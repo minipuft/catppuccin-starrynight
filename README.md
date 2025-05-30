@@ -2,7 +2,7 @@
 
 # 🌙✨ Catppuccin StarryNight
 
-**A mesmerizing Spicetify theme blending Catppuccin's elegance with dynamic starfield effects**
+**A mesmerizing Spicetify theme blending Catppuccin's elegance with dynamic gradient effects**
 
 <!-- Hero image placeholder -->
 
@@ -11,7 +11,7 @@ _The perfect harmony of pastel perfection and cosmic wonder_
 
 [![Spicetify](https://img.shields.io/badge/Spicetify-Theme-1DB954?style=for-the-badge&logo=spotify&logoColor=white)](https://spicetify.app/)
 [![Catppuccin](https://img.shields.io/badge/Catppuccin-Flavored-f5c2e7?style=for-the-badge&logoColor=white)](https://github.com/catppuccin)
-[![Version](https://img.shields.io/badge/Version-2.0-cba6f7?style=for-the-badge)](https://github.com/yourusername/catppuccin-starrynight)
+[![Version](https://img.shields.io/badge/Version-2.0-cba6f7?style=for-the-badge)](https://github.com/minipuft/catppuccin-starrynight)
 [![License](https://img.shields.io/badge/License-MIT-74c7ec?style=for-the-badge)](LICENSE)
 
 </div>
@@ -29,7 +29,6 @@ _The perfect harmony of pastel perfection and cosmic wonder_
 - 🌈 **4 Catppuccin Flavors**: Latte, Frappé, Macchiato, Mocha
 - ⭐ **15 Accent Colors**: Every Catppuccin shade available
 - 🖼️ **Album Art Integration**: Colors that dance with your music
-- ✨ **Shooting Stars**: Subtle cosmic animations
 
 </td>
 <td width="50%">
@@ -75,7 +74,7 @@ _Subtle shooting stars for that cosmic touch_
 
 ```powershell
 # Run this one-liner in PowerShell (Admin not required)
-iwr -useb "https://raw.githubusercontent.com/yourusername/catppuccin-starrynight/main/install.ps1" | iex
+iwr -useb "https://raw.githubusercontent.com/minipuft/catppuccin-starrynight/main/install.ps1" | iex
 ```
 
 ### **Method 2: Manual Setup**
@@ -308,9 +307,9 @@ We'd love your help making this theme even better!
 
 <div align="center">
 
-[![Contributors](https://img.shields.io/github/contributors/yourusername/catppuccin-starrynight?style=for-the-badge&color=cba6f7)](https://github.com/yourusername/catppuccin-starrynight/graphs/contributors)
-[![Issues](https://img.shields.io/github/issues/yourusername/catppuccin-starrynight?style=for-the-badge&color=f38ba8)](https://github.com/yourusername/catppuccin-starrynight/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/yourusername/catppuccin-starrynight?style=for-the-badge&color=a6e3a1)](https://github.com/yourusername/catppuccin-starrynight/pulls)
+[![Contributors](https://img.shields.io/github/contributors/minipuft/catppuccin-starrynight?style=for-the-badge&color=cba6f7)](https://github.com/minipuft/catppuccin-starrynight/graphs/contributors)
+[![Issues](https://img.shields.io/github/issues/minipuft/catppuccin-starrynight?style=for-the-badge&color=f38ba8)](https://github.com/minipuft/catppuccin-starrynight/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/minipuft/catppuccin-starrynight?style=for-the-badge&color=a6e3a1)](https://github.com/minipuft/catppuccin-starrynight/pulls)
 
 </div>
 
@@ -328,8 +327,6 @@ We'd love your help making this theme even better!
 
 ### 🌙 **Sweet dreams and happy listening!** ✨
 
-_Made with 💜 by the Catppuccin StarryNight team_
-
-[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/catppuccin-starrynight&type=Date)](https://star-history.com/#yourusername/catppuccin-starrynight&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=minipuft/catppuccin-starrynight&type=Date)](https://star-history.com/#minipuft/catppuccin-starrynight&Date)
 
 </div>
