@@ -1,0 +1,208 @@
+// StarryNight Typography Module - Phase 4.4: Gradient-Enhanced Typography
+// Simple, focused typography enhancements that build on existing patterns
+
+@use "mixins" as *;
+
+// PHASE 4.4: Simplified Typography Enhancement Variables
+// =============================================================================
+
+:root {
+  // Basic typography enhancement intensities
+  --text-gradient-intensity: 0.8;
+  --text-hover-brightness: 1.1;
+  --text-transition: 0.3s ease-out;
+}
+
+// PHASE 4.4: Simplified Typography Mixins (following existing patterns)
+// =============================================================================
+
+// Simple text gradient using existing text-gradient mixin
+@mixin text-gradient-simple($intensity: var(--text-gradient-intensity)) {
+  @include text-gradient(
+    rgba(var(--spice-rgb-accent), $intensity),
+    rgba(var(--spice-rgb-subtext), calc($intensity * 0.7))
+  );
+
+  // Wrap in & {} to avoid mixed-decls warning
+  & {
+    transition: all var(--text-transition);
+  }
+}
+
+// Simple hover enhancement (fixing mixed-decls issue)
+@mixin text-hover-simple {
+  // Wrap all declarations in & {} to avoid mixed-decls warnings
+  & {
+    transition: all var(--text-transition);
+  }
+
+  &:hover {
+    filter: brightness(var(--text-hover-brightness));
+    transform: translateY(-0.5px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(var(--spice-rgb-accent), 0.6);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+}
+
+// PHASE 4.4: Simple Typography Enhancements
+// =============================================================================
+
+// Enhanced headings (simple approach)
+.main-type-ballad,
+.main-type-canon,
+.main-entityHeader-title {
+  @include text-gradient-simple(0.9);
+  @include text-hover-simple;
+}
+
+// Enhanced secondary text
+.main-type-alto,
+.main-type-mestoBold {
+  @include text-gradient-simple(0.7);
+
+  &:hover {
+    filter: brightness(1.05);
+    transition: filter var(--text-transition);
+  }
+}
+
+// Enhanced navigation text
+.spicetify-playlist-list li span,
+.main-navBar-navBarLink span {
+  @include text-gradient-simple(0.6);
+  @include text-hover-simple;
+
+  // Active state
+  .main-navBar-navBarLinkActive &,
+  li[aria-selected="true"] & {
+    @include text-gradient-simple(1);
+  }
+}
+
+// Enhanced track titles
+.main-trackList-trackListRow .main-type-ballad {
+  @include text-gradient-simple(0.8);
+  @include text-hover-simple;
+
+  // Currently playing enhancement
+  &:has(.main-trackList-playingIcon) {
+    @include text-gradient-simple(1.1);
+  }
+}
+
+// Enhanced button text
+.main-playButton-PlayButton,
+.main-shuffleButton-button {
+  span {
+    @include text-gradient-simple(1);
+    @include text-hover-simple;
+  }
+}
+
+// Enhanced card text
+.main-card-card {
+  .main-cardHeader-text {
+    @include text-gradient-simple(0.7);
+    @include text-hover-simple;
+  }
+
+  .main-card-cardMetadata {
+    color: var(--spice-subtext);
+
+    &:hover {
+      filter: brightness(1.1);
+      transition: filter var(--text-transition);
+    }
+  }
+}
+
+// Enhanced now playing text
+.Root__now-playing-bar {
+  .main-trackInfo-name {
+    @include text-gradient-simple(1);
+    @include text-hover-simple;
+  }
+
+  .main-trackInfo-artists {
+    @include text-gradient-simple(0.8);
+
+    a {
+      @include text-hover-simple;
+    }
+  }
+}
+
+// Enhanced search input
+.x-searchInput-searchInputInput {
+  @include text-gradient-simple(0.8);
+
+  &::placeholder {
+    color: var(--spice-subtext);
+    opacity: 0.7;
+  }
+
+  &:focus {
+    @include text-gradient-simple(1);
+  }
+}
+
+// PHASE 4.4: Accessibility & Performance Optimizations
+// =============================================================================
+
+// High contrast support
+@media (prefers-contrast: high) {
+  :root {
+    --text-gradient-intensity: 1.2;
+    --text-hover-brightness: 1.3;
+  }
+
+  // Enhanced contrast for gradient text
+  .main-type-ballad,
+  .main-type-canon,
+  .main-type-alto {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+    @supports not (background-clip: text) {
+      color: var(--spice-text) !important;
+      font-weight: 600;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .main-type-ballad,
+  .main-type-canon,
+  .main-type-alto,
+  .main-type-mestoBold,
+  .spicetify-playlist-list li span,
+  .main-trackList-trackListRow span {
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+
+    &:hover {
+      transform: none !important;
+      filter: none !important;
+    }
+  }
+}
+
+// Mobile optimizations
+@media (max-width: 768px) {
+  :root {
+    --text-gradient-intensity: 0.6;
+    --text-hover-brightness: 1.05;
+    --text-transition: 0.2s ease-out;
+  }
+
+  // Simplified mobile typography
+  .main-type-ballad,
+  .main-type-canon {
+    font-size: clamp(1.1rem, 4vw, 1.8rem);
+  }
+}

@@ -1,0 +1,410 @@
+// StarryNight Atmospheric Module - Phase 4.5: Atmospheric Main Feed
+// Creates floating content grids and enhanced spatial layouts for a futuristic feel
+
+@use "mixins" as *;
+
+// PHASE 4.5: Atmospheric Enhancement Variables
+// =============================================================================
+
+:root {
+  // Atmospheric spacing and layout
+  --atmospheric-gap: 1.5rem;
+  --atmospheric-hover-lift: 4px;
+  --atmospheric-transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Ambient animation intensities
+  --ambient-float-range: 8px;
+  --ambient-duration: 12s;
+  --ambient-delay-step: 0.8s;
+
+  // Grid flow enhancements
+  --grid-stagger-delay: 0.1s;
+  --grid-item-scale: 1.02;
+}
+
+// PHASE 4.5: Atmospheric Layout Mixins
+// =============================================================================
+
+// Keyframes definitions (must be outside mixins to avoid mixed-decls warnings)
+@keyframes atmospheric-float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(calc(-0.3 * var(--ambient-float-range)))
+      rotate(0.5deg);
+  }
+  50% {
+    transform: translateY(calc(-0.7 * var(--ambient-float-range))) rotate(0deg);
+  }
+  75% {
+    transform: translateY(calc(-0.4 * var(--ambient-float-range)))
+      rotate(-0.3deg);
+  }
+}
+
+@keyframes stagger-fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Floating grid container
+@mixin atmospheric-grid {
+  @include performance-optimized;
+
+  & {
+    display: grid;
+    gap: var(--atmospheric-gap);
+    transition: all var(--atmospheric-transition);
+  }
+
+  // Enhanced grid flow
+  &:hover {
+    gap: calc(var(--atmospheric-gap) * 1.1);
+  }
+}
+
+// Floating grid item with ambient animation
+@mixin atmospheric-item($delay: 0s) {
+  // All CSS declarations first
+  transition: all var(--atmospheric-transition);
+  animation: atmospheric-float var(--ambient-duration) ease-in-out infinite;
+  animation-delay: $delay;
+
+  // Now include mixins that may have nested rules
+  @include performance-optimized;
+  @include glassmorphism-dynamic;
+
+  &:hover {
+    transform: translateY(calc(-1 * var(--atmospheric-hover-lift)))
+      scale(var(--grid-item-scale));
+
+    // CSS custom properties for hover state
+    --glass-blur: 25px;
+    --glass-saturation: 1.4;
+    --glass-opacity: 0.15;
+  }
+}
+
+// Staggered grid animation
+@mixin staggered-reveal($total-items: 6) {
+  @for $i from 1 through $total-items {
+    &:nth-child(#{$i}) {
+      animation-delay: calc(#{$i - 1} * var(--grid-stagger-delay));
+
+      &.loading {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: stagger-fade-in 0.8s ease-out forwards;
+        animation-delay: calc(#{$i - 1} * var(--grid-stagger-delay));
+      }
+    }
+  }
+}
+
+// PHASE 4.5: Enhanced Main Feed Layout
+// =============================================================================
+
+// Enhanced home page grid
+.main-home-content,
+.main-gridContainer-gridContainer {
+  @include atmospheric-grid;
+
+  // Enhanced grid items
+  > div,
+  > section {
+    @include atmospheric-item;
+    @include staggered-reveal(8);
+  }
+
+  // Specific enhancements for different content types
+  .main-card-card {
+    @include atmospheric-item(var(--grid-stagger-delay));
+
+    &:hover {
+      --sn-gradient-primary: var(--spice-accent);
+      --sn-gradient-secondary: var(--spice-subtext);
+    }
+  }
+}
+
+// Enhanced playlist and artist grids
+.main-gridContainer-gridContainer {
+  &[data-testid*="grid"] {
+    @include atmospheric-grid;
+
+    .main-card-card {
+      @include atmospheric-item;
+      @include card-state-base;
+
+      // Context-aware floating
+      &:nth-child(even) {
+        animation-delay: var(--grid-stagger-delay);
+      }
+
+      &:nth-child(3n) {
+        animation-delay: calc(2 * var(--grid-stagger-delay));
+      }
+    }
+  }
+}
+
+// PHASE 4.5: Enhanced Search Results Layout
+// =============================================================================
+
+// Atmospheric search results
+.main-searchPage-content {
+  .main-gridContainer-gridContainer {
+    @include atmospheric-grid;
+
+    .main-card-card {
+      @include atmospheric-item(calc(var(--grid-stagger-delay) * 0.5));
+
+      &:hover {
+        @include context-gradient-zone("search");
+      }
+    }
+  }
+
+  // Enhanced search categories
+  .main-shelf-shelf {
+    .main-gridContainer-gridContainer {
+      @include atmospheric-grid;
+      gap: calc(var(--atmospheric-gap) * 0.8);
+
+      .main-card-card {
+        @include atmospheric-item(calc(var(--grid-stagger-delay) * 0.3));
+      }
+    }
+  }
+}
+
+// PHASE 4.5: Enhanced Track Lists and Tables
+// =============================================================================
+
+// Floating track rows
+.main-trackList-trackListContentWrapper {
+  .main-trackList-trackListRow {
+    // CSS declarations first
+    transition: all var(--atmospheric-transition);
+    border-radius: 8px;
+    margin: 2px 0;
+    background: rgba(var(--spice-rgb-surface0), 0.3);
+
+    // Then includes
+    @include performance-optimized;
+
+    &:hover {
+      @include glassmorphism(15px, 0.1, 1.2);
+      transform: translateX(4px) scale(1.005);
+      background: rgba(var(--spice-rgb-surface1), 0.4);
+    }
+
+    // Staggered hover effects
+    @include staggered-reveal(20);
+
+    // Currently playing enhancement
+    &.main-trackList-selected,
+    &:has(.main-trackList-playingIcon) {
+      @include glassmorphism(20px, 0.15, 1.3);
+      background: linear-gradient(
+        135deg,
+        rgba(var(--spice-rgb-accent), 0.1) 0%,
+        rgba(var(--spice-rgb-surface1), 0.2) 100%
+      );
+      border: 1px solid rgba(var(--spice-rgb-accent), 0.3);
+    }
+  }
+}
+
+// PHASE 4.5: Enhanced Sidebar and Navigation
+// =============================================================================
+
+// Atmospheric playlist sidebar
+.main-yourLibrary-yourLibrary {
+  .main-rootlist-wrapper {
+    .spicetify-playlist-list {
+      li {
+        // CSS declarations first
+        transition: all var(--atmospheric-transition);
+        border-radius: 6px;
+        margin: 1px 0;
+
+        // Then includes
+        @include performance-optimized;
+
+        &:hover {
+          @include glassmorphism(12px, 0.08, 1.1);
+          transform: translateX(2px);
+          background: rgba(var(--spice-rgb-surface1), 0.3);
+        }
+
+        // Active playlist enhancement
+        &[aria-selected="true"],
+        &.main-rootlist-rootlistItemActive {
+          @include glassmorphism(18px, 0.12, 1.2);
+          background: linear-gradient(
+            90deg,
+            rgba(var(--spice-rgb-accent), 0.15) 0%,
+            rgba(var(--spice-rgb-surface1), 0.1) 100%
+          );
+          border-left: 3px solid var(--spice-accent);
+        }
+      }
+    }
+  }
+}
+
+// Enhanced navigation bar
+.main-navBar-navBar {
+  .main-navBar-navBarLink {
+    // CSS declarations first
+    transition: all var(--atmospheric-transition);
+    border-radius: 8px;
+    margin: 2px;
+
+    // Then includes
+    @include performance-optimized;
+
+    &:hover {
+      @include glassmorphism(15px, 0.1, 1.15);
+      transform: translateY(-1px);
+    }
+
+    &.main-navBar-navBarLinkActive {
+      @include glassmorphism(20px, 0.15, 1.25);
+      background: linear-gradient(
+        135deg,
+        rgba(var(--spice-rgb-accent), 0.2) 0%,
+        rgba(var(--spice-rgb-surface1), 0.1) 100%
+      );
+    }
+  }
+}
+
+// PHASE 4.5: Enhanced Now Playing Bar
+// =============================================================================
+
+// Atmospheric now playing bar
+.Root__now-playing-bar {
+  // CSS custom properties first
+  --glass-blur: 30px;
+  --glass-saturation: 1.3;
+  --glass-opacity: 0.2;
+  transition: all var(--atmospheric-transition);
+
+  // Then includes
+  @include performance-optimized;
+  @include glassmorphism-dynamic;
+
+  &:hover {
+    --glass-blur: 35px;
+    --glass-saturation: 1.5;
+    --glass-opacity: 0.25;
+  }
+
+  // Enhanced track info
+  .main-trackInfo-container {
+    .main-trackInfo-name,
+    .main-trackInfo-artists {
+      transition: all var(--atmospheric-transition);
+
+      &:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.1);
+      }
+    }
+  }
+
+  // Enhanced controls
+  .main-playPauseButton-button,
+  .main-skipButton-button,
+  .main-shuffleButton-button {
+    // CSS declarations first
+    transition: all var(--atmospheric-transition);
+    border-radius: 50%;
+
+    // Then includes
+    @include performance-optimized;
+
+    &:hover {
+      @include glassmorphism(20px, 0.15, 1.2);
+      transform: scale(1.05) translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+// PHASE 4.5: Accessibility and Performance Optimizations
+// =============================================================================
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  // Disable atmospheric animations
+  * {
+    animation: none !important;
+
+    &:hover {
+      transform: none !important;
+    }
+  }
+
+  :root {
+    --atmospheric-transition: 0.1s ease;
+    --ambient-duration: 0s;
+    --grid-stagger-delay: 0s;
+  }
+}
+
+// Mobile atmospheric optimizations
+@media (max-width: 768px) {
+  :root {
+    --atmospheric-gap: 1rem;
+    --atmospheric-hover-lift: 2px;
+    --atmospheric-transition: 0.3s ease;
+    --ambient-float-range: 4px;
+    --grid-item-scale: 1.01;
+  }
+
+  // Simplified mobile animations
+  .main-card-card,
+  .main-trackList-trackListRow {
+    &:hover {
+      transform: none;
+    }
+  }
+
+  // Disable glassmorphism on mobile for performance
+  .main-card-card,
+  .main-trackList-trackListRow,
+  .main-navBar-navBarLink {
+    backdrop-filter: none;
+    background: rgba(var(--spice-rgb-surface0), 0.8) !important;
+  }
+}
+
+// High performance mode
+@media (prefers-reduced-motion: reduce) and (max-width: 768px) {
+  // Ultra-simplified for low-end mobile devices
+  .main-card-card,
+  .main-trackList-trackListRow,
+  .main-navBar-navBarLink,
+  .Root__now-playing-bar {
+    backdrop-filter: none !important;
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+
+    &:hover {
+      backdrop-filter: none !important;
+      transform: none !important;
+      filter: brightness(1.05);
+    }
+  }
+}

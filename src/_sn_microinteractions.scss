@@ -1,0 +1,298 @@
+// StarryNight Microinteractions Module - Phase 4.1: Gradient Intelligence
+// Adds intelligent gradient microinteractions that enhance existing card and playlist systems
+
+@use "mixins" as *;
+
+// PHASE 4.1: CSS Custom Properties for Microinteractions
+// =============================================================================
+
+:root {
+  // Phase 4 Microinteraction Variables (extends existing gradient system)
+  --ripple-color: var(--sn-gradient-primary);
+  --ripple-duration: var(--sn-gradient-transition);
+  --ripple-intensity: 0.3;
+  --interaction-feedback-delay: 0.1s;
+
+  // Microinteraction timing (coordinates with existing transitions)
+  --micro-fast: 0.15s;
+  --micro-medium: 0.3s;
+  --micro-slow: 0.6s;
+
+  // Feedback intensity levels
+  --feedback-subtle: 0.1;
+  --feedback-moderate: 0.2;
+  --feedback-prominent: 0.3;
+}
+
+// PHASE 4.1: Enhanced Card Microinteractions
+// =============================================================================
+
+// Enhance existing main-card-card with gradient ripples (builds on _sn_enhanced_cards.scss)
+.main-card-card {
+  // Apply gradient ripple to existing card system
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-accent), var(--feedback-moderate))
+  );
+
+  // Enhanced hover glow that coordinates with existing hover effects
+  @include gradient-glow(var(--sn-gradient-primary), var(--feedback-subtle));
+
+  // Enhance existing play button interaction
+  .main-card-PlayButtonContainer,
+  .main-playButton-PlayButton {
+    @include interaction-feedback(1.05, true);
+
+    // Override ripple color for play buttons
+    --ripple-color: var(--spice-accent);
+    --ripple-intensity: var(--feedback-prominent);
+  }
+}
+
+// PHASE 4.1: Playlist Navigation Microinteractions
+// =============================================================================
+
+// Enhance existing playlist items (builds on _navbar.scss)
+.spicetify-playlist-list li {
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-surface1), var(--feedback-moderate))
+  );
+
+  // Enhanced hover state that builds on existing hover background
+  &:hover {
+    // Preserve existing hover background color
+    background-color: var(--spice-main);
+
+    // Add gradient overlay for enhanced depth
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(var(--spice-rgb-accent), 0.05) 0%,
+        rgba(var(--spice-rgb-accent), 0.1) 50%,
+        rgba(var(--spice-rgb-accent), 0.05) 100%
+      );
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 1;
+    }
+  }
+
+  // Enhanced focus state for accessibility
+  &:focus-visible {
+    outline: 2px solid rgba(var(--spice-rgb-accent), 0.6);
+    outline-offset: 2px;
+  }
+}
+
+// PHASE 4.1: Navigation Button Enhancements
+// =============================================================================
+
+// Enhance existing create playlist button
+.main-createPlaylistButton-button {
+  @include interaction-feedback(1.02, true);
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-accent), var(--feedback-moderate))
+  );
+
+  // Coordinate with existing button styling
+  border-radius: 6px;
+
+  &:hover {
+    // Enhanced glow effect
+    box-shadow: 0 0 12px rgba(var(--spice-rgb-accent), 0.3);
+  }
+}
+
+// Enhance existing nav bar links
+.main-navBar-navBarLink {
+  @include interaction-feedback(1.01, false);
+  border-radius: 4px;
+
+  // Subtle ripple for navigation
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-surface1), var(--feedback-subtle))
+  );
+}
+
+// PHASE 4.1: Control Button Enhancements
+// =============================================================================
+
+// Enhance existing shuffle and control buttons (builds on _now_playing.scss)
+.main-shuffleButton-button,
+.main-skipForwardButton-button,
+.main-skipBackButton-button {
+  @include interaction-feedback(1.05, true);
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-accent), var(--feedback-moderate))
+  );
+
+  // Enhanced active state for shuffle button
+  &.main-shuffleButton-active {
+    --ripple-color: var(--spice-accent);
+
+    // Enhanced glow for active state
+    box-shadow: 0 0 8px rgba(var(--spice-rgb-accent), 0.4);
+  }
+}
+
+// Enhanced main play button
+.main-playButton-PlayButton.main-playButton-primary {
+  @include interaction-feedback(1.08, true);
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-accent), var(--feedback-prominent))
+  );
+
+  // Prominent glow effect
+  &:hover {
+    box-shadow: 0 0 16px rgba(var(--spice-rgb-accent), 0.5);
+  }
+}
+
+// PHASE 4.1: Search and Filter Enhancements
+// =============================================================================
+
+// Enhance filter and search inputs
+.x-filterBox-filterInput {
+  @include interaction-feedback(1.01, false);
+  border-radius: 6px;
+
+  &:focus {
+    // Enhanced focus glow
+    box-shadow: 0 0 8px rgba(var(--spice-rgb-accent), 0.3);
+    border-color: rgba(var(--spice-rgb-accent), 0.6);
+  }
+}
+
+// Enhance dropdown interactions
+.main-dropDown-dropDown {
+  @include interaction-feedback(1.01, false);
+
+  &:focus {
+    box-shadow: 0 0 6px rgba(var(--spice-rgb-accent), 0.2);
+  }
+}
+
+// PHASE 4.1: Track List Microinteractions
+// =============================================================================
+
+// Track list playing icon enhancement
+.main-trackList-playingIcon {
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-accent), var(--feedback-moderate))
+  );
+  border-radius: 4px;
+
+  // Animated glow for playing track
+  &::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(
+      45deg,
+      rgba(var(--spice-rgb-accent), 0.2) 0%,
+      transparent 50%,
+      rgba(var(--spice-rgb-accent), 0.2) 100%
+    );
+    border-radius: inherit;
+    z-index: -1;
+    animation: playing-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes playing-glow {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+}
+
+// PHASE 4.1: Context Menu Enhancement
+// =============================================================================
+
+// Enhance existing context menu buttons
+.main-contextMenu-menuItemButton {
+  @include interaction-feedback(1.02, false);
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-surface1), var(--feedback-subtle))
+  );
+
+  border-radius: 4px;
+
+  &:hover {
+    // Subtle gradient background
+    background: linear-gradient(
+      90deg,
+      rgba(var(--spice-rgb-surface1), 0.8) 0%,
+      rgba(var(--spice-rgb-surface2), 0.6) 100%
+    );
+  }
+}
+
+// PHASE 4.1: Responsive and Accessibility Enhancements
+// =============================================================================
+
+// Mobile optimizations for microinteractions
+@media (max-width: 768px) {
+  :root {
+    --ripple-intensity: var(--feedback-subtle); // Reduce intensity on mobile
+    --interaction-feedback-delay: 0.05s; // Faster feedback on touch
+  }
+
+  // Simplify ripples on mobile for performance
+  .main-card-card,
+  .spicetify-playlist-list li {
+    &::after {
+      // Smaller ripple scale for mobile
+      transform: translate(-50%, -50%) scale(0);
+    }
+
+    &:active::after {
+      transform: translate(-50%, -50%) scale(15); // Reduced from 20
+    }
+  }
+}
+
+// Reduced motion preferences
+@media (prefers-reduced-motion: reduce) {
+  .main-card-card,
+  .spicetify-playlist-list li,
+  .main-createPlaylistButton-button,
+  .main-shuffleButton-button,
+  .main-playButton-PlayButton {
+    // Keep only opacity transitions (moved above nested rules)
+    transition: opacity var(--micro-medium) ease,
+      background-color var(--micro-medium) ease;
+
+    // Disable ripple animations
+    &::after {
+      display: none;
+    }
+
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  :root {
+    --ripple-intensity: var(--feedback-prominent); // Increase visibility
+    --feedback-subtle: 0.2;
+    --feedback-moderate: 0.4;
+    --feedback-prominent: 0.6;
+  }
+}

@@ -1,0 +1,496 @@
+// StarryNight Shared Mixins
+// Common SCSS mixins used across StarryNight modules
+
+// Performance optimization mixin for hardware acceleration
+@mixin hardware-accelerated {
+  will-change: transform, opacity, filter;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+// Animation base mixin for smooth transitions
+@mixin smooth-transition($duration: 0.8s, $timing: ease-in-out) {
+  transition: all $duration $timing;
+}
+
+// Container optimization for performance
+@mixin contain-optimized {
+  contain: layout style paint;
+}
+
+// Combined performance optimizations
+@mixin performance-optimized {
+  @include hardware-accelerated;
+  @include contain-optimized;
+}
+
+// PHASE 1: Glassmorphism Foundation Mixins
+// =============================================================================
+
+// Core glassmorphism effect with performance optimization
+@mixin glassmorphism($blur: 20px, $opacity: 0.1, $saturation: 1.2) {
+  // Main glassmorphism properties first
+  backdrop-filter: blur($blur) saturate($saturation);
+  -webkit-backdrop-filter: blur($blur) saturate($saturation); // Safari support
+  background: rgba(255, 255, 255, $opacity);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  // Integrate with existing hardware acceleration
+  @include hardware-accelerated;
+
+  // Graceful fallback for unsupported browsers (nested rule comes last)
+  @supports not (backdrop-filter: blur(1px)) {
+    background: rgba(var(--spice-rgb-surface0), calc($opacity * 2));
+    border: 1px solid rgba(var(--spice-rgb-surface1), 0.3);
+  }
+}
+
+// Dynamic glassmorphism using CSS variables (integrates with existing gradient system)
+@mixin glassmorphism-dynamic {
+  // ALL CSS declarations first, before any nested rules
+  backdrop-filter: blur(var(--glass-blur, 20px))
+    saturate(var(--glass-saturation, 1.2))
+    brightness(var(--glass-brightness, 1.1));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 20px))
+    saturate(var(--glass-saturation, 1.2))
+    brightness(var(--glass-brightness, 1.1));
+  background: var(--glass-background, rgba(255, 255, 255, 0.1));
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.2));
+  transition: all var(--sn-gradient-transition, 0.8s ease-in-out);
+
+  // Include performance optimizations (these don't contain nested rules)
+  @include performance-optimized;
+
+  // Enhanced fallback using existing Catppuccin variables (nested rule comes last)
+  @supports not (backdrop-filter: blur(1px)) {
+    background: rgba(
+      var(--spice-rgb-surface0),
+      var(--glass-opacity-fallback, 0.2)
+    );
+    border: 1px solid rgba(var(--spice-rgb-surface1), 0.3);
+  }
+}
+
+// Layered glassmorphism for depth effects
+@mixin glassmorphism-layered($layer: 1) {
+  @if $layer == 1 {
+    z-index: 1;
+    @include glassmorphism(15px, 0.08, 1.1);
+  } @else if $layer == 2 {
+    z-index: 2;
+    @include glassmorphism(25px, 0.12, 1.3);
+  } @else if $layer == 3 {
+    z-index: 3;
+    @include glassmorphism(35px, 0.15, 1.5);
+  }
+}
+
+// PHASE 2: 3D Transition Infrastructure
+// =============================================================================
+
+// Enhanced transition system for card interactions
+@mixin card-transition($duration: 0.4s, $timing: cubic-bezier(0.4, 0, 0.2, 1)) {
+  transition: transform $duration $timing, box-shadow $duration $timing,
+    background-color $duration $timing, backdrop-filter $duration $timing,
+    opacity $duration $timing;
+}
+
+// 3D transform preparation (preparing for Phase 3)
+@mixin transform-3d-prep {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  backface-visibility: hidden;
+}
+
+// Enhanced hover lift effect for cards
+@mixin card-hover-lift($lift: 8px, $shadow-blur: 24px) {
+  transform: translateY(-#{$lift}) translateZ(0);
+  box-shadow: 0 #{$shadow-blur} #{$shadow-blur * 2} rgba(0, 0, 0, 0.15),
+    0 #{$lift} #{$shadow-blur} rgba(0, 0, 0, 0.1);
+}
+
+// Interactive element scaling
+@mixin interactive-scale($scale: 1.02) {
+  transform: scale($scale) translateZ(0);
+}
+
+// Advanced card states system
+@mixin card-state-base {
+  // ALL CSS declarations must come first, before any @include or nested rules
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  backface-visibility: hidden;
+
+  // Now include mixins that may contain nested rules
+  @include performance-optimized;
+  @include card-transition;
+
+  // Interactive state indicators
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      transparent 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
+// PHASE 3: 3D Morphing & Advanced Transform Systems
+// =============================================================================
+
+// True 3D perspective container
+@mixin perspective-container($perspective: 1200px) {
+  perspective: $perspective;
+  perspective-origin: center center;
+  transform-style: preserve-3d;
+}
+
+// 3D card transform with rotation and depth
+@mixin card-3d-transform(
+  $rotateX: 0deg,
+  $rotateY: 0deg,
+  $translateZ: 0px,
+  $scale: 1
+) {
+  transform: perspective(1200px) rotateX($rotateX) rotateY($rotateY)
+    translateZ($translateZ) scale($scale);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+// Morphing animation system for card state changes
+@mixin morphing-transition(
+  $duration: 0.8s,
+  $timing: cubic-bezier(0.25, 0.46, 0.45, 0.94)
+) {
+  transition: transform $duration $timing, background $duration $timing,
+    backdrop-filter $duration $timing, box-shadow $duration $timing,
+    border-radius $duration $timing, opacity $duration $timing;
+}
+
+// Interactive 3D hover effect with mouse tracking
+@mixin interactive-3d-hover($max-rotate: 15deg, $depth: 50px) {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  &:hover {
+    transform-style: preserve-3d;
+    // Base 3D state - JavaScript will override with mouse position
+    transform: perspective(1200px)
+      rotateX(calc(var(--mouse-y, 0) * #{$max-rotate}))
+      rotateY(calc(var(--mouse-x, 0) * #{$max-rotate})) translateZ($depth);
+  }
+}
+
+// Layered depth system for complex 3D scenes
+@mixin depth-layer($layer: 1) {
+  @if $layer == 1 {
+    transform: translateZ(10px);
+    z-index: 1;
+  } @else if $layer == 2 {
+    transform: translateZ(20px);
+    z-index: 2;
+  } @else if $layer == 3 {
+    transform: translateZ(40px);
+    z-index: 3;
+  } @else if $layer == 4 {
+    transform: translateZ(60px);
+    z-index: 4;
+  } @else if $layer == 5 {
+    transform: translateZ(80px);
+    z-index: 5;
+  }
+}
+
+// Card morphing states (for different card layouts)
+@mixin card-morph-state($state: "default") {
+  @if $state == "expanded" {
+    transform: scale(1.05) rotateY(5deg) translateZ(30px);
+    border-radius: 20px;
+  } @else if $state == "compact" {
+    transform: scale(0.95) rotateX(-5deg) translateZ(-10px);
+    border-radius: 8px;
+  } @else if $state == "focused" {
+    transform: scale(1.02) rotateY(-2deg) translateZ(40px);
+    border-radius: 16px;
+  } @else {
+    // default state
+    transform: scale(1) rotateX(0deg) rotateY(0deg) translateZ(0px);
+    border-radius: var(--card-border-radius, 12px);
+  }
+}
+
+// 3D floating animation for ambient effects
+@mixin floating-3d($duration: 6s) {
+  animation: floating-3d $duration ease-in-out infinite;
+
+  @keyframes floating-3d {
+    0%,
+    100% {
+      transform: translateZ(0px) rotateX(0deg) rotateY(0deg);
+    }
+    25% {
+      transform: translateZ(10px) rotateX(2deg) rotateY(-1deg);
+    }
+    50% {
+      transform: translateZ(15px) rotateX(-1deg) rotateY(2deg);
+    }
+    75% {
+      transform: translateZ(5px) rotateX(1deg) rotateY(-2deg);
+    }
+  }
+}
+
+// Advanced shadow system for 3D depth
+@mixin shadow-3d($depth: 1) {
+  @if $depth == 1 {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.05);
+  } @else if $depth == 2 {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), 0 16px 32px rgba(0, 0, 0, 0.1),
+      0 32px 64px rgba(0, 0, 0, 0.05);
+  } @else if $depth == 3 {
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2), 0 32px 64px rgba(0, 0, 0, 0.15),
+      0 64px 128px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// PHASE 4: Advanced Gradient Intelligence Mixins
+// =============================================================================
+
+// Enhanced gradient ripple effect (builds on existing card-state-base)
+@mixin gradient-ripple(
+  $color: var(--ripple-color),
+  $intensity: var(--ripple-intensity)
+) {
+  @include performance-optimized; // Use existing performance mixin
+  @include card-transition(0.2s); // Use existing transition system
+
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(var(--spice-rgb-accent), $intensity) 0%,
+      rgba(var(--spice-rgb-accent), calc($intensity * 0.5)) 30%,
+      transparent 70%
+    );
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2;
+    transition: all var(--ripple-duration, 0.4s) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &:active::after {
+    transform: translate(-50%, -50%) scale(20);
+    opacity: 1;
+    transition-duration: 0s;
+  }
+}
+
+// Subtle gradient glow for hover states
+@mixin gradient-glow($color: var(--sn-gradient-primary), $intensity: 0.2) {
+  @include performance-optimized;
+
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--spice-rgb-accent), $intensity) 0%,
+      transparent 40%,
+      transparent 60%,
+      rgba(var(--spice-rgb-accent), calc($intensity * 0.7)) 100%
+    );
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity var(--sn-gradient-transition, 0.8s ease-in-out);
+    pointer-events: none;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
+// Interactive feedback for buttons and controls
+@mixin interaction-feedback($scale: 1.02, $glow: true) {
+  @include card-transition(0.2s);
+
+  &:hover {
+    @include interactive-scale($scale);
+
+    @if $glow {
+      @include gradient-glow();
+    }
+  }
+
+  &:active {
+    transform: scale(0.98);
+    transition-duration: 0.1s;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(var(--spice-rgb-accent), 0.8);
+    outline-offset: 2px;
+  }
+}
+
+// Advanced performance animation (CPU/GPU optimized with fallbacks)
+@mixin performance-animation(
+  $property,
+  $duration,
+  $easing: ease-in-out,
+  $delay: 0s
+) {
+  @include hardware-accelerated;
+  transition: #{$property} #{$duration} #{$easing} #{$delay};
+
+  // GPU optimization for complex transforms
+  @if index($property, transform) {
+    will-change: transform;
+  }
+
+  // Disable on reduced motion
+  @media (prefers-reduced-motion: reduce) {
+    transition: #{$property} calc(#{$duration} * 0.3) ease #{$delay};
+  }
+}
+
+// PHASE 4.2: Context-Aware Gradient Zone System
+// =============================================================================
+
+// Context-aware gradient zone mixin (builds on existing gradient system)
+@mixin context-gradient-zone($context: "default") {
+  @include performance-optimized;
+  position: relative;
+
+  @if $context == "playlist" {
+    --sn-gradient-primary: var(--zone-playlist-primary);
+    --sn-gradient-secondary: var(--zone-playlist-secondary);
+    --sn-current-intensity: var(--zone-intensity-playback);
+  } @else if $context == "artist" {
+    --sn-gradient-primary: var(--zone-artist-primary);
+    --sn-gradient-secondary: var(--zone-artist-secondary);
+    --sn-current-intensity: var(--zone-intensity-discovery);
+  } @else if $context == "search" {
+    --sn-gradient-primary: var(--zone-search-primary);
+    --sn-gradient-secondary: var(--zone-search-secondary);
+    --sn-current-intensity: var(--zone-intensity-focused);
+  } @else if $context == "home" {
+    --sn-gradient-primary: var(--zone-home-primary);
+    --sn-gradient-secondary: var(--zone-home-secondary);
+    --sn-current-intensity: var(--zone-intensity-relaxed);
+  } @else if $context == "discovery" {
+    --sn-gradient-primary: var(--zone-artist-primary);
+    --sn-gradient-secondary: var(--zone-artist-secondary);
+    --sn-current-intensity: var(--zone-intensity-discovery);
+  } @else if $context == "playback" {
+    --sn-gradient-primary: var(--zone-playlist-primary);
+    --sn-gradient-secondary: var(--zone-playlist-secondary);
+    --sn-current-intensity: var(--zone-intensity-playback);
+  } @else {
+    --sn-gradient-primary: var(--spice-accent);
+    --sn-gradient-secondary: var(--spice-subtext);
+    --sn-current-intensity: 1;
+  }
+
+  // Smooth context transitions (builds on existing smooth-transition)
+  transition: background-color var(--zone-transition-medium) ease-in-out,
+    border-color var(--zone-transition-medium) ease-in-out,
+    box-shadow var(--zone-transition-medium) ease-in-out;
+}
+
+// Contextual ripple effect (extends gradient-ripple for context awareness)
+@mixin context-ripple($context: "default", $intensity: 1) {
+  @include context-gradient-zone($context);
+  @include gradient-ripple(var(--sn-gradient-primary), $intensity);
+
+  &::after {
+    background: radial-gradient(
+      circle,
+      rgba(var(--spice-rgb-primary), calc(0.3 * var(--sn-current-intensity))) 0%,
+      rgba(var(--spice-rgb-primary), calc(0.1 * var(--sn-current-intensity)))
+        30%,
+      transparent 70%
+    );
+  }
+}
+
+// Skeleton loading with gradient shimmer
+@mixin skeleton-gradient($width: 100%, $height: 20px) {
+  @include performance-optimized;
+
+  width: $width;
+  height: $height;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--sn-gradient-secondary, var(--spice-surface0)) 0%,
+    var(--sn-gradient-accent, var(--spice-surface1)) 50%,
+    var(--sn-gradient-secondary, var(--spice-surface0)) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+
+  @keyframes skeleton-shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+}
+
+// Enhanced text gradient with fallback
+@mixin text-gradient(
+  $start: var(--sn-gradient-primary),
+  $end: var(--sn-gradient-accent)
+) {
+  // Move all declarations before nested rules
+  background: linear-gradient(135deg, $start 0%, $end 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+  // Robust fallback for unsupported browsers
+  @supports not (background-clip: text) {
+    color: var(--spice-text);
+    background: none;
+    -webkit-text-fill-color: unset;
+  }
+}

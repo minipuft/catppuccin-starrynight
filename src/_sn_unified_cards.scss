@@ -1,0 +1,29 @@
+// Single source of truth for card styling
+.main-card-card {
+  // Base properties (from enhanced cards)
+  border-radius: var(--card-border-radius);
+  @include card-state-base;
+
+  // Glass effects (from glassmorphism)
+  @include glassmorphism-dynamic;
+
+  // Interactive feedback (from microinteractions)
+  @include gradient-ripple;
+
+  // 3D capabilities (from 3D morphing)
+  @include interactive-3d-hover;
+
+  // Typography enhancements
+  @include text-gradient-simple;
+
+  &:hover {
+    // UNIFIED hover that combines all effects
+    backdrop-filter: blur(calc(var(--glass-blur) * 1.2))
+      saturate(calc(var(--glass-saturation) * 1.1));
+    transform: perspective(var(--perspective-distance))
+      rotateX(calc(var(--mouse-y, 0) * var(--max-rotate-x)))
+      rotateY(calc(var(--mouse-x, 0) * var(--max-rotate-y)))
+      translateZ(var(--depth-hover)) scale(var(--grid-item-scale));
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+}

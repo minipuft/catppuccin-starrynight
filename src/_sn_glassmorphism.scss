@@ -1,0 +1,178 @@
+// StarryNight Glassmorphism Module - Advanced glass effects for Year 3000 UI
+@use "mixins" as *;
+
+// CSS custom properties for dynamic glassmorphism control
+:root {
+  // Glass effect intensities (integrates with existing gradient system)
+  --glass-blur: 20px;
+  --glass-saturation: 1.2;
+  --glass-brightness: 1.1;
+  --glass-opacity: 0.1;
+  --glass-opacity-fallback: 0.2;
+
+  // Glass background colors (adapts to existing color extraction)
+  --glass-background: rgba(255, 255, 255, var(--glass-opacity));
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: rgba(0, 0, 0, 0.1);
+
+  // Performance and transition settings (uses existing transition timing)
+  --glass-transition: all var(--sn-gradient-transition, 0.8s ease-in-out);
+}
+
+// PHASE 1: Core Glassmorphism Elements
+// =============================================================================
+
+// Enhanced navigation bar with glassmorphism
+.Root__nav-bar {
+  // Apply all properties first before any nested rules
+  background: var(--glass-background) !important;
+  box-shadow: 0 8px 32px var(--glass-shadow);
+
+  // Apply glassmorphism after properties
+  @include glassmorphism-dynamic;
+
+  // Maintain existing responsive behavior
+  @media (max-width: 768px) {
+    --glass-blur: 15px;
+    --glass-opacity: 0.12;
+  }
+}
+
+// Enhanced now playing bar with glassmorphism
+.Root__now-playing-bar {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+
+    // Add the gradient background first
+    background: linear-gradient(
+      90deg,
+      var(--glass-background) 0%,
+      rgba(var(--spice-rgb-player), var(--glass-opacity)) 50%,
+      var(--glass-background) 100%
+    );
+
+    // Apply glassmorphism mixin after properties
+    @include glassmorphism-dynamic;
+  }
+}
+
+// Glassmorphism modal overlays
+.GenericModal,
+.main-contextMenu-container {
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.2);
+  @include glassmorphism-layered(2);
+}
+
+// Enhanced cards with subtle glassmorphism (updated for Phase 2 compatibility)
+.main-card-card {
+  // Note: Enhanced card styles are now primarily handled by _sn_enhanced_cards.scss
+  // This provides the base glassmorphism foundation that the enhanced cards build upon
+
+  // Base glassmorphism application (lighter touch for enhanced cards)
+  @include glassmorphism(8px, 0.04, 1.02);
+
+  // Simplified hover state (enhanced version in _sn_enhanced_cards.scss)
+  &:hover,
+  &[data-context-menu-open="true"] {
+    // Ensure dynamic colors work (apply property before nested rules)
+    background: var(
+      --dynamic-card-hover-bg,
+      var(--glass-background)
+    ) !important;
+
+    // Only apply glassmorphism enhancement, let enhanced cards handle transforms
+    @include glassmorphism(12px, 0.06, 1.15);
+  }
+}
+
+// Right sidebar glassmorphism
+.Root__right-sidebar {
+  background: var(--glass-background) !important;
+  @include glassmorphism-layered(1);
+}
+
+// PHASE 1: Glassmorphism Control Classes
+// =============================================================================
+
+// Glassmorphism intensity controls (integrates with existing settings system)
+.sn-glass-disabled {
+  .Root__nav-bar,
+  .Root__now-playing-bar::before,
+  .Root__right-sidebar,
+  .main-card-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(var(--spice-rgb-surface0), 0.8) !important;
+  }
+}
+
+.sn-glass-minimal {
+  --glass-blur: 10px;
+  --glass-opacity: 0.05;
+  --glass-saturation: 1.05;
+}
+
+.sn-glass-intense {
+  --glass-blur: 30px;
+  --glass-opacity: 0.15;
+  --glass-saturation: 1.4;
+  --glass-brightness: 1.2;
+}
+
+// PHASE 1: Performance Optimizations
+// =============================================================================
+
+// Reduced motion support (respects existing accessibility)
+@media (prefers-reduced-motion: reduce) {
+  .Root__nav-bar,
+  .Root__now-playing-bar::before,
+  .main-card-card {
+    transition: opacity 0.2s ease;
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+  }
+}
+
+// Mobile optimizations (respects existing responsive design)
+@media (max-width: 768px) {
+  :root {
+    --glass-blur: 12px;
+    --glass-opacity: 0.08;
+  }
+
+  .sn-glass-intense {
+    --glass-blur: 20px;
+    --glass-opacity: 0.12;
+  }
+}
+
+// PHASE 1: Browser Support Detection & Fallbacks
+// =============================================================================
+
+// Advanced fallback for browsers without backdrop-filter support
+@supports not (backdrop-filter: blur(1px)) {
+  .Root__nav-bar {
+    background: rgba(var(--spice-rgb-surface0), 0.9) !important;
+    border: 1px solid rgba(var(--spice-rgb-surface1), 0.5);
+  }
+
+  .Root__now-playing-bar::before {
+    background: rgba(var(--spice-rgb-player), 0.8) !important;
+  }
+
+  .main-card-card {
+    background: rgba(var(--spice-rgb-surface0), 0.7) !important;
+
+    &:hover {
+      background: rgba(var(--spice-rgb-surface1), 0.8) !important;
+    }
+  }
+}

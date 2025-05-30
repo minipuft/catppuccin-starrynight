@@ -1,0 +1,195 @@
+// StarryNight Star Animation Module - Dynamic shooting star effects
+@use "mixins" as *;
+
+// CSS custom properties for star animation control
+:root {
+  --sn-star-count: 3;
+  --sn-star-duration: 8s;
+  --sn-star-delay-base: 2s;
+  --sn-star-size: 2px;
+  --sn-star-trail-length: 100px;
+  --sn-star-opacity: 0.8;
+  --sn-star-color: var(--spice-overlay2);
+  --sn-star-speed: 1;
+}
+
+// Keyframe animations for shooting stars (enhanced with hardware acceleration)
+@keyframes shooting-star {
+  0% {
+    transform: translate3d(-100px, -100px, 0) rotate(45deg) scale(0);
+    opacity: 0;
+  }
+
+  10% {
+    transform: translate3d(-80px, -80px, 0) rotate(45deg) scale(1);
+    opacity: var(--sn-star-opacity);
+  }
+
+  20% {
+    opacity: var(--sn-star-opacity);
+  }
+
+  80% {
+    opacity: var(--sn-star-opacity);
+  }
+
+  90% {
+    transform: translate3d(calc(100vw + 80px), calc(100vh + 80px), 0)
+      rotate(45deg) scale(1);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translate3d(calc(100vw + 100px), calc(100vh + 100px), 0)
+      rotate(45deg) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: var(--sn-star-opacity);
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: calc(var(--sn-star-opacity) * 0.3);
+    transform: scale(0.8);
+  }
+}
+
+// Star container (enhanced with hardware acceleration)
+.sn-stars-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -5;
+  overflow: hidden;
+
+  // Performance optimization - hardware acceleration
+  @include performance-optimized;
+
+  // Base star element (enhanced)
+  .star {
+    position: absolute;
+    width: var(--sn-star-size);
+    height: var(--sn-star-size);
+    background: var(--sn-star-color);
+    border-radius: 50%;
+    animation: shooting-star
+      calc(var(--sn-star-duration) / var(--sn-star-speed)) linear infinite;
+
+    // Performance optimizations
+    @include performance-optimized;
+
+    // Star trail effect (enhanced)
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: var(--sn-star-trail-length);
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        var(--sn-star-color) 0%,
+        transparent 100%
+      );
+      transform: translateX(calc(-1 * var(--sn-star-trail-length)));
+      opacity: 0.6;
+      @include hardware-accelerated;
+    }
+
+    // Twinkle effect for some stars
+    &.twinkle {
+      animation: star-twinkle 4s ease-in-out infinite;
+    }
+
+    // Multiple star variations with different delays and paths
+    &:nth-child(1) {
+      top: 10%;
+      left: -10%;
+      animation-delay: 0s;
+      animation-duration: calc(var(--sn-star-duration) * 1.2);
+    }
+
+    &:nth-child(2) {
+      top: 20%;
+      left: -15%;
+      animation-delay: calc(var(--sn-star-delay-base) * 1);
+      animation-duration: calc(var(--sn-star-duration) * 0.8);
+      --sn-star-size: 1.5px;
+    }
+
+    &:nth-child(3) {
+      top: 60%;
+      left: -5%;
+      animation-delay: calc(var(--sn-star-delay-base) * 2);
+      animation-duration: calc(var(--sn-star-duration) * 1.5);
+      --sn-star-size: 2.5px;
+    }
+
+    &:nth-child(4) {
+      top: 80%;
+      left: -20%;
+      animation-delay: calc(var(--sn-star-delay-base) * 0.5);
+      animation-duration: calc(var(--sn-star-duration) * 1.1);
+    }
+
+    &:nth-child(5) {
+      top: 40%;
+      left: -8%;
+      animation-delay: calc(var(--sn-star-delay-base) * 1.8);
+      animation-duration: calc(var(--sn-star-duration) * 0.9);
+      --sn-star-size: 1.8px;
+    }
+  }
+}
+
+// Utility classes for star control
+.sn-stars-disabled {
+  .sn-stars-container {
+    display: none;
+  }
+}
+
+.sn-stars-minimal {
+  --sn-star-count: 2;
+  --sn-star-opacity: 0.4;
+  --sn-star-duration: 12s;
+
+  .sn-stars-container .star:nth-child(n + 3) {
+    display: none;
+  }
+}
+
+.sn-stars-intense {
+  --sn-star-count: 6;
+  --sn-star-opacity: 1;
+  --sn-star-duration: 6s;
+  --sn-star-size: 3px;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .sn-stars-container {
+    --sn-star-count: 2;
+    --sn-star-duration: 10s;
+    --sn-star-size: 1.5px;
+
+    .star:nth-child(n + 3) {
+      display: none;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .sn-stars-container {
+    display: none;
+  }
+}

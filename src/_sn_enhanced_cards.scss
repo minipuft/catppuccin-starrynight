@@ -1,0 +1,267 @@
+// StarryNight Enhanced Cards Module - Phase 2: Advanced card interactions with 3D prep
+@use "mixins" as *;
+
+// CSS custom properties for enhanced card system
+:root {
+  // Enhanced card dimensions and spacing
+  --card-border-radius: 12px;
+  --card-hover-lift: 8px;
+  --card-shadow-base: rgba(0, 0, 0, 0.08);
+  --card-shadow-hover: rgba(0, 0, 0, 0.15);
+
+  // Interactive timing and easing
+  --card-transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --card-transition-medium: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --card-transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Color enhancement variables (integrates with existing color extraction)
+  --card-content-overlay: rgba(0, 0, 0, 0.6);
+  --card-accent-color: var(--spice-accent, #cba6f7);
+  --card-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+// PHASE 2: Enhanced Main Cards
+// =============================================================================
+
+// Primary content cards with enhanced interactions
+.main-card-card {
+  // Apply base card state system
+  @include card-state-base;
+
+  // Enhanced visual properties
+  border-radius: var(--card-border-radius);
+  background: var(--glass-background);
+  backdrop-filter: blur(var(--glass-blur, 15px))
+    saturate(var(--glass-saturation, 1.2));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  // Base shadow state
+  box-shadow: 0 4px 16px var(--card-shadow-base);
+
+  // Enhanced hover state (builds on glassmorphism)
+  &:hover,
+  &[data-context-menu-open="true"] {
+    @include card-hover-lift(var(--card-hover-lift), 24px);
+
+    // Enhanced glassmorphism on hover
+    backdrop-filter: blur(calc(var(--glass-blur, 15px) * 1.2))
+      saturate(calc(var(--glass-saturation, 1.2) * 1.1));
+    background: var(--dynamic-card-hover-bg, var(--glass-background));
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  // Focus state for accessibility
+  &:focus-visible {
+    outline: 2px solid var(--card-accent-color);
+    outline-offset: 2px;
+  }
+
+  // Active state feedback
+  &:active {
+    transform: translateY(-2px) scale(0.98);
+    transition: transform 0.1s ease;
+  }
+}
+
+// Enhanced album/playlist card headers
+.main-card-header {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--card-border-radius) var(--card-border-radius) 0 0;
+
+  // Enhanced image container
+  .main-image-image,
+  .main-cardImage-image {
+    @include card-transition;
+
+    &:hover {
+      @include interactive-scale(1.05);
+    }
+  }
+
+  // Overlay content enhancement
+  .main-card-cardMetadata {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    background: linear-gradient(
+      transparent 0%,
+      var(--card-content-overlay) 100%
+    );
+
+    // Enhanced text legibility
+    .main-cardHeader-text,
+    .main-type-bass {
+      text-shadow: var(--card-text-shadow);
+      color: rgba(255, 255, 255, 0.95);
+    }
+  }
+}
+
+// PHASE 2: Enhanced Grid Layout System
+// =============================================================================
+
+// Responsive grid container with enhanced spacing
+.main-gridContainer-gridContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 24px;
+  padding: 24px;
+
+  // Enhanced responsive behavior
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    padding: 16px;
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 32px;
+  }
+}
+
+// Enhanced section headers
+.main-shelf-header {
+  margin-bottom: 24px;
+
+  .main-type-alto {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// PHASE 2: Interactive Elements Enhancement
+// =============================================================================
+
+// Enhanced play button with sophisticated interactions
+.main-card-PlayButtonContainer,
+.main-playButton-PlayButton {
+  @include card-transition(0.2s);
+
+  // Enhanced positioning and sizing
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+
+  // Enhanced visual design
+  background: rgba(var(--spice-rgb-accent), 0.9);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+
+  // Initial state (hidden)
+  opacity: 0;
+  transform: translateY(8px) scale(0.8);
+
+  // Show on parent hover
+  .main-card-card:hover & {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition-delay: 0.1s;
+  }
+
+  // Enhanced button hover
+  &:hover {
+    @include interactive-scale(1.1);
+    background: rgba(var(--spice-rgb-accent), 1);
+    box-shadow: 0 6px 20px rgba(var(--spice-rgb-accent), 0.4);
+  }
+
+  // Active state
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// Enhanced progress indicators and controls
+.x-progressBar-progressBarBg {
+  @include card-transition;
+  border-radius: 4px;
+  overflow: hidden;
+
+  > div > div {
+    background: linear-gradient(
+      90deg,
+      var(--card-accent-color) 0%,
+      rgba(var(--spice-rgb-accent), 0.8) 100%
+    );
+    box-shadow: 0 0 8px rgba(var(--spice-rgb-accent), 0.3);
+  }
+
+  &:hover {
+    transform: scaleY(1.2);
+  }
+}
+
+// PHASE 2: Enhanced Button System
+// =============================================================================
+
+// Universal button enhancement
+.Button-sm-buttonSecondary-useBrowserDefaultFocusStyle,
+.Button-sm-16-buttonTertiary-iconOnly-isUsingKeyboard-useBrowserDefaultFocusStyle {
+  @include card-transition(0.2s);
+  border-radius: 8px;
+
+  // Enhanced hover states
+  &:hover {
+    @include interactive-scale(1.02);
+    background: var(--glass-background);
+    backdrop-filter: blur(8px);
+  }
+
+  // Enhanced focus states
+  &:focus-visible {
+    outline: 2px solid var(--card-accent-color);
+    outline-offset: 2px;
+  }
+}
+
+// PHASE 2: Performance Optimizations
+// =============================================================================
+
+// Reduced motion support for enhanced cards
+@media (prefers-reduced-motion: reduce) {
+  .main-card-card,
+  .main-card-PlayButtonContainer,
+  .x-progressBar-progressBarBg {
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  // Disable complex transforms for performance
+  * {
+    transform-style: flat !important;
+    perspective: none !important;
+  }
+}
+
+// Mobile optimizations for enhanced cards
+@media (max-width: 768px) {
+  :root {
+    --card-hover-lift: 4px;
+    --card-transition-medium: 0.3s ease;
+  }
+
+  // Simplified interactions on touch devices
+  .main-card-card {
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  // Always show play buttons on mobile
+  .main-card-PlayButtonContainer {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

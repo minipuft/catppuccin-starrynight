@@ -1,0 +1,350 @@
+// StarryNight 3D Morphing Module - Phase 3: True 3D card interactions and morphing
+@use "mixins" as *;
+
+// CSS custom properties for 3D morphing system
+:root {
+  // 3D perspective and depth settings
+  --perspective-distance: 1200px;
+  --max-rotate-x: 15deg;
+  --max-rotate-y: 15deg;
+  --depth-hover: 50px;
+  --depth-focus: 80px;
+
+  // Morphing animation timing
+  --morph-duration-fast: 0.4s;
+  --morph-duration-medium: 0.8s;
+  --morph-duration-slow: 1.2s;
+  --morph-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  // 3D shadow and lighting
+  --shadow-3d-color: rgba(0, 0, 0, 0.15);
+  --light-source-x: 0;
+  --light-source-y: 0;
+
+  // Mouse tracking variables (updated by JavaScript)
+  --mouse-x: 0;
+  --mouse-y: 0;
+  --mouse-inside: 0;
+}
+
+// PHASE 3: 3D Scene Setup
+// =============================================================================
+
+// Main content areas become 3D containers
+.Root__main-view,
+.main-view-container {
+  @include perspective-container(var(--perspective-distance));
+}
+
+// Enhanced grid container with 3D perspective
+.main-gridContainer-gridContainer {
+  @include perspective-container(1400px);
+
+  // Preserve existing styles but add 3D context
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 24px;
+  padding: 24px;
+
+  // 3D perspective adjustments for mobile
+  @media (max-width: 768px) {
+    perspective: 800px; // Reduced perspective for mobile
+  }
+}
+
+// PHASE 3: 3D Card Morphing System
+// =============================================================================
+
+// Enhanced main cards with true 3D interactions
+.main-card-card {
+  // Apply morphing transition system
+  @include morphing-transition(var(--morph-duration-medium));
+  @include interactive-3d-hover(var(--max-rotate-y), var(--depth-hover));
+
+  // Default 3D state
+  @include card-morph-state("default");
+  @include shadow-3d(1);
+
+  // Transform origin for natural 3D rotation
+  transform-origin: center center;
+  transform-style: preserve-3d;
+
+  // Enhanced hover state with 3D morphing
+  &:hover {
+    @include shadow-3d(2);
+
+    // Dynamic 3D transform based on mouse position (updated by JS)
+    transform: perspective(var(--perspective-distance))
+      rotateX(calc(var(--mouse-y, 0) * var(--max-rotate-x)))
+      rotateY(calc(var(--mouse-x, 0) * var(--max-rotate-y)))
+      translateZ(var(--depth-hover)) scale(1.02);
+  }
+
+  // Focus state with 3D morphing
+  &:focus-visible {
+    @include card-morph-state("focused");
+    @include shadow-3d(3);
+    outline: 2px solid var(--card-accent-color);
+    outline-offset: 4px;
+  }
+
+  // Active state with depth feedback
+  &:active {
+    transform: perspective(var(--perspective-distance))
+      rotateX(calc(var(--mouse-y, 0) * var(--max-rotate-x) * 0.5))
+      rotateY(calc(var(--mouse-x, 0) * var(--max-rotate-y) * 0.5))
+      translateZ(20px) scale(0.98);
+    transition: transform 0.1s ease;
+  }
+
+  // Context menu open state
+  &[data-context-menu-open="true"] {
+    @include card-morph-state("expanded");
+    @include shadow-3d(3);
+  }
+}
+
+// PHASE 3: Layered 3D Content
+// =============================================================================
+
+// Card content layers with depth
+.main-card-header {
+  @include depth-layer(1);
+
+  // Card image with enhanced 3D interaction
+  .main-image-image,
+  .main-cardImage-image {
+    @include morphing-transition(0.6s);
+    transform-origin: center center;
+
+    // Subtle 3D hover for images
+    .main-card-card:hover & {
+      transform: translateZ(20px) scale(1.05);
+    }
+  }
+
+  // Card metadata with increased depth
+  .main-card-cardMetadata {
+    @include depth-layer(2);
+
+    // Enhanced text with 3D positioning
+    .main-cardHeader-text,
+    .main-type-bass {
+      transform: translateZ(5px);
+      transition: transform 0.3s ease;
+    }
+  }
+}
+
+// Play button with advanced 3D interaction
+.main-card-PlayButtonContainer,
+.main-playButton-PlayButton {
+  @include depth-layer(3);
+  @include morphing-transition(0.3s);
+
+  // Enhanced 3D positioning
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+
+  // Initial 3D state (hidden)
+  transform: translateZ(-20px) scale(0.8);
+  opacity: 0;
+
+  // Show with 3D animation on card hover
+  .main-card-card:hover & {
+    transform: translateZ(40px) scale(1);
+    opacity: 1;
+    transition-delay: 0.1s;
+  }
+
+  // Button hover with 3D scaling
+  &:hover {
+    transform: translateZ(50px) scale(1.15);
+    @include shadow-3d(2);
+  }
+
+  // Active state with 3D feedback
+  &:active {
+    transform: translateZ(35px) scale(0.95);
+  }
+}
+
+// PHASE 3: Advanced 3D Morphing States
+// =============================================================================
+
+// Different card morphing modes
+.sn-3d-expanded {
+  .main-card-card {
+    @include card-morph-state("expanded");
+    @include shadow-3d(3);
+  }
+}
+
+.sn-3d-compact {
+  .main-card-card {
+    @include card-morph-state("compact");
+    @include shadow-3d(1);
+  }
+}
+
+.sn-3d-floating {
+  .main-card-card {
+    @include floating-3d(8s);
+  }
+}
+
+// PHASE 3: Interactive 3D Navigation
+// =============================================================================
+
+// Enhanced navigation with 3D depth
+.Root__nav-bar {
+  @include depth-layer(1);
+
+  // Navigation items with subtle 3D hover
+  .main-navBar-navBarLink {
+    @include morphing-transition(0.3s);
+
+    &:hover {
+      transform: translateZ(10px) scale(1.02);
+    }
+
+    &.main-navBar-navBarLinkActive {
+      transform: translateZ(15px);
+      @include shadow-3d(1);
+    }
+  }
+}
+
+// Enhanced now playing bar with 3D interaction
+.Root__now-playing-bar {
+  @include depth-layer(2);
+
+  // Controls with 3D hover effects
+  .main-playButton-PlayButton,
+  .control-button {
+    @include morphing-transition(0.2s);
+
+    &:hover {
+      transform: translateZ(8px) scale(1.05);
+    }
+
+    &:active {
+      transform: translateZ(4px) scale(0.95);
+    }
+  }
+
+  // Progress bar with 3D enhancement
+  .x-progressBar-progressBarBg {
+    @include morphing-transition(0.3s);
+
+    &:hover {
+      transform: translateZ(5px) scaleY(1.2);
+    }
+  }
+}
+
+// PHASE 3: 3D Modal and Overlay System
+// =============================================================================
+
+// Enhanced modals with dramatic 3D entrance
+.GenericModal {
+  @include perspective-container(1000px);
+
+  .main-duplicateTrackModal-container,
+  .main-contextMenu-container {
+    @include morphing-transition(0.5s);
+    @include shadow-3d(3);
+
+    // 3D entrance animation
+    transform: perspective(1000px) rotateX(-10deg) translateZ(100px);
+
+    &.modal-enter {
+      transform: perspective(1000px) rotateX(0deg) translateZ(0px);
+    }
+  }
+}
+
+// Context menus with 3D positioning
+.main-contextMenu-container {
+  @include depth-layer(5);
+  @include morphing-transition(0.3s);
+
+  // Enhanced 3D appearance
+  transform-origin: top left;
+
+  .main-contextMenu-menuItemButton {
+    @include morphing-transition(0.2s);
+
+    &:hover {
+      transform: translateZ(5px) translateX(5px);
+      @include shadow-3d(1);
+    }
+  }
+}
+
+// PHASE 3: Performance Optimizations for 3D
+// =============================================================================
+
+// Reduced motion support for 3D effects
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transform-style: flat !important;
+    perspective: none !important;
+    animation: none !important;
+  }
+
+  .main-card-card {
+    &:hover {
+      transform: translateY(-4px) scale(1.02) !important;
+      transition: transform 0.2s ease !important;
+    }
+  }
+}
+
+// Performance mode for lower-end devices
+.sn-performance-mode {
+  :root {
+    --perspective-distance: 800px;
+    --max-rotate-x: 8deg;
+    --max-rotate-y: 8deg;
+    --depth-hover: 20px;
+    --morph-duration-medium: 0.4s;
+  }
+
+  .main-card-card {
+    transform-style: flat;
+
+    &:hover {
+      transform: translateY(-4px) scale(1.02);
+    }
+  }
+}
+
+// Mobile optimizations for 3D
+@media (max-width: 768px) {
+  :root {
+    --perspective-distance: 600px;
+    --max-rotate-x: 5deg;
+    --max-rotate-y: 5deg;
+    --depth-hover: 15px;
+  }
+
+  // Simplified 3D on touch devices
+  .main-card-card {
+    &:hover {
+      transform: translateZ(10px) scale(1.01);
+    }
+  }
+
+  // Disable complex 3D on very small screens
+  @media (max-width: 480px) {
+    * {
+      transform-style: flat !important;
+      perspective: none !important;
+    }
+  }
+}

@@ -1,0 +1,387 @@
+// StarryNight Context Zones Module - Phase 4.2: Intelligent Gradient Adaptation
+// Enhances existing gradient system with context-aware gradient zones
+
+@use "mixins" as *;
+
+// PHASE 4.2: Context-Aware CSS Variables
+// =============================================================================
+
+:root {
+  // Context-specific gradient variables (extends existing --sn-gradient-* system)
+  --zone-playlist-primary: var(--spice-mauve);
+  --zone-playlist-secondary: var(--spice-lavender);
+  --zone-artist-primary: var(--spice-peach);
+  --zone-artist-secondary: var(--spice-rosewater);
+  --zone-search-primary: var(--spice-lavender);
+  --zone-search-secondary: var(--spice-sapphire);
+  --zone-home-primary: var(--spice-rosewater);
+  --zone-home-secondary: var(--spice-flamingo);
+
+  // Activity-based intensity modifiers
+  --zone-intensity-focused: 0.8; // Reduced for concentration (search, reading)
+  --zone-intensity-discovery: 1.3; // Enhanced for exploration (browse, artist)
+  --zone-intensity-playback: 1.1; // Moderate for active listening (playlists)
+  --zone-intensity-relaxed: 0.9; // Calm for background activities (home)
+
+  // Context transition timing
+  --zone-transition-fast: 0.4s;
+  --zone-transition-medium: 0.8s;
+  --zone-transition-slow: 1.2s;
+}
+
+// PHASE 4.2: Enhanced Entity Header System
+// =============================================================================
+
+// Enhance existing .main-entityHeader-container (builds on _sn_gradient.scss lines 72-90)
+.main-entityHeader-container {
+  // Apply context-aware gradient zones
+  @include context-gradient-zone("default");
+
+  // Playlist context detection
+  &[data-testid*="playlist"],
+  &[aria-label*="playlist" i],
+  .main-entityHeader-container:has([data-testid*="playlist"]) {
+    @include context-gradient-zone("playlist");
+
+    // Enhanced playlist header background
+    &::before {
+      // Build on existing gradient from _sn_gradient.scss
+      background: linear-gradient(
+        180deg,
+        rgba(
+            var(--spice-rgb-mauve),
+            calc(var(--sn-gradient-opacity) * var(--zone-intensity-playback))
+          )
+          0%,
+        rgba(var(--spice-rgb-base), 0.8) 70%,
+        var(--spice-base) 100%
+      );
+      transition: all var(--zone-transition-medium) ease-in-out;
+    }
+
+    // Enhanced glow effect for playlist headers
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(
+        ellipse at center top,
+        rgba(var(--spice-rgb-mauve), 0.15) 0%,
+        transparent 60%
+      );
+      z-index: -1;
+      opacity: 0;
+      transition: opacity var(--zone-transition-medium) ease-in-out;
+    }
+
+    &:hover::after {
+      opacity: 1;
+    }
+  }
+
+  // Artist context detection
+  &[data-testid*="artist"],
+  &[aria-label*="artist" i] {
+    @include context-gradient-zone("artist");
+
+    &::before {
+      background: linear-gradient(
+        180deg,
+        rgba(
+            var(--spice-rgb-peach),
+            calc(var(--sn-gradient-opacity) * var(--zone-intensity-discovery))
+          )
+          0%,
+        rgba(var(--spice-rgb-base), 0.8) 70%,
+        var(--spice-base) 100%
+      );
+    }
+  }
+
+  // Album context (similar to artist but more focused)
+  &[data-testid*="album"],
+  &[aria-label*="album" i] {
+    @include context-gradient-zone("artist");
+
+    --zone-intensity-discovery: 1.2; // Slightly less intense than full artist page
+
+    &::before {
+      background: linear-gradient(
+        180deg,
+        rgba(
+            var(--spice-rgb-flamingo),
+            calc(var(--sn-gradient-opacity) * var(--zone-intensity-discovery))
+          )
+          0%,
+        rgba(var(--spice-rgb-base), 0.8) 70%,
+        var(--spice-base) 100%
+      );
+    }
+  }
+}
+
+// PHASE 4.2: Main View Context Detection
+// =============================================================================
+
+// Enhance existing .Root__main-view with context awareness
+.Root__main-view {
+  // Default context variables
+  @include context-gradient-zone("home");
+
+  // Context detection based on URL patterns (using CSS attribute selectors)
+  &[data-pathname*="playlist"],
+  body:has([data-testid*="playlist"]) .Root__main-view {
+    @include context-gradient-zone("playlist");
+  }
+
+  &[data-pathname*="artist"],
+  body:has([data-testid*="artist"]) .Root__main-view {
+    @include context-gradient-zone("artist");
+  }
+
+  &[data-pathname*="album"],
+  body:has([data-testid*="album"]) .Root__main-view {
+    @include context-gradient-zone("artist");
+    --zone-intensity-discovery: 1.1;
+  }
+
+  &[data-pathname*="search"],
+  body:has([data-testid*="search"]) .Root__main-view {
+    @include context-gradient-zone("search");
+  }
+
+  &[data-pathname*="collection"],
+  &[data-pathname*="library"] {
+    @include context-gradient-zone("home");
+    --zone-intensity-relaxed: 1;
+  }
+}
+
+// PHASE 4.2: Section-Based Context Enhancement
+// =============================================================================
+
+// Enhance existing .main-shelf-header with context awareness
+.main-shelf-header {
+  position: relative;
+
+  // Context-aware section styling
+  &[data-testid*="recently-played"],
+  &:has(.main-type-alto:contains("Recently played")) {
+    @include context-gradient-zone("home");
+
+    .main-type-alto {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--spice-rgb-rosewater), 0.9) 0%,
+        rgba(var(--spice-rgb-flamingo), 0.7) 100%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+
+  &[data-testid*="made-for-you"],
+  &:has(.main-type-alto:contains("Made for")) {
+    @include context-gradient-zone("discovery");
+
+    .main-type-alto {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--spice-rgb-mauve), 0.9) 0%,
+        rgba(var(--spice-rgb-lavender), 0.7) 100%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+
+  &[data-testid*="discover"],
+  &:has(.main-type-alto:contains("Discover")) {
+    @include context-gradient-zone("discovery");
+
+    .main-type-alto {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--spice-rgb-peach), 0.9) 0%,
+        rgba(var(--spice-rgb-yellow), 0.7) 100%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+}
+
+// PHASE 4.2: Top Bar Context Enhancement
+// =============================================================================
+
+// Enhance existing top bar with context-aware styling
+.Root__top-bar header,
+.main-topBar-container {
+  transition: all var(--zone-transition-medium) ease-in-out;
+
+  // Search context enhancement
+  &:has(.x-searchInput-searchInputInput:focus),
+  &:has([data-testid*="search-input"]:focus) {
+    @include context-gradient-zone("search");
+
+    .main-topBar-background {
+      background: linear-gradient(
+        180deg,
+        rgba(
+            var(--spice-rgb-lavender),
+            calc(var(--sn-gradient-opacity) * var(--zone-intensity-focused))
+          )
+          0%,
+        rgba(var(--spice-rgb-base), 0.9) 100%
+      );
+    }
+
+    // Enhanced search input glow
+    .x-searchInput-searchInputInput {
+      box-shadow: 0 0 12px rgba(var(--spice-rgb-lavender), 0.4);
+      border-color: rgba(var(--spice-rgb-lavender), 0.6);
+    }
+  }
+}
+
+// PHASE 4.2: Navigation Context Awareness
+// =============================================================================
+
+// Enhance existing navigation with context-aware feedback
+.Root__nav-bar {
+  // Currently playing context
+  &:has(.main-trackList-playingIcon),
+  &:has([aria-label*="playing" i]) {
+    .spicetify-playlist-list li {
+      // Enhanced gradient for currently playing playlist
+      &[aria-selected="true"],
+      &.active {
+        background: linear-gradient(
+          90deg,
+          rgba(var(--spice-rgb-accent), 0.15) 0%,
+          rgba(var(--spice-rgb-accent), 0.08) 100%
+        );
+        border-left: 3px solid rgba(var(--spice-rgb-accent), 0.8);
+      }
+    }
+  }
+}
+
+// PHASE 4.2: Right Sidebar Context Enhancement
+// =============================================================================
+
+// Enhance existing right sidebar with playback context
+.Root__right-sidebar {
+  // Enhanced "Next in queue" section when actively playing
+  &:has([data-testid*="queue"]),
+  &:has(.main-type-alto:contains("Next in queue")) {
+    @include context-gradient-zone("playback");
+
+    // Enhanced queue background
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(var(--spice-rgb-accent), 0.05) 0%,
+        transparent 40%
+      );
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    // Enhanced queue item styling
+    .main-trackList-rowSectionEnd,
+    [data-testid*="queue-item"] {
+      border-radius: 4px;
+      transition: all var(--zone-transition-fast) ease-in-out;
+
+      &:hover {
+        background: rgba(var(--spice-rgb-accent), 0.08);
+      }
+    }
+  }
+}
+
+// PHASE 4.2: Time-Based Context Adaptation
+// =============================================================================
+
+// Morning context (6 AM - 12 PM)
+@media (prefers-color-scheme: light) {
+  :root {
+    --zone-home-primary: var(--spice-yellow);
+    --zone-home-secondary: var(--spice-peach);
+    --zone-intensity-relaxed: 1.1; // More vibrant in morning
+  }
+}
+
+// Evening context (6 PM - 12 AM) - automatically detected by system
+@media (prefers-color-scheme: dark) {
+  :root {
+    --zone-home-primary: var(--spice-mauve);
+    --zone-home-secondary: var(--spice-lavender);
+    --zone-intensity-relaxed: 0.8; // More subdued in evening
+  }
+}
+
+// PHASE 4.2: Performance and Accessibility
+// =============================================================================
+
+// Reduced motion support for context transitions
+@media (prefers-reduced-motion: reduce) {
+  .main-entityHeader-container,
+  .Root__main-view,
+  .main-shelf-header,
+  .Root__top-bar,
+  .Root__nav-bar,
+  .Root__right-sidebar {
+    transition: background-color var(--zone-transition-fast) ease,
+      opacity var(--zone-transition-fast) ease;
+
+    &::before,
+    &::after {
+      transition: opacity var(--zone-transition-fast) ease;
+    }
+  }
+}
+
+// High contrast mode - enhance context differentiation
+@media (prefers-contrast: high) {
+  :root {
+    --zone-intensity-focused: 1;
+    --zone-intensity-discovery: 1.5;
+    --zone-intensity-playback: 1.3;
+    --zone-intensity-relaxed: 1.1;
+  }
+
+  .main-entityHeader-container {
+    &::before {
+      filter: contrast(1.2) saturate(1.3);
+    }
+  }
+}
+
+// Mobile optimizations for context zones
+@media (max-width: 768px) {
+  :root {
+    --zone-transition-fast: 0.2s;
+    --zone-transition-medium: 0.4s;
+    --zone-transition-slow: 0.6s;
+
+    // Reduce intensity on mobile for battery savings
+    --zone-intensity-focused: 0.6;
+    --zone-intensity-discovery: 1;
+    --zone-intensity-playback: 0.9;
+    --zone-intensity-relaxed: 0.7;
+  }
+}
