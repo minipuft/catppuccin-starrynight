@@ -873,6 +873,121 @@
     settingsManager
   );
 
+  // =============================================================================
+  // YEAR 3000: QUANTUM MOUSE TRACKING SYSTEM
+  // =============================================================================
+  class QuantumMouseTracker {
+    constructor(performanceMonitor) {
+      this.performanceMonitor = performanceMonitor;
+      this.isActive = false;
+      this.mouseX = 0;
+      this.mouseY = 0;
+      this.lastUpdateTime = 0;
+      this.updateThrottle = 16; // ~60fps
+    }
+
+    // Initialize quantum mouse tracking for search pages
+    initialize() {
+      this.setupSearchPageTracking();
+      console.log("StarryNight: Quantum mouse tracking initialized");
+    }
+
+    // Setup mouse tracking specifically for search pages
+    setupSearchPageTracking() {
+      const throttledMouseMove = this.throttle((event) => {
+        this.updateQuantumMousePosition(event);
+      }, this.updateThrottle);
+
+      // Track mouse movement on search containers
+      document.addEventListener("mousemove", (event) => {
+        const searchContainer = event.target.closest(
+          ".main-searchPage-content"
+        );
+        if (searchContainer) {
+          this.isActive = true;
+          throttledMouseMove(event);
+        } else {
+          this.isActive = false;
+          this.resetQuantumVariables();
+        }
+      });
+
+      // Reset on mouse leave
+      document.addEventListener("mouseleave", () => {
+        this.isActive = false;
+        this.resetQuantumVariables();
+      });
+    }
+
+    // Update quantum mouse position for holographic effects
+    updateQuantumMousePosition(event) {
+      if (!this.isActive || this.performanceMonitor.shouldReduceQuality()) {
+        return;
+      }
+
+      const now = performance.now();
+      if (now - this.lastUpdateTime < this.updateThrottle) {
+        return;
+      }
+      this.lastUpdateTime = now;
+
+      // Get search container bounds
+      const searchContainer = document.querySelector(
+        ".main-searchPage-content"
+      );
+      if (!searchContainer) return;
+
+      const rect = searchContainer.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      // Calculate normalized position (-1 to 1)
+      this.mouseX = (event.clientX - centerX) / (rect.width / 2);
+      this.mouseY = (event.clientY - centerY) / (rect.height / 2);
+
+      // Clamp values
+      this.mouseX = Math.max(-1, Math.min(1, this.mouseX));
+      this.mouseY = Math.max(-1, Math.min(1, this.mouseY));
+
+      // Update CSS variables for quantum effects
+      this.updateQuantumVariables();
+    }
+
+    // Update CSS custom properties for quantum holographic effects
+    updateQuantumVariables() {
+      const root = document.documentElement;
+      root.style.setProperty("--mouse-x", this.mouseX.toString());
+      root.style.setProperty("--mouse-y", this.mouseY.toString());
+      root.style.setProperty("--quantum-active", this.isActive ? "1" : "0");
+    }
+
+    // Reset quantum variables
+    resetQuantumVariables() {
+      this.mouseX = 0;
+      this.mouseY = 0;
+      this.updateQuantumVariables();
+    }
+
+    // Utility: Throttle function
+    throttle(func, limit) {
+      let inThrottle;
+      return function () {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+          func.apply(context, args);
+          inThrottle = true;
+          setTimeout(() => (inThrottle = false), limit);
+        }
+      };
+    }
+  }
+
+  // Initialize quantum mouse tracker
+  const quantumMouseTracker = new QuantumMouseTracker(
+    colorAnalyzer.performanceMonitor
+  );
+
   // Accent colors
   const accents = [
     "none",
@@ -935,110 +1050,6 @@
   // Dynamic color extraction variables
   let currentTrackUri = null;
   let colorExtractionEnabled = true;
-
-  // Function to extract colors from album cover art (StarryNight functionality)
-  async function extractColorsFromCoverArt() {
-    try {
-      // Smart throttling to prevent extraction spam
-      if (!colorAnalyzer.shouldExtract()) {
-        console.log("StarryNight: Color extraction throttled");
-        return;
-      }
-
-      const coverArt = document.querySelector(
-        '.main-nowPlayingWidget-coverArt img, .main-image, [data-testid="cover-art-image"]'
-      );
-      if (!coverArt || !coverArt.src) {
-        console.warn("StarryNight: Cover art not found");
-        return;
-      }
-
-      // Get current track to avoid duplicate color extraction
-      const currentTrack = Spicetify.Player.data?.track?.uri;
-      if (currentTrack === currentTrackUri) {
-        return; // Same track, don't re-extract
-      }
-      currentTrackUri = currentTrack;
-
-      // Create a temporary canvas to extract colors
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-
-      img.onload = function () {
-        try {
-          // Optimize canvas size based on performance
-          const maxSize = colorAnalyzer.performanceMonitor.shouldReduceQuality()
-            ? 150
-            : 200;
-          const scale = Math.min(maxSize / img.width, maxSize / img.height);
-
-          canvas.width = Math.floor(img.width * scale);
-          canvas.height = Math.floor(img.height * scale);
-
-          // Use high-quality scaling
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = "high";
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const colors = colorAnalyzer.extractDominantColorsAdvanced(
-            imageData.data
-          );
-          updateGradientColors(colors.primary, colors.secondary);
-
-          // Log performance metrics periodically
-          if (Math.random() < 0.1) {
-            // 10% of the time
-            colorAnalyzer.performanceMonitor.logMetrics();
-          }
-        } catch (error) {
-          console.warn(
-            "StarryNight: Error extracting colors from cover art:",
-            error
-          );
-          // Fallback to catppuccin colors
-          updateGradientColors(
-            getComputedStyle(document.documentElement).getPropertyValue(
-              "--spice-base"
-            ),
-            getComputedStyle(document.documentElement).getPropertyValue(
-              "--spice-surface0"
-            )
-          );
-        }
-      };
-
-      img.onerror = function () {
-        console.warn("StarryNight: Failed to load cover art image");
-      };
-
-      img.src = coverArt.src;
-    } catch (error) {
-      console.error("StarryNight: Error in color extraction:", error);
-    }
-  }
-
-  // Update CSS gradient variables with extracted colors
-  function updateGradientColors(primary, secondary) {
-    const root = document.documentElement;
-
-    // Update the CSS variables that control the StarryNight gradient
-    root.style.setProperty("--gradient-main", primary);
-    root.style.setProperty("--gradient-secondary", secondary);
-
-    // Also update hover backgrounds to match the color scheme
-    root.style.setProperty("--dynamic-card-hover-bg", `${secondary}20`);
-    root.style.setProperty("--dynamic-track-hover-bg", `${secondary}15`);
-
-    // PHASE 1: Update glassmorphism colors with extracted colors
-    glassmorphismManager.updateGlassColors(primary, secondary);
-
-    console.log(
-      `StarryNight: Updated gradient colors - Primary: ${primary}, Secondary: ${secondary}`
-    );
-  }
 
   // Function to inject star container into DOM
   function injectStarContainer() {
@@ -1248,6 +1259,9 @@
         card3DManager.initialize();
         card3DManager.apply3DMode(morphing3DMode);
 
+        // YEAR 3000: Initialize quantum mouse tracking
+        quantumMouseTracker.initialize();
+
         // Performance monitoring integration
         glassmorphismManager.checkPerformanceAndAdjust();
 
@@ -1298,7 +1312,8 @@
         card3DManager.apply3DMode(morphing3DMode);
 
         // Setup player listeners with cleanup
-        playerCleanup = setupMusicPlayerListeners();
+        // DISABLED: Color extraction now handled by theme-vibrant-enhanced.js Year 3000 system
+        // playerCleanup = setupMusicPlayerListeners();
 
         // Start shooting stars
         setTimeout(() => {
@@ -1306,6 +1321,8 @@
         }, 2000);
 
         // Fallback color extraction interval
+        // DISABLED: Color extraction now handled by theme-vibrant-enhanced.js Year 3000 system
+        /*
         fallbackInterval = setInterval(() => {
           if (
             colorExtractionEnabled &&
@@ -1314,9 +1331,10 @@
             extractColorsFromCoverArt();
           }
         }, 3000);
+        */
 
         console.log(
-          "StarryNight: Component effects initialized with validated settings"
+          "StarryNight: Component effects initialized with validated settings (color extraction delegated to Year 3000 system)"
         );
       } catch (error) {
         console.error(
@@ -1328,18 +1346,18 @@
       // Cleanup function
       return () => {
         try {
-          // Clean up player listeners
-          if (playerCleanup && typeof playerCleanup === "function") {
-            playerCleanup();
-          }
+          // Clean up player listeners (disabled - handled by Year 3000 system)
+          // if (playerCleanup && typeof playerCleanup === "function") {
+          //   playerCleanup();
+          // }
 
           // Clear intervals
           if (shootingStarsInterval) {
             clearInterval(shootingStarsInterval);
           }
-          if (fallbackInterval) {
-            clearInterval(fallbackInterval);
-          }
+          // if (fallbackInterval) {
+          //   clearInterval(fallbackInterval);
+          // }
 
           console.log("StarryNight: Component cleanup completed");
         } catch (error) {
@@ -1654,78 +1672,4 @@
   Spicetify.Platform.History.listen((event) => {
     insertOption(event.pathname);
   });
-
-  // StarryNight: Setup music player event listeners for dynamic color extraction
-  function setupMusicPlayerListeners() {
-    let retryCount = 0;
-    const maxRetries = 10;
-    const retryDelay = 500;
-
-    const initializeListeners = () => {
-      if (!Spicetify.Player) {
-        retryCount++;
-        if (retryCount < maxRetries) {
-          console.log(
-            `StarryNight: Spicetify.Player not ready, retrying ${retryCount}/${maxRetries}...`
-          );
-          setTimeout(initializeListeners, retryDelay * retryCount); // Exponential backoff
-          return null;
-        } else {
-          console.error("StarryNight: Failed to initialize after max retries");
-          return null;
-        }
-      }
-
-      try {
-        // Song change listener
-        const songChangeHandler = () => {
-          console.log("StarryNight: Song changed, extracting colors...");
-          setTimeout(extractColorsFromCoverArt, 500); // Delay to ensure cover art loads
-        };
-
-        // Player state change listener
-        const playPauseHandler = () => {
-          if (Spicetify.Player.data?.track?.uri !== currentTrackUri) {
-            setTimeout(extractColorsFromCoverArt, 300);
-          }
-        };
-
-        // Add event listeners
-        Spicetify.Player.addEventListener("songchange", songChangeHandler);
-        Spicetify.Player.addEventListener("onplaypause", playPauseHandler);
-
-        // Initial color extraction
-        if (Spicetify.Player.data?.track) {
-          console.log("StarryNight: Initial color extraction...");
-          setTimeout(extractColorsFromCoverArt, 1000);
-        }
-
-        console.log("StarryNight: Player listeners initialized successfully");
-
-        // Return cleanup function
-        return () => {
-          try {
-            if (Spicetify.Player && Spicetify.Player.removeEventListener) {
-              Spicetify.Player.removeEventListener(
-                "songchange",
-                songChangeHandler
-              );
-              Spicetify.Player.removeEventListener(
-                "onplaypause",
-                playPauseHandler
-              );
-              console.log("StarryNight: Player listeners cleaned up");
-            }
-          } catch (error) {
-            console.warn("StarryNight: Error during cleanup:", error);
-          }
-        };
-      } catch (error) {
-        console.error("StarryNight: Error setting up player listeners:", error);
-        return null;
-      }
-    };
-
-    return initializeListeners();
-  }
 })();

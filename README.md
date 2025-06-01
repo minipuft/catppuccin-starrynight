@@ -6,7 +6,9 @@
 
 <!-- Hero image placeholder -->
 
-![Theme Preview](assets/preview.png)
+![Home Page](assets/home.png)
+![Album/Playlist](assets/album.png)
+![Liked Songs](assets/likedSongs.png)
 _The perfect harmony of pastel perfection and cosmic wonder_
 
 [![Spicetify](https://img.shields.io/badge/Spicetify-Theme-1DB954?style=for-the-badge&logo=spotify&logoColor=white)](https://spicetify.app/)

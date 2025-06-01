@@ -4,15 +4,239 @@ _A comprehensive guide for developing modern, dynamic Spicetify themes with prop
 
 ---
 
+## 🚨 **CRITICAL DISCOVERY: RGB Variables for Gradients**
+
+**Major Finding (January 2025)**: SCSS gradients using `rgba(var(--variable-rgb), opacity)` format require RGB values, not hex values. This was the primary cause of gradient failures in dynamic themes.
+
+### The Problem
+
+```scss
+// This FAILS if --sn-gradient-primary-rgb is not set properly
+background: rgba(var(--sn-gradient-primary-rgb), 0.12);
+```
+
+### The Solution
+
+```javascript
+// JavaScript must set BOTH hex AND RGB versions
+const primaryColor = "#ca9ee6";
+const primaryRgb = hexToRgb(primaryColor); // {r: 202, g: 158, b: 230}
+
+// Set hex version for solid colors
+root.style.setProperty("--sn-gradient-primary", primaryColor);
+
+// Set RGB version for gradients (CRITICAL!)
+root.style.setProperty(
+  "--sn-gradient-primary-rgb",
+  `${primaryRgb.r},${primaryRgb.g},${primaryRgb.b}`
+);
+```
+
+### Required RGB Variables for Gradients
+
+```javascript
+// Year 3000 Gradient Variables (BOTH needed)
+"--sn-gradient-primary"; // Hex: "#ca9ee6"
+"--sn-gradient-primary-rgb"; // RGB: "202,158,230"
+"--sn-gradient-secondary"; // Hex: "#babbf1"
+"--sn-gradient-secondary-rgb"; // RGB: "186,187,241"
+"--sn-gradient-accent"; // Hex: "#8caaee"
+"--sn-gradient-accent-rgb"; // RGB: "140,170,238"
+
+// Spice Variables (BOTH needed)
+"--spice-rgb-main"; // RGB: "48,52,70"
+"--spice-rgb-base"; // RGB: "48,52,70"
+"--spice-rgb-player"; // RGB: "35,38,52"
+"--spice-rgb-sidebar"; // RGB: "30,32,48"
+"--spice-rgb-accent"; // RGB: "202,158,230"
+"--spice-rgb-surface0"; // RGB: "65,69,89"
+"--spice-rgb-surface1"; // RGB: "73,77,100"
+```
+
+---
+
 ## 📋 Feature Implementation Roadmap
 
-| #   | Title                                            | Problem Solved                                                                      | Approach                                                                                     | Benefit                                         | Effort (1-5) | Priority | Status         |
-| --- | ------------------------------------------------ | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------- | ------------ | -------- | -------------- |
-| 1   | **Spicetify Native Color Extractor Integration** | Current themes use outdated Vibrant.js causing CORS issues and performance problems | Leverage Spicetify's built-in `colorExtractor()` API for album art color extraction          | Faster, more reliable, no CORS issues           | 2            | High     | 🔄 In Progress |
-| 2   | **Advanced Developer Tools Integration**         | Theme developers struggle to identify correct CSS selectors and variables           | Enable `spicetify enable-devtools` command for real-time inspection and CSS variable mapping | Better targeting, faster development            | 1            | High     | ✅ Documented  |
-| 3   | **Modern CSS Variable System**                   | Legacy `--modspotify` variables broken after Spotify UI updates                     | Adopt new `--spice-` variable system with proper Encore theme compatibility                  | Future-proof themes, better maintenance         | 3            | High     | 🔄 In Progress |
-| 4   | **Dynamic Theme Engine Architecture**            | Themes hardcode colors instead of reacting to song changes                          | Create extensible system using `Spicetify.Player.addEventListener` for real-time updates     | Live color adaptation, enhanced user experience | 4            | High     | 📋 Planned     |
-| 5   | **Component-Based Targeting Guide**              | Developers use trial-and-error to find correct selectors                            | Build comprehensive selector mapping with React component inspection                         | Faster development, consistent theming          | 3            | Medium   | ✅ Documented  |
+| #   | Title                                            | Problem Solved                                                                      | Approach                                                                                     | Benefit                                 | Effort (1-5) | Priority | Status        |
+| --- | ------------------------------------------------ | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------- | ------------ | -------- | ------------- |
+| 1   | **Spicetify Native Color Extractor Integration** | Current themes use outdated Vibrant.js causing CORS issues and performance problems | Leverage Spicetify's built-in `colorExtractor()` API for album art color extraction          | Faster, more reliable, no CORS issues   | 2            | High     | ✅ Completed  |
+| 2   | **RGB Variable System for Gradients**            | Gradients not appearing due to missing RGB format variables                         | Convert all colors to RGB format and set both hex and RGB versions dynamically               | All gradients work with dynamic colors  | 3            | Critical | ✅ Completed  |
+| 3   | **Complete Year 3000 System Implementation**     | Theme files missing core color application system                                   | Implement complete Year 3000 system with proper RGB variable support                         | Full dynamic color functionality        | 4            | High     | ✅ Completed  |
+| 4   | **Advanced Developer Tools Integration**         | Theme developers struggle to identify correct CSS selectors and variables           | Enable `spicetify enable-devtools` command for real-time inspection and CSS variable mapping | Better targeting, faster development    | 1            | High     | ✅ Documented |
+| 5   | **Modern CSS Variable System**                   | Legacy `--modspotify` variables broken after Spotify UI updates                     | Adopt new `--spice-` variable system with proper Encore theme compatibility                  | Future-proof themes, better maintenance | 3            | High     | ✅ Completed  |
+| 6   | **Component-Based Targeting Guide**              | Developers use trial-and-error to find correct selectors                            | Build comprehensive selector mapping with React component inspection                         | Faster development, consistent theming  | 3            | Medium   | ✅ Documented |
+| 7   | **UI Component Enhanced Styling**                | Key interface elements lack dynamic color integration                               | Add comprehensive styling for action bars, track lists, and other components                 | Enhanced visual integration             | 2            | Medium   | ✅ Completed  |
+
+---
+
+## 🎯 Recent Implementation Achievements (January 2025)
+
+### ✅ Critical RGB Variable Discovery & Implementation
+
+**The Issue Found:**
+
+- SCSS gradients using `rgba(var(--sn-gradient-primary-rgb), 0.12)` format were failing
+- JavaScript was only setting hex versions like `--sn-gradient-primary: "#ca9ee6"`
+- RGB versions like `--sn-gradient-primary-rgb: "202,158,230"` were missing
+
+**The Complete Solution:**
+
+```javascript
+// === Year 3000 Color Harmony Foundation System ===
+const year3000System = {
+  applyColorsToTheme: (colors) => {
+    const root = document.documentElement;
+
+    // Extract colors with intelligent fallbacks
+    const primaryColor = colors.VIBRANT || colors.PROMINENT || "#ca9ee6";
+    const secondaryColor =
+      colors.DARK_VIBRANT || colors.DESATURATED || "#babbf1";
+    const accentColor =
+      colors.VIBRANT_NON_ALARMING || colors.LIGHT_VIBRANT || "#8caaee";
+
+    // Convert to RGB format
+    const primaryRgb = hexToRgb(primaryColor);
+    const secondaryRgb = hexToRgb(secondaryColor);
+    const accentRgb = hexToRgb(accentColor);
+
+    // Set hex versions for solid colors
+    root.style.setProperty("--sn-gradient-primary", primaryColor);
+    root.style.setProperty("--sn-gradient-secondary", secondaryColor);
+    root.style.setProperty("--sn-gradient-accent", accentColor);
+
+    // Set RGB versions for gradients (CRITICAL!)
+    if (primaryRgb) {
+      root.style.setProperty(
+        "--sn-gradient-primary-rgb",
+        `${primaryRgb.r},${primaryRgb.g},${primaryRgb.b}`
+      );
+    }
+    if (secondaryRgb) {
+      root.style.setProperty(
+        "--sn-gradient-secondary-rgb",
+        `${secondaryRgb.r},${secondaryRgb.g},${secondaryRgb.b}`
+      );
+    }
+    if (accentRgb) {
+      root.style.setProperty(
+        "--sn-gradient-accent-rgb",
+        `${accentRgb.r},${accentRgb.g},${accentRgb.b}`
+      );
+    }
+
+    // Set ALL missing spice RGB variables that SCSS expects
+    if (primaryRgb) {
+      root.style.setProperty(
+        "--spice-rgb-accent",
+        `${primaryRgb.r},${primaryRgb.g},${primaryRgb.b}`
+      );
+      root.style.setProperty(
+        "--spice-rgb-button",
+        `${primaryRgb.r},${primaryRgb.g},${primaryRgb.b}`
+      );
+    }
+
+    // Convert existing theme colors to RGB
+    const currentMain = getComputedStyle(root)
+      .getPropertyValue("--spice-main")
+      .trim();
+    const currentPlayer = getComputedStyle(root)
+      .getPropertyValue("--spice-player")
+      .trim();
+    const currentSidebar = getComputedStyle(root)
+      .getPropertyValue("--spice-sidebar")
+      .trim();
+
+    const mainRgb = hexToRgb("#" + currentMain);
+    const playerRgb = hexToRgb("#" + currentPlayer);
+    const sidebarRgb = hexToRgb("#" + currentSidebar);
+
+    if (mainRgb) {
+      root.style.setProperty(
+        "--spice-rgb-main",
+        `${mainRgb.r},${mainRgb.g},${mainRgb.b}`
+      );
+      root.style.setProperty(
+        "--spice-rgb-base",
+        `${mainRgb.r},${mainRgb.g},${mainRgb.b}`
+      );
+    }
+    if (playerRgb) {
+      root.style.setProperty(
+        "--spice-rgb-player",
+        `${playerRgb.r},${playerRgb.g},${playerRgb.b}`
+      );
+    }
+    if (sidebarRgb) {
+      root.style.setProperty(
+        "--spice-rgb-sidebar",
+        `${sidebarRgb.r},${sidebarRgb.g},${sidebarRgb.b}`
+      );
+    }
+
+    // Apply gradient parameters
+    root.style.setProperty("--sn-gradient-opacity", "0.08");
+    root.style.setProperty("--sn-gradient-blur", "30px");
+    root.style.setProperty(
+      "--sn-gradient-transition",
+      "2400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+    );
+  },
+};
+```
+
+### ✅ Enhanced UI Component Styling
+
+**Action Bar Background Integration:**
+
+```scss
+.main-actionBarBackground-background {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.85) 0%,
+    rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.75) 50%,
+    rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.65) 100%
+  ) !important;
+  backdrop-filter: blur(20px) saturate(1.2);
+  border-bottom: 1px solid rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3);
+  transition: all var(--sn-gradient-transition, 600ms ease);
+}
+```
+
+**Track List Dynamic Styling:**
+
+```scss
+.main-rootlist-wrapper {
+  &::before {
+    background: linear-gradient(
+      180deg,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.03) 0%,
+      transparent 15%,
+      transparent 85%,
+      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.02) 100%
+    );
+  }
+
+  .main-trackList-trackListRow {
+    &:hover {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.08) 0%,
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.04) 50%,
+        transparent 100%
+      );
+    }
+
+    &[aria-selected="true"] {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.12) 0%,
+        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.08) 100%
+      );
+    }
+  }
+}
+```
 
 ---
 
@@ -81,6 +305,15 @@ spicetify apply         # For older versions
 --spice-rgb-main          // RGB values: "255,255,255"
 --spice-rgb-text          // RGB values for rgba() usage
 --spice-rgb-button        // RGB values for button transparency
+
+// === Extended RGB Variants (Catppuccin StarryNight) ===
+--spice-rgb-main          // Main background RGB values
+--spice-rgb-text          // Text color RGB values
+--spice-rgb-button        // Button color RGB values
+--spice-rgb-sidebar       // Sidebar background RGB values
+--spice-rgb-player        // Player background RGB values
+--spice-rgb-card          // Card background RGB values
+--spice-rgb-highlight     // Highlight accent RGB values
 ```
 
 ### ❌ Deprecated Variables (Avoid These)
@@ -105,6 +338,10 @@ spicetify apply         # For older versions
 /**
  * Extract colors using Spicetify's built-in color extractor
  * Handles CORS automatically and provides multiple color variants
+ *
+ * ✅ IMPLEMENTATION NOTE: This method resolves CORS issues encountered with
+ * spotify:image: URLs in canvas-based color extraction. Successfully implemented
+ * in Catppuccin StarryNight theme to replace problematic Vibrant.js usage.
  */
 async function extractColorsNative() {
   const currentTrack = Spicetify.Player.data.item;
@@ -554,505 +791,336 @@ button[aria-checked] {
 
 ## 🛠️ Debugging & Development Tools
 
+### Critical RGB Variable Debugging
+
+**Issue**: Gradients not appearing despite color extraction working
+
+**Debug Steps:**
+
+1. **Check RGB variables are set**: Open dev tools → Elements → `:root` → look for `--sn-gradient-*-rgb` variables
+2. **Verify both hex and RGB versions**: Both `--sn-gradient-primary` AND `--sn-gradient-primary-rgb` must be present
+3. **Test color extraction**: Run `Year3000Debug.testGradients()` in console
+4. **Check SCSS compilation**: Ensure SCSS compiled to CSS with `sass app.scss user.css`
+
+**Common RGB Variable Issues:**
+
+```javascript
+// ❌ WRONG: Only setting hex version
+root.style.setProperty("--sn-gradient-primary", "#ca9ee6");
+
+// ✅ CORRECT: Setting both hex AND RGB versions
+root.style.setProperty("--sn-gradient-primary", "#ca9ee6");
+root.style.setProperty("--sn-gradient-primary-rgb", "202,158,230");
+```
+
+### Automatic CSS Application in Spicetify
+
+**Key Discovery**: Manual testing functions are **unnecessary** in Spicetify environment.
+
+**Why CSS Applies Automatically:**
+
+- CSS automatically applies when DOM elements appear
+- Dynamic CSS variables update gradients in real-time
+- Spicetify loads compiled `user.css` automatically
+- No manual intervention needed for styling to take effect
+
+**Best Practice**: Focus on setting CSS variables correctly rather than building test functions for styling verification.
+
 ### Theme Debug Console
 
 ```javascript
 /**
- * Comprehensive debugging utilities for theme development
+ * Enhanced debugging utilities for RGB variable issues
  */
-window.SpicetifyThemeDebug = {
-  // Log current CSS variables
+window.Year3000Debug = {
+  // Test gradient variables and color extraction
+  testGradients: () => {
+    console.log("🧪 Testing gradient application...");
+    year3000System.updateColorsFromCurrentTrack();
+
+    // Show current gradient variables
+    const root = document.documentElement;
+    const gradientVars = {
+      primary: getComputedStyle(root).getPropertyValue("--sn-gradient-primary"),
+      secondary: getComputedStyle(root).getPropertyValue(
+        "--sn-gradient-secondary"
+      ),
+      accent: getComputedStyle(root).getPropertyValue("--sn-gradient-accent"),
+      primaryRgb: getComputedStyle(root).getPropertyValue(
+        "--sn-gradient-primary-rgb"
+      ),
+      secondaryRgb: getComputedStyle(root).getPropertyValue(
+        "--sn-gradient-secondary-rgb"
+      ),
+      accentRgb: getComputedStyle(root).getPropertyValue(
+        "--sn-gradient-accent-rgb"
+      ),
+      opacity: getComputedStyle(root).getPropertyValue("--sn-gradient-opacity"),
+      blur: getComputedStyle(root).getPropertyValue("--sn-gradient-blur"),
+    };
+
+    console.log("🎨 Current gradient variables:", gradientVars);
+
+    // Validate RGB format
+    const rgbValidation = {
+      primaryRgbValid: /^\d+,\d+,\d+$/.test(gradientVars.primaryRgb?.trim()),
+      secondaryRgbValid: /^\d+,\d+,\d+$/.test(
+        gradientVars.secondaryRgb?.trim()
+      ),
+      accentRgbValid: /^\d+,\d+,\d+$/.test(gradientVars.accentRgb?.trim()),
+    };
+
+    console.log("✅ RGB Format Validation:", rgbValidation);
+    return { gradientVars, rgbValidation };
+  },
+
+  // Log current CSS variables with RGB focus
   logCurrentVariables() {
     const style = getComputedStyle(document.documentElement);
     const variables = {};
 
-    // Get all --spice- variables
+    // Get all --spice- and --sn-gradient variables
     for (const property of document.styleSheets[0].cssRules[0].style) {
-      if (property.startsWith("--spice-")) {
+      if (
+        property.startsWith("--spice-") ||
+        property.startsWith("--sn-gradient")
+      ) {
         variables[property] = style.getPropertyValue(property).trim();
       }
     }
 
-    console.table(variables);
-    return variables;
+    // Separate RGB and hex variables for analysis
+    const hexVars = Object.keys(variables).filter(
+      (key) => !key.includes("-rgb")
+    );
+    const rgbVars = Object.keys(variables).filter((key) =>
+      key.includes("-rgb")
+    );
+
+    console.log(
+      "🎨 Hex Variables:",
+      hexVars.reduce((obj, key) => {
+        obj[key] = variables[key];
+        return obj;
+      }, {})
+    );
+    console.log(
+      "🧮 RGB Variables:",
+      rgbVars.reduce((obj, key) => {
+        obj[key] = variables[key];
+        return obj;
+      }, {})
+    );
+
+    return { hexVars, rgbVars, allVariables: variables };
   },
 
-  // Test color extraction
-  async testColorExtraction() {
-    const track = Spicetify.Player.data.item;
-    if (!track) {
-      console.warn("No track currently playing");
-      return;
-    }
-
-    console.log("Testing color extraction for:", track.metadata.title);
-
-    try {
-      const colors = await extractColorsNative();
-      console.log("Extracted colors:", colors);
-
-      // Temporarily apply colors for visual testing
-      this.previewColors(colors);
-
-      return colors;
-    } catch (error) {
-      console.error("Color extraction failed:", error);
-    }
+  // Test hex to RGB conversion
+  testHexToRgb: (hex) => {
+    const rgb = hexToRgb(hex);
+    console.log(
+      `🔄 ${hex} → RGB(${rgb?.r}, ${rgb?.g}, ${rgb?.b}) → "${rgb?.r},${rgb?.g},${rgb?.b}"`
+    );
+    return rgb;
   },
 
-  // Preview colors without permanent application
-  previewColors(colors, duration = 5000) {
-    const originalColors = this.getCurrentColors();
+  // Validate all RGB variables are properly set
+  validateRgbVariables: () => {
+    const requiredRgbVars = [
+      "--sn-gradient-primary-rgb",
+      "--sn-gradient-secondary-rgb",
+      "--sn-gradient-accent-rgb",
+      "--spice-rgb-main",
+      "--spice-rgb-base",
+      "--spice-rgb-player",
+      "--spice-rgb-sidebar",
+      "--spice-rgb-accent",
+      "--spice-rgb-surface0",
+      "--spice-rgb-surface1",
+    ];
 
-    updateThemeColors(colors);
-    console.log(`Previewing colors for ${duration}ms...`);
-
-    setTimeout(() => {
-      this.restoreColors(originalColors);
-      console.log("Colors restored");
-    }, duration);
-  },
-
-  // Get current color state
-  getCurrentColors() {
-    const style = getComputedStyle(document.documentElement);
-    return {
-      text: style.getPropertyValue("--spice-text"),
-      button: style.getPropertyValue("--spice-button"),
-      highlight: style.getPropertyValue("--spice-highlight"),
-    };
-  },
-
-  // Restore previous colors
-  restoreColors(colors) {
     const root = document.documentElement;
-    Object.entries(colors).forEach(([key, value]) => {
-      if (value) {
-        root.style.setProperty(`--spice-${key}`, value);
-      }
+    const validation = {};
+
+    requiredRgbVars.forEach((varName) => {
+      const value = getComputedStyle(root).getPropertyValue(varName).trim();
+      validation[varName] = {
+        present: !!value,
+        value: value,
+        validFormat: /^\d+,\d+,\d+$/.test(value),
+      };
     });
+
+    console.table(validation);
+    return validation;
   },
 
-  // Monitor Spicetify API availability
-  checkSpicetifyAPI() {
-    const apis = {
-      Spicetify: !!window.Spicetify,
-      Player: !!window.Spicetify?.Player,
-      colorExtractor: !!window.Spicetify?.colorExtractor,
-      React: !!window.Spicetify?.React,
-      ReactDOM: !!window.Spicetify?.ReactDOM,
-    };
+  // Reset to defaults
+  resetColors: () => year3000System.resetToDefaults(),
 
-    console.table(apis);
-    return apis;
-  },
+  // Extract colors from current track
+  extractColors: () => year3000System.updateColorsFromCurrentTrack(),
+
+  // Get full system status
+  getReport: () => year3000System.getSystemReport(),
 };
 
-// Auto-run API check on load
-document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(() => {
-    if (window.SpicetifyThemeDebug) {
-      window.SpicetifyThemeDebug.checkSpicetifyAPI();
-    }
-  }, 2000);
-});
+// Utility function for debugging
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      }
+    : null;
+}
 ```
 
-### CSS Variable Inspector
+### CSS Variable Inspector with RGB Focus
 
 ```javascript
 /**
- * Real-time CSS variable inspector for theme development
+ * Real-time CSS variable inspector focused on RGB variables
  */
-function createVariableInspector() {
+function createRgbVariableInspector() {
   // Create floating debug panel
   const panel = document.createElement("div");
-  panel.id = "spicetify-debug-panel";
+  panel.id = "spicetify-rgb-debug-panel";
   panel.style.cssText = `
         position: fixed;
         top: 10px;
         right: 10px;
-        width: 300px;
-        max-height: 400px;
-        background: #000;
+        width: 350px;
+        max-height: 500px;
+        background: rgba(0,0,0,0.9);
         color: #fff;
-        border: 1px solid #333;
-        padding: 10px;
-        font-family: monospace;
-        font-size: 12px;
+        border: 2px solid #ca9ee6;
+        border-radius: 8px;
+        padding: 15px;
+        font-family: 'SF Mono', 'Consolas', monospace;
+        font-size: 11px;
         z-index: 9999;
         overflow-y: auto;
         display: none;
+        backdrop-filter: blur(10px);
     `;
 
   document.body.appendChild(panel);
 
   // Toggle panel with keyboard shortcut
   document.addEventListener("keydown", (e) => {
-    if (e.ctrlKey && e.shiftKey && e.key === "D") {
+    if (e.ctrlKey && e.shiftKey && e.key === "R") {
       panel.style.display = panel.style.display === "none" ? "block" : "none";
       if (panel.style.display === "block") {
-        updateInspector();
+        updateRgbInspector();
       }
     }
   });
 
-  function updateInspector() {
-    const variables = window.SpicetifyThemeDebug.logCurrentVariables();
+  function updateRgbInspector() {
+    const validation = Year3000Debug.validateRgbVariables();
+    const gradientTest = Year3000Debug.testGradients();
+
+    const validCount = Object.values(validation).filter(
+      (v) => v.present && v.validFormat
+    ).length;
+    const totalCount = Object.keys(validation).length;
+
     panel.innerHTML = `
-            <h3>CSS Variables (Ctrl+Shift+D to toggle)</h3>
-            ${Object.entries(variables)
+            <h3 style="color: #ca9ee6; margin-top: 0;">🧮 RGB Variables Inspector (Ctrl+Shift+R)</h3>
+            <div style="color: ${
+              validCount === totalCount ? "#a6e3a1" : "#f38ba8"
+            };">
+                Status: ${validCount}/${totalCount} RGB variables valid
+            </div>
+            <hr style="border-color: #313244; margin: 10px 0;">
+
+            <h4 style="color: #fab387;">🎨 Gradient Variables:</h4>
+            ${Object.entries(validation)
+              .filter(([key]) => key.includes("gradient"))
               .map(
-                ([key, value]) =>
-                  `<div>${key}: <span style="color: ${value}">${value}</span></div>`
+                ([key, data]) => `
+                <div style="margin: 5px 0; padding: 5px; background: ${
+                  data.validFormat
+                    ? "rgba(166, 227, 161, 0.1)"
+                    : "rgba(243, 139, 168, 0.1)"
+                }; border-radius: 4px;">
+                    <strong>${key.replace("--sn-gradient-", "")}:</strong>
+                    <span style="color: ${
+                      data.validFormat ? "#a6e3a1" : "#f38ba8"
+                    }">${data.value || "NOT SET"}</span>
+                </div>
+              `
               )
               .join("")}
+
+            <h4 style="color: #f9e2af;">🎛️ Spice Variables:</h4>
+            ${Object.entries(validation)
+              .filter(([key]) => key.includes("spice-rgb"))
+              .map(
+                ([key, data]) => `
+                <div style="margin: 5px 0; padding: 5px; background: ${
+                  data.validFormat
+                    ? "rgba(166, 227, 161, 0.1)"
+                    : "rgba(243, 139, 168, 0.1)"
+                }; border-radius: 4px;">
+                    <strong>${key.replace("--spice-rgb-", "")}:</strong>
+                    <span style="color: ${
+                      data.validFormat ? "#a6e3a1" : "#f38ba8"
+                    }">${data.value || "NOT SET"}</span>
+                </div>
+              `
+              )
+              .join("")}
+
+            <hr style="border-color: #313244; margin: 10px 0;">
+            <button onclick="Year3000Debug.testGradients()" style="background: #ca9ee6; color: #000; border: none; padding: 8px 12px; border-radius: 4px; margin: 5px; cursor: pointer;">🧪 Test Gradients</button>
+            <button onclick="Year3000Debug.extractColors()" style="background: #a6e3a1; color: #000; border: none; padding: 8px 12px; border-radius: 4px; margin: 5px; cursor: pointer;">🎨 Extract Colors</button>
+            <button onclick="Year3000Debug.resetColors()" style="background: #f38ba8; color: #000; border: none; padding: 8px 12px; border-radius: 4px; margin: 5px; cursor: pointer;">🧹 Reset</button>
         `;
   }
 }
 
-// Initialize inspector in development mode
+// Initialize RGB inspector in development mode
 if (localStorage.getItem("spicetify-debug") === "true") {
-  createVariableInspector();
+  createRgbVariableInspector();
 }
 ```
 
 ---
 
-## 📱 Responsive Design & Accessibility
+## 🎯 Best Practices Summary
 
-### Responsive Breakpoints
+### ✅ RGB Variable Implementation
 
-```scss
-// === Media Queries for Different Screen Sizes ===
-@media (max-width: 1200px) {
-  .Root__main-view {
-    // Large tablet adjustments
-    padding: 0 16px;
-  }
-}
+1. **Always set both hex and RGB versions** of color variables
+2. **Use proper RGB format**: `"202,158,230"` (comma-separated, no spaces, no parentheses)
+3. **Validate RGB variables** using regex: `/^\d+,\d+,\d+$/`
+4. **Include fallbacks** in SCSS: `rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.12)`
 
-@media (max-width: 768px) {
-  .Root__main-view {
-    // Mobile adjustments
-    padding: 0 8px;
-  }
+### ✅ Dynamic Color System Architecture
 
-  .main-trackInfo-container {
-    // Adjust track info for mobile
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
+1. **Extract colors using native API**: `Spicetify.colorExtractor(trackUri)`
+2. **Convert all colors to RGB**: Use `hexToRgb()` utility function
+3. **Set comprehensive variable coverage**: Include all spice and gradient RGB variants
+4. **Implement proper cleanup**: Remove all dynamic variables in reset function
 
-// === Handle Sidebar States ===
-.Root__nav-bar {
-  // Full sidebar
-  &[style*="--panel-width:280px"] {
-    .main-rootlist-textWrapper {
-      opacity: 1;
-      transition: opacity var(--transition-normal);
-    }
-  }
+### ✅ UI Component Integration
 
-  // Collapsed sidebar
-  &[style*="--panel-width:72px"] {
-    .main-rootlist-textWrapper {
-      opacity: 0;
-    }
-  }
-}
-```
+1. **Use CSS variables in gradients**: Leverage both primary and fallback variables
+2. **Apply automatic styling**: CSS applies automatically - no manual testing needed
+3. **Include transition effects**: Use `--sn-gradient-transition` for smooth changes
+4. **Target stable selectors**: Use class-based selectors over complex pseudo-selectors
 
-### Accessibility Considerations
+### ❌ Common Pitfalls to Avoid
 
-```scss
-// === Focus Management ===
-button:focus-visible,
-[role="button"]:focus-visible {
-  outline: 2px solid var(--spice-button);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-// === High Contrast Support ===
-@media (prefers-contrast: high) {
-  :root {
-    --spice-text: #ffffff;
-    --spice-subtext: #cccccc;
-    --spice-main: #000000;
-    --spice-button: #ffffff;
-  }
-}
-
-// === Reduced Motion Support ===
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  .main-trackList-playingIcon {
-    background-image: none !important;
-  }
-}
-```
-
----
-
-## 🎛️ Theme Configuration System
-
-### Settings Panel Integration
-
-```javascript
-/**
- * Create theme settings panel similar to Catppuccin approach
- */
-const ThemeSettings = Spicetify.React.memo(() => {
-  const [colorMode, setColorMode] = Spicetify.React.useState(
-    localStorage.getItem("theme-color-mode") || "auto"
-  );
-
-  const [accentColor, setAccentColor] = Spicetify.React.useState(
-    localStorage.getItem("theme-accent-color") || "vibrant"
-  );
-
-  const colorModes = ["auto", "light", "dark"];
-  const accentOptions = ["vibrant", "muted", "prominent", "custom"];
-
-  Spicetify.React.useEffect(() => {
-    // Apply color mode
-    applyColorMode(colorMode);
-    localStorage.setItem("theme-color-mode", colorMode);
-  }, [colorMode]);
-
-  Spicetify.React.useEffect(() => {
-    // Apply accent color preference
-    applyAccentColor(accentColor);
-    localStorage.setItem("theme-accent-color", accentColor);
-  }, [accentColor]);
-
-  function applyColorMode(mode) {
-    const root = document.documentElement;
-
-    switch (mode) {
-      case "light":
-        root.classList.add("light-theme");
-        root.classList.remove("dark-theme");
-        break;
-      case "dark":
-        root.classList.add("dark-theme");
-        root.classList.remove("light-theme");
-        break;
-      case "auto":
-      default:
-        root.classList.remove("light-theme", "dark-theme");
-        // Follow system preference
-        break;
-    }
-  }
-
-  function applyAccentColor(accent) {
-    // Store preference for next color extraction
-    window.themeAccentPreference = accent;
-  }
-
-  return Spicetify.React.createElement(
-    "div",
-    {
-      className: "x-settings-section",
-    },
-    [
-      Spicetify.React.createElement(
-        "h2",
-        {
-          className: "TextElement-bodyMediumBold-textBase-text",
-          key: "title",
-        },
-        "Dynamic Theme Settings"
-      ),
-
-      // Color Mode Setting
-      Spicetify.React.createElement(
-        "div",
-        {
-          className: "x-settings-row",
-          key: "color-mode",
-        },
-        [
-          Spicetify.React.createElement(
-            "label",
-            {
-              className: "TextElement-bodySmall-textSubdued-text",
-              key: "label",
-            },
-            "Color Mode"
-          ),
-          Spicetify.React.createElement(
-            "select",
-            {
-              className: "main-dropDown-dropDown",
-              value: colorMode,
-              onChange: (e) => setColorMode(e.target.value),
-              key: "select",
-            },
-            colorModes.map((mode) =>
-              Spicetify.React.createElement(
-                "option",
-                {
-                  key: mode,
-                  value: mode,
-                },
-                mode.charAt(0).toUpperCase() + mode.slice(1)
-              )
-            )
-          ),
-        ]
-      ),
-
-      // Accent Color Setting
-      Spicetify.React.createElement(
-        "div",
-        {
-          className: "x-settings-row",
-          key: "accent-color",
-        },
-        [
-          Spicetify.React.createElement(
-            "label",
-            {
-              className: "TextElement-bodySmall-textSubdued-text",
-              key: "label",
-            },
-            "Accent Color Priority"
-          ),
-          Spicetify.React.createElement(
-            "select",
-            {
-              className: "main-dropDown-dropDown",
-              value: accentColor,
-              onChange: (e) => setAccentColor(e.target.value),
-              key: "select",
-            },
-            accentOptions.map((option) =>
-              Spicetify.React.createElement(
-                "option",
-                {
-                  key: option,
-                  value: option,
-                },
-                option.charAt(0).toUpperCase() + option.slice(1)
-              )
-            )
-          ),
-        ]
-      ),
-    ]
-  );
-});
-
-// Insert settings panel into preferences
-function insertThemeSettings(pathname) {
-  if (pathname !== "/preferences") return;
-
-  const checkForSettings = setInterval(() => {
-    const settingsContainer = document.querySelector(
-      '[data-testid="settings-page"]'
-    );
-
-    if (settingsContainer) {
-      clearInterval(checkForSettings);
-
-      const settingsDiv = document.createElement("div");
-      Spicetify.ReactDOM.render(
-        Spicetify.React.createElement(ThemeSettings),
-        settingsDiv
-      );
-
-      const firstSection = settingsContainer.querySelector(
-        ".x-settings-section"
-      );
-      if (firstSection) {
-        firstSection.parentNode.insertBefore(
-          settingsDiv,
-          firstSection.nextSibling
-        );
-      }
-    }
-  }, 100);
-}
-
-// Initialize settings
-insertThemeSettings(Spicetify.Platform.History.location?.pathname);
-Spicetify.Platform.History.listen((event) => {
-  insertThemeSettings(event.pathname);
-});
-```
-
----
-
-## 📋 Implementation Checklist
-
-### ✅ Theme Development Checklist
-
-**Setup & Configuration:**
-
-- [ ] Run `spicetify enable-devtools` for CSS inspection
-- [ ] Configure `inject_css 1 replace_colors 1`
-- [ ] Set up proper theme folder structure
-- [ ] Create `color.ini` with modern `--spice-` variables
-- [ ] Create `user.css` with component-based selectors
-
-**Color System Implementation:**
-
-- [ ] Implement native `Spicetify.colorExtractor()` API
-- [ ] Add canvas-based fallback for color extraction
-- [ ] Set up color caching system for performance
-- [ ] Handle light/dark mode detection and switching
-- [ ] Implement smooth color transitions
-
-**Dynamic Features:**
-
-- [ ] Add `songchange` event listener
-- [ ] Implement debounced color updates
-- [ ] Create theme settings panel
-- [ ] Add user preference persistence
-- [ ] Handle edge cases (no album art, local files)
-
-**Component Targeting:**
-
-- [ ] Use stable CSS selectors (prefer `[data-testid]`)
-- [ ] Target main layout containers properly
-- [ ] Style interactive elements consistently
-- [ ] Handle state-based styling (active, focus, hover)
-- [ ] Test across different Spotify UI states
-
-**Performance & Accessibility:**
-
-- [ ] Implement proper focus management
-- [ ] Add high contrast mode support
-- [ ] Respect `prefers-reduced-motion`
-- [ ] Optimize CSS animations and transitions
-- [ ] Test with screen readers
-
-**Testing & Debugging:**
-
-- [ ] Test color extraction with various album arts
-- [ ] Verify WCAG contrast ratios
-- [ ] Test responsive behavior
-- [ ] Debug with browser dev tools
-- [ ] Test theme persistence across sessions
-
-**Documentation:**
-
-- [ ] Document custom CSS variables
-- [ ] Create installation instructions
-- [ ] Add troubleshooting guide
-- [ ] Document theme configuration options
-- [ ] Include performance considerations
+1. **Setting only hex variables** for gradient usage
+2. **Incorrect RGB format** (with parentheses or spaces)
+3. **Missing fallback variables** in SCSS
+4. **Building manual test functions** for automatic CSS application
+5. **Incomplete variable coverage** missing key spice RGB variants
 
 ---
 
@@ -1081,6 +1149,6 @@ Spicetify.Platform.History.listen((event) => {
 
 _This design bible is a living document. Updates and improvements are welcome as the Spicetify ecosystem evolves._
 
-**Last Updated:** January 2025
-**Version:** 1.0
+**Last Updated:** January 2025 (Catppuccin StarryNight implementation updates)
+**Version:** 1.1
 **Compatibility:** Spicetify CLI 2.27+ | Spotify 1.2.0+

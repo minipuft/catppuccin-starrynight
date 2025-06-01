@@ -1,0 +1,619 @@
+// =============================================================================
+// YEAR 3000 NEXUS SYSTEM - Complete Entity Header & Action Bar Redesign
+// Inspired by the Nexus Orb concept and Focal Bloom interactions
+// =============================================================================
+
+// Year 3000 Custom Properties
+:root {
+  // === Nexus Core Variables ===
+  --nexus-glow-intensity: 0.6;
+  --nexus-pulse-speed: 4s;
+  --nexus-breathe-speed: 6s;
+  --nexus-energy-flow: 8s;
+  --nexus-bloom-radius: 120px;
+  --nexus-hover-scale: 1.02;
+
+  // === Energy Conduit Variables ===
+  --conduit-wave-speed: 3s;
+  --conduit-particle-count: 12;
+  --conduit-energy-opacity: 0.8;
+  --conduit-flow-direction: 1;
+
+  // === Organic Animation Curves ===
+  --nexus-ease-organic: cubic-bezier(0.23, 1, 0.32, 1);
+  --nexus-ease-bloom: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --nexus-ease-pulse: cubic-bezier(0.445, 0.05, 0.55, 0.95);
+
+  // === Depth & Perspective ===
+  --nexus-perspective: 1000px;
+  --nexus-depth-near: translateZ(20px);
+  --nexus-depth-mid: translateZ(10px);
+  --nexus-depth-far: translateZ(0px);
+}
+
+// =============================================================================
+// NEXUS CORE: Entity Header Complete Redesign
+// =============================================================================
+
+.main-entityHeader-container {
+  position: relative;
+  overflow: visible !important;
+  perspective: var(--nexus-perspective);
+  transform-style: preserve-3d;
+
+  // Reset any existing styling
+  background: none !important;
+
+  // === Holographic Foundation Layer ===
+  &::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -40px;
+    z-index: -3;
+
+    // Holographic base with organic shape
+    background: radial-gradient(
+        ellipse 80% 60% at 30% 20%,
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.15) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse 70% 80% at 70% 80%,
+        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.12)
+          0%,
+        transparent 60%
+      ),
+      linear-gradient(
+        135deg,
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.08) 0%,
+        rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.05) 50%,
+        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.03)
+          100%
+      );
+
+    // Organic border radius with subtle morphing
+    border-radius: 24px 32px 28px 20px;
+    backdrop-filter: blur(30px) saturate(1.4);
+    border: 1px solid
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2);
+
+    // Breathing animation
+    animation: nexus-breathe var(--nexus-breathe-speed) ease-in-out infinite
+      alternate;
+    transition: all 800ms var(--nexus-ease-organic);
+  }
+
+  // === Energy Aura Layer ===
+  &::after {
+    content: "";
+    position: absolute;
+    top: -40px;
+    left: -40px;
+    right: -40px;
+    bottom: -60px;
+    z-index: -4;
+
+    // Pulsing energy aura
+    background: radial-gradient(
+      ellipse 120% 100% at center,
+      rgba(
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+          var(--nexus-glow-intensity)
+        )
+        0%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.2) 30%,
+      transparent 70%
+    );
+
+    border-radius: 50%;
+    filter: blur(20px);
+    opacity: 0.6;
+
+    // Pulsing energy animation
+    animation: nexus-energy-pulse var(--nexus-pulse-speed) ease-in-out infinite;
+  }
+
+  // === Interactive Bloom Effect ===
+  &:hover {
+    transform: var(--nexus-depth-near) scale(var(--nexus-hover-scale));
+
+    &::before {
+      --nexus-glow-intensity: 0.9;
+      border-color: rgba(
+        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+        0.4
+      );
+      backdrop-filter: blur(40px) saturate(1.8);
+    }
+
+    &::after {
+      opacity: 1;
+      animation-duration: calc(var(--nexus-pulse-speed) * 0.7);
+    }
+  }
+
+  // === Content Container Styling ===
+  > .main-entityHeader-backgroundColor {
+    display: none !important; // Hide original background
+  }
+
+  > .main-entityHeader-overlay {
+    display: none !important; // Hide original overlay
+  }
+
+  // === Content Wrapper ===
+  > .contentSpacing,
+  > [class*="contentSpacing"] {
+    position: relative;
+    z-index: 2;
+    transform: var(--nexus-depth-mid);
+    padding: 32px 24px 24px;
+
+    // Add subtle internal glow
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.05) 0%,
+        transparent 40%,
+        transparent 60%,
+        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.03)
+          100%
+      );
+      border-radius: 16px;
+      z-index: -1;
+    }
+  }
+}
+
+// =============================================================================
+// NEXUS IMAGE: Album Art Enhancement
+// =============================================================================
+
+.main-entityHeader-imageContainer {
+  position: relative;
+  transform: var(--nexus-depth-near);
+
+  // === Energy Source Ring ===
+  &::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    z-index: -1;
+
+    background: conic-gradient(
+      from 0deg,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6) 0deg,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.4) 120deg,
+      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.6)
+        240deg,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6) 360deg
+    );
+
+    border-radius: 50%;
+    animation: nexus-energy-rotate var(--nexus-energy-flow) linear infinite;
+    filter: blur(2px);
+  }
+
+  // === Album Image Styling ===
+  .main-entityHeader-image,
+  .main-image-image {
+    border-radius: 16px !important;
+    transition: all 600ms var(--nexus-ease-organic);
+    box-shadow: 0 8px 32px
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3),
+      0 4px 16px rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      transform: scale(1.05) rotateY(5deg);
+      box-shadow: 0 12px 48px
+          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4),
+        0 6px 24px rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+
+// =============================================================================
+// NEXUS TYPOGRAPHY: Future Text Effects
+// =============================================================================
+
+.main-entityHeader-headerText {
+  position: relative;
+  transform: var(--nexus-depth-mid);
+
+  // === Title Enhancement ===
+  .main-entityHeader-title {
+    position: relative;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 1) 0%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.9) 50%,
+      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.8)
+        100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    // Add subtle text glow
+    filter: drop-shadow(
+      0 0 8px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3)
+    );
+
+    h1 {
+      font-weight: 800 !important;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      animation: nexus-text-shimmer 8s ease-in-out infinite;
+    }
+  }
+
+  // === Metadata Enhancement ===
+  .main-entityHeader-pretitle {
+    color: rgba(
+      var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)),
+      0.8
+    ) !important;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+
+    &::before {
+      content: "◊ ";
+      color: rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6);
+    }
+  }
+
+  // === Creator & Stats Styling ===
+  [class*="metaDataText"],
+  [class*="creatorWrapper"] {
+    a,
+    span {
+      color: rgba(
+        var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)),
+        0.9
+      ) !important;
+      transition: all 300ms var(--nexus-ease-organic);
+
+      &:hover {
+        color: rgba(
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+          1
+        ) !important;
+        text-shadow: 0 0 8px
+          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4);
+      }
+    }
+  }
+
+  // === Avatar Enhancement ===
+  .main-avatar-avatar {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(
+        45deg,
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6),
+        rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.4)
+      );
+      border-radius: 50%;
+      z-index: -1;
+      animation: nexus-avatar-pulse 3s ease-in-out infinite;
+    }
+
+    img {
+      border-radius: 50%;
+      transition: all 400ms var(--nexus-ease-organic);
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+// =============================================================================
+// ENERGY CONDUIT: Action Bar Complete Redesign
+// =============================================================================
+
+.main-actionBarBackground-background {
+  position: relative;
+  overflow: hidden;
+
+  // Reset existing styling
+  background: none !important;
+  border: none !important;
+
+  // === Flowing Energy Base ===
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    right: -100%;
+    bottom: 0;
+    z-index: -2;
+
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.1) 20%,
+      rgba(
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+          var(--conduit-energy-opacity)
+        )
+        50%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.6) 70%,
+      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.4) 85%,
+      transparent 100%
+    );
+
+    animation: nexus-energy-flow var(--conduit-wave-speed) linear infinite;
+    backdrop-filter: blur(20px) saturate(1.3);
+  }
+
+  // === Energy Particles ===
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+
+    background: radial-gradient(
+        circle at 10% 50%,
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3) 1px,
+        transparent 2px
+      ),
+      radial-gradient(
+        circle at 30% 20%,
+        rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.2) 1px,
+        transparent 2px
+      ),
+      radial-gradient(
+        circle at 70% 80%,
+        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.25)
+          1px,
+        transparent 2px
+      ),
+      radial-gradient(
+        circle at 90% 40%,
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2) 1px,
+        transparent 2px
+      );
+
+    background-size: 150px 40px, 120px 40px, 180px 40px, 140px 40px;
+
+    animation: nexus-particles-drift calc(var(--conduit-wave-speed) * 2) linear
+      infinite;
+    opacity: 0.7;
+  }
+
+  // === Conduit Glow Top Edge ===
+  border-top: 1px solid
+    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4);
+  box-shadow: 0 -2px 16px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2),
+    inset 0 1px 0
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.1);
+
+  // === Interactive Enhancement ===
+  &:hover {
+    --conduit-energy-opacity: 1;
+    --conduit-wave-speed: 2s;
+
+    box-shadow: 0 -4px 24px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3),
+      inset 0 1px 0
+        rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.2);
+  }
+}
+
+// =============================================================================
+// NEXUS ANIMATIONS: Organic Motion System
+// =============================================================================
+
+@keyframes nexus-breathe {
+  0% {
+    transform: scale(1) rotateZ(0deg);
+    border-radius: 24px 32px 28px 20px;
+  }
+  100% {
+    transform: scale(1.01) rotateZ(0.5deg);
+    border-radius: 28px 24px 32px 24px;
+  }
+}
+
+@keyframes nexus-energy-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes nexus-energy-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes nexus-text-shimmer {
+  0%,
+  100% {
+    filter: drop-shadow(
+      0 0 8px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3)
+    );
+  }
+  50% {
+    filter: drop-shadow(
+      0 0 12px
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.5)
+    );
+  }
+}
+
+@keyframes nexus-avatar-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes nexus-energy-flow {
+  0% {
+    transform: translateX(-50%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(50%);
+    opacity: 0;
+  }
+}
+
+@keyframes nexus-particles-drift {
+  0% {
+    background-position: 0 0, 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 150px 0, -120px 0, 180px 0, -140px 0;
+  }
+}
+
+// =============================================================================
+// FOCAL BLOOM: Interactive Element Enhancements
+// =============================================================================
+
+// Apply Focal Bloom to interactive elements within the Nexus
+.main-entityHeader-container {
+  // Buttons get bloom treatment
+  button,
+  [role="button"],
+  a:not([data-testid*="creator-link"]) {
+    position: relative;
+    transition: all 400ms var(--nexus-ease-bloom);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: radial-gradient(
+        circle,
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3) 0%,
+        transparent 70%
+      );
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 600ms var(--nexus-ease-bloom);
+      z-index: -1;
+      opacity: 0;
+    }
+
+    &:hover::before {
+      width: var(--nexus-bloom-radius);
+      height: var(--nexus-bloom-radius);
+      opacity: 1;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}
+
+// Special treatment for creator links
+[data-testid*="creator-link"] {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6) 50%,
+      transparent 100%
+    );
+    transform: scaleX(0);
+    transition: transform 400ms var(--nexus-ease-organic);
+  }
+
+  &:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+// =============================================================================
+// RESPONSIVE ADAPTATIONS
+// =============================================================================
+
+@media (max-width: 768px) {
+  .main-entityHeader-container {
+    &::before {
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -20px;
+    }
+
+    &::after {
+      top: -20px;
+      left: -20px;
+      right: -20px;
+      bottom: -30px;
+    }
+  }
+
+  .main-actionBarBackground-background {
+    --conduit-wave-speed: 4s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

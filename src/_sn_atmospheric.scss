@@ -155,28 +155,50 @@
 // PHASE 4.5: Enhanced Search Results Layout
 // =============================================================================
 
-// Atmospheric search results
+// Atmospheric search results with quantum integration
 .main-searchPage-content {
+  // Enable 3D context for quantum effects
+  transform-style: preserve-3d;
+  perspective: 1500px;
+
   .main-gridContainer-gridContainer {
     @include atmospheric-grid;
+
+    // Enhanced for quantum integration
+    position: relative;
+    z-index: 1;
 
     .main-card-card {
       @include atmospheric-item(calc(var(--grid-stagger-delay) * 0.5));
 
+      // Quantum-aware hover state
       &:hover {
         @include context-gradient-zone("search");
+
+        // Integrate with quantum holographic effects
+        backdrop-filter: blur(15px) saturate(1.4) brightness(1.1);
+        border: 1px solid
+          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4);
       }
     }
   }
 
-  // Enhanced search categories
+  // Enhanced search categories with neural connections
   .main-shelf-shelf {
+    position: relative;
+    z-index: 2; // Above quantum particle field
+
     .main-gridContainer-gridContainer {
       @include atmospheric-grid;
       gap: calc(var(--atmospheric-gap) * 0.8);
 
       .main-card-card {
         @include atmospheric-item(calc(var(--grid-stagger-delay) * 0.3));
+
+        // Enable quantum mouse tracking
+        &:hover {
+          will-change: transform;
+        }
       }
     }
   }

@@ -1,65 +1,263 @@
-// StarryNight Star Animation Module - Dynamic shooting star effects
+// =============================================================================
+// YEAR 3000 ENERGY PARTICLE NETWORK - Advanced Stellar Animation System
+// Organic energy flows that respond to music and connect to the Nexus Orb
+// =============================================================================
+
 @use "mixins" as *;
 
-// CSS custom properties for star animation control
+// Year 3000 Energy Particle System Variables
 :root {
-  --sn-star-count: 3;
-  --sn-star-duration: 8s;
-  --sn-star-delay-base: 2s;
-  --sn-star-size: 2px;
-  --sn-star-trail-length: 100px;
-  --sn-star-opacity: 0.8;
-  --sn-star-color: var(--spice-overlay2);
-  --sn-star-speed: 1;
+  // === Particle Network Core ===
+  --particle-network-density: 3;
+  --particle-base-speed: 8s;
+  --particle-energy-intensity: 0.8;
+  --particle-connection-strength: 0.6;
+  --particle-nexus-influence: 1;
+
+  // === Organic Flow Variables ===
+  --particle-flow-variance: 15deg;
+  --particle-organic-curve: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --particle-life-cycle: 12s;
+  --particle-emergence-delay: 3s;
+
+  // === Energy Clustering System ===
+  --particle-cluster-size: 4;
+  --particle-cluster-radius: 80px;
+  --particle-cluster-cohesion: 0.7;
+  --particle-cluster-drift: 120px;
+
+  // === Dynamic Color Integration ===
+  --particle-primary-energy: var(
+    --sn-gradient-primary,
+    rgba(202, 158, 230, 0.8)
+  );
+  --particle-secondary-energy: var(
+    --sn-gradient-secondary,
+    rgba(186, 187, 241, 0.6)
+  );
+  --particle-accent-energy: var(--sn-gradient-accent, rgba(140, 170, 238, 0.7));
+
+  // === Contextual Intelligence ===
+  --particle-focus-dampening: 0.3; // Reduces in focus contexts
+  --particle-discovery-amplification: 1.4; // Enhances in discovery
+  --particle-music-modulation: 1; // Responds to music energy
 }
 
-// Keyframe animations for shooting stars (enhanced with hardware acceleration)
-@keyframes shooting-star {
+// =============================================================================
+// ADVANCED KEYFRAME SYSTEM: Organic Energy Flows
+// =============================================================================
+
+// Primary Energy Stream - Organic diagonal flow
+@keyframes energy-stream-primary {
   0% {
-    transform: translate3d(-100px, -100px, 0) rotate(45deg) scale(0);
+    transform: translate3d(-150px, -150px, 0)
+      rotate(var(--particle-flow-variance)) scale(0);
+    opacity: 0;
+    filter: blur(2px);
+  }
+
+  5% {
+    transform: translate3d(-120px, -120px, 0)
+      rotate(calc(var(--particle-flow-variance) * 0.8)) scale(0.3);
+    opacity: var(--particle-energy-intensity);
+    filter: blur(1px);
+  }
+
+  15% {
+    opacity: calc(var(--particle-energy-intensity) * 1.2);
+    filter: blur(0px);
+  }
+
+  25% {
+    transform: translate3d(20vw, 15vh, 0)
+      rotate(calc(var(--particle-flow-variance) * 0.6)) scale(1);
+  }
+
+  50% {
+    transform: translate3d(50vw, 40vh, 0)
+      rotate(calc(var(--particle-flow-variance) * 0.4)) scale(1.1);
+    opacity: calc(var(--particle-energy-intensity) * 1.1);
+  }
+
+  75% {
+    transform: translate3d(80vw, 65vh, 0)
+      rotate(calc(var(--particle-flow-variance) * 0.2)) scale(0.9);
+    opacity: calc(var(--particle-energy-intensity) * 0.9);
+  }
+
+  90% {
+    transform: translate3d(calc(100vw + 120px), calc(100vh + 120px), 0)
+      rotate(0deg) scale(0.3);
+    opacity: 0;
+    filter: blur(1px);
+  }
+
+  100% {
+    transform: translate3d(calc(100vw + 150px), calc(100vh + 150px), 0)
+      rotate(0deg) scale(0);
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+// Secondary Energy Whisper - Gentle curved flow
+@keyframes energy-whisper-secondary {
+  0% {
+    transform: translate3d(-80px, 20vh, 0) rotate(-10deg) scale(0);
     opacity: 0;
   }
 
   10% {
-    transform: translate3d(-80px, -80px, 0) rotate(45deg) scale(1);
-    opacity: var(--sn-star-opacity);
+    transform: translate3d(-40px, 18vh, 0) rotate(-8deg) scale(0.6);
+    opacity: calc(var(--particle-energy-intensity) * 0.7);
+  }
+
+  30% {
+    transform: translate3d(25vw, 12vh, 0) rotate(-4deg) scale(0.8);
+    opacity: calc(var(--particle-energy-intensity) * 0.9);
+  }
+
+  60% {
+    transform: translate3d(70vw, 8vh, 0) rotate(2deg) scale(0.7);
+    opacity: calc(var(--particle-energy-intensity) * 0.8);
+  }
+
+  85% {
+    transform: translate3d(calc(100vw + 40px), 5vh, 0) rotate(8deg) scale(0.4);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translate3d(calc(100vw + 80px), 3vh, 0) rotate(10deg) scale(0);
+    opacity: 0;
+  }
+}
+
+// Energy Pulse - Radiating from Nexus influence points
+@keyframes energy-pulse-nexus {
+  0% {
+    transform: translate3d(30vw, 25vh, 0) scale(0);
+    opacity: 0;
+    filter: blur(4px);
   }
 
   20% {
-    opacity: var(--sn-star-opacity);
+    transform: translate3d(30vw, 25vh, 0) scale(1);
+    opacity: calc(
+      var(--particle-energy-intensity) * var(--particle-nexus-influence)
+    );
+    filter: blur(0px);
+  }
+
+  40% {
+    transform: translate3d(35vw, 20vh, 0) scale(1.2);
+    opacity: calc(
+      var(--particle-energy-intensity) * var(--particle-nexus-influence) * 0.8
+    );
+  }
+
+  60% {
+    transform: translate3d(45vw, 15vh, 0) scale(0.9);
+    opacity: calc(
+      var(--particle-energy-intensity) * var(--particle-nexus-influence) * 0.6
+    );
   }
 
   80% {
-    opacity: var(--sn-star-opacity);
-  }
-
-  90% {
-    transform: translate3d(calc(100vw + 80px), calc(100vh + 80px), 0)
-      rotate(45deg) scale(1);
-    opacity: 0;
+    transform: translate3d(60vw, 10vh, 0) scale(0.5);
+    opacity: calc(
+      var(--particle-energy-intensity) * var(--particle-nexus-influence) * 0.3
+    );
+    filter: blur(2px);
   }
 
   100% {
-    transform: translate3d(calc(100vw + 100px), calc(100vh + 100px), 0)
-      rotate(45deg) scale(0);
+    transform: translate3d(80vw, 5vh, 0) scale(0);
     opacity: 0;
+    filter: blur(4px);
   }
 }
 
-@keyframes star-twinkle {
-  0%,
-  100% {
-    opacity: var(--sn-star-opacity);
-    transform: scale(1);
+// Cluster Formation - Particles that form temporary energy clusters
+@keyframes energy-cluster-formation {
+  0% {
+    transform: translate3d(10vw, 70vh, 0) scale(0.5);
+    opacity: 0;
+  }
+
+  15% {
+    transform: translate3d(15vw, 65vh, 0) scale(0.8);
+    opacity: calc(
+      var(--particle-energy-intensity) * var(--particle-cluster-cohesion)
+    );
+  }
+
+  30% {
+    transform: translate3d(22vw, 58vh, 0) scale(1);
+    opacity: calc(
+      var(--particle-energy-intensity) * var(--particle-cluster-cohesion) * 1.1
+    );
   }
 
   50% {
-    opacity: calc(var(--sn-star-opacity) * 0.3);
-    transform: scale(0.8);
+    transform: translate3d(25vw, 55vh, 0) scale(1.1);
+    opacity: calc(
+      var(--particle-energy-intensity) * var(--particle-cluster-cohesion) * 1.2
+    );
+  }
+
+  70% {
+    transform: translate3d(28vw, 52vh, 0) scale(0.9);
+    opacity: calc(
+      var(--particle-energy-intensity) * var(--particle-cluster-cohesion) * 0.9
+    );
+  }
+
+  85% {
+    transform: translate3d(35vw, 45vh, 0) scale(0.6);
+    opacity: calc(
+      var(--particle-energy-intensity) * var(--particle-cluster-cohesion) * 0.5
+    );
+  }
+
+  100% {
+    transform: translate3d(45vw, 35vh, 0) scale(0);
+    opacity: 0;
   }
 }
 
-// Star container (enhanced with hardware acceleration)
+// Energy Twinkle - Organic pulsing for ambient particles
+@keyframes energy-twinkle-organic {
+  0%,
+  100% {
+    opacity: calc(var(--particle-energy-intensity) * 0.6);
+    transform: scale(1) rotate(0deg);
+    filter: blur(0px);
+  }
+
+  25% {
+    opacity: calc(var(--particle-energy-intensity) * 0.9);
+    transform: scale(1.1) rotate(90deg);
+    filter: blur(0.5px);
+  }
+
+  50% {
+    opacity: calc(var(--particle-energy-intensity) * 0.4);
+    transform: scale(0.8) rotate(180deg);
+    filter: blur(1px);
+  }
+
+  75% {
+    opacity: calc(var(--particle-energy-intensity) * 0.8);
+    transform: scale(1.05) rotate(270deg);
+    filter: blur(0.3px);
+  }
+}
+
+// =============================================================================
+// YEAR 3000 ENERGY PARTICLE NETWORK CONTAINER
+// =============================================================================
+
 .sn-stars-container {
   position: fixed;
   top: 0;
@@ -70,87 +268,260 @@
   z-index: -5;
   overflow: hidden;
 
-  // Performance optimization - hardware acceleration
+  // Enhanced hardware acceleration
   @include performance-optimized;
+  transform-style: preserve-3d;
+  perspective: 1000px;
 
-  // Base star element (enhanced)
+  // === Base Energy Particle ===
   .star {
     position: absolute;
-    width: var(--sn-star-size);
-    height: var(--sn-star-size);
-    background: var(--sn-star-color);
+    width: calc(var(--particle-cluster-size) * 1px);
+    height: calc(var(--particle-cluster-size) * 1px);
     border-radius: 50%;
-    animation: shooting-star
-      calc(var(--sn-star-duration) / var(--sn-star-speed)) linear infinite;
 
-    // Performance optimizations
+    // Dynamic energy color that responds to music
+    background: radial-gradient(
+      circle,
+      var(--particle-primary-energy) 0%,
+      var(--particle-secondary-energy) 50%,
+      transparent 100%
+    );
+
+    // Enhanced hardware acceleration
     @include performance-optimized;
+    transform-style: preserve-3d;
 
-    // Star trail effect (enhanced)
+    // Base energy pulse
+    animation: energy-stream-primary
+      calc(var(--particle-base-speed) * var(--particle-music-modulation))
+      var(--particle-organic-curve) infinite;
+
+    // === Enhanced Energy Trail System ===
     &::before {
       content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      width: var(--sn-star-trail-length);
-      height: 1px;
+      top: 50%;
+      left: 50%;
+      width: calc(var(--particle-cluster-radius) * 1px);
+      height: 2px;
+      transform: translate(-50%, -50%) rotate(-45deg);
+
+      // Dynamic trail gradient
       background: linear-gradient(
         90deg,
-        var(--sn-star-color) 0%,
+        var(--particle-primary-energy) 0%,
+        var(--particle-accent-energy) 30%,
         transparent 100%
       );
-      transform: translateX(calc(-1 * var(--sn-star-trail-length)));
-      opacity: 0.6;
+
+      opacity: calc(var(--particle-energy-intensity) * 0.8);
+      filter: blur(0.5px);
+      border-radius: 1px;
       @include hardware-accelerated;
     }
 
-    // Twinkle effect for some stars
-    &.twinkle {
-      animation: star-twinkle 4s ease-in-out infinite;
+    // === Energy Aura Effect ===
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: calc(var(--particle-cluster-size) * 3px);
+      height: calc(var(--particle-cluster-size) * 3px);
+      transform: translate(-50%, -50%);
+
+      background: radial-gradient(
+        circle,
+        var(--particle-accent-energy) 0%,
+        transparent 70%
+      );
+
+      border-radius: 50%;
+      opacity: calc(var(--particle-energy-intensity) * 0.4);
+      filter: blur(2px);
+      @include hardware-accelerated;
     }
 
-    // Multiple star variations with different delays and paths
+    // === Particle Variants: Different Energy Types ===
+
+    // Primary Energy Stream Particles
     &:nth-child(1) {
-      top: 10%;
+      --particle-cluster-size: 3;
+      top: 15%;
       left: -10%;
+      animation: energy-stream-primary calc(var(--particle-base-speed) * 1.2)
+        var(--particle-organic-curve) infinite;
       animation-delay: 0s;
-      animation-duration: calc(var(--sn-star-duration) * 1.2);
+
+      background: radial-gradient(
+        circle,
+        var(--particle-primary-energy) 0%,
+        var(--particle-accent-energy) 70%,
+        transparent 100%
+      );
     }
 
     &:nth-child(2) {
-      top: 20%;
+      --particle-cluster-size: 2;
+      top: 25%;
       left: -15%;
-      animation-delay: calc(var(--sn-star-delay-base) * 1);
-      animation-duration: calc(var(--sn-star-duration) * 0.8);
-      --sn-star-size: 1.5px;
+      animation: energy-whisper-secondary calc(var(--particle-base-speed) * 0.8)
+        var(--particle-organic-curve) infinite;
+      animation-delay: calc(var(--particle-emergence-delay) * 1);
+
+      background: radial-gradient(
+        circle,
+        var(--particle-secondary-energy) 0%,
+        var(--particle-primary-energy) 60%,
+        transparent 100%
+      );
     }
 
     &:nth-child(3) {
-      top: 60%;
+      --particle-cluster-size: 4;
+      top: 65%;
       left: -5%;
-      animation-delay: calc(var(--sn-star-delay-base) * 2);
-      animation-duration: calc(var(--sn-star-duration) * 1.5);
-      --sn-star-size: 2.5px;
+      animation: energy-stream-primary calc(var(--particle-base-speed) * 1.5)
+        var(--particle-organic-curve) infinite;
+      animation-delay: calc(var(--particle-emergence-delay) * 2);
+
+      background: radial-gradient(
+        circle,
+        var(--particle-accent-energy) 0%,
+        var(--particle-secondary-energy) 50%,
+        transparent 100%
+      );
     }
 
+    // Nexus Influence Particles
     &:nth-child(4) {
-      top: 80%;
+      --particle-cluster-size: 2.5;
+      top: 85%;
       left: -20%;
-      animation-delay: calc(var(--sn-star-delay-base) * 0.5);
-      animation-duration: calc(var(--sn-star-duration) * 1.1);
+      animation: energy-pulse-nexus calc(var(--particle-base-speed) * 1.1)
+        var(--particle-organic-curve) infinite;
+      animation-delay: calc(var(--particle-emergence-delay) * 0.5);
+
+      background: radial-gradient(
+        circle,
+        var(--particle-primary-energy) 0%,
+        var(--particle-accent-energy) 40%,
+        transparent 100%
+      );
     }
 
     &:nth-child(5) {
-      top: 40%;
+      --particle-cluster-size: 3.5;
+      top: 45%;
       left: -8%;
-      animation-delay: calc(var(--sn-star-delay-base) * 1.8);
-      animation-duration: calc(var(--sn-star-duration) * 0.9);
-      --sn-star-size: 1.8px;
+      animation: energy-cluster-formation calc(var(--particle-base-speed) * 0.9)
+        var(--particle-organic-curve) infinite;
+      animation-delay: calc(var(--particle-emergence-delay) * 1.8);
+
+      background: radial-gradient(
+        circle,
+        var(--particle-accent-energy) 0%,
+        var(--particle-primary-energy) 65%,
+        transparent 100%
+      );
+    }
+
+    // Ambient Energy Particles (twinkle in place)
+    &:nth-child(6) {
+      --particle-cluster-size: 1.5;
+      top: 35%;
+      left: 25%;
+      animation: energy-twinkle-organic calc(var(--particle-life-cycle))
+        ease-in-out infinite;
+      animation-delay: calc(var(--particle-emergence-delay) * 0.3);
+
+      background: radial-gradient(
+        circle,
+        var(--particle-secondary-energy) 0%,
+        transparent 80%
+      );
+    }
+
+    &:nth-child(7) {
+      --particle-cluster-size: 2;
+      top: 75%;
+      left: 60%;
+      animation: energy-twinkle-organic calc(var(--particle-life-cycle) * 1.3)
+        ease-in-out infinite;
+      animation-delay: calc(var(--particle-emergence-delay) * 2.2);
+
+      background: radial-gradient(
+        circle,
+        var(--particle-accent-energy) 0%,
+        transparent 75%
+      );
+    }
+
+    &:nth-child(8) {
+      --particle-cluster-size: 1.8;
+      top: 55%;
+      left: 80%;
+      animation: energy-twinkle-organic calc(var(--particle-life-cycle) * 0.7)
+        ease-in-out infinite;
+      animation-delay: calc(var(--particle-emergence-delay) * 1.5);
+
+      background: radial-gradient(
+        circle,
+        var(--particle-primary-energy) 0%,
+        transparent 85%
+      );
     }
   }
 }
 
-// Utility classes for star control
+// =============================================================================
+// CONTEXTUAL INTELLIGENCE: Adaptive Energy Network
+// =============================================================================
+
+// Focus Mode: Reduced particle activity for concentration
+.main-searchPage-content,
+[data-context="focus"],
+.search-focused {
+  --particle-energy-intensity: calc(
+    var(--particle-energy-intensity) * var(--particle-focus-dampening)
+  );
+  --particle-network-density: 2;
+  --particle-base-speed: calc(var(--particle-base-speed) * 2);
+
+  .sn-stars-container .star:nth-child(n + 4) {
+    animation-play-state: paused;
+    opacity: 0.2;
+  }
+}
+
+// Discovery Mode: Enhanced particle activity for exploration
+.main-entityHeader-container,
+.main-shelf-shelf,
+[data-context="discovery"] {
+  --particle-energy-intensity: calc(
+    var(--particle-energy-intensity) * var(--particle-discovery-amplification)
+  );
+  --particle-network-density: 5;
+  --particle-nexus-influence: 1.3;
+}
+
+// Music Response Mode: Particles react to playing state
+.Root__now-playing-bar:has(.main-trackList-playingIcon),
+[data-context="playing"] {
+  --particle-music-modulation: 0.7; // Faster, more energetic
+  --particle-energy-intensity: calc(var(--particle-energy-intensity) * 1.2);
+  --particle-nexus-influence: 1.5;
+
+  .sn-stars-container .star {
+    animation-duration: calc(var(--particle-base-speed) * 0.6) !important;
+  }
+}
+
+// =============================================================================
+// UTILITY CLASSES: Network Control
+// =============================================================================
+
 .sn-stars-disabled {
   .sn-stars-container {
     display: none;
@@ -158,9 +529,9 @@
 }
 
 .sn-stars-minimal {
-  --sn-star-count: 2;
-  --sn-star-opacity: 0.4;
-  --sn-star-duration: 12s;
+  --particle-network-density: 1;
+  --particle-energy-intensity: 0.4;
+  --particle-base-speed: calc(var(--particle-base-speed) * 1.5);
 
   .sn-stars-container .star:nth-child(n + 3) {
     display: none;
@@ -168,18 +539,42 @@
 }
 
 .sn-stars-intense {
-  --sn-star-count: 6;
-  --sn-star-opacity: 1;
-  --sn-star-duration: 6s;
-  --sn-star-size: 3px;
+  --particle-network-density: 8;
+  --particle-energy-intensity: 1.2;
+  --particle-base-speed: calc(var(--particle-base-speed) * 0.7);
+  --particle-cluster-size: 5;
+  --particle-nexus-influence: 1.8;
 }
 
-// Responsive adjustments
+// Nexus Mode: Particles cluster around UI elements
+.nexus-active {
+  --particle-nexus-influence: 2;
+  --particle-cluster-cohesion: 1.2;
+
+  .sn-stars-container .star:nth-child(even) {
+    animation-name: energy-pulse-nexus;
+  }
+}
+
+// =============================================================================
+// RESPONSIVE & ACCESSIBILITY ADAPTATIONS
+// =============================================================================
+
 @media (max-width: 768px) {
   .sn-stars-container {
-    --sn-star-count: 2;
-    --sn-star-duration: 10s;
-    --sn-star-size: 1.5px;
+    --particle-network-density: 2;
+    --particle-base-speed: calc(var(--particle-base-speed) * 1.3);
+    --particle-cluster-size: 2;
+
+    .star:nth-child(n + 4) {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .sn-stars-container {
+    --particle-network-density: 1;
 
     .star:nth-child(n + 3) {
       display: none;
@@ -187,9 +582,46 @@
   }
 }
 
-// Reduced motion support
+// Reduced motion: Convert to gentle ambient twinkles
 @media (prefers-reduced-motion: reduce) {
   .sn-stars-container {
-    display: none;
+    .star {
+      animation: energy-twinkle-organic calc(var(--particle-life-cycle) * 2)
+        ease-in-out infinite !important;
+
+      &::before,
+      &::after {
+        animation: none !important;
+        opacity: 0.3 !important;
+      }
+    }
+  }
+}
+
+// High contrast: Enhanced visibility
+@media (prefers-contrast: high) {
+  .sn-stars-container {
+    --particle-energy-intensity: 1.5;
+
+    .star {
+      background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(255, 255, 255, 0.3) 70%,
+        transparent 100%
+      ) !important;
+    }
+  }
+}
+
+// Battery optimization: Reduce activity on low battery
+@media (prefers-reduced-data: reduce) {
+  .sn-stars-container {
+    --particle-network-density: 1;
+    --particle-base-speed: calc(var(--particle-base-speed) * 3);
+
+    .star:nth-child(n + 3) {
+      display: none;
+    }
   }
 }

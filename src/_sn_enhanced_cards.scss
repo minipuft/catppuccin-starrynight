@@ -1,85 +1,318 @@
-// StarryNight Enhanced Cards Module - Phase 2: Advanced card interactions with 3D prep
-@use "mixins" as *;
-
-// CSS custom properties for enhanced card system
-:root {
-  // Enhanced card dimensions and spacing
-  --card-border-radius: 12px;
-  --card-hover-lift: 8px;
-  --card-shadow-base: rgba(0, 0, 0, 0.08);
-  --card-shadow-hover: rgba(0, 0, 0, 0.15);
-
-  // Interactive timing and easing
-  --card-transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --card-transition-medium: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  --card-transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-
-  // Color enhancement variables (integrates with existing color extraction)
-  --card-content-overlay: rgba(0, 0, 0, 0.6);
-  --card-accent-color: var(--spice-accent, #cba6f7);
-  --card-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-}
-
-// PHASE 2: Enhanced Main Cards
+// =============================================================================
+// YEAR 3000 NEXUS CARDS SYSTEM - Holographic Interactive Elements
+// Advanced card interactions with energy bloom, organic morphing, and contextual intelligence
 // =============================================================================
 
-// Primary content cards with enhanced interactions
+@use "mixins" as *;
+
+// Year 3000 Nexus Cards System Variables
+:root {
+  // === Holographic Foundation ===
+  --card-holographic-depth: 16px;
+  --card-energy-field-radius: 24px;
+  --card-nexus-connection-strength: 0.8;
+  --card-bloom-expansion: 1.15;
+  --card-morphing-fluidity: cubic-bezier(0.23, 1, 0.32, 1);
+
+  // === Organic Dimension System ===
+  --card-organic-corners: 16px;
+  --card-depth-near: translateZ(12px);
+  --card-depth-mid: translateZ(6px);
+  --card-depth-far: translateZ(0px);
+  --card-perspective-field: 1200px;
+
+  // === Energy Interaction Variables ===
+  --card-energy-pulse-rate: 3s;
+  --card-bloom-threshold: 0.15s;
+  --card-energy-dissipation: 0.8s;
+  --card-harmonic-resonance: 1;
+
+  // === Contextual Intelligence Core ===
+  --motion-intelligence-level: 1; // Adaptive to user context
+  --focus-mode-dampening: 0.25; // Reduces motion in focus contexts
+  --discovery-mode-amplification: 1.4; // Enhances in exploration
+  --music-energy-modulation: 1; // Responds to music dynamics
+
+  // === Advanced Color Harmony ===
+  --card-energy-primary: var(--sn-gradient-primary, rgba(202, 158, 230, 0.8));
+  --card-energy-secondary: var(
+    --sn-gradient-secondary,
+    rgba(186, 187, 241, 0.6)
+  );
+  --card-energy-accent: var(--sn-gradient-accent, rgba(140, 170, 238, 0.7));
+  --card-energy-ambient: var(--spice-surface0, rgba(65, 69, 89, 0.4));
+
+  // === Intelligent Motion Calculation ===
+  --calculated-lift: calc(
+    var(--card-holographic-depth) * var(--motion-intelligence-level) *
+      var(--card-harmonic-resonance)
+  );
+  --calculated-scale: calc(
+    1 +
+      (0.05 * var(--motion-intelligence-level) * var(--card-harmonic-resonance))
+  );
+  --calculated-transition: calc(
+    var(--card-energy-dissipation) / var(--motion-intelligence-level)
+  );
+}
+
+// =============================================================================
+// CONTEXTUAL INTELLIGENCE ZONES - Year 3000 Adaptive Interface System
+// =============================================================================
+
+// Focus Mode: Enhanced for quantum search interface
+.main-searchPage-content,
+[data-pathname*="search"],
+.search-focused,
+[data-context="focus"] {
+  --motion-intelligence-level: var(--focus-mode-dampening);
+  --card-energy-pulse-rate: calc(var(--card-energy-pulse-rate) * 2);
+  --card-bloom-threshold: calc(var(--card-bloom-threshold) * 2);
+
+  // Enable quantum field interactions
+  --quantum-field-active: 1;
+  --holographic-depth-enabled: 1;
+
+  // Focus feedback shifts to quantum-enhanced interactions
+  .main-card-card {
+    --focus-feedback-mode: 1;
+
+    // Quantum-aware transform origin
+    transform-origin: center center -50px;
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.08) 0%,
+        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.05)
+          100%
+      );
+      border-color: rgba(
+        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+        0.3
+      );
+
+      // Enhanced quantum integration
+      backdrop-filter: blur(20px) saturate(1.3);
+      box-shadow: 0 8px 32px
+          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.12),
+        0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+// Discovery Mode: Full expressiveness for exploration and browsing
+.main-entityHeader-container,
+.main-shelf-shelf,
+.main-gridContainer-gridContainer:not([data-context="search"]),
+[data-context="discovery"] {
+  --motion-intelligence-level: var(--discovery-mode-amplification);
+  --card-harmonic-resonance: 1.2;
+  --card-energy-pulse-rate: calc(var(--card-energy-pulse-rate) * 0.7);
+}
+
+// Nexus Mode: Navigation contexts with balanced interaction
+.Root__nav-bar,
+.main-yourLibrary-yourLibrary,
+[data-context="nexus"] {
+  --motion-intelligence-level: 0.8;
+  --card-harmonic-resonance: 0.9;
+}
+
+// Music Response Mode: Cards react to playing state
+.Root__now-playing-bar:has(.main-trackList-playingIcon),
+[data-context="playing"] {
+  --music-energy-modulation: 1.3;
+  --card-energy-pulse-rate: calc(var(--card-energy-pulse-rate) * 0.6);
+  --card-harmonic-resonance: calc(var(--card-harmonic-resonance) * 1.2);
+}
+
+// =============================================================================
+// YEAR 3000 NEXUS CARDS - Holographic Interactive Elements
+// =============================================================================
+
 .main-card-card {
-  // Apply base card state system
-  @include card-state-base;
+  position: relative;
+  perspective: var(--card-perspective-field);
+  transform-style: preserve-3d;
 
-  // Enhanced visual properties
-  border-radius: var(--card-border-radius);
-  background: var(--glass-background);
-  backdrop-filter: blur(var(--glass-blur, 15px))
-    saturate(var(--glass-saturation, 1.2));
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  // === Holographic Foundation ===
+  border-radius: var(--card-organic-corners);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.05) 0%,
+    rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.08) 50%,
+    rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.03) 100%
+  );
 
-  // Base shadow state
-  box-shadow: 0 4px 16px var(--card-shadow-base);
+  // Advanced glassmorphism with dynamic blur
+  backdrop-filter: blur(20px) saturate(1.3);
+  border: 1px solid
+    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.15);
 
-  // Enhanced hover state (builds on glassmorphism)
-  &:hover,
-  &[data-context-menu-open="true"] {
-    @include card-hover-lift(var(--card-hover-lift), 24px);
+  // Enhanced shadow system with organic depth
+  box-shadow: 0 4px 24px
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
-    // Enhanced glassmorphism on hover
-    backdrop-filter: blur(calc(var(--glass-blur, 15px) * 1.2))
-      saturate(calc(var(--glass-saturation, 1.2) * 1.1));
-    background: var(--dynamic-card-hover-bg, var(--glass-background));
-    border-color: rgba(255, 255, 255, 0.2);
+  // === Energy Field Base State ===
+  transition: transform var(--calculated-transition)
+      var(--card-morphing-fluidity),
+    box-shadow var(--calculated-transition) ease,
+    background var(--calculated-transition) ease,
+    border-color var(--calculated-transition) ease,
+    backdrop-filter var(--calculated-transition) ease;
+
+  // Hardware acceleration and performance
+  @include performance-optimized;
+  will-change: transform, box-shadow, background, border-color;
+
+  // === Organic Energy Field (Invisible Base Layer) ===
+  &::before {
+    content: "";
+    position: absolute;
+    top: calc(-1 * var(--card-energy-field-radius));
+    left: calc(-1 * var(--card-energy-field-radius));
+    right: calc(-1 * var(--card-energy-field-radius));
+    bottom: calc(-1 * var(--card-energy-field-radius));
+    z-index: -2;
+
+    background: radial-gradient(
+      ellipse 120% 100% at center,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0) 0%,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.03) 40%,
+      transparent 70%
+    );
+
+    border-radius: calc(var(--card-organic-corners) * 2);
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all var(--calculated-transition) var(--card-morphing-fluidity);
   }
 
-  // Focus state for accessibility
+  // === Holographic Interaction State ===
+  &:hover {
+    // Contextual lift calculation - adapts to intelligence level
+    transform: var(--card-depth-near) scale(var(--calculated-scale));
+
+    // Enhanced holographic background
+    background: linear-gradient(
+      135deg,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.12) 0%,
+      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.15)
+        50%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.08) 100%
+    );
+
+    // Advanced glassmorphism enhancement
+    backdrop-filter: blur(25px) saturate(1.5) contrast(1.1);
+    border-color: rgba(
+      var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+      0.4
+    );
+
+    // Sophisticated shadow with energy bloom
+    box-shadow: 0 var(--calculated-lift) calc(var(--calculated-lift) * 2)
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.15),
+      0 calc(var(--calculated-lift) * 2) calc(var(--calculated-lift) * 4)
+        rgba(0, 0, 0, 0.2),
+      0 0 calc(var(--card-energy-field-radius) * 2)
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+    // Activate energy field
+    &::before {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  // === Focus State Enhancement ===
   &:focus-visible {
-    outline: 2px solid var(--card-accent-color);
-    outline-offset: 2px;
+    outline: none;
+
+    // Nexus connection ring
+    &::after {
+      content: "";
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      right: -3px;
+      bottom: -3px;
+      border: 2px solid var(--card-energy-primary);
+      border-radius: calc(var(--card-organic-corners) + 3px);
+      box-shadow: 0 0 12px
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4);
+      animation: nexus-focus-pulse var(--card-energy-pulse-rate) ease-in-out
+        infinite;
+    }
   }
 
-  // Active state feedback
+  // === Active State with Organic Response ===
   &:active {
-    transform: translateY(-2px) scale(0.98);
+    transform: var(--card-depth-mid) scale(calc(var(--calculated-scale) * 0.98));
     transition: transform 0.1s ease;
   }
 }
 
-// Enhanced album/playlist card headers
+// =============================================================================
+// ENHANCED CARD HEADER - Album Art Energy Source
+// =============================================================================
+
 .main-card-header {
   position: relative;
   overflow: hidden;
-  border-radius: var(--card-border-radius) var(--card-border-radius) 0 0;
+  border-radius: var(--card-organic-corners) var(--card-organic-corners) 0 0;
+  transform: var(--card-depth-mid);
 
-  // Enhanced image container
+  // === Energy Source Ring (Around Album Art) ===
+  &::before {
+    content: "";
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    z-index: -1;
+
+    background: conic-gradient(
+      from 0deg,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4) 0deg,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.2) 120deg,
+      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.4)
+        240deg,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4) 360deg
+    );
+
+    border-radius: calc(var(--card-organic-corners) + 4px);
+    opacity: 0;
+    animation: energy-source-rotation calc(var(--card-energy-pulse-rate) * 2)
+      linear infinite;
+    transition: opacity var(--calculated-transition) ease;
+  }
+
+  // === Enhanced Image with Contextual Scaling ===
   .main-image-image,
   .main-cardImage-image {
-    @include card-transition;
+    transition: transform var(--calculated-transition)
+        var(--card-morphing-fluidity),
+      filter var(--calculated-transition) ease;
+    filter: contrast(1) saturate(1);
 
     &:hover {
-      @include interactive-scale(1.05);
+      transform: scale(calc(1 + 0.03 * var(--motion-intelligence-level)));
+      filter: contrast(1.05) saturate(1.1);
     }
   }
 
-  // Overlay content enhancement
+  // Show energy ring on card hover
+  .main-card-card:hover & {
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  // === Enhanced Metadata Overlay ===
   .main-card-cardMetadata {
     position: absolute;
     bottom: 0;
@@ -88,27 +321,56 @@
     padding: 16px;
     background: linear-gradient(
       transparent 0%,
-      var(--card-content-overlay) 100%
+      rgba(0, 0, 0, 0.7) 40%,
+      rgba(0, 0, 0, 0.85) 100%
     );
+    backdrop-filter: blur(8px);
 
-    // Enhanced text legibility
+    // Enhanced text legibility with dynamic colors
     .main-cardHeader-text,
     .main-type-bass {
-      text-shadow: var(--card-text-shadow);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8),
+        0 0 8px
+          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2);
       color: rgba(255, 255, 255, 0.95);
+      transition: all 300ms ease;
+
+      &:hover {
+        color: rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 1);
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8),
+          0 0 12px
+            rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4);
+      }
     }
   }
 }
 
-// PHASE 2: Enhanced Grid Layout System
+// =============================================================================
+// ADVANCED GRID SYSTEM - Organic Flow Layout
 // =============================================================================
 
-// Responsive grid container with enhanced spacing
 .main-gridContainer-gridContainer {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 24px;
+  gap: calc(24px * var(--motion-intelligence-level, 1));
   padding: 24px;
+
+  // Grid flow enhancement for Year 3000
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+      ellipse 100% 50% at center top,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.02) 0%,
+      transparent 60%
+    );
+    pointer-events: none;
+    z-index: -1;
+  }
 
   // Enhanced responsive behavior
   @media (max-width: 768px) {
@@ -121,29 +383,20 @@
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 32px;
   }
-}
 
-// Enhanced section headers
-.main-shelf-header {
-  margin-bottom: 24px;
-
-  .main-type-alto {
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: rgba(255, 255, 255, 0.9);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  @media (min-width: 1600px) {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 40px;
   }
 }
 
-// PHASE 2: Interactive Elements Enhancement
+// =============================================================================
+// INTERACTIVE ELEMENTS - Energy Bloom System
 // =============================================================================
 
-// Enhanced play button with sophisticated interactions
+// Enhanced play button with Nexus energy
 .main-card-PlayButtonContainer,
 .main-playButton-PlayButton {
-  @include card-transition(0.2s);
-
-  // Enhanced positioning and sizing
   position: absolute;
   bottom: 16px;
   right: 16px;
@@ -151,117 +404,179 @@
   height: 48px;
   border-radius: 50%;
 
-  // Enhanced visual design
-  background: rgba(var(--spice-rgb-accent), 0.9);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(8px);
+  // Enhanced visual design with dynamic energy
+  background: radial-gradient(
+    circle,
+    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.95) 0%,
+    rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.85) 100%
+  );
 
-  // Initial state (hidden)
-  opacity: 0;
-  transform: translateY(8px) scale(0.8);
+  box-shadow: 0 4px 16px
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3),
+    0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
-  // Show on parent hover
+  backdrop-filter: blur(12px);
+  border: 1px solid
+    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3);
+
+  // Initial state - contextual visibility
+  opacity: calc(0.2 * var(--motion-intelligence-level, 1));
+  transform: translateY(calc(8px * var(--motion-intelligence-level, 1)))
+    scale(calc(0.8 + 0.2 * var(--motion-intelligence-level, 1)));
+
+  transition: all var(--calculated-transition) var(--card-morphing-fluidity);
+
+  // === Energy Bloom Effect ===
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(
+      circle,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3) 0%,
+      transparent 70%
+    );
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 600ms var(--card-morphing-fluidity);
+    z-index: -1;
+    opacity: 0;
+  }
+
+  // Show on parent hover with contextual animation
   .main-card-card:hover & {
     opacity: 1;
     transform: translateY(0) scale(1);
-    transition-delay: 0.1s;
-  }
-
-  // Enhanced button hover
-  &:hover {
-    @include interactive-scale(1.1);
-    background: rgba(var(--spice-rgb-accent), 1);
-    box-shadow: 0 6px 20px rgba(var(--spice-rgb-accent), 0.4);
-  }
-
-  // Active state
-  &:active {
-    transform: scale(0.95);
-  }
-}
-
-// Enhanced progress indicators and controls
-.x-progressBar-progressBarBg {
-  @include card-transition;
-  border-radius: 4px;
-  overflow: hidden;
-
-  > div > div {
-    background: linear-gradient(
-      90deg,
-      var(--card-accent-color) 0%,
-      rgba(var(--spice-rgb-accent), 0.8) 100%
+    transition-delay: calc(
+      var(--card-bloom-threshold) / var(--motion-intelligence-level, 1)
     );
-    box-shadow: 0 0 8px rgba(var(--spice-rgb-accent), 0.3);
   }
 
+  // === Enhanced Button Hover with Energy Bloom ===
   &:hover {
-    transform: scaleY(1.2);
-  }
-}
+    transform: scale(calc(1 + 0.08 * var(--motion-intelligence-level, 1)));
+    background: radial-gradient(
+      circle,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 1) 0%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.95) 100%
+    );
 
-// PHASE 2: Enhanced Button System
-// =============================================================================
+    box-shadow: 0 6px 24px
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4),
+      0 12px 48px rgba(0, 0, 0, 0.3),
+      0 0 16px
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2);
 
-// Universal button enhancement
-.Button-sm-buttonSecondary-useBrowserDefaultFocusStyle,
-.Button-sm-16-buttonTertiary-iconOnly-isUsingKeyboard-useBrowserDefaultFocusStyle {
-  @include card-transition(0.2s);
-  border-radius: 8px;
-
-  // Enhanced hover states
-  &:hover {
-    @include interactive-scale(1.02);
-    background: var(--glass-background);
-    backdrop-filter: blur(8px);
-  }
-
-  // Enhanced focus states
-  &:focus-visible {
-    outline: 2px solid var(--card-accent-color);
-    outline-offset: 2px;
-  }
-}
-
-// PHASE 2: Performance Optimizations
-// =============================================================================
-
-// Reduced motion support for enhanced cards
-@media (prefers-reduced-motion: reduce) {
-  .main-card-card,
-  .main-card-PlayButtonContainer,
-  .x-progressBar-progressBarBg {
-    transition: opacity 0.2s ease, background-color 0.2s ease;
-
-    &:hover {
-      transform: none;
+    // Activate energy bloom
+    &::before {
+      width: 80px;
+      height: 80px;
+      opacity: 1;
     }
   }
 
-  // Disable complex transforms for performance
-  * {
-    transform-style: flat !important;
-    perspective: none !important;
+  // === Active State with Organic Response ===
+  &:active {
+    transform: scale(calc(0.95 + 0.05 * var(--motion-intelligence-level, 1)));
+    transition: transform 0.1s ease;
   }
 }
 
-// Mobile optimizations for enhanced cards
+// =============================================================================
+// ADVANCED ANIMATIONS - Organic Energy System
+// =============================================================================
+
+@keyframes nexus-focus-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 12px
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 20px
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes energy-source-rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// =============================================================================
+// ACCESSIBILITY & PERFORMANCE OPTIMIZATION
+// =============================================================================
+
+// Reduced motion: Switch to focus-mode behavior
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-intelligence-level: 0.1;
+    --card-energy-pulse-rate: 0.01ms;
+  }
+
+  .main-card-card,
+  .main-card-PlayButtonContainer {
+    transition: opacity 200ms ease, background-color 200ms ease,
+      border-color 200ms ease;
+
+    &:hover {
+      transform: none !important;
+    }
+
+    &::before,
+    &::after {
+      animation: none !important;
+    }
+  }
+}
+
+// Mobile optimization: Adapt intelligence level
 @media (max-width: 768px) {
   :root {
-    --card-hover-lift: 4px;
-    --card-transition-medium: 0.3s ease;
-  }
-
-  // Simplified interactions on touch devices
-  .main-card-card {
-    &:hover {
-      transform: translateY(-2px);
-    }
+    --motion-intelligence-level: 0.6;
+    --card-energy-pulse-rate: calc(var(--card-energy-pulse-rate) * 1.5);
   }
 
   // Always show play buttons on mobile
   .main-card-PlayButtonContainer {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    opacity: 0.8 !important;
+    transform: none !important;
+  }
+}
+
+// High contrast: Enhanced visibility
+@media (prefers-contrast: high) {
+  .main-card-card {
+    border-width: 2px;
+    box-shadow: 0 4px 24px rgba(255, 255, 255, 0.1),
+      0 8px 32px rgba(0, 0, 0, 0.4);
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+  }
+}
+
+// Battery optimization: Reduce activity
+@media (prefers-reduced-data: reduce) {
+  :root {
+    --motion-intelligence-level: 0.3;
+    --card-energy-pulse-rate: calc(var(--card-energy-pulse-rate) * 3);
+  }
+
+  .main-card-card {
+    &::before,
+    &::after {
+      display: none;
+    }
   }
 }

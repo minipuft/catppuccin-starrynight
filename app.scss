@@ -31,6 +31,12 @@
 @forward "src/_sn_typography";
 @forward "src/_sn_atmospheric";
 
+// YEAR 3000: Advanced Search Interface
+@forward "src/_sn_search_quantum";
+
+// YEAR 3000: Nexus System (loads last for highest specificity)
+@forward "src/_sn_year3000_nexus";
+
 :root {
   // Spicetify doesn't fully support light-sets yet, so we have to manually set the colors for the light theme
   .encore-dark-theme .encore-inverted-light-set {

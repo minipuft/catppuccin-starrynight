@@ -42,3 +42,6 @@ tmp/
 dist/
 build/
 *.map
+
+# AI Files
+IMPLEMENTAION_NOTES.md
