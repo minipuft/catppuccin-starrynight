@@ -4,19 +4,44 @@
 
 **A mesmerizing Spicetify theme blending Catppuccin's elegance with dynamic gradient effects**
 
-<!-- Hero image placeholder -->
-
-![Home Page](assets/home.png)
-![Album/Playlist](assets/album.png)
-![Liked Songs](assets/likedSongs.png)
-_The perfect harmony of pastel perfection and cosmic wonder_
-
 [![Spicetify](https://img.shields.io/badge/Spicetify-Theme-1DB954?style=for-the-badge&logo=spotify&logoColor=white)](https://spicetify.app/)
 [![Catppuccin](https://img.shields.io/badge/Catppuccin-Flavored-f5c2e7?style=for-the-badge&logoColor=white)](https://github.com/catppuccin)
 [![Version](https://img.shields.io/badge/Version-2.0-cba6f7?style=for-the-badge)](https://github.com/minipuft/catppuccin-starrynight)
 [![License](https://img.shields.io/badge/License-MIT-74c7ec?style=for-the-badge)](LICENSE)
 
 </div>
+
+---
+
+## 🖼️ **Visual Showcase**
+
+<div align="center">
+
+### 🎵 **Theme in Action**
+
+<table>
+<tr>
+<td align="center" width="33%">
+<img src="assets/home.png" alt="Home Page Interface" width="300"/>
+<br/>
+<sub><b>🏠 Home Interface</b><br/>Clean, elegant navigation</sub>
+</td>
+<td align="center" width="33%">
+<img src="assets/album.png" alt="Album/Playlist View" width="300"/>
+<br/>
+<sub><b>💿 Album View</b><br/>Dynamic color adaptation</sub>
+</td>
+<td align="center" width="33%">
+<img src="assets/likedSongs.png" alt="Liked Songs Collection" width="300"/>
+<br/>
+<sub><b>💖 Liked Songs</b><br/>Personal music haven</sub>
+</td>
+</tr>
+</table>
+
+</div>
+
+_The perfect harmony of pastel perfection and cosmic wonder_
 
 ---
 

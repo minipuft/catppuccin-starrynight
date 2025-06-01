@@ -34,6 +34,9 @@
 // YEAR 3000: Advanced Search Interface
 @forward "src/_sn_search_quantum";
 
+// YEAR 3000: Precision Targeting (loads after quantum for enhanced specificity)
+@forward "src/_sn_search_precision";
+
 // YEAR 3000: Nexus System (loads last for highest specificity)
 @forward "src/_sn_year3000_nexus";
 
