@@ -473,7 +473,7 @@ Spicetify.Player.addEventListener("onplaypause", (event) => {
 
 ### Dynamic Color Application
 
-```javascript
+````javascript
 /**
  * Apply extracted colors to CSS variables
  */
@@ -502,18 +502,27 @@ function updateThemeColors(colors) {
 }
 
 /**
- * Utility function to convert hex to RGB
+ * IMPORTANT NOTE on hexToRgb with getComputedStyle:
+ * When retrieving hex color strings from CSS custom properties using
+ * `getComputedStyle(element).getPropertyValue('--your-color').trim()`,
+ * be aware that the returned string might sometimes have an unexpected prefix,
+ * such as a double hash (`##123456`). The standard `hexToRgb` function above
+ * might fail if it strictly expects only an optional single hash.
+ *
+ * Solution: Pre-process the hex string to normalize it before conversion:
+ * ```javascript
+ * const formatHex = (hexString) => {
+ *   const cleanedHex = hexString.replace(/#/g, ""); // Remove all existing '#'
+ *   return `#${cleanedHex}`;
+ * };
+ *
+ * // Usage:
+ * const rawColor = getComputedStyle(root).getPropertyValue("--spice-main").trim();
+ * const formattedColor = formatHex(rawColor);
+ * const mainRgb = hexToRgb(formattedColor);
+ * ```
+ * This ensures robustness when dealing with color strings from `getComputedStyle`.
  */
-function hexToRgb(hex) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-      }
-    : null;
-}
 
 /**
  * Check if current theme is light mode
@@ -524,7 +533,7 @@ function isLightTheme() {
     window.matchMedia("(prefers-color-scheme: light)").matches
   );
 }
-```
+````
 
 ---
 

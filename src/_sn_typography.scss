@@ -1,170 +1,445 @@
-// StarryNight Typography Module - Phase 4.4: Gradient-Enhanced Typography
-// Simple, focused typography enhancements that build on existing patterns
+// ████████████████████████████████████████████████████████████████████████████████
+// TYPOGRAPHY CONSCIOUSNESS SYSTEM - Year 3000 BeatSync Integration
+// Text awakening with rhythm-responsive cosmic typography effects
+// ████████████████████████████████████████████████████████████████████████████████
+//
+// This module transforms static text into consciousness-aware typography that:
+// - RIPPLE text shadows with beat detection
+// - BLOOM headings during musical intensity peaks
+// - HARMONIZE text colors with dynamic music analysis
+// - OSCILLATE letter spacing with rhythm phase
+// - REFRACT text through cosmic filter effects
+//
+// Dependencies:
+// - BeatSyncVisualSystem variables (--sn-beat-pulse-intensity, --sn-rhythm-phase, --sn-breathing-scale)
+// - Year 3000 gradient system variables (--sn-gradient-*-rgb)
+// - Base typography mixins and variables
+//
+// ████████████████████████████████████████████████████████████████████████████████
 
 @use "mixins" as *;
 
-// PHASE 4.4: Simplified Typography Enhancement Variables
-// =============================================================================
+// ████████████████████████████████████████████████████████████████████████████████
+// CORE TYPOGRAPHY CONSCIOUSNESS VARIABLES
+// ████████████████████████████████████████████████████████████████████████████████
 
 :root {
-  // Basic typography enhancement intensities
+  // === BASIC TYPOGRAPHY ENHANCEMENT INTENSITIES (Existing) ===
   --text-gradient-intensity: 0.8;
   --text-hover-brightness: 1.1;
   --text-transition: 0.3s ease-out;
+
+  // === BEATSYNC CONSCIOUSNESS VARIABLES (New) ===
+  --sn-text-beat-glow: calc(var(--sn-beat-pulse-intensity, 0) * 8px);
+  --sn-text-rhythm-hue: calc(var(--sn-rhythm-phase, 0) * 20deg);
+  --sn-text-breathing-scale: var(--sn-breathing-scale, 1);
+
+  // === COSMIC TEXT ENHANCEMENT ===
+  --sn-text-cosmic-shadow: rgba(
+    var(--sn-gradient-primary-rgb, "202,158,230"),
+    calc(var(--sn-beat-pulse-intensity, 0) * 0.8)
+  );
+  --sn-text-energy-brightness: calc(
+    1 + var(--sn-beat-pulse-intensity, 0) * 0.3
+  );
+  --sn-text-rhythm-spacing: calc(var(--sn-rhythm-phase, 0) * 0.1em);
+
+  // === ADVANCED CONSCIOUSNESS VARIABLES ===
+  --sn-text-harmonic-saturation: calc(
+    1 + var(--sn-beat-pulse-intensity, 0) * 0.4
+  );
+  --sn-text-breathing-offset: calc(var(--sn-breathing-scale, 1) - 1);
+  --sn-text-cosmic-blur: calc(var(--sn-beat-pulse-intensity, 0) * 2px);
+  --sn-text-energy-pulse: calc(0.5 + var(--sn-beat-pulse-intensity, 0) * 0.5);
 }
 
-// PHASE 4.4: Simplified Typography Mixins (following existing patterns)
-// =============================================================================
+// ████████████████████████████████████████████████████████████████████████████████
+// ENHANCED CONSCIOUSNESS-AWARE TYPOGRAPHY MIXINS
+// ████████████████████████████████████████████████████████████████████████████████
 
-// Simple text gradient using existing text-gradient mixin
-@mixin text-gradient-simple($intensity: var(--text-gradient-intensity)) {
+// Enhanced text gradient with BeatSync consciousness
+@mixin text-consciousness($intensity: var(--text-gradient-intensity)) {
   @include text-gradient(
     rgba(var(--spice-rgb-accent), $intensity),
     rgba(var(--spice-rgb-subtext), calc($intensity * 0.7))
   );
 
-  // Wrap in & {} to avoid mixed-decls warning
+  // BeatSync enhancements
   & {
-    transition: all var(--text-transition);
+    // BLOOM text glow during beats
+    text-shadow: 0 0 var(--sn-text-beat-glow) var(--sn-text-cosmic-shadow),
+      0 1px 2px
+        rgba(
+          var(--sn-oklab-processed-dynamic-shadow-rgb, "0,0,0"),
+          calc(var(--sn-text-energy-pulse) * 0.3)
+        );
+
+    // BREATHING scale effect
+    transform: scale(var(--sn-text-breathing-scale));
+
+    // HARMONIZE filter effects
+    filter: hue-rotate(calc(var(--sn-text-rhythm-hue) * $intensity))
+      saturate(var(--sn-text-harmonic-saturation))
+      brightness(var(--sn-text-energy-brightness));
+
+    // OSCILLATE letter spacing
+    letter-spacing: calc(normal + var(--sn-text-rhythm-spacing) * $intensity);
+
+    // Enhanced transitions
+    transition: all var(--text-transition), text-shadow 0.2s ease-out,
+      filter 0.4s ease-out, letter-spacing 0.6s ease-out;
   }
 }
 
-// Simple hover enhancement (fixing mixed-decls issue)
-@mixin text-hover-simple {
-  // Wrap all declarations in & {} to avoid mixed-decls warnings
+// Simple hover enhancement with consciousness (fixing mixed-decls issue)
+@mixin text-hover-consciousness {
   & {
     transition: all var(--text-transition);
   }
 
   &:hover {
-    filter: brightness(var(--text-hover-brightness));
-    transform: translateY(-0.5px);
+    // Enhanced brightness with beat synchronization
+    filter: brightness(
+        calc(
+          var(--text-hover-brightness) + var(--sn-beat-pulse-intensity, 0) * 0.2
+        )
+      )
+      hue-rotate(calc(var(--sn-text-rhythm-hue) * 0.5));
+
+    // BLOOM transform enhancement
+    transform: translateY(-0.5px)
+      scale(calc(var(--sn-text-breathing-scale) * 1.02));
+
+    // Enhanced cosmic glow on hover
+    text-shadow: 0 0 calc(var(--sn-text-beat-glow) * 1.5)
+        var(--sn-text-cosmic-shadow),
+      0 2px 4px
+        rgba(
+          var(--sn-oklab-processed-dynamic-shadow-rgb, "0,0,0"),
+          calc(var(--sn-text-energy-pulse) * 0.4)
+        );
   }
 
   &:focus-visible {
-    outline: 2px solid rgba(var(--spice-rgb-accent), 0.6);
+    outline: 2px solid
+      rgba(
+        var(--spice-rgb-accent),
+        calc(0.6 + var(--sn-beat-pulse-intensity, 0) * 0.3)
+      );
     outline-offset: 2px;
     border-radius: 3px;
   }
 }
 
-// PHASE 4.4: Simple Typography Enhancements
-// =============================================================================
+// RIPPLE effect mixin for special text elements
+@mixin text-ripple-effect {
+  position: relative;
 
-// Enhanced headings (simple approach)
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at center,
+      rgba(
+          var(--sn-gradient-accent-rgb, "140,170,238"),
+          calc(var(--sn-beat-pulse-intensity, 0) * 0.2)
+        )
+        0%,
+      transparent 70%
+    );
+    border-radius: 4px;
+    opacity: var(--sn-beat-pulse-intensity, 0);
+    transform: scale(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+    transition: all 0.3s ease-out;
+    pointer-events: none;
+    z-index: -1;
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// ENHANCED HEADINGS WITH FULL CONSCIOUSNESS
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Primary headings with maximum consciousness
 .main-type-ballad,
 .main-type-canon,
 .main-entityHeader-title {
-  @include text-gradient-simple(0.9);
-  @include text-hover-simple;
+  @include text-consciousness(0.9);
+  @include text-hover-consciousness;
+  @include text-ripple-effect;
+
+  // Special BLOOM enhancement for large headings
+  &.main-entityHeader-title {
+    // Enhanced cosmic effects for entity headers
+    text-shadow: 0 0 calc(var(--sn-text-beat-glow) * 1.2)
+        var(--sn-text-cosmic-shadow),
+      0 0 calc(var(--sn-text-beat-glow) * 2)
+        rgba(
+          var(--sn-gradient-secondary-rgb, "186,187,241"),
+          calc(var(--sn-beat-pulse-intensity, 0) * 0.4)
+        ),
+      0 2px 6px
+        rgba(
+          var(--sn-oklab-processed-dynamic-shadow-rgb, "0,0,0"),
+          calc(var(--sn-text-energy-pulse) * 0.5)
+        );
+  }
 }
 
-// Enhanced secondary text
+// ████████████████████████████████████████████████████████████████████████████████
+// ENHANCED SECONDARY TEXT WITH CONSCIOUSNESS
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Secondary text with moderate consciousness
 .main-type-alto,
 .main-type-mestoBold {
-  @include text-gradient-simple(0.7);
+  @include text-consciousness(0.7);
 
   &:hover {
-    filter: brightness(1.05);
+    // Subtle consciousness enhancement
+    filter: brightness(calc(1.05 + var(--sn-beat-pulse-intensity, 0) * 0.1))
+      hue-rotate(calc(var(--sn-text-rhythm-hue) * 0.3));
     transition: filter var(--text-transition);
+
+    // Gentle BLOOM glow
+    text-shadow: 0 0 calc(var(--sn-text-beat-glow) * 0.5)
+      rgba(
+        var(--sn-gradient-accent-rgb, "140,170,238"),
+        calc(var(--sn-beat-pulse-intensity, 0) * 0.4)
+      );
   }
 }
 
-// Enhanced navigation text
+// ████████████████████████████████████████████████████████████████████████████████
+// ENHANCED NAVIGATION TEXT WITH CONSCIOUSNESS
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Navigation text with rhythm awareness
 .spicetify-playlist-list li span,
 .main-navBar-navBarLink span {
-  @include text-gradient-simple(0.6);
-  @include text-hover-simple;
+  @include text-consciousness(0.6);
+  @include text-hover-consciousness;
 
-  // Active state
+  // Active state consciousness enhancement
   .main-navBar-navBarLinkActive &,
   li[aria-selected="true"] & {
-    @include text-gradient-simple(1);
+    @include text-consciousness(1);
+
+    // Enhanced active glow
+    text-shadow: 0 0 calc(var(--sn-text-beat-glow) * 0.8)
+        var(--sn-text-cosmic-shadow),
+      0 1px 3px
+        rgba(
+          var(--sn-oklab-processed-dynamic-shadow-rgb, "0,0,0"),
+          calc(var(--sn-text-energy-pulse) * 0.6)
+        );
   }
 }
 
-// Enhanced track titles
+// ████████████████████████████████████████████████████████████████████████████████
+// ENHANCED TRACK TITLES WITH MUSIC CONSCIOUSNESS
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Track titles with enhanced music responsiveness
 .main-trackList-trackListRow .main-type-ballad {
-  @include text-gradient-simple(0.8);
-  @include text-hover-simple;
+  @include text-consciousness(0.8);
+  @include text-hover-consciousness;
+  @include text-ripple-effect;
 
-  // Currently playing enhancement
-  &:has(.main-trackList-playingIcon) {
-    @include text-gradient-simple(1.1);
+  // Currently playing enhancement with maximum consciousness
+  &:has(.main-trackList-playingIcon),
+  .main-trackList-rowPlayButton + * & {
+    @include text-consciousness(1.1);
+
+    // OSCILLATE effect for currently playing tracks
+    animation: textEnergyPulse calc(2s + var(--sn-rhythm-phase, 0) * 1s)
+      ease-in-out infinite;
+
+    // Enhanced playing track glow
+    text-shadow: 0 0 calc(var(--sn-text-beat-glow) * 1.5)
+        var(--sn-text-cosmic-shadow),
+      0 0 calc(var(--sn-text-beat-glow) * 3)
+        rgba(
+          var(--sn-gradient-accent-rgb, "140,170,238"),
+          calc(var(--sn-beat-pulse-intensity, 0) * 0.6)
+        ),
+      0 2px 8px
+        rgba(
+          var(--sn-oklab-processed-dynamic-shadow-rgb, "0,0,0"),
+          calc(var(--sn-text-energy-pulse) * 0.7)
+        );
   }
 }
 
-// Enhanced button text
+// ████████████████████████████████████████████████████████████████████████████████
+// ENHANCED BUTTON TEXT WITH CONSCIOUSNESS
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Button text with cosmic awareness
 .main-playButton-PlayButton,
 .main-shuffleButton-button {
   span {
-    @include text-gradient-simple(1);
-    @include text-hover-simple;
+    @include text-consciousness(1);
+    @include text-hover-consciousness;
+
+    // Button-specific BLOOM enhancement
+    font-weight: calc(normal + var(--sn-beat-pulse-intensity, 0) * 200);
+
+    // Enhanced button text glow
+    text-shadow: 0 0 calc(var(--sn-text-beat-glow) * 0.8)
+        var(--sn-text-cosmic-shadow),
+      0 1px 4px
+        rgba(
+          var(--sn-oklab-processed-dynamic-shadow-rgb, "0,0,0"),
+          calc(var(--sn-text-energy-pulse) * 0.5)
+        );
   }
 }
 
-// Enhanced card text
+// ████████████████████████████████████████████████████████████████████████████████
+// ENHANCED CARD TEXT WITH CONSCIOUSNESS
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Card text with consciousness integration
 .main-card-card {
   .main-cardHeader-text {
-    @include text-gradient-simple(0.7);
-    @include text-hover-simple;
+    @include text-consciousness(0.7);
+    @include text-hover-consciousness;
+    @include text-ripple-effect;
   }
 
   .main-card-cardMetadata {
     color: var(--spice-subtext);
 
+    // Subtle consciousness for metadata
+    transform: scale(var(--sn-text-breathing-scale));
+    filter: hue-rotate(calc(var(--sn-text-rhythm-hue) * 0.2));
+    transition: all var(--text-transition);
+
     &:hover {
-      filter: brightness(1.1);
-      transition: filter var(--text-transition);
+      filter: brightness(calc(1.1 + var(--sn-beat-pulse-intensity, 0) * 0.15))
+        hue-rotate(calc(var(--sn-text-rhythm-hue) * 0.4));
     }
   }
 }
 
-// Enhanced now playing text
+// ████████████████████████████████████████████████████████████████████████████████
+// ENHANCED NOW PLAYING TEXT WITH CONSCIOUSNESS
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Now playing text with maximum consciousness
 .Root__now-playing-bar {
   .main-trackInfo-name {
-    @include text-gradient-simple(1);
-    @include text-hover-simple;
+    @include text-consciousness(1);
+    @include text-hover-consciousness;
+    @include text-ripple-effect;
+
+    // Special OSCILLATE effect for current track name
+    animation: nowPlayingBreathing calc(4s + var(--sn-rhythm-phase, 0) * 2s)
+      ease-in-out infinite;
   }
 
   .main-trackInfo-artists {
-    @include text-gradient-simple(0.8);
+    @include text-consciousness(0.8);
 
     a {
-      @include text-hover-simple;
+      @include text-hover-consciousness;
+
+      // Artist link consciousness
+      &:hover {
+        text-shadow: 0 0 calc(var(--sn-text-beat-glow) * 0.6)
+          rgba(
+            var(--sn-gradient-secondary-rgb, "186,187,241"),
+            calc(var(--sn-beat-pulse-intensity, 0) * 0.7)
+          );
+      }
     }
   }
 }
 
-// Enhanced search input
+// ████████████████████████████████████████████████████████████████████████████████
+// ENHANCED SEARCH INPUT WITH CONSCIOUSNESS
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Search input text consciousness
 .x-searchInput-searchInputInput {
-  @include text-gradient-simple(0.8);
+  @include text-consciousness(0.8);
 
   &::placeholder {
     color: var(--spice-subtext);
-    opacity: 0.7;
+    opacity: calc(0.7 + var(--sn-beat-pulse-intensity, 0) * 0.2);
+    filter: hue-rotate(calc(var(--sn-text-rhythm-hue) * 0.3));
+    transition: all var(--text-transition);
   }
 
   &:focus {
-    @include text-gradient-simple(1);
+    @include text-consciousness(1);
+
+    // Enhanced focus glow
+    text-shadow: 0 0 calc(var(--sn-text-beat-glow) * 0.8)
+      var(--sn-text-cosmic-shadow);
   }
 }
 
-// PHASE 4.4: Accessibility & Performance Optimizations
-// =============================================================================
+// ████████████████████████████████████████████████████████████████████████████████
+// CONSCIOUSNESS ANIMATIONS
+// ████████████████████████████████████████████████████████████████████████████████
 
-// High contrast support
+@keyframes textEnergyPulse {
+  0%,
+  100% {
+    text-shadow: 0 0 calc(var(--sn-text-beat-glow) * 1.5)
+        var(--sn-text-cosmic-shadow),
+      0 0 calc(var(--sn-text-beat-glow) * 3)
+        rgba(
+          var(--sn-gradient-accent-rgb, "140,170,238"),
+          calc(var(--sn-beat-pulse-intensity, 0) * 0.6)
+        );
+  }
+  50% {
+    text-shadow: 0 0 calc(var(--sn-text-beat-glow) * 2)
+        var(--sn-text-cosmic-shadow),
+      0 0 calc(var(--sn-text-beat-glow) * 4)
+        rgba(
+          var(--sn-gradient-accent-rgb, "140,170,238"),
+          calc(var(--sn-beat-pulse-intensity, 0) * 0.8)
+        );
+  }
+}
+
+@keyframes nowPlayingBreathing {
+  0%,
+  100% {
+    transform: scale(var(--sn-text-breathing-scale)) translateX(0);
+    filter: hue-rotate(var(--sn-text-rhythm-hue));
+  }
+  50% {
+    transform: scale(calc(var(--sn-text-breathing-scale) * 1.01))
+      translateX(1px);
+    filter: hue-rotate(calc(var(--sn-text-rhythm-hue) * 1.2));
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// ACCESSIBILITY & PERFORMANCE OPTIMIZATIONS
+// ████████████████████████████████████████████████████████████████████████████████
+
+// High contrast support (enhanced)
 @media (prefers-contrast: high) {
   :root {
     --text-gradient-intensity: 1.2;
     --text-hover-brightness: 1.3;
+    --sn-text-beat-glow: calc(var(--sn-beat-pulse-intensity, 0) * 12px);
   }
 
-  // Enhanced contrast for gradient text
+  // Enhanced contrast for gradient text with consciousness
   .main-type-ballad,
   .main-type-canon,
   .main-type-alto {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 2px
+        rgba(var(--sn-oklab-processed-dynamic-shadow-rgb, "0,0,0"), 0.3),
+      0 0 var(--sn-text-beat-glow) var(--sn-text-cosmic-shadow);
 
     @supports not (background-clip: text) {
       color: var(--spice-text) !important;
@@ -173,7 +448,7 @@
   }
 }
 
-// Reduced motion support
+// Reduced motion support (preserve accessibility)
 @media (prefers-reduced-motion: reduce) {
   .main-type-ballad,
   .main-type-canon,
@@ -184,25 +459,52 @@
     transition: none !important;
     transform: none !important;
     filter: none !important;
+    animation: none !important;
+    text-shadow: none !important;
 
     &:hover {
       transform: none !important;
       filter: none !important;
+      text-shadow: none !important;
     }
   }
 }
 
-// Mobile optimizations
+// Mobile optimizations (enhanced)
 @media (max-width: 768px) {
   :root {
     --text-gradient-intensity: 0.6;
     --text-hover-brightness: 1.05;
     --text-transition: 0.2s ease-out;
+    --sn-text-beat-glow: calc(var(--sn-beat-pulse-intensity, 0) * 6px);
   }
 
-  // Simplified mobile typography
+  // Simplified mobile typography consciousness
   .main-type-ballad,
   .main-type-canon {
     font-size: clamp(1.1rem, 4vw, 1.8rem);
+
+    // Reduced effects for mobile performance
+    text-shadow: 0 0 calc(var(--sn-text-beat-glow) * 0.5)
+      var(--sn-text-cosmic-shadow);
+    filter: hue-rotate(calc(var(--sn-text-rhythm-hue) * 0.5));
   }
 }
+
+// Performance optimization for lower-end devices
+@media (max-resolution: 1dppx) {
+  :root {
+    --sn-text-beat-glow: calc(var(--sn-beat-pulse-intensity, 0) * 4px);
+  }
+
+  // Disable complex text effects on low-resolution displays
+  .main-type-ballad,
+  .main-type-canon {
+    &::after {
+      display: none;
+    }
+  }
+}
+
+// END OF TYPOGRAPHY CONSCIOUSNESS SYSTEM
+// ████████████████████████████████████████████████████████████████████████████████

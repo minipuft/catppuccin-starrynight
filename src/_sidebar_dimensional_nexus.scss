@@ -1,0 +1,832 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// SIDEBAR DIMENSIONAL NEXUS MODULE
+// Advanced Dimensional Effects, Meditation Modes & Quantum Consciousness Field
+// ████████████████████████████████████████████████████████████████████████████████
+//
+// This module contains advanced sidebar effects that complement the base
+// SidebarConsciousnessSystem, including:
+// - Digital meditation states and biometric feedback
+// - Atmospheric effects (hue shifting, saturation control, vibration)
+// - Quantum entanglement and dimensional rifts
+// - Advanced quantum consciousness field effects
+// - Enhanced navigation items with temporal echoes
+// - Complex animation systems for advanced interactions
+//
+// Dependencies:
+// - Base sidebar consciousness system (_sidebar_consciousness.scss)
+// - Year 3000 gradient variables (--sn-gradient-*-rgb)
+// - Spicetify theme variables (--spice-rgb-*)
+//
+// ████████████████████████████████████████████████████████████████████████████████
+
+:root {
+  // === DIGITAL MEDITATION & BIOMETRIC FEEDBACK ===
+  --sn-sidebar-meditation-desaturation: 0; // 0 to 1 (0 = normal, 1 = fully desaturated gray)
+  --sn-sidebar-meditation-slowdown: 1; // Animation speed multiplier (1 = normal, <1 = slower)
+  --sn-item-energy-absorption-scale: 1; // Scale effect for item absorbing energy
+
+  // === ATMOSPHERIC EFFECTS ===
+  --sn-sidebar-atmosphere-hue-shift: 0deg;
+  --sn-sidebar-atmosphere-saturation-factor: 1;
+  --sn-sidebar-atmosphere-vibration-intensity: 0; // 0 to 1
+
+  // === QUANTUM ENTANGLEMENT ===
+  --sn-sidebar-entanglement-intensity: 0; // 0 to 0.1
+  --sn-sidebar-entanglement-color-rgb: var(--spice-rgb-main, 48, 52, 70);
+
+  // === DIMENSIONAL RIFT VARIABLES ===
+  --sn-dimensional-rift-intensity: 0;
+  --sn-dimensional-rift-color-rgb: 140, 170, 238; // Default: blue
+
+  // === PREDICTIVE MATERIALIZATION ===
+  --sn-predictive-echo-opacity: 0;
+  --sn-predictive-echo-scale: 1;
+
+  // === QUANTUM CONSCIOUSNESS FIELD ===
+  --sn-sidebar-base-bg-opacity: 0.1;
+  --sn-sidebar-harmonic-intensity-multiplier: 1;
+  --sn-sidebar-energy-glow-opacity: 0;
+  --sn-sidebar-temporal-blur: 0px;
+  --sn-sidebar-temporal-echo-opacity: 0;
+  --sn-sidebar-item-bloom-intensity: 0;
+  --sn-sidebar-current-temporal-shift: 0s;
+
+  // === NAVIGATION ENTANGLEMENT ===
+  --sn-nav-item-base-opacity: 0.85;
+  --sn-nav-item-hover-bg-opacity: 0.1;
+  --sn-nav-item-active-bg-opacity: 0.15;
+  --sn-nav-item-glow-color-rgb: var(--sn-gradient-primary-rgb, "202,158,230");
+  --sn-nav-item-glow-intensity: 0; // 0 to 1, controlled by JS
+  --sn-nav-text-energy-color-rgb: var(--sn-gradient-accent-rgb, "140,170,238");
+  --sn-nav-text-energy-opacity: 0; // 0 to 0.5, controlled by JS
+  --sn-nav-item-transform-scale: 1; // 1 to 1.03, controlled by JS
+  --sn-nav-item-transition-duration: 0.3s;
+
+  // === DATA GLYPH ENHANCEMENTS ===
+  --sn-nav-item-echo-opacity: 0;
+  --sn-nav-item-echo-scale: 1;
+  --sn-glyph-resonance-intensity: 0; // 0 to 0.2 for glyph enhancement
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// DIMENSIONAL NEXUS SIDEBAR - Phase 3: Quantum Entanglement of Navigation Elements
+// ████████████████████████████████████████████████████████████████████████████████
+
+div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
+  nav[aria-label="Main"] a,
+  .main-yourLibraryX-header a, // Links in library header
+  div[data-testid="left-sidebar-footer"] a, // Links in sidebar footer
+  a.link-subtle.main-navBar-navBarLink {
+    // Common class for Home, Search etc.
+    position: relative;
+    display: flex; // Use flex for better alignment of icons and text
+    align-items: center;
+    padding: 8px 24px; // Standard Spicetify padding
+    margin: 2px 0;
+    border-radius: 6px;
+    opacity: var(--sn-nav-item-base-opacity);
+    transform: scale(var(--sn-nav-item-transform-scale));
+    transition: opacity var(--sn-nav-item-transition-duration) ease,
+      background-color var(--sn-nav-item-transition-duration) ease,
+      transform var(--sn-nav-item-transition-duration)
+        cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      box-shadow var(--sn-nav-item-transition-duration) ease;
+
+    // Quantum glow effect via pseudo-element
+    &::before {
+      content: "";
+      position: absolute;
+      inset: -1px; // Slightly larger than the element
+      border-radius: inherit;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(
+            var(--sn-nav-item-glow-color-rgb),
+            calc(var(--sn-nav-item-glow-intensity) * 0.6)
+          )
+          0%,
+        rgba(
+            var(--sn-nav-item-glow-color-rgb),
+            calc(var(--sn-nav-item-glow-intensity) * 0.2)
+          )
+          40%,
+        transparent 70%
+      );
+      opacity: 0;
+      transition: opacity var(--sn-nav-item-transition-duration) ease;
+      z-index: -1; // Behind the element
+    }
+
+    // Hover and active states
+    &:hover,
+    &:focus,
+    &[aria-current="page"],
+    &.main-navBar-navBarLinkActive {
+      background-color: rgba(
+        var(--sn-nav-item-glow-color-rgb),
+        var(--sn-nav-item-hover-bg-opacity)
+      );
+      transform: scale(var(--sn-nav-item-transform-scale)) translateY(-0.5px); // Slight lift
+      box-shadow: 0 2px 8px -2px rgba(var(--sn-nav-item-glow-color-rgb), calc(var(
+                --sn-nav-item-glow-intensity
+              ) * 0.4));
+
+      &::before {
+        opacity: 1; // Activate glow
+      }
+
+      // Text glow enhancement for high-energy states
+      .Type__TypeElement-sc-goliZz-0,
+      span {
+        text-shadow: 0 0 6px
+          rgba(
+            var(--sn-nav-text-energy-color-rgb),
+            var(--sn-nav-text-energy-opacity)
+          );
+      }
+    }
+
+    // Active/current page additional styling
+    &[aria-current="page"],
+    &.main-navBar-navBarLinkActive {
+      background-color: rgba(
+        var(--sn-nav-item-glow-color-rgb),
+        var(--sn-nav-item-active-bg-opacity)
+      );
+      box-shadow: inset 0 1px 3px
+          rgba(
+            var(--sn-nav-item-glow-color-rgb),
+            calc(var(--sn-nav-item-glow-intensity) * 0.3)
+          ),
+        0 2px 8px -2px rgba(var(--sn-nav-item-glow-color-rgb), calc(var(
+                  --sn-nav-item-glow-intensity
+                ) * 0.5));
+    }
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// DIGITAL MEDITATION STATE & BIOMETRIC FEEDBACK
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Sidebar Digital Meditation State
+div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
+  // Apply desaturation and slowdown when --sn-sidebar-meditation-desaturation > 0
+  // This requires careful application to not break other filter effects.
+  // We might need to adjust how filters are composed in the ::before/::after layers.
+  // For now, a simple approach targeting the main layers' filter property:
+  &.sn-digital-meditation {
+    // This class will be added by JS
+    .sn-consciousness-layer, // Target the pseudo-elements if they have distinct classes
+    .sn-neural-flow-layer,
+    .sn-quantum-foam-layer,
+    &::before, // If layers are directly on ::before
+    &::after {
+      // and ::after
+      filter: blur(var(--sn-sidebar-blur-intensity, 25px))
+        saturate(
+          calc(
+            var(--sn-gradient-saturation) *
+              (1 - var(--sn-sidebar-meditation-desaturation))
+          )
+        )
+        brightness(var(--sn-gradient-brightness))
+        contrast(var(--sn-gradient-contrast));
+      animation-duration: calc(
+        var(--original-animation-duration, 20s) /
+          var(--sn-sidebar-meditation-slowdown)
+      );
+      // Need to ensure other animation properties also respect this slowdown if not using a single duration property.
+    }
+    // Reduce animation speed for specific animations
+    // This is tricky without a global animation speed control on the parent.
+    // Individual animation-duration properties would need to be targeted or vars used.
+    // For example, if --sn-neural-flow-speed is used by an animation:
+    // --sn-neural-flow-speed: calc(var(--original-neural-flow-speed, 20s) / var(--sn-sidebar-meditation-slowdown));
+  }
+}
+
+// Item Energy Absorption Feedback (applied to nav items by JS)
+.main-yourLibraryX-navLink,
+.main-yourLibraryX-listItem,
+nav[aria-label="Main"] ul li a {
+  &.sn-absorbing-energy {
+    transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3); // Quick, bouncy feel
+    transform: scale(var(--sn-item-energy-absorption-scale));
+    // Potentially add a subtle glow change too
+    box-shadow: 0 0 calc(5px + 8px * var(--sn-nav-item-glow-intensity))
+        rgba(
+          var(--sn-nav-item-glow-color-rgb),
+          calc(var(--sn-nav-item-glow-intensity) * 0.3)
+        ),
+      inset 0 0 3px
+        rgba(
+          var(--sn-nav-item-glow-color-rgb),
+          calc(var(--sn-nav-item-glow-intensity) * 0.15)
+        );
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// ATMOSPHERIC EFFECTS & QUANTUM ENTANGLEMENT
+// ████████████████████████████████████████████████████████████████████████████████
+
+.Root__nav-bar {
+  // Or whichever element holds the main sidebar background layers
+  // Apply atmospheric hue shift and saturation to the whole sidebar or specific layers
+  // This example applies it to the main sidebar container. Be careful with specificity.
+  filter: hue-rotate(var(--sn-sidebar-atmosphere-hue-shift, 0deg))
+    saturate(var(--sn-sidebar-atmosphere-saturation-factor, 1));
+  transition: filter 1.5s ease-in-out; // Smooth transition for atmospheric changes
+
+  // Entanglement: Add a pseudo-element for the color bleed effect
+  &::after {
+    // Or another pseudo-element if ::after is already in use
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(
+      var(--sn-sidebar-entanglement-color-rgb, 48, 52, 70),
+      var(--sn-sidebar-entanglement-intensity, 0)
+    );
+    mix-blend-mode: color-dodge; // Or other blend modes like soft-light, overlay
+    pointer-events: none;
+    z-index: 0; // Ensure it's above base background but below content if needed
+    transition: background-color 1.2s ease-in-out;
+    opacity: var(
+      --sn-sidebar-entanglement-intensity,
+      0
+    ); // Control via intensity var
+  }
+
+  // Vibration Effect (applied to a background layer, e.g., ::before or a dedicated div)
+  // Assuming .sn-sidebar-vibration-layer is a child or pseudo of .Root__nav-bar
+  .sn-sidebar-vibration-layer,
+  &::before {
+    // Example targets
+    // If var is 0, no animation. If > 0, animation runs.
+    // JS could add/remove a class to control animation play state too.
+    animation-name: sn-sidebar-vibrate;
+    animation-duration: 0.3s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    animation-play-state: var(--_sidebar-vibration-play-state, paused);
+    // Helper variable to control play state based on intensity
+    --_sidebar-vibration-play-state: if(
+      var(--sn-sidebar-atmosphere-vibration-intensity, 0) > 0.01,
+      running,
+      paused
+    );
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// PREDICTIVE MATERIALIZATION SYSTEM EFFECTS
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Styles for a generic predictive echo item (applied by JS)
+.sn-predictive-echo-item {
+  opacity: var(--sn-predictive-echo-opacity, 0);
+  transform: scale(var(--sn-predictive-echo-scale, 1));
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  // Add a subtle shimmer or pulse if desired
+  animation: sn-echo-shimmer 3s infinite ease-in-out alternate;
+}
+
+// Styles for a dimensional rift effect (conceptual, likely a pseudo-element on a target)
+.sn-dimensional-rift-target {
+  // Example target class JS might add this to
+  position: relative;
+  overflow: visible; // Allow pseudo-element to extend
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(var(--sn-dimensional-rift-color-rgb), 0.8) 0%,
+      rgba(var(--sn-dimensional-rift-color-rgb), 0.2) 40%,
+      transparent 70%
+    );
+    transform: translate(-50%, -50%)
+      scale(calc(0.5 + var(--sn-dimensional-rift-intensity, 0) * 0.6));
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// QUANTUM CONSCIOUSNESS FIELD & HARMONIC MODES
+// ████████████████████████████████████████████████████████████████████████████████
+
+.Root__nav-bar {
+  // Base transition for all dynamic effects
+  transition: background-color 0.7s var(--sn-easing-explorer),
+    box-shadow 0.7s var(--sn-easing-explorer),
+    filter 0.7s var(--sn-easing-explorer);
+
+  // Apply backgrounds per harmonic mode (JS adds these classes)
+  &.sn-harmonic-analogous-flow {
+    background: linear-gradient(
+      170deg,
+      rgba(
+          var(--sn-gradient-primary-rgb, 202, 158, 230),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.7 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        0%,
+      rgba(
+          var(--sn-gradient-secondary-rgb, 186, 187, 241),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.5 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        40%,
+      rgba(
+          var(--sn-gradient-accent-rgb, 140, 170, 238),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.8 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        100%
+    );
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-primary-rgb, 202, 158, 230), calc(0.15 *
+              var(--sn-sidebar-harmonic-intensity-multiplier))),
+      inset 0 0 30px 5px
+        rgba(
+          var(--sn-gradient-secondary-rgb, 186, 187, 241),
+          calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier))
+        );
+    --sn-sidebar-harmonic-intensity-multiplier: 1;
+  }
+
+  &.sn-harmonic-triadic-trinity {
+    background: linear-gradient(
+      170deg,
+      rgba(
+          var(--sn-gradient-primary-rgb, 203, 166, 247),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.7 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        0%,
+      rgba(
+          var(--sn-gradient-accent-rgb, 148, 226, 213),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.5 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        40%,
+      rgba(
+          var(--sn-gradient-secondary-rgb, 245, 194, 231),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.8 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        100%
+    );
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-primary-rgb, 203, 166, 247), calc(0.15 *
+              var(--sn-sidebar-harmonic-intensity-multiplier))),
+      inset 0 0 30px 5px
+        rgba(
+          var(--sn-gradient-accent-rgb, 148, 226, 213),
+          calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier))
+        );
+    --sn-sidebar-harmonic-intensity-multiplier: 1.1;
+  }
+
+  &.sn-harmonic-complementary-yin-yang {
+    background: linear-gradient(
+      170deg,
+      rgba(
+          var(--sn-gradient-primary-rgb, 239, 159, 118),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.7 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        0%,
+      rgba(
+          var(--sn-gradient-accent-rgb, 137, 180, 250),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.5 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        40%,
+      rgba(
+          var(--spice-rgb-surface1, 69, 71, 90),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.8 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        100%
+    );
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-primary-rgb, 239, 159, 118), calc(0.15 *
+              var(--sn-sidebar-harmonic-intensity-multiplier))),
+      inset 0 0 30px 5px
+        rgba(
+          var(--sn-gradient-accent-rgb, 137, 180, 250),
+          calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier))
+        );
+    --sn-sidebar-harmonic-intensity-multiplier: 1.2;
+  }
+
+  &.sn-harmonic-tetradic-cosmic-cross {
+    background: linear-gradient(
+      170deg,
+      rgba(
+          var(--spice-rgb-green, 166, 227, 161),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.7 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        0%,
+      rgba(
+          var(--spice-rgb-red, 243, 139, 168),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.5 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        40%,
+      rgba(
+          var(--spice-rgb-yellow, 249, 226, 175),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.8 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        100%
+    );
+    --sn-sidebar-harmonic-intensity-multiplier: 1.15;
+  }
+
+  &.sn-harmonic-split-complementary-aurora {
+    background: linear-gradient(
+      170deg,
+      rgba(
+          var(--spice-rgb-peach, 239, 159, 118),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.7 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        0%,
+      rgba(
+          var(--spice-rgb-sky, 137, 220, 235),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.5 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        40%,
+      rgba(
+          var(--spice-rgb-teal, 129, 200, 190),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.8 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        100%
+    );
+    --sn-sidebar-harmonic-intensity-multiplier: 1.05;
+  }
+
+  &.sn-harmonic-monochromatic-meditation {
+    background: linear-gradient(
+      170deg,
+      rgba(
+          var(--sn-gradient-primary-rgb, 202, 158, 230),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.7 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        0%,
+      rgba(
+          var(--sn-gradient-primary-rgb, 202, 158, 230),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.5 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        40%,
+      rgba(
+          var(--sn-gradient-primary-rgb, 202, 158, 230),
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.8 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        100%
+    );
+    --sn-sidebar-harmonic-intensity-multiplier: 0.9;
+    --sn-sidebar-base-bg-opacity: 0.2; // More intense for monochromatic
+  }
+
+  // --- Music Energy Styling ---
+  // (JS adds these classes: sn-music-low-energy, sn-music-mid-energy, sn-music-high-energy)
+  &.sn-music-low-energy {
+    --sn-sidebar-energy-glow-opacity: 0.1;
+    --sn-sidebar-item-bloom-intensity: 0.1;
+    filter: saturate(0.85) brightness(0.95);
+    animation: sn-sidebar-pulse-slow 8s infinite ease-in-out alternate;
+  }
+  &.sn-music-mid-energy {
+    --sn-sidebar-energy-glow-opacity: 0.25;
+    --sn-sidebar-item-bloom-intensity: 0.25;
+    filter: saturate(1) brightness(1);
+    animation: sn-sidebar-pulse-mid 5s infinite ease-in-out alternate;
+  }
+  &.sn-music-high-energy {
+    --sn-sidebar-energy-glow-opacity: 0.4;
+    --sn-sidebar-item-bloom-intensity: 0.5;
+    filter: saturate(1.15) brightness(1.05);
+    animation: sn-sidebar-pulse-fast 3s infinite ease-in-out alternate;
+  }
+
+  // --- Temporal Echo Layer Styling ---
+  // This uses the --sn-sidebar-temporal-shift variable set by JS
+  // Applied to a pseudo-element if existing ones are not sufficient, or integrated into existing ones.
+  // Assuming ::after is available or one of the existing ::before/::after from Dimensional Nexus can be augmented.
+  // This example augments the ::after from Dimensional Nexus Phase 1 (Quantum Foam & Temporal Displacement)
+  &::after {
+    // Keep existing Dimensional Nexus ::after styles (Quantum Foam, Temporal Displacement)
+    // Add new properties or modify existing ones related to the temporal echo
+    transition: opacity 1s ease, filter 1s ease,
+      transform var(--sn-sidebar-current-temporal-shift) ease-out; // Added transform
+
+    // Example: Make the temporal echo more pronounced when shift is active
+    // The --sn-sidebar-temporal-shift is a duration, not direct opacity/blur value.
+    // JS sets this. We can use it to modify animation speed or other properties if needed.
+    // For a visual echo effect, we might need another variable from JS for opacity/blur of the echo itself.
+    // Let's assume --sn-sidebar-temporal-echo-opacity and --sn-sidebar-temporal-blur are set by JS if needed.
+    opacity: calc(
+      var(--sn-quantum-foam-opacity, 0.03) +
+        var(--sn-sidebar-temporal-echo-opacity, 0)
+    );
+    filter: blur(var(--sn-sidebar-temporal-blur, 0px)); // Add blur for echo
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// ENHANCED NAVIGATION ITEMS WITH DIMENSIONAL EFFECTS
+// ████████████████████████████████████████████████████████████████████████████████
+
+.Root__nav-bar {
+  // Target general navigation links. Adapt selectors as needed.
+  .main-navBar-navBarLink,
+  .main-yourLibraryX-navLinkContainer a, // For library items in grid/list view
+  .main-rootlist-rootlistItem a, // For playlist items in folders
+  .main-playlistFolder-textLink {
+    position: relative;
+    transition: all 0.4s var(--sn-easing-explorer);
+    padding: 8px 12px; // Consistent padding
+    margin: 2px 4px;
+    border-radius: var(--border-radius, 6px);
+
+    &::before {
+      // For bloom/glow effect
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(
+            var(--sn-gradient-accent-rgb, "140,170,238"),
+            calc(var(--sn-sidebar-item-bloom-intensity) * 0.7)
+          )
+          0%,
+        transparent 60%
+      );
+      opacity: 0;
+      transition: opacity 0.4s var(--sn-easing-explorer);
+      z-index: -1;
+      transform: scale(0.95);
+    }
+
+    &:hover,
+    &.main-navBar-navBarLinkActive,
+    &[aria-current="page"] {
+      background-color: rgba(
+        var(--sn-gradient-primary-rgb, "202,158,230"),
+        0.15
+      );
+      color: var(--spice-text);
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 3px 15px -5px rgba(var(--sn-gradient-primary-rgb, "202,158,230"), 0.3);
+
+      &::before {
+        // Activate bloom
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    // Energy-based text glow for high energy music
+    .sn-music-high-energy & {
+      .Type__TypeElement-sc-goliZz-0,
+      span {
+        text-shadow: 0 0 8px
+          rgba(
+            var(--sn-gradient-accent-rgb, "140,170,238"),
+            calc(0.5 * var(--sn-sidebar-energy-glow-opacity))
+          );
+      }
+    }
+  }
+
+  // Specificity for Your Library items if different selectors are needed
+  .main-yourLibraryX-listItem .main-useDropTarget-base {
+    // Common wrapper for library items
+    transition: all 0.4s var(--sn-easing-explorer);
+    border-radius: var(--border-radius, 4px);
+    padding: 6px 8px;
+    margin: 1px 4px;
+
+    &:hover {
+      background-color: rgba(
+        var(--sn-gradient-primary-rgb, "202,158,230"),
+        0.1
+      );
+      transform: scale(1.01);
+      box-shadow: 0 2px 10px -4px rgba(var(--sn-gradient-primary-rgb, "202,158,230"), 0.25);
+    } // Closes &:hover
+
+    // Active library item
+    &[aria-current="true"],
+    .main-yourLibraryX-navLinkActive & {
+      // If parent has active class
+      background-color: rgba(
+        var(--sn-gradient-accent-rgb, "140,170,238"),
+        0.15
+      );
+      box-shadow: inset 0 0 10px -5px rgba(var(--sn-gradient-accent-rgb, "140,170,238"), 0.3);
+    } // Closes &[aria-current="true"] / .main-yourLibraryX-navLinkActive &
+  } // Closes .main-yourLibraryX-listItem .main-useDropTarget-base
+
+  // Musical DNA Visualization (Placeholder - requires JS to add specific classes like .sn-item-type-playlist)
+  .sn-item-type-playlist::after {
+    content: "\1F3A7"; /* 🎧 */
+  }
+  .sn-item-type-album::after {
+    content: "\1F4BF"; /* 💿 */
+  }
+  .sn-item-type-artist::after {
+    content: "\1F3A4"; /* 🎤 */
+  }
+  .sn-item-type-folder::after {
+    content: "\1F4C1"; /* 📁 */
+  }
+
+  [class*="sn-item-type-"]::after {
+    font-size: 0.8em;
+    margin-left: 8px;
+    opacity: 0.5;
+  }
+} // Closes the .Root__nav-bar block for navigation item enhancements
+
+// ████████████████████████████████████████████████████████████████████████████████
+// DATA GLYPH SYSTEM - TEMPORAL ECHOES & RESONANCE
+// ████████████████████████████████████████████████████████████████████████████████
+
+.sn-data-glyph {
+  position: relative; // For pseudo-element positioning if used for echo
+  // Base styles... (opacity, size, color already handled by JS on the element or its CSS vars)
+
+  // Resonance: Enhance existing properties or add new ones
+  // Example: Adding a subtle glow based on resonance intensity
+  // The base glyph color and opacity are set via --sn-glyph-color-rgb and --sn-glyph-opacity
+  // Resonance can add to this, e.g. making the base color slightly more intense or adding a distinct glow.
+  box-shadow: 0 0 calc(2px + var(--sn-glyph-resonance-intensity, 0) * 15px)
+    rgba(
+      var(--sn-glyph-color-rgb, var(--spice-rgb-accent)),
+      calc(0.1 + var(--sn-glyph-resonance-intensity, 0) * 0.5)
+    );
+  transition: box-shadow 0.4s ease-in-out; // Smooth resonance changes
+
+  // Temporal Echo (achieved via JS setting --sn-nav-item-echo-opacity/scale on the glyph element)
+  // Or using a pseudo-element if the glyph itself needs to remain unchanged during echo
+  &.sn-nav-item-echoing {
+    // The following assumes JS sets these vars directly on the .sn-data-glyph or its wrapper
+    // when echo is active, and SCSS primarily defines the animation behavior.
+    // An alternative is to use a ::after pseudo-element for the echo.
+    animation: sn-temporal-echo-animation 0.75s ease-out forwards;
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// ADVANCED ANIMATIONS & KEYFRAMES
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Vibration Animation
+@keyframes sn-sidebar-vibrate {
+  0% {
+    transform: translate(
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * 0.2px),
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * 0.2px)
+    );
+  }
+  25% {
+    transform: translate(
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * -0.2px),
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * 0.3px)
+    );
+  }
+  50% {
+    transform: translate(
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * 0.3px),
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * -0.2px)
+    );
+  }
+  75% {
+    transform: translate(
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * -0.1px),
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * -0.3px)
+    );
+  }
+  100% {
+    transform: translate(
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * 0.2px),
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * 0.2px)
+    );
+  }
+}
+
+// Predictive Echo Shimmer
+@keyframes sn-echo-shimmer {
+  0% {
+    filter: brightness(100%) saturate(100%);
+  }
+  50% {
+    filter: brightness(120%) saturate(110%);
+  }
+  100% {
+    filter: brightness(100%) saturate(100%);
+  }
+}
+
+// Temporal Echo Animation
+@keyframes sn-temporal-echo-animation {
+  0% {
+    opacity: var(--sn-nav-item-echo-opacity, 0.3); // Start opacity (set by JS)
+    transform: scale(
+      var(--sn-nav-item-echo-scale, 1.15)
+    ); // Start scale (set by JS)
+    filter: brightness(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+    filter: brightness(1.5);
+  }
+}
+
+// Subtle pulsing animation for the sidebar background based on energy
+@keyframes sn-sidebar-pulse-slow {
+  0%,
+  100% {
+    box-shadow: inset 0 0 70px -25px rgba(var(--sn-gradient-primary-rgb), calc(0.1 *
+            var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
+  }
+  50% {
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-secondary-rgb), calc(0.15 *
+            var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
+  }
+}
+@keyframes sn-sidebar-pulse-mid {
+  0%,
+  100% {
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-primary-rgb), calc(0.2 *
+            var(--sn-sidebar-harmonic-intensity-multiplier)));
+  }
+  50% {
+    box-shadow: inset 0 0 90px -15px rgba(var(--sn-gradient-secondary-rgb), calc(0.25 *
+            var(--sn-sidebar-harmonic-intensity-multiplier)));
+  }
+}
+@keyframes sn-sidebar-pulse-fast {
+  0%,
+  100% {
+    box-shadow: inset 0 0 90px -15px rgba(var(--sn-gradient-primary-rgb), calc(0.3 *
+            var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
+  }
+  50% {
+    box-shadow: inset 0 0 100px -10px rgba(var(--sn-gradient-secondary-rgb), calc(0.35 *
+            var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
+  }
+}

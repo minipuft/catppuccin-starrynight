@@ -1,350 +1,560 @@
-// StarryNight 3D Morphing Module - Phase 3: True 3D card interactions and morphing
+// ████████████████████████████████████████████████████████████████████████████████
+// 3D MORPHING CONSCIOUSNESS SYSTEM - Year 3000 BeatSync Integration
+// Dimensional consciousness with rhythm-responsive 3D morphing effects
+// ████████████████████████████████████████████████████████████████████████████████
+//
+// This module transforms static 3D elements into consciousness-aware interfaces that:
+// - MORPH element shapes and dimensions with beat detection
+// - OSCILLATE 3D rotation with music rhythm phase
+// - BLOOM depth effects during musical intensity peaks
+// - HARMONIZE perspective with dynamic music analysis
+// - BREATHE with dimensional scale effects synchronized to beats
+//
+// CRITICAL: Maintains search exclusion guards to prevent interference
+// Dependencies:
+// - BeatSyncVisualSystem variables (--sn-beat-pulse-intensity, --sn-rhythm-phase, --sn-breathing-scale)
+// - Year 3000 gradient system variables (--sn-gradient-*-rgb)
+//
+// ████████████████████████████████████████████████████████████████████████████████
+
 @use "mixins" as *;
 
-// CSS custom properties for 3D morphing system
-:root {
-  // 3D perspective and depth settings
-  --perspective-distance: 1200px;
-  --max-rotate-x: 15deg;
-  --max-rotate-y: 15deg;
-  --depth-hover: 50px;
-  --depth-focus: 80px;
+// ████████████████████████████████████████████████████████████████████████████████
+// CORE 3D CONSCIOUSNESS VARIABLES
+// ████████████████████████████████████████████████████████████████████████████████
 
-  // Morphing animation timing
-  --morph-duration-fast: 0.4s;
-  --morph-duration-medium: 0.8s;
-  --morph-duration-slow: 1.2s;
+// Year 3000 3D Variables (Search Compatible + Consciousness Enhanced)
+:root {
+  // === BASIC 3D SYSTEM (Existing + Enhanced) ===
+  --perspective-distance: calc(
+    800px + var(--sn-beat-pulse-intensity, 0) * 200px
+  );
+  --max-rotate-x: calc(8deg + var(--sn-rhythm-phase, 0) * 4deg);
+  --max-rotate-y: calc(8deg + var(--sn-rhythm-phase, 0) * 4deg);
+  --depth-hover: calc(12px + var(--sn-beat-pulse-intensity, 0) * 8px);
+  --morph-duration: calc(0.3s - var(--sn-beat-pulse-intensity, 0) * 0.1s);
   --morph-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
-  // 3D shadow and lighting
-  --shadow-3d-color: rgba(0, 0, 0, 0.15);
-  --light-source-x: 0;
-  --light-source-y: 0;
+  // === BEATSYNC CONSCIOUSNESS VARIABLES (New) ===
+  --sn-3d-beat-depth: calc(var(--sn-beat-pulse-intensity, 0) * 20px);
+  --sn-3d-rhythm-rotation: calc(var(--sn-rhythm-phase, 0) * 5deg);
+  --sn-3d-breathing-scale: var(--sn-breathing-scale, 1);
 
-  // Mouse tracking variables (updated by JavaScript)
-  --mouse-x: 0;
-  --mouse-y: 0;
-  --mouse-inside: 0;
+  // === COSMIC 3D ENHANCEMENT ===
+  --sn-3d-cosmic-perspective: calc(
+    800px + var(--sn-beat-pulse-intensity, 0) * 400px
+  );
+  --sn-3d-energy-intensity: calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.5);
+  --sn-3d-morph-strength: calc(var(--sn-beat-pulse-intensity, 0) * 0.15);
+  --sn-3d-rhythm-flow: calc(var(--sn-rhythm-phase, 0) * 15deg);
+
+  // === DIMENSIONAL MORPHING SYSTEM ===
+  --sn-3d-depth-pulse: calc(12px + var(--sn-beat-pulse-intensity, 0) * 20px);
+  --sn-3d-hover-enhancement: calc(
+    1.02 + var(--sn-beat-pulse-intensity, 0) * 0.03
+  );
+  --sn-3d-rotation-consciousness: calc(var(--sn-rhythm-phase, 0) * 3deg);
+  --sn-3d-cosmic-glow: calc(var(--sn-beat-pulse-intensity, 0) * 0.4);
+
+  // === ENHANCED SHADOW SYSTEM (Consciousness Aware) ===
+  --shadow-3d-color: rgba(
+    var(--sn-oklab-processed-dynamic-shadow-rgb),
+    calc(0.12 + var(--sn-beat-pulse-intensity, 0) * 0.15)
+  );
+  --shadow-3d-cosmic: rgba(
+    var(--sn-gradient-primary-rgb, "202,158,230"),
+    calc(var(--sn-beat-pulse-intensity, 0) * 0.3)
+  );
 }
 
-// PHASE 3: 3D Scene Setup
-// =============================================================================
+// ████████████████████████████████████████████████████████████████████████████████
+// SEARCH EXCLUSION GUARD - CONSCIOUSNESS 3D EFFECTS DISABLED IN SEARCH
+// ████████████████████████████████████████████████████████████████████████████████
 
-// Main content areas become 3D containers
-.Root__main-view,
-.main-view-container {
-  @include perspective-container(var(--perspective-distance));
-}
+// Only apply consciousness-enhanced 3D effects OUTSIDE of search pages
+body:not(:has(.main-searchPage-content)) {
+  // ████████████████████████████████████████████████████████████████████████████████
+  // ENHANCED 3D CONSCIOUSNESS CONTAINERS
+  // ████████████████████████████████████████████████████████████████████████████████
 
-// Enhanced grid container with 3D perspective
-.main-gridContainer-gridContainer {
-  @include perspective-container(1400px);
+  // Enhanced 3D perspective with consciousness for non-search containers
+  .main-gridContainer-gridContainer {
+    perspective: var(--sn-3d-cosmic-perspective);
 
-  // Preserve existing styles but add 3D context
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 24px;
-  padding: 24px;
-
-  // 3D perspective adjustments for mobile
-  @media (max-width: 768px) {
-    perspective: 800px; // Reduced perspective for mobile
-  }
-}
-
-// PHASE 3: 3D Card Morphing System
-// =============================================================================
-
-// Enhanced main cards with true 3D interactions
-.main-card-card {
-  // Apply morphing transition system
-  @include morphing-transition(var(--morph-duration-medium));
-  @include interactive-3d-hover(var(--max-rotate-y), var(--depth-hover));
-
-  // Default 3D state
-  @include card-morph-state("default");
-  @include shadow-3d(1);
-
-  // Transform origin for natural 3D rotation
-  transform-origin: center center;
-  transform-style: preserve-3d;
-
-  // Enhanced hover state with 3D morphing
-  &:hover {
-    @include shadow-3d(2);
-
-    // Dynamic 3D transform based on mouse position (updated by JS)
-    transform: perspective(var(--perspective-distance))
-      rotateX(calc(var(--mouse-y, 0) * var(--max-rotate-x)))
-      rotateY(calc(var(--mouse-x, 0) * var(--max-rotate-y)))
-      translateZ(var(--depth-hover)) scale(1.02);
+    // BREATHING effect for entire grid
+    transform: scale(var(--sn-3d-breathing-scale));
+    transition: transform 0.2s ease-out;
   }
 
-  // Focus state with 3D morphing
-  &:focus-visible {
-    @include card-morph-state("focused");
-    @include shadow-3d(3);
-    outline: 2px solid var(--card-accent-color);
-    outline-offset: 4px;
-  }
+  // ████████████████████████████████████████████████████████████████████████████████
+  // ENHANCED 3D CARD CONSCIOUSNESS (NON-SEARCH ONLY)
+  // ████████████████████████████████████████████████████████████████████████████████
 
-  // Active state with depth feedback
-  &:active {
-    transform: perspective(var(--perspective-distance))
-      rotateX(calc(var(--mouse-y, 0) * var(--max-rotate-x) * 0.5))
-      rotateY(calc(var(--mouse-x, 0) * var(--max-rotate-y) * 0.5))
-      translateZ(20px) scale(0.98);
-    transition: transform 0.1s ease;
-  }
-
-  // Context menu open state
-  &[data-context-menu-open="true"] {
-    @include card-morph-state("expanded");
-    @include shadow-3d(3);
-  }
-}
-
-// PHASE 3: Layered 3D Content
-// =============================================================================
-
-// Card content layers with depth
-.main-card-header {
-  @include depth-layer(1);
-
-  // Card image with enhanced 3D interaction
-  .main-image-image,
-  .main-cardImage-image {
-    @include morphing-transition(0.6s);
+  // Consciousness-enhanced 3D card (non-search only)
+  .main-card-card {
+    transition: transform var(--morph-duration) var(--morph-easing),
+      filter 0.4s ease-out, box-shadow 0.3s ease-out;
     transform-origin: center center;
 
-    // Subtle 3D hover for images
+    // Base consciousness state with BREATHING
+    transform: scale(var(--sn-3d-breathing-scale))
+      rotateX(var(--sn-3d-rotation-consciousness))
+      rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.3));
+
+    // Subtle cosmic glow effect
+    filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 10deg))
+      saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.2));
+
+    // BLOOM hover with enhanced consciousness
+    &:hover {
+      // MORPH transformation with beat synchronization
+      transform: translateZ(calc(var(--depth-hover) + var(--sn-3d-beat-depth)))
+        scale(
+          calc(var(--sn-3d-hover-enhancement) * var(--sn-3d-breathing-scale))
+        )
+        rotateX(calc(var(--sn-3d-rotation-consciousness) * 1.5))
+        rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.8));
+
+      // Enhanced consciousness shadow with cosmic elements
+      box-shadow: 0 8px 24px var(--shadow-3d-color),
+        0 4px calc(16px + var(--sn-beat-pulse-intensity, 0) * 8px)
+          var(--shadow-3d-cosmic),
+        0 0 calc(var(--sn-3d-cosmic-glow) * 20px)
+          rgba(
+            var(--sn-gradient-accent-rgb, "140,170,238"),
+            var(--sn-3d-cosmic-glow)
+          );
+
+      // Enhanced REFRACT filter effects
+      filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 20deg))
+        saturate(calc(1.2 + var(--sn-beat-pulse-intensity, 0) * 0.3))
+        brightness(calc(1.05 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+    }
+
+    // Enhanced focus state with consciousness
+    &:focus-visible {
+      outline: 2px solid
+        rgba(
+          var(--spice-rgb-accent),
+          calc(0.8 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+        );
+      outline-offset: calc(2px + var(--sn-beat-pulse-intensity, 0) * 2px);
+
+      // Focus glow enhancement
+      box-shadow: 0 0 calc(8px + var(--sn-beat-pulse-intensity, 0) * 8px)
+        rgba(
+          var(--spice-rgb-accent),
+          calc(0.6 + var(--sn-beat-pulse-intensity, 0) * 0.3)
+        );
+    }
+
+    // Enhanced active state with consciousness
+    &:active {
+      transform: translateZ(calc(4px + var(--sn-3d-beat-depth) * 0.5))
+        scale(calc(0.98 - var(--sn-beat-pulse-intensity, 0) * 0.02))
+        rotateX(calc(var(--sn-3d-rotation-consciousness) * 0.5))
+        rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.2));
+      transition: transform
+        calc(0.1s + var(--sn-beat-pulse-intensity, 0) * 0.05s) ease;
+    }
+  }
+
+  // ████████████████████████████████████████████████████████████████████████████████
+  // ENHANCED CARD CONTENT CONSCIOUSNESS LAYERING (NON-SEARCH ONLY)
+  // ████████████████████████████████████████████████████████████████████████████████
+
+  // Consciousness-enhanced card content layering (non-search only)
+  .main-card-header {
+    .main-image-image,
+    .main-cardImage-image {
+      transition: transform var(--morph-duration) var(--morph-easing),
+        filter 0.4s ease-out;
+
+      // Base consciousness state
+      transform: scale(var(--sn-3d-breathing-scale))
+        rotateZ(calc(var(--sn-rhythm-phase, 0) * 1deg));
+
+      // Subtle REFRACT effect
+      filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 5deg))
+        saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+
+      .main-card-card:hover & {
+        // MORPH image transformation with consciousness
+        transform: translateZ(calc(8px + var(--sn-3d-beat-depth) * 0.4))
+          scale(calc(1.05 + var(--sn-beat-pulse-intensity, 0) * 0.02))
+          rotateZ(calc(var(--sn-rhythm-phase, 0) * 2deg));
+
+        // Enhanced REFRACT on hover
+        filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 15deg))
+          saturate(calc(1.1 + var(--sn-beat-pulse-intensity, 0) * 0.2))
+          brightness(calc(1.05 + var(--sn-beat-pulse-intensity, 0) * 0.05));
+      }
+    }
+  }
+
+  // ████████████████████████████████████████████████████████████████████████████████
+  // ENHANCED PLAY BUTTON CONSCIOUSNESS (NON-SEARCH ONLY)
+  // ████████████████████████████████████████████████████████████████████████████████
+
+  // Consciousness-enhanced play button 3D (non-search only)
+  .main-card-PlayButtonContainer,
+  .main-playButton-PlayButton {
+    transition: transform var(--morph-duration) var(--morph-easing),
+      opacity 0.3s ease-out, filter 0.4s ease-out, box-shadow 0.3s ease-out;
+
+    // Enhanced initial state with consciousness
+    opacity: calc(0.1 + var(--sn-beat-pulse-intensity, 0) * 0.2);
+    transform: translateZ(calc(-8px - var(--sn-3d-beat-depth) * 0.2))
+      scale(calc(0.8 + var(--sn-beat-pulse-intensity, 0) * 0.1))
+      rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.5));
+
+    // Subtle cosmic glow in base state
+    filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 8deg));
+
     .main-card-card:hover & {
-      transform: translateZ(20px) scale(1.05);
+      // BLOOM button appearance with consciousness
+      opacity: calc(0.9 + var(--sn-beat-pulse-intensity, 0) * 0.1);
+      transform: translateZ(calc(16px + var(--sn-3d-beat-depth)))
+        scale(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.05))
+        rotateY(var(--sn-3d-rhythm-rotation));
+
+      // Enhanced cosmic glow
+      filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 20deg))
+        saturate(calc(1.2 + var(--sn-beat-pulse-intensity, 0) * 0.3));
+
+      // BLOOM shadow effect
+      box-shadow: 0 4px calc(12px + var(--sn-beat-pulse-intensity, 0) * 8px)
+          var(--shadow-3d-color),
+        0 0 calc(var(--sn-3d-cosmic-glow) * 15px)
+          rgba(
+            var(--sn-gradient-primary-rgb, "202,158,230"),
+            var(--sn-3d-cosmic-glow)
+          );
     }
-  }
-
-  // Card metadata with increased depth
-  .main-card-cardMetadata {
-    @include depth-layer(2);
-
-    // Enhanced text with 3D positioning
-    .main-cardHeader-text,
-    .main-type-bass {
-      transform: translateZ(5px);
-      transition: transform 0.3s ease;
-    }
-  }
-}
-
-// Play button with advanced 3D interaction
-.main-card-PlayButtonContainer,
-.main-playButton-PlayButton {
-  @include depth-layer(3);
-  @include morphing-transition(0.3s);
-
-  // Enhanced 3D positioning
-  position: absolute;
-  bottom: 16px;
-  right: 16px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-
-  // Initial 3D state (hidden)
-  transform: translateZ(-20px) scale(0.8);
-  opacity: 0;
-
-  // Show with 3D animation on card hover
-  .main-card-card:hover & {
-    transform: translateZ(40px) scale(1);
-    opacity: 1;
-    transition-delay: 0.1s;
-  }
-
-  // Button hover with 3D scaling
-  &:hover {
-    transform: translateZ(50px) scale(1.15);
-    @include shadow-3d(2);
-  }
-
-  // Active state with 3D feedback
-  &:active {
-    transform: translateZ(35px) scale(0.95);
-  }
-}
-
-// PHASE 3: Advanced 3D Morphing States
-// =============================================================================
-
-// Different card morphing modes
-.sn-3d-expanded {
-  .main-card-card {
-    @include card-morph-state("expanded");
-    @include shadow-3d(3);
-  }
-}
-
-.sn-3d-compact {
-  .main-card-card {
-    @include card-morph-state("compact");
-    @include shadow-3d(1);
-  }
-}
-
-.sn-3d-floating {
-  .main-card-card {
-    @include floating-3d(8s);
-  }
-}
-
-// PHASE 3: Interactive 3D Navigation
-// =============================================================================
-
-// Enhanced navigation with 3D depth
-.Root__nav-bar {
-  @include depth-layer(1);
-
-  // Navigation items with subtle 3D hover
-  .main-navBar-navBarLink {
-    @include morphing-transition(0.3s);
 
     &:hover {
-      transform: translateZ(10px) scale(1.02);
-    }
+      // Enhanced BLOOM hover state
+      transform: translateZ(calc(20px + var(--sn-3d-beat-depth) * 1.2))
+        scale(calc(1.1 + var(--sn-beat-pulse-intensity, 0) * 0.1))
+        rotateY(calc(var(--sn-3d-rhythm-rotation) * 1.5));
 
-    &.main-navBar-navBarLinkActive {
-      transform: translateZ(15px);
-      @include shadow-3d(1);
-    }
-  }
-}
+      // Maximum cosmic consciousness
+      filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 30deg))
+        saturate(calc(1.4 + var(--sn-beat-pulse-intensity, 0) * 0.4))
+        brightness(calc(1.1 + var(--sn-beat-pulse-intensity, 0) * 0.15));
 
-// Enhanced now playing bar with 3D interaction
-.Root__now-playing-bar {
-  @include depth-layer(2);
-
-  // Controls with 3D hover effects
-  .main-playButton-PlayButton,
-  .control-button {
-    @include morphing-transition(0.2s);
-
-    &:hover {
-      transform: translateZ(8px) scale(1.05);
+      // Enhanced BLOOM glow
+      box-shadow: 0 6px calc(20px + var(--sn-beat-pulse-intensity, 0) * 12px)
+          var(--shadow-3d-color),
+        0 0 calc(var(--sn-3d-cosmic-glow) * 25px)
+          rgba(
+            var(--sn-gradient-accent-rgb, "140,170,238"),
+            calc(var(--sn-3d-cosmic-glow) * 1.2)
+          );
     }
 
     &:active {
-      transform: translateZ(4px) scale(0.95);
+      // Enhanced active state with consciousness
+      transform: translateZ(calc(12px + var(--sn-3d-beat-depth) * 0.8))
+        scale(calc(0.95 - var(--sn-beat-pulse-intensity, 0) * 0.02))
+        rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.8));
+
+      // Active state cosmic effect
+      filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 15deg))
+        saturate(calc(1.1 + var(--sn-beat-pulse-intensity, 0) * 0.2));
     }
   }
+} // End of non-search body selector
 
-  // Progress bar with 3D enhancement
-  .x-progressBar-progressBarBg {
-    @include morphing-transition(0.3s);
-
-    &:hover {
-      transform: translateZ(5px) scaleY(1.2);
-    }
-  }
-}
-
-// PHASE 3: 3D Modal and Overlay System
+// =============================================================================
+// SEARCH AREAS - Complete Hands-Off Approach
 // =============================================================================
 
-// Enhanced modals with dramatic 3D entrance
-.GenericModal {
-  @include perspective-container(1000px);
+// Ensure search areas get NO 3D styling
+.main-searchPage-content {
+  // Reset all 3D properties
+  * {
+    perspective: none !important;
+    transform-style: flat !important;
+    transform: none !important;
+  }
 
-  .main-duplicateTrackModal-container,
-  .main-contextMenu-container {
-    @include morphing-transition(0.5s);
-    @include shadow-3d(3);
+  .main-card-card {
+    // Complete reset for search cards
+    perspective: none !important;
+    transform-style: flat !important;
+    transform: none !important;
+    transition: none !important;
 
-    // 3D entrance animation
-    transform: perspective(1000px) rotateX(-10deg) translateZ(100px);
-
-    &.modal-enter {
-      transform: perspective(1000px) rotateX(0deg) translateZ(0px);
+    &:hover,
+    &:focus,
+    &:active {
+      transform: none !important;
     }
   }
 }
 
-// Context menus with 3D positioning
-.main-contextMenu-container {
-  @include depth-layer(5);
-  @include morphing-transition(0.3s);
+// ████████████████████████████████████████████████████████████████████████████████
+// 3D CONSCIOUSNESS MODE CONTROLS (NON-SEARCH ONLY)
+// ████████████████████████████████████████████████████████████████████████████████
 
-  // Enhanced 3D appearance
-  transform-origin: top left;
+// Only apply consciousness mode controls outside search
+body:not(:has(.main-searchPage-content)) {
+  // Minimal consciousness 3D mode
+  .sn-3d-minimal {
+    --max-rotate-x: calc(4deg + var(--sn-rhythm-phase, 0) * 2deg);
+    --max-rotate-y: calc(4deg + var(--sn-rhythm-phase, 0) * 2deg);
+    --depth-hover: calc(6px + var(--sn-beat-pulse-intensity, 0) * 3px);
+    --sn-3d-morph-strength: calc(var(--sn-beat-pulse-intensity, 0) * 0.05);
+    --sn-3d-cosmic-glow: calc(var(--sn-beat-pulse-intensity, 0) * 0.2);
+  }
 
-  .main-contextMenu-menuItemButton {
-    @include morphing-transition(0.2s);
+  // Disabled consciousness 3D mode
+  .sn-3d-disabled {
+    .main-card-card {
+      transform: none !important;
+      perspective: none !important;
+      filter: none !important;
+      animation: none !important;
 
-    &:hover {
-      transform: translateZ(5px) translateX(5px);
-      @include shadow-3d(1);
+      &:hover,
+      &:focus,
+      &:active {
+        transform: none !important;
+        filter: none !important;
+        box-shadow: none !important;
+      }
     }
+  }
+
+  // Intense consciousness 3D mode
+  .sn-3d-intense {
+    --max-rotate-x: calc(12deg + var(--sn-rhythm-phase, 0) * 6deg);
+    --max-rotate-y: calc(12deg + var(--sn-rhythm-phase, 0) * 6deg);
+    --depth-hover: calc(20px + var(--sn-beat-pulse-intensity, 0) * 10px);
+    --sn-3d-morph-strength: calc(var(--sn-beat-pulse-intensity, 0) * 0.3);
+    --sn-3d-cosmic-glow: calc(var(--sn-beat-pulse-intensity, 0) * 0.8);
+    --sn-3d-energy-intensity: calc(
+      1.5 + var(--sn-beat-pulse-intensity, 0) * 0.5
+    );
+  }
+
+  // Floating consciousness 3D mode
+  .sn-3d-floating {
+    .main-card-card {
+      animation: consciousness-float
+          calc(8s - var(--sn-beat-pulse-intensity, 0) * 2s) ease-in-out infinite,
+        consciousness-breathe calc(4s / max(var(--sn-3d-energy-intensity), 0.1))
+          ease-in-out infinite;
+    }
+  }
+} // End of non-search mode controls
+
+// ████████████████████████████████████████████████████████████████████████████████
+// CONSCIOUSNESS ANIMATIONS
+// ████████████████████████████████████████████████████████████████████████████████
+
+@keyframes consciousness-float {
+  0%,
+  100% {
+    transform: translateY(0px) translateZ(0px)
+      rotateX(var(--sn-3d-rotation-consciousness))
+      rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.5))
+      scale(var(--sn-3d-breathing-scale));
+    filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 5deg));
+  }
+  25% {
+    transform: translateY(calc(-2px - var(--sn-3d-beat-depth) * 0.1))
+      translateZ(calc(4px + var(--sn-3d-beat-depth) * 0.2))
+      rotateX(calc(var(--sn-3d-rotation-consciousness) * 1.2))
+      rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.8))
+      scale(calc(var(--sn-3d-breathing-scale) * 1.005));
+    filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 10deg));
+  }
+  50% {
+    transform: translateY(calc(-4px - var(--sn-3d-beat-depth) * 0.2))
+      translateZ(calc(8px + var(--sn-3d-beat-depth) * 0.4))
+      rotateX(calc(var(--sn-3d-rotation-consciousness) * 1.5))
+      rotateY(calc(var(--sn-3d-rhythm-rotation) * 1.2))
+      scale(calc(var(--sn-3d-breathing-scale) * 1.01));
+    filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 15deg))
+      saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.2));
+  }
+  75% {
+    transform: translateY(calc(-2px - var(--sn-3d-beat-depth) * 0.1))
+      translateZ(calc(4px + var(--sn-3d-beat-depth) * 0.2))
+      rotateX(calc(var(--sn-3d-rotation-consciousness) * 1.2))
+      rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.8))
+      scale(calc(var(--sn-3d-breathing-scale) * 1.005));
+    filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 10deg));
   }
 }
 
-// PHASE 3: Performance Optimizations for 3D
-// =============================================================================
+@keyframes consciousness-breathe {
+  0%,
+  100% {
+    transform: scale(var(--sn-3d-breathing-scale));
+    filter: brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.05));
+    box-shadow: 0 0 calc(var(--sn-3d-cosmic-glow) * 10px)
+      rgba(
+        var(--sn-gradient-primary-rgb, "202,158,230"),
+        var(--sn-3d-cosmic-glow)
+      );
+  }
+  50% {
+    transform: scale(calc(var(--sn-3d-breathing-scale) * 1.002));
+    filter: brightness(calc(1.02 + var(--sn-beat-pulse-intensity, 0) * 0.08))
+      hue-rotate(calc(var(--sn-rhythm-phase, 0) * 5deg));
+    box-shadow: 0 0 calc(var(--sn-3d-cosmic-glow) * 15px)
+      rgba(
+        var(--sn-gradient-accent-rgb, "140,170,238"),
+        calc(var(--sn-3d-cosmic-glow) * 1.2)
+      );
+  }
+}
 
-// Reduced motion support for 3D effects
+@keyframes consciousness-morph {
+  0%,
+  100% {
+    transform: perspective(var(--sn-3d-cosmic-perspective))
+      rotateX(var(--sn-3d-rotation-consciousness))
+      rotateY(var(--sn-3d-rhythm-rotation)) translateZ(var(--sn-3d-beat-depth))
+      scale(var(--sn-3d-breathing-scale));
+  }
+  33% {
+    transform: perspective(var(--sn-3d-cosmic-perspective))
+      rotateX(calc(var(--sn-3d-rotation-consciousness) * 1.3))
+      rotateY(calc(var(--sn-3d-rhythm-rotation) * 1.5))
+      translateZ(calc(var(--sn-3d-beat-depth) * 1.2))
+      scale(calc(var(--sn-3d-breathing-scale) * 1.01));
+  }
+  66% {
+    transform: perspective(var(--sn-3d-cosmic-perspective))
+      rotateX(calc(var(--sn-3d-rotation-consciousness) * 0.7))
+      rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.8))
+      translateZ(calc(var(--sn-3d-beat-depth) * 0.8))
+      scale(calc(var(--sn-3d-breathing-scale) * 0.99));
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// ACCESSIBILITY & PERFORMANCE CONSCIOUSNESS
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Enhanced reduced motion support (respects accessibility while maintaining structure)
 @media (prefers-reduced-motion: reduce) {
   * {
-    transform-style: flat !important;
-    perspective: none !important;
     animation: none !important;
-  }
+    transform: none !important;
+    transition-duration: 0.1s !important;
+    filter: none !important;
 
-  .main-card-card {
-    &:hover {
-      transform: translateY(-4px) scale(1.02) !important;
-      transition: transform 0.2s ease !important;
+    &:hover,
+    &:focus,
+    &:active {
+      transform: none !important;
+      filter: none !important;
+      animation: none !important;
     }
   }
-}
 
-// Performance mode for lower-end devices
-.sn-performance-mode {
+  // Override consciousness variables to minimal values
   :root {
-    --perspective-distance: 800px;
-    --max-rotate-x: 8deg;
-    --max-rotate-y: 8deg;
-    --depth-hover: 20px;
-    --morph-duration-medium: 0.4s;
+    --sn-3d-beat-depth: 0px;
+    --sn-3d-rhythm-rotation: 0deg;
+    --sn-3d-breathing-scale: 1;
+    --sn-3d-cosmic-glow: 0;
+    --sn-3d-morph-strength: 0;
+  }
+}
+
+// High contrast mode support (enhanced consciousness visibility)
+@media (prefers-contrast: high) {
+  :root {
+    --sn-3d-cosmic-glow: calc(var(--sn-beat-pulse-intensity, 0) * 0.8);
+    --shadow-3d-color: rgba(
+      var(--sn-oklab-processed-dynamic-shadow-rgb),
+      calc(0.25 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+    );
   }
 
-  .main-card-card {
-    transform-style: flat;
-
-    &:hover {
-      transform: translateY(-4px) scale(1.02);
+  // Enhanced shadows for better visibility
+  body:not(:has(.main-searchPage-content)) {
+    .main-card-card:hover {
+      box-shadow: 0 8px 24px var(--shadow-3d-color),
+        0 4px calc(16px + var(--sn-beat-pulse-intensity, 0) * 8px)
+          var(--shadow-3d-cosmic),
+        0 0 calc(var(--sn-3d-cosmic-glow) * 30px)
+          rgba(
+            var(--sn-gradient-accent-rgb, "140,170,238"),
+            var(--sn-3d-cosmic-glow)
+          ) !important;
     }
   }
 }
 
-// Mobile optimizations for 3D
+// Mobile optimizations (consciousness-aware responsive design)
 @media (max-width: 768px) {
   :root {
-    --perspective-distance: 600px;
-    --max-rotate-x: 5deg;
-    --max-rotate-y: 5deg;
-    --depth-hover: 15px;
+    --perspective-distance: calc(
+      600px + var(--sn-beat-pulse-intensity, 0) * 100px
+    );
+    --depth-hover: calc(8px + var(--sn-beat-pulse-intensity, 0) * 4px);
+    --max-rotate-x: calc(4deg + var(--sn-rhythm-phase, 0) * 2deg);
+    --max-rotate-y: calc(4deg + var(--sn-rhythm-phase, 0) * 2deg);
+
+    // Reduced consciousness effects for mobile performance
+    --sn-3d-beat-depth: calc(var(--sn-beat-pulse-intensity, 0) * 10px);
+    --sn-3d-cosmic-glow: calc(var(--sn-beat-pulse-intensity, 0) * 0.2);
+    --sn-3d-morph-strength: calc(var(--sn-beat-pulse-intensity, 0) * 0.05);
   }
 
-  // Simplified 3D on touch devices
-  .main-card-card {
-    &:hover {
-      transform: translateZ(10px) scale(1.01);
-    }
-  }
-
-  // Disable complex 3D on very small screens
-  @media (max-width: 480px) {
-    * {
-      transform-style: flat !important;
-      perspective: none !important;
+  // Simplified mobile 3D effects
+  body:not(:has(.main-searchPage-content)) {
+    .main-card-card {
+      &:hover {
+        transform: translateZ(
+            calc(var(--depth-hover) + var(--sn-3d-beat-depth) * 0.5)
+          )
+          scale(calc(var(--sn-3d-hover-enhancement) * 0.5));
+      }
     }
   }
 }
+
+// Performance optimization for lower-end devices
+@media (max-resolution: 1dppx) {
+  :root {
+    --sn-3d-cosmic-glow: calc(var(--sn-beat-pulse-intensity, 0) * 0.1);
+    --sn-3d-beat-depth: calc(var(--sn-beat-pulse-intensity, 0) * 8px);
+  }
+
+  // Disable complex 3D effects on low-resolution displays
+  body:not(:has(.main-searchPage-content)) {
+    .main-card-PlayButtonContainer,
+    .main-playButton-PlayButton {
+      filter: none !important;
+
+      &:hover {
+        box-shadow: 0 4px 12px var(--shadow-3d-color) !important;
+      }
+    }
+  }
+}
+
+// Performance optimization for older browsers
+@supports not (transform: perspective(1000px)) {
+  body:not(:has(.main-searchPage-content)) {
+    .main-card-card {
+      transform: none !important;
+
+      &:hover {
+        transform: scale(1.02) !important;
+        box-shadow: 0 8px 24px var(--shadow-3d-color) !important;
+      }
+    }
+  }
+}
+
+// END OF 3D MORPHING CONSCIOUSNESS SYSTEM
+// ████████████████████████████████████████████████████████████████████████████████

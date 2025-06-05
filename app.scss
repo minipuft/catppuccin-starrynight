@@ -15,10 +15,10 @@
 @forward "src/_sn_gradient";
 @forward "src/_sn_stars";
 
-// PHASE 1: Advanced StarryNight modules
+// PHASE 1: Advanced StarryNight modules (Vista-free version)
 @forward "src/_sn_glassmorphism";
 
-// PHASE 2: Enhanced StarryNight modules
+// PHASE 2: Enhanced StarryNight modules (search-compatible version)
 @forward "src/_sn_enhanced_cards";
 
 // PHASE 3: 3D StarryNight modules
@@ -29,16 +29,16 @@
 @forward "src/_sn_context_zones";
 @forward "src/_sn_loading";
 @forward "src/_sn_typography";
-@forward "src/_sn_atmospheric";
+// @forward "src/_sn_atmospheric"; // DISABLED: Conventional effects - not Year 3000 aligned
+
+// Unified cards (search-compatible version)
+@forward "src/_sn_unified_cards";
 
 // YEAR 3000: Advanced Search Interface
 @forward "src/_sn_search_quantum";
 
 // YEAR 3000: Precision Targeting (loads after quantum for enhanced specificity)
 @forward "src/_sn_search_precision";
-
-// YEAR 3000: Nexus System (loads last for highest specificity)
-@forward "src/_sn_year3000_nexus";
 
 :root {
   // Spicetify doesn't fully support light-sets yet, so we have to manually set the colors for the light theme

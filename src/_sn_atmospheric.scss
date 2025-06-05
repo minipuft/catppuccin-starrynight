@@ -51,41 +51,47 @@
   }
 }
 
-// Floating grid container
+// Atmospheric Grid Layout (Year 3000 Compatible)
+// Uses existing grid system and enhances with atmospheric properties
 @mixin atmospheric-grid {
+  // display: grid; // REMOVED: Handled by _sn_enhanced_cards.scss
+  // gap: var(--atmospheric-gap, 24px); // REMOVED: Handled by _sn_enhanced_cards.scss
+  position: relative; // For pseudo-elements if needed for atmosphere
+  transition: all var(--sn-gradient-transition, 0.8s ease-in-out); // Smooth transitions
+
+  // Year 3000 performance optimization
   @include performance-optimized;
-
-  & {
-    display: grid;
-    gap: var(--atmospheric-gap);
-    transition: all var(--atmospheric-transition);
-  }
-
-  // Enhanced grid flow
-  &:hover {
-    gap: calc(var(--atmospheric-gap) * 1.1);
-  }
 }
 
-// Floating grid item with ambient animation
-@mixin atmospheric-item($delay: 0s) {
-  // All CSS declarations first
-  transition: all var(--atmospheric-transition);
-  animation: atmospheric-float var(--ambient-duration) ease-in-out infinite;
-  animation-delay: $delay;
+// Atmospheric Item Styling (Year 3000 Compatible)
+// Applies to individual items within the atmospheric grid
+@mixin atmospheric-item($index: 0) {
+  // ALL CSS declarations must come first, before any @include or nested rules
+  position: relative;
+  opacity: 0; // Start hidden, will be revealed by animation
+  // Base transform for animation entry (no Z-transform here to avoid complexity)
+  transform: translateY(var(--ambient-float-range, 20px));
+  // Animation driven by CSS variables for dynamic control
+  animation: atmospheric-float var(--ambient-float-duration, 6s)
+      \var(--ambient-float-timing, ease-in-out)infinite alternate,
+    \atmospheric-fade-in0.8s\cubic-bezier(0.25, 0.46, 0.45, 0.94)forwards;
+  animation-delay: calc(var(--ambient-float-stagger, 0.1s) * #{$index});
 
-  // Now include mixins that may have nested rules
+  // Include dynamic glassmorphism (Year 3000 compatible)
+  // @include glassmorphism-dynamic; // COMMENTED OUT: Let _sn_enhanced_cards.scss handle card glassmorphism
+
+  // Include performance optimizations (these don't contain nested rules)
   @include performance-optimized;
-  @include glassmorphism-dynamic;
 
+  // Enhanced hover effect (Year 3000 compatible)
   &:hover {
-    transform: translateY(calc(-1 * var(--atmospheric-hover-lift)))
-      scale(var(--grid-item-scale));
-
-    // CSS custom properties for hover state
-    --glass-blur: 25px;
-    --glass-saturation: 1.4;
-    --glass-opacity: 0.15;
+    // ALL CSS declarations must come first, before any @include or nested rules
+    // Dynamic hover effects using CSS variables
+    // Example: brightness, saturation - specific transforms handled by other modules
+    filter: brightness(var(--hover-brightness, 1.05))
+      \saturate(var(--hover-saturation, 1.15));
+    // Keep transition smooth for hover effects
+    transition: filter 0.3s ease, transform 0.3s ease; // Ensure transform is part of transition if changed on hover
   }
 }
 
@@ -428,5 +434,219 @@
       transform: none !important;
       filter: brightness(1.05);
     }
+  }
+}
+
+// =============================================================================
+// YEAR 3000 ATMOSPHERIC ENHANCEMENT - Search Compatible Version
+// Lightweight atmospheric effects that don't interfere with search precision
+// =============================================================================
+
+// Year 3000 Atmospheric Variables (Search Compatible)
+:root {
+  // === Lightweight Atmospheric Foundation ===
+  --atmospheric-transition: 0.3s ease;
+  --atmospheric-gap: 16px;
+  --atmospheric-float-range: 8px;
+  --atmospheric-hover-lift: 4px;
+  --ambient-duration: 8s;
+  --grid-stagger-delay: 0.1s;
+}
+
+// Basic floating animation (NO transform conflicts)
+@keyframes atmospheric-float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(calc(-0.3 * var(--atmospheric-float-range)))
+      rotate(0deg);
+  }
+  50% {
+    transform: translateY(calc(-0.7 * var(--atmospheric-float-range)))
+      rotate(0deg);
+  }
+  75% {
+    transform: translateY(calc(-0.4 * var(--atmospheric-float-range)))
+      rotate(0deg);
+  }
+}
+
+@keyframes stagger-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// =============================================================================
+// SEARCH EXCLUSION GUARD - Atmospheric Effects DISABLED in Search
+// =============================================================================
+
+// Only apply atmospheric effects OUTSIDE of search pages
+body:not(:has(.main-searchPage-content)) {
+  // Atmospheric enhancements for non-search areas only
+  .main-card-card {
+    animation: atmospheric-float var(--ambient-duration) ease-in-out infinite;
+    transition: transform var(--atmospheric-transition);
+
+    &:hover {
+      transform: translateY(calc(-1 * var(--atmospheric-hover-lift)));
+    }
+  }
+
+  .main-gridContainer-gridContainer {
+    .main-card-card {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: stagger-fade-in 0.8s ease-out forwards;
+    }
+  }
+
+  // Enhanced track lists (non-search)
+  .main-trackList-trackListContentWrapper {
+    .main-trackList-trackListRow {
+      transition: all var(--atmospheric-transition);
+      border-radius: 8px;
+      margin: 2px 0;
+      background: rgba(var(--spice-rgb-surface0), 0.3);
+
+      &:hover {
+        // NO BACKDROP FILTERS - use solid backgrounds only
+        background: rgba(var(--spice-rgb-surface1), 0.4);
+        transform: translateX(4px) scale(1.005);
+      }
+
+      &.main-trackList-selected,
+      &:has(.main-trackList-playingIcon) {
+        background: linear-gradient(
+          135deg,
+          rgba(var(--spice-rgb-accent), 0.1) 0%,
+          rgba(var(--spice-rgb-surface1), 0.2) 100%
+        );
+        border: 1px solid rgba(var(--spice-rgb-accent), 0.3);
+      }
+    }
+  }
+
+  // Enhanced sidebar (non-search)
+  .main-yourLibrary-yourLibrary {
+    .main-rootlist-wrapper {
+      .spicetify-playlist-list {
+        li {
+          transition: all var(--atmospheric-transition);
+          border-radius: 6px;
+          margin: 1px 0;
+
+          &:hover {
+            background: rgba(var(--spice-rgb-surface1), 0.3);
+            transform: translateX(2px);
+          }
+
+          &[aria-selected="true"],
+          &.main-rootlist-rootlistItemActive {
+            background: linear-gradient(
+              90deg,
+              rgba(var(--spice-rgb-accent), 0.15) 0%,
+              rgba(var(--spice-rgb-surface1), 0.1) 100%
+            );
+            border-left: 3px solid var(--spice-accent);
+          }
+        }
+      }
+    }
+  }
+
+  // Enhanced navigation bar (non-search)
+  .main-navBar-navBar {
+    .main-navBar-navBarLink {
+      transition: all var(--atmospheric-transition);
+      border-radius: 8px;
+      margin: 2px;
+
+      &:hover {
+        // NO BACKDROP FILTERS
+        background: rgba(var(--spice-rgb-surface1), 0.3);
+        transform: translateY(-1px);
+      }
+
+      &.main-navBar-navBarLinkActive {
+        background: linear-gradient(
+          135deg,
+          rgba(var(--spice-rgb-accent), 0.2) 0%,
+          rgba(var(--spice-rgb-surface1), 0.1) 100%
+        );
+      }
+    }
+  }
+
+  // Enhanced now playing bar (non-search)
+  .Root__now-playing-bar {
+    transition: all var(--atmospheric-transition);
+
+    // Enhanced track info
+    .main-trackInfo-container {
+      .main-trackInfo-name,
+      .main-trackInfo-artists {
+        transition: all var(--atmospheric-transition);
+
+        &:hover {
+          transform: translateY(-1px);
+          filter: brightness(1.1);
+        }
+      }
+    }
+
+    // Enhanced controls
+    .main-playPauseButton-button,
+    .main-skipButton-button,
+    .main-shuffleButton-button {
+      transition: all var(--atmospheric-transition);
+      border-radius: 50%;
+
+      &:hover {
+        // NO BACKDROP FILTERS
+        background: rgba(var(--spice-rgb-surface1), 0.3);
+        transform: scale(1.05) translateY(-1px);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+} // End of non-search body selector
+
+// =============================================================================
+// SEARCH AREAS - Complete Hands-Off Approach
+// =============================================================================
+
+// Ensure search areas get NO atmospheric styling
+.main-searchPage-content {
+  // Reset any inherited atmospheric effects
+  * {
+    animation: none !important;
+  }
+
+  .main-card-card {
+    // Let precision targeting handle everything
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+// =============================================================================
+// ACCESSIBILITY & PERFORMANCE
+// =============================================================================
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transform: none !important;
   }
 }

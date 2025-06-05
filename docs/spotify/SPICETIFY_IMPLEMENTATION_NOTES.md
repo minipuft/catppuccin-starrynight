@@ -117,6 +117,13 @@ const year3000System = {
       );
     }
 
+    // Helper to ensure hex string starts with exactly one '#' (as implemented in theme.js)
+    const formatHex = (hexString) => {
+      if (typeof hexString !== "string") return "#000000"; // Fallback for non-string input
+      const cleanedHex = hexString.replace(/#/g, "");
+      return `#${cleanedHex}`;
+    };
+
     // Convert existing theme colors to RGB
     const currentMain = getComputedStyle(root)
       .getPropertyValue("--spice-main")
@@ -127,10 +134,21 @@ const year3000System = {
     const currentSidebar = getComputedStyle(root)
       .getPropertyValue("--spice-sidebar")
       .trim();
-
-    const mainRgb = hexToRgb("#" + currentMain);
-    const playerRgb = hexToRgb("#" + currentPlayer);
-    const sidebarRgb = hexToRgb("#" + currentSidebar);
+    const currentCard = getComputedStyle(root)
+      .getPropertyValue("--spice-card")
+      .trim();
+    const currentSurface0 = getComputedStyle(root)
+      .getPropertyValue("--surface0")
+      .trim();
+    const currentSurface1 = getComputedStyle(root)
+      .getPropertyValue("--surface1")
+      .trim();
+    const mainRgb = hexToRgb(formatHex(currentMain));
+    const playerRgb = hexToRgb(formatHex(currentPlayer));
+    const sidebarRgb = hexToRgb(formatHex(currentSidebar));
+    const cardRgb = hexToRgb(formatHex(currentCard));
+    const surface0Rgb = hexToRgb(formatHex(currentSurface0));
+    const surface1Rgb = hexToRgb(formatHex(currentSurface1));
 
     if (mainRgb) {
       root.style.setProperty(
@@ -152,6 +170,24 @@ const year3000System = {
       root.style.setProperty(
         "--spice-rgb-sidebar",
         `${sidebarRgb.r},${sidebarRgb.g},${sidebarRgb.b}`
+      );
+    }
+    if (cardRgb) {
+      root.style.setProperty(
+        "--spice-rgb-card",
+        `${cardRgb.r},${cardRgb.g},${cardRgb.b}`
+      );
+    }
+    if (surface0Rgb) {
+      root.style.setProperty(
+        "--spice-rgb-surface0",
+        `${surface0Rgb.r},${surface0Rgb.g},${surface0Rgb.b}`
+      );
+    }
+    if (surface1Rgb) {
+      root.style.setProperty(
+        "--spice-rgb-surface1",
+        `${surface1Rgb.r},${surface1Rgb.g},${surface1Rgb.b}`
       );
     }
 
@@ -231,6 +267,51 @@ year3000System.applyColorsToTheme(colors);
 }
 ```
 
+### 5. SCSS Audit & Dynamic OKLab Variable Integration (Phase 1 Audit)
+
+**Objective**: To replace hardcoded static white/black colors in SCSS modules with dynamically generated, theme-aware colors derived from the OKLab system in `theme.js`. This enhances theme consistency and adaptability to the core Catppuccin palette and album art colors.
+
+**New Dynamic CSS Variables Introduced in `theme.js`**:
+
+These variables are calculated within the `year3000System.applyColorsToTheme` function:
+
+- `--sn-oklab-processed-bright-highlight-rgb`:
+  - **Purpose**: Provides a very light, near-achromatic color that is subtly tinted by the current theme's processed accent color. Ideal for highlights, subtle borders, or light elements that need to adapt to the theme dynamically.
+  - **Derivation**: Calculated by taking the OKLab values of the processed accent color, setting Lightness (L*) to a high value (0.97), and drastically reducing Chroma (a*, b\* components by multiplying by 0.05) to make it near-achromatic yet thematically linked.
+- `--sn-oklab-processed-dynamic-shadow-rgb`:
+  - **Purpose**: Provides a theme-aware shadow color. Instead of a static black (`#000`), this shadow is derived from the theme's main background color, making it darker but harmonious with the overall theme.
+  - **Derivation**: Calculated by taking the main background color (e.g., `--spice-main`), converting it to OKLab, significantly reducing its Lightness (L* by multiplying by 0.3, clamped to a minimum of 0.05), and desaturating it (a*, b\* components multiplied by 0.4) to retain some of the base hue.
+
+**SCSS Audit Summary & Key Integrations**:
+
+- **Methodology**: Each SCSS file in the `src/` directory was systematically reviewed for hardcoded `rgba(255,255,255,...)` or `rgba(0,0,0,...)` instances, or static hex colors used for highlights and shadows.
+- **Key Changes Made**:
+  - `src/_main.scss`: Replaced static white inset highlights and black drop shadows with the new dynamic variables. Updated a button hover border to use the bright highlight.
+  - `src/_mixins.scss`: Updated `glassmorphism`, `glassmorphism-dynamic`, `card-hover-lift`, `card-state-base`, `apply-3d-shadow`, and `text-gradient-subtle` mixins to use the new dynamic variables instead of static white/black, ensuring these reusable utilities are theme-aware.
+  - `src/_sn_glassmorphism.scss`: Replaced hardcoded black shadows in `--enhanced-shadow` and modal styles with `--sn-oklab-processed-dynamic-shadow-rgb`.
+  - `src/_sn_header_actionBar.scss`: Updated album art `box-shadow`s to use `--sn-oklab-processed-dynamic-shadow-rgb`.
+  - `src/_sn_enhanced_cards.scss`: Replaced numerous hardcoded black/white shadows and highlights (e.g., in focus mode, base card, "ethereal glow", "quantum entanglement") with the dynamic OKLab variables.
+  - `src/_sn_search_quantum.scss`: Updated quantum shimmer on section headers to use bright highlight and top result card hover shadow to use dynamic shadow.
+  - `src/_sn_search_precision.scss`: Replaced static white in text gradients with bright highlight variable.
+  - `src/_sn_3d_morphing.scss`: Updated the `--shadow-3d-color` variable to use dynamic shadow.
+  - `src/_sn_unified_cards.scss`: Updated the `--simple-card-shadow` variable to use dynamic shadow.
+  - `src/_sn_stars.scss`: Updated the high-contrast mode star color to use bright highlight.
+  - `src/_sn_typography.scss`: Updated high-contrast mode text shadow to use dynamic shadow.
+- **Files Audited with No Changes Required (Already dynamic or not applicable for these specific variables)**:
+  - `src/_sn_atmospheric.scss`
+  - `src/_sn_gradient.scss`
+  - `src/_sn_year3000_reality_breach.scss`
+  - `src/_sn_reality_breach.scss`
+  - `src/_sn_context_zones.scss`
+  - `src/_sn_loading.scss`
+  - `src/_sn_microinteractions.scss`
+  - `src/_top_bar.scss`
+  - `src/_right_sidebar.scss`
+  - `src/_now_playing.scss`
+  - `src/_navbar.scss`
+
+This systematic replacement ensures that highlights and shadows across the theme are more cohesive and adapt to the base Catppuccin palette and dynamically extracted album colors through the OKLab processing pipeline.
+
 ## 🚀 Key Findings & Solutions
 
 ### Critical Issue: Missing RGB Variables
@@ -257,6 +338,29 @@ root.style.setProperty("--sn-gradient-primary", "#ca9ee6"); // Hex
 root.style.setProperty("--sn-gradient-primary-rgb", "202,158,230"); // RGB
 ```
 
+### New Sub-Finding: Double Hash Prefix from `getComputedStyle`
+
+**Problem**: When reading existing CSS variables using `getComputedStyle(root).getPropertyValue("--some-color").trim()`, the returned hex string sometimes had a double hash prefix (e.g., `##1e1e2e`) instead of the standard single hash or no hash. This caused the `hexToRgb` function (which expects an optional single `#`) to fail its regex match and return `null`.
+
+**Solution**: Implemented a `formatHex` helper function. This function removes all existing `#` characters from the input string and then prepends a single `#`, ensuring a valid format for `hexToRgb`. This was integrated into `applyColorsToTheme` when processing colors read from `getComputedStyle`.
+
+```javascript
+// Helper to ensure hex string starts with exactly one '#'
+const formatHex = (hexString) => {
+  const cleanedHex = hexString.replace(/#/g, ""); // Remove all existing '#'
+  return `#${cleanedHex}`;
+};
+
+// Example usage within applyColorsToTheme:
+const currentMainHex = getComputedStyle(root)
+  .getPropertyValue("--spice-main")
+  .trim();
+const mainRgb = Year3000Utilities.hexToRgb(formatHex(currentMainHex));
+// ... similar for other base theme colors ...
+```
+
+This resolved issues where base theme colors (like `--spice-main`, `--surface0`, etc.) were not being correctly converted to their RGB counterparts for `--spice-rgb-*` variables.
+
 ### Automatic CSS Application
 
 **Finding**: No manual testing or application needed in Spicetify environment.
@@ -271,9 +375,11 @@ root.style.setProperty("--sn-gradient-primary-rgb", "202,158,230"); // RGB
 
 ### Gradients Not Appearing
 
-1. **Check RGB variables are set**: Open dev tools → Elements → `:root` → look for `--sn-gradient-*-rgb` variables
-2. **Verify color extraction**: Run `Year3000Debug.testGradients()` in console
-3. **Check compilation**: Ensure SCSS compiled to CSS with `sass app.scss user.css`
+1. **Check RGB variables are set**: Open dev tools → Elements → `:root` → look for `--sn-gradient-*-rgb` variables. Ensure they have valid RGB string values (e.g., "123,45,67").
+2. **Verify `hexToRgb` inputs**: If `--sn-gradient-*-rgb` variables are missing or `null`, check the console logs for `Year3000Utilities.hexToRgb`. Ensure the hex input it receives is valid (e.g., `#RRGGBB` or `RRGGBB`).
+3. **Inspect `getComputedStyle` outputs**: If `hexToRgb` is failing for base theme colors (like `--spice-main`, `--surface0`), log the raw output from `getComputedStyle(...).getPropertyValue(...).trim()`. It might be returning a malformed hex string (e.g., `##RRGGBB`). The `formatHex` utility in `applyColorsToTheme` should handle this, but verifying its input can be useful.
+4. **Verify color extraction**: Run `Year3000Debug.testGradients()` or `Year3000Debug.extractColors()` in console to see if `Spicetify.colorExtractor` is returning valid hex colors for the album art.
+5. **Check SCSS compilation**: Ensure SCSS compiled to CSS with `sass app.scss user.css` and that `user.css` contains the gradient rules referencing the RGB variables.
 
 ### Missing Year 3000 System
 

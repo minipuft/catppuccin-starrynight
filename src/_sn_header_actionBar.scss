@@ -1,619 +1,374 @@
-// =============================================================================
-// YEAR 3000 NEXUS SYSTEM - Complete Entity Header & Action Bar Redesign
-// Inspired by the Nexus Orb concept and Focal Bloom interactions
-// =============================================================================
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌟 YEAR 3000 HEADER SOUL CONSCIOUSNESS
+// Technology that breathes with the music's emotional essence
+// ═══════════════════════════════════════════════════════════════════════════════
 
-// Year 3000 Custom Properties
+@use "mixins" as *;
+
+// Year 3000 Header Soul Variables (Conscious Beauty)
 :root {
-  // === Nexus Core Variables ===
-  --nexus-glow-intensity: 0.6;
-  --nexus-pulse-speed: 4s;
-  --nexus-breathe-speed: 6s;
-  --nexus-energy-flow: 8s;
-  --nexus-bloom-radius: 120px;
-  --nexus-hover-scale: 1.02;
+  // === CONSCIOUS SOUL CONTROL ===
+  --header-soul-intensity: calc(
+    var(--conscious-elegance-intensity, 0.6) * 1.1
+  ); // Connected to main consciousness
+  --header-soul-breath-rate: calc(
+    var(--conscious-breath-rate, 8s) * 1.2
+  ); // Gentle breathing
+  --header-musical-response: 0.6; // How much the header responds to musical energy
 
-  // === Energy Conduit Variables ===
-  --conduit-wave-speed: 3s;
-  --conduit-particle-count: 12;
-  --conduit-energy-opacity: 0.8;
-  --conduit-flow-direction: 1;
+  // === ETHEREAL HEADER DYNAMICS ===
+  --header-transition: calc(var(--choreography-harmony-sync, 0.8s) * 0.7)
+    cubic-bezier(0.25, 0.46, 0.45, 0.94); // Smooth, alive motion
+  --header-cosmic-depth: calc(
+    var(--cosmic-depth-layers, 80px) * 0.4
+  ); // Subtle 3D presence
+  --header-cosmic-blur: calc(
+    var(--cosmic-blur-poetry, 12px) * 0.8
+  ); // Dreamlike softness
 
-  // === Organic Animation Curves ===
-  --nexus-ease-organic: cubic-bezier(0.23, 1, 0.32, 1);
-  --nexus-ease-bloom: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --nexus-ease-pulse: cubic-bezier(0.445, 0.05, 0.55, 0.95);
-
-  // === Depth & Perspective ===
-  --nexus-perspective: 1000px;
-  --nexus-depth-near: translateZ(20px);
-  --nexus-depth-mid: translateZ(10px);
-  --nexus-depth-far: translateZ(0px);
+  // === MUSICAL COLOR SOUL (Connected to Conscious Elegance) ===
+  --header-soul-primary: rgba(
+    var(--sn-gradient-primary-rgb, 202, 158, 230),
+    calc(var(--ethereal-glow-base, 0.2) * 0.9)
+  );
+  --header-soul-secondary: rgba(
+    var(--sn-gradient-secondary-rgb, 186, 187, 241),
+    calc(var(--ethereal-glow-base, 0.2) * 0.8)
+  );
+  --header-soul-accent: rgba(
+    var(--sn-gradient-accent-rgb, 140, 170, 238),
+    calc(var(--ethereal-glow-base, 0.2) * 1)
+  );
+  --header-soul-whisper: rgba(
+    var(--sn-gradient-primary-rgb, 202, 158, 230),
+    calc(var(--ethereal-glow-base, 0.2) * 0.4)
+  );
 }
 
-// =============================================================================
-// NEXUS CORE: Entity Header Complete Redesign
-// =============================================================================
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🚫 SEARCH EXCLUSION GUARD - Header Soul DISABLED in Search
+// ═══════════════════════════════════════════════════════════════════════════════
 
-.main-entityHeader-container {
-  position: relative;
-  overflow: visible !important;
-  perspective: var(--nexus-perspective);
-  transform-style: preserve-3d;
+// Only apply soul consciousness OUTSIDE of search pages
+body:not(:has(.main-searchPage-content)) {
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🎯 NEXUS ACTION BAR SOUL CONSCIOUSNESS
+  // Header that breathes and pulses with musical energy
+  // ═══════════════════════════════════════════════════════════════════════════════
 
-  // Reset any existing styling
-  background: none !important;
-
-  // === Holographic Foundation Layer ===
-  &::before {
-    content: "";
-    position: absolute;
-    top: -20px;
-    left: -20px;
-    right: -20px;
-    bottom: -40px;
-    z-index: -3;
-
-    // Holographic base with organic shape
-    background: radial-gradient(
-        ellipse 80% 60% at 30% 20%,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.15) 0%,
-        transparent 50%
-      ),
-      radial-gradient(
-        ellipse 70% 80% at 70% 80%,
-        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.12)
-          0%,
-        transparent 60%
-      ),
-      linear-gradient(
-        135deg,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.08) 0%,
-        rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.05) 50%,
-        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.03)
-          100%
-      );
-
-    // Organic border radius with subtle morphing
-    border-radius: 24px 32px 28px 20px;
-    backdrop-filter: blur(30px) saturate(1.4);
-    border: 1px solid
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2);
-
-    // Breathing animation
-    animation: nexus-breathe var(--nexus-breathe-speed) ease-in-out infinite
-      alternate;
-    transition: all 800ms var(--nexus-ease-organic);
-  }
-
-  // === Energy Aura Layer ===
-  &::after {
-    content: "";
-    position: absolute;
-    top: -40px;
-    left: -40px;
-    right: -40px;
-    bottom: -60px;
-    z-index: -4;
-
-    // Pulsing energy aura
-    background: radial-gradient(
-      ellipse 120% 100% at center,
-      rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-          var(--nexus-glow-intensity)
-        )
-        0%,
-      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.2) 30%,
-      transparent 70%
-    );
-
-    border-radius: 50%;
-    filter: blur(20px);
-    opacity: 0.6;
-
-    // Pulsing energy animation
-    animation: nexus-energy-pulse var(--nexus-pulse-speed) ease-in-out infinite;
-  }
-
-  // === Interactive Bloom Effect ===
-  &:hover {
-    transform: var(--nexus-depth-near) scale(var(--nexus-hover-scale));
-
-    &::before {
-      --nexus-glow-intensity: 0.9;
-      border-color: rgba(
-        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-        0.4
-      );
-      backdrop-filter: blur(40px) saturate(1.8);
-    }
-
-    &::after {
-      opacity: 1;
-      animation-duration: calc(var(--nexus-pulse-speed) * 0.7);
-    }
-  }
-
-  // === Content Container Styling ===
-  > .main-entityHeader-backgroundColor {
-    display: none !important; // Hide original background
-  }
-
-  > .main-entityHeader-overlay {
-    display: none !important; // Hide original overlay
-  }
-
-  // === Content Wrapper ===
-  > .contentSpacing,
-  > [class*="contentSpacing"] {
+  .main-actionBarBackground-background {
     position: relative;
-    z-index: 2;
-    transform: var(--nexus-depth-mid);
-    padding: 32px 24px 24px;
+    transition: all var(--header-transition);
 
-    // Add subtle internal glow
+    // === LIVING CONSCIOUSNESS PRESENCE ===
     &::before {
       content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(
-        180deg,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.05) 0%,
-        transparent 40%,
-        transparent 60%,
-        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.03)
-          100%
-      );
-      border-radius: 16px;
+      top: -16px;
+      left: -16px;
+      right: -16px;
+      bottom: -16px;
       z-index: -1;
+
+      // Cosmic consciousness inspired by moodboard
+      background:
+        // Primary soul energy
+        radial-gradient(
+          ellipse 400% 120% at 25% 50%,
+          var(--header-soul-primary) 0%,
+          transparent 45%
+        ),
+        // Secondary harmonic flow
+        radial-gradient(
+            ellipse 300% 100% at 75% 50%,
+            var(--header-soul-secondary) 0%,
+            transparent 40%
+          ),
+        // Accent energy shimmer
+        linear-gradient(
+            90deg,
+            var(--header-soul-accent) 0%,
+            transparent 25%,
+            var(--header-soul-whisper) 60%,
+            transparent 100%
+          );
+
+      border-radius: 20px 28px 24px 32px; // Organic, flowing shape
+      filter: blur(var(--header-cosmic-blur))
+        saturate(calc(var(--cosmic-saturation, 1.4) * 0.9))
+        brightness(calc(1 + 0.08 * var(--header-soul-intensity)));
+
+      // Conscious breathing - always alive but subtle
+      animation: header-soul-breathing var(--header-soul-breath-rate)
+        ease-in-out infinite;
+
+      opacity: calc(var(--header-soul-intensity) * 0.6);
+      transform: scale(1.02);
     }
-  }
-}
 
-// =============================================================================
-// NEXUS IMAGE: Album Art Enhancement
-// =============================================================================
-
-.main-entityHeader-imageContainer {
-  position: relative;
-  transform: var(--nexus-depth-near);
-
-  // === Energy Source Ring ===
-  &::before {
-    content: "";
-    position: absolute;
-    top: -8px;
-    left: -8px;
-    right: -8px;
-    bottom: -8px;
-    z-index: -1;
-
-    background: conic-gradient(
-      from 0deg,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6) 0deg,
-      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.4) 120deg,
-      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.6)
-        240deg,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6) 360deg
-    );
-
-    border-radius: 50%;
-    animation: nexus-energy-rotate var(--nexus-energy-flow) linear infinite;
-    filter: blur(2px);
-  }
-
-  // === Album Image Styling ===
-  .main-entityHeader-image,
-  .main-image-image {
-    border-radius: 16px !important;
-    transition: all 600ms var(--nexus-ease-organic);
-    box-shadow: 0 8px 32px
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3),
-      0 4px 16px rgba(0, 0, 0, 0.2);
-
+    // === ENHANCED INTERACTION CONSCIOUSNESS ===
     &:hover {
-      transform: scale(1.05) rotateY(5deg);
-      box-shadow: 0 12px 48px
-          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4),
-        0 6px 24px rgba(0, 0, 0, 0.3);
+      &::before {
+        opacity: calc(var(--header-soul-intensity) * 0.9);
+        transform: scale(1.04);
+        filter: blur(calc(var(--header-cosmic-blur) * 1.1))
+          saturate(calc(var(--cosmic-saturation, 1.4) * 1.1))
+          brightness(calc(1 + 0.15 * var(--header-soul-intensity)));
+      }
     }
-  }
-}
 
-// =============================================================================
-// NEXUS TYPOGRAPHY: Future Text Effects
-// =============================================================================
+    // === CONTENT PRESERVATION ===
+    .main-actionBar-ActionBar {
+      position: relative;
+      z-index: 2;
+      transition: all var(--header-transition);
 
-.main-entityHeader-headerText {
-  position: relative;
-  transform: var(--nexus-depth-mid);
-
-  // === Title Enhancement ===
-  .main-entityHeader-title {
-    position: relative;
-    background: linear-gradient(
-      135deg,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 1) 0%,
-      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.9) 50%,
-      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.8)
-        100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-
-    // Add subtle text glow
-    filter: drop-shadow(
-      0 0 8px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3)
-    );
-
-    h1 {
-      font-weight: 800 !important;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      animation: nexus-text-shimmer 8s ease-in-out infinite;
-    }
-  }
-
-  // === Metadata Enhancement ===
-  .main-entityHeader-pretitle {
-    color: rgba(
-      var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)),
-      0.8
-    ) !important;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-
-    &::before {
-      content: "◊ ";
-      color: rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6);
-    }
-  }
-
-  // === Creator & Stats Styling ===
-  [class*="metaDataText"],
-  [class*="creatorWrapper"] {
-    a,
-    span {
-      color: rgba(
-        var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)),
-        0.9
-      ) !important;
-      transition: all 300ms var(--nexus-ease-organic);
-
+      // Gentle enhancement that supports content
       &:hover {
-        color: rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-          1
-        ) !important;
-        text-shadow: 0 0 8px
-          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4);
+        filter: brightness(calc(1 + 0.05 * var(--header-soul-intensity)))
+          saturate(calc(1 + 0.1 * var(--header-soul-intensity)));
       }
     }
   }
 
-  // === Avatar Enhancement ===
-  .main-avatar-avatar {
-    position: relative;
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🎭 NEXUS ENTITY HEADER WITH COSMIC SOUL
+  // Album/playlist headers that honor content while adding consciousness
+  // ═══════════════════════════════════════════════════════════════════════════════
 
+  .main-entityHeader-container {
+    position: relative;
+    transition: all var(--header-transition);
+
+    // === COSMIC SOUL BACKGROUND ===
     &::before {
       content: "";
       position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(
-        45deg,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6),
-        rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.4)
-      );
-      border-radius: 50%;
+      top: -12px;
+      left: -12px;
+      right: -12px;
+      bottom: -12px;
       z-index: -1;
-      animation: nexus-avatar-pulse 3s ease-in-out infinite;
-    }
 
-    img {
-      border-radius: 50%;
-      transition: all 400ms var(--nexus-ease-organic);
-
-      &:hover {
-        transform: scale(1.1);
-      }
-    }
-  }
-}
-
-// =============================================================================
-// ENERGY CONDUIT: Action Bar Complete Redesign
-// =============================================================================
-
-.main-actionBarBackground-background {
-  position: relative;
-  overflow: hidden;
-
-  // Reset existing styling
-  background: none !important;
-  border: none !important;
-
-  // === Flowing Energy Base ===
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    right: -100%;
-    bottom: 0;
-    z-index: -2;
-
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.1) 20%,
-      rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-          var(--conduit-energy-opacity)
-        )
-        50%,
-      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.6) 70%,
-      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.4) 85%,
-      transparent 100%
-    );
-
-    animation: nexus-energy-flow var(--conduit-wave-speed) linear infinite;
-    backdrop-filter: blur(20px) saturate(1.3);
-  }
-
-  // === Energy Particles ===
-  &::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: -1;
-
-    background: radial-gradient(
-        circle at 10% 50%,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3) 1px,
-        transparent 2px
-      ),
-      radial-gradient(
-        circle at 30% 20%,
-        rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.2) 1px,
-        transparent 2px
-      ),
-      radial-gradient(
-        circle at 70% 80%,
-        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.25)
-          1px,
-        transparent 2px
-      ),
-      radial-gradient(
-        circle at 90% 40%,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2) 1px,
-        transparent 2px
-      );
-
-    background-size: 150px 40px, 120px 40px, 180px 40px, 140px 40px;
-
-    animation: nexus-particles-drift calc(var(--conduit-wave-speed) * 2) linear
-      infinite;
-    opacity: 0.7;
-  }
-
-  // === Conduit Glow Top Edge ===
-  border-top: 1px solid
-    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4);
-  box-shadow: 0 -2px 16px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2),
-    inset 0 1px 0
-      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.1);
-
-  // === Interactive Enhancement ===
-  &:hover {
-    --conduit-energy-opacity: 1;
-    --conduit-wave-speed: 2s;
-
-    box-shadow: 0 -4px 24px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3),
-      inset 0 1px 0
-        rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.2);
-  }
-}
-
-// =============================================================================
-// NEXUS ANIMATIONS: Organic Motion System
-// =============================================================================
-
-@keyframes nexus-breathe {
-  0% {
-    transform: scale(1) rotateZ(0deg);
-    border-radius: 24px 32px 28px 20px;
-  }
-  100% {
-    transform: scale(1.01) rotateZ(0.5deg);
-    border-radius: 28px 24px 32px 24px;
-  }
-}
-
-@keyframes nexus-energy-pulse {
-  0%,
-  100% {
-    opacity: 0.4;
-    transform: scale(0.95);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-}
-
-@keyframes nexus-energy-rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes nexus-text-shimmer {
-  0%,
-  100% {
-    filter: drop-shadow(
-      0 0 8px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3)
-    );
-  }
-  50% {
-    filter: drop-shadow(
-      0 0 12px
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.5)
-    );
-  }
-}
-
-@keyframes nexus-avatar-pulse {
-  0%,
-  100% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-@keyframes nexus-energy-flow {
-  0% {
-    transform: translateX(-50%);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(50%);
-    opacity: 0;
-  }
-}
-
-@keyframes nexus-particles-drift {
-  0% {
-    background-position: 0 0, 0 0, 0 0, 0 0;
-  }
-  100% {
-    background-position: 150px 0, -120px 0, 180px 0, -140px 0;
-  }
-}
-
-// =============================================================================
-// FOCAL BLOOM: Interactive Element Enhancements
-// =============================================================================
-
-// Apply Focal Bloom to interactive elements within the Nexus
-.main-entityHeader-container {
-  // Buttons get bloom treatment
-  button,
-  [role="button"],
-  a:not([data-testid*="creator-link"]) {
-    position: relative;
-    transition: all 400ms var(--nexus-ease-bloom);
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
+      // Ethereal consciousness that supports the content
       background: radial-gradient(
-        circle,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3) 0%,
-        transparent 70%
-      );
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      transition: all 600ms var(--nexus-ease-bloom);
-      z-index: -1;
+          ellipse 250% 120% at 40% 60%,
+          var(--header-soul-primary) 0%,
+          transparent 50%
+        ),
+        linear-gradient(
+          120deg,
+          var(--header-soul-secondary) 0%,
+          transparent 35%,
+          var(--header-soul-accent) 80%,
+          transparent 100%
+        );
+
+      border-radius: 16px 20px 18px 22px;
+      filter: blur(var(--header-cosmic-blur))
+        saturate(calc(var(--cosmic-saturation, 1.4) * 0.8));
+
+      // Gentle breathing presence
+      animation: header-soul-breathing
+        calc(var(--header-soul-breath-rate) * 1.3) ease-in-out infinite;
+
       opacity: 0;
+      transform: scale(1.01);
+      transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     &:hover::before {
-      width: var(--nexus-bloom-radius);
-      height: var(--nexus-bloom-radius);
-      opacity: 1;
+      opacity: calc(var(--header-soul-intensity) * 0.7);
     }
 
-    &:active {
-      transform: scale(0.98);
+    // === ENHANCED TITLE WITH SOUL ===
+    .main-entityHeader-title {
+      position: relative;
+      transition: all var(--header-transition);
+
+      &:hover {
+        filter: drop-shadow(0 0 8px var(--header-soul-primary))
+          drop-shadow(0 0 16px var(--header-soul-accent));
+        transform: perspective(var(--header-cosmic-depth)) translateZ(4px);
+      }
+
+      h1 {
+        font-weight: 700 !important;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+
+        // Subtle text enhancement
+        text-shadow: 0 0 20px
+          rgba(
+            var(--sn-gradient-primary-rgb, 202, 158, 230),
+            calc(var(--header-soul-intensity) * 0.2)
+          );
+      }
     }
   }
-}
 
-// Special treatment for creator links
-[data-testid*="creator-link"] {
-  position: relative;
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🖼️ ALBUM ART COSMIC PRESENCE MODE
+  // Respect album art while adding subtle cosmic consciousness
+  // ═══════════════════════════════════════════════════════════════════════════════
 
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6) 50%,
-      transparent 100%
-    );
-    transform: scaleX(0);
-    transition: transform 400ms var(--nexus-ease-organic);
-  }
+  .main-entityHeader-imageContainer {
+    position: relative;
+    transition: all var(--header-transition);
 
-  &:hover::after {
-    transform: scaleX(1);
-  }
-}
-
-// =============================================================================
-// RESPONSIVE ADAPTATIONS
-// =============================================================================
-
-@media (max-width: 768px) {
-  .main-entityHeader-container {
+    // === COSMIC ENERGY RING (Subtle) ===
     &::before {
-      top: -10px;
-      left: -10px;
-      right: -10px;
-      bottom: -20px;
+      content: "";
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
+      z-index: -1;
+
+      // Ethereal ring that enhances without competing
+      background: conic-gradient(
+        from 0deg,
+        var(--header-soul-accent) 0%,
+        transparent 25%,
+        var(--header-soul-primary) 50%,
+        transparent 75%,
+        var(--header-soul-secondary) 100%
+      );
+
+      border-radius: 50%;
+      filter: blur(3px) saturate(calc(var(--cosmic-saturation, 1.4) * 0.7));
+
+      // Slow, cosmic rotation
+      animation: cosmic-ring-rotation calc(var(--ethereal-flow-speed, 12s) * 2)
+        linear infinite;
+
+      opacity: 0;
+      transform: scale(1.02);
+      transition: all 0.5s ease;
     }
 
-    &::after {
-      top: -20px;
-      left: -20px;
-      right: -20px;
-      bottom: -30px;
+    &:hover::before {
+      opacity: calc(var(--header-soul-intensity) * 0.5);
+    }
+
+    // === ALBUM IMAGE PRESERVATION WITH SOUL ===
+    .main-entityHeader-image,
+    .main-image-image {
+      border-radius: 12px !important;
+      transition: all var(--header-transition);
+
+      // Preserve image quality while adding soul
+      box-shadow: 0 6px 24px
+          rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.3),
+        0 0 40px
+          rgba(
+            var(--sn-gradient-primary-rgb, 202, 158, 230),
+            calc(var(--header-soul-intensity) * 0.1)
+          );
+
+      &:hover {
+        transform: scale(1.03) perspective(var(--header-cosmic-depth))
+          rotateY(2deg) rotateX(1deg);
+        box-shadow: 0 12px 40px
+            rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.4),
+          0 0 60px
+            rgba(
+              var(--sn-gradient-primary-rgb, 202, 158, 230),
+              calc(var(--header-soul-intensity) * 0.2)
+            ),
+          0 0 100px
+            rgba(
+              var(--sn-gradient-accent-rgb, 140, 170, 238),
+              calc(var(--header-soul-intensity) * 0.1)
+            );
+        -webkit-transform: scale(1.03) perspective(var(--header-cosmic-depth));
+        -moz-transform: scale(1.03) perspective(var(--header-cosmic-depth));
+        -ms-transform: scale(1.03) perspective(var(--header-cosmic-depth));
+        -o-transform: scale(1.03) perspective(var(--header-cosmic-depth));
+      }
     }
   }
+} // End of non-search body selector
 
-  .main-actionBarBackground-background {
-    --conduit-wave-speed: 4s;
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🚫 SEARCH AREAS - Complete Respect Mode
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.main-searchPage-content {
+  .main-actionBarBackground-background,
+  .main-entityHeader-container {
+    // Preserve search functionality
+    &::before,
+    &::after {
+      opacity: 0.05 !important; // Minimal presence in search
+    }
+
+    animation-duration: 30s !important; // Much slower if any
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎬 SOUL CONSCIOUSNESS ANIMATIONS
+// Movements that feel alive and emotionally connected
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@keyframes header-soul-breathing {
+  0%,
+  100% {
+    transform: scale(1.02) translate(0, 0);
+    opacity: 0.6;
+    filter: brightness(1) hue-rotate(0deg);
+  }
+  33% {
+    transform: scale(1.04) translate(1px, -0.5px);
+    opacity: 0.8;
+    filter: brightness(1.05) hue-rotate(15deg);
+  }
+  66% {
+    transform: scale(1.03) translate(-0.5px, 1px);
+    opacity: 0.7;
+    filter: brightness(1.02) hue-rotate(-10deg);
+  }
+}
+
+@keyframes cosmic-ring-rotation {
+  0% {
+    transform: rotate(0deg) scale(1.02);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.04);
+  }
+  100% {
+    transform: rotate(360deg) scale(1.02);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ♿ ACCESSIBILITY & PERFORMANCE WITH SOUL
+// ═══════════════════════════════════════════════════════════════════════════════
 
 @media (prefers-reduced-motion: reduce) {
+  :root {
+    --header-soul-intensity: 0.3; // Keep gentle soul
+    --header-soul-breath-rate: 30s; // Much slower breathing
+  }
+
   * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    animation-duration: 30s !important; // Slow, calm motion
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --header-soul-intensity: 0.4; // Reduce for mobile
+    --header-cosmic-blur: 6px;
+    --header-cosmic-depth: 30px;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --header-soul-intensity: 0.8; // More visible for accessibility
   }
 }

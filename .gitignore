@@ -44,4 +44,6 @@ build/
 *.map
 
 # AI Files
-IMPLEMENTAION_NOTES.md
+docs/IMPLEMENTAION_NOTES.md
+/.cursor
+year3000.txt

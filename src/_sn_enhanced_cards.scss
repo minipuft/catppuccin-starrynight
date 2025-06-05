@@ -42,14 +42,32 @@
   --card-energy-accent: var(--sn-gradient-accent, rgba(140, 170, 238, 0.7));
   --card-energy-ambient: var(--spice-surface0, rgba(65, 69, 89, 0.4));
 
-  // === Intelligent Motion Calculation ===
+  // === YEAR 3000 BEATSYNC CONSCIOUSNESS INTEGRATION ===
+  // Cards pulse and breathe with the rhythm of the cosmos
+  --card-beat-pulse-multiplier: 1; // Amplifier for beat responses
+  --card-rhythm-breathing: var(
+    --sn-breathing-scale,
+    1
+  ); // Sync with breathing scale
+  --card-beat-intensity: var(
+    --sn-beat-pulse-intensity,
+    0
+  ); // Direct beat connection
+  --card-rhythm-phase: var(--sn-rhythm-phase, 0); // Harmonic oscillation
+
+  // === Intelligent Motion Calculation - ENHANCED WITH RHYTHM ===
   --calculated-lift: calc(
     var(--card-holographic-depth) * var(--motion-intelligence-level) *
-      var(--card-harmonic-resonance)
+      var(--card-harmonic-resonance) *
+      (
+        1 +
+          (var(--card-beat-intensity) * var(--card-beat-pulse-multiplier) * 0.3)
+      )
   );
   --calculated-scale: calc(
     1 +
-      (0.05 * var(--motion-intelligence-level) * var(--card-harmonic-resonance))
+      (0.05 * var(--motion-intelligence-level) * var(--card-harmonic-resonance)) +
+      (var(--card-beat-intensity) * var(--card-beat-pulse-multiplier) * 0.02)
   );
   --calculated-transition: calc(
     var(--card-energy-dissipation) / var(--motion-intelligence-level)
@@ -96,7 +114,8 @@
       backdrop-filter: blur(20px) saturate(1.3);
       box-shadow: 0 8px 32px
           rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.12),
-        0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        0 4px 16px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.15),
+        inset 0 1px 0 rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1);
     }
   }
 }
@@ -136,13 +155,32 @@
   perspective: var(--card-perspective-field);
   transform-style: preserve-3d;
 
-  // === Holographic Foundation ===
+  // === YEAR 3000 RHYTHMIC FOUNDATION ===
+  // Kinetic Verb: OSCILLATE - Cards breathe with the music
+  transform: scale(var(--card-rhythm-breathing))
+    rotateY(calc(var(--card-rhythm-phase) * 0.5deg))
+    rotateX(calc(var(--card-rhythm-phase) * 0.3deg));
+
+  // === Holographic Foundation - ENHANCED WITH RHYTHM ===
   border-radius: var(--card-organic-corners);
   background: linear-gradient(
-    135deg,
-    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.05) 0%,
-    rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.08) 50%,
-    rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.03) 100%
+    calc(135deg + (var(--card-rhythm-phase) * 2deg)),
+    // Kinetic Verb: HARMONIZE
+    rgba(
+        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+        calc(0.05 + (var(--card-beat-intensity) * 0.03))
+      )
+      0%,
+    rgba(
+        var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
+        calc(0.08 + (var(--card-beat-intensity) * 0.04))
+      )
+      50%,
+    rgba(
+        var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)),
+        calc(0.03 + (var(--card-beat-intensity) * 0.02))
+      )
+      100%
   );
 
   // Advanced glassmorphism with dynamic blur
@@ -150,10 +188,22 @@
   border: 1px solid
     rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.15);
 
-  // Enhanced shadow system with organic depth
-  box-shadow: 0 4px 24px
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.08),
-    0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  // Enhanced shadow system with organic depth - YEAR 3000 BEAT SYNC
+  box-shadow: 0 4px calc(24px + (8px * var(--card-beat-intensity)))
+      rgba(
+        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+        calc(0.08 + (var(--card-beat-intensity) * 0.06))
+      ),
+    0 8px calc(32px + (12px * var(--card-beat-intensity)))
+      rgba(
+        var(--sn-oklab-processed-dynamic-shadow-rgb),
+        calc(0.12 + (var(--card-beat-intensity) * 0.08))
+      ),
+    inset 0 1px 0
+      rgba(
+        var(--sn-oklab-processed-bright-highlight-rgb),
+        calc(0.1 + (var(--card-beat-intensity) * 0.05))
+      );
 
   // === Energy Field Base State ===
   transition: transform var(--calculated-transition)
@@ -190,10 +240,12 @@
     transition: all var(--calculated-transition) var(--card-morphing-fluidity);
   }
 
-  // === Holographic Interaction State ===
+  // === Holographic Interaction State - YEAR 3000 ENHANCED ===
   &:hover {
-    // Contextual lift calculation - adapts to intelligence level
-    transform: var(--card-depth-near) scale(var(--calculated-scale));
+    // Kinetic Verb: BLOOM - Contextual lift calculation with rhythm
+    transform: var(--card-depth-near) scale(var(--calculated-scale))
+      rotateY(calc(var(--card-rhythm-phase) * 1deg))
+      rotateX(calc(var(--card-rhythm-phase) * 0.5deg));
 
     // Enhanced holographic background
     background: linear-gradient(
@@ -215,10 +267,10 @@
     box-shadow: 0 var(--calculated-lift) calc(var(--calculated-lift) * 2)
         rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.15),
       0 calc(var(--calculated-lift) * 2) calc(var(--calculated-lift) * 4)
-        rgba(0, 0, 0, 0.2),
+        rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2),
       0 0 calc(var(--card-energy-field-radius) * 2)
         rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      inset 0 1px 0 rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2);
 
     // Activate energy field
     &::before {
@@ -321,15 +373,16 @@
     padding: 16px;
     background: linear-gradient(
       transparent 0%,
-      rgba(0, 0, 0, 0.7) 40%,
-      rgba(0, 0, 0, 0.85) 100%
+      rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.7) 40%,
+      rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.85) 100%
     );
     backdrop-filter: blur(8px);
 
     // Enhanced text legibility with dynamic colors
     .main-cardHeader-text,
     .main-type-bass {
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8),
+      text-shadow: 0 1px 3px
+          rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.8),
         0 0 8px
           rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2);
       color: rgba(255, 255, 255, 0.95);
@@ -337,7 +390,8 @@
 
       &:hover {
         color: rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 1);
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8),
+        text-shadow: 0 1px 3px
+            rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.8),
           0 0 12px
             rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4);
       }
@@ -413,7 +467,8 @@
 
   box-shadow: 0 4px 16px
       rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3),
-    0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    0 8px 32px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2),
+    inset 0 1px 0 rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2);
 
   backdrop-filter: blur(12px);
   border: 1px solid
@@ -466,7 +521,7 @@
 
     box-shadow: 0 6px 24px
         rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4),
-      0 12px 48px rgba(0, 0, 0, 0.3),
+      0 12px 48px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.3),
       0 0 16px
         rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2);
 
@@ -557,11 +612,12 @@
 @media (prefers-contrast: high) {
   .main-card-card {
     border-width: 2px;
-    box-shadow: 0 4px 24px rgba(255, 255, 255, 0.1),
-      0 8px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 24px
+        rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1),
+      0 8px 32px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.4);
 
     &:hover {
-      border-color: rgba(255, 255, 255, 0.8);
+      border-color: rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.8);
     }
   }
 }
@@ -578,5 +634,176 @@
     &::after {
       display: none;
     }
+  }
+}
+
+// =============================================================================
+// YEAR 3000 CARD ENHANCEMENT - Search Compatible Version
+// Lightweight card enhancements that don't interfere with search precision targeting
+// =============================================================================
+
+// Year 3000 Card Enhancement Variables (Search Compatible)
+:root {
+  // === Lightweight Enhancement Foundation ===
+  --card-border-radius: 12px;
+  --card-color-intensity: 0.08;
+  --card-shadow-intensity: 0.12;
+  --card-transition-speed: 0.3s;
+
+  // === Search-Compatible Color System ===
+  --card-color-primary: var(--sn-gradient-primary, rgba(202, 158, 230, 0.08));
+  --card-color-secondary: var(
+    --sn-gradient-secondary,
+    rgba(186, 187, 241, 0.06)
+  );
+  --card-color-accent: var(--sn-gradient-accent, rgba(140, 170, 238, 0.07));
+  --card-shadow-base: rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.12);
+}
+
+// =============================================================================
+// SEARCH COMPATIBILITY GUARD - Disable in Search Pages
+// =============================================================================
+
+// Only apply enhancements OUTSIDE of search pages to avoid conflicts
+body:not(:has(.main-searchPage-content)) {
+  // =============================================================================
+  // YEAR 3000 ENHANCED CARDS - Non-Search Areas Only
+  // =============================================================================
+
+  .main-card-card {
+    position: relative;
+    border-radius: var(--card-border-radius);
+
+    // === Lightweight Color Enhancement ===
+    background: linear-gradient(
+      135deg,
+      var(--card-color-primary) 0%,
+      var(--card-color-secondary) 50%,
+      var(--card-color-accent) 100%
+    );
+
+    // === Simple Border Enhancement ===
+    border: 1px solid rgba(var(--spice-rgb-surface1), 0.2);
+
+    // === Subtle Shadow Enhancement ===
+    box-shadow: 0 4px 12px var(--card-shadow-base);
+
+    // === Smooth Transitions (No Transform Conflicts) ===
+    transition: box-shadow var(--card-transition-speed) ease,
+      border-color var(--card-transition-speed) ease,
+      background var(--card-transition-speed) ease;
+
+    // === Hover Enhancement (No Transforms) ===
+    &:hover {
+      // Enhanced background
+      background: linear-gradient(
+        135deg,
+        rgba(var(--spice-rgb-accent), 0.12) 0%,
+        rgba(var(--spice-rgb-surface1), 0.15) 50%,
+        rgba(var(--spice-rgb-surface0), 0.08) 100%
+      );
+
+      // Enhanced border
+      border-color: rgba(var(--spice-rgb-accent), 0.3);
+
+      // Enhanced shadow (no transform needed)
+      box-shadow: 0 8px 24px var(--card-shadow-base),
+        0 4px 16px rgba(var(--spice-rgb-accent), 0.1);
+    }
+
+    // === Focus State Enhancement ===
+    &:focus-visible {
+      outline: 2px solid var(--spice-accent);
+      outline-offset: 2px;
+    }
+
+    // === Active State Enhancement ===
+    &:active {
+      // Slight shadow reduction for feedback
+      box-shadow: 0 2px 8px var(--card-shadow-base);
+    }
+  }
+
+  // =============================================================================
+  // ENHANCED CARD HEADERS - Non-Search Areas Only
+  // =============================================================================
+
+  .main-card-header {
+    position: relative;
+    border-radius: var(--card-border-radius) var(--card-border-radius) 0 0;
+
+    // === Enhanced Image ===
+    .main-image-image,
+    .main-cardImage-image {
+      transition: filter var(--card-transition-speed) ease;
+      filter: contrast(1) saturate(1);
+
+      // Hover enhancement
+      .main-card-card:hover & {
+        filter: contrast(1.05) saturate(1.1);
+      }
+    }
+  }
+
+  // =============================================================================
+  // ENHANCED CARD CONTENT - Non-Search Areas Only
+  // =============================================================================
+
+  .main-card-content {
+    // Enhanced typography
+    color: var(--spice-text);
+
+    .main-type-mestoBold,
+    .main-type-celloMedium {
+      color: inherit;
+      transition: color var(--card-transition-speed) ease;
+
+      .main-card-card:hover & {
+        color: var(--spice-accent);
+      }
+    }
+  }
+} // End of non-search body selector
+
+// =============================================================================
+// SEARCH PAGE CARDS - Let Precision Module Handle Entirely
+// =============================================================================
+
+// Ensure search cards are completely handled by our precision targeting
+.main-searchPage-content .main-card-card {
+  // Reset only conflicting properties, not everything
+  margin: 0;
+  padding: inherit;
+  display: block;
+  position: relative;
+  box-sizing: border-box;
+
+  // Preserve essential clickability
+  cursor: pointer;
+  text-decoration: none;
+
+  // Preserve accessibility
+  &:focus-visible {
+    outline: 2px solid var(--spice-accent);
+    outline-offset: 2px;
+  }
+}
+
+// =============================================================================
+// PERFORMANCE OPTIMIZATIONS
+// =============================================================================
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .main-card-card {
+    transition-duration: 0.1s !important;
+  }
+}
+
+// Mobile optimizations
+@media (max-width: 768px) {
+  :root {
+    --card-transition-speed: 0.2s;
+    --card-shadow-intensity: 0.08;
   }
 }

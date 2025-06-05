@@ -1,593 +1,67 @@
 // =============================================================================
-// YEAR 3000 UNIFIED CARDS ORCHESTRATION - Holographic Synthesis System
-// Seamless integration of all Year 3000 effects with sophisticated state management
+// YEAR 3000 CARDS - SEARCH COMPATIBLE VERSION
+// Lightweight card system that doesn't interfere with search precision targeting
 // =============================================================================
 
-// Year 3000 Unified Orchestration Variables
+// Year 3000 Simple Card Variables
 :root {
-  // === Holographic Synthesis Core ===
-  --unified-orchestration-depth: 3;
-  --unified-energy-synchronization: 1;
-  --unified-state-fluidity: cubic-bezier(0.23, 1, 0.32, 1);
-  --unified-harmonic-convergence: 0.8s;
-
-  // === Dynamic Effect Layering ===
-  --layer-holographic-base: 1;
-  --layer-energy-field: 2;
-  --layer-nexus-connection: 3;
-  --layer-bloom-effect: 4;
-  --layer-contextual-overlay: 5;
-
-  // === Organic State Transitions ===
-  --state-dormant-energy: 0.15;
-  --state-ambient-energy: 0.35;
-  --state-active-energy: 0.75;
-  --state-nexus-energy: 1.2;
-  --state-bloom-energy: 1.8;
-
-  // === Environmental Harmony ===
-  --env-music-resonance: var(--music-energy-modulation, 1);
-  --env-context-adaptation: var(--motion-intelligence-level, 1);
-  --env-color-harmony: var(--card-harmonic-resonance, 1);
-}
-
-// =============================================================================
-// YEAR 3000 MASTER CARD ORCHESTRATION
-// =============================================================================
-
-.main-card-card {
-  // === Foundational Holographic Layer ===
-  position: relative;
-  isolation: isolate;
-  perspective: var(--card-perspective-field, 1200px);
-  transform-style: preserve-3d;
-
-  // Dynamic border radius that morphs with state
-  border-radius: calc(
-    var(--card-organic-corners, 16px) *
-      (1 + var(--state-ambient-energy) * 0.2 * var(--env-context-adaptation))
+  // === Basic Enhancement Variables ===
+  --simple-card-radius: 12px;
+  --simple-card-transition: 0.3s ease;
+  --simple-card-shadow: rgba(
+    var(--sn-oklab-processed-dynamic-shadow-rgb),
+    0.12
   );
+  --simple-card-border: rgba(var(--spice-rgb-surface1), 0.2);
+}
 
-  // === Advanced Holographic Background System ===
-  background:
-    // Primary energy layer
-    radial-gradient(
-      ellipse 150% 120% at 30% 20%,
-      rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-          calc(var(--state-ambient-energy) * 0.08 * var(--env-color-harmony))
-        )
-        0%,
-      transparent 50%
-    ),
-    // Secondary harmonic layer
-    radial-gradient(
-        ellipse 120% 100% at 70% 80%,
-        rgba(
-            var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
-            calc(var(--state-ambient-energy) * 0.06 * var(--env-color-harmony))
-          )
-          0%,
-        transparent 60%
-      ),
-    // Base foundation gradient
-    linear-gradient(
-        135deg,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.05) 0%,
-        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.08)
-          50%,
-        rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.03)
-          100%
-      );
+// =============================================================================
+// SEARCH COMPATIBILITY - Only Apply Outside Search
+// =============================================================================
 
-  // === Ultra-Advanced Glassmorphism ===
-  backdrop-filter: blur(calc(20px * (1 + var(--state-ambient-energy) * 0.3)))
-    saturate(calc(1.3 + var(--state-ambient-energy) * 0.2))
-    contrast(calc(1 + var(--state-ambient-energy) * 0.1));
+// Only apply to cards OUTSIDE of search pages
+body:not(:has(.main-searchPage-content)) .main-card-card {
+  // === Simple Card Enhancement ===
+  border-radius: var(--simple-card-radius);
+  background: rgba(var(--spice-rgb-surface0), 0.1);
+  border: 1px solid var(--simple-card-border);
+  box-shadow: 0 4px 12px var(--simple-card-shadow);
 
-  // === Dynamic Border System ===
-  border: 1px solid
-    rgba(
-      var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-      calc(0.15 + var(--state-ambient-energy) * 0.2)
-    );
+  // === Simple Transition ===
+  transition: box-shadow var(--simple-card-transition);
 
-  // === Organic Shadow Orchestration ===
-  box-shadow:
-    // Near shadow with energy tint
-    0 4px 24px
-      rgba(
-        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-        calc(0.08 * var(--state-ambient-energy))
-      ),
-    // Mid depth shadow
-    0 8px 32px
-      rgba(0, 0, 0, calc(0.12 * (1 + var(--state-ambient-energy) * 0.5))),
-    // Far atmospheric shadow
-    0 16px 64px rgba(0, 0, 0, calc(0.06 * var(--state-ambient-energy))),
-    // Internal highlight
-    inset 0 1px 0
-      rgba(255, 255, 255, calc(0.1 + var(--state-ambient-energy) * 0.1));
-
-  // === Unified Transition Orchestration ===
-  transition: transform var(--unified-harmonic-convergence)
-      var(--unified-state-fluidity),
-    background var(--unified-harmonic-convergence) ease,
-    backdrop-filter var(--unified-harmonic-convergence) ease,
-    border-color var(--unified-harmonic-convergence) ease,
-    box-shadow var(--unified-harmonic-convergence) ease,
-    border-radius calc(var(--unified-harmonic-convergence) * 0.7) ease;
-
-  // === Performance Optimization ===
-  @include performance-optimized;
-  will-change: transform, background, backdrop-filter, border-color, box-shadow;
-
-  // === Invisible Energy Field Foundation ===
-  &::before {
-    content: "";
-    position: absolute;
-    top: calc(-1 * var(--card-energy-field-radius, 24px));
-    left: calc(-1 * var(--card-energy-field-radius, 24px));
-    right: calc(-1 * var(--card-energy-field-radius, 24px));
-    bottom: calc(-1 * var(--card-energy-field-radius, 24px));
-    z-index: calc(-1 * var(--layer-energy-field));
-
-    // Expanding energy field
-    background: radial-gradient(
-      ellipse 140% 120% at center,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0) 0%,
-      rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-          calc(var(--state-dormant-energy) * 0.5 * var(--env-color-harmony))
-        )
-        30%,
-      rgba(
-          var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)),
-          calc(var(--state-dormant-energy) * 0.3 * var(--env-color-harmony))
-        )
-        60%,
-      transparent 80%
-    );
-
-    border-radius: calc(var(--card-organic-corners, 16px) * 2.5);
-    opacity: 0;
-    transform: scale(0.9) translateZ(-2px);
-    filter: blur(1px);
-
-    transition: all var(--unified-harmonic-convergence)
-      var(--unified-state-fluidity);
-  }
-
-  // === Nexus Connection Indicator ===
-  &::after {
-    content: "";
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    z-index: calc(-1 * var(--layer-nexus-connection));
-
-    // Nexus ring gradient
-    background: conic-gradient(
-      from calc(var(--env-music-resonance, 1) * 360deg),
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0) 0deg,
-      rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-          calc(var(--state-dormant-energy) * 0.3)
-        )
-        90deg,
-      rgba(
-          var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)),
-          calc(var(--state-dormant-energy) * 0.5)
-        )
-        180deg,
-      rgba(
-          var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
-          calc(var(--state-dormant-energy) * 0.3)
-        )
-        270deg,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0) 360deg
-    );
-
-    border-radius: calc(var(--card-organic-corners, 16px) + 2px);
-    opacity: 0;
-    transform: scale(0.98) rotate(0deg);
-    filter: blur(0.5px);
-
-    // Subtle rotation based on music energy
-    animation: nexus-energy-rotation
-      calc(
-        var(--card-energy-pulse-rate, 3s) * 2 / var(--env-music-resonance, 1)
-      )
-      linear infinite;
-    animation-play-state: paused;
-
-    transition: all var(--unified-harmonic-convergence)
-      var(--unified-state-fluidity);
-  }
-
-  // === UNIFIED HOVER STATE - Energy Activation ===
+  // === Simple Hover Enhancement ===
   &:hover {
-    // === Elevated State Variables ===
-    --state-ambient-energy: var(--state-active-energy);
-    --state-bloom-energy: 1.5;
-
-    // === Holographic Elevation ===
-    transform: var(--card-depth-near, translateZ(12px))
-      scale(var(--calculated-scale, 1.05))
-      perspective(var(--card-perspective-field, 1200px));
-
-    // === Enhanced Background Layers ===
-    background:
-      // Primary energy enhancement
-      radial-gradient(
-        ellipse 180% 150% at 30% 20%,
-        rgba(
-            var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-            calc(var(--state-active-energy) * 0.15 * var(--env-color-harmony))
-          )
-          0%,
-        transparent 45%
-      ),
-      // Secondary harmonic enhancement
-      radial-gradient(
-          ellipse 160% 130% at 70% 80%,
-          rgba(
-              var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
-              calc(var(--state-active-energy) * 0.12 * var(--env-color-harmony))
-            )
-            0%,
-          transparent 55%
-        ),
-      // Accent energy bloom
-      radial-gradient(
-          ellipse 200% 100% at center,
-          rgba(
-              var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)),
-              calc(var(--state-active-energy) * 0.08 * var(--env-color-harmony))
-            )
-            0%,
-          transparent 70%
-        ),
-      // Enhanced foundation
-      linear-gradient(
-          135deg,
-          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.12) 0%,
-          rgba(
-              var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
-              0.15
-            )
-            50%,
-          rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.08)
-            100%
-        );
-
-    // === Enhanced Glassmorphism ===
-    backdrop-filter: blur(calc(25px * (1 + var(--state-active-energy) * 0.4)))
-      saturate(calc(1.5 + var(--state-active-energy) * 0.3))
-      contrast(calc(1.1 + var(--state-active-energy) * 0.1))
-      brightness(calc(1 + var(--state-active-energy) * 0.05));
-
-    // === Dynamic Border Enhancement ===
-    border-color: rgba(
-      var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-      calc(0.4 + var(--state-active-energy) * 0.2)
-    );
-
-    border-radius: calc(
-      var(--card-organic-corners, 16px) *
-        (1 + var(--state-active-energy) * 0.3 * var(--env-context-adaptation))
-    );
-
-    // === Sophisticated Shadow System ===
-    box-shadow:
-      // Near energy shadow
-      0 var(--calculated-lift, 16px) calc(var(--calculated-lift, 16px) * 2)
-        rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-          calc(0.15 * var(--state-active-energy))
-        ),
-      // Mid depth shadow
-      0 calc(var(--calculated-lift, 16px) * 2)
-        calc(var(--calculated-lift, 16px) * 4)
-        rgba(0, 0, 0, calc(0.2 * (1 + var(--state-active-energy) * 0.3))),
-      // Far atmospheric shadow
-      0 calc(var(--calculated-lift, 16px) * 3)
-        calc(var(--calculated-lift, 16px) * 6)
-        rgba(0, 0, 0, calc(0.1 * var(--state-active-energy))),
-      // Energy aura
-      0 0 calc(var(--card-energy-field-radius, 24px) * 2)
-        rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-          calc(0.1 * var(--state-active-energy))
-        ),
-      // Enhanced internal highlight
-      inset 0 1px 0
-        rgba(255, 255, 255, calc(0.2 + var(--state-active-energy) * 0.1)),
-      // Internal energy glow
-      inset 0 0 calc(var(--card-energy-field-radius, 24px) / 2)
-        rgba(
-          var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)),
-          calc(0.05 * var(--state-active-energy))
-        );
-
-    // === Activate Energy Field ===
-    &::before {
-      opacity: calc(var(--state-active-energy) * 0.8);
-      transform: scale(1.1) translateZ(-1px);
-      filter: blur(0.5px);
-    }
-
-    // === Activate Nexus Connection ===
-    &::after {
-      opacity: calc(var(--state-active-energy) * 0.6);
-      transform: scale(1.02) rotate(calc(var(--env-music-resonance, 1) * 5deg));
-      filter: blur(0px);
-      animation-play-state: running;
-    }
+    box-shadow: 0 8px 24px var(--simple-card-shadow);
+    border-color: rgba(var(--spice-rgb-accent), 0.3);
   }
 
-  // === UNIFIED FOCUS STATE - Nexus Connection ===
+  // === Focus Enhancement ===
   &:focus-visible {
-    outline: none;
-
-    // Enhanced focus variables
-    --state-ambient-energy: var(--state-nexus-energy);
-
-    // Nexus focus ring
-    box-shadow:
-      // Standard shadow system
-      0 4px 24px
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.08),
-      0 8px 32px rgba(0, 0, 0, 0.12),
-      // Nexus connection ring
-      0 0 0 3px
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4),
-      0 0 0 6px
-        rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.2),
-      // Nexus energy pulse
-      0 0 24px
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3);
-
-    // Activate nexus connection
-    &::after {
-      opacity: 1;
-      animation-play-state: running;
-      animation-duration: calc(var(--card-energy-pulse-rate, 3s) / 2);
-    }
-  }
-
-  // === UNIFIED ACTIVE STATE - Energy Pulse ===
-  &:active {
-    // Compressed energy state
-    --state-ambient-energy: calc(var(--state-active-energy) * 0.8);
-
-    transform: var(--card-depth-mid, translateZ(6px))
-      scale(calc(var(--calculated-scale, 1.05) * 0.98));
-
-    transition: transform 0.1s ease;
-
-    // Energy compression effect
-    &::before {
-      transform: scale(0.95) translateZ(-3px);
-    }
-
-    &::after {
-      transform: scale(0.99) rotate(calc(var(--env-music-resonance, 1) * -2deg));
-    }
-  }
-
-  // === CONTEXTUAL STATE ADAPTATIONS ===
-
-  // Focus mode: Minimal effects for concentration
-  .main-searchPage-content &,
-  [data-context="focus"] & {
-    --state-ambient-energy: calc(var(--state-ambient-energy) * 0.3);
-    --unified-energy-synchronization: 0.3;
-
-    &::before,
-    &::after {
-      opacity: 0 !important;
-    }
-
-    &:hover {
-      transform: none;
-      --state-ambient-energy: 0.5;
-    }
-  }
-
-  // Discovery mode: Enhanced effects for exploration
-  .main-entityHeader-container &,
-  .main-shelf-shelf &,
-  [data-context="discovery"] & {
-    --state-ambient-energy: calc(var(--state-ambient-energy) * 1.3);
-    --unified-energy-synchronization: 1.4;
-
-    &::before {
-      transform: scale(0.95) translateZ(-1px);
-      opacity: 0.3;
-    }
-  }
-
-  // Music playing: Synchronized with music energy
-  [data-context="playing"] & {
-    --state-ambient-energy: calc(
-      var(--state-ambient-energy) * var(--env-music-resonance, 1)
-    );
-
-    &::after {
-      animation-play-state: running;
-      animation-duration: calc(
-        var(--card-energy-pulse-rate, 3s) / var(--env-music-resonance, 1)
-      );
-    }
+    outline: 2px solid var(--spice-accent);
+    outline-offset: 2px;
   }
 }
 
 // =============================================================================
-// ADVANCED NEXUS ANIMATIONS
+// SEARCH CARDS - Complete Hands-Off Approach
 // =============================================================================
 
-@keyframes nexus-energy-rotation {
-  0% {
-    transform: scale(0.98) rotate(0deg);
-  }
-  25% {
-    transform: scale(1) rotate(90deg);
-  }
-  50% {
-    transform: scale(1.01) rotate(180deg);
-  }
-  75% {
-    transform: scale(1) rotate(270deg);
-  }
-  100% {
-    transform: scale(0.98) rotate(360deg);
-  }
-}
-
-@keyframes nexus-energy-pulse {
-  0%,
-  100% {
-    opacity: 0.6;
-    transform: scale(1.02);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
+// Ensure search cards get NO styling from this module
+.main-searchPage-content .main-card-card {
+  // Reset everything to let precision targeting handle it
+  all: unset;
+  display: block;
+  position: relative;
+  cursor: pointer;
 }
 
 // =============================================================================
-// UNIFIED INTERACTION ENHANCEMENTS
+// PERFORMANCE OPTIMIZATIONS
 // =============================================================================
 
-// Enhanced play button integration
-.main-card-card .main-card-PlayButtonContainer,
-.main-card-card .main-playButton-PlayButton {
-  // Inherit card's state variables
-  --button-state-energy: var(--state-ambient-energy, 0.35);
-
-  // Dynamic positioning based on card energy
-  transform: translateY(calc(8px * (1 - var(--button-state-energy))))
-    scale(calc(0.8 + 0.2 * var(--button-state-energy)))
-    translateZ(calc(var(--button-state-energy) * 2px));
-
-  // Enhanced energy bloom
-  &::before {
-    background: radial-gradient(
-      circle,
-      rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-          calc(0.3 * var(--button-state-energy))
-        )
-        0%,
-      rgba(
-          var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)),
-          calc(0.15 * var(--button-state-energy))
-        )
-        40%,
-      transparent 70%
-    );
-  }
-
-  // Show with card hover
-  .main-card-card:hover & {
-    --button-state-energy: var(--state-active-energy);
-    opacity: 1;
-    transform: translateY(0) scale(1) translateZ(4px);
-
-    &:hover {
-      --button-state-energy: var(--state-bloom-energy);
-    }
-  }
-}
-
-// Enhanced image integration
-.main-card-card .main-card-header {
-  // Inherit card depth
-  transform: var(--card-depth-mid, translateZ(6px));
-
-  // Enhanced energy source ring
-  &::before {
-    opacity: calc(var(--state-ambient-energy, 0.35) * 0.5);
-
-    .main-card-card:hover & {
-      opacity: calc(var(--state-active-energy, 0.75) * 0.8);
-    }
-  }
-
-  // Image responds to card state
-  .main-image-image,
-  .main-cardImage-image {
-    transition: transform var(--unified-harmonic-convergence)
-        var(--unified-state-fluidity),
-      filter var(--unified-harmonic-convergence) ease;
-
-    filter: contrast(calc(1 + var(--state-ambient-energy, 0.35) * 0.1))
-      saturate(calc(1 + var(--state-ambient-energy, 0.35) * 0.2));
-
-    &:hover {
-      transform: scale(calc(1 + 0.03 * var(--state-active-energy, 0.75)));
-      filter: contrast(calc(1.05 + var(--state-active-energy, 0.75) * 0.1))
-        saturate(calc(1.1 + var(--state-active-energy, 0.75) * 0.2));
-    }
-  }
-}
-
-// =============================================================================
-// ACCESSIBILITY & PERFORMANCE
-// =============================================================================
-
-// Reduced motion: Disable all effects except color
 @media (prefers-reduced-motion: reduce) {
-  .main-card-card {
-    transition: background 300ms ease, border-color 300ms ease,
-      opacity 300ms ease;
-
-    &,
-    &:hover,
-    &:focus-visible,
-    &:active {
-      transform: none !important;
-      animation: none !important;
-    }
-
-    &::before,
-    &::after {
-      display: none !important;
-    }
-  }
-}
-
-// High contrast: Enhanced visual boundaries
-@media (prefers-contrast: high) {
-  .main-card-card {
-    border-width: 2px;
-
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.8);
-    }
-
-    &:focus-visible {
-      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.8);
-    }
-  }
-}
-
-// Battery optimization: Minimal effects
-@media (prefers-reduced-data: reduce) {
-  .main-card-card {
-    --unified-energy-synchronization: 0.2;
-
-    &::before,
-    &::after {
-      display: none;
-    }
-
-    &:hover {
-      transform: scale(1.02);
-    }
+  * {
+    transition-duration: 0.1s !important;
   }
 }

@@ -1,44 +1,18 @@
 // =============================================================================
-// YEAR 3000: QUANTUM SEARCH INTERFACE MODULE
+// YEAR 3000: QUANTUM SEARCH INTERFACE MODULE - HARMONY INTEGRATED
 // =============================================================================
 // Transforms search results into a holographic, neural-connected interface
-// with energy fields, particle systems, and temporal relevance indicators
-// NOTE: Works in conjunction with _sn_search_precision.scss for modern targeting
+// UPDATED: Full harmony engine integration with contrast boosting
 
-// === QUANTUM SEARCH CONTAINER ===
+// === QUANTUM SEARCH CONTAINER WITH HARMONY BOOST ===
 .main-searchPage-content {
   position: relative;
   perspective: 2000px;
 
-  // Quantum particle field background
-  &::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: -1;
-    background: radial-gradient(
-        circle at 20% 30%,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.03) 0%,
-        transparent 50%
-      ),
-      radial-gradient(
-        circle at 80% 70%,
-        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.02)
-          0%,
-        transparent 50%
-      ),
-      radial-gradient(
-        circle at 40% 80%,
-        rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.025) 0%,
-        transparent 50%
-      );
-    animation: quantum-particle-drift 20s ease-in-out infinite;
-  }
+  // REMOVED: Quantum particle field background - now handled by precision module
+  // This eliminates conflict with unified gradient system
 
-  // Quantum field resonance effect
+  // Harmony-boosted quantum field resonance effect
   &::after {
     content: "";
     position: absolute;
@@ -50,24 +24,32 @@
     background: conic-gradient(
       from 0deg at 50% 50%,
       transparent 0deg,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.02) 90deg,
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(0.015 * var(--sn-search-contrast-boost, 1))
+        )
+        90deg,
       transparent 180deg,
-      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.015)
+      rgba(
+          var(--sn-search-gradient-secondary-rgb),
+          calc(0.01 * var(--sn-search-contrast-boost, 1))
+        )
         270deg,
       transparent 360deg
     );
     animation: quantum-field-rotation 30s linear infinite;
     border-radius: 24px;
+    pointer-events: none;
   }
 }
 
-// === HOLOGRAPHIC RESULT SECTIONS ===
+// === HOLOGRAPHIC RESULT SECTIONS WITH HARMONY ===
 .main-shelf-shelf {
   position: relative;
   transform-style: preserve-3d;
   margin: 32px 0;
 
-  // Neural network connection lines between sections
+  // Neural network connection lines (harmony-boosted)
   &:not(:last-child)::after {
     content: "";
     position: absolute;
@@ -79,33 +61,32 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3) 20%,
-      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.5) 50%,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3) 80%,
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(0.3 * var(--sn-search-contrast-boost, 1))
+        )
+        20%,
+      rgba(
+          var(--sn-search-gradient-accent-rgb),
+          calc(0.5 * var(--sn-search-contrast-boost, 1))
+        )
+        50%,
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(0.3 * var(--sn-search-contrast-boost, 1))
+        )
+        80%,
       transparent 100%
     );
     animation: neural-pulse 3s ease-in-out infinite;
   }
 
-  // Section headers with quantum energy
+  // Section headers with harmony integration
   .main-shelf-header {
     position: relative;
-    margin-bottom: 24px;
 
     h2 {
-      position: relative;
-      background: linear-gradient(
-        135deg,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 1) 0%,
-        rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.9) 50%,
-        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.8)
-          100%
-      );
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-
-      // Quantum shimmer effect
+      // Enhanced quantum shimmer with harmony boost
       &::before {
         content: "";
         position: absolute;
@@ -116,7 +97,11 @@
         background: linear-gradient(
           90deg,
           transparent 0%,
-          rgba(255, 255, 255, 0.2) 50%,
+          rgba(
+              var(--sn-oklab-processed-bright-highlight-rgb),
+              calc(0.2 * var(--sn-search-contrast-boost, 1))
+            )
+            50%,
           transparent 100%
         );
         animation: quantum-shimmer 4s ease-in-out infinite;
@@ -130,47 +115,22 @@
   position: relative;
   transform-style: preserve-3d;
 
-  // Energy field base
-  &::before {
-    content: "";
-    position: absolute;
-    top: -12px;
-    left: -12px;
-    right: -12px;
-    bottom: -12px;
-    z-index: -1;
-    background: radial-gradient(
-      ellipse 150% 100% at center,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.04) 0%,
-      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.02)
-        40%,
-      transparent 70%
-    );
-    border-radius: 20px;
-    opacity: 0;
-    transform: scale(0.95);
-    transition: all 800ms cubic-bezier(0.23, 1, 0.32, 1);
-  }
-
-  &:hover::before {
-    opacity: 1;
-    transform: scale(1);
-  }
+  // REMOVED: Energy field base - now handled by precision module for consistency
 }
 
-// === QUANTUM-ENHANCED CARDS ===
+// === QUANTUM-ENHANCED CARDS WITH HARMONY BOOST ===
 .main-card-card {
   position: relative;
   transform-style: preserve-3d;
   transform-origin: center center;
 
-  // Holographic depth enhancement
+  // Holographic depth enhancement (compatible with unified gradient backgrounds)
   &:hover {
-    transform: perspective(1000px) rotateX(var(--mouse-y, 0) * 5deg)
-      rotateY(var(--mouse-x, 0) * 5deg) translateZ(20px) scale(1.05);
+    transform: perspective(1000px) rotateX(calc(var(--mouse-y, 0) * 5deg))
+      rotateY(calc(var(--mouse-x, 0) * 5deg)) translateZ(20px) scale(1.05);
   }
 
-  // Temporal relevance indicator
+  // Harmony-boosted temporal relevance indicator
   &::before {
     content: "";
     position: absolute;
@@ -181,17 +141,32 @@
     border-radius: 50%;
     background: conic-gradient(
       from 0deg,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.8) 0deg,
-      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.6) 120deg,
-      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.8)
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(0.8 * var(--sn-search-contrast-boost, 1))
+        )
+        0deg,
+      rgba(
+          var(--sn-search-gradient-accent-rgb),
+          calc(0.6 * var(--sn-search-contrast-boost, 1))
+        )
+        120deg,
+      rgba(
+          var(--sn-search-gradient-secondary-rgb),
+          calc(0.8 * var(--sn-search-contrast-boost, 1))
+        )
         240deg,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.8) 360deg
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(0.8 * var(--sn-search-contrast-boost, 1))
+        )
+        360deg
     );
     animation: temporal-indicator 2s linear infinite;
     z-index: 2;
   }
 
-  // Neural connection points
+  // Enhanced neural connection points with harmony boost
   &::after {
     content: "";
     position: absolute;
@@ -201,16 +176,23 @@
     height: 4px;
     transform: translate(-50%, -50%);
     background: rgba(
-      var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-      0.6
+      var(--sn-search-gradient-primary-rgb),
+      calc(0.6 * var(--sn-search-contrast-boost, 1))
     );
     border-radius: 50%;
     opacity: 0;
     transition: all 400ms ease;
     box-shadow: 0 0 8px
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4),
+        rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(0.4 * var(--sn-search-contrast-boost, 1))
+        ),
       0 0 16px
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2);
+        rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(0.2 * var(--sn-search-contrast-boost, 1))
+        );
+    z-index: 1; // Ensure it appears above precision module overlays
   }
 
   &:hover::after {
@@ -219,48 +201,39 @@
   }
 }
 
-// === ENHANCED TOP RESULT ===
+// === ENHANCED TOP RESULT WITH HARMONY BOOST ===
 [data-testid="top-result-card"] {
   .main-card-card {
     position: relative;
 
-    // Quantum signature border
-    border: 2px solid transparent;
-    background: linear-gradient(var(--spice-base), var(--spice-base))
-        padding-box,
-      conic-gradient(
-          from 0deg,
-          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6)
-            0deg,
-          rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.4)
-            120deg,
-          rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.6)
-            240deg,
-          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6)
-            360deg
-        )
-        border-box;
+    // Quantum signature border animation (works with precision module gradient border)
     animation: quantum-border-flow 8s linear infinite;
 
-    // Enhanced holographic effects
+    // Enhanced holographic effects with harmony boost
     &:hover {
-      transform: perspective(1200px) rotateX(var(--mouse-y, 0) * 8deg)
-        rotateY(var(--mouse-x, 0) * 8deg) translateZ(40px) scale(1.08);
+      transform: perspective(1200px) rotateX(calc(var(--mouse-y, 0) * 8deg))
+        rotateY(calc(var(--mouse-x, 0) * 8deg)) translateZ(40px) scale(1.08);
 
       box-shadow: 0 25px 50px
-          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2),
-        0 15px 30px rgba(0, 0, 0, 0.3),
+          rgba(
+            var(--sn-search-gradient-primary-rgb),
+            calc(0.2 * var(--sn-search-contrast-boost, 1))
+          ),
+        0 15px 30px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.3),
         0 0 50px
-          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.15);
+          rgba(
+            var(--sn-search-gradient-primary-rgb),
+            calc(0.15 * var(--sn-search-contrast-boost, 1))
+          );
     }
   }
 }
 
-// === TRACK LIST QUANTUM ENHANCEMENTS ===
+// === TRACK LIST QUANTUM ENHANCEMENTS WITH HARMONY ===
 .main-trackList-trackListRow {
   position: relative;
 
-  // Quantum track energy indicator
+  // Harmony-boosted quantum track energy indicator
   &::before {
     content: "";
     position: absolute;
@@ -271,9 +244,21 @@
     transform: translateY(-50%);
     background: linear-gradient(
       180deg,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.8) 0%,
-      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.6) 50%,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.8) 100%
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(0.8 * var(--sn-search-contrast-boost, 1))
+        )
+        0%,
+      rgba(
+          var(--sn-search-gradient-accent-rgb),
+          calc(0.6 * var(--sn-search-contrast-boost, 1))
+        )
+        50%,
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(0.8 * var(--sn-search-contrast-boost, 1))
+        )
+        100%
     );
     border-radius: 2px;
     transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
@@ -284,7 +269,7 @@
     animation: quantum-energy-flow 2s ease-in-out infinite;
   }
 
-  // Neural network connections between tracks
+  // Enhanced neural network connections between tracks
   &:not(:last-child)::after {
     content: "";
     position: absolute;
@@ -295,9 +280,21 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.1) 25%,
-      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.2) 50%,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.1) 75%,
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(0.1 * var(--sn-search-contrast-boost, 1))
+        )
+        25%,
+      rgba(
+          var(--sn-search-gradient-accent-rgb),
+          calc(0.2 * var(--sn-search-contrast-boost, 1))
+        )
+        50%,
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(0.1 * var(--sn-search-contrast-boost, 1))
+        )
+        75%,
       transparent 100%
     );
     opacity: 0;
@@ -431,8 +428,7 @@
     }
   }
 
-  .main-searchPage-content::before,
   .main-searchPage-content::after {
-    display: none; // Disable particle effects on mobile
+    display: none; // Disable quantum field rotation on mobile
   }
 }

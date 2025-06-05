@@ -1,35 +1,459 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// TOP BAR CONSCIOUSNESS SYSTEM - Year 3000 BeatSync Integration
+// Complete transformation from basic module to full consciousness
+// ████████████████████████████████████████████████████████████████████████████████
+//
+// This module provides consciousness awakening for the top navigation bar, transforming
+// static interface elements into rhythm-responsive, cosmic-aware components that:
+// - OSCILLATE backgrounds with music rhythm phase
+// - RIPPLE search interactions with beat detection
+// - BLOOM buttons during musical intensity peaks
+// - HARMONIZE colors with dynamic music analysis
+// - REFRACT light through cosmic filter effects
+//
+// Dependencies:
+// - BeatSyncVisualSystem variables (--sn-beat-pulse-intensity, --sn-rhythm-phase, --sn-breathing-scale)
+// - Year 3000 gradient system variables (--sn-gradient-*-rgb)
+// - Base Spicetify theme variables (--spice-*)
+//
+// ████████████████████████████████████████████████████████████████████████████████
+
+:root {
+  // === CORE CONSCIOUSNESS VARIABLES (BeatSync Integration) ===
+  --sn-topbar-beat-glow-intensity: calc(
+    var(--sn-beat-pulse-intensity, 0) * 0.8
+  );
+  --sn-topbar-rhythm-hue-shift: calc(var(--sn-rhythm-phase, 0) * 25deg);
+  --sn-topbar-cosmic-opacity: calc(
+    0.1 + var(--sn-beat-pulse-intensity, 0) * 0.15
+  );
+  --sn-topbar-breathing-scale: var(--sn-breathing-scale, 1);
+
+  // === SEARCH CONSCIOUSNESS VARIABLES ===
+  --sn-search-ripple-intensity: calc(var(--sn-beat-pulse-intensity, 0) * 0.6);
+  --sn-search-focus-bloom: calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.05);
+  --sn-search-beat-border: rgba(
+    var(--sn-gradient-accent-rgb, "140,170,238"),
+    calc(0.3 + var(--sn-beat-pulse-intensity, 0) * 0.4)
+  );
+
+  // === BUTTON CONSCIOUSNESS VARIABLES ===
+  --sn-button-harmony-color: rgba(
+    var(--sn-gradient-primary-rgb, "202,158,230"),
+    calc(0.1 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+  );
+  --sn-button-bloom-scale: calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.03);
+  --sn-button-cosmic-glow: calc(5px + var(--sn-beat-pulse-intensity, 0) * 10px);
+
+  // === TEMPORAL SHIFT VARIABLES ===
+  --sn-topbar-temporal-phase: var(--sn-rhythm-phase, 0);
+  --sn-topbar-energy-absorption: var(--sn-beat-pulse-intensity, 0);
+  --sn-topbar-consciousness-flow: calc(var(--sn-rhythm-phase, 0) * 180deg);
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// MAIN TOP BAR CONSCIOUSNESS FIELD
+// ████████████████████████████████████████████████████████████████████████████████
+
 :root .Root__top-bar header,
 :root .main-topBar-container {
-  // Normalize button hover effect
-  button:not(.x-searchInput-searchInputClearButton),
-  .main-topBar-button {
-    color: var(--spice-subtext) !important;
-    background-color: var(--spice-main-elevated) !important;
+  position: relative;
+  overflow: hidden;
+
+  // Multi-layer cosmic background system
+  background:
+    // Layer 1: OSCILLATE rhythm gradient
+    linear-gradient(
+      calc(90deg + var(--sn-topbar-consciousness-flow)),
+      rgba(
+          var(--sn-gradient-primary-rgb, "202,158,230"),
+          var(--sn-topbar-cosmic-opacity)
+        )
+        0%,
+      transparent 40%,
+      transparent 60%,
+      rgba(
+          var(--sn-gradient-secondary-rgb, "186,187,241"),
+          calc(var(--sn-topbar-cosmic-opacity) * 0.8)
+        )
+        100%
+    ),
+    // Layer 2: Base background (preserve existing functionality)
+    var(--spice-main, #1e1e2e) !important;
+
+  // BLOOM glow effect during beats
+  box-shadow: 0 2px var(--sn-button-cosmic-glow)
+      rgba(
+        var(--sn-gradient-primary-rgb, "202,158,230"),
+        calc(var(--sn-topbar-beat-glow-intensity) * 0.3)
+      ),
+    inset 0 1px 0
+      rgba(
+        var(--sn-gradient-accent-rgb, "140,170,238"),
+        calc(var(--sn-topbar-beat-glow-intensity) * 0.2)
+      );
+
+  // REFRACT cosmic filter effects
+  filter: hue-rotate(var(--sn-topbar-rhythm-hue-shift))
+    saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.2))
+    brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+
+  // BREATHING scale effect (subtle)
+  transform: scale(var(--sn-topbar-breathing-scale));
+
+  // Smooth consciousness transitions
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    filter 0.3s ease-out, transform 0.2s ease-out;
+
+  // Cosmic atmosphere enhancement layer
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      ellipse 150% 100% at 50% 0%,
+      rgba(
+          var(--sn-gradient-accent-rgb, "140,170,238"),
+          calc(var(--sn-topbar-energy-absorption) * 0.15)
+        )
+        0%,
+      transparent 70%
+    );
+    animation: cosmicFlow
+      calc(20s / max(var(--sn-beat-pulse-intensity, 0.1), 0.1)) linear infinite;
+    opacity: var(--sn-topbar-energy-absorption);
   }
 
+  // Background normalization (preserve existing)
   .main-topBar-background {
-    background-color: var(--spice-mantle) !important;
+    background-color: transparent !important;
   }
 
-  .Svg-img-24-icon.home-active-icon {
-    color: var(--spice-player);
-  }
+  // Entity header consciousness enhancement
+  .main-entityHeader-withBackgroundImage {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(
+          var(--sn-gradient-primary-rgb, "202,158,230"),
+          calc(var(--sn-topbar-cosmic-opacity) * 1.5)
+        )
+        0%,
+      rgba(var(--spice-rgb-player, "49,50,68"), 0.2) 100%
+    ) !important;
 
-  // Search bar
+    // BREATHING effect
+    transform: scale(var(--sn-topbar-breathing-scale));
+    transition: transform 0.4s ease-out;
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// SEARCH BAR CONSCIOUSNESS AWAKENING
+// ████████████████████████████████████████████████████████████████████████████████
+
+:root .Root__top-bar header,
+:root .main-topBar-container {
+  // Search bar consciousness enhancement
   .x-searchInput-searchInputInput {
-    background-color: var(--spice-overlay0);
-    color: var(--spice-subtext) !important;
+    position: relative;
 
+    // RIPPLE border effects with rhythm
+    border: 2px solid var(--sn-search-beat-border);
+    border-radius: 24px;
+
+    // Enhanced background with cosmic layers
+    background: linear-gradient(
+      135deg,
+      rgba(var(--spice-rgb-overlay0, "108,112,134"), 0.9) 0%,
+      rgba(
+          var(--sn-gradient-primary-rgb, "202,158,230"),
+          calc(var(--sn-search-ripple-intensity) * 0.1)
+        )
+        100%
+    ) !important;
+
+    // Cosmic glow during activity
+    box-shadow: 0 0 calc(8px + var(--sn-search-ripple-intensity) * 12px)
+        rgba(
+          var(--sn-gradient-accent-rgb, "140,170,238"),
+          calc(var(--sn-search-ripple-intensity) * 0.4)
+        ),
+      inset 0 1px 3px
+        rgba(
+          var(--sn-gradient-primary-rgb, "202,158,230"),
+          calc(var(--sn-search-ripple-intensity) * 0.2)
+        );
+
+    // Text consciousness
+    color: var(--spice-subtext, #bac2de) !important;
+
+    // BLOOM scale with beats
+    transform: scale(var(--sn-search-focus-bloom));
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+    // Enhanced placeholder consciousness
     &::placeholder {
-      color: rgba(var(--spice-rgb-subtext), 0.3);
+      color: rgba(
+        var(--spice-rgb-subtext, "186,194,222"),
+        calc(0.5 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+      ) !important;
+      transition: color 0.3s ease;
+    }
+
+    // Enhanced focus state
+    &:focus {
+      // Intensified BLOOM on focus
+      transform: scale(calc(var(--sn-search-focus-bloom) * 1.02));
+      border-color: rgba(var(--sn-gradient-primary-rgb, "202,158,230"), 0.8);
+
+      box-shadow: 0 0 calc(12px + var(--sn-search-ripple-intensity) * 16px)
+          rgba(
+            var(--sn-gradient-accent-rgb, "140,170,238"),
+            calc(var(--sn-search-ripple-intensity) * 0.6 + 0.3)
+          ),
+        inset 0 2px 4px
+          rgba(
+            var(--sn-gradient-primary-rgb, "202,158,230"),
+            calc(var(--sn-search-ripple-intensity) * 0.3 + 0.1)
+          );
+
+      // REFRACT color shift on focus
+      filter: hue-rotate(calc(var(--sn-topbar-rhythm-hue-shift) * 0.5));
+    }
+
+    // Typing rhythm response
+    &:not(:placeholder-shown) {
+      border-color: rgba(
+        var(--sn-gradient-accent-rgb, "140,170,238"),
+        calc(0.6 + var(--sn-beat-pulse-intensity, 0) * 0.3)
+      );
     }
   }
 
-  .main-topBar-background {
-    background-color: var(--spice-main) !important;
-  }
+  // Search clear button consciousness
+  .x-searchInput-searchInputClearButton {
+    color: rgba(
+      var(--spice-rgb-subtext, "186,194,222"),
+      calc(0.7 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+    );
 
-  .main-entityHeader-withBackgroundImage {
-    background-color: rgba(var(--spice-rgb-player), 0.2);
+    &:hover {
+      color: var(--sn-gradient-primary, #ca9ee6);
+      transform: scale(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+    }
   }
 }
+
+// ████████████████████████████████████████████████████████████████████████████████
+// NAVIGATION BUTTON CONSCIOUSNESS AWAKENING
+// ████████████████████████████████████████████████████████████████████████████████
+
+:root .Root__top-bar header,
+:root .main-topBar-container {
+  // Button consciousness enhancement
+  button:not(.x-searchInput-searchInputClearButton),
+  .main-topBar-button {
+    position: relative;
+    overflow: hidden;
+
+    // HARMONIZE background colors with rhythm
+    background: var(--sn-button-harmony-color) !important;
+    color: var(--spice-subtext, #bac2de) !important;
+
+    // BLOOM scale effect during beats
+    transform: scale(var(--sn-button-bloom-scale));
+
+    // Cosmic border enhancement
+    border: 1px solid
+      rgba(
+        var(--sn-gradient-accent-rgb, "140,170,238"),
+        calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.3)
+      ) !important;
+    border-radius: 8px;
+
+    // Smooth consciousness transitions
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+    // Cosmic shimmer effect
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(
+            var(--sn-gradient-accent-rgb, "140,170,238"),
+            calc(var(--sn-topbar-energy-absorption) * 0.3)
+          )
+          50%,
+        transparent 100%
+      );
+      transition: left 0.6s ease;
+      pointer-events: none;
+    }
+
+    // Enhanced hover states with cosmic consciousness
+    &:hover {
+      background: rgba(
+        var(--sn-gradient-primary-rgb, "202,158,230"),
+        calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.15)
+      ) !important;
+
+      // BLOOM glow enhancement
+      box-shadow: 0 0 var(--sn-button-cosmic-glow)
+          rgba(
+            var(--sn-gradient-primary-rgb, "202,158,230"),
+            calc(var(--sn-topbar-beat-glow-intensity) * 0.5 + 0.2)
+          ),
+        inset 0 1px 2px
+          rgba(
+            var(--sn-gradient-accent-rgb, "140,170,238"),
+            calc(var(--sn-topbar-beat-glow-intensity) * 0.3)
+          );
+
+      // Enhanced BLOOM transform
+      transform: scale(calc(var(--sn-button-bloom-scale) * 1.05))
+        translateY(-1px);
+
+      // Shimmer effect on hover
+      &::before {
+        left: 100%;
+      }
+    }
+
+    // Active state consciousness
+    &:active {
+      transform: scale(calc(var(--sn-button-bloom-scale) * 0.95));
+      box-shadow: inset 0 2px 4px
+        rgba(var(--sn-gradient-primary-rgb, "202,158,230"), 0.3);
+    }
+
+    // Focus state accessibility
+    &:focus-visible {
+      outline: 2px solid rgba(var(--sn-gradient-accent-rgb, "140,170,238"), 0.8);
+      outline-offset: 2px;
+    }
+  }
+
+  // Home icon special consciousness (preserve existing functionality)
+  .Svg-img-24-icon.home-active-icon {
+    // Enhanced active state with cosmic glow
+    filter: drop-shadow(
+      0 0 calc(6px + var(--sn-beat-pulse-intensity, 0) * 8px)
+        rgba(
+          var(--sn-gradient-primary-rgb, "202,158,230"),
+          calc(var(--sn-topbar-beat-glow-intensity) * 0.8 + 0.2)
+        )
+    );
+
+    // OSCILLATE color with rhythm (enhanced from original)
+    color: hsl(
+      calc(250 + var(--sn-rhythm-phase, 0) * 15),
+      calc(70% + var(--sn-beat-pulse-intensity, 0) * 20%),
+      calc(60% + var(--sn-beat-pulse-intensity, 0) * 20%)
+    ) !important;
+
+    // BREATHING scale effect
+    transform: scale(var(--sn-topbar-breathing-scale));
+    transition: all 0.4s ease-out;
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// COSMIC ANIMATIONS & CONSCIOUSNESS FLOW
+// ████████████████████████████████████████████████████████████████████████████████
+
+@keyframes cosmicFlow {
+  from {
+    transform: translateX(-100%);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0.8;
+  }
+}
+
+@keyframes consciousnessBreathing {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    transform: scale(1.002) rotate(0.5deg);
+    filter: hue-rotate(5deg);
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// ACCESSIBILITY & PERFORMANCE OPTIMIZATION
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Reduced motion support (preserve accessibility)
+@media (prefers-reduced-motion: reduce) {
+  :root .Root__top-bar header,
+  :root .main-topBar-container {
+    &::before {
+      animation: none !important;
+    }
+
+    * {
+      transition-duration: 0.1s !important;
+      transform: none !important;
+      animation: none !important;
+    }
+  }
+}
+
+// High contrast support
+@media (prefers-contrast: high) {
+  :root {
+    --sn-topbar-cosmic-opacity: 0.25;
+    --sn-search-ripple-intensity: 1;
+
+    .x-searchInput-searchInputInput {
+      border-width: 3px !important;
+    }
+
+    button:not(.x-searchInput-searchInputClearButton),
+    .main-topBar-button {
+      border-width: 2px !important;
+    }
+  }
+}
+
+// Mobile optimizations
+@media (max-width: 768px) {
+  :root {
+    --sn-topbar-cosmic-opacity: 0.08;
+    --sn-button-cosmic-glow: calc(
+      3px + var(--sn-beat-pulse-intensity, 0) * 6px
+    );
+  }
+
+  :root .Root__top-bar header,
+  :root .main-topBar-container {
+    .x-searchInput-searchInputInput {
+      border-radius: 20px;
+    }
+  }
+}
+
+// Performance optimization for lower-end devices
+@media (max-resolution: 1dppx) {
+  :root .Root__top-bar header,
+  :root .main-topBar-container {
+    &::before {
+      display: none;
+    }
+  }
+}
+
+// END OF TOP BAR CONSCIOUSNESS SYSTEM
+// ████████████████████████████████████████████████████████████████████████████████

@@ -1,68 +1,157 @@
-// =============================================================================
 // YEAR 3000: PRECISION TARGETING MODULE - FLUX REVOLUTION
+// === UNIFIED SEARCH CONSCIOUSNESS - Gradient System Integration ===
+// Eliminates color fragmentation and creates seamless Year 3000 search experience
+
+@use "mixins" as *;
+
 // =============================================================================
-// Modern Spotify class targeting with holographic, neural-connected interface
-// Targets: data-testid, e-9911-, encore-, Areas__, ListRowTitle, etc.
+// SEARCH CONSCIOUSNESS VARIABLES - Gradient System Integration
+// =============================================================================
 
-// === PHASE 4B: IMAGE LIBERATION PROTOCOL ===
-// NUCLEAR OPTION: Force all album art to be visible
-img[src*="spotifycdn.com"],
-img[src*="mosaic.scdn.co"],
-img[src*="image-cdn-ak.spotifycdn.com"],
-.main-image-image {
-  opacity: 1 !important;
-  filter: contrast(1.15) saturate(1.35) brightness(1.08)
-    drop-shadow(0 0 12px rgba(var(--spice-rgb-accent, 205, 214, 244), 0.25)) !important;
-  border-radius: 8px !important;
-  transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1) !important;
+:root {
+  // Search-specific gradient harmonics (extends main gradient system)
+  --sn-search-gradient-primary: var(--sn-gradient-primary);
+  --sn-search-gradient-secondary: var(--sn-gradient-secondary);
+  --sn-search-gradient-accent: var(--sn-gradient-accent);
 
-  // Quantum energy resonance on hover
-  &:hover {
-    filter: contrast(1.25) saturate(1.5) brightness(1.15)
-      drop-shadow(0 0 20px rgba(var(--spice-rgb-accent, 205, 214, 244), 0.4)) !important;
-    transform: scale(1.02) !important;
+  // RGB versions for precise control
+  --sn-search-gradient-primary-rgb: var(--sn-gradient-primary-rgb);
+  --sn-search-gradient-secondary-rgb: var(--sn-gradient-secondary-rgb);
+  --sn-search-gradient-accent-rgb: var(--sn-gradient-accent-rgb);
+
+  // Search-specific intensity modulation (enhanced for visibility without white boxes)
+  --sn-search-intensity: 0.15; // Increased from 0.1 for better vibrancy visibility
+  --sn-search-depth-factor: 0.1; // Enhanced from 0.07 for more layered effects
+  --sn-search-harmony-factor: 0.12; // Increased from 0.08 for stronger accent touches
+
+  // HARMONY ENGINE INTEGRATION - Dynamic contrast boost with enhanced vibrancy
+  --sn-search-contrast-boost: 1; // Set by harmony engine when needed
+  --sn-search-fallback-primary: var(
+    --sn-gradient-primary,
+    #ca9ee6
+  ); // Harmony engine fallback
+
+  // Enhanced intensity with harmony boost support - more vibrant defaults
+  --sn-search-intensity-boosted: calc(
+    var(--sn-search-intensity) * var(--sn-search-contrast-boost, 1)
+  );
+  --sn-search-depth-factor-boosted: calc(
+    var(--sn-search-depth-factor) * var(--sn-search-contrast-boost, 1)
+  );
+  --sn-search-harmony-factor-boosted: calc(
+    var(--sn-search-harmony-factor) * var(--sn-search-contrast-boost, 1)
+  );
+
+  // Temporal transition system
+  --sn-search-transition-organic: var(--sn-gradient-transition);
+  --sn-search-transition-quick: 400ms var(--sn-easing-emergence);
+}
+
+// =============================================================================
+// UNIFIED SEARCH CONTAINER - Gradient Consciousness Extension
+// =============================================================================
+
+.main-searchPage-content {
+  position: relative;
+
+  // Unified gradient foundation (extends main gradient system)
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -10;
+    background:
+      // Primary gradient layer matching main system
+      radial-gradient(
+        ellipse at 30% 20%,
+        rgba(var(--sn-search-gradient-primary-rgb), var(--sn-search-intensity))
+          0%,
+        transparent 60%
+      ),
+      // Secondary harmonic
+      radial-gradient(
+          ellipse at 70% 80%,
+          rgba(
+              var(--sn-search-gradient-secondary-rgb),
+              var(--sn-search-depth-factor)
+            )
+            0%,
+          transparent 50%
+        ),
+      // Accent layer for depth
+      linear-gradient(
+          135deg,
+          rgba(
+              var(--sn-search-gradient-accent-rgb),
+              var(--sn-search-harmony-factor)
+            )
+            0%,
+          transparent 40%,
+          transparent 60%,
+          rgba(
+              var(--sn-search-gradient-primary-rgb),
+              calc(var(--sn-search-intensity) * 0.5)
+            )
+            100%
+        );
+    transition: all var(--sn-search-transition-organic);
+
+    // Performance optimization
+    will-change: var(--sn-gpu-acceleration);
+    transform: translateZ(0);
+    @include performance-optimized;
   }
 }
 
-// === PHASE 4C: CONTAINER QUANTUM REPLACEMENT ===
-// OBLITERATE VISTA-ERA TRANSPARENT BOXES
-.pueeb339I8KrXZr0SDm1,
-.GOcsybnoHYyJGQGDRuwj,
-.mXNT9H2GU7lDW4cGx0q1,
-.cofBW8sjoBtMAmzDgqKt {
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
+// =============================================================================
+// SEARCH RESULT SECTIONS - Unified Gradient Treatment
+// =============================================================================
 
-  // YEAR 3000 HOLOGRAPHIC MATERIAL REPLACEMENT
+.main-shelf-shelf {
   position: relative;
 
+  // Section header unification
+  .main-shelf-header {
+    position: relative;
+
+    h2,
+    h3,
+    h4 {
+      // Unified gradient text treatment
+      background: linear-gradient(
+        135deg,
+        rgba(var(--sn-search-gradient-primary-rgb), 1) 0%,
+        rgba(var(--sn-search-gradient-accent-rgb), 0.9) 60%,
+        rgba(var(--sn-search-gradient-secondary-rgb), 0.8) 100%
+      ) !important;
+      -webkit-background-clip: text !important;
+      background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+
+      // Gentle enhancement glow
+      text-shadow: 0 0 20px rgba(var(--sn-search-gradient-primary-rgb), 0.2) !important;
+    }
+  }
+}
+
+// =============================================================================
+// CARD UNIFICATION - HIGH SPECIFICITY - Eliminate Color Fragmentation
+// =============================================================================
+
+// Increased specificity to override enhanced cards and other modules
+body:has(.main-searchPage-content) .main-searchPage-content .main-card-card {
+  // YEAR 3000 GRADIENT CONSCIOUSNESS - ELIMINATE WHITE BOXES
+  background: transparent !important;
+  border: 1px solid rgba(var(--sn-search-gradient-primary-rgb), 0.15) !important;
+  border-radius: 12px !important;
+
+  // Enhanced gradient overlay (stronger since no white background)
   &::before {
     content: "";
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    right: -1px;
-    bottom: -1px;
-    z-index: -2;
-    background: conic-gradient(
-      from 0deg,
-      rgba(var(--spice-rgb-accent, 205, 214, 244), 0.6) 0deg,
-      rgba(var(--spice-rgb-blue, 137, 180, 250), 0.4) 72deg,
-      rgba(var(--spice-rgb-mauve, 203, 166, 247), 0.5) 144deg,
-      rgba(var(--spice-rgb-pink, 245, 194, 231), 0.4) 216deg,
-      rgba(var(--spice-rgb-accent, 205, 214, 244), 0.6) 288deg,
-      rgba(var(--spice-rgb-accent, 205, 214, 244), 0.6) 360deg
-    );
-    border-radius: 12px;
-    animation: plasma-border-rotation 3s linear infinite;
-    filter: blur(0.5px);
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
+    position: absolute !important;
     top: 0;
     left: 0;
     right: 0;
@@ -70,386 +159,464 @@ img[src*="image-cdn-ak.spotifycdn.com"],
     z-index: -1;
     background: linear-gradient(
       135deg,
-      rgba(var(--spice-rgb-base, 30, 30, 46), 0.92) 0%,
-      rgba(var(--spice-rgb-surface0, 69, 71, 90), 0.88) 50%,
-      rgba(var(--spice-rgb-surface1, 88, 91, 112), 0.85) 100%
-    );
-    border-radius: 8px;
-    backdrop-filter: blur(20px) saturate(1.4);
-  }
-}
-
-// === PHASE 1: TOP RESULT CARD - MAXIMUM ENERGY SIGNATURE ===
-[data-testid="top-result-card"] {
-  position: relative;
-  transform-style: preserve-3d;
-
-  // Enhanced holographic container
-  .pueeb339I8KrXZr0SDm1,
-  .mXNT9H2GU7lDW4cGx0q1 {
-    &::before {
-      background: conic-gradient(
-        from 0deg,
-        rgba(var(--spice-rgb-accent, 205, 214, 244), 0.8) 0deg,
-        rgba(var(--spice-rgb-blue, 137, 180, 250), 0.6) 60deg,
-        rgba(var(--spice-rgb-mauve, 203, 166, 247), 0.7) 120deg,
-        rgba(var(--spice-rgb-pink, 245, 194, 231), 0.6) 180deg,
-        rgba(var(--spice-rgb-peach, 250, 179, 135), 0.7) 240deg,
-        rgba(var(--spice-rgb-accent, 205, 214, 244), 0.8) 300deg,
-        rgba(var(--spice-rgb-accent, 205, 214, 244), 0.8) 360deg
-      );
-      animation: plasma-border-top-result 2.5s linear infinite;
-      filter: blur(0.8px);
-    }
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          var(--sn-search-intensity-boosted)
+        )
+        0%,
+      rgba(
+          var(--sn-search-gradient-secondary-rgb),
+          var(--sn-search-depth-factor-boosted)
+        )
+        50%,
+      rgba(
+          var(--sn-search-gradient-accent-rgb),
+          var(--sn-search-harmony-factor-boosted)
+        )
+        100%
+    ) !important;
+    border-radius: inherit;
+    transition: all var(--sn-search-transition-quick);
+    pointer-events: none;
   }
 
-  // HOLOGRAPHIC HOVER TRANSFORM (ENERGY LEVEL 5)
+  // Enhanced hover state (no white backgrounds)
   &:hover {
-    .pueeb339I8KrXZr0SDm1,
-    .mXNT9H2GU7lDW4cGx0q1 {
-      transform: perspective(1200px) rotateX(calc(var(--mouse-y, 0) * 8deg))
-        rotateY(calc(var(--mouse-x, 0) * 8deg)) translateZ(25px) scale(1.03);
-      transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1);
+    background: transparent !important;
+    border-color: rgba(
+      var(--sn-search-gradient-primary-rgb),
+      calc(0.25 * var(--sn-search-contrast-boost, 1))
+    ) !important;
+
+    &::before {
+      background: linear-gradient(
+        135deg,
+        rgba(
+            var(--sn-search-gradient-primary-rgb),
+            calc(var(--sn-search-intensity-boosted) * 1.5)
+          )
+          0%,
+        rgba(
+            var(--sn-search-gradient-secondary-rgb),
+            calc(var(--sn-search-depth-factor-boosted) * 1.5)
+          )
+          50%,
+        rgba(
+            var(--sn-search-gradient-accent-rgb),
+            calc(var(--sn-search-harmony-factor-boosted) * 1.5)
+          )
+          100%
+      ) !important;
     }
   }
 
-  // Temporal relevance indicator for top result
-  &::before {
-    content: "";
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: conic-gradient(
-      from 0deg,
-      rgba(var(--spice-rgb-accent, 205, 214, 244), 1) 0deg,
-      rgba(var(--spice-rgb-blue, 137, 180, 250), 0.8) 120deg,
-      rgba(var(--spice-rgb-mauve, 203, 166, 247), 1) 240deg,
-      rgba(var(--spice-rgb-accent, 205, 214, 244), 1) 360deg
-    );
-    animation: temporal-indicator-top 1.8s linear infinite;
-    z-index: 10;
-    box-shadow: 0 0 8px rgba(var(--spice-rgb-accent, 205, 214, 244), 0.5);
+  // Enhanced focus state
+  &:focus-visible {
+    outline: 2px solid rgba(var(--sn-search-gradient-primary-rgb), 0.8) !important;
+    outline-offset: 2px;
   }
 }
 
-// === PHASE 1: ENCORE TEXT QUANTUM ENHANCEMENT ===
-.e-9911-text,
-.encore-text-title-small,
-.encore-text-title-medium,
-.encore-text-body-small,
-.encore-text-body-medium {
-  position: relative;
+// =============================================================================
+// TOP RESULT - Enhanced Gradient Signature - HIGH SPECIFICITY
+// =============================================================================
 
-  // Energy glow for important headers
-  &.encore-text-title-small,
-  &.encore-text-title-medium {
-    text-shadow: 0 0 8px rgba(var(--spice-rgb-accent, 205, 214, 244), 0.4),
-      0 0 16px rgba(var(--spice-rgb-accent, 205, 214, 244), 0.2),
-      0 0 24px rgba(var(--spice-rgb-accent, 205, 214, 244), 0.1);
+body:has(.main-searchPage-content)
+  [data-testid="top-result-card"]
+  .main-card-card {
+  // Pure gradient border for top result (NO WHITE BACKGROUND)
+  border: 2px solid transparent !important;
+  background: transparent,
+    linear-gradient(
+        135deg,
+        rgba(var(--sn-search-gradient-primary-rgb), 0.4) 0%,
+        rgba(var(--sn-search-gradient-accent-rgb), 0.3) 50%,
+        rgba(var(--sn-search-gradient-secondary-rgb), 0.35) 100%
+      )
+      border-box !important;
 
-    // Quantum shimmer effect on hover
-    &:hover::before {
+  // Enhanced gradient overlay for top result
+  &::before {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--sn-search-gradient-primary-rgb), 0.15) 0%,
+      rgba(var(--sn-search-gradient-secondary-rgb), 0.1) 50%,
+      rgba(var(--sn-search-gradient-accent-rgb), 0.12) 100%
+    ) !important;
+  }
+
+  &:hover::before {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--sn-search-gradient-primary-rgb), 0.22) 0%,
+      rgba(var(--sn-search-gradient-secondary-rgb), 0.16) 50%,
+      rgba(var(--sn-search-gradient-accent-rgb), 0.18) 100%
+    ) !important;
+  }
+}
+
+// =============================================================================
+// ALBUM ART & IMAGES - Unified Enhancement Treatment - HIGH SPECIFICITY
+// =============================================================================
+
+body:has(.main-searchPage-content) .main-searchPage-content {
+  .main-image-image,
+  .main-cardImage-image,
+  .main-entityHeader-image {
+    // Unified gradient enhancement
+    filter: saturate(1.05) brightness(1.02) contrast(1.01) !important;
+    position: relative;
+
+    // Gentle gradient overlay on hover
+    &::after {
       content: "";
       position: absolute;
       top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
+      left: 0;
+      right: 0;
+      bottom: 0;
       background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.3) 50%,
-        transparent 100%
+        135deg,
+        rgba(var(--sn-search-gradient-primary-rgb), 0.02) 0%,
+        transparent 50%,
+        rgba(var(--sn-search-gradient-accent-rgb), 0.01) 100%
       );
-      animation: quantum-shimmer 1.5s ease-out forwards;
-      z-index: 1;
+      opacity: 0;
+      transition: opacity var(--sn-search-transition-quick);
+      border-radius: inherit;
       pointer-events: none;
+    }
+
+    .main-card-card:hover & {
+      &::after {
+        opacity: 1;
+      }
     }
   }
 }
 
-// === PHASE 1: LISTROW NEURAL CONNECTIONS ===
-.e-9911-box[role="group"],
-.ListRowTitle__ListRowText-sc-1xe2if1-1,
-.Areas__HeaderArea-sc-8gfrea-3 {
-  position: relative;
+// =============================================================================
+// ARTIST PAGES IN SEARCH - Gradient Consciousness Override - HIGH SPECIFICITY
+// =============================================================================
 
-  // Neural connection indicator
-  &::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    right: -15px;
-    width: 30px;
-    height: 1px;
+// Override any entityHeader styling within search context
+body:has(.main-searchPage-content) .main-entityHeader-container {
+  // Pure gradient background treatment (NO WHITE BACKGROUNDS)
+  background: transparent !important;
+
+  // Enhanced gradient overlay that matches search system
+  &::before {
     background: linear-gradient(
-      90deg,
-      rgba(var(--spice-rgb-accent, 205, 214, 244), 0.6) 0%,
-      rgba(var(--spice-rgb-surface1, 88, 91, 112), 0.3) 70%,
+      180deg,
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(var(--sn-search-intensity) * 1.5)
+        )
+        0%,
+      rgba(
+          var(--sn-search-gradient-secondary-rgb),
+          calc(var(--sn-search-depth-factor) * 1.2)
+        )
+        40%,
       transparent 100%
-    );
-    animation: neural-pulse 2.5s ease-in-out infinite;
-    opacity: 0;
-    transition: opacity 300ms ease;
-    transform: translateY(-50%);
-  }
-
-  &:hover::after {
-    opacity: 1;
+    ) !important;
+    opacity: 1 !important;
   }
 }
 
-// === PHASE 3: SECTION ENERGY SIGNATURES ===
-section.main-shelf-shelf[aria-label] {
-  position: relative;
-  margin: 40px 0;
+// =============================================================================
+// TEXT ELEMENTS - Enhanced Gradient Typography - HIGH SPECIFICITY
+// =============================================================================
 
-  // Section-specific energy signatures
-  &[aria-label*="Top result"] {
-    --section-energy-color: var(--spice-rgb-accent, 205, 214, 244);
-    --section-energy-intensity: 0.8;
+body:has(.main-searchPage-content) .main-searchPage-content {
+  .main-cardHeader-text,
+  .main-cardSubHeader-root,
+  .main-type-mestoBold,
+  .main-type-mesto {
+    // Enhanced gradient text enhancement for important elements
+    &:is(h1, h2, h3, h4, [data-testid*="title"]) {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.95) 0%,
+        rgba(var(--sn-search-gradient-primary-rgb), 0.9) 100%
+      ) !important;
+      -webkit-background-clip: text !important;
+      background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+    }
+
+    // Enhanced regular text visibility without white backgrounds
+    color: rgba(255, 255, 255, 0.85) !important;
   }
+}
 
-  &[aria-label*="Songs"] {
-    --section-energy-color: var(--spice-rgb-blue, 137, 180, 250);
-    --section-energy-intensity: 0.6;
-  }
+// =============================================================================
+// PLAY BUTTONS - Unified Gradient Treatment - HIGH SPECIFICITY
+// =============================================================================
 
-  &[aria-label*="Artists"] {
-    --section-energy-color: var(--spice-rgb-mauve, 203, 166, 247);
-    --section-energy-intensity: 0.7;
-  }
-
-  &[aria-label*="Albums"] {
-    --section-energy-color: var(--spice-rgb-pink, 245, 194, 231);
-    --section-energy-intensity: 0.65;
-  }
-
-  &[aria-label*="Playlists"] {
-    --section-energy-color: var(--spice-rgb-peach, 250, 179, 135);
-    --section-energy-intensity: 0.6;
-  }
-
-  // Neural connection lines between sections
-  &:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    bottom: -20px;
-    left: 50%;
-    width: 150px;
-    height: 2px;
-    transform: translateX(-50%);
+body:has(.main-searchPage-content) .main-searchPage-content {
+  .main-playButton-PlayButton,
+  .main-card-PlayButtonContainer button {
+    // Unified gradient background
     background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(
-          var(--section-energy-color),
-          calc(var(--section-energy-intensity, 0.6) * 0.7)
-        )
-        20%,
-      rgba(var(--section-energy-color), var(--section-energy-intensity, 0.6))
-        50%,
-      rgba(
-          var(--section-energy-color),
-          calc(var(--section-energy-intensity, 0.6) * 0.7)
-        )
-        80%,
-      transparent 100%
-    );
-    animation: neural-section-pulse 3.5s ease-in-out infinite;
+      135deg,
+      rgba(var(--sn-search-gradient-primary-rgb), 0.9) 0%,
+      rgba(var(--sn-search-gradient-accent-rgb), 0.8) 100%
+    ) !important;
+
+    // Enhanced hover state
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--sn-search-gradient-primary-rgb), 1) 0%,
+        rgba(var(--sn-search-gradient-accent-rgb), 0.9) 100%
+      ) !important;
+
+      box-shadow: 0 4px 12px rgba(var(--sn-search-gradient-primary-rgb), 0.3),
+        0 0 0 3px rgba(var(--sn-search-gradient-primary-rgb), 0.1) !important;
+    }
   }
 }
 
-// === PHASE 2: GRID CONTAINER QUANTUM ENHANCEMENT ===
-[role="presentation"].main-gridContainer-gridContainer,
-.main-gridContainer-gridContainer[style*="--min-column-width"] {
-  position: relative;
-  transform-style: preserve-3d;
+// =============================================================================
+// GRID CONTAINERS - Unified Layout Enhancement with Harmony Boost
+// =============================================================================
 
-  // Energy field activation on hover
-  &:hover::before {
-    content: "";
-    position: absolute;
-    top: -12px;
-    left: -12px;
-    right: -12px;
-    bottom: -12px;
-    z-index: -1;
-    background: radial-gradient(
-      ellipse 140% 100% at center,
-      rgba(var(--spice-rgb-accent, 205, 214, 244), 0.08) 0%,
-      rgba(var(--spice-rgb-surface0, 69, 71, 90), 0.04) 40%,
-      transparent 70%
-    );
-    border-radius: 16px;
-    animation: energy-field-pulse 1.2s ease-out forwards;
-  }
-}
-
-// === PHASE 4D: TEMPORAL RELEVANCE INDICATORS ===
-.main-card-card,
-[class*="Card"],
-.pueeb339I8KrXZr0SDm1 {
+body:has(.main-searchPage-content)
+  .main-searchPage-content
+  .main-gridContainer-gridContainer {
+  // Harmony-boosted grid enhancement
   &::before {
     content: "";
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: conic-gradient(
-      from 0deg,
-      rgba(var(--spice-rgb-accent, 205, 214, 244), 0.9) 0deg,
-      rgba(var(--spice-rgb-blue, 137, 180, 250), 0.7) 120deg,
-      rgba(var(--spice-rgb-mauve, 203, 166, 247), 0.9) 240deg,
-      rgba(var(--spice-rgb-accent, 205, 214, 244), 0.9) 360deg
-    );
-    animation: temporal-indicator 2.2s linear infinite;
-    z-index: 10;
-    opacity: 0;
-    transition: opacity 300ms ease;
-  }
-
-  &:hover::before {
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    z-index: -1;
+    background: radial-gradient(
+      ellipse 120% 80% at center,
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(0.02 * var(--sn-search-contrast-boost, 1))
+        )
+        0%,
+      rgba(
+          var(--sn-search-gradient-secondary-rgb),
+          calc(0.01 * var(--sn-search-contrast-boost, 1))
+        )
+        40%,
+      transparent 70%
+    ) !important;
     opacity: 1;
-  }
-}
-
-// === YEAR 3000 ANIMATIONS ===
-@keyframes plasma-border-rotation {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes plasma-border-top-result {
-  0% {
-    transform: rotate(0deg) scale(1);
-  }
-  50% {
-    transform: rotate(180deg) scale(1.05);
-  }
-  100% {
-    transform: rotate(360deg) scale(1);
-  }
-}
-
-@keyframes quantum-shimmer {
-  0% {
-    left: -100%;
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    left: 100%;
-    opacity: 0;
-  }
-}
-
-@keyframes neural-pulse {
-  0%,
-  100% {
-    opacity: 0.4;
-    transform: translateY(-50%) scaleX(1);
-  }
-  50% {
-    opacity: 1;
-    transform: translateY(-50%) scaleX(1.2);
-  }
-}
-
-@keyframes neural-section-pulse {
-  0%,
-  100% {
-    opacity: 0.5;
-    transform: translateX(-50%) scaleX(1);
-  }
-  50% {
-    opacity: 1;
-    transform: translateX(-50%) scaleX(1.1);
-  }
-}
-
-@keyframes temporal-indicator {
-  0% {
-    transform: rotate(0deg) scale(1);
-  }
-  50% {
-    transform: rotate(180deg) scale(1.15);
-  }
-  100% {
-    transform: rotate(360deg) scale(1);
-  }
-}
-
-@keyframes temporal-indicator-top {
-  0% {
-    transform: rotate(0deg) scale(1);
-  }
-  25% {
-    transform: rotate(90deg) scale(1.2);
-  }
-  50% {
-    transform: rotate(180deg) scale(1.1);
-  }
-  75% {
-    transform: rotate(270deg) scale(1.2);
-  }
-  100% {
-    transform: rotate(360deg) scale(1);
-  }
-}
-
-@keyframes energy-field-pulse {
-  0% {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-  100% {
-    opacity: 0.6;
     transform: scale(1);
+    border-radius: 12px;
+    pointer-events: none;
   }
 }
 
-// === PERFORMANCE OPTIMIZATIONS ===
+// =============================================================================
+// ALBUM ART & IMAGES - Harmony-Enhanced Treatment
+// =============================================================================
+
+body:has(.main-searchPage-content) .main-searchPage-content {
+  .main-image-image,
+  .main-cardImage-image,
+  .main-entityHeader-image {
+    // Unified gradient enhancement
+    filter: saturate(1.05) brightness(1.02) contrast(1.01) !important;
+    position: relative;
+
+    // Harmony-boosted gradient overlay on hover
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(
+            var(--sn-search-gradient-primary-rgb),
+            calc(0.02 * var(--sn-search-contrast-boost, 1))
+          )
+          0%,
+        transparent 50%,
+        rgba(
+            var(--sn-search-gradient-accent-rgb),
+            calc(0.01 * var(--sn-search-contrast-boost, 1))
+          )
+          100%
+      );
+      opacity: 0;
+      transition: opacity var(--sn-search-transition-quick);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .main-card-card:hover & {
+      &::after {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+// =============================================================================
+// TEXT ELEMENTS - Harmony-Enhanced Typography
+// =============================================================================
+
+body:has(.main-searchPage-content) .main-searchPage-content {
+  .main-cardHeader-text,
+  .main-cardSubHeader-root,
+  .main-type-mestoBold,
+  .main-type-mesto {
+    // Enhanced gradient text with harmony boost for titles
+    &:is(h1, h2, h3, h4, [data-testid*="title"]) {
+      background: linear-gradient(
+        135deg,
+        rgba(
+            var(--sn-oklab-processed-bright-highlight-rgb),
+            calc(0.95 * var(--sn-search-contrast-boost, 1))
+          )
+          0%,
+        rgba(
+            var(--sn-search-gradient-primary-rgb),
+            calc(0.9 * var(--sn-search-contrast-boost, 1))
+          )
+          100%
+      ) !important;
+      -webkit-background-clip: text !important;
+      background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+    }
+
+    // Enhanced regular text visibility with harmony boost
+    color: rgba(
+      255,
+      255,
+      255,
+      calc(0.85 * var(--sn-search-contrast-boost, 1))
+    ) !important;
+  }
+}
+
+// =============================================================================
+// PLAY BUTTONS - Harmony-Enhanced Gradient Treatment
+// =============================================================================
+
+body:has(.main-searchPage-content) .main-searchPage-content {
+  .main-playButton-PlayButton,
+  .main-card-PlayButtonContainer button {
+    // Harmony-boosted gradient background
+    background: linear-gradient(
+      135deg,
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(0.9 * var(--sn-search-contrast-boost, 1))
+        )
+        0%,
+      rgba(
+          var(--sn-search-gradient-accent-rgb),
+          calc(0.8 * var(--sn-search-contrast-boost, 1))
+        )
+        100%
+    ) !important;
+
+    // Enhanced hover state with harmony boost
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        rgba(
+            var(--sn-search-gradient-primary-rgb),
+            calc(1 * var(--sn-search-contrast-boost, 1))
+          )
+          0%,
+        rgba(
+            var(--sn-search-gradient-accent-rgb),
+            calc(0.9 * var(--sn-search-contrast-boost, 1))
+          )
+          100%
+      ) !important;
+
+      box-shadow: 0 4px 12px
+          rgba(
+            var(--sn-search-gradient-primary-rgb),
+            calc(0.3 * var(--sn-search-contrast-boost, 1))
+          ),
+        0 0 0 3px
+          rgba(
+            var(--sn-search-gradient-primary-rgb),
+            calc(0.1 * var(--sn-search-contrast-boost, 1))
+          ) !important;
+    }
+  }
+}
+
+// =============================================================================
+// ARTIST PAGES IN SEARCH - Harmony-Enhanced Override
+// =============================================================================
+
+// Override any entityHeader styling within search context
+body:has(.main-searchPage-content) .main-entityHeader-container {
+  // Pure gradient background treatment (NO WHITE BACKGROUNDS)
+  background: transparent !important;
+
+  // Harmony-boosted gradient overlay
+  &::before {
+    background: linear-gradient(
+      180deg,
+      rgba(
+          var(--sn-search-gradient-primary-rgb),
+          calc(var(--sn-search-intensity-boosted) * 1.5)
+        )
+        0%,
+      rgba(
+          var(--sn-search-gradient-secondary-rgb),
+          calc(var(--sn-search-depth-factor-boosted) * 1.2)
+        )
+        40%,
+      transparent 100%
+    ) !important;
+    opacity: 1 !important;
+  }
+}
+
+// =============================================================================
+// ACCESSIBILITY & RESPONSIVE HARMONICS
+// =============================================================================
+
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.1s !important;
-    animation-iteration-count: 1 !important;
+  .main-searchPage-content * {
+    animation: none !important;
     transition-duration: 0.1s !important;
   }
 }
 
-// Mobile optimizations
 @media (max-width: 768px) {
-  .pueeb339I8KrXZr0SDm1::before,
-  .GOcsybnoHYyJGQGDRuwj::before {
-    animation-duration: 4s; // Slower plasma borders on mobile
-  }
+  :root {
+    // Responsive harmony boost scaling - enhanced for mobile vibrancy
+    --sn-search-intensity: 0.12; // Increased from 0.08 to maintain vibrancy
+    --sn-search-depth-factor: 0.08; // Increased from 0.06 to maintain depth
+    --sn-search-harmony-factor: 0.1; // Increased from 0.07 to maintain accent presence
 
-  [data-testid="top-result-card"]::before {
-    width: 8px;
-    height: 8px; // Slightly larger temporal indicator on mobile
+    // Ensure contrast boost is maintained on mobile
+    --sn-search-intensity-boosted: calc(
+      var(--sn-search-intensity) * var(--sn-search-contrast-boost, 1)
+    );
+    --sn-search-depth-factor-boosted: calc(
+      var(--sn-search-depth-factor) * var(--sn-search-contrast-boost, 1)
+    );
+    --sn-search-harmony-factor-boosted: calc(
+      var(--sn-search-harmony-factor) * var(--sn-search-contrast-boost, 1)
+    );
   }
 }
 
-// GPU acceleration for smooth performance
-.pueeb339I8KrXZr0SDm1,
-.GOcsybnoHYyJGQGDRuwj,
-.main-card-card {
-  will-change: transform;
-  contain: layout style paint;
-}
+// =============================================================================
+// YEAR 3000 HARMONY-INTEGRATED SEARCH SYSTEM COMPLETE
+// =============================================================================
+// This module creates a seamless Year 3000 gradient consciousness that flows
+// throughout the search experience with intelligent contrast boosting from the
+// harmony engine to ensure visibility regardless of extracted album colors

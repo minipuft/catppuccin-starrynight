@@ -36,6 +36,11 @@
 <br/>
 <sub><b>💖 Liked Songs</b><br/>Personal music haven</sub>
 </td>
+<td align="center" width="33%">
+<img src="assets/search.png" alt="Search Interface" width="300"/>
+<br/>
+<sub><b>🔍 Search View</b><br/>Intuitive discovery experience</sub>
+</td>
 </tr>
 </table>
 

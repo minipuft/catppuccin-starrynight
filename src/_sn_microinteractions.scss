@@ -1,50 +1,105 @@
-// StarryNight Microinteractions Module - Phase 4.1: Gradient Intelligence
-// Adds intelligent gradient microinteractions that enhance existing card and playlist systems
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 MICROINTERACTIONS - Rhythmic Consciousness in Every Touch
+// Kinetic Verbs: RIPPLE, BLOOM, REFRACT, HARMONIZE
+// Every interaction pulses with the heartbeat of the universe
+// ████████████████████████████████████████████████████████████████████████████████
 
 @use "mixins" as *;
 
-// PHASE 4.1: CSS Custom Properties for Microinteractions
-// =============================================================================
+// ══════════════════════════════════════════════════════════════════════════════
+// YEAR 3000 BEATSYNC MICROINTERACTION VARIABLES
+// ══════════════════════════════════════════════════════════════════════════════
 
 :root {
-  // Phase 4 Microinteraction Variables (extends existing gradient system)
+  // === RHYTHMIC FOUNDATION VARIABLES ===
+  --micro-beat-intensity: var(
+    --sn-beat-pulse-intensity,
+    0
+  ); // Direct beat connection
+  --micro-breathing-scale: var(--sn-breathing-scale, 1); // Breathing rhythm
+  --micro-rhythm-phase: var(--sn-rhythm-phase, 0); // Harmonic oscillation
+
+  // === Enhanced Microinteraction Variables (BeatSync Enabled) ===
   --ripple-color: var(--sn-gradient-primary);
-  --ripple-duration: var(--sn-gradient-transition);
-  --ripple-intensity: 0.3;
-  --interaction-feedback-delay: 0.1s;
+  --ripple-duration: calc(
+    var(--sn-gradient-transition) * (1 - (var(--micro-beat-intensity) * 0.3))
+  ); // Faster on beats
+  --ripple-intensity: calc(
+    0.3 + (var(--micro-beat-intensity) * 0.4)
+  ); // More intense on beats
+  --interaction-feedback-delay: calc(
+    0.1s * (1 - (var(--micro-beat-intensity) * 0.5))
+  ); // Quicker response
 
-  // Microinteraction timing (coordinates with existing transitions)
-  --micro-fast: 0.15s;
-  --micro-medium: 0.3s;
-  --micro-slow: 0.6s;
+  // === Rhythmic Timing Variables ===
+  --micro-fast: calc(0.15s * (1 - (var(--micro-beat-intensity) * 0.3)));
+  --micro-medium: calc(0.3s * (1 - (var(--micro-beat-intensity) * 0.2)));
+  --micro-slow: calc(0.6s * (1 - (var(--micro-beat-intensity) * 0.1)));
 
-  // Feedback intensity levels
-  --feedback-subtle: 0.1;
-  --feedback-moderate: 0.2;
-  --feedback-prominent: 0.3;
+  // === Beat-Responsive Feedback Intensity ===
+  --feedback-subtle: calc(0.1 + (var(--micro-beat-intensity) * 0.05));
+  --feedback-moderate: calc(0.2 + (var(--micro-beat-intensity) * 0.1));
+  --feedback-prominent: calc(0.3 + (var(--micro-beat-intensity) * 0.2));
+
+  // === Cosmic Enhancement Variables ===
+  --micro-glow-radius: calc(8px + (12px * var(--micro-beat-intensity)));
+  --micro-scale-enhancement: calc(1 + (var(--micro-beat-intensity) * 0.02));
+  --micro-hue-shift: calc(var(--micro-rhythm-phase) * 1deg);
 }
 
-// PHASE 4.1: Enhanced Card Microinteractions
-// =============================================================================
+// ══════════════════════════════════════════════════════════════════════════════
+// YEAR 3000 ENHANCED CARD MICROINTERACTIONS - Cosmic Touch Symphony
+// ══════════════════════════════════════════════════════════════════════════════
 
-// Enhance existing main-card-card with gradient ripples (builds on _sn_enhanced_cards.scss)
+// Enhanced main-card-card with YEAR 3000 rhythmic consciousness
 .main-card-card {
-  // Apply gradient ripple to existing card system
+  // Kinetic Verb: OSCILLATE - Base breathing with rhythm
+  transform: scale(var(--micro-breathing-scale));
+  transition: transform var(--micro-medium) var(--sn-easing-explorer, ease-out);
+
+  // Apply gradient ripple with beat sync
   @include gradient-ripple(
     rgba(var(--spice-rgb-accent), var(--feedback-moderate))
   );
 
-  // Enhanced hover glow that coordinates with existing hover effects
+  // Enhanced hover glow with rhythmic intensity
   @include gradient-glow(var(--sn-gradient-primary), var(--feedback-subtle));
 
-  // Enhance existing play button interaction
+  // Add cosmic filter effects
+  filter: hue-rotate(var(--micro-hue-shift))
+    saturate(calc(1 + (var(--micro-beat-intensity) * 0.1)))
+    brightness(calc(1 + (var(--micro-beat-intensity) * 0.05)));
+
+  // Kinetic Verb: BLOOM - Enhanced hover with rhythm
+  &:hover {
+    transform: scale(
+      calc(var(--micro-breathing-scale) * var(--micro-scale-enhancement))
+    );
+    box-shadow: 0 0 var(--micro-glow-radius)
+      rgba(
+        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+        var(--feedback-moderate)
+      );
+  }
+
+  // Enhanced play button interaction with cosmic consciousness
   .main-card-PlayButtonContainer,
   .main-playButton-PlayButton {
-    @include interaction-feedback(1.05, true);
+    @include interaction-feedback(
+      calc(1.05 + (var(--micro-beat-intensity) * 0.03)),
+      true
+    );
 
-    // Override ripple color for play buttons
+    // Beat-responsive ripple enhancement
     --ripple-color: var(--spice-accent);
     --ripple-intensity: var(--feedback-prominent);
+
+    // Cosmic glow pulse
+    box-shadow: 0 0 calc(var(--micro-glow-radius) * 0.8)
+      rgba(
+        var(--spice-rgb-accent),
+        calc(var(--feedback-moderate) * var(--micro-beat-intensity))
+      );
   }
 }
 
@@ -121,37 +176,83 @@
   );
 }
 
-// PHASE 4.1: Control Button Enhancements
-// =============================================================================
+// ══════════════════════════════════════════════════════════════════════════════
+// YEAR 3000 CONTROL BUTTON COSMIC ENHANCEMENT - The Hearts of Interaction
+// ══════════════════════════════════════════════════════════════════════════════
 
-// Enhance existing shuffle and control buttons (builds on _now_playing.scss)
+// Enhanced shuffle and transport buttons with YEAR 3000 consciousness
 .main-shuffleButton-button,
 .main-skipForwardButton-button,
 .main-skipBackButton-button {
-  @include interaction-feedback(1.05, true);
+  // Kinetic Verb: OSCILLATE - Base breathing
+  transform: scale(var(--micro-breathing-scale));
+
+  @include interaction-feedback(
+    calc(1.05 + (var(--micro-beat-intensity) * 0.03)),
+    true
+  );
   @include gradient-ripple(
     rgba(var(--spice-rgb-accent), var(--feedback-moderate))
   );
 
-  // Enhanced active state for shuffle button
+  // Cosmic filter enhancement
+  filter: hue-rotate(var(--micro-hue-shift))
+    brightness(calc(1 + (var(--micro-beat-intensity) * 0.08)));
+  transition: all var(--micro-fast) var(--sn-easing-explorer, ease-out);
+
+  // Kinetic Verb: BLOOM - Enhanced hover
+  &:hover {
+    transform: scale(calc(var(--micro-breathing-scale) * 1.08));
+    box-shadow: 0 0 var(--micro-glow-radius)
+      rgba(var(--spice-rgb-accent), var(--feedback-moderate));
+  }
+
+  // Enhanced active state for shuffle button with rhythm consciousness
   &.main-shuffleButton-active {
     --ripple-color: var(--spice-accent);
 
-    // Enhanced glow for active state
-    box-shadow: 0 0 8px rgba(var(--spice-rgb-accent), 0.4);
+    // Kinetic Verb: REFRACT - Rhythmic glow for active state
+    box-shadow: 0 0 calc(var(--micro-glow-radius) * 1.2)
+      rgba(
+        var(--spice-rgb-accent),
+        calc(0.4 + (var(--micro-beat-intensity) * 0.3))
+      );
+    text-shadow: 0 0 calc(4px * var(--micro-beat-intensity))
+      rgba(var(--spice-rgb-accent), var(--micro-beat-intensity));
   }
 }
 
-// Enhanced main play button
+// Enhanced main play button - THE COSMIC HEART 💫
 .main-playButton-PlayButton.main-playButton-primary {
-  @include interaction-feedback(1.08, true);
+  // Kinetic Verb: BLOOM - Maximum love for the most important button
+  transform: scale(
+    calc(
+      var(--micro-breathing-scale) * (1 + (var(--micro-beat-intensity) * 0.05))
+    )
+  );
+
+  @include interaction-feedback(
+    calc(1.08 + (var(--micro-beat-intensity) * 0.05)),
+    true
+  );
   @include gradient-ripple(
     rgba(var(--spice-rgb-accent), var(--feedback-prominent))
   );
 
-  // Prominent glow effect
+  // Cosmic pulse enhancement
+  filter: hue-rotate(var(--micro-hue-shift))
+    brightness(calc(1 + (var(--micro-beat-intensity) * 0.12)))
+    saturate(calc(1.1 + (var(--micro-beat-intensity) * 0.2)));
+  transition: all var(--micro-fast) cubic-bezier(0.175, 0.885, 0.32, 1.4);
+
+  // Prominent glow effect with rhythm
   &:hover {
-    box-shadow: 0 0 16px rgba(var(--spice-rgb-accent), 0.5);
+    box-shadow: 0 0 calc(var(--micro-glow-radius) * 2)
+      rgba(
+        var(--spice-rgb-accent),
+        calc(0.5 + (var(--micro-beat-intensity) * 0.3))
+      );
+    transform: scale(calc(var(--micro-breathing-scale) * 1.12));
   }
 }
 
