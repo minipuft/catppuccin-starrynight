@@ -430,69 +430,6 @@
   // =============================================================================
   // PHASE 2: ENHANCED SETTINGS MANAGEMENT & VALIDATION
   // =============================================================================
-  // -------------------------
-  // Configuration Options
-  // -------------------------
-
-  // Accent colors
-  const accents = [
-    "none",
-    "rosewater",
-    "flamingo",
-    "pink",
-    "maroon",
-    "red",
-    "peach",
-    "yellow",
-    "green",
-    "teal",
-    "sapphire",
-    "blue",
-    "sky",
-    "mauve",
-    "lavender",
-  ];
-
-  // StarryNight settings options
-  const gradientIntensityOptions = [
-    { value: "disabled", label: "Disabled" },
-    { value: "minimal", label: "Minimal" },
-    { value: "balanced", label: "Balanced" },
-    { value: "intense", label: "Intense" },
-  ];
-
-  const starDensityOptions = [
-    { value: "disabled", label: "Disabled" },
-    { value: "minimal", label: "Minimal" },
-    { value: "balanced", label: "Balanced" },
-    { value: "intense", label: "Intense" },
-  ];
-
-  // Performance quality options
-  const performanceOptions = [
-    { value: "auto", label: "Auto (Recommended)" },
-    { value: "quality", label: "High Quality" },
-    { value: "balanced", label: "Balanced" },
-    { value: "performance", label: "Performance Mode" },
-  ];
-
-  // Glassmorphism intensity options
-  const glassmorphismOptions = [
-    { value: "disabled", label: "Disabled" },
-    { value: "minimal", label: "Minimal" },
-    { value: "balanced", label: "Balanced" },
-    { value: "intense", label: "Intense" },
-  ];
-
-  // 3D morphing mode options
-  const morphing3DOptions = [
-    { value: "disabled", label: "Disabled" },
-    { value: "minimal", label: "Minimal" },
-    { value: "balanced", label: "Balanced" },
-    { value: "intense", label: "Intense" },
-    { value: "floating", label: "Floating Animation" },
-  ];
-
   class SettingsManager {
     constructor() {
       this.prefix = "catppuccin-starrynight";
@@ -1051,6 +988,64 @@
     colorAnalyzer.performanceMonitor
   );
 
+  // Accent colors
+  const accents = [
+    "none",
+    "rosewater",
+    "flamingo",
+    "pink",
+    "maroon",
+    "red",
+    "peach",
+    "yellow",
+    "green",
+    "teal",
+    "sapphire",
+    "blue",
+    "sky",
+    "mauve",
+    "lavender",
+  ];
+
+  // StarryNight settings options
+  const gradientIntensityOptions = [
+    { value: "disabled", label: "Disabled" },
+    { value: "minimal", label: "Minimal" },
+    { value: "balanced", label: "Balanced" },
+    { value: "intense", label: "Intense" },
+  ];
+
+  const starDensityOptions = [
+    { value: "disabled", label: "Disabled" },
+    { value: "minimal", label: "Minimal" },
+    { value: "balanced", label: "Balanced" },
+    { value: "intense", label: "Intense" },
+  ];
+
+  // Phase 1: Performance quality options
+  const performanceOptions = [
+    { value: "auto", label: "Auto (Recommended)" },
+    { value: "quality", label: "High Quality" },
+    { value: "balanced", label: "Balanced" },
+    { value: "performance", label: "Performance Mode" },
+  ];
+
+  // PHASE 1: Glassmorphism intensity options
+  const glassmorphismOptions = [
+    { value: "disabled", label: "Disabled" },
+    { value: "minimal", label: "Minimal" },
+    { value: "balanced", label: "Balanced" },
+    { value: "intense", label: "Intense" },
+  ];
+
+  // PHASE 3: 3D morphing mode options
+  const morphing3DOptions = [
+    { value: "disabled", label: "Disabled" },
+    { value: "minimal", label: "Minimal" },
+    { value: "balanced", label: "Balanced" },
+    { value: "intense", label: "Intense" },
+    { value: "floating", label: "Floating Animation" },
+  ];
 
   // Dynamic color extraction variables
   let currentTrackUri = null;
