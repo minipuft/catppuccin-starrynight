@@ -328,6 +328,31 @@
   // YEAR 3000 UTILITIES - Centralized Helper Functions
   // =============================================================================
   const Year3000Utilities = {
+    _cachedRoot: null,
+    _cachedRootStyle: null,
+
+    getRootStyle() {
+      const currentRoot = document.documentElement;
+      if (this._cachedRoot !== currentRoot || !this._cachedRootStyle) {
+        this._cachedRoot = currentRoot;
+        this._cachedRootStyle = getComputedStyle(currentRoot);
+      }
+      return this._cachedRootStyle;
+    },
+
+    throttle(func, limit) {
+      let inThrottle;
+      return function () {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+          func.apply(context, args);
+          inThrottle = true;
+          setTimeout(() => (inThrottle = false), limit);
+        }
+      };
+    },
+
     hexToRgb(hex) {
       if (typeof hex !== "string") {
         console.warn(
