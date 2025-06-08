@@ -832,13 +832,15 @@ export class MusicSyncService {
     this.performanceInterval = setInterval(() => {
       if (
         this.metrics.avgProcessingTime >
-        this.config.performance.processingTimeTarget
+        MUSIC_SYNC_CONFIG.performance.processingTimeTarget
       ) {
-        if (this.config.enableDebug) {
-          console.warn(
-            `[MusicSyncService] Performance warning: Avg processing time ${this.metrics.avgProcessingTime}ms exceeds target ${this.config.performance.processingTimeTarget}ms`
-          );
-        }
+        console.warn(
+          `[MusicSyncService] High average processing time: ${this.metrics.avgProcessingTime.toFixed(
+            2
+          )}ms exceeds target ${
+            MUSIC_SYNC_CONFIG.performance.processingTimeTarget
+          }ms`
+        );
       }
     }, 30000);
   }

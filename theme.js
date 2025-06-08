@@ -5,50 +5,36 @@ var catppuccinStarryNight = (() => {
   var __getOwnPropNames = Object.getOwnPropertyNames;
   var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
-  var __require = /* @__PURE__ */ ((x) =>
-    typeof require !== "undefined"
-      ? require
-      : typeof Proxy !== "undefined"
-      ? new Proxy(x, {
-          get: (a, b) => (typeof require !== "undefined" ? require : a)[b],
-        })
-      : x)(function (x) {
-    if (typeof require !== "undefined") return require.apply(this, arguments);
+  var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+    get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+  }) : x)(function(x) {
+    if (typeof require !== "undefined")
+      return require.apply(this, arguments);
     throw Error('Dynamic require of "' + x + '" is not supported');
   });
-  var __esm = (fn, res) =>
-    function __init() {
-      return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])((fn = 0))), res;
-    };
+  var __esm = (fn, res) => function __init() {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  };
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
   };
   var __copyProps = (to, from, except, desc) => {
-    if ((from && typeof from === "object") || typeof from === "function") {
+    if (from && typeof from === "object" || typeof from === "function") {
       for (let key of __getOwnPropNames(from))
         if (!__hasOwnProp.call(to, key) && key !== except)
-          __defProp(to, key, {
-            get: () => from[key],
-            enumerable:
-              !(desc = __getOwnPropDesc(from, key)) || desc.enumerable,
-          });
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
     }
     return to;
   };
-  var __toESM = (mod, isNodeMode, target) => (
-    (target = mod != null ? __create(__getProtoOf(mod)) : {}),
-    __copyProps(
-      // If the importer is in node compatibility mode or this is not an ESM
-      // file that has been converted to a CommonJS file using a Babel-
-      // compatible transform (i.e. "__esModule" has not been set), then set
-      // "default" to the CommonJS "module.exports" for node compatibility.
-      isNodeMode || !mod || !mod.__esModule
-        ? __defProp(target, "default", { value: mod, enumerable: true })
-        : target,
-      mod
-    )
-  );
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
 
   // src-js/config/globalConfig.js
   var HARMONIC_MODES, ARTISTIC_MODE_PROFILES, YEAR3000_CONFIG;
@@ -58,41 +44,39 @@ var catppuccinStarryNight = (() => {
         "analogous-flow": {
           rule: "analogous",
           angle: 30,
-          description: "Gentle rivers of adjacent hues",
+          description: "Gentle rivers of adjacent hues"
         },
         "triadic-trinity": {
           rule: "triadic",
           angle: 120,
-          description: "Three-point stellar equilibrium",
+          description: "Three-point stellar equilibrium"
         },
         "complementary-yin-yang": {
           rule: "complementary",
           angle: 180,
-          description: "Opposing forces in harmony",
+          description: "Opposing forces in harmony"
         },
         "tetradic-cosmic-cross": {
           rule: "tetradic",
           angle: 90,
-          description: "Four-dimensional color matrix",
+          description: "Four-dimensional color matrix"
         },
         "split-complementary-aurora": {
           rule: "split-complementary",
           angle: 150,
-          description: "Dancing polar opposites",
+          description: "Dancing polar opposites"
         },
         "monochromatic-meditation": {
           rule: "monochromatic",
           angle: 0,
-          description: "Single-hue consciousness expansion",
-        },
+          description: "Single-hue consciousness expansion"
+        }
       };
       ARTISTIC_MODE_PROFILES = {
         "corporate-safe": {
           displayName: "Corporate Safe",
-          description:
-            "Elegant professional choreography with subtle Year 3000 enhancements",
-          philosophy:
-            "Refined efficiency that respects workspace harmony while providing gentle predictive assistance",
+          description: "Elegant professional choreography with subtle Year 3000 enhancements",
+          philosophy: "Refined efficiency that respects workspace harmony while providing gentle predictive assistance",
           multipliers: {
             opacity: 0.15,
             saturation: 1.05,
@@ -105,7 +89,7 @@ var catppuccinStarryNight = (() => {
             quantumEmpathyLevel: 0.3,
             aestheticGravityStrength: 0.1,
             emergentChoreography: false,
-            visualIntensityBase: 0.8,
+            visualIntensityBase: 0.8
           },
           features: {
             rippleEffects: false,
@@ -122,7 +106,7 @@ var catppuccinStarryNight = (() => {
             dimensionalEffects: false,
             quantumEmpathy: false,
             // Disabled for professional environments
-            aestheticGravity: false,
+            aestheticGravity: false
             // Disabled for professional environments
           },
           performance: {
@@ -130,15 +114,13 @@ var catppuccinStarryNight = (() => {
             animationThrottle: 32,
             // 30fps for efficiency
             enableGPUAcceleration: false,
-            reducedMotion: true,
-          },
+            reducedMotion: true
+          }
         },
         "artist-vision": {
           displayName: "Artist Vision",
-          description:
-            "Balanced creative expression that enhances musical experience without overwhelming",
-          philosophy:
-            "Harmonic amplification that honors artistic intent while providing musical visual synchronization",
+          description: "Balanced creative expression that enhances musical experience without overwhelming",
+          philosophy: "Harmonic amplification that honors artistic intent while providing musical visual synchronization",
           multipliers: {
             opacity: 0.25,
             saturation: 1.25,
@@ -151,7 +133,7 @@ var catppuccinStarryNight = (() => {
             quantumEmpathyLevel: 0.6,
             aestheticGravityStrength: 0.4,
             emergentChoreography: true,
-            visualIntensityBase: 1,
+            visualIntensityBase: 1
           },
           features: {
             rippleEffects: true,
@@ -171,7 +153,7 @@ var catppuccinStarryNight = (() => {
             // Moderate
             quantumEmpathy: true,
             // Balanced empathy assistance
-            aestheticGravity: true,
+            aestheticGravity: true
             // Balanced gravitational effects
           },
           performance: {
@@ -179,15 +161,13 @@ var catppuccinStarryNight = (() => {
             animationThrottle: 16,
             // 60fps
             enableGPUAcceleration: true,
-            reducedMotion: false,
-          },
+            reducedMotion: false
+          }
         },
         "cosmic-maximum": {
           displayName: "Cosmic Maximum",
-          description:
-            "Full Year 3000 emergent systems choreography with kinetic beauty and aesthetic gravity",
-          philosophy:
-            "Gravitational optimism through aesthetic attractor fields that create quantum empathy and temporal play",
+          description: "Full Year 3000 emergent systems choreography with kinetic beauty and aesthetic gravity",
+          philosophy: "Gravitational optimism through aesthetic attractor fields that create quantum empathy and temporal play",
           multipliers: {
             opacity: 0.45,
             saturation: 1.75,
@@ -200,7 +180,7 @@ var catppuccinStarryNight = (() => {
             quantumEmpathyLevel: 0.85,
             aestheticGravityStrength: 1.6,
             emergentChoreography: true,
-            visualIntensityBase: 1.4,
+            visualIntensityBase: 1.4
           },
           features: {
             rippleEffects: true,
@@ -225,7 +205,7 @@ var catppuccinStarryNight = (() => {
             // Visual magnetism
             quantumEmpathy: true,
             // Full prediction
-            temporalPlay: true,
+            temporalPlay: true
             // Time-folding effects
           },
           performance: {
@@ -233,9 +213,9 @@ var catppuccinStarryNight = (() => {
             animationThrottle: 8,
             // 120fps for smoothness
             enableGPUAcceleration: true,
-            reducedMotion: false,
-          },
-        },
+            reducedMotion: false
+          }
+        }
       };
       YEAR3000_CONFIG = {
         enableDebug: true,
@@ -250,9 +230,9 @@ var catppuccinStarryNight = (() => {
             // Throttle frequent warnings
             throttleInterval: 5e3,
             // ms between repeated warnings
-            enableAdaptiveDegradation: true,
+            enableAdaptiveDegradation: true
             // Auto-reduce quality when needed
-          },
+          }
         },
         enableColorExtraction: true,
         enableMusicAnalysis: true,
@@ -269,11 +249,9 @@ var catppuccinStarryNight = (() => {
         _pendingArtisticMode: null,
         // Initialize bound methods to preserve context
         init() {
-          this.boundGetCurrentMultipliers =
-            this.getCurrentMultipliers.bind(this);
+          this.boundGetCurrentMultipliers = this.getCurrentMultipliers.bind(this);
           this.boundGetCurrentFeatures = this.getCurrentFeatures.bind(this);
-          this.boundGetCurrentPerformanceSettings =
-            this.getCurrentPerformanceSettings.bind(this);
+          this.boundGetCurrentPerformanceSettings = this.getCurrentPerformanceSettings.bind(this);
           if (this._pendingArtisticMode && this.isFullyInitialized()) {
             if (this.enableDebug) {
               console.log(
@@ -300,37 +278,37 @@ var catppuccinStarryNight = (() => {
           saturation: 1.45,
           brightness: 1.25,
           contrast: 1.35,
-          musicEnergyBoost: 1.6,
+          musicEnergyBoost: 1.6
         },
         corporateMultipliers: {
           opacity: 0.08,
           saturation: 1.05,
           brightness: 1.02,
           contrast: 1.01,
-          musicEnergyBoost: 1,
+          musicEnergyBoost: 1
         },
         cosmicMultipliers: {
           opacity: 0.45,
           saturation: 1.75,
           brightness: 1.5,
           contrast: 1.6,
-          musicEnergyBoost: 2,
+          musicEnergyBoost: 2
         },
         musicVisualSync: {
           energyScaling: {
             low: 0.6,
             medium: 1,
-            high: 1.4,
+            high: 1.4
           },
           valenceScaling: {
             sad: 0.8,
             neutral: 1,
-            happy: 1.3,
+            happy: 1.3
           },
           danceabilityEffects: {
             enable: true,
             animationSpeedMultiplier: 1.5,
-            blurVariation: 0.3,
+            blurVariation: 0.3
           },
           // NEW: Enhanced BPM calculation (inspired by Cat Jam extension)
           enhancedBPM: {
@@ -347,7 +325,7 @@ var catppuccinStarryNight = (() => {
               // Pop/Electronic
               lowMediumDance: { min: 80, max: 180, value: 0.4 },
               // General music
-              lowDance: { value: 0.2 },
+              lowDance: { value: 0.2 }
               // Very slow/fast
             },
             // Energy estimation from tempo + loudness
@@ -358,20 +336,20 @@ var catppuccinStarryNight = (() => {
               // How much loudness affects energy estimate
               tempoRange: { min: 60, max: 180 },
               // Expected tempo range
-              loudnessRange: { min: -60, max: 0 },
+              loudnessRange: { min: -60, max: 0 }
               // Expected loudness range (dB)
             },
             // Enhanced BPM calculation parameters
             danceabilityThresholds: {
               high: 0.7,
               // High danceability - use full tempo
-              low: 0.3,
+              low: 0.3
               // Low danceability - may reduce tempo
             },
             energyMultiplierRange: {
               min: 0.8,
               // Minimum energy multiplier
-              max: 1.4,
+              max: 1.4
               // Maximum energy multiplier
             },
             tempoMultipliers: {
@@ -379,7 +357,7 @@ var catppuccinStarryNight = (() => {
               // Full tempo for danceable tracks
               mediumDance: 0.75,
               // Moderate reduction
-              lowDance: 0.5,
+              lowDance: 0.5
               // Significant reduction for smooth visuals
             },
             // Fallback values when audio data is unavailable
@@ -389,17 +367,15 @@ var catppuccinStarryNight = (() => {
               danceability: 0.5,
               energy: 0.5,
               key: 0,
-              timeSignature: 4,
-            },
-          },
+              timeSignature: 4
+            }
+          }
         },
         // Enhanced: Get current mode profile with full Year 3000 parameters
         getCurrentModeProfile() {
           try {
             const mode = this.artisticMode || "artist-vision";
-            const profile =
-              ARTISTIC_MODE_PROFILES[mode] ||
-              ARTISTIC_MODE_PROFILES["artist-vision"];
+            const profile = ARTISTIC_MODE_PROFILES[mode] || ARTISTIC_MODE_PROFILES["artist-vision"];
             if (!profile) {
               console.warn(
                 `[YEAR3000_CONFIG] No profile found for mode: ${mode}, using default`
@@ -408,10 +384,7 @@ var catppuccinStarryNight = (() => {
             }
             return profile;
           } catch (error) {
-            console.error(
-              `[YEAR3000_CONFIG] Error in getCurrentModeProfile:`,
-              error
-            );
+            console.error(`[YEAR3000_CONFIG] Error in getCurrentModeProfile:`, error);
             return ARTISTIC_MODE_PROFILES["artist-vision"];
           }
         },
@@ -433,10 +406,7 @@ var catppuccinStarryNight = (() => {
             }
             return currentProfile.multipliers;
           } catch (error) {
-            console.error(
-              "[YEAR3000_CONFIG] Error in getCurrentMultipliers:",
-              error
-            );
+            console.error("[YEAR3000_CONFIG] Error in getCurrentMultipliers:", error);
             return this.artisticMultipliers;
           }
         },
@@ -451,7 +421,7 @@ var catppuccinStarryNight = (() => {
                 enableAdvancedEffects: true,
                 enableHarmony: true,
                 beatSync: true,
-                colorHarmony: true,
+                colorHarmony: true
               };
             }
             const currentProfile = this.getCurrentModeProfile();
@@ -463,20 +433,17 @@ var catppuccinStarryNight = (() => {
                 enableAdvancedEffects: true,
                 enableHarmony: true,
                 beatSync: true,
-                colorHarmony: true,
+                colorHarmony: true
               };
             }
             return currentProfile.features;
           } catch (error) {
-            console.error(
-              "[YEAR3000_CONFIG] Error in getCurrentFeatures:",
-              error
-            );
+            console.error("[YEAR3000_CONFIG] Error in getCurrentFeatures:", error);
             return {
               enableAdvancedEffects: true,
               enableHarmony: true,
               beatSync: true,
-              colorHarmony: true,
+              colorHarmony: true
             };
           }
         },
@@ -491,7 +458,7 @@ var catppuccinStarryNight = (() => {
                 maxParticles: 20,
                 animationThrottle: 16,
                 enableGPUAcceleration: true,
-                reducedMotion: false,
+                reducedMotion: false
               };
             }
             const currentProfile = this.getCurrentModeProfile();
@@ -503,7 +470,7 @@ var catppuccinStarryNight = (() => {
                 maxParticles: 20,
                 animationThrottle: 16,
                 enableGPUAcceleration: true,
-                reducedMotion: false,
+                reducedMotion: false
               };
             }
             return currentProfile.performance;
@@ -516,7 +483,7 @@ var catppuccinStarryNight = (() => {
               maxParticles: 20,
               animationThrottle: 16,
               enableGPUAcceleration: true,
-              reducedMotion: false,
+              reducedMotion: false
             };
           }
         },
@@ -527,7 +494,7 @@ var catppuccinStarryNight = (() => {
             "getCurrentModeProfile",
             "getCurrentMultipliers",
             "getCurrentFeatures",
-            "getCurrentPerformanceSettings",
+            "getCurrentPerformanceSettings"
           ];
           return requiredMethods.every(
             (method) => typeof this[method] === "function"
@@ -564,15 +531,12 @@ var catppuccinStarryNight = (() => {
                   detail: {
                     previousMode,
                     newMode: mode,
-                    profile: this.getCurrentModeProfile(),
-                  },
+                    profile: this.getCurrentModeProfile()
+                  }
                 })
               );
             }
-            if (
-              typeof globalThis.year3000System !== "undefined" &&
-              globalThis.year3000System.setGradientParameters
-            ) {
+            if (typeof globalThis.year3000System !== "undefined" && globalThis.year3000System.setGradientParameters) {
               globalThis.year3000System.setGradientParameters(
                 document.documentElement
               );
@@ -590,20 +554,11 @@ var catppuccinStarryNight = (() => {
         // ===========================================
         // Set logging level for all Year 3000 systems
         setLoggingLevel(level) {
-          const validLevels = [
-            "off",
-            "error",
-            "warn",
-            "info",
-            "debug",
-            "verbose",
-          ];
+          const validLevels = ["off", "error", "warn", "info", "debug", "verbose"];
           if (validLevels.includes(level)) {
             this.logging.level = level;
             if (level !== "off") {
-              console.log(
-                `\u{1F527} [YEAR3000_CONFIG] Logging level set to: ${level}`
-              );
+              console.log(`\u{1F527} [YEAR3000_CONFIG] Logging level set to: ${level}`);
             }
             return true;
           }
@@ -616,16 +571,12 @@ var catppuccinStarryNight = (() => {
         // Disable performance warnings (useful for production or when performance is acceptable)
         disablePerformanceWarnings() {
           this.logging.performance.enableFrameBudgetWarnings = false;
-          console.log(
-            "\u{1F527} [YEAR3000_CONFIG] Performance warnings disabled"
-          );
+          console.log("\u{1F527} [YEAR3000_CONFIG] Performance warnings disabled");
         },
         // Enable performance warnings
         enablePerformanceWarnings() {
           this.logging.performance.enableFrameBudgetWarnings = true;
-          console.log(
-            "\u{1F527} [YEAR3000_CONFIG] Performance warnings enabled"
-          );
+          console.log("\u{1F527} [YEAR3000_CONFIG] Performance warnings enabled");
         },
         // Set performance warning throttle interval (ms)
         setPerformanceWarningThrottle(intervalMs) {
@@ -647,27 +598,21 @@ var catppuccinStarryNight = (() => {
           this.setLoggingLevel("warn");
           this.disablePerformanceWarnings();
           this.logging.performance.enableAdaptiveDegradation = true;
-          console.log(
-            "\u{1F527} [YEAR3000_CONFIG] Configured for production environment"
-          );
+          console.log("\u{1F527} [YEAR3000_CONFIG] Configured for production environment");
         },
         setupForDevelopment() {
           this.setLoggingLevel("debug");
           this.enablePerformanceWarnings();
           this.setPerformanceWarningThrottle(2e3);
           this.logging.performance.enableAdaptiveDegradation = true;
-          console.log(
-            "\u{1F527} [YEAR3000_CONFIG] Configured for development environment"
-          );
+          console.log("\u{1F527} [YEAR3000_CONFIG] Configured for development environment");
         },
         setupForDebugging() {
           this.setLoggingLevel("verbose");
           this.enablePerformanceWarnings();
           this.setPerformanceWarningThrottle(500);
           this.logging.performance.enableAdaptiveDegradation = false;
-          console.log(
-            "\u{1F527} [YEAR3000_CONFIG] Configured for debugging environment"
-          );
+          console.log("\u{1F527} [YEAR3000_CONFIG] Configured for debugging environment");
         },
         // Validate configuration health and functionality
         validateConfigHealth() {
@@ -675,13 +620,13 @@ var catppuccinStarryNight = (() => {
             methodsWorking: {},
             propertiesValid: {},
             issues: [],
-            score: 100,
+            score: 100
           };
           const methodsToTest = [
             "getCurrentModeProfile",
             "getCurrentMultipliers",
             "getCurrentFeatures",
-            "setArtisticMode",
+            "setArtisticMode"
           ];
           methodsToTest.forEach((methodName) => {
             try {
@@ -692,9 +637,7 @@ var catppuccinStarryNight = (() => {
                   const result = this[methodName]();
                   health.methodsWorking[methodName] = !!result;
                   if (!result) {
-                    health.issues.push(
-                      `Method ${methodName} returns falsy result`
-                    );
+                    health.issues.push(`Method ${methodName} returns falsy result`);
                     health.score -= 15;
                   }
                 }
@@ -711,12 +654,9 @@ var catppuccinStarryNight = (() => {
               health.score -= 25;
             }
           });
-          health.propertiesValid.artisticMode =
-            !!this.artisticMode && typeof this.artisticMode === "string";
-          health.propertiesValid.enableDebug =
-            typeof this.enableDebug === "boolean";
-          health.propertiesValid.boundMethods =
-            !!this.boundGetCurrentMultipliers;
+          health.propertiesValid.artisticMode = !!this.artisticMode && typeof this.artisticMode === "string";
+          health.propertiesValid.enableDebug = typeof this.enableDebug === "boolean";
+          health.propertiesValid.boundMethods = !!this.boundGetCurrentMultipliers;
           if (!health.propertiesValid.artisticMode) {
             health.issues.push("artisticMode property invalid");
             health.score -= 10;
@@ -759,12 +699,12 @@ var catppuccinStarryNight = (() => {
               `\u{1F3A8} [YEAR3000_CONFIG] Loaded artistic preference: ${this.artisticMode}`
             );
           }
-        },
+        }
       };
       if (typeof YEAR3000_CONFIG.init === "function") {
         YEAR3000_CONFIG.init();
       }
-    },
+    }
   });
 
   // src-js/utils/Year3000Utilities.js
@@ -790,7 +730,7 @@ var catppuccinStarryNight = (() => {
             if (!inThrottle) {
               func.apply(context, args);
               inThrottle = true;
-              setTimeout(() => (inThrottle = false), limit);
+              setTimeout(() => inThrottle = false, limit);
             }
           };
         },
@@ -803,9 +743,7 @@ var catppuccinStarryNight = (() => {
             return { r: 0, g: 0, b: 0 };
           }
           const sanitizedHex = hex.trim();
-          let processedHex = sanitizedHex.startsWith("#")
-            ? sanitizedHex
-            : `#${sanitizedHex}`;
+          let processedHex = sanitizedHex.startsWith("#") ? sanitizedHex : `#${sanitizedHex}`;
           processedHex = processedHex.replace(/##+/g, "#");
           if (processedHex.length === 4) {
             processedHex = `#${processedHex[1]}${processedHex[1]}${processedHex[2]}${processedHex[2]}${processedHex[3]}${processedHex[3]}`;
@@ -818,7 +756,7 @@ var catppuccinStarryNight = (() => {
               const rgb = {
                 r: parseInt(result[1], 16),
                 g: parseInt(result[2], 16),
-                b: parseInt(result[3], 16),
+                b: parseInt(result[3], 16)
               };
               return rgb;
             } catch (e) {
@@ -844,11 +782,8 @@ var catppuccinStarryNight = (() => {
           r /= 255;
           g /= 255;
           b /= 255;
-          const max = Math.max(r, g, b),
-            min = Math.min(r, g, b);
-          let h,
-            s,
-            l = (max + min) / 2;
+          const max = Math.max(r, g, b), min = Math.min(r, g, b);
+          let h, s, l = (max + min) / 2;
           if (max === min) {
             h = s = 0;
           } else {
@@ -874,11 +809,16 @@ var catppuccinStarryNight = (() => {
           s /= 100;
           l /= 100;
           const hue2rgb = (p, q, t) => {
-            if (t < 0) t += 1;
-            if (t > 1) t -= 1;
-            if (t < 1 / 6) return p + (q - p) * 6 * t;
-            if (t < 1 / 2) return q;
-            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            if (t < 0)
+              t += 1;
+            if (t > 1)
+              t -= 1;
+            if (t < 1 / 6)
+              return p + (q - p) * 6 * t;
+            if (t < 1 / 2)
+              return q;
+            if (t < 2 / 3)
+              return p + (q - p) * (2 / 3 - t) * 6;
             return p;
           };
           let r_val, g_val, b_val;
@@ -894,27 +834,24 @@ var catppuccinStarryNight = (() => {
           return {
             r: Math.round(r_val * 255),
             g: Math.round(g_val * 255),
-            b: Math.round(b_val * 255),
+            b: Math.round(b_val * 255)
           };
         },
         rgbToHex(r, g, b) {
-          return (
-            "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")
-          );
+          return "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
         },
         calculateContrastRatio(color1, color2) {
           const getLuminance = (rgb) => {
             const [r_val, g_val, b_val] = [rgb.r, rgb.g, rgb.b].map((c) => {
               c = c / 255;
-              return c <= 0.03928
-                ? c / 12.92
-                : Math.pow((c + 0.055) / 1.055, 2.4);
+              return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
             });
             return 0.2126 * r_val + 0.7152 * g_val + 0.0722 * b_val;
           };
           const rgb1 = this.hexToRgb(color1);
           const rgb2 = this.hexToRgb(color2);
-          if (!rgb1 || !rgb2) return 1;
+          if (!rgb1 || !rgb2)
+            return 1;
           const lum1 = getLuminance(rgb1);
           const lum2 = getLuminance(rgb2);
           const brightest = Math.max(lum1, lum2);
@@ -930,8 +867,7 @@ var catppuccinStarryNight = (() => {
             }
             return target;
           }
-          const result =
-            target + (current - target) * Math.pow(2, -deltaTime / halfLife);
+          const result = target + (current - target) * Math.pow(2, -deltaTime / halfLife);
           return result;
         },
         // NEW: BPM and timing utility methods (inspired by Cat Jam extension)
@@ -941,7 +877,8 @@ var catppuccinStarryNight = (() => {
          * @returns {number} Milliseconds between beats
          */
         bpmToInterval(bpm) {
-          if (!bpm || bpm <= 0) return 500;
+          if (!bpm || bpm <= 0)
+            return 500;
           return 6e4 / bpm;
         },
         /**
@@ -950,7 +887,8 @@ var catppuccinStarryNight = (() => {
          * @returns {number} Beats per minute
          */
         intervalToBpm(intervalMs) {
-          if (!intervalMs || intervalMs <= 0) return 120;
+          if (!intervalMs || intervalMs <= 0)
+            return 120;
           return 6e4 / intervalMs;
         },
         /**
@@ -975,10 +913,7 @@ var catppuccinStarryNight = (() => {
           const beatInterval = this.bpmToInterval(bpm);
           const timeSinceStart = currentTime - trackStartTime;
           const beatPosition = timeSinceStart % beatInterval;
-          return (
-            beatPosition <= tolerance ||
-            beatPosition >= beatInterval - tolerance
-          );
+          return beatPosition <= tolerance || beatPosition >= beatInterval - tolerance;
         },
         /**
          * Calculate beat phase (0-1) within current beat interval
@@ -1019,10 +954,7 @@ var catppuccinStarryNight = (() => {
             case "ease-out":
               return 1 - Math.pow(1 - beatPhase, 2);
             case "bounce":
-              return (
-                Math.abs(Math.sin(beatPhase * Math.PI * 2)) *
-                (1 - Math.abs(beatPhase - 0.5) * 2)
-              );
+              return Math.abs(Math.sin(beatPhase * Math.PI * 2)) * (1 - Math.abs(beatPhase - 0.5) * 2);
             case "pulse":
               return Math.max(0, 1 - beatPhase * 4);
             case "linear":
@@ -1037,10 +969,7 @@ var catppuccinStarryNight = (() => {
          * @returns {number} Rhythm phase in radians (0 to 2π)
          */
         calculateRhythmPhase(currentTime, animationSpeedFactor = 1) {
-          return (
-            ((currentTime / 1e3) * animationSpeedFactor * Math.PI) %
-            (Math.PI * 2)
-          );
+          return currentTime / 1e3 * animationSpeedFactor * Math.PI % (Math.PI * 2);
         },
         /**
          * Calculate breathing scale based on rhythm phase and energy
@@ -1051,8 +980,7 @@ var catppuccinStarryNight = (() => {
         calculateBreathingScale(rhythmPhase, processedEnergy = 0.5) {
           const baseBreathing = 0.99;
           const energyInfluence = 0.01 + processedEnergy * 0.02;
-          const breathingIntensity =
-            baseBreathing + Math.sin(rhythmPhase) * energyInfluence;
+          const breathingIntensity = baseBreathing + Math.sin(rhythmPhase) * energyInfluence;
           return Math.max(0.97, Math.min(1.02, breathingIntensity));
         },
         /**
@@ -1061,15 +989,9 @@ var catppuccinStarryNight = (() => {
          * @param {string} moodIdentifier - Mood from music analysis ("energetic_happy", "danceable", etc.)
          * @returns {number} Transform scale factor (1.0-1.03)
          */
-        calculateNavigationScale(
-          visualIntensity = 0.5,
-          moodIdentifier = "neutral"
-        ) {
+        calculateNavigationScale(visualIntensity = 0.5, moodIdentifier = "neutral") {
           let navItemTransformScale = 1 + visualIntensity * 0.025;
-          if (
-            moodIdentifier === "energetic_happy" ||
-            moodIdentifier === "danceable"
-          ) {
+          if (moodIdentifier === "energetic_happy" || moodIdentifier === "danceable") {
             navItemTransformScale += 5e-3;
           }
           return Math.max(1, Math.min(1.03, navItemTransformScale));
@@ -1078,25 +1000,18 @@ var catppuccinStarryNight = (() => {
           const r = r_srgb / 255;
           const g = g_srgb / 255;
           const b = b_srgb / 255;
-          const r_lin =
-            r <= 0.04045 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
-          const g_lin =
-            g <= 0.04045 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
-          const b_lin =
-            b <= 0.04045 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
-          const l_cone =
-            0.4122214708 * r_lin + 0.5363325363 * g_lin + 0.0514459929 * b_lin;
-          const m_cone =
-            0.2119034982 * r_lin + 0.6806995451 * g_lin + 0.1073969566 * b_lin;
-          const s_cone =
-            0.0883024619 * r_lin + 0.2817188376 * g_lin + 0.6299787005 * b_lin;
+          const r_lin = r <= 0.04045 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
+          const g_lin = g <= 0.04045 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
+          const b_lin = b <= 0.04045 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
+          const l_cone = 0.4122214708 * r_lin + 0.5363325363 * g_lin + 0.0514459929 * b_lin;
+          const m_cone = 0.2119034982 * r_lin + 0.6806995451 * g_lin + 0.1073969566 * b_lin;
+          const s_cone = 0.0883024619 * r_lin + 0.2817188376 * g_lin + 0.6299787005 * b_lin;
           const l_ = Math.cbrt(l_cone);
           const m_ = Math.cbrt(m_cone);
           const s_ = Math.cbrt(s_cone);
           const L = 0.2104542553 * l_ + 0.793617785 * m_ - 0.0040720468 * s_;
           const a = 1.9779984951 * l_ - 2.428592205 * m_ + 0.4505937099 * s_;
-          const b_oklab =
-            0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_;
+          const b_oklab = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_;
           return { L, a, b: b_oklab };
         },
         oklabToRgb(L, a, b_oklab) {
@@ -1106,34 +1021,16 @@ var catppuccinStarryNight = (() => {
           const l_cone = l_ * l_ * l_;
           const m_cone = m_ * m_ * m_;
           const s_cone = s_ * s_ * s_;
-          const r_lin =
-            3.2409699419 * l_cone -
-            1.5373831776 * m_cone -
-            0.4986107603 * s_cone;
-          const g_lin =
-            -0.9692436363 * l_cone +
-            1.8759675015 * m_cone +
-            0.0415550574 * s_cone;
-          const b_lin =
-            0.0556300797 * l_cone -
-            0.2039769589 * m_cone +
-            1.0569715142 * s_cone;
-          const r_srgb =
-            r_lin <= 31308e-7
-              ? 12.92 * r_lin
-              : 1.055 * Math.pow(r_lin, 1 / 2.4) - 0.055;
-          const g_srgb =
-            g_lin <= 31308e-7
-              ? 12.92 * g_lin
-              : 1.055 * Math.pow(g_lin, 1 / 2.4) - 0.055;
-          const b_srgb =
-            b_lin <= 31308e-7
-              ? 12.92 * b_lin
-              : 1.055 * Math.pow(b_lin, 1 / 2.4) - 0.055;
+          const r_lin = 3.2409699419 * l_cone - 1.5373831776 * m_cone - 0.4986107603 * s_cone;
+          const g_lin = -0.9692436363 * l_cone + 1.8759675015 * m_cone + 0.0415550574 * s_cone;
+          const b_lin = 0.0556300797 * l_cone - 0.2039769589 * m_cone + 1.0569715142 * s_cone;
+          const r_srgb = r_lin <= 31308e-7 ? 12.92 * r_lin : 1.055 * Math.pow(r_lin, 1 / 2.4) - 0.055;
+          const g_srgb = g_lin <= 31308e-7 ? 12.92 * g_lin : 1.055 * Math.pow(g_lin, 1 / 2.4) - 0.055;
+          const b_srgb = b_lin <= 31308e-7 ? 12.92 * b_lin : 1.055 * Math.pow(b_lin, 1 / 2.4) - 0.055;
           return {
             r: Math.max(0, Math.min(255, Math.round(r_srgb * 255))),
             g: Math.max(0, Math.min(255, Math.round(g_srgb * 255))),
-            b: Math.max(0, Math.min(255, Math.round(b_srgb * 255))),
+            b: Math.max(0, Math.min(255, Math.round(b_srgb * 255)))
           };
         },
         // PHASE 2.1 - Implement initial OKLab color processing function.
@@ -1143,7 +1040,7 @@ var catppuccinStarryNight = (() => {
             musicEnergy,
             moodIdentifier,
             visualIntensity,
-            targetContrastRatio,
+            targetContrastRatio
           } = context;
           const lightnessThresholdMin = 0.1;
           const lightnessThresholdMax = 0.9;
@@ -1163,10 +1060,7 @@ var catppuccinStarryNight = (() => {
               const boostFactor = 1 + (visualIntensity - 0.5) * 0.1;
               a *= boostFactor;
               b *= boostFactor;
-            } else if (
-              (moodIdentifier === "calm_sad" || moodIdentifier === "sad") &&
-              visualIntensity < 0.5
-            ) {
+            } else if ((moodIdentifier === "calm_sad" || moodIdentifier === "sad") && visualIntensity < 0.5) {
               const reductionFactor = 1 - (0.5 - visualIntensity) * 0.1;
               a *= reductionFactor;
               b *= reductionFactor;
@@ -1177,12 +1071,7 @@ var catppuccinStarryNight = (() => {
         },
         // PHASE 4: Utility to calculate derived OKLab properties
         calculateOklabDerivedProperties(oklabColor) {
-          if (
-            !oklabColor ||
-            typeof oklabColor.L !== "number" ||
-            typeof oklabColor.a !== "number" ||
-            typeof oklabColor.b !== "number"
-          ) {
+          if (!oklabColor || typeof oklabColor.L !== "number" || typeof oklabColor.a !== "number" || typeof oklabColor.b !== "number") {
             console.warn(
               "[Year3000Utilities] Invalid oklabColor input for calculateOklabDerivedProperties. Using defaults.",
               oklabColor
@@ -1203,21 +1092,12 @@ var catppuccinStarryNight = (() => {
             b_star: b,
             // OKLab b is b*
             chroma,
-            hue,
+            hue
           };
         },
         // PHASE 6: Generate Harmonic OKLab Colors
-        generateHarmonicOklabColors(
-          baseOklabColor,
-          rule = "analogous",
-          angle = 30
-        ) {
-          if (
-            !baseOklabColor ||
-            typeof baseOklabColor.L !== "number" ||
-            typeof baseOklabColor.a !== "number" ||
-            typeof baseOklabColor.b !== "number"
-          ) {
+        generateHarmonicOklabColors(baseOklabColor, rule = "analogous", angle = 30) {
+          if (!baseOklabColor || typeof baseOklabColor.L !== "number" || typeof baseOklabColor.a !== "number" || typeof baseOklabColor.b !== "number") {
             console.warn(
               "[Year3000Utilities] Invalid baseOklabColor input for generateHarmonicOklabColors. Required: { L, a, b }.",
               baseOklabColor
@@ -1232,12 +1112,12 @@ var catppuccinStarryNight = (() => {
           }
           const harmonicColorsOklab = [];
           const getOklabFromLCH = (l_val, c_val, h_deg_val) => {
-            const h_rad = (h_deg_val % 360) * (Math.PI / 180);
+            const h_rad = h_deg_val % 360 * (Math.PI / 180);
             return {
               L: Math.max(0, Math.min(1, l_val)),
               // Clamp L to 0-1
               a: c_val * Math.cos(h_rad),
-              b: c_val * Math.sin(h_rad),
+              b: c_val * Math.sin(h_rad)
             };
           };
           if (rule === "analogous") {
@@ -1299,11 +1179,11 @@ var catppuccinStarryNight = (() => {
           }
           return harmonicColorsOklab;
         },
-        pseudoRandom: function (seed) {
-          let t = (seed += 1831565813);
-          t = Math.imul(t ^ (t >>> 15), t | 1);
-          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        pseudoRandom: function(seed) {
+          let t = seed += 1831565813;
+          t = Math.imul(t ^ t >>> 15, t | 1);
+          t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+          return ((t ^ t >>> 14) >>> 0) / 4294967296;
         },
         // === Phase 6: Global Health Monitor & Debug System Initialization ===
         initializeHealthMonitoring() {
@@ -1311,23 +1191,19 @@ var catppuccinStarryNight = (() => {
             this.systemHealthMonitor = new SystemHealthMonitor();
           }
           if (!this.unifiedDebug) {
-            this.unifiedDebug = new Year3000UnifiedDebug(
-              this.systemHealthMonitor
-            );
+            this.unifiedDebug = new Year3000UnifiedDebug(this.systemHealthMonitor);
           }
           if (typeof window !== "undefined") {
             window.Year3000SystemHealth = this.systemHealthMonitor;
             window.Year3000Debug = this.unifiedDebug;
-            console.log(
-              "\u{1F527} Phase 6: System Health Monitoring initialized"
-            );
+            console.log("\u{1F527} Phase 6: System Health Monitoring initialized");
             console.log(
               "\u{1F50D} Available globally: window.Year3000SystemHealth, window.Year3000Debug"
             );
           }
           return {
             healthMonitor: this.systemHealthMonitor,
-            debug: this.unifiedDebug,
+            debug: this.unifiedDebug
           };
         },
         getHealthMonitor() {
@@ -1341,7 +1217,7 @@ var catppuccinStarryNight = (() => {
             return this.initializeHealthMonitoring().debug;
           }
           return this.unifiedDebug;
-        },
+        }
         // === End Phase 6 Global Initialization ===
       };
       SystemHealthMonitor = class {
@@ -1353,7 +1229,7 @@ var catppuccinStarryNight = (() => {
             // 50MB
             maxCPUUsage: 30,
             // 30% threshold
-            maxFrameDrops: 5,
+            maxFrameDrops: 5
             // per second
           };
           this.lastCleanupTime = Date.now();
@@ -1369,9 +1245,9 @@ var catppuccinStarryNight = (() => {
               averageFrameTime: 0,
               memoryUsage: 0,
               errorCount: 0,
-              animationComplexity: 0,
+              animationComplexity: 0
             },
-            healthStatus: "healthy",
+            healthStatus: "healthy"
           });
         }
         updateSystemMetrics(systemName, metrics) {
@@ -1385,16 +1261,11 @@ var catppuccinStarryNight = (() => {
           }
         }
         calculateHealthStatus(performanceData) {
-          if (performanceData.errorCount > 10) return "critical";
-          if (
-            performanceData.memoryUsage >
-            this.performanceBudget.maxMemoryUsage * 0.8
-          )
+          if (performanceData.errorCount > 10)
+            return "critical";
+          if (performanceData.memoryUsage > this.performanceBudget.maxMemoryUsage * 0.8)
             return "warning";
-          if (
-            performanceData.animationComplexity >
-            this.performanceBudget.maxAnimationComplexity * 0.9
-          )
+          if (performanceData.animationComplexity > this.performanceBudget.maxAnimationComplexity * 0.9)
             return "warning";
           return "healthy";
         }
@@ -1403,18 +1274,13 @@ var catppuccinStarryNight = (() => {
           for (const [name, data] of this.systemMetrics) {
             totalComplexity += data.performanceData.animationComplexity || 0;
           }
-          return (
-            totalComplexity > this.performanceBudget.maxAnimationComplexity
-          );
+          return totalComplexity > this.performanceBudget.maxAnimationComplexity;
         }
         performAutomaticCleanup() {
           const now = Date.now();
           if (now - this.lastCleanupTime > this.cleanupInterval) {
             for (const [name, data] of this.systemMetrics) {
-              if (
-                data.system &&
-                typeof data.system.performCleanup === "function"
-              ) {
+              if (data.system && typeof data.system.performCleanup === "function") {
                 data.system.performCleanup();
               }
             }
@@ -1425,10 +1291,10 @@ var catppuccinStarryNight = (() => {
         }
         getAllSystemsReport() {
           const report = {
-            timestamp: /* @__PURE__ */ new Date().toISOString(),
+            timestamp: (/* @__PURE__ */ new Date()).toISOString(),
             overallHealth: "healthy",
             performanceBudget: this.performanceBudget,
-            systems: {},
+            systems: {}
           };
           let hasWarnings = false;
           let hasCritical = false;
@@ -1437,16 +1303,14 @@ var catppuccinStarryNight = (() => {
               healthStatus: data.healthStatus,
               lastUpdate: new Date(data.lastUpdate).toISOString(),
               timeSinceUpdate: Date.now() - data.lastUpdate,
-              performanceData: { ...data.performanceData },
+              performanceData: { ...data.performanceData }
             };
-            if (data.healthStatus === "warning") hasWarnings = true;
-            if (data.healthStatus === "critical") hasCritical = true;
+            if (data.healthStatus === "warning")
+              hasWarnings = true;
+            if (data.healthStatus === "critical")
+              hasCritical = true;
           }
-          report.overallHealth = hasCritical
-            ? "critical"
-            : hasWarnings
-            ? "warning"
-            : "healthy";
+          report.overallHealth = hasCritical ? "critical" : hasWarnings ? "warning" : "healthy";
           return report;
         }
         getOptimizationRecommendations() {
@@ -1462,10 +1326,7 @@ var catppuccinStarryNight = (() => {
                 `${name}: High error count (${data.performanceData.errorCount})`
               );
             }
-            if (
-              data.performanceData.memoryUsage >
-              this.performanceBudget.maxMemoryUsage * 0.7
-            ) {
+            if (data.performanceData.memoryUsage > this.performanceBudget.maxMemoryUsage * 0.7) {
               recommendations.push(
                 `${name}: High memory usage (${Math.round(
                   data.performanceData.memoryUsage / 1024 / 1024
@@ -1484,16 +1345,14 @@ var catppuccinStarryNight = (() => {
         }
         getAllSystemsReport() {
           const report = this.healthMonitor.getAllSystemsReport();
-          const recommendations =
-            this.healthMonitor.getOptimizationRecommendations();
+          const recommendations = this.healthMonitor.getOptimizationRecommendations();
           const unifiedReport = {
             timestamp: report.timestamp,
             overallHealth: report.overallHealth,
             systems: report.systems,
             recommendations,
             performance: {
-              shouldThrottleAnimations:
-                this.healthMonitor.shouldThrottleAnimations(),
+              shouldThrottleAnimations: this.healthMonitor.shouldThrottleAnimations(),
               totalSystems: Object.keys(report.systems).length,
               healthySystems: Object.values(report.systems).filter(
                 (s) => s.healthStatus === "healthy"
@@ -1503,9 +1362,9 @@ var catppuccinStarryNight = (() => {
               ).length,
               criticalSystems: Object.values(report.systems).filter(
                 (s) => s.healthStatus === "critical"
-              ).length,
+              ).length
             },
-            integration: this.getIntegrationStatus(),
+            integration: this.getIntegrationStatus()
           };
           this.addToHistory(unifiedReport);
           return unifiedReport;
@@ -1516,7 +1375,7 @@ var catppuccinStarryNight = (() => {
             crossSystemCommunication: "healthy",
             dataFlowIntegrity: "healthy",
             memoryEfficiency: "healthy",
-            animationSynchronization: "healthy",
+            animationSynchronization: "healthy"
           };
           const now = Date.now();
           for (const [name, data] of systems) {
@@ -1538,7 +1397,7 @@ var catppuccinStarryNight = (() => {
         addToHistory(report) {
           this.debugHistory.push({
             timestamp: Date.now(),
-            report: JSON.parse(JSON.stringify(report)),
+            report: JSON.parse(JSON.stringify(report))
             // Deep clone
           });
           if (this.debugHistory.length > this.maxHistorySize) {
@@ -1555,7 +1414,7 @@ var catppuccinStarryNight = (() => {
             const systemTrend = {
               healthTrend: "stable",
               memoryTrend: "stable",
-              errorTrend: "stable",
+              errorTrend: "stable"
             };
             const healthHistory = recent.map(
               (r) => r.report.systems[systemName]?.healthStatus
@@ -1573,7 +1432,7 @@ var catppuccinStarryNight = (() => {
           const results = {
             passed: true,
             tests: {},
-            summary: "",
+            summary: ""
           };
           const registeredSystems = Array.from(
             this.healthMonitor.systemMetrics.keys()
@@ -1581,25 +1440,23 @@ var catppuccinStarryNight = (() => {
           const expectedSystems = [
             "BeatSyncVisualSystem",
             "DimensionalNexusSystem",
-            "DataGlyphSystem",
+            "DataGlyphSystem"
           ];
           results.tests.systemRegistration = {
-            passed: expectedSystems.every((sys) =>
-              registeredSystems.includes(sys)
-            ),
+            passed: expectedSystems.every((sys) => registeredSystems.includes(sys)),
             expected: expectedSystems,
-            actual: registeredSystems,
+            actual: registeredSystems
           };
           const root = document.documentElement;
           const criticalVariables = [
             "--sn-breathing-scale",
             "--sn-rhythm-phase",
             "--sn-nav-item-transform-scale",
-            "--sn-sidebar-meditation-desaturation",
+            "--sn-sidebar-meditation-desaturation"
           ];
           results.tests.cssVariables = {
             passed: true,
-            variables: {},
+            variables: {}
           };
           for (const variable of criticalVariables) {
             const value = getComputedStyle(root).getPropertyValue(variable);
@@ -1613,8 +1470,7 @@ var catppuccinStarryNight = (() => {
           results.tests.performance = {
             passed: systemsReport.overallHealth !== "critical",
             overallHealth: systemsReport.overallHealth,
-            throttlingNeeded:
-              systemsReport.performance.shouldThrottleAnimations,
+            throttlingNeeded: systemsReport.performance.shouldThrottleAnimations
           };
           if (systemsReport.overallHealth === "critical") {
             results.passed = false;
@@ -1623,20 +1479,18 @@ var catppuccinStarryNight = (() => {
             (t) => t.passed
           ).length;
           const totalTests = Object.keys(results.tests).length;
-          results.summary = `${passedTests}/${totalTests} tests passed. Overall: ${
-            results.passed ? "PASS" : "FAIL"
-          }`;
+          results.summary = `${passedTests}/${totalTests} tests passed. Overall: ${results.passed ? "PASS" : "FAIL"}`;
           console.log("\u{1F9EA} Integration Test Results:", results);
           return results;
         }
       };
-    },
+    }
   });
 
   // src-js/systems/ColorHarmonyEngine.js
   var ColorHarmonyEngine_exports = {};
   __export(ColorHarmonyEngine_exports, {
-    ColorHarmonyEngine: () => ColorHarmonyEngine,
+    ColorHarmonyEngine: () => ColorHarmonyEngine
   });
   var ColorHarmonyEngine;
   var init_ColorHarmonyEngine = __esm({
@@ -1644,13 +1498,7 @@ var catppuccinStarryNight = (() => {
       init_globalConfig();
       init_Year3000Utilities();
       ColorHarmonyEngine = class {
-        constructor(
-          config,
-          utils,
-          performanceMonitor,
-          musicAnalysisService,
-          settingsManager
-        ) {
+        constructor(config, utils, performanceMonitor, musicAnalysisService, settingsManager) {
           this.config = config || YEAR3000_CONFIG;
           this.utils = utils || Year3000Utilities;
           this.performanceMonitor = performanceMonitor;
@@ -1661,19 +1509,19 @@ var catppuccinStarryNight = (() => {
           this.harmonyMetrics = {
             totalHarmonyCalculations: 0,
             musicInfluencedAdjustments: 0,
-            temporalMemoryEvents: 0,
+            temporalMemoryEvents: 0
           };
           this.musicalMemory = {
             recentTracks: [],
             userColorPreferences: /* @__PURE__ */ new Map(),
             energyHistory: [],
-            maxMemorySize: 50,
+            maxMemorySize: 50
           };
           this.kineticState = {
             currentPulse: 0,
             breathingPhase: 0,
             lastBeatTime: 0,
-            visualMomentum: 0,
+            visualMomentum: 0
           };
           if (this.musicAnalysisService) {
             this.musicAnalysisService.subscribe(this, this.systemName);
@@ -1704,14 +1552,14 @@ var catppuccinStarryNight = (() => {
                 sky: "#99d1db",
                 sapphire: "#85c1dc",
                 blue: "#8caaee",
-                lavender: "#babbf1",
+                lavender: "#babbf1"
               },
               neutrals: {
                 base: "#303446",
                 surface0: "#414559",
                 surface1: "#51576d",
-                surface2: "#626880",
-              },
+                surface2: "#626880"
+              }
             },
             latte: {
               accents: {
@@ -1728,14 +1576,14 @@ var catppuccinStarryNight = (() => {
                 sky: "#04a5e5",
                 sapphire: "#209fb5",
                 blue: "#1e66f5",
-                lavender: "#7287fd",
+                lavender: "#7287fd"
               },
               neutrals: {
                 base: "#eff1f5",
                 surface0: "#e6e9ef",
                 surface1: "#dce0e8",
-                surface2: "#c5c9d1",
-              },
+                surface2: "#c5c9d1"
+              }
             },
             macchiato: {
               accents: {
@@ -1752,14 +1600,14 @@ var catppuccinStarryNight = (() => {
                 sky: "#91d7e3",
                 sapphire: "#7dc4e4",
                 blue: "#8aadf4",
-                lavender: "#b7bdf8",
+                lavender: "#b7bdf8"
               },
               neutrals: {
                 base: "#24273a",
                 surface0: "#363a4f",
                 surface1: "#494d64",
-                surface2: "#5b6078",
-              },
+                surface2: "#5b6078"
+              }
             },
             mocha: {
               accents: {
@@ -1776,15 +1624,15 @@ var catppuccinStarryNight = (() => {
                 sky: "#89dceb",
                 sapphire: "#74c7ec",
                 blue: "#89b4fa",
-                lavender: "#b4befe",
+                lavender: "#b4befe"
               },
               neutrals: {
                 base: "#1e1e2e",
                 surface0: "#313244",
                 surface1: "#45475a",
-                surface2: "#585b70",
-              },
-            },
+                surface2: "#585b70"
+              }
+            }
           };
           this.vibrancyConfig = {
             defaultBlendRatio: 0.95,
@@ -1811,11 +1659,11 @@ var catppuccinStarryNight = (() => {
                 // Conservative: 75% extracted
                 "artist-vision": 0.95,
                 // Bold: 95% extracted
-                "cosmic-maximum": 0.98,
+                "cosmic-maximum": 0.98
                 // Maximum: 98% extracted!
               };
               return ratios[artisticMode] || this.defaultBlendRatio;
-            },
+            }
             // Note: getMusicIntensityMultiplier moved to class method for proper context access
           };
         }
@@ -1828,25 +1676,20 @@ var catppuccinStarryNight = (() => {
             return "mocha";
           }
           const computedRootStyle = getComputedStyle(rootElement);
-          const baseColorHex = computedRootStyle
-            .getPropertyValue("--spice-main")
-            .trim();
-          const normalizedBaseColor = baseColorHex.startsWith("#")
-            ? baseColorHex.substring(1).toUpperCase()
-            : baseColorHex.toUpperCase();
+          const baseColorHex = computedRootStyle.getPropertyValue("--spice-main").trim();
+          const normalizedBaseColor = baseColorHex.startsWith("#") ? baseColorHex.substring(1).toUpperCase() : baseColorHex.toUpperCase();
           const themeMap = {
             303446: "frappe",
             // Mocha's base is 1E1E2E, Frappe's is 303446
             EFF1F5: "latte",
             "24273A": "macchiato",
-            "1E1E2E": "mocha",
+            "1E1E2E": "mocha"
           };
           return themeMap[normalizedBaseColor] || "mocha";
         }
         // 🎵 Music-Driven Intensity Scaling
         getMusicIntensityMultiplier(energy = 0.5, valence = 0.5) {
-          const baseMultiplier =
-            this.config.getCurrentMultipliers().musicEnergyBoost;
+          const baseMultiplier = this.config.getCurrentMultipliers().musicEnergyBoost;
           const energyBoost = energy > 0.7 ? 1.3 : energy > 0.4 ? 1 : 0.8;
           const valenceBoost = valence > 0.6 ? 1.2 : valence < 0.4 ? 0.9 : 1;
           return baseMultiplier * energyBoost * valenceBoost;
@@ -1857,33 +1700,28 @@ var catppuccinStarryNight = (() => {
           const contextRequirements = {
             general: {
               minContrast: 1.8,
-              minHarmony: this.vibrancyConfig.harmonyTolerance,
+              minHarmony: this.vibrancyConfig.harmonyTolerance
             },
             search: {
               minContrast: 2.8,
-              minHarmony: 0.4,
+              minHarmony: 0.4
             },
             navigation: {
               minContrast: 2.5,
-              minHarmony: 0.45,
+              minHarmony: 0.45
             },
             text: {
               minContrast: 4.5,
-              minHarmony: 0.6,
+              minHarmony: 0.6
             },
             accent: {
               minContrast: 1.5,
-              minHarmony: 0.3,
-            },
+              minHarmony: 0.3
+            }
           };
-          const requirements =
-            contextRequirements[context] || contextRequirements.general;
+          const requirements = contextRequirements[context] || contextRequirements.general;
           const currentPalette = this.catppuccinPalettes[this.currentTheme];
-          if (
-            !currentPalette ||
-            !currentPalette.neutrals ||
-            !currentPalette.neutrals.base
-          ) {
+          if (!currentPalette || !currentPalette.neutrals || !currentPalette.neutrals.base) {
             console.error(
               "StarryNight Error: Catppuccin palette or base neutral not found for theme:",
               this.currentTheme,
@@ -1896,10 +1734,7 @@ var catppuccinStarryNight = (() => {
             color,
             backgroundColor
           );
-          const harmonyScore = this.calculateHarmonyScore(
-            color,
-            currentPalette
-          );
+          const harmonyScore = this.calculateHarmonyScore(color, currentPalette);
           const currentMode = this.config.artisticMode;
           let adjustedRequirements = { ...requirements };
           if (currentMode === "cosmic-maximum") {
@@ -1909,8 +1744,7 @@ var catppuccinStarryNight = (() => {
             adjustedRequirements.minContrast *= 0.85;
             adjustedRequirements.minHarmony *= 0.8;
           }
-          const meetsContrast =
-            contrastRatio >= adjustedRequirements.minContrast;
+          const meetsContrast = contrastRatio >= adjustedRequirements.minContrast;
           const isHarmonious = harmonyScore >= adjustedRequirements.minHarmony;
           const endTime = performance.now();
           this.harmonyMetrics.performance.push(endTime - startTime);
@@ -1927,12 +1761,13 @@ var catppuccinStarryNight = (() => {
               contrastRatio,
               harmonyScore,
               adjustedRequirements
-            ),
+            )
           };
         }
         calculateHarmonyScore(color, palette) {
           const colorRgb = Year3000Utilities.hexToRgb(color);
-          if (!colorRgb) return 0;
+          if (!colorRgb)
+            return 0;
           const colorHsl = Year3000Utilities.rgbToHsl(
             colorRgb.r,
             colorRgb.g,
@@ -1941,7 +1776,8 @@ var catppuccinStarryNight = (() => {
           let maxHarmony = 0;
           Object.values(palette.accents).forEach((accentColor) => {
             const accentRgb = Year3000Utilities.hexToRgb(accentColor);
-            if (!accentRgb) return;
+            if (!accentRgb)
+              return;
             const accentHsl = Year3000Utilities.rgbToHsl(
               accentRgb.r,
               accentRgb.g,
@@ -1950,20 +1786,28 @@ var catppuccinStarryNight = (() => {
             const hueDiff = Math.abs(colorHsl.h - accentHsl.h);
             const normalizedHueDiff = Math.min(hueDiff, 360 - hueDiff);
             const harmoniousAngles = [
-              0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330,
+              0,
+              30,
+              60,
+              90,
+              120,
+              150,
+              180,
+              210,
+              240,
+              270,
+              300,
+              330
             ];
             const isHarmonious = harmoniousAngles.some(
               (angle) => Math.abs(normalizedHueDiff - angle) < 20
             );
             if (isHarmonious) {
-              const harmonyStrength =
-                1 -
-                Math.min(
-                  ...harmoniousAngles.map((angle) =>
-                    Math.abs(normalizedHueDiff - angle)
-                  )
-                ) /
-                  20;
+              const harmonyStrength = 1 - Math.min(
+                ...harmoniousAngles.map(
+                  (angle) => Math.abs(normalizedHueDiff - angle)
+                )
+              ) / 20;
               maxHarmony = Math.max(maxHarmony, harmonyStrength);
             }
           });
@@ -1979,7 +1823,7 @@ var catppuccinStarryNight = (() => {
             "sky",
             "pink",
             "peach",
-            "teal",
+            "teal"
           ];
           let bestAccent = null;
           let bestScore = 0;
@@ -1988,7 +1832,8 @@ var catppuccinStarryNight = (() => {
               const accentRgb = Year3000Utilities.hexToRgb(
                 palette.accents[accentName]
               );
-              if (!accentRgb) return;
+              if (!accentRgb)
+                return;
               const accentHsl = Year3000Utilities.rgbToHsl(
                 accentRgb.r,
                 accentRgb.g,
@@ -1997,31 +1842,26 @@ var catppuccinStarryNight = (() => {
               const hueDiff = Math.abs(hsl.h - accentHsl.h);
               const normalizedHueDiff = Math.min(hueDiff, 360 - hueDiff);
               const harmonyScore = 1 - normalizedHueDiff / 180;
-              const saturationBonus = (accentHsl.s / 100) * 0.3;
+              const saturationBonus = accentHsl.s / 100 * 0.3;
               const totalScore = harmonyScore + saturationBonus;
               if (totalScore > bestScore) {
                 bestScore = totalScore;
                 bestAccent = {
                   name: accentName,
                   hex: palette.accents[accentName],
-                  rgb: accentRgb,
+                  rgb: accentRgb
                 };
               }
             }
           });
           const fallbackAccentName = "mauve";
-          const fallbackAccentHex =
-            palette.accents[fallbackAccentName] ||
-            Object.values(palette.accents)[0];
-          const fallbackAccentRgb =
-            Year3000Utilities.hexToRgb(fallbackAccentHex);
-          return (
-            bestAccent || {
-              name: fallbackAccentName,
-              hex: fallbackAccentHex,
-              rgb: fallbackAccentRgb,
-            }
-          );
+          const fallbackAccentHex = palette.accents[fallbackAccentName] || Object.values(palette.accents)[0];
+          const fallbackAccentRgb = Year3000Utilities.hexToRgb(fallbackAccentHex);
+          return bestAccent || {
+            name: fallbackAccentName,
+            hex: fallbackAccentHex,
+            rgb: fallbackAccentRgb
+          };
         }
         blendColors(rgb1, rgb2, ratio = this.vibrancyConfig.defaultBlendRatio) {
           const hsl1 = Year3000Utilities.rgbToHsl(rgb1.r, rgb1.g, rgb1.b);
@@ -2034,7 +1874,7 @@ var catppuccinStarryNight = (() => {
               hsl1.s * dynamicRatio + hsl2.s * (1 - dynamicRatio),
               this.vibrancyConfig.minimumSaturation * 100
             ),
-            l: hsl1.l * dynamicRatio + hsl2.l * (1 - dynamicRatio),
+            l: hsl1.l * dynamicRatio + hsl2.l * (1 - dynamicRatio)
           };
           blendedHsl.s = Math.min(
             100,
@@ -2052,21 +1892,14 @@ var catppuccinStarryNight = (() => {
               globalThis.currentMusicAnalysis.energy || 0.5,
               globalThis.currentMusicAnalysis.valence || 0.5
             );
-            blendedHsl.s = Math.min(
-              100,
-              blendedHsl.s * (1 + (musicBoost - 1) * 0.3)
-            );
+            blendedHsl.s = Math.min(100, blendedHsl.s * (1 + (musicBoost - 1) * 0.3));
           }
           const blendedRgb = Year3000Utilities.hslToRgb(
             blendedHsl.h,
             blendedHsl.s,
             blendedHsl.l
           );
-          return Year3000Utilities.rgbToHex(
-            blendedRgb.r,
-            blendedRgb.g,
-            blendedRgb.b
-          );
+          return Year3000Utilities.rgbToHex(blendedRgb.r, blendedRgb.g, blendedRgb.b);
         }
         blendWithCatppuccin(extractedColors, musicContext = null) {
           const startTime = performance.now();
@@ -2081,7 +1914,8 @@ var catppuccinStarryNight = (() => {
           }
           const harmonizedColors = {};
           Object.entries(extractedColors).forEach(([role, color]) => {
-            if (!color) return;
+            if (!color)
+              return;
             const extractedRgb = Year3000Utilities.hexToRgb(color);
             if (!extractedRgb) {
               harmonizedColors[role] = color;
@@ -2101,8 +1935,10 @@ var catppuccinStarryNight = (() => {
             }
             let blendRatio = this.vibrancyConfig.defaultBlendRatio;
             if (musicContext) {
-              if (musicContext.energy > 0.7) blendRatio = 0.9;
-              if (musicContext.valence > 0.6) blendRatio += 0.05;
+              if (musicContext.energy > 0.7)
+                blendRatio = 0.9;
+              if (musicContext.valence > 0.6)
+                blendRatio += 0.05;
               blendRatio = Math.min(1, Math.max(0, blendRatio));
             }
             harmonizedColors[role] = this.blendColors(
@@ -2116,12 +1952,7 @@ var catppuccinStarryNight = (() => {
           this.harmonyMetrics.performance.push(endTime - startTime);
           return harmonizedColors;
         }
-        generateRecommendations(
-          color,
-          contrastRatio,
-          harmonyScore,
-          requirements
-        ) {
+        generateRecommendations(color, contrastRatio, harmonyScore, requirements) {
           const recommendations = [];
           if (contrastRatio < requirements.minContrast) {
             recommendations.push(
@@ -2136,40 +1967,32 @@ var catppuccinStarryNight = (() => {
           return recommendations;
         }
         getPerformanceReport() {
-          const avgTime =
-            this.harmonyMetrics.performance.length > 0
-              ? this.harmonyMetrics.performance.reduce((a, b) => a + b, 0) /
-                this.harmonyMetrics.performance.length
-              : 0;
+          const avgTime = this.harmonyMetrics.performance.length > 0 ? this.harmonyMetrics.performance.reduce((a, b) => a + b, 0) / this.harmonyMetrics.performance.length : 0;
           return {
-            totalHarmonyCalculations:
-              this.harmonyMetrics.totalHarmonyCalculations,
-            musicInfluencedAdjustments:
-              this.harmonyMetrics.musicInfluencedAdjustments,
+            totalHarmonyCalculations: this.harmonyMetrics.totalHarmonyCalculations,
+            musicInfluencedAdjustments: this.harmonyMetrics.musicInfluencedAdjustments,
             temporalMemoryEvents: this.harmonyMetrics.temporalMemoryEvents,
             blends: this.harmonyMetrics.blends,
-            averageProcessingTime: Math.round(avgTime * 100) / 100,
+            averageProcessingTime: Math.round(avgTime * 100) / 100
             // vibrancyConfig: this.vibrancyConfig, // Consider if this much detail is needed in report
           };
         }
         // 🌟 Year 3000 Method: Receive live music updates
         updateFromMusicAnalysis(processedMusicData, rawFeatures, trackUri) {
-          if (!processedMusicData) return;
+          if (!processedMusicData)
+            return;
           try {
             this._updateMusicalMemory(processedMusicData, trackUri);
             this._updateKineticState(processedMusicData);
             this._applyAestheticGravity(processedMusicData);
             this.harmonyMetrics.musicInfluencedAdjustments++;
             if (this.config.enableDebug && Math.random() < 0.1) {
-              console.log(
-                "\u{1F3A8} [ColorHarmonyEngine] Cosmic harmony update:",
-                {
-                  energy: processedMusicData.energy?.toFixed(2),
-                  valence: processedMusicData.valence?.toFixed(2),
-                  pulse: this.kineticState.currentPulse.toFixed(2),
-                  momentum: this.kineticState.visualMomentum.toFixed(2),
-                }
-              );
+              console.log("\u{1F3A8} [ColorHarmonyEngine] Cosmic harmony update:", {
+                energy: processedMusicData.energy?.toFixed(2),
+                valence: processedMusicData.valence?.toFixed(2),
+                pulse: this.kineticState.currentPulse.toFixed(2),
+                momentum: this.kineticState.visualMomentum.toFixed(2)
+              });
             }
           } catch (error) {
             console.error(
@@ -2185,12 +2008,9 @@ var catppuccinStarryNight = (() => {
             energy: musicData.energy,
             valence: musicData.valence,
             enhancedBPM: musicData.enhancedBPM,
-            timestamp: Date.now(),
+            timestamp: Date.now()
           });
-          if (
-            this.musicalMemory.recentTracks.length >
-            this.musicalMemory.maxMemorySize
-          ) {
+          if (this.musicalMemory.recentTracks.length > this.musicalMemory.maxMemorySize) {
             this.musicalMemory.recentTracks.pop();
           }
           this.musicalMemory.energyHistory.unshift(musicData.energy || 0.5);
@@ -2205,25 +2025,19 @@ var catppuccinStarryNight = (() => {
           const energy = musicData.energy || 0.5;
           const enhancedBPM = musicData.enhancedBPM || 120;
           const beatInterval = 6e4 / enhancedBPM;
-          const timeSinceLastBeat =
-            (now - this.kineticState.lastBeatTime) % beatInterval;
+          const timeSinceLastBeat = (now - this.kineticState.lastBeatTime) % beatInterval;
           this.kineticState.currentPulse = Math.sin(
-            (timeSinceLastBeat / beatInterval) * Math.PI * 2
+            timeSinceLastBeat / beatInterval * Math.PI * 2
           );
           this.kineticState.breathingPhase += 0.02 * energy;
           if (this.kineticState.breathingPhase > Math.PI * 2) {
             this.kineticState.breathingPhase -= Math.PI * 2;
           }
           if (this.musicalMemory.energyHistory.length > 1) {
-            const energyDelta =
-              this.musicalMemory.energyHistory[0] -
-              this.musicalMemory.energyHistory[1];
+            const energyDelta = this.musicalMemory.energyHistory[0] - this.musicalMemory.energyHistory[1];
             this.kineticState.visualMomentum = Math.max(
               0,
-              Math.min(
-                1,
-                this.kineticState.visualMomentum * 0.9 + energyDelta * 0.5
-              )
+              Math.min(1, this.kineticState.visualMomentum * 0.9 + energyDelta * 0.5)
             );
           }
           if (timeSinceLastBeat < 100) {
@@ -2232,27 +2046,20 @@ var catppuccinStarryNight = (() => {
         }
         // 🎨 Aesthetic Gravity: Apply real-time color transformations
         _applyAestheticGravity(musicData) {
-          if (typeof document === "undefined") return;
+          if (typeof document === "undefined")
+            return;
           const root = document.documentElement;
           const energy = musicData.energy || 0.5;
           const valence = musicData.valence || 0.5;
-          const breathingIntensity =
-            0.5 + Math.sin(this.kineticState.breathingPhase) * 0.3 * energy;
+          const breathingIntensity = 0.5 + Math.sin(this.kineticState.breathingPhase) * 0.3 * energy;
           const currentOpacity = parseFloat(
-            getComputedStyle(root).getPropertyValue("--sn-gradient-opacity") ||
-              "0.3"
+            getComputedStyle(root).getPropertyValue("--sn-gradient-opacity") || "0.3"
           );
           const targetOpacity = currentOpacity * breathingIntensity;
-          root.style.setProperty(
-            "--sn-kinetic-opacity",
-            targetOpacity.toFixed(3)
-          );
-          const pulseIntensity =
-            1 + this.kineticState.currentPulse * 0.2 * energy;
+          root.style.setProperty("--sn-kinetic-opacity", targetOpacity.toFixed(3));
+          const pulseIntensity = 1 + this.kineticState.currentPulse * 0.2 * energy;
           const currentSaturation = parseFloat(
-            getComputedStyle(root).getPropertyValue(
-              "--sn-gradient-saturation"
-            ) || "1.0"
+            getComputedStyle(root).getPropertyValue("--sn-gradient-saturation") || "1.0"
           );
           const targetSaturation = currentSaturation * pulseIntensity;
           root.style.setProperty(
@@ -2260,10 +2067,7 @@ var catppuccinStarryNight = (() => {
             targetSaturation.toFixed(3)
           );
           const momentumBlur = 30 + this.kineticState.visualMomentum * 20;
-          root.style.setProperty(
-            "--sn-kinetic-blur",
-            `${momentumBlur.toFixed(1)}px`
-          );
+          root.style.setProperty("--sn-kinetic-blur", `${momentumBlur.toFixed(1)}px`);
           const hueShift = (valence - 0.5) * 20;
           root.style.setProperty(
             "--sn-kinetic-hue-shift",
@@ -2274,16 +2078,14 @@ var catppuccinStarryNight = (() => {
         getQuantumEmpathyMetrics() {
           return {
             musicalMemorySize: this.musicalMemory.recentTracks.length,
-            averageEnergy:
-              this.musicalMemory.energyHistory.reduce((a, b) => a + b, 0) /
-                this.musicalMemory.energyHistory.length || 0.5,
+            averageEnergy: this.musicalMemory.energyHistory.reduce((a, b) => a + b, 0) / this.musicalMemory.energyHistory.length || 0.5,
             visualMomentum: this.kineticState.visualMomentum,
             harmonicResonance: this.kineticState.currentPulse,
-            temporalDepth: this.harmonyMetrics.temporalMemoryEvents,
+            temporalDepth: this.harmonyMetrics.temporalMemoryEvents
           };
         }
       };
-    },
+    }
   });
 
   // src-js/systems/BaseVisualSystem.js
@@ -2293,13 +2095,7 @@ var catppuccinStarryNight = (() => {
       init_globalConfig();
       init_Year3000Utilities();
       BaseVisualSystem = class {
-        constructor(
-          config = {},
-          utils,
-          performanceMonitor,
-          musicSyncService,
-          settingsManager
-        ) {
+        constructor(config = {}, utils, performanceMonitor, musicSyncService, settingsManager) {
           this.config = config || YEAR3000_CONFIG;
           this.utils = utils || Year3000Utilities;
           this.performanceMonitor = performanceMonitor;
@@ -2311,7 +2107,7 @@ var catppuccinStarryNight = (() => {
           this.metrics = {
             initializationTime: 0,
             updates: 0,
-            errors: 0,
+            errors: 0
           };
           this._resizeHandler = null;
           this.currentPerformanceProfile = {};
@@ -2330,9 +2126,7 @@ var catppuccinStarryNight = (() => {
               "year3000SystemSettingsChanged",
               this.boundHandleSettingsChange
             );
-            const initialQuality = this.settingsManager.get(
-              "sn-performanceQuality"
-            );
+            const initialQuality = this.settingsManager.get("sn-performanceQuality");
             if (initialQuality) {
               this._applyPerformanceProfile(initialQuality);
             }
@@ -2420,9 +2214,7 @@ var catppuccinStarryNight = (() => {
             );
             return;
           }
-          const profile =
-            this.config.performanceProfiles[quality] ||
-            this.config.performanceProfiles.balanced;
+          const profile = this.config.performanceProfiles[quality] || this.config.performanceProfiles.balanced;
           if (profile) {
             this.currentPerformanceProfile = profile;
             if (this.config.enableDebug) {
@@ -2438,7 +2230,8 @@ var catppuccinStarryNight = (() => {
           }
         }
         updateFromMusicAnalysis(processedMusicData, rawFeatures, trackUri) {
-          if (!this.initialized) return;
+          if (!this.initialized)
+            return;
           this._startPerformanceTimer("update");
           this.metrics.updates++;
           if (processedMusicData) {
@@ -2446,9 +2239,7 @@ var catppuccinStarryNight = (() => {
             this._updateGlobalKinetics(processedMusicData);
             if (this.config.enableDebug && Math.random() < 5e-3) {
               console.log(
-                `\u{1F30A} [BaseVisualSystem (${
-                  this.systemName
-                })] Kinetic update - Energy: ${processedMusicData.energy?.toFixed(
+                `\u{1F30A} [BaseVisualSystem (${this.systemName})] Kinetic update - Energy: ${processedMusicData.energy?.toFixed(
                   2
                 )}, BPM: ${processedMusicData.enhancedBPM}`
               );
@@ -2458,22 +2249,22 @@ var catppuccinStarryNight = (() => {
         }
         // 🌊 Year 3000 Method: Apply cosmic breathing to visual elements
         _applyCosmicBreathing(musicData) {
-          if (typeof document === "undefined") return;
+          if (typeof document === "undefined")
+            return;
           const energy = musicData.energy || 0.5;
           const enhancedBPM = musicData.enhancedBPM || 120;
-          const breathingSpeed = (enhancedBPM / 120) * 0.02;
-          const breathingPhase = (Date.now() * breathingSpeed) % (Math.PI * 2);
-          const breathingIntensity =
-            0.8 + Math.sin(breathingPhase) * 0.2 * energy;
+          const breathingSpeed = enhancedBPM / 120 * 0.02;
+          const breathingPhase = Date.now() * breathingSpeed % (Math.PI * 2);
+          const breathingIntensity = 0.8 + Math.sin(breathingPhase) * 0.2 * energy;
           const canvas = document.getElementById(`${this.systemName}-canvas`);
           if (canvas) {
-            canvas.style.opacity =
-              (parseFloat(canvas.style.opacity) || 0.5) * breathingIntensity;
+            canvas.style.opacity = (parseFloat(canvas.style.opacity) || 0.5) * breathingIntensity;
           }
         }
         // 🌟 Year 3000 Method: Update global kinetic CSS variables
         _updateGlobalKinetics(musicData) {
-          if (typeof document === "undefined") return;
+          if (typeof document === "undefined")
+            return;
           const root = document.documentElement;
           const energy = musicData.energy || 0.5;
           const valence = musicData.valence || 0.5;
@@ -2487,24 +2278,13 @@ var catppuccinStarryNight = (() => {
           );
           const beatInterval = 6e4 / enhancedBPM;
           const timeSinceLastBeat = Date.now() % beatInterval;
-          const beatPhase = (timeSinceLastBeat / beatInterval) * Math.PI * 2;
+          const beatPhase = timeSinceLastBeat / beatInterval * Math.PI * 2;
           const beatPulse = Math.sin(beatPhase);
-          root.style.setProperty(
-            "--sn-kinetic-beat-phase",
-            beatPhase.toFixed(3)
-          );
-          root.style.setProperty(
-            "--sn-kinetic-beat-pulse",
-            beatPulse.toFixed(3)
-          );
+          root.style.setProperty("--sn-kinetic-beat-phase", beatPhase.toFixed(3));
+          root.style.setProperty("--sn-kinetic-beat-pulse", beatPulse.toFixed(3));
         }
         // 🎨 Year 3000 Utility: Create kinetic canvas with cosmic properties
-        _createKineticCanvas(
-          id,
-          zIndex = 5,
-          blendMode = "screen",
-          kineticMode = "pulse"
-        ) {
+        _createKineticCanvas(id, zIndex = 5, blendMode = "screen", kineticMode = "pulse") {
           const canvas = this._createCanvasElement(id, zIndex, blendMode);
           canvas.classList.add("year3000-kinetic-canvas");
           canvas.dataset.kineticMode = kineticMode;
@@ -2521,26 +2301,23 @@ var catppuccinStarryNight = (() => {
         // 🌈 Year 3000 Utility: Get kinetic CSS styles based on mode
         _getKineticStyles(kineticMode) {
           const baseStyles = {
-            transition: "all 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+            transition: "all 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94)"
           };
           switch (kineticMode) {
             case "pulse":
               return {
                 ...baseStyles,
-                animation:
-                  "year3000-pulse calc(var(--sn-kinetic-tempo-multiplier, 1) * 1s) ease-in-out infinite",
+                animation: "year3000-pulse calc(var(--sn-kinetic-tempo-multiplier, 1) * 1s) ease-in-out infinite"
               };
             case "breathe":
               return {
                 ...baseStyles,
-                animation:
-                  "year3000-breathe calc(var(--sn-kinetic-tempo-multiplier, 1) * 4s) ease-in-out infinite",
+                animation: "year3000-breathe calc(var(--sn-kinetic-tempo-multiplier, 1) * 4s) ease-in-out infinite"
               };
             case "flow":
               return {
                 ...baseStyles,
-                animation:
-                  "year3000-flow calc(var(--sn-kinetic-tempo-multiplier, 1) * 8s) linear infinite",
+                animation: "year3000-flow calc(var(--sn-kinetic-tempo-multiplier, 1) * 8s) linear infinite"
               };
             default:
               return baseStyles;
@@ -2548,25 +2325,17 @@ var catppuccinStarryNight = (() => {
         }
         // 🧬 Year 3000 Utility: Get current cosmic state for subclasses
         getCosmicState() {
-          if (typeof document === "undefined") return {};
+          if (typeof document === "undefined")
+            return {};
           const root = document.documentElement;
           const style = getComputedStyle(root);
           return {
-            energy:
-              parseFloat(style.getPropertyValue("--sn-kinetic-energy")) || 0.5,
-            valence:
-              parseFloat(style.getPropertyValue("--sn-kinetic-valence")) || 0.5,
+            energy: parseFloat(style.getPropertyValue("--sn-kinetic-energy")) || 0.5,
+            valence: parseFloat(style.getPropertyValue("--sn-kinetic-valence")) || 0.5,
             bpm: parseFloat(style.getPropertyValue("--sn-kinetic-bpm")) || 120,
-            tempoMultiplier:
-              parseFloat(
-                style.getPropertyValue("--sn-kinetic-tempo-multiplier")
-              ) || 1,
-            beatPhase:
-              parseFloat(style.getPropertyValue("--sn-kinetic-beat-phase")) ||
-              0,
-            beatPulse:
-              parseFloat(style.getPropertyValue("--sn-kinetic-beat-pulse")) ||
-              0,
+            tempoMultiplier: parseFloat(style.getPropertyValue("--sn-kinetic-tempo-multiplier")) || 1,
+            beatPhase: parseFloat(style.getPropertyValue("--sn-kinetic-beat-phase")) || 0,
+            beatPulse: parseFloat(style.getPropertyValue("--sn-kinetic-beat-pulse")) || 0
           };
         }
         destroy() {
@@ -2589,31 +2358,22 @@ var catppuccinStarryNight = (() => {
                 this.boundHandleSettingsChange
               );
               if (this.config.enableDebug) {
-                console.log(
-                  `[${this.systemName}] Removed settings event listener`
-                );
+                console.log(`[${this.systemName}] Removed settings event listener`);
               }
             }
             if (this._resizeHandler) {
               window.removeEventListener("resize", this._resizeHandler);
               this._resizeHandler = null;
               if (this.config.enableDebug) {
-                console.log(
-                  `[${this.systemName}] Removed resize event listener`
-                );
+                console.log(`[${this.systemName}] Removed resize event listener`);
               }
             }
             this._performSystemSpecificCleanup();
             if (this.config.enableDebug) {
-              console.log(
-                `[${this.systemName}] Destruction completed successfully`
-              );
+              console.log(`[${this.systemName}] Destruction completed successfully`);
             }
           } catch (error) {
-            console.error(
-              `[${this.systemName}] Error during destruction:`,
-              error
-            );
+            console.error(`[${this.systemName}] Error during destruction:`, error);
           }
         }
         // ✅ FIX #7: Virtual method for system-specific cleanup (can be overridden)
@@ -2640,23 +2400,16 @@ var catppuccinStarryNight = (() => {
           }
           return 0;
         }
-        _createCanvasElement(
-          id,
-          zIndex = 5,
-          blendMode = "screen",
-          customCssText = ""
-        ) {
+        _createCanvasElement(id, zIndex = 5, blendMode = "screen", customCssText = "") {
           const existing = document.getElementById(id);
-          if (existing) existing.remove();
+          if (existing)
+            existing.remove();
           const canvas = document.createElement("canvas");
           canvas.id = id;
           let baseOpacity = 0.5;
           if (this.config && typeof this.config.opacity === "number") {
             baseOpacity = this.config.opacity;
-          } else if (
-            YEAR3000_CONFIG &&
-            typeof YEAR3000_CONFIG.getCurrentMultipliers === "function"
-          ) {
+          } else if (YEAR3000_CONFIG && typeof YEAR3000_CONFIG.getCurrentMultipliers === "function") {
             const multipliers = YEAR3000_CONFIG.getCurrentMultipliers();
             if (multipliers && typeof multipliers.opacity === "number") {
               baseOpacity = multipliers.opacity * 0.5;
@@ -2690,13 +2443,13 @@ var catppuccinStarryNight = (() => {
           cancelAnimationFrame(frameId);
         }
       };
-    },
+    }
   });
 
   // src-js/systems/visual/SidebarConsciousnessSystem.js
   var SidebarConsciousnessSystem_exports = {};
   __export(SidebarConsciousnessSystem_exports, {
-    SidebarConsciousnessSystem: () => SidebarConsciousnessSystem,
+    SidebarConsciousnessSystem: () => SidebarConsciousnessSystem
   });
   var SidebarConsciousnessSystem;
   var init_SidebarConsciousnessSystem = __esm({
@@ -2705,14 +2458,7 @@ var catppuccinStarryNight = (() => {
       init_Year3000Utilities();
       init_BaseVisualSystem();
       SidebarConsciousnessSystem = class extends BaseVisualSystem {
-        constructor(
-          config,
-          utils,
-          performanceMonitor,
-          musicSyncService,
-          settingsManager,
-          year3000System = null
-        ) {
+        constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System = null) {
           super(
             config,
             utils,
@@ -2738,13 +2484,13 @@ var catppuccinStarryNight = (() => {
             averageFrameTime: 0,
             frameTimeHistory: [],
             cssVariableUpdates: 0,
-            elementUpdates: 0,
+            elementUpdates: 0
           };
           this.deviceCapabilities = {
             supportsCSSFilter: this._detectCSSFilterSupport(),
             supportsTransforms: this._detectTransformSupport(),
             performanceLevel: this._detectPerformanceLevel(),
-            reducedMotion: this._detectReducedMotion(),
+            reducedMotion: this._detectReducedMotion()
           };
           this.animationState = {
             lastPulse: 0,
@@ -2752,7 +2498,7 @@ var catppuccinStarryNight = (() => {
             baseOpacity: 0.7,
             currentScale: 1,
             targetScale: 1,
-            smoothingFactor: 0.15,
+            smoothingFactor: 0.15
           };
           if (this.config?.enableDebug) {
             console.log(
@@ -2775,8 +2521,10 @@ var catppuccinStarryNight = (() => {
         _detectPerformanceLevel() {
           const memory = navigator.deviceMemory || 4;
           const cores = navigator.hardwareConcurrency || 2;
-          if (memory >= 8 && cores >= 8) return "high";
-          if (memory >= 4 && cores >= 4) return "medium";
+          if (memory >= 8 && cores >= 8)
+            return "high";
+          if (memory >= 4 && cores >= 4)
+            return "medium";
           return "low";
         }
         _detectReducedMotion() {
@@ -2803,48 +2551,27 @@ var catppuccinStarryNight = (() => {
           this._tryRegisterWithMasterAnimation();
           if (this.config.enableDebug) {
             console.log(
-              `[${
-                this.systemName
-              }] Sidebar consciousness system initialized. Using ${
-                this.isUsingMasterAnimation
-                  ? "Master Animation Coordinator"
-                  : "fallback animation loop"
-              }.`
+              `[${this.systemName}] Sidebar consciousness system initialized. Using ${this.isUsingMasterAnimation ? "Master Animation Coordinator" : "fallback animation loop"}.`
             );
           }
         }
         // === PHASE 3: MASTER ANIMATION COORDINATOR METHODS ===
         _tryRegisterWithMasterAnimation() {
-          if (
-            this.year3000System &&
-            this.year3000System.registerAnimationSystem
-          ) {
+          if (this.year3000System && this.year3000System.registerAnimationSystem) {
             try {
               this.year3000System.registerAnimationSystem(
                 "SidebarConsciousnessSystem",
                 this,
                 "background",
                 // Background priority - less critical than visual effects
-                this.deviceCapabilities.performanceLevel === "high"
-                  ? 30
-                  : this.deviceCapabilities.performanceLevel === "medium"
-                  ? 20
-                  : 15
+                this.deviceCapabilities.performanceLevel === "high" ? 30 : this.deviceCapabilities.performanceLevel === "medium" ? 20 : 15
                 // Lower FPS for consciousness effects
               );
               this.masterAnimationRegistered = true;
               this.isUsingMasterAnimation = true;
               if (this.config?.enableDebug) {
                 console.log(
-                  `\u{1F3AC} [${
-                    this.systemName
-                  }] Registered with Master Animation Coordinator at ${
-                    this.deviceCapabilities.performanceLevel === "high"
-                      ? 30
-                      : this.deviceCapabilities.performanceLevel === "medium"
-                      ? 20
-                      : 15
-                  }fps`
+                  `\u{1F3AC} [${this.systemName}] Registered with Master Animation Coordinator at ${this.deviceCapabilities.performanceLevel === "high" ? 30 : this.deviceCapabilities.performanceLevel === "medium" ? 20 : 15}fps`
                 );
               }
             } catch (error) {
@@ -2886,14 +2613,9 @@ var catppuccinStarryNight = (() => {
             }
             const time = timestamp * 1e-3;
             const pulse = Math.sin(time * 2) * 0.1 + 0.9;
-            const useBatching =
-              this.year3000System && this.year3000System.queueCSSVariableUpdate;
+            const useBatching = this.year3000System && this.year3000System.queueCSSVariableUpdate;
             this.animationState.targetScale = pulse;
-            this.animationState.currentScale =
-              this.animationState.currentScale +
-              (this.animationState.targetScale -
-                this.animationState.currentScale) *
-                this.animationState.smoothingFactor;
+            this.animationState.currentScale = this.animationState.currentScale + (this.animationState.targetScale - this.animationState.currentScale) * this.animationState.smoothingFactor;
             if (this.consciousnessVisualizer) {
               const transform = `translateX(-50%) scale(${this.animationState.currentScale.toFixed(
                 3
@@ -2909,10 +2631,7 @@ var catppuccinStarryNight = (() => {
               }
             }
             if (this.harmonicModeIndicator) {
-              const opacity = (
-                this.animationState.baseOpacity +
-                pulse * 0.2
-              ).toString();
+              const opacity = (this.animationState.baseOpacity + pulse * 0.2).toString();
               if (useBatching) {
                 this.year3000System.queueCSSVariableUpdate(
                   "opacity",
@@ -2933,11 +2652,7 @@ var catppuccinStarryNight = (() => {
             if (this.performanceMetrics.frameTimeHistory.length > 30) {
               this.performanceMetrics.frameTimeHistory.shift();
             }
-            this.performanceMetrics.averageFrameTime =
-              this.performanceMetrics.frameTimeHistory.reduce(
-                (a, b) => a + b,
-                0
-              ) / this.performanceMetrics.frameTimeHistory.length;
+            this.performanceMetrics.averageFrameTime = this.performanceMetrics.frameTimeHistory.reduce((a, b) => a + b, 0) / this.performanceMetrics.frameTimeHistory.length;
           } catch (error) {
             console.error(
               `[${this.systemName}] Error in consciousness animation:`,
@@ -3059,16 +2774,14 @@ var catppuccinStarryNight = (() => {
           }
         }
         updateColors() {
-          if (!this.consciousnessVisualizer) return;
+          if (!this.consciousnessVisualizer)
+            return;
           try {
             const root = document.documentElement;
             const style = getComputedStyle(root);
-            const accentColor =
-              style.getPropertyValue("--spice-accent") || "#ca9ee6";
-            const buttonColor =
-              style.getPropertyValue("--spice-button") || "#8caaee";
-            const highlightColor =
-              style.getPropertyValue("--spice-highlight") || "#babbf1";
+            const accentColor = style.getPropertyValue("--spice-accent") || "#ca9ee6";
+            const buttonColor = style.getPropertyValue("--spice-button") || "#8caaee";
+            const highlightColor = style.getPropertyValue("--spice-highlight") || "#babbf1";
             this.consciousnessVisualizer.style.background = `linear-gradient(90deg,
         rgba(var(--spice-rgb-accent, 202,158,230), 0.6),
         rgba(var(--spice-rgb-button, 140,170,238), 0.6)
@@ -3078,10 +2791,7 @@ var catppuccinStarryNight = (() => {
               console.log(`[${this.systemName}] Colors updated successfully`);
             }
           } catch (error) {
-            console.error(
-              `[${this.systemName}] Failed to update colors:`,
-              error
-            );
+            console.error(`[${this.systemName}] Failed to update colors:`, error);
           }
         }
         startConsciousnessLoop() {
@@ -3099,10 +2809,7 @@ var catppuccinStarryNight = (() => {
                 this.consciousnessVisualizer.style.transform = `translateX(-50%) scale(${pulse})`;
               }
               if (this.harmonicModeIndicator) {
-                this.harmonicModeIndicator.style.opacity = (
-                  0.6 +
-                  pulse * 0.2
-                ).toString();
+                this.harmonicModeIndicator.style.opacity = (0.6 + pulse * 0.2).toString();
               }
               this.consciousnessAnimationFrame = requestAnimationFrame(animate);
             } catch (error) {
@@ -3119,8 +2826,7 @@ var catppuccinStarryNight = (() => {
         }
         updateHarmonicModeDisplay(newModeKey) {
           this.currentHarmonicModeKey = newModeKey;
-          const modeDetails =
-            HARMONIC_MODES[newModeKey] || HARMONIC_MODES["analogous-flow"];
+          const modeDetails = HARMONIC_MODES[newModeKey] || HARMONIC_MODES["analogous-flow"];
           if (this.consciousnessVisualizer) {
             const placeholderPrimary = "var(--spice-rgb-accent)";
             const placeholderSecondary = "var(--spice-rgb-button)";
@@ -3146,12 +2852,13 @@ var catppuccinStarryNight = (() => {
           }
         }
         _updateSidebarVariables(processedMusicData = {}) {
-          if (!this.isInitialized || !this.rootNavBar) return;
+          if (!this.isInitialized || !this.rootNavBar)
+            return;
           const {
             energy = 0.5,
             valence = 0.5,
             visualIntensity = 0.5,
-            moodIdentifier = "neutral",
+            moodIdentifier = "neutral"
           } = processedMusicData;
           const rootStyle = Year3000Utilities.getRootStyle();
           this.nexusVariables.complexity = parseFloat(
@@ -3165,8 +2872,7 @@ var catppuccinStarryNight = (() => {
           );
           const opacity = Year3000Utilities.lerpSmooth(
             parseFloat(
-              this.rootNavBar.style.getPropertyValue("--sn-sidebar-opacity") ||
-                "0.7"
+              this.rootNavBar.style.getPropertyValue("--sn-sidebar-opacity") || "0.7"
             ),
             0.6 + visualIntensity * 0.4 - this.nexusVariables.volatility * 0.2,
             0.1,
@@ -3182,9 +2888,7 @@ var catppuccinStarryNight = (() => {
             // Height in px
           );
           const widthPercentage = Year3000Utilities.lerpSmooth(
-            parseFloat(
-              this.consciousnessVisualizer?.style.width.replace("%", "")
-            ) || 80,
+            parseFloat(this.consciousnessVisualizer?.style.width.replace("%", "")) || 80,
             70 + valence * 20 + this.nexusVariables.coherence * 10,
             0.1,
             0.2
@@ -3202,8 +2906,7 @@ var catppuccinStarryNight = (() => {
               50,
               Math.min(95, widthPercentage)
             ).toFixed(0)}%`;
-            const pulseSpeed =
-              (1 / (processedMusicData.tempo / 120 || 1)) * 0.5 + 0.5;
+            const pulseSpeed = 1 / (processedMusicData.tempo / 120 || 1) * 0.5 + 0.5;
             this.consciousnessVisualizer.style.animationDuration = `${Math.max(
               0.5,
               Math.min(3, pulseSpeed)
@@ -3211,21 +2914,16 @@ var catppuccinStarryNight = (() => {
           }
           if (this.config?.enableDebug && Math.random() < 0.01) {
             console.log(
-              `[${
-                this.systemName
-              }] Sidebar variables updated. Opacity: ${opacity.toFixed(
+              `[${this.systemName}] Sidebar variables updated. Opacity: ${opacity.toFixed(
                 2
               )}, Height: ${height.toFixed(0)}px, Mood: ${moodIdentifier}`
             );
           }
         }
         updateFromMusicAnalysis(processedMusicData, rawFeatures, trackUri) {
-          if (!this.isInitialized) return;
-          super.updateFromMusicAnalysis(
-            processedMusicData,
-            rawFeatures,
-            trackUri
-          );
+          if (!this.isInitialized)
+            return;
+          super.updateFromMusicAnalysis(processedMusicData, rawFeatures, trackUri);
           this._updateSidebarVariables(processedMusicData);
         }
         // ===== YEAR 3000 MODE CONFIGURATION =====
@@ -3234,7 +2932,8 @@ var catppuccinStarryNight = (() => {
          * @param {Object} modeConfig - Configuration from artistic mode profile
          */
         updateModeConfiguration(modeConfig) {
-          if (!modeConfig) return;
+          if (!modeConfig)
+            return;
           const { enabled, animations, intensity } = modeConfig;
           if (this.config?.enableDebug) {
             console.log(
@@ -3246,7 +2945,7 @@ var catppuccinStarryNight = (() => {
             systemEnabled: enabled !== false,
             consciousnessAnimationsEnabled: animations || false,
             intensityMultiplier: intensity || 1,
-            harmonicSyncEnabled: modeConfig.harmonicSync || false,
+            harmonicSyncEnabled: modeConfig.harmonicSync || false
           };
           this.updateConsciousnessForMode();
           if (this.modeConfig.harmonicSyncEnabled) {
@@ -3259,11 +2958,11 @@ var catppuccinStarryNight = (() => {
          * Update consciousness display behavior based on current mode
          */
         updateConsciousnessForMode() {
-          if (!this.modeConfig) return;
+          if (!this.modeConfig)
+            return;
           const baseIntensity = this.modeConfig.intensityMultiplier || 1;
           this.consciousnessState.modeScaling = baseIntensity;
-          this.consciousnessState.animationsEnabled =
-            this.modeConfig.consciousnessAnimationsEnabled;
+          this.consciousnessState.animationsEnabled = this.modeConfig.consciousnessAnimationsEnabled;
           this.updateConsciousnessDisplay(this.consciousnessState);
           if (this.config?.enableDebug) {
             console.log(
@@ -3275,9 +2974,11 @@ var catppuccinStarryNight = (() => {
          * Setup listener for harmonic sync events
          */
         setupHarmonicSyncListener() {
-          if (this.harmonicSyncListener) return;
+          if (this.harmonicSyncListener)
+            return;
           this.harmonicSyncListener = (event) => {
-            if (!this.modeConfig?.harmonicSyncEnabled) return;
+            if (!this.modeConfig?.harmonicSyncEnabled)
+              return;
             const harmonicData = event.detail;
             this.syncConsciousnessToHarmonics(harmonicData);
           };
@@ -3286,9 +2987,7 @@ var catppuccinStarryNight = (() => {
             this.harmonicSyncListener
           );
           if (this.config?.enableDebug) {
-            console.log(
-              `\u{1F3B5} [${this.systemName}] Harmonic sync listener enabled`
-            );
+            console.log(`\u{1F3B5} [${this.systemName}] Harmonic sync listener enabled`);
           }
         }
         /**
@@ -3302,9 +3001,7 @@ var catppuccinStarryNight = (() => {
             );
             this.harmonicSyncListener = null;
             if (this.config?.enableDebug) {
-              console.log(
-                `\u{1F3B5} [${this.systemName}] Harmonic sync listener disabled`
-              );
+              console.log(`\u{1F3B5} [${this.systemName}] Harmonic sync listener disabled`);
             }
           }
         }
@@ -3313,14 +3010,15 @@ var catppuccinStarryNight = (() => {
          * @param {Object} harmonicData - Harmonic data from BeatSyncVisualSystem
          */
         syncConsciousnessToHarmonics(harmonicData) {
-          if (!harmonicData || !this.consciousnessState) return;
+          if (!harmonicData || !this.consciousnessState)
+            return;
           const { composite } = harmonicData;
           const intensity = this.modeConfig?.intensityMultiplier || 1;
           const harmonicModulation = {
             opacity: 0.8 + composite.oscillation * 0.15 * intensity,
             scale: 1 + composite.pulse * 0.05 * intensity,
             rotation: composite.flow * 2 * intensity,
-            glow: 0.3 + composite.oscillation * 0.2 * intensity,
+            glow: 0.3 + composite.oscillation * 0.2 * intensity
           };
           this.consciousnessState.harmonicModulation = harmonicModulation;
           this.applyHarmonicModulation(harmonicModulation);
@@ -3354,9 +3052,7 @@ var catppuccinStarryNight = (() => {
             if (this.modeConfig?.consciousnessAnimationsEnabled) {
               element.style.opacity = modulation.opacity;
               element.style.transform = `scale(${modulation.scale}) rotate(${modulation.rotation}deg)`;
-              element.style.filter = `drop-shadow(0 0 ${
-                modulation.glow * 10
-              }px rgba(var(--sn-gradient-accent-rgb), ${modulation.glow}))`;
+              element.style.filter = `drop-shadow(0 0 ${modulation.glow * 10}px rgba(var(--sn-gradient-accent-rgb), ${modulation.glow}))`;
             }
           });
         }
@@ -3370,37 +3066,26 @@ var catppuccinStarryNight = (() => {
             consciousnessVisualizer: !!this.consciousnessVisualizer,
             harmonicModeIndicator: !!this.harmonicModeIndicator,
             methodsExist: {
-              createHarmonicModeDisplay:
-                typeof this.createHarmonicModeDisplay === "function",
+              createHarmonicModeDisplay: typeof this.createHarmonicModeDisplay === "function",
               updateColors: typeof this.updateColors === "function",
-              startConsciousnessLoop:
-                typeof this.startConsciousnessLoop === "function",
-              _createConsciousnessVisualizer:
-                typeof this._createConsciousnessVisualizer === "function",
+              startConsciousnessLoop: typeof this.startConsciousnessLoop === "function",
+              _createConsciousnessVisualizer: typeof this._createConsciousnessVisualizer === "function"
             },
             domElements: {
-              rootNavBarAccessible:
-                this.rootNavBar &&
-                document.contains &&
-                document.contains(this.rootNavBar),
-              visualizerAttached:
-                this.consciousnessVisualizer &&
-                this.consciousnessVisualizer.parentNode,
-              indicatorAttached:
-                this.harmonicModeIndicator &&
-                this.harmonicModeIndicator.parentNode,
+              rootNavBarAccessible: this.rootNavBar && document.contains && document.contains(this.rootNavBar),
+              visualizerAttached: this.consciousnessVisualizer && this.consciousnessVisualizer.parentNode,
+              indicatorAttached: this.harmonicModeIndicator && this.harmonicModeIndicator.parentNode
             },
             initialization: {
               initialized: this.initialized !== false,
               configValid: !!this.config,
-              systemNameSet: !!this.systemName,
-            },
+              systemNameSet: !!this.systemName
+            }
           };
-          const methodIssues = Object.entries(checks.methodsExist)
-            .filter(([method, exists]) => !exists)
-            .map(([method]) => `${method} method missing`);
+          const methodIssues = Object.entries(checks.methodsExist).filter(([method, exists]) => !exists).map(([method]) => `${method} method missing`);
           const domIssues = [];
-          if (!checks.rootNavBar) domIssues.push("rootNavBar not found");
+          if (!checks.rootNavBar)
+            domIssues.push("rootNavBar not found");
           if (!checks.consciousnessVisualizer)
             domIssues.push("consciousnessVisualizer not created");
           if (!checks.harmonicModeIndicator)
@@ -3428,8 +3113,8 @@ var catppuccinStarryNight = (() => {
             categories: {
               methods: methodIssues,
               dom: domIssues,
-              initialization: initIssues,
-            },
+              initialization: initIssues
+            }
           };
         }
         destroy() {
@@ -3456,9 +3141,7 @@ var catppuccinStarryNight = (() => {
             cancelAnimationFrame(this.consciousnessAnimationFrame);
             this.consciousnessAnimationFrame = null;
             if (this.config?.enableDebug) {
-              console.log(
-                `\u{1F504} [${this.systemName}] Stopped fallback animation loop`
-              );
+              console.log(`\u{1F504} [${this.systemName}] Stopped fallback animation loop`);
             }
           }
           this.removeHarmonicSyncListener();
@@ -3484,7 +3167,7 @@ var catppuccinStarryNight = (() => {
           }
         }
       };
-    },
+    }
   });
 
   // src-js/services/GenreProfileManager.js
@@ -3498,34 +3181,18 @@ var catppuccinStarryNight = (() => {
         house: { energyBoost: 1.2, beatEmphasis: 1.25, precision: 0.95 },
         techno: { energyBoost: 1.15, beatEmphasis: 1.3, precision: 1 },
         trance: { energyBoost: 1.15, beatEmphasis: 1.1, precision: 0.85 },
-        rock: {
-          energyBoost: 1.05,
-          intensityMultiplier: 1.1,
-          dynamicRange: 1.1,
-        },
-        metal: {
-          energyBoost: 1.15,
-          intensityMultiplier: 1.2,
-          dynamicRange: 1.2,
-        },
+        rock: { energyBoost: 1.05, intensityMultiplier: 1.1, dynamicRange: 1.1 },
+        metal: { energyBoost: 1.15, intensityMultiplier: 1.2, dynamicRange: 1.2 },
         punk: { energyBoost: 1.2, intensityMultiplier: 1.1, precision: 0.8 },
         hiphop: { beatEmphasis: 1.3, grooveFactor: 1.2, tempoMultiplier: 0.95 },
         rap: { beatEmphasis: 1.3, grooveFactor: 1.2, tempoMultiplier: 0.95 },
-        jazz: {
-          adaptiveVariation: true,
-          complexity: 1.2,
-          smoothingFactor: 1.3,
-        },
+        jazz: { adaptiveVariation: true, complexity: 1.2, smoothingFactor: 1.3 },
         classical: {
           gentleMode: true,
           dynamicRange: 1.4,
-          tempoVariationHandling: "adaptive",
+          tempoVariationHandling: "adaptive"
         },
-        ambient: {
-          subtleMode: true,
-          intensityReduction: 0.7,
-          smoothingFactor: 1.5,
-        },
+        ambient: { subtleMode: true, intensityReduction: 0.7, smoothingFactor: 1.5 },
         pop: { energyBoost: 1.05, beatEmphasis: 1.1, precision: 0.85 },
         rnb: { grooveFactor: 1.25, smoothingFactor: 1.1 },
         soul: { grooveFactor: 1.3, smoothingFactor: 1.15 },
@@ -3533,8 +3200,8 @@ var catppuccinStarryNight = (() => {
           balanced: true,
           energyBoost: 1,
           beatEmphasis: 1,
-          precision: 1,
-        },
+          precision: 1
+        }
       };
       GenreProfileManager = class {
         constructor(dependencies = {}) {
@@ -3546,29 +3213,23 @@ var catppuccinStarryNight = (() => {
         // A simple genre detection heuristic based on audio features.
         // This avoids needing extra API calls for artist/album genres for now.
         _getGenreFromAudioFeatures(features) {
-          if (!features) return "default";
-          const {
-            danceability,
-            energy,
-            acousticness,
-            instrumentalness,
-            tempo,
-          } = features;
+          if (!features)
+            return "default";
+          const { danceability, energy, acousticness, instrumentalness, tempo } = features;
           if (instrumentalness > 0.6 && acousticness < 0.2 && energy > 0.6) {
-            if (tempo > 120) return "techno";
+            if (tempo > 120)
+              return "techno";
             return "electronic";
           }
-          if (danceability > 0.7 && energy > 0.7) return "dance";
-          if (acousticness > 0.7 && energy < 0.4) return "classical";
-          if (acousticness > 0.5 && instrumentalness < 0.1) return "jazz";
+          if (danceability > 0.7 && energy > 0.7)
+            return "dance";
+          if (acousticness > 0.7 && energy < 0.4)
+            return "classical";
+          if (acousticness > 0.5 && instrumentalness < 0.1)
+            return "jazz";
           if (energy > 0.7 && instrumentalness < 0.1 && danceability > 0.5)
             return "rock";
-          if (
-            danceability > 0.7 &&
-            instrumentalness < 0.2 &&
-            energy > 0.5 &&
-            tempo < 110
-          )
+          if (danceability > 0.7 && instrumentalness < 0.2 && energy > 0.5 && tempo < 110)
             return "hiphop";
           return "default";
         }
@@ -3584,13 +3245,13 @@ var catppuccinStarryNight = (() => {
           return profile;
         }
       };
-    },
+    }
   });
 
   // src-js/services/MusicSyncService.js
   var MusicSyncService_exports = {};
   __export(MusicSyncService_exports, {
-    MusicSyncService: () => MusicSyncService,
+    MusicSyncService: () => MusicSyncService
   });
   var MUSIC_SYNC_CONFIG, MusicSyncService;
   var init_MusicSyncService = __esm({
@@ -3613,7 +3274,7 @@ var catppuccinStarryNight = (() => {
           danceabilityThreshold: 0.5,
           bpmThreshold: 0.8,
           maxBPM: 100,
-          minBPM: 70,
+          minBPM: 70
         },
         // Performance settings (unified from both services)
         performance: {
@@ -3623,7 +3284,7 @@ var catppuccinStarryNight = (() => {
           maxRetries: 10,
           retryDelay: 200,
           enableMetrics: true,
-          processingTimeTarget: 50,
+          processingTimeTarget: 50
         },
         // Simplified synchronization settings
         synchronization: {
@@ -3631,7 +3292,7 @@ var catppuccinStarryNight = (() => {
           maxSyncDelay: 1e3,
           adaptiveQuality: true,
           predictiveCaching: true,
-          debounceRapidChanges: 200,
+          debounceRapidChanges: 200
         },
         // Genre profiles (will be moved to separate module in Phase 2)
         genreProfiles: {
@@ -3641,8 +3302,8 @@ var catppuccinStarryNight = (() => {
           rock: { energyBoost: 1.15, consistentTiming: true },
           ambient: { subtleMode: true, intensityReduction: 0.7 },
           hiphop: { beatEmphasis: 1.25, rhythmPrecision: "high" },
-          default: { balanced: true },
-        },
+          default: { balanced: true }
+        }
       };
       MusicSyncService = class {
         constructor(dependencies = {}) {
@@ -3650,9 +3311,7 @@ var catppuccinStarryNight = (() => {
           this.utils = dependencies.Year3000Utilities || Year3000Utilities;
           this.colorHarmonyEngine = dependencies.colorHarmonyEngine;
           this.settingsManager = dependencies.settingsManager;
-          this.genreProfileManager =
-            dependencies.genreProfileManager ||
-            new GenreProfileManager({ YEAR3000_CONFIG: this.config });
+          this.genreProfileManager = dependencies.genreProfileManager || new GenreProfileManager({ YEAR3000_CONFIG: this.config });
           this.isInitialized = false;
           this.currentTrack = null;
           this.audioData = null;
@@ -3666,7 +3325,7 @@ var catppuccinStarryNight = (() => {
             avgProcessingTime: 0,
             performance: [],
             errors: 0,
-            updates: 0,
+            updates: 0
           };
           this.unifiedCache = /* @__PURE__ */ new Map();
           this.cacheTTL = MUSIC_SYNC_CONFIG.performance.cacheTTL;
@@ -3676,7 +3335,7 @@ var catppuccinStarryNight = (() => {
             nextBeatTime: 0,
             beatInterval: 0,
             confidence: 0,
-            isActive: false,
+            isActive: false
           };
           this.userPreferences = this.loadUserPreferences();
           this.performanceInterval = null;
@@ -3710,24 +3369,16 @@ var catppuccinStarryNight = (() => {
             }
             this.isInitialized = true;
             if (this.config.enableDebug) {
-              console.log(
-                "\u{1F31F} MusicSyncService initialized successfully!"
-              );
+              console.log("\u{1F31F} MusicSyncService initialized successfully!");
             }
           } catch (error) {
-            console.error(
-              "\u274C MusicSyncService initialization failed:",
-              error
-            );
+            console.error("\u274C MusicSyncService initialization failed:", error);
             this.metrics.errors++;
           }
         }
         // === SUBSCRIBER MANAGEMENT (Simplified from MusicAnalysisService) ===
         subscribe(systemInstance, systemName) {
-          if (
-            !systemInstance ||
-            typeof systemInstance.updateFromMusicAnalysis !== "function"
-          ) {
+          if (!systemInstance || typeof systemInstance.updateFromMusicAnalysis !== "function") {
             console.warn(
               `[MusicSyncService] Invalid system or missing updateFromMusicAnalysis method: ${systemName}`
             );
@@ -3764,9 +3415,7 @@ var catppuccinStarryNight = (() => {
           if (this.subscribers.has(systemName)) {
             this.subscribers.delete(systemName);
             if (this.config.enableDebug) {
-              console.log(
-                `[MusicSyncService] System unsubscribed: ${systemName}`
-              );
+              console.log(`[MusicSyncService] System unsubscribed: ${systemName}`);
             }
           }
         }
@@ -3778,11 +3427,7 @@ var catppuccinStarryNight = (() => {
             return;
           }
           this.latestProcessedData = processedData;
-          if (
-            this.config.enableDebug &&
-            this.subscribers.size > 0 &&
-            Math.random() < 0.05
-          ) {
+          if (this.config.enableDebug && this.subscribers.size > 0 && Math.random() < 0.05) {
             console.log(
               `[MusicSyncService] Notifying ${this.subscribers.size} subscribers for track ${trackUri}`
             );
@@ -3791,15 +3436,8 @@ var catppuccinStarryNight = (() => {
           let errors = 0;
           for (const [name, system] of this.subscribers) {
             try {
-              if (
-                system.initialized &&
-                typeof system.updateFromMusicAnalysis === "function"
-              ) {
-                system.updateFromMusicAnalysis(
-                  processedData,
-                  rawFeatures,
-                  trackUri
-                );
+              if (system.initialized && typeof system.updateFromMusicAnalysis === "function") {
+                system.updateFromMusicAnalysis(processedData, rawFeatures, trackUri);
                 notified++;
               }
             } catch (error) {
@@ -3820,7 +3458,7 @@ var catppuccinStarryNight = (() => {
         async fetchAudioData(options = {}) {
           const {
             retryDelay = MUSIC_SYNC_CONFIG.performance.retryDelay,
-            maxRetries = MUSIC_SYNC_CONFIG.performance.maxRetries,
+            maxRetries = MUSIC_SYNC_CONFIG.performance.maxRetries
           } = options;
           const currentTrackUri = Spicetify.Player.data?.item?.uri;
           if (!currentTrackUri) {
@@ -3847,9 +3485,7 @@ var catppuccinStarryNight = (() => {
               if (attempt < maxRetries - 1) {
                 if (this.config.enableDebug) {
                   console.log(
-                    `[MusicSyncService] Retrying audio data fetch (${
-                      attempt + 1
-                    }/${maxRetries})...`
+                    `[MusicSyncService] Retrying audio data fetch (${attempt + 1}/${maxRetries})...`
                   );
                 }
                 await new Promise((resolve) => setTimeout(resolve, retryDelay));
@@ -3870,7 +3506,8 @@ var catppuccinStarryNight = (() => {
         async getAudioFeatures() {
           try {
             const currentTrack = Spicetify.Player.data?.item;
-            if (!currentTrack?.uri) return null;
+            if (!currentTrack?.uri)
+              return null;
             const trackId = currentTrack.uri.split(":")[2];
             const cacheKey = this.generateCacheKey(trackId, "features");
             const cached = this.getFromCache(cacheKey);
@@ -3888,7 +3525,7 @@ var catppuccinStarryNight = (() => {
               valence: response.valence,
               acousticness: response.acousticness,
               instrumentalness: response.instrumentalness,
-              tempo: response.tempo,
+              tempo: response.tempo
             };
             this.setInCache(cacheKey, { audioFeatures: features });
             return features;
@@ -3908,9 +3545,7 @@ var catppuccinStarryNight = (() => {
           try {
             if (!audioData?.track?.tempo) {
               if (this.config.enableDebug) {
-                console.warn(
-                  "[MusicSyncService] No BPM data available for track"
-                );
+                console.warn("[MusicSyncService] No BPM data available for track");
               }
               return this.getFallbackBPM();
             }
@@ -3929,20 +3564,19 @@ var catppuccinStarryNight = (() => {
                 `[MusicSyncService] Audio features - Danceability: ${danceability}, Energy: ${energy}, Valence: ${valence}`
               );
             }
-            const profile =
-              this.genreProfileManager.getProfileForTrack(audioFeatures);
+            const profile = this.genreProfileManager.getProfileForTrack(audioFeatures);
             const enhancedBPM = this.computeAdvancedBPM({
               trackBPM,
               danceability,
               energy,
               valence,
               config,
-              profile,
+              profile
             });
             const cacheKey = this.generateCacheKey(audioData.track.uri, "bpm");
             this.setInCache(cacheKey, {
               bpm: enhancedBPM,
-              audioFeatures,
+              audioFeatures
             });
             this.metrics.bpmCalculations++;
             this.trackPerformance(startTime);
@@ -3964,7 +3598,7 @@ var catppuccinStarryNight = (() => {
           energy,
           valence,
           config,
-          profile,
+          profile
         }) {
           const {
             danceabilityWeight,
@@ -3974,7 +3608,7 @@ var catppuccinStarryNight = (() => {
             danceabilityThreshold,
             bpmThreshold,
             maxBPM,
-            minBPM,
+            minBPM
           } = config;
           const normalizedBPM = Math.min(trackBPM / 100, 2);
           let adjustedDanceabilityWeight = danceabilityWeight;
@@ -3989,17 +3623,9 @@ var catppuccinStarryNight = (() => {
           if (normalizedBPM < bpmThreshold) {
             adjustedBpmWeight = 0.9;
           }
-          const valenceInfluence =
-            valence > 0.6 ? 1.1 : valence < 0.4 ? 0.9 : 1;
-          const weightSum =
-            adjustedDanceabilityWeight +
-            adjustedEnergyWeight +
-            adjustedBpmWeight;
-          const weightedAverage =
-            (danceability * adjustedDanceabilityWeight +
-              energy * adjustedEnergyWeight +
-              normalizedBPM * adjustedBpmWeight) /
-            weightSum;
+          const valenceInfluence = valence > 0.6 ? 1.1 : valence < 0.4 ? 0.9 : 1;
+          const weightSum = adjustedDanceabilityWeight + adjustedEnergyWeight + adjustedBpmWeight;
+          const weightedAverage = (danceability * adjustedDanceabilityWeight + energy * adjustedEnergyWeight + normalizedBPM * adjustedBpmWeight) / weightSum;
           let enhancedBPM = weightedAverage * maxBPM * valenceInfluence;
           if (enhancedBPM > trackBPM) {
             enhancedBPM = (enhancedBPM + trackBPM) / 2;
@@ -4014,63 +3640,44 @@ var catppuccinStarryNight = (() => {
         }
         // === AUDIO FEATURE ESTIMATION (From MusicAnalysisService) ===
         estimateDanceabilityFromTempo(tempo) {
-          const config =
-            this.config.musicVisualSync.enhancedBPM.danceabilityEstimation;
+          const config = this.config.musicVisualSync.enhancedBPM.danceabilityEstimation;
           if (tempo >= config.highDance.min && tempo <= config.highDance.max) {
             return config.highDance.value;
           }
-          if (
-            tempo >= config.mediumDance.min &&
-            tempo <= config.mediumDance.max
-          ) {
+          if (tempo >= config.mediumDance.min && tempo <= config.mediumDance.max) {
             return config.mediumDance.value;
           }
-          if (
-            tempo >= config.lowMediumDance.min &&
-            tempo <= config.lowMediumDance.max
-          ) {
+          if (tempo >= config.lowMediumDance.min && tempo <= config.lowMediumDance.max) {
             return config.lowMediumDance.value;
           }
           return config.lowDance.value;
         }
         estimateEnergyFromTempoLoudness(tempo, loudness) {
-          const config =
-            this.config.musicVisualSync.enhancedBPM.energyEstimation;
+          const config = this.config.musicVisualSync.enhancedBPM.energyEstimation;
           const tempoFactor = Math.max(
             0,
             Math.min(
               1,
-              (tempo - config.tempoRange.min) /
-                (config.tempoRange.max - config.tempoRange.min)
+              (tempo - config.tempoRange.min) / (config.tempoRange.max - config.tempoRange.min)
             )
           );
           const loudnessFactor = Math.max(
             0,
             Math.min(
               1,
-              (loudness - config.loudnessRange.min) /
-                (config.loudnessRange.max - config.loudnessRange.min)
+              (loudness - config.loudnessRange.min) / (config.loudnessRange.max - config.loudnessRange.min)
             )
           );
-          return (
-            tempoFactor * config.tempoWeight +
-            loudnessFactor * config.loudnessWeight
-          );
+          return tempoFactor * config.tempoWeight + loudnessFactor * config.loudnessWeight;
         }
         estimateValenceFromKey(key) {
           const majorKeys = [0, 2, 4, 5, 7, 9, 11];
           return majorKeys.includes(key) ? 0.6 : 0.4;
         }
         // === MAIN PROCESSING PIPELINE (From MusicAnalysisService) ===
-        async processAudioFeatures(
-          rawSpicetifyAudioFeatures,
-          trackUri,
-          trackDurationMs
-        ) {
+        async processAudioFeatures(rawSpicetifyAudioFeatures, trackUri, trackDurationMs) {
           if (!this.isInitialized) {
-            console.warn(
-              "[MusicSyncService] Not initialized, skipping processing."
-            );
+            console.warn("[MusicSyncService] Not initialized, skipping processing.");
             return null;
           }
           this.currentTrackUri = trackUri;
@@ -4091,31 +3698,17 @@ var catppuccinStarryNight = (() => {
             if (audioAnalysisData) {
               enhancedBPM = await this.calculateEnhancedBPM(audioAnalysisData);
               const trackData = audioAnalysisData.track || {};
-              tempo =
-                trackData.tempo ||
-                this.config.musicVisualSync.enhancedBPM.fallbacks.tempo;
-              loudness =
-                trackData.loudness ||
-                this.config.musicVisualSync.enhancedBPM.fallbacks.loudness;
-              key =
-                trackData.key ||
-                this.config.musicVisualSync.enhancedBPM.fallbacks.key;
-              timeSignature =
-                trackData.time_signature ||
-                this.config.musicVisualSync.enhancedBPM.fallbacks.timeSignature;
+              tempo = trackData.tempo || this.config.musicVisualSync.enhancedBPM.fallbacks.tempo;
+              loudness = trackData.loudness || this.config.musicVisualSync.enhancedBPM.fallbacks.loudness;
+              key = trackData.key || this.config.musicVisualSync.enhancedBPM.fallbacks.key;
+              timeSignature = trackData.time_signature || this.config.musicVisualSync.enhancedBPM.fallbacks.timeSignature;
               const audioFeatures = await this.getAudioFeatures();
               if (audioFeatures) {
-                estimatedDanceability =
-                  audioFeatures.danceability ||
-                  this.estimateDanceabilityFromTempo(tempo);
-                estimatedEnergy =
-                  audioFeatures.energy ||
-                  this.estimateEnergyFromTempoLoudness(tempo, loudness);
-                estimatedValence =
-                  audioFeatures.valence || this.estimateValenceFromKey(key);
+                estimatedDanceability = audioFeatures.danceability || this.estimateDanceabilityFromTempo(tempo);
+                estimatedEnergy = audioFeatures.energy || this.estimateEnergyFromTempoLoudness(tempo, loudness);
+                estimatedValence = audioFeatures.valence || this.estimateValenceFromKey(key);
               } else {
-                estimatedDanceability =
-                  this.estimateDanceabilityFromTempo(tempo);
+                estimatedDanceability = this.estimateDanceabilityFromTempo(tempo);
                 estimatedEnergy = this.estimateEnergyFromTempoLoudness(
                   tempo,
                   loudness
@@ -4123,18 +3716,14 @@ var catppuccinStarryNight = (() => {
                 estimatedValence = this.estimateValenceFromKey(key);
               }
             } else {
-              const fallbacks =
-                this.config.musicVisualSync.enhancedBPM.fallbacks;
+              const fallbacks = this.config.musicVisualSync.enhancedBPM.fallbacks;
               tempo = fallbacks.tempo;
               loudness = fallbacks.loudness;
               key = fallbacks.key;
               timeSignature = fallbacks.timeSignature;
               enhancedBPM = tempo;
               estimatedDanceability = this.estimateDanceabilityFromTempo(tempo);
-              estimatedEnergy = this.estimateEnergyFromTempoLoudness(
-                tempo,
-                loudness
-              );
+              estimatedEnergy = this.estimateEnergyFromTempoLoudness(tempo, loudness);
               estimatedValence = this.estimateValenceFromKey(key);
             }
             let artisticMultipliers;
@@ -4144,29 +3733,23 @@ var catppuccinStarryNight = (() => {
               } else {
                 artisticMultipliers = this.config.artisticMultipliers || {
                   musicEnergyBoost: 1,
-                  visualIntensityBase: 1,
+                  visualIntensityBase: 1
                 };
               }
             } catch (error) {
-              console.error(
-                "[MusicSyncService] Error getting multipliers:",
-                error
-              );
+              console.error("[MusicSyncService] Error getting multipliers:", error);
               artisticMultipliers = {
                 musicEnergyBoost: 1,
-                visualIntensityBase: 1,
+                visualIntensityBase: 1
               };
             }
             let processedEnergy = estimatedEnergy;
             if (this.config.enableCosmicSync) {
-              processedEnergy =
-                estimatedEnergy * artisticMultipliers.musicEnergyBoost;
+              processedEnergy = estimatedEnergy * artisticMultipliers.musicEnergyBoost;
               processedEnergy = Math.max(0.1, Math.min(1, processedEnergy));
             }
-            const baseIntensity =
-              estimatedEnergy * 0.6 + estimatedDanceability * 0.4;
-            const visualIntensity =
-              baseIntensity * (artisticMultipliers.visualIntensityBase || 1);
+            const baseIntensity = estimatedEnergy * 0.6 + estimatedDanceability * 0.4;
+            const visualIntensity = baseIntensity * (artisticMultipliers.visualIntensityBase || 1);
             let moodIdentifier = "neutral";
             if (estimatedValence > 0.6 && estimatedEnergy > 0.6) {
               moodIdentifier = "energetic-happy";
@@ -4201,21 +3784,18 @@ var catppuccinStarryNight = (() => {
               enhancedBPM,
               bmpCalculationMethod: "unified-service",
               // Metadata
-              dataSource: "unified-music-sync-service",
+              dataSource: "unified-music-sync-service"
             };
             this.setInCache(cacheKey, { processedData });
             this.latestProcessedData = processedData;
             if (this.config.enableDebug) {
-              console.log(
-                "\u{1F3B5} [MusicSyncService] Processed music data:",
-                {
-                  baseTempo: tempo,
-                  enhancedBPM,
-                  mood: moodIdentifier,
-                  energy: estimatedEnergy.toFixed(2),
-                  visualIntensity: visualIntensity.toFixed(2),
-                }
-              );
+              console.log("\u{1F3B5} [MusicSyncService] Processed music data:", {
+                baseTempo: tempo,
+                enhancedBPM,
+                mood: moodIdentifier,
+                energy: estimatedEnergy.toFixed(2),
+                visualIntensity: visualIntensity.toFixed(2)
+              });
             }
             this.notifySubscribers(processedData);
             return processedData;
@@ -4231,10 +3811,7 @@ var catppuccinStarryNight = (() => {
         // === UTILITY METHODS ===
         validateBPM(bpm) {
           const { minBPM, maxBPM } = this.config.bpmCalculation;
-          return Math.max(
-            minBPM,
-            Math.min(maxBPM * 2, Math.round(bpm * 100) / 100)
-          );
+          return Math.max(minBPM, Math.min(maxBPM * 2, Math.round(bpm * 100) / 100));
         }
         getFallbackBPM() {
           return 75;
@@ -4264,14 +3841,12 @@ var catppuccinStarryNight = (() => {
             baseBPM: fallbacks.tempo,
             enhancedBPM: fallbacks.tempo,
             bmpCalculationMethod: "fallback",
-            dataSource: "fallback",
+            dataSource: "fallback"
           };
         }
         // === CACHING SYSTEM (Unified) ===
         generateCacheKey(identifier, type = "default") {
-          return `${type}_${
-            identifier?.split?.(":").pop?.() || identifier || Date.now()
-          }`;
+          return `${type}_${identifier?.split?.(":").pop?.() || identifier || Date.now()}`;
         }
         getFromCache(key) {
           const cached = this.unifiedCache.get(key);
@@ -4286,7 +3861,7 @@ var catppuccinStarryNight = (() => {
         setInCache(key, data) {
           this.unifiedCache.set(key, {
             ...data,
-            timestamp: Date.now(),
+            timestamp: Date.now()
           });
         }
         setupCacheManagement() {
@@ -4323,30 +3898,27 @@ var catppuccinStarryNight = (() => {
         }
         // === PERFORMANCE MONITORING ===
         setupPerformanceMonitoring() {
-          if (this.performanceInterval) clearInterval(this.performanceInterval);
+          if (this.performanceInterval)
+            clearInterval(this.performanceInterval);
           this.performanceInterval = setInterval(() => {
-            if (
-              this.metrics.avgProcessingTime >
-              this.config.performance.processingTimeTarget
-            ) {
-              if (this.config.enableDebug) {
-                console.warn(
-                  `[MusicSyncService] Performance warning: Avg processing time ${this.metrics.avgProcessingTime}ms exceeds target ${this.config.performance.processingTimeTarget}ms`
-                );
-              }
+            if (this.metrics.avgProcessingTime > MUSIC_SYNC_CONFIG.performance.processingTimeTarget) {
+              console.warn(
+                `[MusicSyncService] High average processing time: ${this.metrics.avgProcessingTime.toFixed(
+                  2
+                )}ms exceeds target ${MUSIC_SYNC_CONFIG.performance.processingTimeTarget}ms`
+              );
             }
           }, 3e4);
         }
         trackPerformance(startTime) {
-          if (!this.config.performance.enableMetrics) return;
+          if (!this.config.performance.enableMetrics)
+            return;
           const duration = performance.now() - startTime;
           this.metrics.performance.push(duration);
           if (this.metrics.performance.length > 100) {
             this.metrics.performance.shift();
           }
-          this.metrics.avgProcessingTime =
-            this.metrics.performance.reduce((a, b) => a + b, 0) /
-            this.metrics.performance.length;
+          this.metrics.avgProcessingTime = this.metrics.performance.reduce((a, b) => a + b, 0) / this.metrics.performance.length;
         }
         // === USER PREFERENCES ===
         loadUserPreferences() {
@@ -4385,14 +3957,13 @@ var catppuccinStarryNight = (() => {
         async getEnhancedBPMForCurrentTrack(options = {}) {
           if (!this.isInitialized) {
             if (this.config.enableDebug) {
-              console.warn(
-                "[MusicSyncService] Not initialized, cannot get BPM"
-              );
+              console.warn("[MusicSyncService] Not initialized, cannot get BPM");
             }
             return this.getFallbackBPM();
           }
           const audioData = await this.fetchAudioData();
-          if (!audioData) return this.getFallbackBPM();
+          if (!audioData)
+            return this.getFallbackBPM();
           return this.calculateEnhancedBPM(audioData, options);
         }
         async calculatePlaybackRate(videoDefaultBPM = 135.48, options = {}) {
@@ -4412,10 +3983,7 @@ var catppuccinStarryNight = (() => {
               this.audioData,
               options
             );
-            const playbackRate =
-              videoDefaultBPM && videoDefaultBPM !== 0
-                ? enhancedBPM / videoDefaultBPM
-                : 1;
+            const playbackRate = videoDefaultBPM && videoDefaultBPM !== 0 ? enhancedBPM / videoDefaultBPM : 1;
             const clampedRate = Math.max(0.5, Math.min(2, playbackRate));
             if (this.config.enableDebug) {
               console.log(
@@ -4446,7 +4014,7 @@ var catppuccinStarryNight = (() => {
             cacheTTL: this.cacheTTL,
             currentTrackUri: this.currentTrackUri,
             metrics: this.metrics,
-            hasLatestData: !!this.latestProcessedData,
+            hasLatestData: !!this.latestProcessedData
           };
         }
         destroy() {
@@ -4469,14 +4037,11 @@ var catppuccinStarryNight = (() => {
               console.log("[MusicSyncService] Destroyed successfully");
             }
           } catch (error) {
-            console.error(
-              "[MusicSyncService] Error during destruction:",
-              error
-            );
+            console.error("[MusicSyncService] Error during destruction:", error);
           }
         }
       };
-    },
+    }
   });
 
   // src-js/theme.entry.js
@@ -4492,7 +4057,7 @@ var catppuccinStarryNight = (() => {
         colorExtractionTime: [],
         memoryUsage: [],
         // This seems aspirational in the original, detectMemoryPressure uses performance.memory
-        frameRate: [],
+        frameRate: []
         // This also seems aspirational, not directly calculated in the provided snippet
       };
       this.lastFrameTime = performance.now();
@@ -4513,16 +4078,14 @@ var catppuccinStarryNight = (() => {
     }
     getAverageTime(operation) {
       const times = this.metrics[operation] || [];
-      return times.length > 0
-        ? times.reduce((a, b) => a + b, 0) / times.length
-        : 0;
+      return times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : 0;
     }
     logMetrics() {
       console.log("StarryNight Performance Metrics:", {
-        avgColorExtraction: `${this.getAverageTime(
-          "colorExtractionTime"
-        ).toFixed(2)}ms`,
-        memoryPressure: this.detectMemoryPressure(),
+        avgColorExtraction: `${this.getAverageTime("colorExtractionTime").toFixed(
+          2
+        )}ms`,
+        memoryPressure: this.detectMemoryPressure()
         // avgFrameRate: this.getAverageTime("frameRate").toFixed(2) + "fps", // If frameRate was tracked
       });
     }
@@ -4535,10 +4098,8 @@ var catppuccinStarryNight = (() => {
       return "unknown";
     }
     shouldReduceQuality() {
-      return (
-        this.getAverageTime("colorExtractionTime") > 300 || // Example threshold
-        this.detectMemoryPressure() === "high"
-      );
+      return this.getAverageTime("colorExtractionTime") > 300 || // Example threshold
+      this.detectMemoryPressure() === "high";
     }
   };
 
@@ -4548,7 +4109,7 @@ var catppuccinStarryNight = (() => {
     applyStarryNightSettings: () => applyStarryNightSettings,
     createShootingStar: () => createShootingStar,
     injectStarContainer: () => injectStarContainer,
-    startShootingStars: () => startShootingStars,
+    startShootingStars: () => startShootingStars
   });
   init_globalConfig();
   function injectStarContainer() {
@@ -4561,7 +4122,8 @@ var catppuccinStarryNight = (() => {
     for (let i = 1; i <= 5; i++) {
       const star = document.createElement("div");
       star.className = "star";
-      if (Math.random() > 0.7) star.classList.add("twinkle");
+      if (Math.random() > 0.7)
+        star.classList.add("twinkle");
       starContainer.appendChild(star);
     }
     document.body.appendChild(starContainer);
@@ -4589,36 +4151,31 @@ var catppuccinStarryNight = (() => {
   }
   function applyStarryNightSettings(gradientIntensity, starDensity) {
     if (YEAR3000_CONFIG.enableDebug) {
-      console.log(
-        "[StarryNightEffects] applyStarryNightSettings CALLED with:",
-        {
-          gradientIntensity,
-          starDensity,
-        }
-      );
+      console.log("[StarryNightEffects] applyStarryNightSettings CALLED with:", {
+        gradientIntensity,
+        starDensity
+      });
     }
     const body = document.body;
-    const configGradient =
-      YEAR3000_CONFIG?.settings?.["sn-gradientIntensity"]?.options?.find(
-        (o) => o.default
-      )?.value || "balanced";
-    const configStars =
-      YEAR3000_CONFIG?.settings?.["sn-starDensity"]?.options?.find(
-        (o) => o.default
-      )?.value || "balanced";
+    const configGradient = YEAR3000_CONFIG?.settings?.["sn-gradientIntensity"]?.options?.find(
+      (o) => o.default
+    )?.value || "balanced";
+    const configStars = YEAR3000_CONFIG?.settings?.["sn-starDensity"]?.options?.find(
+      (o) => o.default
+    )?.value || "balanced";
     const currentGradient = gradientIntensity || configGradient;
     const currentStars = starDensity || configStars;
     const gradientClasses = [
       "sn-gradient-disabled",
       "sn-gradient-minimal",
       "sn-gradient-balanced",
-      "sn-gradient-intense",
+      "sn-gradient-intense"
     ];
     const starClasses = [
       "sn-stars-disabled",
       "sn-stars-minimal",
       "sn-stars-balanced",
-      "sn-stars-intense",
+      "sn-stars-intense"
     ];
     body.classList.remove(...gradientClasses, ...starClasses);
     if (currentGradient !== "balanced") {
@@ -4635,9 +4192,11 @@ var catppuccinStarryNight = (() => {
     }
     const existingContainer = document.querySelector(".sn-stars-container");
     if (currentStars === "disabled") {
-      if (existingContainer) existingContainer.remove();
+      if (existingContainer)
+        existingContainer.remove();
     } else {
-      if (!existingContainer) injectStarContainer();
+      if (!existingContainer)
+        injectStarContainer();
     }
   }
 
@@ -4716,11 +4275,12 @@ var catppuccinStarryNight = (() => {
         "balanced",
         "floating",
         "intense",
-        "dynamic",
+        "dynamic"
       ];
       modes.forEach((m) => document.body.classList.remove(`sn-3d-${m}`));
     }
-    setupMouseTracking() {}
+    setupMouseTracking() {
+    }
     setupCardObserver() {
       this.observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
@@ -4729,9 +4289,7 @@ var catppuccinStarryNight = (() => {
               if (node.matches && node.matches(".main-card-card")) {
                 this.enhanceCard(node);
               }
-              const cards =
-                node.querySelectorAll &&
-                node.querySelectorAll(".main-card-card");
+              const cards = node.querySelectorAll && node.querySelectorAll(".main-card-card");
               if (cards) {
                 cards.forEach((card) => this.enhanceCard(card));
               }
@@ -4740,23 +4298,20 @@ var catppuccinStarryNight = (() => {
         });
       });
       this.observer.observe(document.body, { childList: true, subtree: true });
-      document
-        .querySelectorAll(".main-card-card")
-        .forEach((card) => this.enhanceCard(card));
+      document.querySelectorAll(".main-card-card").forEach((card) => this.enhanceCard(card));
     }
     enhanceCard(cardElement) {
-      if (this.activeCards.has(cardElement) || !this.isSupported) return;
+      if (this.activeCards.has(cardElement) || !this.isSupported)
+        return;
       const cardData = {
         element: cardElement,
-        mouseEnterHandler: (event) =>
-          this.handleCardMouseEnter(event, cardElement),
+        mouseEnterHandler: (event) => this.handleCardMouseEnter(event, cardElement),
         mouseMoveHandler: Year3000Utilities.throttle(
           (event) => this.handleCardMouseMove(event, cardElement),
           this.frameThrottle
         ),
         // Throttle per-card mouse move
-        mouseLeaveHandler: (event) =>
-          this.handleCardMouseLeave(event, cardElement),
+        mouseLeaveHandler: (event) => this.handleCardMouseLeave(event, cardElement)
       };
       this.activeCards.add(cardElement);
       cardElement.addEventListener("mouseenter", cardData.mouseEnterHandler);
@@ -4767,10 +4322,7 @@ var catppuccinStarryNight = (() => {
       card.style.transformStyle = "preserve-3d";
     }
     handleCardMouseMove(event, card) {
-      if (
-        !this.mouseTrackingEnabled ||
-        this.performanceMonitor.shouldReduceQuality()
-      ) {
+      if (!this.mouseTrackingEnabled || this.performanceMonitor.shouldReduceQuality()) {
         return;
       }
       const rect = card.getBoundingClientRect();
@@ -4778,12 +4330,7 @@ var catppuccinStarryNight = (() => {
       const cardMouseY = event.clientY - rect.top;
       const normalizedX = (cardMouseX / rect.width - 0.5) * 2;
       const normalizedY = (cardMouseY / rect.height - 0.5) * 2;
-      const maxRotation =
-        this.currentMode === "intense"
-          ? 20
-          : this.currentMode === "minimal"
-          ? 10
-          : 15;
+      const maxRotation = this.currentMode === "intense" ? 20 : this.currentMode === "minimal" ? 10 : 15;
       const rotateY = normalizedX * maxRotation;
       const rotateX = -normalizedY * maxRotation;
       card.style.setProperty("--card-rotate-x", `${rotateX}deg`);
@@ -4794,7 +4341,8 @@ var catppuccinStarryNight = (() => {
       card.style.setProperty("--card-rotate-y", "0deg");
     }
     setupPerformanceMonitoring() {
-      if (this.performanceInterval) clearInterval(this.performanceInterval);
+      if (this.performanceInterval)
+        clearInterval(this.performanceInterval);
       this.performanceInterval = setInterval(() => {
         if (this.performanceMonitor.shouldReduceQuality()) {
           this.enablePerformanceMode(true);
@@ -4822,7 +4370,7 @@ var catppuccinStarryNight = (() => {
         "balanced",
         "floating",
         "intense",
-        "dynamic",
+        "dynamic"
       ];
       modes.forEach((m) => body.classList.remove(`sn-3d-${m}`));
       if (mode && mode !== "default") {
@@ -4830,7 +4378,8 @@ var catppuccinStarryNight = (() => {
       }
       this.currentMode = mode;
       if (mode === "disabled") {
-        if (!skipSetup) this._internalDestroy();
+        if (!skipSetup)
+          this._internalDestroy();
         this.mouseTrackingEnabled = false;
         return;
       }
@@ -4863,7 +4412,7 @@ var catppuccinStarryNight = (() => {
         mouseTrackingEnabled: this.mouseTrackingEnabled,
         performanceModeActive: document.body.classList.contains(
           "sn-performance-mode"
-        ),
+        )
       };
     }
     destroy() {
@@ -4924,10 +4473,7 @@ var catppuccinStarryNight = (() => {
     }
     detectBackdropFilterSupport() {
       try {
-        return (
-          CSS.supports("backdrop-filter", "blur(1px)") ||
-          CSS.supports("-webkit-backdrop-filter", "blur(1px)")
-        );
+        return CSS.supports("backdrop-filter", "blur(1px)") || CSS.supports("-webkit-backdrop-filter", "blur(1px)");
       } catch (error) {
         console.warn(
           "StarryNight: CSS.supports not available, assuming no backdrop-filter support",
@@ -5034,9 +4580,7 @@ var catppuccinStarryNight = (() => {
         intensity: this.currentIntensity,
         isSupported: this.isSupported,
         // Check if performanceMonitor is available before calling its method
-        performanceReduced: this.performanceMonitor
-          ? this.performanceMonitor.shouldReduceQuality()
-          : false,
+        performanceReduced: this.performanceMonitor ? this.performanceMonitor.shouldReduceQuality() : false
       };
     }
   };
@@ -5063,7 +4607,7 @@ var catppuccinStarryNight = (() => {
         // Stored as string, parsed to float later
         "sn-harmonicEvolution": "true",
         // Stored as string, parsed to boolean later
-        "sn-harmonicManualBaseColor": "",
+        "sn-harmonicManualBaseColor": ""
         // NEW: Empty string means auto/album art
       };
       this.validationSchemas = {
@@ -5085,24 +4629,24 @@ var catppuccinStarryNight = (() => {
             "blue",
             "lavender",
             "text",
-            "none",
-          ],
+            "none"
+          ]
         },
         "sn-gradientIntensity": {
           default: "balanced",
-          allowedValues: ["disabled", "minimal", "balanced", "intense"],
+          allowedValues: ["disabled", "minimal", "balanced", "intense"]
         },
         "sn-starDensity": {
           default: "balanced",
-          allowedValues: ["disabled", "minimal", "balanced", "intense"],
+          allowedValues: ["disabled", "minimal", "balanced", "intense"]
         },
         "sn-performanceQuality": {
           default: "auto",
-          allowedValues: ["auto", "optimized", "high-fidelity"],
+          allowedValues: ["auto", "optimized", "high-fidelity"]
         },
         "sn-glassmorphismIntensity": {
           default: "moderate",
-          allowedValues: ["disabled", "minimal", "moderate", "intense"],
+          allowedValues: ["disabled", "minimal", "moderate", "intense"]
         },
         "sn-3dMorphingMode": {
           default: "dynamic",
@@ -5112,35 +4656,35 @@ var catppuccinStarryNight = (() => {
             "balanced",
             "floating",
             "intense",
-            "dynamic",
-          ],
+            "dynamic"
+          ]
         },
         "sn-artisticMode": {
           default: "artist-vision",
           // Use ARTISTIC_MODE_PROFILES for dynamic allowed values
-          allowedValues: Object.keys(ARTISTIC_MODE_PROFILES),
+          allowedValues: Object.keys(ARTISTIC_MODE_PROFILES)
         },
         // NEW: Harmonic Validation Schemas
         "sn-currentHarmonicMode": {
           default: "analogous-flow",
-          allowedValues: Object.keys(this.harmonicModes),
+          allowedValues: Object.keys(this.harmonicModes)
           // Dynamically get allowed modes
         },
         "sn-harmonicIntensity": {
-          default: "0.7",
+          default: "0.7"
           // For sliders, we validate range/type upon retrieval/use.
         },
         "sn-harmonicEvolution": {
           default: "true",
-          allowedValues: ["true", "false"],
+          allowedValues: ["true", "false"]
         },
         // NEW: Manual Base Color Validation
         "sn-harmonicManualBaseColor": {
-          default: "",
+          default: ""
           // Empty string for auto
           // Validation will be primarily by regex on input, here we just define it exists
           // Allowed values could be a regex, but for simplicity, direct validation on set/get is better.
-        },
+        }
       };
       Object.keys(this.defaults).forEach((key) => {
         if (this.validationSchemas[key]) {
@@ -5181,10 +4725,7 @@ var catppuccinStarryNight = (() => {
           );
           return value;
         }
-        if (
-          value === null ||
-          (schema.allowedValues && !schema.allowedValues.includes(value))
-        ) {
+        if (value === null || schema.allowedValues && !schema.allowedValues.includes(value)) {
           if (value !== null && this.config.enableDebug) {
             console.warn(
               `StarryNight: Invalid or missing value '${value}' for ${key}, using default '${schema.default}'`
@@ -5213,20 +4754,14 @@ var catppuccinStarryNight = (() => {
           return true;
         }
         if (key === "sn-harmonicManualBaseColor") {
-          if (
-            value !== "" &&
-            !/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)
-          ) {
+          if (value !== "" && !/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)) {
             console.error(
               `StarryNight: Invalid hex color '${value}' for ${key}. Setting to default (empty string).`
             );
             Spicetify.LocalStorage.set(key, schema.default);
             return false;
           }
-        } else if (
-          schema.allowedValues &&
-          !schema.allowedValues.includes(value)
-        ) {
+        } else if (schema.allowedValues && !schema.allowedValues.includes(value)) {
           console.error(
             `StarryNight: Cannot set invalid value '${value}' for ${key}. Allowed: ${schema.allowedValues.join(
               ", "
@@ -5239,7 +4774,7 @@ var catppuccinStarryNight = (() => {
         }
         document.dispatchEvent(
           new CustomEvent("year3000SystemSettingsChanged", {
-            detail: { key, value },
+            detail: { key, value }
           })
         );
         return true;
@@ -5319,21 +4854,8 @@ var catppuccinStarryNight = (() => {
   init_Year3000Utilities();
   init_BaseVisualSystem();
   var BeatSyncVisualSystem = class extends BaseVisualSystem {
-    constructor(
-      config,
-      utils,
-      performanceMonitor,
-      musicSyncService,
-      settingsManager,
-      year3000System = null
-    ) {
-      super(
-        config,
-        utils,
-        performanceMonitor,
-        musicSyncService,
-        settingsManager
-      );
+    constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System = null) {
+      super(config, utils, performanceMonitor, musicSyncService, settingsManager);
       this.year3000System = year3000System;
       this.beatFlashElement = null;
       this.animationFrameId = null;
@@ -5353,7 +4875,7 @@ var catppuccinStarryNight = (() => {
         animationUpdates: 0,
         cssVariableUpdates: 0,
         memoryStartTime: performance.now(),
-        memoryStartSize: this._getMemoryUsage(),
+        memoryStartSize: this._getMemoryUsage()
       };
       this.isAnimating = false;
       this.animationFrameId = null;
@@ -5433,10 +4955,7 @@ var catppuccinStarryNight = (() => {
       }
     }
     _stopAnimationLoop() {
-      if (
-        this.year3000System &&
-        this.year3000System.unregisterAnimationSystem
-      ) {
+      if (this.year3000System && this.year3000System.unregisterAnimationSystem) {
         this.year3000System.unregisterAnimationSystem("BeatSyncVisualSystem");
         if (this.config?.enableDebug) {
           console.log(
@@ -5457,7 +4976,8 @@ var catppuccinStarryNight = (() => {
      * @param {number} deltaTime - Time since last frame
      */
     updateAnimation(timestamp, deltaTime) {
-      if (!this.isAnimating || !this.isInitialized) return;
+      if (!this.isAnimating || !this.isInitialized)
+        return;
       const frameStart = performance.now();
       this.frameCount++;
       try {
@@ -5489,14 +5009,11 @@ var catppuccinStarryNight = (() => {
         }
         if (this.beatIntensity > 0 && this.beatFlashElement) {
           this.beatIntensity -= 0.025;
-          if (this.beatIntensity < 0) this.beatIntensity = 0;
+          if (this.beatIntensity < 0)
+            this.beatIntensity = 0;
           const rootStyle = Year3000Utilities.getRootStyle();
-          const accentRgb =
-            rootStyle.getPropertyValue("--sn-gradient-accent-rgb").trim() ||
-            "140,170,238";
-          this.beatFlashElement.style.backgroundColor = `rgba(${accentRgb}, ${
-            this.beatIntensity * 0.25
-          })`;
+          const accentRgb = rootStyle.getPropertyValue("--sn-gradient-accent-rgb").trim() || "140,170,238";
+          this.beatFlashElement.style.backgroundColor = `rgba(${accentRgb}, ${this.beatIntensity * 0.25})`;
           this.beatFlashElement.style.opacity = `${this.beatIntensity * 0.85}`;
         } else if (this.beatFlashElement) {
           this.beatFlashElement.style.opacity = "0";
@@ -5511,10 +5028,7 @@ var catppuccinStarryNight = (() => {
           console.warn(
             `[${this.systemName}] High error count, requesting performance mode`
           );
-          if (
-            this.year3000System &&
-            this.year3000System._activatePerformanceMode
-          ) {
+          if (this.year3000System && this.year3000System._activatePerformanceMode) {
             this.year3000System._activatePerformanceMode();
           }
         }
@@ -5558,7 +5072,8 @@ var catppuccinStarryNight = (() => {
       this.animationFrameId = this._requestAnimationFrame(loop);
     }
     _animationLoop() {
-      if (!this.isAnimating || !this.isInitialized) return;
+      if (!this.isAnimating || !this.isInitialized)
+        return;
       const frameStart = performance.now();
       this.frameCount++;
       try {
@@ -5590,14 +5105,11 @@ var catppuccinStarryNight = (() => {
         }
         if (this.beatIntensity > 0 && this.beatFlashElement) {
           this.beatIntensity -= 0.025;
-          if (this.beatIntensity < 0) this.beatIntensity = 0;
+          if (this.beatIntensity < 0)
+            this.beatIntensity = 0;
           const rootStyle = Year3000Utilities.getRootStyle();
-          const accentRgb =
-            rootStyle.getPropertyValue("--sn-gradient-accent-rgb").trim() ||
-            "140,170,238";
-          this.beatFlashElement.style.backgroundColor = `rgba(${accentRgb}, ${
-            this.beatIntensity * 0.25
-          })`;
+          const accentRgb = rootStyle.getPropertyValue("--sn-gradient-accent-rgb").trim() || "140,170,238";
+          this.beatFlashElement.style.backgroundColor = `rgba(${accentRgb}, ${this.beatIntensity * 0.25})`;
           this.beatFlashElement.style.opacity = `${this.beatIntensity * 0.85}`;
         } else if (this.beatFlashElement) {
           this.beatFlashElement.style.opacity = "0";
@@ -5614,8 +5126,8 @@ var catppuccinStarryNight = (() => {
           );
           setTimeout(() => {
             if (this.isAnimating) {
-              this.animationFrameId = requestAnimationFrame(() =>
-                this._animationLoop()
+              this.animationFrameId = requestAnimationFrame(
+                () => this._animationLoop()
               );
             }
           }, 100);
@@ -5624,15 +5136,14 @@ var catppuccinStarryNight = (() => {
       }
     }
     _updateCSSVariables(breathingScale, rhythmPhase, deltaTime) {
-      if (deltaTime > 50) return;
+      if (deltaTime > 50)
+        return;
       const rootStyle = Year3000Utilities.getRootStyle();
-      if (!rootStyle) return;
+      if (!rootStyle)
+        return;
       try {
         const queueCSSUpdate = (property, value) => {
-          if (
-            this.year3000System &&
-            this.year3000System.queueCSSVariableUpdate
-          ) {
+          if (this.year3000System && this.year3000System.queueCSSVariableUpdate) {
             this.year3000System.queueCSSVariableUpdate(property, value);
           } else {
             rootStyle.style.setProperty(property, value);
@@ -5642,30 +5153,22 @@ var catppuccinStarryNight = (() => {
           0.97,
           Math.min(1.02, breathingScale)
         );
-        queueCSSUpdate(
-          "--sn-breathing-scale",
-          clampedBreathingScale.toFixed(4)
-        );
+        queueCSSUpdate("--sn-breathing-scale", clampedBreathingScale.toFixed(4));
         const normalizedPhase = rhythmPhase % (Math.PI * 2);
         queueCSSUpdate("--sn-rhythm-phase", normalizedPhase.toFixed(4));
         this.performanceMetrics.cssVariableUpdates++;
         if (this.config.enableDebug && Math.random() < 5e-3) {
           console.log(
-            `\u{1F30A} [${
-              this.systemName
-            }] Breathing: ${clampedBreathingScale.toFixed(
+            `\u{1F30A} [${this.systemName}] Breathing: ${clampedBreathingScale.toFixed(
               3
-            )}, Phase: ${normalizedPhase.toFixed(
-              3
-            )}, Delta: ${deltaTime.toFixed(1)}ms`
+            )}, Phase: ${normalizedPhase.toFixed(3)}, Delta: ${deltaTime.toFixed(
+              1
+            )}ms`
           );
         }
       } catch (error) {
         if (this.config.enableDebug) {
-          console.warn(
-            `[${this.systemName}] CSS variable update failed:`,
-            error
-          );
+          console.warn(`[${this.systemName}] CSS variable update failed:`, error);
         }
       }
     }
@@ -5680,22 +5183,17 @@ var catppuccinStarryNight = (() => {
       return {
         systemName: this.systemName,
         elapsedTime: elapsedTime.toFixed(1),
-        animationUpdatesPerSecond: (
-          this.performanceMetrics.animationUpdates /
-          (elapsedTime / 1e3)
-        ).toFixed(1),
-        cssUpdatesPerSecond: (
-          this.performanceMetrics.cssVariableUpdates /
-          (elapsedTime / 1e3)
-        ).toFixed(1),
+        animationUpdatesPerSecond: (this.performanceMetrics.animationUpdates / (elapsedTime / 1e3)).toFixed(1),
+        cssUpdatesPerSecond: (this.performanceMetrics.cssVariableUpdates / (elapsedTime / 1e3)).toFixed(1),
         memoryIncreaseKB: (memoryIncrease / 1024).toFixed(1),
         currentRhythmPhase: this.currentRhythmPhase.toFixed(3),
-        isSyncActive: this.isSyncActive,
+        isSyncActive: this.isSyncActive
       };
     }
     // NEW: Enhanced BPM-based beat synchronization (inspired by Cat Jam)
     _triggerBeat(timestamp) {
-      if (!this.isInitialized) return;
+      if (!this.isInitialized)
+        return;
       const latestMusicData = this.musicSyncService?.getLatestProcessedData();
       const energy = latestMusicData?.energy || 0.5;
       const visualIntensity = latestMusicData?.visualIntensity || 0.5;
@@ -5714,11 +5212,7 @@ var catppuccinStarryNight = (() => {
       this.isSyncActive = true;
       if (this.config.enableDebug) {
         console.log(
-          `\u{1F3B5} [${
-            this.systemName
-          }] Beat sync started - Enhanced BPM: ${bpm}, Interval: ${this.beatInterval.toFixed(
-            1
-          )}ms`
+          `\u{1F3B5} [${this.systemName}] Beat sync started - Enhanced BPM: ${bpm}, Interval: ${this.beatInterval.toFixed(1)}ms`
         );
       }
     }
@@ -5733,14 +5227,15 @@ var catppuccinStarryNight = (() => {
       }
     }
     updateFromMusicAnalysis(processedMusicData) {
-      if (!this.isInitialized || !processedMusicData) return;
+      if (!this.isInitialized || !processedMusicData)
+        return;
       super.updateFromMusicAnalysis(processedMusicData);
       const {
         enhancedBPM,
         baseBPM,
         bpmCalculationMethod,
         energy,
-        visualIntensity,
+        visualIntensity
       } = processedMusicData;
       if (enhancedBPM && enhancedBPM !== this.enhancedBPM) {
         if (this.config.enableDebug) {
@@ -5791,9 +5286,9 @@ var catppuccinStarryNight = (() => {
     }
     // ENHANCED: Handle music data updates with realistic BPM calculation
     handleMusicDataUpdate(musicData) {
-      if (!musicData || !this.isActive) return;
-      const newBPM =
-        musicData.enhancedBPM || musicData.baseBPM || musicData.tempo || 120;
+      if (!musicData || !this.isActive)
+        return;
+      const newBPM = musicData.enhancedBPM || musicData.baseBPM || musicData.tempo || 120;
       const method = musicData.bpmCalculationMethod || "basic";
       const multiplier = musicData.bpmMultiplier || 1;
       this.currentEnergy = musicData.estimatedEnergy || musicData.energy || 0.5;
@@ -5804,11 +5299,7 @@ var catppuccinStarryNight = (() => {
         this.beatCount = 0;
         if (this.config.enableDebug) {
           console.log(
-            `\u{1F3B5} [BeatSyncVisualSystem] BPM updated: ${
-              musicData.baseBPM || musicData.tempo
-            } \u2192 ${newBPM} (method: ${method}, mult: ${multiplier.toFixed(
-              2
-            )})`
+            `\u{1F3B5} [BeatSyncVisualSystem] BPM updated: ${musicData.baseBPM || musicData.tempo} \u2192 ${newBPM} (method: ${method}, mult: ${multiplier.toFixed(2)})`
           );
         }
       }
@@ -5822,14 +5313,14 @@ var catppuccinStarryNight = (() => {
     }
     // NEW: Use precise beat timing from audio analysis if available
     usePreciseBeatTiming(beats) {
-      if (!beats || beats.length === 0) return;
+      if (!beats || beats.length === 0)
+        return;
       const intervals = [];
       for (let i = 1; i < Math.min(beats.length, 20); i++) {
         intervals.push(beats[i].start - beats[i - 1].start);
       }
       if (intervals.length > 0) {
-        const avgInterval =
-          intervals.reduce((a, b) => a + b) / intervals.length;
+        const avgInterval = intervals.reduce((a, b) => a + b) / intervals.length;
         const preciseBPM = Math.round(60 / avgInterval);
         if (Math.abs(preciseBPM - this.currentBPM) > 2) {
           this.currentBPM = preciseBPM;
@@ -5853,18 +5344,16 @@ var catppuccinStarryNight = (() => {
             averageFrameTime: frameTime,
             memoryUsage,
             errorCount: this.errorCount,
-            animationComplexity,
+            animationComplexity
           });
         }
       }
     }
     calculateAnimationComplexity() {
       let complexity = 0;
-      if (this.isAnimating) complexity += 10;
-      if (
-        this.processedMusicData &&
-        this.processedMusicData.visualIntensity > 0.7
-      )
+      if (this.isAnimating)
+        complexity += 10;
+      if (this.processedMusicData && this.processedMusicData.visualIntensity > 0.7)
         complexity += 20;
       return complexity;
     }
@@ -5880,7 +5369,8 @@ var catppuccinStarryNight = (() => {
      * @param {Object} modeConfig - Configuration from artistic mode profile
      */
     updateModeConfiguration(modeConfig) {
-      if (!modeConfig) return;
+      if (!modeConfig)
+        return;
       const { enabled, animations, intensity, harmonicSync } = modeConfig;
       if (this.config?.enableDebug) {
         console.log(
@@ -5893,7 +5383,7 @@ var catppuccinStarryNight = (() => {
         harmonicSyncEnabled: harmonicSync || animations || false,
         oscillateEnabled: animations || false,
         intensityMultiplier: intensity || 1,
-        temporalPlayEnabled: modeConfig.temporalPlay || false,
+        temporalPlayEnabled: modeConfig.temporalPlay || false
       };
       if (this.modeConfig.harmonicSyncEnabled) {
         this.initializeHarmonicSync();
@@ -5907,7 +5397,8 @@ var catppuccinStarryNight = (() => {
      * Initialize harmonic oscillation sync across all visual systems
      */
     initializeHarmonicSync() {
-      if (this.harmonicSyncInitialized) return;
+      if (this.harmonicSyncInitialized)
+        return;
       this.harmonicSync = {
         masterFrequency: 1,
         // Base frequency (1 = BPM/60)
@@ -5918,17 +5409,17 @@ var catppuccinStarryNight = (() => {
             frequency: 2,
             phase: Math.PI / 4,
             amplitude: 0.5,
-            name: "second-harmonic",
+            name: "second-harmonic"
           },
           {
             frequency: 0.25,
             phase: Math.PI / 2,
             amplitude: 0.8,
-            name: "deep-pulse",
-          },
+            name: "deep-pulse"
+          }
         ],
         subscribedSystems: /* @__PURE__ */ new Set(),
-        syncEventChannel: "year3000HarmonicSync",
+        syncEventChannel: "year3000HarmonicSync"
       };
       this.startHarmonicLoop();
       this.harmonicSyncInitialized = true;
@@ -5942,7 +5433,8 @@ var catppuccinStarryNight = (() => {
      * Disable harmonic sync and cleanup
      */
     disableHarmonicSync() {
-      if (!this.harmonicSyncInitialized) return;
+      if (!this.harmonicSyncInitialized)
+        return;
       if (this.harmonicLoopId) {
         cancelAnimationFrame(this.harmonicLoopId);
         this.harmonicLoopId = null;
@@ -5958,9 +5450,11 @@ var catppuccinStarryNight = (() => {
      * Start the harmonic oscillation calculation loop
      */
     startHarmonicLoop() {
-      if (!this.harmonicSync) return;
+      if (!this.harmonicSync)
+        return;
       const harmonicLoop = (timestamp) => {
-        if (!this.harmonicSync || !this.modeConfig?.harmonicSyncEnabled) return;
+        if (!this.harmonicSync || !this.modeConfig?.harmonicSyncEnabled)
+          return;
         this.updateHarmonicFrequencies();
         this.calculateHarmonicValues(timestamp);
         this.dispatchHarmonicSync(timestamp);
@@ -5972,9 +5466,11 @@ var catppuccinStarryNight = (() => {
      * Update harmonic frequencies based on current BPM and music data
      */
     updateHarmonicFrequencies() {
-      if (!this.isInitialized) return;
+      if (!this.isInitialized)
+        return;
       const latestMusicData = this.musicSyncService?.getLatestProcessedData?.();
-      if (!latestMusicData) return;
+      if (!latestMusicData)
+        return;
       const bpmFrequency = this.enhancedBPM / 60;
       this.harmonicSync.masterFrequency = bpmFrequency;
       const energy = latestMusicData?.processedEnergy || 0.5;
@@ -6002,7 +5498,8 @@ var catppuccinStarryNight = (() => {
      * @param {number} timestamp - Current animation timestamp
      */
     calculateHarmonicValues(timestamp) {
-      if (!this.harmonicSync) return;
+      if (!this.harmonicSync)
+        return;
       const timeInSeconds = timestamp / 1e3;
       const harmonicData = {
         timestamp,
@@ -6011,19 +5508,17 @@ var catppuccinStarryNight = (() => {
         composite: {
           oscillation: 0,
           pulse: 0,
-          flow: 0,
-        },
+          flow: 0
+        }
       };
       this.harmonicSync.harmonicLayers.forEach((layer) => {
-        const omega =
-          2 * Math.PI * layer.frequency * this.harmonicSync.masterFrequency;
-        const value =
-          layer.amplitude * Math.sin(omega * timeInSeconds + layer.phase);
+        const omega = 2 * Math.PI * layer.frequency * this.harmonicSync.masterFrequency;
+        const value = layer.amplitude * Math.sin(omega * timeInSeconds + layer.phase);
         harmonicData.layers[layer.name] = {
           frequency: layer.frequency * this.harmonicSync.masterFrequency,
           amplitude: layer.amplitude,
           value,
-          phase: layer.phase,
+          phase: layer.phase
         };
         switch (layer.name) {
           case "fundamental":
@@ -6036,9 +5531,7 @@ var catppuccinStarryNight = (() => {
             break;
         }
       });
-      harmonicData.composite.flow =
-        harmonicData.composite.oscillation * 0.6 +
-        harmonicData.composite.pulse * 0.4;
+      harmonicData.composite.flow = harmonicData.composite.oscillation * 0.6 + harmonicData.composite.pulse * 0.4;
       harmonicData.composite.oscillation = Math.max(
         -1,
         Math.min(1, harmonicData.composite.oscillation)
@@ -6089,10 +5582,7 @@ var catppuccinStarryNight = (() => {
       const scalePulse = 1 + harmonicData.composite.pulse * 0.02;
       const rotationFlow = harmonicData.composite.flow * 0.5;
       const opacityOscillation = 0.8 + harmonicData.composite.oscillation * 0.1;
-      root.style.setProperty(
-        "--sn-harmonic-scale-pulse",
-        scalePulse.toFixed(3)
-      );
+      root.style.setProperty("--sn-harmonic-scale-pulse", scalePulse.toFixed(3));
       root.style.setProperty(
         "--sn-harmonic-rotation-flow",
         rotationFlow.toFixed(3)
@@ -6107,13 +5597,14 @@ var catppuccinStarryNight = (() => {
      * @param {number} timestamp - Current timestamp
      */
     dispatchHarmonicSync(timestamp) {
-      if (!this.currentHarmonicData) return;
+      if (!this.currentHarmonicData)
+        return;
       const syncEvent = new CustomEvent(this.harmonicSync.syncEventChannel, {
         detail: {
           ...this.currentHarmonicData,
           systemName: this.systemName,
-          modeConfig: this.modeConfig,
-        },
+          modeConfig: this.modeConfig
+        }
       });
       document.dispatchEvent(syncEvent);
       if (typeof window !== "undefined") {
@@ -6132,7 +5623,7 @@ var catppuccinStarryNight = (() => {
         "--sn-harmonic-flow",
         "--sn-harmonic-scale-pulse",
         "--sn-harmonic-rotation-flow",
-        "--sn-harmonic-opacity-oscillation",
+        "--sn-harmonic-opacity-oscillation"
       ];
       this.harmonicSync?.harmonicLayers?.forEach((layer) => {
         harmonicVars.push(`--sn-harmonic-${layer.name}`);
@@ -6146,12 +5637,12 @@ var catppuccinStarryNight = (() => {
      * Update beat flash intensity based on current mode
      */
     updateBeatFlashIntensity() {
-      if (!this.modeConfig) return;
+      if (!this.modeConfig)
+        return;
       this.beatFlashIntensity = {
         base: 0.25 * (this.modeConfig.intensityMultiplier || 1),
         peak: 0.85 * (this.modeConfig.intensityMultiplier || 1),
-        enabled:
-          this.modeConfig.systemEnabled && this.modeConfig.oscillateEnabled,
+        enabled: this.modeConfig.systemEnabled && this.modeConfig.oscillateEnabled
       };
       if (this.config?.enableDebug) {
         console.log(
@@ -6224,7 +5715,7 @@ var catppuccinStarryNight = (() => {
     albumArt: ".main-trackList-albumArt",
     // Modal & Overlay
     modal: ".main-modal-container",
-    overlay: ".main-overlay-container",
+    overlay: ".main-overlay-container"
   };
   var SELECTOR_MAPPINGS = {
     // Migration mapping: legacy → modern
@@ -6233,14 +5724,14 @@ var catppuccinStarryNight = (() => {
     ".main-search-searchBar": MODERN_SELECTORS.searchInput,
     ".main-topBar-topBar": MODERN_SELECTORS.actionBar,
     ".main-queue-queue": MODERN_SELECTORS.queue,
-    ".main-trackList-trackList": MODERN_SELECTORS.trackListContainer,
+    ".main-trackList-trackList": MODERN_SELECTORS.trackListContainer
   };
   var ORBITAL_ELEMENTS = {
     // Elements that can have orbital gravity effects
     trackRows: MODERN_SELECTORS.trackRow,
     libraryItems: MODERN_SELECTORS.libraryItems,
     cards: MODERN_SELECTORS.card,
-    navLinks: ".main-navBar-navBarLink",
+    navLinks: ".main-navBar-navBarLink"
     // This one still works
   };
   var GRAVITY_WELL_TARGETS = {
@@ -6248,23 +5739,23 @@ var catppuccinStarryNight = (() => {
     primary: [
       MODERN_SELECTORS.nowPlayingBar,
       MODERN_SELECTORS.leftSidebar,
-      MODERN_SELECTORS.entityHeader,
+      MODERN_SELECTORS.entityHeader
     ],
     secondary: [
       MODERN_SELECTORS.actionBar,
       MODERN_SELECTORS.queue,
-      MODERN_SELECTORS.searchInput,
+      MODERN_SELECTORS.searchInput
     ],
-    tertiary: [MODERN_SELECTORS.playButton, MODERN_SELECTORS.trackListHeader],
+    tertiary: [MODERN_SELECTORS.playButton, MODERN_SELECTORS.trackListHeader]
   };
   var ANTI_GRAVITY_ZONES = {
     // Areas where anti-gravity effects should be applied
     searchAreas: [MODERN_SELECTORS.searchInput, MODERN_SELECTORS.searchPage],
     notifications: [
       "[data-testid='notification-bar']",
-      ".main-topBar-notifications",
+      ".main-topBar-notifications"
     ],
-    dropdowns: [".main-dropdown-menu", "[role='menu']", "[role='listbox']"],
+    dropdowns: [".main-dropdown-menu", "[role='menu']", "[role='listbox']"]
   };
   function elementExists(selector) {
     return document.querySelector(selector) !== null;
@@ -6298,14 +5789,14 @@ var catppuccinStarryNight = (() => {
     const results = {
       found: 0,
       missing: 0,
-      details: {},
+      details: {}
     };
     Object.entries(MODERN_SELECTORS).forEach(([key, selector]) => {
       const exists = elementExists(selector);
       results.details[key] = {
         selector,
         exists,
-        element: exists ? document.querySelector(selector) : null,
+        element: exists ? document.querySelector(selector) : null
       };
       if (exists) {
         results.found++;
@@ -6315,9 +5806,7 @@ var catppuccinStarryNight = (() => {
         console.warn(`\u274C ${key}: ${selector}`);
       }
     });
-    console.log(
-      `\u{1F4CA} Summary: ${results.found} found, ${results.missing} missing`
-    );
+    console.log(`\u{1F4CA} Summary: ${results.found} found, ${results.missing} missing`);
     console.groupEnd();
     return results;
   }
@@ -6337,9 +5826,7 @@ var catppuccinStarryNight = (() => {
     Object.entries(ORBITAL_ELEMENTS).forEach(([key, selector]) => {
       const elements = document.querySelectorAll(selector);
       console.log(
-        `${elements.length > 0 ? "\u2705" : "\u274C"} ${key} (${selector}): ${
-          elements.length
-        } found`
+        `${elements.length > 0 ? "\u2705" : "\u274C"} ${key} (${selector}): ${elements.length} found`
       );
     });
     console.groupEnd();
@@ -6354,18 +5841,15 @@ var catppuccinStarryNight = (() => {
       { name: "Play Button", selector: MODERN_SELECTORS.playButton },
       { name: "Heart Button", selector: MODERN_SELECTORS.heartButton },
       { name: "Album Cover", selector: MODERN_SELECTORS.albumCover },
-      {
-        name: "Now Playing Widget",
-        selector: MODERN_SELECTORS.nowPlayingWidget,
-      },
+      { name: "Now Playing Widget", selector: MODERN_SELECTORS.nowPlayingWidget },
       { name: "Now Playing Left", selector: MODERN_SELECTORS.nowPlayingLeft },
       { name: "Left Sidebar", selector: MODERN_SELECTORS.leftSidebar },
-      { name: "Library Items", selector: ORBITAL_ELEMENTS.libraryItems },
+      { name: "Library Items", selector: ORBITAL_ELEMENTS.libraryItems }
     ];
     const results = {
       found: 0,
       missing: 0,
-      details: {},
+      details: {}
     };
     testSelectors.forEach(({ name, selector }) => {
       const elements = findElementsWithFallback(selector);
@@ -6373,7 +5857,7 @@ var catppuccinStarryNight = (() => {
       results.details[name] = {
         selector,
         count,
-        exists: count > 0,
+        exists: count > 0
       };
       if (count > 0) {
         results.found++;
@@ -6390,19 +5874,17 @@ var catppuccinStarryNight = (() => {
     return results;
   }
   function testPhase2Systems() {
-    console.group(
-      "\u{1F30C} [SpotifyDOMSelectors] Phase 2 - System Integration Test"
-    );
+    console.group("\u{1F30C} [SpotifyDOMSelectors] Phase 2 - System Integration Test");
     const systemTests = {
       behavioralPrediction: validatePredictionTargets(),
       dimensionalNexus: {
-        sidebarElement: elementExists(MODERN_SELECTORS.leftSidebar),
+        sidebarElement: elementExists(MODERN_SELECTORS.leftSidebar)
       },
       dataGlyph: {
         navLinks: elementExists(MODERN_SELECTORS.navBarLink),
         trackRows: elementExists(ORBITAL_ELEMENTS.trackRows),
-        cards: elementExists(ORBITAL_ELEMENTS.cards),
-      },
+        cards: elementExists(ORBITAL_ELEMENTS.cards)
+      }
     };
     let totalIssues = 0;
     Object.entries(systemTests).forEach(([system, tests]) => {
@@ -6411,11 +5893,7 @@ var catppuccinStarryNight = (() => {
       }
     });
     console.log(
-      `\u{1F3AF} Phase 2 Integration Health: ${
-        totalIssues === 0
-          ? "\u2705 All systems operational"
-          : `\u26A0\uFE0F ${totalIssues} issues detected`
-      }`
+      `\u{1F3AF} Phase 2 Integration Health: ${totalIssues === 0 ? "\u2705 All systems operational" : `\u26A0\uFE0F ${totalIssues} issues detected`}`
     );
     console.groupEnd();
     return systemTests;
@@ -6429,7 +5907,7 @@ var catppuccinStarryNight = (() => {
       selectors: MODERN_SELECTORS,
       targets: GRAVITY_WELL_TARGETS,
       orbital: ORBITAL_ELEMENTS,
-      antiGravity: ANTI_GRAVITY_ZONES,
+      antiGravity: ANTI_GRAVITY_ZONES
     };
     console.log("\u{1F3AF} [SpotifyDOMSelectors] Debug functions available:");
     console.log("  window.SpotifyDOMSelectors.validate() - Test all selectors");
@@ -6441,14 +5919,7 @@ var catppuccinStarryNight = (() => {
   // src-js/systems/visual/BehavioralPredictionEngine.js
   init_BaseVisualSystem();
   var BehavioralPredictionEngine = class extends BaseVisualSystem {
-    constructor(
-      config,
-      utils,
-      performanceMonitor,
-      musicSyncService,
-      settingsManager,
-      year3000System = null
-    ) {
+    constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System = null) {
       super(
         config,
         utils,
@@ -6483,7 +5954,7 @@ var catppuccinStarryNight = (() => {
         // Limit concurrent animations
         // Empathy responsiveness
         maxWarmthIntensity: 0.8,
-        currentActiveAnimations: 0,
+        currentActiveAnimations: 0
       };
       this.modeConfig = null;
       if (this.config?.enableDebug) {
@@ -6499,9 +5970,7 @@ var catppuccinStarryNight = (() => {
       }
       if (this.config?.enableDebug) {
         console.log(
-          `\u{1F9E0} [${this.systemName}] Initialized with empathy status: ${
-            this.modeConfig?.quantumEmpathyEnabled ? "COSMIC ACTIVE" : "DORMANT"
-          }.`
+          `\u{1F9E0} [${this.systemName}] Initialized with empathy status: ${this.modeConfig?.quantumEmpathyEnabled ? "COSMIC ACTIVE" : "DORMANT"}.`
         );
       }
     }
@@ -6510,7 +5979,8 @@ var catppuccinStarryNight = (() => {
      * Initialize performance-optimized quantum empathy
      */
     initializeOptimizedQuantumEmpathy() {
-      if (this.quantumEmpathyInitialized) return;
+      if (this.quantumEmpathyInitialized)
+        return;
       this.setupOptimizedInteractionTracking();
       this.startOptimizedPredictiveHighlighting();
       this.setupSelectiveAnticipatoryAnimations();
@@ -6539,7 +6009,7 @@ var catppuccinStarryNight = (() => {
         this._eventListeners.push({
           element: document,
           event: eventType,
-          handler,
+          handler
         });
       });
     }
@@ -6547,19 +6017,17 @@ var catppuccinStarryNight = (() => {
      * Record and analyze user interactions (OPTIMIZED)
      */
     recordOptimizedInteraction(event) {
-      if (!this.modeConfig?.quantumEmpathyEnabled) return;
+      if (!this.modeConfig?.quantumEmpathyEnabled)
+        return;
       const interaction = {
         type: event.type,
         target: this.getElementSignature(event.target),
         timestamp: Date.now(),
-        context: this.getCurrentMusicContext(),
+        context: this.getCurrentMusicContext()
         // Simplified context
       };
       this.quantumEmpathy.interactionHistory.push(interaction);
-      if (
-        this.quantumEmpathy.interactionHistory.length >
-        this.quantumEmpathy.maxHistoryLength
-      ) {
+      if (this.quantumEmpathy.interactionHistory.length > this.quantumEmpathy.maxHistoryLength) {
         this.quantumEmpathy.interactionHistory.shift();
       }
       this.learnFromInteractionOptimized(interaction);
@@ -6568,7 +6036,8 @@ var catppuccinStarryNight = (() => {
      * Generate a lightweight element signature
      */
     getElementSignature(element) {
-      if (!element) return "unknown";
+      if (!element)
+        return "unknown";
       const signatures = [];
       if (element.className)
         signatures.push(`class:${element.className.split(" ")[0]}`);
@@ -6580,12 +6049,11 @@ var catppuccinStarryNight = (() => {
      * Get simplified music context for performance
      */
     getCurrentMusicContext() {
-      const latestMusicData =
-        this.musicSyncService?.getLatestProcessedData?.() || {};
+      const latestMusicData = this.musicSyncService?.getLatestProcessedData?.() || {};
       return {
         energy: latestMusicData.processedEnergy || 0.5,
         valence: latestMusicData.valence || 0.5,
-        timeSegment: Math.floor(/* @__PURE__ */ new Date().getHours() / 6),
+        timeSegment: Math.floor((/* @__PURE__ */ new Date()).getHours() / 6)
         // 4 time segments instead of 24 hours
       };
     }
@@ -6599,7 +6067,7 @@ var catppuccinStarryNight = (() => {
           frequency: 0,
           contexts: [],
           lastUsed: 0,
-          confidence: 0.1,
+          confidence: 0.1
         });
       }
       const pattern = this.quantumEmpathy.patternDatabase.get(patternKey);
@@ -6610,7 +6078,7 @@ var catppuccinStarryNight = (() => {
         pattern.contexts.shift();
       }
       const recencyFactor = Math.exp(-(Date.now() - pattern.lastUsed) / 6e4);
-      pattern.confidence = Math.min(1, (pattern.frequency / 5) * recencyFactor);
+      pattern.confidence = Math.min(1, pattern.frequency / 5 * recencyFactor);
       if (this.quantumEmpathy.patternDatabase.size > 100) {
         this.cleanupOldPatterns();
       }
@@ -6631,7 +6099,8 @@ var catppuccinStarryNight = (() => {
      */
     startOptimizedPredictiveHighlighting() {
       const interval = setInterval(() => {
-        if (!this.modeConfig?.quantumEmpathyEnabled) return;
+        if (!this.modeConfig?.quantumEmpathyEnabled)
+          return;
         this.calculateOptimizedPredictions();
         this.applySelectivePredictiveHighlighting();
       }, this.quantumEmpathy.predictionUpdateMs);
@@ -6645,9 +6114,7 @@ var catppuccinStarryNight = (() => {
       const predictions = [];
       const sortedPatterns = Array.from(
         this.quantumEmpathy.patternDatabase.entries()
-      )
-        .sort(([, a], [, b]) => b.confidence - a.confidence)
-        .slice(0, 10);
+      ).sort(([, a], [, b]) => b.confidence - a.confidence).slice(0, 10);
       sortedPatterns.forEach(([key, pattern]) => {
         const [target, action] = key.split(":");
         const contextSimilarity = this.calculateSimplifiedContextSimilarity(
@@ -6660,7 +6127,7 @@ var catppuccinStarryNight = (() => {
             target,
             action,
             probability,
-            confidence: pattern.confidence,
+            confidence: pattern.confidence
           });
         }
       });
@@ -6672,21 +6139,17 @@ var catppuccinStarryNight = (() => {
      * Simplified context similarity for performance
      */
     calculateSimplifiedContextSimilarity(pastContexts, currentContext) {
-      if (!pastContexts.length) return 0;
+      if (!pastContexts.length)
+        return 0;
       const recentContext = pastContexts[pastContexts.length - 1];
       let similarity = 0;
       let factors = 0;
       if (recentContext.energy !== void 0 && currentContext.energy !== void 0) {
-        similarity +=
-          1 - Math.abs(recentContext.energy - currentContext.energy);
+        similarity += 1 - Math.abs(recentContext.energy - currentContext.energy);
         factors++;
       }
-      if (
-        recentContext.valence !== void 0 &&
-        currentContext.valence !== void 0
-      ) {
-        similarity +=
-          1 - Math.abs(recentContext.valence - currentContext.valence);
+      if (recentContext.valence !== void 0 && currentContext.valence !== void 0) {
+        similarity += 1 - Math.abs(recentContext.valence - currentContext.valence);
         factors++;
       }
       return factors > 0 ? similarity / factors : 0;
@@ -6695,10 +6158,7 @@ var catppuccinStarryNight = (() => {
      * Apply selective predictive highlighting
      */
     applySelectivePredictiveHighlighting() {
-      if (
-        this.quantumEmpathy.currentActiveAnimations >=
-        this.quantumEmpathy.maxActiveAnimations
-      ) {
+      if (this.quantumEmpathy.currentActiveAnimations >= this.quantumEmpathy.maxActiveAnimations) {
         return;
       }
       this.quantumEmpathy.actionProbabilities.forEach((prediction, key) => {
@@ -6752,15 +6212,12 @@ var catppuccinStarryNight = (() => {
      * Optimized anticipatory animation
      */
     triggerOptimizedAnticipatoryAnimation(element, actionType, confidence) {
-      if (!element || !this.modeConfig?.quantumEmpathyEnabled) return;
-      if (
-        this.quantumEmpathy.currentActiveAnimations >=
-        this.quantumEmpathy.maxActiveAnimations
-      ) {
+      if (!element || !this.modeConfig?.quantumEmpathyEnabled)
+        return;
+      if (this.quantumEmpathy.currentActiveAnimations >= this.quantumEmpathy.maxActiveAnimations) {
         return;
       }
-      const intensity =
-        confidence * (this.modeConfig?.intensityMultiplier || 1);
+      const intensity = confidence * (this.modeConfig?.intensityMultiplier || 1);
       element.style.setProperty(
         "--sn-anticipatory-intensity",
         intensity.toString()
@@ -6770,7 +6227,8 @@ var catppuccinStarryNight = (() => {
         confidence.toString()
       );
       let animationClass = "sn-anticipatory-generic";
-      if (actionType === "click") animationClass = "sn-anticipatory-click";
+      if (actionType === "click")
+        animationClass = "sn-anticipatory-click";
       element.classList.add(animationClass);
       this.quantumEmpathy.currentActiveAnimations++;
       setTimeout(() => {
@@ -6781,9 +6239,7 @@ var catppuccinStarryNight = (() => {
       }, 800);
       if (this.config?.enableDebug && Math.random() < 0.2) {
         console.log(
-          `\u{1F31F} [${
-            this.systemName
-          }] Cosmic anticipation: ${actionType} (confidence: ${confidence.toFixed(
+          `\u{1F31F} [${this.systemName}] Cosmic anticipation: ${actionType} (confidence: ${confidence.toFixed(
             2
           )})`
         );
@@ -6791,35 +6247,28 @@ var catppuccinStarryNight = (() => {
     }
     // ===== PRESERVED CORE SYSTEMS =====
     updateFromMusicAnalysis(processedMusicData, rawFeatures, trackUri) {
-      if (!this.initialized) return;
+      if (!this.initialized)
+        return;
       super.updateFromMusicAnalysis(processedMusicData, rawFeatures, trackUri);
       const currentContext = {
         ...this.getCurrentMusicContext(),
         trackUri,
-        musicData: processedMusicData,
+        musicData: processedMusicData
       };
       const predictions = this.generatePredictions(currentContext);
       this.applyHighlights(predictions);
       if (this.modeConfig?.quantumEmpathyEnabled) {
-        this.quantumEmpathy.learningCurve =
-          0.8 + (processedMusicData.valence || 0.5) * 0.4;
+        this.quantumEmpathy.learningCurve = 0.8 + (processedMusicData.valence || 0.5) * 0.4;
       }
     }
     generatePredictions(context) {
       let predictionKey = "default";
       if (context.energy > 0.6) {
-        predictionKey =
-          context.valence > 0.5
-            ? "highEnergyHighValence"
-            : "highEnergyLowValence";
+        predictionKey = context.valence > 0.5 ? "highEnergyHighValence" : "highEnergyLowValence";
       } else {
-        predictionKey =
-          context.valence > 0.5
-            ? "lowEnergyHighValence"
-            : "lowEnergyLowValence";
+        predictionKey = context.valence > 0.5 ? "lowEnergyHighValence" : "lowEnergyLowValence";
       }
-      const predictedBehavior =
-        this.predictionModel[predictionKey] || this.predictionModel.default;
+      const predictedBehavior = this.predictionModel[predictionKey] || this.predictionModel.default;
       if (this.config?.enableDebug && Math.random() < 0.05) {
         console.log(
           `\u{1F52E} [${this.systemName}] Context: E=${context.energy.toFixed(
@@ -6829,11 +6278,12 @@ var catppuccinStarryNight = (() => {
       }
       return {
         ...predictedBehavior,
-        dynamicIntensity: context.visualIntensity,
+        dynamicIntensity: context.visualIntensity
       };
     }
     applyHighlights(predictions) {
-      if (!predictions || !predictions.targetElements) return;
+      if (!predictions || !predictions.targetElements)
+        return;
       let appliedHighlights = 0;
       let missedSelectors = [];
       predictions.targetElements.forEach((selector) => {
@@ -6849,8 +6299,8 @@ var catppuccinStarryNight = (() => {
           );
           if (this.activeHighlights.has(el)) {
             clearTimeout(this.activeHighlights.get(el).timeoutId);
-            (this.activeHighlights.get(el).classes || []).forEach((cls) =>
-              el.classList.remove(cls)
+            (this.activeHighlights.get(el).classes || []).forEach(
+              (cls) => el.classList.remove(cls)
             );
           }
           el.classList.add(...highlightClass);
@@ -6861,18 +6311,9 @@ var catppuccinStarryNight = (() => {
           this.activeHighlights.set(el, { timeoutId, classes: highlightClass });
         });
       });
-      if (
-        this.config?.enableDebug &&
-        (missedSelectors.length > 0 || appliedHighlights > 0)
-      ) {
+      if (this.config?.enableDebug && (missedSelectors.length > 0 || appliedHighlights > 0)) {
         console.log(
-          `\u{1F31F} [${
-            this.systemName
-          }] Applied ${appliedHighlights} cosmic highlights. ${
-            missedSelectors.length > 0
-              ? `Missing elements: ${missedSelectors.join(", ")}`
-              : "All elements found!"
-          }`
+          `\u{1F31F} [${this.systemName}] Applied ${appliedHighlights} cosmic highlights. ${missedSelectors.length > 0 ? `Missing elements: ${missedSelectors.join(", ")}` : "All elements found!"}`
         );
       }
     }
@@ -6894,7 +6335,8 @@ var catppuccinStarryNight = (() => {
     }
     // ===== MODE CONFIGURATION =====
     updateModeConfiguration(modeConfig) {
-      if (!modeConfig) return;
+      if (!modeConfig)
+        return;
       const { enabled, quantumEmpathy, intensity } = modeConfig;
       if (this.config?.enableDebug) {
         console.log(
@@ -6906,20 +6348,16 @@ var catppuccinStarryNight = (() => {
         systemEnabled: enabled !== false,
         quantumEmpathyEnabled: quantumEmpathy || false,
         predictiveHighlightingEnabled: quantumEmpathy || false,
-        intensityMultiplier: intensity || 1,
+        intensityMultiplier: intensity || 1
       };
       this.updatePredictionBehaviorForMode();
     }
     updatePredictionBehaviorForMode() {
-      if (!this.modeConfig) return;
+      if (!this.modeConfig)
+        return;
       const baseIntensity = this.modeConfig.intensityMultiplier || 1;
-      this.predictionSensitivity = this.modeConfig.quantumEmpathyEnabled
-        ? baseIntensity * 1.5
-        : baseIntensity * 0.7;
-      this.highlightResponsiveness = this.modeConfig
-        .predictiveHighlightingEnabled
-        ? baseIntensity * 1.2
-        : baseIntensity * 0.5;
+      this.predictionSensitivity = this.modeConfig.quantumEmpathyEnabled ? baseIntensity * 1.5 : baseIntensity * 0.7;
+      this.highlightResponsiveness = this.modeConfig.predictiveHighlightingEnabled ? baseIntensity * 1.2 : baseIntensity * 0.5;
       if (this.config?.enableDebug) {
         console.log(
           `\u2728 [${this.systemName}] Updated cosmic sensitivity: ${this.predictionSensitivity}, responsiveness: ${this.highlightResponsiveness}`
@@ -6933,10 +6371,7 @@ var catppuccinStarryNight = (() => {
       this._activeTimers.length = 0;
       for (const listener of this._eventListeners) {
         try {
-          listener.element.removeEventListener(
-            listener.event,
-            listener.handler
-          );
+          listener.element.removeEventListener(listener.event, listener.handler);
         } catch (error) {
           console.error(
             `[${this.systemName}] Failed to remove event listener:`,
@@ -6990,7 +6425,7 @@ var catppuccinStarryNight = (() => {
         energy: 0.8,
         valence: 0.7,
         visualIntensity: 0.6,
-        moodIdentifier: "energetic",
+        moodIdentifier: "energetic"
       };
       const predictions = this.generatePredictions(testContext);
       this.applyHighlights(predictions);
@@ -7003,41 +6438,41 @@ var catppuccinStarryNight = (() => {
         highEnergyLowValence: {
           targetElements: [
             ORBITAL_ELEMENTS.trackRows,
-            MODERN_SELECTORS.progressBar,
+            MODERN_SELECTORS.progressBar
           ],
           highlightType: "intense-glow",
-          duration: 1500,
+          duration: 1500
         },
         highEnergyHighValence: {
           targetElements: [
             MODERN_SELECTORS.playButton,
             MODERN_SELECTORS.heartButton,
-            ORBITAL_ELEMENTS.trackRows + "[aria-current='true']",
+            ORBITAL_ELEMENTS.trackRows + "[aria-current='true']"
           ],
           highlightType: "vibrant-pulse",
-          duration: 1e3,
+          duration: 1e3
         },
         lowEnergyHighValence: {
           targetElements: [
             MODERN_SELECTORS.albumCover,
-            MODERN_SELECTORS.nowPlayingWidget,
+            MODERN_SELECTORS.nowPlayingWidget
           ],
           highlightType: "soft-aura",
-          duration: 2500,
+          duration: 2500
         },
         lowEnergyLowValence: {
           targetElements: [
             MODERN_SELECTORS.nowPlayingLeft,
-            MODERN_SELECTORS.leftSidebar,
+            MODERN_SELECTORS.leftSidebar
           ],
           highlightType: "subtle-sheen",
-          duration: 3e3,
+          duration: 3e3
         },
         default: {
           targetElements: [ORBITAL_ELEMENTS.libraryItems],
           highlightType: "gentle-flow",
-          duration: 2e3,
-        },
+          duration: 2e3
+        }
       };
     }
     _performAdditionalDependencyValidation() {
@@ -7049,7 +6484,8 @@ var catppuccinStarryNight = (() => {
       return true;
     }
     updateAnimation(timestamp, deltaTime) {
-      if (!this.isInitialized) return;
+      if (!this.isInitialized)
+        return;
       this.performanceMetrics.animationFrames++;
       const frameStartTime = performance.now();
       const musicData = this.musicSyncService?.getLatestProcessedData?.() || {};
@@ -7063,28 +6499,16 @@ var catppuccinStarryNight = (() => {
       }
     }
     predictUserInteractions(musicData, deltaTime) {
-      if (this.behavioralState.isInteracting) return;
+      if (this.behavioralState.isInteracting)
+        return;
     }
   };
 
   // src-js/systems/visual/DataGlyphSystem.js
   init_BaseVisualSystem();
   var DataGlyphSystem = class extends BaseVisualSystem {
-    constructor(
-      config,
-      utils,
-      performanceMonitor,
-      musicSyncService,
-      settingsManager,
-      year3000System = null
-    ) {
-      super(
-        config,
-        utils,
-        performanceMonitor,
-        musicSyncService,
-        settingsManager
-      );
+    constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System = null) {
+      super(config, utils, performanceMonitor, musicSyncService, settingsManager);
       this.year3000System = year3000System;
       this.masterAnimationRegistered = false;
       this.animationFrameId = null;
@@ -7111,7 +6535,7 @@ var catppuccinStarryNight = (() => {
         // Memory management for Map-based observedItems
         maxObservedItems: 200,
         // Prevent memory leaks by limiting tracked items
-        staleItemThreshold: 3e5,
+        staleItemThreshold: 3e5
         // 5 minutes for stale item cleanup
       };
       this.performanceMetrics = {
@@ -7124,7 +6548,7 @@ var catppuccinStarryNight = (() => {
         maxFrameTime: 0,
         averageFrameTime: 0,
         frameTimeHistory: [],
-        observedItemsCleanups: 0,
+        observedItemsCleanups: 0
         // Track manual cleanup operations
       };
       this.deviceCapabilities = {
@@ -7132,7 +6556,7 @@ var catppuccinStarryNight = (() => {
         supportsCSSFilter: this._detectCSSFilterSupport(),
         supportsWebGL: this._detectWebGLSupport(),
         performanceLevel: this._detectPerformanceLevel(),
-        reducedMotion: this._detectReducedMotion(),
+        reducedMotion: this._detectReducedMotion()
       };
       if (this.utils && this.utils.systemHealthMonitor) {
         this.utils.systemHealthMonitor.registerSystem("DataGlyphSystem", this);
@@ -7162,9 +6586,7 @@ var catppuccinStarryNight = (() => {
     _detectWebGLSupport() {
       try {
         const canvas = document.createElement("canvas");
-        return !!(
-          canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
-        );
+        return !!(canvas.getContext("webgl") || canvas.getContext("experimental-webgl"));
       } catch (e) {
         return false;
       }
@@ -7172,8 +6594,10 @@ var catppuccinStarryNight = (() => {
     _detectPerformanceLevel() {
       const memory = navigator.deviceMemory || 4;
       const cores = navigator.hardwareConcurrency || 2;
-      if (memory >= 8 && cores >= 8) return "high";
-      if (memory >= 4 && cores >= 4) return "medium";
+      if (memory >= 8 && cores >= 8)
+        return "high";
+      if (memory >= 4 && cores >= 4)
+        return "medium";
       return "low";
     }
     _detectReducedMotion() {
@@ -7185,11 +6609,7 @@ var catppuccinStarryNight = (() => {
       this.setupItemObserver();
       if (this.config?.enableDebug) {
         console.log(
-          `[${this.systemName}] Initialized and item observer started. Using ${
-            this.isUsingMasterAnimation
-              ? "Master Animation Coordinator"
-              : "fallback animation loop"
-          }.`
+          `[${this.systemName}] Initialized and item observer started. Using ${this.isUsingMasterAnimation ? "Master Animation Coordinator" : "fallback animation loop"}.`
         );
       }
     }
@@ -7202,26 +6622,14 @@ var catppuccinStarryNight = (() => {
             this,
             "normal",
             // Priority level
-            this.deviceCapabilities.performanceLevel === "high"
-              ? 60
-              : this.deviceCapabilities.performanceLevel === "medium"
-              ? 45
-              : 30
+            this.deviceCapabilities.performanceLevel === "high" ? 60 : this.deviceCapabilities.performanceLevel === "medium" ? 45 : 30
             // Dynamic FPS based on device
           );
           this.masterAnimationRegistered = true;
           this.isUsingMasterAnimation = true;
           if (this.config?.enableDebug) {
             console.log(
-              `\u{1F3AC} [${
-                this.systemName
-              }] Registered with Master Animation Coordinator at ${
-                this.deviceCapabilities.performanceLevel === "high"
-                  ? 60
-                  : this.deviceCapabilities.performanceLevel === "medium"
-                  ? 45
-                  : 30
-              }fps`
+              `\u{1F3AC} [${this.systemName}] Registered with Master Animation Coordinator at ${this.deviceCapabilities.performanceLevel === "high" ? 60 : this.deviceCapabilities.performanceLevel === "medium" ? 45 : 30}fps`
             );
           }
         } catch (error) {
@@ -7241,7 +6649,8 @@ var catppuccinStarryNight = (() => {
     _startFallbackAnimationLoop() {
       this.isUsingMasterAnimation = false;
       const fallbackLoop = () => {
-        if (!this.isInitialized) return;
+        if (!this.isInitialized)
+          return;
         try {
           this.updateAnimation(performance.now(), 16.67);
         } catch (error) {
@@ -7251,9 +6660,7 @@ var catppuccinStarryNight = (() => {
       };
       this.animationFrameId = requestAnimationFrame(fallbackLoop);
       if (this.config?.enableDebug) {
-        console.log(
-          `\u{1F504} [${this.systemName}] Started fallback animation loop`
-        );
+        console.log(`\u{1F504} [${this.systemName}] Started fallback animation loop`);
       }
     }
     /**
@@ -7264,12 +6671,7 @@ var catppuccinStarryNight = (() => {
     updateAnimation(timestamp, deltaTime) {
       const frameStartTime = performance.now();
       try {
-        const maxFrameTime =
-          this.deviceCapabilities.performanceLevel === "high"
-            ? 8
-            : this.deviceCapabilities.performanceLevel === "medium"
-            ? 12
-            : 16;
+        const maxFrameTime = this.deviceCapabilities.performanceLevel === "high" ? 8 : this.deviceCapabilities.performanceLevel === "medium" ? 12 : 16;
         if (deltaTime > maxFrameTime * 2) {
           this.performanceMetrics.animationFrames++;
           return;
@@ -7290,9 +6692,7 @@ var catppuccinStarryNight = (() => {
         if (this.performanceMetrics.frameTimeHistory.length > 60) {
           this.performanceMetrics.frameTimeHistory.shift();
         }
-        this.performanceMetrics.averageFrameTime =
-          this.performanceMetrics.frameTimeHistory.reduce((a, b) => a + b, 0) /
-          this.performanceMetrics.frameTimeHistory.length;
+        this.performanceMetrics.averageFrameTime = this.performanceMetrics.frameTimeHistory.reduce((a, b) => a + b, 0) / this.performanceMetrics.frameTimeHistory.length;
       } catch (error) {
         console.warn(`[${this.systemName}] Animation update error:`, error);
       }
@@ -7319,11 +6719,11 @@ var catppuccinStarryNight = (() => {
     }
     // === PHASE 3: OPTIMIZED UPDATE METHODS ===
     _updateGlyphTargetsOptimized() {
-      if (!this.initialized) return;
+      if (!this.initialized)
+        return;
       const musicData = this.musicSyncService?.getLatestProcessedData() || {};
       const { energy = 0.5, valence = 0.5, enhancedBPM = 120 } = musicData;
-      const useBatching =
-        this.year3000System && this.year3000System.queueCSSVariableUpdate;
+      const useBatching = this.year3000System && this.year3000System.queueCSSVariableUpdate;
       const globalIntensity = musicData.visualIntensity || 0;
       if (useBatching) {
         this.year3000System.queueCSSVariableUpdate(
@@ -7338,10 +6738,7 @@ var catppuccinStarryNight = (() => {
       }
       const visibleGlyphs = [];
       this.observedItems.forEach((itemData, itemElement) => {
-        if (
-          itemElement.offsetParent &&
-          this._isElementInViewport(itemElement)
-        ) {
+        if (itemElement.offsetParent && this._isElementInViewport(itemElement)) {
           visibleGlyphs.push({ itemElement, itemData });
         }
       });
@@ -7358,20 +6755,14 @@ var catppuccinStarryNight = (() => {
     }
     _isElementInViewport(element) {
       const rect = element.getBoundingClientRect();
-      return (
-        rect.top >= -100 && // Small buffer for elements just outside viewport
-        rect.left >= -100 &&
-        rect.bottom <=
-          (window.innerHeight || document.documentElement.clientHeight) + 100 &&
-        rect.right <=
-          (window.innerWidth || document.documentElement.clientWidth) + 100
-      );
+      return rect.top >= -100 && // Small buffer for elements just outside viewport
+      rect.left >= -100 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) + 100 && rect.right <= (window.innerWidth || document.documentElement.clientWidth) + 100;
     }
     setupItemObserver() {
       const targetNodes = [
         ".main-cardImage-imageWrapper",
         // Cards
-        ".main-trackList-row",
+        ".main-trackList-row"
         // Tracklist items
         // Potential future targets: playlist entries, artist circles
       ];
@@ -7384,9 +6775,7 @@ var catppuccinStarryNight = (() => {
                   if (node.matches(selector)) {
                     this.attachGlyph(node);
                   }
-                  node
-                    .querySelectorAll(selector)
-                    .forEach((item) => this.attachGlyph(item));
+                  node.querySelectorAll(selector).forEach((item) => this.attachGlyph(item));
                 });
               }
             });
@@ -7396,7 +6785,8 @@ var catppuccinStarryNight = (() => {
                   const glyphElement = node.querySelector(
                     ".data-glyph-visualization"
                   );
-                  if (glyphElement) glyphElement.remove();
+                  if (glyphElement)
+                    glyphElement.remove();
                   this.observedItems.delete(node);
                   if (this.glyphDataCache.has(node)) {
                     this.glyphDataCache.delete(node);
@@ -7422,7 +6812,7 @@ var catppuccinStarryNight = (() => {
       if (mainAppContainer) {
         this.itemObserver.observe(mainAppContainer, {
           childList: true,
-          subtree: true,
+          subtree: true
         });
       } else {
         console.warn(
@@ -7430,7 +6820,7 @@ var catppuccinStarryNight = (() => {
         );
         this.itemObserver.observe(document.body, {
           childList: true,
-          subtree: true,
+          subtree: true
         });
       }
     }
@@ -7481,7 +6871,7 @@ var catppuccinStarryNight = (() => {
         pulseIntensity: 0,
         shimmerOpacity: 0.3,
         colorRgb: "140,170,238",
-        pulseAnimationState: "paused",
+        pulseAnimationState: "paused"
       });
       this.itemInteractionData.set(itemElement, {
         lastInteraction: Date.now(),
@@ -7489,10 +6879,9 @@ var catppuccinStarryNight = (() => {
         lastInteractionTime: Date.now(),
         interactionScore: 0,
         resonanceIntensity: 0,
-        echoActiveUntil: 0,
+        echoActiveUntil: 0
       });
-      const boundHandleInteraction = (event) =>
-        this.handleItemInteraction(itemElement, event);
+      const boundHandleInteraction = (event) => this.handleItemInteraction(itemElement, event);
       glyphElement._boundHandleInteraction = boundHandleInteraction;
       itemElement.addEventListener("click", boundHandleInteraction);
       itemElement.addEventListener("mouseenter", boundHandleInteraction);
@@ -7539,7 +6928,8 @@ var catppuccinStarryNight = (() => {
      */
     updateGlyphVisuals(itemElement, itemData) {
       const glyphElement = itemData.glyphElement;
-      if (!glyphElement) return;
+      if (!glyphElement)
+        return;
       glyphElement.style.setProperty(
         "--sn-glyph-opacity",
         itemData.currentOpacity.toFixed(2)
@@ -7567,7 +6957,8 @@ var catppuccinStarryNight = (() => {
       );
     }
     updateGlyphData(itemElement, data) {
-      if (!this.observedItems.has(itemElement)) return;
+      if (!this.observedItems.has(itemElement))
+        return;
       this.performanceMetrics.glyphUpdates++;
       const itemData = this.observedItems.get(itemElement);
       const glyphElement = itemData.glyphElement;
@@ -7583,14 +6974,8 @@ var catppuccinStarryNight = (() => {
       let pulseIntensity = data.pulseIntensity || 0;
       let shimmerOpacity = 0.3 + (data.shimmerFactor || 0) * 0.7;
       let rotation = data.rotationAngle || 0;
-      let colorRgb =
-        data.colorRgb ||
-        getComputedStyle(document.documentElement)
-          .getPropertyValue("--sn-glyph-color-rgb")
-          .trim() ||
-        "140,170,238";
-      let pulseAnimationState =
-        data.pulseIntensity > 0.1 ? "running" : "paused";
+      let colorRgb = data.colorRgb || getComputedStyle(document.documentElement).getPropertyValue("--sn-glyph-color-rgb").trim() || "140,170,238";
+      let pulseAnimationState = data.pulseIntensity > 0.1 ? "running" : "paused";
       glyphElement.style.setProperty("--sn-glyph-opacity", opacity.toFixed(2));
       glyphElement.style.setProperty("--sn-glyph-scale", scale.toFixed(2));
       glyphElement.style.setProperty(
@@ -7607,8 +6992,7 @@ var catppuccinStarryNight = (() => {
         "--sn-glyph-pulse-animation-state",
         pulseAnimationState
       );
-      itemData.resonanceFactor =
-        (itemData.resonanceFactor + (data.intensity || 0)) / 2;
+      itemData.resonanceFactor = (itemData.resonanceFactor + (data.intensity || 0)) / 2;
       if (this.performanceMetrics.glyphUpdates % 100 === 0) {
         this.performOptimizedCleanup();
       }
@@ -7616,11 +7000,13 @@ var catppuccinStarryNight = (() => {
       }
     }
     handleItemInteraction(itemElement, event) {
-      if (!itemElement || !this.itemInteractionData.has(itemElement)) return;
+      if (!itemElement || !this.itemInteractionData.has(itemElement))
+        return;
       const interactionType = event.type;
       const data = this.itemInteractionData.get(itemElement);
       const glyphElement = this.observedItems.get(itemElement)?.glyphElement;
-      if (!glyphElement) return;
+      if (!glyphElement)
+        return;
       data.lastInteraction = Date.now();
       data.lastInteractionTime = Date.now();
       let scoreIncrement = 0;
@@ -7633,9 +7019,7 @@ var catppuccinStarryNight = (() => {
       } else if (interactionType === "mouseenter") {
         scoreIncrement = 1;
         const rootStyle = getComputedStyle(document.documentElement);
-        const primaryRGB =
-          rootStyle.getPropertyValue("--sn-gradient-primary-rgb").trim() ||
-          "202,158,230";
+        const primaryRGB = rootStyle.getPropertyValue("--sn-gradient-primary-rgb").trim() || "202,158,230";
         glyphElement.style.opacity = "0.9";
         glyphElement.style.transform = "scale(1.5)";
         glyphElement.style.backgroundColor = `rgba(${primaryRGB}, 0.7)`;
@@ -7663,10 +7047,7 @@ var catppuccinStarryNight = (() => {
             data.echoActiveUntil = 0;
             this.itemInteractionData.set(itemElement, data);
           }
-          if (
-            now - data.lastInteractionTime > 6e4 &&
-            data.interactionScore > 0
-          ) {
+          if (now - data.lastInteractionTime > 6e4 && data.interactionScore > 0) {
             data.interactionScore = Math.max(0, data.interactionScore - 0.1);
             data.resonanceIntensity = Math.min(
               0.25,
@@ -7703,17 +7084,12 @@ var catppuccinStarryNight = (() => {
         cancelAnimationFrame(this.animationFrameId);
         this.animationFrameId = null;
         if (this.config?.enableDebug) {
-          console.log(
-            `\u{1F504} [${this.systemName}] Stopped fallback animation loop`
-          );
+          console.log(`\u{1F504} [${this.systemName}] Stopped fallback animation loop`);
         }
       }
       for (const listener of this._domEventListeners) {
         try {
-          listener.element.removeEventListener(
-            listener.event,
-            listener.handler
-          );
+          listener.element.removeEventListener(listener.event, listener.handler);
         } catch (error) {
           console.error(
             `[${this.systemName}] Failed to remove event listener:`,
@@ -7769,20 +7145,13 @@ var catppuccinStarryNight = (() => {
     // NEW: Phase 6 Optimized memory cleanup and performance monitoring
     performOptimizedCleanup() {
       const now = Date.now();
-      if (
-        now - this.memoryOptimization.lastCleanup >
-        this.memoryOptimization.cleanupInterval
-      ) {
+      if (now - this.memoryOptimization.lastCleanup > this.memoryOptimization.cleanupInterval) {
         this.performanceMetrics.memoryCleanups++;
         const itemsToDelete = [];
         this.observedItems.forEach((itemData, itemElement) => {
           if (!itemElement.isConnected) {
             itemsToDelete.push(itemElement);
-          } else if (
-            itemData.lastInteraction &&
-            now - itemData.lastInteraction >
-              this.memoryOptimization.staleItemThreshold
-          ) {
+          } else if (itemData.lastInteraction && now - itemData.lastInteraction > this.memoryOptimization.staleItemThreshold) {
             itemsToDelete.push(itemElement);
           }
         });
@@ -7790,26 +7159,20 @@ var catppuccinStarryNight = (() => {
         this.itemInteractionData.forEach((interactionData, itemElement) => {
           if (!itemElement.isConnected) {
             interactionItemsToDelete.push(itemElement);
-          } else if (
-            interactionData.lastInteraction &&
-            now - interactionData.lastInteraction >
-              this.memoryOptimization.staleItemThreshold
-          ) {
+          } else if (interactionData.lastInteraction && now - interactionData.lastInteraction > this.memoryOptimization.staleItemThreshold) {
             interactionItemsToDelete.push(itemElement);
           }
         });
         const allItemsToDelete = [
-          .../* @__PURE__ */ new Set([
-            ...itemsToDelete,
-            ...interactionItemsToDelete,
-          ]),
+          .../* @__PURE__ */ new Set([...itemsToDelete, ...interactionItemsToDelete])
         ];
         allItemsToDelete.forEach((element) => {
           const itemData = this.observedItems.get(element);
           if (itemData?.glyphElement) {
             try {
               itemData.glyphElement.remove();
-            } catch (e) {}
+            } catch (e) {
+            }
           }
           this.observedItems.delete(element);
           if (this.glyphDataCache.has(element)) {
@@ -7827,23 +7190,21 @@ var catppuccinStarryNight = (() => {
             );
           }
         }
-        if (
-          this.observedItems.size > this.memoryOptimization.maxObservedItems
-        ) {
+        if (this.observedItems.size > this.memoryOptimization.maxObservedItems) {
           const itemsArray = Array.from(this.observedItems.entries());
           const sortedItems = itemsArray.sort((a, b) => {
             const aTime = a[1].lastInteraction || 0;
             const bTime = b[1].lastInteraction || 0;
             return aTime - bTime;
           });
-          const excessCount =
-            this.observedItems.size - this.memoryOptimization.maxObservedItems;
+          const excessCount = this.observedItems.size - this.memoryOptimization.maxObservedItems;
           const itemsToRemove = sortedItems.slice(0, excessCount);
           itemsToRemove.forEach(([element, itemData]) => {
             if (itemData?.glyphElement) {
               try {
                 itemData.glyphElement.remove();
-              } catch (e) {}
+              } catch (e) {
+              }
             }
             this.observedItems.delete(element);
             if (this.glyphDataCache.has(element)) {
@@ -7859,21 +7220,14 @@ var catppuccinStarryNight = (() => {
             );
           }
         }
-        if (
-          this.itemInteractionData.size >
-          this.memoryOptimization.maxObservedItems
-        ) {
-          const interactionArray = Array.from(
-            this.itemInteractionData.entries()
-          );
+        if (this.itemInteractionData.size > this.memoryOptimization.maxObservedItems) {
+          const interactionArray = Array.from(this.itemInteractionData.entries());
           const sortedInteractions = interactionArray.sort((a, b) => {
             const aTime = a[1].lastInteraction || 0;
             const bTime = b[1].lastInteraction || 0;
             return aTime - bTime;
           });
-          const excessCount =
-            this.itemInteractionData.size -
-            this.memoryOptimization.maxObservedItems;
+          const excessCount = this.itemInteractionData.size - this.memoryOptimization.maxObservedItems;
           const interactionsToRemove = sortedInteractions.slice(0, excessCount);
           interactionsToRemove.forEach(([element, interactionData]) => {
             this.itemInteractionData.delete(element);
@@ -7882,7 +7236,8 @@ var catppuccinStarryNight = (() => {
               if (itemData?.glyphElement) {
                 try {
                   itemData.glyphElement.remove();
-                } catch (e) {}
+                } catch (e) {
+                }
               }
               this.observedItems.delete(element);
             }
@@ -7920,10 +7275,7 @@ var catppuccinStarryNight = (() => {
           echoEffects: this.performanceMetrics.echoEffects,
           memoryUsage,
           animationComplexity,
-          cacheEfficiency:
-            this.performanceMetrics.cacheHits /
-              (this.performanceMetrics.cacheHits +
-                this.performanceMetrics.cacheMisses) || 0,
+          cacheEfficiency: this.performanceMetrics.cacheHits / (this.performanceMetrics.cacheHits + this.performanceMetrics.cacheMisses) || 0
         });
       }
     }
@@ -7956,7 +7308,8 @@ var catppuccinStarryNight = (() => {
      * @param {Object} modeConfig - Configuration from artistic mode profile
      */
     updateModeConfiguration(modeConfig) {
-      if (!modeConfig) return;
+      if (!modeConfig)
+        return;
       const { enabled, animations, intensity } = modeConfig;
       if (this.config?.enableDebug) {
         console.log(
@@ -7969,7 +7322,7 @@ var catppuccinStarryNight = (() => {
         bloomAnimationsEnabled: animations || false,
         temporalEchoEnabled: modeConfig.temporalEcho || false,
         intensityMultiplier: intensity || 1,
-        refractEffectsEnabled: animations || false,
+        refractEffectsEnabled: animations || false
       };
       this.applyModeToExistingGlyphs();
       if (this.modeConfig.bloomAnimationsEnabled) {
@@ -7983,12 +7336,13 @@ var catppuccinStarryNight = (() => {
      * Initialize bloom and refract effects for UI elements
      */
     initializeBloomEffects() {
-      if (this.bloomInitialized) return;
+      if (this.bloomInitialized)
+        return;
       this.bloomSystem = {
         activeBloomElements: /* @__PURE__ */ new WeakMap(),
         bloomTimers: /* @__PURE__ */ new WeakMap(),
         refractElements: /* @__PURE__ */ new WeakSet(),
-        attentionTracker: /* @__PURE__ */ new WeakMap(),
+        attentionTracker: /* @__PURE__ */ new WeakMap()
       };
       this.setupAttentionTracking();
       this.bloomInitialized = true;
@@ -8000,15 +7354,14 @@ var catppuccinStarryNight = (() => {
      * Disable bloom effects and cleanup
      */
     disableBloomEffects() {
-      if (!this.bloomInitialized) return;
+      if (!this.bloomInitialized)
+        return;
       if (this.bloomSystem?.bloomTimers) {
         this.bloomSystem.bloomTimers = /* @__PURE__ */ new WeakMap();
       }
-      document
-        .querySelectorAll(".sn-bloom-active, .sn-refract-active")
-        .forEach((el) => {
-          el.classList.remove("sn-bloom-active", "sn-refract-active");
-        });
+      document.querySelectorAll(".sn-bloom-active, .sn-refract-active").forEach((el) => {
+        el.classList.remove("sn-bloom-active", "sn-refract-active");
+      });
       this.bloomSystem = null;
       this.bloomInitialized = false;
       if (this.config?.enableDebug) {
@@ -8048,13 +7401,11 @@ var catppuccinStarryNight = (() => {
      * @param {string} type - Type of attention (focus, blur, hover, unhover)
      */
     handleElementAttention(element, type) {
-      if (
-        !this.modeConfig?.bloomAnimationsEnabled &&
-        !this.modeConfig?.refractEffectsEnabled
-      )
+      if (!this.modeConfig?.bloomAnimationsEnabled && !this.modeConfig?.refractEffectsEnabled)
         return;
       const relevantElement = this.findRelevantElement(element);
-      if (!relevantElement) return;
+      if (!relevantElement)
+        return;
       const intensity = this.modeConfig?.intensityMultiplier || 1;
       switch (type) {
         case "focus":
@@ -8096,7 +7447,7 @@ var catppuccinStarryNight = (() => {
         MODERN_SELECTORS.navBarLink,
         // Enhanced fallbacks for broader compatibility
         MODERN_SELECTORS.albumCover,
-        MODERN_SELECTORS.heartButton,
+        MODERN_SELECTORS.heartButton
       ];
       for (const selector of relevantSelectors) {
         if (element.matches(selector)) {
@@ -8121,7 +7472,8 @@ var catppuccinStarryNight = (() => {
      * @param {number} intensity - Bloom intensity
      */
     bloomElement(element, intensity = 1) {
-      if (!this.bloomSystem || !element) return;
+      if (!this.bloomSystem || !element)
+        return;
       const existingTimer = this.bloomSystem.bloomTimers.get(element);
       if (existingTimer) {
         clearTimeout(existingTimer);
@@ -8133,14 +7485,11 @@ var catppuccinStarryNight = (() => {
         (1 + intensity * 0.1).toString()
       );
       const root = document.documentElement;
-      const accentRgb =
-        getComputedStyle(root)
-          .getPropertyValue("--sn-gradient-accent-rgb")
-          .trim() || "140,170,238";
+      const accentRgb = getComputedStyle(root).getPropertyValue("--sn-gradient-accent-rgb").trim() || "140,170,238";
       element.style.setProperty("--sn-bloom-glow-color", accentRgb);
       this.bloomSystem.activeBloomElements.set(element, {
         startTime: Date.now(),
-        intensity,
+        intensity
       });
       const bloomDuration = 1500 * intensity;
       const timer = setTimeout(() => {
@@ -8162,7 +7511,8 @@ var catppuccinStarryNight = (() => {
      * @param {number} intensity - Refract intensity
      */
     applyRefractEffect(element, intensity = 1) {
-      if (!this.bloomSystem || !element) return;
+      if (!this.bloomSystem || !element)
+        return;
       element.classList.add("sn-refract-active");
       element.style.setProperty("--sn-refract-intensity", intensity.toString());
       element.style.setProperty(
@@ -8186,7 +7536,8 @@ var catppuccinStarryNight = (() => {
      * @param {number} intensity - Echo intensity
      */
     addTemporalEcho(element, intensity = 1) {
-      if (!element) return;
+      if (!element)
+        return;
       const echo = element.cloneNode(true);
       echo.classList.add("sn-temporal-echo");
       echo.style.position = "absolute";
@@ -8215,7 +7566,8 @@ var catppuccinStarryNight = (() => {
      * @param {Element} element - Element to remove bloom from
      */
     removeBloomEffect(element) {
-      if (!element) return;
+      if (!element)
+        return;
       element.classList.remove("sn-bloom-active");
       if (this.bloomSystem) {
         this.bloomSystem.activeBloomElements.delete(element);
@@ -8231,7 +7583,8 @@ var catppuccinStarryNight = (() => {
      * @param {Element} element - Element to clean up
      */
     removeKineticEffects(element) {
-      if (!element) return;
+      if (!element)
+        return;
       element.classList.remove("sn-refract-active");
       this.removeBloomEffect(element);
       if (this.bloomSystem?.refractElements) {
@@ -8242,7 +7595,8 @@ var catppuccinStarryNight = (() => {
      * Apply current mode configuration to existing glyphs
      */
     applyModeToExistingGlyphs() {
-      if (!this.modeConfig) return;
+      if (!this.modeConfig)
+        return;
       const intensity = this.modeConfig.intensityMultiplier || 1;
       try {
         this.observedItems.forEach((itemData, itemElement) => {
@@ -8279,9 +7633,7 @@ var catppuccinStarryNight = (() => {
       console.log(
         "\u{1F9EA} [DataGlyphSystem] Testing Map-based forEach functionality:"
       );
-      console.log(
-        `\u{1F4CA} observedItems: ${this.observedItems.size} entries`
-      );
+      console.log(`\u{1F4CA} observedItems: ${this.observedItems.size} entries`);
       let observedCount = 0;
       try {
         this.observedItems.forEach((value, key) => {
@@ -8305,10 +7657,7 @@ var catppuccinStarryNight = (() => {
           `\u2705 itemInteractionData.forEach() works: iterated ${interactionCount} entries`
         );
       } catch (error) {
-        console.log(
-          `\u274C itemInteractionData.forEach() failed:`,
-          error.message
-        );
+        console.log(`\u274C itemInteractionData.forEach() failed:`, error.message);
       }
       try {
         const entriesArray = Array.from(this.itemInteractionData.entries());
@@ -8316,17 +7665,14 @@ var catppuccinStarryNight = (() => {
           `\u2705 itemInteractionData.entries() works: ${entriesArray.length} entries converted to array`
         );
       } catch (error) {
-        console.log(
-          `\u274C itemInteractionData.entries() failed:`,
-          error.message
-        );
+        console.log(`\u274C itemInteractionData.entries() failed:`, error.message);
       }
       return {
         observedItemsCount: observedCount,
         interactionDataCount: interactionCount,
         entriesMethodWorks: true,
         mapBased: true,
-        fixApplied: true,
+        fixApplied: true
       };
     }
   };
@@ -8334,14 +7680,7 @@ var catppuccinStarryNight = (() => {
   // src-js/systems/visual/DimensionalNexusSystem.js
   init_BaseVisualSystem();
   var DimensionalNexusSystem = class extends BaseVisualSystem {
-    constructor(
-      config,
-      utils,
-      performanceMonitor,
-      musicSyncService,
-      settingsManager,
-      year3000System = null
-    ) {
+    constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System = null) {
       super(
         config,
         utils,
@@ -8372,7 +7711,7 @@ var catppuccinStarryNight = (() => {
         lastMoodIdentifier: "neutral",
         // Responsiveness settings
         responsiveness: 1,
-        temporalSensitivity: 1,
+        temporalSensitivity: 1
       };
       this.biometricState = {
         isMeditating: false,
@@ -8384,7 +7723,7 @@ var catppuccinStarryNight = (() => {
         desaturation: 0,
         slowdown: 1,
         targetDesaturation: 0,
-        targetSlowdown: 1,
+        targetSlowdown: 1
       };
       this.lastHeavyUpdateTime = 0;
       this.heavyUpdateInterval = 1e3 / 10;
@@ -8401,7 +7740,7 @@ var catppuccinStarryNight = (() => {
         integrationHealth: "healthy",
         crossSystemErrors: 0,
         meditationTransitions: 0,
-        navigationScaleUpdates: 0,
+        navigationScaleUpdates: 0
       };
       if (this.utils && this.utils.systemHealthMonitor) {
         this.utils.systemHealthMonitor.registerSystem(
@@ -8460,11 +7799,13 @@ var catppuccinStarryNight = (() => {
      */
     initializeOptimizedQuantumSpace() {
       const root = this.utils.getRootStyle();
-      if (!root) return;
+      if (!root)
+        return;
       const safeSetProperty = (name, value) => {
         try {
           root.style.setProperty(name, value);
-        } catch (e) {}
+        } catch (e) {
+        }
       };
       safeSetProperty("--sn-nexus-complexity", this.nexusState.complexity);
       safeSetProperty("--sn-nexus-coherence", this.nexusState.coherence);
@@ -8485,18 +7826,12 @@ var catppuccinStarryNight = (() => {
     recordUserInteraction(event) {
       const eventType = event.type;
       const now = performance.now();
-      if (
-        now - this.lastInteractionRecordTime <
-        this.interactionRecordInterval
-      ) {
+      if (now - this.lastInteractionRecordTime < this.interactionRecordInterval) {
         return;
       }
       this.lastInteractionRecordTime = now;
       this.nexusState.userInfluence += 5e-3;
-      this.nexusState.volatility = Math.min(
-        1,
-        this.nexusState.volatility + 0.01
-      );
+      this.nexusState.volatility = Math.min(1, this.nexusState.volatility + 0.01);
       this.nexusState.userInfluence = Math.min(
         0.5,
         this.nexusState.userInfluence
@@ -8512,7 +7847,8 @@ var catppuccinStarryNight = (() => {
     }
     setupModalObserver() {
       const modalRoot = document.querySelector(".main-modal-container");
-      if (!modalRoot) return;
+      if (!modalRoot)
+        return;
       const observerCallback = (mutationsList, observer) => {
         for (const mutation of mutationsList) {
           if (mutation.type === "childList") {
@@ -8534,12 +7870,11 @@ var catppuccinStarryNight = (() => {
      * Optimized interaction listener (fewer events, more throttling)
      */
     setupOptimizedInteractionListener() {
-      this.boundInteractionHandler = (event) =>
-        this.recordUserInteraction(event);
+      this.boundInteractionHandler = (event) => this.recordUserInteraction(event);
       const interactionEvents = ["click", "keypress"];
       interactionEvents.forEach((eventType) => {
         document.addEventListener(eventType, this.boundInteractionHandler, {
-          passive: true,
+          passive: true
         });
       });
       if (this.config?.enableDebug) {
@@ -8552,7 +7887,8 @@ var catppuccinStarryNight = (() => {
      * Main update entry point
      */
     updateFromMusicAnalysis(processedMusicData, rawFeatures, trackUri) {
-      if (!this.isInitialized) return;
+      if (!this.isInitialized)
+        return;
       super.updateFromMusicAnalysis(processedMusicData, rawFeatures, trackUri);
       const now = performance.now();
       if (now - this.lastHeavyUpdateTime > this.heavyUpdateInterval) {
@@ -8582,7 +7918,7 @@ var catppuccinStarryNight = (() => {
           moodIdentifier = "neutral",
           rawEnergy = 0.5,
           rawValence = 0.5,
-          animationSpeedFactor = 1,
+          animationSpeedFactor = 1
         } = processedMusicData;
         const energyDelta = Math.abs(rawEnergy - this.nexusState.lastEnergy);
         const valenceDelta = Math.abs(rawValence - this.nexusState.lastValence);
@@ -8594,26 +7930,21 @@ var catppuccinStarryNight = (() => {
         this.nexusState.targetCoherence = rawValence * 0.5 + 0.4;
         this.nexusState.targetVolatility = (energyDelta + valenceDelta) * 1.5;
         this.nexusState.targetTimeDistortionFactor = animationSpeedFactor;
-        this.nexusState.targetNavigationScale =
-          this.calculateOptimizedNavigationScale(
-            visualIntensity,
-            moodIdentifier
-          );
+        this.nexusState.targetNavigationScale = this.calculateOptimizedNavigationScale(visualIntensity, moodIdentifier);
         const root = this.utils.getRootStyle();
-        if (!root) return;
+        if (!root)
+          return;
         const hueShift = (1 - rawValence) * 30 - 15;
         const saturationBoost = 1 + rawEnergy * 0.2;
         const brightnessFactor = 1 + visualIntensity * 0.05;
         const queueCSSUpdate = (property, value) => {
-          if (
-            this.year3000System &&
-            this.year3000System.queueCSSVariableUpdate
-          ) {
+          if (this.year3000System && this.year3000System.queueCSSVariableUpdate) {
             this.year3000System.queueCSSVariableUpdate(property, value);
           } else {
             try {
               root.style.setProperty(property, value);
-            } catch (e) {}
+            } catch (e) {
+            }
           }
         };
         queueCSSUpdate("--sn-nexus-hue-shift", `${hueShift.toFixed(1)}deg`);
@@ -8648,31 +7979,17 @@ var catppuccinStarryNight = (() => {
      * Digital meditation state update (preserved - core Year 3000 feature)
      */
     updateDigitalMeditationState(processedMusicData) {
-      const { visualIntensity = 0.5, moodIdentifier = "neutral" } =
-        processedMusicData || {};
+      const { visualIntensity = 0.5, moodIdentifier = "neutral" } = processedMusicData || {};
       const now = Date.now();
-      const timeSinceLastInteraction =
-        now - this.biometricState.lastUserInteractionTime;
-      const isCalmMusic =
-        visualIntensity < 0.25 &&
-        (moodIdentifier.includes("calm") ||
-          moodIdentifier.includes("sad") ||
-          moodIdentifier === "neutral");
+      const timeSinceLastInteraction = now - this.biometricState.lastUserInteractionTime;
+      const isCalmMusic = visualIntensity < 0.25 && (moodIdentifier.includes("calm") || moodIdentifier.includes("sad") || moodIdentifier === "neutral");
       if (this.biometricState.isMeditating) {
-        if (
-          !isCalmMusic ||
-          timeSinceLastInteraction < this.biometricState.meditationGracePeriod
-        ) {
+        if (!isCalmMusic || timeSinceLastInteraction < this.biometricState.meditationGracePeriod) {
           this.biometricState.isMeditating = false;
           this.systemIntegrationMetrics.meditationTransitions++;
         }
       } else {
-        if (
-          isCalmMusic &&
-          timeSinceLastInteraction >
-            this.biometricState.meditationGracePeriod +
-              this.biometricState.interactionCooldown
-        ) {
+        if (isCalmMusic && timeSinceLastInteraction > this.biometricState.meditationGracePeriod + this.biometricState.interactionCooldown) {
           this.biometricState.isMeditating = true;
           this.systemIntegrationMetrics.meditationTransitions++;
         }
@@ -8689,7 +8006,8 @@ var catppuccinStarryNight = (() => {
      * PERFORMANCE OPTIMIZATION: Unified animation update for Master Animation Coordinator
      */
     updateAnimation(timestamp, deltaTime) {
-      if (!this.isInitialized) return;
+      if (!this.isInitialized)
+        return;
       this.frameCount++;
       const frameStart = performance.now();
       const musicData = this.musicSyncService?.getLatestProcessedData() || {};
@@ -8700,10 +8018,7 @@ var catppuccinStarryNight = (() => {
         this.lastHeavyUpdateTime = frameStart;
         this.updateNexusTargets(musicData);
       }
-      if (
-        frameStart - this.lastBiometricCheckTime >
-        this.biometricCheckInterval
-      ) {
+      if (frameStart - this.lastBiometricCheckTime > this.biometricCheckInterval) {
         this.lastBiometricCheckTime = frameStart;
         this.updateDigitalMeditationState(musicData);
       }
@@ -8728,10 +8043,7 @@ var catppuccinStarryNight = (() => {
      * Fallback animation loops
      */
     _startFallbackAnimationLoops() {
-      if (
-        this.year3000System &&
-        this.year3000System.registerConsolidatedTimer
-      ) {
+      if (this.year3000System && this.year3000System.registerConsolidatedTimer) {
         this.year3000System.registerConsolidatedTimer(
           "DimensionalNexusFrameUpdate",
           () => this.animateOptimizedNexusFrame(),
@@ -8746,7 +8058,8 @@ var catppuccinStarryNight = (() => {
      */
     animateOptimizedNexusFrame(deltaTimeMs = null) {
       const root = this.utils.getRootStyle();
-      if (!root) return;
+      if (!root)
+        return;
       const lerpSpeed = 0.15;
       this.nexusState.complexity = this.utils.lerpSmooth(
         this.nexusState.complexity,
@@ -8780,8 +8093,7 @@ var catppuccinStarryNight = (() => {
       );
       this.nexusState.userInfluence *= 0.99;
       const now = Date.now();
-      const lerpDeltaTime =
-        (now - (this.biometricState.lastMeditationUpdateTime || now)) / 1e3;
+      const lerpDeltaTime = (now - (this.biometricState.lastMeditationUpdateTime || now)) / 1e3;
       this.biometricState.lastMeditationUpdateTime = now;
       this.biometricState.desaturation = this.utils.lerpSmooth(
         this.biometricState.desaturation,
@@ -8799,7 +8111,7 @@ var catppuccinStarryNight = (() => {
       if (this.config?.enableDebug && Math.random() < 5e-3) {
         console.log(`\u{1F30C} [${this.systemName}] Nexus frame animated.`, {
           complexity: this.nexusState.complexity.toFixed(3),
-          meditation: this.biometricState.desaturation.toFixed(3),
+          meditation: this.biometricState.desaturation.toFixed(3)
         });
       }
     }
@@ -8808,7 +8120,8 @@ var catppuccinStarryNight = (() => {
      */
     applyOptimizedStateToCSS() {
       const root = this.utils.getRootStyle();
-      if (!root) return;
+      if (!root)
+        return;
       const queueCSSUpdate = (property, value) => {
         if (this.year3000System && this.year3000System.queueCSSVariableUpdate) {
           this.year3000System.queueCSSVariableUpdate(property, value);
@@ -8817,7 +8130,8 @@ var catppuccinStarryNight = (() => {
             if (isFinite(value)) {
               root.style.setProperty(property, value.toString());
             }
-          } catch (e) {}
+          } catch (e) {
+          }
         }
       };
       queueCSSUpdate(
@@ -8853,9 +8167,9 @@ var catppuccinStarryNight = (() => {
         this.biometricState.slowdown.toFixed(2)
       );
       const adjustedNeuralSpeed = (2 / this.biometricState.slowdown).toFixed(1);
-      const adjustedTemporalSpeed = (
-        1.5 / this.biometricState.slowdown
-      ).toFixed(1);
+      const adjustedTemporalSpeed = (1.5 / this.biometricState.slowdown).toFixed(
+        1
+      );
       queueCSSUpdate("--sn-neural-flow-speed", `${adjustedNeuralSpeed}s`);
       queueCSSUpdate(
         "--sn-temporal-animation-speed",
@@ -8865,29 +8179,30 @@ var catppuccinStarryNight = (() => {
         MODERN_SELECTORS.leftSidebar
       );
       if (sidebarElement) {
-        const isMeditating =
-          this.biometricState.isMeditating &&
-          this.biometricState.desaturation > 0.1;
+        const isMeditating = this.biometricState.isMeditating && this.biometricState.desaturation > 0.1;
         sidebarElement.classList.toggle("sn-digital-meditation", isMeditating);
       }
     }
     validateMusicData(data) {
-      if (!data) return false;
+      if (!data)
+        return false;
       const requiredFields = [
         "visualIntensity",
         "moodIdentifier",
         "rawEnergy",
-        "rawValence",
+        "rawValence"
       ];
       return requiredFields.every((field) => data.hasOwnProperty(field));
     }
     applySafeDefaults() {
       const root = this.utils.getRootStyle();
-      if (!root) return;
+      if (!root)
+        return;
       const safeSetProperty = (name, value) => {
         try {
           root.style.setProperty(name, value);
-        } catch (e) {}
+        } catch (e) {
+        }
       };
       safeSetProperty("--sn-nav-item-transform-scale", "1.0");
       safeSetProperty("--sn-sidebar-meditation-desaturation", "0");
@@ -8905,19 +8220,20 @@ var catppuccinStarryNight = (() => {
             memoryUsage,
             errorCount: this.systemIntegrationMetrics.crossSystemErrors,
             animationComplexity,
-            meditationTransitions:
-              this.systemIntegrationMetrics.meditationTransitions,
-            navigationUpdates:
-              this.systemIntegrationMetrics.navigationScaleUpdates,
+            meditationTransitions: this.systemIntegrationMetrics.meditationTransitions,
+            navigationUpdates: this.systemIntegrationMetrics.navigationScaleUpdates
           });
         }
       }
     }
     calculateIntegrationComplexity() {
       let complexity = 0;
-      if (this.biometricState.isMeditating) complexity += 10;
-      if (this.nexusState.currentNavigationScale > 1.01) complexity += 5;
-      if (this.nexusState.volatility > 0.5) complexity += 10;
+      if (this.biometricState.isMeditating)
+        complexity += 10;
+      if (this.nexusState.currentNavigationScale > 1.01)
+        complexity += 5;
+      if (this.nexusState.volatility > 0.5)
+        complexity += 10;
       return complexity;
     }
     performCleanup() {
@@ -8933,16 +8249,10 @@ var catppuccinStarryNight = (() => {
     /**
      * Optimized navigation scale calculation (simplified)
      */
-    calculateOptimizedNavigationScale(
-      visualIntensity = 0.5,
-      moodIdentifier = "neutral"
-    ) {
+    calculateOptimizedNavigationScale(visualIntensity = 0.5, moodIdentifier = "neutral") {
       const baseScale = 1 + visualIntensity * 0.02;
       let moodModifier = 0;
-      if (
-        moodIdentifier.includes("energetic") ||
-        moodIdentifier.includes("danceable")
-      ) {
+      if (moodIdentifier.includes("energetic") || moodIdentifier.includes("danceable")) {
         moodModifier = 3e-3;
       }
       return Math.max(1, Math.min(1.025, baseScale + moodModifier));
@@ -8953,16 +8263,13 @@ var catppuccinStarryNight = (() => {
         targetScale: this.nexusState.targetNavigationScale.toFixed(4),
         lastVisualIntensity: this.nexusState.lastVisualIntensity.toFixed(3),
         lastMood: this.nexusState.lastMoodIdentifier,
-        isResponsive:
-          Math.abs(
-            this.nexusState.currentNavigationScale -
-              this.nexusState.targetNavigationScale
-          ) < 1e-3,
+        isResponsive: Math.abs(
+          this.nexusState.currentNavigationScale - this.nexusState.targetNavigationScale
+        ) < 1e-3
       };
     }
     getMeditationReport() {
-      const timeSinceLastInteraction =
-        Date.now() - this.biometricState.lastUserInteractionTime;
+      const timeSinceLastInteraction = Date.now() - this.biometricState.lastUserInteractionTime;
       const currentDesaturation = this.biometricState.desaturation;
       const currentSlowdown = this.biometricState.slowdown;
       return {
@@ -8971,20 +8278,19 @@ var catppuccinStarryNight = (() => {
         meditationGracePeriod: this.biometricState.meditationGracePeriod / 1e3,
         currentDesaturation: currentDesaturation.toFixed(3),
         currentSlowdown: currentSlowdown.toFixed(3),
-        meditationDepth: this.biometricState.isMeditating
-          ? ((currentDesaturation / 0.45) * 100).toFixed(1) + "%"
-          : "0%",
+        meditationDepth: this.biometricState.isMeditating ? (currentDesaturation / 0.45 * 100).toFixed(1) + "%" : "0%"
       };
     }
     // ===== YEAR 3000 MODE CONFIGURATION =====
     updateModeConfiguration(modeConfig) {
-      if (!modeConfig) return;
+      if (!modeConfig)
+        return;
       const {
         enabled,
         temporalEcho,
         aestheticGravity,
         quantumEmpathy,
-        intensity,
+        intensity
       } = modeConfig;
       if (this.config?.enableDebug) {
         console.log(
@@ -8998,14 +8304,7 @@ var catppuccinStarryNight = (() => {
   init_Year3000Utilities();
   init_BaseVisualSystem();
   var LightweightParticleSystem = class extends BaseVisualSystem {
-    constructor(
-      config,
-      utils,
-      performanceMonitor,
-      musicSyncService,
-      settingsManager,
-      year3000System = null
-    ) {
+    constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System = null) {
       super(
         config,
         utils,
@@ -9024,8 +8323,7 @@ var catppuccinStarryNight = (() => {
           JSON.parse(JSON.stringify(this.config))
         );
       }
-      this.maxParticles =
-        this.config?.performanceProfiles?.balanced?.maxParticles || 75;
+      this.maxParticles = this.config?.performanceProfiles?.balanced?.maxParticles || 75;
       this.animationId = null;
       this.lastSpawnTime = 0;
       this.spawnCooldown = 80;
@@ -9050,9 +8348,7 @@ var catppuccinStarryNight = (() => {
       this.lastFrameTime = performance.now();
       this.startRenderLoop();
       if (this.config?.enableDebug) {
-        console.log(
-          `[${this.systemName}] Initialized and render loop started.`
-        );
+        console.log(`[${this.systemName}] Initialized and render loop started.`);
       }
     }
     _applyPerformanceProfile(quality) {
@@ -9065,22 +8361,14 @@ var catppuccinStarryNight = (() => {
       }
     }
     _updateParticleSettingsFromProfile() {
-      if (
-        this.currentPerformanceProfile &&
-        this.currentPerformanceProfile.maxParticles
-      ) {
+      if (this.currentPerformanceProfile && this.currentPerformanceProfile.maxParticles) {
         this.maxParticles = this.currentPerformanceProfile.maxParticles;
       } else {
-        this.maxParticles =
-          this.config?.performanceProfiles?.balanced?.maxParticles || 75;
+        this.maxParticles = this.config?.performanceProfiles?.balanced?.maxParticles || 75;
       }
     }
     createCanvas() {
-      this.canvas = this._createCanvasElement(
-        "sn-particle-canvas",
-        3,
-        "screen"
-      );
+      this.canvas = this._createCanvasElement("sn-particle-canvas", 3, "screen");
       this.ctx = this.canvas.getContext("2d");
     }
     resizeCanvas() {
@@ -9111,36 +8399,31 @@ var catppuccinStarryNight = (() => {
           baseOpacity: 0.5,
           life: 0,
           maxLife: 1e3,
-          color: "rgba(255,255,255,0.5)",
+          color: "rgba(255,255,255,0.5)"
         });
       }
     }
     updateFromMusicAnalysis(processedMusicData) {
-      if (!this.isInitialized || !processedMusicData) return;
+      if (!this.isInitialized || !processedMusicData)
+        return;
       const currentTime = performance.now();
       const {
         processedEnergy,
         visualIntensity,
         animationSpeedFactor,
-        moodIdentifier,
+        moodIdentifier
       } = processedMusicData;
       const dynamicSpawnCooldown = Math.max(
         50,
         this.spawnCooldown / (animationSpeedFactor || 1)
       );
-      if (
-        processedEnergy > 0.45 &&
-        visualIntensity > 0.3 &&
-        currentTime - this.lastSpawnTime > dynamicSpawnCooldown
-      ) {
+      if (processedEnergy > 0.45 && visualIntensity > 0.3 && currentTime - this.lastSpawnTime > dynamicSpawnCooldown) {
         const numToSpawn = Math.max(
           1,
           Math.floor(visualIntensity * 5 + processedEnergy * 3)
         );
         for (let i = 0; i < numToSpawn; i++) {
-          if (
-            this.particlePool.filter((p) => p.active).length < this.maxParticles
-          ) {
+          if (this.particlePool.filter((p) => p.active).length < this.maxParticles) {
             this.spawnParticle(
               processedEnergy,
               visualIntensity,
@@ -9148,10 +8431,7 @@ var catppuccinStarryNight = (() => {
               moodIdentifier
             );
           } else {
-            if (
-              this.config.YEAR3000_CONFIG.enableDebug &&
-              Math.random() < 0.1
-            ) {
+            if (this.config.YEAR3000_CONFIG.enableDebug && Math.random() < 0.1) {
             }
             break;
           }
@@ -9161,22 +8441,18 @@ var catppuccinStarryNight = (() => {
     }
     spawnParticle(energy, intensity, speedFactor, mood) {
       const particle = this.particlePool.find((p) => !p.active);
-      if (!particle) return;
+      if (!particle)
+        return;
       const rootStyle = Year3000Utilities.getRootStyle();
-      const primaryRgbStr =
-        rootStyle.getPropertyValue("--sn-gradient-primary-rgb").trim() ||
-        "202,158,230";
-      const accentRgbStr =
-        rootStyle.getPropertyValue("--sn-gradient-accent-rgb").trim() ||
-        "140,170,238";
+      const primaryRgbStr = rootStyle.getPropertyValue("--sn-gradient-primary-rgb").trim() || "202,158,230";
+      const accentRgbStr = rootStyle.getPropertyValue("--sn-gradient-accent-rgb").trim() || "140,170,238";
       particle.active = true;
       particle.currentX = Math.random() * this.canvas.width;
       particle.currentY = this.canvas.height + Math.random() * 30 + 20;
       particle.targetX = particle.currentX;
       particle.targetY = particle.currentY;
       particle.vx = (Math.random() - 0.5) * 3 * (speedFactor || 1);
-      particle.vy =
-        -(1.5 + Math.random() * 2.5 + energy * 3) * (speedFactor || 1);
+      particle.vy = -(1.5 + Math.random() * 2.5 + energy * 3) * (speedFactor || 1);
       particle.maxLife = 2500 + Math.random() * 3500 * intensity;
       particle.life = particle.maxLife;
       particle.baseSize = 1.5 + Math.random() * 2.5 + intensity * 2.5;
@@ -9185,10 +8461,7 @@ var catppuccinStarryNight = (() => {
       particle.baseOpacity = 0.4 + Math.random() * 0.5;
       particle.currentOpacity = 0;
       particle.targetOpacity = particle.baseOpacity;
-      const baseColor =
-        (mood && mood.includes("happy")) || Math.random() > 0.6
-          ? primaryRgbStr
-          : accentRgbStr;
+      const baseColor = mood && mood.includes("happy") || Math.random() > 0.6 ? primaryRgbStr : accentRgbStr;
       particle.color = `rgba(${baseColor},1)`;
       particle.currentRotation = Math.random() * Math.PI * 2;
       particle.targetRotation = particle.currentRotation;
@@ -9301,11 +8574,7 @@ var catppuccinStarryNight = (() => {
           }
         }
       });
-      if (
-        this.config?.enableDebug &&
-        activeParticleCount > this.maxParticles * 0.8 &&
-        Math.random() < 0.01
-      ) {
+      if (this.config?.enableDebug && activeParticleCount > this.maxParticles * 0.8 && Math.random() < 0.01) {
         console.log(
           `\u2728 [${this.systemName}] High particle load: ${activeParticleCount}/${this.maxParticles}`
         );
@@ -9340,7 +8609,8 @@ var catppuccinStarryNight = (() => {
       }
       const render = (timestamp) => {
         if (!this.isInitialized || !this.canvas || !this.ctx) {
-          if (this.animationId) this._cancelAnimationFrame(this.animationId);
+          if (this.animationId)
+            this._cancelAnimationFrame(this.animationId);
           this.animationId = null;
           return;
         }
@@ -9359,7 +8629,8 @@ var catppuccinStarryNight = (() => {
      * @param {Object} modeConfig - Configuration from artistic mode profile
      */
     updateModeConfiguration(modeConfig) {
-      if (!modeConfig) return;
+      if (!modeConfig)
+        return;
       const { enabled, animations, intensity } = modeConfig;
       if (this.config?.enableDebug) {
         console.log(
@@ -9370,7 +8641,7 @@ var catppuccinStarryNight = (() => {
       this.modeConfig = {
         systemEnabled: enabled !== false,
         particleAnimationsEnabled: animations || false,
-        intensityMultiplier: intensity || 1,
+        intensityMultiplier: intensity || 1
       };
       this.updateParticleSystemForMode();
     }
@@ -9378,22 +8649,17 @@ var catppuccinStarryNight = (() => {
      * Update particle system behavior based on current mode
      */
     updateParticleSystemForMode() {
-      if (!this.modeConfig) return;
+      if (!this.modeConfig)
+        return;
       const baseMultiplier = this.modeConfig.intensityMultiplier || 1;
       if (this.modeConfig.systemEnabled) {
-        const modeParticleCount = Math.floor(
-          this.maxParticles * baseMultiplier
-        );
+        const modeParticleCount = Math.floor(this.maxParticles * baseMultiplier);
         this.maxParticles = Math.min(modeParticleCount, this.maxParticles * 2);
       } else {
         this.maxParticles = Math.floor(this.maxParticles * 0.3);
       }
-      this.spawnCooldown = this.modeConfig.particleAnimationsEnabled
-        ? Math.max(30, 80 / baseMultiplier)
-        : 150;
-      this.particleHalfLife = this.modeConfig.particleAnimationsEnabled
-        ? 0.08 * baseMultiplier
-        : 0.04;
+      this.spawnCooldown = this.modeConfig.particleAnimationsEnabled ? Math.max(30, 80 / baseMultiplier) : 150;
+      this.particleHalfLife = this.modeConfig.particleAnimationsEnabled ? 0.08 * baseMultiplier : 0.04;
       if (this.config?.enableDebug) {
         console.log(
           `\u2728 [${this.systemName}] Updated for mode - Max particles: ${this.maxParticles}, Spawn cooldown: ${this.spawnCooldown}`
@@ -9401,11 +8667,7 @@ var catppuccinStarryNight = (() => {
       }
     }
     destroy() {
-      if (
-        this._animationRegistered &&
-        this.year3000System &&
-        this.year3000System.unregisterAnimationSystem
-      ) {
+      if (this._animationRegistered && this.year3000System && this.year3000System.unregisterAnimationSystem) {
         this.year3000System.unregisterAnimationSystem(
           "LightweightParticleSystem"
         );
@@ -9436,14 +8698,7 @@ var catppuccinStarryNight = (() => {
   init_Year3000Utilities();
   init_BaseVisualSystem();
   var PredictiveMaterializationSystem = class extends BaseVisualSystem {
-    constructor(
-      config,
-      utils,
-      performanceMonitor,
-      musicSyncService,
-      settingsManager,
-      year3000System = null
-    ) {
+    constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System = null) {
       super(
         config,
         utils,
@@ -9457,7 +8712,7 @@ var catppuccinStarryNight = (() => {
         // How close something is to "materializing"
         clarity: 0,
         // How clear the materialized element is
-        targetElement: null,
+        targetElement: null
         // Could be a predicted next track, UI element etc.
       };
       this.rootElement = Year3000Utilities.getRootStyle();
@@ -9491,19 +8746,17 @@ var catppuccinStarryNight = (() => {
       safeSetProperty("--sn-materialize-clarity", "0");
     }
     updateFromMusicAnalysis(processedMusicData) {
-      if (!this.isInitialized || !processedMusicData) return;
+      if (!this.isInitialized || !processedMusicData)
+        return;
       super.updateFromMusicAnalysis(processedMusicData);
       const {
         segmentTransitionConfidence,
         // Confidence that a new major segment is approaching
         visualIntensity,
         energy,
-        valence,
+        valence
       } = processedMusicData;
-      let targetImminence =
-        (segmentTransitionConfidence || 0) * 0.6 +
-        energy * 0.3 +
-        visualIntensity * 0.1;
+      let targetImminence = (segmentTransitionConfidence || 0) * 0.6 + energy * 0.3 + visualIntensity * 0.1;
       let targetClarity = valence * 0.5 + visualIntensity * 0.3 + energy * 0.2;
       this.materializationState.imminence = Year3000Utilities.lerpSmooth(
         this.materializationState.imminence,
@@ -9547,9 +8800,7 @@ var catppuccinStarryNight = (() => {
       );
       if (this.config?.enableDebug && Math.random() < 0.01) {
         console.log(
-          `[${
-            this.systemName
-          }] Materialization state updated: Imminence=${this.materializationState.imminence.toFixed(
+          `[${this.systemName}] Materialization state updated: Imminence=${this.materializationState.imminence.toFixed(
             2
           )}, Clarity=${this.materializationState.clarity.toFixed(2)}`
         );
@@ -9561,7 +8812,8 @@ var catppuccinStarryNight = (() => {
      * @param {Object} modeConfig - Configuration from artistic mode profile
      */
     updateModeConfiguration(modeConfig) {
-      if (!modeConfig) return;
+      if (!modeConfig)
+        return;
       const { enabled, animations, intensity } = modeConfig;
       if (this.config?.enableDebug) {
         console.log(
@@ -9572,7 +8824,7 @@ var catppuccinStarryNight = (() => {
       this.modeConfig = {
         systemEnabled: enabled !== false,
         materializationAnimationsEnabled: animations || false,
-        intensityMultiplier: intensity || 1,
+        intensityMultiplier: intensity || 1
       };
       this.updateMaterializationForMode();
     }
@@ -9580,13 +8832,11 @@ var catppuccinStarryNight = (() => {
      * Update materialization behavior based on current mode
      */
     updateMaterializationForMode() {
-      if (!this.modeConfig) return;
+      if (!this.modeConfig)
+        return;
       const baseIntensity = this.modeConfig.intensityMultiplier || 1;
       this.materializationIntensity = baseIntensity;
-      this.materializationSpeed = this.modeConfig
-        .materializationAnimationsEnabled
-        ? baseIntensity * 1.3
-        : baseIntensity * 0.8;
+      this.materializationSpeed = this.modeConfig.materializationAnimationsEnabled ? baseIntensity * 1.3 : baseIntensity * 0.8;
       if (this.config?.enableDebug) {
         console.log(
           `\u2728 [${this.systemName}] Updated materialization - Intensity: ${this.materializationIntensity}, Speed: ${this.materializationSpeed}`
@@ -9613,7 +8863,7 @@ var catppuccinStarryNight = (() => {
         // ~60fps batch rate
         maxBatchSize: config.maxBatchSize || 50,
         enableDebug: config.enableDebug || false,
-        ...config,
+        ...config
       };
       this._cssVariableBatcher = {
         pendingUpdates: /* @__PURE__ */ new Map(),
@@ -9622,7 +8872,7 @@ var catppuccinStarryNight = (() => {
         maxBatchSize: this.config.maxBatchSize,
         totalUpdates: 0,
         batchCount: 0,
-        enabled: true,
+        enabled: true
       };
       this._performanceMetrics = {
         totalBatches: 0,
@@ -9630,7 +8880,7 @@ var catppuccinStarryNight = (() => {
         totalBatchTime: 0,
         maxBatchTime: 0,
         averageBatchSize: 0,
-        overBudgetBatches: 0,
+        overBudgetBatches: 0
       };
       if (this.config.enableDebug) {
         console.log("\u{1F3A8} [CSSVariableBatcher] Initialized");
@@ -9649,15 +8899,13 @@ var catppuccinStarryNight = (() => {
         return;
       }
       const target = element || document.documentElement;
-      const elementKey = element
-        ? `element_${element.id || element.className || "unnamed"}`
-        : "root";
+      const elementKey = element ? `element_${element.id || element.className || "unnamed"}` : "root";
       const updateKey = `${elementKey}:${property}`;
       this._cssVariableBatcher.pendingUpdates.set(updateKey, {
         element: target,
         property,
         value,
-        timestamp: performance.now(),
+        timestamp: performance.now()
       });
       this._cssVariableBatcher.totalUpdates++;
       this._performanceMetrics.totalUpdates++;
@@ -9666,10 +8914,7 @@ var catppuccinStarryNight = (() => {
           this._processCSSVariableBatch();
         }, this._cssVariableBatcher.batchIntervalMs);
       }
-      if (
-        this._cssVariableBatcher.pendingUpdates.size >=
-        this._cssVariableBatcher.maxBatchSize
-      ) {
+      if (this._cssVariableBatcher.pendingUpdates.size >= this._cssVariableBatcher.maxBatchSize) {
         this._processCSSVariableBatch();
       }
     }
@@ -9677,10 +8922,7 @@ var catppuccinStarryNight = (() => {
      * Process pending CSS variable updates in batch
      */
     _processCSSVariableBatch() {
-      if (
-        !this._cssVariableBatcher ||
-        this._cssVariableBatcher.pendingUpdates.size === 0
-      ) {
+      if (!this._cssVariableBatcher || this._cssVariableBatcher.pendingUpdates.size === 0) {
         return;
       }
       const startTime = performance.now();
@@ -9695,10 +8937,7 @@ var catppuccinStarryNight = (() => {
       try {
         const updatesByElement = /* @__PURE__ */ new Map();
         updates.forEach((update) => {
-          const elementKey =
-            update.element === document.documentElement
-              ? "root"
-              : update.element;
+          const elementKey = update.element === document.documentElement ? "root" : update.element;
           if (!updatesByElement.has(elementKey)) {
             updatesByElement.set(elementKey, []);
           }
@@ -9734,9 +8973,7 @@ var catppuccinStarryNight = (() => {
           this._performanceMetrics.maxBatchTime,
           batchTime
         );
-        this._performanceMetrics.averageBatchSize =
-          this._performanceMetrics.totalUpdates /
-          this._performanceMetrics.totalBatches;
+        this._performanceMetrics.averageBatchSize = this._performanceMetrics.totalUpdates / this._performanceMetrics.totalBatches;
         if (batchTime > 8) {
           this._performanceMetrics.overBudgetBatches++;
           if (this.config.enableDebug) {
@@ -9757,9 +8994,7 @@ var catppuccinStarryNight = (() => {
         }
         if (this.config.enableDebug && Math.random() < 0.1) {
           console.log(
-            `\u{1F3A8} [CSSVariableBatcher] Processed CSS batch: ${
-              updates.length
-            } updates in ${batchTime.toFixed(2)}ms`
+            `\u{1F3A8} [CSSVariableBatcher] Processed CSS batch: ${updates.length} updates in ${batchTime.toFixed(2)}ms`
           );
         }
       } catch (error) {
@@ -9800,9 +9035,7 @@ var catppuccinStarryNight = (() => {
       }
       if (this.config.enableDebug) {
         console.log(
-          `\u{1F3A8} [CSSVariableBatcher] Batching ${
-            enabled ? "enabled" : "disabled"
-          }`
+          `\u{1F3A8} [CSSVariableBatcher] Batching ${enabled ? "enabled" : "disabled"}`
         );
       }
     }
@@ -9819,10 +9052,7 @@ var catppuccinStarryNight = (() => {
         this._cssVariableBatcher.maxBatchSize = newConfig.maxBatchSize;
       }
       if (this.config.enableDebug) {
-        console.log(
-          "\u{1F3A8} [CSSVariableBatcher] Configuration updated:",
-          newConfig
-        );
+        console.log("\u{1F3A8} [CSSVariableBatcher] Configuration updated:", newConfig);
       }
     }
     /**
@@ -9833,38 +9063,26 @@ var catppuccinStarryNight = (() => {
       if (!this._cssVariableBatcher) {
         return { enabled: false, reason: "CSS batching not initialized" };
       }
-      const averageBatchTime =
-        this._performanceMetrics.totalBatches > 0
-          ? this._performanceMetrics.totalBatchTime /
-            this._performanceMetrics.totalBatches
-          : 0;
-      const estimatedSavings =
-        this._performanceMetrics.totalBatches > 0
-          ? Math.round(
-              ((this._performanceMetrics.totalUpdates -
-                this._performanceMetrics.totalBatches) /
-                this._performanceMetrics.totalUpdates) *
-                100
-            )
-          : 0;
+      const averageBatchTime = this._performanceMetrics.totalBatches > 0 ? this._performanceMetrics.totalBatchTime / this._performanceMetrics.totalBatches : 0;
+      const estimatedSavings = this._performanceMetrics.totalBatches > 0 ? Math.round(
+        (this._performanceMetrics.totalUpdates - this._performanceMetrics.totalBatches) / this._performanceMetrics.totalUpdates * 100
+      ) : 0;
       return {
         enabled: this._cssVariableBatcher.enabled,
         pendingUpdates: this._cssVariableBatcher.pendingUpdates.size,
         totalUpdates: this._performanceMetrics.totalUpdates,
         totalBatches: this._performanceMetrics.totalBatches,
-        averageBatchSize:
-          Math.round(this._performanceMetrics.averageBatchSize * 10) / 10,
+        averageBatchSize: Math.round(this._performanceMetrics.averageBatchSize * 10) / 10,
         averageBatchTime: Math.round(averageBatchTime * 100) / 100,
-        maxBatchTime:
-          Math.round(this._performanceMetrics.maxBatchTime * 100) / 100,
+        maxBatchTime: Math.round(this._performanceMetrics.maxBatchTime * 100) / 100,
         overBudgetBatches: this._performanceMetrics.overBudgetBatches,
         batchInterval: this._cssVariableBatcher.batchIntervalMs,
         maxBatchSize: this._cssVariableBatcher.maxBatchSize,
         performance: {
           estimatedDomManipulationReduction: estimatedSavings,
-          efficiency: this._calculateEfficiency(),
+          efficiency: this._calculateEfficiency()
         },
-        recommendations: this._generateBatchingRecommendations(),
+        recommendations: this._generateBatchingRecommendations()
       };
     }
     /**
@@ -9872,14 +9090,16 @@ var catppuccinStarryNight = (() => {
      * @returns {string} Efficiency rating
      */
     _calculateEfficiency() {
-      if (this._performanceMetrics.totalBatches === 0) return "unknown";
+      if (this._performanceMetrics.totalBatches === 0)
+        return "unknown";
       const averageBatchSize = this._performanceMetrics.averageBatchSize;
-      const overBudgetRate =
-        this._performanceMetrics.overBudgetBatches /
-        this._performanceMetrics.totalBatches;
-      if (averageBatchSize > 10 && overBudgetRate < 0.1) return "excellent";
-      if (averageBatchSize > 5 && overBudgetRate < 0.2) return "good";
-      if (averageBatchSize > 2 && overBudgetRate < 0.3) return "fair";
+      const overBudgetRate = this._performanceMetrics.overBudgetBatches / this._performanceMetrics.totalBatches;
+      if (averageBatchSize > 10 && overBudgetRate < 0.1)
+        return "excellent";
+      if (averageBatchSize > 5 && overBudgetRate < 0.2)
+        return "good";
+      if (averageBatchSize > 2 && overBudgetRate < 0.3)
+        return "fair";
       return "poor";
     }
     /**
@@ -9892,20 +9112,16 @@ var catppuccinStarryNight = (() => {
         recommendations.push({
           type: "batch_size",
           priority: "low",
-          message:
-            "Average batch size is small - consider increasing batch interval",
-          action: "Increase batchIntervalMs to collect more updates per batch",
+          message: "Average batch size is small - consider increasing batch interval",
+          action: "Increase batchIntervalMs to collect more updates per batch"
         });
       }
-      if (
-        this._performanceMetrics.overBudgetBatches >
-        this._performanceMetrics.totalBatches * 0.2
-      ) {
+      if (this._performanceMetrics.overBudgetBatches > this._performanceMetrics.totalBatches * 0.2) {
         recommendations.push({
           type: "performance",
           priority: "medium",
           message: "Frequent over-budget batches detected",
-          action: "Reduce maxBatchSize or optimize CSS property updates",
+          action: "Reduce maxBatchSize or optimize CSS property updates"
         });
       }
       if (this._performanceMetrics.maxBatchTime > 16) {
@@ -9915,18 +9131,15 @@ var catppuccinStarryNight = (() => {
           message: `Maximum batch time is high (${this._performanceMetrics.maxBatchTime.toFixed(
             2
           )}ms)`,
-          action: "Consider reducing batch size or optimizing CSS updates",
+          action: "Consider reducing batch size or optimizing CSS updates"
         });
       }
-      if (
-        this._performanceMetrics.totalUpdates > 1e3 &&
-        this._performanceMetrics.averageBatchSize < 5
-      ) {
+      if (this._performanceMetrics.totalUpdates > 1e3 && this._performanceMetrics.averageBatchSize < 5) {
         recommendations.push({
           type: "efficiency",
           priority: "medium",
           message: "High update volume with small batches",
-          action: "Tune batching parameters for better efficiency",
+          action: "Tune batching parameters for better efficiency"
         });
       }
       return recommendations;
@@ -9941,7 +9154,7 @@ var catppuccinStarryNight = (() => {
         totalBatchTime: 0,
         maxBatchTime: 0,
         averageBatchSize: 0,
-        overBudgetBatches: 0,
+        overBudgetBatches: 0
       };
       this._cssVariableBatcher.totalUpdates = 0;
       this._cssVariableBatcher.batchCount = 0;
@@ -9970,7 +9183,7 @@ var catppuccinStarryNight = (() => {
         enableDebug: config.enableDebug || false,
         runStressTests: config.runStressTests !== false,
         // Default true
-        ...config,
+        ...config
       };
       this.deviceCapabilities = null;
       this.isInitialized = false;
@@ -9997,13 +9210,13 @@ var catppuccinStarryNight = (() => {
           total: navigator.deviceMemory || 4,
           level: this._detectMemoryLevel(),
           jsHeapSizeLimit: performance.memory?.jsHeapSizeLimit || 0,
-          estimatedAvailable: this._estimateAvailableMemory(),
+          estimatedAvailable: this._estimateAvailableMemory()
         },
         // CPU analysis
         cpu: {
           cores: navigator.hardwareConcurrency || 2,
           level: this._detectCPULevel(),
-          estimatedScore: this._calculateCPUScore(),
+          estimatedScore: this._calculateCPUScore()
         },
         // GPU analysis
         gpu: {
@@ -10012,7 +9225,7 @@ var catppuccinStarryNight = (() => {
           maxTextureSize: this._getMaxTextureSize(),
           level: this._detectGPULevel(),
           vendor: this._getGPUVendor(),
-          renderer: this._getGPURenderer(),
+          renderer: this._getGPURenderer()
         },
         // Browser capabilities
         browser: {
@@ -10020,7 +9233,7 @@ var catppuccinStarryNight = (() => {
           supportsWorkers: this._detectWorkerSupport(),
           supportsSharedArrayBuffer: this._detectSharedArrayBufferSupport(),
           supportsWASM: this._detectWASMSupport(),
-          supportsCSSHoudini: this._detectCSSHoudiniSupport(),
+          supportsCSSHoudini: this._detectCSSHoudiniSupport()
         },
         // Display capabilities
         display: {
@@ -10028,24 +9241,23 @@ var catppuccinStarryNight = (() => {
           refreshRate: await this._detectRefreshRate(),
           colorGamut: this._detectColorGamut(),
           contrastRatio: this._detectContrastCapability(),
-          reducedMotion: this._detectReducedMotion(),
+          reducedMotion: this._detectReducedMotion()
         },
         // Network capabilities
         network: {
           effectiveType: navigator.connection?.effectiveType || "unknown",
           downlink: navigator.connection?.downlink || 0,
           rtt: navigator.connection?.rtt || 0,
-          saveData: navigator.connection?.saveData || false,
+          saveData: navigator.connection?.saveData || false
         },
         // Overall performance level
-        overall: "detecting",
+        overall: "detecting"
         // Will be calculated after all tests
       };
       if (this.config.runStressTests) {
         await this._runCapabilityTests();
       }
-      this.deviceCapabilities.overall =
-        this._calculateOverallPerformanceLevel();
+      this.deviceCapabilities.overall = this._calculateOverallPerformanceLevel();
       this.isInitialized = true;
       if (this.config.enableDebug) {
         console.log(
@@ -10058,22 +9270,24 @@ var catppuccinStarryNight = (() => {
     // === DEVICE CAPABILITY DETECTION METHODS ===
     _detectMemoryLevel() {
       const memory = navigator.deviceMemory || 4;
-      if (memory >= 8) return "high";
-      if (memory >= 4) return "medium";
+      if (memory >= 8)
+        return "high";
+      if (memory >= 4)
+        return "medium";
       return "low";
     }
     _estimateAvailableMemory() {
       if (performance.memory) {
-        return (
-          performance.memory.jsHeapSizeLimit - performance.memory.usedJSHeapSize
-        );
+        return performance.memory.jsHeapSizeLimit - performance.memory.usedJSHeapSize;
       }
       return (navigator.deviceMemory || 4) * 1024 * 1024 * 1024 * 0.7;
     }
     _detectCPULevel() {
       const cores = navigator.hardwareConcurrency || 2;
-      if (cores >= 8) return "high";
-      if (cores >= 4) return "medium";
+      if (cores >= 8)
+        return "high";
+      if (cores >= 4)
+        return "medium";
       return "low";
     }
     _calculateCPUScore() {
@@ -10083,16 +9297,16 @@ var catppuccinStarryNight = (() => {
         result += Math.sin(i) * Math.cos(i);
       }
       const duration = performance.now() - start;
-      if (duration < 10) return "high";
-      if (duration < 25) return "medium";
+      if (duration < 10)
+        return "high";
+      if (duration < 25)
+        return "medium";
       return "low";
     }
     _detectWebGLSupport() {
       try {
         const canvas = document.createElement("canvas");
-        return !!(
-          canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
-        );
+        return !!(canvas.getContext("webgl") || canvas.getContext("experimental-webgl"));
       } catch (e) {
         return false;
       }
@@ -10108,8 +9322,7 @@ var catppuccinStarryNight = (() => {
     _getMaxTextureSize() {
       try {
         const canvas = document.createElement("canvas");
-        const gl =
-          canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+        const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
         return gl ? gl.getParameter(gl.MAX_TEXTURE_SIZE) : 0;
       } catch (e) {
         return 0;
@@ -10117,22 +9330,10 @@ var catppuccinStarryNight = (() => {
     }
     _detectGPULevel() {
       const renderer = this._getGPURenderer().toLowerCase();
-      if (
-        renderer.includes("rtx") ||
-        renderer.includes("radeon rx") ||
-        renderer.includes("gtx 16") ||
-        renderer.includes("gtx 20") ||
-        renderer.includes("apple m1") ||
-        renderer.includes("apple m2")
-      ) {
+      if (renderer.includes("rtx") || renderer.includes("radeon rx") || renderer.includes("gtx 16") || renderer.includes("gtx 20") || renderer.includes("apple m1") || renderer.includes("apple m2")) {
         return "high";
       }
-      if (
-        renderer.includes("gtx") ||
-        renderer.includes("radeon") ||
-        renderer.includes("intel iris") ||
-        renderer.includes("intel uhd")
-      ) {
+      if (renderer.includes("gtx") || renderer.includes("radeon") || renderer.includes("intel iris") || renderer.includes("intel uhd")) {
         return "medium";
       }
       return "low";
@@ -10140,13 +9341,11 @@ var catppuccinStarryNight = (() => {
     _getGPUVendor() {
       try {
         const canvas = document.createElement("canvas");
-        const gl =
-          canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-        if (!gl) return "unknown";
+        const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+        if (!gl)
+          return "unknown";
         const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
-        return debugInfo
-          ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL)
-          : "unknown";
+        return debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : "unknown";
       } catch (e) {
         return "unknown";
       }
@@ -10154,13 +9353,11 @@ var catppuccinStarryNight = (() => {
     _getGPURenderer() {
       try {
         const canvas = document.createElement("canvas");
-        const gl =
-          canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-        if (!gl) return "unknown";
+        const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+        if (!gl)
+          return "unknown";
         const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
-        return debugInfo
-          ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
-          : "unknown";
+        return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "unknown";
       } catch (e) {
         return "unknown";
       }
@@ -10202,13 +9399,17 @@ var catppuccinStarryNight = (() => {
       });
     }
     _detectColorGamut() {
-      if (window.matchMedia("(color-gamut: p3)").matches) return "p3";
-      if (window.matchMedia("(color-gamut: srgb)").matches) return "srgb";
+      if (window.matchMedia("(color-gamut: p3)").matches)
+        return "p3";
+      if (window.matchMedia("(color-gamut: srgb)").matches)
+        return "srgb";
       return "limited";
     }
     _detectContrastCapability() {
-      if (window.matchMedia("(dynamic-range: high)").matches) return "high";
-      if (window.matchMedia("(contrast: high)").matches) return "high";
+      if (window.matchMedia("(dynamic-range: high)").matches)
+        return "high";
+      if (window.matchMedia("(contrast: high)").matches)
+        return "high";
       return "standard";
     }
     _detectReducedMotion() {
@@ -10216,14 +9417,10 @@ var catppuccinStarryNight = (() => {
     }
     // === DYNAMIC CAPABILITY TESTS ===
     async _runCapabilityTests() {
-      this.deviceCapabilities.gpu.stressTestScore =
-        await this._runGPUStressTest();
-      this.deviceCapabilities.memory.stressTestScore =
-        await this._runMemoryStressTest();
+      this.deviceCapabilities.gpu.stressTestScore = await this._runGPUStressTest();
+      this.deviceCapabilities.memory.stressTestScore = await this._runMemoryStressTest();
       if (this.config.enableDebug) {
-        console.log(
-          "\u26A1 [DeviceCapabilityDetector] Capability tests completed"
-        );
+        console.log("\u26A1 [DeviceCapabilityDetector] Capability tests completed");
       }
     }
     async _runGPUStressTest() {
@@ -10232,9 +9429,7 @@ var catppuccinStarryNight = (() => {
           const canvas = document.createElement("canvas");
           canvas.width = 512;
           canvas.height = 512;
-          const gl =
-            canvas.getContext("webgl") ||
-            canvas.getContext("experimental-webgl");
+          const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
           if (!gl) {
             resolve(0);
             return;
@@ -10277,7 +9472,7 @@ var catppuccinStarryNight = (() => {
               requestAnimationFrame(renderFrame);
             } else {
               const duration = performance.now() - startTime;
-              const score = (testFrames / duration) * 1e3;
+              const score = testFrames / duration * 1e3;
               resolve(Math.min(score, 60));
             }
           };
@@ -10290,9 +9485,7 @@ var catppuccinStarryNight = (() => {
     async _runMemoryStressTest() {
       return new Promise((resolve) => {
         try {
-          const startMemory = performance.memory
-            ? performance.memory.usedJSHeapSize
-            : 0;
+          const startMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;
           const arrays = [];
           const startTime = performance.now();
           for (let i = 0; i < 100; i++) {
@@ -10302,14 +9495,9 @@ var catppuccinStarryNight = (() => {
           setTimeout(() => {
             const endTime = performance.now();
             const duration = endTime - startTime;
-            const endMemory = performance.memory
-              ? performance.memory.usedJSHeapSize
-              : 0;
+            const endMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;
             const timeScore = Math.max(0, 100 - duration);
-            const memoryScore =
-              startMemory > 0
-                ? Math.max(0, 100 - (endMemory - startMemory) / 1024 / 1024)
-                : 50;
+            const memoryScore = startMemory > 0 ? Math.max(0, 100 - (endMemory - startMemory) / 1024 / 1024) : 50;
             resolve((timeScore + memoryScore) / 2);
           }, 100);
         } catch (e) {
@@ -10319,33 +9507,16 @@ var catppuccinStarryNight = (() => {
     }
     _calculateOverallPerformanceLevel() {
       const scores = {
-        memory:
-          this.deviceCapabilities.memory.level === "high"
-            ? 3
-            : this.deviceCapabilities.memory.level === "medium"
-            ? 2
-            : 1,
-        cpu:
-          this.deviceCapabilities.cpu.level === "high"
-            ? 3
-            : this.deviceCapabilities.cpu.level === "medium"
-            ? 2
-            : 1,
-        gpu:
-          this.deviceCapabilities.gpu.level === "high"
-            ? 3
-            : this.deviceCapabilities.gpu.level === "medium"
-            ? 2
-            : 1,
-        browser:
-          (this.deviceCapabilities.browser.supportsWebGL ? 1 : 0) +
-          (this.deviceCapabilities.browser.supportsWorkers ? 1 : 0) +
-          (this.deviceCapabilities.browser.supportsOffscreenCanvas ? 1 : 0),
+        memory: this.deviceCapabilities.memory.level === "high" ? 3 : this.deviceCapabilities.memory.level === "medium" ? 2 : 1,
+        cpu: this.deviceCapabilities.cpu.level === "high" ? 3 : this.deviceCapabilities.cpu.level === "medium" ? 2 : 1,
+        gpu: this.deviceCapabilities.gpu.level === "high" ? 3 : this.deviceCapabilities.gpu.level === "medium" ? 2 : 1,
+        browser: (this.deviceCapabilities.browser.supportsWebGL ? 1 : 0) + (this.deviceCapabilities.browser.supportsWorkers ? 1 : 0) + (this.deviceCapabilities.browser.supportsOffscreenCanvas ? 1 : 0)
       };
-      const totalScore =
-        scores.memory + scores.cpu + scores.gpu + Math.min(scores.browser, 3);
-      if (totalScore >= 10) return "high";
-      if (totalScore >= 7) return "medium";
+      const totalScore = scores.memory + scores.cpu + scores.gpu + Math.min(scores.browser, 3);
+      if (totalScore >= 10)
+        return "high";
+      if (totalScore >= 7)
+        return "medium";
       return "low";
     }
     /**
@@ -10391,9 +9562,7 @@ var catppuccinStarryNight = (() => {
         recommendations.push("Enable data-saving mode");
         recommendations.push("Reduce resource-intensive operations");
       }
-      return recommendations.length > 0
-        ? recommendations
-        : ["Device capabilities are optimal"];
+      return recommendations.length > 0 ? recommendations : ["Device capabilities are optimal"];
     }
     /**
      * Check if a specific capability is supported
@@ -10401,22 +9570,21 @@ var catppuccinStarryNight = (() => {
      * @returns {boolean} Whether the capability is supported
      */
     supportsCapability(capability) {
-      if (!this.deviceCapabilities) return false;
+      if (!this.deviceCapabilities)
+        return false;
       const capabilityMap = {
         webgl: this.deviceCapabilities.gpu.supportsWebGL,
         webgl2: this.deviceCapabilities.gpu.supportsWebGL2,
         workers: this.deviceCapabilities.browser.supportsWorkers,
-        offscreenCanvas:
-          this.deviceCapabilities.browser.supportsOffscreenCanvas,
-        sharedArrayBuffer:
-          this.deviceCapabilities.browser.supportsSharedArrayBuffer,
+        offscreenCanvas: this.deviceCapabilities.browser.supportsOffscreenCanvas,
+        sharedArrayBuffer: this.deviceCapabilities.browser.supportsSharedArrayBuffer,
         wasm: this.deviceCapabilities.browser.supportsWASM,
         cssHoudini: this.deviceCapabilities.browser.supportsCSSHoudini,
         highMemory: this.deviceCapabilities.memory.level === "high",
         highCPU: this.deviceCapabilities.cpu.level === "high",
         highGPU: this.deviceCapabilities.gpu.level === "high",
         reducedMotion: this.deviceCapabilities.display.reducedMotion,
-        saveData: this.deviceCapabilities.network.saveData,
+        saveData: this.deviceCapabilities.network.saveData
       };
       return capabilityMap[capability] || false;
     }
@@ -10425,14 +9593,15 @@ var catppuccinStarryNight = (() => {
      * @returns {Object} Recommended settings for optimal performance
      */
     getOptimalSettings() {
-      if (!this.deviceCapabilities) return {};
+      if (!this.deviceCapabilities)
+        return {};
       const settings = {
         performanceMode: "auto",
         maxParticles: 100,
         animationQuality: "high",
         enableGPUAcceleration: true,
         batchUpdates: true,
-        frameBudget: 16,
+        frameBudget: 16
       };
       if (this.deviceCapabilities.overall === "low") {
         settings.performanceMode = "performance";
@@ -10483,7 +9652,7 @@ var catppuccinStarryNight = (() => {
         // 16ms target for 60fps
         maxBatchSize: config.maxBatchSize || 50,
         enableDebug: config.enableDebug || false,
-        ...config,
+        ...config
       };
       this.masterAnimationController = null;
       this._animationSystemRegistry = /* @__PURE__ */ new Map();
@@ -10499,7 +9668,7 @@ var catppuccinStarryNight = (() => {
         maxFrameTime: 0,
         systemStats: /* @__PURE__ */ new Map(),
         performanceMode: "auto",
-        lastOptimization: 0,
+        lastOptimization: 0
       };
       if (this.config.enableDebug) {
         console.log("\u{1F3AC} [MasterAnimationCoordinator] Initialized");
@@ -10518,7 +9687,7 @@ var catppuccinStarryNight = (() => {
         registeredSystems: /* @__PURE__ */ new Map(),
         frameStartTime: 0,
         lastFrameTime: 0,
-        performanceMode: "auto",
+        performanceMode: "auto"
         // auto, performance, quality
       };
       if (this.config.enableDebug) {
@@ -10534,12 +9703,7 @@ var catppuccinStarryNight = (() => {
      * @param {string} priority - Priority level: 'critical', 'normal', 'background'
      * @param {number} targetFPS - Target frame rate (optional, defaults to 60)
      */
-    registerAnimationSystem(
-      systemName,
-      system,
-      priority = "normal",
-      targetFPS = 60
-    ) {
+    registerAnimationSystem(systemName, system, priority = "normal", targetFPS = 60) {
       if (!this.masterAnimationController) {
         this.initialize();
       }
@@ -10553,23 +9717,20 @@ var catppuccinStarryNight = (() => {
         frameCount: 0,
         totalTime: 0,
         maxFrameTime: 0,
-        skippedFrames: 0,
+        skippedFrames: 0
       };
       this._animationSystemRegistry.set(systemName, systemConfig);
       this._performanceMetrics.systemStats.set(systemName, {
         averageTime: 0,
         maxTime: 0,
-        calls: 0,
+        calls: 0
       });
       if (this.config.enableDebug) {
         console.log(
           `\u{1F3AC} [MasterAnimationCoordinator] Registered animation system: ${systemName} (${priority} priority, ${targetFPS}fps)`
         );
       }
-      if (
-        this._animationSystemRegistry.size === 1 &&
-        !this.masterAnimationController.isRunning
-      ) {
+      if (this._animationSystemRegistry.size === 1 && !this.masterAnimationController.isRunning) {
         this.startMasterAnimationLoop();
       }
     }
@@ -10596,16 +9757,15 @@ var catppuccinStarryNight = (() => {
      * Single requestAnimationFrame loop that coordinates all visual systems
      */
     startMasterAnimationLoop() {
-      if (this.masterAnimationController?.isRunning) return;
+      if (this.masterAnimationController?.isRunning)
+        return;
       this.masterAnimationController.isRunning = true;
       this._animationPaused = false;
       const masterLoop = (timestamp) => {
         if (this._animationPaused || !this.masterAnimationController?.isRunning)
           return;
         this._frameStartTime = performance.now();
-        const deltaTime =
-          timestamp -
-          (this.masterAnimationController.lastFrameTime || timestamp);
+        const deltaTime = timestamp - (this.masterAnimationController.lastFrameTime || timestamp);
         this.masterAnimationController.lastFrameTime = timestamp;
         try {
           this._executeMasterAnimationFrame(timestamp, deltaTime);
@@ -10672,10 +9832,7 @@ var catppuccinStarryNight = (() => {
         }
         const systemStartTime = performance.now();
         try {
-          if (
-            config.system &&
-            typeof config.system.updateAnimation === "function"
-          ) {
+          if (config.system && typeof config.system.updateAnimation === "function") {
             config.system.updateAnimation(timestamp, deltaTime);
           }
           const systemExecutionTime = performance.now() - systemStartTime;
@@ -10719,9 +9876,7 @@ var catppuccinStarryNight = (() => {
     _updatePerformanceMetrics(frameTime) {
       const metrics = this._performanceMetrics;
       metrics.maxFrameTime = Math.max(metrics.maxFrameTime, frameTime);
-      metrics.averageFrameTime =
-        (metrics.averageFrameTime * (metrics.totalFrames - 1) + frameTime) /
-        metrics.totalFrames;
+      metrics.averageFrameTime = (metrics.averageFrameTime * (metrics.totalFrames - 1) + frameTime) / metrics.totalFrames;
       if (frameTime > 16.67) {
         metrics.droppedFrames++;
       }
@@ -10734,9 +9889,7 @@ var catppuccinStarryNight = (() => {
       if (now - this._performanceMetrics.lastOptimization < 5e3) {
         return;
       }
-      const frameDropRate =
-        this._performanceMetrics.droppedFrames /
-        this._performanceMetrics.totalFrames;
+      const frameDropRate = this._performanceMetrics.droppedFrames / this._performanceMetrics.totalFrames;
       const avgFrameTime = this._performanceMetrics.averageFrameTime;
       if (frameDropRate > 0.1 || avgFrameTime > 20) {
         this._activatePerformanceMode();
@@ -10749,7 +9902,8 @@ var catppuccinStarryNight = (() => {
      * Activate performance mode - reduce quality for better frame rate
      */
     _activatePerformanceMode() {
-      if (this._performanceMetrics.performanceMode === "performance") return;
+      if (this._performanceMetrics.performanceMode === "performance")
+        return;
       this._performanceMetrics.performanceMode = "performance";
       this._frameTimeBudget = 12;
       for (const [systemName, config] of this._animationSystemRegistry) {
@@ -10759,16 +9913,15 @@ var catppuccinStarryNight = (() => {
       }
       this._notifyPerformanceModeChange("performance");
       if (this.config.enableDebug) {
-        console.log(
-          "\u{1F3AC} [MasterAnimationCoordinator] Activated performance mode"
-        );
+        console.log("\u{1F3AC} [MasterAnimationCoordinator] Activated performance mode");
       }
     }
     /**
      * Activate quality mode - prioritize visual quality
      */
     _activateQualityMode() {
-      if (this._performanceMetrics.performanceMode === "quality") return;
+      if (this._performanceMetrics.performanceMode === "quality")
+        return;
       this._performanceMetrics.performanceMode = "quality";
       this._frameTimeBudget = 16;
       for (const [systemName, config] of this._animationSystemRegistry) {
@@ -10776,9 +9929,7 @@ var catppuccinStarryNight = (() => {
       }
       this._notifyPerformanceModeChange("quality");
       if (this.config.enableDebug) {
-        console.log(
-          "\u{1F3AC} [MasterAnimationCoordinator] Activated quality mode"
-        );
+        console.log("\u{1F3AC} [MasterAnimationCoordinator] Activated quality mode");
       }
     }
     /**
@@ -10787,10 +9938,7 @@ var catppuccinStarryNight = (() => {
      */
     _notifyPerformanceModeChange(mode) {
       for (const [systemName, config] of this._animationSystemRegistry) {
-        if (
-          config.system &&
-          typeof config.system.onPerformanceModeChange === "function"
-        ) {
+        if (config.system && typeof config.system.onPerformanceModeChange === "function") {
           try {
             config.system.onPerformanceModeChange(mode);
           } catch (error) {
@@ -10808,21 +9956,17 @@ var catppuccinStarryNight = (() => {
      */
     getPerformanceReport() {
       const metrics = this._performanceMetrics;
-      const frameDropRate =
-        metrics.totalFrames > 0
-          ? metrics.droppedFrames / metrics.totalFrames
-          : 0;
+      const frameDropRate = metrics.totalFrames > 0 ? metrics.droppedFrames / metrics.totalFrames : 0;
       const systemReports = {};
       for (const [systemName, config] of this._animationSystemRegistry) {
         systemReports[systemName] = {
           priority: config.priority,
           targetFPS: config.targetFPS,
           frameCount: config.frameCount,
-          averageTime:
-            config.frameCount > 0 ? config.totalTime / config.frameCount : 0,
+          averageTime: config.frameCount > 0 ? config.totalTime / config.frameCount : 0,
           maxFrameTime: config.maxFrameTime,
           skippedFrames: config.skippedFrames,
-          enabled: config.enabled,
+          enabled: config.enabled
         };
       }
       return {
@@ -10837,7 +9981,7 @@ var catppuccinStarryNight = (() => {
         frameTimeBudget: this._frameTimeBudget,
         registeredSystems: this._animationSystemRegistry.size,
         systemReports,
-        recommendations: this._generatePerformanceRecommendations(),
+        recommendations: this._generatePerformanceRecommendations()
       };
     }
     /**
@@ -10847,19 +9991,13 @@ var catppuccinStarryNight = (() => {
     _generatePerformanceRecommendations() {
       const recommendations = [];
       const metrics = this._performanceMetrics;
-      const frameDropRate =
-        metrics.totalFrames > 0
-          ? metrics.droppedFrames / metrics.totalFrames
-          : 0;
+      const frameDropRate = metrics.totalFrames > 0 ? metrics.droppedFrames / metrics.totalFrames : 0;
       if (frameDropRate > 0.1) {
         recommendations.push({
           type: "performance",
           priority: "high",
-          message: `High frame drop rate (${(frameDropRate * 100).toFixed(
-            1
-          )}%)`,
-          action:
-            "Consider reducing visual effects or enabling performance mode",
+          message: `High frame drop rate (${(frameDropRate * 100).toFixed(1)}%)`,
+          action: "Consider reducing visual effects or enabling performance mode"
         });
       }
       if (metrics.averageFrameTime > 20) {
@@ -10869,12 +10007,11 @@ var catppuccinStarryNight = (() => {
           message: `High average frame time (${metrics.averageFrameTime.toFixed(
             2
           )}ms)`,
-          action: "Optimize animation systems or reduce frame time budget",
+          action: "Optimize animation systems or reduce frame time budget"
         });
       }
       for (const [systemName, config] of this._animationSystemRegistry) {
-        const avgTime =
-          config.frameCount > 0 ? config.totalTime / config.frameCount : 0;
+        const avgTime = config.frameCount > 0 ? config.totalTime / config.frameCount : 0;
         if (avgTime > 8) {
           recommendations.push({
             type: "system",
@@ -10882,7 +10019,7 @@ var catppuccinStarryNight = (() => {
             message: `System ${systemName} has high execution time (${avgTime.toFixed(
               2
             )}ms)`,
-            action: `Optimize ${systemName} or reduce its update frequency`,
+            action: `Optimize ${systemName} or reduce its update frequency`
           });
         }
         if (config.skippedFrames > config.frameCount * 0.2) {
@@ -10890,8 +10027,7 @@ var catppuccinStarryNight = (() => {
             type: "system",
             priority: "low",
             message: `System ${systemName} frequently skips frames`,
-            action:
-              "Consider increasing frame time budget or optimizing other systems",
+            action: "Consider increasing frame time budget or optimizing other systems"
           });
         }
       }
@@ -10900,7 +10036,7 @@ var catppuccinStarryNight = (() => {
           type: "architecture",
           priority: "low",
           message: `Many animation systems registered (${this._animationSystemRegistry.size})`,
-          action: "Consider consolidating or merging similar animation systems",
+          action: "Consider consolidating or merging similar animation systems"
         });
       }
       return recommendations;
@@ -10920,9 +10056,7 @@ var catppuccinStarryNight = (() => {
     resumeAnimations() {
       this._animationPaused = false;
       if (this.config.enableDebug) {
-        console.log(
-          "\u{1F3AC} [MasterAnimationCoordinator] Animations resumed"
-        );
+        console.log("\u{1F3AC} [MasterAnimationCoordinator] Animations resumed");
       }
     }
     /**
@@ -10936,9 +10070,7 @@ var catppuccinStarryNight = (() => {
         config.enabled = enabled;
         if (this.config.enableDebug) {
           console.log(
-            `\u{1F3AC} [MasterAnimationCoordinator] System ${systemName} ${
-              enabled ? "enabled" : "disabled"
-            }`
+            `\u{1F3AC} [MasterAnimationCoordinator] System ${systemName} ${enabled ? "enabled" : "disabled"}`
           );
         }
       }
@@ -10966,7 +10098,7 @@ var catppuccinStarryNight = (() => {
         maxFrameTime: 0,
         systemStats: /* @__PURE__ */ new Map(),
         performanceMode: "auto",
-        lastOptimization: 0,
+        lastOptimization: 0
       };
       for (const [systemName, config] of this._animationSystemRegistry) {
         config.frameCount = 0;
@@ -10976,13 +10108,11 @@ var catppuccinStarryNight = (() => {
         this._performanceMetrics.systemStats.set(systemName, {
           averageTime: 0,
           maxTime: 0,
-          calls: 0,
+          calls: 0
         });
       }
       if (this.config.enableDebug) {
-        console.log(
-          "\u{1F3AC} [MasterAnimationCoordinator] Performance metrics reset"
-        );
+        console.log("\u{1F3AC} [MasterAnimationCoordinator] Performance metrics reset");
       }
     }
     /**
@@ -11008,7 +10138,7 @@ var catppuccinStarryNight = (() => {
         // 5 seconds
         retentionPeriod: config.retentionPeriod || 3e5,
         // 5 minutes
-        ...config,
+        ...config
       };
       this.performanceHistory = [];
       this.metricsBuffer = /* @__PURE__ */ new Map();
@@ -11060,7 +10190,7 @@ var catppuccinStarryNight = (() => {
         timing: this._getTimingMetrics(),
         fps: this._getFPSMetrics(),
         dom: this._getDOMMetrics(),
-        network: this._getNetworkMetrics(),
+        network: this._getNetworkMetrics()
       };
       this.performanceHistory.push(metrics);
       const cutoff = timestamp - this.config.retentionPeriod;
@@ -11083,12 +10213,8 @@ var catppuccinStarryNight = (() => {
         used: memoryInfo.usedJSHeapSize || 0,
         total: memoryInfo.totalJSHeapSize || 0,
         limit: memoryInfo.jsHeapSizeLimit || 0,
-        utilization: memoryInfo.totalJSHeapSize
-          ? (memoryInfo.usedJSHeapSize / memoryInfo.totalJSHeapSize) * 100
-          : 0,
-        available: memoryInfo.jsHeapSizeLimit
-          ? memoryInfo.jsHeapSizeLimit - memoryInfo.usedJSHeapSize
-          : 0,
+        utilization: memoryInfo.totalJSHeapSize ? memoryInfo.usedJSHeapSize / memoryInfo.totalJSHeapSize * 100 : 0,
+        available: memoryInfo.jsHeapSizeLimit ? memoryInfo.jsHeapSizeLimit - memoryInfo.usedJSHeapSize : 0
       };
     }
     /**
@@ -11101,7 +10227,7 @@ var catppuccinStarryNight = (() => {
         loadComplete: navigation.loadEventEnd || 0,
         firstPaint: this._getFirstPaint(),
         firstContentfulPaint: this._getFirstContentfulPaint(),
-        largestContentfulPaint: this._getLargestContentfulPaint(),
+        largestContentfulPaint: this._getLargestContentfulPaint()
       };
     }
     /**
@@ -11113,14 +10239,14 @@ var catppuccinStarryNight = (() => {
           current: this._fpsCounter.currentFPS,
           average: this._fpsCounter.averageFPS,
           min: this._fpsCounter.minFPS,
-          max: this._fpsCounter.maxFPS,
+          max: this._fpsCounter.maxFPS
         };
       }
       return {
         current: 0,
         average: 0,
         min: 0,
-        max: 0,
+        max: 0
       };
     }
     /**
@@ -11132,7 +10258,7 @@ var catppuccinStarryNight = (() => {
         styleSheets: document.styleSheets.length,
         images: document.images.length,
         scripts: document.scripts.length,
-        links: document.links.length,
+        links: document.links.length
       };
     }
     /**
@@ -11144,7 +10270,7 @@ var catppuccinStarryNight = (() => {
         effectiveType: connection.effectiveType || "unknown",
         downlink: connection.downlink || 0,
         rtt: connection.rtt || 0,
-        saveData: connection.saveData || false,
+        saveData: connection.saveData || false
       };
     }
     /**
@@ -11171,12 +10297,8 @@ var catppuccinStarryNight = (() => {
      * Get Largest Contentful Paint timing
      */
     _getLargestContentfulPaint() {
-      const lcpEntries = performance.getEntriesByType(
-        "largest-contentful-paint"
-      );
-      return lcpEntries.length > 0
-        ? lcpEntries[lcpEntries.length - 1].startTime
-        : 0;
+      const lcpEntries = performance.getEntriesByType("largest-contentful-paint");
+      return lcpEntries.length > 0 ? lcpEntries[lcpEntries.length - 1].startTime : 0;
     }
     /**
      * Analyze component performance
@@ -11191,7 +10313,7 @@ var catppuccinStarryNight = (() => {
         performance: "unknown",
         memory: "unknown",
         recommendations: [],
-        metrics: {},
+        metrics: {}
       };
       try {
         if (!component) {
@@ -11205,8 +10327,7 @@ var catppuccinStarryNight = (() => {
           analysis.metrics = report;
           analysis.performance = this._analyzeComponentPerformance(report);
           analysis.memory = this._analyzeComponentMemory(report);
-          analysis.recommendations =
-            this._generateComponentRecommendations(report);
+          analysis.recommendations = this._generateComponentRecommendations(report);
         } else if (component.getMemoryUsage) {
           const memoryUsage = component.getMemoryUsage();
           analysis.memory = memoryUsage > 50 * 1024 * 1024 ? "high" : "normal";
@@ -11217,7 +10338,7 @@ var catppuccinStarryNight = (() => {
         analysis.capabilities = {
           updatable: hasUpdate,
           destroyable: hasDestroy,
-          resettable: hasReset,
+          resettable: hasReset
         };
         if (!hasUpdate && !hasDestroy) {
           analysis.recommendations.push(
@@ -11236,8 +10357,10 @@ var catppuccinStarryNight = (() => {
      */
     _analyzeComponentPerformance(report) {
       if (report.averageExecutionTime) {
-        if (report.averageExecutionTime > 16) return "poor";
-        if (report.averageExecutionTime > 8) return "fair";
+        if (report.averageExecutionTime > 16)
+          return "poor";
+        if (report.averageExecutionTime > 8)
+          return "fair";
         return "good";
       }
       if (report.performance) {
@@ -11251,8 +10374,10 @@ var catppuccinStarryNight = (() => {
     _analyzeComponentMemory(report) {
       if (report.memoryUsage) {
         const usage = report.memoryUsage;
-        if (usage > 100 * 1024 * 1024) return "high";
-        if (usage > 50 * 1024 * 1024) return "medium";
+        if (usage > 100 * 1024 * 1024)
+          return "high";
+        if (usage > 50 * 1024 * 1024)
+          return "medium";
         return "low";
       }
       if (report.memory) {
@@ -11305,7 +10430,7 @@ var catppuccinStarryNight = (() => {
         memory: this._getMemoryAnalysis(),
         components: {},
         recommendations: [],
-        metrics: this._getSystemMetrics(),
+        metrics: this._getSystemMetrics()
       };
       Object.entries(systems).forEach(([name, component]) => {
         if (component && name !== "config") {
@@ -11323,16 +10448,12 @@ var catppuccinStarryNight = (() => {
       if (this.performanceHistory.length < 2) {
         return {
           status: "insufficient_data",
-          message: "Need more performance data",
+          message: "Need more performance data"
         };
       }
       const recent = this.performanceHistory.slice(-5);
-      const averageMemoryUsage =
-        recent.reduce((sum, m) => sum + m.memory.utilization, 0) /
-        recent.length;
-      const averageFPS =
-        recent.reduce((sum, m) => sum + (m.fps.current || 0), 0) /
-        recent.length;
+      const averageMemoryUsage = recent.reduce((sum, m) => sum + m.memory.utilization, 0) / recent.length;
+      const averageFPS = recent.reduce((sum, m) => sum + (m.fps.current || 0), 0) / recent.length;
       let status = "good";
       const issues = [];
       if (averageMemoryUsage > 80) {
@@ -11353,7 +10474,7 @@ var catppuccinStarryNight = (() => {
         status,
         averageMemoryUsage: Math.round(averageMemoryUsage),
         averageFPS: Math.round(averageFPS),
-        issues,
+        issues
       };
     }
     /**
@@ -11363,8 +10484,7 @@ var catppuccinStarryNight = (() => {
       if (this.performanceHistory.length === 0) {
         return { status: "no_data" };
       }
-      const latest =
-        this.performanceHistory[this.performanceHistory.length - 1];
+      const latest = this.performanceHistory[this.performanceHistory.length - 1];
       const memory = latest.memory;
       return {
         current: {
@@ -11372,15 +10492,10 @@ var catppuccinStarryNight = (() => {
           // MB
           total: Math.round(memory.total / 1024 / 1024),
           // MB
-          utilization: Math.round(memory.utilization),
+          utilization: Math.round(memory.utilization)
         },
         trend: this._getMemoryTrend(),
-        status:
-          memory.utilization > 80
-            ? "critical"
-            : memory.utilization > 60
-            ? "warning"
-            : "good",
+        status: memory.utilization > 80 ? "critical" : memory.utilization > 60 ? "warning" : "good"
       };
     }
     /**
@@ -11392,34 +10507,31 @@ var catppuccinStarryNight = (() => {
       }
       const recent = this.performanceHistory.slice(-3);
       const utilizationTrend = recent.map((m) => m.memory.utilization);
-      const isIncreasing =
-        utilizationTrend[2] > utilizationTrend[1] &&
-        utilizationTrend[1] > utilizationTrend[0];
-      const isDecreasing =
-        utilizationTrend[2] < utilizationTrend[1] &&
-        utilizationTrend[1] < utilizationTrend[0];
-      if (isIncreasing) return "increasing";
-      if (isDecreasing) return "decreasing";
+      const isIncreasing = utilizationTrend[2] > utilizationTrend[1] && utilizationTrend[1] > utilizationTrend[0];
+      const isDecreasing = utilizationTrend[2] < utilizationTrend[1] && utilizationTrend[1] < utilizationTrend[0];
+      if (isIncreasing)
+        return "increasing";
+      if (isDecreasing)
+        return "decreasing";
       return "stable";
     }
     /**
      * Get system-wide metrics
      */
     _getSystemMetrics() {
-      const latest =
-        this.performanceHistory[this.performanceHistory.length - 1];
+      const latest = this.performanceHistory[this.performanceHistory.length - 1];
       if (!latest) {
         return { status: "no_data" };
       }
       return {
         performance: {
           fps: latest.fps,
-          timing: latest.timing,
+          timing: latest.timing
         },
         memory: latest.memory,
         dom: latest.dom,
         network: latest.network,
-        timestamp: latest.timestamp,
+        timestamp: latest.timestamp
       };
     }
     /**
@@ -11440,9 +10552,7 @@ var catppuccinStarryNight = (() => {
         (c) => c.performance === "poor"
       ).length;
       const totalComponents = componentStates.length;
-      const healthyRatio =
-        (totalComponents - errorComponents - missingComponents) /
-        totalComponents;
+      const healthyRatio = (totalComponents - errorComponents - missingComponents) / totalComponents;
       if (errorComponents > 0 || missingComponents > totalComponents * 0.3) {
         return "critical";
       }
@@ -11466,8 +10576,8 @@ var catppuccinStarryNight = (() => {
           message: "System performance is poor",
           actions: [
             "Consider enabling performance mode",
-            "Reduce visual effect intensity",
-          ],
+            "Reduce visual effect intensity"
+          ]
         });
       }
       if (report.memory.status === "critical") {
@@ -11478,19 +10588,17 @@ var catppuccinStarryNight = (() => {
           actions: [
             "Enable aggressive cleanup",
             "Restart components",
-            "Reduce memory-intensive features",
-          ],
+            "Reduce memory-intensive features"
+          ]
         });
       }
-      const errorComponents = Object.entries(report.components)
-        .filter(([, component]) => component.status === "error")
-        .map(([name]) => name);
+      const errorComponents = Object.entries(report.components).filter(([, component]) => component.status === "error").map(([name]) => name);
       if (errorComponents.length > 0) {
         recommendations.push({
           type: "components",
           priority: "high",
           message: `Component errors detected: ${errorComponents.join(", ")}`,
-          actions: ["Review component logs", "Restart affected components"],
+          actions: ["Review component logs", "Restart affected components"]
         });
       }
       return recommendations;
@@ -11525,7 +10633,7 @@ var catppuccinStarryNight = (() => {
         averageFPS: 0,
         minFPS: Infinity,
         maxFPS: 0,
-        frameHistory: [],
+        frameHistory: []
       };
       const updateFPS = () => {
         const now = performance.now();
@@ -11536,12 +10644,9 @@ var catppuccinStarryNight = (() => {
           this._fpsCounter.currentFPS = 1e3 / deltaTime;
           this._fpsCounter.frameHistory.push(this._fpsCounter.currentFPS);
           if (this._fpsCounter.frameHistory.length > 60) {
-            this._fpsCounter.frameHistory =
-              this._fpsCounter.frameHistory.slice(-60);
+            this._fpsCounter.frameHistory = this._fpsCounter.frameHistory.slice(-60);
           }
-          this._fpsCounter.averageFPS =
-            this._fpsCounter.frameHistory.reduce((a, b) => a + b, 0) /
-            this._fpsCounter.frameHistory.length;
+          this._fpsCounter.averageFPS = this._fpsCounter.frameHistory.reduce((a, b) => a + b, 0) / this._fpsCounter.frameHistory.length;
           this._fpsCounter.minFPS = Math.min(
             this._fpsCounter.minFPS,
             this._fpsCounter.currentFPS
@@ -11577,7 +10682,7 @@ var catppuccinStarryNight = (() => {
         maxTimerBudget: config.maxTimerBudget || 10,
         // 10ms budget for timer operations
         enableDebug: config.enableDebug || false,
-        ...config,
+        ...config
       };
       this._timerRegistry = /* @__PURE__ */ new Map();
       this._timerMasterInterval = null;
@@ -11589,7 +10694,7 @@ var catppuccinStarryNight = (() => {
         maxExecutionTime: 0,
         averageExecutionTime: 0,
         skippedTimers: 0,
-        timerCallbacks: /* @__PURE__ */ new Map(),
+        timerCallbacks: /* @__PURE__ */ new Map()
         // timerId -> { calls: 0, totalTime: 0, maxTime: 0 }
       };
       if (this.config.enableDebug) {
@@ -11617,12 +10722,7 @@ var catppuccinStarryNight = (() => {
      * @param {number} intervalMs - Timer interval in milliseconds
      * @param {string} priority - Priority level: 'critical', 'normal', 'background'
      */
-    registerConsolidatedTimer(
-      timerId,
-      callback,
-      intervalMs,
-      priority = "normal"
-    ) {
+    registerConsolidatedTimer(timerId, callback, intervalMs, priority = "normal") {
       if (this._timerRegistry.has(timerId)) {
         console.warn(
           `[TimerConsolidationSystem] Timer ${timerId} already registered`
@@ -11638,13 +10738,13 @@ var catppuccinStarryNight = (() => {
         executionCount: 0,
         totalExecutionTime: 0,
         maxExecutionTime: 0,
-        skippedExecutions: 0,
+        skippedExecutions: 0
       };
       this._timerRegistry.set(timerId, timerConfig);
       this._timerPerformanceMetrics.timerCallbacks.set(timerId, {
         calls: 0,
         totalTime: 0,
-        maxTime: 0,
+        maxTime: 0
       });
       if (this.config.enableDebug) {
         console.log(
@@ -11677,14 +10777,13 @@ var catppuccinStarryNight = (() => {
      * Start the master timer loop
      */
     _startMasterTimer() {
-      if (this._timerMasterInterval) return;
+      if (this._timerMasterInterval)
+        return;
       this._timerMasterInterval = setInterval(() => {
         this._executeMasterTimerFrame();
       }, this.config.timerIntervalMs);
       if (this.config.enableDebug) {
-        console.log(
-          "\u23F1\uFE0F [TimerConsolidationSystem] Master timer started"
-        );
+        console.log("\u23F1\uFE0F [TimerConsolidationSystem] Master timer started");
       }
     }
     /**
@@ -11696,9 +10795,7 @@ var catppuccinStarryNight = (() => {
         this._timerMasterInterval = null;
       }
       if (this.config.enableDebug) {
-        console.log(
-          "\u23F1\uFE0F [TimerConsolidationSystem] Master timer stopped"
-        );
+        console.log("\u23F1\uFE0F [TimerConsolidationSystem] Master timer stopped");
       }
     }
     /**
@@ -11736,8 +10833,7 @@ var catppuccinStarryNight = (() => {
             timerExecutionTime
           );
           config.lastExecution = currentTime;
-          const stats =
-            this._timerPerformanceMetrics.timerCallbacks.get(timerId);
+          const stats = this._timerPerformanceMetrics.timerCallbacks.get(timerId);
           if (stats) {
             stats.calls++;
             stats.totalTime += timerExecutionTime;
@@ -11774,8 +10870,7 @@ var catppuccinStarryNight = (() => {
       metrics.totalExecutions++;
       metrics.totalTime += frameTime;
       metrics.maxExecutionTime = Math.max(metrics.maxExecutionTime, frameTime);
-      metrics.averageExecutionTime =
-        metrics.totalTime / metrics.totalExecutions;
+      metrics.averageExecutionTime = metrics.totalTime / metrics.totalExecutions;
       if (frameTime > this.config.maxTimerBudget) {
         metrics.skippedTimers++;
       }
@@ -11786,23 +10881,17 @@ var catppuccinStarryNight = (() => {
      */
     getPerformanceReport() {
       const metrics = this._timerPerformanceMetrics;
-      const overBudgetRate =
-        metrics.totalExecutions > 0
-          ? metrics.skippedTimers / metrics.totalExecutions
-          : 0;
+      const overBudgetRate = metrics.totalExecutions > 0 ? metrics.skippedTimers / metrics.totalExecutions : 0;
       const timerReports = {};
       for (const [timerId, config] of this._timerRegistry) {
         timerReports[timerId] = {
           priority: config.priority,
           intervalMs: config.intervalMs,
           executionCount: config.executionCount,
-          averageTime:
-            config.executionCount > 0
-              ? config.totalExecutionTime / config.executionCount
-              : 0,
+          averageTime: config.executionCount > 0 ? config.totalExecutionTime / config.executionCount : 0,
           maxExecutionTime: config.maxExecutionTime,
           skippedExecutions: config.skippedExecutions,
-          enabled: config.enabled,
+          enabled: config.enabled
         };
       }
       return {
@@ -11811,13 +10900,12 @@ var catppuccinStarryNight = (() => {
         timeBudget: this.config.maxTimerBudget,
         registeredTimers: this._timerRegistry.size,
         totalExecutions: metrics.totalExecutions,
-        averageExecutionTime:
-          Math.round(metrics.averageExecutionTime * 100) / 100,
+        averageExecutionTime: Math.round(metrics.averageExecutionTime * 100) / 100,
         maxExecutionTime: Math.round(metrics.maxExecutionTime * 100) / 100,
         overBudgetRate: Math.round(overBudgetRate * 1e3) / 10,
         // Percentage with 1 decimal
         timerReports,
-        recommendations: this._generateTimerRecommendations(),
+        recommendations: this._generateTimerRecommendations()
       };
     }
     /**
@@ -11827,19 +10915,13 @@ var catppuccinStarryNight = (() => {
     _generateTimerRecommendations() {
       const recommendations = [];
       const metrics = this._timerPerformanceMetrics;
-      const overBudgetRate =
-        metrics.totalExecutions > 0
-          ? metrics.skippedTimers / metrics.totalExecutions
-          : 0;
+      const overBudgetRate = metrics.totalExecutions > 0 ? metrics.skippedTimers / metrics.totalExecutions : 0;
       if (overBudgetRate > 0.1) {
         recommendations.push({
           type: "performance",
           priority: "high",
-          message: `Frequent timer budget overruns (${(
-            overBudgetRate * 100
-          ).toFixed(1)}%)`,
-          action:
-            "Consider reducing timer frequency or optimizing timer callbacks",
+          message: `Frequent timer budget overruns (${(overBudgetRate * 100).toFixed(1)}%)`,
+          action: "Consider reducing timer frequency or optimizing timer callbacks"
         });
       }
       if (metrics.averageExecutionTime > this.config.maxTimerBudget * 0.8) {
@@ -11849,14 +10931,11 @@ var catppuccinStarryNight = (() => {
           message: `High average timer execution time (${metrics.averageExecutionTime.toFixed(
             2
           )}ms)`,
-          action: "Optimize timer callbacks or increase timer budget",
+          action: "Optimize timer callbacks or increase timer budget"
         });
       }
       for (const [timerId, config] of this._timerRegistry) {
-        const avgTime =
-          config.executionCount > 0
-            ? config.totalExecutionTime / config.executionCount
-            : 0;
+        const avgTime = config.executionCount > 0 ? config.totalExecutionTime / config.executionCount : 0;
         if (avgTime > 3) {
           recommendations.push({
             type: "timer",
@@ -11864,7 +10943,7 @@ var catppuccinStarryNight = (() => {
             message: `Timer ${timerId} has high execution time (${avgTime.toFixed(
               2
             )}ms)`,
-            action: `Optimize timer ${timerId} callback or increase its interval`,
+            action: `Optimize timer ${timerId} callback or increase its interval`
           });
         }
         if (config.skippedExecutions > config.executionCount * 0.2) {
@@ -11872,8 +10951,7 @@ var catppuccinStarryNight = (() => {
             type: "timer",
             priority: "low",
             message: `Timer ${timerId} frequently skips executions`,
-            action:
-              "Consider increasing timer budget or optimizing other timers",
+            action: "Consider increasing timer budget or optimizing other timers"
           });
         }
       }
@@ -11882,7 +10960,7 @@ var catppuccinStarryNight = (() => {
           type: "architecture",
           priority: "low",
           message: `Many timers registered (${this._timerRegistry.size})`,
-          action: "Consider consolidating or merging similar timer operations",
+          action: "Consider consolidating or merging similar timer operations"
         });
       }
       const shortIntervalTimers = Array.from(
@@ -11893,7 +10971,7 @@ var catppuccinStarryNight = (() => {
           type: "efficiency",
           priority: "medium",
           message: `Many high-frequency timers (${shortIntervalTimers.length} under 100ms)`,
-          action: "Consider increasing intervals or merging timer operations",
+          action: "Consider increasing intervals or merging timer operations"
         });
       }
       return recommendations;
@@ -11909,9 +10987,7 @@ var catppuccinStarryNight = (() => {
         config.enabled = enabled;
         if (this.config.enableDebug) {
           console.log(
-            `\u23F1\uFE0F [TimerConsolidationSystem] Timer ${timerId} ${
-              enabled ? "enabled" : "disabled"
-            }`
+            `\u23F1\uFE0F [TimerConsolidationSystem] Timer ${timerId} ${enabled ? "enabled" : "disabled"}`
           );
         }
       }
@@ -12003,7 +11079,7 @@ var catppuccinStarryNight = (() => {
         maxExecutionTime: 0,
         averageExecutionTime: 0,
         skippedTimers: 0,
-        timerCallbacks: /* @__PURE__ */ new Map(),
+        timerCallbacks: /* @__PURE__ */ new Map()
       };
       for (const [timerId, config] of this._timerRegistry) {
         config.executionCount = 0;
@@ -12014,14 +11090,12 @@ var catppuccinStarryNight = (() => {
         this._timerPerformanceMetrics.timerCallbacks.set(timerId, {
           calls: 0,
           totalTime: 0,
-          maxTime: 0,
+          maxTime: 0
         });
       }
       this._timerExecutionCount = 0;
       if (this.config.enableDebug) {
-        console.log(
-          "\u23F1\uFE0F [TimerConsolidationSystem] Performance metrics reset"
-        );
+        console.log("\u23F1\uFE0F [TimerConsolidationSystem] Performance metrics reset");
       }
     }
     /**
@@ -12036,7 +11110,7 @@ var catppuccinStarryNight = (() => {
           priority: config.priority,
           enabled: config.enabled,
           executionCount: config.executionCount,
-          lastExecution: config.lastExecution,
+          lastExecution: config.lastExecution
         })
       );
     }
@@ -12055,19 +11129,17 @@ var catppuccinStarryNight = (() => {
      */
     getTimerConfig(timerId) {
       const config = this._timerRegistry.get(timerId);
-      if (!config) return null;
+      if (!config)
+        return null;
       return {
         intervalMs: config.intervalMs,
         priority: config.priority,
         enabled: config.enabled,
         executionCount: config.executionCount,
-        averageTime:
-          config.executionCount > 0
-            ? config.totalExecutionTime / config.executionCount
-            : 0,
+        averageTime: config.executionCount > 0 ? config.totalExecutionTime / config.executionCount : 0,
         maxExecutionTime: config.maxExecutionTime,
         skippedExecutions: config.skippedExecutions,
-        lastExecution: config.lastExecution,
+        lastExecution: config.lastExecution
       };
     }
     /**
@@ -12127,7 +11199,8 @@ var catppuccinStarryNight = (() => {
      * @returns {Object} Deep cloned configuration
      */
     _deepCloneConfig(config) {
-      if (!config || typeof config !== "object") return {};
+      if (!config || typeof config !== "object")
+        return {};
       try {
         const cloned = JSON.parse(JSON.stringify(config));
         const methodsToRestore = [
@@ -12137,7 +11210,7 @@ var catppuccinStarryNight = (() => {
           "getCurrentFeatures",
           "getCurrentPerformanceSettings",
           "setArtisticMode",
-          "loadArtisticPreference",
+          "loadArtisticPreference"
         ];
         methodsToRestore.forEach((methodName) => {
           if (typeof config[methodName] === "function") {
@@ -12194,11 +11267,7 @@ var catppuccinStarryNight = (() => {
      */
     _notifyConfigurationChange(key, newValue, oldValue) {
       if (key.startsWith("harmonic") || key.includes("HarmonicMode")) {
-        if (
-          this.sidebarConsciousnessSystem &&
-          typeof this.sidebarConsciousnessSystem.updateHarmonicModeDisplay ===
-            "function"
-        ) {
+        if (this.sidebarConsciousnessSystem && typeof this.sidebarConsciousnessSystem.updateHarmonicModeDisplay === "function") {
           this.sidebarConsciousnessSystem.updateHarmonicModeDisplay(newValue);
         }
       }
@@ -12213,7 +11282,7 @@ var catppuccinStarryNight = (() => {
       const initializationResults = {
         success: [],
         failed: [],
-        skipped: [],
+        skipped: []
       };
       try {
         this.masterAnimationCoordinator = new MasterAnimationCoordinator(
@@ -12239,9 +11308,7 @@ var catppuccinStarryNight = (() => {
         await this.timerConsolidationSystem.initialize();
         initializationResults.success.push("TimerConsolidationSystem");
         if (this.YEAR3000_CONFIG.enableDebug)
-          console.log(
-            "\u23F1\uFE0F [Year3000System] TimerConsolidationSystem initialized"
-          );
+          console.log("\u23F1\uFE0F [Year3000System] TimerConsolidationSystem initialized");
       } catch (error) {
         console.error(
           "\u274C [Year3000System] Failed to initialize TimerConsolidationSystem:",
@@ -12253,9 +11320,7 @@ var catppuccinStarryNight = (() => {
         this.cssVariableBatcher = new CSSVariableBatcher(this.YEAR3000_CONFIG);
         initializationResults.success.push("CSSVariableBatcher");
         if (this.YEAR3000_CONFIG.enableDebug)
-          console.log(
-            "\u{1F3A8} [Year3000System] CSSVariableBatcher initialized"
-          );
+          console.log("\u{1F3A8} [Year3000System] CSSVariableBatcher initialized");
       } catch (error) {
         console.error(
           "\u274C [Year3000System] Failed to initialize CSSVariableBatcher:",
@@ -12270,9 +11335,7 @@ var catppuccinStarryNight = (() => {
         await this.deviceCapabilityDetector.initialize();
         initializationResults.success.push("DeviceCapabilityDetector");
         if (this.YEAR3000_CONFIG.enableDebug)
-          console.log(
-            "\u{1F50D} [Year3000System] DeviceCapabilityDetector initialized"
-          );
+          console.log("\u{1F50D} [Year3000System] DeviceCapabilityDetector initialized");
       } catch (error) {
         console.error(
           "\u274C [Year3000System] Failed to initialize DeviceCapabilityDetector:",
@@ -12281,14 +11344,10 @@ var catppuccinStarryNight = (() => {
         initializationResults.failed.push("DeviceCapabilityDetector");
       }
       try {
-        this.performanceAnalyzer = new PerformanceAnalyzer(
-          this.YEAR3000_CONFIG
-        );
+        this.performanceAnalyzer = new PerformanceAnalyzer(this.YEAR3000_CONFIG);
         initializationResults.success.push("PerformanceAnalyzer");
         if (this.YEAR3000_CONFIG.enableDebug)
-          console.log(
-            "\u{1F4CA} [Year3000System] PerformanceAnalyzer initialized"
-          );
+          console.log("\u{1F4CA} [Year3000System] PerformanceAnalyzer initialized");
       } catch (error) {
         console.error(
           "\u274C [Year3000System] Failed to initialize PerformanceAnalyzer:",
@@ -12300,9 +11359,7 @@ var catppuccinStarryNight = (() => {
         this.performanceMonitor = new PerformanceMonitor();
         initializationResults.success.push("PerformanceMonitor");
         if (this.YEAR3000_CONFIG.enableDebug)
-          console.log(
-            "\u{1F30C} [Year3000System] PerformanceMonitor instantiated."
-          );
+          console.log("\u{1F30C} [Year3000System] PerformanceMonitor instantiated.");
       } catch (error) {
         console.error(
           "\u274C [Year3000System] Failed to initialize PerformanceMonitor:",
@@ -12318,9 +11375,7 @@ var catppuccinStarryNight = (() => {
         );
         initializationResults.success.push("SettingsManager");
         if (this.YEAR3000_CONFIG.enableDebug)
-          console.log(
-            "\u{1F30C} [Year3000System] SettingsManager instantiated."
-          );
+          console.log("\u{1F30C} [Year3000System] SettingsManager instantiated.");
       } catch (error) {
         console.error(
           "\u274C [Year3000System] Failed to initialize SettingsManager:",
@@ -12330,13 +11385,11 @@ var catppuccinStarryNight = (() => {
       }
       try {
         this.genreProfileManager = new GenreProfileManager({
-          YEAR3000_CONFIG: this.YEAR3000_CONFIG,
+          YEAR3000_CONFIG: this.YEAR3000_CONFIG
         });
         initializationResults.success.push("GenreProfileManager");
         if (this.YEAR3000_CONFIG.enableDebug)
-          console.log(
-            "\u{1F30C} [Year3000System] GenreProfileManager instantiated."
-          );
+          console.log("\u{1F30C} [Year3000System] GenreProfileManager instantiated.");
       } catch (error) {
         console.error(
           "\u274C [Year3000System] Failed to initialize GenreProfileManager:",
@@ -12351,9 +11404,7 @@ var catppuccinStarryNight = (() => {
         );
         initializationResults.success.push("ColorHarmonyEngine");
         if (this.YEAR3000_CONFIG.enableDebug)
-          console.log(
-            "\u{1F30C} [Year3000System] ColorHarmonyEngine instantiated."
-          );
+          console.log("\u{1F30C} [Year3000System] ColorHarmonyEngine instantiated.");
       } catch (error) {
         console.error(
           "\u274C [Year3000System] Failed to initialize ColorHarmonyEngine:",
@@ -12367,10 +11418,7 @@ var catppuccinStarryNight = (() => {
             this.performanceMonitor,
             this.settingsManager
           );
-          if (
-            this.glassmorphismManager &&
-            typeof this.glassmorphismManager.initialize === "function"
-          ) {
+          if (this.glassmorphismManager && typeof this.glassmorphismManager.initialize === "function") {
             this.glassmorphismManager.initialize();
           }
           initializationResults.success.push("GlassmorphismManager");
@@ -12394,9 +11442,7 @@ var catppuccinStarryNight = (() => {
           await this.card3DManager.initialize();
           initializationResults.success.push("Card3DManager");
           if (this.YEAR3000_CONFIG.enableDebug)
-            console.log(
-              "\u{1F30C} [Year3000System] Card3DManager initialized."
-            );
+            console.log("\u{1F30C} [Year3000System] Card3DManager initialized.");
         } catch (error) {
           console.error(
             "\u274C [Year3000System] Failed to initialize Card3DManager:",
@@ -12419,7 +11465,7 @@ var catppuccinStarryNight = (() => {
           Year3000Utilities: this.utils,
           colorHarmonyEngine: this.colorHarmonyEngine,
           settingsManager: this.settingsManager,
-          genreProfileManager: this.genreProfileManager,
+          genreProfileManager: this.genreProfileManager
         });
         await this.musicSyncService.initialize();
         initializationResults.success.push("MusicSyncService");
@@ -12442,45 +11488,45 @@ var catppuccinStarryNight = (() => {
         // Updated to use unified MusicSyncService
         this.settingsManager,
         // Correctly pass the settingsManager instance
-        this,
+        this
         // Pass year3000System instance for Master Animation Coordinator access
       ];
       const visualSystems = [
         {
           name: "LightweightParticleSystem",
           Class: LightweightParticleSystem,
-          property: "lightweightParticleSystem",
+          property: "lightweightParticleSystem"
         },
         {
           name: "DimensionalNexusSystem",
           Class: DimensionalNexusSystem,
-          property: "dimensionalNexusSystem",
+          property: "dimensionalNexusSystem"
         },
         {
           name: "DataGlyphSystem",
           Class: DataGlyphSystem,
-          property: "dataGlyphSystem",
+          property: "dataGlyphSystem"
         },
         {
           name: "BeatSyncVisualSystem",
           Class: BeatSyncVisualSystem,
-          property: "beatSyncVisualSystem",
+          property: "beatSyncVisualSystem"
         },
         {
           name: "BehavioralPredictionEngine",
           Class: BehavioralPredictionEngine,
-          property: "behavioralPredictionEngine",
+          property: "behavioralPredictionEngine"
         },
         {
           name: "PredictiveMaterializationSystem",
           Class: PredictiveMaterializationSystem,
-          property: "predictiveMaterializationSystem",
+          property: "predictiveMaterializationSystem"
         },
         {
           name: "SidebarConsciousnessSystem",
           Class: SidebarConsciousnessSystem,
-          property: "sidebarConsciousnessSystem",
-        },
+          property: "sidebarConsciousnessSystem"
+        }
       ];
       for (const systemConfig of visualSystems) {
         try {
@@ -12491,10 +11537,7 @@ var catppuccinStarryNight = (() => {
             initializationResults.skipped.push(systemConfig.name);
             continue;
           }
-          if (
-            systemConfig.name === "SidebarConsciousnessSystem" &&
-            !document.querySelector(".Root__nav-bar")
-          ) {
+          if (systemConfig.name === "SidebarConsciousnessSystem" && !document.querySelector(".Root__nav-bar")) {
             console.warn(
               `\u26A0\uFE0F [Year3000System] Skipping ${systemConfig.name} - required DOM element .Root__nav-bar not found`
             );
@@ -12507,9 +11550,7 @@ var catppuccinStarryNight = (() => {
           await this[systemConfig.property].initialize();
           initializationResults.success.push(systemConfig.name);
           if (this.YEAR3000_CONFIG.enableDebug)
-            console.log(
-              `\u{1F30C} [Year3000System] ${systemConfig.name} initialized.`
-            );
+            console.log(`\u{1F30C} [Year3000System] ${systemConfig.name} initialized.`);
         } catch (error) {
           console.error(
             `\u274C [Year3000System] Failed to initialize ${systemConfig.name}:`,
@@ -12519,29 +11560,19 @@ var catppuccinStarryNight = (() => {
           this[systemConfig.property] = null;
         }
       }
-      const totalSystems =
-        initializationResults.success.length +
-        initializationResults.failed.length +
-        initializationResults.skipped.length;
-      const successRate = (
-        (initializationResults.success.length / totalSystems) *
-        100
-      ).toFixed(1);
+      const totalSystems = initializationResults.success.length + initializationResults.failed.length + initializationResults.skipped.length;
+      const successRate = (initializationResults.success.length / totalSystems * 100).toFixed(1);
       if (this.YEAR3000_CONFIG.enableDebug) {
         const endTime = performance.now();
         console.log(
-          `\u{1F30C} [Year3000System] initializeAllSystems() completed in ${(
-            endTime - startTime
-          ).toFixed(2)}ms.`
+          `\u{1F30C} [Year3000System] initializeAllSystems() completed in ${(endTime - startTime).toFixed(2)}ms.`
         );
         console.log(`\u{1F4CA} [Year3000System] Initialization Results:`);
         console.log(
           `  \u2705 Success: ${initializationResults.success.length} (${successRate}%)`
         );
         console.log(`  \u274C Failed: ${initializationResults.failed.length}`);
-        console.log(
-          `  \u23ED\uFE0F Skipped: ${initializationResults.skipped.length}`
-        );
+        console.log(`  \u23ED\uFE0F Skipped: ${initializationResults.skipped.length}`);
         if (initializationResults.failed.length > 0) {
           console.log(
             `  Failed systems: ${initializationResults.failed.join(", ")}`
@@ -12573,11 +11604,7 @@ var catppuccinStarryNight = (() => {
               }
             }
           }
-          const finalSuccessRate2 =
-            (initializationResults.success.length /
-              (initializationResults.success.length +
-                initializationResults.failed.length)) *
-            100;
+          const finalSuccessRate2 = initializationResults.success.length / (initializationResults.success.length + initializationResults.failed.length) * 100;
           console.log(
             `\u{1F4CA} [Year3000System] Final initialization success rate: ${finalSuccessRate2.toFixed(
               1
@@ -12615,11 +11642,7 @@ var catppuccinStarryNight = (() => {
           "\u26A0\uFE0F [Year3000System] SettingsManager not available - skipping initial settings application"
         );
       }
-      const finalSuccessRate =
-        (initializationResults.success.length /
-          (initializationResults.success.length +
-            initializationResults.failed.length)) *
-        100;
+      const finalSuccessRate = initializationResults.success.length / (initializationResults.success.length + initializationResults.failed.length) * 100;
       if (initializationResults.success.length > 0 && finalSuccessRate >= 95) {
         this.startProactiveHealthMonitoring();
         if (this.YEAR3000_CONFIG.enableDebug) {
@@ -12647,59 +11670,51 @@ var catppuccinStarryNight = (() => {
         healthySystems: 0,
         unhealthySystems: [],
         criticalErrors: [],
-        warnings: [],
+        warnings: []
       };
       const systemsToCheck = [
         {
           name: "sidebarConsciousnessSystem",
           critical: false,
-          property: "sidebarConsciousnessSystem",
+          property: "sidebarConsciousnessSystem"
         },
         {
           name: "colorHarmonyEngine",
           critical: true,
-          property: "colorHarmonyEngine",
+          property: "colorHarmonyEngine"
         },
         {
           name: "musicSyncService",
           critical: true,
-          property: "musicSyncService",
+          property: "musicSyncService"
         },
-        {
-          name: "settingsManager",
-          critical: true,
-          property: "settingsManager",
-        },
+        { name: "settingsManager", critical: true, property: "settingsManager" },
         {
           name: "performanceMonitor",
           critical: false,
-          property: "performanceMonitor",
+          property: "performanceMonitor"
         },
         {
           name: "glassmorphismManager",
           critical: false,
-          property: "glassmorphismManager",
+          property: "glassmorphismManager"
         },
         { name: "card3DManager", critical: false, property: "card3DManager" },
         {
           name: "beatSyncVisualSystem",
           critical: false,
-          property: "beatSyncVisualSystem",
+          property: "beatSyncVisualSystem"
         },
         {
           name: "lightweightParticleSystem",
           critical: false,
-          property: "lightweightParticleSystem",
-        },
+          property: "lightweightParticleSystem"
+        }
       ];
       for (const { name, critical, property } of systemsToCheck) {
         healthReport.totalSystems++;
         const systemInstance = this[property];
-        const isHealthy =
-          systemInstance &&
-          systemInstance.initialized !== false &&
-          (typeof systemInstance.destroy !== "function" ||
-            systemInstance.initialized !== false);
+        const isHealthy = systemInstance && systemInstance.initialized !== false && (typeof systemInstance.destroy !== "function" || systemInstance.initialized !== false);
         if (isHealthy) {
           healthReport.healthySystems++;
           if (name === "sidebarConsciousnessSystem" && systemInstance) {
@@ -12725,8 +11740,7 @@ var catppuccinStarryNight = (() => {
       if (this.YEAR3000_CONFIG?.enableDebug) {
         console.log("\u{1F50D} [Year3000System] Health validation completed:", {
           healthy: `${healthReport.healthySystems}/${healthReport.totalSystems}`,
-          issues:
-            healthReport.criticalErrors.length + healthReport.warnings.length,
+          issues: healthReport.criticalErrors.length + healthReport.warnings.length
         });
       }
       return healthReport;
@@ -12746,34 +11760,20 @@ var catppuccinStarryNight = (() => {
           switch (failedSystemName) {
             case "sidebarConsciousnessSystem":
               if (!this.sidebarConsciousnessSystem) {
-                const SidebarConsciousnessSystem_IMPORTED = (
-                  await Promise.resolve().then(
-                    () => (
-                      init_SidebarConsciousnessSystem(),
-                      SidebarConsciousnessSystem_exports
-                    )
-                  )
-                ).SidebarConsciousnessSystem;
-                this.sidebarConsciousnessSystem =
-                  new SidebarConsciousnessSystem_IMPORTED(
-                    this.YEAR3000_CONFIG,
-                    this.utils,
-                    this.performanceMonitor,
-                    this.musicAnalysisService,
-                    this.settingsManager
-                  );
+                const SidebarConsciousnessSystem_IMPORTED = (await Promise.resolve().then(() => (init_SidebarConsciousnessSystem(), SidebarConsciousnessSystem_exports))).SidebarConsciousnessSystem;
+                this.sidebarConsciousnessSystem = new SidebarConsciousnessSystem_IMPORTED(
+                  this.YEAR3000_CONFIG,
+                  this.utils,
+                  this.performanceMonitor,
+                  this.musicAnalysisService,
+                  this.settingsManager
+                );
                 await this.sidebarConsciousnessSystem.initialize();
               }
               break;
             case "colorHarmonyEngine":
               if (!this.colorHarmonyEngine) {
-                const ColorHarmonyEngine_IMPORTED = (
-                  await Promise.resolve().then(
-                    () => (
-                      init_ColorHarmonyEngine(), ColorHarmonyEngine_exports
-                    )
-                  )
-                ).ColorHarmonyEngine;
+                const ColorHarmonyEngine_IMPORTED = (await Promise.resolve().then(() => (init_ColorHarmonyEngine(), ColorHarmonyEngine_exports))).ColorHarmonyEngine;
                 this.colorHarmonyEngine = new ColorHarmonyEngine_IMPORTED(
                   this.YEAR3000_CONFIG,
                   this.utils,
@@ -12785,29 +11785,24 @@ var catppuccinStarryNight = (() => {
               break;
             case "musicAnalysisService":
               if (!this.musicAnalysisService) {
-                const MusicAnalysisService_IMPORTED = (
-                  await import("../services/MusicAnalysisService.js")
-                ).MusicAnalysisService;
+                const MusicAnalysisService_IMPORTED = (await import("../services/MusicAnalysisService.js")).MusicAnalysisService;
                 this.musicAnalysisService = new MusicAnalysisService_IMPORTED({
                   YEAR3000_CONFIG: this.YEAR3000_CONFIG,
                   utils: this.utils,
-                  performanceMonitor: this.performanceMonitor,
+                  performanceMonitor: this.performanceMonitor
                 });
                 await this.musicAnalysisService.initialize();
               }
               break;
             case "musicSyncService":
               if (!this.musicSyncService) {
-                const { MusicSyncService: MusicSyncService2 } =
-                  await Promise.resolve().then(
-                    () => (init_MusicSyncService(), MusicSyncService_exports)
-                  );
+                const { MusicSyncService: MusicSyncService2 } = await Promise.resolve().then(() => (init_MusicSyncService(), MusicSyncService_exports));
                 this.musicSyncService = new MusicSyncService2({
                   YEAR3000_CONFIG: this.YEAR3000_CONFIG,
                   Year3000Utilities: this.utils,
                   colorHarmonyEngine: this.colorHarmonyEngine,
                   settingsManager: this.settingsManager,
-                  genreProfileManager: this.genreProfileManager,
+                  genreProfileManager: this.genreProfileManager
                 });
                 await this.musicSyncService.initialize();
               }
@@ -12842,12 +11837,13 @@ var catppuccinStarryNight = (() => {
      * Add performance monitoring for critical method calls
      */
     _addPerformanceMonitoring() {
-      if (!this.YEAR3000_CONFIG) return;
+      if (!this.YEAR3000_CONFIG)
+        return;
       const methodsToMonitor = [
         "getCurrentModeProfile",
         "getCurrentMultipliers",
         "setArtisticMode",
-        "getCurrentFeatures",
+        "getCurrentFeatures"
       ];
       methodsToMonitor.forEach((methodName) => {
         if (typeof this.YEAR3000_CONFIG[methodName] === "function") {
@@ -12901,31 +11897,22 @@ var catppuccinStarryNight = (() => {
         return;
       }
       try {
-        const selectedAccent =
-          this.settingsManager.get("catppuccin-accentColor") || "mauve";
+        const selectedAccent = this.settingsManager.get("catppuccin-accentColor") || "mauve";
         await this._applyCatppuccinAccent(selectedAccent);
-        const gradientIntensity =
-          this.settingsManager.get("sn-gradientIntensity") || "balanced";
-        const starDensity =
-          this.settingsManager.get("sn-starDensity") || "balanced";
+        const gradientIntensity = this.settingsManager.get("sn-gradientIntensity") || "balanced";
+        const starDensity = this.settingsManager.get("sn-starDensity") || "balanced";
         await this._applyStarryNightSettings(gradientIntensity, starDensity);
-        const glassmorphismIntensity =
-          this.settingsManager.get("sn-glassmorphismIntensity") || "moderate";
-        if (
-          this.glassmorphismManager &&
-          this.glassmorphismManager.applyGlassmorphismSettings
-        ) {
+        const glassmorphismIntensity = this.settingsManager.get("sn-glassmorphismIntensity") || "moderate";
+        if (this.glassmorphismManager && this.glassmorphismManager.applyGlassmorphismSettings) {
           this.glassmorphismManager.applyGlassmorphismSettings(
             glassmorphismIntensity
           );
         }
-        const morphing3DMode =
-          this.settingsManager.get("sn-3dMorphingMode") || "dynamic";
+        const morphing3DMode = this.settingsManager.get("sn-3dMorphingMode") || "dynamic";
         if (this.card3DManager && this.card3DManager.apply3DMode) {
           this.card3DManager.apply3DMode(morphing3DMode);
         }
-        const artisticMode =
-          this.settingsManager.get("sn-artisticMode") || "artist-vision";
+        const artisticMode = this.settingsManager.get("sn-artisticMode") || "artist-vision";
         if (!this._validateConfigInitialization()) {
           console.warn(
             "\u{1F3A8} [Year3000System] Skipping artistic mode initialization due to config issues"
@@ -12937,33 +11924,24 @@ var catppuccinStarryNight = (() => {
         if (this.updateColorsFromCurrentTrack) {
           this.updateColorsFromCurrentTrack();
         }
-        const currentHarmonicMode =
-          this.settingsManager.get("sn-currentHarmonicMode") ||
-          "analogous-flow";
+        const currentHarmonicMode = this.settingsManager.get("sn-currentHarmonicMode") || "analogous-flow";
         const harmonicIntensity = parseFloat(
           this.settingsManager.get("sn-harmonicIntensity") || "0.7"
         );
-        const harmonicEvolution =
-          (this.settingsManager.get("sn-harmonicEvolution") || "true") ===
-          "true";
+        const harmonicEvolution = (this.settingsManager.get("sn-harmonicEvolution") || "true") === "true";
         this.updateConfiguration("currentHarmonicMode", currentHarmonicMode);
         this.updateConfiguration("harmonicIntensity", harmonicIntensity);
         this.updateConfiguration("harmonicEvolution", harmonicEvolution);
-        const manualBaseColor =
-          this.settingsManager.get("sn-harmonicManualBaseColor") || "";
+        const manualBaseColor = this.settingsManager.get("sn-harmonicManualBaseColor") || "";
         if (manualBaseColor && this.updateHarmonicBaseColor) {
           this.updateHarmonicBaseColor(manualBaseColor);
         }
-        if (
-          this.sidebarConsciousnessSystem &&
-          this.sidebarConsciousnessSystem.updateHarmonicModeDisplay
-        ) {
+        if (this.sidebarConsciousnessSystem && this.sidebarConsciousnessSystem.updateHarmonicModeDisplay) {
           this.sidebarConsciousnessSystem.updateHarmonicModeDisplay(
             currentHarmonicMode
           );
         }
-        const performanceQuality =
-          this.settingsManager.get("sn-performanceQuality") || "auto";
+        const performanceQuality = this.settingsManager.get("sn-performanceQuality") || "auto";
         if (this.YEAR3000_CONFIG.enableDebug) {
           console.log(
             `\u{1F527} [Year3000System] Performance quality loaded: ${performanceQuality}`
@@ -12989,19 +11967,11 @@ var catppuccinStarryNight = (() => {
         const colorScheme = Spicetify.Config?.color_scheme || "mocha";
         const accent = selectedAccent === "none" ? "text" : selectedAccent;
         const properties = {
-          "--spice-text":
-            selectedAccent === "none"
-              ? void 0
-              : `var(--spice-${selectedAccent})`,
-          "--spice-button-active":
-            selectedAccent === "none"
-              ? void 0
-              : `var(--spice-${selectedAccent})`,
+          "--spice-text": selectedAccent === "none" ? void 0 : `var(--spice-${selectedAccent})`,
+          "--spice-button-active": selectedAccent === "none" ? void 0 : `var(--spice-${selectedAccent})`,
           "--spice-equalizer": document.querySelector(
             "body > script.marketplaceScript"
-          )
-            ? `url('https://github.com/catppuccin/spicetify/blob/main/catppuccin/assets/${colorScheme}/equalizer-animated-${accent}.gif?raw=true')`
-            : `url('${colorScheme}/equalizer-animated-${accent}.gif')`,
+          ) ? `url('https://github.com/catppuccin/spicetify/blob/main/catppuccin/assets/${colorScheme}/equalizer-animated-${accent}.gif?raw=true')` : `url('${colorScheme}/equalizer-animated-${accent}.gif')`
         };
         Object.entries(properties).forEach(([property, value]) => {
           if (value === void 0 || value.includes("none")) {
@@ -13054,10 +12024,9 @@ var catppuccinStarryNight = (() => {
         disabled: { opacity: 0 },
         minimal: { opacity: 0.05 },
         balanced: { opacity: 0.15 },
-        intense: { opacity: 0.25 },
+        intense: { opacity: 0.25 }
       };
-      const gradient =
-        gradientSettings[gradientIntensity] || gradientSettings["balanced"];
+      const gradient = gradientSettings[gradientIntensity] || gradientSettings["balanced"];
       document.documentElement.style.setProperty(
         "--sn-gradient-opacity",
         gradient.opacity.toString()
@@ -13066,7 +12035,7 @@ var catppuccinStarryNight = (() => {
         disabled: { display: "none" },
         minimal: { display: "block", animationDuration: "8s" },
         balanced: { display: "block", animationDuration: "6s" },
-        intense: { display: "block", animationDuration: "4s" },
+        intense: { display: "block", animationDuration: "4s" }
       };
       const stars = starSettings[starDensity] || starSettings["balanced"];
       const starContainer = document.querySelector(".star-container");
@@ -13083,39 +12052,32 @@ var catppuccinStarryNight = (() => {
     // MODIFIED: Add destroyAllSystems method for cleanup
     async destroyAllSystems() {
       if (this.YEAR3000_CONFIG.enableDebug) {
-        console.log(
-          "\u{1F30C} [Year3000System] destroyAllSystems(): Cleaning up..."
-        );
+        console.log("\u{1F30C} [Year3000System] destroyAllSystems(): Cleaning up...");
       }
       this.stopProactiveHealthMonitoring();
       const performanceSystems = [
         {
           name: "MasterAnimationCoordinator",
-          instance: this.masterAnimationCoordinator,
+          instance: this.masterAnimationCoordinator
         },
         {
           name: "TimerConsolidationSystem",
-          instance: this.timerConsolidationSystem,
+          instance: this.timerConsolidationSystem
         },
         { name: "CSSVariableBatcher", instance: this.cssVariableBatcher },
         {
           name: "DeviceCapabilityDetector",
-          instance: this.deviceCapabilityDetector,
+          instance: this.deviceCapabilityDetector
         },
-        { name: "PerformanceAnalyzer", instance: this.performanceAnalyzer },
+        { name: "PerformanceAnalyzer", instance: this.performanceAnalyzer }
       ];
       for (const system of performanceSystems) {
         try {
-          if (
-            system.instance &&
-            typeof system.instance.destroy === "function"
-          ) {
+          if (system.instance && typeof system.instance.destroy === "function") {
             await system.instance.destroy();
             destroyResults.success.push(system.name);
             if (this.YEAR3000_CONFIG.enableDebug)
-              console.log(
-                `\u{1F30C} [Year3000System] ${system.name} destroyed.`
-              );
+              console.log(`\u{1F30C} [Year3000System] ${system.name} destroyed.`);
           } else {
             destroyResults.skipped.push(system.name);
           }
@@ -13135,14 +12097,10 @@ var catppuccinStarryNight = (() => {
       const destroyResults = {
         success: [],
         failed: [],
-        skipped: [],
+        skipped: []
       };
       try {
-        if (
-          this._songChangeHandler &&
-          typeof Spicetify !== "undefined" &&
-          Spicetify.Player
-        ) {
+        if (this._songChangeHandler && typeof Spicetify !== "undefined" && Spicetify.Player) {
           Spicetify.Player.removeEventListener(
             "songchange",
             this._songChangeHandler
@@ -13160,39 +12118,31 @@ var catppuccinStarryNight = (() => {
       const visualSystems = [
         {
           name: "SidebarConsciousnessSystem",
-          instance: this.sidebarConsciousnessSystem,
+          instance: this.sidebarConsciousnessSystem
         },
         {
           name: "PredictiveMaterializationSystem",
-          instance: this.predictiveMaterializationSystem,
+          instance: this.predictiveMaterializationSystem
         },
         {
           name: "BehavioralPredictionEngine",
-          instance: this.behavioralPredictionEngine,
+          instance: this.behavioralPredictionEngine
         },
         { name: "BeatSyncVisualSystem", instance: this.beatSyncVisualSystem },
         { name: "DataGlyphSystem", instance: this.dataGlyphSystem },
-        {
-          name: "DimensionalNexusSystem",
-          instance: this.dimensionalNexusSystem,
-        },
+        { name: "DimensionalNexusSystem", instance: this.dimensionalNexusSystem },
         {
           name: "LightweightParticleSystem",
-          instance: this.lightweightParticleSystem,
-        },
+          instance: this.lightweightParticleSystem
+        }
       ];
       for (const system of visualSystems) {
         try {
-          if (
-            system.instance &&
-            typeof system.instance.destroy === "function"
-          ) {
+          if (system.instance && typeof system.instance.destroy === "function") {
             system.instance.destroy();
             destroyResults.success.push(system.name);
             if (this.YEAR3000_CONFIG.enableDebug)
-              console.log(
-                `\u{1F30C} [Year3000System] ${system.name} destroyed.`
-              );
+              console.log(`\u{1F30C} [Year3000System] ${system.name} destroyed.`);
           } else {
             destroyResults.skipped.push(system.name);
           }
@@ -13210,20 +12160,15 @@ var catppuccinStarryNight = (() => {
         { name: "MusicAnalysisService", instance: this.musicAnalysisService },
         { name: "BMPHarmonyEngine", instance: this.bmpHarmonyEngine },
         { name: "ColorHarmonyEngine", instance: this.colorHarmonyEngine },
-        { name: "PerformanceMonitor", instance: this.performanceMonitor },
+        { name: "PerformanceMonitor", instance: this.performanceMonitor }
       ];
       for (const manager of managers) {
         try {
-          if (
-            manager.instance &&
-            typeof manager.instance.destroy === "function"
-          ) {
+          if (manager.instance && typeof manager.instance.destroy === "function") {
             manager.instance.destroy();
             destroyResults.success.push(manager.name);
             if (this.YEAR3000_CONFIG.enableDebug)
-              console.log(
-                `\u{1F30C} [Year3000System] ${manager.name} destroyed.`
-              );
+              console.log(`\u{1F30C} [Year3000System] ${manager.name} destroyed.`);
           } else {
             destroyResults.skipped.push(manager.name);
           }
@@ -13256,9 +12201,7 @@ var catppuccinStarryNight = (() => {
         console.log(`  \u274C Failed: ${destroyResults.failed.length}`);
         console.log(`  \u23ED\uFE0F Skipped: ${destroyResults.skipped.length}`);
         if (destroyResults.failed.length > 0) {
-          console.log(
-            `  Failed components: ${destroyResults.failed.join(", ")}`
-          );
+          console.log(`  Failed components: ${destroyResults.failed.join(", ")}`);
         }
         console.log("\u{1F30C} [Year3000System] All systems destroyed.");
       }
@@ -13279,21 +12222,9 @@ var catppuccinStarryNight = (() => {
         return;
       }
       const defaults = this.YEAR3000_CONFIG.catppuccinDefaults || {};
-      const primaryColorHex =
-        extractedColors.VIBRANT ||
-        extractedColors.PROMINENT ||
-        defaults.mauve ||
-        "#ca9ee6";
-      const secondaryColorHex =
-        extractedColors.DARK_VIBRANT ||
-        extractedColors.DESATURATED ||
-        defaults.lavender ||
-        "#babbf1";
-      const accentColorHex =
-        extractedColors.VIBRANT_NON_ALARMING ||
-        extractedColors.LIGHT_VIBRANT ||
-        defaults.blue ||
-        "#8caaee";
+      const primaryColorHex = extractedColors.VIBRANT || extractedColors.PROMINENT || defaults.mauve || "#ca9ee6";
+      const secondaryColorHex = extractedColors.DARK_VIBRANT || extractedColors.DESATURATED || defaults.lavender || "#babbf1";
+      const accentColorHex = extractedColors.VIBRANT_NON_ALARMING || extractedColors.LIGHT_VIBRANT || defaults.blue || "#8caaee";
       const primaryRgbSource = this.utils.hexToRgb(primaryColorHex);
       const secondaryRgbSource = this.utils.hexToRgb(secondaryColorHex);
       const accentRgbSource = this.utils.hexToRgb(accentColorHex);
@@ -13314,15 +12245,14 @@ var catppuccinStarryNight = (() => {
         accentRgbSource?.b ?? defaultRgb.b
       );
       let musicContext = {};
-      const latestMusicData =
-        this.musicAnalysisService?.getLatestProcessedData();
+      const latestMusicData = this.musicAnalysisService?.getLatestProcessedData();
       if (this.YEAR3000_CONFIG.enableMusicAnalysis && latestMusicData) {
         musicContext = {
           musicEnergy: latestMusicData.processedEnergy,
           // Ensure field names match service output
           moodIdentifier: latestMusicData.moodIdentifier,
           // Ensure field names match service output
-          visualIntensity: latestMusicData.visualIntensity,
+          visualIntensity: latestMusicData.visualIntensity
           // Ensure field names match service output
         };
       }
@@ -13369,10 +12299,7 @@ var catppuccinStarryNight = (() => {
         finalAccentRgb.b
       );
       rootElement.style.setProperty("--sn-gradient-primary", finalPrimaryHex);
-      rootElement.style.setProperty(
-        "--sn-gradient-secondary",
-        finalSecondaryHex
-      );
+      rootElement.style.setProperty("--sn-gradient-secondary", finalSecondaryHex);
       rootElement.style.setProperty("--sn-gradient-accent", finalAccentHex);
       rootElement.style.setProperty(
         "--sn-gradient-primary-rgb",
@@ -13389,12 +12316,12 @@ var catppuccinStarryNight = (() => {
       const oklabColors = {
         primary: processedPrimaryOklab,
         secondary: processedSecondaryOklab,
-        accent: processedAccentOklab,
+        accent: processedAccentOklab
       };
       const finalRgbs = {
         primary: finalPrimaryRgb,
         secondary: finalSecondaryRgb,
-        accent: finalAccentRgb,
+        accent: finalAccentRgb
       };
       for (const key of ["primary", "secondary", "accent"]) {
         const derivedProps = this.utils.calculateOklabDerivedProperties(
@@ -13443,9 +12370,7 @@ var catppuccinStarryNight = (() => {
     }
     async updateColorsFromCurrentTrack() {
       if (this.YEAR3000_CONFIG.enableDebug) {
-        console.log(
-          "\u{1F504} [Year3000System] updateColorsFromCurrentTrack() called."
-        );
+        console.log("\u{1F504} [Year3000System] updateColorsFromCurrentTrack() called.");
       }
       let originalExtractedColors = null;
       try {
@@ -13480,7 +12405,7 @@ var catppuccinStarryNight = (() => {
         originalExtractedColors = {};
       }
       let colorsToApply = {
-        ...(originalExtractedColors || {}),
+        ...originalExtractedColors || {}
       };
       const harmonicMode = this.YEAR3000_CONFIG.currentHarmonicMode;
       const evolveHarmonies = this.YEAR3000_CONFIG.harmonicEvolution;
@@ -13497,11 +12422,8 @@ var catppuccinStarryNight = (() => {
             );
           }
         } else if (evolveHarmonies) {
-          baseHexForHarmonics =
-            originalExtractedColors?.VIBRANT ||
-            originalExtractedColors?.PROMINENT ||
-            defaults.mauve || // Fallback to Catppuccin default
-            "#ca9ee6";
+          baseHexForHarmonics = originalExtractedColors?.VIBRANT || originalExtractedColors?.PROMINENT || defaults.mauve || // Fallback to Catppuccin default
+          "#ca9ee6";
           if (this.YEAR3000_CONFIG.enableDebug) {
             console.log(
               "[Year3000System updateColors] Using auto base for harmonics:",
@@ -13531,7 +12453,7 @@ var catppuccinStarryNight = (() => {
               ...colorsToApply,
               VIBRANT: baseHexForHarmonics,
               DARK_VIBRANT: harmonicSet.derivedDarkVibrantHex,
-              LIGHT_VIBRANT: harmonicSet.derivedLightVibrantHex,
+              LIGHT_VIBRANT: harmonicSet.derivedLightVibrantHex
             };
           } else {
             if (this.YEAR3000_CONFIG.enableDebug) {
@@ -13556,11 +12478,7 @@ var catppuccinStarryNight = (() => {
           `\u{1F3B6} [Year3000System] evolveHarmonicSignature(${selectedModeKey}, ${baseSourceHex}) called.`
         );
       }
-      if (
-        !selectedModeKey ||
-        !baseSourceHex ||
-        !this.HARMONIC_MODES[selectedModeKey]
-      ) {
+      if (!selectedModeKey || !baseSourceHex || !this.HARMONIC_MODES[selectedModeKey]) {
         console.warn(
           "[Year3000System evolveHarmonicSignature] Invalid mode key or base hex. Mode:",
           selectedModeKey,
@@ -13588,34 +12506,30 @@ var catppuccinStarryNight = (() => {
       let derivedOklab1, derivedOklab2;
       if (rawHarmonicOklabs && rawHarmonicOklabs.length > 0) {
         derivedOklab1 = rawHarmonicOklabs[0];
-        derivedOklab2 =
-          rawHarmonicOklabs.length > 1
-            ? rawHarmonicOklabs[1]
-            : {
-                ...rawHarmonicOklabs[0],
-                L: Math.max(
-                  0.1,
-                  Math.min(
-                    0.9,
-                    rawHarmonicOklabs[0].L *
-                      (rawHarmonicOklabs[0].L > 0.5 ? 0.8 : 1.2)
-                  )
-                ),
-              };
+        derivedOklab2 = rawHarmonicOklabs.length > 1 ? rawHarmonicOklabs[1] : {
+          ...rawHarmonicOklabs[0],
+          L: Math.max(
+            0.1,
+            Math.min(
+              0.9,
+              rawHarmonicOklabs[0].L * (rawHarmonicOklabs[0].L > 0.5 ? 0.8 : 1.2)
+            )
+          )
+        };
       } else {
         derivedOklab1 = {
           ...baseOklab,
-          L: Math.max(0.1, Math.min(0.9, baseOklab.L * 0.75)),
+          L: Math.max(0.1, Math.min(0.9, baseOklab.L * 0.75))
         };
         derivedOklab2 = {
           ...baseOklab,
-          L: Math.max(0.1, Math.min(0.9, baseOklab.L * 1.25)),
+          L: Math.max(0.1, Math.min(0.9, baseOklab.L * 1.25))
         };
       }
       const blendWithIntensity = (targetOklab) => ({
         L: baseOklab.L + (targetOklab.L - baseOklab.L) * intensity,
         a: baseOklab.a + (targetOklab.a - baseOklab.a) * intensity,
-        b: baseOklab.b + (targetOklab.b - baseOklab.b) * intensity,
+        b: baseOklab.b + (targetOklab.b - baseOklab.b) * intensity
       });
       const finalOklab1 = blendWithIntensity(derivedOklab1);
       const finalOklab2 = blendWithIntensity(derivedOklab2);
@@ -13648,41 +12562,32 @@ var catppuccinStarryNight = (() => {
         lightVibrantHex = finalHex1;
       }
       if (this.YEAR3000_CONFIG.enableDebug) {
-        console.log(
-          "\u{1F3B6} [Year3000System] evolveHarmonicSignature() produced:",
-          {
-            derivedDarkVibrantHex: darkVibrantHex,
-            derivedLightVibrantHex: lightVibrantHex,
-          }
-        );
+        console.log("\u{1F3B6} [Year3000System] evolveHarmonicSignature() produced:", {
+          derivedDarkVibrantHex: darkVibrantHex,
+          derivedLightVibrantHex: lightVibrantHex
+        });
       }
       return {
         derivedDarkVibrantHex: darkVibrantHex,
-        derivedLightVibrantHex: lightVibrantHex,
+        derivedLightVibrantHex: lightVibrantHex
       };
     }
     // Enhanced helper method inspired by Cat Jam extension for reliable track data retrieval
     async waitForTrackData(maxRetries = 10, delayMs = 100) {
       for (let i = 0; i < maxRetries; i++) {
-        const track =
-          Spicetify.Player.data?.item ||
-          Spicetify.Player.data?.track ||
-          Spicetify.Player.state?.track ||
-          Spicetify.Queue?.track;
+        const track = Spicetify.Player.data?.item || Spicetify.Player.data?.track || Spicetify.Player.state?.track || Spicetify.Queue?.track;
         if (track?.uri) {
           if (this.YEAR3000_CONFIG.enableDebug) {
             console.log(
-              `\u{1F3A7} [Year3000System] Track data retrieved on attempt ${
-                i + 1
-              }:`,
+              `\u{1F3A7} [Year3000System] Track data retrieved on attempt ${i + 1}:`,
               track.uri
             );
           }
           return track;
         }
         if (i < maxRetries - 1) {
-          await new Promise((resolve) =>
-            setTimeout(resolve, delayMs * Math.pow(1.5, i))
+          await new Promise(
+            (resolve) => setTimeout(resolve, delayMs * Math.pow(1.5, i))
           );
         }
       }
@@ -13703,8 +12608,7 @@ var catppuccinStarryNight = (() => {
         return;
       }
       const computedRootStyle = getComputedStyle(rootElement);
-      const getColorVal = (varName) =>
-        computedRootStyle.getPropertyValue(varName).trim();
+      const getColorVal = (varName) => computedRootStyle.getPropertyValue(varName).trim();
       const hexVariables = {
         main: getColorVal("--spice-main"),
         player: getColorVal("--spice-player"),
@@ -13714,7 +12618,7 @@ var catppuccinStarryNight = (() => {
         // Catppuccin standard with fallback
         surface1: getColorVal("--spice-surface1") || getColorVal("--surface1"),
         // Catppuccin standard with fallback
-        text: getColorVal("--spice-text"),
+        text: getColorVal("--spice-text")
       };
       const rgbMappings = {
         main: ["--spice-rgb-main", "--spice-rgb-base"],
@@ -13723,21 +12627,16 @@ var catppuccinStarryNight = (() => {
         card: ["--spice-rgb-card"],
         surface0: ["--spice-rgb-surface0"],
         surface1: ["--spice-rgb-surface1"],
-        text: ["--spice-rgb-text"],
+        text: ["--spice-rgb-text"]
       };
       for (const key in hexVariables) {
         if (hexVariables[key]) {
           const rgb = this.utils.hexToRgb(
-            hexVariables[key].startsWith("#")
-              ? hexVariables[key]
-              : `#${hexVariables[key]}`
+            hexVariables[key].startsWith("#") ? hexVariables[key] : `#${hexVariables[key]}`
           );
           if (rgb && rgbMappings[key]) {
             rgbMappings[key].forEach((cssVar) => {
-              rootElement.style.setProperty(
-                cssVar,
-                `${rgb.r},${rgb.g},${rgb.b}`
-              );
+              rootElement.style.setProperty(cssVar, `${rgb.r},${rgb.g},${rgb.b}`);
             });
           }
         } else {
@@ -13780,24 +12679,14 @@ var catppuccinStarryNight = (() => {
           musicData
         );
       }
-      if (
-        this.YEAR3000_CONFIG.enableCosmicSync &&
-        musicData &&
-        typeof musicData.energy !== "undefined" &&
-        typeof musicData.valence !== "undefined"
-      ) {
+      if (this.YEAR3000_CONFIG.enableCosmicSync && musicData && typeof musicData.energy !== "undefined" && typeof musicData.valence !== "undefined") {
         let musicMultiplier = 1;
         try {
-          if (
-            this.colorHarmonyEngine?.getMusicIntensityMultiplier &&
-            typeof this.colorHarmonyEngine.getMusicIntensityMultiplier ===
-              "function"
-          ) {
-            musicMultiplier =
-              this.colorHarmonyEngine.getMusicIntensityMultiplier(
-                musicData.energy || 0.5,
-                musicData.valence || 0.5
-              );
+          if (this.colorHarmonyEngine?.getMusicIntensityMultiplier && typeof this.colorHarmonyEngine.getMusicIntensityMultiplier === "function") {
+            musicMultiplier = this.colorHarmonyEngine.getMusicIntensityMultiplier(
+              musicData.energy || 0.5,
+              musicData.valence || 0.5
+            );
           } else {
             if (this.YEAR3000_CONFIG.enableDebug) {
               console.warn(
@@ -13859,12 +12748,7 @@ var catppuccinStarryNight = (() => {
         "--sn-gradient-contrast",
         multipliers.contrast.toString()
       );
-      const blurIntensity =
-        artisticMode === "cosmic-maximum"
-          ? "40px"
-          : artisticMode === "artist-vision"
-          ? "35px"
-          : "30px";
+      const blurIntensity = artisticMode === "cosmic-maximum" ? "40px" : artisticMode === "artist-vision" ? "35px" : "30px";
       rootElement.style.setProperty("--sn-gradient-blur", blurIntensity);
       rootElement.style.setProperty(
         "--sn-gradient-transition",
@@ -13888,7 +12772,7 @@ var catppuccinStarryNight = (() => {
             saturation: multipliers.saturation,
             brightness: multipliers.brightness,
             contrast: multipliers.contrast,
-            blur: blurIntensity,
+            blur: blurIntensity
           }
         );
       }
@@ -13937,9 +12821,7 @@ var catppuccinStarryNight = (() => {
             await this.updateColorsFromCurrentTrack();
           } catch (e) {
             console.error(
-              `\u{1F3A8} [Year3000System processSongUpdate] Error during color update: ${
-                e.message || e
-              }`,
+              `\u{1F3A8} [Year3000System processSongUpdate] Error during color update: ${e.message || e}`,
               e
             );
           }
@@ -13957,10 +12839,7 @@ var catppuccinStarryNight = (() => {
                 "[Year3000System processSongUpdate] MusicAnalysisService not available. Skipping analysis."
               );
             }
-          } else if (
-            !Spicetify.getAudioData ||
-            typeof Spicetify.getAudioData !== "function"
-          ) {
+          } else if (!Spicetify.getAudioData || typeof Spicetify.getAudioData !== "function") {
             if (this.YEAR3000_CONFIG.enableDebug) {
               console.warn(
                 "[Year3000System processSongUpdate] Spicetify.getAudioData is not available. Skipping music feature fetching."
@@ -13996,9 +12875,7 @@ var catppuccinStarryNight = (() => {
               );
             } catch (e) {
               console.error(
-                `\u{1F3A7} [Year3000System processSongUpdate] Error fetching/processing realistic audio data: ${
-                  e.message || e
-                }`,
+                `\u{1F3A7} [Year3000System processSongUpdate] Error fetching/processing realistic audio data: ${e.message || e}`,
                 e
               );
               try {
@@ -14031,10 +12908,7 @@ var catppuccinStarryNight = (() => {
       };
       if (Spicetify.Player) {
         this._songChangeHandler = processSongUpdate;
-        Spicetify.Player.addEventListener(
-          "songchange",
-          this._songChangeHandler
-        );
+        Spicetify.Player.addEventListener("songchange", this._songChangeHandler);
         if (this.YEAR3000_CONFIG.enableDebug) {
           console.log(
             "\u{1F3A7} [Year3000System setupMusicAnalysisAndColorExtraction] Added songchange listener."
@@ -14058,7 +12932,7 @@ var catppuccinStarryNight = (() => {
         "getCurrentModeProfile",
         "getCurrentMultipliers",
         "getCurrentFeatures",
-        "getCurrentPerformanceSettings",
+        "getCurrentPerformanceSettings"
       ];
       const missingMethods = requiredMethods.filter(
         (method) => typeof this.YEAR3000_CONFIG[method] !== "function"
@@ -14078,10 +12952,7 @@ var catppuccinStarryNight = (() => {
      * @param {string} mode - Optional mode to initialize, defaults to current settings
      */
     async initializeArtisticMode(mode = null) {
-      const targetMode =
-        mode ||
-        this.settingsManager?.get("sn-artisticMode") ||
-        this.YEAR3000_CONFIG.artisticMode;
+      const targetMode = mode || this.settingsManager?.get("sn-artisticMode") || this.YEAR3000_CONFIG.artisticMode;
       if (this.YEAR3000_CONFIG.enableDebug) {
         console.log(
           `\u{1F3A8} [Year3000System] Initializing artistic mode: ${targetMode}`
@@ -14121,7 +12992,7 @@ var catppuccinStarryNight = (() => {
       if (typeof document !== "undefined") {
         document.dispatchEvent(
           new CustomEvent("year3000ArtisticModeInitialized", {
-            detail: { mode: targetMode, profile: modeProfile },
+            detail: { mode: targetMode, profile: modeProfile }
           })
         );
       }
@@ -14158,9 +13029,7 @@ var catppuccinStarryNight = (() => {
           await this.updateColorsFromCurrentTrack();
         }
         if (this.YEAR3000_CONFIG.enableDebug) {
-          console.log(
-            `\u2705 [Year3000System] Successfully switched to: ${newMode}`
-          );
+          console.log(`\u2705 [Year3000System] Successfully switched to: ${newMode}`);
         }
         return true;
       } catch (error) {
@@ -14184,10 +13053,7 @@ var catppuccinStarryNight = (() => {
      * @returns {Object} Current mode profile including multipliers, features, and performance settings
      */
     getCurrentModeProfile() {
-      return (
-        ARTISTIC_MODE_PROFILES[this.YEAR3000_CONFIG.artisticMode] ||
-        ARTISTIC_MODE_PROFILES["artist-vision"]
-      );
+      return ARTISTIC_MODE_PROFILES[this.YEAR3000_CONFIG.artisticMode] || ARTISTIC_MODE_PROFILES["artist-vision"];
     }
     /**
      * Apply mode configuration to all visual systems
@@ -14203,13 +13069,11 @@ var catppuccinStarryNight = (() => {
       }
       try {
         if (this.glassmorphismManager && features.glassEffects) {
-          const glassIntensity =
-            features.glassEffects === true ? "moderate" : "disabled";
+          const glassIntensity = features.glassEffects === true ? "moderate" : "disabled";
           this.glassmorphismManager.applyGlassmorphismSettings(glassIntensity);
         }
         if (this.card3DManager && features.dimensionalEffects) {
-          const morphingMode =
-            features.dimensionalEffects === true ? "balanced" : "disabled";
+          const morphingMode = features.dimensionalEffects === true ? "balanced" : "disabled";
           this.card3DManager.apply3DMode(morphingMode);
         }
         if (this.lightweightParticleSystem) {
@@ -14217,7 +13081,7 @@ var catppuccinStarryNight = (() => {
             this.lightweightParticleSystem.updateModeConfiguration({
               maxParticles: performance2.maxParticles,
               enabled: features.particleStreams,
-              intensity: multipliers.kineticIntensity,
+              intensity: multipliers.kineticIntensity
             });
           }
         }
@@ -14226,7 +13090,7 @@ var catppuccinStarryNight = (() => {
             this.beatSyncVisualSystem.updateModeConfiguration({
               enabled: features.beatSync,
               intensity: multipliers.musicEnergyBoost,
-              throttle: performance2.animationThrottle,
+              throttle: performance2.animationThrottle
             });
           }
         }
@@ -14235,7 +13099,7 @@ var catppuccinStarryNight = (() => {
             this.dataGlyphSystem.updateModeConfiguration({
               enabled: features.dataGlyphs,
               animations: features.temporalEcho,
-              intensity: multipliers.kineticIntensity,
+              intensity: multipliers.kineticIntensity
             });
           }
         }
@@ -14244,7 +13108,7 @@ var catppuccinStarryNight = (() => {
             this.behavioralPredictionEngine.updateModeConfiguration({
               enabled: features.predictiveHighlights,
               empathyLevel: multipliers.quantumEmpathyLevel,
-              intensity: multipliers.temporalPlayFactor,
+              intensity: multipliers.temporalPlayFactor
             });
           }
         }
@@ -14254,7 +13118,7 @@ var catppuccinStarryNight = (() => {
               rippleEffects: features.rippleEffects,
               temporalEcho: features.temporalEcho,
               aestheticGravity: features.aestheticGravity || false,
-              intensity: multipliers.aestheticGravityStrength,
+              intensity: multipliers.aestheticGravityStrength
             });
           }
         }
@@ -14328,14 +13192,15 @@ var catppuccinStarryNight = (() => {
         );
       }
     }
-    setupEventListeners() {}
+    setupEventListeners() {
+    }
     getSystemReport() {
       if (this.YEAR3000_CONFIG.enableDebug) {
         console.log(
           "\u{1F4CA} [Year3000System] Generating comprehensive system report..."
         );
       }
-      const reportTimestamp = /* @__PURE__ */ new Date().toISOString();
+      const reportTimestamp = (/* @__PURE__ */ new Date()).toISOString();
       const report = {
         // === SYSTEM IDENTIFICATION ===
         timestamp: reportTimestamp,
@@ -14349,7 +13214,7 @@ var catppuccinStarryNight = (() => {
           enableCosmicSync: this.YEAR3000_CONFIG.enableCosmicSync,
           features: this.YEAR3000_CONFIG.getCurrentFeatures?.() || {},
           multipliers: this.YEAR3000_CONFIG.getCurrentMultipliers?.() || {},
-          modeProfile: this.getCurrentModeProfile(),
+          modeProfile: this.getCurrentModeProfile()
         },
         // === SYSTEM HEALTH METRICS ===
         health: this._generateHealthMetrics(),
@@ -14359,7 +13224,7 @@ var catppuccinStarryNight = (() => {
           lastInitTime: this._lastInitializationTime || 0,
           totalSystems: this._getTotalSystemCount(),
           successRate: this._calculateCurrentSuccessRate(),
-          retryHistory: this._initializationRetryHistory || [],
+          retryHistory: this._initializationRetryHistory || []
         },
         // === PERFORMANCE METRICS ===
         performance: this._generatePerformanceMetrics(),
@@ -14373,21 +13238,21 @@ var catppuccinStarryNight = (() => {
         settings: {
           current: this.settingsManager?.getAllSettings?.() || {},
           schema: this.settingsManager?.getSettingsSchema?.() || {},
-          validation: this._validateCurrentSettings(),
+          validation: this._validateCurrentSettings()
         },
         // === ADVANCED TELEMETRY ===
         telemetry: this._generateTelemetryData(),
         // === FUTURE-PROOFING STATUS ===
         compatibility: this._generateCompatibilityReport(),
         // === RECOMMENDATIONS ===
-        recommendations: this._generateSystemRecommendations(),
+        recommendations: this._generateSystemRecommendations()
       };
       if (this.YEAR3000_CONFIG.enableDebug) {
         console.log("\u{1F4CA} [Year3000System] System report generated:", {
           healthScore: report.health.overallScore,
           successRate: report.initialization.successRate,
           performanceScore: report.performance.overallScore,
-          recommendations: report.recommendations.length,
+          recommendations: report.recommendations.length
         });
       }
       return report;
@@ -14397,43 +13262,22 @@ var catppuccinStarryNight = (() => {
       const startTime = performance.now();
       const systemChecks = {
         coreConfig: this.YEAR3000_CONFIG ? 100 : 0,
-        settingsManager: this.settingsManager?.isHealthy?.()
-          ? 100
-          : this.settingsManager
-          ? 75
-          : 0,
-        musicAnalysis: this.musicAnalysisService?.isHealthy?.()
-          ? 100
-          : this.musicAnalysisService
-          ? 75
-          : 0,
-        colorHarmony: this.colorHarmonyEngine?.isHealthy?.()
-          ? 100
-          : this.colorHarmonyEngine
-          ? 75
-          : 0,
+        settingsManager: this.settingsManager?.isHealthy?.() ? 100 : this.settingsManager ? 75 : 0,
+        musicAnalysis: this.musicAnalysisService?.isHealthy?.() ? 100 : this.musicAnalysisService ? 75 : 0,
+        colorHarmony: this.colorHarmonyEngine?.isHealthy?.() ? 100 : this.colorHarmonyEngine ? 75 : 0,
         visualSystems: this._checkVisualSystemsHealth(),
-        performance: this.performanceMonitor?.getHealthScore?.() || 85,
+        performance: this.performanceMonitor?.getHealthScore?.() || 85
       };
-      const overallScore =
-        Object.values(systemChecks).reduce((sum, score) => sum + score, 0) /
-        Object.keys(systemChecks).length;
-      const healthLevel =
-        overallScore >= 95
-          ? "excellent"
-          : overallScore >= 85
-          ? "good"
-          : overallScore >= 70
-          ? "fair"
-          : "poor";
+      const overallScore = Object.values(systemChecks).reduce((sum, score) => sum + score, 0) / Object.keys(systemChecks).length;
+      const healthLevel = overallScore >= 95 ? "excellent" : overallScore >= 85 ? "good" : overallScore >= 70 ? "fair" : "poor";
       return {
         overallScore: Math.round(overallScore),
         healthLevel,
         systemChecks,
-        lastChecked: /* @__PURE__ */ new Date().toISOString(),
+        lastChecked: (/* @__PURE__ */ new Date()).toISOString(),
         checkDuration: performance.now() - startTime,
         issues: this._identifyHealthIssues(systemChecks),
-        trends: this._getHealthTrends(),
+        trends: this._getHealthTrends()
       };
     }
     // ✅ PHASE 5: Performance Metrics Collection
@@ -14442,31 +13286,31 @@ var catppuccinStarryNight = (() => {
         initialization: {
           lastDuration: this._lastInitializationTime || 0,
           averageDuration: this._getAverageInitTime(),
-          trend: this._getInitTimeTrend(),
+          trend: this._getInitTimeTrend()
         },
         memory: {
           usage: this._estimateMemoryUsage(),
           leakDetection: this._detectMemoryLeaks(),
-          optimization: this._getMemoryOptimizations(),
+          optimization: this._getMemoryOptimizations()
         },
         rendering: {
           frameRate: this._estimateFrameRate(),
           gpuUtilization: this._checkGPUUtilization(),
-          renderingOptimizations: this._getRenderingOptimizations(),
+          renderingOptimizations: this._getRenderingOptimizations()
         },
         responsiveness: {
           uiLatency: this._measureUILatency(),
           colorExtractionTime: this._getColorExtractionMetrics(),
-          settingsResponseTime: this._getSettingsResponseMetrics(),
+          settingsResponseTime: this._getSettingsResponseMetrics()
         },
-        overallScore: 0,
+        overallScore: 0
         // Will be calculated
       };
       const scores = [
         this._scoreInitialization(metrics.initialization),
         this._scoreMemory(metrics.memory),
         this._scoreRendering(metrics.rendering),
-        this._scoreResponsiveness(metrics.responsiveness),
+        this._scoreResponsiveness(metrics.responsiveness)
       ];
       metrics.overallScore = Math.round(
         scores.reduce((sum, score) => sum + score, 0) / scores.length
@@ -14481,7 +13325,7 @@ var catppuccinStarryNight = (() => {
         criticalErrors: this._getCriticalErrors(),
         recoveryActions: this._getRecoveryActions(),
         errorTrends: this._getErrorTrends(),
-        preventiveActions: this._getPreventiveActions(),
+        preventiveActions: this._getPreventiveActions()
       };
     }
     // ✅ PHASE 5: Component Status Analysis
@@ -14500,7 +13344,7 @@ var catppuccinStarryNight = (() => {
         behavioralPrediction: this._analyzeComponent(
           "behavioralPredictionEngine"
         ),
-        dimensionalNexus: this._analyzeComponent("dimensionalNexusSystem"),
+        dimensionalNexus: this._analyzeComponent("dimensionalNexusSystem")
       };
       const activeComponents = Object.values(components).filter(
         (c) => c.status !== "not_available"
@@ -14514,9 +13358,8 @@ var catppuccinStarryNight = (() => {
           total: Object.keys(components).length,
           active: activeComponents,
           healthy: healthyComponents,
-          healthRate:
-            Math.round((healthyComponents / activeComponents) * 100) || 0,
-        },
+          healthRate: Math.round(healthyComponents / activeComponents * 100) || 0
+        }
       };
     }
     // ✅ PHASE 5: Music Analysis Integration Report
@@ -14528,10 +13371,9 @@ var catppuccinStarryNight = (() => {
         available: true,
         currentTrack: this.musicAnalysisService.getCurrentTrack?.() || null,
         analysisMetrics: this.musicAnalysisService.getMetrics?.() || {},
-        colorExtraction:
-          this.musicAnalysisService.getColorExtractionStatus?.() || {},
+        colorExtraction: this.musicAnalysisService.getColorExtractionStatus?.() || {},
         performance: this.musicAnalysisService.getPerformanceMetrics?.() || {},
-        subscribers: this.musicAnalysisService.getSubscriberCount?.() || 0,
+        subscribers: this.musicAnalysisService.getSubscriberCount?.() || 0
       };
     }
     // ✅ PHASE 5: Settings Validation
@@ -14542,17 +13384,17 @@ var catppuccinStarryNight = (() => {
       try {
         const validation = this.settingsManager.validateAllSettings?.() || {
           valid: true,
-          issues: [],
+          issues: []
         };
         return {
           ...validation,
-          timestamp: /* @__PURE__ */ new Date().toISOString(),
+          timestamp: (/* @__PURE__ */ new Date()).toISOString()
         };
       } catch (error) {
         return {
           valid: false,
           error: error.message,
-          timestamp: /* @__PURE__ */ new Date().toISOString(),
+          timestamp: (/* @__PURE__ */ new Date()).toISOString()
         };
       }
     }
@@ -14564,7 +13406,7 @@ var catppuccinStarryNight = (() => {
         features: this._getFeatureUsageMetrics(),
         errors: this._getErrorStatistics(),
         performance: this._getPerformanceStatistics(),
-        compatibility: this._getCompatibilityMetrics(),
+        compatibility: this._getCompatibilityMetrics()
       };
     }
     // ✅ PHASE 5: Compatibility Assessment
@@ -14576,7 +13418,7 @@ var catppuccinStarryNight = (() => {
         features: this._checkFeatureCompatibility(),
         apis: this._checkAPICompatibility(),
         deprecations: this._checkDeprecatedFeatures(),
-        recommendations: this._getCompatibilityRecommendations(),
+        recommendations: this._getCompatibilityRecommendations()
       };
     }
     // ✅ PHASE 5: System Recommendations Engine
@@ -14589,7 +13431,7 @@ var catppuccinStarryNight = (() => {
           priority: "high",
           title: "Performance Optimization Needed",
           description: "System performance is below optimal levels",
-          actions: this._getPerformanceOptimizationActions(perfMetrics),
+          actions: this._getPerformanceOptimizationActions(perfMetrics)
         });
       }
       const healthMetrics = this._generateHealthMetrics();
@@ -14599,7 +13441,7 @@ var catppuccinStarryNight = (() => {
           priority: "medium",
           title: "System Health Improvement",
           description: "Some system components could be optimized",
-          actions: this._getHealthImprovementActions(healthMetrics),
+          actions: this._getHealthImprovementActions(healthMetrics)
         });
       }
       const errorAnalysis = this._generateErrorAnalysis();
@@ -14609,7 +13451,7 @@ var catppuccinStarryNight = (() => {
           priority: "high",
           title: "Critical Error Resolution",
           description: "Critical errors detected that need attention",
-          actions: errorAnalysis.preventiveActions,
+          actions: errorAnalysis.preventiveActions
         });
       }
       const featureRecommendations = this._getFeatureRecommendations();
@@ -14623,24 +13465,19 @@ var catppuccinStarryNight = (() => {
         "beatSyncVisualSystem",
         "lightweightParticleSystem",
         "dataGlyphSystem",
-        "dimensionalNexusSystem",
+        "dimensionalNexusSystem"
       ];
       let healthyCount = 0;
       let totalCount = 0;
       systems.forEach((systemName) => {
         if (this[systemName]) {
           totalCount++;
-          if (
-            this[systemName].isHealthy?.() ||
-            this[systemName].initialized !== false
-          ) {
+          if (this[systemName].isHealthy?.() || this[systemName].initialized !== false) {
             healthyCount++;
           }
         }
       });
-      return totalCount > 0
-        ? Math.round((healthyCount / totalCount) * 100)
-        : 100;
+      return totalCount > 0 ? Math.round(healthyCount / totalCount * 100) : 100;
     }
     _identifyHealthIssues(systemChecks) {
       const issues = [];
@@ -14650,7 +13487,7 @@ var catppuccinStarryNight = (() => {
             system,
             score,
             severity: score < 50 ? "critical" : "warning",
-            description: `${system} health score is ${score}%`,
+            description: `${system} health score is ${score}%`
           });
         }
       });
@@ -14660,7 +13497,7 @@ var catppuccinStarryNight = (() => {
       return {
         trend: "stable",
         change: 0,
-        period: "24h",
+        period: "24h"
       };
     }
     _analyzeComponent(componentName) {
@@ -14671,11 +13508,11 @@ var catppuccinStarryNight = (() => {
           status: "not_available",
           health: 0,
           lastUpdate: null,
-          issues: ["Component not initialized"],
+          issues: ["Component not initialized"]
         };
       }
       const isHealthy = component.isHealthy?.() || {
-        healthy: component.initialized !== false,
+        healthy: component.initialized !== false
       };
       const status = isHealthy.healthy ? "healthy" : "degraded";
       return {
@@ -14684,7 +13521,7 @@ var catppuccinStarryNight = (() => {
         health: isHealthy.score || (isHealthy.healthy ? 100 : 50),
         lastUpdate: component.lastUpdate || Date.now(),
         issues: isHealthy.issues || [],
-        features: component.getFeatureStatus?.() || {},
+        features: component.getFeatureStatus?.() || {}
       };
     }
     // ✅ PHASE 5: Placeholder implementations for advanced metrics
@@ -14694,14 +13531,10 @@ var catppuccinStarryNight = (() => {
     }
     _calculateCurrentSuccessRate() {
       const results = this.initializationResults;
-      if (!results) return 100;
-      const total =
-        results.success?.length +
-        results.failed?.length +
-        results.skipped?.length;
-      return total > 0
-        ? Math.round((results.success?.length / total) * 100)
-        : 100;
+      if (!results)
+        return 100;
+      const total = results.success?.length + results.failed?.length + results.skipped?.length;
+      return total > 0 ? Math.round(results.success?.length / total * 100) : 100;
     }
     _getAverageInitTime() {
       return this._lastInitializationTime || 20;
@@ -14806,10 +13639,7 @@ var catppuccinStarryNight = (() => {
       if (this.YEAR3000_CONFIG.enableDebug) {
         console.log("\u{1F504} [Year3000System] resetToDefaults() called.");
       }
-      if (
-        this.settingsManager &&
-        typeof this.settingsManager.resetAllToDefaults === "function"
-      ) {
+      if (this.settingsManager && typeof this.settingsManager.resetAllToDefaults === "function") {
         this.settingsManager.resetAllToDefaults();
         if (this.YEAR3000_CONFIG.enableDebug) {
           console.log(
@@ -14824,9 +13654,7 @@ var catppuccinStarryNight = (() => {
       const defaultColors = this.YEAR3000_CONFIG.catppuccinDefaults || {};
       this.applyColorsToTheme(defaultColors);
       if (this.YEAR3000_CONFIG.enableDebug) {
-        console.log(
-          "\u{1F504} [Year3000System] Default Catppuccin colors applied."
-        );
+        console.log("\u{1F504} [Year3000System] Default Catppuccin colors applied.");
       }
       if (this.YEAR3000_CONFIG.enableDebug) {
         console.log(
@@ -14845,14 +13673,14 @@ var catppuccinStarryNight = (() => {
         criticalInterval: 6e4,
         // 1 minute for critical issues
         maxConsecutiveFailures: 3,
-        autoRecoveryEnabled: true,
+        autoRecoveryEnabled: true
       };
       this._healthMonitoringData = {
         consecutiveFailures: 0,
         lastHealthScore: 100,
         healthHistory: [],
         recoveryAttempts: 0,
-        maxRecoveryAttempts: 5,
+        maxRecoveryAttempts: 5
       };
       this._healthMonitorInterval = setInterval(async () => {
         try {
@@ -14865,9 +13693,7 @@ var catppuccinStarryNight = (() => {
         }
       }, monitoringConfig.interval);
       if (this.YEAR3000_CONFIG.enableDebug) {
-        console.log(
-          "\u{1F504} [Year3000System] Proactive health monitoring started"
-        );
+        console.log("\u{1F504} [Year3000System] Proactive health monitoring started");
       }
     }
     stopProactiveHealthMonitoring() {
@@ -14875,9 +13701,7 @@ var catppuccinStarryNight = (() => {
         clearInterval(this._healthMonitorInterval);
         this._healthMonitorInterval = null;
         if (this.YEAR3000_CONFIG.enableDebug) {
-          console.log(
-            "\u{1F504} [Year3000System] Proactive health monitoring stopped"
-          );
+          console.log("\u{1F504} [Year3000System] Proactive health monitoring stopped");
         }
       }
     }
@@ -14887,24 +13711,19 @@ var catppuccinStarryNight = (() => {
       this._healthMonitoringData.healthHistory.push({
         timestamp: Date.now(),
         score: currentScore,
-        level: healthMetrics.healthLevel,
+        level: healthMetrics.healthLevel
       });
       const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1e3;
-      this._healthMonitoringData.healthHistory =
-        this._healthMonitoringData.healthHistory.filter(
-          (entry) => entry.timestamp > twentyFourHoursAgo
-        );
-      const scoreDrop =
-        this._healthMonitoringData.lastHealthScore - currentScore;
+      this._healthMonitoringData.healthHistory = this._healthMonitoringData.healthHistory.filter(
+        (entry) => entry.timestamp > twentyFourHoursAgo
+      );
+      const scoreDrop = this._healthMonitoringData.lastHealthScore - currentScore;
       if (scoreDrop > 10) {
-        console.warn(
-          "\u26A0\uFE0F [Year3000System] Health degradation detected:",
-          {
-            previous: this._healthMonitoringData.lastHealthScore,
-            current: currentScore,
-            drop: scoreDrop,
-          }
-        );
+        console.warn("\u26A0\uFE0F [Year3000System] Health degradation detected:", {
+          previous: this._healthMonitoringData.lastHealthScore,
+          current: currentScore,
+          drop: scoreDrop
+        });
       }
       if (currentScore < 70) {
         this._healthMonitoringData.consecutiveFailures++;
@@ -14919,15 +13738,12 @@ var catppuccinStarryNight = (() => {
         console.log("\u{1F49A} [Year3000System] Health check completed:", {
           score: currentScore,
           level: healthMetrics.healthLevel,
-          trend: this._calculateHealthTrend(),
+          trend: this._calculateHealthTrend()
         });
       }
     }
     async _handleCriticalHealthIssue(healthMetrics) {
-      if (
-        this._healthMonitoringData.recoveryAttempts >=
-        this._healthMonitoringData.maxRecoveryAttempts
-      ) {
+      if (this._healthMonitoringData.recoveryAttempts >= this._healthMonitoringData.maxRecoveryAttempts) {
         console.error(
           "\u{1F6A8} [Year3000System] Maximum recovery attempts reached - entering safe mode"
         );
@@ -14935,13 +13751,10 @@ var catppuccinStarryNight = (() => {
         return;
       }
       this._healthMonitoringData.recoveryAttempts++;
-      console.warn(
-        "\u{1F527} [Year3000System] Attempting automatic recovery:",
-        {
-          attempt: this._healthMonitoringData.recoveryAttempts,
-          issues: healthMetrics.issues,
-        }
-      );
+      console.warn("\u{1F527} [Year3000System] Attempting automatic recovery:", {
+        attempt: this._healthMonitoringData.recoveryAttempts,
+        issues: healthMetrics.issues
+      });
       for (const issue of healthMetrics.issues) {
         if (issue.severity === "critical") {
           await this._attemptSystemRecovery(issue.system);
@@ -14952,7 +13765,7 @@ var catppuccinStarryNight = (() => {
         if (newHealth.overallScore > 80) {
           console.log("\u2705 [Year3000System] Recovery successful:", {
             newScore: newHealth.overallScore,
-            attempt: this._healthMonitoringData.recoveryAttempts,
+            attempt: this._healthMonitoringData.recoveryAttempts
           });
           this._healthMonitoringData.recoveryAttempts = 0;
         }
@@ -14981,15 +13794,12 @@ var catppuccinStarryNight = (() => {
           console.warn(
             `\u26A0\uFE0F [Year3000System] No recovery strategy for ${systemName}`
           );
-        },
+        }
       };
-      const strategy =
-        recoveryStrategies[systemName] || recoveryStrategies.default;
+      const strategy = recoveryStrategies[systemName] || recoveryStrategies.default;
       try {
         await strategy();
-        console.log(
-          `\u{1F527} [Year3000System] Recovery attempted for ${systemName}`
-        );
+        console.log(`\u{1F527} [Year3000System] Recovery attempted for ${systemName}`);
       } catch (error) {
         console.error(
           `\u274C [Year3000System] Recovery failed for ${systemName}:`,
@@ -15004,7 +13814,7 @@ var catppuccinStarryNight = (() => {
       const safeConfig = {
         artisticMode: "corporate-safe",
         enableCosmicSync: false,
-        musicModulationIntensity: 0.1,
+        musicModulationIntensity: 0.1
       };
       Object.assign(this.YEAR3000_CONFIG, safeConfig);
       const nonCriticalSystems = [
@@ -15012,13 +13822,10 @@ var catppuccinStarryNight = (() => {
         "beatSyncVisualSystem",
         "dataGlyphSystem",
         "dimensionalNexusSystem",
-        "aestheticGravitySystem",
+        "aestheticGravitySystem"
       ];
       for (const systemName of nonCriticalSystems) {
-        if (
-          this[systemName] &&
-          typeof this[systemName].destroy === "function"
-        ) {
+        if (this[systemName] && typeof this[systemName].destroy === "function") {
           try {
             await this[systemName].destroy();
             this[systemName] = null;
@@ -15042,7 +13849,8 @@ var catppuccinStarryNight = (() => {
       );
     }
     exitSafeMode() {
-      if (!this._inSafeMode) return;
+      if (!this._inSafeMode)
+        return;
       console.log(
         "\u{1F31F} [Year3000System] Exiting safe mode - reinitializing systems"
       );
@@ -15052,24 +13860,22 @@ var catppuccinStarryNight = (() => {
       root.classList.remove("year3000-safe-mode");
       this._healthMonitoringData.recoveryAttempts = 0;
       this._healthMonitoringData.consecutiveFailures = 0;
-      this.initializeAllSystems()
-        .then(() => {
-          console.log("\u2705 [Year3000System] Safe mode exit completed");
-        })
-        .catch((error) => {
-          console.error(
-            "\u274C [Year3000System] Error exiting safe mode:",
-            error
-          );
-        });
+      this.initializeAllSystems().then(() => {
+        console.log("\u2705 [Year3000System] Safe mode exit completed");
+      }).catch((error) => {
+        console.error("\u274C [Year3000System] Error exiting safe mode:", error);
+      });
     }
     _calculateHealthTrend() {
       const history = this._healthMonitoringData.healthHistory;
-      if (history.length < 2) return "insufficient_data";
+      if (history.length < 2)
+        return "insufficient_data";
       const recent = history.slice(-5);
       const trend = recent[recent.length - 1].score - recent[0].score;
-      if (trend > 5) return "improving";
-      if (trend < -5) return "declining";
+      if (trend > 5)
+        return "improving";
+      if (trend < -5)
+        return "declining";
       return "stable";
     }
     // ✅ PHASE 5: Enhanced Debug Interface
@@ -15080,34 +13886,29 @@ var catppuccinStarryNight = (() => {
           active: !!this._healthMonitorInterval,
           data: this._healthMonitoringData,
           trend: this._calculateHealthTrend(),
-          safeMode: this._inSafeMode || false,
+          safeMode: this._inSafeMode || false
         },
         performanceProfile: {
           initialization: this.initializationResults,
           memoryEstimate: this._estimateMemoryUsage(),
-          renderingMetrics: this._estimateFrameRate(),
+          renderingMetrics: this._estimateFrameRate()
         },
         systemIntelligence: {
           predictiveRecommendations: this._generateSystemRecommendations(),
           errorPatterns: this._analyzeErrorPatterns(),
-          optimizationOpportunities: this._identifyOptimizationOpportunities(),
-        },
+          optimizationOpportunities: this._identifyOptimizationOpportunities()
+        }
       };
     }
     _identifyOptimizationOpportunities() {
       const opportunities = [];
       const memoryUsage = this._estimateMemoryUsage();
-      if (
-        memoryUsage.current &&
-        memoryUsage.current.includes("MB") &&
-        parseInt(memoryUsage.current) > 20
-      ) {
+      if (memoryUsage.current && memoryUsage.current.includes("MB") && parseInt(memoryUsage.current) > 20) {
         opportunities.push({
           type: "memory",
           priority: "medium",
-          description:
-            "Memory usage is high - consider reducing particle count or disabling intensive effects",
-          action: "Reduce performance quality setting",
+          description: "Memory usage is high - consider reducing particle count or disabling intensive effects",
+          action: "Reduce performance quality setting"
         });
       }
       const frameRate = this._estimateFrameRate();
@@ -15115,9 +13916,8 @@ var catppuccinStarryNight = (() => {
         opportunities.push({
           type: "performance",
           priority: "high",
-          description:
-            "Frame rate is below target - disable resource-intensive features",
-          action: "Switch to corporate-safe mode or disable particle effects",
+          description: "Frame rate is below target - disable resource-intensive features",
+          action: "Switch to corporate-safe mode or disable particle effects"
         });
       }
       const initTime = this._lastInitializationTime || 0;
@@ -15125,9 +13925,8 @@ var catppuccinStarryNight = (() => {
         opportunities.push({
           type: "startup",
           priority: "low",
-          description:
-            "Initialization is slow - consider lazy loading some systems",
-          action: "Review system initialization order",
+          description: "Initialization is slow - consider lazy loading some systems",
+          action: "Review system initialization order"
         });
       }
       return opportunities;
@@ -15136,12 +13935,7 @@ var catppuccinStarryNight = (() => {
     /**
      * Register an animation system - delegates to MasterAnimationCoordinator
      */
-    registerAnimationSystem(
-      systemName,
-      system,
-      priority = "normal",
-      targetFPS = 60
-    ) {
+    registerAnimationSystem(systemName, system, priority = "normal", targetFPS = 60) {
       if (this.masterAnimationCoordinator) {
         return this.masterAnimationCoordinator.registerAnimationSystem(
           systemName,
@@ -15177,19 +13971,14 @@ var catppuccinStarryNight = (() => {
       return {
         error: "MasterAnimationCoordinator not available",
         isRunning: false,
-        registeredSystems: 0,
+        registeredSystems: 0
       };
     }
     // === DELEGATED TIMER METHODS ===
     /**
      * Register a timer - delegates to TimerConsolidationSystem
      */
-    registerConsolidatedTimer(
-      timerId,
-      callback,
-      intervalMs,
-      priority = "normal"
-    ) {
+    registerConsolidatedTimer(timerId, callback, intervalMs, priority = "normal") {
       if (this.timerConsolidationSystem) {
         return this.timerConsolidationSystem.registerTimer(
           timerId,
@@ -15223,7 +14012,7 @@ var catppuccinStarryNight = (() => {
       return {
         error: "TimerConsolidationSystem not available",
         enabled: false,
-        activeTimers: 0,
+        activeTimers: 0
       };
     }
     /**
@@ -15238,18 +14027,15 @@ var catppuccinStarryNight = (() => {
           type: "performance",
           priority: "high",
           message: "Frame rate below 60fps - consider reducing visual effects",
-          action: "Switch to performance mode or disable background animations",
+          action: "Switch to performance mode or disable background animations"
         });
       }
-      if (
-        this._performanceMetrics.droppedFrames >
-        this._performanceMetrics.frameCount * 0.05
-      ) {
+      if (this._performanceMetrics.droppedFrames > this._performanceMetrics.frameCount * 0.05) {
         recommendations.push({
           type: "stability",
           priority: "medium",
           message: "High frame drop rate detected",
-          action: "Check for expensive operations in animation loops",
+          action: "Check for expensive operations in animation loops"
         });
       }
       this._performanceMetrics.systemStats.forEach((stats, systemName) => {
@@ -15260,7 +14046,7 @@ var catppuccinStarryNight = (() => {
             message: `System ${systemName} has expensive frames (${stats.maxTime.toFixed(
               2
             )}ms max)`,
-            action: "Consider optimizing or reducing update frequency",
+            action: "Consider optimizing or reducing update frequency"
           });
         }
       });
@@ -15339,14 +14125,15 @@ var catppuccinStarryNight = (() => {
      */
     _generateTimerRecommendations() {
       const recommendations = [];
-      if (!this._timerRegistry) return recommendations;
+      if (!this._timerRegistry)
+        return recommendations;
       this._timerRegistry.forEach((config, timerId) => {
         if (config.errorCount > 2) {
           recommendations.push({
             type: "timer_errors",
             priority: "medium",
             message: `Timer ${timerId} has ${config.errorCount} errors`,
-            action: "Review timer callback for error handling",
+            action: "Review timer callback for error handling"
           });
         }
         if (config.maxTime > 8) {
@@ -15356,7 +14143,7 @@ var catppuccinStarryNight = (() => {
             message: `Timer ${timerId} has expensive execution (${config.maxTime.toFixed(
               2
             )}ms max)`,
-            action: "Optimize timer callback or reduce frequency",
+            action: "Optimize timer callback or reduce frequency"
           });
         }
         if (config.intervalMs < 100 && config.priority === "background") {
@@ -15364,8 +14151,7 @@ var catppuccinStarryNight = (() => {
             type: "timer_frequency",
             priority: "low",
             message: `Background timer ${timerId} has high frequency (${config.intervalMs}ms)`,
-            action:
-              "Consider reducing update frequency for background operations",
+            action: "Consider reducing update frequency for background operations"
           });
         }
       });
@@ -15406,7 +14192,7 @@ var catppuccinStarryNight = (() => {
       return {
         error: "CSSVariableBatcher not available",
         enabled: false,
-        totalUpdates: 0,
+        totalUpdates: 0
       };
     }
     // === DELEGATED DEVICE CAPABILITY METHODS ===
@@ -15430,7 +14216,7 @@ var catppuccinStarryNight = (() => {
       }
       return {
         error: "DeviceCapabilityDetector not available",
-        overall: "unknown",
+        overall: "unknown"
       };
     }
     /**
@@ -15442,7 +14228,7 @@ var catppuccinStarryNight = (() => {
       }
       return {
         error: "PerformanceAnalyzer not available",
-        overall: "unknown",
+        overall: "unknown"
       };
     }
     // === REMAINING DELEGATED METHODS ===
@@ -15451,10 +14237,7 @@ var catppuccinStarryNight = (() => {
      */
     enableGPUAcceleration(element, type = "standard") {
       if (this.deviceCapabilityDetector) {
-        return this.deviceCapabilityDetector.enableGPUAcceleration(
-          element,
-          type
-        );
+        return this.deviceCapabilityDetector.enableGPUAcceleration(element, type);
       }
       if (element && element.style) {
         element.style.transform = "translateZ(0)";
@@ -15479,18 +14262,10 @@ var catppuccinStarryNight = (() => {
   init_globalConfig();
   var RawSectionComponent = () => {
     const settingsManager = globalThis.year3000System?.settingsManager;
-    const glassmorphismManager =
-      globalThis.year3000System?.glassmorphismManager;
+    const glassmorphismManager = globalThis.year3000System?.glassmorphismManager;
     const card3DManager = globalThis.year3000System?.card3DManager;
     const year3000System = globalThis.year3000System;
-    if (
-      !settingsManager ||
-      !glassmorphismManager ||
-      !card3DManager ||
-      !year3000System ||
-      !YEAR3000_CONFIG ||
-      !HARMONIC_MODES
-    ) {
+    if (!settingsManager || !glassmorphismManager || !card3DManager || !year3000System || !YEAR3000_CONFIG || !HARMONIC_MODES) {
       if (YEAR3000_CONFIG?.enableDebug || !settingsManager) {
         console.warn(
           "[StarryNight Section] Essential managers/configs not yet available on globalThis.year3000System. UI will be minimal or delayed."
@@ -15498,120 +14273,76 @@ var catppuccinStarryNight = (() => {
       }
       return Spicetify.React.createElement("div", null, "Loading settings...");
     }
-    const accents =
-      settingsManager.validationSchemas?.["catppuccin-accentColor"]
-        ?.allowedValues || [];
-    const gradientIntensityOptions =
-      settingsManager.validationSchemas?.[
-        "sn-gradientIntensity"
-      ]?.allowedValues.map((val) => ({
+    const accents = settingsManager.validationSchemas?.["catppuccin-accentColor"]?.allowedValues || [];
+    const gradientIntensityOptions = settingsManager.validationSchemas?.["sn-gradientIntensity"]?.allowedValues.map((val) => ({
+      value: val,
+      label: val.charAt(0).toUpperCase() + val.slice(1)
+    })) || [];
+    const starDensityOptions = settingsManager.validationSchemas?.["sn-starDensity"]?.allowedValues.map(
+      (val) => ({
         value: val,
-        label: val.charAt(0).toUpperCase() + val.slice(1),
-      })) || [];
-    const starDensityOptions =
-      settingsManager.validationSchemas?.["sn-starDensity"]?.allowedValues.map(
-        (val) => ({
-          value: val,
-          label: val.charAt(0).toUpperCase() + val.slice(1),
-        })
-      ) || [];
-    const performanceOptions =
-      settingsManager.validationSchemas?.[
-        "sn-performanceQuality"
-      ]?.allowedValues.map((val) => ({
+        label: val.charAt(0).toUpperCase() + val.slice(1)
+      })
+    ) || [];
+    const performanceOptions = settingsManager.validationSchemas?.["sn-performanceQuality"]?.allowedValues.map((val) => ({
+      value: val,
+      label: val === "auto" ? "Auto-Adjust" : val === "optimized" ? "Optimized Quality" : "High Fidelity"
+    })) || [];
+    const glassmorphismOptions = settingsManager.validationSchemas?.["sn-glassmorphismIntensity"]?.allowedValues.map((val) => ({
+      value: val,
+      label: val.charAt(0).toUpperCase() + val.slice(1)
+    })) || [];
+    const artisticModeOptions = settingsManager.validationSchemas?.["sn-artisticMode"]?.allowedValues.map(
+      (val) => ({
         value: val,
-        label:
-          val === "auto"
-            ? "Auto-Adjust"
-            : val === "optimized"
-            ? "Optimized Quality"
-            : "High Fidelity",
-      })) || [];
-    const glassmorphismOptions =
-      settingsManager.validationSchemas?.[
-        "sn-glassmorphismIntensity"
-      ]?.allowedValues.map((val) => ({
+        label: ARTISTIC_MODE_PROFILES[val]?.displayName || val.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "),
+        profile: ARTISTIC_MODE_PROFILES[val]
+      })
+    ) || [];
+    const morphing3DOptions = settingsManager.validationSchemas?.["sn-3dMorphingMode"]?.allowedValues.map(
+      (val) => ({
         value: val,
-        label: val.charAt(0).toUpperCase() + val.slice(1),
-      })) || [];
-    const artisticModeOptions =
-      settingsManager.validationSchemas?.["sn-artisticMode"]?.allowedValues.map(
-        (val) => ({
-          value: val,
-          label:
-            ARTISTIC_MODE_PROFILES[val]?.displayName ||
-            val
-              .split("-")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" "),
-          profile: ARTISTIC_MODE_PROFILES[val],
-        })
-      ) || [];
-    const morphing3DOptions =
-      settingsManager.validationSchemas?.[
-        "sn-3dMorphingMode"
-      ]?.allowedValues.map((val) => ({
-        value: val,
-        label: val.charAt(0).toUpperCase() + val.slice(1),
-      })) || [];
+        label: val.charAt(0).toUpperCase() + val.slice(1)
+      })
+    ) || [];
     const colorScheme = Spicetify.Config.color_scheme || "mocha";
-    const initialAccent =
-      settingsManager.get("catppuccin-accentColor") || accents[0];
-    const [selectedAccent, setSelectedAccent] =
-      Spicetify.React.useState(initialAccent);
-    const initialGradient =
-      settingsManager.get("sn-gradientIntensity") ||
-      gradientIntensityOptions[0]?.value;
-    const initialStars =
-      settingsManager.get("sn-starDensity") || starDensityOptions[0]?.value;
-    const initialPerformance =
-      settingsManager.get("sn-performanceQuality") ||
-      performanceOptions[0]?.value;
-    const [gradientIntensity, setGradientIntensity] =
-      Spicetify.React.useState(initialGradient);
-    const [starDensity, setStarDensity] =
-      Spicetify.React.useState(initialStars);
-    const [performanceQuality, setPerformanceQuality] =
-      Spicetify.React.useState(initialPerformance);
-    const initialGlass =
-      settingsManager.get("sn-glassmorphismIntensity") ||
-      glassmorphismOptions[0]?.value;
-    const [glassmorphismIntensity, setGlassmorphismIntensity] =
-      Spicetify.React.useState(initialGlass);
-    const initial3DMode =
-      settingsManager.get("sn-3dMorphingMode") || morphing3DOptions[0]?.value;
-    const [morphing3DMode, setMorphing3DMode] =
-      Spicetify.React.useState(initial3DMode);
-    const initialArtisticMode =
-      settingsManager.get(
-        "sn-artisticMode",
-        YEAR3000_CONFIG?.artisticMode || "artist-vision"
-      ) || artisticModeOptions[0]?.value;
-    const [artisticMode, setArtisticModeState] =
-      Spicetify.React.useState(initialArtisticMode);
+    const initialAccent = settingsManager.get("catppuccin-accentColor") || accents[0];
+    const [selectedAccent, setSelectedAccent] = Spicetify.React.useState(initialAccent);
+    const initialGradient = settingsManager.get("sn-gradientIntensity") || gradientIntensityOptions[0]?.value;
+    const initialStars = settingsManager.get("sn-starDensity") || starDensityOptions[0]?.value;
+    const initialPerformance = settingsManager.get("sn-performanceQuality") || performanceOptions[0]?.value;
+    const [gradientIntensity, setGradientIntensity] = Spicetify.React.useState(initialGradient);
+    const [starDensity, setStarDensity] = Spicetify.React.useState(initialStars);
+    const [performanceQuality, setPerformanceQuality] = Spicetify.React.useState(initialPerformance);
+    const initialGlass = settingsManager.get("sn-glassmorphismIntensity") || glassmorphismOptions[0]?.value;
+    const [glassmorphismIntensity, setGlassmorphismIntensity] = Spicetify.React.useState(initialGlass);
+    const initial3DMode = settingsManager.get("sn-3dMorphingMode") || morphing3DOptions[0]?.value;
+    const [morphing3DMode, setMorphing3DMode] = Spicetify.React.useState(initial3DMode);
+    const initialArtisticMode = settingsManager.get(
+      "sn-artisticMode",
+      YEAR3000_CONFIG?.artisticMode || "artist-vision"
+    ) || artisticModeOptions[0]?.value;
+    const [artisticMode, setArtisticModeState] = Spicetify.React.useState(initialArtisticMode);
     const initialHarmonicModeKey = Object.keys(HARMONIC_MODES)[0];
-    const initialHarmonicMode =
-      settingsManager.get("sn-currentHarmonicMode") || initialHarmonicModeKey;
-    const [currentHarmonicMode, setCurrentHarmonicMode] =
-      Spicetify.React.useState(initialHarmonicMode);
+    const initialHarmonicMode = settingsManager.get("sn-currentHarmonicMode") || initialHarmonicModeKey;
+    const [currentHarmonicMode, setCurrentHarmonicMode] = Spicetify.React.useState(initialHarmonicMode);
     const initialHarmonicIntensity = parseFloat(
       settingsManager.get("sn-harmonicIntensity") || "0.5"
     );
     const [harmonicIntensity, setHarmonicIntensity] = Spicetify.React.useState(
       initialHarmonicIntensity
     );
-    const initialHarmonicEvolution =
-      (settingsManager.get("sn-harmonicEvolution") || "true") === "true";
+    const initialHarmonicEvolution = (settingsManager.get("sn-harmonicEvolution") || "true") === "true";
     const [harmonicEvolution, setHarmonicEvolution] = Spicetify.React.useState(
       initialHarmonicEvolution
     );
-    const initialManualBaseColor =
-      settingsManager.get("sn-harmonicManualBaseColor") || "";
+    const initialManualBaseColor = settingsManager.get("sn-harmonicManualBaseColor") || "";
     const [manualBaseColor, setManualBaseColor] = Spicetify.React.useState(
       initialManualBaseColor
     );
     Spicetify.React.useEffect(() => {
-      if (!settingsManager) return;
+      if (!settingsManager)
+        return;
       try {
         const accent = selectedAccent === "none" ? "text" : selectedAccent;
         const properties = {
@@ -15619,9 +14350,7 @@ var catppuccinStarryNight = (() => {
           "--spice-button-active": `var(--spice-${selectedAccent})`,
           "--spice-equalizer": document.querySelector(
             "body > script.marketplaceScript"
-          )
-            ? `url('https://github.com/catppuccin/spicetify/blob/main/catppuccin/assets/${colorScheme}/equalizer-animated-${accent}.gif?raw=true')`
-            : `url('${colorScheme}/equalizer-animated-${accent}.gif')`,
+          ) ? `url('https://github.com/catppuccin/spicetify/blob/main/catppuccin/assets/${colorScheme}/equalizer-animated-${accent}.gif?raw=true')` : `url('${colorScheme}/equalizer-animated-${accent}.gif')`
         };
         Object.entries(properties).forEach(([property, value]) => {
           if (value.includes("none")) {
@@ -15636,20 +14365,19 @@ var catppuccinStarryNight = (() => {
       }
     }, [selectedAccent, colorScheme, settingsManager]);
     Spicetify.React.useEffect(() => {
-      if (!settingsManager) return;
+      if (!settingsManager)
+        return;
       try {
         applyStarryNightSettings(gradientIntensity, starDensity);
         settingsManager.set("sn-gradientIntensity", gradientIntensity);
         settingsManager.set("sn-starDensity", starDensity);
       } catch (error) {
-        console.error(
-          "StarryNight: Error applying StarryNight settings:",
-          error
-        );
+        console.error("StarryNight: Error applying StarryNight settings:", error);
       }
     }, [gradientIntensity, starDensity, settingsManager]);
     Spicetify.React.useEffect(() => {
-      if (!settingsManager) return;
+      if (!settingsManager)
+        return;
       try {
         settingsManager.set("sn-performanceQuality", performanceQuality);
         if (YEAR3000_CONFIG?.enableDebug) {
@@ -15658,14 +14386,12 @@ var catppuccinStarryNight = (() => {
           );
         }
       } catch (error) {
-        console.error(
-          "StarryNight: Error applying performance settings:",
-          error
-        );
+        console.error("StarryNight: Error applying performance settings:", error);
       }
     }, [performanceQuality, settingsManager, YEAR3000_CONFIG]);
     Spicetify.React.useEffect(() => {
-      if (!settingsManager || !YEAR3000_CONFIG || !year3000System) return;
+      if (!settingsManager || !YEAR3000_CONFIG || !year3000System)
+        return;
       try {
         if (year3000System.switchArtisticMode) {
           year3000System.switchArtisticMode(artisticMode);
@@ -15691,21 +14417,13 @@ var catppuccinStarryNight = (() => {
       }
     }, [artisticMode, settingsManager, YEAR3000_CONFIG, year3000System]);
     Spicetify.React.useEffect(() => {
-      if (!settingsManager || !YEAR3000_CONFIG) return;
+      if (!settingsManager || !YEAR3000_CONFIG)
+        return;
       try {
         settingsManager.set("sn-currentHarmonicMode", currentHarmonicMode);
-        settingsManager.set(
-          "sn-harmonicIntensity",
-          harmonicIntensity.toString()
-        );
-        settingsManager.set(
-          "sn-harmonicEvolution",
-          harmonicEvolution.toString()
-        );
-        if (
-          globalThis.year3000System &&
-          typeof globalThis.year3000System.updateConfiguration === "function"
-        ) {
+        settingsManager.set("sn-harmonicIntensity", harmonicIntensity.toString());
+        settingsManager.set("sn-harmonicEvolution", harmonicEvolution.toString());
+        if (globalThis.year3000System && typeof globalThis.year3000System.updateConfiguration === "function") {
           globalThis.year3000System.updateConfiguration(
             "currentHarmonicMode",
             currentHarmonicMode
@@ -15729,11 +14447,7 @@ var catppuccinStarryNight = (() => {
         if (year3000System && year3000System.updateColorsFromCurrentTrack) {
           year3000System.updateColorsFromCurrentTrack();
         }
-        if (
-          year3000System &&
-          year3000System.sidebarConsciousnessSystem &&
-          year3000System.sidebarConsciousnessSystem.updateHarmonicModeDisplay
-        ) {
+        if (year3000System && year3000System.sidebarConsciousnessSystem && year3000System.sidebarConsciousnessSystem.updateHarmonicModeDisplay) {
           year3000System.sidebarConsciousnessSystem.updateHarmonicModeDisplay(
             currentHarmonicMode
           );
@@ -15760,10 +14474,11 @@ var catppuccinStarryNight = (() => {
       harmonicEvolution,
       settingsManager,
       YEAR3000_CONFIG,
-      year3000System,
+      year3000System
     ]);
     Spicetify.React.useEffect(() => {
-      if (!settingsManager || !YEAR3000_CONFIG) return;
+      if (!settingsManager || !YEAR3000_CONFIG)
+        return;
       try {
         const hexRegex = /^(#?([0-9a-fA-F]{3}){1,2})$/i;
         let validatedColor = manualBaseColor.trim();
@@ -15784,10 +14499,7 @@ var catppuccinStarryNight = (() => {
           if (year3000System && year3000System.updateHarmonicBaseColor) {
             year3000System.updateHarmonicBaseColor(validatedColor);
           }
-          if (
-            YEAR3000_CONFIG.enableDebug ||
-            manualBaseColor !== validatedColor
-          ) {
+          if (YEAR3000_CONFIG.enableDebug || manualBaseColor !== validatedColor) {
             console.log(
               `StarryNight: Manual Harmonic Base Color processing. Input: "${manualBaseColor}", Applied: "${validatedColor}"`
             );
@@ -15807,19 +14519,11 @@ var catppuccinStarryNight = (() => {
       }
     }, [manualBaseColor, settingsManager, YEAR3000_CONFIG, year3000System]);
     Spicetify.React.useEffect(() => {
-      if (
-        !settingsManager ||
-        !glassmorphismManager ||
-        !card3DManager ||
-        !YEAR3000_CONFIG
-      )
+      if (!settingsManager || !glassmorphismManager || !card3DManager || !YEAR3000_CONFIG)
         return;
       try {
         glassmorphismManager.applyGlassmorphismSettings(glassmorphismIntensity);
-        settingsManager.set(
-          "sn-glassmorphismIntensity",
-          glassmorphismIntensity
-        );
+        settingsManager.set("sn-glassmorphismIntensity", glassmorphismIntensity);
         card3DManager.initialize();
         card3DManager.apply3DMode(morphing3DMode);
         glassmorphismManager.checkPerformanceAndAdjust();
@@ -15840,10 +14544,11 @@ var catppuccinStarryNight = (() => {
       settingsManager,
       glassmorphismManager,
       card3DManager,
-      YEAR3000_CONFIG,
+      YEAR3000_CONFIG
     ]);
     Spicetify.React.useEffect(() => {
-      if (!settingsManager || !card3DManager || !YEAR3000_CONFIG) return;
+      if (!settingsManager || !card3DManager || !YEAR3000_CONFIG)
+        return;
       try {
         card3DManager.apply3DMode(morphing3DMode);
         settingsManager.set("sn-3dMorphingMode", morphing3DMode);
@@ -15851,14 +14556,12 @@ var catppuccinStarryNight = (() => {
           console.log(`StarryNight: 3D morphing mode set to ${morphing3DMode}`);
         }
       } catch (error) {
-        console.error(
-          "StarryNight: Error applying 3D morphing settings:",
-          error
-        );
+        console.error("StarryNight: Error applying 3D morphing settings:", error);
       }
     }, [morphing3DMode, settingsManager, card3DManager, YEAR3000_CONFIG]);
     Spicetify.React.useEffect(() => {
-      if (!settingsManager || !glassmorphismManager || !YEAR3000_CONFIG) return;
+      if (!settingsManager || !glassmorphismManager || !YEAR3000_CONFIG)
+        return;
       let shootingStarsIntervalId = null;
       try {
         applyStarryNightSettings(gradientIntensity, starDensity);
@@ -15900,7 +14603,7 @@ var catppuccinStarryNight = (() => {
       glassmorphismIntensity,
       settingsManager,
       glassmorphismManager,
-      YEAR3000_CONFIG,
+      YEAR3000_CONFIG
     ]);
     if (YEAR3000_CONFIG?.enableDebug) {
       console.log(
@@ -15915,8 +14618,7 @@ var catppuccinStarryNight = (() => {
           "h2",
           {
             "data-encore-id": "type",
-            className:
-              "TextElement-bodyMediumBold-textBase-text encore-text-body-medium-bold",
+            className: "TextElement-bodyMediumBold-textBase-text encore-text-body-medium-bold"
           },
           "Catppuccin StarryNight"
         ),
@@ -15929,12 +14631,11 @@ var catppuccinStarryNight = (() => {
               Spicetify.React.createElement(
                 "label",
                 {
-                  className:
-                    "TextElement-bodySmall-textSubdued-text encore-text-body-small",
-                  "data-encore-id": "type",
+                  className: "TextElement-bodySmall-textSubdued-text encore-text-body-small",
+                  "data-encore-id": "type"
                 },
                 "Accent Color"
-              ),
+              )
             ]
           ),
           Spicetify.React.createElement(
@@ -15947,19 +14648,19 @@ var catppuccinStarryNight = (() => {
                   {
                     className: "main-dropDown-dropDown",
                     value: selectedAccent,
-                    onChange: (event) => setSelectedAccent(event.target.value),
+                    onChange: (event) => setSelectedAccent(event.target.value)
                   },
-                  accents.map((option) =>
-                    Spicetify.React.createElement(
+                  accents.map(
+                    (option) => Spicetify.React.createElement(
                       "option",
                       { key: option, value: option },
                       option
                     )
                   )
-                ),
-              ]),
+                )
+              ])
             ]
-          ),
+          )
         ]),
         // Gradient Intensity Setting
         Spicetify.React.createElement("div", { className: "x-settings-row" }, [
@@ -15970,12 +14671,11 @@ var catppuccinStarryNight = (() => {
               Spicetify.React.createElement(
                 "label",
                 {
-                  className:
-                    "TextElement-bodySmall-textSubdued-text encore-text-body-small",
-                  "data-encore-id": "type",
+                  className: "TextElement-bodySmall-textSubdued-text encore-text-body-small",
+                  "data-encore-id": "type"
                 },
                 "Dynamic Gradient"
-              ),
+              )
             ]
           ),
           Spicetify.React.createElement(
@@ -15988,20 +14688,19 @@ var catppuccinStarryNight = (() => {
                   {
                     className: "main-dropDown-dropDown",
                     value: gradientIntensity,
-                    onChange: (event) =>
-                      setGradientIntensity(event.target.value),
+                    onChange: (event) => setGradientIntensity(event.target.value)
                   },
-                  gradientIntensityOptions.map((option) =>
-                    Spicetify.React.createElement(
+                  gradientIntensityOptions.map(
+                    (option) => Spicetify.React.createElement(
                       "option",
                       { key: option.value, value: option.value },
                       option.label
                     )
                   )
-                ),
-              ]),
+                )
+              ])
             ]
-          ),
+          )
         ]),
         // Star Density Setting
         Spicetify.React.createElement("div", { className: "x-settings-row" }, [
@@ -16012,12 +14711,11 @@ var catppuccinStarryNight = (() => {
               Spicetify.React.createElement(
                 "label",
                 {
-                  className:
-                    "TextElement-bodySmall-textSubdued-text encore-text-body-small",
-                  "data-encore-id": "type",
+                  className: "TextElement-bodySmall-textSubdued-text encore-text-body-small",
+                  "data-encore-id": "type"
                 },
                 "Star Animation"
-              ),
+              )
             ]
           ),
           Spicetify.React.createElement(
@@ -16030,19 +14728,19 @@ var catppuccinStarryNight = (() => {
                   {
                     className: "main-dropDown-dropDown",
                     value: starDensity,
-                    onChange: (event) => setStarDensity(event.target.value),
+                    onChange: (event) => setStarDensity(event.target.value)
                   },
-                  starDensityOptions.map((option) =>
-                    Spicetify.React.createElement(
+                  starDensityOptions.map(
+                    (option) => Spicetify.React.createElement(
                       "option",
                       { key: option.value, value: option.value },
                       option.label
                     )
                   )
-                ),
-              ]),
+                )
+              ])
             ]
-          ),
+          )
         ]),
         // Performance Quality Setting
         Spicetify.React.createElement("div", { className: "x-settings-row" }, [
@@ -16053,12 +14751,11 @@ var catppuccinStarryNight = (() => {
               Spicetify.React.createElement(
                 "label",
                 {
-                  className:
-                    "TextElement-bodySmall-textSubdued-text encore-text-body-small",
-                  "data-encore-id": "type",
+                  className: "TextElement-bodySmall-textSubdued-text encore-text-body-small",
+                  "data-encore-id": "type"
                 },
                 "Performance Quality"
-              ),
+              )
             ]
           ),
           Spicetify.React.createElement(
@@ -16071,20 +14768,19 @@ var catppuccinStarryNight = (() => {
                   {
                     className: "main-dropDown-dropDown",
                     value: performanceQuality,
-                    onChange: (event) =>
-                      setPerformanceQuality(event.target.value),
+                    onChange: (event) => setPerformanceQuality(event.target.value)
                   },
-                  performanceOptions.map((option) =>
-                    Spicetify.React.createElement(
+                  performanceOptions.map(
+                    (option) => Spicetify.React.createElement(
                       "option",
                       { key: option.value, value: option.value },
                       option.label
                     )
                   )
-                ),
-              ]),
+                )
+              ])
             ]
-          ),
+          )
         ]),
         // PHASE 1: Glassmorphism Intensity Setting
         Spicetify.React.createElement("div", { className: "x-settings-row" }, [
@@ -16095,12 +14791,11 @@ var catppuccinStarryNight = (() => {
               Spicetify.React.createElement(
                 "label",
                 {
-                  className:
-                    "TextElement-bodySmall-textSubdued-text encore-text-body-small",
-                  "data-encore-id": "type",
+                  className: "TextElement-bodySmall-textSubdued-text encore-text-body-small",
+                  "data-encore-id": "type"
                 },
                 "Glass Effects"
-              ),
+              )
             ]
           ),
           Spicetify.React.createElement(
@@ -16113,20 +14808,19 @@ var catppuccinStarryNight = (() => {
                   {
                     className: "main-dropDown-dropDown",
                     value: glassmorphismIntensity,
-                    onChange: (event) =>
-                      setGlassmorphismIntensity(event.target.value),
+                    onChange: (event) => setGlassmorphismIntensity(event.target.value)
                   },
-                  glassmorphismOptions.map((option) =>
-                    Spicetify.React.createElement(
+                  glassmorphismOptions.map(
+                    (option) => Spicetify.React.createElement(
                       "option",
                       { key: option.value, value: option.value },
                       option.label
                     )
                   )
-                ),
-              ]),
+                )
+              ])
             ]
-          ),
+          )
         ]),
         // ADDED: Artistic Mode Setting (before 3D Morphing Mode) - Enhanced with Year 3000 descriptions
         Spicetify.React.createElement("div", { className: "x-settings-row" }, [
@@ -16137,12 +14831,11 @@ var catppuccinStarryNight = (() => {
               Spicetify.React.createElement(
                 "label",
                 {
-                  className:
-                    "TextElement-bodySmall-textSubdued-text encore-text-body-small",
-                  "data-encore-id": "type",
+                  className: "TextElement-bodySmall-textSubdued-text encore-text-body-small",
+                  "data-encore-id": "type"
                 },
                 "Artistic Mode"
-              ),
+              )
             ]
           ),
           Spicetify.React.createElement(
@@ -16155,20 +14848,19 @@ var catppuccinStarryNight = (() => {
                   {
                     className: "main-dropDown-dropDown",
                     value: artisticMode,
-                    onChange: (event) =>
-                      setArtisticModeState(event.target.value),
+                    onChange: (event) => setArtisticModeState(event.target.value)
                   },
-                  artisticModeOptions.map((option) =>
-                    Spicetify.React.createElement(
+                  artisticModeOptions.map(
+                    (option) => Spicetify.React.createElement(
                       "option",
                       { key: option.value, value: option.value },
                       option.label
                     )
                   )
-                ),
-              ]),
+                )
+              ])
             ]
-          ),
+          )
         ]),
         // NEW: Artistic Mode Description - Year 3000 Philosophy Display
         Spicetify.React.createElement("div", { className: "x-settings-row" }, [
@@ -16180,14 +14872,13 @@ var catppuccinStarryNight = (() => {
                 padding: "8px 12px",
                 marginTop: "-8px",
                 marginBottom: "8px",
-                backgroundColor:
-                  "rgba(var(--spice-rgb-accent, 202,158,230), 0.06)",
+                backgroundColor: "rgba(var(--spice-rgb-accent, 202,158,230), 0.06)",
                 borderRadius: "6px",
                 borderLeft: "3px solid var(--spice-accent, #ca9ee6)",
                 fontSize: "0.8em",
                 lineHeight: "1.4",
-                gridColumn: "1 / -1",
-              },
+                gridColumn: "1 / -1"
+              }
             },
             [
               // Current mode description
@@ -16197,11 +14888,10 @@ var catppuccinStarryNight = (() => {
                   style: {
                     fontWeight: "500",
                     color: "var(--spice-text)",
-                    marginBottom: "4px",
-                  },
+                    marginBottom: "4px"
+                  }
                 },
-                ARTISTIC_MODE_PROFILES[artisticMode]?.description ||
-                  "Standard artistic expression mode"
+                ARTISTIC_MODE_PROFILES[artisticMode]?.description || "Standard artistic expression mode"
               ),
               // Current mode philosophy
               Spicetify.React.createElement(
@@ -16210,14 +14900,13 @@ var catppuccinStarryNight = (() => {
                   style: {
                     fontStyle: "italic",
                     color: "var(--spice-subtext)",
-                    fontSize: "0.9em",
-                  },
+                    fontSize: "0.9em"
+                  }
                 },
-                ARTISTIC_MODE_PROFILES[artisticMode]?.philosophy ||
-                  "Enhances your listening experience with visual harmony."
-              ),
+                ARTISTIC_MODE_PROFILES[artisticMode]?.philosophy || "Enhances your listening experience with visual harmony."
+              )
             ]
-          ),
+          )
         ]),
         // PHASE 3: 3D morphing mode setting
         Spicetify.React.createElement("div", { className: "x-settings-row" }, [
@@ -16228,12 +14917,11 @@ var catppuccinStarryNight = (() => {
               Spicetify.React.createElement(
                 "label",
                 {
-                  className:
-                    "TextElement-bodySmall-textSubdued-text encore-text-body-small",
-                  "data-encore-id": "type",
+                  className: "TextElement-bodySmall-textSubdued-text encore-text-body-small",
+                  "data-encore-id": "type"
                 },
                 "3D Morphing Mode"
-              ),
+              )
             ]
           ),
           Spicetify.React.createElement(
@@ -16246,19 +14934,19 @@ var catppuccinStarryNight = (() => {
                   {
                     className: "main-dropDown-dropDown",
                     value: morphing3DMode,
-                    onChange: (event) => setMorphing3DMode(event.target.value),
+                    onChange: (event) => setMorphing3DMode(event.target.value)
                   },
-                  morphing3DOptions.map((option) =>
-                    Spicetify.React.createElement(
+                  morphing3DOptions.map(
+                    (option) => Spicetify.React.createElement(
                       "option",
                       { key: option.value, value: option.value },
                       option.label
                     )
                   )
-                ),
-              ]),
+                )
+              ])
             ]
-          ),
+          )
         ]),
         // NEW: Chromatic Harmony Weaver Setting
         Spicetify.React.createElement("div", { className: "x-settings-row" }, [
@@ -16269,12 +14957,11 @@ var catppuccinStarryNight = (() => {
               Spicetify.React.createElement(
                 "label",
                 {
-                  className:
-                    "TextElement-bodySmall-textSubdued-text encore-text-body-small",
-                  "data-encore-id": "type",
+                  className: "TextElement-bodySmall-textSubdued-text encore-text-body-small",
+                  "data-encore-id": "type"
                 },
                 "Chromatic Harmony Mode"
-              ),
+              )
             ]
           ),
           Spicetify.React.createElement(
@@ -16287,20 +14974,19 @@ var catppuccinStarryNight = (() => {
                   {
                     className: "main-dropDown-dropDown",
                     value: currentHarmonicMode,
-                    onChange: (event) =>
-                      setCurrentHarmonicMode(event.target.value),
+                    onChange: (event) => setCurrentHarmonicMode(event.target.value)
                   },
-                  Object.keys(HARMONIC_MODES).map((modeKey) =>
-                    Spicetify.React.createElement(
+                  Object.keys(HARMONIC_MODES).map(
+                    (modeKey) => Spicetify.React.createElement(
                       "option",
                       { key: modeKey, value: modeKey },
                       HARMONIC_MODES[modeKey].description
                     )
                   )
-                ),
-              ]),
+                )
+              ])
             ]
-          ),
+          )
         ]),
         // NEW: Harmonic Intensity Setting
         Spicetify.React.createElement("div", { className: "x-settings-row" }, [
@@ -16311,13 +14997,12 @@ var catppuccinStarryNight = (() => {
               Spicetify.React.createElement(
                 "label",
                 {
-                  className:
-                    "TextElement-bodySmall-textSubdued-text encore-text-body-small",
+                  className: "TextElement-bodySmall-textSubdued-text encore-text-body-small",
                   "data-encore-id": "type",
-                  htmlFor: "sn-harmonic-intensity-slider",
+                  htmlFor: "sn-harmonic-intensity-slider"
                 },
                 `Harmonic Intensity: ${harmonicIntensity.toFixed(2)}`
-              ),
+              )
             ]
           ),
           Spicetify.React.createElement(
@@ -16332,11 +15017,10 @@ var catppuccinStarryNight = (() => {
                 max: "1",
                 step: "0.05",
                 value: harmonicIntensity,
-                onChange: (event) =>
-                  setHarmonicIntensity(parseFloat(event.target.value)),
-              }),
+                onChange: (event) => setHarmonicIntensity(parseFloat(event.target.value))
+              })
             ]
-          ),
+          )
         ]),
         // NEW: Harmonic Evolution Toggle
         Spicetify.React.createElement("div", { className: "x-settings-row" }, [
@@ -16347,13 +15031,12 @@ var catppuccinStarryNight = (() => {
               Spicetify.React.createElement(
                 "label",
                 {
-                  className:
-                    "TextElement-bodySmall-textSubdued-text encore-text-body-small",
+                  className: "TextElement-bodySmall-textSubdued-text encore-text-body-small",
                   "data-encore-id": "type",
-                  htmlFor: "sn-harmonic-evolution-toggle",
+                  htmlFor: "sn-harmonic-evolution-toggle"
                 },
                 "Evolve Harmonies with Music"
-              ),
+              )
             ]
           ),
           Spicetify.React.createElement(
@@ -16365,10 +15048,10 @@ var catppuccinStarryNight = (() => {
                 id: "sn-harmonic-evolution-toggle",
                 className: "x-settings-checkbox sn-toggle",
                 checked: harmonicEvolution,
-                onChange: (event) => setHarmonicEvolution(event.target.checked),
-              }),
+                onChange: (event) => setHarmonicEvolution(event.target.checked)
+              })
             ]
-          ),
+          )
         ]),
         // NEW: Manual Harmonic Base Color Input
         Spicetify.React.createElement("div", { className: "x-settings-row" }, [
@@ -16379,13 +15062,12 @@ var catppuccinStarryNight = (() => {
               Spicetify.React.createElement(
                 "label",
                 {
-                  className:
-                    "TextElement-bodySmall-textSubdued-text encore-text-body-small",
+                  className: "TextElement-bodySmall-textSubdued-text encore-text-body-small",
                   "data-encore-id": "type",
-                  htmlFor: "sn-manual-base-color-input",
+                  htmlFor: "sn-manual-base-color-input"
                 },
                 "Harmonic Base Color Seed (Hex, empty for auto)"
-              ),
+              )
             ]
           ),
           Spicetify.React.createElement(
@@ -16398,11 +15080,11 @@ var catppuccinStarryNight = (() => {
                 className: "x-settings-input sn-text-input",
                 placeholder: "#RRGGBB or RRGGBB",
                 value: manualBaseColor,
-                onChange: (event) => setManualBaseColor(event.target.value),
-              }),
+                onChange: (event) => setManualBaseColor(event.target.value)
+              })
             ]
-          ),
-        ]),
+          )
+        ])
       ]
     );
   };
@@ -16413,9 +15095,7 @@ var catppuccinStarryNight = (() => {
       clearInterval(checkHeaderInterval);
       checkHeaderInterval = null;
       if (YEAR3000_CONFIG?.enableDebug) {
-        console.log(
-          "[StarryNight Settings] Cleared settings polling interval."
-        );
+        console.log("[StarryNight Settings] Cleared settings polling interval.");
       }
     }
     if (mountedContainer) {
@@ -16467,10 +15147,7 @@ var catppuccinStarryNight = (() => {
         container.id = containerId;
         container.classList.add("starry-night-settings-section");
         mountedContainer = container;
-        settingsPage.parentNode.insertBefore(
-          container,
-          settingsPage.nextSibling
-        );
+        settingsPage.parentNode.insertBefore(container, settingsPage.nextSibling);
         try {
           Spicetify.ReactDOM.render(
             Spicetify.React.createElement(RawSectionComponent),
@@ -16508,9 +15185,7 @@ var catppuccinStarryNight = (() => {
     // ===================================================================
     testGradients() {
       if (YEAR3000_CONFIG?.enableDebug) {
-        console.log(
-          "\u{1F9EA} [StarryNight Debug] Testing gradient application..."
-        );
+        console.log("\u{1F9EA} [StarryNight Debug] Testing gradient application...");
       }
       if (globalThis.year3000System?.updateColorsFromCurrentTrack) {
         globalThis.year3000System.updateColorsFromCurrentTrack();
@@ -16531,12 +15206,10 @@ var catppuccinStarryNight = (() => {
         secondary: root.getPropertyValue("--sn-gradient-secondary").trim(),
         accent: root.getPropertyValue("--sn-gradient-accent").trim(),
         primaryRgb: root.getPropertyValue("--sn-gradient-primary-rgb").trim(),
-        secondaryRgb: root
-          .getPropertyValue("--sn-gradient-secondary-rgb")
-          .trim(),
+        secondaryRgb: root.getPropertyValue("--sn-gradient-secondary-rgb").trim(),
         accentRgb: root.getPropertyValue("--sn-gradient-accent-rgb").trim(),
         opacity: root.getPropertyValue("--sn-gradient-opacity").trim(),
-        blur: root.getPropertyValue("--sn-gradient-blur").trim(),
+        blur: root.getPropertyValue("--sn-gradient-blur").trim()
       };
       if (YEAR3000_CONFIG?.enableDebug) {
         console.log(
@@ -16547,7 +15220,7 @@ var catppuccinStarryNight = (() => {
       const rgbValidation = {
         primaryRgbValid: /^\d+,\d+,\d+$/.test(gradientVars.primaryRgb),
         secondaryRgbValid: /^\d+,\d+,\d+$/.test(gradientVars.secondaryRgb),
-        accentRgbValid: /^\d+,\d+,\d+$/.test(gradientVars.accentRgb),
+        accentRgbValid: /^\d+,\d+,\d+$/.test(gradientVars.accentRgb)
       };
       if (YEAR3000_CONFIG?.enableDebug) {
         console.log(
@@ -16569,10 +15242,7 @@ var catppuccinStarryNight = (() => {
       const allCssRules = [];
       try {
         for (const styleSheet of document.styleSheets) {
-          if (
-            styleSheet.href &&
-            !styleSheet.href.startsWith(window.location.origin)
-          ) {
+          if (styleSheet.href && !styleSheet.href.startsWith(window.location.origin)) {
             if (YEAR3000_CONFIG?.enableDebug) {
             }
             continue;
@@ -16598,16 +15268,14 @@ var catppuccinStarryNight = (() => {
       for (let i = 0; i < computedRootStyle.length; i++) {
         const propName = computedRootStyle[i];
         if (propName.startsWith("--spice-") || propName.startsWith("--sn-")) {
-          variables[propName] = computedRootStyle
-            .getPropertyValue(propName)
-            .trim();
+          variables[propName] = computedRootStyle.getPropertyValue(propName).trim();
         }
       }
       const hexVars = Object.keys(variables).filter(
         (key) => !key.includes("-rgb")
       );
-      const rgbVars = Object.keys(variables).filter((key) =>
-        key.includes("-rgb")
+      const rgbVars = Object.keys(variables).filter(
+        (key) => key.includes("-rgb")
       );
       if (YEAR3000_CONFIG?.enableDebug) {
         console.log(
@@ -16634,7 +15302,7 @@ var catppuccinStarryNight = (() => {
           obj[key] = variables[key];
           return obj;
         }, {}),
-        allVariables: variables,
+        allVariables: variables
       };
     }
     testHexToRgb(hex) {
@@ -16660,7 +15328,7 @@ var catppuccinStarryNight = (() => {
         // Added from notes
         "--spice-rgb-surface0",
         "--spice-rgb-surface1",
-        "--spice-rgb-text",
+        "--spice-rgb-text"
         // Added from notes
       ];
       const root = Year3000Utilities.getRootStyle();
@@ -16676,7 +15344,7 @@ var catppuccinStarryNight = (() => {
         validation[varName] = {
           present: !!value,
           value,
-          validFormat: /^\d+,\d+,\d+$/.test(value),
+          validFormat: /^\d+,\d+,\d+$/.test(value)
         };
       });
       if (YEAR3000_CONFIG?.enableDebug) {
@@ -16686,9 +15354,7 @@ var catppuccinStarryNight = (() => {
     }
     resetColors() {
       if (YEAR3000_CONFIG?.enableDebug) {
-        console.log(
-          "\u{1F504} [StarryNight Debug] Resetting colors to defaults..."
-        );
+        console.log("\u{1F504} [StarryNight Debug] Resetting colors to defaults...");
       }
       if (globalThis.year3000System?.resetToDefaults) {
         globalThis.year3000System.resetToDefaults();
@@ -16714,9 +15380,7 @@ var catppuccinStarryNight = (() => {
     }
     getReport() {
       if (YEAR3000_CONFIG?.enableDebug) {
-        console.log(
-          "\u{1F4CA} [StarryNight Debug] Generating system report..."
-        );
+        console.log("\u{1F4CA} [StarryNight Debug] Generating system report...");
       }
       if (globalThis.year3000System?.getSystemReport) {
         return globalThis.year3000System.getSystemReport();
@@ -16756,7 +15420,7 @@ var catppuccinStarryNight = (() => {
         systemTests: {},
         crossSystemTests: {},
         performanceTests: {},
-        errors: [],
+        errors: []
       };
       try {
         console.log("\u{1F4CB} Step 1: Validating DOM structure...");
@@ -16764,15 +15428,13 @@ var catppuccinStarryNight = (() => {
         console.log("\u{1F3AF} Step 2: Testing individual systems...");
         this.testResults.systemTests = await this.testAllVisualSystems();
         console.log("\u{1F517} Step 3: Testing cross-system integration...");
-        this.testResults.crossSystemTests =
-          await this.testCrossSystemIntegration();
+        this.testResults.crossSystemTests = await this.testCrossSystemIntegration();
         console.log("\u26A1 Step 4: Performance testing...");
         this.testResults.performanceTests = await this.testSystemPerformance();
         console.log("\u{1F4CA} Step 5: Generating integration report...");
         const report = this.generateIntegrationReport();
         this.testResults.endTime = Date.now();
-        this.testResults.duration =
-          this.testResults.endTime - this.testResults.startTime;
+        this.testResults.duration = this.testResults.endTime - this.testResults.startTime;
         console.log("\u2705 Integration test completed successfully!");
         console.groupEnd();
         return report;
@@ -16781,7 +15443,7 @@ var catppuccinStarryNight = (() => {
           type: "FATAL_ERROR",
           message: error.message,
           stack: error.stack,
-          timestamp: Date.now(),
+          timestamp: Date.now()
         });
         console.error("\u274C Integration test failed:", error);
         console.groupEnd();
@@ -16797,21 +15459,19 @@ var catppuccinStarryNight = (() => {
         modernSelectorsMissing: 0,
         legacySelectorsStillPresent: 0,
         criticalElementsMissing: [],
-        recommendations: [],
+        recommendations: []
       };
       Object.entries(MODERN_SELECTORS).forEach(([key, selector]) => {
         if (elementExists(selector)) {
           domValidation.modernSelectorsFound++;
         } else {
           domValidation.modernSelectorsMissing++;
-          const isCritical =
-            GRAVITY_WELL_TARGETS.primary.includes(selector) ||
-            GRAVITY_WELL_TARGETS.secondary.includes(selector);
+          const isCritical = GRAVITY_WELL_TARGETS.primary.includes(selector) || GRAVITY_WELL_TARGETS.secondary.includes(selector);
           if (isCritical) {
             domValidation.criticalElementsMissing.push({
               name: key,
               selector,
-              impact: "HIGH",
+              impact: "HIGH"
             });
           }
         }
@@ -16821,7 +15481,7 @@ var catppuccinStarryNight = (() => {
         ".main-navBar-navBar",
         ".main-search-searchBar",
         ".main-topBar-topBar",
-        ".main-queue-queue",
+        ".main-queue-queue"
       ];
       legacySelectors.forEach((selector) => {
         if (elementExists(selector)) {
@@ -16829,7 +15489,7 @@ var catppuccinStarryNight = (() => {
           domValidation.recommendations.push({
             type: "LEGACY_SELECTOR_FOUND",
             selector,
-            message: `Legacy selector ${selector} still exists - systems may have redundant targeting`,
+            message: `Legacy selector ${selector} still exists - systems may have redundant targeting`
           });
         }
       });
@@ -16841,7 +15501,7 @@ var catppuccinStarryNight = (() => {
       const systemsToTest = [
         "BehavioralPredictionEngine",
         "DimensionalNexusSystem",
-        "DataGlyphSystem",
+        "DataGlyphSystem"
       ];
       for (const systemName of systemsToTest) {
         systemTests[systemName] = await this.testIndividualSystem(systemName);
@@ -16855,7 +15515,7 @@ var catppuccinStarryNight = (() => {
         targetsFound: 0,
         targetsMissing: 0,
         selectors: [],
-        errors: [],
+        errors: []
       };
       try {
         const selectorTest = await this.testSystemSelectors(systemName);
@@ -16873,7 +15533,7 @@ var catppuccinStarryNight = (() => {
         systemTest.status = "ERROR";
         systemTest.errors.push({
           type: "TEST_ERROR",
-          message: error.message,
+          message: error.message
         });
       }
       return systemTest;
@@ -16882,7 +15542,7 @@ var catppuccinStarryNight = (() => {
       const selectorTest = {
         found: 0,
         missing: 0,
-        details: [],
+        details: []
       };
       const systemSelectors = this.getExpectedSelectorsForSystem(systemName);
       systemSelectors.forEach(({ name, selector, importance }) => {
@@ -16893,7 +15553,7 @@ var catppuccinStarryNight = (() => {
           selector,
           found,
           count: elements.length,
-          importance,
+          importance
         });
         if (found) {
           selectorTest.found++;
@@ -16908,18 +15568,18 @@ var catppuccinStarryNight = (() => {
         {
           name: "Left Sidebar",
           selector: MODERN_SELECTORS.leftSidebar,
-          importance: "HIGH",
+          importance: "HIGH"
         },
         {
           name: "Now Playing Bar",
           selector: MODERN_SELECTORS.nowPlayingBar,
-          importance: "HIGH",
+          importance: "HIGH"
         },
         {
           name: "Track Rows",
           selector: ORBITAL_ELEMENTS.trackRows,
-          importance: "MEDIUM",
-        },
+          importance: "MEDIUM"
+        }
       ];
       const systemSpecificSelectors = {
         BehavioralPredictionEngine: [
@@ -16927,38 +15587,38 @@ var catppuccinStarryNight = (() => {
           {
             name: "Play Button",
             selector: MODERN_SELECTORS.playButton,
-            importance: "HIGH",
+            importance: "HIGH"
           },
           {
             name: "Like Button",
             selector: MODERN_SELECTORS.likeButton,
-            importance: "MEDIUM",
-          },
+            importance: "MEDIUM"
+          }
         ],
         DimensionalNexusSystem: [
           {
             name: "Left Sidebar",
             selector: MODERN_SELECTORS.leftSidebar,
-            importance: "CRITICAL",
+            importance: "CRITICAL"
           },
           {
             name: "Modal Container",
             selector: MODERN_SELECTORS.modal,
-            importance: "MEDIUM",
-          },
+            importance: "MEDIUM"
+          }
         ],
         DataGlyphSystem: [
           {
             name: "Nav Links",
             selector: ORBITAL_ELEMENTS.navLinks,
-            importance: "HIGH",
+            importance: "HIGH"
           },
           {
             name: "Cards",
             selector: ORBITAL_ELEMENTS.cards,
-            importance: "MEDIUM",
-          },
-        ],
+            importance: "MEDIUM"
+          }
+        ]
       };
       return systemSpecificSelectors[systemName] || commonSelectors;
     }
@@ -16966,7 +15626,7 @@ var catppuccinStarryNight = (() => {
     async testCrossSystemIntegration() {
       const crossSystemTests = {
         sharedElementConflicts: [],
-        performanceImpacts: [],
+        performanceImpacts: []
       };
       crossSystemTests.sharedElementConflicts = this.testSharedElementUsage();
       return crossSystemTests;
@@ -16976,17 +15636,14 @@ var catppuccinStarryNight = (() => {
       const criticalSelectors = [
         MODERN_SELECTORS.leftSidebar,
         MODERN_SELECTORS.nowPlayingBar,
-        ORBITAL_ELEMENTS.trackRows,
+        ORBITAL_ELEMENTS.trackRows
       ];
       criticalSelectors.forEach((selector) => {
         const element = document.querySelector(selector);
         if (element) {
           const classes = Array.from(element.classList);
           const systemPrefixes = classes.filter(
-            (cls) =>
-              cls.startsWith("sn-") ||
-              cls.startsWith("year3000-") ||
-              cls.startsWith("gravity-")
+            (cls) => cls.startsWith("sn-") || cls.startsWith("year3000-") || cls.startsWith("gravity-")
           );
           if (systemPrefixes.length > 3) {
             conflicts.push({
@@ -16994,7 +15651,7 @@ var catppuccinStarryNight = (() => {
               element,
               systemClasses: systemPrefixes,
               severity: "POTENTIAL_CONFLICT",
-              message: `Element has ${systemPrefixes.length} system-specific classes`,
+              message: `Element has ${systemPrefixes.length} system-specific classes`
             });
           }
         }
@@ -17005,7 +15662,7 @@ var catppuccinStarryNight = (() => {
     async testSystemPerformance() {
       const performanceTests = {
         domQuerySpeed: await this.testDOMQueryPerformance(),
-        memoryUsage: this.testMemoryUsage(),
+        memoryUsage: this.testMemoryUsage()
       };
       return performanceTests;
     }
@@ -17026,8 +15683,7 @@ var catppuccinStarryNight = (() => {
         iterations,
         totalTime: endTime - startTime,
         averageTime,
-        status:
-          averageTime < 5 ? "GOOD" : averageTime < 15 ? "ACCEPTABLE" : "SLOW",
+        status: averageTime < 5 ? "GOOD" : averageTime < 15 ? "ACCEPTABLE" : "SLOW"
       });
       return tests;
     }
@@ -17039,16 +15695,8 @@ var catppuccinStarryNight = (() => {
           used: performance.memory.usedJSHeapSize,
           total: performance.memory.totalJSHeapSize,
           limit: performance.memory.jsHeapSizeLimit,
-          percentage: (
-            (performance.memory.usedJSHeapSize /
-              performance.memory.totalJSHeapSize) *
-            100
-          ).toFixed(2),
-          status:
-            performance.memory.usedJSHeapSize <
-            performance.memory.totalJSHeapSize * 0.8
-              ? "GOOD"
-              : "HIGH",
+          percentage: (performance.memory.usedJSHeapSize / performance.memory.totalJSHeapSize * 100).toFixed(2),
+          status: performance.memory.usedJSHeapSize < performance.memory.totalJSHeapSize * 0.8 ? "GOOD" : "HIGH"
         });
       }
       return memoryTests;
@@ -17056,11 +15704,11 @@ var catppuccinStarryNight = (() => {
     // === REPORTING ===
     generateIntegrationReport() {
       const report = {
-        timestamp: /* @__PURE__ */ new Date().toISOString(),
+        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
         duration: this.testResults.duration,
         summary: this.generateSummary(),
         recommendations: this.generateRecommendations(),
-        fullResults: this.testResults,
+        fullResults: this.testResults
       };
       this.logFormattedReport(report);
       return report;
@@ -17078,7 +15726,7 @@ var catppuccinStarryNight = (() => {
         modernSelectorsMissing: domValidation.modernSelectorsMissing,
         systemsHealthy: healthySystems,
         systemsTotal: totalSystems,
-        criticalIssues: domValidation.criticalElementsMissing.length,
+        criticalIssues: domValidation.criticalElementsMissing.length
       };
     }
     calculateOverallHealth() {
@@ -17102,7 +15750,7 @@ var catppuccinStarryNight = (() => {
           priority: "HIGH",
           type: "CRITICAL_ELEMENTS",
           message: `${domValidation.criticalElementsMissing.length} critical elements are missing`,
-          action: "Update Spotify or check for UI changes",
+          action: "Update Spotify or check for UI changes"
         });
       }
       Object.entries(systemTests).forEach(([systemName, test]) => {
@@ -17112,7 +15760,7 @@ var catppuccinStarryNight = (() => {
             type: "SYSTEM_FAILURE",
             system: systemName,
             message: `${systemName} is not functioning properly`,
-            action: "Check system initialization and selector updates",
+            action: "Check system initialization and selector updates"
           });
         }
       });
@@ -17132,9 +15780,7 @@ var catppuccinStarryNight = (() => {
         console.group("\u{1F6A8} Recommendations");
         report.recommendations.forEach((rec) => {
           console.log(
-            `${rec.priority === "HIGH" ? "\u{1F534}" : "\u{1F7E1}"} ${
-              rec.type
-            }: ${rec.message}`
+            `${rec.priority === "HIGH" ? "\u{1F534}" : "\u{1F7E1}"} ${rec.type}: ${rec.message}`
           );
           console.log(`   Action: ${rec.action}`);
         });
@@ -17146,39 +15792,29 @@ var catppuccinStarryNight = (() => {
   var Year3000Debug = {
     // Quick debug utilities (direct methods for console convenience)
     testGradients: () => new SystemIntegrationTester().testGradients(),
-    logCurrentVariables: () =>
-      new SystemIntegrationTester().logCurrentVariables(),
+    logCurrentVariables: () => new SystemIntegrationTester().logCurrentVariables(),
     testHexToRgb: (hex) => new SystemIntegrationTester().testHexToRgb(hex),
-    validateRgbVariables: () =>
-      new SystemIntegrationTester().validateRgbVariables(),
+    validateRgbVariables: () => new SystemIntegrationTester().validateRgbVariables(),
     resetColors: () => new SystemIntegrationTester().resetColors(),
     extractColors: () => new SystemIntegrationTester().extractColors(),
     getReport: () => new SystemIntegrationTester().getReport(),
-    getCssVariable: (varName) =>
-      new SystemIntegrationTester().getCssVariable(varName),
+    getCssVariable: (varName) => new SystemIntegrationTester().getCssVariable(varName),
     // Comprehensive testing
-    runFullIntegrationTest: () =>
-      new SystemIntegrationTester().runFullIntegrationTest(),
+    runFullIntegrationTest: () => new SystemIntegrationTester().runFullIntegrationTest(),
     // Get instance for advanced usage
-    getInstance: () => new SystemIntegrationTester(),
+    getInstance: () => new SystemIntegrationTester()
   };
   if (typeof window !== "undefined") {
     window.SystemIntegrationTester = new SystemIntegrationTester();
     window.Year3000Debug = Year3000Debug;
-    window.runIntegrationTest = () =>
-      window.SystemIntegrationTester.runFullIntegrationTest();
+    window.runIntegrationTest = () => window.SystemIntegrationTester.runFullIntegrationTest();
   }
 
   // src-js/core/mainInitialization.js
   async function main() {
     try {
-      console.log(
-        "\u{1F31F} [StarryNight] Starting YEAR 3000 main initialization..."
-      );
-      if (
-        globalThis.year3000System &&
-        typeof globalThis.year3000System.initializeAllSystems === "function"
-      ) {
+      console.log("\u{1F31F} [StarryNight] Starting YEAR 3000 main initialization...");
+      if (globalThis.year3000System && typeof globalThis.year3000System.initializeAllSystems === "function") {
         await globalThis.year3000System.initializeAllSystems();
         console.log(
           "\u{1F31F} [StarryNight] year3000System.initializeAllSystems() completed successfully"
@@ -17188,10 +15824,7 @@ var catppuccinStarryNight = (() => {
           "\u{1F525} [StarryNight] year3000System.initializeAllSystems not available!"
         );
       }
-      if (
-        globalThis.year3000System &&
-        globalThis.year3000System.setupMusicAnalysisAndColorExtraction
-      ) {
+      if (globalThis.year3000System && globalThis.year3000System.setupMusicAnalysisAndColorExtraction) {
         globalThis.year3000System.setupMusicAnalysisAndColorExtraction();
         console.log(
           "\u{1F31F} [StarryNight] Music analysis and color extraction set up"
@@ -17201,10 +15834,7 @@ var catppuccinStarryNight = (() => {
         "\u{1F31F} [StarryNight] YEAR 3000 main initialization completed successfully!"
       );
     } catch (error) {
-      console.error(
-        "\u{1F525} [StarryNight] Error during main initialization:",
-        error
-      );
+      console.error("\u{1F525} [StarryNight] Error during main initialization:", error);
     }
   }
 
@@ -17217,22 +15847,17 @@ var catppuccinStarryNight = (() => {
     globalThis.YEAR3000_CONFIG = YEAR3000_CONFIG;
     if (typeof ENABLE_GLOBAL_DEBUGGING === "boolean") {
       console.log(
-        `[StarryNight Theme] MASTER DEBUG SWITCH is ${
-          ENABLE_GLOBAL_DEBUGGING ? "ON" : "OFF"
-        }. Overriding config debug flags.`
+        `[StarryNight Theme] MASTER DEBUG SWITCH is ${ENABLE_GLOBAL_DEBUGGING ? "ON" : "OFF"}. Overriding config debug flags.`
       );
       globalThis.YEAR3000_CONFIG.enableDebug = ENABLE_GLOBAL_DEBUGGING;
-      globalThis.YEAR3000_CONFIG.enableArtisticModeLogging =
-        ENABLE_GLOBAL_DEBUGGING;
+      globalThis.YEAR3000_CONFIG.enableArtisticModeLogging = ENABLE_GLOBAL_DEBUGGING;
       globalThis.YEAR3000_CONFIG.enableDebugMode = ENABLE_GLOBAL_DEBUGGING;
     } else {
       console.warn(
         "[StarryNight Theme] Master debug switch (ENABLE_GLOBAL_DEBUGGING) is not a boolean. Using individual config flags."
       );
     }
-    if (
-      typeof globalThis.YEAR3000_CONFIG.loadArtisticPreference === "function"
-    ) {
+    if (typeof globalThis.YEAR3000_CONFIG.loadArtisticPreference === "function") {
       globalThis.YEAR3000_CONFIG.loadArtisticPreference();
     } else {
       console.warn(
@@ -17241,16 +15866,8 @@ var catppuccinStarryNight = (() => {
     }
   }
   (async function catppuccinStarryNight() {
-    console.log(
-      "\u{1F31F} Catppuccin StarryNight Theme: Main IIFE executing v2"
-    );
-    if (
-      !Spicetify ||
-      !Spicetify.React ||
-      !Spicetify.ReactDOM ||
-      !Spicetify.Player ||
-      !Spicetify.Platform
-    ) {
+    console.log("\u{1F31F} Catppuccin StarryNight Theme: Main IIFE executing v2");
+    if (!Spicetify || !Spicetify.React || !Spicetify.ReactDOM || !Spicetify.Player || !Spicetify.Platform) {
       console.warn(
         "[StarryNight Theme] Spicetify APIs not fully available yet. Retrying in 100ms..."
       );
@@ -17258,9 +15875,7 @@ var catppuccinStarryNight = (() => {
       return;
     }
     console.log("[StarryNight Theme] Spicetify APIs ready.");
-    console.log(
-      "\u{1F31F} [StarryNight Theme] Initializing Year3000 System Core..."
-    );
+    console.log("\u{1F31F} [StarryNight Theme] Initializing Year3000 System Core...");
     const year3000SystemInstance = new Year3000System(
       globalThis.YEAR3000_CONFIG,
       globalThis.HARMONIC_MODES
