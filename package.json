@@ -1,0 +1,21 @@
+{
+  "name": "catppuccin-starrynight-spicetify-theme",
+  "version": "1.0.0",
+  "description": "Spicetify theme with Catppuccin StarryNight dynamic effects.",
+  "main": "theme.js",
+  "scripts": {
+    "build": "esbuild src-js/theme.entry.js --bundle --outfile=theme.js --format=iife --global-name=catppuccinStarryNight --loader:.js=jsx --jsx-factory=Spicetify.React.createElement --jsx-fragment=Spicetify.React.Fragment",
+    "watch": "esbuild src-js/theme.entry.js --bundle --outfile=theme.js --format=iife --global-name=catppuccinStarryNight --loader:.js=jsx --jsx-factory=Spicetify.React.createElement --jsx-fragment=Spicetify.React.Fragment --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0"
+  },
+  "keywords": [
+    "spicetify",
+    "theme",
+    "catppuccin",
+    "starrynight"
+  ],
+  "author": "",
+  "license": "MIT"
+}

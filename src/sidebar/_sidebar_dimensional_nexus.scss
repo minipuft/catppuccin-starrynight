@@ -25,6 +25,10 @@
   --sn-sidebar-meditation-slowdown: 1; // Animation speed multiplier (1 = normal, <1 = slower)
   --sn-item-energy-absorption-scale: 1; // Scale effect for item absorbing energy
 
+  // === RHYTHMIC BREATHING & PHASE CALCULATIONS ===
+  --sn-breathing-scale: 1; // 0.97 to 1.02, controlled by BeatSyncVisualSystem
+  --sn-rhythm-phase: 0; // 0 to 2π, math phase for rhythm calculations
+
   // === ATMOSPHERIC EFFECTS ===
   --sn-sidebar-atmosphere-hue-shift: 0deg;
   --sn-sidebar-atmosphere-saturation-factor: 1;
@@ -830,3 +834,33 @@ nav[aria-label="Main"] ul li a {
             var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
   }
 }
+
+// === Digital Meditation Support (Phase 5) ===
+.sn-digital-meditation {
+  filter: grayscale(var(--sn-sidebar-meditation-desaturation))
+          brightness(calc(1 - var(--sn-sidebar-meditation-desaturation) * 0.2));
+  transition: filter calc(var(--sn-sidebar-meditation-slowdown) * 2000ms) ease-out;
+
+  // Slow down all sidebar animations during meditation
+  * {
+    animation-duration: calc(var(--sn-sidebar-meditation-slowdown, 1) * 1s) !important;
+    transition-duration: calc(var(--sn-sidebar-meditation-slowdown, 1) * 400ms) !important;
+  }
+
+  // Apply meditation blur effect to sidebar links
+  .main-navBar-navBarLink {
+    filter: blur(calc(var(--sn-sidebar-meditation-desaturation) * 2px));
+    opacity: calc(1 - var(--sn-sidebar-meditation-desaturation) * 0.3);
+  }
+
+  // Soften the sidebar background during meditation
+  &::before {
+    background: linear-gradient(
+      180deg,
+      rgba(var(--spice-rgb-sidebar, 48, 52, 70), calc(1 - var(--sn-sidebar-meditation-desaturation) * 0.5)) 0%,
+      rgba(var(--spice-rgb-sidebar, 48, 52, 70), 1) 100%
+    );
+  }
+}
+
+// === End Digital Meditation Support ===

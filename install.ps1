@@ -3,7 +3,6 @@
 
 param(
     [string]$ColorScheme = "mocha",
-    [switch]$SkipExtension,
     [switch]$Force
 )
 
@@ -67,10 +66,42 @@ if (Test-Path $themeTargetPath) {
     }
 }
 
-# Copy theme files
-Write-Host "📋 Copying theme files..." -ForegroundColor Blue
+# Copy essential theme files only (excluding development sources)
+Write-Host "📋 Copying essential theme files..." -ForegroundColor Blue
 $sourceThemePath = $PSScriptRoot
-Copy-Item $sourceThemePath $themeTargetPath -Recurse -Force
+
+# Create target directory
+New-Item -ItemType Directory -Path $themeTargetPath -Force | Out-Null
+
+# Define essential files and directories to copy
+$essentialItems = @(
+    "user.css",
+    "color.ini",
+    "theme.js",
+    "manifest.json",
+    "assets",
+    "docs"
+)
+
+# Copy each essential item
+foreach ($item in $essentialItems) {
+    $sourcePath = Join-Path $sourceThemePath $item
+    $targetPath = Join-Path $themeTargetPath $item
+
+    if (Test-Path $sourcePath) {
+        if (Test-Path $sourcePath -PathType Container) {
+            # It's a directory - copy recursively
+            Copy-Item $sourcePath $targetPath -Recurse -Force
+            Write-Host "  📁 Copied directory: $item" -ForegroundColor Gray
+        } else {
+            # It's a file - copy directly
+            Copy-Item $sourcePath $targetPath -Force
+            Write-Host "  📄 Copied file: $item" -ForegroundColor Gray
+        }
+    } else {
+        Write-Host "  ⚠️  Optional item not found: $item" -ForegroundColor Yellow
+    }
+}
 
 # Verify essential files
 $essentialFiles = @("user.css", "color.ini", "theme.js", "manifest.json")
@@ -81,36 +112,13 @@ foreach ($file in $essentialFiles) {
         exit 1
     }
 }
-Write-Host "✅ Theme files copied successfully" -ForegroundColor Green
 
-# Install enhanced extension (optional)
-if (!$SkipExtension) {
-    $extensionSource = "$sourceThemePath\Extensions\theme-vibrant-enhanced.js"
-    $extensionTarget = "$extensionsPath\theme-vibrant-enhanced.js"
+Write-Host "✅ Essential theme files copied successfully" -ForegroundColor Green
+Write-Host "  🚫 Excluded development sources: /src, /src-js" -ForegroundColor Blue
 
-    if (Test-Path $extensionSource) {
-        Copy-Item $extensionSource $extensionTarget -Force
-        Write-Host "✅ Extension installed: theme-vibrant-enhanced.js" -ForegroundColor Green
-        $extensionInstalled = $true
-    } else {
-        Write-Host "⚠️  Enhanced extension file not found, checking for legacy extension..." -ForegroundColor Yellow
-
-        # Fallback to legacy extension if enhanced not found
-        $legacyExtensionSource = "$sourceThemePath\Extensions\theme-vibrant.js"
-        if (Test-Path $legacyExtensionSource) {
-            Copy-Item $legacyExtensionSource "$extensionsPath\theme-vibrant.js" -Force
-            Write-Host "✅ Legacy extension installed: theme-vibrant.js" -ForegroundColor Green
-            $extensionInstalled = $true
-            $legacyExtension = $true
-        } else {
-            Write-Host "⚠️  No extension files found, skipping..." -ForegroundColor Yellow
-            $extensionInstalled = $false
-        }
-    }
-} else {
-    Write-Host "⏭️  Skipping extension installation" -ForegroundColor Yellow
-    $extensionInstalled = $false
-}
+# No extensions to install - theme is self-contained
+$extensionInstalled = $false
+Write-Host "📦 Theme is self-contained (no extensions needed)" -ForegroundColor Blue
 
 # Validate color scheme
 $validSchemes = @("latte", "frappe", "macchiato", "mocha")
@@ -131,16 +139,7 @@ try {
     spicetify config current_theme catppuccin-starrynight
     spicetify config color_scheme $ColorScheme
 
-    # Enable extension if installed
-    if ($extensionInstalled) {
-        if ($legacyExtension) {
-            spicetify config extensions theme-vibrant.js
-            Write-Host "🔌 Extension enabled: theme-vibrant.js (legacy)" -ForegroundColor Green
-        } else {
-            spicetify config extensions theme-vibrant-enhanced.js
-            Write-Host "🔌 Extension enabled: theme-vibrant-enhanced.js (modern)" -ForegroundColor Green
-        }
-    }
+    # No extensions to configure - theme is self-contained
 
     # Apply changes using appropriate command based on version
     Write-Host "🚀 Applying theme..." -ForegroundColor Blue
@@ -157,13 +156,6 @@ try {
     Write-Host "📝 Try running manually:" -ForegroundColor Yellow
     Write-Host "   spicetify config current_theme catppuccin-starrynight" -ForegroundColor Gray
     Write-Host "   spicetify config color_scheme $ColorScheme" -ForegroundColor Gray
-    if ($extensionInstalled) {
-        if ($legacyExtension) {
-            Write-Host "   spicetify config extensions theme-vibrant.js" -ForegroundColor Gray
-        } else {
-            Write-Host "   spicetify config extensions theme-vibrant-enhanced.js" -ForegroundColor Gray
-        }
-    }
     if ($isNewVersion) {
         Write-Host "   spicetify backup apply" -ForegroundColor Gray
     } else {
@@ -183,23 +175,11 @@ Write-Host "🌟 Features enabled:" -ForegroundColor Yellow
 Write-Host "   • Catppuccin $ColorScheme color scheme" -ForegroundColor Gray
 Write-Host "   • Modern --spice- variable system" -ForegroundColor Gray
 Write-Host "   • 15 customizable accent colors" -ForegroundColor Gray
-if ($extensionInstalled) {
-    if ($legacyExtension) {
-        Write-Host "   • Dynamic album art gradients (legacy canvas-based)" -ForegroundColor Gray
-    } else {
-        Write-Host "   • Dynamic album art gradients (native API - CORS-free)" -ForegroundColor Gray
-        Write-Host "   • Enhanced color extraction with smart fallbacks" -ForegroundColor Gray
-    }
-    Write-Host "   • Animated star effects" -ForegroundColor Gray
-    Write-Host "   • Performance optimizations" -ForegroundColor Gray
-} else {
-    Write-Host "   • Static gradients (extension not installed)" -ForegroundColor Gray
-}
+Write-Host "   • Self-contained theme with built-in features" -ForegroundColor Gray
+Write-Host "   • Modern CSS gradient system" -ForegroundColor Gray
+Write-Host "   • Performance optimized styling" -ForegroundColor Gray
 Write-Host ""
 Write-Host "📖 For more info, check the README.md and IMPLEMENTATION_NOTES.md" -ForegroundColor Blue
-if ($extensionInstalled -and !$legacyExtension) {
-    Write-Host "🎯 Enable debug mode: Set enableDebug: true in theme-vibrant-enhanced.js" -ForegroundColor Blue
-}
 Write-Host "🐛 Issues? Run: spicetify restore && spicetify backup apply" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "Enjoy your starry night! 🌙✨" -ForegroundColor Magenta

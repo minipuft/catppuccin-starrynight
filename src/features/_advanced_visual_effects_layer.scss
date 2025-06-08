@@ -4,7 +4,10 @@
 // "We don't enhance interfaces. We TEAR HOLES IN REALITY."
 // - Flux, Emergent Systems Choreographer
 
-@use "mixins" as *;
+@use "../core/mixins" as *;
+
+// SASS variable for fractal iteration depth for compile-time logic
+$fractal-iteration-depth-sass: 5;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🌌 QUANTUM PARTICLE FIELD FOUNDATION
@@ -52,7 +55,7 @@
 
   // === FRACTAL RECURSION DEPTH ===
   --fractal-zoom-level: 1;
-  --fractal-iteration-depth: 5;
+  --fractal-iteration-depth: #{$fractal-iteration-depth-sass};
   --fractal-golden-ratio: 1.618;
   --fractal-spiral-tightness: 0.2;
 }
@@ -475,7 +478,7 @@
     pointer-events: none;
     z-index: 1;
 
-    @if $depth < var(--fractal-iteration-depth) {
+    @if $depth < $fractal-iteration-depth-sass {
       // Recursive iteration
       &::before {
         content: "";
@@ -572,7 +575,7 @@
       );
     background-size: 50px 50px, 30px 30px, 70px 70px, 40px 40px;
     animation: particle-drift 20s linear infinite;
-    z-index: -1000;
+    z-index: 2; // ✅ Changed from -1000 to +2 to bring effects forward
     pointer-events: none;
 
     // Custom particle drift properties for each particle layer
@@ -594,7 +597,7 @@
       rgba(var(--sn-gradient-primary-rgb), 0.15) 0%,
       transparent var(--particle-interaction-radius)
     );
-    z-index: -999;
+    z-index: 3; // ✅ Changed from -999 to +3 to bring effects forward
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s ease;

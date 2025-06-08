@@ -1,10 +1,20 @@
 // ████████████████████████████████████████████████████████████████████████████████
 // YEAR 3000 REALITY BREACH ENHANCEMENT - Revolutionary Visual Experience
 // ████████████████████████████████████████████████████████████████████████████████
-@use "mixins" as *;
-@use "sn_year3000_reality_breach" as *;
-@use "sidebar_consciousness" as *;
-@use "sidebar_dimensional_nexus" as *;
+@use "mixins" as *; // Corrected path for _mixins.scss in the same directory
+@use "../features/themed_interactive_components" as *;
+@use "../sidebar/sidebar_consciousness" as *;
+@use "../sidebar/sidebar_dimensional_nexus" as *;
+
+// ████████████████████████████████████████████████████████████████████████████████
+// BREATHING SCALE APPLICATION - Subtle Rhythm Synchronization
+// ████████████████████████████████████████████████████████████████████████████████
+:root {
+  // Apply breathing scale to main interface elements for subtle rhythm sync
+  transform: scale(var(--sn-breathing-scale, 1));
+  transform-origin: center;
+  transition: transform 50ms ease-out; // Quick response to rhythm changes
+}
 
 :root .Root__main-view {
   // Duration in album view

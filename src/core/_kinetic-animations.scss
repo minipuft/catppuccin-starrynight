@@ -1,0 +1,436 @@
+// ===== YEAR 3000 KINETIC ANIMATIONS =====
+// CSS keyframe animations for kinetic verbs: ripple, bloom, refract, oscillate, harmonize
+
+// ===== RIPPLE ANIMATIONS =====
+
+@keyframes year3000-ripple {
+  0% {
+    transform: scale(0);
+    opacity: var(--sn-kinetic-intensity, 0.6);
+  }
+  50% {
+    opacity: calc(var(--sn-kinetic-intensity, 0.6) * 0.8);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes year3000-ripple-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: var(--sn-kinetic-intensity, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: calc(var(--sn-kinetic-intensity, 0.3) * 1.5);
+  }
+}
+
+// ===== BLOOM ANIMATIONS =====
+
+@keyframes year3000-bloom {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter:
+      drop-shadow(0 0 0px rgba(var(--sn-bloom-glow-color, 140,170,238), 0))
+      brightness(1);
+  }
+  25% {
+    transform: scale(calc(1 + var(--sn-bloom-intensity, 1) * 0.15)) rotate(1deg);
+    filter:
+      drop-shadow(0 0 calc(var(--sn-bloom-intensity, 1) * 8px) rgba(var(--sn-bloom-glow-color, 140,170,238), 0.6))
+      brightness(calc(1 + var(--sn-bloom-intensity, 1) * 0.1));
+  }
+  75% {
+    transform: scale(calc(1 + var(--sn-bloom-intensity, 1) * 0.08)) rotate(-0.5deg);
+    filter:
+      drop-shadow(0 0 calc(var(--sn-bloom-intensity, 1) * 12px) rgba(var(--sn-bloom-glow-color, 140,170,238), 0.4))
+      brightness(calc(1 + var(--sn-bloom-intensity, 1) * 0.05));
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter:
+      drop-shadow(0 0 0px rgba(var(--sn-bloom-glow-color, 140,170,238), 0))
+      brightness(1);
+  }
+}
+
+@keyframes year3000-bloom-subtle {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0px rgba(var(--sn-bloom-glow-color, 140,170,238), 0);
+  }
+  50% {
+    transform: scale(calc(1 + var(--sn-bloom-intensity, 1) * 0.03));
+    box-shadow: 0 0 calc(var(--sn-bloom-intensity, 1) * 6px) rgba(var(--sn-bloom-glow-color, 140,170,238), 0.3);
+  }
+}
+
+// ===== REFRACT ANIMATIONS =====
+
+@keyframes year3000-refract {
+  0% {
+    filter:
+      blur(0px)
+      hue-rotate(0deg)
+      saturate(1);
+    transform: perspective(1000px) rotateY(0deg);
+  }
+  50% {
+    filter:
+      blur(calc(var(--sn-refract-intensity, 1) * 0.5px))
+      hue-rotate(calc(var(--sn-refract-intensity, 1) * 15deg))
+      saturate(calc(1 + var(--sn-refract-intensity, 1) * 0.2));
+    transform: perspective(1000px) rotateY(calc(var(--sn-refract-intensity, 1) * 2deg));
+  }
+  100% {
+    filter:
+      blur(0px)
+      hue-rotate(0deg)
+      saturate(1);
+    transform: perspective(1000px) rotateY(0deg);
+  }
+}
+
+@keyframes year3000-light-bend {
+  0%, 100% {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0) 45%,
+      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.1) 50%,
+      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0) 55%,
+      transparent 100%
+    );
+    transform: translateX(-100%);
+  }
+  50% {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0) 30%,
+      rgba(var(--sn-gradient-accent-rgb, 140,170,238), calc(var(--sn-refract-intensity, 1) * 0.3)) 50%,
+      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0) 70%,
+      transparent 100%
+    );
+    transform: translateX(100%);
+  }
+}
+
+// ===== OSCILLATE ANIMATIONS =====
+
+@keyframes year3000-oscillate {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: var(--sn-harmonic-opacity-oscillation, 0.8);
+  }
+  25% {
+    transform: scale(var(--sn-harmonic-scale-pulse, 1.02)) rotate(calc(var(--sn-harmonic-rotation-flow, 0) * 1deg));
+  }
+  50% {
+    transform: scale(calc(var(--sn-harmonic-scale-pulse, 1.02) * 1.01)) rotate(calc(var(--sn-harmonic-rotation-flow, 0) * -0.5deg));
+  }
+  75% {
+    transform: scale(var(--sn-harmonic-scale-pulse, 1.02)) rotate(calc(var(--sn-harmonic-rotation-flow, 0) * 0.5deg));
+  }
+}
+
+@keyframes year3000-heartbeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.05);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.08);
+  }
+  70% {
+    transform: scale(1);
+  }
+}
+
+// ===== HARMONIZE ANIMATIONS =====
+
+@keyframes year3000-harmonize-fundamental {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: calc(0.8 + var(--sn-harmonic-fundamental, 0) * 0.2);
+  }
+  50% {
+    transform: translateY(calc(var(--sn-harmonic-fundamental, 0) * -2px)) scale(calc(1 + var(--sn-harmonic-fundamental, 0) * 0.02));
+  }
+}
+
+@keyframes year3000-harmonize-sub {
+  0%, 100% {
+    transform: rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    transform: rotate(calc(var(--sn-harmonic-sub-harmonic, 0) * 1deg));
+    filter: hue-rotate(calc(var(--sn-harmonic-sub-harmonic, 0) * 5deg));
+  }
+}
+
+@keyframes year3000-harmonize-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+// ===== TEMPORAL ECHO ANIMATIONS =====
+
+@keyframes year3000-temporal-echo {
+  0% {
+    opacity: calc(var(--sn-kinetic-intensity, 1) * 0.3);
+    transform: scale(1.05);
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+    filter: blur(3px);
+  }
+}
+
+@keyframes year3000-future-preview {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+    filter: blur(2px);
+  }
+  50% {
+    opacity: calc(var(--sn-kinetic-intensity, 1) * 0.2);
+    transform: scale(1);
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+    filter: blur(0px);
+  }
+}
+
+// ===== AESTHETIC GRAVITY ANIMATIONS =====
+
+@keyframes year3000-gravity-pull {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(calc(var(--sn-gravity-x, 0) * 2px), calc(var(--sn-gravity-y, 0) * 2px)) scale(1.01);
+  }
+}
+
+@keyframes year3000-attention-flow {
+  0% {
+    background: radial-gradient(
+      circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.05) 0%,
+      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.02) 30%,
+      transparent 60%
+    );
+  }
+  100% {
+    background: radial-gradient(
+      circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.08) 0%,
+      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.03) 40%,
+      transparent 70%
+    );
+  }
+}
+
+// ===== KINETIC VERB CSS CLASSES =====
+
+// Ripple Classes
+.sn-ripple-active {
+  animation: year3000-ripple 1200ms ease-out;
+}
+
+.sn-ripple-pulse {
+  animation: year3000-ripple-pulse calc(var(--sn-kinetic-tempo-multiplier, 1) * 2s) ease-in-out infinite;
+}
+
+// Bloom Classes
+.sn-bloom-active {
+  animation: year3000-bloom calc(var(--sn-bloom-intensity, 1) * 1500ms) cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.sn-bloom-subtle {
+  animation: year3000-bloom-subtle calc(var(--sn-kinetic-tempo-multiplier, 1) * 3s) ease-in-out infinite;
+}
+
+// Refract Classes
+.sn-refract-active {
+  animation: year3000-refract 800ms ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.sn-refract-active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: year3000-light-bend 1200ms ease-in-out;
+  pointer-events: none;
+}
+
+// Oscillate Classes
+.sn-oscillate-active {
+  animation: year3000-oscillate calc(var(--sn-kinetic-tempo-multiplier, 1) * 4s) ease-in-out infinite;
+}
+
+.sn-heartbeat-sync {
+  animation: year3000-heartbeat calc(var(--sn-kinetic-tempo-multiplier, 1) * 2s) ease-in-out infinite;
+}
+
+// Harmonize Classes
+.sn-harmonize-fundamental {
+  animation: year3000-harmonize-fundamental calc(var(--sn-kinetic-tempo-multiplier, 1) * 1s) linear infinite;
+}
+
+.sn-harmonize-sub {
+  animation: year3000-harmonize-sub calc(var(--sn-kinetic-tempo-multiplier, 1) * 2s) ease-in-out infinite;
+}
+
+.sn-harmonize-flow {
+  background: linear-gradient(
+    90deg,
+    rgba(var(--sn-gradient-primary-rgb, 202,158,230), 0.1),
+    rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.1),
+    rgba(var(--sn-gradient-secondary-rgb, 186,187,241), 0.1)
+  );
+  background-size: 200% 100%;
+  animation: year3000-harmonize-flow calc(var(--sn-kinetic-tempo-multiplier, 1) * 8s) linear infinite;
+}
+
+// Temporal Echo Classes
+.sn-temporal-echo {
+  animation: year3000-temporal-echo 800ms ease-out forwards;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.sn-future-preview {
+  animation: year3000-future-preview 2000ms ease-in-out;
+}
+
+// Aesthetic Gravity Classes
+.sn-gravity-active {
+  animation: year3000-gravity-pull calc(var(--sn-kinetic-tempo-multiplier, 1) * 1s) ease-in-out infinite;
+}
+
+.sn-attention-flow {
+  animation: year3000-attention-flow 3000ms ease-in-out infinite alternate;
+}
+
+// ===== KINETIC CANVAS ANIMATIONS =====
+
+.year3000-kinetic-canvas {
+  transition: all 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.year3000-kinetic-canvas[data-kinetic-mode="pulse"] {
+  animation: year3000-pulse calc(var(--sn-kinetic-tempo-multiplier, 1) * 1s) ease-in-out infinite;
+}
+
+.year3000-kinetic-canvas[data-kinetic-mode="breathe"] {
+  animation: year3000-oscillate calc(var(--sn-kinetic-tempo-multiplier, 1) * 4s) ease-in-out infinite;
+}
+
+.year3000-kinetic-canvas[data-kinetic-mode="flow"] {
+  background: linear-gradient(
+    45deg,
+    rgba(var(--sn-gradient-primary-rgb, 202,158,230), 0.03),
+    rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.03),
+    rgba(var(--sn-gradient-secondary-rgb, 186,187,241), 0.03)
+  );
+  background-size: 400% 400%;
+  animation: year3000-harmonize-flow calc(var(--sn-kinetic-tempo-multiplier, 1) * 8s) linear infinite;
+}
+
+// ===== RESPONSIVE KINETIC ANIMATIONS =====
+
+// Reduce motion for accessibility
+@media (prefers-reduced-motion: reduce) {
+  .sn-bloom-active,
+  .sn-refract-active,
+  .sn-oscillate-active,
+  .sn-harmonize-fundamental,
+  .sn-harmonize-sub,
+  .sn-harmonize-flow,
+  .sn-temporal-echo,
+  .sn-gravity-active,
+  .year3000-kinetic-canvas {
+    animation: none !important;
+  }
+
+  .sn-bloom-active {
+    transform: scale(1.02);
+    filter: drop-shadow(0 0 4px rgba(var(--sn-bloom-glow-color, 140,170,238), 0.3));
+  }
+
+  .sn-refract-active {
+    filter: brightness(1.05);
+  }
+}
+
+// Performance optimizations for low-end devices
+@media (max-width: 768px) {
+  .sn-bloom-active,
+  .sn-refract-active,
+  .sn-harmonize-flow {
+    animation-duration: calc(var(--original-duration, 1s) * 0.7) !important;
+  }
+
+  .sn-temporal-echo,
+  .sn-future-preview {
+    display: none; // Skip echo effects on mobile
+  }
+}
+
+// ===== MODE-SPECIFIC KINETIC OVERRIDES =====
+
+// Corporate Safe Mode: Minimal kinetic effects
+[data-artistic-mode="corporate-safe"] .sn-bloom-active {
+  animation: year3000-bloom-subtle calc(var(--sn-kinetic-tempo-multiplier, 1) * 4s) ease-in-out infinite;
+}
+
+[data-artistic-mode="corporate-safe"] .sn-refract-active,
+[data-artistic-mode="corporate-safe"] .sn-temporal-echo,
+[data-artistic-mode="corporate-safe"] .sn-gravity-active {
+  animation: none;
+}
+
+// Artist Vision Mode: Balanced kinetic effects
+[data-artistic-mode="artist-vision"] .sn-bloom-active {
+  animation-duration: calc(var(--sn-bloom-intensity, 1) * 1200ms);
+}
+
+// Cosmic Maximum Mode: Enhanced kinetic effects
+[data-artistic-mode="cosmic-maximum"] .sn-bloom-active {
+  animation:
+    year3000-bloom calc(var(--sn-bloom-intensity, 1) * 1000ms) cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    year3000-bloom-subtle calc(var(--sn-kinetic-tempo-multiplier, 1) * 3s) ease-in-out infinite;
+}
+
+[data-artistic-mode="cosmic-maximum"] .sn-harmonize-flow {
+  background-size: 300% 300%;
+  animation-duration: calc(var(--sn-kinetic-tempo-multiplier, 1) * 6s);
+}

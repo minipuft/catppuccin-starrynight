@@ -300,8 +300,8 @@ These variables are calculated within the `year3000System.applyColorsToTheme` fu
 - **Files Audited with No Changes Required (Already dynamic or not applicable for these specific variables)**:
   - `src/_sn_atmospheric.scss`
   - `src/_sn_gradient.scss`
-  - `src/_sn_year3000_reality_breach.scss`
-  - `src/_sn_reality_breach.scss`
+  - `src/_themed_interactive_components.scss`
+  - `src/_advanced_visual_effects_layer.scss`
   - `src/_sn_context_zones.scss`
   - `src/_sn_loading.scss`
   - `src/_sn_microinteractions.scss`
