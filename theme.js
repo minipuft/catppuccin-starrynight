@@ -1105,7 +1105,7 @@
   }
   function createSettingsPanel() {
     const settingsContainer = document.querySelector(
-      ".main-view-container__scroll-node-child"
+      ".main-viewContainer-scrollNode, .main-view-container__scroll-node-child"
     );
     if (!settingsContainer) {
       console.warn("Settings container not found, retrying...");
@@ -1118,14 +1118,23 @@
     <h2 class="TypeElement-cello-textBase-type">Catppuccin StarryNight</h2>
     <div id="starrynight-settings-content"></div>
   `;
+    const settingsPageRoot = settingsContainer.querySelector(
+      ".main-settingsPage-section, .main-settingsPage-sectionContainer"
+    )?.parentElement;
+    if (settingsPageRoot && !settingsPageRoot.querySelector("#starrynight-settings-content")) {
+      settingsPageRoot.appendChild(settingsSection);
+      renderSettingsContent();
+    }
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === Node.ELEMENT_NODE) {
             const element = node;
-            if (element.querySelector?.(".main-settingsPage-section")) {
+            if (element.querySelector?.(
+              ".main-settingsPage-section, .main-settingsPage-sectionContainer"
+            )) {
               const settingsPage = element.querySelector(
-                ".main-settingsPage-section"
+                ".main-settingsPage-section, .main-settingsPage-sectionContainer"
               )?.parentElement;
               if (settingsPage && !settingsPage.querySelector("#starrynight-settings-content")) {
                 settingsPage.appendChild(settingsSection);
@@ -1147,6 +1156,7 @@
     const currentGradient = settingsManager?.get("sn-gradient-intensity") || "balanced";
     const currentStars = settingsManager?.get("sn-star-density") || "balanced";
     const currentGlass = settingsManager?.get("sn-glassmorphism-level") || "moderate";
+    const current3D = settingsManager?.get("sn-3d-effects-level") || "full";
     const SettingsComponent = () => {
       const [accentColor, setAccentColor] = React.useState(currentAccent);
       const [gradientIntensity, setGradientIntensity] = React.useState(currentGradient);
@@ -1154,6 +1164,7 @@
       const [glassLevel, setGlassLevel] = React.useState(
         currentGlass === "moderate" ? "balanced" : currentGlass
       );
+      const [threeDLevel, setThreeDLevel] = React.useState(current3D);
       const handleAccentChange = (newAccent) => {
         setAccentColor(newAccent);
         applyAccentColor(newAccent);
@@ -1181,6 +1192,13 @@
         if (settingsManager) {
           const mappedValue = newLevel === "balanced" ? "moderate" : newLevel;
           settingsManager.set("sn-glassmorphism-level", mappedValue);
+        }
+      };
+      const handleThreeDChange = (newLevel) => {
+        setThreeDLevel(newLevel);
+        applyThreeDEffects(newLevel);
+        if (settingsManager) {
+          settingsManager.set("sn-3d-effects-level", newLevel);
         }
       };
       return React.createElement("div", { className: "starrynight-settings" }, [
@@ -1283,9 +1301,44 @@
               )
             )
           )
+        ]),
+        // 3-D Effects Dropdown
+        React.createElement("div", { key: "threeD", className: "setting-row" }, [
+          React.createElement(
+            "label",
+            { key: "threeD-label", className: "setting-label" },
+            "3D Effects"
+          ),
+          React.createElement(
+            "select",
+            {
+              key: "threeD-select",
+              className: "main-dropDown-dropDown",
+              value: threeDLevel,
+              onChange: (e) => handleThreeDChange(e.target.value)
+            },
+            threeDOptions.map(
+              (option) => React.createElement(
+                "option",
+                { key: option, value: option },
+                option.charAt(0).toUpperCase() + option.slice(1)
+              )
+            )
+          )
         ])
       ]);
     };
+    if (!document.getElementById("starrynight-settings-style")) {
+      const styleEl = document.createElement("style");
+      styleEl.id = "starrynight-settings-style";
+      styleEl.textContent = `
+      /* StarryNight settings styling */
+      .starrynight-settings .setting-row { display:flex; align-items:center; justify-content: space-between; margin:8px 0; }
+      .starrynight-settings .setting-label { font-weight:600; opacity:0.9; }
+      .starrynight-settings .main-dropDown-dropDown { min-width:180px; }
+    `;
+      document.head.appendChild(styleEl);
+    }
     ReactDOM.render(React.createElement(SettingsComponent), container);
   }
   function migrateExistingSettings() {
@@ -1350,7 +1403,18 @@
       console.error("\u274C [StarryNight] Error applying glass settings:", error);
     }
   }
-  var React, ReactDOM, accentColors, intensityOptions;
+  function applyThreeDEffects(level) {
+    try {
+      const year3000System2 = globalThis.year3000System;
+      if (year3000System2?.card3DManager) {
+        year3000System2.card3DManager.apply3DMode(level);
+      }
+      console.log(`\u2728 [StarryNight] 3D effects applied: ${level}`);
+    } catch (error) {
+      console.error("\u274C [StarryNight] Error applying 3D effects:", error);
+    }
+  }
+  var React, ReactDOM, accentColors, intensityOptions, threeDOptions;
   var init_SettingsSpicetifyNative = __esm({
     "src-js/components/SettingsSpicetifyNative.tsx"() {
       "use strict";
@@ -1375,6 +1439,7 @@
         "text"
       ];
       intensityOptions = ["disabled", "minimal", "balanced", "intense"];
+      threeDOptions = ["disabled", "minimal", "full"];
     }
   });
 
@@ -3492,7 +3557,6 @@
   var Year3000Utilities_exports = {};
   __export(Year3000Utilities_exports, {
     adjustColor: () => adjustColor,
-    adjustColorForContrast: () => adjustColorForContrast,
     bpmToAnimationFrameRate: () => bpmToAnimationFrameRate,
     bpmToInterval: () => bpmToInterval,
     calculateBreathingScale: () => calculateBreathingScale,
@@ -3894,38 +3958,6 @@
     hsl.l = Math.max(0, Math.min(100, hsl.l * brightness));
     return hslToRgb(hsl.h, hsl.s, hsl.l);
   }
-  function adjustColorForContrast(foregroundHex, backgroundHex, minContrast = 4.5, maxSteps = 20, stepSize = 2) {
-    let fgRgb = hexToRgb(foregroundHex);
-    const bgRgb = hexToRgb(backgroundHex);
-    if (!fgRgb || !bgRgb) return foregroundHex;
-    let contrast = calculateContrastRatio(foregroundHex, backgroundHex);
-    if (contrast >= minContrast) {
-      return foregroundHex;
-    }
-    const luminance = (rgb) => {
-      const [r, g, b] = [rgb.r, rgb.g, rgb.b].map((c) => {
-        c = c / 255;
-        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-      });
-      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    };
-    const bgLum = luminance(bgRgb);
-    let lighten = luminance(fgRgb) <= bgLum;
-    let hsl = rgbToHsl(fgRgb.r, fgRgb.g, fgRgb.b);
-    for (let i = 0; i < maxSteps && contrast < minContrast; i++) {
-      hsl.l = Math.max(
-        0,
-        Math.min(100, hsl.l + (lighten ? stepSize : -stepSize))
-      );
-      const adjusted = hslToRgb(hsl.h, hsl.s, hsl.l);
-      const adjustedHex = rgbToHex(adjusted.r, adjusted.g, adjusted.b);
-      contrast = calculateContrastRatio(adjustedHex, backgroundHex);
-      if (contrast >= minContrast) {
-        return adjustedHex;
-      }
-    }
-    return foregroundHex;
-  }
 
   // src-js/managers/GlassmorphismManager.ts
   var GlassmorphismManager = class _GlassmorphismManager {
@@ -4131,8 +4163,7 @@
         "sn-harmonic-intensity": "0.7",
         "sn-harmonic-evolution": "true",
         "sn-harmonic-manual-base-color": "",
-        "sn-enable-webgpu": "true",
-        "sn-accessibility-mode": "default"
+        "sn-enable-webgpu": "true"
       };
       this.validationSchemas = {
         "catppuccin-flavor": {
@@ -4195,10 +4226,6 @@
         "sn-enable-webgpu": {
           default: "true",
           allowedValues: ["true", "false"]
-        },
-        "sn-accessibility-mode": {
-          default: "default",
-          allowedValues: ["default", "high-contrast", "colorblind-safe"]
         }
       };
       this.validateAndRepair();
@@ -6109,22 +6136,11 @@
         musicAnalysisService || null,
         settingsManager || null
       );
-      // Accessibility settings
-      this.accessibilityMode = "default";
       this.systemName = "ColorHarmonyEngine";
       this.paletteExtensionManager = new PaletteExtensionManager(
         this.config,
         this.utils
       );
-      if (settingsManager) {
-        try {
-          this.accessibilityMode = settingsManager.get(
-            "sn-accessibility-mode"
-          );
-        } catch (e) {
-          this.accessibilityMode = "default";
-        }
-      }
       this.currentTheme = this.detectCurrentTheme();
       this.harmonyMetrics = {
         totalHarmonyCalculations: 0,
@@ -6687,15 +6703,11 @@
           bestAccent.rgb,
           blendRatio
         );
-        let finalHex = this.utils.rgbToHex(finalRgb.r, finalRgb.g, finalRgb.b);
-        if (this.accessibilityMode === "high-contrast") {
-          try {
-            const baseBg = currentPalette.neutrals.base;
-            finalHex = this.utils.adjustColorForContrast(finalHex, baseBg, 4.5);
-          } catch (e) {
-          }
-        }
-        harmonizedColors[role] = finalHex;
+        harmonizedColors[role] = this.utils.rgbToHex(
+          finalRgb.r,
+          finalRgb.g,
+          finalRgb.b
+        );
       }
       this.harmonyMetrics.musicInfluencedAdjustments++;
       this.performanceMonitor?.emitTrace?.(
@@ -11030,7 +11042,9 @@
     try {
       if (requiredAPIs.react && requiredAPIs.reactDOM) {
         const settingsUiModule = await Promise.resolve().then(() => (init_SettingsSpicetifyNative(), SettingsSpicetifyNative_exports));
-        await settingsUiModule.initializeSpicetifyNativeSettings();
+        if (settingsUiModule.initializeSpicetifyNativeSettings) {
+          await settingsUiModule.initializeSpicetifyNativeSettings();
+        }
         console.log(
           "\u{1F31F} [StarryNight] Spicetify native settings with Year3000System integration initialized"
         );

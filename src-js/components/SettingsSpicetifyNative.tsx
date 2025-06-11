@@ -25,6 +25,9 @@ const accentColors = [
 
 const intensityOptions = ["disabled", "minimal", "balanced", "intense"];
 
+// 3-D effects quality options
+const threeDOptions = ["disabled", "minimal", "full"];
+
 export function initializeSpicetifyNativeSettings() {
   try {
     // Migrate existing settings first
@@ -43,9 +46,9 @@ export function initializeSpicetifyNativeSettings() {
 }
 
 function createSettingsPanel() {
-  // Find Spotify's settings container
+  // Find Spotify's settings container (new and legacy class names)
   const settingsContainer = document.querySelector(
-    ".main-view-container__scroll-node-child"
+    ".main-viewContainer-scrollNode, .main-view-container__scroll-node-child"
   );
   if (!settingsContainer) {
     console.warn("Settings container not found, retrying...");
@@ -55,11 +58,33 @@ function createSettingsPanel() {
 
   // Create our settings section
   const settingsSection = document.createElement("div");
-  settingsSection.className = "main-settingsPage-section";
+  settingsSection.className = "main-settingsPage-section"; // keep legacy class for styling
   settingsSection.innerHTML = `
     <h2 class="TypeElement-cello-textBase-type">Catppuccin StarryNight</h2>
     <div id="starrynight-settings-content"></div>
   `;
+
+  /*
+   * Attempt immediate insertion.
+   * -------------------------------------------------------------
+   * When the user navigates to Settings, the DOM for all sections
+   * is usually rendered **before** our extension code runs. In
+   * that case our previous approach – waiting for a MutationObserver
+   * – never fired, so the panel was never attached.  We now try to
+   * append the section right away if the page is already present.
+   */
+
+  const settingsPageRoot = settingsContainer.querySelector(
+    ".main-settingsPage-section, .main-settingsPage-sectionContainer"
+  )?.parentElement;
+
+  if (
+    settingsPageRoot &&
+    !settingsPageRoot.querySelector("#starrynight-settings-content")
+  ) {
+    settingsPageRoot.appendChild(settingsSection);
+    renderSettingsContent();
+  }
 
   // Insert into settings page (when user opens settings)
   const observer = new MutationObserver((mutations) => {
@@ -67,9 +92,13 @@ function createSettingsPanel() {
       mutation.addedNodes.forEach((node) => {
         if (node.nodeType === Node.ELEMENT_NODE) {
           const element = node as Element;
-          if (element.querySelector?.(".main-settingsPage-section")) {
+          if (
+            element.querySelector?.(
+              ".main-settingsPage-section, .main-settingsPage-sectionContainer"
+            )
+          ) {
             const settingsPage = element.querySelector(
-              ".main-settingsPage-section"
+              ".main-settingsPage-section, .main-settingsPage-sectionContainer"
             )?.parentElement;
             if (
               settingsPage &&
@@ -103,6 +132,9 @@ function renderSettingsContent() {
   const currentGlass =
     settingsManager?.get("sn-glassmorphism-level") || "moderate";
 
+  // 3-D Effects
+  const current3D = settingsManager?.get("sn-3d-effects-level") || "full";
+
   // Create React component using Spicetify's components
   const SettingsComponent = () => {
     const [accentColor, setAccentColor] = React.useState(currentAccent);
@@ -112,6 +144,7 @@ function renderSettingsContent() {
     const [glassLevel, setGlassLevel] = React.useState(
       currentGlass === "moderate" ? "balanced" : currentGlass
     );
+    const [threeDLevel, setThreeDLevel] = React.useState(current3D);
 
     const handleAccentChange = (newAccent: string) => {
       setAccentColor(newAccent);
@@ -143,6 +176,14 @@ function renderSettingsContent() {
       if (settingsManager) {
         const mappedValue = newLevel === "balanced" ? "moderate" : newLevel;
         settingsManager.set("sn-glassmorphism-level", mappedValue);
+      }
+    };
+
+    const handleThreeDChange = (newLevel: string) => {
+      setThreeDLevel(newLevel);
+      applyThreeDEffects(newLevel);
+      if (settingsManager) {
+        settingsManager.set("sn-3d-effects-level", newLevel as any);
       }
     };
 
@@ -250,10 +291,48 @@ function renderSettingsContent() {
           )
         ),
       ]),
+
+      // 3-D Effects Dropdown
+      React.createElement("div", { key: "threeD", className: "setting-row" }, [
+        React.createElement(
+          "label",
+          { key: "threeD-label", className: "setting-label" },
+          "3D Effects"
+        ),
+        React.createElement(
+          "select",
+          {
+            key: "threeD-select",
+            className: "main-dropDown-dropDown",
+            value: threeDLevel,
+            onChange: (e: any) => handleThreeDChange(e.target.value),
+          },
+          threeDOptions.map((option) =>
+            React.createElement(
+              "option",
+              { key: option, value: option },
+              option.charAt(0).toUpperCase() + option.slice(1)
+            )
+          )
+        ),
+      ]),
     ]);
   };
 
   // Render using Spicetify's ReactDOM
+  // Inject minimal CSS styling once per session
+  if (!document.getElementById("starrynight-settings-style")) {
+    const styleEl = document.createElement("style");
+    styleEl.id = "starrynight-settings-style";
+    styleEl.textContent = `
+      /* StarryNight settings styling */
+      .starrynight-settings .setting-row { display:flex; align-items:center; justify-content: space-between; margin:8px 0; }
+      .starrynight-settings .setting-label { font-weight:600; opacity:0.9; }
+      .starrynight-settings .main-dropDown-dropDown { min-width:180px; }
+    `;
+    document.head.appendChild(styleEl);
+  }
+
   ReactDOM.render(React.createElement(SettingsComponent), container);
 }
 
@@ -333,5 +412,17 @@ function applyGlassSettings(glassLevel: string) {
     console.log(`✨ [StarryNight] Glass effects applied: ${glassLevel}`);
   } catch (error) {
     console.error("❌ [StarryNight] Error applying glass settings:", error);
+  }
+}
+
+function applyThreeDEffects(level: string) {
+  try {
+    const year3000System = (globalThis as any).year3000System;
+    if (year3000System?.card3DManager) {
+      year3000System.card3DManager.apply3DMode(level);
+    }
+    console.log(`✨ [StarryNight] 3D effects applied: ${level}`);
+  } catch (error) {
+    console.error("❌ [StarryNight] Error applying 3D effects:", error);
   }
 }

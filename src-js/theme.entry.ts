@@ -121,7 +121,9 @@ async function waitForAPI(apiPath: string, timeout = 5000): Promise<any> {
       const settingsUiModule = await import(
         "./components/SettingsSpicetifyNative"
       );
-      await settingsUiModule.initializeSpicetifyNativeSettings();
+      if (settingsUiModule.initializeSpicetifyNativeSettings) {
+        await settingsUiModule.initializeSpicetifyNativeSettings();
+      }
       console.log(
         "🌟 [StarryNight] Spicetify native settings with Year3000System integration initialized"
       );
