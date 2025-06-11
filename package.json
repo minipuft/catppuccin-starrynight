@@ -4,11 +4,19 @@
   "description": "Spicetify theme with Catppuccin StarryNight dynamic effects.",
   "main": "theme.js",
   "scripts": {
-    "build": "esbuild src-js/theme.entry.js --bundle --outfile=theme.js --format=iife --global-name=catppuccinStarryNight --loader:.js=jsx --jsx-factory=Spicetify.React.createElement --jsx-fragment=Spicetify.React.Fragment",
-    "watch": "esbuild src-js/theme.entry.js --bundle --outfile=theme.js --format=iife --global-name=catppuccinStarryNight --loader:.js=jsx --jsx-factory=Spicetify.React.createElement --jsx-fragment=Spicetify.React.Fragment --watch"
+    "test": "jest",
+    "build": "esbuild src-js/theme.entry.ts --bundle --outfile=theme.js --format=iife --target=es2020 --external:react --external:react-dom"
   },
   "devDependencies": {
-    "esbuild": "^0.20.0"
+    "@types/node": "^20.12.12",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "esbuild": "^0.21.4",
+    "typescript": "^5.4.5",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "@types/jest": "^29.5.12",
+    "spicetify-creator": "^1.0.17"
   },
   "keywords": [
     "spicetify",

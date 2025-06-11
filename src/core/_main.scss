@@ -1,17 +1,16 @@
 // ████████████████████████████████████████████████████████████████████████████████
 // YEAR 3000 REALITY BREACH ENHANCEMENT - Revolutionary Visual Experience
 // ████████████████████████████████████████████████████████████████████████████████
-@use "mixins" as *; // Corrected path for _mixins.scss in the same directory
+@use "mixins" as *;
 @use "../features/themed_interactive_components" as *;
-@use "../sidebar/sidebar_consciousness" as *;
+@use "../sidebar/sidebar-consciousness" as *;
 @use "../sidebar/sidebar_dimensional_nexus" as *;
 
 // ████████████████████████████████████████████████████████████████████████████████
 // BREATHING SCALE APPLICATION - Subtle Rhythm Synchronization
 // ████████████████████████████████████████████████████████████████████████████████
 :root {
-  // Apply breathing scale to main interface elements for subtle rhythm sync
-  transform: scale(var(--sn-breathing-scale, 1));
+  //Applybreathingscaletomaininterfaceelementsforsubtlerhythmsynctransform: scale(var(--sn-breathing-scale, 1));
   transform-origin: center;
   transition: transform 50ms ease-out; // Quick response to rhythm changes
 }
@@ -203,6 +202,9 @@
         filter: brightness(
           calc(1 + (0.5 - var(--sn-oklab-primary-l, 0.5)) * 0.3)
         );
+        -webkit-filter: brightness(
+          calc(1 + (0.5 - var(--sn-oklab-primary-l, 0.5)) * 0.3)
+        );
         backdrop-filter: blur(5px);
 
         // Add subtle side border
@@ -259,46 +261,27 @@
         filter: brightness(
           calc(1 + (0.5 - var(--sn-oklab-primary-l, 0.5)) * 0.15)
         );
+        -webkit-filter: brightness(
+          calc(1 + (0.5 - var(--sn-oklab-primary-l, 0.5)) * 0.15)
+        );
 
         &::before {
-          content: "";
-          position: absolute;
-          left: 0;
-          top: 50%; // Center vertically
-          bottom: auto; // Remove bottom constraint
-          height: 40px; // Set fixed height
-          transform: translateY(-50%); // Adjust for vertical centering
-          width: 4px;
-          background: rgb(
-            var(--sn-oklab-processed-primary-rgb-r, 202),
-            var(--sn-oklab-processed-primary-rgb-g, 158),
-            var(--sn-oklab-processed-primary-rgb-b, 230)
-          );
-          border-radius: 0 2px 2px 0;
+          opacity: 1;
+          transform: translateY(-50%) scaleY(1.5);
         }
       }
     }
 
     // Row marker (track numbers) styling
     .main-trackList-rowMarker {
-      .main-trackList-number {
-        color: rgba(var(--spice-rgb-text, 198, 208, 245), 0.7);
-        font-weight: 500;
-        transition: all 200ms ease;
-      }
-
-      // Playing indicator
-      .main-trackList-playingIcon {
-        background-color: var(--sn-gradient-primary, var(--spice-accent));
-      }
-    }
-
-    // Row sections styling
-    .main-trackList-rowSectionIndex,
-    .main-trackList-rowSectionStart,
-    .main-trackList-rowSectionVariable,
-    .main-trackList-rowSectionEnd {
-      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--spice-subtext);
+      transition: color 300ms ease;
       z-index: 1;
     }
   }
@@ -2087,3 +2070,50 @@ nav[aria-label="Main"] ul li a {
 // Ensure this new block is the last major styling block for the sidebar to give it appropriate CSS precedence.
 // END OF QUANTUM SIDEBAR CONSCIOUSNESS FIELD
 // =============================================================================
+
+// StarryNight settings component styling
+.starrynight-settings {
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--spice-border);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .setting-label {
+      color: var(--spice-text);
+      font-size: 14px;
+      font-weight: 500;
+      min-width: 120px;
+    }
+
+    select.main-dropDown-dropDown {
+      min-width: 150px;
+      background: var(--spice-button);
+      color: var(--spice-text);
+      border: 1px solid var(--spice-border);
+      border-radius: 4px;
+      padding: 8px 12px;
+
+      &:hover {
+        background: var(--spice-button-active);
+      }
+
+      &:focus {
+        outline: 2px solid var(--spice-accent);
+        outline-offset: 2px;
+      }
+    }
+  }
+}
+
+// Integration with main settings page
+.main-settingsPage-section {
+  .starrynight-settings {
+    margin-top: 16px;
+  }
+}

@@ -1,0 +1,542 @@
+import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
+import type { Year3000Config } from "@/types/models";
+import { Year3000System } from "../../core/year3000System";
+import { MODERN_SELECTORS } from "../../debug/SpotifyDOMSelectors";
+import { SettingsManager } from "../../managers/SettingsManager";
+import { MusicSyncService } from "../../services/MusicSyncService";
+import * as Year3000Utilities from "../../utils/Year3000Utilities";
+import { BaseVisualSystem } from "../BaseVisualSystem";
+
+// Type definitions
+interface DeviceCapabilities {
+  maxParticles: number;
+  supportsCSSFilter: boolean;
+  supportsWebGL: boolean;
+  performanceLevel: "high" | "medium" | "low";
+  reducedMotion: boolean;
+}
+
+interface PerformanceMetrics {
+  glyphUpdates: number;
+  echoEffects: number;
+  memoryCleanups: number;
+  cacheHits: number;
+  cacheMisses: number;
+  animationFrames: number;
+  maxFrameTime: number;
+  averageFrameTime: number;
+  frameTimeHistory: number[];
+  observedItemsCleanups: number;
+}
+
+interface MemoryOptimization {
+  maxCacheSize: number;
+  cleanupInterval: number;
+  lastCleanup: number;
+  maxEchoTimers: number;
+  maxObservedItems: number;
+  staleItemThreshold: number;
+}
+
+interface GlyphData {
+  id: string;
+  type: "track" | "album" | "artist" | "playlist";
+  lastInteracted: number;
+  intensity: number;
+  kineticState: {
+    velocity: { x: number; y: number };
+    rotation: number;
+    scale: number;
+  };
+  musicContext: any;
+  attentionScore: number;
+}
+
+// YEAR 3000 DATA GLYPH SYSTEM
+export class DataGlyphSystem extends BaseVisualSystem {
+  private year3000System: Year3000System | null;
+  private masterAnimationRegistered: boolean = false;
+  public animationFrameId: number | null = null;
+  private isUsingMasterAnimation: boolean = false;
+  private itemObserver: MutationObserver | null = null;
+  private observedItems: Map<Element, { removeListeners: () => void }>;
+  private glyphDataCache: WeakMap<Element, GlyphData>;
+  private itemInteractionData: Map<Element, any>;
+  private activeEchoTimers: WeakMap<Element, NodeJS.Timeout>;
+  private glyphElements: Map<Element, HTMLElement>;
+  private interactionHistory: any[];
+  private modeIntensity: number;
+  public modeConfig: any;
+  private lastHeavyUpdateTime: number;
+  private heavyUpdateInterval: number;
+  private memoryOptimization: MemoryOptimization;
+  private performanceMetrics: PerformanceMetrics;
+  private deviceCapabilities: DeviceCapabilities;
+  private _eventListeners: any[];
+  private _domEventListeners: any[];
+
+  constructor(
+    config: Year3000Config,
+    utils: typeof Year3000Utilities,
+    performanceMonitor: PerformanceAnalyzer,
+    musicSyncService: MusicSyncService,
+    settingsManager: SettingsManager,
+    year3000System: Year3000System | null = null
+  ) {
+    super(config, utils, performanceMonitor, musicSyncService, settingsManager);
+    this.year3000System = year3000System;
+    this.observedItems = new Map();
+    this.glyphDataCache = new WeakMap();
+    this.itemInteractionData = new Map();
+    this.activeEchoTimers = new WeakMap();
+    this.glyphElements = new Map();
+    this.interactionHistory = [];
+    this.modeIntensity = 0.5;
+    this.lastHeavyUpdateTime = 0;
+    this.heavyUpdateInterval = 1000;
+    this._eventListeners = [];
+    this._domEventListeners = [];
+
+    this.memoryOptimization = {
+      maxCacheSize: 100,
+      cleanupInterval: 30000,
+      lastCleanup: Date.now(),
+      maxEchoTimers: 50,
+      maxObservedItems: 200,
+      staleItemThreshold: 300000,
+    };
+
+    this.performanceMetrics = {
+      glyphUpdates: 0,
+      echoEffects: 0,
+      memoryCleanups: 0,
+      cacheHits: 0,
+      cacheMisses: 0,
+      animationFrames: 0,
+      maxFrameTime: 0,
+      averageFrameTime: 0,
+      frameTimeHistory: [],
+      observedItemsCleanups: 0,
+    };
+
+    this.deviceCapabilities = {
+      maxParticles: this._detectMaxParticles(),
+      supportsCSSFilter: this._detectCSSFilterSupport(),
+      supportsWebGL: this._detectWebGLSupport(),
+      performanceLevel: this._detectPerformanceLevel(),
+      reducedMotion: this._detectReducedMotion(),
+    };
+
+    const healthMonitor = this.utils.getHealthMonitor();
+    if (healthMonitor) {
+      healthMonitor.registerSystem("DataGlyphSystem", this);
+    }
+  }
+
+  private _detectMaxParticles(): number {
+    const memory = (navigator as any).deviceMemory || 4;
+    const baseParticles = 50;
+    return Math.min(200, Math.max(20, baseParticles * (memory / 4)));
+  }
+
+  private _detectCSSFilterSupport(): boolean {
+    const testElement = document.createElement("div");
+    testElement.style.filter = "blur(1px)";
+    return testElement.style.filter === "blur(1px)";
+  }
+
+  private _detectWebGLSupport(): boolean {
+    try {
+      const canvas = document.createElement("canvas");
+      return !!(
+        canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
+      );
+    } catch (e) {
+      return false;
+    }
+  }
+
+  private _detectPerformanceLevel(): "high" | "medium" | "low" {
+    const memory = (navigator as any).deviceMemory || 4;
+    const cores = navigator.hardwareConcurrency || 2;
+    if (memory >= 8 && cores >= 8) return "high";
+    if (memory >= 4 && cores >= 4) return "medium";
+    return "low";
+  }
+
+  private _detectReducedMotion(): boolean {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
+  async initialize() {
+    await super.initialize();
+    this._tryRegisterWithMasterAnimation();
+    this.setupItemObserver();
+  }
+
+  private _tryRegisterWithMasterAnimation() {
+    if (
+      this.year3000System &&
+      (this.year3000System as any).registerAnimationSystem
+    ) {
+      try {
+        (this.year3000System as any).registerAnimationSystem(
+          "DataGlyphSystem",
+          this,
+          "normal",
+          this.deviceCapabilities.performanceLevel === "high" ? 60 : 30
+        );
+        this.masterAnimationRegistered = true;
+        this.isUsingMasterAnimation = true;
+      } catch (error) {
+        this._startFallbackAnimationLoop();
+      }
+    } else {
+      this._startFallbackAnimationLoop();
+    }
+  }
+
+  private _startFallbackAnimationLoop() {
+    this.isUsingMasterAnimation = false;
+    const fallbackLoop = () => {
+      if (!this.initialized) return;
+      this.updateAnimation(performance.now(), 16.67);
+      this.animationFrameId = requestAnimationFrame(fallbackLoop);
+    };
+    this.animationFrameId = requestAnimationFrame(fallbackLoop);
+  }
+
+  // TODO: Implement abstract onAnimate method for Year 3000 MasterAnimationCoordinator
+  public onAnimate(deltaMs: number): void {
+    this.updateAnimation(performance.now(), deltaMs);
+  }
+
+  public updateAnimation(timestamp: number, deltaTime: number) {
+    const frameStartTime = performance.now();
+    try {
+      const maxFrameTime =
+        this.deviceCapabilities.performanceLevel === "high"
+          ? 8
+          : this.deviceCapabilities.performanceLevel === "medium"
+          ? 12
+          : 16;
+      if (deltaTime > maxFrameTime * 2) {
+        this.performanceMetrics.animationFrames++;
+        return;
+      }
+      if (timestamp - this.lastHeavyUpdateTime > this.heavyUpdateInterval) {
+        this.lastHeavyUpdateTime = timestamp;
+        this._updateGlyphTargetsOptimized();
+      }
+      this.animateAllGlyphs();
+      this.updateActiveEchoesAndResonance();
+      if (
+        timestamp - this.memoryOptimization.lastCleanup >
+        this.memoryOptimization.cleanupInterval
+      ) {
+        this.performOptimizedCleanup();
+      }
+      const frameTime = performance.now() - frameStartTime;
+      this.updatePerformanceMetrics(frameTime);
+    } catch (error) {
+      console.error(`[${this.systemName}] Animation update error:`, error);
+    }
+  }
+
+  public onPerformanceModeChange(mode: "performance" | "quality") {
+    if (mode === "performance") {
+      this.heavyUpdateInterval = 1500;
+      this.memoryOptimization.maxObservedItems = 100;
+    } else {
+      this.heavyUpdateInterval = 1000;
+      this.memoryOptimization.maxObservedItems = 200;
+    }
+  }
+
+  /**
+   * Optimized maintenance pass executed at a relatively low frequency (default 1 s).
+   * Responsibilities:
+   *   1. Detach glyphs whose host elements have been removed from the DOM.
+   *   2. Ensure we respect the `maxObservedItems` cap.
+   *   3. NO full-document `querySelectorAll` – MutationObserver already attaches new glyphs.
+   *
+   *  This change aligns with the Year 3000 "Kinetic Verbs" ethos—moving lightly through the
+   *  DOM constellation instead of flooding it with scans every 50 ms.
+   */
+  private _updateGlyphTargetsOptimized() {
+    // 1. Clean up elements that are no longer connected to the document
+    this.observedItems.forEach((_, itemElement) => {
+      if (!document.contains(itemElement)) {
+        const glyph = this.glyphElements.get(itemElement);
+        if (glyph) {
+          this.detachGlyph(itemElement, glyph);
+        }
+      }
+    });
+
+    // 2. If we still exceed the allowed budget, prune the oldest entries
+    if (this.observedItems.size > this.memoryOptimization.maxObservedItems) {
+      const overflow =
+        this.observedItems.size - this.memoryOptimization.maxObservedItems;
+      const iterator = this.observedItems.keys();
+      for (let i = 0; i < overflow; i++) {
+        const elem = iterator.next().value as Element | undefined;
+        if (!elem) break;
+        const glyph = this.glyphElements.get(elem);
+        if (glyph) this.detachGlyph(elem, glyph);
+      }
+    }
+  }
+
+  private _isElementInViewport(element: Element): boolean {
+    const rect = element.getBoundingClientRect();
+    return (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <=
+        (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+  }
+
+  private setupItemObserver() {
+    const observerCallback = (
+      mutationsList: MutationRecord[],
+      observer: MutationObserver
+    ) => {
+      for (const mutation of mutationsList) {
+        if (mutation.type === "childList") {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) {
+              // ELEMENT_NODE
+              this._scanAndAttachGlyphs(node as Element);
+            }
+          });
+          mutation.removedNodes.forEach((node) => {
+            if (node.nodeType === 1) {
+              this._scanAndDetachGlyphs(node as Element);
+            }
+          });
+        }
+      }
+    };
+    this.itemObserver = new MutationObserver(observerCallback);
+    this.itemObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  private _scanAndAttachGlyphs(rootElement: Element) {
+    const selector = Object.values(MODERN_SELECTORS).join(", ");
+    if (!selector) return;
+    const items = rootElement.matches(selector)
+      ? [rootElement]
+      : Array.from(rootElement.querySelectorAll(selector));
+    items.forEach((item) => this.attachGlyph(item as HTMLElement));
+  }
+
+  private _scanAndDetachGlyphs(rootElement: Element) {
+    const selector = Object.values(MODERN_SELECTORS).join(", ");
+    if (!selector) return;
+    const items = rootElement.matches(selector)
+      ? [rootElement]
+      : Array.from(rootElement.querySelectorAll(selector));
+    items.forEach((item) => {
+      const glyph = this.glyphElements.get(item);
+      if (glyph) this.detachGlyph(item, glyph);
+    });
+  }
+
+  private attachGlyph(itemElement: HTMLElement) {
+    if (
+      this.glyphElements.has(itemElement) ||
+      this.observedItems.size >= this.memoryOptimization.maxObservedItems
+    )
+      return;
+
+    const glyphElement = document.createElement("div");
+    glyphElement.className = "sn-data-glyph";
+    itemElement.appendChild(glyphElement);
+    this.glyphElements.set(itemElement, glyphElement);
+
+    const data = this.updateGlyphData(itemElement, {});
+    this.glyphDataCache.set(itemElement, data);
+
+    const boundHandleInteraction = (event: Event) =>
+      this.handleItemInteraction(itemElement, event);
+    itemElement.addEventListener("mouseenter", boundHandleInteraction);
+    itemElement.addEventListener("mouseleave", boundHandleInteraction);
+    const removeListeners = () => {
+      itemElement.removeEventListener("mouseenter", boundHandleInteraction);
+      itemElement.removeEventListener("mouseleave", boundHandleInteraction);
+    };
+
+    this.observedItems.set(itemElement, { removeListeners });
+  }
+
+  private detachGlyph(itemElement: Element, glyphElement: HTMLElement) {
+    if (glyphElement.parentElement) {
+      glyphElement.parentElement.removeChild(glyphElement);
+    }
+    this.glyphElements.delete(itemElement);
+
+    const observation = this.observedItems.get(itemElement);
+    if (observation) {
+      observation.removeListeners();
+      this.observedItems.delete(itemElement);
+    }
+
+    this.glyphDataCache.delete(itemElement);
+    this.itemInteractionData.delete(itemElement);
+  }
+
+  private animateAllGlyphs() {
+    this.observedItems.forEach((_, itemElement) => {
+      const itemData = this.glyphDataCache.get(itemElement);
+      if (itemData) {
+        this.updateGlyphVisuals(itemElement as HTMLElement, itemData);
+      }
+    });
+  }
+
+  private updateGlyphVisuals(itemElement: HTMLElement, itemData: GlyphData) {
+    const glyphElement = this.glyphElements.get(itemElement);
+    if (!glyphElement) return;
+
+    const musicData = this.musicSyncService?.getLatestProcessedData();
+    let intensity = 0;
+    if (musicData) {
+      intensity = musicData.energy * 0.5 + musicData.valence * 0.5;
+    }
+    intensity = (intensity + itemData.attentionScore) / 2;
+
+    glyphElement.style.setProperty("--glyph-intensity", `${intensity}`);
+    glyphElement.style.opacity = `${intensity * 0.8}`;
+  }
+
+  private updateGlyphData(
+    itemElement: HTMLElement,
+    data: Partial<GlyphData>
+  ): GlyphData {
+    let glyphData = this.glyphDataCache.get(itemElement);
+    if (!glyphData) {
+      glyphData = {
+        id: itemElement.getAttribute("data-uri") || `glyph-${Date.now()}`,
+        type: "track",
+        lastInteracted: 0,
+        intensity: 0,
+        kineticState: { velocity: { x: 0, y: 0 }, rotation: 0, scale: 1 },
+        musicContext: {},
+        attentionScore: 0,
+      };
+    }
+    const updatedData = { ...glyphData, ...data };
+    this.glyphDataCache.set(itemElement, updatedData);
+    return updatedData;
+  }
+
+  private handleItemInteraction(itemElement: HTMLElement, event: Event) {
+    const glyphData = this.updateGlyphData(itemElement, {
+      lastInteracted: Date.now(),
+      attentionScore: event.type === "mouseenter" ? 1 : 0,
+    });
+    if (event.type === "mouseenter") {
+      this.addTemporalEcho(itemElement);
+    }
+  }
+
+  private updateActiveEchoesAndResonance() {
+    // Logic for managing echoes
+  }
+
+  public destroy() {
+    super.destroy();
+    if (this.itemObserver) this.itemObserver.disconnect();
+    this.observedItems.forEach((val, key) =>
+      this.detachGlyph(key, this.glyphElements.get(key)!)
+    );
+    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+  }
+
+  private performOptimizedCleanup() {
+    const now = Date.now();
+    // Clean up old interaction data
+    for (const [element, data] of this.itemInteractionData.entries()) {
+      if (
+        now - data.lastInteraction >
+        this.memoryOptimization.staleItemThreshold
+      ) {
+        this.itemInteractionData.delete(element);
+      }
+    }
+    // Clean up stale observed items
+    if (this.observedItems.size > this.memoryOptimization.maxObservedItems) {
+      for (const [element, data] of this.observedItems.entries()) {
+        const glyphData = this.glyphDataCache.get(element);
+        if (
+          !glyphData ||
+          now - glyphData.lastInteracted >
+            this.memoryOptimization.staleItemThreshold
+        ) {
+          this.detachGlyph(element, this.glyphElements.get(element)!);
+        }
+        if (this.observedItems.size <= this.memoryOptimization.maxObservedItems)
+          break;
+      }
+    }
+    this.memoryOptimization.lastCleanup = now;
+  }
+
+  private updatePerformanceMetrics(frameTime: number) {
+    this.performanceMetrics.animationFrames++;
+    this.performanceMetrics.frameTimeHistory.push(frameTime);
+    if (this.performanceMetrics.frameTimeHistory.length > 100) {
+      this.performanceMetrics.frameTimeHistory.shift();
+    }
+    this.performanceMetrics.maxFrameTime = Math.max(
+      this.performanceMetrics.maxFrameTime,
+      frameTime
+    );
+    this.performanceMetrics.averageFrameTime =
+      this.performanceMetrics.frameTimeHistory.reduce((a, b) => a + b, 0) /
+      this.performanceMetrics.frameTimeHistory.length;
+  }
+
+  private calculateGlyphComplexity(): number {
+    return this.observedItems.size;
+  }
+
+  private estimateMemoryUsage(): number {
+    return this.observedItems.size * 5 + this.itemInteractionData.size * 2; // Rough estimation
+  }
+
+  public updateModeConfiguration(modeConfig: any) {
+    super.updateModeConfiguration(modeConfig);
+    if (modeConfig.glyphIntensity) {
+      this.modeIntensity = modeConfig.glyphIntensity;
+    }
+    this.applyModeToExistingGlyphs();
+  }
+
+  private applyModeToExistingGlyphs() {
+    this.observedItems.forEach((_, item) => {
+      const glyph = this.glyphElements.get(item);
+      if (glyph) {
+        glyph.setAttribute(
+          "data-glyph-mode",
+          (this.modeConfig as any).activeMode || "default"
+        );
+      }
+    });
+  }
+
+  private addTemporalEcho(element: HTMLElement) {
+    const echo = document.createElement("div");
+    echo.className = "sn-temporal-echo";
+    element.appendChild(echo);
+    setTimeout(() => {
+      if (echo.parentElement) echo.parentElement.removeChild(echo);
+    }, 800);
+  }
+}

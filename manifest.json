@@ -7,7 +7,6 @@
     "usercss": "user.css",
     "schemes": "color.ini",
     "include": ["theme.js"],
-    "extensions": ["Extensions/theme-vibrant-enhanced.js"],
     "authors": [
       {
         "name": "Catppuccin StarryNight Contributors",

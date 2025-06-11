@@ -1,0 +1,578 @@
+import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { DeviceCapabilityDetector } from "@/core/DeviceCapabilityDetector";
+import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
+import { SettingsManager } from "@/managers/SettingsManager";
+import { MusicSyncService } from "@/services/MusicSyncService";
+import type { Year3000Config } from "@/types/models";
+
+import {
+  CanvasContextType,
+  CanvasResult,
+  createOptimizedCanvas,
+  detectRenderingCapabilities,
+} from "@/utils/VisualCanvasFactory";
+import * as Year3000Utilities from "@/utils/Year3000Utilities";
+import { selectPerformanceProfile } from "@/utils/visualPerformance";
+
+// Extend the config type locally to include the missing property
+type SystemConfig = Year3000Config & {
+  performanceProfiles?: { [key: string]: any };
+};
+
+// Add SystemMetrics interface for strong typing of the metrics object.
+interface SystemMetrics {
+  initializationTime: number;
+  updates: number;
+  errors: number;
+}
+
+export abstract class BaseVisualSystem {
+  protected config: SystemConfig;
+  protected utils: typeof Year3000Utilities;
+  protected performanceMonitor: PerformanceAnalyzer;
+  protected musicSyncService: MusicSyncService | null;
+  protected settingsManager: SettingsManager | null;
+  protected systemName: string;
+  public initialized: boolean;
+  public isActive: boolean;
+  protected currentPerformanceProfile: any; // Can be defined better later
+  private boundHandleSettingsChange: (event: Event) => void;
+
+  // Add missing properties from the original JS version for state management.
+  protected metrics: SystemMetrics;
+  private _resizeHandler: (() => void) | null;
+  private _initializationStartTime: number | null = null;
+
+  // GPU-accelerated canvas support
+  protected canvasCapabilities: {
+    webgpu: boolean;
+    webgl2: boolean;
+    recommendedType: CanvasContextType;
+  } | null = null;
+  protected activeCanvasResults: Map<string, CanvasResult> = new Map();
+
+  constructor(
+    config: SystemConfig = YEAR3000_CONFIG,
+    utils: typeof Year3000Utilities = Year3000Utilities,
+    performanceMonitor: PerformanceAnalyzer,
+    musicSyncService: MusicSyncService | null,
+    settingsManager: SettingsManager | null
+  ) {
+    this.config = config;
+    this.utils = utils;
+    this.performanceMonitor = performanceMonitor;
+    this.musicSyncService = musicSyncService;
+    this.settingsManager = settingsManager;
+    this.systemName = this.constructor.name;
+    this.initialized = false;
+    this.isActive = false;
+    this.currentPerformanceProfile = {};
+
+    // Initialize new properties in the constructor.
+    this.metrics = {
+      initializationTime: 0,
+      updates: 0,
+      errors: 0,
+    };
+    this._resizeHandler = null;
+
+    this.boundHandleSettingsChange = this.handleSettingsChange.bind(this);
+
+    if (this.config.enableDebug) {
+      console.log(`[${this.systemName}] Constructor`);
+    }
+  }
+
+  // Replace the current skeletal `initialize` method with this complete, multi-phase version.
+  async initialize() {
+    if (this.config.enableDebug) {
+      console.log(`[${this.systemName}] Initializing...`);
+      this._initializationStartTime = this.performanceMonitor.startTiming(
+        `initialize_${this.systemName}`
+      );
+    }
+
+    // Phase 1: Set up settings manager and performance profile listener.
+    if (this.settingsManager) {
+      document.addEventListener(
+        "year3000SystemSettingsChanged",
+        this.boundHandleSettingsChange
+      );
+      const storedQuality = this.settingsManager.get(
+        "sn-performanceQuality" as any
+      );
+
+      let quality: string | undefined = undefined;
+      if (storedQuality && typeof storedQuality === "string") {
+        quality = storedQuality;
+      }
+
+      // Auto-detect when no explicit user preference was saved.
+      if (!quality || quality === "auto") {
+        try {
+          const detectorInstance = (globalThis as any).year3000System
+            ?.deviceCapabilityDetector as DeviceCapabilityDetector;
+
+          let recommended: "low" | "balanced" | "high" = "balanced";
+          if (detectorInstance?.isInitialized) {
+            recommended = detectorInstance.recommendPerformanceQuality();
+          }
+
+          quality = recommended;
+
+          // Persist so subsequent loads are faster, but allow user override.
+          this.settingsManager.set(
+            "sn-performanceQuality" as any,
+            quality as any
+          );
+          this.performanceMonitor?.emitTrace?.(
+            `[${this.systemName}] Auto-selected performance quality '${quality}' based on device capability.`
+          );
+        } catch (e) {
+          // Fallback to balanced.
+          this.performanceMonitor?.emitTrace?.(
+            `[${this.systemName}] Device capability detection failed; defaulting to 'balanced'.`,
+            e as any
+          );
+          quality = "balanced";
+        }
+      }
+
+      if (quality) {
+        this._applyPerformanceProfile(quality);
+      }
+    }
+
+    // Phase 2: Call the system-specific initialization hook for subclasses.
+    await this._performSystemSpecificInitialization();
+
+    // Phase 3: Mark as initialized before subscribing to prevent race conditions.
+    this.initialized = true;
+    this.isActive = true;
+
+    // Phase 4: Subscribe to the MusicSyncService, validating dependencies first.
+    if (this.musicSyncService) {
+      if (this._validateDependenciesForSubscription()) {
+        this.musicSyncService.subscribe(this, this.systemName);
+        if (this.config.enableDebug) {
+          console.log(`[${this.systemName}] Subscribed to MusicSyncService.`);
+        }
+      } else {
+        console.warn(
+          `[${this.systemName}] Dependency validation failed; subscription skipped.`
+        );
+      }
+    }
+
+    if (this.config.enableDebug && this._initializationStartTime !== null) {
+      this.performanceMonitor.endTiming(
+        `initialize_${this.systemName}`,
+        this._initializationStartTime
+      );
+      // We no longer get the time back directly, so we just log completion.
+      // The PerformanceAnalyzer will handle aggregation.
+      console.log(`[${this.systemName}] Initialization complete.`);
+    }
+  }
+
+  // Add new virtual methods for subclass extension.
+  // These provide safe hooks for custom initialization logic.
+  async _performSystemSpecificInitialization(): Promise<void> {
+    // Detect canvas capabilities during initialization
+    this.canvasCapabilities = detectRenderingCapabilities();
+    if (this.canvasCapabilities) {
+      this.performanceMonitor?.emitTrace?.(
+        `[${this.systemName}] Canvas capabilities detected: WebGPU=${this.canvasCapabilities.webgpu}, WebGL2=${this.canvasCapabilities.webgl2}, Recommended=${this.canvasCapabilities.recommendedType}`
+      );
+    }
+
+    // Base implementation sets up GPU-accelerated canvas support.
+    // Subclasses can override this to add specific initialization.
+  }
+
+  _validateDependenciesForSubscription(): boolean {
+    if (typeof this.updateFromMusicAnalysis !== "function") {
+      console.error(
+        `[${this.systemName}] Missing updateFromMusicAnalysis method.`
+      );
+      return false;
+    }
+    if (!this.initialized) {
+      console.warn(`[${this.systemName}] System not initialized.`);
+      return false;
+    }
+    return this._performAdditionalDependencyValidation();
+  }
+
+  _performAdditionalDependencyValidation(): boolean {
+    // Base implementation is a pass-through. Subclasses can add specific checks.
+    return true;
+  }
+
+  // Replace the current skeletal `destroy` method with this complete version for proper cleanup.
+  destroy() {
+    if (this.config.enableDebug) {
+      console.log(`[${this.systemName}] Destroying...`);
+    }
+
+    try {
+      this.initialized = false;
+      this.isActive = false;
+
+      // Unsubscribe from services to prevent memory leaks.
+      if (this.musicSyncService) {
+        this.musicSyncService.unsubscribe(this.systemName);
+      }
+
+      // Remove event listeners.
+      if (this.settingsManager && this.boundHandleSettingsChange) {
+        document.removeEventListener(
+          "year3000SystemSettingsChanged",
+          this.boundHandleSettingsChange
+        );
+      }
+
+      if (this._resizeHandler) {
+        window.removeEventListener("resize", this._resizeHandler);
+        this._resizeHandler = null;
+      }
+
+      // Call the system-specific cleanup hook.
+      this._performSystemSpecificCleanup();
+    } catch (error) {
+      console.error(`[${this.systemName}] Error during destruction:`, error);
+      this.metrics.errors++;
+    }
+  }
+
+  // Add the virtual cleanup hook for subclasses.
+  _performSystemSpecificCleanup(): void {
+    // Clean up GPU-accelerated canvas resources
+    for (const [id, canvasResult] of this.activeCanvasResults) {
+      const canvas = canvasResult.canvas;
+      if (canvas.parentNode) {
+        canvas.parentNode.removeChild(canvas);
+      }
+
+      if (this.config.enableDebug) {
+        console.log(
+          `[${this.systemName}] Cleaned up canvas: ${id} (type: ${canvasResult.type})`
+        );
+      }
+    }
+    this.activeCanvasResults.clear();
+
+    // Base implementation cleans up GPU resources. Subclasses can override this.
+  }
+
+  public updateFromMusicAnalysis(
+    processedMusicData: any,
+    ...args: any[]
+  ): void {
+    // This method is now a hook for subclasses.
+    // The core logic for setting global CSS variables has been moved
+    // to Year3000System for better separation of concerns.
+  }
+
+  /**
+   * Unified animation hook called by MasterAnimationCoordinator.
+   * Subclasses can override this method or implement updateAnimation for legacy support.
+   *
+   * @param deltaMs - Time in milliseconds since the last frame for this system
+   */
+  public onAnimate(deltaMs: number): void {
+    // Default implementation delegates to updateAnimation for backward compatibility
+    if (typeof (this as any).updateAnimation === "function") {
+      const timestamp = performance.now();
+      (this as any).updateAnimation(timestamp, deltaMs);
+    }
+
+    // Subclasses should override this method to implement their animation logic
+    // using the deltaMs parameter for frame-rate independent animations
+  }
+
+  /**
+   * Legacy animation method for backward compatibility.
+   * New systems should override onAnimate instead.
+   */
+  public updateAnimation?(timestamp: number, deltaTime: number): void;
+
+  public updateModeConfiguration(modeConfig: any) {
+    // Base implementation
+  }
+
+  handleSettingsChange(event: Event) {
+    const customEvent = event as CustomEvent;
+    if (customEvent.detail.key === "sn-performanceQuality") {
+      this._applyPerformanceProfile(customEvent.detail.value);
+    }
+  }
+
+  _applyPerformanceProfile(quality: string) {
+    if (!this.config?.performanceProfiles) {
+      this.performanceMonitor?.emitTrace?.(
+        `[${this.systemName}] Performance profiles not found in config.`
+      );
+      return;
+    }
+
+    const profile = selectPerformanceProfile(
+      quality,
+      this.config.performanceProfiles,
+      {
+        trace: (msg) => this.performanceMonitor?.emitTrace(msg),
+      }
+    );
+
+    if (profile) {
+      this.currentPerformanceProfile = profile;
+      this.performanceMonitor?.emitTrace?.(
+        `[BaseVisualSystem (${this.systemName})] Applied performance profile '${quality}'`,
+        profile
+      );
+    } else {
+      this.performanceMonitor?.emitTrace?.(
+        `[${this.systemName}] Performance profile '${quality}' not found.`
+      );
+    }
+  }
+
+  public getCosmicState(): { [key: string]: number } {
+    if (typeof document === "undefined") return {};
+
+    const root = document.documentElement;
+    const style = getComputedStyle(root);
+
+    return {
+      energy: parseFloat(style.getPropertyValue("--sn-kinetic-energy")) || 0.5,
+      valence:
+        parseFloat(style.getPropertyValue("--sn-kinetic-valence")) || 0.5,
+      bpm: parseFloat(style.getPropertyValue("--sn-kinetic-bpm")) || 120,
+      tempoMultiplier:
+        parseFloat(style.getPropertyValue("--sn-kinetic-tempo-multiplier")) ||
+        1.0,
+      beatPhase:
+        parseFloat(style.getPropertyValue("--sn-kinetic-beat-phase")) || 0,
+      beatPulse:
+        parseFloat(style.getPropertyValue("--sn-kinetic-beat-pulse")) || 0,
+    };
+  }
+
+  /**
+   * Create GPU-accelerated optimized canvas with kinetic styling.
+   * This method prioritizes WebGPU > WebGL2 > 2D Canvas based on device capabilities.
+   */
+  protected async _createOptimizedKineticCanvas(
+    id: string,
+    zIndex = 5,
+    blendMode = "screen",
+    kineticMode = "pulse"
+  ): Promise<CanvasResult> {
+    // Remove existing canvas if present
+    const existing = document.getElementById(id);
+    if (existing) {
+      existing.remove();
+    }
+
+    // Determine preferred canvas type based on performance profile and capabilities
+    let preferredType: CanvasContextType = "2d";
+    if (this.canvasCapabilities && this.currentPerformanceProfile) {
+      const quality = this.currentPerformanceProfile.quality || "balanced";
+
+      // Read WebGPU enablement setting (default false)
+      let webgpuAllowed = false;
+      try {
+        if (this.settingsManager) {
+          webgpuAllowed =
+            this.settingsManager.get("sn-enable-webgpu" as any) !== "false";
+        }
+      } catch (e) {
+        // Ignore settings errors and assume allowed
+        webgpuAllowed = true;
+      }
+
+      if (
+        webgpuAllowed &&
+        quality === "high" &&
+        this.canvasCapabilities.webgpu
+      ) {
+        preferredType = "webgpu";
+      } else if (quality !== "low" && this.canvasCapabilities.webgl2) {
+        preferredType = "webgl2";
+      }
+    }
+
+    // Create optimized canvas
+    const canvasResult = await createOptimizedCanvas({
+      id,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      alpha: true,
+      antialias: true,
+      preferredType,
+    });
+
+    // Apply kinetic styling
+    const canvas = canvasResult.canvas;
+    canvas.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: ${zIndex};
+      pointer-events: none;
+      mix-blend-mode: ${blendMode};
+    `;
+
+    // Add kinetic classes and styling
+    canvas.classList.add("year3000-kinetic-canvas");
+    canvas.dataset.kineticMode = kineticMode;
+    canvas.dataset.systemName = this.systemName;
+    canvas.dataset.canvasType = canvasResult.type;
+
+    const kineticStyles = this._getKineticStyles(kineticMode);
+    Object.assign(canvas.style, kineticStyles);
+
+    // Append to body
+    document.body.appendChild(canvas);
+
+    // Store canvas result for tracking and cleanup
+    this.activeCanvasResults.set(id, canvasResult);
+
+    // Set up resize handler for optimized canvas
+    this._resizeHandler = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      if (typeof (this as any).handleResize === "function") {
+        (this as any).handleResize();
+      }
+    };
+
+    window.addEventListener("resize", this._resizeHandler);
+    this._resizeHandler(); // Set initial size
+
+    if (this.config.enableDebug) {
+      console.log(
+        `[BaseVisualSystem (${this.systemName})] Created optimized kinetic canvas: ${canvasResult.type} (mode: ${kineticMode})`
+      );
+    }
+
+    return canvasResult;
+  }
+
+  /**
+   * Get current canvas rendering capabilities.
+   */
+  public getCanvasCapabilities() {
+    return this.canvasCapabilities;
+  }
+
+  /**
+   * Check if GPU acceleration is available and active.
+   */
+  public hasGPUAcceleration(): boolean {
+    return (
+      this.canvasCapabilities?.webgpu ||
+      this.canvasCapabilities?.webgl2 ||
+      false
+    );
+  }
+
+  protected _createKineticCanvas(
+    id: string,
+    zIndex = 5,
+    blendMode = "screen",
+    kineticMode = "pulse"
+  ): HTMLCanvasElement {
+    // This method leverages the existing canvas creation utility.
+    const canvas = this._createCanvasElement(id, zIndex, blendMode);
+
+    // It adds kinetic CSS classes and data attributes for styling and identification.
+    canvas.classList.add("year3000-kinetic-canvas");
+    canvas.dataset.kineticMode = kineticMode;
+    canvas.dataset.systemName = this.systemName;
+
+    // It applies CSS animations based on the selected kinetic mode.
+    const kineticStyles = this._getKineticStyles(kineticMode);
+    Object.assign(canvas.style, kineticStyles);
+
+    if (this.config.enableDebug) {
+      console.log(
+        `[BaseVisualSystem (${this.systemName})] Created kinetic canvas with mode: ${kineticMode}`
+      );
+    }
+
+    return canvas;
+  }
+
+  private _getKineticStyles(kineticMode: string): Partial<CSSStyleDeclaration> {
+    const baseStyles: Partial<CSSStyleDeclaration> = {
+      transition: "all 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    };
+
+    switch (kineticMode) {
+      case "pulse":
+        return {
+          ...baseStyles,
+          animation:
+            "year3000-pulse calc(var(--sn-kinetic-tempo-multiplier, 1) * 1s) ease-in-out infinite",
+        };
+      case "breathe":
+        return {
+          ...baseStyles,
+          animation:
+            "year3000-breathe calc(var(--sn-kinetic-tempo-multiplier, 1) * 4s) ease-in-out infinite",
+        };
+      case "flow":
+        return {
+          ...baseStyles,
+          animation:
+            "year3000-flow calc(var(--sn-kinetic-tempo-multiplier, 1) * 8s) linear infinite",
+        };
+      default:
+        return baseStyles;
+    }
+  }
+
+  protected _createCanvasElement(
+    id: string,
+    zIndex: number,
+    blendMode: string
+  ): HTMLCanvasElement {
+    const existing = document.getElementById(id);
+    if (existing) {
+      // If a canvas with the same ID exists, remove it before creating a new one.
+      existing.remove();
+    }
+    const canvas = document.createElement("canvas");
+    canvas.id = id;
+    canvas.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: ${zIndex};
+      pointer-events: none;
+      mix-blend-mode: ${blendMode};
+    `;
+    document.body.appendChild(canvas);
+
+    // Define the resize handler.
+    this._resizeHandler = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      // Check if a subclass has implemented a specific handleResize method.
+      if (typeof (this as any).handleResize === "function") {
+        (this as any).handleResize();
+      }
+    };
+
+    // Attach the listener and call it once to set the initial size.
+    window.addEventListener("resize", this._resizeHandler);
+    this._resizeHandler(); // Set initial size
+
+    return canvas;
+  }
+}

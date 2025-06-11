@@ -32,46 +32,17 @@ try {
     exit 1
 }
 
-# Get Spicetify paths
-$spicetifyConfigPath = "$env:APPDATA\spicetify"
-$themesPath = "$spicetifyConfigPath\Themes"
-$extensionsPath = "$spicetifyConfigPath\Extensions"
-$themeTargetPath = "$themesPath\catppuccin-starrynight"
+# Define Spicetify paths for both Roaming and Local AppData
+$spicetifyRoamingPath = "$env:APPDATA\spicetify"
+$spicetifyLocalPath = "$env:LOCALAPPDATA\spicetify"
 
-Write-Host "📁 Spicetify config path: $spicetifyConfigPath" -ForegroundColor Blue
+# Array of target locations
+$targetLocations = @(
+    @{ Path = $spicetifyRoamingPath; Name = "Roaming" },
+    @{ Path = $spicetifyLocalPath; Name = "Local" }
+)
 
-# Create directories if they don't exist
-if (!(Test-Path $themesPath)) {
-    New-Item -ItemType Directory -Path $themesPath -Force | Out-Null
-    Write-Host "📁 Created Themes directory" -ForegroundColor Green
-}
-
-if (!(Test-Path $extensionsPath)) {
-    New-Item -ItemType Directory -Path $extensionsPath -Force | Out-Null
-    Write-Host "📁 Created Extensions directory" -ForegroundColor Green
-}
-
-# Check if theme already exists
-if (Test-Path $themeTargetPath) {
-    if ($Force) {
-        Write-Host "🔄 Force flag set, removing existing theme..." -ForegroundColor Yellow
-        Remove-Item $themeTargetPath -Recurse -Force
-    } else {
-        $overwrite = Read-Host "⚠️  Theme already exists. Overwrite? (y/N)"
-        if ($overwrite.ToLower() -ne "y") {
-            Write-Host "❌ Installation cancelled." -ForegroundColor Red
-            exit 1
-        }
-        Remove-Item $themeTargetPath -Recurse -Force
-    }
-}
-
-# Copy essential theme files only (excluding development sources)
-Write-Host "📋 Copying essential theme files..." -ForegroundColor Blue
 $sourceThemePath = $PSScriptRoot
-
-# Create target directory
-New-Item -ItemType Directory -Path $themeTargetPath -Force | Out-Null
 
 # Define essential files and directories to copy
 $essentialItems = @(
@@ -79,46 +50,100 @@ $essentialItems = @(
     "color.ini",
     "theme.js",
     "manifest.json",
+    "Extensions",
     "assets",
     "docs"
 )
 
-# Copy each essential item
-foreach ($item in $essentialItems) {
-    $sourcePath = Join-Path $sourceThemePath $item
-    $targetPath = Join-Path $themeTargetPath $item
+# Process installation for both Roaming and Local paths
+foreach ($location in $targetLocations) {
+    $spicetifyConfigPath = $location.Path
+    $locationName = $location.Name
+    $themesPath = Join-Path -Path $spicetifyConfigPath -ChildPath "Themes"
+    $themeTargetPath = Join-Path -Path $themesPath -ChildPath "catppuccin-starrynight"
 
-    if (Test-Path $sourcePath) {
-        if (Test-Path $sourcePath -PathType Container) {
-            # It's a directory - copy recursively
-            Copy-Item $sourcePath $targetPath -Recurse -Force
-            Write-Host "  📁 Copied directory: $item" -ForegroundColor Gray
+    Write-Host "------------------------------------------------" -ForegroundColor Cyan
+    Write-Host "Processing ${locationName} installation..." -ForegroundColor Magenta
+    Write-Host "📁 Spicetify ${locationName} config path: $spicetifyConfigPath" -ForegroundColor Blue
+
+    # Create Themes directory if it doesn't exist
+    if (!(Test-Path $themesPath)) {
+        New-Item -ItemType Directory -Path $themesPath -Force | Out-Null
+        Write-Host "📁 Created Themes directory in ${locationName}" -ForegroundColor Green
+    }
+
+    # Check if theme already exists and handle overwrite
+    if (Test-Path $themeTargetPath) {
+        if ($Force) {
+            Write-Host "🔄 Force flag set, removing existing theme from ${locationName}..." -ForegroundColor Yellow
+            Remove-Item $themeTargetPath -Recurse -Force
         } else {
-            # It's a file - copy directly
-            Copy-Item $sourcePath $targetPath -Force
-            Write-Host "  📄 Copied file: $item" -ForegroundColor Gray
+            $overwrite = Read-Host "⚠️  Theme already exists in ${locationName}. Overwrite? (y/N)"
+            if ($overwrite.ToLower() -ne "y") {
+                Write-Host "❌ Installation for ${locationName} cancelled." -ForegroundColor Red
+                continue # Skip to the next location
+            }
+            Remove-Item $themeTargetPath -Recurse -Force
         }
+    }
+
+    # Copy essential theme files
+    Write-Host "📋 Copying essential theme files to ${locationName}..." -ForegroundColor Blue
+    New-Item -ItemType Directory -Path $themeTargetPath -Force | Out-Null
+
+    foreach ($item in $essentialItems) {
+        $sourcePath = Join-Path $sourceThemePath $item
+        $targetPath = Join-Path $themeTargetPath $item
+
+        if (Test-Path $sourcePath) {
+            if (Test-Path $sourcePath -PathType Container) {
+                Copy-Item $sourcePath $targetPath -Recurse -Force
+                Write-Host "  📁 Copied directory: $item to ${locationName}" -ForegroundColor Gray
+            } else {
+                Copy-Item $sourcePath $targetPath -Force
+                Write-Host "  📄 Copied file: $item to ${locationName}" -ForegroundColor Gray
+            }
+        } else {
+            Write-Host "  ⚠️  Optional item not found: $item" -ForegroundColor Yellow
+        }
+    }
+
+    # Verify essential files
+    $essentialFiles = @("user.css", "color.ini", "theme.js", "manifest.json")
+    $extensionFiles = @("Extensions/catppuccin-starrynight.js")
+    $allFilesExist = $true
+
+    foreach ($file in $essentialFiles) {
+        $filePath = Join-Path -Path $themeTargetPath -ChildPath $file
+        if (!(Test-Path $filePath)) {
+            Write-Host "❌ Essential file missing in ${locationName}: ${file}" -ForegroundColor Red
+            $allFilesExist = $false
+        }
+    }
+
+    foreach ($file in $extensionFiles) {
+        $filePath = Join-Path -Path $themeTargetPath -ChildPath $file
+        if (!(Test-Path $filePath)) {
+            Write-Host "⚠️  Extension file missing in ${locationName}: ${file}" -ForegroundColor Yellow
+        } else {
+            Write-Host "✅ Extension file found in ${locationName}: ${file}" -ForegroundColor Green
+        }
+    }
+
+    if ($allFilesExist) {
+        Write-Host "✅ Essential theme files copied to ${locationName} successfully" -ForegroundColor Green
     } else {
-        Write-Host "  ⚠️  Optional item not found: $item" -ForegroundColor Yellow
+        Write-Host "❌ Failed to copy essential files to ${locationName}." -ForegroundColor Red
     }
 }
 
-# Verify essential files
-$essentialFiles = @("user.css", "color.ini", "theme.js", "manifest.json")
-foreach ($file in $essentialFiles) {
-    $filePath = "$themeTargetPath\$file"
-    if (!(Test-Path $filePath)) {
-        Write-Host "❌ Essential file missing: $file" -ForegroundColor Red
-        exit 1
-    }
-}
-
-Write-Host "✅ Essential theme files copied successfully" -ForegroundColor Green
+Write-Host "------------------------------------------------" -ForegroundColor Cyan
+Write-Host "✅ Theme files copied to both Roaming and Local AppData locations." -ForegroundColor Green
 Write-Host "  🚫 Excluded development sources: /src, /src-js" -ForegroundColor Blue
 
-# No extensions to install - theme is self-contained
-$extensionInstalled = $false
-Write-Host "📦 Theme is self-contained (no extensions needed)" -ForegroundColor Blue
+# Extension installation preparation
+$extensionInstalled = $true
+Write-Host "📦 Theme includes progressive loading extension for enhanced compatibility" -ForegroundColor Blue
 
 # Validate color scheme
 $validSchemes = @("latte", "frappe", "macchiato", "mocha")
@@ -139,7 +164,22 @@ try {
     spicetify config current_theme catppuccin-starrynight
     spicetify config color_scheme $ColorScheme
 
-    # No extensions to configure - theme is self-contained
+    # Configure extension for progressive loading
+    Write-Host "🔌 Configuring extension..." -ForegroundColor Blue
+    $extensionPath = "catppuccin-starrynight/Extensions/catppuccin-starrynight.js"
+
+    # Check current extensions config
+    $currentExtensions = spicetify config extensions 2>$null
+    if ($currentExtensions -notlike "*catppuccin-starrynight.js*") {
+        if ($currentExtensions) {
+            spicetify config extensions "${currentExtensions}|${extensionPath}"
+        } else {
+            spicetify config extensions $extensionPath
+        }
+        Write-Host "✅ Extension configured: catppuccin-starrynight.js" -ForegroundColor Green
+    } else {
+        Write-Host "✅ Extension already configured" -ForegroundColor Green
+    }
 
     # Apply changes using appropriate command based on version
     Write-Host "🚀 Applying theme..." -ForegroundColor Blue
@@ -156,6 +196,7 @@ try {
     Write-Host "📝 Try running manually:" -ForegroundColor Yellow
     Write-Host "   spicetify config current_theme catppuccin-starrynight" -ForegroundColor Gray
     Write-Host "   spicetify config color_scheme $ColorScheme" -ForegroundColor Gray
+    Write-Host "   spicetify config extensions catppuccin-starrynight/Extensions/catppuccin-starrynight.js" -ForegroundColor Gray
     if ($isNewVersion) {
         Write-Host "   spicetify backup apply" -ForegroundColor Gray
     } else {
@@ -170,12 +211,15 @@ Write-Host "🎉 Installation Complete!" -ForegroundColor Green
 Write-Host "================================================" -ForegroundColor Cyan
 Write-Host "📱 Open Spotify to see your new theme" -ForegroundColor Blue
 Write-Host "⚙️  Access theme settings in Spotify Preferences" -ForegroundColor Blue
+Write-Host "🔧 Extension will automatically handle API compatibility issues" -ForegroundColor Blue
 Write-Host ""
 Write-Host "🌟 Features enabled:" -ForegroundColor Yellow
 Write-Host "   • Catppuccin $ColorScheme color scheme" -ForegroundColor Gray
 Write-Host "   • Modern --spice- variable system" -ForegroundColor Gray
 Write-Host "   • 15 customizable accent colors" -ForegroundColor Gray
-Write-Host "   • Self-contained theme with built-in features" -ForegroundColor Gray
+Write-Host "   • Progressive loading extension with API resilience" -ForegroundColor Gray
+Write-Host "   • Year 3000 Color Harmony System" -ForegroundColor Gray
+Write-Host "   • Music-reactive visual effects" -ForegroundColor Gray
 Write-Host "   • Modern CSS gradient system" -ForegroundColor Gray
 Write-Host "   • Performance optimized styling" -ForegroundColor Gray
 Write-Host ""

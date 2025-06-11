@@ -1,44 +1,52 @@
 // Catppuccin StarryNight Theme - Main SCSS Entry Point
 // Combines Catppuccin's beautiful UI with StarryNight's dynamic visual effects
 
+@use "sass:meta";
 // Core utilities and base styles
-@forward "src/core/_mixins";
+@forward "src/core/mixins";
 @forward "src/core/_sn_typography";
 @forward "src/core/_sn_gradient";
 @forward "src/core/_kinetic-animations"; // Year 3000 Kinetic Verb Animations
-@forward "src/core/_quantum-empathy"; // Year 3000 Quantum Empathy Visual Effects
-@forward "src/core/_aesthetic-gravity"; // Year 3000 Aesthetic Gravity System
 @forward "src/core/_main";
 
 // Layout modules
 @forward "src/layout/_navbar";
-@forward "src/layout/_top_bar";
-@forward "src/layout/_right_sidebar";
-@forward "src/layout/_sn_header_actionBar";
+@forward "src/layout/top_bar";
+@forward "src/layout/right_sidebar";
+@forward "src/layout/sn_header_actionBar";
 
 // Component-specific styles
 @forward "src/components/_now_playing";
-@forward "src/components/_sn_enhanced_cards";
-@forward "src/components/_sn_unified_cards";
-@forward "src/components/_sn_loading";
+@forward "src/components/sn_enhanced_cards";
+@forward "src/components/sn_unified_cards";
+@forward "src/components/sn_loading";
 
 // StarryNight Feature Modules
-@forward "src/features/_sn_stars";
-@forward "src/features/_sn_glassmorphism";
-@forward "src/features/_sn_3d_morphing";
-@forward "src/features/_sn_microinteractions";
-@forward "src/features/_sn_context_zones";
-// @forward "src/features/_sn_atmospheric"; // DISABLED: Conventional effects - not Year 3000 aligned
-@forward "src/features/_themed_interactive_components"; // Renamed from _conscious_elegance_ui.scss (was _conscious_elegance_ui.scss)
-@forward "src/features/_advanced_visual_effects_layer"; // Renamed from _visual_reality_breach_effects.scss (was _visual_reality_breach_effects.scss)
+@forward "src/features/sn_stars";
+@forward "src/features/sn_glassmorphism";
+@forward "src/features/sn_3d_morphing";
+@forward "src/features/sn_microinteractions";
+@forward "src/features/sn_context_zones";
+// @forward "src/features/sn_atmospheric"; // DISABLED: Conventional effects - not Year 3000 aligned
+@forward "src/features/themed_interactive_components"; // Renamed from _conscious_elegance_ui.scss (was _conscious_elegance_ui.scss)
+@forward "src/features/advanced_visual_effects_layer"; // Renamed from _visual_reality_breach_effects.scss (was _visual_reality_breach_effects.scss)
 
 // Search Interface Modules
-@forward "src/search/_sn_search_quantum";
-@forward "src/search/_sn_search_precision";
+@forward "src/search/sn_search_quantum";
+@forward "src/search/sn_search_precision";
 
 // Sidebar Visual System Modules
-@forward "src/sidebar/_sidebar_consciousness";
-@forward "src/sidebar/_sidebar_dimensional_nexus";
+@forward "src/sidebar/sidebar-consciousness";
+@forward "src/sidebar/sidebar_dimensional_nexus";
+
+// Features
+//@import "src/features/tooltips";
+//@import "src/features/lyrics";
+
+// Layout
+//@import "src/layout/grid";
+//@import "src/layout/flex";
+
 
 :root {
   // Spicetify doesn't fully support light-sets yet, so we have to manually set the colors for the light theme

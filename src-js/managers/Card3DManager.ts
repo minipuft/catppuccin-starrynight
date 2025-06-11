@@ -1,0 +1,188 @@
+import type { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
+import type { SettingsManager } from "@/managers/SettingsManager";
+import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
+import type * as Utils from "@/utils/Year3000Utilities";
+
+// ===================================================================
+// 🃏 3D CARD MANAGER - Year 3000 Visual System
+// ===================================================================
+// Manages 3D transformations and effects for interactive cards.
+
+interface Card3DConfig {
+  perspective: number;
+  maxRotation: number;
+  scale: number;
+  transitionSpeed: string;
+  glowOpacity: number;
+  selector: string;
+}
+
+export class Card3DManager implements IManagedSystem {
+  public initialized = false;
+  private static instance: Card3DManager;
+  private config: Card3DConfig;
+  private performanceMonitor: PerformanceAnalyzer;
+  private settingsManager: SettingsManager;
+  private utils: typeof Utils;
+  private cards: NodeListOf<HTMLElement>;
+  private isModernTheme: boolean;
+  private cardQuerySelector =
+    ".main-card-card, .main-gridContainer-gridContainer.main-gridContainer-fixedWidth";
+
+  public constructor(
+    performanceMonitor: PerformanceAnalyzer,
+    settingsManager: SettingsManager,
+    utils: typeof Utils
+  ) {
+    this.config = {
+      perspective: 1000,
+      maxRotation: 5,
+      scale: 1.02,
+      transitionSpeed: "200ms",
+      glowOpacity: 0.8,
+      selector:
+        ".main-card-card, .main-grid-grid > *, .main-shelf-shelf > * > *",
+    };
+    this.performanceMonitor = performanceMonitor;
+    this.settingsManager = settingsManager;
+    this.utils = utils;
+    this.isModernTheme = true; // Assuming modern theme by default
+    this.cards = document.querySelectorAll(this.config.selector);
+  }
+
+  public static getInstance(
+    performanceMonitor: PerformanceAnalyzer,
+    settingsManager: SettingsManager,
+    utils: typeof Utils
+  ): Card3DManager {
+    if (!Card3DManager.instance) {
+      Card3DManager.instance = new Card3DManager(
+        performanceMonitor,
+        settingsManager,
+        utils
+      );
+    }
+    return Card3DManager.instance;
+  }
+
+  public async initialize(): Promise<void> {
+    const quality = this.performanceMonitor.shouldReduceQuality();
+    if (quality) {
+      if (this.settingsManager.get("sn-3d-effects-level") !== "disabled") {
+        console.log(
+          `[Card3DManager] Performance is low. 3D effects disabled. Current quality: ${quality}`
+        );
+        return;
+      }
+    }
+    await this.applyEventListeners();
+    this.initialized = true;
+  }
+
+  public async healthCheck(): Promise<HealthCheckResult> {
+    const elements = document.querySelectorAll(this.cardQuerySelector);
+    if (elements.length > 0) {
+      return { ok: true, details: `Found ${elements.length} cards to manage.` };
+    }
+    return {
+      ok: false,
+      details: "No card elements found with the configured selector.",
+    };
+  }
+
+  public updateAnimation(deltaTime: number): void {
+    // All animations are handled by CSS transitions triggered by mouse events.
+  }
+
+  public apply3DMode(mode: string): void {
+    // TODO: Implement logic for different 3D morphing modes
+    console.log(`[Card3DManager] Applying 3D mode: ${mode}`);
+    if (mode === "disabled") {
+      this.destroy();
+    } else {
+      this.initialize();
+    }
+  }
+
+  private get shouldEnable3DEffects(): boolean {
+    const quality = this.performanceMonitor.shouldReduceQuality();
+    const setting = this.settingsManager.get("sn-enable3dCards" as any);
+    return !quality && setting !== "disabled";
+  }
+
+  private async applyEventListeners(): Promise<void> {
+    this.cards.forEach((card) => {
+      card.addEventListener("mousemove", this.handleMouseMove.bind(this, card));
+      card.addEventListener(
+        "mouseleave",
+        this.handleMouseLeave.bind(this, card)
+      );
+    });
+  }
+
+  private handleMouseMove(card: HTMLElement, e: MouseEvent): void {
+    if (!this.shouldEnable3DEffects) return;
+
+    const { clientX, clientY } = e;
+    const { top, left, width, height } = card.getBoundingClientRect();
+
+    const x = clientX - left;
+    const y = clientY - top;
+
+    const rotateX = (this.config.maxRotation * (y - height / 2)) / (height / 2);
+    const rotateY = (-this.config.maxRotation * (x - width / 2)) / (width / 2);
+
+    card.style.transform = `perspective(${this.config.perspective}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(${this.config.scale}, ${this.config.scale}, ${this.config.scale})`;
+    card.style.transition = `transform ${this.config.transitionSpeed} ease-out`;
+
+    this.applyGlow(card, x, y, width, height);
+  }
+
+  private handleMouseLeave(card: HTMLElement): void {
+    card.style.transform =
+      "perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)";
+    card.style.transition = "transform 600ms ease-in-out";
+    this.removeGlow(card);
+  }
+
+  private applyGlow(
+    card: HTMLElement,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void {
+    let glowElement = card.querySelector(".card-glow") as HTMLElement;
+    if (!glowElement) {
+      glowElement = document.createElement("div");
+      glowElement.className = "card-glow";
+      card.appendChild(glowElement);
+    }
+
+    glowElement.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(var(--spice-rgb-button), ${this.config.glowOpacity}) 0%, transparent 40%)`;
+  }
+
+  private removeGlow(card: HTMLElement): void {
+    const glowElement = card.querySelector(".card-glow") as HTMLElement;
+    if (glowElement) {
+      glowElement.style.background = "transparent";
+    }
+  }
+
+  public destroy(): void {
+    this.cards.forEach((card) => {
+      card.removeEventListener(
+        "mousemove",
+        this.handleMouseMove.bind(this, card)
+      );
+      card.removeEventListener(
+        "mouseleave",
+        this.handleMouseLeave.bind(this, card)
+      );
+      this.removeGlow(card);
+      card.style.transform = "";
+      card.style.transition = "";
+    });
+    this.initialized = false;
+  }
+}
