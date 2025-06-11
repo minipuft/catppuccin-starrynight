@@ -5,14 +5,10 @@
 ![Catppuccin StarryNight Logo](assets/logo.png)
 
 [![Spicetify](https://img.shields.io/badge/Spicetify-Theme-1DB954?style=for-the-badge&logo=spotify&logoColor=white)](https://spicetify.app/)
-[![Catppuccin](https://img.shields.io/badge/
-Catppuccin-Flavored-f5c2e7?style=for-the-badge&logoColor=white)]
-(https://github.com/catppuccin)
-[![Version](https://img.shields.io/badge/Version-2.0-cba6f7?
-style=for-the-badge)](https://github.com/minipuft/
-catppuccin-starrynight)
-[![License](https://img.shields.io/badge/License-MIT-74c7ec?
-style=for-the-badge)](LICENSE)
+[![Catppuccin](https://img.shields.io/badge/Catppuccin-Flavored-f5c2e7?style=for-the-badge&logoColor=white)](https://github.com/catppuccin)
+[![Year 3000 Ready](https://img.shields.io/badge/Year%203000-Ready-ca9ee6?style=for-the-badge)](#)
+[![Version](https://img.shields.io/badge/Version-2.0-cba6f7?style=for-the-badge)](https://github.com/minipuft/catppuccin-starrynight)
+[![License](https://img.shields.io/badge/License-MIT-74c7ec?style=for-the-badge)](LICENSE)
 
 **🚀 The Revolutionary Music-Reactive Visual Experience Platform**
 
