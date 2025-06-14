@@ -98,48 +98,28 @@ export abstract class BaseVisualSystem {
         "year3000SystemSettingsChanged",
         this.boundHandleSettingsChange
       );
-      const storedQuality = this.settingsManager.get(
-        "sn-performanceQuality" as any
-      );
+      // Determine an appropriate performance profile entirely via auto-detection.
+      try {
+        const detectorInstance = (globalThis as any).year3000System
+          ?.deviceCapabilityDetector as DeviceCapabilityDetector;
 
-      let quality: string | undefined = undefined;
-      if (storedQuality && typeof storedQuality === "string") {
-        quality = storedQuality;
-      }
-
-      // Auto-detect when no explicit user preference was saved.
-      if (!quality || quality === "auto") {
-        try {
-          const detectorInstance = (globalThis as any).year3000System
-            ?.deviceCapabilityDetector as DeviceCapabilityDetector;
-
-          let recommended: "low" | "balanced" | "high" = "balanced";
-          if (detectorInstance?.isInitialized) {
-            recommended = detectorInstance.recommendPerformanceQuality();
-          }
-
-          quality = recommended;
-
-          // Persist so subsequent loads are faster, but allow user override.
-          this.settingsManager.set(
-            "sn-performanceQuality" as any,
-            quality as any
-          );
-          this.performanceMonitor?.emitTrace?.(
-            `[${this.systemName}] Auto-selected performance quality '${quality}' based on device capability.`
-          );
-        } catch (e) {
-          // Fallback to balanced.
-          this.performanceMonitor?.emitTrace?.(
-            `[${this.systemName}] Device capability detection failed; defaulting to 'balanced'.`,
-            e as any
-          );
-          quality = "balanced";
+        let quality: "low" | "balanced" | "high" = "balanced";
+        if (detectorInstance?.isInitialized) {
+          quality = detectorInstance.recommendPerformanceQuality();
         }
-      }
 
-      if (quality) {
+        this.performanceMonitor?.emitTrace?.(
+          `[${this.systemName}] Auto-selected performance quality '${quality}' based on device capability.`
+        );
+
         this._applyPerformanceProfile(quality);
+      } catch (e) {
+        // Fall back to a balanced profile on error.
+        this.performanceMonitor?.emitTrace?.(
+          `[${this.systemName}] Device capability detection failed; defaulting to 'balanced'.`,
+          e as any
+        );
+        this._applyPerformanceProfile("balanced");
       }
     }
 
@@ -301,11 +281,15 @@ export abstract class BaseVisualSystem {
     // Base implementation
   }
 
+  /**
+   * Base implementation of the settings-change hook. It is intentionally empty
+   * now that the legacy `sn-performanceQuality` key has been removed. Subclasses
+   * should override this method if they need to respond to other settings keys
+   * and are still encouraged to call `super.handleSettingsChange(event)`.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handleSettingsChange(event: Event) {
-    const customEvent = event as CustomEvent;
-    if (customEvent.detail.key === "sn-performanceQuality") {
-      this._applyPerformanceProfile(customEvent.detail.value);
-    }
+    // No-op in the base class.
   }
 
   _applyPerformanceProfile(quality: string) {
@@ -574,5 +558,60 @@ export abstract class BaseVisualSystem {
     this._resizeHandler(); // Set initial size
 
     return canvas;
+  }
+
+  /**
+   * Apply a fully-resolved PerformanceProfile coming from Year3000System.
+   * Sub-systems may override this to adjust internal parameters (particle
+   * counts, throttle values, etc.). The base implementation simply stores the
+   * profile so dependants can query `currentPerformanceProfile`.
+   */
+  public applyPerformanceSettings(
+    profile: import("@/types/models").PerformanceProfile
+  ): void {
+    this.currentPerformanceProfile = profile;
+
+    // Legacy path – if the system previously relied on quality tiers, convert
+    // the object to a string key when possible.
+    if (
+      (profile as any).quality &&
+      typeof this._applyPerformanceProfile === "function"
+    ) {
+      // Keep internal behaviour unchanged for older systems.
+      this._applyPerformanceProfile?.((profile as any).quality);
+    }
+
+    if (this.config.enableDebug) {
+      this.performanceMonitor?.emitTrace?.(
+        `[BaseVisualSystem (${this.systemName})] Performance settings applied`,
+        profile
+      );
+    }
+  }
+
+  /**
+   * Centralised settings responder invoked by Year3000System.  The base
+   * implementation simply adapts the parameters into a synthetic CustomEvent
+   * so that legacy subclasses overriding `handleSettingsChange` continue to
+   * work without modification.  Newer systems can override this directly for
+   * efficiency.
+   */
+  public applyUpdatedSettings?(key: string, value: any): void {
+    // Build a minimal CustomEvent identical to what SettingsManager used to
+    // dispatch so that existing overrides (expecting event.detail.key/value)
+    // still operate.
+    const evt = new CustomEvent("year3000SystemSettingsChanged", {
+      detail: { key, value },
+    });
+    try {
+      this.handleSettingsChange(evt);
+    } catch (err) {
+      if (this.config.enableDebug) {
+        console.warn(
+          `[BaseVisualSystem] ${this.systemName} applyUpdatedSettings error`,
+          err
+        );
+      }
+    }
   }
 }

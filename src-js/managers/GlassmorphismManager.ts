@@ -1,4 +1,5 @@
 import { YEAR3000_CONFIG as Config } from "@/config/globalConfig";
+import { GLASS_LEVEL_KEY, GLASS_LEVEL_OLD_KEY } from "@/config/settingKeys";
 import { CSSVariableBatcher } from "@/core/CSSVariableBatcher";
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
 import type { SettingsManager } from "@/managers/SettingsManager";
@@ -82,8 +83,9 @@ export class GlassmorphismManager implements IManagedSystem {
 
   private handleSettingsChange(event: Event): void {
     const customEvent = event as CustomEvent;
-    if (customEvent.detail.key === "sn-glassmorphismIntensity") {
-      this.applyGlassmorphismSettings(customEvent.detail.value);
+    const { key, value } = customEvent.detail || {};
+    if (key === GLASS_LEVEL_KEY || key === GLASS_LEVEL_OLD_KEY) {
+      this.applyGlassmorphismSettings(value);
     }
   }
 
@@ -152,7 +154,7 @@ export class GlassmorphismManager implements IManagedSystem {
   }
 
   public updateGlassColors(primaryColor: string, secondaryColor: string): void {
-    if (!this.isSupported || this.currentIntensity === "disabled") return;
+    if (this.currentIntensity === "disabled") return;
 
     const root = document.documentElement;
     const glassPrimary = this.convertToGlassColor(primaryColor, 0.1);
@@ -237,6 +239,15 @@ export class GlassmorphismManager implements IManagedSystem {
     this.cssBatcher.flushCSSVariableBatch();
     if (this.config.enableDebug) {
       console.log(`💎 [GlassmorphismManager] Applied level: ${level}`);
+    }
+  }
+
+  // --------------------------------------------------------------------
+  // Year3000System central settings broadcast hook
+  // --------------------------------------------------------------------
+  public applyUpdatedSettings?(key: string, value: any): void {
+    if (key === "sn-glassmorphism-level") {
+      this.applyGlassmorphismSettings(value as any);
     }
   }
 }

@@ -1,3 +1,4 @@
+import { CARD_3D_LEVEL_KEY } from "@/config/settingKeys";
 import type { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
 import type { SettingsManager } from "@/managers/SettingsManager";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
@@ -29,6 +30,8 @@ export class Card3DManager implements IManagedSystem {
   private cardQuerySelector =
     ".main-card-card, .main-gridContainer-gridContainer.main-gridContainer-fixedWidth";
 
+  private boundHandleSettingsChange: (event: Event) => void;
+
   public constructor(
     performanceMonitor: PerformanceAnalyzer,
     settingsManager: SettingsManager,
@@ -48,6 +51,9 @@ export class Card3DManager implements IManagedSystem {
     this.utils = utils;
     this.isModernTheme = true; // Assuming modern theme by default
     this.cards = document.querySelectorAll(this.config.selector);
+
+    // Bind event handler once
+    this.boundHandleSettingsChange = this.handleSettingsChange.bind(this);
   }
 
   public static getInstance(
@@ -75,7 +81,17 @@ export class Card3DManager implements IManagedSystem {
         return;
       }
     }
+    // Re-query cards because the DOM may have changed since construction
+    this.cards = document.querySelectorAll(this.config.selector);
+
     await this.applyEventListeners();
+
+    // Listen for live settings changes
+    document.addEventListener(
+      "year3000SystemSettingsChanged",
+      this.boundHandleSettingsChange
+    );
+
     this.initialized = true;
   }
 
@@ -184,5 +200,18 @@ export class Card3DManager implements IManagedSystem {
       card.style.transition = "";
     });
     this.initialized = false;
+
+    // Remove global listener
+    document.removeEventListener(
+      "year3000SystemSettingsChanged",
+      this.boundHandleSettingsChange
+    );
+  }
+
+  private handleSettingsChange(event: Event): void {
+    const { key, value } = (event as CustomEvent).detail || {};
+    if (key === CARD_3D_LEVEL_KEY) {
+      this.apply3DMode(value);
+    }
   }
 }

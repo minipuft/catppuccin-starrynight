@@ -154,7 +154,6 @@ export const ARTISTIC_MODE_PROFILES: ArtisticModeProfiles = {
       dimensionalEffects: true, // Full 3D
       aestheticGravity: true, // Visual magnetism
       quantumEmpathy: true, // Full prediction
-      temporalPlay: true, // Time-folding effects
     },
     performance: {
       maxParticles: 50,
@@ -266,31 +265,6 @@ export const YEAR3000_CONFIG: Year3000Config = {
   harmonicBaseColor: null,
   harmonicIntensity: 0.7,
   harmonicEvolution: true,
-
-  // Legacy multipliers - kept for backward compatibility but deprecated
-  artisticMultipliers: {
-    opacity: 0.28,
-    saturation: 1.45,
-    brightness: 1.25,
-    contrast: 1.35,
-    musicEnergyBoost: 1.6,
-  },
-
-  corporateMultipliers: {
-    opacity: 0.08,
-    saturation: 1.05,
-    brightness: 1.02,
-    contrast: 1.01,
-    musicEnergyBoost: 1.0,
-  },
-
-  cosmicMultipliers: {
-    opacity: 0.45,
-    saturation: 1.75,
-    brightness: 1.5,
-    contrast: 1.6,
-    musicEnergyBoost: 2.0,
-  },
 
   musicVisualSync: {
     energyScaling: {

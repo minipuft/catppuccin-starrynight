@@ -99,9 +99,9 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0) 45%,
-      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.1) 50%,
-      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0) 55%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0) 45%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0.1) 50%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0) 55%,
       transparent 100%
     );
     transform: translateX(-100%);
@@ -110,9 +110,9 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0) 30%,
-      rgba(var(--sn-gradient-accent-rgb, 140,170,238), calc(var(--sn-refract-intensity, 1) * 0.3)) 50%,
-      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0) 70%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0) 30%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), calc(var(--sn-refract-intensity, 1) * 0.3)) 50%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0) 70%,
       transparent 100%
     );
     transform: translateX(100%);
@@ -238,16 +238,16 @@
   0% {
     background: radial-gradient(
       circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.05) 0%,
-      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.02) 30%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0.05) 0%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0.02) 30%,
       transparent 60%
     );
   }
   100% {
     background: radial-gradient(
       circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.08) 0%,
-      rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.03) 40%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0.08) 0%,
+      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0.03) 40%,
       transparent 70%
     );
   }
@@ -312,9 +312,9 @@
 .sn-harmonize-flow {
   background: linear-gradient(
     90deg,
-    rgba(var(--sn-gradient-primary-rgb, 202,158,230), 0.1),
-    rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.1),
-    rgba(var(--sn-gradient-secondary-rgb, 186,187,241), 0.1)
+    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.1),
+    rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0.1),
+    rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.1)
   );
   background-size: 200% 100%;
   animation: year3000-harmonize-flow calc(var(--sn-kinetic-tempo-multiplier, 1) * 8s) linear infinite;
@@ -357,9 +357,9 @@
 .year3000-kinetic-canvas[data-kinetic-mode="flow"] {
   background: linear-gradient(
     45deg,
-    rgba(var(--sn-gradient-primary-rgb, 202,158,230), 0.03),
-    rgba(var(--sn-gradient-accent-rgb, 140,170,238), 0.03),
-    rgba(var(--sn-gradient-secondary-rgb, 186,187,241), 0.03)
+    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.03),
+    rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0.03),
+    rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.03)
   );
   background-size: 400% 400%;
   animation: year3000-harmonize-flow calc(var(--sn-kinetic-tempo-multiplier, 1) * 8s) linear infinite;

@@ -152,3 +152,30 @@
     color: var(--spice-subtext);
   }
 }
+
+@layer theme.settings {
+  .Root.settings,
+  [data-testid="settings-view"] {
+    background: var(--spice-main) !important;
+    color: var(--spice-text);
+  }
+
+  @container (min-width: 600px) {
+    [data-testid="settings-option"] {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      padding-inline: 24px;
+    }
+  }
+
+  [data-testid="settings-option"] input[type="checkbox"]:checked {
+    accent-color: var(--spice-accent) !important;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    h2[data-testid="settings-section-header"] {
+      border-bottom: 1px solid var(--spice-subdued);
+    }
+  }
+}

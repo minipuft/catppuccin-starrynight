@@ -28,19 +28,19 @@
 
   // === MUSICAL COLOR SOUL (Connected to Conscious Elegance) ===
   --header-soul-primary: rgba(
-    var(--sn-gradient-primary-rgb, 202, 158, 230),
+    var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
     calc(var(--ethereal-glow-base, 0.2) * 0.9)
   );
   --header-soul-secondary: rgba(
-    var(--sn-gradient-secondary-rgb, 186, 187, 241),
+    var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
     calc(var(--ethereal-glow-base, 0.2) * 0.8)
   );
   --header-soul-accent: rgba(
-    var(--sn-gradient-accent-rgb, 140, 170, 238),
+    var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
     calc(var(--ethereal-glow-base, 0.2) * 1)
   );
   --header-soul-whisper: rgba(
-    var(--sn-gradient-primary-rgb, 202, 158, 230),
+    var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
     calc(var(--ethereal-glow-base, 0.2) * 0.4)
   );
 }
@@ -200,7 +200,7 @@ body:not(:has(.main-searchPage-content)) {
         // Subtle text enhancement
         text-shadow: 0 0 20px
           rgba(
-            var(--sn-gradient-primary-rgb, 202, 158, 230),
+            var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
             calc(var(--header-soul-intensity) * 0.2)
           );
       }
@@ -263,7 +263,7 @@ body:not(:has(.main-searchPage-content)) {
           rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.3),
         0 0 40px
           rgba(
-            var(--sn-gradient-primary-rgb, 202, 158, 230),
+            var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
             calc(var(--header-soul-intensity) * 0.1)
           );
 

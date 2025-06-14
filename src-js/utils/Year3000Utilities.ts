@@ -99,6 +99,43 @@ export function hexToRgb(hex: string): RgbColor | null {
   }
 }
 
+export function sanitizeColorMap(input: {
+  [key: string]: string | undefined | null;
+}): { [key: string]: string } {
+  // Accepts 3- or 6-digit hex strings, with or without a leading '#'.
+  const validHex = /^#?[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$/;
+  const sanitized: { [key: string]: string } = {};
+
+  if (!input || typeof input !== "object") {
+    return sanitized;
+  }
+
+  Object.entries(input).forEach(([key, value]) => {
+    if (typeof value !== "string") return;
+    const trimmed = value.trim();
+    // Discard obviously invalid placeholders returned by upstream extractors
+    if (!trimmed || trimmed === "undefined") return;
+    if (!validHex.test(trimmed)) return;
+
+    // Normalise: ensure single leading '#'
+    const normalised = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+    sanitized[key] = normalised;
+  });
+
+  if (
+    YEAR3000_CONFIG?.enableDebug &&
+    Object.keys(input).length !== Object.keys(sanitized).length
+  ) {
+    console.warn(
+      `[StarryNight sanitizeColorMap] Dropped ${
+        Object.keys(input).length - Object.keys(sanitized).length
+      } invalid colour entries.`
+    );
+  }
+
+  return sanitized;
+}
+
 export function rgbToHsl(r: number, g: number, b: number): HslColor {
   r /= 255;
   g /= 255;
@@ -160,8 +197,28 @@ export function hslToRgb(h: number, s: number, l: number): RgbColor {
   };
 }
 
+// Accepts either 0-255 integers or 0-1 floats and clamps to valid range before
+// converting to hex. This prevents malformed output such as "0.c03…" which in
+// turn breaks downstream `hexToRgb` parsing and forces a black fallback.
 export function rgbToHex(r: number, g: number, b: number): string {
-  return "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
+  const normalize = (c: number): number => {
+    if (!Number.isFinite(c)) return 0;
+
+    // If the channel appears to be in 0-1 range, upscale to 0-255.
+    const scaled = c <= 1 ? c * 255 : c;
+
+    // Clamp and round to nearest integer.
+    return Math.min(255, Math.max(0, Math.round(scaled)));
+  };
+
+  const [nr, ng, nb] = [normalize(r), normalize(g), normalize(b)];
+
+  return (
+    "#" +
+    [nr, ng, nb]
+      .map((channel) => channel.toString(16).padStart(2, "0"))
+      .join("")
+  );
 }
 
 export function calculateContrastRatio(color1: string, color2: string): number {

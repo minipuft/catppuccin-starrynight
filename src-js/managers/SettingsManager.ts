@@ -3,6 +3,7 @@ import {
   YEAR3000_CONFIG as Config,
   HARMONIC_MODES as Modes,
 } from "@/config/globalConfig";
+import type { HarmonicMode } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import * as Utils from "@/utils/Year3000Utilities";
 
@@ -284,5 +285,25 @@ export class SettingsManager implements IManagedSystem {
   public destroy(): void {
     // No specific cleanup needed for SettingsManager.
     console.log("StarryNight: SettingsManager destroyed (no-op).");
+  }
+
+  // === NEW: Harmonic mode helpers ===========================================
+  /**
+   * Return the full HarmonicMode object for the currently selected mode.
+   * Falls back to the default entry ("analogous-flow") if the key is missing.
+   */
+  public getCurrentHarmonicMode(): HarmonicMode {
+    const key = this.get("sn-current-harmonic-mode");
+    return (this.harmonicModes[key as keyof typeof Modes] ||
+      this.harmonicModes["analogous-flow"]) as HarmonicMode;
+  }
+
+  /**
+   * Retrieve a HarmonicMode definition by key, or undefined if not found.
+   */
+  public getHarmonicMode(key: string): HarmonicMode | undefined {
+    return this.harmonicModes[key as keyof typeof Modes] as
+      | HarmonicMode
+      | undefined;
   }
 }

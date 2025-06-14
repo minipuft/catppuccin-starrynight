@@ -1,7 +1,17 @@
 "use strict";
 (() => {
+  var __create = Object.create;
   var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getProtoOf = Object.getPrototypeOf;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+    get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+  }) : x)(function(x) {
+    if (typeof require !== "undefined") return require.apply(this, arguments);
+    throw Error('Dynamic require of "' + x + '" is not supported');
+  });
   var __esm = (fn, res) => function __init() {
     return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
   };
@@ -9,6 +19,22 @@
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
   };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
 
   // src-js/utils/StorageManager.ts
   var LEGACY_KEY_MAPPINGS, VALID_KEY_PREFIXES, StorageManager;
@@ -512,10 +538,8 @@
             // Full 3D
             aestheticGravity: true,
             // Visual magnetism
-            quantumEmpathy: true,
+            quantumEmpathy: true
             // Full prediction
-            temporalPlay: true
-            // Time-folding effects
           },
           performance: {
             maxParticles: 50,
@@ -626,28 +650,6 @@
         harmonicBaseColor: null,
         harmonicIntensity: 0.7,
         harmonicEvolution: true,
-        // Legacy multipliers - kept for backward compatibility but deprecated
-        artisticMultipliers: {
-          opacity: 0.28,
-          saturation: 1.45,
-          brightness: 1.25,
-          contrast: 1.35,
-          musicEnergyBoost: 1.6
-        },
-        corporateMultipliers: {
-          opacity: 0.08,
-          saturation: 1.05,
-          brightness: 1.02,
-          contrast: 1.01,
-          musicEnergyBoost: 1
-        },
-        cosmicMultipliers: {
-          opacity: 0.45,
-          saturation: 1.75,
-          brightness: 1.5,
-          contrast: 1.6,
-          musicEnergyBoost: 2
-        },
         musicVisualSync: {
           energyScaling: {
             low: 0.6,
@@ -1023,6 +1025,657 @@
     }
   });
 
+  // src-js/utils/Year3000Utilities.ts
+  var Year3000Utilities_exports = {};
+  __export(Year3000Utilities_exports, {
+    adjustColor: () => adjustColor,
+    bpmToAnimationFrameRate: () => bpmToAnimationFrameRate,
+    bpmToInterval: () => bpmToInterval,
+    calculateBreathingScale: () => calculateBreathingScale,
+    calculateContrastRatio: () => calculateContrastRatio,
+    calculateNavigationScale: () => calculateNavigationScale,
+    calculateOklabDerivedProperties: () => calculateOklabDerivedProperties,
+    calculateRhythmPhase: () => calculateRhythmPhase,
+    colorDifference: () => colorDifference,
+    easeBeatAnimation: () => easeBeatAnimation,
+    findRequiredLuminance: () => findRequiredLuminance,
+    generateHarmonicOklabColors: () => generateHarmonicOklabColors,
+    getBeatPhase: () => getBeatPhase,
+    getHealthMonitor: () => getHealthMonitor,
+    getNextBeatTime: () => getNextBeatTime,
+    getRootStyle: () => getRootStyle,
+    hexToRgb: () => hexToRgb,
+    hslToRgb: () => hslToRgb,
+    intervalToBpm: () => intervalToBpm,
+    isOnBeat: () => isOnBeat,
+    lerp: () => lerp,
+    lerpSmooth: () => lerpSmooth,
+    oklabToRgb: () => oklabToRgb,
+    processOklabColor: () => processOklabColor,
+    rgbToHex: () => rgbToHex,
+    rgbToHsl: () => rgbToHsl,
+    rgbToOklab: () => rgbToOklab,
+    sanitizeColorMap: () => sanitizeColorMap,
+    sleep: () => sleep,
+    throttle: () => throttle
+  });
+  function getRootStyle() {
+    return document.documentElement;
+  }
+  function throttle(func, limit) {
+    let inThrottle;
+    return function throttled(...args) {
+      if (!inThrottle) {
+        func(...args);
+        inThrottle = true;
+        setTimeout(() => inThrottle = false, limit);
+      }
+    };
+  }
+  function hexToRgb(hex) {
+    if (typeof hex !== "string") {
+      console.warn(
+        "[StarryNight hexToRgb] Input is not a string. Using fallback color (black). Hex:",
+        hex
+      );
+      return { r: 0, g: 0, b: 0 };
+    }
+    const sanitizedHex = hex.trim();
+    let processedHex = sanitizedHex.startsWith("#") ? sanitizedHex : `#${sanitizedHex}`;
+    processedHex = processedHex.replace(/##+/g, "#");
+    if (processedHex.length === 4) {
+      processedHex = `#${processedHex[1]}${processedHex[1]}${processedHex[2]}${processedHex[2]}${processedHex[3]}${processedHex[3]}`;
+    }
+    const result = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(processedHex);
+    if (result) {
+      try {
+        const rgb = {
+          r: parseInt(result[1] || "0", 16),
+          g: parseInt(result[2] || "0", 16),
+          b: parseInt(result[3] || "0", 16)
+        };
+        return rgb;
+      } catch (e) {
+        console.error(
+          "[StarryNight hexToRgb] ERROR during parseInt:",
+          e,
+          "for hex:",
+          processedHex,
+          ". Using fallback color (black)."
+        );
+        return { r: 0, g: 0, b: 0 };
+      }
+    } else {
+      console.warn(
+        "[StarryNight hexToRgb] REGEX failed for hex:",
+        processedHex,
+        ". Using fallback color (black)."
+      );
+      return { r: 0, g: 0, b: 0 };
+    }
+  }
+  function sanitizeColorMap(input) {
+    const validHex = /^#?[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$/;
+    const sanitized = {};
+    if (!input || typeof input !== "object") {
+      return sanitized;
+    }
+    Object.entries(input).forEach(([key, value]) => {
+      if (typeof value !== "string") return;
+      const trimmed = value.trim();
+      if (!trimmed || trimmed === "undefined") return;
+      if (!validHex.test(trimmed)) return;
+      const normalised = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+      sanitized[key] = normalised;
+    });
+    if (YEAR3000_CONFIG?.enableDebug && Object.keys(input).length !== Object.keys(sanitized).length) {
+      console.warn(
+        `[StarryNight sanitizeColorMap] Dropped ${Object.keys(input).length - Object.keys(sanitized).length} invalid colour entries.`
+      );
+    }
+    return sanitized;
+  }
+  function rgbToHsl(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0, l = (max + min) / 2;
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
+      }
+      h /= 6;
+    }
+    return { h: h * 360, s: s * 100, l: l * 100 };
+  }
+  function hslToRgb(h, s, l) {
+    h /= 360;
+    s /= 100;
+    l /= 100;
+    const hue2rgb = (p, q, t) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    };
+    let r_val, g_val, b_val;
+    if (s === 0) {
+      r_val = g_val = b_val = l;
+    } else {
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r_val = hue2rgb(p, q, h + 1 / 3);
+      g_val = hue2rgb(p, q, h);
+      b_val = hue2rgb(p, q, h - 1 / 3);
+    }
+    return {
+      r: Math.round(r_val * 255),
+      g: Math.round(g_val * 255),
+      b: Math.round(b_val * 255)
+    };
+  }
+  function rgbToHex(r, g, b) {
+    const normalize = (c) => {
+      if (!Number.isFinite(c)) return 0;
+      const scaled = c <= 1 ? c * 255 : c;
+      return Math.min(255, Math.max(0, Math.round(scaled)));
+    };
+    const [nr, ng, nb] = [normalize(r), normalize(g), normalize(b)];
+    return "#" + [nr, ng, nb].map((channel) => channel.toString(16).padStart(2, "0")).join("");
+  }
+  function calculateContrastRatio(color1, color2) {
+    const getLuminance = (rgb) => {
+      const [r_val = 0, g_val = 0, b_val = 0] = [rgb.r, rgb.g, rgb.b].map((c) => {
+        c = c / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * r_val + 0.7152 * g_val + 0.0722 * b_val;
+    };
+    const rgb1 = hexToRgb(color1);
+    const rgb2 = hexToRgb(color2);
+    if (!rgb1 || !rgb2) return 1;
+    const lum1 = getLuminance(rgb1);
+    const lum2 = getLuminance(rgb2);
+    const brightest = Math.max(lum1, lum2);
+    const darkest = Math.min(lum1, lum2);
+    return (brightest + 0.05) / (darkest + 0.05);
+  }
+  function lerpSmooth(current, target, deltaTime, halfLife) {
+    const EPSILON = 1e-5;
+    if (halfLife <= EPSILON || deltaTime <= 0) {
+      if (YEAR3000_CONFIG?.enableDebug) {
+        if (halfLife <= EPSILON) {
+        }
+      }
+      return target;
+    }
+    const result = target + (current - target) * Math.pow(2, -deltaTime / halfLife);
+    return result;
+  }
+  function bpmToInterval(bpm) {
+    if (!bpm || bpm <= 0) return 500;
+    return 6e4 / bpm;
+  }
+  function intervalToBpm(intervalMs) {
+    if (!intervalMs || intervalMs <= 0) return 120;
+    return 6e4 / intervalMs;
+  }
+  function bpmToAnimationFrameRate(bpm, framesPerBeat = 4) {
+    const beatInterval = bpmToInterval(bpm);
+    return beatInterval / framesPerBeat;
+  }
+  function isOnBeat(currentTime, trackStartTime, bpm, tolerance = 50) {
+    const beatInterval = bpmToInterval(bpm);
+    const timeSinceStart = currentTime - trackStartTime;
+    const beatPosition = timeSinceStart % beatInterval;
+    return beatPosition <= tolerance || beatPosition >= beatInterval - tolerance;
+  }
+  function getBeatPhase(currentTime, trackStartTime, bpm) {
+    const beatInterval = bpmToInterval(bpm);
+    const timeSinceStart = currentTime - trackStartTime;
+    const beatPosition = timeSinceStart % beatInterval;
+    return beatPosition / beatInterval;
+  }
+  function getNextBeatTime(currentTime, trackStartTime, bpm) {
+    const beatInterval = bpmToInterval(bpm);
+    const timeSinceStart = currentTime - trackStartTime;
+    const beatsElapsed = Math.floor(timeSinceStart / beatInterval);
+    return trackStartTime + (beatsElapsed + 1) * beatInterval;
+  }
+  function easeBeatAnimation(beatPhase, easingType = "ease-out") {
+    switch (easingType) {
+      case "ease-in":
+        return beatPhase * beatPhase;
+      case "linear":
+        return beatPhase;
+      case "ease-out":
+      default:
+        return beatPhase * (2 - beatPhase);
+    }
+  }
+  function calculateRhythmPhase(currentTime, animationSpeedFactor = 1) {
+    const speed = 1e-3 * animationSpeedFactor;
+    return currentTime * speed % (2 * Math.PI);
+  }
+  function calculateBreathingScale(rhythmPhase, processedEnergy = 0.5) {
+    const baseScale = 1;
+    const pulseAmount = 0.02 * processedEnergy;
+    const breath = Math.sin(rhythmPhase) * pulseAmount;
+    return baseScale + breath;
+  }
+  function calculateNavigationScale(visualIntensity = 0.5, moodIdentifier = "neutral") {
+    const baseScale = 1;
+    const moodFactor = moodIdentifier === "energetic" ? 1.2 : moodIdentifier === "calm" ? 0.8 : 1;
+    return baseScale + 0.05 * visualIntensity * moodFactor;
+  }
+  function rgbToOklab(r_srgb, g_srgb, b_srgb) {
+    const r = r_srgb / 255;
+    const g = g_srgb / 255;
+    const b = b_srgb / 255;
+    const l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
+    const m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
+    const s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
+    const l_ = Math.cbrt(l);
+    const m_ = Math.cbrt(m);
+    const s_ = Math.cbrt(s);
+    return {
+      L: 0.2104542553 * l_ + 0.793617785 * m_ - 0.0040720468 * s_,
+      a: 1.9779984951 * l_ - 2.428592205 * m_ + 0.4505937099 * s_,
+      b: 0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_
+    };
+  }
+  function oklabToRgb(L, a, b_oklab) {
+    const l_ = L + 0.3963377774 * a + 0.2158037573 * b_oklab;
+    const m_ = L - 0.1055613458 * a - 0.0638541728 * b_oklab;
+    const s_ = L - 0.0894841775 * a - 1.291485548 * b_oklab;
+    const l = l_ * l_ * l_;
+    const m = m_ * m_ * m_;
+    const s = s_ * s_ * s_;
+    let r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+    let g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+    let b = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
+    r = Math.round(Math.max(0, Math.min(1, r)) * 255);
+    g = Math.round(Math.max(0, Math.min(1, g)) * 255);
+    b = Math.round(Math.max(0, Math.min(1, b)) * 255);
+    return { r, g, b };
+  }
+  function processOklabColor(oklabColor, context = {}) {
+    const { L, a, b } = oklabColor;
+    const C = Math.sqrt(a * a + b * b);
+    let h_rad = Math.atan2(b, a);
+    if (h_rad < 0) {
+      h_rad += 2 * Math.PI;
+    }
+    const h = h_rad * (180 / Math.PI);
+    const {
+      energy = 0.5,
+      valence = 0.5,
+      artisticMode = "artist-vision"
+    } = context;
+    const multipliers = YEAR3000_CONFIG.getCurrentMultipliers();
+    let adjusted_L = L * (1 + (valence - 0.5) * 0.1);
+    let adjusted_C = C * (1 + (energy - 0.5) * 0.2) * (multipliers?.saturation || 1);
+    adjusted_L = Math.max(
+      0,
+      Math.min(1, adjusted_L * (multipliers?.brightness || 1))
+    );
+    return {
+      L: adjusted_L,
+      C: adjusted_C,
+      h: C > 1e-3 ? h : null
+      // Hue is meaningless if chroma is near zero
+    };
+  }
+  function calculateOklabDerivedProperties(oklabColor) {
+    const { L, C, h } = processOklabColor(oklabColor);
+    const isWarm = h !== null ? h >= 0 && h < 90 || h >= 270 && h <= 360 : false;
+    const isCool = h !== null ? h >= 90 && h < 270 : false;
+    let mood = "neutral";
+    if (L > 0.7 && C > 0.1) mood = "bright";
+    else if (L < 0.4) mood = "dark";
+    else if (isWarm && C > 0.1) mood = "warm";
+    else if (isCool && C > 0.1) mood = "cool";
+    return {
+      lightness: L,
+      chroma: C,
+      hue: h,
+      isWarm,
+      isCool,
+      mood
+    };
+  }
+  function generateHarmonicOklabColors(baseOklabColor, rule = "analogous", angle = 30) {
+    const baseLCH = processOklabColor(baseOklabColor);
+    if (baseLCH.h === null) {
+      return [baseOklabColor];
+    }
+    const getOklabFromLCH = (l_val, c_val, h_deg_val) => {
+      const h_rad = h_deg_val * (Math.PI / 180);
+      const a_val = c_val * Math.cos(h_rad);
+      const b_val = c_val * Math.sin(h_rad);
+      return { L: l_val, a: a_val, b: b_val };
+    };
+    const colors = [baseOklabColor];
+    const { L, C, h } = baseLCH;
+    switch (rule) {
+      case "complementary":
+        colors.push(getOklabFromLCH(L, C, (h + 180) % 360));
+        break;
+      case "analogous":
+        colors.push(getOklabFromLCH(L, C, (h + angle) % 360));
+        colors.push(getOklabFromLCH(L, C, (h - angle + 360) % 360));
+        break;
+      case "triadic":
+        colors.push(getOklabFromLCH(L, C, (h + 120) % 360));
+        colors.push(getOklabFromLCH(L, C, (h + 240) % 360));
+        break;
+      case "tetradic":
+        colors.push(getOklabFromLCH(L, C, (h + 90) % 360));
+        colors.push(getOklabFromLCH(L, C, (h + 180) % 360));
+        colors.push(getOklabFromLCH(L, C, (h + 270) % 360));
+        break;
+      case "split-complementary":
+        colors.push(getOklabFromLCH(L, C, (h + 180 - angle) % 360));
+        colors.push(getOklabFromLCH(L, C, (h + 180 + angle) % 360));
+        break;
+      case "monochromatic":
+        colors.push({
+          L: Math.max(0, L - 0.2),
+          a: baseOklabColor.a,
+          b: baseOklabColor.b
+        });
+        colors.push({
+          L: Math.min(1, L + 0.2),
+          a: baseOklabColor.a,
+          b: baseOklabColor.b
+        });
+        break;
+    }
+    return colors;
+  }
+  function lerp(start, end, amt) {
+    return (1 - amt) * start + amt * end;
+  }
+  function colorDifference(rgb1, rgb2) {
+    const lab1 = rgbToOklab(rgb1.r, rgb1.g, rgb1.b);
+    const lab2 = rgbToOklab(rgb2.r, rgb2.g, rgb2.b);
+    const deltaL = lab1.L - lab2.L;
+    const deltaA = lab1.a - lab2.a;
+    const deltaB = lab1.b - lab2.b;
+    return Math.sqrt(deltaL * deltaL + deltaA * deltaA + deltaB * deltaB);
+  }
+  function getHealthMonitor() {
+    return healthMonitorInstance;
+  }
+  function findRequiredLuminance(color1, color2, ratio) {
+    const getLuminance = (rgb) => {
+      const [r_val = 0, g_val = 0, b_val = 0] = [rgb.r, rgb.g, rgb.b].map((c) => {
+        c = c / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * r_val + 0.7152 * g_val + 0.0722 * b_val;
+    };
+    const lum2 = getLuminance(color2);
+    let targetLuminance;
+    targetLuminance = ratio * (lum2 + 0.05) - 0.05;
+    const hsl = rgbToHsl(color1.r, color1.g, color1.b);
+    const currentLuminance = getLuminance(color1);
+    const luminanceRatio = targetLuminance / currentLuminance;
+    return hsl.l;
+  }
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  function adjustColor(rgb, {
+    brightness = 1,
+    saturation = 1,
+    hue = 0
+  }) {
+    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+    hsl.h = (hsl.h + hue) % 360;
+    hsl.s = Math.max(0, Math.min(100, hsl.s * saturation));
+    hsl.l = Math.max(0, Math.min(100, hsl.l * brightness));
+    return hslToRgb(hsl.h, hsl.s, hsl.l);
+  }
+  var HealthMonitor, healthMonitorInstance;
+  var init_Year3000Utilities = __esm({
+    "src-js/utils/Year3000Utilities.ts"() {
+      "use strict";
+      init_globalConfig();
+      HealthMonitor = class {
+        registerSystem(name, instance) {
+        }
+        updateSystemMetrics(name, metrics) {
+        }
+      };
+      healthMonitorInstance = new HealthMonitor();
+    }
+  });
+
+  // src-js/managers/SettingsManager.ts
+  var SettingsManager;
+  var init_SettingsManager = __esm({
+    "src-js/managers/SettingsManager.ts"() {
+      "use strict";
+      init_globalConfig();
+      init_Year3000Utilities();
+      SettingsManager = class {
+        constructor(config = YEAR3000_CONFIG, harmonicModes = HARMONIC_MODES, utils = Year3000Utilities_exports) {
+          this.initialized = false;
+          this.config = config;
+          this.harmonicModes = harmonicModes;
+          this.utils = utils;
+          this.defaults = {
+            "catppuccin-flavor": "mocha",
+            "catppuccin-accentColor": "mauve",
+            "sn-star-density": "balanced",
+            "sn-gradient-intensity": "balanced",
+            "sn-glassmorphism-level": "moderate",
+            "sn-3d-effects-level": "full",
+            "sn-artistic-mode": "artist-vision",
+            "sn-current-harmonic-mode": "analogous-flow",
+            "sn-harmonic-intensity": "0.7",
+            "sn-harmonic-evolution": "true",
+            "sn-harmonic-manual-base-color": "",
+            "sn-enable-webgpu": "true"
+          };
+          this.validationSchemas = {
+            "catppuccin-flavor": {
+              default: "mocha",
+              allowedValues: ["latte", "frappe", "macchiato", "mocha"]
+            },
+            "catppuccin-accentColor": {
+              default: "mauve",
+              allowedValues: [
+                "rosewater",
+                "flamingo",
+                "pink",
+                "mauve",
+                "red",
+                "maroon",
+                "peach",
+                "yellow",
+                "green",
+                "teal",
+                "sky",
+                "sapphire",
+                "blue",
+                "lavender",
+                "text",
+                "none"
+              ]
+            },
+            "sn-star-density": {
+              default: "balanced",
+              allowedValues: ["disabled", "minimal", "balanced", "intense"]
+            },
+            "sn-gradient-intensity": {
+              default: "balanced",
+              allowedValues: ["disabled", "minimal", "balanced", "intense"]
+            },
+            "sn-glassmorphism-level": {
+              default: "moderate",
+              allowedValues: ["disabled", "minimal", "moderate", "intense"]
+            },
+            "sn-3d-effects-level": {
+              default: "full",
+              allowedValues: ["full", "minimal", "disabled"]
+            },
+            "sn-artistic-mode": {
+              default: "artist-vision",
+              allowedValues: Object.keys(ARTISTIC_MODE_PROFILES)
+            },
+            "sn-current-harmonic-mode": {
+              default: "analogous-flow",
+              allowedValues: Object.keys(
+                this.harmonicModes
+              )
+            },
+            "sn-harmonic-intensity": { default: "0.7" },
+            "sn-harmonic-evolution": {
+              default: "true",
+              allowedValues: ["true", "false"]
+            },
+            "sn-harmonic-manual-base-color": { default: "" },
+            "sn-enable-webgpu": {
+              default: "true",
+              allowedValues: ["true", "false"]
+            }
+          };
+          this.validateAndRepair();
+          this.initialized = true;
+        }
+        async initialize() {
+          this.initialized = true;
+        }
+        async healthCheck() {
+          try {
+            Spicetify.LocalStorage.get("spicetify-exp-features");
+            return { ok: true, details: "LocalStorage is accessible." };
+          } catch (e) {
+            return {
+              ok: false,
+              details: "Failed to access Spicetify.LocalStorage.",
+              issues: [e.message]
+            };
+          }
+        }
+        get(key) {
+          try {
+            const value = Spicetify.LocalStorage.get(key);
+            const schema = this.validationSchemas[key];
+            if (!schema) {
+              console.warn(`StarryNight: No validation schema for key: ${key}.`);
+              return value;
+            }
+            if (value === null || schema.allowedValues && !schema.allowedValues.includes(value)) {
+              return schema.default;
+            }
+            return value;
+          } catch (error) {
+            console.error(`StarryNight: Error reading key ${key}:`, error);
+            return this.validationSchemas[key]?.default;
+          }
+        }
+        getAllowedValues(key) {
+          return this.validationSchemas[key]?.allowedValues;
+        }
+        set(key, value) {
+          try {
+            const schema = this.validationSchemas[key];
+            if (!schema) {
+              Spicetify.LocalStorage.set(key, value);
+              return true;
+            }
+            if (key === "sn-harmonic-manual-base-color") {
+              if (value !== "" && !/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)) {
+                return false;
+              }
+            } else if (schema.allowedValues && !schema.allowedValues.includes(value)) {
+              return false;
+            }
+            Spicetify.LocalStorage.set(key, value);
+            document.dispatchEvent(
+              new CustomEvent("year3000SystemSettingsChanged", {
+                detail: { key, value }
+              })
+            );
+            return true;
+          } catch (error) {
+            console.error(`StarryNight: Error setting key ${key}:`, error);
+            return false;
+          }
+        }
+        getAllSettings() {
+          const settings = {};
+          for (const key in this.validationSchemas) {
+            settings[key] = this.get(key);
+          }
+          return settings;
+        }
+        validateAndRepair() {
+          let repairedCount = 0;
+          for (const key in this.validationSchemas) {
+            const aKey = key;
+            const currentValue = Spicetify.LocalStorage.get(aKey);
+            const validatedValue = this.get(aKey);
+            if (currentValue !== validatedValue) {
+              this.set(aKey, validatedValue);
+              repairedCount++;
+            }
+          }
+          if (repairedCount > 0) {
+            console.log(`StarryNight: Repaired ${repairedCount} invalid settings.`);
+          }
+        }
+        resetAllToDefaults() {
+          for (const key of Object.keys(this.defaults)) {
+            this.set(
+              key,
+              this.defaults[key]
+            );
+          }
+          console.log("StarryNight: All settings reset to defaults.");
+        }
+        // To satisfy the SystemHealthMonitor, which expects all registered systems
+        // to have these lifecycle methods.
+        updateAnimation() {
+        }
+        destroy() {
+          console.log("StarryNight: SettingsManager destroyed (no-op).");
+        }
+        // === NEW: Harmonic mode helpers ===========================================
+        /**
+         * Return the full HarmonicMode object for the currently selected mode.
+         * Falls back to the default entry ("analogous-flow") if the key is missing.
+         */
+        getCurrentHarmonicMode() {
+          const key = this.get("sn-current-harmonic-mode");
+          return this.harmonicModes[key] || this.harmonicModes["analogous-flow"];
+        }
+        /**
+         * Retrieve a HarmonicMode definition by key, or undefined if not found.
+         */
+        getHarmonicMode(key) {
+          return this.harmonicModes[key];
+        }
+      };
+    }
+  });
+
   // src-js/effects/starryNightEffects.ts
   function injectStarContainer() {
     const existingContainer = document.querySelector(
@@ -1081,365 +1734,490 @@
   var init_starryNightEffects = __esm({
     "src-js/effects/starryNightEffects.ts"() {
       "use strict";
+      init_SettingsManager();
       init_globalConfig();
-      init_StorageManager();
     }
   });
 
-  // src-js/components/SettingsSpicetifyNative.tsx
-  var SettingsSpicetifyNative_exports = {};
-  __export(SettingsSpicetifyNative_exports, {
-    initializeSpicetifyNativeSettings: () => initializeSpicetifyNativeSettings
+  // src-js/utils/SettingsSection.tsx
+  var import_react, import_react_dom, SettingsSection;
+  var init_SettingsSection = __esm({
+    "src-js/utils/SettingsSection.tsx"() {
+      "use strict";
+      import_react = __toESM(__require("react"));
+      import_react_dom = __toESM(__require("react-dom"));
+      SettingsSection = class {
+        constructor(name, settingsId, initialSettingsFields = {}) {
+          this.name = name;
+          this.settingsId = settingsId;
+          this.initialSettingsFields = initialSettingsFields;
+          this.settingsFields = this.initialSettingsFields;
+          this.setRerender = null;
+          /** Mounts the section when the user visits the Spotify settings route */
+          this.pushSettings = async () => {
+            Object.entries(this.settingsFields).forEach(([nameId, field]) => {
+              if (field.type !== "button" && this.getFieldValue(nameId) === void 0) {
+                this.setFieldValue(nameId, field.defaultValue);
+              }
+            });
+            while (!window.Spicetify?.Platform?.History?.listen) {
+              await new Promise((r) => setTimeout(r, 100));
+            }
+            if (this.stopHistoryListener) this.stopHistoryListener();
+            this.stopHistoryListener = window.Spicetify.Platform.History.listen((e) => {
+              if (e.pathname === "/preferences") this.render();
+            });
+            if (window.Spicetify.Platform.History.location.pathname === "/preferences") {
+              await this.render();
+            }
+          };
+          this.rerender = () => {
+            this.setRerender?.(Math.random());
+          };
+          /* ----------------------- field creators ---------------------------- */
+          this.addDropDown = (nameId, description, options, defaultIndex, _onSelect, events) => {
+            this.settingsFields[nameId] = {
+              type: "dropdown",
+              description,
+              defaultValue: options[defaultIndex],
+              options,
+              events
+            };
+          };
+          /** Toggle (checkbox) */
+          this.addToggle = (nameId, description, defaultValue, events) => {
+            this.settingsFields[nameId] = {
+              type: "toggle",
+              description,
+              defaultValue,
+              events
+            };
+          };
+          /** Text / number / color input */
+          this.addInput = (nameId, description, defaultValue, inputType = "text", events) => {
+            this.settingsFields[nameId] = {
+              type: "input",
+              description,
+              defaultValue,
+              inputType,
+              events
+            };
+          };
+          this.getFieldValue = (nameId) => {
+            return JSON.parse(
+              window.Spicetify?.LocalStorage.get(this.storageKey(nameId)) || "null"
+            )?.value;
+          };
+          /* ---------------------- React wrappers ----------------------------- */
+          this.FieldsContainer = () => {
+            const [nonce, setNonce] = (0, import_react.useState)(0);
+            this.setRerender = setNonce;
+            return /* @__PURE__ */ import_react.default.createElement("div", { className: "x-settings-section", key: nonce }, /* @__PURE__ */ import_react.default.createElement("h2", { className: "TypeElement-cello-textBase-type" }, this.name), Object.entries(this.settingsFields).map(([nameId, field]) => /* @__PURE__ */ import_react.default.createElement(this.Field, { key: nameId, nameId, field })));
+          };
+          this.Field = ({
+            nameId,
+            field
+          }) => {
+            const id = `${this.settingsId}.${nameId}`;
+            const initial = field.type === "button" ? field.value : this.getFieldValue(nameId) ?? field.defaultValue;
+            const [value, setVal] = (0, import_react.useState)(initial);
+            const setValue = (v) => {
+              setVal(v);
+              this.setFieldValue(nameId, v);
+            };
+            if (field.type === "hidden") return /* @__PURE__ */ import_react.default.createElement(import_react.default.Fragment, null);
+            const Label = /* @__PURE__ */ import_react.default.createElement("label", { className: "TypeElement-viola-textSubdued-type", htmlFor: id }, field.description || "");
+            let Control = null;
+            switch (field.type) {
+              case "dropdown":
+                Control = /* @__PURE__ */ import_react.default.createElement(
+                  "select",
+                  {
+                    className: "main-dropDown-dropDown",
+                    id,
+                    ...field.events,
+                    onChange: (e) => {
+                      const idx = e.currentTarget.selectedIndex;
+                      const newVal = field.options[idx];
+                      setValue(newVal);
+                      field.events?.onChange?.(e);
+                    }
+                  },
+                  field.options.map((opt, i) => /* @__PURE__ */ import_react.default.createElement("option", { key: opt, value: opt, selected: opt === value }, opt))
+                );
+                break;
+              case "toggle":
+                Control = /* @__PURE__ */ import_react.default.createElement("label", { className: "x-settings-secondColumn x-toggle-wrapper" }, /* @__PURE__ */ import_react.default.createElement(
+                  "input",
+                  {
+                    id,
+                    className: "x-toggle-input",
+                    type: "checkbox",
+                    checked: !!value,
+                    ...field.events,
+                    onClick: (e) => {
+                      const checked = e.currentTarget.checked;
+                      setValue(checked);
+                      field.events?.onClick?.(e);
+                    }
+                  }
+                ), /* @__PURE__ */ import_react.default.createElement("span", { className: "x-toggle-indicatorWrapper" }, /* @__PURE__ */ import_react.default.createElement("span", { className: "x-toggle-indicator" })));
+                break;
+              case "input":
+                Control = /* @__PURE__ */ import_react.default.createElement(
+                  "input",
+                  {
+                    className: "x-settings-input",
+                    id,
+                    dir: "ltr",
+                    value,
+                    type: field.inputType || "text",
+                    ...field.events,
+                    onChange: (e) => {
+                      setValue(e.currentTarget.value);
+                      field.events?.onChange?.(e);
+                    }
+                  }
+                );
+                break;
+              case "button":
+                Control = /* @__PURE__ */ import_react.default.createElement(
+                  "button",
+                  {
+                    id,
+                    className: "Button-sc-y0gtbx-0 Button-small-buttonSecondary-useBrowserDefaultFocusStyle x-settings-button",
+                    ...field.events,
+                    onClick: (e) => {
+                      field.events?.onClick?.(e);
+                    },
+                    type: "button"
+                  },
+                  value
+                );
+                break;
+              default:
+                Control = null;
+            }
+            return /* @__PURE__ */ import_react.default.createElement("div", { className: "x-settings-row" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "x-settings-firstColumn" }, Label), /* @__PURE__ */ import_react.default.createElement("div", { className: "x-settings-secondColumn" }, Control));
+          };
+        }
+        /* --------------------- internal render helpers --------------------- */
+        async render() {
+          while (!document.getElementById("desktop.settings.selectLanguage")) {
+            if (window.Spicetify.Platform.History.location.pathname !== "/preferences")
+              return;
+            await new Promise((r) => setTimeout(r, 100));
+          }
+          const container = document.querySelector(
+            ".main-view-container__scroll-node-child main div"
+          );
+          if (!container)
+            return console.error("[StarryNight] settings container not found");
+          let host = Array.from(container.children).find(
+            (c) => c.id === this.settingsId
+          );
+          if (!host) {
+            host = document.createElement("div");
+            host.id = this.settingsId;
+            container.appendChild(host);
+          }
+          import_react_dom.default.render(/* @__PURE__ */ import_react.default.createElement(this.FieldsContainer, null), host);
+        }
+        /* ----- generic storage helpers (use Spicetify.LocalStorage) -------- */
+        storageKey(nameId) {
+          return `${this.settingsId}.${nameId}`;
+        }
+        setFieldValue(nameId, newValue) {
+          window.Spicetify?.LocalStorage.set(
+            this.storageKey(nameId),
+            JSON.stringify({ value: newValue })
+          );
+        }
+      };
+    }
   });
-  function initializeSpicetifyNativeSettings() {
-    try {
-      migrateExistingSettings();
-      createSettingsPanel();
-      console.log("\u2728 [StarryNight] Spicetify native settings initialized");
-    } catch (error) {
-      console.error(
-        "\u274C [StarryNight] Error initializing native settings:",
-        error
+
+  // src-js/components/StarryNightSettings.ts
+  var StarryNightSettings_exports = {};
+  __export(StarryNightSettings_exports, {
+    initializeStarryNightSettings: () => initializeStarryNightSettings
+  });
+  async function initializeStarryNightSettings() {
+    const section = new SettingsSection(
+      "StarryNight Theme",
+      "starrynight-settings"
+    );
+    const accentOptions = [
+      "rosewater",
+      "flamingo",
+      "pink",
+      "mauve",
+      "red",
+      "maroon",
+      "peach",
+      "yellow",
+      "green",
+      "teal",
+      "sky",
+      "sapphire",
+      "blue",
+      "lavender"
+    ];
+    function getSettingsManager() {
+      const existing = window.Y3K?.system?.settingsManager;
+      if (existing) return existing;
+      const cached = globalThis.__SN_settingsManager;
+      if (cached) return cached;
+      const manager = new SettingsManager();
+      globalThis.__SN_settingsManager = manager;
+      return manager;
+    }
+    const settingsManager = getSettingsManager();
+    const currentAccent = settingsManager.get("catppuccin-accentColor");
+    section.addDropDown(
+      "catppuccin-accentColor",
+      // settings key (nameId)
+      "Accent colour",
+      // user-visible label
+      accentOptions,
+      // option list
+      Math.max(0, accentOptions.indexOf(currentAccent)),
+      // default index
+      void 0,
+      // onSelect (unused – we use onChange)
+      {
+        onChange: (e) => {
+          try {
+            const idx = e?.currentTarget?.selectedIndex ?? 0;
+            const newAccent = accentOptions[idx] ?? "mauve";
+            settingsManager.set("catppuccin-accentColor", newAccent);
+            const grad = settingsManager.get("sn-gradient-intensity");
+            const stars = settingsManager.get("sn-star-density");
+            applyStarryNightSettings(grad, stars);
+            try {
+              globalThis.Y3K?.system?.applyInitialSettings?.();
+            } catch (applyErr) {
+              console.warn(
+                "[StarryNight] Unable to trigger Year3000System colour refresh",
+                applyErr
+              );
+            }
+          } catch (err) {
+            console.error("[StarryNight] Failed to update accent colour", err);
+          }
+        }
+      }
+    );
+    const intensityOptions = [
+      "disabled",
+      "minimal",
+      "balanced",
+      "intense"
+    ];
+    const currentGradient = settingsManager.get("sn-gradient-intensity");
+    section.addDropDown(
+      "sn-gradient-intensity",
+      "Gradient intensity",
+      intensityOptions,
+      Math.max(0, intensityOptions.indexOf(currentGradient)),
+      void 0,
+      {
+        onChange: (e) => {
+          const idx = e?.currentTarget?.selectedIndex ?? 0;
+          const newGrad = intensityOptions[idx] ?? "balanced";
+          settingsManager.set("sn-gradient-intensity", newGrad);
+          const stars = settingsManager.get("sn-star-density");
+          applyStarryNightSettings(newGrad, stars);
+        }
+      }
+    );
+    const currentStars = settingsManager.get("sn-star-density");
+    section.addDropDown(
+      "sn-star-density",
+      "Star density",
+      intensityOptions,
+      Math.max(0, intensityOptions.indexOf(currentStars)),
+      void 0,
+      {
+        onChange: (e) => {
+          const idx = e?.currentTarget?.selectedIndex ?? 0;
+          const newStars = intensityOptions[idx] ?? "balanced";
+          settingsManager.set("sn-star-density", newStars);
+          const grad = settingsManager.get("sn-gradient-intensity");
+          applyStarryNightSettings(grad, newStars);
+        }
+      }
+    );
+    const flavourOptions = ["latte", "frappe", "macchiato", "mocha"];
+    const currentFlavor = settingsManager.get("catppuccin-flavor");
+    section.addDropDown(
+      "catppuccin-flavor",
+      "Catppuccin flavour",
+      flavourOptions,
+      Math.max(0, flavourOptions.indexOf(currentFlavor)),
+      void 0,
+      {
+        onChange: (e) => {
+          const idx = e?.currentTarget?.selectedIndex ?? 0;
+          settingsManager.set("catppuccin-flavor", flavourOptions[idx]);
+          globalThis.Y3K?.system?.applyInitialSettings?.();
+        }
+      }
+    );
+    const glassOptions = ["disabled", "minimal", "moderate", "intense"];
+    const currentGlass = settingsManager.get("sn-glassmorphism-level");
+    section.addDropDown(
+      "sn-glassmorphism-level",
+      "Glassmorphism",
+      glassOptions,
+      Math.max(0, glassOptions.indexOf(currentGlass)),
+      void 0,
+      {
+        onChange: (e) => {
+          const idx = e?.currentTarget?.selectedIndex ?? 0;
+          settingsManager.set("sn-glassmorphism-level", glassOptions[idx]);
+        }
+      }
+    );
+    const fx3dOptions = ["full", "minimal", "disabled"];
+    const current3d = settingsManager.get("sn-3d-effects-level");
+    section.addDropDown(
+      "sn-3d-effects-level",
+      "3D card effects",
+      fx3dOptions,
+      Math.max(0, fx3dOptions.indexOf(current3d)),
+      void 0,
+      {
+        onChange: (e) => {
+          const idx = e?.currentTarget?.selectedIndex ?? 0;
+          settingsManager.set("sn-3d-effects-level", fx3dOptions[idx]);
+        }
+      }
+    );
+    const artisticOptions = [
+      "corporate-safe",
+      "artist-vision",
+      "cosmic-maximum"
+    ];
+    const currentArtistic = settingsManager.get("sn-artistic-mode");
+    section.addDropDown(
+      "sn-artistic-mode",
+      "Artistic mode",
+      artisticOptions,
+      Math.max(0, artisticOptions.indexOf(currentArtistic)),
+      void 0,
+      {
+        onChange: (e) => {
+          const idx = e?.currentTarget?.selectedIndex ?? 0;
+          const mode = artisticOptions[idx];
+          settingsManager.set("sn-artistic-mode", mode);
+          globalThis.year3000System?.YEAR3000_CONFIG?.safeSetArtisticMode?.(mode);
+        }
+      }
+    );
+    const harmonicModes = Object.keys(HARMONIC_MODES);
+    const currentHarmMode = settingsManager.get("sn-current-harmonic-mode");
+    if (harmonicModes.length) {
+      section.addDropDown(
+        "sn-current-harmonic-mode",
+        "Harmonic colour mode",
+        harmonicModes,
+        Math.max(0, harmonicModes.indexOf(currentHarmMode)),
+        void 0,
+        {
+          onChange: (e) => {
+            const idx = e?.currentTarget?.selectedIndex ?? 0;
+            const modeKey = harmonicModes[idx];
+            settingsManager.set("sn-current-harmonic-mode", modeKey);
+            globalThis.Y3K?.system?.evolveHarmonicSignature?.(modeKey);
+          }
+        }
       );
     }
-  }
-  function createSettingsPanel() {
-    const settingsContainer = document.querySelector(
-      ".main-viewContainer-scrollNode, .main-view-container__scroll-node-child"
+    const currentHarmInt = settingsManager.get("sn-harmonic-intensity") || "0.7";
+    section.addInput(
+      "sn-harmonic-intensity",
+      "Harmonic intensity (0-1)",
+      currentHarmInt,
+      "number",
+      {
+        onChange: (e) => {
+          const val = e.currentTarget.value;
+          settingsManager.set("sn-harmonic-intensity", val);
+        }
+      }
     );
-    if (!settingsContainer) {
-      console.warn("Settings container not found, retrying...");
-      setTimeout(createSettingsPanel, 1e3);
-      return;
-    }
-    const settingsSection = document.createElement("div");
-    settingsSection.className = "main-settingsPage-section";
-    settingsSection.innerHTML = `
-    <h2 class="TypeElement-cello-textBase-type">Catppuccin StarryNight</h2>
-    <div id="starrynight-settings-content"></div>
-  `;
-    const settingsPageRoot = settingsContainer.querySelector(
-      ".main-settingsPage-section, .main-settingsPage-sectionContainer"
-    )?.parentElement;
-    if (settingsPageRoot && !settingsPageRoot.querySelector("#starrynight-settings-content")) {
-      settingsPageRoot.appendChild(settingsSection);
-      renderSettingsContent();
-    }
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-          if (node.nodeType === Node.ELEMENT_NODE) {
-            const element = node;
-            if (element.querySelector?.(
-              ".main-settingsPage-section, .main-settingsPage-sectionContainer"
-            )) {
-              const settingsPage = element.querySelector(
-                ".main-settingsPage-section, .main-settingsPage-sectionContainer"
-              )?.parentElement;
-              if (settingsPage && !settingsPage.querySelector("#starrynight-settings-content")) {
-                settingsPage.appendChild(settingsSection);
-                renderSettingsContent();
-              }
-            }
+    const currentEvolution = settingsManager.get("sn-harmonic-evolution") === "true";
+    section.addToggle(
+      "sn-harmonic-evolution",
+      "Allow harmonic evolution",
+      currentEvolution,
+      {
+        onClick: (e) => {
+          const checked = e.currentTarget.checked;
+          settingsManager.set(
+            "sn-harmonic-evolution",
+            checked ? "true" : "false"
+          );
+        }
+      }
+    );
+    const currentManual = settingsManager.get("sn-harmonic-manual-base-color") || "#ffffff";
+    section.addInput(
+      "sn-harmonic-manual-base-color",
+      "Manual base colour",
+      currentManual,
+      "color",
+      {
+        onChange: (e) => {
+          const val = e.currentTarget.value;
+          settingsManager.set("sn-harmonic-manual-base-color", val);
+          globalThis.Y3K?.system?.updateHarmonicBaseColor?.(val);
+        }
+      }
+    );
+    const enableGpu = settingsManager.get("sn-enable-webgpu") === "true";
+    section.addToggle(
+      "sn-enable-webgpu",
+      "Enable WebGPU acceleration (experimental)",
+      enableGpu,
+      {
+        onClick: (e) => {
+          const checked = e.currentTarget.checked;
+          settingsManager.set(
+            "sn-enable-webgpu",
+            checked ? "true" : "false"
+          );
+          console.info("[StarryNight] WebGPU setting changed \u2013 reload required");
+        }
+      }
+    );
+    await section.pushSettings();
+    console.log("\u2728 [StarryNight] spcr-settings panel initialised");
+    const rerender = () => section.rerender();
+    const history = globalThis.Spicetify?.Platform?.History;
+    try {
+      if (history?.listen) {
+        history.listen(({ location }) => {
+          if (location?.pathname === "/settings") {
+            setTimeout(rerender, 100);
           }
         });
-      });
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-  }
-  function renderSettingsContent() {
-    const container = document.getElementById("starrynight-settings-content");
-    if (!container) return;
-    const year3000System2 = globalThis.year3000System;
-    const settingsManager = year3000System2?.settingsManager;
-    const currentAccent = settingsManager?.get("catppuccin-accentColor") || "blue";
-    const currentGradient = settingsManager?.get("sn-gradient-intensity") || "balanced";
-    const currentStars = settingsManager?.get("sn-star-density") || "balanced";
-    const currentGlass = settingsManager?.get("sn-glassmorphism-level") || "moderate";
-    const current3D = settingsManager?.get("sn-3d-effects-level") || "full";
-    const SettingsComponent = () => {
-      const [accentColor, setAccentColor] = React.useState(currentAccent);
-      const [gradientIntensity, setGradientIntensity] = React.useState(currentGradient);
-      const [starDensity, setStarDensity] = React.useState(currentStars);
-      const [glassLevel, setGlassLevel] = React.useState(
-        currentGlass === "moderate" ? "balanced" : currentGlass
-      );
-      const [threeDLevel, setThreeDLevel] = React.useState(current3D);
-      const handleAccentChange = (newAccent) => {
-        setAccentColor(newAccent);
-        applyAccentColor(newAccent);
-        if (settingsManager) {
-          settingsManager.set("catppuccin-accentColor", newAccent);
-        }
-      };
-      const handleGradientChange = (newIntensity) => {
-        setGradientIntensity(newIntensity);
-        applyGradientSettings(newIntensity, starDensity);
-        if (settingsManager) {
-          settingsManager.set("sn-gradient-intensity", newIntensity);
-        }
-      };
-      const handleStarChange = (newDensity) => {
-        setStarDensity(newDensity);
-        applyStarSettings(newDensity, gradientIntensity);
-        if (settingsManager) {
-          settingsManager.set("sn-star-density", newDensity);
-        }
-      };
-      const handleGlassChange = (newLevel) => {
-        setGlassLevel(newLevel);
-        applyGlassSettings(newLevel);
-        if (settingsManager) {
-          const mappedValue = newLevel === "balanced" ? "moderate" : newLevel;
-          settingsManager.set("sn-glassmorphism-level", mappedValue);
-        }
-      };
-      const handleThreeDChange = (newLevel) => {
-        setThreeDLevel(newLevel);
-        applyThreeDEffects(newLevel);
-        if (settingsManager) {
-          settingsManager.set("sn-3d-effects-level", newLevel);
-        }
-      };
-      return React.createElement("div", { className: "starrynight-settings" }, [
-        // Accent Color Dropdown
-        React.createElement("div", { key: "accent", className: "setting-row" }, [
-          React.createElement(
-            "label",
-            { key: "accent-label", className: "setting-label" },
-            "Accent Color"
-          ),
-          React.createElement(
-            "select",
-            {
-              key: "accent-select",
-              className: "main-dropDown-dropDown",
-              value: accentColor,
-              onChange: (e) => handleAccentChange(e.target.value)
-            },
-            accentColors.map(
-              (color) => React.createElement(
-                "option",
-                { key: color, value: color },
-                color.charAt(0).toUpperCase() + color.slice(1)
-              )
-            )
-          )
-        ]),
-        // Gradient Intensity Dropdown
-        React.createElement(
-          "div",
-          { key: "gradient", className: "setting-row" },
-          [
-            React.createElement(
-              "label",
-              { key: "gradient-label", className: "setting-label" },
-              "Dynamic Gradient"
-            ),
-            React.createElement(
-              "select",
-              {
-                key: "gradient-select",
-                className: "main-dropDown-dropDown",
-                value: gradientIntensity,
-                onChange: (e) => handleGradientChange(e.target.value)
-              },
-              intensityOptions.map(
-                (option) => React.createElement(
-                  "option",
-                  { key: option, value: option },
-                  option.charAt(0).toUpperCase() + option.slice(1)
-                )
-              )
-            )
-          ]
-        ),
-        // Star Animation Dropdown
-        React.createElement("div", { key: "stars", className: "setting-row" }, [
-          React.createElement(
-            "label",
-            { key: "stars-label", className: "setting-label" },
-            "Star Animation"
-          ),
-          React.createElement(
-            "select",
-            {
-              key: "stars-select",
-              className: "main-dropDown-dropDown",
-              value: starDensity,
-              onChange: (e) => handleStarChange(e.target.value)
-            },
-            intensityOptions.map(
-              (option) => React.createElement(
-                "option",
-                { key: option, value: option },
-                option.charAt(0).toUpperCase() + option.slice(1)
-              )
-            )
-          )
-        ]),
-        // Glass Effects Dropdown
-        React.createElement("div", { key: "glass", className: "setting-row" }, [
-          React.createElement(
-            "label",
-            { key: "glass-label", className: "setting-label" },
-            "Glass Effects"
-          ),
-          React.createElement(
-            "select",
-            {
-              key: "glass-select",
-              className: "main-dropDown-dropDown",
-              value: glassLevel,
-              onChange: (e) => handleGlassChange(e.target.value)
-            },
-            intensityOptions.map(
-              (option) => React.createElement(
-                "option",
-                { key: option, value: option },
-                option.charAt(0).toUpperCase() + option.slice(1)
-              )
-            )
-          )
-        ]),
-        // 3-D Effects Dropdown
-        React.createElement("div", { key: "threeD", className: "setting-row" }, [
-          React.createElement(
-            "label",
-            { key: "threeD-label", className: "setting-label" },
-            "3D Effects"
-          ),
-          React.createElement(
-            "select",
-            {
-              key: "threeD-select",
-              className: "main-dropDown-dropDown",
-              value: threeDLevel,
-              onChange: (e) => handleThreeDChange(e.target.value)
-            },
-            threeDOptions.map(
-              (option) => React.createElement(
-                "option",
-                { key: option, value: option },
-                option.charAt(0).toUpperCase() + option.slice(1)
-              )
-            )
-          )
-        ])
-      ]);
-    };
-    if (!document.getElementById("starrynight-settings-style")) {
-      const styleEl = document.createElement("style");
-      styleEl.id = "starrynight-settings-style";
-      styleEl.textContent = `
-      /* StarryNight settings styling */
-      .starrynight-settings .setting-row { display:flex; align-items:center; justify-content: space-between; margin:8px 0; }
-      .starrynight-settings .setting-label { font-weight:600; opacity:0.9; }
-      .starrynight-settings .main-dropDown-dropDown { min-width:180px; }
-    `;
-      document.head.appendChild(styleEl);
-    }
-    ReactDOM.render(React.createElement(SettingsComponent), container);
-  }
-  function migrateExistingSettings() {
-    try {
-      const year3000System2 = globalThis.year3000System;
-      const settingsManager = year3000System2?.settingsManager;
-      if (settingsManager) {
-        console.log("\u2728 [StarryNight] Settings migrated from Year3000System");
       }
-    } catch (error) {
-      console.warn("\u26A0\uFE0F [StarryNight] Settings migration failed:", error);
+    } catch (err) {
+      console.warn("[StarryNight] Could not hook navigation for settings", err);
+    }
+    if (window.location.pathname === "/settings") {
+      setTimeout(rerender, 300);
     }
   }
-  function applyAccentColor(accent) {
-    try {
-      const colorScheme = globalThis.Spicetify?.Config?.color_scheme || "mocha";
-      const actualAccent = accent === "none" ? "text" : accent;
-      document.documentElement.style.setProperty(
-        "--spice-text",
-        `var(--spice-${accent})`
-      );
-      document.documentElement.style.setProperty(
-        "--spice-button-active",
-        `var(--spice-${accent})`
-      );
-      document.documentElement.style.setProperty(
-        "--spice-equalizer",
-        `url('${colorScheme}/equalizer-animated-${actualAccent}.gif')`
-      );
-      console.log(`\u2728 [StarryNight] Accent color applied: ${accent}`);
-    } catch (error) {
-      console.error("\u274C [StarryNight] Error applying accent color:", error);
-    }
-  }
-  function applyGradientSettings(intensity, starDensity = "balanced") {
-    try {
-      applyStarryNightSettings(intensity, starDensity);
-      console.log(`\u2728 [StarryNight] Gradient settings applied: ${intensity}`);
-    } catch (error) {
-      console.error("\u274C [StarryNight] Error applying gradient settings:", error);
-    }
-  }
-  function applyStarSettings(starDensity, gradientIntensity = "balanced") {
-    try {
-      applyStarryNightSettings(gradientIntensity, starDensity);
-      console.log(`\u2728 [StarryNight] Star settings applied: ${starDensity}`);
-    } catch (error) {
-      console.error("\u274C [StarryNight] Error applying star settings:", error);
-    }
-  }
-  function applyGlassSettings(glassLevel) {
-    try {
-      const year3000System2 = globalThis.year3000System;
-      if (year3000System2?.glassmorphismManager) {
-        const mappedLevel = glassLevel === "balanced" ? "moderate" : glassLevel;
-        year3000System2.glassmorphismManager.applyGlassmorphismSettings(
-          mappedLevel
-        );
-      }
-      console.log(`\u2728 [StarryNight] Glass effects applied: ${glassLevel}`);
-    } catch (error) {
-      console.error("\u274C [StarryNight] Error applying glass settings:", error);
-    }
-  }
-  function applyThreeDEffects(level) {
-    try {
-      const year3000System2 = globalThis.year3000System;
-      if (year3000System2?.card3DManager) {
-        year3000System2.card3DManager.apply3DMode(level);
-      }
-      console.log(`\u2728 [StarryNight] 3D effects applied: ${level}`);
-    } catch (error) {
-      console.error("\u274C [StarryNight] Error applying 3D effects:", error);
-    }
-  }
-  var React, ReactDOM, accentColors, intensityOptions, threeDOptions;
-  var init_SettingsSpicetifyNative = __esm({
-    "src-js/components/SettingsSpicetifyNative.tsx"() {
+  var init_StarryNightSettings = __esm({
+    "src-js/components/StarryNightSettings.ts"() {
       "use strict";
+      init_globalConfig();
       init_starryNightEffects();
-      React = Spicetify.React;
-      ReactDOM = Spicetify.ReactDOM;
-      accentColors = [
-        "rosewater",
-        "flamingo",
-        "pink",
-        "mauve",
-        "red",
-        "maroon",
-        "peach",
-        "yellow",
-        "green",
-        "teal",
-        "sky",
-        "sapphire",
-        "blue",
-        "lavender",
-        "text"
-      ];
-      intensityOptions = ["disabled", "minimal", "balanced", "intense"];
-      threeDOptions = ["disabled", "minimal", "full"];
+      init_SettingsManager();
+      init_SettingsSection();
     }
   });
 
@@ -1448,6 +2226,16 @@
 
   // src-js/core/year3000System.ts
   init_globalConfig();
+
+  // src-js/config/settingKeys.ts
+  var GLASS_LEVEL_KEY = "sn-glassmorphism-level";
+  var GLASS_LEVEL_OLD_KEY = "sn-glassmorphismIntensity";
+  var CARD_3D_LEVEL_KEY = "sn-3d-effects-level";
+  var ARTISTIC_MODE_KEY = "sn-artistic-mode";
+  var HARMONIC_MODE_KEY = "sn-current-harmonic-mode";
+  var HARMONIC_INTENSITY_KEY = "sn-harmonic-intensity";
+  var HARMONIC_EVOLUTION_KEY = "sn-harmonic-evolution";
+  var MANUAL_BASE_COLOR_KEY = "sn-harmonic-manual-base-color";
 
   // src-js/core/CSSVariableBatcher.ts
   var CSSVariableBatcher = class {
@@ -3442,6 +4230,7 @@
       this.utils = utils;
       this.isModernTheme = true;
       this.cards = document.querySelectorAll(this.config.selector);
+      this.boundHandleSettingsChange = this.handleSettingsChange.bind(this);
     }
     static getInstance(performanceMonitor, settingsManager, utils) {
       if (!_Card3DManager.instance) {
@@ -3463,7 +4252,12 @@
           return;
         }
       }
+      this.cards = document.querySelectorAll(this.config.selector);
       await this.applyEventListeners();
+      document.addEventListener(
+        "year3000SystemSettingsChanged",
+        this.boundHandleSettingsChange
+      );
       this.initialized = true;
     }
     async healthCheck() {
@@ -3547,419 +4341,22 @@
         card.style.transition = "";
       });
       this.initialized = false;
+      document.removeEventListener(
+        "year3000SystemSettingsChanged",
+        this.boundHandleSettingsChange
+      );
+    }
+    handleSettingsChange(event) {
+      const { key, value } = event.detail || {};
+      if (key === CARD_3D_LEVEL_KEY) {
+        this.apply3DMode(value);
+      }
     }
   };
 
   // src-js/managers/GlassmorphismManager.ts
   init_globalConfig();
-
-  // src-js/utils/Year3000Utilities.ts
-  var Year3000Utilities_exports = {};
-  __export(Year3000Utilities_exports, {
-    adjustColor: () => adjustColor,
-    bpmToAnimationFrameRate: () => bpmToAnimationFrameRate,
-    bpmToInterval: () => bpmToInterval,
-    calculateBreathingScale: () => calculateBreathingScale,
-    calculateContrastRatio: () => calculateContrastRatio,
-    calculateNavigationScale: () => calculateNavigationScale,
-    calculateOklabDerivedProperties: () => calculateOklabDerivedProperties,
-    calculateRhythmPhase: () => calculateRhythmPhase,
-    colorDifference: () => colorDifference,
-    easeBeatAnimation: () => easeBeatAnimation,
-    findRequiredLuminance: () => findRequiredLuminance,
-    generateHarmonicOklabColors: () => generateHarmonicOklabColors,
-    getBeatPhase: () => getBeatPhase,
-    getHealthMonitor: () => getHealthMonitor,
-    getNextBeatTime: () => getNextBeatTime,
-    getRootStyle: () => getRootStyle,
-    hexToRgb: () => hexToRgb,
-    hslToRgb: () => hslToRgb,
-    intervalToBpm: () => intervalToBpm,
-    isOnBeat: () => isOnBeat,
-    lerp: () => lerp,
-    lerpSmooth: () => lerpSmooth,
-    oklabToRgb: () => oklabToRgb,
-    processOklabColor: () => processOklabColor,
-    rgbToHex: () => rgbToHex,
-    rgbToHsl: () => rgbToHsl,
-    rgbToOklab: () => rgbToOklab,
-    sleep: () => sleep,
-    throttle: () => throttle
-  });
-  init_globalConfig();
-  function getRootStyle() {
-    return document.documentElement;
-  }
-  function throttle(func, limit) {
-    let inThrottle;
-    return function throttled(...args) {
-      if (!inThrottle) {
-        func(...args);
-        inThrottle = true;
-        setTimeout(() => inThrottle = false, limit);
-      }
-    };
-  }
-  function hexToRgb(hex) {
-    if (typeof hex !== "string") {
-      console.warn(
-        "[StarryNight hexToRgb] Input is not a string. Using fallback color (black). Hex:",
-        hex
-      );
-      return { r: 0, g: 0, b: 0 };
-    }
-    const sanitizedHex = hex.trim();
-    let processedHex = sanitizedHex.startsWith("#") ? sanitizedHex : `#${sanitizedHex}`;
-    processedHex = processedHex.replace(/##+/g, "#");
-    if (processedHex.length === 4) {
-      processedHex = `#${processedHex[1]}${processedHex[1]}${processedHex[2]}${processedHex[2]}${processedHex[3]}${processedHex[3]}`;
-    }
-    const result = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(processedHex);
-    if (result) {
-      try {
-        const rgb = {
-          r: parseInt(result[1] || "0", 16),
-          g: parseInt(result[2] || "0", 16),
-          b: parseInt(result[3] || "0", 16)
-        };
-        return rgb;
-      } catch (e) {
-        console.error(
-          "[StarryNight hexToRgb] ERROR during parseInt:",
-          e,
-          "for hex:",
-          processedHex,
-          ". Using fallback color (black)."
-        );
-        return { r: 0, g: 0, b: 0 };
-      }
-    } else {
-      console.warn(
-        "[StarryNight hexToRgb] REGEX failed for hex:",
-        processedHex,
-        ". Using fallback color (black)."
-      );
-      return { r: 0, g: 0, b: 0 };
-    }
-  }
-  function rgbToHsl(r, g, b) {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
-    let h = 0, s = 0, l = (max + min) / 2;
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
-          break;
-        case g:
-          h = (b - r) / d + 2;
-          break;
-        case b:
-          h = (r - g) / d + 4;
-          break;
-      }
-      h /= 6;
-    }
-    return { h: h * 360, s: s * 100, l: l * 100 };
-  }
-  function hslToRgb(h, s, l) {
-    h /= 360;
-    s /= 100;
-    l /= 100;
-    const hue2rgb = (p, q, t) => {
-      if (t < 0) t += 1;
-      if (t > 1) t -= 1;
-      if (t < 1 / 6) return p + (q - p) * 6 * t;
-      if (t < 1 / 2) return q;
-      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-      return p;
-    };
-    let r_val, g_val, b_val;
-    if (s === 0) {
-      r_val = g_val = b_val = l;
-    } else {
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      r_val = hue2rgb(p, q, h + 1 / 3);
-      g_val = hue2rgb(p, q, h);
-      b_val = hue2rgb(p, q, h - 1 / 3);
-    }
-    return {
-      r: Math.round(r_val * 255),
-      g: Math.round(g_val * 255),
-      b: Math.round(b_val * 255)
-    };
-  }
-  function rgbToHex(r, g, b) {
-    return "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
-  }
-  function calculateContrastRatio(color1, color2) {
-    const getLuminance = (rgb) => {
-      const [r_val = 0, g_val = 0, b_val = 0] = [rgb.r, rgb.g, rgb.b].map((c) => {
-        c = c / 255;
-        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-      });
-      return 0.2126 * r_val + 0.7152 * g_val + 0.0722 * b_val;
-    };
-    const rgb1 = hexToRgb(color1);
-    const rgb2 = hexToRgb(color2);
-    if (!rgb1 || !rgb2) return 1;
-    const lum1 = getLuminance(rgb1);
-    const lum2 = getLuminance(rgb2);
-    const brightest = Math.max(lum1, lum2);
-    const darkest = Math.min(lum1, lum2);
-    return (brightest + 0.05) / (darkest + 0.05);
-  }
-  function lerpSmooth(current, target, deltaTime, halfLife) {
-    const EPSILON = 1e-5;
-    if (halfLife <= EPSILON || deltaTime <= 0) {
-      if (YEAR3000_CONFIG?.enableDebug) {
-        if (halfLife <= EPSILON) {
-        }
-      }
-      return target;
-    }
-    const result = target + (current - target) * Math.pow(2, -deltaTime / halfLife);
-    return result;
-  }
-  function bpmToInterval(bpm) {
-    if (!bpm || bpm <= 0) return 500;
-    return 6e4 / bpm;
-  }
-  function intervalToBpm(intervalMs) {
-    if (!intervalMs || intervalMs <= 0) return 120;
-    return 6e4 / intervalMs;
-  }
-  function bpmToAnimationFrameRate(bpm, framesPerBeat = 4) {
-    const beatInterval = bpmToInterval(bpm);
-    return beatInterval / framesPerBeat;
-  }
-  function isOnBeat(currentTime, trackStartTime, bpm, tolerance = 50) {
-    const beatInterval = bpmToInterval(bpm);
-    const timeSinceStart = currentTime - trackStartTime;
-    const beatPosition = timeSinceStart % beatInterval;
-    return beatPosition <= tolerance || beatPosition >= beatInterval - tolerance;
-  }
-  function getBeatPhase(currentTime, trackStartTime, bpm) {
-    const beatInterval = bpmToInterval(bpm);
-    const timeSinceStart = currentTime - trackStartTime;
-    const beatPosition = timeSinceStart % beatInterval;
-    return beatPosition / beatInterval;
-  }
-  function getNextBeatTime(currentTime, trackStartTime, bpm) {
-    const beatInterval = bpmToInterval(bpm);
-    const timeSinceStart = currentTime - trackStartTime;
-    const beatsElapsed = Math.floor(timeSinceStart / beatInterval);
-    return trackStartTime + (beatsElapsed + 1) * beatInterval;
-  }
-  function easeBeatAnimation(beatPhase, easingType = "ease-out") {
-    switch (easingType) {
-      case "ease-in":
-        return beatPhase * beatPhase;
-      case "linear":
-        return beatPhase;
-      case "ease-out":
-      default:
-        return beatPhase * (2 - beatPhase);
-    }
-  }
-  function calculateRhythmPhase(currentTime, animationSpeedFactor = 1) {
-    const speed = 1e-3 * animationSpeedFactor;
-    return currentTime * speed % (2 * Math.PI);
-  }
-  function calculateBreathingScale(rhythmPhase, processedEnergy = 0.5) {
-    const baseScale = 1;
-    const pulseAmount = 0.02 * processedEnergy;
-    const breath = Math.sin(rhythmPhase) * pulseAmount;
-    return baseScale + breath;
-  }
-  function calculateNavigationScale(visualIntensity = 0.5, moodIdentifier = "neutral") {
-    const baseScale = 1;
-    const moodFactor = moodIdentifier === "energetic" ? 1.2 : moodIdentifier === "calm" ? 0.8 : 1;
-    return baseScale + 0.05 * visualIntensity * moodFactor;
-  }
-  function rgbToOklab(r_srgb, g_srgb, b_srgb) {
-    const r = r_srgb / 255;
-    const g = g_srgb / 255;
-    const b = b_srgb / 255;
-    const l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
-    const m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
-    const s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
-    const l_ = Math.cbrt(l);
-    const m_ = Math.cbrt(m);
-    const s_ = Math.cbrt(s);
-    return {
-      L: 0.2104542553 * l_ + 0.793617785 * m_ - 0.0040720468 * s_,
-      a: 1.9779984951 * l_ - 2.428592205 * m_ + 0.4505937099 * s_,
-      b: 0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_
-    };
-  }
-  function oklabToRgb(L, a, b_oklab) {
-    const l_ = L + 0.3963377774 * a + 0.2158037573 * b_oklab;
-    const m_ = L - 0.1055613458 * a - 0.0638541728 * b_oklab;
-    const s_ = L - 0.0894841775 * a - 1.291485548 * b_oklab;
-    const l = l_ * l_ * l_;
-    const m = m_ * m_ * m_;
-    const s = s_ * s_ * s_;
-    let r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
-    let g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
-    let b = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
-    r = Math.round(Math.max(0, Math.min(1, r)) * 255);
-    g = Math.round(Math.max(0, Math.min(1, g)) * 255);
-    b = Math.round(Math.max(0, Math.min(1, b)) * 255);
-    return { r, g, b };
-  }
-  function processOklabColor(oklabColor, context = {}) {
-    const { L, a, b } = oklabColor;
-    const C = Math.sqrt(a * a + b * b);
-    let h_rad = Math.atan2(b, a);
-    if (h_rad < 0) {
-      h_rad += 2 * Math.PI;
-    }
-    const h = h_rad * (180 / Math.PI);
-    const {
-      energy = 0.5,
-      valence = 0.5,
-      artisticMode = "artist-vision"
-    } = context;
-    const multipliers = YEAR3000_CONFIG.getCurrentMultipliers();
-    let adjusted_L = L * (1 + (valence - 0.5) * 0.1);
-    let adjusted_C = C * (1 + (energy - 0.5) * 0.2) * (multipliers?.saturation || 1);
-    adjusted_L = Math.max(
-      0,
-      Math.min(1, adjusted_L * (multipliers?.brightness || 1))
-    );
-    return {
-      L: adjusted_L,
-      C: adjusted_C,
-      h: C > 1e-3 ? h : null
-      // Hue is meaningless if chroma is near zero
-    };
-  }
-  function calculateOklabDerivedProperties(oklabColor) {
-    const { L, C, h } = processOklabColor(oklabColor);
-    const isWarm = h !== null ? h >= 0 && h < 90 || h >= 270 && h <= 360 : false;
-    const isCool = h !== null ? h >= 90 && h < 270 : false;
-    let mood = "neutral";
-    if (L > 0.7 && C > 0.1) mood = "bright";
-    else if (L < 0.4) mood = "dark";
-    else if (isWarm && C > 0.1) mood = "warm";
-    else if (isCool && C > 0.1) mood = "cool";
-    return {
-      lightness: L,
-      chroma: C,
-      hue: h,
-      isWarm,
-      isCool,
-      mood
-    };
-  }
-  function generateHarmonicOklabColors(baseOklabColor, rule = "analogous", angle = 30) {
-    const baseLCH = processOklabColor(baseOklabColor);
-    if (baseLCH.h === null) {
-      return [baseOklabColor];
-    }
-    const getOklabFromLCH = (l_val, c_val, h_deg_val) => {
-      const h_rad = h_deg_val * (Math.PI / 180);
-      const a_val = c_val * Math.cos(h_rad);
-      const b_val = c_val * Math.sin(h_rad);
-      return { L: l_val, a: a_val, b: b_val };
-    };
-    const colors = [baseOklabColor];
-    const { L, C, h } = baseLCH;
-    switch (rule) {
-      case "complementary":
-        colors.push(getOklabFromLCH(L, C, (h + 180) % 360));
-        break;
-      case "analogous":
-        colors.push(getOklabFromLCH(L, C, (h + angle) % 360));
-        colors.push(getOklabFromLCH(L, C, (h - angle + 360) % 360));
-        break;
-      case "triadic":
-        colors.push(getOklabFromLCH(L, C, (h + 120) % 360));
-        colors.push(getOklabFromLCH(L, C, (h + 240) % 360));
-        break;
-      case "tetradic":
-        colors.push(getOklabFromLCH(L, C, (h + 90) % 360));
-        colors.push(getOklabFromLCH(L, C, (h + 180) % 360));
-        colors.push(getOklabFromLCH(L, C, (h + 270) % 360));
-        break;
-      case "split-complementary":
-        colors.push(getOklabFromLCH(L, C, (h + 180 - angle) % 360));
-        colors.push(getOklabFromLCH(L, C, (h + 180 + angle) % 360));
-        break;
-      case "monochromatic":
-        colors.push({
-          L: Math.max(0, L - 0.2),
-          a: baseOklabColor.a,
-          b: baseOklabColor.b
-        });
-        colors.push({
-          L: Math.min(1, L + 0.2),
-          a: baseOklabColor.a,
-          b: baseOklabColor.b
-        });
-        break;
-    }
-    return colors;
-  }
-  function lerp(start, end, amt) {
-    return (1 - amt) * start + amt * end;
-  }
-  function colorDifference(rgb1, rgb2) {
-    const lab1 = rgbToOklab(rgb1.r, rgb1.g, rgb1.b);
-    const lab2 = rgbToOklab(rgb2.r, rgb2.g, rgb2.b);
-    const deltaL = lab1.L - lab2.L;
-    const deltaA = lab1.a - lab2.a;
-    const deltaB = lab1.b - lab2.b;
-    return Math.sqrt(deltaL * deltaL + deltaA * deltaA + deltaB * deltaB);
-  }
-  var HealthMonitor = class {
-    registerSystem(name, instance) {
-    }
-    updateSystemMetrics(name, metrics) {
-    }
-  };
-  var healthMonitorInstance = new HealthMonitor();
-  function getHealthMonitor() {
-    return healthMonitorInstance;
-  }
-  function findRequiredLuminance(color1, color2, ratio) {
-    const getLuminance = (rgb) => {
-      const [r_val = 0, g_val = 0, b_val = 0] = [rgb.r, rgb.g, rgb.b].map((c) => {
-        c = c / 255;
-        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-      });
-      return 0.2126 * r_val + 0.7152 * g_val + 0.0722 * b_val;
-    };
-    const lum2 = getLuminance(color2);
-    let targetLuminance;
-    targetLuminance = ratio * (lum2 + 0.05) - 0.05;
-    const hsl = rgbToHsl(color1.r, color1.g, color1.b);
-    const currentLuminance = getLuminance(color1);
-    const luminanceRatio = targetLuminance / currentLuminance;
-    return hsl.l;
-  }
-  function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-  function adjustColor(rgb, {
-    brightness = 1,
-    saturation = 1,
-    hue = 0
-  }) {
-    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-    hsl.h = (hsl.h + hue) % 360;
-    hsl.s = Math.max(0, Math.min(100, hsl.s * saturation));
-    hsl.l = Math.max(0, Math.min(100, hsl.l * brightness));
-    return hslToRgb(hsl.h, hsl.s, hsl.l);
-  }
-
-  // src-js/managers/GlassmorphismManager.ts
+  init_Year3000Utilities();
   var GlassmorphismManager = class _GlassmorphismManager {
     constructor(config = YEAR3000_CONFIG, utils = Year3000Utilities_exports, cssBatcher = null, performanceAnalyzer = null, settingsManager) {
       this.initialized = false;
@@ -4007,8 +4404,9 @@
     }
     handleSettingsChange(event) {
       const customEvent = event;
-      if (customEvent.detail.key === "sn-glassmorphismIntensity") {
-        this.applyGlassmorphismSettings(customEvent.detail.value);
+      const { key, value } = customEvent.detail || {};
+      if (key === GLASS_LEVEL_KEY || key === GLASS_LEVEL_OLD_KEY) {
+        this.applyGlassmorphismSettings(value);
       }
     }
     detectBackdropFilterSupport() {
@@ -4066,7 +4464,7 @@
       root.style.setProperty("--glass-saturation", saturationValue);
     }
     updateGlassColors(primaryColor, secondaryColor) {
-      if (!this.isSupported || this.currentIntensity === "disabled") return;
+      if (this.currentIntensity === "disabled") return;
       const root = document.documentElement;
       const glassPrimary = this.convertToGlassColor(primaryColor, 0.1);
       const glassSecondary = this.convertToGlassColor(secondaryColor, 0.08);
@@ -4141,196 +4539,65 @@
         console.log(`\u{1F48E} [GlassmorphismManager] Applied level: ${level}`);
       }
     }
+    // --------------------------------------------------------------------
+    // Year3000System central settings broadcast hook
+    // --------------------------------------------------------------------
+    applyUpdatedSettings(key, value) {
+      if (key === "sn-glassmorphism-level") {
+        this.applyGlassmorphismSettings(value);
+      }
+    }
   };
 
-  // src-js/managers/SettingsManager.ts
-  init_globalConfig();
-  var SettingsManager = class {
-    constructor(config = YEAR3000_CONFIG, harmonicModes = HARMONIC_MODES, utils = Year3000Utilities_exports) {
-      this.initialized = false;
-      this.config = config;
-      this.harmonicModes = harmonicModes;
-      this.utils = utils;
-      this.defaults = {
-        "catppuccin-flavor": "mocha",
-        "catppuccin-accentColor": "mauve",
-        "sn-star-density": "balanced",
-        "sn-gradient-intensity": "balanced",
-        "sn-glassmorphism-level": "moderate",
-        "sn-3d-effects-level": "full",
-        "sn-artistic-mode": "artist-vision",
-        "sn-current-harmonic-mode": "analogous-flow",
-        "sn-harmonic-intensity": "0.7",
-        "sn-harmonic-evolution": "true",
-        "sn-harmonic-manual-base-color": "",
-        "sn-enable-webgpu": "true"
-      };
-      this.validationSchemas = {
-        "catppuccin-flavor": {
-          default: "mocha",
-          allowedValues: ["latte", "frappe", "macchiato", "mocha"]
-        },
-        "catppuccin-accentColor": {
-          default: "mauve",
-          allowedValues: [
-            "rosewater",
-            "flamingo",
-            "pink",
-            "mauve",
-            "red",
-            "maroon",
-            "peach",
-            "yellow",
-            "green",
-            "teal",
-            "sky",
-            "sapphire",
-            "blue",
-            "lavender",
-            "text",
-            "none"
-          ]
-        },
-        "sn-star-density": {
-          default: "balanced",
-          allowedValues: ["disabled", "minimal", "balanced", "intense"]
-        },
-        "sn-gradient-intensity": {
-          default: "balanced",
-          allowedValues: ["disabled", "minimal", "balanced", "intense"]
-        },
-        "sn-glassmorphism-level": {
-          default: "moderate",
-          allowedValues: ["disabled", "minimal", "moderate", "intense"]
-        },
-        "sn-3d-effects-level": {
-          default: "full",
-          allowedValues: ["full", "minimal", "disabled"]
-        },
-        "sn-artistic-mode": {
-          default: "artist-vision",
-          allowedValues: Object.keys(ARTISTIC_MODE_PROFILES)
-        },
-        "sn-current-harmonic-mode": {
-          default: "analogous-flow",
-          allowedValues: Object.keys(
-            this.harmonicModes
-          )
-        },
-        "sn-harmonic-intensity": { default: "0.7" },
-        "sn-harmonic-evolution": {
-          default: "true",
-          allowedValues: ["true", "false"]
-        },
-        "sn-harmonic-manual-base-color": { default: "" },
-        "sn-enable-webgpu": {
-          default: "true",
-          allowedValues: ["true", "false"]
-        }
-      };
-      this.validateAndRepair();
-      this.initialized = true;
+  // src-js/core/year3000System.ts
+  init_SettingsManager();
+
+  // src-js/core/EventBus.ts
+  var EventBus = class {
+    constructor() {
+      this.subscribers = {};
     }
-    async initialize() {
-      this.initialized = true;
-    }
-    async healthCheck() {
-      try {
-        Spicetify.LocalStorage.get("spicetify-exp-features");
-        return { ok: true, details: "LocalStorage is accessible." };
-      } catch (e) {
-        return {
-          ok: false,
-          details: "Failed to access Spicetify.LocalStorage.",
-          issues: [e.message]
-        };
+    subscribe(topic, callback) {
+      if (!this.subscribers[topic]) {
+        this.subscribers[topic] = /* @__PURE__ */ new Set();
       }
-    }
-    get(key) {
-      try {
-        const value = Spicetify.LocalStorage.get(key);
-        const schema = this.validationSchemas[key];
-        if (!schema) {
-          console.warn(`StarryNight: No validation schema for key: ${key}.`);
-          return value;
-        }
-        if (value === null || schema.allowedValues && !schema.allowedValues.includes(value)) {
-          return schema.default;
-        }
-        return value;
-      } catch (error) {
-        console.error(`StarryNight: Error reading key ${key}:`, error);
-        return this.validationSchemas[key]?.default;
-      }
-    }
-    getAllowedValues(key) {
-      return this.validationSchemas[key]?.allowedValues;
-    }
-    set(key, value) {
-      try {
-        const schema = this.validationSchemas[key];
-        if (!schema) {
-          Spicetify.LocalStorage.set(key, value);
-          return true;
-        }
-        if (key === "sn-harmonic-manual-base-color") {
-          if (value !== "" && !/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)) {
-            return false;
+      this.subscribers[topic].add(callback);
+      return () => {
+        if (this.subscribers[topic]) {
+          this.subscribers[topic].delete(callback);
+          if (this.subscribers[topic].size === 0) {
+            delete this.subscribers[topic];
           }
-        } else if (schema.allowedValues && !schema.allowedValues.includes(value)) {
-          return false;
         }
-        Spicetify.LocalStorage.set(key, value);
-        document.dispatchEvent(
-          new CustomEvent("year3000SystemSettingsChanged", {
-            detail: { key, value }
-          })
-        );
-        return true;
-      } catch (error) {
-        console.error(`StarryNight: Error setting key ${key}:`, error);
-        return false;
+      };
+    }
+    publish(topic, payload) {
+      if (this.subscribers[topic]) {
+        this.subscribers[topic].forEach((callback) => {
+          try {
+            callback(payload);
+          } catch (error) {
+            console.error(
+              `[EventBus] Error in subscriber for topic "${topic}":`,
+              error
+            );
+          }
+        });
       }
     }
-    getAllSettings() {
-      const settings = {};
-      for (const key in this.validationSchemas) {
-        settings[key] = this.get(key);
-      }
-      return settings;
-    }
-    validateAndRepair() {
-      let repairedCount = 0;
-      for (const key in this.validationSchemas) {
-        const aKey = key;
-        const currentValue = Spicetify.LocalStorage.get(aKey);
-        const validatedValue = this.get(aKey);
-        if (currentValue !== validatedValue) {
-          this.set(aKey, validatedValue);
-          repairedCount++;
+    unsubscribe(topic, callback) {
+      if (this.subscribers[topic]) {
+        this.subscribers[topic].delete(callback);
+        if (this.subscribers[topic].size === 0) {
+          delete this.subscribers[topic];
         }
       }
-      if (repairedCount > 0) {
-        console.log(`StarryNight: Repaired ${repairedCount} invalid settings.`);
-      }
-    }
-    resetAllToDefaults() {
-      for (const key of Object.keys(this.defaults)) {
-        this.set(
-          key,
-          this.defaults[key]
-        );
-      }
-      console.log("StarryNight: All settings reset to defaults.");
-    }
-    // To satisfy the SystemHealthMonitor, which expects all registered systems
-    // to have these lifecycle methods.
-    updateAnimation() {
     }
     destroy() {
-      console.log("StarryNight: SettingsManager destroyed (no-op).");
+      this.subscribers = {};
     }
   };
+  var GlobalEventBus = new EventBus();
 
   // src-js/services/MusicSyncService.ts
   init_globalConfig();
@@ -4390,6 +4657,7 @@
 
   // src-js/services/MusicSyncService.ts
   init_StorageManager();
+  init_Year3000Utilities();
 
   // src-js/services/GenreProfileManager.ts
   init_globalConfig();
@@ -4462,6 +4730,13 @@
       throw new Error(
         "[GenreProfileManager] Critical: Default genre profile is missing."
       );
+    }
+    /**
+     * Public helper that returns the genre string detected for the given audio-features without
+     * allocating a full profile. Useful for colour/palette routing.
+     */
+    detectGenre(features) {
+      return this._getGenreFromAudioFeatures(features);
     }
   };
 
@@ -4814,7 +5089,12 @@
             `[MusicSyncService] Audio features - Danceability: ${danceability}, Energy: ${energy}, Valence: ${valence}`
           );
         }
-        const profile = this.genreProfileManager.getProfileForTrack(audioFeatures);
+        const profile = this.genreProfileManager.getProfileForTrack(
+          audioFeatures || void 0
+        );
+        const detectedGenre = this.genreProfileManager.detectGenre(
+          audioFeatures || void 0
+        );
         const enhancedBPM = this.computeAdvancedBPM({
           trackBPM,
           danceability,
@@ -5022,6 +5302,9 @@
           moodIdentifier = "calm-melancholy";
         }
         const animationSpeedFactor = Math.max(0.5, 0.8 + visualIntensity * 0.4);
+        const genreTag = this.genreProfileManager.detectGenre(
+          audioFeatures || void 0
+        );
         const processedData = {
           trackUri,
           timestamp: Date.now(),
@@ -5044,7 +5327,8 @@
           bmpCalculationMethod: "unified-service",
           dataSource: "unified-music-sync-service",
           beatOccurred: false,
-          animationSpeedFactor
+          animationSpeedFactor,
+          genre: genreTag
         };
         this.setInCache(cacheKey, { processedData });
         this.latestProcessedData = processedData;
@@ -5057,7 +5341,33 @@
             visualIntensity: visualIntensity.toFixed(2)
           });
         }
-        this.notifySubscribers(processedData, audioAnalysisData, trackUri);
+        this.notifySubscribers(
+          processedData,
+          rawSpicetifyAudioFeatures,
+          trackUri
+        );
+        GlobalEventBus.publish("beat/frame", {
+          timestamp: performance.now(),
+          trackUri,
+          processedData,
+          rawData: rawSpicetifyAudioFeatures
+        });
+        GlobalEventBus.publish("beat/bpm", { bpm: processedData.enhancedBPM });
+        GlobalEventBus.publish("beat/intensity", {
+          intensity: processedData.visualIntensity
+        });
+        if (this.config.enableDebug) {
+          console.log(
+            "[MusicSyncService] Successfully processed audio features.",
+            {
+              baseTempo: tempo,
+              enhancedBPM,
+              mood: moodIdentifier,
+              energy: estimatedEnergy.toFixed(2),
+              visualIntensity: visualIntensity.toFixed(2)
+            }
+          );
+        }
       } catch (error) {
         console.error("[MusicSyncService] Processing failed:", error);
         this.metrics.errors++;
@@ -5074,11 +5384,14 @@
       this.invalidateTrackCaches(trackUri);
       try {
         const trackDuration = Spicetify.Player.data?.item?.duration?.milliseconds || 0;
-        const [audioFeatures, colors] = await Promise.all([
+        const [audioFeatures, rawColors] = await Promise.all([
           this.getAudioFeatures(),
           Spicetify.colorExtractor(trackUri)
         ]);
-        if (this.colorHarmonyEngine && this.year3000System && colors) {
+        const colors = this.utils.sanitizeColorMap(
+          rawColors || {}
+        );
+        if (this.colorHarmonyEngine && this.year3000System && Object.keys(colors).length > 0) {
           const blendedColors = this.colorHarmonyEngine.blendWithCatppuccin(colors);
           this.year3000System.applyColorsToTheme(blendedColors);
         }
@@ -5560,6 +5873,9 @@
     }
   };
 
+  // src-js/systems/ColorHarmonyEngine.ts
+  init_Year3000Utilities();
+
   // src-js/systems/BaseVisualSystem.ts
   init_globalConfig();
 
@@ -5722,6 +6038,9 @@
     return { webgpu, webgl2, recommendedType };
   }
 
+  // src-js/systems/BaseVisualSystem.ts
+  init_Year3000Utilities();
+
   // src-js/utils/visualPerformance.ts
   function selectPerformanceProfile(quality, performanceProfiles, opts = {}) {
     const { trace } = opts;
@@ -5790,38 +6109,22 @@
           "year3000SystemSettingsChanged",
           this.boundHandleSettingsChange
         );
-        const storedQuality = this.settingsManager.get(
-          "sn-performanceQuality"
-        );
-        let quality = void 0;
-        if (storedQuality && typeof storedQuality === "string") {
-          quality = storedQuality;
-        }
-        if (!quality || quality === "auto") {
-          try {
-            const detectorInstance = globalThis.year3000System?.deviceCapabilityDetector;
-            let recommended = "balanced";
-            if (detectorInstance?.isInitialized) {
-              recommended = detectorInstance.recommendPerformanceQuality();
-            }
-            quality = recommended;
-            this.settingsManager.set(
-              "sn-performanceQuality",
-              quality
-            );
-            this.performanceMonitor?.emitTrace?.(
-              `[${this.systemName}] Auto-selected performance quality '${quality}' based on device capability.`
-            );
-          } catch (e) {
-            this.performanceMonitor?.emitTrace?.(
-              `[${this.systemName}] Device capability detection failed; defaulting to 'balanced'.`,
-              e
-            );
-            quality = "balanced";
+        try {
+          const detectorInstance = globalThis.year3000System?.deviceCapabilityDetector;
+          let quality = "balanced";
+          if (detectorInstance?.isInitialized) {
+            quality = detectorInstance.recommendPerformanceQuality();
           }
-        }
-        if (quality) {
+          this.performanceMonitor?.emitTrace?.(
+            `[${this.systemName}] Auto-selected performance quality '${quality}' based on device capability.`
+          );
           this._applyPerformanceProfile(quality);
+        } catch (e) {
+          this.performanceMonitor?.emitTrace?.(
+            `[${this.systemName}] Device capability detection failed; defaulting to 'balanced'.`,
+            e
+          );
+          this._applyPerformanceProfile("balanced");
         }
       }
       await this._performSystemSpecificInitialization();
@@ -5931,11 +6234,14 @@
     }
     updateModeConfiguration(modeConfig) {
     }
+    /**
+     * Base implementation of the settings-change hook. It is intentionally empty
+     * now that the legacy `sn-performanceQuality` key has been removed. Subclasses
+     * should override this method if they need to respond to other settings keys
+     * and are still encouraged to call `super.handleSettingsChange(event)`.
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     handleSettingsChange(event) {
-      const customEvent = event;
-      if (customEvent.detail.key === "sn-performanceQuality") {
-        this._applyPerformanceProfile(customEvent.detail.value);
-      }
     }
     _applyPerformanceProfile(quality) {
       if (!this.config?.performanceProfiles) {
@@ -6124,6 +6430,46 @@
       this._resizeHandler();
       return canvas;
     }
+    /**
+     * Apply a fully-resolved PerformanceProfile coming from Year3000System.
+     * Sub-systems may override this to adjust internal parameters (particle
+     * counts, throttle values, etc.). The base implementation simply stores the
+     * profile so dependants can query `currentPerformanceProfile`.
+     */
+    applyPerformanceSettings(profile) {
+      this.currentPerformanceProfile = profile;
+      if (profile.quality && typeof this._applyPerformanceProfile === "function") {
+        this._applyPerformanceProfile?.(profile.quality);
+      }
+      if (this.config.enableDebug) {
+        this.performanceMonitor?.emitTrace?.(
+          `[BaseVisualSystem (${this.systemName})] Performance settings applied`,
+          profile
+        );
+      }
+    }
+    /**
+     * Centralised settings responder invoked by Year3000System.  The base
+     * implementation simply adapts the parameters into a synthetic CustomEvent
+     * so that legacy subclasses overriding `handleSettingsChange` continue to
+     * work without modification.  Newer systems can override this directly for
+     * efficiency.
+     */
+    applyUpdatedSettings(key, value) {
+      const evt = new CustomEvent("year3000SystemSettingsChanged", {
+        detail: { key, value }
+      });
+      try {
+        this.handleSettingsChange(evt);
+      } catch (err) {
+        if (this.config.enableDebug) {
+          console.warn(
+            `[BaseVisualSystem] ${this.systemName} applyUpdatedSettings error`,
+            err
+          );
+        }
+      }
+    }
   };
 
   // src-js/systems/ColorHarmonyEngine.ts
@@ -6136,12 +6482,28 @@
         musicAnalysisService || null,
         settingsManager || null
       );
+      this.emergentEngine = null;
+      // User-specified harmonic intensity (0-1). Multiplies defaultBlendRatio.
+      this.userIntensity = 0.7;
+      this.evolutionEnabled = true;
+      this._evolutionTimer = null;
+      // Timer ref for debounce
+      this._pendingPaletteRefresh = null;
+      // Track last applied genre to avoid redundant palette refreshes
+      this._lastGenre = null;
       this.systemName = "ColorHarmonyEngine";
       this.paletteExtensionManager = new PaletteExtensionManager(
         this.config,
         this.utils
       );
       this.currentTheme = this.detectCurrentTheme();
+      if (config && typeof config.harmonicIntensity === "number" && Number.isFinite(config.harmonicIntensity)) {
+        const clamped = Math.max(
+          0,
+          Math.min(1, config.harmonicIntensity)
+        );
+        this.userIntensity = clamped;
+      }
       this.harmonyMetrics = {
         totalHarmonyCalculations: 0,
         musicInfluencedAdjustments: 0,
@@ -6294,6 +6656,22 @@
           "\u{1F3A8} [ColorHarmonyEngine] Initialized with Year 3000 Quantum Empathy"
         );
       }
+      if (config && typeof config.harmonicEvolution === "boolean") {
+        this.evolutionEnabled = config.harmonicEvolution;
+      }
+      this._boundSettingsChangeHandler = this._handleSettingsChange.bind(this);
+      this._boundArtisticModeHandler = this._handleArtisticModeChanged.bind(this);
+      document.addEventListener(
+        "year3000SystemSettingsChanged",
+        this._boundSettingsChangeHandler
+      );
+      document.addEventListener(
+        "year3000ArtisticModeChanged",
+        this._boundArtisticModeHandler
+      );
+      if (this.evolutionEnabled) {
+        this._startEvolutionLoop();
+      }
     }
     // TODO: Legacy interface method - delegates to new onAnimate
     updateAnimation(deltaTime) {
@@ -6303,6 +6681,10 @@
     onAnimate(deltaMs) {
       this._updateCSSVariables(deltaMs);
       this._calculateBeatPulse(deltaMs);
+      GlobalEventBus.publish("colorharmony/frame", {
+        timestamp: performance.now(),
+        kineticState: this.kineticState
+      });
     }
     // TODO: Private method for updating CSS variables with kinetic state
     _updateCSSVariables(deltaMs) {
@@ -6537,8 +6919,8 @@
     calculateHarmonyScore(color, palette) {
       const colorHsl = this.utils.rgbToHsl(color.r, color.g, color.b);
       let maxHarmony = 0;
-      const accentColors2 = Object.values(palette.accents);
-      for (const accentColor of accentColors2) {
+      const accentColors = Object.values(palette.accents);
+      for (const accentColor of accentColors) {
         const accentRgb = this.utils.hexToRgb(accentColor);
         if (!accentRgb) continue;
         const accentHsl = this.utils.rgbToHsl(
@@ -6629,26 +7011,38 @@
       };
     }
     blendColors(rgb1, rgb2, ratio = this.vibrancyConfig.defaultBlendRatio) {
-      const hsl1 = this.utils.rgbToHsl(rgb1.r, rgb1.g, rgb1.b);
-      const hsl2 = this.utils.rgbToHsl(rgb2.r, rgb2.g, rgb2.b);
-      const artisticMode = this.config.artisticMode;
-      const blendedHsl = {
-        h: this.utils.lerp(hsl1.h, hsl2.h, 1 - ratio),
-        s: Math.max(
-          this.utils.lerp(hsl1.s, hsl2.s, 1 - ratio),
-          this.vibrancyConfig.minimumSaturation * 100
-        ),
-        l: this.utils.lerp(hsl1.l, hsl2.l, 1 - ratio)
+      const r = Math.max(0, Math.min(1, ratio));
+      const oklab1 = this.utils.rgbToOklab(rgb1.r, rgb1.g, rgb1.b);
+      const oklab2 = this.utils.rgbToOklab(rgb2.r, rgb2.g, rgb2.b);
+      const lerp2 = (a, b) => a * r + b * (1 - r);
+      const blendedOklab = {
+        L: lerp2(oklab1.L, oklab2.L),
+        a: lerp2(oklab1.a, oklab2.a),
+        b: lerp2(oklab1.b, oklab2.b)
       };
-      blendedHsl.s = Math.min(
-        100,
-        blendedHsl.s * this.vibrancyConfig.artisticSaturationBoost
+      const blendedRgb = this.utils.oklabToRgb(
+        blendedOklab.L,
+        blendedOklab.a,
+        blendedOklab.b
       );
+      const blendedHsl = this.utils.rgbToHsl(
+        blendedRgb.r,
+        blendedRgb.g,
+        blendedRgb.b
+      );
+      const artisticMode = this.config?.artisticMode ?? "artist-vision";
+      const emergentMultipliers = this.emergentEngine?.getCurrentMultipliers?.() || void 0;
+      const shouldUseEmergent = artisticMode === "cosmic-maximum" && !!emergentMultipliers;
+      const validMultipliers = emergentMultipliers || {};
+      const saturationBoostFactor = shouldUseEmergent ? (validMultipliers.visualIntensityBase || 1) * 1.25 : this.vibrancyConfig.artisticSaturationBoost;
+      const luminanceBoostFactor = shouldUseEmergent ? (validMultipliers.aestheticGravityStrength || 1) * 1.15 : this.vibrancyConfig.cosmicLuminanceBoost;
+      blendedHsl.s = Math.max(
+        blendedHsl.s,
+        this.vibrancyConfig.minimumSaturation * 100
+      );
+      blendedHsl.s = Math.min(100, blendedHsl.s * saturationBoostFactor);
       if (artisticMode !== "corporate-safe") {
-        blendedHsl.l = Math.min(
-          95,
-          blendedHsl.l * this.vibrancyConfig.cosmicLuminanceBoost
-        );
+        blendedHsl.l = Math.min(95, blendedHsl.l * luminanceBoostFactor);
       }
       const finalRgb = this.utils.hslToRgb(
         blendedHsl.h,
@@ -6695,7 +7089,7 @@
             musicContext.energy,
             musicContext.valence
           );
-          blendRatio *= musicIntensity;
+          blendRatio *= musicIntensity * this.userIntensity;
           blendRatio = Math.max(0, Math.min(1, blendRatio));
         }
         const finalRgb = this.blendColors(
@@ -6778,6 +7172,13 @@
     }
     updateFromMusicAnalysis(processedMusicData, rawFeatures, trackUri) {
       if (!processedMusicData) return;
+      const g = processedMusicData.genre;
+      if (g && g !== this._lastGenre) {
+        this._applyGenrePalette(g).then(() => {
+          this._lastGenre = g;
+          this._forcePaletteRepaint();
+        });
+      }
       this._updateMusicalMemory(processedMusicData, trackUri);
       this._updateKineticState(processedMusicData);
       this._applyAestheticGravity(processedMusicData);
@@ -6824,11 +7225,15 @@
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         return 0;
       }
-      let hueShift = Math.sin(beatPhase * 2 * Math.PI) * 5;
+      const artisticMode = this.config.artisticMode;
+      const baseAmplitude = artisticMode === "cosmic-maximum" ? 8 : 5;
+      let hueShift = Math.sin(beatPhase * 2 * Math.PI) * baseAmplitude;
       if (beatOccurred) {
-        hueShift += energy * 10;
+        const beatBoost = artisticMode === "cosmic-maximum" ? 12 : 10;
+        hueShift += energy * beatBoost;
       }
-      return Math.max(-15, Math.min(15, hueShift));
+      const clampRange = artisticMode === "cosmic-maximum" ? 25 : 15;
+      return Math.max(-clampRange, Math.min(clampRange, hueShift));
     }
     _updateMusicalMemory(musicData, trackUri) {
       this.musicalMemory.recentTracks.unshift({
@@ -6887,38 +7292,663 @@
       };
     }
     generateHarmonicVariations(baseRgb) {
-      const currentPalette = this.catppuccinPalettes[this.currentTheme];
-      if (!currentPalette) {
-        return {
-          darkVibrantHex: this.utils.rgbToHex(baseRgb.r, baseRgb.g, baseRgb.b),
-          lightVibrantHex: this.utils.rgbToHex(baseRgb.r, baseRgb.g, baseRgb.b)
-        };
-      }
-      const harmoniousAccent = this.findBestHarmoniousAccent(
-        baseRgb,
-        currentPalette
-      );
-      const baseHsl = this.utils.rgbToHsl(
-        harmoniousAccent.rgb.r,
-        harmoniousAccent.rgb.g,
-        harmoniousAccent.rgb.b
-      );
-      const darkHsl = { ...baseHsl };
-      darkHsl.s = Math.min(100, baseHsl.s * 1.1);
-      darkHsl.l = Math.max(10, baseHsl.l * 0.75);
-      const lightHsl = { ...baseHsl };
-      lightHsl.s = Math.min(100, baseHsl.s * 1.05);
-      lightHsl.l = Math.min(90, baseHsl.l * 1.25);
-      const darkRgb = this.utils.hslToRgb(darkHsl.h, darkHsl.s, darkHsl.l);
-      const lightRgb = this.utils.hslToRgb(lightHsl.h, lightHsl.s, lightHsl.l);
+      const oklab = this.utils.rgbToOklab(baseRgb.r, baseRgb.g, baseRgb.b);
+      const darkOklabL = Math.max(0, Math.min(1, oklab.L * 0.75));
+      const darkRgb = this.utils.oklabToRgb(darkOklabL, oklab.a, oklab.b);
+      const lightOklabL = Math.max(0, Math.min(1, oklab.L * 1.25));
+      const lightRgb = this.utils.oklabToRgb(lightOklabL, oklab.a, oklab.b);
       return {
         darkVibrantHex: this.utils.rgbToHex(darkRgb.r, darkRgb.g, darkRgb.b),
         lightVibrantHex: this.utils.rgbToHex(lightRgb.r, lightRgb.g, lightRgb.b)
       };
     }
+    // =========================
+    // PUBLIC API – User Control
+    // =========================
+    /**
+     * Update user-defined harmonic intensity (0–1). Values outside range are clamped.
+     */
+    setIntensity(value) {
+      const clamped = Math.max(0, Math.min(1, value));
+      this.userIntensity = clamped;
+      if (this.config?.enableDebug) {
+        console.log(
+          `[ColorHarmonyEngine] User harmonic intensity set to ${clamped}`
+        );
+      }
+    }
+    // ============================
+    // Settings / Event Integration
+    // ============================
+    _handleSettingsChange(event) {
+      const { key, value } = event.detail || {};
+      switch (key) {
+        case HARMONIC_INTENSITY_KEY: {
+          const num = parseFloat(value);
+          if (!Number.isNaN(num)) {
+            this.setIntensity(num);
+          }
+          break;
+        }
+        case HARMONIC_EVOLUTION_KEY: {
+          const enabled = value === "true" || value === true;
+          this._setEvolutionEnabled(enabled);
+          break;
+        }
+      }
+    }
+    _handleArtisticModeChanged() {
+      this.currentTheme = this.detectCurrentTheme();
+      if (!this._pendingPaletteRefresh) {
+        this._pendingPaletteRefresh = setTimeout(() => {
+          this._pendingPaletteRefresh = null;
+          this.refreshPalette();
+        }, 80);
+      }
+    }
+    _forcePaletteRepaint() {
+      this.kineticState.hueShift = (this.kineticState.hueShift || 0) + 0.01;
+    }
+    // Evolution helpers
+    _startEvolutionLoop() {
+      if (this._evolutionTimer) return;
+      const basePeriod = 3e4;
+      const period = basePeriod / Math.max(0.1, this.userIntensity);
+      this._evolutionTimer = setInterval(() => {
+        const step = 2 * this.userIntensity;
+        const current = this.kineticState.hueShift ?? 0;
+        this.kineticState.hueShift = (current + step + 360) % 360 - 180;
+      }, period);
+    }
+    _stopEvolutionLoop() {
+      if (this._evolutionTimer) {
+        clearInterval(this._evolutionTimer);
+        this._evolutionTimer = null;
+      }
+    }
+    _setEvolutionEnabled(enabled) {
+      if (this.evolutionEnabled === enabled) return;
+      this.evolutionEnabled = enabled;
+      if (enabled) this._startEvolutionLoop();
+      else this._stopEvolutionLoop();
+    }
+    // Clean up listeners when destroyed
+    destroy() {
+      this._stopEvolutionLoop();
+      document.removeEventListener(
+        "year3000SystemSettingsChanged",
+        this._boundSettingsChangeHandler
+      );
+      document.removeEventListener(
+        "year3000ArtisticModeChanged",
+        this._boundArtisticModeHandler
+      );
+      super.destroy?.();
+    }
+    /**
+     * Public helper that triggers a colour rebake based on the current track.
+     * Prefer calling the global Year3000System where available so the full
+     * pipeline (extraction → harmonisation → CSS variable batch) is reused.
+     */
+    async refreshPalette() {
+      try {
+        const y3kSystem = globalThis.year3000System;
+        if (y3kSystem?.updateColorsFromCurrentTrack) {
+          await y3kSystem.updateColorsFromCurrentTrack();
+          return;
+        }
+        const root = this.utils.getRootStyle();
+        if (!root) return;
+        const styles = getComputedStyle(root);
+        const primary = styles.getPropertyValue("--sn-gradient-primary").trim();
+        if (primary) {
+          root.style.setProperty("--sn-gradient-primary", primary);
+          const rgb = this.utils.hexToRgb(primary);
+          if (rgb) {
+            root.style.setProperty(
+              "--sn-gradient-primary-rgb",
+              `${rgb.r},${rgb.g},${rgb.b}`
+            );
+          }
+        }
+      } catch (err) {
+        if (this.config.enableDebug) {
+          console.warn("[ColorHarmonyEngine] refreshPalette failed", err);
+        }
+      }
+    }
+    /**
+     * Swap Catppuccin palette accents & neutrals based on detected genre.
+     * Executes asynchronously to avoid blocking audio thread.
+     */
+    async _applyGenrePalette(genre) {
+      try {
+        const palette = await this._getGenreAwarePalette(genre);
+        if (!palette) return;
+        this.catppuccinPalettes[this.currentTheme] = palette;
+        await this.refreshPalette();
+      } catch (err) {
+        if (this.config.enableDebug) {
+          console.warn("[ColorHarmonyEngine] _applyGenrePalette failed", err);
+        }
+      }
+    }
+    setEmergentEngine(engine) {
+      this.emergentEngine = engine;
+    }
+  };
+
+  // src-js/types/signature.ts
+  var createDefaultSignature = (userId) => ({
+    version: "1.0.0",
+    userId,
+    createdAt: Date.now(),
+    lastModified: Date.now(),
+    colorMemories: /* @__PURE__ */ new Map(),
+    rhythmicPreferences: /* @__PURE__ */ new Map(),
+    emotionalResonanceProfile: {},
+    evolutionaryTrajectory: {
+      adaptability: 0.5,
+      // Start balanced
+      explorationFactor: 0.5,
+      // Start balanced
+      lastUpdate: Date.now()
+    }
+  });
+
+  // node_modules/idb/build/index.js
+  var instanceOfAny = (object, constructors) => constructors.some((c) => object instanceof c);
+  var idbProxyableTypes;
+  var cursorAdvanceMethods;
+  function getIdbProxyableTypes() {
+    return idbProxyableTypes || (idbProxyableTypes = [
+      IDBDatabase,
+      IDBObjectStore,
+      IDBIndex,
+      IDBCursor,
+      IDBTransaction
+    ]);
+  }
+  function getCursorAdvanceMethods() {
+    return cursorAdvanceMethods || (cursorAdvanceMethods = [
+      IDBCursor.prototype.advance,
+      IDBCursor.prototype.continue,
+      IDBCursor.prototype.continuePrimaryKey
+    ]);
+  }
+  var transactionDoneMap = /* @__PURE__ */ new WeakMap();
+  var transformCache = /* @__PURE__ */ new WeakMap();
+  var reverseTransformCache = /* @__PURE__ */ new WeakMap();
+  function promisifyRequest(request) {
+    const promise = new Promise((resolve, reject) => {
+      const unlisten = () => {
+        request.removeEventListener("success", success);
+        request.removeEventListener("error", error);
+      };
+      const success = () => {
+        resolve(wrap(request.result));
+        unlisten();
+      };
+      const error = () => {
+        reject(request.error);
+        unlisten();
+      };
+      request.addEventListener("success", success);
+      request.addEventListener("error", error);
+    });
+    reverseTransformCache.set(promise, request);
+    return promise;
+  }
+  function cacheDonePromiseForTransaction(tx) {
+    if (transactionDoneMap.has(tx))
+      return;
+    const done = new Promise((resolve, reject) => {
+      const unlisten = () => {
+        tx.removeEventListener("complete", complete);
+        tx.removeEventListener("error", error);
+        tx.removeEventListener("abort", error);
+      };
+      const complete = () => {
+        resolve();
+        unlisten();
+      };
+      const error = () => {
+        reject(tx.error || new DOMException("AbortError", "AbortError"));
+        unlisten();
+      };
+      tx.addEventListener("complete", complete);
+      tx.addEventListener("error", error);
+      tx.addEventListener("abort", error);
+    });
+    transactionDoneMap.set(tx, done);
+  }
+  var idbProxyTraps = {
+    get(target, prop, receiver) {
+      if (target instanceof IDBTransaction) {
+        if (prop === "done")
+          return transactionDoneMap.get(target);
+        if (prop === "store") {
+          return receiver.objectStoreNames[1] ? void 0 : receiver.objectStore(receiver.objectStoreNames[0]);
+        }
+      }
+      return wrap(target[prop]);
+    },
+    set(target, prop, value) {
+      target[prop] = value;
+      return true;
+    },
+    has(target, prop) {
+      if (target instanceof IDBTransaction && (prop === "done" || prop === "store")) {
+        return true;
+      }
+      return prop in target;
+    }
+  };
+  function replaceTraps(callback) {
+    idbProxyTraps = callback(idbProxyTraps);
+  }
+  function wrapFunction(func) {
+    if (getCursorAdvanceMethods().includes(func)) {
+      return function(...args) {
+        func.apply(unwrap(this), args);
+        return wrap(this.request);
+      };
+    }
+    return function(...args) {
+      return wrap(func.apply(unwrap(this), args));
+    };
+  }
+  function transformCachableValue(value) {
+    if (typeof value === "function")
+      return wrapFunction(value);
+    if (value instanceof IDBTransaction)
+      cacheDonePromiseForTransaction(value);
+    if (instanceOfAny(value, getIdbProxyableTypes()))
+      return new Proxy(value, idbProxyTraps);
+    return value;
+  }
+  function wrap(value) {
+    if (value instanceof IDBRequest)
+      return promisifyRequest(value);
+    if (transformCache.has(value))
+      return transformCache.get(value);
+    const newValue = transformCachableValue(value);
+    if (newValue !== value) {
+      transformCache.set(value, newValue);
+      reverseTransformCache.set(newValue, value);
+    }
+    return newValue;
+  }
+  var unwrap = (value) => reverseTransformCache.get(value);
+  function openDB(name, version, { blocked, upgrade, blocking, terminated } = {}) {
+    const request = indexedDB.open(name, version);
+    const openPromise = wrap(request);
+    if (upgrade) {
+      request.addEventListener("upgradeneeded", (event) => {
+        upgrade(wrap(request.result), event.oldVersion, event.newVersion, wrap(request.transaction), event);
+      });
+    }
+    if (blocked) {
+      request.addEventListener("blocked", (event) => blocked(
+        // Casting due to https://github.com/microsoft/TypeScript-DOM-lib-generator/pull/1405
+        event.oldVersion,
+        event.newVersion,
+        event
+      ));
+    }
+    openPromise.then((db) => {
+      if (terminated)
+        db.addEventListener("close", () => terminated());
+      if (blocking) {
+        db.addEventListener("versionchange", (event) => blocking(event.oldVersion, event.newVersion, event));
+      }
+    }).catch(() => {
+    });
+    return openPromise;
+  }
+  var readMethods = ["get", "getKey", "getAll", "getAllKeys", "count"];
+  var writeMethods = ["put", "add", "delete", "clear"];
+  var cachedMethods = /* @__PURE__ */ new Map();
+  function getMethod(target, prop) {
+    if (!(target instanceof IDBDatabase && !(prop in target) && typeof prop === "string")) {
+      return;
+    }
+    if (cachedMethods.get(prop))
+      return cachedMethods.get(prop);
+    const targetFuncName = prop.replace(/FromIndex$/, "");
+    const useIndex = prop !== targetFuncName;
+    const isWrite = writeMethods.includes(targetFuncName);
+    if (
+      // Bail if the target doesn't exist on the target. Eg, getAll isn't in Edge.
+      !(targetFuncName in (useIndex ? IDBIndex : IDBObjectStore).prototype) || !(isWrite || readMethods.includes(targetFuncName))
+    ) {
+      return;
+    }
+    const method = async function(storeName, ...args) {
+      const tx = this.transaction(storeName, isWrite ? "readwrite" : "readonly");
+      let target2 = tx.store;
+      if (useIndex)
+        target2 = target2.index(args.shift());
+      return (await Promise.all([
+        target2[targetFuncName](...args),
+        isWrite && tx.done
+      ]))[0];
+    };
+    cachedMethods.set(prop, method);
+    return method;
+  }
+  replaceTraps((oldTraps) => ({
+    ...oldTraps,
+    get: (target, prop, receiver) => getMethod(target, prop) || oldTraps.get(target, prop, receiver),
+    has: (target, prop) => !!getMethod(target, prop) || oldTraps.has(target, prop)
+  }));
+  var advanceMethodProps = ["continue", "continuePrimaryKey", "advance"];
+  var methodMap = {};
+  var advanceResults = /* @__PURE__ */ new WeakMap();
+  var ittrProxiedCursorToOriginalProxy = /* @__PURE__ */ new WeakMap();
+  var cursorIteratorTraps = {
+    get(target, prop) {
+      if (!advanceMethodProps.includes(prop))
+        return target[prop];
+      let cachedFunc = methodMap[prop];
+      if (!cachedFunc) {
+        cachedFunc = methodMap[prop] = function(...args) {
+          advanceResults.set(this, ittrProxiedCursorToOriginalProxy.get(this)[prop](...args));
+        };
+      }
+      return cachedFunc;
+    }
+  };
+  async function* iterate(...args) {
+    let cursor = this;
+    if (!(cursor instanceof IDBCursor)) {
+      cursor = await cursor.openCursor(...args);
+    }
+    if (!cursor)
+      return;
+    cursor = cursor;
+    const proxiedCursor = new Proxy(cursor, cursorIteratorTraps);
+    ittrProxiedCursorToOriginalProxy.set(proxiedCursor, cursor);
+    reverseTransformCache.set(proxiedCursor, unwrap(cursor));
+    while (cursor) {
+      yield proxiedCursor;
+      cursor = await (advanceResults.get(proxiedCursor) || cursor.continue());
+      advanceResults.delete(proxiedCursor);
+    }
+  }
+  function isIteratorProp(target, prop) {
+    return prop === Symbol.asyncIterator && instanceOfAny(target, [IDBIndex, IDBObjectStore, IDBCursor]) || prop === "iterate" && instanceOfAny(target, [IDBIndex, IDBObjectStore]);
+  }
+  replaceTraps((oldTraps) => ({
+    ...oldTraps,
+    get(target, prop, receiver) {
+      if (isIteratorProp(target, prop))
+        return iterate;
+      return oldTraps.get(target, prop, receiver);
+    },
+    has(target, prop) {
+      return isIteratorProp(target, prop) || oldTraps.has(target, prop);
+    }
+  }));
+
+  // src-js/services/TemporalMemoryService.ts
+  var DB_NAME = "Year3000-TemporalMemory";
+  var DB_VERSION = 1;
+  var SIGNATURE_STORE = "aestheticSignatures";
+  var SIGNATURE_KEY = "currentUser";
+  var TemporalMemoryService = class {
+    constructor() {
+      this.dbPromise = openDB(DB_NAME, DB_VERSION, {
+        upgrade(db) {
+          if (!db.objectStoreNames.contains(SIGNATURE_STORE)) {
+            db.createObjectStore(SIGNATURE_STORE);
+          }
+        }
+      });
+    }
+    async getSignature(userId = "defaultUser") {
+      try {
+        const db = await this.dbPromise;
+        const signature = await db.get(SIGNATURE_STORE, SIGNATURE_KEY);
+        if (signature) {
+          return signature;
+        } else {
+          const defaultSignature = createDefaultSignature(userId);
+          await this.saveSignature(defaultSignature);
+          return defaultSignature;
+        }
+      } catch (error) {
+        console.error(
+          "[TemporalMemoryService] Failed to get signature from IndexedDB. Returning default.",
+          error
+        );
+        return createDefaultSignature(userId);
+      }
+    }
+    async saveSignature(signature) {
+      try {
+        const db = await this.dbPromise;
+        signature.lastModified = Date.now();
+        await db.put(SIGNATURE_STORE, signature, SIGNATURE_KEY);
+      } catch (error) {
+        console.error(
+          "[TemporalMemoryService] Failed to save signature to IndexedDB.",
+          error
+        );
+      }
+    }
+    async resetSignature(userId = "defaultUser") {
+      const defaultSignature = createDefaultSignature(userId);
+      await this.saveSignature(defaultSignature);
+      console.log("[TemporalMemoryService] Aesthetic signature has been reset.");
+      return defaultSignature;
+    }
+    async getSignatureTrends(signature) {
+      if (!signature) return null;
+      const trends = {
+        dominantColor: null,
+        dominantRhythm: null,
+        avgEnergy: 0,
+        avgValence: 0
+      };
+      let dominantColor = null;
+      signature.colorMemories.forEach((mem, hex) => {
+        if (!dominantColor || mem.count > dominantColor.count) {
+          dominantColor = { hex, count: mem.count };
+        }
+        trends.avgValence += mem.emotionalValence * mem.count;
+      });
+      let totalColorCount = 0;
+      signature.colorMemories.forEach((mem) => totalColorCount += mem.count);
+      if (totalColorCount > 0) {
+        trends.avgValence /= totalColorCount;
+      }
+      trends.dominantColor = dominantColor;
+      let dominantRhythm = null;
+      signature.rhythmicPreferences.forEach((pattern, id) => {
+        if (!dominantRhythm || pattern.count > dominantRhythm.count) {
+          dominantRhythm = { id, count: pattern.count };
+        }
+        trends.avgEnergy += pattern.associatedEnergy * pattern.count;
+      });
+      let totalRhythmCount = 0;
+      signature.rhythmicPreferences.forEach((p) => totalRhythmCount += p.count);
+      if (totalRhythmCount > 0) {
+        trends.avgEnergy /= totalRhythmCount;
+      }
+      trends.dominantRhythm = dominantRhythm;
+      return trends;
+    }
+  };
+  var temporalMemoryService = new TemporalMemoryService();
+
+  // src-js/systems/EmergentChoreographyEngine.ts
+  init_Year3000Utilities();
+  var EmergentChoreographyEngine = class extends BaseVisualSystem {
+    constructor(config, utils, performanceMonitor, settingsManager) {
+      super(
+        config,
+        utils || Year3000Utilities_exports,
+        performanceMonitor,
+        null,
+        settingsManager || null
+      );
+      this.eventSubscriptions = [];
+      this.signature = null;
+      this.saveInterval = null;
+      this.currentBpm = 120;
+      this.currentIntensity = 0.5;
+      this.systemName = "EmergentChoreographyEngine";
+      this.currentMultipliers = this.config.cosmicMultipliers;
+    }
+    async healthCheck() {
+      if (!GlobalEventBus) {
+        return { ok: false, details: "GlobalEventBus is not available." };
+      }
+      return {
+        ok: true,
+        details: "Emergent Choreography Engine is operational."
+      };
+    }
+    async initialize() {
+      await super.initialize();
+      if (this.config.enableDebug) {
+        console.log(`[${this.systemName}] Initializing...`);
+      }
+      this.signature = await temporalMemoryService.getSignature();
+      this.registerEventListeners();
+      this.saveInterval = setInterval(() => {
+        if (this.signature) {
+          temporalMemoryService.saveSignature(this.signature);
+        }
+      }, 3e4);
+      this.initialized = true;
+    }
+    registerEventListeners() {
+      const beatFrameSub = GlobalEventBus.subscribe(
+        "beat/frame",
+        (payload) => this.handleBeatFrame(payload)
+      );
+      const harmonyFrameSub = GlobalEventBus.subscribe(
+        "colorharmony/frame",
+        (payload) => this.handleHarmonyFrame(payload)
+      );
+      const bpmSub = GlobalEventBus.subscribe(
+        "beat/bpm",
+        (payload) => {
+          this.currentBpm = payload.bpm;
+        }
+      );
+      const intensitySub = GlobalEventBus.subscribe(
+        "beat/intensity",
+        (payload) => {
+          this.currentIntensity = payload.intensity;
+        }
+      );
+      this.eventSubscriptions.push(
+        beatFrameSub,
+        harmonyFrameSub,
+        bpmSub,
+        intensitySub
+      );
+    }
+    handleBeatFrame(payload) {
+      if (!this.signature) return;
+      this.signature.lastModified = Date.now();
+    }
+    handleHarmonyFrame(payload) {
+      if (!this.signature) return;
+      const { kineticState } = payload;
+      this.signature.lastModified = Date.now();
+    }
+    async _updateEvolutionaryTrajectory() {
+      if (!this.signature) return;
+      const trends = await temporalMemoryService.getSignatureTrends(
+        this.signature
+      );
+      if (!trends) return;
+      const { avgEnergy, avgValence } = trends;
+      const explorationFactor = 0.5 + (avgEnergy - 0.5) * 0.2;
+      this.signature.evolutionaryTrajectory.explorationFactor = Math.max(
+        0.1,
+        Math.min(0.9, explorationFactor)
+      );
+      const adaptability = 0.5 + (Math.abs(avgValence) - 0.2) * 0.3;
+      this.signature.evolutionaryTrajectory.adaptability = Math.max(
+        0.1,
+        Math.min(0.9, adaptability)
+      );
+      this.signature.evolutionaryTrajectory.lastUpdate = Date.now();
+    }
+    _calculateVisualPulse(deltaMs) {
+      if (!this.initialized) return null;
+      const beatInterval = 6e4 / this.currentBpm;
+      const phase = performance.now() % beatInterval / beatInterval;
+      const hueShift = Math.sin(phase * 2 * Math.PI + Math.PI / 2) * 15 * this.currentIntensity;
+      return {
+        timestamp: performance.now(),
+        bpm: this.currentBpm,
+        intensity: this.currentIntensity,
+        phase,
+        hueShift
+      };
+    }
+    _calculateAdaptiveCoefficients() {
+      if (!this.signature) return;
+      const { adaptability, explorationFactor } = this.signature.evolutionaryTrajectory;
+      const kineticIntensity = 0.5 + adaptability * 0.5;
+      const visualIntensityBase = 0.8 + explorationFactor * 0.4;
+      this.currentMultipliers = {
+        ...this.config.cosmicMultipliers,
+        kineticIntensity,
+        visualIntensityBase
+      };
+      GlobalEventBus.publish(
+        "emergent/multipliersUpdated",
+        this.currentMultipliers
+      );
+    }
+    getCurrentMultipliers() {
+      return this.currentMultipliers;
+    }
+    updateAnimation(deltaTime) {
+      this.onTick(deltaTime);
+    }
+    onTick(deltaMs) {
+      if (!this.initialized) return;
+      this._calculateAdaptiveCoefficients();
+      if (this.signature && Date.now() - this.signature.evolutionaryTrajectory.lastUpdate > 6e4) {
+        this._updateEvolutionaryTrajectory();
+      }
+      const visualPulse = this._calculateVisualPulse(deltaMs);
+      if (visualPulse) {
+        GlobalEventBus.publish("visual/pulse", visualPulse);
+      }
+      const emergentPayload = {
+        timestamp: performance.now(),
+        deltaMs
+        // ...other emergent data to be calculated in later phases
+      };
+      GlobalEventBus.publish("emergent/frame", emergentPayload);
+    }
+    destroy() {
+      if (this.config.enableDebug) {
+        console.log(`[${this.systemName}] Destroying...`);
+      }
+      if (this.signature) {
+        temporalMemoryService.saveSignature(this.signature);
+      }
+      if (this.saveInterval) {
+        clearInterval(this.saveInterval);
+      }
+      this.eventSubscriptions.forEach((unsubscribe) => unsubscribe());
+      this.eventSubscriptions = [];
+      super.destroy?.();
+    }
   };
 
   // src-js/systems/visual/BeatSyncVisualSystem.ts
+  init_Year3000Utilities();
   var BeatSyncVisualSystem = class extends BaseVisualSystem {
     constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System2 = null) {
       super(config, utils, performanceMonitor, musicSyncService, settingsManager);
@@ -8789,6 +9819,7 @@
   };
 
   // src-js/systems/visual/LightweightParticleSystem.ts
+  init_Year3000Utilities();
   var LightweightParticleSystem = class extends BaseVisualSystem {
     constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System2 = null) {
       super(config, utils, performanceMonitor, musicSyncService, settingsManager);
@@ -8893,10 +9924,150 @@
         this.ctx.restore();
       }
     }
+    // --------------------------------------------------------------------
+    // Central settings responder – adjust particle counts or reset pools
+    // --------------------------------------------------------------------
+    applyUpdatedSettings(key, value) {
+      if (key === "sn-star-density") {
+        const mapping = {
+          disabled: 0,
+          minimal: 40,
+          balanced: 75,
+          intense: 120
+        };
+        const desired = mapping[value] ?? this.maxParticles;
+        if (desired !== this.maxParticles) {
+          this.maxParticles = desired;
+          this.initializeParticlePool();
+        }
+      }
+    }
+  };
+
+  // src-js/systems/visual/ParticleFieldSystem.ts
+  var ParticleFieldSystem = class {
+    constructor(config, utils, performanceAnalyzer, musicSyncService, settingsManager, rootSystem) {
+      this.config = config;
+      this.utils = utils;
+      this.performanceAnalyzer = performanceAnalyzer;
+      this.musicSyncService = musicSyncService;
+      this.settingsManager = settingsManager;
+      this.rootSystem = rootSystem;
+      this.initialized = false;
+      this._canvas = null;
+      this._ctx = null;
+      this._particles = [];
+      this._animationFrame = null;
+      this._pulseStrength = 0;
+    }
+    // ───────────────────────────── IManagedSystem ──────────────────────────────
+    async initialize() {
+      if (this.config.artisticMode !== "cosmic-maximum") return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches && this.settingsManager.get("sn-3d-effects-level") === "disabled") {
+        return;
+      }
+      this._setupCanvas();
+      this._createParticles(300);
+      this._startLoop();
+      this.musicSyncService.subscribe(this, "ParticleFieldSystem");
+      this.initialized = true;
+    }
+    updateAnimation(_delta) {
+    }
+    async healthCheck() {
+      return { ok: this.initialized, details: "Particle field running" };
+    }
+    destroy() {
+      if (this._animationFrame) cancelAnimationFrame(this._animationFrame);
+      this.musicSyncService.unsubscribe("ParticleFieldSystem");
+      if (this._canvas && this._canvas.parentElement) {
+        this._canvas.parentElement.removeChild(this._canvas);
+      }
+      this._particles = [];
+      this.initialized = false;
+    }
+    // ───────────────────────── MusicSyncSubscriber API ─────────────────────────
+    updateFromMusicAnalysis(processedData) {
+      if (processedData?.beatOccurred) {
+        this._pulseStrength = Math.min(1, processedData.energy || 0.5) * 3;
+      }
+    }
+    // ───────────────────────────────── helpers ─────────────────────────────────
+    _setupCanvas() {
+      const canvas = document.createElement("canvas");
+      canvas.id = "sn-particle-field";
+      canvas.style.position = "fixed";
+      canvas.style.top = "0";
+      canvas.style.left = "0";
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      canvas.style.pointerEvents = "none";
+      canvas.style.zIndex = "-1";
+      document.body.appendChild(canvas);
+      this._canvas = canvas;
+      this._ctx = canvas.getContext("2d");
+      this._resize();
+      window.addEventListener("resize", this._resize.bind(this));
+    }
+    _resize() {
+      if (!this._canvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      this._canvas.width = window.innerWidth * dpr;
+      this._canvas.height = window.innerHeight * dpr;
+      this._ctx?.scale(dpr, dpr);
+    }
+    _createParticles(count) {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      for (let i = 0; i < count; i++) {
+        this._particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          baseSize: Math.random() * 1.5 + 0.5,
+          pulse: 0,
+          speedX: (Math.random() - 0.5) * 0.1,
+          speedY: (Math.random() - 0.5) * 0.1
+        });
+      }
+    }
+    _startLoop() {
+      const tick = () => {
+        this._step();
+        this._animationFrame = requestAnimationFrame(tick);
+      };
+      this._animationFrame = requestAnimationFrame(tick);
+    }
+    _step() {
+      const ctx = this._ctx;
+      if (!ctx || !this._canvas) return;
+      ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+      this._pulseStrength *= 0.93;
+      for (const p of this._particles) {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if (p.x < 0) p.x += window.innerWidth;
+        if (p.x > window.innerWidth) p.x -= window.innerWidth;
+        if (p.y < 0) p.y += window.innerHeight;
+        if (p.y > window.innerHeight) p.y -= window.innerHeight;
+        const size = p.baseSize + p.pulse;
+        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size);
+        gradient.addColorStop(0, "rgba(255,255,255,0.8)");
+        gradient.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+        ctx.fill();
+        p.pulse *= 0.9;
+        if (this._pulseStrength > 0.1) {
+          p.pulse += this._pulseStrength * 0.1 * Math.random();
+        }
+      }
+    }
   };
 
   // src-js/systems/visual/PredictiveMaterializationSystem.ts
   init_globalConfig();
+  init_SettingsManager();
   var PredictiveMaterializationSystem = class extends BaseVisualSystem {
     constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System2 = null) {
       super(
@@ -9303,7 +10474,210 @@
     }
   };
 
+  // src-js/systems/visual/WebGPUBackgroundSystem.ts
+  var WebGPUBackgroundSystem = class {
+    constructor(config, utils, performanceAnalyzer, musicSyncService, settingsManager, rootSystem) {
+      this.config = config;
+      this.utils = utils;
+      this.performanceAnalyzer = performanceAnalyzer;
+      this.musicSyncService = musicSyncService;
+      this.settingsManager = settingsManager;
+      this.rootSystem = rootSystem;
+      this.initialized = false;
+      this._canvas = null;
+      this._device = null;
+      this._ctx = null;
+      this._animationFrame = null;
+      this._uniformBuffer = null;
+      this._bindGroup = null;
+      this._frame = 0;
+      this._pipeline = null;
+      // Helper caches
+      this._primary = [0.5, 0.4, 0.9];
+      this._secondary = [0.35, 0.35, 0.75];
+      this._accent = [0.3, 0.55, 0.9];
+      this._energy = 0.5;
+      this._valence = 0.5;
+    }
+    // ---------------------------------------------------------------------------
+    // IManagedSystem lifecycle
+    // ---------------------------------------------------------------------------
+    async initialize() {
+      if (!this._shouldActivate()) {
+        return;
+      }
+      try {
+        await this._initWebGPU();
+        this._startRenderLoop();
+        this.initialized = true;
+      } catch (err) {
+        console.warn("[WebGPUBackgroundSystem] Initialization failed", err);
+        this.initialized = false;
+        this.destroy();
+      }
+    }
+    updateAnimation(_deltaMs) {
+    }
+    async healthCheck() {
+      return {
+        ok: this.initialized,
+        details: this.initialized ? "WebGPU canvas active" : "WebGPU background inactive or failed to initialise"
+      };
+    }
+    destroy() {
+      if (this._animationFrame !== null) {
+        cancelAnimationFrame(this._animationFrame);
+        this._animationFrame = null;
+      }
+      if (this._canvas && this._canvas.parentElement) {
+        this._canvas.parentElement.removeChild(this._canvas);
+      }
+      this._device = null;
+      this._ctx = null;
+      this._canvas = null;
+      this.initialized = false;
+      if (this.config.enableDebug) {
+        console.log("[WebGPUBackgroundSystem] Destroyed");
+      }
+    }
+    // ---------------------------------------------------------------------------
+    // Private helpers
+    // ---------------------------------------------------------------------------
+    _shouldActivate() {
+      const webgpuSetting = this.settingsManager.get("sn-enable-webgpu");
+      return webgpuSetting === "true" && typeof navigator !== "undefined" && navigator.gpu;
+    }
+    async _initWebGPU() {
+      const adapter = await navigator.gpu.requestAdapter();
+      if (!adapter) throw new Error("GPU adapter unavailable");
+      const device = await adapter.requestDevice();
+      this._device = device;
+      const canvas = document.createElement("canvas");
+      canvas.style.position = "fixed";
+      canvas.style.top = "0";
+      canvas.style.left = "0";
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      canvas.style.pointerEvents = "none";
+      canvas.style.zIndex = "-1";
+      canvas.id = "sn-webgpu-nebula";
+      document.body.appendChild(canvas);
+      this._canvas = canvas;
+      const ctx = canvas.getContext("webgpu");
+      if (!ctx) throw new Error("Failed to get WebGPU context");
+      this._ctx = ctx;
+      const format = navigator.gpu.getPreferredCanvasFormat();
+      ctx.configure({
+        device,
+        format,
+        alphaMode: "premultiplied"
+      });
+      const shaderModule = device.createShaderModule({
+        code: `@fragment fn fs_main(@builtin(position) pos: vec4<f32>) -> @location(0) vec4<f32> {
+        // Simple time-based RGB noise placeholder
+        let r = fract(sin(dot(pos.xy, vec2<f32>(12.9898,78.233))) * 43758.5453);
+        let g = fract(sin(dot(pos.xy, vec2<f32>(93.9898,67.345))) * 24634.6345);
+        let b = fract(sin(dot(pos.xy, vec2<f32>(45.1131,98.245))) * 31415.9265);
+        return vec4<f32>(r, g, b, 0.14);
+      }
+      @vertex fn vs_main(@builtin(vertex_index) idx : u32) -> @builtin(position) vec4<f32> {
+        var pos = array<vec2<f32>, 3>(vec2<f32>(-1.0, -1.0), vec2<f32>(3.0, -1.0), vec2<f32>(-1.0, 3.0));
+        return vec4<f32>(pos[idx], 0.0, 1.0);
+      }`
+      });
+      const pipeline = device.createRenderPipeline({
+        layout: "auto",
+        vertex: { module: shaderModule, entryPoint: "vs_main" },
+        fragment: {
+          module: shaderModule,
+          entryPoint: "fs_main",
+          targets: [{ format }]
+        },
+        primitive: { topology: "triangle-list" }
+      });
+      const uniformBuffer = device.createBuffer({
+        size: 64,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+      });
+      const bindGroupLayout = pipeline.getBindGroupLayout(0);
+      const bindGroup = device.createBindGroup({
+        layout: bindGroupLayout,
+        entries: [{ binding: 0, resource: { buffer: uniformBuffer } }]
+      });
+      this._pipeline = pipeline;
+      this._uniformBuffer = uniformBuffer;
+      this._bindGroup = bindGroup;
+    }
+    _startRenderLoop() {
+      const render = (time) => {
+        if (!this._device || !this._ctx || !this._pipeline) return;
+        if (this._frame % 30 === 0) {
+          this._refreshThemeColors();
+        }
+        this._frame++;
+        const uni = new Float32Array(16);
+        uni.set([this._primary[0], this._primary[1], this._primary[2], 1]);
+        uni.set(
+          [this._secondary[0], this._secondary[1], this._secondary[2], 1],
+          4
+        );
+        uni.set([this._accent[0], this._accent[1], this._accent[2], 1], 8);
+        uni.set([time * 1e-3, this._energy, this._valence, 0], 12);
+        this._device.queue.writeBuffer(
+          this._uniformBuffer,
+          0,
+          uni.buffer
+        );
+        const encoder = this._device.createCommandEncoder();
+        const textureView = this._ctx.getCurrentTexture().createView();
+        const pass = encoder.beginRenderPass({
+          colorAttachments: [
+            {
+              view: textureView,
+              clearValue: { r: 0, g: 0, b: 0, a: 0 },
+              loadOp: "clear",
+              storeOp: "store"
+            }
+          ]
+        });
+        pass.setPipeline(this._pipeline);
+        pass.setBindGroup(0, this._bindGroup);
+        pass.draw(3);
+        pass.end();
+        this._device.queue.submit([encoder.finish()]);
+        this._animationFrame = requestAnimationFrame(render);
+      };
+      this._animationFrame = requestAnimationFrame(render);
+    }
+    _refreshThemeColors() {
+      const root = document.documentElement;
+      const styles = getComputedStyle(root);
+      const parseRgb = (v) => {
+        const parts = v.trim().split(/\s*,\s*/).map(Number);
+        if (parts.length === 3 && parts.every((n) => !isNaN(n))) {
+          return [parts[0] / 255, parts[1] / 255, parts[2] / 255];
+        }
+        return null;
+      };
+      const p = parseRgb(styles.getPropertyValue("--sn-gradient-primary-rgb"));
+      const s = parseRgb(styles.getPropertyValue("--sn-gradient-secondary-rgb"));
+      const a = parseRgb(styles.getPropertyValue("--sn-gradient-accent-rgb"));
+      if (p) this._primary = p;
+      if (s) this._secondary = s;
+      if (a) this._accent = a;
+      const energyVar = parseFloat(
+        styles.getPropertyValue("--sn-harmony-energy") || "0.5"
+      );
+      const valenceVar = parseFloat(
+        styles.getPropertyValue("--sn-harmony-valence") || "0.5"
+      );
+      if (!isNaN(energyVar)) this._energy = energyVar;
+      if (!isNaN(valenceVar)) this._valence = valenceVar;
+    }
+  };
+
   // src-js/core/year3000System.ts
+  init_Year3000Utilities();
   var Year3000System = class {
     constructor(config = YEAR3000_CONFIG, harmonicModes = HARMONIC_MODES) {
       // API availability tracking
@@ -9313,6 +10687,14 @@
       this._lastInitializationTime = null;
       this._initializationRetryHistory = [];
       this._systemStartTime = null;
+      /**
+       * Indicates whether automatic harmonic evolution is permitted. This mirrors the
+       * `sn-harmonic-evolution` setting and `YEAR3000_CONFIG.harmonicEvolution`.
+       * Sub-systems can read this flag instead of accessing the config directly so
+       * that future scheduling logic (e.g. TimerConsolidationSystem) can rely on a
+       * guaranteed field.
+       */
+      this.allowHarmonicEvolution = true;
       this.YEAR3000_CONFIG = this._deepCloneConfig(config);
       if (typeof this.YEAR3000_CONFIG.init === "function") {
         this.YEAR3000_CONFIG.init();
@@ -9339,43 +10721,32 @@
       this.behavioralPredictionEngine = null;
       this.predictiveMaterializationSystem = null;
       this.sidebarConsciousnessSystem = null;
+      this.webGPUBackgroundSystem = null;
+      this.particleFieldSystem = null;
+      this.emergentChoreographyEngine = null;
       this.initializationResults = null;
       if (this.YEAR3000_CONFIG?.enableDebug) {
         console.log(
           "\u{1F31F} [Year3000System] Constructor: Instance created with Master Animation Coordinator"
         );
       }
+      this._boundExternalSettingsHandler = this._handleExternalSettingsChange.bind(this);
+      document.addEventListener(
+        "year3000SystemSettingsChanged",
+        this._boundExternalSettingsHandler
+      );
+      this._boundArtisticModeHandler = this._onArtisticModeChanged.bind(this);
+      document.addEventListener(
+        "year3000ArtisticModeChanged",
+        this._boundArtisticModeHandler
+      );
+      this.allowHarmonicEvolution = this.YEAR3000_CONFIG.harmonicEvolution ?? true;
+      setTimeout(() => {
+        this._applyPerformanceProfile();
+      }, 0);
     }
     _deepCloneConfig(config) {
-      if (!config || typeof config !== "object") return {};
-      try {
-        const cloned = JSON.parse(JSON.stringify(config));
-        const methodsToRestore = [
-          "init",
-          "getCurrentModeProfile",
-          "getCurrentMultipliers",
-          "getCurrentFeatures",
-          "getCurrentPerformanceSettings",
-          "setArtisticMode",
-          "loadArtisticPreference"
-        ];
-        methodsToRestore.forEach((methodName) => {
-          if (typeof config[methodName] === "function") {
-            cloned[methodName] = config[methodName].bind(
-              cloned
-            );
-          }
-        });
-        if (config.enableDebug) {
-          console.log(
-            "\u{1F527} [Year3000System] Configuration cloned with all methods restored"
-          );
-        }
-        return cloned;
-      } catch (error) {
-        console.error("[Year3000System] Failed to clone configuration:", error);
-        return { ...config };
-      }
+      return config;
     }
     updateConfiguration(key, value) {
       if (!this.YEAR3000_CONFIG) {
@@ -9604,6 +10975,27 @@
         console.log(
           `[Year3000System] Results: ${initializationResults.success.length} success, ${initializationResults.failed.length} failed.`
         );
+        if (initializationResults.failed.length > 0) {
+          console.warn(
+            `[Year3000System] Failed systems: ${initializationResults.failed.join(
+              ", "
+            )}`
+          );
+        }
+        if (initializationResults.skipped && initializationResults.skipped.length > 0) {
+          console.info(
+            `[Year3000System] Skipped systems: ${initializationResults.skipped.join(
+              ", "
+            )}`
+          );
+        }
+        if (initializationResults.success.length > 0) {
+          console.info(
+            `[Year3000System] Successful systems: ${initializationResults.success.join(
+              ", "
+            )}`
+          );
+        }
         if (this.systemHealthMonitor) {
           this.systemHealthMonitor.logHealthReport();
         }
@@ -9621,7 +11013,9 @@
           "BeatSyncVisualSystem",
           "BehavioralPredictionEngine",
           "PredictiveMaterializationSystem",
-          "SidebarConsciousnessSystem"
+          "SidebarConsciousnessSystem",
+          "WebGPUBackgroundSystem",
+          "EmergentChoreographyEngine"
         ];
         visualSystems.forEach((s) => results.skipped.push(s));
         return;
@@ -9648,6 +11042,11 @@
           property: "beatSyncVisualSystem"
         },
         {
+          name: "EmergentChoreographyEngine",
+          Class: EmergentChoreographyEngine,
+          property: "emergentChoreographyEngine"
+        },
+        {
           name: "BehavioralPredictionEngine",
           Class: BehavioralPredictionEngine,
           property: "behavioralPredictionEngine"
@@ -9661,6 +11060,16 @@
           name: "SidebarConsciousnessSystem",
           Class: SidebarConsciousnessSystem,
           property: "sidebarConsciousnessSystem"
+        },
+        {
+          name: "WebGPUBackgroundSystem",
+          Class: WebGPUBackgroundSystem,
+          property: "webGPUBackgroundSystem"
+        },
+        {
+          name: "ParticleFieldSystem",
+          Class: ParticleFieldSystem,
+          property: "particleFieldSystem"
         }
       ];
       for (const config of visualSystemConfigs) {
@@ -9682,16 +11091,28 @@
             }
             results.success.push(name);
           } else {
-            results.failed.push(name);
-            console.error(
-              `[Year3000System] Initialization method completed for ${name}, but the 'initialized' flag is false.`
-            );
+            results.skipped.push(name);
+            if (this.YEAR3000_CONFIG.enableDebug) {
+              console.info(
+                `[Year3000System] System ${name} opted out of activation (initialized=false). Marked as skipped.`
+              );
+            }
           }
         } catch (error) {
           results.failed.push(name);
           console.error(
             `[Year3000System] Failed to initialize visual system ${name}:`,
             error
+          );
+        }
+      }
+      if (this.colorHarmonyEngine && this.emergentChoreographyEngine) {
+        this.colorHarmonyEngine.setEmergentEngine(
+          this.emergentChoreographyEngine
+        );
+        if (this.YEAR3000_CONFIG.enableDebug) {
+          console.log(
+            "\u{1F517} [Year3000System] EmergentChoreographyEngine linked to ColorHarmonyEngine."
           );
         }
       }
@@ -9720,7 +11141,10 @@
         this.settingsManager,
         this.performanceAnalyzer,
         this.deviceCapabilityDetector,
-        this.cssVariableBatcher
+        this.cssVariableBatcher,
+        this.webGPUBackgroundSystem,
+        this.particleFieldSystem,
+        this.emergentChoreographyEngine
       ];
       for (const system of allSystems) {
         if (system && typeof system.destroy === "function") {
@@ -9741,6 +11165,14 @@
       if (this.YEAR3000_CONFIG.enableDebug) {
         console.log("\u{1F525} [Year3000System] All systems have been destroyed.");
       }
+      document.removeEventListener(
+        "year3000SystemSettingsChanged",
+        this._boundExternalSettingsHandler
+      );
+      document.removeEventListener(
+        "year3000ArtisticModeChanged",
+        this._boundArtisticModeHandler
+      );
     }
     async applyInitialSettings() {
       if (!this.settingsManager) {
@@ -9762,6 +11194,14 @@
         const accent = this.settingsManager.get("catppuccin-accentColor");
         const gradient = this.settingsManager.get("sn-gradient-intensity");
         const stars = this.settingsManager.get("sn-star-density");
+        const intensityRaw = this.settingsManager.get("sn-harmonic-intensity");
+        const evolutionRaw = this.settingsManager.get("sn-harmonic-evolution");
+        const harmonicModeKey = this.settingsManager.get(
+          "sn-current-harmonic-mode"
+        );
+        if (harmonicModeKey) {
+          this.YEAR3000_CONFIG.currentHarmonicMode = String(harmonicModeKey);
+        }
         console.log(
           `\u{1F3A8} [Year3000System] applyInitialSettings: Accent=${accent}, Gradient=${gradient}, Stars=${stars}`
         );
@@ -9770,6 +11210,16 @@
           gradient,
           stars
         );
+        const intensity = parseFloat(intensityRaw);
+        if (!Number.isNaN(intensity)) {
+          if (this.colorHarmonyEngine) {
+            this.colorHarmonyEngine.setIntensity?.(intensity);
+          }
+          this.YEAR3000_CONFIG.harmonicIntensity = intensity;
+        }
+        const evolutionEnabled = evolutionRaw === "true";
+        this.allowHarmonicEvolution = evolutionEnabled;
+        this.YEAR3000_CONFIG.harmonicEvolution = evolutionEnabled;
         console.log(
           "\u{1F3A8} [Year3000System] applyInitialSettings: Successfully applied initial settings."
         );
@@ -9842,6 +11292,7 @@
       if (primaryHex) queueUpdate("--sn-gradient-primary", primaryHex);
       if (secondaryHex) queueUpdate("--sn-gradient-secondary", secondaryHex);
       if (accentHex) queueUpdate("--sn-gradient-accent", accentHex);
+      if (accentHex) queueUpdate("--spice-accent", accentHex);
       const addRgb = (prop, hex) => {
         if (!hex) return;
         const rgb = this.utils.hexToRgb(hex);
@@ -9852,6 +11303,7 @@
       addRgb("--sn-gradient-primary-rgb", primaryHex);
       addRgb("--sn-gradient-secondary-rgb", secondaryHex);
       addRgb("--sn-gradient-accent-rgb", accentHex);
+      addRgb("--spice-rgb-accent", accentHex);
       if (this.cssVariableBatcher) {
         this.cssVariableBatcher.flushCSSVariableBatch();
       }
@@ -10023,6 +11475,11 @@
         {
           name: "BeatSyncVisualSystem",
           system: this.beatSyncVisualSystem,
+          priority: "critical"
+        },
+        {
+          name: "EmergentChoreographyEngine",
+          system: this.emergentChoreographyEngine,
           priority: "critical"
         },
         {
@@ -10335,6 +11792,27 @@
           console.log(
             `\u{1F31F} [Year3000System] Upgrade complete: ${upgradeResults.success.length} success, ${upgradeResults.failed.length} failed`
           );
+          if (upgradeResults.failed.length > 0) {
+            console.warn(
+              `\u{1F31F} [Year3000System] Upgrade failed systems: ${upgradeResults.failed.join(
+                ", "
+              )}`
+            );
+          }
+          if (upgradeResults.skipped && upgradeResults.skipped.length > 0) {
+            console.info(
+              `\u{1F31F} [Year3000System] Upgrade skipped systems: ${upgradeResults.skipped.join(
+                ", "
+              )}`
+            );
+          }
+          if (upgradeResults.success.length > 0) {
+            console.info(
+              `\u{1F31F} [Year3000System] Upgrade successful systems: ${upgradeResults.success.join(
+                ", "
+              )}`
+            );
+          }
         }
       } catch (error) {
         console.error(
@@ -10343,14 +11821,248 @@
         );
       }
     }
+    _handleExternalSettingsChange(event) {
+      const { key, value } = event.detail || {};
+      if (!key) return;
+      switch (key) {
+        case ARTISTIC_MODE_KEY: {
+          try {
+            if (typeof this.YEAR3000_CONFIG.safeSetArtisticMode === "function") {
+              this.YEAR3000_CONFIG.safeSetArtisticMode(value);
+            }
+          } catch (e) {
+            console.warn("[Year3000System] Failed to apply artistic mode", e);
+          }
+          break;
+        }
+        case HARMONIC_INTENSITY_KEY: {
+          const num = parseFloat(value);
+          if (!Number.isNaN(num)) {
+            this.YEAR3000_CONFIG.harmonicIntensity = num;
+            if (this.colorHarmonyEngine) {
+              this.colorHarmonyEngine.setIntensity?.(num);
+              this.updateColorsFromCurrentTrack?.();
+            }
+          }
+          break;
+        }
+        case HARMONIC_EVOLUTION_KEY: {
+          const enabled = value === "true" || value === true;
+          this.allowHarmonicEvolution = enabled;
+          this.YEAR3000_CONFIG.harmonicEvolution = enabled;
+          break;
+        }
+        case MANUAL_BASE_COLOR_KEY: {
+          if (typeof value === "string" && value.startsWith("#")) {
+            this.updateHarmonicBaseColor(value);
+          }
+          break;
+        }
+        case HARMONIC_MODE_KEY: {
+          if (value !== null && value !== void 0) {
+            this.YEAR3000_CONFIG.currentHarmonicMode = String(value);
+            this.updateColorsFromCurrentTrack?.();
+          }
+          break;
+        }
+        default:
+          break;
+      }
+      this._broadcastSettingChange(key, value);
+      this._refreshConditionalSystems();
+    }
+    /**
+     * Notify all subsystems that implement applyUpdatedSettings so they can
+     * adjust behaviour immediately after a SettingsManager change.
+     */
+    _broadcastSettingChange(key, value) {
+      const systems = [
+        this.lightweightParticleSystem,
+        this.dimensionalNexusSystem,
+        this.dataGlyphSystem,
+        this.beatSyncVisualSystem,
+        this.behavioralPredictionEngine,
+        this.predictiveMaterializationSystem,
+        this.sidebarConsciousnessSystem,
+        this.particleFieldSystem,
+        this.webGPUBackgroundSystem
+      ];
+      systems.forEach((sys) => {
+        if (sys && typeof sys.applyUpdatedSettings === "function") {
+          try {
+            sys.applyUpdatedSettings(key, value);
+          } catch (err) {
+            console.warn(
+              `[Year3000System] ${sys.systemName || sys.constructor.name} failed to handle settings change`,
+              err
+            );
+          }
+        }
+      });
+    }
+    /**
+     * Respond to Artistic Mode changes coming from the shared YEAR3000_CONFIG.
+     * We re-apply colors extracted from the current track so gradients and
+     * other CSS variables update without needing a song-change or full reload.
+     */
+    async _onArtisticModeChanged() {
+      if (this.YEAR3000_CONFIG.enableDebug) {
+        console.log(
+          "\u{1F3A8} [Year3000System] Artistic mode changed \u2013 refreshing colours"
+        );
+      }
+      try {
+        this._applyPerformanceProfile();
+        await this._refreshConditionalSystems();
+        await this.updateColorsFromCurrentTrack();
+      } catch (err) {
+        console.warn(
+          "[Year3000System] Failed to refresh colours after artistic mode change:",
+          err
+        );
+      }
+    }
+    /**
+     * Push the current Artistic Mode's performance profile down into every
+     * active visual system that exposes an `applyPerformanceSettings` method.
+     */
+    _applyPerformanceProfile() {
+      const perf = this.YEAR3000_CONFIG.getCurrentPerformanceSettings?.();
+      if (!perf) return;
+      const systems = [
+        this.lightweightParticleSystem,
+        this.dimensionalNexusSystem,
+        this.dataGlyphSystem,
+        this.beatSyncVisualSystem,
+        this.behavioralPredictionEngine,
+        this.predictiveMaterializationSystem,
+        this.sidebarConsciousnessSystem
+      ];
+      systems.forEach((s) => {
+        if (s && typeof s.applyPerformanceSettings === "function") {
+          try {
+            s.applyPerformanceSettings(perf);
+          } catch (e) {
+            console.warn("[Year3000System] Failed to apply perf settings", e);
+          }
+        }
+      });
+    }
+    // === NEW: helper to retrieve harmonic mode object ========================
+    /**
+     * Convenience wrapper that fetches the current harmonic mode from the
+     * SettingsManager and stores the key on the shared configuration so that
+     * all subsystems have easy access without reading localStorage directly.
+     */
+    _syncCurrentHarmonicMode() {
+      if (!this.settingsManager) return;
+      const key = this.settingsManager.get("sn-current-harmonic-mode");
+      if (key && typeof key === "string") {
+        this.YEAR3000_CONFIG.currentHarmonicMode = key;
+      }
+    }
+    async _refreshConditionalSystems() {
+      if (!this.performanceAnalyzer || !this.settingsManager) return;
+      const mode = this.YEAR3000_CONFIG.artisticMode;
+      const enableDebug = this.YEAR3000_CONFIG.enableDebug;
+      const wantsParticle = mode === "cosmic-maximum";
+      if (wantsParticle && !this.particleFieldSystem) {
+        try {
+          const sys = new ParticleFieldSystem(
+            this.YEAR3000_CONFIG,
+            this.utils,
+            this.performanceAnalyzer,
+            this.musicSyncService,
+            this.settingsManager,
+            this
+          );
+          await sys.initialize();
+          if (sys.initialized) {
+            this.particleFieldSystem = sys;
+            this.systemHealthMonitor?.registerSystem("ParticleFieldSystem", sys);
+            this.registerAnimationSystem(
+              "ParticleFieldSystem",
+              sys,
+              "background",
+              30
+            );
+            if (enableDebug) {
+              console.log(
+                "\u{1F30C} [Year3000System] ParticleFieldSystem started (cosmic-maximum mode)"
+              );
+            }
+          }
+        } catch (err) {
+          console.warn(
+            "[Year3000System] Failed to start ParticleFieldSystem",
+            err
+          );
+        }
+      } else if (!wantsParticle && this.particleFieldSystem) {
+        this.unregisterAnimationSystem("ParticleFieldSystem");
+        this.particleFieldSystem.destroy();
+        this.particleFieldSystem = null;
+        if (enableDebug) {
+          console.log(
+            "\u{1F30C} [Year3000System] ParticleFieldSystem stopped (mode change)"
+          );
+        }
+      }
+      const gpuSupported = typeof navigator !== "undefined" && navigator.gpu;
+      const webgpuEnabled = this.settingsManager.get("sn-enable-webgpu") === "true";
+      const wantsWebGPU = gpuSupported && webgpuEnabled && mode === "cosmic-maximum";
+      if (wantsWebGPU && !this.webGPUBackgroundSystem) {
+        try {
+          const sys = new WebGPUBackgroundSystem(
+            this.YEAR3000_CONFIG,
+            this.utils,
+            this.performanceAnalyzer,
+            this.musicSyncService,
+            this.settingsManager,
+            this
+          );
+          await sys.initialize();
+          if (sys.initialized) {
+            this.webGPUBackgroundSystem = sys;
+            this.systemHealthMonitor?.registerSystem(
+              "WebGPUBackgroundSystem",
+              sys
+            );
+            this.registerAnimationSystem(
+              "WebGPUBackgroundSystem",
+              sys,
+              "background",
+              30
+            );
+            if (enableDebug) {
+              console.log("\u{1F5A5}\uFE0F [Year3000System] WebGPUBackgroundSystem started");
+            }
+          }
+        } catch (err) {
+          console.warn(
+            "[Year3000System] Failed to start WebGPUBackgroundSystem",
+            err
+          );
+        }
+      } else if (!wantsWebGPU && this.webGPUBackgroundSystem) {
+        this.unregisterAnimationSystem("WebGPUBackgroundSystem");
+        this.webGPUBackgroundSystem.destroy();
+        this.webGPUBackgroundSystem = null;
+        if (enableDebug) {
+          console.log("\u{1F5A5}\uFE0F [Year3000System] WebGPUBackgroundSystem stopped");
+        }
+      }
+    }
   };
   var year3000System = new Year3000System();
   if (typeof window !== "undefined") {
+    window.HARMONIC_MODES = HARMONIC_MODES;
     window.year3000System = year3000System;
   }
 
   // src-js/debug/SystemIntegrationTester.ts
   init_globalConfig();
+  init_Year3000Utilities();
   var SystemIntegrationTester = class {
     constructor() {
       this.testResults = {};
@@ -10976,6 +12688,26 @@
     }
     return null;
   }
+  function patchReactRequire() {
+    const g = globalThis;
+    if (g.__STARLIGHT_REACT_SHIM__) return;
+    const shim = (name) => {
+      if (name === "react") return g.Spicetify?.React;
+      if (name === "react-dom") return g.Spicetify?.ReactDOM;
+      throw new Error(`[StarryNight shim] Module '${name}' not available`);
+    };
+    if (typeof g.require === "function") {
+      const original = g.require.bind(g);
+      g.require = (name) => {
+        if (name === "react" || name === "react-dom") return shim(name);
+        return original(name);
+      };
+    } else {
+      g.require = shim;
+    }
+    g.__STARLIGHT_REACT_SHIM__ = true;
+  }
+  patchReactRequire();
   (async function catppuccinStarryNight() {
     const startTime = Date.now();
     console.log("\u{1F31F} [Catppuccin StarryNight] Theme entry point starting...");
@@ -11041,10 +12773,8 @@
     }
     try {
       if (requiredAPIs.react && requiredAPIs.reactDOM) {
-        const settingsUiModule = await Promise.resolve().then(() => (init_SettingsSpicetifyNative(), SettingsSpicetifyNative_exports));
-        if (settingsUiModule.initializeSpicetifyNativeSettings) {
-          await settingsUiModule.initializeSpicetifyNativeSettings();
-        }
+        const settingsUiModule = await Promise.resolve().then(() => (init_StarryNightSettings(), StarryNightSettings_exports));
+        await settingsUiModule.initializeStarryNightSettings?.();
         console.log(
           "\u{1F31F} [StarryNight] Spicetify native settings with Year3000System integration initialized"
         );

@@ -118,33 +118,6 @@ export interface Year3000Config {
   harmonicBaseColor: string | null;
   harmonicIntensity: number;
   harmonicEvolution: boolean;
-  artisticMultipliers: Omit<
-    MultiplierProfile,
-    | "kineticIntensity"
-    | "temporalPlayFactor"
-    | "quantumEmpathyLevel"
-    | "aestheticGravityStrength"
-    | "emergentChoreography"
-    | "visualIntensityBase"
-  >;
-  corporateMultipliers: Omit<
-    MultiplierProfile,
-    | "kineticIntensity"
-    | "temporalPlayFactor"
-    | "quantumEmpathyLevel"
-    | "aestheticGravityStrength"
-    | "emergentChoreography"
-    | "visualIntensityBase"
-  >;
-  cosmicMultipliers: Omit<
-    MultiplierProfile,
-    | "kineticIntensity"
-    | "temporalPlayFactor"
-    | "quantumEmpathyLevel"
-    | "aestheticGravityStrength"
-    | "emergentChoreography"
-    | "visualIntensityBase"
-  >;
   musicVisualSync: any; // Can be typed more strictly if needed
   getCurrentModeProfile(): ArtisticModeProfile;
   getCurrentMultipliers(): MultiplierProfile;

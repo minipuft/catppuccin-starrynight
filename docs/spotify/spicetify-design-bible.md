@@ -1469,14 +1469,14 @@ class MyVisualSystem extends BaseVisualSystem {
   constructor(
     config,
     utils,
-    performanceMonitor,
+    performanceAnalyzer,
     musicAnalysisService,
     settingsManager
   ) {
     super(
       config,
       utils,
-      performanceMonitor,
+      performanceAnalyzer,
       musicAnalysisService,
       settingsManager
     );

@@ -55,13 +55,17 @@
   --sn-sidebar-item-bloom-intensity: 0;
   --sn-sidebar-current-temporal-shift: 0s;
 
+  // === YEAR 3000 DYNAMIC ACCENT ===
+  // Central variable that all systems can rely on. Fallbacks to existing gradient/spice accent values.
+  --sn-dynamic-accent-rgb: var(--sn-gradient-accent-rgb, var(--spice-rgb-accent));
+
   // === NAVIGATION ENTANGLEMENT ===
   --sn-nav-item-base-opacity: 0.85;
   --sn-nav-item-hover-bg-opacity: 0.1;
   --sn-nav-item-active-bg-opacity: 0.15;
-  --sn-nav-item-glow-color-rgb: var(--sn-gradient-primary-rgb, "202,158,230");
+  --sn-nav-item-glow-color-rgb: var(--sn-gradient-primary-rgb, var(--spice-rgb-accent));
   --sn-nav-item-glow-intensity: 0; // 0 to 1, controlled by JS
-  --sn-nav-text-energy-color-rgb: var(--sn-gradient-accent-rgb, "140,170,238");
+  --sn-nav-text-energy-color-rgb: var(--sn-dynamic-accent-rgb, 140,170,238);
   --sn-nav-text-energy-opacity: 0; // 0 to 0.5, controlled by JS
   --sn-nav-item-transform-scale: 1; // 1 to 1.03, controlled by JS
   --sn-nav-item-transition-duration: 0.3s;
@@ -337,7 +341,7 @@ nav[aria-label="Main"] ul li a {
     background: linear-gradient(
       170deg,
       rgba(
-          var(--sn-gradient-primary-rgb, 202, 158, 230),
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
           calc(
             var(--sn-sidebar-base-bg-opacity) * 0.7 *
               var(--sn-sidebar-harmonic-intensity-multiplier)
@@ -345,7 +349,7 @@ nav[aria-label="Main"] ul li a {
         )
         0%,
       rgba(
-          var(--sn-gradient-secondary-rgb, 186, 187, 241),
+          var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
           calc(
             var(--sn-sidebar-base-bg-opacity) * 0.5 *
               var(--sn-sidebar-harmonic-intensity-multiplier)
@@ -353,7 +357,7 @@ nav[aria-label="Main"] ul li a {
         )
         40%,
       rgba(
-          var(--sn-gradient-accent-rgb, 140, 170, 238),
+          var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
           calc(
             var(--sn-sidebar-base-bg-opacity) * 0.8 *
               var(--sn-sidebar-harmonic-intensity-multiplier)
@@ -361,11 +365,11 @@ nav[aria-label="Main"] ul li a {
         )
         100%
     );
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-primary-rgb, 202, 158, 230), calc(0.15 *
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(0.15 *
               var(--sn-sidebar-harmonic-intensity-multiplier))),
       inset 0 0 30px 5px
         rgba(
-          var(--sn-gradient-secondary-rgb, 186, 187, 241),
+          var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
           calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier))
         );
     --sn-sidebar-harmonic-intensity-multiplier: 1;
@@ -375,7 +379,7 @@ nav[aria-label="Main"] ul li a {
     background: linear-gradient(
       170deg,
       rgba(
-          var(--sn-gradient-primary-rgb, 203, 166, 247),
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
           calc(
             var(--sn-sidebar-base-bg-opacity) * 0.7 *
               var(--sn-sidebar-harmonic-intensity-multiplier)
@@ -383,7 +387,7 @@ nav[aria-label="Main"] ul li a {
         )
         0%,
       rgba(
-          var(--sn-gradient-accent-rgb, 148, 226, 213),
+          var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
           calc(
             var(--sn-sidebar-base-bg-opacity) * 0.5 *
               var(--sn-sidebar-harmonic-intensity-multiplier)
@@ -391,7 +395,7 @@ nav[aria-label="Main"] ul li a {
         )
         40%,
       rgba(
-          var(--sn-gradient-secondary-rgb, 245, 194, 231),
+          var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
           calc(
             var(--sn-sidebar-base-bg-opacity) * 0.8 *
               var(--sn-sidebar-harmonic-intensity-multiplier)
@@ -399,11 +403,11 @@ nav[aria-label="Main"] ul li a {
         )
         100%
     );
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-primary-rgb, 203, 166, 247), calc(0.15 *
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(0.15 *
               var(--sn-sidebar-harmonic-intensity-multiplier))),
       inset 0 0 30px 5px
         rgba(
-          var(--sn-gradient-accent-rgb, 148, 226, 213),
+          var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
           calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier))
         );
     --sn-sidebar-harmonic-intensity-multiplier: 1.1;
@@ -413,7 +417,7 @@ nav[aria-label="Main"] ul li a {
     background: linear-gradient(
       170deg,
       rgba(
-          var(--sn-gradient-primary-rgb, 239, 159, 118),
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
           calc(
             var(--sn-sidebar-base-bg-opacity) * 0.7 *
               var(--sn-sidebar-harmonic-intensity-multiplier)
@@ -421,7 +425,7 @@ nav[aria-label="Main"] ul li a {
         )
         0%,
       rgba(
-          var(--sn-gradient-accent-rgb, 137, 180, 250),
+          var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
           calc(
             var(--sn-sidebar-base-bg-opacity) * 0.5 *
               var(--sn-sidebar-harmonic-intensity-multiplier)
@@ -437,11 +441,11 @@ nav[aria-label="Main"] ul li a {
         )
         100%
     );
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-primary-rgb, 239, 159, 118), calc(0.15 *
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(0.15 *
               var(--sn-sidebar-harmonic-intensity-multiplier))),
       inset 0 0 30px 5px
         rgba(
-          var(--sn-gradient-accent-rgb, 137, 180, 250),
+          var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
           calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier))
         );
     --sn-sidebar-harmonic-intensity-multiplier: 1.2;
@@ -513,7 +517,7 @@ nav[aria-label="Main"] ul li a {
     background: linear-gradient(
       170deg,
       rgba(
-          var(--sn-gradient-primary-rgb, 202, 158, 230),
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
           calc(
             var(--sn-sidebar-base-bg-opacity) * 0.7 *
               var(--sn-sidebar-harmonic-intensity-multiplier)
@@ -521,7 +525,7 @@ nav[aria-label="Main"] ul li a {
         )
         0%,
       rgba(
-          var(--sn-gradient-primary-rgb, 202, 158, 230),
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
           calc(
             var(--sn-sidebar-base-bg-opacity) * 0.5 *
               var(--sn-sidebar-harmonic-intensity-multiplier)
@@ -529,7 +533,7 @@ nav[aria-label="Main"] ul li a {
         )
         40%,
       rgba(
-          var(--sn-gradient-primary-rgb, 202, 158, 230),
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
           calc(
             var(--sn-sidebar-base-bg-opacity) * 0.8 *
               var(--sn-sidebar-harmonic-intensity-multiplier)
@@ -611,7 +615,7 @@ nav[aria-label="Main"] ul li a {
       background: radial-gradient(
         ellipse at center,
         rgba(
-            var(--sn-gradient-accent-rgb, "140,170,238"),
+            var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
             calc(var(--sn-sidebar-item-bloom-intensity) * 0.7)
           )
           0%,
@@ -627,12 +631,12 @@ nav[aria-label="Main"] ul li a {
     &.main-navBar-navBarLinkActive,
     &[aria-current="page"] {
       background-color: rgba(
-        var(--sn-gradient-primary-rgb, "202,158,230"),
+        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
         0.15
       );
       color: var(--spice-text);
       transform: translateY(-1px) scale(1.02);
-      box-shadow: 0 3px 15px -5px rgba(var(--sn-gradient-primary-rgb, "202,158,230"), 0.3);
+      box-shadow: 0 3px 15px -5px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3);
 
       &::before {
         // Activate bloom
@@ -647,7 +651,7 @@ nav[aria-label="Main"] ul li a {
       span {
         text-shadow: 0 0 8px
           rgba(
-            var(--sn-gradient-accent-rgb, "140,170,238"),
+            var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
             calc(0.5 * var(--sn-sidebar-energy-glow-opacity))
           );
       }
@@ -664,11 +668,11 @@ nav[aria-label="Main"] ul li a {
 
     &:hover {
       background-color: rgba(
-        var(--sn-gradient-primary-rgb, "202,158,230"),
+        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
         0.1
       );
       transform: scale(1.01);
-      box-shadow: 0 2px 10px -4px rgba(var(--sn-gradient-primary-rgb, "202,158,230"), 0.25);
+      box-shadow: 0 2px 10px -4px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.25);
     } // Closes &:hover
 
     // Active library item
@@ -676,10 +680,10 @@ nav[aria-label="Main"] ul li a {
     .main-yourLibraryX-navLinkActive & {
       // If parent has active class
       background-color: rgba(
-        var(--sn-gradient-accent-rgb, "140,170,238"),
+        var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
         0.15
       );
-      box-shadow: inset 0 0 10px -5px rgba(var(--sn-gradient-accent-rgb, "140,170,238"), 0.3);
+      box-shadow: inset 0 0 10px -5px rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0.3);
     } // Closes &[aria-current="true"] / .main-yourLibraryX-navLinkActive &
   } // Closes .main-yourLibraryX-listItem .main-useDropTarget-base
 
@@ -804,33 +808,33 @@ nav[aria-label="Main"] ul li a {
 @keyframes sn-sidebar-pulse-slow {
   0%,
   100% {
-    box-shadow: inset 0 0 70px -25px rgba(var(--sn-gradient-primary-rgb), calc(0.1 *
+    box-shadow: inset 0 0 70px -25px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(0.1 *
             var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
   }
   50% {
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-secondary-rgb), calc(0.15 *
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), calc(0.15 *
             var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
   }
 }
 @keyframes sn-sidebar-pulse-mid {
   0%,
   100% {
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-primary-rgb), calc(0.2 *
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(0.2 *
             var(--sn-sidebar-harmonic-intensity-multiplier)));
   }
   50% {
-    box-shadow: inset 0 0 90px -15px rgba(var(--sn-gradient-secondary-rgb), calc(0.25 *
+    box-shadow: inset 0 0 90px -15px rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), calc(0.25 *
             var(--sn-sidebar-harmonic-intensity-multiplier)));
   }
 }
 @keyframes sn-sidebar-pulse-fast {
   0%,
   100% {
-    box-shadow: inset 0 0 90px -15px rgba(var(--sn-gradient-primary-rgb), calc(0.3 *
+    box-shadow: inset 0 0 90px -15px rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(0.3 *
             var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
   }
   50% {
-    box-shadow: inset 0 0 100px -10px rgba(var(--sn-gradient-secondary-rgb), calc(0.35 *
+    box-shadow: inset 0 0 100px -10px rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), calc(0.35 *
             var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
   }
 }

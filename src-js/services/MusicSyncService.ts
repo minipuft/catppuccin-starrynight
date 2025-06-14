@@ -1,3 +1,4 @@
+import { GlobalEventBus } from "@/core/EventBus";
 import type { Year3000Config } from "@/types/models";
 import { YEAR3000_CONFIG } from "../config/globalConfig";
 import { Year3000System } from "../core/year3000System";
@@ -589,8 +590,12 @@ export class MusicSyncService {
         );
       }
 
-      const profile =
-        this.genreProfileManager.getProfileForTrack(audioFeatures);
+      const profile = this.genreProfileManager.getProfileForTrack(
+        audioFeatures || undefined
+      );
+      const detectedGenre = this.genreProfileManager.detectGenre(
+        audioFeatures || undefined
+      );
 
       const enhancedBPM = this.computeAdvancedBPM({
         trackBPM,
@@ -883,6 +888,10 @@ export class MusicSyncService {
 
       const animationSpeedFactor = Math.max(0.5, 0.8 + visualIntensity * 0.4);
 
+      const genreTag = this.genreProfileManager.detectGenre(
+        audioFeatures || undefined
+      );
+
       const processedData = {
         trackUri,
         timestamp: Date.now(),
@@ -906,6 +915,7 @@ export class MusicSyncService {
         dataSource: "unified-music-sync-service",
         beatOccurred: false,
         animationSpeedFactor,
+        genre: genreTag,
       };
 
       this.setInCache(cacheKey, { processedData });
@@ -921,7 +931,38 @@ export class MusicSyncService {
         });
       }
 
-      this.notifySubscribers(processedData, audioAnalysisData, trackUri);
+      this.notifySubscribers(
+        processedData,
+        rawSpicetifyAudioFeatures,
+        trackUri
+      );
+
+      // Publish beat/frame event for EmergentChoreographyEngine
+      GlobalEventBus.publish("beat/frame", {
+        timestamp: performance.now(),
+        trackUri: trackUri,
+        processedData: processedData,
+        rawData: rawSpicetifyAudioFeatures,
+      });
+
+      // Publish more granular events for Phase 4
+      GlobalEventBus.publish("beat/bpm", { bpm: processedData.enhancedBPM });
+      GlobalEventBus.publish("beat/intensity", {
+        intensity: processedData.visualIntensity,
+      });
+
+      if (this.config.enableDebug) {
+        console.log(
+          "[MusicSyncService] Successfully processed audio features.",
+          {
+            baseTempo: tempo,
+            enhancedBPM,
+            mood: moodIdentifier,
+            energy: estimatedEnergy.toFixed(2),
+            visualIntensity: visualIntensity.toFixed(2),
+          }
+        );
+      }
     } catch (error) {
       console.error("[MusicSyncService] Processing failed:", error);
       this.metrics.errors++;
@@ -946,12 +987,21 @@ export class MusicSyncService {
         Spicetify.Player.data?.item?.duration?.milliseconds || 0;
 
       // Phase 1 – instant colour update + provisional BPM from audio-features
-      const [audioFeatures, colors] = await Promise.all([
+      const [audioFeatures, rawColors] = await Promise.all([
         this.getAudioFeatures(),
         Spicetify.colorExtractor(trackUri),
       ]);
 
-      if (this.colorHarmonyEngine && this.year3000System && colors) {
+      // Sanitize extracted colours to remove undefined / malformed values
+      const colors = this.utils.sanitizeColorMap(
+        (rawColors as Record<string, string>) || {}
+      );
+
+      if (
+        this.colorHarmonyEngine &&
+        this.year3000System &&
+        Object.keys(colors).length > 0
+      ) {
         const blendedColors =
           this.colorHarmonyEngine.blendWithCatppuccin(colors);
         this.year3000System.applyColorsToTheme(blendedColors);

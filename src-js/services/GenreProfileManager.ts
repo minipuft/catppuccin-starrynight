@@ -131,4 +131,12 @@ export class GenreProfileManager {
       "[GenreProfileManager] Critical: Default genre profile is missing."
     );
   }
+
+  /**
+   * Public helper that returns the genre string detected for the given audio-features without
+   * allocating a full profile. Useful for colour/palette routing.
+   */
+  public detectGenre(features?: AudioFeatures): string {
+    return this._getGenreFromAudioFeatures(features);
+  }
 }

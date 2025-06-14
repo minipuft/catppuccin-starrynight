@@ -1,5 +1,5 @@
+import { SettingsManager } from "@/managers/SettingsManager";
 import { YEAR3000_CONFIG } from "../config/globalConfig";
-import { StorageManager } from "../utils/StorageManager";
 
 type GradientIntensity = "disabled" | "minimal" | "balanced" | "intense";
 type StarDensity = "disabled" | "minimal" | "balanced" | "intense";
@@ -40,7 +40,8 @@ function createShootingStar(): void {
 
 function startShootingStars(): number {
   return window.setInterval(() => {
-    const starSetting = StorageManager.get("sn-star-density") ?? "balanced";
+    const starSetting =
+      getSettingsManager().get("sn-star-density") ?? "balanced";
     if (starSetting !== "disabled" && Math.random() < 0.3) {
       createShootingStar();
     }
@@ -90,6 +91,23 @@ function applyStarryNightSettings(
       injectStarContainer();
     }
   }
+}
+
+// Unified accessor – mirrors helper used by StarryNightSettings.ts
+function getSettingsManager(): SettingsManager {
+  const existing = (window as any).Y3K?.system?.settingsManager as
+    | SettingsManager
+    | undefined;
+  if (existing) return existing;
+
+  const cached = (globalThis as any).__SN_settingsManager as
+    | SettingsManager
+    | undefined;
+  if (cached) return cached;
+
+  const manager = new SettingsManager();
+  (globalThis as any).__SN_settingsManager = manager;
+  return manager;
 }
 
 export {

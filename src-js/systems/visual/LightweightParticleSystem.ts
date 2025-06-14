@@ -182,4 +182,26 @@ export class LightweightParticleSystem extends BaseVisualSystem {
       this.ctx.restore();
     }
   }
+
+  // --------------------------------------------------------------------
+  // Central settings responder – adjust particle counts or reset pools
+  // --------------------------------------------------------------------
+  public applyUpdatedSettings?(key: string, value: any): void {
+    // Star density drives particle count
+    if (key === "sn-star-density") {
+      const mapping: Record<string, number> = {
+        disabled: 0,
+        minimal: 40,
+        balanced: 75,
+        intense: 120,
+      } as const;
+
+      const desired =
+        mapping[value as keyof typeof mapping] ?? this.maxParticles;
+      if (desired !== this.maxParticles) {
+        this.maxParticles = desired;
+        this.initializeParticlePool();
+      }
+    }
+  }
 }

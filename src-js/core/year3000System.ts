@@ -1,6 +1,13 @@
 declare const Spicetify: any;
 
 import { HARMONIC_MODES, YEAR3000_CONFIG } from "@/config/globalConfig";
+import {
+  ARTISTIC_MODE_KEY,
+  HARMONIC_EVOLUTION_KEY,
+  HARMONIC_INTENSITY_KEY,
+  HARMONIC_MODE_KEY,
+  MANUAL_BASE_COLOR_KEY,
+} from "@/config/settingKeys";
 import { CSSVariableBatcher } from "@/core/CSSVariableBatcher";
 import { DeviceCapabilityDetector } from "@/core/DeviceCapabilityDetector";
 import { MasterAnimationCoordinator } from "@/core/MasterAnimationCoordinator";
@@ -14,13 +21,16 @@ import { SettingsManager } from "@/managers/SettingsManager";
 import type { ProcessedAudioData } from "@/services/MusicSyncService";
 import { MusicSyncService } from "@/services/MusicSyncService";
 import { ColorHarmonyEngine } from "@/systems/ColorHarmonyEngine";
+import { EmergentChoreographyEngine } from "@/systems/EmergentChoreographyEngine";
 import { BeatSyncVisualSystem } from "@/systems/visual/BeatSyncVisualSystem";
 import { BehavioralPredictionEngine } from "@/systems/visual/BehavioralPredictionEngine";
 import { DataGlyphSystem } from "@/systems/visual/DataGlyphSystem";
 import { DimensionalNexusSystem } from "@/systems/visual/DimensionalNexusSystem";
 import { LightweightParticleSystem } from "@/systems/visual/LightweightParticleSystem";
+import { ParticleFieldSystem } from "@/systems/visual/ParticleFieldSystem";
 import { PredictiveMaterializationSystem } from "@/systems/visual/PredictiveMaterializationSystem";
 import { SidebarConsciousnessSystem } from "@/systems/visual/SidebarConsciousnessSystem";
+import { WebGPUBackgroundSystem } from "@/systems/visual/WebGPUBackgroundSystem";
 import type { HarmonicModes, Year3000Config } from "@/types/models";
 import * as Utils from "@/utils/Year3000Utilities";
 
@@ -49,7 +59,10 @@ interface VisualSystemConfig {
     | "beatSyncVisualSystem"
     | "behavioralPredictionEngine"
     | "predictiveMaterializationSystem"
-    | "sidebarConsciousnessSystem";
+    | "sidebarConsciousnessSystem"
+    | "webGPUBackgroundSystem"
+    | "particleFieldSystem"
+    | "emergentChoreographyEngine";
 }
 
 export class Year3000System {
@@ -81,6 +94,9 @@ export class Year3000System {
   public behavioralPredictionEngine: BehavioralPredictionEngine | null;
   public predictiveMaterializationSystem: PredictiveMaterializationSystem | null;
   public sidebarConsciousnessSystem: SidebarConsciousnessSystem | null;
+  public webGPUBackgroundSystem: WebGPUBackgroundSystem | null;
+  public particleFieldSystem: ParticleFieldSystem | null;
+  public emergentChoreographyEngine: EmergentChoreographyEngine | null;
 
   // API availability tracking
   public availableAPIs: AvailableAPIs | null = null;
@@ -92,6 +108,20 @@ export class Year3000System {
   private _lastInitializationTime: number | null = null;
   private readonly _initializationRetryHistory: any[] = [];
   private _systemStartTime: number | null = null;
+
+  // Listen for live settings changes (registered early so no duplicates)
+  private _boundExternalSettingsHandler: (event: Event) => void;
+  // Bound handler for Artistic Mode change events
+  private _boundArtisticModeHandler: (event: Event) => void;
+
+  /**
+   * Indicates whether automatic harmonic evolution is permitted. This mirrors the
+   * `sn-harmonic-evolution` setting and `YEAR3000_CONFIG.harmonicEvolution`.
+   * Sub-systems can read this flag instead of accessing the config directly so
+   * that future scheduling logic (e.g. TimerConsolidationSystem) can rely on a
+   * guaranteed field.
+   */
+  public allowHarmonicEvolution: boolean = true;
 
   constructor(
     config: Year3000Config = YEAR3000_CONFIG,
@@ -126,6 +156,9 @@ export class Year3000System {
     this.behavioralPredictionEngine = null;
     this.predictiveMaterializationSystem = null;
     this.sidebarConsciousnessSystem = null;
+    this.webGPUBackgroundSystem = null;
+    this.particleFieldSystem = null;
+    this.emergentChoreographyEngine = null;
 
     this.initializationResults = null;
 
@@ -134,39 +167,38 @@ export class Year3000System {
         "🌟 [Year3000System] Constructor: Instance created with Master Animation Coordinator"
       );
     }
+
+    // Listen for live settings changes (registered early so no duplicates)
+    this._boundExternalSettingsHandler =
+      this._handleExternalSettingsChange.bind(this);
+    document.addEventListener(
+      "year3000SystemSettingsChanged",
+      this._boundExternalSettingsHandler
+    );
+
+    // Bind and register Artistic Mode change listener so that UI refreshes instantly
+    this._boundArtisticModeHandler = this._onArtisticModeChanged.bind(this);
+    document.addEventListener(
+      "year3000ArtisticModeChanged",
+      this._boundArtisticModeHandler
+    );
+
+    // Keep local convenience flag in sync with config default
+    this.allowHarmonicEvolution =
+      this.YEAR3000_CONFIG.harmonicEvolution ?? true;
+
+    // Apply initial performance profile based on default artistic mode
+    setTimeout(() => {
+      this._applyPerformanceProfile();
+    }, 0);
   }
 
   private _deepCloneConfig(config: Year3000Config): Year3000Config {
-    if (!config || typeof config !== "object") return {} as Year3000Config;
-
-    try {
-      const cloned = JSON.parse(JSON.stringify(config));
-      const methodsToRestore: (keyof Year3000Config)[] = [
-        "init",
-        "getCurrentModeProfile",
-        "getCurrentMultipliers",
-        "getCurrentFeatures",
-        "getCurrentPerformanceSettings",
-        "setArtisticMode",
-        "loadArtisticPreference",
-      ];
-      methodsToRestore.forEach((methodName) => {
-        if (typeof config[methodName] === "function") {
-          (cloned as any)[methodName] = (config[methodName] as Function).bind(
-            cloned
-          );
-        }
-      });
-      if (config.enableDebug) {
-        console.log(
-          "🔧 [Year3000System] Configuration cloned with all methods restored"
-        );
-      }
-      return cloned;
-    } catch (error) {
-      console.error("[Year3000System] Failed to clone configuration:", error);
-      return { ...config }; // Fallback to shallow clone
-    }
+    // From v0.9.15 we stop deep-cloning the shared configuration to avoid state
+    // divergence between the global YEAR3000_CONFIG (used by the settings UI)
+    // and the copy referenced by subsystems. We simply keep the original object
+    // reference so that all mutations are observed everywhere.
+    return config;
   }
 
   public updateConfiguration(key: string, value: any): void {
@@ -420,6 +452,34 @@ export class Year3000System {
         `[Year3000System] Results: ${initializationResults.success.length} success, ${initializationResults.failed.length} failed.`
       );
 
+      // NEW: Verbose breakdown for easier debugging of missing/failed systems
+      if (initializationResults.failed.length > 0) {
+        console.warn(
+          `[Year3000System] Failed systems: ${initializationResults.failed.join(
+            ", "
+          )}`
+        );
+      }
+
+      if (
+        initializationResults.skipped &&
+        initializationResults.skipped.length > 0
+      ) {
+        console.info(
+          `[Year3000System] Skipped systems: ${initializationResults.skipped.join(
+            ", "
+          )}`
+        );
+      }
+
+      if (initializationResults.success.length > 0) {
+        console.info(
+          `[Year3000System] Successful systems: ${initializationResults.success.join(
+            ", "
+          )}`
+        );
+      }
+
       // Log the detailed health report right after initialization
       if (this.systemHealthMonitor) {
         this.systemHealthMonitor.logHealthReport();
@@ -446,6 +506,8 @@ export class Year3000System {
         "BehavioralPredictionEngine",
         "PredictiveMaterializationSystem",
         "SidebarConsciousnessSystem",
+        "WebGPUBackgroundSystem",
+        "EmergentChoreographyEngine",
       ];
       visualSystems.forEach((s) => results.skipped.push(s));
       return;
@@ -473,6 +535,11 @@ export class Year3000System {
         property: "beatSyncVisualSystem",
       },
       {
+        name: "EmergentChoreographyEngine",
+        Class: EmergentChoreographyEngine,
+        property: "emergentChoreographyEngine",
+      },
+      {
         name: "BehavioralPredictionEngine",
         Class: BehavioralPredictionEngine,
         property: "behavioralPredictionEngine",
@@ -486,6 +553,16 @@ export class Year3000System {
         name: "SidebarConsciousnessSystem",
         Class: SidebarConsciousnessSystem,
         property: "sidebarConsciousnessSystem",
+      },
+      {
+        name: "WebGPUBackgroundSystem",
+        Class: WebGPUBackgroundSystem,
+        property: "webGPUBackgroundSystem",
+      },
+      {
+        name: "ParticleFieldSystem",
+        Class: ParticleFieldSystem,
+        property: "particleFieldSystem",
       },
     ];
 
@@ -509,16 +586,31 @@ export class Year3000System {
           }
           results.success.push(name);
         } else {
-          results.failed.push(name);
-          console.error(
-            `[Year3000System] Initialization method completed for ${name}, but the 'initialized' flag is false.`
-          );
+          // Treat gracefully as skipped if the system self-disabled (e.g., env unsupported)
+          results.skipped.push(name);
+          if (this.YEAR3000_CONFIG.enableDebug) {
+            console.info(
+              `[Year3000System] System ${name} opted out of activation (initialized=false). Marked as skipped.`
+            );
+          }
         }
       } catch (error) {
         results.failed.push(name);
         console.error(
           `[Year3000System] Failed to initialize visual system ${name}:`,
           error
+        );
+      }
+    }
+
+    // After all visual systems are initialized, link the engines
+    if (this.colorHarmonyEngine && this.emergentChoreographyEngine) {
+      this.colorHarmonyEngine.setEmergentEngine(
+        this.emergentChoreographyEngine
+      );
+      if (this.YEAR3000_CONFIG.enableDebug) {
+        console.log(
+          "🔗 [Year3000System] EmergentChoreographyEngine linked to ColorHarmonyEngine."
         );
       }
     }
@@ -550,6 +642,9 @@ export class Year3000System {
       this.performanceAnalyzer,
       this.deviceCapabilityDetector,
       this.cssVariableBatcher,
+      this.webGPUBackgroundSystem,
+      this.particleFieldSystem,
+      this.emergentChoreographyEngine,
     ];
 
     for (const system of allSystems) {
@@ -572,6 +667,18 @@ export class Year3000System {
     if (this.YEAR3000_CONFIG.enableDebug) {
       console.log("🔥 [Year3000System] All systems have been destroyed.");
     }
+
+    // Remove the listener before proceeding to original destroyAllSystems logic
+    document.removeEventListener(
+      "year3000SystemSettingsChanged",
+      this._boundExternalSettingsHandler
+    );
+
+    // Clean up Artistic Mode change listener
+    document.removeEventListener(
+      "year3000ArtisticModeChanged",
+      this._boundArtisticModeHandler
+    );
   }
 
   public async applyInitialSettings(): Promise<void> {
@@ -594,6 +701,19 @@ export class Year3000System {
       const accent = this.settingsManager.get("catppuccin-accentColor");
       const gradient = this.settingsManager.get("sn-gradient-intensity");
       const stars = this.settingsManager.get("sn-star-density");
+
+      // NEW – harmonic settings
+      const intensityRaw = this.settingsManager.get("sn-harmonic-intensity");
+      const evolutionRaw = this.settingsManager.get("sn-harmonic-evolution");
+
+      // NEW – harmonic mode selection
+      const harmonicModeKey = this.settingsManager.get(
+        "sn-current-harmonic-mode"
+      );
+      if (harmonicModeKey) {
+        this.YEAR3000_CONFIG.currentHarmonicMode = String(harmonicModeKey);
+      }
+
       console.log(
         `🎨 [Year3000System] applyInitialSettings: Accent=${accent}, Gradient=${gradient}, Stars=${stars}`
       );
@@ -602,6 +722,21 @@ export class Year3000System {
         gradient as "disabled" | "minimal" | "balanced" | "intense",
         stars as "disabled" | "minimal" | "balanced" | "intense"
       );
+
+      // Apply harmonic intensity once the engine is ready
+      const intensity = parseFloat(intensityRaw as string);
+      if (!Number.isNaN(intensity)) {
+        if (this.colorHarmonyEngine) {
+          (this.colorHarmonyEngine as any).setIntensity?.(intensity);
+        }
+        this.YEAR3000_CONFIG.harmonicIntensity = intensity;
+      }
+
+      // Persist evolution flag locally
+      const evolutionEnabled = evolutionRaw === "true";
+      this.allowHarmonicEvolution = evolutionEnabled;
+      this.YEAR3000_CONFIG.harmonicEvolution = evolutionEnabled;
+
       console.log(
         "🎨 [Year3000System] applyInitialSettings: Successfully applied initial settings."
       );
@@ -699,10 +834,14 @@ export class Year3000System {
       }
     };
 
-    // Hex variables
+    // Hex variables – StarryNight private
     if (primaryHex) queueUpdate("--sn-gradient-primary", primaryHex);
     if (secondaryHex) queueUpdate("--sn-gradient-secondary", secondaryHex);
     if (accentHex) queueUpdate("--sn-gradient-accent", accentHex);
+
+    // Mirror accent into core Spicetify vars (buttons, sliders, etc.)
+    if (accentHex) queueUpdate("--spice-accent", accentHex);
+    // Preserve text colour; do NOT overwrite --spice-main (maintains Catppuccin readability)
 
     // RGB variants for transparency support
     const addRgb = (prop: string, hex: string | undefined) => {
@@ -716,6 +855,12 @@ export class Year3000System {
     addRgb("--sn-gradient-primary-rgb", primaryHex);
     addRgb("--sn-gradient-secondary-rgb", secondaryHex);
     addRgb("--sn-gradient-accent-rgb", accentHex);
+
+    // Year 3000 — expose a unified dynamic accent variable consumed by all visual systems
+    addRgb("--sn-dynamic-accent-rgb", accentHex);
+
+    addRgb("--spice-rgb-accent", accentHex);
+    // Avoid overriding --spice-rgb-main to prevent pale text
 
     // Flush batched updates immediately for visual responsiveness
     if (this.cssVariableBatcher) {
@@ -940,6 +1085,11 @@ export class Year3000System {
       {
         name: "BeatSyncVisualSystem",
         system: this.beatSyncVisualSystem,
+        priority: "critical",
+      },
+      {
+        name: "EmergentChoreographyEngine",
+        system: this.emergentChoreographyEngine,
         priority: "critical",
       },
       {
@@ -1329,6 +1479,30 @@ export class Year3000System {
         console.log(
           `🌟 [Year3000System] Upgrade complete: ${upgradeResults.success.length} success, ${upgradeResults.failed.length} failed`
         );
+        // NEW: Verbose breakdown for upgrade phase
+        if (upgradeResults.failed.length > 0) {
+          console.warn(
+            `🌟 [Year3000System] Upgrade failed systems: ${upgradeResults.failed.join(
+              ", "
+            )}`
+          );
+        }
+
+        if (upgradeResults.skipped && upgradeResults.skipped.length > 0) {
+          console.info(
+            `🌟 [Year3000System] Upgrade skipped systems: ${upgradeResults.skipped.join(
+              ", "
+            )}`
+          );
+        }
+
+        if (upgradeResults.success.length > 0) {
+          console.info(
+            `🌟 [Year3000System] Upgrade successful systems: ${upgradeResults.success.join(
+              ", "
+            )}`
+          );
+        }
       }
     } catch (error) {
       console.error(
@@ -1337,12 +1511,288 @@ export class Year3000System {
       );
     }
   }
+
+  private _handleExternalSettingsChange(event: Event): void {
+    const { key, value } = (event as CustomEvent).detail || {};
+
+    // Guard when settingsManager or subsystems are not ready yet
+    if (!key) return;
+
+    switch (key) {
+      case ARTISTIC_MODE_KEY: {
+        try {
+          if (
+            typeof (this.YEAR3000_CONFIG as any).safeSetArtisticMode ===
+            "function"
+          ) {
+            (this.YEAR3000_CONFIG as any).safeSetArtisticMode(value);
+          }
+        } catch (e) {
+          console.warn("[Year3000System] Failed to apply artistic mode", e);
+        }
+        break;
+      }
+      case HARMONIC_INTENSITY_KEY: {
+        // Expect numeric string or number 0-1
+        const num = parseFloat(value);
+        if (!Number.isNaN(num)) {
+          this.YEAR3000_CONFIG.harmonicIntensity = num;
+          if (this.colorHarmonyEngine) {
+            (this.colorHarmonyEngine as any).setIntensity?.(num);
+            // Re-blend colours
+            this.updateColorsFromCurrentTrack?.();
+          }
+        }
+        break;
+      }
+      case HARMONIC_EVOLUTION_KEY: {
+        const enabled = value === "true" || value === true;
+        this.allowHarmonicEvolution = enabled;
+        this.YEAR3000_CONFIG.harmonicEvolution = enabled;
+        break;
+      }
+      case MANUAL_BASE_COLOR_KEY: {
+        if (typeof value === "string" && value.startsWith("#")) {
+          this.updateHarmonicBaseColor(value);
+        }
+        break;
+      }
+      case HARMONIC_MODE_KEY: {
+        if (value !== null && value !== undefined) {
+          this.YEAR3000_CONFIG.currentHarmonicMode = String(value);
+          // Trigger colour update so gradient mapping aligns with new mode
+          this.updateColorsFromCurrentTrack?.();
+        }
+        break;
+      }
+      default:
+        // Other settings handled generically below
+        break;
+    }
+
+    // ────────────────────────────────────────────────────────────────
+    // Generic propagation to subsystems that expose applyUpdatedSettings
+    // ────────────────────────────────────────────────────────────────
+    this._broadcastSettingChange(key, value);
+
+    // Some settings may require conditional system refresh (e.g., webgpu, 3d-effects)
+    this._refreshConditionalSystems();
+  }
+
+  /**
+   * Notify all subsystems that implement applyUpdatedSettings so they can
+   * adjust behaviour immediately after a SettingsManager change.
+   */
+  private _broadcastSettingChange(key: string, value: any): void {
+    const systems: any[] = [
+      this.lightweightParticleSystem,
+      this.dimensionalNexusSystem,
+      this.dataGlyphSystem,
+      this.beatSyncVisualSystem,
+      this.behavioralPredictionEngine,
+      this.predictiveMaterializationSystem,
+      this.sidebarConsciousnessSystem,
+      this.particleFieldSystem,
+      this.webGPUBackgroundSystem,
+    ];
+
+    systems.forEach((sys) => {
+      if (sys && typeof sys.applyUpdatedSettings === "function") {
+        try {
+          sys.applyUpdatedSettings(key, value);
+        } catch (err) {
+          console.warn(
+            `[Year3000System] ${
+              sys.systemName || sys.constructor.name
+            } failed to handle settings change`,
+            err
+          );
+        }
+      }
+    });
+  }
+
+  /**
+   * Respond to Artistic Mode changes coming from the shared YEAR3000_CONFIG.
+   * We re-apply colors extracted from the current track so gradients and
+   * other CSS variables update without needing a song-change or full reload.
+   */
+  private async _onArtisticModeChanged(): Promise<void> {
+    if (this.YEAR3000_CONFIG.enableDebug) {
+      console.log(
+        "🎨 [Year3000System] Artistic mode changed – refreshing colours"
+      );
+    }
+
+    try {
+      // Re-apply performance caps for new mode first
+      this._applyPerformanceProfile();
+      // Refresh conditional systems (ParticleField, WebGPU, etc.)
+      await this._refreshConditionalSystems();
+      // Re-extract and harmonise colours based on the newly selected profile.
+      await this.updateColorsFromCurrentTrack();
+    } catch (err) {
+      console.warn(
+        "[Year3000System] Failed to refresh colours after artistic mode change:",
+        err
+      );
+    }
+  }
+
+  /**
+   * Push the current Artistic Mode's performance profile down into every
+   * active visual system that exposes an `applyPerformanceSettings` method.
+   */
+  private _applyPerformanceProfile(): void {
+    const perf = this.YEAR3000_CONFIG.getCurrentPerformanceSettings?.();
+    if (!perf) return;
+
+    const systems: any[] = [
+      this.lightweightParticleSystem,
+      this.dimensionalNexusSystem,
+      this.dataGlyphSystem,
+      this.beatSyncVisualSystem,
+      this.behavioralPredictionEngine,
+      this.predictiveMaterializationSystem,
+      this.sidebarConsciousnessSystem,
+    ];
+
+    systems.forEach((s) => {
+      if (s && typeof s.applyPerformanceSettings === "function") {
+        try {
+          s.applyPerformanceSettings(perf);
+        } catch (e) {
+          console.warn("[Year3000System] Failed to apply perf settings", e);
+        }
+      }
+    });
+  }
+
+  // === NEW: helper to retrieve harmonic mode object ========================
+  /**
+   * Convenience wrapper that fetches the current harmonic mode from the
+   * SettingsManager and stores the key on the shared configuration so that
+   * all subsystems have easy access without reading localStorage directly.
+   */
+  private _syncCurrentHarmonicMode(): void {
+    if (!this.settingsManager) return;
+    const key = this.settingsManager.get("sn-current-harmonic-mode");
+    if (key && typeof key === "string") {
+      this.YEAR3000_CONFIG.currentHarmonicMode = key;
+    }
+  }
+
+  private async _refreshConditionalSystems(): Promise<void> {
+    // Ensure core dependencies ready
+    if (!this.performanceAnalyzer || !this.settingsManager) return;
+
+    const mode = this.YEAR3000_CONFIG.artisticMode;
+    const enableDebug = this.YEAR3000_CONFIG.enableDebug;
+
+    // ─────────────── ParticleFieldSystem ───────────────
+    const wantsParticle = mode === "cosmic-maximum";
+    if (wantsParticle && !this.particleFieldSystem) {
+      try {
+        const sys = new ParticleFieldSystem(
+          this.YEAR3000_CONFIG,
+          this.utils,
+          this.performanceAnalyzer,
+          this.musicSyncService!,
+          this.settingsManager,
+          this
+        );
+        await sys.initialize();
+        if (sys.initialized) {
+          this.particleFieldSystem = sys;
+          // Register with health monitor
+          this.systemHealthMonitor?.registerSystem("ParticleFieldSystem", sys);
+          // Animation loop – background priority at 30 fps
+          this.registerAnimationSystem(
+            "ParticleFieldSystem",
+            sys,
+            "background",
+            30
+          );
+          if (enableDebug) {
+            console.log(
+              "🌌 [Year3000System] ParticleFieldSystem started (cosmic-maximum mode)"
+            );
+          }
+        }
+      } catch (err) {
+        console.warn(
+          "[Year3000System] Failed to start ParticleFieldSystem",
+          err
+        );
+      }
+    } else if (!wantsParticle && this.particleFieldSystem) {
+      this.unregisterAnimationSystem("ParticleFieldSystem");
+      this.particleFieldSystem.destroy();
+      this.particleFieldSystem = null;
+      if (enableDebug) {
+        console.log(
+          "🌌 [Year3000System] ParticleFieldSystem stopped (mode change)"
+        );
+      }
+    }
+
+    // ─────────────── WebGPUBackgroundSystem ───────────────
+    const gpuSupported =
+      typeof navigator !== "undefined" && (navigator as any).gpu;
+    const webgpuEnabled =
+      this.settingsManager.get("sn-enable-webgpu") === "true";
+    const wantsWebGPU =
+      gpuSupported && webgpuEnabled && mode === "cosmic-maximum";
+    if (wantsWebGPU && !this.webGPUBackgroundSystem) {
+      try {
+        const sys = new WebGPUBackgroundSystem(
+          this.YEAR3000_CONFIG,
+          this.utils,
+          this.performanceAnalyzer,
+          this.musicSyncService!,
+          this.settingsManager,
+          this
+        );
+        await sys.initialize();
+        if (sys.initialized) {
+          this.webGPUBackgroundSystem = sys;
+          this.systemHealthMonitor?.registerSystem(
+            "WebGPUBackgroundSystem",
+            sys
+          );
+          // Background priority 30 fps as it's purely visual
+          this.registerAnimationSystem(
+            "WebGPUBackgroundSystem",
+            sys,
+            "background",
+            30
+          );
+          if (enableDebug) {
+            console.log("🖥️ [Year3000System] WebGPUBackgroundSystem started");
+          }
+        }
+      } catch (err) {
+        console.warn(
+          "[Year3000System] Failed to start WebGPUBackgroundSystem",
+          err
+        );
+      }
+    } else if (!wantsWebGPU && this.webGPUBackgroundSystem) {
+      this.unregisterAnimationSystem("WebGPUBackgroundSystem");
+      this.webGPUBackgroundSystem.destroy();
+      this.webGPUBackgroundSystem = null;
+      if (enableDebug) {
+        console.log("🖥️ [Year3000System] WebGPUBackgroundSystem stopped");
+      }
+    }
+  }
 }
 
 const year3000System = new Year3000System();
 
 // Make the system globally available for extension access
 if (typeof window !== "undefined") {
+  (window as any).HARMONIC_MODES = HARMONIC_MODES;
   (window as any).year3000System = year3000System;
 }
 

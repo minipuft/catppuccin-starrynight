@@ -48,13 +48,16 @@
   --sn-sidebar-temporal-blur: 0px;
   --sn-sidebar-temporal-echo-opacity: 0;
 
+  // === YEAR 3000 DYNAMIC ACCENT ===
+  --sn-dynamic-accent-rgb: var(--sn-gradient-accent-rgb, var(--spice-rgb-accent));
+
   // === NAVIGATION VARIABLES ===
   --sn-nav-item-base-opacity: 0.85;
   --sn-nav-item-hover-bg-opacity: 0.1;
   --sn-nav-item-active-bg-opacity: 0.15;
-  --sn-nav-item-glow-color-rgb: var(--sn-gradient-primary-rgb, "202,158,230");
+  --sn-nav-item-glow-color-rgb: var(--sn-gradient-primary-rgb, var(--spice-rgb-accent));
   --sn-nav-item-glow-intensity: 0; // 0 to 1, controlled by JS
-  --sn-nav-text-energy-color-rgb: var(--sn-gradient-accent-rgb, "140,170,238");
+  --sn-nav-text-energy-color-rgb: var(--sn-dynamic-accent-rgb, 140,170,238);
   --sn-nav-text-energy-opacity: 0; // 0 to 0.5, controlled by JS
   --sn-nav-item-transform-scale: 1; // 1 to 1.03, controlled by JS
   --sn-nav-item-transition-duration: 0.3s;
@@ -76,17 +79,17 @@
     background: linear-gradient(
       160deg,
       rgba(
-          var(--sn-gradient-primary-rgb, "202,158,230"),
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.8)
         )
         0%,
       rgba(
-          var(--sn-gradient-secondary-rgb, "186,187,241"),
+          var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.6)
         )
         50%,
       rgba(
-          var(--sn-gradient-accent-rgb, "140,170,238"),
+          var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.9)
         )
         100%
@@ -114,17 +117,17 @@
     background: radial-gradient(
       ellipse at 20% 80%,
       rgba(
-          var(--sn-gradient-primary-rgb, "203,166,247"),
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.7)
         )
         0%,
       rgba(
-          var(--sn-gradient-accent-rgb, "148,226,213"),
+          var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.5)
         )
         40%,
       rgba(
-          var(--sn-gradient-secondary-rgb, "245,194,231"),
+          var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.8)
         )
         100%
@@ -161,7 +164,7 @@
     background: linear-gradient(
       45deg,
       rgba(
-          var(--sn-gradient-primary-rgb, "239,159,118"),
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.9)
         )
         0%,
@@ -171,7 +174,7 @@
         )
         50%,
       rgba(
-          var(--sn-gradient-accent-rgb, "137,180,250"),
+          var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.9)
         )
         100%
@@ -626,9 +629,9 @@ nav[aria-label="Main"] ul li a {
   // Extended Harmonic Mode Classes
   &.sn-harmonic-analogous-flow {
     @include harmonic-background(
-      var(--sn-gradient-primary-rgb, "202,158,230"),
-      var(--sn-gradient-secondary-rgb, "186,187,241"),
-      var(--sn-gradient-accent-rgb, "140,170,238")
+      var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+      var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
+      var(--sn-gradient-accent-rgb, var(--spice-rgb-accent))
     );
     --sn-sidebar-harmonic-intensity-multiplier: 1;
   }
@@ -636,9 +639,9 @@ nav[aria-label="Main"] ul li a {
   &.sn-harmonic-triadic-balance,
   &.sn-harmonic-triadic-trinity {
     @include harmonic-background(
-      var(--sn-gradient-primary-rgb, "203,166,247"),
-      var(--sn-gradient-accent-rgb, "148,226,213"),
-      var(--sn-gradient-secondary-rgb, "245,194,231")
+      var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+      var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
+      var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0))
     );
     --sn-sidebar-harmonic-intensity-multiplier: 1.1;
   }
@@ -646,8 +649,8 @@ nav[aria-label="Main"] ul li a {
   &.sn-harmonic-complementary-duality,
   &.sn-harmonic-complementary-yin-yang {
     @include harmonic-background(
-      var(--sn-gradient-primary-rgb, "239,159,118"),
-      var(--sn-gradient-accent-rgb, "137,180,250"),
+      var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+      var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
       var(--spice-rgb-surface1, "69,71,90")
     );
     --sn-sidebar-harmonic-intensity-multiplier: 1.2;
@@ -726,7 +729,7 @@ nav[aria-label="Main"] ul li a {
       background: radial-gradient(
         ellipse at center,
         rgba(
-            var(--sn-gradient-accent-rgb, "140,170,238"),
+            var(--sn-gradient-accent-rgb),
             calc(var(--sn-sidebar-item-bloom-intensity) * 0.7)
           )
           0%,
@@ -742,12 +745,12 @@ nav[aria-label="Main"] ul li a {
     &.main-navBar-navBarLinkActive,
     &[aria-current="page"] {
       background-color: rgba(
-        var(--sn-gradient-primary-rgb, "202,158,230"),
+        var(--sn-gradient-primary-rgb),
         0.15
       );
       color: var(--spice-text);
       transform: translateY(-1px) scale(1.02);
-      box-shadow: 0 3px 15px -5px rgba(var(--sn-gradient-primary-rgb, "202,158,230"), 0.3);
+      box-shadow: 0 3px 15px -5px rgba(var(--sn-gradient-primary-rgb), 0.3);
 
       &::before {
         opacity: 1;
@@ -761,7 +764,7 @@ nav[aria-label="Main"] ul li a {
       span {
         text-shadow: 0 0 8px
           rgba(
-            var(--sn-gradient-accent-rgb, "140,170,238"),
+            var(--sn-gradient-accent-rgb),
             calc(0.5 * var(--sn-sidebar-energy-glow-opacity))
           );
       }

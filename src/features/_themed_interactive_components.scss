@@ -33,19 +33,19 @@
 
   // === EFFICIENT COLOR CONSCIOUSNESS ===
   --soul-primary: rgba(
-    var(--sn-gradient-primary-rgb, 202, 158, 230),
+    var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
     var(--ethereal-glow-base)
   );
   --soul-secondary: rgba(
-    var(--sn-gradient-secondary-rgb, 186, 187, 241),
+    var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
     calc(var(--ethereal-glow-base) * 0.9)
   );
   --soul-accent: rgba(
-    var(--sn-gradient-accent-rgb, 140, 170, 238),
+    var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
     calc(var(--ethereal-glow-base) * 1.1)
   );
   --soul-whisper: rgba(
-    var(--sn-gradient-primary-rgb, 202, 158, 230),
+    var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
     calc(var(--ethereal-glow-base) * 0.3)
   );
 }
@@ -199,7 +199,7 @@
     // SIMPLIFIED: Single shadow instead of multiple
     box-shadow: 0 8px 32px
       rgba(
-        var(--sn-gradient-primary-rgb, 202, 158, 230),
+        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
         calc(var(--conscious-elegance-intensity) * 0.3)
       );
 
@@ -210,7 +210,7 @@
   &:focus-visible {
     outline: none;
     box-shadow: 0 0 0 2px
-      rgba(var(--sn-gradient-primary-rgb, 202, 158, 230), 0.5);
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.5);
   }
 }
 
@@ -234,7 +234,7 @@
     @media (min-width: 1200px) {
       box-shadow: -2px 0 8px
         rgba(
-          var(--sn-gradient-primary-rgb, 202, 158, 230),
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
           calc(var(--conscious-elegance-intensity) * 0.1)
         );
     }

@@ -1,3 +1,8 @@
+import {
+  HARMONIC_EVOLUTION_KEY,
+  HARMONIC_INTENSITY_KEY,
+} from "@/config/settingKeys";
+import { GlobalEventBus } from "@/core/EventBus";
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
 import { SettingsManager } from "@/managers/SettingsManager";
 import { MusicSyncService } from "@/services/MusicSyncService";
@@ -6,6 +11,7 @@ import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import { PaletteExtensionManager } from "@/utils/PaletteExtensionManager";
 import * as Year3000Utilities from "@/utils/Year3000Utilities";
 import { BaseVisualSystem } from "./BaseVisualSystem";
+import type { EmergentChoreographyEngine } from "./EmergentChoreographyEngine";
 // TODO: Phase 4 - Import WebGL and Worker support for performance
 
 // Type definitions for color structures
@@ -81,6 +87,21 @@ export class ColorHarmonyEngine
   private catppuccinPalettes: CatppuccinFlavors;
   private vibrancyConfig: any;
   private paletteExtensionManager: PaletteExtensionManager;
+  private emergentEngine: EmergentChoreographyEngine | null = null;
+
+  // User-specified harmonic intensity (0-1). Multiplies defaultBlendRatio.
+  private userIntensity: number = 0.7;
+  private evolutionEnabled: boolean = true;
+  private _boundSettingsChangeHandler: (e: Event) => void;
+  private _boundArtisticModeHandler: (e: Event) => void;
+
+  private _evolutionTimer: NodeJS.Timeout | null = null;
+
+  // Timer ref for debounce
+  private _pendingPaletteRefresh: NodeJS.Timeout | null = null;
+
+  // Track last applied genre to avoid redundant palette refreshes
+  private _lastGenre: string | null = null;
 
   constructor(
     config?: Year3000Config,
@@ -104,6 +125,23 @@ export class ColorHarmonyEngine
     );
 
     this.currentTheme = this.detectCurrentTheme();
+
+    // ------------------------------------------------------------------
+    // Sync initial harmonic intensity from shared config so that user
+    // preferences are respected as soon as the engine is instantiated.
+    // ------------------------------------------------------------------
+    if (
+      config &&
+      typeof (config as any).harmonicIntensity === "number" &&
+      Number.isFinite((config as any).harmonicIntensity)
+    ) {
+      const clamped = Math.max(
+        0,
+        Math.min(1, (config as any).harmonicIntensity)
+      );
+      this.userIntensity = clamped;
+    }
+
     this.harmonyMetrics = {
       totalHarmonyCalculations: 0,
       musicInfluencedAdjustments: 0,
@@ -256,6 +294,29 @@ export class ColorHarmonyEngine
         "🎨 [ColorHarmonyEngine] Initialized with Year 3000 Quantum Empathy"
       );
     }
+
+    // Sync evolution flag from config
+    if (config && typeof (config as any).harmonicEvolution === "boolean") {
+      this.evolutionEnabled = (config as any).harmonicEvolution;
+    }
+
+    // Bind handlers once
+    this._boundSettingsChangeHandler = this._handleSettingsChange.bind(this);
+    this._boundArtisticModeHandler = this._handleArtisticModeChanged.bind(this);
+
+    document.addEventListener(
+      "year3000SystemSettingsChanged",
+      this._boundSettingsChangeHandler
+    );
+    document.addEventListener(
+      "year3000ArtisticModeChanged",
+      this._boundArtisticModeHandler
+    );
+
+    // Start evolution loop if allowed
+    if (this.evolutionEnabled) {
+      this._startEvolutionLoop();
+    }
   }
   // TODO: Legacy interface method - delegates to new onAnimate
   updateAnimation(deltaTime: number): void {
@@ -266,6 +327,12 @@ export class ColorHarmonyEngine
   public onAnimate(deltaMs: number): void {
     this._updateCSSVariables(deltaMs);
     this._calculateBeatPulse(deltaMs);
+
+    // Publish event for EmergentChoreographyEngine
+    GlobalEventBus.publish("colorharmony/frame", {
+      timestamp: performance.now(),
+      kineticState: this.kineticState,
+    });
   }
 
   // TODO: Private method for updating CSS variables with kinetic state
@@ -677,32 +744,69 @@ export class ColorHarmonyEngine
     rgb2: RGBColor,
     ratio: number = this.vibrancyConfig.defaultBlendRatio
   ): RGBColor {
-    const hsl1 = this.utils.rgbToHsl(rgb1.r, rgb1.g, rgb1.b);
-    const hsl2 = this.utils.rgbToHsl(rgb2.r, rgb2.g, rgb2.b);
+    // =============================
+    // NEW  – Perceptual interpolation using Oklab
+    // =============================
+    // `ratio` expresses the dominance of `rgb1` (extracted colour).
+    // We interpolate towards the Catppuccin accent in OKLab then convert
+    // back to sRGB for downstream HSL-based aesthetic boosts.
 
-    const artisticMode = this.config.artisticMode;
+    // Guard & clamp ratio to [0,1]
+    const r = Math.max(0, Math.min(1, ratio));
 
-    const blendedHsl: HSLColor = {
-      h: this.utils.lerp(hsl1.h, hsl2.h, 1 - ratio),
-      s: Math.max(
-        this.utils.lerp(hsl1.s, hsl2.s, 1 - ratio),
-        this.vibrancyConfig.minimumSaturation * 100
-      ),
-      l: this.utils.lerp(hsl1.l, hsl2.l, 1 - ratio),
-    };
+    const oklab1 = this.utils.rgbToOklab(rgb1.r, rgb1.g, rgb1.b);
+    const oklab2 = this.utils.rgbToOklab(rgb2.r, rgb2.g, rgb2.b);
 
-    // Apply artistic saturation boost
-    blendedHsl.s = Math.min(
-      100,
-      blendedHsl.s * this.vibrancyConfig.artisticSaturationBoost
+    const lerp = (a: number, b: number): number => a * r + b * (1 - r);
+
+    const blendedOklab = {
+      L: lerp(oklab1.L, oklab2.L),
+      a: lerp(oklab1.a, oklab2.a),
+      b: lerp(oklab1.b, oklab2.b),
+    } as const;
+
+    const blendedRgb = this.utils.oklabToRgb(
+      blendedOklab.L,
+      blendedOklab.a,
+      blendedOklab.b
     );
 
-    // Apply cosmic luminance boost only in non-conservative modes
+    // Convert to HSL **after** perceptual interpolation so we can apply
+    // artistic saturation & luminance boosts in a familiar space.
+    const blendedHsl = this.utils.rgbToHsl(
+      blendedRgb.r,
+      blendedRgb.g,
+      blendedRgb.b
+    );
+
+    // Preserve previous boost behaviour
+    const artisticMode = this.config?.artisticMode ?? "artist-vision";
+    const emergentMultipliers =
+      this.emergentEngine?.getCurrentMultipliers?.() || undefined;
+
+    const shouldUseEmergent =
+      artisticMode === "cosmic-maximum" && !!emergentMultipliers;
+
+    const validMultipliers: any = emergentMultipliers || {};
+
+    const saturationBoostFactor = shouldUseEmergent
+      ? (validMultipliers.visualIntensityBase || 1) * 1.25 // Align with previous behaviour
+      : this.vibrancyConfig.artisticSaturationBoost;
+
+    const luminanceBoostFactor = shouldUseEmergent
+      ? (validMultipliers.aestheticGravityStrength || 1) * 1.15
+      : this.vibrancyConfig.cosmicLuminanceBoost;
+
+    // Minimum saturation guard (uses configured threshold)
+    blendedHsl.s = Math.max(
+      blendedHsl.s,
+      this.vibrancyConfig.minimumSaturation * 100
+    );
+
+    // Apply artistic boosts (mode-aware)
+    blendedHsl.s = Math.min(100, blendedHsl.s * saturationBoostFactor);
     if (artisticMode !== "corporate-safe") {
-      blendedHsl.l = Math.min(
-        95,
-        blendedHsl.l * this.vibrancyConfig.cosmicLuminanceBoost
-      );
+      blendedHsl.l = Math.min(95, blendedHsl.l * luminanceBoostFactor);
     }
 
     const finalRgb = this.utils.hslToRgb(
@@ -710,6 +814,7 @@ export class ColorHarmonyEngine
       blendedHsl.s,
       blendedHsl.l
     );
+
     return { r: finalRgb.r, g: finalRgb.g, b: finalRgb.b };
   }
 
@@ -760,7 +865,7 @@ export class ColorHarmonyEngine
           musicContext.energy,
           musicContext.valence
         );
-        blendRatio *= musicIntensity;
+        blendRatio *= musicIntensity * this.userIntensity;
         // Clamp ratio to prevent inverse effects
         blendRatio = Math.max(0, Math.min(1, blendRatio));
       }
@@ -864,6 +969,17 @@ export class ColorHarmonyEngine
     trackUri: string
   ): void {
     if (!processedMusicData) return;
+
+    // Phase 3 – genre-aware palette morphing
+    const g = processedMusicData.genre as string | undefined;
+    if (g && g !== this._lastGenre) {
+      this._applyGenrePalette(g).then(() => {
+        this._lastGenre = g;
+        // Nudge CSS variables repaint
+        this._forcePaletteRepaint();
+      });
+    }
+
     this._updateMusicalMemory(processedMusicData, trackUri);
     this._updateKineticState(processedMusicData);
     this._applyAestheticGravity(processedMusicData);
@@ -938,15 +1054,18 @@ export class ColorHarmonyEngine
       return 0;
     }
 
-    // Base hue shift from beat phase (subtle cycling)
-    let hueShift = Math.sin(beatPhase * 2 * Math.PI) * 5; // ±5 degrees base
+    const artisticMode = this.config.artisticMode;
+    const baseAmplitude = artisticMode === "cosmic-maximum" ? 8 : 5; // stronger base swing in cosmic mode
+    let hueShift = Math.sin(beatPhase * 2 * Math.PI) * baseAmplitude;
 
     // Boost on actual beats
     if (beatOccurred) {
-      hueShift += energy * 10; // Up to 10 degrees on high-energy beats
+      const beatBoost = artisticMode === "cosmic-maximum" ? 12 : 10;
+      hueShift += energy * beatBoost; // larger boost for cosmic mode
     }
 
-    return Math.max(-15, Math.min(15, hueShift)); // Clamp to ±15 degrees
+    const clampRange = artisticMode === "cosmic-maximum" ? 25 : 15;
+    return Math.max(-clampRange, Math.min(clampRange, hueShift)); // Clamp depending on mode
   }
 
   private _updateMusicalMemory(musicData: any, trackUri: string): void {
@@ -1025,40 +1144,180 @@ export class ColorHarmonyEngine
     darkVibrantHex: string;
     lightVibrantHex: string;
   } {
-    const currentPalette = (this.catppuccinPalettes as any)[this.currentTheme];
-    if (!currentPalette) {
-      return {
-        darkVibrantHex: this.utils.rgbToHex(baseRgb.r, baseRgb.g, baseRgb.b),
-        lightVibrantHex: this.utils.rgbToHex(baseRgb.r, baseRgb.g, baseRgb.b),
-      };
-    }
+    // =============================
+    // NEW  – OKLab-based light/dark variants
+    // =============================
+    const oklab = this.utils.rgbToOklab(baseRgb.r, baseRgb.g, baseRgb.b);
 
-    const harmoniousAccent = this.findBestHarmoniousAccent(
-      baseRgb,
-      currentPalette
-    );
-    const baseHsl = this.utils.rgbToHsl(
-      harmoniousAccent.rgb.r,
-      harmoniousAccent.rgb.g,
-      harmoniousAccent.rgb.b
-    );
+    // Dark variant – reduce lightness perceptually
+    const darkOklabL = Math.max(0, Math.min(1, oklab.L * 0.75));
+    const darkRgb = this.utils.oklabToRgb(darkOklabL, oklab.a, oklab.b);
 
-    // Create Dark Vibrant
-    const darkHsl = { ...baseHsl };
-    darkHsl.s = Math.min(100, baseHsl.s * 1.1); // Increase saturation
-    darkHsl.l = Math.max(10, baseHsl.l * 0.75); // Decrease lightness
-
-    // Create Light Vibrant
-    const lightHsl = { ...baseHsl };
-    lightHsl.s = Math.min(100, baseHsl.s * 1.05); // Slightly increase saturation
-    lightHsl.l = Math.min(90, baseHsl.l * 1.25); // Increase lightness
-
-    const darkRgb = this.utils.hslToRgb(darkHsl.h, darkHsl.s, darkHsl.l);
-    const lightRgb = this.utils.hslToRgb(lightHsl.h, lightHsl.s, lightHsl.l);
+    // Light variant – increase lightness perceptually
+    const lightOklabL = Math.max(0, Math.min(1, oklab.L * 1.25));
+    const lightRgb = this.utils.oklabToRgb(lightOklabL, oklab.a, oklab.b);
 
     return {
       darkVibrantHex: this.utils.rgbToHex(darkRgb.r, darkRgb.g, darkRgb.b),
       lightVibrantHex: this.utils.rgbToHex(lightRgb.r, lightRgb.g, lightRgb.b),
     };
+  }
+
+  // =========================
+  // PUBLIC API – User Control
+  // =========================
+  /**
+   * Update user-defined harmonic intensity (0–1). Values outside range are clamped.
+   */
+  public setIntensity(value: number): void {
+    const clamped = Math.max(0, Math.min(1, value));
+    this.userIntensity = clamped;
+    if (this.config?.enableDebug) {
+      console.log(
+        `[ColorHarmonyEngine] User harmonic intensity set to ${clamped}`
+      );
+    }
+  }
+
+  // ============================
+  // Settings / Event Integration
+  // ============================
+
+  private _handleSettingsChange(event: Event): void {
+    const { key, value } = (event as CustomEvent).detail || {};
+    switch (key) {
+      case HARMONIC_INTENSITY_KEY: {
+        const num = parseFloat(value);
+        if (!Number.isNaN(num)) {
+          this.setIntensity(num);
+        }
+        break;
+      }
+      case HARMONIC_EVOLUTION_KEY: {
+        const enabled = value === "true" || value === true;
+        this._setEvolutionEnabled(enabled);
+        break;
+      }
+    }
+  }
+
+  private _handleArtisticModeChanged(): void {
+    // Artistic mode influences multipliers & contrast. Force a full palette
+    // refresh so gradients & other CSS vars update instantly.
+    this.currentTheme = this.detectCurrentTheme();
+    // Debounced to avoid thrashing if multiple settings change quickly.
+    if (!this._pendingPaletteRefresh) {
+      this._pendingPaletteRefresh = setTimeout(() => {
+        this._pendingPaletteRefresh = null;
+        this.refreshPalette();
+      }, 80); // ~1 animation frame
+    }
+  }
+
+  private _forcePaletteRepaint(): void {
+    // Simply bump kinetic hue shift to trigger _updateCSSVariables logic.
+    this.kineticState.hueShift = (this.kineticState.hueShift || 0) + 0.01;
+  }
+
+  // Evolution helpers
+  private _startEvolutionLoop(): void {
+    if (this._evolutionTimer) return;
+    // Period depends on intensity: stronger intensity → faster evolution
+    const basePeriod = 30000; // 30s full cycle at intensity 1
+    const period = basePeriod / Math.max(0.1, this.userIntensity);
+    this._evolutionTimer = setInterval(() => {
+      // Rotate hue slowly; we piggy-back on kineticState hueShift
+      const step = 2 * this.userIntensity; // degrees per tick
+      const current = this.kineticState.hueShift ?? 0;
+      this.kineticState.hueShift = ((current + step + 360) % 360) - 180;
+    }, period);
+  }
+
+  private _stopEvolutionLoop(): void {
+    if (this._evolutionTimer) {
+      clearInterval(this._evolutionTimer);
+      this._evolutionTimer = null;
+    }
+  }
+
+  private _setEvolutionEnabled(enabled: boolean): void {
+    if (this.evolutionEnabled === enabled) return;
+    this.evolutionEnabled = enabled;
+    if (enabled) this._startEvolutionLoop();
+    else this._stopEvolutionLoop();
+  }
+
+  // Clean up listeners when destroyed
+  public destroy(): void {
+    this._stopEvolutionLoop();
+    document.removeEventListener(
+      "year3000SystemSettingsChanged",
+      this._boundSettingsChangeHandler
+    );
+    document.removeEventListener(
+      "year3000ArtisticModeChanged",
+      this._boundArtisticModeHandler
+    );
+    super.destroy?.();
+  }
+
+  /**
+   * Public helper that triggers a colour rebake based on the current track.
+   * Prefer calling the global Year3000System where available so the full
+   * pipeline (extraction → harmonisation → CSS variable batch) is reused.
+   */
+  public async refreshPalette(): Promise<void> {
+    try {
+      const y3kSystem = (globalThis as any).year3000System;
+      if (y3kSystem?.updateColorsFromCurrentTrack) {
+        await y3kSystem.updateColorsFromCurrentTrack();
+        return;
+      }
+
+      // Fallback: If Year3000System unavailable, attempt to re-apply CSS vars
+      // using whatever colours are currently set on --sn-gradient-primary.
+      const root = this.utils.getRootStyle();
+      if (!root) return;
+      const styles = getComputedStyle(root);
+      const primary = styles.getPropertyValue("--sn-gradient-primary").trim();
+      if (primary) {
+        root.style.setProperty("--sn-gradient-primary", primary);
+        // Recompute RGB variant
+        const rgb = this.utils.hexToRgb(primary);
+        if (rgb) {
+          root.style.setProperty(
+            "--sn-gradient-primary-rgb",
+            `${rgb.r},${rgb.g},${rgb.b}`
+          );
+        }
+      }
+    } catch (err) {
+      if (this.config.enableDebug) {
+        console.warn("[ColorHarmonyEngine] refreshPalette failed", err);
+      }
+    }
+  }
+
+  /**
+   * Swap Catppuccin palette accents & neutrals based on detected genre.
+   * Executes asynchronously to avoid blocking audio thread.
+   */
+  private async _applyGenrePalette(genre: string): Promise<void> {
+    try {
+      const palette = await this._getGenreAwarePalette(genre);
+      if (!palette) return;
+
+      // Replace current flavour palette in-memory then refresh CSS vars
+      (this.catppuccinPalettes as any)[this.currentTheme] = palette;
+      await this.refreshPalette();
+    } catch (err) {
+      if (this.config.enableDebug) {
+        console.warn("[ColorHarmonyEngine] _applyGenrePalette failed", err);
+      }
+    }
+  }
+
+  public setEmergentEngine(engine: EmergentChoreographyEngine): void {
+    this.emergentEngine = engine;
   }
 }
