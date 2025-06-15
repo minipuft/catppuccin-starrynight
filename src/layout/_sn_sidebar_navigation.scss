@@ -1,0 +1,261 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// STARRYNIGHT SIDEBAR NAVIGATION - Enhanced Navigation Styling
+// ████████████████████████████████████████████████████████████████████████████████
+// TODO: Extract sidebar navigation styling from main file
+// TODO: Include quantum consciousness field effects
+// TODO: Include temporal echo layer styling
+// TODO: Target file: src/layout/_sn_sidebar_navigation.scss
+
+// General styling for navigation links within the main sidebar navigation area
+// Targets links in "Home", "Search", "Your Library" headers, and potentially footer links.
+// More specific targeting for library items follows.
+div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
+  nav[aria-label="Main"] a,
+  .main-yourLibraryX-header a, // Links in library header
+  div[data-testid="left-sidebar-footer"] a, // Links in sidebar footer
+  a.link-subtle.main-navBar-navBarLink {
+    // Common class for Home, Search etc.
+    position: relative;
+    display: flex; // Use flex for better alignment of icons and text
+    align-items: center;
+    padding: 8px 24px; // Standard Spicetify padding
+    margin: 2px 0;
+    border-radius: 6px;
+    opacity: var(--sn-nav-item-base-opacity);
+    transform: scale(var(--sn-nav-item-transform-scale));
+    transition: opacity var(--sn-nav-item-transition-duration) ease,
+      background-color var(--sn-nav-item-transition-duration) ease,
+      transform var(--sn-nav-item-transition-duration)
+        cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      box-shadow var(--sn-nav-item-transition-duration) ease;
+    text-decoration: none;
+    color: var(--spice-subtext, #b3b3b3); // Default text color
+
+    // Text as Quantum Foam (subtle)
+    .Type__TypeElement-sc-goliZz-0 {
+      // Target the span that usually holds the text
+      // This selector might need to be more generic e.g. span, or specific to text containers
+      text-shadow: 0 0 3px
+          rgba(
+            var(--sn-nav-text-energy-color-rgb),
+            calc(var(--sn-nav-text-energy-opacity) * 0.5)
+          ),
+        0 0 8px
+          rgba(
+            var(--sn-nav-text-energy-color-rgb),
+            calc(var(--sn-nav-text-energy-opacity) * 0.3)
+          );
+      transition: text-shadow var(--sn-nav-item-transition-duration) ease;
+      color: inherit; // Ensure text color is properly inherited or set
+    }
+
+    svg {
+      fill: currentColor; // Ensure icons match text color
+      transition: fill var(--sn-nav-item-transition-duration) ease;
+      margin-right: 16px; // Space between icon and text
+    }
+
+    &:hover {
+      opacity: 1;
+      color: var(--spice-text, #ffffff);
+      background-color: rgba(
+        var(--sn-nav-item-glow-color-rgb),
+        var(--sn-nav-item-hover-bg-opacity)
+      );
+      // Neural Glow Propagation (subtle glow on hover)
+      box-shadow: 0 0 calc(8px + 12px * var(--sn-nav-item-glow-intensity))
+        calc(1px + 2px * var(--sn-nav-item-glow-intensity))
+        rgba(
+          var(--sn-nav-item-glow-color-rgb),
+          calc(0.3 + 0.4 * var(--sn-nav-item-glow-intensity))
+        );
+
+      .Type__TypeElement-sc-goliZz-0 {
+        text-shadow: 0 0 5px
+            rgba(
+              var(--sn-nav-text-energy-color-rgb),
+              var(--sn-nav-text-energy-opacity)
+            ),
+          0 0 12px
+            rgba(
+              var(--sn-nav-text-energy-color-rgb),
+              calc(var(--sn-nav-text-energy-opacity) * 0.6)
+            );
+      }
+    }
+
+    // Active state for main nav links (e.g., Home, Search when on that page)
+    &.main-navBar-navBarLinkActive,
+    &[aria-current="page"] {
+      opacity: 1;
+      color: var(--spice-text, #ffffff);
+      background-color: rgba(
+        var(--sn-nav-item-glow-color-rgb),
+        var(--sn-nav-item-active-bg-opacity)
+      );
+      box-shadow: 0 0 calc(10px + 15px * var(--sn-nav-item-glow-intensity))
+        calc(2px + 3px * var(--sn-nav-item-glow-intensity))
+        rgba(
+          var(--sn-nav-item-glow-color-rgb),
+          calc(0.5 + 0.3 * var(--sn-nav-item-glow-intensity))
+        );
+
+      .Type__TypeElement-sc-goliZz-0 {
+        font-weight: bold; // Make active link text bold
+        text-shadow: 0 0 6px
+            rgba(
+              var(--sn-nav-text-energy-color-rgb),
+              calc(var(--sn-nav-text-energy-opacity) * 1.2)
+            ),
+          0 0 15px
+            rgba(
+              var(--sn-nav-text-energy-color-rgb),
+              calc(var(--sn-nav-text-energy-opacity) * 0.8)
+            );
+      }
+      svg {
+        // Potentially slightly larger or brighter icon for active state
+      }
+    }
+  }
+}
+
+// --- Temporal Echo Layer Styling ---
+// This uses the --sn-sidebar-temporal-shift variable set by JS
+// Applied to a pseudo-element if existing ones are not sufficient, or integrated into existing ones.
+// Assuming ::after is available or one of the existing ::before/::after from Dimensional Nexus can be augmented.
+// This example augments the ::after from Dimensional Nexus Phase 1 (Quantum Foam & Temporal Displacement)
+.Root__nav-bar {
+  &::after {
+    // Keep existing Dimensional Nexus ::after styles (Quantum Foam, Temporal Displacement)
+    // Add new properties or modify existing ones related to the temporal echo
+    transition: opacity 1s ease, filter 1s ease,
+      transform var(--sn-sidebar-current-temporal-shift) ease-out; // Added transform
+
+    // Example: Make the temporal echo more pronounced when shift is active
+    // The --sn-sidebar-temporal-shift is a duration, not direct opacity/blur value.
+    // JS sets this. We can use it to modify animation speed or other properties if needed.
+    // For a visual echo effect, we might need another variable from JS for opacity/blur of the echo itself.
+    // Let's assume --sn-sidebar-temporal-echo-opacity and --sn-sidebar-temporal-blur are set by JS if needed.
+    opacity: calc(
+      var(--sn-quantum-foam-opacity, 0.03) +
+        var(--sn-sidebar-temporal-echo-opacity, 0)
+    );
+    filter: blur(var(--sn-sidebar-temporal-blur, 0px)); // Add blur for echo
+  }
+}
+
+// --- Sidebar Navigation Item Enhancements ---
+.Root__nav-bar {
+  // Target general navigation links. Adapt selectors as needed.
+  .main-navBar-navBarLink,
+  .main-yourLibraryX-navLinkContainer a, // For library items in grid/list view
+  .main-rootlist-rootlistItem a, // For playlist items in folders
+  .main-playlistFolder-textLink {
+    position: relative;
+    transition: all 0.4s var(--sn-easing-explorer);
+    padding: 8px 12px; // Consistent padding
+    margin: 2px 4px;
+    border-radius: var(--border-radius, 6px);
+
+    &::before {
+      // For bloom/glow effect
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(
+            var(--sn-gradient-accent-rgb, "140,170,238"),
+            calc(var(--sn-sidebar-item-bloom-intensity) * 0.7)
+          )
+          0%,
+        transparent 60%
+      );
+      opacity: 0;
+      transition: opacity 0.4s var(--sn-easing-explorer);
+      z-index: -1;
+      transform: scale(0.95);
+    }
+
+    &:hover,
+    &.main-navBar-navBarLinkActive,
+    &[aria-current="page"] {
+      background-color: rgba(
+        var(--sn-gradient-primary-rgb, "202,158,230"),
+        0.15
+      );
+      color: var(--spice-text);
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 3px 15px -5px rgba(var(--sn-gradient-primary-rgb, "202,158,230"), 0.3);
+
+      &::before {
+        // Activate bloom
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    // Energy-based text glow for high energy music
+    .sn-music-high-energy & {
+      .Type__TypeElement-sc-goliZz-0,
+      span {
+        text-shadow: 0 0 8px
+          rgba(
+            var(--sn-gradient-accent-rgb, "140,170,238"),
+            calc(0.5 * var(--sn-sidebar-energy-glow-opacity))
+          );
+      }
+    }
+  }
+
+  // Specificity for Your Library items if different selectors are needed
+  .main-yourLibraryX-listItem .main-useDropTarget-base {
+    // Common wrapper for library items
+    transition: all 0.4s var(--sn-easing-explorer);
+    border-radius: var(--border-radius, 4px);
+    padding: 6px 8px;
+    margin: 1px 4px;
+
+    &:hover {
+      background-color: rgba(
+        var(--sn-gradient-primary-rgb, "202,158,230"),
+        0.1
+      );
+      transform: scale(1.01);
+      box-shadow: 0 2px 10px -4px rgba(var(--sn-gradient-primary-rgb, "202,158,230"), 0.25);
+    } // Closes &:hover
+
+    // Active library item
+    &[aria-current="true"],
+    .main-yourLibraryX-navLinkActive & {
+      // If parent has active class
+      background-color: rgba(
+        var(--sn-gradient-accent-rgb, "140,170,238"),
+        0.15
+      );
+      box-shadow: inset 0 0 10px -5px rgba(var(--sn-gradient-accent-rgb, "140,170,238"), 0.3);
+    } // Closes &[aria-current="true"] / .main-yourLibraryX-navLinkActive &
+  } // Closes .main-yourLibraryX-listItem .main-useDropTarget-base
+
+  // Musical DNA Visualization (emoji icons)
+  .sn-item-type-playlist::after {
+    content: "\1F3A7"; /* 🎧 */
+  }
+  .sn-item-type-album::after {
+    content: "\1F4BF"; /* 💿 */
+  }
+  .sn-item-type-artist::after {
+    content: "\1F3A4"; /* 🎤 */
+  }
+  .sn-item-type-folder::after {
+    content: "\1F4C1"; /* 📁 */
+  }
+
+  [class*="sn-item-type-"]::after {
+    font-size: 0.8em;
+    margin-left: 8px;
+    opacity: 0.5;
+  }
+} // Closes the .Root__nav-bar block for navigation item enhancements

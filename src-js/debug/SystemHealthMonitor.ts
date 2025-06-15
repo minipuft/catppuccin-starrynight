@@ -99,6 +99,20 @@ export class SystemHealthMonitor {
 
   private config: MonitorConfig;
 
+  private static getStatusColor(status: string): string {
+    const statusColors: { [key: string]: string } = {
+      HEALTHY: "var(--spice-green, #a6e3a1)",
+      WARNING: "var(--spice-yellow, #f9e2af)",
+      DEGRADED: "var(--spice-peach, #fab387)",
+      FAILING: "var(--spice-red, #f38ba8)",
+      ERROR: "var(--spice-red, #f38ba8)",
+      UNKNOWN: "var(--spice-text, #cdd6f4)",
+      CRITICAL: "var(--spice-red, #f38ba8)",
+      REGISTERED: "var(--spice-blue, #89b4fa)",
+    };
+    return statusColors[status] || "var(--spice-text, #cdd6f4)";
+  }
+
   constructor() {
     this.config = {
       checkIntervalMs: 10000,
@@ -615,9 +629,9 @@ export class SystemHealthMonitor {
     const summary = this.getHealthSummary();
     console.log(
       `%cOverall Status: ${summary.overallStatus}`,
-      `color: ${
-        statusColors[summary.overallStatus] || "#fff"
-      }; font-weight: bold;`
+      `color: ${SystemHealthMonitor.getStatusColor(
+        summary.overallStatus
+      )}; font-weight: bold;`
     );
     console.log(
       `Summary: ${summary.healthy} Healthy, ${summary.warning} Warning, ${summary.failing} Failing`
@@ -627,7 +641,9 @@ export class SystemHealthMonitor {
       const latestResult = this.getLatestHealthResult(systemName);
       if (!latestResult) return;
 
-      const statusColor = statusColors[latestResult.status] || "#999";
+      const statusColor = SystemHealthMonitor.getStatusColor(
+        latestResult.status
+      );
       console.log(
         `%c● ${systemName} - ${latestResult.status}`,
         `color: ${statusColor}; font-weight: bold;`

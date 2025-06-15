@@ -402,6 +402,16 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
       const normalizedPhase = rhythmPhase % (Math.PI * 2);
       queueCSSUpdate("--sn-rhythm-phase", normalizedPhase.toFixed(4));
 
+      // 🆕 ADD MISSING BEAT PULSE INTENSITY - Critical for now playing animations
+      const beatPulseIntensity = Math.max(
+        0,
+        Math.min(1, this.beatIntensity * 0.7 + this.currentEnergy * 0.3)
+      );
+      queueCSSUpdate(
+        "--sn-beat-pulse-intensity",
+        beatPulseIntensity.toFixed(4)
+      );
+
       this.performanceMetrics.cssVariableUpdates++;
     } catch (error) {
       if (this.config.enableDebug) {

@@ -1,0 +1,38 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 BEAT SYNC ENHANCED - Advanced Rhythm Synchronization
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Now Playing Bar (Bottom Player) Beat Synchronization
+.main-nowPlayingBar-nowPlayingBar {
+  // Continuous breathing effect, slightly different to distinguish from Action Bar
+  transform: scale(var(--sn-breathing-scale, 1));
+  transition: transform 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  // Pulse on the heart icon - YEAR 3000 LOVE AMPLIFIER
+  .main-addButton-button.control-button-heart {
+    // Kinetic Verb: BLOOM - Love beats stronger!
+    transform: scale(
+      calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.15))
+    ); // Enhanced heart pulse: max 15% size increase
+    transition: transform 140ms cubic-bezier(0.175, 0.885, 0.32, 1.4);
+
+    // Additional cosmic glow for heart
+    filter: drop-shadow(
+      0 0 calc(6px * var(--sn-beat-pulse-intensity, 0))
+        rgba(
+          var(--spice-rgb-red, 243, 139, 168),
+          calc(0.6 * var(--sn-beat-pulse-intensity, 0))
+        )
+    );
+  }
+}
+
+// General subtle pulse for cards on beat (optional, can be performance heavy)
+/* Uncomment if desired and performance allows
+.main-card-card {
+  &:hover { // Only apply strong pulse on hover to save performance
+     transform: translateY(-2px) scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.02)));
+  }
+  transition: transform 200ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+*/

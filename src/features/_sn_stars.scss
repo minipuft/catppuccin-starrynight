@@ -27,15 +27,18 @@
   --particle-cluster-drift: 120px;
 
   // === Dynamic Color Integration ===
-  --particle-primary-energy: var(
-    --sn-gradient-primary,
-    rgba(202, 158, 230, 0.8)
+  --particle-primary-energy: rgba(
+    var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+    0.8
   );
-  --particle-secondary-energy: var(
-    --sn-gradient-secondary,
-    rgba(186, 187, 241, 0.6)
+  --particle-secondary-energy: rgba(
+    var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0, 186,187,241)),
+    0.6
   );
-  --particle-accent-energy: var(--sn-gradient-accent, rgba(140, 170, 238, 0.7));
+  --particle-accent-energy: rgba(
+    var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+    0.7
+  );
 
   // === Contextual Intelligence ===
   --particle-focus-dampening: 0.3; // Reduces in focus contexts

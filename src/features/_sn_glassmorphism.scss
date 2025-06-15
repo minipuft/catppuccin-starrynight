@@ -80,7 +80,7 @@
   box-shadow: 0 8px 32px var(--enhanced-shadow),
     0 2px calc(16px + var(--sn-beat-pulse-intensity, 0) * 8px)
       rgba(
-        var(--sn-gradient-primary-rgb, "202,158,230"),
+        var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
         calc(var(--sn-beat-pulse-intensity, 0) * 0.2)
       );
 
@@ -103,16 +103,16 @@
     z-index: -1;
     background: linear-gradient(
       calc(135deg + var(--sn-glass-spectrum-shift)),
-      rgba(
-          var(--sn-gradient-primary-rgb, "202,158,230"),
-          calc(var(--sn-beat-pulse-intensity, 0) * 0.1)
-        )
+            rgba(
+        var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+        calc(var(--sn-beat-pulse-intensity, 0) * 0.1)
+      )
         0%,
       transparent 40%,
-      rgba(
-          var(--sn-gradient-accent-rgb, "140,170,238"),
-          calc(var(--sn-beat-pulse-intensity, 0) * 0.08)
-        )
+            rgba(
+        var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+        calc(var(--sn-beat-pulse-intensity, 0) * 0.08)
+      )
         100%
     );
     animation: glassConsciousnessFlow
@@ -174,10 +174,10 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(
-          var(--sn-gradient-primary-rgb, "202,158,230"),
-          var(--sn-beat-pulse-intensity, 0)
-        )
+            rgba(
+        var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+        var(--sn-beat-pulse-intensity, 0)
+      )
         50%,
       transparent 100%
     );
@@ -192,10 +192,10 @@
   box-shadow: 0 16px 64px
       rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2),
     0 8px calc(32px + var(--sn-beat-pulse-intensity, 0) * 16px)
-      rgba(
-        var(--sn-gradient-primary-rgb, "202,158,230"),
-        calc(var(--sn-beat-pulse-intensity, 0) * 0.15)
-      );
+          rgba(
+      var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+      calc(var(--sn-beat-pulse-intensity, 0) * 0.15)
+    );
 
   // REFRACT border with rhythm
   border: 1px solid

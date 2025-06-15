@@ -28,8 +28,8 @@
   --sn-search-contrast-boost: 1; // Set by harmony engine when needed
   --sn-search-fallback-primary: var(
     --sn-gradient-primary,
-    #ca9ee6
-  ); // Harmony engine fallback
+    #8caaee
+  ); // Harmony engine fallback using default StarryNight accent
 
   // Enhanced intensity with harmony boost support - more vibrant defaults
   --sn-search-intensity-boosted: calc(

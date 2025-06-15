@@ -51,6 +51,18 @@
   }
 }
 
+// Fade-in animation used by atmospheric-item
+@keyframes atmospheric-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--ambient-float-range, 20px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 // Atmospheric Grid Layout (Year 3000 Compatible)
 // Uses existing grid system and enhances with atmospheric properties
 @mixin atmospheric-grid {
@@ -73,8 +85,8 @@
   transform: translateY(var(--ambient-float-range, 20px));
   // Animation driven by CSS variables for dynamic control
   animation: atmospheric-float var(--ambient-float-duration, 6s)
-      \var(--ambient-float-timing, ease-in-out)infinite alternate,
-    \atmospheric-fade-in0.8s\cubic-bezier(0.25, 0.46, 0.45, 0.94)forwards;
+      var(--ambient-float-timing, ease-in-out) infinite alternate,
+    atmospheric-fade-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   animation-delay: calc(var(--ambient-float-stagger, 0.1s) * #{$index});
 
   // Include dynamic glassmorphism (Year 3000 compatible)
@@ -87,9 +99,8 @@
   &:hover {
     // ALL CSS declarations must come first, before any @include or nested rules
     // Dynamic hover effects using CSS variables
-    // Example: brightness, saturation - specific transforms handled by other modules
     filter: brightness(var(--hover-brightness, 1.05))
-      \saturate(var(--hover-saturation, 1.15));
+      saturate(var(--hover-saturation, 1.15));
     // Keep transition smooth for hover effects
     transition: filter 0.3s ease, transform 0.3s ease; // Ensure transform is part of transition if changed on hover
   }

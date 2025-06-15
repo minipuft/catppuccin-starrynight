@@ -1,0 +1,89 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 ACTION BAR ENHANCED - Harmonic Oscillation & Beat Sync
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Action Bar integration for Phase 1 - YEAR 3000 HARMONIC OSCILLATION
+.main-actionBarBackground-background {
+  background: linear-gradient(
+    calc(135deg + (var(--sn-rhythm-phase, 0) * 5deg)),
+    // Kinetic Verb: HARMONIZE - Subtle angle oscillation
+    rgba(
+        var(--sn-header-primary-rgb, var(--spice-rgb-accent)),
+        calc(var(--sn-header-intensity, 0.2) * 0.85)
+      )
+      0%,
+    rgba(
+        var(--sn-header-secondary-rgb, var(--spice-rgb-surface0)),
+        calc(var(--sn-header-intensity, 0.2) * 0.75)
+      )
+      50%,
+    rgba(
+        var(--sn-header-accent-rgb, var(--spice-rgb-surface1)),
+        calc(var(--sn-header-intensity, 0.2) * 0.65)
+      )
+      100%
+  ) !important;
+  backdrop-filter: blur(15px)
+    saturate(calc(1.15 + (var(--sn-breathing-scale, 1) - 1) * 0.3));
+  transition: background 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  // Kinetic Verb: REFRACT - Subtle hue breathing with rhythm
+  filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 2deg))
+    brightness(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.1)));
+}
+
+.main-actionBar-ActionBarRow {
+  // Ensure content within the action bar is visually distinct
+  // This might need further refinement based on specific child elements
+  position: relative;
+  z-index: 1;
+
+  .main-playButton-PlayButton,
+  .main-shuffleButton-button,
+  .main-button-button {
+    // Example: add subtle shadow to buttons for better contrast
+    text-shadow: 0 0 5px rgba(var(--spice-rgb-shadow), 0.3);
+    // Ensure button backgrounds are slightly translucent if desired
+    // background-color: rgba(var(--spice-rgb-main), 0.1) !important;
+  }
+
+  // Continuous breathing effect based on rhythm
+  transform: scale(var(--sn-breathing-scale, 1));
+  transition: transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94); // Smooth transition for breathing
+
+  // Pulse effect on beat detection - YEAR 3000 ENHANCED
+  .main-playButton-PlayButton,
+  .main-shuffleButton-button,
+  .main-button-button {
+    // Kinetic Verb: BLOOM - More pronounced pulse for stronger connection
+    transform: scale(
+      calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.12))
+    ); // Enhanced pulse: max 12% size increase - sell the effect!
+    transition: transform 120ms cubic-bezier(0.175, 0.885, 0.32, 1.375); // Snappier, bouncier pulse
+
+    // Additional enhancement: subtle glow pulse
+    box-shadow: 0 0 calc(8px * var(--sn-beat-pulse-intensity, 0))
+      rgba(
+        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+        calc(0.4 * var(--sn-beat-pulse-intensity, 0))
+      );
+  }
+
+  // Optional: Background pulse for the entire action bar (can be intense)
+  &::after {
+    content: "";
+    position: absolute;
+    left: 10%; // Start inset from edges
+    right: 10%; // End inset from edges
+    top: 50%;
+    height: 4px; // Fixed height for the bar
+    transform: translateY(-50%) scaleX(var(--sn-beat-pulse-intensity, 0)); // Pulse width with beat, centered
+    background: rgba(
+      var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+      0.7
+    ); // Solid color for the bar, using a dynamic theme color
+    border-radius: 2px; // Rounded edges for the bar
+    transition: transform 120ms cubic-bezier(0.175, 0.885, 0.32, 1.375); // Snappy pulse
+    z-index: -1; // Behind the buttons
+  }
+}

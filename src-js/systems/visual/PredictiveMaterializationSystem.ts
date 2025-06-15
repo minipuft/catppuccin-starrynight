@@ -90,20 +90,31 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
   }
 
   private _setInitialMaterializationCSS(): void {
-    const safeSetProperty = (name: string, value: string) => {
+    const applyCss = (prop: string, val: string) => {
       try {
-        this.rootElement.style.setProperty(name, value);
+        if (
+          (this as any).year3000System &&
+          (this as any).year3000System.queueCSSVariableUpdate
+        ) {
+          (this as any).year3000System.queueCSSVariableUpdate(
+            prop,
+            val,
+            this.rootElement
+          );
+        } else {
+          this.rootElement.style.setProperty(prop, val);
+        }
       } catch (e: any) {
         if (this.config?.enableDebug) {
           console.warn(
-            `[${this.systemName}] Error setting CSS variable ${name}:`,
+            `[${this.systemName}] Error setting CSS variable ${prop}:`,
             e.message
           );
         }
       }
     };
-    safeSetProperty("--sn-materialize-imminence", "0");
-    safeSetProperty("--sn-materialize-clarity", "0");
+    applyCss("--sn-materialize-imminence", "0");
+    applyCss("--sn-materialize-clarity", "0");
   }
 
   public updateFromMusicAnalysis(processedMusicData: ProcessedMusicData): void {
@@ -142,24 +153,35 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
       Math.min(1, this.materializationState.clarity)
     );
 
-    const safeSetProperty = (name: string, value: string) => {
+    const applyCss = (prop: string, val: string) => {
       try {
-        this.rootElement.style.setProperty(name, value);
+        if (
+          (this as any).year3000System &&
+          (this as any).year3000System.queueCSSVariableUpdate
+        ) {
+          (this as any).year3000System.queueCSSVariableUpdate(
+            prop,
+            val,
+            this.rootElement
+          );
+        } else {
+          this.rootElement.style.setProperty(prop, val);
+        }
       } catch (e: any) {
         if (this.config?.enableDebug) {
           console.warn(
-            `[${this.systemName}] Error setting CSS variable ${name} during update:`,
+            `[${this.systemName}] Error setting CSS variable ${prop} during update:`,
             e.message
           );
         }
       }
     };
 
-    safeSetProperty(
+    applyCss(
       "--sn-materialize-imminence",
       `${this.materializationState.imminence.toFixed(3)}`
     );
-    safeSetProperty(
+    applyCss(
       "--sn-materialize-clarity",
       `${this.materializationState.clarity.toFixed(3)}`
     );

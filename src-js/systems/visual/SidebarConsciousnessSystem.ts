@@ -314,11 +314,32 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
       "sn-music-high-energy"
     );
     this.rootNavBar.classList.add(`sn-music-${energyLevel}-energy`);
-    this.rootNavBar.style.setProperty(
-      "--sidebar-intensity",
-      `${visualIntensity}`
-    );
     this.rootNavBar.setAttribute("data-mood", moodIdentifier);
+
+    // === Year 3000 – Dynamic navigation glow & text energy ===
+    // Map music‐derived visual intensity (0–1) onto sidebar nav CSS vars so
+    // SCSS in _sidebar_dimensional_nexus.scss can render real-time glow.
+    const glow = Math.max(0, Math.min(1, visualIntensity));
+    const textOpacity = Math.min(0.5, glow * 0.6);
+
+    const applyCss = (prop: string, val: string) => {
+      if (
+        this.year3000System &&
+        (this.year3000System as any).queueCSSVariableUpdate
+      ) {
+        (this.year3000System as any).queueCSSVariableUpdate(
+          prop,
+          val,
+          this.rootNavBar as HTMLElement
+        );
+      } else {
+        (this.rootNavBar as HTMLElement).style.setProperty(prop, val);
+      }
+    };
+
+    applyCss("--sn-nav-item-glow-intensity", `${glow}`);
+    applyCss("--sn-nav-text-energy-opacity", `${textOpacity}`);
+    applyCss("--sidebar-intensity", `${visualIntensity}`);
   }
 
   public updateFromMusicAnalysis(

@@ -1,0 +1,338 @@
+// =============================================================================
+// Catppuccin StarryNight - Phase 6 SCSS Additions
+// =============================================================================
+
+@use "../core/mixins" as *;
+
+:root {
+  // --- Phase 6: Predictive Materialization System ---
+  --sn-predictive-echo-opacity: 0;
+  --sn-predictive-echo-scale: 1;
+  --sn-dimensional-rift-intensity: 0;
+  --sn-dimensional-rift-color-rgb: 140, 170, 238; // Default: blue
+
+  // --- Phase 6: Dimensional Nexus - Atmospheric & Entanglement ---
+  --sn-sidebar-atmosphere-hue-shift: 0deg;
+  --sn-sidebar-atmosphere-saturation-factor: 1;
+  --sn-sidebar-atmosphere-vibration-intensity: 0; // 0 to 1
+  --sn-sidebar-entanglement-intensity: 0; // 0 to 0.1
+  --sn-sidebar-entanglement-color-rgb: var(
+    --spice-rgb-main,
+    48,
+    52,
+    70
+  ); // Default: main bg
+
+  // --- Phase 6: DataGlyphSystem - Temporal Echoes & Resonance ---
+  // Item-specific, but defaults can be useful for base styling or if not overridden
+  --sn-nav-item-echo-opacity: 0;
+  --sn-nav-item-echo-scale: 1;
+  --sn-glyph-resonance-intensity: 0; // 0 to 0.2 for glyph enhancement
+}
+
+// =============================================================================
+// PHASE 6: STYLING IMPLEMENTATIONS
+// =============================================================================
+
+// 1. Predictive Materialization System Effects
+// ============================================
+
+// Styles for a generic predictive echo item (applied by JS)
+.sn-predictive-echo-item {
+  opacity: var(--sn-predictive-echo-opacity, 0);
+  transform: scale(var(--sn-predictive-echo-scale, 1));
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  // Add a subtle shimmer or pulse if desired
+  animation: sn-echo-shimmer 3s infinite ease-in-out alternate;
+}
+
+@keyframes sn-echo-shimmer {
+  0% {
+    filter: brightness(100%) saturate(100%);
+  }
+  50% {
+    filter: brightness(120%) saturate(110%);
+  }
+  100% {
+    filter: brightness(100%) saturate(100%);
+  }
+}
+
+// Styles for a dimensional rift effect (conceptual, likely a pseudo-element on a target)
+.sn-dimensional-rift-target {
+  // Example target class JS might add this to
+  position: relative;
+  overflow: visible; // Allow pseudo-element to extend
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at center,
+      rgba(
+          var(--sn-dimensional-rift-color-rgb, 140, 170, 238),
+          calc(var(--sn-dimensional-rift-intensity, 0) * 0.3)
+        )
+        0%,
+      rgba(
+          var(--sn-dimensional-rift-color-rgb, 140, 170, 238),
+          calc(var(--sn-dimensional-rift-intensity, 0) * 0.1)
+        )
+        40%,
+      transparent 70%
+    );
+    transform: translate(-50%, -50%)
+      scale(calc(0.5 + var(--sn-dimensional-rift-intensity, 0) * 0.5));
+    opacity: var(--sn-dimensional-rift-intensity, 0);
+    filter: blur(
+      calc(10px * (1 - var(--sn-dimensional-rift-intensity, 0)) + 5px)
+    );
+    animation: sn-rift-pulse 4s infinite ease-in-out;
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out,
+      background 0.6s ease-out;
+    pointer-events: none;
+    z-index: -1; // Behind content usually
+  }
+}
+
+@keyframes sn-rift-pulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%)
+      scale(calc(0.5 + var(--sn-dimensional-rift-intensity, 0) * 0.5));
+  }
+  50% {
+    transform: translate(-50%, -50%)
+      scale(calc(0.5 + var(--sn-dimensional-rift-intensity, 0) * 0.6));
+  }
+}
+
+// 2. Dimensional Nexus - Atmospheric & Entanglement Enhancements
+// ===============================================================
+
+.Root__nav-bar {
+  // Or whichever element holds the main sidebar background layers
+  // Apply atmospheric hue shift and saturation to the whole sidebar or specific layers
+  // This example applies it to the main sidebar container. Be careful with specificity.
+  filter: hue-rotate(var(--sn-sidebar-atmosphere-hue-shift, 0deg))
+    saturate(var(--sn-sidebar-atmosphere-saturation-factor, 1));
+  transition: filter 1.5s ease-in-out; // Smooth transition for atmospheric changes
+
+  // Entanglement: Add a pseudo-element for the color bleed effect
+  &::after {
+    // Or another pseudo-element if ::after is already in use
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(
+      var(--sn-sidebar-entanglement-color-rgb, 48, 52, 70),
+      var(--sn-sidebar-entanglement-intensity, 0)
+    );
+    mix-blend-mode: color-dodge; // Or other blend modes like soft-light, overlay
+    pointer-events: none;
+    z-index: 0; // Ensure it's above base background but below content if needed
+    transition: background-color 1.2s ease-in-out;
+    opacity: var(
+      --sn-sidebar-entanglement-intensity,
+      0
+    ); // Control via intensity var
+  }
+
+  // Vibration Effect (applied to a background layer, e.g., ::before or a dedicated div)
+  // Assuming .sn-sidebar-vibration-layer is a child or pseudo of .Root__nav-bar
+  .sn-sidebar-vibration-layer,
+  &::before {
+    // Example targets
+    // If var is 0, no animation. If > 0, animation runs.
+    // JS could add/remove a class to control animation play state too.
+    animation-name: sn-sidebar-vibrate;
+    animation-duration: 0.3s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    animation-play-state: var(--_sidebar-vibration-play-state, paused);
+    // Helper variable to control play state based on intensity
+    --_sidebar-vibration-play-state: if(
+      var(--sn-sidebar-atmosphere-vibration-intensity, 0) > 0.01,
+      running,
+      paused
+    );
+  }
+}
+
+@keyframes sn-sidebar-vibrate {
+  0% {
+    transform: translate(
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * 0.2px),
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * 0.2px)
+    );
+  }
+  25% {
+    transform: translate(
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * -0.2px),
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * 0.3px)
+    );
+  }
+  50% {
+    transform: translate(
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * 0.3px),
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * -0.2px)
+    );
+  }
+  75% {
+    transform: translate(
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * -0.1px),
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * -0.3px)
+    );
+  }
+  100% {
+    transform: translate(
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * 0.2px),
+      calc(var(--sn-sidebar-atmosphere-vibration-intensity, 0) * 0.2px)
+    );
+  }
+}
+
+// 3. DataGlyphSystem - Temporal Echoes & Resonance
+// =================================================
+
+.sn-data-glyph {
+  position: relative; // For pseudo-element positioning if used for echo
+  // Base styles... (opacity, size, color already handled by JS on the element or its CSS vars)
+
+  // Resonance: Enhance existing properties or add new ones
+  // Example: Adding a subtle glow based on resonance intensity
+  // The base glyph color and opacity are set via --sn-glyph-color-rgb and --sn-glyph-opacity
+  // Resonance can add to this, e.g. making the base color slightly more intense or adding a distinct glow.
+  box-shadow: 0 0 calc(2px + var(--sn-glyph-resonance-intensity, 0) * 15px)
+    rgba(
+      var(--sn-glyph-color-rgb, var(--spice-rgb-accent)),
+      calc(0.1 + var(--sn-glyph-resonance-intensity, 0) * 0.5)
+    );
+  transition: box-shadow 0.4s ease-in-out; // Smooth resonance changes
+
+  // Temporal Echo (achieved via JS setting --sn-nav-item-echo-opacity/scale on the glyph element)
+  // Or using a pseudo-element if the glyph itself needs to remain unchanged during echo
+  &.sn-nav-item-echoing {
+    // The following assumes JS sets these vars directly on the .sn-data-glyph or its wrapper
+    // when echo is active, and SCSS primarily defines the animation behavior.
+    // An alternative is to use a ::after pseudo-element for the echo.
+    animation: sn-temporal-echo-animation 0.75s ease-out forwards;
+  }
+}
+
+@keyframes sn-temporal-echo-animation {
+  0% {
+    opacity: var(--sn-nav-item-echo-opacity, 0.3); // Start opacity (set by JS)
+    transform: scale(
+      var(--sn-nav-item-echo-scale, 1.15)
+    ); // Start scale (set by JS)
+    filter: brightness(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+    filter: brightness(1.5);
+  }
+}
+
+// =============================================================================
+// PHASE 6.1: Sidebar Thematic Integration - Enhanced Background
+// =============================================================================
+.Root__nav-bar {
+  position: relative; // Ensure positioning context for pseudo-elements
+  z-index: 1; // Ensure sidebar itself is above main view pseudo-elements if overlapping fixed might occur
+
+  &::before {
+    content: "";
+    position: absolute; // Covers the sidebar area
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1; // Behind the sidebar's direct content and its own background
+
+    // Gradient similar to .Root__main-view but adapted for sidebar context
+    background: linear-gradient(
+      180deg,
+      // Top to bottom
+      rgba(var(--sn-gradient-primary-rgb), 0.3) 0%,
+      rgba(var(--sn-gradient-secondary-rgb), 0.15) 50%,
+      rgba(var(--sn-gradient-accent-rgb), 0.25) 100%
+    );
+
+    opacity: var(--sn-dynamic-opacity); // Use theme's dynamic opacity
+
+    // Integrate sidebar-specific atmospheric effects and standard gradient filters
+    filter: blur(var(--sn-gradient-blur))
+      saturate(
+        calc(
+          var(--sn-dynamic-saturation) *
+            var(--sn-sidebar-atmosphere-saturation-factor, 1)
+        )
+      )
+      brightness(
+        calc(
+          var(--sn-dynamic-brightness) *
+            (1 + var(--sn-sidebar-atmosphere-vibration-intensity, 0) * 0.1)
+        )
+      )
+      // Vibration slightly increases brightness
+      contrast(var(--sn-gradient-contrast))
+      hue-rotate(var(--sn-sidebar-atmosphere-hue-shift, 0deg));
+
+    transition: opacity var(--sn-gradient-transition),
+      filter var(--sn-gradient-transition);
+
+    @include performance-optimized;
+  }
+
+  // Note: The existing direct background on .Root__nav-bar from _sn_glassmorphism.scss
+  // is var(--enhanced-background) which is rgba(var(--spice-rgb-surface0), var(--color-enhancement-opacity)).
+  // With --color-enhancement-opacity at its default (0.1), this should allow our ::before gradient to show through.
+}
+
+// Further integration for nav items, building upon _sn_atmospheric.scss styles
+// This ensures hover/active states also feel part of the new background.
+.main-yourLibrary-yourLibrary .main-rootlist-wrapper .spicetify-playlist-list {
+  li {
+    // Slightly more pronounced effect on hover to match the new background intensity
+    &:hover {
+      background: rgba(var(--sn-gradient-primary-rgb), 0.15);
+      box-shadow: 0 0 15px rgba(var(--sn-gradient-primary-rgb), 0.2);
+      transform: translateX(3px) scale(1.01);
+    }
+
+    &[aria-selected="true"],
+    &.main-rootlist-rootlistItemActive {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--sn-gradient-accent-rgb), 0.25) 0%,
+        rgba(var(--sn-gradient-primary-rgb), 0.1) 100%
+      );
+      border-left: 3px solid rgba(var(--sn-gradient-accent-rgb), 0.7);
+      box-shadow: inset 3px 0 8px -2px rgba(var(--sn-gradient-accent-rgb), 0.3);
+    }
+  }
+}
+
+.main-navBar-navBar .main-navBar-navBarLink {
+  &:hover {
+    background: rgba(var(--sn-gradient-primary-rgb), 0.2);
+    box-shadow: 0 0 15px rgba(var(--sn-gradient-primary-rgb), 0.25);
+    transform: translateY(-1px) scale(1.02);
+  }
+
+  &.main-navBar-navBarLinkActive {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--sn-gradient-accent-rgb), 0.3) 0%,
+      rgba(var(--sn-gradient-primary-rgb), 0.15) 100%
+    );
+    box-shadow: 0 2px 10px rgba(var(--sn-gradient-accent-rgb), 0.2);
+  }
+}

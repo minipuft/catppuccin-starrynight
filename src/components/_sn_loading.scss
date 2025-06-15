@@ -212,9 +212,9 @@
       bottom: 0;
       background: linear-gradient(
         135deg,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-mauve)), 0.1) 0%,
+        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.1) 0%,
         transparent 50%,
-        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-lavender)), 0.1)
+        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.1)
           100%
       );
       animation: loading-pulse 2s ease-in-out infinite;
@@ -324,7 +324,7 @@
               90deg,
               transparent 0%,
               rgba(
-                  var(--sn-gradient-primary-rgb, var(--spice-rgb-lavender)),
+                  var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
                   calc(var(--loading-intensity-search) * 0.2)
                 )
                 50%,
@@ -361,7 +361,7 @@
           circle,
           transparent 30%,
           rgba(
-              var(--sn-gradient-primary-rgb, var(--spice-rgb-peach)),
+              var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
               calc(var(--loading-intensity-artist) * 0.4)
             )
             60%,

@@ -5,9 +5,24 @@
 // Reduces DOM manipulation overhead for better performance
 
 interface CSSVariableBatcherConfig {
+  /**
+   * Minimum delay (ms) before a pending batch is flushed. A value of 16 ms
+   * aligns with ~60 FPS.
+   */
   batchIntervalMs: number;
+  /** Maximum number of queued updates before an immediate flush. */
   maxBatchSize: number;
+  /** Enables verbose logging. */
   enableDebug: boolean;
+  /**
+   * Legacy fast-path that rewrites the entire `cssText` string for batches
+   * larger than three updates. This path is measurably faster in some very
+   * old browsers but causes heavy style-recalc costs in modern engines.
+   *
+   * Default = false (safer). Set to `true` to restore the previous behaviour
+   * for environments that still benefit from it.
+   */
+  useCssTextFastPath?: boolean;
 }
 
 interface PerformanceMetrics {
@@ -43,9 +58,10 @@ export class CSSVariableBatcher {
 
   constructor(config: Partial<CSSVariableBatcherConfig> = {}) {
     this.config = {
-      batchIntervalMs: config.batchIntervalMs || 16, // ~60fps batch rate
-      maxBatchSize: config.maxBatchSize || 50,
-      enableDebug: config.enableDebug || false,
+      batchIntervalMs: config.batchIntervalMs ?? 16, // ~60fps batch rate
+      maxBatchSize: config.maxBatchSize ?? 50,
+      enableDebug: config.enableDebug ?? false,
+      useCssTextFastPath: config.useCssTextFastPath ?? false,
       ...config,
     };
 
@@ -140,7 +156,7 @@ export class CSSVariableBatcher {
       }
 
       for (const [element, elementUpdates] of updatesByElement.entries()) {
-        if (elementUpdates.length > 3) {
+        if (elementUpdates.length > 3 && this.config.useCssTextFastPath) {
           let cssText = element.style.cssText;
           for (const update of elementUpdates) {
             const propertyPattern = new RegExp(

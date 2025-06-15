@@ -8,6 +8,7 @@
 @forward "src/core/_sn_gradient";
 @forward "src/core/_kinetic-animations"; // Year 3000 Kinetic Verb Animations
 @forward "src/core/_main";
+@forward "src/core/variables";
 
 // Layout modules
 @forward "src/layout/_navbar";
@@ -17,8 +18,9 @@
 
 // Component-specific styles
 @forward "src/components/_now_playing";
+@forward "src/components/sn_card_base";
+@forward "src/components/sn_card_non_search";
 @forward "src/components/sn_enhanced_cards";
-@forward "src/components/sn_unified_cards";
 @forward "src/components/sn_loading";
 
 // StarryNight Feature Modules
@@ -36,8 +38,8 @@
 @forward "src/search/sn_search_precision";
 
 // Sidebar Visual System Modules
-@forward "src/sidebar/sidebar-consciousness";
-@forward "src/sidebar/sidebar_dimensional_nexus";
+@forward "src/sidebar/sidebar_background_effects";
+@forward "src/sidebar/sidebar_interactive";
 
 // Features
 //@import "src/features/tooltips";

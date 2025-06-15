@@ -1,0 +1,49 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 PERFORMANCE OPTIMIZATION - GPU Acceleration & Efficiency
+// ████████████████████████████████████████████████████████████████████████████████
+
+// GPU Acceleration Hints for High-Performance Elements
+.sn-gpu-accelerated {
+  // Force GPU layer creation for smooth animations
+  transform: translateZ(0);
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+// Performance-optimized transitions
+:root {
+  // Standard transition timings optimized for 60fps
+  --sn-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --sn-transition-standard: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --sn-transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Specialized easing for different animation types
+  --sn-ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --sn-ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --sn-ease-sharp: cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+// Apply performance optimizations to key animated elements
+.main-card-card,
+.main-trackList-trackListRow,
+.main-actionBar-ActionBarRow,
+.main-nowPlayingBar-nowPlayingBar {
+  @extend .sn-gpu-accelerated;
+}
+
+// Reduce motion for users who prefer it
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  // Disable complex visual effects for performance
+  .sn-stars-container,
+  .shootingstar {
+    display: none !important;
+  }
+}

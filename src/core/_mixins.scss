@@ -335,7 +335,10 @@
 }
 
 // Subtle gradient glow for hover states
-@mixin gradient-glow($color: var(--sn-gradient-primary), $intensity: 0.2) {
+@mixin gradient-glow(
+  $color: rgba(var(--sn-dynamic-accent-rgb, var(--spice-rgb-accent)), 1),
+  $intensity: 0.2
+) {
   @include performance-optimized;
 
   position: relative;
@@ -349,10 +352,13 @@
     bottom: -2px;
     background: linear-gradient(
       135deg,
-      rgba(var(--spice-rgb-accent), $intensity) 0%,
+      rgba(var(--sn-dynamic-accent-rgb, var(--spice-rgb-accent)), $intensity) 0%,
       transparent 40%,
       transparent 60%,
-      rgba(var(--spice-rgb-accent), calc($intensity * 0.7)) 100%
+      rgba(
+        var(--sn-dynamic-accent-rgb, var(--spice-rgb-accent)),
+        calc($intensity * 0.7)
+      ) 100%
     );
     border-radius: inherit;
     z-index: -1;
@@ -496,22 +502,53 @@
   }
 }
 
-// Enhanced text gradient with fallback
+// === Year 3000 Text Gradient Utility ======================================
+// Supports angle & multi-stop maps while remaining backward-compatible.
+// Example multi-stop usage:
+//   $stops: (
+//     0%: rgba(var(--sn-gradient-primary-rgb),1),
+//     60%: rgba(var(--sn-gradient-secondary-rgb),1),
+//     100%: rgba(var(--sn-gradient-accent-rgb),1)
+//   );
+//   @include text-gradient(null, null, 90deg, $stops);
+
 @mixin text-gradient(
   $start: var(--sn-gradient-primary),
-  $end: var(--sn-gradient-accent)
+  $end: var(--sn-gradient-accent),
+  $angle: 135deg,
+  $stops: null
 ) {
-  // Move all declarations before nested rules
-  background: linear-gradient(135deg, $start 0%, $end 100%);
+  // Build gradient string
+  $gradient: null;
+
+  @if $stops == null {
+    $gradient: unquote("linear-gradient(#{$angle}, #{$start} 0%, #{$end} 100%)");
+  } @else {
+    $pairs: ();
+    @each $pos, $color in $stops {
+      $pairs: append($pairs, "#{$color} #{$pos}", comma);
+    }
+    $gradient: unquote("linear-gradient(#{$angle}, #{$pairs})");
+  }
+
+  background: $gradient;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 1px 2px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.1);
 
-  // Robust fallback for unsupported browsers
+  // Fallback for browsers not supporting text clipping
   @supports not (background-clip: text) {
     color: var(--spice-text);
     background: none;
     -webkit-text-fill-color: unset;
   }
+}
+
+// === Year 3000 Dynamic Text Glow ==========================================
+// Creates a soft glow whose strength follows a CSS variable (0-1).
+// Example: @include text-glow(--sn-gradient-accent-rgb);
+@mixin text-glow($rgbVar, $intensityVar: --sn-text-glow-intensity) {
+  text-shadow: 0 0 calc(2px + 6px * var(#{$intensityVar}))
+      rgba(var(#{$rgbVar}), calc(0.3 + 0.4 * var(#{$intensityVar}))),
+    0 1px 2px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.1);
 }

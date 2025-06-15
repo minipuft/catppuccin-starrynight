@@ -1,0 +1,20 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 Z-INDEX MANAGEMENT - StarryNight Effects Layer Control
+// ████████████████████████████████████████████████████████████████████████████████
+
+.sn-stars-container {
+  z-index: 1 !important; // Ensure it's above main backgrounds but below particles and UI
+}
+
+.shootingstar {
+  z-index: 2 !important; // Above stars, below particles and UI
+  position: fixed; // Ensure positioning context for z-index if not already set globally
+}
+
+// Particle canvas (#sn-particle-canvas) is set to z-index: 3 via JavaScript.
+// Ensure main content containers are appropriately z-indexed if they need to be above particles,
+// or below the main background effects.
+// For example, if .Root__main-view .main-view-container__scroll-node itself should be at the very bottom:
+// .Root__main-view .main-view-container__scroll-node {
+//   z-index: 0; // Or an appropriate base level like -3 if pseudo-elements are -2 and -1
+// }

@@ -1,0 +1,11 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 BEAT SYNC VARIABLES - Real-Time Beat Synchronization
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Define CSS variables used by BeatSyncVisualSystem if not already defined
+// These are primarily set by JS, but can have fallbacks here.
+:root {
+  --sn-beat-pulse-intensity: 0; // Smoothed value from JS (0 to 1 typically)
+  --sn-rhythm-phase: 0; // Continuous value from JS (radians)
+  --sn-breathing-scale: 1; // Continuous value from JS (e.g., 0.95 to 1.05)
+}

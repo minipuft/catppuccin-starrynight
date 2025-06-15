@@ -36,7 +36,7 @@
 
   // === COSMIC TEXT ENHANCEMENT ===
   --sn-text-cosmic-shadow: rgba(
-    var(--sn-gradient-primary-rgb, "202,158,230"),
+    var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
     calc(var(--sn-beat-pulse-intensity, 0) * 0.8)
   );
   --sn-text-energy-brightness: calc(
@@ -60,19 +60,24 @@
 // Enhanced text gradient with BeatSync consciousness
 @mixin text-consciousness($intensity: var(--text-gradient-intensity)) {
   @include text-gradient(
-    rgba(var(--spice-rgb-accent), $intensity),
-    rgba(var(--spice-rgb-subtext), calc($intensity * 0.7))
+    rgba(
+      var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb)),
+      $intensity
+    ),
+    rgba(
+      var(--sn-gradient-secondary-rgb, var(--spice-rgb-subtext)),
+      calc($intensity * 0.7)
+    )
   );
+
+  // Unified Year 3000 glow – relies on --sn-text-glow-intensity set by
+  // ColorHarmonyEngine based on beat pulse.
+  @include text-glow(--sn-gradient-accent-rgb);
 
   // BeatSync enhancements
   & {
     // BLOOM text glow during beats
-    text-shadow: 0 0 var(--sn-text-beat-glow) var(--sn-text-cosmic-shadow),
-      0 1px 2px
-        rgba(
-          var(--sn-oklab-processed-dynamic-shadow-rgb, "0,0,0"),
-          calc(var(--sn-text-energy-pulse) * 0.3)
-        );
+    // Remove custom glow; now handled by text-glow mixin above
 
     // BREATHING scale effect
     transform: scale(var(--sn-text-breathing-scale));
@@ -123,7 +128,7 @@
   &:focus-visible {
     outline: 2px solid
       rgba(
-        var(--spice-rgb-accent),
+        var(--sn-dynamic-accent-rgb, var(--spice-rgb-accent)),
         calc(0.6 + var(--sn-beat-pulse-intensity, 0) * 0.3)
       );
     outline-offset: 2px;
@@ -141,10 +146,10 @@
     inset: 0;
     background: radial-gradient(
       circle at center,
-      rgba(
-          var(--sn-gradient-accent-rgb, "140,170,238"),
-          calc(var(--sn-beat-pulse-intensity, 0) * 0.2)
-        )
+            rgba(
+        var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+        calc(var(--sn-beat-pulse-intensity, 0) * 0.2)
+      )
         0%,
       transparent 70%
     );

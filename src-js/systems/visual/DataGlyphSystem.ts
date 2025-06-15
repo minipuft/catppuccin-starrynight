@@ -411,7 +411,18 @@ export class DataGlyphSystem extends BaseVisualSystem {
     }
     intensity = (intensity + itemData.attentionScore) / 2;
 
-    glyphElement.style.setProperty("--glyph-intensity", `${intensity}`);
+    const applyCss = (prop: string, val: string, el: HTMLElement) => {
+      if (
+        this.year3000System &&
+        (this.year3000System as any).queueCSSVariableUpdate
+      ) {
+        (this.year3000System as any).queueCSSVariableUpdate(prop, val, el);
+      } else {
+        el.style.setProperty(prop, val);
+      }
+    };
+
+    applyCss("--glyph-intensity", `${intensity}`, glyphElement);
     glyphElement.style.opacity = `${intensity * 0.8}`;
   }
 

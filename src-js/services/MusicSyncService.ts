@@ -973,9 +973,18 @@ export class MusicSyncService {
     }
   }
 
-  public async processSongUpdate(): Promise<void> {
-    const trackUri = Spicetify.Player.data?.item?.uri;
-    if (!trackUri || trackUri === this.currentTrackUri) {
+  /**
+   * Re-extract colours & (optionally) recompute beat analysis for the current
+   * track.  When `force === true` the method runs even if the track URI hasn't
+   * changed (used after live settings updates so gradients repaint instantly).
+   */
+  public async processSongUpdate(force: boolean = false): Promise<void> {
+    const trackUri = Spicetify.Player?.data?.item?.uri;
+
+    if (!trackUri) return;
+
+    if (!force && trackUri === this.currentTrackUri) {
+      // No change in track and caller didn't request a forced refresh – exit.
       return;
     }
 

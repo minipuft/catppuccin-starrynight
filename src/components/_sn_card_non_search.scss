@@ -1,0 +1,350 @@
+// =============================================================================
+// YEAR 3000 COSMIC CARD CONSTELLATION SYSTEM
+// Stellar entities that breathe, pulse, and resonate with gravitational majesty
+// =============================================================================
+
+@use "./sn_card_base";
+
+// =============================================================================
+// COSMIC FOUNDATION VARIABLES
+// =============================================================================
+
+:root {
+  // === Energy & Rhythm ===
+  --sn-card-energy-level: 0.6;
+  --sn-card-breathing-scale: 1;
+  --sn-card-rhythm-phase: 0;
+  --sn-card-gravitational-intensity: 1;
+  --sn-card-stellar-emergence: 0;
+
+  // === Geometry ===
+  --sn-card-stellar-radius: 16px;
+  --sn-card-cosmic-border-width: 1px;
+  --sn-card-nebula-blur: 12px;
+  --sn-card-constellation-size: 2px;
+
+  // === Harmonic Color Palette ===
+  --sn-card-base-luminance: var(--sn-oklab-processed-dynamic-base-luminance, 0.4);
+  --sn-card-harmonic-base-hue: 270deg;
+  --sn-card-harmonic-primary: hsl(var(--sn-card-harmonic-base-hue), 70%, 60%);
+  --sn-card-harmonic-analogous-1: hsl(calc(var(--sn-card-harmonic-base-hue) + 30deg), 65%, 55%);
+  --sn-card-harmonic-analogous-2: hsl(calc(var(--sn-card-harmonic-base-hue) - 30deg), 65%, 55%);
+  --sn-card-harmonic-complementary: hsl(calc(var(--sn-card-harmonic-base-hue) + 180deg), 60%, 50%);
+  --sn-card-harmonic-triadic-1: hsl(calc(var(--sn-card-harmonic-base-hue) + 120deg), 60%, 50%);
+  --sn-card-harmonic-triadic-2: hsl(calc(var(--sn-card-harmonic-base-hue) + 240deg), 60%, 50%);
+
+  // === RGB Fallbacks (Design Bible Compliance) ===
+  --sn-card-harmonic-primary-rgb: var(--sn-gradient-primary-rgb);
+  --sn-card-harmonic-analogous-1-rgb: var(--sn-gradient-secondary-rgb);
+  --sn-card-harmonic-analogous-2-rgb: var(--sn-gradient-secondary-rgb);
+  --sn-card-harmonic-complementary-rgb: var(--sn-gradient-accent-rgb);
+  --sn-card-harmonic-triadic-1-rgb: var(--sn-gradient-primary-rgb);
+  --sn-card-harmonic-triadic-2-rgb: var(--sn-gradient-accent-rgb);
+
+  // === Timing ===
+  --sn-card-stellar-breath-duration: 4s;
+  --sn-card-gravitational-transition: 0.8s;
+  --sn-card-chromatic-shift-duration: 2s;
+  --sn-card-constellation-orbit-duration: 12s;
+}
+
+// =============================================================================
+// COSMIC ANIMATIONS
+// =============================================================================
+
+@keyframes stellar-breathing {
+  0%, 100% {
+    transform: scale(calc(0.98 + var(--sn-card-breathing-scale) * 0.02));
+    filter: brightness(0.95);
+  }
+  50% {
+    transform: scale(calc(1.0 + var(--sn-card-breathing-scale) * 0.04));
+    filter: brightness(1.05);
+  }
+}
+
+@keyframes cosmic-resonance-pulse {
+  0%, 100% {
+    filter: brightness(1) saturate(1) hue-rotate(0deg);
+  }
+  25% {
+    filter: brightness(1.03) saturate(1.08) hue-rotate(5deg);
+  }
+  50% {
+    filter: brightness(1.06) saturate(1.15) hue-rotate(10deg);
+  }
+  75% {
+    filter: brightness(1.03) saturate(1.08) hue-rotate(5deg);
+  }
+}
+
+@keyframes chromatic-harmony-shift {
+  0% { border-color: var(--sn-card-harmonic-primary); }
+  25% { border-color: var(--sn-card-harmonic-analogous-1); }
+  50% { border-color: var(--sn-card-harmonic-complementary); }
+  75% { border-color: var(--sn-card-harmonic-analogous-2); }
+  100% { border-color: var(--sn-card-harmonic-primary); }
+}
+
+@keyframes constellation-orbit {
+  0% { transform: rotate(0deg) translateX(8px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(8px) rotate(-360deg); }
+}
+
+@keyframes nebula-drift {
+  0%, 100% {
+    background-position: 0% 50%;
+    opacity: calc(0.1 + var(--sn-card-energy-level) * 0.15);
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: calc(0.05 + var(--sn-card-energy-level) * 0.1);
+  }
+}
+
+// =============================================================================
+// COSMIC CARD STYLING (NON-SEARCH ONLY)
+// =============================================================================
+
+body:not(:has(.main-searchPage-content)) .main-card-card {
+  // === Foundation ===
+  position: relative;
+  border-radius: var(--sn-card-stellar-radius);
+  isolation: isolate;
+  contain: layout style;
+  will-change: transform, box-shadow, border-color;
+
+  // === Gravitational Field Shadows ===
+  --sn-card-gravitational-field-idle:
+    0 2px 8px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.08),
+    0 4px 16px rgba(var(--sn-card-harmonic-primary-rgb), 0.04),
+    inset 0 1px 0 rgba(var(--spice-rgb-surface1), 0.1);
+
+  --sn-card-gravitational-field-active:
+    0 8px 32px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.15),
+    0 16px 64px rgba(var(--sn-card-harmonic-primary-rgb), 0.1),
+    0 4px 24px rgba(var(--sn-card-harmonic-analogous-1-rgb), 0.06),
+    inset 0 1px 0 rgba(var(--spice-rgb-surface1), 0.2),
+    inset 0 -1px 0 rgba(var(--sn-card-harmonic-primary-rgb), 0.05);
+
+  --sn-card-gravitational-field-emergence:
+    0 12px 48px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2),
+    0 24px 96px rgba(var(--sn-card-harmonic-primary-rgb), 0.15),
+    0 8px 32px rgba(var(--sn-card-harmonic-complementary-rgb), 0.08),
+    0 4px 16px rgba(var(--sn-card-harmonic-triadic-1-rgb), 0.06),
+    inset 0 2px 0 rgba(var(--spice-rgb-surface1), 0.25),
+    inset 0 -2px 0 rgba(var(--sn-card-harmonic-primary-rgb), 0.1);
+
+  // === Base Appearance ===
+  background:
+    linear-gradient(
+      135deg,
+      rgba(var(--sn-card-harmonic-primary-rgb), 0.03) 0%,
+      rgba(var(--sn-card-harmonic-analogous-1-rgb), 0.02) 30%,
+      rgba(var(--sn-card-harmonic-analogous-2-rgb), 0.01) 60%,
+      rgba(var(--sn-card-harmonic-primary-rgb), 0.03) 100%
+    ),
+    rgba(var(--spice-rgb-surface0), 0.08);
+
+  background-size: 300% 300%;
+  border: var(--sn-card-cosmic-border-width) solid rgba(var(--sn-card-harmonic-primary-rgb), 0.15);
+  box-shadow: var(--sn-card-gravitational-field-idle);
+
+  // === Animations ===
+  animation:
+    stellar-breathing var(--sn-card-stellar-breath-duration) ease-in-out infinite,
+    nebula-drift calc(var(--sn-card-stellar-breath-duration) * 3) ease-in-out infinite;
+
+  transition:
+    box-shadow var(--sn-card-gravitational-transition) cubic-bezier(0.4, 0, 0.2, 1),
+    border-color var(--sn-card-gravitational-transition) cubic-bezier(0.4, 0, 0.2, 1),
+    transform var(--sn-card-gravitational-transition) cubic-bezier(0.4, 0, 0.2, 1);
+
+  // === Constellation Particles ===
+  &::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: var(--sn-card-constellation-size);
+    height: var(--sn-card-constellation-size);
+    background: radial-gradient(
+      circle,
+      rgba(var(--sn-card-harmonic-primary-rgb), 0.8) 0%,
+      rgba(var(--sn-card-harmonic-primary-rgb), 0) 70%
+    );
+    border-radius: 50%;
+    animation: constellation-orbit var(--sn-card-constellation-orbit-duration) linear infinite;
+    opacity: calc(0.6 + var(--sn-card-energy-level) * 0.4);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    width: calc(var(--sn-card-constellation-size) * 0.8);
+    height: calc(var(--sn-card-constellation-size) * 0.8);
+    background: radial-gradient(
+      circle,
+      rgba(var(--sn-card-harmonic-analogous-1-rgb), 0.6) 0%,
+      rgba(var(--sn-card-harmonic-analogous-1-rgb), 0) 70%
+    );
+    border-radius: 50%;
+    animation: constellation-orbit calc(var(--sn-card-constellation-orbit-duration) * 1.3) linear infinite reverse;
+    opacity: calc(0.4 + var(--sn-card-energy-level) * 0.3);
+  }
+
+  // === HOVER STATE ===
+  &:hover {
+    --sn-card-energy-level: 0.85;
+    --sn-card-breathing-scale: 1.5;
+    --sn-card-gravitational-intensity: 1.4;
+
+    box-shadow: var(--sn-card-gravitational-field-active);
+    border-color: rgba(var(--sn-card-harmonic-primary-rgb), 0.4);
+    transform: translateY(-2px) scale(1.02);
+
+    animation:
+      stellar-breathing calc(var(--sn-card-stellar-breath-duration) * 0.7) ease-in-out infinite,
+      nebula-drift calc(var(--sn-card-stellar-breath-duration) * 2) ease-in-out infinite,
+      chromatic-harmony-shift var(--sn-card-chromatic-shift-duration) ease-in-out infinite;
+  }
+
+  // === ACTIVE/SELECTED STATE ===
+  &:active,
+  &.sn-card-selected,
+  &[aria-selected="true"] {
+    --sn-card-energy-level: 1;
+    --sn-card-breathing-scale: 1.8;
+    --sn-card-gravitational-intensity: 2.5;
+    --sn-card-stellar-emergence: 1;
+
+    box-shadow: var(--sn-card-gravitational-field-emergence);
+    border-color: rgba(var(--sn-card-harmonic-complementary-rgb), 0.8);
+    transform: translateY(-6px) scale(1.06);
+
+    animation:
+      stellar-breathing calc(var(--sn-card-stellar-breath-duration) * 0.6) ease-in-out infinite,
+      nebula-drift calc(var(--sn-card-stellar-breath-duration) * 1.2) ease-in-out infinite,
+      chromatic-harmony-shift calc(var(--sn-card-chromatic-shift-duration) * 0.8) ease-in-out infinite,
+      cosmic-resonance-pulse calc(var(--sn-card-stellar-breath-duration) * 3) cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  // === FOCUS STATE ===
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      var(--sn-card-gravitational-field-active),
+      0 0 0 3px rgba(var(--sn-card-harmonic-complementary-rgb), 0.5),
+      0 0 0 6px rgba(var(--sn-card-harmonic-complementary-rgb), 0.2);
+
+    &::before,
+    &::after {
+      opacity: 1;
+      animation-duration: calc(var(--sn-card-constellation-orbit-duration) * 0.5);
+    }
+  }
+}
+
+// =============================================================================
+// HARMONIC SYNCHRONIZATION - Multiple Selected Cards
+// =============================================================================
+
+body:not(:has(.main-searchPage-content)) .main-card-card.sn-card-selected:nth-child(2n),
+body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]:nth-child(2n) {
+  animation-delay: calc(var(--sn-card-stellar-breath-duration) * 0.33);
+}
+
+body:not(:has(.main-searchPage-content)) .main-card-card.sn-card-selected:nth-child(3n),
+body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]:nth-child(3n) {
+  animation-delay: calc(var(--sn-card-stellar-breath-duration) * 0.66);
+}
+
+// Enhanced constellation particles for selected cards
+body:not(:has(.main-searchPage-content)) .main-card-card.sn-card-selected::before,
+body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::before {
+  width: calc(var(--sn-card-constellation-size) * 1.5);
+  height: calc(var(--sn-card-constellation-size) * 1.5);
+  opacity: 1;
+  animation-duration: calc(var(--sn-card-constellation-orbit-duration) * 0.7);
+  box-shadow: 0 0 8px rgba(var(--sn-card-harmonic-primary-rgb), 0.6);
+}
+
+body:not(:has(.main-searchPage-content)) .main-card-card.sn-card-selected::after,
+body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::after {
+  width: calc(var(--sn-card-constellation-size) * 1.2);
+  height: calc(var(--sn-card-constellation-size) * 1.2);
+  opacity: 0.9;
+  animation-duration: calc(var(--sn-card-constellation-orbit-duration) * 0.9);
+  box-shadow: 0 0 6px rgba(var(--sn-card-harmonic-analogous-1-rgb), 0.5);
+}
+
+// =============================================================================
+// SEARCH EXCLUSION - Complete Isolation
+// =============================================================================
+
+.main-searchPage-content .main-card-card {
+  all: unset;
+  display: block;
+  position: relative;
+  cursor: pointer;
+
+  // Ensure no cosmic interference
+  animation: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  background: none !important;
+  transform: none !important;
+
+  &::before,
+  &::after {
+    display: none !important;
+  }
+}
+
+// =============================================================================
+// ACCESSIBILITY & PERFORMANCE
+// =============================================================================
+
+@media (prefers-reduced-motion: reduce) {
+  body:not(:has(.main-searchPage-content)) .main-card-card {
+    animation-duration: 0.1s !important;
+    transition-duration: 0.2s !important;
+
+    &::before,
+    &::after {
+      animation: none !important;
+    }
+  }
+}
+
+@supports (will-change: transform) {
+  body:not(:has(.main-searchPage-content)) .main-card-card {
+    will-change: transform, box-shadow, border-color, opacity;
+
+    &::before,
+    &::after {
+      will-change: transform, opacity;
+    }
+  }
+}
+
+@media (prefers-contrast: high) {
+  body:not(:has(.main-searchPage-content)) .main-card-card {
+    --sn-card-cosmic-border-width: 2px;
+    border-color: var(--spice-accent) !important;
+
+    &::before,
+    &::after {
+      opacity: 0.9 !important;
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sn-card-energy-level: 0.8;
+    --sn-card-base-luminance: 0.2;
+  }
+}

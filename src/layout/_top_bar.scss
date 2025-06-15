@@ -33,13 +33,13 @@
   --sn-search-ripple-intensity: calc(var(--sn-beat-pulse-intensity, 0) * 0.6);
   --sn-search-focus-bloom: calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.05);
   --sn-search-beat-border: rgba(
-    var(--sn-gradient-accent-rgb, "140,170,238"),
+    var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
     calc(0.3 + var(--sn-beat-pulse-intensity, 0) * 0.4)
   );
 
   // === BUTTON CONSCIOUSNESS VARIABLES ===
   --sn-button-harmony-color: rgba(
-    var(--sn-gradient-primary-rgb, "202,158,230"),
+    var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
     calc(0.1 + var(--sn-beat-pulse-intensity, 0) * 0.2)
   );
   --sn-button-bloom-scale: calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.03);
@@ -65,17 +65,17 @@
     // Layer 1: OSCILLATE rhythm gradient
     linear-gradient(
       calc(90deg + var(--sn-topbar-consciousness-flow)),
-      rgba(
-          var(--sn-gradient-primary-rgb, "202,158,230"),
-          var(--sn-topbar-cosmic-opacity)
-        )
+            rgba(
+        var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+        var(--sn-topbar-cosmic-opacity)
+      )
         0%,
       transparent 40%,
       transparent 60%,
-      rgba(
-          var(--sn-gradient-secondary-rgb, "186,187,241"),
-          calc(var(--sn-topbar-cosmic-opacity) * 0.8)
-        )
+            rgba(
+        var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0, 186,187,241)),
+        calc(var(--sn-topbar-cosmic-opacity) * 0.8)
+      )
         100%
     ),
     // Layer 2: Base background (preserve existing functionality)
@@ -83,10 +83,10 @@
 
   // BLOOM glow effect during beats
   box-shadow: 0 2px var(--sn-button-cosmic-glow)
-      rgba(
-        var(--sn-gradient-primary-rgb, "202,158,230"),
-        calc(var(--sn-topbar-beat-glow-intensity) * 0.3)
-      ),
+          rgba(
+      var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+      calc(var(--sn-topbar-beat-glow-intensity) * 0.3)
+    ),
     inset 0 1px 0
       rgba(
         var(--sn-gradient-accent-rgb, "140,170,238"),
@@ -114,7 +114,7 @@
     background: radial-gradient(
       ellipse 150% 100% at 50% 0%,
       rgba(
-          var(--sn-gradient-accent-rgb, "140,170,238"),
+          var(--sn-dynamic-accent-rgb, 140,170,238),
           calc(var(--sn-topbar-energy-absorption) * 0.15)
         )
         0%,
@@ -176,7 +176,7 @@
     // Cosmic glow during activity
     box-shadow: 0 0 calc(8px + var(--sn-search-ripple-intensity) * 12px)
         rgba(
-          var(--sn-gradient-accent-rgb, "140,170,238"),
+          var(--sn-dynamic-accent-rgb, 140,170,238),
           calc(var(--sn-search-ripple-intensity) * 0.4)
         ),
       inset 0 1px 3px
@@ -209,7 +209,7 @@
 
       box-shadow: 0 0 calc(12px + var(--sn-search-ripple-intensity) * 16px)
           rgba(
-            var(--sn-gradient-accent-rgb, "140,170,238"),
+            var(--sn-dynamic-accent-rgb, 140,170,238),
             calc(var(--sn-search-ripple-intensity) * 0.6 + 0.3)
           ),
         inset 0 2px 4px
@@ -225,7 +225,7 @@
     // Typing rhythm response
     &:not(:placeholder-shown) {
       border-color: rgba(
-        var(--sn-gradient-accent-rgb, "140,170,238"),
+        var(--sn-dynamic-accent-rgb, 140,170,238),
         calc(0.6 + var(--sn-beat-pulse-intensity, 0) * 0.3)
       );
     }
@@ -234,12 +234,12 @@
   // Search clear button consciousness
   .x-searchInput-searchInputClearButton {
     color: rgba(
-      var(--spice-rgb-subtext, "186,194,222"),
+      var(--spice-rgb-subtext, 186,194,222),
       calc(0.7 + var(--sn-beat-pulse-intensity, 0) * 0.2)
     );
 
     &:hover {
-      color: var(--sn-gradient-primary, #ca9ee6);
+      color: rgba(var(--sn-dynamic-accent-rgb, 140,170,238), 1);
       transform: scale(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
     }
   }
@@ -267,7 +267,7 @@
     // Cosmic border enhancement
     border: 1px solid
       rgba(
-        var(--sn-gradient-accent-rgb, "140,170,238"),
+        var(--sn-dynamic-accent-rgb, 140,170,238),
         calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.3)
       ) !important;
     border-radius: 8px;
@@ -287,7 +287,7 @@
         90deg,
         transparent 0%,
         rgba(
-            var(--sn-gradient-accent-rgb, "140,170,238"),
+            var(--sn-dynamic-accent-rgb, 140,170,238),
             calc(var(--sn-topbar-energy-absorption) * 0.3)
           )
           50%,
@@ -312,7 +312,7 @@
           ),
         inset 0 1px 2px
           rgba(
-            var(--sn-gradient-accent-rgb, "140,170,238"),
+            var(--sn-dynamic-accent-rgb, 140,170,238),
             calc(var(--sn-topbar-beat-glow-intensity) * 0.3)
           );
 
@@ -335,7 +335,7 @@
 
     // Focus state accessibility
     &:focus-visible {
-      outline: 2px solid rgba(var(--sn-gradient-accent-rgb, "140,170,238"), 0.8);
+      outline: 2px solid rgba(var(--sn-dynamic-accent-rgb, 140,170,238), 0.8);
       outline-offset: 2px;
     }
   }

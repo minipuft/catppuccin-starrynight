@@ -1,0 +1,98 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 LEGACY SUPPORT - Backward Compatibility & Migration Support
+// ████████████████████████████████████████████████████████████████████████████████
+
+:root .Root__main-view {
+  // Duration in album view
+  .UyzJidwrGk3awngSGIwv {
+    color: var(--spice-subtext);
+  }
+
+  // For that small dot on podcasts that notify us of new episodes
+  .main-home-content
+    > section:first-child
+    > .main-gridContainer-gridContainer
+    > div
+    span[aria-label],
+  span[aria-label="New episode"],
+  span[aria-label="New Podcast Episode"] {
+    background: var(--spice-text);
+  }
+
+  // Enhanced button
+  .Button-sm-buttonSecondary-useBrowserDefaultFocusStyle {
+    background-color: var(--spice-base);
+    color: var(--spice-text);
+    border: 1px solid var(--spice-overlay1);
+
+    &:hover {
+      border-color: rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.7);
+    }
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// STARRYNIGHT LEGACY SUPPORT - Backward Compatibility Support
+// ████████████████████████████████████████████████████████████████████████████████
+// TODO: Extract backward compatibility styles and settings UI from main file
+// TODO: Ensure compatibility with existing Spicetify themes
+// TODO: Include StarryNight settings component styling
+// TODO: Target file: src/core/_sn_legacy_support.scss
+
+// StarryNight settings component styling
+.starrynight-settings {
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--spice-border);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .setting-label {
+      color: var(--spice-text);
+      font-size: 14px;
+      font-weight: 500;
+      min-width: 120px;
+    }
+
+    select.main-dropDown-dropDown {
+      min-width: 150px;
+      background: var(--spice-button);
+      color: var(--spice-text);
+      border: 1px solid var(--spice-border);
+      border-radius: 4px;
+      padding: 8px 12px;
+
+      &:hover {
+        background: var(--spice-button-active);
+      }
+
+      &:focus {
+        outline: 2px solid var(--spice-accent);
+        outline-offset: 2px;
+      }
+    }
+  }
+}
+
+// Integration with main settings page
+.main-settingsPage-section {
+  .starrynight-settings {
+    margin-top: 16px;
+  }
+}
+
+// Legacy Spicetify variable fallbacks
+:root {
+  // Ensure compatibility with older Spicetify themes
+  --spice-rgb-base: var(--spice-base, "30,30,46");
+  --spice-rgb-button: var(--spice-button, "64,64,80");
+  --spice-rgb-accent: var(--spice-accent, "140,170,238");
+
+  // Fallback border radius if not defined
+  --border-radius: var(--spice-border-radius, 6px);
+}

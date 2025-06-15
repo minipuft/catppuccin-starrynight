@@ -28,6 +28,16 @@ export interface IManagedSystem {
    * Cleans up resources, listeners, and intervals.
    */
   destroy(): void;
+
+  /**
+   * Optional hint that a live-settings change occurred and the system should
+   * immediately recalculate any internal colour caches or GPU resources. This
+   * MUST be lightweight; heavy work should be deferred internally (e.g.
+   * via requestIdleCallback).
+   *
+   * @param reason A short string describing why the repaint was requested.
+   */
+  forceRepaint?(reason?: string): void;
 }
 
 // Optional mix-in interface for runtime settings updates. Visual systems that

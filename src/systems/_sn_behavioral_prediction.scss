@@ -1,0 +1,23 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 BEHAVIORAL PREDICTION - Advanced User Interaction Prediction
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Base class for any predicted element (can be used for targeting if needed)
+.sn-predicted-active {
+  // Base styles for elements that have an active prediction
+  // Example: slightly increase transition speed for responsiveness
+  transition-duration: 150ms !important;
+}
+
+// Shared variable for highlight color, can be overridden per type or element
+:root {
+  --sn-predict-glow-color: rgba(
+    var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
+    0.7
+  );
+  --sn-predict-pulse-color: rgba(
+    var(--sn-gradient-primary-rgb, var(--spice-rgb-button)),
+    0.8
+  );
+  // --sn-prediction-confidence: 0; // This is set per element by JS, no need for global default here if JS always sets it.
+}

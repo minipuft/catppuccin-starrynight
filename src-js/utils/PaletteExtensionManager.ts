@@ -97,9 +97,16 @@ export class PaletteExtensionManager {
     const computedStyle = getComputedStyle(root);
 
     const baseColor =
-      computedStyle.getPropertyValue("--spice-main").trim() || "#1e1e2e";
+      computedStyle.getPropertyValue("--spice-main").trim() ||
+      computedStyle.getPropertyValue("--spice-base").trim() ||
+      "#1e1e2e";
     const accentColor =
-      computedStyle.getPropertyValue("--spice-button").trim() || "#ca9ee6";
+      // Prefer Year 3000 dynamic accent if it's already available, else fall back to spice button, then to dynamic accent fallback.
+      computedStyle.getPropertyValue("--sn-gradient-accent").trim() ||
+      computedStyle.getPropertyValue("--spice-button").trim() ||
+      computedStyle.getPropertyValue("--sn-dynamic-accent").trim() ||
+      computedStyle.getPropertyValue("--spice-accent").trim() ||
+      "#8caaee";
 
     // Generate complementary colors based on base colors
     const baseRgb = this.utils.hexToRgb(
@@ -110,14 +117,19 @@ export class PaletteExtensionManager {
     );
 
     if (!baseRgb || !accentRgb) {
-      // Ultimate fallback - Catppuccin Mocha-like colors
+      // Ultimate fallback - Use dynamic variables if available, otherwise Catppuccin Mocha-like colors
+      const dynamicAccent = computedStyle
+        .getPropertyValue("--sn-dynamic-accent")
+        .trim();
+      const dynamicBase = computedStyle.getPropertyValue("--spice-base").trim();
+
       return {
         name: themeName,
         version: "1.0.0",
         accents: {
-          mauve: "#ca9ee6",
+          mauve: dynamicAccent || "#ca9ee6",
           pink: "#f4b8e4",
-          blue: "#8caaee",
+          blue: dynamicAccent || "#8caaee",
           sapphire: "#85c1dc",
           sky: "#99d1db",
           teal: "#81c8be",
@@ -128,7 +140,7 @@ export class PaletteExtensionManager {
           lavender: "#babbf1",
         },
         neutrals: {
-          base: "#1e1e2e",
+          base: dynamicBase || "#1e1e2e",
           surface0: "#313244",
           surface1: "#45475a",
           surface2: "#585b70",

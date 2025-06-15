@@ -1,0 +1,32 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 TOP BAR ENHANCED - Advanced Navigation Experience
+// ████████████████████████████████████████████████████████████████████████████████
+
+.main-topBar-container {
+  background: linear-gradient(
+    90deg,
+    rgba(
+        var(--sn-header-primary-rgb, var(--spice-rgb-accent)),
+        calc(var(--sn-header-intensity, 0.2) * 0.6)
+      )
+      0%,
+    rgba(
+        var(--sn-header-secondary-rgb, var(--spice-rgb-surface0)),
+        calc(var(--sn-header-intensity, 0.2) * 0.4)
+      )
+      50%,
+    rgba(
+        var(--sn-header-accent-rgb, var(--spice-rgb-surface1)),
+        calc(var(--sn-header-intensity, 0.2) * 0.25)
+      )
+      100%
+  ) !important;
+  backdrop-filter: blur(10px) saturate(1.1);
+  border-bottom: 1px solid
+    rgba(
+      var(--sn-header-primary-rgb, var(--spice-rgb-accent)),
+      calc(var(--sn-header-intensity, 0.2) * 0.5)
+    );
+  transition: background 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-bottom 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}

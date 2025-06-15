@@ -382,6 +382,11 @@ export class ColorHarmonyEngine
         `${this.kineticState.hueShift.toFixed(1)}deg`
       );
     }
+
+    // === Year 3000: Dynamic text glow intensity ===
+    // Map beat pulse (0–1) to a soft clamp between 0 and 1 for CSS consumers
+    const glow = Math.max(0, Math.min(1, this.kineticState.currentPulse * 1.2));
+    root.style.setProperty("--sn-text-glow-intensity", glow.toFixed(3));
   }
 
   // TODO: Private method for calculating beat pulse effects
@@ -674,6 +679,21 @@ export class ColorHarmonyEngine
     rgb: RGBColor,
     palette: CatppuccinPalette
   ): HarmoniousAccent {
+    let bestAccent: HarmoniousAccent = {
+      name: "mauve",
+      hex:
+        this.utils
+          .getRootStyle()
+          ?.style.getPropertyValue("--sn-dynamic-accent")
+          ?.trim() ||
+        this.utils
+          .getRootStyle()
+          ?.style.getPropertyValue("--spice-accent")
+          ?.trim() ||
+        "#cba6f7", // Fallback to default mauve hex
+      rgb: { r: 203, g: 166, b: 247 },
+    };
+
     const accentPriority = [
       "mauve",
       "lavender",
@@ -685,7 +705,6 @@ export class ColorHarmonyEngine
       "teal",
     ];
 
-    let bestAccent: HarmoniousAccent | null = null;
     let bestScore = -1;
 
     const inputHsl = this.utils.rgbToHsl(rgb.r, rgb.g, rgb.b);
@@ -720,23 +739,7 @@ export class ColorHarmonyEngine
       }
     }
 
-    if (bestAccent) {
-      return bestAccent;
-    }
-
-    // Fallback logic
-    const fallbackAccentName = "mauve";
-    const fallbackAccentHex =
-      palette.accents[fallbackAccentName] ||
-      Object.values(palette.accents)[0] ||
-      "#cba6f7"; // Default mauve hex
-    const fallbackAccentRgb = this.utils.hexToRgb(fallbackAccentHex);
-
-    return {
-      name: fallbackAccentName,
-      hex: fallbackAccentHex,
-      rgb: fallbackAccentRgb || { r: 198, g: 160, b: 246 }, // Default mauve
-    };
+    return bestAccent;
   }
 
   blendColors(
@@ -1319,5 +1322,19 @@ export class ColorHarmonyEngine
 
   public setEmergentEngine(engine: EmergentChoreographyEngine): void {
     this.emergentEngine = engine;
+  }
+
+  // ---------------------------------------------------------------------------
+  // 🔄 SETTINGS-AWARE REPAINT IMPLEMENTATION
+  // ---------------------------------------------------------------------------
+  /**
+   * Re-apply the current palette immediately.  This is extremely lightweight
+   * (just re-blends colours + sets CSS vars) so it can be called synchronously
+   * from Year3000System after a relevant settings change.
+   */
+  public forceRepaint(_reason: string = "settings-change"): void {
+    // Debounced palette refresh is intentionally bypassed here—we want an
+    // immediate update so UI responds in the same frame.
+    this.refreshPalette?.();
   }
 }

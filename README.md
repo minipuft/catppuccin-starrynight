@@ -8,6 +8,8 @@
 [![Catppuccin](https://img.shields.io/badge/Catppuccin-Flavored-f5c2e7?style=for-the-badge&logoColor=white)](https://github.com/catppuccin)
 [![Year 3000 Ready](https://img.shields.io/badge/Year%203000-Ready-ca9ee6?style=for-the-badge)](#)
 [![Version](https://img.shields.io/badge/Version-2.0-cba6f7?style=for-the-badge)](https://github.com/minipuft/catppuccin-starrynight)
+[![RGB Variables](https://img.shields.io/badge/RGB%20Variables-Complete-a6e3a1?style=for-the-badge)](#)
+[![Dynamic Colors](https://img.shields.io/badge/Dynamic%20Colors-Operational-f9e2af?style=for-the-badge)](#)
 [![License](https://img.shields.io/badge/License-MIT-74c7ec?style=for-the-badge)](LICENSE)
 
 **🚀 The Revolutionary Music-Reactive Visual Experience Platform**
@@ -24,11 +26,11 @@ _Transform Spotify into an intelligent, music-synchronized visual ecosystem with
 
 My attempt at a **sophisticated audio-visual intelligence platform** that creates a living, breathing interface synchronized to your music:
 
-- **🧠 Year 3000 Color Harmony System** → Advanced color extraction with intelligent harmonization algorithms
+- **🧠 Year 3000 Color Harmony System** → Advanced color extraction with complete RGB variable pipeline for gradients
 - **⚡ Kinetic Animation Engine** → 5 sophisticated animation systems: ripple, bloom, refract, oscillate, harmonize
 - **🎵 Music-Reactive Intelligence** → Real-time BPM synchronization with visual effects orchestration
 - **🏗️ Enterprise Architecture** → Modular systems with performance optimization and hot-reload capabilities
-- **🎨 Dynamic Visual Adaptation** → Colors, gradients, and animations that evolve with every track
+- **🎨 Dynamic Visual Adaptation** → Complete RGB variable system enables all gradients to work with album art colors
 - **🚀 Performance Orchestration** → Consolidated animation loops, timer management, and resource optimization
 - 🌌 **Aesthetic Gravity** → Attention-flow systems that guide visual focus
 
@@ -212,14 +214,14 @@ _The perfect harmony of pastel perfection and cosmic wonder_
 
 - 🌈 **4 Catppuccin Flavors**: Latte, Frappé, Macchiato, Mocha
 - ⭐ **15 Accent Colors**: Every Catppuccin shade available
-- 🖼️ **Album Art Integration**: Colors that dance with your music
+- 🖼️ **Album Art Integration**: Complete RGB variable system for dynamic gradients
 
 </td>
 <td width="50%">
 
 ### ⚡ **Smart Features**
 
-- 🎵 **Dynamic Gradients**: Real-time color extraction
+- 🎵 **Dynamic Gradients**: Complete RGB variable pipeline enables all gradients with album art colors
 - 🔧 **Highly Customizable**: Tweak every visual aspect
 - 🚀 **Performance Optimized**: Smooth as silk
 - 📱 **Responsive Design**: Perfect on any screen size
@@ -331,11 +333,12 @@ teal • sapphire • blue • sky • mauve • lavender • none
 
 Access theme settings directly in Spotify preferences:
 
-| Setting              | Options                                   | What it does                          |
-| -------------------- | ----------------------------------------- | ------------------------------------- |
-| **Dynamic Gradient** | `disabled` `minimal` `balanced` `intense` | Controls album art background effects |
-| **Star Animation**   | `disabled` `minimal` `balanced` `intense` | Adjusts shooting star overlay         |
-| **Performance Mode** | `auto` `high` `balanced` `eco`            | Optimizes for your system             |
+| Setting              | Options                                      | What it does                                             |
+| -------------------- | -------------------------------------------- | -------------------------------------------------------- |
+| **Accent Color**     | `dynamic` `rosewater` `flamingo` `pink` etc. | Choose dynamic album colors or static Catppuccin accents |
+| **Dynamic Gradient** | `disabled` `minimal` `balanced` `intense`    | Controls album art background effects                    |
+| **Star Animation**   | `disabled` `minimal` `balanced` `intense`    | Adjusts shooting star overlay                            |
+| **Performance Mode** | `auto` `high` `balanced` `eco`               | Optimizes for your system                                |
 
 ---
 
@@ -352,6 +355,11 @@ Add these to your `user.css` for fine-tuning:
   --sn-gradient-opacity: 0.25; /* 0.0 - 1.0 */
   --sn-gradient-blur: 30px; /* 10px - 50px */
   --sn-gradient-transition: 1.2s; /* Animation speed */
+
+  /* 🎨 RGB Variable System (Year 3000) */
+  --sn-dynamic-accent-rgb: 202, 158, 230; /* Central dynamic accent RGB */
+  --sn-gradient-primary-rgb: 202, 158, 230; /* Primary gradient RGB */
+  --sn-gradient-secondary-rgb: 186, 187, 241; /* Secondary gradient RGB */
 
   /* ⭐ Star Controls */
   --sn-star-count: 5; /* 0 - 10 */
@@ -405,10 +413,12 @@ spicetify restore backup apply
 ### **Dynamic colors not working**
 
 1. ✅ Check extension is installed: `spicetify config extensions`
-2. ✅ Restart Spotify completely
-3. ✅ Verify catppuccin-starrynight.js is in Extensions folder
-4. ✅ Check console logs for "Year 3000 Color Harmony System initialized"
-5. ✅ Extension automatically falls back to degraded mode if APIs unavailable
+2. ✅ Ensure "Dynamic" is selected in accent color settings
+3. ✅ Restart Spotify completely
+4. ✅ Verify catppuccin-starrynight.js is in Extensions folder
+5. ✅ Check console logs for "Year 3000 Color Harmony System initialized"
+6. ✅ Test RGB variables with `Year3000Debug.validateRgbVariables()` in console
+7. ✅ Extension automatically falls back to degraded mode if APIs unavailable
 
 ### **Performance issues**
 

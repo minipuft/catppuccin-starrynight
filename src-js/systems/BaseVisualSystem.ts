@@ -249,9 +249,7 @@ export abstract class BaseVisualSystem {
     processedMusicData: any,
     ...args: any[]
   ): void {
-    // This method is now a hook for subclasses.
-    // The core logic for setting global CSS variables has been moved
-    // to Year3000System for better separation of concerns.
+    // Intentionally empty – override in subclasses that need music data.
   }
 
   /**
@@ -261,14 +259,13 @@ export abstract class BaseVisualSystem {
    * @param deltaMs - Time in milliseconds since the last frame for this system
    */
   public onAnimate(deltaMs: number): void {
-    // Default implementation delegates to updateAnimation for backward compatibility
-    if (typeof (this as any).updateAnimation === "function") {
-      const timestamp = performance.now();
-      (this as any).updateAnimation(timestamp, deltaMs);
+    if (typeof this.updateAnimation === "function") {
+      // Preserve legacy signature (timestamp, deltaTime)
+      this.updateAnimation(performance.now(), deltaMs);
     }
 
-    // Subclasses should override this method to implement their animation logic
-    // using the deltaMs parameter for frame-rate independent animations
+    // Subclasses that override onAnimate can add their own logic without
+    // relying on updateAnimation.
   }
 
   /**
@@ -613,5 +610,17 @@ export abstract class BaseVisualSystem {
         );
       }
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // SETTINGS-AWARE REPAINT CONTRACT
+  // ---------------------------------------------------------------------------
+  /**
+   * Default no-op implementation.  Subclasses that cache colours, shaders, or
+   * other theme-dependent resources should override and perform a lightweight
+   * refresh.
+   */
+  public forceRepaint(_reason: string = "generic"): void {
+    /* no-op by default */
   }
 }

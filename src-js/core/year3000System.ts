@@ -717,7 +717,13 @@ export class Year3000System {
       console.log(
         `🎨 [Year3000System] applyInitialSettings: Accent=${accent}, Gradient=${gradient}, Stars=${stars}`
       );
-      await this._applyCatppuccinAccent(accent);
+      if ((accent as string) !== "dynamic") {
+        await this._applyCatppuccinAccent(accent);
+      } else if (this.YEAR3000_CONFIG.enableDebug) {
+        console.log(
+          "🎨 [Year3000System] Skipping static accent application because 'dynamic' accent is selected."
+        );
+      }
       await this._applyStarryNightSettings(
         gradient as "disabled" | "minimal" | "balanced" | "intense",
         stars as "disabled" | "minimal" | "balanced" | "intense"
@@ -746,6 +752,15 @@ export class Year3000System {
   }
 
   private async _applyCatppuccinAccent(selectedAccent: string): Promise<void> {
+    if (selectedAccent === "dynamic") {
+      if (this.YEAR3000_CONFIG.enableDebug) {
+        console.log(
+          "🎨 [Year3000System] _applyCatppuccinAccent: 'dynamic' accent selected – skipping static accent overrides."
+        );
+      }
+      return;
+    }
+
     console.log(
       `🎨 [Year3000System] _applyCatppuccinAccent: Applying accent color '${selectedAccent}'`
     );
@@ -840,7 +855,11 @@ export class Year3000System {
     if (accentHex) queueUpdate("--sn-gradient-accent", accentHex);
 
     // Mirror accent into core Spicetify vars (buttons, sliders, etc.)
-    if (accentHex) queueUpdate("--spice-accent", accentHex);
+    if (accentHex) {
+      queueUpdate("--spice-accent", accentHex);
+      queueUpdate("--spice-button", accentHex);
+      queueUpdate("--spice-button-active", accentHex);
+    }
     // Preserve text colour; do NOT overwrite --spice-main (maintains Catppuccin readability)
 
     // RGB variants for transparency support
@@ -859,8 +878,35 @@ export class Year3000System {
     // Year 3000 — expose a unified dynamic accent variable consumed by all visual systems
     addRgb("--sn-dynamic-accent-rgb", accentHex);
 
+    // Generate RGB versions of all spice variables for SCSS compatibility
     addRgb("--spice-rgb-accent", accentHex);
-    // Avoid overriding --spice-rgb-main to prevent pale text
+    addRgb("--spice-rgb-button", accentHex);
+
+    // Generate RGB versions of existing spice variables by reading their current hex values
+    const root = this.utils.getRootStyle();
+    if (root) {
+      const computedStyle = getComputedStyle(root);
+
+      // Helper to safely get and convert existing spice variables to RGB
+      const addSpiceRgb = (
+        rgbProp: string,
+        hexProp: string,
+        fallbackHex: string
+      ) => {
+        const hexValue =
+          computedStyle.getPropertyValue(hexProp).trim() || fallbackHex;
+        addRgb(rgbProp, hexValue);
+      };
+
+      // Add RGB versions of all spice variables that SCSS files expect
+      addSpiceRgb("--spice-rgb-main", "--spice-main", "#cdd6f4");
+      addSpiceRgb("--spice-rgb-base", "--spice-base", "#1e1e2e");
+      addSpiceRgb("--spice-rgb-player", "--spice-player", "#181825");
+      addSpiceRgb("--spice-rgb-sidebar", "--spice-sidebar", "#313244");
+      addSpiceRgb("--spice-rgb-surface0", "--spice-surface0", "#313244");
+      addSpiceRgb("--spice-rgb-surface1", "--spice-surface1", "#45475a");
+      addSpiceRgb("--spice-rgb-text", "--spice-text", "#cdd6f4");
+    }
 
     // Flush batched updates immediately for visual responsiveness
     if (this.cssVariableBatcher) {
@@ -885,6 +931,38 @@ export class Year3000System {
         secondaryHex,
         accentHex,
       });
+    }
+  }
+
+  // =============================================
+  // 🆕 PUBLIC WRAPPER – UNIFIED CSS VARIABLE BATCH API
+  // =============================================
+  /**
+   * Queue a CSS variable update through the shared CSSVariableBatcher. Falls
+   * back to an immediate style mutation when the batcher is unavailable
+   * (degraded mode or very early boot).
+   *
+   * @param property  The CSS custom property name (e.g. "--sn-nav-intensity")
+   * @param value     The value to assign (raw string, keep units if needed)
+   * @param element   Optional specific HTMLElement target. When omitted the
+   *                  root <html> element is used so variables cascade.
+   */
+  public queueCSSVariableUpdate(
+    property: string,
+    value: string,
+    element: HTMLElement | null = null
+  ): void {
+    if (this.cssVariableBatcher) {
+      // Use the batching system for maximum performance
+      this.cssVariableBatcher.queueCSSVariableUpdate(
+        property,
+        value,
+        element || undefined
+      );
+    } else {
+      // Fallback – apply directly so functionality still works in degraded mode
+      const target = element || document.documentElement;
+      target.style.setProperty(property, value);
     }
   }
 
@@ -1585,6 +1663,9 @@ export class Year3000System {
    */
   private _broadcastSettingChange(key: string, value: any): void {
     const systems: any[] = [
+      this.colorHarmonyEngine,
+      this.glassmorphismManager,
+      this.card3DManager,
       this.lightweightParticleSystem,
       this.dimensionalNexusSystem,
       this.dataGlyphSystem,
@@ -1605,6 +1686,20 @@ export class Year3000System {
             `[Year3000System] ${
               sys.systemName || sys.constructor.name
             } failed to handle settings change`,
+            err
+          );
+        }
+      }
+
+      // NEW: Repaint contract – call once per system if implemented
+      if (sys && typeof sys.forceRepaint === "function") {
+        try {
+          sys.forceRepaint(`settings:${key}`);
+        } catch (err) {
+          console.warn(
+            `[Year3000System] ${
+              sys.systemName || sys.constructor.name
+            } failed to repaint after settings change`,
             err
           );
         }

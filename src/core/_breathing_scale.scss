@@ -1,0 +1,11 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 BREATHING SCALE SYSTEM - Subtle Rhythm Synchronization
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Apply breathing scale to main interface elements for subtle rhythm sync
+:root {
+  // Apply breathing scale to main interface elements for subtle rhythm sync
+  // transform: scale(var(--sn-breathing-scale, 1));
+  transform-origin: center;
+  transition: transform 50ms ease-out; // Quick response to rhythm changes
+}

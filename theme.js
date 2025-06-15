@@ -1948,6 +1948,8 @@
       "starrynight-settings"
     );
     const accentOptions = [
+      "dynamic",
+      // 🎨 Album-based accent (Year 3000)
       "rosewater",
       "flamingo",
       "pink",
@@ -2241,10 +2243,11 @@
   var CSSVariableBatcher = class {
     constructor(config = {}) {
       this.config = {
-        batchIntervalMs: config.batchIntervalMs || 16,
+        batchIntervalMs: config.batchIntervalMs ?? 16,
         // ~60fps batch rate
-        maxBatchSize: config.maxBatchSize || 50,
-        enableDebug: config.enableDebug || false,
+        maxBatchSize: config.maxBatchSize ?? 50,
+        enableDebug: config.enableDebug ?? false,
+        useCssTextFastPath: config.useCssTextFastPath ?? false,
         ...config
       };
       this._cssVariableBatcher = {
@@ -2315,7 +2318,7 @@
           updatesByElement.get(update.element).push(update);
         }
         for (const [element, elementUpdates] of updatesByElement.entries()) {
-          if (elementUpdates.length > 3) {
+          if (elementUpdates.length > 3 && this.config.useCssTextFastPath) {
             let cssText = element.style.cssText;
             for (const update of elementUpdates) {
               const propertyPattern = new RegExp(
@@ -3690,17 +3693,7 @@
   }
 
   // src-js/debug/SystemHealthMonitor.ts
-  var statusColors = {
-    HEALTHY: "#a6e3a1",
-    WARNING: "#f9e2af",
-    DEGRADED: "#fab387",
-    FAILING: "#f38ba8",
-    ERROR: "#f38ba8",
-    CRITICAL: "#f38ba8",
-    REGISTERED: "#cdd6f4",
-    UNKNOWN: "#9399b2"
-  };
-  var SystemHealthMonitor = class {
+  var SystemHealthMonitor = class _SystemHealthMonitor {
     constructor() {
       this.registeredSystems = /* @__PURE__ */ new Map();
       this.healthHistory = /* @__PURE__ */ new Map();
@@ -3714,6 +3707,19 @@
         maxRecoveryAttempts: 3,
         alertThreshold: 3
       };
+    }
+    static getStatusColor(status) {
+      const statusColors = {
+        HEALTHY: "var(--spice-green, #a6e3a1)",
+        WARNING: "var(--spice-yellow, #f9e2af)",
+        DEGRADED: "var(--spice-peach, #fab387)",
+        FAILING: "var(--spice-red, #f38ba8)",
+        ERROR: "var(--spice-red, #f38ba8)",
+        UNKNOWN: "var(--spice-text, #cdd6f4)",
+        CRITICAL: "var(--spice-red, #f38ba8)",
+        REGISTERED: "var(--spice-blue, #89b4fa)"
+      };
+      return statusColors[status] || "var(--spice-text, #cdd6f4)";
     }
     // === SYSTEM REGISTRATION ===
     registerSystem(systemName, systemInstance, options = {}) {
@@ -4117,7 +4123,9 @@
       const summary = this.getHealthSummary();
       console.log(
         `%cOverall Status: ${summary.overallStatus}`,
-        `color: ${statusColors[summary.overallStatus] || "#fff"}; font-weight: bold;`
+        `color: ${_SystemHealthMonitor.getStatusColor(
+          summary.overallStatus
+        )}; font-weight: bold;`
       );
       console.log(
         `Summary: ${summary.healthy} Healthy, ${summary.warning} Warning, ${summary.failing} Failing`
@@ -4125,7 +4133,9 @@
       this.registeredSystems.forEach((systemData, systemName) => {
         const latestResult = this.getLatestHealthResult(systemName);
         if (!latestResult) return;
-        const statusColor = statusColors[latestResult.status] || "#999";
+        const statusColor = _SystemHealthMonitor.getStatusColor(
+          latestResult.status
+        );
         console.log(
           `%c\u25CF ${systemName} - ${latestResult.status}`,
           `color: ${statusColor}; font-weight: bold;`
@@ -5376,9 +5386,15 @@
         this.notifySubscribers(fallbackData, null, trackUri);
       }
     }
-    async processSongUpdate() {
-      const trackUri = Spicetify.Player.data?.item?.uri;
-      if (!trackUri || trackUri === this.currentTrackUri) {
+    /**
+     * Re-extract colours & (optionally) recompute beat analysis for the current
+     * track.  When `force === true` the method runs even if the track URI hasn't
+     * changed (used after live settings updates so gradients repaint instantly).
+     */
+    async processSongUpdate(force = false) {
+      const trackUri = Spicetify.Player?.data?.item?.uri;
+      if (!trackUri) return;
+      if (!force && trackUri === this.currentTrackUri) {
         return;
       }
       this.invalidateTrackCaches(trackUri);
@@ -5644,8 +5660,11 @@
     generateFallbackPalette(themeName) {
       const root = this.utils.getRootStyle();
       const computedStyle = getComputedStyle(root);
-      const baseColor = computedStyle.getPropertyValue("--spice-main").trim() || "#1e1e2e";
-      const accentColor = computedStyle.getPropertyValue("--spice-button").trim() || "#ca9ee6";
+      const baseColor = computedStyle.getPropertyValue("--spice-main").trim() || computedStyle.getPropertyValue("--spice-base").trim() || "#1e1e2e";
+      const accentColor = (
+        // Prefer Year 3000 dynamic accent if it's already available, else fall back to spice button, then to dynamic accent fallback.
+        computedStyle.getPropertyValue("--sn-gradient-accent").trim() || computedStyle.getPropertyValue("--spice-button").trim() || computedStyle.getPropertyValue("--sn-dynamic-accent").trim() || computedStyle.getPropertyValue("--spice-accent").trim() || "#8caaee"
+      );
       const baseRgb = this.utils.hexToRgb(
         baseColor.startsWith("#") ? baseColor : `#${baseColor}`
       );
@@ -5653,13 +5672,15 @@
         accentColor.startsWith("#") ? accentColor : `#${accentColor}`
       );
       if (!baseRgb || !accentRgb) {
+        const dynamicAccent = computedStyle.getPropertyValue("--sn-dynamic-accent").trim();
+        const dynamicBase = computedStyle.getPropertyValue("--spice-base").trim();
         return {
           name: themeName,
           version: "1.0.0",
           accents: {
-            mauve: "#ca9ee6",
+            mauve: dynamicAccent || "#ca9ee6",
             pink: "#f4b8e4",
-            blue: "#8caaee",
+            blue: dynamicAccent || "#8caaee",
             sapphire: "#85c1dc",
             sky: "#99d1db",
             teal: "#81c8be",
@@ -5670,7 +5691,7 @@
             lavender: "#babbf1"
           },
           neutrals: {
-            base: "#1e1e2e",
+            base: dynamicBase || "#1e1e2e",
             surface0: "#313244",
             surface1: "#45475a",
             surface2: "#585b70",
@@ -6228,8 +6249,7 @@
      */
     onAnimate(deltaMs) {
       if (typeof this.updateAnimation === "function") {
-        const timestamp = performance.now();
-        this.updateAnimation(timestamp, deltaMs);
+        this.updateAnimation(performance.now(), deltaMs);
       }
     }
     updateModeConfiguration(modeConfig) {
@@ -6469,6 +6489,16 @@
           );
         }
       }
+    }
+    // ---------------------------------------------------------------------------
+    // SETTINGS-AWARE REPAINT CONTRACT
+    // ---------------------------------------------------------------------------
+    /**
+     * Default no-op implementation.  Subclasses that cache colours, shaders, or
+     * other theme-dependent resources should override and perform a lightweight
+     * refresh.
+     */
+    forceRepaint(_reason = "generic") {
     }
   };
 
@@ -6726,6 +6756,8 @@
           `${this.kineticState.hueShift.toFixed(1)}deg`
         );
       }
+      const glow = Math.max(0, Math.min(1, this.kineticState.currentPulse * 1.2));
+      root.style.setProperty("--sn-text-glow-intensity", glow.toFixed(3));
     }
     // TODO: Private method for calculating beat pulse effects
     _calculateBeatPulse(deltaMs) {
@@ -6959,6 +6991,12 @@
       return maxHarmony;
     }
     findBestHarmoniousAccent(rgb, palette) {
+      let bestAccent = {
+        name: "mauve",
+        hex: this.utils.getRootStyle()?.style.getPropertyValue("--sn-dynamic-accent")?.trim() || this.utils.getRootStyle()?.style.getPropertyValue("--spice-accent")?.trim() || "#cba6f7",
+        // Fallback to default mauve hex
+        rgb: { r: 203, g: 166, b: 247 }
+      };
       const accentPriority = [
         "mauve",
         "lavender",
@@ -6969,7 +7007,6 @@
         "peach",
         "teal"
       ];
-      let bestAccent = null;
       let bestScore = -1;
       const inputHsl = this.utils.rgbToHsl(rgb.r, rgb.g, rgb.b);
       for (const accentName of accentPriority) {
@@ -6997,18 +7034,7 @@
           }
         }
       }
-      if (bestAccent) {
-        return bestAccent;
-      }
-      const fallbackAccentName = "mauve";
-      const fallbackAccentHex = palette.accents[fallbackAccentName] || Object.values(palette.accents)[0] || "#cba6f7";
-      const fallbackAccentRgb = this.utils.hexToRgb(fallbackAccentHex);
-      return {
-        name: fallbackAccentName,
-        hex: fallbackAccentHex,
-        rgb: fallbackAccentRgb || { r: 198, g: 160, b: 246 }
-        // Default mauve
-      };
+      return bestAccent;
     }
     blendColors(rgb1, rgb2, ratio = this.vibrancyConfig.defaultBlendRatio) {
       const r = Math.max(0, Math.min(1, ratio));
@@ -7435,6 +7461,17 @@
     }
     setEmergentEngine(engine) {
       this.emergentEngine = engine;
+    }
+    // ---------------------------------------------------------------------------
+    // 🔄 SETTINGS-AWARE REPAINT IMPLEMENTATION
+    // ---------------------------------------------------------------------------
+    /**
+     * Re-apply the current palette immediately.  This is extremely lightweight
+     * (just re-blends colours + sets CSS vars) so it can be called synchronously
+     * from Year3000System after a relevant settings change.
+     */
+    forceRepaint(_reason = "settings-change") {
+      this.refreshPalette?.();
     }
   };
 
@@ -8238,6 +8275,14 @@
         queueCSSUpdate("--sn-breathing-scale", clampedBreathingScale.toFixed(4));
         const normalizedPhase = rhythmPhase % (Math.PI * 2);
         queueCSSUpdate("--sn-rhythm-phase", normalizedPhase.toFixed(4));
+        const beatPulseIntensity = Math.max(
+          0,
+          Math.min(1, this.beatIntensity * 0.7 + this.currentEnergy * 0.3)
+        );
+        queueCSSUpdate(
+          "--sn-beat-pulse-intensity",
+          beatPulseIntensity.toFixed(4)
+        );
         this.performanceMetrics.cssVariableUpdates++;
       } catch (error) {
         if (this.config.enableDebug) {
@@ -9377,7 +9422,14 @@
         intensity = musicData.energy * 0.5 + musicData.valence * 0.5;
       }
       intensity = (intensity + itemData.attentionScore) / 2;
-      glyphElement.style.setProperty("--glyph-intensity", `${intensity}`);
+      const applyCss = (prop, val, el) => {
+        if (this.year3000System && this.year3000System.queueCSSVariableUpdate) {
+          this.year3000System.queueCSSVariableUpdate(prop, val, el);
+        } else {
+          el.style.setProperty(prop, val);
+        }
+      };
+      applyCss("--glyph-intensity", `${intensity}`, glyphElement);
       glyphElement.style.opacity = `${intensity * 0.8}`;
     }
     updateGlyphData(itemElement, data) {
@@ -10108,20 +10160,28 @@
       }
     }
     _setInitialMaterializationCSS() {
-      const safeSetProperty = (name, value) => {
+      const applyCss = (prop, val) => {
         try {
-          this.rootElement.style.setProperty(name, value);
+          if (this.year3000System && this.year3000System.queueCSSVariableUpdate) {
+            this.year3000System.queueCSSVariableUpdate(
+              prop,
+              val,
+              this.rootElement
+            );
+          } else {
+            this.rootElement.style.setProperty(prop, val);
+          }
         } catch (e) {
           if (this.config?.enableDebug) {
             console.warn(
-              `[${this.systemName}] Error setting CSS variable ${name}:`,
+              `[${this.systemName}] Error setting CSS variable ${prop}:`,
               e.message
             );
           }
         }
       };
-      safeSetProperty("--sn-materialize-imminence", "0");
-      safeSetProperty("--sn-materialize-clarity", "0");
+      applyCss("--sn-materialize-imminence", "0");
+      applyCss("--sn-materialize-clarity", "0");
     }
     updateFromMusicAnalysis(processedMusicData) {
       if (!this.initialized || !processedMusicData) return;
@@ -10149,23 +10209,31 @@
         0,
         Math.min(1, this.materializationState.clarity)
       );
-      const safeSetProperty = (name, value) => {
+      const applyCss = (prop, val) => {
         try {
-          this.rootElement.style.setProperty(name, value);
+          if (this.year3000System && this.year3000System.queueCSSVariableUpdate) {
+            this.year3000System.queueCSSVariableUpdate(
+              prop,
+              val,
+              this.rootElement
+            );
+          } else {
+            this.rootElement.style.setProperty(prop, val);
+          }
         } catch (e) {
           if (this.config?.enableDebug) {
             console.warn(
-              `[${this.systemName}] Error setting CSS variable ${name} during update:`,
+              `[${this.systemName}] Error setting CSS variable ${prop} during update:`,
               e.message
             );
           }
         }
       };
-      safeSetProperty(
+      applyCss(
         "--sn-materialize-imminence",
         `${this.materializationState.imminence.toFixed(3)}`
       );
-      safeSetProperty(
+      applyCss(
         "--sn-materialize-clarity",
         `${this.materializationState.clarity.toFixed(3)}`
       );
@@ -10421,11 +10489,23 @@
         "sn-music-high-energy"
       );
       this.rootNavBar.classList.add(`sn-music-${energyLevel}-energy`);
-      this.rootNavBar.style.setProperty(
-        "--sidebar-intensity",
-        `${visualIntensity}`
-      );
       this.rootNavBar.setAttribute("data-mood", moodIdentifier);
+      const glow = Math.max(0, Math.min(1, visualIntensity));
+      const textOpacity = Math.min(0.5, glow * 0.6);
+      const applyCss = (prop, val) => {
+        if (this.year3000System && this.year3000System.queueCSSVariableUpdate) {
+          this.year3000System.queueCSSVariableUpdate(
+            prop,
+            val,
+            this.rootNavBar
+          );
+        } else {
+          this.rootNavBar.style.setProperty(prop, val);
+        }
+      };
+      applyCss("--sn-nav-item-glow-intensity", `${glow}`);
+      applyCss("--sn-nav-text-energy-opacity", `${textOpacity}`);
+      applyCss("--sidebar-intensity", `${visualIntensity}`);
     }
     updateFromMusicAnalysis(processedMusicData, rawFeatures, trackUri) {
       if (!this.initialized) return;
@@ -11205,7 +11285,13 @@
         console.log(
           `\u{1F3A8} [Year3000System] applyInitialSettings: Accent=${accent}, Gradient=${gradient}, Stars=${stars}`
         );
-        await this._applyCatppuccinAccent(accent);
+        if (accent !== "dynamic") {
+          await this._applyCatppuccinAccent(accent);
+        } else if (this.YEAR3000_CONFIG.enableDebug) {
+          console.log(
+            "\u{1F3A8} [Year3000System] Skipping static accent application because 'dynamic' accent is selected."
+          );
+        }
         await this._applyStarryNightSettings(
           gradient,
           stars
@@ -11228,6 +11314,14 @@
       }
     }
     async _applyCatppuccinAccent(selectedAccent) {
+      if (selectedAccent === "dynamic") {
+        if (this.YEAR3000_CONFIG.enableDebug) {
+          console.log(
+            "\u{1F3A8} [Year3000System] _applyCatppuccinAccent: 'dynamic' accent selected \u2013 skipping static accent overrides."
+          );
+        }
+        return;
+      }
       console.log(
         `\u{1F3A8} [Year3000System] _applyCatppuccinAccent: Applying accent color '${selectedAccent}'`
       );
@@ -11292,7 +11386,11 @@
       if (primaryHex) queueUpdate("--sn-gradient-primary", primaryHex);
       if (secondaryHex) queueUpdate("--sn-gradient-secondary", secondaryHex);
       if (accentHex) queueUpdate("--sn-gradient-accent", accentHex);
-      if (accentHex) queueUpdate("--spice-accent", accentHex);
+      if (accentHex) {
+        queueUpdate("--spice-accent", accentHex);
+        queueUpdate("--spice-button", accentHex);
+        queueUpdate("--spice-button-active", accentHex);
+      }
       const addRgb = (prop, hex) => {
         if (!hex) return;
         const rgb = this.utils.hexToRgb(hex);
@@ -11303,7 +11401,24 @@
       addRgb("--sn-gradient-primary-rgb", primaryHex);
       addRgb("--sn-gradient-secondary-rgb", secondaryHex);
       addRgb("--sn-gradient-accent-rgb", accentHex);
+      addRgb("--sn-dynamic-accent-rgb", accentHex);
       addRgb("--spice-rgb-accent", accentHex);
+      addRgb("--spice-rgb-button", accentHex);
+      const root = this.utils.getRootStyle();
+      if (root) {
+        const computedStyle = getComputedStyle(root);
+        const addSpiceRgb = (rgbProp, hexProp, fallbackHex) => {
+          const hexValue = computedStyle.getPropertyValue(hexProp).trim() || fallbackHex;
+          addRgb(rgbProp, hexValue);
+        };
+        addSpiceRgb("--spice-rgb-main", "--spice-main", "#cdd6f4");
+        addSpiceRgb("--spice-rgb-base", "--spice-base", "#1e1e2e");
+        addSpiceRgb("--spice-rgb-player", "--spice-player", "#181825");
+        addSpiceRgb("--spice-rgb-sidebar", "--spice-sidebar", "#313244");
+        addSpiceRgb("--spice-rgb-surface0", "--spice-surface0", "#313244");
+        addSpiceRgb("--spice-rgb-surface1", "--spice-surface1", "#45475a");
+        addSpiceRgb("--spice-rgb-text", "--spice-text", "#cdd6f4");
+      }
       if (this.cssVariableBatcher) {
         this.cssVariableBatcher.flushCSSVariableBatch();
       }
@@ -11323,6 +11438,31 @@
           secondaryHex,
           accentHex
         });
+      }
+    }
+    // =============================================
+    // 🆕 PUBLIC WRAPPER – UNIFIED CSS VARIABLE BATCH API
+    // =============================================
+    /**
+     * Queue a CSS variable update through the shared CSSVariableBatcher. Falls
+     * back to an immediate style mutation when the batcher is unavailable
+     * (degraded mode or very early boot).
+     *
+     * @param property  The CSS custom property name (e.g. "--sn-nav-intensity")
+     * @param value     The value to assign (raw string, keep units if needed)
+     * @param element   Optional specific HTMLElement target. When omitted the
+     *                  root <html> element is used so variables cascade.
+     */
+    queueCSSVariableUpdate(property, value, element = null) {
+      if (this.cssVariableBatcher) {
+        this.cssVariableBatcher.queueCSSVariableUpdate(
+          property,
+          value,
+          element || void 0
+        );
+      } else {
+        const target = element || document.documentElement;
+        target.style.setProperty(property, value);
       }
     }
     setGradientParameters() {
@@ -11877,6 +12017,9 @@
      */
     _broadcastSettingChange(key, value) {
       const systems = [
+        this.colorHarmonyEngine,
+        this.glassmorphismManager,
+        this.card3DManager,
         this.lightweightParticleSystem,
         this.dimensionalNexusSystem,
         this.dataGlyphSystem,
@@ -11894,6 +12037,16 @@
           } catch (err) {
             console.warn(
               `[Year3000System] ${sys.systemName || sys.constructor.name} failed to handle settings change`,
+              err
+            );
+          }
+        }
+        if (sys && typeof sys.forceRepaint === "function") {
+          try {
+            sys.forceRepaint(`settings:${key}`);
+          } catch (err) {
+            console.warn(
+              `[Year3000System] ${sys.systemName || sys.constructor.name} failed to repaint after settings change`,
               err
             );
           }

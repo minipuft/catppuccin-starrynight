@@ -1,0 +1,43 @@
+/* =============================================================================
+   CARD BASE LAYER – shared structural styles (Phase 2)
+   -----------------------------------------------------------------------------
+   Purpose: Provide a single source of truth for fundamental `.main-card-card`
+   attributes that must be consistent across Lite & Cosmic variants.
+   This file MUST contain **no high-intensity motion** – keep it gentle so that
+   additional layers can opt-in to heavier effects.
+============================================================================= */
+
+@use "../core/mixins" as *;
+
+// Base selector – keep scope broad so both search & non-search contexts inherit.
+.main-card-card {
+  // Layout & geometry
+  position: relative;
+  border-radius: var(--sn-card-stellar-radius, var(--card-border-radius, 12px));
+  overflow: hidden; // Ensure child pseudo-elements clip correctly
+  isolation: isolate; // Contain stacked pseudo-elements
+
+  // Subtle default surface (light enough for overrides)
+  background: rgba(var(--spice-rgb-surface0, 28, 28, 30), 0.08);
+  box-shadow: 0 1px 4px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb, 0,0,0), 0.06);
+
+  // Smooth, conservative transitions – motion layers can override timing-func/speed
+  transition: box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease,
+    transform 0.3s ease;
+
+  // Accessibility: visible keyboard focus
+  &:focus-visible {
+    outline: 2px solid var(--spice-accent, #f5c2e7);
+    outline-offset: 2px;
+  }
+
+  // Reduced-motion respect – turn off animations introduced by higher layers
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0.15s !important;
+    animation: none !important;
+  }
+
+  // Performance hint
+  @include performance-optimized;
+  will-change: transform, box-shadow, background, border-color;
+}

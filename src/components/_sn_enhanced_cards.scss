@@ -4,6 +4,7 @@
 // =============================================================================
 
 @use "../core/mixins" as *;
+@use "./sn_card_base";
 
 // Year 3000 Nexus Cards System Variables
 :root {
@@ -34,13 +35,22 @@
   --music-energy-modulation: 1; // Responds to music dynamics
 
   // === Advanced Color Harmony ===
-  --card-energy-primary: var(--sn-gradient-primary, rgba(202, 158, 230, 0.8));
-  --card-energy-secondary: var(
-    --sn-gradient-secondary,
-    rgba(186, 187, 241, 0.6)
+  --card-energy-primary: rgba(
+    var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+    0.8
   );
-  --card-energy-accent: var(--sn-gradient-accent, rgba(140, 170, 238, 0.7));
-  --card-energy-ambient: var(--spice-surface0, rgba(65, 69, 89, 0.4));
+  --card-energy-secondary: rgba(
+    var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0, 186,187,241)),
+    0.6
+  );
+  --card-energy-accent: rgba(
+    var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+    0.7
+  );
+  --card-energy-ambient: rgba(
+    var(--spice-rgb-surface0, 65,69,89),
+    0.4
+  );
 
   // === YEAR 3000 BEATSYNC CONSCIOUSNESS INTEGRATION ===
   // Cards pulse and breathe with the rhythm of the cosmos
@@ -72,6 +82,27 @@
   --calculated-transition: calc(
     var(--card-energy-dissipation) / var(--motion-intelligence-level)
   );
+
+  // === Lightweight Enhancement Foundation ===
+  --card-border-radius: 12px;
+  --card-color-intensity: 0.08;
+  --card-shadow-intensity: 0.12;
+  --card-transition-speed: 0.3s;
+
+  // === Search-Compatible Color System ===
+  --card-color-primary: rgba(
+    var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+    0.08
+  );
+  --card-color-secondary: rgba(
+    var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0, 186,187,241)),
+    0.06
+  );
+  --card-color-accent: rgba(
+    var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+    0.07
+  );
+  --card-shadow-base: rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.12);
 }
 
 // =============================================================================
@@ -313,7 +344,6 @@
 
 .main-card-header {
   position: relative;
-  overflow: hidden;
   border-radius: var(--card-organic-corners) var(--card-organic-corners) 0 0;
   transform: var(--card-depth-mid);
 
@@ -640,28 +670,6 @@
 // =============================================================================
 // YEAR 3000 CARD ENHANCEMENT - Search Compatible Version
 // Lightweight card enhancements that don't interfere with search precision targeting
-// =============================================================================
-
-// Year 3000 Card Enhancement Variables (Search Compatible)
-:root {
-  // === Lightweight Enhancement Foundation ===
-  --card-border-radius: 12px;
-  --card-color-intensity: 0.08;
-  --card-shadow-intensity: 0.12;
-  --card-transition-speed: 0.3s;
-
-  // === Search-Compatible Color System ===
-  --card-color-primary: var(--sn-gradient-primary, rgba(202, 158, 230, 0.08));
-  --card-color-secondary: var(
-    --sn-gradient-secondary,
-    rgba(186, 187, 241, 0.06)
-  );
-  --card-color-accent: var(--sn-gradient-accent, rgba(140, 170, 238, 0.07));
-  --card-shadow-base: rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.12);
-}
-
-// =============================================================================
-// SEARCH COMPATIBILITY GUARD - Disable in Search Pages
 // =============================================================================
 
 // Only apply enhancements OUTSIDE of search pages to avoid conflicts

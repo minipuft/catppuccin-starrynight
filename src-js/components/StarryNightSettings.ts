@@ -18,6 +18,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
 
   // --- Accent colour drop-down (example) -----------------------------------
   const accentOptions = [
+    "dynamic", // 🎨 Album-based accent (Year 3000)
     "rosewater",
     "flamingo",
     "pink",
