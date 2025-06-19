@@ -16,11 +16,12 @@ The Year 3000 Dynamic Color System has been fully implemented and is operational
 
 ### 🏗️ **Architecture & Implementation**
 
-| Document                                                                    | Status      | Description                                |
-| --------------------------------------------------------------------------- | ----------- | ------------------------------------------ |
-| [Implementation Roadmap](plans/IMPLEMENTATION_ROADMAP.md)                   | ✅ Complete | Complete implementation status and results |
-| [Visual Systems Architecture](VISUAL_SYSTEMS_ARCHITECTURE.md)               | ✅ Current  | System architecture overview               |
-| [Spicetify Implementation Notes](spotify/SPICETIFY_IMPLEMENTATION_NOTES.md) | ✅ Current  | Technical implementation details           |
+| Document                                                                    | Status      | Description                                                    |
+| --------------------------------------------------------------------------- | ----------- | -------------------------------------------------------------- |
+| [Implementation Roadmap](plans/IMPLEMENTATION_ROADMAP.md)                   | ✅ Complete | Complete implementation status and results                     |
+| [Visual Systems Architecture](VISUAL_SYSTEMS_ARCHITECTURE.md)               | ✅ Current  | System architecture overview                                   |
+| [Aberration Visual System](visual/ABERRATION_SYSTEM.md)                     | ✅ Current  | Chromatic aberration visual stack (Canvas + Manager + Adaptor) |
+| [Spicetify Implementation Notes](spotify/SPICETIFY_IMPLEMENTATION_NOTES.md) | ✅ Current  | Technical implementation details                               |
 
 ### 🎵 **Music & Audio Systems**
 
@@ -28,6 +29,15 @@ The Year 3000 Dynamic Color System has been fully implemented and is operational
 | ------------------------------------------------------------------ | ---------- | --------------------------------------- |
 | [BeatSync Implementation](BeatSync/ENHANCED_BPM_IMPLEMENTATION.md) | ✅ Current | BPM detection and music synchronization |
 | [BMP Harmony Engine](BeatSync/BMP_HARMONY_ENGINE.md)               | ✅ Current | Music analysis and harmony systems      |
+
+### 🖱️ **Drag-and-Drop UX**
+
+| Document                                                    | Status     | Description                         |
+| ----------------------------------------------------------- | ---------- | ----------------------------------- |
+| [Overview](DragAndDrop/DRAG_AND_DROP_OVERVIEW.md)           | 🔄 Current | Architecture & phased rollout       |
+| [DragCartographer](DragAndDrop/DRAG_CARTOGRAPHER.md)        | ✅ Stable  | Debug tracker for drag selectors    |
+| [EnhancedDragPreview](DragAndDrop/ENHANCED_DRAG_PREVIEW.md) | ✅ Stable  | Hi-DPI canvas drag ghost            |
+| [QuickAddRadialMenu](DragAndDrop/QUICK_ADD_RADIAL_MENU.md)  | ✅ Stable  | 5-button MRU radial & sidebar clone |
 
 ## 🎯 **Key Implementation Achievements**
 
@@ -96,6 +106,6 @@ background: rgba(
 
 ---
 
-**Last Updated**: January 2025
+**Last Updated**: June 2025
 **System Status**: ✅ Fully Operational
 **Version**: 2.0

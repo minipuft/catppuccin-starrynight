@@ -7,7 +7,7 @@
    additional layers can opt-in to heavier effects.
 ============================================================================= */
 
-@use "../core/mixins" as *;
+@use "../core/_mixins" as *;
 
 // Base selector – keep scope broad so both search & non-search contexts inherit.
 .main-card-card {

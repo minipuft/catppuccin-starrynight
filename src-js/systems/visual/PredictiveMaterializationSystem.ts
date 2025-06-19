@@ -4,6 +4,7 @@ import { Year3000System } from "@/core/year3000System";
 import { SettingsManager } from "@/managers/SettingsManager";
 import { MusicSyncService } from "@/services/MusicSyncService";
 import type { Year3000Config } from "@/types/models";
+import { echoPool } from "@/utils/echoPool";
 import * as Year3000Utilities from "@/utils/Year3000Utilities";
 import { BaseVisualSystem } from "../BaseVisualSystem";
 
@@ -34,10 +35,79 @@ interface ModeConfig {
 
 // YEAR 3000 PREDICTIVE MATERIALIZATION SYSTEM
 export class PredictiveMaterializationSystem extends BaseVisualSystem {
-  // TODO: Implement abstract onAnimate method for Year 3000 MasterAnimationCoordinator
-  public onAnimate(deltaMs: number): void {
-    // Basic implementation - can be enhanced in future phases
+  // Time tracking for resonance triggers
+  private _resonanceCooldownMs = 1200;
+  private _timeSinceLastResonance = 0;
+
+  // TODO[Y3K-PH3]: Allow external callers (e.g., Navigation system) to set the element that receives resonance
+  public setTargetElement(el: HTMLElement | null): void {
+    this.materializationState.targetElement = el;
   }
+
+  // Frame-level animation hook used by MasterAnimationCoordinator
+  public onAnimate(deltaMs: number): void {
+    // Skip if system disabled or no target element
+    if (!this.materializationState.targetElement) return;
+
+    this._timeSinceLastResonance += deltaMs;
+
+    // Basic heuristic: fire resonance when imminence + clarity exceed threshold and cooldown elapsed
+    const imminence = this.materializationState.imminence;
+    const clarity = this.materializationState.clarity;
+
+    const threshold = 0.6; // later tweakable via config
+
+    if (
+      imminence * 0.7 + clarity * 0.3 > threshold &&
+      this._timeSinceLastResonance >= this._resonanceCooldownMs
+    ) {
+      this._maybeTriggerResonance();
+      this._timeSinceLastResonance = 0;
+    }
+  }
+
+  private _maybeTriggerResonance(): void {
+    const target = this.materializationState.targetElement;
+    if (!target) return;
+
+    // Ensure class isn't already active to avoid stacking animations
+    if (target.classList.contains("sn-materialize-resonance")) return;
+
+    target.classList.add(
+      "sn-materialize-resonance",
+      "sn-predict-materialize-glow"
+    );
+
+    const handleEnd = () => {
+      target.classList.remove("sn-materialize-resonance");
+      target.removeEventListener("animationend", handleEnd);
+    };
+    target.addEventListener("animationend", handleEnd, { once: true });
+
+    // === Phase 1: Spawn mega echo when imminence high ===
+    if (
+      this.materializationState.imminence >= 0.7 &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      const tintHue = (this.materializationState.clarity ?? 0.5) * 360;
+      echoPool.spawn(target, {
+        tintHue,
+        radius: 160, // Mega ripple radius (2× base ~80)
+        intensity: 0.4,
+      });
+    }
+
+    if (this.config?.enableDebug) {
+      console.debug(
+        `[${this.systemName}] Materialize resonance triggered on`,
+        target,
+        `imminence=${this.materializationState.imminence.toFixed(
+          2
+        )}, clarity=${this.materializationState.clarity.toFixed(2)}`
+      );
+    }
+  }
+
   private materializationState: MaterializationState;
   private rootElement: HTMLElement;
   private modeConfig?: Partial<ModeConfig>;
@@ -229,6 +299,42 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
     super.destroy();
     if (this.config?.enableDebug) {
       console.log(`[${this.systemName}] Destroyed and cleaned up.`);
+    }
+  }
+
+  // TODO[Y3K-PH2]: Public helper to trigger anticipatory shimmer on a target element.
+  // This seeds two-way integration with BehavioralPredictionEngine while keeping
+  // backward-compatibility (calling code can still add the CSS class directly).
+  public triggerAnticipatoryWarmth(
+    target: HTMLElement,
+    {
+      hue = 0,
+      intensity = 0.18,
+      durationMs = 1200,
+    }: { hue?: number; intensity?: number; durationMs?: number } = {}
+  ): void {
+    if (!target) return;
+
+    // Clamp intensity to [0,0.3] so we respect accessibility caps.
+    const clamped = Math.max(0, Math.min(0.3, intensity));
+
+    target.style.setProperty("--sn-anticipatory-intensity", clamped.toFixed(3));
+    target.style.setProperty("--sn-anticipatory-hue", `${hue.toFixed(1)}deg`);
+
+    target.classList.add("sn-anticipatory-warmth");
+
+    // Auto-cleanup to avoid lingering classes/vars
+    const handleEnd = () => {
+      target.classList.remove("sn-anticipatory-warmth");
+      target.removeEventListener("animationend", handleEnd);
+    };
+    target.addEventListener("animationend", handleEnd);
+
+    if (this.config?.enableDebug) {
+      console.debug(
+        `[${this.systemName}] Anticipatory shimmer fired (hue=${hue}, intensity=${clamped}) on`,
+        target
+      );
     }
   }
 }

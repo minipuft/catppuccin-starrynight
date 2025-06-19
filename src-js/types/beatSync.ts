@@ -41,5 +41,10 @@ export interface BeatSyncModeConfig {
 export interface BeatFlashIntensity {
   base: number;
   peak: number;
+  /**
+   * Transient runtime value representing the current eased intensity (0-1). Not
+   * required by all call-sites, hence optional.
+   */
+  intensity?: number;
   enabled: boolean;
 }

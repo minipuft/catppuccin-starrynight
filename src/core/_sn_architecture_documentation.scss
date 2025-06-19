@@ -69,7 +69,7 @@ LAYER 5: SYSTEM MODULES (src/systems/)
 ├── _sn_prediction_effects.scss       - Advanced glow & pulse systems
 ├── _sn_quantum_consciousness.scss    - Quantum sidebar consciousness field
 ├── _sn_data_glyphs.scss              - Data glyphs & biometric feedback
-└── _sn_dimensional_nexus.scss         - Dimensional nexus & predictive materialization
+└── _sidebar_dimensional_nexus.scss    - Sidebar dimensional nexus enhancements (consolidated)
 
 LAYER 6: SEARCH MODULES (src/search/)
 ├── _sn_search_precision.scss        - Precision-mode search styling
@@ -193,3 +193,24 @@ Performance:             Optimized through modularization
 // ████████████████████████████████████████████████████████████████████████████████
 // END OF ARCHITECTURE DOCUMENTATION
 // ████████████████████████████████████████████████████████████████████████████████
+
+// ================================================================================================
+// NEBULA FIELD VARIABLE FACADE (Phase 1)
+// ================================================================================================
+// The Nebula Field introduces four CSS custom-property groups that *alias* existing depth-layer &
+// gradient variables. This semantic layer gives designers and JavaScript controllers a clear
+// contract without duplicating data sources.
+//
+//   ┌───────────────┬──────────────────────────────────────────────────────────┐
+//   │ Variable      │ Upstream Alias                                          │
+//   ├───────────────┼──────────────────────────────────────────────────────────┤
+//   │ --sn-nebula-layer-0-color-rgb │ --sn-gradient-primary-rgb              │
+//   │ --sn-nebula-layer-0-opacity   │ --sn-depth-layer-0-opacity            │
+//   │ --sn-nebula-layer-0-blur      │ --sn-depth-layer-0-blur               │
+//   │ --sn-nebula-layer-0-scale     │ --sn-depth-layer-0-scale              │
+//   │ … repeat for layers 1–3 using gradient-secondary / accent / highlight  │
+//   └───────────────┴──────────────────────────────────────────────────────────┘
+//
+// Controllers MAY update opacity / blur / scale at runtime; colour variables
+// should remain theme-driven via gradient tokens. See `src/core/_sn_nebula_variables.scss`.
+// ================================================================================================

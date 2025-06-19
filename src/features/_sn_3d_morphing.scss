@@ -1,6 +1,8 @@
 // ████████████████████████████████████████████████████████████████████████████████
 // 3D MORPHING CONSCIOUSNESS SYSTEM - Year 3000 BeatSync Integration
+// PHASE 2 ENHANCEMENT: Neural Constellation Discovery Integration
 // Dimensional consciousness with rhythm-responsive 3D morphing effects
+// Now enhanced with constellation-specific 3D transformations
 // ████████████████████████████████████████████████████████████████████████████████
 //
 // This module transforms static 3D elements into consciousness-aware interfaces that:
@@ -9,15 +11,17 @@
 // - BLOOM depth effects during musical intensity peaks
 // - HARMONIZE perspective with dynamic music analysis
 // - BREATHE with dimensional scale effects synchronized to beats
+// - CONSTELLATION orbital motion and gravitational effects (PHASE 2)
 //
 // CRITICAL: Maintains search exclusion guards to prevent interference
 // Dependencies:
 // - BeatSyncVisualSystem variables (--sn-beat-pulse-intensity, --sn-rhythm-phase, --sn-breathing-scale)
 // - Year 3000 gradient system variables (--sn-gradient-*-rgb)
+// - Neural Constellation variables (--constellation-*, PHASE 2)
 //
 // ████████████████████████████████████████████████████████████████████████████████
 
-@use "../core/mixins" as *;
+@use "../core/_mixins" as *;
 
 // ████████████████████████████████████████████████████████████████████████████████
 // CORE 3D CONSCIOUSNESS VARIABLES
@@ -29,15 +33,15 @@
   --perspective-distance: calc(
     800px + var(--sn-beat-pulse-intensity, 0) * 200px
   );
-  --max-rotate-x: calc(8deg + var(--sn-rhythm-phase, 0) * 4deg);
-  --max-rotate-y: calc(8deg + var(--sn-rhythm-phase, 0) * 4deg);
+  --max-rotate-x: 0deg;
+  --max-rotate-y: 0deg;
   --depth-hover: calc(12px + var(--sn-beat-pulse-intensity, 0) * 8px);
   --morph-duration: calc(0.3s - var(--sn-beat-pulse-intensity, 0) * 0.1s);
   --morph-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   // === BEATSYNC CONSCIOUSNESS VARIABLES (New) ===
   --sn-3d-beat-depth: calc(var(--sn-beat-pulse-intensity, 0) * 20px);
-  --sn-3d-rhythm-rotation: calc(var(--sn-rhythm-phase, 0) * 5deg);
+  --sn-3d-rhythm-rotation: 0deg;
   --sn-3d-breathing-scale: var(--sn-breathing-scale, 1);
 
   // === COSMIC 3D ENHANCEMENT ===
@@ -46,15 +50,22 @@
   );
   --sn-3d-energy-intensity: calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.5);
   --sn-3d-morph-strength: calc(var(--sn-beat-pulse-intensity, 0) * 0.15);
-  --sn-3d-rhythm-flow: calc(var(--sn-rhythm-phase, 0) * 15deg);
+  --sn-3d-rhythm-flow: 0deg;
 
   // === DIMENSIONAL MORPHING SYSTEM ===
   --sn-3d-depth-pulse: calc(12px + var(--sn-beat-pulse-intensity, 0) * 20px);
   --sn-3d-hover-enhancement: calc(
     1.02 + var(--sn-beat-pulse-intensity, 0) * 0.03
   );
-  --sn-3d-rotation-consciousness: calc(var(--sn-rhythm-phase, 0) * 3deg);
+  --sn-3d-rotation-consciousness: 0deg;
   --sn-3d-cosmic-glow: calc(var(--sn-beat-pulse-intensity, 0) * 0.4);
+
+  // TODO: Enhance existing 3D morphing with constellation-specific transforms
+  // === PHASE 2: CONSTELLATION 3D ENHANCEMENT ===
+  --sn-3d-constellation-depth: var(--constellation-z-mid, translateZ(60px));
+  --sn-3d-constellation-orbit: calc(var(--constellation-orbit-speed, 8s) * 0.5);
+  --sn-3d-constellation-perspective: var(--constellation-depth-field, 1200px);
+  --sn-3d-constellation-gravity: var(--constellation-gravity-strength, 0.8);
 
   // === ENHANCED SHADOW SYSTEM (Consciousness Aware) ===
   --shadow-3d-color: rgba(
@@ -84,6 +95,18 @@ body:not(:has(.main-searchPage-content)) {
     // BREATHING effect for entire grid
     transform: scale(var(--sn-3d-breathing-scale));
     transition: transform 0.2s ease-out;
+
+    // TODO: Add constellation node positioning calculations
+    // PHASE 2: Constellation mode 3D enhancement
+    &:has([data-testid*="constellation"]),
+    .main-view-container:has([data-testid*="artist"]) & {
+      // Enhanced constellation perspective
+      perspective: var(--sn-3d-constellation-perspective);
+      transform-style: preserve-3d;
+
+      // Constellation breathing synchronized with cosmic rotation
+      transform: scale(var(--sn-3d-breathing-scale));
+    }
   }
 
   // ████████████████████████████████████████████████████████████████████████████████
@@ -97,23 +120,19 @@ body:not(:has(.main-searchPage-content)) {
     transform-origin: center center;
 
     // Base consciousness state with BREATHING
-    transform: scale(var(--sn-3d-breathing-scale))
-      rotateX(var(--sn-3d-rotation-consciousness))
-      rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.3));
+    transform: scale(var(--sn-3d-breathing-scale));
 
     // Subtle cosmic glow effect
     filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 10deg))
       saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.2));
 
-    // BLOOM hover with enhanced consciousness
+            // BLOOM hover with enhanced consciousness
     &:hover {
       // MORPH transformation with beat synchronization
       transform: translateZ(calc(var(--depth-hover) + var(--sn-3d-beat-depth)))
         scale(
           calc(var(--sn-3d-hover-enhancement) * var(--sn-3d-breathing-scale))
-        )
-        rotateX(calc(var(--sn-3d-rotation-consciousness) * 1.5))
-        rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.8));
+        );
 
       // Enhanced consciousness shadow with cosmic elements
       box-shadow: 0 8px 24px var(--shadow-3d-color),
@@ -151,12 +170,28 @@ body:not(:has(.main-searchPage-content)) {
     // Enhanced active state with consciousness
     &:active {
       transform: translateZ(calc(4px + var(--sn-3d-beat-depth) * 0.5))
-        scale(calc(0.98 - var(--sn-beat-pulse-intensity, 0) * 0.02))
-        rotateX(calc(var(--sn-3d-rotation-consciousness) * 0.5))
-        rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.2));
+        scale(calc(0.98 - var(--sn-beat-pulse-intensity, 0) * 0.02));
       transition: transform
         calc(0.1s + var(--sn-beat-pulse-intensity, 0) * 0.05s) ease;
     }
+  }
+
+  // TODO: Implement smooth transitions between 2D grid and 3D constellation views
+  // PHASE 2: Enhanced constellation node hover effects
+  .main-view-container:has([data-testid*="artist"]) .main-card-card:hover {
+    // Constellation gravitational hover enhancement
+    transform: translateZ(calc(var(--depth-hover) + var(--sn-3d-beat-depth) + 20px))
+      scale(calc(var(--sn-3d-hover-enhancement) * var(--sn-3d-breathing-scale) * 1.1));
+
+    // Enhanced constellation shadow effects
+    box-shadow: 0 12px 32px var(--shadow-3d-color),
+      0 6px calc(24px + var(--sn-beat-pulse-intensity, 0) * 12px)
+        var(--shadow-3d-cosmic),
+      0 0 calc(var(--sn-3d-cosmic-glow) * 30px)
+        rgba(
+          var(--constellation-line-accent, var(--sn-gradient-accent-rgb, 140,170,238)),
+          calc(var(--sn-3d-cosmic-glow) * 1.5)
+        );
   }
 
   // ████████████████████████████████████████████████████████████████████████████████
@@ -171,8 +206,7 @@ body:not(:has(.main-searchPage-content)) {
         filter 0.4s ease-out;
 
       // Base consciousness state
-      transform: scale(var(--sn-3d-breathing-scale))
-        rotateZ(calc(var(--sn-rhythm-phase, 0) * 1deg));
+      transform: scale(var(--sn-3d-breathing-scale));
 
       // Subtle REFRACT effect
       filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 5deg))
@@ -181,8 +215,7 @@ body:not(:has(.main-searchPage-content)) {
       .main-card-card:hover & {
         // MORPH image transformation with consciousness
         transform: translateZ(calc(8px + var(--sn-3d-beat-depth) * 0.4))
-          scale(calc(1.05 + var(--sn-beat-pulse-intensity, 0) * 0.02))
-          rotateZ(calc(var(--sn-rhythm-phase, 0) * 2deg));
+          scale(calc(1.05 + var(--sn-beat-pulse-intensity, 0) * 0.02));
 
         // Enhanced REFRACT on hover
         filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 15deg))
@@ -205,8 +238,7 @@ body:not(:has(.main-searchPage-content)) {
     // Enhanced initial state with consciousness
     opacity: calc(0.1 + var(--sn-beat-pulse-intensity, 0) * 0.2);
     transform: translateZ(calc(-8px - var(--sn-3d-beat-depth) * 0.2))
-      scale(calc(0.8 + var(--sn-beat-pulse-intensity, 0) * 0.1))
-      rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.5));
+      scale(calc(0.8 + var(--sn-beat-pulse-intensity, 0) * 0.1));
 
     // Subtle cosmic glow in base state
     filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 8deg));
@@ -215,8 +247,7 @@ body:not(:has(.main-searchPage-content)) {
       // BLOOM button appearance with consciousness
       opacity: calc(0.9 + var(--sn-beat-pulse-intensity, 0) * 0.1);
       transform: translateZ(calc(16px + var(--sn-3d-beat-depth)))
-        scale(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.05))
-        rotateY(var(--sn-3d-rhythm-rotation));
+        scale(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.05));
 
       // Enhanced cosmic glow
       filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 20deg))
@@ -235,8 +266,7 @@ body:not(:has(.main-searchPage-content)) {
     &:hover {
       // Enhanced BLOOM hover state
       transform: translateZ(calc(20px + var(--sn-3d-beat-depth) * 1.2))
-        scale(calc(1.1 + var(--sn-beat-pulse-intensity, 0) * 0.1))
-        rotateY(calc(var(--sn-3d-rhythm-rotation) * 1.5));
+        scale(calc(1.1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
 
       // Maximum cosmic consciousness
       filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 30deg))
@@ -256,8 +286,7 @@ body:not(:has(.main-searchPage-content)) {
     &:active {
       // Enhanced active state with consciousness
       transform: translateZ(calc(12px + var(--sn-3d-beat-depth) * 0.8))
-        scale(calc(0.95 - var(--sn-beat-pulse-intensity, 0) * 0.02))
-        rotateY(calc(var(--sn-3d-rhythm-rotation) * 0.8));
+        scale(calc(0.95 - var(--sn-beat-pulse-intensity, 0) * 0.02));
 
       // Active state cosmic effect
       filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 15deg))

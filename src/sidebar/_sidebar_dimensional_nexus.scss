@@ -1,0 +1,48 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// SIDEBAR DIMENSIONAL NEXUS — Enhancement Layer (Phase 2)
+// Consolidated unique effects from _sn_dimensional_nexus.scss
+// ████████████████████████████████████████████████████████████████████████████████
+
+/* TODO: Phase 2 will populate this file with merged sections */
+
+@use "../core/mixins" as *;
+
+// ============================================================================
+// TODO-PHASE3: Dimensional Rift Target Enhancements
+//  - Adds pulse animation & blur/opacity based on --sn-dimensional-rift-intensity
+//  - Relies on variables defined in _sidebar_background_effects.scss
+// ============================================================================
+
+.sn-dimensional-rift-target {
+  // Extend existing definition from _sidebar_interactive.scss
+
+  &::before {
+    // Preserve positional rules from original declaration
+    // New visual enhancements
+    opacity: var(--sn-dimensional-rift-intensity, 0);
+    filter: blur(
+      calc(10px * (1 - var(--sn-dimensional-rift-intensity, 0)) + 5px)
+    );
+    animation: sn-rift-pulse 4s infinite ease-in-out;
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out,
+      background 0.6s ease-out;
+    pointer-events: none;
+    z-index: -1; // Behind content
+  }
+}
+
+// ============================================================================
+// TODO-PHASE3: Rift Pulse Keyframes (unique)
+// ============================================================================
+
+@keyframes sn-rift-pulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%)
+      scale(calc(0.5 + var(--sn-dimensional-rift-intensity, 0) * 0.5));
+  }
+  50% {
+    transform: translate(-50%, -50%)
+      scale(calc(0.5 + var(--sn-dimensional-rift-intensity, 0) * 0.6));
+  }
+}

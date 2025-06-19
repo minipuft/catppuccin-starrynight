@@ -33,6 +33,18 @@
   --sn-temporal-shift-progress: 0; // 0 to 1, for temporal layer blend
   --sn-temporal-animation-speed: 30s;
 
+  // === GLOBAL HUE-SHIFT SYSTEM =============================================
+  // Base hue offset (deg).  JS visual systems such as NebulaController and
+  // BeatSyncVisualSystem can update this at runtime to drive macro palette
+  // drifts (e.g. ±8deg on genre change).
+  --sn-hue-shift-base: 0deg;
+
+  // Dynamic hue offset driven by rhythm phase.  Small multiplier keeps the
+  // effect subtle and safe for accessibility.  Total shift = base + phase * 2.
+  --sn-hue-shift-dynamic: calc(
+    var(--sn-hue-shift-base) + (var(--sn-rhythm-phase, 0) * 2deg)
+  );
+
   // === NAV ITEM ENTANGLEMENT VARIABLES ===
   --sn-nav-item-base-opacity: 0.85;
   --sn-nav-item-hover-bg-opacity: 0.1;
@@ -48,6 +60,17 @@
 
   --sn-nav-item-transform-scale: 1; // 1 to 1.03, controlled by JS
   --sn-nav-item-transition-duration: 0.3s;
+
+  // TODO[Y3K-PH1]: Anticipatory shimmer theme hooks
+  --sn-anticipatory-hue: 0deg; // runtime hue offset injected by BehavioralPredictionEngine
+  --sn-anticipatory-intensity: 0.18; // default opacity for shimmer (0–0.3)
+
+  // TODO[Y3K-PH2]: Predictive Materialization CSS hooks
+  --sn-materialize-imminence: 0; // 0–1, set by PredictiveMaterializationSystem
+  --sn-materialize-clarity: 0;   // 0–1, set by PredictiveMaterializationSystem
+
+  // Nebula fractal noise image used for sub-pixel grain dissolve (Phase 5)
+  --sn-nebula-noise-url: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4Ij48ZGVmcz48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjEuMiIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiAvPjwvc3ZnPg==");
 }
 
 // ████████████████████████████████████████████████████████████████████████████████

@@ -1,0 +1,40 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌌 QUICK ADD RADIAL MENU – Basic Styles
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.sn-quick-add-overlay {
+  // backdrop subtle glow
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(#000, 0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  // Phase4: GPU blur when supported
+  @supports (backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px)) {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+}
+
+.sn-quick-add-btn {
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  transform-style: preserve-3d;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+
+  &:hover {
+    transform: scale(1.1) translateZ(0);
+    box-shadow: 0 0 8px rgba(#000, 0.6);
+  }
+}
+
+.sn-prune-out {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease-out;
+}

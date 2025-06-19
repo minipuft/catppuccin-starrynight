@@ -57,8 +57,9 @@ export class CSSVariableBatcher {
   private _performanceMetrics: PerformanceMetrics;
 
   constructor(config: Partial<CSSVariableBatcherConfig> = {}) {
+    // Apply defaults first, then let the caller override.
     this.config = {
-      batchIntervalMs: config.batchIntervalMs ?? 16, // ~60fps batch rate
+      batchIntervalMs: config.batchIntervalMs ?? 16, // ~60 fps batch rate
       maxBatchSize: config.maxBatchSize ?? 50,
       enableDebug: config.enableDebug ?? false,
       useCssTextFastPath: config.useCssTextFastPath ?? false,
@@ -156,6 +157,17 @@ export class CSSVariableBatcher {
       }
 
       for (const [element, elementUpdates] of updatesByElement.entries()) {
+        // ----------------------------------------------
+        // Fast-path VS safe-path decision
+        // ----------------------------------------------
+        // The previous implementation rewrote the *entire* cssText when more
+        // than three updates targeted the same element. While marginally
+        // faster for string concatenations, it incurs a huge style-recalc
+        // cost because the browser treats it like a full style attribute
+        // mutation.
+        //
+        // We now only take that branch when the new feature-flag
+        // `useCssTextFastPath` is explicitly enabled.
         if (elementUpdates.length > 3 && this.config.useCssTextFastPath) {
           let cssText = element.style.cssText;
           for (const update of elementUpdates) {

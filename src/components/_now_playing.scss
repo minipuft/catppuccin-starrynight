@@ -20,9 +20,9 @@
     &:hover {
       color: var(--spice-text);
       // Kinetic Verb: BLOOM - Enhanced hover with rhythm
-      transform: scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.08)));
+      transform: scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.05)));
       filter: drop-shadow(
-        0 0 calc(6px * var(--sn-beat-pulse-intensity, 0))
+        0 0 calc(4px * var(--sn-beat-pulse-intensity, 0))
           rgba(
             var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
             calc(0.4 * var(--sn-beat-pulse-intensity, 0))
@@ -50,7 +50,7 @@
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.4);
 
     // Kinetic Verb: BLOOM - The most important button gets maximum love
-    transform: scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.15)));
+    transform: scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.10)));
 
     // Cosmic glow around play button
     &::before {
@@ -62,7 +62,7 @@
         circle,
         rgba(
             var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-            calc(0.3 * var(--sn-beat-pulse-intensity, 0))
+            calc(0.25 * var(--sn-beat-pulse-intensity, 0))
           )
           0%,
         transparent 70%
@@ -78,7 +78,7 @@
         circle,
         rgba(
             var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-            calc(0.5 * var(--sn-beat-pulse-intensity, 0))
+            calc(0.35 * var(--sn-beat-pulse-intensity, 0))
           )
           0%,
         transparent 70%
@@ -107,8 +107,8 @@
       rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-sidebar)), 0.8) 100%
     );
     // Kinetic Verb: BLOOM
-    transform: scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.06)));
-    box-shadow: 0 0 calc(10px * var(--sn-beat-pulse-intensity, 0))
+    transform: scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.04)));
+    box-shadow: 0 0 calc(6px * var(--sn-beat-pulse-intensity, 0))
       rgba(
         var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
         calc(0.3 * var(--sn-beat-pulse-intensity, 0))
@@ -156,10 +156,10 @@
     color: var(--spice-red);
     // Kinetic Verb: BLOOM - Love pulses stronger!
     transform: scale(
-      calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.18))
-    ); // Maximum love pulse!
+      calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.12))
+    ); // Calmer love pulse
     filter: drop-shadow(
-      0 0 calc(8px * var(--sn-beat-pulse-intensity, 0))
+      0 0 calc(6px * var(--sn-beat-pulse-intensity, 0))
         rgba(var(--spice-rgb-red, 243, 139, 168), calc(0.7 * var(--sn-beat-pulse-intensity, 0)))
     );
     transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.5); // Heart beats fast!

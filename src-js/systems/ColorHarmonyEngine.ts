@@ -1313,6 +1313,16 @@ export class ColorHarmonyEngine
       // Replace current flavour palette in-memory then refresh CSS vars
       (this.catppuccinPalettes as any)[this.currentTheme] = palette;
       await this.refreshPalette();
+
+      // Phase 3 – Broadcast genre change so NebulaController can respond.
+      try {
+        GlobalEventBus.publish("music:genre-change", {
+          genre,
+          palette,
+        });
+      } catch (_e) {
+        /* ignore publish errors */
+      }
     } catch (err) {
       if (this.config.enableDebug) {
         console.warn("[ColorHarmonyEngine] _applyGenrePalette failed", err);

@@ -1135,24 +1135,24 @@
     }
     return sanitized;
   }
-  function rgbToHsl(r, g, b) {
+  function rgbToHsl(r, g2, b) {
     r /= 255;
-    g /= 255;
+    g2 /= 255;
     b /= 255;
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const max = Math.max(r, g2, b), min = Math.min(r, g2, b);
     let h = 0, s = 0, l = (max + min) / 2;
     if (max !== min) {
       const d = max - min;
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
       switch (max) {
         case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
+          h = (g2 - b) / d + (g2 < b ? 6 : 0);
           break;
-        case g:
+        case g2:
           h = (b - r) / d + 2;
           break;
         case b:
-          h = (r - g) / d + 4;
+          h = (r - g2) / d + 4;
           break;
       }
       h /= 6;
@@ -1187,13 +1187,13 @@
       b: Math.round(b_val * 255)
     };
   }
-  function rgbToHex(r, g, b) {
+  function rgbToHex(r, g2, b) {
     const normalize = (c) => {
       if (!Number.isFinite(c)) return 0;
       const scaled = c <= 1 ? c * 255 : c;
       return Math.min(255, Math.max(0, Math.round(scaled)));
     };
-    const [nr, ng, nb] = [normalize(r), normalize(g), normalize(b)];
+    const [nr, ng, nb] = [normalize(r), normalize(g2), normalize(b)];
     return "#" + [nr, ng, nb].map((channel) => channel.toString(16).padStart(2, "0")).join("");
   }
   function calculateContrastRatio(color1, color2) {
@@ -1283,11 +1283,11 @@
   }
   function rgbToOklab(r_srgb, g_srgb, b_srgb) {
     const r = r_srgb / 255;
-    const g = g_srgb / 255;
+    const g2 = g_srgb / 255;
     const b = b_srgb / 255;
-    const l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
-    const m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
-    const s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
+    const l = 0.4122214708 * r + 0.5363325363 * g2 + 0.0514459929 * b;
+    const m = 0.2119034982 * r + 0.6806995451 * g2 + 0.1073969566 * b;
+    const s = 0.0883024619 * r + 0.2817188376 * g2 + 0.6299787005 * b;
     const l_ = Math.cbrt(l);
     const m_ = Math.cbrt(m);
     const s_ = Math.cbrt(s);
@@ -1305,12 +1305,12 @@
     const m = m_ * m_ * m_;
     const s = s_ * s_ * s_;
     let r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
-    let g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+    let g2 = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
     let b = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
     r = Math.round(Math.max(0, Math.min(1, r)) * 255);
-    g = Math.round(Math.max(0, Math.min(1, g)) * 255);
+    g2 = Math.round(Math.max(0, Math.min(1, g2)) * 255);
     b = Math.round(Math.max(0, Math.min(1, b)) * 255);
-    return { r, g, b };
+    return { r, g: g2, b };
   }
   function processOklabColor(oklabColor, context = {}) {
     const { L, a, b } = oklabColor;
@@ -1456,7 +1456,7 @@
       "use strict";
       init_globalConfig();
       HealthMonitor = class {
-        registerSystem(name, instance) {
+        registerSystem(name, instance2) {
         }
         updateSystemMetrics(name, metrics) {
         }
@@ -1485,12 +1485,16 @@
             "sn-gradient-intensity": "balanced",
             "sn-glassmorphism-level": "moderate",
             "sn-3d-effects-level": "full",
+            "sn-nebula-intensity": "balanced",
             "sn-artistic-mode": "artist-vision",
             "sn-current-harmonic-mode": "analogous-flow",
             "sn-harmonic-intensity": "0.7",
             "sn-harmonic-evolution": "true",
             "sn-harmonic-manual-base-color": "",
-            "sn-enable-webgpu": "true"
+            "sn-enable-webgpu": "true",
+            "sn-enable-aberration": "true",
+            "sn-nebula-aberration-strength": "0.4",
+            "sn-echo-intensity": "2"
           };
           this.validationSchemas = {
             "catppuccin-flavor": {
@@ -1534,6 +1538,10 @@
               default: "full",
               allowedValues: ["full", "minimal", "disabled"]
             },
+            "sn-nebula-intensity": {
+              default: "balanced",
+              allowedValues: ["disabled", "minimal", "balanced", "intense"]
+            },
             "sn-artistic-mode": {
               default: "artist-vision",
               allowedValues: Object.keys(ARTISTIC_MODE_PROFILES)
@@ -1553,6 +1561,15 @@
             "sn-enable-webgpu": {
               default: "true",
               allowedValues: ["true", "false"]
+            },
+            "sn-enable-aberration": {
+              default: "true",
+              allowedValues: ["true", "false"]
+            },
+            "sn-nebula-aberration-strength": { default: "0.4" },
+            "sn-echo-intensity": {
+              default: "2",
+              allowedValues: ["0", "1", "2", "3"]
             }
           };
           this.validateAndRepair();
@@ -1736,6 +1753,751 @@
       "use strict";
       init_SettingsManager();
       init_globalConfig();
+    }
+  });
+
+  // src-js/debug/DragCartographer.ts
+  var DragCartographer_exports = {};
+  __export(DragCartographer_exports, {
+    enableDragCartography: () => enableDragCartography,
+    getDragMap: () => getDragMap
+  });
+  function enableDragCartography() {
+    const g2 = globalThis;
+    if (g2.__SN_dragCartographer) return;
+    g2.__SN_dragCartographer = new DragCartographer();
+    console.info("\u{1F6F0}\uFE0F  DragCartographer enabled \u2013 logging dragstart events");
+  }
+  function getDragMap() {
+    return DragCartographer.getDragMap();
+  }
+  var _DragCartographer, DragCartographer;
+  var init_DragCartographer = __esm({
+    "src-js/debug/DragCartographer.ts"() {
+      "use strict";
+      _DragCartographer = class _DragCartographer {
+        constructor() {
+          this.seen = /* @__PURE__ */ new WeakSet();
+          this.handleDragStart = (event) => {
+            const target = event.target;
+            if (!target) return;
+            if (this.seen.has(target)) return;
+            this.seen.add(target);
+            const selector = _DragCartographer.buildSelectorPath(target);
+            const detail = {
+              time: (/* @__PURE__ */ new Date()).toLocaleTimeString(),
+              selector
+            };
+            try {
+              const dt = event.dataTransfer;
+              if (dt) {
+                const uris = dt.getData("text/spotify") || dt.getData("text/uri-list");
+                if (uris) {
+                  detail.uris = uris.split(/\n|,/).filter(Boolean);
+                }
+                const label = dt.getData("text/plain");
+                if (label) detail.label = label;
+              }
+            } catch {
+            }
+            const agg = _DragCartographer.aggregate;
+            const entry = agg.get(selector);
+            if (entry) {
+              entry.count += 1;
+              if (entry.samples.length < 3) entry.samples.push(detail);
+            } else {
+              agg.set(selector, { selector, count: 1, samples: [detail] });
+            }
+            console.groupCollapsed(
+              `%c[DragCartographer] dragstart \u2192 ${selector}`,
+              "color:#7dd3fc;font-weight:600"
+            );
+            console.table(detail);
+            console.log("Event:", event);
+            console.log("Target element snapshot:", target);
+            console.groupEnd();
+          };
+          document.addEventListener("dragstart", this.handleDragStart, true);
+        }
+        static buildSelectorPath(el) {
+          const path = [];
+          let current = el;
+          let depth = 0;
+          while (current && depth < _DragCartographer.MAX_PATH_DEPTH) {
+            const tag = current.tagName.toLowerCase();
+            const id = current.id ? `#${current.id}` : "";
+            const cls = current.className && typeof current.className === "string" ? "." + current.className.split(/\s+/).slice(0, 2).join(".") : "";
+            path.push(`${tag}${id}${cls}`);
+            current = current.parentElement;
+            depth += 1;
+          }
+          return path.join(" > ");
+        }
+        // Public helper to fetch map
+        static getDragMap() {
+          return Array.from(_DragCartographer.aggregate.values()).sort(
+            (a, b) => b.count - a.count
+          );
+        }
+      };
+      _DragCartographer.MAX_PATH_DEPTH = 4;
+      _DragCartographer.aggregate = /* @__PURE__ */ new Map();
+      DragCartographer = _DragCartographer;
+    }
+  });
+
+  // src-js/utils/CanvasGhostBuilder.ts
+  function buildDragGhostCanvas(label, imgSrc, opts = {}) {
+    const key = `${label}|${imgSrc}|${opts.size}|${opts.dpr}`;
+    const cached = cache.get(key);
+    if (cached) return cached;
+    const size = opts.size ?? 72;
+    const dpr = opts.dpr ?? (window.devicePixelRatio || 1);
+    const borderRadius = opts.borderRadius ?? 8;
+    const canvas = document.createElement("canvas");
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    canvas.style.width = `${size}px`;
+    canvas.style.height = `${size}px`;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    ctx.fillStyle = "rgba(32,32,35,0.9)";
+    ctx.roundRect(0, 0, size, size, borderRadius);
+    ctx.fill();
+    if (opts.shadow !== false) {
+      ctx.shadowColor = "rgba(0,0,0,0.4)";
+      ctx.shadowBlur = 6;
+    }
+    const inner = size - 16;
+    if (imgSrc) {
+      const img = new Image();
+      img.src = imgSrc;
+      const drawImage = () => {
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(8, 8, inner, inner, borderRadius - 2);
+        ctx.clip();
+        ctx.drawImage(img, 8, 8, inner, inner);
+        ctx.restore();
+        drawLabel();
+      };
+      if (img.complete) {
+        drawImage();
+      } else {
+        img.onload = drawImage;
+        img.onerror = drawLabel;
+      }
+    } else {
+      drawLabel();
+    }
+    function drawLabel() {
+      ctx.fillStyle = "#fff";
+      ctx.font = `500 12px Inter, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const maxWidth = size - 10;
+      let text = label;
+      while (ctx.measureText(text).width > maxWidth && text.length > 4) {
+        text = text.slice(0, -2);
+      }
+      if (text !== label) text = text.slice(0, -1) + "\u2026";
+      ctx.fillText(text, size / 2, size - 10);
+    }
+    cache.set(key, canvas);
+    return canvas;
+  }
+  var cache;
+  var init_CanvasGhostBuilder = __esm({
+    "src-js/utils/CanvasGhostBuilder.ts"() {
+      "use strict";
+      cache = /* @__PURE__ */ new Map();
+    }
+  });
+
+  // src-js/effects/EnhancedDragPreview.ts
+  var EnhancedDragPreview_exports = {};
+  __export(EnhancedDragPreview_exports, {
+    enableEnhancedDragPreview: () => enableEnhancedDragPreview
+  });
+  function createGhost(label, imgSrc) {
+    try {
+      return buildDragGhostCanvas(label, imgSrc);
+    } catch {
+      const div = document.createElement("div");
+      div.textContent = label;
+      div.style.padding = "4px 6px";
+      div.style.fontSize = "12px";
+      div.style.background = "rgba(32,32,35,0.9)";
+      div.style.color = "#fff";
+      return div;
+    }
+  }
+  function extractImageSrc(el) {
+    const img = el.querySelector("img[src]");
+    if (img?.src) return img.src;
+    const bg = getComputedStyle(el).backgroundImage;
+    const match = bg && /url\("?([^\"]+)"?\)/.exec(bg);
+    return match ? match[1] : void 0;
+  }
+  function findFallbackLabel(el) {
+    const attrLabel = el.getAttribute("aria-label") || el.getAttribute("title");
+    if (attrLabel) return attrLabel;
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const text = node.textContent?.trim();
+        return text ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+      }
+    });
+    const n = walker.nextNode();
+    return (n?.textContent?.trim() || "").slice(0, 60);
+  }
+  function getPreviewData(target) {
+    if (cache2.has(target)) return cache2.get(target);
+    const label = findFallbackLabel(target);
+    if (!label) return null;
+    const img = extractImageSrc(target);
+    const data = { label, img };
+    cache2.set(target, data);
+    return data;
+  }
+  function onDragStart(event) {
+    try {
+      if (!event.dataTransfer || typeof event.dataTransfer.setDragImage !== "function")
+        return;
+      const target = event.target;
+      if (!target) return;
+      let label = event.dataTransfer.getData("text/plain");
+      let imgSrc;
+      if (!label) {
+        const data = getPreviewData(target);
+        if (!data) return;
+        label = data.label;
+        imgSrc = data.img;
+      } else {
+        imgSrc = extractImageSrc(target);
+      }
+      const ghostEl = createGhost(label, imgSrc);
+      document.body.appendChild(ghostEl);
+      const offset = ghostEl.offsetWidth / 2;
+      event.dataTransfer.setDragImage(ghostEl, offset, offset);
+      const cleanup = () => {
+        ghostEl.remove();
+        window.removeEventListener("dragend", cleanup, true);
+      };
+      window.addEventListener("dragend", cleanup, true);
+    } catch (err) {
+      console.debug("[StarryNight] EnhancedDragPreview failed:", err);
+    }
+  }
+  function enableEnhancedDragPreview(opts = {}) {
+    const g2 = globalThis;
+    if (g2.__SN_enhancedDragPreview) return;
+    g2.__SN_enhancedDragPreview = true;
+    Object.assign(DEFAULT_OPTS, opts);
+    document.addEventListener("dragstart", onDragStart, true);
+    console.info("\u{1F320} Enhanced drag preview enabled");
+  }
+  var DEFAULT_OPTS, cache2;
+  var init_EnhancedDragPreview = __esm({
+    "src-js/effects/EnhancedDragPreview.ts"() {
+      "use strict";
+      init_CanvasGhostBuilder();
+      DEFAULT_OPTS = {
+        size: 72,
+        borderRadius: 8,
+        fontSize: 12
+      };
+      cache2 = /* @__PURE__ */ new WeakMap();
+    }
+  });
+
+  // src-js/utils/flipSpring.ts
+  function spring(config) {
+    const k = config.stiffness ?? 260;
+    const d = config.damping ?? 24;
+    const m = config.mass ?? 1;
+    let current = {};
+    let velocity = {};
+    let target = {};
+    let animId = null;
+    function step() {
+      let done = true;
+      const dt = 1 / 60;
+      for (const key in target) {
+        const x = current[key] ?? 0;
+        const v = velocity[key] ?? 0;
+        const goal = target[key] ?? 0;
+        const Fspring = -k * (x - goal);
+        const Fdamp = -d * v;
+        const a = (Fspring + Fdamp) / m;
+        const newV = v + a * dt;
+        const newX = x + newV * dt;
+        velocity[key] = newV;
+        current[key] = newX;
+        if (Math.abs(newV) > 0.1 || Math.abs(newX - goal) > 0.1) done = false;
+      }
+      config.onUpdate(current);
+      if (!done) animId = requestAnimationFrame(step);
+    }
+    return {
+      to(newTarget) {
+        target = newTarget;
+        if (!animId) animId = requestAnimationFrame(step);
+      }
+    };
+  }
+  var init_flipSpring = __esm({
+    "src-js/utils/flipSpring.ts"() {
+      "use strict";
+      window.snFlipSpringLoaded = true;
+    }
+  });
+
+  // src-js/utils/sidebarDetector.ts
+  function querySidebar() {
+    const node = document.querySelector(SIDEBAR_SELECTOR);
+    if (!node) return null;
+    const rect = node.getBoundingClientRect();
+    return { node, rect };
+  }
+  function isSidebarCloneCapable() {
+    const hasSidebar = !!querySidebar();
+    const canClone = typeof Element.prototype.cloneNode === "function";
+    const springReady = !!window.snFlipSpringLoaded;
+    return hasSidebar && canClone && springReady;
+  }
+  var SIDEBAR_SELECTOR;
+  var init_sidebarDetector = __esm({
+    "src-js/utils/sidebarDetector.ts"() {
+      "use strict";
+      SIDEBAR_SELECTOR = '[data-testid="rootlist-container"]';
+    }
+  });
+
+  // src-js/effects/SidebarCloneOverlay.ts
+  var SidebarCloneOverlay_exports = {};
+  __export(SidebarCloneOverlay_exports, {
+    destroySidebarClone: () => destroySidebarClone,
+    launchSidebarClone: () => launchSidebarClone
+  });
+  function launchSidebarClone(context) {
+    if (activeClone) return;
+    const sidebar = querySidebar();
+    if (!sidebar) return;
+    const clone = sidebar.node.cloneNode(true);
+    clone.id = "";
+    clone.setAttribute("aria-hidden", "true");
+    clone.classList.add("sn-clone-overlay");
+    clone.style.position = "fixed";
+    clone.style.top = `${sidebar.rect.top}px`;
+    clone.style.left = `${sidebar.rect.left}px`;
+    clone.style.width = `${sidebar.rect.width}px`;
+    clone.style.height = `${sidebar.rect.height}px`;
+    clone.style.zIndex = "9999";
+    clone.style.willChange = "transform, opacity";
+    clone.style.contain = "paint";
+    document.body.appendChild(clone);
+    activeClone = clone;
+    const firstX = 0;
+    const firstY = 0;
+    const firstS = 1;
+    const lastX = context.cursorX - sidebar.rect.left - sidebar.rect.width * 0.2;
+    const lastY = context.cursorY - sidebar.rect.top - sidebar.rect.height * 0.2;
+    const lastS = 0.6;
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (prefersReduced) {
+      clone.style.transform = `translate(${lastX}px, ${lastY}px) scale(${lastS})`;
+      pruneCloneItems(clone, context);
+      return;
+    }
+    const anim = spring({
+      stiffness: 220,
+      damping: 20,
+      onUpdate: (v) => {
+        clone.style.transform = `translate(${v.x}px, ${v.y}px) scale(${v.s})`;
+      }
+    });
+    clone.style.transformOrigin = "top left";
+    clone.style.transform = `translate(${firstX}px, ${firstY}px) scale(${firstS})`;
+    requestAnimationFrame(() => anim.to({ x: lastX, y: lastY, s: lastS }));
+    setTimeout(() => {
+      if (activeClone) pruneCloneItems(activeClone, context);
+    }, 400);
+  }
+  function destroySidebarClone() {
+    cleanupFns.forEach((fn) => fn());
+    cleanupFns.length = 0;
+    if (activeClone) {
+      activeClone.remove();
+      activeClone = null;
+    }
+  }
+  function addTracksToPlaylist(uri, trackUris) {
+    try {
+      const Cosmos = window.Spicetify?.CosmosAsync;
+      if (!Cosmos) return;
+      const endpoint = `/v1/playlists/${uri.split(":").pop()}/tracks`;
+      Cosmos.post(endpoint, { uris: trackUris });
+    } catch {
+    }
+  }
+  function pruneCloneItems(root, context) {
+    const all = Array.from(
+      root.querySelectorAll('[data-uri^="spotify:playlist:"]')
+    );
+    if (!all.length) return;
+    const keep = all.slice(0, 5);
+    all.slice(5).forEach((el) => {
+      el.classList.add("sn-prune-out");
+      setTimeout(() => el.remove(), 180);
+    });
+    keep.forEach((el, idx) => {
+      el.setAttribute("data-index", String(idx + 1));
+      el.setAttribute("role", "button");
+      el.tabIndex = 0;
+      el.style.setProperty("--sn-glow-level", "0");
+      el.style.backgroundImage = "paint(sn-aura)";
+      el.addEventListener(
+        "mouseenter",
+        () => el.style.setProperty("--sn-glow-level", "1")
+      );
+      el.addEventListener(
+        "mouseleave",
+        () => el.style.setProperty("--sn-glow-level", "0")
+      );
+      const uriVal = el.getAttribute("data-uri");
+      if (!uriVal) {
+        return;
+      }
+      const trackUris = context.uris;
+      const clickHandler = (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const img = el.querySelector("img");
+        pushRecentPlaylist(
+          uriVal,
+          img?.src || "",
+          el.textContent?.trim() || "Playlist"
+        );
+        addTracksToPlaylist(uriVal, trackUris);
+        announce("Track added to " + (el.textContent?.trim() || "playlist"));
+        destroySidebarClone();
+      };
+      el.addEventListener("click", clickHandler);
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          clickHandler(e);
+        }
+      });
+    });
+    const keyListener = (e) => {
+      const n = parseInt(e.key, 10);
+      if (n >= 1 && n <= keep.length) {
+        keep[n - 1]?.click();
+      }
+    };
+    window.addEventListener("keydown", keyListener, { capture: true });
+    cleanupFns.push(
+      () => window.removeEventListener("keydown", keyListener, { capture: true })
+    );
+  }
+  function pushRecentPlaylist(uri, image, name) {
+    try {
+      const raw = localStorage.getItem(MRU_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+      const existing = list.findIndex((p) => p.uri === uri);
+      if (existing !== -1) list.splice(existing, 1);
+      list.unshift({ uri, image, name });
+      localStorage.setItem(MRU_KEY, JSON.stringify(list.slice(0, 10)));
+    } catch {
+    }
+  }
+  function announce(message) {
+    const live = document.getElementById("sn-live");
+    if (live) live.textContent = message;
+  }
+  var activeClone, cleanupFns, MRU_KEY;
+  var init_SidebarCloneOverlay = __esm({
+    "src-js/effects/SidebarCloneOverlay.ts"() {
+      "use strict";
+      init_flipSpring();
+      init_sidebarDetector();
+      activeClone = null;
+      cleanupFns = [];
+      MRU_KEY = "sn-recent-playlists";
+    }
+  });
+
+  // src-js/effects/QuickAddRadialMenu.ts
+  var QuickAddRadialMenu_exports = {};
+  __export(QuickAddRadialMenu_exports, {
+    enableQuickAddRadialMenu: () => enableQuickAddRadialMenu
+  });
+  function ensureLiveRegion() {
+    let live = document.getElementById(LIVE_ID);
+    if (!live) {
+      live = document.createElement("div");
+      live.id = LIVE_ID;
+      live.setAttribute("aria-live", "polite");
+      live.style.position = "absolute";
+      live.style.width = "1px";
+      live.style.height = "1px";
+      live.style.overflow = "hidden";
+      live.style.clipPath = "inset(100%)";
+      live.style.clip = "rect(1px,1px,1px,1px)";
+      live.style.whiteSpace = "nowrap";
+      document.body.appendChild(live);
+    }
+    return live;
+  }
+  function distance(x1, y1, x2, y2) {
+    const dx = x1 - x2;
+    const dy = y1 - y2;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+  function fetchRecentPlaylists() {
+    try {
+      const raw = localStorage.getItem("sn-recent-playlists");
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr.slice(0, MAX_PLAYLISTS_SHOWN) : [];
+    } catch {
+      return [];
+    }
+  }
+  function addTracksToPlaylist2(playlistUri, trackUris) {
+    try {
+      const endpoint = `/v1/playlists/${playlistUri.split(":").pop()}/tracks`;
+      window.Spicetify?.CosmosAsync.post(endpoint, {
+        uris: trackUris
+      });
+    } catch (e) {
+      console.warn("[StarryNight] QuickAddRadial failed to add tracks:", e);
+    }
+  }
+  function pushRecentPlaylist2(pl) {
+    try {
+      const list = fetchRecentPlaylists();
+      const existingIdx = list.findIndex((p) => p.uri === pl.uri);
+      if (existingIdx !== -1) list.splice(existingIdx, 1);
+      list.unshift(pl);
+      const trimmed = list.slice(0, 10);
+      localStorage.setItem("sn-recent-playlists", JSON.stringify(trimmed));
+    } catch {
+    }
+  }
+  function createOverlay(x, y, playlists) {
+    if (!playlists.length) return;
+    destroyOverlay();
+    overlayEl = document.createElement("div");
+    overlayEl.className = "sn-quick-add-overlay";
+    overlayEl.style.position = "fixed";
+    overlayEl.style.inset = "0";
+    overlayEl.style.pointerEvents = "none";
+    overlayEl.style.zIndex = "9999";
+    const center = document.createElement("div");
+    center.className = "sn-quick-add-center";
+    center.style.position = "absolute";
+    center.style.left = `${x}px`;
+    center.style.top = `${y}px`;
+    center.style.width = "0";
+    center.style.height = "0";
+    overlayEl.appendChild(center);
+    document.body.appendChild(overlayEl);
+    const radius = 90;
+    const angleStep = Math.PI * 2 / playlists.length;
+    playlists.forEach((pl, idx) => {
+      const angle = angleStep * idx - Math.PI / 2;
+      const btn = document.createElement("button");
+      btn.className = "sn-quick-add-btn";
+      btn.style.position = "absolute";
+      btn.style.width = "64px";
+      btn.style.height = "64px";
+      btn.style.borderRadius = "50%";
+      btn.style.border = "2px solid rgba(255,255,255,0.4)";
+      btn.style.background = `url('${pl.image}') center/cover no-repeat`;
+      btn.style.cursor = "pointer";
+      btn.style.pointerEvents = "auto";
+      const cx = radius * Math.cos(angle);
+      const cy = radius * Math.sin(angle);
+      btn.style.transform = `translate(${cx - 32}px, ${cy - 32}px)`;
+      btn.style.transformOrigin = "center center";
+      const firstX = 0;
+      const firstY = 0;
+      btn.style.transform = `translate(${firstX}px, ${firstY}px) scale(0.1)`;
+      requestAnimationFrame(() => {
+        const animator = spring({
+          stiffness: 220,
+          damping: 20,
+          onUpdate: (v) => {
+            btn.style.transform = `translate(${v.x}px, ${v.y}px) scale(${v.s})`;
+          }
+        });
+        animator.to({ x: cx - 32, y: cy - 32, s: 1 });
+      });
+      btn.style.setProperty("--sn-glow-level", "0");
+      btn.style.backgroundImage = `paint(sn-aura)`;
+      btn.addEventListener(
+        "mouseenter",
+        () => btn.style.setProperty("--sn-glow-level", "1")
+      );
+      btn.addEventListener(
+        "mouseleave",
+        () => btn.style.setProperty("--sn-glow-level", "0")
+      );
+      btn.title = `Add to ${pl.name}`;
+      btn.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (currentDragDataUris) addTracksToPlaylist2(pl.uri, currentDragDataUris);
+        pushRecentPlaylist2(pl);
+        destroyOverlay();
+      });
+      center.appendChild(btn);
+    });
+    const live = ensureLiveRegion();
+    live.textContent = "Quick-add menu open. Press number keys 1 to 5 to pick a playlist or continue dragging.";
+  }
+  function destroyOverlay() {
+    overlayEl?.remove();
+    overlayEl = null;
+    const live = document.getElementById(LIVE_ID);
+    if (live) live.textContent = "";
+  }
+  function clearHoldTimer() {
+    if (holdTimer) {
+      clearTimeout(holdTimer);
+      holdTimer = null;
+    }
+  }
+  function onDragStart2(e) {
+    startX = e.clientX;
+    startY = e.clientY;
+    currentDragDataUris = (e.dataTransfer?.getData("text/spotify") || "").split(/[\n,]/).filter(Boolean);
+    const cloneCapable = isSidebarCloneCapable();
+    clearHoldTimer();
+    holdTimer = window.setTimeout(async () => {
+      if (cloneCapable) {
+        const overlay = await Promise.resolve().then(() => (init_SidebarCloneOverlay(), SidebarCloneOverlay_exports));
+        overlay.launchSidebarClone({
+          cursorX: currentPointer.x,
+          cursorY: currentPointer.y,
+          uris: currentDragDataUris ?? []
+        });
+      } else {
+        const playlists = await getRadialPlaylists();
+        createOverlay(startX, startY, playlists);
+      }
+    }, HOLD_MS);
+  }
+  function onDragEnd() {
+    clearHoldTimer();
+    destroyOverlay();
+    currentDragDataUris = null;
+  }
+  function onPointerMove(e) {
+    currentPointer = { x: e.clientX, y: e.clientY };
+    if (!holdTimer) return;
+    if (distance(startX, startY, e.clientX, e.clientY) > MOVE_THRESHOLD) {
+      clearHoldTimer();
+    }
+  }
+  async function fetchPlaylistsFromAPI() {
+    try {
+      const Cosmos = window.Spicetify?.CosmosAsync;
+      if (!Cosmos) return [];
+      const resp = await Cosmos.get(
+        "https://api.spotify.com/v1/me/playlists?limit=10"
+      );
+      if (!resp?.items) return [];
+      return resp.items.slice(0, MAX_PLAYLISTS_SHOWN).map((pl) => ({
+        uri: pl.uri,
+        name: pl.name,
+        image: pl.images?.[0]?.url || ""
+      }));
+    } catch {
+      return [];
+    }
+  }
+  function scrapeSidebarPlaylists() {
+    try {
+      const items = Array.from(
+        document.querySelectorAll('[data-testid="rootlist-card"]')
+      );
+      const res = [];
+      for (const el of items) {
+        const uri = el.getAttribute("data-uri") || el.querySelector("a")?.getAttribute("href")?.replace("/playlist/", "spotify:playlist:");
+        if (!uri) continue;
+        const img = el.querySelector("img");
+        const image = img?.src || "";
+        const name = img?.alt || el.textContent?.trim() || "Playlist";
+        res.push({ uri, image, name });
+        if (res.length >= MAX_PLAYLISTS_SHOWN) break;
+      }
+      return res;
+    } catch {
+      return [];
+    }
+  }
+  async function getRadialPlaylists() {
+    const local = fetchRecentPlaylists();
+    if (local.length) return local;
+    const sidebar = scrapeSidebarPlaylists();
+    if (sidebar.length) return sidebar;
+    const api = await fetchPlaylistsFromAPI();
+    return api;
+  }
+  function enableQuickAddRadialMenu() {
+    const g2 = globalThis;
+    if (g2.__SN_quickAddRadial) return;
+    g2.__SN_quickAddRadial = true;
+    window.addEventListener("dragstart", onDragStart2, true);
+    window.addEventListener("dragend", onDragEnd, true);
+    window.addEventListener("pointermove", onPointerMove, true);
+    console.info("\u{1F30C} Quick-Add radial menu enabled");
+    console.info(
+      `[StarryNight] Sidebar clone capability: ${isSidebarCloneCapable()}`
+    );
+    const anyCSS = CSS;
+    if (anyCSS && anyCSS.paintWorklet) {
+      try {
+        const auraUrl = "worklets/quickAddAura.js";
+        if (!anyCSS._sn_aura_registered) {
+          anyCSS.paintWorklet.addModule(auraUrl).then(() => {
+            anyCSS._sn_aura_registered = true;
+          }).catch(() => {
+          });
+        }
+      } catch {
+      }
+    }
+  }
+  var HOLD_MS, MOVE_THRESHOLD, MAX_PLAYLISTS_SHOWN, holdTimer, startX, startY, overlayEl, currentDragDataUris, currentPointer, LIVE_ID;
+  var init_QuickAddRadialMenu = __esm({
+    "src-js/effects/QuickAddRadialMenu.ts"() {
+      "use strict";
+      init_flipSpring();
+      init_sidebarDetector();
+      HOLD_MS = 250;
+      MOVE_THRESHOLD = 8;
+      MAX_PLAYLISTS_SHOWN = 5;
+      holdTimer = null;
+      startX = 0;
+      startY = 0;
+      overlayEl = null;
+      currentDragDataUris = null;
+      currentPointer = { x: 0, y: 0 };
+      LIVE_ID = "sn-live";
+      document.addEventListener("keydown", (e) => {
+        if (!overlayEl) return;
+        const num = parseInt(e.key, 10);
+        if (num >= 1 && num <= MAX_PLAYLISTS_SHOWN) {
+          const btn = overlayEl.querySelectorAll(".sn-quick-add-btn")[num - 1];
+          btn?.click();
+        }
+      });
     }
   });
 
@@ -2194,6 +2956,36 @@
         }
       }
     );
+    const enableAb = settingsManager.get("sn-enable-aberration") === "true";
+    section.addToggle(
+      "sn-enable-aberration",
+      "Chromatic aberration effect",
+      enableAb,
+      {
+        onClick: (e) => {
+          const checked = e.currentTarget.checked;
+          settingsManager.set(
+            "sn-enable-aberration",
+            checked ? "true" : "false"
+          );
+        }
+      }
+    );
+    const echoOptions = ["Off", "Subtle", "Balanced", "Intense"];
+    const currentEcho = settingsManager.get("sn-echo-intensity") ?? "2";
+    section.addDropDown(
+      "sn-echo-intensity",
+      "Temporal Echo Intensity",
+      echoOptions,
+      Math.min(3, parseInt(currentEcho, 10)),
+      void 0,
+      {
+        onChange: (e) => {
+          const idx = e?.currentTarget?.selectedIndex ?? 2;
+          settingsManager.set("sn-echo-intensity", `${idx}`);
+        }
+      }
+    );
     await section.pushSettings();
     console.log("\u2728 [StarryNight] spcr-settings panel initialised");
     const rerender = () => section.rerender();
@@ -2238,13 +3030,14 @@
   var HARMONIC_INTENSITY_KEY = "sn-harmonic-intensity";
   var HARMONIC_EVOLUTION_KEY = "sn-harmonic-evolution";
   var MANUAL_BASE_COLOR_KEY = "sn-harmonic-manual-base-color";
+  var NEBULA_INTENSITY_KEY = "sn-nebula-intensity";
 
   // src-js/core/CSSVariableBatcher.ts
   var CSSVariableBatcher = class {
     constructor(config = {}) {
       this.config = {
         batchIntervalMs: config.batchIntervalMs ?? 16,
-        // ~60fps batch rate
+        // ~60 fps batch rate
         maxBatchSize: config.maxBatchSize ?? 50,
         enableDebug: config.enableDebug ?? false,
         useCssTextFastPath: config.useCssTextFastPath ?? false,
@@ -2563,6 +3356,7 @@
         await this._runCapabilityTests();
       }
       this.deviceCapabilities.overall = this._calculateOverallPerformanceLevel();
+      this._applyAnticipatoryIntensity(this.deviceCapabilities.overall);
       this.isInitialized = true;
       if (this.config.enableDebug) {
         console.log(
@@ -2768,6 +3562,21 @@
         case "low":
         default:
           return "low";
+      }
+    }
+    _applyAnticipatoryIntensity(level) {
+      const root = document.documentElement;
+      const mapping = {
+        high: 0.26,
+        medium: 0.18,
+        low: 0.1
+      };
+      const val = mapping[level] ?? 0.18;
+      root.style.setProperty("--sn-anticipatory-intensity", val.toString());
+      if (this.config.enableDebug) {
+        console.log(
+          `\u{1F50D} [DeviceCapabilityDetector] Applied --sn-anticipatory-intensity=${val} for performance level ${level}`
+        );
       }
     }
   };
@@ -3065,6 +3874,7 @@
       this.monitoringTimer = null;
       this._fpsCounter = null;
       this.timedOperations = /* @__PURE__ */ new Map();
+      this._buckets = /* @__PURE__ */ new Map();
       this.config = {
         enableDebug: config.enableDebug || false,
         monitoringInterval: config.monitoringInterval || 5e3,
@@ -3084,6 +3894,7 @@
           error
         );
       }
+      this._buckets = /* @__PURE__ */ new Map();
     }
     startMonitoring() {
       if (this.isMonitoring) return;
@@ -3255,6 +4066,24 @@
       } else {
         console.log(`\u{1F4CA} [PerformanceAnalyzer] ${message}`);
       }
+    }
+    /**
+     * Throttle helper – returns true when the caller is allowed to perform an update
+     * for the supplied bucket. Subsequent calls within `minIntervalMs` will return
+     * false until the interval has elapsed. Useful for cheaply rate-limiting CSS
+     * variable flushes, expensive observers, etc.
+     *
+     * @param bucket        Arbitrary string identifying the operation family
+     * @param minIntervalMs Minimum time between allowed updates (default 16 ms)
+     */
+    shouldUpdate(bucket, minIntervalMs = 16) {
+      const now = performance.now();
+      const nextAllowed = this._buckets.get(bucket) ?? 0;
+      if (now >= nextAllowed) {
+        this._buckets.set(bucket, now + minIntervalMs);
+        return true;
+      }
+      return false;
     }
     // --- End of migrated methods ---
     destroy() {
@@ -3835,11 +4664,11 @@
         issues: [],
         recommendations: []
       };
-      const instance = systemData.instance;
+      const instance2 = systemData.instance;
       let totalChecks = 0;
       let passedChecks = 0;
       totalChecks++;
-      if (instance) {
+      if (instance2) {
         healthResult.checks.instanceAvailable = {
           status: "PASS",
           message: "System instance is available"
@@ -3852,10 +4681,10 @@
         };
         healthResult.issues.push("System instance is null or undefined");
       }
-      if (instance) {
+      if (instance2) {
         totalChecks++;
-        if (typeof instance.initialize === "function") {
-          if (instance.initialized !== false) {
+        if (typeof instance2.initialize === "function") {
+          if (instance2.initialized !== false) {
             healthResult.checks.initialization = {
               status: "PASS",
               message: "System appears to be initialized"
@@ -3877,11 +4706,11 @@
           };
         }
       }
-      if (instance) {
+      if (instance2) {
         const requiredMethods = ["updateAnimation", "destroy"];
         totalChecks++;
         const missingMethods = requiredMethods.filter(
-          (method) => typeof instance[method] !== "function"
+          (method) => typeof instance2[method] !== "function"
         );
         if (missingMethods.length === 0) {
           healthResult.checks.requiredMethods = {
@@ -4493,10 +5322,10 @@
         if (color.startsWith("#")) {
           const hex = color.slice(1);
           const r = parseInt(hex.substring(0, 2), 16);
-          const g = parseInt(hex.substring(2, 4), 16);
+          const g2 = parseInt(hex.substring(2, 4), 16);
           const b = parseInt(hex.substring(4, 6), 16);
-          if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
-            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+          if (!isNaN(r) && !isNaN(g2) && !isNaN(b)) {
+            return `rgba(${r}, ${g2}, ${b}, ${opacity})`;
           }
         }
         return `rgba(255, 255, 255, ${opacity})`;
@@ -4608,6 +5437,10 @@
     }
   };
   var GlobalEventBus = new EventBus();
+  var g = globalThis;
+  if (!g.GlobalEventBus) {
+    g.GlobalEventBus = GlobalEventBus;
+  }
 
   // src-js/services/MusicSyncService.ts
   init_globalConfig();
@@ -4849,6 +5682,8 @@
       this.cacheCleanupInterval = null;
       // Increment this prefix whenever cache schema changes to avoid stale data
       this.CACHE_KEY_VERSION_PREFIX = "v3";
+      /** Current unit beat direction vector (updated each beat). */
+      this.currentBeatVector = { x: 0, y: 0 };
       this.config = dependencies.YEAR3000_CONFIG || YEAR3000_CONFIG;
       this.utils = dependencies.Year3000Utilities || Year3000Utilities_exports;
       this.colorHarmonyEngine = dependencies.colorHarmonyEngine;
@@ -5530,6 +6365,13 @@
     getLatestProcessedData() {
       return this.latestProcessedData;
     }
+    /**
+     * Get the latest beat vector (unit direction) for visual systems that need
+     * directional rhythm cues. Falls back to {0,0} when unavailable.
+     */
+    getCurrentBeatVector() {
+      return this.currentBeatVector;
+    }
     stopBeatScheduler() {
       if (this.beatSchedulerTimer) {
         clearTimeout(this.beatSchedulerTimer);
@@ -5537,8 +6379,15 @@
       }
     }
     triggerBeatEvent() {
+      const GOLDEN_RATIO = 0.61803398875;
+      const angle = this.nextBeatIndex * GOLDEN_RATIO % 1 * Math.PI * 2;
+      this.currentBeatVector = { x: Math.cos(angle), y: Math.sin(angle) };
       if (this.latestProcessedData) {
-        const beatUpdate = { ...this.latestProcessedData, beatOccurred: true };
+        const beatUpdate = {
+          ...this.latestProcessedData,
+          beatOccurred: true,
+          beatVector: this.currentBeatVector
+        };
         this.notifySubscribers(beatUpdate, null, this.currentTrackUri);
       }
       this.nextBeatIndex++;
@@ -7198,10 +8047,10 @@
     }
     updateFromMusicAnalysis(processedMusicData, rawFeatures, trackUri) {
       if (!processedMusicData) return;
-      const g = processedMusicData.genre;
-      if (g && g !== this._lastGenre) {
-        this._applyGenrePalette(g).then(() => {
-          this._lastGenre = g;
+      const g2 = processedMusicData.genre;
+      if (g2 && g2 !== this._lastGenre) {
+        this._applyGenrePalette(g2).then(() => {
+          this._lastGenre = g2;
           this._forcePaletteRepaint();
         });
       }
@@ -7453,6 +8302,13 @@
         if (!palette) return;
         this.catppuccinPalettes[this.currentTheme] = palette;
         await this.refreshPalette();
+        try {
+          GlobalEventBus.publish("music:genre-change", {
+            genre,
+            palette
+          });
+        } catch (_e) {
+        }
       } catch (err) {
         if (this.config.enableDebug) {
           console.warn("[ColorHarmonyEngine] _applyGenrePalette failed", err);
@@ -7984,12 +8840,125 @@
     }
   };
 
+  // src-js/utils/echoPool.ts
+  var EchoPool = class {
+    constructor() {
+      this._maxSize = 32;
+      this._pool = [];
+    }
+    /** Number of echo nodes currently in use (for debug / tests) */
+    activeCount() {
+      return document.querySelectorAll(
+        ".sn-temporal-echo:not(.sn-temporal-echo--pooled)"
+      ).length;
+    }
+    /**
+     * Acquire an echo element from the pool or create a new one.
+     */
+    _acquire() {
+      const el = this._pool.pop() || this._create();
+      el.classList.remove("sn-temporal-echo--pooled");
+      return el;
+    }
+    /**
+     * Return an element back to the pool.
+     */
+    _release(el) {
+      el.classList.add("sn-temporal-echo--pooled");
+      el.style.opacity = "0";
+      if (this._pool.length < this._maxSize) {
+        this._pool.push(el);
+      } else {
+        el.remove();
+      }
+    }
+    /**
+     * Spawn an echo either at a given coordinate or centered on a target element.
+     */
+    spawn(target, opts = {}) {
+      const el = this._acquire();
+      let x, y;
+      if (target instanceof HTMLElement) {
+        const rect = target.getBoundingClientRect();
+        x = rect.left + rect.width / 2;
+        y = rect.top + rect.height / 2;
+      } else {
+        x = target.x;
+        y = target.y;
+      }
+      el.style.left = `${x}px`;
+      el.style.top = `${y}px`;
+      if (opts.tintHue !== void 0) {
+        el.style.setProperty("--sn-echo-hue", `${opts.tintHue}`);
+      }
+      if (opts.intensity !== void 0) {
+        el.style.setProperty("--sn-kinetic-intensity", `${opts.intensity}`);
+      }
+      if (opts.radius !== void 0) {
+        const scale = opts.radius / 16;
+        el.style.transform = `translate(-50%, -50%) scale(${scale.toFixed(2)})`;
+      }
+      void el.offsetWidth;
+      el.classList.add("sn-temporal-echo--active");
+      const handleEnd = () => {
+        el.removeEventListener("animationend", handleEnd);
+        el.classList.remove("sn-temporal-echo--active");
+        this._release(el);
+      };
+      el.addEventListener("animationend", handleEnd, { once: true });
+      document.body.appendChild(el);
+    }
+    /**
+     * Convenience wrapper: spawn echo underneath a target element inside its parent.
+     */
+    spawnBehind(target, opts = {}) {
+      opts = { ...opts };
+      const el = this._acquire();
+      const rect = target.getBoundingClientRect();
+      el.style.position = "absolute";
+      el.style.left = `${rect.left + rect.width / 2}px`;
+      el.style.top = `${rect.top + rect.height / 2}px`;
+      if (opts.tintHue !== void 0) {
+        el.style.setProperty("--sn-echo-hue", `${opts.tintHue}`);
+      }
+      if (opts.intensity !== void 0) {
+        el.style.setProperty("--sn-kinetic-intensity", `${opts.intensity}`);
+      }
+      if (opts.radius !== void 0) {
+        const scale = opts.radius / 16;
+        el.style.transform = `translate(-50%, -50%) scale(${scale.toFixed(2)})`;
+      }
+      const parent = target.parentElement || document.body;
+      parent.insertBefore(el, parent.firstChild);
+      void el.offsetWidth;
+      el.classList.add("sn-temporal-echo--active");
+      const handleEnd = () => {
+        el.removeEventListener("animationend", handleEnd);
+        el.classList.remove("sn-temporal-echo--active");
+        this._release(el);
+      };
+      el.addEventListener("animationend", handleEnd, { once: true });
+    }
+    /** Create a pristine echo DOM node */
+    _create() {
+      const el = document.createElement("div");
+      el.className = "sn-temporal-echo sn-temporal-echo--pooled";
+      el.style.position = "fixed";
+      el.style.left = "0";
+      el.style.top = "0";
+      el.style.pointerEvents = "none";
+      return el;
+    }
+  };
+  var echoPool = new EchoPool();
+
   // src-js/systems/visual/BeatSyncVisualSystem.ts
   init_Year3000Utilities();
   var BeatSyncVisualSystem = class extends BaseVisualSystem {
     constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System2 = null) {
       super(config, utils, performanceMonitor, musicSyncService, settingsManager);
       this.beatFlashElement = null;
+      this.crystallineOverlayElement = null;
       this.animationFrameId = null;
       this.lastBeatTime = 0;
       this.beatIntensity = 0;
@@ -8017,6 +8986,10 @@
       this.harmonicLoopId = null;
       this.currentHarmonicData = null;
       this.beatFlashIntensity = null;
+      this.analysis = null;
+      this.rafId = 0;
+      this.smoothedLoudness = 0;
+      this.SMOOTHING_FACTOR = 0.1;
       this.year3000System = year3000System2;
       this.performanceMetrics = {
         animationUpdates: 0,
@@ -8033,6 +9006,8 @@
           `[${this.systemName} Constructor] Initialized with Master Animation Coordinator support.`
         );
       }
+      this.onSongChange = this.onSongChange.bind(this);
+      this.update = this.update.bind(this);
     }
     _getMemoryUsage() {
       if (typeof performance !== "undefined" && performance.memory) {
@@ -8043,6 +9018,7 @@
     async initialize() {
       await super.initialize();
       this._createBeatFlashElement();
+      this._createCrystallineOverlay();
       this._startAnimationLoop();
       if (this.config.enableDebug) {
         console.log(
@@ -8064,6 +9040,17 @@
       transition: background-color 150ms ease-out, opacity 250ms ease-out;
     `;
       document.body.appendChild(this.beatFlashElement);
+    }
+    _createCrystallineOverlay() {
+      this.crystallineOverlayElement = document.createElement("div");
+      this.crystallineOverlayElement.className = "sn-crystalline-overlay";
+      const crystals = ["a", "b", "c"];
+      crystals.forEach((type) => {
+        const crystalEl = document.createElement("div");
+        crystalEl.className = `sn-crystal sn-crystal--${type}`;
+        this.crystallineOverlayElement?.appendChild(crystalEl);
+      });
+      document.body.appendChild(this.crystallineOverlayElement);
     }
     _startAnimationLoop() {
       if (this.year3000System && typeof this.year3000System.registerAnimationSystem === "function") {
@@ -8104,7 +9091,6 @@
         }
       }
     }
-    // TODO: Implement abstract onAnimate method for Year 3000 MasterAnimationCoordinator
     onAnimate(deltaMs) {
       this.updateAnimation(performance.now(), deltaMs);
     }
@@ -8130,7 +9116,8 @@
         this._updateCSSVariables(
           breathingScale,
           this.currentRhythmPhase,
-          actualDeltaTime
+          actualDeltaTime,
+          processedEnergy
         );
         if (this.isSyncActive && this.enhancedBPM > 0) {
           const now = Date.now();
@@ -8149,150 +9136,84 @@
         } else if (this.beatFlashElement) {
           this.beatFlashElement.style.opacity = "0";
         }
-        this.performanceMetrics.animationUpdates++;
-        const frameTime = performance.now() - frameStart;
-        this.updatePerformanceMetrics(frameTime);
+        this.updatePerformanceMetrics(performance.now() - frameStart);
       } catch (error) {
+        console.error(`[${this.systemName}] Error in animation loop:`, error);
         this.errorCount++;
-        console.warn(`[${this.systemName}] Animation update error:`, error);
-        if (this.errorCount > 5) {
-          console.warn(
-            `[${this.systemName}] High error count, requesting performance mode`
+        if (this.errorCount > 100) {
+          this._stopAnimationLoop();
+          console.error(
+            `[${this.systemName}] Too many errors, stopping animation.`
           );
-          if (this.year3000System && this.year3000System._activatePerformanceMode) {
-            this.year3000System._activatePerformanceMode();
-          }
         }
       }
     }
     onPerformanceModeChange(mode) {
+      if (this.config.enableDebug) {
+        console.log(`[${this.systemName}] Performance mode changed to:`, mode);
+      }
       if (mode === "performance") {
         this._performanceMode = true;
-        this._reducedQualityMode = true;
-        if (this.config?.enableDebug) {
-          console.log(
-            `\u{1F3AC} [${this.systemName}] Switched to performance mode - reducing quality`
-          );
-        }
-      } else if (mode === "quality") {
+        this.animationFrameId && cancelAnimationFrame(this.animationFrameId);
+      } else {
         this._performanceMode = false;
-        this._reducedQualityMode = false;
-        if (this.config?.enableDebug) {
-          console.log(
-            `\u{1F3AC} [${this.systemName}] Switched to quality mode - full effects`
-          );
-        }
+        this._startAnimationLoop();
       }
     }
     _startFallbackAnimationLoop() {
-      if (this.animationFrameId) {
-        cancelAnimationFrame(this.animationFrameId);
-      }
       const loop = () => {
-        this._animationLoop();
+        this.updateAnimation(performance.now(), 16.67);
         this.animationFrameId = requestAnimationFrame(loop);
       };
       this.animationFrameId = requestAnimationFrame(loop);
     }
     _animationLoop() {
-      if (!this.isAnimating || !this.initialized) return;
-      const frameStart = performance.now();
-      this.frameCount++;
-      try {
-        const currentTime = performance.now();
-        const deltaTime = currentTime - this.lastAnimationTime;
-        this.lastAnimationTime = currentTime;
-        const latestMusicData = this.musicSyncService?.getLatestProcessedData();
-        const processedEnergy = latestMusicData?.processedEnergy || 0.5;
-        const animationSpeedFactor = latestMusicData?.animationSpeedFactor || 1;
-        this.currentRhythmPhase = calculateRhythmPhase(
-          currentTime,
-          animationSpeedFactor
-        );
-        const breathingScale = calculateBreathingScale(
-          this.currentRhythmPhase,
-          processedEnergy
-        );
-        this._updateCSSVariables(
-          breathingScale,
-          this.currentRhythmPhase,
-          deltaTime
-        );
-        if (this.isSyncActive && this.enhancedBPM > 0) {
-          const now = Date.now();
-          if (now >= this.nextBeatTime) {
-            this._triggerBeat(now);
-            this._scheduleNextBeat();
-          }
-        }
-        if (this.beatIntensity > 0 && this.beatFlashElement) {
-          this.beatIntensity -= 0.025;
-          if (this.beatIntensity < 0) this.beatIntensity = 0;
-          const rootStyle = getRootStyle();
-          const accentRgb = rootStyle.style.getPropertyValue("--sn-gradient-accent-rgb").trim() || "140,170,238";
-          this.beatFlashElement.style.backgroundColor = `rgba(${accentRgb}, ${this.beatIntensity * 0.25})`;
-          this.beatFlashElement.style.opacity = `${this.beatIntensity * 0.85}`;
-        } else if (this.beatFlashElement) {
-          this.beatFlashElement.style.opacity = "0";
-        }
-        this.performanceMetrics.animationUpdates++;
-        const frameTime = performance.now() - frameStart;
-        this.updatePerformanceMetrics(frameTime);
-      } catch (error) {
-        this.errorCount++;
-        console.warn(`[${this.systemName}] Animation loop error:`, error);
-        if (this.errorCount > 5) {
-          console.warn(
-            `[${this.systemName}] High error count, throttling animations`
-          );
-          setTimeout(() => {
-            if (this.isAnimating) {
-              this.animationFrameId = requestAnimationFrame(
-                () => this._animationLoop()
-              );
-            }
-          }, 100);
-          return;
-        }
-      }
+      if (!this.isAnimating) return;
+      const timestamp = performance.now();
+      const deltaTime = timestamp - this.lastAnimationTime;
+      this.lastAnimationTime = timestamp;
+      const latestMusicData = this.musicSyncService?.getLatestProcessedData();
+      const processedEnergy = latestMusicData?.processedEnergy || 0.5;
+      const animationSpeedFactor = latestMusicData?.animationSpeedFactor || 1;
+      this.currentRhythmPhase = calculateRhythmPhase(
+        timestamp,
+        animationSpeedFactor
+      );
+      const breathingScale = calculateBreathingScale(
+        this.currentRhythmPhase,
+        processedEnergy
+      );
+      this._updateCSSVariables(
+        breathingScale,
+        this.currentRhythmPhase,
+        deltaTime,
+        processedEnergy
+      );
+      this.animationFrameId = requestAnimationFrame(
+        this._animationLoop.bind(this)
+      );
     }
-    _updateCSSVariables(breathingScale, rhythmPhase, deltaTime) {
+    _updateCSSVariables(breathingScale, rhythmPhase, deltaTime, processedEnergy) {
       if (deltaTime > 50) return;
-      const rootStyle = getRootStyle();
-      if (!rootStyle) return;
-      try {
-        const queueCSSUpdate = (property, value) => {
-          if (this.year3000System && this.year3000System.queueCSSVariableUpdate) {
-            this.year3000System.queueCSSVariableUpdate(property, value);
-          } else {
-            rootStyle.style.setProperty(property, value);
-          }
-        };
-        const clampedBreathingScale = Math.max(
-          0.97,
-          Math.min(1.02, breathingScale)
-        );
-        queueCSSUpdate("--sn-breathing-scale", clampedBreathingScale.toFixed(4));
-        const normalizedPhase = rhythmPhase % (Math.PI * 2);
-        queueCSSUpdate("--sn-rhythm-phase", normalizedPhase.toFixed(4));
-        const beatPulseIntensity = Math.max(
-          0,
-          Math.min(1, this.beatIntensity * 0.7 + this.currentEnergy * 0.3)
-        );
-        queueCSSUpdate(
-          "--sn-beat-pulse-intensity",
-          beatPulseIntensity.toFixed(4)
-        );
-        this.performanceMetrics.cssVariableUpdates++;
-      } catch (error) {
-        if (this.config.enableDebug) {
-          console.warn(`[${this.systemName}] CSS variable update failed:`, error);
+      const root = getRootStyle();
+      if (!root) return;
+      const queueCSSUpdate = (property, value) => {
+        if (this.year3000System?.queueCSSVariableUpdate && typeof this.year3000System.queueCSSVariableUpdate === "function") {
+          this.year3000System.queueCSSVariableUpdate(property, value);
+        } else {
+          root.style.setProperty(property, value);
         }
-      }
+      };
+      queueCSSUpdate("--sn-breathing-scale", breathingScale.toFixed(4));
+      queueCSSUpdate("--sn-rhythm-phase", rhythmPhase.toFixed(4));
+      const beatPulseIntensity = this.beatIntensity;
+      queueCSSUpdate("--sn-beat-pulse-intensity", beatPulseIntensity.toFixed(4));
+      const bloomIntensity = processedEnergy * 0.4;
+      queueCSSUpdate("--sn-feed-bloom-intensity", bloomIntensity.toFixed(3));
+      this.performanceMetrics.cssVariableUpdates++;
     }
     getPerformanceReport() {
-      const currentTime = performance.now();
-      const elapsedTime = currentTime - this.performanceMetrics.memoryStartTime;
+      const duration = (performance.now() - this.performanceStartTime) / 1e3;
       const currentMemory = this._getMemoryUsage();
       const memoryIncrease = Math.max(
         0,
@@ -8300,9 +9221,9 @@
       );
       return {
         systemName: this.systemName,
-        elapsedTime: elapsedTime.toFixed(1),
-        animationUpdatesPerSecond: (this.performanceMetrics.animationUpdates / (elapsedTime / 1e3)).toFixed(1),
-        cssUpdatesPerSecond: (this.performanceMetrics.cssVariableUpdates / (elapsedTime / 1e3)).toFixed(1),
+        elapsedTime: duration.toFixed(1),
+        animationUpdatesPerSecond: (this.performanceMetrics.animationUpdates / duration).toFixed(1),
+        cssUpdatesPerSecond: (this.performanceMetrics.cssVariableUpdates / duration).toFixed(1),
         memoryIncreaseKB: (memoryIncrease / 1024).toFixed(1),
         currentRhythmPhase: this.currentRhythmPhase.toFixed(3),
         isSyncActive: this.isSyncActive
@@ -8314,6 +9235,29 @@
       const energy = latestMusicData?.energy || 0.5;
       const visualIntensity = latestMusicData?.visualIntensity || 0.5;
       this.onBeatDetected(timestamp, energy, visualIntensity);
+      try {
+        const tintHue = (this.currentEnergy ?? 0.5) * 360;
+        let x = window.innerWidth / 2;
+        let y = window.innerHeight / 2;
+        if (typeof this.musicSyncService?.getCurrentBeatVector === "function") {
+          const vec = this.musicSyncService.getCurrentBeatVector();
+          x += (vec?.x ?? 0) * 80;
+          y += (vec?.y ?? 0) * 80;
+        }
+        echoPool.spawn(
+          { x, y },
+          {
+            tintHue,
+            radius: 120,
+            // Base radius for beat echo; may be tuned later
+            intensity: 0.12
+          }
+        );
+      } catch (e) {
+        if (this.config?.enableDebug) {
+          console.warn(`[BeatSyncVisualSystem] Echo spawn error:`, e);
+        }
+      }
     }
     _scheduleNextBeat() {
       this.beatInterval = 6e4 / this.enhancedBPM;
@@ -8389,11 +9333,25 @@
         1,
         this.beatIntensity + (energy * 0.5 + visualIntensity * 0.5)
       );
+      try {
+        GlobalEventBus.publish("music:beat", {
+          energy,
+          bpm: this.currentBPM,
+          valence: this.processedMusicData?.valence ?? 0
+        });
+      } catch (_e) {
+      }
     }
     destroy() {
       this.disableHarmonicSync();
       this._stopBeatSync();
       this._stopAnimationLoop();
+      if (this.crystallineOverlayElement && this.crystallineOverlayElement.parentElement) {
+        this.crystallineOverlayElement.parentElement.removeChild(
+          this.crystallineOverlayElement
+        );
+        this.crystallineOverlayElement = null;
+      }
       const rootStyle = getRootStyle();
       if (rootStyle) {
         rootStyle.style.setProperty("--sn-breathing-scale", "1");
@@ -8701,6 +9659,61 @@
     }
     updateVisualIntensity() {
     }
+    start() {
+      Spicetify.Player.addEventListener("songchange", this.onSongChange);
+      this.onSongChange();
+    }
+    stop() {
+      Spicetify.Player.removeEventListener("songchange", this.onSongChange);
+      if (this.rafId) {
+        cancelAnimationFrame(this.rafId);
+      }
+    }
+    async onSongChange() {
+      if (this.rafId) {
+        cancelAnimationFrame(this.rafId);
+      }
+      const currentTrack = Spicetify.Player.data?.item;
+      if (!currentTrack || !currentTrack.uri) {
+        return;
+      }
+      try {
+        this.analysis = await Spicetify.getAudioData(currentTrack.uri);
+        if (this.analysis && this.analysis.segments) {
+          this.update();
+        }
+      } catch (error) {
+        console.error("StarryNight: Failed to get audio data", error);
+        this.analysis = null;
+      }
+    }
+    update() {
+      if (!this.analysis || !Spicetify.Player.isPlaying()) {
+        this.smoothedLoudness = 0;
+        document.documentElement.style.setProperty(
+          "--sn-feed-bloom-intensity",
+          "0"
+        );
+        this.rafId = requestAnimationFrame(this.update);
+        return;
+      }
+      const progress = Spicetify.Player.getProgress() / 1e3;
+      const segment = this.analysis.segments.find(
+        (s) => progress >= s.start && progress < s.start + s.duration
+      );
+      let currentLoudness = 0;
+      if (segment) {
+        const normalizedLoudness = (segment.loudness_max + 60) / 60;
+        currentLoudness = Math.max(0, Math.min(1, normalizedLoudness));
+      }
+      this.smoothedLoudness = currentLoudness * this.SMOOTHING_FACTOR + this.smoothedLoudness * (1 - this.SMOOTHING_FACTOR);
+      const bloomIntensity = this.smoothedLoudness * 0.4;
+      document.documentElement.style.setProperty(
+        "--sn-feed-bloom-intensity",
+        bloomIntensity.toFixed(3)
+      );
+      this.rafId = requestAnimationFrame(this.update);
+    }
   };
 
   // src-js/systems/visual/BehavioralPredictionEngine.ts
@@ -8734,6 +9747,7 @@
         maxWarmthIntensity: 0.8,
         currentActiveAnimations: 0
       };
+      this._predictiveSystem = year3000System2 && year3000System2.getSystem ? year3000System2.getSystem("PredictiveMaterializationSystem") : null;
       if (this.config?.enableDebug) {
         console.log(
           `\u{1F30C} [${this.systemName}] Optimized Quantum Empathy system initialized.`
@@ -8969,9 +9983,21 @@
       this._activeTimers.push(this.animationTimer);
     }
     triggerOptimizedAnticipatoryAnimation(element, actionType, confidence) {
+      if (this._predictiveSystem?.setTargetElement) {
+        this._predictiveSystem.setTargetElement(element);
+      }
       this.quantumEmpathy.currentActiveAnimations++;
       const intensity = Math.min(1, confidence * 1.2);
       element.classList.add("sn-anticipatory-warmth");
+      const hueShift = (Math.random() * 40 - 20).toFixed(1);
+      element.style.setProperty(
+        "--sn-anticipatory-intensity",
+        intensity.toFixed(3)
+      );
+      element.style.setProperty(
+        "--sn-anticipatory-hue",
+        `${hueShift}deg`
+      );
       element.style.setProperty(
         "--sn-warmth-intensity",
         `${intensity}`
@@ -9050,16 +10076,21 @@
         });
       });
     }
+    /**
+     * Map confidence buckets to CSS classes defined in _sn_prediction_effects.scss.
+     * The naming now aligns with the unified "sn-predict-" convention.
+     */
     getHighlightClasses(type) {
       switch (type) {
         case "strong":
           return [
-            "sn-predictive-highlight",
-            "sn-predictive-highlight-strong",
-            "sn-bloom-active"
+            "sn-predict-glow",
+            // vivid static glow
+            "sn-predict-pulse"
+            // animated pulse
           ];
         default:
-          return ["sn-predictive-highlight"];
+          return ["sn-predict-subtle-glow"];
       }
     }
     updateModeConfiguration(modeConfig) {
@@ -9154,14 +10185,56 @@
     }
   };
 
+  // src-js/utils/NoiseField.ts
+  var GRID_SIZE = 64;
+  var vectors = new Array(GRID_SIZE * GRID_SIZE);
+  (function init() {
+    for (let i = 0; i < vectors.length; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      vectors[i] = {
+        x: Math.cos(angle),
+        y: Math.sin(angle)
+      };
+    }
+  })();
+  function sample(u, v) {
+    const x = Math.max(0, Math.min(0.9999, u)) * (GRID_SIZE - 1);
+    const y = Math.max(0, Math.min(0.9999, v)) * (GRID_SIZE - 1);
+    const x0 = Math.floor(x);
+    const y0 = Math.floor(y);
+    const x1 = x0 + 1;
+    const y1 = y0 + 1;
+    const sx = x - x0;
+    const sy = y - y0;
+    const v00 = vectors[y0 * GRID_SIZE + x0];
+    const v10 = vectors[y0 * GRID_SIZE + x1 % GRID_SIZE];
+    const v01 = vectors[y1 % GRID_SIZE * GRID_SIZE + x0];
+    const v11 = vectors[y1 % GRID_SIZE * GRID_SIZE + x1 % GRID_SIZE];
+    const lerp2 = (a, b, t) => a + (b - a) * t;
+    const ix0x = lerp2(v00.x, v10.x, sx);
+    const ix0y = lerp2(v00.y, v10.y, sx);
+    const ix1x = lerp2(v01.x, v11.x, sx);
+    const ix1y = lerp2(v01.y, v11.y, sx);
+    return {
+      x: lerp2(ix0x, ix1x, sy),
+      y: lerp2(ix0y, ix1y, sy)
+    };
+  }
+
   // src-js/systems/visual/DataGlyphSystem.ts
-  var DataGlyphSystem = class extends BaseVisualSystem {
+  var _DataGlyphSystem = class _DataGlyphSystem extends BaseVisualSystem {
     constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System2 = null) {
       super(config, utils, performanceMonitor, musicSyncService, settingsManager);
       this.masterAnimationRegistered = false;
       this.animationFrameId = null;
       this.isUsingMasterAnimation = false;
       this.itemObserver = null;
+      this.hoverTimeouts = /* @__PURE__ */ new WeakMap();
+      this.currentEchoCount = 0;
+      // --- Phase4: recent echo timestamps per element for clustering -----------
+      this.recentEchoes = /* @__PURE__ */ new WeakMap();
+      // TODO[PHASE3-POOL]: Pool of detached .sn-temporal-echo elements reused to cut GC churn.
+      this.echoPool = [];
       this.year3000System = year3000System2;
       this.observedItems = /* @__PURE__ */ new Map();
       this.glyphDataCache = /* @__PURE__ */ new WeakMap();
@@ -9455,7 +10528,14 @@
         attentionScore: event.type === "mouseenter" ? 1 : 0
       });
       if (event.type === "mouseenter") {
-        this.addTemporalEcho(itemElement);
+        const dwell = setTimeout(() => {
+          this.addTemporalEcho(itemElement);
+        }, 120);
+        this.hoverTimeouts.set(itemElement, dwell);
+      } else if (event.type === "mouseleave") {
+        const t = this.hoverTimeouts.get(itemElement);
+        if (t) clearTimeout(t);
+        this.hoverTimeouts.delete(itemElement);
       }
     }
     updateActiveEchoesAndResonance() {
@@ -9524,14 +10604,103 @@
       });
     }
     addTemporalEcho(element) {
-      const echo = document.createElement("div");
-      echo.className = "sn-temporal-echo";
+      const now = Date.now();
+      const bucket = this.recentEchoes.get(element) ?? [];
+      const filtered = bucket.filter((t) => now - t < 300);
+      filtered.push(now);
+      this.recentEchoes.set(element, filtered);
+      const spawnMega = filtered.length >= 3;
+      if (spawnMega) {
+        this.recentEchoes.set(element, []);
+      }
+      if (this.currentEchoCount >= this.dynamicMaxEchoes) return;
+      if (this.echoIntensitySetting === 0) return;
+      const echo = this.acquireEchoElement();
+      const musicData = this.musicSyncService?.getLatestProcessedData();
+      const energy = musicData?.energy ?? 0;
+      const valence = musicData?.valence ?? 0.5;
+      const intensityFactor = 0.2 * this.echoIntensitySetting;
+      let radius = Math.min(1.6, 1 + energy * 0.4 + intensityFactor);
+      const hueShift = ((valence - 0.5) * 40).toFixed(1);
+      const beatVec = this.musicSyncService?.getCurrentBeatVector?.();
+      let offsetX = 0, offsetY = 0, skewDeg = 0;
+      try {
+        const rect = element.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const normX = Math.min(Math.max(centerX / window.innerWidth, 0), 1);
+        const normY = Math.min(Math.max(centerY / window.innerHeight, 0), 1);
+        const vec = sample(normX, normY);
+        const intensityMult = this.echoIntensitySetting;
+        const offsetMagnitude = 6 + energy * 6 + intensityMult * 2;
+        offsetX = vec.x * offsetMagnitude;
+        offsetY = vec.y * offsetMagnitude;
+        if (beatVec) {
+          offsetX += beatVec.x * 10;
+          offsetY += beatVec.y * 10;
+        }
+        skewDeg = vec.x * 6;
+      } catch (e) {
+      }
+      if (spawnMega) {
+        radius = Math.min(radius * 1.6, 2.4);
+        echo.style.setProperty("--sn-kinetic-intensity", "0.4");
+      }
+      const baseAngle = (Math.random() * 360).toFixed(1);
+      echo.style.setProperty("--sn-echo-radius-multiplier", radius.toFixed(2));
+      echo.style.setProperty("--sn-echo-hue-shift", `${hueShift}deg`);
+      echo.style.setProperty("--sn-echo-offset-x", `${offsetX.toFixed(1)}px`);
+      echo.style.setProperty("--sn-echo-offset-y", `${offsetY.toFixed(1)}px`);
+      echo.style.setProperty("--sn-echo-skew", `${skewDeg.toFixed(2)}deg`);
+      echo.style.setProperty("--sn-echo-rotate", `${baseAngle}deg`);
       element.appendChild(echo);
+      this.currentEchoCount++;
       setTimeout(() => {
         if (echo.parentElement) echo.parentElement.removeChild(echo);
-      }, 800);
+        this.currentEchoCount--;
+        this.releaseEchoElement(echo);
+      }, 1250);
+    }
+    get echoIntensitySetting() {
+      const val = this.settingsManager?.get?.("sn-echo-intensity") ?? "2";
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? 2 : parsed;
+    }
+    get dynamicMaxEchoes() {
+      switch (this.echoIntensitySetting) {
+        case 0:
+          return 0;
+        case 1:
+          return Math.ceil(_DataGlyphSystem.BASE_MAX_ECHOES / 2);
+        case 3:
+          return _DataGlyphSystem.BASE_MAX_ECHOES * 2;
+        default:
+          return _DataGlyphSystem.BASE_MAX_ECHOES;
+      }
+    }
+    // --- Phase3 helper methods ---------------------------------------
+    /** Obtain an echo element from pool or create */
+    acquireEchoElement() {
+      let el = this.echoPool.pop();
+      if (el) {
+        el.style.animation = "none";
+        void el.offsetWidth;
+        el.style.animation = "";
+      } else {
+        el = document.createElement("div");
+        el.className = "sn-temporal-echo";
+      }
+      return el;
+    }
+    /** Return echo element to pool (bounded) */
+    releaseEchoElement(el) {
+      if (this.echoPool.length < 20) {
+        this.echoPool.push(el);
+      }
     }
   };
+  _DataGlyphSystem.BASE_MAX_ECHOES = 6;
+  var DataGlyphSystem = _DataGlyphSystem;
 
   // src-js/systems/visual/DimensionalNexusSystem.ts
   var DimensionalNexusSystem = class extends BaseVisualSystem {
@@ -9594,6 +10763,8 @@
       }
       this.rootElement = this.utils.getRootStyle();
       this.modalObserver = null;
+      this._lastScrollTime = null;
+      this._lastScrollTop = null;
     }
     async initialize() {
       await super.initialize();
@@ -9639,6 +10810,22 @@
     }
     recordUserInteraction(event) {
       const eventType = event.type;
+      if (eventType === "scroll") {
+        const target = event.target;
+        if (target) {
+          const newTop = target.scrollTop;
+          const now2 = performance.now();
+          const velocity = this._lastScrollTime ? (newTop - (this._lastScrollTop ?? 0)) / (now2 - this._lastScrollTime) : 0;
+          const direction = velocity < 0 ? "up" : "down";
+          GlobalEventBus.publish("user:scroll", {
+            velocity: velocity * 1e3,
+            // pixels per second
+            direction
+          });
+          this._lastScrollTop = newTop;
+          this._lastScrollTime = now2;
+        }
+      }
       const now = performance.now();
       if (now - this.lastInteractionRecordTime < this.interactionRecordInterval) {
         return;
@@ -10134,6 +11321,9 @@
         }),
         settingsManager ?? new SettingsManager(config, HARMONIC_MODES, utils)
       );
+      // Time tracking for resonance triggers
+      this._resonanceCooldownMs = 1200;
+      this._timeSinceLastResonance = 0;
       this.materializationIntensity = 1;
       this.materializationSpeed = 1;
       this.systemName = "PredictiveMaterializationSystem";
@@ -10147,8 +11337,53 @@
         console.log(`[${this.systemName} Constructor] Initialized.`);
       }
     }
-    // TODO: Implement abstract onAnimate method for Year 3000 MasterAnimationCoordinator
+    // TODO[Y3K-PH3]: Allow external callers (e.g., Navigation system) to set the element that receives resonance
+    setTargetElement(el) {
+      this.materializationState.targetElement = el;
+    }
+    // Frame-level animation hook used by MasterAnimationCoordinator
     onAnimate(deltaMs) {
+      if (!this.materializationState.targetElement) return;
+      this._timeSinceLastResonance += deltaMs;
+      const imminence = this.materializationState.imminence;
+      const clarity = this.materializationState.clarity;
+      const threshold = 0.6;
+      if (imminence * 0.7 + clarity * 0.3 > threshold && this._timeSinceLastResonance >= this._resonanceCooldownMs) {
+        this._maybeTriggerResonance();
+        this._timeSinceLastResonance = 0;
+      }
+    }
+    _maybeTriggerResonance() {
+      const target = this.materializationState.targetElement;
+      if (!target) return;
+      if (target.classList.contains("sn-materialize-resonance")) return;
+      target.classList.add(
+        "sn-materialize-resonance",
+        "sn-predict-materialize-glow"
+      );
+      const handleEnd = () => {
+        target.classList.remove("sn-materialize-resonance");
+        target.removeEventListener("animationend", handleEnd);
+      };
+      target.addEventListener("animationend", handleEnd, { once: true });
+      if (this.materializationState.imminence >= 0.7 && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const tintHue = (this.materializationState.clarity ?? 0.5) * 360;
+        echoPool.spawn(target, {
+          tintHue,
+          radius: 160,
+          // Mega ripple radius (2× base ~80)
+          intensity: 0.4
+        });
+      }
+      if (this.config?.enableDebug) {
+        console.debug(
+          `[${this.systemName}] Materialize resonance triggered on`,
+          target,
+          `imminence=${this.materializationState.imminence.toFixed(
+            2
+          )}, clarity=${this.materializationState.clarity.toFixed(2)}`
+        );
+      }
     }
     async initialize() {
       await super.initialize();
@@ -10270,6 +11505,31 @@
       super.destroy();
       if (this.config?.enableDebug) {
         console.log(`[${this.systemName}] Destroyed and cleaned up.`);
+      }
+    }
+    // TODO[Y3K-PH2]: Public helper to trigger anticipatory shimmer on a target element.
+    // This seeds two-way integration with BehavioralPredictionEngine while keeping
+    // backward-compatibility (calling code can still add the CSS class directly).
+    triggerAnticipatoryWarmth(target, {
+      hue = 0,
+      intensity = 0.18,
+      durationMs = 1200
+    } = {}) {
+      if (!target) return;
+      const clamped = Math.max(0, Math.min(0.3, intensity));
+      target.style.setProperty("--sn-anticipatory-intensity", clamped.toFixed(3));
+      target.style.setProperty("--sn-anticipatory-hue", `${hue.toFixed(1)}deg`);
+      target.classList.add("sn-anticipatory-warmth");
+      const handleEnd = () => {
+        target.classList.remove("sn-anticipatory-warmth");
+        target.removeEventListener("animationend", handleEnd);
+      };
+      target.addEventListener("animationend", handleEnd);
+      if (this.config?.enableDebug) {
+        console.debug(
+          `[${this.systemName}] Anticipatory shimmer fired (hue=${hue}, intensity=${clamped}) on`,
+          target
+        );
       }
     }
   };
@@ -10506,6 +11766,22 @@
       applyCss("--sn-nav-item-glow-intensity", `${glow}`);
       applyCss("--sn-nav-text-energy-opacity", `${textOpacity}`);
       applyCss("--sidebar-intensity", `${visualIntensity}`);
+      if (!this.deviceCapabilities.reducedMotion) {
+        const focused = this.rootNavBar.querySelector(
+          '.main-navBar-navLink[aria-current="page"], .main-navBar-navLink:focus'
+        );
+        if (focused) {
+          const hueVar = getComputedStyle(focused).getPropertyValue(
+            "--sidebar-focus-hue"
+          );
+          const tintHue = parseFloat(hueVar) || glow * 360;
+          echoPool.spawnBehind(focused, {
+            tintHue,
+            radius: 80,
+            intensity: glow * 0.6
+          });
+        }
+      }
     }
     updateFromMusicAnalysis(processedMusicData, rawFeatures, trackUri) {
       if (!this.initialized) return;
@@ -11020,9 +12296,9 @@
           }
         }
       ];
-      for (const { name, init } of systemInitializers) {
+      for (const { name, init: init2 } of systemInitializers) {
         try {
-          await init();
+          await init2();
           initializationResults.success.push(name);
         } catch (error) {
           initializationResults.failed.push(name);
@@ -11155,7 +12431,7 @@
       for (const config of visualSystemConfigs) {
         const { name, Class, property } = config;
         try {
-          const instance = new Class(
+          const instance2 = new Class(
             this.YEAR3000_CONFIG,
             this.utils,
             this.performanceAnalyzer,
@@ -11163,11 +12439,11 @@
             this.settingsManager,
             this
           );
-          await instance.initialize();
-          if (instance.initialized) {
-            this[property] = instance;
+          await instance2.initialize();
+          if (instance2.initialized) {
+            this[property] = instance2;
             if (this.systemHealthMonitor) {
-              this.systemHealthMonitor.registerSystem(name, instance);
+              this.systemHealthMonitor.registerSystem(name, instance2);
             }
             results.success.push(name);
           } else {
@@ -11769,9 +13045,9 @@
           }
         }
       ];
-      for (const { name, init } of essentialSystems) {
+      for (const { name, init: init2 } of essentialSystems) {
         try {
-          await init();
+          await init2();
           initializationResults.success.push(name);
         } catch (error) {
           initializationResults.failed.push(name);
@@ -12815,6 +14091,567 @@
     window.runIntegrationTest = () => window.SystemIntegrationTester.runFullIntegrationTest();
   }
 
+  // src-js/effects/Aberration/AberrationCanvas.ts
+  var AberrationCanvas = class {
+    constructor(parent, y3k = null) {
+      this.parent = parent;
+      this.y3k = y3k;
+      this.gl = null;
+      this.program = null;
+      this.tex = null;
+      this.strength = 0.4;
+      // default; overridden via CSS var
+      this.rafId = null;
+      this.frameStart = 0;
+      this._defaultSize = 256;
+      // Bound handlers so we can remove them in destroy()
+      this._boundContextLost = (e) => this._handleContextLost(e);
+      this._boundContextRestored = () => this._handleContextRestored();
+      this.canvas = document.createElement("canvas");
+      this.canvas.width = this._defaultSize;
+      this.canvas.height = this._defaultSize;
+      this.canvas.style.width = "100%";
+      this.canvas.style.height = "100%";
+      Object.assign(this.canvas.style, {
+        position: "absolute",
+        inset: "0",
+        pointerEvents: "none",
+        mixBlendMode: "screen",
+        zIndex: "-1"
+      });
+      this.parent.appendChild(this.canvas);
+      this.perf = y3k?.performanceAnalyzer ?? null;
+      this.canvas.addEventListener(
+        "webglcontextlost",
+        this._boundContextLost,
+        false
+      );
+      this.canvas.addEventListener(
+        "webglcontextrestored",
+        this._boundContextRestored,
+        false
+      );
+      this._initGL();
+    }
+    _initGL() {
+      const gl = this.canvas.getContext("webgl", {
+        premultipliedAlpha: false,
+        alpha: true,
+        antialias: false
+      });
+      if (!gl) {
+        console.warn("[AberrationCanvas] WebGL not available \u2013 effect disabled");
+        return;
+      }
+      this.gl = gl;
+      const vsSource = `attribute vec2 aPos; varying vec2 vUv; void main(){ vUv = (aPos+1.0)*0.5; gl_Position = vec4(aPos,0.0,1.0); }`;
+      const fsSource = `precision mediump float; uniform sampler2D uTex; uniform float uStrength; uniform float uTime; varying vec2 vUv; void main(){ float freq = 8.0; vec2 offset = vec2(sin(vUv.y*freq+uTime)*uStrength, 0.0); vec4 c; c.r = texture2D(uTex, vUv + offset).r; c.g = texture2D(uTex, vUv).g; c.b = texture2D(uTex, vUv - offset).b; c.a = clamp(uStrength * 1.5, 0.0, 0.6); gl_FragColor = c; }`;
+      const compile = (type, src) => {
+        const sh = gl.createShader(type);
+        gl.shaderSource(sh, src);
+        gl.compileShader(sh);
+        return sh;
+      };
+      const vs = compile(gl.VERTEX_SHADER, vsSource);
+      const fs = compile(gl.FRAGMENT_SHADER, fsSource);
+      const prog = gl.createProgram();
+      gl.attachShader(prog, vs);
+      gl.attachShader(prog, fs);
+      gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+        console.error("[AberrationCanvas] Shader link failed");
+        return;
+      }
+      this.program = prog;
+      gl.useProgram(prog);
+      const verts = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(prog, "aPos");
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      const tex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        1,
+        1,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        new Uint8Array([255, 255, 255, 255])
+      );
+      this.tex = tex;
+    }
+    /** Public API: update strength via CSS variable (0–1) */
+    setStrength(value) {
+      this.strength = value;
+    }
+    /** Uploads a bitmap (e.g., gradient snapshot) into the shader texture. */
+    updateSourceBitmap(bmp) {
+      if (!this.gl || !this.tex) return;
+      const gl = this.gl;
+      gl.bindTexture(gl.TEXTURE_2D, this.tex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bmp);
+    }
+    /**
+     * Public render hook – called by AberrationVisualSystem.onAnimate().
+     * All original rendering logic from the private _render loop lives here so
+     * that the effect can be orchestrated by MasterAnimationCoordinator.
+     */
+    render(time) {
+      if (!this.gl || !this.program) return;
+      const gl = this.gl;
+      if (this.perf) this.frameStart = performance.now();
+      gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.useProgram(this.program);
+      const uTexLoc = gl.getUniformLocation(this.program, "uTex");
+      const uStrLoc = gl.getUniformLocation(this.program, "uStrength");
+      const uTimeLoc = gl.getUniformLocation(this.program, "uTime");
+      gl.uniform1i(uTexLoc, 0);
+      gl.uniform1f(uStrLoc, this.strength);
+      gl.uniform1f(uTimeLoc, time * 1e-3);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      if (this.perf) {
+        const dur = performance.now() - this.frameStart;
+        this.perf.shouldUpdate("aberration", 500) && this.perf.endTiming("AberrationCanvas", this.frameStart);
+        if (dur > 0.5) {
+          console.warn(
+            `[AberrationCanvas] Frame ${dur.toFixed(2)} ms exceeds 0.5 ms budget`
+          );
+        }
+      }
+    }
+    destroy() {
+      if (this.rafId) cancelAnimationFrame(this.rafId);
+      if (this.gl) {
+        const lose = this.gl.getExtension("WEBGL_lose_context");
+        lose?.loseContext();
+      }
+      this.canvas.removeEventListener("webglcontextlost", this._boundContextLost);
+      this.canvas.removeEventListener(
+        "webglcontextrestored",
+        this._boundContextRestored
+      );
+      this.canvas.remove();
+    }
+    /**
+     * Dynamically adjusts the off-screen buffer resolution. Caller should use
+     * powers of two (64–256) to keep GPU happy. Safe to call every time
+     * performance mode toggles – texture & buffers are reused.
+     */
+    setPixelSize(size) {
+      if (size === this.canvas.width) return;
+      this.canvas.width = size;
+      this.canvas.height = size;
+    }
+    // ────────────────────────────────────────────────────────────────
+    // Context-loss life-cycle helpers (Phase-5)
+    // ────────────────────────────────────────────────────────────────
+    _handleContextLost(e) {
+      e.preventDefault();
+      console.warn("[AberrationCanvas] WebGL context lost \u2013 waiting for restore");
+      this.gl = null;
+      this.program = null;
+    }
+    _handleContextRestored() {
+      console.info(
+        "[AberrationCanvas] WebGL context restored \u2013 re-initializing GL"
+      );
+      this._initGL();
+    }
+  };
+
+  // src-js/effects/Aberration/AberrationVisualSystem.ts
+  var AberrationVisualSystem = class {
+    constructor(canvas, perf) {
+      this.systemName = "AberrationCanvas";
+      this._elapsed = 0;
+      this._canvas = canvas;
+      this._perf = perf;
+    }
+    /* --------------------------------------------------------------- */
+    /* MasterAnimationCoordinator hooks                                */
+    /* --------------------------------------------------------------- */
+    /**
+     * Called by the coordinator every frame (subject to frame budgeting).
+     * @param deltaMs Time in milliseconds since last call.
+     */
+    onAnimate(deltaMs) {
+      this._elapsed += deltaMs;
+      let start = 0;
+      if (this._perf) start = this._perf.startTiming("AberrationVisualSystem");
+      this._canvas.render(this._elapsed);
+      if (this._perf && start) {
+        this._perf.endTiming("AberrationVisualSystem", start);
+      }
+    }
+    /**
+     * Optional hook – will be invoked when MAC toggles performance modes.
+     * We keep it for future Phase-2 improvements (dynamic resolution scaling).
+     */
+    onPerformanceModeChange(mode) {
+      if (mode === "performance") {
+        this._canvas.setPixelSize(128);
+        this._canvas.setStrength(0.25);
+      } else {
+        this._canvas.setPixelSize(256);
+        this._canvas.setStrength(0.4);
+      }
+    }
+    /* --------------------------------------------------------------- */
+    /* Lifecycle helpers                                               */
+    /* --------------------------------------------------------------- */
+    destroy() {
+      this._canvas.destroy();
+    }
+  };
+
+  // src-js/utils/getScrollNode.ts
+  var SCROLL_NODE_SELECTORS = [
+    ".main-view-container__scroll-node",
+    // 2023-era builds
+    ".main-viewContainer-scrollNode",
+    // 2024 dash variant
+    ".main-viewContainer__scrollNode"
+    // 2024 double-underscore variant
+  ].join(", ");
+  function getScrollNode() {
+    return document.querySelector(SCROLL_NODE_SELECTORS);
+  }
+
+  // src-js/effects/Aberration/AberrationManager.ts
+  var instance = null;
+  var visualSystem = null;
+  function isAberrationEnabled() {
+    try {
+      const val = window.Spicetify?.LocalStorage?.get?.(
+        "sn-enable-aberration"
+      );
+      return val !== "false";
+    } catch {
+      return true;
+    }
+  }
+  function attach(y3k) {
+    if (!isAberrationEnabled()) {
+      setNebulaNoiseEnabled(false, y3k);
+      return;
+    }
+    const node = getScrollNode();
+    if (!node) return;
+    if (instance && instance.parent === node) return;
+    instance?.destroy();
+    instance = new AberrationCanvas(node, y3k);
+    if (window.__SN_DEBUG_ABERRATION) {
+      console.log("[AberrationManager] canvas attached", node);
+    }
+    setNebulaNoiseEnabled(true, y3k);
+    if (y3k && instance) {
+      visualSystem = new AberrationVisualSystem(
+        instance,
+        y3k.performanceAnalyzer || void 0
+      );
+      y3k.registerAnimationSystem(
+        "AberrationCanvas",
+        visualSystem,
+        // satisfies minimal AnimationSystem
+        "critical",
+        60
+      );
+      y3k.performanceAnalyzer?.emitTrace("AberrationCanvasAttached");
+    }
+  }
+  function setNebulaNoiseEnabled(enabled, y3k) {
+    if (y3k) {
+      y3k.queueCSSVariableUpdate(
+        "--sn-nebula-noise-opacity",
+        enabled ? "0.03" : "0"
+      );
+    } else {
+      document.documentElement.style.setProperty(
+        "--sn-nebula-noise-opacity",
+        enabled ? "0.03" : "0"
+      );
+    }
+  }
+  function initializeAberrationManager(y3k = null) {
+    attach(y3k);
+    if (!instance) setNebulaNoiseEnabled(false, y3k);
+    const history = window.Spicetify?.Platform?.History;
+    if (history?.listen) {
+      history.listen(() => setTimeout(() => attach(y3k), 0));
+    }
+    document.addEventListener("spicetify:appchange", () => attach(y3k));
+    const observer = new MutationObserver(() => {
+      if (!instance) {
+        attach(y3k);
+        if (!instance) setNebulaNoiseEnabled(false, y3k);
+      } else {
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+    document.addEventListener("year3000SystemSettingsChanged", (e) => {
+      const { key, value } = e.detail || {};
+      if (key === "sn-enable-aberration") {
+        const enable = value === "true";
+        if (enable && !instance) {
+          attach(y3k);
+        } else if (!enable && instance) {
+          instance.destroy();
+          instance = null;
+          y3k?.unregisterAnimationSystem("AberrationCanvas");
+          visualSystem?.destroy();
+          visualSystem = null;
+          y3k?.performanceAnalyzer?.emitTrace("AberrationCanvasDetached");
+        }
+        setNebulaNoiseEnabled(enable && !!instance, y3k);
+      }
+      if (key === "sn-nebula-aberration-strength") {
+        const num = parseFloat(value);
+        if (!Number.isNaN(num) && instance) {
+          instance.setStrength(num);
+        }
+        y3k?.queueCSSVariableUpdate(
+          "--sn-nebula-aberration-strength",
+          String(value)
+        );
+      }
+    });
+  }
+
+  // src-js/store/UserHistory.ts
+  var LS_KEY = "sn_seen_genres_v1";
+  var UserGenreHistory = class {
+    constructor() {
+      const raw = typeof localStorage !== "undefined" ? localStorage.getItem(LS_KEY) : null;
+      this.seen = new Set(raw ? JSON.parse(raw) : []);
+    }
+    hasSeen(genre) {
+      return this.seen.has(genre.toLowerCase());
+    }
+    markSeen(genre) {
+      const key = genre.toLowerCase();
+      if (!this.seen.has(key)) {
+        this.seen.add(key);
+        this._persist();
+      }
+    }
+    _persist() {
+      try {
+        if (typeof localStorage !== "undefined") {
+          localStorage.setItem(LS_KEY, JSON.stringify([...this.seen]));
+        }
+      } catch (_e) {
+      }
+    }
+  };
+
+  // src-js/effects/NebulaController.ts
+  function median(values) {
+    if (!values.length) return 0;
+    const sorted = [...values].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    if (sorted.length % 2 !== 0) {
+      return sorted[mid] ?? 0;
+    }
+    const lower = sorted[mid - 1] ?? 0;
+    const upper = sorted[mid] ?? 0;
+    return (lower + upper) / 2;
+  }
+  var _NebulaController = class _NebulaController {
+    constructor(y3k = null, batcher, perf) {
+      this.unsubscribers = [];
+      this.frameDurations = [];
+      // rolling window for medians
+      this.enabled = true;
+      this.intensitySetting = "balanced";
+      this.intensityFactor = 1;
+      this.genreHistory = new UserGenreHistory();
+      this.activeGlowTimeout = null;
+      this.interactionOffHandler = null;
+      this.year3000System = y3k;
+      if (batcher) {
+        this.batcher = batcher;
+      } else {
+        const sharedBatcher = y3k?.cssVariableBatcher;
+        if (sharedBatcher) {
+          this.batcher = sharedBatcher;
+        } else {
+          this.batcher = new CSSVariableBatcher({
+            batchIntervalMs: 16,
+            maxBatchSize: 40
+          });
+        }
+      }
+      this.perf = perf ? perf : y3k?.performanceAnalyzer ?? null;
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      const capabilityOverall = y3k?.deviceCapabilityDetector?.deviceCapabilities?.overall;
+      const settings = y3k?.settingsManager;
+      if (settings) {
+        this.intensitySetting = settings.get(NEBULA_INTENSITY_KEY) ?? "balanced";
+      }
+      switch (this.intensitySetting) {
+        case "disabled":
+          this.enabled = false;
+          break;
+        case "minimal":
+          this.intensityFactor = 0.6;
+          break;
+        case "balanced":
+          this.intensityFactor = 1;
+          break;
+        case "intense":
+          this.intensityFactor = 1.4;
+          break;
+      }
+      if (prefersReducedMotion || capabilityOverall === "low") {
+        this.enabled = false;
+      }
+      if (this.enabled) {
+        this._subscribe();
+      } else {
+        if (typeof document !== "undefined") {
+          document.documentElement.style.setProperty(
+            "--sn-nebula-beat-intensity",
+            "0"
+          );
+        }
+      }
+    }
+    _subscribe() {
+      this.unsubscribers.push(
+        GlobalEventBus.subscribe(
+          "music:beat",
+          (p) => this._handleBeat(p)
+        ),
+        GlobalEventBus.subscribe(
+          "music:genre-change",
+          (p) => this._handleGenreChange(p)
+        ),
+        GlobalEventBus.subscribe(
+          "user:scroll",
+          (p) => this._handleScroll(p)
+        )
+      );
+    }
+    // ---------------------------------------------------------------------------
+    // Event Handlers – all lightweight calculations to stay under 2 ms median.
+    // ---------------------------------------------------------------------------
+    _handleBeat(payload) {
+      const t0 = performance.now();
+      const safeEnergy = typeof payload.energy === "number" ? payload.energy : 0.5;
+      const intensity = (0.8 + Math.min(Math.max(safeEnergy, 0), 1) * 0.6) * this.intensityFactor;
+      this._queueVar("--sn-nebula-beat-intensity", intensity.toFixed(3));
+      const aberrationStrength = (safeEnergy * 0.6).toFixed(3);
+      this._queueVar("--sn-nebula-aberration-strength", aberrationStrength);
+      this._recordDuration(t0);
+    }
+    _handleGenreChange(payload) {
+      const t0 = performance.now();
+      if (this.genreHistory.hasSeen(payload.genre)) {
+        return;
+      }
+      this.genreHistory.markSeen(payload.genre);
+      const cueOpacity = 0.18 * this.intensityFactor;
+      this._queueVar("--sn-nebula-layer-0-opacity", cueOpacity.toFixed(3));
+      const clearCue = () => {
+        if (this.activeGlowTimeout) {
+          clearTimeout(this.activeGlowTimeout);
+          this.activeGlowTimeout = null;
+        }
+        this._queueVar("--sn-nebula-layer-0-opacity", "0.05");
+        if (this.interactionOffHandler) {
+          document.removeEventListener("pointerdown", this.interactionOffHandler);
+          document.removeEventListener("keydown", this.interactionOffHandler);
+          this.interactionOffHandler = null;
+        }
+      };
+      this.activeGlowTimeout = setTimeout(clearCue, 4e3);
+      this.interactionOffHandler = () => clearCue();
+      document.addEventListener("pointerdown", this.interactionOffHandler, {
+        once: true
+      });
+      document.addEventListener("keydown", this.interactionOffHandler, {
+        once: true
+      });
+      this._queueVar("--sn-nebula-ease-t", "1");
+      this._recordDuration(t0);
+    }
+    _handleScroll(payload) {
+      const t0 = performance.now();
+      const safeVel = typeof payload.velocity === "number" ? payload.velocity : 0;
+      const vel = Math.min(Math.abs(safeVel), 50);
+      const blurBoost = vel / 50 * 2 * this.intensityFactor;
+      this._queueVar(
+        "--sn-nebula-layer-3-blur",
+        `calc(var(--sn-depth-layer-3-blur) + ${blurBoost.toFixed(2)}px)`
+      );
+      const baseScaleY = 150;
+      let clampedVel = Math.max(Math.min(payload.velocity ?? 0, 50), -50);
+      const deltaScale = clampedVel / 50 * 50;
+      const noiseScale = Math.max(140, Math.min(200, baseScaleY + deltaScale));
+      this._queueVar("--sn-nebula-noise-scale-y", `${noiseScale.toFixed(1)}%`);
+      this._recordDuration(t0);
+    }
+    // ---------------------------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------------------------
+    _queueVar(prop, value) {
+      if (!this.enabled) return;
+      if (this.year3000System) {
+        this.year3000System.queueCSSVariableUpdate(prop, value);
+      } else {
+        this.batcher.queueCSSVariableUpdate(prop, value);
+      }
+    }
+    _recordDuration(start) {
+      const duration = performance.now() - start;
+      this.frameDurations.push(duration);
+      if (this.frameDurations.length > _NebulaController.FRAME_HISTORY) {
+        this.frameDurations.shift();
+      }
+      if (this.frameDurations.length === _NebulaController.FRAME_HISTORY) {
+        const med = median(this.frameDurations);
+        if (med > 2) {
+          console.warn(
+            `[NebulaController] Median scripting cost ${med.toFixed(
+              2
+            )} ms exceeds 2 ms budget.`
+          );
+          this._queueVar("--sn-nebula-blend-mode", "screen");
+        }
+      }
+      this.perf?.shouldUpdate("nebulaCtr", 1e3) && this.perf?.endTiming("NebulaController", start);
+    }
+    destroy() {
+      this.unsubscribers.forEach((u) => u());
+      this.unsubscribers = [];
+    }
+  };
+  _NebulaController.FRAME_HISTORY = 120;
+  var NebulaController = _NebulaController;
+  function initializeNebulaController(y3k = null) {
+    const g2 = globalThis;
+    if (g2.__SN_nebulaController)
+      return g2.__SN_nebulaController;
+    const instance2 = new NebulaController(y3k);
+    g2.__SN_nebulaController = instance2;
+    return instance2;
+  }
+
   // src-js/utils/spicetifyReady.ts
   async function waitForSpicetifyReady(timeout = 1e4, checkInterval = 100) {
     const start = Date.now();
@@ -12842,23 +14679,23 @@
     return null;
   }
   function patchReactRequire() {
-    const g = globalThis;
-    if (g.__STARLIGHT_REACT_SHIM__) return;
+    const g2 = globalThis;
+    if (g2.__STARLIGHT_REACT_SHIM__) return;
     const shim = (name) => {
-      if (name === "react") return g.Spicetify?.React;
-      if (name === "react-dom") return g.Spicetify?.ReactDOM;
+      if (name === "react") return g2.Spicetify?.React;
+      if (name === "react-dom") return g2.Spicetify?.ReactDOM;
       throw new Error(`[StarryNight shim] Module '${name}' not available`);
     };
-    if (typeof g.require === "function") {
-      const original = g.require.bind(g);
-      g.require = (name) => {
+    if (typeof g2.require === "function") {
+      const original = g2.require.bind(g2);
+      g2.require = (name) => {
         if (name === "react" || name === "react-dom") return shim(name);
         return original(name);
       };
     } else {
-      g.require = shim;
+      g2.require = shim;
     }
-    g.__STARLIGHT_REACT_SHIM__ = true;
+    g2.__STARLIGHT_REACT_SHIM__ = true;
   }
   patchReactRequire();
   (async function catppuccinStarryNight() {
@@ -12903,8 +14740,20 @@
     const ENABLE_GLOBAL_DEBUGGING = true;
     if (ENABLE_GLOBAL_DEBUGGING) {
       YEAR3000_CONFIG.enableDebug = true;
+      Promise.resolve().then(() => (init_DragCartographer(), DragCartographer_exports)).then((m) => {
+        m.enableDragCartography?.();
+        window.getDragMap = m.getDragMap;
+      });
     }
     const year3000System2 = new Year3000System(YEAR3000_CONFIG, HARMONIC_MODES);
+    initializeNebulaController(year3000System2);
+    initializeAberrationManager(year3000System2);
+    Promise.resolve().then(() => (init_EnhancedDragPreview(), EnhancedDragPreview_exports)).then(
+      (m) => m.enableEnhancedDragPreview?.()
+    );
+    Promise.resolve().then(() => (init_QuickAddRadialMenu(), QuickAddRadialMenu_exports)).then(
+      (m) => m.enableQuickAddRadialMenu?.()
+    );
     try {
       if (degradedMode) {
         await year3000System2.initializeWithAvailableAPIs({

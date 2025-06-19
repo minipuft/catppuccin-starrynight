@@ -16,3 +16,5 @@ export const HARMONIC_INTENSITY_KEY = "sn-harmonic-intensity";
 export const HARMONIC_EVOLUTION_KEY = "sn-harmonic-evolution";
 export const MANUAL_BASE_COLOR_KEY = "sn-harmonic-manual-base-color";
 export const ENABLE_WEBGPU_KEY = "sn-enable-webgpu";
+export const NEBULA_INTENSITY_KEY = "sn-nebula-intensity";
+export const ENABLE_ABERRATION_KEY = "sn-enable-aberration";

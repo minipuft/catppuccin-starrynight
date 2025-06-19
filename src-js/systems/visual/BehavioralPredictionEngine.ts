@@ -58,6 +58,7 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
   private predictionTimer: NodeJS.Timeout | null = null;
   private animationTimer: NodeJS.Timeout | null = null;
   private lastPredictionTime: number = 0;
+  private _predictiveSystem?: any;
 
   constructor(
     config: Year3000Config,
@@ -92,6 +93,12 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
       maxWarmthIntensity: 0.8,
       currentActiveAnimations: 0,
     };
+
+    // Link to PredictiveMaterializationSystem if available for resonance coordination
+    this._predictiveSystem =
+      year3000System && (year3000System as any).getSystem
+        ? (year3000System as any).getSystem("PredictiveMaterializationSystem")
+        : null;
 
     if (this.config?.enableDebug) {
       console.log(
@@ -364,9 +371,30 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
     actionType: string,
     confidence: number
   ) {
+    // Phase 4: Respect prefers-reduced-motion by skipping shimmer
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    // Trigger only when confidence spikes above threshold (0.7)
+    if (confidence < 0.7) return;
+
+    // Share predicted interaction target with PredictiveMaterializationSystem for resonance visuals
+    if (this._predictiveSystem?.setTargetElement) {
+      this._predictiveSystem.setTargetElement(element as HTMLElement);
+    }
     this.quantumEmpathy.currentActiveAnimations++;
     const intensity = Math.min(1, confidence * 1.2);
     element.classList.add("sn-anticipatory-warmth");
+    const hueShift = (Math.random() * 40 - 20).toFixed(1); // placeholder hue variance
+    (element as HTMLElement).style.setProperty(
+      "--sn-anticipatory-intensity",
+      intensity.toFixed(3)
+    );
+    (element as HTMLElement).style.setProperty(
+      "--sn-anticipatory-hue",
+      `${hueShift}deg`
+    );
     (element as HTMLElement).style.setProperty(
       "--sn-warmth-intensity",
       `${intensity}`
@@ -457,16 +485,21 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
     });
   }
 
+  /**
+   * Map confidence buckets to CSS classes defined in _sn_prediction_effects.scss.
+   * The naming now aligns with the unified "sn-predict-" convention.
+   */
   getHighlightClasses(type: "default" | "strong"): string[] {
     switch (type) {
       case "strong":
+        // Strong predictions receive a brighter glow and a pulse.
         return [
-          "sn-predictive-highlight",
-          "sn-predictive-highlight-strong",
-          "sn-bloom-active",
+          "sn-predict-glow", // vivid static glow
+          "sn-predict-pulse", // animated pulse
         ];
       default:
-        return ["sn-predictive-highlight"];
+        // Default predictions get only a subtle glow.
+        return ["sn-predict-subtle-glow"];
     }
   }
 

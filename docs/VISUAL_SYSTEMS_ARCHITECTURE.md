@@ -108,3 +108,46 @@ Below is a breakdown of each distinct visual system, outlining its specific cont
 ---
 
 This detailed overview should provide a solid understanding of the purpose, role, and general implementation strategy for each visual system within the Catppuccin StarryNight theme. For more granular details on specific mechanisms, such as BPM calculation in the `BMPHarmonyEngine` or color blending logic in the `ColorHarmonyEngine`, please refer to their respective dedicated documentation files: `BMP_HARMONY_ENGINE.md` and `COLOR_HARMONY_ENGINE.md`.
+
+## 🆕 Aberration Visual System (Chromatic Aberration Overlay)
+
+For a deep-dive into the newly refactored chromatic-aberration effect, see **[Aberration Visual System](visual/ABERRATION_SYSTEM.md)**.
+It details:
+
+- `AberrationCanvas` WebGL renderer
+- `AberrationVisualSystem` adaptor for MasterAnimationCoordinator
+- `AberrationManager` settings orchestration & CSS-batch integration
+
+This system lives under `src-js/effects/Aberration/` and was finalised in **Phase 6 (June 2025)**.
+
+## Temporal Echo Contract (Phase 1–5)
+
+The `.sn-temporal-echo` element is now the **single source of truth** for transient ripple / echo visuals across StarryNight. All interactive systems must use `echoPool.spawn()` or `echoPool.spawnBehind()` to create instances.
+
+### CSS Custom Properties injected
+
+| Variable                      | Purpose                                        | Range                        |
+| ----------------------------- | ---------------------------------------------- | ---------------------------- |
+| `--sn-echo-hue`               | Base hue in **deg** applied via `hue-rotate()` | 0 – 360                      |
+| `--sn-kinetic-intensity`      | Drives opacity / blur strength                 | 0 – 1                        |
+| `--sn-echo-radius-multiplier` | Controlled by JS `radius / 16`                 | 0.8 – 3                      |
+| `--sn-echo-decay-curve`       | Easing curve (token)                           | `var(--sn-easing-emergence)` |
+
+### JS API
+
+```
+import { echoPool } from '@/utils/echoPool';
+
+echoPool.spawn(targetOrVector, {
+  tintHue: 220,     // deg
+  radius: 120,      // px
+  offset: 4,        // beat-vector multiplier (optional)
+  intensity: 0.2    // 0-1
+});
+```
+
+• Elements are **pooled** (max 32) to avoid DOM churn.
+• Reduced-motion users automatically skip echo animations via media query.
+• Echoes inherit a noise mask (`mask-image: var(--sn-nebula-noise-url)`) and `year3000-grain-shift` animation for coherence with atmospheric grain.
+
+> NOTE: Legacy classes `.sn-ripple-active`, `.sn-ocean-ripple` etc. are deprecated—do **not** use them in new code.

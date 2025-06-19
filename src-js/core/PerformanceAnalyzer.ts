@@ -113,6 +113,7 @@ export class PerformanceAnalyzer {
   private monitoringTimer: NodeJS.Timeout | null = null;
   private _fpsCounter: FPSCounter | null = null;
   private timedOperations = new Map<string, number[]>();
+  private _buckets: Map<string, number> = new Map();
 
   constructor(config: Partial<AnalyzerConfig> = {}) {
     this.config = {
@@ -135,6 +136,8 @@ export class PerformanceAnalyzer {
         error
       );
     }
+
+    this._buckets = new Map();
   }
 
   public startMonitoring(): void {
@@ -342,6 +345,25 @@ export class PerformanceAnalyzer {
     } else {
       console.log(`📊 [PerformanceAnalyzer] ${message}`);
     }
+  }
+
+  /**
+   * Throttle helper – returns true when the caller is allowed to perform an update
+   * for the supplied bucket. Subsequent calls within `minIntervalMs` will return
+   * false until the interval has elapsed. Useful for cheaply rate-limiting CSS
+   * variable flushes, expensive observers, etc.
+   *
+   * @param bucket        Arbitrary string identifying the operation family
+   * @param minIntervalMs Minimum time between allowed updates (default 16 ms)
+   */
+  public shouldUpdate(bucket: string, minIntervalMs = 16): boolean {
+    const now = performance.now();
+    const nextAllowed = this._buckets.get(bucket) ?? 0;
+    if (now >= nextAllowed) {
+      this._buckets.set(bucket, now + minIntervalMs);
+      return true;
+    }
+    return false;
   }
 
   // --- End of migrated methods ---

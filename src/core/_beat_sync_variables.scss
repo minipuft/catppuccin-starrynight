@@ -8,4 +8,5 @@
   --sn-beat-pulse-intensity: 0; // Smoothed value from JS (0 to 1 typically)
   --sn-rhythm-phase: 0; // Continuous value from JS (radians)
   --sn-breathing-scale: 1; // Continuous value from JS (e.g., 0.95 to 1.05)
+  --sn-feed-bloom-intensity: 0;
 }

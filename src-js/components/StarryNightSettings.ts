@@ -310,6 +310,42 @@ export async function initializeStarryNightSettings(): Promise<void> {
     }
   );
 
+  // Aberration toggle
+  const enableAb = settingsManager.get("sn-enable-aberration") === "true";
+  (section as any).addToggle(
+    "sn-enable-aberration",
+    "Chromatic aberration effect",
+    enableAb,
+    {
+      onClick: (e: any) => {
+        const checked = (e.currentTarget as HTMLInputElement).checked;
+        settingsManager.set(
+          "sn-enable-aberration",
+          (checked ? "true" : "false") as any
+        );
+        // Notify AberrationManager via custom event already dispatched by SettingsManager.
+      },
+    }
+  );
+
+  // Temporal Echo Intensity (Phase 4)
+  // TODO[PHASE4-UI]: Surfaced new echo intensity setting (0-3) so users can tweak visual loudness.
+  const echoOptions = ["Off", "Subtle", "Balanced", "Intense"] as const;
+  const currentEcho = settingsManager.get("sn-echo-intensity") ?? "2";
+  (section as any).addDropDown(
+    "sn-echo-intensity",
+    "Temporal Echo Intensity",
+    echoOptions as unknown as string[],
+    Math.min(3, parseInt(currentEcho as string, 10)),
+    undefined,
+    {
+      onChange: (e: any) => {
+        const idx = e?.currentTarget?.selectedIndex ?? 2;
+        settingsManager.set("sn-echo-intensity", `${idx}` as any);
+      },
+    }
+  );
+
   // Push the section into the DOM.
   await (section as any).pushSettings();
   console.log("✨ [StarryNight] spcr-settings panel initialised");

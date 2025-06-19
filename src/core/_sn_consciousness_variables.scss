@@ -1,0 +1,80 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🧠 YEAR 3000 CONSCIOUSNESS FIELD VARIABLES (Magnetic Depth)
+// Defines global CSS custom properties that power the Magnetic Depth system.
+// No mixins are declared here (they live in _mixins.scss). This file exists so
+// that `app.scss` can `@forward` it, making the variables available project-wide.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // === INVITATION DEPTH LAYERS ===
+  --magnetic-depth-field: 800px; // Comfortable 3D perspective for readability
+  --magnetic-approach-distance: 20px;
+  --magnetic-recede-distance: -10px;
+  --magnetic-neutral-position: 0px;
+
+  // === USER INTERACTION MAGNETISM ===
+  --magnetic-hover-pull: 12px;
+  --magnetic-focus-pull: 18px;
+  --magnetic-interest-pull: 8px;
+  --magnetic-transition-speed: 0.6s;
+
+  // === DEPTH HIERARCHY SYSTEM ===
+  --depth-priority-high: translateZ(8px);
+  --depth-priority-medium: translateZ(4px);
+  --depth-priority-low: translateZ(0px);
+  --depth-priority-receded: translateZ(-6px);
+
+  // === READABILITY PRESERVATION ===
+  --magnetic-max-rotation: 2deg;
+  --magnetic-text-clarity: 1;
+  --magnetic-contrast-boost: 1.05;
+
+  // === COSMIC CONSCIOUSNESS INTEGRATION ===
+  --consciousness-field-intensity: 0.4;
+  --consciousness-breathing-rate: 12s;
+  --consciousness-response-sensitivity: 0.8;
+
+  // === PERFORMANCE & ACCESSIBILITY ===
+  --magnetic-performance-mode: 1;
+  --magnetic-accessibility-scale: 1;
+  --magnetic-mobile-reduction: 0.6;
+
+}
+
+// =============================================================================
+// PHASE 3: SERENDIPITY STREAMS
+// Variables for surfacing "approaching" suggestions during user idle time.
+// =============================================================================
+:root {
+  --serendipity-idle-threshold: 2000ms;
+  --serendipity-animation-duration: 600ms;
+  --serendipity-start-z: -60px;
+  --serendipity-end-z: -10px;
+}
+
+// Accessibility overrides
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --magnetic-hover-pull: 4px;
+    --magnetic-focus-pull: 6px;
+    --magnetic-transition-speed: 1.2s;
+    --consciousness-breathing-rate: 30s;
+    --consciousness-field-intensity: 0.2;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --magnetic-depth-field: 600px;
+    --magnetic-hover-pull: calc(12px * var(--magnetic-mobile-reduction));
+    --magnetic-focus-pull: calc(18px * var(--magnetic-mobile-reduction));
+    --consciousness-field-intensity: calc(0.4 * var(--magnetic-mobile-reduction));
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --magnetic-contrast-boost: 1.15;
+    --consciousness-field-intensity: 0.6;
+  }
+}

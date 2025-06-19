@@ -16,7 +16,8 @@
 
 // Container optimization for performance
 @mixin contain-optimized {
-  contain: layout style paint;
+  // Remove layout containment to prevent lazy-load bug causing images to stay blank after scroll.
+  contain: style paint;
 }
 
 // Combined performance optimizations
@@ -179,8 +180,7 @@
   $translateZ: 0px,
   $scale: 1
 ) {
-  transform: perspective(1200px) rotateX($rotateX) rotateY($rotateY)
-    translateZ($translateZ) scale($scale);
+  transform: perspective(1200px) translateZ($translateZ) scale($scale);
   transform-style: preserve-3d;
   backface-visibility: hidden;
 }
@@ -196,15 +196,14 @@
 }
 
 // Interactive 3D hover effect with mouse tracking
-@mixin interactive-3d-hover($max-rotate: 15deg, $depth: 50px) {
+@mixin interactive-3d-hover($max-rotate: 0deg, $depth: 50px) {
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   &:hover {
     transform-style: preserve-3d;
     // Base 3D state - JavaScript will override with mouse position
     transform: perspective(1200px)
-      rotateX(calc(var(--mouse-y, 0) * #{$max-rotate}))
-      rotateY(calc(var(--mouse-x, 0) * #{$max-rotate})) translateZ($depth);
+      translateZ($depth);
   }
 }
 
@@ -231,17 +230,17 @@
 // Card morphing states (for different card layouts)
 @mixin card-morph-state($state: "default") {
   @if $state == "expanded" {
-    transform: scale(1.05) rotateY(5deg) translateZ(30px);
+    transform: scale(1.05) translateZ(30px);
     border-radius: 20px;
   } @else if $state == "compact" {
-    transform: scale(0.95) rotateX(-5deg) translateZ(-10px);
+    transform: scale(0.95) translateZ(-10px);
     border-radius: 8px;
   } @else if $state == "focused" {
-    transform: scale(1.02) rotateY(-2deg) translateZ(40px);
+    transform: scale(1.02) translateZ(40px);
     border-radius: 16px;
   } @else {
     // default state
-    transform: scale(1) rotateX(0deg) rotateY(0deg) translateZ(0px);
+    transform: scale(1) translateZ(0px);
     border-radius: var(--card-border-radius, 12px);
   }
 }
@@ -253,16 +252,16 @@
   @keyframes floating-3d {
     0%,
     100% {
-      transform: translateZ(0px) rotateX(0deg) rotateY(0deg);
+      transform: translateZ(0px);
     }
     25% {
-      transform: translateZ(10px) rotateX(2deg) rotateY(-1deg);
+      transform: translateZ(10px);
     }
     50% {
-      transform: translateZ(15px) rotateX(-1deg) rotateY(2deg);
+      transform: translateZ(15px);
     }
     75% {
-      transform: translateZ(5px) rotateX(1deg) rotateY(-2deg);
+      transform: translateZ(5px);
     }
   }
 }
@@ -416,6 +415,27 @@
   }
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// 🎨 HUE-SHIFT MIXIN (Year 3000 Dynamic Palette)
+// Injects a hue-rotate filter driven by a CSS variable (defaults to
+// --sn-hue-shift-dynamic).  Keeps transitions smooth and respects reduced-
+// motion preferences.
+// ---------------------------------------------------------------------------
+// Usage: @include hue-shift();                   // use default token
+//        @include hue-shift(--custom-hue-var);   // custom token
+// ---------------------------------------------------------------------------
+@mixin hue-shift($degVar: --sn-hue-shift-dynamic) {
+  // Prevent duplicate filters when parent already contains heavy effects.
+  // Designers should call this mixin only on decorative layers.
+  filter: hue-rotate(var(#{$degVar}));
+  transition: filter 0.4s ease-out;
+
+  // Respect user accessibility preferences.
+  @media (prefers-reduced-motion: reduce) {
+    filter: none !important;
+  }
+}
+
 // PHASE 4.2: Context-Aware Gradient Zone System
 // =============================================================================
 
@@ -551,4 +571,117 @@
   text-shadow: 0 0 calc(2px + 6px * var(#{$intensityVar}))
       rgba(var(#{$rgbVar}), calc(0.3 + 0.4 * var(#{$intensityVar}))),
     0 1px 2px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.1);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🧲 MAGNETIC DEPTH SYSTEM MIXINS (Year 3000 Invitation-Focused 3D)
+// These mixins power the Magnetic Depth philosophy – subtle 3D depth that
+// invites users toward content instead of distracting rotations.
+// They are appended here so that any SCSS module that already `@use`s this
+// mixin file automatically gains access without needing additional imports.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// 3D container that establishes a perspective field and preserve-3D rendering
+@mixin magnetic-depth-container {
+  perspective: var(--magnetic-depth-field, 800px);
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+// Hover invitation – gently pulls element toward the user
+@mixin magnetic-hover-invitation {
+  transition: transform var(--magnetic-transition-speed, 0.6s)
+      cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  &:hover {
+    transform: translateZ(var(--magnetic-hover-pull, 12px))
+      scale(1.02);
+  }
+}
+
+// Focus/active invitation – stronger pull & recede siblings
+@mixin magnetic-focus-invitation {
+  &:focus-within {
+    transform: translateZ(var(--magnetic-focus-pull, 18px)) scale(1.03);
+
+    // Recede siblings slightly to increase focus prominence
+    ~ * {
+      transform: translateZ(var(--magnetic-recede-distance, -10px));
+      opacity: 0.85;
+    }
+  }
+}
+
+// Quickly assign depth layer based on relevance priority
+@mixin magnetic-depth-layer($priority: 'medium') {
+  @if $priority == 'high' {
+    transform: var(--depth-priority-high, translateZ(8px));
+    filter: brightness(var(--magnetic-contrast-boost, 1.05)) contrast(1.05);
+  } @else if $priority == 'low' {
+    transform: var(--depth-priority-low, translateZ(0px));
+    filter: brightness(0.95) contrast(0.98);
+  } @else if $priority == 'receded' {
+    transform: var(--depth-priority-receded, translateZ(-6px));
+    filter: brightness(0.9) contrast(0.95) opacity(0.8);
+  } @else {
+    transform: var(--depth-priority-medium, translateZ(4px));
+    filter: brightness(1) contrast(1);
+  }
+}
+
+// Cosmic consciousness field backdrop – subtle radial aura breathing
+@mixin consciousness-field-background {
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -30px;
+    z-index: -1;
+    pointer-events: none;
+
+    background: radial-gradient(
+      ellipse 600% 200% at 50% 50%,
+      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+        calc(var(--consciousness-field-intensity, 0.4) * 0.3)) 0%,
+      transparent 40%
+    );
+
+    filter: blur(20px);
+    opacity: var(--consciousness-field-intensity, 0.4);
+    animation: consciousness-breathing var(--consciousness-breathing-rate, 12s)
+      ease-in-out infinite;
+  }
+}
+
+// === Magnetic Depth Utility Animations =====================
+
+@keyframes consciousness-breathing {
+  0%, 100% {
+    transform: scale(1);
+    opacity: var(--consciousness-field-intensity, 0.4);
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: calc(var(--consciousness-field-intensity, 0.4) * 1.2);
+  }
+}
+
+@keyframes magnetic-invitation-pulse {
+  0%, 100% {
+    transform: translateZ(0px) scale(1);
+  }
+  50% {
+    transform: translateZ(4px) scale(1.01);
+  }
+}
+
+// === Nebula Gradient Smoothing – Noise Overlay Mixin (Phase 1) ==============
+// Provides a tiled SVG fractal noise pattern for reducing gradient banding.
+// Consumers control opacity, background-size, and blend mode in their own
+// rule context for maximum flexibility.
+//
+// $opacity is retained for future compile-time scenarios but is currently
+// unused because opacity is handled via runtime CSS variables.
+@mixin nebula-noise($opacity: 0.06) {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc2NCcgaGVpZ2h0PSc2NCc+PGZpbHRlciBpZD0nZic+PGZlVHVyYnVsZW5jZSB0eXBlPSdmcmFjdGFsTm9pc2UnIGJhc2VGcmVxdWVuY3k9Jy4yJyBudW1PY3RhdmVzPSc0JyBzdGl0Y2hUaWxlcz0nc3RpdGNoJy8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScgZmlsdGVyPSd1cmwoI2YpJy8+PC9zdmc+");
+  background-repeat: repeat;
 }

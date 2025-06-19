@@ -3,6 +3,7 @@ import { SettingsManager } from "@/managers/SettingsManager";
 import { MusicSyncService } from "@/services/MusicSyncService";
 import type { Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
+import * as NoiseField from "@/utils/NoiseField";
 import * as Utils from "@/utils/Year3000Utilities";
 
 /**
@@ -34,6 +35,7 @@ export class WebGPUBackgroundSystem implements IManagedSystem {
   private _accent: [number, number, number] = [0.3, 0.55, 0.9];
   private _energy = 0.5;
   private _valence = 0.5;
+  private _lastDriftUpdate = 0;
 
   constructor(
     private config: Year3000Config,
@@ -189,6 +191,30 @@ export class WebGPUBackgroundSystem implements IManagedSystem {
         this._refreshThemeColors();
       }
       this._frame++;
+
+      // === Phase 4: adjust nebula drift every 2 s based on beat & noise field ===
+      if (time - this._lastDriftUpdate > 2000) {
+        try {
+          const vec = this.musicSyncService?.getCurrentBeatVector?.() || {
+            x: 0,
+            y: 0,
+          };
+          // Convert beat vector (-1..1) to 0..1 for sampling
+          const u = (vec.x + 1) * 0.5;
+          const v = (vec.y + 1) * 0.5;
+          const n = NoiseField.sample(u, v);
+          // Map noise to subtle hue shift of accent colour
+          this._accent[0] = 0.25 + n.x * 0.1; // R component
+          this._accent[1] = 0.45 + n.y * 0.1; // G component
+          // Keep B derivation from energy for slight variation
+          this._accent[2] = 0.8 + (this._energy - 0.5) * 0.1;
+        } catch (err) {
+          if (this.config?.enableDebug) {
+            console.warn("[WebGPUBackgroundSystem] Drift update error", err);
+          }
+        }
+        this._lastDriftUpdate = time;
+      }
 
       // Write uniform data
       const uni = new Float32Array(16);

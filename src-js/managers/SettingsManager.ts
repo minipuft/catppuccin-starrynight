@@ -33,12 +33,18 @@ export interface ThemeSettings {
   "sn-gradient-intensity": "disabled" | "minimal" | "balanced" | "intense";
   "sn-glassmorphism-level": "disabled" | "minimal" | "moderate" | "intense";
   "sn-3d-effects-level": "full" | "minimal" | "disabled";
+  "sn-nebula-intensity": "disabled" | "minimal" | "balanced" | "intense";
   "sn-artistic-mode": "corporate-safe" | "artist-vision" | "cosmic-maximum";
   "sn-current-harmonic-mode": keyof typeof Modes;
   "sn-harmonic-intensity": string; // Stored as string, parsed to float
   "sn-harmonic-evolution": string; // Stored as string, parsed to boolean
   "sn-harmonic-manual-base-color": string; // Hex color or empty
   "sn-enable-webgpu": "true" | "false"; // Enable or disable WebGPU acceleration
+  "sn-enable-aberration": "true" | "false"; // Toggle chromatic aberration canvas
+  /** Chromatic aberration shader strength (0–1) stored as string */
+  "sn-nebula-aberration-strength": string;
+  /** Temporal Echo Intensity (0=off, 1=minimal, 2=default, 3=intense) */
+  "sn-echo-intensity": "0" | "1" | "2" | "3";
 }
 
 type ValidationSchema = {
@@ -72,12 +78,16 @@ export class SettingsManager implements IManagedSystem {
       "sn-gradient-intensity": "balanced",
       "sn-glassmorphism-level": "moderate",
       "sn-3d-effects-level": "full",
+      "sn-nebula-intensity": "balanced",
       "sn-artistic-mode": "artist-vision",
       "sn-current-harmonic-mode": "analogous-flow",
       "sn-harmonic-intensity": "0.7",
       "sn-harmonic-evolution": "true",
       "sn-harmonic-manual-base-color": "",
       "sn-enable-webgpu": "true",
+      "sn-enable-aberration": "true",
+      "sn-nebula-aberration-strength": "0.4",
+      "sn-echo-intensity": "2",
     };
 
     this.validationSchemas = {
@@ -122,6 +132,10 @@ export class SettingsManager implements IManagedSystem {
         default: "full",
         allowedValues: ["full", "minimal", "disabled"],
       },
+      "sn-nebula-intensity": {
+        default: "balanced",
+        allowedValues: ["disabled", "minimal", "balanced", "intense"],
+      },
       "sn-artistic-mode": {
         default: "artist-vision",
         allowedValues: Object.keys(ARTISTIC_MODE_PROFILES) as (
@@ -145,6 +159,15 @@ export class SettingsManager implements IManagedSystem {
       "sn-enable-webgpu": {
         default: "true",
         allowedValues: ["true", "false"],
+      },
+      "sn-enable-aberration": {
+        default: "true",
+        allowedValues: ["true", "false"],
+      },
+      "sn-nebula-aberration-strength": { default: "0.4" },
+      "sn-echo-intensity": {
+        default: "2",
+        allowedValues: ["0", "1", "2", "3"],
       },
     };
 

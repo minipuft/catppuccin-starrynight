@@ -3,72 +3,73 @@
 // ████████████████████████████████████████████████████████████████████████████████
 
 // === CORE MODULES ===
-@use "variables" as *;
-@use "mixins" as *;
-@use "breathing_scale" as *;
-@use "beat_sync_variables" as *;
-@use "sn_root_variables" as *;
-@use "sn_gradient" as *;
-@use "sn_typography" as *;
-@use "kinetic-animations" as *;
-@use "sn_legacy_support" as *;
-@use "sn_architecture_documentation" as *;
+@use "_variables" as *;
+@use "_mixins" as *;
+@use "_breathing_scale" as *;
+@use "_beat_sync_variables" as *;
+@use "_sn_root_variables" as *;
+@use "_sn_gradient" as *;
+@use "_sn_typography" as *;
+@use "_kinetic-animations" as *;
+@use "_sn_legacy_support" as *;
+@use "_sn_architecture_documentation" as *;
+@use "_sn_nebula_variables" as *; // [Phase 1] Nebula alias tokens
 
 // === LAYOUT MODULES ===
-@use "../layout/main_view_container" as *;
-@use "../layout/entity_header_enhanced" as *;
-@use "../layout/top_bar_enhanced" as *;
-@use "../layout/action_bar_enhanced" as *;
-@use "../layout/sn_sidebar_navigation" as *;
+@use "../layout/_main_view_container" as *;
+@use "../layout/_entity_header_enhanced" as *;
+@use "../layout/_top_bar_enhanced" as *;
+@use "../layout/_action_bar_enhanced" as *;
+@use "../layout/_sn_sidebar_navigation" as *;
+@use "../layout/_navbar" as *;
+@use "../layout/_top_bar" as *;
+@use "../layout/_right_sidebar" as *;
+@use "../layout/_sn_header_actionBar" as *;
+@use "../layout/_artist_aura_fields" as *;
+@use "../layout/_sn_scroll_node_backgrounds" as *;
 
 // === COMPONENT MODULES ===
-
-@use "../components/track_list_enhanced" as *;
-@use "../components/sn_enhanced_cards" as *;
-@use "../components/sn_card_non_search" as *;
-@use "../components/sn_loading" as *;
-@use "../components/now_playing" as *;
+@use "../components/_track_list_enhanced" as *;
+@use "../components/_sn_card_base" as *;
+@use "../components/_sn_enhanced_cards" as *;
+@use "../components/_sn_card_non_search" as *;
+@use "../components/_sn_loading" as *;
+@use "../components/_now_playing" as *;
 
 // === FEATURE MODULES ===
-@use "../features/themed_interactive_components" as *;
-@use "../features/sn_beat_sync_enhanced" as *;
-@use "../features/sn_depth_layers" as *;
-@use "../features/sn_z_index_management" as *;
-@use "../features/sn_glassmorphism" as *;
-@use "../features/sn_atmospheric" as *;
-@use "../features/sn_stars" as *;
-@use "../features/sn_3d_morphing" as *;
-@use "../features/sn_context_zones" as *;
-@use "../features/sn_microinteractions" as *;
-@use "../features/advanced_visual_effects_layer" as *;
+@use "../features/_themed_interactive_components" as *;
+@use "../features/_sn_beat_sync_enhanced" as *;
+@use "../features/_sn_depth_layers" as *;
+@use "../features/_sn_z_index_management" as *;
+@use "../features/_sn_glassmorphism" as *;
+@use "../features/_sn_atmospheric" as *;
+@use "../features/_sn_stars" as *;
+@use "../features/_sn_3d_morphing" as *;
+@use "../features/_sn_context_zones" as *;
+@use "../features/_sn_microinteractions" as *;
+@use "../features/_advanced_visual_effects_layer" as *;
+@use "../features/_floating_crystals" as *;
+@use "../features/_stellar_constellation" as *;
+@use "../features/_year3000_temporal_stream" as *;
 
 // === SYSTEMS MODULES ===
-@use "../systems/sn_behavioral_prediction" as *;
-@use "../systems/sn_performance_optimization" as *;
-@use "../systems/sn_prediction_effects" as *;
-@use "../systems/sn_quantum_consciousness" as *;
-@use "../systems/sn_data_glyphs" as *;
-@use "../systems/sn_dimensional_nexus" as *;
+@use "../systems/_sn_behavioral_prediction" as *;
+@use "../systems/_sn_performance_optimization" as *;
+@use "../systems/_sn_prediction_effects" as *;
+@use "../systems/_sn_quantum_consciousness" as *;
+@use "../systems/_sn_data_glyphs" as *;
 
 // === SEARCH MODULES ===
-@use "../search/sn_search_precision" as *;
-@use "../search/sn_search_quantum" as *;
+@use "../search/_sn_search_precision" as *;
+//@use "../search/_sn_search_quantum" as *; // Temporarily disabled pending conflict resolution
 
 // === LEGACY SIDEBAR MODULES ===
-@use "../sidebar/sidebar_background_effects" as *;
-@use "../sidebar/sidebar_interactive" as *;
+@use "../sidebar/_sidebar_background_effects" as *;
+@use "../sidebar/_sidebar_interactive" as *;
 
-// ████████████████████████████████████████████████████████████████████████████████
-// MODULAR ARCHITECTURE COMPLETE - 5-Phase Refactoring Success
-// ████████████████████████████████████████████████████████████████████████████████
-//
-// TRANSFORMATION SUMMARY:
-// • Original monolithic file: ~2,120 lines → Current orchestrator: ~50 lines
-// • 95% size reduction through systematic modularization
-// • 20 focused modules across 5 architectural layers
-// • Single responsibility principle compliance
-// • Maintainable and scalable codebase architecture
-//
+// Sidebar Dimensional Nexus enhancement module (post-interactive)
+@use "../sidebar/_sidebar_dimensional_nexus" as *;
+
 // ARCHITECTURAL LAYERS:
 // 1. CORE MODULES      - Foundation utilities and variables
 // 2. LAYOUT MODULES    - Structural styling and positioning

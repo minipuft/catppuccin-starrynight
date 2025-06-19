@@ -1,7 +1,7 @@
 // StarryNight Progressive Loading Module - Phase 4.3: Intelligent Loading States
 // Enhances UX with context-aware gradient loading animations and smooth content transitions
 
-@use "../core/mixins" as *;
+@use "../core/_mixins" as *;
 
 // PHASE 4.3: Progressive Loading CSS Variables
 // =============================================================================
@@ -73,8 +73,14 @@
         50%,
       transparent 100%
     );
-    animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out
-      infinite;
+    // Subtle hue drift so even loading states feel alive
+    @include hue-shift();
+    // Phase 2: Tokenised easing + grain dissolve mask
+    mask-image: var(--sn-nebula-noise-url);
+    mask-size: 200% 200%;
+    mask-repeat: repeat;
+    animation: skeleton-shimmer var(--loading-shimmer-duration) var(--sn-easing-explorer, ease-in-out) infinite,
+      year3000-grain-shift var(--loading-shimmer-duration) linear infinite;
   }
 
   @keyframes skeleton-shimmer {
@@ -144,11 +150,17 @@
         border-radius: 4px;
       }
 
-      // Hide actual content during loading
+      // Hide card metadata text while loading, but **do not fully hide <img>**
+      // to avoid interaction with Spotify's virtual-scroll lazy-loading logic
+      // which expects the element to remain visible when `loading="lazy"`.
+      // Instead, reduce brightness for smoother skeleton effect.
       .main-card-cardMetadata,
-      .main-cardHeader-container,
-      img {
+      .main-cardHeader-container {
         opacity: 0;
+      }
+
+      img {
+        filter: brightness(0.4) saturate(0.2);
       }
     }
   }

@@ -2,53 +2,15 @@
 // Combines Catppuccin's beautiful UI with StarryNight's dynamic visual effects
 
 @use "sass:meta";
-// Core utilities and base styles
-@forward "src/core/mixins";
-@forward "src/core/_sn_typography";
-@forward "src/core/_sn_gradient";
-@forward "src/core/_kinetic-animations"; // Year 3000 Kinetic Verb Animations
+
+// === MAIN ARCHITECTURE ===
+// All modules are centrally managed in _main.scss following architectural layers
 @forward "src/core/_main";
+
+// === ROOT-LEVEL UTILITIES (non-duplicated) ===
 @forward "src/core/variables";
 
-// Layout modules
-@forward "src/layout/_navbar";
-@forward "src/layout/top_bar";
-@forward "src/layout/right_sidebar";
-@forward "src/layout/sn_header_actionBar";
-
-// Component-specific styles
-@forward "src/components/_now_playing";
-@forward "src/components/sn_card_base";
-@forward "src/components/sn_card_non_search";
-@forward "src/components/sn_enhanced_cards";
-@forward "src/components/sn_loading";
-
-// StarryNight Feature Modules
-@forward "src/features/sn_stars";
-@forward "src/features/sn_glassmorphism";
-@forward "src/features/sn_3d_morphing";
-@forward "src/features/sn_microinteractions";
-@forward "src/features/sn_context_zones";
-// @forward "src/features/sn_atmospheric"; // DISABLED: Conventional effects - not Year 3000 aligned
-@forward "src/features/themed_interactive_components"; // Renamed from _conscious_elegance_ui.scss (was _conscious_elegance_ui.scss)
-@forward "src/features/advanced_visual_effects_layer"; // Renamed from _visual_reality_breach_effects.scss (was _visual_reality_breach_effects.scss)
-
-// Search Interface Modules
-@forward "src/search/sn_search_quantum";
-@forward "src/search/sn_search_precision";
-
-// Sidebar Visual System Modules
-@forward "src/sidebar/sidebar_background_effects";
-@forward "src/sidebar/sidebar_interactive";
-
-// Features
-//@import "src/features/tooltips";
-//@import "src/features/lyrics";
-
-// Layout
-//@import "src/layout/grid";
-//@import "src/layout/flex";
-
+@forward "src/scss/quick_add_radial";
 
 :root {
   // Spicetify doesn't fully support light-sets yet, so we have to manually set the colors for the light theme

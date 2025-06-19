@@ -1,6 +1,8 @@
 import { HARMONIC_MODES, YEAR3000_CONFIG } from "./config/globalConfig";
 import { Year3000System } from "./core/year3000System";
 import { Year3000Debug } from "./debug/SystemIntegrationTester";
+import { initializeAberrationManager } from "./effects/Aberration/AberrationManager";
+import { initializeNebulaController } from "./effects/NebulaController";
 import { waitForSpicetifyReady } from "./utils/spicetifyReady";
 
 // A placeholder for the settings UI function until it can be properly typed.
@@ -117,10 +119,31 @@ patchReactRequire();
   const ENABLE_GLOBAL_DEBUGGING = true;
   if (ENABLE_GLOBAL_DEBUGGING) {
     YEAR3000_CONFIG.enableDebug = true;
+    // Activate Drag Cartography mapping in debug mode (Phase 1)
+    import("./debug/DragCartographer").then((m) => {
+      m.enableDragCartography?.();
+      (window as any).getDragMap = m.getDragMap;
+    });
   }
 
   // 1. Instantiate the main system. It will handle its own internal dependencies.
   const year3000System = new Year3000System(YEAR3000_CONFIG, HARMONIC_MODES);
+
+  // 1a. 🎆 Initialise NebulaController (Phase 2)
+  initializeNebulaController(year3000System);
+
+  // 1a-b. 🌈 Initialise Adaptive Chromatic Aberration Canvas (Phase 2)
+  initializeAberrationManager(year3000System);
+
+  // 1b. 🌠 Enable Enhanced Drag Preview (Phase 2)
+  import("./effects/EnhancedDragPreview").then((m) =>
+    m.enableEnhancedDragPreview?.()
+  );
+
+  // 1c. 🎉 Enable Quick Add Radial Menu (Phase 2)
+  import("./effects/QuickAddRadialMenu").then((m) =>
+    m.enableQuickAddRadialMenu?.()
+  );
 
   // 2. Initialize the system using progressive loading approach
   try {

@@ -1,6 +1,7 @@
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
 import { MusicSyncService } from "@/services/MusicSyncService";
 import type { Year3000Config } from "@/types/models";
+import { echoPool } from "@/utils/echoPool";
 import { HARMONIC_MODES } from "../../config/globalConfig";
 import { Year3000System } from "../../core/year3000System";
 import { SettingsManager } from "../../managers/SettingsManager";
@@ -340,6 +341,25 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     applyCss("--sn-nav-item-glow-intensity", `${glow}`);
     applyCss("--sn-nav-text-energy-opacity", `${textOpacity}`);
     applyCss("--sidebar-intensity", `${visualIntensity}`);
+
+    // === Phase 1: Spawn echo behind focused / hovered nav item ===
+    // Guard for reduced-motion users
+    if (!this.deviceCapabilities.reducedMotion) {
+      const focused = this.rootNavBar.querySelector<HTMLElement>(
+        '.main-navBar-navLink[aria-current="page"], .main-navBar-navLink:focus'
+      );
+      if (focused) {
+        const hueVar = getComputedStyle(focused).getPropertyValue(
+          "--sidebar-focus-hue"
+        );
+        const tintHue = parseFloat(hueVar) || glow * 360;
+        echoPool.spawnBehind(focused, {
+          tintHue,
+          radius: 80,
+          intensity: glow * 0.6,
+        });
+      }
+    }
   }
 
   public updateFromMusicAnalysis(

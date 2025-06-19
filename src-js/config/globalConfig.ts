@@ -258,6 +258,14 @@ export const YEAR3000_CONFIG: Year3000Config = {
       );
     }
 
+    // TODO[Y3K-PH6]: Broadcast active artistic-mode to CSS selectors
+    if (typeof document !== "undefined") {
+      document.documentElement.setAttribute(
+        "data-artistic-mode",
+        this.artisticMode
+      );
+    }
+
     return this; // Allow chaining
   },
 
@@ -523,6 +531,12 @@ export const YEAR3000_CONFIG: Year3000Config = {
           document.documentElement
         );
       }
+
+      // TODO[Y3K-PH6]: Broadcast active artistic-mode to CSS selectors
+      if (typeof document !== "undefined") {
+        document.documentElement.setAttribute("data-artistic-mode", mode);
+      }
+
       return true;
     }
     console.warn(

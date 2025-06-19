@@ -1,0 +1,59 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Implementation & Style Guide (Year 3000)
+
+This document outlines the coding standards, patterns, and troubleshooting protocols for the Year 3000 project. Adhering to these guidelines ensures consistency, stability, and maintainability.
+
+---
+
+## 1. TypeScript & Type System Protocol
+
+This project uses TypeScript with an extremely strict configuration (`"strict": true` in `tsconfig.json`). This is intentional to maximize type safety.
+
+- **Rule 1.1: Assume Nothing is Null-Safe.** Every variable that can be `null` or `undefined` must be explicitly handled. Use type guards, optional chaining (`?.`), and the nullish coalescing operator (`??`). Avoid non-null assertions (`!`) unless you can absolutely guarantee the value is present.
+
+- **Rule 1.2: Embrace Class-Based Services.** For complex, stateful services (like `SerendipityService`), prefer a `class`-based approach over a simple object literal. This provides clearer type information to the compiler, simplifies dependency injection, and makes the code easier to reason about and test.
+
+- **Rule 1.3: Isolate Type Dependencies.** When a module's types become complex, define them in a dedicated `types.ts` file within that module's directory. This keeps implementation files clean and focused on logic.
+
+## 2. SCSS Architecture Protocol
+
+Our SCSS follows a strict single-source-of-truth pattern to prevent duplicate imports and maintain clear dependency ordering.
+
+- **Rule 2.1: `_main.scss` is the Single Orchestrator.** All module imports are centralized in `src/core/_main.scss` following the documented architectural layers:
+    1. CORE MODULES → Foundation utilities and variables
+    2. LAYOUT MODULES → Structural styling and positioning
+    3. COMPONENT MODULES → Individual component styling
+    4. FEATURE MODULES → Advanced interactive features
+    5. SYSTEM MODULES → Complex behavioral systems
+
+- **Rule 2.2: `app.scss` is the Minimal Entry Point.** The root `app.scss` file should only:
+    - Forward `src/core/_main` (which contains all organized imports)
+    - Forward essential root-level utilities (like `variables`)
+    - Contain Catppuccin-specific root configuration and overrides
+    - **NEVER** duplicate module imports that already exist in `_main.scss`
+
+- **Rule 2.3: New Modules Always Go in `_main.scss`.** When adding new SCSS modules, always add the `@use` statement to the appropriate architectural layer in `_main.scss`, never directly to `app.scss`.
+
+## 3. Linter & Tooling Protocol
+
+Our tooling is here to help, but it can sometimes be misleading.
+
+- **Rule 3.1: Trust, But Verify Linter Errors.** If the linter reports a persistent error that seems incorrect after a valid fix has been applied:
+    1.  **Check the Configuration:** Review `tsconfig.json` and any other relevant config files (`.eslintrc`, etc.). The error may stem from a strict rule you are not fully addressing.
+    2.  **Suspect Type Inference:** The issue might be a deeper type inference problem. Re-examine how types are defined and used in the module. Refactoring to a simpler or more explicit pattern (like a class) often resolves these issues.
+    3.  **Do Not Assume the Linter is "Broken."** The configuration is strict for a reason. Use its feedback as a guide to write more robust code.
+
+- **Rule 3.2: Work Around Model Failures Systematically.** If the `edit_file` tool fails to apply a small change:
+    1.  Re-attempt the edit with more surrounding context to help the model find the correct location.
+    2.  If it still fails, rewrite the entire function block instead of just the single line.
+    3.  As a last resort, rewrite the entire file. This almost always bypasses patching issues.
+
+## 4. General Philosophy
+
+- **Rule 4.1: No Surrender.** When faced with a stubborn problem, do not give up. Systematically diagnose the issue. Is it the code? The types? The configuration? The tooling? Work through each layer until the root cause is found and fixed.
+
+- **Rule 4.2: Document as We Go.** When we establish a new pattern or solve a tricky problem (like the linter issue), we must document it here in `implementation.mdc`. This turns a temporary struggle into a permanent improvement for the team.

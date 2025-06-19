@@ -4,6 +4,7 @@ import { Year3000System } from "../../core/year3000System";
 import { MODERN_SELECTORS } from "../../debug/SpotifyDOMSelectors";
 import { SettingsManager } from "../../managers/SettingsManager";
 import { MusicSyncService } from "../../services/MusicSyncService";
+import { sample as sampleNoise } from "../../utils/NoiseField";
 import * as Year3000Utilities from "../../utils/Year3000Utilities";
 import { BaseVisualSystem } from "../BaseVisualSystem";
 
@@ -74,6 +75,13 @@ export class DataGlyphSystem extends BaseVisualSystem {
   private deviceCapabilities: DeviceCapabilities;
   private _eventListeners: any[];
   private _domEventListeners: any[];
+  private hoverTimeouts: WeakMap<Element, NodeJS.Timeout> = new WeakMap();
+  private currentEchoCount = 0;
+  // --- Phase4: recent echo timestamps per element for clustering -----------
+  private recentEchoes: WeakMap<Element, number[]> = new WeakMap();
+  // TODO[PHASE3-POOL]: Pool of detached .sn-temporal-echo elements reused to cut GC churn.
+  private echoPool: HTMLElement[] = [];
+  private static readonly BASE_MAX_ECHOES = 6;
 
   constructor(
     config: Year3000Config,
@@ -453,7 +461,16 @@ export class DataGlyphSystem extends BaseVisualSystem {
       attentionScore: event.type === "mouseenter" ? 1 : 0,
     });
     if (event.type === "mouseenter") {
-      this.addTemporalEcho(itemElement);
+      // Start dwell-timer (120 ms) to avoid accidental flickers
+      const dwell = setTimeout(() => {
+        this.addTemporalEcho(itemElement);
+      }, 120);
+      this.hoverTimeouts.set(itemElement, dwell);
+    } else if (event.type === "mouseleave") {
+      // Clear pending echo if user leaves early
+      const t = this.hoverTimeouts.get(itemElement);
+      if (t) clearTimeout(t);
+      this.hoverTimeouts.delete(itemElement);
     }
   }
 
@@ -543,11 +560,136 @@ export class DataGlyphSystem extends BaseVisualSystem {
   }
 
   private addTemporalEcho(element: HTMLElement) {
-    const echo = document.createElement("div");
-    echo.className = "sn-temporal-echo";
+    // ---------------- Phase4: check for clustering -------------------------
+    const now = Date.now();
+    const bucket = this.recentEchoes.get(element) ?? [];
+    // keep only last 300ms
+    const filtered = bucket.filter((t) => now - t < 300);
+    filtered.push(now);
+    this.recentEchoes.set(element, filtered);
+
+    const spawnMega = filtered.length >= 3;
+    if (spawnMega) {
+      // prevent further normal echoes in this window by clearing timestamps
+      this.recentEchoes.set(element, []);
+    }
+
+    // Perf guard – cap simultaneous echoes
+    if (this.currentEchoCount >= this.dynamicMaxEchoes) return;
+
+    if (this.echoIntensitySetting === 0) return; // feature disabled
+
+    // --- Phase3: Acquire pooled element or create new ---------------
+    const echo = this.acquireEchoElement();
+
+    // Inject music-aware CSS vars
+    const musicData = this.musicSyncService?.getLatestProcessedData();
+    const energy = musicData?.energy ?? 0;
+    const valence = musicData?.valence ?? 0.5;
+
+    const intensityFactor = 0.2 * this.echoIntensitySetting; // 0..0.6
+    let radius = Math.min(1.6, 1 + energy * 0.4 + intensityFactor);
+    const hueShift = ((valence - 0.5) * 40).toFixed(1);
+
+    // Beat vector contributes directional drift -----------------------------
+    const beatVec = this.musicSyncService?.getCurrentBeatVector?.();
+
+    // --- Phase2: Noise-driven spatial offsets -----------------------
+    let offsetX = 0,
+      offsetY = 0,
+      skewDeg = 0;
+    try {
+      const rect = element.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const normX = Math.min(Math.max(centerX / window.innerWidth, 0), 1);
+      const normY = Math.min(Math.max(centerY / window.innerHeight, 0), 1);
+
+      const vec = sampleNoise(normX, normY);
+
+      const intensityMult = this.echoIntensitySetting; // 1..3
+      const offsetMagnitude = 6 + energy * 6 + intensityMult * 2; // px
+
+      offsetX = vec.x * offsetMagnitude;
+      offsetY = vec.y * offsetMagnitude;
+
+      if (beatVec) {
+        offsetX += beatVec.x * 10; // k = 10px per requirements
+        offsetY += beatVec.y * 10;
+      }
+      skewDeg = vec.x * 6; // small rotational flavour
+    } catch (e) {
+      // Fallback to centered echo if sampling fails
+    }
+
+    // --- Phase4: Mega ripple adjustments -----------------------------------
+    if (spawnMega) {
+      radius = Math.min(radius * 1.6, 2.4); // limit growth
+      echo.style.setProperty("--sn-kinetic-intensity", "0.4");
+    }
+
+    // Rotation start angle (beat-aligned) ------------------------------------
+    const baseAngle = (Math.random() * 360).toFixed(1);
+
+    echo.style.setProperty("--sn-echo-radius-multiplier", radius.toFixed(2));
+    echo.style.setProperty("--sn-echo-hue-shift", `${hueShift}deg`);
+
+    echo.style.setProperty("--sn-echo-offset-x", `${offsetX.toFixed(1)}px`);
+    echo.style.setProperty("--sn-echo-offset-y", `${offsetY.toFixed(1)}px`);
+    echo.style.setProperty("--sn-echo-skew", `${skewDeg.toFixed(2)}deg`);
+    echo.style.setProperty("--sn-echo-rotate", `${baseAngle}deg`);
+
     element.appendChild(echo);
+    this.currentEchoCount++;
+
+    // Return to pool after animation completes
     setTimeout(() => {
       if (echo.parentElement) echo.parentElement.removeChild(echo);
-    }, 800);
+      this.currentEchoCount--;
+      this.releaseEchoElement(echo);
+    }, 1250); // slightly longer than longest layer duration
+  }
+
+  private get echoIntensitySetting(): number {
+    const val = this.settingsManager?.get?.("sn-echo-intensity") ?? "2";
+    const parsed = parseInt(val as string, 10);
+    return isNaN(parsed) ? 2 : parsed;
+  }
+
+  private get dynamicMaxEchoes(): number {
+    switch (this.echoIntensitySetting) {
+      case 0:
+        return 0; // disabled
+      case 1:
+        return Math.ceil(DataGlyphSystem.BASE_MAX_ECHOES / 2);
+      case 3:
+        return DataGlyphSystem.BASE_MAX_ECHOES * 2;
+      default:
+        return DataGlyphSystem.BASE_MAX_ECHOES;
+    }
+  }
+
+  // --- Phase3 helper methods ---------------------------------------
+  /** Obtain an echo element from pool or create */
+  private acquireEchoElement(): HTMLElement {
+    let el = this.echoPool.pop();
+    if (el) {
+      // Reset inline styles & force reflow to replay animation
+      el.style.animation = "none";
+      // Force reflow
+      void el.offsetWidth;
+      el.style.animation = ""; // will use the class-declared animation
+    } else {
+      el = document.createElement("div");
+      el.className = "sn-temporal-echo";
+    }
+    return el;
+  }
+
+  /** Return echo element to pool (bounded) */
+  private releaseEchoElement(el: HTMLElement) {
+    if (this.echoPool.length < 20) {
+      this.echoPool.push(el);
+    }
   }
 }

@@ -3,7 +3,7 @@
 // Organic energy flows that respond to music and connect to the Nexus Orb
 // =============================================================================
 
-@use "../core/mixins" as *;
+@use "../core/_mixins" as *;
 
 // Year 3000 Energy Particle System Variables
 :root {
@@ -16,7 +16,7 @@
 
   // === Organic Flow Variables ===
   --particle-flow-variance: 15deg;
-  --particle-organic-curve: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --particle-organic-curve: var(--sn-easing-organic, cubic-bezier(0.25, 0.46, 0.45, 0.94));
   --particle-life-cycle: 12s;
   --particle-emergence-delay: 3s;
 
@@ -53,85 +53,65 @@
 // Primary Energy Stream - Organic diagonal flow
 @keyframes energy-stream-primary {
   0% {
-    transform: translate3d(-150px, -150px, 0)
-      rotate(var(--particle-flow-variance)) scale(0);
+    transform: translate(-50%, -50%) scale(0);
     opacity: 0;
-    filter: blur(2px);
   }
 
-  5% {
-    transform: translate3d(-120px, -120px, 0)
-      rotate(calc(var(--particle-flow-variance) * 0.8)) scale(0.3);
-    opacity: var(--particle-energy-intensity);
-    filter: blur(1px);
+  20% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0.8;
   }
 
-  15% {
-    opacity: calc(var(--particle-energy-intensity) * 1.2);
-    filter: blur(0px);
+  80% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
   }
 
-  25% {
-    transform: translate3d(20vw, 15vh, 0)
-      rotate(calc(var(--particle-flow-variance) * 0.6)) scale(1);
+  85% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.5;
   }
 
-  50% {
-    transform: translate3d(50vw, 40vh, 0)
-      rotate(calc(var(--particle-flow-variance) * 0.4)) scale(1.1);
-    opacity: calc(var(--particle-energy-intensity) * 1.1);
-  }
-
-  75% {
-    transform: translate3d(80vw, 65vh, 0)
-      rotate(calc(var(--particle-flow-variance) * 0.2)) scale(0.9);
-    opacity: calc(var(--particle-energy-intensity) * 0.9);
-  }
-
-  90% {
-    transform: translate3d(calc(100vw + 120px), calc(100vh + 120px), 0)
-      rotate(0deg) scale(0.3);
-    opacity: 0;
-    filter: blur(1px);
+  95% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0.1;
   }
 
   100% {
-    transform: translate3d(calc(100vw + 150px), calc(100vh + 150px), 0)
-      rotate(0deg) scale(0);
+    transform: translate(-50%, -50%) scale(0.3);
     opacity: 0;
-    filter: blur(2px);
   }
 }
 
 // Secondary Energy Whisper - Gentle curved flow
 @keyframes energy-whisper-secondary {
   0% {
-    transform: translate3d(-80px, 20vh, 0) rotate(-10deg) scale(0);
+    transform: translate(-50%, -50%) scale(0);
     opacity: 0;
   }
 
   10% {
-    transform: translate3d(-40px, 18vh, 0) rotate(-8deg) scale(0.6);
+    transform: translate(-50%, -50%) scale(0.6);
     opacity: calc(var(--particle-energy-intensity) * 0.7);
   }
 
   30% {
-    transform: translate3d(25vw, 12vh, 0) rotate(-4deg) scale(0.8);
+    transform: translate(-50%, -50%) scale(0.8);
     opacity: calc(var(--particle-energy-intensity) * 0.9);
   }
 
   60% {
-    transform: translate3d(70vw, 8vh, 0) rotate(2deg) scale(0.7);
+    transform: translate(-50%, -50%) scale(0.7);
     opacity: calc(var(--particle-energy-intensity) * 0.8);
   }
 
   85% {
-    transform: translate3d(calc(100vw + 40px), 5vh, 0) rotate(8deg) scale(0.4);
+    transform: translate(-50%, -50%) scale(0.4);
     opacity: 0;
   }
 
   100% {
-    transform: translate3d(calc(100vw + 80px), 3vh, 0) rotate(10deg) scale(0);
+    transform: translate(-50%, -50%) scale(0);
     opacity: 0;
   }
 }
@@ -139,92 +119,88 @@
 // Energy Pulse - Radiating from Nexus influence points
 @keyframes energy-pulse-nexus {
   0% {
-    transform: translate3d(30vw, 25vh, 0) scale(0);
+    transform: translate(-50%, -50%) scale(0);
     opacity: 0;
-    filter: blur(4px);
   }
 
   20% {
-    transform: translate3d(30vw, 25vh, 0) scale(1);
+    transform: translate(-50%, -50%) scale(1);
     opacity: calc(
       var(--particle-energy-intensity) * var(--particle-nexus-influence)
     );
-    filter: blur(0px);
   }
 
   40% {
-    transform: translate3d(35vw, 20vh, 0) scale(1.2);
+    transform: translate(-50%, -50%) scale(1.2);
     opacity: calc(
       var(--particle-energy-intensity) * var(--particle-nexus-influence) * 0.8
     );
   }
 
   60% {
-    transform: translate3d(45vw, 15vh, 0) scale(0.9);
+    transform: translate(-50%, -50%) scale(0.9);
     opacity: calc(
       var(--particle-energy-intensity) * var(--particle-nexus-influence) * 0.6
     );
   }
 
   80% {
-    transform: translate3d(60vw, 10vh, 0) scale(0.5);
+    transform: translate(-50%, -50%) scale(0.5);
     opacity: calc(
       var(--particle-energy-intensity) * var(--particle-nexus-influence) * 0.3
     );
-    filter: blur(2px);
   }
 
   100% {
-    transform: translate3d(80vw, 5vh, 0) scale(0);
+    transform: translate(-50%, -50%) scale(0);
     opacity: 0;
-    filter: blur(4px);
   }
 }
 
 // Cluster Formation - Particles that form temporary energy clusters
 @keyframes energy-cluster-formation {
   0% {
-    transform: translate3d(10vw, 70vh, 0) scale(0.5);
+    transform: translate(-50%, -50%) scale(0.5);
     opacity: 0;
   }
 
   15% {
-    transform: translate3d(15vw, 65vh, 0) scale(0.8);
+    transform: translate(-50%, -50%) scale(0.8);
     opacity: calc(
       var(--particle-energy-intensity) * var(--particle-cluster-cohesion)
     );
   }
 
   30% {
-    transform: translate3d(22vw, 58vh, 0) scale(1);
+    transform: translate(-50%, -50%) scale(1);
     opacity: calc(
       var(--particle-energy-intensity) * var(--particle-cluster-cohesion) * 1.1
     );
   }
 
   50% {
-    transform: translate3d(25vw, 55vh, 0) scale(1.1);
+    transform: translate(-50%, -50%) scale(1.1);
     opacity: calc(
       var(--particle-energy-intensity) * var(--particle-cluster-cohesion) * 1.2
     );
   }
 
   70% {
-    transform: translate3d(28vw, 52vh, 0) scale(0.9);
+    transform: translate(-50%, -50%) scale(0.9);
     opacity: calc(
       var(--particle-energy-intensity) * var(--particle-cluster-cohesion) * 0.9
     );
   }
 
   85% {
-    transform: translate3d(35vw, 45vh, 0) scale(0.6);
+    transform: translate(-50%, -50%) scale(0.6);
     opacity: calc(
       var(--particle-energy-intensity) * var(--particle-cluster-cohesion) * 0.5
     );
   }
 
   100% {
-    transform: translate3d(45vw, 35vh, 0) scale(0);
+    transform: translate(-50%, -50%) scale(0);
     opacity: 0;
   }
 }
@@ -234,26 +210,22 @@
   0%,
   100% {
     opacity: calc(var(--particle-energy-intensity) * 0.6);
-    transform: scale(1) rotate(0deg);
-    filter: blur(0px);
+    transform: scale(1);
   }
 
   25% {
     opacity: calc(var(--particle-energy-intensity) * 0.9);
-    transform: scale(1.1) rotate(90deg);
-    filter: blur(0.5px);
+    transform: scale(1.1);
   }
 
   50% {
     opacity: calc(var(--particle-energy-intensity) * 0.4);
-    transform: scale(0.8) rotate(180deg);
-    filter: blur(1px);
+    transform: scale(0.8);
   }
 
   75% {
     opacity: calc(var(--particle-energy-intensity) * 0.8);
-    transform: scale(1.05) rotate(270deg);
-    filter: blur(0.3px);
+    transform: scale(1.05);
   }
 }
 
@@ -270,6 +242,14 @@
   pointer-events: none;
   z-index: -5;
   overflow: hidden;
+
+  // Add grain-dissolve masking for fade-outs (Phase 2)
+  @supports (mask-image: url("dummy")) {
+    mask-image: var(--sn-nebula-noise-url);
+    mask-size: 300% 300%;
+    mask-repeat: repeat;
+    animation: year3000-grain-shift 6s linear infinite;
+  }
 
   // Enhanced hardware acceleration
   @include performance-optimized;
@@ -626,5 +606,24 @@
     .star:nth-child(n + 3) {
       display: none;
     }
+  }
+}
+
+@keyframes particle-shimmer {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(1.05);
+    opacity: 0.9;
   }
 }

@@ -3,7 +3,8 @@
 // Stellar entities that breathe, pulse, and resonate with gravitational majesty
 // =============================================================================
 
-@use "./sn_card_base";
+@use "./_sn_card_base";
+@use "../core/_mixins" as *;
 
 // =============================================================================
 // COSMIC FOUNDATION VARIABLES
@@ -63,20 +64,7 @@
   }
 }
 
-@keyframes cosmic-resonance-pulse {
-  0%, 100% {
-    filter: brightness(1) saturate(1) hue-rotate(0deg);
-  }
-  25% {
-    filter: brightness(1.03) saturate(1.08) hue-rotate(5deg);
-  }
-  50% {
-    filter: brightness(1.06) saturate(1.15) hue-rotate(10deg);
-  }
-  75% {
-    filter: brightness(1.03) saturate(1.08) hue-rotate(5deg);
-  }
-}
+
 
 @keyframes chromatic-harmony-shift {
   0% { border-color: var(--sn-card-harmonic-primary); }
@@ -111,7 +99,8 @@ body:not(:has(.main-searchPage-content)) .main-card-card {
   position: relative;
   border-radius: var(--sn-card-stellar-radius);
   isolation: isolate;
-  contain: layout style;
+  // Remove layout containment (see Chrome lazy-load issue)
+  contain: style paint;
   will-change: transform, box-shadow, border-color;
 
   // === Gravitational Field Shadows ===
@@ -285,7 +274,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::
 // =============================================================================
 
 .main-searchPage-content .main-card-card {
-  all: unset;
+  /* Removed all: unset to retain essential card layout */
   display: block;
   position: relative;
   cursor: pointer;

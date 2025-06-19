@@ -53,21 +53,7 @@
     inset: 0;
     pointer-events: none;
     z-index: -2; // Ensure it's behind ::after and main content
-    background: radial-gradient(
-      // Example gradient, can be simpler or use theme colors
-      circle at center,
-      rgba(
-          var(--sn-header-primary-rgb, var(--spice-rgb-accent)),
-          var(--sn-depth-layer-0-opacity, 0.05)
-        )
-        0%,
-      rgba(
-          var(--sn-header-secondary-rgb, var(--spice-rgb-surface0)),
-          calc(var(--sn-depth-layer-0-opacity, 0.05) * 0.7)
-        )
-        70%,
-      transparent 100%
-    );
+
     transform: translateZ(calc(var(--sn-depth-layer-0-z, 75px) * -1))
       // Move back in Z
       translateY(var(--sn-depth-layer-0-offset-y, 0px))

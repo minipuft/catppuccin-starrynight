@@ -53,3 +53,14 @@ export class EventBus {
 
 // Create a singleton instance for global use
 export const GlobalEventBus = new EventBus();
+
+// ---------------------------------------------------------------------------
+// 🌐 Debug Convenience: expose the singleton on global scope for DevTools.
+// This adds **no runtime dependency**—in production builds the global symbol is
+// harmless and tree-shaking minifiers will keep the import intact.  Guarded to
+// avoid overwrite during hot-reload loops.
+// ---------------------------------------------------------------------------
+const g = globalThis as any;
+if (!g.GlobalEventBus) {
+  g.GlobalEventBus = GlobalEventBus;
+}

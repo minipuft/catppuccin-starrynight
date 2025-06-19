@@ -262,6 +262,9 @@ export class MusicSyncService {
   // Increment this prefix whenever cache schema changes to avoid stale data
   private readonly CACHE_KEY_VERSION_PREFIX = "v3";
 
+  /** Current unit beat direction vector (updated each beat). */
+  private currentBeatVector: { x: number; y: number } = { x: 0, y: 0 };
+
   constructor(dependencies: any = {}) {
     this.config = dependencies.YEAR3000_CONFIG || YEAR3000_CONFIG;
     this.utils = dependencies.Year3000Utilities || Utils;
@@ -1159,6 +1162,14 @@ export class MusicSyncService {
     return this.latestProcessedData;
   }
 
+  /**
+   * Get the latest beat vector (unit direction) for visual systems that need
+   * directional rhythm cues. Falls back to {0,0} when unavailable.
+   */
+  public getCurrentBeatVector(): { x: number; y: number } {
+    return this.currentBeatVector;
+  }
+
   private stopBeatScheduler(): void {
     if (this.beatSchedulerTimer) {
       clearTimeout(this.beatSchedulerTimer);
@@ -1167,8 +1178,20 @@ export class MusicSyncService {
   }
 
   private triggerBeatEvent(): void {
+    // --- Update beat vector --------------------------------------------------
+    // Generate a pseudo-random but temporally coherent direction. We rotate the
+    // vector each beat by a golden-ratio increment so it never repeats in a
+    // short cycle yet still feels smooth.
+    const GOLDEN_RATIO = 0.61803398875;
+    const angle = ((this.nextBeatIndex * GOLDEN_RATIO) % 1) * Math.PI * 2;
+    this.currentBeatVector = { x: Math.cos(angle), y: Math.sin(angle) };
+
     if (this.latestProcessedData) {
-      const beatUpdate = { ...this.latestProcessedData, beatOccurred: true };
+      const beatUpdate = {
+        ...this.latestProcessedData,
+        beatOccurred: true,
+        beatVector: this.currentBeatVector,
+      };
       this.notifySubscribers(beatUpdate, null, this.currentTrackUri);
     }
     this.nextBeatIndex++;

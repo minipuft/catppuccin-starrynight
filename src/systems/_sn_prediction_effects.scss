@@ -248,3 +248,29 @@ div[role="dialog"] {
       var(--sn-modal-emergence-timing-function) forwards;
   }
 }
+
+// Alias: deprecated class names from early prototype mapped to new unified naming
+.sn-predict-glow {
+  @extend .sn-predict-static-glow;
+}
+
+.sn-predict-subtle-glow {
+  // already defined above; keep as is
+}
+
+// Ensure pulse-only class exists for default subtle glow animations
+// .sn-predict-pulse {
+//   @extend .sn-predict-pulse;
+// }
+
+// TODO[Y3K-PH3]: Materialization resonance glow (driven by --sn-materialize-* vars)
+.sn-predict-materialize-glow {
+  position: relative;
+  border-radius: inherit;
+  transition: box-shadow 300ms ease-out;
+  box-shadow: 0 0 calc(6px + 14px * var(--sn-materialize-clarity, 0))
+    rgba(
+      var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
+      calc(0.1 + 0.4 * var(--sn-materialize-imminence, 0))
+    );
+}

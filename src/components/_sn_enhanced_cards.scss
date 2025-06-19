@@ -1,18 +1,23 @@
 // =============================================================================
 // YEAR 3000 NEXUS CARDS SYSTEM - Holographic Interactive Elements
+// PHASE 2 ENHANCEMENT: Neural Constellation Discovery Integration
 // Advanced card interactions with energy bloom, organic morphing, and contextual intelligence
+// Now enhanced with 3D constellation node capabilities
 // =============================================================================
 
-@use "../core/mixins" as *;
-@use "./sn_card_base";
+@use "../core/_mixins" as *;
+@use "./_sn_card_base";
+@use "./_sn_harmonic_aura" as *;
+@use "../core/_kinetic-animations" as *;
+@use "../systems/_sn_prediction_effects" as *;
 
 // Year 3000 Nexus Cards System Variables
 :root {
   // === Holographic Foundation ===
   --card-holographic-depth: 16px;
-  --card-energy-field-radius: 24px;
+  --card-energy-field-radius: 20px;
   --card-nexus-connection-strength: 0.8;
-  --card-bloom-expansion: 1.15;
+  --card-bloom-expansion: 1.08;
   --card-morphing-fluidity: cubic-bezier(0.23, 1, 0.32, 1);
 
   // === Organic Dimension System ===
@@ -24,9 +29,27 @@
 
   // === Energy Interaction Variables ===
   --card-energy-pulse-rate: 3s;
-  --card-bloom-threshold: 0.15s;
+  --card-bloom-threshold: 0.25s;
   --card-energy-dissipation: 0.8s;
   --card-harmonic-resonance: 1;
+
+  // === Adaptive Bloom 2.0 – Year 3000 Cosmic Sync ==========================
+  // Base alpha kept very light; value tuned for HDR displays.
+  --card-bloom-base-alpha: 0.015;
+
+  // Dynamic scale factors
+  --card-bloom-beat-factor: var(--sn-nebula-beat-intensity, 0); // set by NebulaController
+  --card-bloom-context-factor: var(--motion-intelligence-level);
+
+  // Final bloom alpha – capped to 0.12 for accessibility.
+  --card-bloom-alpha: clamp(
+    0.015,
+    calc(
+      (var(--card-bloom-base-alpha) * var(--card-bloom-context-factor)) +
+      (var(--card-bloom-beat-factor) * 0.05)
+    ),
+    0.12
+  );
 
   // === Contextual Intelligence Core ===
   --motion-intelligence-level: 1; // Adaptive to user context
@@ -64,6 +87,13 @@
     0
   ); // Direct beat connection
   --card-rhythm-phase: var(--sn-rhythm-phase, 0); // Harmonic oscillation
+
+  // TODO: Extend existing holographic card system with 3D constellation positioning
+  // === PHASE 2: CONSTELLATION INTEGRATION ===
+  // Cards can exist as constellation nodes while preserving existing functionality
+  --card-constellation-mode: 0; // 0 = normal, 1 = constellation node
+  --card-constellation-depth: var(--constellation-z-mid, translateZ(60px));
+  --card-constellation-connection: var(--constellation-connection-strength, 0.7);
 
   // === Intelligent Motion Calculation - ENHANCED WITH RHYTHM ===
   --calculated-lift: calc(
@@ -186,11 +216,28 @@
   perspective: var(--card-perspective-field);
   transform-style: preserve-3d;
 
+  // Attach lightweight, beat-aware glow
+  @include harmonic-aura;
+
   // === YEAR 3000 RHYTHMIC FOUNDATION ===
   // Kinetic Verb: OSCILLATE - Cards breathe with the music
   transform: scale(var(--card-rhythm-breathing))
     rotateY(calc(var(--card-rhythm-phase) * 0.5deg))
     rotateX(calc(var(--card-rhythm-phase) * 0.3deg));
+
+  // TODO: Add constellation node styling that builds on existing card holographics
+  // === PHASE 2: CONSTELLATION NODE ENHANCEMENT ===
+  // Cards in constellation mode get enhanced 3D presence
+  .main-gridContainer-gridContainer:has([data-testid*="constellation"]) &,
+  .main-view-container:has([data-testid*="artist"]) & {
+    --card-constellation-mode: 1;
+
+    // Enhanced 3D positioning for constellation nodes
+    transform: scale(var(--card-rhythm-breathing))
+      var(--card-constellation-depth)
+      rotateY(calc(var(--card-rhythm-phase) * 0.5deg + 2deg))
+      rotateX(calc(var(--card-rhythm-phase) * 0.3deg + 1deg));
+  }
 
   // === Holographic Foundation - ENHANCED WITH RHYTHM ===
   border-radius: var(--card-organic-corners);
@@ -219,21 +266,21 @@
   border: 1px solid
     rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.15);
 
-  // Enhanced shadow system with organic depth - YEAR 3000 BEAT SYNC
-  box-shadow: 0 4px calc(24px + (8px * var(--card-beat-intensity)))
+  // Softened organic shadow to reduce visual bloom while preserving beat dynamics
+  box-shadow: 0 4px calc(16px + (6px * var(--card-beat-intensity)))
       rgba(
         var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-        calc(0.08 + (var(--card-beat-intensity) * 0.06))
+        calc(0.05 + (var(--card-beat-intensity) * 0.05))
       ),
-    0 8px calc(32px + (12px * var(--card-beat-intensity)))
+    0 8px calc(24px + (8px * var(--card-beat-intensity)))
       rgba(
         var(--sn-oklab-processed-dynamic-shadow-rgb),
-        calc(0.12 + (var(--card-beat-intensity) * 0.08))
+        calc(0.08 + (var(--card-beat-intensity) * 0.07))
       ),
     inset 0 1px 0
       rgba(
         var(--sn-oklab-processed-bright-highlight-rgb),
-        calc(0.1 + (var(--card-beat-intensity) * 0.05))
+        calc(0.07 + (var(--card-beat-intensity) * 0.04))
       );
 
   // === Energy Field Base State ===
@@ -261,7 +308,10 @@
     background: radial-gradient(
       ellipse 120% 100% at center,
       rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0) 0%,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.03) 40%,
+      rgba(
+        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+        var(--card-bloom-alpha)
+      ) 40%,
       transparent 70%
     );
 
@@ -273,6 +323,10 @@
 
   // === Holographic Interaction State - YEAR 3000 ENHANCED ===
   &:hover {
+    // Phase 3: unified temporal echo effect
+    @extend .sn-temporal-echo;
+    --sn-kinetic-intensity: calc(0.1 * var(--motion-intelligence-level, 1));
+
     // Kinetic Verb: BLOOM - Contextual lift calculation with rhythm
     transform: var(--card-depth-near) scale(var(--calculated-scale))
       rotateY(calc(var(--card-rhythm-phase) * 1deg))
@@ -300,13 +354,26 @@
       0 calc(var(--calculated-lift) * 2) calc(var(--calculated-lift) * 4)
         rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2),
       0 0 calc(var(--card-energy-field-radius) * 2)
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.1),
+        rgba(
+          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+          var(--card-bloom-alpha)
+        ),
       inset 0 1px 0 rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2);
 
     // Activate energy field
     &::before {
       opacity: 1;
       transform: scale(1);
+      -webkit-transform: scale(1);
+      -moz-transform: scale(1);
+      -ms-transform: scale(1);
+      -o-transform: scale(1);
+    }
+
+    // ===== Artist Vision Mode: anticipatory shimmer on hover
+    [data-artistic-mode="cosmic-maximum"] &:hover {
+      @extend .sn-anticipatory-warmth;
+      --sn-anticipatory-hue: 0deg;
     }
   }
 
@@ -557,8 +624,8 @@
 
     // Activate energy bloom
     &::before {
-      width: 80px;
-      height: 80px;
+      width: 60px;
+      height: 60px;
       opacity: 1;
     }
   }

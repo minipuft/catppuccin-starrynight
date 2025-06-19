@@ -1,0 +1,134 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 SCROLL NODE BACKGROUNDS - Consolidated radial gradients for main view
+// ████████████████████████████████████████████████████████████████████████████████
+
+// This module unifies the two separate radial-gradient backgrounds that were
+// previously declared in `_main_view_container.scss` and `_sn_depth_layers.scss`.
+// By combining them into a single multi-layer background we avoid cascade
+// conflicts while keeping the full stacked visual effect.
+
+@use "../core/_mixins" as *;
+
+.Root__main-view .main-view-container__scroll-node {
+  // Ensure the container is properly prepared for pseudo-elements. These
+  // declarations remain here so that this file can stand alone if imported
+  // without `_main_view_container.scss` (defensive coding).
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0; // shorthand for top/right/bottom/left: 0
+    pointer-events: none;
+    z-index: -2; // Behind ::after (-1) and main content
+
+    // ────────────────────────────────────────────────────────────────────────
+    // [Phase 1] Four-Layer Nebula Background Stack
+    // Each layer's colour/opacity/blur hooks into the new
+    // `--sn-nebula-layer-N-*` variables (defined in _sn_nebula_variables.scss).
+    // Layer-order: first gradient rendered on top.
+    // TODO[Phase 2]: NebulaController.js will pulse opacity via beat-sync.
+    // ────────────────────────────────────────────────────────────────────────
+
+    // Default/fallback background definition (static stops)
+    background:
+    /* Layer 3 – Inner bright highlight core */
+    radial-gradient(
+      ellipse at center,
+      rgba(var(--sn-nebula-layer-3-color-rgb),
+        calc(var(--sn-nebula-layer-3-opacity, 0.03) * var(--sn-nebula-beat-intensity, 1))) 0%,
+      transparent 60%
+    ),
+    /* Layer 2 */
+    radial-gradient(
+      ellipse at center,
+      rgba(var(--sn-nebula-layer-2-color-rgb),
+        calc(var(--sn-nebula-layer-2-opacity, 0.04) * var(--sn-nebula-beat-intensity, 1))) 0%,
+      transparent 70%
+    ),
+    /* Layer 1 */
+    radial-gradient(
+      circle at center,
+      rgba(var(--sn-nebula-layer-1-color-rgb),
+        calc(var(--sn-nebula-layer-1-opacity, 0.05) * var(--sn-nebula-beat-intensity, 1))) 0%,
+      transparent 85%
+    ),
+    /* Layer 0 – Outermost diffuse glow */
+    radial-gradient(
+      circle at center,
+      rgba(var(--sn-nebula-layer-0-color-rgb),
+        calc(var(--sn-nebula-layer-0-opacity, 0.05) * var(--sn-nebula-beat-intensity, 1))) 0%,
+      transparent 100%
+    );
+
+    // Advanced easing-based stops (Edge ≤89 will ignore due to @supports)
+    @supports (background: radial-gradient(circle at center, transparent calc(1%))) {
+      background:
+        /* Layer 3 */
+        radial-gradient(
+          ellipse at center,
+          rgba(var(--sn-nebula-layer-3-color-rgb),
+            calc(var(--sn-nebula-layer-3-opacity, 0.03) * var(--sn-nebula-beat-intensity, 1))) 0%,
+          transparent calc(clamp(0%, 45% * (1 - var(--sn-nebula-ease-t, 0)), 90%))
+        ),
+        /* Layer 2 */
+        radial-gradient(
+          ellipse at center,
+          rgba(var(--sn-nebula-layer-2-color-rgb),
+            calc(var(--sn-nebula-layer-2-opacity, 0.04) * var(--sn-nebula-beat-intensity, 1))) 0%,
+          transparent calc(clamp(0%, 55% * (1 - var(--sn-nebula-ease-t, 0)), 95%))
+        ),
+        /* Layer 1 */
+        radial-gradient(
+          circle at center,
+          rgba(var(--sn-nebula-layer-1-color-rgb),
+            calc(var(--sn-nebula-layer-1-opacity, 0.05) * var(--sn-nebula-beat-intensity, 1))) 0%,
+          transparent calc(clamp(0%, 75% * (1 - var(--sn-nebula-ease-t, 0)), 98%))
+        ),
+        /* Layer 0 */
+        radial-gradient(
+          circle at center,
+          rgba(var(--sn-nebula-layer-0-color-rgb),
+            calc(var(--sn-nebula-layer-0-opacity, 0.05) * var(--sn-nebula-beat-intensity, 1))) 0%,
+          transparent 100%
+        );
+    }
+
+    transition-property: background, --sn-nebula-ease-t;
+    transition-duration: 600ms, 800ms;
+    transition-timing-function: ease, cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Apply softening blur & hint to compositor */
+    filter: blur(var(--sn-nebula-layer-3-blur, var(--sn-nebula-max-blur, 12px)));
+    will-change: filter;
+
+    /* ------------------------------------------------------------------ */
+    /*  Header Mask – prevent overlay bleeding into playlist/album header  */
+    /* ------------------------------------------------------------------ */
+    mask-image: linear-gradient(
+      to bottom,
+      transparent var(--sn-header-height, 112px),
+      black calc(var(--sn-header-height, 112px) + 1px)
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent var(--sn-header-height, 112px),
+      black calc(var(--sn-header-height, 112px) + 1px)
+    );
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: -3; // beneath ::before but still over main bg
+
+    // Phase 1 – Nebula Gradient Smoothing noise overlay
+    @include nebula-noise();
+    background-size: 300% var(--sn-nebula-noise-scale-y, 150%);
+    opacity: var(--sn-nebula-noise-opacity, 0.06);
+    mix-blend-mode: var(--sn-nebula-blend-mode, color-dodge);
+  }
+}

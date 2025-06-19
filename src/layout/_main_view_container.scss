@@ -6,23 +6,4 @@
 .main-view-container__scroll-node {
   position: relative; // Needed for pseudo-elements
   isolation: isolate; // Ensure pseudo-elements are behind content
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(
-      ellipse at center,
-      rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.02) 0%,
-      transparent 60%
-    );
-    z-index: -1; // Behind content
-    pointer-events: none;
-    transition: background var(--sn-gradient-transition, 600ms ease);
-  }
 }

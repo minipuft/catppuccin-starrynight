@@ -153,6 +153,14 @@
     @include context-gradient-zone("search");
   }
 
+  // Liked Songs (Collections ▸ Tracks) — treat like a playlist to enable dynamic depth effects
+  &[data-pathname*="collection/tracks"],
+  body:has([data-testid*="liked" i]) .Root__main-view {
+    @include context-gradient-zone("playlist");
+    // Slightly calmer than full playlist pages
+    --zone-intensity-playback: 1.1;
+  }
+
   &[data-pathname*="collection"],
   &[data-pathname*="library"] {
     @include context-gradient-zone("home");

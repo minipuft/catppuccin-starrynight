@@ -66,6 +66,14 @@
   --sn-nav-item-echo-opacity: 0;
   --sn-nav-item-echo-scale: 1;
   --sn-glyph-resonance-intensity: 0; // 0 to 0.2 for glyph enhancement
+
+  // === PREDICTIVE MATERIALIZATION ===
+  --sn-predictive-echo-opacity: 0;
+  --sn-predictive-echo-scale: 1;
+
+  // === DIMENSIONAL RIFT VARIABLES ===
+  --sn-dimensional-rift-intensity: 0;
+  --sn-dimensional-rift-color-rgb: 140, 170, 238; // Default: blue
 }
 
 // Enhanced harmonic mode styling that responds to the classes applied by JavaScript

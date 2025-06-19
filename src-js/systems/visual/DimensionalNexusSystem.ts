@@ -1,3 +1,4 @@
+import { GlobalEventBus } from "@/core/EventBus";
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
 import type { Year3000Config } from "@/types/models";
 import { Year3000System } from "../../core/year3000System";
@@ -69,6 +70,8 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
   private systemIntegrationMetrics: SystemIntegrationMetrics;
   private rootElement: HTMLElement;
   private modalObserver: MutationObserver | null;
+  private _lastScrollTime: number | null;
+  private _lastScrollTop: number | null;
 
   constructor(
     config: Year3000Config,
@@ -139,6 +142,8 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
 
     this.rootElement = this.utils.getRootStyle() as HTMLElement;
     this.modalObserver = null;
+    this._lastScrollTime = null;
+    this._lastScrollTop = null;
   }
 
   async initialize() {
@@ -192,6 +197,26 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
 
   private recordUserInteraction(event: Event) {
     const eventType = event.type;
+
+    // Phase 3 – Emit user:scroll with velocity/direction
+    if (eventType === "scroll") {
+      const target = event.target as HTMLElement | null;
+      if (target) {
+        const newTop = target.scrollTop;
+        const now = performance.now();
+        const velocity = this._lastScrollTime
+          ? (newTop - (this._lastScrollTop ?? 0)) / (now - this._lastScrollTime)
+          : 0;
+        const direction = velocity < 0 ? "up" : "down";
+        GlobalEventBus.publish("user:scroll", {
+          velocity: velocity * 1000, // pixels per second
+          direction,
+        });
+        this._lastScrollTop = newTop;
+        this._lastScrollTime = now;
+      }
+    }
+
     const now = performance.now();
 
     if (now - this.lastInteractionRecordTime < this.interactionRecordInterval) {

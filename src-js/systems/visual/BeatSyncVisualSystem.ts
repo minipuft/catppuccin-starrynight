@@ -1,3 +1,4 @@
+import { GlobalEventBus } from "@/core/EventBus";
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
 import { SettingsManager } from "@/managers/SettingsManager";
 import { MusicSyncService } from "@/services/MusicSyncService";
@@ -8,14 +9,22 @@ import type {
   HarmonicSyncState,
 } from "@/types/beatSync";
 import type { Year3000Config } from "@/types/models";
+import { echoPool } from "@/utils/echoPool";
 import * as Year3000Utilities from "@/utils/Year3000Utilities";
 import { Year3000System } from "../../core/year3000System";
 import { BaseVisualSystem } from "../BaseVisualSystem";
+
+interface AudioSegment {
+  start: number;
+  duration: number;
+  loudness_max: number;
+}
 
 // YEAR 3000 BEATSYNC VISUAL SYSTEM
 export class BeatSyncVisualSystem extends BaseVisualSystem {
   private year3000System: Year3000System | null;
   private beatFlashElement: HTMLElement | null = null;
+  private crystallineOverlayElement: HTMLElement | null = null;
   public animationFrameId: number | null = null;
   private lastBeatTime: number = 0;
   private beatIntensity: number = 0;
@@ -57,6 +66,11 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
   private currentHarmonicData: HarmonicData | null = null;
   private beatFlashIntensity: BeatFlashIntensity | null = null;
 
+  private analysis: any = null;
+  private rafId: number = 0;
+  private smoothedLoudness: number = 0;
+  private readonly SMOOTHING_FACTOR: number = 0.1;
+
   constructor(
     config: Year3000Config,
     utils: typeof Year3000Utilities,
@@ -86,6 +100,9 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
         `[${this.systemName} Constructor] Initialized with Master Animation Coordinator support.`
       );
     }
+
+    this.onSongChange = this.onSongChange.bind(this);
+    this.update = this.update.bind(this);
   }
 
   private _getMemoryUsage(): number {
@@ -98,6 +115,7 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
   async initialize() {
     await super.initialize();
     this._createBeatFlashElement();
+    this._createCrystallineOverlay();
     this._startAnimationLoop();
     if (this.config.enableDebug) {
       console.log(
@@ -120,6 +138,20 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
       transition: background-color 150ms ease-out, opacity 250ms ease-out;
     `;
     document.body.appendChild(this.beatFlashElement);
+  }
+
+  private _createCrystallineOverlay() {
+    this.crystallineOverlayElement = document.createElement("div");
+    this.crystallineOverlayElement.className = "sn-crystalline-overlay";
+
+    const crystals = ["a", "b", "c"];
+    crystals.forEach((type) => {
+      const crystalEl = document.createElement("div");
+      crystalEl.className = `sn-crystal sn-crystal--${type}`;
+      this.crystallineOverlayElement?.appendChild(crystalEl);
+    });
+
+    document.body.appendChild(this.crystallineOverlayElement);
   }
 
   private _startAnimationLoop() {
@@ -174,7 +206,6 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
     }
   }
 
-  // TODO: Implement abstract onAnimate method for Year 3000 MasterAnimationCoordinator
   public onAnimate(deltaMs: number): void {
     this.updateAnimation(performance.now(), deltaMs);
   }
@@ -207,7 +238,8 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
       this._updateCSSVariables(
         breathingScale,
         this.currentRhythmPhase,
-        actualDeltaTime
+        actualDeltaTime,
+        processedEnergy
       );
 
       if (this.isSyncActive && this.enhancedBPM > 0) {
@@ -235,194 +267,116 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
         this.beatFlashElement.style.opacity = "0";
       }
 
-      this.performanceMetrics.animationUpdates++;
-
-      const frameTime = performance.now() - frameStart;
-      this.updatePerformanceMetrics(frameTime);
+      this.updatePerformanceMetrics(performance.now() - frameStart);
     } catch (error) {
+      console.error(`[${this.systemName}] Error in animation loop:`, error);
       this.errorCount++;
-      console.warn(`[${this.systemName}] Animation update error:`, error);
-
-      if (this.errorCount > 5) {
-        console.warn(
-          `[${this.systemName}] High error count, requesting performance mode`
+      if (this.errorCount > 100) {
+        this._stopAnimationLoop();
+        console.error(
+          `[${this.systemName}] Too many errors, stopping animation.`
         );
-
-        if (
-          this.year3000System &&
-          (this.year3000System as any)._activatePerformanceMode
-        ) {
-          (this.year3000System as any)._activatePerformanceMode();
-        }
       }
     }
   }
 
   public onPerformanceModeChange(mode: "performance" | "quality") {
+    if (this.config.enableDebug) {
+      console.log(`[${this.systemName}] Performance mode changed to:`, mode);
+    }
+
     if (mode === "performance") {
       this._performanceMode = true;
-      this._reducedQualityMode = true;
-
-      if (this.config?.enableDebug) {
-        console.log(
-          `🎬 [${this.systemName}] Switched to performance mode - reducing quality`
-        );
-      }
-    } else if (mode === "quality") {
+      this.animationFrameId && cancelAnimationFrame(this.animationFrameId);
+      // Let the master coordinator handle throttling
+    } else {
       this._performanceMode = false;
-      this._reducedQualityMode = false;
-
-      if (this.config?.enableDebug) {
-        console.log(
-          `🎬 [${this.systemName}] Switched to quality mode - full effects`
-        );
-      }
+      this._startAnimationLoop(); // Resume individual loop if needed
     }
   }
 
   private _startFallbackAnimationLoop() {
-    if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-    }
     const loop = () => {
-      this._animationLoop();
+      this.updateAnimation(performance.now(), 16.67); // Assume ~60fps
       this.animationFrameId = requestAnimationFrame(loop);
     };
     this.animationFrameId = requestAnimationFrame(loop);
   }
 
   private _animationLoop() {
-    if (!this.isAnimating || !this.initialized) return;
+    if (!this.isAnimating) return;
 
-    const frameStart = performance.now();
-    this.frameCount++;
+    const timestamp = performance.now();
+    const deltaTime = timestamp - this.lastAnimationTime;
+    this.lastAnimationTime = timestamp;
 
-    try {
-      const currentTime = performance.now();
-      const deltaTime = currentTime - this.lastAnimationTime;
-      this.lastAnimationTime = currentTime;
+    const latestMusicData = this.musicSyncService?.getLatestProcessedData();
+    const processedEnergy = latestMusicData?.processedEnergy || 0.5;
+    const animationSpeedFactor = latestMusicData?.animationSpeedFactor || 1.0;
 
-      const latestMusicData = this.musicSyncService?.getLatestProcessedData();
-      const processedEnergy = latestMusicData?.processedEnergy || 0.5;
-      const animationSpeedFactor = latestMusicData?.animationSpeedFactor || 1.0;
+    this.currentRhythmPhase = Year3000Utilities.calculateRhythmPhase(
+      timestamp,
+      animationSpeedFactor
+    );
 
-      this.currentRhythmPhase = Year3000Utilities.calculateRhythmPhase(
-        currentTime,
-        animationSpeedFactor
-      );
+    const breathingScale = Year3000Utilities.calculateBreathingScale(
+      this.currentRhythmPhase,
+      processedEnergy
+    );
 
-      const breathingScale = Year3000Utilities.calculateBreathingScale(
-        this.currentRhythmPhase,
-        processedEnergy
-      );
+    this._updateCSSVariables(
+      breathingScale,
+      this.currentRhythmPhase,
+      deltaTime,
+      processedEnergy
+    );
 
-      this._updateCSSVariables(
-        breathingScale,
-        this.currentRhythmPhase,
-        deltaTime
-      );
-
-      if (this.isSyncActive && this.enhancedBPM > 0) {
-        const now = Date.now();
-        if (now >= this.nextBeatTime) {
-          this._triggerBeat(now);
-          this._scheduleNextBeat();
-        }
-      }
-
-      if (this.beatIntensity > 0 && this.beatFlashElement) {
-        this.beatIntensity -= 0.025;
-        if (this.beatIntensity < 0) this.beatIntensity = 0;
-
-        const rootStyle = Year3000Utilities.getRootStyle();
-        const accentRgb =
-          rootStyle.style.getPropertyValue("--sn-gradient-accent-rgb").trim() ||
-          "140,170,238";
-
-        this.beatFlashElement.style.backgroundColor = `rgba(${accentRgb}, ${
-          this.beatIntensity * 0.25
-        })`;
-        this.beatFlashElement.style.opacity = `${this.beatIntensity * 0.85}`;
-      } else if (this.beatFlashElement) {
-        this.beatFlashElement.style.opacity = "0";
-      }
-
-      this.performanceMetrics.animationUpdates++;
-
-      const frameTime = performance.now() - frameStart;
-      this.updatePerformanceMetrics(frameTime);
-    } catch (error) {
-      this.errorCount++;
-      console.warn(`[${this.systemName}] Animation loop error:`, error);
-
-      if (this.errorCount > 5) {
-        console.warn(
-          `[${this.systemName}] High error count, throttling animations`
-        );
-        setTimeout(() => {
-          if (this.isAnimating) {
-            this.animationFrameId = requestAnimationFrame(() =>
-              this._animationLoop()
-            );
-          }
-        }, 100);
-        return;
-      }
-    }
+    this.animationFrameId = requestAnimationFrame(
+      this._animationLoop.bind(this)
+    );
   }
 
   private _updateCSSVariables(
     breathingScale: number,
     rhythmPhase: number,
-    deltaTime: number
+    deltaTime: number,
+    processedEnergy: number
   ) {
+    // Skip if frame took too long – prevents cascaded jank on stalled tabs
     if (deltaTime > 50) return;
 
-    const rootStyle = Year3000Utilities.getRootStyle();
-    if (!rootStyle) return;
+    const root = Year3000Utilities.getRootStyle();
+    if (!root) return;
 
-    try {
-      const queueCSSUpdate = (property: string, value: string) => {
-        if (
-          this.year3000System &&
-          (this.year3000System as any).queueCSSVariableUpdate
-        ) {
-          (this.year3000System as any).queueCSSVariableUpdate(property, value);
-        } else {
-          rootStyle.style.setProperty(property, value);
-        }
-      };
-
-      const clampedBreathingScale = Math.max(
-        0.97,
-        Math.min(1.02, breathingScale)
-      );
-      queueCSSUpdate("--sn-breathing-scale", clampedBreathingScale.toFixed(4));
-
-      const normalizedPhase = rhythmPhase % (Math.PI * 2);
-      queueCSSUpdate("--sn-rhythm-phase", normalizedPhase.toFixed(4));
-
-      // 🆕 ADD MISSING BEAT PULSE INTENSITY - Critical for now playing animations
-      const beatPulseIntensity = Math.max(
-        0,
-        Math.min(1, this.beatIntensity * 0.7 + this.currentEnergy * 0.3)
-      );
-      queueCSSUpdate(
-        "--sn-beat-pulse-intensity",
-        beatPulseIntensity.toFixed(4)
-      );
-
-      this.performanceMetrics.cssVariableUpdates++;
-    } catch (error) {
-      if (this.config.enableDebug) {
-        console.warn(`[${this.systemName}] CSS variable update failed:`, error);
+    // Helper: prefer central batcher when available
+    const queueCSSUpdate = (property: string, value: string) => {
+      if (
+        (this.year3000System as any)?.queueCSSVariableUpdate &&
+        typeof (this.year3000System as any).queueCSSVariableUpdate ===
+          "function"
+      ) {
+        (this.year3000System as any).queueCSSVariableUpdate(property, value);
+      } else {
+        root.style.setProperty(property, value);
       }
-    }
+    };
+
+    queueCSSUpdate("--sn-breathing-scale", breathingScale.toFixed(4));
+    queueCSSUpdate("--sn-rhythm-phase", rhythmPhase.toFixed(4));
+
+    // Use local eased value instead of deprecated BeatFlashIntensity.intensity
+    const beatPulseIntensity = this.beatIntensity;
+    queueCSSUpdate("--sn-beat-pulse-intensity", beatPulseIntensity.toFixed(4));
+
+    // Map music energy → feed bloom gradient
+    const bloomIntensity = processedEnergy * 0.4;
+    queueCSSUpdate("--sn-feed-bloom-intensity", bloomIntensity.toFixed(3));
+
+    this.performanceMetrics.cssVariableUpdates++;
   }
 
   public getPerformanceReport() {
-    const currentTime = performance.now();
-    const elapsedTime = currentTime - this.performanceMetrics.memoryStartTime;
+    const duration = (performance.now() - this.performanceStartTime) / 1000;
     const currentMemory = this._getMemoryUsage();
     const memoryIncrease = Math.max(
       0,
@@ -431,14 +385,12 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
 
     return {
       systemName: this.systemName,
-      elapsedTime: elapsedTime.toFixed(1),
+      elapsedTime: duration.toFixed(1),
       animationUpdatesPerSecond: (
-        this.performanceMetrics.animationUpdates /
-        (elapsedTime / 1000)
+        this.performanceMetrics.animationUpdates / duration
       ).toFixed(1),
       cssUpdatesPerSecond: (
-        this.performanceMetrics.cssVariableUpdates /
-        (elapsedTime / 1000)
+        this.performanceMetrics.cssVariableUpdates / duration
       ).toFixed(1),
       memoryIncreaseKB: (memoryIncrease / 1024).toFixed(1),
       currentRhythmPhase: this.currentRhythmPhase.toFixed(3),
@@ -454,6 +406,35 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
     const visualIntensity = latestMusicData?.visualIntensity || 0.5;
 
     this.onBeatDetected(timestamp, energy, visualIntensity);
+
+    // === Phase 1: Spawn unified temporal echo on each beat ===
+    try {
+      // Derive tint hue from current energy/valence mapping helper
+      const tintHue = (this.currentEnergy ?? 0.5) * 360; // TODO: refine mapping using colour harmony engine
+
+      // Beat vector provides directional hint (x,y in viewport coords)
+      let x = window.innerWidth / 2;
+      let y = window.innerHeight / 2;
+      if (typeof this.musicSyncService?.getCurrentBeatVector === "function") {
+        const vec = this.musicSyncService.getCurrentBeatVector();
+        // Map vector (-1..1) to viewport px with small offset
+        x += (vec?.x ?? 0) * 80;
+        y += (vec?.y ?? 0) * 80;
+      }
+
+      echoPool.spawn(
+        { x, y },
+        {
+          tintHue,
+          radius: 120, // Base radius for beat echo; may be tuned later
+          intensity: 0.12,
+        }
+      );
+    } catch (e) {
+      if (this.config?.enableDebug) {
+        console.warn(`[BeatSyncVisualSystem] Echo spawn error:`, e);
+      }
+    }
   }
 
   private _scheduleNextBeat() {
@@ -560,12 +541,33 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
       1,
       this.beatIntensity + (energy * 0.5 + visualIntensity * 0.5)
     );
+
+    // Phase 3 – Emit cross-system beat event for NebulaController, etc.
+    try {
+      GlobalEventBus.publish("music:beat", {
+        energy,
+        bpm: this.currentBPM,
+        valence: (this.processedMusicData as any)?.valence ?? 0,
+      });
+    } catch (_e) {
+      /* silent fail */
+    }
   }
 
   public destroy() {
     this.disableHarmonicSync();
     this._stopBeatSync();
     this._stopAnimationLoop();
+
+    if (
+      this.crystallineOverlayElement &&
+      this.crystallineOverlayElement.parentElement
+    ) {
+      this.crystallineOverlayElement.parentElement.removeChild(
+        this.crystallineOverlayElement
+      );
+      this.crystallineOverlayElement = null;
+    }
 
     const rootStyle = Year3000Utilities.getRootStyle();
     if (rootStyle) {
@@ -958,4 +960,79 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
   public updateVisualIntensity() {
     // Placeholder for visual intensity update
   }
+
+  public start(): void {
+    Spicetify.Player.addEventListener("songchange", this.onSongChange);
+    this.onSongChange(); // Initial call for the current song
+  }
+
+  public stop(): void {
+    Spicetify.Player.removeEventListener("songchange", this.onSongChange);
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+    }
+  }
+
+  private async onSongChange(): Promise<void> {
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+    }
+
+    const currentTrack = Spicetify.Player.data?.item;
+    if (!currentTrack || !currentTrack.uri) {
+      return;
+    }
+
+    try {
+      this.analysis = await Spicetify.getAudioData(currentTrack.uri);
+      if (this.analysis && this.analysis.segments) {
+        this.update();
+      }
+    } catch (error) {
+      console.error("StarryNight: Failed to get audio data", error);
+      this.analysis = null;
+    }
+  }
+
+  private update(): void {
+    if (!this.analysis || !Spicetify.Player.isPlaying()) {
+      this.smoothedLoudness = 0; // Reset when paused
+      document.documentElement.style.setProperty(
+        "--sn-feed-bloom-intensity",
+        "0"
+      );
+      this.rafId = requestAnimationFrame(this.update);
+      return;
+    }
+
+    const progress = Spicetify.Player.getProgress() / 1000; // in seconds
+    const segment = this.analysis.segments.find(
+      (s: AudioSegment) =>
+        progress >= s.start && progress < s.start + s.duration
+    );
+
+    let currentLoudness = 0;
+    if (segment) {
+      // Normalize loudness from [-60, 0] dB to [0, 1]
+      const normalizedLoudness = (segment.loudness_max + 60) / 60;
+      currentLoudness = Math.max(0, Math.min(1, normalizedLoudness));
+    }
+
+    // Apply exponential smoothing
+    this.smoothedLoudness =
+      currentLoudness * this.SMOOTHING_FACTOR +
+      this.smoothedLoudness * (1 - this.SMOOTHING_FACTOR);
+
+    // Map smoothed loudness [0, 1] to bloom intensity [0, 0.4]
+    const bloomIntensity = this.smoothedLoudness * 0.4;
+
+    document.documentElement.style.setProperty(
+      "--sn-feed-bloom-intensity",
+      bloomIntensity.toFixed(3)
+    );
+
+    this.rafId = requestAnimationFrame(this.update);
+  }
 }
+
+export default BeatSyncVisualSystem;
