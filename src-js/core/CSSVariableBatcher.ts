@@ -43,7 +43,11 @@ interface PendingUpdate {
 
 interface BatcherState {
   pendingUpdates: Map<string, PendingUpdate>;
-  batchTimeout: NodeJS.Timeout | null;
+  /** requestAnimationFrame handle when a flush is scheduled, otherwise null */
+  rafHandle: number | null;
+  /** Flag indicating a flush has been scheduled via queueMicrotask() */
+  microtaskScheduled: boolean;
+  /** Kept for backward-compat diagnostics but no longer used for scheduling */
   batchIntervalMs: number;
   maxBatchSize: number;
   totalUpdates: number;
@@ -59,7 +63,7 @@ export class CSSVariableBatcher {
   constructor(config: Partial<CSSVariableBatcherConfig> = {}) {
     // Apply defaults first, then let the caller override.
     this.config = {
-      batchIntervalMs: config.batchIntervalMs ?? 16, // ~60 fps batch rate
+      batchIntervalMs: config.batchIntervalMs ?? 0, // 0 = coalesced; scheduling handled via rAF/microtask
       maxBatchSize: config.maxBatchSize ?? 50,
       enableDebug: config.enableDebug ?? false,
       useCssTextFastPath: config.useCssTextFastPath ?? false,
@@ -68,7 +72,8 @@ export class CSSVariableBatcher {
 
     this._cssVariableBatcher = {
       pendingUpdates: new Map(),
-      batchTimeout: null,
+      rafHandle: null,
+      microtaskScheduled: false,
       batchIntervalMs: this.config.batchIntervalMs,
       maxBatchSize: this.config.maxBatchSize,
       totalUpdates: 0,
@@ -116,11 +121,8 @@ export class CSSVariableBatcher {
     this._cssVariableBatcher.totalUpdates++;
     this._performanceMetrics.totalUpdates++;
 
-    if (!this._cssVariableBatcher.batchTimeout) {
-      this._cssVariableBatcher.batchTimeout = setTimeout(() => {
-        this._processCSSVariableBatch();
-      }, this._cssVariableBatcher.batchIntervalMs);
-    }
+    // Schedule a flush using the new micro-task + rAF strategy.
+    this._scheduleFlush();
 
     if (
       this._cssVariableBatcher.pendingUpdates.size >=
@@ -141,10 +143,11 @@ export class CSSVariableBatcher {
     );
 
     this._cssVariableBatcher.pendingUpdates.clear();
-    if (this._cssVariableBatcher.batchTimeout) {
-      clearTimeout(this._cssVariableBatcher.batchTimeout);
-      this._cssVariableBatcher.batchTimeout = null;
+    if (this._cssVariableBatcher.rafHandle !== null) {
+      cancelAnimationFrame(this._cssVariableBatcher.rafHandle);
+      this._cssVariableBatcher.rafHandle = null;
     }
+    this._cssVariableBatcher.microtaskScheduled = false;
 
     try {
       const updatesByElement = new Map<HTMLElement, PendingUpdate[]>();
@@ -252,11 +255,19 @@ export class CSSVariableBatcher {
   }
 
   public flushCSSVariableBatch(): void {
-    if (this._cssVariableBatcher.batchTimeout) {
-      clearTimeout(this._cssVariableBatcher.batchTimeout);
-      this._cssVariableBatcher.batchTimeout = null;
+    if (this._cssVariableBatcher.rafHandle !== null) {
+      cancelAnimationFrame(this._cssVariableBatcher.rafHandle);
+      this._cssVariableBatcher.rafHandle = null;
     }
+    this._cssVariableBatcher.microtaskScheduled = false;
     this._processCSSVariableBatch();
+  }
+
+  /**
+   * Alias for unit tests that need to synchronously flush the pending batch.
+   */
+  public flushNow(): void {
+    this.flushCSSVariableBatch();
   }
 
   public setBatchingEnabled(enabled: boolean): void {
@@ -377,11 +388,46 @@ export class CSSVariableBatcher {
 
   public destroy(): void {
     this.flushCSSVariableBatch();
-    if (this._cssVariableBatcher.batchTimeout) {
-      clearTimeout(this._cssVariableBatcher.batchTimeout);
+    if (this._cssVariableBatcher.rafHandle !== null) {
+      cancelAnimationFrame(this._cssVariableBatcher.rafHandle);
     }
     if (this.config.enableDebug) {
       console.log("🎨 [CSSVariableBatcher] Destroyed");
+    }
+  }
+
+  private _scheduleFlush(): void {
+    // Avoid double-scheduling.
+    if (
+      this._cssVariableBatcher.rafHandle !== null ||
+      this._cssVariableBatcher.microtaskScheduled
+    ) {
+      return;
+    }
+
+    const flushCallback = () => {
+      // Reset scheduling flags *before* processing so new updates inside
+      // _processCSSVariableBatch can schedule the next frame if required.
+      this._cssVariableBatcher.rafHandle = null;
+      this._cssVariableBatcher.microtaskScheduled = false;
+      this._processCSSVariableBatch();
+    };
+
+    // Prefer micro-tasks when the page is hidden (background tab) to avoid
+    // unnecessarily waking up the rendering pipeline.
+    if (
+      typeof document !== "undefined" &&
+      document.visibilityState === "hidden"
+    ) {
+      this._cssVariableBatcher.microtaskScheduled = true;
+      queueMicrotask(flushCallback);
+    } else if (typeof requestAnimationFrame === "function") {
+      this._cssVariableBatcher.rafHandle = requestAnimationFrame(() =>
+        flushCallback()
+      );
+    } else {
+      // Fallback (very old browsers / non-DOM env) — immediate flush.
+      setTimeout(flushCallback, 0);
     }
   }
 }

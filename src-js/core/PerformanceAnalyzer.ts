@@ -114,6 +114,7 @@ export class PerformanceAnalyzer {
   private _fpsCounter: FPSCounter | null = null;
   private timedOperations = new Map<string, number[]>();
   private _buckets: Map<string, number> = new Map();
+  private static _isLowEndCache: boolean | null = null;
 
   constructor(config: Partial<AnalyzerConfig> = {}) {
     this.config = {
@@ -380,4 +381,50 @@ export class PerformanceAnalyzer {
       console.log("📊 [PerformanceAnalyzer] Destroyed and cleaned up.");
     }
   }
+
+  /**
+   * Lightweight, synchronous heuristic to decide whether the current device
+   * should be treated as "low-end". This avoids the async overhead of
+   * `DeviceCapabilityDetector` while still giving callers a fast gate for
+   * performance-heavy logic.
+   *
+   * The heuristic intentionally stays conservative: we only mark devices as
+   * low-end when *multiple* indicators point in that direction to minimise
+   * false-positives on mid-tier hardware.
+   */
+  public static isLowEndDevice(): boolean {
+    // Return cached result if already computed – this helper can be called on
+    // every animation frame.
+    if (this._isLowEndCache !== null) {
+      return this._isLowEndCache;
+    }
+
+    try {
+      const deviceMemory = (navigator as any).deviceMemory ?? 4; // GB
+      const cpuCores = navigator.hardwareConcurrency ?? 4;
+
+      // Basic thresholds: < 4 GB RAM OR ≤ 2 cores → potential low-end.
+      const memoryFlag = deviceMemory < 4;
+      const coreFlag = cpuCores <= 2;
+
+      // Network information as a secondary signal (helps on mobile).
+      const connection = (navigator as any).connection || {};
+      const effectiveType = connection.effectiveType as string | undefined;
+      const slowNetworkFlag = ["slow-2g", "2g"].includes(effectiveType ?? "");
+
+      // Final decision – require at least one strong flag and one secondary flag
+      // to avoid misclassifying decent devices with a single weak metric.
+      const isLowEnd =
+        (memoryFlag && coreFlag) || (memoryFlag && slowNetworkFlag);
+
+      this._isLowEndCache = isLowEnd;
+      return isLowEnd;
+    } catch {
+      // If detection fails (e.g., non-browser env), presume not low-end.
+      this._isLowEndCache = false;
+      return false;
+    }
+  }
+
+  // --- End of static helpers ---
 }

@@ -50,9 +50,19 @@ interface SystemIntegrationMetrics {
 
 // YEAR 3000 DIMENSIONAL NEXUS SYSTEM - Performance Optimized
 export class DimensionalNexusSystem extends BaseVisualSystem {
-  // TODO: Implement abstract onAnimate method for Year 3000 MasterAnimationCoordinator
+  /**
+   * Frame callback invoked by the MasterAnimationCoordinator.
+   * Delegates to the existing `updateAnimation` implementation which
+   * contains the system's main per-frame logic (including internal
+   * frame-skipping and heavy-update cadence).
+   *
+   * @param deltaMs  Milliseconds elapsed since the previous animation frame.
+   */
   public onAnimate(deltaMs: number): void {
-    // Basic implementation - can be enhanced in future phases
+    if (!this.initialized) return;
+
+    // Use the established updateAnimation pathway to avoid duplicating logic.
+    this.updateAnimation(performance.now(), deltaMs);
   }
   private year3000System: Year3000System | null;
   private nexusState: NexusState;
@@ -72,6 +82,7 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
   private modalObserver: MutationObserver | null;
   private _lastScrollTime: number | null;
   private _lastScrollTop: number | null;
+  private _scrollContainerElements: HTMLElement[] = [];
 
   constructor(
     config: Year3000Config,
@@ -253,14 +264,45 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
   }
 
   private setupOptimizedInteractionListener() {
-    const interactionEvents = ["click", "mousemove", "scroll", "keydown"];
+    // Throttled handler shared by all interaction events
     const throttledHandler = this.utils.throttle(
       (event: Event) => this.recordUserInteraction(event),
       100
     );
-    interactionEvents.forEach((eventType) => {
+
+    // Attach generic interaction listeners to `document` (excluding scroll)
+    const genericEvents = ["click", "mousemove", "keydown"];
+    genericEvents.forEach((eventType) => {
       document.addEventListener(eventType, throttledHandler, { passive: true });
     });
+
+    // --- Scroll interaction binding -------------------------------------
+    // Spotify scrolls an inner container (e.g. playlist page section) and
+    // `scroll` does NOT bubble to `document`.  Bind directly to known
+    // containers so velocity can be captured.
+    const scrollSelectors = [
+      ".main-view-container__scroll-node",
+      ".main-view-container__scroll-node-child",
+      "section[data-testid='playlist-page']",
+    ];
+
+    const foundContainers: HTMLElement[] = [];
+    scrollSelectors.forEach((sel) => {
+      document.querySelectorAll<HTMLElement>(sel).forEach((el) => {
+        foundContainers.push(el);
+      });
+    });
+
+    // If no specific container found, fall back to document so behaviour
+    // degrades gracefully on unexpected layouts.
+    const targets = foundContainers.length ? foundContainers : [document];
+
+    targets.forEach((el) => {
+      el.addEventListener("scroll", throttledHandler, { passive: true });
+    });
+
+    // Keep reference for potential clean-up later.
+    this._scrollContainerElements = foundContainers;
   }
 
   public updateFromMusicAnalysis(

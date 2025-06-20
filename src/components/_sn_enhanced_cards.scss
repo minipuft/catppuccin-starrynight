@@ -9,7 +9,6 @@
 @use "./_sn_card_base";
 @use "./_sn_harmonic_aura" as *;
 @use "../core/_kinetic-animations" as *;
-@use "../systems/_sn_prediction_effects" as *;
 
 // Year 3000 Nexus Cards System Variables
 :root {
@@ -323,10 +322,6 @@
 
   // === Holographic Interaction State - YEAR 3000 ENHANCED ===
   &:hover {
-    // Phase 3: unified temporal echo effect
-    @extend .sn-temporal-echo;
-    --sn-kinetic-intensity: calc(0.1 * var(--motion-intelligence-level, 1));
-
     // Kinetic Verb: BLOOM - Contextual lift calculation with rhythm
     transform: var(--card-depth-near) scale(var(--calculated-scale))
       rotateY(calc(var(--card-rhythm-phase) * 1deg))
@@ -370,10 +365,11 @@
       -o-transform: scale(1);
     }
 
-    // ===== Artist Vision Mode: anticipatory shimmer on hover
-    [data-artistic-mode="cosmic-maximum"] &:hover {
-      @extend .sn-anticipatory-warmth;
-      --sn-anticipatory-hue: 0deg;
+    // Temporal Echo
+    &::after {
+      content: "";
+      @extend .sn-temporal-echo;
+      --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.18);
     }
   }
 
@@ -402,6 +398,15 @@
   &:active {
     transform: var(--card-depth-mid) scale(calc(var(--calculated-scale) * 0.98));
     transition: transform 0.1s ease;
+
+    // Slight shadow reduction for feedback
+    box-shadow: 0 2px 8px var(--card-shadow-base);
+
+    &::after {
+      content: "";
+      @extend .sn-temporal-echo;
+      --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.24);
+    }
   }
 }
 
@@ -784,6 +789,13 @@ body:not(:has(.main-searchPage-content)) {
       // Enhanced shadow (no transform needed)
       box-shadow: 0 8px 24px var(--card-shadow-base),
         0 4px 16px rgba(var(--spice-rgb-accent), 0.1);
+
+      // Temporal Echo
+      &::after {
+        content: "";
+        @extend .sn-temporal-echo;
+        --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.18);
+      }
     }
 
     // === Focus State Enhancement ===
@@ -796,6 +808,12 @@ body:not(:has(.main-searchPage-content)) {
     &:active {
       // Slight shadow reduction for feedback
       box-shadow: 0 2px 8px var(--card-shadow-base);
+
+      &::after {
+        content: "";
+        @extend .sn-temporal-echo;
+        --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.24);
+      }
     }
   }
 

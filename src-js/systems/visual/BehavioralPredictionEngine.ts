@@ -371,45 +371,61 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
     actionType: string,
     confidence: number
   ) {
-    // Phase 4: Respect prefers-reduced-motion by skipping shimmer
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return;
+    // Phase 4 – Respect prefers-reduced-motion
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return; // Skip anticipatory warmth animation entirely
     }
-
-    // Trigger only when confidence spikes above threshold (0.7)
-    if (confidence < 0.7) return;
-
     // Share predicted interaction target with PredictiveMaterializationSystem for resonance visuals
     if (this._predictiveSystem?.setTargetElement) {
       this._predictiveSystem.setTargetElement(element as HTMLElement);
     }
-    this.quantumEmpathy.currentActiveAnimations++;
-    const intensity = Math.min(1, confidence * 1.2);
-    element.classList.add("sn-anticipatory-warmth");
-    const hueShift = (Math.random() * 40 - 20).toFixed(1); // placeholder hue variance
-    (element as HTMLElement).style.setProperty(
-      "--sn-anticipatory-intensity",
-      intensity.toFixed(3)
-    );
-    (element as HTMLElement).style.setProperty(
-      "--sn-anticipatory-hue",
-      `${hueShift}deg`
-    );
-    (element as HTMLElement).style.setProperty(
-      "--sn-warmth-intensity",
-      `${intensity}`
-    );
-    (element as HTMLElement).style.setProperty(
-      "--sn-warmth-duration",
-      `${1500 - intensity * 500}ms`
-    );
 
-    const animationEndHandler = () => {
-      element.classList.remove("sn-anticipatory-warmth");
-      this.quantumEmpathy.currentActiveAnimations--;
-      element.removeEventListener("animationend", animationEndHandler);
-    };
-    element.addEventListener("animationend", animationEndHandler);
+    this.quantumEmpathy.currentActiveAnimations++;
+
+    // Map confidence (0.6-1) to warmth intensity 0.15-0.35 and duration 900-1500ms
+    const clamped = Math.max(0.6, Math.min(1, confidence));
+    const intensity = 0.15 + ((clamped - 0.6) / 0.4) * 0.2; // 0.15 → 0.35
+    const durationMs = 1500 - ((clamped - 0.6) / 0.4) * 600; // 1500 → 900ms
+
+    const hueShift = (Math.random() * 40 - 20).toFixed(1); // gentle hue variance
+
+    if (this._predictiveSystem?.triggerAnticipatoryWarmth) {
+      // Delegate warmth animation for color harmony with Materialization system
+      this._predictiveSystem.triggerAnticipatoryWarmth(element as HTMLElement, {
+        hue: parseFloat(hueShift),
+        intensity,
+        durationMs,
+      });
+    } else {
+      // Fallback: apply class & vars directly
+      element.classList.add("sn-anticipatory-warmth");
+      (element as HTMLElement).style.setProperty(
+        "--sn-anticipatory-intensity",
+        intensity.toFixed(3)
+      );
+      (element as HTMLElement).style.setProperty(
+        "--sn-anticipatory-hue",
+        `${hueShift}deg`
+      );
+      (element as HTMLElement).style.setProperty(
+        "--sn-warmth-intensity",
+        intensity.toFixed(3)
+      );
+      (element as HTMLElement).style.setProperty(
+        "--sn-warmth-duration",
+        `${durationMs}ms`
+      );
+      const animationEndHandler = () => {
+        element.classList.remove("sn-anticipatory-warmth");
+        this.quantumEmpathy.currentActiveAnimations--;
+        element.removeEventListener("animationend", animationEndHandler);
+      };
+      element.addEventListener("animationend", animationEndHandler);
+    }
   }
 
   public updateFromMusicAnalysis(
@@ -489,18 +505,8 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
    * Map confidence buckets to CSS classes defined in _sn_prediction_effects.scss.
    * The naming now aligns with the unified "sn-predict-" convention.
    */
-  getHighlightClasses(type: "default" | "strong"): string[] {
-    switch (type) {
-      case "strong":
-        // Strong predictions receive a brighter glow and a pulse.
-        return [
-          "sn-predict-glow", // vivid static glow
-          "sn-predict-pulse", // animated pulse
-        ];
-      default:
-        // Default predictions get only a subtle glow.
-        return ["sn-predict-subtle-glow"];
-    }
+  getHighlightClasses(_type: "default" | "strong" = "default"): string[] {
+    return ["sn-anticipatory-warmth"];
   }
 
   updateModeConfiguration(modeConfig: any) {

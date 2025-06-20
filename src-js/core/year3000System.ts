@@ -1151,6 +1151,31 @@ export class Year3000System {
     return true;
   }
 
+  /**
+   * Public accessor that returns a subsystem instance by its constructor name or
+   * by the conventional camel-cased property key. This is primarily used for
+   * loose coupling between visual systems (e.g. BehaviouralPredictionEngine ⇆
+   * PredictiveMaterializationSystem). Returns `null` when the requested system
+   * is not available or not yet initialised.
+   */
+  public getSystem<T = any>(name: string): T | null {
+    if (!name) return null;
+
+    // 1) Try camel-cased property convention (e.g. "PredictiveMaterializationSystem" → "predictiveMaterializationSystem")
+    const camel = name.charAt(0).toLowerCase() + name.slice(1);
+    if ((this as any)[camel]) return (this as any)[camel] as T;
+
+    // 2) Fallback: iterate own properties and match by constructor name
+    for (const key of Object.keys(this)) {
+      const maybeInstance = (this as any)[key];
+      if (maybeInstance && maybeInstance.constructor?.name === name) {
+        return maybeInstance as T;
+      }
+    }
+
+    return null;
+  }
+
   private async _registerAnimationSystems(): Promise<void> {
     if (!this.masterAnimationCoordinator) {
       console.warn(

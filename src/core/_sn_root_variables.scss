@@ -46,31 +46,18 @@
   );
 
   // === NAV ITEM ENTANGLEMENT VARIABLES ===
-  --sn-nav-item-base-opacity: 0.85;
-  --sn-nav-item-hover-bg-opacity: 0.1;
-  --sn-nav-item-active-bg-opacity: 0.15;
+  // NAV variables are now defined in the dedicated "Sidebar Navigation" section
+  // of the second :root block below. This keeps all navigation-specific
+  // tokens grouped together and avoids duplicate definitions that would
+  // otherwise be overwritten later in the file.
 
-  // Default RGB for glow - can be overridden by JS from theme accents
-  --sn-nav-item-glow-color-rgb: var(--sn-gradient-primary-rgb, "202,158,230");
-  --sn-nav-item-glow-intensity: 0; // 0 to 1, controlled by JS
+  /*
+    Removed duplicate NAV item variables.  Authoritative definitions live in
+    the second :root block under the "Sidebar Navigation Variables" heading.
+  */
 
-  // Default RGB for text energy - can be overridden by JS
-  --sn-nav-text-energy-color-rgb: var(--sn-gradient-accent-rgb, "140,170,238");
-  --sn-nav-text-energy-opacity: 0; // 0 to 0.5, controlled by JS
-
-  --sn-nav-item-transform-scale: 1; // 1 to 1.03, controlled by JS
-  --sn-nav-item-transition-duration: 0.3s;
-
-  // TODO[Y3K-PH1]: Anticipatory shimmer theme hooks
-  --sn-anticipatory-hue: 0deg; // runtime hue offset injected by BehavioralPredictionEngine
-  --sn-anticipatory-intensity: 0.18; // default opacity for shimmer (0–0.3)
-
-  // TODO[Y3K-PH2]: Predictive Materialization CSS hooks
-  --sn-materialize-imminence: 0; // 0–1, set by PredictiveMaterializationSystem
-  --sn-materialize-clarity: 0;   // 0–1, set by PredictiveMaterializationSystem
-
-  // Nebula fractal noise image used for sub-pixel grain dissolve (Phase 5)
-  --sn-nebula-noise-url: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4Ij48ZGVmcz48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjEuMiIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiAvPjwvc3ZnPg==");
+  // Quantum Foam variable defined here (system-wide). Duplicate definition
+  // removed from the later "Sidebar Navigation" section to avoid conflicts.
 }
 
 // ████████████████████████████████████████████████████████████████████████████████
@@ -126,9 +113,6 @@
   --sn-sidebar-temporal-blur: 0px;
   --sn-sidebar-item-bloom-intensity: 0.5;
   --sn-sidebar-energy-glow-opacity: 0.3;
-
-  // Quantum Foam Variables
-  --sn-quantum-foam-opacity: 0.03;
 
   // Easing Functions
   --sn-easing-explorer: cubic-bezier(0.25, 0.46, 0.45, 0.94);

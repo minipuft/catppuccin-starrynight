@@ -4,6 +4,14 @@
 // Centralized selector mappings based on SPOTIFY_DOM_TARGETING.md
 // Provides modern selectors and legacy fallbacks for Spicetify theming
 
+import { $$ } from "../utils/domCache";
+
+// ---------------------------------------------------------------------------
+// NOTE[Phase3]: Replaced repetitive querySelectorAll calls with WeakRef-caching
+// helper $$.  All look-ups inside this module should go through $$ from now on
+// to benefit from selector-level memoisation.
+// ---------------------------------------------------------------------------
+
 export const MODERN_SELECTORS: { [key: string]: string } = {
   // Main Layout Structure
   nowPlayingBar: ".Root__now-playing-bar",
@@ -137,7 +145,7 @@ export const ANTI_GRAVITY_ZONES: { [key: string]: string[] } = {
 
 // Utility function to check if an element exists
 export function elementExists(selector: string): boolean {
-  return document.querySelector(selector) !== null;
+  return $$(selector).length > 0;
 }
 
 // Utility function to find element with fallback
@@ -145,9 +153,12 @@ export function findElementWithFallback(
   modernSelector: string,
   legacySelector?: string
 ): Element | null {
-  let element = document.querySelector(modernSelector);
+  const modernMatches = $$(modernSelector);
+  let element: Element | null = modernMatches.length
+    ? (modernMatches[0] as Element)
+    : null;
   if (!element && legacySelector) {
-    element = document.querySelector(legacySelector);
+    element = ($$(legacySelector)[0] as Element | undefined) || null;
     if (element) {
       console.warn(
         `🌌 [SpotifyDOMSelectors] Using legacy selector: ${legacySelector}. Consider updating to: ${modernSelector}`
@@ -160,11 +171,12 @@ export function findElementWithFallback(
 // Utility function to get all elements with fallbacks
 export function findElementsWithFallback(
   modernSelector: string,
-  legacySelector?: string
-): NodeListOf<Element> {
-  let elements = document.querySelectorAll(modernSelector);
+  legacySelector?: string,
+  options?: { force?: boolean }
+): Element[] {
+  let elements = $$(modernSelector, options);
   if (elements.length === 0 && legacySelector) {
-    elements = document.querySelectorAll(legacySelector);
+    elements = $$(legacySelector, options);
     if (elements.length > 0) {
       console.warn(
         `🌌 [SpotifyDOMSelectors] Using legacy selector: ${legacySelector}. Consider updating to: ${modernSelector}`
@@ -189,7 +201,7 @@ export function validateSpotifyDOM(): any {
     results.details[key] = {
       selector,
       exists,
-      element: exists ? document.querySelector(selector) : null,
+      element: exists ? $$(selector)[0] || null : null,
     };
 
     if (exists) {
@@ -216,7 +228,7 @@ export function testGravitySystemSelectors(): void {
   console.log("🎯 Primary gravity well targets:");
   if (GRAVITY_WELL_TARGETS.primary) {
     GRAVITY_WELL_TARGETS.primary.forEach((selector) => {
-      const element = document.querySelector(selector);
+      const element = $$(selector)[0] || null;
       console.log(`${element ? "✅" : "❌"} ${selector}`, element);
     });
   }
@@ -224,14 +236,14 @@ export function testGravitySystemSelectors(): void {
   console.log("🎯 Secondary gravity well targets:");
   if (GRAVITY_WELL_TARGETS.secondary) {
     GRAVITY_WELL_TARGETS.secondary.forEach((selector) => {
-      const element = document.querySelector(selector);
+      const element = $$(selector)[0] || null;
       console.log(`${element ? "✅" : "❌"} ${selector}`, element);
     });
   }
 
   console.log("🛸 Orbital elements:");
   Object.entries(ORBITAL_ELEMENTS).forEach(([key, selector]) => {
-    const elements = document.querySelectorAll(selector);
+    const elements = $$(selector);
     console.log(
       `${elements.length > 0 ? "✅" : "❌"} ${key} (${selector}): ${
         elements.length

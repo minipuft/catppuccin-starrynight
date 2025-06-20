@@ -29,6 +29,9 @@ interface SystemConfig {
   totalTime: number;
   maxFrameTime: number;
   skippedFrames: number;
+  recentFrameTimes: number[];
+  overBudgetHits: number;
+  lastAdjustment: number;
 }
 
 interface PerformanceMetrics {
@@ -98,6 +101,9 @@ export class MasterAnimationCoordinator {
       totalTime: 0,
       maxFrameTime: 0,
       skippedFrames: 0,
+      recentFrameTimes: [],
+      overBudgetHits: 0,
+      lastAdjustment: 0,
     };
 
     this._animationSystemRegistry.set(systemName, systemConfig);
@@ -243,6 +249,68 @@ export class MasterAnimationCoordinator {
 
         remainingBudget -= systemExecutionTime;
 
+        // -----------------------------------------------------------------
+        // TODO[Phase1] Adaptive Frame Governance — evaluate performance of
+        // each system and dynamically expand/contract its frameInterval.
+        // -----------------------------------------------------------------
+        {
+          // 1️⃣ Maintain rolling execution-time buffer (20 samples ≈ 333 ms@60FPS)
+          config.recentFrameTimes.push(systemExecutionTime);
+          if (config.recentFrameTimes.length > 20) {
+            config.recentFrameTimes.shift();
+          }
+
+          // 2️⃣ Track over-budget hits for the current 2 s observation window
+          if (systemExecutionTime > config.frameInterval) {
+            config.overBudgetHits++;
+          }
+
+          // 3️⃣ Every ~2 s decide whether we need to stretch or contract
+          if (timestamp - config.lastAdjustment > 2000) {
+            const avgExec =
+              config.recentFrameTimes.reduce((a, b) => a + b, 0) /
+              config.recentFrameTimes.length;
+
+            // Expand slice when budget blown ≥ 3 × within window
+            if (config.overBudgetHits >= 3 && config.frameInterval < 1000) {
+              config.frameInterval = Math.min(config.frameInterval * 1.5, 1000);
+              config.lastAdjustment = timestamp;
+              config.overBudgetHits = 0;
+              if (this.config.enableDebug) {
+                console.warn(
+                  `🎬 [MAC] Auto-expanded frameInterval for ${systemName} → ${config.frameInterval.toFixed(
+                    1
+                  )} ms`
+                );
+              }
+            }
+
+            // Contract slice when sustained head-room > 40 %
+            const idealInterval = 1000 / config.targetFPS;
+            const headroom = this._frameTimeBudget - avgExec;
+            if (
+              headroom > this._frameTimeBudget * 0.4 &&
+              config.frameInterval > idealInterval + 0.5
+            ) {
+              config.frameInterval = Math.max(
+                idealInterval,
+                config.frameInterval * 0.8
+              );
+              config.lastAdjustment = timestamp;
+              if (this.config.enableDebug) {
+                console.info(
+                  `🎬 [MAC] Contracted frameInterval for ${systemName} → ${config.frameInterval.toFixed(
+                    1
+                  )} ms`
+                );
+              }
+            }
+
+            // Reset over-budget counter every evaluation window regardless
+            config.overBudgetHits = 0;
+          }
+        }
+
         if (systemExecutionTime > 5 && this.config.enableDebug) {
           console.warn(
             `🎬 [MasterAnimationCoordinator] System ${systemName} took ${systemExecutionTime.toFixed(
@@ -344,5 +412,12 @@ export class MasterAnimationCoordinator {
     if (this.config.enableDebug) {
       console.log("🎬 [MasterAnimationCoordinator] Destroyed");
     }
+  }
+
+  // -----------------------------------------------------------------------
+  // TODO[Phase1] Expose a shallow-cloned metrics report for external tooling
+  // -----------------------------------------------------------------------
+  public getPerformanceReport() {
+    return JSON.parse(JSON.stringify(this._performanceMetrics));
   }
 }

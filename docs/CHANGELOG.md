@@ -9,6 +9,7 @@
 - Consolidated duplicated variables into `_sidebar_background_effects.scss`.
 - Removed import of deprecated `src/systems/_sn_dimensional_nexus.scss` from build.
 - Updated import order in `src/core/_main.scss` to ensure background → interactive → nexus hierarchy.
+- Removed all resolved `TODO[Y3K-*]` comment markers from SCSS core files after full implementation of anticipatory shimmer (PH1) and predictive materialization (PH2) hooks.
 
 ### Removed
 

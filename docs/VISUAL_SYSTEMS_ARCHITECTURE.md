@@ -120,34 +120,42 @@ It details:
 
 This system lives under `src-js/effects/Aberration/` and was finalised in **Phase 6 (June 2025)**.
 
-## Temporal Echo Contract (Phase 1–5)
+## 🌠 Temporal Echo Contract (Phase 4)
 
-The `.sn-temporal-echo` element is now the **single source of truth** for transient ripple / echo visuals across StarryNight. All interactive systems must use `echoPool.spawn()` or `echoPool.spawnBehind()` to create instances.
+The **Temporal Echo** is the canonical ripple / pulse primitive used across all
+visual systems. A single SCSS class (`.sn-temporal-echo`) together with a small
+set of CSS custom properties replaces a dozen bespoke key-frames. Every system now spawns an echo via DOM (JS) or extends the class
+in CSS.
 
-### CSS Custom Properties injected
+| CSS Variable                  | Purpose                                       | Typical Range                                         |
+| ----------------------------- | --------------------------------------------- | ----------------------------------------------------- |
+| `--sn-echo-radius-multiplier` | Scales core radius of the expanding circle    | `0.8 – 2.4`                                           |
+| `--sn-echo-hue-shift`         | Hue rotation applied to `filter:hue-rotate()` | `-40deg – +40deg` based on track valence              |
+| `--sn-kinetic-intensity`      | Overall opacity / blur multiplier (0 = muted) | `0 – 0.5` controlled by **motion-intelligence-level** |
+| `--sn-echo-offset-x`          | X-axis positional nudge (noise + beat)        | `-12px – +12px`                                       |
+| `--sn-echo-offset-y`          | Y-axis positional nudge                       | `-12px – +12px`                                       |
+| `--sn-echo-skew`              | Minor `skewX()` flavour                       | `-6deg – +6deg`                                       |
+| `--sn-echo-rotate`            | Start angle for radial mask                   | `0deg – 360deg`                                       |
 
-| Variable                      | Purpose                                        | Range                        |
-| ----------------------------- | ---------------------------------------------- | ---------------------------- |
-| `--sn-echo-hue`               | Base hue in **deg** applied via `hue-rotate()` | 0 – 360                      |
-| `--sn-kinetic-intensity`      | Drives opacity / blur strength                 | 0 – 1                        |
-| `--sn-echo-radius-multiplier` | Controlled by JS `radius / 16`                 | 0.8 – 3                      |
-| `--sn-echo-decay-curve`       | Easing curve (token)                           | `var(--sn-easing-emergence)` |
-
-### JS API
+### Lifecycle
 
 ```
-import { echoPool } from '@/utils/echoPool';
-
-echoPool.spawn(targetOrVector, {
-  tintHue: 220,     // deg
-  radius: 120,      // px
-  offset: 4,        // beat-vector multiplier (optional)
-  intensity: 0.2    // 0-1
-});
+┌────────── UI-interaction / beat-peak / prediction ──────────┐
+│  Visual system calls `addTemporalEcho(hostElement)`         │
+├─────────────────────────────────────────────────────────────┤
+│ 1. Echo element acquired from pool (≤ dynamicMaxEchoes)     │
+│ 2. Inline CSS vars injected (energy, valence, NoiseField)   │
+│ 3. Element appended → CSS handles animation (600–1000 ms)   │
+│ 4. On `animationend` → element recycled into pool           │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-• Elements are **pooled** (max 32) to avoid DOM churn.
-• Reduced-motion users automatically skip echo animations via media query.
-• Echoes inherit a noise mask (`mask-image: var(--sn-nebula-noise-url)`) and `year3000-grain-shift` animation for coherence with atmospheric grain.
+### Accessibility
 
-> NOTE: Legacy classes `.sn-ripple-active`, `.sn-ocean-ripple` etc. are deprecated—do **not** use them in new code.
+The constructor of each system lazily caches `prefers-reduced-motion`. Spawning
+is **skipped entirely** when the user prefers reduced motion or when the
+`sn-echo-intensity` setting is `0`. This guarantees a motion-free experience
+without double-rendering.
+
+> **Contract Rule:** Systems **MUST NOT** mutate the echo's key-frames – visual
+> variation is expressed only through the variables above.

@@ -93,6 +93,11 @@ patchReactRequire();
     10000
   );
 
+  // Initialize light-weight prismatic scroll sheen once scroll node is confirmed.
+  import("./effects/prismaticScrollSheen").then((m) =>
+    m.initializePrismaticScrollSheen?.()
+  );
+
   // Determine if we can run in full mode or degraded mode
   const hasRequiredAPIs =
     requiredAPIs.player && requiredAPIs.platform && mainContainer;

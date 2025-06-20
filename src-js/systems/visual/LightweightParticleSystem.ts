@@ -132,8 +132,17 @@ export class LightweightParticleSystem extends BaseVisualSystem {
     particle.vr = (Math.random() - 0.5) * 0.08 * (speedFactor || 1);
   }
 
-  // TODO: Implement abstract onAnimate method for Year 3000 MasterAnimationCoordinator
+  /**
+   * Per-frame callback from the MasterAnimationCoordinator. Delegates to the
+   * established `updateAnimation` pathway so that particle rendering continues
+   * to obey the existing logic – including potential fallback loops created
+   * earlier in the system's lifecycle.
+   *
+   * @param deltaMs   Milliseconds elapsed since the previous frame.
+   */
   public onAnimate(deltaMs: number): void {
+    if (!this.initialized) return;
+
     this.updateAnimation(performance.now(), deltaMs);
   }
 

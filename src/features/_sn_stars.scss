@@ -243,14 +243,6 @@
   z-index: -5;
   overflow: hidden;
 
-  // Add grain-dissolve masking for fade-outs (Phase 2)
-  @supports (mask-image: url("dummy")) {
-    mask-image: var(--sn-nebula-noise-url);
-    mask-size: 300% 300%;
-    mask-repeat: repeat;
-    animation: year3000-grain-shift 6s linear infinite;
-  }
-
   // Enhanced hardware acceleration
   @include performance-optimized;
   transform-style: preserve-3d;

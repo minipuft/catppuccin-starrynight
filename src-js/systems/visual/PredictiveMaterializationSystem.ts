@@ -4,8 +4,8 @@ import { Year3000System } from "@/core/year3000System";
 import { SettingsManager } from "@/managers/SettingsManager";
 import { MusicSyncService } from "@/services/MusicSyncService";
 import type { Year3000Config } from "@/types/models";
-import { echoPool } from "@/utils/echoPool";
 import * as Year3000Utilities from "@/utils/Year3000Utilities";
+import { sample as sampleNoise } from "../../utils/NoiseField";
 import { BaseVisualSystem } from "../BaseVisualSystem";
 
 // Interface for the music analysis data shape
@@ -70,36 +70,22 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
     const target = this.materializationState.targetElement;
     if (!target) return;
 
-    // Ensure class isn't already active to avoid stacking animations
-    if (target.classList.contains("sn-materialize-resonance")) return;
+    // When imminence ≥ 0.7 spawn mega echo; else fallback to previous glow.
+    if (this.materializationState.imminence >= 0.7) {
+      this._spawnMegaEcho(target);
+    } else {
+      target.classList.add("sn-materialize-resonance");
 
-    target.classList.add(
-      "sn-materialize-resonance",
-      "sn-predict-materialize-glow"
-    );
-
-    const handleEnd = () => {
-      target.classList.remove("sn-materialize-resonance");
-      target.removeEventListener("animationend", handleEnd);
-    };
-    target.addEventListener("animationend", handleEnd, { once: true });
-
-    // === Phase 1: Spawn mega echo when imminence high ===
-    if (
-      this.materializationState.imminence >= 0.7 &&
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      const tintHue = (this.materializationState.clarity ?? 0.5) * 360;
-      echoPool.spawn(target, {
-        tintHue,
-        radius: 160, // Mega ripple radius (2× base ~80)
-        intensity: 0.4,
-      });
+      const handleEnd = () => {
+        target.classList.remove("sn-materialize-resonance");
+        target.removeEventListener("animationend", handleEnd);
+      };
+      target.addEventListener("animationend", handleEnd, { once: true });
     }
 
     if (this.config?.enableDebug) {
       console.debug(
-        `[${this.systemName}] Materialize resonance triggered on`,
+        `[${this.systemName}] Materialization event on`,
         target,
         `imminence=${this.materializationState.imminence.toFixed(
           2
@@ -113,6 +99,12 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
   private modeConfig?: Partial<ModeConfig>;
   private materializationIntensity: number = 1.0;
   private materializationSpeed: number = 1.0;
+
+  // === Temporal Echo Pool ===
+  private echoPool: HTMLElement[] = [];
+  private currentEchoCount: number = 0;
+  private static readonly BASE_MAX_ECHOES = 4;
+  private _elementsWithActiveEcho: WeakSet<HTMLElement> = new WeakSet();
 
   constructor(
     config: Year3000Config,
@@ -336,5 +328,93 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
         target
       );
     }
+  }
+
+  // -------------------------------------------------------------------------
+  // ⚡ TEMPORAL ECHO HELPERS
+  // -------------------------------------------------------------------------
+
+  private get echoIntensitySetting(): number {
+    const val = this.settingsManager?.get?.("sn-echo-intensity") ?? "2";
+    const parsed = parseInt(val as string, 10);
+    return isNaN(parsed) ? 2 : parsed;
+  }
+
+  private get dynamicMaxEchoes(): number {
+    switch (this.echoIntensitySetting) {
+      case 0:
+        return 0;
+      case 1:
+        return Math.ceil(PredictiveMaterializationSystem.BASE_MAX_ECHOES / 2);
+      case 3:
+        return PredictiveMaterializationSystem.BASE_MAX_ECHOES * 2;
+      default:
+        return PredictiveMaterializationSystem.BASE_MAX_ECHOES;
+    }
+  }
+
+  private _acquireEchoElement(): HTMLElement {
+    let el = this.echoPool.pop();
+    if (el) {
+      el.style.animation = "none";
+      void el.offsetWidth;
+      el.style.animation = "";
+    } else {
+      el = document.createElement("div");
+      el.className = "sn-temporal-echo";
+    }
+    return el;
+  }
+
+  private _releaseEchoElement(el: HTMLElement) {
+    if (this.echoPool.length < 20) this.echoPool.push(el);
+  }
+
+  private _spawnMegaEcho(element: HTMLElement) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (this.currentEchoCount >= this.dynamicMaxEchoes) return;
+    if (this.echoIntensitySetting === 0) return;
+
+    if (this._elementsWithActiveEcho.has(element)) return;
+
+    const musicData = this.musicSyncService?.getLatestProcessedData() ?? {};
+    const energy = musicData.energy ?? 0.5;
+    const valence = musicData.valence ?? 0.5;
+
+    const baseRadius = Math.min(1.6, 1 + energy * 0.4);
+    const radius = Math.min(baseRadius * 2, 2.4); // mega echo radius ×2
+    const hueShift = ((valence - 0.5) * 40).toFixed(1);
+
+    const rect = element.getBoundingClientRect();
+    const normX = rect.left / window.innerWidth;
+    const normY = rect.top / window.innerHeight;
+    const vec = sampleNoise(normX, normY);
+
+    const offsetMagnitude = 10 + energy * 10;
+    let offsetX = vec.x * offsetMagnitude;
+    let offsetY = vec.y * offsetMagnitude;
+    const skewDeg = vec.x * 6;
+
+    const baseAngle = (Math.random() * 360).toFixed(1);
+
+    const echo = this._acquireEchoElement();
+    echo.style.setProperty("--sn-echo-radius-multiplier", radius.toFixed(2));
+    echo.style.setProperty("--sn-echo-hue-shift", `${hueShift}deg`);
+    echo.style.setProperty("--sn-echo-offset-x", `${offsetX.toFixed(1)}px`);
+    echo.style.setProperty("--sn-echo-offset-y", `${offsetY.toFixed(1)}px`);
+    echo.style.setProperty("--sn-echo-skew", `${skewDeg.toFixed(2)}deg`);
+    echo.style.setProperty("--sn-echo-rotate", `${baseAngle}deg`);
+    echo.style.setProperty("--sn-kinetic-intensity", "0.4");
+
+    element.appendChild(echo);
+    this.currentEchoCount++;
+    this._elementsWithActiveEcho.add(element);
+
+    setTimeout(() => {
+      if (echo.parentElement) echo.parentElement.removeChild(echo);
+      this.currentEchoCount--;
+      this._releaseEchoElement(echo);
+      this._elementsWithActiveEcho.delete(element);
+    }, 1300);
   }
 }

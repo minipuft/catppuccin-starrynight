@@ -1,10 +1,10 @@
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
 import { MusicSyncService } from "@/services/MusicSyncService";
 import type { Year3000Config } from "@/types/models";
-import { echoPool } from "@/utils/echoPool";
 import { HARMONIC_MODES } from "../../config/globalConfig";
 import { Year3000System } from "../../core/year3000System";
 import { SettingsManager } from "../../managers/SettingsManager";
+import { sample as sampleNoise } from "../../utils/NoiseField";
 import * as Year3000Utilities from "../../utils/Year3000Utilities";
 import { BaseVisualSystem } from "../BaseVisualSystem";
 
@@ -56,6 +56,13 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
   private deviceCapabilities: DeviceCapabilities;
   private animationState: AnimationState;
   public modeConfig: any;
+
+  // === Temporal Echo Pool ===
+  private echoPool: HTMLElement[] = [];
+  private currentEchoCount: number = 0;
+  private static readonly BASE_MAX_ECHOES = 4;
+
+  private _elementsWithActiveEcho: WeakSet<HTMLElement> = new WeakSet();
 
   constructor(
     config: Year3000Config,
@@ -135,6 +142,20 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     this._createConsciousnessVisualizer();
     this.createHarmonicModeDisplay();
     this.updateColors();
+
+    // Attach focus & hover listeners for nav items → spawn echo
+    if (this.rootNavBar) {
+      const handler = (evt: Event) => {
+        const el = evt.target as HTMLElement;
+        if (!el || !(el instanceof HTMLElement)) return;
+        if (el.matches("a, button, [role='link']")) {
+          this._spawnNavEcho(el as HTMLElement);
+        }
+      };
+      this.rootNavBar.addEventListener("focusin", handler, true);
+      this.rootNavBar.addEventListener("pointerenter", handler, true);
+    }
+
     this._tryRegisterWithMasterAnimation();
     this._setupResizeObserver();
   }
@@ -341,25 +362,6 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     applyCss("--sn-nav-item-glow-intensity", `${glow}`);
     applyCss("--sn-nav-text-energy-opacity", `${textOpacity}`);
     applyCss("--sidebar-intensity", `${visualIntensity}`);
-
-    // === Phase 1: Spawn echo behind focused / hovered nav item ===
-    // Guard for reduced-motion users
-    if (!this.deviceCapabilities.reducedMotion) {
-      const focused = this.rootNavBar.querySelector<HTMLElement>(
-        '.main-navBar-navLink[aria-current="page"], .main-navBar-navLink:focus'
-      );
-      if (focused) {
-        const hueVar = getComputedStyle(focused).getPropertyValue(
-          "--sidebar-focus-hue"
-        );
-        const tintHue = parseFloat(hueVar) || glow * 360;
-        echoPool.spawnBehind(focused, {
-          tintHue,
-          radius: 80,
-          intensity: glow * 0.6,
-        });
-      }
-    }
   }
 
   public updateFromMusicAnalysis(
@@ -416,5 +418,96 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
       });
     }
     super.destroy();
+  }
+
+  // -------------------------------------------------------------------------
+  // ⚡ TEMPORAL ECHO HELPERS (shared with BeatSync/DataGlyph)
+  // -------------------------------------------------------------------------
+
+  private get echoIntensitySetting(): number {
+    const val = this.settingsManager?.get?.("sn-echo-intensity") ?? "2";
+    const parsed = parseInt(val as string, 10);
+    return isNaN(parsed) ? 2 : parsed;
+  }
+
+  private get dynamicMaxEchoes(): number {
+    switch (this.echoIntensitySetting) {
+      case 0:
+        return 0;
+      case 1:
+        return Math.ceil(SidebarConsciousnessSystem.BASE_MAX_ECHOES / 2);
+      case 3:
+        return SidebarConsciousnessSystem.BASE_MAX_ECHOES * 2;
+      default:
+        return SidebarConsciousnessSystem.BASE_MAX_ECHOES;
+    }
+  }
+
+  private _acquireEchoElement(): HTMLElement {
+    let el = this.echoPool.pop();
+    if (el) {
+      el.style.animation = "none";
+      void el.offsetWidth;
+      el.style.animation = "";
+    } else {
+      el = document.createElement("div");
+      el.className = "sn-temporal-echo";
+    }
+    return el;
+  }
+
+  private _releaseEchoElement(el: HTMLElement) {
+    if (this.echoPool.length < 20) this.echoPool.push(el);
+  }
+
+  private _spawnNavEcho(element: HTMLElement) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (this.currentEchoCount >= this.dynamicMaxEchoes) return;
+    if (this.echoIntensitySetting === 0) return;
+
+    if (this._elementsWithActiveEcho.has(element)) return;
+
+    const musicData = this.musicSyncService?.getLatestProcessedData() ?? {};
+    const energy = musicData.energy ?? 0.5;
+    const valence = musicData.valence ?? 0.5;
+
+    const radius = Math.min(1.4, 1 + energy * 0.4);
+    const hueShift = ((valence - 0.5) * 40).toFixed(1);
+
+    const rect = element.getBoundingClientRect();
+    const normX = rect.left / window.innerWidth;
+    const normY = rect.top / window.innerHeight;
+    const vec = sampleNoise(normX, normY);
+
+    const beatVec = this.musicSyncService?.getCurrentBeatVector?.() ?? {
+      x: 0,
+      y: 0,
+    };
+
+    const offsetMagnitude = 6 + energy * 6;
+    let offsetX = (vec.x + beatVec.x) * offsetMagnitude;
+    let offsetY = (vec.y + beatVec.y) * offsetMagnitude;
+    const skewDeg = vec.x * 6;
+
+    const baseAngle = (Math.random() * 360).toFixed(1);
+
+    const echo = this._acquireEchoElement();
+    echo.style.setProperty("--sn-echo-radius-multiplier", radius.toFixed(2));
+    echo.style.setProperty("--sn-echo-hue-shift", `${hueShift}deg`);
+    echo.style.setProperty("--sn-echo-offset-x", `${offsetX.toFixed(1)}px`);
+    echo.style.setProperty("--sn-echo-offset-y", `${offsetY.toFixed(1)}px`);
+    echo.style.setProperty("--sn-echo-skew", `${skewDeg.toFixed(2)}deg`);
+    echo.style.setProperty("--sn-echo-rotate", `${baseAngle}deg`);
+
+    element.appendChild(echo);
+    this.currentEchoCount++;
+    this._elementsWithActiveEcho.add(element);
+
+    setTimeout(() => {
+      if (echo.parentElement) echo.parentElement.removeChild(echo);
+      this.currentEchoCount--;
+      this._releaseEchoElement(echo);
+      this._elementsWithActiveEcho.delete(element);
+    }, 1100);
   }
 }

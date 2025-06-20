@@ -9,9 +9,9 @@ import type {
   HarmonicSyncState,
 } from "@/types/beatSync";
 import type { Year3000Config } from "@/types/models";
-import { echoPool } from "@/utils/echoPool";
 import * as Year3000Utilities from "@/utils/Year3000Utilities";
 import { Year3000System } from "../../core/year3000System";
+import { sample as sampleNoise } from "../../utils/NoiseField";
 import { BaseVisualSystem } from "../BaseVisualSystem";
 
 interface AudioSegment {
@@ -28,6 +28,11 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
   public animationFrameId: number | null = null;
   private lastBeatTime: number = 0;
   private beatIntensity: number = 0;
+  // === Temporal Echo Pool (shared logic with DataGlyphSystem) ===
+  private echoPool: HTMLElement[] = [];
+  private currentEchoCount: number = 0;
+  private static readonly BASE_MAX_ECHOES = 6;
+  private _elementsWithActiveEcho: WeakSet<HTMLElement> = new WeakSet();
 
   private currentBPM: number = 120;
   private enhancedBPM: number = 120;
@@ -406,35 +411,6 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
     const visualIntensity = latestMusicData?.visualIntensity || 0.5;
 
     this.onBeatDetected(timestamp, energy, visualIntensity);
-
-    // === Phase 1: Spawn unified temporal echo on each beat ===
-    try {
-      // Derive tint hue from current energy/valence mapping helper
-      const tintHue = (this.currentEnergy ?? 0.5) * 360; // TODO: refine mapping using colour harmony engine
-
-      // Beat vector provides directional hint (x,y in viewport coords)
-      let x = window.innerWidth / 2;
-      let y = window.innerHeight / 2;
-      if (typeof this.musicSyncService?.getCurrentBeatVector === "function") {
-        const vec = this.musicSyncService.getCurrentBeatVector();
-        // Map vector (-1..1) to viewport px with small offset
-        x += (vec?.x ?? 0) * 80;
-        y += (vec?.y ?? 0) * 80;
-      }
-
-      echoPool.spawn(
-        { x, y },
-        {
-          tintHue,
-          radius: 120, // Base radius for beat echo; may be tuned later
-          intensity: 0.12,
-        }
-      );
-    } catch (e) {
-      if (this.config?.enableDebug) {
-        console.warn(`[BeatSyncVisualSystem] Echo spawn error:`, e);
-      }
-    }
   }
 
   private _scheduleNextBeat() {
@@ -541,6 +517,13 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
       1,
       this.beatIntensity + (energy * 0.5 + visualIntensity * 0.5)
     );
+
+    // === Spawn beat echo ==================================================
+    try {
+      this._spawnBeatEcho();
+    } catch (_e) {
+      /* silent */
+    }
 
     // Phase 3 – Emit cross-system beat event for NebulaController, etc.
     try {
@@ -1032,6 +1015,102 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
     );
 
     this.rafId = requestAnimationFrame(this.update);
+  }
+
+  // -------------------------------------------------------------------------
+  // ⚡ TEMPORAL ECHO HELPERS
+  // -------------------------------------------------------------------------
+
+  /** Returns user-setting echo intensity (0–3). */
+  private get echoIntensitySetting(): number {
+    const val = this.settingsManager?.get?.("sn-echo-intensity") ?? "2";
+    const parsed = parseInt(val as string, 10);
+    return isNaN(parsed) ? 2 : parsed;
+  }
+
+  /** Calculates dynamic max echoes based on intensity. */
+  private get dynamicMaxEchoes(): number {
+    switch (this.echoIntensitySetting) {
+      case 0:
+        return 0;
+      case 1:
+        return Math.ceil(BeatSyncVisualSystem.BASE_MAX_ECHOES / 2);
+      case 3:
+        return BeatSyncVisualSystem.BASE_MAX_ECHOES * 2;
+      default:
+        return BeatSyncVisualSystem.BASE_MAX_ECHOES;
+    }
+  }
+
+  /** Acquire pooled echo or create new element */
+  private _acquireEchoElement(): HTMLElement {
+    let el = this.echoPool.pop();
+    if (el) {
+      el.style.animation = "none";
+      // Force reflow to restart animation
+      void el.offsetWidth;
+      el.style.animation = "";
+    } else {
+      el = document.createElement("div");
+      el.className = "sn-temporal-echo";
+    }
+    return el;
+  }
+
+  /** Return echo element back to pool */
+  private _releaseEchoElement(el: HTMLElement) {
+    if (this.echoPool.length < 20) {
+      this.echoPool.push(el);
+    }
+  }
+
+  /** Spawns a temporal echo at the centre of crystalline overlay */
+  private _spawnBeatEcho() {
+    // Accessibility guard
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    if (this.currentEchoCount >= this.dynamicMaxEchoes) return;
+    if (this.echoIntensitySetting === 0) return;
+
+    const musicData = this.musicSyncService?.getLatestProcessedData() ?? {};
+    const energy = musicData.energy ?? 0.5;
+    const valence = musicData.valence ?? 0.5;
+
+    const intensityFactor = 0.2 * this.echoIntensitySetting;
+    const radius = Math.min(1.6, 1 + energy * 0.4 + intensityFactor);
+    const hueShift = ((valence - 0.5) * 40).toFixed(1);
+
+    // Use noise field & beat vector for subtle offset --------------------------------
+    const vec = sampleNoise(Math.random(), Math.random());
+    const beatVec = this.musicSyncService?.getCurrentBeatVector?.() ?? {
+      x: 0,
+      y: 0,
+    };
+
+    const offsetMagnitude = 8 + energy * 8;
+    let offsetX = (vec.x + beatVec.x) * offsetMagnitude;
+    let offsetY = (vec.y + beatVec.y) * offsetMagnitude;
+    const skewDeg = vec.x * 6;
+
+    const baseAngle = (Math.random() * 360).toFixed(1);
+
+    const echo = this._acquireEchoElement();
+    echo.style.setProperty("--sn-echo-radius-multiplier", radius.toFixed(2));
+    echo.style.setProperty("--sn-echo-hue-shift", `${hueShift}deg`);
+    echo.style.setProperty("--sn-echo-offset-x", `${offsetX.toFixed(1)}px`);
+    echo.style.setProperty("--sn-echo-offset-y", `${offsetY.toFixed(1)}px`);
+    echo.style.setProperty("--sn-echo-skew", `${skewDeg.toFixed(2)}deg`);
+    echo.style.setProperty("--sn-echo-rotate", `${baseAngle}deg`);
+
+    const host = this.crystallineOverlayElement ?? document.body;
+    host.appendChild(echo);
+    this.currentEchoCount++;
+
+    setTimeout(() => {
+      if (echo.parentElement) echo.parentElement.removeChild(echo);
+      this.currentEchoCount--;
+      this._releaseEchoElement(echo);
+    }, 1250);
   }
 }
 

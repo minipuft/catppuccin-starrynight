@@ -47,3 +47,6 @@ build/
 docs/IMPLEMENTAION_NOTES.md
 /.cursor
 year3000.txt
+
+#Ignore cursor AI rules
+.cursor\rules\codacy.mdc

@@ -154,16 +154,6 @@ function createOverlay(x: number, y: number, playlists: PlaylistInfo[]): void {
       animator.to({ x: cx - 32, y: cy - 32, s: 1 });
     });
 
-    // Set initial custom property for glow level
-    btn.style.setProperty("--sn-glow-level", "0");
-    btn.style.backgroundImage = `paint(sn-aura)`;
-    btn.addEventListener("mouseenter", () =>
-      btn.style.setProperty("--sn-glow-level", "1")
-    );
-    btn.addEventListener("mouseleave", () =>
-      btn.style.setProperty("--sn-glow-level", "0")
-    );
-
     btn.title = `Add to ${pl.name}`;
     btn.addEventListener("click", (ev) => {
       ev.preventDefault();
@@ -315,24 +305,4 @@ export function enableQuickAddRadialMenu(): void {
     `[StarryNight] Sidebar clone capability: ${sidebarCloneCapable()}`
   );
   // TODO(Phase1): If true, future implementation will use clone flow
-
-  // Phase3: Houdini aura paint worklet registration
-  const anyCSS = CSS as any;
-  if (anyCSS && anyCSS.paintWorklet) {
-    try {
-      const auraUrl = "worklets/quickAddAura.js";
-      if (!anyCSS._sn_aura_registered) {
-        anyCSS.paintWorklet
-          .addModule(auraUrl)
-          .then(() => {
-            anyCSS._sn_aura_registered = true;
-          })
-          .catch(() => {
-            /* ignore */
-          });
-      }
-    } catch {
-      /* ignore */
-    }
-  }
 }

@@ -21,12 +21,29 @@ interface DragContext {
 let activeClone: HTMLElement | null = null;
 const cleanupFns: Array<() => void> = [];
 
-// TODO(Phase2): Add `AbortController` to cancel animations on rapid drags.
+// NEW: AbortController to allow cancelling the spring animation on rapid drags
+let animationAbortController: AbortController | null = null;
 
 // Reuse MRU storage key from QuickAddRadialMenu
 const MRU_KEY = "sn-recent-playlists";
 
 export function launchSidebarClone(context: DragContext): void {
+  // Abort any in-flight animation controller so a fresh drag can start cleanly.
+  if (animationAbortController) {
+    animationAbortController.abort();
+    animationAbortController = null;
+  }
+
+  // If a clone overlay is still active from a previous drag, remove it so we
+  // can start fresh.  This prevents the early guard from exiting prematurely
+  // on rapid consecutive drags.
+  if (activeClone) {
+    destroySidebarClone();
+  }
+
+  animationAbortController = new AbortController();
+  const { signal } = animationAbortController;
+
   // Guard: if overlay already present, ignore.
   if (activeClone) return;
 
@@ -47,7 +64,21 @@ export function launchSidebarClone(context: DragContext): void {
   clone.style.willChange = "transform, opacity";
   clone.style.contain = "paint";
 
-  // TODO(Phase2): Strip event listeners & conflicting aria-labels if needed.
+  // Strip potentially conflicting attributes that could interfere with
+  // accessibility or duplicate event semantics when the node is detached
+  // from its original context.
+  (function stripCloneArtefacts(root: HTMLElement) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    while (walker.nextNode()) {
+      const el = walker.currentNode as HTMLElement;
+      // Remove redundant aria-labels that may clash with the source list.
+      if (el.hasAttribute("aria-label")) el.removeAttribute("aria-label");
+      // Reset tabindex so cloned items don\'t pollute the tab order before we
+      // intentionally re-enable focus for curated playlist targets later.
+      if (el.tabIndex >= 0) el.tabIndex = -1;
+    }
+  })(clone);
 
   document.body.appendChild(clone);
   activeClone = clone;
@@ -76,6 +107,8 @@ export function launchSidebarClone(context: DragContext): void {
     stiffness: 220,
     damping: 20,
     onUpdate: (v) => {
+      // Abort early if the drag was superseded by another action.
+      if (signal.aborted) return;
       clone.style.transform = `translate(${v.x}px, ${v.y}px) scale(${v.s})`;
     },
   });
@@ -86,9 +119,13 @@ export function launchSidebarClone(context: DragContext): void {
   requestAnimationFrame(() => anim.to({ x: lastX, y: lastY, s: lastS }));
 
   // After approx 400 ms (spring settle) prune and wire interactions
-  setTimeout(() => {
-    if (activeClone) pruneCloneItems(activeClone, context);
+  const pruneTimeout = setTimeout(() => {
+    if (!signal.aborted && activeClone) pruneCloneItems(activeClone, context);
   }, 400);
+  // Ensure timeout cleared on abort to prevent unnecessary work.
+  signal.addEventListener("abort", () => clearTimeout(pruneTimeout));
+  // Destroy clone when aborted so the UI cleans up instantly.
+  signal.addEventListener("abort", () => destroySidebarClone());
 }
 
 export function destroySidebarClone(): void {
@@ -97,6 +134,10 @@ export function destroySidebarClone(): void {
   if (activeClone) {
     activeClone.remove();
     activeClone = null;
+  }
+  if (animationAbortController) {
+    animationAbortController.abort();
+    animationAbortController = null;
   }
 }
 

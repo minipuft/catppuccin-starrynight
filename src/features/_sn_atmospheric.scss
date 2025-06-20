@@ -77,7 +77,11 @@
   }
   25% {
     transform: rotateY(90deg) translateX(4px) rotateY(-90deg);
-  }
+    -webkit-transform: rotateY(90deg) translateX(4px) rotateY(-90deg);
+    -moz-transform: rotateY(90deg) translateX(4px) rotateY(-90deg);
+    -ms-transform: rotateY(90deg) translateX(4px) rotateY(-90deg);
+    -o-transform: rotateY(90deg) translateX(4px) rotateY(-90deg);
+}
   50% {
     transform: rotateY(180deg) translateX(2px) rotateY(-180deg);
   }
@@ -110,11 +114,9 @@
   // Base transform for animation entry (no Z-transform here to avoid complexity)
   transform: translateY(var(--ambient-float-range, 20px));
   // Animation driven by CSS variables for dynamic control
-  animation:
-    floating var(--ambient-float-duration, 6s)
-      var(--ambient-float-timing, var(--sn-easing-explorer, ease-in-out)) infinite alternate,
-    atmospheric-fade-in 0.8s var(--sn-easing-emergence, cubic-bezier(0.25, 0.46, 0.45, 0.94)) forwards,
-    year3000-grain-shift 0.8s linear forwards;
+  animation: floating var(--ambient-float-duration, 6s)
+      var(--ambient-float-timing, ease-in-out) infinite alternate,
+    atmospheric-fade-in 0.8s var(--sn-easing-emergence, cubic-bezier(0.25, 0.46, 0.45, 0.94)) forwards;
   animation-delay: calc(var(--ambient-float-stagger, 0.1s) * #{$index});
 
   // Include dynamic glassmorphism (Year 3000 compatible)
@@ -130,7 +132,7 @@
     filter: brightness(var(--hover-brightness, 1.05))
       saturate(var(--hover-saturation, 1.15));
     // Keep transition smooth for hover effects
-    transition: filter 0.3s var(--sn-easing-explorer, ease-out), transform 0.3s var(--sn-easing-explorer, ease-out); // tokenised easing
+    transition: filter 0.3s ease, transform 0.3s ease; // Ensure transform is part of transition if changed on hover
   }
 }
 

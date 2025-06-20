@@ -1251,7 +1251,7 @@ export class ColorHarmonyEngine
   }
 
   // Clean up listeners when destroyed
-  public destroy(): void {
+  public override destroy(): void {
     this._stopEvolutionLoop();
     document.removeEventListener(
       "year3000SystemSettingsChanged",

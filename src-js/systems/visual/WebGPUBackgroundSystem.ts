@@ -3,7 +3,7 @@ import { SettingsManager } from "@/managers/SettingsManager";
 import { MusicSyncService } from "@/services/MusicSyncService";
 import type { Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
-import * as NoiseField from "@/utils/NoiseField";
+import { sample as sampleNoise } from "@/utils/NoiseField";
 import * as Utils from "@/utils/Year3000Utilities";
 
 /**
@@ -35,6 +35,8 @@ export class WebGPUBackgroundSystem implements IManagedSystem {
   private _accent: [number, number, number] = [0.3, 0.55, 0.9];
   private _energy = 0.5;
   private _valence = 0.5;
+  // Phase 4 – nebula drift direction
+  private _driftVec: [number, number] = [0, 0];
   private _lastDriftUpdate = 0;
 
   constructor(
@@ -190,31 +192,14 @@ export class WebGPUBackgroundSystem implements IManagedSystem {
       if (this._frame % 30 === 0) {
         this._refreshThemeColors();
       }
-      this._frame++;
 
-      // === Phase 4: adjust nebula drift every 2 s based on beat & noise field ===
+      // Phase 4 – update nebula drift every 2 s
       if (time - this._lastDriftUpdate > 2000) {
-        try {
-          const vec = this.musicSyncService?.getCurrentBeatVector?.() || {
-            x: 0,
-            y: 0,
-          };
-          // Convert beat vector (-1..1) to 0..1 for sampling
-          const u = (vec.x + 1) * 0.5;
-          const v = (vec.y + 1) * 0.5;
-          const n = NoiseField.sample(u, v);
-          // Map noise to subtle hue shift of accent colour
-          this._accent[0] = 0.25 + n.x * 0.1; // R component
-          this._accent[1] = 0.45 + n.y * 0.1; // G component
-          // Keep B derivation from energy for slight variation
-          this._accent[2] = 0.8 + (this._energy - 0.5) * 0.1;
-        } catch (err) {
-          if (this.config?.enableDebug) {
-            console.warn("[WebGPUBackgroundSystem] Drift update error", err);
-          }
-        }
         this._lastDriftUpdate = time;
+        this._updateDriftVector();
       }
+
+      this._frame++;
 
       // Write uniform data
       const uni = new Float32Array(16);
@@ -224,7 +209,15 @@ export class WebGPUBackgroundSystem implements IManagedSystem {
         4
       );
       uni.set([this._accent[0], this._accent[1], this._accent[2], 1], 8);
-      uni.set([time * 0.001, this._energy, this._valence, 0], 12);
+      uni.set(
+        [
+          time * 0.001,
+          this._energy,
+          this._valence,
+          Math.atan2(this._driftVec[1], this._driftVec[0]),
+        ],
+        12
+      );
       // @ts-ignore experimental API & potential undefined
       (this._device as any).queue.writeBuffer(
         this._uniformBuffer as any,
@@ -287,6 +280,48 @@ export class WebGPUBackgroundSystem implements IManagedSystem {
     );
     if (!isNaN(energyVar)) this._energy = energyVar;
     if (!isNaN(valenceVar)) this._valence = valenceVar;
+  }
+
+  /**
+   * Phase 4 – Derive a new nebula drift vector every ~2 seconds.
+   * Combines pseudo-random noise sampling with the current beat vector so that
+   * background motion loosely follows the music's momentum.
+   */
+  private _updateDriftVector(): void {
+    try {
+      // 1. Base noise component – pseudo-random but deterministic over time
+      const noiseVec = sampleNoise(Math.random(), performance.now() * 0.0001);
+      const noiseVec2 = sampleNoise(performance.now() * 0.0001, Math.random());
+      const noiseX = (noiseVec.x + noiseVec2.x) * 0.5;
+      const noiseY = (noiseVec.y + noiseVec2.y) * 0.5;
+
+      // 2. Beat vector from MusicSyncService (falls back to zero vector)
+      const beat = this.musicSyncService?.getCurrentBeatVector?.() || {
+        x: 0,
+        y: 0,
+      };
+
+      // 3. Combine and normalise
+      const vx = noiseX * 0.6 + beat.x * 0.4;
+      const vy = noiseY * 0.6 + beat.y * 0.4;
+      const len = Math.hypot(vx, vy) || 1;
+      this._driftVec = [vx / len, vy / len];
+
+      // 4. Propagate to CSS so pure-CSS shaders (fallback) can react
+      const root = document.documentElement;
+      root.style.setProperty(
+        "--sn-nebula-drift-x",
+        this._driftVec[0].toFixed(3)
+      );
+      root.style.setProperty(
+        "--sn-nebula-drift-y",
+        this._driftVec[1].toFixed(3)
+      );
+    } catch (err) {
+      if (this.config?.enableDebug) {
+        console.warn("[WebGPUBackgroundSystem] Drift update failed", err);
+      }
+    }
   }
 }
 

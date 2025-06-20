@@ -4,7 +4,6 @@
 
 @use "../core/mixins" as *;
 @use "../core/_kinetic-animations" as *;
-@use "../systems/_sn_prediction_effects" as *; // for materialize glow
 
 // === FEED BLOOM MIXIN =========================================================
 // Generates a directional bloom gradient that is modulated in real-time via the
@@ -93,10 +92,15 @@
     body:not([data-bloom="off"]) & {
       // Hover effect with dynamic colors
       &:hover {
-        @extend .sn-temporal-echo;
-        --sn-kinetic-intensity: 0.15;
         transform: translateZ(12px);
-        @include hue-shift();
+        // Motion-aware intensity
+        --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.15);
+
+        // Echo element
+        &::after {
+          content: "";
+          @extend .sn-temporal-echo;
+        }
 
         // Add subtle side border
         &::before {
@@ -133,13 +137,13 @@
       // Selected/active state – one-shot ocean ripple
       &[aria-selected="true"],
       &:has(.main-trackList-playingIcon) {
-        // Replace ripple with materialize resonance when next in queue
-        @extend .sn-materialize-resonance;
-        @extend .sn-predict-materialize-glow;
-        --sn-materialize-imminence: 0.8;
-        --sn-materialize-clarity: 0.9;
         transform: translateZ(12px);
         @include hue-shift();
+        &::after {
+          content: "";
+          @extend .sn-temporal-echo;
+          --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.22);
+        }
 
         // Highlight track number when row is active
         .main-trackList-rowMarker {
@@ -159,13 +163,6 @@
         }
       }
 
-      // ===== Artist Vision Mode Enhancements =========================
-      [data-artistic-mode="cosmic-maximum"] & {
-        &:hover {
-          @extend .sn-anticipatory-warmth;
-          --sn-anticipatory-hue: 0deg;
-        }
-      }
     }
   }
 

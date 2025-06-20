@@ -495,7 +495,6 @@
         var(--sn-echo-offset-y, 0px)
       )
       skew(var(--sn-echo-skew, 0deg))
-      rotate(var(--sn-echo-rotate, 0deg))
       scale(calc(0.8 * var(--sn-echo-radius-multiplier, 1)));
     filter: blur(1px) hue-rotate(var(--sn-echo-hue-shift, 0deg));
   }
@@ -507,7 +506,6 @@
         var(--sn-echo-offset-y, 0px)
       )
       skew(var(--sn-echo-skew, 0deg))
-      rotate(calc(var(--sn-echo-rotate, 0deg) + 12deg))
       scale(calc(1.4 * var(--sn-echo-radius-multiplier, 1)));
     filter: blur(4px) hue-rotate(var(--sn-echo-hue-shift, 0deg));
   }
@@ -553,86 +551,11 @@
 
 // The curve approximates lerpSmooth's exponential ease-out (base 2) for CSS
 
-// TODO[Y3K-PH1]: Anticipatory shimmer keyframes – lays groundwork for Predictive Materialization System
-@keyframes year3000-anticipatory-shimmer {
-  0% {
-    opacity: 0;
-    transform: scale(0.92);
-    filter: blur(2px) hue-rotate(var(--sn-anticipatory-hue, 0deg));
-  }
-  40% {
-    opacity: var(--sn-anticipatory-intensity, 0.18);
-    transform: scale(1);
-    filter: blur(1px) hue-rotate(var(--sn-anticipatory-hue, 0deg));
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.05);
-    filter: blur(0px) hue-rotate(var(--sn-anticipatory-hue, 0deg));
-  }
-}
-
-// TODO[Y3K-PH1]: Anticipatory preview utility class (one-shot)
-.sn-anticipatory-warmth {
-  animation: year3000-anticipatory-shimmer 1200ms ease-out forwards;
-}
-
-// TODO[Y3K-PH1]: Register anticipatory class with reduced-motion guard
-@media (prefers-reduced-motion: reduce) {
-  .sn-anticipatory-warmth {
-    animation: none !important;
-  }
-}
-
-// TODO[Y3K-PH3]: Materialization resonance keyframes – visualises imminence & clarity variables
-@keyframes year3000-materialize-resonance {
-  0% {
-    opacity: 0;
-    transform: scale(0.94);
-    box-shadow: 0 0 0px rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0);
-  }
-  45% {
-    opacity: calc(var(--sn-materialize-imminence, 0) * 0.6);
-    transform: scale(1);
-    box-shadow: 0 0 calc(6px + 12px * var(--sn-materialize-clarity, 0)) rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), calc(var(--sn-materialize-clarity, 0) * 0.4));
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.06);
-    box-shadow: 0 0 0px rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0);
-  }
-}
-
-// TODO[Y3K-PH3]: Materialization resonance utility class
-.sn-materialize-resonance {
-  animation: year3000-materialize-resonance 1000ms ease-out forwards;
-  will-change: opacity, transform, box-shadow;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sn-materialize-resonance {
-    animation: none !important;
-  }
-}
-
-// ===== TEMPORAL ECHO GRAIN DISSOLVE =====
 @keyframes year3000-grain-shift {
   0% {
-    mask-position: 0% 0%;
+    mask-position: 0 0;
   }
   100% {
-    mask-position: 50% 50%;
-  }
-}
-
-@supports (mask-image: url("dummy")) {
-  .sn-temporal-echo,
-  .sn-temporal-echo::before,
-  .sn-temporal-echo::after {
-    mask-image: var(--sn-nebula-noise-url);
-    mask-size: 200% 200%;
-    mask-repeat: repeat;
-    animation: year3000-echo-core 800ms var(--sn-echo-decay-curve) forwards,
-      year3000-grain-shift 800ms linear forwards;
+    mask-position: 200% 0;
   }
 }

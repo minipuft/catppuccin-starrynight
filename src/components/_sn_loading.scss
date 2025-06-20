@@ -73,14 +73,11 @@
         50%,
       transparent 100%
     );
-    // Subtle hue drift so even loading states feel alive
-    @include hue-shift();
-    // Phase 2: Tokenised easing + grain dissolve mask
+    /* Phase 2 – apply grain dissolve */
     mask-image: var(--sn-nebula-noise-url);
-    mask-size: 200% 200%;
-    mask-repeat: repeat;
-    animation: skeleton-shimmer var(--loading-shimmer-duration) var(--sn-easing-explorer, ease-in-out) infinite,
-      year3000-grain-shift var(--loading-shimmer-duration) linear infinite;
+    mask-size: 600% 600%;
+    animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite,
+      year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
   }
 
   @keyframes skeleton-shimmer {
@@ -129,7 +126,7 @@
   // Loading state detection (when content is being fetched)
   &[aria-busy="true"],
   &.loading-state {
-    .main-card-card {
+    .main-card-card:not(:has(img[src])) {
       @include skeleton-loading(100%, 200px, "home");
 
       // Enhanced card skeleton structure
@@ -150,17 +147,11 @@
         border-radius: 4px;
       }
 
-      // Hide card metadata text while loading, but **do not fully hide <img>**
-      // to avoid interaction with Spotify's virtual-scroll lazy-loading logic
-      // which expects the element to remain visible when `loading="lazy"`.
-      // Instead, reduce brightness for smoother skeleton effect.
+      // Hide actual content during loading
       .main-card-cardMetadata,
-      .main-cardHeader-container {
-        opacity: 0;
-      }
-
+      .main-cardHeader-container,
       img {
-        filter: brightness(0.4) saturate(0.2);
+        opacity: 0;
       }
     }
   }
@@ -327,7 +318,7 @@
       }
 
       .main-gridContainer-gridContainer {
-        .main-card-card {
+        .main-card-card:not(:has(img[src])) {
           @include skeleton-loading(100%, 180px, "search");
 
           // Reduced intensity for search context
@@ -529,7 +520,7 @@
 
   // Simplified mobile skeletons
   .main-gridContainer-gridContainer {
-    &[aria-busy="true"] .main-card-card {
+    &[aria-busy="true"] .main-card-card:not(:has(img[src])) {
       height: 160px; // Smaller cards on mobile
     }
   }

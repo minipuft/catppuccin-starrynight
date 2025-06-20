@@ -141,7 +141,6 @@ export class DeviceCapabilityDetector {
     }
 
     this.deviceCapabilities.overall = this._calculateOverallPerformanceLevel();
-    this._applyAnticipatoryIntensity(this.deviceCapabilities.overall as any);
     this.isInitialized = true;
 
     if (this.config.enableDebug) {
@@ -417,22 +416,6 @@ export class DeviceCapabilityDetector {
       case "low":
       default:
         return "low";
-    }
-  }
-
-  private _applyAnticipatoryIntensity(level: "high" | "medium" | "low"): void {
-    const root = document.documentElement;
-    const mapping: Record<string, number> = {
-      high: 0.26,
-      medium: 0.18,
-      low: 0.1,
-    };
-    const val = mapping[level] ?? 0.18;
-    root.style.setProperty("--sn-anticipatory-intensity", val.toString());
-    if (this.config.enableDebug) {
-      console.log(
-        `🔍 [DeviceCapabilityDetector] Applied --sn-anticipatory-intensity=${val} for performance level ${level}`
-      );
     }
   }
 }

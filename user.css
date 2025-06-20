@@ -67,20 +67,10 @@
   --sn-hue-shift-dynamic: calc(
     var(--sn-hue-shift-base) + (var(--sn-rhythm-phase, 0) * 2deg)
   );
-  --sn-nav-item-base-opacity: 0.85;
-  --sn-nav-item-hover-bg-opacity: 0.1;
-  --sn-nav-item-active-bg-opacity: 0.15;
-  --sn-nav-item-glow-color-rgb: var(--sn-gradient-primary-rgb, "202,158,230");
-  --sn-nav-item-glow-intensity: 0;
-  --sn-nav-text-energy-color-rgb: var(--sn-gradient-accent-rgb, "140,170,238");
-  --sn-nav-text-energy-opacity: 0;
-  --sn-nav-item-transform-scale: 1;
-  --sn-nav-item-transition-duration: 0.3s;
-  --sn-anticipatory-hue: 0deg;
-  --sn-anticipatory-intensity: 0.18;
-  --sn-materialize-imminence: 0;
-  --sn-materialize-clarity: 0;
-  --sn-nebula-noise-url: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4Ij48ZGVmcz48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjEuMiIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiAvPjwvc3ZnPg==");
+  /*
+    Removed duplicate NAV item variables.  Authoritative definitions live in
+    the second :root block under the "Sidebar Navigation Variables" heading.
+  */
 }
 
 :root {
@@ -119,7 +109,6 @@
   --sn-sidebar-temporal-blur: 0px;
   --sn-sidebar-item-bloom-intensity: 0.5;
   --sn-sidebar-energy-glow-opacity: 0.3;
-  --sn-quantum-foam-opacity: 0.03;
   --sn-easing-explorer: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -1109,7 +1098,7 @@ li[aria-selected=true] .main-navBar-navBarLink span {
     background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0.08) 0%, rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0.03) 40%, transparent 70%);
   }
 }
-.sn-ripple-active, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover {
+.sn-ripple-active {
   animation: year3000-ripple 1200ms ease-out;
 }
 
@@ -1170,7 +1159,7 @@ li[aria-selected=true] .main-navBar-navBarLink span {
   animation: year3000-harmonize-flow calc(var(--sn-kinetic-tempo-multiplier, 1) * 8s) linear infinite;
 }
 
-.sn-temporal-echo {
+.sn-temporal-echo, .main-card-card:hover::after, .main-card-card:active::after, body:not(:has(.main-searchPage-content)) .main-card-card:hover::after, body:not(:has(.main-searchPage-content)) .main-card-card:active::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after {
   animation: year3000-temporal-echo 800ms ease-out forwards;
   position: absolute;
   top: 50%;
@@ -1185,7 +1174,14 @@ li[aria-selected=true] .main-navBar-navBarLink span {
 }
 
 .sn-temporal-echo::before,
-.sn-temporal-echo::after {
+.sn-temporal-echo::after,
+.main-card-card:hover::after,
+.main-card-card:active::after,
+body:not(:has(.main-searchPage-content)) .main-card-card:hover::after,
+body:not(:has(.main-searchPage-content)) .main-card-card:active::after,
+body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after,
+body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after,
+body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -1198,7 +1194,7 @@ li[aria-selected=true] .main-navBar-navBarLink span {
   opacity: 0.6;
 }
 
-.sn-temporal-echo::after {
+.sn-temporal-echo::after, .main-card-card:hover::after, .main-card-card:active::after, body:not(:has(.main-searchPage-content)) .main-card-card:hover::after, body:not(:has(.main-searchPage-content)) .main-card-card:active::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after {
   animation: year3000-echo-core 1200ms 160ms var(--sn-echo-decay-curve) forwards;
   opacity: 0.3;
 }
@@ -1242,6 +1238,13 @@ li[aria-selected=true] .main-navBar-navBarLink span {
   .sn-harmonize-sub,
   .sn-harmonize-flow,
   .sn-temporal-echo,
+  .main-card-card:hover::after,
+  .main-card-card:active::after,
+  body:not(:has(.main-searchPage-content)) .main-card-card:hover::after,
+  body:not(:has(.main-searchPage-content)) .main-card-card:active::after,
+  body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after,
+  body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after,
+  body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after,
   .sn-gravity-active,
   .year3000-kinetic-canvas {
     animation: none !important;
@@ -1260,7 +1263,7 @@ li[aria-selected=true] .main-navBar-navBarLink span {
   .sn-harmonize-flow {
     animation-duration: calc(var(--original-duration, 1s) * 0.7) !important;
   }
-  .sn-temporal-echo,
+  .sn-temporal-echo, .main-card-card:hover::after, .main-card-card:active::after, body:not(:has(.main-searchPage-content)) .main-card-card:hover::after, body:not(:has(.main-searchPage-content)) .main-card-card:active::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after,
   .sn-future-preview {
     display: none;
   }
@@ -1271,6 +1274,18 @@ li[aria-selected=true] .main-navBar-navBarLink span {
 
 [data-artistic-mode=corporate-safe] .sn-refract-active,
 [data-artistic-mode=corporate-safe] .sn-temporal-echo,
+[data-artistic-mode=corporate-safe] .main-card-card:hover::after,
+[data-artistic-mode=corporate-safe] .main-card-card:active::after,
+[data-artistic-mode=corporate-safe] body:not(:has(.main-searchPage-content)) .main-card-card:hover::after,
+body:not(:has(.main-searchPage-content)) [data-artistic-mode=corporate-safe] .main-card-card:hover::after,
+[data-artistic-mode=corporate-safe] body:not(:has(.main-searchPage-content)) .main-card-card:active::after,
+body:not(:has(.main-searchPage-content)) [data-artistic-mode=corporate-safe] .main-card-card:active::after,
+[data-artistic-mode=corporate-safe] body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after,
+body:not([data-bloom=off]) .main-rootlist-wrapper [data-artistic-mode=corporate-safe] .main-trackList-trackListRow:hover::after,
+[data-artistic-mode=corporate-safe] body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after,
+body:not([data-bloom=off]) .main-rootlist-wrapper [data-artistic-mode=corporate-safe] .main-trackList-trackListRow[aria-selected=true]::after,
+[data-artistic-mode=corporate-safe] body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after,
+body:not([data-bloom=off]) .main-rootlist-wrapper [data-artistic-mode=corporate-safe] .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after,
 [data-artistic-mode=corporate-safe] .sn-gravity-active {
   animation: none;
 }
@@ -1297,16 +1312,16 @@ li[aria-selected=true] .main-navBar-navBarLink span {
 @keyframes year3000-echo-core {
   0% {
     opacity: 0.32;
-    transform: translate(var(--sn-echo-offset-x, 0px), var(--sn-echo-offset-y, 0px)) skew(var(--sn-echo-skew, 0deg)) rotate(var(--sn-echo-rotate, 0deg)) scale(calc(0.8 * var(--sn-echo-radius-multiplier, 1)));
+    transform: translate(var(--sn-echo-offset-x, 0px), var(--sn-echo-offset-y, 0px)) skew(var(--sn-echo-skew, 0deg)) scale(calc(0.8 * var(--sn-echo-radius-multiplier, 1)));
     filter: blur(1px) hue-rotate(var(--sn-echo-hue-shift, 0deg));
   }
   100% {
     opacity: 0;
-    transform: translate(var(--sn-echo-offset-x, 0px), var(--sn-echo-offset-y, 0px)) skew(var(--sn-echo-skew, 0deg)) rotate(calc(var(--sn-echo-rotate, 0deg) + 12deg)) scale(calc(1.4 * var(--sn-echo-radius-multiplier, 1)));
+    transform: translate(var(--sn-echo-offset-x, 0px), var(--sn-echo-offset-y, 0px)) skew(var(--sn-echo-skew, 0deg)) scale(calc(1.4 * var(--sn-echo-radius-multiplier, 1)));
     filter: blur(4px) hue-rotate(var(--sn-echo-hue-shift, 0deg));
   }
 }
-.sn-temporal-echo {
+.sn-temporal-echo, .main-card-card:hover::after, .main-card-card:active::after, body:not(:has(.main-searchPage-content)) .main-card-card:hover::after, body:not(:has(.main-searchPage-content)) .main-card-card:active::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after {
   /* dynamic props injected by JS ↓ */
   --sn-echo-hue-shift: var(--sn-echo-hue-shift, 0deg);
   --sn-echo-radius-multiplier: var(--sn-echo-radius-multiplier, 1);
@@ -1323,7 +1338,14 @@ li[aria-selected=true] .main-navBar-navBarLink span {
 }
 
 .sn-temporal-echo::before,
-.sn-temporal-echo::after {
+.sn-temporal-echo::after,
+.main-card-card:hover::after,
+.main-card-card:active::after,
+body:not(:has(.main-searchPage-content)) .main-card-card:hover::after,
+body:not(:has(.main-searchPage-content)) .main-card-card:active::after,
+body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after,
+body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after,
+body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -1336,80 +1358,17 @@ li[aria-selected=true] .main-navBar-navBarLink span {
   opacity: 0.6;
 }
 
-.sn-temporal-echo::after {
+.sn-temporal-echo::after, .main-card-card:hover::after, .main-card-card:active::after, body:not(:has(.main-searchPage-content)) .main-card-card:hover::after, body:not(:has(.main-searchPage-content)) .main-card-card:active::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after {
   animation: year3000-echo-core 1200ms 160ms var(--sn-echo-decay-curve) forwards;
   opacity: 0.3;
 }
 
-@keyframes year3000-anticipatory-shimmer {
-  0% {
-    opacity: 0;
-    transform: scale(0.92);
-    filter: blur(2px) hue-rotate(var(--sn-anticipatory-hue, 0deg));
-  }
-  40% {
-    opacity: var(--sn-anticipatory-intensity, 0.18);
-    transform: scale(1);
-    filter: blur(1px) hue-rotate(var(--sn-anticipatory-hue, 0deg));
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.05);
-    filter: blur(0px) hue-rotate(var(--sn-anticipatory-hue, 0deg));
-  }
-}
-.sn-anticipatory-warmth, [data-artistic-mode=cosmic-maximum] .main-card-card:hover:hover, [data-artistic-mode=cosmic-maximum] body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover {
-  animation: year3000-anticipatory-shimmer 1200ms ease-out forwards;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sn-anticipatory-warmth, [data-artistic-mode=cosmic-maximum] .main-card-card:hover:hover, [data-artistic-mode=cosmic-maximum] body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover {
-    animation: none !important;
-  }
-}
-@keyframes year3000-materialize-resonance {
-  0% {
-    opacity: 0;
-    transform: scale(0.94);
-    box-shadow: 0 0 0px rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0);
-  }
-  45% {
-    opacity: calc(var(--sn-materialize-imminence, 0) * 0.6);
-    transform: scale(1);
-    box-shadow: 0 0 calc(6px + 12px * var(--sn-materialize-clarity, 0)) rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), calc(var(--sn-materialize-clarity, 0) * 0.4));
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.06);
-    box-shadow: 0 0 0px rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0);
-  }
-}
-.sn-materialize-resonance, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true], body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon) {
-  animation: year3000-materialize-resonance 1000ms ease-out forwards;
-  will-change: opacity, transform, box-shadow;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sn-materialize-resonance, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true], body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon) {
-    animation: none !important;
-  }
-}
 @keyframes year3000-grain-shift {
   0% {
-    mask-position: 0% 0%;
+    mask-position: 0 0;
   }
   100% {
-    mask-position: 50% 50%;
-  }
-}
-@supports (mask-image: url("dummy")) {
-  .sn-temporal-echo,
-  .sn-temporal-echo::before,
-  .sn-temporal-echo::after {
-    mask-image: var(--sn-nebula-noise-url);
-    mask-size: 200% 200%;
-    mask-repeat: repeat;
-    animation: year3000-echo-core 800ms var(--sn-echo-decay-curve) forwards, year3000-grain-shift 800ms linear forwards;
+    mask-position: 200% 0;
   }
 }
 :root .Root__main-view .UyzJidwrGk3awngSGIwv {
@@ -2670,150 +2629,6 @@ body:has(.main-searchPage-content) .main-view-container::before {
   mix-blend-mode: var(--sn-nebula-blend-mode, color-dodge);
 }
 
-.sn-predict-static-glow, .sn-predict-glow {
-  box-shadow: 0 0 calc(10px + 15px * var(--sn-prediction-confidence, 0)) calc(2px + 3px * var(--sn-prediction-confidence, 0)) var(--sn-predict-glow-color);
-  border-radius: inherit;
-  transition: box-shadow 300ms ease-out;
-}
-
-.sn-predict-subtle-glow::before {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  background: radial-gradient(ellipse at center, rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), calc(0.1 + 0.2 * var(--sn-prediction-confidence, 0))) 0%, transparent 70%);
-  border-radius: inherit;
-  opacity: var(--sn-prediction-confidence, 0.5);
-  pointer-events: none;
-  z-index: -1;
-  transition: opacity 300ms ease-out, background 300ms ease-out;
-}
-
-@keyframes sn-pulse-animation {
-  0% {
-    transform: scale(1);
-    opacity: calc(0.5 + 0.5 * var(--sn-prediction-confidence, 0));
-  }
-  50% {
-    transform: scale(calc(1 + 0.03 * var(--sn-prediction-confidence, 0)));
-    opacity: calc(0.8 + 0.2 * var(--sn-prediction-confidence, 0));
-  }
-  100% {
-    transform: scale(1);
-    opacity: calc(0.5 + 0.5 * var(--sn-prediction-confidence, 0));
-  }
-}
-.sn-predict-pulse,
-.sn-predict-subtle-pulse {
-  animation: sn-pulse-animation calc(2000ms - 1000ms * var(--sn-prediction-confidence, 0)) ease-in-out infinite;
-}
-
-.sn-predict-glow.sn-predict-pulse {
-  position: relative;
-}
-.sn-predict-glow.sn-predict-pulse::after {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  box-shadow: 0 0 calc(8px + 12px * var(--sn-prediction-confidence, 0)) var(--sn-predict-pulse-color);
-  opacity: 0;
-  animation: sn-glow-pulse-fade calc(2000ms - 1000ms * var(--sn-prediction-confidence, 0)) ease-in-out infinite;
-  pointer-events: none;
-  z-index: -1;
-}
-
-@keyframes sn-glow-pulse-fade {
-  0% {
-    opacity: calc(0.3 * var(--sn-prediction-confidence, 0));
-  }
-  50% {
-    opacity: calc(0.7 * var(--sn-prediction-confidence, 0));
-  }
-  100% {
-    opacity: calc(0.3 * var(--sn-prediction-confidence, 0));
-  }
-}
-@keyframes sn-organic-emergence {
-  0% {
-    opacity: 0;
-    transform: scale(0.85) translateY(20px);
-    clip-path: ellipse(50% 20% at 50% 100%);
-  }
-  60% {
-    opacity: 0.9;
-    transform: scale(1.02) translateY(-5px);
-    clip-path: ellipse(150% 100% at 50% 50%);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-    clip-path: inset(0% 0% 0% 0% round var(--border-radius));
-  }
-}
-@keyframes sn-harmonic-oscillation {
-  0%, 100% {
-    box-shadow: inset 0 0 80px -15px rgba(var(--sn-gradient-primary-rgb), calc(0.25 * var(--sn-sidebar-harmonic-intensity-multiplier)));
-  }
-  50% {
-    box-shadow: inset 0 0 100px -10px rgba(var(--sn-gradient-secondary-rgb), calc(0.35 * var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
-  }
-}
-.GenericModal__overlay,
-.encore-context-menu-container,
-body > div[role=dialog] > div:first-child,
-body > div[data-encore-id=popover] > div:first-child {
-  background-color: rgba(var(--spice-rgb-base, "30,30,46"), 0.3) !important;
-  backdrop-filter: blur(calc(var(--sn-modal-blur-intensity) * 0.5));
-}
-
-.GenericModal__content,
-.encore-context-menu,
-.encore-dropdown-menu,
-.encore-popover__content,
-div[role=dialog] {
-  background: transparent !important;
-  color: var(--spice-text) !important;
-  border: 1px solid rgba(var(--sn-modal-border-color-rgb), var(--sn-modal-border-opacity));
-  border-radius: var(--border-radius);
-  box-shadow: 0 8px 32px 0 rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.37);
-  overflow: hidden;
-  position: relative;
-  transform-origin: center center;
-}
-.GenericModal__content::before,
-.encore-context-menu::before,
-.encore-dropdown-menu::before,
-.encore-popover__content::before,
-div[role=dialog]::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background-image: radial-gradient(ellipse at 70% 30%, hsla(from oklch(var(--sn-oklab-primary-l, 0.6) var(--sn-oklab-primary-chroma, 0.15) var(--sn-oklab-primary-hue, 280)) calc(l - 0.05) calc(c * 0.8) h/calc(var(--sn-modal-bg-opacity) * 0.7)), transparent 60%), radial-gradient(ellipse at 30% 70%, hsla(from oklch(var(--sn-oklab-secondary-l, 0.6) var(--sn-oklab-secondary-chroma, 0.1) var(--sn-oklab-secondary-hue, 260)) calc(l - 0.08) calc(c * 0.7) h/calc(var(--sn-modal-bg-opacity) * 0.6)), transparent 55%);
-  opacity: var(--sn-modal-bg-opacity);
-  filter: blur(var(--sn-modal-blur-intensity)) saturate(var(--sn-gradient-saturation)) brightness(var(--sn-gradient-brightness)) contrast(var(--sn-gradient-contrast));
-  background-blend-mode: screen;
-  transition: opacity var(--sn-gradient-transition), filter var(--sn-gradient-transition);
-}
-.GenericModal__content.sn-dimensional-modal-emerging,
-.encore-context-menu.sn-dimensional-modal-emerging,
-.encore-dropdown-menu.sn-dimensional-modal-emerging,
-.encore-popover__content.sn-dimensional-modal-emerging,
-div[role=dialog].sn-dimensional-modal-emerging {
-  animation: sn-organic-emergence var(--sn-modal-emergence-duration) var(--sn-modal-emergence-timing-function) forwards;
-}
-
-.sn-predict-materialize-glow, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true], body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon) {
-  position: relative;
-  border-radius: inherit;
-  transition: box-shadow 300ms ease-out;
-  box-shadow: 0 0 calc(6px + 14px * var(--sn-materialize-clarity, 0)) rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), calc(0.1 + 0.4 * var(--sn-materialize-imminence, 0)));
-}
-
 .main-rootlist-wrapper {
   position: relative;
   background: transparent;
@@ -2851,15 +2666,11 @@ div[role=dialog].sn-dimensional-modal-emerging {
   transform: translateZ(var(--magnetic-hover-pull, 12px)) scale(1.02);
 }
 body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover {
-  --sn-kinetic-intensity: 0.15;
   transform: translateZ(12px);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
+  --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.15);
 }
-@media (prefers-reduced-motion: reduce) {
-  body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover {
-    filter: none !important;
-  }
+body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after {
+  content: "";
 }
 body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::before {
   content: "";
@@ -2875,8 +2686,6 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
   transition: all 200ms ease;
 }
 body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true], body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon) {
-  --sn-materialize-imminence: 0.8;
-  --sn-materialize-clarity: 0.9;
   transform: translateZ(12px);
   filter: hue-rotate(var(--sn-hue-shift-dynamic));
   transition: filter 0.4s ease-out;
@@ -2885,6 +2694,10 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[a
   body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true], body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon) {
     filter: none !important;
   }
+}
+body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after {
+  content: "";
+  --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.22);
 }
 body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true] .main-trackList-rowMarker, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon) .main-trackList-rowMarker {
   color: var(--spice-accent);
@@ -2895,9 +2708,6 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[a
 }
 body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover .main-trackList-rowMarker {
   color: var(--spice-text);
-}
-[data-artistic-mode=cosmic-maximum] body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover {
-  --sn-anticipatory-hue: 0deg;
 }
 .main-rootlist-wrapper .main-trackList-rowMarker {
   display: flex;
@@ -3161,8 +2971,9 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
   -ms-transform: scale(1);
   -o-transform: scale(1);
 }
-[data-artistic-mode=cosmic-maximum] .main-card-card:hover:hover {
-  --sn-anticipatory-hue: 0deg;
+.main-card-card:hover::after {
+  content: "";
+  --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.18);
 }
 .main-card-card:focus-visible {
   outline: none;
@@ -3182,6 +2993,11 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
 .main-card-card:active {
   transform: var(--card-depth-mid) scale(calc(var(--calculated-scale) * 0.98));
   transition: transform 0.1s ease;
+  box-shadow: 0 2px 8px var(--card-shadow-base);
+}
+.main-card-card:active::after {
+  content: "";
+  --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.24);
 }
 
 .main-card-header {
@@ -3407,12 +3223,20 @@ body:not(:has(.main-searchPage-content)) .main-card-card:hover {
   border-color: rgba(var(--spice-rgb-accent), 0.3);
   box-shadow: 0 8px 24px var(--card-shadow-base), 0 4px 16px rgba(var(--spice-rgb-accent), 0.1);
 }
+body:not(:has(.main-searchPage-content)) .main-card-card:hover::after {
+  content: "";
+  --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.18);
+}
 body:not(:has(.main-searchPage-content)) .main-card-card:focus-visible {
   outline: 2px solid var(--spice-accent);
   outline-offset: 2px;
 }
 body:not(:has(.main-searchPage-content)) .main-card-card:active {
   box-shadow: 0 2px 8px var(--card-shadow-base);
+}
+body:not(:has(.main-searchPage-content)) .main-card-card:active::after {
+  content: "";
+  --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.24);
 }
 body:not(:has(.main-searchPage-content)) .main-card-header {
   position: relative;
@@ -3717,8 +3541,8 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   --loading-scale-end: 1;
 }
 
-.main-gridContainer-gridContainer[aria-busy=true] .main-card-card, .main-gridContainer-gridContainer.loading-state .main-card-card, .main-gridContainer-gridContainer[data-testid*=loading] .main-card-card, .main-gridContainer-gridContainer:empty .main-card-card,
-.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-gridContainer-gridContainer.main-trackList-trackListRow:empty .main-card-card {
+.main-gridContainer-gridContainer[aria-busy=true] .main-card-card:not(:has(img[src])), .main-gridContainer-gridContainer.loading-state .main-card-card:not(:has(img[src])), .main-gridContainer-gridContainer[data-testid*=loading] .main-card-card:not(:has(img[src])), .main-gridContainer-gridContainer:empty .main-card-card:not(:has(img[src])),
+.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-gridContainer-gridContainer.main-trackList-trackListRow:empty .main-card-card:not(:has(img[src])) {
   will-change: transform, opacity, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -3741,8 +3565,8 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   overflow: hidden;
   background: linear-gradient(90deg, var(--skeleton-base) 0%, var(--skeleton-shimmer) 50%, var(--skeleton-base) 100%);
 }
-.main-gridContainer-gridContainer[aria-busy=true] .main-card-card::before, .main-gridContainer-gridContainer.loading-state .main-card-card::before, .main-gridContainer-gridContainer[data-testid*=loading] .main-card-card::before, .main-gridContainer-gridContainer:empty .main-card-card::before,
-.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-gridContainer-gridContainer.main-trackList-trackListRow:empty .main-card-card::before {
+.main-gridContainer-gridContainer[aria-busy=true] .main-card-card:not(:has(img[src]))::before, .main-gridContainer-gridContainer.loading-state .main-card-card:not(:has(img[src]))::before, .main-gridContainer-gridContainer[data-testid*=loading] .main-card-card:not(:has(img[src]))::before, .main-gridContainer-gridContainer:empty .main-card-card:not(:has(img[src]))::before,
+.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-gridContainer-gridContainer.main-trackList-trackListRow:empty .main-card-card:not(:has(img[src]))::before {
   content: "";
   position: absolute;
   top: 0;
@@ -3750,15 +3574,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-gridContainer-gridContainer[aria-busy=true] .main-card-card::before, .main-gridContainer-gridContainer.loading-state .main-card-card::before, .main-gridContainer-gridContainer[data-testid*=loading] .main-card-card::before, .main-gridContainer-gridContainer:empty .main-card-card::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-gridContainer-gridContainer.main-trackList-trackListRow:empty .main-card-card::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -3768,8 +3587,8 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
     left: 100%;
   }
 }
-.main-gridContainer-gridContainer[aria-busy=true] .main-card-card::after, .main-gridContainer-gridContainer.loading-state .main-card-card::after, .main-gridContainer-gridContainer[data-testid*=loading] .main-card-card::after, .main-gridContainer-gridContainer:empty .main-card-card::after,
-.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-gridContainer-gridContainer.main-trackList-trackListRow:empty .main-card-card::after {
+.main-gridContainer-gridContainer[aria-busy=true] .main-card-card:not(:has(img[src]))::after, .main-gridContainer-gridContainer.loading-state .main-card-card:not(:has(img[src]))::after, .main-gridContainer-gridContainer[data-testid*=loading] .main-card-card:not(:has(img[src]))::after, .main-gridContainer-gridContainer:empty .main-card-card:not(:has(img[src]))::after,
+.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-gridContainer-gridContainer.main-trackList-trackListRow:empty .main-card-card:not(:has(img[src]))::after {
   content: "";
   position: absolute;
   bottom: 16px;
@@ -3779,18 +3598,16 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   background: linear-gradient(180deg, transparent 0%, var(--skeleton-base) 30%, var(--skeleton-shimmer) 70%, var(--skeleton-base) 100%);
   border-radius: 4px;
 }
-.main-gridContainer-gridContainer[aria-busy=true] .main-card-card .main-card-cardMetadata,
-.main-gridContainer-gridContainer[aria-busy=true] .main-card-card .main-cardHeader-container,
-.main-gridContainer-gridContainer[aria-busy=true] .main-card-card img, .main-gridContainer-gridContainer.loading-state .main-card-card .main-card-cardMetadata, .main-gridContainer-gridContainer[data-testid*=loading] .main-card-card .main-card-cardMetadata, .main-gridContainer-gridContainer:empty .main-card-card .main-card-cardMetadata,
-.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-gridContainer-gridContainer.main-trackList-trackListRow:empty .main-card-card .main-card-cardMetadata,
-.main-gridContainer-gridContainer.loading-state .main-card-card .main-cardHeader-container,
-.main-gridContainer-gridContainer[data-testid*=loading] .main-card-card .main-cardHeader-container,
-.main-gridContainer-gridContainer:empty .main-card-card .main-cardHeader-container,
-.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-gridContainer-gridContainer.main-trackList-trackListRow:empty .main-card-card .main-cardHeader-container,
-.main-gridContainer-gridContainer.loading-state .main-card-card img,
-.main-gridContainer-gridContainer[data-testid*=loading] .main-card-card img,
-.main-gridContainer-gridContainer:empty .main-card-card img,
-.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-gridContainer-gridContainer.main-trackList-trackListRow:empty .main-card-card img {
+.main-gridContainer-gridContainer[aria-busy=true] .main-card-card:not(:has(img[src])) .main-card-cardMetadata,
+.main-gridContainer-gridContainer[aria-busy=true] .main-card-card:not(:has(img[src])) .main-cardHeader-container,
+.main-gridContainer-gridContainer[aria-busy=true] .main-card-card:not(:has(img[src])) img, .main-gridContainer-gridContainer.loading-state .main-card-card:not(:has(img[src])) .main-card-cardMetadata, .main-gridContainer-gridContainer[data-testid*=loading] .main-card-card:not(:has(img[src])) .main-card-cardMetadata, .main-gridContainer-gridContainer:empty .main-card-card:not(:has(img[src])) .main-card-cardMetadata,
+.main-gridContainer-gridContainer.loading-state .main-card-card:not(:has(img[src])) .main-cardHeader-container,
+.main-gridContainer-gridContainer[data-testid*=loading] .main-card-card:not(:has(img[src])) .main-cardHeader-container,
+.main-gridContainer-gridContainer:empty .main-card-card:not(:has(img[src])) .main-cardHeader-container,
+.main-gridContainer-gridContainer.loading-state .main-card-card:not(:has(img[src])) img,
+.main-gridContainer-gridContainer[data-testid*=loading] .main-card-card:not(:has(img[src])) img,
+.main-gridContainer-gridContainer:empty .main-card-card:not(:has(img[src])) img,
+.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-gridContainer-gridContainer.main-trackList-trackListRow:empty .main-card-card:not(:has(img[src])) img {
   opacity: 0;
 }
 .main-gridContainer-gridContainer:not([aria-busy=true]):not(.loading-state):not(.main-gridContainer-gridContainer[data-testid*=loading]):not(.main-entityHeader-container[data-testid*=loading]):not(.main-gridContainer-gridContainer:empty) .main-card-card:nth-child(1) {
@@ -3999,16 +3816,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-entityHeader-container[aria-busy=true] .main-entityHeader-image::before, .main-entityHeader-container.loading-state .main-entityHeader-image::before,
-  .main-entityHeader-container[data-testid*=loading] .main-entityHeader-image::before, .main-entityHeader-container.main-gridContainer-gridContainer:empty .main-entityHeader-image::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-entityHeader-container.main-trackList-trackListRow:empty .main-entityHeader-image::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -4058,16 +3869,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-entityHeader-container[aria-busy=true] .main-entityHeader-metadata .main-type-alto::before, .main-entityHeader-container.loading-state .main-entityHeader-metadata .main-type-alto::before,
-  .main-entityHeader-container[data-testid*=loading] .main-entityHeader-metadata .main-type-alto::before, .main-entityHeader-container.main-gridContainer-gridContainer:empty .main-entityHeader-metadata .main-type-alto::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-entityHeader-container.main-trackList-trackListRow:empty .main-entityHeader-metadata .main-type-alto::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -4117,16 +3922,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-entityHeader-container[aria-busy=true] .main-entityHeader-metadata .main-type-ballad::before, .main-entityHeader-container.loading-state .main-entityHeader-metadata .main-type-ballad::before,
-  .main-entityHeader-container[data-testid*=loading] .main-entityHeader-metadata .main-type-ballad::before, .main-entityHeader-container.main-gridContainer-gridContainer:empty .main-entityHeader-metadata .main-type-ballad::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-entityHeader-container.main-trackList-trackListRow:empty .main-entityHeader-metadata .main-type-ballad::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -4176,16 +3975,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-entityHeader-container[aria-busy=true] .main-entityHeader-metadata .main-type-mestoBold::before, .main-entityHeader-container.loading-state .main-entityHeader-metadata .main-type-mestoBold::before,
-  .main-entityHeader-container[data-testid*=loading] .main-entityHeader-metadata .main-type-mestoBold::before, .main-entityHeader-container.main-gridContainer-gridContainer:empty .main-entityHeader-metadata .main-type-mestoBold::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-entityHeader-container.main-trackList-trackListRow:empty .main-entityHeader-metadata .main-type-mestoBold::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -4321,25 +4114,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-trackList-trackListHeaderRow.loading-state .main-trackList-rowSectionStart::before, .main-trackList-trackListHeaderRow.main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-rowSectionStart::before,
-  .main-trackList-trackListHeaderRow.main-entityHeader-container[data-testid*=loading] .main-trackList-rowSectionStart::before, .main-trackList-trackListHeaderRow.main-gridContainer-gridContainer:empty .main-trackList-rowSectionStart::before, .loading-state .main-trackList-trackListHeaderRow .main-trackList-rowSectionStart::before, .main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-trackListHeaderRow .main-trackList-rowSectionStart::before,
-  .main-entityHeader-container[data-testid*=loading] .main-trackList-trackListHeaderRow .main-trackList-rowSectionStart::before, .main-gridContainer-gridContainer:empty .main-trackList-trackListHeaderRow .main-trackList-rowSectionStart::before,
-  .main-trackList-trackListRow.loading-state .main-trackList-rowSectionStart::before,
-  .main-trackList-trackListRow.main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-rowSectionStart::before,
-  .main-trackList-trackListRow.main-entityHeader-container[data-testid*=loading] .main-trackList-rowSectionStart::before,
-  .main-trackList-trackListRow.main-gridContainer-gridContainer:empty .main-trackList-rowSectionStart::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-trackList-trackListRow:empty .main-trackList-rowSectionStart::before,
-  .loading-state .main-trackList-trackListRow .main-trackList-rowSectionStart::before,
-  .main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-trackListRow .main-trackList-rowSectionStart::before,
-  .main-entityHeader-container[data-testid*=loading] .main-trackList-trackListRow .main-trackList-rowSectionStart::before,
-  .main-gridContainer-gridContainer:empty .main-trackList-trackListRow .main-trackList-rowSectionStart::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -4402,25 +4180,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-trackList-trackListHeaderRow.loading-state .main-trackList-rowSectionVariable .main-type-ballad::before, .main-trackList-trackListHeaderRow.main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-rowSectionVariable .main-type-ballad::before,
-  .main-trackList-trackListHeaderRow.main-entityHeader-container[data-testid*=loading] .main-trackList-rowSectionVariable .main-type-ballad::before, .main-trackList-trackListHeaderRow.main-gridContainer-gridContainer:empty .main-trackList-rowSectionVariable .main-type-ballad::before, .loading-state .main-trackList-trackListHeaderRow .main-trackList-rowSectionVariable .main-type-ballad::before, .main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-trackListHeaderRow .main-trackList-rowSectionVariable .main-type-ballad::before,
-  .main-entityHeader-container[data-testid*=loading] .main-trackList-trackListHeaderRow .main-trackList-rowSectionVariable .main-type-ballad::before, .main-gridContainer-gridContainer:empty .main-trackList-trackListHeaderRow .main-trackList-rowSectionVariable .main-type-ballad::before,
-  .main-trackList-trackListRow.loading-state .main-trackList-rowSectionVariable .main-type-ballad::before,
-  .main-trackList-trackListRow.main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-rowSectionVariable .main-type-ballad::before,
-  .main-trackList-trackListRow.main-entityHeader-container[data-testid*=loading] .main-trackList-rowSectionVariable .main-type-ballad::before,
-  .main-trackList-trackListRow.main-gridContainer-gridContainer:empty .main-trackList-rowSectionVariable .main-type-ballad::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-trackList-trackListRow:empty .main-trackList-rowSectionVariable .main-type-ballad::before,
-  .loading-state .main-trackList-trackListRow .main-trackList-rowSectionVariable .main-type-ballad::before,
-  .main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-trackListRow .main-trackList-rowSectionVariable .main-type-ballad::before,
-  .main-entityHeader-container[data-testid*=loading] .main-trackList-trackListRow .main-trackList-rowSectionVariable .main-type-ballad::before,
-  .main-gridContainer-gridContainer:empty .main-trackList-trackListRow .main-trackList-rowSectionVariable .main-type-ballad::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -4497,25 +4260,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-trackList-trackListHeaderRow.loading-state .main-trackList-rowSectionVariable .main-type-mestoBold::before, .main-trackList-trackListHeaderRow.main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-rowSectionVariable .main-type-mestoBold::before,
-  .main-trackList-trackListHeaderRow.main-entityHeader-container[data-testid*=loading] .main-trackList-rowSectionVariable .main-type-mestoBold::before, .main-trackList-trackListHeaderRow.main-gridContainer-gridContainer:empty .main-trackList-rowSectionVariable .main-type-mestoBold::before, .loading-state .main-trackList-trackListHeaderRow .main-trackList-rowSectionVariable .main-type-mestoBold::before, .main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-trackListHeaderRow .main-trackList-rowSectionVariable .main-type-mestoBold::before,
-  .main-entityHeader-container[data-testid*=loading] .main-trackList-trackListHeaderRow .main-trackList-rowSectionVariable .main-type-mestoBold::before, .main-gridContainer-gridContainer:empty .main-trackList-trackListHeaderRow .main-trackList-rowSectionVariable .main-type-mestoBold::before,
-  .main-trackList-trackListRow.loading-state .main-trackList-rowSectionVariable .main-type-mestoBold::before,
-  .main-trackList-trackListRow.main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-rowSectionVariable .main-type-mestoBold::before,
-  .main-trackList-trackListRow.main-entityHeader-container[data-testid*=loading] .main-trackList-rowSectionVariable .main-type-mestoBold::before,
-  .main-trackList-trackListRow.main-gridContainer-gridContainer:empty .main-trackList-rowSectionVariable .main-type-mestoBold::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-trackList-trackListRow:empty .main-trackList-rowSectionVariable .main-type-mestoBold::before,
-  .loading-state .main-trackList-trackListRow .main-trackList-rowSectionVariable .main-type-mestoBold::before,
-  .main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-trackListRow .main-trackList-rowSectionVariable .main-type-mestoBold::before,
-  .main-entityHeader-container[data-testid*=loading] .main-trackList-trackListRow .main-trackList-rowSectionVariable .main-type-mestoBold::before,
-  .main-gridContainer-gridContainer:empty .main-trackList-trackListRow .main-trackList-rowSectionVariable .main-type-mestoBold::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -4578,25 +4326,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-trackList-trackListHeaderRow.loading-state .main-trackList-rowSectionEnd::before, .main-trackList-trackListHeaderRow.main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-rowSectionEnd::before,
-  .main-trackList-trackListHeaderRow.main-entityHeader-container[data-testid*=loading] .main-trackList-rowSectionEnd::before, .main-trackList-trackListHeaderRow.main-gridContainer-gridContainer:empty .main-trackList-rowSectionEnd::before, .loading-state .main-trackList-trackListHeaderRow .main-trackList-rowSectionEnd::before, .main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-trackListHeaderRow .main-trackList-rowSectionEnd::before,
-  .main-entityHeader-container[data-testid*=loading] .main-trackList-trackListHeaderRow .main-trackList-rowSectionEnd::before, .main-gridContainer-gridContainer:empty .main-trackList-trackListHeaderRow .main-trackList-rowSectionEnd::before,
-  .main-trackList-trackListRow.loading-state .main-trackList-rowSectionEnd::before,
-  .main-trackList-trackListRow.main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-rowSectionEnd::before,
-  .main-trackList-trackListRow.main-entityHeader-container[data-testid*=loading] .main-trackList-rowSectionEnd::before,
-  .main-trackList-trackListRow.main-gridContainer-gridContainer:empty .main-trackList-rowSectionEnd::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-trackList-trackListRow:empty .main-trackList-rowSectionEnd::before,
-  .loading-state .main-trackList-trackListRow .main-trackList-rowSectionEnd::before,
-  .main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-trackListRow .main-trackList-rowSectionEnd::before,
-  .main-entityHeader-container[data-testid*=loading] .main-trackList-trackListRow .main-trackList-rowSectionEnd::before,
-  .main-gridContainer-gridContainer:empty .main-trackList-trackListRow .main-trackList-rowSectionEnd::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -4659,25 +4392,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-trackList-trackListHeaderRow.loading-state .main-trackList-rowSectionEnd:last-child::before, .main-trackList-trackListHeaderRow.main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-rowSectionEnd:last-child::before,
-  .main-trackList-trackListHeaderRow.main-entityHeader-container[data-testid*=loading] .main-trackList-rowSectionEnd:last-child::before, .main-trackList-trackListHeaderRow.main-gridContainer-gridContainer:empty .main-trackList-rowSectionEnd:last-child::before, .loading-state .main-trackList-trackListHeaderRow .main-trackList-rowSectionEnd:last-child::before, .main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-trackListHeaderRow .main-trackList-rowSectionEnd:last-child::before,
-  .main-entityHeader-container[data-testid*=loading] .main-trackList-trackListHeaderRow .main-trackList-rowSectionEnd:last-child::before, .main-gridContainer-gridContainer:empty .main-trackList-trackListHeaderRow .main-trackList-rowSectionEnd:last-child::before,
-  .main-trackList-trackListRow.loading-state .main-trackList-rowSectionEnd:last-child::before,
-  .main-trackList-trackListRow.main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-rowSectionEnd:last-child::before,
-  .main-trackList-trackListRow.main-entityHeader-container[data-testid*=loading] .main-trackList-rowSectionEnd:last-child::before,
-  .main-trackList-trackListRow.main-gridContainer-gridContainer:empty .main-trackList-rowSectionEnd:last-child::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-trackList-trackListRow:empty .main-trackList-rowSectionEnd:last-child::before,
-  .loading-state .main-trackList-trackListRow .main-trackList-rowSectionEnd:last-child::before,
-  .main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-trackListRow .main-trackList-rowSectionEnd:last-child::before,
-  .main-entityHeader-container[data-testid*=loading] .main-trackList-trackListRow .main-trackList-rowSectionEnd:last-child::before,
-  .main-gridContainer-gridContainer:empty .main-trackList-trackListRow .main-trackList-rowSectionEnd:last-child::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -5388,16 +5106,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-searchPage-content[aria-busy=true] .main-shelf-shelf .main-shelf-header .main-type-alto::before, .main-searchPage-content.loading-state .main-shelf-shelf .main-shelf-header .main-type-alto::before, .main-searchPage-content.main-gridContainer-gridContainer[data-testid*=loading] .main-shelf-shelf .main-shelf-header .main-type-alto::before,
-  .main-searchPage-content.main-entityHeader-container[data-testid*=loading] .main-shelf-shelf .main-shelf-header .main-type-alto::before, .main-searchPage-content.main-gridContainer-gridContainer:empty .main-shelf-shelf .main-shelf-header .main-type-alto::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-searchPage-content.main-trackList-trackListRow:empty .main-shelf-shelf .main-shelf-header .main-type-alto::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -5412,9 +5124,9 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
 .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-searchPage-content.main-trackList-trackListRow:empty .main-shelf-shelf .main-shelf-header .main-type-alto {
   margin-bottom: 16px;
 }
-.main-searchPage-content[aria-busy=true] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card, .main-searchPage-content.loading-state .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card, .main-searchPage-content.main-gridContainer-gridContainer[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card,
-.main-searchPage-content.main-entityHeader-container[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card, .main-searchPage-content.main-gridContainer-gridContainer:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card,
-.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-searchPage-content.main-trackList-trackListRow:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card {
+.main-searchPage-content[aria-busy=true] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src])), .main-searchPage-content.loading-state .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src])), .main-searchPage-content.main-gridContainer-gridContainer[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src])),
+.main-searchPage-content.main-entityHeader-container[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src])), .main-searchPage-content.main-gridContainer-gridContainer:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src])),
+.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-searchPage-content.main-trackList-trackListRow:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src])) {
   will-change: transform, opacity, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -5437,9 +5149,9 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   overflow: hidden;
   background: linear-gradient(90deg, var(--skeleton-base) 0%, var(--skeleton-shimmer) 50%, var(--skeleton-base) 100%);
 }
-.main-searchPage-content[aria-busy=true] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before, .main-searchPage-content.loading-state .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before, .main-searchPage-content.main-gridContainer-gridContainer[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before,
-.main-searchPage-content.main-entityHeader-container[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before, .main-searchPage-content.main-gridContainer-gridContainer:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before,
-.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-searchPage-content.main-trackList-trackListRow:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before {
+.main-searchPage-content[aria-busy=true] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src]))::before, .main-searchPage-content.loading-state .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src]))::before, .main-searchPage-content.main-gridContainer-gridContainer[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src]))::before,
+.main-searchPage-content.main-entityHeader-container[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src]))::before, .main-searchPage-content.main-gridContainer-gridContainer:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src]))::before,
+.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-searchPage-content.main-trackList-trackListRow:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src]))::before {
   content: "";
   position: absolute;
   top: 0;
@@ -5447,16 +5159,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-searchPage-content[aria-busy=true] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before, .main-searchPage-content.loading-state .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before, .main-searchPage-content.main-gridContainer-gridContainer[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before,
-  .main-searchPage-content.main-entityHeader-container[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before, .main-searchPage-content.main-gridContainer-gridContainer:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-searchPage-content.main-trackList-trackListRow:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -5466,9 +5172,9 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
     left: 100%;
   }
 }
-.main-searchPage-content[aria-busy=true] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before, .main-searchPage-content.loading-state .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before, .main-searchPage-content.main-gridContainer-gridContainer[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before,
-.main-searchPage-content.main-entityHeader-container[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before, .main-searchPage-content.main-gridContainer-gridContainer:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before,
-.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-searchPage-content.main-trackList-trackListRow:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card::before {
+.main-searchPage-content[aria-busy=true] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src]))::before, .main-searchPage-content.loading-state .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src]))::before, .main-searchPage-content.main-gridContainer-gridContainer[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src]))::before,
+.main-searchPage-content.main-entityHeader-container[data-testid*=loading] .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src]))::before, .main-searchPage-content.main-gridContainer-gridContainer:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src]))::before,
+.main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-searchPage-content.main-trackList-trackListRow:empty .main-shelf-shelf .main-gridContainer-gridContainer .main-card-card:not(:has(img[src]))::before {
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--loading-intensity-search) * 0.2)) 50%, transparent 100%);
 }
 
@@ -5521,16 +5227,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-entityHeader-container[data-testid*=artist][aria-busy=true] .main-entityHeader-image::before, .main-entityHeader-container[data-testid*=artist].loading-state .main-entityHeader-image::before,
-  .main-entityHeader-container[data-testid*=artist][data-testid*=loading] .main-entityHeader-image::before, .main-entityHeader-container[data-testid*=artist].main-gridContainer-gridContainer:empty .main-entityHeader-image::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-entityHeader-container[data-testid*=artist].main-trackList-trackListRow:empty .main-entityHeader-image::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -5587,16 +5287,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .main-entityHeader-container[data-testid*=artist][aria-busy=true] .main-entityHeader-titleText::after::before, .main-entityHeader-container[data-testid*=artist].loading-state .main-entityHeader-titleText::after::before,
-  .main-entityHeader-container[data-testid*=artist][data-testid*=loading] .main-entityHeader-titleText::after::before, .main-entityHeader-container[data-testid*=artist].main-gridContainer-gridContainer:empty .main-entityHeader-titleText::after::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .main-entityHeader-container[data-testid*=artist].main-trackList-trackListRow:empty .main-entityHeader-titleText::after::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -5648,16 +5342,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .spicetify-playlist-list.loading-state li::before, .spicetify-playlist-list.main-gridContainer-gridContainer[data-testid*=loading] li::before,
-  .spicetify-playlist-list.main-entityHeader-container[data-testid*=loading] li::before, .spicetify-playlist-list.main-gridContainer-gridContainer:empty li::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .spicetify-playlist-list.main-trackList-trackListRow:empty li::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -5988,16 +5676,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .Root__right-sidebar[aria-busy=true] .main-type-alto::before, .Root__right-sidebar.loading-state .main-type-alto::before, .Root__right-sidebar.main-gridContainer-gridContainer[data-testid*=loading] .main-type-alto::before,
-  .Root__right-sidebar.main-entityHeader-container[data-testid*=loading] .main-type-alto::before, .Root__right-sidebar.main-gridContainer-gridContainer:empty .main-type-alto::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .Root__right-sidebar.main-trackList-trackListRow:empty .main-type-alto::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -6047,16 +5729,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-current-intensity, 1) * 0.3)) 50%, transparent 100%);
-  filter: hue-rotate(var(--sn-hue-shift-dynamic));
-  transition: filter 0.4s ease-out;
-  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .Root__right-sidebar[aria-busy=true] .main-trackList-rowSectionVariable::before, .Root__right-sidebar.loading-state .main-trackList-rowSectionVariable::before, .Root__right-sidebar.main-gridContainer-gridContainer[data-testid*=loading] .main-trackList-rowSectionVariable::before,
-  .Root__right-sidebar.main-entityHeader-container[data-testid*=loading] .main-trackList-rowSectionVariable::before, .Root__right-sidebar.main-gridContainer-gridContainer:empty .main-trackList-rowSectionVariable::before,
-  .main-trackList-trackListHeaderRow + .main-trackList-trackListRow:empty + .Root__right-sidebar.main-trackList-trackListRow:empty .main-trackList-rowSectionVariable::before {
-    filter: none !important;
-  }
+  /* Phase 2 – apply grain dissolve */
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: skeleton-shimmer var(--loading-shimmer-duration) ease-in-out infinite, year3000-grain-shift calc(var(--loading-shimmer-duration) * 2) linear infinite;
 }
 @keyframes skeleton-shimmer {
   0% {
@@ -6334,7 +6010,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
     --loading-intensity-search: 0.3;
     --loading-intensity-home: 0.6;
   }
-  .main-gridContainer-gridContainer[aria-busy=true] .main-card-card {
+  .main-gridContainer-gridContainer[aria-busy=true] .main-card-card:not(:has(img[src])) {
     height: 160px;
   }
   .main-entityHeader-container[aria-busy=true] .main-entityHeader-image {
@@ -7050,7 +6726,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card:hover {
 :root {
   --atmospheric-gap: 1.5rem;
   --atmospheric-hover-lift: 4px;
-  --atmospheric-transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  --atmospheric-transition: 0.6s var(--sn-easing-harmony, cubic-bezier(0.4, 0, 0.2, 1));
   --ambient-float-range: 8px;
   --ambient-duration: 12s;
   --ambient-delay-step: 0.8s;
@@ -7098,6 +6774,10 @@ body:not(:has(.main-searchPage-content)) .main-card-card:hover {
   }
   25% {
     transform: rotateY(90deg) translateX(4px) rotateY(-90deg);
+    -webkit-transform: rotateY(90deg) translateX(4px) rotateY(-90deg);
+    -moz-transform: rotateY(90deg) translateX(4px) rotateY(-90deg);
+    -ms-transform: rotateY(90deg) translateX(4px) rotateY(-90deg);
+    -o-transform: rotateY(90deg) translateX(4px) rotateY(-90deg);
   }
   50% {
     transform: rotateY(180deg) translateX(2px) rotateY(-180deg);
@@ -7126,7 +6806,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card:hover {
   position: relative;
   opacity: 0;
   transform: translateY(var(--ambient-float-range, 20px));
-  animation: floating var(--ambient-float-duration, 6s) var(--ambient-float-timing, ease-in-out) infinite alternate, atmospheric-fade-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: floating var(--ambient-float-duration, 6s) var(--ambient-float-timing, ease-in-out) infinite alternate, atmospheric-fade-in 0.8s var(--sn-easing-emergence, cubic-bezier(0.25, 0.46, 0.45, 0.94)) forwards;
   animation-delay: calc(var(--ambient-float-stagger, 0.1s) * 0);
   will-change: transform, opacity, filter;
   transform: translateZ(0);
@@ -7266,7 +6946,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card:hover {
   position: relative;
   opacity: 0;
   transform: translateY(var(--ambient-float-range, 20px));
-  animation: floating var(--ambient-float-duration, 6s) var(--ambient-float-timing, ease-in-out) infinite alternate, atmospheric-fade-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: floating var(--ambient-float-duration, 6s) var(--ambient-float-timing, ease-in-out) infinite alternate, atmospheric-fade-in 0.8s var(--sn-easing-emergence, cubic-bezier(0.25, 0.46, 0.45, 0.94)) forwards;
   animation-delay: calc(var(--ambient-float-stagger, 0.1s) * var(--grid-stagger-delay));
   will-change: transform, opacity, filter;
   transform: translateZ(0);
@@ -7329,7 +7009,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card:hover {
   position: relative;
   opacity: 0;
   transform: translateY(var(--ambient-float-range, 20px));
-  animation: floating var(--ambient-float-duration, 6s) var(--ambient-float-timing, ease-in-out) infinite alternate, atmospheric-fade-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: floating var(--ambient-float-duration, 6s) var(--ambient-float-timing, ease-in-out) infinite alternate, atmospheric-fade-in 0.8s var(--sn-easing-emergence, cubic-bezier(0.25, 0.46, 0.45, 0.94)) forwards;
   animation-delay: calc(var(--ambient-float-stagger, 0.1s) * 0);
   will-change: transform, opacity, filter;
   transform: translateZ(0);
@@ -7394,7 +7074,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card:hover {
   position: relative;
   opacity: 0;
   transform: translateY(var(--ambient-float-range, 20px));
-  animation: floating var(--ambient-float-duration, 6s) var(--ambient-float-timing, ease-in-out) infinite alternate, atmospheric-fade-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: floating var(--ambient-float-duration, 6s) var(--ambient-float-timing, ease-in-out) infinite alternate, atmospheric-fade-in 0.8s var(--sn-easing-emergence, cubic-bezier(0.25, 0.46, 0.45, 0.94)) forwards;
   animation-delay: calc(var(--ambient-float-stagger, 0.1s) * calc(var(--grid-stagger-delay) * 0.5));
   will-change: transform, opacity, filter;
   transform: translateZ(0);
@@ -7438,7 +7118,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card:hover {
   position: relative;
   opacity: 0;
   transform: translateY(var(--ambient-float-range, 20px));
-  animation: floating var(--ambient-float-duration, 6s) var(--ambient-float-timing, ease-in-out) infinite alternate, atmospheric-fade-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: floating var(--ambient-float-duration, 6s) var(--ambient-float-timing, ease-in-out) infinite alternate, atmospheric-fade-in 0.8s var(--sn-easing-emergence, cubic-bezier(0.25, 0.46, 0.45, 0.94)) forwards;
   animation-delay: calc(var(--ambient-float-stagger, 0.1s) * calc(var(--grid-stagger-delay) * 0.3));
   will-change: transform, opacity, filter;
   transform: translateZ(0);
@@ -7970,7 +7650,7 @@ body:not(:has(.main-searchPage-content)) .Root__now-playing-bar .main-shuffleBut
   --particle-connection-strength: 0.6;
   --particle-nexus-influence: 1;
   --particle-flow-variance: 15deg;
-  --particle-organic-curve: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --particle-organic-curve: var(--sn-easing-organic, cubic-bezier(0.25, 0.46, 0.45, 0.94));
   --particle-life-cycle: 12s;
   --particle-emergence-delay: 3s;
   --particle-cluster-size: 4;
@@ -11007,8 +10687,29 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation .sn-
 .main-yourLibraryX-listItem.sn-absorbing-energy,
 nav[aria-label=Main] ul li a.sn-absorbing-energy {
   transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
-  transform: scale(var(--sn-item-energy-absorption-scale));
-  box-shadow: 0 0 calc(5px + 8px * var(--sn-nav-item-glow-intensity)) rgba(var(--sn-nav-item-glow-color-rgb), calc(var(--sn-nav-item-glow-intensity) * 0.3)), inset 0 0 3px rgba(var(--sn-nav-item-glow-color-rgb), calc(var(--sn-nav-item-glow-intensity) * 0.15));
+  -webkit-transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
+  -moz-transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
+  -ms-transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
+  -o-transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
+}
+
+[data-sn-glyph] {
+  position: relative;
+}
+[data-sn-glyph]::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: var(--sn-glyph-base-size);
+  height: var(--sn-glyph-base-size);
+  border-radius: 50%;
+  background-color: rgba(var(--sn-glyph-color-rgb), var(--sn-glyph-shimmer-opacity, 0.5));
+  opacity: var(--sn-glyph-opacity);
+  transform: scale(var(--sn-glyph-scale)) rotate(var(--sn-glyph-rotation));
+  transition: opacity 0.4s ease, transform 0.4s ease, background-color 0.4s ease;
+  pointer-events: none;
+  z-index: 5;
 }
 
 :root {
