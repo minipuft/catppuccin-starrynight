@@ -1,0 +1,40 @@
+// StarryNight – Glyph Variable Map & Mixin
+// Provides canonical --sn-glyph-* CSS custom properties and helper mixin.
+
+:root {
+  // Core glyph visual controls written by DataGlyphSystem (JS)
+  --sn-glyph-intensity: 0; // 0–1 base intensity
+  --sn-glyph-glow: 0;      // 0–1 glow factor (usually intensity * 0.8)
+
+  // Legacy tokens removed – use --sn-glyph-glow instead.
+}
+
+// ===================================================================
+//  Mixin ▪ glyph-consciousness()
+//  Injects standard glyph styling variables into a selector so that
+//  future refactors only need to adjust this block.
+// ===================================================================
+@mixin glyph-consciousness(
+  $size: var(--sn-glyph-base-size, 6px),
+  $color-rgb: var(--sn-glyph-color-rgb, 140,170,238)
+) {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: $size;
+    height: $size;
+    border-radius: 50%;
+    background-color: rgba($color-rgb, var(--sn-glyph-glow, 0.5));
+    opacity: var(--sn-glyph-glow);
+    transform: scale(calc(0.8 + 0.4 * var(--sn-glyph-intensity)))
+      rotate(var(--sn-glyph-rotation, 0deg));
+    transition: opacity 0.3s ease, transform 0.3s ease,
+      background-color 0.3s ease;
+    pointer-events: none;
+    z-index: 5;
+  }
+}

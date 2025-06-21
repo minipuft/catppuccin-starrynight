@@ -83,6 +83,8 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
   private _lastScrollTime: number | null;
   private _lastScrollTop: number | null;
   private _scrollContainerElements: HTMLElement[] = [];
+  // Stored throttled interaction handler for proper cleanup.
+  private _interactionHandler: ((event: Event) => void) | null = null;
 
   constructor(
     config: Year3000Config,
@@ -264,16 +266,19 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
   }
 
   private setupOptimizedInteractionListener() {
-    // Throttled handler shared by all interaction events
-    const throttledHandler = this.utils.throttle(
+    this._interactionHandler = this.utils.throttle(
       (event: Event) => this.recordUserInteraction(event),
       100
     );
 
     // Attach generic interaction listeners to `document` (excluding scroll)
-    const genericEvents = ["click", "mousemove", "keydown"];
+    const genericEvents = ["click", "mousemove", "keydown"] as const;
     genericEvents.forEach((eventType) => {
-      document.addEventListener(eventType, throttledHandler, { passive: true });
+      document.addEventListener(
+        eventType,
+        this._interactionHandler as EventListener,
+        { passive: true }
+      );
     });
 
     // --- Scroll interaction binding -------------------------------------
@@ -298,7 +303,9 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
     const targets = foundContainers.length ? foundContainers : [document];
 
     targets.forEach((el) => {
-      el.addEventListener("scroll", throttledHandler, { passive: true });
+      el.addEventListener("scroll", this._interactionHandler as EventListener, {
+        passive: true,
+      });
     });
 
     // Keep reference for potential clean-up later.
@@ -538,5 +545,28 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
       desaturation: this.biometricState.desaturation,
       slowdown: this.biometricState.slowdown,
     };
+  }
+
+  public destroy() {
+    // Remove generic interaction listeners
+    if (this._interactionHandler) {
+      ["click", "mousemove", "keydown"].forEach((evt) => {
+        document.removeEventListener(
+          evt,
+          this._interactionHandler as EventListener
+        );
+      });
+      // Remove scroll listeners
+      this._scrollContainerElements.forEach((el) => {
+        el.removeEventListener(
+          "scroll",
+          this._interactionHandler as EventListener
+        );
+      });
+      this._interactionHandler = null;
+    }
+
+    // Call parent cleanup
+    super.destroy();
   }
 }

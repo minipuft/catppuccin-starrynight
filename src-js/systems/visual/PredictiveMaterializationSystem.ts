@@ -371,7 +371,14 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
   }
 
   private _spawnMegaEcho(element: HTMLElement) {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Respect user/system performance constraints
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      this.performanceMonitor.shouldReduceQuality()
+    ) {
+      return;
+    }
+
     if (this.currentEchoCount >= this.dynamicMaxEchoes) return;
     if (this.echoIntensitySetting === 0) return;
 

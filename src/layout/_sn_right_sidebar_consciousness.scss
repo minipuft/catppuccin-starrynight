@@ -1,0 +1,213 @@
+// StarryNight – Right Sidebar Consciousness Module (Phase 1)
+// Inspired by bioluminescent jellyfish bloom flows
+// Provides baseline gradient + hover-echo utilities.
+// All runtime dynamics are driven by CSS variables (prefixed --sn-rs-).
+@use "../core/_mixins" as *;
+
+// =============================================================================
+// 1 ▪ Variable Scaffold – defaults are neutral; JS systems will animate them.
+// =============================================================================
+:root {
+  // Beat-responsive intensity (0-1) – set by RightSidebarConsciousnessSystem
+  --sn-rs-beat-intensity: 0;
+
+  // Hue shift in degrees – rotates the entire colour wheel
+  --sn-rs-hue-shift: 0deg;
+
+  // Bloom alpha (0-1) – multiplied into each gradient layer opacity
+  --sn-rs-glow-alpha: 0.25;
+
+  // Static base colours sampled from current Catppuccin flavour
+  --sn-rs-layer1-rgb: var(--sn-gradient-primary-rgb, var(--spice-rgb-accent));
+  --sn-rs-layer2-rgb: var(--sn-gradient-secondary-rgb, var(--spice-rgb-subtext));
+  --sn-rs-layer3-rgb: var(--sn-gradient-accent-rgb, var(--spice-rgb-text));
+  // Use Catppuccin overlay0 shade (with fallback to main-elevated) for subtle surface tint
+  --sn-rs-layer4-rgb: var(--spice-rgb-overlay0, var(--spice-rgb-main-elevated)); // subtle surface tint
+}
+
+// Convenience colour helper – returns rgba colour string for a layer
+@function rs-layer($alpha, $scale) {
+  $alpha-multiplied: $alpha * 1; // will be multiplied in calc() below
+  @return unquote("rgba(var(--sn-rs-layer#{$scale}-rgb), calc(#{$alpha} * var(--sn-rs-glow-alpha)))");
+}
+
+// =============================================================================
+// 2 ▪ Core Gradient Flow Mixin
+// =============================================================================
+@mixin right-sidebar-conic-flow($animation-duration: 28s) {
+  background-image:
+    radial-gradient(circle at 20% 30%, #{rs-layer(0.35, 1)} 0%, transparent 60%),
+    radial-gradient(circle at 80% 25%, #{rs-layer(0.25, 2)} 0%, transparent 70%),
+    conic-gradient(from var(--sn-rs-hue-shift), #{rs-layer(0.20, 3)} 0deg 120deg, transparent 120deg 300deg, #{rs-layer(0.20, 3)} 300deg 360deg),
+    radial-gradient(circle at 50% 120%, #{rs-layer(0.15, 4)} 0%, transparent 80%);
+
+  background-blend-mode: screen, screen, overlay, overlay;
+  background-size: 140% 140%;
+  animation: rsConicFlow #{$animation-duration} linear infinite;
+}
+
+@keyframes rsConicFlow {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 50% 50%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+// =============================================================================
+// 3 ▪ Hover Echo Utility
+// =============================================================================
+@mixin rs-hover-echo($size: 160px, $duration: 300ms) {
+  position: relative;
+  overflow: visible;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: $size;
+    height: $size;
+    margin-top: calc(-1 * #{$size}/2);
+    margin-left: calc(-1 * #{$size}/2);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(var(--sn-rs-layer1-rgb), 0.4) 0%, transparent 70%);
+    transform: scale(0.1);
+    opacity: 0.8;
+    pointer-events: none;
+    animation: rsEcho $duration ease-out forwards;
+  }
+}
+
+@keyframes rsEcho {
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+// =============================================================================
+// 4 ▪ Application – Attach to Spotify Right Sidebar
+// =============================================================================
+.Root__right-sidebar {
+  @include right-sidebar-conic-flow();
+
+  // Ensure gradient sits under internal content
+  position: relative;
+  z-index: 0;
+
+  &::before {
+    // Fallback solid colour layer for safer contrast
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(var(--sn-rs-layer4-rgb), 0.1);
+    backdrop-filter: blur(12px) saturate(1.2);
+    z-index: -1;
+  }
+}
+
+// =============================================================================
+// 5 ▪ Accessibility – Reduced Motion
+// =============================================================================
+@media (prefers-reduced-motion: reduce) {
+  .Root__right-sidebar {
+    animation: none !important;
+    background-image: none !important;
+    background: rgba(var(--sn-rs-layer4-rgb), 0.06);
+  }
+}
+
+// =============================================================================
+// 6 ▪ Sub-Section Card Styling – Now Playing internal panels
+//     Unifies right-sidebar "cards" with StarryNight cosmic card design
+// =============================================================================
+.Root__right-sidebar {
+  // Generic card wrapper (About Artist, Credits, Queue, etc.)
+  .main-nowPlayingView-section {
+    position: relative;
+    margin: 12px 0;
+    padding: clamp(12px, 2.2vw, 18px);
+    border-radius: 12px;
+    background:
+      linear-gradient(
+        135deg,
+        rgba(var(--sn-gradient-primary-rgb), 0.05) 0%,
+        rgba(var(--sn-gradient-secondary-rgb), 0.04) 50%,
+        rgba(var(--sn-gradient-accent-rgb), 0.06) 100%
+      );
+    backdrop-filter: blur(10px) saturate(1.25);
+    box-shadow:
+      0 2px 8px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb, 0, 0, 0), 0.12),
+      inset 0 0 0 1px rgba(var(--sn-gradient-primary-rgb), 0.12);
+    overflow: hidden;
+    transition:
+      background 400ms var(--sn-easing-explorer, ease),
+      box-shadow 400ms var(--sn-easing-explorer, ease),
+      transform var(--sn-transition-fast);
+
+    // Hover lift + glow echo
+    &:hover {
+      background:
+        linear-gradient(
+          135deg,
+          rgba(var(--sn-gradient-primary-rgb), 0.08) 0%,
+          rgba(var(--sn-gradient-secondary-rgb), 0.07) 50%,
+          rgba(var(--sn-gradient-accent-rgb), 0.10) 100%
+        );
+      box-shadow:
+        0 6px 18px rgba(var(--sn-gradient-primary-rgb), 0.20),
+        inset 0 0 0 1px rgba(var(--sn-gradient-primary-rgb), 0.20);
+      transform: translateY(-2px) scale(1.015);
+    }
+
+    // Section headers
+    .main-nowPlayingView-sectionHeaderText {
+      color: var(--spice-text);
+      text-shadow: 0 0 4px rgba(var(--sn-gradient-accent-rgb), 0.5);
+    }
+  }
+
+  // 👉 Queue rows – lightweight hover highlight
+  .main-nowPlayingView-queue li {
+    border-radius: 8px;
+    padding-block: 6px;
+    margin-inline: 4px;
+    transition: background 250ms var(--sn-easing-explorer, ease);
+
+    &:hover {
+      background-color: rgba(var(--sn-gradient-primary-rgb), 0.08);
+    }
+  }
+}
+
+// =============================================================================
+// 7 ▪ About Artist Card Accents (Phase 2) – integrates with CDF energy & hue
+// =============================================================================
+.Root__right-sidebar {
+  // Header "About the artist" text gradient + glow
+  .main-nowPlayingView-sectionHeaderText {
+    // Dynamic gradient text – respects current harmonic colours
+    background: linear-gradient(
+      135deg,
+      rgba(var(--sn-gradient-primary-rgb), 1) 0%,
+      rgba(var(--sn-gradient-accent-rgb), 1) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    // Subtle glow driven by energy envelope (fallback to beat var until CDF fully wired)
+    @include text-glow(--sn-gradient-accent-rgb, --sn-cdf-energy);
+  }
+
+  // Artist bio snippet – fade in with energy
+  span.r8e3SfYjm_1JbXLXV3YP {
+    transition: opacity 400ms var(--sn-easing-explorer);
+    opacity: calc(0.6 + var(--sn-cdf-energy, var(--sn-beat-pulse-intensity, 0)) * 0.4);
+  }
+}

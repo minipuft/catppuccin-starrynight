@@ -1,4 +1,5 @@
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
+import type { FrameContext, IVisualSystem } from "@/core/VisualSystemRegistry";
 import { SettingsManager } from "@/managers/SettingsManager";
 import { MusicSyncService } from "@/services/MusicSyncService";
 import type { Year3000Config } from "@/types/models";
@@ -18,7 +19,7 @@ import * as Utils from "@/utils/Year3000Utilities";
  *   • The browser supports WebGPU (navigator.gpu defined)
  * All failure paths gracefully fall back to doing nothing.
  */
-export class WebGPUBackgroundSystem implements IManagedSystem {
+export class WebGPUBackgroundSystem implements IManagedSystem, IVisualSystem {
   public initialized = false;
   private _canvas: HTMLCanvasElement | null = null;
   private _device: GPUDevice | null = null;
@@ -28,6 +29,7 @@ export class WebGPUBackgroundSystem implements IManagedSystem {
   private _bindGroup: GPUBindGroup | null = null;
   private _frame: number = 0;
   private _pipeline: GPURenderPipeline | null = null;
+  public readonly systemName = "WebGPUBackgroundSystem";
 
   // Helper caches
   private _primary: [number, number, number] = [0.5, 0.4, 0.9];
@@ -47,6 +49,9 @@ export class WebGPUBackgroundSystem implements IManagedSystem {
     private settingsManager: SettingsManager,
     private rootSystem: any // Year3000System reference for future hooks
   ) {}
+  forceRepaint?(reason?: string): void {
+    throw new Error("Method not implemented.");
+  }
 
   // ---------------------------------------------------------------------------
   // IManagedSystem lifecycle
@@ -61,6 +66,11 @@ export class WebGPUBackgroundSystem implements IManagedSystem {
       await this._initWebGPU();
       this._startRenderLoop();
       this.initialized = true;
+
+      // Register with Cosmic Discovery Framework if available.
+      if ((this.rootSystem as any)?.registerVisualSystem) {
+        (this.rootSystem as any).registerVisualSystem(this, "background");
+      }
     } catch (err) {
       console.warn("[WebGPUBackgroundSystem] Initialization failed", err);
       this.initialized = false;
@@ -322,6 +332,18 @@ export class WebGPUBackgroundSystem implements IManagedSystem {
         console.warn("[WebGPUBackgroundSystem] Drift update failed", err);
       }
     }
+  }
+
+  // -----------------------------------------------------------------------
+  // CDF VisualSystemRegistry hook – delegate to existing GPU render schedule
+  // -----------------------------------------------------------------------
+  public onAnimate(_delta: number, _context: FrameContext): void {
+    // Placeholder: WebGPU loop already drives frames internally. Future work
+    // could synchronize uniforms here for perfect lockstep.
+  }
+
+  public onPerformanceModeChange?(mode: "performance" | "quality"): void {
+    // TODO: adjust resolution or render cadence based on mode if feasible.
   }
 }
 

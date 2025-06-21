@@ -27,6 +27,7 @@
 @use "../layout/_sn_header_actionBar" as *;
 @use "../layout/_artist_aura_fields" as *;
 @use "../layout/_sn_scroll_node_backgrounds" as *;
+@use "../layout/_sn_right_sidebar_consciousness" as *;
 
 // === COMPONENT MODULES ===
 @use "../components/_track_list_enhanced" as *;
@@ -59,8 +60,9 @@
 @use "../systems/_sn_data_glyphs" as *;
 
 // === SEARCH MODULES ===
-@use "../search/_sn_search_precision" as *;
+//@use "../search/_sn_search_precision" as *; // Disabled to debug search-page load issue
 //@use "../search/_sn_search_quantum" as *; // Temporarily disabled pending conflict resolution
+@use "../search/_sn_search_future" as *; // Lightweight Year3000 search styling
 
 // === LEGACY SIDEBAR MODULES ===
 @use "../sidebar/_sidebar_background_effects" as *;

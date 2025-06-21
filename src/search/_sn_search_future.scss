@@ -1,0 +1,49 @@
+@use "../components/_sn_harmonic_aura" as *;
+@use "../core/_mixins" as *;
+
+:root {
+  // Future-proof tokens for search context – reuse existing dynamic gradient vars
+  --sn-search-future-primary-rgb: var(--sn-gradient-primary-rgb);
+  --sn-search-future-accent-rgb:  var(--sn-gradient-accent-rgb);
+  --sn-search-fade-in-distance: 12px;
+}
+
+// -----------------------------------------------------------------------------
+// YEAR 3000 – Future Search Experience (Lite)
+// Provides subtle fade-in and harmonic aura only – no heavy atmospheric floats
+// -----------------------------------------------------------------------------
+
+body:has(.main-searchPage-content) .main-searchPage-content {
+  // Grid container subtle perspective for depth
+  perspective: 1000px;
+
+  // Cards
+  .main-card-card {
+    // Initial state for fade-in (leverages progressive-fade-in keyframe from _sn_loading.scss)
+    opacity: 0;
+    transform: translateY(var(--sn-search-fade-in-distance));
+    animation: progressive-fade-in 600ms ease-out forwards;
+
+    // Lightweight harmonic aura on hover – reuse mixin from _sn_harmonic_aura.scss
+    @include harmonic-aura;
+
+    &:hover {
+      transform: translateY(-2px) scale(1.02);
+      transition: transform 250ms ease;
+    }
+  }
+
+  // Section headers – apply dynamic text-gradient utility
+  h1, h2, h3, h4, [data-testid="title"] {
+    @include text-gradient();
+  }
+}
+
+// Reduced-motion users still get instant visibility
+@media (prefers-reduced-motion: reduce) {
+  body:has(.main-searchPage-content) .main-searchPage-content .main-card-card {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+}

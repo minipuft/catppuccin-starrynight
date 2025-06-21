@@ -45,6 +45,8 @@ export interface ThemeSettings {
   "sn-nebula-aberration-strength": string;
   /** Temporal Echo Intensity (0=off, 1=minimal, 2=default, 3=intense) */
   "sn-echo-intensity": "0" | "1" | "2" | "3";
+  "sn-visual-intensity": string;
+  "sn-animation-quality": "auto" | "low" | "high";
 }
 
 type ValidationSchema = {
@@ -88,6 +90,27 @@ export class SettingsManager implements IManagedSystem {
       "sn-enable-aberration": "true",
       "sn-nebula-aberration-strength": "0.4",
       "sn-echo-intensity": "2",
+      "sn-visual-intensity": (() => {
+        try {
+          const detector = (globalThis as any).year3000System
+            ?.deviceCapabilityDetector as any;
+          const overall: string | undefined =
+            detector?.deviceCapabilities?.overall;
+          switch (overall) {
+            case "high":
+              return "1";
+            case "medium":
+              return "0.7";
+            case "low":
+              return "0.4";
+            default:
+              return "0.8"; // safe middle ground
+          }
+        } catch (e) {
+          return "0.8";
+        }
+      })() as any,
+      "sn-animation-quality": "auto",
     };
 
     this.validationSchemas = {
@@ -169,10 +192,18 @@ export class SettingsManager implements IManagedSystem {
         default: "2",
         allowedValues: ["0", "1", "2", "3"],
       },
+      "sn-visual-intensity": { default: "0.8" },
+      "sn-animation-quality": {
+        default: "auto",
+        allowedValues: ["auto", "low", "high"],
+      },
     };
 
     this.validateAndRepair();
     this.initialized = true;
+  }
+  forceRepaint?(reason?: string): void {
+    throw new Error("Method not implemented.");
   }
 
   public async initialize(): Promise<void> {

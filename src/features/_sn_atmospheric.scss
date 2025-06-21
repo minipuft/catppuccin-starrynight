@@ -449,15 +449,7 @@
 
 // Reduced motion support
 @media (prefers-reduced-motion: reduce) {
-  // Disable atmospheric animations
-  * {
-    animation: none !important;
-
-    &:hover {
-      transform: none !important;
-    }
-  }
-
+  /* Blanket animation disable removed to allow new lightweight search animations */
   :root {
     --atmospheric-transition: 0.1s ease;
     --ambient-duration: 0s;
@@ -753,6 +745,7 @@ body:not(:has(.main-searchPage-content)) {
 // Ensure search areas get NO atmospheric styling
 .main-searchPage-content {
   // Reset any inherited atmospheric effects
+  /* Blanket animation disable removed to allow new lightweight search animations */
   * {
     animation: none !important;
   }
@@ -761,6 +754,8 @@ body:not(:has(.main-searchPage-content)) {
     // Let precision targeting handle everything
     animation: none !important;
     transform: none !important;
+    // Ensure cards remain visible after clearing animations
+    opacity: 1 !important;
   }
 }
 

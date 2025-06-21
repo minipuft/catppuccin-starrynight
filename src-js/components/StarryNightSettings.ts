@@ -346,6 +346,44 @@ export async function initializeStarryNightSettings(): Promise<void> {
     }
   );
 
+  // === Phase 5 Controls ===============================================
+  // Visual intensity (0-1 slider)
+  const currentVisualInt = settingsManager.get("sn-visual-intensity") || "0.8";
+  (section as any).addInput(
+    "sn-visual-intensity",
+    "Visual intensity (0-1)",
+    currentVisualInt,
+    "number",
+    {
+      attributes: { min: 0, max: 1, step: 0.05 },
+      onChange: (e: any) => {
+        const val = (e.currentTarget as HTMLInputElement).value;
+        let num = parseFloat(val);
+        if (isNaN(num)) num = 0.8;
+        num = Math.max(0, Math.min(1, num));
+        settingsManager.set("sn-visual-intensity", num.toFixed(2) as any);
+      },
+    }
+  );
+
+  // Animation quality drop-down
+  const animQualityOptions = ["auto", "low", "high"] as const;
+  const currentAnimQ = settingsManager.get("sn-animation-quality") || "auto";
+  (section as any).addDropDown(
+    "sn-animation-quality",
+    "Animation quality",
+    animQualityOptions as unknown as string[],
+    Math.max(0, animQualityOptions.indexOf(currentAnimQ as any)),
+    undefined,
+    {
+      onChange: (e: any) => {
+        const idx = e?.currentTarget?.selectedIndex ?? 0;
+        const val = animQualityOptions[idx] ?? "auto";
+        settingsManager.set("sn-animation-quality", val as any);
+      },
+    }
+  );
+
   // Push the section into the DOM.
   await (section as any).pushSettings();
   console.log("✨ [StarryNight] spcr-settings panel initialised");

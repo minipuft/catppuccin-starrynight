@@ -314,6 +314,59 @@ spicetify apply         # For older versions
 --spice-rgb-player        // Player background RGB values
 --spice-rgb-card          // Card background RGB values
 --spice-rgb-highlight     // Highlight accent RGB values
+// === Catppuccin Hex Palette (Full) ===
+--spice-pink              // Catppuccin Pink
+--spice-rosewater         // Catppuccin Rosewater
+--spice-peach             // Catppuccin Peach
+--spice-sky               // Catppuccin Sky
+--spice-lavender          // Catppuccin Lavender
+--spice-red               // Catppuccin Red
+--spice-maroon            // Catppuccin Maroon
+--spice-teal              // Catppuccin Teal
+--spice-yellow            // Catppuccin Yellow
+--spice-blue              // Catppuccin Blue
+--spice-mauve             // Catppuccin Mauve
+--spice-green             // Catppuccin Green
+--spice-sapphire          // Catppuccin Sapphire
+--spice-flamingo          // Catppuccin Flamingo
+--spice-misc              // Neutral grey from palette
+--spice-crust             // Catppuccin Crust
+--spice-mantle            // Catppuccin Mantle
+--spice-base              // Catppuccin Base
+--spice-overlay0          // Catppuccin Overlay0
+--spice-overlay1          // Catppuccin Overlay1
+--spice-overlay2          // Catppuccin Overlay2
+--spice-surface0          // Catppuccin Surface0
+--spice-surface1          // Catppuccin Surface1
+--spice-surface2          // Catppuccin Surface2
+--spice-shadow            // Global shadow colour (alias)
+
+// === Catppuccin RGB Palette (Full) ===
+--spice-rgb-pink              // 245,194,231
+--spice-rgb-rosewater         // 245,224,220
+--spice-rgb-peach             // 250,179,135
+--spice-rgb-sky               // 137,220,235
+--spice-rgb-lavender          // 180,190,254
+--spice-rgb-red               // 243,139,168
+--spice-rgb-maroon            // 235,160,172
+--spice-rgb-teal              // 148,226,213
+--spice-rgb-yellow            // 249,226,175
+--spice-rgb-blue              // 137,180,250
+--spice-rgb-mauve             // 203,166,247
+--spice-rgb-green             // 166,227,161
+--spice-rgb-sapphire          // 116,199,236
+--spice-rgb-flamingo          // 242,205,205
+--spice-rgb-misc              // 69,71,90
+--spice-rgb-crust             // 17,17,27
+--spice-rgb-mantle            // 24,24,37
+--spice-rgb-base              // 30,30,46
+--spice-rgb-overlay0          // 108,112,134
+--spice-rgb-overlay1          // 127,132,156
+--spice-rgb-overlay2          // 147,153,178
+--spice-rgb-surface0          // 49,50,68
+--spice-rgb-surface1          // 69,71,90
+--spice-rgb-surface2          // 88,91,112
+--spice-rgb-shadow            // 24,24,37
 ```
 
 ### ❌ Deprecated Variables (Avoid These)

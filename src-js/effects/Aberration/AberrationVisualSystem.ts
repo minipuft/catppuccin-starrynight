@@ -11,16 +11,10 @@
  * =================================================================== */
 
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
+import type { FrameContext, IVisualSystem } from "@/core/VisualSystemRegistry";
 import { AberrationCanvas } from "@/effects/Aberration/AberrationCanvas";
 
-// NOTE: MasterAnimationCoordinator's AnimationSystem interface is internal and not exported.
-// We re-declare the subset we need locally to avoid a circular dependency.
-interface AnimationSystem {
-  onAnimate(deltaMs: number): void;
-  onPerformanceModeChange?(mode: "performance" | "quality"): void;
-}
-
-export class AberrationVisualSystem implements AnimationSystem {
+export class AberrationVisualSystem implements IVisualSystem {
   public readonly systemName = "AberrationCanvas";
   private _canvas: AberrationCanvas;
   private _elapsed = 0;
@@ -38,8 +32,9 @@ export class AberrationVisualSystem implements AnimationSystem {
   /**
    * Called by the coordinator every frame (subject to frame budgeting).
    * @param deltaMs Time in milliseconds since last call.
+   * @param _context Shared FrameContext from VisualSystemRegistry (unused for now).
    */
-  public onAnimate(deltaMs: number): void {
+  public onAnimate(deltaMs: number, _context: FrameContext): void {
     this._elapsed += deltaMs;
     let start = 0;
     if (this._perf) start = this._perf.startTiming("AberrationVisualSystem");

@@ -98,7 +98,7 @@
 // =============================================================================
 
 // Enhanced transition system for card interactions
-@mixin card-transition($duration: 0.4s, $timing: cubic-bezier(0.4, 0, 0.2, 1)) {
+@mixin card-transition($duration: 0.4s, $timing: var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1))) {
   transition: transform $duration $timing, box-shadow $duration $timing,
     background-color $duration $timing, backdrop-filter $duration $timing,
     opacity $duration $timing;
@@ -188,7 +188,7 @@
 // Morphing animation system for card state changes
 @mixin morphing-transition(
   $duration: 0.8s,
-  $timing: cubic-bezier(0.25, 0.46, 0.45, 0.94)
+  $timing: var(--sn-transition-timing-default, cubic-bezier(0.25, 0.46, 0.45, 0.94))
 ) {
   transition: transform $duration $timing, background $duration $timing,
     backdrop-filter $duration $timing, box-shadow $duration $timing,
@@ -197,7 +197,7 @@
 
 // Interactive 3D hover effect with mouse tracking
 @mixin interactive-3d-hover($max-rotate: 0deg, $depth: 50px) {
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 0.3s var(--sn-transition-timing-default, cubic-bezier(0.25, 0.46, 0.45, 0.94));
 
   &:hover {
     transform-style: preserve-3d;
@@ -684,4 +684,30 @@
 @mixin nebula-noise($opacity: 0.06) {
   background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc2NCcgaGVpZ2h0PSc2NCc+PGZpbHRlciBpZD0nZic+PGZlVHVyYnVsZW5jZSB0eXBlPSdmcmFjdGFsTm9pc2UnIGJhc2VGcmVxdWVuY3k9Jy4yJyBudW1PY3RhdmVzPSc0JyBzdGl0Y2hUaWxlcz0nc3RpdGNoJy8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScgZmlsdGVyPSd1cmwoI2YpJy8+PC9zdmc+");
   background-repeat: repeat;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CDF VARIABLE ALIAS MIXIN (Phase 2)
+// Provides a shorthand to alias legacy CSS variables to the new --sn-cdf-* ones.
+// Usage: inside a :root block → @include cdf-alias('sn-old', 'sn-cdf-new');
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin cdf-alias($old, $new) {
+  // Emit CSS variable reassignment so legacy selectors continue to work.
+  --#{$old}: var(--#{$new});
+}
+
+// === Performance Helper – GPU-Only Wrapper ===
+// Use when an optimisation or effect should run only on devices that
+// advertise a fast display update frequency (usually ≥60 Hz). The
+// `update` media feature is supported by all evergreen browsers.
+//
+// Example:
+//   @include gpu-only {
+//     filter: drop-shadow(0 2px 6px rgba(#000, .25));
+//   }
+@mixin gpu-only {
+  @media (update: fast) {
+    @content;
+  }
 }

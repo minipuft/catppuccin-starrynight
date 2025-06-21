@@ -71,6 +71,31 @@
     Removed duplicate NAV item variables.  Authoritative definitions live in
     the second :root block under the "Sidebar Navigation Variables" heading.
   */
+  --sn-cdf-energy: 0;
+  --sn-cdf-scroll-ratio: 0;
+  --sn-cdf-aberration-strength: 0;
+  --sn-cdf-enabled: 1;
+  --sn-cdf-depth-0-z: 0px;
+  --sn-cdf-depth-1-z: -4px;
+  --sn-cdf-depth-2-z: -8px;
+  --sn-cdf-depth-3-z: -12px;
+  --sn-cdf-depth-4-z: -16px;
+  --sn-cdf-depth-5-z: -20px;
+  --sn-nebula-beat-intensity: var(--sn-cdf-energy);
+  --sn-scroll-ratio: var(--sn-cdf-scroll-ratio);
+  --sn-nebula-aberration-strength: var(--sn-cdf-aberration-strength);
+  --sn-oklab-processed-bright-highlight-rgb: var(
+    --sn-gradient-primary-rgb,
+    var(--spice-rgb-accent)
+  );
+  --sn-oklab-processed-dynamic-shadow-rgb: var(
+    --spice-rgb-base,
+    "0,0,0"
+  );
+  --section-background-base: var(
+    --background-elevated-base,
+    var(--spice-rgb-surface1, "69,71,90")
+  );
 }
 
 :root {
@@ -1701,7 +1726,7 @@ Performance:             Optimized through modularization
   position: relative;
   z-index: 1;
   transform: scale(var(--sn-breathing-scale, 1));
-  transition: transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform var(--sn-transition-fast);
 }
 .main-actionBar-ActionBarRow .main-playButton-PlayButton,
 .main-actionBar-ActionBarRow .main-shuffleButton-button,
@@ -2189,12 +2214,12 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar a.link-subtle.main-navBar-
 }
 :root .Root__right-sidebar .main-buddyFeed-activityMetadata .main-buddyFeed-username a,
 :root .Root__right-sidebar .main-buddyFeed-activityMetadata .main-buddyFeed-usernameAndTimestamp {
-  color: rgba(var(--text), 0.2);
+  color: rgba(var(--spice-rgb-text), 0.2);
 }
 :root .Root__right-sidebar .main-buddyFeed-activityMetadata .main-buddyFeed-artistAndTrackName a,
 :root .Root__right-sidebar .main-buddyFeed-activityMetadata .main-buddyFeed-playbackContextLink,
 :root .Root__right-sidebar .main-buddyFeed-activityMetadata .main-buddyFeed-timestamp {
-  color: rgba(var(--spice-rgb-sidebar-text), 0.8);
+  color: rgba(var(--spice-rgb-text), 0.8);
 }
 
 :root {
@@ -2629,6 +2654,99 @@ body:has(.main-searchPage-content) .main-view-container::before {
   mix-blend-mode: var(--sn-nebula-blend-mode, color-dodge);
 }
 
+:root {
+  --sn-rs-beat-intensity: 0;
+  --sn-rs-hue-shift: 0deg;
+  --sn-rs-glow-alpha: 0.25;
+  --sn-rs-layer1-rgb: var(--sn-gradient-primary-rgb, var(--spice-rgb-accent));
+  --sn-rs-layer2-rgb: var(--sn-gradient-secondary-rgb, var(--spice-rgb-subtext));
+  --sn-rs-layer3-rgb: var(--sn-gradient-accent-rgb, var(--spice-rgb-text));
+  --sn-rs-layer4-rgb: var(--spice-rgb-overlay0, var(--spice-rgb-main-elevated));
+}
+
+@keyframes rsConicFlow {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 50% 50%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+@keyframes rsEcho {
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+.Root__right-sidebar {
+  background-image: radial-gradient(circle at 20% 30%, rgba(var(--sn-rs-layer1-rgb), calc(0.35 * var(--sn-rs-glow-alpha))) 0%, transparent 60%), radial-gradient(circle at 80% 25%, rgba(var(--sn-rs-layer2-rgb), calc(0.25 * var(--sn-rs-glow-alpha))) 0%, transparent 70%), conic-gradient(from var(--sn-rs-hue-shift), rgba(var(--sn-rs-layer3-rgb), calc(0.2 * var(--sn-rs-glow-alpha))) 0deg 120deg, transparent 120deg 300deg, rgba(var(--sn-rs-layer3-rgb), calc(0.2 * var(--sn-rs-glow-alpha))) 300deg 360deg), radial-gradient(circle at 50% 120%, rgba(var(--sn-rs-layer4-rgb), calc(0.15 * var(--sn-rs-glow-alpha))) 0%, transparent 80%);
+  background-blend-mode: screen, screen, overlay, overlay;
+  background-size: 140% 140%;
+  animation: rsConicFlow 28s linear infinite;
+  position: relative;
+  z-index: 0;
+}
+.Root__right-sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(var(--sn-rs-layer4-rgb), 0.1);
+  backdrop-filter: blur(12px) saturate(1.2);
+  z-index: -1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .Root__right-sidebar {
+    animation: none !important;
+    background-image: none !important;
+    background: rgba(var(--sn-rs-layer4-rgb), 0.06);
+  }
+}
+.Root__right-sidebar .main-nowPlayingView-section {
+  position: relative;
+  margin: 12px 0;
+  padding: clamp(12px, 2.2vw, 18px);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(var(--sn-gradient-primary-rgb), 0.05) 0%, rgba(var(--sn-gradient-secondary-rgb), 0.04) 50%, rgba(var(--sn-gradient-accent-rgb), 0.06) 100%);
+  backdrop-filter: blur(10px) saturate(1.25);
+  box-shadow: 0 2px 8px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb, 0, 0, 0), 0.12), inset 0 0 0 1px rgba(var(--sn-gradient-primary-rgb), 0.12);
+  overflow: hidden;
+  transition: background 400ms var(--sn-easing-explorer, ease), box-shadow 400ms var(--sn-easing-explorer, ease), transform var(--sn-transition-fast);
+}
+.Root__right-sidebar .main-nowPlayingView-section:hover {
+  background: linear-gradient(135deg, rgba(var(--sn-gradient-primary-rgb), 0.08) 0%, rgba(var(--sn-gradient-secondary-rgb), 0.07) 50%, rgba(var(--sn-gradient-accent-rgb), 0.1) 100%);
+  box-shadow: 0 6px 18px rgba(var(--sn-gradient-primary-rgb), 0.2), inset 0 0 0 1px rgba(var(--sn-gradient-primary-rgb), 0.2);
+  transform: translateY(-2px) scale(1.015);
+}
+.Root__right-sidebar .main-nowPlayingView-section .main-nowPlayingView-sectionHeaderText {
+  color: var(--spice-text);
+  text-shadow: 0 0 4px rgba(var(--sn-gradient-accent-rgb), 0.5);
+}
+.Root__right-sidebar .main-nowPlayingView-queue li {
+  border-radius: 8px;
+  padding-block: 6px;
+  margin-inline: 4px;
+  transition: background 250ms var(--sn-easing-explorer, ease);
+}
+.Root__right-sidebar .main-nowPlayingView-queue li:hover {
+  background-color: rgba(var(--sn-gradient-primary-rgb), 0.08);
+}
+
+.Root__right-sidebar .main-nowPlayingView-sectionHeaderText {
+  background: linear-gradient(135deg, rgba(var(--sn-gradient-primary-rgb), 1) 0%, rgba(var(--sn-gradient-accent-rgb), 1) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 calc(2px + 6px * var(--sn-cdf-energy)) rgba(var(--sn-gradient-accent-rgb), calc(0.3 + 0.4 * var(--sn-cdf-energy))), 0 1px 2px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.1);
+}
+.Root__right-sidebar span.r8e3SfYjm_1JbXLXV3YP {
+  transition: opacity 400ms var(--sn-easing-explorer);
+  opacity: calc(0.6 + var(--sn-cdf-energy, var(--sn-beat-pulse-intensity, 0)) * 0.4);
+}
+
 .main-rootlist-wrapper {
   position: relative;
   background: transparent;
@@ -2734,15 +2852,14 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
   border-radius: var(--sn-card-stellar-radius, var(--card-border-radius, 12px));
   overflow: hidden;
   isolation: isolate;
-  background: rgba(var(--spice-rgb-surface0, 28, 28, 30), 0.08);
-  box-shadow: 0 1px 4px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb, 0, 0, 0), 0.06);
+  background: rgba(var(--section-background-base, var(--spice-rgb-surface0, 28, 28, 30)), 0.08);
+  filter: drop-shadow(0 1px 4px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb, 0, 0, 0), 0.06));
   transition: box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
   will-change: transform, opacity, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
   contain: style paint;
-  will-change: transform, box-shadow, background, border-color;
 }
 .main-card-card:focus-visible {
   outline: 2px solid var(--spice-accent, #f5c2e7);
@@ -2752,6 +2869,11 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
   .main-card-card {
     transition-duration: 0.15s !important;
     animation: none !important;
+  }
+}
+@media (update: fast) {
+  .main-card-card {
+    will-change: transform, opacity, filter;
   }
 }
 
@@ -7026,7 +7148,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card:hover {
   backface-visibility: hidden;
   perspective: 1000px;
   contain: style paint;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.4s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.4s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.4s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.4s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
 }
 .main-gridContainer-gridContainer[data-testid*=grid] .main-card-card:hover {
   filter: brightness(var(--hover-brightness, 1.05)) saturate(var(--hover-saturation, 1.15));
@@ -7419,12 +7541,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation: none !important;
-  }
-  *:hover {
-    transform: none !important;
-  }
+  /* Blanket animation disable removed to allow new lightweight search animations */
   :root {
     --atmospheric-transition: 0.1s ease;
     --ambient-duration: 0s;
@@ -7629,12 +7746,16 @@ body:not(:has(.main-searchPage-content)) .Root__now-playing-bar .main-shuffleBut
   transform: scale(0.95);
 }
 
+.main-searchPage-content {
+  /* Blanket animation disable removed to allow new lightweight search animations */
+}
 .main-searchPage-content * {
   animation: none !important;
 }
 .main-searchPage-content .main-card-card {
   animation: none !important;
   transform: none !important;
+  opacity: 1 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -8739,7 +8860,7 @@ body:not(:has(.main-searchPage-content)) .sn-3d-floating .main-card-card {
   backface-visibility: hidden;
   perspective: 1000px;
   contain: style paint;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   position: relative;
   overflow: hidden;
   will-change: transform, opacity, filter;
@@ -8793,7 +8914,7 @@ body:not(:has(.main-searchPage-content)) .sn-3d-floating .main-card-card {
 }
 .main-card-card .main-card-PlayButtonContainer,
 .main-card-card .main-playButton-PlayButton {
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   --ripple-color: var(--spice-accent);
   --ripple-intensity: var(--feedback-prominent);
   box-shadow: 0 0 calc(var(--micro-glow-radius) * 0.8) rgba(var(--spice-rgb-accent), calc(var(--feedback-moderate) * var(--micro-beat-intensity)));
@@ -8844,7 +8965,7 @@ body:not(:has(.main-searchPage-content)) .sn-3d-floating .main-card-card {
   backface-visibility: hidden;
   perspective: 1000px;
   contain: style paint;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   position: relative;
   overflow: hidden;
 }
@@ -8890,13 +9011,13 @@ body:not(:has(.main-searchPage-content)) .sn-3d-floating .main-card-card {
 }
 
 .main-createPlaylistButton-button {
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   will-change: transform, opacity, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
   contain: style paint;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   position: relative;
   overflow: hidden;
   border-radius: 6px;
@@ -8960,14 +9081,14 @@ body:not(:has(.main-searchPage-content)) .sn-3d-floating .main-card-card {
 }
 
 .main-navBar-navBarLink {
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   border-radius: 4px;
   will-change: transform, opacity, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
   contain: style paint;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   position: relative;
   overflow: hidden;
 }
@@ -9007,13 +9128,13 @@ body:not(:has(.main-searchPage-content)) .sn-3d-floating .main-card-card {
 .main-skipForwardButton-button,
 .main-skipBackButton-button {
   transform: scale(var(--micro-breathing-scale));
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   will-change: transform, opacity, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
   contain: style paint;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   position: relative;
   overflow: hidden;
   filter: hue-rotate(var(--micro-hue-shift)) brightness(calc(1 + var(--micro-beat-intensity) * 0.08));
@@ -9103,13 +9224,13 @@ body:not(:has(.main-searchPage-content)) .sn-3d-floating .main-card-card {
 
 .main-playButton-PlayButton.main-playButton-primary {
   transform: scale(calc(var(--micro-breathing-scale) * (1 + var(--micro-beat-intensity) * 0.05)));
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   will-change: transform, opacity, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
   contain: style paint;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   position: relative;
   overflow: hidden;
   filter: hue-rotate(var(--micro-hue-shift)) brightness(calc(1 + var(--micro-beat-intensity) * 0.12)) saturate(calc(1.1 + var(--micro-beat-intensity) * 0.2));
@@ -9175,7 +9296,7 @@ body:not(:has(.main-searchPage-content)) .sn-3d-floating .main-card-card {
 }
 
 .x-filterBox-filterInput {
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   border-radius: 6px;
 }
 .x-filterBox-filterInput:hover {
@@ -9195,7 +9316,7 @@ body:not(:has(.main-searchPage-content)) .sn-3d-floating .main-card-card {
 }
 
 .main-dropDown-dropDown {
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
 }
 .main-dropDown-dropDown:hover {
   transform: scale(1.01) translateZ(0);
@@ -9218,7 +9339,7 @@ body:not(:has(.main-searchPage-content)) .sn-3d-floating .main-card-card {
   backface-visibility: hidden;
   perspective: 1000px;
   contain: style paint;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   position: relative;
   overflow: hidden;
   border-radius: 4px;
@@ -9265,13 +9386,13 @@ body:not(:has(.main-searchPage-content)) .sn-3d-floating .main-card-card {
 }
 
 .main-contextMenu-menuItemButton {
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   will-change: transform, opacity, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
   contain: style paint;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), background-color 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), backdrop-filter 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1)), opacity 0.2s var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1));
   position: relative;
   overflow: hidden;
   border-radius: 4px;
@@ -10513,9 +10634,13 @@ body {
 }
 
 :root {
-  --sn-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --sn-transition-standard: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  --sn-transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --sn-transition-fast-duration: 150ms;
+  --sn-transition-standard-duration: 300ms;
+  --sn-transition-slow-duration: 500ms;
+  --sn-transition-timing-default: var(--sn-easing-explorer, cubic-bezier(0.25, 0.46, 0.45, 0.94));
+  --sn-transition-fast: var(--sn-transition-fast-duration) var(--sn-transition-timing-default);
+  --sn-transition-standard: var(--sn-transition-standard-duration) var(--sn-transition-timing-default);
+  --sn-transition-slow: var(--sn-transition-slow-duration) var(--sn-transition-timing-default);
   --sn-ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --sn-ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --sn-ease-sharp: cubic-bezier(0.4, 0, 0.6, 1);
@@ -10621,8 +10746,13 @@ body {
 }
 
 :root {
+  --sn-glyph-intensity: 0;
+  --sn-glyph-glow: 0;
+}
+
+:root {
   --sn-glyph-base-size: 6px;
-  --sn-glyph-opacity: 0;
+  --sn-glyph-glow: 0;
   --sn-glyph-scale: 1;
   --sn-glyph-pulse-intensity: 0;
   --sn-glyph-shimmer-opacity: 0;
@@ -10644,7 +10774,7 @@ body {
   height: var(--sn-glyph-base-size);
   background-color: rgba(var(--sn-glyph-color-rgb), var(--sn-glyph-shimmer-opacity, 0.5));
   border-radius: 50%;
-  opacity: var(--sn-glyph-opacity);
+  opacity: var(--sn-glyph-glow);
   transform: scale(var(--sn-glyph-scale)) rotate(var(--sn-glyph-rotation));
   transition: opacity 0.4s ease, transform 0.4s ease, background-color 0.4s ease;
   pointer-events: none;
@@ -10701,281 +10831,68 @@ nav[aria-label=Main] ul li a.sn-absorbing-energy {
   position: absolute;
   top: 4px;
   right: 4px;
-  width: var(--sn-glyph-base-size);
-  height: var(--sn-glyph-base-size);
+  width: var(--sn-glyph-base-size, 6px);
+  height: var(--sn-glyph-base-size, 6px);
   border-radius: 50%;
-  background-color: rgba(var(--sn-glyph-color-rgb), var(--sn-glyph-shimmer-opacity, 0.5));
-  opacity: var(--sn-glyph-opacity);
-  transform: scale(var(--sn-glyph-scale)) rotate(var(--sn-glyph-rotation));
-  transition: opacity 0.4s ease, transform 0.4s ease, background-color 0.4s ease;
+  background-color: rgba(var(--sn-glyph-color-rgb, 140, 170, 238), var(--sn-glyph-glow, 0.5));
+  opacity: var(--sn-glyph-glow);
+  transform: scale(calc(0.8 + 0.4 * var(--sn-glyph-intensity))) rotate(var(--sn-glyph-rotation, 0deg));
+  transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
   pointer-events: none;
   z-index: 5;
 }
 
 :root {
-  --sn-search-gradient-primary: var(--sn-gradient-primary);
-  --sn-search-gradient-secondary: var(--sn-gradient-secondary);
-  --sn-search-gradient-accent: var(--sn-gradient-accent);
-  --sn-search-gradient-primary-rgb: var(--sn-gradient-primary-rgb);
-  --sn-search-gradient-secondary-rgb: var(--sn-gradient-secondary-rgb);
-  --sn-search-gradient-accent-rgb: var(--sn-gradient-accent-rgb);
-  --sn-search-intensity: 0.15;
-  --sn-search-depth-factor: 0.1;
-  --sn-search-harmony-factor: 0.12;
-  --sn-search-contrast-boost: 1;
-  --sn-search-fallback-primary: var(
-    --sn-gradient-primary,
-    #8caaee
-  );
-  --sn-search-intensity-boosted: calc(
-    var(--sn-search-intensity) * var(--sn-search-contrast-boost, 1)
-  );
-  --sn-search-depth-factor-boosted: calc(
-    var(--sn-search-depth-factor) * var(--sn-search-contrast-boost, 1)
-  );
-  --sn-search-harmony-factor-boosted: calc(
-    var(--sn-search-harmony-factor) * var(--sn-search-contrast-boost, 1)
-  );
-  --sn-search-transition-organic: var(--sn-gradient-transition);
-  --sn-search-transition-quick: 400ms var(--sn-easing-emergence);
+  --sn-search-future-primary-rgb: var(--sn-gradient-primary-rgb);
+  --sn-search-future-accent-rgb: var(--sn-gradient-accent-rgb);
+  --sn-search-fade-in-distance: 12px;
 }
 
-.main-searchPage-content {
-  position: relative;
-}
-.main-searchPage-content::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -10;
-  background: radial-gradient(ellipse at 30% 20%, rgba(var(--sn-search-gradient-primary-rgb), var(--sn-search-intensity)) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(var(--sn-search-gradient-secondary-rgb), var(--sn-search-depth-factor)) 0%, transparent 50%), linear-gradient(135deg, rgba(var(--sn-search-gradient-accent-rgb), var(--sn-search-harmony-factor)) 0%, transparent 40%, transparent 60%, rgba(var(--sn-search-gradient-primary-rgb), calc(var(--sn-search-intensity) * 0.5)) 100%);
-  transition: all var(--sn-search-transition-organic);
-  will-change: var(--sn-gpu-acceleration);
-  transform: translateZ(0);
-  will-change: transform, opacity, filter;
-  transform: translateZ(0);
-  backface-visibility: hidden;
+body:has(.main-searchPage-content) .main-searchPage-content {
   perspective: 1000px;
-  contain: style paint;
 }
-
-.main-shelf-shelf {
-  position: relative;
-}
-.main-shelf-shelf .main-shelf-header {
-  position: relative;
-}
-.main-shelf-shelf .main-shelf-header h2,
-.main-shelf-shelf .main-shelf-header h3,
-.main-shelf-shelf .main-shelf-header h4 {
-  background: linear-gradient(135deg, rgba(var(--sn-search-gradient-primary-rgb), 1) 0%, rgba(var(--sn-search-gradient-accent-rgb), 0.9) 60%, rgba(var(--sn-search-gradient-secondary-rgb), 0.8) 100%) !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  text-shadow: 0 0 20px rgba(var(--sn-search-gradient-primary-rgb), 0.2) !important;
-}
-
 body:has(.main-searchPage-content) .main-searchPage-content .main-card-card {
-  background: transparent !important;
-  border: 1px solid rgba(var(--sn-search-gradient-primary-rgb), 0.15) !important;
-  border-radius: 12px !important;
+  opacity: 0;
+  transform: translateY(var(--sn-search-fade-in-distance));
+  animation: progressive-fade-in 600ms ease-out forwards;
+  position: relative;
 }
-body:has(.main-searchPage-content) .main-searchPage-content .main-card-card::before {
+body:has(.main-searchPage-content) .main-searchPage-content .main-card-card::after {
   content: "";
-  position: absolute !important;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-  background: linear-gradient(135deg, rgba(var(--sn-search-gradient-primary-rgb), var(--sn-search-intensity-boosted)) 0%, rgba(var(--sn-search-gradient-secondary-rgb), var(--sn-search-depth-factor-boosted)) 50%, rgba(var(--sn-search-gradient-accent-rgb), var(--sn-search-harmony-factor-boosted)) 100%) !important;
-  border-radius: inherit;
-  transition: all var(--sn-search-transition-quick);
+  position: absolute;
+  inset: 0;
   pointer-events: none;
+  border-radius: inherit;
+  filter: drop-shadow(0 0 calc(var(--sn-harmonic-aura-blur-base) + var(--sn-harmonic-aura-blur-dynamic)) rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-harmonic-aura-alpha-base) + var(--sn-harmonic-aura-alpha-dynamic))));
+  transition: filter 400ms ease-out;
+  z-index: -1;
+}
+body:has(.main-searchPage-content) .main-searchPage-content .main-card-card:hover::after {
+  filter: drop-shadow(0 0 calc(var(--sn-harmonic-aura-blur-base) * 1.4 + var(--sn-harmonic-aura-blur-dynamic)) rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-harmonic-aura-alpha-base) * 1.4 + var(--sn-harmonic-aura-alpha-dynamic))));
 }
 body:has(.main-searchPage-content) .main-searchPage-content .main-card-card:hover {
-  background: transparent !important;
-  border-color: rgba(var(--sn-search-gradient-primary-rgb), calc(0.25 * var(--sn-search-contrast-boost, 1))) !important;
+  transform: translateY(-2px) scale(1.02);
+  transition: transform 250ms ease;
 }
-body:has(.main-searchPage-content) .main-searchPage-content .main-card-card:hover::before {
-  background: linear-gradient(135deg, rgba(var(--sn-search-gradient-primary-rgb), calc(var(--sn-search-intensity-boosted) * 1.5)) 0%, rgba(var(--sn-search-gradient-secondary-rgb), calc(var(--sn-search-depth-factor-boosted) * 1.5)) 50%, rgba(var(--sn-search-gradient-accent-rgb), calc(var(--sn-search-harmony-factor-boosted) * 1.5)) 100%) !important;
+body:has(.main-searchPage-content) .main-searchPage-content h1, body:has(.main-searchPage-content) .main-searchPage-content h2, body:has(.main-searchPage-content) .main-searchPage-content h3, body:has(.main-searchPage-content) .main-searchPage-content h4, body:has(.main-searchPage-content) .main-searchPage-content [data-testid=title] {
+  background: linear-gradient(135deg, var(--sn-gradient-primary) 0%, var(--sn-gradient-accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
-body:has(.main-searchPage-content) .main-searchPage-content .main-card-card:focus-visible {
-  outline: 2px solid rgba(var(--sn-search-gradient-primary-rgb), 0.8) !important;
-  outline-offset: 2px;
-}
-
-body:has(.main-searchPage-content) [data-testid=top-result-card] .main-card-card {
-  border: 2px solid transparent !important;
-  background: transparent, linear-gradient(135deg, rgba(var(--sn-search-gradient-primary-rgb), 0.4) 0%, rgba(var(--sn-search-gradient-accent-rgb), 0.3) 50%, rgba(var(--sn-search-gradient-secondary-rgb), 0.35) 100%) border-box !important;
-}
-body:has(.main-searchPage-content) [data-testid=top-result-card] .main-card-card::before {
-  background: linear-gradient(135deg, rgba(var(--sn-search-gradient-primary-rgb), 0.15) 0%, rgba(var(--sn-search-gradient-secondary-rgb), 0.1) 50%, rgba(var(--sn-search-gradient-accent-rgb), 0.12) 100%) !important;
-}
-body:has(.main-searchPage-content) [data-testid=top-result-card] .main-card-card:hover::before {
-  background: linear-gradient(135deg, rgba(var(--sn-search-gradient-primary-rgb), 0.22) 0%, rgba(var(--sn-search-gradient-secondary-rgb), 0.16) 50%, rgba(var(--sn-search-gradient-accent-rgb), 0.18) 100%) !important;
-}
-
-body:has(.main-searchPage-content) .main-searchPage-content .main-image-image,
-body:has(.main-searchPage-content) .main-searchPage-content .main-cardImage-image,
-body:has(.main-searchPage-content) .main-searchPage-content .main-entityHeader-image {
-  filter: saturate(1.05) brightness(1.02) contrast(1.01) !important;
-  position: relative;
-}
-body:has(.main-searchPage-content) .main-searchPage-content .main-image-image::after,
-body:has(.main-searchPage-content) .main-searchPage-content .main-cardImage-image::after,
-body:has(.main-searchPage-content) .main-searchPage-content .main-entityHeader-image::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(var(--sn-search-gradient-primary-rgb), 0.02) 0%, transparent 50%, rgba(var(--sn-search-gradient-accent-rgb), 0.01) 100%);
-  opacity: 0;
-  transition: opacity var(--sn-search-transition-quick);
-  border-radius: inherit;
-  pointer-events: none;
-}
-.main-card-card:hover body:has(.main-searchPage-content) .main-searchPage-content .main-image-image::after,
-.main-card-card:hover body:has(.main-searchPage-content) .main-searchPage-content .main-cardImage-image::after,
-.main-card-card:hover body:has(.main-searchPage-content) .main-searchPage-content .main-entityHeader-image::after {
-  opacity: 1;
-}
-
-body:has(.main-searchPage-content) .main-entityHeader-container {
-  background: transparent !important;
-}
-body:has(.main-searchPage-content) .main-entityHeader-container::before {
-  background: linear-gradient(180deg, rgba(var(--sn-search-gradient-primary-rgb), calc(var(--sn-search-intensity) * 1.5)) 0%, rgba(var(--sn-search-gradient-secondary-rgb), calc(var(--sn-search-depth-factor) * 1.2)) 40%, transparent 100%) !important;
-  opacity: 1 !important;
-}
-
-body:has(.main-searchPage-content) .main-searchPage-content .main-cardHeader-text,
-body:has(.main-searchPage-content) .main-searchPage-content .main-cardSubHeader-root,
-body:has(.main-searchPage-content) .main-searchPage-content .main-type-mestoBold,
-body:has(.main-searchPage-content) .main-searchPage-content .main-type-mesto {
-  color: rgba(255, 255, 255, 0.85) !important;
-}
-body:has(.main-searchPage-content) .main-searchPage-content .main-cardHeader-text:is(h1, h2, h3, h4, [data-testid*=title]),
-body:has(.main-searchPage-content) .main-searchPage-content .main-cardSubHeader-root:is(h1, h2, h3, h4, [data-testid*=title]),
-body:has(.main-searchPage-content) .main-searchPage-content .main-type-mestoBold:is(h1, h2, h3, h4, [data-testid*=title]),
-body:has(.main-searchPage-content) .main-searchPage-content .main-type-mesto:is(h1, h2, h3, h4, [data-testid*=title]) {
-  background: linear-gradient(135deg, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.95) 0%, rgba(var(--sn-search-gradient-primary-rgb), 0.9) 100%) !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-}
-
-body:has(.main-searchPage-content) .main-searchPage-content .main-playButton-PlayButton,
-body:has(.main-searchPage-content) .main-searchPage-content .main-card-PlayButtonContainer button {
-  background: linear-gradient(135deg, rgba(var(--sn-search-gradient-primary-rgb), 0.9) 0%, rgba(var(--sn-search-gradient-accent-rgb), 0.8) 100%) !important;
-}
-body:has(.main-searchPage-content) .main-searchPage-content .main-playButton-PlayButton:hover,
-body:has(.main-searchPage-content) .main-searchPage-content .main-card-PlayButtonContainer button:hover {
-  background: linear-gradient(135deg, rgba(var(--sn-search-gradient-primary-rgb), 1) 0%, rgba(var(--sn-search-gradient-accent-rgb), 0.9) 100%) !important;
-  box-shadow: 0 4px 12px rgba(var(--sn-search-gradient-primary-rgb), 0.3), 0 0 0 3px rgba(var(--sn-search-gradient-primary-rgb), 0.1) !important;
-}
-
-body:has(.main-searchPage-content) .main-searchPage-content .main-gridContainer-gridContainer::before {
-  content: "";
-  position: absolute;
-  top: -8px;
-  left: -8px;
-  right: -8px;
-  bottom: -8px;
-  z-index: -1;
-  background: radial-gradient(ellipse 120% 80% at center, rgba(var(--sn-search-gradient-primary-rgb), calc(0.02 * var(--sn-search-contrast-boost, 1))) 0%, rgba(var(--sn-search-gradient-secondary-rgb), calc(0.01 * var(--sn-search-contrast-boost, 1))) 40%, transparent 70%) !important;
-  opacity: 1;
-  transform: scale(1);
-  border-radius: 12px;
-  pointer-events: none;
-}
-
-body:has(.main-searchPage-content) .main-searchPage-content .main-image-image,
-body:has(.main-searchPage-content) .main-searchPage-content .main-cardImage-image,
-body:has(.main-searchPage-content) .main-searchPage-content .main-entityHeader-image {
-  filter: saturate(1.05) brightness(1.02) contrast(1.01) !important;
-  position: relative;
-}
-body:has(.main-searchPage-content) .main-searchPage-content .main-image-image::after,
-body:has(.main-searchPage-content) .main-searchPage-content .main-cardImage-image::after,
-body:has(.main-searchPage-content) .main-searchPage-content .main-entityHeader-image::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(var(--sn-search-gradient-primary-rgb), calc(0.02 * var(--sn-search-contrast-boost, 1))) 0%, transparent 50%, rgba(var(--sn-search-gradient-accent-rgb), calc(0.01 * var(--sn-search-contrast-boost, 1))) 100%);
-  opacity: 0;
-  transition: opacity var(--sn-search-transition-quick);
-  border-radius: inherit;
-  pointer-events: none;
-}
-.main-card-card:hover body:has(.main-searchPage-content) .main-searchPage-content .main-image-image::after,
-.main-card-card:hover body:has(.main-searchPage-content) .main-searchPage-content .main-cardImage-image::after,
-.main-card-card:hover body:has(.main-searchPage-content) .main-searchPage-content .main-entityHeader-image::after {
-  opacity: 1;
-}
-
-body:has(.main-searchPage-content) .main-searchPage-content .main-cardHeader-text,
-body:has(.main-searchPage-content) .main-searchPage-content .main-cardSubHeader-root,
-body:has(.main-searchPage-content) .main-searchPage-content .main-type-mestoBold,
-body:has(.main-searchPage-content) .main-searchPage-content .main-type-mesto {
-  color: rgba(255, 255, 255, calc(0.85 * var(--sn-search-contrast-boost, 1))) !important;
-}
-body:has(.main-searchPage-content) .main-searchPage-content .main-cardHeader-text:is(h1, h2, h3, h4, [data-testid*=title]),
-body:has(.main-searchPage-content) .main-searchPage-content .main-cardSubHeader-root:is(h1, h2, h3, h4, [data-testid*=title]),
-body:has(.main-searchPage-content) .main-searchPage-content .main-type-mestoBold:is(h1, h2, h3, h4, [data-testid*=title]),
-body:has(.main-searchPage-content) .main-searchPage-content .main-type-mesto:is(h1, h2, h3, h4, [data-testid*=title]) {
-  background: linear-gradient(135deg, rgba(var(--sn-oklab-processed-bright-highlight-rgb), calc(0.95 * var(--sn-search-contrast-boost, 1))) 0%, rgba(var(--sn-search-gradient-primary-rgb), calc(0.9 * var(--sn-search-contrast-boost, 1))) 100%) !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-}
-
-body:has(.main-searchPage-content) .main-searchPage-content .main-playButton-PlayButton,
-body:has(.main-searchPage-content) .main-searchPage-content .main-card-PlayButtonContainer button {
-  background: linear-gradient(135deg, rgba(var(--sn-search-gradient-primary-rgb), calc(0.9 * var(--sn-search-contrast-boost, 1))) 0%, rgba(var(--sn-search-gradient-accent-rgb), calc(0.8 * var(--sn-search-contrast-boost, 1))) 100%) !important;
-}
-body:has(.main-searchPage-content) .main-searchPage-content .main-playButton-PlayButton:hover,
-body:has(.main-searchPage-content) .main-searchPage-content .main-card-PlayButtonContainer button:hover {
-  background: linear-gradient(135deg, rgba(var(--sn-search-gradient-primary-rgb), calc(1 * var(--sn-search-contrast-boost, 1))) 0%, rgba(var(--sn-search-gradient-accent-rgb), calc(0.9 * var(--sn-search-contrast-boost, 1))) 100%) !important;
-  box-shadow: 0 4px 12px rgba(var(--sn-search-gradient-primary-rgb), calc(0.3 * var(--sn-search-contrast-boost, 1))), 0 0 0 3px rgba(var(--sn-search-gradient-primary-rgb), calc(0.1 * var(--sn-search-contrast-boost, 1))) !important;
-}
-
-body:has(.main-searchPage-content) .main-entityHeader-container {
-  background: transparent !important;
-}
-body:has(.main-searchPage-content) .main-entityHeader-container::before {
-  background: linear-gradient(180deg, rgba(var(--sn-search-gradient-primary-rgb), calc(var(--sn-search-intensity-boosted) * 1.5)) 0%, rgba(var(--sn-search-gradient-secondary-rgb), calc(var(--sn-search-depth-factor-boosted) * 1.2)) 40%, transparent 100%) !important;
-  opacity: 1 !important;
+@supports not (background-clip: text) {
+  body:has(.main-searchPage-content) .main-searchPage-content h1, body:has(.main-searchPage-content) .main-searchPage-content h2, body:has(.main-searchPage-content) .main-searchPage-content h3, body:has(.main-searchPage-content) .main-searchPage-content h4, body:has(.main-searchPage-content) .main-searchPage-content [data-testid=title] {
+    color: var(--spice-text);
+    background: none;
+    -webkit-text-fill-color: unset;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .main-searchPage-content * {
+  body:has(.main-searchPage-content) .main-searchPage-content .main-card-card {
     animation: none !important;
-    transition-duration: 0.1s !important;
-  }
-}
-@media (max-width: 768px) {
-  :root {
-    --sn-search-intensity: 0.12;
-    --sn-search-depth-factor: 0.08;
-    --sn-search-harmony-factor: 0.1;
-    --sn-search-intensity-boosted: calc(
-      var(--sn-search-intensity) * var(--sn-search-contrast-boost, 1)
-    );
-    --sn-search-depth-factor-boosted: calc(
-      var(--sn-search-depth-factor) * var(--sn-search-contrast-boost, 1)
-    );
-    --sn-search-harmony-factor-boosted: calc(
-      var(--sn-search-harmony-factor) * var(--sn-search-contrast-boost, 1)
-    );
+    opacity: 1;
+    transform: none;
   }
 }
 :root {
@@ -11020,6 +10937,20 @@ body:has(.main-searchPage-content) .main-entityHeader-container::before {
 .Root__nav-bar {
   position: relative;
   transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: linear-gradient(135deg, rgba(var(--sn-gradient-primary-rgb), 0.04) 0%, rgba(var(--sn-gradient-secondary-rgb), 0.03) 50%, rgba(var(--sn-gradient-accent-rgb), 0.06) 100%), rgba(var(--spice-rgb-surface0), 0.07);
+  backdrop-filter: blur(6px) saturate(1.15);
+  border: 1px solid rgba(var(--sn-gradient-primary-rgb), 0.12);
+  filter: drop-shadow(0 2px 6px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb, 0, 0, 0), 0.12));
+  will-change: transform, opacity, filter;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  contain: style paint;
+}
+@media (update: fast) {
+  .Root__nav-bar {
+    will-change: transform, opacity, filter;
+  }
 }
 .Root__nav-bar.sn-harmonic-analogous-flow {
   background: linear-gradient(160deg, rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-sidebar-harmonic-base-opacity) * 0.8)) 0%, rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), calc(var(--sn-sidebar-harmonic-base-opacity) * 0.6)) 50%, rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), calc(var(--sn-sidebar-harmonic-base-opacity) * 0.9)) 100%) !important;
@@ -11116,14 +11047,19 @@ body:has(.main-searchPage-content) .main-entityHeader-container::before {
 .Root__nav-bar.sn-music-high-energy .main-yourLibraryX-title {
   text-shadow: 0 0 calc(6px * var(--sn-sidebar-energy-glow-opacity)) rgba(var(--sn-gradient-accent-rgb), calc(var(--sn-sidebar-energy-glow-opacity) * 0.8));
 }
+.Root__nav-bar.sn-motion-disabled, .Root__nav-bar.sn-motion-disabled::before, .Root__nav-bar.sn-motion-disabled::after, .Root__nav-bar.sn-motion-disabled .sn-sidebar-vibration-layer {
+  animation: none !important;
+  transition: none !important;
+  filter: none !important;
+}
 
 @keyframes consciousnessFlow {
   0% {
-    transform: rotate(0deg);
+    background-position: 0% 50%;
     filter: hue-rotate(0deg);
   }
   100% {
-    transform: rotate(360deg);
+    background-position: 100% 50%;
     filter: hue-rotate(15deg);
   }
 }

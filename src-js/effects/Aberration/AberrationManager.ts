@@ -53,12 +53,8 @@ function attach(y3k: Year3000System | null): void {
       instance,
       y3k.performanceAnalyzer || undefined
     );
-    y3k.registerAnimationSystem(
-      "AberrationCanvas",
-      visualSystem as any, // satisfies minimal AnimationSystem
-      "critical",
-      60
-    );
+    // Register with Cosmic Discovery Framework
+    (y3k as any)?.registerVisualSystem?.(visualSystem, "critical");
     y3k.performanceAnalyzer?.emitTrace("AberrationCanvasAttached");
   }
 }

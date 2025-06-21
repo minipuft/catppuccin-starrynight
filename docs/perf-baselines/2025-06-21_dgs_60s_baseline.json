@@ -1,0 +1,27 @@
+{
+  "system": "DataGlyphSystem",
+  "scenario": "60s-scroll-session",
+  "timestamp": "2025-06-21T00:00:00Z",
+  "environment": {
+    "deviceMemoryGB": "TODO",
+    "hardwareConcurrency": "TODO",
+    "userAgent": "TODO"
+  },
+  "metrics": {
+    "fps": {
+      "average": "TODO",
+      "median": "TODO",
+      "min": "TODO",
+      "max": "TODO",
+      "samples": []
+    },
+    "memory": {
+      "beforeBytes": "TODO",
+      "afterBytes": "TODO",
+      "deltaBytes": "TODO"
+    },
+    "echoCount": "TODO",
+    "glyphUpdates": "TODO"
+  },
+  "notes": "Baseline captured using MasterAnimationCoordinator performance overlay. Replace TODO fields with real sample data after running the 60-second scroll session."
+}

@@ -14,6 +14,7 @@
 // - Base Spicetify theme variables (--spice-rgb-*, etc.)
 //
 // ████████████████████████████████████████████████████████████████████████████████
+@use "../core/_mixins" as *;
 
 :root {
   // === CORE CONSCIOUSNESS VARIABLES (Set by JavaScript) ===
@@ -78,9 +79,28 @@
 
 // Enhanced harmonic mode styling that responds to the classes applied by JavaScript
 .Root__nav-bar {
-  // Base consciousness field styling
   position: relative;
   transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  // === Cosmic Card Baseline ===
+  background:
+    linear-gradient(
+      135deg,
+      rgba(var(--sn-gradient-primary-rgb), 0.04) 0%,
+      rgba(var(--sn-gradient-secondary-rgb), 0.03) 50%,
+      rgba(var(--sn-gradient-accent-rgb), 0.06) 100%
+    ),
+    rgba(var(--spice-rgb-surface0), 0.07);
+  backdrop-filter: blur(6px) saturate(1.15);
+  border: 1px solid rgba(var(--sn-gradient-primary-rgb), 0.12);
+  // GPU-friendly shadow
+  filter: drop-shadow(0 2px 6px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb,0,0,0),0.12));
+
+  // Performance & GPU hints – promote sidebar to its own layer and avoid style recalc jank
+  @include performance-optimized;
+  @include gpu-only {
+    will-change: transform, opacity, filter;
+  }
 
   // Harmonic Mode Classes (applied by updateHarmonicModeDisplay)
   &.sn-harmonic-analogous-flow {
@@ -310,16 +330,25 @@
         );
     }
   }
+
+  // Add motion-disabled override
+  &.sn-motion-disabled {
+    &, &::before, &::after, .sn-sidebar-vibration-layer {
+      animation: none !important;
+      transition: none !important;
+      filter: none !important;
+    }
+  }
 }
 
 // Consciousness flow animations
 @keyframes consciousnessFlow {
   0% {
-    transform: rotate(0deg);
+    background-position: 0% 50%;
     filter: hue-rotate(0deg);
   }
   100% {
-    transform: rotate(360deg);
+    background-position: 100% 50%;
     filter: hue-rotate(15deg);
   }
 }

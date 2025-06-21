@@ -23,6 +23,8 @@ interface CSSVariableBatcherConfig {
    * for environments that still benefit from it.
    */
   useCssTextFastPath?: boolean;
+  /** Automatically hijack CSSStyleDeclaration.setProperty for --sn- variables */
+  autoHijack?: boolean;
 }
 
 interface PerformanceMetrics {
@@ -56,6 +58,9 @@ interface BatcherState {
 }
 
 export class CSSVariableBatcher {
+  // Singleton reference so the hijack can reach the live instance
+  public static instance: CSSVariableBatcher | null = null;
+  private static hijackEnabled = false;
   private config: CSSVariableBatcherConfig;
   private _cssVariableBatcher: BatcherState;
   private _performanceMetrics: PerformanceMetrics;
@@ -67,8 +72,9 @@ export class CSSVariableBatcher {
       maxBatchSize: config.maxBatchSize ?? 50,
       enableDebug: config.enableDebug ?? false,
       useCssTextFastPath: config.useCssTextFastPath ?? false,
+      autoHijack: config.autoHijack ?? true,
       ...config,
-    };
+    } as CSSVariableBatcherConfig;
 
     this._cssVariableBatcher = {
       pendingUpdates: new Map(),
@@ -92,6 +98,13 @@ export class CSSVariableBatcher {
 
     if (this.config.enableDebug) {
       console.log("🎨 [CSSVariableBatcher] Initialized");
+    }
+
+    // Keep singleton reference
+    CSSVariableBatcher.instance = this;
+
+    if (this.config.autoHijack) {
+      this._enableGlobalHijack();
     }
   }
 
@@ -428,6 +441,31 @@ export class CSSVariableBatcher {
     } else {
       // Fallback (very old browsers / non-DOM env) — immediate flush.
       setTimeout(flushCallback, 0);
+    }
+  }
+
+  /** Patch CSSStyleDeclaration.setProperty so legacy code is batched */
+  private _enableGlobalHijack(): void {
+    if (CSSVariableBatcher.hijackEnabled) return;
+    const original = CSSStyleDeclaration.prototype.setProperty;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const batchInstance = this;
+    // @ts-ignore
+    CSSStyleDeclaration.prototype.setProperty = function (
+      prop: string,
+      value: string | null,
+      priority?: string
+    ) {
+      if (prop && prop.startsWith("--sn-") && batchInstance) {
+        batchInstance.queueCSSVariableUpdate(prop, String(value ?? ""));
+      } else {
+        // @ts-ignore
+        original.call(this, prop, value, priority);
+      }
+    } as typeof CSSStyleDeclaration.prototype.setProperty;
+    CSSVariableBatcher.hijackEnabled = true;
+    if (this.config.enableDebug) {
+      console.log("🎨 [CSSVariableBatcher] Global setProperty hijack enabled");
     }
   }
 }

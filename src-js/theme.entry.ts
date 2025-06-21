@@ -4,6 +4,7 @@ import { Year3000Debug } from "./debug/SystemIntegrationTester";
 import { initializeAberrationManager } from "./effects/Aberration/AberrationManager";
 import { initializeNebulaController } from "./effects/NebulaController";
 import { waitForSpicetifyReady } from "./utils/spicetifyReady";
+import * as Year3000Utilities from "./utils/Year3000Utilities";
 
 // A placeholder for the settings UI function until it can be properly typed.
 declare const initializeSettingsUI: (location: any) => void;
@@ -211,6 +212,42 @@ patchReactRequire();
       mode: degradedMode ? "degraded" : "full",
       availableAPIs: requiredAPIs,
     };
+  }
+
+  // 3b. 🫧 Initialize Right Sidebar Consciousness System (Phase 2)
+  try {
+    const { RightSidebarConsciousnessSystem } = await import(
+      "./systems/visual/RightSidebarConsciousnessSystem"
+    );
+    if (year3000System.performanceAnalyzer) {
+      const rsSystem = new RightSidebarConsciousnessSystem(
+        YEAR3000_CONFIG,
+        Year3000Utilities,
+        year3000System.performanceAnalyzer,
+        year3000System.musicSyncService as any,
+        year3000System.settingsManager as any,
+        year3000System
+      );
+      await rsSystem.initialize();
+      (year3000System as any).rightSidebarConsciousnessSystem = rsSystem;
+    }
+  } catch (err) {
+    console.error(
+      "[StarryNight] Failed to initialize RightSidebarConsciousnessSystem",
+      err
+    );
+  }
+
+  // -----------------------------------------------------------------------
+  // 🌠 CDF Variable Bridge – start syncing canonical --sn-cdf-* props.
+  // -----------------------------------------------------------------------
+  try {
+    const { CDFVariableBridge } = await import("./core/CDFVariableBridge");
+    if (year3000System.cssVariableBatcher) {
+      new CDFVariableBridge(year3000System.cssVariableBatcher);
+    }
+  } catch (err) {
+    console.error("[StarryNight] Failed to initialize CDFVariableBridge", err);
   }
 
   const initTime = Date.now() - startTime;

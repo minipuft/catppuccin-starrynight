@@ -1,3 +1,5 @@
+@use "_mixins" as *;
+
 // ████████████████████████████████████████████████████████████████████████████████
 // YEAR 3000 ROOT VARIABLES - Consolidated CSS Custom Properties
 // ████████████████████████████████████████████████████████████████████████████████
@@ -58,6 +60,48 @@
 
   // Quantum Foam variable defined here (system-wide). Duplicate definition
   // removed from the later "Sidebar Navigation" section to avoid conflicts.
+
+  // === COSMIC DISCOVERY FRAMEWORK (CDF) CANONICAL VARIABLES ================
+  // These are the new shared tokens consumed by VisualSystemRegistry & its
+  // subsystems.  Legacy variables are aliased below via @include cdf-alias.
+  --sn-cdf-energy: 0; // 0-1 current music energy envelope
+  --sn-cdf-scroll-ratio: 0; // 0-1 vertical scroll progress
+  --sn-cdf-aberration-strength: 0; // 0-1 RGB split shader intensity
+  --sn-cdf-enabled: 1; // 0 = motion reduced / disabled
+  // Depth Z layers (0: nearest … 5: farthest)
+  --sn-cdf-depth-0-z: 0px;
+  --sn-cdf-depth-1-z: -4px;
+  --sn-cdf-depth-2-z: -8px;
+  --sn-cdf-depth-3-z: -12px;
+  --sn-cdf-depth-4-z: -16px;
+  --sn-cdf-depth-5-z: -20px;
+
+  // Legacy ↔ CDF aliases -------------------------------------------------------
+  @include cdf-alias('sn-nebula-beat-intensity', 'sn-cdf-energy');
+  @include cdf-alias('sn-scroll-ratio', 'sn-cdf-scroll-ratio');
+  @include cdf-alias('sn-nebula-aberration-strength', 'sn-cdf-aberration-strength');
+
+  // === RUNTIME FALLBACKS =====================================================
+  // These tokens are normally computed by JS (theme.entry.ts → theme.js).  To
+  // avoid flashes of un-styled content before the script executes, we provide
+  // safe defaults that will be overridden once the runtime calculation is
+  // ready.  Keep the values lightweight and universally accessible.
+  --sn-oklab-processed-bright-highlight-rgb: var(
+    --sn-gradient-primary-rgb,
+    var(--spice-rgb-accent)
+  ); // Fallback to current primary accent
+  --sn-oklab-processed-dynamic-shadow-rgb: var(
+    --spice-rgb-base,
+    "0,0,0"
+  ); // Neutral shadow base until JS refines
+
+  // === SHARED SECTION BACKGROUND ===========================================
+  // Provides a unified base colour for elevated card/section surfaces.
+  // Falls back to Catppuccin surface token when Spotify variable is missing.
+  --section-background-base: var(
+    --background-elevated-base,
+    var(--spice-rgb-surface1, "69,71,90")
+  );
 }
 
 // ████████████████████████████████████████████████████████████████████████████████

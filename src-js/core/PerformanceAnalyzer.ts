@@ -102,6 +102,11 @@ class FPSCounter {
       cancelAnimationFrame(this.rafHandle);
     }
   };
+
+  /** Returns copy of the last recorded FPS samples (1-sec granularity). */
+  public getHistory(): number[] {
+    return [...this.history];
+  }
 }
 
 export class PerformanceAnalyzer {
@@ -424,6 +429,84 @@ export class PerformanceAnalyzer {
       this._isLowEndCache = false;
       return false;
     }
+  }
+
+  /**
+   * Returns median FPS using the most recent N one-second samples (default 5).
+   * Falls back to current FPS when insufficient samples.
+   */
+  public getMedianFPS(sampleWindowSeconds = 5): number {
+    if (!this._fpsCounter) return 60;
+    const hist = (this._fpsCounter as any).getHistory?.() || [];
+    const samples = hist.slice(-sampleWindowSeconds);
+    if (!samples.length) return this._fpsCounter.currentFPS || 60;
+    const sorted = [...samples].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 0
+      ? (sorted[mid - 1] + sorted[mid]) / 2
+      : sorted[mid];
+  }
+
+  /**
+   * Capture a one-off 60 s (or custom) performance baseline and trigger a JSON
+   * download so developers can commit the artefact under
+   * `docs/perf-baselines/`.
+   *
+   * Example (DevTools):
+   *   await year3000System.performanceAnalyzer.startBaselineCapture("Home");
+   */
+  public async startBaselineCapture(
+    viewName = "unknown",
+    durationMs = 60_000
+  ): Promise<PerformanceMetrics[]> {
+    if (!this.isMonitoring) {
+      this.startMonitoring();
+    }
+
+    const start = Date.now();
+    if (this.config.enableDebug) {
+      console.log(
+        `📊 [PerformanceAnalyzer] Baseline capture for "${viewName}" started`
+      );
+    }
+
+    await new Promise((r) => setTimeout(r, durationMs));
+
+    if (this.config.enableDebug) {
+      console.log(
+        `📊 [PerformanceAnalyzer] Baseline capture complete – ${
+          this.performanceHistory.length
+        } samples in ${(Date.now() - start) / 1_000}s`
+      );
+    }
+
+    const artefact = {
+      view: viewName,
+      capturedAt: new Date().toISOString(),
+      durationMs,
+      samples: this.performanceHistory,
+    };
+
+    try {
+      const blob = new Blob([JSON.stringify(artefact, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${viewName}_${new Date()
+        .toISOString()
+        .slice(0, 10)}_baseline.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 5_000);
+    } catch (err) {
+      console.warn(
+        "[PerformanceAnalyzer] Unable to trigger baseline download",
+        err
+      );
+    }
+
+    return [...this.performanceHistory];
   }
 
   // --- End of static helpers ---

@@ -4,6 +4,8 @@
 // Replaces multiple concurrent requestAnimationFrame loops with single coordinated system
 // Provides frame budgeting, priority-based scheduling, and automatic performance optimization
 
+import { DeviceCapabilityDetector } from "./DeviceCapabilityDetector";
+
 interface CoordinatorConfig {
   frameTimeBudget: number;
   maxBatchSize: number;
@@ -52,6 +54,8 @@ export class MasterAnimationCoordinator {
   private _frameTimeBudget: number;
 
   private _performanceMetrics: PerformanceMetrics;
+  /** Optional capability gating helper injected by Year3000System */
+  private _deviceCapabilityDetector: DeviceCapabilityDetector | null = null;
 
   constructor(config: Partial<CoordinatorConfig> = {}) {
     this.config = {
@@ -190,6 +194,11 @@ export class MasterAnimationCoordinator {
     }
   }
 
+  /** Inject DeviceCapabilityDetector so MAC can auto-skip on low-end tiers */
+  public setDeviceCapabilityDetector(detector: DeviceCapabilityDetector): void {
+    this._deviceCapabilityDetector = detector;
+  }
+
   private _executeMasterAnimationFrame(
     timestamp: number,
     deltaTime: number
@@ -204,6 +213,16 @@ export class MasterAnimationCoordinator {
     });
 
     for (const [systemName, config] of systemsByPriority) {
+      // ── Low-end gate: skip background systems entirely on "low" profiles
+      if (
+        this._deviceCapabilityDetector &&
+        this._deviceCapabilityDetector.recommendPerformanceQuality() ===
+          "low" &&
+        config.priority === "background"
+      ) {
+        continue;
+      }
+
       if (
         !config.enabled ||
         (remainingBudget <= 0 && config.priority === "background")
@@ -419,5 +438,13 @@ export class MasterAnimationCoordinator {
   // -----------------------------------------------------------------------
   public getPerformanceReport() {
     return JSON.parse(JSON.stringify(this._performanceMetrics));
+  }
+
+  public getCurrentPerformanceMode(): "auto" | "performance" | "quality" {
+    return this._performanceMetrics.performanceMode;
+  }
+
+  public getFrameTimeBudget(): number {
+    return this._frameTimeBudget;
   }
 }

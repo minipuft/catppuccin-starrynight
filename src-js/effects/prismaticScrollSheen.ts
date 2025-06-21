@@ -2,11 +2,13 @@
 // Prismatic Scroll Sheen Effect – Year 3000 visual enhancement
 // ---------------------------------------------------------------------------
 // Applies a rainbow-sheen gradient that shifts hue based on the user's vertical
-// scroll position inside Spotify's playlist/content viewport.  The effect is
-// extremely lightweight (one scroll handler + a single CSS variable write) and
-// auto-disables on low-end devices as reported by DeviceCapabilityDetector.
+// scroll position **provided by the Cosmic Discovery Framework**. The legacy
+// scroll listener has been removed – we now rely on the shared `scrollRatio`
+// from `FrameContext`, ensuring perfect sync between systems and zero extra
+// event overhead.
 // ---------------------------------------------------------------------------
 
+import type { FrameContext, IVisualSystem } from "@/core/VisualSystemRegistry";
 import year3000System from "@/core/year3000System";
 
 // Default cycle length in pixels before the ratio loops back to 0.
@@ -15,90 +17,63 @@ import year3000System from "@/core/year3000System";
 const DEFAULT_CYCLE_PX = 6000;
 
 /**
- * Initialise the prismatic scroll sheen.  A CSS custom property
- * `--sn-scroll-ratio` (0-1) is updated in real-time and consumed by SCSS.
- *
- * @param selector CSS selector for the scroll container.  Defaults to
- *                 Spotify's `.main-view-container__scroll-node`.
+ * Lightweight visual system that maps `frameContext.scrollRatio` (0-1) onto
+ * a CSS custom property `--sn-cdf-scroll-ratio`.  All gradient animations in
+ * SCSS reference this canonical var.  We optionally keep the legacy
+ * `--sn-scroll-ratio` alias alive for backwards compatibility.
  */
-export function initializePrismaticScrollSheen(
-  selector = ".main-view-container__scroll-node"
-): void {
-  // Graceful degradation when the system or container is missing.
-  if (typeof document === "undefined") return;
+export class PrismaticScrollSheenSystem implements IVisualSystem {
+  public readonly systemName = "PrismaticScrollSheen";
 
-  // Shutdown pathway for low-end devices.
-  try {
-    const detector = year3000System?.deviceCapabilityDetector;
-    if (
-      detector &&
-      detector.deviceCapabilities?.overall &&
-      detector.deviceCapabilities.overall === "low"
-    ) {
-      // Flag disabled via CSS variable so the gradient stays hidden.
-      document.documentElement.style.setProperty(
-        "--sn-scroll-sheen-enabled",
-        "0"
-      );
-      return;
-    }
-  } catch (_e) {
-    /* ignore detection errors – proceed */
-  }
+  private _lastRatio = -1;
 
-  document.documentElement.style.setProperty("--sn-scroll-sheen-enabled", "1");
-
-  const attachListener = (container: HTMLElement) => {
-    let previousTop = container.scrollTop;
-    let cumulativePx = 0;
-
-    // Determine cycle length – CSS variable beats default.
-    const rootStyle = getComputedStyle(document.documentElement);
-    const cssCyclePx = parseFloat(
-      rootStyle.getPropertyValue("--sn-scroll-cycle-px") || ""
-    );
-    const cyclePx = isNaN(cssCyclePx) ? DEFAULT_CYCLE_PX : cssCyclePx;
-
-    // Expose the effective cycle length so SCSS authors can read it.
+  constructor(private cyclePx = DEFAULT_CYCLE_PX) {
+    // Expose cycle length so SCSS authors can reference it.
     document.documentElement.style.setProperty(
       "--sn-scroll-cycle-px",
-      cyclePx.toString()
+      String(cyclePx)
     );
-
-    const update = () => {
-      const currentTop = container.scrollTop;
-      const delta = Math.abs(currentTop - previousTop);
-      previousTop = currentTop;
-
-      // Accumulate distance and wrap at cycle boundary.
-      cumulativePx = (cumulativePx + delta) % cyclePx;
-
-      const ratio = cumulativePx / cyclePx; // 0-1 repeating value
-      document.documentElement.style.setProperty(
-        "--sn-scroll-ratio",
-        ratio.toFixed(4)
-      );
-    };
-
-    container.addEventListener("scroll", update, { passive: true });
-    update(); // Initial seed
-  };
-
-  const maybeAttach = () => {
-    const container = document.querySelector<HTMLElement>(selector);
-    if (container) {
-      attachListener(container);
-      return true;
-    }
-    return false;
-  };
-
-  // Attempt immediate attach; if not found, retry a few times.
-  if (!maybeAttach()) {
-    const retryInterval = setInterval(() => {
-      if (maybeAttach()) clearInterval(retryInterval);
-    }, 500);
-    // Stop trying after 20 seconds to avoid leaking.
-    setTimeout(() => clearInterval(retryInterval), 20000);
   }
+
+  /**
+   * Called each animation frame by VisualSystemRegistry.
+   */
+  public onAnimate(_delta: number, context: FrameContext): void {
+    const ratio = context.scrollRatio ?? 0;
+    if (Math.abs(ratio - this._lastRatio) < 0.001) return; // avoid spam
+    this._lastRatio = ratio;
+
+    // Update canonical CDF var and legacy alias
+    const root = document.documentElement;
+    root.style.setProperty("--sn-cdf-scroll-ratio", ratio.toFixed(4));
+    root.style.setProperty("--sn-scroll-ratio", ratio.toFixed(4));
+  }
+
+  public onPerformanceModeChange(): void {
+    // no-op – effect is negligible cost
+  }
+
+  public destroy(): void {
+    // nothing to clean up
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Backwards-compat helper – retain original function signature so existing
+// calls in theme.entry.ts don't break.  Internally we just register the new
+// visual system with CDF and do no more work here.
+// ---------------------------------------------------------------------------
+
+export function initializePrismaticScrollSheen(): void {
+  try {
+    const sys = new PrismaticScrollSheenSystem();
+    (year3000System as any)?.registerVisualSystem?.(sys, "background");
+  } catch (err) {
+    console.error("[PrismaticScrollSheen] Failed to init:", err);
+  }
+}
+
+// Auto-initialise if Year3000System global already available (hot-reload / tests)
+if ((window as any).Y3K?.system?.registerVisualSystem) {
+  initializePrismaticScrollSheen();
 }

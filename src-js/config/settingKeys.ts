@@ -18,3 +18,5 @@ export const MANUAL_BASE_COLOR_KEY = "sn-harmonic-manual-base-color";
 export const ENABLE_WEBGPU_KEY = "sn-enable-webgpu";
 export const NEBULA_INTENSITY_KEY = "sn-nebula-intensity";
 export const ENABLE_ABERRATION_KEY = "sn-enable-aberration";
+export const VISUAL_INTENSITY_KEY = "sn-visual-intensity";
+export const ANIMATION_QUALITY_KEY = "sn-animation-quality";

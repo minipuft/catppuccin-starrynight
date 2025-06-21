@@ -2,10 +2,12 @@
 // DIMENSIONAL NEXUS SIDEBAR - Phase 5: Holographic Data Glyphs & Biometric Feedback
 // ████████████████████████████████████████████████████████████████████████████████
 
+@use "../components/_sn_glyph_variables.scss" as *;
+
 :root {
   // Variables for Data Glyphs (Phase 5)
   --sn-glyph-base-size: 6px; // Base size of a glyph element
-  --sn-glyph-opacity: 0;
+  --sn-glyph-glow: 0;
   --sn-glyph-scale: 1;
   --sn-glyph-pulse-intensity: 0; // 0 to 1, for pulsing animation
   --sn-glyph-shimmer-opacity: 0; // For color shimmer effect
@@ -34,7 +36,7 @@
     var(--sn-glyph-shimmer-opacity, 0.5)
   ); // Base with shimmer
   border-radius: 50%;
-  opacity: var(--sn-glyph-opacity);
+  opacity: var(--sn-glyph-glow);
   transform: scale(var(--sn-glyph-scale)) rotate(var(--sn-glyph-rotation));
   transition: opacity 0.4s ease, transform 0.4s ease, background-color 0.4s ease;
   pointer-events: none; // Glyphs shouldn't interfere with interaction
@@ -135,21 +137,5 @@ nav[aria-label="Main"] ul li a {
 // ---------------------------------------------------------------------------
 
 [data-sn-glyph] {
-  position: relative; // ensure containing block for the ::after glyph
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: var(--sn-glyph-base-size);
-    height: var(--sn-glyph-base-size);
-    border-radius: 50%;
-    background-color: rgba(var(--sn-glyph-color-rgb), var(--sn-glyph-shimmer-opacity, 0.5));
-    opacity: var(--sn-glyph-opacity);
-    transform: scale(var(--sn-glyph-scale)) rotate(var(--sn-glyph-rotation));
-    transition: opacity 0.4s ease, transform 0.4s ease, background-color 0.4s ease;
-    pointer-events: none;
-    z-index: 5;
-  }
+  @include glyph-consciousness();
 }

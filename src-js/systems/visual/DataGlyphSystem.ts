@@ -76,7 +76,8 @@ export class DataGlyphSystem extends BaseVisualSystem {
   private deviceCapabilities: DeviceCapabilities;
   private _eventListeners: any[];
   private _domEventListeners: any[];
-  private hoverTimeouts: WeakMap<Element, NodeJS.Timeout> = new WeakMap();
+  private hoverTimeouts: WeakMap<Element, string | NodeJS.Timeout> =
+    new WeakMap();
   // Active echo elements tracked for the low-cost lifecycle maintenance loop.
   private activeEchoElements: Set<HTMLElement> = new Set();
   // Timestamp gate for throttling maintenance pass (ms since epoch) – avoids running heavy DOM ops every frame.
@@ -93,6 +94,30 @@ export class DataGlyphSystem extends BaseVisualSystem {
   /** Flag toggled by MasterAnimationCoordinator – echo spawning is skipped
    *  entirely while in performance mode to preserve frame budget. */
   private _performanceMode = false;
+  // === Performance-Optimisation Additions (Phase Patch DG-P1) ===
+  /** Elements currently intersecting viewport (incl. small rootMargin buffer). */
+  private _visibleItems: Set<Element> = new Set();
+
+  /** IntersectionObserver instance used to maintain _visibleItems. */
+  private _intersectionObserver: IntersectionObserver | null = null;
+
+  /** Style element used to batch per-glyph CSS variable updates. */
+  private _styleElement: HTMLStyleElement | null = null;
+
+  /** Cache of last emitted CSS for diff detection to avoid useless DOM writes. */
+  private _lastGlyphBatchCss = "";
+
+  /** Mapping of last intensity value per glyph to allow <0.01 early-out. */
+  private _lastIntensityMap: Map<Element, number> = new Map();
+
+  /** Throttle gate – last time (ms, performance.now) we executed a glyph batch. */
+  private _lastGlyphUpdate = 0;
+
+  /** Minimum interval between glyph batches (ms). 10 Hz ⇒ 100 ms. */
+  private readonly _maxUpdateInterval = 100;
+
+  /** Running counter for data-sn-glyph-id generation (ensures uniqueness). */
+  private _glyphIdCounter = 0;
 
   constructor(
     config: Year3000Config,
@@ -146,9 +171,12 @@ export class DataGlyphSystem extends BaseVisualSystem {
       reducedMotion: this._detectReducedMotion(),
     };
 
-    const healthMonitor = this.utils.getHealthMonitor();
+    const healthMonitor = this.utils.getHealthMonitor?.();
     if (healthMonitor) {
-      healthMonitor.registerSystem("DataGlyphSystem", this);
+      (healthMonitor as any).registerSystem("DataGlyphSystem", this, {
+        criticalLevel: "MEDIUM",
+        requiredSelectors: ["[data-sn-glyph]"],
+      });
     }
   }
 
@@ -187,10 +215,52 @@ export class DataGlyphSystem extends BaseVisualSystem {
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
+  // === Helper: ensure <style id="sn-glyph-style"> element exists ===
+  private _ensureStyleElement(): void {
+    if (this._styleElement && document.contains(this._styleElement)) return;
+
+    const existing = document.getElementById(
+      "sn-glyph-style"
+    ) as HTMLStyleElement | null;
+    if (existing) {
+      this._styleElement = existing;
+      return;
+    }
+
+    const style = document.createElement("style");
+    style.id = "sn-glyph-style";
+    document.head.appendChild(style);
+    this._styleElement = style;
+  }
+
+  // === Helper: set up IntersectionObserver to cap glyph work to viewport ===
+  private _setupIntersectionObserver(): void {
+    if (this._intersectionObserver) return;
+
+    this._intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            this._visibleItems.add(entry.target);
+          } else {
+            this._visibleItems.delete(entry.target);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: "200px", // small look-ahead buffer for smoothness
+      }
+    );
+  }
+
   async initialize() {
     await super.initialize();
     this._tryRegisterWithMasterAnimation();
     this.setupItemObserver();
+    // Patch additions ----------------------------------------------------
+    this._ensureStyleElement();
+    this._setupIntersectionObserver();
   }
 
   private _tryRegisterWithMasterAnimation() {
@@ -202,32 +272,28 @@ export class DataGlyphSystem extends BaseVisualSystem {
         (this.year3000System as any).registerAnimationSystem(
           "DataGlyphSystem",
           this,
-          "normal",
-          this.deviceCapabilities.performanceLevel === "high" ? 60 : 30
+          "background",
+          30
         );
         this.masterAnimationRegistered = true;
         this.isUsingMasterAnimation = true;
       } catch (error) {
-        this._startFallbackAnimationLoop();
+        // NOTE: rAF fallback loop removed – DataGlyphSystem now operates strictly
+        // under MasterAnimationCoordinator scheduling.  If registration fails we
+        // operate in a dormant state and rely on MutationObserver-driven updates.
       }
-    } else {
-      this._startFallbackAnimationLoop();
     }
-  }
-
-  private _startFallbackAnimationLoop() {
-    this.isUsingMasterAnimation = false;
-    const fallbackLoop = () => {
-      if (!this.initialized) return;
-      this.updateAnimation(performance.now(), 16.67);
-      this.animationFrameId = requestAnimationFrame(fallbackLoop);
-    };
-    this.animationFrameId = requestAnimationFrame(fallbackLoop);
   }
 
   // Conforms to MasterAnimationCoordinator – delegates to updateAnimation
   public onAnimate(deltaMs: number): void {
-    this.updateAnimation(performance.now(), deltaMs);
+    // Use PerformanceAnalyzer bucket throttle to skip frames when not needed.
+    if (
+      !this.performanceMonitor ||
+      this.performanceMonitor.shouldUpdate("glyph-maint", 100)
+    ) {
+      this.updateAnimation(performance.now(), deltaMs);
+    }
   }
 
   public updateAnimation(timestamp: number, deltaTime: number) {
@@ -388,6 +454,18 @@ export class DataGlyphSystem extends BaseVisualSystem {
 
     // We now render the glyph via ::after pseudo-element. Just tag the element.
     itemElement.setAttribute("data-sn-glyph", "");
+
+    // Ensure each glyph has a stable unique selector for batched CSS.
+    if (!itemElement.hasAttribute("data-sn-glyph-id")) {
+      this._glyphIdCounter += 1;
+      itemElement.setAttribute("data-sn-glyph-id", `g${this._glyphIdCounter}`);
+    }
+
+    // Observe for viewport visibility management.
+    if (this._intersectionObserver) {
+      this._intersectionObserver.observe(itemElement);
+    }
+
     this.glyphElements.set(itemElement, null);
 
     const data = this.updateGlyphData(itemElement, {});
@@ -411,6 +489,13 @@ export class DataGlyphSystem extends BaseVisualSystem {
       itemElement.removeAttribute("data-sn-glyph");
     }
 
+    // Stop observing for visibility
+    if (this._intersectionObserver) {
+      this._intersectionObserver.unobserve(itemElement);
+    }
+    this._visibleItems.delete(itemElement);
+    this._lastIntensityMap.delete(itemElement);
+
     const observation = this.observedItems.get(itemElement);
     if (observation) {
       observation.removeListeners();
@@ -421,13 +506,53 @@ export class DataGlyphSystem extends BaseVisualSystem {
     this.itemInteractionData.delete(itemElement);
   }
 
+  /**
+   * Batched glyph animation pass (≤ 10 Hz).
+   * – Updates only items currently intersecting the viewport (+200 px buffer).
+   * – Builds a single <style> rule string to avoid per-element style mutation.
+   * – Skips emission when Δ intensity < 0.01 to minimise layout thrash.
+   */
   private animateAllGlyphs() {
-    this.observedItems.forEach((_, itemElement) => {
-      const itemData = this.glyphDataCache.get(itemElement);
-      if (itemData) {
-        this.updateGlyphVisuals(itemElement as HTMLElement, itemData);
+    const now = performance.now();
+    if (now - this._lastGlyphUpdate < this._maxUpdateInterval) return;
+    this._lastGlyphUpdate = now;
+
+    this._ensureStyleElement();
+    if (!this._styleElement) return; // Safety guard
+
+    const rules: string[] = [];
+
+    this._visibleItems.forEach((item) => {
+      const itemData = this.glyphDataCache.get(item);
+      if (!itemData) return;
+
+      const musicData = this.musicSyncService?.getLatestProcessedData();
+      let intensity = 0;
+      if (musicData) {
+        intensity = musicData.energy * 0.5 + musicData.valence * 0.5;
       }
+      intensity = (intensity + itemData.attentionScore) / 2;
+
+      const prev = this._lastIntensityMap.get(item);
+      if (prev !== undefined && Math.abs(prev - intensity) < 0.01) return;
+      this._lastIntensityMap.set(item, intensity);
+
+      const glow = intensity * 0.8;
+      const id = (item as HTMLElement).getAttribute("data-sn-glyph-id");
+      if (!id) return;
+
+      rules.push(
+        `[data-sn-glyph-id="${id}"]{--sn-glyph-intensity:${intensity.toFixed(
+          3
+        )};--sn-glyph-glow:${glow.toFixed(3)};}`
+      );
     });
+
+    const cssText = rules.join("");
+    if (cssText && cssText !== this._lastGlyphBatchCss) {
+      this._styleElement.textContent = cssText;
+      this._lastGlyphBatchCss = cssText;
+    }
   }
 
   private updateGlyphVisuals(itemElement: HTMLElement, itemData: GlyphData) {
@@ -443,19 +568,9 @@ export class DataGlyphSystem extends BaseVisualSystem {
     }
     intensity = (intensity + itemData.attentionScore) / 2;
 
-    const applyCss = (prop: string, val: string, el: HTMLElement) => {
-      if (
-        this.year3000System &&
-        (this.year3000System as any).queueCSSVariableUpdate
-      ) {
-        (this.year3000System as any).queueCSSVariableUpdate(prop, val, el);
-      } else {
-        el.style.setProperty(prop, val);
-      }
-    };
+    // Legacy inline update path removed – batched style rules now handle CSS vars.
 
-    applyCss("--glyph-intensity", `${intensity}`, targetEl);
-    applyCss("--sn-glyph-opacity", `${(intensity * 0.8).toFixed(2)}`, targetEl);
+    // Legacy tokens removed
   }
 
   private updateGlyphData(
@@ -486,14 +601,40 @@ export class DataGlyphSystem extends BaseVisualSystem {
     });
     if (event.type === "mouseenter") {
       // Start dwell-timer (120 ms) to avoid accidental flickers
-      const dwell = setTimeout(() => {
-        this.addTemporalEcho(itemElement);
-      }, 120);
-      this.hoverTimeouts.set(itemElement, dwell);
+      const timerSystem = (this.year3000System as any)
+        ?.timerConsolidationSystem;
+      if (timerSystem && timerSystem.registerConsolidatedTimer) {
+        const dwellId = `dgs-dwell-${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2)}`;
+        timerSystem.registerConsolidatedTimer(
+          dwellId,
+          () => {
+            this.addTemporalEcho(itemElement);
+            timerSystem.unregisterConsolidatedTimer(dwellId);
+          },
+          120,
+          "background"
+        );
+        this.hoverTimeouts.set(itemElement, dwellId);
+      } else {
+        const dwell = setTimeout(() => {
+          this.addTemporalEcho(itemElement);
+        }, 120);
+        this.hoverTimeouts.set(itemElement, dwell);
+      }
     } else if (event.type === "mouseleave") {
       // Clear pending echo if user leaves early
-      const t = this.hoverTimeouts.get(itemElement);
-      if (t) clearTimeout(t);
+      const h = this.hoverTimeouts.get(itemElement);
+      if (h) {
+        const timerSystem = (this.year3000System as any)
+          ?.timerConsolidationSystem;
+        if (typeof h === "string" && timerSystem) {
+          timerSystem.unregisterConsolidatedTimer(h);
+        } else if (typeof h !== "string") {
+          clearTimeout(h as NodeJS.Timeout);
+        }
+      }
       this.hoverTimeouts.delete(itemElement);
     }
   }
@@ -634,10 +775,14 @@ export class DataGlyphSystem extends BaseVisualSystem {
     // Perf guard – cap simultaneous echoes
     if (this.currentEchoCount >= this.dynamicMaxEchoes) return;
 
+    // Skip echo generation if overall performance is struggling.
+    if (this.performanceMonitor?.shouldReduceQuality?.()) return;
+
     if (this.echoIntensitySetting === 0) return; // feature disabled
 
     // --- Phase3: Acquire pooled element or create new ---------------
     const echo = this.acquireEchoElement();
+    echo.setAttribute("data-sn-echo", "1"); // SHM diagnostics
 
     // Inject music-aware CSS vars
     const musicData = this.musicSyncService?.getLatestProcessedData();
@@ -729,14 +874,42 @@ export class DataGlyphSystem extends BaseVisualSystem {
     // mark element as having an active echo
     this._elementsWithActiveEcho.add(element);
 
-    setTimeout(() => {
-      if (echo.parentElement) echo.parentElement.removeChild(echo);
-      this.currentEchoCount--;
-      // Remove from active set to avoid double-handling
-      this.activeEchoElements.delete(echo);
-      this.releaseEchoElement(echo);
-      this._elementsWithActiveEcho.delete(element);
-    }, 1250); // slightly longer than longest layer duration
+    // Consolidated timer cleanup to avoid scattered setTimeouts.
+    const timerSystem = (this.year3000System as any)?.timerConsolidationSystem;
+    if (
+      timerSystem &&
+      typeof timerSystem.registerConsolidatedTimer === "function"
+    ) {
+      const timerId = `dgs-echo-${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2)}`;
+      timerSystem.registerConsolidatedTimer(
+        timerId,
+        () => {
+          try {
+            if (echo.parentElement) echo.parentElement.removeChild(echo);
+          } catch (_) {}
+          this.currentEchoCount--;
+          this.activeEchoElements.delete(echo);
+          this.releaseEchoElement(echo);
+          this._elementsWithActiveEcho.delete(element);
+          timerSystem.unregisterConsolidatedTimer(timerId);
+        },
+        1300, // slightly longer than longest layer duration
+        "background"
+      );
+    } else {
+      // Fallback for safety (should rarely happen now)
+      setTimeout(() => {
+        try {
+          if (echo.parentElement) echo.parentElement.removeChild(echo);
+        } catch (_) {}
+        this.currentEchoCount--;
+        this.activeEchoElements.delete(echo);
+        this.releaseEchoElement(echo);
+        this._elementsWithActiveEcho.delete(element);
+      }, 1300);
+    }
   }
 
   private get echoIntensitySetting(): number {
@@ -775,9 +948,38 @@ export class DataGlyphSystem extends BaseVisualSystem {
   /** Return echo element to pool (bounded) */
   private releaseEchoElement(el: HTMLElement) {
     this.echoPool.push(el);
-    const limit = this.dynamicMaxEchoes + 2;
+    const limit = this.dynamicMaxEchoes * 2;
     if (this.echoPool.length > limit) {
       this.echoPool.shift(); // discard oldest to cap memory
     }
+  }
+
+  /**
+   * Expose a lightweight snapshot of runtime metrics for external baselines.
+   * Consumers (e.g. MasterAnimationCoordinator perf overlay) can poll this
+   * method at low frequency (≤1 Hz) to log FPS, memory delta & echo counts
+   * without trolling the render thread.
+   */
+  public getMetricsSnapshot() {
+    return {
+      ...this.performanceMetrics,
+      echoCount: this.currentEchoCount,
+      timestamp: Date.now(),
+    };
+  }
+
+  /**
+   * SystemHealthMonitor hook – returns basic health metrics.
+   */
+  public healthCheck(): { ok: boolean; details?: string } {
+    const echoesOk = this.currentEchoCount <= this.dynamicMaxEchoes;
+    const poolOk = this.echoPool.length <= this.dynamicMaxEchoes * 2;
+    const ok = echoesOk && poolOk;
+    return {
+      ok,
+      details: ok
+        ? "Echo and pool within limits"
+        : `Counts – echo:${this.currentEchoCount}, pool:${this.echoPool.length}`,
+    };
   }
 }

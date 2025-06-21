@@ -1,6 +1,6 @@
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
 import { MusicSyncService } from "@/services/MusicSyncService";
-import type { Year3000Config } from "@/types/models";
+import type { PerformanceProfile, Year3000Config } from "@/types/models";
 import { HARMONIC_MODES } from "../../config/globalConfig";
 import { Year3000System } from "../../core/year3000System";
 import { SettingsManager } from "../../managers/SettingsManager";
@@ -63,6 +63,10 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
   private static readonly BASE_MAX_ECHOES = 4;
 
   private _elementsWithActiveEcho: WeakSet<HTMLElement> = new WeakSet();
+  // Stores nav interaction handler reference for clean removal.
+  private _navInteractionHandler: ((evt: Event) => void) | null = null;
+  /** Flag used to skip re-applying motion-disabled class when already set */
+  private _lastMotionDisabled = false;
 
   constructor(
     config: Year3000Config,
@@ -145,15 +149,23 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
 
     // Attach focus & hover listeners for nav items → spawn echo
     if (this.rootNavBar) {
-      const handler = (evt: Event) => {
+      this._navInteractionHandler = (evt: Event) => {
         const el = evt.target as HTMLElement;
         if (!el || !(el instanceof HTMLElement)) return;
         if (el.matches("a, button, [role='link']")) {
           this._spawnNavEcho(el as HTMLElement);
         }
       };
-      this.rootNavBar.addEventListener("focusin", handler, true);
-      this.rootNavBar.addEventListener("pointerenter", handler, true);
+      this.rootNavBar.addEventListener(
+        "focusin",
+        this._navInteractionHandler,
+        true
+      );
+      this.rootNavBar.addEventListener(
+        "pointerenter",
+        this._navInteractionHandler,
+        true
+      );
     }
 
     this._tryRegisterWithMasterAnimation();
@@ -392,6 +404,20 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     if (this.consciousnessAnimationFrame) {
       cancelAnimationFrame(this.consciousnessAnimationFrame);
     }
+    // Clean up nav interaction listener
+    if (this.rootNavBar && this._navInteractionHandler) {
+      this.rootNavBar.removeEventListener(
+        "focusin",
+        this._navInteractionHandler,
+        true
+      );
+      this.rootNavBar.removeEventListener(
+        "pointerenter",
+        this._navInteractionHandler,
+        true
+      );
+      this._navInteractionHandler = null;
+    }
     if (
       this.year3000System &&
       (this.year3000System as any).unregisterAnimationSystem
@@ -509,5 +535,32 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
       this._releaseEchoElement(echo);
       this._elementsWithActiveEcho.delete(element);
     }, 1100);
+  }
+
+  // ---------------------------------------------------------------------
+  // 🏎️  Performance-Aware Animation Gate
+  // ---------------------------------------------------------------------
+  /**
+   * Overrides the base implementation so we can toggle a lightweight
+   * CSS class (`sn-motion-disabled`) on the sidebar element whenever the
+   * active PerformanceProfile suggests a "low" tier or when reduced motion
+   * should be respected.  This allows the SCSS layer to instantly pause
+   * expensive keyframes (vibrations, pulses, hue-shifts) without touching
+   * inline styles.
+   */
+  public applyPerformanceSettings(profile: PerformanceProfile): void {
+    // Preserve existing behaviour (store on `currentPerformanceProfile` etc.)
+    super.applyPerformanceSettings(profile as any);
+
+    const lowPerf =
+      !profile.enableGPUAcceleration || profile.animationThrottle >= 24;
+    const motionDisabled = lowPerf || profile.reducedMotion;
+
+    if (this.rootNavBar) {
+      if (motionDisabled !== this._lastMotionDisabled) {
+        this.rootNavBar.classList.toggle("sn-motion-disabled", motionDisabled);
+        this._lastMotionDisabled = motionDisabled;
+      }
+    }
   }
 }

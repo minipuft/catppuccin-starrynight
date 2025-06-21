@@ -1,4 +1,5 @@
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
+import type { FrameContext, IVisualSystem } from "@/core/VisualSystemRegistry";
 import { SettingsManager } from "@/managers/SettingsManager";
 import { MusicSyncService } from "@/services/MusicSyncService";
 import type { Year3000Config } from "@/types/models";
@@ -20,13 +21,22 @@ interface Particle {
  * 300 particles animate slowly; every detected beat triggers a size pulse and
  * slight drift to give a breathing effect. Respects prefers-reduced-motion.
  */
-export class ParticleFieldSystem implements IManagedSystem {
+export class ParticleFieldSystem implements IManagedSystem, IVisualSystem {
   public initialized = false;
   private _canvas: HTMLCanvasElement | null = null;
   private _ctx: CanvasRenderingContext2D | null = null;
   private _particles: Particle[] = [];
   private _animationFrame: number | null = null;
+  /** Whether we spawned our own requestAnimationFrame loop (fallback for standalone usage). */
+  private _ownsRAF = false;
+
+  /** Cached performance flag so we don\'t call shouldReduceQuality() every particle. */
+  private _lowQualityMode = false;
   private _pulseStrength = 0;
+  // Stores the resize handler reference for proper cleanup.
+  private _boundResizeHandler: (() => void) | null = null;
+
+  public readonly systemName = "ParticleFieldSystem";
 
   constructor(
     private config: Year3000Config,
@@ -36,6 +46,9 @@ export class ParticleFieldSystem implements IManagedSystem {
     private settingsManager: SettingsManager,
     private rootSystem: any // Year3000System ref
   ) {}
+  forceRepaint?(reason?: string): void {
+    throw new Error("Method not implemented.");
+  }
 
   // ───────────────────────────── IManagedSystem ──────────────────────────────
   async initialize(): Promise<void> {
@@ -51,17 +64,36 @@ export class ParticleFieldSystem implements IManagedSystem {
     }
 
     this._setupCanvas();
-    this._createParticles(300);
-    this._startLoop();
+
+    // Determine particle density based on quality heuristics
+    const particleCount = this._getParticleCount();
+    this._createParticles(particleCount);
+
+    // If no MasterAnimationCoordinator is present (stand-alone testing) we fall back
+    // to our own rAF loop. In normal Year3000 usage the coordinator will invoke
+    // onAnimate() after we get registered in Year3000System._refreshConditionalSystems.
+    const hasMAC = !!(
+      this.rootSystem && (this.rootSystem as any).masterAnimationCoordinator
+    );
+
+    if (!hasMAC) {
+      this._startLoop();
+      this._ownsRAF = true;
+    }
 
     // Subscribe to MusicSyncService updates
     this.musicSyncService.subscribe(this as any, "ParticleFieldSystem");
 
     this.initialized = true;
+
+    // Register with CDF VisualSystemRegistry when available.
+    if ((this.rootSystem as any)?.registerVisualSystem) {
+      (this.rootSystem as any).registerVisualSystem(this, "background");
+    }
   }
 
   updateAnimation(_delta: number): void {
-    // rendering handled in RAF loop
+    // rendering handled in RAF loop (legacy path)
   }
 
   async healthCheck(): Promise<HealthCheckResult> {
@@ -70,9 +102,14 @@ export class ParticleFieldSystem implements IManagedSystem {
 
   destroy(): void {
     if (this._animationFrame) cancelAnimationFrame(this._animationFrame);
+    this._ownsRAF = false;
     this.musicSyncService.unsubscribe("ParticleFieldSystem");
     if (this._canvas && this._canvas.parentElement) {
       this._canvas.parentElement.removeChild(this._canvas);
+    }
+    if (this._boundResizeHandler) {
+      window.removeEventListener("resize", this._boundResizeHandler);
+      this._boundResizeHandler = null;
     }
     this._particles = [];
     this.initialized = false;
@@ -100,7 +137,8 @@ export class ParticleFieldSystem implements IManagedSystem {
     this._canvas = canvas;
     this._ctx = canvas.getContext("2d");
     this._resize();
-    window.addEventListener("resize", this._resize.bind(this));
+    this._boundResizeHandler = this._resize.bind(this);
+    window.addEventListener("resize", this._boundResizeHandler);
   }
 
   private _resize(): void {
@@ -143,6 +181,11 @@ export class ParticleFieldSystem implements IManagedSystem {
     // Fade global pulse strength
     this._pulseStrength *= 0.93;
 
+    // Evaluate quality flag once per frame.
+    this._lowQualityMode =
+      this.performanceAnalyzer.shouldReduceQuality() ||
+      PerformanceAnalyzer.isLowEndDevice();
+
     for (const p of this._particles) {
       // Movement
       p.x += p.speedX;
@@ -154,10 +197,16 @@ export class ParticleFieldSystem implements IManagedSystem {
 
       // Draw
       const size = p.baseSize + p.pulse;
-      const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size);
-      gradient.addColorStop(0, "rgba(255,255,255,0.8)");
-      gradient.addColorStop(1, "rgba(255,255,255,0)");
-      ctx.fillStyle = gradient;
+
+      if (this._lowQualityMode) {
+        // Lightweight draw path – solid circle with global alpha.
+        ctx.fillStyle = "rgba(255,255,255,0.75)";
+      } else {
+        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size);
+        gradient.addColorStop(0, "rgba(255,255,255,0.8)");
+        gradient.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = gradient;
+      }
       ctx.beginPath();
       ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
       ctx.fill();
@@ -170,5 +219,28 @@ export class ParticleFieldSystem implements IManagedSystem {
         p.pulse += this._pulseStrength * 0.1 * Math.random();
       }
     }
+  }
+
+  // -----------------------------------------------------------------------
+  // VisualSystemRegistry hook – use registry cadence when available
+  // -----------------------------------------------------------------------
+  public onAnimate(_delta: number, _context: FrameContext): void {
+    if (this._ownsRAF) return; // avoid duplicate renders
+    this._step();
+  }
+
+  public onPerformanceModeChange?(mode: "performance" | "quality"): void {
+    // Reduce particle count or effects in performance mode (future work)
+  }
+
+  // Helper to compute particle count based on performance mode
+  private _getParticleCount(): number {
+    if (
+      this.performanceAnalyzer.shouldReduceQuality() ||
+      PerformanceAnalyzer.isLowEndDevice()
+    ) {
+      return 180; // low quality
+    }
+    return 300; // default
   }
 }

@@ -13,12 +13,26 @@
 
 // Performance-optimized transitions
 :root {
-  // Standard transition timings optimized for 60fps
-  --sn-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --sn-transition-standard: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  --sn-transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  // Standard transition **durations** (split from timing curves so JavaScript can
+  // lerp-update the numeric portion via Year3000Utilities.lerpSmooth)
+  --sn-transition-fast-duration: 150ms;
+  --sn-transition-standard-duration: 300ms;
+  --sn-transition-slow-duration: 500ms;
 
-  // Specialized easing for different animation types
+  // Timing curves are now referenced via the shared easing tokens which other
+  // SCSS modules already consume (see _sn_root_variables.scss & _sn_gradient.scss)
+  // These remain as fallbacks so nothing breaks if the variables are unset.
+  --sn-transition-timing-default: var(--sn-easing-explorer, cubic-bezier(0.25, 0.46, 0.45, 0.94));
+
+  // Composite transition helpers (duration + timing) for convenience.  These
+  // map 1-to-1 with the previous public tokens so no downstream refactor is
+  // required.  Only the **duration** portion will be mutated at runtime.
+  --sn-transition-fast: var(--sn-transition-fast-duration) var(--sn-transition-timing-default);
+  --sn-transition-standard: var(--sn-transition-standard-duration) var(--sn-transition-timing-default);
+  --sn-transition-slow: var(--sn-transition-slow-duration) var(--sn-transition-timing-default);
+
+  // Legacy specialized easings kept for semantics – consider consolidating into
+  // _sn_root_variables.scss in a later housekeeping pass.
   --sn-ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --sn-ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --sn-ease-sharp: cubic-bezier(0.4, 0, 0.6, 1);

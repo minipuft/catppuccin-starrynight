@@ -1043,11 +1043,11 @@
   });
 
   // src-js/core/CSSVariableBatcher.ts
-  var CSSVariableBatcher;
+  var _CSSVariableBatcher, CSSVariableBatcher;
   var init_CSSVariableBatcher = __esm({
     "src-js/core/CSSVariableBatcher.ts"() {
       "use strict";
-      CSSVariableBatcher = class {
+      _CSSVariableBatcher = class _CSSVariableBatcher {
         constructor(config = {}) {
           this.config = {
             batchIntervalMs: config.batchIntervalMs ?? 0,
@@ -1055,6 +1055,7 @@
             maxBatchSize: config.maxBatchSize ?? 50,
             enableDebug: config.enableDebug ?? false,
             useCssTextFastPath: config.useCssTextFastPath ?? false,
+            autoHijack: config.autoHijack ?? true,
             ...config
           };
           this._cssVariableBatcher = {
@@ -1077,6 +1078,10 @@
           };
           if (this.config.enableDebug) {
             console.log("\u{1F3A8} [CSSVariableBatcher] Initialized");
+          }
+          _CSSVariableBatcher.instance = this;
+          if (this.config.autoHijack) {
+            this._enableGlobalHijack();
           }
         }
         queueCSSVariableUpdate(property, value, element = null) {
@@ -1324,7 +1329,28 @@
             setTimeout(flushCallback, 0);
           }
         }
+        /** Patch CSSStyleDeclaration.setProperty so legacy code is batched */
+        _enableGlobalHijack() {
+          if (_CSSVariableBatcher.hijackEnabled) return;
+          const original = CSSStyleDeclaration.prototype.setProperty;
+          const batchInstance = this;
+          CSSStyleDeclaration.prototype.setProperty = function(prop, value, priority) {
+            if (prop && prop.startsWith("--sn-") && batchInstance) {
+              batchInstance.queueCSSVariableUpdate(prop, String(value ?? ""));
+            } else {
+              original.call(this, prop, value, priority);
+            }
+          };
+          _CSSVariableBatcher.hijackEnabled = true;
+          if (this.config.enableDebug) {
+            console.log("\u{1F3A8} [CSSVariableBatcher] Global setProperty hijack enabled");
+          }
+        }
       };
+      // Singleton reference so the hijack can reach the live instance
+      _CSSVariableBatcher.instance = null;
+      _CSSVariableBatcher.hijackEnabled = false;
+      CSSVariableBatcher = _CSSVariableBatcher;
     }
   });
 
@@ -1622,6 +1648,8 @@
           this._animationSystemRegistry = /* @__PURE__ */ new Map();
           this._animationFrameId = null;
           this._animationPaused = false;
+          /** Optional capability gating helper injected by Year3000System */
+          this._deviceCapabilityDetector = null;
           this.config = {
             frameTimeBudget: config.frameTimeBudget || 16,
             // 16ms target for 60fps
@@ -1737,6 +1765,10 @@
             );
           }
         }
+        /** Inject DeviceCapabilityDetector so MAC can auto-skip on low-end tiers */
+        setDeviceCapabilityDetector(detector) {
+          this._deviceCapabilityDetector = detector;
+        }
         _executeMasterAnimationFrame(timestamp, deltaTime) {
           let remainingBudget = this._frameTimeBudget;
           const systemsByPriority = Array.from(
@@ -1746,6 +1778,9 @@
             return priorityOrder[a.priority] - priorityOrder[b.priority];
           });
           for (const [systemName, config] of systemsByPriority) {
+            if (this._deviceCapabilityDetector && this._deviceCapabilityDetector.recommendPerformanceQuality() === "low" && config.priority === "background") {
+              continue;
+            }
             if (!config.enabled || remainingBudget <= 0 && config.priority === "background") {
               if (remainingBudget <= 0) config.skippedFrames++;
               continue;
@@ -1910,6 +1945,12 @@
         getPerformanceReport() {
           return JSON.parse(JSON.stringify(this._performanceMetrics));
         }
+        getCurrentPerformanceMode() {
+          return this._performanceMetrics.performanceMode;
+        }
+        getFrameTimeBudget() {
+          return this._frameTimeBudget;
+        }
       };
     }
   });
@@ -1954,6 +1995,10 @@
             }
           };
           this.loop();
+        }
+        /** Returns copy of the last recorded FPS samples (1-sec granularity). */
+        getHistory() {
+          return [...this.history];
         }
       };
       PerformanceAnalyzer = class {
@@ -2219,6 +2264,67 @@
             return false;
           }
         }
+        /**
+         * Returns median FPS using the most recent N one-second samples (default 5).
+         * Falls back to current FPS when insufficient samples.
+         */
+        getMedianFPS(sampleWindowSeconds = 5) {
+          if (!this._fpsCounter) return 60;
+          const hist = this._fpsCounter.getHistory?.() || [];
+          const samples = hist.slice(-sampleWindowSeconds);
+          if (!samples.length) return this._fpsCounter.currentFPS || 60;
+          const sorted = [...samples].sort((a, b) => a - b);
+          const mid = Math.floor(sorted.length / 2);
+          return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+        }
+        /**
+         * Capture a one-off 60 s (or custom) performance baseline and trigger a JSON
+         * download so developers can commit the artefact under
+         * `docs/perf-baselines/`.
+         *
+         * Example (DevTools):
+         *   await year3000System.performanceAnalyzer.startBaselineCapture("Home");
+         */
+        async startBaselineCapture(viewName = "unknown", durationMs = 6e4) {
+          if (!this.isMonitoring) {
+            this.startMonitoring();
+          }
+          const start = Date.now();
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F4CA} [PerformanceAnalyzer] Baseline capture for "${viewName}" started`
+            );
+          }
+          await new Promise((r) => setTimeout(r, durationMs));
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F4CA} [PerformanceAnalyzer] Baseline capture complete \u2013 ${this.performanceHistory.length} samples in ${(Date.now() - start) / 1e3}s`
+            );
+          }
+          const artefact = {
+            view: viewName,
+            capturedAt: (/* @__PURE__ */ new Date()).toISOString(),
+            durationMs,
+            samples: this.performanceHistory
+          };
+          try {
+            const blob = new Blob([JSON.stringify(artefact, null, 2)], {
+              type: "application/json"
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${viewName}_${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}_baseline.json`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 5e3);
+          } catch (err) {
+            console.warn(
+              "[PerformanceAnalyzer] Unable to trigger baseline download",
+              err
+            );
+          }
+          return [...this.performanceHistory];
+        }
         // --- End of static helpers ---
       };
       PerformanceAnalyzer._isLowEndCache = null;
@@ -2386,6 +2492,329 @@
           this._timerRegistry.clear();
           if (this.config.enableDebug) {
             console.log("\u23F1\uFE0F [TimerConsolidationSystem] Destroyed");
+          }
+        }
+      };
+    }
+  });
+
+  // src-js/utils/getScrollNode.ts
+  function getScrollNode() {
+    return document.querySelector(SCROLL_NODE_SELECTORS);
+  }
+  var SCROLL_NODE_SELECTORS;
+  var init_getScrollNode = __esm({
+    "src-js/utils/getScrollNode.ts"() {
+      "use strict";
+      SCROLL_NODE_SELECTORS = [
+        ".main-view-container__scroll-node",
+        // 2023-era builds
+        ".main-viewContainer-scrollNode",
+        // 2024 dash variant
+        ".main-viewContainer__scrollNode"
+        // 2024 double-underscore variant
+      ].join(", ");
+    }
+  });
+
+  // src-js/core/EventBus.ts
+  var EventBus, GlobalEventBus, g;
+  var init_EventBus = __esm({
+    "src-js/core/EventBus.ts"() {
+      "use strict";
+      EventBus = class {
+        constructor() {
+          this.subscribers = {};
+        }
+        subscribe(topic, callback) {
+          if (!this.subscribers[topic]) {
+            this.subscribers[topic] = /* @__PURE__ */ new Set();
+          }
+          this.subscribers[topic].add(callback);
+          return () => {
+            if (this.subscribers[topic]) {
+              this.subscribers[topic].delete(callback);
+              if (this.subscribers[topic].size === 0) {
+                delete this.subscribers[topic];
+              }
+            }
+          };
+        }
+        publish(topic, payload) {
+          if (this.subscribers[topic]) {
+            this.subscribers[topic].forEach((callback) => {
+              try {
+                callback(payload);
+              } catch (error) {
+                console.error(
+                  `[EventBus] Error in subscriber for topic "${topic}":`,
+                  error
+                );
+              }
+            });
+          }
+        }
+        unsubscribe(topic, callback) {
+          if (this.subscribers[topic]) {
+            this.subscribers[topic].delete(callback);
+            if (this.subscribers[topic].size === 0) {
+              delete this.subscribers[topic];
+            }
+          }
+        }
+        destroy() {
+          this.subscribers = {};
+        }
+      };
+      GlobalEventBus = new EventBus();
+      g = globalThis;
+      if (!g.GlobalEventBus) {
+        g.GlobalEventBus = GlobalEventBus;
+      }
+    }
+  });
+
+  // src-js/core/VisualSystemRegistry.ts
+  var PRIORITY_SORT, DEFAULT_FRAME_BUDGET_MS, VisualSystemRegistry;
+  var init_VisualSystemRegistry = __esm({
+    "src-js/core/VisualSystemRegistry.ts"() {
+      "use strict";
+      init_getScrollNode();
+      init_EventBus();
+      PRIORITY_SORT = {
+        critical: 0,
+        normal: 1,
+        background: 2
+      };
+      DEFAULT_FRAME_BUDGET_MS = 12;
+      VisualSystemRegistry = class {
+        constructor(perfAnalyzer, deviceDetector) {
+          this.perfAnalyzer = perfAnalyzer;
+          this.deviceDetector = deviceDetector;
+          this.systems = [];
+          this.rafHandle = null;
+          this.lastTimestamp = performance.now();
+          this.performanceMode = "quality";
+          this.orientation = { x: 0, y: 0 };
+          this.reduceMotion = false;
+          // ---------------------------------------------------------------------
+          // Event listener references for proper cleanup in destroy()
+          // ---------------------------------------------------------------------
+          this._orientationHandler = null;
+          this._reduceMotionMQ = null;
+          this._reduceMotionHandler = null;
+          this._reduceTransparencyMQ = null;
+          this._reduceTransparencyHandler = null;
+          this.frameBudgetMs = this._resolveFrameBudget();
+          this._setupOrientationListeners();
+          this._setupReducedMotionListener();
+          this._startLoop();
+        }
+        // -------------------------------------------------------------------------
+        // Public API
+        // -------------------------------------------------------------------------
+        registerSystem(system, priority = "normal") {
+          if (this.systems.find((s) => s.system === system)) return;
+          this.systems.push({
+            system,
+            priority,
+            averageTime: 0,
+            lastExec: 0
+          });
+          this.systems.sort(
+            (a, b) => PRIORITY_SORT[a.priority] - PRIORITY_SORT[b.priority]
+          );
+        }
+        unregisterSystem(system) {
+          const idx = this.systems.findIndex((s) => s.system === system);
+          if (idx !== -1) {
+            try {
+              this.systems[idx]?.system.destroy();
+            } catch (err) {
+              console.error("[VisualSystemRegistry] Error during destroy:", err);
+            }
+            this.systems.splice(idx, 1);
+          }
+        }
+        destroy() {
+          if (this.rafHandle) {
+            cancelAnimationFrame(this.rafHandle);
+            this.rafHandle = null;
+          }
+          this.systems.forEach((wrap2) => wrap2.system.destroy());
+          this.systems = [];
+          if (this._orientationHandler) {
+            try {
+              window.removeEventListener(
+                "deviceorientation",
+                this._orientationHandler
+              );
+            } catch {
+            }
+            this._orientationHandler = null;
+          }
+          if (this._reduceMotionMQ && this._reduceMotionHandler) {
+            try {
+              this._reduceMotionMQ.removeEventListener(
+                "change",
+                this._reduceMotionHandler
+              );
+            } catch {
+              this._reduceMotionMQ.removeListener(this._reduceMotionHandler);
+            }
+            this._reduceMotionHandler = null;
+            this._reduceMotionMQ = null;
+          }
+          if (this._reduceTransparencyMQ && this._reduceTransparencyHandler) {
+            try {
+              this._reduceTransparencyMQ.removeEventListener(
+                "change",
+                this._reduceTransparencyHandler
+              );
+            } catch {
+              this._reduceTransparencyMQ.removeListener(
+                this._reduceTransparencyHandler
+              );
+            }
+            this._reduceTransparencyHandler = null;
+            this._reduceTransparencyMQ = null;
+          }
+        }
+        // -------------------------------------------------------------------------
+        // Internal loop & helpers
+        // -------------------------------------------------------------------------
+        _startLoop() {
+          const loop = (timestamp) => {
+            const deltaMs = timestamp - this.lastTimestamp;
+            this.lastTimestamp = timestamp;
+            if (this.reduceMotion) {
+              this.rafHandle = requestAnimationFrame(loop);
+              return;
+            }
+            const context = {
+              timestamp,
+              deltaMs,
+              performanceMode: this.performanceMode,
+              frameBudget: this.frameBudgetMs,
+              beatIntensity: void 0,
+              // TODO – Phase 2 integration
+              scrollRatio: this._getScrollRatio(),
+              tiltXY: this.orientation
+            };
+            GlobalEventBus.publish("cdf:frameContext", context);
+            let remaining = this.frameBudgetMs;
+            for (const wrapper of this.systems) {
+              if (remaining <= 0 && wrapper.priority === "background") break;
+              const start = performance.now();
+              try {
+                wrapper.system.onAnimate(deltaMs, context);
+              } catch (err) {
+                console.error(
+                  `[VisualSystemRegistry] Error in system ${wrapper.system.systemName}:`,
+                  err
+                );
+              }
+              const execTime = performance.now() - start;
+              remaining -= execTime;
+              wrapper.lastExec = execTime;
+              wrapper.averageTime = wrapper.averageTime === 0 ? execTime : wrapper.averageTime * 0.9 + execTime * 0.1;
+            }
+            if (timestamp % 1e3 < deltaMs) {
+              this._evaluatePerformanceMode();
+            }
+            this.rafHandle = requestAnimationFrame(loop);
+          };
+          this.rafHandle = requestAnimationFrame(loop);
+        }
+        _evaluatePerformanceMode() {
+          if (!this.perfAnalyzer) return;
+          const medianFPS = this.perfAnalyzer.getMedianFPS(5);
+          const deviceLow = this.deviceDetector?.deviceCapabilities?.overall === "low";
+          let newMode;
+          if (medianFPS < 48 || deviceLow) {
+            newMode = "performance";
+          } else if (medianFPS > 56 && !deviceLow) {
+            newMode = "quality";
+          } else {
+            newMode = this.performanceMode;
+          }
+          if (newMode !== this.performanceMode) {
+            this.performanceMode = newMode;
+            this.frameBudgetMs = this._resolveFrameBudget();
+            this.systems.forEach(
+              (w) => w.system.onPerformanceModeChange?.(this.performanceMode)
+            );
+            GlobalEventBus.publish(
+              "cdf:performanceModeChanged",
+              this.performanceMode
+            );
+          }
+        }
+        _resolveFrameBudget() {
+          if (!this.perfAnalyzer) return DEFAULT_FRAME_BUDGET_MS;
+          return this.performanceMode === "performance" ? 12 : 16;
+        }
+        _getScrollRatio() {
+          try {
+            const node = getScrollNode();
+            if (!node) return 0;
+            const max = node.scrollHeight - node.clientHeight;
+            return max > 0 ? node.scrollTop / max : 0;
+          } catch {
+            return 0;
+          }
+        }
+        _setupOrientationListeners() {
+          if (typeof window === "undefined" || !window.addEventListener) return;
+          this._orientationHandler = (e) => {
+            const { beta, gamma } = e;
+            if (typeof beta === "number" && typeof gamma === "number") {
+              this.orientation.x = Math.max(-1, Math.min(1, gamma / 45));
+              this.orientation.y = Math.max(-1, Math.min(1, beta / 45));
+            }
+          };
+          try {
+            window.addEventListener(
+              "deviceorientation",
+              this._orientationHandler,
+              false
+            );
+          } catch {
+          }
+        }
+        _setupReducedMotionListener() {
+          if (typeof window === "undefined" || !window.matchMedia) return;
+          this._reduceMotionMQ = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+          );
+          this._reduceMotionHandler = (e) => {
+            this.reduceMotion = e ? e.matches : this._reduceMotionMQ.matches;
+          };
+          this._reduceMotionHandler?.();
+          try {
+            this._reduceMotionMQ.addEventListener(
+              "change",
+              this._reduceMotionHandler
+            );
+          } catch {
+            this._reduceMotionMQ.addListener(this._reduceMotionHandler);
+          }
+          this._reduceTransparencyMQ = window.matchMedia(
+            "(prefers-reduced-transparency: reduce)"
+          );
+          this._reduceTransparencyHandler = (e) => {
+            if (e ? e.matches : this._reduceTransparencyMQ.matches) {
+              this.reduceMotion = true;
+            }
+          };
+          this._reduceTransparencyHandler?.();
+          try {
+            this._reduceTransparencyMQ.addEventListener(
+              "change",
+              this._reduceTransparencyHandler
+            );
+          } catch {
+            this._reduceTransparencyMQ.addListener(this._reduceTransparencyHandler);
           }
         }
       };
@@ -3695,7 +4124,26 @@
             "sn-enable-webgpu": "true",
             "sn-enable-aberration": "true",
             "sn-nebula-aberration-strength": "0.4",
-            "sn-echo-intensity": "2"
+            "sn-echo-intensity": "2",
+            "sn-visual-intensity": (() => {
+              try {
+                const detector = globalThis.year3000System?.deviceCapabilityDetector;
+                const overall = detector?.deviceCapabilities?.overall;
+                switch (overall) {
+                  case "high":
+                    return "1";
+                  case "medium":
+                    return "0.7";
+                  case "low":
+                    return "0.4";
+                  default:
+                    return "0.8";
+                }
+              } catch (e) {
+                return "0.8";
+              }
+            })(),
+            "sn-animation-quality": "auto"
           };
           this.validationSchemas = {
             "catppuccin-flavor": {
@@ -3771,10 +4219,18 @@
             "sn-echo-intensity": {
               default: "2",
               allowedValues: ["0", "1", "2", "3"]
+            },
+            "sn-visual-intensity": { default: "0.8" },
+            "sn-animation-quality": {
+              default: "auto",
+              allowedValues: ["auto", "low", "high"]
             }
           };
           this.validateAndRepair();
           this.initialized = true;
+        }
+        forceRepaint(reason) {
+          throw new Error("Method not implemented.");
         }
         async initialize() {
           this.initialized = true;
@@ -3967,6 +4423,7 @@
         constructor(performanceMonitor, settingsManager, utils) {
           this.initialized = false;
           this.cardQuerySelector = ".main-card-card, .main-gridContainer-gridContainer.main-gridContainer-fixedWidth";
+          this.cardEventHandlers = /* @__PURE__ */ new WeakMap();
           this.config = {
             perspective: 1e3,
             maxRotation: 5,
@@ -3978,7 +4435,6 @@
           this.performanceMonitor = performanceMonitor;
           this.settingsManager = settingsManager;
           this.utils = utils;
-          this.isModernTheme = true;
           this.cards = document.querySelectorAll(this.config.selector);
           this.boundHandleSettingsChange = this.handleSettingsChange.bind(this);
         }
@@ -3993,6 +4449,7 @@
           return _Card3DManager.instance;
         }
         async initialize() {
+          if (this.initialized) return;
           const quality = this.performanceMonitor.shouldReduceQuality();
           if (quality) {
             if (this.settingsManager.get("sn-3d-effects-level") !== "disabled") {
@@ -4037,11 +4494,15 @@
         }
         async applyEventListeners() {
           this.cards.forEach((card) => {
-            card.addEventListener("mousemove", this.handleMouseMove.bind(this, card));
-            card.addEventListener(
-              "mouseleave",
-              this.handleMouseLeave.bind(this, card)
-            );
+            if (this.cardEventHandlers.has(card)) return;
+            const moveHandler = (e) => this.handleMouseMove(card, e);
+            const leaveHandler = () => this.handleMouseLeave(card);
+            this.cardEventHandlers.set(card, {
+              move: moveHandler,
+              leave: leaveHandler
+            });
+            card.addEventListener("mousemove", moveHandler);
+            card.addEventListener("mouseleave", leaveHandler);
           });
         }
         handleMouseMove(card, e) {
@@ -4078,14 +4539,12 @@
         }
         destroy() {
           this.cards.forEach((card) => {
-            card.removeEventListener(
-              "mousemove",
-              this.handleMouseMove.bind(this, card)
-            );
-            card.removeEventListener(
-              "mouseleave",
-              this.handleMouseLeave.bind(this, card)
-            );
+            const handlers = this.cardEventHandlers.get(card);
+            if (handlers) {
+              card.removeEventListener("mousemove", handlers.move);
+              card.removeEventListener("mouseleave", handlers.leave);
+              this.cardEventHandlers.delete(card);
+            }
             this.removeGlow(card);
             card.style.transform = "";
             card.style.transition = "";
@@ -4305,63 +4764,6 @@
           }
         }
       };
-    }
-  });
-
-  // src-js/core/EventBus.ts
-  var EventBus, GlobalEventBus, g;
-  var init_EventBus = __esm({
-    "src-js/core/EventBus.ts"() {
-      "use strict";
-      EventBus = class {
-        constructor() {
-          this.subscribers = {};
-        }
-        subscribe(topic, callback) {
-          if (!this.subscribers[topic]) {
-            this.subscribers[topic] = /* @__PURE__ */ new Set();
-          }
-          this.subscribers[topic].add(callback);
-          return () => {
-            if (this.subscribers[topic]) {
-              this.subscribers[topic].delete(callback);
-              if (this.subscribers[topic].size === 0) {
-                delete this.subscribers[topic];
-              }
-            }
-          };
-        }
-        publish(topic, payload) {
-          if (this.subscribers[topic]) {
-            this.subscribers[topic].forEach((callback) => {
-              try {
-                callback(payload);
-              } catch (error) {
-                console.error(
-                  `[EventBus] Error in subscriber for topic "${topic}":`,
-                  error
-                );
-              }
-            });
-          }
-        }
-        unsubscribe(topic, callback) {
-          if (this.subscribers[topic]) {
-            this.subscribers[topic].delete(callback);
-            if (this.subscribers[topic].size === 0) {
-              delete this.subscribers[topic];
-            }
-          }
-        }
-        destroy() {
-          this.subscribers = {};
-        }
-      };
-      GlobalEventBus = new EventBus();
-      g = globalThis;
-      if (!g.GlobalEventBus) {
-        g.GlobalEventBus = GlobalEventBus;
-      }
     }
   });
 
@@ -9254,6 +9656,23 @@
           /** Flag toggled by MasterAnimationCoordinator – echo spawning is skipped
            *  entirely while in performance mode to preserve frame budget. */
           this._performanceMode = false;
+          // === Performance-Optimisation Additions (Phase Patch DG-P1) ===
+          /** Elements currently intersecting viewport (incl. small rootMargin buffer). */
+          this._visibleItems = /* @__PURE__ */ new Set();
+          /** IntersectionObserver instance used to maintain _visibleItems. */
+          this._intersectionObserver = null;
+          /** Style element used to batch per-glyph CSS variable updates. */
+          this._styleElement = null;
+          /** Cache of last emitted CSS for diff detection to avoid useless DOM writes. */
+          this._lastGlyphBatchCss = "";
+          /** Mapping of last intensity value per glyph to allow <0.01 early-out. */
+          this._lastIntensityMap = /* @__PURE__ */ new Map();
+          /** Throttle gate – last time (ms, performance.now) we executed a glyph batch. */
+          this._lastGlyphUpdate = 0;
+          /** Minimum interval between glyph batches (ms). 10 Hz ⇒ 100 ms. */
+          this._maxUpdateInterval = 100;
+          /** Running counter for data-sn-glyph-id generation (ensures uniqueness). */
+          this._glyphIdCounter = 0;
           this.year3000System = year3000System2;
           this.observedItems = /* @__PURE__ */ new Map();
           this.glyphDataCache = /* @__PURE__ */ new WeakMap();
@@ -9293,9 +9712,12 @@
             performanceLevel: this._detectPerformanceLevel(),
             reducedMotion: this._detectReducedMotion()
           };
-          const healthMonitor = this.utils.getHealthMonitor();
+          const healthMonitor = this.utils.getHealthMonitor?.();
           if (healthMonitor) {
-            healthMonitor.registerSystem("DataGlyphSystem", this);
+            healthMonitor.registerSystem("DataGlyphSystem", this, {
+              criticalLevel: "MEDIUM",
+              requiredSelectors: ["[data-sn-glyph]"]
+            });
           }
         }
         _detectMaxParticles() {
@@ -9326,10 +9748,47 @@
         _detectReducedMotion() {
           return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         }
+        // === Helper: ensure <style id="sn-glyph-style"> element exists ===
+        _ensureStyleElement() {
+          if (this._styleElement && document.contains(this._styleElement)) return;
+          const existing = document.getElementById(
+            "sn-glyph-style"
+          );
+          if (existing) {
+            this._styleElement = existing;
+            return;
+          }
+          const style = document.createElement("style");
+          style.id = "sn-glyph-style";
+          document.head.appendChild(style);
+          this._styleElement = style;
+        }
+        // === Helper: set up IntersectionObserver to cap glyph work to viewport ===
+        _setupIntersectionObserver() {
+          if (this._intersectionObserver) return;
+          this._intersectionObserver = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  this._visibleItems.add(entry.target);
+                } else {
+                  this._visibleItems.delete(entry.target);
+                }
+              });
+            },
+            {
+              root: null,
+              rootMargin: "200px"
+              // small look-ahead buffer for smoothness
+            }
+          );
+        }
         async initialize() {
           await super.initialize();
           this._tryRegisterWithMasterAnimation();
           this.setupItemObserver();
+          this._ensureStyleElement();
+          this._setupIntersectionObserver();
         }
         _tryRegisterWithMasterAnimation() {
           if (this.year3000System && this.year3000System.registerAnimationSystem) {
@@ -9337,30 +9796,20 @@
               this.year3000System.registerAnimationSystem(
                 "DataGlyphSystem",
                 this,
-                "normal",
-                this.deviceCapabilities.performanceLevel === "high" ? 60 : 30
+                "background",
+                30
               );
               this.masterAnimationRegistered = true;
               this.isUsingMasterAnimation = true;
             } catch (error) {
-              this._startFallbackAnimationLoop();
             }
-          } else {
-            this._startFallbackAnimationLoop();
           }
-        }
-        _startFallbackAnimationLoop() {
-          this.isUsingMasterAnimation = false;
-          const fallbackLoop = () => {
-            if (!this.initialized) return;
-            this.updateAnimation(performance.now(), 16.67);
-            this.animationFrameId = requestAnimationFrame(fallbackLoop);
-          };
-          this.animationFrameId = requestAnimationFrame(fallbackLoop);
         }
         // Conforms to MasterAnimationCoordinator – delegates to updateAnimation
         onAnimate(deltaMs) {
-          this.updateAnimation(performance.now(), deltaMs);
+          if (!this.performanceMonitor || this.performanceMonitor.shouldUpdate("glyph-maint", 100)) {
+            this.updateAnimation(performance.now(), deltaMs);
+          }
         }
         updateAnimation(timestamp, deltaTime) {
           const frameStartTime = performance.now();
@@ -9477,6 +9926,13 @@
           if (this.glyphElements.has(itemElement) || this.observedItems.size >= this.memoryOptimization.maxObservedItems)
             return;
           itemElement.setAttribute("data-sn-glyph", "");
+          if (!itemElement.hasAttribute("data-sn-glyph-id")) {
+            this._glyphIdCounter += 1;
+            itemElement.setAttribute("data-sn-glyph-id", `g${this._glyphIdCounter}`);
+          }
+          if (this._intersectionObserver) {
+            this._intersectionObserver.observe(itemElement);
+          }
           this.glyphElements.set(itemElement, null);
           const data = this.updateGlyphData(itemElement, {});
           this.glyphDataCache.set(itemElement, data);
@@ -9493,6 +9949,11 @@
           if (itemElement instanceof HTMLElement) {
             itemElement.removeAttribute("data-sn-glyph");
           }
+          if (this._intersectionObserver) {
+            this._intersectionObserver.unobserve(itemElement);
+          }
+          this._visibleItems.delete(itemElement);
+          this._lastIntensityMap.delete(itemElement);
           const observation = this.observedItems.get(itemElement);
           if (observation) {
             observation.removeListeners();
@@ -9501,13 +9962,45 @@
           this.glyphDataCache.delete(itemElement);
           this.itemInteractionData.delete(itemElement);
         }
+        /**
+         * Batched glyph animation pass (≤ 10 Hz).
+         * – Updates only items currently intersecting the viewport (+200 px buffer).
+         * – Builds a single <style> rule string to avoid per-element style mutation.
+         * – Skips emission when Δ intensity < 0.01 to minimise layout thrash.
+         */
         animateAllGlyphs() {
-          this.observedItems.forEach((_, itemElement) => {
-            const itemData = this.glyphDataCache.get(itemElement);
-            if (itemData) {
-              this.updateGlyphVisuals(itemElement, itemData);
+          const now = performance.now();
+          if (now - this._lastGlyphUpdate < this._maxUpdateInterval) return;
+          this._lastGlyphUpdate = now;
+          this._ensureStyleElement();
+          if (!this._styleElement) return;
+          const rules = [];
+          this._visibleItems.forEach((item) => {
+            const itemData = this.glyphDataCache.get(item);
+            if (!itemData) return;
+            const musicData = this.musicSyncService?.getLatestProcessedData();
+            let intensity = 0;
+            if (musicData) {
+              intensity = musicData.energy * 0.5 + musicData.valence * 0.5;
             }
+            intensity = (intensity + itemData.attentionScore) / 2;
+            const prev = this._lastIntensityMap.get(item);
+            if (prev !== void 0 && Math.abs(prev - intensity) < 0.01) return;
+            this._lastIntensityMap.set(item, intensity);
+            const glow = intensity * 0.8;
+            const id = item.getAttribute("data-sn-glyph-id");
+            if (!id) return;
+            rules.push(
+              `[data-sn-glyph-id="${id}"]{--sn-glyph-intensity:${intensity.toFixed(
+                3
+              )};--sn-glyph-glow:${glow.toFixed(3)};}`
+            );
           });
+          const cssText = rules.join("");
+          if (cssText && cssText !== this._lastGlyphBatchCss) {
+            this._styleElement.textContent = cssText;
+            this._lastGlyphBatchCss = cssText;
+          }
         }
         updateGlyphVisuals(itemElement, itemData) {
           const targetEl = this.glyphElements.get(itemElement) ?? null ? this.glyphElements.get(itemElement) : itemElement;
@@ -9517,15 +10010,6 @@
             intensity = musicData.energy * 0.5 + musicData.valence * 0.5;
           }
           intensity = (intensity + itemData.attentionScore) / 2;
-          const applyCss = (prop, val, el) => {
-            if (this.year3000System && this.year3000System.queueCSSVariableUpdate) {
-              this.year3000System.queueCSSVariableUpdate(prop, val, el);
-            } else {
-              el.style.setProperty(prop, val);
-            }
-          };
-          applyCss("--glyph-intensity", `${intensity}`, targetEl);
-          applyCss("--sn-glyph-opacity", `${(intensity * 0.8).toFixed(2)}`, targetEl);
         }
         updateGlyphData(itemElement, data) {
           let glyphData = this.glyphDataCache.get(itemElement);
@@ -9550,13 +10034,35 @@
             attentionScore: event.type === "mouseenter" ? 1 : 0
           });
           if (event.type === "mouseenter") {
-            const dwell = setTimeout(() => {
-              this.addTemporalEcho(itemElement);
-            }, 120);
-            this.hoverTimeouts.set(itemElement, dwell);
+            const timerSystem = this.year3000System?.timerConsolidationSystem;
+            if (timerSystem && timerSystem.registerConsolidatedTimer) {
+              const dwellId = `dgs-dwell-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+              timerSystem.registerConsolidatedTimer(
+                dwellId,
+                () => {
+                  this.addTemporalEcho(itemElement);
+                  timerSystem.unregisterConsolidatedTimer(dwellId);
+                },
+                120,
+                "background"
+              );
+              this.hoverTimeouts.set(itemElement, dwellId);
+            } else {
+              const dwell = setTimeout(() => {
+                this.addTemporalEcho(itemElement);
+              }, 120);
+              this.hoverTimeouts.set(itemElement, dwell);
+            }
           } else if (event.type === "mouseleave") {
-            const t = this.hoverTimeouts.get(itemElement);
-            if (t) clearTimeout(t);
+            const h = this.hoverTimeouts.get(itemElement);
+            if (h) {
+              const timerSystem = this.year3000System?.timerConsolidationSystem;
+              if (typeof h === "string" && timerSystem) {
+                timerSystem.unregisterConsolidatedTimer(h);
+              } else if (typeof h !== "string") {
+                clearTimeout(h);
+              }
+            }
             this.hoverTimeouts.delete(itemElement);
           }
         }
@@ -9658,8 +10164,10 @@
             this.recentEchoes.set(element, []);
           }
           if (this.currentEchoCount >= this.dynamicMaxEchoes) return;
+          if (this.performanceMonitor?.shouldReduceQuality?.()) return;
           if (this.echoIntensitySetting === 0) return;
           const echo = this.acquireEchoElement();
+          echo.setAttribute("data-sn-echo", "1");
           const musicData = this.musicSyncService?.getLatestProcessedData();
           const energy = musicData?.energy ?? 0;
           const valence = musicData?.valence ?? 0.5;
@@ -9719,13 +10227,38 @@
           element.appendChild(echo);
           this.currentEchoCount++;
           this._elementsWithActiveEcho.add(element);
-          setTimeout(() => {
-            if (echo.parentElement) echo.parentElement.removeChild(echo);
-            this.currentEchoCount--;
-            this.activeEchoElements.delete(echo);
-            this.releaseEchoElement(echo);
-            this._elementsWithActiveEcho.delete(element);
-          }, 1250);
+          const timerSystem = this.year3000System?.timerConsolidationSystem;
+          if (timerSystem && typeof timerSystem.registerConsolidatedTimer === "function") {
+            const timerId = `dgs-echo-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+            timerSystem.registerConsolidatedTimer(
+              timerId,
+              () => {
+                try {
+                  if (echo.parentElement) echo.parentElement.removeChild(echo);
+                } catch (_) {
+                }
+                this.currentEchoCount--;
+                this.activeEchoElements.delete(echo);
+                this.releaseEchoElement(echo);
+                this._elementsWithActiveEcho.delete(element);
+                timerSystem.unregisterConsolidatedTimer(timerId);
+              },
+              1300,
+              // slightly longer than longest layer duration
+              "background"
+            );
+          } else {
+            setTimeout(() => {
+              try {
+                if (echo.parentElement) echo.parentElement.removeChild(echo);
+              } catch (_) {
+              }
+              this.currentEchoCount--;
+              this.activeEchoElements.delete(echo);
+              this.releaseEchoElement(echo);
+              this._elementsWithActiveEcho.delete(element);
+            }, 1300);
+          }
         }
         get echoIntensitySetting() {
           const val = this.settingsManager?.get?.("sn-echo-intensity") ?? "2";
@@ -9759,10 +10292,35 @@
         /** Return echo element to pool (bounded) */
         releaseEchoElement(el) {
           this.echoPool.push(el);
-          const limit = this.dynamicMaxEchoes + 2;
+          const limit = this.dynamicMaxEchoes * 2;
           if (this.echoPool.length > limit) {
             this.echoPool.shift();
           }
+        }
+        /**
+         * Expose a lightweight snapshot of runtime metrics for external baselines.
+         * Consumers (e.g. MasterAnimationCoordinator perf overlay) can poll this
+         * method at low frequency (≤1 Hz) to log FPS, memory delta & echo counts
+         * without trolling the render thread.
+         */
+        getMetricsSnapshot() {
+          return {
+            ...this.performanceMetrics,
+            echoCount: this.currentEchoCount,
+            timestamp: Date.now()
+          };
+        }
+        /**
+         * SystemHealthMonitor hook – returns basic health metrics.
+         */
+        healthCheck() {
+          const echoesOk = this.currentEchoCount <= this.dynamicMaxEchoes;
+          const poolOk = this.echoPool.length <= this.dynamicMaxEchoes * 2;
+          const ok = echoesOk && poolOk;
+          return {
+            ok,
+            details: ok ? "Echo and pool within limits" : `Counts \u2013 echo:${this.currentEchoCount}, pool:${this.echoPool.length}`
+          };
         }
       };
       _DataGlyphSystem.BASE_MAX_ECHOES = 6;
@@ -9781,6 +10339,8 @@
         constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System2 = null) {
           super(config, utils, performanceMonitor, musicSyncService, settingsManager);
           this._scrollContainerElements = [];
+          // Stored throttled interaction handler for proper cleanup.
+          this._interactionHandler = null;
           this.year3000System = year3000System2;
           this.nexusState = {
             complexity: 0.1,
@@ -9940,13 +10500,17 @@
           this.modalObserver.observe(modalRoot, { childList: true });
         }
         setupOptimizedInteractionListener() {
-          const throttledHandler = this.utils.throttle(
+          this._interactionHandler = this.utils.throttle(
             (event) => this.recordUserInteraction(event),
             100
           );
           const genericEvents = ["click", "mousemove", "keydown"];
           genericEvents.forEach((eventType) => {
-            document.addEventListener(eventType, throttledHandler, { passive: true });
+            document.addEventListener(
+              eventType,
+              this._interactionHandler,
+              { passive: true }
+            );
           });
           const scrollSelectors = [
             ".main-view-container__scroll-node",
@@ -9961,7 +10525,9 @@
           });
           const targets = foundContainers.length ? foundContainers : [document];
           targets.forEach((el) => {
-            el.addEventListener("scroll", throttledHandler, { passive: true });
+            el.addEventListener("scroll", this._interactionHandler, {
+              passive: true
+            });
           });
           this._scrollContainerElements = foundContainers;
         }
@@ -10155,6 +10721,24 @@
             slowdown: this.biometricState.slowdown
           };
         }
+        destroy() {
+          if (this._interactionHandler) {
+            ["click", "mousemove", "keydown"].forEach((evt) => {
+              document.removeEventListener(
+                evt,
+                this._interactionHandler
+              );
+            });
+            this._scrollContainerElements.forEach((el) => {
+              el.removeEventListener(
+                "scroll",
+                this._interactionHandler
+              );
+            });
+            this._interactionHandler = null;
+          }
+          super.destroy();
+        }
       };
     }
   });
@@ -10305,6 +10889,7 @@
   var init_ParticleFieldSystem = __esm({
     "src-js/systems/visual/ParticleFieldSystem.ts"() {
       "use strict";
+      init_PerformanceAnalyzer();
       ParticleFieldSystem = class {
         constructor(config, utils, performanceAnalyzer, musicSyncService, settingsManager, rootSystem) {
           this.config = config;
@@ -10318,7 +10903,17 @@
           this._ctx = null;
           this._particles = [];
           this._animationFrame = null;
+          /** Whether we spawned our own requestAnimationFrame loop (fallback for standalone usage). */
+          this._ownsRAF = false;
+          /** Cached performance flag so we don\'t call shouldReduceQuality() every particle. */
+          this._lowQualityMode = false;
           this._pulseStrength = 0;
+          // Stores the resize handler reference for proper cleanup.
+          this._boundResizeHandler = null;
+          this.systemName = "ParticleFieldSystem";
+        }
+        forceRepaint(reason) {
+          throw new Error("Method not implemented.");
         }
         // ───────────────────────────── IManagedSystem ──────────────────────────────
         async initialize() {
@@ -10327,10 +10922,18 @@
             return;
           }
           this._setupCanvas();
-          this._createParticles(300);
-          this._startLoop();
+          const particleCount = this._getParticleCount();
+          this._createParticles(particleCount);
+          const hasMAC = !!(this.rootSystem && this.rootSystem.masterAnimationCoordinator);
+          if (!hasMAC) {
+            this._startLoop();
+            this._ownsRAF = true;
+          }
           this.musicSyncService.subscribe(this, "ParticleFieldSystem");
           this.initialized = true;
+          if (this.rootSystem?.registerVisualSystem) {
+            this.rootSystem.registerVisualSystem(this, "background");
+          }
         }
         updateAnimation(_delta) {
         }
@@ -10339,9 +10942,14 @@
         }
         destroy() {
           if (this._animationFrame) cancelAnimationFrame(this._animationFrame);
+          this._ownsRAF = false;
           this.musicSyncService.unsubscribe("ParticleFieldSystem");
           if (this._canvas && this._canvas.parentElement) {
             this._canvas.parentElement.removeChild(this._canvas);
+          }
+          if (this._boundResizeHandler) {
+            window.removeEventListener("resize", this._boundResizeHandler);
+            this._boundResizeHandler = null;
           }
           this._particles = [];
           this.initialized = false;
@@ -10367,7 +10975,8 @@
           this._canvas = canvas;
           this._ctx = canvas.getContext("2d");
           this._resize();
-          window.addEventListener("resize", this._resize.bind(this));
+          this._boundResizeHandler = this._resize.bind(this);
+          window.addEventListener("resize", this._boundResizeHandler);
         }
         _resize() {
           if (!this._canvas) return;
@@ -10402,6 +11011,7 @@
           if (!ctx || !this._canvas) return;
           ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
           this._pulseStrength *= 0.93;
+          this._lowQualityMode = this.performanceAnalyzer.shouldReduceQuality() || PerformanceAnalyzer.isLowEndDevice();
           for (const p of this._particles) {
             p.x += p.speedX;
             p.y += p.speedY;
@@ -10410,10 +11020,14 @@
             if (p.y < 0) p.y += window.innerHeight;
             if (p.y > window.innerHeight) p.y -= window.innerHeight;
             const size = p.baseSize + p.pulse;
-            const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size);
-            gradient.addColorStop(0, "rgba(255,255,255,0.8)");
-            gradient.addColorStop(1, "rgba(255,255,255,0)");
-            ctx.fillStyle = gradient;
+            if (this._lowQualityMode) {
+              ctx.fillStyle = "rgba(255,255,255,0.75)";
+            } else {
+              const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size);
+              gradient.addColorStop(0, "rgba(255,255,255,0.8)");
+              gradient.addColorStop(1, "rgba(255,255,255,0)");
+              ctx.fillStyle = gradient;
+            }
             ctx.beginPath();
             ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
             ctx.fill();
@@ -10422,6 +11036,22 @@
               p.pulse += this._pulseStrength * 0.1 * Math.random();
             }
           }
+        }
+        // -----------------------------------------------------------------------
+        // VisualSystemRegistry hook – use registry cadence when available
+        // -----------------------------------------------------------------------
+        onAnimate(_delta, _context) {
+          if (this._ownsRAF) return;
+          this._step();
+        }
+        onPerformanceModeChange(mode) {
+        }
+        // Helper to compute particle count based on performance mode
+        _getParticleCount() {
+          if (this.performanceAnalyzer.shouldReduceQuality() || PerformanceAnalyzer.isLowEndDevice()) {
+            return 180;
+          }
+          return 300;
         }
       };
     }
@@ -10694,7 +11324,9 @@
           if (this.echoPool.length < 20) this.echoPool.push(el);
         }
         _spawnMegaEcho(element) {
-          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || this.performanceMonitor.shouldReduceQuality()) {
+            return;
+          }
           if (this.currentEchoCount >= this.dynamicMaxEchoes) return;
           if (this.echoIntensitySetting === 0) return;
           if (this._elementsWithActiveEcho.has(element)) return;
@@ -10758,6 +11390,10 @@
           this.echoPool = [];
           this.currentEchoCount = 0;
           this._elementsWithActiveEcho = /* @__PURE__ */ new WeakSet();
+          // Stores nav interaction handler reference for clean removal.
+          this._navInteractionHandler = null;
+          /** Flag used to skip re-applying motion-disabled class when already set */
+          this._lastMotionDisabled = false;
           this.year3000System = year3000System2;
           this.masterAnimationRegistered = false;
           this.isUsingMasterAnimation = false;
@@ -10823,15 +11459,23 @@
           this.createHarmonicModeDisplay();
           this.updateColors();
           if (this.rootNavBar) {
-            const handler = (evt) => {
+            this._navInteractionHandler = (evt) => {
               const el = evt.target;
               if (!el || !(el instanceof HTMLElement)) return;
               if (el.matches("a, button, [role='link']")) {
                 this._spawnNavEcho(el);
               }
             };
-            this.rootNavBar.addEventListener("focusin", handler, true);
-            this.rootNavBar.addEventListener("pointerenter", handler, true);
+            this.rootNavBar.addEventListener(
+              "focusin",
+              this._navInteractionHandler,
+              true
+            );
+            this.rootNavBar.addEventListener(
+              "pointerenter",
+              this._navInteractionHandler,
+              true
+            );
           }
           this._tryRegisterWithMasterAnimation();
           this._setupResizeObserver();
@@ -11012,6 +11656,19 @@
           if (this.consciousnessAnimationFrame) {
             cancelAnimationFrame(this.consciousnessAnimationFrame);
           }
+          if (this.rootNavBar && this._navInteractionHandler) {
+            this.rootNavBar.removeEventListener(
+              "focusin",
+              this._navInteractionHandler,
+              true
+            );
+            this.rootNavBar.removeEventListener(
+              "pointerenter",
+              this._navInteractionHandler,
+              true
+            );
+            this._navInteractionHandler = null;
+          }
           if (this.year3000System && this.year3000System.unregisterAnimationSystem) {
             this.year3000System.unregisterAnimationSystem(
               "SidebarConsciousnessSystem"
@@ -11111,6 +11768,28 @@
             this._elementsWithActiveEcho.delete(element);
           }, 1100);
         }
+        // ---------------------------------------------------------------------
+        // 🏎️  Performance-Aware Animation Gate
+        // ---------------------------------------------------------------------
+        /**
+         * Overrides the base implementation so we can toggle a lightweight
+         * CSS class (`sn-motion-disabled`) on the sidebar element whenever the
+         * active PerformanceProfile suggests a "low" tier or when reduced motion
+         * should be respected.  This allows the SCSS layer to instantly pause
+         * expensive keyframes (vibrations, pulses, hue-shifts) without touching
+         * inline styles.
+         */
+        applyPerformanceSettings(profile) {
+          super.applyPerformanceSettings(profile);
+          const lowPerf = !profile.enableGPUAcceleration || profile.animationThrottle >= 24;
+          const motionDisabled = lowPerf || profile.reducedMotion;
+          if (this.rootNavBar) {
+            if (motionDisabled !== this._lastMotionDisabled) {
+              this.rootNavBar.classList.toggle("sn-motion-disabled", motionDisabled);
+              this._lastMotionDisabled = motionDisabled;
+            }
+          }
+        }
       };
       _SidebarConsciousnessSystem.BASE_MAX_ECHOES = 4;
       SidebarConsciousnessSystem = _SidebarConsciousnessSystem;
@@ -11140,6 +11819,7 @@
           this._bindGroup = null;
           this._frame = 0;
           this._pipeline = null;
+          this.systemName = "WebGPUBackgroundSystem";
           // Helper caches
           this._primary = [0.5, 0.4, 0.9];
           this._secondary = [0.35, 0.35, 0.75];
@@ -11149,6 +11829,9 @@
           // Phase 4 – nebula drift direction
           this._driftVec = [0, 0];
           this._lastDriftUpdate = 0;
+        }
+        forceRepaint(reason) {
+          throw new Error("Method not implemented.");
         }
         // ---------------------------------------------------------------------------
         // IManagedSystem lifecycle
@@ -11161,6 +11844,9 @@
             await this._initWebGPU();
             this._startRenderLoop();
             this.initialized = true;
+            if (this.rootSystem?.registerVisualSystem) {
+              this.rootSystem.registerVisualSystem(this, "background");
+            }
           } catch (err) {
             console.warn("[WebGPUBackgroundSystem] Initialization failed", err);
             this.initialized = false;
@@ -11371,6 +12057,13 @@
             }
           }
         }
+        // -----------------------------------------------------------------------
+        // CDF VisualSystemRegistry hook – delegate to existing GPU render schedule
+        // -----------------------------------------------------------------------
+        onAnimate(_delta, _context) {
+        }
+        onPerformanceModeChange(mode) {
+        }
       };
     }
   });
@@ -11387,6 +12080,7 @@
       init_MasterAnimationCoordinator();
       init_PerformanceAnalyzer();
       init_TimerConsolidationSystem();
+      init_VisualSystemRegistry();
       init_SystemHealthMonitor();
       init_starryNightEffects();
       init_Card3DManager();
@@ -11422,6 +12116,8 @@
            * guaranteed field.
            */
           this.allowHarmonicEvolution = true;
+          /** Global switch other systems can read to know guardrails are active */
+          this.performanceGuardActive = false;
           this.YEAR3000_CONFIG = this._deepCloneConfig(config);
           if (typeof this.YEAR3000_CONFIG.init === "function") {
             this.YEAR3000_CONFIG.init();
@@ -11452,6 +12148,7 @@
           this.particleFieldSystem = null;
           this.emergentChoreographyEngine = null;
           this.initializationResults = null;
+          this.visualSystemRegistry = null;
           if (this.YEAR3000_CONFIG?.enableDebug) {
             console.log(
               "\u{1F31F} [Year3000System] Constructor: Instance created with Master Animation Coordinator"
@@ -11540,7 +12237,9 @@
               name: "CSSVariableBatcher",
               init: () => {
                 this.cssVariableBatcher = new CSSVariableBatcher({
-                  enableDebug: this.YEAR3000_CONFIG.enableDebug
+                  enableDebug: this.YEAR3000_CONFIG.enableDebug,
+                  batchIntervalMs: 100,
+                  autoHijack: true
                 });
               }
             },
@@ -11550,6 +12249,17 @@
                 this.performanceAnalyzer = new PerformanceAnalyzer({
                   enableDebug: this.YEAR3000_CONFIG.enableDebug
                 });
+                this.performanceAnalyzer.startMonitoring();
+                this.performanceGuardActive = true;
+              }
+            },
+            {
+              name: "VisualSystemRegistry",
+              init: () => {
+                this.visualSystemRegistry = new VisualSystemRegistry(
+                  this.performanceAnalyzer,
+                  this.deviceCapabilityDetector
+                );
               }
             },
             {
@@ -11575,6 +12285,11 @@
                 this.masterAnimationCoordinator = new MasterAnimationCoordinator({
                   enableDebug: this.YEAR3000_CONFIG.enableDebug
                 });
+                if (this.deviceCapabilityDetector) {
+                  this.masterAnimationCoordinator.setDeviceCapabilityDetector(
+                    this.deviceCapabilityDetector
+                  );
+                }
                 this.masterAnimationCoordinator.startMasterAnimationLoop();
               }
             },
@@ -12408,7 +13123,9 @@
               name: "CSSVariableBatcher",
               init: () => {
                 this.cssVariableBatcher = new CSSVariableBatcher({
-                  enableDebug: this.YEAR3000_CONFIG.enableDebug
+                  enableDebug: this.YEAR3000_CONFIG.enableDebug,
+                  batchIntervalMs: 100,
+                  autoHijack: true
                 });
               }
             },
@@ -12872,6 +13589,25 @@
             }
           }
         }
+        // -----------------------------------------------------------------------
+        // CDF Visual System registration helpers
+        // -----------------------------------------------------------------------
+        registerVisualSystem(system, priority = "normal") {
+          if (!this.visualSystemRegistry) {
+            console.warn(
+              "[Year3000System] VisualSystemRegistry not ready \u2013 cannot register",
+              system.systemName
+            );
+            return false;
+          }
+          this.visualSystemRegistry.registerSystem(system, priority);
+          return true;
+        }
+        unregisterVisualSystem(system) {
+          if (!this.visualSystemRegistry) return false;
+          this.visualSystemRegistry.unregisterSystem(system);
+          return true;
+        }
       };
       year3000System = new Year3000System();
       if (typeof window !== "undefined") {
@@ -12885,69 +13621,52 @@
   // src-js/effects/prismaticScrollSheen.ts
   var prismaticScrollSheen_exports = {};
   __export(prismaticScrollSheen_exports, {
+    PrismaticScrollSheenSystem: () => PrismaticScrollSheenSystem,
     initializePrismaticScrollSheen: () => initializePrismaticScrollSheen
   });
-  function initializePrismaticScrollSheen(selector = ".main-view-container__scroll-node") {
-    if (typeof document === "undefined") return;
+  function initializePrismaticScrollSheen() {
     try {
-      const detector = year3000System_default?.deviceCapabilityDetector;
-      if (detector && detector.deviceCapabilities?.overall && detector.deviceCapabilities.overall === "low") {
-        document.documentElement.style.setProperty(
-          "--sn-scroll-sheen-enabled",
-          "0"
-        );
-        return;
-      }
-    } catch (_e) {
-    }
-    document.documentElement.style.setProperty("--sn-scroll-sheen-enabled", "1");
-    const attachListener = (container) => {
-      let previousTop = container.scrollTop;
-      let cumulativePx = 0;
-      const rootStyle = getComputedStyle(document.documentElement);
-      const cssCyclePx = parseFloat(
-        rootStyle.getPropertyValue("--sn-scroll-cycle-px") || ""
-      );
-      const cyclePx = isNaN(cssCyclePx) ? DEFAULT_CYCLE_PX : cssCyclePx;
-      document.documentElement.style.setProperty(
-        "--sn-scroll-cycle-px",
-        cyclePx.toString()
-      );
-      const update = () => {
-        const currentTop = container.scrollTop;
-        const delta = Math.abs(currentTop - previousTop);
-        previousTop = currentTop;
-        cumulativePx = (cumulativePx + delta) % cyclePx;
-        const ratio = cumulativePx / cyclePx;
-        document.documentElement.style.setProperty(
-          "--sn-scroll-ratio",
-          ratio.toFixed(4)
-        );
-      };
-      container.addEventListener("scroll", update, { passive: true });
-      update();
-    };
-    const maybeAttach = () => {
-      const container = document.querySelector(selector);
-      if (container) {
-        attachListener(container);
-        return true;
-      }
-      return false;
-    };
-    if (!maybeAttach()) {
-      const retryInterval = setInterval(() => {
-        if (maybeAttach()) clearInterval(retryInterval);
-      }, 500);
-      setTimeout(() => clearInterval(retryInterval), 2e4);
+      const sys = new PrismaticScrollSheenSystem();
+      year3000System_default?.registerVisualSystem?.(sys, "background");
+    } catch (err) {
+      console.error("[PrismaticScrollSheen] Failed to init:", err);
     }
   }
-  var DEFAULT_CYCLE_PX;
+  var DEFAULT_CYCLE_PX, PrismaticScrollSheenSystem;
   var init_prismaticScrollSheen = __esm({
     "src-js/effects/prismaticScrollSheen.ts"() {
       "use strict";
       init_year3000System();
       DEFAULT_CYCLE_PX = 6e3;
+      PrismaticScrollSheenSystem = class {
+        constructor(cyclePx = DEFAULT_CYCLE_PX) {
+          this.cyclePx = cyclePx;
+          this.systemName = "PrismaticScrollSheen";
+          this._lastRatio = -1;
+          document.documentElement.style.setProperty(
+            "--sn-scroll-cycle-px",
+            String(cyclePx)
+          );
+        }
+        /**
+         * Called each animation frame by VisualSystemRegistry.
+         */
+        onAnimate(_delta, context) {
+          const ratio = context.scrollRatio ?? 0;
+          if (Math.abs(ratio - this._lastRatio) < 1e-3) return;
+          this._lastRatio = ratio;
+          const root = document.documentElement;
+          root.style.setProperty("--sn-cdf-scroll-ratio", ratio.toFixed(4));
+          root.style.setProperty("--sn-scroll-ratio", ratio.toFixed(4));
+        }
+        onPerformanceModeChange() {
+        }
+        destroy() {
+        }
+      };
+      if (window.Y3K?.system?.registerVisualSystem) {
+        initializePrismaticScrollSheen();
+      }
     }
   });
 
@@ -14183,6 +14902,39 @@
         }
       }
     );
+    const currentVisualInt = settingsManager.get("sn-visual-intensity") || "0.8";
+    section.addInput(
+      "sn-visual-intensity",
+      "Visual intensity (0-1)",
+      currentVisualInt,
+      "number",
+      {
+        attributes: { min: 0, max: 1, step: 0.05 },
+        onChange: (e) => {
+          const val = e.currentTarget.value;
+          let num = parseFloat(val);
+          if (isNaN(num)) num = 0.8;
+          num = Math.max(0, Math.min(1, num));
+          settingsManager.set("sn-visual-intensity", num.toFixed(2));
+        }
+      }
+    );
+    const animQualityOptions = ["auto", "low", "high"];
+    const currentAnimQ = settingsManager.get("sn-animation-quality") || "auto";
+    section.addDropDown(
+      "sn-animation-quality",
+      "Animation quality",
+      animQualityOptions,
+      Math.max(0, animQualityOptions.indexOf(currentAnimQ)),
+      void 0,
+      {
+        onChange: (e) => {
+          const idx = e?.currentTarget?.selectedIndex ?? 0;
+          const val = animQualityOptions[idx] ?? "auto";
+          settingsManager.set("sn-animation-quality", val);
+        }
+      }
+    );
     await section.pushSettings();
     console.log("\u2728 [StarryNight] spcr-settings panel initialised");
     const rerender = () => section.rerender();
@@ -14209,6 +14961,196 @@
       init_starryNightEffects();
       init_SettingsManager();
       init_SettingsSection();
+    }
+  });
+
+  // src-js/systems/visual/RightSidebarConsciousnessSystem.ts
+  var RightSidebarConsciousnessSystem_exports = {};
+  __export(RightSidebarConsciousnessSystem_exports, {
+    RightSidebarConsciousnessSystem: () => RightSidebarConsciousnessSystem
+  });
+  var RightSidebarConsciousnessSystem;
+  var init_RightSidebarConsciousnessSystem = __esm({
+    "src-js/systems/visual/RightSidebarConsciousnessSystem.ts"() {
+      "use strict";
+      init_CSSVariableBatcher();
+      init_EventBus();
+      init_BaseVisualSystem();
+      RightSidebarConsciousnessSystem = class extends BaseVisualSystem {
+        constructor(config, utils, perf, musicSync, settings, year3000System2 = null) {
+          super(config, utils, perf, musicSync, settings);
+          // Current → target state for smooth lerp
+          this.currentBeatIntensity = 0;
+          this.targetBeatIntensity = 0;
+          this.currentHueShift = 0;
+          // degrees
+          this.targetHueShift = 0;
+          // Lerp smoothing factors
+          this.INTENSITY_LERP = 0.25;
+          this.HUE_LERP = 0.05;
+          // Loop control
+          this.fallbackRafId = null;
+          this.lastTimestamp = performance.now();
+          // Unsubscribe functions
+          this.unsubBeat = null;
+          this.unsubEnergy = null;
+          this.year3000System = year3000System2;
+          this.cssBatcher = year3000System2?.cssVariableBatcher ?? new CSSVariableBatcher();
+        }
+        /* ------------------------------------------------------------------ */
+        /* Initialization                                                     */
+        /* ------------------------------------------------------------------ */
+        async _performSystemSpecificInitialization() {
+          this.unsubBeat = GlobalEventBus.subscribe(
+            "music:beat",
+            (payload) => this._handleBeat(payload)
+          );
+          this.unsubEnergy = GlobalEventBus.subscribe(
+            "music:energy",
+            (payload) => this._handleEnergy(payload)
+          );
+          this._tryRegisterWithMasterAnimation();
+        }
+        _tryRegisterWithMasterAnimation() {
+          if (this.year3000System?.registerAnimationSystem && this.year3000System.masterAnimationCoordinator) {
+            const ok = this.year3000System.registerAnimationSystem(
+              "RightSidebarConsciousnessSystem",
+              this,
+              "background",
+              60
+            );
+            if (ok) return;
+          }
+          this._startFallbackLoop();
+        }
+        /* ------------------------------------------------------------------ */
+        /* Event Handlers                                                     */
+        /* ------------------------------------------------------------------ */
+        _handleBeat({ intensity }) {
+          this.targetBeatIntensity = Math.min(Math.max(intensity, 0), 1);
+        }
+        _handleEnergy({ energy }) {
+          const deg = Math.round(energy * 120);
+          this.targetHueShift = deg;
+        }
+        /* ------------------------------------------------------------------ */
+        /* Animation Loop                                                     */
+        /* ------------------------------------------------------------------ */
+        onAnimate(deltaMs) {
+          this._tick(deltaMs);
+        }
+        _startFallbackLoop() {
+          const loop = (ts) => {
+            const delta = ts - this.lastTimestamp;
+            this.lastTimestamp = ts;
+            this._tick(delta);
+            this.fallbackRafId = requestAnimationFrame(loop);
+          };
+          this.fallbackRafId = requestAnimationFrame(loop);
+        }
+        _tick(deltaMs) {
+          this.currentBeatIntensity = this._lerp(
+            this.currentBeatIntensity,
+            this.targetBeatIntensity,
+            this.INTENSITY_LERP
+          );
+          this.currentHueShift = this._lerp(
+            this.currentHueShift,
+            this.targetHueShift,
+            this.HUE_LERP
+          );
+          this._queueCssVar("--sn-rs-beat-intensity", this.currentBeatIntensity);
+          const glowAlpha = (0.15 + this.currentBeatIntensity * 0.45).toFixed(3);
+          this._queueCssVar("--sn-rs-glow-alpha", glowAlpha);
+          this._queueCssVar("--sn-rs-hue-shift", `${this.currentHueShift}deg`);
+        }
+        _queueCssVar(property, value) {
+          this.cssBatcher.queueCSSVariableUpdate(property, String(value));
+        }
+        _lerp(from, to, alpha) {
+          return from + (to - from) * alpha;
+        }
+        /* ------------------------------------------------------------------ */
+        /* Cleanup                                                            */
+        /* ------------------------------------------------------------------ */
+        destroy() {
+          super.destroy();
+          this.unsubBeat?.();
+          this.unsubEnergy?.();
+          if (this.fallbackRafId) cancelAnimationFrame(this.fallbackRafId);
+        }
+      };
+    }
+  });
+
+  // src-js/core/CDFVariableBridge.ts
+  var CDFVariableBridge_exports = {};
+  __export(CDFVariableBridge_exports, {
+    CDFVariableBridge: () => CDFVariableBridge
+  });
+  var CDFVariableBridge;
+  var init_CDFVariableBridge = __esm({
+    "src-js/core/CDFVariableBridge.ts"() {
+      "use strict";
+      init_EventBus();
+      CDFVariableBridge = class {
+        constructor(batcher) {
+          this.batcher = batcher;
+          this.reduceMotionMQ = null;
+          this._mqHandler = null;
+          this.unsubscribe = GlobalEventBus.subscribe(
+            "cdf:frameContext",
+            (ctx) => this._handleFrame(ctx)
+          );
+          if (typeof window !== "undefined" && window.matchMedia) {
+            this.reduceMotionMQ = window.matchMedia(
+              "(prefers-reduced-motion: reduce)"
+            );
+            this._syncReducedMotion(this.reduceMotionMQ.matches);
+            this._mqHandler = (e) => {
+              this._syncReducedMotion(e.matches);
+            };
+            try {
+              this.reduceMotionMQ.addEventListener("change", this._mqHandler);
+            } catch {
+              this.reduceMotionMQ.addListener(this._mqHandler);
+            }
+          }
+        }
+        destroy() {
+          this.unsubscribe?.();
+          if (this.reduceMotionMQ && this._mqHandler) {
+            try {
+              this.reduceMotionMQ.removeEventListener("change", this._mqHandler);
+            } catch {
+              this.reduceMotionMQ.removeListener(this._mqHandler);
+            }
+          }
+        }
+        // -------------------------------------------------------------------------
+        // Internal helpers
+        // -------------------------------------------------------------------------
+        _handleFrame(ctx) {
+          if (typeof ctx.scrollRatio === "number") {
+            this.batcher.queueCSSVariableUpdate(
+              "--sn-cdf-scroll-ratio",
+              ctx.scrollRatio.toFixed(3)
+            );
+            this.batcher.queueCSSVariableUpdate(
+              "--sn-scroll-ratio",
+              ctx.scrollRatio.toFixed(3)
+            );
+          }
+          if (typeof ctx.beatIntensity === "number") {
+            const val = ctx.beatIntensity.toFixed(3);
+            this.batcher.queueCSSVariableUpdate("--sn-cdf-energy", val);
+            this.batcher.queueCSSVariableUpdate("--sn-nebula-beat-intensity", val);
+          }
+        }
+        _syncReducedMotion(reduce) {
+          this.batcher.queueCSSVariableUpdate("--sn-cdf-enabled", reduce ? "0" : "1");
+        }
+      };
     }
   });
 
@@ -15010,8 +15952,9 @@
     /**
      * Called by the coordinator every frame (subject to frame budgeting).
      * @param deltaMs Time in milliseconds since last call.
+     * @param _context Shared FrameContext from VisualSystemRegistry (unused for now).
      */
-    onAnimate(deltaMs) {
+    onAnimate(deltaMs, _context) {
       this._elapsed += deltaMs;
       let start = 0;
       if (this._perf) start = this._perf.startTiming("AberrationVisualSystem");
@@ -15041,20 +15984,8 @@
     }
   };
 
-  // src-js/utils/getScrollNode.ts
-  var SCROLL_NODE_SELECTORS = [
-    ".main-view-container__scroll-node",
-    // 2023-era builds
-    ".main-viewContainer-scrollNode",
-    // 2024 dash variant
-    ".main-viewContainer__scrollNode"
-    // 2024 double-underscore variant
-  ].join(", ");
-  function getScrollNode() {
-    return document.querySelector(SCROLL_NODE_SELECTORS);
-  }
-
   // src-js/effects/Aberration/AberrationManager.ts
+  init_getScrollNode();
   var instance = null;
   var visualSystem = null;
   function isAberrationEnabled() {
@@ -15086,13 +16017,7 @@
         instance,
         y3k.performanceAnalyzer || void 0
       );
-      y3k.registerAnimationSystem(
-        "AberrationCanvas",
-        visualSystem,
-        // satisfies minimal AnimationSystem
-        "critical",
-        60
-      );
+      y3k?.registerVisualSystem?.(visualSystem, "critical");
       y3k.performanceAnalyzer?.emitTrace("AberrationCanvasAttached");
     }
   }
@@ -15399,6 +16324,7 @@
   }
 
   // src-js/theme.entry.ts
+  init_Year3000Utilities();
   async function waitForAPI(apiPath, timeout = 5e3) {
     const start = Date.now();
     while (Date.now() - start < timeout) {
@@ -15540,6 +16466,34 @@
         mode: degradedMode ? "degraded" : "full",
         availableAPIs: requiredAPIs
       };
+    }
+    try {
+      const { RightSidebarConsciousnessSystem: RightSidebarConsciousnessSystem2 } = await Promise.resolve().then(() => (init_RightSidebarConsciousnessSystem(), RightSidebarConsciousnessSystem_exports));
+      if (year3000System2.performanceAnalyzer) {
+        const rsSystem = new RightSidebarConsciousnessSystem2(
+          YEAR3000_CONFIG,
+          Year3000Utilities_exports,
+          year3000System2.performanceAnalyzer,
+          year3000System2.musicSyncService,
+          year3000System2.settingsManager,
+          year3000System2
+        );
+        await rsSystem.initialize();
+        year3000System2.rightSidebarConsciousnessSystem = rsSystem;
+      }
+    } catch (err) {
+      console.error(
+        "[StarryNight] Failed to initialize RightSidebarConsciousnessSystem",
+        err
+      );
+    }
+    try {
+      const { CDFVariableBridge: CDFVariableBridge2 } = await Promise.resolve().then(() => (init_CDFVariableBridge(), CDFVariableBridge_exports));
+      if (year3000System2.cssVariableBatcher) {
+        new CDFVariableBridge2(year3000System2.cssVariableBatcher);
+      }
+    } catch (err) {
+      console.error("[StarryNight] Failed to initialize CDFVariableBridge", err);
     }
     const initTime = Date.now() - startTime;
     console.log(

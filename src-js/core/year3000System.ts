@@ -13,6 +13,11 @@ import { DeviceCapabilityDetector } from "@/core/DeviceCapabilityDetector";
 import { MasterAnimationCoordinator } from "@/core/MasterAnimationCoordinator";
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
 import { TimerConsolidationSystem } from "@/core/TimerConsolidationSystem";
+import {
+  IVisualSystem,
+  VisualSystemPriority,
+  VisualSystemRegistry,
+} from "@/core/VisualSystemRegistry";
 import { SystemHealthMonitor } from "@/debug/SystemHealthMonitor";
 import { applyStarryNightSettings } from "@/effects/starryNightEffects";
 import { Card3DManager } from "@/managers/Card3DManager";
@@ -78,6 +83,9 @@ export class Year3000System {
   public deviceCapabilityDetector: DeviceCapabilityDetector | null;
   public performanceAnalyzer: PerformanceAnalyzer | null;
 
+  // Cosmic Discovery Framework – central visual registry
+  public visualSystemRegistry: VisualSystemRegistry | null;
+
   // Managers and Services
   public systemHealthMonitor: SystemHealthMonitor | null;
   public settingsManager: SettingsManager | null;
@@ -123,6 +131,9 @@ export class Year3000System {
    */
   public allowHarmonicEvolution: boolean = true;
 
+  /** Global switch other systems can read to know guardrails are active */
+  public performanceGuardActive: boolean = false;
+
   constructor(
     config: Year3000Config = YEAR3000_CONFIG,
     harmonicModes: HarmonicModes = HARMONIC_MODES
@@ -161,6 +172,8 @@ export class Year3000System {
     this.emergentChoreographyEngine = null;
 
     this.initializationResults = null;
+
+    this.visualSystemRegistry = null;
 
     if (this.YEAR3000_CONFIG?.enableDebug) {
       console.log(
@@ -281,6 +294,8 @@ export class Year3000System {
         init: () => {
           this.cssVariableBatcher = new CSSVariableBatcher({
             enableDebug: this.YEAR3000_CONFIG.enableDebug,
+            batchIntervalMs: 100,
+            autoHijack: true,
           });
         },
       },
@@ -290,6 +305,19 @@ export class Year3000System {
           this.performanceAnalyzer = new PerformanceAnalyzer({
             enableDebug: this.YEAR3000_CONFIG.enableDebug,
           });
+
+          // Start continuous monitoring immediately and enable guard flag
+          this.performanceAnalyzer.startMonitoring();
+          this.performanceGuardActive = true;
+        },
+      },
+      {
+        name: "VisualSystemRegistry",
+        init: () => {
+          this.visualSystemRegistry = new VisualSystemRegistry(
+            this.performanceAnalyzer,
+            this.deviceCapabilityDetector
+          );
         },
       },
       {
@@ -315,6 +343,14 @@ export class Year3000System {
           this.masterAnimationCoordinator = new MasterAnimationCoordinator({
             enableDebug: this.YEAR3000_CONFIG.enableDebug,
           });
+
+          // Inject capability detector so MAC can quality-gate systems
+          if (this.deviceCapabilityDetector) {
+            this.masterAnimationCoordinator.setDeviceCapabilityDetector(
+              this.deviceCapabilityDetector
+            );
+          }
+
           this.masterAnimationCoordinator.startMasterAnimationLoop();
         },
       },
@@ -1350,6 +1386,8 @@ export class Year3000System {
         init: () => {
           this.cssVariableBatcher = new CSSVariableBatcher({
             enableDebug: this.YEAR3000_CONFIG.enableDebug,
+            batchIntervalMs: 100,
+            autoHijack: true,
           });
         },
       },
@@ -1905,6 +1943,31 @@ export class Year3000System {
         console.log("🖥️ [Year3000System] WebGPUBackgroundSystem stopped");
       }
     }
+  }
+
+  // -----------------------------------------------------------------------
+  // CDF Visual System registration helpers
+  // -----------------------------------------------------------------------
+
+  public registerVisualSystem(
+    system: IVisualSystem,
+    priority: VisualSystemPriority = "normal"
+  ): boolean {
+    if (!this.visualSystemRegistry) {
+      console.warn(
+        "[Year3000System] VisualSystemRegistry not ready – cannot register",
+        system.systemName
+      );
+      return false;
+    }
+    this.visualSystemRegistry.registerSystem(system, priority);
+    return true;
+  }
+
+  public unregisterVisualSystem(system: IVisualSystem): boolean {
+    if (!this.visualSystemRegistry) return false;
+    this.visualSystemRegistry.unregisterSystem(system);
+    return true;
   }
 }
 

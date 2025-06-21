@@ -26,9 +26,15 @@ export class Card3DManager implements IManagedSystem {
   private settingsManager: SettingsManager;
   private utils: typeof Utils;
   private cards: NodeListOf<HTMLElement>;
-  private isModernTheme: boolean;
   private cardQuerySelector =
     ".main-card-card, .main-gridContainer-gridContainer.main-gridContainer-fixedWidth";
+  private cardEventHandlers: WeakMap<
+    HTMLElement,
+    {
+      move: EventListenerOrEventListenerObject;
+      leave: EventListenerOrEventListenerObject;
+    }
+  > = new WeakMap();
 
   private boundHandleSettingsChange: (event: Event) => void;
 
@@ -49,7 +55,6 @@ export class Card3DManager implements IManagedSystem {
     this.performanceMonitor = performanceMonitor;
     this.settingsManager = settingsManager;
     this.utils = utils;
-    this.isModernTheme = true; // Assuming modern theme by default
     this.cards = document.querySelectorAll(this.config.selector);
 
     // Bind event handler once
@@ -72,6 +77,8 @@ export class Card3DManager implements IManagedSystem {
   }
 
   public async initialize(): Promise<void> {
+    if (this.initialized) return;
+
     const quality = this.performanceMonitor.shouldReduceQuality();
     if (quality) {
       if (this.settingsManager.get("sn-3d-effects-level") !== "disabled") {
@@ -128,11 +135,20 @@ export class Card3DManager implements IManagedSystem {
 
   private async applyEventListeners(): Promise<void> {
     this.cards.forEach((card) => {
-      card.addEventListener("mousemove", this.handleMouseMove.bind(this, card));
-      card.addEventListener(
-        "mouseleave",
-        this.handleMouseLeave.bind(this, card)
-      );
+      // Skip if handlers for this card are already registered
+      if (this.cardEventHandlers.has(card)) return;
+
+      const moveHandler = (e: Event) =>
+        this.handleMouseMove(card, e as MouseEvent);
+      const leaveHandler = () => this.handleMouseLeave(card);
+
+      this.cardEventHandlers.set(card, {
+        move: moveHandler,
+        leave: leaveHandler,
+      });
+
+      card.addEventListener("mousemove", moveHandler);
+      card.addEventListener("mouseleave", leaveHandler);
     });
   }
 
@@ -187,14 +203,13 @@ export class Card3DManager implements IManagedSystem {
 
   public destroy(): void {
     this.cards.forEach((card) => {
-      card.removeEventListener(
-        "mousemove",
-        this.handleMouseMove.bind(this, card)
-      );
-      card.removeEventListener(
-        "mouseleave",
-        this.handleMouseLeave.bind(this, card)
-      );
+      const handlers = this.cardEventHandlers.get(card);
+      if (handlers) {
+        card.removeEventListener("mousemove", handlers.move);
+        card.removeEventListener("mouseleave", handlers.leave);
+        this.cardEventHandlers.delete(card);
+      }
+
       this.removeGlow(card);
       card.style.transform = "";
       card.style.transition = "";

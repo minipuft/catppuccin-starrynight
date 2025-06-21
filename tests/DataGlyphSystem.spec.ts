@@ -58,3 +58,60 @@ describe("DataGlyphSystem – Quantum-Splash clustering", () => {
     ).toBe("0.4");
   });
 });
+
+// Mock Year3000 utilities and system dependencies
+jest.mock("@/utils/Year3000Utilities", () => ({
+  __esModule: true,
+  // minimal stub – return object with getHealthMonitor undefined so DGS skips
+  default: {},
+  getHealthMonitor: () => null,
+}));
+
+describe("DataGlyphSystem echo pool management", () => {
+  jest.useFakeTimers();
+
+  const createHostElement = () => {
+    const el = document.createElement("div");
+    el.className = "main-trackList-trackListRow"; // matches MODERN_SELECTORS.trackRow
+    document.body.appendChild(el);
+    return el;
+  };
+
+  const makeSystem = async () => {
+    const perf = new PerformanceAnalyzer({ enableDebug: false });
+    const dummyYear3000: any = {
+      queueCSSVariableUpdate: jest.fn(),
+      registerAnimationSystem: jest.fn(),
+    };
+
+    const dgs = new DataGlyphSystem(
+      {} as any,
+      require("@/utils/Year3000Utilities"),
+      perf,
+      null,
+      null,
+      dummyYear3000
+    );
+    await dgs.initialize();
+    return dgs as any; // cast for private inspection
+  };
+
+  it("should keep echo counts within dynamic limits after burst hovers", async () => {
+    const dgs: any = await makeSystem();
+    const host = createHostElement();
+
+    // Fire 500 hover events
+    for (let i = 0; i < 500; i++) {
+      host.dispatchEvent(new Event("mouseenter"));
+      jest.advanceTimersByTime(130); // > dwell delay
+      host.dispatchEvent(new Event("mouseleave"));
+    }
+
+    // flush pending timers including echo removal timers (1.3s each)
+    jest.runOnlyPendingTimers();
+
+    // Expectations
+    expect(dgs.currentEchoCount).toBeLessThanOrEqual(dgs.dynamicMaxEchoes);
+    expect(dgs.echoPool.length).toBeLessThanOrEqual(dgs.dynamicMaxEchoes * 2);
+  });
+});
