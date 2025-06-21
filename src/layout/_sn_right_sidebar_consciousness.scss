@@ -93,7 +93,7 @@
 // =============================================================================
 // 4 ▪ Application – Attach to Spotify Right Sidebar
 // =============================================================================
-.Root__right-sidebar {
+div.Root__right-sidebar[data-testid="right-sidebar"] {
   @include right-sidebar-conic-flow();
 
   // Ensure gradient sits under internal content
@@ -115,7 +115,7 @@
 // 5 ▪ Accessibility – Reduced Motion
 // =============================================================================
 @media (prefers-reduced-motion: reduce) {
-  .Root__right-sidebar {
+  div.Root__right-sidebar[data-testid="right-sidebar"] {
     animation: none !important;
     background-image: none !important;
     background: rgba(var(--sn-rs-layer4-rgb), 0.06);
@@ -126,7 +126,7 @@
 // 6 ▪ Sub-Section Card Styling – Now Playing internal panels
 //     Unifies right-sidebar "cards" with StarryNight cosmic card design
 // =============================================================================
-.Root__right-sidebar {
+div.Root__right-sidebar[data-testid="right-sidebar"] {
   // Generic card wrapper (About Artist, Credits, Queue, etc.)
   .main-nowPlayingView-section {
     position: relative;
@@ -188,7 +188,7 @@
 // =============================================================================
 // 7 ▪ About Artist Card Accents (Phase 2) – integrates with CDF energy & hue
 // =============================================================================
-.Root__right-sidebar {
+div.Root__right-sidebar[data-testid="right-sidebar"] {
   // Header "About the artist" text gradient + glow
   .main-nowPlayingView-sectionHeaderText {
     // Dynamic gradient text – respects current harmonic colours

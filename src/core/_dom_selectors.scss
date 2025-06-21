@@ -1,0 +1,45 @@
+// Centralised DOM Selector Helpers
+// ---------------------------------
+// This partial defines reusable mixins that encapsulate Spotify's most
+// stable selectors (data-attributes) while keeping legacy class hooks for
+// backward compatibility. Import it once via `_mixins.scss` (@forward) so
+// every SCSS module instantly gains access.
+
+// Right Sidebar (Now Playing panel)
+// Usage: @include right-sidebar-root { … }
+@mixin right-sidebar-root {
+  div.Root__right-sidebar[data-testid="right-sidebar"],
+  .Root__right-sidebar {
+    @content;
+  }
+}
+
+// Left Sidebar (Navigation)
+// Usage: @include left-sidebar-root { … }
+@mixin left-sidebar-root {
+  div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar,
+  .Root__nav-bar {
+    @content;
+  }
+}
+
+// Now Playing Bottom Bar
+// Usage: @include now-playing-bar-root { … }
+@mixin now-playing-bar-root {
+  aside[data-testid="now-playing-bar"],
+  .Root__now-playing-bar {
+    @content;
+  }
+}
+
+// Main View Container (scroll node)
+// Usage: @include main-view-root { … }
+@mixin main-view-root {
+  div.Root__main-view#main-view,
+  .Root__main-view {
+    @content;
+  }
+}
+
+// Add additional selector helpers below as needed, following the same
+// pattern: prefer attribute selectors first, fall back to legacy class names.

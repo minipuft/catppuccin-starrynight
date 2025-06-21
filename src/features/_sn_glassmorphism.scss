@@ -266,7 +266,7 @@
 }
 
 // Right sidebar consciousness glass enhancement
-.Root__right-sidebar {
+div.Root__right-sidebar[data-testid="right-sidebar"] {
   background: var(--enhanced-background) !important;
   border-left: 1px solid var(--enhanced-border);
 
