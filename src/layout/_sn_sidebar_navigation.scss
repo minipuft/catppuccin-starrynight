@@ -6,10 +6,13 @@
 // TODO: Include temporal echo layer styling
 // TODO: Target file: src/layout/_sn_sidebar_navigation.scss
 
+// Add import
+@use "../core/_mixins" as *;
+
 // General styling for navigation links within the main sidebar navigation area
 // Targets links in "Home", "Search", "Your Library" headers, and potentially footer links.
 // More specific targeting for library items follows.
-div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
+@include left-sidebar-root {
   nav[aria-label="Main"] a,
   .main-yourLibraryX-header a, // Links in library header
   div[data-testid="left-sidebar-footer"] a, // Links in sidebar footer
@@ -125,7 +128,7 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
 // Applied to a pseudo-element if existing ones are not sufficient, or integrated into existing ones.
 // Assuming ::after is available or one of the existing ::before/::after from Dimensional Nexus can be augmented.
 // This example augments the ::after from Dimensional Nexus Phase 1 (Quantum Foam & Temporal Displacement)
-.Root__nav-bar {
+@include left-sidebar-root {
   &::after {
     // Keep existing Dimensional Nexus ::after styles (Quantum Foam, Temporal Displacement)
     // Add new properties or modify existing ones related to the temporal echo
@@ -146,7 +149,7 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
 }
 
 // --- Sidebar Navigation Item Enhancements ---
-.Root__nav-bar {
+@include left-sidebar-root {
   // Target general navigation links. Adapt selectors as needed.
   .main-navBar-navBarLink,
   .main-yourLibraryX-navLinkContainer a, // For library items in grid/list view

@@ -1,5 +1,6 @@
 // StarryNight Shared Mixins
 // Common SCSS mixins used across StarryNight modules
+@forward "dom_selectors";
 
 // Performance optimization mixin for hardware acceleration
 @mixin hardware-accelerated {
@@ -714,4 +715,3 @@
 
 // Forward centralised DOM selector helpers so any module that `@use`s
 // `_mixins.scss` automatically gains access.
-@forward "dom_selectors";

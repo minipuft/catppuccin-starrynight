@@ -9,7 +9,7 @@
 
 @use "../core/_mixins" as *;
 
-.Root__main-view .main-view-container__scroll-node {
+@include main-view-scroll-node {
   // Ensure the container is properly prepared for pseudo-elements. These
   // declarations remain here so that this file can stand alone if imported
   // without `_main_view_container.scss` (defensive coding).

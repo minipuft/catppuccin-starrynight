@@ -2696,7 +2696,7 @@
               deltaMs,
               performanceMode: this.performanceMode,
               frameBudget: this.frameBudgetMs,
-              beatIntensity: void 0,
+              beatIntensity: 0,
               // TODO – Phase 2 integration
               scrollRatio: this._getScrollRatio(),
               tiltXY: this.orientation
@@ -12735,9 +12735,9 @@
         // =============================================
         _applyHarmonizedColorsToCss(colors = {}) {
           if (!colors || Object.keys(colors).length === 0) return;
-          const primaryHex = colors.VIBRANT || colors.PROMINENT || colors.PRIMARY || Object.values(colors)[0];
-          const secondaryHex = colors.DARK_VIBRANT || colors.DESATURATED || colors.SECONDARY || primaryHex;
-          const accentHex = colors.VIBRANT_NON_ALARMING || colors.LIGHT_VIBRANT || primaryHex;
+          const primaryHex = colors["VIBRANT"] || colors["PROMINENT"] || colors["PRIMARY"] || Object.values(colors)[0];
+          const secondaryHex = colors["DARK_VIBRANT"] || colors["DESATURATED"] || colors["SECONDARY"] || primaryHex;
+          const accentHex = colors["VIBRANT_NON_ALARMING"] || colors["LIGHT_VIBRANT"] || primaryHex;
           const queueUpdate = (prop, value) => {
             if (this.cssVariableBatcher) {
               this.cssVariableBatcher.queueCSSVariableUpdate(prop, value);

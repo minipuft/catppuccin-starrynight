@@ -72,7 +72,7 @@
 // ████████████████████████████████████████████████████████████████████████████████
 
 // Enhanced navigation bar with consciousness-aware glass effects
-.Root__nav-bar {
+@include left-sidebar-root {
   // Apply consciousness-enhanced glass effects without backdrop-filter interference
   background: var(--enhanced-background) !important;
 
@@ -266,7 +266,7 @@
 }
 
 // Right sidebar consciousness glass enhancement
-div.Root__right-sidebar[data-testid="right-sidebar"] {
+@include right-sidebar-root {
   background: var(--enhanced-background) !important;
   border-left: 1px solid var(--enhanced-border);
 
@@ -287,9 +287,17 @@ div.Root__right-sidebar[data-testid="right-sidebar"] {
 
 // Color enhancement intensity controls (integrates with existing settings system)
 .sn-glass-disabled {
-  .Root__nav-bar,
-  .Root__now-playing-bar::before,
-  .Root__right-sidebar,
+  @include left-sidebar-root {
+    background: rgba(var(--spice-rgb-surface0), 0.8) !important;
+  }
+  @include now-playing-bar-root {
+    &::before {
+      background: rgba(var(--spice-rgb-player), 0.8) !important;
+    }
+  }
+  @include right-sidebar-root {
+    background: rgba(var(--spice-rgb-surface0), 0.8) !important;
+  }
   .main-card-card {
     // REMOVED ALL BACKDROP FILTERS - use solid backgrounds instead
     background: rgba(var(--spice-rgb-surface0), 0.8) !important;

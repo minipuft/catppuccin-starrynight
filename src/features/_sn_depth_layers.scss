@@ -2,6 +2,8 @@
 // YEAR 3000 DEPTH LAYERS - Advanced 3D Visual System
 // ████████████████████████████████████████████████████████████████████████████████
 
+@use "../core/_mixins" as *;
+
 :root {
   // Define CSS variables for each depth layer (e.g., up to 4 layers).
   // These will be controlled by the DepthLayerSystem in JS.
@@ -39,7 +41,7 @@
     filter 700ms ease-out;
 }
 
-.Root__main-view .main-view-container__scroll-node {
+@include main-view-scroll-node {
   // Ensure perspective is set for 3D effects:
   perspective: 1000px;
   // Ensure overflow: hidden if necessary to contain blur from pseudo-elements.

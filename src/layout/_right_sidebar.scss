@@ -1,4 +1,6 @@
-div.Root__right-sidebar[data-testid="right-sidebar"] {
+@use "../core/_mixins" as *;
+
+@include right-sidebar-root {
   // New artist side bar
 
   .Button-textSubdued-sm-16-buttonTertiary-condensed-useBrowserDefaultFocusStyle {

@@ -392,7 +392,7 @@
 // =============================================================================
 
 // Atmospheric now playing bar
-.Root__now-playing-bar {
+@include now-playing-bar-root {
   // CSS custom properties first
   --glass-blur: 30px;
   --glass-saturation: 1.3;
@@ -489,8 +489,21 @@
   // Ultra-simplified for low-end mobile devices
   .main-card-card,
   .main-trackList-trackListRow,
-  .main-navBar-navBarLink,
-  .Root__now-playing-bar {
+  .main-navBar-navBarLink {
+    backdrop-filter: none !important;
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+
+    &:hover {
+      backdrop-filter: none !important;
+      transform: none !important;
+      filter: brightness(1.05);
+    }
+  }
+
+  // Apply the same restrictions to the Now Playing bar using the central mixin
+  @include now-playing-bar-root {
     backdrop-filter: none !important;
     animation: none !important;
     transition: none !important;
@@ -702,7 +715,7 @@ body:not(:has(.main-searchPage-content)) {
   }
 
   // Enhanced now playing bar (non-search)
-  .Root__now-playing-bar {
+  @include now-playing-bar-root {
     transition: all var(--atmospheric-transition);
 
     // Enhanced track info

@@ -17,7 +17,14 @@
 
     /* Bundler */
     "module": "commonjs",
-    // "moduleResolution": "node",
+    "moduleResolution": "node",
+    "incremental": true,
+    "exactOptionalPropertyTypes": true,
+    "useUnknownInCatchVariables": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
 
     /* Path Aliases */

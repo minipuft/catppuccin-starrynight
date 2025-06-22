@@ -216,7 +216,7 @@ export class VisualSystemRegistry {
         deltaMs,
         performanceMode: this.performanceMode,
         frameBudget: this.frameBudgetMs,
-        beatIntensity: undefined, // TODO – Phase 2 integration
+        beatIntensity: 0, // TODO – Phase 2 integration
         scrollRatio: this._getScrollRatio(),
         tiltXY: this.orientation,
       };

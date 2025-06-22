@@ -865,17 +865,17 @@ export class Year3000System {
 
     // Heuristic mapping – favour extractor roles first, then fallbacks
     const primaryHex =
-      colors.VIBRANT ||
-      colors.PROMINENT ||
-      colors.PRIMARY ||
+      colors["VIBRANT"] ||
+      colors["PROMINENT"] ||
+      colors["PRIMARY"] ||
       Object.values(colors)[0];
     const secondaryHex =
-      colors.DARK_VIBRANT ||
-      colors.DESATURATED ||
-      colors.SECONDARY ||
+      colors["DARK_VIBRANT"] ||
+      colors["DESATURATED"] ||
+      colors["SECONDARY"] ||
       primaryHex;
     const accentHex =
-      colors.VIBRANT_NON_ALARMING || colors.LIGHT_VIBRANT || primaryHex;
+      colors["VIBRANT_NON_ALARMING"] || colors["LIGHT_VIBRANT"] || primaryHex;
 
     const queueUpdate = (prop: string, value: string) => {
       if (this.cssVariableBatcher) {

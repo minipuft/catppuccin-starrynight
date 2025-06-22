@@ -41,5 +41,22 @@
   }
 }
 
+// Main View Scroll Node (inner scroll container)
+// Usage: @include main-view-scroll-node { … }
+@mixin main-view-scroll-node {
+  // TODO: refine once a stable attribute hook exists
+  .Root__main-view .main-view-container__scroll-node {
+    @content;
+  }
+}
+
+// Main Navigation Link inside the left sidebar ("Main" nav)
+// Usage: @include main-nav-link { … }
+@mixin main-nav-link {
+  nav[aria-label="Main"] ul li a {
+    @content;
+  }
+}
+
 // Add additional selector helpers below as needed, following the same
 // pattern: prefer attribute selectors first, fall back to legacy class names.

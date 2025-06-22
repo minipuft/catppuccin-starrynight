@@ -6,7 +6,12 @@
   "scripts": {
     "test": "jest",
     "build": "esbuild src-js/theme.entry.ts --bundle --outfile=theme.js --format=iife --target=es2020 --external:react --external:react-dom",
-    "lint:css": "stylelint \"src/**/*.scss\""
+    "lint:css": "stylelint \"src/**/*.scss\"",
+    "list-selectors": "node scripts/listSelectors.js",
+    "scan-css": "ts-node scripts/scanCssTokens.ts",
+    "diff-css": "ts-node scripts/diffTokens.ts",
+    "replace-css": "ts-node scripts/replaceCssTokens.ts --mapping build/css-audit/replace-map.json",
+    "generate-map": "ts-node scripts/generateReplaceMap.ts"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
@@ -21,7 +26,10 @@
     "typescript": "^5.4.5",
     "stylelint": "^15.10.3",
     "jsdom": "^22.1.0",
-    "@types/jsdom": "^21.1.1"
+    "@types/jsdom": "^21.1.1",
+    "ts-node": "^10.9.2",
+    "postcss": "^8.4.38",
+    "postcss-scss": "^4.0.6"
   },
   "keywords": [
     "spicetify",

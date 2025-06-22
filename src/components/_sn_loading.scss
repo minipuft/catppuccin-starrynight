@@ -419,7 +419,7 @@
 // =============================================================================
 
 // Queue loading with playback context
-.Root__right-sidebar {
+@include right-sidebar-root {
   &[aria-busy="true"],
   &.loading-state {
     @include context-gradient-zone("playback");
