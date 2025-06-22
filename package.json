@@ -11,7 +11,9 @@
     "scan-css": "ts-node scripts/scanCssTokens.ts",
     "diff-css": "ts-node scripts/diffTokens.ts",
     "replace-css": "ts-node scripts/replaceCssTokens.ts --mapping build/css-audit/replace-map.json",
-    "generate-map": "ts-node scripts/generateReplaceMap.ts"
+    "generate-map": "ts-node scripts/generateReplaceMap.ts",
+    "fill-dispositions": "ts-node scripts/fillDispositions.ts --mode merge",
+    "prune-css": "ts-node scripts/pruneDuplicateDecls.ts"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",

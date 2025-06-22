@@ -105,11 +105,13 @@ async function main() {
 	${token}`);
         markdownSections.push("Defined in:");
         for (const f of files) {
-          markdownSections.push(`- \\${f}`);
+          const normalized = f.replace(/\\/g, "/");
+          markdownSections.push(`- ${normalized}`);
         }
-        markdownSections.push(`Preferred source (auto-ranked): \\
+        const preferredNorm = preferred.replace(/\\/g, "/");
+        markdownSections.push(`Preferred source (auto-ranked): \
 
-	${preferred}`);
+	${preferredNorm}`);
         markdownSections.push("Disposition: _merge | alias | ignore_\n");
       }
     }
