@@ -355,7 +355,9 @@ export async function initializeStarryNightSettings(): Promise<void> {
     currentVisualInt,
     "number",
     {
-      attributes: { min: 0, max: 1, step: 0.05 },
+      min: 0,
+      max: 1,
+      step: 0.05,
       onChange: (e: any) => {
         const val = (e.currentTarget as HTMLInputElement).value;
         let num = parseFloat(val);
@@ -380,6 +382,47 @@ export async function initializeStarryNightSettings(): Promise<void> {
         const idx = e?.currentTarget?.selectedIndex ?? 0;
         const val = animQualityOptions[idx] ?? "auto";
         settingsManager.set("sn-animation-quality", val as any);
+      },
+    }
+  );
+
+  // === GLASS PULSE CONTROLS ===============================================
+  
+  // Glass Pulse toggle
+  const enableGlassPulse = settingsManager.get("sn-glass-beat-pulse") === "true";
+  (section as any).addToggle(
+    "sn-glass-beat-pulse",
+    "Glass Pulse (beat-synchronized glass effects)",
+    enableGlassPulse,
+    {
+      onClick: (e: any) => {
+        const checked = (e.currentTarget as HTMLInputElement).checked;
+        settingsManager.set(
+          "sn-glass-beat-pulse",
+          (checked ? "true" : "false") as any
+        );
+        console.info("[StarryNight] Glass Pulse setting changed");
+      },
+    }
+  );
+
+  // Glass Base Intensity slider
+  const currentGlassIntensity = settingsManager.get("sn-glass-base-intensity") || "0.5";
+  (section as any).addInput(
+    "sn-glass-base-intensity",
+    "Glass Base Intensity (0-1)",
+    currentGlassIntensity,
+    "number",
+    {
+      min: 0,
+      max: 1,
+      step: 0.1,
+      onChange: (e: any) => {
+        const val = (e.currentTarget as HTMLInputElement).value;
+        let num = parseFloat(val);
+        if (isNaN(num)) num = 0.5;
+        num = Math.max(0, Math.min(1, num));
+        settingsManager.set("sn-glass-base-intensity", num.toFixed(1) as any);
       },
     }
   );

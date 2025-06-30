@@ -219,17 +219,37 @@ patchReactRequire();
     const { RightSidebarConsciousnessSystem } = await import(
       "./systems/visual/RightSidebarConsciousnessSystem"
     );
+    const { RightSidebarCoordinator } = await import(
+      "./systems/visual/RightSidebarCoordinator"
+    );
+    
     if (year3000System.performanceAnalyzer) {
+      // Initialize the coordinator first
+      const coordinator = RightSidebarCoordinator.getInstance({
+        enableDebug: YEAR3000_CONFIG.enableDebug,
+        performanceAnalyzer: year3000System.performanceAnalyzer,
+        onFlushComplete: () => {
+          year3000System.performanceAnalyzer?.emitTrace?.(
+            "[RightSidebarCoordinator] Flush completed"
+          );
+        }
+      });
+
+      // Setup DOM observation for the coordinator
+      coordinator.setupDOMObservation();
+
       const rsSystem = new RightSidebarConsciousnessSystem(
         YEAR3000_CONFIG,
         Year3000Utilities,
         year3000System.performanceAnalyzer,
         year3000System.musicSyncService as any,
         year3000System.settingsManager as any,
-        year3000System
+        year3000System,
+        coordinator
       );
       await rsSystem.initialize();
       (year3000System as any).rightSidebarConsciousnessSystem = rsSystem;
+      (year3000System as any).rightSidebarCoordinator = coordinator;
     }
   } catch (err) {
     console.error(

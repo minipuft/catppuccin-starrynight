@@ -58,7 +58,7 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
    *
    * @param deltaMs  Milliseconds elapsed since the previous animation frame.
    */
-  public onAnimate(deltaMs: number): void {
+  public override onAnimate(deltaMs: number): void {
     if (!this.initialized) return;
 
     // Use the established updateAnimation pathway to avoid duplicating logic.
@@ -159,7 +159,7 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
     this._lastScrollTop = null;
   }
 
-  async initialize() {
+  public override async initialize() {
     await super.initialize();
     this.initializeOptimizedQuantumSpace();
     this.setupModalObserver();
@@ -312,7 +312,7 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
     this._scrollContainerElements = foundContainers;
   }
 
-  public updateFromMusicAnalysis(
+  public override updateFromMusicAnalysis(
     processedMusicData: any,
     rawFeatures?: any,
     trackUri?: string | null
@@ -368,7 +368,7 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
     }
   }
 
-  public updateAnimation(timestamp: number, deltaTime: number) {
+  public override updateAnimation(timestamp: number, deltaTime: number) {
     if (!this.initialized) return;
     this._frameSkipCounter++;
     if (this._frameSkipCounter < this._maxFrameSkip) {
@@ -547,7 +547,7 @@ export class DimensionalNexusSystem extends BaseVisualSystem {
     };
   }
 
-  public destroy() {
+  public override destroy() {
     // Remove generic interaction listeners
     if (this._interactionHandler) {
       ["click", "mousemove", "keydown"].forEach((evt) => {

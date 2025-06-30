@@ -73,7 +73,7 @@
     calc(0.12 + var(--sn-beat-pulse-intensity, 0) * 0.15)
   );
   --shadow-3d-cosmic: rgba(
-    var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+    var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
     calc(var(--sn-beat-pulse-intensity, 0) * 0.3)
   );
 }
@@ -140,7 +140,7 @@ body:not(:has(.main-searchPage-content)) {
           var(--shadow-3d-cosmic),
         0 0 calc(var(--sn-3d-cosmic-glow) * 20px)
           rgba(
-            var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+            var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
             var(--sn-3d-cosmic-glow)
           );
 
@@ -189,7 +189,7 @@ body:not(:has(.main-searchPage-content)) {
         var(--shadow-3d-cosmic),
       0 0 calc(var(--sn-3d-cosmic-glow) * 30px)
         rgba(
-          var(--constellation-line-accent, var(--sn-gradient-accent-rgb, 140,170,238)),
+          var(--constellation-line-accent, var(--sn-accent-rgb, 140,170,238)),
           calc(var(--sn-3d-cosmic-glow) * 1.5)
         );
   }
@@ -258,7 +258,7 @@ body:not(:has(.main-searchPage-content)) {
           var(--shadow-3d-color),
         0 0 calc(var(--sn-3d-cosmic-glow) * 15px)
           rgba(
-            var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+            var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
             var(--sn-3d-cosmic-glow)
           );
     }
@@ -278,7 +278,7 @@ body:not(:has(.main-searchPage-content)) {
           var(--shadow-3d-color),
         0 0 calc(var(--sn-3d-cosmic-glow) * 25px)
           rgba(
-            var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+            var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
             calc(var(--sn-3d-cosmic-glow) * 1.2)
           );
     }
@@ -294,34 +294,6 @@ body:not(:has(.main-searchPage-content)) {
     }
   }
 } // End of non-search body selector
-
-// =============================================================================
-// SEARCH AREAS - Complete Hands-Off Approach
-// =============================================================================
-
-// Ensure search areas get NO 3D styling
-.main-searchPage-content {
-  // Reset all 3D properties
-  * {
-    perspective: none !important;
-    transform-style: flat !important;
-    transform: none !important;
-  }
-
-  .main-card-card {
-    // Complete reset for search cards
-    perspective: none !important;
-    transform-style: flat !important;
-    transform: none !important;
-    transition: none !important;
-
-    &:hover,
-    &:focus,
-    &:active {
-      transform: none !important;
-    }
-  }
-}
 
 // ████████████████████████████████████████████████████████████████████████████████
 // 3D CONSCIOUSNESS MODE CONTROLS (NON-SEARCH ONLY)
@@ -426,7 +398,7 @@ body:not(:has(.main-searchPage-content)) {
     filter: brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.05));
     box-shadow: 0 0 calc(var(--sn-3d-cosmic-glow) * 10px)
       rgba(
-        var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+        var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
         var(--sn-3d-cosmic-glow)
       );
   }
@@ -436,7 +408,7 @@ body:not(:has(.main-searchPage-content)) {
       hue-rotate(calc(var(--sn-rhythm-phase, 0) * 5deg));
     box-shadow: 0 0 calc(var(--sn-3d-cosmic-glow) * 15px)
       rgba(
-        var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+        var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
         calc(var(--sn-3d-cosmic-glow) * 1.2)
       );
   }
@@ -515,7 +487,7 @@ body:not(:has(.main-searchPage-content)) {
           var(--shadow-3d-cosmic),
         0 0 calc(var(--sn-3d-cosmic-glow) * 30px)
           rgba(
-            var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+            var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
             var(--sn-3d-cosmic-glow)
           ) !important;
     }

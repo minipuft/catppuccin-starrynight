@@ -10,14 +10,14 @@
 
 :root {
   // Search-specific gradient harmonics (extends main gradient system)
-  --sn-search-gradient-primary: var(--sn-gradient-primary);
-  --sn-search-gradient-secondary: var(--sn-gradient-secondary);
-  --sn-search-gradient-accent: var(--sn-gradient-accent);
+  --sn-search-gradient-primary: var(--sn-accent-hex);
+  --sn-search-gradient-secondary: var(--sn-accent-hex);
+  --sn-search-gradient-accent: var(--sn-accent-hex);
 
   // RGB versions for precise control
-  --sn-search-gradient-primary-rgb: var(--sn-gradient-primary-rgb);
-  --sn-search-gradient-secondary-rgb: var(--sn-gradient-secondary-rgb);
-  --sn-search-gradient-accent-rgb: var(--sn-gradient-accent-rgb);
+  --sn-search-gradient-primary-rgb: var(--sn-accent-rgb);
+  --sn-search-gradient-secondary-rgb: var(--sn-accent-rgb);
+  --sn-search-gradient-accent-rgb: var(--sn-accent-rgb);
 
   // Search-specific intensity modulation (enhanced for visibility without white boxes)
   --sn-search-intensity: 0.15; // Increased from 0.1 for better vibrancy visibility

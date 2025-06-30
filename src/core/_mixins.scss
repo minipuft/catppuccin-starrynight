@@ -51,10 +51,11 @@
 // Dynamic glassmorphism using CSS variables (integrates with existing gradient system)
 @mixin glassmorphism-dynamic {
   // ALL CSS declarations first, before any nested rules
-  backdrop-filter: blur(var(--glass-blur, 20px))
+  // Phase 3: Beat-Sync Glass Effects - Dynamic blur modulation
+  backdrop-filter: blur(calc(var(--glass-blur, 20px) + var(--sn-glass-beat-boost, 0) * 5px))
     saturate(var(--glass-saturation, 1.2))
     brightness(var(--glass-brightness, 1.1));
-  -webkit-backdrop-filter: blur(var(--glass-blur, 20px))
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur, 20px) + var(--sn-glass-beat-boost, 0) * 5px))
     saturate(var(--glass-saturation, 1.2))
     brightness(var(--glass-brightness, 1.1));
   background: var(
@@ -66,10 +67,17 @@
       --glass-border,
       rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2)
     );
-  transition: all var(--sn-gradient-transition, 0.8s ease-in-out);
+  // Phase 3: Beat-Sync Glass Effects - Optimized transitions for smooth beat pulses
+  transition: backdrop-filter 400ms ease-out,
+              -webkit-backdrop-filter 400ms ease-out,
+              background var(--sn-gradient-transition, 0.8s ease-in-out),
+              border var(--sn-gradient-transition, 0.8s ease-in-out);
 
   // Include performance optimizations (these don't contain nested rules)
   @include performance-optimized;
+  
+  // Phase 3: Beat-Sync Glass Effects - GPU acceleration for smooth beat pulses
+  will-change: backdrop-filter, -webkit-backdrop-filter;
 
   // Enhanced fallback using existing Catppuccin variables (nested rule comes last)
   @supports not (backdrop-filter: blur(1px)) {

@@ -7,6 +7,13 @@
 :root {
   // Define CSS variables for each depth layer (e.g., up to 4 layers).
   // These will be controlled by the DepthLayerSystem in JS.
+  
+  // Right Sidebar Dedicated Depth Layer (Year 3000 Flux-Aligned)
+  --depth-layer-right-sidebar: 2.5;
+  --sn-depth-right-sidebar-z: 4px; // Medium magnetic depth as specified
+  --sn-depth-right-sidebar-opacity: 0.06;
+  --sn-depth-right-sidebar-blur: 1px;
+  
   // Layer 0 (Furthest)
   --sn-depth-layer-0-z: 75px;
   --sn-depth-layer-0-opacity: 0.05;

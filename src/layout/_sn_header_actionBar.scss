@@ -1,66 +1,55 @@
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🌟 YEAR 3000 HEADER SOUL CONSCIOUSNESS
-// Technology that breathes with the music's emotional essence
-// ═══════════════════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════════════*/
+/* 🌟 YEAR 3000 HEADER SOUL CONSCIOUSNESS*/
+/* Technology that breathes with the music's emotional essence*/
+/* ═══════════════════════════════════════════════════════════════════════════════*/
 
 @use "../core/mixins" as *;
 
-// Year 3000 Header Soul Variables (Conscious Beauty)
+/* Year 3000 Header Soul Variables (Conscious Beauty)*/
 :root {
-  // === CONSCIOUS SOUL CONTROL ===
-  --header-soul-intensity: calc(
-    var(--conscious-elegance-intensity, 0.6) * 1.1
-  ); // Connected to main consciousness
-  --header-soul-breath-rate: calc(
-    var(--conscious-breath-rate, 8s) * 1.2
-  ); // Gentle breathing
-  --header-musical-response: 0.6; // How much the header responds to musical energy
+  /* === CONSCIOUS SOUL CONTROL ===*/ /* Connected to main consciousness*/ /* Gentle breathing*/
+  --header-musical-response: 0.6; /* How much the header responds to musical energy*/
 
-  // === ETHEREAL HEADER DYNAMICS ===
+  /* === ETHEREAL HEADER DYNAMICS ===*/
   --header-transition: calc(var(--choreography-harmony-sync, 0.8s) * 0.7)
-    cubic-bezier(0.25, 0.46, 0.45, 0.94); // Smooth, alive motion
+    cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth, alive motion*/
   --header-cosmic-depth: calc(
     var(--cosmic-depth-layers, 80px) * 0.4
-  ); // Subtle 3D presence
+  ); /* Subtle 3D presence*/
   --header-cosmic-blur: calc(
     var(--cosmic-blur-poetry, 12px) * 0.8
-  ); // Dreamlike softness
+  ); /* Dreamlike softness*/
 
-  // === MUSICAL COLOR SOUL (Connected to Conscious Elegance) ===
-  --header-soul-primary: rgba(
-    var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-    calc(var(--ethereal-glow-base, 0.2) * 0.9)
-  );
-  --header-soul-secondary: rgba(
-    var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
-    calc(var(--ethereal-glow-base, 0.2) * 0.8)
-  );
-  --header-soul-accent: rgba(
-    var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
-    calc(var(--ethereal-glow-base, 0.2) * 1)
-  );
+  /* === MUSICAL COLOR SOUL (Connected to Conscious Elegance) ===*/
   --header-soul-whisper: rgba(
-    var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+    var(--sn-accent-rgb, var(--spice-rgb-accent)),
     calc(var(--ethereal-glow-base, 0.2) * 0.4)
   );
+
+  /* === DEFAULT SOUL TOKENS – ensure graceful fallback before JS initializes === */
+  --header-soul-intensity: 0.8; /* 0 → off, 1 → full */
+  --header-soul-breath-rate: 8s;
+  --header-soul-primary: var(--sn-accent-hex, var(--spice-accent));
+  --header-soul-secondary: var(--sn-accent-hex, var(--spice-subtext));
+  --header-soul-accent: var(--sn-accent-hex, var(--spice-accent));
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🚫 SEARCH EXCLUSION GUARD - Header Soul DISABLED in Search
-// ═══════════════════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════════════*/
+/* 🚫 SEARCH EXCLUSION GUARD - Header Soul DISABLED in Search*/
+/* ═══════════════════════════════════════════════════════════════════════════════*/
 
-// Only apply soul consciousness OUTSIDE of search pages
+/* Only apply soul consciousness OUTSIDE of search pages*/
 body:not(:has(.main-searchPage-content)) {
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // 🎯 NEXUS ACTION BAR SOUL CONSCIOUSNESS
-  // Header that breathes and pulses with musical energy
-  // ═══════════════════════════════════════════════════════════════════════════════
+  /* ═══════════════════════════════════════════════════════════════════════════════*/
+  /* 🎯 NEXUS ACTION BAR SOUL CONSCIOUSNESS*/
+  /* Header that breathes and pulses with musical energy*/
+  /* ═══════════════════════════════════════════════════════════════════════════════*/
 
   .main-actionBarBackground-background {
     position: relative;
     transition: all var(--header-transition);
 
-    // === LIVING CONSCIOUSNESS PRESENCE ===
+    /* === LIVING CONSCIOUSNESS PRESENCE ===*/
     &::before {
       content: "";
       position: absolute;
@@ -70,7 +59,7 @@ body:not(:has(.main-searchPage-content)) {
       bottom: -16px;
       z-index: -1;
 
-      // Cosmic consciousness inspired by moodboard
+      /* Cosmic consciousness inspired by moodboard*/
       background:
         // Primary soul energy
         radial-gradient(
@@ -78,13 +67,13 @@ body:not(:has(.main-searchPage-content)) {
           var(--header-soul-primary) 0%,
           transparent 45%
         ),
-        // Secondary harmonic flow
+        /* Secondary harmonic flow*/
         radial-gradient(
             ellipse 300% 100% at 75% 50%,
             var(--header-soul-secondary) 0%,
             transparent 40%
           ),
-        // Accent energy shimmer
+        /* Accent energy shimmer*/
         linear-gradient(
             90deg,
             var(--header-soul-accent) 0%,
@@ -93,12 +82,12 @@ body:not(:has(.main-searchPage-content)) {
             transparent 100%
           );
 
-      border-radius: 20px 28px 24px 32px; // Organic, flowing shape
+      border-radius: 20px 28px 24px 32px; /* Organic, flowing shape*/
       filter: blur(var(--header-cosmic-blur))
         saturate(calc(var(--cosmic-saturation, 1.4) * 0.9))
         brightness(calc(1 + 0.08 * var(--header-soul-intensity)));
 
-      // Conscious breathing - always alive but subtle
+      /* Conscious breathing - always alive but subtle*/
       animation: header-soul-breathing var(--header-soul-breath-rate)
         ease-in-out infinite;
 
@@ -106,7 +95,7 @@ body:not(:has(.main-searchPage-content)) {
       transform: scale(1.02);
     }
 
-    // === ENHANCED INTERACTION CONSCIOUSNESS ===
+    /* === ENHANCED INTERACTION CONSCIOUSNESS ===*/
     &:hover {
       &::before {
         opacity: calc(var(--header-soul-intensity) * 0.9);
@@ -117,13 +106,13 @@ body:not(:has(.main-searchPage-content)) {
       }
     }
 
-    // === CONTENT PRESERVATION ===
+    /* === CONTENT PRESERVATION ===*/
     .main-actionBar-ActionBar {
       position: relative;
       z-index: 2;
       transition: all var(--header-transition);
 
-      // Gentle enhancement that supports content
+      /* Gentle enhancement that supports content*/
       &:hover {
         filter: brightness(calc(1 + 0.05 * var(--header-soul-intensity)))
           saturate(calc(1 + 0.1 * var(--header-soul-intensity)));
@@ -131,16 +120,16 @@ body:not(:has(.main-searchPage-content)) {
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // 🎭 NEXUS ENTITY HEADER WITH COSMIC SOUL
-  // Album/playlist headers that honor content while adding consciousness
-  // ═══════════════════════════════════════════════════════════════════════════════
+  /* ═══════════════════════════════════════════════════════════════════════════════*/
+  /* 🎭 NEXUS ENTITY HEADER WITH COSMIC SOUL*/
+  /* Album/playlist headers that honor content while adding consciousness*/
+  /* ═══════════════════════════════════════════════════════════════════════════════*/
 
   .main-entityHeader-container {
     position: relative;
     transition: all var(--header-transition);
 
-    // === COSMIC SOUL BACKGROUND ===
+    /* === COSMIC SOUL BACKGROUND ===*/
     &::before {
       content: "";
       position: absolute;
@@ -150,7 +139,7 @@ body:not(:has(.main-searchPage-content)) {
       bottom: -12px;
       z-index: -1;
 
-      // Ethereal consciousness that supports the content
+      /* Ethereal consciousness that supports the content*/
       background: radial-gradient(
           ellipse 250% 120% at 40% 60%,
           var(--header-soul-primary) 0%,
@@ -168,7 +157,7 @@ body:not(:has(.main-searchPage-content)) {
       filter: blur(var(--header-cosmic-blur))
         saturate(calc(var(--cosmic-saturation, 1.4) * 0.8));
 
-      // Gentle breathing presence
+      /* Gentle breathing presence*/
       animation: header-soul-breathing
         calc(var(--header-soul-breath-rate) * 1.3) ease-in-out infinite;
 
@@ -181,7 +170,7 @@ body:not(:has(.main-searchPage-content)) {
       opacity: calc(var(--header-soul-intensity) * 0.7);
     }
 
-    // === ENHANCED TITLE WITH SOUL ===
+    /* === ENHANCED TITLE WITH SOUL ===*/
     .main-entityHeader-title {
       position: relative;
       transition: all var(--header-transition);
@@ -197,26 +186,26 @@ body:not(:has(.main-searchPage-content)) {
         letter-spacing: -0.01em;
         line-height: 1.2;
 
-        // Subtle text enhancement
+        /* Subtle text enhancement*/
         text-shadow: 0 0 20px
           rgba(
-            var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+            var(--sn-accent-rgb, var(--spice-rgb-accent)),
             calc(var(--header-soul-intensity) * 0.2)
           );
       }
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // 🖼️ ALBUM ART COSMIC PRESENCE MODE
-  // Respect album art while adding subtle cosmic consciousness
-  // ═══════════════════════════════════════════════════════════════════════════════
+  /* ═══════════════════════════════════════════════════════════════════════════════*/
+  /* 🖼️ ALBUM ART COSMIC PRESENCE MODE*/
+  /* Respect album art while adding subtle cosmic consciousness*/
+  /* ═══════════════════════════════════════════════════════════════════════════════*/
 
   .main-entityHeader-imageContainer {
     position: relative;
     transition: all var(--header-transition);
 
-    // === COSMIC ENERGY RING (Subtle) ===
+    /* === COSMIC ENERGY RING (Subtle) ===*/
     &::before {
       content: "";
       position: absolute;
@@ -226,7 +215,7 @@ body:not(:has(.main-searchPage-content)) {
       bottom: -8px;
       z-index: -1;
 
-      // Ethereal ring that enhances without competing
+      /* Ethereal ring that enhances without competing*/
       background: conic-gradient(
         from 0deg,
         var(--header-soul-accent) 0%,
@@ -239,7 +228,7 @@ body:not(:has(.main-searchPage-content)) {
       border-radius: 50%;
       filter: blur(3px) saturate(calc(var(--cosmic-saturation, 1.4) * 0.7));
 
-      // Slow, cosmic rotation
+      /* Slow, cosmic rotation*/
       animation: cosmic-ring-rotation calc(var(--ethereal-flow-speed, 12s) * 2)
         linear infinite;
 
@@ -252,18 +241,18 @@ body:not(:has(.main-searchPage-content)) {
       opacity: calc(var(--header-soul-intensity) * 0.5);
     }
 
-    // === ALBUM IMAGE PRESERVATION WITH SOUL ===
+    /* === ALBUM IMAGE PRESERVATION WITH SOUL ===*/
     .main-entityHeader-image,
     .main-image-image {
       border-radius: 12px !important;
       transition: all var(--header-transition);
 
-      // Preserve image quality while adding soul
+      /* Preserve image quality while adding soul*/
       box-shadow: 0 6px 24px
           rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.3),
         0 0 40px
           rgba(
-            var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+            var(--sn-accent-rgb, var(--spice-rgb-accent)),
             calc(var(--header-soul-intensity) * 0.1)
           );
 
@@ -274,12 +263,12 @@ body:not(:has(.main-searchPage-content)) {
             rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.4),
           0 0 60px
             rgba(
-              var(--sn-gradient-primary-rgb, 202, 158, 230),
+              var(--sn-accent-rgb, 202, 158, 230),
               calc(var(--header-soul-intensity) * 0.2)
             ),
           0 0 100px
             rgba(
-              var(--sn-gradient-accent-rgb, 140, 170, 238),
+              var(--sn-accent-rgb, 140, 170, 238),
               calc(var(--header-soul-intensity) * 0.1)
             );
         -webkit-transform: scale(1.03) perspective(var(--header-cosmic-depth));
@@ -289,29 +278,29 @@ body:not(:has(.main-searchPage-content)) {
       }
     }
   }
-} // End of non-search body selector
+} /* End of non-search body selector*/
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🚫 SEARCH AREAS - Complete Respect Mode
-// ═══════════════════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════════════*/
+/* 🚫 SEARCH AREAS - Complete Respect Mode*/
+/* ═══════════════════════════════════════════════════════════════════════════════*/
 
 .main-searchPage-content {
   .main-actionBarBackground-background,
   .main-entityHeader-container {
-    // Preserve search functionality
+    /* Preserve search functionality*/
     &::before,
     &::after {
-      opacity: 0.05 !important; // Minimal presence in search
+      opacity: 0.05 !important; /* Minimal presence in search*/
     }
 
-    animation-duration: 30s !important; // Much slower if any
+    animation-duration: 30s !important; /* Much slower if any*/
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎬 SOUL CONSCIOUSNESS ANIMATIONS
-// Movements that feel alive and emotionally connected
-// ═══════════════════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════════════*/
+/* 🎬 SOUL CONSCIOUSNESS ANIMATIONS*/
+/* Movements that feel alive and emotionally connected*/
+/* ═══════════════════════════════════════════════════════════════════════════════*/
 
 @keyframes header-soul-breathing {
   0%,
@@ -344,31 +333,27 @@ body:not(:has(.main-searchPage-content)) {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// ♿ ACCESSIBILITY & PERFORMANCE WITH SOUL
-// ═══════════════════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════════════*/
+/* ♿ ACCESSIBILITY & PERFORMANCE WITH SOUL*/
+/* ═══════════════════════════════════════════════════════════════════════════════*/
 
 @media (prefers-reduced-motion: reduce) {
-  :root {
-    --header-soul-intensity: 0.3; // Keep gentle soul
-    --header-soul-breath-rate: 30s; // Much slower breathing
+  :root { /* Keep gentle soul*/ /* Much slower breathing*/
   }
 
   * {
-    animation-duration: 30s !important; // Slow, calm motion
+    animation-duration: 30s !important; /* Slow, calm motion*/
   }
 }
 
 @media (max-width: 768px) {
-  :root {
-    --header-soul-intensity: 0.4; // Reduce for mobile
+  :root { /* Reduce for mobile*/
     --header-cosmic-blur: 6px;
     --header-cosmic-depth: 30px;
   }
 }
 
 @media (prefers-contrast: high) {
-  :root {
-    --header-soul-intensity: 0.8; // More visible for accessibility
+  :root { /* More visible for accessibility*/
   }
 }

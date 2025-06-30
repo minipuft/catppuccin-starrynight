@@ -227,6 +227,9 @@ export class MusicSyncService {
 
   // High-precision beat scheduling
   private beatSchedulerTimer: NodeJS.Timeout | null = null;
+  
+  // Phase 1: Song Change Debouncing
+  private songChangeDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private nextBeatIndex: number = 0;
   private currentSongBeats: any[] = [];
   private songStartTimestamp: number = 0;
@@ -991,6 +994,28 @@ export class MusicSyncService {
       return;
     }
 
+    // Phase 1: Debounce rapid song changes
+    if (this.songChangeDebounceTimer) {
+      clearTimeout(this.songChangeDebounceTimer);
+    }
+
+    // If force is true, bypass debouncing for immediate settings updates
+    if (force) {
+      await this._processSongUpdateInternal(trackUri);
+      return;
+    }
+
+    // Debounce normal song changes using existing config
+    this.songChangeDebounceTimer = setTimeout(async () => {
+      this.songChangeDebounceTimer = null;
+      await this._processSongUpdateInternal(trackUri);
+    }, MUSIC_SYNC_CONFIG.synchronization.debounceRapidChanges);
+  }
+
+  /**
+   * Internal implementation of song processing, extracted for debouncing.
+   */
+  private async _processSongUpdateInternal(trackUri: string): Promise<void> {
     // New track detected – clear any stale cache entries for it
     this.invalidateTrackCaches(trackUri);
 
@@ -1127,6 +1152,12 @@ export class MusicSyncService {
   }
 
   public destroy(): void {
+    // Clear debounce timer (Phase 1)
+    if (this.songChangeDebounceTimer) {
+      clearTimeout(this.songChangeDebounceTimer);
+      this.songChangeDebounceTimer = null;
+    }
+
     this.stopBeatScheduler();
     if (this.performanceInterval) clearInterval(this.performanceInterval);
     if (this.cacheCleanupInterval) clearInterval(this.cacheCleanupInterval);
@@ -1264,4 +1295,5 @@ export class MusicSyncService {
       // Optional arrays left undefined – beat grid will arrive later
     } as AudioData;
   }
+
 }

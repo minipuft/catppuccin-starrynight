@@ -1,123 +1,103 @@
-// ████████████████████████████████████████████████████████████████████████████████
-// SIDEBAR CONSCIOUSNESS SYSTEM MODULE
-// Year 3000 Dynamic Harmonic & Energy Styling for Navigation Elements
-// ████████████████████████████████████████████████████████████████████████████████
-//
-// This module contains all styles related to the SidebarConsciousnessSystem JavaScript class.
-// It provides dynamic visual effects for the sidebar that respond to:
-// - Harmonic mode changes (analogous-flow, triadic-balance, complementary-duality, etc.)
-// - Music energy levels (low-energy, mid-energy, high-energy)
-// - Real-time music analysis (tempo, mood, energy)
-//
-// Dependencies:
-// - CSS variables from the main Year 3000 system (--sn-gradient-primary-rgb, etc.)
-// - Base Spicetify theme variables (--spice-rgb-*, etc.)
-//
-// ████████████████████████████████████████████████████████████████████████████████
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/* SIDEBAR CONSCIOUSNESS SYSTEM MODULE*/
+/* Year 3000 Dynamic Harmonic & Energy Styling for Navigation Elements*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/**/
+/* This module contains all styles related to the SidebarConsciousnessSystem JavaScript class.*/
+/* It provides dynamic visual effects for the sidebar that respond to:*/
+/* - Harmonic mode changes (analogous-flow, triadic-balance, complementary-duality, etc.)*/
+/* - Music energy levels (low-energy, mid-energy, high-energy)*/
+/* - Real-time music analysis (tempo, mood, energy)*/
+/**/
+/* Dependencies:*/
+/* - CSS variables from the main Year 3000 system (--sn-gradient-primary-rgb, etc.)*/
+/* - Base Spicetify theme variables (--spice-rgb-*, etc.)*/
+/**/
+/* ████████████████████████████████████████████████████████████████████████████████*/
 @use "../core/_mixins" as *;
 
 :root {
-  // === CORE CONSCIOUSNESS VARIABLES (Set by JavaScript) ===
-  --sn-sidebar-current-temporal-shift: 0s; // Set by updateFromMusicAnalysis
-  --sn-sidebar-item-bloom-intensity: 0; // Set by updateFromMusicAnalysis
-  --sn-sidebar-energy-glow-opacity: 0; // Set by updateFromMusicAnalysis
+  /* === CORE CONSCIOUSNESS VARIABLES (Set by JavaScript) ===*/ /* Set by updateFromMusicAnalysis*/ /* Set by updateFromMusicAnalysis*/ /* Set by updateFromMusicAnalysis*/
 
-  // === HARMONIC CONSCIOUSNESS VARIABLES ===
+  /* === HARMONIC CONSCIOUSNESS VARIABLES ===*/
   --sn-sidebar-harmonic-base-opacity: 0.15;
   --sn-sidebar-energy-pulse-strength: 1;
   --sn-sidebar-consciousness-flow-speed: 12s;
-  --sn-sidebar-base-bg-opacity: 0.1;
-  --sn-sidebar-harmonic-intensity-multiplier: 1;
 
-  // === BIOMORPHIC SHAPING ===
-  --sn-sidebar-clip-path: inset(0); // Default rectangular
-  // Example organic: "polygon(0% 0%, 100% 0%, 100% 100%, 10% 95%, 0% 100%)"
+  /* === BIOMORPHIC SHAPING ===*/
+  --sn-sidebar-clip-path: inset(0); /* Default rectangular*/
+  /* Example organic: "polygon(0% 0%, 100% 0%, 100% 100%, 10% 95%, 0% 100%)"*/
 
-  // === MEDITATION MODE VARIABLES ===
-  --sn-sidebar-meditation-desaturation: 0; // 0 to 1 (0 = normal, 1 = fully desaturated gray)
-  --sn-sidebar-meditation-slowdown: 1; // Animation speed multiplier (1 = normal, <1 = slower)
-  --sn-item-energy-absorption-scale: 1; // Scale effect for item absorbing energy
+  /* === MEDITATION MODE VARIABLES ===*/ /* 0 to 1 (0 = normal, 1 = fully desaturated gray)*/ /* Animation speed multiplier (1 = normal, <1 = slower)*/ /* Scale effect for item absorbing energy*/
 
-  // === ATMOSPHERIC & ENTANGLEMENT VARIABLES ===
+  /* === ATMOSPHERIC & ENTANGLEMENT VARIABLES ===*/
   --sn-sidebar-atmosphere-hue-shift: 0deg;
   --sn-sidebar-atmosphere-saturation-factor: 1;
-  --sn-sidebar-atmosphere-vibration-intensity: 0; // 0 to 1
-  --sn-sidebar-entanglement-intensity: 0; // 0 to 0.1
+  --sn-sidebar-atmosphere-vibration-intensity: 0; /* 0 to 1*/
+  --sn-sidebar-entanglement-intensity: 0; /* 0 to 0.1*/
   --sn-sidebar-entanglement-color-rgb: var(--spice-rgb-main, 48, 52, 70);
 
-  // === TEMPORAL ECHO VARIABLES ===
-  --sn-sidebar-temporal-blur: 0px;
-  --sn-sidebar-temporal-echo-opacity: 0;
+  /* === TEMPORAL ECHO VARIABLES ===*/
 
-  // === YEAR 3000 DYNAMIC ACCENT ===
-  --sn-dynamic-accent-rgb: var(--sn-gradient-accent-rgb, var(--spice-rgb-accent));
+  /* === YEAR 3000 DYNAMIC ACCENT ===*/
 
-  // === NAVIGATION VARIABLES ===
-  --sn-nav-item-base-opacity: 0.85;
-  --sn-nav-item-hover-bg-opacity: 0.1;
-  --sn-nav-item-active-bg-opacity: 0.15;
-  --sn-nav-item-glow-color-rgb: var(--sn-gradient-primary-rgb, var(--spice-rgb-accent));
-  --sn-nav-item-glow-intensity: 0; // 0 to 1, controlled by JS
-  --sn-nav-text-energy-color-rgb: var(--sn-dynamic-accent-rgb, 140,170,238);
-  --sn-nav-text-energy-opacity: 0; // 0 to 0.5, controlled by JS
-  --sn-nav-item-transform-scale: 1; // 1 to 1.03, controlled by JS
-  --sn-nav-item-transition-duration: 0.3s;
+  /* === NAVIGATION VARIABLES ===*/ /* 0 to 1, controlled by JS*/ /* 0 to 0.5, controlled by JS*/ /* 1 to 1.03, controlled by JS*/
 
-  // === DATA GLYPH & ECHO VARIABLES ===
+  /* === DATA GLYPH & ECHO VARIABLES ===*/
   --sn-nav-item-echo-opacity: 0;
   --sn-nav-item-echo-scale: 1;
-  --sn-glyph-resonance-intensity: 0; // 0 to 0.2 for glyph enhancement
+  --sn-glyph-resonance-intensity: 0; /* 0 to 0.2 for glyph enhancement*/
 
-  // === PREDICTIVE MATERIALIZATION ===
+  /* === PREDICTIVE MATERIALIZATION ===*/
   --sn-predictive-echo-opacity: 0;
   --sn-predictive-echo-scale: 1;
 
-  // === DIMENSIONAL RIFT VARIABLES ===
+  /* === DIMENSIONAL RIFT VARIABLES ===*/
   --sn-dimensional-rift-intensity: 0;
-  --sn-dimensional-rift-color-rgb: 140, 170, 238; // Default: blue
+  --sn-dimensional-rift-color-rgb: 140, 170, 238; /* Default: blue*/
 }
 
-// Enhanced harmonic mode styling that responds to the classes applied by JavaScript
+/* Enhanced harmonic mode styling that responds to the classes applied by JavaScript*/
 .Root__nav-bar {
   position: relative;
   transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
-  // === Cosmic Card Baseline ===
+  /* === Cosmic Card Baseline ===*/
   background:
     linear-gradient(
       135deg,
-      rgba(var(--sn-gradient-primary-rgb), 0.04) 0%,
-      rgba(var(--sn-gradient-secondary-rgb), 0.03) 50%,
-      rgba(var(--sn-gradient-accent-rgb), 0.06) 100%
+      rgba(var(--sn-accent-rgb), 0.04) 0%,
+      rgba(var(--sn-accent-rgb), 0.03) 50%,
+      rgba(var(--sn-accent-rgb), 0.06) 100%
     ),
     rgba(var(--spice-rgb-surface0), 0.07);
   backdrop-filter: blur(6px) saturate(1.15);
-  border: 1px solid rgba(var(--sn-gradient-primary-rgb), 0.12);
-  // GPU-friendly shadow
+  border: 1px solid rgba(var(--sn-accent-rgb), 0.12);
+  /* GPU-friendly shadow*/
   filter: drop-shadow(0 2px 6px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb,0,0,0),0.12));
 
-  // Performance & GPU hints – promote sidebar to its own layer and avoid style recalc jank
+  /* Performance & GPU hints – promote sidebar to its own layer and avoid style recalc jank*/
   @include performance-optimized;
   @include gpu-only {
     will-change: transform, opacity, filter;
   }
 
-  // Harmonic Mode Classes (applied by updateHarmonicModeDisplay)
+  /* Harmonic Mode Classes (applied by updateHarmonicModeDisplay)*/
   &.sn-harmonic-analogous-flow {
     background: linear-gradient(
       160deg,
       rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.8)
         )
         0%,
       rgba(
-          var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
+          var(--sn-accent-rgb, var(--spice-rgb-surface0)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.6)
         )
         50%,
       rgba(
-          var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.9)
         )
         100%
@@ -129,10 +109,10 @@
       inset: 0;
       background: conic-gradient(
         from 0deg at 30% 70%,
-        rgba(var(--sn-gradient-primary-rgb), 0.05) 0deg,
-        rgba(var(--sn-gradient-secondary-rgb), 0.08) 120deg,
-        rgba(var(--sn-gradient-accent-rgb), 0.06) 240deg,
-        rgba(var(--sn-gradient-primary-rgb), 0.05) 360deg
+        rgba(var(--sn-accent-rgb), 0.05) 0deg,
+        rgba(var(--sn-accent-rgb), 0.08) 120deg,
+        rgba(var(--sn-accent-rgb), 0.06) 240deg,
+        rgba(var(--sn-accent-rgb), 0.05) 360deg
       );
       animation: consciousnessFlow var(--sn-sidebar-consciousness-flow-speed)
         linear infinite;
@@ -145,17 +125,17 @@
     background: radial-gradient(
       ellipse at 20% 80%,
       rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.7)
         )
         0%,
       rgba(
-          var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.5)
         )
         40%,
       rgba(
-          var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
+          var(--sn-accent-rgb, var(--spice-rgb-surface0)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.8)
         )
         100%
@@ -167,17 +147,17 @@
       inset: 0;
       background: linear-gradient(
           45deg,
-          rgba(var(--sn-gradient-primary-rgb), 0.03) 0%,
+          rgba(var(--sn-accent-rgb), 0.03) 0%,
           transparent 30%
         ),
         linear-gradient(
           -45deg,
-          rgba(var(--sn-gradient-accent-rgb), 0.04) 0%,
+          rgba(var(--sn-accent-rgb), 0.04) 0%,
           transparent 30%
         ),
         linear-gradient(
           135deg,
-          rgba(var(--sn-gradient-secondary-rgb), 0.03) 0%,
+          rgba(var(--sn-accent-rgb), 0.03) 0%,
           transparent 30%
         );
       animation: tribalBalance
@@ -192,7 +172,7 @@
     background: linear-gradient(
       45deg,
       rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.9)
         )
         0%,
@@ -202,7 +182,7 @@
         )
         50%,
       rgba(
-          var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
           calc(var(--sn-sidebar-harmonic-base-opacity) * 0.9)
         )
         100%
@@ -214,9 +194,9 @@
       inset: 0;
       background: linear-gradient(
         90deg,
-        rgba(var(--sn-gradient-primary-rgb), 0.06) 0%,
+        rgba(var(--sn-accent-rgb), 0.06) 0%,
         transparent 50%,
-        rgba(var(--sn-gradient-accent-rgb), 0.06) 100%
+        rgba(var(--sn-accent-rgb), 0.06) 100%
       );
       animation: dualityFlow
         calc(var(--sn-sidebar-consciousness-flow-speed) * 1.2) ease-in-out
@@ -226,7 +206,7 @@
     }
   }
 
-  // Music Energy Classes (applied by updateFromMusicAnalysis)
+  /* Music Energy Classes (applied by updateFromMusicAnalysis)*/
   &.sn-music-low-energy {
     filter: saturate(0.9) brightness(0.95);
 
@@ -263,7 +243,7 @@
       &:hover {
         box-shadow: 0 0 calc(15px * var(--sn-sidebar-item-bloom-intensity))
           rgba(
-            var(--sn-gradient-primary-rgb),
+            var(--sn-accent-rgb),
             var(--sn-sidebar-energy-glow-opacity)
           );
         transform: translateY(-2px)
@@ -272,7 +252,7 @@
     }
   }
 
-  // Enhanced navigation item styling with consciousness variables
+  /* Enhanced navigation item styling with consciousness variables*/
   .main-navBar-navBarLink,
   .main-yourLibraryX-listItem .main-useDropTarget-base {
     position: relative;
@@ -289,7 +269,7 @@
         90deg,
         transparent 0%,
         rgba(
-            var(--sn-gradient-accent-rgb),
+            var(--sn-accent-rgb),
             calc(var(--sn-sidebar-energy-glow-opacity) * 0.3)
           )
           50%,
@@ -304,34 +284,34 @@
       left: 100%;
     }
 
-    // Energy-responsive glow
+    /* Energy-responsive glow*/
     &:hover {
       box-shadow: 0 0 calc(8px * var(--sn-sidebar-item-bloom-intensity))
           rgba(
-            var(--sn-gradient-primary-rgb),
+            var(--sn-accent-rgb),
             calc(var(--sn-sidebar-energy-glow-opacity) * 0.6)
           ),
         inset 0 0 calc(20px * var(--sn-sidebar-item-bloom-intensity))
           rgba(
-            var(--sn-gradient-accent-rgb),
+            var(--sn-accent-rgb),
             calc(var(--sn-sidebar-energy-glow-opacity) * 0.2)
           );
     }
   }
 
-  // Text energy enhancement for high energy states
+  /* Text energy enhancement for high energy states*/
   &.sn-music-high-energy {
     .main-navBar-navBarLink span,
     .main-yourLibraryX-title {
       text-shadow: 0 0 calc(6px * var(--sn-sidebar-energy-glow-opacity))
         rgba(
-          var(--sn-gradient-accent-rgb),
+          var(--sn-accent-rgb),
           calc(var(--sn-sidebar-energy-glow-opacity) * 0.8)
         );
     }
   }
 
-  // Add motion-disabled override
+  /* Add motion-disabled override*/
   &.sn-motion-disabled {
     &, &::before, &::after, .sn-sidebar-vibration-layer {
       animation: none !important;
@@ -341,7 +321,7 @@
   }
 }
 
-// Consciousness flow animations
+/* Consciousness flow animations*/
 @keyframes consciousnessFlow {
   0% {
     background-position: 0% 50%;
@@ -381,7 +361,7 @@
     filter: saturate(1.15) brightness(1.08) contrast(1.02);
     box-shadow: inset 0 0 50px
       rgba(
-        var(--sn-gradient-primary-rgb),
+        var(--sn-accent-rgb),
         calc(var(--sn-sidebar-energy-glow-opacity) * 0.3)
       );
   }
@@ -389,13 +369,13 @@
     filter: saturate(1.25) brightness(1.12) contrast(1.05);
     box-shadow: inset 0 0 70px
       rgba(
-        var(--sn-gradient-primary-rgb),
+        var(--sn-accent-rgb),
         calc(var(--sn-sidebar-energy-glow-opacity) * 0.5)
       );
   }
 }
 
-// Performance optimization for animations
+/* Performance optimization for animations*/
 @media (prefers-reduced-motion: reduce) {
   .Root__nav-bar {
     &::before {
@@ -415,23 +395,23 @@
   }
 }
 
-// ████████████████████████████████████████████████████████████████████████████████
-// BIOMORPHIC SHAPING & DEEP CONSCIOUSNESS LAYERS
-// ████████████████████████████████████████████████████████████████████████████████
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/* BIOMORPHIC SHAPING & DEEP CONSCIOUSNESS LAYERS*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
 
 div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
-  background: transparent !important; // Override default background
-  position: relative; // For pseudo-elements
-  overflow: hidden; // Important for clip-path and pseudo-elements not spilling
-  clip-path: var(--sn-sidebar-clip-path); // Apply biomorphic shape
-  transition: clip-path 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); // Animate shape changes
+  background: transparent !important; /* Override default background*/
+  position: relative; /* For pseudo-elements*/
+  overflow: hidden; /* Important for clip-path and pseudo-elements not spilling*/
+  clip-path: var(--sn-sidebar-clip-path); /* Apply biomorphic shape*/
+  transition: clip-path 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Animate shape changes*/
 
   &::before {
-    // Layer 1: Deep Consciousness & Neural Network
+    /* Layer 1: Deep Consciousness & Neural Network*/
     content: "";
     position: absolute;
     inset: 0;
-    z-index: -2; // Furthest back
+    z-index: -2; /* Furthest back*/
 
     background-image:
       // Deep Space Layer (subtle, dark, radial)
@@ -441,7 +421,7 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
           0%,
         transparent 70%
       ),
-      // Neural Network Layer (dynamic, flowing conic gradient)
+      /* Neural Network Layer (dynamic, flowing conic gradient)*/
       conic-gradient(
           from calc(var(--sn-temporal-shift-progress, 0) * 360deg),
           at 30% 70%,
@@ -462,20 +442,20 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
             )
             360deg
         );
-    background-blend-mode: screen; // Blend layers for ethereal effect
+    background-blend-mode: screen; /* Blend layers for ethereal effect*/
     animation: consciousnessBreathing calc(var(--sn-neural-flow-speed) * 2)
         ease-in-out infinite alternate,
       neuralFlow var(--sn-neural-flow-speed) linear infinite;
-    opacity: 0.7; // Overall opacity for this combined layer
+    opacity: 0.7; /* Overall opacity for this combined layer*/
     transition: opacity 1s ease;
   }
 
   &::after {
-    // Layer 2: Quantum Foam & Temporal Displacement
+    /* Layer 2: Quantum Foam & Temporal Displacement*/
     content: "";
     position: absolute;
     inset: 0;
-    z-index: -1; // In front of ::before, behind content
+    z-index: -1; /* In front of ::before, behind content*/
 
     background-image:
       // Quantum Foam (subtle, animated noise)
@@ -495,7 +475,7 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
         rgba(255, 255, 255, 0.01) 75%,
         rgba(255, 255, 255, 0.01)
       ),
-      // Temporal Displacement Field
+      /* Temporal Displacement Field*/
       linear-gradient(
           90deg,
           rgba(
@@ -524,11 +504,11 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
   }
 }
 
-// ████████████████████████████████████████████████████████████████████████████████
-// MEDITATION MODE & DIGITAL CONSCIOUSNESS
-// ████████████████████████████████████████████████████████████████████████████████
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/* MEDITATION MODE & DIGITAL CONSCIOUSNESS*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
 
-// Sidebar Digital Meditation State
+/* Sidebar Digital Meditation State*/
 div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
   &.sn-digital-meditation {
     .sn-consciousness-layer,
@@ -553,7 +533,7 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
   }
 }
 
-// Item Energy Absorption Feedback
+/* Item Energy Absorption Feedback*/
 .main-yourLibraryX-navLink,
 .main-yourLibraryX-listItem,
 nav[aria-label="Main"] ul li a {
@@ -573,17 +553,17 @@ nav[aria-label="Main"] ul li a {
   }
 }
 
-// ████████████████████████████████████████████████████████████████████████████████
-// ATMOSPHERIC EFFECTS & QUANTUM ENTANGLEMENT
-// ████████████████████████████████████████████████████████████████████████████████
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/* ATMOSPHERIC EFFECTS & QUANTUM ENTANGLEMENT*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
 
 .Root__nav-bar {
-  // Apply atmospheric hue shift and saturation
+  /* Apply atmospheric hue shift and saturation*/
   filter: hue-rotate(var(--sn-sidebar-atmosphere-hue-shift, 0deg))
     saturate(var(--sn-sidebar-atmosphere-saturation-factor, 1));
   transition: filter 1.5s ease-in-out;
 
-  // Entanglement: color bleed effect
+  /* Entanglement: color bleed effect*/
   &::after {
     content: "";
     position: absolute;
@@ -599,7 +579,7 @@ nav[aria-label="Main"] ul li a {
     opacity: var(--sn-sidebar-entanglement-intensity, 0);
   }
 
-  // Vibration Effect
+  /* Vibration Effect*/
   .sn-sidebar-vibration-layer,
   &::before {
     animation-name: sn-sidebar-vibrate;
@@ -615,17 +595,17 @@ nav[aria-label="Main"] ul li a {
   }
 }
 
-// ████████████████████████████████████████████████████████████████████████████████
-// QUANTUM CONSCIOUSNESS FIELD & HARMONIC MODES
-// ████████████████████████████████████████████████████████████████████████████████
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/* QUANTUM CONSCIOUSNESS FIELD & HARMONIC MODES*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
 
 .Root__nav-bar {
-  // Base transition for all dynamic effects
+  /* Base transition for all dynamic effects*/
   transition: background-color 0.7s var(--sn-easing-explorer),
     box-shadow 0.7s var(--sn-easing-explorer),
     filter 0.7s var(--sn-easing-explorer);
 
-  // Harmonic Mode Background Mixin
+  /* Harmonic Mode Background Mixin*/
   @mixin harmonic-background($primary-rgb, $secondary-rgb, $accent-rgb) {
     background: linear-gradient(
       170deg,
@@ -663,34 +643,31 @@ nav[aria-label="Main"] ul li a {
         );
   }
 
-  // Extended Harmonic Mode Classes
+  /* Extended Harmonic Mode Classes*/
   &.sn-harmonic-analogous-flow {
     @include harmonic-background(
-      var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-      var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
-      var(--sn-gradient-accent-rgb, var(--spice-rgb-accent))
+      var(--sn-accent-rgb, var(--spice-rgb-accent)),
+      var(--sn-accent-rgb, var(--spice-rgb-surface0)),
+      var(--sn-accent-rgb, var(--spice-rgb-accent))
     );
-    --sn-sidebar-harmonic-intensity-multiplier: 1;
   }
 
   &.sn-harmonic-triadic-balance,
   &.sn-harmonic-triadic-trinity {
     @include harmonic-background(
-      var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-      var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
-      var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0))
+      var(--sn-accent-rgb, var(--spice-rgb-accent)),
+      var(--sn-accent-rgb, var(--spice-rgb-accent)),
+      var(--sn-accent-rgb, var(--spice-rgb-surface0))
     );
-    --sn-sidebar-harmonic-intensity-multiplier: 1.1;
   }
 
   &.sn-harmonic-complementary-duality,
   &.sn-harmonic-complementary-yin-yang {
     @include harmonic-background(
-      var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-      var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
+      var(--sn-accent-rgb, var(--spice-rgb-accent)),
+      var(--sn-accent-rgb, var(--spice-rgb-accent)),
       var(--spice-rgb-surface1, "69,71,90")
     );
-    --sn-sidebar-harmonic-intensity-multiplier: 1.2;
   }
 
   &.sn-harmonic-tetradic-cosmic-cross {
@@ -699,7 +676,6 @@ nav[aria-label="Main"] ul li a {
       var(--spice-rgb-red),
       var(--spice-rgb-yellow)
     );
-    --sn-sidebar-harmonic-intensity-multiplier: 1.15;
   }
 
   &.sn-harmonic-split-complementary-aurora {
@@ -708,20 +684,17 @@ nav[aria-label="Main"] ul li a {
       var(--spice-rgb-sky),
       var(--spice-rgb-teal)
     );
-    --sn-sidebar-harmonic-intensity-multiplier: 1.05;
   }
 
   &.sn-harmonic-monochromatic-meditation {
     @include harmonic-background(
-      var(--sn-gradient-primary-rgb),
-      var(--sn-gradient-primary-rgb),
-      var(--sn-gradient-primary-rgb)
+      var(--sn-accent-rgb),
+      var(--sn-accent-rgb),
+      var(--sn-accent-rgb)
     );
-    --sn-sidebar-harmonic-intensity-multiplier: 0.9;
-    --sn-sidebar-base-bg-opacity: 0.2;
   }
 
-  // Temporal Echo Layer Enhancement
+  /* Temporal Echo Layer Enhancement*/
   &::after {
     transition: opacity 1s ease, filter 1s ease,
       transform var(--sn-sidebar-current-temporal-shift) ease-out;
@@ -733,12 +706,12 @@ nav[aria-label="Main"] ul li a {
   }
 }
 
-// ████████████████████████████████████████████████████████████████████████████████
-// ENHANCED NAVIGATION ITEMS WITH CONSCIOUSNESS INTEGRATION
-// ████████████████████████████████████████████████████████████████████████████████
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/* ENHANCED NAVIGATION ITEMS WITH CONSCIOUSNESS INTEGRATION*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
 
 .Root__nav-bar {
-  // Target all navigation links with consciousness effects
+  /* Target all navigation links with consciousness effects*/
   .main-navBar-navBarLink,
   .main-yourLibraryX-navLinkContainer a,
   .main-rootlist-rootlistItem a,
@@ -758,7 +731,7 @@ nav[aria-label="Main"] ul li a {
       all 0.4s var(--sn-easing-explorer);
 
     &::before {
-      // Bloom/glow effect
+      /* Bloom/glow effect*/
       content: "";
       position: absolute;
       inset: -2px;
@@ -766,7 +739,7 @@ nav[aria-label="Main"] ul li a {
       background: radial-gradient(
         ellipse at center,
         rgba(
-            var(--sn-gradient-accent-rgb),
+            var(--sn-accent-rgb),
             calc(var(--sn-sidebar-item-bloom-intensity) * 0.7)
           )
           0%,
@@ -782,12 +755,12 @@ nav[aria-label="Main"] ul li a {
     &.main-navBar-navBarLinkActive,
     &[aria-current="page"] {
       background-color: rgba(
-        var(--sn-gradient-primary-rgb),
+        var(--sn-accent-rgb),
         0.15
       );
       color: var(--spice-text);
       transform: translateY(-1px) scale(1.02);
-      box-shadow: 0 3px 15px -5px rgba(var(--sn-gradient-primary-rgb), 0.3);
+      box-shadow: 0 3px 15px -5px rgba(var(--sn-accent-rgb), 0.3);
 
       &::before {
         opacity: 1;
@@ -795,28 +768,28 @@ nav[aria-label="Main"] ul li a {
       }
     }
 
-    // Energy-based text glow for high energy music
+    /* Energy-based text glow for high energy music*/
     .sn-music-high-energy & {
       .Type__TypeElement-sc-goliZz-0,
       span {
         text-shadow: 0 0 8px
           rgba(
-            var(--sn-gradient-accent-rgb),
+            var(--sn-accent-rgb),
             calc(0.5 * var(--sn-sidebar-energy-glow-opacity))
           );
       }
     }
   }
 
-  // Specific styling for "Your Library" list items
+  /* Specific styling for "Your Library" list items*/
   .main-yourLibraryX-listItem {
     .main-useDropTarget-base {
-      // This is the clickable area for library items
+      /* This is the clickable area for library items*/
       position: relative;
       display: flex;
       align-items: center;
-      padding: 6px 16px; // Slightly less padding than main nav items
-      margin: 1px 8px; // Adjust margin to fit nicely in the library list
+      padding: 6px 16px; /* Slightly less padding than main nav items*/
+      margin: 1px 8px; /* Adjust margin to fit nicely in the library list*/
       border-radius: 4px;
       opacity: var(--sn-nav-item-base-opacity);
       transform: scale(var(--sn-nav-item-transform-scale));
@@ -827,14 +800,14 @@ nav[aria-label="Main"] ul li a {
         box-shadow var(--sn-nav-item-transition-duration) ease;
       color: var(--spice-subtext, #b3b3b3);
 
-      // Album art / icon
+      /* Album art / icon*/
       .main-cardImage-imageRegion {
         margin-right: 12px;
-        width: 40px; // Consistent size for library item images
+        width: 40px; /* Consistent size for library item images*/
         height: 40px;
       }
 
-      // Text content (title, subtitle)
+      /* Text content (title, subtitle)*/
       .main-yourLibraryX-title,
       .main-yourLibraryX-subtitle {
         text-shadow: 0 0 2px
@@ -850,7 +823,7 @@ nav[aria-label="Main"] ul li a {
         transition: text-shadow var(--sn-nav-item-transition-duration) ease;
       }
       .main-yourLibraryX-title {
-        color: var(--spice-subtext); // Ensure correct initial color
+        color: var(--spice-subtext); /* Ensure correct initial color*/
       }
       .main-yourLibraryX-subtitle {
         color: var(--spice-subtext);
@@ -890,12 +863,12 @@ nav[aria-label="Main"] ul li a {
       }
     }
 
-    // Active state for library items (e.g., currently playing playlist from library)
-    // Spicetify often adds main-yourLibraryX-navLinkActive to the parent .main-yourLibraryX-listItem
-    // or the inner anchor/div if it's a direct link.
+    /* Active state for library items (e.g., currently playing playlist from library)*/
+    /* Spicetify often adds main-yourLibraryX-navLinkActive to the parent .main-yourLibraryX-listItem*/
+    /* or the inner anchor/div if it's a direct link.*/
     &.main-yourLibraryX-navLinkActive .main-useDropTarget-base,
     .main-useDropTarget-base[aria-current="page"] {
-      // Check for aria-current as well
+      /* Check for aria-current as well*/
       opacity: 1;
       color: var(--spice-text, #ffffff);
       background-color: rgba(
@@ -930,7 +903,7 @@ nav[aria-label="Main"] ul li a {
     }
   }
 
-  // Musical DNA Visualization (emoji icons)
+  /* Musical DNA Visualization (emoji icons)*/
   .sn-item-type-playlist::after {
     content: "\1F3A7"; /* 🎧 */
   }
@@ -951,11 +924,11 @@ nav[aria-label="Main"] ul li a {
   }
 }
 
-// ████████████████████████████████████████████████████████████████████████████████
-// ANIMATIONS & KEYFRAMES
-// ████████████████████████████████████████████████████████████████████████████████
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/* ANIMATIONS & KEYFRAMES*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
 
-// Deep Consciousness Animations
+/* Deep Consciousness Animations*/
 @keyframes consciousnessBreathing {
   from {
     opacity: 0.6;
@@ -997,7 +970,7 @@ nav[aria-label="Main"] ul li a {
   }
 }
 
-// Vibration Animation
+/* Vibration Animation*/
 @keyframes sn-sidebar-vibrate {
   0% {
     transform: translate(
@@ -1031,15 +1004,15 @@ nav[aria-label="Main"] ul li a {
   }
 }
 
-// Energy Pulse Animations (extends original ones)
+/* Energy Pulse Animations (extends original ones)*/
 @keyframes sn-sidebar-pulse-slow {
   0%,
   100% {
-    box-shadow: inset 0 0 70px -25px rgba(var(--sn-gradient-primary-rgb), calc(0.1 *
+    box-shadow: inset 0 0 70px -25px rgba(var(--sn-accent-rgb), calc(0.1 *
             var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
   }
   50% {
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-secondary-rgb), calc(0.15 *
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb), calc(0.15 *
             var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
   }
 }
@@ -1047,11 +1020,11 @@ nav[aria-label="Main"] ul li a {
 @keyframes sn-sidebar-pulse-mid {
   0%,
   100% {
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-gradient-primary-rgb), calc(0.2 *
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb), calc(0.2 *
             var(--sn-sidebar-harmonic-intensity-multiplier)));
   }
   50% {
-    box-shadow: inset 0 0 90px -15px rgba(var(--sn-gradient-secondary-rgb), calc(0.25 *
+    box-shadow: inset 0 0 90px -15px rgba(var(--sn-accent-rgb), calc(0.25 *
             var(--sn-sidebar-harmonic-intensity-multiplier)));
   }
 }
@@ -1059,14 +1032,14 @@ nav[aria-label="Main"] ul li a {
 @keyframes sn-sidebar-pulse-fast {
   0%,
   100% {
-    box-shadow: inset 0 0 90px -15px rgba(var(--sn-gradient-primary-rgb), calc(0.3 *
+    box-shadow: inset 0 0 90px -15px rgba(var(--sn-accent-rgb), calc(0.3 *
             var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
   }
   50% {
-    box-shadow: inset 0 0 100px -10px rgba(var(--sn-gradient-secondary-rgb), calc(0.35 *
+    box-shadow: inset 0 0 100px -10px rgba(var(--sn-accent-rgb), calc(0.35 *
             var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
   }
 }
 
-// END OF SIDEBAR CONSCIOUSNESS SYSTEM MODULE
-// ████████████████████████████████████████████████████████████████████████████████
+/* END OF SIDEBAR CONSCIOUSNESS SYSTEM MODULE*/
+/* ████████████████████████████████████████████████████████████████████████████████*/

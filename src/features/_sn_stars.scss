@@ -28,15 +28,15 @@
 
   // === Dynamic Color Integration ===
   --particle-primary-energy: rgba(
-    var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+    var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
     0.8
   );
   --particle-secondary-energy: rgba(
-    var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0, 186,187,241)),
+    var(--sn-accent-rgb, var(--spice-rgb-surface0, 186,187,241)),
     0.6
   );
   --particle-accent-energy: rgba(
-    var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+    var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
     0.7
   );
 

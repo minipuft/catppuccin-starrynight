@@ -31,23 +31,57 @@
   --color-enhancement-opacity: 0.1;
 
   // === BEATSYNC CONSCIOUSNESS VARIABLES (New) ===
+  // Phase 4: Gate beat effects behind user toggle
   --sn-glass-beat-opacity: calc(
     var(--color-enhancement-opacity) *
-      (1 + var(--sn-beat-pulse-intensity, 0) * 0.5)
+      (1 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.5)
   );
-  --sn-glass-rhythm-hue: calc(var(--sn-rhythm-phase, 0) * 20deg);
-  --sn-glass-breathing-scale: var(--sn-breathing-scale, 1);
+  --sn-glass-rhythm-hue: calc(var(--sn-rhythm-phase, 0) * var(--sn-glass-pulse-enabled) * 20deg);
+  --sn-glass-breathing-scale: calc(
+    1 + (var(--sn-breathing-scale, 1) - 1) * var(--sn-glass-pulse-enabled)
+  );
 
   // === COSMIC GLASS ENHANCEMENT ===
-  --sn-glass-cosmic-blur: calc(var(--sn-beat-pulse-intensity, 0) * 3px);
-  --sn-glass-saturation: calc(1.2 + var(--sn-beat-pulse-intensity, 0) * 0.3);
-  --sn-glass-brightness: calc(1.1 + var(--sn-beat-pulse-intensity, 0) * 0.2);
-  --sn-glass-rhythm-shift: calc(var(--sn-rhythm-phase, 0) * 0.1);
+  --sn-glass-cosmic-blur: calc(var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 3px);
+  --sn-glass-saturation: calc(1.2 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.3);
+  --sn-glass-brightness: calc(1.1 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.2);
+  --sn-glass-rhythm-shift: calc(var(--sn-rhythm-phase, 0) * var(--sn-glass-pulse-enabled) * 0.1);
+
+  // === PHASE 3: BEAT-BOOST GLASS INTEGRATION ===
+  // Dynamic glass variables that respond to beat-boost intensity
+  // Phase 4: Add user control variables for Glass Pulse toggle and base intensity
+  --sn-glass-pulse-enabled: var(--glass-pulse-toggle, 1); // 1 = enabled, 0 = disabled
+  --sn-glass-user-base-intensity: var(--glass-user-intensity, 0.5); // 0-1 user setting
+  
+  --glass-blur: calc(
+    var(--sn-glass-user-base-intensity) * 20px + 
+    var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 5px
+  );
+  --glass-saturation: calc(
+    1.2 + var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 0.2
+  );
+  --glass-brightness: calc(
+    1.1 + var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 0.15
+  );
+  --glass-background: rgba(
+    var(--sn-oklab-processed-bright-highlight-rgb),
+    calc(
+      var(--sn-glass-user-base-intensity) * 0.1 + 
+      var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 0.05
+    )
+  );
+  --glass-border: rgba(
+    var(--sn-oklab-processed-bright-highlight-rgb),
+    calc(
+      var(--sn-glass-user-base-intensity) * 0.2 + 
+      var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 0.1
+    )
+  );
 
   // === REFRACTION SYSTEM VARIABLES ===
-  --sn-glass-refract-intensity: calc(var(--sn-beat-pulse-intensity, 0) * 15deg);
-  --sn-glass-spectrum-shift: calc(var(--sn-rhythm-phase, 0) * 30deg);
-  --sn-glass-energy-pulse: calc(0.8 + var(--sn-beat-pulse-intensity, 0) * 0.4);
+  --sn-glass-refract-intensity: calc(var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 15deg);
+  --sn-glass-spectrum-shift: calc(var(--sn-rhythm-phase, 0) * var(--sn-glass-pulse-enabled) * 30deg);
+  --sn-glass-energy-pulse: calc(0.8 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.4);
 
   // Background colors (adapts to existing color extraction with consciousness)
   --enhanced-background: rgba(
@@ -56,11 +90,11 @@
   );
   --enhanced-border: rgba(
     var(--spice-rgb-surface1),
-    calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.15)
+    calc(0.2 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.15)
   );
   --enhanced-shadow: rgba(
     var(--sn-oklab-processed-dynamic-shadow-rgb),
-    calc(0.1 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+    calc(0.1 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.2)
   );
 
   // Performance and transition settings (uses existing transition timing)
@@ -80,7 +114,7 @@
   box-shadow: 0 8px 32px var(--enhanced-shadow),
     0 2px calc(16px + var(--sn-beat-pulse-intensity, 0) * 8px)
       rgba(
-        var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+        var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
         calc(var(--sn-beat-pulse-intensity, 0) * 0.2)
       );
 
@@ -104,13 +138,13 @@
     background: linear-gradient(
       calc(135deg + var(--sn-glass-spectrum-shift)),
             rgba(
-        var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+        var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
         calc(var(--sn-beat-pulse-intensity, 0) * 0.1)
       )
         0%,
       transparent 40%,
             rgba(
-        var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+        var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
         calc(var(--sn-beat-pulse-intensity, 0) * 0.08)
       )
         100%
@@ -129,61 +163,19 @@
   }
 }
 
-// Enhanced now playing bar with consciousness glass effects
-.Root__now-playing-bar {
-  position: relative;
-
-  // BREATHING scale effect for entire player
-  transform: scale(var(--sn-glass-breathing-scale));
-  transition: transform 0.2s ease-out;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: -1;
-
-    // OSCILLATE gradient background with consciousness
-    background: linear-gradient(
-      calc(90deg + var(--sn-glass-spectrum-shift) * 0.5),
-      var(--enhanced-background) 0%,
-      rgba(var(--spice-rgb-player), var(--sn-glass-beat-opacity)) 50%,
-      var(--enhanced-background) 100%
-    );
-
-    // REFRACT filter effects
-    filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.5))
-      saturate(var(--sn-glass-saturation))
-      blur(calc(var(--sn-glass-cosmic-blur) * 0.5));
-
-    // Enhanced transitions
-    transition: all 0.6s ease-out;
-  }
-
-  // BLOOM glow enhancement during beats
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-            rgba(
-        var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
-        var(--sn-beat-pulse-intensity, 0)
-      )
-        50%,
-      transparent 100%
-    );
-    transition: all 0.3s ease-out;
-  }
-}
+// ══════════════════════════════════════════════════════════════════════════════
+// NOW-PLAYING BAR GLASS INTEGRATION MOVED TO _now_playing.scss
+// ══════════════════════════════════════════════════════════════════════════════
+// The now-playing bar glassmorphism effects have been integrated directly
+// into the component file using the glassmorphism-dynamic mixin for better
+// modularity and to avoid CSS specificity conflicts.
+// 
+// This provides:
+// - Cleaner separation of concerns
+// - Proper mixin-based integration
+// - Avoids duplicate selectors
+// - Maintains consciousness-aware glass effects
+// ══════════════════════════════════════════════════════════════════════════════
 
 // Modal overlays with consciousness-enhanced shadows
 .GenericModal,
@@ -193,14 +185,14 @@
       rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2),
     0 8px calc(32px + var(--sn-beat-pulse-intensity, 0) * 16px)
           rgba(
-      var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+      var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
       calc(var(--sn-beat-pulse-intensity, 0) * 0.15)
     );
 
   // REFRACT border with rhythm
   border: 1px solid
     rgba(
-      var(--sn-gradient-accent-rgb, "140,170,238"),
+      var(--sn-accent-rgb, "140,170,238"),
       calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.2)
     );
 
@@ -221,7 +213,7 @@
     box-shadow: 0 4px 12px var(--enhanced-shadow),
       0 2px calc(8px + var(--sn-beat-pulse-intensity, 0) * 4px)
         rgba(
-          var(--sn-gradient-accent-rgb, "140,170,238"),
+          var(--sn-accent-rgb, "140,170,238"),
           calc(var(--sn-beat-pulse-intensity, 0) * 0.1)
         );
 
@@ -250,7 +242,7 @@
       box-shadow: 0 8px 24px var(--enhanced-shadow),
         0 4px calc(16px + var(--sn-beat-pulse-intensity, 0) * 8px)
           rgba(
-            var(--sn-gradient-primary-rgb, "202,158,230"),
+            var(--sn-accent-rgb, "202,158,230"),
             calc(var(--sn-beat-pulse-intensity, 0) * 0.2)
           );
 
@@ -290,11 +282,7 @@
   @include left-sidebar-root {
     background: rgba(var(--spice-rgb-surface0), 0.8) !important;
   }
-  @include now-playing-bar-root {
-    &::before {
-      background: rgba(var(--spice-rgb-player), 0.8) !important;
-    }
-  }
+  // Now-playing bar glass controls moved to _now_playing.scss for better integration
   @include right-sidebar-root {
     background: rgba(var(--spice-rgb-surface0), 0.8) !important;
   }
@@ -349,7 +337,6 @@
 // Reduced motion support (enhanced with consciousness respect)
 @media (prefers-reduced-motion: reduce) {
   .Root__nav-bar,
-  .Root__now-playing-bar,
   .main-card-card,
   .Root__right-sidebar {
     transition: none !important;
@@ -363,6 +350,7 @@
       transition: none !important;
     }
   }
+  // Now-playing bar reduced motion controls moved to _now_playing.scss
 }
 
 // High contrast mode support (enhanced)
@@ -414,12 +402,12 @@
   }
 
   // Disable complex glass effects on low-resolution displays
-  .Root__nav-bar,
-  .Root__now-playing-bar {
+  .Root__nav-bar {
     &::after {
       display: none;
     }
   }
+  // Now-playing bar performance controls moved to _now_playing.scss
 }
 
 // Solid Fallbacks (NO BACKDROP FILTER DEPENDENCY)
@@ -431,9 +419,7 @@
   border-bottom: 1px solid rgba(var(--spice-rgb-surface1), 0.5);
 }
 
-.Root__now-playing-bar::before {
-  background: rgba(var(--spice-rgb-player), 0.8) !important;
-}
+// Now-playing bar fallbacks moved to _now_playing.scss for integrated control
 
 .main-card-card {
   // Let Year 3000 search precision handle search cards

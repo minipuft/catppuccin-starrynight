@@ -57,6 +57,17 @@ export class ColorHarmonyEngine
   extends BaseVisualSystem
   implements IManagedSystem
 {
+  /**
+   * Canonical accent CSS custom property names.
+   *  – `--sn-accent-hex`  : Hex string (e.g. "#cba6f7")
+   *  – `--sn-accent-rgb`  : Comma-separated R,G,B channels (e.g. "203,166,247")
+   *
+   * These are written by the Year3000System colour pipeline and are considered
+   * the single source-of-truth accent accessed by SCSS and visual systems.
+   */
+  public static readonly CANONICAL_HEX_VAR = "--sn-accent-hex";
+  public static readonly CANONICAL_RGB_VAR = "--sn-accent-rgb";
+
   private currentTheme: CatppuccinFlavor;
   private harmonyMetrics: {
     totalHarmonyCalculations: number;
@@ -319,12 +330,21 @@ export class ColorHarmonyEngine
     }
   }
   // TODO: Legacy interface method - delegates to new onAnimate
-  updateAnimation(deltaTime: number): void {
-    this.onAnimate(deltaTime);
+  // Overload signature for IManagedSystem (single-parameter)
+  override updateAnimation(deltaTime: number): void;
+  // Overload signature for BaseVisualSystem (two-parameter)
+  override updateAnimation(timestamp: number, deltaTime: number): void;
+  // Unified implementation
+  override updateAnimation(
+    timestampOrDelta: number,
+    maybeDelta?: number
+  ): void {
+    const delta = maybeDelta ?? timestampOrDelta;
+    this.onAnimate(delta);
   }
 
   // TODO: Implement proper onAnimate method for Year 3000 per-frame updates
-  public onAnimate(deltaMs: number): void {
+  public override onAnimate(deltaMs: number): void {
     this._updateCSSVariables(deltaMs);
     this._calculateBeatPulse(deltaMs);
 
@@ -401,7 +421,7 @@ export class ColorHarmonyEngine
     }
   }
 
-  public async initialize(): Promise<void> {
+  public override async initialize(): Promise<void> {
     await super.initialize();
     if (this.config.enableDebug) {
       console.log(
@@ -573,7 +593,7 @@ export class ColorHarmonyEngine
     };
 
     const requirements =
-      contextRequirements[context] || contextRequirements.general;
+      contextRequirements[context] || contextRequirements["general"];
     const currentPalette = (this.catppuccinPalettes as any)[this.currentTheme];
 
     if (!currentPalette?.neutrals?.base) {
@@ -966,7 +986,7 @@ export class ColorHarmonyEngine
     };
   }
 
-  updateFromMusicAnalysis(
+  public override updateFromMusicAnalysis(
     processedMusicData: any,
     rawFeatures: any,
     trackUri: string
@@ -1342,7 +1362,7 @@ export class ColorHarmonyEngine
    * (just re-blends colours + sets CSS vars) so it can be called synchronously
    * from Year3000System after a relevant settings change.
    */
-  public forceRepaint(_reason: string = "settings-change"): void {
+  public override forceRepaint(_reason: string = "settings-change"): void {
     // Debounced palette refresh is intentionally bypassed here—we want an
     // immediate update so UI responds in the same frame.
     this.refreshPalette?.();

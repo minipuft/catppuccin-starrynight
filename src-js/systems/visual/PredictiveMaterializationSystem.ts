@@ -45,7 +45,7 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
   }
 
   // Frame-level animation hook used by MasterAnimationCoordinator
-  public onAnimate(deltaMs: number): void {
+  public override onAnimate(deltaMs: number): void {
     // Skip if system disabled or no target element
     if (!this.materializationState.targetElement) return;
 
@@ -141,7 +141,7 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
     }
   }
 
-  public async initialize(): Promise<void> {
+  public override async initialize(): Promise<void> {
     await super.initialize();
     this._setInitialMaterializationCSS();
     if (this.config?.enableDebug) {
@@ -179,7 +179,7 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
     applyCss("--sn-materialize-clarity", "0");
   }
 
-  public updateFromMusicAnalysis(processedMusicData: ProcessedMusicData): void {
+  public override updateFromMusicAnalysis(processedMusicData: ProcessedMusicData): void {
     if (!this.initialized || !processedMusicData) return;
     super.updateFromMusicAnalysis(processedMusicData);
 
@@ -249,7 +249,7 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
     );
   }
 
-  public updateModeConfiguration(modeConfig: Partial<ModeConfig>): void {
+  public override updateModeConfiguration(modeConfig: Partial<ModeConfig>): void {
     if (!modeConfig) return;
 
     const { enabled, animations, intensity } = modeConfig;
@@ -287,7 +287,7 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
     }
   }
 
-  public destroy(): void {
+  public override destroy(): void {
     super.destroy();
     if (this.config?.enableDebug) {
       console.log(`[${this.systemName}] Destroyed and cleaned up.`);

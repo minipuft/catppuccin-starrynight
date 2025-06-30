@@ -12,11 +12,11 @@
 // Shared variable for highlight color, can be overridden per type or element
 :root {
   --sn-predict-glow-color: rgba(
-    var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
+    var(--sn-accent-rgb, var(--spice-rgb-accent)),
     0.7
   );
   --sn-predict-pulse-color: rgba(
-    var(--sn-gradient-primary-rgb, var(--spice-rgb-button)),
+    var(--sn-accent-rgb, var(--spice-rgb-button)),
     0.8
   );
   // --sn-prediction-confidence: 0; // This is set per element by JS, no need for global default here if JS always sets it.

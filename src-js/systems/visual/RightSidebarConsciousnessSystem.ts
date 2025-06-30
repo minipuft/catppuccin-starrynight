@@ -1,4 +1,3 @@
-import { CSSVariableBatcher } from "@/core/CSSVariableBatcher";
 import { GlobalEventBus } from "@/core/EventBus";
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
 import { Year3000System } from "@/core/year3000System";
@@ -7,6 +6,7 @@ import { MusicSyncService } from "@/services/MusicSyncService";
 import type { Year3000Config } from "@/types/models";
 import * as Year3000Utilities from "@/utils/Year3000Utilities";
 import { BaseVisualSystem } from "../BaseVisualSystem";
+import { RightSidebarCoordinator } from "./RightSidebarCoordinator";
 
 interface BeatPayload {
   intensity: number; // 0‒1 range
@@ -23,13 +23,13 @@ interface EnergyPayload {
  * Phase-2 implementation that animates the right-sidebar gradient variables in
  * real-time, staying within <1 ms / frame budget.
  * – Subscribes to GlobalEventBus topics: `music:beat`, `music:energy`
- * – Uses CSSVariableBatcher for batched style mutations
+ * – Uses RightSidebarCoordinator for optimized CSS variable batching
  * – Registers with MasterAnimationCoordinator when available; otherwise falls
  *   back to its own rAF loop.
  */
 export class RightSidebarConsciousnessSystem extends BaseVisualSystem {
-  private cssBatcher: CSSVariableBatcher;
   private year3000System: Year3000System | null;
+  private coordinator: RightSidebarCoordinator;
   // Current → target state for smooth lerp
   private currentBeatIntensity = 0;
   private targetBeatIntensity = 0;
@@ -51,19 +51,31 @@ export class RightSidebarConsciousnessSystem extends BaseVisualSystem {
     perf: PerformanceAnalyzer,
     musicSync: MusicSyncService,
     settings: SettingsManager,
-    year3000System: Year3000System | null = null
+    year3000System: Year3000System | null = null,
+    coordinator?: RightSidebarCoordinator
   ) {
     super(config, utils, perf, musicSync, settings);
     this.year3000System = year3000System;
-    // Prefer global batcher from Year3000System if available
-    this.cssBatcher =
-      year3000System?.cssVariableBatcher ?? new CSSVariableBatcher();
+
+    // Initialize coordinator (injected or singleton)
+    this.coordinator =
+      coordinator ||
+      RightSidebarCoordinator.getInstance({
+        enableDebug: config.enableDebug,
+        performanceAnalyzer: perf,
+        onFlushComplete: () => {
+          // Emit performance trace after each flush
+          perf?.emitTrace?.(
+            "[RightSidebarConsciousnessSystem] Coordinator flush completed"
+          );
+        },
+      });
   }
 
   /* ------------------------------------------------------------------ */
   /* Initialization                                                     */
   /* ------------------------------------------------------------------ */
-  async _performSystemSpecificInitialization(): Promise<void> {
+  override async _performSystemSpecificInitialization(): Promise<void> {
     // Subscribe to music events once system is active.
     this.unsubBeat = GlobalEventBus.subscribe<BeatPayload>(
       "music:beat",
@@ -112,7 +124,7 @@ export class RightSidebarConsciousnessSystem extends BaseVisualSystem {
   /* ------------------------------------------------------------------ */
   /* Animation Loop                                                     */
   /* ------------------------------------------------------------------ */
-  public onAnimate(deltaMs: number): void {
+  public override onAnimate(deltaMs: number): void {
     this._tick(deltaMs);
   }
 
@@ -126,7 +138,7 @@ export class RightSidebarConsciousnessSystem extends BaseVisualSystem {
     this.fallbackRafId = requestAnimationFrame(loop);
   }
 
-  private _tick(deltaMs: number) {
+  private _tick(_deltaMs: number) {
     // Lerp current values towards targets
     this.currentBeatIntensity = this._lerp(
       this.currentBeatIntensity,
@@ -148,8 +160,8 @@ export class RightSidebarConsciousnessSystem extends BaseVisualSystem {
   }
 
   private _queueCssVar(property: string, value: number | string) {
-    // Ensure root element
-    this.cssBatcher.queueCSSVariableUpdate(property, String(value));
+    // Route through the right sidebar coordinator for optimized batching
+    this.coordinator.queueUpdate(property, String(value));
   }
 
   private _lerp(from: number, to: number, alpha: number): number {
@@ -159,10 +171,13 @@ export class RightSidebarConsciousnessSystem extends BaseVisualSystem {
   /* ------------------------------------------------------------------ */
   /* Cleanup                                                            */
   /* ------------------------------------------------------------------ */
-  destroy() {
+  override destroy() {
     super.destroy();
     this.unsubBeat?.();
     this.unsubEnergy?.();
     if (this.fallbackRafId) cancelAnimationFrame(this.fallbackRafId);
+
+    // Don't destroy the coordinator here as it might be shared
+    // The coordinator will be destroyed by the Year3000System
   }
 }

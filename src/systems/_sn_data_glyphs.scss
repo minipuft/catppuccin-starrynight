@@ -1,32 +1,31 @@
-// ████████████████████████████████████████████████████████████████████████████████
-// DIMENSIONAL NEXUS SIDEBAR - Phase 5: Holographic Data Glyphs & Biometric Feedback
-// ████████████████████████████████████████████████████████████████████████████████
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/* DIMENSIONAL NEXUS SIDEBAR - Phase 5: Holographic Data Glyphs & Biometric Feedback*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
 
 @use "../components/_sn_glyph_variables.scss" as *;
 
 :root {
-  // Variables for Data Glyphs (Phase 5)
-  --sn-glyph-base-size: 6px; // Base size of a glyph element
-  --sn-glyph-glow: 0;
+  /* Variables for Data Glyphs (Phase 5)*/
+  --sn-glyph-base-size: 6px; /* Base size of a glyph element*/
   --sn-glyph-scale: 1;
-  --sn-glyph-pulse-intensity: 0; // 0 to 1, for pulsing animation
-  --sn-glyph-shimmer-opacity: 0; // For color shimmer effect
+  --sn-glyph-pulse-intensity: 0; /* 0 to 1, for pulsing animation*/
+  --sn-glyph-shimmer-opacity: 0; /* For color shimmer effect*/
   --sn-glyph-rotation: 0deg;
   --sn-glyph-color-rgb: var(
     --sn-gradient-accent-rgb,
     "140,170,238"
-  ); // Default color
+  ); /* Default color*/
 
-  // Variables for Biometric Feedback States (Phase 5)
-  --sn-sidebar-meditation-desaturation: 0; // 0 to 1 (0 = normal, 1 = fully desaturated gray)
-  --sn-sidebar-meditation-slowdown: 1; // Animation speed multiplier (1 = normal, <1 = slower)
-  --sn-item-energy-absorption-scale: 1; // Scale effect for item absorbing energy
+  /* Variables for Biometric Feedback States (Phase 5)*/
+  --sn-sidebar-meditation-desaturation: 0; /* 0 to 1 (0 = normal, 1 = fully desaturated gray)*/
+  --sn-sidebar-meditation-slowdown: 1; /* Animation speed multiplier (1 = normal, <1 = slower)*/
+  --sn-item-energy-absorption-scale: 1; /* Scale effect for item absorbing energy*/
 }
 
-// Base Data Glyph Styling
+/* Base Data Glyph Styling*/
 .sn-data-glyph {
   position: absolute;
-  // Example positioning: top-right of parent. JS will need to handle parent context.
+  /* Example positioning: top-right of parent. JS will need to handle parent context.*/
   top: 4px;
   right: 4px;
   width: var(--sn-glyph-base-size);
@@ -34,23 +33,23 @@
   background-color: rgba(
     var(--sn-glyph-color-rgb),
     var(--sn-glyph-shimmer-opacity, 0.5)
-  ); // Base with shimmer
+  ); /* Base with shimmer*/
   border-radius: 50%;
   opacity: var(--sn-glyph-glow);
   transform: scale(var(--sn-glyph-scale)) rotate(var(--sn-glyph-rotation));
   transition: opacity 0.4s ease, transform 0.4s ease, background-color 0.4s ease;
-  pointer-events: none; // Glyphs shouldn't interfere with interaction
-  z-index: 5; // Ensure it's above the item's text/icon but below popups
+  pointer-events: none; /* Glyphs shouldn't interfere with interaction*/
+  z-index: 5; /* Ensure it's above the item's text/icon but below popups*/
 
   &::before,
   &::after {
-    // For more complex glyphs (e.g., core + orbiting elements)
+    /* For more complex glyphs (e.g., core + orbiting elements)*/
     content: "";
     position: absolute;
     border-radius: 50%;
   }
 
-  // Example: Pulsing Core for the glyph
+  /* Example: Pulsing Core for the glyph*/
   &::before {
     width: 100%;
     height: 100%;
@@ -59,10 +58,10 @@
     animation-play-state: var(
       --sn-glyph-pulse-animation-state,
       paused
-    ); // Controlled by JS
+    ); /* Controlled by JS*/
     transform: scale(
       calc(0.6 + 0.4 * var(--sn-glyph-pulse-intensity))
-    ); // Pulse size based on intensity
+    ); /* Pulse size based on intensity*/
     opacity: calc(0.5 + 0.5 * var(--sn-glyph-pulse-intensity));
     transition: transform 0.3s ease, opacity 0.3s ease;
   }
@@ -80,20 +79,20 @@
   }
 }
 
-// Sidebar Digital Meditation State
+/* Sidebar Digital Meditation State*/
 div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
-  // Apply desaturation and slowdown when --sn-sidebar-meditation-desaturation > 0
-  // This requires careful application to not break other filter effects.
-  // We might need to adjust how filters are composed in the ::before/::after layers.
-  // For now, a simple approach targeting the main layers' filter property:
+  /* Apply desaturation and slowdown when --sn-sidebar-meditation-desaturation > 0*/
+  /* This requires careful application to not break other filter effects.*/
+  /* We might need to adjust how filters are composed in the ::before/::after layers.*/
+  /* For now, a simple approach targeting the main layers' filter property:*/
   &.sn-digital-meditation {
-    // This class will be added by JS
-    .sn-consciousness-layer, // Target the pseudo-elements if they have distinct classes
+    /* This class will be added by JS*/
+    .sn-consciousness-layer, /* Target the pseudo-elements if they have distinct classes*/
     .sn-neural-flow-layer,
     .sn-quantum-foam-layer,
-    &::before, // If layers are directly on ::before
+    &::before, /* If layers are directly on ::before*/
     &::after {
-      // and ::after
+      /* and ::after*/
       filter: blur(var(--sn-sidebar-blur-intensity, 25px))
         saturate(
           calc(
@@ -107,24 +106,24 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
         var(--original-animation-duration, 20s) /
           var(--sn-sidebar-meditation-slowdown)
       );
-      // Need to ensure other animation properties also respect this slowdown if not using a single duration property.
+      /* Need to ensure other animation properties also respect this slowdown if not using a single duration property.*/
     }
-    // Reduce animation speed for specific animations
-    // This is tricky without a global animation speed control on the parent.
-    // Individual animation-duration properties would need to be targeted or vars used.
-    // For example, if --sn-neural-flow-speed is used by an animation:
-    // --sn-neural-flow-speed: calc(var(--original-neural-flow-speed, 20s) / var(--sn-sidebar-meditation-slowdown));
+    /* Reduce animation speed for specific animations*/
+    /* This is tricky without a global animation speed control on the parent.*/
+    /* Individual animation-duration properties would need to be targeted or vars used.*/
+    /* For example, if --sn-neural-flow-speed is used by an animation:*/
+    /* --sn-neural-flow-speed: calc(var(--original-neural-flow-speed, 20s) / var(--sn-sidebar-meditation-slowdown));*/
   }
 }
 
-// Item Energy Absorption Feedback (applied to nav items by JS)
+/* Item Energy Absorption Feedback (applied to nav items by JS)*/
 .main-yourLibraryX-navLink,
 .main-yourLibraryX-listItem,
 nav[aria-label="Main"] ul li a {
   &.sn-absorbing-energy {
     transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
-    //Quick,bouncyfeeltransform: scale(var(--sn-item-energy-absorption-scale));
-    //Potentiallyaddasubtleglowchangetoobox-shadow: 0 0 calc(5px + 8px * var(--sn-nav-item-glow-intensity))        rgba(          var(--sn-nav-item-glow-color-rgb),          calc(var(--sn-nav-item-glow-intensity) * 0.3)        ),      inset 0 0 3px        rgba(          var(--sn-nav-item-glow-color-rgb),          calc(var(--sn-nav-item-glow-intensity) * 0.15)        );
+    /*Quick,bouncyfeeltransform: scale(var(--sn-item-energy-absorption-scale));*/
+    /*Potentiallyaddasubtleglowchangetoobox-shadow: 0 0 calc(5px + 8px * var(--sn-nav-item-glow-intensity))        rgba(          var(--sn-nav-item-glow-color-rgb),          calc(var(--sn-nav-item-glow-intensity) * 0.3)        ),      inset 0 0 3px        rgba(          var(--sn-nav-item-glow-color-rgb),          calc(var(--sn-nav-item-glow-intensity) * 0.15)        );*/
     -webkit-transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
     -moz-transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
     -ms-transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
@@ -132,9 +131,9 @@ nav[aria-label="Main"] ul li a {
 }
 }
 
-// ---------------------------------------------------------------------------
-// NEW: Glyph rendered via pseudo-element to avoid DOM churn (2025-06-19)
-// ---------------------------------------------------------------------------
+/* ---------------------------------------------------------------------------*/
+/* NEW: Glyph rendered via pseudo-element to avoid DOM churn (2025-06-19)*/
+/* ---------------------------------------------------------------------------*/
 
 [data-sn-glyph] {
   @include glyph-consciousness();

@@ -1,26 +1,26 @@
 import { YEAR3000_CONFIG } from "../src-js/config/globalConfig";
-import { PerformanceMonitor } from "../src-js/debug/PerformanceMonitor";
+import { PerformanceAnalyzer } from "../src-js/core/PerformanceAnalyzer";
 import { SettingsManager } from "../src-js/managers/SettingsManager";
 import { MusicSyncService } from "../src-js/services/MusicSyncService";
 import { BehavioralPredictionEngine } from "../src-js/systems/visual/BehavioralPredictionEngine";
 import * as Year3000Utilities from "../src-js/utils/Year3000Utilities";
 
 // Mock dependencies
-jest.mock("../src-js/debug/PerformanceMonitor");
+jest.mock("../src-js/core/PerformanceAnalyzer");
 jest.mock("../src-js/services/MusicSyncService");
 jest.mock("../src-js/managers/SettingsManager");
 
 describe("BehavioralPredictionEngine", () => {
   let config: any;
   let utils: any;
-  let performanceMonitor: any;
+  let performanceAnalyzer: any;
   let musicSyncService: any;
   let settingsManager: any;
 
   beforeEach(() => {
     config = YEAR3000_CONFIG;
     utils = Year3000Utilities;
-    performanceMonitor = new PerformanceMonitor();
+    performanceAnalyzer = new PerformanceAnalyzer();
     musicSyncService = new MusicSyncService({} as any);
     settingsManager = new SettingsManager({} as any);
   });
@@ -30,7 +30,7 @@ describe("BehavioralPredictionEngine", () => {
       new BehavioralPredictionEngine(
         config,
         utils,
-        performanceMonitor,
+        performanceAnalyzer,
         musicSyncService,
         settingsManager
       );

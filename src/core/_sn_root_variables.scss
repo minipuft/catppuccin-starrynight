@@ -107,10 +107,6 @@
 // ████████████████████████████████████████████████████████████████████████████████
 // STARRYNIGHT ROOT VARIABLES - Consolidated CSS Custom Properties
 // ████████████████████████████████████████████████████████████████████████████████
-// TODO: Extract all CSS custom properties and root-level variables from main file
-// TODO: Organize by category (Modal, Sidebar, Navigation, etc.)
-// TODO: Ensure proper inheritance and fallback values
-// TODO: Target file: src/core/_sn_root_variables.scss
 
 :root {
   // Variables for Modal/Popup Symbiosis (Phase 4)
@@ -159,5 +155,10 @@
   --sn-sidebar-energy-glow-opacity: 0.3;
 
   // Easing Functions
-  --sn-easing-explorer: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  // Maintain a single source of truth ( --sn-easing-emergence ).
+  // All derivative tokens alias to it so tweaks propagate theme-wide.
+  --sn-easing-organic: var(--sn-easing-emergence);
+  --sn-easing-breathing: var(--sn-easing-emergence);
+  --sn-easing-harmony: var(--sn-easing-emergence);
+  --sn-easing-explorer: var(--sn-easing-emergence);
 }

@@ -91,12 +91,12 @@ export const LEGACY_SELECTORS: { [key: string]: string } = {
 
 export const SELECTOR_MAPPINGS: { [key: string]: string } = Object.entries({
   // Migration mapping: legacy → modern
-  ".main-nowPlayingWidget-nowPlaying": MODERN_SELECTORS.nowPlayingBar,
-  ".main-navBar-navBar": MODERN_SELECTORS.leftSidebar,
-  ".main-search-searchBar": MODERN_SELECTORS.searchInput,
-  ".main-topBar-topBar": MODERN_SELECTORS.actionBar,
-  ".main-queue-queue": MODERN_SELECTORS.queue,
-  ".main-trackList-trackList": MODERN_SELECTORS.trackListContainer,
+  ".main-nowPlayingWidget-nowPlaying": MODERN_SELECTORS["nowPlayingBar"],
+  ".main-navBar-navBar": MODERN_SELECTORS["leftSidebar"],
+  ".main-search-searchBar": MODERN_SELECTORS["searchInput"],
+  ".main-topBar-topBar": MODERN_SELECTORS["actionBar"],
+  ".main-queue-queue": MODERN_SELECTORS["queue"],
+  ".main-trackList-trackList": MODERN_SELECTORS["trackListContainer"],
 }).reduce((acc, [key, value]) => {
   if (typeof value === "string") {
     acc[key] = value;
@@ -106,35 +106,35 @@ export const SELECTOR_MAPPINGS: { [key: string]: string } = Object.entries({
 
 export const ORBITAL_ELEMENTS: { [key: string]: string } = {
   // Elements that can have orbital gravity effects
-  trackRows: MODERN_SELECTORS.trackRow ?? "",
-  libraryItems: MODERN_SELECTORS.libraryItems ?? "",
-  cards: MODERN_SELECTORS.card ?? "",
+  trackRows: MODERN_SELECTORS["trackRow"] ?? "",
+  libraryItems: MODERN_SELECTORS["libraryItems"] ?? "",
+  cards: MODERN_SELECTORS["card"] ?? "",
   navLinks: ".main-navBar-navBarLink", // This one still works
 };
 
 export const GRAVITY_WELL_TARGETS: { [key: string]: string[] } = {
   // Major UI elements that should have gravity wells
   primary: [
-    MODERN_SELECTORS.nowPlayingBar,
-    MODERN_SELECTORS.leftSidebar,
-    MODERN_SELECTORS.entityHeader,
+    MODERN_SELECTORS["nowPlayingBar"],
+    MODERN_SELECTORS["leftSidebar"],
+    MODERN_SELECTORS["entityHeader"],
   ].filter((s): s is string => !!s),
   secondary: [
-    MODERN_SELECTORS.actionBar,
-    MODERN_SELECTORS.queue,
-    MODERN_SELECTORS.searchInput,
+    MODERN_SELECTORS["actionBar"],
+    MODERN_SELECTORS["queue"],
+    MODERN_SELECTORS["searchInput"],
   ].filter((s): s is string => !!s),
   tertiary: [
-    MODERN_SELECTORS.playButton,
-    MODERN_SELECTORS.trackListHeader,
+    MODERN_SELECTORS["playButton"],
+    MODERN_SELECTORS["trackListHeader"],
   ].filter((s): s is string => !!s),
 };
 
 export const ANTI_GRAVITY_ZONES: { [key: string]: string[] } = {
   // Areas where anti-gravity effects should be applied
   searchAreas: [
-    MODERN_SELECTORS.searchInput,
-    MODERN_SELECTORS.searchPage,
+    MODERN_SELECTORS["searchInput"],
+    MODERN_SELECTORS["searchPage"],
   ].filter((s): s is string => !!s),
   notifications: [
     "[data-testid='notification-bar']",
@@ -226,16 +226,16 @@ export function testGravitySystemSelectors(): void {
   console.group("🌌 [Phase 1] Testing Gravity System Selectors");
 
   console.log("🎯 Primary gravity well targets:");
-  if (GRAVITY_WELL_TARGETS.primary) {
-    GRAVITY_WELL_TARGETS.primary.forEach((selector) => {
+  if (GRAVITY_WELL_TARGETS["primary"]) {
+    GRAVITY_WELL_TARGETS["primary"].forEach((selector) => {
       const element = $$(selector)[0] || null;
       console.log(`${element ? "✅" : "❌"} ${selector}`, element);
     });
   }
 
   console.log("🎯 Secondary gravity well targets:");
-  if (GRAVITY_WELL_TARGETS.secondary) {
-    GRAVITY_WELL_TARGETS.secondary.forEach((selector) => {
+  if (GRAVITY_WELL_TARGETS["secondary"]) {
+    GRAVITY_WELL_TARGETS["secondary"].forEach((selector) => {
       const element = $$(selector)[0] || null;
       console.log(`${element ? "✅" : "❌"} ${selector}`, element);
     });
@@ -263,15 +263,18 @@ export function validatePredictionTargets(): any {
   );
 
   const testSelectors = [
-    { name: "Track Rows", selector: ORBITAL_ELEMENTS.trackRows },
-    { name: "Progress Bar", selector: MODERN_SELECTORS.progressBar },
-    { name: "Play Button", selector: MODERN_SELECTORS.playButton },
-    { name: "Heart Button", selector: MODERN_SELECTORS.heartButton },
-    { name: "Album Cover", selector: MODERN_SELECTORS.albumCover },
-    { name: "Now Playing Widget", selector: MODERN_SELECTORS.nowPlayingWidget },
-    { name: "Now Playing Left", selector: MODERN_SELECTORS.nowPlayingLeft },
-    { name: "Left Sidebar", selector: MODERN_SELECTORS.leftSidebar },
-    { name: "Library Items", selector: ORBITAL_ELEMENTS.libraryItems },
+    { name: "Track Rows", selector: ORBITAL_ELEMENTS["trackRows"] },
+    { name: "Progress Bar", selector: MODERN_SELECTORS["progressBar"] },
+    { name: "Play Button", selector: MODERN_SELECTORS["playButton"] },
+    { name: "Heart Button", selector: MODERN_SELECTORS["heartButton"] },
+    { name: "Album Cover", selector: MODERN_SELECTORS["albumCover"] },
+    {
+      name: "Now Playing Widget",
+      selector: MODERN_SELECTORS["nowPlayingWidget"],
+    },
+    { name: "Now Playing Left", selector: MODERN_SELECTORS["nowPlayingLeft"] },
+    { name: "Left Sidebar", selector: MODERN_SELECTORS["leftSidebar"] },
+    { name: "Library Items", selector: ORBITAL_ELEMENTS["libraryItems"] },
   ];
 
   const results = {
@@ -314,19 +317,19 @@ export function testPhase2Systems(): any {
   const systemTests = {
     behavioralPrediction: validatePredictionTargets(),
     dimensionalNexus: {
-      sidebarElement: MODERN_SELECTORS.leftSidebar
-        ? elementExists(MODERN_SELECTORS.leftSidebar)
+      sidebarElement: MODERN_SELECTORS["leftSidebar"]
+        ? elementExists(MODERN_SELECTORS["leftSidebar"])
         : false,
     },
     dataGlyph: {
-      navLinks: MODERN_SELECTORS.navBarLink
-        ? elementExists(MODERN_SELECTORS.navBarLink)
+      navLinks: MODERN_SELECTORS["navBarLink"]
+        ? elementExists(MODERN_SELECTORS["navBarLink"])
         : false,
-      trackRows: ORBITAL_ELEMENTS.trackRows
-        ? elementExists(ORBITAL_ELEMENTS.trackRows)
+      trackRows: ORBITAL_ELEMENTS["trackRows"]
+        ? elementExists(ORBITAL_ELEMENTS["trackRows"])
         : false,
-      cards: ORBITAL_ELEMENTS.cards
-        ? elementExists(ORBITAL_ELEMENTS.cards)
+      cards: ORBITAL_ELEMENTS["cards"]
+        ? elementExists(ORBITAL_ELEMENTS["cards"])
         : false,
     },
   };

@@ -1,15 +1,15 @@
-// ████████████████████████████████████████████████████████████████████████████████
-// YEAR 3000 TRACK LIST ENHANCED - Revolutionary Track Experience
-// ████████████████████████████████████████████████████████████████████████████████
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/* YEAR 3000 TRACK LIST ENHANCED - Revolutionary Track Experience*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
 
 @use "../core/mixins" as *;
 @use "../core/_kinetic-animations" as *;
 
-// === FEED BLOOM MIXIN =========================================================
-// Generates a directional bloom gradient that is modulated in real-time via the
-// `--sn-feed-bloom-intensity` CSS variable (updated by the BeatSync system).
-// The optional $base-alpha argument allows individual call-sites to strengthen
-// or soften the effect while still respecting the global intensity.
+/* === FEED BLOOM MIXIN =========================================================*/
+/* Generates a directional bloom gradient that is modulated in real-time via the*/
+/* `--sn-feed-bloom-intensity` CSS variable (updated by the BeatSync system).*/
+/* The optional $base-alpha argument allows individual call-sites to strengthen*/
+/* or soften the effect while still respecting the global intensity.*/
 
 @mixin feed-bloom($base-alpha: 0.08) {
   background: linear-gradient(
@@ -18,7 +18,7 @@
         var(--sn-oklab-processed-primary-rgb-r, 202),
         var(--sn-oklab-processed-primary-rgb-g, 158),
         var(--sn-oklab-processed-primary-rgb-b, 230),
-        // Intensity is a combination of base alpha and beat-driven variable
+        /* Intensity is a combination of base alpha and beat-driven variable*/
         calc(var(--sn-feed-bloom-intensity, 0) + #{$base-alpha})
       )
       0%,
@@ -33,17 +33,17 @@
   );
 }
 
-// TODO[PHASE1-SOURCE-OF-TRUTH]:
-// Track-list kinetic behaviour (hover, selected, playing) is defined only here.
-// Down-stream modules (e.g. _sn_atmospheric.scss) should NOT duplicate these
-// `@extend` statements.
+/* TODO[PHASE1-SOURCE-OF-TRUTH]:*/
+/* Track-list kinetic behaviour (hover, selected, playing) is defined only here.*/
+/* Down-stream modules (e.g. _sn_atmospheric.scss) should NOT duplicate these*/
+/* `@extend` statements.*/
 
-// === YEAR 3000: Track List Container Styling ===
+/* === YEAR 3000: Track List Container Styling ===*/
 .main-rootlist-wrapper {
   position: relative;
   background: transparent;
 
-  // Add gentle gradient background
+  /* Add gentle gradient background*/
   &::before {
     content: "";
     position: absolute;
@@ -53,16 +53,16 @@
     bottom: 0;
     background: linear-gradient(
       180deg,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.15) 0%,
-      // Significantly stronger start
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.12) 30%,
-      // Maintain strong presence
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.15) 0%,
+      /* Significantly stronger start*/
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.12) 30%,
+      /* Maintain strong presence*/
       transparent 65%,
-      // Smooth but more decisive fade
+      /* Smooth but more decisive fade*/
       transparent 85%,
-      // Transparent mid-bottom
-      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.05)
-        100% // Stronger bottom anchor
+      /* Transparent mid-bottom*/
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-surface0)), 0.05)
+        100% /* Stronger bottom anchor*/
     );
     z-index: 0;
     pointer-events: none;
@@ -73,14 +73,14 @@
     -o-transition: all var(--sn-gradient-transition, 600ms ease);
   }
 
-  // Track list row grid enhancements
+  /* Track list row grid enhancements*/
   .main-trackList-trackListRowGrid {
     position: relative;
     z-index: 1;
     @include magnetic-depth-container;
   }
 
-  // Individual track row styling
+  /* Individual track row styling*/
   .main-trackList-trackListRow {
     position: relative;
     transform: translateZ(0);
@@ -88,29 +88,28 @@
     transition: transform 300ms var(--sn-easing-explorer, cubic-bezier(0.25, 0.46, 0.45, 0.94)),
                 background 300ms var(--sn-easing-explorer, cubic-bezier(0.25, 0.46, 0.45, 0.94));
 
-    // Add this wrapper around the hover and selected states
+    /* Add this wrapper around the hover and selected states*/
     body:not([data-bloom="off"]) & {
-      // Hover effect with dynamic colors
+      /* Hover effect with dynamic colors*/
       &:hover {
         transform: translateZ(12px);
-        // Motion-aware intensity
-        --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.15);
+        /* Motion-aware intensity*/
 
-        // Echo element
+        /* Echo element*/
         &::after {
           content: "";
           @extend .sn-temporal-echo;
         }
 
-        // Add subtle side border
+        /* Add subtle side border*/
         &::before {
           content: "";
           position: absolute;
           left: 0;
-          top: 50%; // Center vertically
-          bottom: auto; // Remove bottom constraint
-          height: 40px; // Set fixed height (e.g., matches album art)
-          transform: translateY(-50%); // Adjust for vertical centering
+          top: 50%; /* Center vertically*/
+          bottom: auto; /* Remove bottom constraint*/
+          height: 40px; /* Set fixed height (e.g., matches album art)*/
+          transform: translateY(-50%); /* Adjust for vertical centering*/
           width: 3px;
           background: linear-gradient(
             180deg,
@@ -134,7 +133,7 @@
         }
       }
 
-      // Selected/active state – one-shot ocean ripple
+      /* Selected/active state – one-shot ocean ripple*/
       &[aria-selected="true"],
       &:has(.main-trackList-playingIcon) {
         transform: translateZ(12px);
@@ -142,10 +141,9 @@
         &::after {
           content: "";
           @extend .sn-temporal-echo;
-          --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.22);
         }
 
-        // Highlight track number when row is active
+        /* Highlight track number when row is active*/
         .main-trackList-rowMarker {
           color: var(--spice-accent);
         }
@@ -156,7 +154,7 @@
         }
       }
 
-      // Track number colour shift on hover (non-selected rows)
+      /* Track number colour shift on hover (non-selected rows)*/
       &:hover {
         .main-trackList-rowMarker {
           color: var(--spice-text);
@@ -166,7 +164,7 @@
     }
   }
 
-  // Row marker (track numbers) styling
+  /* Row marker (track numbers) styling*/
   .main-trackList-rowMarker {
     display: flex;
     align-items: center;

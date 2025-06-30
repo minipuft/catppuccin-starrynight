@@ -616,3 +616,37 @@ export function adjustColor(
   hsl.l = Math.max(0, Math.min(100, hsl.l * brightness));
   return hslToRgb(hsl.h, hsl.s, hsl.l);
 }
+
+// ---------------------------------------------------------------------------
+// 🌈  Canonical Accent Helper
+// ---------------------------------------------------------------------------
+/**
+ * Retrieve the canonical StarryNight accent colour as exposed by
+ * `--sn-accent-hex` and `--sn-accent-rgb` CSS variables. Returns both HEX and
+ * RGB string forms so callers can pick the one best suited for their use case.
+ */
+export function getCanonicalAccent(): { hex: string; rgb: string } {
+  const root = getRootStyle();
+  const styles = getComputedStyle(root);
+
+  let hex = styles.getPropertyValue("--sn-accent-hex").trim();
+  let rgb = styles.getPropertyValue("--sn-accent-rgb").trim();
+
+  // Fallback conversions where only one format is present
+  if (!hex && rgb) {
+    const [rStr = "0", gStr = "0", bStr = "0"] = rgb.split(/\s*,\s*/);
+    const r = parseInt(rStr, 10) || 0;
+    const g = parseInt(gStr, 10) || 0;
+    const b = parseInt(bStr, 10) || 0;
+    hex = rgbToHex(r, g, b);
+  }
+
+  if (!rgb && hex) {
+    const rgbObj = hexToRgb(hex);
+    if (rgbObj) {
+      rgb = `${rgbObj.r},${rgbObj.g},${rgbObj.b}`;
+    }
+  }
+
+  return { hex, rgb };
+}

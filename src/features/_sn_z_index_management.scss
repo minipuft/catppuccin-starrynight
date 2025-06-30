@@ -13,6 +13,10 @@
   --z-content-hover: 2;
   --z-content-focus: 3;
 
+  // --- Sidebar & Navigation Layers ---
+  --z-right-sidebar-glow: 5; // Below modals but above main content
+  --z-right-sidebar-content: 6;
+
   // --- Foreground Effect Layers ---
   --z-ui-overlays: 100; // e.g., Pop-ups, menus
 }

@@ -57,10 +57,25 @@ interface BatcherState {
   enabled: boolean;
 }
 
+// === Critical now-playing variables ======================================
+// These variables must be visible in the same rendering frame in which they
+// are produced; batching them can introduce a 1-frame (≈16 ms) delay that
+// makes the now-playing bar appear "behind the beat".
+const CRITICAL_NOW_PLAYING_VARS = new Set<string>([
+  "--sn-beat-pulse-intensity",
+  "--sn-breathing-scale",
+  "--sn-accent-hex",
+  "--sn-accent-rgb",
+]);
+
 export class CSSVariableBatcher {
   // Singleton reference so the hijack can reach the live instance
   public static instance: CSSVariableBatcher | null = null;
   private static hijackEnabled = false;
+
+  /** Unpatched reference to CSSStyleDeclaration.setProperty for fast-path writes */
+  private static nativeSetProperty?: typeof CSSStyleDeclaration.prototype.setProperty;
+
   private config: CSSVariableBatcherConfig;
   private _cssVariableBatcher: BatcherState;
   private _performanceMetrics: PerformanceMetrics;
@@ -113,6 +128,20 @@ export class CSSVariableBatcher {
     value: string,
     element: HTMLElement | null = null
   ): void {
+    // ---- FAST-PATH ------------------------------------------------------
+    // Apply critical now-playing variables immediately to avoid a frame of lag.
+    if (CRITICAL_NOW_PLAYING_VARS.has(property)) {
+      const styleDecl = (element || document.documentElement).style;
+      if (CSSVariableBatcher.nativeSetProperty) {
+        CSSVariableBatcher.nativeSetProperty.call(styleDecl, property, value);
+      } else {
+        // hijack not yet installed – fallback to default setter (no recursion risk)
+        styleDecl.setProperty(property, value);
+      }
+      return;
+    }
+    // ---- Normal batched path -------------------------------------------
+
     const target = element || document.documentElement;
     if (!this._cssVariableBatcher.enabled) {
       target.style.setProperty(property, value);
@@ -447,7 +476,11 @@ export class CSSVariableBatcher {
   /** Patch CSSStyleDeclaration.setProperty so legacy code is batched */
   private _enableGlobalHijack(): void {
     if (CSSVariableBatcher.hijackEnabled) return;
+
     const original = CSSStyleDeclaration.prototype.setProperty;
+    // Retain native setter for critical fast-path writes
+    CSSVariableBatcher.nativeSetProperty = original;
+
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const batchInstance = this;
     // @ts-ignore

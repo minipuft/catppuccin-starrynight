@@ -33,19 +33,19 @@
 
   // === EFFICIENT COLOR CONSCIOUSNESS ===
   --soul-primary: rgba(
-    var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+    var(--sn-accent-rgb, var(--spice-rgb-accent)),
     var(--ethereal-glow-base)
   );
   --soul-secondary: rgba(
-    var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
+    var(--sn-accent-rgb, var(--spice-rgb-surface0)),
     calc(var(--ethereal-glow-base) * 0.9)
   );
   --soul-accent: rgba(
-    var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
+    var(--sn-accent-rgb, var(--spice-rgb-accent)),
     calc(var(--ethereal-glow-base) * 1.1)
   );
   --soul-whisper: rgba(
-    var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+    var(--sn-accent-rgb, var(--spice-rgb-accent)),
     calc(var(--ethereal-glow-base) * 0.3)
   );
 }
@@ -199,7 +199,7 @@
     // SIMPLIFIED: Single shadow instead of multiple
     box-shadow: 0 8px 32px
       rgba(
-        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+        var(--sn-accent-rgb, var(--spice-rgb-accent)),
         calc(var(--conscious-elegance-intensity) * 0.3)
       );
 
@@ -210,7 +210,7 @@
   &:focus-visible {
     outline: none;
     box-shadow: 0 0 0 2px
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.5);
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.5);
   }
 }
 
@@ -234,7 +234,7 @@
     @media (min-width: 1200px) {
       box-shadow: -2px 0 8px
         rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
           calc(var(--conscious-elegance-intensity) * 0.1)
         );
     }
@@ -282,76 +282,6 @@
         background: var(--soul-accent);
         border-left: 2px solid var(--soul-primary);
       }
-    }
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🎛️ OPTIMIZED PLAYER CONTROLS
-// Soul that doesn't compromise playback performance
-// ═══════════════════════════════════════════════════════════════════════════════
-
-.Root__now-playing-bar {
-  position: relative;
-
-  // Simplified background consciousness
-  &::before {
-    content: "";
-    position: absolute;
-    top: -4px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: -1;
-
-    background: linear-gradient(
-      180deg,
-      var(--soul-primary) 0%,
-      transparent 50%
-    );
-
-    opacity: calc(var(--conscious-elegance-intensity) * 0.2);
-
-    // Only animate on high-performance devices
-    @media (min-width: 1200px) and (prefers-reduced-motion: no-preference) {
-      animation: conscious-breathing-simple
-        calc(var(--conscious-breath-rate) * 2) ease-in-out infinite;
-    }
-  }
-
-  // Simplified control consciousness
-  .main-playPauseButton-button,
-  .main-skipButton-button,
-  .main-shuffleButton-button {
-    transition: transform 0.2s ease, filter 0.2s ease;
-    border-radius: 50%;
-
-    &:hover {
-      transform: scale(1.05);
-      filter: brightness(calc(1 + 0.1 * var(--conscious-elegance-intensity)));
-    }
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🔒 SEARCH COMPATIBILITY GUARD (PERFORMANCE OPTIMIZED)
-// ═══════════════════════════════════════════════════════════════════════════════
-
-.main-searchPage-content {
-  // Minimal consciousness in search for maximum performance
-  .main-card-card {
-    &:hover {
-      transform: translateY(-1px) !important;
-      filter: brightness(1.03) !important;
-    }
-  }
-
-  // Disable all heavy effects in search
-  * {
-    &::before,
-    &::after {
-      opacity: 0 !important;
-      animation: none !important;
     }
   }
 }

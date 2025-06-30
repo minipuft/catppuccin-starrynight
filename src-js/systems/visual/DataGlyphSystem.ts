@@ -254,7 +254,7 @@ export class DataGlyphSystem extends BaseVisualSystem {
     );
   }
 
-  async initialize() {
+  public override async initialize() {
     await super.initialize();
     this._tryRegisterWithMasterAnimation();
     this.setupItemObserver();
@@ -286,7 +286,7 @@ export class DataGlyphSystem extends BaseVisualSystem {
   }
 
   // Conforms to MasterAnimationCoordinator – delegates to updateAnimation
-  public onAnimate(deltaMs: number): void {
+  public override onAnimate(deltaMs: number): void {
     // Use PerformanceAnalyzer bucket throttle to skip frames when not needed.
     if (
       !this.performanceMonitor ||
@@ -296,7 +296,7 @@ export class DataGlyphSystem extends BaseVisualSystem {
     }
   }
 
-  public updateAnimation(timestamp: number, deltaTime: number) {
+  public override updateAnimation(timestamp: number, deltaTime: number) {
     const frameStartTime = performance.now();
     try {
       const maxFrameTime =
@@ -671,7 +671,7 @@ export class DataGlyphSystem extends BaseVisualSystem {
     });
   }
 
-  public destroy() {
+  public override destroy() {
     super.destroy();
     if (this.itemObserver) this.itemObserver.disconnect();
     this.observedItems.forEach((val, key) =>
@@ -732,7 +732,7 @@ export class DataGlyphSystem extends BaseVisualSystem {
     return this.observedItems.size * 5 + this.itemInteractionData.size * 2; // Rough estimation
   }
 
-  public updateModeConfiguration(modeConfig: any) {
+  public override updateModeConfiguration(modeConfig: any) {
     super.updateModeConfiguration(modeConfig);
     if (modeConfig.glyphIntensity) {
       this.modeIntensity = modeConfig.glyphIntensity;

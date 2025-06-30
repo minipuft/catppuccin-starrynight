@@ -35,12 +35,12 @@
   --sn-card-harmonic-triadic-2: hsl(calc(var(--sn-card-harmonic-base-hue) + 240deg), 60%, 50%);
 
   // === RGB Fallbacks (Design Bible Compliance) ===
-  --sn-card-harmonic-primary-rgb: var(--sn-gradient-primary-rgb);
-  --sn-card-harmonic-analogous-1-rgb: var(--sn-gradient-secondary-rgb);
-  --sn-card-harmonic-analogous-2-rgb: var(--sn-gradient-secondary-rgb);
-  --sn-card-harmonic-complementary-rgb: var(--sn-gradient-accent-rgb);
-  --sn-card-harmonic-triadic-1-rgb: var(--sn-gradient-primary-rgb);
-  --sn-card-harmonic-triadic-2-rgb: var(--sn-gradient-accent-rgb);
+  --sn-card-harmonic-primary-rgb: var(--sn-accent-rgb);
+  --sn-card-harmonic-analogous-1-rgb: var(--sn-accent-rgb);
+  --sn-card-harmonic-analogous-2-rgb: var(--sn-accent-rgb);
+  --sn-card-harmonic-complementary-rgb: var(--sn-accent-rgb);
+  --sn-card-harmonic-triadic-1-rgb: var(--sn-accent-rgb);
+  --sn-card-harmonic-triadic-2-rgb: var(--sn-accent-rgb);
 
   // === Timing ===
   --sn-card-stellar-breath-duration: 4s;
@@ -269,28 +269,6 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::
   box-shadow: 0 0 6px rgba(var(--sn-card-harmonic-analogous-1-rgb), 0.5);
 }
 
-// =============================================================================
-// SEARCH EXCLUSION - Complete Isolation
-// =============================================================================
-
-.main-searchPage-content .main-card-card {
-  /* Removed all: unset to retain essential card layout */
-  display: block;
-  position: relative;
-  cursor: pointer;
-
-  // Ensure no cosmic interference
-  animation: none !important;
-  box-shadow: none !important;
-  border: none !important;
-  background: none !important;
-  transform: none !important;
-
-  &::before,
-  &::after {
-    display: none !important;
-  }
-}
 
 // =============================================================================
 // ACCESSIBILITY & PERFORMANCE

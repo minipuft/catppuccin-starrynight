@@ -1,5 +1,8 @@
 import { promises as fs } from "fs";
 import * as path from "path";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore – postcss-scss ships no types yet
+import scss from "postcss-scss";
 
 /**
  * Phase 4 helper — pruneDuplicateDecls.ts
@@ -136,29 +139,30 @@ async function pruneFile(
   tokens: string[],
   write: boolean
 ): Promise<number> {
-  let content: string;
+  let css: string;
   try {
-    content = await fs.readFile(filePath, "utf8");
+    css = await fs.readFile(filePath, "utf8");
   } catch {
     return 0;
   }
-  const original = content;
 
-  for (const t of tokens) {
-    const token = t.trim();
-    if (!token.startsWith("--")) continue;
-    const pattern = new RegExp(
-      `^\\s*${escapeRegExp(token)}\\s*:[^;]+;?\\s*$`,
-      "gm"
-    );
-    content = content.replace(pattern, "");
+  const tokenSet = new Set(tokens.map((t) => t.trim()));
+
+  let mutated = false;
+  const root = scss.parse(css);
+
+  root.walkDecls((decl) => {
+    if (tokenSet.has(decl.prop.trim())) {
+      decl.remove();
+      mutated = true;
+    }
+  });
+
+  if (mutated && write) {
+    await fs.writeFile(filePath, root.toString(), "utf8");
   }
 
-  let removed = original.length - content.length;
-  if (removed > 0 && write) {
-    await fs.writeFile(filePath, content, "utf8");
-  }
-  return removed > 0 ? 1 : 0;
+  return mutated ? 1 : 0;
 }
 
 async function run() {

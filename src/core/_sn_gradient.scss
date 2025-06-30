@@ -1,57 +1,59 @@
-// StarryNight Gradient Module - YEAR 3000 ARTISTIC REVOLUTION SYSTEM 🌌
-// FLUX COSMIC TRANSFORMATION: Bold Expression Over Corporate Safety
+/* StarryNight Gradient Module - YEAR 3000 ARTISTIC REVOLUTION SYSTEM 🌌*/
+/* FLUX COSMIC TRANSFORMATION: Bold Expression Over Corporate Safety*/
 @use "_mixins" as *;
 
-// ══════════════════════════════════════════════════════════════════════════════
-// YEAR 3000 BEATSYNC GRADIENT CONSCIOUSNESS VARIABLES
-// Every gradient now pulses with the cosmic heartbeat
-// ══════════════════════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════════════════════*/
+/* YEAR 3000 BEATSYNC GRADIENT CONSCIOUSNESS VARIABLES*/
+/* Every gradient now pulses with the cosmic heartbeat*/
+/* ══════════════════════════════════════════════════════════════════════════════*/
 :root {
-  // === RHYTHMIC FOUNDATION - Direct BeatSync Integration ===
+  /* === RHYTHMIC FOUNDATION - Direct BeatSync Integration ===*/
   --gradient-beat-intensity: var(
     --sn-beat-pulse-intensity,
     0
-  ); // 0-1 beat pulse strength
-  --gradient-rhythm-phase: var(--sn-rhythm-phase, 0); // Continuous rhythm phase
+  ); /* 0-1 beat pulse strength*/
+  --gradient-rhythm-phase: var(--sn-rhythm-phase, 0); /* Continuous rhythm phase*/
   --gradient-breathing-scale: var(
     --sn-breathing-scale,
     1
-  ); // Breathing rhythm 0.95-1.05
+  ); /* Breathing rhythm 0.95-1.05*/
 
-  // Default gradient values using Catppuccin base colors (will be overridden by JavaScript)
-  --sn-gradient-primary: var(--spice-accent);
-  --sn-gradient-secondary: var(--spice-surface0);
+  /* Default gradient values using Catppuccin base colors (will be overridden by JavaScript)*/
   --sn-gradient-accent: var(--spice-surface1);
 
-  // RGB versions for components that need them
+  /* Legacy color tokens (non-RGB) still referenced by a few components */
+  --sn-gradient-primary: var(--spice-accent);
+  --sn-gradient-secondary: var(--spice-surface0);
+
+  /* RGB versions for components that need them*/
   --sn-gradient-primary-rgb: var(--spice-rgb-accent);
   --sn-gradient-secondary-rgb: var(--spice-rgb-surface0);
   --sn-gradient-accent-rgb: var(--spice-rgb-surface1);
 
-  // 🌌 YEAR 3000 ARTISTIC PARAMETERS - BEATSYNC ENHANCED Bold Expression Mode!
+  /* 🌌 YEAR 3000 ARTISTIC PARAMETERS - BEATSYNC ENHANCED Bold Expression Mode!*/
   --sn-gradient-opacity: calc(
     0.28 + (var(--gradient-beat-intensity) * 0.15)
-  ); // PULSES with beats!
+  ); /* PULSES with beats!*/
   --sn-gradient-blur: calc(
     35px + (var(--gradient-beat-intensity) * 10px)
-  ); // Dynamic blur with rhythm
+  ); /* Dynamic blur with rhythm*/
   --sn-gradient-saturation: calc(
     1.45 + (var(--gradient-beat-intensity) * 0.25)
-  ); // VIBRANT with rhythm!
+  ); /* VIBRANT with rhythm!*/
   --sn-gradient-brightness: calc(
     1.25 + (var(--gradient-beat-intensity) * 0.15)
-  ); // LUMINOUS with beats!
+  ); /* LUMINOUS with beats!*/
   --sn-gradient-contrast: calc(
     1.35 + (var(--gradient-beat-intensity) * 0.2)
-  ); // IMPACTFUL with rhythm!
+  ); /* IMPACTFUL with rhythm!*/
 
-  // 🎵 MUSIC-RESPONSIVE VARIABLES - Cosmic Synchronization
-  --sn-music-energy: 0.5; // Set by music analysis (0.0 - 1.0)
-  --sn-music-valence: 0.5; // Musical positivity (0.0 - 1.0)
-  --sn-music-intensity-boost: 1; // Dynamic multiplier from music
-  --sn-cosmic-sync-enabled: 1; // 1 = enabled, 0 = disabled
+  /* 🎵 MUSIC-RESPONSIVE VARIABLES - Cosmic Synchronization*/
+  --sn-music-energy: 0.5; /* Set by music analysis (0.0 - 1.0)*/
+  --sn-music-valence: 0.5; /* Musical positivity (0.0 - 1.0)*/
+  --sn-music-intensity-boost: 1; /* Dynamic multiplier from music*/
+  --sn-cosmic-sync-enabled: 1; /* 1 = enabled, 0 = disabled*/
 
-  // 🌟 DYNAMIC ARTISTIC INTENSITY - Scales with music and mode
+  /* 🌟 DYNAMIC ARTISTIC INTENSITY - Scales with music and mode*/
   --sn-dynamic-opacity: calc(
     var(--sn-gradient-opacity) * var(--sn-music-intensity-boost, 1)
   );
@@ -62,31 +64,31 @@
     var(--sn-gradient-brightness) * (1 + (var(--sn-music-valence, 0.5) * 0.2))
   );
 
-  // YEAR 3000: Organic transition system with cosmic enhancement
+  /* YEAR 3000: Organic transition system with cosmic enhancement*/
   --sn-gradient-transition: 2400ms
     var(--sn-easing-emergence, cubic-bezier(0.25, 0.46, 0.45, 0.94));
 
-  // Phase 2: Breathing rhythm variables (set by JavaScript)
+  /* Phase 2: Breathing rhythm variables (set by JavaScript)*/
   --sn-organic-duration: 2400ms;
   --sn-breathing-inhale: 1200ms;
   --sn-breathing-hold: 600ms;
   --sn-breathing-exhale: 600ms;
 
-  // Phase 2: Natural easing curves (golden ratio based)
-  --sn-easing-organic: cubic-bezier(0.618, 0, 0.382, 1);
-  --sn-easing-breathing: cubic-bezier(0.455, 0.03, 0.515, 0.955);
-  --sn-easing-emergence: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --sn-easing-harmony: cubic-bezier(0.165, 0.84, 0.44, 1);
+  /* Phase 2: Natural easing curves – now alias to the canonical emergence easing */
+  --sn-easing-emergence: cubic-bezier(0.25, 0.46, 0.45, 0.94); // canonical source
+  --sn-easing-organic: var(--sn-easing-emergence);
+  --sn-easing-breathing: var(--sn-easing-emergence);
+  --sn-easing-harmony: var(--sn-easing-emergence);
 
-  // Phase 2: GPU acceleration optimization
+  /* Phase 2: GPU acceleration optimization*/
   --sn-gpu-acceleration: transform, opacity, filter;
 }
 
-// 🌌 YEAR 3000: Main gradient background overlay - BOLD COSMIC PRESENCE!
+/* 🌌 YEAR 3000: Main gradient background overlay - BOLD COSMIC PRESENCE!*/
 .Root__main-view {
   position: relative;
 
-  // Primary gradient layer - YEAR 3000 RHYTHMIC CONSCIOUSNESS (Beats & Breathes!)
+  /* Primary gradient layer - YEAR 3000 RHYTHMIC CONSCIOUSNESS (Beats & Breathes!)*/
   &::before {
     content: "";
     position: fixed;
@@ -135,7 +137,7 @@
     }
   }
 
-  // 🌟 YEAR 3000: Secondary accent gradient - Enhanced Cosmic Depth
+  /* 🌟 YEAR 3000: Secondary accent gradient - Enhanced Cosmic Depth*/
   &::after {
     content: "";
     position: fixed;
@@ -146,25 +148,25 @@
     background: linear-gradient(
       135deg,
       rgba(var(--sn-gradient-accent-rgb), 0.22) 0%,
-      // BOLD! Up from pathetic 0.08
+      /* BOLD! Up from pathetic 0.08*/
       transparent 30%,
       transparent 70%,
-      rgba(var(--sn-gradient-accent-rgb), 0.12) 100% // VISIBLE! Up from 0.04
+      rgba(var(--sn-gradient-accent-rgb), 0.12) 100% /* VISIBLE! Up from 0.04*/
     );
     opacity: calc(
       var(--sn-dynamic-opacity) * 0.8
-    ); // Music-responsive with 80% intensity
+    ); /* Music-responsive with 80% intensity*/
     z-index: -9;
     transition: all var(--sn-gradient-transition);
 
-    // Phase 2: GPU acceleration for organic transitions
+    /* Phase 2: GPU acceleration for organic transitions*/
     will-change: var(--sn-gpu-acceleration);
-    transform: translateZ(0); // Force GPU layer
+    transform: translateZ(0); /* Force GPU layer*/
     @include performance-optimized;
   }
 }
 
-// 🌌 COSMIC PULSE ANIMATION - Music-Responsive Breathing
+/* 🌌 COSMIC PULSE ANIMATION - Music-Responsive Breathing*/
 @keyframes cosmic-pulse {
   0%,
   100% {
@@ -177,7 +179,7 @@
   }
 }
 
-// YEAR 3000: Enhanced gradient for main content areas - BOLD ARTISTIC PRESENCE
+/* YEAR 3000: Enhanced gradient for main content areas - BOLD ARTISTIC PRESENCE*/
 .main-gridContainer-gridContainer {
   position: relative;
 
@@ -191,23 +193,23 @@
     background: linear-gradient(
       180deg,
       rgba(var(--sn-gradient-primary-rgb), 0.18) 0%,
-      // BOLD! Up from timid 0.06
+      /* BOLD! Up from timid 0.06*/
       rgba(var(--sn-gradient-secondary-rgb), 0.1) 50%,
-      // VISIBLE! Up from 0.03
+      /* VISIBLE! Up from 0.03*/
       transparent 100%
     );
     z-index: -1;
     transition: all var(--sn-gradient-transition);
     pointer-events: none;
 
-    // Phase 2: GPU optimization
+    /* Phase 2: GPU optimization*/
     will-change: var(--sn-gpu-acceleration);
     transform: translateZ(0);
     @include performance-optimized;
   }
 }
 
-// Year 3000: Enhanced gradient for album/artist pages - COSMIC ARTISTIC IMPACT
+/* Year 3000: Enhanced gradient for album/artist pages - COSMIC ARTISTIC IMPACT*/
 .main-entityHeader-container,
 .main-shelf-header {
   position: relative;
@@ -222,23 +224,23 @@
     background: linear-gradient(
       180deg,
       rgba(var(--sn-gradient-primary-rgb), 0.25) 0%,
-      // BOLD! Up from timid 0.08
+      /* BOLD! Up from timid 0.08*/
       rgba(var(--spice-rgb-base), 0.6) 70%,
-      // VISIBLE! Up from 0.5
+      /* VISIBLE! Up from 0.5*/
       var(--spice-base) 100%
     );
-    opacity: var(--sn-dynamic-opacity); // Music-responsive!
+    opacity: var(--sn-dynamic-opacity); /* Music-responsive!*/
     z-index: -1;
     transition: all var(--sn-gradient-transition);
 
-    // Phase 2: GPU acceleration for organic transitions
+    /* Phase 2: GPU acceleration for organic transitions*/
     will-change: var(--sn-gpu-acceleration);
     transform: translateZ(0);
     @include performance-optimized;
   }
 }
 
-// Year 3000: Now playing bar BOLD gradient - Artistic rhythm synchronization
+/* Year 3000: Now playing bar BOLD gradient - Artistic rhythm synchronization*/
 .Root__now-playing-bar {
   position: relative;
 
@@ -249,28 +251,16 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(
-      90deg,
-      rgba(var(--sn-gradient-primary-rgb), 0.2) 0%,
-      // BOLD! Up from timid 0.06
-      rgba(var(--spice-rgb-player), 0.4) 50%,
-      // VISIBLE! Up from 0.3
-      rgba(var(--sn-gradient-primary-rgb), 0.2) 100% // CONSISTENT BOLDNESS!
-    );
-    opacity: calc(
-      var(--sn-dynamic-opacity) * 0.7
-    ); // Music-responsive with 70% intensity
-    z-index: -1;
-    transition: all var(--sn-gradient-transition);
 
-    // Phase 2: GPU acceleration for organic transitions
+
+    /* Phase 2: GPU acceleration for organic transitions*/
     will-change: var(--sn-gpu-acceleration);
     transform: translateZ(0);
     @include performance-optimized;
   }
 }
 
-// Year 3000: Utility classes for organic gradient control (Phase 2)
+/* Year 3000: Utility classes for organic gradient control (Phase 2)*/
 .sn-gradient-disabled {
   .Root__main-view::before,
   .Root__main-view::after {
@@ -280,24 +270,24 @@
 }
 
 .sn-gradient-minimal {
-  --sn-gradient-opacity: 0.04; // Even gentler than default
-  --sn-gradient-blur: 40px; // More diffused
-  --sn-gradient-saturation: 1.02; // Barely noticeable
+  --sn-gradient-opacity: 0.04; /* Even gentler than default*/
+  --sn-gradient-blur: 40px; /* More diffused*/
+  --sn-gradient-saturation: 1.02; /* Barely noticeable*/
 }
 
 .sn-gradient-balanced {
-  --sn-gradient-opacity: 0.08; // Default Year 3000 value
-  --sn-gradient-blur: 30px; // Default blur
-  --sn-gradient-saturation: 1.05; // Default gentle enhancement
+  --sn-gradient-opacity: 0.08; /* Default Year 3000 value*/
+  --sn-gradient-blur: 30px; /* Default blur*/
+  --sn-gradient-saturation: 1.05; /* Default gentle enhancement*/
 }
 
 .sn-gradient-intense {
-  --sn-gradient-opacity: 0.12; // Still much gentler than old 0.5
-  --sn-gradient-blur: 20px; // Slightly less diffused
-  --sn-gradient-saturation: 1.08; // Maximum gentle enhancement
+  --sn-gradient-opacity: 0.12; /* Still much gentler than old 0.5*/
+  --sn-gradient-blur: 20px; /* Slightly less diffused*/
+  --sn-gradient-saturation: 1.08; /* Maximum gentle enhancement*/
 }
 
-// Phase 2: Breathing rhythm intensity controls
+/* Phase 2: Breathing rhythm intensity controls*/
 .sn-breathing-subtle {
   --sn-breathing-inhale: 800ms;
   --sn-breathing-hold: 400ms;
@@ -305,9 +295,9 @@
 }
 
 .sn-breathing-moderate {
-  --sn-breathing-inhale: 1200ms; // Default
-  --sn-breathing-hold: 600ms; // Default
-  --sn-breathing-exhale: 600ms; // Default
+  --sn-breathing-inhale: 1200ms; /* Default*/
+  --sn-breathing-hold: 600ms; /* Default*/
+  --sn-breathing-exhale: 600ms; /* Default*/
 }
 
 .sn-breathing-deep {
@@ -316,14 +306,14 @@
   --sn-breathing-exhale: 800ms;
 }
 
-// Phase 2: Performance optimization class
+/* Phase 2: Performance optimization class*/
 .sn-performance-mode {
   .Root__main-view::before,
   .Root__main-view::after,
   .main-gridContainer-gridContainer::before,
   .Root__now-playing-bar::before {
-    will-change: auto !important; // Disable GPU acceleration
-    filter: none !important; // Disable filters for performance
-    --sn-gradient-transition: 1000ms ease !important; // Simpler transition
+    will-change: auto !important; /* Disable GPU acceleration*/
+    filter: none !important; /* Disable filters for performance*/
+    --sn-gradient-transition: 1000ms ease !important; /* Simpler transition*/
   }
 }

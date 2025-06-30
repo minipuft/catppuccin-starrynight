@@ -25,15 +25,15 @@
   // TODO: Artist-specific theming hooks using [data-testid*="artist"] selectors
   --artist-aura-signature-primary: var(
     --header-soul-primary,
-    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.18)
+    rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.18)
   );
   --artist-aura-signature-secondary: var(
     --header-soul-secondary,
-    rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.14)
+    rgba(var(--sn-accent-rgb, var(--spice-rgb-surface0)), 0.14)
   );
   --artist-aura-signature-accent: var(
     --header-soul-accent,
-    rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0.2)
+    rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.2)
   );
 
   // === ATMOSPHERIC CASCADE INFLUENCE ===
@@ -239,18 +239,5 @@ body:has(.main-entityHeader-container) .main-view-container {
   .main-view-container::before {
     opacity: calc(var(--artist-aura-intensity) * 0.2) !important;
     filter: blur(3px) !important;
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🚫 SEARCH EXCLUSION GUARD (Maintain Existing Behavior)
-// ═══════════════════════════════════════════════════════════════════════════════
-
-// TODO: Maintain backwards compatibility with existing entity header system
-// Disable aura fields in search to preserve search functionality
-body:has(.main-searchPage-content) {
-  .main-view-container::before {
-    opacity: 0 !important;
-    animation: none !important;
   }
 }

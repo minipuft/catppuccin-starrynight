@@ -224,6 +224,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
   enableCosmicSync: true, // NEW: Music-driven visual intensity
   musicModulationIntensity: 0.25,
 
+  // Active artistic mode for UX / visual presets
   artisticMode: "artist-vision", // "corporate-safe" | "artist-vision" | "cosmic-maximum"
 
   // Context-bound method references for external calling
@@ -347,7 +348,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
         console.warn(
           "[YEAR3000_CONFIG] getCurrentModeProfile method not available, using fallback multipliers"
         );
-        return this.artisticMultipliers as any; // Fallback to legacy multipliers
+        return this["artisticMultipliers"] as any; // Fallback to legacy multipliers
       }
 
       const currentProfile = this.getCurrentModeProfile();
@@ -357,13 +358,13 @@ export const YEAR3000_CONFIG: Year3000Config = {
         console.warn(
           "[YEAR3000_CONFIG] Invalid profile or missing multipliers, using fallback"
         );
-        return this.artisticMultipliers as any;
+        return this["artisticMultipliers"] as any;
       }
 
       return currentProfile.multipliers;
     } catch (error) {
       console.error("[YEAR3000_CONFIG] Error in getCurrentMultipliers:", error);
-      return this.artisticMultipliers as any; // Safe fallback
+      return this["artisticMultipliers"] as any; // Safe fallback
     }
   },
 

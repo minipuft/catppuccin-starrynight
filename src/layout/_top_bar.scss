@@ -33,13 +33,13 @@
   --sn-search-ripple-intensity: calc(var(--sn-beat-pulse-intensity, 0) * 0.6);
   --sn-search-focus-bloom: calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.05);
   --sn-search-beat-border: rgba(
-    var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+    var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
     calc(0.3 + var(--sn-beat-pulse-intensity, 0) * 0.4)
   );
 
   // === BUTTON CONSCIOUSNESS VARIABLES ===
   --sn-button-harmony-color: rgba(
-    var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+    var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
     calc(0.1 + var(--sn-beat-pulse-intensity, 0) * 0.2)
   );
   --sn-button-bloom-scale: calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.03);
@@ -66,14 +66,14 @@
     linear-gradient(
       calc(90deg + var(--sn-topbar-consciousness-flow)),
             rgba(
-        var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+        var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
         var(--sn-topbar-cosmic-opacity)
       )
         0%,
       transparent 40%,
       transparent 60%,
             rgba(
-        var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0, 186,187,241)),
+        var(--sn-accent-rgb, var(--spice-rgb-surface0, 186,187,241)),
         calc(var(--sn-topbar-cosmic-opacity) * 0.8)
       )
         100%
@@ -84,12 +84,12 @@
   // BLOOM glow effect during beats
   box-shadow: 0 2px var(--sn-button-cosmic-glow)
           rgba(
-      var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+      var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
       calc(var(--sn-topbar-beat-glow-intensity) * 0.3)
     ),
     inset 0 1px 0
       rgba(
-        var(--sn-gradient-accent-rgb, "140,170,238"),
+        var(--sn-accent-rgb, "140,170,238"),
         calc(var(--sn-topbar-beat-glow-intensity) * 0.2)
       );
 
@@ -114,7 +114,7 @@
     background: radial-gradient(
       ellipse 150% 100% at 50% 0%,
       rgba(
-          var(--sn-dynamic-accent-rgb, 140,170,238),
+          var(--sn-accent-rgb, 140,170,238),
           calc(var(--sn-topbar-energy-absorption) * 0.15)
         )
         0%,
@@ -135,11 +135,15 @@
     background: radial-gradient(
       ellipse at center,
       rgba(
-          var(--sn-gradient-primary-rgb, "202,158,230"),
+          var(--sn-accent-rgb, "202,158,230"),
           calc(var(--sn-topbar-cosmic-opacity) * 1.5)
         )
         0%,
-      rgba(var(--spice-rgb-player, "49,50,68"), 0.2) 100%
+      /* Pull secondary gradient tint instead of the old player colour */
+      rgba(
+        var(--sn-accent-rgb, var(--spice-rgb-base)),
+        0.2
+      ) 100%
     ) !important;
 
     // BREATHING effect
@@ -167,7 +171,7 @@
       135deg,
       rgba(var(--spice-rgb-overlay0, "108,112,134"), 0.9) 0%,
       rgba(
-          var(--sn-gradient-primary-rgb, "202,158,230"),
+          var(--sn-accent-rgb, "202,158,230"),
           calc(var(--sn-search-ripple-intensity) * 0.1)
         )
         100%
@@ -176,12 +180,12 @@
     // Cosmic glow during activity
     box-shadow: 0 0 calc(8px + var(--sn-search-ripple-intensity) * 12px)
         rgba(
-          var(--sn-dynamic-accent-rgb, 140,170,238),
+          var(--sn-accent-rgb, 140,170,238),
           calc(var(--sn-search-ripple-intensity) * 0.4)
         ),
       inset 0 1px 3px
         rgba(
-          var(--sn-gradient-primary-rgb, "202,158,230"),
+          var(--sn-accent-rgb, "202,158,230"),
           calc(var(--sn-search-ripple-intensity) * 0.2)
         );
 
@@ -205,16 +209,16 @@
     &:focus {
       // Intensified BLOOM on focus
       transform: scale(calc(var(--sn-search-focus-bloom) * 1.02));
-      border-color: rgba(var(--sn-gradient-primary-rgb, "202,158,230"), 0.8);
+      border-color: rgba(var(--sn-accent-rgb, "202,158,230"), 0.8);
 
       box-shadow: 0 0 calc(12px + var(--sn-search-ripple-intensity) * 16px)
           rgba(
-            var(--sn-dynamic-accent-rgb, 140,170,238),
+            var(--sn-accent-rgb, 140,170,238),
             calc(var(--sn-search-ripple-intensity) * 0.6 + 0.3)
           ),
         inset 0 2px 4px
           rgba(
-            var(--sn-gradient-primary-rgb, "202,158,230"),
+            var(--sn-accent-rgb, "202,158,230"),
             calc(var(--sn-search-ripple-intensity) * 0.3 + 0.1)
           );
 
@@ -225,7 +229,7 @@
     // Typing rhythm response
     &:not(:placeholder-shown) {
       border-color: rgba(
-        var(--sn-dynamic-accent-rgb, 140,170,238),
+        var(--sn-accent-rgb, 140,170,238),
         calc(0.6 + var(--sn-beat-pulse-intensity, 0) * 0.3)
       );
     }
@@ -239,7 +243,7 @@
     );
 
     &:hover {
-      color: rgba(var(--sn-dynamic-accent-rgb, 140,170,238), 1);
+      color: rgba(var(--sn-accent-rgb, 140,170,238), 1);
       transform: scale(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
     }
   }
@@ -267,7 +271,7 @@
     // Cosmic border enhancement
     border: 1px solid
       rgba(
-        var(--sn-dynamic-accent-rgb, 140,170,238),
+        var(--sn-accent-rgb, 140,170,238),
         calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.3)
       ) !important;
     border-radius: 8px;
@@ -287,7 +291,7 @@
         90deg,
         transparent 0%,
         rgba(
-            var(--sn-dynamic-accent-rgb, 140,170,238),
+            var(--sn-accent-rgb, 140,170,238),
             calc(var(--sn-topbar-energy-absorption) * 0.3)
           )
           50%,
@@ -300,19 +304,19 @@
     // Enhanced hover states with cosmic consciousness
     &:hover {
       background: rgba(
-        var(--sn-gradient-primary-rgb, "202,158,230"),
+        var(--sn-accent-rgb, "202,158,230"),
         calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.15)
       ) !important;
 
       // BLOOM glow enhancement
       box-shadow: 0 0 var(--sn-button-cosmic-glow)
           rgba(
-            var(--sn-gradient-primary-rgb, "202,158,230"),
+            var(--sn-accent-rgb, "202,158,230"),
             calc(var(--sn-topbar-beat-glow-intensity) * 0.5 + 0.2)
           ),
         inset 0 1px 2px
           rgba(
-            var(--sn-dynamic-accent-rgb, 140,170,238),
+            var(--sn-accent-rgb, 140,170,238),
             calc(var(--sn-topbar-beat-glow-intensity) * 0.3)
           );
 
@@ -330,12 +334,12 @@
     &:active {
       transform: scale(calc(var(--sn-button-bloom-scale) * 0.95));
       box-shadow: inset 0 2px 4px
-        rgba(var(--sn-gradient-primary-rgb, "202,158,230"), 0.3);
+        rgba(var(--sn-accent-rgb, "202,158,230"), 0.3);
     }
 
     // Focus state accessibility
     &:focus-visible {
-      outline: 2px solid rgba(var(--sn-dynamic-accent-rgb, 140,170,238), 0.8);
+      outline: 2px solid rgba(var(--sn-accent-rgb, 140,170,238), 0.8);
       outline-offset: 2px;
     }
   }
@@ -346,7 +350,7 @@
     filter: drop-shadow(
       0 0 calc(6px + var(--sn-beat-pulse-intensity, 0) * 8px)
         rgba(
-          var(--sn-gradient-primary-rgb, "202,158,230"),
+          var(--sn-accent-rgb, "202,158,230"),
           calc(var(--sn-topbar-beat-glow-intensity) * 0.8 + 0.2)
         )
     );

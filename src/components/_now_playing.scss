@@ -9,6 +9,20 @@
 :root {
   @include now-playing-bar-root {
     // ══════════════════════════════════════════════════════════════════════════════
+    // GLASSMORPHISM INTEGRATION - Now-Playing Glass Convergence Phase 3
+    // ══════════════════════════════════════════════════════════════════════════════
+    
+    // Apply dynamic glassmorphism effects to the now-playing bar
+    // Phase 3: Beat-Sync Glass Effects - Automatic beat-responsive blur/opacity
+    @include glassmorphism-dynamic;
+    
+    // Phase 3: COMPLETED - Beat-boost glass variable integration
+    // - Blur increases by up to 5px on heavy beats (--sn-glass-beat-boost)
+    // - Smooth 400ms ease-back transitions with GPU acceleration
+    // - Performance optimized with meaningful threshold checks
+    // TODO: Phase 4 - Add glass layering hooks for depth effects
+    
+    // ══════════════════════════════════════════════════════════════════════════════
     // CONTROL BUTTONS - Year 3000 Enhanced
     // ══════════════════════════════════════════════════════════════════════════════
 
@@ -27,7 +41,7 @@
         filter: drop-shadow(
           0 0 calc(4px * var(--sn-beat-pulse-intensity, 0))
             rgba(
-              var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
+              var(--sn-accent-rgb),
               calc(0.4 * var(--sn-beat-pulse-intensity, 0))
             )
         );
@@ -40,7 +54,7 @@
         transform: scale(var(--sn-breathing-scale, 1));
         text-shadow: 0 0 calc(4px * var(--sn-beat-pulse-intensity, 0))
           rgba(
-            var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+            var(--sn-accent-rgb),
             calc(0.6 * var(--sn-beat-pulse-intensity, 0))
           );
       }
@@ -48,7 +62,8 @@
 
     // Play Button - THE COSMIC HEART ❤️‍🔥
     .main-playButton-PlayButton.main-playButton-primary {
-      color: var(--spice-player);
+      // Use unified Year 3000 dynamic accent so play button palette stays in-sync
+      color: var(--sn-accent-hex);
       position: relative;
       transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.4);
 
@@ -64,7 +79,7 @@
         background: radial-gradient(
           circle,
           rgba(
-              var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+              var(--sn-accent-rgb),
               calc(0.25 * var(--sn-beat-pulse-intensity, 0))
             )
             0%,
@@ -80,7 +95,7 @@
         background: radial-gradient(
           circle,
           rgba(
-              var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+              var(--sn-accent-rgb),
               calc(0.35 * var(--sn-beat-pulse-intensity, 0))
             )
             0%,
@@ -89,31 +104,44 @@
       }
     }
 
-    // Primary Button - Enhanced background consciousness
+    // Primary Button - Enhanced background consciousness (Glass-compatible)
     .main-button-primary {
-      background: linear-gradient(
-        135deg,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-main)), 0.9) 0%,
-        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-main)), 0.7) 100%
+      // Use CSS variables compatible with glassmorphism system
+      background: var(
+        --glass-button-background,
+        linear-gradient(
+          135deg,
+          rgba(var(--sn-accent-rgb), 0.9) 0%,
+          rgba(var(--sn-accent-rgb), 0.7) 100%
+        )
       );
       border: 1px solid
-        rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)), 0.3);
+        var(
+          --glass-button-border,
+          rgba(var(--sn-accent-rgb), 0.3)
+        );
       transition: all 0.3s var(--sn-easing-explorer, ease-out);
+      
+      // TODO: Phase 2 - Add glass-button-layer for advanced depth effects
     }
 
     .main-button-primary:active,
     .main-button-primary:focus,
     .main-button-primary:hover {
-      background: linear-gradient(
-        135deg,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-sidebar)), 0.95) 0%,
-        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-sidebar)), 0.8) 100%
+      // Glass-compatible hover states
+      background: var(
+        --glass-button-background-hover,
+        linear-gradient(
+          135deg,
+          rgba(var(--sn-accent-rgb), 0.95) 0%,
+          rgba(var(--sn-accent-rgb), 0.8) 100%
+        )
       );
       // Kinetic Verb: BLOOM
       transform: scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.04)));
       box-shadow: 0 0 calc(6px * var(--sn-beat-pulse-intensity, 0))
         rgba(
-          var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
+          var(--sn-accent-rgb),
           calc(0.3 * var(--sn-beat-pulse-intensity, 0))
         );
     }
@@ -143,7 +171,7 @@
         );
         text-shadow: 0 0 calc(3px * var(--sn-beat-pulse-intensity, 0))
           rgba(
-            var(--sn-gradient-accent-rgb, var(--spice-rgb-accent)),
+            var(--sn-accent-rgb),
             calc(0.4 * var(--sn-beat-pulse-intensity, 0))
           );
       }
@@ -178,14 +206,14 @@
         background: linear-gradient(
           calc(90deg + (var(--sn-rhythm-phase, 0) * 4deg)),
           // Kinetic Verb: HARMONIZE
-          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-text)), 0.9) 0%,
-          rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-text)), 1) 50%,
-          rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-text)), 0.9) 100%
+          rgba(var(--sn-accent-rgb), 0.9) 0%,
+          rgba(var(--sn-accent-rgb), 1) 50%,
+          rgba(var(--sn-accent-rgb), 0.9) 100%
         );
         // Kinetic Verb: REFRACT - Progress bar glows with energy
         box-shadow: 0 0 calc(4px * var(--sn-beat-pulse-intensity, 0))
           rgba(
-            var(--sn-gradient-accent-rgb, var(--spice-rgb-text)),
+            var(--sn-accent-rgb),
             calc(0.5 * var(--sn-beat-pulse-intensity, 0))
           );
         transition: box-shadow 0.2s ease-out;
@@ -200,7 +228,7 @@
           90deg,
           transparent 0%,
           rgba(
-              var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+              var(--sn-accent-rgb),
               calc(0.1 * var(--sn-beat-pulse-intensity, 0))
             )
             50%,
@@ -210,5 +238,58 @@
         transition: all 0.3s ease-out;
       }
     }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// GLASSMORPHISM SETTINGS INTEGRATION - Now-Playing Glass Convergence
+// ════════════════════════════════════════════════════════════════════════════════
+
+// Glass intensity controls (integrates with settings system)
+.sn-glass-disabled {
+  @include now-playing-bar-root {
+    // Disable glass effects, use solid backgrounds
+    background: rgba(var(--spice-rgb-surface0), 0.9) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    
+    &::before {
+      background: rgba(var(--sn-accent-rgb), 0.8) !important;
+    }
+  }
+}
+
+// Performance and accessibility optimizations for now-playing bar
+@media (prefers-reduced-motion: reduce) {
+  @include now-playing-bar-root {
+    // Disable glass animations but keep basic glass effect
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+
+    &::before,
+    &::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}
+
+// Performance optimization for lower-end devices
+@media (max-resolution: 1dppx) {
+  @include now-playing-bar-root {
+    // Disable complex glass effects on low-resolution displays
+    &::after {
+      display: none;
+    }
+  }
+}
+
+// Solid fallback for unsupported browsers
+@supports not (backdrop-filter: blur(1px)) {
+  @include now-playing-bar-root {
+    background: rgba(var(--spice-rgb-surface0), 0.9) !important;
+    border-top: 1px solid rgba(var(--spice-rgb-surface1), 0.5);
   }
 }

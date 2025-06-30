@@ -1,14 +1,13 @@
 :root {
-  // Year 3000 — unified dynamic accent variable available to every visual system.
-  // It will be set at runtime by Year3000System; falls back to gradient or spice accent.
+  /* Year 3000 — unified dynamic accent variable available to every visual system.*/
+  /* It will be set at runtime by Year3000System; falls back to gradient or spice accent.*/
   --sn-dynamic-accent-rgb: var(--sn-gradient-accent-rgb, var(--spice-rgb-accent));
 
-  // Ensure legacy systems referencing the nav text energy color get correct default.
-  --sn-nav-text-energy-color-rgb: var(--sn-dynamic-accent-rgb, 140,170,238);
+  /* Ensure legacy systems referencing the nav text energy color get correct default.*/
 
   /* === Year 3000 – Text Glow & Gradient Controls === */
   --sn-text-glow-intensity: 0; /* 0 → no glow, 1 → full */
   --sn-text-gradient-angle: 135deg;
 
-  // Future scope: migrate other shared variables here for single-source-of-truth.
+  /* Future scope: migrate other shared variables here for single-source-of-truth.*/
 }

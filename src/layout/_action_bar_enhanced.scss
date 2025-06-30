@@ -64,7 +64,7 @@
     // Additional enhancement: subtle glow pulse
     box-shadow: 0 0 calc(8px * var(--sn-beat-pulse-intensity, 0))
       rgba(
-        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+        var(--sn-accent-rgb, var(--spice-rgb-accent)),
         calc(0.4 * var(--sn-beat-pulse-intensity, 0))
       );
   }
@@ -79,7 +79,7 @@
     height: 4px; // Fixed height for the bar
     transform: translateY(-50%) scaleX(var(--sn-beat-pulse-intensity, 0)); // Pulse width with beat, centered
     background: rgba(
-      var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+      var(--sn-accent-rgb, var(--spice-rgb-accent)),
       0.7
     ); // Solid color for the bar, using a dynamic theme color
     border-radius: 2px; // Rounded edges for the bar

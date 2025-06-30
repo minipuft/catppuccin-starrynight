@@ -55,7 +55,7 @@ export class LightweightParticleSystem extends BaseVisualSystem {
       (this.currentPerformanceProfile as any)?.maxParticles || 75;
   }
 
-  async initialize() {
+  override async initialize() {
     await super.initialize();
     this.createCanvas();
     this.initializeParticlePool();
@@ -102,12 +102,17 @@ export class LightweightParticleSystem extends BaseVisualSystem {
     if (!particle || !this.canvas) return;
 
     const rootStyle = window.getComputedStyle(Year3000Utilities.getRootStyle());
+
+    const accentRgbStr =
+      rootStyle.getPropertyValue("--sn-accent-rgb").trim() ||
+      rootStyle.getPropertyValue("--sn-gradient-accent-rgb").trim() ||
+      "202,158,230";
+
+    // Use primary gradient colour when available (legacy). Otherwise fall back
+    // to the canonical accent so particle palette remains coherent.
     const primaryRgbStr =
       rootStyle.getPropertyValue("--sn-gradient-primary-rgb").trim() ||
-      "202,158,230";
-    const accentRgbStr =
-      rootStyle.getPropertyValue("--sn-gradient-accent-rgb").trim() ||
-      "140,170,238";
+      accentRgbStr;
 
     particle.active = true;
     particle.currentX = Math.random() * this.canvas.width;
@@ -140,13 +145,13 @@ export class LightweightParticleSystem extends BaseVisualSystem {
    *
    * @param deltaMs   Milliseconds elapsed since the previous frame.
    */
-  public onAnimate(deltaMs: number): void {
+  public override onAnimate(deltaMs: number): void {
     if (!this.initialized) return;
 
     this.updateAnimation(performance.now(), deltaMs);
   }
 
-  public updateAnimation(timestamp: number, deltaTime: number) {
+  public override updateAnimation(timestamp: number, deltaTime: number) {
     if (!this.ctx || !this.canvas) return;
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -195,7 +200,7 @@ export class LightweightParticleSystem extends BaseVisualSystem {
   // --------------------------------------------------------------------
   // Central settings responder – adjust particle counts or reset pools
   // --------------------------------------------------------------------
-  public applyUpdatedSettings?(key: string, value: any): void {
+  public override applyUpdatedSettings?(key: string, value: any): void {
     // Star density drives particle count
     if (key === "sn-star-density") {
       const mapping: Record<string, number> = {

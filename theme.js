@@ -617,6 +617,7 @@
         enableCosmicSync: true,
         // NEW: Music-driven visual intensity
         musicModulationIntensity: 0.25,
+        // Active artistic mode for UX / visual presets
         artisticMode: "artist-vision",
         // "corporate-safe" | "artist-vision" | "cosmic-maximum"
         // Context-bound method references for external calling
@@ -739,19 +740,19 @@
               console.warn(
                 "[YEAR3000_CONFIG] getCurrentModeProfile method not available, using fallback multipliers"
               );
-              return this.artisticMultipliers;
+              return this["artisticMultipliers"];
             }
             const currentProfile = this.getCurrentModeProfile();
             if (!currentProfile || !currentProfile.multipliers) {
               console.warn(
                 "[YEAR3000_CONFIG] Invalid profile or missing multipliers, using fallback"
               );
-              return this.artisticMultipliers;
+              return this["artisticMultipliers"];
             }
             return currentProfile.multipliers;
           } catch (error) {
             console.error("[YEAR3000_CONFIG] Error in getCurrentMultipliers:", error);
-            return this.artisticMultipliers;
+            return this["artisticMultipliers"];
           }
         },
         // Enhanced: Get current features from active mode profile
@@ -1043,10 +1044,16 @@
   });
 
   // src-js/core/CSSVariableBatcher.ts
-  var _CSSVariableBatcher, CSSVariableBatcher;
+  var CRITICAL_NOW_PLAYING_VARS, _CSSVariableBatcher, CSSVariableBatcher;
   var init_CSSVariableBatcher = __esm({
     "src-js/core/CSSVariableBatcher.ts"() {
       "use strict";
+      CRITICAL_NOW_PLAYING_VARS = /* @__PURE__ */ new Set([
+        "--sn-beat-pulse-intensity",
+        "--sn-breathing-scale",
+        "--sn-accent-hex",
+        "--sn-accent-rgb"
+      ]);
       _CSSVariableBatcher = class _CSSVariableBatcher {
         constructor(config = {}) {
           this.config = {
@@ -1085,6 +1092,15 @@
           }
         }
         queueCSSVariableUpdate(property, value, element = null) {
+          if (CRITICAL_NOW_PLAYING_VARS.has(property)) {
+            const styleDecl = (element || document.documentElement).style;
+            if (_CSSVariableBatcher.nativeSetProperty) {
+              _CSSVariableBatcher.nativeSetProperty.call(styleDecl, property, value);
+            } else {
+              styleDecl.setProperty(property, value);
+            }
+            return;
+          }
           const target = element || document.documentElement;
           if (!this._cssVariableBatcher.enabled) {
             target.style.setProperty(property, value);
@@ -1333,6 +1349,7 @@
         _enableGlobalHijack() {
           if (_CSSVariableBatcher.hijackEnabled) return;
           const original = CSSStyleDeclaration.prototype.setProperty;
+          _CSSVariableBatcher.nativeSetProperty = original;
           const batchInstance = this;
           CSSStyleDeclaration.prototype.setProperty = function(prop, value, priority) {
             if (prop && prop.startsWith("--sn-") && batchInstance) {
@@ -2899,15 +2916,15 @@
   function testGravitySystemSelectors() {
     console.group("\u{1F30C} [Phase 1] Testing Gravity System Selectors");
     console.log("\u{1F3AF} Primary gravity well targets:");
-    if (GRAVITY_WELL_TARGETS.primary) {
-      GRAVITY_WELL_TARGETS.primary.forEach((selector) => {
+    if (GRAVITY_WELL_TARGETS["primary"]) {
+      GRAVITY_WELL_TARGETS["primary"].forEach((selector) => {
         const element = $$(selector)[0] || null;
         console.log(`${element ? "\u2705" : "\u274C"} ${selector}`, element);
       });
     }
     console.log("\u{1F3AF} Secondary gravity well targets:");
-    if (GRAVITY_WELL_TARGETS.secondary) {
-      GRAVITY_WELL_TARGETS.secondary.forEach((selector) => {
+    if (GRAVITY_WELL_TARGETS["secondary"]) {
+      GRAVITY_WELL_TARGETS["secondary"].forEach((selector) => {
         const element = $$(selector)[0] || null;
         console.log(`${element ? "\u2705" : "\u274C"} ${selector}`, element);
       });
@@ -2926,15 +2943,18 @@
       "\u{1F52E} [SpotifyDOMSelectors] Phase 2 - Prediction Target Validation"
     );
     const testSelectors = [
-      { name: "Track Rows", selector: ORBITAL_ELEMENTS.trackRows },
-      { name: "Progress Bar", selector: MODERN_SELECTORS.progressBar },
-      { name: "Play Button", selector: MODERN_SELECTORS.playButton },
-      { name: "Heart Button", selector: MODERN_SELECTORS.heartButton },
-      { name: "Album Cover", selector: MODERN_SELECTORS.albumCover },
-      { name: "Now Playing Widget", selector: MODERN_SELECTORS.nowPlayingWidget },
-      { name: "Now Playing Left", selector: MODERN_SELECTORS.nowPlayingLeft },
-      { name: "Left Sidebar", selector: MODERN_SELECTORS.leftSidebar },
-      { name: "Library Items", selector: ORBITAL_ELEMENTS.libraryItems }
+      { name: "Track Rows", selector: ORBITAL_ELEMENTS["trackRows"] },
+      { name: "Progress Bar", selector: MODERN_SELECTORS["progressBar"] },
+      { name: "Play Button", selector: MODERN_SELECTORS["playButton"] },
+      { name: "Heart Button", selector: MODERN_SELECTORS["heartButton"] },
+      { name: "Album Cover", selector: MODERN_SELECTORS["albumCover"] },
+      {
+        name: "Now Playing Widget",
+        selector: MODERN_SELECTORS["nowPlayingWidget"]
+      },
+      { name: "Now Playing Left", selector: MODERN_SELECTORS["nowPlayingLeft"] },
+      { name: "Left Sidebar", selector: MODERN_SELECTORS["leftSidebar"] },
+      { name: "Library Items", selector: ORBITAL_ELEMENTS["libraryItems"] }
     ];
     const results = {
       found: 0,
@@ -2969,12 +2989,12 @@
     const systemTests = {
       behavioralPrediction: validatePredictionTargets(),
       dimensionalNexus: {
-        sidebarElement: MODERN_SELECTORS.leftSidebar ? elementExists(MODERN_SELECTORS.leftSidebar) : false
+        sidebarElement: MODERN_SELECTORS["leftSidebar"] ? elementExists(MODERN_SELECTORS["leftSidebar"]) : false
       },
       dataGlyph: {
-        navLinks: MODERN_SELECTORS.navBarLink ? elementExists(MODERN_SELECTORS.navBarLink) : false,
-        trackRows: ORBITAL_ELEMENTS.trackRows ? elementExists(ORBITAL_ELEMENTS.trackRows) : false,
-        cards: ORBITAL_ELEMENTS.cards ? elementExists(ORBITAL_ELEMENTS.cards) : false
+        navLinks: MODERN_SELECTORS["navBarLink"] ? elementExists(MODERN_SELECTORS["navBarLink"]) : false,
+        trackRows: ORBITAL_ELEMENTS["trackRows"] ? elementExists(ORBITAL_ELEMENTS["trackRows"]) : false,
+        cards: ORBITAL_ELEMENTS["cards"] ? elementExists(ORBITAL_ELEMENTS["cards"]) : false
       }
     };
     let totalIssues = 0;
@@ -3052,12 +3072,12 @@
       };
       SELECTOR_MAPPINGS = Object.entries({
         // Migration mapping: legacy → modern
-        ".main-nowPlayingWidget-nowPlaying": MODERN_SELECTORS.nowPlayingBar,
-        ".main-navBar-navBar": MODERN_SELECTORS.leftSidebar,
-        ".main-search-searchBar": MODERN_SELECTORS.searchInput,
-        ".main-topBar-topBar": MODERN_SELECTORS.actionBar,
-        ".main-queue-queue": MODERN_SELECTORS.queue,
-        ".main-trackList-trackList": MODERN_SELECTORS.trackListContainer
+        ".main-nowPlayingWidget-nowPlaying": MODERN_SELECTORS["nowPlayingBar"],
+        ".main-navBar-navBar": MODERN_SELECTORS["leftSidebar"],
+        ".main-search-searchBar": MODERN_SELECTORS["searchInput"],
+        ".main-topBar-topBar": MODERN_SELECTORS["actionBar"],
+        ".main-queue-queue": MODERN_SELECTORS["queue"],
+        ".main-trackList-trackList": MODERN_SELECTORS["trackListContainer"]
       }).reduce((acc, [key, value]) => {
         if (typeof value === "string") {
           acc[key] = value;
@@ -3066,34 +3086,34 @@
       }, {});
       ORBITAL_ELEMENTS = {
         // Elements that can have orbital gravity effects
-        trackRows: MODERN_SELECTORS.trackRow ?? "",
-        libraryItems: MODERN_SELECTORS.libraryItems ?? "",
-        cards: MODERN_SELECTORS.card ?? "",
+        trackRows: MODERN_SELECTORS["trackRow"] ?? "",
+        libraryItems: MODERN_SELECTORS["libraryItems"] ?? "",
+        cards: MODERN_SELECTORS["card"] ?? "",
         navLinks: ".main-navBar-navBarLink"
         // This one still works
       };
       GRAVITY_WELL_TARGETS = {
         // Major UI elements that should have gravity wells
         primary: [
-          MODERN_SELECTORS.nowPlayingBar,
-          MODERN_SELECTORS.leftSidebar,
-          MODERN_SELECTORS.entityHeader
+          MODERN_SELECTORS["nowPlayingBar"],
+          MODERN_SELECTORS["leftSidebar"],
+          MODERN_SELECTORS["entityHeader"]
         ].filter((s) => !!s),
         secondary: [
-          MODERN_SELECTORS.actionBar,
-          MODERN_SELECTORS.queue,
-          MODERN_SELECTORS.searchInput
+          MODERN_SELECTORS["actionBar"],
+          MODERN_SELECTORS["queue"],
+          MODERN_SELECTORS["searchInput"]
         ].filter((s) => !!s),
         tertiary: [
-          MODERN_SELECTORS.playButton,
-          MODERN_SELECTORS.trackListHeader
+          MODERN_SELECTORS["playButton"],
+          MODERN_SELECTORS["trackListHeader"]
         ].filter((s) => !!s)
       };
       ANTI_GRAVITY_ZONES = {
         // Areas where anti-gravity effects should be applied
         searchAreas: [
-          MODERN_SELECTORS.searchInput,
-          MODERN_SELECTORS.searchPage
+          MODERN_SELECTORS["searchInput"],
+          MODERN_SELECTORS["searchPage"]
         ].filter((s) => !!s),
         notifications: [
           "[data-testid='notification-bar']",
@@ -3671,6 +3691,7 @@
     findRequiredLuminance: () => findRequiredLuminance,
     generateHarmonicOklabColors: () => generateHarmonicOklabColors,
     getBeatPhase: () => getBeatPhase,
+    getCanonicalAccent: () => getCanonicalAccent,
     getHealthMonitor: () => getHealthMonitor,
     getNextBeatTime: () => getNextBeatTime,
     getRootStyle: () => getRootStyle,
@@ -4080,6 +4101,26 @@
     hsl.l = Math.max(0, Math.min(100, hsl.l * brightness));
     return hslToRgb(hsl.h, hsl.s, hsl.l);
   }
+  function getCanonicalAccent() {
+    const root = getRootStyle();
+    const styles = getComputedStyle(root);
+    let hex = styles.getPropertyValue("--sn-accent-hex").trim();
+    let rgb = styles.getPropertyValue("--sn-accent-rgb").trim();
+    if (!hex && rgb) {
+      const [rStr = "0", gStr = "0", bStr = "0"] = rgb.split(/\s*,\s*/);
+      const r = parseInt(rStr, 10) || 0;
+      const g2 = parseInt(gStr, 10) || 0;
+      const b = parseInt(bStr, 10) || 0;
+      hex = rgbToHex(r, g2, b);
+    }
+    if (!rgb && hex) {
+      const rgbObj = hexToRgb(hex);
+      if (rgbObj) {
+        rgb = `${rgbObj.r},${rgbObj.g},${rgbObj.b}`;
+      }
+    }
+    return { hex, rgb };
+  }
   var HealthMonitor, healthMonitorInstance;
   var init_Year3000Utilities = __esm({
     "src-js/utils/Year3000Utilities.ts"() {
@@ -4143,7 +4184,9 @@
                 return "0.8";
               }
             })(),
-            "sn-animation-quality": "auto"
+            "sn-animation-quality": "auto",
+            "sn-glass-beat-pulse": "true",
+            "sn-glass-base-intensity": "0.5"
           };
           this.validationSchemas = {
             "catppuccin-flavor": {
@@ -4224,7 +4267,12 @@
             "sn-animation-quality": {
               default: "auto",
               allowedValues: ["auto", "low", "high"]
-            }
+            },
+            "sn-glass-beat-pulse": {
+              default: "true",
+              allowedValues: ["true", "false"]
+            },
+            "sn-glass-base-intensity": { default: "0.5" }
           };
           this.validateAndRepair();
           this.initialized = true;
@@ -4996,6 +5044,8 @@
           this.latestProcessedData = null;
           // High-precision beat scheduling
           this.beatSchedulerTimer = null;
+          // Phase 1: Song Change Debouncing
+          this.songChangeDebounceTimer = null;
           this.nextBeatIndex = 0;
           this.currentSongBeats = [];
           this.songStartTimestamp = 0;
@@ -5572,6 +5622,22 @@
           if (!force && trackUri === this.currentTrackUri) {
             return;
           }
+          if (this.songChangeDebounceTimer) {
+            clearTimeout(this.songChangeDebounceTimer);
+          }
+          if (force) {
+            await this._processSongUpdateInternal(trackUri);
+            return;
+          }
+          this.songChangeDebounceTimer = setTimeout(async () => {
+            this.songChangeDebounceTimer = null;
+            await this._processSongUpdateInternal(trackUri);
+          }, MUSIC_SYNC_CONFIG.synchronization.debounceRapidChanges);
+        }
+        /**
+         * Internal implementation of song processing, extracted for debouncing.
+         */
+        async _processSongUpdateInternal(trackUri) {
           this.invalidateTrackCaches(trackUri);
           try {
             const trackDuration = Spicetify.Player.data?.item?.duration?.milliseconds || 0;
@@ -5675,6 +5741,10 @@
           }
         }
         destroy() {
+          if (this.songChangeDebounceTimer) {
+            clearTimeout(this.songChangeDebounceTimer);
+            this.songChangeDebounceTimer = null;
+          }
           this.stopBeatScheduler();
           if (this.performanceInterval) clearInterval(this.performanceInterval);
           if (this.cacheCleanupInterval) clearInterval(this.cacheCleanupInterval);
@@ -6920,9 +6990,10 @@
             this._startEvolutionLoop();
           }
         }
-        // TODO: Legacy interface method - delegates to new onAnimate
-        updateAnimation(deltaTime) {
-          this.onAnimate(deltaTime);
+        // Unified implementation
+        updateAnimation(timestampOrDelta, maybeDelta) {
+          const delta = maybeDelta ?? timestampOrDelta;
+          this.onAnimate(delta);
         }
         // TODO: Implement proper onAnimate method for Year 3000 per-frame updates
         onAnimate(deltaMs) {
@@ -7112,7 +7183,7 @@
             text: { minContrast: 4.5, minHarmony: 0.6 },
             accent: { minContrast: 1.5, minHarmony: 0.3 }
           };
-          const requirements = contextRequirements[context] || contextRequirements.general;
+          const requirements = contextRequirements[context] || contextRequirements["general"];
           const currentPalette = this.catppuccinPalettes[this.currentTheme];
           if (!currentPalette?.neutrals?.base) {
             const errorMsg = `[StarryNight] Catppuccin palette or base neutral not found for theme: ${this.currentTheme}`;
@@ -7698,6 +7769,16 @@
           this.refreshPalette?.();
         }
       };
+      /**
+       * Canonical accent CSS custom property names.
+       *  – `--sn-accent-hex`  : Hex string (e.g. "#cba6f7")
+       *  – `--sn-accent-rgb`  : Comma-separated R,G,B channels (e.g. "203,166,247")
+       *
+       * These are written by the Year3000System colour pipeline and are considered
+       * the single source-of-truth accent accessed by SCSS and visual systems.
+       */
+      ColorHarmonyEngine.CANONICAL_HEX_VAR = "--sn-accent-hex";
+      ColorHarmonyEngine.CANONICAL_RGB_VAR = "--sn-accent-rgb";
     }
   });
 
@@ -8236,6 +8317,241 @@
     }
   });
 
+  // src-js/systems/nowPlaying/NowPlayingCoordinator.ts
+  function getNowPlayingCoordinator(config) {
+    return NowPlayingCoordinator.getInstance(config);
+  }
+  var _NowPlayingCoordinator, NowPlayingCoordinator;
+  var init_NowPlayingCoordinator = __esm({
+    "src-js/systems/nowPlaying/NowPlayingCoordinator.ts"() {
+      "use strict";
+      init_SpotifyDOMSelectors();
+      _NowPlayingCoordinator = class _NowPlayingCoordinator {
+        constructor(config = {}) {
+          this.pendingUpdates = /* @__PURE__ */ new Map();
+          this.isFlushScheduled = false;
+          this.rafId = null;
+          this.performanceAnalyzer = null;
+          // Performance tracking
+          this.flushCount = 0;
+          this.totalFlushTime = 0;
+          this.lastFlushTimestamp = 0;
+          // DOM observation for reactive refresh (Phase 4)
+          this.domObserver = null;
+          this.nowPlayingElement = null;
+          this.config = {
+            enableDebug: config.enableDebug ?? false,
+            maxBatchSize: config.maxBatchSize ?? 50,
+            ...config
+          };
+          this.performanceAnalyzer = config.performanceAnalyzer || null;
+          if (this.config.enableDebug) {
+            console.log(
+              "\u{1F3B5} [NowPlayingCoordinator] Initialized with RAF-based batching"
+            );
+          }
+        }
+        /**
+         * Singleton accessor for global coordination
+         */
+        static getInstance(config) {
+          if (!_NowPlayingCoordinator.instance) {
+            _NowPlayingCoordinator.instance = new _NowPlayingCoordinator(config);
+          }
+          return _NowPlayingCoordinator.instance;
+        }
+        /**
+         * Queue a CSS variable update for atomic application at next animation frame
+         */
+        queueUpdate(property, value) {
+          const criticalVars = [
+            "--sn-beat-pulse-intensity",
+            "--sn-breathing-scale",
+            "--sn-accent-hex",
+            "--sn-accent-rgb"
+          ];
+          if (criticalVars.includes(property)) {
+            return;
+          }
+          this.pendingUpdates.set(property, {
+            property,
+            value,
+            timestamp: performance.now()
+          });
+          if (this.config.enableDebug && this.pendingUpdates.size === 1) {
+            console.log(
+              `\u{1F3B5} [NowPlayingCoordinator] Queuing first update: ${property}`
+            );
+          }
+          this.scheduleFlush();
+        }
+        /**
+         * Schedule atomic flush at next animation frame
+         */
+        scheduleFlush() {
+          if (this.isFlushScheduled) {
+            return;
+          }
+          this.isFlushScheduled = true;
+          this.rafId = requestAnimationFrame(() => {
+            this.flushUpdates();
+          });
+        }
+        /**
+         * Atomically apply all pending updates
+         */
+        flushUpdates() {
+          if (this.pendingUpdates.size === 0) {
+            this.isFlushScheduled = false;
+            return;
+          }
+          const startTime = performance.now();
+          const root = document.documentElement;
+          const updateCount = this.pendingUpdates.size;
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F3B5} [NowPlayingCoordinator] Flushing ${updateCount} updates atomically`
+            );
+          }
+          if (updateCount > (this.config.maxBatchSize || 50)) {
+            console.warn(
+              `\u{1F3B5} [NowPlayingCoordinator] Large batch detected (${updateCount} updates), may impact performance`
+            );
+          }
+          for (const update of this.pendingUpdates.values()) {
+            try {
+              root.style.setProperty(update.property, update.value);
+            } catch (error) {
+              console.error(
+                `\u{1F3B5} [NowPlayingCoordinator] Failed to apply ${update.property}:`,
+                error
+              );
+            }
+          }
+          this.pendingUpdates.clear();
+          this.isFlushScheduled = false;
+          this.rafId = null;
+          if (this.config.onFlushComplete) {
+            try {
+              this.config.onFlushComplete();
+            } catch (error) {
+              console.error(
+                "\u{1F3B5} [NowPlayingCoordinator] Error in flush completion callback:",
+                error
+              );
+            }
+          }
+          const endTime = performance.now();
+          const flushTime = endTime - startTime;
+          this.flushCount++;
+          this.totalFlushTime += flushTime;
+          this.lastFlushTimestamp = endTime;
+          if (this.performanceAnalyzer) {
+            this.performanceAnalyzer.emitTrace?.(
+              `[NowPlayingCoordinator] Flushed ${updateCount} updates in ${flushTime.toFixed(
+                2
+              )}ms`
+            );
+          }
+          if (this.config.enableDebug && flushTime > 5) {
+            console.warn(
+              `\u{1F3B5} [NowPlayingCoordinator] Slow flush detected: ${flushTime.toFixed(
+                2
+              )}ms for ${updateCount} updates`
+            );
+          }
+        }
+        /**
+         * Phase 4: Setup DOM observation for reactive refresh
+         */
+        setupDOMObservation() {
+          if (this.domObserver) {
+            return;
+          }
+          this.nowPlayingElement = document.querySelector(
+            MODERN_SELECTORS["nowPlayingBar"]
+          );
+          if (!this.nowPlayingElement) {
+            if (this.config.enableDebug) {
+              console.warn(
+                "\u{1F3B5} [NowPlayingCoordinator] Now playing bar not found, deferring DOM observation"
+              );
+            }
+            setTimeout(() => this.setupDOMObservation(), 1e3);
+            return;
+          }
+          this.domObserver = new MutationObserver(() => {
+            this.queueUpdate("--sn-force-refresh", Date.now().toString());
+            if (this.config.enableDebug) {
+              console.log(
+                "\u{1F3B5} [NowPlayingCoordinator] DOM change detected, forcing refresh"
+              );
+            }
+          });
+          this.domObserver.observe(this.nowPlayingElement, {
+            childList: true,
+            subtree: true,
+            attributes: false
+            // Only watch structure changes, not style changes
+          });
+          if (this.config.enableDebug) {
+            console.log(
+              "\u{1F3B5} [NowPlayingCoordinator] DOM observation active on now playing bar"
+            );
+          }
+        }
+        /**
+         * Get performance metrics for monitoring
+         */
+        getPerformanceMetrics() {
+          return {
+            flushCount: this.flushCount,
+            averageFlushTime: this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0,
+            lastFlushTimestamp: this.lastFlushTimestamp,
+            pendingUpdates: this.pendingUpdates.size
+          };
+        }
+        /**
+         * Force immediate flush for critical scenarios
+         */
+        forceFlush() {
+          if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+          }
+          this.flushUpdates();
+        }
+        /**
+         * Cleanup and destroy coordinator
+         */
+        destroy() {
+          if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+          }
+          if (this.domObserver) {
+            this.domObserver.disconnect();
+            this.domObserver = null;
+          }
+          this.pendingUpdates.clear();
+          this.isFlushScheduled = false;
+          this.nowPlayingElement = null;
+          if (_NowPlayingCoordinator.instance === this) {
+            _NowPlayingCoordinator.instance = null;
+          }
+          if (this.config.enableDebug) {
+            const avgFlushTime = this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0;
+            console.log(
+              `\u{1F3B5} [NowPlayingCoordinator] Destroyed. Performance: ${this.flushCount} flushes, ${avgFlushTime.toFixed(2)}ms avg`
+            );
+          }
+        }
+      };
+      _NowPlayingCoordinator.instance = null;
+      NowPlayingCoordinator = _NowPlayingCoordinator;
+    }
+  });
+
   // src-js/utils/NoiseField.ts
   function sample(u, v) {
     const x = Math.max(0, Math.min(0.9999, u)) * (GRID_SIZE - 1);
@@ -8284,6 +8600,7 @@
     "src-js/systems/visual/BeatSyncVisualSystem.ts"() {
       "use strict";
       init_EventBus();
+      init_NowPlayingCoordinator();
       init_Year3000Utilities();
       init_NoiseField();
       init_BaseVisualSystem();
@@ -8327,6 +8644,8 @@
           this.rafId = 0;
           this.smoothedLoudness = 0;
           this.SMOOTHING_FACTOR = 0.1;
+          // Phase 3: Beat-Sync Glass Effects - Performance tracking
+          this.lastBeatBoostGlass = 0;
           this.year3000System = year3000System2;
           this.performanceMetrics = {
             animationUpdates: 0,
@@ -8352,14 +8671,49 @@
           }
           return 0;
         }
+        /**
+         * Helper method to get NowPlayingCoordinator with glass convergence callback
+         * Phase 2: Glass Convergence Integration
+         */
+        _getCoordinatorWithGlassCallback() {
+          const glassConvergenceCallback = () => {
+            try {
+              if (this.year3000System?.glassmorphismManager) {
+                this.year3000System.glassmorphismManager.checkPerformanceAndAdjust();
+                if (this.config?.enableDebug) {
+                  console.log(
+                    `\u{1F3B5} [${this.systemName}] Glass convergence callback triggered - GlassCheck invoked`
+                  );
+                }
+                if (this.performanceMonitor) {
+                  this.performanceMonitor.emitTrace?.(
+                    "[BeatSyncVisualSystem] GlassCheck triggered via NowPlayingCoordinator flush"
+                  );
+                }
+              }
+            } catch (error) {
+              console.error(
+                `\u{1F3B5} [${this.systemName}] Error in glass convergence callback:`,
+                error
+              );
+            }
+          };
+          return getNowPlayingCoordinator({
+            enableDebug: this.config?.enableDebug,
+            performanceAnalyzer: this.performanceMonitor,
+            onFlushComplete: glassConvergenceCallback
+          });
+        }
         async initialize() {
           await super.initialize();
           this._createBeatFlashElement();
           this._createCrystallineOverlay();
           this._startAnimationLoop();
+          const coordinator = this._getCoordinatorWithGlassCallback();
+          coordinator.setupDOMObservation();
           if (this.config.enableDebug) {
             console.log(
-              `[${this.systemName}] Initialized and animation loop started.`
+              `[${this.systemName}] Initialized and animation loop started. NowPlayingCoordinator: active`
             );
           }
         }
@@ -8467,7 +8821,7 @@
               this.beatIntensity -= 0.025;
               if (this.beatIntensity < 0) this.beatIntensity = 0;
               const rootStyle = getRootStyle();
-              const accentRgb = rootStyle.style.getPropertyValue("--sn-gradient-accent-rgb").trim() || "140,170,238";
+              const accentRgb = rootStyle.style.getPropertyValue("--sn-accent-rgb").trim() || rootStyle.style.getPropertyValue("--sn-gradient-accent-rgb").trim() || "140,170,238";
               this.beatFlashElement.style.backgroundColor = `rgba(${accentRgb}, ${this.beatIntensity * 0.25})`;
               this.beatFlashElement.style.opacity = `${this.beatIntensity * 0.85}`;
             } else if (this.beatFlashElement) {
@@ -8534,17 +8888,32 @@
           if (deltaTime > 50) return;
           const root = getRootStyle();
           if (!root) return;
+          const coordinator = this._getCoordinatorWithGlassCallback();
           const queueCSSUpdate = (property, value) => {
-            if (this.year3000System?.queueCSSVariableUpdate && typeof this.year3000System.queueCSSVariableUpdate === "function") {
-              this.year3000System.queueCSSVariableUpdate(property, value);
+            const criticalVars = ["--sn-beat-pulse-intensity", "--sn-breathing-scale"];
+            if (criticalVars.includes(property)) {
+              if (this.year3000System?.queueCSSVariableUpdate && typeof this.year3000System.queueCSSVariableUpdate === "function") {
+                this.year3000System.queueCSSVariableUpdate(property, value);
+              } else {
+                root.style.setProperty(property, value);
+              }
             } else {
-              root.style.setProperty(property, value);
+              coordinator.queueUpdate(property, value);
             }
           };
           queueCSSUpdate("--sn-breathing-scale", breathingScale.toFixed(4));
           queueCSSUpdate("--sn-rhythm-phase", rhythmPhase.toFixed(4));
           const beatPulseIntensity = this.beatIntensity;
           queueCSSUpdate("--sn-beat-pulse-intensity", beatPulseIntensity.toFixed(4));
+          const glassPulseEnabled = this.settingsManager?.get("sn-glass-beat-pulse") === "true";
+          const glassBaseIntensity = parseFloat(this.settingsManager?.get("sn-glass-base-intensity") || "0.5");
+          queueCSSUpdate("--glass-pulse-toggle", glassPulseEnabled ? "1" : "0");
+          queueCSSUpdate("--glass-user-intensity", Math.max(0, Math.min(1, glassBaseIntensity)).toFixed(2));
+          const beatBoostGlass = Math.min(1, Math.max(0, beatPulseIntensity * 1.5));
+          if (beatBoostGlass > 0.01 || this.lastBeatBoostGlass > 0.01) {
+            queueCSSUpdate("--sn-glass-beat-boost", beatBoostGlass.toFixed(4));
+            this.lastBeatBoostGlass = beatBoostGlass;
+          }
           const bloomIntensity = processedEnergy * 0.4;
           queueCSSUpdate("--sn-feed-bloom-intensity", bloomIntensity.toFixed(3));
           this.performanceMetrics.cssVariableUpdates++;
@@ -8679,10 +9048,22 @@
             this.beatFlashElement.parentElement.removeChild(this.beatFlashElement);
             this.beatFlashElement = null;
           }
+          this.echoPool.forEach((el) => {
+            if (el.parentElement) {
+              el.parentElement.removeChild(el);
+            }
+          });
+          this.echoPool = [];
+          this.currentEchoCount = 0;
+          try {
+            const coordinator = getNowPlayingCoordinator();
+            coordinator.destroy();
+          } catch (e) {
+          }
           if (this.config.enableDebug) {
             const report = this.getPerformanceReport();
             console.log(`[${this.systemName}] Performance Report:`, report);
-            console.log(`[${this.systemName}] Destroyed.`);
+            console.log(`[${this.systemName}] Destroyed with NowPlayingCoordinator cleanup.`);
           }
           super.destroy();
         }
@@ -10792,8 +11173,8 @@
           const particle = this.particlePool.find((p) => !p.active);
           if (!particle || !this.canvas) return;
           const rootStyle = window.getComputedStyle(getRootStyle());
-          const primaryRgbStr = rootStyle.getPropertyValue("--sn-gradient-primary-rgb").trim() || "202,158,230";
-          const accentRgbStr = rootStyle.getPropertyValue("--sn-gradient-accent-rgb").trim() || "140,170,238";
+          const accentRgbStr = rootStyle.getPropertyValue("--sn-accent-rgb").trim() || rootStyle.getPropertyValue("--sn-gradient-accent-rgb").trim() || "202,158,230";
+          const primaryRgbStr = rootStyle.getPropertyValue("--sn-gradient-primary-rgb").trim() || accentRgbStr;
           particle.active = true;
           particle.currentX = Math.random() * this.canvas.width;
           particle.currentY = this.canvas.height + Math.random() * 30 + 20;
@@ -12745,13 +13126,11 @@
               document.documentElement.style.setProperty(prop, value);
             }
           };
-          if (primaryHex) queueUpdate("--sn-gradient-primary", primaryHex);
-          if (secondaryHex) queueUpdate("--sn-gradient-secondary", secondaryHex);
-          if (accentHex) queueUpdate("--sn-gradient-accent", accentHex);
           if (accentHex) {
             queueUpdate("--spice-accent", accentHex);
             queueUpdate("--spice-button", accentHex);
             queueUpdate("--spice-button-active", accentHex);
+            if (primaryHex) queueUpdate("--spice-player", primaryHex);
           }
           const addRgb = (prop, hex) => {
             if (!hex) return;
@@ -12760,12 +13139,13 @@
               queueUpdate(prop, `${rgb.r},${rgb.g},${rgb.b}`);
             }
           };
-          addRgb("--sn-gradient-primary-rgb", primaryHex);
-          addRgb("--sn-gradient-secondary-rgb", secondaryHex);
-          addRgb("--sn-gradient-accent-rgb", accentHex);
-          addRgb("--sn-dynamic-accent-rgb", accentHex);
+          if (accentHex) {
+            queueUpdate(ColorHarmonyEngine.CANONICAL_HEX_VAR, accentHex);
+          }
+          addRgb(ColorHarmonyEngine.CANONICAL_RGB_VAR, accentHex);
           addRgb("--spice-rgb-accent", accentHex);
           addRgb("--spice-rgb-button", accentHex);
+          addRgb("--spice-rgb-player", primaryHex);
           const root = this.utils.getRootStyle();
           if (root) {
             const computedStyle = getComputedStyle(root);
@@ -12857,14 +13237,6 @@
             await this.utils.sleep(delayMs);
           }
           return null;
-        }
-        _setSpiceRgbVariables() {
-          if (this.colorHarmonyEngine) {
-          }
-        }
-        _setGradientParameters() {
-          if (this.colorHarmonyEngine) {
-          }
         }
         updateHarmonicBaseColor(hexColor) {
           if (this.colorHarmonyEngine && this.cssVariableBatcher) {
@@ -13419,199 +13791,42 @@
                 sys.applyUpdatedSettings(key, value);
               } catch (err) {
                 console.warn(
-                  `[Year3000System] ${sys.systemName || sys.constructor.name} failed to handle settings change`,
-                  err
-                );
-              }
-            }
-            if (sys && typeof sys.forceRepaint === "function") {
-              try {
-                sys.forceRepaint(`settings:${key}`);
-              } catch (err) {
-                console.warn(
-                  `[Year3000System] ${sys.systemName || sys.constructor.name} failed to repaint after settings change`,
+                  `[Year3000System] ${sys.systemName || sys.constructor?.name || "UnknownSystem"} failed to applyUpdatedSettings`,
                   err
                 );
               }
             }
           });
         }
+        // ---------------------------------------------------------------------------
+        // 🔧  Placeholder implementations restored after merge conflict
+        // ---------------------------------------------------------------------------
         /**
-         * Respond to Artistic Mode changes coming from the shared YEAR3000_CONFIG.
-         * We re-apply colors extracted from the current track so gradients and
-         * other CSS variables update without needing a song-change or full reload.
-         */
-        async _onArtisticModeChanged() {
-          if (this.YEAR3000_CONFIG.enableDebug) {
-            console.log(
-              "\u{1F3A8} [Year3000System] Artistic mode changed \u2013 refreshing colours"
-            );
-          }
-          try {
-            this._applyPerformanceProfile();
-            await this._refreshConditionalSystems();
-            await this.updateColorsFromCurrentTrack();
-          } catch (err) {
-            console.warn(
-              "[Year3000System] Failed to refresh colours after artistic mode change:",
-              err
-            );
-          }
-        }
-        /**
-         * Push the current Artistic Mode's performance profile down into every
-         * active visual system that exposes an `applyPerformanceSettings` method.
+         * Apply the current performance profile to subsystems.
+         * NOTE: Full implementation was lost in a previous edit; this stub preserves
+         *        compile-time integrity until the original logic is reinstated.
          */
         _applyPerformanceProfile() {
-          const perf = this.YEAR3000_CONFIG.getCurrentPerformanceSettings?.();
-          if (!perf) return;
-          const systems = [
-            this.lightweightParticleSystem,
-            this.dimensionalNexusSystem,
-            this.dataGlyphSystem,
-            this.beatSyncVisualSystem,
-            this.behavioralPredictionEngine,
-            this.predictiveMaterializationSystem,
-            this.sidebarConsciousnessSystem
-          ];
-          systems.forEach((s) => {
-            if (s && typeof s.applyPerformanceSettings === "function") {
-              try {
-                s.applyPerformanceSettings(perf);
-              } catch (e) {
-                console.warn("[Year3000System] Failed to apply perf settings", e);
-              }
-            }
-          });
         }
-        // === NEW: helper to retrieve harmonic mode object ========================
         /**
-         * Convenience wrapper that fetches the current harmonic mode from the
-         * SettingsManager and stores the key on the shared configuration so that
-         * all subsystems have easy access without reading localStorage directly.
+         * Refresh conditional visual systems (WebGPU, ParticleField, etc.) depending
+         * on capability and artistic mode settings.
          */
-        _syncCurrentHarmonicMode() {
-          if (!this.settingsManager) return;
-          const key = this.settingsManager.get("sn-current-harmonic-mode");
-          if (key && typeof key === "string") {
-            this.YEAR3000_CONFIG.currentHarmonicMode = key;
-          }
+        _refreshConditionalSystems() {
         }
-        async _refreshConditionalSystems() {
-          if (!this.performanceAnalyzer || !this.settingsManager) return;
-          const mode = this.YEAR3000_CONFIG.artisticMode;
-          const enableDebug = this.YEAR3000_CONFIG.enableDebug;
-          const wantsParticle = mode === "cosmic-maximum";
-          if (wantsParticle && !this.particleFieldSystem) {
-            try {
-              const sys = new ParticleFieldSystem(
-                this.YEAR3000_CONFIG,
-                this.utils,
-                this.performanceAnalyzer,
-                this.musicSyncService,
-                this.settingsManager,
-                this
-              );
-              await sys.initialize();
-              if (sys.initialized) {
-                this.particleFieldSystem = sys;
-                this.systemHealthMonitor?.registerSystem("ParticleFieldSystem", sys);
-                this.registerAnimationSystem(
-                  "ParticleFieldSystem",
-                  sys,
-                  "background",
-                  30
-                );
-                if (enableDebug) {
-                  console.log(
-                    "\u{1F30C} [Year3000System] ParticleFieldSystem started (cosmic-maximum mode)"
-                  );
-                }
-              }
-            } catch (err) {
-              console.warn(
-                "[Year3000System] Failed to start ParticleFieldSystem",
-                err
-              );
-            }
-          } else if (!wantsParticle && this.particleFieldSystem) {
-            this.unregisterAnimationSystem("ParticleFieldSystem");
-            this.particleFieldSystem.destroy();
-            this.particleFieldSystem = null;
-            if (enableDebug) {
-              console.log(
-                "\u{1F30C} [Year3000System] ParticleFieldSystem stopped (mode change)"
-              );
-            }
+        /**
+         * Handle artistic-mode changes by triggering a colour refresh.
+         */
+        _onArtisticModeChanged() {
+          try {
+            this.updateColorsFromCurrentTrack?.();
+          } catch (e) {
+            console.warn("[Year3000System] _onArtisticModeChanged stub error", e);
           }
-          const gpuSupported = typeof navigator !== "undefined" && navigator.gpu;
-          const webgpuEnabled = this.settingsManager.get("sn-enable-webgpu") === "true";
-          const wantsWebGPU = gpuSupported && webgpuEnabled && mode === "cosmic-maximum";
-          if (wantsWebGPU && !this.webGPUBackgroundSystem) {
-            try {
-              const sys = new WebGPUBackgroundSystem(
-                this.YEAR3000_CONFIG,
-                this.utils,
-                this.performanceAnalyzer,
-                this.musicSyncService,
-                this.settingsManager,
-                this
-              );
-              await sys.initialize();
-              if (sys.initialized) {
-                this.webGPUBackgroundSystem = sys;
-                this.systemHealthMonitor?.registerSystem(
-                  "WebGPUBackgroundSystem",
-                  sys
-                );
-                this.registerAnimationSystem(
-                  "WebGPUBackgroundSystem",
-                  sys,
-                  "background",
-                  30
-                );
-                if (enableDebug) {
-                  console.log("\u{1F5A5}\uFE0F [Year3000System] WebGPUBackgroundSystem started");
-                }
-              }
-            } catch (err) {
-              console.warn(
-                "[Year3000System] Failed to start WebGPUBackgroundSystem",
-                err
-              );
-            }
-          } else if (!wantsWebGPU && this.webGPUBackgroundSystem) {
-            this.unregisterAnimationSystem("WebGPUBackgroundSystem");
-            this.webGPUBackgroundSystem.destroy();
-            this.webGPUBackgroundSystem = null;
-            if (enableDebug) {
-              console.log("\u{1F5A5}\uFE0F [Year3000System] WebGPUBackgroundSystem stopped");
-            }
-          }
-        }
-        // -----------------------------------------------------------------------
-        // CDF Visual System registration helpers
-        // -----------------------------------------------------------------------
-        registerVisualSystem(system, priority = "normal") {
-          if (!this.visualSystemRegistry) {
-            console.warn(
-              "[Year3000System] VisualSystemRegistry not ready \u2013 cannot register",
-              system.systemName
-            );
-            return false;
-          }
-          this.visualSystemRegistry.registerSystem(system, priority);
-          return true;
-        }
-        unregisterVisualSystem(system) {
-          if (!this.visualSystemRegistry) return false;
-          this.visualSystemRegistry.unregisterSystem(system);
-          return true;
         }
       };
       year3000System = new Year3000System();
       if (typeof window !== "undefined") {
-        window.HARMONIC_MODES = HARMONIC_MODES;
         window.year3000System = year3000System;
       }
       year3000System_default = year3000System;
@@ -14909,7 +15124,9 @@
       currentVisualInt,
       "number",
       {
-        attributes: { min: 0, max: 1, step: 0.05 },
+        min: 0,
+        max: 1,
+        step: 0.05,
         onChange: (e) => {
           const val = e.currentTarget.value;
           let num = parseFloat(val);
@@ -14932,6 +15149,41 @@
           const idx = e?.currentTarget?.selectedIndex ?? 0;
           const val = animQualityOptions[idx] ?? "auto";
           settingsManager.set("sn-animation-quality", val);
+        }
+      }
+    );
+    const enableGlassPulse = settingsManager.get("sn-glass-beat-pulse") === "true";
+    section.addToggle(
+      "sn-glass-beat-pulse",
+      "Glass Pulse (beat-synchronized glass effects)",
+      enableGlassPulse,
+      {
+        onClick: (e) => {
+          const checked = e.currentTarget.checked;
+          settingsManager.set(
+            "sn-glass-beat-pulse",
+            checked ? "true" : "false"
+          );
+          console.info("[StarryNight] Glass Pulse setting changed");
+        }
+      }
+    );
+    const currentGlassIntensity = settingsManager.get("sn-glass-base-intensity") || "0.5";
+    section.addInput(
+      "sn-glass-base-intensity",
+      "Glass Base Intensity (0-1)",
+      currentGlassIntensity,
+      "number",
+      {
+        min: 0,
+        max: 1,
+        step: 0.1,
+        onChange: (e) => {
+          const val = e.currentTarget.value;
+          let num = parseFloat(val);
+          if (isNaN(num)) num = 0.5;
+          num = Math.max(0, Math.min(1, num));
+          settingsManager.set("sn-glass-base-intensity", num.toFixed(1));
         }
       }
     );
@@ -14964,6 +15216,387 @@
     }
   });
 
+  // src-js/systems/visual/RightSidebarCoordinator.ts
+  var RightSidebarCoordinator_exports = {};
+  __export(RightSidebarCoordinator_exports, {
+    RightSidebarCoordinator: () => RightSidebarCoordinator,
+    getRightSidebarCoordinator: () => getRightSidebarCoordinator
+  });
+  function getRightSidebarCoordinator(config) {
+    return RightSidebarCoordinator.getInstance(config);
+  }
+  var _RightSidebarCoordinator, RightSidebarCoordinator;
+  var init_RightSidebarCoordinator = __esm({
+    "src-js/systems/visual/RightSidebarCoordinator.ts"() {
+      "use strict";
+      init_SpotifyDOMSelectors();
+      _RightSidebarCoordinator = class _RightSidebarCoordinator {
+        constructor(config = {}) {
+          this.pendingUpdates = /* @__PURE__ */ new Map();
+          this.isFlushScheduled = false;
+          this.rafId = null;
+          this.performanceAnalyzer = null;
+          // Harmonic variable mapping for Year 3000 convergence
+          this.harmonicVariableMap = /* @__PURE__ */ new Map([
+            ["--sn-rs-beat-intensity", "--sn-beat-pulse-intensity"],
+            ["--sn-rs-glow-alpha", "--sn-rhythm-phase"],
+            ["--sn-rs-hue-shift", "--sn-spectrum-phase"]
+          ]);
+          // Performance tracking
+          this.flushCount = 0;
+          this.totalFlushTime = 0;
+          this.lastFlushTimestamp = 0;
+          // DOM observation for reactive refresh and temporal play
+          this.domObserver = null;
+          this.rightSidebarElement = null;
+          this.visibilityObserver = null;
+          this.isFirstOpen = true;
+          this.lastScrollUpdate = 0;
+          this.config = {
+            enableDebug: config.enableDebug ?? false,
+            maxBatchSize: config.maxBatchSize ?? 50,
+            ...config
+          };
+          this.performanceAnalyzer = config.performanceAnalyzer || null;
+          if (this.config.enableDebug) {
+            console.log(
+              "\u{1F30C} [RightSidebarCoordinator] Initialized with RAF-based batching"
+            );
+          }
+        }
+        /**
+         * Singleton accessor for global coordination
+         */
+        static getInstance(config) {
+          if (!_RightSidebarCoordinator.instance) {
+            _RightSidebarCoordinator.instance = new _RightSidebarCoordinator(config);
+          }
+          return _RightSidebarCoordinator.instance;
+        }
+        /**
+         * Queue a CSS variable update for atomic application at next animation frame
+         */
+        queueUpdate(property, value) {
+          const criticalVars = [
+            "--sn-rs-glow-alpha",
+            "--sn-rs-beat-intensity",
+            "--sn-rs-hue-shift"
+          ];
+          if (criticalVars.includes(property)) {
+            this.applyCriticalUpdate(property, value);
+            return;
+          }
+          this.pendingUpdates.set(property, {
+            property,
+            value,
+            timestamp: performance.now()
+          });
+          if (this.config.enableDebug && this.pendingUpdates.size === 1) {
+            console.log(
+              `\u{1F30C} [RightSidebarCoordinator] Queuing first update: ${property}`
+            );
+          }
+          this.scheduleFlush();
+        }
+        /**
+         * Apply critical updates immediately to the right sidebar element
+         */
+        applyCriticalUpdate(property, value) {
+          const sidebarElement = this.getRightSidebarElement();
+          if (sidebarElement) {
+            try {
+              sidebarElement.style.setProperty(property, value);
+            } catch (error) {
+              console.error(
+                `\u{1F30C} [RightSidebarCoordinator] Failed to apply critical ${property}:`,
+                error
+              );
+            }
+          }
+        }
+        /**
+         * Get the right sidebar element with fallback to document root
+         */
+        getRightSidebarElement() {
+          if (!this.rightSidebarElement) {
+            this.rightSidebarElement = document.querySelector(
+              MODERN_SELECTORS.rightSidebar
+            );
+          }
+          return this.rightSidebarElement || document.documentElement;
+        }
+        /**
+         * Schedule atomic flush at next animation frame
+         */
+        scheduleFlush() {
+          if (this.isFlushScheduled) {
+            return;
+          }
+          this.isFlushScheduled = true;
+          this.rafId = requestAnimationFrame(() => {
+            this.flushUpdates();
+          });
+        }
+        /**
+         * Atomically apply all pending updates
+         */
+        flushUpdates() {
+          if (this.pendingUpdates.size === 0) {
+            this.isFlushScheduled = false;
+            return;
+          }
+          const startTime = performance.now();
+          const targetElement = this.getRightSidebarElement();
+          const updateCount = this.pendingUpdates.size;
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [RightSidebarCoordinator] Flushing ${updateCount} updates atomically`
+            );
+          }
+          if (updateCount > (this.config.maxBatchSize || 50)) {
+            console.warn(
+              `\u{1F30C} [RightSidebarCoordinator] Large batch detected (${updateCount} updates), may impact performance`
+            );
+          }
+          for (const update of this.pendingUpdates.values()) {
+            try {
+              targetElement.style.setProperty(update.property, update.value);
+              const harmonicVar = this.harmonicVariableMap.get(update.property);
+              if (harmonicVar) {
+                document.documentElement.style.setProperty(harmonicVar, update.value);
+                if (this.config.enableDebug) {
+                  console.log(
+                    `\u{1F30C} [RightSidebarCoordinator] Mapped ${update.property} \u2192 ${harmonicVar} = ${update.value}`
+                  );
+                }
+              }
+            } catch (error) {
+              console.error(
+                `\u{1F30C} [RightSidebarCoordinator] Failed to apply ${update.property}:`,
+                error
+              );
+            }
+          }
+          this.pendingUpdates.clear();
+          this.isFlushScheduled = false;
+          this.rafId = null;
+          if (this.config.onFlushComplete) {
+            try {
+              this.config.onFlushComplete();
+            } catch (error) {
+              console.error(
+                "\u{1F30C} [RightSidebarCoordinator] Error in flush completion callback:",
+                error
+              );
+            }
+          }
+          const endTime = performance.now();
+          const flushTime = endTime - startTime;
+          this.flushCount++;
+          this.totalFlushTime += flushTime;
+          this.lastFlushTimestamp = endTime;
+          if (this.performanceAnalyzer) {
+            this.performanceAnalyzer.emitTrace?.(
+              `[RightSidebarCoordinator] Flushed ${updateCount} updates in ${flushTime.toFixed(
+                2
+              )}ms`
+            );
+          }
+          const avgFlushTime = this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0;
+          if (avgFlushTime > 3) {
+            console.warn(
+              `\u{1F30C} [RightSidebarCoordinator] Performance threshold exceeded: average ${avgFlushTime.toFixed(
+                2
+              )}ms per flush (target: <3ms)`
+            );
+          }
+          if (this.config.enableDebug && flushTime > 4) {
+            console.warn(
+              `\u{1F30C} [RightSidebarCoordinator] Slow flush detected: ${flushTime.toFixed(
+                2
+              )}ms for ${updateCount} updates`
+            );
+          }
+        }
+        /**
+         * Setup DOM observation for reactive refresh and temporal play
+         */
+        setupDOMObservation() {
+          if (this.domObserver) {
+            return;
+          }
+          this.rightSidebarElement = document.querySelector(
+            MODERN_SELECTORS.rightSidebar
+          );
+          if (!this.rightSidebarElement) {
+            if (this.config.enableDebug) {
+              console.warn(
+                "\u{1F30C} [RightSidebarCoordinator] Right sidebar not found, deferring DOM observation"
+              );
+            }
+            setTimeout(() => this.setupDOMObservation(), 1e3);
+            return;
+          }
+          this.domObserver = new MutationObserver((mutations) => {
+            this.queueUpdate("--sn-rs-force-refresh", Date.now().toString());
+            for (const mutation of mutations) {
+              if (mutation.type === "attributes" && (mutation.attributeName === "aria-hidden" || mutation.attributeName === "style")) {
+                this.handleVisibilityChange();
+              }
+            }
+            if (this.config.enableDebug) {
+              console.log(
+                "\u{1F30C} [RightSidebarCoordinator] DOM change detected, forcing refresh"
+              );
+            }
+          });
+          this.domObserver.observe(this.rightSidebarElement, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            // Watch for aria-hidden and style changes
+            attributeFilter: ["aria-hidden", "style", "class"]
+          });
+          this.setupVisibilityObserver();
+          this.setupScrollObservation();
+          if (this.config.enableDebug) {
+            console.log(
+              "\u{1F30C} [RightSidebarCoordinator] DOM observation active on right sidebar"
+            );
+          }
+        }
+        /**
+         * Setup visibility observer for temporal echo effects
+         */
+        setupVisibilityObserver() {
+          if (!this.rightSidebarElement || this.visibilityObserver) return;
+          this.visibilityObserver = new IntersectionObserver(
+            (entries) => {
+              const entry = entries[0];
+              if (entry && entry.isIntersecting && this.isFirstOpen) {
+                this.triggerTemporalEcho();
+                this.isFirstOpen = false;
+              }
+            },
+            { threshold: 0.1 }
+          );
+          this.visibilityObserver.observe(this.rightSidebarElement);
+        }
+        /**
+         * Setup scroll observation with throttling for performance
+         */
+        setupScrollObservation() {
+          if (!this.rightSidebarElement) return;
+          const queueElement = this.rightSidebarElement.querySelector(".main-nowPlayingView-queue");
+          if (!queueElement) return;
+          queueElement.addEventListener("scroll", this.throttledScrollHandler.bind(this), {
+            passive: true
+          });
+        }
+        /**
+         * Throttled scroll handler (≤30 Hz as specified)
+         */
+        throttledScrollHandler() {
+          const now = performance.now();
+          if (now - this.lastScrollUpdate < 33) return;
+          this.lastScrollUpdate = now;
+          if (window.requestIdleCallback) {
+            window.requestIdleCallback(() => {
+              this.queueUpdate("--sn-rs-scroll-ratio", Math.random().toString());
+            });
+          } else {
+            this.queueUpdate("--sn-rs-scroll-ratio", Math.random().toString());
+          }
+        }
+        /**
+         * Handle visibility changes for temporal effects
+         */
+        handleVisibilityChange() {
+          if (!this.rightSidebarElement) return;
+          const isVisible = !this.rightSidebarElement.hasAttribute("aria-hidden") && !this.rightSidebarElement.style.display?.includes("none");
+          if (isVisible && this.isFirstOpen) {
+            this.triggerTemporalEcho();
+            this.isFirstOpen = false;
+          }
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [RightSidebarCoordinator] Visibility changed: ${isVisible ? "visible" : "hidden"}`
+            );
+          }
+        }
+        /**
+         * Trigger one-time temporal echo effect
+         */
+        triggerTemporalEcho() {
+          if (!this.rightSidebarElement) return;
+          this.rightSidebarElement.classList.add("sn-future-preview");
+          this.queueUpdate("--sn-kinetic-intensity", "1");
+          this.queueUpdate("--sn-echo-hue-shift", "15deg");
+          this.queueUpdate("--sn-echo-radius-multiplier", "1.2");
+          if (this.config.enableDebug) {
+            console.log("\u{1F30C} [RightSidebarCoordinator] Triggering temporal echo effect");
+          }
+          setTimeout(() => {
+            this.rightSidebarElement?.classList.remove("sn-future-preview");
+            this.queueUpdate("--sn-kinetic-intensity", "0");
+          }, 2e3);
+        }
+        /**
+         * Get performance metrics for monitoring
+         */
+        getPerformanceMetrics() {
+          return {
+            flushCount: this.flushCount,
+            averageFlushTime: this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0,
+            lastFlushTimestamp: this.lastFlushTimestamp,
+            pendingUpdates: this.pendingUpdates.size
+          };
+        }
+        /**
+         * Force immediate flush for critical scenarios
+         */
+        forceFlush() {
+          if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+          }
+          this.flushUpdates();
+        }
+        /**
+         * Cleanup and destroy coordinator
+         */
+        destroy() {
+          if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+          }
+          if (this.domObserver) {
+            this.domObserver.disconnect();
+            this.domObserver = null;
+          }
+          if (this.visibilityObserver) {
+            this.visibilityObserver.disconnect();
+            this.visibilityObserver = null;
+          }
+          this.pendingUpdates.clear();
+          this.isFlushScheduled = false;
+          this.rightSidebarElement = null;
+          if (_RightSidebarCoordinator.instance === this) {
+            _RightSidebarCoordinator.instance = null;
+          }
+          if (this.config.enableDebug) {
+            const avgFlushTime = this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0;
+            console.log(
+              `\u{1F30C} [RightSidebarCoordinator] Destroyed. Performance: ${this.flushCount} flushes, ${avgFlushTime.toFixed(2)}ms avg`
+            );
+          }
+        }
+      };
+      _RightSidebarCoordinator.instance = null;
+      RightSidebarCoordinator = _RightSidebarCoordinator;
+    }
+  });
+
   // src-js/systems/visual/RightSidebarConsciousnessSystem.ts
   var RightSidebarConsciousnessSystem_exports = {};
   __export(RightSidebarConsciousnessSystem_exports, {
@@ -14973,11 +15606,11 @@
   var init_RightSidebarConsciousnessSystem = __esm({
     "src-js/systems/visual/RightSidebarConsciousnessSystem.ts"() {
       "use strict";
-      init_CSSVariableBatcher();
       init_EventBus();
       init_BaseVisualSystem();
+      init_RightSidebarCoordinator();
       RightSidebarConsciousnessSystem = class extends BaseVisualSystem {
-        constructor(config, utils, perf, musicSync, settings, year3000System2 = null) {
+        constructor(config, utils, perf, musicSync, settings, year3000System2 = null, coordinator) {
           super(config, utils, perf, musicSync, settings);
           // Current → target state for smooth lerp
           this.currentBeatIntensity = 0;
@@ -14995,7 +15628,15 @@
           this.unsubBeat = null;
           this.unsubEnergy = null;
           this.year3000System = year3000System2;
-          this.cssBatcher = year3000System2?.cssVariableBatcher ?? new CSSVariableBatcher();
+          this.coordinator = coordinator || RightSidebarCoordinator.getInstance({
+            enableDebug: config.enableDebug,
+            performanceAnalyzer: perf,
+            onFlushComplete: () => {
+              perf?.emitTrace?.(
+                "[RightSidebarConsciousnessSystem] Coordinator flush completed"
+              );
+            }
+          });
         }
         /* ------------------------------------------------------------------ */
         /* Initialization                                                     */
@@ -15048,7 +15689,7 @@
           };
           this.fallbackRafId = requestAnimationFrame(loop);
         }
-        _tick(deltaMs) {
+        _tick(_deltaMs) {
           this.currentBeatIntensity = this._lerp(
             this.currentBeatIntensity,
             this.targetBeatIntensity,
@@ -15065,7 +15706,7 @@
           this._queueCssVar("--sn-rs-hue-shift", `${this.currentHueShift}deg`);
         }
         _queueCssVar(property, value) {
-          this.cssBatcher.queueCSSVariableUpdate(property, String(value));
+          this.coordinator.queueUpdate(property, String(value));
         }
         _lerp(from, to, alpha) {
           return from + (to - from) * alpha;
@@ -16469,17 +17110,30 @@
     }
     try {
       const { RightSidebarConsciousnessSystem: RightSidebarConsciousnessSystem2 } = await Promise.resolve().then(() => (init_RightSidebarConsciousnessSystem(), RightSidebarConsciousnessSystem_exports));
+      const { RightSidebarCoordinator: RightSidebarCoordinator2 } = await Promise.resolve().then(() => (init_RightSidebarCoordinator(), RightSidebarCoordinator_exports));
       if (year3000System2.performanceAnalyzer) {
+        const coordinator = RightSidebarCoordinator2.getInstance({
+          enableDebug: YEAR3000_CONFIG.enableDebug,
+          performanceAnalyzer: year3000System2.performanceAnalyzer,
+          onFlushComplete: () => {
+            year3000System2.performanceAnalyzer?.emitTrace?.(
+              "[RightSidebarCoordinator] Flush completed"
+            );
+          }
+        });
+        coordinator.setupDOMObservation();
         const rsSystem = new RightSidebarConsciousnessSystem2(
           YEAR3000_CONFIG,
           Year3000Utilities_exports,
           year3000System2.performanceAnalyzer,
           year3000System2.musicSyncService,
           year3000System2.settingsManager,
-          year3000System2
+          year3000System2,
+          coordinator
         );
         await rsSystem.initialize();
         year3000System2.rightSidebarConsciousnessSystem = rsSystem;
+        year3000System2.rightSidebarCoordinator = coordinator;
       }
     } catch (err) {
       console.error(

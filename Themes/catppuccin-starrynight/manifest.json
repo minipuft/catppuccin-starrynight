@@ -1,0 +1,43 @@
+[
+  {
+    "name": "Catppuccin StarryNight",
+    "description": "A hybrid theme combining Catppuccin's beautiful color palette with StarryNight's dynamic visual effects for an immersive Spotify experience. Now with modern Spicetify APIs and CORS-free color extraction.",
+    "preview": "assets/preview.webp",
+    "readme": "README.md",
+    "usercss": "user.css",
+    "schemes": "color.ini",
+    "include": ["theme.js"],
+    "authors": [
+      {
+        "name": "Catppuccin StarryNight Contributors",
+        "url": "https://github.com/catppuccin/spicetify"
+      }
+    ],
+    "tags": [
+      "catppuccin",
+      "dynamic",
+      "animated",
+      "starrynight",
+      "gradient",
+      "modern",
+      "spice-variables"
+    ],
+    "version": "2.0.0",
+    "compatibility": {
+      "spicetify": ">=2.27.0",
+      "spotify": ">=1.2.0"
+    },
+    "features": [
+      "Native colorExtractor() API - No CORS issues",
+      "Modern --spice- variable system",
+      "Dynamic album art-reactive gradients",
+      "Animated star effects",
+      "15 Catppuccin accent colors",
+      "4 Catppuccin color schemes (Mocha, Frappe, Latte, Macchiato)",
+      "Enhanced error handling & fallbacks",
+      "Performance optimizations",
+      "Future-proof implementation",
+      "Debug mode for developers"
+    ]
+  }
+]

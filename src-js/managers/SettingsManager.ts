@@ -47,6 +47,10 @@ export interface ThemeSettings {
   "sn-echo-intensity": "0" | "1" | "2" | "3";
   "sn-visual-intensity": string;
   "sn-animation-quality": "auto" | "low" | "high";
+  /** Glass Pulse: Enable beat-synchronized glass effects */
+  "sn-glass-beat-pulse": "true" | "false";
+  /** Glass Base Intensity: Controls base glass blur intensity (0-1) */
+  "sn-glass-base-intensity": string;
 }
 
 type ValidationSchema = {
@@ -111,6 +115,8 @@ export class SettingsManager implements IManagedSystem {
         }
       })() as any,
       "sn-animation-quality": "auto",
+      "sn-glass-beat-pulse": "true",
+      "sn-glass-base-intensity": "0.5",
     };
 
     this.validationSchemas = {
@@ -197,6 +203,11 @@ export class SettingsManager implements IManagedSystem {
         default: "auto",
         allowedValues: ["auto", "low", "high"],
       },
+      "sn-glass-beat-pulse": {
+        default: "true",
+        allowedValues: ["true", "false"],
+      },
+      "sn-glass-base-intensity": { default: "0.5" },
     };
 
     this.validateAndRepair();

@@ -1,16 +1,9 @@
 // @ts-nocheck -- Test file intentionally accesses private APIs
-import { JSDOM } from "jsdom";
 import { PerformanceAnalyzer } from "../src-js/core/PerformanceAnalyzer";
 import { SettingsManager } from "../src-js/managers/SettingsManager";
 import { MusicSyncService } from "../src-js/services/MusicSyncService";
 import { DataGlyphSystem } from "../src-js/systems/visual/DataGlyphSystem";
 import * as Year3000Utilities from "../src-js/utils/Year3000Utilities";
-
-// Jest environment setup
-const dom = new JSDOM("<html><body></body></html>");
-(globalThis as any).document = dom.window.document;
-(globalThis as any).window = dom.window as any;
-(globalThis as any).navigator = dom.window.navigator as any;
 
 // Dummy dependencies ---------------------------------------------------------
 class DummyMusicSync implements Partial<MusicSyncService> {

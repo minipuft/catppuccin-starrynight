@@ -18,6 +18,17 @@ fi
 SPICETIFY_VERSION=$(spicetify -v)
 echo "✅ Spicetify detected: $SPICETIFY_VERSION"
 
+# Extract version number for command compatibility
+VERSION_STRING=$(echo "$SPICETIFY_VERSION" | sed 's/spicetify v//')
+MAJOR_VERSION=$(echo "$VERSION_STRING" | cut -d. -f1)
+MINOR_VERSION=$(echo "$VERSION_STRING" | cut -d. -f2)
+
+IS_NEW_VERSION=false
+if [ "$MAJOR_VERSION" -gt 2 ] || { [ "$MAJOR_VERSION" -eq 2 ] && [ "$MINOR_VERSION" -ge 27 ]; }; then
+    IS_NEW_VERSION=true
+fi
+echo "📋 CLI Version: $MAJOR_VERSION.$MINOR_VERSION (Using $(if [ "$IS_NEW_VERSION" = true ]; then echo 'new'; else echo 'legacy'; fi) commands)"
+
 # Determine Spicetify config path
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS
@@ -152,15 +163,28 @@ fi
 
 # Apply changes
 echo "🚀 Applying theme..."
-if spicetify backup apply; then
-    echo "✅ Theme applied successfully"
+if [ "$IS_NEW_VERSION" = true ]; then
+    if spicetify backup apply; then
+        echo "✅ Theme applied successfully using 'backup apply' (CLI 2.27+)"
+    else
+        echo "❌ Error applying theme. Try running manually:"
+        echo "   spicetify config current_theme catppuccin-starrynight"
+        echo "   spicetify config color_scheme $COLOR_SCHEME"
+        echo "   spicetify config extensions $EXTENSION_PATH"
+        echo "   spicetify backup apply"
+        exit 1
+    fi
 else
-    echo "❌ Error applying theme. Try running manually:"
-    echo "   spicetify config current_theme catppuccin-starrynight"
-    echo "   spicetify config color_scheme $COLOR_SCHEME"
-    echo "   spicetify config extensions $EXTENSION_PATH"
-    echo "   spicetify backup apply"
-    exit 1
+    if spicetify apply; then
+        echo "✅ Theme applied successfully using legacy 'apply' command"
+    else
+        echo "❌ Error applying theme. Try running manually:"
+        echo "   spicetify config current_theme catppuccin-starrynight"
+        echo "   spicetify config color_scheme $COLOR_SCHEME"
+        echo "   spicetify config extensions $EXTENSION_PATH"
+        echo "   spicetify apply"
+        exit 1
+    fi
 fi
 
 # Success message

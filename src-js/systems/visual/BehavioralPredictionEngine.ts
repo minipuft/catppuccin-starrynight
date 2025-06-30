@@ -38,7 +38,7 @@ interface Prediction {
 // YEAR 3000 BEHAVIORAL PREDICTION ENGINE - Performance Optimized
 export class BehavioralPredictionEngine extends BaseVisualSystem {
   // TODO: Implement abstract onAnimate method for Year 3000 MasterAnimationCoordinator
-  public onAnimate(deltaMs: number): void {
+  public override onAnimate(deltaMs: number): void {
     // Basic implementation - can be enhanced in future phases
   }
   public modeConfig: any;
@@ -107,7 +107,7 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
     }
   }
 
-  async initialize() {
+  public override async initialize() {
     await super.initialize();
     if (this.modeConfig?.quantumEmpathyEnabled) {
       this.initializeOptimizedQuantumEmpathy();
@@ -428,7 +428,7 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
     }
   }
 
-  public updateFromMusicAnalysis(
+  public override updateFromMusicAnalysis(
     processedMusicData: any,
     timestamp?: number
   ): void {
@@ -509,7 +509,7 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
     return ["sn-anticipatory-warmth"];
   }
 
-  updateModeConfiguration(modeConfig: any) {
+  override updateModeConfiguration(modeConfig: any) {
     super.updateModeConfiguration(modeConfig);
     this.updatePredictionBehaviorForMode();
     if (this.modeConfig?.quantumEmpathyEnabled) {
@@ -530,7 +530,7 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
     }
   }
 
-  destroy() {
+  override destroy() {
     super.destroy();
     this._activeTimers.forEach(clearInterval);
     this._eventListeners.forEach(({ element, event, handler }) => {
@@ -595,7 +595,7 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
     };
   }
 
-  updateAnimation(timestamp: number, deltaTime: number) {
+  override  updateAnimation(timestamp: number, deltaTime: number) {
     if (!this.initialized || !this.modeConfig?.quantumEmpathyEnabled) return;
     // This system's primary updates are interval-based, not frame-based
   }

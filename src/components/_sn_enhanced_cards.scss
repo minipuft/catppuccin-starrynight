@@ -58,15 +58,15 @@
 
   // === Advanced Color Harmony ===
   --card-energy-primary: rgba(
-    var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+    var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
     0.8
   );
   --card-energy-secondary: rgba(
-    var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0, 186,187,241)),
+    var(--sn-accent-rgb, var(--spice-rgb-surface0, 186,187,241)),
     0.6
   );
   --card-energy-accent: rgba(
-    var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+    var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
     0.7
   );
   --card-energy-ambient: rgba(
@@ -120,15 +120,15 @@
 
   // === Search-Compatible Color System ===
   --card-color-primary: rgba(
-    var(--sn-gradient-primary-rgb, var(--sn-dynamic-accent-rgb, 202,158,230)),
+    var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
     0.08
   );
   --card-color-secondary: rgba(
-    var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0, 186,187,241)),
+    var(--sn-accent-rgb, var(--spice-rgb-surface0, 186,187,241)),
     0.06
   );
   --card-color-accent: rgba(
-    var(--sn-gradient-accent-rgb, var(--sn-dynamic-accent-rgb, 140,170,238)),
+    var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
     0.07
   );
   --card-shadow-base: rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.12);
@@ -137,48 +137,6 @@
 // =============================================================================
 // CONTEXTUAL INTELLIGENCE ZONES - Year 3000 Adaptive Interface System
 // =============================================================================
-
-// Focus Mode: Enhanced for quantum search interface
-.main-searchPage-content,
-[data-pathname*="search"],
-.search-focused,
-[data-context="focus"] {
-  --motion-intelligence-level: var(--focus-mode-dampening);
-  --card-energy-pulse-rate: calc(var(--card-energy-pulse-rate) * 2);
-  --card-bloom-threshold: calc(var(--card-bloom-threshold) * 2);
-
-  // Enable quantum field interactions
-  --quantum-field-active: 1;
-  --holographic-depth-enabled: 1;
-
-  // Focus feedback shifts to quantum-enhanced interactions
-  .main-card-card {
-    --focus-feedback-mode: 1;
-
-    // Quantum-aware transform origin
-    transform-origin: center center -50px;
-
-    &:hover {
-      background: linear-gradient(
-        135deg,
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.08) 0%,
-        rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.05)
-          100%
-      );
-      border-color: rgba(
-        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-        0.3
-      );
-
-      // Enhanced quantum integration
-      backdrop-filter: blur(20px) saturate(1.3);
-      box-shadow: 0 8px 32px
-          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.12),
-        0 4px 16px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.15),
-        inset 0 1px 0 rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1);
-    }
-  }
-}
 
 // Discovery Mode: Full expressiveness for exploration and browsing
 .main-entityHeader-container,
@@ -244,17 +202,17 @@
     calc(135deg + (var(--card-rhythm-phase) * 2deg)),
     // Kinetic Verb: HARMONIZE
     rgba(
-        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+        var(--sn-accent-rgb, var(--spice-rgb-accent)),
         calc(0.05 + (var(--card-beat-intensity) * 0.03))
       )
       0%,
     rgba(
-        var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)),
+        var(--sn-accent-rgb, var(--spice-rgb-surface0)),
         calc(0.08 + (var(--card-beat-intensity) * 0.04))
       )
       50%,
     rgba(
-        var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)),
+        var(--sn-accent-rgb, var(--spice-rgb-surface1)),
         calc(0.03 + (var(--card-beat-intensity) * 0.02))
       )
       100%
@@ -263,12 +221,12 @@
   // Advanced glassmorphism with dynamic blur
   backdrop-filter: blur(20px) saturate(1.3);
   border: 1px solid
-    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.15);
+    rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.15);
 
   // Softened organic shadow to reduce visual bloom while preserving beat dynamics
   box-shadow: 0 4px calc(16px + (6px * var(--card-beat-intensity)))
       rgba(
-        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+        var(--sn-accent-rgb, var(--spice-rgb-accent)),
         calc(0.05 + (var(--card-beat-intensity) * 0.05))
       ),
     0 8px calc(24px + (8px * var(--card-beat-intensity)))
@@ -306,9 +264,9 @@
 
     background: radial-gradient(
       ellipse 120% 100% at center,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0) 0%,
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0) 0%,
       rgba(
-        var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+        var(--sn-accent-rgb, var(--spice-rgb-accent)),
         var(--card-bloom-alpha)
       ) 40%,
       transparent 70%
@@ -330,27 +288,27 @@
     // Enhanced holographic background
     background: linear-gradient(
       135deg,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.12) 0%,
-      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.15)
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.12) 0%,
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-surface0)), 0.15)
         50%,
-      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.08) 100%
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-surface1)), 0.08) 100%
     );
 
     // Advanced glassmorphism enhancement
     backdrop-filter: blur(25px) saturate(1.5) contrast(1.1);
     border-color: rgba(
-      var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+      var(--sn-accent-rgb, var(--spice-rgb-accent)),
       0.4
     );
 
     // Sophisticated shadow with energy bloom
     box-shadow: 0 var(--calculated-lift) calc(var(--calculated-lift) * 2)
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.15),
+        rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.15),
       0 calc(var(--calculated-lift) * 2) calc(var(--calculated-lift) * 4)
         rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2),
       0 0 calc(var(--card-energy-field-radius) * 2)
         rgba(
-          var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
           var(--card-bloom-alpha)
         ),
       inset 0 1px 0 rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2);
@@ -388,7 +346,7 @@
       border: 2px solid var(--card-energy-primary);
       border-radius: calc(var(--card-organic-corners) + 3px);
       box-shadow: 0 0 12px
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4);
+        rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4);
       animation: nexus-focus-pulse var(--card-energy-pulse-rate) ease-in-out
         infinite;
     }
@@ -431,11 +389,11 @@
 
     background: conic-gradient(
       from 0deg,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4) 0deg,
-      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.2) 120deg,
-      rgba(var(--sn-gradient-secondary-rgb, var(--spice-rgb-surface0)), 0.4)
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4) 0deg,
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-surface1)), 0.2) 120deg,
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-surface0)), 0.4)
         240deg,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4) 360deg
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4) 360deg
     );
 
     border-radius: calc(var(--card-organic-corners) + 4px);
@@ -486,16 +444,16 @@
       text-shadow: 0 1px 3px
           rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.8),
         0 0 8px
-          rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2);
+          rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.2);
       color: rgba(255, 255, 255, 0.95);
       transition: all 300ms ease;
 
       &:hover {
-        color: rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 1);
+        color: rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 1);
         text-shadow: 0 1px 3px
             rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.8),
           0 0 12px
-            rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4);
+            rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4);
       }
     }
   }
@@ -521,7 +479,7 @@
     bottom: 0;
     background: radial-gradient(
       ellipse 100% 50% at center top,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.02) 0%,
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.02) 0%,
       transparent 60%
     );
     pointer-events: none;
@@ -563,18 +521,18 @@
   // Enhanced visual design with dynamic energy
   background: radial-gradient(
     circle,
-    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.95) 0%,
-    rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.85) 100%
+    rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.95) 0%,
+    rgba(var(--sn-accent-rgb, var(--spice-rgb-surface1)), 0.85) 100%
   );
 
   box-shadow: 0 4px 16px
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3),
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.3),
     0 8px 32px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2),
     inset 0 1px 0 rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2);
 
   backdrop-filter: blur(12px);
   border: 1px solid
-    rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3);
+    rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.3);
 
   // Initial state - contextual visibility
   opacity: calc(0.2 * var(--motion-intelligence-level, 1));
@@ -593,7 +551,7 @@
     height: 0;
     background: radial-gradient(
       circle,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.3) 0%,
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.3) 0%,
       transparent 70%
     );
     border-radius: 50%;
@@ -617,15 +575,15 @@
     transform: scale(calc(1 + 0.08 * var(--motion-intelligence-level, 1)));
     background: radial-gradient(
       circle,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 1) 0%,
-      rgba(var(--sn-gradient-accent-rgb, var(--spice-rgb-surface1)), 0.95) 100%
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 1) 0%,
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-surface1)), 0.95) 100%
     );
 
     box-shadow: 0 6px 24px
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4),
+        rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4),
       0 12px 48px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.3),
       0 0 16px
-        rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.2);
+        rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.2);
 
     // Activate energy bloom
     &::before {
@@ -650,12 +608,12 @@
   0%,
   100% {
     box-shadow: 0 0 12px
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.4);
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4);
     transform: scale(1);
   }
   50% {
     box-shadow: 0 0 20px
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)), 0.6);
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.6);
     transform: scale(1.02);
   }
 }
@@ -858,29 +816,6 @@ body:not(:has(.main-searchPage-content)) {
   }
 } // End of non-search body selector
 
-// =============================================================================
-// SEARCH PAGE CARDS - Let Precision Module Handle Entirely
-// =============================================================================
-
-// Ensure search cards are completely handled by our precision targeting
-.main-searchPage-content .main-card-card {
-  // Reset only conflicting properties, not everything
-  margin: 0;
-  padding: inherit;
-  display: block;
-  position: relative;
-  box-sizing: border-box;
-
-  // Preserve essential clickability
-  cursor: pointer;
-  text-decoration: none;
-
-  // Preserve accessibility
-  &:focus-visible {
-    outline: 2px solid var(--spice-accent);
-    outline-offset: 2px;
-  }
-}
 
 // =============================================================================
 // PERFORMANCE OPTIMIZATIONS
