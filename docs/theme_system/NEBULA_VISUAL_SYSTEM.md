@@ -1,5 +1,10 @@
 # 🌌 Nebula Visual System Documentation
 
+> **Experimental Notice – WebGPU**
+>
+> The WebGPU portions of StarryNight (e.g. `WebGPUBackgroundSystem`) are **experimental** and **off by default**.
+> Most users will see the **CSS / WebGL fallback** path described below. Enable the `sn-enable-webgpu` setting _only for testing_ on browsers that expose `navigator.gpu`.
+
 ## Overview
 
 The **Nebula Visual System** is the atmospheric glow that sits behind the main content of Catppuccin StarryNight, gently reacting to **music, scrolling and genre changes** while remaining GPU-friendly. It is composed of two cooperating runtimes:

@@ -5,6 +5,7 @@
 
 import type { IManagedSystem } from "@/types/systems";
 import { elementExists } from "./SpotifyDOMSelectors";
+import { YEAR3000_CONFIG } from "@/config/globalConfig";
 
 type CriticalLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 type SystemStatus =
@@ -748,3 +749,24 @@ export class SystemHealthMonitor {
 if (typeof window !== "undefined") {
   (window as any).SystemHealthMonitor = new SystemHealthMonitor();
 }
+
+// ===================================================================
+// 🌟 Y3K DEBUG INTERFACE EXPORT
+// ===================================================================
+// Export Y3K debug interface that other systems expect to import
+
+export const Y3K = {
+  debug: {
+    log: (component: string, message: string, ...args: any[]) => {
+      if (YEAR3000_CONFIG?.enableDebug) {
+        console.log(`[${component}] ${message}`, ...args);
+      }
+    },
+    error: (component: string, message: string, error?: any) => {
+      console.error(`[${component}] ${message}`, error);
+    },
+    warn: (component: string, message: string, ...args: any[]) => {
+      console.warn(`[${component}] ${message}`, ...args);
+    }
+  }
+};

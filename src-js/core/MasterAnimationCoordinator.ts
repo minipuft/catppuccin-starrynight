@@ -4,6 +4,7 @@
 // Replaces multiple concurrent requestAnimationFrame loops with single coordinated system
 // Provides frame budgeting, priority-based scheduling, and automatic performance optimization
 
+import { CSSVariableBatcher } from "./CSSVariableBatcher";
 import { DeviceCapabilityDetector } from "./DeviceCapabilityDetector";
 
 interface CoordinatorConfig {
@@ -346,6 +347,10 @@ export class MasterAnimationCoordinator {
       }
     }
     this._performanceMetrics.totalFrames++;
+
+    // Ensure all queued CSS variable updates are committed this frame so
+    // time-sensitive visuals (now-playing bar, right sidebar) stay in sync
+    CSSVariableBatcher.instance?.flushCSSVariableBatch?.();
   }
 
   private _updatePerformanceMetrics(frameTime: number): void {

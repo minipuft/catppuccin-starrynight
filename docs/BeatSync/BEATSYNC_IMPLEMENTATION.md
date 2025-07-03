@@ -35,9 +35,9 @@ The BeatSync system operates through 3 fundamental CSS variables that bridge Jav
 - **`--sn-rhythm-phase`**: Continuous rhythm tracking, powers oscillating effects
 - **`--sn-breathing-scale`**: Organic breathing rhythm, creates life-like scaling effects
 
-### 6 Kinetic Verbs Implementation Pattern
+### 7 Kinetic Verbs Implementation Pattern
 
-Each module implements BeatSync through 6 core kinetic verbs that define how elements respond to music:
+Each module implements BeatSync through 7 core kinetic verbs that define how elements respond to music:
 
 | Kinetic Verb  | Purpose                                 | Implementation Pattern                                               | Musical Trigger   |
 | ------------- | --------------------------------------- | -------------------------------------------------------------------- | ----------------- |
@@ -47,6 +47,7 @@ Each module implements BeatSync through 6 core kinetic verbs that define how ele
 | **OSCILLATE** | Rhythmic movement using rhythm phase    | `transform: rotate(calc(var(--sn-rhythm-phase) * 5deg))`             | Continuous rhythm |
 | **REFRACT**   | Color spectrum effects during beats     | `filter: hue-rotate(calc(var(--sn-beat-pulse-intensity) * 30deg))`   | Beat intensity    |
 | **MORPH**     | Shape/transform changes                 | `transform: scale(var(--sn-breathing-scale))`                        | Breathing rhythm  |
+| **DRIFT**     | WebGL gradient flow strength modulation | `u_flowStrength = 0.4 + (beat_intensity * 0.6)`                     | Beat intensity    |
 
 ---
 
@@ -490,6 +491,57 @@ h6 {
 
 ---
 
+### 5. WebGL Flow Gradient System - Beat-Responsive Fluid Motion (NEW)
+
+**Implementation Scope:** WebGL shader integration with BeatSync adapter
+
+#### DRIFT Kinetic Verb Implementation
+
+The WebGL Flow Gradient system introduces the **DRIFT** kinetic verb, which modulates the WebGL shader's flow strength based on beat intensity:
+
+```typescript
+// BeatSync ↔ Flow Gradient Adapter in BeatSyncVisualSystem
+private _updateCSSVariables(/* ... */) {
+  // Map --sn-beat-pulse-intensity to u_flowStrength (range 0.4-1.0)
+  const flowStrength = 0.4 + (beatPulseIntensity * 0.6);
+  queueCSSUpdate("--sn-flow-strength", flowStrength.toFixed(3));
+}
+```
+
+#### WebGL Uniform Integration
+
+```typescript
+// WebGLGradientBackgroundSystem shader uniform update
+private render(currentTime: number): void {
+  if (this.uniforms.u_flowStrength) {
+    // BeatSync ↔ Flow Gradient Adapter: Read from CSS variable
+    const rootStyle = document.documentElement;
+    const flowStrengthValue = rootStyle.style.getPropertyValue('--sn-flow-strength').trim();
+    const flowStrength = flowStrengthValue ? parseFloat(flowStrengthValue) : this.settings.flowStrength;
+    this.gl.uniform1f(this.uniforms.u_flowStrength, flowStrength);
+  }
+}
+```
+
+#### Real-time Flow Behavior
+
+The DRIFT verb creates organic, beat-responsive movement patterns:
+
+- **Base Flow**: Constant 0.4 flow strength provides subtle background motion
+- **Beat Enhancement**: Each beat adds up to 0.6 additional flow strength
+- **Range**: 0.4 (calm) → 1.0 (intense beat peaks)
+- **Visual Result**: Gradient flows appear to "dance" with the music rhythm
+
+**Key Achievements:**
+
+- ✅ DRIFT kinetic verb integrated with WebGL shader pipeline  
+- ✅ CSS variable bridge connecting BeatSync to WebGL uniforms
+- ✅ Real-time flow strength modulation based on beat intensity
+- ✅ Seamless integration with existing WebGL flow gradient system
+- ✅ Performance-optimized with frame-rate independent updates
+
+---
+
 ## 🎛️ Variable Architecture Enhancement
 
 ### Universal BeatSync Integration
@@ -524,6 +576,9 @@ Each module now includes comprehensive BeatSync variable integration:
   --sn-3d-perspective-depth: 1000px;
   --sn-3d-rotation-intensity: 1deg;
   --sn-3d-cosmic-glow-radius: 8px;
+
+  // WebGL Flow Gradient Consciousness (NEW)
+  --sn-flow-strength: 0.7; // 0.4-1.0, WebGL shader flow intensity
 }
 ```
 
@@ -701,6 +756,9 @@ All BeatSync modules use GPU-accelerated properties:
 
   // MORPH: Scale changes
   transform: scale(var(--module-breathing-scale));
+
+  // DRIFT: WebGL flow strength (for WebGL systems)
+  --sn-flow-strength: calc(0.4 + var(--module-beat-intensity) * 0.6);
 }
 ```
 

@@ -51,6 +51,8 @@ export interface ThemeSettings {
   "sn-glass-beat-pulse": "true" | "false";
   /** Glass Base Intensity: Controls base glass blur intensity (0-1) */
   "sn-glass-base-intensity": string;
+  /** Flow Gradient: WebGL flowing gradient background intensity */
+  "sn-flow-gradient": "disabled" | "minimal" | "balanced" | "intense";
 }
 
 type ValidationSchema = {
@@ -117,6 +119,7 @@ export class SettingsManager implements IManagedSystem {
       "sn-animation-quality": "auto",
       "sn-glass-beat-pulse": "true",
       "sn-glass-base-intensity": "0.5",
+      "sn-flow-gradient": "balanced",
     };
 
     this.validationSchemas = {
@@ -208,6 +211,10 @@ export class SettingsManager implements IManagedSystem {
         allowedValues: ["true", "false"],
       },
       "sn-glass-base-intensity": { default: "0.5" },
+      "sn-flow-gradient": {
+        default: "balanced",
+        allowedValues: ["disabled", "minimal", "balanced", "intense"],
+      },
     };
 
     this.validateAndRepair();

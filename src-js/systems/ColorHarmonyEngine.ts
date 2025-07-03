@@ -1186,6 +1186,119 @@ export class ColorHarmonyEngine
     };
   }
 
+  /**
+   * Get current gradient colors optimized for WebGL texture creation
+   * @param stopCount Number of gradient stops to generate (default: 5)
+   * @returns Array of RGB color objects or null if unavailable
+   */
+  public getCurrentGradient(stopCount: number = 5): Array<{r: number, g: number, b: number}> | null {
+    try {
+      const currentPalette = this.catppuccinPalettes[this.currentTheme];
+      if (!currentPalette) {
+        return null;
+      }
+
+      // Get current accent color from CSS variables
+      const accentHex = this.utils.getRootStyle(ColorHarmonyEngine.CANONICAL_HEX_VAR);
+      let primaryColor: RGBColor;
+      
+      if (accentHex && accentHex !== '') {
+        primaryColor = this.utils.hexToRgb(accentHex);
+      } else {
+        // Fallback to theme default accent
+        const defaultAccent = currentPalette.accents.mauve || '#cba6f7';
+        primaryColor = this.utils.hexToRgb(defaultAccent);
+      }
+
+      // Generate harmonious color variations
+      const gradientColors: Array<{r: number, g: number, b: number}> = [];
+      
+      // Apply kinetic state for music-responsive dynamics
+      const musicInfluence = this.kineticState.musicIntensityMultiplier || 1.0;
+      const hueShift = this.kineticState.hueShift || 0;
+      const valenceGravity = this.kineticState.valenceGravity || 0.5;
+
+      // Generate gradient stops
+      for (let i = 0; i < stopCount; i++) {
+        const position = i / (stopCount - 1); // 0 to 1
+        
+        // Create color variation based on position
+        let variantColor: RGBColor;
+        
+        if (position === 0) {
+          // Start with darker base color
+          variantColor = this._createVariant(primaryColor, -0.3, valenceGravity, hueShift);
+        } else if (position === 1) {
+          // End with lighter accent color
+          variantColor = this._createVariant(primaryColor, 0.2, valenceGravity, hueShift);
+        } else {
+          // Intermediate colors with smooth transitions
+          const lightnessFactor = (position - 0.5) * 0.4;
+          variantColor = this._createVariant(primaryColor, lightnessFactor, valenceGravity, hueShift);
+        }
+
+        // Apply music intensity scaling
+        variantColor = this._applyMusicInfluence(variantColor, musicInfluence, position);
+        
+        gradientColors.push({
+          r: Math.round(Math.max(0, Math.min(255, variantColor.r))),
+          g: Math.round(Math.max(0, Math.min(255, variantColor.g))),
+          b: Math.round(Math.max(0, Math.min(255, variantColor.b)))
+        });
+      }
+
+      if (this.config?.enableDebug) {
+        console.log(`[ColorHarmonyEngine] Generated gradient with ${stopCount} stops:`, gradientColors);
+      }
+
+      return gradientColors;
+    } catch (error) {
+      if (this.config?.enableDebug) {
+        console.error('[ColorHarmonyEngine] Failed to generate gradient:', error);
+      }
+      return null;
+    }
+  }
+
+  /**
+   * Create a color variant with lightness, saturation, and hue adjustments
+   */
+  private _createVariant(baseColor: RGBColor, lightnessFactor: number, valenceGravity: number, hueShift: number): RGBColor {
+    // Convert to OKLab for perceptual adjustments
+    const oklab = this.utils.rgbToOklab(baseColor.r, baseColor.g, baseColor.b);
+    
+    // Adjust lightness (-1 to 1 range)
+    const newL = Math.max(0, Math.min(1, oklab.L + lightnessFactor * 0.2));
+    
+    // Apply music valence to chroma (saturation)
+    const chromaScale = 0.8 + (valenceGravity * 0.4); // 0.8 to 1.2 range
+    const newA = oklab.a * chromaScale;
+    const newB = oklab.b * chromaScale;
+    
+    // Apply subtle hue shift from music
+    const hueAdjustment = hueShift * 0.1; // Subtle shift
+    const adjustedA = newA * Math.cos(hueAdjustment) - newB * Math.sin(hueAdjustment);
+    const adjustedB = newA * Math.sin(hueAdjustment) + newB * Math.cos(hueAdjustment);
+    
+    // Convert back to RGB
+    return this.utils.oklabToRgb(newL, adjustedA, adjustedB);
+  }
+
+  /**
+   * Apply music intensity influence to color
+   */
+  private _applyMusicInfluence(color: RGBColor, intensity: number, position: number): RGBColor {
+    // Scale intensity effect based on gradient position
+    const positionEffect = 1 + (Math.sin(position * Math.PI) * 0.2); // Boost middle colors
+    const effectiveIntensity = Math.max(0.7, Math.min(1.3, intensity * positionEffect));
+    
+    return {
+      r: color.r * effectiveIntensity,
+      g: color.g * effectiveIntensity,
+      b: color.b * effectiveIntensity
+    };
+  }
+
   // =========================
   // PUBLIC API – User Control
   // =========================

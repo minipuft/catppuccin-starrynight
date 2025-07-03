@@ -1,29 +1,23 @@
-# 🌌 Catppuccin StarryNight: Year 3000 Visual System
-
 <div align="center">
-  <img src="assets/logo.png" alt="Catppuccin StarryNight Logo" width="180"/>
+  <img src="assets/logo.png" alt="Catppuccin StarryNight Logo" width="200"/>
+  <h1>Catppuccin StarryNight</h1>
+  <p><strong>Year 3000 Visual System for Spotify</strong></p>
+
+  <p>
+    <a href="https://github.com/minipuft/catppuccin-starrynight/stargazers"><img src="https://img.shields.io/github/stars/minipuft/catppuccin-starrynight?style=for-the-badge&colorA=363a4f&colorB=cba6f7&logo=github" alt="Stars"></a>
+    <a href="https://github.com/minipuft/catppuccin-starrynight/releases/latest"><img src="https://img.shields.io/github/v/release/minipuft/catppuccin-starrynight?style=for-the-badge&colorA=363a4f&colorB=a6e3a1&logo=github" alt="Release"></a>
+    <a href="https://github.com/minipuft/catppuccin-starrynight/blob/main/LICENSE"><img src="https://img.shields.io/github/license/minipuft/catppuccin-starrynight?style=for-the-badge&colorA=363a4f&colorB=f9e2af&logo=github" alt="License"></a>
+    <a href="https://github.com/minipuft/catppuccin-starrynight/issues"><img src="https://img.shields.io/github/issues/minipuft/catppuccin-starrynight?style=for-the-badge&colorA=363a4f&colorB=f38ba8&logo=github" alt="Issues"></a>
+  </p>
 </div>
 
-Catppuccin StarryNight is a music-reactive, performance-aware theme for Spotify (via Spicetify). It blends dynamic color extraction, beat-synchronized visuals, and a modular animation system to create a more immersive and responsive Spotify experience. This README is meant to help you get started, customize, and understand how the theme works—think of it as a friendly guide, not a sales pitch.
-
 ---
 
-## Features
+**Catppuccin StarryNight** is more than just a theme—it's a visual system designed to transform your Spotify client into a dynamic, music-reactive experience. Built on the beloved [Catppuccin](https://github.com/catppuccin) color palette, it synchronizes UI elements with your music's rhythm and energy, while adapting its colors to every song's album art.
 
-- **Dynamic Color Pipeline**: UI colors adapt in real-time to album art and Catppuccin flavor.
-- **BeatSync Visuals**: UI elements pulse, bloom, and animate in sync with the music's BPM and energy.
-- **Performance Core**: Single animation loop and CSS variable batching for smooth 60 FPS visuals.
-- **Graceful Degradation**: Supports reduced-motion, low-end hardware, and fallback modes.
-- **Modular Visual Systems**: Includes 3D card effects, glassmorphism, nebula glows, and more.
-- **Settings UI**: Change theme options directly in Spotify's preferences.
-- **Advanced Drag-and-Drop**: Enhanced drag ghosts, quick-add radial menu, and sidebar morphing.
-- **Accessibility**: Honors system motion/contrast preferences and provides keyboard navigation.
+Engineered for performance and designed for immersion, StarryNight uses a sophisticated animation and color pipeline to deliver stunning visuals at a smooth 60 FPS, even on modest hardware. This project represents a significant effort in reverse-engineering Spotify's UI and building a robust, customizable, and beautiful experience for music lovers.
 
-For a deeper dive, see the [Documentation Hub](docs/README.md) and [Visual Systems Architecture](docs/VISUAL_SYSTEMS_ARCHITECTURE.md).
-
----
-
-## Screenshots
+## 📸 Screenshots
 
 <div align="center">
   <table>
@@ -48,115 +42,138 @@ For a deeper dive, see the [Documentation Hub](docs/README.md) and [Visual Syste
   </table>
 </div>
 
-_The theme adapts to your music and color preferences in real time._
+*The theme adapts to your music and color preferences in real time.*
 
----
+## ✨ Features
 
-## Table of Contents
+-   **🎨 Dynamic Color Pipeline**: UI colors adapt in real-time to album art, harmonized with your chosen Catppuccin flavor.
+-   **🌊 WebGL Flow Gradient**: Revolutionary flowing gradient system with dual time-offset waves, dynamic blur, and hardware acceleration.
+-   **🎵 BeatSync Visuals**: UI elements pulse, bloom, and animate in sync with the music's BPM and energy.
+-   **🚀 Performance Core**: A unified animation loop and batched CSS variable updates ensure a smooth 60 FPS experience.
+-   **⚙️ Graceful Degradation**: Automatically scales visual fidelity for reduced-motion settings, low-end hardware, and fallback modes.
+-   **🔮 Modular Visual Systems**: Includes 3D card effects, glassmorphism, nebula glows, wave stack blending, and more, all configurable.
+-   **🔧 In-App Settings**: Tweak theme options directly in Spotify's preferences menu—no manual file editing required.
+-   **🖐️ Advanced Drag-and-Drop**: Experience enhanced drag ghosts, a quick-add radial menu, and morphing sidebar interactions.
+-   **♿ Accessibility**: Respects system motion/contrast preferences and provides full keyboard navigation.
 
-- [🌌 Catppuccin StarryNight: Year 3000 Visual System](#-catppuccin-starrynight-year-3000-visual-system)
-  - [Features](#features)
-  - [Screenshots](#screenshots)
-  - [Table of Contents](#table-of-contents)
-  - [Installation](#installation)
-    - [Prerequisites](#prerequisites)
-    - [Method 1: PowerShell Script (Recommended)](#method-1-powershell-script-recommended)
-    - [Method 2: Manual Setup](#method-2-manual-setup)
-  - [Customization](#customization)
-  - [Troubleshooting](#troubleshooting)
-  - [Credits](#credits)
-  - [License](#license)
+For a deeper dive, explore the [**Documentation Hub**](docs/README.md) and the [**Visual Systems Architecture**](docs/VISUAL_SYSTEMS_ARCHITECTURE.md).
 
----
-
-## Installation
+## 🚀 Installation
 
 ### Prerequisites
 
-- [Spicetify CLI](https://spicetify.app/docs/getting-started) installed
+-   [Spicetify CLI](https://spicetify.app/docs/getting-started) must be installed.
+-   You are on the latest version of Spotify.
 
-### Method 1: PowerShell Script (Recommended)
+### Method 1: Automated Install
 
+**Windows (PowerShell):**
+This one-line command automatically installs the theme, downloads the required extension, and applies the optimal configuration.
 ```powershell
 iwr -useb "https://raw.githubusercontent.com/minipuft/catppuccin-starrynight/main/install.ps1" | iex
 ```
 
-- Installs theme files, configures the extension, and applies optimal settings.
+**Linux/macOS (Bash):**
+This script clones the repository and sets up the theme and extension for you.
+```bash
+curl -fsSL "https://raw.githubusercontent.com/minipuft/catppuccin-starrynight/main/install.sh" | sh
+```
 
 ### Method 2: Manual Setup
 
-1. Download and extract the theme to your Spicetify Themes directory:
-   ```powershell
-   cd "$env:APPDATA\spicetify\Themes"
-   # Extract catppuccin-starrynight folder here (with Extensions directory)
-   ```
-2. Apply the theme and extension:
-   ```powershell
-   spicetify config current_theme catppuccin-starrynight
-   spicetify config color_scheme mocha
-   spicetify config extensions catppuccin-starrynight/Extensions/catppuccin-starrynight.js
-   spicetify backup apply
-   ```
+1.  **Download the Theme**:
+    -   Go to the [**Releases**](https://github.com/minipuft/catppuccin-starrynight/releases/latest) page.
+    -   Download the `Source code (zip)` and extract it.
 
----
+2.  **Install Files**:
+    -   Move the contents of the extracted folder into a new folder named `catppuccin-starrynight` inside your Spicetify `Themes` directory.
+    -   Copy `Extensions/catppuccin-starrynight.js` from your theme folder to your Spicetify `Extensions` directory.
 
-## Customization
+3.  **Apply the Theme**:
+    Run the following commands in your terminal:
+    ```bash
+    spicetify config current_theme catppuccin-starrynight
+    spicetify config color_scheme mocha # Or latte, frappe, macchiato
+    spicetify config extensions catppuccin-starrynight.js
+    spicetify backup apply
+    ```
 
-You can adjust the theme's appearance and behavior in Spotify's preferences panel. Options include:
+## 🎨 Customization
 
-- **Accent Color**: Choose a static Catppuccin accent or let it adapt to album art.
-- **Dynamic Gradient**: Control the intensity of background gradients.
-- **Star Animation**: Set the density and speed of star overlays.
-- **Performance Mode**: Optimize for your device.
-- **Flavor**: Switch between Latte, Frappé, Macchiato, and Mocha color schemes.
+Fine-tune your experience directly from Spotify's **Settings > Catppuccin StarryNight** panel.
 
-For advanced tweaks, you can override CSS variables in `user.css`:
+**Available Options:**
+-   **Flavor**: Switch between Latte, Frappé, Macchiato, and Mocha color schemes.
+-   **Accent Color**: Choose a static Catppuccin accent or let it adapt dynamically to album art.
+-   **Flow Gradient**: Control WebGL gradient intensity (minimal/balanced/intense) with automatic fallback.
+-   **Dynamic Gradient**: Control the intensity and blur of the background gradients.
+-   **Star Animation**: Set the density and speed of the animated starfield overlay.
+-   **Performance Mode**: Optimize visuals for your specific device capabilities.
+
+For advanced tweaks, you can override CSS variables by creating a `user.css` file in your Spicetify config directory:
 
 ```css
+/* Example user.css overrides */
 :root {
   --sn-gradient-opacity: 0.25;
   --sn-gradient-blur: 30px;
+  --sn-gradient-flow-x: 0%;          /* WebGL flow offset X */
+  --sn-gradient-flow-y: 0%;          /* WebGL flow offset Y */
+  --sn-gradient-flow-scale: 1.0;     /* WebGL flow scale */
   --sn-star-count: 5;
   --sn-star-speed: 6s;
   --sn-color-saturation: 1.3;
   --sn-color-brightness: 1.1;
 }
+
+/* Disable skew transform on all viewports */
+.sn-flow-gradient-wrapper {
+  transform: skewY(0deg) translateZ(0) !important;
+}
 ```
+See the [**Customization Guide**](docs/README.md) for more details.
 
-See [docs/README.md](docs/README.md) for more details and technical documentation.
+## 🛠️ Troubleshooting
 
----
+**Theme not applying correctly?**
+-   Run `spicetify restore backup apply` and then try applying the theme again.
+-   Ensure you have the latest version of Spotify and Spicetify.
 
-## Troubleshooting
+**Dynamic colors not working?**
+1.  Make sure the `catppuccin-starrynight.js` extension is enabled in your `config-xpui.ini` file.
+2.  In the theme's settings, ensure the Accent Color is set to "Dynamic".
+3.  Restart Spotify completely.
+4.  Check the Spicetify console for errors via `Spicetify > Advanced > Developer tools`. Look for "Year 3000 Color Harmony System initialized".
 
-- **Theme not showing up**: Run `spicetify restore backup apply`.
-- **Dynamic colors not working**:
-  1. Check that the extension is installed and enabled.
-  2. Select "Dynamic" in accent color settings.
-  3. Restart Spotify.
-  4. Ensure `catppuccin-starrynight.js` is in the Extensions folder.
-  5. Check for "Year 3000 Color Harmony System initialized" in the console.
-- **Performance issues**: Lower gradient/star settings or enable eco mode.
-- **PowerShell execution policy error**: Run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
-- **Colors look wrong**: Try a different color scheme or reset settings.
+**Performance issues?**
+-   Lower the gradient/star settings in the theme's options panel.
+-   Set Flow Gradient to "minimal" or "disabled" for older hardware.
+-   Enable "Eco Mode" to reduce animation intensity.
 
-For more, see the [full troubleshooting guide](docs/README.md#troubleshooting) and the [docs/](docs/) directory for technical details.
+**WebGL gradient not working?**
+-   Check if WebGL2 is supported: Open browser console and run `!!document.createElement('canvas').getContext('webgl2')`
+-   Update your graphics drivers to the latest version.
+-   The theme automatically falls back to CSS gradients if WebGL is unavailable.
 
----
+**PowerShell script error?**
+-   You may need to change the execution policy. Run this command in PowerShell: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
 
-## Credits
+For more solutions, see the [**full troubleshooting guide**](docs/README.md#troubleshooting).
 
-- **Catppuccin**: Color palette and UI inspiration ([repo](https://github.com/catppuccin/spicetify))
-- **StarryNight Vibrant**: Dynamic effects inspiration ([repo](https://github.com/ElPioterro/StarryNightVibrant))
-- **Spicetify**: The platform that makes Spotify theming possible ([repo](https://github.com/spicetify/spicetify-cli))
-- Thanks to all contributors and the open-source community!
+## 🤝 Contributing
 
----
+This project is a labor of love, and contributions are welcome! Whether it's reporting a bug, suggesting a feature, or submitting a pull request, your help is appreciated.
 
-## License
+-   **Bugs & Suggestions**: Please open an [**Issue**](https://github.com/minipuft/catppuccin-starrynight/issues/new/choose) using the appropriate template.
+-   **Development**: If you'd like to contribute code, please see the [**Development Guide**](docs/development/PROJECT_RULES.md) to get started.
 
-MIT License — see [LICENSE](LICENSE) for details.
+## ❤️ Credits & Thanks
 
----
+-   **[Catppuccin](https://github.com/catppuccin)**: For the wonderful color palette that started it all.
+-   **[ElPioterro](https://github.com/ElPioterro)**: For the original StarryNight theme that inspired this project's visual effects.
+-   **[Spicetify Community](https://github.com/spicetify/spicetify-cli)**: For building the tools that make Spotify theming possible.
+-   And a huge thank you to all contributors and users!
 
-_If you have questions, suggestions, or want to contribute, feel free to open an issue or pull request!_
+## 📜 License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.

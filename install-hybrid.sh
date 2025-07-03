@@ -5,6 +5,8 @@
 COLOR_SCHEME=${1:-mocha}
 FORCE=${2:-false}
 
+IN_WSL=false # Flag to indicate we are running inside WSL
+
 echo "🌙✨ Catppuccin StarryNight Theme Installer (Hybrid)"
 echo "================================================"
 
@@ -28,6 +30,7 @@ TARGET_LOCATIONS=()
 
 # Check if running in WSL and get Windows paths
 if [[ -n "$WSL_DISTRO_NAME" ]]; then
+    IN_WSL=true  # Flag used later to conditionally skip certain commands
     echo "🐧 WSL environment detected. Attempting to find Windows Spicetify paths."
 
     # Get Roaming AppData path
@@ -233,28 +236,33 @@ else
 fi
 
 # Apply changes
-echo "🚀 Applying theme..."
-if [ "$IS_NEW_VERSION" = true ]; then
-    if $SPICETIFY_CMD backup apply; then
-        echo "✅ Theme applied successfully using 'backup apply' (CLI 2.27+)"
-    else
-        echo "❌ Error applying theme. Try running manually:"
-        echo "   $SPICETIFY_CMD config current_theme catppuccin-starrynight"
-        echo "   $SPICETIFY_CMD config color_scheme $COLOR_SCHEME"
-        echo "   $SPICETIFY_CMD config extensions $EXTENSION_PATH"
-        echo "   $SPICETIFY_CMD backup apply"
-        exit 1
-    fi
+if [ "$IN_WSL" = true ]; then
+    echo "⚠️  Detected WSL environment. Skipping 'spicetify apply/backup apply' commands."
+    echo "   Please run 'spicetify backup apply' (or 'spicetify apply' for older CLI) from Windows PowerShell/CMD if required."
 else
-    if $SPICETIFY_CMD apply; then
-        echo "✅ Theme applied successfully using legacy 'apply' command"
+    echo "🚀 Applying theme..."
+    if [ "$IS_NEW_VERSION" = true ]; then
+        if $SPICETIFY_CMD backup apply; then
+            echo "✅ Theme applied successfully using 'backup apply' (CLI 2.27+)"
+        else
+            echo "❌ Error applying theme. Try running manually:"
+            echo "   $SPICETIFY_CMD config current_theme catppuccin-starrynight"
+            echo "   $SPICETIFY_CMD config color_scheme $COLOR_SCHEME"
+            echo "   $SPICETIFY_CMD config extensions $EXTENSION_PATH"
+            echo "   $SPICETIFY_CMD backup apply"
+            exit 1
+        fi
     else
-        echo "❌ Error applying theme. Try running manually:"
-        echo "   $SPICETIFY_CMD config current_theme catppuccin-starrynight"
-        echo "   $SPICETIFY_CMD config color_scheme $COLOR_SCHEME"
-        echo "   $SPICETIFY_CMD config extensions $EXTENSION_PATH"
-        echo "   $SPICETIFY_CMD apply"
-        exit 1
+        if $SPICETIFY_CMD apply; then
+            echo "✅ Theme applied successfully using legacy 'apply' command"
+        else
+            echo "❌ Error applying theme. Try running manually:"
+            echo "   $SPICETIFY_CMD config current_theme catppuccin-starrynight"
+            echo "   $SPICETIFY_CMD config color_scheme $COLOR_SCHEME"
+            echo "   $SPICETIFY_CMD config extensions $EXTENSION_PATH"
+            echo "   $SPICETIFY_CMD apply"
+            exit 1
+        fi
     fi
 fi
 

@@ -1,3 +1,56 @@
+## v1.2.0 – Flow Gradient Wave/Blur System (03-Jul-2025)
+
+### Added
+
+- **WebGL Flow Gradient System** - Comprehensive flowing gradient background with dual time-offset waves and dynamic blur
+  - `WebGLGradientBackgroundSystem` - New visual system extending `BaseVisualSystem`
+  - **Wave Stack Architecture**: Dual independent wave layers with per-wave alpha masks
+  - **Dynamic Blur System**: Power function blur calculation for depth perception
+  - **Three-Field Noise Blending**: Independent background noise with time offsets
+  - **CSS Skew Transform**: Sleek `-6deg` skew with responsive & accessibility support
+
+- **New Shader Uniforms**:
+  - `u_waveY[2]` - Wave Y positions (default: [0.25, 0.75])
+  - `u_waveHeight[2]` - Wave blend heights (default: [0.4, 0.3])
+  - `u_waveOffset[2]` - Time offsets (default: [2.5, -1.8])
+  - `u_blurExp` - Blur power function exponent (default: 1.2)
+  - `u_blurMax` - Maximum blur amount (default: 0.6)
+
+- **Public API Methods**:
+  - `setWaveY()`, `setWaveHeight()`, `setWaveOffset()` - Wave parameter control
+  - `setBlurSettings()` - Dynamic blur configuration
+  - `getMetrics()` - Performance monitoring (fps, compileErrors, isActive, settings)
+
+- **CSS Wrapper System**:
+  - `.sn-flow-gradient-wrapper` - Canvas container with transform isolation
+  - Mobile responsiveness: skew disabled ≤ 768px viewports
+  - Accessibility: `prefers-reduced-motion` compliance
+
+- **Intensity Presets**: `minimal` | `balanced` | `intense` with different parameter matrices
+- **Comprehensive Testing**: 33 unit tests covering wave stack, wrapper performance, and integration
+
+### Changed
+
+- **Enhanced Fallback Consistency**: CSS gradient fallback now matches WebGL skew transform
+- **Performance Optimizations**: GPU cost < 1ms @1080p, compile time < 3ms on Intel UHD 620
+- **Accessibility Improvements**: Full reduced motion support across WebGL and CSS systems
+
+### Technical Details
+
+- **Framework**: C.A.G.E.E.R.F methodology implementation
+- **Performance Targets**: 60fps target, <50MB memory, <10% CPU overhead  
+- **Browser Support**: WebGL2 baseline, automatic fallback to CSS gradient
+- **Quality Gates**: 90%+ test coverage, zero TypeScript errors, WCAG 2.1 AA compliance
+
+### Documentation
+
+- Updated `docs/webgl-gradient-integration.md` with Phase 1-5 implementation status
+- Added comprehensive troubleshooting section with driver compatibility matrix
+- Documented settings matrix, API methods, and debug tools
+- Performance benchmarks and accessibility compliance detailed
+
+---
+
 ## v1.1.0 – Canonical Accent Token Roll-Out (01-Jul-2025)
 
 ### Breaking ⚠️

@@ -1660,6 +1660,7 @@
   var init_MasterAnimationCoordinator = __esm({
     "src-js/core/MasterAnimationCoordinator.ts"() {
       "use strict";
+      init_CSSVariableBatcher();
       MasterAnimationCoordinator = class {
         constructor(config = {}) {
           this._animationSystemRegistry = /* @__PURE__ */ new Map();
@@ -1886,6 +1887,7 @@
             }
           }
           this._performanceMetrics.totalFrames++;
+          CSSVariableBatcher.instance?.flushCSSVariableBatch?.();
         }
         _updatePerformanceMetrics(frameTime) {
           const metrics = this._performanceMetrics;
@@ -3142,11 +3144,12 @@
   });
 
   // src-js/debug/SystemHealthMonitor.ts
-  var SystemHealthMonitor;
+  var SystemHealthMonitor, Y3K;
   var init_SystemHealthMonitor = __esm({
     "src-js/debug/SystemHealthMonitor.ts"() {
       "use strict";
       init_SpotifyDOMSelectors();
+      init_globalConfig();
       SystemHealthMonitor = class _SystemHealthMonitor {
         constructor() {
           this.registeredSystems = /* @__PURE__ */ new Map();
@@ -3672,6 +3675,21 @@
       if (typeof window !== "undefined") {
         window.SystemHealthMonitor = new SystemHealthMonitor();
       }
+      Y3K = {
+        debug: {
+          log: (component, message, ...args) => {
+            if (YEAR3000_CONFIG?.enableDebug) {
+              console.log(`[${component}] ${message}`, ...args);
+            }
+          },
+          error: (component, message, error) => {
+            console.error(`[${component}] ${message}`, error);
+          },
+          warn: (component, message, ...args) => {
+            console.warn(`[${component}] ${message}`, ...args);
+          }
+        }
+      };
     }
   });
 
@@ -4186,7 +4204,8 @@
             })(),
             "sn-animation-quality": "auto",
             "sn-glass-beat-pulse": "true",
-            "sn-glass-base-intensity": "0.5"
+            "sn-glass-base-intensity": "0.5",
+            "sn-flow-gradient": "balanced"
           };
           this.validationSchemas = {
             "catppuccin-flavor": {
@@ -4272,7 +4291,11 @@
               default: "true",
               allowedValues: ["true", "false"]
             },
-            "sn-glass-base-intensity": { default: "0.5" }
+            "sn-glass-base-intensity": { default: "0.5" },
+            "sn-flow-gradient": {
+              default: "balanced",
+              allowedValues: ["disabled", "minimal", "balanced", "intense"]
+            }
           };
           this.validateAndRepair();
           this.initialized = true;
@@ -5228,7 +5251,26 @@
                   );
                 }
                 this.metrics.errors++;
-                return null;
+                const fallback = {
+                  tempo: 120,
+                  energy: 0.5,
+                  valence: 0.5,
+                  loudness: -10,
+                  key: 0,
+                  time_signature: 4,
+                  danceability: 0.5,
+                  acousticness: 0.5,
+                  instrumentalness: 0,
+                  speechiness: 0.05,
+                  liveness: 0.2,
+                  mode: 1
+                };
+                if (this.config.enableDebug) {
+                  console.warn(
+                    `[MusicSyncService] All audio-data attempts failed \u2013 using fallback defaults`
+                  );
+                }
+                return fallback;
               }
             }
             await new Promise((resolve) => setTimeout(resolve, retryDelay));
@@ -6781,7 +6823,7 @@
   });
 
   // src-js/systems/ColorHarmonyEngine.ts
-  var ColorHarmonyEngine;
+  var _ColorHarmonyEngine, ColorHarmonyEngine;
   var init_ColorHarmonyEngine = __esm({
     "src-js/systems/ColorHarmonyEngine.ts"() {
       "use strict";
@@ -6790,7 +6832,7 @@
       init_PaletteExtensionManager();
       init_Year3000Utilities();
       init_BaseVisualSystem();
-      ColorHarmonyEngine = class extends BaseVisualSystem {
+      _ColorHarmonyEngine = class _ColorHarmonyEngine extends BaseVisualSystem {
         constructor(config, utils, performanceMonitor, musicAnalysisService, settingsManager) {
           super(
             config,
@@ -7616,6 +7658,84 @@
             lightVibrantHex: this.utils.rgbToHex(lightRgb.r, lightRgb.g, lightRgb.b)
           };
         }
+        /**
+         * Get current gradient colors optimized for WebGL texture creation
+         * @param stopCount Number of gradient stops to generate (default: 5)
+         * @returns Array of RGB color objects or null if unavailable
+         */
+        getCurrentGradient(stopCount = 5) {
+          try {
+            const currentPalette = this.catppuccinPalettes[this.currentTheme];
+            if (!currentPalette) {
+              return null;
+            }
+            const accentHex = this.utils.getRootStyle(_ColorHarmonyEngine.CANONICAL_HEX_VAR);
+            let primaryColor;
+            if (accentHex && accentHex !== "") {
+              primaryColor = this.utils.hexToRgb(accentHex);
+            } else {
+              const defaultAccent = currentPalette.accents.mauve || "#cba6f7";
+              primaryColor = this.utils.hexToRgb(defaultAccent);
+            }
+            const gradientColors = [];
+            const musicInfluence = this.kineticState.musicIntensityMultiplier || 1;
+            const hueShift = this.kineticState.hueShift || 0;
+            const valenceGravity = this.kineticState.valenceGravity || 0.5;
+            for (let i = 0; i < stopCount; i++) {
+              const position = i / (stopCount - 1);
+              let variantColor;
+              if (position === 0) {
+                variantColor = this._createVariant(primaryColor, -0.3, valenceGravity, hueShift);
+              } else if (position === 1) {
+                variantColor = this._createVariant(primaryColor, 0.2, valenceGravity, hueShift);
+              } else {
+                const lightnessFactor = (position - 0.5) * 0.4;
+                variantColor = this._createVariant(primaryColor, lightnessFactor, valenceGravity, hueShift);
+              }
+              variantColor = this._applyMusicInfluence(variantColor, musicInfluence, position);
+              gradientColors.push({
+                r: Math.round(Math.max(0, Math.min(255, variantColor.r))),
+                g: Math.round(Math.max(0, Math.min(255, variantColor.g))),
+                b: Math.round(Math.max(0, Math.min(255, variantColor.b)))
+              });
+            }
+            if (this.config?.enableDebug) {
+              console.log(`[ColorHarmonyEngine] Generated gradient with ${stopCount} stops:`, gradientColors);
+            }
+            return gradientColors;
+          } catch (error) {
+            if (this.config?.enableDebug) {
+              console.error("[ColorHarmonyEngine] Failed to generate gradient:", error);
+            }
+            return null;
+          }
+        }
+        /**
+         * Create a color variant with lightness, saturation, and hue adjustments
+         */
+        _createVariant(baseColor, lightnessFactor, valenceGravity, hueShift) {
+          const oklab = this.utils.rgbToOklab(baseColor.r, baseColor.g, baseColor.b);
+          const newL = Math.max(0, Math.min(1, oklab.L + lightnessFactor * 0.2));
+          const chromaScale = 0.8 + valenceGravity * 0.4;
+          const newA = oklab.a * chromaScale;
+          const newB = oklab.b * chromaScale;
+          const hueAdjustment = hueShift * 0.1;
+          const adjustedA = newA * Math.cos(hueAdjustment) - newB * Math.sin(hueAdjustment);
+          const adjustedB = newA * Math.sin(hueAdjustment) + newB * Math.cos(hueAdjustment);
+          return this.utils.oklabToRgb(newL, adjustedA, adjustedB);
+        }
+        /**
+         * Apply music intensity influence to color
+         */
+        _applyMusicInfluence(color, intensity, position) {
+          const positionEffect = 1 + Math.sin(position * Math.PI) * 0.2;
+          const effectiveIntensity = Math.max(0.7, Math.min(1.3, intensity * positionEffect));
+          return {
+            r: color.r * effectiveIntensity,
+            g: color.g * effectiveIntensity,
+            b: color.b * effectiveIntensity
+          };
+        }
         // =========================
         // PUBLIC API – User Control
         // =========================
@@ -7777,8 +7897,9 @@
        * These are written by the Year3000System colour pipeline and are considered
        * the single source-of-truth accent accessed by SCSS and visual systems.
        */
-      ColorHarmonyEngine.CANONICAL_HEX_VAR = "--sn-accent-hex";
-      ColorHarmonyEngine.CANONICAL_RGB_VAR = "--sn-accent-rgb";
+      _ColorHarmonyEngine.CANONICAL_HEX_VAR = "--sn-accent-hex";
+      _ColorHarmonyEngine.CANONICAL_RGB_VAR = "--sn-accent-rgb";
+      ColorHarmonyEngine = _ColorHarmonyEngine;
     }
   });
 
@@ -8317,238 +8438,38 @@
     }
   });
 
-  // src-js/systems/nowPlaying/NowPlayingCoordinator.ts
-  function getNowPlayingCoordinator(config) {
-    return NowPlayingCoordinator.getInstance(config);
+  // src-js/systems/nowPlaying/NowPlayingDomWatcher.ts
+  function startNowPlayingWatcher(onChange, enableDebug = false) {
+    const bar = document.querySelector(
+      MODERN_SELECTORS["nowPlayingBar"]
+    );
+    if (!bar) {
+      if (enableDebug) {
+        console.warn(
+          "\u{1F3B5} [NowPlayingDomWatcher] nowPlayingBar element not found \u2013 watcher inactive"
+        );
+      }
+      return () => {
+      };
+    }
+    const mObserver = new MutationObserver(() => {
+      onChange();
+      if (enableDebug)
+        console.log(
+          "\u{1F3B5} [NowPlayingDomWatcher] DOM mutation detected \u2192 onChange dispatched"
+        );
+    });
+    mObserver.observe(bar, { childList: true, subtree: true });
+    if (enableDebug) console.log("\u{1F3B5} [NowPlayingDomWatcher] watcher active");
+    return () => {
+      mObserver.disconnect();
+      if (enableDebug) console.log("\u{1F3B5} [NowPlayingDomWatcher] watcher disposed");
+    };
   }
-  var _NowPlayingCoordinator, NowPlayingCoordinator;
-  var init_NowPlayingCoordinator = __esm({
-    "src-js/systems/nowPlaying/NowPlayingCoordinator.ts"() {
+  var init_NowPlayingDomWatcher = __esm({
+    "src-js/systems/nowPlaying/NowPlayingDomWatcher.ts"() {
       "use strict";
       init_SpotifyDOMSelectors();
-      _NowPlayingCoordinator = class _NowPlayingCoordinator {
-        constructor(config = {}) {
-          this.pendingUpdates = /* @__PURE__ */ new Map();
-          this.isFlushScheduled = false;
-          this.rafId = null;
-          this.performanceAnalyzer = null;
-          // Performance tracking
-          this.flushCount = 0;
-          this.totalFlushTime = 0;
-          this.lastFlushTimestamp = 0;
-          // DOM observation for reactive refresh (Phase 4)
-          this.domObserver = null;
-          this.nowPlayingElement = null;
-          this.config = {
-            enableDebug: config.enableDebug ?? false,
-            maxBatchSize: config.maxBatchSize ?? 50,
-            ...config
-          };
-          this.performanceAnalyzer = config.performanceAnalyzer || null;
-          if (this.config.enableDebug) {
-            console.log(
-              "\u{1F3B5} [NowPlayingCoordinator] Initialized with RAF-based batching"
-            );
-          }
-        }
-        /**
-         * Singleton accessor for global coordination
-         */
-        static getInstance(config) {
-          if (!_NowPlayingCoordinator.instance) {
-            _NowPlayingCoordinator.instance = new _NowPlayingCoordinator(config);
-          }
-          return _NowPlayingCoordinator.instance;
-        }
-        /**
-         * Queue a CSS variable update for atomic application at next animation frame
-         */
-        queueUpdate(property, value) {
-          const criticalVars = [
-            "--sn-beat-pulse-intensity",
-            "--sn-breathing-scale",
-            "--sn-accent-hex",
-            "--sn-accent-rgb"
-          ];
-          if (criticalVars.includes(property)) {
-            return;
-          }
-          this.pendingUpdates.set(property, {
-            property,
-            value,
-            timestamp: performance.now()
-          });
-          if (this.config.enableDebug && this.pendingUpdates.size === 1) {
-            console.log(
-              `\u{1F3B5} [NowPlayingCoordinator] Queuing first update: ${property}`
-            );
-          }
-          this.scheduleFlush();
-        }
-        /**
-         * Schedule atomic flush at next animation frame
-         */
-        scheduleFlush() {
-          if (this.isFlushScheduled) {
-            return;
-          }
-          this.isFlushScheduled = true;
-          this.rafId = requestAnimationFrame(() => {
-            this.flushUpdates();
-          });
-        }
-        /**
-         * Atomically apply all pending updates
-         */
-        flushUpdates() {
-          if (this.pendingUpdates.size === 0) {
-            this.isFlushScheduled = false;
-            return;
-          }
-          const startTime = performance.now();
-          const root = document.documentElement;
-          const updateCount = this.pendingUpdates.size;
-          if (this.config.enableDebug) {
-            console.log(
-              `\u{1F3B5} [NowPlayingCoordinator] Flushing ${updateCount} updates atomically`
-            );
-          }
-          if (updateCount > (this.config.maxBatchSize || 50)) {
-            console.warn(
-              `\u{1F3B5} [NowPlayingCoordinator] Large batch detected (${updateCount} updates), may impact performance`
-            );
-          }
-          for (const update of this.pendingUpdates.values()) {
-            try {
-              root.style.setProperty(update.property, update.value);
-            } catch (error) {
-              console.error(
-                `\u{1F3B5} [NowPlayingCoordinator] Failed to apply ${update.property}:`,
-                error
-              );
-            }
-          }
-          this.pendingUpdates.clear();
-          this.isFlushScheduled = false;
-          this.rafId = null;
-          if (this.config.onFlushComplete) {
-            try {
-              this.config.onFlushComplete();
-            } catch (error) {
-              console.error(
-                "\u{1F3B5} [NowPlayingCoordinator] Error in flush completion callback:",
-                error
-              );
-            }
-          }
-          const endTime = performance.now();
-          const flushTime = endTime - startTime;
-          this.flushCount++;
-          this.totalFlushTime += flushTime;
-          this.lastFlushTimestamp = endTime;
-          if (this.performanceAnalyzer) {
-            this.performanceAnalyzer.emitTrace?.(
-              `[NowPlayingCoordinator] Flushed ${updateCount} updates in ${flushTime.toFixed(
-                2
-              )}ms`
-            );
-          }
-          if (this.config.enableDebug && flushTime > 5) {
-            console.warn(
-              `\u{1F3B5} [NowPlayingCoordinator] Slow flush detected: ${flushTime.toFixed(
-                2
-              )}ms for ${updateCount} updates`
-            );
-          }
-        }
-        /**
-         * Phase 4: Setup DOM observation for reactive refresh
-         */
-        setupDOMObservation() {
-          if (this.domObserver) {
-            return;
-          }
-          this.nowPlayingElement = document.querySelector(
-            MODERN_SELECTORS["nowPlayingBar"]
-          );
-          if (!this.nowPlayingElement) {
-            if (this.config.enableDebug) {
-              console.warn(
-                "\u{1F3B5} [NowPlayingCoordinator] Now playing bar not found, deferring DOM observation"
-              );
-            }
-            setTimeout(() => this.setupDOMObservation(), 1e3);
-            return;
-          }
-          this.domObserver = new MutationObserver(() => {
-            this.queueUpdate("--sn-force-refresh", Date.now().toString());
-            if (this.config.enableDebug) {
-              console.log(
-                "\u{1F3B5} [NowPlayingCoordinator] DOM change detected, forcing refresh"
-              );
-            }
-          });
-          this.domObserver.observe(this.nowPlayingElement, {
-            childList: true,
-            subtree: true,
-            attributes: false
-            // Only watch structure changes, not style changes
-          });
-          if (this.config.enableDebug) {
-            console.log(
-              "\u{1F3B5} [NowPlayingCoordinator] DOM observation active on now playing bar"
-            );
-          }
-        }
-        /**
-         * Get performance metrics for monitoring
-         */
-        getPerformanceMetrics() {
-          return {
-            flushCount: this.flushCount,
-            averageFlushTime: this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0,
-            lastFlushTimestamp: this.lastFlushTimestamp,
-            pendingUpdates: this.pendingUpdates.size
-          };
-        }
-        /**
-         * Force immediate flush for critical scenarios
-         */
-        forceFlush() {
-          if (this.rafId) {
-            cancelAnimationFrame(this.rafId);
-            this.rafId = null;
-          }
-          this.flushUpdates();
-        }
-        /**
-         * Cleanup and destroy coordinator
-         */
-        destroy() {
-          if (this.rafId) {
-            cancelAnimationFrame(this.rafId);
-            this.rafId = null;
-          }
-          if (this.domObserver) {
-            this.domObserver.disconnect();
-            this.domObserver = null;
-          }
-          this.pendingUpdates.clear();
-          this.isFlushScheduled = false;
-          this.nowPlayingElement = null;
-          if (_NowPlayingCoordinator.instance === this) {
-            _NowPlayingCoordinator.instance = null;
-          }
-          if (this.config.enableDebug) {
-            const avgFlushTime = this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0;
-            console.log(
-              `\u{1F3B5} [NowPlayingCoordinator] Destroyed. Performance: ${this.flushCount} flushes, ${avgFlushTime.toFixed(2)}ms avg`
-            );
-          }
-        }
-      };
-      _NowPlayingCoordinator.instance = null;
-      NowPlayingCoordinator = _NowPlayingCoordinator;
     }
   });
 
@@ -8600,7 +8521,6 @@
     "src-js/systems/visual/BeatSyncVisualSystem.ts"() {
       "use strict";
       init_EventBus();
-      init_NowPlayingCoordinator();
       init_Year3000Utilities();
       init_NoiseField();
       init_BaseVisualSystem();
@@ -8671,49 +8591,14 @@
           }
           return 0;
         }
-        /**
-         * Helper method to get NowPlayingCoordinator with glass convergence callback
-         * Phase 2: Glass Convergence Integration
-         */
-        _getCoordinatorWithGlassCallback() {
-          const glassConvergenceCallback = () => {
-            try {
-              if (this.year3000System?.glassmorphismManager) {
-                this.year3000System.glassmorphismManager.checkPerformanceAndAdjust();
-                if (this.config?.enableDebug) {
-                  console.log(
-                    `\u{1F3B5} [${this.systemName}] Glass convergence callback triggered - GlassCheck invoked`
-                  );
-                }
-                if (this.performanceMonitor) {
-                  this.performanceMonitor.emitTrace?.(
-                    "[BeatSyncVisualSystem] GlassCheck triggered via NowPlayingCoordinator flush"
-                  );
-                }
-              }
-            } catch (error) {
-              console.error(
-                `\u{1F3B5} [${this.systemName}] Error in glass convergence callback:`,
-                error
-              );
-            }
-          };
-          return getNowPlayingCoordinator({
-            enableDebug: this.config?.enableDebug,
-            performanceAnalyzer: this.performanceMonitor,
-            onFlushComplete: glassConvergenceCallback
-          });
-        }
         async initialize() {
           await super.initialize();
           this._createBeatFlashElement();
           this._createCrystallineOverlay();
           this._startAnimationLoop();
-          const coordinator = this._getCoordinatorWithGlassCallback();
-          coordinator.setupDOMObservation();
           if (this.config.enableDebug) {
             console.log(
-              `[${this.systemName}] Initialized and animation loop started. NowPlayingCoordinator: active`
+              `[${this.systemName}] Initialized and animation loop started.`
             );
           }
         }
@@ -8888,9 +8773,11 @@
           if (deltaTime > 50) return;
           const root = getRootStyle();
           if (!root) return;
-          const coordinator = this._getCoordinatorWithGlassCallback();
           const queueCSSUpdate = (property, value) => {
-            const criticalVars = ["--sn-beat-pulse-intensity", "--sn-breathing-scale"];
+            const criticalVars = [
+              "--sn-beat-pulse-intensity",
+              "--sn-breathing-scale"
+            ];
             if (criticalVars.includes(property)) {
               if (this.year3000System?.queueCSSVariableUpdate && typeof this.year3000System.queueCSSVariableUpdate === "function") {
                 this.year3000System.queueCSSVariableUpdate(property, value);
@@ -8898,7 +8785,11 @@
                 root.style.setProperty(property, value);
               }
             } else {
-              coordinator.queueUpdate(property, value);
+              if (this.year3000System?.queueCSSVariableUpdate && typeof this.year3000System.queueCSSVariableUpdate === "function") {
+                this.year3000System.queueCSSVariableUpdate(property, value);
+              } else {
+                root.style.setProperty(property, value);
+              }
             }
           };
           queueCSSUpdate("--sn-breathing-scale", breathingScale.toFixed(4));
@@ -8906,9 +8797,14 @@
           const beatPulseIntensity = this.beatIntensity;
           queueCSSUpdate("--sn-beat-pulse-intensity", beatPulseIntensity.toFixed(4));
           const glassPulseEnabled = this.settingsManager?.get("sn-glass-beat-pulse") === "true";
-          const glassBaseIntensity = parseFloat(this.settingsManager?.get("sn-glass-base-intensity") || "0.5");
+          const glassBaseIntensity = parseFloat(
+            this.settingsManager?.get("sn-glass-base-intensity") || "0.5"
+          );
           queueCSSUpdate("--glass-pulse-toggle", glassPulseEnabled ? "1" : "0");
-          queueCSSUpdate("--glass-user-intensity", Math.max(0, Math.min(1, glassBaseIntensity)).toFixed(2));
+          queueCSSUpdate(
+            "--glass-user-intensity",
+            Math.max(0, Math.min(1, glassBaseIntensity)).toFixed(2)
+          );
           const beatBoostGlass = Math.min(1, Math.max(0, beatPulseIntensity * 1.5));
           if (beatBoostGlass > 0.01 || this.lastBeatBoostGlass > 0.01) {
             queueCSSUpdate("--sn-glass-beat-boost", beatBoostGlass.toFixed(4));
@@ -8916,6 +8812,8 @@
           }
           const bloomIntensity = processedEnergy * 0.4;
           queueCSSUpdate("--sn-feed-bloom-intensity", bloomIntensity.toFixed(3));
+          const flowStrength = 0.4 + beatPulseIntensity * 0.6;
+          queueCSSUpdate("--sn-flow-strength", flowStrength.toFixed(3));
           this.performanceMetrics.cssVariableUpdates++;
         }
         getPerformanceReport() {
@@ -9055,15 +8953,10 @@
           });
           this.echoPool = [];
           this.currentEchoCount = 0;
-          try {
-            const coordinator = getNowPlayingCoordinator();
-            coordinator.destroy();
-          } catch (e) {
-          }
           if (this.config.enableDebug) {
             const report = this.getPerformanceReport();
             console.log(`[${this.systemName}] Performance Report:`, report);
-            console.log(`[${this.systemName}] Destroyed with NowPlayingCoordinator cleanup.`);
+            console.log(`[${this.systemName}] Destroyed.`);
           }
           super.destroy();
         }
@@ -11750,6 +11643,409 @@
     }
   });
 
+  // src-js/systems/visual/RightSidebarCoordinator.ts
+  var RightSidebarCoordinator_exports = {};
+  __export(RightSidebarCoordinator_exports, {
+    RightSidebarCoordinator: () => RightSidebarCoordinator,
+    getRightSidebarCoordinator: () => getRightSidebarCoordinator
+  });
+  function getRightSidebarCoordinator(config) {
+    return RightSidebarCoordinator.getInstance(config);
+  }
+  var _RightSidebarCoordinator, RightSidebarCoordinator;
+  var init_RightSidebarCoordinator = __esm({
+    "src-js/systems/visual/RightSidebarCoordinator.ts"() {
+      "use strict";
+      init_CSSVariableBatcher();
+      init_SpotifyDOMSelectors();
+      _RightSidebarCoordinator = class _RightSidebarCoordinator {
+        constructor(config = {}) {
+          this.pendingUpdates = /* @__PURE__ */ new Map();
+          this.isFlushScheduled = false;
+          this.rafId = null;
+          this.performanceAnalyzer = null;
+          // Harmonic variable mapping for Year 3000 convergence
+          this.harmonicVariableMap = /* @__PURE__ */ new Map([
+            ["--sn-rs-beat-intensity", "--sn-beat-pulse-intensity"],
+            ["--sn-rs-glow-alpha", "--sn-rhythm-phase"],
+            ["--sn-rs-hue-shift", "--sn-spectrum-phase"]
+          ]);
+          // Performance tracking
+          this.flushCount = 0;
+          this.totalFlushTime = 0;
+          this.lastFlushTimestamp = 0;
+          // DOM observation for reactive refresh and temporal play
+          this.domObserver = null;
+          this.rightSidebarElement = null;
+          this.visibilityObserver = null;
+          this.isFirstOpen = true;
+          this.lastScrollUpdate = 0;
+          this.config = {
+            enableDebug: config.enableDebug ?? false,
+            maxBatchSize: config.maxBatchSize ?? 50,
+            ...config
+          };
+          this.performanceAnalyzer = config.performanceAnalyzer || null;
+          if (this.config.enableDebug) {
+            console.log(
+              "\u{1F30C} [RightSidebarCoordinator] Initialized with RAF-based batching"
+            );
+          }
+        }
+        /**
+         * Singleton accessor for global coordination
+         */
+        static getInstance(config) {
+          if (!_RightSidebarCoordinator.instance) {
+            _RightSidebarCoordinator.instance = new _RightSidebarCoordinator(config);
+          }
+          return _RightSidebarCoordinator.instance;
+        }
+        /**
+         * Queue a CSS variable update for atomic application at next animation frame
+         */
+        queueUpdate(property, value) {
+          const criticalVars = [
+            "--sn-rs-glow-alpha",
+            "--sn-rs-beat-intensity",
+            "--sn-rs-hue-shift"
+          ];
+          if (criticalVars.includes(property)) {
+            this.applyCriticalUpdate(property, value);
+            return;
+          }
+          if (CSSVariableBatcher.instance) {
+            CSSVariableBatcher.instance.queueCSSVariableUpdate(
+              property,
+              value,
+              this.getRightSidebarElement()
+            );
+          } else {
+            this.pendingUpdates.set(property, {
+              property,
+              value,
+              timestamp: performance.now()
+            });
+            if (this.config.enableDebug && this.pendingUpdates.size === 1) {
+              console.log(
+                `\u{1F30C} [RightSidebarCoordinator] Queuing first update (fallback): ${property}`
+              );
+            }
+            this.scheduleFlush();
+          }
+        }
+        /**
+         * Apply critical updates immediately to the right sidebar element
+         */
+        applyCriticalUpdate(property, value) {
+          const sidebarElement = this.getRightSidebarElement();
+          if (sidebarElement) {
+            try {
+              sidebarElement.style.setProperty(property, value);
+            } catch (error) {
+              console.error(
+                `\u{1F30C} [RightSidebarCoordinator] Failed to apply critical ${property}:`,
+                error
+              );
+            }
+          }
+        }
+        /**
+         * Get the right sidebar element with fallback to document root
+         */
+        getRightSidebarElement() {
+          if (!this.rightSidebarElement) {
+            this.rightSidebarElement = document.querySelector(
+              MODERN_SELECTORS.rightSidebar
+            );
+          }
+          return this.rightSidebarElement || document.documentElement;
+        }
+        /**
+         * Schedule atomic flush at next animation frame
+         */
+        scheduleFlush() {
+          if (this.isFlushScheduled) {
+            return;
+          }
+          this.isFlushScheduled = true;
+          this.rafId = requestAnimationFrame(() => {
+            this.flushUpdates();
+          });
+        }
+        /**
+         * Atomically apply all pending updates
+         */
+        flushUpdates() {
+          if (this.pendingUpdates.size === 0) {
+            this.isFlushScheduled = false;
+            return;
+          }
+          const startTime = performance.now();
+          const targetElement = this.getRightSidebarElement();
+          const updateCount = this.pendingUpdates.size;
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [RightSidebarCoordinator] Flushing ${updateCount} updates atomically`
+            );
+          }
+          if (updateCount > (this.config.maxBatchSize || 50)) {
+            console.warn(
+              `\u{1F30C} [RightSidebarCoordinator] Large batch detected (${updateCount} updates), may impact performance`
+            );
+          }
+          for (const update of this.pendingUpdates.values()) {
+            try {
+              targetElement.style.setProperty(
+                update.property,
+                update.value
+              );
+              const harmonicVar = this.harmonicVariableMap.get(update.property);
+              if (harmonicVar) {
+                document.documentElement.style.setProperty(harmonicVar, update.value);
+                if (this.config.enableDebug) {
+                  console.log(
+                    `\u{1F30C} [RightSidebarCoordinator] Mapped ${update.property} \u2192 ${harmonicVar} = ${update.value}`
+                  );
+                }
+              }
+            } catch (error) {
+              console.error(
+                `\u{1F30C} [RightSidebarCoordinator] Failed to apply ${update.property}:`,
+                error
+              );
+            }
+          }
+          this.pendingUpdates.clear();
+          this.isFlushScheduled = false;
+          this.rafId = null;
+          if (this.config.onFlushComplete) {
+            try {
+              this.config.onFlushComplete();
+            } catch (error) {
+              console.error(
+                "\u{1F30C} [RightSidebarCoordinator] Error in flush completion callback:",
+                error
+              );
+            }
+          }
+          const endTime = performance.now();
+          const flushTime = endTime - startTime;
+          this.flushCount++;
+          this.totalFlushTime += flushTime;
+          this.lastFlushTimestamp = endTime;
+          if (this.performanceAnalyzer) {
+            this.performanceAnalyzer.emitTrace?.(
+              `[RightSidebarCoordinator] Flushed ${updateCount} updates in ${flushTime.toFixed(
+                2
+              )}ms`
+            );
+          }
+          const avgFlushTime = this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0;
+          if (avgFlushTime > 3) {
+            console.warn(
+              `\u{1F30C} [RightSidebarCoordinator] Performance threshold exceeded: average ${avgFlushTime.toFixed(
+                2
+              )}ms per flush (target: <3ms)`
+            );
+          }
+          if (this.config.enableDebug && flushTime > 4) {
+            console.warn(
+              `\u{1F30C} [RightSidebarCoordinator] Slow flush detected: ${flushTime.toFixed(
+                2
+              )}ms for ${updateCount} updates`
+            );
+          }
+        }
+        /**
+         * Setup DOM observation for reactive refresh and temporal play
+         */
+        setupDOMObservation() {
+          if (this.domObserver) {
+            return;
+          }
+          this.rightSidebarElement = document.querySelector(
+            MODERN_SELECTORS.rightSidebar
+          );
+          if (!this.rightSidebarElement) {
+            if (this.config.enableDebug) {
+              console.warn(
+                "\u{1F30C} [RightSidebarCoordinator] Right sidebar not found, deferring DOM observation"
+              );
+            }
+            setTimeout(() => this.setupDOMObservation(), 1e3);
+            return;
+          }
+          this.domObserver = new MutationObserver((mutations) => {
+            this.queueUpdate("--sn-rs-force-refresh", Date.now().toString());
+            for (const mutation of mutations) {
+              if (mutation.type === "attributes" && (mutation.attributeName === "aria-hidden" || mutation.attributeName === "style")) {
+                this.handleVisibilityChange();
+              }
+            }
+            if (this.config.enableDebug) {
+              console.log(
+                "\u{1F30C} [RightSidebarCoordinator] DOM change detected, forcing refresh"
+              );
+            }
+          });
+          this.domObserver.observe(this.rightSidebarElement, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            // Watch for aria-hidden and style changes
+            attributeFilter: ["aria-hidden", "style", "class"]
+          });
+          this.setupVisibilityObserver();
+          this.setupScrollObservation();
+          if (this.config.enableDebug) {
+            console.log(
+              "\u{1F30C} [RightSidebarCoordinator] DOM observation active on right sidebar"
+            );
+          }
+        }
+        /**
+         * Setup visibility observer for temporal echo effects
+         */
+        setupVisibilityObserver() {
+          if (!this.rightSidebarElement || this.visibilityObserver) return;
+          this.visibilityObserver = new IntersectionObserver(
+            (entries) => {
+              const entry = entries[0];
+              if (entry && entry.isIntersecting && this.isFirstOpen) {
+                this.triggerTemporalEcho();
+                this.isFirstOpen = false;
+              }
+            },
+            { threshold: 0.1 }
+          );
+          this.visibilityObserver.observe(this.rightSidebarElement);
+        }
+        /**
+         * Setup scroll observation with throttling for performance
+         */
+        setupScrollObservation() {
+          if (!this.rightSidebarElement) return;
+          const queueElement = this.rightSidebarElement.querySelector(
+            ".main-nowPlayingView-queue"
+          );
+          if (!queueElement) return;
+          queueElement.addEventListener(
+            "scroll",
+            this.throttledScrollHandler.bind(this),
+            {
+              passive: true
+            }
+          );
+        }
+        /**
+         * Throttled scroll handler (≤30 Hz as specified)
+         */
+        throttledScrollHandler() {
+          const now = performance.now();
+          if (now - this.lastScrollUpdate < 33) return;
+          this.lastScrollUpdate = now;
+          if (window.requestIdleCallback) {
+            window.requestIdleCallback(() => {
+              this.queueUpdate("--sn-rs-scroll-ratio", Math.random().toString());
+            });
+          } else {
+            this.queueUpdate("--sn-rs-scroll-ratio", Math.random().toString());
+          }
+        }
+        /**
+         * Handle visibility changes for temporal effects
+         */
+        handleVisibilityChange() {
+          if (!this.rightSidebarElement) return;
+          const isVisible = !this.rightSidebarElement.hasAttribute("aria-hidden") && !this.rightSidebarElement.style.display?.includes(
+            "none"
+          );
+          if (isVisible && this.isFirstOpen) {
+            this.triggerTemporalEcho();
+            this.isFirstOpen = false;
+          }
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [RightSidebarCoordinator] Visibility changed: ${isVisible ? "visible" : "hidden"}`
+            );
+          }
+        }
+        /**
+         * Trigger one-time temporal echo effect
+         */
+        triggerTemporalEcho() {
+          if (!this.rightSidebarElement) return;
+          this.rightSidebarElement.classList.add("sn-future-preview");
+          this.queueUpdate("--sn-kinetic-intensity", "1");
+          this.queueUpdate("--sn-echo-hue-shift", "15deg");
+          this.queueUpdate("--sn-echo-radius-multiplier", "1.2");
+          if (this.config.enableDebug) {
+            console.log(
+              "\u{1F30C} [RightSidebarCoordinator] Triggering temporal echo effect"
+            );
+          }
+          setTimeout(() => {
+            this.rightSidebarElement?.classList.remove("sn-future-preview");
+            this.queueUpdate("--sn-kinetic-intensity", "0");
+          }, 2e3);
+        }
+        /**
+         * Get performance metrics for monitoring
+         */
+        getPerformanceMetrics() {
+          return {
+            flushCount: this.flushCount,
+            averageFlushTime: this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0,
+            lastFlushTimestamp: this.lastFlushTimestamp,
+            pendingUpdates: this.pendingUpdates.size
+          };
+        }
+        /**
+         * Force immediate flush for critical scenarios
+         */
+        forceFlush() {
+          if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+          }
+          this.flushUpdates();
+        }
+        /**
+         * Cleanup and destroy coordinator
+         */
+        destroy() {
+          if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+          }
+          if (this.domObserver) {
+            this.domObserver.disconnect();
+            this.domObserver = null;
+          }
+          if (this.visibilityObserver) {
+            this.visibilityObserver.disconnect();
+            this.visibilityObserver = null;
+          }
+          this.pendingUpdates.clear();
+          this.isFlushScheduled = false;
+          this.rightSidebarElement = null;
+          if (_RightSidebarCoordinator.instance === this) {
+            _RightSidebarCoordinator.instance = null;
+          }
+          if (this.config.enableDebug) {
+            const avgFlushTime = this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0;
+            console.log(
+              `\u{1F30C} [RightSidebarCoordinator] Destroyed. Performance: ${this.flushCount} flushes, ${avgFlushTime.toFixed(2)}ms avg`
+            );
+          }
+        }
+      };
+      _RightSidebarCoordinator.instance = null;
+      RightSidebarCoordinator = _RightSidebarCoordinator;
+    }
+  });
+
   // src-js/systems/visual/SidebarConsciousnessSystem.ts
   var _SidebarConsciousnessSystem, SidebarConsciousnessSystem;
   var init_SidebarConsciousnessSystem = __esm({
@@ -12177,6 +12473,793 @@
     }
   });
 
+  // src-js/utils/ShaderLoader.ts
+  function createGradientTexture(gl, stops, width = 256) {
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = 1;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return null;
+      const gradient = ctx.createLinearGradient(0, 0, width, 0);
+      stops.forEach((stop) => {
+        const color = `rgba(${Math.round(stop.r * 255)}, ${Math.round(stop.g * 255)}, ${Math.round(stop.b * 255)}, ${stop.a})`;
+        gradient.addColorStop(stop.position, color);
+      });
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, 1);
+      const texture = gl.createTexture();
+      if (!texture) return null;
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      return texture;
+    } catch (error) {
+      Y3K?.debug?.error("ShaderLoader", `Gradient texture creation failed: ${error}`);
+      return null;
+    }
+  }
+  var ShaderLoader, DEFAULT_VERTEX_SHADER;
+  var init_ShaderLoader = __esm({
+    "src-js/utils/ShaderLoader.ts"() {
+      "use strict";
+      init_SystemHealthMonitor();
+      ShaderLoader = class {
+        /**
+         * Load and compile a fragment shader from source
+         * @param gl WebGL2 rendering context
+         * @param source GLSL fragment shader source code
+         * @param cacheKey Optional cache key (defaults to hash of source)
+         * @returns Compiled WebGL shader or null on failure
+         */
+        static loadFragment(gl, source, cacheKey) {
+          const key = cacheKey || this.hashSource(source);
+          const contextCache = this.getContextCache(gl);
+          if (contextCache[key]) {
+            return contextCache[key];
+          }
+          try {
+            const shader = this.compileShader(gl, gl.FRAGMENT_SHADER, source);
+            if (shader) {
+              contextCache[key] = shader;
+              Y3K?.debug?.log("ShaderLoader", `Fragment shader compiled: ${key.substring(0, 8)}...`);
+            }
+            return shader;
+          } catch (error) {
+            Y3K?.debug?.error("ShaderLoader", `Fragment shader compilation failed: ${error}`);
+            return null;
+          }
+        }
+        /**
+         * Load and compile a vertex shader from source
+         * @param gl WebGL2 rendering context
+         * @param source GLSL vertex shader source code
+         * @param cacheKey Optional cache key
+         * @returns Compiled WebGL shader or null on failure
+         */
+        static loadVertex(gl, source, cacheKey) {
+          const key = cacheKey || this.hashSource(source);
+          const contextCache = this.getContextCache(gl);
+          if (contextCache[key]) {
+            return contextCache[key];
+          }
+          try {
+            const shader = this.compileShader(gl, gl.VERTEX_SHADER, source);
+            if (shader) {
+              contextCache[key] = shader;
+              Y3K?.debug?.log("ShaderLoader", `Vertex shader compiled: ${key.substring(0, 8)}...`);
+            }
+            return shader;
+          } catch (error) {
+            Y3K?.debug?.error("ShaderLoader", `Vertex shader compilation failed: ${error}`);
+            return null;
+          }
+        }
+        /**
+         * Create a shader program from vertex and fragment shaders
+         * @param gl WebGL2 rendering context
+         * @param vertexShader Compiled vertex shader
+         * @param fragmentShader Compiled fragment shader
+         * @returns WebGL program or null on failure
+         */
+        static createProgram(gl, vertexShader, fragmentShader) {
+          try {
+            const program = gl.createProgram();
+            if (!program) return null;
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+              const info = gl.getProgramInfoLog(program);
+              gl.deleteProgram(program);
+              throw new Error(`Program linking failed: ${info}`);
+            }
+            return program;
+          } catch (error) {
+            Y3K?.debug?.error("ShaderLoader", `Program creation failed: ${error}`);
+            return null;
+          }
+        }
+        /**
+         * Clear shader cache for a specific WebGL context
+         * @param gl WebGL2 rendering context
+         */
+        static clearCache(gl) {
+          const contextCache = this.cache.get(gl);
+          if (contextCache) {
+            Object.values(contextCache).forEach((shader) => {
+              gl.deleteShader(shader);
+            });
+            this.cache.delete(gl);
+          }
+        }
+        /**
+         * Clear all shader caches (use on theme hot-reload)
+         */
+        static clearAllCaches() {
+          this.cache.clear();
+        }
+        static compileShader(gl, type, source) {
+          const shader = gl.createShader(type);
+          if (!shader) return null;
+          gl.shaderSource(shader, source);
+          gl.compileShader(shader);
+          if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            const info = gl.getShaderInfoLog(shader);
+            gl.deleteShader(shader);
+            throw new Error(`Shader compilation failed: ${info}`);
+          }
+          return shader;
+        }
+        static getContextCache(gl) {
+          if (!this.cache.has(gl)) {
+            this.cache.set(gl, {});
+          }
+          return this.cache.get(gl);
+        }
+        static hashSource(source) {
+          let hash = 0;
+          for (let i = 0; i < source.length; i++) {
+            const char = source.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+            hash = hash & hash;
+          }
+          return hash.toString(16);
+        }
+      };
+      ShaderLoader.cache = /* @__PURE__ */ new Map();
+      DEFAULT_VERTEX_SHADER = `#version 300 es
+precision mediump float;
+
+in vec2 a_position;
+out vec2 v_uv;
+
+void main() {
+  v_uv = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+    }
+  });
+
+  // src-js/systems/visual/WebGLGradientBackgroundSystem.ts
+  var flowGradientShader, WebGLGradientBackgroundSystem;
+  var init_WebGLGradientBackgroundSystem = __esm({
+    "src-js/systems/visual/WebGLGradientBackgroundSystem.ts"() {
+      "use strict";
+      init_BaseVisualSystem();
+      init_ShaderLoader();
+      init_DeviceCapabilityDetector();
+      init_CSSVariableBatcher();
+      init_globalConfig();
+      init_SystemHealthMonitor();
+      flowGradientShader = `#version 300 es
+precision mediump float;
+
+uniform float u_time;
+uniform sampler2D u_gradientTex;
+uniform vec2 u_resolution;
+uniform float u_flowStrength;
+uniform float u_noiseScale;
+
+// Wave stack uniforms
+uniform float u_waveY[2];
+uniform float u_waveHeight[2];
+uniform float u_waveOffset[2];
+uniform float u_blurExp;
+uniform float u_blurMax;
+
+out vec4 fragColor;
+
+// Simplex noise implementation
+vec3 mod289(vec3 x) {
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec2 mod289(vec2 x) {
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec3 permute(vec3 x) {
+  return mod289(((x*34.0)+1.0)*x);
+}
+
+float snoise(vec2 v) {
+  const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
+                      0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
+                     -0.577350269189626,  // -1.0 + 2.0 * C.x
+                      0.024390243902439); // 1.0 / 41.0
+  vec2 i  = floor(v + dot(v, C.yy) );
+  vec2 x0 = v -   i + dot(i, C.xx);
+
+  vec2 i1;
+  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+  vec4 x12 = x0.xyxy + C.xxzz;
+  x12.xy -= i1;
+
+  i = mod289(i);
+  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
+		+ i.x + vec3(0.0, i1.x, 1.0 ));
+
+  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+  m = m*m ;
+  m = m*m ;
+
+  vec3 x = 2.0 * fract(p * C.www) - 1.0;
+  vec3 h = abs(x) - 0.5;
+  vec3 ox = floor(x + 0.5);
+  vec3 a0 = x - ox;
+
+  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+
+  vec3 g;
+  g.x  = a0.x  * x0.x  + h.x  * x0.y;
+  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+  return 130.0 * dot(m, g);
+}
+
+// Octave noise for richer detail
+float octaveNoise(vec2 uv, float octaves, float persistence, float scale) {
+  float value = 0.0;
+  float amplitude = 1.0;
+  float frequency = scale;
+  float maxValue = 0.0;
+  
+  for(float i = 0.0; i < octaves; i++) {
+    value += snoise(uv * frequency) * amplitude;
+    maxValue += amplitude;
+    amplitude *= persistence;
+    frequency *= 2.0;
+  }
+  
+  return value / maxValue;
+}
+
+// Wave alpha calculation with smooth transitions
+float wave_alpha(vec2 uv, int waveIndex) {
+  float y = uv.y;
+  float waveCenter = u_waveY[waveIndex];
+  float waveHeight = u_waveHeight[waveIndex];
+  
+  float distance = abs(y - waveCenter);
+  float alpha = 1.0 - smoothstep(0.0, waveHeight * 0.5, distance);
+  
+  return alpha;
+}
+
+// Dynamic blur calculation using power function
+float calc_blur(vec2 uv) {
+  vec2 center = vec2(0.5, 0.5);
+  float distance = length(uv - center);
+  
+  float blur = pow(distance, u_blurExp);
+  blur = clamp(blur, 0.0, u_blurMax);
+  
+  return blur;
+}
+
+// Background noise generator with time offset
+float background_noise(vec2 uv, float timeOffset) {
+  vec2 flowUV = uv;
+  float adjustedTime = u_time + timeOffset;
+  
+  flowUV.x += adjustedTime * 0.02 * u_flowStrength;
+  flowUV.y += sin(adjustedTime * 0.03 + uv.x * 3.14159) * 0.01 * u_flowStrength;
+  
+  float noise1 = octaveNoise(flowUV * u_noiseScale, 4.0, 0.5, 1.0);
+  float noise2 = octaveNoise(flowUV * u_noiseScale * 2.0 + vec2(100.0), 3.0, 0.4, 1.0);
+  
+  return (noise1 + noise2 * 0.3) * 0.5 + 0.5;
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+  
+  // Generate three distinct background noise fields with time offsets
+  float noise1 = background_noise(uv, u_waveOffset[0]);
+  float noise2 = background_noise(uv, u_waveOffset[1]);
+  float noise3 = background_noise(uv, 0.0); // Base noise without offset
+  
+  // Calculate wave alphas for blending
+  float alpha1 = wave_alpha(uv, 0);
+  float alpha2 = wave_alpha(uv, 1);
+  float alpha3 = 1.0 - alpha1 - alpha2; // Remaining area
+  alpha3 = max(alpha3, 0.0); // Ensure non-negative
+  
+  // Normalize alphas to ensure they sum to 1.0
+  float totalAlpha = alpha1 + alpha2 + alpha3;
+  if (totalAlpha > 0.0) {
+    alpha1 /= totalAlpha;
+    alpha2 /= totalAlpha;
+    alpha3 /= totalAlpha;
+  }
+  
+  // Blend the three noise fields based on wave alphas
+  float t = noise1 * alpha1 + noise2 * alpha2 + noise3 * alpha3;
+  t = clamp(t, 0.0, 1.0);
+  
+  // Sample gradient texture
+  vec4 color = texture(u_gradientTex, vec2(t, 0.5));
+  
+  // Apply dynamic blur based on position
+  float blurAmount = calc_blur(uv);
+  
+  // Apply subtle vignette with blur modulation
+  vec2 center = uv - 0.5;
+  float vignette = 1.0 - dot(center, center) * (0.3 + blurAmount * 0.2);
+  color.rgb *= vignette;
+  
+  // Apply blur effect to alpha channel for depth
+  color.a *= (1.0 - blurAmount * 0.3);
+  
+  fragColor = color;
+}`;
+      WebGLGradientBackgroundSystem = class extends BaseVisualSystem {
+        constructor(config = YEAR3000_CONFIG, utils, performanceMonitor, musicSyncService = null, settingsManager = null, year3000System2 = null) {
+          super(config, utils, performanceMonitor, musicSyncService, settingsManager);
+          this.canvas = null;
+          this.wrapper = null;
+          this.gl = null;
+          this.shaderProgram = null;
+          this.uniforms = {
+            u_time: null,
+            u_gradientTex: null,
+            u_resolution: null,
+            u_flowStrength: null,
+            u_noiseScale: null,
+            u_waveY: null,
+            u_waveHeight: null,
+            u_waveOffset: null,
+            u_blurExp: null,
+            u_blurMax: null
+          };
+          this.gradientTexture = null;
+          this.vertexBuffer = null;
+          this.vao = null;
+          this.settings = {
+            enabled: true,
+            intensity: "balanced",
+            flowStrength: 0.7,
+            noiseScale: 1.2,
+            waveY: [0.25, 0.75],
+            // Wave positions from theme metrics
+            waveHeight: [0.4, 0.3],
+            // Wave heights for smooth blending
+            waveOffset: [2.5, -1.8],
+            // Time offsets for wave independence
+            blurExp: 1.2,
+            // Blur power function exponent
+            blurMax: 0.6
+            // Maximum blur amount
+          };
+          this.isWebGLAvailable = false;
+          this.animationId = null;
+          this.startTime = 0;
+          this.lastFrameTime = 0;
+          this.frameThrottleInterval = 1e3 / 45;
+          // 45 FPS target
+          this.colorHarmonyEngine = null;
+          this.cssVariableBatcher = null;
+          this.boundColorHarmonyHandler = null;
+          this.prefersReducedMotion = false;
+          this.animate = () => {
+            if (!this.isActive || !this.gl || !this.canvas) return;
+            const currentTime = performance.now();
+            const deltaTime = currentTime - this.lastFrameTime;
+            if (deltaTime < this.frameThrottleInterval) {
+              this.animationId = requestAnimationFrame(this.animate);
+              return;
+            }
+            this.lastFrameTime = currentTime;
+            this.render(currentTime);
+            this.animationId = requestAnimationFrame(this.animate);
+          };
+          this.resize = () => {
+            if (!this.canvas) return;
+            const dpr = window.devicePixelRatio || 1;
+            const displayWidth = window.innerWidth;
+            const displayHeight = window.innerHeight;
+            this.canvas.width = displayWidth * dpr;
+            this.canvas.height = displayHeight * dpr;
+            this.canvas.style.width = displayWidth + "px";
+            this.canvas.style.height = displayHeight + "px";
+          };
+          this.colorHarmonyEngine = year3000System2?.colorHarmonyEngine || null;
+          this.cssVariableBatcher = new CSSVariableBatcher();
+          this.prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          this.boundColorHarmonyHandler = this.handleColorHarmonyChange.bind(this);
+        }
+        async _performSystemSpecificInitialization() {
+          await super._performSystemSpecificInitialization();
+          this.isWebGLAvailable = this.checkWebGL2Support();
+          if (!this.isWebGLAvailable) {
+            this.fallbackToCSSGradient();
+            return;
+          }
+          const deviceDetector = new DeviceCapabilityDetector();
+          if (deviceDetector.recommendPerformanceQuality() === "low") {
+            Y3K?.debug?.log("WebGLGradientBackgroundSystem", "Low performance device detected, falling back to CSS gradient");
+            this.fallbackToCSSGradient();
+            return;
+          }
+          this.loadSettings();
+          if (!this.settings.enabled) {
+            this.fallbackToCSSGradient();
+            return;
+          }
+          try {
+            await this.initializeWebGL();
+            this.subscribeToEvents();
+            this.startAnimation();
+            Y3K?.debug?.log("WebGLGradientBackgroundSystem", "WebGL gradient system initialized successfully");
+          } catch (error) {
+            Y3K?.debug?.error("WebGLGradientBackgroundSystem", "Failed to initialize WebGL gradient:", error);
+            this.fallbackToCSSGradient();
+          }
+        }
+        checkWebGL2Support() {
+          const canvas = document.createElement("canvas");
+          const gl = canvas.getContext("webgl2");
+          return gl !== null;
+        }
+        loadSettings() {
+          if (!this.settingsManager) return;
+          try {
+            const intensitySetting = this.settingsManager.get("sn-flow-gradient");
+            if (intensitySetting === "disabled") {
+              this.settings.enabled = false;
+              return;
+            }
+            this.settings.intensity = intensitySetting || "balanced";
+            switch (this.settings.intensity) {
+              case "minimal":
+                this.settings.flowStrength = 0.4;
+                this.settings.noiseScale = 0.8;
+                this.settings.waveHeight = [0.3, 0.2];
+                this.settings.waveOffset = [1.5, -1];
+                this.settings.blurExp = 1;
+                this.settings.blurMax = 0.4;
+                break;
+              case "balanced":
+                this.settings.flowStrength = 0.7;
+                this.settings.noiseScale = 1.2;
+                this.settings.waveHeight = [0.4, 0.3];
+                this.settings.waveOffset = [2.5, -1.8];
+                this.settings.blurExp = 1.2;
+                this.settings.blurMax = 0.6;
+                break;
+              case "intense":
+                this.settings.flowStrength = 1;
+                this.settings.noiseScale = 1.6;
+                this.settings.waveHeight = [0.5, 0.4];
+                this.settings.waveOffset = [3.5, -2.5];
+                this.settings.blurExp = 1.4;
+                this.settings.blurMax = 0.8;
+                break;
+            }
+          } catch (error) {
+            Y3K?.debug?.warn("WebGLGradientBackgroundSystem", "Failed to load settings, using defaults:", error);
+          }
+        }
+        async initializeWebGL() {
+          this.wrapper = document.createElement("div");
+          this.wrapper.className = "sn-flow-gradient-wrapper";
+          this.wrapper.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -11;
+      pointer-events: none;
+      overflow: hidden;
+    `;
+          this.canvas = document.createElement("canvas");
+          this.canvas.id = "sn-webgl-gradient";
+          this.canvas.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    `;
+          this.wrapper.appendChild(this.canvas);
+          this.gl = this.canvas.getContext("webgl2", {
+            alpha: true,
+            antialias: false,
+            depth: false,
+            stencil: false,
+            powerPreference: "default"
+          });
+          if (!this.gl) {
+            throw new Error("Failed to get WebGL2 context");
+          }
+          await this.compileShaders();
+          this.createGeometry();
+          await this.updateGradientTexture();
+          this.setupUniforms();
+          this.resize();
+          document.body.appendChild(this.wrapper);
+          window.addEventListener("resize", this.resize.bind(this));
+        }
+        async compileShaders() {
+          if (!this.gl) throw new Error("WebGL context not available");
+          const vertexShader = ShaderLoader.loadVertex(this.gl, DEFAULT_VERTEX_SHADER);
+          const fragmentShader = ShaderLoader.loadFragment(this.gl, flowGradientShader);
+          if (!vertexShader || !fragmentShader) {
+            throw new Error("Failed to compile shaders");
+          }
+          this.shaderProgram = ShaderLoader.createProgram(this.gl, vertexShader, fragmentShader);
+          if (!this.shaderProgram) {
+            throw new Error("Failed to create shader program");
+          }
+        }
+        createGeometry() {
+          if (!this.gl || !this.shaderProgram) return;
+          const vertices = new Float32Array([
+            -1,
+            -1,
+            3,
+            -1,
+            -1,
+            3
+          ]);
+          this.vertexBuffer = this.gl.createBuffer();
+          this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
+          this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
+          this.vao = this.gl.createVertexArray();
+          this.gl.bindVertexArray(this.vao);
+          const positionLocation = this.gl.getAttribLocation(this.shaderProgram, "a_position");
+          this.gl.enableVertexAttribArray(positionLocation);
+          this.gl.vertexAttribPointer(positionLocation, 2, this.gl.FLOAT, false, 0, 0);
+          this.gl.bindVertexArray(null);
+        }
+        setupUniforms() {
+          if (!this.gl || !this.shaderProgram) return;
+          this.uniforms.u_time = this.gl.getUniformLocation(this.shaderProgram, "u_time");
+          this.uniforms.u_gradientTex = this.gl.getUniformLocation(this.shaderProgram, "u_gradientTex");
+          this.uniforms.u_resolution = this.gl.getUniformLocation(this.shaderProgram, "u_resolution");
+          this.uniforms.u_flowStrength = this.gl.getUniformLocation(this.shaderProgram, "u_flowStrength");
+          this.uniforms.u_noiseScale = this.gl.getUniformLocation(this.shaderProgram, "u_noiseScale");
+          this.uniforms.u_waveY = this.gl.getUniformLocation(this.shaderProgram, "u_waveY");
+          this.uniforms.u_waveHeight = this.gl.getUniformLocation(this.shaderProgram, "u_waveHeight");
+          this.uniforms.u_waveOffset = this.gl.getUniformLocation(this.shaderProgram, "u_waveOffset");
+          this.uniforms.u_blurExp = this.gl.getUniformLocation(this.shaderProgram, "u_blurExp");
+          this.uniforms.u_blurMax = this.gl.getUniformLocation(this.shaderProgram, "u_blurMax");
+        }
+        async updateGradientTexture() {
+          if (!this.gl) return;
+          let colorStops = this.getDefaultGradientStops();
+          if (this.colorHarmonyEngine) {
+            try {
+              const currentGradient = this.colorHarmonyEngine.getCurrentGradient(5);
+              if (currentGradient && currentGradient.length > 0) {
+                colorStops = currentGradient.map((color, index) => ({
+                  r: color.r / 255,
+                  g: color.g / 255,
+                  b: color.b / 255,
+                  a: 1,
+                  position: index / (currentGradient.length - 1)
+                }));
+                Y3K?.debug?.log("WebGLGradientBackgroundSystem", `Updated gradient texture with ${colorStops.length} stops from ColorHarmonyEngine`);
+              }
+            } catch (error) {
+              Y3K?.debug?.warn("WebGLGradientBackgroundSystem", "Failed to get gradient from ColorHarmonyEngine:", error);
+            }
+          }
+          if (this.gradientTexture) {
+            this.gl.deleteTexture(this.gradientTexture);
+          }
+          this.gradientTexture = createGradientTexture(this.gl, colorStops);
+          if (!this.gradientTexture) {
+            throw new Error("Failed to create gradient texture");
+          }
+        }
+        getDefaultGradientStops() {
+          return [
+            { r: 0.196, g: 0.165, b: 0.282, a: 1, position: 0 },
+            // Base
+            { r: 0.549, g: 0.408, b: 0.878, a: 1, position: 0.3 },
+            // Mauve
+            { r: 0.788, g: 0.557, b: 0.902, a: 1, position: 0.6 },
+            // Pink
+            { r: 0.957, g: 0.761, b: 0.494, a: 1, position: 1 }
+            // Peach
+          ];
+        }
+        subscribeToEvents() {
+          if (this.colorHarmonyEngine && this.boundColorHarmonyHandler) {
+            document.addEventListener("color-harmony:gradient-changed", this.boundColorHarmonyHandler);
+          }
+        }
+        handleColorHarmonyChange(event) {
+          this.updateGradientTexture().catch((error) => {
+            Y3K?.debug?.error("WebGLGradientBackgroundSystem", "Failed to update gradient texture:", error);
+          });
+        }
+        startAnimation() {
+          this.startTime = performance.now();
+          this.lastFrameTime = this.startTime;
+          this.animate();
+        }
+        render(currentTime) {
+          if (!this.gl || !this.shaderProgram || !this.vao || !this.gradientTexture) return;
+          this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+          this.gl.clearColor(0, 0, 0, 0);
+          this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+          this.gl.useProgram(this.shaderProgram);
+          this.gl.bindVertexArray(this.vao);
+          const time = this.prefersReducedMotion ? 0 : (currentTime - this.startTime) / 1e3;
+          if (this.uniforms.u_time) {
+            this.gl.uniform1f(this.uniforms.u_time, time);
+          }
+          if (this.uniforms.u_resolution) {
+            this.gl.uniform2f(this.uniforms.u_resolution, this.canvas.width, this.canvas.height);
+          }
+          if (this.uniforms.u_flowStrength) {
+            const rootStyle = document.documentElement;
+            const flowStrengthValue = rootStyle.style.getPropertyValue("--sn-flow-strength").trim();
+            const flowStrength = flowStrengthValue ? parseFloat(flowStrengthValue) : this.settings.flowStrength;
+            this.gl.uniform1f(this.uniforms.u_flowStrength, flowStrength);
+          }
+          if (this.uniforms.u_noiseScale) {
+            this.gl.uniform1f(this.uniforms.u_noiseScale, this.settings.noiseScale);
+          }
+          if (this.uniforms.u_waveY) {
+            this.gl.uniform1fv(this.uniforms.u_waveY, this.settings.waveY);
+          }
+          if (this.uniforms.u_waveHeight) {
+            this.gl.uniform1fv(this.uniforms.u_waveHeight, this.settings.waveHeight);
+          }
+          if (this.uniforms.u_waveOffset) {
+            this.gl.uniform1fv(this.uniforms.u_waveOffset, this.settings.waveOffset);
+          }
+          if (this.uniforms.u_blurExp) {
+            this.gl.uniform1f(this.uniforms.u_blurExp, this.settings.blurExp);
+          }
+          if (this.uniforms.u_blurMax) {
+            this.gl.uniform1f(this.uniforms.u_blurMax, this.settings.blurMax);
+          }
+          this.gl.activeTexture(this.gl.TEXTURE0);
+          this.gl.bindTexture(this.gl.TEXTURE_2D, this.gradientTexture);
+          if (this.uniforms.u_gradientTex) {
+            this.gl.uniform1i(this.uniforms.u_gradientTex, 0);
+          }
+          this.gl.drawArrays(this.gl.TRIANGLES, 0, 3);
+          this.gl.bindVertexArray(null);
+        }
+        fallbackToCSSGradient() {
+          if (this.cssVariableBatcher) {
+            this.startCSSFallbackAnimation();
+          }
+          Y3K?.debug?.log("WebGLGradientBackgroundSystem", "Using CSS gradient fallback");
+        }
+        startCSSFallbackAnimation() {
+          if (!this.cssVariableBatcher) return;
+          const animateCSS = () => {
+            if (!this.isActive) return;
+            const time = performance.now() / 1e3;
+            const flowX = Math.sin(time * 0.02) * 25;
+            const flowY = Math.cos(time * 0.03) * 25;
+            const scale = 1 + Math.sin(time * 0.01) * 0.15;
+            this.cssVariableBatcher.updateVariable("--sn-gradient-flow-x", `${flowX}%`);
+            this.cssVariableBatcher.updateVariable("--sn-gradient-flow-y", `${flowY}%`);
+            this.cssVariableBatcher.updateVariable("--sn-gradient-flow-scale", scale.toString());
+            setTimeout(animateCSS, this.frameThrottleInterval);
+          };
+          animateCSS();
+        }
+        handleSettingsChange(event) {
+          super.handleSettingsChange(event);
+          const customEvent = event;
+          const { key, value } = customEvent.detail;
+          if (key === "sn-flow-gradient") {
+            const wasEnabled = this.settings.enabled;
+            this.settings.intensity = value;
+            this.loadSettings();
+            if (value === "disabled" && wasEnabled) {
+              this.settings.enabled = false;
+              this.destroy();
+              this.fallbackToCSSGradient();
+            } else if (this.settings.enabled && !wasEnabled && this.isWebGLAvailable) {
+              this.initialize();
+            }
+          }
+        }
+        _performSystemSpecificCleanup() {
+          super._performSystemSpecificCleanup();
+          if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+            this.animationId = null;
+          }
+          if (this.gl) {
+            if (this.gradientTexture) {
+              this.gl.deleteTexture(this.gradientTexture);
+              this.gradientTexture = null;
+            }
+            if (this.vertexBuffer) {
+              this.gl.deleteBuffer(this.vertexBuffer);
+              this.vertexBuffer = null;
+            }
+            if (this.vao) {
+              this.gl.deleteVertexArray(this.vao);
+              this.vao = null;
+            }
+            if (this.shaderProgram) {
+              this.gl.deleteProgram(this.shaderProgram);
+              this.shaderProgram = null;
+            }
+            ShaderLoader.clearCache(this.gl);
+          }
+          if (this.wrapper && this.wrapper.parentNode) {
+            this.wrapper.parentNode.removeChild(this.wrapper);
+            this.wrapper = null;
+          }
+          this.canvas = null;
+          if (this.boundColorHarmonyHandler) {
+            document.removeEventListener("color-harmony:gradient-changed", this.boundColorHarmonyHandler);
+            this.boundColorHarmonyHandler = null;
+          }
+          window.removeEventListener("resize", this.resize);
+          this.gl = null;
+        }
+        forceRepaint(reason = "settings-change") {
+          if (this.isActive && this.gradientTexture) {
+            this.updateGradientTexture().catch((error) => {
+              Y3K?.debug?.error("WebGLGradientBackgroundSystem", "Failed to repaint gradient:", error);
+            });
+          }
+        }
+        // Public setters for wave parameters
+        setWaveY(waveY) {
+          this.settings.waveY = waveY;
+        }
+        setWaveHeight(waveHeight) {
+          this.settings.waveHeight = waveHeight;
+        }
+        setWaveOffset(waveOffset) {
+          this.settings.waveOffset = waveOffset;
+        }
+        setBlurSettings(blurExp, blurMax) {
+          this.settings.blurExp = blurExp;
+          this.settings.blurMax = blurMax;
+        }
+        getMetrics() {
+          return {
+            fps: this.performanceMonitor?.getAverageFPS() || 0,
+            compileErrors: 0,
+            // TODO: Track compilation errors
+            isActive: this.isActive,
+            settings: { ...this.settings }
+          };
+        }
+      };
+    }
+  });
+
   // src-js/systems/visual/WebGPUBackgroundSystem.ts
   var WebGPUBackgroundSystem;
   var init_WebGPUBackgroundSystem = __esm({
@@ -12470,6 +13553,7 @@
       init_MusicSyncService();
       init_ColorHarmonyEngine();
       init_EmergentChoreographyEngine();
+      init_NowPlayingDomWatcher();
       init_BeatSyncVisualSystem();
       init_BehavioralPredictionEngine();
       init_DataGlyphSystem();
@@ -12477,7 +13561,9 @@
       init_LightweightParticleSystem();
       init_ParticleFieldSystem();
       init_PredictiveMaterializationSystem();
+      init_RightSidebarCoordinator();
       init_SidebarConsciousnessSystem();
+      init_WebGLGradientBackgroundSystem();
       init_WebGPUBackgroundSystem();
       init_Year3000Utilities();
       Year3000System = class {
@@ -12489,6 +13575,7 @@
           this._lastInitializationTime = null;
           this._initializationRetryHistory = [];
           this._systemStartTime = null;
+          this._disposeNowPlayingWatcher = null;
           /**
            * Indicates whether automatic harmonic evolution is permitted. This mirrors the
            * `sn-harmonic-evolution` setting and `YEAR3000_CONFIG.harmonicEvolution`.
@@ -12525,6 +13612,7 @@
           this.behavioralPredictionEngine = null;
           this.predictiveMaterializationSystem = null;
           this.sidebarConsciousnessSystem = null;
+          this.webGLGradientBackgroundSystem = null;
           this.webGPUBackgroundSystem = null;
           this.particleFieldSystem = null;
           this.emergentChoreographyEngine = null;
@@ -12545,6 +13633,14 @@
             "year3000ArtisticModeChanged",
             this._boundArtisticModeHandler
           );
+          this._boundVisibilityChangeHandler = this._handleVisibilityChange.bind(this);
+          document.addEventListener(
+            "visibilitychange",
+            this._boundVisibilityChangeHandler
+          );
+          this._disposeNowPlayingWatcher = startNowPlayingWatcher(() => {
+            this.queueCSSVariableUpdate("--sn-force-refresh", Date.now().toString());
+          }, this.YEAR3000_CONFIG.enableDebug);
           this.allowHarmonicEvolution = this.YEAR3000_CONFIG.harmonicEvolution ?? true;
           setTimeout(() => {
             this._applyPerformanceProfile();
@@ -12885,6 +13981,11 @@
               property: "sidebarConsciousnessSystem"
             },
             {
+              name: "WebGLGradientBackgroundSystem",
+              Class: WebGLGradientBackgroundSystem,
+              property: "webGLGradientBackgroundSystem"
+            },
+            {
               name: "WebGPUBackgroundSystem",
               Class: WebGPUBackgroundSystem,
               property: "webGPUBackgroundSystem"
@@ -12965,6 +14066,7 @@
             this.performanceAnalyzer,
             this.deviceCapabilityDetector,
             this.cssVariableBatcher,
+            this.webGLGradientBackgroundSystem,
             this.webGPUBackgroundSystem,
             this.particleFieldSystem,
             this.emergentChoreographyEngine
@@ -12996,6 +14098,14 @@
             "year3000ArtisticModeChanged",
             this._boundArtisticModeHandler
           );
+          document.removeEventListener(
+            "visibilitychange",
+            this._boundVisibilityChangeHandler
+          );
+          if (this._disposeNowPlayingWatcher) {
+            this._disposeNowPlayingWatcher();
+            this._disposeNowPlayingWatcher = null;
+          }
         }
         async applyInitialSettings() {
           if (!this.settingsManager) {
@@ -13115,7 +14225,9 @@
         // 🎨 INTERNAL – APPLY COLOR MAP TO CSS VARIABLES
         // =============================================
         _applyHarmonizedColorsToCss(colors = {}) {
-          if (!colors || Object.keys(colors).length === 0) return;
+          if (!colors || Object.keys(colors).length === 0) {
+            colors = { VIBRANT: "#a6adc8" };
+          }
           const primaryHex = colors["VIBRANT"] || colors["PROMINENT"] || colors["PRIMARY"] || Object.values(colors)[0];
           const secondaryHex = colors["DARK_VIBRANT"] || colors["DESATURATED"] || colors["SECONDARY"] || primaryHex;
           const accentHex = colors["VIBRANT_NON_ALARMING"] || colors["LIGHT_VIBRANT"] || primaryHex;
@@ -13822,6 +14934,25 @@
             this.updateColorsFromCurrentTrack?.();
           } catch (e) {
             console.warn("[Year3000System] _onArtisticModeChanged stub error", e);
+          }
+        }
+        _handleVisibilityChange() {
+          if (document.visibilityState !== "hidden") return;
+          try {
+            this.cssVariableBatcher?.flushCSSVariableBatch?.();
+            try {
+              getRightSidebarCoordinator()?.forceFlush();
+            } catch {
+            }
+            if (this.YEAR3000_CONFIG?.enableDebug) {
+              console.log(
+                "\u{1F31F} [Year3000System] Visibility hidden \u2192 forced flush of pending style updates"
+              );
+            }
+          } catch (e) {
+            if (this.YEAR3000_CONFIG?.enableDebug) {
+              console.warn("[Year3000System] VisibilityChange flush error", e);
+            }
           }
         }
       };
@@ -14926,6 +16057,21 @@
         }
       }
     );
+    const currentFlowGradient = settingsManager.get("sn-flow-gradient");
+    section.addDropDown(
+      "sn-flow-gradient",
+      "Flow gradient intensity (WebGL)",
+      intensityOptions,
+      Math.max(0, intensityOptions.indexOf(currentFlowGradient)),
+      void 0,
+      {
+        onChange: (e) => {
+          const idx = e?.currentTarget?.selectedIndex ?? 0;
+          const newFlow = intensityOptions[idx] ?? "balanced";
+          settingsManager.set("sn-flow-gradient", newFlow);
+        }
+      }
+    );
     const currentStars = settingsManager.get("sn-star-density");
     section.addDropDown(
       "sn-star-density",
@@ -15213,387 +16359,6 @@
       init_starryNightEffects();
       init_SettingsManager();
       init_SettingsSection();
-    }
-  });
-
-  // src-js/systems/visual/RightSidebarCoordinator.ts
-  var RightSidebarCoordinator_exports = {};
-  __export(RightSidebarCoordinator_exports, {
-    RightSidebarCoordinator: () => RightSidebarCoordinator,
-    getRightSidebarCoordinator: () => getRightSidebarCoordinator
-  });
-  function getRightSidebarCoordinator(config) {
-    return RightSidebarCoordinator.getInstance(config);
-  }
-  var _RightSidebarCoordinator, RightSidebarCoordinator;
-  var init_RightSidebarCoordinator = __esm({
-    "src-js/systems/visual/RightSidebarCoordinator.ts"() {
-      "use strict";
-      init_SpotifyDOMSelectors();
-      _RightSidebarCoordinator = class _RightSidebarCoordinator {
-        constructor(config = {}) {
-          this.pendingUpdates = /* @__PURE__ */ new Map();
-          this.isFlushScheduled = false;
-          this.rafId = null;
-          this.performanceAnalyzer = null;
-          // Harmonic variable mapping for Year 3000 convergence
-          this.harmonicVariableMap = /* @__PURE__ */ new Map([
-            ["--sn-rs-beat-intensity", "--sn-beat-pulse-intensity"],
-            ["--sn-rs-glow-alpha", "--sn-rhythm-phase"],
-            ["--sn-rs-hue-shift", "--sn-spectrum-phase"]
-          ]);
-          // Performance tracking
-          this.flushCount = 0;
-          this.totalFlushTime = 0;
-          this.lastFlushTimestamp = 0;
-          // DOM observation for reactive refresh and temporal play
-          this.domObserver = null;
-          this.rightSidebarElement = null;
-          this.visibilityObserver = null;
-          this.isFirstOpen = true;
-          this.lastScrollUpdate = 0;
-          this.config = {
-            enableDebug: config.enableDebug ?? false,
-            maxBatchSize: config.maxBatchSize ?? 50,
-            ...config
-          };
-          this.performanceAnalyzer = config.performanceAnalyzer || null;
-          if (this.config.enableDebug) {
-            console.log(
-              "\u{1F30C} [RightSidebarCoordinator] Initialized with RAF-based batching"
-            );
-          }
-        }
-        /**
-         * Singleton accessor for global coordination
-         */
-        static getInstance(config) {
-          if (!_RightSidebarCoordinator.instance) {
-            _RightSidebarCoordinator.instance = new _RightSidebarCoordinator(config);
-          }
-          return _RightSidebarCoordinator.instance;
-        }
-        /**
-         * Queue a CSS variable update for atomic application at next animation frame
-         */
-        queueUpdate(property, value) {
-          const criticalVars = [
-            "--sn-rs-glow-alpha",
-            "--sn-rs-beat-intensity",
-            "--sn-rs-hue-shift"
-          ];
-          if (criticalVars.includes(property)) {
-            this.applyCriticalUpdate(property, value);
-            return;
-          }
-          this.pendingUpdates.set(property, {
-            property,
-            value,
-            timestamp: performance.now()
-          });
-          if (this.config.enableDebug && this.pendingUpdates.size === 1) {
-            console.log(
-              `\u{1F30C} [RightSidebarCoordinator] Queuing first update: ${property}`
-            );
-          }
-          this.scheduleFlush();
-        }
-        /**
-         * Apply critical updates immediately to the right sidebar element
-         */
-        applyCriticalUpdate(property, value) {
-          const sidebarElement = this.getRightSidebarElement();
-          if (sidebarElement) {
-            try {
-              sidebarElement.style.setProperty(property, value);
-            } catch (error) {
-              console.error(
-                `\u{1F30C} [RightSidebarCoordinator] Failed to apply critical ${property}:`,
-                error
-              );
-            }
-          }
-        }
-        /**
-         * Get the right sidebar element with fallback to document root
-         */
-        getRightSidebarElement() {
-          if (!this.rightSidebarElement) {
-            this.rightSidebarElement = document.querySelector(
-              MODERN_SELECTORS.rightSidebar
-            );
-          }
-          return this.rightSidebarElement || document.documentElement;
-        }
-        /**
-         * Schedule atomic flush at next animation frame
-         */
-        scheduleFlush() {
-          if (this.isFlushScheduled) {
-            return;
-          }
-          this.isFlushScheduled = true;
-          this.rafId = requestAnimationFrame(() => {
-            this.flushUpdates();
-          });
-        }
-        /**
-         * Atomically apply all pending updates
-         */
-        flushUpdates() {
-          if (this.pendingUpdates.size === 0) {
-            this.isFlushScheduled = false;
-            return;
-          }
-          const startTime = performance.now();
-          const targetElement = this.getRightSidebarElement();
-          const updateCount = this.pendingUpdates.size;
-          if (this.config.enableDebug) {
-            console.log(
-              `\u{1F30C} [RightSidebarCoordinator] Flushing ${updateCount} updates atomically`
-            );
-          }
-          if (updateCount > (this.config.maxBatchSize || 50)) {
-            console.warn(
-              `\u{1F30C} [RightSidebarCoordinator] Large batch detected (${updateCount} updates), may impact performance`
-            );
-          }
-          for (const update of this.pendingUpdates.values()) {
-            try {
-              targetElement.style.setProperty(update.property, update.value);
-              const harmonicVar = this.harmonicVariableMap.get(update.property);
-              if (harmonicVar) {
-                document.documentElement.style.setProperty(harmonicVar, update.value);
-                if (this.config.enableDebug) {
-                  console.log(
-                    `\u{1F30C} [RightSidebarCoordinator] Mapped ${update.property} \u2192 ${harmonicVar} = ${update.value}`
-                  );
-                }
-              }
-            } catch (error) {
-              console.error(
-                `\u{1F30C} [RightSidebarCoordinator] Failed to apply ${update.property}:`,
-                error
-              );
-            }
-          }
-          this.pendingUpdates.clear();
-          this.isFlushScheduled = false;
-          this.rafId = null;
-          if (this.config.onFlushComplete) {
-            try {
-              this.config.onFlushComplete();
-            } catch (error) {
-              console.error(
-                "\u{1F30C} [RightSidebarCoordinator] Error in flush completion callback:",
-                error
-              );
-            }
-          }
-          const endTime = performance.now();
-          const flushTime = endTime - startTime;
-          this.flushCount++;
-          this.totalFlushTime += flushTime;
-          this.lastFlushTimestamp = endTime;
-          if (this.performanceAnalyzer) {
-            this.performanceAnalyzer.emitTrace?.(
-              `[RightSidebarCoordinator] Flushed ${updateCount} updates in ${flushTime.toFixed(
-                2
-              )}ms`
-            );
-          }
-          const avgFlushTime = this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0;
-          if (avgFlushTime > 3) {
-            console.warn(
-              `\u{1F30C} [RightSidebarCoordinator] Performance threshold exceeded: average ${avgFlushTime.toFixed(
-                2
-              )}ms per flush (target: <3ms)`
-            );
-          }
-          if (this.config.enableDebug && flushTime > 4) {
-            console.warn(
-              `\u{1F30C} [RightSidebarCoordinator] Slow flush detected: ${flushTime.toFixed(
-                2
-              )}ms for ${updateCount} updates`
-            );
-          }
-        }
-        /**
-         * Setup DOM observation for reactive refresh and temporal play
-         */
-        setupDOMObservation() {
-          if (this.domObserver) {
-            return;
-          }
-          this.rightSidebarElement = document.querySelector(
-            MODERN_SELECTORS.rightSidebar
-          );
-          if (!this.rightSidebarElement) {
-            if (this.config.enableDebug) {
-              console.warn(
-                "\u{1F30C} [RightSidebarCoordinator] Right sidebar not found, deferring DOM observation"
-              );
-            }
-            setTimeout(() => this.setupDOMObservation(), 1e3);
-            return;
-          }
-          this.domObserver = new MutationObserver((mutations) => {
-            this.queueUpdate("--sn-rs-force-refresh", Date.now().toString());
-            for (const mutation of mutations) {
-              if (mutation.type === "attributes" && (mutation.attributeName === "aria-hidden" || mutation.attributeName === "style")) {
-                this.handleVisibilityChange();
-              }
-            }
-            if (this.config.enableDebug) {
-              console.log(
-                "\u{1F30C} [RightSidebarCoordinator] DOM change detected, forcing refresh"
-              );
-            }
-          });
-          this.domObserver.observe(this.rightSidebarElement, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            // Watch for aria-hidden and style changes
-            attributeFilter: ["aria-hidden", "style", "class"]
-          });
-          this.setupVisibilityObserver();
-          this.setupScrollObservation();
-          if (this.config.enableDebug) {
-            console.log(
-              "\u{1F30C} [RightSidebarCoordinator] DOM observation active on right sidebar"
-            );
-          }
-        }
-        /**
-         * Setup visibility observer for temporal echo effects
-         */
-        setupVisibilityObserver() {
-          if (!this.rightSidebarElement || this.visibilityObserver) return;
-          this.visibilityObserver = new IntersectionObserver(
-            (entries) => {
-              const entry = entries[0];
-              if (entry && entry.isIntersecting && this.isFirstOpen) {
-                this.triggerTemporalEcho();
-                this.isFirstOpen = false;
-              }
-            },
-            { threshold: 0.1 }
-          );
-          this.visibilityObserver.observe(this.rightSidebarElement);
-        }
-        /**
-         * Setup scroll observation with throttling for performance
-         */
-        setupScrollObservation() {
-          if (!this.rightSidebarElement) return;
-          const queueElement = this.rightSidebarElement.querySelector(".main-nowPlayingView-queue");
-          if (!queueElement) return;
-          queueElement.addEventListener("scroll", this.throttledScrollHandler.bind(this), {
-            passive: true
-          });
-        }
-        /**
-         * Throttled scroll handler (≤30 Hz as specified)
-         */
-        throttledScrollHandler() {
-          const now = performance.now();
-          if (now - this.lastScrollUpdate < 33) return;
-          this.lastScrollUpdate = now;
-          if (window.requestIdleCallback) {
-            window.requestIdleCallback(() => {
-              this.queueUpdate("--sn-rs-scroll-ratio", Math.random().toString());
-            });
-          } else {
-            this.queueUpdate("--sn-rs-scroll-ratio", Math.random().toString());
-          }
-        }
-        /**
-         * Handle visibility changes for temporal effects
-         */
-        handleVisibilityChange() {
-          if (!this.rightSidebarElement) return;
-          const isVisible = !this.rightSidebarElement.hasAttribute("aria-hidden") && !this.rightSidebarElement.style.display?.includes("none");
-          if (isVisible && this.isFirstOpen) {
-            this.triggerTemporalEcho();
-            this.isFirstOpen = false;
-          }
-          if (this.config.enableDebug) {
-            console.log(
-              `\u{1F30C} [RightSidebarCoordinator] Visibility changed: ${isVisible ? "visible" : "hidden"}`
-            );
-          }
-        }
-        /**
-         * Trigger one-time temporal echo effect
-         */
-        triggerTemporalEcho() {
-          if (!this.rightSidebarElement) return;
-          this.rightSidebarElement.classList.add("sn-future-preview");
-          this.queueUpdate("--sn-kinetic-intensity", "1");
-          this.queueUpdate("--sn-echo-hue-shift", "15deg");
-          this.queueUpdate("--sn-echo-radius-multiplier", "1.2");
-          if (this.config.enableDebug) {
-            console.log("\u{1F30C} [RightSidebarCoordinator] Triggering temporal echo effect");
-          }
-          setTimeout(() => {
-            this.rightSidebarElement?.classList.remove("sn-future-preview");
-            this.queueUpdate("--sn-kinetic-intensity", "0");
-          }, 2e3);
-        }
-        /**
-         * Get performance metrics for monitoring
-         */
-        getPerformanceMetrics() {
-          return {
-            flushCount: this.flushCount,
-            averageFlushTime: this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0,
-            lastFlushTimestamp: this.lastFlushTimestamp,
-            pendingUpdates: this.pendingUpdates.size
-          };
-        }
-        /**
-         * Force immediate flush for critical scenarios
-         */
-        forceFlush() {
-          if (this.rafId) {
-            cancelAnimationFrame(this.rafId);
-            this.rafId = null;
-          }
-          this.flushUpdates();
-        }
-        /**
-         * Cleanup and destroy coordinator
-         */
-        destroy() {
-          if (this.rafId) {
-            cancelAnimationFrame(this.rafId);
-            this.rafId = null;
-          }
-          if (this.domObserver) {
-            this.domObserver.disconnect();
-            this.domObserver = null;
-          }
-          if (this.visibilityObserver) {
-            this.visibilityObserver.disconnect();
-            this.visibilityObserver = null;
-          }
-          this.pendingUpdates.clear();
-          this.isFlushScheduled = false;
-          this.rightSidebarElement = null;
-          if (_RightSidebarCoordinator.instance === this) {
-            _RightSidebarCoordinator.instance = null;
-          }
-          if (this.config.enableDebug) {
-            const avgFlushTime = this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0;
-            console.log(
-              `\u{1F30C} [RightSidebarCoordinator] Destroyed. Performance: ${this.flushCount} flushes, ${avgFlushTime.toFixed(2)}ms avg`
-            );
-          }
-        }
-      };
-      _RightSidebarCoordinator.instance = null;
-      RightSidebarCoordinator = _RightSidebarCoordinator;
     }
   });
 

@@ -2,6 +2,10 @@
 
 > **Purpose:** give both **humans** and **AI models** a concise map of the theme's architecture, files, and core ideas. Feed this file first — it links to every deeper doc.
 
+> **ℹ️ WebGL/WebGPU status**: The **WebGL Flow Gradient System** (v1.2.0) is **✅ production-ready** and enabled by default.
+> WebGPU-powered systems (e.g. `WebGPUBackgroundSystem`) remain **experimental** and **disabled by default**.
+> The theme uses **WebGL 2.0** with automatic CSS fallbacks. Enable the `sn-enable-webgpu` setting only for testing.
+
 ---
 
 ## 1 What is StarryNight?
@@ -59,6 +63,7 @@ Key pillars:
 - `Data_Glyph_System.md` — adaptive glyph dots on tracks/cards.
 - `DIMENSIONAL_NEXUS_SYSTEM.md` — navigation-field warp & meditation states.
 - `Predictive_Behavior_Systems.md` — anticipatory glows & behavioural prediction.
+- `webgl-gradient-integration.md` — **✅** WebGL flow gradient with wave stack & skew transforms.
 
 </details>
 
@@ -120,4 +125,4 @@ Individual docs declare a badge in their header.
 
 ---
 
-_Last updated: **June 2025**_
+_Last updated: **July 2025** — WebGL Flow Gradient System v1.2.0_

@@ -6,6 +6,7 @@
  * element for optimal performance.
  */
 
+import { CSSVariableBatcher } from "@/core/CSSVariableBatcher";
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
 import { MODERN_SELECTORS } from "@/debug/SpotifyDOMSelectors";
 
@@ -69,7 +70,9 @@ export class RightSidebarCoordinator {
   /**
    * Singleton accessor for global coordination
    */
-  public static getInstance(config?: CoordinatorConfig): RightSidebarCoordinator {
+  public static getInstance(
+    config?: CoordinatorConfig
+  ): RightSidebarCoordinator {
     if (!RightSidebarCoordinator.instance) {
       RightSidebarCoordinator.instance = new RightSidebarCoordinator(config);
     }
@@ -93,19 +96,28 @@ export class RightSidebarCoordinator {
       return;
     }
 
-    this.pendingUpdates.set(property, {
-      property,
-      value,
-      timestamp: performance.now(),
-    });
-
-    if (this.config.enableDebug && this.pendingUpdates.size === 1) {
-      console.log(
-        `🌌 [RightSidebarCoordinator] Queuing first update: ${property}`
+    // Delegate non-critical vars to global CSSVariableBatcher for sync flush
+    if (CSSVariableBatcher.instance) {
+      CSSVariableBatcher.instance.queueCSSVariableUpdate(
+        property,
+        value,
+        this.getRightSidebarElement() as HTMLElement
       );
-    }
+    } else {
+      this.pendingUpdates.set(property, {
+        property,
+        value,
+        timestamp: performance.now(),
+      });
 
-    this.scheduleFlush();
+      if (this.config.enableDebug && this.pendingUpdates.size === 1) {
+        console.log(
+          `🌌 [RightSidebarCoordinator] Queuing first update (fallback): ${property}`
+        );
+      }
+
+      this.scheduleFlush();
+    }
   }
 
   /**
@@ -134,7 +146,7 @@ export class RightSidebarCoordinator {
         MODERN_SELECTORS.rightSidebar as string
       );
     }
-    
+
     // Fallback to document root if sidebar not found
     return this.rightSidebarElement || document.documentElement;
   }
@@ -183,13 +195,16 @@ export class RightSidebarCoordinator {
     for (const update of this.pendingUpdates.values()) {
       try {
         // Apply the original variable to the sidebar element
-        (targetElement as HTMLElement).style.setProperty(update.property, update.value);
-        
+        (targetElement as HTMLElement).style.setProperty(
+          update.property,
+          update.value
+        );
+
         // Also apply to global harmonic if mapping exists
         const harmonicVar = this.harmonicVariableMap.get(update.property);
         if (harmonicVar) {
           document.documentElement.style.setProperty(harmonicVar, update.value);
-          
+
           if (this.config.enableDebug) {
             console.log(
               `🌌 [RightSidebarCoordinator] Mapped ${update.property} → ${harmonicVar} = ${update.value}`
@@ -237,7 +252,8 @@ export class RightSidebarCoordinator {
     }
 
     // Performance validation as specified (warn if average flush > 3ms)
-    const avgFlushTime = this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0;
+    const avgFlushTime =
+      this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0;
     if (avgFlushTime > 3) {
       console.warn(
         `🌌 [RightSidebarCoordinator] Performance threshold exceeded: average ${avgFlushTime.toFixed(
@@ -286,9 +302,11 @@ export class RightSidebarCoordinator {
 
       // Check for visibility changes (aria-hidden, style.display)
       for (const mutation of mutations) {
-        if (mutation.type === 'attributes' && 
-            (mutation.attributeName === 'aria-hidden' || 
-             mutation.attributeName === 'style')) {
+        if (
+          mutation.type === "attributes" &&
+          (mutation.attributeName === "aria-hidden" ||
+            mutation.attributeName === "style")
+        ) {
           this.handleVisibilityChange();
         }
       }
@@ -304,7 +322,7 @@ export class RightSidebarCoordinator {
       childList: true,
       subtree: true,
       attributes: true, // Watch for aria-hidden and style changes
-      attributeFilter: ['aria-hidden', 'style', 'class']
+      attributeFilter: ["aria-hidden", "style", "class"],
     });
 
     // Intersection observer for visibility changes
@@ -346,12 +364,18 @@ export class RightSidebarCoordinator {
   private setupScrollObservation(): void {
     if (!this.rightSidebarElement) return;
 
-    const queueElement = this.rightSidebarElement.querySelector('.main-nowPlayingView-queue');
+    const queueElement = this.rightSidebarElement.querySelector(
+      ".main-nowPlayingView-queue"
+    );
     if (!queueElement) return;
 
-    queueElement.addEventListener('scroll', this.throttledScrollHandler.bind(this), {
-      passive: true
-    });
+    queueElement.addEventListener(
+      "scroll",
+      this.throttledScrollHandler.bind(this),
+      {
+        passive: true,
+      }
+    );
   }
 
   /**
@@ -362,7 +386,7 @@ export class RightSidebarCoordinator {
     if (now - this.lastScrollUpdate < 33) return; // 30 Hz limit
 
     this.lastScrollUpdate = now;
-    
+
     // Use requestIdleCallback when available for better performance
     if (window.requestIdleCallback) {
       window.requestIdleCallback(() => {
@@ -379,8 +403,11 @@ export class RightSidebarCoordinator {
   private handleVisibilityChange(): void {
     if (!this.rightSidebarElement) return;
 
-    const isVisible = !this.rightSidebarElement.hasAttribute('aria-hidden') &&
-                     !this.rightSidebarElement.style.display?.includes('none');
+    const isVisible =
+      !this.rightSidebarElement.hasAttribute("aria-hidden") &&
+      !(this.rightSidebarElement as HTMLElement).style.display?.includes(
+        "none"
+      );
 
     if (isVisible && this.isFirstOpen) {
       this.triggerTemporalEcho();
@@ -389,7 +416,9 @@ export class RightSidebarCoordinator {
 
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [RightSidebarCoordinator] Visibility changed: ${isVisible ? 'visible' : 'hidden'}`
+        `🌌 [RightSidebarCoordinator] Visibility changed: ${
+          isVisible ? "visible" : "hidden"
+        }`
       );
     }
   }
@@ -401,20 +430,22 @@ export class RightSidebarCoordinator {
     if (!this.rightSidebarElement) return;
 
     // Add temporal echo class for 3-layer effect
-    this.rightSidebarElement.classList.add('sn-future-preview');
-    
+    this.rightSidebarElement.classList.add("sn-future-preview");
+
     // Set temporal variables
     this.queueUpdate("--sn-kinetic-intensity", "1");
     this.queueUpdate("--sn-echo-hue-shift", "15deg");
     this.queueUpdate("--sn-echo-radius-multiplier", "1.2");
 
     if (this.config.enableDebug) {
-      console.log("🌌 [RightSidebarCoordinator] Triggering temporal echo effect");
+      console.log(
+        "🌌 [RightSidebarCoordinator] Triggering temporal echo effect"
+      );
     }
 
     // Clean up after animation
     setTimeout(() => {
-      this.rightSidebarElement?.classList.remove('sn-future-preview');
+      this.rightSidebarElement?.classList.remove("sn-future-preview");
       this.queueUpdate("--sn-kinetic-intensity", "0");
     }, 2000);
   }

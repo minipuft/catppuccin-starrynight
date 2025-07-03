@@ -2,7 +2,6 @@ import { GlobalEventBus } from "@/core/EventBus";
 import { PerformanceAnalyzer } from "@/core/PerformanceAnalyzer";
 import { SettingsManager } from "@/managers/SettingsManager";
 import { MusicSyncService } from "@/services/MusicSyncService";
-import { getNowPlayingCoordinator } from "@/systems/nowPlaying/NowPlayingCoordinator";
 import type {
   BeatFlashIntensity,
   BeatSyncModeConfig,
@@ -121,58 +120,15 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
     return 0;
   }
 
-  /**
-   * Helper method to get NowPlayingCoordinator with glass convergence callback
-   * Phase 2: Glass Convergence Integration
-   */
-  private _getCoordinatorWithGlassCallback() {
-    const glassConvergenceCallback = () => {
-      try {
-        if (this.year3000System?.glassmorphismManager) {
-          this.year3000System.glassmorphismManager.checkPerformanceAndAdjust();
-          
-          if (this.config?.enableDebug) {
-            console.log(
-              `🎵 [${this.systemName}] Glass convergence callback triggered - GlassCheck invoked`
-            );
-          }
-
-          // Emit performance trace for monitoring
-          if (this.performanceMonitor) {
-            this.performanceMonitor.emitTrace?.(
-              "[BeatSyncVisualSystem] GlassCheck triggered via NowPlayingCoordinator flush"
-            );
-          }
-        }
-      } catch (error) {
-        console.error(
-          `🎵 [${this.systemName}] Error in glass convergence callback:`,
-          error
-        );
-      }
-    };
-
-    return getNowPlayingCoordinator({
-      enableDebug: this.config?.enableDebug,
-      performanceAnalyzer: this.performanceMonitor,
-      onFlushComplete: glassConvergenceCallback
-    });
-  }
-
   override async initialize() {
     await super.initialize();
     this._createBeatFlashElement();
     this._createCrystallineOverlay();
     this._startAnimationLoop();
 
-    // Phase 3: Initialize NowPlayingCoordinator with DOM observation
-    // Phase 2: Glass Convergence - Setup callback to trigger glass refresh after flush
-    const coordinator = this._getCoordinatorWithGlassCallback();
-    coordinator.setupDOMObservation();
-
     if (this.config.enableDebug) {
       console.log(
-        `[${this.systemName}] Initialized and animation loop started. NowPlayingCoordinator: active`
+        `[${this.systemName}] Initialized and animation loop started.`
       );
     }
   }
@@ -403,29 +359,39 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
     const root = Year3000Utilities.getRootStyle();
     if (!root) return;
 
-    // Phase 3: Use NowPlayingCoordinator for coordinated updates
-    // Phase 2: Glass Convergence - Use coordinator with glass callback
-    const coordinator = this._getCoordinatorWithGlassCallback();
+    // Phase 3: Updates routed through unified CSSVariableBatcher – no per-area coordinator required
 
     // Helper: Route updates through coordinator for atomicity
     const queueCSSUpdate = (property: string, value: string) => {
-      // Critical variables (--sn-beat-pulse-intensity, --sn-breathing-scale) 
+      // Critical variables (--sn-beat-pulse-intensity, --sn-breathing-scale)
       // are handled by CSSVariableBatcher fast path, others go through coordinator
-      const criticalVars = ['--sn-beat-pulse-intensity', '--sn-breathing-scale'];
-      
+      const criticalVars = [
+        "--sn-beat-pulse-intensity",
+        "--sn-breathing-scale",
+      ];
+
       if (criticalVars.includes(property)) {
         // Critical variables bypass coordinator (handled by CSSVariableBatcher)
         if (
           (this.year3000System as any)?.queueCSSVariableUpdate &&
-          typeof (this.year3000System as any).queueCSSVariableUpdate === "function"
+          typeof (this.year3000System as any).queueCSSVariableUpdate ===
+            "function"
         ) {
           (this.year3000System as any).queueCSSVariableUpdate(property, value);
         } else {
           root.style.setProperty(property, value);
         }
       } else {
-        // Non-critical variables go through coordinator for atomic updates
-        coordinator.queueUpdate(property, value);
+        // Non-critical variables go directly to unified batcher via Year3000System
+        if (
+          (this.year3000System as any)?.queueCSSVariableUpdate &&
+          typeof (this.year3000System as any).queueCSSVariableUpdate ===
+            "function"
+        ) {
+          (this.year3000System as any).queueCSSVariableUpdate(property, value);
+        } else {
+          root.style.setProperty(property, value);
+        }
       }
     };
 
@@ -438,13 +404,19 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
 
     // Phase 3: Beat-Sync Glass Effects - Add beat-boost glass variable
     // Phase 4: Read user settings for glass pulse control
-    const glassPulseEnabled = this.settingsManager?.get("sn-glass-beat-pulse") === "true";
-    const glassBaseIntensity = parseFloat(this.settingsManager?.get("sn-glass-base-intensity") || "0.5");
-    
+    const glassPulseEnabled =
+      this.settingsManager?.get("sn-glass-beat-pulse") === "true";
+    const glassBaseIntensity = parseFloat(
+      this.settingsManager?.get("sn-glass-base-intensity") || "0.5"
+    );
+
     // Update CSS variables for user controls
     queueCSSUpdate("--glass-pulse-toggle", glassPulseEnabled ? "1" : "0");
-    queueCSSUpdate("--glass-user-intensity", Math.max(0, Math.min(1, glassBaseIntensity)).toFixed(2));
-    
+    queueCSSUpdate(
+      "--glass-user-intensity",
+      Math.max(0, Math.min(1, glassBaseIntensity)).toFixed(2)
+    );
+
     // Bounds-checked (0-1 range) with 1.5x multiplier for enhanced glass effect
     // Performance optimization: only update when there's meaningful beat intensity
     const beatBoostGlass = Math.min(1, Math.max(0, beatPulseIntensity * 1.5));
@@ -456,6 +428,11 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
     // Map music energy → feed bloom gradient
     const bloomIntensity = processedEnergy * 0.4;
     queueCSSUpdate("--sn-feed-bloom-intensity", bloomIntensity.toFixed(3));
+
+    // BeatSync ↔ Flow Gradient Adapter
+    // Map --sn-beat-pulse-intensity to u_flowStrength (range 0.4-1.0)
+    const flowStrength = 0.4 + (beatPulseIntensity * 0.6); // Scale 0-1 to 0.4-1.0
+    queueCSSUpdate("--sn-flow-strength", flowStrength.toFixed(3));
 
     this.performanceMetrics.cssVariableUpdates++;
   }
@@ -644,7 +621,7 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
     }
 
     // Phase 3: Cleanup echo pool
-    this.echoPool.forEach(el => {
+    this.echoPool.forEach((el) => {
       if (el.parentElement) {
         el.parentElement.removeChild(el);
       }
@@ -652,18 +629,10 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
     this.echoPool = [];
     this.currentEchoCount = 0;
 
-    // Phase 3: Destroy NowPlayingCoordinator if we're the last system
-    try {
-      const coordinator = getNowPlayingCoordinator();
-      coordinator.destroy();
-    } catch (e) {
-      // Coordinator may already be destroyed, ignore
-    }
-
     if (this.config.enableDebug) {
       const report = this.getPerformanceReport();
       console.log(`[${this.systemName}] Performance Report:`, report);
-      console.log(`[${this.systemName}] Destroyed with NowPlayingCoordinator cleanup.`);
+      console.log(`[${this.systemName}] Destroyed.`);
     }
 
     super.destroy();
@@ -1209,7 +1178,6 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
       this._releaseEchoElement(echo);
     }, 1250);
   }
-
 }
 
 export default BeatSyncVisualSystem;

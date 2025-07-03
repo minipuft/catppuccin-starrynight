@@ -2,11 +2,11 @@ declare const Spicetify: any;
 
 import { HARMONIC_MODES, YEAR3000_CONFIG } from "@/config/globalConfig";
 import {
-    ARTISTIC_MODE_KEY,
-    HARMONIC_EVOLUTION_KEY,
-    HARMONIC_INTENSITY_KEY,
-    HARMONIC_MODE_KEY,
-    MANUAL_BASE_COLOR_KEY,
+  ARTISTIC_MODE_KEY,
+  HARMONIC_EVOLUTION_KEY,
+  HARMONIC_INTENSITY_KEY,
+  HARMONIC_MODE_KEY,
+  MANUAL_BASE_COLOR_KEY,
 } from "@/config/settingKeys";
 import { CSSVariableBatcher } from "@/core/CSSVariableBatcher";
 import { DeviceCapabilityDetector } from "@/core/DeviceCapabilityDetector";
@@ -19,11 +19,11 @@ import { applyStarryNightSettings } from "@/effects/starryNightEffects";
 import { Card3DManager } from "@/managers/Card3DManager";
 import { GlassmorphismManager } from "@/managers/GlassmorphismManager";
 import { SettingsManager } from "@/managers/SettingsManager";
-import { getNowPlayingCoordinator } from "@/systems/nowPlaying/NowPlayingCoordinator";
 import type { ProcessedAudioData } from "@/services/MusicSyncService";
 import { MusicSyncService } from "@/services/MusicSyncService";
 import { ColorHarmonyEngine } from "@/systems/ColorHarmonyEngine";
 import { EmergentChoreographyEngine } from "@/systems/EmergentChoreographyEngine";
+import { startNowPlayingWatcher } from "@/systems/nowPlaying/NowPlayingDomWatcher";
 import { BeatSyncVisualSystem } from "@/systems/visual/BeatSyncVisualSystem";
 import { BehavioralPredictionEngine } from "@/systems/visual/BehavioralPredictionEngine";
 import { DataGlyphSystem } from "@/systems/visual/DataGlyphSystem";
@@ -31,7 +31,9 @@ import { DimensionalNexusSystem } from "@/systems/visual/DimensionalNexusSystem"
 import { LightweightParticleSystem } from "@/systems/visual/LightweightParticleSystem";
 import { ParticleFieldSystem } from "@/systems/visual/ParticleFieldSystem";
 import { PredictiveMaterializationSystem } from "@/systems/visual/PredictiveMaterializationSystem";
+import { getRightSidebarCoordinator } from "@/systems/visual/RightSidebarCoordinator";
 import { SidebarConsciousnessSystem } from "@/systems/visual/SidebarConsciousnessSystem";
+import { WebGLGradientBackgroundSystem } from "@/systems/visual/WebGLGradientBackgroundSystem";
 import { WebGPUBackgroundSystem } from "@/systems/visual/WebGPUBackgroundSystem";
 import type { HarmonicModes, Year3000Config } from "@/types/models";
 import * as Utils from "@/utils/Year3000Utilities";
@@ -62,6 +64,7 @@ interface VisualSystemConfig {
     | "behavioralPredictionEngine"
     | "predictiveMaterializationSystem"
     | "sidebarConsciousnessSystem"
+    | "webGLGradientBackgroundSystem"
     | "webGPUBackgroundSystem"
     | "particleFieldSystem"
     | "emergentChoreographyEngine";
@@ -99,6 +102,7 @@ export class Year3000System {
   public behavioralPredictionEngine: BehavioralPredictionEngine | null;
   public predictiveMaterializationSystem: PredictiveMaterializationSystem | null;
   public sidebarConsciousnessSystem: SidebarConsciousnessSystem | null;
+  public webGLGradientBackgroundSystem: WebGLGradientBackgroundSystem | null;
   public webGPUBackgroundSystem: WebGPUBackgroundSystem | null;
   public particleFieldSystem: ParticleFieldSystem | null;
   public emergentChoreographyEngine: EmergentChoreographyEngine | null;
@@ -118,6 +122,9 @@ export class Year3000System {
   private _boundExternalSettingsHandler: (event: Event) => void;
   // Bound handler for Artistic Mode change events
   private _boundArtisticModeHandler: (event: Event) => void;
+  // NEW: Flush pending style updates when the tab becomes backgrounded
+  private _boundVisibilityChangeHandler: () => void;
+  private _disposeNowPlayingWatcher: (() => void) | null = null;
 
   /**
    * Indicates whether automatic harmonic evolution is permitted. This mirrors the
@@ -164,6 +171,7 @@ export class Year3000System {
     this.behavioralPredictionEngine = null;
     this.predictiveMaterializationSystem = null;
     this.sidebarConsciousnessSystem = null;
+    this.webGLGradientBackgroundSystem = null;
     this.webGPUBackgroundSystem = null;
     this.particleFieldSystem = null;
     this.emergentChoreographyEngine = null;
@@ -192,6 +200,19 @@ export class Year3000System {
       "year3000ArtisticModeChanged",
       this._boundArtisticModeHandler
     );
+
+    // NEW: Flush pending style updates when the tab becomes backgrounded
+    this._boundVisibilityChangeHandler =
+      this._handleVisibilityChange.bind(this);
+    document.addEventListener(
+      "visibilitychange",
+      this._boundVisibilityChangeHandler
+    );
+
+    // Start NowPlaying DOM watcher (force-refresh variable)
+    this._disposeNowPlayingWatcher = startNowPlayingWatcher(() => {
+      this.queueCSSVariableUpdate("--sn-force-refresh", Date.now().toString());
+    }, this.YEAR3000_CONFIG.enableDebug);
 
     // Keep local convenience flag in sync with config default
     this.allowHarmonicEvolution =
@@ -588,6 +609,11 @@ export class Year3000System {
         property: "sidebarConsciousnessSystem",
       },
       {
+        name: "WebGLGradientBackgroundSystem",
+        Class: WebGLGradientBackgroundSystem,
+        property: "webGLGradientBackgroundSystem",
+      },
+      {
         name: "WebGPUBackgroundSystem",
         Class: WebGPUBackgroundSystem,
         property: "webGPUBackgroundSystem",
@@ -675,6 +701,7 @@ export class Year3000System {
       this.performanceAnalyzer,
       this.deviceCapabilityDetector,
       this.cssVariableBatcher,
+      this.webGLGradientBackgroundSystem,
       this.webGPUBackgroundSystem,
       this.particleFieldSystem,
       this.emergentChoreographyEngine,
@@ -712,6 +739,18 @@ export class Year3000System {
       "year3000ArtisticModeChanged",
       this._boundArtisticModeHandler
     );
+
+    // NEW: Clean up visibilitychange listener
+    document.removeEventListener(
+      "visibilitychange",
+      this._boundVisibilityChangeHandler
+    );
+
+    // Dispose NowPlaying watcher
+    if (this._disposeNowPlayingWatcher) {
+      this._disposeNowPlayingWatcher();
+      this._disposeNowPlayingWatcher = null;
+    }
   }
 
   public async applyInitialSettings(): Promise<void> {
@@ -858,7 +897,9 @@ export class Year3000System {
   private _applyHarmonizedColorsToCss(
     colors: { [key: string]: string } = {}
   ): void {
-    if (!colors || Object.keys(colors).length === 0) return;
+    if (!colors || Object.keys(colors).length === 0) {
+      colors = { VIBRANT: "#a6adc8" }; // neutral fallback accent
+    }
 
     // Heuristic mapping – favour extractor roles first, then fallbacks
     const primaryHex =
@@ -1773,6 +1814,33 @@ export class Year3000System {
       this.updateColorsFromCurrentTrack?.();
     } catch (e) {
       console.warn("[Year3000System] _onArtisticModeChanged stub error", e);
+    }
+  }
+
+  private _handleVisibilityChange(): void {
+    if (document.visibilityState !== "hidden") return;
+
+    try {
+      // Flush global batched CSS variables first
+      this.cssVariableBatcher?.flushCSSVariableBatch?.();
+
+      // Force-flush NowPlayingCoordinator to avoid frame skew
+      // NowPlayingCoordinator removed – its flush is handled via CSSVariableBatcher
+
+      // Force-flush RightSidebarCoordinator if present
+      try {
+        getRightSidebarCoordinator()?.forceFlush();
+      } catch {}
+
+      if (this.YEAR3000_CONFIG?.enableDebug) {
+        console.log(
+          "🌟 [Year3000System] Visibility hidden → forced flush of pending style updates"
+        );
+      }
+    } catch (e) {
+      if (this.YEAR3000_CONFIG?.enableDebug) {
+        console.warn("[Year3000System] VisibilityChange flush error", e);
+      }
     }
   }
 } // ← end of Year3000System class

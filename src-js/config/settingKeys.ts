@@ -20,3 +20,4 @@ export const NEBULA_INTENSITY_KEY = "sn-nebula-intensity";
 export const ENABLE_ABERRATION_KEY = "sn-enable-aberration";
 export const VISUAL_INTENSITY_KEY = "sn-visual-intensity";
 export const ANIMATION_QUALITY_KEY = "sn-animation-quality";
+export const FLOW_GRADIENT_KEY = "sn-flow-gradient";

@@ -227,7 +227,7 @@ export class MusicSyncService {
 
   // High-precision beat scheduling
   private beatSchedulerTimer: NodeJS.Timeout | null = null;
-  
+
   // Phase 1: Song Change Debouncing
   private songChangeDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private nextBeatIndex: number = 0;
@@ -472,7 +472,27 @@ export class MusicSyncService {
             );
           }
           this.metrics.errors++;
-          return null;
+          // Return synthetic fallback so downstream visuals can still animate
+          const fallback: AudioData = {
+            tempo: 120,
+            energy: 0.5,
+            valence: 0.5,
+            loudness: -10,
+            key: 0,
+            time_signature: 4,
+            danceability: 0.5,
+            acousticness: 0.5,
+            instrumentalness: 0,
+            speechiness: 0.05,
+            liveness: 0.2,
+            mode: 1,
+          };
+          if (this.config.enableDebug) {
+            console.warn(
+              `[MusicSyncService] All audio-data attempts failed – using fallback defaults`
+            );
+          }
+          return fallback;
         }
       }
 
@@ -1295,5 +1315,4 @@ export class MusicSyncService {
       // Optional arrays left undefined – beat grid will arrive later
     } as AudioData;
   }
-
 }

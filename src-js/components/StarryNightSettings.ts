@@ -118,6 +118,25 @@ export async function initializeStarryNightSettings(): Promise<void> {
     }
   );
 
+  // --- Flow gradient intensity drop-down ----------------------------------
+  const currentFlowGradient = settingsManager.get("sn-flow-gradient");
+
+  (section as any).addDropDown(
+    "sn-flow-gradient",
+    "Flow gradient intensity (WebGL)",
+    intensityOptions as unknown as string[],
+    Math.max(0, intensityOptions.indexOf(currentFlowGradient as any)),
+    undefined,
+    {
+      onChange: (e: any) => {
+        const idx = e?.currentTarget?.selectedIndex ?? 0;
+        const newFlow = intensityOptions[idx] ?? "balanced";
+        settingsManager.set("sn-flow-gradient", newFlow as any);
+        // WebGL gradient system will automatically pick up the change via event listener
+      },
+    }
+  );
+
   // --- Star density drop-down ---------------------------------------------
   const currentStars = settingsManager.get("sn-star-density");
 

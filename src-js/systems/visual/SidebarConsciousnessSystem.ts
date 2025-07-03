@@ -36,7 +36,7 @@ interface AnimationState {
 
 export class SidebarConsciousnessSystem extends BaseVisualSystem {
   // TODO: Implement abstract onAnimate method for Year 3000 MasterAnimationCoordinator
-  public onAnimate(deltaMs: number): void {
+  public override onAnimate(deltaMs: number): void {
     // Basic implementation - can be enhanced in future phases
   }
   private year3000System: Year3000System | null;
@@ -135,7 +135,7 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
-  async initialize() {
+  public override async initialize() {
     await super.initialize();
     this.rootNavBar = document.querySelector(".Root__nav-bar");
     if (!this.rootNavBar) {
@@ -226,7 +226,7 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     this.startConsciousnessLoop();
   }
 
-  public updateAnimation(timestamp: number, deltaTime: number) {
+  public override updateAnimation(timestamp: number, deltaTime: number) {
     if (
       this.deviceCapabilities.reducedMotion ||
       !this.consciousnessVisualizer ||
@@ -258,7 +258,7 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     }
   }
 
-  public handleSettingsChange(event: CustomEvent) {
+  public override handleSettingsChange(event: CustomEvent) {
     super.handleSettingsChange(event);
     if (event.detail.key === "sn-harmonic-mode") {
       this.updateHarmonicModeDisplay(event.detail.value);
@@ -376,7 +376,7 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     applyCss("--sidebar-intensity", `${visualIntensity}`);
   }
 
-  public updateFromMusicAnalysis(
+  public override updateFromMusicAnalysis(
     processedMusicData: any,
     rawFeatures?: any,
     trackUri?: string | null
@@ -386,7 +386,7 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     this._updateSidebarVariables(processedMusicData);
   }
 
-  public updateModeConfiguration(modeConfig: any) {
+  public override updateModeConfiguration(modeConfig: any) {
     super.updateModeConfiguration(modeConfig);
     this.currentHarmonicModeKey = modeConfig.activeMode || "artist-vision";
     this.updateConsciousnessForMode();
@@ -400,7 +400,7 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     }
   }
 
-  public destroy() {
+  public override destroy() {
     if (this.consciousnessAnimationFrame) {
       cancelAnimationFrame(this.consciousnessAnimationFrame);
     }
@@ -548,7 +548,7 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
    * expensive keyframes (vibrations, pulses, hue-shifts) without touching
    * inline styles.
    */
-  public applyPerformanceSettings(profile: PerformanceProfile): void {
+  public override applyPerformanceSettings(profile: PerformanceProfile): void {
     // Preserve existing behaviour (store on `currentPerformanceProfile` etc.)
     super.applyPerformanceSettings(profile as any);
 
