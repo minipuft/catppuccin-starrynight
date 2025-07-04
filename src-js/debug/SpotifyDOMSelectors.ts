@@ -4,7 +4,7 @@
 // Centralized selector mappings based on SPOTIFY_DOM_TARGETING.md
 // Provides modern selectors and legacy fallbacks for Spicetify theming
 
-import { $$ } from "../utils/domCache";
+import { $$ } from "@/utils/dom/domCache";
 
 // ---------------------------------------------------------------------------
 // NOTE[Phase3]: Replaced repetitive querySelectorAll calls with WeakRef-caching

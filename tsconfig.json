@@ -30,7 +30,17 @@
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src-js/*"]
+      "@/*": ["src-js/*"],
+      "@/audio/*": ["src-js/audio/*"],
+      "@/assets/*": ["src-js/assets/*"],
+      "@/core/*": ["src-js/core/*"],
+      "@/ui/*": ["src-js/ui/*"],
+      "@/utils/*": ["src-js/utils/*"],
+      "@/visual/*": ["src-js/visual/*"],
+      "@/config/*": ["src-js/config/*"],
+      "@/debug/*": ["src-js/debug/*"],
+      "@/types/*": ["src-js/types/*"],
+      "@/tests/*": ["src-js/tests/*"]
     }
   },
   "include": ["src-js", "types", "src-js/types"]

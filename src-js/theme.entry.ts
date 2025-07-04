@@ -1,10 +1,10 @@
 import { HARMONIC_MODES, YEAR3000_CONFIG } from "./config/globalConfig";
-import { Year3000System } from "./core/year3000System";
+import { Year3000System } from "./core/lifecycle/year3000System";
 import { Year3000Debug } from "./debug/SystemIntegrationTester";
-import { initializeAberrationManager } from "./effects/Aberration/AberrationManager";
-import { initializeNebulaController } from "./effects/NebulaController";
-import { waitForSpicetifyReady } from "./utils/spicetifyReady";
-import * as Year3000Utilities from "./utils/Year3000Utilities";
+import { initializeAberrationManager } from "./visual/ui-effects/Aberration/AberrationManager";
+import { initializeNebulaController } from "./visual/ui-effects/NebulaController";
+import { waitForSpicetifyReady } from "./utils/platform/spicetifyReady";
+import * as Year3000Utilities from "./utils/core/Year3000Utilities";
 
 // A placeholder for the settings UI function until it can be properly typed.
 declare const initializeSettingsUI: (location: any) => void;
@@ -95,7 +95,7 @@ patchReactRequire();
   );
 
   // Initialize light-weight prismatic scroll sheen once scroll node is confirmed.
-  import("./effects/prismaticScrollSheen").then((m) =>
+  import("./visual/ui-effects/prismaticScrollSheen").then((m) =>
     m.initializePrismaticScrollSheen?.()
   );
 
@@ -142,12 +142,12 @@ patchReactRequire();
   initializeAberrationManager(year3000System);
 
   // 1b. 🌠 Enable Enhanced Drag Preview (Phase 2)
-  import("./effects/EnhancedDragPreview").then((m) =>
+  import("./ui/interactions/EnhancedDragPreview").then((m) =>
     m.enableEnhancedDragPreview?.()
   );
 
   // 1c. 🎉 Enable Quick Add Radial Menu (Phase 2)
-  import("./effects/QuickAddRadialMenu").then((m) =>
+  import("./ui/interactions/QuickAddRadialMenu").then((m) =>
     m.enableQuickAddRadialMenu?.()
   );
 
@@ -181,7 +181,7 @@ patchReactRequire();
   try {
     // Only initialize settings if React APIs are available
     if (requiredAPIs.react && requiredAPIs.reactDOM) {
-      const settingsUiModule = await import("./components/StarryNightSettings");
+      const settingsUiModule = await import("./ui/components/StarryNightSettings");
       await (settingsUiModule as any).initializeStarryNightSettings?.();
       console.log(
         "🌟 [StarryNight] Spicetify native settings with Year3000System integration initialized"
@@ -217,10 +217,10 @@ patchReactRequire();
   // 3b. 🫧 Initialize Right Sidebar Consciousness System (Phase 2)
   try {
     const { RightSidebarConsciousnessSystem } = await import(
-      "./systems/visual/RightSidebarConsciousnessSystem"
+      "./visual/ui-effects/RightSidebarConsciousnessSystem"
     );
     const { RightSidebarCoordinator } = await import(
-      "./systems/visual/RightSidebarCoordinator"
+      "./visual/ui-effects/RightSidebarCoordinator"
     );
     
     if (year3000System.performanceAnalyzer) {
@@ -262,7 +262,7 @@ patchReactRequire();
   // 🌠 CDF Variable Bridge – start syncing canonical --sn-cdf-* props.
   // -----------------------------------------------------------------------
   try {
-    const { CDFVariableBridge } = await import("./core/CDFVariableBridge");
+    const { CDFVariableBridge } = await import("./core/performance/CDFVariableBridge");
     if (year3000System.cssVariableBatcher) {
       new CDFVariableBridge(year3000System.cssVariableBatcher);
     }

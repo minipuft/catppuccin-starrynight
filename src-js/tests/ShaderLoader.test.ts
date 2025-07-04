@@ -3,7 +3,7 @@
  * Tests shader compilation and gradient texture creation
  */
 
-import { ShaderLoader, createGradientTexture, DEFAULT_VERTEX_SHADER } from '@/utils/ShaderLoader';
+import { ShaderLoader, createGradientTexture, DEFAULT_VERTEX_SHADER } from '@/utils/graphics/ShaderLoader';
 
 // Mock WebGL2 context for headless testing
 const createMockGL = (): Partial<WebGL2RenderingContext> => {

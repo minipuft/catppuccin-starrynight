@@ -4,8 +4,8 @@
 // Comprehensive testing framework and debug utilities for validating
 // all visual systems integration and providing developer tools
 
-import { YEAR3000_CONFIG } from "../config/globalConfig";
-import * as Year3000Utilities from "../utils/Year3000Utilities";
+import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 import {
   GRAVITY_WELL_TARGETS,
   MODERN_SELECTORS,

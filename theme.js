@@ -36,10 +36,10 @@
     mod
   ));
 
-  // src-js/utils/StorageManager.ts
+  // src-js/utils/platform/StorageManager.ts
   var LEGACY_KEY_MAPPINGS, VALID_KEY_PREFIXES, StorageManager;
   var init_StorageManager = __esm({
-    "src-js/utils/StorageManager.ts"() {
+    "src-js/utils/platform/StorageManager.ts"() {
       "use strict";
       LEGACY_KEY_MAPPINGS = {
         "sn-starDensity": "sn-star-density",
@@ -1043,10 +1043,10 @@
     }
   });
 
-  // src-js/core/CSSVariableBatcher.ts
+  // src-js/core/performance/CSSVariableBatcher.ts
   var CRITICAL_NOW_PLAYING_VARS, _CSSVariableBatcher, CSSVariableBatcher;
   var init_CSSVariableBatcher = __esm({
-    "src-js/core/CSSVariableBatcher.ts"() {
+    "src-js/core/performance/CSSVariableBatcher.ts"() {
       "use strict";
       CRITICAL_NOW_PLAYING_VARS = /* @__PURE__ */ new Set([
         "--sn-beat-pulse-intensity",
@@ -1371,10 +1371,10 @@
     }
   });
 
-  // src-js/core/DeviceCapabilityDetector.ts
+  // src-js/core/performance/DeviceCapabilityDetector.ts
   var DeviceCapabilityDetector;
   var init_DeviceCapabilityDetector = __esm({
-    "src-js/core/DeviceCapabilityDetector.ts"() {
+    "src-js/core/performance/DeviceCapabilityDetector.ts"() {
       "use strict";
       DeviceCapabilityDetector = class {
         constructor(config = {}) {
@@ -1655,10 +1655,10 @@
     }
   });
 
-  // src-js/core/MasterAnimationCoordinator.ts
+  // src-js/core/animation/MasterAnimationCoordinator.ts
   var MasterAnimationCoordinator;
   var init_MasterAnimationCoordinator = __esm({
-    "src-js/core/MasterAnimationCoordinator.ts"() {
+    "src-js/core/animation/MasterAnimationCoordinator.ts"() {
       "use strict";
       init_CSSVariableBatcher();
       MasterAnimationCoordinator = class {
@@ -1974,10 +1974,10 @@
     }
   });
 
-  // src-js/core/PerformanceAnalyzer.ts
+  // src-js/core/performance/PerformanceAnalyzer.ts
   var FPSCounter, PerformanceAnalyzer;
   var init_PerformanceAnalyzer = __esm({
-    "src-js/core/PerformanceAnalyzer.ts"() {
+    "src-js/core/performance/PerformanceAnalyzer.ts"() {
       "use strict";
       FPSCounter = class {
         constructor() {
@@ -2350,10 +2350,10 @@
     }
   });
 
-  // src-js/core/TimerConsolidationSystem.ts
+  // src-js/core/performance/TimerConsolidationSystem.ts
   var TimerConsolidationSystem;
   var init_TimerConsolidationSystem = __esm({
-    "src-js/core/TimerConsolidationSystem.ts"() {
+    "src-js/core/performance/TimerConsolidationSystem.ts"() {
       "use strict";
       TimerConsolidationSystem = class {
         constructor(config = {}) {
@@ -2517,29 +2517,10 @@
     }
   });
 
-  // src-js/utils/getScrollNode.ts
-  function getScrollNode() {
-    return document.querySelector(SCROLL_NODE_SELECTORS);
-  }
-  var SCROLL_NODE_SELECTORS;
-  var init_getScrollNode = __esm({
-    "src-js/utils/getScrollNode.ts"() {
-      "use strict";
-      SCROLL_NODE_SELECTORS = [
-        ".main-view-container__scroll-node",
-        // 2023-era builds
-        ".main-viewContainer-scrollNode",
-        // 2024 dash variant
-        ".main-viewContainer__scrollNode"
-        // 2024 double-underscore variant
-      ].join(", ");
-    }
-  });
-
-  // src-js/core/EventBus.ts
+  // src-js/core/events/EventBus.ts
   var EventBus, GlobalEventBus, g;
   var init_EventBus = __esm({
-    "src-js/core/EventBus.ts"() {
+    "src-js/core/events/EventBus.ts"() {
       "use strict";
       EventBus = class {
         constructor() {
@@ -2593,13 +2574,32 @@
     }
   });
 
-  // src-js/core/VisualSystemRegistry.ts
+  // src-js/utils/dom/getScrollNode.ts
+  function getScrollNode() {
+    return document.querySelector(SCROLL_NODE_SELECTORS);
+  }
+  var SCROLL_NODE_SELECTORS;
+  var init_getScrollNode = __esm({
+    "src-js/utils/dom/getScrollNode.ts"() {
+      "use strict";
+      SCROLL_NODE_SELECTORS = [
+        ".main-view-container__scroll-node",
+        // 2023-era builds
+        ".main-viewContainer-scrollNode",
+        // 2024 dash variant
+        ".main-viewContainer__scrollNode"
+        // 2024 double-underscore variant
+      ].join(", ");
+    }
+  });
+
+  // src-js/core/lifecycle/VisualSystemRegistry.ts
   var PRIORITY_SORT, DEFAULT_FRAME_BUDGET_MS, VisualSystemRegistry;
   var init_VisualSystemRegistry = __esm({
-    "src-js/core/VisualSystemRegistry.ts"() {
+    "src-js/core/lifecycle/VisualSystemRegistry.ts"() {
       "use strict";
-      init_getScrollNode();
       init_EventBus();
+      init_getScrollNode();
       PRIORITY_SORT = {
         critical: 0,
         normal: 1,
@@ -2840,7 +2840,7 @@
     }
   });
 
-  // src-js/utils/domCache.ts
+  // src-js/utils/dom/domCache.ts
   function $$(selector, options = {}) {
     if (!SUPPORTS_WEAKREF) {
       return Array.from(document.querySelectorAll(selector));
@@ -2858,7 +2858,7 @@
   }
   var CACHE, SUPPORTS_WEAKREF, SUPPORTS_REGISTRY, registry;
   var init_domCache = __esm({
-    "src-js/utils/domCache.ts"() {
+    "src-js/utils/dom/domCache.ts"() {
       "use strict";
       CACHE = /* @__PURE__ */ new Map();
       SUPPORTS_WEAKREF = typeof WeakRef !== "undefined";
@@ -3693,7 +3693,7 @@
     }
   });
 
-  // src-js/utils/Year3000Utilities.ts
+  // src-js/utils/core/Year3000Utilities.ts
   var Year3000Utilities_exports = {};
   __export(Year3000Utilities_exports, {
     adjustColor: () => adjustColor,
@@ -4141,7 +4141,7 @@
   }
   var HealthMonitor, healthMonitorInstance;
   var init_Year3000Utilities = __esm({
-    "src-js/utils/Year3000Utilities.ts"() {
+    "src-js/utils/core/Year3000Utilities.ts"() {
       "use strict";
       init_globalConfig();
       HealthMonitor = class {
@@ -4154,10 +4154,10 @@
     }
   });
 
-  // src-js/managers/SettingsManager.ts
+  // src-js/ui/managers/SettingsManager.ts
   var SettingsManager;
   var init_SettingsManager = __esm({
-    "src-js/managers/SettingsManager.ts"() {
+    "src-js/ui/managers/SettingsManager.ts"() {
       "use strict";
       init_globalConfig();
       init_Year3000Utilities();
@@ -4421,7 +4421,7 @@
     }
   });
 
-  // src-js/effects/starryNightEffects.ts
+  // src-js/visual/base/starryNightEffects.ts
   function injectStarContainer() {
     const existingContainer = document.querySelector(
       ".sn-stars-container"
@@ -4477,17 +4477,17 @@
     }
   }
   var init_starryNightEffects = __esm({
-    "src-js/effects/starryNightEffects.ts"() {
+    "src-js/visual/base/starryNightEffects.ts"() {
       "use strict";
       init_SettingsManager();
       init_globalConfig();
     }
   });
 
-  // src-js/managers/Card3DManager.ts
+  // src-js/ui/managers/Card3DManager.ts
   var Card3DManager;
   var init_Card3DManager = __esm({
-    "src-js/managers/Card3DManager.ts"() {
+    "src-js/ui/managers/Card3DManager.ts"() {
       "use strict";
       init_settingKeys();
       Card3DManager = class _Card3DManager {
@@ -4636,10 +4636,10 @@
     }
   });
 
-  // src-js/managers/GlassmorphismManager.ts
+  // src-js/ui/managers/GlassmorphismManager.ts
   var GlassmorphismManager;
   var init_GlassmorphismManager = __esm({
-    "src-js/managers/GlassmorphismManager.ts"() {
+    "src-js/ui/managers/GlassmorphismManager.ts"() {
       "use strict";
       init_globalConfig();
       init_settingKeys();
@@ -4838,10 +4838,10 @@
     }
   });
 
-  // src-js/utils/SpicetifyCompat.ts
+  // src-js/utils/platform/SpicetifyCompat.ts
   var SpicetifyCompat;
   var init_SpicetifyCompat = __esm({
-    "src-js/utils/SpicetifyCompat.ts"() {
+    "src-js/utils/platform/SpicetifyCompat.ts"() {
       "use strict";
       SpicetifyCompat = class {
         /**
@@ -4897,10 +4897,10 @@
     }
   });
 
-  // src-js/services/GenreProfileManager.ts
+  // src-js/audio/GenreProfileManager.ts
   var GENRE_PROFILES, GenreProfileManager;
   var init_GenreProfileManager = __esm({
-    "src-js/services/GenreProfileManager.ts"() {
+    "src-js/audio/GenreProfileManager.ts"() {
       "use strict";
       init_globalConfig();
       GENRE_PROFILES = {
@@ -4984,16 +4984,16 @@
     }
   });
 
-  // src-js/services/MusicSyncService.ts
+  // src-js/audio/MusicSyncService.ts
   var MUSIC_SYNC_CONFIG, MusicSyncService;
   var init_MusicSyncService = __esm({
-    "src-js/services/MusicSyncService.ts"() {
+    "src-js/audio/MusicSyncService.ts"() {
       "use strict";
-      init_EventBus();
       init_globalConfig();
+      init_EventBus();
+      init_Year3000Utilities();
       init_SpicetifyCompat();
       init_StorageManager();
-      init_Year3000Utilities();
       init_GenreProfileManager();
       MUSIC_SYNC_CONFIG = {
         enableDebug: true,
@@ -5910,10 +5910,10 @@
     }
   });
 
-  // src-js/utils/PaletteExtensionManager.ts
+  // src-js/utils/core/PaletteExtensionManager.ts
   var GENRE_PALETTE_HINTS, PaletteExtensionManager;
   var init_PaletteExtensionManager = __esm({
-    "src-js/utils/PaletteExtensionManager.ts"() {
+    "src-js/utils/core/PaletteExtensionManager.ts"() {
       "use strict";
       GENRE_PALETTE_HINTS = {
         jazz: { temperatureShift: 15, saturationBoost: 1.1, warmth: 0.8 },
@@ -6203,7 +6203,7 @@
     }
   });
 
-  // src-js/utils/VisualCanvasFactory.ts
+  // src-js/utils/graphics/VisualCanvasFactory.ts
   function detectWebGPUSupport() {
     if (!navigator.gpu) {
       return false;
@@ -6362,12 +6362,12 @@
     return { webgpu, webgl2, recommendedType };
   }
   var init_VisualCanvasFactory = __esm({
-    "src-js/utils/VisualCanvasFactory.ts"() {
+    "src-js/utils/graphics/VisualCanvasFactory.ts"() {
       "use strict";
     }
   });
 
-  // src-js/utils/visualPerformance.ts
+  // src-js/utils/animation/visualPerformance.ts
   function selectPerformanceProfile(quality, performanceProfiles, opts = {}) {
     const { trace } = opts;
     if (!performanceProfiles || typeof performanceProfiles !== "object") {
@@ -6395,15 +6395,15 @@
     return selected;
   }
   var init_visualPerformance = __esm({
-    "src-js/utils/visualPerformance.ts"() {
+    "src-js/utils/animation/visualPerformance.ts"() {
       "use strict";
     }
   });
 
-  // src-js/systems/BaseVisualSystem.ts
+  // src-js/visual/base/BaseVisualSystem.ts
   var BaseVisualSystem;
   var init_BaseVisualSystem = __esm({
-    "src-js/systems/BaseVisualSystem.ts"() {
+    "src-js/visual/base/BaseVisualSystem.ts"() {
       "use strict";
       init_globalConfig();
       init_VisualCanvasFactory();
@@ -6822,10 +6822,10 @@
     }
   });
 
-  // src-js/systems/ColorHarmonyEngine.ts
+  // src-js/audio/ColorHarmonyEngine.ts
   var _ColorHarmonyEngine, ColorHarmonyEngine;
   var init_ColorHarmonyEngine = __esm({
-    "src-js/systems/ColorHarmonyEngine.ts"() {
+    "src-js/audio/ColorHarmonyEngine.ts"() {
       "use strict";
       init_settingKeys();
       init_EventBus();
@@ -7669,10 +7669,17 @@
             if (!currentPalette) {
               return null;
             }
-            const accentHex = this.utils.getRootStyle(_ColorHarmonyEngine.CANONICAL_HEX_VAR);
+            const rootEl = this.utils.getRootStyle();
+            const accentHex = rootEl ? getComputedStyle(rootEl).getPropertyValue(_ColorHarmonyEngine.CANONICAL_HEX_VAR).trim() : "";
             let primaryColor;
-            if (accentHex && accentHex !== "") {
-              primaryColor = this.utils.hexToRgb(accentHex);
+            if (accentHex) {
+              const rgb = this.utils.hexToRgb(accentHex);
+              if (rgb) {
+                primaryColor = rgb;
+              } else {
+                const defaultAccent = currentPalette.accents.mauve || "#cba6f7";
+                primaryColor = this.utils.hexToRgb(defaultAccent);
+              }
             } else {
               const defaultAccent = currentPalette.accents.mauve || "#cba6f7";
               primaryColor = this.utils.hexToRgb(defaultAccent);
@@ -7685,14 +7692,33 @@
               const position = i / (stopCount - 1);
               let variantColor;
               if (position === 0) {
-                variantColor = this._createVariant(primaryColor, -0.3, valenceGravity, hueShift);
+                variantColor = this._createVariant(
+                  primaryColor,
+                  -0.3,
+                  valenceGravity,
+                  hueShift
+                );
               } else if (position === 1) {
-                variantColor = this._createVariant(primaryColor, 0.2, valenceGravity, hueShift);
+                variantColor = this._createVariant(
+                  primaryColor,
+                  0.2,
+                  valenceGravity,
+                  hueShift
+                );
               } else {
                 const lightnessFactor = (position - 0.5) * 0.4;
-                variantColor = this._createVariant(primaryColor, lightnessFactor, valenceGravity, hueShift);
+                variantColor = this._createVariant(
+                  primaryColor,
+                  lightnessFactor,
+                  valenceGravity,
+                  hueShift
+                );
               }
-              variantColor = this._applyMusicInfluence(variantColor, musicInfluence, position);
+              variantColor = this._applyMusicInfluence(
+                variantColor,
+                musicInfluence,
+                position
+              );
               gradientColors.push({
                 r: Math.round(Math.max(0, Math.min(255, variantColor.r))),
                 g: Math.round(Math.max(0, Math.min(255, variantColor.g))),
@@ -7700,12 +7726,18 @@
               });
             }
             if (this.config?.enableDebug) {
-              console.log(`[ColorHarmonyEngine] Generated gradient with ${stopCount} stops:`, gradientColors);
+              console.log(
+                `[ColorHarmonyEngine] Generated gradient with ${stopCount} stops:`,
+                gradientColors
+              );
             }
             return gradientColors;
           } catch (error) {
             if (this.config?.enableDebug) {
-              console.error("[ColorHarmonyEngine] Failed to generate gradient:", error);
+              console.error(
+                "[ColorHarmonyEngine] Failed to generate gradient:",
+                error
+              );
             }
             return null;
           }
@@ -7729,7 +7761,10 @@
          */
         _applyMusicInfluence(color, intensity, position) {
           const positionEffect = 1 + Math.sin(position * Math.PI) * 0.2;
-          const effectiveIntensity = Math.max(0.7, Math.min(1.3, intensity * positionEffect));
+          const effectiveIntensity = Math.max(
+            0.7,
+            Math.min(1.3, intensity * positionEffect)
+          );
           return {
             r: color.r * effectiveIntensity,
             g: color.g * effectiveIntensity,
@@ -8165,10 +8200,10 @@
     }
   });
 
-  // src-js/services/TemporalMemoryService.ts
+  // src-js/audio/TemporalMemoryService.ts
   var DB_NAME, DB_VERSION, SIGNATURE_STORE, SIGNATURE_KEY, TemporalMemoryService, temporalMemoryService;
   var init_TemporalMemoryService = __esm({
-    "src-js/services/TemporalMemoryService.ts"() {
+    "src-js/audio/TemporalMemoryService.ts"() {
       "use strict";
       init_signature();
       init_build();
@@ -8264,13 +8299,13 @@
     }
   });
 
-  // src-js/systems/EmergentChoreographyEngine.ts
+  // src-js/core/animation/EmergentChoreographyEngine.ts
   var EmergentChoreographyEngine;
   var init_EmergentChoreographyEngine = __esm({
-    "src-js/systems/EmergentChoreographyEngine.ts"() {
+    "src-js/core/animation/EmergentChoreographyEngine.ts"() {
       "use strict";
-      init_EventBus();
       init_TemporalMemoryService();
+      init_EventBus();
       init_Year3000Utilities();
       init_BaseVisualSystem();
       EmergentChoreographyEngine = class extends BaseVisualSystem {
@@ -8311,7 +8346,6 @@
               temporalMemoryService.saveSignature(this.signature);
             }
           }, 3e4);
-          this.initialized = true;
         }
         registerEventListeners() {
           const beatFrameSub = GlobalEventBus.subscribe(
@@ -8438,7 +8472,7 @@
     }
   });
 
-  // src-js/systems/nowPlaying/NowPlayingDomWatcher.ts
+  // src-js/utils/dom/NowPlayingDomWatcher.ts
   function startNowPlayingWatcher(onChange, enableDebug = false) {
     const bar = document.querySelector(
       MODERN_SELECTORS["nowPlayingBar"]
@@ -8467,13 +8501,13 @@
     };
   }
   var init_NowPlayingDomWatcher = __esm({
-    "src-js/systems/nowPlaying/NowPlayingDomWatcher.ts"() {
+    "src-js/utils/dom/NowPlayingDomWatcher.ts"() {
       "use strict";
       init_SpotifyDOMSelectors();
     }
   });
 
-  // src-js/utils/NoiseField.ts
+  // src-js/utils/graphics/NoiseField.ts
   function sample(u, v) {
     const x = Math.max(0, Math.min(0.9999, u)) * (GRID_SIZE - 1);
     const y = Math.max(0, Math.min(0.9999, v)) * (GRID_SIZE - 1);
@@ -8499,7 +8533,7 @@
   }
   var GRID_SIZE, vectors;
   var init_NoiseField = __esm({
-    "src-js/utils/NoiseField.ts"() {
+    "src-js/utils/graphics/NoiseField.ts"() {
       "use strict";
       GRID_SIZE = 64;
       vectors = new Array(GRID_SIZE * GRID_SIZE);
@@ -8515,10 +8549,10 @@
     }
   });
 
-  // src-js/systems/visual/BeatSyncVisualSystem.ts
+  // src-js/visual/beat-sync/BeatSyncVisualSystem.ts
   var _BeatSyncVisualSystem, BeatSyncVisualSystem;
   var init_BeatSyncVisualSystem = __esm({
-    "src-js/systems/visual/BeatSyncVisualSystem.ts"() {
+    "src-js/visual/beat-sync/BeatSyncVisualSystem.ts"() {
       "use strict";
       init_EventBus();
       init_Year3000Utilities();
@@ -9390,10 +9424,10 @@
     }
   });
 
-  // src-js/systems/visual/BehavioralPredictionEngine.ts
+  // src-js/visual/ui-effects/BehavioralPredictionEngine.ts
   var BehavioralPredictionEngine;
   var init_BehavioralPredictionEngine = __esm({
-    "src-js/systems/visual/BehavioralPredictionEngine.ts"() {
+    "src-js/visual/ui-effects/BehavioralPredictionEngine.ts"() {
       "use strict";
       init_SpotifyDOMSelectors();
       init_BaseVisualSystem();
@@ -9870,7 +9904,7 @@
     }
   });
 
-  // src-js/utils/animationUtils.ts
+  // src-js/utils/animation/animationUtils.ts
   function restartCssAnimation(el) {
     try {
       const anims = el.getAnimations?.();
@@ -9893,18 +9927,18 @@
     });
   }
   var init_animationUtils = __esm({
-    "src-js/utils/animationUtils.ts"() {
+    "src-js/utils/animation/animationUtils.ts"() {
       "use strict";
     }
   });
 
-  // src-js/systems/visual/DataGlyphSystem.ts
+  // src-js/visual/ui-effects/DataGlyphSystem.ts
   var _DataGlyphSystem, DataGlyphSystem;
   var init_DataGlyphSystem = __esm({
-    "src-js/systems/visual/DataGlyphSystem.ts"() {
+    "src-js/visual/ui-effects/DataGlyphSystem.ts"() {
       "use strict";
-      init_animationUtils();
       init_SpotifyDOMSelectors();
+      init_animationUtils();
       init_NoiseField();
       init_BaseVisualSystem();
       _DataGlyphSystem = class _DataGlyphSystem extends BaseVisualSystem {
@@ -10602,10 +10636,10 @@
     }
   });
 
-  // src-js/systems/visual/DimensionalNexusSystem.ts
+  // src-js/visual/ui-effects/DimensionalNexusSystem.ts
   var DimensionalNexusSystem;
   var init_DimensionalNexusSystem = __esm({
-    "src-js/systems/visual/DimensionalNexusSystem.ts"() {
+    "src-js/visual/ui-effects/DimensionalNexusSystem.ts"() {
       "use strict";
       init_EventBus();
       init_BaseVisualSystem();
@@ -11017,10 +11051,10 @@
     }
   });
 
-  // src-js/systems/visual/LightweightParticleSystem.ts
+  // src-js/visual/backgrounds/LightweightParticleSystem.ts
   var LightweightParticleSystem;
   var init_LightweightParticleSystem = __esm({
-    "src-js/systems/visual/LightweightParticleSystem.ts"() {
+    "src-js/visual/backgrounds/LightweightParticleSystem.ts"() {
       "use strict";
       init_BaseVisualSystem();
       init_Year3000Utilities();
@@ -11158,10 +11192,10 @@
     }
   });
 
-  // src-js/systems/visual/ParticleFieldSystem.ts
+  // src-js/visual/backgrounds/ParticleFieldSystem.ts
   var ParticleFieldSystem;
   var init_ParticleFieldSystem = __esm({
-    "src-js/systems/visual/ParticleFieldSystem.ts"() {
+    "src-js/visual/backgrounds/ParticleFieldSystem.ts"() {
       "use strict";
       init_PerformanceAnalyzer();
       ParticleFieldSystem = class {
@@ -11331,10 +11365,10 @@
     }
   });
 
-  // src-js/systems/visual/PredictiveMaterializationSystem.ts
+  // src-js/visual/ui-effects/PredictiveMaterializationSystem.ts
   var _PredictiveMaterializationSystem, PredictiveMaterializationSystem;
   var init_PredictiveMaterializationSystem = __esm({
-    "src-js/systems/visual/PredictiveMaterializationSystem.ts"() {
+    "src-js/visual/ui-effects/PredictiveMaterializationSystem.ts"() {
       "use strict";
       init_globalConfig();
       init_PerformanceAnalyzer();
@@ -11643,7 +11677,7 @@
     }
   });
 
-  // src-js/systems/visual/RightSidebarCoordinator.ts
+  // src-js/visual/ui-effects/RightSidebarCoordinator.ts
   var RightSidebarCoordinator_exports = {};
   __export(RightSidebarCoordinator_exports, {
     RightSidebarCoordinator: () => RightSidebarCoordinator,
@@ -11654,7 +11688,7 @@
   }
   var _RightSidebarCoordinator, RightSidebarCoordinator;
   var init_RightSidebarCoordinator = __esm({
-    "src-js/systems/visual/RightSidebarCoordinator.ts"() {
+    "src-js/visual/ui-effects/RightSidebarCoordinator.ts"() {
       "use strict";
       init_CSSVariableBatcher();
       init_SpotifyDOMSelectors();
@@ -12046,10 +12080,10 @@
     }
   });
 
-  // src-js/systems/visual/SidebarConsciousnessSystem.ts
+  // src-js/visual/ui-effects/SidebarConsciousnessSystem.ts
   var _SidebarConsciousnessSystem, SidebarConsciousnessSystem;
   var init_SidebarConsciousnessSystem = __esm({
-    "src-js/systems/visual/SidebarConsciousnessSystem.ts"() {
+    "src-js/visual/ui-effects/SidebarConsciousnessSystem.ts"() {
       "use strict";
       init_globalConfig();
       init_NoiseField();
@@ -12473,7 +12507,7 @@
     }
   });
 
-  // src-js/utils/ShaderLoader.ts
+  // src-js/utils/graphics/ShaderLoader.ts
   function createGradientTexture(gl, stops, width = 256) {
     try {
       const canvas = document.createElement("canvas");
@@ -12483,7 +12517,9 @@
       if (!ctx) return null;
       const gradient = ctx.createLinearGradient(0, 0, width, 0);
       stops.forEach((stop) => {
-        const color = `rgba(${Math.round(stop.r * 255)}, ${Math.round(stop.g * 255)}, ${Math.round(stop.b * 255)}, ${stop.a})`;
+        const color = `rgba(${Math.round(stop.r * 255)}, ${Math.round(
+          stop.g * 255
+        )}, ${Math.round(stop.b * 255)}, ${stop.a})`;
         gradient.addColorStop(stop.position, color);
       });
       ctx.fillStyle = gradient;
@@ -12498,13 +12534,16 @@
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       return texture;
     } catch (error) {
-      Y3K?.debug?.error("ShaderLoader", `Gradient texture creation failed: ${error}`);
+      Y3K?.debug?.error(
+        "ShaderLoader",
+        `Gradient texture creation failed: ${error}`
+      );
       return null;
     }
   }
   var ShaderLoader, DEFAULT_VERTEX_SHADER;
   var init_ShaderLoader = __esm({
-    "src-js/utils/ShaderLoader.ts"() {
+    "src-js/utils/graphics/ShaderLoader.ts"() {
       "use strict";
       init_SystemHealthMonitor();
       ShaderLoader = class {
@@ -12525,11 +12564,17 @@
             const shader = this.compileShader(gl, gl.FRAGMENT_SHADER, source);
             if (shader) {
               contextCache[key] = shader;
-              Y3K?.debug?.log("ShaderLoader", `Fragment shader compiled: ${key.substring(0, 8)}...`);
+              Y3K?.debug?.log(
+                "ShaderLoader",
+                `Fragment shader compiled: ${key.substring(0, 8)}...`
+              );
             }
             return shader;
           } catch (error) {
-            Y3K?.debug?.error("ShaderLoader", `Fragment shader compilation failed: ${error}`);
+            Y3K?.debug?.error(
+              "ShaderLoader",
+              `Fragment shader compilation failed: ${error}`
+            );
             return null;
           }
         }
@@ -12550,11 +12595,17 @@
             const shader = this.compileShader(gl, gl.VERTEX_SHADER, source);
             if (shader) {
               contextCache[key] = shader;
-              Y3K?.debug?.log("ShaderLoader", `Vertex shader compiled: ${key.substring(0, 8)}...`);
+              Y3K?.debug?.log(
+                "ShaderLoader",
+                `Vertex shader compiled: ${key.substring(0, 8)}...`
+              );
             }
             return shader;
           } catch (error) {
-            Y3K?.debug?.error("ShaderLoader", `Vertex shader compilation failed: ${error}`);
+            Y3K?.debug?.error(
+              "ShaderLoader",
+              `Vertex shader compilation failed: ${error}`
+            );
             return null;
           }
         }
@@ -12644,17 +12695,17 @@ void main() {
     }
   });
 
-  // src-js/systems/visual/WebGLGradientBackgroundSystem.ts
+  // src-js/visual/backgrounds/WebGLGradientBackgroundSystem.ts
   var flowGradientShader, WebGLGradientBackgroundSystem;
   var init_WebGLGradientBackgroundSystem = __esm({
-    "src-js/systems/visual/WebGLGradientBackgroundSystem.ts"() {
+    "src-js/visual/backgrounds/WebGLGradientBackgroundSystem.ts"() {
       "use strict";
-      init_BaseVisualSystem();
-      init_ShaderLoader();
-      init_DeviceCapabilityDetector();
-      init_CSSVariableBatcher();
       init_globalConfig();
+      init_CSSVariableBatcher();
+      init_DeviceCapabilityDetector();
       init_SystemHealthMonitor();
+      init_ShaderLoader();
+      init_BaseVisualSystem();
       flowGradientShader = `#version 300 es
 precision mediump float;
 
@@ -12726,14 +12777,14 @@ float octaveNoise(vec2 uv, float octaves, float persistence, float scale) {
   float amplitude = 1.0;
   float frequency = scale;
   float maxValue = 0.0;
-  
+
   for(float i = 0.0; i < octaves; i++) {
     value += snoise(uv * frequency) * amplitude;
     maxValue += amplitude;
     amplitude *= persistence;
     frequency *= 2.0;
   }
-  
+
   return value / maxValue;
 }
 
@@ -12742,10 +12793,10 @@ float wave_alpha(vec2 uv, int waveIndex) {
   float y = uv.y;
   float waveCenter = u_waveY[waveIndex];
   float waveHeight = u_waveHeight[waveIndex];
-  
+
   float distance = abs(y - waveCenter);
   float alpha = 1.0 - smoothstep(0.0, waveHeight * 0.5, distance);
-  
+
   return alpha;
 }
 
@@ -12753,10 +12804,10 @@ float wave_alpha(vec2 uv, int waveIndex) {
 float calc_blur(vec2 uv) {
   vec2 center = vec2(0.5, 0.5);
   float distance = length(uv - center);
-  
+
   float blur = pow(distance, u_blurExp);
   blur = clamp(blur, 0.0, u_blurMax);
-  
+
   return blur;
 }
 
@@ -12764,30 +12815,30 @@ float calc_blur(vec2 uv) {
 float background_noise(vec2 uv, float timeOffset) {
   vec2 flowUV = uv;
   float adjustedTime = u_time + timeOffset;
-  
+
   flowUV.x += adjustedTime * 0.02 * u_flowStrength;
   flowUV.y += sin(adjustedTime * 0.03 + uv.x * 3.14159) * 0.01 * u_flowStrength;
-  
+
   float noise1 = octaveNoise(flowUV * u_noiseScale, 4.0, 0.5, 1.0);
   float noise2 = octaveNoise(flowUV * u_noiseScale * 2.0 + vec2(100.0), 3.0, 0.4, 1.0);
-  
+
   return (noise1 + noise2 * 0.3) * 0.5 + 0.5;
 }
 
 void main() {
   vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-  
+
   // Generate three distinct background noise fields with time offsets
   float noise1 = background_noise(uv, u_waveOffset[0]);
   float noise2 = background_noise(uv, u_waveOffset[1]);
   float noise3 = background_noise(uv, 0.0); // Base noise without offset
-  
+
   // Calculate wave alphas for blending
   float alpha1 = wave_alpha(uv, 0);
   float alpha2 = wave_alpha(uv, 1);
   float alpha3 = 1.0 - alpha1 - alpha2; // Remaining area
   alpha3 = max(alpha3, 0.0); // Ensure non-negative
-  
+
   // Normalize alphas to ensure they sum to 1.0
   float totalAlpha = alpha1 + alpha2 + alpha3;
   if (totalAlpha > 0.0) {
@@ -12795,25 +12846,25 @@ void main() {
     alpha2 /= totalAlpha;
     alpha3 /= totalAlpha;
   }
-  
+
   // Blend the three noise fields based on wave alphas
   float t = noise1 * alpha1 + noise2 * alpha2 + noise3 * alpha3;
   t = clamp(t, 0.0, 1.0);
-  
+
   // Sample gradient texture
   vec4 color = texture(u_gradientTex, vec2(t, 0.5));
-  
+
   // Apply dynamic blur based on position
   float blurAmount = calc_blur(uv);
-  
+
   // Apply subtle vignette with blur modulation
   vec2 center = uv - 0.5;
   float vignette = 1.0 - dot(center, center) * (0.3 + blurAmount * 0.2);
   color.rgb *= vignette;
-  
+
   // Apply blur effect to alpha channel for depth
   color.a *= (1.0 - blurAmount * 0.3);
-  
+
   fragColor = color;
 }`;
       WebGLGradientBackgroundSystem = class extends BaseVisualSystem {
@@ -12888,7 +12939,9 @@ void main() {
           };
           this.colorHarmonyEngine = year3000System2?.colorHarmonyEngine || null;
           this.cssVariableBatcher = new CSSVariableBatcher();
-          this.prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          this.prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+          ).matches;
           this.boundColorHarmonyHandler = this.handleColorHarmonyChange.bind(this);
         }
         async _performSystemSpecificInitialization() {
@@ -12900,7 +12953,10 @@ void main() {
           }
           const deviceDetector = new DeviceCapabilityDetector();
           if (deviceDetector.recommendPerformanceQuality() === "low") {
-            Y3K?.debug?.log("WebGLGradientBackgroundSystem", "Low performance device detected, falling back to CSS gradient");
+            Y3K?.debug?.log(
+              "WebGLGradientBackgroundSystem",
+              "Low performance device detected, falling back to CSS gradient"
+            );
             this.fallbackToCSSGradient();
             return;
           }
@@ -12913,9 +12969,16 @@ void main() {
             await this.initializeWebGL();
             this.subscribeToEvents();
             this.startAnimation();
-            Y3K?.debug?.log("WebGLGradientBackgroundSystem", "WebGL gradient system initialized successfully");
+            Y3K?.debug?.log(
+              "WebGLGradientBackgroundSystem",
+              "WebGL gradient system initialized successfully"
+            );
           } catch (error) {
-            Y3K?.debug?.error("WebGLGradientBackgroundSystem", "Failed to initialize WebGL gradient:", error);
+            Y3K?.debug?.error(
+              "WebGLGradientBackgroundSystem",
+              "Failed to initialize WebGL gradient:",
+              error
+            );
             this.fallbackToCSSGradient();
           }
         }
@@ -12927,7 +12990,9 @@ void main() {
         loadSettings() {
           if (!this.settingsManager) return;
           try {
-            const intensitySetting = this.settingsManager.get("sn-flow-gradient");
+            const intensitySetting = this.settingsManager.get(
+              "sn-flow-gradient"
+            );
             if (intensitySetting === "disabled") {
               this.settings.enabled = false;
               return;
@@ -12960,7 +13025,11 @@ void main() {
                 break;
             }
           } catch (error) {
-            Y3K?.debug?.warn("WebGLGradientBackgroundSystem", "Failed to load settings, using defaults:", error);
+            Y3K?.debug?.warn(
+              "WebGLGradientBackgroundSystem",
+              "Failed to load settings, using defaults:",
+              error
+            );
           }
         }
         async initializeWebGL() {
@@ -13007,48 +13076,91 @@ void main() {
         }
         async compileShaders() {
           if (!this.gl) throw new Error("WebGL context not available");
-          const vertexShader = ShaderLoader.loadVertex(this.gl, DEFAULT_VERTEX_SHADER);
-          const fragmentShader = ShaderLoader.loadFragment(this.gl, flowGradientShader);
+          const vertexShader = ShaderLoader.loadVertex(
+            this.gl,
+            DEFAULT_VERTEX_SHADER
+          );
+          const fragmentShader = ShaderLoader.loadFragment(
+            this.gl,
+            flowGradientShader
+          );
           if (!vertexShader || !fragmentShader) {
             throw new Error("Failed to compile shaders");
           }
-          this.shaderProgram = ShaderLoader.createProgram(this.gl, vertexShader, fragmentShader);
+          this.shaderProgram = ShaderLoader.createProgram(
+            this.gl,
+            vertexShader,
+            fragmentShader
+          );
           if (!this.shaderProgram) {
             throw new Error("Failed to create shader program");
           }
         }
         createGeometry() {
           if (!this.gl || !this.shaderProgram) return;
-          const vertices = new Float32Array([
-            -1,
-            -1,
-            3,
-            -1,
-            -1,
-            3
-          ]);
+          const vertices = new Float32Array([-1, -1, 3, -1, -1, 3]);
           this.vertexBuffer = this.gl.createBuffer();
           this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
           this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
           this.vao = this.gl.createVertexArray();
           this.gl.bindVertexArray(this.vao);
-          const positionLocation = this.gl.getAttribLocation(this.shaderProgram, "a_position");
+          const positionLocation = this.gl.getAttribLocation(
+            this.shaderProgram,
+            "a_position"
+          );
           this.gl.enableVertexAttribArray(positionLocation);
-          this.gl.vertexAttribPointer(positionLocation, 2, this.gl.FLOAT, false, 0, 0);
+          this.gl.vertexAttribPointer(
+            positionLocation,
+            2,
+            this.gl.FLOAT,
+            false,
+            0,
+            0
+          );
           this.gl.bindVertexArray(null);
         }
         setupUniforms() {
           if (!this.gl || !this.shaderProgram) return;
-          this.uniforms.u_time = this.gl.getUniformLocation(this.shaderProgram, "u_time");
-          this.uniforms.u_gradientTex = this.gl.getUniformLocation(this.shaderProgram, "u_gradientTex");
-          this.uniforms.u_resolution = this.gl.getUniformLocation(this.shaderProgram, "u_resolution");
-          this.uniforms.u_flowStrength = this.gl.getUniformLocation(this.shaderProgram, "u_flowStrength");
-          this.uniforms.u_noiseScale = this.gl.getUniformLocation(this.shaderProgram, "u_noiseScale");
-          this.uniforms.u_waveY = this.gl.getUniformLocation(this.shaderProgram, "u_waveY");
-          this.uniforms.u_waveHeight = this.gl.getUniformLocation(this.shaderProgram, "u_waveHeight");
-          this.uniforms.u_waveOffset = this.gl.getUniformLocation(this.shaderProgram, "u_waveOffset");
-          this.uniforms.u_blurExp = this.gl.getUniformLocation(this.shaderProgram, "u_blurExp");
-          this.uniforms.u_blurMax = this.gl.getUniformLocation(this.shaderProgram, "u_blurMax");
+          this.uniforms.u_time = this.gl.getUniformLocation(
+            this.shaderProgram,
+            "u_time"
+          );
+          this.uniforms.u_gradientTex = this.gl.getUniformLocation(
+            this.shaderProgram,
+            "u_gradientTex"
+          );
+          this.uniforms.u_resolution = this.gl.getUniformLocation(
+            this.shaderProgram,
+            "u_resolution"
+          );
+          this.uniforms.u_flowStrength = this.gl.getUniformLocation(
+            this.shaderProgram,
+            "u_flowStrength"
+          );
+          this.uniforms.u_noiseScale = this.gl.getUniformLocation(
+            this.shaderProgram,
+            "u_noiseScale"
+          );
+          this.uniforms.u_waveY = this.gl.getUniformLocation(
+            this.shaderProgram,
+            "u_waveY"
+          );
+          this.uniforms.u_waveHeight = this.gl.getUniformLocation(
+            this.shaderProgram,
+            "u_waveHeight"
+          );
+          this.uniforms.u_waveOffset = this.gl.getUniformLocation(
+            this.shaderProgram,
+            "u_waveOffset"
+          );
+          this.uniforms.u_blurExp = this.gl.getUniformLocation(
+            this.shaderProgram,
+            "u_blurExp"
+          );
+          this.uniforms.u_blurMax = this.gl.getUniformLocation(
+            this.shaderProgram,
+            "u_blurMax"
+          );
         }
         async updateGradientTexture() {
           if (!this.gl) return;
@@ -13064,10 +13176,17 @@ void main() {
                   a: 1,
                   position: index / (currentGradient.length - 1)
                 }));
-                Y3K?.debug?.log("WebGLGradientBackgroundSystem", `Updated gradient texture with ${colorStops.length} stops from ColorHarmonyEngine`);
+                Y3K?.debug?.log(
+                  "WebGLGradientBackgroundSystem",
+                  `Updated gradient texture with ${colorStops.length} stops from ColorHarmonyEngine`
+                );
               }
             } catch (error) {
-              Y3K?.debug?.warn("WebGLGradientBackgroundSystem", "Failed to get gradient from ColorHarmonyEngine:", error);
+              Y3K?.debug?.warn(
+                "WebGLGradientBackgroundSystem",
+                "Failed to get gradient from ColorHarmonyEngine:",
+                error
+              );
             }
           }
           if (this.gradientTexture) {
@@ -13092,12 +13211,19 @@ void main() {
         }
         subscribeToEvents() {
           if (this.colorHarmonyEngine && this.boundColorHarmonyHandler) {
-            document.addEventListener("color-harmony:gradient-changed", this.boundColorHarmonyHandler);
+            document.addEventListener(
+              "color-harmony:gradient-changed",
+              this.boundColorHarmonyHandler
+            );
           }
         }
         handleColorHarmonyChange(event) {
           this.updateGradientTexture().catch((error) => {
-            Y3K?.debug?.error("WebGLGradientBackgroundSystem", "Failed to update gradient texture:", error);
+            Y3K?.debug?.error(
+              "WebGLGradientBackgroundSystem",
+              "Failed to update gradient texture:",
+              error
+            );
           });
         }
         startAnimation() {
@@ -13106,7 +13232,8 @@ void main() {
           this.animate();
         }
         render(currentTime) {
-          if (!this.gl || !this.shaderProgram || !this.vao || !this.gradientTexture) return;
+          if (!this.gl || !this.shaderProgram || !this.vao || !this.gradientTexture)
+            return;
           this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
           this.gl.clearColor(0, 0, 0, 0);
           this.gl.clear(this.gl.COLOR_BUFFER_BIT);
@@ -13117,7 +13244,11 @@ void main() {
             this.gl.uniform1f(this.uniforms.u_time, time);
           }
           if (this.uniforms.u_resolution) {
-            this.gl.uniform2f(this.uniforms.u_resolution, this.canvas.width, this.canvas.height);
+            this.gl.uniform2f(
+              this.uniforms.u_resolution,
+              this.canvas.width,
+              this.canvas.height
+            );
           }
           if (this.uniforms.u_flowStrength) {
             const rootStyle = document.documentElement;
@@ -13155,7 +13286,10 @@ void main() {
           if (this.cssVariableBatcher) {
             this.startCSSFallbackAnimation();
           }
-          Y3K?.debug?.log("WebGLGradientBackgroundSystem", "Using CSS gradient fallback");
+          Y3K?.debug?.log(
+            "WebGLGradientBackgroundSystem",
+            "Using CSS gradient fallback"
+          );
         }
         startCSSFallbackAnimation() {
           if (!this.cssVariableBatcher) return;
@@ -13165,9 +13299,14 @@ void main() {
             const flowX = Math.sin(time * 0.02) * 25;
             const flowY = Math.cos(time * 0.03) * 25;
             const scale = 1 + Math.sin(time * 0.01) * 0.15;
-            this.cssVariableBatcher.updateVariable("--sn-gradient-flow-x", `${flowX}%`);
-            this.cssVariableBatcher.updateVariable("--sn-gradient-flow-y", `${flowY}%`);
-            this.cssVariableBatcher.updateVariable("--sn-gradient-flow-scale", scale.toString());
+            const batcher = this.cssVariableBatcher;
+            if (!batcher) return;
+            batcher.queueCSSVariableUpdate("--sn-gradient-flow-x", `${flowX}%`);
+            batcher.queueCSSVariableUpdate("--sn-gradient-flow-y", `${flowY}%`);
+            batcher.queueCSSVariableUpdate(
+              "--sn-gradient-flow-scale",
+              scale.toString()
+            );
             setTimeout(animateCSS, this.frameThrottleInterval);
           };
           animateCSS();
@@ -13220,7 +13359,10 @@ void main() {
           }
           this.canvas = null;
           if (this.boundColorHarmonyHandler) {
-            document.removeEventListener("color-harmony:gradient-changed", this.boundColorHarmonyHandler);
+            document.removeEventListener(
+              "color-harmony:gradient-changed",
+              this.boundColorHarmonyHandler
+            );
             this.boundColorHarmonyHandler = null;
           }
           window.removeEventListener("resize", this.resize);
@@ -13229,7 +13371,11 @@ void main() {
         forceRepaint(reason = "settings-change") {
           if (this.isActive && this.gradientTexture) {
             this.updateGradientTexture().catch((error) => {
-              Y3K?.debug?.error("WebGLGradientBackgroundSystem", "Failed to repaint gradient:", error);
+              Y3K?.debug?.error(
+                "WebGLGradientBackgroundSystem",
+                "Failed to repaint gradient:",
+                error
+              );
             });
           }
         }
@@ -13249,7 +13395,7 @@ void main() {
         }
         getMetrics() {
           return {
-            fps: this.performanceMonitor?.getAverageFPS() || 0,
+            fps: this.performanceMonitor?.getMedianFPS?.() || 0,
             compileErrors: 0,
             // TODO: Track compilation errors
             isActive: this.isActive,
@@ -13260,10 +13406,10 @@ void main() {
     }
   });
 
-  // src-js/systems/visual/WebGPUBackgroundSystem.ts
+  // src-js/visual/backgrounds/WebGPUBackgroundSystem.ts
   var WebGPUBackgroundSystem;
   var init_WebGPUBackgroundSystem = __esm({
-    "src-js/systems/visual/WebGPUBackgroundSystem.ts"() {
+    "src-js/visual/backgrounds/WebGPUBackgroundSystem.ts"() {
       "use strict";
       init_NoiseField();
       WebGPUBackgroundSystem = class {
@@ -13532,10 +13678,10 @@ void main() {
     }
   });
 
-  // src-js/core/year3000System.ts
+  // src-js/core/lifecycle/year3000System.ts
   var Year3000System, year3000System, year3000System_default;
   var init_year3000System = __esm({
-    "src-js/core/year3000System.ts"() {
+    "src-js/core/lifecycle/year3000System.ts"() {
       "use strict";
       init_globalConfig();
       init_settingKeys();
@@ -14964,7 +15110,7 @@ void main() {
     }
   });
 
-  // src-js/effects/prismaticScrollSheen.ts
+  // src-js/visual/ui-effects/prismaticScrollSheen.ts
   var prismaticScrollSheen_exports = {};
   __export(prismaticScrollSheen_exports, {
     PrismaticScrollSheenSystem: () => PrismaticScrollSheenSystem,
@@ -14980,7 +15126,7 @@ void main() {
   }
   var DEFAULT_CYCLE_PX, PrismaticScrollSheenSystem;
   var init_prismaticScrollSheen = __esm({
-    "src-js/effects/prismaticScrollSheen.ts"() {
+    "src-js/visual/ui-effects/prismaticScrollSheen.ts"() {
       "use strict";
       init_year3000System();
       DEFAULT_CYCLE_PX = 6e3;
@@ -15106,7 +15252,7 @@ void main() {
     }
   });
 
-  // src-js/utils/CanvasGhostBuilder.ts
+  // src-js/utils/graphics/CanvasGhostBuilder.ts
   function buildDragGhostCanvas(label, imgSrc, opts = {}) {
     const key = `${label}|${imgSrc}|${opts.size}|${opts.dpr}`;
     const cached = cache.get(key);
@@ -15168,13 +15314,13 @@ void main() {
   }
   var cache;
   var init_CanvasGhostBuilder = __esm({
-    "src-js/utils/CanvasGhostBuilder.ts"() {
+    "src-js/utils/graphics/CanvasGhostBuilder.ts"() {
       "use strict";
       cache = /* @__PURE__ */ new Map();
     }
   });
 
-  // src-js/effects/EnhancedDragPreview.ts
+  // src-js/ui/interactions/EnhancedDragPreview.ts
   var EnhancedDragPreview_exports = {};
   __export(EnhancedDragPreview_exports, {
     enableEnhancedDragPreview: () => enableEnhancedDragPreview
@@ -15216,7 +15362,7 @@ void main() {
     const label = findFallbackLabel(target);
     if (!label) return null;
     const img = extractImageSrc(target);
-    const data = { label, img };
+    const data = img ? { label, img } : { label };
     cache2.set(target, data);
     return data;
   }
@@ -15259,7 +15405,7 @@ void main() {
   }
   var DEFAULT_OPTS, cache2;
   var init_EnhancedDragPreview = __esm({
-    "src-js/effects/EnhancedDragPreview.ts"() {
+    "src-js/ui/interactions/EnhancedDragPreview.ts"() {
       "use strict";
       init_CanvasGhostBuilder();
       DEFAULT_OPTS = {
@@ -15271,7 +15417,7 @@ void main() {
     }
   });
 
-  // src-js/utils/flipSpring.ts
+  // src-js/utils/animation/flipSpring.ts
   function spring(config) {
     const k = config.stiffness ?? 260;
     const d = config.damping ?? 24;
@@ -15307,13 +15453,13 @@ void main() {
     };
   }
   var init_flipSpring = __esm({
-    "src-js/utils/flipSpring.ts"() {
+    "src-js/utils/animation/flipSpring.ts"() {
       "use strict";
       window.snFlipSpringLoaded = true;
     }
   });
 
-  // src-js/utils/sidebarDetector.ts
+  // src-js/utils/dom/sidebarDetector.ts
   function querySidebar() {
     const node = document.querySelector(SIDEBAR_SELECTOR);
     if (!node) return null;
@@ -15328,13 +15474,13 @@ void main() {
   }
   var SIDEBAR_SELECTOR;
   var init_sidebarDetector = __esm({
-    "src-js/utils/sidebarDetector.ts"() {
+    "src-js/utils/dom/sidebarDetector.ts"() {
       "use strict";
       SIDEBAR_SELECTOR = '[data-testid="rootlist-container"]';
     }
   });
 
-  // src-js/effects/SidebarCloneOverlay.ts
+  // src-js/ui/interactions/SidebarCloneOverlay.ts
   var SidebarCloneOverlay_exports = {};
   __export(SidebarCloneOverlay_exports, {
     destroySidebarClone: () => destroySidebarClone,
@@ -15504,7 +15650,7 @@ void main() {
   }
   var activeClone, cleanupFns, animationAbortController, MRU_KEY;
   var init_SidebarCloneOverlay = __esm({
-    "src-js/effects/SidebarCloneOverlay.ts"() {
+    "src-js/ui/interactions/SidebarCloneOverlay.ts"() {
       "use strict";
       init_flipSpring();
       init_sidebarDetector();
@@ -15515,7 +15661,7 @@ void main() {
     }
   });
 
-  // src-js/effects/QuickAddRadialMenu.ts
+  // src-js/ui/interactions/QuickAddRadialMenu.ts
   var QuickAddRadialMenu_exports = {};
   __export(QuickAddRadialMenu_exports, {
     enableQuickAddRadialMenu: () => enableQuickAddRadialMenu
@@ -15738,7 +15884,7 @@ void main() {
   }
   var HOLD_MS, MOVE_THRESHOLD, MAX_PLAYLISTS_SHOWN, holdTimer, startX, startY, overlayEl, currentDragDataUris, currentPointer, LIVE_ID;
   var init_QuickAddRadialMenu = __esm({
-    "src-js/effects/QuickAddRadialMenu.ts"() {
+    "src-js/ui/interactions/QuickAddRadialMenu.ts"() {
       "use strict";
       init_flipSpring();
       init_sidebarDetector();
@@ -15763,10 +15909,10 @@ void main() {
     }
   });
 
-  // src-js/utils/SettingsSection.tsx
+  // src-js/ui/components/SettingsSection.tsx
   var import_react, import_react_dom, SettingsSection;
   var init_SettingsSection = __esm({
-    "src-js/utils/SettingsSection.tsx"() {
+    "src-js/ui/components/SettingsSection.tsx"() {
       "use strict";
       import_react = __toESM(__require("react"));
       import_react_dom = __toESM(__require("react-dom"));
@@ -15961,7 +16107,7 @@ void main() {
     }
   });
 
-  // src-js/components/StarryNightSettings.ts
+  // src-js/ui/components/StarryNightSettings.ts
   var StarryNightSettings_exports = {};
   __export(StarryNightSettings_exports, {
     initializeStarryNightSettings: () => initializeStarryNightSettings
@@ -16353,23 +16499,23 @@ void main() {
     }
   }
   var init_StarryNightSettings = __esm({
-    "src-js/components/StarryNightSettings.ts"() {
+    "src-js/ui/components/StarryNightSettings.ts"() {
       "use strict";
       init_globalConfig();
-      init_starryNightEffects();
-      init_SettingsManager();
       init_SettingsSection();
+      init_SettingsManager();
+      init_starryNightEffects();
     }
   });
 
-  // src-js/systems/visual/RightSidebarConsciousnessSystem.ts
+  // src-js/visual/ui-effects/RightSidebarConsciousnessSystem.ts
   var RightSidebarConsciousnessSystem_exports = {};
   __export(RightSidebarConsciousnessSystem_exports, {
     RightSidebarConsciousnessSystem: () => RightSidebarConsciousnessSystem
   });
   var RightSidebarConsciousnessSystem;
   var init_RightSidebarConsciousnessSystem = __esm({
-    "src-js/systems/visual/RightSidebarConsciousnessSystem.ts"() {
+    "src-js/visual/ui-effects/RightSidebarConsciousnessSystem.ts"() {
       "use strict";
       init_EventBus();
       init_BaseVisualSystem();
@@ -16489,14 +16635,14 @@ void main() {
     }
   });
 
-  // src-js/core/CDFVariableBridge.ts
+  // src-js/core/performance/CDFVariableBridge.ts
   var CDFVariableBridge_exports = {};
   __export(CDFVariableBridge_exports, {
     CDFVariableBridge: () => CDFVariableBridge
   });
   var CDFVariableBridge;
   var init_CDFVariableBridge = __esm({
-    "src-js/core/CDFVariableBridge.ts"() {
+    "src-js/core/performance/CDFVariableBridge.ts"() {
       "use strict";
       init_EventBus();
       CDFVariableBridge = class {
@@ -17167,7 +17313,7 @@ void main() {
     window.runIntegrationTest = () => window.SystemIntegrationTester.runFullIntegrationTest();
   }
 
-  // src-js/effects/Aberration/AberrationCanvas.ts
+  // src-js/visual/ui-effects/Aberration/AberrationCanvas.ts
   var AberrationCanvas = class {
     constructor(parent, y3k = null) {
       this.parent = parent;
@@ -17344,7 +17490,7 @@ void main() {
     }
   };
 
-  // src-js/effects/Aberration/AberrationVisualSystem.ts
+  // src-js/visual/ui-effects/Aberration/AberrationVisualSystem.ts
   var AberrationVisualSystem = class {
     constructor(canvas, perf) {
       this.systemName = "AberrationCanvas";
@@ -17390,7 +17536,7 @@ void main() {
     }
   };
 
-  // src-js/effects/Aberration/AberrationManager.ts
+  // src-js/visual/ui-effects/Aberration/AberrationManager.ts
   init_getScrollNode();
   var instance = null;
   var visualSystem = null;
@@ -17489,12 +17635,12 @@ void main() {
     });
   }
 
-  // src-js/effects/NebulaController.ts
+  // src-js/visual/ui-effects/NebulaController.ts
   init_settingKeys();
   init_CSSVariableBatcher();
   init_EventBus();
 
-  // src-js/store/UserHistory.ts
+  // src-js/utils/platform/UserHistory.ts
   var LS_KEY = "sn_seen_genres_v1";
   var UserGenreHistory = class {
     constructor() {
@@ -17521,7 +17667,7 @@ void main() {
     }
   };
 
-  // src-js/effects/NebulaController.ts
+  // src-js/visual/ui-effects/NebulaController.ts
   function median(values) {
     if (!values.length) return 0;
     const sorted = [...values].sort((a, b) => a - b);
@@ -17716,7 +17862,7 @@ void main() {
     return instance2;
   }
 
-  // src-js/utils/spicetifyReady.ts
+  // src-js/utils/platform/spicetifyReady.ts
   async function waitForSpicetifyReady(timeout = 1e4, checkInterval = 100) {
     const start = Date.now();
     while (Date.now() - start < timeout) {

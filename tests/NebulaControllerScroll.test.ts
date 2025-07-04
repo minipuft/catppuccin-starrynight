@@ -1,7 +1,7 @@
 // Phase 2: Stochastic Star-Dust Dither – Unit Tests for noise-scale mapping
 
-import { CSSVariableBatcher } from "../src-js/core/CSSVariableBatcher";
-import { NebulaController } from "../src-js/effects/NebulaController";
+import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { NebulaController } from "@/visual/ui-effects/NebulaController";
 
 // Stub batcher that captures queued CSS variable updates synchronously.
 class StubBatcher extends CSSVariableBatcher {

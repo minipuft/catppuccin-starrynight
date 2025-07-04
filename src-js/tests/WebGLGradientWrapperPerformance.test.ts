@@ -4,8 +4,8 @@
  */
 
 import { WebGLGradientBackgroundSystem } from '@/systems/visual/WebGLGradientBackgroundSystem';
-import { PerformanceAnalyzer } from '@/core/PerformanceAnalyzer';
-import { SettingsManager } from '@/managers/SettingsManager';
+import { PerformanceAnalyzer } from '@/core/performance/PerformanceAnalyzer';
+import { SettingsManager } from '@/ui/managers/SettingsManager';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';
 
 // Mock performance APIs

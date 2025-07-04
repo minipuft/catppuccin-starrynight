@@ -3,11 +3,11 @@
  * Tests the flowing WebGL gradient background system
  */
 
-import { WebGLGradientBackgroundSystem } from '@/systems/visual/WebGLGradientBackgroundSystem';
-import { PerformanceAnalyzer } from '@/core/PerformanceAnalyzer';
-import { SettingsManager } from '@/managers/SettingsManager';
+import { WebGLGradientBackgroundSystem } from '@/visual/backgrounds/WebGLGradientBackgroundSystem';
+import { PerformanceAnalyzer } from '@/core/performance/PerformanceAnalyzer';
+import { SettingsManager } from '@/ui/managers/SettingsManager';
 import { ColorHarmonyEngine } from '@/systems/ColorHarmonyEngine';
-import { DeviceCapabilityDetector } from '@/core/DeviceCapabilityDetector';
+import { DeviceCapabilityDetector } from '@/core/performance/DeviceCapabilityDetector';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';
 
 // Mock WebGL2 context

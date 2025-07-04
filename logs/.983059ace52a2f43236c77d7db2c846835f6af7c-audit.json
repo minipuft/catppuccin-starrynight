@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/home/minipuft/Applications/catppuccin-starrynight/logs/.983059ace52a2f43236c77d7db2c846835f6af7c-audit.json",
+    "files": [
+        {
+            "date": 1751640525121,
+            "name": "/home/minipuft/Applications/catppuccin-starrynight/logs/mcp-puppeteer-2025-07-04.log",
+            "hash": "ed114e0c6a5d25e9723e4d6fa1997dbca31557fef0de1ffb3463c3aeafc972d4"
+        }
+    ],
+    "hashType": "sha256"
+}

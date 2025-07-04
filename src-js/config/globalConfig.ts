@@ -5,7 +5,7 @@ import type {
   HarmonicModes,
   Year3000Config,
 } from "@/types/models";
-import { StorageManager } from "@/utils/StorageManager";
+import { StorageManager } from "@/utils/platform/StorageManager";
 
 export const HARMONIC_MODES: HarmonicModes = {
   "analogous-flow": {

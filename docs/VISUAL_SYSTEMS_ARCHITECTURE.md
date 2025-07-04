@@ -1,12 +1,14 @@
 # 👁️ Catppuccin StarryNight: Visual Systems Architecture
 
-**Document Version:** 1.1
+**Document Version:** 2.0 - Updated for New Directory Structure
 
 ## 👋 Welcome to Catppuccin StarryNight!
 
-The Catppuccin StarryNight theme for Spicetify is more than just a color scheme; it's an immersive visual experience designed to bring your Spotify interface to life. It dynamically responds to the music you play, user interactions, and the beloved Catppuccin color palettes (Mocha, Macchiato, Frappe, Latte). This document delves into the JavaScript-powered visual systems that are the heart of this dynamic behavior, offering insight into how they work and interact.
+The Catppuccin StarryNight theme for Spicetify is more than just a color scheme; it's an immersive visual experience designed to bring your Spotify interface to life. It dynamically responds to the music you play, user interactions, and the beloved Catppuccin color palettes (Mocha, Macchiato, Frappe, Latte). 
 
-Whether you're a developer looking to understand the theme's internals, a contributor, or simply curious, this guide will walk you through the architecture of these sophisticated visual components.
+This document details the **developer-friendly architecture** of our sophisticated visual systems, organized in an intuitive directory structure that separates concerns and promotes maintainability.
+
+Whether you're a developer looking to understand the theme's internals, a contributor, or simply curious, this guide will walk you through the organized architecture of these sophisticated visual components.
 
 ---
 
@@ -17,24 +19,76 @@ This document aims to:
 - Explain the overall architecture of the visual systems within `theme.js`.
 - Detail the role and implementation of each individual visual system.
 - Provide a clear understanding of how these systems achieve music synchronization and dynamic effects.
+- Document the new developer-friendly directory structure and its benefits.
+
+---
+
+## 🗂️ New Directory Structure Overview
+
+As of version 2.0, the codebase has been reorganized into a **developer-friendly structure** that promotes clarity and maintainability:
+
+### **Domain-Driven Organization**
+```
+src-js/
+├── 🎵 audio/          # Music analysis, color extraction, genre profiling
+├── 👁️ visual/         # Visual effects, rendering, animations
+├── 💻 ui/             # User interface components and interactions  
+├── ⚙️ core/           # Core system infrastructure
+├── 🛠️ utils/          # Utility functions by domain
+└── 📦 assets/         # Static assets (shaders, worklets)
+```
+
+### **Key Benefits**
+- **Intuitive Navigation**: Find components by their purpose, not implementation details
+- **Clear Dependencies**: Layered architecture with defined data flow
+- **Maintainability**: Related functionality grouped together
+- **Scalability**: Easy to add new systems within existing domains
+
+### **Visual Systems Location**
+Visual systems are now organized in `src-js/visual/` by type:
+- `visual/base/` - Core visual infrastructure
+- `visual/backgrounds/` - Background rendering systems  
+- `visual/beat-sync/` - Music-reactive visual effects
+- `visual/ui-effects/` - Interface enhancement effects
+
+This replaces the previous scattered organization across multiple directories.
 
 ---
 
 ## 🎶 The Core Engine: How Visuals Sync with Music
 
-The dynamic nature of Catppuccin StarryNight is powered by a coordinated system where music analysis drives visual changes. Here's a simplified flow:
+The dynamic nature of Catppuccin StarryNight is powered by a coordinated system where music analysis drives visual changes. Here's the architectural flow:
 
-1.  **`MusicAnalysisService` - The Conductor**: This central service is the brain behind music understanding. It fetches raw audio analysis data for the currently playing track from Spotify (including BPM, energy levels, danceability, loudness over time, and detailed timing information like segments, tatums, bars, and beats). It then processes this data into a more usable format and caches it for performance.
-2.  **Visual Systems - The Performers**: Each visual system (detailed below) is a specialized module responsible for a particular aspect of the theme's visuals (e.g., particle effects, beat-synchronized pulses, sidebar animations).
-3.  **Subscription Model**: Each visual system registers itself (subscribes) to the `MusicAnalysisService` to receive updates.
-4.  **Data Broadcast**: When a new song starts, or as significant musical data becomes available during playback, the `MusicAnalysisService` broadcasts this information to all its subscribed visual systems. This is typically done by calling a standardized method in each system, like `updateFromMusicAnalysis(processedMusicData, rawFeatures, trackUri)`.
-5.  **Visual Transformation**: Upon receiving the music data, each visual system independently interprets it and translates it into visual changes. This can involve:
-    - Dynamically altering CSS Custom Properties (CSS Variables), which are then used by the theme's SCSS/CSS stylesheets.
-    - Adding or removing specific CSS classes on various parts of the Spotify interface (DOM elements) to trigger predefined styles or animations.
-    - Rendering complex graphics or animations directly onto HTML5 Canvas elements integrated into the UI.
-    - Orchestrating more complex, timed animations and transitions.
+### **Audio Layer** (`src-js/audio/`)
+1.  **`MusicSyncService`** - The Conductor: Central music analysis engine that fetches raw audio data from Spotify (BPM, energy, danceability, timing segments) and processes it into usable formats.
+2.  **`ColorHarmonyEngine`** - The Palette Extractor: Analyzes album artwork to extract dominant colors and harmonizes them with Catppuccin palettes.
+3.  **Event Broadcasting**: Music data is published via the GlobalEventBus to all subscribed visual systems.
 
-All visual systems are built upon a common `BaseVisualSystem` class. This foundation provides shared tools and functionalities, such as a consistent initialization and cleanup process, performance monitoring utilities, helper functions for creating canvas elements, and robust methods for color manipulation and mathematical calculations (like the `lerpSmooth` for framerate-independent animations).
+### **Visual Layer** (`src-js/visual/`)
+4.  **Visual Systems - The Performers**: Specialized modules organized by type:
+    - **Background Systems** (`visual/backgrounds/`) - WebGL/WebGPU renderers, particle effects
+    - **Beat-Sync Systems** (`visual/beat-sync/`) - Music-reactive visual effects  
+    - **UI Effects** (`visual/ui-effects/`) - Interface enhancements, sidebar animations
+    - **Base Infrastructure** (`visual/base/`) - Common visual system foundation
+
+### **Core Coordination** (`src-js/core/`)
+5.  **System Orchestration**: `Year3000System` manages lifecycle, `MasterAnimationCoordinator` synchronizes animations, `PerformanceAnalyzer` monitors performance.
+
+### **Data Flow**
+```
+Audio Analysis → Color Extraction → Event Broadcasting → Visual Rendering
+     ↓              ↓                    ↓                    ↓
+MusicSyncService → ColorHarmonyEngine → GlobalEventBus → Visual Systems
+```
+
+### **Visual Transformation Methods**
+Visual systems receive music data and create effects through:
+- **CSS Variable Updates**: Dynamic CSS Custom Properties via `CSSVariableBatcher`
+- **DOM Manipulation**: Adding/removing classes for animation triggers  
+- **Canvas Rendering**: Direct HTML5 Canvas graphics for complex visuals
+- **Animation Orchestration**: Coordinated timing via `MasterAnimationCoordinator`
+
+All visual systems extend `BaseVisualSystem` (`src-js/visual/base/`) providing consistent initialization, cleanup, performance monitoring, and utility functions for color manipulation and frame-rate independent animations.
 
 ---
 
@@ -42,12 +96,13 @@ All visual systems are built upon a common `BaseVisualSystem` class. This founda
 
 Below is a breakdown of each distinct visual system, outlining its specific contribution to the theme and key aspects of its implementation.
 
-### 1. `BeatSyncVisualSystem`
+### 1. `BeatSyncVisualSystem` (`src-js/visual/beat-sync/`)
 
 - **Purpose**: To create visual effects that pulse and react in direct synchronization with the music's beat and rhythm. This system provides immediate, tangible feedback to the listener, strengthening the connection between sight and sound.
+- **Location**: `src-js/visual/beat-sync/BeatSyncVisualSystem.ts`
 - **Implementation Highlights**:
-  - **Rhythm-Responsive**: It primarily listens for distinct beat events identified by the `MusicAnalysisService`. The `onBeatDetected(currentTime, energy, visualIntensity)` method is crucial for triggering its effects.
-  - **Smooth Animations**: Employs an internal animation loop (driven by `requestAnimationFrame`) for fluid visual changes. It leverages the `Year3000Utilities.lerpSmooth` function to ensure that pulses and other rhythmic effects animate smoothly, regardless of the user's screen refresh rate.
+  - **Rhythm-Responsive**: Subscribes to music events via `GlobalEventBus` from `MusicSyncService`. The `onBeatDetected(currentTime, energy, visualIntensity)` method triggers beat-synchronized effects.
+  - **Smooth Animations**: Employs `MasterAnimationCoordinator` integration for optimized animation loops with `requestAnimationFrame`. Uses `Year3000Utilities.lerpSmooth` for frame-rate independent smooth animations.
   - **Controlled Pulsing**: It manages the intensity of visual pulses by interpolating a `currentPulseIntensity` value towards a `targetPulseIntensity` (set upon beat detection). The speed of this animation is controlled by distinct `pulseHalfLifeAttack` and `pulseHalfLifeDecay` parameters, allowing for customizable attack and release times for the pulses.
   - **CSS-Driven Effects**: The calculated `currentPulseIntensity` is typically applied to a CSS custom property (e.g., `--sn-beat-pulse-intensity`). The theme's stylesheets then use this variable to drive actual visual effects like glows, size changes, or opacity shifts on UI elements.
 
