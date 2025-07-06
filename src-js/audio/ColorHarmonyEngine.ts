@@ -3,6 +3,7 @@ import {
   HARMONIC_EVOLUTION_KEY,
   HARMONIC_INTENSITY_KEY,
 } from "@/config/settingKeys";
+import type { EmergentChoreographyEngine } from "@/core/animation/EmergentChoreographyEngine";
 import { GlobalEventBus } from "@/core/events/EventBus";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import type { Year3000Config } from "@/types/models";
@@ -11,7 +12,6 @@ import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { PaletteExtensionManager } from "@/utils/core/PaletteExtensionManager";
 import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
-import type { EmergentChoreographyEngine } from "@/core/animation/EmergentChoreographyEngine";
 // TODO: Phase 4 - Import WebGL and Worker support for performance
 
 // Type definitions for color structures
@@ -1369,6 +1369,27 @@ export class ColorHarmonyEngine
     }
   }
 
+  /**
+   * External systems can push a pre-computed RGB palette to the engine.
+   * Currently this simply triggers a palette refresh so all CSS variables
+   * are recalculated.  Future phases may blend these colours directly.
+   *
+   * @param colors – Array of RGB objects ({ r,g,b }) representing the new palette
+   */
+  public updatePalette(
+    colors: Array<{ r: number; g: number; b: number }>
+  ): void {
+    if (!colors?.length) return;
+    // TODO: Phase-4 – incorporate provided colours into harmony pipeline
+    if (this.config?.enableDebug) {
+      console.log("[ColorHarmonyEngine] updatePalette invoked", {
+        count: colors.length,
+      });
+    }
+    // For now, simply force a repaint so downstream CSS vars refresh.
+    this.forceRepaint("external-palette");
+  }
+
   // ============================
   // Settings / Event Integration
   // ============================
@@ -1501,7 +1522,7 @@ export class ColorHarmonyEngine
       (this.catppuccinPalettes as any)[this.currentTheme] = palette;
       await this.refreshPalette();
 
-      // Phase 3 – Broadcast genre change so NebulaController can respond.
+      // Phase 3 – Broadcast genre change so AudioVisualController can respond.
       try {
         GlobalEventBus.publish("music:genre-change", {
           genre,

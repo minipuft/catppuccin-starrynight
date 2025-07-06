@@ -33,7 +33,7 @@ Testing: 90%+ coverage with Jest/ts-jest
 
 AI assistants must understand:
 
-- **Modular Architecture**: All components implement `StarryNightModule` interface
+- **Modular Architecture**: All components implement `IManagedSystem` interface
 - **Performance Constraints**: Non-negotiable resource limits
 - **Security Requirements**: Defensive security practices only
 - **Accessibility Standards**: WCAG 2.1 AA compliance mandatory
@@ -99,14 +99,14 @@ interface ActionContext {
 Code Correctness: 99%+ syntactically valid, logically sound
 Performance Compliance: Meets all Year 3000 System constraints
 Security Standards: Zero introduction of vulnerabilities
-Architecture Alignment: Follows StarryNightModule patterns
+Architecture Alignment: Follows IManagedSystem patterns
 Testing Coverage: 90%+ with meaningful assertions
 Documentation Quality: Complete JSDoc with examples
 ```
 
 ### Project-Specific Goals
 
-- **StarryNightModule Compliance**: All components follow interface patterns
+- **IManagedSystem Compliance**: All components follow interface patterns
 - **Performance Optimization**: GPU-accelerated effects within resource limits
 - **Accessibility Integration**: Seamless support for assistive technologies
 - **Catppuccin Harmony**: Perfect integration with color palette system
@@ -142,7 +142,7 @@ interface AIResponse {
 
 ```
 1. Context Assessment
-   ├── StarryNightModule interface compliance
+   ├── IManagedSystem interface compliance
    ├── Performance constraint validation
    ├── Security requirement check
    └── Accessibility standard verification
@@ -231,7 +231,7 @@ interface QualityAssessment {
 2. Constraint Analysis
    ├── Performance: 60fps, <5MB memory, GPU acceleration
    ├── Accessibility: Respect prefers-reduced-motion
-   ├── Architecture: Extend BaseVisualSystem, implement StarryNightModule
+   ├── Architecture: Extend BaseVisualSystem, implement IManagedSystem
    └── Security: No external dependencies, input validation
 
 3. Solution Evaluation
@@ -262,7 +262,7 @@ Proactively ask when:
 - Multiple Year 3000 System integration approaches exist
 - Performance vs. functionality trade-offs need user input
 - Accessibility requirements impact design decisions
-- Breaking changes to existing StarryNightModule interfaces
+- Breaking changes to existing IManagedSystem interfaces
 
 ### Standard Clarification Questions
 
@@ -330,7 +330,7 @@ interface SolutionSet {
 
 ```typescript
 // Clean, commented TypeScript code
-// Following StarryNightModule patterns
+// Following IManagedSystem patterns
 // With comprehensive error handling
 [Generated code here]
 ```
@@ -402,7 +402,7 @@ interface SolutionSet {
 ### Immediate Response Pattern
 ```
 
-1. Quick Assessment (StarryNightModule compliance check)
+1. Quick Assessment (IManagedSystem compliance check)
 2. Scope Confirmation (performance/accessibility impact)
 3. Solution Delivery (code with comprehensive explanation)
 4. Quality Validation (self-assessment against project standards)
@@ -412,7 +412,7 @@ interface SolutionSet {
 
 ### Year 3000 System Integration Checklist
 ```markdown
-□ Implements StarryNightModule interface
+□ Implements IManagedSystem interface
 □ Registers with appropriate system managers
 □ Includes performance monitoring hooks
 □ Supports accessibility preferences

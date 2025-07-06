@@ -1,41 +1,16 @@
-# 🎬 Master Animation Coordinator – DEPRECATED
+# 🎬 Animation Conductor
 
-**Document Version:** 1.0 (DEPRECATED)
-**Status:** 🔴 Deprecated (Renamed to AnimationConductor)
+**Document Version:** 2.0  
+**Implementation Date:** June 2025  
+**Status:** 🟢 Active (Renamed from MasterAnimationCoordinator)
 
----
+## Overview
 
-## ⚠️ DEPRECATION NOTICE
+`AnimationConductor` replaces ad-hoc `requestAnimationFrame` loops with a **single orchestrated timeline** that budgets frame time, prioritises systems, and auto-switches between _performance_ and _quality_ modes.
 
-**This documentation is deprecated.** The `MasterAnimationCoordinator` has been renamed to `AnimationConductor` for better clarity and consistency with the conductor/coordinator naming hierarchy.
+**Previously known as:** `MasterAnimationCoordinator` (renamed for clarity)
 
-**Please refer to the updated documentation:** [`ANIMATION_CONDUCTOR.md`](./ANIMATION_CONDUCTOR.md)
-
----
-
-## 🔄 Migration Information
-
-- **Old Class Name:** `MasterAnimationCoordinator`
-- **New Class Name:** `AnimationConductor`
-- **Old File:** `src-js/core/MasterAnimationCoordinator.ts`
-- **New File:** `src-js/core/animation/AnimationConductor.ts`
-
-### Backward Compatibility
-The old `MasterAnimationCoordinator` export is still available as an alias, but new code should use `AnimationConductor`.
-
-### What Changed
-- **Functionality:** No changes - all features remain identical
-- **API:** No changes - all methods and properties remain the same
-- **Performance:** No changes - performance characteristics are identical
-- **Location:** Moved to `src-js/core/animation/` directory for better organization
-
----
-
-## Overview (Legacy Documentation)
-
-`MasterAnimationCoordinator` (MAC) replaces ad-hoc `requestAnimationFrame` loops with a **single orchestrated timeline** that budgets frame time, prioritises systems, and auto-switches between _performance_ and _quality_ modes.
-
-- **File:** `src-js/core/MasterAnimationCoordinator.ts`
+- **File:** `src-js/core/animation/AnimationConductor.ts`
 - **Primary goal:** Maintain 60 FPS by distributing frame budget across registered _Animation Systems_.
 
 ---
@@ -53,10 +28,10 @@ interface CoordinatorConfig {
 ### Quick-start
 
 ```ts
-import { MasterAnimationCoordinator } from "@/core/MasterAnimationCoordinator";
+import { AnimationConductor } from "@/core/animation/AnimationConductor";
 
-const mac = new MasterAnimationCoordinator({ enableDebug: true });
-mac.initialize();
+const conductor = new AnimationConductor({ enableDebug: true });
+conductor.initialize();
 ```
 
 ---
@@ -76,7 +51,7 @@ interface AnimationSystem {
 Register the system:
 
 ```ts
-mac.registerAnimationSystem("Nebula", nebulaSystem, "normal", 60);
+conductor.registerAnimationSystem("AudioVisual", audioVisualSystem, "normal", 60);
 ```
 
 | Param        | Meaning                                                           |
@@ -84,9 +59,9 @@ mac.registerAnimationSystem("Nebula", nebulaSystem, "normal", 60);
 | `systemName` | Unique identifier used in debug stats.                            |
 | `system`     | Object implementing `AnimationSystem`.                            |
 | `priority`   | `"critical"                                                       | "normal" | "background"` (influences scheduling order). |
-| `targetFPS`  | Desired rate; MAC stretches/compresses `frameInterval` as needed. |
+| `targetFPS`  | Desired rate; Conductor stretches/compresses `frameInterval` as needed. |
 
-> Unregister with `mac.unregisterAnimationSystem("Nebula")`.
+> Unregister with `conductor.unregisterAnimationSystem("AudioVisual")`.
 
 ---
 
@@ -127,7 +102,7 @@ Registered systems receive `onPerformanceModeChange` notifications.
 | `unregisterAnimationSystem(name)`                          | Detach subsystem; stops loop when last removed.         |
 | `startMasterAnimationLoop()` / `stopMasterAnimationLoop()` | Manually control the rAF loop if needed.                |
 | `destroy()`                                                | Stops loop & clears registry (for hot-reload).          |
-| `getPerformanceReport()`                                   | Returns shallow-cloned metrics snapshot (TODO Phase 1). |
+| `getPerformanceReport()`                                   | Returns shallow-cloned metrics snapshot.                |
 
 ---
 
@@ -143,26 +118,54 @@ Registered systems receive `onPerformanceModeChange` notifications.
 ## 6 ▪ Integration Points
 
 - **TimerConsolidationSystem** shares the same philosophy for `setInterval` consolidation.
-- **PerformanceAnalyzer** invokes `calculateHealthScore()` → MAC listens via future EventBus link to force perf mode.
+- **PerformanceAnalyzer** invokes `calculateHealthScore()` → Conductor listens via EventBus to force perf mode.
 - **Year3000 Debug Overlay** visualises `systemStats` for each registered system.
 
 ---
 
-## 7 ▪ Roadmap
+## 7 ▪ Migration from MasterAnimationCoordinator
+
+### Automatic Migration
+- All existing registrations continue to work
+- API methods remain identical
+- Performance characteristics unchanged
+
+### Recommended Updates
+```ts
+// Old (still works due to backward compatibility)
+import { MasterAnimationCoordinator } from "@/core/MasterAnimationCoordinator";
+
+// New (recommended)
+import { AnimationConductor } from "@/core/animation/AnimationConductor";
+```
+
+### Registration Updates
+```ts
+// Old system name format
+conductor.registerAnimationSystem("DimensionalNexusSystem", system, "normal", 30);
+
+// New system name format (recommended)
+conductor.registerAnimationSystem("InteractionTrackingSystem", system, "normal", 30);
+```
+
+---
+
+## 8 ▪ Roadmap
 
 | Phase | Enhancement                                                               |
 | ----- | ------------------------------------------------------------------------- |
-| 2     | Expose `mac.on("modeChange", cb)` via EventBus.                           |
+| 2     | Expose `conductor.on("modeChange", cb)` via EventBus.                     |
 | 3     | Dynamic frameTimeBudget based on DeviceCapabilityDetector results.        |
 | 4     | Web-Worker based fall-back for background systems on supporting browsers. |
 
 ---
 
-## 8 ▪ Status
+## 9 ▪ Status
 
 - **Introduced:** v1.0 (Jan 2025)
-- **API Stability:** Beta – minor tweaks possible until v1.1.
+- **Renamed:** v2.0 (June 2025) - MasterAnimationCoordinator → AnimationConductor
+- **API Stability:** Stable – backward compatibility maintained.
 
 ---
 
-_“One loop to rule them all.”_
+_"One conductor to orchestrate them all."_

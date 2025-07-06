@@ -6,6 +6,8 @@
   "scripts": {
     "test": "jest",
     "build": "esbuild src-js/theme.entry.ts --bundle --outfile=theme.js --format=iife --target=es2020 --external:react --external:react-dom --loader:.fs=text",
+    "install": "npm run build && ./install-hybrid.sh",
+    "install:force": "npm run build && ./install-hybrid.sh mocha true",
     "sass:watch": "sass --watch app.scss:user.css",
     "lint:css": "stylelint \"src/**/*.scss\"",
     "list-selectors": "node scripts/listSelectors.js",

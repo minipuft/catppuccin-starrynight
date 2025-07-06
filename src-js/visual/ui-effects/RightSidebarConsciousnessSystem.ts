@@ -6,7 +6,7 @@ import { MusicSyncService } from "@/audio/MusicSyncService";
 import type { Year3000Config } from "@/types/models";
 import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
-import { RightSidebarCoordinator } from "./RightSidebarCoordinator";
+import { SidebarPerformanceCoordinator } from "./SidebarPerformanceCoordinator";
 
 interface BeatPayload {
   intensity: number; // 0‒1 range
@@ -29,7 +29,7 @@ interface EnergyPayload {
  */
 export class RightSidebarConsciousnessSystem extends BaseVisualSystem {
   private year3000System: Year3000System | null;
-  private coordinator: RightSidebarCoordinator;
+  private coordinator: SidebarPerformanceCoordinator;
   // Current → target state for smooth lerp
   private currentBeatIntensity = 0;
   private targetBeatIntensity = 0;
@@ -52,7 +52,7 @@ export class RightSidebarConsciousnessSystem extends BaseVisualSystem {
     musicSync: MusicSyncService,
     settings: SettingsManager,
     year3000System: Year3000System | null = null,
-    coordinator?: RightSidebarCoordinator
+    coordinator?: SidebarPerformanceCoordinator
   ) {
     super(config, utils, perf, musicSync, settings);
     this.year3000System = year3000System;
@@ -60,7 +60,7 @@ export class RightSidebarConsciousnessSystem extends BaseVisualSystem {
     // Initialize coordinator (injected or singleton)
     this.coordinator =
       coordinator ||
-      RightSidebarCoordinator.getInstance({
+      SidebarPerformanceCoordinator.getInstance({
         enableDebug: config.enableDebug,
         performanceAnalyzer: perf,
         onFlushComplete: () => {

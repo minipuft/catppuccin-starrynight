@@ -138,10 +138,6 @@
   --sn-sidebar-temporal-blur: 0px;
   --sn-sidebar-item-bloom-intensity: 0.5;
   --sn-sidebar-energy-glow-opacity: 0.3;
-  --sn-easing-organic: var(--sn-easing-emergence);
-  --sn-easing-breathing: var(--sn-easing-emergence);
-  --sn-easing-harmony: var(--sn-easing-emergence);
-  --sn-easing-explorer: var(--sn-easing-emergence);
 }
 
 /* StarryNight Gradient Module - YEAR 3000 ARTISTIC REVOLUTION SYSTEM 🌌*/
@@ -223,6 +219,8 @@
   --sn-gradient-flow-x: 0%; /* −25 % → +25 % */
   --sn-gradient-flow-y: 0%; /* −25 % → +25 % */
   --sn-gradient-flow-scale: 1; /* 1 = 100 %, 1.3 = gentle zoom */
+  /* WebGL readiness flag (0 = CSS-only, 1 = WebGL active)*/
+  --sn-webgl-ready: 0;
 }
 
 /* 🌌 YEAR 3000: Main gradient background overlay - BOLD COSMIC PRESENCE!*/
@@ -440,6 +438,9 @@
 /* Sleek -6deg skew transform while preserving pointer hit-testing*/
 /* ══════════════════════════════════════════════════════════════════════════════*/
 .sn-flow-gradient-wrapper {
+  /* Fade in when WebGL becomes available */
+  opacity: var(--sn-webgl-ready);
+  transition: opacity 600ms var(--sn-easing-emergence, ease-out);
   /* Base positioning and visibility*/
   position: fixed;
   top: 0;
@@ -1734,24 +1735,24 @@ Performance:             Optimized through modularization
 :root {
   /* === Layer 0 (outer-most, subtle accent glow) === */
   --sn-nebula-layer-0-color-rgb: var(--sn-gradient-primary-rgb);
-  --sn-nebula-layer-0-opacity: var(--sn-depth-layer-0-opacity);
-  --sn-nebula-layer-0-blur: var(--sn-depth-layer-0-blur);
-  --sn-nebula-layer-0-scale: var(--sn-depth-layer-0-scale);
+  --sn-nebula-layer-0-opacity: 0.05; /* Set directly by NebulaController.ts */
+  --sn-nebula-layer-0-blur: 2px; /* Default value, modified by JS */
+  --sn-nebula-layer-0-scale: 1; /* Default value, modified by JS */
   /* === Layer 1 === */
   --sn-nebula-layer-1-color-rgb: var(--sn-gradient-secondary-rgb);
-  --sn-nebula-layer-1-opacity: var(--sn-depth-layer-1-opacity);
-  --sn-nebula-layer-1-blur: var(--sn-depth-layer-1-blur);
-  --sn-nebula-layer-1-scale: var(--sn-depth-layer-1-scale);
+  --sn-nebula-layer-1-opacity: 0.05; /* Default value, modified by JS */
+  --sn-nebula-layer-1-blur: 4px; /* Default value, modified by JS */
+  --sn-nebula-layer-1-scale: 1; /* Default value, modified by JS */
   /* === Layer 2 === */
   --sn-nebula-layer-2-color-rgb: var(--sn-gradient-accent-rgb);
-  --sn-nebula-layer-2-opacity: var(--sn-depth-layer-2-opacity);
-  --sn-nebula-layer-2-blur: var(--sn-depth-layer-2-blur);
-  --sn-nebula-layer-2-scale: var(--sn-depth-layer-2-scale);
+  --sn-nebula-layer-2-opacity: 0.04; /* Default value, modified by JS */
+  --sn-nebula-layer-2-blur: 6px; /* Default value, modified by JS */
+  --sn-nebula-layer-2-scale: 1; /* Default value, modified by JS */
   /* === Layer 3 (inner-most, highlight core) === */
   --sn-nebula-layer-3-color-rgb: var(--sn-oklab-processed-bright-highlight-rgb, var(--sn-gradient-primary-rgb));
-  --sn-nebula-layer-3-opacity: var(--sn-depth-layer-3-opacity);
-  --sn-nebula-layer-3-blur: var(--sn-depth-layer-3-blur);
-  --sn-nebula-layer-3-scale: var(--sn-depth-layer-3-scale);
+  --sn-nebula-layer-3-opacity: 0.03; /* Default value, modified by JS */
+  --sn-nebula-layer-3-blur: 8px; /* Set directly by NebulaController.ts */
+  --sn-nebula-layer-3-scale: 1; /* Default value, modified by JS */
   /* === Beat-sync multiplier (read-only here) === */
   --sn-nebula-beat-intensity: var(--sn-beat-pulse-intensity, 1);
   /* === Global Blur Budget === */
@@ -1764,6 +1765,60 @@ Performance:             Optimized through modularization
   --sn-nebula-blend-mode: color-dodge;
 }
 
+:root {
+  --magnetic-depth-field: 800px;
+  --magnetic-approach-distance: 20px;
+  --magnetic-recede-distance: -10px;
+  --magnetic-neutral-position: 0px;
+  --magnetic-hover-pull: 12px;
+  --magnetic-focus-pull: 18px;
+  --magnetic-interest-pull: 8px;
+  --magnetic-transition-speed: 0.6s;
+  --depth-priority-high: translateZ(8px);
+  --depth-priority-medium: translateZ(4px);
+  --depth-priority-low: translateZ(0px);
+  --depth-priority-receded: translateZ(-6px);
+  --magnetic-max-rotation: 2deg;
+  --magnetic-text-clarity: 1;
+  --magnetic-contrast-boost: 1.05;
+  --consciousness-field-intensity: 0.4;
+  --consciousness-breathing-rate: 12s;
+  --consciousness-response-sensitivity: 0.8;
+  --magnetic-performance-mode: 1;
+  --magnetic-accessibility-scale: 1;
+  --magnetic-mobile-reduction: 0.6;
+}
+
+:root {
+  --serendipity-idle-threshold: 2000ms;
+  --serendipity-animation-duration: 600ms;
+  --serendipity-start-z: -60px;
+  --serendipity-end-z: -10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --magnetic-hover-pull: 4px;
+    --magnetic-focus-pull: 6px;
+    --magnetic-transition-speed: 1.2s;
+    --consciousness-breathing-rate: 30s;
+    --consciousness-field-intensity: 0.2;
+  }
+}
+@media (max-width: 768px) {
+  :root {
+    --magnetic-depth-field: 600px;
+    --magnetic-hover-pull: calc(12px * var(--magnetic-mobile-reduction));
+    --magnetic-focus-pull: calc(18px * var(--magnetic-mobile-reduction));
+    --consciousness-field-intensity: calc(0.4 * var(--magnetic-mobile-reduction));
+  }
+}
+@media (prefers-contrast: high) {
+  :root {
+    --magnetic-contrast-boost: 1.15;
+    --consciousness-field-intensity: 0.6;
+  }
+}
 .main-view-container__scroll-node {
   position: relative;
   isolation: isolate;
@@ -6651,6 +6706,11 @@ div.Root__right-sidebar[data-testid=right-sidebar]:not([aria-busy=true]):not(.lo
   }
 }
 :root {
+  --sn-glyph-intensity: 0;
+  --sn-glyph-glow: 0;
+}
+
+:root {
   --conscious-elegance-intensity: calc(
     var(--reality-breach-intensity, 1) * 0.6
   );
@@ -11124,11 +11184,6 @@ body {
 /* ████████████████████████████████████████████████████████████████████████████████*/
 /* DIMENSIONAL NEXUS SIDEBAR - Phase 5: Holographic Data Glyphs & Biometric Feedback*/
 /* ████████████████████████████████████████████████████████████████████████████████*/
-:root {
-  --sn-glyph-intensity: 0;
-  --sn-glyph-glow: 0;
-}
-
 :root {
   /* Variables for Data Glyphs (Phase 5)*/
   --sn-glyph-base-size: 6px; /* Base size of a glyph element*/

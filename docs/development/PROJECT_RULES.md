@@ -109,22 +109,38 @@ The theme is built around the **"Emergent Systems Choreographer"** approach - a 
 
 #### Module Interface Requirements
 ```typescript
-// All modules must implement StarryNightModule
-interface StarryNightModule {
-  initialize(): void;
-  cleanup(): void;
+// All modules must implement IManagedSystem
+interface IManagedSystem {
+  initialized: boolean;
+  initialize(): Promise<void>;
+  updateAnimation(deltaTime: number): void;
+  healthCheck(): Promise<HealthCheckResult>;
+  destroy(): void;
+  forceRepaint?(reason?: string): void;
 }
 
 // Example implementation
-class FeatureManager implements StarryNightModule {
+class FeatureManager implements IManagedSystem {
+  public initialized: boolean = false;
+  
   constructor(private system: Year3000System) {}
 
-  initialize(): void {
+  async initialize(): Promise<void> {
     // Setup with error handling
+    this.initialized = true;
   }
 
-  cleanup(): void {
+  updateAnimation(deltaTime: number): void {
+    // Animation updates
+  }
+
+  async healthCheck(): Promise<HealthCheckResult> {
+    return { ok: true };
+  }
+
+  destroy(): void {
     // Always implement cleanup
+    this.initialized = false;
   }
 }
 ```
@@ -274,7 +290,7 @@ const result = monitor.measureOperation('color-extraction', () => {
 ### Quality Assurance Checklist
 - [ ] Follows Year3000System architecture patterns
 - [ ] Uses proper CSS variable naming (`--sn-*`)
-- [ ] Implements StarryNightModule interface
+- [ ] Implements IManagedSystem interface
 - [ ] Has comprehensive error handling
 - [ ] Includes JSDoc documentation
 - [ ] Passes TypeScript strict mode
@@ -346,9 +362,13 @@ const result = monitor.measureOperation('color-extraction', () => {
 #### Code Naming
 ```typescript
 // Interface naming: starts with capital I
-interface IStarryNightModule {
-  initialize(): void;
-  cleanup(): void;
+interface IManagedSystem {
+  initialized: boolean;
+  initialize(): Promise<void>;
+  updateAnimation(deltaTime: number): void;
+  healthCheck(): Promise<HealthCheckResult>;
+  destroy(): void;
+  forceRepaint?(reason?: string): void;
 }
 
 // CSS variables: kebab-case with sn- prefix
@@ -408,10 +428,11 @@ interface IStarryNightModule {
 /**
  * Example of properly documented StarryNight component
  * @class ParticleSystemManager
- * @implements {StarryNightModule}
+ * @implements {IManagedSystem}
  * @description Manages lightweight particle effects responding to beat detection
  */
-class ParticleSystemManager implements StarryNightModule {
+class ParticleSystemManager implements IManagedSystem {
+  public initialized: boolean = false;
   constructor(private system: Year3000System) {}
 
   /**
@@ -528,20 +549,32 @@ try {
 #### 1. ORIENT - Understand System Context
 ```typescript
 import { Year3000System } from '../core/Year3000System';
-import type { StarryNightModule } from '../types/StarryNightModule';
+import type { IManagedSystem } from '../types/systems';
 ```
 
 #### 2. APPLY - Follow Established Patterns
 ```typescript
-class NewFeatureManager implements StarryNightModule {
+class NewFeatureManager implements IManagedSystem {
+  public initialized: boolean = false;
+  
   constructor(private system: Year3000System) {}
   
-  initialize(): void {
+  async initialize(): Promise<void> {
     // Setup with error handling
+    this.initialized = true;
   }
   
-  cleanup(): void {
+  updateAnimation(deltaTime: number): void {
+    // Animation updates
+  }
+  
+  async healthCheck(): Promise<HealthCheckResult> {
+    return { ok: true };
+  }
+  
+  destroy(): void {
     // Always implement cleanup
+    this.initialized = false;
   }
 }
 ```

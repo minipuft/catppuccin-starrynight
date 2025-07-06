@@ -5,13 +5,13 @@
  * Implements Alex Harri's flowing gradient technique with Catppuccin color integration
  */
 
+import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { Y3K } from "@/debug/SystemHealthMonitor";
-import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import type { Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import {
@@ -255,6 +255,8 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
   private boundColorHarmonyHandler: ((event: Event) => void) | null = null;
   private prefersReducedMotion = false;
 
+  private webglReady = false;
+
   constructor(
     config: Year3000Config = YEAR3000_CONFIG,
     utils: typeof import("@/utils/core/Year3000Utilities"),
@@ -312,6 +314,9 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
       await this.initializeWebGL();
       this.subscribeToEvents();
       this.startAnimation();
+
+      // WebGL initialised; flag readiness (fade-in handled via CSS)
+      document.documentElement.style.setProperty("--sn-webgl-ready", "1");
 
       Y3K?.debug?.log(
         "WebGLGradientBackgroundSystem",
@@ -595,6 +600,20 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
     if (!this.gradientTexture) {
       throw new Error("Failed to create gradient texture");
     }
+
+    // Expose gradient stops to CSS for the fallback layer (max 8 stops)
+    const root = document.documentElement;
+    const maxStops = Math.min(8, colorStops.length);
+    root.style.setProperty("--sn-grad-stop-count", String(maxStops));
+    for (let i = 0; i < maxStops; i++) {
+      const c = colorStops[i]!; // non-null as i < maxStops
+      root.style.setProperty(
+        `--sn-grad-stop-${i}-rgb`,
+        `${Math.round(c.r * 255)},${Math.round(c.g * 255)},${Math.round(
+          c.b * 255
+        )}`
+      );
+    }
   }
 
   private getDefaultGradientStops() {
@@ -665,6 +684,12 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
 
     // Bind VAO
     this.gl.bindVertexArray(this.vao);
+
+    // First successful draw → mark WebGL ready (only once)
+    if (!this.webglReady) {
+      this.webglReady = true;
+      document.documentElement.style.setProperty("--sn-webgl-ready", "1");
+    }
 
     // Update uniforms
     const time = this.prefersReducedMotion
@@ -749,6 +774,8 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
   };
 
   private fallbackToCSSGradient(): void {
+    // Ensure CSS knows WebGL is not active
+    document.documentElement.style.setProperty("--sn-webgl-ready", "0");
     // Update CSS variables for fallback gradient animation
     if (this.cssVariableBatcher) {
       this.startCSSFallbackAnimation();
@@ -867,6 +894,9 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
     window.removeEventListener("resize", this.resize);
 
     this.gl = null;
+
+    // Reset WebGL readiness flag so CSS fallback regains prominence
+    document.documentElement.style.setProperty("--sn-webgl-ready", "0");
   }
 
   public override forceRepaint(reason: string = "settings-change"): void {
@@ -911,5 +941,39 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
       isActive: this.isActive,
       settings: { ...this.settings },
     };
+  }
+
+  /**
+   * Gracefully stop the animation loop.  Exposed for backplane adapters.
+   */
+  public stopAnimation(): void {
+    if (this.animationId !== null) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+  }
+
+  /**
+   * Lightweight health check used by adapters; returns OK if WebGL is ready.
+   */
+  public async healthCheck(): Promise<{ ok: boolean; details: string }> {
+    return {
+      ok: this.webglReady,
+      details: this.webglReady
+        ? "WebGL system nominal"
+        : "WebGL not initialized",
+    };
+  }
+
+  /**
+   * Alternative resize helper that allows explicit dimensions while leaving
+   * the original `resize` listener (no-arg) intact.
+   */
+  public resizeTo(width: number, height: number): void {
+    if (!this.canvas) return;
+    this.canvas.width = width;
+    this.canvas.height = height;
+    // Trigger any additional resize handling logic via existing arrow fn.
+    (this as any).resize?.();
   }
 }

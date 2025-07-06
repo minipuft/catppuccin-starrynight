@@ -121,6 +121,23 @@ export class PerformanceAnalyzer {
   private _buckets: Map<string, number> = new Map();
   private static _isLowEndCache: boolean | null = null;
 
+  // -------------------------------------------------------------------
+  // Simple metric recorder for external systems -----------------------
+  // -------------------------------------------------------------------
+
+  /**
+   * Lightweight metric recording helper used by visual systems.
+   * Currently stores last value per metric name; can be expanded later.
+   */
+  private _externalMetrics: Map<string, number> = new Map();
+
+  public recordMetric(name: string, value: number): void {
+    this._externalMetrics.set(name, value);
+    if (this.config.enableDebug) {
+      console.log(`[PerformanceAnalyzer] metric '${name}' = ${value}`);
+    }
+  }
+
   constructor(config: Partial<AnalyzerConfig> = {}) {
     this.config = {
       enableDebug: config.enableDebug || false,

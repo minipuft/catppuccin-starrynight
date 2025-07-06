@@ -1,7 +1,7 @@
+import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
 import { GlobalEventBus } from "@/core/events/EventBus";
 import { Year3000System } from "@/core/lifecycle/year3000System";
-import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import type { Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import * as Utils from "@/utils/core/Year3000Utilities";
@@ -1218,7 +1218,7 @@ export class MusicSyncService {
    * directional rhythm cues. Falls back to {0,0} when unavailable.
    */
   public getCurrentBeatVector(): { x: number; y: number } {
-    return this.currentBeatVector;
+    return { ...this.currentBeatVector };
   }
 
   private stopBeatScheduler(): void {
@@ -1314,5 +1314,19 @@ export class MusicSyncService {
       mode: 0,
       // Optional arrays left undefined – beat grid will arrive later
     } as AudioData;
+  }
+
+  // -------------------------------------------------------------------
+  // External adapter integration helpers ------------------------------
+  // -------------------------------------------------------------------
+
+  /**
+   * Adapter-facing helper to push music metrics without relying on the
+   * full processing pipeline.  Currently a no-op placeholder that may be
+   * expanded in future phases.
+   */
+  public updateMetrics(metrics: any): void {
+    // Intentionally lightweight; store latest metrics for retrieval.
+    this.latestProcessedData = metrics;
   }
 }

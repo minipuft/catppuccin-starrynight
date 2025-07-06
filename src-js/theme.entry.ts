@@ -2,7 +2,7 @@ import { HARMONIC_MODES, YEAR3000_CONFIG } from "./config/globalConfig";
 import { Year3000System } from "./core/lifecycle/year3000System";
 import { Year3000Debug } from "./debug/SystemIntegrationTester";
 import { initializeAberrationManager } from "./visual/ui-effects/Aberration/AberrationManager";
-import { initializeNebulaController } from "./visual/ui-effects/NebulaController";
+import { initializeAudioVisualController } from "./visual/ui-effects/AudioVisualController";
 import { waitForSpicetifyReady } from "./utils/platform/spicetifyReady";
 import * as Year3000Utilities from "./utils/core/Year3000Utilities";
 
@@ -135,8 +135,8 @@ patchReactRequire();
   // 1. Instantiate the main system. It will handle its own internal dependencies.
   const year3000System = new Year3000System(YEAR3000_CONFIG, HARMONIC_MODES);
 
-  // 1a. 🎆 Initialise NebulaController (Phase 2)
-  initializeNebulaController(year3000System);
+  // 1a. 🎆 Initialise AudioVisualController (Phase 2)
+  initializeAudioVisualController(year3000System);
 
   // 1a-b. 🌈 Initialise Adaptive Chromatic Aberration Canvas (Phase 2)
   initializeAberrationManager(year3000System);
@@ -219,18 +219,18 @@ patchReactRequire();
     const { RightSidebarConsciousnessSystem } = await import(
       "./visual/ui-effects/RightSidebarConsciousnessSystem"
     );
-    const { RightSidebarCoordinator } = await import(
-      "./visual/ui-effects/RightSidebarCoordinator"
+    const { SidebarPerformanceCoordinator } = await import(
+      "./visual/ui-effects/SidebarPerformanceCoordinator"
     );
     
     if (year3000System.performanceAnalyzer) {
       // Initialize the coordinator first
-      const coordinator = RightSidebarCoordinator.getInstance({
+      const coordinator = SidebarPerformanceCoordinator.getInstance({
         enableDebug: YEAR3000_CONFIG.enableDebug,
         performanceAnalyzer: year3000System.performanceAnalyzer,
         onFlushComplete: () => {
           year3000System.performanceAnalyzer?.emitTrace?.(
-            "[RightSidebarCoordinator] Flush completed"
+            "[SidebarPerformanceCoordinator] Flush completed"
           );
         }
       });

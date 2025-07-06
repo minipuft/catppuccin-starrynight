@@ -233,7 +233,7 @@ export class AberrationCanvas {
   }
 }
 
-/** Convenience initializer matching NebulaController style. */
+/** Convenience initializer matching AudioVisualController style. */
 export function initializeAberrationCanvas(
   y3k: Year3000System | null = null
 ): AberrationCanvas | null {

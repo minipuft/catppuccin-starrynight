@@ -13,7 +13,7 @@
 import type {
   FrameContext,
   IVisualSystem,
-} from "@/core/lifecycle/VisualSystemRegistry";
+} from "@/core/lifecycle/VisualFrameCoordinator";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { AberrationCanvas } from "@/visual/ui-effects/Aberration/AberrationCanvas";
 

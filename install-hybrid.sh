@@ -10,6 +10,26 @@ IN_WSL=false # Flag to indicate we are running inside WSL
 echo "🌙✨ Catppuccin StarryNight Theme Installer (Hybrid)"
 echo "================================================"
 
+# Check if theme.js exists and is up-to-date
+THEME_JS_PATH="$(dirname "$0")/theme.js"
+THEME_ENTRY_PATH="$(dirname "$0")/src-js/theme.entry.ts"
+
+if [ ! -f "$THEME_JS_PATH" ]; then
+    echo "❌ theme.js not found. Please run 'npm run build' first."
+    exit 1
+fi
+
+if [ -f "$THEME_ENTRY_PATH" ] && [ "$THEME_ENTRY_PATH" -nt "$THEME_JS_PATH" ]; then
+    echo "⚠️  theme.js appears to be older than TypeScript sources."
+    echo "   Please run 'npm run build' to ensure you have the latest version."
+    echo "   Continue anyway? (y/N)"
+    read -r continue_anyway
+    if [ "$continue_anyway" != "y" ] && [ "$continue_anyway" != "Y" ]; then
+        echo "❌ Installation cancelled. Run 'npm run build' first."
+        exit 1
+    fi
+fi
+
 # Check if Spicetify is installed
 if ! command -v spicetify &> /dev/null && ! command -v spicetify.exe &> /dev/null; then
     echo "❌ Spicetify not found. Please install Spicetify CLI first:"

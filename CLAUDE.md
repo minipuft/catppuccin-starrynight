@@ -33,18 +33,21 @@ The theme follows a **C.A.G.E.E.R.F** framework (Constraints, Actions, Goals, Ex
 ### "Year 3000" System Framework
 The theme is built around a sophisticated internal framework designed for futuristic, music-responsive visual design:
 
-- **`Year3000System`** - Central orchestrator implementing `StarryNightModule` pattern
+- **`Year3000System`** - Central orchestrator implementing `IManagedSystem` pattern
 - **`ColorHarmonyEngine`** - Dynamic color extraction (<200ms) and Catppuccin palette blending
 - **`MusicSyncService`** - Real-time audio analysis with 90% accuracy for 60-200 BPM
 - **Performance Layer** - `MasterAnimationCoordinator`, `PerformanceAnalyzer`, `CSSVariableBatcher` targeting 60fps
 
 ### Modular Architecture Pattern
-All components implement the `StarryNightModule` interface:
+All components implement the `IManagedSystem` interface:
 ```typescript
-interface StarryNightModule {
+interface IManagedSystem {
+  initialized: boolean;
   initialize(): Promise<void>;
-  cleanup(): void;
-  healthCheck?(): HealthCheckResult;
+  updateAnimation(deltaTime: number): void;
+  healthCheck(): Promise<HealthCheckResult>;
+  destroy(): void;
+  forceRepaint?(reason?: string): void;
 }
 ```
 
@@ -102,7 +105,7 @@ interface StarryNightModule {
 - **Files**: `PascalCase.ts` for classes, `camelCase.ts` for utilities
 - **CSS Variables**: `--sn-*` prefix for theme, `--spice-*` for Spicetify compatibility
 - **SCSS Mixins**: `kebab-case` with descriptive action names
-- **Components**: Implement `StarryNightModule` interface pattern
+- **Components**: Implement `IManagedSystem` interface pattern
 
 ### Testing
 - Jest with ts-jest for TypeScript support
@@ -171,7 +174,7 @@ This project uses the **C.A.G.E.E.R.F** prompt engineering framework for consist
 
 ### Integration with Project Standards
 The framework enforces:
-- **Architecture Patterns**: `StarryNightModule` interface compliance
+- **Architecture Patterns**: `IManagedSystem` interface compliance
 - **Performance Targets**: 60fps animations, <50MB memory, <10% CPU overhead
 - **Code Quality**: 90%+ test coverage, zero `any` types, comprehensive error handling
 - **Security**: Defensive coding practices, input validation, graceful degradation

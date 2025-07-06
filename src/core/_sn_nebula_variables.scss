@@ -25,27 +25,27 @@
 :root {
   /* === Layer 0 (outer-most, subtle accent glow) === */
   --sn-nebula-layer-0-color-rgb: var(--sn-gradient-primary-rgb);
-  --sn-nebula-layer-0-opacity:   var(--sn-depth-layer-0-opacity);
-  --sn-nebula-layer-0-blur:      var(--sn-depth-layer-0-blur);
-  --sn-nebula-layer-0-scale:     var(--sn-depth-layer-0-scale);
+  --sn-nebula-layer-0-opacity:   0.05; /* Set directly by NebulaController.ts */
+  --sn-nebula-layer-0-blur:      2px;  /* Default value, modified by JS */
+  --sn-nebula-layer-0-scale:     1;    /* Default value, modified by JS */
 
   /* === Layer 1 === */
   --sn-nebula-layer-1-color-rgb: var(--sn-gradient-secondary-rgb);
-  --sn-nebula-layer-1-opacity:   var(--sn-depth-layer-1-opacity);
-  --sn-nebula-layer-1-blur:      var(--sn-depth-layer-1-blur);
-  --sn-nebula-layer-1-scale:     var(--sn-depth-layer-1-scale);
+  --sn-nebula-layer-1-opacity:   0.05; /* Default value, modified by JS */
+  --sn-nebula-layer-1-blur:      4px;  /* Default value, modified by JS */
+  --sn-nebula-layer-1-scale:     1;    /* Default value, modified by JS */
 
   /* === Layer 2 === */
   --sn-nebula-layer-2-color-rgb: var(--sn-gradient-accent-rgb);
-  --sn-nebula-layer-2-opacity:   var(--sn-depth-layer-2-opacity);
-  --sn-nebula-layer-2-blur:      var(--sn-depth-layer-2-blur);
-  --sn-nebula-layer-2-scale:     var(--sn-depth-layer-2-scale);
+  --sn-nebula-layer-2-opacity:   0.04; /* Default value, modified by JS */
+  --sn-nebula-layer-2-blur:      6px;  /* Default value, modified by JS */
+  --sn-nebula-layer-2-scale:     1;    /* Default value, modified by JS */
 
   /* === Layer 3 (inner-most, highlight core) === */
   --sn-nebula-layer-3-color-rgb: var(--sn-oklab-processed-bright-highlight-rgb, var(--sn-gradient-primary-rgb));
-  --sn-nebula-layer-3-opacity:   var(--sn-depth-layer-3-opacity);
-  --sn-nebula-layer-3-blur:      var(--sn-depth-layer-3-blur);
-  --sn-nebula-layer-3-scale:     var(--sn-depth-layer-3-scale);
+  --sn-nebula-layer-3-opacity:   0.03; /* Default value, modified by JS */
+  --sn-nebula-layer-3-blur:      8px;  /* Set directly by NebulaController.ts */
+  --sn-nebula-layer-3-scale:     1;    /* Default value, modified by JS */
 
   /* === Beat-sync multiplier (read-only here) === */
   // JS/NebulaController may adjust this in Phase 2 to pulse opacity with music.

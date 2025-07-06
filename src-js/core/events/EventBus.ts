@@ -46,6 +46,26 @@ export class EventBus {
     }
   }
 
+  // -------------------------------------------------------------------
+  // Compatibility aliases (v2 API) ------------------------------------
+  // These provide ergonomic `on` / `emit` helpers used throughout newer
+  // systems while retaining the underlying subscribe/publish semantics.
+  // -------------------------------------------------------------------
+
+  /**
+   * Alias for `subscribe` to improve readability (`on('topic', cb)`).
+   */
+  public on<T>(topic: string, callback: Callback<T>): () => void {
+    return this.subscribe(topic, callback);
+  }
+
+  /**
+   * Alias for `publish` so call sites can use `emit('topic', data)`.
+   */
+  public emit<T>(topic: string, payload: T): void {
+    this.publish(topic, payload);
+  }
+
   public destroy(): void {
     this.subscribers = {};
   }

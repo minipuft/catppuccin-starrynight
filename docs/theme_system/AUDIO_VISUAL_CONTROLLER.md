@@ -1,62 +1,37 @@
-# 🌌 Nebula Visual System Documentation – DEPRECATED
+# 🎵 Audio Visual Controller Documentation
 
-**Document Version:** 1.0 (DEPRECATED)
-**Status:** 🔴 Deprecated (Renamed to Audio Visual Controller)
-
----
-
-## ⚠️ DEPRECATION NOTICE
-
-**This documentation is deprecated.** The `NebulaController` has been renamed to `AudioVisualController` for better clarity.
-
-**Please refer to the updated documentation:** [`AUDIO_VISUAL_CONTROLLER.md`](./AUDIO_VISUAL_CONTROLLER.md)
-
----
-
-## 🔄 Migration Information
-
-- **Old Class Name:** `NebulaController`
-- **New Class Name:** `AudioVisualController`
-- **Old Function:** `initializeNebulaController()`
-- **New Function:** `initializeAudioVisualController()`
-- **Old File:** `src-js/visual/ui-effects/NebulaController.ts`
-- **New File:** `src-js/visual/ui-effects/AudioVisualController.ts`
-
-### Backward Compatibility
-The old `NebulaController` export and `initializeNebulaController` function are still available as aliases, but new code should use `AudioVisualController`.
-
-### What Changed
-- **Functionality:** No changes - all features remain identical
-- **API:** No changes - all methods and properties remain the same
-- **CSS Variables:** No changes - all CSS variable names remain the same
-- **Performance:** No changes - performance characteristics are identical
-
----
+**Document Version:** 2.0  
+**Implementation Date:** June 2025  
+**Status:** 🟢 Active (Renamed from NebulaController)
 
 > **Experimental Notice – WebGPU**
 >
 > The WebGPU portions of StarryNight (e.g. `WebGPUBackgroundSystem`) are **experimental** and **off by default**.
 > Most users will see the **CSS / WebGL fallback** path described below. Enable the `sn-enable-webgpu` setting _only for testing_ on browsers that expose `navigator.gpu`.
 
-## Overview (Legacy Documentation)
+## Overview
 
-The **Nebula Visual System** is the atmospheric glow that sits behind the main content of Catppuccin StarryNight, gently reacting to **music, scrolling and genre changes** while remaining GPU-friendly. It is composed of two cooperating runtimes:
+The **Audio Visual Controller** is the atmospheric glow that sits behind the main content of Catppuccin StarryNight, gently reacting to **music, scrolling and genre changes** while remaining GPU-friendly. 
 
-1. **NebulaController** (`src-js/effects/NebulaController.ts`)
+**Previously known as:** `NebulaController` (renamed for clarity)
+
+It is composed of two cooperating runtimes:
+
+1. **AudioVisualController** (`src-js/visual/ui-effects/AudioVisualController.ts`)
    - Lightweight (< 2 ms median) JavaScript that converts beat/genre/scroll events into CSS custom-property updates.
-2. **WebGPUBackgroundSystem** (`src-js/systems/visual/WebGPUBackgroundSystem.ts`)
+2. **WebGPUBackgroundSystem** (`src-js/visual/backgrounds/WebGPUBackgroundSystem.ts`)
    - A progressively-enhanced, optional renderer that paints a procedural RGB-noise nebula via WebGPU when the browser supports it **and** the user has enabled the _Cosmic Maximum_ mode.
 
-When WebGPU is not available—or the user prefers reduced motion—the SCSS fallback defined in `src/core/_sn_nebula_variables.scss` + `src/layout/_sn_scroll_node_backgrounds.scss` provides a purely-CSS multi-gradient alternative that still receives live updates from `NebulaController`.
+When WebGPU is not available—or the user prefers reduced motion—the SCSS fallback defined in `src/core/_sn_nebula_variables.scss` + `src/layout/_sn_scroll_node_backgrounds.scss` provides a purely-CSS multi-gradient alternative that still receives live updates from `AudioVisualController`.
 
 ---
 
-## 1 ▪ NebulaController
+## 1 ▪ AudioVisualController
 
 | Aspect                   | Details                                                                                                                                                                                                                                                                                                               |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **File**                 | `src-js/effects/NebulaController.ts`                                                                                                                                                                                                                                                                                  |
-| **Public ctor**          | `new NebulaController(y3k?: Year3000System)` – automatically initialised via `initializeNebulaController()` in `theme.entry.ts`.                                                                                                                                                                                      |
+| **File**                 | `src-js/visual/ui-effects/AudioVisualController.ts`                                                                                                                                                                                                                                                                  |
+| **Public ctor**          | `new AudioVisualController(y3k?: Year3000System)` – automatically initialised via `initializeAudioVisualController()` in `theme.entry.ts`.                                                                                                                                                                         |
 | **Key responsibilities** | 1) Subscribe to _GlobalEventBus_ topics (`music:beat`, `music:genre-change`, `user:scroll`).<br>2) Translate payloads into the CSS variables listed below.<br>3) Throttle writes via a shared `CSSVariableBatcher` to minimise layout thrashing.<br>4) Emit performance timings to `PerformanceAnalyzer` every ≈ 1 s. |
 | **User settings**        | • `nebula-intensity` (disabled · minimal · balanced · intense)<br>• honours OS «Prefers-reduced-motion» & Year3000 device-capability tiers.                                                                                                                                                                           |
 | **Performance Guard**    | Maintains a 120-frame rolling median; if scripting cost > 2 ms it will fall back to a cheaper `screen` blend-mode.                                                                                                                                                                                                    |
@@ -81,7 +56,7 @@ All other colour tokens are **aliases** to `--sn-gradient-*` and therefore inher
 
 | Aspect                 | Details                                                                                                                                                                                                                                                                                                                          |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **File**               | `src-js/systems/visual/WebGPUBackgroundSystem.ts`                                                                                                                                                                                                                                                                                |
+| **File**               | `src-js/visual/backgrounds/WebGPUBackgroundSystem.ts`                                                                                                                                                                                                                                                                           |
 | **Activation rules**   | • User setting `sn-enable-webgpu` == `"true"`.<br>• Artistic Mode == `cosmic-maximum`.<br>• `navigator.gpu` present.<br>Otherwise the system stays dormant (`initialized === false`).                                                                                                                                            |
 | **Rendering approach** | Full-screen `<canvas>` fixed behind the DOM. Renders a single full-screen triangle with a minimalist WGSL fragment shader that outputs RGB noise tinted via 3 colour uniforms (`primary`, `secondary`, `accent`).                                                                                                                |
 | **Uniform layout**     | `vec4f[4]` (64 bytes):<br>0–3 Primary (RGB + 1)<br>4–7 Secondary<br>8–11 Accent<br>12 time · energy · valence · drift-angle                                                                                                                                                                                                      |
@@ -109,7 +84,7 @@ All SCSS honours **prefers-reduced-motion** by disabling animation when requeste
 
 ## 4 ▪ Integration Points
 
-- `theme.entry.ts` → calls `initializeNebulaController(year3000System)` and registers `WebGPUBackgroundSystem` with _Year3000System_’s ManagedSystem scheduler.
+- `theme.entry.ts` → calls `initializeAudioVisualController(year3000System)` and registers `WebGPUBackgroundSystem` with _Year3000System_'s ManagedSystem scheduler.
 - `MusicSyncService` supplies `music:beat` + `getCurrentBeatVector()` used by both components.
 - `SettingsManager` exposes `nebula-intensity` & `sn-enable-webgpu` toggles.
 - Dynamic colour updates flow from **Color Harmony Engine → CSS variables → Nebula shader**.
@@ -119,8 +94,8 @@ All SCSS honours **prefers-reduced-motion** by disabling animation when requeste
 ## 5 ▪ Debug & Testing
 
 ```javascript
-// Quick check: Nebula variables & performance
-Year3000Debug.testNebula = () => {
+// Quick check: Audio Visual Controller variables & performance
+Year3000Debug.testAudioVisual = () => {
   const root = document.documentElement;
   console.table({
     beat: getComputedStyle(root).getPropertyValue("--sn-nebula-beat-intensity"),
@@ -129,16 +104,44 @@ Year3000Debug.testNebula = () => {
       "--sn-nebula-aberration-strength"
     ),
   });
-  return globalThis.__SN_nebulaController?.frameDurations?.slice(-10);
+  return globalThis.__SN_audioVisualController?.frameDurations?.slice(-10);
 };
 ```
 
 There is also a built-in median warning: open DevTools console and look for
-`[NebulaController] Median scripting cost … ms exceeds 2 ms budget.`
+`[AudioVisualController] Median scripting cost … ms exceeds 2 ms budget.`
 
 ---
 
-## 6 ▪ Future Roadmap
+## 6 ▪ Migration from NebulaController
+
+### Automatic Migration
+- Import statements automatically resolve via backward compatibility alias
+- All existing API calls continue to work unchanged
+- CSS variable names remain the same
+- Singleton global name updated: `__SN_nebulaController` → `__SN_audioVisualController`
+
+### Recommended Updates
+```ts
+// Old (still works)
+import { NebulaController, initializeNebulaController } from '@/visual/ui-effects/NebulaController';
+
+// New (recommended)
+import { AudioVisualController, initializeAudioVisualController } from '@/visual/ui-effects/AudioVisualController';
+```
+
+### Function Updates
+```ts
+// Old (still works)
+initializeNebulaController(year3000System);
+
+// New (recommended)
+initializeAudioVisualController(year3000System);
+```
+
+---
+
+## 7 ▪ Future Roadmap
 
 | Phase | Planned Feature                                                                                     |
 | ----- | --------------------------------------------------------------------------------------------------- |
@@ -149,17 +152,19 @@ There is also a built-in median warning: open DevTools console and look for
 
 ---
 
-## 7 ▪ Implementation Checklist
+## 8 ▪ Implementation Checklist
 
-- [x] `NebulaController` initialised exactly once (hot-reload safe).
+- [x] `AudioVisualController` initialised exactly once (hot-reload safe).
 - [x] WebGPU canvas only created when `navigator.gpu` present.
 - [x] All new CSS variables are **RGB-based** (no hex in gradients).
 - [x] Performance guard falls back to `screen` blend-mode at > 2 ms median.
 - [x] honours `prefers-reduced-motion` & low-capability devices.
 - [x] Noise overlay rendered via `@include nebula-noise()` mixin.
+- [x] Renamed from NebulaController for clarity.
+- [x] Backward compatibility maintained.
 
 ---
 
-**Status:** Phase 1 complete ‑ Nebula live in production.
+**Status:** Phase 2 complete ‑ Audio Visual Controller live in production.
 
-— _January 2025_ | **Version 1.0** | _Catppuccin StarryNight_
+— _June 2025_ | **Version 2.0** | _Catppuccin StarryNight_

@@ -154,11 +154,6 @@
   --sn-sidebar-item-bloom-intensity: 0.5;
   --sn-sidebar-energy-glow-opacity: 0.3;
 
-  // Easing Functions
-  // Maintain a single source of truth ( --sn-easing-emergence ).
-  // All derivative tokens alias to it so tweaks propagate theme-wide.
-  --sn-easing-organic: var(--sn-easing-emergence);
-  --sn-easing-breathing: var(--sn-easing-emergence);
-  --sn-easing-harmony: var(--sn-easing-emergence);
-  --sn-easing-explorer: var(--sn-easing-emergence);
+  // Easing Functions are now defined in _sn_gradient.scss (canonical source)
+  // This prevents duplication and ensures single source of truth
 }

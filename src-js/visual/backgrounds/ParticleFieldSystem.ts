@@ -2,7 +2,7 @@ import { MusicSyncService } from "@/audio/MusicSyncService";
 import type {
   FrameContext,
   IVisualSystem,
-} from "@/core/lifecycle/VisualSystemRegistry";
+} from "@/core/lifecycle/VisualFrameCoordinator";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import type { Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";

@@ -582,7 +582,7 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
       /* silent */
     }
 
-    // Phase 3 – Emit cross-system beat event for NebulaController, etc.
+    // Phase 3 – Emit cross-system beat event for AudioVisualController, etc.
     try {
       GlobalEventBus.publish("music:beat", {
         energy,

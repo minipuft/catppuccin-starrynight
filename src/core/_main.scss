@@ -14,6 +14,8 @@
 @use "_sn_legacy_support" as *;
 @use "_sn_architecture_documentation" as *;
 @use "_sn_nebula_variables" as *; // [Phase 1] Nebula alias tokens
+@use "_dom_selectors" as *; // Centralized DOM selector mixins
+@use "_sn_consciousness_variables" as *; // Consciousness field variables
 
 // === LAYOUT MODULES ===
 @use "../layout/_main_view_container" as *;
@@ -36,6 +38,8 @@
 @use "../components/_sn_card_non_search" as *;
 @use "../components/_sn_loading" as *;
 @use "../components/_now_playing" as *;
+@use "../components/_sn_glyph_variables" as *; // Glyph system variables
+@use "../components/_sn_harmonic_aura" as *; // Harmonic aura effects
 
 // === FEATURE MODULES ===
 @use "../features/_themed_interactive_components" as *;
@@ -52,6 +56,8 @@
 @use "../features/_floating_crystals" as *;
 @use "../features/_stellar_constellation" as *;
 @use "../features/_year3000_temporal_stream" as *;
+@use "../features/_consciousness_field_matrix" as *; // Consciousness field matrix
+@use "../features/_sn_constellation_network" as *; // Constellation network effects
 
 // === SYSTEMS MODULES ===
 @use "../systems/_sn_behavioral_prediction" as *;
@@ -60,8 +66,6 @@
 @use "../systems/_sn_data_glyphs" as *;
 
 // === SEARCH MODULES ===
-//@use "../search/_sn_search_precision" as *; // Disabled to debug search-page load issue
-//@use "../search/_sn_search_quantum" as *; // Temporarily disabled pending conflict resolution
 @use "../search/_sn_search_future" as *; // Lightweight Year3000 search styling
 
 // === LEGACY SIDEBAR MODULES ===

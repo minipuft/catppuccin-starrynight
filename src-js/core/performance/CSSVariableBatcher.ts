@@ -62,10 +62,22 @@ interface BatcherState {
 // are produced; batching them can introduce a 1-frame (≈16 ms) delay that
 // makes the now-playing bar appear "behind the beat".
 const CRITICAL_NOW_PLAYING_VARS = new Set<string>([
+  // Legacy variables (Phase 1 migration)
   "--sn-beat-pulse-intensity",
   "--sn-breathing-scale",
   "--sn-accent-hex",
   "--sn-accent-rgb",
+
+  // New namespaced variables (Phase 2+)
+  "--sn.music.beat.pulse.intensity",
+  "--sn.music.breathing.scale",
+  "--sn.music.rhythm.phase",
+  "--sn.music.spectrum.phase",
+  "--sn.color.accent.hex",
+  "--sn.color.accent.rgb",
+  "--sn.bg.webgl.ready",
+  "--sn.bg.webgpu.ready",
+  "--sn.bg.active-backend",
 ]);
 
 export class CSSVariableBatcher {
@@ -75,6 +87,36 @@ export class CSSVariableBatcher {
 
   /** Unpatched reference to CSSStyleDeclaration.setProperty for fast-path writes */
   private static nativeSetProperty?: typeof CSSStyleDeclaration.prototype.setProperty;
+
+  /**
+   * Get the singleton instance of CSSVariableBatcher
+   * Creates a new instance if none exists
+   *
+   * @param config - Configuration for new instance (ignored if instance already exists)
+   * @returns The singleton CSSVariableBatcher instance
+   */
+  public static getInstance(
+    config: Partial<CSSVariableBatcherConfig> = {}
+  ): CSSVariableBatcher {
+    if (!CSSVariableBatcher.instance) {
+      CSSVariableBatcher.instance = new CSSVariableBatcher(config);
+    }
+    return CSSVariableBatcher.instance;
+  }
+
+  /**
+   * Ensure all systems use the same CSSVariableBatcher instance
+   * Call this method to get the shared batcher
+   */
+  public static getSharedInstance(): CSSVariableBatcher {
+    if (!CSSVariableBatcher.instance) {
+      console.warn(
+        "[CSSVariableBatcher] No instance exists, creating default instance"
+      );
+      CSSVariableBatcher.instance = new CSSVariableBatcher();
+    }
+    return CSSVariableBatcher.instance;
+  }
 
   private config: CSSVariableBatcherConfig;
   private _cssVariableBatcher: BatcherState;
@@ -489,7 +531,12 @@ export class CSSVariableBatcher {
       value: string | null,
       priority?: string
     ) {
-      if (prop && prop.startsWith("--sn-") && batchInstance) {
+      // Intercept both legacy --sn- and new --sn. namespaced variables
+      if (
+        prop &&
+        (prop.startsWith("--sn-") || prop.startsWith("--sn.")) &&
+        batchInstance
+      ) {
         batchInstance.queueCSSVariableUpdate(prop, String(value ?? ""));
       } else {
         // @ts-ignore
@@ -498,7 +545,283 @@ export class CSSVariableBatcher {
     } as typeof CSSStyleDeclaration.prototype.setProperty;
     CSSVariableBatcher.hijackEnabled = true;
     if (this.config.enableDebug) {
-      console.log("🎨 [CSSVariableBatcher] Global setProperty hijack enabled");
+      console.log(
+        "🎨 [CSSVariableBatcher] Global setProperty hijack enabled (--sn- and --sn. namespaces)"
+      );
     }
+  }
+
+  // ========================================================================
+  // DESIGN TOKEN SYSTEM INTEGRATION
+  // ========================================================================
+
+  /**
+   * Add a critical variable to the fast-path list
+   * Critical variables bypass batching for real-time updates
+   *
+   * @param variable - CSS variable name to add to fast-path
+   */
+  public addCriticalVariable(variable: string): void {
+    CRITICAL_NOW_PLAYING_VARS.add(variable);
+
+    if (this.config.enableDebug) {
+      console.log(
+        `🎨 [CSSVariableBatcher] Added critical variable: ${variable}`
+      );
+    }
+  }
+
+  /**
+   * Remove a variable from the critical fast-path list
+   *
+   * @param variable - CSS variable name to remove from fast-path
+   */
+  public removeCriticalVariable(variable: string): void {
+    CRITICAL_NOW_PLAYING_VARS.delete(variable);
+
+    if (this.config.enableDebug) {
+      console.log(
+        `🎨 [CSSVariableBatcher] Removed critical variable: ${variable}`
+      );
+    }
+  }
+
+  /**
+   * Check if a variable is on the critical fast-path
+   *
+   * @param variable - CSS variable name to check
+   * @returns True if variable is critical
+   */
+  public isCriticalVariable(variable: string): boolean {
+    return CRITICAL_NOW_PLAYING_VARS.has(variable);
+  }
+
+  /**
+   * Get list of all critical variables
+   *
+   * @returns Array of critical variable names
+   */
+  public getCriticalVariables(): string[] {
+    return Array.from(CRITICAL_NOW_PLAYING_VARS);
+  }
+
+  /**
+   * Convenience method for setting music synchronization variables
+   * Maps to the new design token namespace
+   *
+   * @param metrics - Music metrics object
+   */
+  public setMusicMetrics(metrics: {
+    beatIntensity?: number;
+    rhythmPhase?: number;
+    breathingScale?: number;
+    spectrumPhase?: number;
+    energy?: number;
+    valence?: number;
+    bpm?: number;
+  }): void {
+    if (metrics.beatIntensity !== undefined) {
+      this.setProperty(
+        "--sn.music.beat.pulse.intensity",
+        metrics.beatIntensity.toString()
+      );
+    }
+
+    if (metrics.rhythmPhase !== undefined) {
+      this.setProperty("--sn.music.rhythm.phase", `${metrics.rhythmPhase}deg`);
+    }
+
+    if (metrics.breathingScale !== undefined) {
+      this.setProperty(
+        "--sn.music.breathing.scale",
+        metrics.breathingScale.toString()
+      );
+    }
+
+    if (metrics.spectrumPhase !== undefined) {
+      this.setProperty(
+        "--sn.music.spectrum.phase",
+        `${metrics.spectrumPhase}deg`
+      );
+    }
+
+    if (metrics.energy !== undefined) {
+      this.setProperty("--sn.music.energy.level", metrics.energy.toString());
+    }
+
+    if (metrics.valence !== undefined) {
+      this.setProperty("--sn.music.valence", metrics.valence.toString());
+    }
+
+    if (metrics.bpm !== undefined) {
+      this.setProperty("--sn.music.tempo.bpm", metrics.bpm.toString());
+    }
+  }
+
+  /**
+   * Convenience method for setting color variables
+   * Maps to the new design token namespace
+   *
+   * @param colors - Color values object
+   */
+  public setColorTokens(colors: {
+    accentHex?: string;
+    accentRgb?: string;
+    primaryRgb?: string;
+    secondaryRgb?: string;
+    gradientOpacity?: number;
+    gradientBlur?: string;
+  }): void {
+    if (colors.accentHex) {
+      this.setProperty("--sn.color.accent.hex", colors.accentHex);
+    }
+
+    if (colors.accentRgb) {
+      this.setProperty("--sn.color.accent.rgb", colors.accentRgb);
+    }
+
+    if (colors.primaryRgb) {
+      this.setProperty("--sn.bg.gradient.primary.rgb", colors.primaryRgb);
+    }
+
+    if (colors.secondaryRgb) {
+      this.setProperty("--sn.bg.gradient.secondary.rgb", colors.secondaryRgb);
+    }
+
+    if (colors.gradientOpacity !== undefined) {
+      this.setProperty(
+        "--sn.bg.gradient.opacity",
+        colors.gradientOpacity.toString()
+      );
+    }
+
+    if (colors.gradientBlur) {
+      this.setProperty("--sn.bg.gradient.blur", colors.gradientBlur);
+    }
+  }
+
+  /**
+   * Convenience method for setting performance-related variables
+   *
+   * @param perf - Performance values object
+   */
+  public setPerformanceTokens(perf: {
+    webglReady?: boolean;
+    webgpuReady?: boolean;
+    activeBackend?: string;
+    qualityLevel?: string;
+    reducedMotion?: boolean;
+    gpuAcceleration?: boolean;
+  }): void {
+    if (perf.webglReady !== undefined) {
+      this.setProperty("--sn.bg.webgl.ready", perf.webglReady ? "1" : "0");
+    }
+
+    if (perf.webgpuReady !== undefined) {
+      this.setProperty("--sn.bg.webgpu.ready", perf.webgpuReady ? "1" : "0");
+    }
+
+    if (perf.activeBackend) {
+      this.setProperty("--sn.bg.active-backend", perf.activeBackend);
+    }
+
+    if (perf.qualityLevel) {
+      this.setProperty("--sn.perf.quality.level", perf.qualityLevel);
+    }
+
+    if (perf.reducedMotion !== undefined) {
+      this.setProperty(
+        "--sn.anim.motion.reduced",
+        perf.reducedMotion ? "1" : "0"
+      );
+    }
+
+    if (perf.gpuAcceleration !== undefined) {
+      this.setProperty(
+        "--sn.perf.gpu.acceleration.enabled",
+        perf.gpuAcceleration ? "1" : "0"
+      );
+    }
+  }
+
+  /**
+   * Force immediate flush of all pending updates
+   * Useful for ensuring critical updates are applied immediately
+   */
+  public forceFlush(): void {
+    if (this._cssVariableBatcher.pendingUpdates.size > 0) {
+      this._processCSSVariableBatch();
+    }
+  }
+
+  /**
+   * Get statistics about batching efficiency
+   *
+   * @returns Performance statistics and recommendations
+   */
+  public getBatchingStats(): {
+    efficiency: string;
+    totalBatches: number;
+    averageBatchSize: number;
+    overBudgetPercentage: number;
+    criticalVariableCount: number;
+    recommendations: string[];
+  } {
+    const overBudgetPercentage =
+      this._performanceMetrics.totalBatches > 0
+        ? (this._performanceMetrics.overBudgetBatches /
+            this._performanceMetrics.totalBatches) *
+          100
+        : 0;
+
+    const recommendations: string[] = [];
+
+    if (this._performanceMetrics.averageBatchSize < 2) {
+      recommendations.push(
+        "Consider reducing update frequency to improve batching efficiency"
+      );
+    }
+
+    if (overBudgetPercentage > 20) {
+      recommendations.push(
+        "High percentage of over-budget batches - consider reducing maxBatchSize"
+      );
+    }
+
+    if (CRITICAL_NOW_PLAYING_VARS.size > 10) {
+      recommendations.push(
+        "Many critical variables may impact performance - review fast-path usage"
+      );
+    }
+
+    return {
+      efficiency: this._calculateEfficiency(),
+      totalBatches: this._performanceMetrics.totalBatches,
+      averageBatchSize: this._performanceMetrics.averageBatchSize,
+      overBudgetPercentage: Math.round(overBudgetPercentage * 10) / 10,
+      criticalVariableCount: CRITICAL_NOW_PLAYING_VARS.size,
+      recommendations,
+    };
+  }
+
+  // =====================================================================
+  // Convenience API ------------------------------------------------------
+  // =====================================================================
+  /**
+   * Direct helper mirroring CSSStyleDeclaration.setProperty semantics.
+   * Internally delegates to queueCSSVariableUpdate so external call sites
+   * (e.g. GradientConductor) can use a familiar imperative API while still
+   * benefiting from batching.
+   *
+   * @param property – CSS custom property name (e.g. "--sn.color.accent.rgb")
+   * @param value    – The value to assign
+   * @param element  – Optional target element, defaults to <html>
+   */
+  public setProperty(
+    property: string,
+    value: string,
+    element: HTMLElement | null = null
+  ): void {
+    this.queueCSSVariableUpdate(property, value, element);
   }
 }

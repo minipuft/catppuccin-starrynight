@@ -1,5 +1,8 @@
 declare const Spicetify: any;
 
+import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
+import type { ProcessedAudioData } from "@/audio/MusicSyncService";
+import { MusicSyncService } from "@/audio/MusicSyncService";
 import { HARMONIC_MODES, YEAR3000_CONFIG } from "@/config/globalConfig";
 import {
   ARTISTIC_MODE_KEY,
@@ -8,35 +11,32 @@ import {
   HARMONIC_MODE_KEY,
   MANUAL_BASE_COLOR_KEY,
 } from "@/config/settingKeys";
+import { AnimationConductor } from "@/core/animation/AnimationConductor";
+import { EmergentChoreographyEngine } from "@/core/animation/EmergentChoreographyEngine";
+import { VisualFrameCoordinator } from "@/core/lifecycle/VisualFrameCoordinator";
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { MasterAnimationCoordinator } from "@/core/animation/MasterAnimationCoordinator";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { TimerConsolidationSystem } from "@/core/performance/TimerConsolidationSystem";
-import { VisualSystemRegistry } from "@/core/lifecycle/VisualSystemRegistry";
 import { SystemHealthMonitor } from "@/debug/SystemHealthMonitor";
-import { applyStarryNightSettings } from "@/visual/base/starryNightEffects";
+import type { HarmonicModes, Year3000Config } from "@/types/models";
 import { Card3DManager } from "@/ui/managers/Card3DManager";
 import { GlassmorphismManager } from "@/ui/managers/GlassmorphismManager";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
-import type { ProcessedAudioData } from "@/audio/MusicSyncService";
-import { MusicSyncService } from "@/audio/MusicSyncService";
-import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
-import { EmergentChoreographyEngine } from "@/core/animation/EmergentChoreographyEngine";
+import * as Utils from "@/utils/core/Year3000Utilities";
 import { startNowPlayingWatcher } from "@/utils/dom/NowPlayingDomWatcher";
+import { LightweightParticleSystem } from "@/visual/backgrounds/LightweightParticleSystem";
+import { ParticleFieldSystem } from "@/visual/backgrounds/ParticleFieldSystem";
+import { WebGLGradientBackgroundSystem } from "@/visual/backgrounds/WebGLGradientBackgroundSystem";
+import { WebGPUBackgroundSystem } from "@/visual/backgrounds/WebGPUBackgroundSystem";
+import { applyStarryNightSettings } from "@/visual/base/starryNightEffects";
 import { BeatSyncVisualSystem } from "@/visual/beat-sync/BeatSyncVisualSystem";
 import { BehavioralPredictionEngine } from "@/visual/ui-effects/BehavioralPredictionEngine";
 import { DataGlyphSystem } from "@/visual/ui-effects/DataGlyphSystem";
-import { DimensionalNexusSystem } from "@/visual/ui-effects/DimensionalNexusSystem";
-import { LightweightParticleSystem } from "@/visual/backgrounds/LightweightParticleSystem";
-import { ParticleFieldSystem } from "@/visual/backgrounds/ParticleFieldSystem";
+import { InteractionTrackingSystem } from "@/visual/ui-effects/InteractionTrackingSystem";
 import { PredictiveMaterializationSystem } from "@/visual/ui-effects/PredictiveMaterializationSystem";
-import { getRightSidebarCoordinator } from "@/visual/ui-effects/RightSidebarCoordinator";
 import { SidebarConsciousnessSystem } from "@/visual/ui-effects/SidebarConsciousnessSystem";
-import { WebGLGradientBackgroundSystem } from "@/visual/backgrounds/WebGLGradientBackgroundSystem";
-import { WebGPUBackgroundSystem } from "@/visual/backgrounds/WebGPUBackgroundSystem";
-import type { HarmonicModes, Year3000Config } from "@/types/models";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import { getSidebarPerformanceCoordinator } from "@/visual/ui-effects/SidebarPerformanceCoordinator";
 
 // Type for initialization results
 interface InitializationResults {
@@ -58,7 +58,7 @@ interface VisualSystemConfig {
   Class: new (...args: any[]) => any;
   property:
     | "lightweightParticleSystem"
-    | "dimensionalNexusSystem"
+    | "interactionTrackingSystem"
     | "dataGlyphSystem"
     | "beatSyncVisualSystem"
     | "behavioralPredictionEngine"
@@ -77,14 +77,14 @@ export class Year3000System {
   public initialized: boolean;
 
   // Performance Systems
-  public masterAnimationCoordinator: MasterAnimationCoordinator | null;
+  public animationConductor: AnimationConductor | null;
   public timerConsolidationSystem: TimerConsolidationSystem | null;
   public cssVariableBatcher: CSSVariableBatcher | null;
   public deviceCapabilityDetector: DeviceCapabilityDetector | null;
   public performanceAnalyzer: PerformanceAnalyzer | null;
 
   // Cosmic Discovery Framework – central visual registry
-  public visualSystemRegistry: VisualSystemRegistry | null;
+  public visualFrameCoordinator: VisualFrameCoordinator | null;
 
   // Managers and Services
   public systemHealthMonitor: SystemHealthMonitor | null;
@@ -96,7 +96,7 @@ export class Year3000System {
 
   // Visual Systems
   public lightweightParticleSystem: LightweightParticleSystem | null;
-  public dimensionalNexusSystem: DimensionalNexusSystem | null;
+  public interactionTrackingSystem: InteractionTrackingSystem | null;
   public dataGlyphSystem: DataGlyphSystem | null;
   public beatSyncVisualSystem: BeatSyncVisualSystem | null;
   public behavioralPredictionEngine: BehavioralPredictionEngine | null;
@@ -151,7 +151,7 @@ export class Year3000System {
     this.initialized = false;
     this._systemStartTime = Date.now();
 
-    this.masterAnimationCoordinator = null;
+    this.animationConductor = null;
     this.timerConsolidationSystem = null;
     this.cssVariableBatcher = null;
     this.deviceCapabilityDetector = null;
@@ -165,7 +165,7 @@ export class Year3000System {
     this.card3DManager = null;
 
     this.lightweightParticleSystem = null;
-    this.dimensionalNexusSystem = null;
+    this.interactionTrackingSystem = null;
     this.dataGlyphSystem = null;
     this.beatSyncVisualSystem = null;
     this.behavioralPredictionEngine = null;
@@ -178,7 +178,7 @@ export class Year3000System {
 
     this.initializationResults = null;
 
-    this.visualSystemRegistry = null;
+    this.visualFrameCoordinator = null;
 
     if (this.YEAR3000_CONFIG?.enableDebug) {
       console.log(
@@ -330,9 +330,9 @@ export class Year3000System {
         },
       },
       {
-        name: "VisualSystemRegistry",
+        name: "VisualFrameCoordinator",
         init: () => {
-          this.visualSystemRegistry = new VisualSystemRegistry(
+          this.visualFrameCoordinator = new VisualFrameCoordinator(
             this.performanceAnalyzer,
             this.deviceCapabilityDetector
           );
@@ -351,25 +351,25 @@ export class Year3000System {
         },
       },
       {
-        name: "MasterAnimationCoordinator",
+        name: "AnimationConductor",
         init: () => {
           if (!this.performanceAnalyzer) {
             throw new Error(
-              "PerformanceAnalyzer is required for MasterAnimationCoordinator."
+              "PerformanceAnalyzer is required for AnimationConductor."
             );
           }
-          this.masterAnimationCoordinator = new MasterAnimationCoordinator({
+          this.animationConductor = new AnimationConductor({
             enableDebug: this.YEAR3000_CONFIG.enableDebug,
           });
 
-          // Inject capability detector so MAC can quality-gate systems
+          // Inject capability detector so AnimationConductor can quality-gate systems
           if (this.deviceCapabilityDetector) {
-            this.masterAnimationCoordinator.setDeviceCapabilityDetector(
+            this.animationConductor.setDeviceCapabilityDetector(
               this.deviceCapabilityDetector
             );
           }
 
-          this.masterAnimationCoordinator.startMasterAnimationLoop();
+          this.animationConductor.startMasterAnimationLoop();
         },
       },
       {
@@ -477,7 +477,7 @@ export class Year3000System {
     await this._initializeVisualSystems(initializationResults);
 
     // Animation System Registration Phase - after all systems are initialized
-    if (this.masterAnimationCoordinator) {
+    if (this.animationConductor) {
       await this._registerAnimationSystems();
       if (this.YEAR3000_CONFIG.enableDebug) {
         console.log(
@@ -554,7 +554,7 @@ export class Year3000System {
       );
       const visualSystems = [
         "LightweightParticleSystem",
-        "DimensionalNexusSystem",
+        "InteractionTrackingSystem",
         "DataGlyphSystem",
         "BeatSyncVisualSystem",
         "BehavioralPredictionEngine",
@@ -574,9 +574,9 @@ export class Year3000System {
         property: "lightweightParticleSystem",
       },
       {
-        name: "DimensionalNexusSystem",
-        Class: DimensionalNexusSystem,
-        property: "dimensionalNexusSystem",
+        name: "InteractionTrackingSystem",
+        Class: InteractionTrackingSystem,
+        property: "interactionTrackingSystem",
       },
       {
         name: "DataGlyphSystem",
@@ -676,8 +676,8 @@ export class Year3000System {
   }
 
   public async destroyAllSystems(): Promise<void> {
-    if (this.masterAnimationCoordinator) {
-      this.masterAnimationCoordinator.stopMasterAnimationLoop();
+    if (this.animationConductor) {
+      this.animationConductor.stopMasterAnimationLoop();
     }
     if (this.timerConsolidationSystem) {
       this.timerConsolidationSystem.destroy();
@@ -688,7 +688,7 @@ export class Year3000System {
 
     const allSystems = [
       this.lightweightParticleSystem,
-      this.dimensionalNexusSystem,
+      this.interactionTrackingSystem,
       this.dataGlyphSystem,
       this.beatSyncVisualSystem,
       this.behavioralPredictionEngine,
@@ -1190,14 +1190,14 @@ export class Year3000System {
     priority: "background" | "normal" | "critical" = "normal",
     targetFPS: number = 60
   ): boolean {
-    if (!this.masterAnimationCoordinator) {
+    if (!this.animationConductor) {
       console.warn(
         `[Year3000System] Cannot register ${name} - MasterAnimationCoordinator not ready`
       );
       return false;
     }
 
-    this.masterAnimationCoordinator.registerAnimationSystem(
+    this.animationConductor.registerAnimationSystem(
       name,
       system,
       priority,
@@ -1207,11 +1207,11 @@ export class Year3000System {
   }
 
   public unregisterAnimationSystem(name: string): boolean {
-    if (!this.masterAnimationCoordinator) {
+    if (!this.animationConductor) {
       return false;
     }
 
-    this.masterAnimationCoordinator.unregisterAnimationSystem(name);
+    this.animationConductor.unregisterAnimationSystem(name);
     return true;
   }
 
@@ -1241,7 +1241,7 @@ export class Year3000System {
   }
 
   private async _registerAnimationSystems(): Promise<void> {
-    if (!this.masterAnimationCoordinator) {
+    if (!this.animationConductor) {
       console.warn(
         "[Year3000System] MasterAnimationCoordinator not available for visual system registration"
       );
@@ -1280,8 +1280,8 @@ export class Year3000System {
         priority: "background",
       },
       {
-        name: "DimensionalNexusSystem",
-        system: this.dimensionalNexusSystem,
+        name: "InteractionTrackingSystem",
+        system: this.interactionTrackingSystem,
         priority: "background",
       },
       {
@@ -1322,7 +1322,7 @@ export class Year3000System {
           targetFPS = Math.min(targetFPS, 30); // Cap background systems at 30fps
         }
 
-        this.masterAnimationCoordinator.registerAnimationSystem(
+        this.animationConductor.registerAnimationSystem(
           name,
           system as any,
           optimizedPriority,
@@ -1435,10 +1435,10 @@ export class Year3000System {
               "PerformanceAnalyzer is required for MasterAnimationCoordinator."
             );
           }
-          this.masterAnimationCoordinator = new MasterAnimationCoordinator({
+          this.animationConductor = new AnimationConductor({
             enableDebug: this.YEAR3000_CONFIG.enableDebug,
           });
-          this.masterAnimationCoordinator.startMasterAnimationLoop();
+          this.animationConductor.startMasterAnimationLoop();
         },
       },
     ];
@@ -1629,7 +1629,7 @@ export class Year3000System {
         await this._initializeVisualSystems(upgradeResults);
 
         // Register animation systems
-        if (this.masterAnimationCoordinator) {
+        if (this.animationConductor) {
           await this._registerAnimationSystems();
         }
       }
@@ -1758,7 +1758,7 @@ export class Year3000System {
       this.glassmorphismManager,
       this.card3DManager,
       this.lightweightParticleSystem,
-      this.dimensionalNexusSystem,
+      this.interactionTrackingSystem,
       this.dataGlyphSystem,
       this.beatSyncVisualSystem,
       this.behavioralPredictionEngine,
@@ -1829,7 +1829,7 @@ export class Year3000System {
 
       // Force-flush RightSidebarCoordinator if present
       try {
-        getRightSidebarCoordinator()?.forceFlush();
+        getSidebarPerformanceCoordinator()?.forceFlush();
       } catch {}
 
       if (this.YEAR3000_CONFIG?.enableDebug) {

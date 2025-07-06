@@ -1,58 +1,36 @@
-# 🌀 Dimensional Nexus System – DEPRECATED
+# 🔗 Interaction Tracking System – Adaptive Navigation Field
 
-**Document Version:** 1.0 (DEPRECATED)
-**Implementation Date:** June 2025
-**Status:** 🔴 Deprecated (Renamed to InteractionTrackingSystem)
-
----
-
-## ⚠️ DEPRECATION NOTICE
-
-**This documentation is deprecated.** The `DimensionalNexusSystem` has been renamed to `InteractionTrackingSystem` for better clarity.
-
-**Please refer to the updated documentation:** [`INTERACTION_TRACKING_SYSTEM.md`](./INTERACTION_TRACKING_SYSTEM.md)
+**Document Version:** 2.0
+**Implementation Date:** June 2025  
+**Status:** 🟢 Active (Renamed from DimensionalNexusSystem)
 
 ---
 
-## 🔄 Migration Information
+## 🚀 Purpose
 
-- **Old Class Name:** `DimensionalNexusSystem`
-- **New Class Name:** `InteractionTrackingSystem`
-- **Old File:** `src-js/visual/ui-effects/DimensionalNexusSystem.ts`
-- **New File:** `src-js/visual/ui-effects/InteractionTrackingSystem.ts`
+The **Interaction Tracking System** (ITS) is the central _navigation-field_ orchestrator that subtly warps, scales and desaturates UI regions according to musical energy, user interaction and meditation states. It lives in the _visual systems_ layer and feeds CSS variables that sidebar / navigation SCSS modules consume to create depth-shift, focus and calm-mode animations.
 
-### Backward Compatibility
-The old `DimensionalNexusSystem` export is still available as an alias, but new code should use `InteractionTrackingSystem`.
-
-### What Changed
-- **Functionality:** No changes - all features remain identical
-- **API:** No changes - all methods and properties remain the same
-- **CSS Variables:** No changes - all CSS variable names remain the same
-- **Performance:** No changes - performance characteristics are identical
-
----
-
-## 🚀 Purpose (Legacy Documentation)
-
-The **Dimensional Nexus System** (DNS) is the central _navigation-field_ orchestrator that subtly warps, scales and desaturates UI regions according to musical energy, user interaction and meditation states. It lives in the _visual systems_ layer and feeds CSS variables that sidebar / navigation SCSS modules consume to create depth-shift, focus and calm-mode animations.
+**Previously known as:** `DimensionalNexusSystem` (renamed for clarity)
 
 It reacts to four primary input streams:
 
 1. **Music analysis** via `MusicSyncService` (energy / valence / intensity).
 2. **User interaction cadence** (click, pointer, keydown, scroll velocity).
 3. **Modal state** (e.g. playlist-edit dialog) via DOM MutationObserver.
-4. **Performance mode** signals from `MasterAnimationCoordinator`.
+4. **Performance mode** signals from `AnimationConductor`.
 
 ---
 
 ## 🗂️ Key Source Files
 
-| File                                              | Role                                                                                                   |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `src-js/systems/visual/DimensionalNexusSystem.ts` | Core TypeScript class implementing logic, state-machines and CSS variable output.                      |
-| SCSS consumers (after consolidation)              | `_sidebar_*` modules & `_sn_context_zones.scss` read the exported variables for actual visual effects. |
+| File                                                      | Role                                                                                                   |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `src-js/visual/ui-effects/InteractionTrackingSystem.ts` | Core TypeScript class implementing logic, state-machines and CSS variable output.                      |
+| SCSS consumers (after consolidation)                     | `_sidebar_*` modules & `_sn_context_zones.scss` read the exported variables for actual visual effects. |
 
-> Note: The legacy `_sn_dimensional_nexus.scss` was removed in the June 2025 consolidation; SCSS now references **sidebar** enhancement layers.
+> **Note:** Renamed from `DimensionalNexusSystem.ts` for better clarity. The legacy `_sn_dimensional_nexus.scss` was removed in the June 2025 consolidation; SCSS now references **sidebar** enhancement layers.
+
+> **Backward Compatibility:** `DimensionalNexusSystem` export alias maintained for existing code.
 
 ---
 
@@ -62,21 +40,21 @@ It reacts to four primary input streams:
 sequenceDiagram
     participant Boot as Theme Bootstrap
     participant Y3K  as Year3000System
-    participant MAC  as MasterAnimationCoordinator
-    participant DNS  as DimensionalNexusSystem
+    participant AC   as AnimationConductor
+    participant ITS  as InteractionTrackingSystem
     participant MS   as MusicSyncService
     participant DOM  as Scroll / Modal Events
 
-    Boot->>DNS: new DimensionalNexusSystem(...)
-    DNS->>MAC: registerAnimationSystem("DimensionalNexusSystem", fps=30)
+    Boot->>ITS: new InteractionTrackingSystem(...)
+    ITS->>AC: registerAnimationSystem("InteractionTrackingSystem", fps=30)
     loop every frame (budget permitting)
-        MAC-->>DNS: onAnimate(deltaMs)
-        DNS->>DNS: updateAnimation(now, deltaMs)
-        DNS->>DOM: queueCSSVariableUpdate(--sn-nexus-*)
+        AC-->>ITS: onAnimate(deltaMs)
+        ITS->>ITS: updateAnimation(now, deltaMs)
+        ITS->>DOM: queueCSSVariableUpdate(--sn-nexus-*)
     end
-    MS-->>DNS: updateFromMusicAnalysis(processedData)
-    DOM-->>DNS: user scroll / click / key → recordUserInteraction
-    DOM-->>DNS: modal open/close mutation → adjust coherence/timeDistortion
+    MS-->>ITS: updateFromMusicAnalysis(processedData)
+    DOM-->>ITS: user scroll / click / key → recordUserInteraction
+    DOM-->>ITS: modal open/close mutation → adjust coherence/timeDistortion
 ```
 
 Key timing layers:
@@ -105,7 +83,7 @@ All writes are funnelled through **CSSVariableBatcher** for optimal batching.
 
 ## 📑 Public API Surface
 
-DNS is primarily registered automatically – developers usually do _not_ instantiate it directly – but understanding its hooks helps when extending:
+ITS is primarily registered automatically – developers usually do _not_ instantiate it directly – but understanding its hooks helps when extending:
 
 ```ts
 constructor(
@@ -121,7 +99,7 @@ constructor(
 ### Animation hooks
 
 ```ts
-onAnimate(deltaMs: number): void       // called by MAC
+onAnimate(deltaMs: number): void       // called by AnimationConductor
 onPerformanceModeChange(mode): void    // performance | quality
 override updateAnimation(ts, dt): void // internal heavy+light ticks
 ```
@@ -144,11 +122,11 @@ getMeditationReport(): { isMeditating: boolean; desaturation: number; ... }
 
 Most tunables live in **SettingsManager** or **Year3000Config** constants. Developers can adjust these without touching the class:
 
-| Setting Key                     | Default | Influence                                       |
-| ------------------------------- | ------- | ----------------------------------------------- |
-| `sn-dimnexus-performance-mode`  | `auto`  | Forces DNS to run in _performance_ or _quality_ |
-| `sn-dimnexus-max-frame-skip`    | `2`     | Frames skipped between updates (quality)        |
-| `sn-dimnexus-heavy-interval-ms` | `100`   | Heavy-tick cadence                              |
+| Setting Key                     | Default | Influence                                                      |
+| ------------------------------- | ------- | -------------------------------------------------------------- |
+| `sn-interaction-performance-mode` | `auto`  | Forces ITS to run in _performance_ or _quality_               |
+| `sn-interaction-max-frame-skip`   | `2`     | Frames skipped between updates (quality)                      |
+| `sn-interaction-heavy-interval-ms`| `100`   | Heavy-tick cadence                                            |
 
 > **Tip:** Use `Year3000Debug.overlay()` panel (Phase 3) to change these live and watch CSS variables in DevTools.
 
@@ -159,7 +137,7 @@ Most tunables live in **SettingsManager** or **Year3000Config** constants. Devel
 - [ ] Verify CSS vars update while scrolling & playing high-energy track.
 - [ ] Open a Spotify modal – `--sn-nexus-time-distortion` drops to ≈ 0.2.
 - [ ] Leave the UI idle on a chill track → meditation activates (`--sn-sidebar-meditation-desaturation` > 0).
-- [ ] Toggle MAC performance mode via dev overlay – heavy interval & frame skip change.
+- [ ] Toggle AnimationConductor performance mode via dev overlay – heavy interval & frame skip change.
 
 ### Force meditation quickly
 
@@ -183,12 +161,35 @@ GlobalEventBus.publish("beat/frame", { energy: 0.1, valence: 0.8 });
 
 ---
 
+## 🔄 Migration from DimensionalNexusSystem
+
+### Automatic Migration
+- Import statements automatically resolve via backward compatibility alias
+- All existing API calls continue to work unchanged
+- CSS variable names remain the same
+
+### Recommended Updates
+```ts
+// Old (still works)
+import { DimensionalNexusSystem } from '@/visual/ui-effects/DimensionalNexusSystem';
+
+// New (recommended)
+import { InteractionTrackingSystem } from '@/visual/ui-effects/InteractionTrackingSystem';
+```
+
+### Property Name Changes in Year3000System
+- `year3000System.dimensionalNexusSystem` → `year3000System.interactionTrackingSystem`
+- Registration name: `"DimensionalNexusSystem"` → `"InteractionTrackingSystem"`
+
+---
+
 ## 📅 Roadmap
 
 1. **Cross-system coupling** – feed volatility into _ParticleFieldSystem_ for gravity ripples.
 2. **AI mood detection** – leverage _Emergent Choreography Engine_ mood window to bias complexity.
 3. **Performance Telemetry** – expose per-frame cost to _PerformanceAnalyzer_ history.
+4. **Enhanced scroll tracking** – more granular velocity and acceleration data.
 
 ---
 
-© Catppuccin StarryNight 2025 – "Bend the UI, feel the vibe."
+© Catppuccin StarryNight 2025 – "Track interactions, feel the vibe."

@@ -399,7 +399,7 @@ export class SystemIntegrationTester {
     const systemTests: { [key: string]: any } = {};
     const systemsToTest = [
       "BehavioralPredictionEngine",
-      "DimensionalNexusSystem",
+      "InteractionTrackingSystem",
       "DataGlyphSystem",
     ];
 
@@ -511,7 +511,7 @@ export class SystemIntegrationTester {
           importance: "MEDIUM",
         },
       ],
-      DimensionalNexusSystem: [
+      InteractionTrackingSystem: [
         {
           name: "Left Sidebar",
           selector: MODERN_SELECTORS.leftSidebar ?? "",
