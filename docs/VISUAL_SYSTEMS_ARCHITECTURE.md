@@ -72,7 +72,7 @@ The dynamic nature of Catppuccin StarryNight is powered by a coordinated system 
 ### **Visual Layer** (`src-js/visual/`)
 
 4.  **Visual Systems - The Performers**: Specialized modules organized by type:
-    - **Background Systems** (`visual/backgrounds/`) - WebGL/WebGPU renderers, particle effects
+    - **Background Systems** (`visual/backgrounds/`) - WebGL renderers, particle effects
     - **Beat-Sync Systems** (`visual/beat-sync/`) - Music-reactive visual effects
     - **UI Effects** (`visual/ui-effects/`) - Interface enhancements, sidebar animations
     - **Base Infrastructure** (`visual/base/`) - Common visual system foundation

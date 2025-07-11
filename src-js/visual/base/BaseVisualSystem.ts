@@ -45,7 +45,6 @@ export abstract class BaseVisualSystem {
 
   // GPU-accelerated canvas support
   protected canvasCapabilities: {
-    webgpu: boolean;
     webgl2: boolean;
     recommendedType: CanvasContextType;
   } | null = null;
@@ -162,7 +161,7 @@ export abstract class BaseVisualSystem {
     this.canvasCapabilities = detectRenderingCapabilities();
     if (this.canvasCapabilities) {
       this.performanceMonitor?.emitTrace?.(
-        `[${this.systemName}] Canvas capabilities detected: WebGPU=${this.canvasCapabilities.webgpu}, WebGL2=${this.canvasCapabilities.webgl2}, Recommended=${this.canvasCapabilities.recommendedType}`
+        `[${this.systemName}] Canvas capabilities detected: WebGL2=${this.canvasCapabilities.webgl2}, Recommended=${this.canvasCapabilities.recommendedType}`
       );
     }
 
@@ -341,7 +340,7 @@ export abstract class BaseVisualSystem {
 
   /**
    * Create GPU-accelerated optimized canvas with kinetic styling.
-   * This method prioritizes WebGPU > WebGL2 > 2D Canvas based on device capabilities.
+   * This method prioritizes WebGL2 > 2D Canvas based on device capabilities.
    */
   protected async _createOptimizedKineticCanvas(
     id: string,
@@ -360,25 +359,7 @@ export abstract class BaseVisualSystem {
     if (this.canvasCapabilities && this.currentPerformanceProfile) {
       const quality = this.currentPerformanceProfile.quality || "balanced";
 
-      // Read WebGPU enablement setting (default false)
-      let webgpuAllowed = false;
-      try {
-        if (this.settingsManager) {
-          webgpuAllowed =
-            this.settingsManager.get("sn-enable-webgpu" as any) !== "false";
-        }
-      } catch (e) {
-        // Ignore settings errors and assume allowed
-        webgpuAllowed = true;
-      }
-
-      if (
-        webgpuAllowed &&
-        quality === "high" &&
-        this.canvasCapabilities.webgpu
-      ) {
-        preferredType = "webgpu";
-      } else if (quality !== "low" && this.canvasCapabilities.webgl2) {
+      if (quality !== "low" && this.canvasCapabilities.webgl2) {
         preferredType = "webgl2";
       }
     }
@@ -454,7 +435,6 @@ export abstract class BaseVisualSystem {
    */
   public hasGPUAcceleration(): boolean {
     return (
-      this.canvasCapabilities?.webgpu ||
       this.canvasCapabilities?.webgl2 ||
       false
     );

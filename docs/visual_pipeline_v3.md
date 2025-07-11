@@ -1,6 +1,6 @@
 # Visual Pipeline v3.0 - Unified Year 3000 System Architecture
 
-This document describes the modernized visual pipeline for Catppuccin StarryNight, implementing a unified orchestration system for CSS, WebGL, and WebGPU backends with seamless coordination and perfect synchronization.
+This document describes the modernized visual pipeline for Catppuccin StarryNight, implementing a unified orchestration system for CSS and WebGL backends with seamless coordination and perfect synchronization.
 
 ## Overview
 
@@ -10,7 +10,7 @@ The Visual Pipeline v3.0 represents a complete redesign of how visual systems co
 
 - **Single Source of Truth**: GradientConductor manages all visual backends
 - **Perfect Synchronization**: Shared animation clock eliminates timing drift  
-- **Progressive Enhancement**: Automatic backend selection (WebGPU → WebGL → CSS)
+- **Progressive Enhancement**: Automatic backend selection (WebGL → CSS)
 - **Performance Optimized**: ≤2 layout-thrashing style writes per frame
 - **Developer Experience**: Hot-reload shaders, visual regression testing
 - **Production Ready**: Graceful degradation, comprehensive error handling
@@ -71,7 +71,7 @@ Standardized interface that all visual rendering systems implement, ensuring sea
 
 ```typescript
 interface VisualBackplane extends IManagedSystem {
-  readonly backendId: 'css' | 'webgl' | 'webgpu' | string;
+  readonly backendId: 'css' | 'webgl' | string;
   readonly isReady: boolean;
   readonly capabilities: BackendCapabilities;
   
@@ -96,11 +96,6 @@ interface VisualBackplane extends IManagedSystem {
    - Advanced shader effects
    - Context loss recovery
 
-3. **WebGPU Backend** (Future expansion)
-   - Next-generation GPU compute
-   - Advanced particle systems
-   - Ray-traced lighting effects
-
 ### 3. GradientConductor Service
 
 **Location**: `/src-js/visual/backbone/GradientConductor.ts`
@@ -119,7 +114,7 @@ Central orchestrator responsible for coordinating all visual rendering systems. 
 #### Backend Selection Logic
 
 ```typescript
-// Priority order: WebGPU > WebGL2 > WebGL1 > CSS
+// Priority order: WebGL2 > WebGL1 > CSS
 const optimal = BackendSelector.selectOptimalBackend(registrations);
 
 // Decision factors:
@@ -144,7 +139,6 @@ const conductor = new GradientConductor(
 // Register backends
 conductor.registerBackend(cssBackend, 1);      // Lowest priority
 conductor.registerBackend(webglBackend, 10);   // Higher priority
-conductor.registerBackend(webgpuBackend, 20);  // Highest priority
 
 // Initialize with DOM
 await conductor.initializeBackends(rootElement);
@@ -422,7 +416,6 @@ const markdownReport = tester.exportResults('markdown');
 |---------|-----|--------|-----|-----|---------------|
 | CSS | 60 | 5MB | 2% | 0% | 100% |
 | WebGL | 60 | 25MB | 8% | 20% | 95% |
-| WebGPU | 60 | 30MB | 5% | 15% | 70% |
 
 ## Migration Timeline
 
@@ -555,12 +548,7 @@ window.shaderHotReload.getRegisteredShaders();
 
 ### Planned Features
 
-1. **WebGPU Compute Shaders**
-   - Advanced particle systems
-   - Real-time fluid simulation
-   - Ray-traced lighting effects
-
-2. **Advanced Music Analysis**
+1. **Advanced Music Analysis**
    - Frequency domain visualization
    - Harmonic content detection
    - Beat prediction algorithms

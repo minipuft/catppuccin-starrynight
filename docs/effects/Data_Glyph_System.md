@@ -126,7 +126,7 @@ GlobalEventBus.subscribe("visual/pulse", () => {
 | 3     | Encode semantic icons (🎧, 🎶) depending on content type.  |
 | 4     | Feed `UserGenreHistory` into glyph colour palette.         |
 | 4     | Expose ARIA-labelled glyph for screen-reader hints.        |
-| 5     | GPU Canvas glyph mode using WebGPU for thousands of items. |
+| 5     | GPU Canvas glyph mode using WebGL for thousands of items. |
 
 ---
 

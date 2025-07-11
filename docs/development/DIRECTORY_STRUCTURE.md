@@ -22,7 +22,6 @@ All visual components, organized by type:
 
 #### `visual/backgrounds/` - Background Rendering Systems
 - `WebGLGradientBackgroundSystem.ts` - GPU-accelerated flowing gradients
-- `WebGPUBackgroundSystem.ts` - Next-gen WebGPU background rendering
 - `LightweightParticleSystem.ts` - CPU-optimized particle effects
 - `ParticleFieldSystem.ts` - Advanced particle field rendering
 

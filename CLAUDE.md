@@ -62,7 +62,6 @@ interface IManagedSystem {
 #### Visual Systems (`src-js/systems/visual/`)
 - **`BeatSyncVisualSystem.ts`** - Beat-synchronized animations
 - **`LightweightParticleSystem.ts`** - Optimized particle effects
-- **`WebGPUBackgroundSystem.ts`** - GPU-accelerated backgrounds
 - **`RightSidebarConsciousnessSystem.ts`** - Sidebar-specific visual enhancements
 
 #### Managers (`src-js/managers/`)

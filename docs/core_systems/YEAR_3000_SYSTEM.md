@@ -41,7 +41,7 @@ A global debug handle `window.Y3K` is exposed once initialisation completes, con
 |                                          | `MusicSyncService`                                                                                                                                                                                                                                                      | Audio feature extraction, BPM enhancement                                | `src-js/services/MusicSyncService.ts`       |
 |                                          | `GlassmorphismManager`                                                                                                                                                                                                                                                  | Backdrop-filter tuning based on perf tier                                | `src-js/managers/GlassmorphismManager.ts`   |
 |                                          | `Card3DManager`                                                                                                                                                                                                                                                         | 3-D tilt & glow for playlist cards                                       | `src-js/managers/Card3DManager.ts`          |
-| **Visual Systems (registered with MAC)** | `BeatSyncVisualSystem`, `EmergentChoreographyEngine`, `LightweightParticleSystem`, `DimensionalNexusSystem`, `DataGlyphSystem`, `PredictiveMaterializationSystem`, `SidebarConsciousnessSystem`, `ParticleFieldSystem` (optional), `WebGPUBackgroundSystem` (GPU-gated) | See individual files under `src-js/systems/visual/`                      |
+| **Visual Systems (registered with MAC)** | `BeatSyncVisualSystem`, `EmergentChoreographyEngine`, `LightweightParticleSystem`, `DimensionalNexusSystem`, `DataGlyphSystem`, `PredictiveMaterializationSystem`, `SidebarConsciousnessSystem`, `ParticleFieldSystem` (optional) | See individual files under `src-js/systems/visual/`                      |
 | **Utility Layer**                        | **Year3000Utilities**                                                                                                                                                                                                                                                   | 60+ helpers (color spaces, beat math, lerpSmooth, throttling, etc.)      | `src-js/utils/Year3000Utilities.ts`         |
 
 ---
@@ -87,7 +87,6 @@ await year3000System.initializeWithAvailableAPIs({
 | `sn-harmonic-intensity` (0-1)              | Realtime intensity push to ColorHarmonyEngine                  |
 | `sn-harmonic-evolution` (bool)             | Toggles automatic harmonic cycling                             |
 | `sn-current-harmonic-mode`                 | Forces mode key from `HARMONIC_MODES` map                      |
-| `sn-enable-webgpu` (bool)                  | Hot-loads WebGPUBackgroundSystem (GPU only)                    |
 | Artistic Mode (shared via YEAR3000_CONFIG) | Adjusts performance caps across all visual systems             |
 
 Live changes dispatch `year3000SystemSettingsChanged`, which cascades through every subsystem via `applyUpdatedSettings()`.

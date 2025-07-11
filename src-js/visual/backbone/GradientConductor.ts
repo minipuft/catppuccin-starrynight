@@ -478,7 +478,6 @@ export class GradientConductor implements IManagedSystem {
       "--sn.music.rhythm.phase",
       "--sn.music.breathing.scale",
       "--sn.bg.webgl.ready",
-      "--sn.bg.webgpu.ready",
       "--sn.bg.active-backend",
     ];
 

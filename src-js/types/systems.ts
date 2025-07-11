@@ -47,7 +47,7 @@ export interface IManagedSystem {
 export interface ISettingsResponsiveSystem {
   /**
    * Called by Year3000System each time a user or API mutates a theme setting.
-   * @param key   The storage key that changed (e.g. "sn-enable-webgpu")
+   * @param key   The storage key that changed (e.g. "sn-enable-webgl")
    * @param value The new value (already validated by SettingsManager)
    */
   applyUpdatedSettings?(key: string, value: any): void;
@@ -85,7 +85,6 @@ export interface MusicMetrics {
 export interface BackendCapabilities {
   webgl: boolean;
   webgl2: boolean;
-  webgpu: boolean;
   highPerformance: boolean;
   maxTextureSize: number;
   maxShaderComplexity: 'low' | 'medium' | 'high';
@@ -105,7 +104,7 @@ export interface PerformanceConstraints {
 /**
  * VisualBackplane - Unified interface for all visual rendering systems
  * 
- * This interface standardizes how CSS fallback, WebGL, and WebGPU backgrounds
+ * This interface standardizes how CSS fallback and WebGL backgrounds
  * integrate with the Year 3000 System architecture. Every visual layer implements
  * this contract to ensure seamless orchestration by the GradientConductor.
  * 
@@ -117,7 +116,7 @@ export interface VisualBackplane extends IManagedSystem {
   /**
    * Unique identifier for this visual backend
    */
-  readonly backendId: 'css' | 'webgl' | 'webgpu' | string;
+  readonly backendId: 'css' | 'webgl' | string;
   
   /**
    * Current readiness state of the backend
@@ -198,7 +197,7 @@ export interface VisualBackplane extends IManagedSystem {
   /**
    * Handle context loss and recovery
    * 
-   * WebGL/WebGPU backends should implement proper context recovery.
+   * WebGL backends should implement proper context recovery.
    * CSS backends can use this for DOM cleanup and recreation.
    * 
    * @returns Promise that resolves when context is restored
@@ -230,7 +229,7 @@ export interface VisualBackplane extends IManagedSystem {
 }
 
 /**
- * Extended interface for WebGL/WebGPU backends that support shader customization
+ * Extended interface for WebGL backends that support shader customization
  */
 export interface ShaderBackplane extends VisualBackplane {
   /**

@@ -39,7 +39,6 @@ export interface ThemeSettings {
   "sn-harmonic-intensity": string; // Stored as string, parsed to float
   "sn-harmonic-evolution": string; // Stored as string, parsed to boolean
   "sn-harmonic-manual-base-color": string; // Hex color or empty
-  "sn-enable-webgpu": "true" | "false"; // Enable or disable WebGPU acceleration
   "sn-enable-aberration": "true" | "false"; // Toggle chromatic aberration canvas
   /** Chromatic aberration shader strength (0–1) stored as string */
   "sn-nebula-aberration-strength": string;
@@ -92,7 +91,6 @@ export class SettingsManager implements IManagedSystem {
       "sn-harmonic-intensity": "0.7",
       "sn-harmonic-evolution": "true",
       "sn-harmonic-manual-base-color": "",
-      "sn-enable-webgpu": "true",
       "sn-enable-aberration": "true",
       "sn-nebula-aberration-strength": "0.4",
       "sn-echo-intensity": "2",
@@ -188,10 +186,6 @@ export class SettingsManager implements IManagedSystem {
         allowedValues: ["true", "false"],
       },
       "sn-harmonic-manual-base-color": { default: "" },
-      "sn-enable-webgpu": {
-        default: "true",
-        allowedValues: ["true", "false"],
-      },
       "sn-enable-aberration": {
         default: "true",
         allowedValues: ["true", "false"],

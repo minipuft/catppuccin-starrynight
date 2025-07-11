@@ -311,23 +311,6 @@ export async function initializeStarryNightSettings(): Promise<void> {
     }
   );
 
-  // WebGPU toggle
-  const enableGpu = settingsManager.get("sn-enable-webgpu") === "true";
-  (section as any).addToggle(
-    "sn-enable-webgpu",
-    "Enable WebGPU acceleration (experimental)",
-    enableGpu,
-    {
-      onClick: (e: any) => {
-        const checked = (e.currentTarget as HTMLInputElement).checked;
-        settingsManager.set(
-          "sn-enable-webgpu",
-          (checked ? "true" : "false") as any
-        );
-        console.info("[StarryNight] WebGPU setting changed – reload required");
-      },
-    }
-  );
 
   // Aberration toggle
   const enableAb = settingsManager.get("sn-enable-aberration") === "true";

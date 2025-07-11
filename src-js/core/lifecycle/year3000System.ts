@@ -28,7 +28,6 @@ import { startNowPlayingWatcher } from "@/utils/dom/NowPlayingDomWatcher";
 import { LightweightParticleSystem } from "@/visual/backgrounds/LightweightParticleSystem";
 import { ParticleFieldSystem } from "@/visual/backgrounds/ParticleFieldSystem";
 import { WebGLGradientBackgroundSystem } from "@/visual/backgrounds/WebGLGradientBackgroundSystem";
-import { WebGPUBackgroundSystem } from "@/visual/backgrounds/WebGPUBackgroundSystem";
 import { applyStarryNightSettings } from "@/visual/base/starryNightEffects";
 import { BeatSyncVisualSystem } from "@/visual/beat-sync/BeatSyncVisualSystem";
 import { BehavioralPredictionEngine } from "@/visual/ui-effects/BehavioralPredictionEngine";
@@ -66,7 +65,6 @@ interface VisualSystemConfig {
     | "predictiveMaterializationSystem"
     | "sidebarConsciousnessSystem"
     | "webGLGradientBackgroundSystem"
-    | "webGPUBackgroundSystem"
     | "particleFieldSystem"
     | "emergentChoreographyEngine"
     | "spotifyUIApplicationSystem";
@@ -105,7 +103,6 @@ export class Year3000System {
   public predictiveMaterializationSystem: PredictiveMaterializationSystem | null;
   public sidebarConsciousnessSystem: SidebarConsciousnessSystem | null;
   public webGLGradientBackgroundSystem: WebGLGradientBackgroundSystem | null;
-  public webGPUBackgroundSystem: WebGPUBackgroundSystem | null;
   public particleFieldSystem: ParticleFieldSystem | null;
   public emergentChoreographyEngine: EmergentChoreographyEngine | null;
   public spotifyUIApplicationSystem: SpotifyUIApplicationSystem | null;
@@ -175,7 +172,6 @@ export class Year3000System {
     this.predictiveMaterializationSystem = null;
     this.sidebarConsciousnessSystem = null;
     this.webGLGradientBackgroundSystem = null;
-    this.webGPUBackgroundSystem = null;
     this.particleFieldSystem = null;
     this.emergentChoreographyEngine = null;
     this.spotifyUIApplicationSystem = null;
@@ -564,7 +560,6 @@ export class Year3000System {
         "BehavioralPredictionEngine",
         "PredictiveMaterializationSystem",
         "SidebarConsciousnessSystem",
-        "WebGPUBackgroundSystem",
         "EmergentChoreographyEngine",
       ];
       visualSystems.forEach((s) => results.skipped.push(s));
@@ -616,11 +611,6 @@ export class Year3000System {
         name: "WebGLGradientBackgroundSystem",
         Class: WebGLGradientBackgroundSystem,
         property: "webGLGradientBackgroundSystem",
-      },
-      {
-        name: "WebGPUBackgroundSystem",
-        Class: WebGPUBackgroundSystem,
-        property: "webGPUBackgroundSystem",
       },
       {
         name: "ParticleFieldSystem",
@@ -711,7 +701,6 @@ export class Year3000System {
       this.deviceCapabilityDetector,
       this.cssVariableBatcher,
       this.webGLGradientBackgroundSystem,
-      this.webGPUBackgroundSystem,
       this.particleFieldSystem,
       this.emergentChoreographyEngine,
       this.spotifyUIApplicationSystem,
@@ -1759,7 +1748,7 @@ export class Year3000System {
     // ────────────────────────────────────────────────────────────────
     this._broadcastSettingChange(key, value);
 
-    // Some settings may require conditional system refresh (e.g., webgpu, 3d-effects)
+    // Some settings may require conditional system refresh (e.g., webgl, 3d-effects)
     this._refreshConditionalSystems();
   }
 
@@ -1780,7 +1769,6 @@ export class Year3000System {
       this.predictiveMaterializationSystem,
       this.sidebarConsciousnessSystem,
       this.particleFieldSystem,
-      this.webGPUBackgroundSystem,
     ];
 
     systems.forEach((sys) => {
@@ -1814,7 +1802,7 @@ export class Year3000System {
   }
 
   /**
-   * Refresh conditional visual systems (WebGPU, ParticleField, etc.) depending
+   * Refresh conditional visual systems (WebGL, ParticleField, etc.) depending
    * on capability and artistic mode settings.
    */
   private _refreshConditionalSystems(): void {

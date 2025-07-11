@@ -4,10 +4,10 @@
 **Implementation Date:** June 2025  
 **Status:** 🟢 Active (Renamed from NebulaController)
 
-> **Experimental Notice – WebGPU**
+> **System Notice – WebGL**
 >
-> The WebGPU portions of StarryNight (e.g. `WebGPUBackgroundSystem`) are **experimental** and **off by default**.
-> Most users will see the **CSS / WebGL fallback** path described below. Enable the `sn-enable-webgpu` setting _only for testing_ on browsers that expose `navigator.gpu`.
+> The StarryNight theme uses **WebGL** for GPU-accelerated background rendering with automatic **CSS fallbacks**.
+> Most users will see the **CSS / WebGL** path described below, with automatic selection based on browser capabilities.
 
 ## Overview
 
@@ -19,10 +19,10 @@ It is composed of two cooperating runtimes:
 
 1. **AudioVisualController** (`src-js/visual/ui-effects/AudioVisualController.ts`)
    - Lightweight (< 2 ms median) JavaScript that converts beat/genre/scroll events into CSS custom-property updates.
-2. **WebGPUBackgroundSystem** (`src-js/visual/backgrounds/WebGPUBackgroundSystem.ts`)
-   - A progressively-enhanced, optional renderer that paints a procedural RGB-noise nebula via WebGPU when the browser supports it **and** the user has enabled the _Cosmic Maximum_ mode.
+2. **WebGL Background System** (`src-js/visual/backgrounds/WebGLGradientBackgroundSystem.ts`)
+   - A GPU-accelerated renderer that paints flowing gradients via WebGL when the browser supports it.
 
-When WebGPU is not available—or the user prefers reduced motion—the SCSS fallback defined in `src/core/_sn_nebula_variables.scss` + `src/layout/_sn_scroll_node_backgrounds.scss` provides a purely-CSS multi-gradient alternative that still receives live updates from `AudioVisualController`.
+When WebGL is not available—or the user prefers reduced motion—the SCSS fallback defined in `src/core/_sn_nebula_variables.scss` + `src/layout/_sn_scroll_node_backgrounds.scss` provides a purely-CSS multi-gradient alternative that still receives live updates from `AudioVisualController`.
 
 ---
 
@@ -41,7 +41,7 @@ When WebGPU is not available—or the user prefers reduced motion—the SCSS fal
 | Variable                          | Range                    | Source event           | Purpose                                                    |
 | --------------------------------- | ------------------------ | ---------------------- | ---------------------------------------------------------- |
 | `--sn-nebula-beat-intensity`      | 0.8 – 1.4                | `music:beat.energy`    | Global multiplier applied to the 4 background layers.      |
-| `--sn-nebula-aberration-strength` | 0 – 0.6                  | `music:beat.energy`    | Drives chromatic-aberration effect in CSS & WebGPU.        |
+| `--sn-nebula-aberration-strength` | 0 – 0.6                  | `music:beat.energy`    | Drives chromatic-aberration effect in CSS & WebGL.        |
 | `--sn-nebula-layer-3-blur`        | `calc(...)`              | `user:scroll.velocity` | Adds extra blur on fast scrolls to suggest depth parallax. |
 | `--sn-nebula-noise-scale-y`       | 140 % – 200 %            | `user:scroll.velocity` | Vertically stretches the noise overlay when scrolling.     |
 | `--sn-nebula-layer-0-opacity`     | 0 – 0.18                 | `music:genre-change`   | Brief discovery glow when a brand-new genre is detected.   |
@@ -52,12 +52,12 @@ All other colour tokens are **aliases** to `--sn-gradient-*` and therefore inher
 
 ---
 
-## 2 ▪ WebGPUBackgroundSystem
+## 2 ▪ WebGL Background System
 
 | Aspect                 | Details                                                                                                                                                                                                                                                                                                                          |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **File**               | `src-js/visual/backgrounds/WebGPUBackgroundSystem.ts`                                                                                                                                                                                                                                                                           |
-| **Activation rules**   | • User setting `sn-enable-webgpu` == `"true"`.<br>• Artistic Mode == `cosmic-maximum`.<br>• `navigator.gpu` present.<br>Otherwise the system stays dormant (`initialized === false`).                                                                                                                                            |
+| **File**               | `src-js/visual/backgrounds/WebGLGradientBackgroundSystem.ts`                                                                                                                                                                                                                                                           |
+| **Activation rules**   | • WebGL context available.<br>• Performance mode allows GPU acceleration.<br>• User hasn't disabled visual effects.<br>Otherwise the system falls back to CSS (`initialized === false`).                                                                                                                                            |
 | **Rendering approach** | Full-screen `<canvas>` fixed behind the DOM. Renders a single full-screen triangle with a minimalist WGSL fragment shader that outputs RGB noise tinted via 3 colour uniforms (`primary`, `secondary`, `accent`).                                                                                                                |
 | **Uniform layout**     | `vec4f[4]` (64 bytes):<br>0–3 Primary (RGB + 1)<br>4–7 Secondary<br>8–11 Accent<br>12 time · energy · valence · drift-angle                                                                                                                                                                                                      |
 | **Dynamic updates**    | • Colours refreshed every 30 frames by sampling computed CSS `<custom-properties>`.<br>• A drift vector (pseudo-random + music beat vector) is recalculated every 2 s and exposed to CSS as `--sn-nebula-drift-x/y` so the fallback shaders can stay in sync.<br>• Uniform buffer is updated each frame via `queue.writeBuffer`. |
@@ -84,7 +84,7 @@ All SCSS honours **prefers-reduced-motion** by disabling animation when requeste
 
 ## 4 ▪ Integration Points
 
-- `theme.entry.ts` → calls `initializeAudioVisualController(year3000System)` and registers `WebGPUBackgroundSystem` with _Year3000System_'s ManagedSystem scheduler.
+- `theme.entry.ts` → calls `initializeAudioVisualController(year3000System)` and registers WebGL background system with _Year3000System_'s ManagedSystem scheduler.
 - `MusicSyncService` supplies `music:beat` + `getCurrentBeatVector()` used by both components.
 - `SettingsManager` exposes `nebula-intensity` & `sn-enable-webgpu` toggles.
 - Dynamic colour updates flow from **Color Harmony Engine → CSS variables → Nebula shader**.
@@ -155,7 +155,7 @@ initializeAudioVisualController(year3000System);
 ## 8 ▪ Implementation Checklist
 
 - [x] `AudioVisualController` initialised exactly once (hot-reload safe).
-- [x] WebGPU canvas only created when `navigator.gpu` present.
+- [x] WebGL canvas only created when WebGL context available.
 - [x] All new CSS variables are **RGB-based** (no hex in gradients).
 - [x] Performance guard falls back to `screen` blend-mode at > 2 ms median.
 - [x] honours `prefers-reduced-motion` & low-capability devices.

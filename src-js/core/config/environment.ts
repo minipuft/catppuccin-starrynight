@@ -11,4 +11,3 @@ export const ENVIRONMENT_RULES = {
 
 // Future flags:
 // export const CAN_USE_SHARED_ARRAY_BUFFER = false;
-// export const CAN_USE_WEBGPU = typeof navigator !== "undefined" && (navigator as any).gpu;

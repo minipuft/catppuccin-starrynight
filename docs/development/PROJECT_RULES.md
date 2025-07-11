@@ -54,7 +54,6 @@ The theme is built around the **"Emergent Systems Choreographer"** approach - a 
 #### Visual Systems
 - **BeatSyncVisualSystem**: Beat-synchronized animations
 - **LightweightParticleSystem**: Optimized particle effects
-- **WebGPUBackgroundSystem**: GPU-accelerated backgrounds
 - **RightSidebarConsciousnessSystem**: Sidebar-specific enhancements
 
 #### Managers

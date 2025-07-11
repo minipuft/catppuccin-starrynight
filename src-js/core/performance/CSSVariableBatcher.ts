@@ -76,7 +76,6 @@ const CRITICAL_NOW_PLAYING_VARS = new Set<string>([
   "--sn.color.accent.hex",
   "--sn.color.accent.rgb",
   "--sn.bg.webgl.ready",
-  "--sn.bg.webgpu.ready",
   "--sn.bg.active-backend",
 ]);
 
@@ -707,7 +706,6 @@ export class CSSVariableBatcher {
    */
   public setPerformanceTokens(perf: {
     webglReady?: boolean;
-    webgpuReady?: boolean;
     activeBackend?: string;
     qualityLevel?: string;
     reducedMotion?: boolean;
@@ -715,10 +713,6 @@ export class CSSVariableBatcher {
   }): void {
     if (perf.webglReady !== undefined) {
       this.setProperty("--sn.bg.webgl.ready", perf.webglReady ? "1" : "0");
-    }
-
-    if (perf.webgpuReady !== undefined) {
-      this.setProperty("--sn.bg.webgpu.ready", perf.webgpuReady ? "1" : "0");
     }
 
     if (perf.activeBackend) {

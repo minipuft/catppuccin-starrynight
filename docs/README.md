@@ -2,9 +2,8 @@
 
 > **Purpose:** give both **humans** and **AI models** a concise map of the theme's architecture, files, and core ideas. Feed this file first — it links to every deeper doc.
 
-> **ℹ️ WebGL/WebGPU status**: The **WebGL Flow Gradient System** (v1.2.0) is **✅ production-ready** and enabled by default.
-> WebGPU-powered systems (e.g. `WebGPUBackgroundSystem`) remain **experimental** and **disabled by default**.
-> The theme uses **WebGL 2.0** with automatic CSS fallbacks. Enable the `sn-enable-webgpu` setting only for testing.
+> **ℹ️ WebGL status**: The **WebGL Flow Gradient System** (v1.2.0) is **✅ production-ready** and enabled by default.
+> The theme uses **WebGL 2.0** with automatic CSS fallbacks for optimal performance and compatibility.
 
 ---
 
@@ -91,7 +90,7 @@ Key pillars:
 
 - `COLOR_HARMONY_ENGINE.md` — RGB pipeline & dynamic extraction.
 - `LERP_SMOOTHING_INTEGRATION.md` — colour easing mathematics.
-- `NEBULA_VISUAL_SYSTEM.md` — atmospheric glow stack (CSS + WebGPU).
+- `NEBULA_VISUAL_SYSTEM.md` — atmospheric glow stack (CSS + WebGL).
 
 </details>
 
