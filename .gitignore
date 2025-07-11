@@ -3,7 +3,7 @@
 *-compiled.css
 user-compiled.css
 test-output.css
-.gitignore
+*.gitignore
 # Node modules and dependencies
 node_modules/
 *.log
@@ -49,7 +49,9 @@ docs/IMPLEMENTAION_NOTES.md
 year3000.txt
 
 #Ignore cursor AI rules
-.cursor\rules\codacy.mdc
+.cursor/rules/codacy.mdc
+**/logs/
+**/tsconfig.tsbuildinfo
 /.worktrees/
 logs/
 tsconfig.tsbuildinfo
