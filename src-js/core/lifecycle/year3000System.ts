@@ -37,6 +37,7 @@ import { InteractionTrackingSystem } from "@/visual/ui-effects/InteractionTracki
 import { PredictiveMaterializationSystem } from "@/visual/ui-effects/PredictiveMaterializationSystem";
 import { SidebarConsciousnessSystem } from "@/visual/ui-effects/SidebarConsciousnessSystem";
 import { getSidebarPerformanceCoordinator } from "@/visual/ui-effects/SidebarPerformanceCoordinator";
+import { SpotifyUIApplicationSystem } from "@/visual/ui-effects/SpotifyUIApplicationSystem";
 
 // Type for initialization results
 interface InitializationResults {
@@ -67,7 +68,8 @@ interface VisualSystemConfig {
     | "webGLGradientBackgroundSystem"
     | "webGPUBackgroundSystem"
     | "particleFieldSystem"
-    | "emergentChoreographyEngine";
+    | "emergentChoreographyEngine"
+    | "spotifyUIApplicationSystem";
 }
 
 export class Year3000System {
@@ -106,6 +108,7 @@ export class Year3000System {
   public webGPUBackgroundSystem: WebGPUBackgroundSystem | null;
   public particleFieldSystem: ParticleFieldSystem | null;
   public emergentChoreographyEngine: EmergentChoreographyEngine | null;
+  public spotifyUIApplicationSystem: SpotifyUIApplicationSystem | null;
 
   // API availability tracking
   public availableAPIs: AvailableAPIs | null = null;
@@ -175,6 +178,7 @@ export class Year3000System {
     this.webGPUBackgroundSystem = null;
     this.particleFieldSystem = null;
     this.emergentChoreographyEngine = null;
+    this.spotifyUIApplicationSystem = null;
 
     this.initializationResults = null;
 
@@ -623,6 +627,11 @@ export class Year3000System {
         Class: ParticleFieldSystem,
         property: "particleFieldSystem",
       },
+      {
+        name: "SpotifyUIApplicationSystem",
+        Class: SpotifyUIApplicationSystem,
+        property: "spotifyUIApplicationSystem",
+      },
     ];
 
     for (const config of visualSystemConfigs) {
@@ -705,6 +714,7 @@ export class Year3000System {
       this.webGPUBackgroundSystem,
       this.particleFieldSystem,
       this.emergentChoreographyEngine,
+      this.spotifyUIApplicationSystem,
     ];
 
     for (const system of allSystems) {
@@ -1288,6 +1298,11 @@ export class Year3000System {
         name: "DataGlyphSystem",
         system: this.dataGlyphSystem,
         priority: "background",
+      },
+      {
+        name: "SpotifyUIApplicationSystem",
+        system: this.spotifyUIApplicationSystem,
+        priority: "normal",
       },
     ];
 

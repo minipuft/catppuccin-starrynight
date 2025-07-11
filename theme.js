@@ -14187,6 +14187,485 @@ void main() {
     }
   });
 
+  // src-js/visual/ui-effects/SpotifyUIApplicationSystem.ts
+  var SpotifyUIApplicationSystem;
+  var init_SpotifyUIApplicationSystem = __esm({
+    "src-js/visual/ui-effects/SpotifyUIApplicationSystem.ts"() {
+      "use strict";
+      SpotifyUIApplicationSystem = class {
+        constructor(year3000System2) {
+          this.year3000System = year3000System2;
+          this.systemName = "SpotifyUIApplicationSystem";
+          this.initialized = false;
+          this.effectLayers = [];
+          this.observerRegistry = /* @__PURE__ */ new Map();
+          this.debounceRefresh = this.debounce(() => {
+            this.refreshUITargets();
+          }, 500);
+          this.targets = this.initializeEmptyTargets();
+        }
+        /**
+         * Required by IManagedSystem - periodic animation updates
+         */
+        updateAnimation(deltaTime) {
+        }
+        /**
+         * Required by IManagedSystem - health check
+         */
+        async healthCheck() {
+          try {
+            const targetStats = this.getTargetStats();
+            const totalElements = Object.values(targetStats).reduce(
+              (sum, count) => sum + count,
+              0
+            );
+            const result = {
+              ok: this.initialized && totalElements > 0,
+              details: `UI Application System ${this.initialized ? "active" : "inactive"}, ${totalElements} elements enhanced`
+            };
+            if (totalElements === 0) {
+              result.issues = ["No UI elements discovered"];
+            }
+            return result;
+          } catch (error) {
+            return {
+              ok: false,
+              details: "Health check failed",
+              issues: [error instanceof Error ? error.message : "Unknown error"]
+            };
+          }
+        }
+        /**
+         * Force repaint - implements optional IManagedSystem method
+         * Cascade Coordination - Ensures proper layering of effects
+         */
+        forceRepaint(reason) {
+          console.log(`\u{1F3A8} Force repaint requested: ${reason || "manual trigger"}`);
+          this.forceEffectCascade();
+        }
+        initializeEmptyTargets() {
+          return {
+            nowPlaying: [],
+            sidebar: [],
+            mainContent: [],
+            buttons: [],
+            cards: [],
+            headers: [],
+            textElements: [],
+            iconElements: [],
+            playbackControls: [],
+            trackRows: []
+          };
+        }
+        async initialize() {
+          if (this.initialized) return;
+          try {
+            await this.discoverUITargets();
+            this.setupEffectLayers();
+            this.applyUnifiedState();
+            this.setupDOMObservers();
+            this.registerSystemCallbacks();
+            this.initialized = true;
+            console.log("\u2728 SpotifyUIApplicationSystem initialized successfully");
+          } catch (error) {
+            console.error("Failed to initialize SpotifyUIApplicationSystem", error);
+            throw error;
+          }
+        }
+        /**
+         * DOM Intelligence Layer - Discovers current Spotify UI elements
+         */
+        async discoverUITargets() {
+          const selectors = {
+            nowPlaying: [
+              '[data-testid="now-playing-widget"]',
+              ".main-nowPlayingWidget-nowPlaying",
+              ".Root__now-playing-bar"
+            ],
+            sidebar: [
+              '[data-testid="nav-bar"]',
+              ".main-navBar-navBar",
+              ".Root__nav-bar"
+            ],
+            mainContent: [
+              '[data-testid="main"]',
+              ".main-view-container",
+              ".Root__main-view"
+            ],
+            buttons: [
+              'button[class*="Button"]',
+              '[role="button"]',
+              ".main-playButton-PlayButton"
+            ],
+            cards: [
+              '[data-testid*="card"]',
+              ".main-card-card",
+              ".main-entityCard-container"
+            ],
+            headers: [
+              "h1, h2, h3, h4, h5, h6",
+              '[data-testid*="header"]',
+              ".main-entityHeader-titleText"
+            ],
+            textElements: [
+              '[data-testid="track-name"]',
+              '[data-testid="artist-name"]',
+              ".main-trackList-trackName",
+              ".main-trackList-artistName"
+            ],
+            iconElements: [
+              'svg[class*="Icon"]',
+              '[data-testid*="icon"]',
+              ".Svg-sc-ytk21e-0"
+            ],
+            playbackControls: [
+              '[data-testid="control-button"]',
+              ".main-playPauseButton-button",
+              ".player-controls__buttons"
+            ],
+            trackRows: [
+              '[data-testid="tracklist-row"]',
+              ".main-trackList-trackListRow",
+              ".main-rootlist-rootlistItem"
+            ]
+          };
+          for (const [category, selectorArray] of Object.entries(selectors)) {
+            const elements = [];
+            for (const selector of selectorArray) {
+              try {
+                const found = document.querySelectorAll(selector);
+                elements.push(...Array.from(found));
+              } catch (error) {
+                continue;
+              }
+            }
+            const uniqueElements = Array.from(new Set(elements));
+            this.targets[category] = uniqueElements;
+          }
+          console.log("\u{1F3AF} UI targets discovered", {
+            nowPlaying: this.targets.nowPlaying.length,
+            sidebar: this.targets.sidebar.length,
+            mainContent: this.targets.mainContent.length,
+            buttons: this.targets.buttons.length,
+            cards: this.targets.cards.length,
+            headers: this.targets.headers.length,
+            textElements: this.targets.textElements.length,
+            iconElements: this.targets.iconElements.length,
+            playbackControls: this.targets.playbackControls.length,
+            trackRows: this.targets.trackRows.length
+          });
+        }
+        /**
+         * Effect Application Pipeline - Sets up cascade layers from background to foreground
+         */
+        setupEffectLayers() {
+          this.effectLayers = [
+            // Layer 1: Background & Container Effects
+            {
+              name: "background-containers",
+              elements: [...this.targets.mainContent, ...this.targets.sidebar],
+              priority: 10,
+              cssVariables: {
+                "--sn-bg-primary": "var(--sn-accent-primary)",
+                "--sn-bg-secondary": "var(--sn-accent-secondary)",
+                "--sn-gradient-start": "var(--sn-gradient-primary-rgb)",
+                "--sn-gradient-end": "var(--sn-gradient-secondary-rgb)"
+              }
+            },
+            // Layer 2: Card & Content Effects
+            {
+              name: "ui-cards",
+              elements: this.targets.cards,
+              priority: 20,
+              cssVariables: {
+                "--sn-card-bg": "var(--sn-accent-primary)",
+                "--sn-card-border": "var(--sn-accent-secondary)",
+                "--sn-card-glow": "var(--sn-accent-tertiary)",
+                "--sn-glassmorphism-intensity": "var(--sn-effect-intensity)"
+              },
+              interactionEffects: true
+            },
+            // Layer 3: Interactive Elements
+            {
+              name: "interactive-elements",
+              elements: [...this.targets.buttons, ...this.targets.playbackControls],
+              priority: 30,
+              cssVariables: {
+                "--sn-button-bg": "var(--sn-accent-primary)",
+                "--sn-button-hover": "var(--sn-accent-secondary)",
+                "--sn-button-active": "var(--sn-accent-tertiary)",
+                "--sn-beat-sync-intensity": "var(--sn-music-intensity)"
+              },
+              interactionEffects: true
+            },
+            // Layer 4: Text & Icon Enhancement
+            {
+              name: "text-icon-effects",
+              elements: [
+                ...this.targets.textElements,
+                ...this.targets.iconElements,
+                ...this.targets.headers
+              ],
+              priority: 40,
+              cssVariables: {
+                "--sn-text-primary": "var(--sn-accent-primary)",
+                "--sn-text-secondary": "var(--sn-accent-secondary)",
+                "--sn-text-glow": "var(--sn-accent-tertiary)",
+                "--sn-icon-color": "var(--sn-accent-primary)",
+                "--sn-icon-glow": "var(--sn-accent-secondary)"
+              }
+            },
+            // Layer 5: Now Playing Special Effects
+            {
+              name: "now-playing-effects",
+              elements: this.targets.nowPlaying,
+              priority: 50,
+              cssVariables: {
+                "--sn-now-playing-bg": "var(--sn-accent-primary)",
+                "--sn-now-playing-glow": "var(--sn-accent-secondary)",
+                "--sn-beat-pulse": "var(--sn-music-intensity)",
+                "--sn-track-progress": "var(--sn-accent-tertiary)"
+              },
+              interactionEffects: true
+            }
+          ];
+        }
+        /**
+         * Applies unified state from existing systems to discovered UI elements
+         */
+        applyUnifiedState() {
+          this.effectLayers.forEach((layer) => {
+            layer.elements.forEach((element) => {
+              this.applyEffectToElement(element, layer);
+            });
+          });
+        }
+        applyEffectToElement(element, layer) {
+          if (!(element instanceof HTMLElement)) return;
+          Object.entries(layer.cssVariables).forEach(([property, value]) => {
+            this.year3000System.queueCSSVariableUpdate(property, value, element);
+          });
+          element.classList.add(`sn-${layer.name}`);
+          element.classList.add("sn-ui-enhanced");
+          if (layer.interactionEffects) {
+            this.addInteractionEffects(element, layer);
+          }
+          element.setAttribute("data-sn-layer", layer.name);
+          element.setAttribute("data-sn-priority", layer.priority.toString());
+        }
+        addInteractionEffects(element, layer) {
+          if (layer.name === "interactive-elements" || layer.name === "now-playing-effects") {
+            this.year3000System.queueCSSVariableUpdate(
+              "--sn-beat-response",
+              "var(--sn-music-intensity)",
+              element
+            );
+            element.classList.add("sn-beat-responsive");
+          }
+          element.addEventListener("mouseenter", () => {
+            this.year3000System.queueCSSVariableUpdate(
+              "--sn-hover-intensity",
+              "1",
+              element
+            );
+            element.classList.add("sn-hover-active");
+          });
+          element.addEventListener("mouseleave", () => {
+            this.year3000System.queueCSSVariableUpdate(
+              "--sn-hover-intensity",
+              "0",
+              element
+            );
+            element.classList.remove("sn-hover-active");
+          });
+          element.addEventListener("click", () => {
+            this.year3000System.queueCSSVariableUpdate(
+              "--sn-click-intensity",
+              "1",
+              element
+            );
+            element.classList.add("sn-click-active");
+            setTimeout(() => {
+              this.year3000System.queueCSSVariableUpdate(
+                "--sn-click-intensity",
+                "0",
+                element
+              );
+              element.classList.remove("sn-click-active");
+            }, 300);
+          });
+        }
+        /**
+         * Sets up DOM mutation observers for dynamic Spotify UI updates
+         */
+        setupDOMObservers() {
+          const observerConfig = {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ["class", "data-testid"]
+          };
+          const mainObserver = new MutationObserver((mutations) => {
+            let needsRefresh = false;
+            mutations.forEach((mutation) => {
+              if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+                needsRefresh = true;
+              }
+            });
+            if (needsRefresh) {
+              this.debounceRefresh();
+            }
+          });
+          const mainElement = document.querySelector('[data-testid="main"]') || document.body;
+          mainObserver.observe(mainElement, observerConfig);
+          this.observerRegistry.set("main", mainObserver);
+        }
+        debounce(func, wait) {
+          let timeout;
+          return function executedFunction(...args) {
+            const later = () => {
+              clearTimeout(timeout);
+              func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+          };
+        }
+        async refreshUITargets() {
+          try {
+            await this.discoverUITargets();
+            this.applyUnifiedState();
+            console.log("\u{1F504} UI targets refreshed");
+          } catch (error) {
+            console.error("Failed to refresh UI targets", error);
+          }
+        }
+        /**
+         * Registers for updates from unified systems - connects to existing Year3000System events
+         */
+        registerSystemCallbacks() {
+          if (this.year3000System.colorHarmonyEngine) {
+            const originalApplyColors = this.year3000System.applyColorsToTheme.bind(
+              this.year3000System
+            );
+            this.year3000System.applyColorsToTheme = (extractedColors = {}) => {
+              originalApplyColors(extractedColors);
+              this.updateColorVariables(extractedColors);
+            };
+          }
+          if (this.year3000System.musicSyncService) {
+            const originalUpdateFromAnalysis = this.year3000System.updateFromMusicAnalysis.bind(this.year3000System);
+            this.year3000System.updateFromMusicAnalysis = (processedData, rawFeatures, trackUri) => {
+              originalUpdateFromAnalysis(processedData, rawFeatures, trackUri);
+              this.updateMusicIntensity(processedData);
+            };
+          }
+          if (this.year3000System.beatSyncVisualSystem) {
+            setInterval(() => {
+              const intensity = this.getCurrentMusicIntensity();
+              if (intensity > 0.5) {
+                this.triggerBeatEffects({ intensity });
+              }
+            }, 200);
+          }
+        }
+        getCurrentMusicIntensity() {
+          const root = document.documentElement;
+          const intensity = getComputedStyle(root).getPropertyValue("--sn-kinetic-energy").trim();
+          return parseFloat(intensity) || 0;
+        }
+        updateColorVariables(colorData) {
+          const enhancedElements = document.querySelectorAll(".sn-ui-enhanced");
+          enhancedElements.forEach((element) => {
+            if (element instanceof HTMLElement) {
+              this.year3000System.queueCSSVariableUpdate(
+                "--sn-accent-primary",
+                colorData.primary || "var(--spice-accent)",
+                element
+              );
+              this.year3000System.queueCSSVariableUpdate(
+                "--sn-accent-secondary",
+                colorData.secondary || "var(--spice-accent)",
+                element
+              );
+              this.year3000System.queueCSSVariableUpdate(
+                "--sn-accent-tertiary",
+                colorData.tertiary || "var(--spice-accent)",
+                element
+              );
+            }
+          });
+        }
+        updateMusicIntensity(processedData) {
+          const intensity = processedData?.processedEnergy || 0;
+          const intensityElements = document.querySelectorAll(".sn-beat-responsive");
+          intensityElements.forEach((element) => {
+            if (element instanceof HTMLElement) {
+              this.year3000System.queueCSSVariableUpdate(
+                "--sn-music-intensity",
+                intensity.toString(),
+                element
+              );
+            }
+          });
+        }
+        triggerBeatEffects(beatData) {
+          const beatElements = document.querySelectorAll(".sn-beat-responsive");
+          beatElements.forEach((element) => {
+            if (element instanceof HTMLElement) {
+              this.year3000System.queueCSSVariableUpdate(
+                "--sn-beat-pulse",
+                "1",
+                element
+              );
+              element.classList.add("sn-beat-active");
+              setTimeout(() => {
+                this.year3000System.queueCSSVariableUpdate(
+                  "--sn-beat-pulse",
+                  "0",
+                  element
+                );
+                element.classList.remove("sn-beat-active");
+              }, 200);
+            }
+          });
+        }
+        /**
+         * Cascade Coordination - Ensures proper layering of effects
+         */
+        forceEffectCascade() {
+          this.effectLayers.sort((a, b) => a.priority - b.priority).forEach((layer) => {
+            layer.elements.forEach((element) => {
+              this.applyEffectToElement(element, layer);
+            });
+          });
+        }
+        async destroy() {
+          this.observerRegistry.forEach((observer) => {
+            observer.disconnect();
+          });
+          this.observerRegistry.clear();
+          const enhancedElements = document.querySelectorAll(".sn-ui-enhanced");
+          enhancedElements.forEach((element) => {
+            element.classList.remove("sn-ui-enhanced");
+            element.removeAttribute("data-sn-layer");
+            element.removeAttribute("data-sn-priority");
+          });
+          this.initialized = false;
+        }
+        // Debug utility
+        getTargetStats() {
+          return Object.fromEntries(
+            Object.entries(this.targets).map(([key, elements]) => [
+              key,
+              elements.length
+            ])
+          );
+        }
+      };
+    }
+  });
+
   // src-js/core/lifecycle/year3000System.ts
   var Year3000System, year3000System, year3000System_default;
   var init_year3000System = __esm({
@@ -14221,6 +14700,7 @@ void main() {
       init_PredictiveMaterializationSystem();
       init_SidebarConsciousnessSystem();
       init_SidebarPerformanceCoordinator();
+      init_SpotifyUIApplicationSystem();
       Year3000System = class {
         constructor(config = YEAR3000_CONFIG, harmonicModes = HARMONIC_MODES) {
           // API availability tracking
@@ -14271,6 +14751,7 @@ void main() {
           this.webGPUBackgroundSystem = null;
           this.particleFieldSystem = null;
           this.emergentChoreographyEngine = null;
+          this.spotifyUIApplicationSystem = null;
           this.initializationResults = null;
           this.visualFrameCoordinator = null;
           if (this.YEAR3000_CONFIG?.enableDebug) {
@@ -14649,6 +15130,11 @@ void main() {
               name: "ParticleFieldSystem",
               Class: ParticleFieldSystem,
               property: "particleFieldSystem"
+            },
+            {
+              name: "SpotifyUIApplicationSystem",
+              Class: SpotifyUIApplicationSystem,
+              property: "spotifyUIApplicationSystem"
             }
           ];
           for (const config of visualSystemConfigs) {
@@ -14724,7 +15210,8 @@ void main() {
             this.webGLGradientBackgroundSystem,
             this.webGPUBackgroundSystem,
             this.particleFieldSystem,
-            this.emergentChoreographyEngine
+            this.emergentChoreographyEngine,
+            this.spotifyUIApplicationSystem
           ];
           for (const system of allSystems) {
             if (system && typeof system.destroy === "function") {
@@ -15171,6 +15658,11 @@ void main() {
               name: "DataGlyphSystem",
               system: this.dataGlyphSystem,
               priority: "background"
+            },
+            {
+              name: "SpotifyUIApplicationSystem",
+              system: this.spotifyUIApplicationSystem,
+              priority: "normal"
             }
           ];
           for (const { name, system, priority } of visualSystems) {
