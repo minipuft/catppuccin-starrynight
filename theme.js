@@ -9669,6 +9669,30 @@ void main() {
           const gl = canvas.getContext("webgl2");
           return gl !== null;
         }
+        findSpotifyContainer() {
+          const containers = [
+            ".Root__main-view",
+            ".main-view-container",
+            ".main-gridContainer-gridContainer",
+            ".Root__top-container",
+            "body"
+          ];
+          for (const selector of containers) {
+            const element = document.querySelector(selector);
+            if (element) {
+              Y3K?.debug?.log(
+                "WebGLGradientBackgroundSystem",
+                `Found container: ${selector}`
+              );
+              return element;
+            }
+          }
+          Y3K?.debug?.warn(
+            "WebGLGradientBackgroundSystem",
+            "No Spotify container found, falling back to body"
+          );
+          return document.body;
+        }
         loadSettings() {
           if (!this.settingsManager) return;
           try {
@@ -9718,7 +9742,7 @@ void main() {
           this.wrapper = document.createElement("div");
           this.wrapper.className = "sn-flow-gradient-wrapper";
           this.wrapper.style.cssText = `
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
@@ -9753,7 +9777,8 @@ void main() {
           await this.updateGradientTexture();
           this.setupUniforms();
           this.resize();
-          document.body.appendChild(this.wrapper);
+          const targetContainer = this.findSpotifyContainer();
+          targetContainer.appendChild(this.wrapper);
           window.addEventListener("resize", this.resize.bind(this));
         }
         async compileShaders() {

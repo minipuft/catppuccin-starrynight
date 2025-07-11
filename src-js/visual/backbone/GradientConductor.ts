@@ -26,7 +26,7 @@ import {
 } from "@/types/systems";
 
 export interface GradientConductorConfig {
-  enabledBackends: ("css" | "webgl" | "webgpu")[];
+  enabledBackends: ("css" | "webgl")[];
   defaultQuality: "low" | "medium" | "high" | "ultra";
   transitionDuration: number;
   performanceMonitoring: boolean;
@@ -48,7 +48,7 @@ export class BackendSelector {
   static selectOptimalBackend(
     registrations: BackendRegistration[]
   ): VisualBackplane | null {
-    // Sort by priority (WebGPU > WebGL > CSS)
+    // Sort by priority (WebGL > CSS)
     const sorted = registrations
       .filter((reg) => reg.backend.isReady && reg.backend.capabilities)
       .sort((a, b) => b.priority - a.priority);
@@ -56,12 +56,7 @@ export class BackendSelector {
     for (const registration of sorted) {
       const caps = registration.capabilities;
 
-      // WebGPU - highest priority if available
-      if (caps.webgpu && caps.highPerformance) {
-        return registration.backend;
-      }
-
-      // WebGL2 - second priority
+      // WebGL2 - highest priority
       if (caps.webgl2 && caps.maxTextureSize >= 2048) {
         return registration.backend;
       }
@@ -122,7 +117,7 @@ export class GradientConductor implements IManagedSystem {
     this.performanceAnalyzer = performanceAnalyzer;
 
     this.config = {
-      enabledBackends: ["webgpu", "webgl", "css"],
+      enabledBackends: ["webgl", "css"],
       defaultQuality: "high",
       transitionDuration: 500,
       performanceMonitoring: true,
@@ -572,10 +567,6 @@ export class GradientConductor implements IManagedSystem {
     this.cssVariableBatcher.setProperty(
       "--sn.bg.webgl.ready",
       this.registeredBackends.has("webgl") ? "1" : "0"
-    );
-    this.cssVariableBatcher.setProperty(
-      "--sn.bg.webgpu.ready",
-      this.registeredBackends.has("webgpu") ? "1" : "0"
     );
     this.cssVariableBatcher.setProperty(
       "--sn.bg.active-backend",

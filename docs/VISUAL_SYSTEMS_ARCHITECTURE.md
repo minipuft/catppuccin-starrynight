@@ -4,7 +4,7 @@
 
 ## 👋 Welcome to Catppuccin StarryNight!
 
-The Catppuccin StarryNight theme for Spicetify is more than just a color scheme; it's an immersive visual experience designed to bring your Spotify interface to life. It dynamically responds to the music you play, user interactions, and the beloved Catppuccin color palettes (Mocha, Macchiato, Frappe, Latte). 
+The Catppuccin StarryNight theme for Spicetify is more than just a color scheme; it's an immersive visual experience designed to bring your Spotify interface to life. It dynamically responds to the music you play, user interactions, and the beloved Catppuccin color palettes (Mocha, Macchiato, Frappe, Latte).
 
 This document details the **developer-friendly architecture** of our sophisticated visual systems, organized in an intuitive directory structure that separates concerns and promotes maintainability.
 
@@ -28,26 +28,30 @@ This document aims to:
 As of version 2.0, the codebase has been reorganized into a **developer-friendly structure** that promotes clarity and maintainability:
 
 ### **Domain-Driven Organization**
+
 ```
 src-js/
 ├── 🎵 audio/          # Music analysis, color extraction, genre profiling
 ├── 👁️ visual/         # Visual effects, rendering, animations
-├── 💻 ui/             # User interface components and interactions  
+├── 💻 ui/             # User interface components and interactions
 ├── ⚙️ core/           # Core system infrastructure
 ├── 🛠️ utils/          # Utility functions by domain
 └── 📦 assets/         # Static assets (shaders, worklets)
 ```
 
 ### **Key Benefits**
+
 - **Intuitive Navigation**: Find components by their purpose, not implementation details
 - **Clear Dependencies**: Layered architecture with defined data flow
 - **Maintainability**: Related functionality grouped together
 - **Scalability**: Easy to add new systems within existing domains
 
 ### **Visual Systems Location**
+
 Visual systems are now organized in `src-js/visual/` by type:
+
 - `visual/base/` - Core visual infrastructure
-- `visual/backgrounds/` - Background rendering systems  
+- `visual/backgrounds/` - Background rendering systems
 - `visual/beat-sync/` - Music-reactive visual effects
 - `visual/ui-effects/` - Interface enhancement effects
 
@@ -60,21 +64,25 @@ This replaces the previous scattered organization across multiple directories.
 The dynamic nature of Catppuccin StarryNight is powered by a coordinated system where music analysis drives visual changes. Here's the architectural flow:
 
 ### **Audio Layer** (`src-js/audio/`)
+
 1.  **`MusicSyncService`** - The Conductor: Central music analysis engine that fetches raw audio data from Spotify (BPM, energy, danceability, timing segments) and processes it into usable formats.
 2.  **`ColorHarmonyEngine`** - The Palette Extractor: Analyzes album artwork to extract dominant colors and harmonizes them with Catppuccin palettes.
 3.  **Event Broadcasting**: Music data is published via the GlobalEventBus to all subscribed visual systems.
 
 ### **Visual Layer** (`src-js/visual/`)
+
 4.  **Visual Systems - The Performers**: Specialized modules organized by type:
     - **Background Systems** (`visual/backgrounds/`) - WebGL/WebGPU renderers, particle effects
-    - **Beat-Sync Systems** (`visual/beat-sync/`) - Music-reactive visual effects  
+    - **Beat-Sync Systems** (`visual/beat-sync/`) - Music-reactive visual effects
     - **UI Effects** (`visual/ui-effects/`) - Interface enhancements, sidebar animations
     - **Base Infrastructure** (`visual/base/`) - Common visual system foundation
 
 ### **Core Coordination** (`src-js/core/`)
+
 5.  **System Orchestration**: `Year3000System` manages lifecycle, `MasterAnimationCoordinator` synchronizes animations, `PerformanceAnalyzer` monitors performance.
 
 ### **Data Flow**
+
 ```
 Audio Analysis → Color Extraction → Event Broadcasting → Visual Rendering
      ↓              ↓                    ↓                    ↓
@@ -82,9 +90,11 @@ MusicSyncService → ColorHarmonyEngine → GlobalEventBus → Visual Systems
 ```
 
 ### **Visual Transformation Methods**
+
 Visual systems receive music data and create effects through:
+
 - **CSS Variable Updates**: Dynamic CSS Custom Properties via `CSSVariableBatcher`
-- **DOM Manipulation**: Adding/removing classes for animation triggers  
+- **DOM Manipulation**: Adding/removing classes for animation triggers
 - **Canvas Rendering**: Direct HTML5 Canvas graphics for complex visuals
 - **Animation Orchestration**: Coordinated timing via `MasterAnimationCoordinator`
 
@@ -151,7 +161,30 @@ Below is a breakdown of each distinct visual system, outlining its specific cont
   - **Synergy with Prediction**: It probably receives cues or data from a prediction engine. If, for example, a beat drop is predicted in a few seconds, this system might initiate a subtle animation or start rendering an element that will become fully prominent when the drop occurs.
   - **Seamless Transitions**: The timing of these materializations is key, aiming for a smooth and natural integration where visuals appear "just in time" or gracefully lead into significant moments in the music.
 
-### 7. `SidebarConsciousnessSystem`
+### 7. `GradientConductor` (`src-js/visual/backbone/`)
+
+- **Purpose**: Central orchestrator for all gradient background rendering systems. Manages the coordination between WebGL and CSS gradient backends, providing a single source of truth for gradient management with progressive enhancement capabilities.
+- **Location**: `src-js/visual/backbone/GradientConductor.ts`
+- **Implementation Highlights**:
+  - **Backend Management**: Registers and manages multiple visual backends (WebGL, CSS) with priority-based selection using `BackendSelector.selectOptimalBackend()`.
+  - **Progressive Enhancement**: Automatically selects the optimal backend based on device capabilities, gracefully falling back from WebGL to CSS when needed.
+  - **Performance Monitoring**: Continuously monitors performance metrics and automatically scales quality down when frame rates drop below targets.
+  - **Unified API**: Provides consistent methods (`setPalette()`, `setMusicMetrics()`, `setPerformanceConstraints()`) that work across all backends.
+  - **Event Coordination**: Listens for color harmony updates, music sync changes, and performance constraint modifications via `GlobalEventBus`.
+  - **CSS Variable Integration**: Updates CSS variables for fallback rendering and cross-system coordination via `CSSVariableBatcher`.
+
+### 8. `WebGLGradientBackgroundSystem` (`src-js/visual/backgrounds/`)
+
+- **Purpose**: High-performance WebGL2-based gradient renderer that creates flowing, music-synchronized background gradients using Alex Harri's flowing gradient technique.
+- **Location**: `src-js/visual/backgrounds/WebGLGradientBackgroundSystem.ts`
+- **Implementation Highlights**:
+  - **Advanced Shaders**: Uses sophisticated fragment shaders with dual time-offset waves, dynamic blur system, and three-field noise blending.
+  - **Music Synchronization**: Real-time response to beat detection, energy levels, and rhythm phase changes.
+  - **Performance Optimized**: Maintains 60fps target with automatic quality scaling and memory management.
+  - **Accessibility Compliant**: Respects `prefers-reduced-motion` by freezing animations and disabling transform effects.
+  - **Seamless Integration**: Coordinates with `GradientConductor` for backend switching and fallback management.
+
+### 9. `SidebarConsciousnessSystem`
 
 - **Purpose**: To apply dynamic visual effects specifically to the Spotify sidebar (the left navigation pane). The goal is to transform the sidebar from a static list of links into an element that feels aware of and responsive to the currently playing music.
 - **Implementation Highlights**:
