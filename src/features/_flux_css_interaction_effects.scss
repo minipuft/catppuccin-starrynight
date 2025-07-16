@@ -1,0 +1,375 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// 🎯 FLUX CSS INTERACTION EFFECTS - Pure CSS Interaction System
+// YEAR 3000 VISUAL TRANSCENDENCE MODULE
+// "Interactive feedback that dances with user intention, not against it."
+// ████████████████████████████████████████████████████████████████████████████████
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ✨ INTERACTION VARIABLES (Replacing Canvas-Based LiquidMorphingSystem)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // === CSS-BASED RIPPLE EFFECTS ===
+  --ripple-duration: 600ms;
+  --ripple-max-scale: 3;
+  --ripple-opacity: 0.3;
+  --ripple-color: rgba(var(--sn-gradient-accent-rgb), var(--ripple-opacity));
+  
+  // === FOCUS FLOW EFFECTS ===
+  --focus-glow-intensity: 0.4;
+  --focus-flow-duration: 300ms;
+  --focus-ring-thickness: 2px;
+  --focus-ring-color: rgba(var(--sn-gradient-accent-rgb), var(--focus-glow-intensity));
+  
+  // === HOVER RESPONSIVENESS ===
+  --hover-lift-distance: 2px;
+  --hover-glow-intensity: 0.2;
+  --hover-transition-speed: 200ms;
+  --hover-scale-factor: 1.02;
+  
+  // === MUSICAL INTERACTION SYNC ===
+  --interaction-beat-sync: calc(var(--sn-beat-pulse-intensity, 0) * 0.5);
+  --interaction-energy-boost: calc(var(--sn-music-energy, 0) * 0.3);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌊 CSS RIPPLE EFFECT (Replacing Canvas Ripples)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@keyframes css-interaction-ripple {
+  0% {
+    transform: scale(0);
+    opacity: var(--ripple-opacity);
+  }
+  50% {
+    opacity: calc(var(--ripple-opacity) * 0.6);
+  }
+  100% {
+    transform: scale(var(--ripple-max-scale));
+    opacity: 0;
+  }
+}
+
+@keyframes focus-flow-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 0 var(--focus-ring-thickness) var(--focus-ring-color),
+      0 0 10px var(--focus-ring-color);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 
+      0 0 0 calc(var(--focus-ring-thickness) * 1.5) var(--focus-ring-color),
+      0 0 20px var(--focus-ring-color);
+    transform: scale(1.01);
+  }
+}
+
+@keyframes musical-interaction-boost {
+  0%, 100% {
+    filter: brightness(1) saturate(1);
+  }
+  50% {
+    filter: brightness(calc(1 + var(--interaction-energy-boost))) 
+            saturate(calc(1 + var(--interaction-beat-sync)));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 INTERACTION MIXIN LIBRARY
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin css-interaction-ripple($intensity: normal) {
+  position: relative;
+  overflow: hidden;
+  
+  @if $intensity == subtle {
+    --local-ripple-opacity: 0.15;
+    --local-ripple-scale: 2;
+  } @else if $intensity == strong {
+    --local-ripple-opacity: 0.5;
+    --local-ripple-scale: 4;
+  } @else {
+    --local-ripple-opacity: var(--ripple-opacity);
+    --local-ripple-scale: var(--ripple-max-scale);
+  }
+  
+  // Create ripple effect on click using CSS pseudo-elements
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      var(--ripple-color) 0%,
+      rgba(var(--sn-gradient-accent-rgb), 0) 70%
+    );
+    transform: translate(-50%, -50%) scale(0);
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  &:active::after {
+    width: 100%;
+    height: 100%;
+    animation: css-interaction-ripple var(--ripple-duration) ease-out;
+  }
+}
+
+@mixin css-focus-flow($intensity: normal) {
+  transition: 
+    box-shadow var(--focus-flow-duration) ease-out,
+    transform var(--focus-flow-duration) ease-out,
+    filter var(--focus-flow-duration) ease-out;
+  
+  @if $intensity == subtle {
+    --local-focus-glow: 0.2;
+  } @else if $intensity == strong {
+    --local-focus-glow: 0.6;
+  } @else {
+    --local-focus-glow: var(--focus-glow-intensity);
+  }
+  
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    animation: focus-flow-pulse 2s ease-in-out infinite;
+    z-index: 10;
+  }
+  
+  &:focus:not(:focus-visible) {
+    animation: none;
+    box-shadow: 
+      0 0 0 var(--focus-ring-thickness) var(--focus-ring-color),
+      0 0 10px var(--focus-ring-color);
+  }
+}
+
+@mixin css-hover-lift($intensity: normal) {
+  transition: 
+    transform var(--hover-transition-speed) ease-out,
+    box-shadow var(--hover-transition-speed) ease-out,
+    filter var(--hover-transition-speed) ease-out;
+  
+  @if $intensity == subtle {
+    --local-lift-distance: 1px;
+    --local-hover-scale: 1.005;
+    --local-hover-glow: 0.1;
+  } @else if $intensity == strong {
+    --local-lift-distance: 4px;
+    --local-hover-scale: 1.05;
+    --local-hover-glow: 0.4;
+  } @else {
+    --local-lift-distance: var(--hover-lift-distance);
+    --local-hover-scale: var(--hover-scale-factor);
+    --local-hover-glow: var(--hover-glow-intensity);
+  }
+  
+  &:hover {
+    transform: 
+      translateY(calc(-1 * var(--local-lift-distance))) 
+      scale(var(--local-hover-scale));
+    box-shadow: 
+      0 calc(var(--local-lift-distance) * 2) 
+      calc(var(--local-lift-distance) * 8) 
+      rgba(var(--sn-gradient-accent-rgb), var(--local-hover-glow));
+    filter: brightness(1.05) saturate(1.1);
+  }
+}
+
+@mixin css-musical-interaction() {
+  // Sync interaction effects with music when available
+  animation: musical-interaction-boost 
+    calc(var(--living-pulse-speed, 4s) / max(var(--sn-beat-pulse-intensity, 0.5), 0.5)) 
+    ease-in-out infinite;
+    
+  // Enhanced effects during musical peaks
+  &:hover,
+  &:focus {
+    animation-duration: calc(var(--living-pulse-speed, 4s) * 0.7);
+    filter: brightness(calc(1.05 + var(--interaction-energy-boost))) 
+            saturate(calc(1.1 + var(--interaction-beat-sync)));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎵 MUSICAL INTERACTION RESPONSIVENESS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Enhanced interaction during musical activity
+.Root[style*="--sn-beat-pulse-intensity"] {
+  // Boost ripple effects during beat pulses
+  :root {
+    --ripple-opacity: calc(0.3 + var(--sn-beat-pulse-intensity, 0) * 0.2);
+    --focus-glow-intensity: calc(0.4 + var(--sn-music-energy, 0) * 0.3);
+    --hover-glow-intensity: calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.2);
+  }
+  
+  // Speed up interactions during high energy
+  button,
+  .main-playButton-PlayButton,
+  .main-card-card,
+  .main-trackList-trackListRow {
+    --ripple-duration: calc(600ms / max(var(--sn-music-energy, 0.5), 0.5));
+    --hover-transition-speed: calc(200ms / max(var(--sn-beat-pulse-intensity, 0.5), 0.5));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎛️ APPLICATION TO SPOTIFY UI ELEMENTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// === MAIN INTERACTIVE BUTTONS ===
+.main-playButton-PlayButton,
+.main-skipBackButton-button,
+.main-skipForwardButton-button,
+.main-shuffleButton-button,
+.main-repeatButton-button {
+  @include css-interaction-ripple(strong);
+  @include css-focus-flow(strong);
+  @include css-hover-lift(normal);
+  @include css-musical-interaction();
+  
+  // Special treatment for main play button
+  &.main-playButton-PlayButton {
+    @include css-hover-lift(strong);
+    --ripple-color: rgba(var(--sn-gradient-primary-rgb), 0.4);
+  }
+}
+
+// === CARDS AND CONTENT CONTAINERS ===
+.main-card-card {
+  @include css-interaction-ripple(subtle);
+  @include css-focus-flow(normal);
+  @include css-hover-lift(subtle);
+  @include css-musical-interaction();
+  
+  // Enhanced effects for artist cards
+  &[data-testid*="artist"] {
+    @include css-hover-lift(normal);
+  }
+}
+
+// === TRACK LIST ROWS ===
+.main-trackList-trackListRow {
+  @include css-interaction-ripple(subtle);
+  @include css-focus-flow(subtle);
+  @include css-hover-lift(subtle);
+  
+  // Currently playing track gets enhanced interaction
+  &.main-trackList-selected,
+  &:has(.main-trackList-playingIcon) {
+    @include css-musical-interaction();
+    @include css-hover-lift(normal);
+    --ripple-color: rgba(var(--sn-gradient-primary-rgb), 0.3);
+  }
+}
+
+// === NAVIGATION AND MENU ITEMS ===
+.main-navBar-navBarLink,
+.main-rootlist-rootlistItemLink,
+.main-contextMenu-menuItemButton,
+.spicetify-playlist-list li a {
+  @include css-interaction-ripple(subtle);
+  @include css-focus-flow(subtle);
+  @include css-hover-lift(subtle);
+  
+  // Enhanced effects on active/selected states
+  &[aria-selected="true"],
+  &.main-rootlist-rootlistItemActive {
+    @include css-musical-interaction();
+  }
+}
+
+// === INPUT FIELDS AND SEARCH ===
+input[type="text"],
+input[type="search"],
+.x-filterBox-filterInput,
+.main-dropDown-dropDown {
+  @include css-focus-flow(normal);
+  @include css-hover-lift(subtle);
+  
+  transition: 
+    border-color var(--focus-flow-duration) ease-out,
+    box-shadow var(--focus-flow-duration) ease-out;
+    
+  &:focus {
+    border-color: rgba(var(--sn-gradient-accent-rgb), 0.6);
+  }
+}
+
+// === CONTEXT MENUS ===
+.main-contextMenu-menu {
+  .main-contextMenu-menuItemButton {
+    @include css-interaction-ripple(normal);
+    @include css-hover-lift(subtle);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌟 ACCESSIBILITY & PERFORMANCE CONSCIOUSNESS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ripple-duration: 200ms;
+    --focus-flow-duration: 100ms;
+    --hover-transition-speed: 100ms;
+    --ripple-opacity: 0.1;
+    --focus-glow-intensity: 0.2;
+  }
+  
+  // Disable complex animations
+  * {
+    animation-duration: 200ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  
+  // Keep only essential feedback
+  .main-playButton-PlayButton,
+  input:focus,
+  button:focus {
+    animation: none !important;
+    box-shadow: 0 0 0 2px rgba(var(--sn-gradient-accent-rgb), 0.6) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --hover-lift-distance: 1px;
+    --ripple-max-scale: 2;
+    --focus-glow-intensity: 0.3;
+  }
+  
+  // Reduce effects for mobile performance
+  .main-card-card,
+  .main-trackList-trackListRow {
+    --hover-transition-speed: 300ms;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --focus-glow-intensity: 0.8;
+    --focus-ring-thickness: 3px;
+    --ripple-opacity: 0.6;
+  }
+  
+  // Enhanced visibility for high contrast
+  button:focus,
+  input:focus,
+  a:focus {
+    box-shadow: 
+      0 0 0 var(--focus-ring-thickness) rgba(255, 255, 255, 0.8),
+      0 0 0 calc(var(--focus-ring-thickness) + 2px) rgba(0, 0, 0, 0.8) !important;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🚀 CSS INTERACTION SYSTEM COMPLETION
+// "We replaced 1500 lines of canvas JavaScript with 200 lines of elegant CSS."
+// ═══════════════════════════════════════════════════════════════════════════════

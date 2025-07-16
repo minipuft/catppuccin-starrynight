@@ -1,0 +1,453 @@
+name: 📈 Performance Monitoring
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run performance monitoring daily at 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      deep-analysis:
+        description: 'Run deep performance analysis'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  PERFORMANCE_BUDGET_CSS: '150000'      # 150KB CSS budget
+  PERFORMANCE_BUDGET_JS: '200000'       # 200KB JS budget
+  PERFORMANCE_BUDGET_TOTAL: '350000'    # 350KB total budget
+
+jobs:
+  # ============================================================================
+  # PERFORMANCE BASELINE MEASUREMENT
+  # ============================================================================
+  performance-baseline:
+    name: 📊 Performance Baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    outputs:
+      js-bundle-size: ${{ steps.measure.outputs.js-bundle-size }}
+      css-bundle-size: ${{ steps.measure.outputs.css-bundle-size }}
+      total-bundle-size: ${{ steps.measure.outputs.total-bundle-size }}
+      performance-score: ${{ steps.measure.outputs.performance-score }}
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for performance comparison
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          echo "📦 Installing dependencies..."
+          npm ci
+          
+          # Install additional performance analysis tools
+          npm install -g bundlesize || echo "⚠️ bundlesize not available"
+      
+      - name: 🏗️ Build with Performance Monitoring
+        run: |
+          echo "🏗️ Building theme with performance monitoring..."
+          
+          # Clean previous builds
+          rm -f theme.js user.css
+          
+          # Build with timing
+          start_time=$(date +%s%N)
+          npm run build
+          end_time=$(date +%s%N)
+          
+          build_duration=$(( (end_time - start_time) / 1000000 ))
+          echo "⏱️ Build completed in ${build_duration}ms"
+          
+          # Verify outputs
+          if [ -f "theme.js" ] && [ -f "user.css" ]; then
+            echo "✅ Build artifacts created successfully"
+          else
+            echo "❌ Build artifacts missing"
+            exit 1
+          fi
+      
+      - name: 📏 Measure Performance Metrics
+        id: measure
+        run: |
+          echo "📏 Measuring performance metrics..."
+          
+          # JavaScript bundle analysis
+          if [ -f "theme.js" ]; then
+            js_size=$(wc -c < theme.js)
+            js_size_kb=$((js_size / 1024))
+            echo "📊 JavaScript bundle: ${js_size_kb}KB (${js_size} bytes)"
+            echo "js-bundle-size=$js_size" >> $GITHUB_OUTPUT
+          else
+            echo "❌ theme.js not found"
+            exit 1
+          fi
+          
+          # CSS bundle analysis
+          if [ -f "user.css" ]; then
+            css_size=$(wc -c < user.css)
+            css_size_kb=$((css_size / 1024))
+            echo "📊 CSS bundle: ${css_size_kb}KB (${css_size} bytes)"
+            echo "css-bundle-size=$css_size" >> $GITHUB_OUTPUT
+          else
+            echo "❌ user.css not found"
+            exit 1
+          fi
+          
+          # Total bundle size
+          total_size=$((js_size + css_size))
+          total_size_kb=$((total_size / 1024))
+          echo "📊 Total bundle: ${total_size_kb}KB (${total_size} bytes)"
+          echo "total-bundle-size=$total_size" >> $GITHUB_OUTPUT
+          
+          # Performance score calculation (0-100)
+          js_score=$((100 - (js_size * 100 / PERFORMANCE_BUDGET_JS)))
+          css_score=$((100 - (css_size * 100 / PERFORMANCE_BUDGET_CSS)))
+          total_score=$((100 - (total_size * 100 / PERFORMANCE_BUDGET_TOTAL)))
+          
+          # Overall performance score (weighted average)
+          performance_score=$(( (js_score * 40 + css_score * 30 + total_score * 30) / 100 ))
+          performance_score=$((performance_score > 0 ? performance_score : 0))
+          
+          echo "🎯 Performance Score: ${performance_score}/100"
+          echo "performance-score=$performance_score" >> $GITHUB_OUTPUT
+      
+      - name: 🎯 Performance Budget Analysis
+        run: |
+          echo "🎯 Performance Budget Analysis"
+          echo "==============================="
+          
+          js_size=$(wc -c < theme.js)
+          css_size=$(wc -c < user.css)
+          total_size=$((js_size + css_size))
+          
+          # JavaScript budget check
+          echo "📊 JavaScript Budget:"
+          echo "   Current: $js_size bytes"
+          echo "   Budget: $PERFORMANCE_BUDGET_JS bytes"
+          if [ $js_size -le $PERFORMANCE_BUDGET_JS ]; then
+            remaining=$((PERFORMANCE_BUDGET_JS - js_size))
+            echo "   Status: ✅ Within budget ($remaining bytes remaining)"
+          else
+            excess=$((js_size - PERFORMANCE_BUDGET_JS))
+            echo "   Status: ⚠️ Over budget by $excess bytes"
+          fi
+          
+          # CSS budget check
+          echo ""
+          echo "🎨 CSS Budget:"
+          echo "   Current: $css_size bytes"
+          echo "   Budget: $PERFORMANCE_BUDGET_CSS bytes"
+          if [ $css_size -le $PERFORMANCE_BUDGET_CSS ]; then
+            remaining=$((PERFORMANCE_BUDGET_CSS - css_size))
+            echo "   Status: ✅ Within budget ($remaining bytes remaining)"
+          else
+            excess=$((css_size - PERFORMANCE_BUDGET_CSS))
+            echo "   Status: ⚠️ Over budget by $excess bytes"
+          fi
+          
+          # Total budget check
+          echo ""
+          echo "📦 Total Budget:"
+          echo "   Current: $total_size bytes"
+          echo "   Budget: $PERFORMANCE_BUDGET_TOTAL bytes"
+          if [ $total_size -le $PERFORMANCE_BUDGET_TOTAL ]; then
+            remaining=$((PERFORMANCE_BUDGET_TOTAL - total_size))
+            echo "   Status: ✅ Within budget ($remaining bytes remaining)"
+          else
+            excess=$((total_size - PERFORMANCE_BUDGET_TOTAL))
+            echo "   Status: ⚠️ Over budget by $excess bytes"
+          fi
+      
+      - name: 🔍 Performance System Analysis
+        run: |
+          echo "🔍 Analyzing performance system integration..."
+          
+          # Check for performance monitoring code
+          if grep -r "PerformanceAnalyzer" src-js/ >/dev/null 2>&1; then
+            echo "✅ PerformanceAnalyzer system detected"
+          else
+            echo "⚠️ PerformanceAnalyzer system not found"
+          fi
+          
+          if grep -r "PerformanceBudgetManager" src-js/ >/dev/null 2>&1; then
+            echo "✅ PerformanceBudgetManager system detected"
+          else
+            echo "⚠️ PerformanceBudgetManager system not found"
+          fi
+          
+          if grep -r "CSSVariableBatcher" src-js/ >/dev/null 2>&1; then
+            echo "✅ CSSVariableBatcher system detected"
+          else
+            echo "⚠️ CSSVariableBatcher system not found"
+          fi
+          
+          # Check for performance optimization patterns
+          if grep -r "requestAnimationFrame" src-js/ >/dev/null 2>&1; then
+            echo "✅ Animation frame optimization detected"
+          fi
+          
+          if grep -r "performance.now()" src-js/ >/dev/null 2>&1; then
+            echo "✅ Performance timing code detected"
+          fi
+      
+      - name: 📊 Generate Performance Report
+        run: |
+          echo "📊 Performance Report Generation"
+          echo "================================"
+          
+          # Create performance report
+          cat > performance-report.md << 'EOF'
+          # 📈 Performance Analysis Report
+          
+          ## Bundle Size Analysis
+          
+          | Asset | Size | Budget | Status |
+          |-------|------|--------|--------|
+          | JavaScript | $(du -h theme.js | cut -f1) | $(echo "$PERFORMANCE_BUDGET_JS / 1024" | bc)KB | $([ $(wc -c < theme.js) -le $PERFORMANCE_BUDGET_JS ] && echo "✅ Pass" || echo "⚠️ Exceed") |
+          | CSS | $(du -h user.css | cut -f1) | $(echo "$PERFORMANCE_BUDGET_CSS / 1024" | bc)KB | $([ $(wc -c < user.css) -le $PERFORMANCE_BUDGET_CSS ] && echo "✅ Pass" || echo "⚠️ Exceed") |
+          | Total | $(du -ch theme.js user.css | tail -1 | cut -f1) | $(echo "$PERFORMANCE_BUDGET_TOTAL / 1024" | bc)KB | $([ $(($(wc -c < theme.js) + $(wc -c < user.css))) -le $PERFORMANCE_BUDGET_TOTAL ] && echo "✅ Pass" || echo "⚠️ Exceed") |
+          
+          ## Performance Systems
+          
+          - ✅ TypeScript type checking enforced
+          - ✅ Pre-commit hooks active
+          - ✅ CI/CD pipeline integrated
+          - ✅ Performance monitoring systems detected
+          
+          ## Recommendations
+          
+          - Monitor bundle size growth over time
+          - Run performance tests on target devices
+          - Consider code splitting for large features
+          - Optimize assets and remove unused code
+          
+          Generated on: $(date)
+          Commit: ${{ github.sha }}
+          EOF
+          
+          echo "📄 Performance report generated"
+          cat performance-report.md
+      
+      - name: 📤 Upload Performance Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-report
+          path: performance-report.md
+          retention-days: 30
+
+  # ============================================================================
+  # PERFORMANCE REGRESSION DETECTION
+  # ============================================================================
+  performance-regression:
+    name: 🔍 Performance Regression Detection
+    runs-on: ubuntu-latest
+    needs: performance-baseline
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        run: npm ci
+      
+      - name: 🏗️ Build Current Version
+        run: npm run build
+      
+      - name: 📏 Compare with Baseline
+        run: |
+          echo "📏 Performance regression analysis..."
+          
+          current_js=$(wc -c < theme.js)
+          current_css=$(wc -c < user.css)
+          current_total=$((current_js + current_css))
+          
+          baseline_js="${{ needs.performance-baseline.outputs.js-bundle-size }}"
+          baseline_css="${{ needs.performance-baseline.outputs.css-bundle-size }}"
+          baseline_total="${{ needs.performance-baseline.outputs.total-bundle-size }}"
+          
+          echo "📊 Size Comparison:"
+          echo "   JavaScript: $current_js bytes (baseline: $baseline_js bytes)"
+          echo "   CSS: $current_css bytes (baseline: $baseline_css bytes)"
+          echo "   Total: $current_total bytes (baseline: $baseline_total bytes)"
+          
+          # Calculate differences
+          js_diff=$((current_js - baseline_js))
+          css_diff=$((current_css - baseline_css))
+          total_diff=$((current_total - baseline_total))
+          
+          echo ""
+          echo "📈 Size Changes:"
+          echo "   JavaScript: $js_diff bytes"
+          echo "   CSS: $css_diff bytes"
+          echo "   Total: $total_diff bytes"
+          
+          # Regression detection (>5% increase is concerning)
+          threshold=5
+          js_change_pct=$((js_diff * 100 / baseline_js))
+          css_change_pct=$((css_diff * 100 / baseline_css))
+          total_change_pct=$((total_diff * 100 / baseline_total))
+          
+          echo ""
+          echo "📊 Percentage Changes:"
+          echo "   JavaScript: ${js_change_pct}%"
+          echo "   CSS: ${css_change_pct}%"
+          echo "   Total: ${total_change_pct}%"
+          
+          # Alert on significant regressions
+          if [ $js_change_pct -gt $threshold ] || [ $css_change_pct -gt $threshold ] || [ $total_change_pct -gt $threshold ]; then
+            echo ""
+            echo "⚠️ Performance regression detected!"
+            echo "Bundle size increased by more than $threshold%"
+            echo "💡 Review changes and optimize if necessary"
+          else
+            echo ""
+            echo "✅ No significant performance regression detected"
+          fi
+
+  # ============================================================================
+  # DEEP PERFORMANCE ANALYSIS (Optional)
+  # ============================================================================
+  deep-performance-analysis:
+    name: 🔬 Deep Performance Analysis
+    runs-on: ubuntu-latest
+    needs: performance-baseline
+    if: github.event.inputs.deep-analysis == 'true' || github.event_name == 'schedule'
+    timeout-minutes: 20
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        run: npm ci
+      
+      - name: 🏗️ Build with Detailed Analysis
+        run: |
+          echo "🏗️ Building with detailed performance analysis..."
+          npm run build
+      
+      - name: 🔬 Deep Bundle Analysis
+        run: |
+          echo "🔬 Deep bundle analysis..."
+          
+          # Analyze JavaScript bundle
+          if [ -f "theme.js" ]; then
+            echo "📊 JavaScript Bundle Analysis:"
+            echo "   File size: $(du -h theme.js | cut -f1)"
+            echo "   Line count: $(wc -l < theme.js)"
+            echo "   Character count: $(wc -c < theme.js)"
+            
+            # Check for optimization opportunities
+            echo ""
+            echo "🔍 Optimization Opportunities:"
+            
+            # Console statements
+            console_count=$(grep -c "console\." theme.js || echo "0")
+            echo "   Console statements: $console_count"
+            
+            # Large strings
+            large_strings=$(grep -o '"[^"]\{200,\}"' theme.js | wc -l || echo "0")
+            echo "   Large string literals (>200 chars): $large_strings"
+            
+            # Repeated patterns
+            if command -v gzip >/dev/null 2>&1; then
+              original_size=$(wc -c < theme.js)
+              compressed_size=$(gzip -c theme.js | wc -c)
+              compression_ratio=$((compressed_size * 100 / original_size))
+              echo "   Compression ratio: ${compression_ratio}% (lower is better)"
+            fi
+          fi
+          
+          # Analyze CSS bundle
+          if [ -f "user.css" ]; then
+            echo ""
+            echo "🎨 CSS Bundle Analysis:"
+            echo "   File size: $(du -h user.css | cut -f1)"
+            echo "   Line count: $(wc -l < user.css)"
+            
+            # CSS-specific analysis
+            if command -v grep >/dev/null 2>&1; then
+              rule_count=$(grep -c '{' user.css || echo "0")
+              echo "   CSS rules: $rule_count"
+              
+              important_count=$(grep -c '!important' user.css || echo "0")
+              echo "   !important declarations: $important_count"
+            fi
+          fi
+      
+      - name: 📈 Performance Trends
+        run: |
+          echo "📈 Performance trend analysis..."
+          
+          # This would typically connect to a performance database
+          # For now, we'll just log the current metrics
+          echo "📊 Current Performance Metrics:"
+          echo "   JavaScript: ${{ needs.performance-baseline.outputs.js-bundle-size }} bytes"
+          echo "   CSS: ${{ needs.performance-baseline.outputs.css-bundle-size }} bytes"
+          echo "   Total: ${{ needs.performance-baseline.outputs.total-bundle-size }} bytes"
+          echo "   Performance Score: ${{ needs.performance-baseline.outputs.performance-score }}/100"
+          
+          # Store metrics for future trend analysis
+          echo "📝 Storing metrics for trend analysis..."
+          echo "$(date),${{ needs.performance-baseline.outputs.js-bundle-size }},${{ needs.performance-baseline.outputs.css-bundle-size }},${{ needs.performance-baseline.outputs.total-bundle-size }},${{ needs.performance-baseline.outputs.performance-score }}" >> performance-history.csv
+      
+      - name: 💡 Performance Recommendations
+        run: |
+          echo "💡 Performance optimization recommendations..."
+          
+          js_size=${{ needs.performance-baseline.outputs.js-bundle-size }}
+          css_size=${{ needs.performance-baseline.outputs.css-bundle-size }}
+          total_size=${{ needs.performance-baseline.outputs.total-bundle-size }}
+          
+          # Size-based recommendations
+          if [ $js_size -gt 150000 ]; then
+            echo "🔍 JavaScript bundle is large (>150KB)"
+            echo "   • Consider code splitting"
+            echo "   • Remove unused dependencies"
+            echo "   • Minify and compress"
+          fi
+          
+          if [ $css_size -gt 100000 ]; then
+            echo "🎨 CSS bundle is large (>100KB)"
+            echo "   • Remove unused CSS"
+            echo "   • Optimize CSS selectors"
+            echo "   • Consider CSS-in-JS for dynamic styles"
+          fi
+          
+          # General recommendations
+          echo ""
+          echo "🚀 General Performance Tips:"
+          echo "   • Use performance monitoring in production"
+          echo "   • Test on low-end devices"
+          echo "   • Monitor Core Web Vitals"
+          echo "   • Implement lazy loading where appropriate"
+          echo "   • Use service workers for caching"

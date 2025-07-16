@@ -11,6 +11,7 @@ import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { PaletteExtensionManager } from "@/utils/core/PaletteExtensionManager";
 import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+import { SemanticColorManager } from "@/utils/spicetify/SemanticColorManager";
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
 // TODO: Phase 4 - Import WebGL and Worker support for performance
 
@@ -98,6 +99,7 @@ export class ColorHarmonyEngine
   private catppuccinPalettes: CatppuccinFlavors;
   private vibrancyConfig: any;
   private paletteExtensionManager: PaletteExtensionManager;
+  private semanticColorManager: SemanticColorManager;
   private emergentEngine: EmergentChoreographyEngine | null = null;
 
   // User-specified harmonic intensity (0-1). Multiplies defaultBlendRatio.
@@ -134,6 +136,13 @@ export class ColorHarmonyEngine
       this.config,
       this.utils
     );
+
+    // Initialize SemanticColorManager for Spicetify integration
+    this.semanticColorManager = new SemanticColorManager({
+      enableDebug: this.config.enableDebug,
+      fallbackToSpiceColors: true,
+      cacheDuration: 5000
+    });
 
     this.currentTheme = this.detectCurrentTheme();
 
@@ -423,9 +432,18 @@ export class ColorHarmonyEngine
 
   public override async initialize(): Promise<void> {
     await super.initialize();
+    
+    // Initialize SemanticColorManager with CSSVariableBatcher from parent system
+    const cssVariableBatcher = this.performanceAnalyzer ? 
+      (this.performanceAnalyzer as any).cssVariableBatcher : undefined;
+    this.semanticColorManager.initialize(cssVariableBatcher);
+    
+    // Initial semantic color setup
+    await this.semanticColorManager.updateSemanticColors();
+    
     if (this.config.enableDebug) {
       console.log(
-        "🎨 [ColorHarmonyEngine] Initialized with Year 3000 Quantum Empathy via BaseVisualSystem."
+        "🎨 [ColorHarmonyEngine] Initialized with Year 3000 Quantum Empathy via BaseVisualSystem and SemanticColorManager."
       );
     }
     this.initialized = true;
@@ -911,7 +929,89 @@ export class ColorHarmonyEngine
       "[ColorHarmonyEngine] Completed blendWithCatppuccin"
     );
 
+    // Apply semantic color updates after blending
+    this.updateSemanticColorsWithHarmonizedPalette(harmonizedColors);
+
     return harmonizedColors;
+  }
+
+  /**
+   * Updates semantic colors using the harmonized palette
+   * Integrates with Spicetify's semantic color system for consistent theming
+   */
+  private updateSemanticColorsWithHarmonizedPalette(harmonizedColors: { [key: string]: string }): void {
+    if (!this.semanticColorManager) {
+      return;
+    }
+
+    try {
+      // Update semantic colors based on harmonized palette
+      // This ensures that Spicetify's semantic colors align with our theme
+      this.semanticColorManager.updateSemanticColors();
+      
+      // Apply harmonized colors to key semantic variables
+      const primaryColor = harmonizedColors['VIBRANT'] || harmonizedColors['PRIMARY'];
+      const secondaryColor = harmonizedColors['DARK_VIBRANT'] || harmonizedColors['SECONDARY'];
+      const accentColor = harmonizedColors['VIBRANT_NON_ALARMING'] || harmonizedColors['LIGHT_VIBRANT'];
+      
+      if (primaryColor) {
+        this.semanticColorManager.getSemanticColor('essentialBrightAccent').then(color => {
+          // Use the harmonized color as the base for semantic accent
+          const blendedColor = this.blendWithSemanticColor(primaryColor, color, 0.7);
+          this.applyCSSVariable('--spice-accent', blendedColor);
+          this.applyCSSVariable('--spice-button-active', blendedColor);
+        });
+      }
+      
+      if (secondaryColor) {
+        this.semanticColorManager.getSemanticColor('backgroundElevatedHighlight').then(color => {
+          const blendedColor = this.blendWithSemanticColor(secondaryColor, color, 0.5);
+          this.applyCSSVariable('--spice-highlight', blendedColor);
+        });
+      }
+      
+      if (accentColor) {
+        this.semanticColorManager.getSemanticColor('textBrightAccent').then(color => {
+          const blendedColor = this.blendWithSemanticColor(accentColor, color, 0.6);
+          this.applyCSSVariable('--spice-text-accent', blendedColor);
+        });
+      }
+      
+      // Flush all semantic color updates
+      this.semanticColorManager.flushUpdates();
+      
+    } catch (error) {
+      if (this.config.enableDebug) {
+        console.warn('[ColorHarmonyEngine] Failed to update semantic colors:', error);
+      }
+    }
+  }
+
+  /**
+   * Blends a harmonized color with a semantic color for consistency
+   */
+  private blendWithSemanticColor(harmonizedHex: string, semanticHex: string, blendRatio: number): string {
+    const harmonizedRgb = this.utils.hexToRgb(harmonizedHex);
+    const semanticRgb = this.utils.hexToRgb(semanticHex);
+    
+    if (!harmonizedRgb || !semanticRgb) {
+      return harmonizedHex; // Fallback to harmonized color
+    }
+    
+    const blendedRgb = this.blendColors(harmonizedRgb, semanticRgb, blendRatio);
+    return this.utils.rgbToHex(blendedRgb.r, blendedRgb.g, blendedRgb.b);
+  }
+
+  /**
+   * Applies CSS variable with fallback to direct style application
+   */
+  private applyCSSVariable(property: string, value: string): void {
+    const cssVariableBatcher = (this.performanceAnalyzer as any)?.cssVariableBatcher;
+    if (cssVariableBatcher) {
+      cssVariableBatcher.queueCSSVariableUpdate(property, value);
+    } else {
+      document.documentElement.style.setProperty(property, value);
+    }
   }
 
   generateRecommendations(
@@ -1469,6 +1569,12 @@ export class ColorHarmonyEngine
       "year3000ArtisticModeChanged",
       this._boundArtisticModeHandler
     );
+    
+    // Clean up SemanticColorManager
+    if (this.semanticColorManager) {
+      this.semanticColorManager.destroy();
+    }
+    
     super.destroy?.();
   }
 

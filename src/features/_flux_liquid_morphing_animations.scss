@@ -1,0 +1,832 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// 🌊 FLUX LIQUID MORPHING ANIMATIONS - Organic Shape Consciousness
+// YEAR 3000 VISUAL TRANSCENDENCE MODULE
+// "Matter is not solid. Everything flows. We just make it visible."
+// ████████████████████████████████████████████████████████████████████████████████
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 💧 LIQUID DYNAMICS VARIABLES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // === MEDITATIVE BASELINE (Resting State) ===
+  --meditation-rhythm: 15s;
+  --meditation-amplitude: 4px;
+  --meditation-breathing-depth: 0.02;
+  --meditation-surface-tension: 0.95;
+  --meditation-flow-velocity: 20s;
+  
+  // === LIQUID SURFACE PROPERTIES ===
+  --liquid-viscosity: 0.8; // More viscous for calmer movement
+  --liquid-surface-tension: var(--meditation-surface-tension);
+  --liquid-cohesion: 0.9; // Higher cohesion for organic feel
+  --liquid-flow-velocity: var(--meditation-flow-velocity);
+  --liquid-morphing-amplitude: var(--meditation-amplitude);
+  --liquid-ripple-frequency: 8s; // Slower, more meditative
+  
+  // === HOLOGRAPHIC SHAPE MORPHING ===
+  --holographic-form-complexity: 2; // Simplified for performance
+  --holographic-growth-rate: 0.8; // Slower, more natural
+  --holographic-light-depth: 0.05; // Light-based effects only
+  --holographic-pulse-rhythm: var(--meditation-rhythm);
+  --holographic-cellular-division: 25s; // Much slower cellular activity
+  
+  // === MERCURY FLOW DYNAMICS ===
+  --mercury-droplet-size: 15px;
+  --mercury-coalescence-speed: 2s;
+  --mercury-surface-reflection: 0.9;
+  --mercury-gravity-pull: 1px;
+  --mercury-magnetic-attraction: 3px;
+  
+  // === MUSICAL AWAKENING THRESHOLDS ===
+  --awakening-threshold: 0.3; // Beat intensity needed to start awakening
+  --transcendence-threshold: 0.6; // Energy level for full transcendence
+  --peak-experience-threshold: 0.8; // Maximum intensity state
+  
+  // === INTELLIGENT MUSIC RESPONSIVENESS ===
+  // Only activate when above awakening threshold
+  --music-awakening-gate: max(0, var(--sn-beat-pulse-intensity, 0) - var(--awakening-threshold));
+  --music-transcendence-gate: max(0, var(--sn-music-energy, 0) - var(--transcendence-threshold));
+  
+  // Gentle escalation curves instead of linear
+  --music-liquid-resonance: calc(
+    var(--holographic-light-depth) + 
+    var(--music-awakening-gate) * 0.08 + 
+    var(--music-transcendence-gate) * 0.12
+  );
+  --music-flow-acceleration: calc(
+    1 - var(--music-awakening-gate) * 0.4 - var(--music-transcendence-gate) * 0.3
+  );
+  --music-morphing-amplitude: calc(
+    var(--meditation-amplitude) + 
+    var(--music-awakening-gate) * 8px + 
+    var(--music-transcendence-gate) * 12px
+  );
+  --music-viscosity-change: calc(
+    var(--liquid-viscosity) - var(--music-awakening-gate) * 0.3
+  );
+  
+  // === CONSCIOUSNESS ADAPTATION ===
+  --consciousness-flow-state: calc(var(--sn-rhythm-phase, 0) * 360deg);
+  --consciousness-cellular-mitosis: calc(var(--sn-dynamic-genre-hue-shift, 0deg) * 0.2);
+  --consciousness-membrane-permeability: calc(var(--sn-music-valence, 0.5) * 0.5 + 0.3);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌊 LIQUID MORPHING KEYFRAMES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@keyframes meditative-liquid-breathing {
+  0%, 100% {
+    border-radius: 48% 52% 53% 47% / 51% 49% 52% 48%;
+    transform: rotate(0deg) scale(1) skewX(0deg);
+  }
+  25% {
+    border-radius: 52% 48% 47% 53% / 49% 51% 48% 52%;
+    transform: rotate(1deg) scale(1.005) skewX(0.5deg);
+  }
+  50% {
+    border-radius: 47% 53% 52% 48% / 52% 48% 51% 49%;
+    transform: rotate(0deg) scale(1.01) skewX(0deg);
+  }
+  75% {
+    border-radius: 53% 47% 48% 52% / 48% 52% 49% 51%;
+    transform: rotate(-1deg) scale(1.005) skewX(-0.5deg);
+  }
+}
+
+// Musical awakening - more dramatic but still organic
+@keyframes musical-liquid-awakening {
+  0% {
+    border-radius: 45% 55% 60% 40% / 55% 45% 65% 35%;
+    transform: rotate(0deg) scale(1) skewX(0deg);
+  }
+  20% {
+    border-radius: 55% 65% 35% 45% / 65% 35% 45% 75%;
+    transform: rotate(15deg) scale(1.02) skewX(1deg);
+  }
+  40% {
+    border-radius: 65% 35% 55% 65% / 40% 80% 30% 60%;
+    transform: rotate(30deg) scale(0.98) skewX(-0.5deg);
+  }
+  60% {
+    border-radius: 35% 65% 75% 25% / 80% 55% 40% 70%;
+    transform: rotate(45deg) scale(1.03) skewX(1.5deg);
+  }
+  80% {
+    border-radius: 65% 45% 25% 85% / 35% 75% 65% 45%;
+    transform: rotate(60deg) scale(0.97) skewX(-1deg);
+  }
+  100% {
+    border-radius: 45% 55% 60% 40% / 55% 45% 65% 35%;
+    transform: rotate(75deg) scale(1) skewX(0deg);
+  }
+}
+
+@keyframes organic-cellular-growth {
+  0% {
+    clip-path: polygon(
+      30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%
+    );
+    filter: brightness(1) contrast(1);
+  }
+  16.66% {
+    clip-path: polygon(
+      20% 5%, 80% 10%, 95% 25%, 90% 75%, 75% 95%, 25% 90%, 10% 80%, 5% 20%
+    );
+    filter: brightness(1.1) contrast(1.05);
+  }
+  33.33% {
+    clip-path: polygon(
+      10% 15%, 85% 5%, 90% 40%, 95% 80%, 80% 85%, 15% 95%, 5% 60%, 10% 15%
+    );
+    filter: brightness(0.95) contrast(1.1);
+  }
+  50% {
+    clip-path: polygon(
+      15% 10%, 75% 15%, 85% 35%, 80% 85%, 65% 90%, 35% 85%, 15% 65%, 20% 35%
+    );
+    filter: brightness(1.05) contrast(0.95);
+  }
+  66.66% {
+    clip-path: polygon(
+      25% 20%, 70% 25%, 80% 45%, 75% 75%, 55% 80%, 45% 75%, 25% 55%, 30% 45%
+    );
+    filter: brightness(1.15) contrast(1.1);
+  }
+  83.33% {
+    clip-path: polygon(
+      35% 25%, 65% 30%, 75% 50%, 70% 70%, 50% 75%, 50% 70%, 35% 50%, 40% 50%
+    );
+    filter: brightness(0.9) contrast(1.05);
+  }
+  100% {
+    clip-path: polygon(
+      30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%
+    );
+    filter: brightness(1) contrast(1);
+  }
+}
+
+@keyframes mercury-droplet-coalescence {
+  0% {
+    transform: scale(1) translateX(0);
+    border-radius: 50%;
+    opacity: 1;
+  }
+  30% {
+    transform: scale(1.2) translateX(5px);
+    border-radius: 60% 40% 60% 40% / 70% 50% 50% 30%;
+    opacity: 0.9;
+  }
+  60% {
+    transform: scale(0.8) translateX(-3px);
+    border-radius: 40% 60% 40% 60% / 30% 70% 70% 50%;
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1) translateX(0);
+    border-radius: 50%;
+    opacity: 1;
+  }
+}
+
+@keyframes holographic-consciousness-light {
+  0%, 100% {
+    border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+    filter: brightness(1) saturate(1.2) hue-rotate(var(--consciousness-flow-state));
+  }
+  25% {
+    border-radius: 60% 40% 70% 30% / 40% 80% 20% 60%;
+    filter: brightness(1.1) saturate(1.4) hue-rotate(calc(var(--consciousness-flow-state) + 15deg));
+  }
+  50% {
+    border-radius: 70% 30% 40% 60% / 80% 20% 60% 40%;
+    filter: brightness(0.95) saturate(1.1) hue-rotate(calc(var(--consciousness-flow-state) + 30deg));
+  }
+  75% {
+    border-radius: 40% 60% 30% 70% / 20% 60% 80% 40%;
+    filter: brightness(1.05) saturate(1.3) hue-rotate(calc(var(--consciousness-flow-state) + 45deg));
+  }
+}
+
+@keyframes plasma-membrane-oscillation {
+  0% {
+    background-position: 0% 50%, 100% 50%, 50% 0%;
+    border-radius: 45% 55% 65% 35% / 55% 45% 35% 65%;
+  }
+  25% {
+    background-position: 25% 75%, 75% 25%, 50% 50%;
+    border-radius: 55% 45% 35% 65% / 65% 35% 55% 45%;
+  }
+  50% {
+    background-position: 50% 100%, 50% 0%, 100% 50%;
+    border-radius: 65% 35% 55% 45% / 45% 65% 35% 55%;
+  }
+  75% {
+    background-position: 75% 25%, 25% 75%, 0% 50%;
+    border-radius: 35% 65% 45% 55% / 35% 55% 65% 45%;
+  }
+  100% {
+    background-position: 100% 50%, 0% 50%, 50% 100%;
+    border-radius: 45% 55% 65% 35% / 55% 45% 35% 65%;
+  }
+}
+
+@keyframes liquid-ripple-propagation {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0.8;
+    border-radius: 50%;
+  }
+  25% {
+    transform: scale(0.5) rotate(90deg);
+    opacity: 0.6;
+    border-radius: 60% 40% 60% 40% / 50% 70% 30% 50%;
+  }
+  50% {
+    transform: scale(1) rotate(180deg);
+    opacity: 0.4;
+    border-radius: 40% 60% 40% 60% / 70% 30% 50% 70%;
+  }
+  75% {
+    transform: scale(1.5) rotate(270deg);
+    opacity: 0.2;
+    border-radius: 60% 40% 60% 40% / 30% 70% 50% 30%;
+  }
+  100% {
+    transform: scale(2) rotate(360deg);
+    opacity: 0;
+    border-radius: 50%;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🧬 LIQUID MORPHING MIXINS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin liquid-surface-morphing($complexity: normal) {
+  position: relative;
+  overflow: visible;
+  
+  @if $complexity == simple {
+    --local-complexity: 1;
+    --local-amplitude: var(--meditation-amplitude);
+  } @else if $complexity == complex {
+    --local-complexity: 3;
+    --local-amplitude: calc(var(--meditation-amplitude) * 2);
+  } @else {
+    --local-complexity: 2;
+    --local-amplitude: var(--music-morphing-amplitude);
+  }
+  
+  // Gentle meditative surface with subtle organic curves
+  border-radius: 48% 52% 53% 47% / 51% 49% 52% 48%;
+  background: 
+    radial-gradient(
+      ellipse 90% 70% at 35% 45%,
+      rgba(var(--sn-gradient-primary-rgb), 0.04) 0%,
+      transparent 80%
+    ),
+    radial-gradient(
+      ellipse 70% 85% at 65% 55%,
+      rgba(var(--sn-gradient-accent-rgb), 0.03) 0%,
+      transparent 70%
+    ),
+    linear-gradient(
+      calc(145deg + var(--consciousness-flow-state) * 0.2),
+      rgba(var(--sn-gradient-secondary-rgb), 0.02) 0%,
+      rgba(var(--sn-gradient-primary-rgb), 0.015) 60%,
+      transparent 100%
+    );
+  
+  background-size: 250% 180%, 220% 250%, 300% 150%;
+  
+  // Intelligent animation selection based on musical state
+  animation: 
+    meditative-liquid-breathing var(--meditation-rhythm) cubic-bezier(0.4, 0, 0.2, 1) infinite,
+    holographic-consciousness-light calc(var(--holographic-pulse-rhythm) * 1.5) ease-in-out infinite;
+  
+  // Smooth state transitions with organic easing
+  transition: 
+    border-radius 2.5s cubic-bezier(0.4, 0, 0.2, 1),
+    background 3s ease-out,
+    animation-duration 2s ease-in-out;
+  
+  // Musical awakening override - activate when threshold is met
+  .Root[style*="--sn-beat-pulse-intensity"] & {
+    animation: 
+      musical-liquid-awakening calc(var(--meditation-rhythm) / var(--music-flow-acceleration)) cubic-bezier(0.4, 0, 0.2, 1) infinite,
+      holographic-consciousness-light calc(var(--holographic-pulse-rhythm) / max(var(--music-liquid-resonance), 0.1)) ease-in-out infinite;
+    
+    // Enhanced background intensity during musical state
+    background: 
+      radial-gradient(
+        ellipse 95% 75% at 30% 40%,
+        rgba(var(--sn-gradient-primary-rgb), calc(0.04 + var(--music-awakening-gate) * 0.06)) 0%,
+        transparent 75%
+      ),
+      radial-gradient(
+        ellipse 75% 90% at 70% 60%,
+        rgba(var(--sn-gradient-accent-rgb), calc(0.03 + var(--music-transcendence-gate) * 0.05)) 0%,
+        transparent 65%
+      ),
+      linear-gradient(
+        calc(145deg + var(--consciousness-flow-state) * 0.5),
+        rgba(var(--sn-gradient-secondary-rgb), calc(0.02 + var(--music-awakening-gate) * 0.04)) 0%,
+        rgba(var(--sn-gradient-primary-rgb), calc(0.015 + var(--music-transcendence-gate) * 0.03)) 50%,
+        transparent 100%
+      );
+  }
+  
+  // Mercury-like surface reflection
+  &::before {
+    content: "";
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    width: 40%;
+    height: 60%;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, var(--mercury-surface-reflection)) 0%,
+      rgba(255, 255, 255, calc(var(--mercury-surface-reflection) * 0.6)) 30%,
+      transparent 70%
+    );
+    border-radius: 80% 20% 60% 40% / 70% 30% 80% 20%;
+    pointer-events: none;
+    z-index: 1;
+    
+    animation: 
+      liquid-surface-flow calc(var(--liquid-flow-velocity) / var(--music-flow-acceleration) * 0.8) ease-in-out infinite reverse,
+      mercury-droplet-coalescence var(--mercury-coalescence-speed) ease-in-out infinite;
+  }
+  
+  // Organic cellular structure
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(
+        circle at 25% 25%,
+        rgba(var(--sn-gradient-accent-rgb), 0.03) 0%,
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 75% 75%,
+        rgba(var(--sn-gradient-secondary-rgb), 0.04) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 50% 80%,
+        rgba(var(--sn-gradient-primary-rgb), 0.02) 0%,
+        transparent 60%
+      );
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    
+    animation: 
+      organic-cellular-growth var(--organic-cellular-division) ease-in-out infinite,
+      plasma-membrane-oscillation calc(var(--liquid-flow-velocity) * 2) linear infinite reverse;
+  }
+}
+
+@mixin mercury-droplet-dynamics {
+  position: relative;
+  
+  // Main mercury surface
+  background: 
+    radial-gradient(
+      ellipse 100% 80% at 50% 30%,
+      rgba(var(--sn-gradient-primary-rgb), 0.12) 0%,
+      rgba(var(--sn-gradient-accent-rgb), 0.08) 40%,
+      transparent 80%
+    ),
+    linear-gradient(
+      45deg,
+      rgba(var(--sn-gradient-secondary-rgb), 0.06) 0%,
+      transparent 50%,
+      rgba(var(--sn-gradient-primary-rgb), 0.04) 100%
+    );
+  
+  border-radius: 50%;
+  
+  animation: 
+    mercury-droplet-coalescence var(--mercury-coalescence-speed) ease-in-out infinite,
+    holographic-consciousness-light calc(var(--holographic-pulse-rhythm) * 1.2) ease-in-out infinite;
+  
+  // Surface tension highlights
+  &::before {
+    content: "";
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    width: 30%;
+    height: 30%;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.8) 0%,
+      rgba(255, 255, 255, 0.4) 40%,
+      transparent 70%
+    );
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+    
+    animation: mercury-droplet-coalescence calc(var(--mercury-coalescence-speed) * 0.7) ease-in-out infinite reverse;
+  }
+  
+  // Magnetic field interaction
+  &:hover {
+    animation-duration: calc(var(--mercury-coalescence-speed) * 0.5);
+    transform: scale(1.1);
+    
+    &::before {
+      background: radial-gradient(
+        circle,
+        rgba(var(--sn-gradient-primary-rgb), 0.9) 0%,
+        rgba(var(--sn-gradient-accent-rgb), 0.6) 40%,
+        transparent 70%
+      );
+    }
+  }
+}
+
+@mixin liquid-ripple-interaction {
+  position: relative;
+  overflow: visible;
+  
+  // Ripple effect on interaction
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(
+      circle,
+      rgba(var(--sn-gradient-primary-rgb), 0.3) 0%,
+      rgba(var(--sn-gradient-accent-rgb), 0.2) 30%,
+      rgba(var(--sn-gradient-secondary-rgb), 0.1) 60%,
+      transparent 100%
+    );
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0;
+    transition: all 0.3s ease-out;
+  }
+  
+  &:hover,
+  &:focus,
+  &[aria-selected="true"],
+  &.main-trackList-selected {
+    &::before {
+      width: 200%;
+      height: 200%;
+      opacity: 1;
+      animation: liquid-ripple-propagation var(--liquid-ripple-frequency) ease-out infinite;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌊 APPLICATION TO SPOTIFY UI ELEMENTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// === CARDS BECOME LIQUID SURFACES ===
+.main-card-card {
+  @include liquid-surface-morphing(normal);
+  @include liquid-ripple-interaction;
+  
+  // Enhanced liquid effects for different card types
+  &[data-testid*="artist"] {
+    @include mercury-droplet-dynamics;
+    
+    border-radius: 50%;
+    --holographic-light-depth: 0.08;
+    --mercury-coalescence-speed: 1.5s;
+  }
+  
+  &[data-testid*="album"] {
+    @include liquid-surface-morphing(complex);
+    
+    --liquid-morphing-amplitude: 30px;
+    --holographic-form-complexity: 5;
+  }
+  
+  &[data-testid*="playlist"] {
+    @include liquid-surface-morphing(simple);
+    
+    --liquid-flow-velocity: 6s;
+    --holographic-light-depth: 0.03;
+  }
+}
+
+// === TRACK ROWS BECOME FLOWING STREAMS ===
+.main-trackList-trackListRow {
+  @include liquid-surface-morphing(simple);
+  @include liquid-ripple-interaction;
+  
+  border-radius: 25px 50px 25px 50px / 15px 25px 15px 25px;
+  --liquid-flow-velocity: 10s;
+  --holographic-light-depth: 0.02;
+  --liquid-morphing-amplitude: 12px;
+  
+  // Currently playing track gets enhanced liquid properties
+  &.main-trackList-selected,
+  &:has(.main-trackList-playingIcon) {
+    @include mercury-droplet-dynamics;
+    
+    --mercury-coalescence-speed: 1s;
+    --holographic-light-depth: 0.06;
+    
+    border-radius: 40px 60px 40px 60px / 30px 40px 30px 40px;
+    
+    // Liquid energy field around playing track
+    &::after {
+      background: 
+        radial-gradient(
+          ellipse 150% 100% at 50% 50%,
+          rgba(var(--sn-gradient-primary-rgb), 0.08) 0%,
+          rgba(var(--sn-gradient-accent-rgb), 0.06) 40%,
+          transparent 80%
+        );
+      
+      animation: 
+        organic-cellular-growth calc(var(--holographic-cellular-division) * 0.7) ease-in-out infinite,
+        holographic-consciousness-light var(--holographic-pulse-rhythm) ease-in-out infinite;
+    }
+  }
+}
+
+// === SIDEBAR NAVIGATION BECOMES LIQUID MEMBRANE ===
+.main-yourLibrary-yourLibrary,
+.main-navBar-navBar {
+  @include liquid-surface-morphing(simple);
+  
+  border-radius: 0;
+  --liquid-flow-velocity: 15s;
+  --holographic-light-depth: 0.01;
+  --liquid-morphing-amplitude: 8px;
+  
+  .main-navBar-navBarLink,
+  .spicetify-playlist-list li {
+    @include liquid-surface-morphing(simple);
+    @include liquid-ripple-interaction;
+    
+    border-radius: 20px 40px 20px 40px / 15px 20px 15px 20px;
+    margin: 2px 0;
+    --liquid-flow-velocity: 8s;
+    --holographic-light-depth: 0.02;
+    
+    &:hover,
+    &[aria-selected="true"],
+    &.main-rootlist-rootlistItemActive {
+      @include mercury-droplet-dynamics;
+      
+      --mercury-coalescence-speed: 2s;
+      border-radius: 30px;
+    }
+  }
+}
+
+// === PLAYBACK CONTROLS BECOME LIQUID INTERFACE ===
+.main-nowPlayingBar-nowPlayingBar {
+  @include liquid-surface-morphing(simple);
+  
+  border-radius: 0;
+  --liquid-flow-velocity: 12s;
+  --holographic-light-depth: 0.015;
+  
+  .main-playButton-PlayButton,
+  .main-skipBackButton-button,
+  .main-skipForwardButton-button {
+    @include mercury-droplet-dynamics;
+    
+    border-radius: 50%;
+    --mercury-coalescence-speed: 1.5s;
+    --holographic-light-depth: 0.04;
+    
+    &:hover {
+      --mercury-coalescence-speed: 0.8s;
+      --holographic-light-depth: 0.08;
+    }
+  }
+  
+  // Main play button gets enhanced liquid consciousness
+  .main-playButton-PlayButton {
+    @include liquid-surface-morphing(normal);
+    
+    --liquid-morphing-amplitude: 20px;
+    --holographic-form-complexity: 4;
+  }
+}
+
+// === SEARCH RESULTS BECOME LIQUID DISCOVERY ===
+.main-search-searchCategory,
+.main-shelf-shelf {
+  @include liquid-surface-morphing(simple);
+  
+  border-radius: 20px;
+  --liquid-flow-velocity: 18s;
+  --holographic-light-depth: 0.01;
+  
+  .main-card-card {
+    --liquid-flow-velocity: 6s;
+    --holographic-light-depth: 0.03;
+  }
+}
+
+// === MODALS AND CONTEXT MENUS BECOME LIQUID PORTALS ===
+.GenericModal,
+.main-contextMenu-menu {
+  @include liquid-surface-morphing(complex);
+  @include mercury-droplet-dynamics;
+  
+  border-radius: 25px;
+  --liquid-morphing-amplitude: 20px;
+  --mercury-coalescence-speed: 2.5s;
+  
+  .main-contextMenu-menuItemButton {
+    @include liquid-ripple-interaction;
+    
+    border-radius: 15px 25px 15px 25px / 10px 15px 10px 15px;
+    
+    &:hover {
+      @include mercury-droplet-dynamics;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎵 MUSIC-RESPONSIVE LIQUID AMPLIFICATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Beat-synchronized liquid acceleration
+.Root[style*="--sn-beat-pulse-intensity"] {
+  .main-card-card,
+  .main-trackList-trackListRow,
+  .main-playButton-PlayButton {
+    --music-flow-acceleration: calc(2 - var(--sn-beat-pulse-intensity, 0) * 1.5);
+    --music-liquid-resonance: calc(var(--sn-beat-pulse-intensity, 0) * 0.8 + 0.4);
+    --holographic-light-depth: calc(0.05 + var(--sn-beat-pulse-intensity, 0) * 0.05);
+    
+    animation-duration: 
+      calc(var(--liquid-flow-velocity) / var(--music-flow-acceleration)),
+      calc(var(--holographic-pulse-rhythm) / max(var(--music-liquid-resonance), 0.3));
+  }
+}
+
+// Genre-responsive liquid evolution
+.Root[style*="--sn-dynamic-genre-hue-shift"] {
+  :root {
+    --consciousness-flow-state: calc(var(--sn-dynamic-genre-hue-shift, 0deg) + var(--sn-rhythm-phase, 0) * 180deg);
+    --consciousness-cellular-mitosis: calc(var(--sn-dynamic-genre-hue-shift, 0deg) * 0.3);
+  }
+  
+  .main-card-card,
+  .main-trackList-trackListRow {
+    filter: hue-rotate(var(--consciousness-cellular-mitosis));
+  }
+}
+
+// Energy-responsive viscosity changes
+.Root[style*="--sn-music-energy"] {
+  :root {
+    --music-viscosity-change: calc(0.6 - var(--sn-music-energy, 0.5) * 0.4);
+    --music-morphing-complexity: calc(var(--sn-music-energy, 0.5) + 0.5);
+  }
+  
+  .main-card-card {
+    --holographic-form-complexity: calc(4 * var(--music-morphing-complexity));
+    --liquid-morphing-amplitude: calc(25px * var(--music-morphing-complexity));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌟 ACCESSIBILITY & PERFORMANCE CONSCIOUSNESS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --liquid-flow-velocity: 20s;
+    --holographic-pulse-rhythm: 15s;
+    --mercury-coalescence-speed: 5s;
+    --liquid-ripple-frequency: 8s;
+    --holographic-light-depth: 0.01;
+    --liquid-morphing-amplitude: 5px;
+  }
+  
+  // Disable complex liquid animations
+  .main-card-card,
+  .main-trackList-trackListRow,
+  .main-navBar-navBarLink {
+    animation: none !important;
+    border-radius: 12px !important;
+    
+    &::before,
+    &::after {
+      animation: none !important;
+    }
+  }
+  
+  // Keep subtle liquid effects only
+  .main-playButton-PlayButton {
+    border-radius: 50% !important;
+    
+    &:hover {
+      transform: scale(1.05);
+      transition: transform 0.3s ease-out;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --liquid-flow-velocity: 12s;
+    --holographic-light-depth: 0.02;
+    --liquid-morphing-amplitude: 15px;
+    --mercury-coalescence-speed: 3s;
+    --holographic-form-complexity: 3;
+  }
+  
+  // Simplified liquid effects for mobile
+  .main-card-card {
+    --liquid-morphing-amplitude: 10px;
+    
+    &::after {
+      display: none; // Remove complex cellular structure on mobile
+    }
+  }
+  
+  .main-trackList-trackListRow {
+    --holographic-light-depth: 0.01;
+    border-radius: 15px 20px 15px 20px / 10px 15px 10px 15px;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --liquid-morphing-amplitude: 30px;
+    --holographic-light-depth: 0.08;
+    --mercury-surface-reflection: 1.2;
+  }
+  
+  // Enhanced visibility for liquid elements
+  .main-card-card,
+  .main-trackList-trackListRow {
+    border: 1px solid rgba(var(--spice-rgb-text), 0.3);
+    
+    &::before {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--spice-rgb-text), 0.8) 0%,
+        rgba(var(--spice-rgb-text), 0.4) 50%,
+        transparent 100%
+      );
+    }
+  }
+}
+
+// Performance optimization for lower-end devices
+@media (max-resolution: 1.5dppx) {
+  :root {
+    --holographic-form-complexity: 2;
+    --liquid-morphing-amplitude: 8px;
+  }
+  
+  // Disable complex liquid effects on low-resolution displays
+  .main-card-card,
+  .main-trackList-trackListRow {
+    &::after {
+      display: none; // Remove cellular structure overlays
+    }
+  }
+  
+  .GenericModal,
+  .main-contextMenu-menu {
+    animation: none !important;
+    border-radius: 12px !important;
+  }
+}
+
+// Performance optimization for better performance
+.main-card-card,
+.main-trackList-trackListRow,
+.main-playButton-PlayButton {
+  // Only use will-change during active animations
+  will-change: auto;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🚀 LIQUID CONSCIOUSNESS COMPLETION
+// "We didn't just animate shapes. We made matter itself dance to consciousness."
+// ═══════════════════════════════════════════════════════════════════════════════

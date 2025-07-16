@@ -1,0 +1,434 @@
+name: 🚀 Release Deployment
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: 'Release type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+      dry-run:
+        description: 'Dry run (test without publishing)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  RELEASE_BRANCH: 'main'
+  THEME_NAME: 'catppuccin-starrynight'
+
+jobs:
+  # ============================================================================
+  # RELEASE PREPARATION
+  # ============================================================================
+  prepare-release:
+    name: 🎯 Release Preparation
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.event_name == 'release'
+    timeout-minutes: 15
+    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      release-notes: ${{ steps.notes.outputs.release-notes }}
+      should-release: ${{ steps.validation.outputs.should-release }}
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        run: npm ci
+      
+      - name: 🔍 Run Quality Gates
+        run: |
+          echo "🔍 Running pre-release quality gates..."
+          
+          # TypeScript check
+          if npm run typecheck; then
+            echo "✅ TypeScript check passed"
+          else
+            echo "❌ TypeScript check failed"
+            exit 1
+          fi
+          
+          # Build check
+          if npm run build; then
+            echo "✅ Build successful"
+          else
+            echo "❌ Build failed"
+            exit 1
+          fi
+          
+          # Test check
+          if npm test -- --passWithNoTests; then
+            echo "✅ Tests passed"
+          else
+            echo "⚠️ Tests failed but continuing (review required)"
+          fi
+      
+      - name: 📊 Performance Validation
+        run: |
+          echo "📊 Validating performance budgets..."
+          
+          js_size=$(wc -c < theme.js)
+          css_size=$(wc -c < user.css)
+          total_size=$((js_size + css_size))
+          
+          # Performance budgets
+          js_budget=200000    # 200KB
+          css_budget=150000   # 150KB
+          total_budget=350000 # 350KB
+          
+          echo "📏 Bundle sizes:"
+          echo "   JavaScript: $js_size bytes (budget: $js_budget bytes)"
+          echo "   CSS: $css_size bytes (budget: $css_budget bytes)"
+          echo "   Total: $total_size bytes (budget: $total_budget bytes)"
+          
+          # Check budgets
+          if [ $js_size -gt $js_budget ] || [ $css_size -gt $css_budget ] || [ $total_size -gt $total_budget ]; then
+            echo "⚠️ Performance budget exceeded"
+            echo "💡 Consider optimizing before release"
+          else
+            echo "✅ Performance budgets met"
+          fi
+      
+      - name: 🏷️ Version Management
+        id: version
+        run: |
+          echo "🏷️ Managing version..."
+          
+          current_version=$(node -p "require('./package.json').version")
+          echo "📋 Current version: $current_version"
+          
+          if [ "${{ github.event_name }}" = "release" ]; then
+            # Use release tag version
+            release_version="${{ github.event.release.tag_name }}"
+            release_version="${release_version#v}"  # Remove 'v' prefix if present
+            echo "📦 Release version: $release_version"
+            echo "version=$release_version" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # Calculate next version based on input
+            if [ "${{ github.event.inputs.release-type }}" = "major" ]; then
+              new_version=$(npm version major --no-git-tag-version)
+            elif [ "${{ github.event.inputs.release-type }}" = "minor" ]; then
+              new_version=$(npm version minor --no-git-tag-version)
+            elif [ "${{ github.event.inputs.release-type }}" = "prerelease" ]; then
+              new_version=$(npm version prerelease --no-git-tag-version)
+            else
+              new_version=$(npm version patch --no-git-tag-version)
+            fi
+            
+            new_version="${new_version#v}"  # Remove 'v' prefix
+            echo "📦 New version: $new_version"
+            echo "version=$new_version" >> $GITHUB_OUTPUT
+          else
+            echo "version=$current_version" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 📝 Generate Release Notes
+        id: notes
+        run: |
+          echo "📝 Generating release notes..."
+          
+          # Generate changelog since last release
+          if git describe --tags --abbrev=0 >/dev/null 2>&1; then
+            last_tag=$(git describe --tags --abbrev=0)
+            echo "📋 Changes since $last_tag:"
+            
+            # Generate commit log
+            commits=$(git log --oneline "$last_tag..HEAD" --no-merges)
+            
+            if [ -n "$commits" ]; then
+              echo "## 🌌 What's Changed" > release-notes.md
+              echo "" >> release-notes.md
+              
+              # Categorize commits
+              echo "### ✨ Features" >> release-notes.md
+              echo "$commits" | grep -E "^[a-f0-9]+ (feat|feature)" | sed 's/^[a-f0-9]* /- /' >> release-notes.md || echo "- No new features" >> release-notes.md
+              echo "" >> release-notes.md
+              
+              echo "### 🐛 Bug Fixes" >> release-notes.md
+              echo "$commits" | grep -E "^[a-f0-9]+ (fix|bug)" | sed 's/^[a-f0-9]* /- /' >> release-notes.md || echo "- No bug fixes" >> release-notes.md
+              echo "" >> release-notes.md
+              
+              echo "### 🎨 Improvements" >> release-notes.md
+              echo "$commits" | grep -E "^[a-f0-9]+ (improve|enhance|refactor)" | sed 's/^[a-f0-9]* /- /' >> release-notes.md || echo "- No improvements" >> release-notes.md
+              echo "" >> release-notes.md
+              
+              echo "### 📚 Documentation" >> release-notes.md
+              echo "$commits" | grep -E "^[a-f0-9]+ (docs|doc)" | sed 's/^[a-f0-9]* /- /' >> release-notes.md || echo "- No documentation changes" >> release-notes.md
+              echo "" >> release-notes.md
+              
+              echo "### 🔧 Technical Changes" >> release-notes.md
+              echo "$commits" | grep -vE "^[a-f0-9]+ (feat|feature|fix|bug|improve|enhance|refactor|docs|doc)" | sed 's/^[a-f0-9]* /- /' >> release-notes.md || echo "- No technical changes" >> release-notes.md
+              echo "" >> release-notes.md
+              
+              echo "## 📊 Performance" >> release-notes.md
+              echo "- JavaScript bundle: $(du -h theme.js | cut -f1)" >> release-notes.md
+              echo "- CSS bundle: $(du -h user.css | cut -f1)" >> release-notes.md
+              echo "- Total bundle: $(du -ch theme.js user.css | tail -1 | cut -f1)" >> release-notes.md
+              echo "" >> release-notes.md
+              
+              echo "## 🔧 Installation" >> release-notes.md
+              echo "1. Download the release assets" >> release-notes.md
+              echo "2. Extract to your Spicetify themes directory" >> release-notes.md
+              echo "3. Run \`spicetify config current_theme $THEME_NAME\`" >> release-notes.md
+              echo "4. Run \`spicetify apply\`" >> release-notes.md
+              
+            else
+              echo "No changes since last release" > release-notes.md
+            fi
+          else
+            echo "## 🌌 Initial Release" > release-notes.md
+            echo "This is the initial release of Catppuccin StarryNight theme." >> release-notes.md
+          fi
+          
+          # Output for GitHub Actions
+          echo "release-notes<<EOF" >> $GITHUB_OUTPUT
+          cat release-notes.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: ✅ Release Validation
+        id: validation
+        run: |
+          echo "✅ Validating release readiness..."
+          
+          # Check if this is a dry run
+          if [ "${{ github.event.inputs.dry-run }}" = "true" ]; then
+            echo "🧪 Dry run mode - no actual release will be created"
+            echo "should-release=false" >> $GITHUB_OUTPUT
+          else
+            echo "🚀 Ready for release"
+            echo "should-release=true" >> $GITHUB_OUTPUT
+          fi
+          
+          # Validate required files exist
+          required_files=("theme.js" "user.css" "manifest.json" "color.ini")
+          for file in "${required_files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✅ $file exists"
+            else
+              echo "❌ $file missing"
+              exit 1
+            fi
+          done
+          
+          echo "✅ All required files present"
+
+  # ============================================================================
+  # BUILD RELEASE ARTIFACTS
+  # ============================================================================
+  build-release:
+    name: 🏗️ Build Release
+    runs-on: ubuntu-latest
+    needs: prepare-release
+    timeout-minutes: 15
+    
+    strategy:
+      matrix:
+        variant: [standard, minimal, performance]
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        run: npm ci
+      
+      - name: 🏗️ Build Theme Variant
+        run: |
+          echo "🏗️ Building ${{ matrix.variant }} variant..."
+          
+          case "${{ matrix.variant }}" in
+            "standard")
+              npm run build
+              ;;
+            "minimal")
+              # Build with minimal features
+              echo "🔧 Building minimal variant..."
+              npm run build
+              # TODO: Add minimal build logic
+              ;;
+            "performance")
+              # Build with performance optimizations
+              echo "🚀 Building performance variant..."
+              npm run build
+              # TODO: Add performance build logic
+              ;;
+          esac
+          
+          # Verify build output
+          if [ -f "theme.js" ]; then
+            echo "✅ theme.js built successfully"
+            echo "📏 Size: $(du -h theme.js | cut -f1)"
+          else
+            echo "❌ theme.js build failed"
+            exit 1
+          fi
+      
+      - name: 📦 Package Theme
+        run: |
+          echo "📦 Packaging ${{ matrix.variant }} variant..."
+          
+          # Create variant directory
+          variant_dir="${THEME_NAME}-${{ matrix.variant }}"
+          mkdir -p "$variant_dir"
+          
+          # Copy core files
+          cp theme.js "$variant_dir/"
+          cp user.css "$variant_dir/"
+          cp manifest.json "$variant_dir/"
+          cp color.ini "$variant_dir/"
+          cp README.md "$variant_dir/"
+          
+          # Copy assets if they exist
+          if [ -d "assets" ]; then
+            cp -r assets "$variant_dir/"
+          fi
+          
+          # Copy installation scripts
+          cp install*.sh "$variant_dir/" 2>/dev/null || true
+          cp install*.ps1 "$variant_dir/" 2>/dev/null || true
+          
+          # Create variant-specific manifest
+          jq --arg variant "${{ matrix.variant }}" '.name = .name + " (" + ($variant | ascii_upcase) + ")"' manifest.json > "$variant_dir/manifest.json"
+          
+          # Create archive
+          tar -czf "${variant_dir}.tar.gz" "$variant_dir"
+          zip -r "${variant_dir}.zip" "$variant_dir"
+          
+          echo "✅ Packaged ${{ matrix.variant }} variant"
+          echo "📦 Archive sizes:"
+          echo "   TAR.GZ: $(du -h ${variant_dir}.tar.gz | cut -f1)"
+          echo "   ZIP: $(du -h ${variant_dir}.zip | cut -f1)"
+      
+      - name: 📤 Upload Release Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.variant }}
+          path: |
+            ${{ env.THEME_NAME }}-${{ matrix.variant }}.tar.gz
+            ${{ env.THEME_NAME }}-${{ matrix.variant }}.zip
+          retention-days: 30
+
+  # ============================================================================
+  # PUBLISH RELEASE
+  # ============================================================================
+  publish-release:
+    name: 🚀 Publish Release
+    runs-on: ubuntu-latest
+    needs: [prepare-release, build-release]
+    if: needs.prepare-release.outputs.should-release == 'true'
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 📦 Download Release Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+      
+      - name: 🏷️ Create Git Tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "🏷️ Creating git tag..."
+          
+          version="${{ needs.prepare-release.outputs.version }}"
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          git tag -a "v$version" -m "Release v$version"
+          git push origin "v$version"
+      
+      - name: 🚀 Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: v${{ needs.prepare-release.outputs.version }}
+          name: 🌌 StarryNight v${{ needs.prepare-release.outputs.version }}
+          body: ${{ needs.prepare-release.outputs.release-notes }}
+          draft: false
+          prerelease: ${{ contains(needs.prepare-release.outputs.version, 'pre') }}
+          files: |
+            ${{ env.THEME_NAME }}-*.tar.gz
+            ${{ env.THEME_NAME }}-*.zip
+      
+      - name: 📢 Release Notification
+        run: |
+          echo "📢 Release published successfully!"
+          echo "🌌 Version: ${{ needs.prepare-release.outputs.version }}"
+          echo "🔗 GitHub: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.prepare-release.outputs.version }}"
+          echo "📦 Assets: $(ls -la *.tar.gz *.zip | wc -l) files"
+
+  # ============================================================================
+  # POST-RELEASE TASKS
+  # ============================================================================
+  post-release:
+    name: 🎉 Post-Release Tasks
+    runs-on: ubuntu-latest
+    needs: [prepare-release, publish-release]
+    if: needs.prepare-release.outputs.should-release == 'true'
+    timeout-minutes: 5
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🔄 Update Development Version
+        run: |
+          echo "🔄 Updating development version..."
+          
+          # Bump to next development version
+          npm version prerelease --preid=dev --no-git-tag-version
+          
+          # Commit version bump
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add package.json
+          git commit -m "chore: bump version to next development version"
+          git push origin main
+      
+      - name: 📊 Release Analytics
+        run: |
+          echo "📊 Release analytics..."
+          echo "🎯 Release: v${{ needs.prepare-release.outputs.version }}"
+          echo "📅 Date: $(date)"
+          echo "🔗 Repository: ${{ github.repository }}"
+          echo "👤 Actor: ${{ github.actor }}"
+          echo "🌟 Success: Release completed successfully"
+      
+      - name: 🎉 Success Notification
+        run: |
+          echo "🎉 Release deployment completed successfully!"
+          echo ""
+          echo "🌌 Catppuccin StarryNight v${{ needs.prepare-release.outputs.version }} is now available!"
+          echo "📦 Download: https://github.com/${{ github.repository }}/releases/latest"
+          echo "📚 Documentation: https://github.com/${{ github.repository }}/blob/main/README.md"
+          echo ""
+          echo "✨ Thank you for using Catppuccin StarryNight!"

@@ -1,0 +1,160 @@
+# =============================================================================
+# 🌌 Catppuccin StarryNight - Code Ownership & Review Requirements
+# =============================================================================
+# This file defines code ownership and review requirements for the repository.
+# GitHub will automatically request reviews from code owners when PRs are opened.
+
+# =============================================================================
+# GLOBAL OWNERSHIP
+# =============================================================================
+# All files require review unless overridden below
+* @catppuccin/starrynight-maintainers
+
+# =============================================================================
+# CORE SYSTEM OWNERSHIP
+# =============================================================================
+
+# TypeScript Configuration and Build System
+tsconfig.json @catppuccin/starrynight-maintainers
+tsconfig.*.json @catppuccin/starrynight-maintainers
+package.json @catppuccin/starrynight-maintainers
+package-lock.json @catppuccin/starrynight-maintainers
+jest.config.js @catppuccin/starrynight-maintainers
+*.config.js @catppuccin/starrynight-maintainers
+
+# Core System Architecture
+src-js/core/ @catppuccin/starrynight-core-team
+src-js/core/lifecycle/ @catppuccin/starrynight-core-team
+src-js/core/performance/ @catppuccin/starrynight-performance-team
+src-js/types/ @catppuccin/starrynight-core-team
+
+# Performance-Critical Systems
+src-js/core/performance/PerformanceAnalyzer.ts @catppuccin/starrynight-performance-team
+src-js/core/performance/PerformanceBudgetManager.ts @catppuccin/starrynight-performance-team
+src-js/core/performance/CSSVariableBatcher.ts @catppuccin/starrynight-performance-team
+src-js/core/performance/OptimizedCSSVariableBatcher.ts @catppuccin/starrynight-performance-team
+
+# =============================================================================
+# VISUAL SYSTEMS OWNERSHIP
+# =============================================================================
+
+# Visual System Architecture
+src-js/visual/ @catppuccin/starrynight-visual-team
+src-js/visual/base/ @catppuccin/starrynight-visual-team
+src-js/visual/backgrounds/ @catppuccin/starrynight-visual-team
+
+# Animation and Effects
+src-js/visual/ui-effects/ @catppuccin/starrynight-visual-team
+src-js/core/animation/ @catppuccin/starrynight-visual-team
+src-js/visual/beat-sync/ @catppuccin/starrynight-audio-team @catppuccin/starrynight-visual-team
+
+# WebGL and Graphics
+src-js/visual/backgrounds/WebGL*.ts @catppuccin/starrynight-graphics-team
+src-js/utils/graphics/ @catppuccin/starrynight-graphics-team
+src-js/assets/shaders/ @catppuccin/starrynight-graphics-team
+
+# =============================================================================
+# AUDIO SYSTEMS OWNERSHIP
+# =============================================================================
+
+# Audio Analysis and Music Sync
+src-js/audio/ @catppuccin/starrynight-audio-team
+src-js/services/MusicSyncService.ts @catppuccin/starrynight-audio-team
+
+# =============================================================================
+# STYLING AND THEMING OWNERSHIP
+# =============================================================================
+
+# SCSS and CSS Architecture
+src/ @catppuccin/starrynight-styling-team
+src/core/ @catppuccin/starrynight-styling-team
+src/design-tokens/ @catppuccin/starrynight-styling-team
+app.scss @catppuccin/starrynight-styling-team
+user.css @catppuccin/starrynight-styling-team
+
+# Catppuccin Color Integration
+src/core/_variables.scss @catppuccin/starrynight-styling-team @catppuccin/color-maintainers
+color.ini @catppuccin/starrynight-styling-team @catppuccin/color-maintainers
+
+# =============================================================================
+# TESTING AND QUALITY ASSURANCE
+# =============================================================================
+
+# Test Files
+tests/ @catppuccin/starrynight-qa-team
+src-js/tests/ @catppuccin/starrynight-qa-team
+*.test.ts @catppuccin/starrynight-qa-team
+*.test.tsx @catppuccin/starrynight-qa-team
+*.spec.ts @catppuccin/starrynight-qa-team
+
+# Quality Assurance Tools
+.github/workflows/ @catppuccin/starrynight-devops-team
+.git/hooks/ @catppuccin/starrynight-devops-team
+scripts/ @catppuccin/starrynight-devops-team
+
+# =============================================================================
+# DOCUMENTATION AND GUIDES
+# =============================================================================
+
+# Documentation
+docs/ @catppuccin/starrynight-docs-team
+README.md @catppuccin/starrynight-docs-team
+CHANGELOG.md @catppuccin/starrynight-docs-team
+*.md @catppuccin/starrynight-docs-team
+
+# Developer Experience
+CLAUDE.md @catppuccin/starrynight-maintainers
+.github/ @catppuccin/starrynight-devops-team
+
+# =============================================================================
+# SPICETIFY INTEGRATION
+# =============================================================================
+
+# Spicetify Theme Files
+manifest.json @catppuccin/starrynight-maintainers @catppuccin/spicetify-team
+theme.js @catppuccin/starrynight-maintainers
+install*.sh @catppuccin/starrynight-maintainers
+install*.ps1 @catppuccin/starrynight-maintainers
+
+# Spicetify API Integration
+src-js/utils/platform/SpicetifyCompat.ts @catppuccin/starrynight-maintainers @catppuccin/spicetify-team
+src-js/utils/platform/spicetifyReady.ts @catppuccin/starrynight-maintainers @catppuccin/spicetify-team
+
+# =============================================================================
+# SECURITY AND CRITICAL PATHS
+# =============================================================================
+
+# Security-sensitive files (require additional review)
+package.json @catppuccin/starrynight-maintainers @catppuccin/security-team
+package-lock.json @catppuccin/starrynight-maintainers @catppuccin/security-team
+.github/workflows/ @catppuccin/starrynight-devops-team @catppuccin/security-team
+
+# Performance-critical paths (require performance team review)
+src-js/core/performance/ @catppuccin/starrynight-performance-team @catppuccin/starrynight-maintainers
+
+# =============================================================================
+# EMERGENCY OVERRIDES
+# =============================================================================
+
+# Critical hotfixes - maintainers can override any review requirements
+# Use sparingly and document in PR description
+HOTFIX.md @catppuccin/starrynight-maintainers
+
+# =============================================================================
+# TEAM DEFINITIONS
+# =============================================================================
+# NOTE: These teams would be configured in GitHub organization settings
+# 
+# @catppuccin/starrynight-maintainers - Overall project maintainers
+# @catppuccin/starrynight-core-team - Core system architecture
+# @catppuccin/starrynight-performance-team - Performance optimization specialists
+# @catppuccin/starrynight-visual-team - Visual effects and animations
+# @catppuccin/starrynight-audio-team - Audio analysis and music sync
+# @catppuccin/starrynight-styling-team - CSS/SCSS theming experts
+# @catppuccin/starrynight-graphics-team - WebGL and graphics specialists
+# @catppuccin/starrynight-qa-team - Quality assurance and testing
+# @catppuccin/starrynight-devops-team - CI/CD and infrastructure
+# @catppuccin/starrynight-docs-team - Documentation and guides
+# @catppuccin/spicetify-team - Spicetify integration experts
+# @catppuccin/security-team - Security review specialists
+# @catppuccin/color-maintainers - Catppuccin color palette maintainers

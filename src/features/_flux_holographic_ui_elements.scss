@@ -1,0 +1,320 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// 🌈 FLUX HOLOGRAPHIC UI ELEMENTS - Integrated Glass & Crystal Effects
+// YEAR 3000 VISUAL TRANSCENDENCE MODULE
+// "Text doesn't live on screens. It projects from crystalline consciousness."
+// ████████████████████████████████████████████████████████████████████████████████
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎨 INTEGRATED HOLOGRAPHIC VARIABLES (via GlassmorphismManager + CrystallineGlass)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // === HOLOGRAPHIC INTEGRATION HOOKS ===
+  // These integrate with the glassmorphism and crystalline systems
+  --holographic-chromatic-intensity: var(--music-aberration-strength, 1px);
+  --holographic-chromatic-speed: var(--living-pulse-speed, 8s);
+  --holographic-prism-intensity: var(--music-prism-intensity, 0.4);
+
+  // === SIMPLIFIED TEXT EFFECTS ===
+  --text-shimmer-intensity: 0.3;
+  --text-shimmer-speed: var(--living-pulse-speed, 8s);
+  --text-glow-strength: 0.2;
+
+  // === MUSICAL RESPONSIVENESS (Simplified) ===
+  --music-text-intensity: calc(
+    var(--text-shimmer-intensity) +
+    var(--sn-beat-pulse-intensity, 0) * 0.3
+  );
+  --music-glow-strength: calc(
+    var(--text-glow-strength) +
+    var(--sn-music-energy, 0) * 0.4
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ✨ LIGHTWEIGHT TEXT EFFECTS (Integrated with Crystal System)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Gentle text shimmer (replaces heavy chromatic aberration)
+@keyframes gentle-text-shimmer {
+  0%, 100% {
+    opacity: var(--text-shimmer-intensity);
+    text-shadow: 0 0 5px rgba(var(--sn-gradient-accent-rgb), 0.2);
+  }
+  50% {
+    opacity: calc(var(--text-shimmer-intensity) * 1.4);
+    text-shadow: 0 0 8px rgba(var(--sn-gradient-accent-rgb), 0.4);
+  }
+}
+
+// Simple gradient flow (replaces rainbow spectrum)
+@keyframes simple-gradient-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎨 LIGHTWEIGHT TEXT SHIMMER MIXIN (Replaces Chromatic Aberration)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin lightweight-text-shimmer($intensity: normal) {
+  color: rgba(var(--sn-gradient-primary-rgb), 0.95);
+
+  @if $intensity == subtle {
+    --local-shimmer-strength: 0.15;
+  } @else if $intensity == intense {
+    --local-shimmer-strength: 0.5;
+  } @else {
+    --local-shimmer-strength: var(--music-text-intensity);
+  }
+
+  // Simple text glow that responds to music
+  text-shadow: 0 0 calc(var(--local-shimmer-strength) * 10px) rgba(var(--sn-gradient-accent-rgb), var(--music-glow-strength));
+
+  // Lightweight shimmer animation (replaces heavy aberration)
+  animation: gentle-text-shimmer var(--text-shimmer-speed) ease-in-out infinite;
+
+  // Transition smoothly between states
+  transition: text-shadow 0.3s ease-out, opacity 0.2s ease-out;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌈 SIMPLE GRADIENT TEXT MIXIN (Replaces Heavy Rainbow Spectrum)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin simple-gradient-text($flow-speed: normal) {
+  @if $flow-speed == slow {
+    --local-gradient-speed: calc(var(--text-shimmer-speed) * 1.5);
+  } @else if $flow-speed == fast {
+    --local-gradient-speed: calc(var(--text-shimmer-speed) * 0.7);
+  } @else {
+    --local-gradient-speed: var(--text-shimmer-speed);
+  }
+
+  // Simple three-color gradient (replaces complex rainbow)
+  background: linear-gradient(
+    45deg,
+    rgba(var(--sn-gradient-primary-rgb), 1) 0%,
+    rgba(var(--sn-gradient-accent-rgb), 1) 50%,
+    rgba(var(--sn-gradient-secondary-rgb), 1) 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+
+  // Simple gradient flow animation (replaces heavy rainbow flow)
+  animation: simple-gradient-flow var(--local-gradient-speed) linear infinite;
+
+  // Transition smoothly
+  transition: background-size 0.3s ease-out;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🔮 SIMPLE GLOW EFFECT (Replaces Heavy Portal Effects)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin simple-glow-effect {
+  // Simple glow on hover (replaces complex portal effects)
+  transition:
+    box-shadow 0.3s ease-out,
+    transform 0.2s ease-out;
+
+  &:hover,
+  &:focus,
+  &[aria-selected="true"] {
+    box-shadow:
+      0 0 15px rgba(var(--sn-gradient-accent-rgb), 0.3),
+      0 0 30px rgba(var(--sn-gradient-accent-rgb), 0.1);
+    transform: scale(1.02);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎭 APPLICATION TO SPOTIFY UI ELEMENTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// === MAIN HEADINGS AND TITLES ===
+h1,
+h2,
+h3,
+.main-entityHeader-title,
+.main-trackList-trackListHeaderRow th,
+.main-cardHeader-text {
+  @include lightweight-text-shimmer(subtle);
+}
+
+// === SPECIAL EMPHASIS ELEMENTS ===
+.main-nowPlayingBar-trackInfo strong,
+.main-trackInfo-name,
+.main-cardHeader-cardHeaderTitle,
+.main-entityHeader-subtitle {
+  @include simple-gradient-text(slow);
+  @include simple-glow-effect;
+}
+
+// === NAVIGATION AND MENU ITEMS ===
+.main-navBar-navBarLink,
+.main-rootlist-rootlistItemLink,
+.main-contextMenu-menuItemButton,
+.spicetify-playlist-list li a {
+  @include lightweight-text-shimmer(subtle);
+
+  // Enhanced effects on active/selected states only
+  &[aria-selected="true"],
+  &.main-rootlist-rootlistItemActive {
+    @include simple-gradient-text(fast);
+  }
+
+  // Simple glow on hover
+  &:hover {
+    @include simple-glow-effect;
+  }
+}
+
+// === TRACK NAMES AND ARTIST NAMES ===
+.main-trackList-trackName,
+.main-trackList-rowTitle a,
+.main-card-cardMetadata-title,
+.main-cardHeader-link {
+  @include lightweight-text-shimmer(subtle);
+
+  // Currently playing track gets gradient treatment
+  .main-trackList-selected &,
+  .main-trackList-trackListRow:has(.main-trackList-playingIcon) & {
+    @include simple-gradient-text(normal);
+    @include simple-glow-effect;
+  }
+}
+
+// === BUTTONS AND INTERACTIVE ELEMENTS ===
+.main-playButton-PlayButton,
+.main-skipBackButton-button,
+.main-skipForwardButton-button,
+.main-shuffleButton-button,
+.main-repeatButton-button {
+  @include lightweight-text-shimmer(intense);
+  @include simple-glow-effect;
+
+  // Special treatment for main play button
+  &.main-playButton-PlayButton {
+    @include simple-gradient-text(fast);
+  }
+}
+
+// === SEARCH RESULTS ===
+.main-search-searchCategory h2,
+.main-shelf-header h2 {
+  @include simple-gradient-text(slow);
+  @include simple-glow-effect;
+}
+
+// === TIME DISPLAYS AND NUMERIC VALUES ===
+.main-trackList-duration,
+.main-playbackBarRemainingTime-container,
+.main-playbackBarDisplay-bar {
+  @include lightweight-text-shimmer(subtle);
+
+  // Enhanced effects during active playback
+  .main-nowPlayingBar-nowPlayingBar:hover & {
+    @include simple-gradient-text(fast);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎵 SIMPLIFIED MUSIC-RESPONSIVE ENHANCEMENT (Integrated with Other Systems)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Note: Main music responsiveness now handled by:
+// - GlassmorphismManager for aberration effects
+// - BeatSyncVisualSystem for pulse coordination
+// - CrystallineGlass for prismatic effects
+
+// Simple beat-responsive text glow enhancement
+.Root[style*="--sn-beat-pulse-intensity"] {
+  h1, h2, h3,
+  .main-entityHeader-title,
+  .main-trackList-trackName,
+  .main-cardHeader-text {
+    // Text shimmer speed scales with beat intensity
+    animation-duration: calc(var(--text-shimmer-speed) / max(var(--sn-beat-pulse-intensity, 0.3), 0.3));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌟 ACCESSIBILITY & PERFORMANCE CONSCIOUSNESS (Simplified)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --text-shimmer-speed: 20s;
+    --text-shimmer-intensity: 0.1;
+  }
+
+  // Disable all animations for motion sensitivity
+  h1, h2, h3,
+  .main-entityHeader-title,
+  .main-trackList-trackName,
+  .main-cardHeader-text,
+  .main-navBar-navBarLink {
+    animation: none !important;
+  }
+
+  // Static gradient text only
+  .main-nowPlayingBar-trackInfo strong,
+  .main-cardHeader-cardHeaderTitle {
+    background: linear-gradient(
+      45deg,
+      rgba(var(--sn-gradient-primary-rgb), 1) 0%,
+      rgba(var(--sn-gradient-accent-rgb), 1) 50%,
+      rgba(var(--sn-gradient-secondary-rgb), 1) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --text-shimmer-intensity: 0.2;
+    --text-glow-strength: 0.1;
+  }
+
+  // Reduced effects for mobile performance
+  .main-trackList-trackName,
+  .main-cardHeader-text {
+    animation-duration: calc(var(--text-shimmer-speed) * 2) !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --text-shimmer-intensity: 0.8;
+    --text-glow-strength: 0.6;
+  }
+
+  // Enhanced visibility for high contrast
+  h1, h2, h3,
+  .main-entityHeader-title,
+  .main-trackList-trackName {
+    text-shadow:
+      2px 0 rgba(255, 255, 255, 0.8),
+      -2px 0 rgba(0, 0, 0, 0.8),
+      0 2px rgba(255, 255, 255, 0.6),
+      0 -2px rgba(0, 0, 0, 0.6);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🚀 HOLOGRAPHIC INTERFACE COMPLETION
+// "We didn't just style text. We made language itself interdimensional."
+// ═══════════════════════════════════════════════════════════════════════════════

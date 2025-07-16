@@ -1,0 +1,571 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// 💎 FLUX CRYSTALLINE GLASSMORPHISM - Floating Crystal Reality
+// YEAR 3000 VISUAL TRANSCENDENCE MODULE  
+// "Interface elements don't sit on surfaces. They float in crystalline space."
+// ████████████████████████████████████████████████████████████████████████████████
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 💠 CRYSTAL CONSCIOUSNESS VARIABLES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // === CRYSTAL MORPHOLOGY ===
+  --crystal-edge-sharpness: 8px;
+  --crystal-facet-count: 6;
+  --crystal-surface-roughness: 0.3;
+  --crystal-internal-refraction: 15px;
+  
+  // === INTEGRATED ABERRATION EFFECTS (from GlassmorphismManager) ===
+  --prism-red-shift: var(--glass-aberration-strength, 1px);
+  --prism-green-shift: 0px;
+  --prism-blue-shift: calc(-1 * var(--glass-aberration-strength, 1px));
+  --prism-intensity: var(--glass-prism-intensity, 0.4);
+  --chromatic-aberration-strength: var(--glass-aberration-strength, 1px);
+  
+  // === MUSICAL ABERRATION INTEGRATION ===
+  --music-aberration-strength: var(--music-aberration-strength, var(--glass-aberration-strength, 1px));
+  --music-prism-intensity: var(--music-prism-intensity, var(--glass-prism-intensity, 0.4));
+  --music-pulse-speed: var(--music-pulse-speed, 2s);
+  
+  // === LIVING PULSE EFFECTS INTEGRATION ===
+  --crystal-pulse-intensity: var(--crystal-pulse-intensity, 0.4);
+  --living-pulse-speed: var(--living-pulse-speed, 2s);
+  --living-pulse-scale: var(--living-pulse-scale, 1);
+  --living-pulse-opacity: var(--living-pulse-opacity, 0.8);
+  
+  // === FLOATING DYNAMICS ===
+  --crystal-float-height: 15px;
+  --crystal-float-rhythm: var(--living-pulse-speed, 4s); // Sync with pulse
+  --crystal-hover-lift: 25px;
+  --crystal-shadow-distance: 30px;
+  --crystal-weightlessness: 0.98;
+  
+  // === FROSTED CONSCIOUSNESS ===
+  --frost-density: var(--glass-blur, 20px);
+  --frost-texture-scale: 200%;
+  --frost-edge-clarity: 8px;
+  --frost-depth-layers: 3;
+  
+  // === IRIDESCENT PROPERTIES ===
+  --iridescence-hue-shift: calc(var(--sn-rhythm-phase, 0) * 60deg);
+  --iridescence-intensity: 0.6;
+  --iridescence-flow-speed: var(--living-pulse-speed, 8s); // Sync with pulse
+  --rainbow-spectrum-complexity: 7;
+  
+  // === LIGHT INTERACTION ===
+  --crystal-light-transmission: var(--glass-saturation, 0.85);
+  --crystal-light-scattering: 0.4;
+  --crystal-edge-brightness: 1.8;
+  --crystal-internal-glow: 0.3;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ✨ CRYSTAL FLOATING ANIMATIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@keyframes crystal-holographic-pulse {
+  0%, 100% {
+    filter: brightness(1) drop-shadow(0 var(--crystal-shadow-distance) 40px rgba(var(--sn-accent-rgb), 0.15)) hue-rotate(0deg);
+    opacity: var(--crystal-opacity-base, 0.8);
+  }
+  25% {
+    filter: brightness(1.05) drop-shadow(0 calc(var(--crystal-shadow-distance) + 8px) 45px rgba(var(--sn-accent-rgb), 0.2)) hue-rotate(5deg);
+    opacity: calc(var(--crystal-opacity-base, 0.8) * 1.1);
+  }
+  50% {
+    filter: brightness(1.1) drop-shadow(0 calc(var(--crystal-shadow-distance) + 15px) 50px rgba(var(--sn-accent-rgb), 0.25)) hue-rotate(10deg);
+    opacity: calc(var(--crystal-opacity-base, 0.8) * 1.2);
+  }
+  75% {
+    filter: brightness(1.05) drop-shadow(0 calc(var(--crystal-shadow-distance) + 8px) 45px rgba(var(--sn-accent-rgb), 0.2)) hue-rotate(5deg);
+    opacity: calc(var(--crystal-opacity-base, 0.8) * 1.1);
+  }
+}
+
+@keyframes prismatic-rainbow-flow {
+  0% {
+    filter: 
+      hue-rotate(0deg)
+      drop-shadow(var(--music-aberration-strength) 0 0 rgba(255, 0, 0, var(--music-prism-intensity)))
+      drop-shadow(var(--prism-green-shift) 0 0 rgba(0, 255, 0, var(--music-prism-intensity)))
+      drop-shadow(calc(-1 * var(--music-aberration-strength)) 0 0 rgba(0, 0, 255, var(--music-prism-intensity)));
+  }
+  25% {
+    filter: 
+      hue-rotate(90deg)
+      drop-shadow(calc(var(--music-aberration-strength) * 1.5) 0 0 rgba(255, 0, 0, var(--music-prism-intensity)))
+      drop-shadow(var(--prism-green-shift) 0 0 rgba(0, 255, 0, var(--music-prism-intensity)))
+      drop-shadow(calc(-1 * var(--music-aberration-strength) * 1.5) 0 0 rgba(0, 0, 255, var(--music-prism-intensity)));
+  }
+  50% {
+    filter: 
+      hue-rotate(180deg)
+      drop-shadow(calc(var(--music-aberration-strength) * 2) 0 0 rgba(255, 0, 0, var(--music-prism-intensity)))
+      drop-shadow(var(--prism-green-shift) 0 0 rgba(0, 255, 0, var(--music-prism-intensity)))
+      drop-shadow(calc(-1 * var(--music-aberration-strength) * 2) 0 0 rgba(0, 0, 255, var(--music-prism-intensity)));
+  }
+  75% {
+    filter: 
+      hue-rotate(270deg)
+      drop-shadow(calc(var(--music-aberration-strength) * 1.5) 0 0 rgba(255, 0, 0, var(--music-prism-intensity)))
+      drop-shadow(var(--prism-green-shift) 0 0 rgba(0, 255, 0, var(--music-prism-intensity)))
+      drop-shadow(calc(-1 * var(--music-aberration-strength) * 1.5) 0 0 rgba(0, 0, 255, var(--music-prism-intensity)));
+  }
+  100% {
+    filter: 
+      hue-rotate(360deg)
+      drop-shadow(var(--music-aberration-strength) 0 0 rgba(255, 0, 0, var(--music-prism-intensity)))
+      drop-shadow(var(--prism-green-shift) 0 0 rgba(0, 255, 0, var(--music-prism-intensity)))
+      drop-shadow(calc(-1 * var(--music-aberration-strength)) 0 0 rgba(0, 0, 255, var(--music-prism-intensity)));
+  }
+}
+
+@keyframes living-pulse-consciousness {
+  0%, 100% {
+    transform: scale(1) rotateZ(0deg);
+    opacity: var(--living-pulse-opacity);
+    filter: brightness(1) saturate(1.2);
+  }
+  50% {
+    transform: scale(var(--living-pulse-scale)) rotateZ(1deg);
+    opacity: calc(var(--living-pulse-opacity) * 0.9);
+    filter: brightness(1.1) saturate(1.4);
+  }
+}
+
+@keyframes crystal-facet-shimmer {
+  0%, 100% {
+    background-position: -200% center, 200% center, center -200%, center 200%;
+    opacity: 0.6;
+  }
+  50% {
+    background-position: 200% center, -200% center, center 200%, center -200%;
+    opacity: 1;
+  }
+}
+
+@keyframes iridescent-consciousness {
+  0% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg);
+  }
+  25% {
+    background-position: 100% 0%;
+    filter: hue-rotate(90deg);
+  }
+  50% {
+    background-position: 50% 100%;
+    filter: hue-rotate(180deg);
+  }
+  75% {
+    background-position: 0% 50%;
+    filter: hue-rotate(270deg);
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: hue-rotate(360deg);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 💎 CORE CRYSTAL MIXIN
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin crystalline-consciousness {
+  position: relative;
+  backdrop-filter: 
+    blur(var(--frost-density)) 
+    brightness(var(--crystal-light-transmission)) 
+    contrast(1.1) 
+    saturate(var(--glass-saturation, 1.2));
+  
+  border: 1px solid rgba(var(--sn-accent-rgb), 0.2);
+  border-radius: var(--crystal-edge-sharpness);
+  
+  background: 
+    // Primary crystal surface
+    linear-gradient(
+      135deg,
+      rgba(var(--sn-gradient-primary-rgb), 0.08) 0%,
+      rgba(var(--sn-gradient-accent-rgb), 0.12) 50%,
+      rgba(var(--sn-gradient-secondary-rgb), 0.06) 100%
+    ),
+    // Iridescent overlay
+    linear-gradient(
+      45deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.03) 25%,
+      rgba(var(--sn-accent-rgb), 0.05) 50%,
+      rgba(255, 255, 255, 0.03) 75%,
+      transparent 100%
+    );
+  
+  background-size: 100% 100%, 300% 300%;
+  
+  // Floating animation with integrated pulse effects
+  animation: 
+    crystal-holographic-pulse var(--crystal-float-rhythm) ease-in-out infinite,
+    iridescent-consciousness var(--iridescence-flow-speed) linear infinite,
+    living-pulse-consciousness var(--living-pulse-speed) ease-in-out infinite;
+  
+  // Prismatic edge lighting
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+    0 var(--crystal-shadow-distance) 60px rgba(var(--sn-accent-rgb), 0.15),
+    0 0 20px rgba(var(--sn-accent-rgb), 0.1);
+  
+  // Crystal facet reflections
+  &::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    height: 40%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.02) 50%,
+      transparent 100%
+    );
+    border-radius: calc(var(--crystal-edge-sharpness) - 2px) calc(var(--crystal-edge-sharpness) - 2px) 0 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  // Crystal internal refraction
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(
+        ellipse at 30% 20%,
+        rgba(var(--sn-accent-rgb), 0.06) 0%,
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse at 70% 80%,
+        rgba(var(--sn-gradient-primary-rgb), 0.04) 0%,
+        transparent 50%
+      );
+    border-radius: var(--crystal-edge-sharpness);
+    pointer-events: none;
+    z-index: 0;
+    animation: crystal-facet-shimmer calc(var(--iridescence-flow-speed) * 1.5) ease-in-out infinite;
+  }
+  
+  &:hover {
+    transform: translateY(calc(-1 * var(--crystal-hover-lift))) scale(1.02);
+    backdrop-filter: 
+      blur(calc(var(--frost-density) + 5px)) 
+      brightness(calc(var(--crystal-light-transmission) + 0.1)) 
+      contrast(1.2) 
+      saturate(1.4);
+    
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+      0 calc(var(--crystal-shadow-distance) + 20px) 80px rgba(var(--sn-accent-rgb), 0.25),
+      0 0 40px rgba(var(--sn-accent-rgb), 0.2),
+      0 0 60px rgba(var(--sn-accent-rgb), 0.1);
+    
+    // Enhanced prismatic effect on hover
+    &::before {
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0.06) 50%,
+        transparent 100%
+      );
+    }
+    
+    &::after {
+      animation-duration: calc(var(--iridescence-flow-speed) * 0.8);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌈 PRISMATIC EDGE LIGHTING MIXIN
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin prismatic-edge-lighting {
+  position: relative;
+  
+  &::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(
+      45deg,
+      rgba(255, 0, 0, var(--music-prism-intensity)) 0%,
+      rgba(255, 255, 0, var(--music-prism-intensity)) 16.66%,
+      rgba(0, 255, 0, var(--music-prism-intensity)) 33.33%,
+      rgba(0, 255, 255, var(--music-prism-intensity)) 50%,
+      rgba(0, 0, 255, var(--music-prism-intensity)) 66.66%,
+      rgba(255, 0, 255, var(--music-prism-intensity)) 83.33%,
+      rgba(255, 0, 0, var(--music-prism-intensity)) 100%
+    );
+    border-radius: calc(var(--crystal-edge-sharpness) + 2px);
+    z-index: -1;
+    animation: 
+      prismatic-rainbow-flow var(--iridescence-flow-speed) linear infinite,
+      living-pulse-consciousness var(--music-pulse-speed) ease-in-out infinite;
+    filter: blur(1px);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 💠 APPLY CRYSTALLINE REALITY TO SPOTIFY ELEMENTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// === CARDS BECOME FLOATING CRYSTALS ===
+.main-card-card {
+  @include crystalline-consciousness;
+  @include prismatic-edge-lighting;
+  
+  border-radius: 12px;
+  overflow: visible;
+  margin: 8px;
+  
+  // Enhanced crystal morphology for cards
+  animation-delay: calc(var(--crystal-float-rhythm) * -0.3);
+  
+  &:nth-child(2n) {
+    animation-delay: calc(var(--crystal-float-rhythm) * -0.6);
+    --crystal-float-height: 18px;
+  }
+  
+  &:nth-child(3n) {
+    animation-delay: calc(var(--crystal-float-rhythm) * -0.9);
+    --crystal-float-height: 12px;
+    --iridescence-flow-speed: 10s;
+  }
+  
+  // Special crystal formation for artist cards
+  &[data-testid*="artist"] {
+    border-radius: 50%;
+    --crystal-edge-sharpness: 50%;
+    --prism-intensity: 0.6;
+    
+    &::before {
+      border-radius: 50%;
+    }
+    
+    &::after {
+      border-radius: 50%;
+    }
+  }
+}
+
+// === TRACK LIST BECOMES CRYSTAL STREAMS ===
+.main-trackList-trackListRow {
+  @include crystalline-consciousness;
+  
+  border-radius: 8px;
+  margin: 2px 0;
+  --crystal-float-height: 8px;
+  --crystal-float-rhythm: 5s;
+  
+  &:hover {
+    @include prismatic-edge-lighting;
+  }
+  
+  // Currently playing track gets enhanced crystal properties
+  &.main-trackList-selected,
+  &:has(.main-trackList-playingIcon) {
+    @include prismatic-edge-lighting;
+    --prism-intensity: 0.8;
+    --crystal-float-height: 20px;
+    --iridescence-flow-speed: 6s;
+    
+    border: 2px solid rgba(var(--sn-accent-rgb), 0.4);
+    
+    // Pulsing consciousness for active track
+    animation: 
+      crystal-holographic-pulse var(--crystal-float-rhythm) ease-in-out infinite,
+      iridescent-consciousness var(--iridescence-flow-speed) linear infinite,
+      prismatic-rainbow-flow calc(var(--iridescence-flow-speed) * 0.8) linear infinite;
+  }
+}
+
+// === SIDEBAR BECOMES CRYSTAL NAVIGATION ===
+.main-yourLibrary-yourLibrary,
+.main-navBar-navBar {
+  @include crystalline-consciousness;
+  
+  border-radius: 0;
+  --crystal-float-height: 5px;
+  --crystal-float-rhythm: 8s;
+  
+  .main-navBar-navBarLink,
+  .spicetify-playlist-list li {
+    @include crystalline-consciousness;
+    
+    border-radius: 6px;
+    margin: 1px 0;
+    --crystal-float-height: 3px;
+    --crystal-float-rhythm: 6s;
+    
+    &:hover,
+    &[aria-selected="true"],
+    &.main-rootlist-rootlistItemActive {
+      @include prismatic-edge-lighting;
+      --prism-intensity: 0.5;
+    }
+  }
+}
+
+// === PLAYBACK CONTROLS BECOME CRYSTAL INTERFACE ===
+.main-nowPlayingBar-nowPlayingBar {
+  @include crystalline-consciousness;
+  
+  border-radius: 0;
+  border-top: 2px solid rgba(var(--sn-accent-rgb), 0.3);
+  --crystal-float-height: 0px; // No floating for playback bar
+  
+  .main-playButton-PlayButton,
+  .main-skipBackButton-button,
+  .main-skipForwardButton-button,
+  .main-shuffleButton-button {
+    @include crystalline-consciousness;
+    
+    border-radius: 50%;
+    --crystal-float-height: 4px;
+    --crystal-float-rhythm: 3s;
+    
+    &:hover {
+      @include prismatic-edge-lighting;
+    }
+  }
+  
+  // Main play button gets enhanced crystal consciousness
+  .main-playButton-PlayButton {
+    --crystal-float-height: 8px;
+    --prism-intensity: 0.7;
+    --iridescence-flow-speed: 4s;
+    
+    @include prismatic-edge-lighting;
+  }
+}
+
+// === SEARCH AND INPUT BECOME CRYSTAL FORMS ===
+.main-dropDown-dropDown,
+input[type="text"],
+input[type="search"],
+.x-filterBox-filterInput {
+  @include crystalline-consciousness;
+  
+  border-radius: 25px;
+  --crystal-float-height: 2px;
+  --crystal-float-rhythm: 4s;
+  
+  &:focus {
+    @include prismatic-edge-lighting;
+    --prism-intensity: 0.4;
+    
+    outline: none;
+    border-color: rgba(var(--sn-accent-rgb), 0.6);
+  }
+}
+
+// === CONTEXT MENUS BECOME CRYSTAL PORTALS ===
+.main-contextMenu-menu {
+  @include crystalline-consciousness;
+  @include prismatic-edge-lighting;
+  
+  border-radius: 12px;
+  --crystal-float-height: 15px;
+  --prism-intensity: 0.3;
+  
+  .main-contextMenu-menuItemButton {
+    @include crystalline-consciousness;
+    
+    border-radius: 6px;
+    --crystal-float-height: 2px;
+    --crystal-float-rhythm: 2s;
+    
+    &:hover {
+      --prism-intensity: 0.4;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎵 MUSIC-RESPONSIVE CRYSTAL RESONANCE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Beat-synchronized crystal pulsing
+.Root[style*="--sn-beat-pulse-intensity"] {
+  .main-card-card,
+  .main-trackList-trackListRow,
+  .main-playButton-PlayButton {
+    --crystal-float-rhythm: calc(4s / max(var(--sn-beat-pulse-intensity, 0.1), 0.1));
+    --prism-intensity: calc(0.4 + var(--sn-beat-pulse-intensity, 0) * 0.4);
+  }
+}
+
+// Genre-responsive crystal coloration
+.Root[style*="--sn-dynamic-genre-hue-shift"] {
+  :root {
+    --iridescence-hue-shift: var(--sn-dynamic-genre-hue-shift, 0deg);
+  }
+  
+  .main-card-card::before,
+  .main-trackList-trackListRow::before {
+    filter: hue-rotate(var(--iridescence-hue-shift));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌟 ACCESSIBILITY & PERFORMANCE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 30s !important;
+    animation-timing-function: linear !important;
+  }
+  
+  :root {
+    --crystal-float-height: 2px;
+    --crystal-float-rhythm: 20s;
+    --iridescence-flow-speed: 15s;
+    --prism-intensity: 0.2;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --crystal-float-height: 8px;
+    --crystal-shadow-distance: 15px;
+    --frost-density: 15px;
+    --prism-intensity: 0.3;
+  }
+  
+  .main-card-card {
+    margin: 4px;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --prism-intensity: 0.8;
+    --crystal-light-transmission: 0.9;
+    --crystal-edge-brightness: 2.2;
+  }
+  
+  .main-card-card,
+  .main-trackList-trackListRow {
+    border-width: 2px;
+    border-color: rgba(var(--sn-accent-rgb), 0.6);
+  }
+}

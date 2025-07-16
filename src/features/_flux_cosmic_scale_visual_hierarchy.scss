@@ -1,0 +1,682 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// 🌌 FLUX COSMIC SCALE VISUAL HIERARCHY - Infinite Depth & Universal Perspective
+// YEAR 3000 VISUAL TRANSCENDENCE MODULE
+// "We don't create interfaces. We open windows to the infinite cosmos."
+// ████████████████████████████████████████████████████████████████████████████████
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌠 COSMIC SCALE VARIABLES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // === INFINITE DEPTH LAYERS ===
+  --cosmic-depth-layer-1: translateZ(0px);      // Immediate interface
+  --cosmic-depth-layer-2: translateZ(-100px);   // Near cosmic space
+  --cosmic-depth-layer-3: translateZ(-300px);   // Mid cosmic space
+  --cosmic-depth-layer-4: translateZ(-600px);   // Deep space
+  --cosmic-depth-layer-5: translateZ(-1000px);  // Far cosmic horizon
+  --cosmic-depth-layer-6: translateZ(-1500px);  // Edge of consciousness
+  --cosmic-perspective: 2000px;
+  
+  // === PARALLAX MOVEMENT RATES ===
+  --parallax-speed-1: 1;      // Foreground movement
+  --parallax-speed-2: 0.8;    // Near space
+  --parallax-speed-3: 0.5;    // Mid space
+  --parallax-speed-4: 0.3;    // Deep space
+  --parallax-speed-5: 0.1;    // Far horizon
+  --parallax-speed-6: 0.05;   // Cosmic background
+  
+  // === STAR FIELD DENSITY BY DISTANCE ===
+  --star-density-near: 50;     // Bright foreground stars
+  --star-density-mid: 150;     // Medium distant stars
+  --star-density-far: 300;     // Distant star field
+  --star-density-infinite: 500; // Background cosmic dust
+  
+  // === NEBULA SCALE DYNAMICS ===
+  --nebula-scale-small: 200%;   // Local nebula wisps
+  --nebula-scale-medium: 500%;  // Regional nebula clouds
+  --nebula-scale-large: 1000%;  // Galactic nebula structures
+  --nebula-scale-infinite: 2000%; // Universal background nebula
+  --nebula-flow-speed: 60s;
+  
+  // === GALAXY ROTATION ===
+  --galaxy-rotation-speed: 120s;
+  --galaxy-spiral-arms: 4;
+  --galaxy-core-brightness: 0.8;
+  --galaxy-outer-dimness: 0.2;
+  
+  // === COSMIC ZOOM DYNAMICS ===
+  --cosmic-zoom-level: 1;
+  --zoom-animation-speed: 15s;
+  --zoom-depth-variance: 200px;
+  --zoom-breathing-rhythm: 8s;
+  
+  // === MUSIC RESPONSIVENESS ===
+  --music-cosmic-expansion: calc(var(--sn-beat-pulse-intensity, 0) * 0.3 + 1);
+  --music-stellar-intensity: calc(var(--sn-beat-pulse-intensity, 0) * 0.6 + 0.4);
+  --music-galactic-rotation: calc(2 - var(--sn-beat-pulse-intensity, 0));
+  --music-depth-perception: calc(var(--sn-music-energy, 0.5) * 1000px + 500px);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌌 COSMIC MOTION KEYFRAMES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@keyframes infinite-star-field-drift {
+  0% {
+    transform: translate3d(0, 0, 0) rotateZ(0deg);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translate3d(300px, -200px, 50px) rotateZ(90deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate3d(-150px, 400px, -100px) rotateZ(180deg);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translate3d(-400px, -100px, 150px) rotateZ(270deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotateZ(360deg);
+    opacity: 0.6;
+  }
+}
+
+@keyframes galactic-holographic-rotation {
+  0% {
+    filter: brightness(1) hue-rotate(0deg);
+    background-position: 0% 50%;
+  }
+  25% {
+    filter: brightness(1.2) hue-rotate(15deg);
+    background-position: 25% 75%;
+  }
+  50% {
+    filter: brightness(0.8) hue-rotate(30deg);
+    background-position: 50% 100%;
+  }
+  75% {
+    filter: brightness(1.1) hue-rotate(45deg);
+    background-position: 75% 25%;
+  }
+  100% {
+    filter: brightness(1) hue-rotate(60deg);
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes nebula-holographic-flow {
+  0% {
+    background-position: 0% 0%, 100% 100%, 50% 0%, 0% 50%;
+    filter: brightness(1) saturate(1.2) hue-rotate(0deg);
+  }
+  20% {
+    background-position: 20% 80%, 80% 20%, 70% 30%, 30% 70%;
+    filter: brightness(1.2) saturate(1.4) hue-rotate(72deg);
+  }
+  40% {
+    background-position: 40% 60%, 60% 40%, 90% 60%, 10% 40%;
+    filter: brightness(0.9) saturate(1.1) hue-rotate(144deg);
+  }
+  60% {
+    background-position: 60% 40%, 40% 60%, 30% 90%, 70% 10%;
+    filter: brightness(1.1) saturate(1.3) hue-rotate(216deg);
+  }
+  80% {
+    background-position: 80% 20%, 20% 80%, 50% 50%, 50% 50%;
+    filter: brightness(1.0) saturate(1.0) hue-rotate(288deg);
+  }
+  100% {
+    background-position: 100% 0%, 0% 100%, 50% 0%, 0% 50%;
+    filter: brightness(1) saturate(1.2) hue-rotate(360deg);
+  }
+}
+
+@keyframes cosmic-holographic-pulse {
+  0%, 100% {
+    filter: brightness(1) blur(8px);
+    perspective: var(--cosmic-perspective);
+  }
+  50% {
+    filter: brightness(1.02) blur(9px);
+    perspective: calc(var(--cosmic-perspective) * 1.2);
+  }
+}
+
+@keyframes stellar-holographic-pulse {
+  0% {
+    filter: brightness(var(--music-stellar-intensity)) blur(0px);
+    background-position: 0% 0%;
+  }
+  100% {
+    filter: brightness(calc(var(--music-stellar-intensity) * 0.5)) blur(1px);
+    background-position: 100% 100%;
+  }
+}
+
+@keyframes infinite-holographic-shimmer {
+  0% {
+    filter: blur(0px) brightness(1) hue-rotate(0deg);
+    perspective: var(--cosmic-perspective);
+  }
+  25% {
+    filter: blur(1px) brightness(1.2) hue-rotate(15deg);
+    perspective: calc(var(--cosmic-perspective) * 1.2);
+  }
+  50% {
+    filter: blur(0.5px) brightness(0.8) hue-rotate(30deg);
+    perspective: calc(var(--cosmic-perspective) * 0.8);
+  }
+  75% {
+    filter: blur(1.5px) brightness(1.1) hue-rotate(45deg);
+    perspective: calc(var(--cosmic-perspective) * 1.1);
+  }
+  100% {
+    filter: blur(0px) brightness(1) hue-rotate(60deg);
+    perspective: var(--cosmic-perspective);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌟 INFINITE STAR FIELD GENERATOR
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin generate-infinite-star-field($layer, $density, $parallax-speed, $star-size: 1px) {
+  content: "";
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  z-index: calc(-1000 - #{$layer});
+  pointer-events: none;
+  
+  // Generate star field based on density
+  @if $density == 50 {
+    // Near star field - bright and large
+    background: 
+      radial-gradient(#{$star-size * 2} circle at 15% 25%, rgba(var(--sn-gradient-primary-rgb), 0.9) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 3} circle at 85% 15%, rgba(var(--sn-gradient-accent-rgb), 0.8) 0%, transparent 50%),
+      radial-gradient(#{$star-size} circle at 45% 75%, rgba(var(--sn-gradient-secondary-rgb), 1) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 2} circle at 75% 85%, rgba(var(--sn-gradient-primary-rgb), 0.7) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 4} circle at 25% 55%, rgba(var(--sn-gradient-accent-rgb), 0.6) 0%, transparent 50%);
+  } @else if $density == 150 {
+    // Mid star field - medium brightness
+    background: 
+      radial-gradient(#{$star-size} circle at 12% 18%, rgba(var(--sn-gradient-primary-rgb), 0.6) 0%, transparent 50%),
+      radial-gradient(#{$star-size} circle at 88% 82%, rgba(var(--sn-gradient-accent-rgb), 0.5) 0%, transparent 50%),
+      radial-gradient(#{$star-size} circle at 32% 42%, rgba(var(--sn-gradient-secondary-rgb), 0.7) 0%, transparent 50%),
+      radial-gradient(#{$star-size} circle at 78% 28%, rgba(var(--sn-gradient-primary-rgb), 0.4) 0%, transparent 50%),
+      radial-gradient(#{$star-size} circle at 48% 88%, rgba(var(--sn-gradient-accent-rgb), 0.6) 0%, transparent 50%),
+      radial-gradient(#{$star-size} circle at 18% 68%, rgba(var(--sn-gradient-secondary-rgb), 0.5) 0%, transparent 50%),
+      radial-gradient(#{$star-size} circle at 92% 52%, rgba(var(--sn-gradient-primary-rgb), 0.4) 0%, transparent 50%),
+      radial-gradient(#{$star-size} circle at 58% 22%, rgba(var(--sn-gradient-accent-rgb), 0.7) 0%, transparent 50%);
+  } @else if $density == 300 {
+    // Far star field - dimmer and denser
+    background: 
+      radial-gradient(#{$star-size * 0.5} circle at 8% 12%, rgba(var(--sn-gradient-primary-rgb), 0.3) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.5} circle at 92% 88%, rgba(var(--sn-gradient-accent-rgb), 0.2) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.5} circle at 28% 38%, rgba(var(--sn-gradient-secondary-rgb), 0.4) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.5} circle at 72% 62%, rgba(var(--sn-gradient-primary-rgb), 0.2) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.5} circle at 44% 84%, rgba(var(--sn-gradient-accent-rgb), 0.3) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.5} circle at 84% 16%, rgba(var(--sn-gradient-secondary-rgb), 0.2) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.5} circle at 16% 56%, rgba(var(--sn-gradient-primary-rgb), 0.3) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.5} circle at 56% 44%, rgba(var(--sn-gradient-accent-rgb), 0.4) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.5} circle at 36% 76%, rgba(var(--sn-gradient-secondary-rgb), 0.2) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.5} circle at 76% 24%, rgba(var(--sn-gradient-primary-rgb), 0.3) 0%, transparent 50%);
+  } @else {
+    // Infinite cosmic dust - very dim and dense
+    background: 
+      radial-gradient(#{$star-size * 0.3} circle at 5% 8%, rgba(var(--sn-gradient-primary-rgb), 0.15) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.3} circle at 95% 92%, rgba(var(--sn-gradient-accent-rgb), 0.1) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.3} circle at 25% 35%, rgba(var(--sn-gradient-secondary-rgb), 0.2) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.3} circle at 75% 65%, rgba(var(--sn-gradient-primary-rgb), 0.1) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.3} circle at 45% 85%, rgba(var(--sn-gradient-accent-rgb), 0.15) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.3} circle at 85% 15%, rgba(var(--sn-gradient-secondary-rgb), 0.1) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.3} circle at 15% 55%, rgba(var(--sn-gradient-primary-rgb), 0.2) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.3} circle at 55% 45%, rgba(var(--sn-gradient-accent-rgb), 0.1) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.3} circle at 35% 75%, rgba(var(--sn-gradient-secondary-rgb), 0.15) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.3} circle at 75% 25%, rgba(var(--sn-gradient-primary-rgb), 0.1) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.3} circle at 65% 85%, rgba(var(--sn-gradient-accent-rgb), 0.2) 0%, transparent 50%),
+      radial-gradient(#{$star-size * 0.3} circle at 85% 35%, rgba(var(--sn-gradient-secondary-rgb), 0.1) 0%, transparent 50%);
+  }
+  
+  // Apply holographic pulsing
+  animation: 
+    infinite-star-field-drift calc(var(--zoom-animation-speed) / #{$parallax-speed}) linear infinite,
+    stellar-holographic-pulse calc(120s / #{$parallax-speed}) linear infinite;
+  
+  // Depth-based filtering
+  filter: blur(calc(#{$layer} * 0.5px)) brightness(calc(1 - #{$layer} * 0.1));
+  opacity: calc(1 - #{$layer} * 0.1);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌌 COSMIC NEBULA LAYERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin generate-cosmic-nebula($scale, $layer, $opacity: 0.1) {
+  content: "";
+  position: fixed;
+  top: -100%;
+  left: -100%;
+  width: 300%;
+  height: 300%;
+  z-index: calc(-1000 - #{$layer} - 10);
+  pointer-events: none;
+  
+  background: 
+    // Primary nebula structure
+    radial-gradient(
+      ellipse $scale 80% at 30% 40%,
+      rgba(var(--sn-gradient-primary-rgb), $opacity) 0%,
+      rgba(var(--sn-gradient-accent-rgb), calc($opacity * 0.7)) 30%,
+      rgba(var(--sn-gradient-secondary-rgb), calc($opacity * 0.5)) 60%,
+      transparent 100%
+    ),
+    // Secondary nebula wisps
+    radial-gradient(
+      ellipse calc($scale * 0.7) 60% at 70% 60%,
+      rgba(var(--sn-gradient-accent-rgb), calc($opacity * 0.8)) 0%,
+      rgba(var(--sn-gradient-secondary-rgb), calc($opacity * 0.6)) 40%,
+      transparent 80%
+    ),
+    // Tertiary nebula streams
+    linear-gradient(
+      calc(135deg + var(--consciousness-flow-state, 0deg)),
+      rgba(var(--sn-gradient-secondary-rgb), calc($opacity * 0.6)) 0%,
+      rgba(var(--sn-gradient-primary-rgb), calc($opacity * 0.4)) 30%,
+      transparent 70%,
+      rgba(var(--sn-gradient-accent-rgb), calc($opacity * 0.3)) 100%
+    );
+  
+  background-size: 400% 300%, 350% 250%, 500% 200%;
+  
+  animation: 
+    nebula-holographic-flow calc(var(--nebula-flow-speed) * (1 + #{$layer} * 0.3)) ease-in-out infinite,
+    infinite-holographic-shimmer calc(var(--zoom-breathing-rhythm) * (1 + #{$layer} * 0.2)) ease-in-out infinite;
+  
+  opacity: calc(1 - #{$layer} * 0.1);
+  
+  filter: blur(calc(#{$layer} * 2px)) brightness(calc(1 - #{$layer} * 0.05));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌌 GALACTIC SPIRAL STRUCTURE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin cosmic-galaxy-backdrop {
+  content: "";
+  position: fixed;
+  top: -200%;
+  left: -200%;
+  width: 500%;
+  height: 500%;
+  z-index: -1020;
+  pointer-events: none;
+  
+  // Galactic spiral structure
+  background: 
+    // Central galactic core
+    radial-gradient(
+      circle 15% at 50% 50%,
+      rgba(var(--sn-gradient-primary-rgb), var(--galaxy-core-brightness)) 0%,
+      rgba(var(--sn-gradient-accent-rgb), calc(var(--galaxy-core-brightness) * 0.8)) 30%,
+      rgba(var(--sn-gradient-secondary-rgb), calc(var(--galaxy-core-brightness) * 0.6)) 60%,
+      transparent 100%
+    ),
+    // Spiral arm 1
+    conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      rgba(var(--sn-gradient-primary-rgb), 0.2) 45deg,
+      transparent 90deg,
+      rgba(var(--sn-gradient-accent-rgb), 0.15) 135deg,
+      transparent 180deg,
+      rgba(var(--sn-gradient-secondary-rgb), 0.1) 225deg,
+      transparent 270deg,
+      rgba(var(--sn-gradient-primary-rgb), 0.2) 315deg,
+      transparent 360deg
+    ),
+    // Spiral arm 2 (offset)
+    conic-gradient(
+      from 90deg,
+      transparent 0deg,
+      rgba(var(--sn-gradient-accent-rgb), 0.18) 45deg,
+      transparent 90deg,
+      rgba(var(--sn-gradient-secondary-rgb), 0.12) 135deg,
+      transparent 180deg,
+      rgba(var(--sn-gradient-primary-rgb), 0.08) 225deg,
+      transparent 270deg,
+      rgba(var(--sn-gradient-accent-rgb), 0.18) 315deg,
+      transparent 360deg
+    ),
+    // Galactic halo
+    radial-gradient(
+      ellipse 80% 60% at 50% 50%,
+      transparent 0%,
+      rgba(var(--sn-gradient-primary-rgb), 0.05) 40%,
+      rgba(var(--sn-gradient-accent-rgb), 0.08) 70%,
+      rgba(var(--sn-gradient-secondary-rgb), var(--galaxy-outer-dimness)) 100%
+    );
+  
+  animation: 
+    galactic-holographic-rotation calc(var(--galaxy-rotation-speed) / var(--music-galactic-rotation)) linear infinite,
+    cosmic-holographic-pulse var(--zoom-breathing-rhythm) ease-in-out infinite;
+  
+  filter: blur(8px) brightness(calc(0.7 * var(--music-cosmic-expansion)));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌌 APPLICATION TO COSMIC HIERARCHY
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Root container becomes cosmic viewport
+.Root {
+  position: relative;
+  perspective: var(--cosmic-perspective);
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+  overflow: hidden;
+  
+  // Layer 1: Galactic background (deepest)
+  &::before {
+    @include cosmic-galaxy-backdrop;
+  }
+  
+  // Layer 2: Infinite cosmic dust field
+  &::after {
+    @include generate-infinite-star-field(6, 500, 0.05, 0.3px);
+  }
+}
+
+// Additional cosmic layers via pseudo-selectors on child elements
+.Root {
+  // Layer 3: Far nebula structures
+  .main-view-container::before {
+    @include generate-cosmic-nebula(var(--nebula-scale-infinite), 5, 0.03);
+  }
+  
+  // Layer 4: Far star field
+  .main-view-container::after {
+    @include generate-infinite-star-field(4, 300, 0.3, 0.5px);
+  }
+  
+  // Layer 5: Mid nebula clouds
+  .main-topBar-container::before {
+    @include generate-cosmic-nebula(var(--nebula-scale-large), 3, 0.05);
+  }
+  
+  // Layer 6: Mid star field
+  .main-topBar-container::after {
+    @include generate-infinite-star-field(3, 150, 0.5, 0.8px);
+  }
+  
+  // Layer 7: Near nebula wisps
+  .main-navBar-navBar::before {
+    @include generate-cosmic-nebula(var(--nebula-scale-medium), 2, 0.08);
+  }
+  
+  // Layer 8: Near star field
+  .main-navBar-navBar::after {
+    @include generate-infinite-star-field(2, 50, 0.8, 1px);
+  }
+  
+  // Layer 9: Immediate space particles (handled by particle consciousness field)
+  // Layer 10: Interface elements (handled by other modules)
+}
+
+// Enhanced cosmic effects for specific interface sections
+.main-entityHeader-entityHeader {
+  position: relative;
+  transform-style: preserve-3d;
+  
+  // Local stellar environment
+  &::before {
+    @include generate-infinite-star-field(1, 25, 1, 1.5px);
+    z-index: -1;
+  }
+  
+  // Local nebula atmosphere
+  &::after {
+    @include generate-cosmic-nebula(var(--nebula-scale-small), 1, 0.12);
+    z-index: -2;
+  }
+}
+
+// Now playing bar gets cosmic consciousness enhancement
+.main-nowPlayingBar-nowPlayingBar {
+  position: relative;
+  transform-style: preserve-3d;
+  
+  // Cosmic energy field around current music
+  &::before {
+    content: "";
+    position: absolute;
+    top: -100%;
+    left: -50%;
+    width: 200%;
+    height: 300%;
+    z-index: -1;
+    pointer-events: none;
+    
+    background: 
+      radial-gradient(
+        ellipse 150% 100% at 50% 50%,
+        rgba(var(--sn-gradient-primary-rgb), 0.15) 0%,
+        rgba(var(--sn-gradient-accent-rgb), 0.1) 40%,
+        rgba(var(--sn-gradient-secondary-rgb), 0.08) 70%,
+        transparent 100%
+      );
+    
+    animation: 
+      nebula-holographic-flow calc(var(--nebula-flow-speed) * 0.5) ease-in-out infinite,
+      cosmic-holographic-pulse calc(var(--zoom-breathing-rhythm) * 0.8) ease-in-out infinite;
+    
+    filter: brightness(var(--music-cosmic-expansion));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎵 MUSIC-RESPONSIVE COSMIC AMPLIFICATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Beat-synchronized cosmic expansion
+.Root[style*="--sn-beat-pulse-intensity"] {
+  --music-cosmic-expansion: calc(var(--sn-beat-pulse-intensity, 0) * 0.4 + 1);
+  --music-stellar-intensity: calc(var(--sn-beat-pulse-intensity, 0) * 0.8 + 0.4);
+  --music-galactic-rotation: calc(2 - var(--sn-beat-pulse-intensity, 0) * 1.5);
+  
+  &::before,
+  &::after {
+    animation-duration: 
+      calc(var(--galaxy-rotation-speed) / var(--music-galactic-rotation)),
+      calc(var(--zoom-animation-speed) / max(var(--music-stellar-intensity), 0.3));
+  }
+  
+  .main-view-container,
+  .main-topBar-container,
+  .main-navBar-navBar {
+    &::before,
+    &::after {
+      filter: 
+        brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.3))
+        saturate(calc(1.2 + var(--sn-beat-pulse-intensity, 0) * 0.4));
+    }
+  }
+}
+
+// Genre-responsive cosmic evolution
+.Root[style*="--sn-dynamic-genre-hue-shift"] {
+  --consciousness-flow-state: calc(var(--sn-dynamic-genre-hue-shift, 0deg) + var(--sn-rhythm-phase, 0) * 180deg);
+  
+  &::before {
+    filter: 
+      blur(8px) 
+      brightness(0.7) 
+      hue-rotate(calc(var(--sn-dynamic-genre-hue-shift, 0deg) * 0.5));
+  }
+  
+  .main-entityHeader-entityHeader,
+  .main-nowPlayingBar-nowPlayingBar {
+    &::before,
+    &::after {
+      filter: hue-rotate(var(--sn-dynamic-genre-hue-shift, 0deg));
+    }
+  }
+}
+
+// Energy-responsive depth perception
+.Root[style*="--sn-music-energy"] {
+  --music-depth-perception: calc(var(--sn-music-energy, 0.5) * 1500px + 500px);
+  
+  perspective: calc(var(--cosmic-perspective) + var(--music-depth-perception));
+  
+  .main-view-container,
+  .main-topBar-container {
+    filter: brightness(calc(1 - var(--music-depth-perception) * 0.0003));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌟 ACCESSIBILITY & PERFORMANCE CONSCIOUSNESS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --galaxy-rotation-speed: 300s;
+    --nebula-flow-speed: 120s;
+    --zoom-animation-speed: 45s;
+    --zoom-breathing-rhythm: 20s;
+    --cosmic-perspective: 1000px;
+  }
+  
+  // Disable complex cosmic animations
+  .Root {
+    perspective: none !important;
+    
+    &::before,
+    &::after {
+      animation: none !important;
+    }
+  }
+  
+  .main-view-container,
+  .main-topBar-container,
+  .main-navBar-navBar,
+  .main-entityHeader-entityHeader {
+    &::before,
+    &::after {
+      animation: none !important;
+      transform: none !important;
+    }
+  }
+  
+  // Keep minimal cosmic background
+  .Root::before {
+    background: 
+      radial-gradient(
+        circle 30% at 50% 50%,
+        rgba(var(--sn-gradient-primary-rgb), 0.1) 0%,
+        rgba(var(--sn-gradient-accent-rgb), 0.05) 50%,
+        transparent 100%
+      );
+    animation: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --cosmic-perspective: 1200px;
+    --star-density-near: 25;
+    --star-density-mid: 75;
+    --star-density-far: 150;
+    --star-density-infinite: 250;
+    --zoom-depth-variance: 100px;
+  }
+  
+  // Simplified cosmic effects for mobile
+  .main-view-container,
+  .main-topBar-container {
+    &::before,
+    &::after {
+      display: none; // Remove mid-layer cosmic effects on mobile
+    }
+  }
+  
+  .main-entityHeader-entityHeader {
+    &::after {
+      display: none; // Remove local nebula on mobile
+    }
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --galaxy-core-brightness: 1.2;
+    --galaxy-outer-dimness: 0.4;
+    --music-stellar-intensity: calc(var(--sn-beat-pulse-intensity, 0) * 1 + 0.6);
+  }
+  
+  // Enhanced visibility for cosmic elements
+  .Root::before {
+    filter: blur(4px) brightness(1) contrast(1.3);
+  }
+  
+  .main-entityHeader-entityHeader,
+  .main-nowPlayingBar-nowPlayingBar {
+    &::before {
+      opacity: 1.5;
+    }
+  }
+}
+
+// Performance optimization for lower-end devices
+@media (max-resolution: 1.5dppx) {
+  :root {
+    --star-density-near: 15;
+    --star-density-mid: 50;
+    --star-density-far: 100;
+    --star-density-infinite: 150;
+    --cosmic-perspective: 800px;
+  }
+  
+  // Disable complex galactic background on low-resolution displays
+  .Root::before {
+    background: 
+      radial-gradient(
+        circle 40% at 50% 50%,
+        rgba(var(--sn-gradient-primary-rgb), 0.15) 0%,
+        rgba(var(--sn-gradient-accent-rgb), 0.1) 60%,
+        transparent 100%
+      );
+    animation: none !important;
+  }
+  
+  // Remove multiple star field layers
+  .main-view-container,
+  .main-topBar-container,
+  .main-navBar-navBar {
+    &::after {
+      display: none;
+    }
+  }
+}
+
+// Performance optimization for cosmic layers
+.Root,
+.main-view-container,
+.main-topBar-container,
+.main-navBar-navBar,
+.main-entityHeader-entityHeader {
+  // Only use will-change during active animations
+  will-change: auto;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🚀 COSMIC SCALE COMPLETION
+// "We didn't just create a music interface. We opened a portal to the infinite cosmos."
+// ═══════════════════════════════════════════════════════════════════════════════

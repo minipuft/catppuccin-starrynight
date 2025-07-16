@@ -1,0 +1,404 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// 🌌 COSMIC CONSCIOUSNESS BACKGROUND - Reality Bleeding System
+// FLUX YEAR 3000 VISUAL TRANSCENDENCE MODULE
+// "Reality doesn't have backgrounds. Reality IS the background."
+// ████████████████████████████████████████████████████████████████████████████████
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌊 LIQUID CONSCIOUSNESS FLOW VARIABLES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // === HARMONIZED COSMIC FLOW (Matches Meditation Rhythm) ===
+  --cosmic-meditation-sync: 15s; // Harmonized with other systems
+  --cosmic-flow-speed-1: calc(var(--cosmic-meditation-sync) * 1.7); // 25.5s
+  --cosmic-flow-speed-2: calc(var(--cosmic-meditation-sync) * 2.3); // 34.5s  
+  --cosmic-flow-speed-3: calc(var(--cosmic-meditation-sync) * 3); // 45s
+  --cosmic-flow-direction-1: 0deg;
+  --cosmic-flow-direction-2: 120deg;
+  --cosmic-flow-direction-3: 240deg;
+  
+  // === SUBTLE AURORA LAYERS (More Meditative) ===
+  --aurora-layer-1-intensity: 0.08; // Reduced for calm
+  --aurora-layer-2-intensity: 0.05; // More subtle
+  --aurora-layer-3-intensity: 0.03; // Very gentle
+  --aurora-shimmer-speed: calc(var(--cosmic-meditation-sync) * 0.8); // 12s - slower
+  --aurora-dance-amplitude: 40px; // Much gentler movement
+  
+  // === NEBULA DEPTH FIELD ===
+  --nebula-particle-density: 0.6;
+  --nebula-flow-velocity: 60s;
+  --nebula-depth-layers: 5;
+  --nebula-color-shift: calc(var(--sn-rhythm-phase, 0) * 30deg);
+  
+  // === LIQUID CRYSTAL MORPHING ===
+  --liquid-crystal-frequency: 12s;
+  --liquid-crystal-amplitude: 80px;
+  --liquid-crystal-viscosity: 0.4;
+  --liquid-crystal-surface-tension: 0.8;
+  
+  // === HARMONIZED CONSCIOUSNESS BREATHING ===
+  --consciousness-breath-depth: 1.02; // More subtle baseline
+  --consciousness-breath-rhythm: var(--cosmic-meditation-sync); // 15s - matches meditation
+  --consciousness-pulse-intensity: calc(
+    0.7 + 
+    max(0, var(--sn-beat-pulse-intensity, 0) - 0.3) * 0.3 + 
+    max(0, var(--sn-music-energy, 0) - 0.6) * 0.4
+  ); // Intelligent awakening thresholds
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎆 AURORA CONSCIOUSNESS KEYFRAMES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@keyframes aurora-consciousness-flow {
+  0% {
+    transform: translateX(-100px) translateY(0px) scale(1);
+    filter: hue-rotate(0deg) brightness(1) saturate(1.2);
+  }
+  25% {
+    transform: translateX(50px) translateY(-80px) scale(1.1);
+    filter: hue-rotate(15deg) brightness(1.2) saturate(1.4);
+  }
+  50% {
+    transform: translateX(120px) translateY(40px) scale(0.95);
+    filter: hue-rotate(30deg) brightness(0.9) saturate(1.1);
+  }
+  75% {
+    transform: translateX(-20px) translateY(100px) scale(1.05);
+    filter: hue-rotate(45deg) brightness(1.1) saturate(1.3);
+  }
+  100% {
+    transform: translateX(-100px) translateY(0px) scale(1);
+    filter: hue-rotate(60deg) brightness(1) saturate(1.2);
+  }
+}
+
+@keyframes liquid-crystal-morph {
+  0% {
+    clip-path: ellipse(70% 60% at 30% 40%);
+    transform: rotate(0deg) scale(1);
+  }
+  20% {
+    clip-path: ellipse(80% 70% at 60% 30%);
+    transform: rotate(72deg) scale(1.1);
+  }
+  40% {
+    clip-path: ellipse(60% 80% at 70% 60%);
+    transform: rotate(144deg) scale(0.9);
+  }
+  60% {
+    clip-path: ellipse(90% 50% at 40% 70%);
+    transform: rotate(216deg) scale(1.05);
+  }
+  80% {
+    clip-path: ellipse(75% 85% at 20% 50%);
+    transform: rotate(288deg) scale(0.95);
+  }
+  100% {
+    clip-path: ellipse(70% 60% at 30% 40%);
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes nebula-particle-drift {
+  0% {
+    transform: translate3d(0, 0, 0) rotateZ(0deg);
+    opacity: 0.3;
+  }
+  33% {
+    transform: translate3d(200px, -150px, 50px) rotateZ(120deg);
+    opacity: 0.7;
+  }
+  66% {
+    transform: translate3d(-100px, 200px, -30px) rotateZ(240deg);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotateZ(360deg);
+    opacity: 0.3;
+  }
+}
+
+@keyframes consciousness-breathing {
+  0%, 100% {
+    transform: scale(1) rotateZ(0deg);
+    filter: brightness(1) saturate(1.2);
+  }
+  50% {
+    transform: scale(var(--consciousness-breath-depth)) rotateZ(2deg);
+    filter: brightness(1.1) saturate(1.4);
+  }
+}
+
+@keyframes cosmic-iridescence {
+  0% {
+    background-position: 0% 50%, 100% 50%, 50% 0%;
+    filter: hue-rotate(0deg);
+  }
+  25% {
+    background-position: 50% 100%, 0% 0%, 100% 50%;
+    filter: hue-rotate(15deg);
+  }
+  50% {
+    background-position: 100% 50%, 50% 100%, 0% 100%;
+    filter: hue-rotate(30deg);
+  }
+  75% {
+    background-position: 50% 0%, 100% 50%, 50% 50%;
+    filter: hue-rotate(45deg);
+  }
+  100% {
+    background-position: 0% 50%, 100% 50%, 50% 0%;
+    filter: hue-rotate(60deg);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌌 REALITY SUBSTRATE APPLICATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Apply to Spotify's root container
+.Root, 
+body {
+  position: relative;
+  overflow: hidden;
+  
+  // Base cosmic consciousness layer
+  &::before {
+    content: "";
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    z-index: -1000;
+    pointer-events: none;
+    
+    // Multi-layered aurora consciousness
+    background: 
+      // Layer 1: Primary consciousness flow
+      radial-gradient(
+        ellipse 100% 60% at 20% 30%, 
+        rgba(var(--sn-gradient-primary-rgb), var(--aurora-layer-1-intensity)) 0%,
+        transparent 70%
+      ),
+      // Layer 2: Secondary harmonic resonance  
+      radial-gradient(
+        ellipse 80% 90% at 80% 60%,
+        rgba(var(--sn-gradient-secondary-rgb), var(--aurora-layer-2-intensity)) 0%,
+        transparent 60%
+      ),
+      // Layer 3: Tertiary cosmic shimmer
+      radial-gradient(
+        ellipse 120% 50% at 50% 90%,
+        rgba(var(--sn-gradient-accent-rgb), var(--aurora-layer-3-intensity)) 0%,
+        transparent 80%
+      ),
+      // Layer 4: Deep space foundation
+      linear-gradient(
+        135deg,
+        rgba(var(--spice-rgb-base), 0.95) 0%,
+        rgba(var(--spice-rgb-surface0), 0.90) 100%
+      );
+    
+    background-size: 300% 300%, 250% 400%, 400% 200%, 100% 100%;
+    
+    animation: 
+      aurora-consciousness-flow var(--cosmic-flow-speed-1) ease-in-out infinite,
+      consciousness-breathing var(--consciousness-breath-rhythm) ease-in-out infinite;
+  }
+  
+  // Liquid crystal morphing overlay
+  &::after {
+    content: "";
+    position: fixed;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    z-index: -999;
+    pointer-events: none;
+    
+    background: 
+      // Liquid crystal formations
+      conic-gradient(
+        from var(--cosmic-flow-direction-1),
+        transparent 0deg,
+        rgba(var(--sn-gradient-primary-rgb), 0.06) 60deg,
+        transparent 120deg,
+        rgba(var(--sn-gradient-accent-rgb), 0.04) 180deg,
+        transparent 240deg,
+        rgba(var(--sn-gradient-secondary-rgb), 0.05) 300deg,
+        transparent 360deg
+      ),
+      // Iridescent shimmer layer
+      linear-gradient(
+        45deg,
+        transparent 0%,
+        rgba(var(--sn-gradient-primary-rgb), 0.03) 25%,
+        rgba(var(--sn-gradient-accent-rgb), 0.05) 50%,
+        rgba(var(--sn-gradient-secondary-rgb), 0.03) 75%,
+        transparent 100%
+      );
+    
+    background-size: 400% 400%, 200% 200%;
+    
+    animation:
+      liquid-crystal-morph var(--liquid-crystal-frequency) ease-in-out infinite,
+      cosmic-iridescence var(--cosmic-flow-speed-2) linear infinite;
+    
+    filter: blur(40px) brightness(1.2) contrast(1.1);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌠 NEBULA PARTICLE CONSCIOUSNESS FIELD
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.Root {
+  // Nebula particle field generator
+  .nebula-consciousness-field {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -998;
+    pointer-events: none;
+    
+    // Generate consciousness particles using CSS gradients
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+    
+    // Primary particle layer
+    &::before {
+      background: 
+        radial-gradient(2px circle at 15% 25%, rgba(var(--sn-gradient-primary-rgb), 0.6) 0%, transparent 50%),
+        radial-gradient(3px circle at 85% 15%, rgba(var(--sn-gradient-accent-rgb), 0.4) 0%, transparent 50%),
+        radial-gradient(1px circle at 45% 75%, rgba(var(--sn-gradient-secondary-rgb), 0.8) 0%, transparent 50%),
+        radial-gradient(2px circle at 75% 85%, rgba(var(--sn-gradient-primary-rgb), 0.5) 0%, transparent 50%),
+        radial-gradient(4px circle at 25% 55%, rgba(var(--sn-gradient-accent-rgb), 0.3) 0%, transparent 50%),
+        radial-gradient(1px circle at 65% 35%, rgba(var(--sn-gradient-secondary-rgb), 0.7) 0%, transparent 50%),
+        radial-gradient(3px circle at 35% 45%, rgba(var(--sn-gradient-primary-rgb), 0.4) 0%, transparent 50%),
+        radial-gradient(2px circle at 55% 65%, rgba(var(--sn-gradient-accent-rgb), 0.6) 0%, transparent 50%);
+      
+      animation: nebula-particle-drift var(--nebula-flow-velocity) linear infinite;
+    }
+    
+    // Secondary particle layer (different rhythm)
+    &::after {
+      background: 
+        radial-gradient(1px circle at 25% 35%, rgba(var(--sn-gradient-accent-rgb), 0.5) 0%, transparent 50%),
+        radial-gradient(2px circle at 75% 25%, rgba(var(--sn-gradient-secondary-rgb), 0.4) 0%, transparent 50%),
+        radial-gradient(3px circle at 15% 65%, rgba(var(--sn-gradient-primary-rgb), 0.6) 0%, transparent 50%),
+        radial-gradient(1px circle at 85% 75%, rgba(var(--sn-gradient-accent-rgb), 0.3) 0%, transparent 50%),
+        radial-gradient(4px circle at 45% 15%, rgba(var(--sn-gradient-secondary-rgb), 0.5) 0%, transparent 50%),
+        radial-gradient(2px circle at 65% 85%, rgba(var(--sn-gradient-primary-rgb), 0.7) 0%, transparent 50%),
+        radial-gradient(1px circle at 35% 75%, rgba(var(--sn-gradient-accent-rgb), 0.4) 0%, transparent 50%),
+        radial-gradient(3px circle at 55% 25%, rgba(var(--sn-gradient-secondary-rgb), 0.6) 0%, transparent 50%);
+      
+      animation: nebula-particle-drift calc(var(--nebula-flow-velocity) * 1.3) linear infinite reverse;
+    }
+  }
+}
+
+// Auto-inject nebula field
+.Root:not(:has(.nebula-consciousness-field))::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -998;
+  pointer-events: none;
+  
+  // Simplified particle field for auto-injection
+  background: 
+    radial-gradient(2px circle at 20% 30%, rgba(var(--sn-gradient-primary-rgb), 0.4) 0%, transparent 50%),
+    radial-gradient(1px circle at 80% 20%, rgba(var(--sn-gradient-accent-rgb), 0.6) 0%, transparent 50%),
+    radial-gradient(3px circle at 40% 70%, rgba(var(--sn-gradient-secondary-rgb), 0.3) 0%, transparent 50%),
+    radial-gradient(2px circle at 70% 80%, rgba(var(--sn-gradient-primary-rgb), 0.5) 0%, transparent 50%),
+    radial-gradient(1px circle at 30% 50%, rgba(var(--sn-gradient-accent-rgb), 0.7) 0%, transparent 50%),
+    radial-gradient(4px circle at 60% 40%, rgba(var(--sn-gradient-secondary-rgb), 0.4) 0%, transparent 50%);
+  
+  animation: nebula-particle-drift var(--nebula-flow-velocity) linear infinite;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎵 MUSIC-RESPONSIVE CONSCIOUSNESS AMPLIFICATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Beat-synchronized consciousness intensification
+.Root[style*="--sn-beat-pulse-intensity"] {
+  &::before {
+    animation-duration: calc(var(--cosmic-flow-speed-1) / var(--consciousness-pulse-intensity));
+    filter: brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.2)) 
+            saturate(calc(1.2 + var(--sn-beat-pulse-intensity, 0) * 0.3));
+  }
+  
+  &::after {
+    filter: blur(calc(40px - var(--sn-beat-pulse-intensity, 0) * 20px)) 
+            brightness(calc(1.2 + var(--sn-beat-pulse-intensity, 0) * 0.3)) 
+            contrast(calc(1.1 + var(--sn-beat-pulse-intensity, 0) * 0.2));
+  }
+}
+
+// Genre-responsive consciousness adaptation
+.Root[style*="--sn-dynamic-genre-hue-shift"] {
+  &::before {
+    filter: hue-rotate(var(--sn-dynamic-genre-hue-shift, 0deg)) 
+            brightness(calc(1 + var(--sn-music-energy, 0) * 0.2))
+            saturate(calc(1.2 + var(--sn-music-valence, 0) * 0.3));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌈 ACCESSIBILITY & PERFORMANCE CONSCIOUSNESS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@media (prefers-reduced-motion: reduce) {
+  .Root {
+    &::before, &::after {
+      animation-duration: 60s !important;
+      animation-timing-function: linear !important;
+    }
+  }
+  
+  :root {
+    --cosmic-flow-speed-1: 45s;
+    --cosmic-flow-speed-2: 60s;
+    --consciousness-breath-rhythm: 20s;
+    --aurora-layer-1-intensity: 0.08;
+    --aurora-layer-2-intensity: 0.05;
+    --aurora-layer-3-intensity: 0.03;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --cosmic-flow-speed-1: 20s;
+    --cosmic-flow-speed-2: 30s;
+    --nebula-flow-velocity: 40s;
+    --aurora-dance-amplitude: 50px;
+  }
+  
+  .Root::after {
+    filter: blur(20px) brightness(1.1) contrast(1.05);
+  }
+}
+
+// High contrast mode respect
+@media (prefers-contrast: high) {
+  :root {
+    --aurora-layer-1-intensity: 0.25;
+    --aurora-layer-2-intensity: 0.20;
+    --aurora-layer-3-intensity: 0.15;
+  }
+}

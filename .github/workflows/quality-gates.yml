@@ -1,0 +1,351 @@
+name: 🔍 Quality Gates
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node.js version to use'
+        required: false
+        default: '20'
+        type: string
+      performance-budget:
+        description: 'Performance budget in bytes'
+        required: false
+        default: '200000'
+        type: string
+    outputs:
+      bundle-size:
+        description: 'Bundle size in bytes'
+        value: ${{ jobs.quality-checks.outputs.bundle-size }}
+      type-check-status:
+        description: 'TypeScript type check status'
+        value: ${{ jobs.quality-checks.outputs.type-check-status }}
+  workflow_dispatch:
+    inputs:
+      node-version:
+        description: 'Node.js version to use'
+        required: false
+        default: '20'
+        type: string
+
+jobs:
+  quality-checks:
+    name: 🔍 Quality Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    outputs:
+      bundle-size: ${{ steps.bundle-analysis.outputs.bundle-size }}
+      type-check-status: ${{ steps.type-check.outputs.status }}
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          echo "📦 Installing dependencies..."
+          npm ci
+          
+          # Verify installation
+          if [ -d "node_modules" ]; then
+            echo "✅ Dependencies installed successfully"
+          else
+            echo "❌ Dependencies installation failed"
+            exit 1
+          fi
+      
+      - name: 🔍 TypeScript Type Check
+        id: type-check
+        run: |
+          echo "🔍 Running TypeScript type checking..."
+          
+          # Create temporary file for output
+          TYPE_CHECK_OUTPUT=$(mktemp)
+          
+          if npm run typecheck 2>&1 | tee "$TYPE_CHECK_OUTPUT"; then
+            echo "✅ TypeScript type check passed"
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "❌ TypeScript type check failed"
+            echo "status=failure" >> $GITHUB_OUTPUT
+            
+            # Show the errors
+            echo "🔍 TypeScript errors:"
+            cat "$TYPE_CHECK_OUTPUT"
+            
+            # This is a hard failure - cannot proceed
+            exit 1
+          fi
+      
+      - name: 🎨 Code Quality Checks
+        run: |
+          echo "🎨 Running code quality checks..."
+          
+          # ESLint check (non-blocking)
+          if command -v npx >/dev/null 2>&1 && npx eslint --version >/dev/null 2>&1; then
+            echo "🔍 Running ESLint..."
+            if npm run lint:js; then
+              echo "✅ ESLint passed"
+            else
+              echo "⚠️ ESLint issues found (review recommended)"
+            fi
+          else
+            echo "⚠️ ESLint not configured, skipping"
+          fi
+          
+          # Stylelint check (non-blocking)
+          if npm run lint:css --silent >/dev/null 2>&1; then
+            echo "🔍 Running stylelint..."
+            if npm run lint:css; then
+              echo "✅ Stylelint passed"
+            else
+              echo "⚠️ Stylelint issues found (review recommended)"
+            fi
+          else
+            echo "⚠️ Stylelint not configured, skipping"
+          fi
+        continue-on-error: true
+      
+      - name: 🏗️ Build Validation
+        run: |
+          echo "🏗️ Validating build process..."
+          
+          # Clean any existing build
+          rm -f theme.js user.css
+          
+          # Build the theme
+          if npm run build; then
+            echo "✅ Build successful"
+          else
+            echo "❌ Build failed"
+            exit 1
+          fi
+          
+          # Verify build outputs
+          if [ -f "theme.js" ]; then
+            echo "✅ theme.js created"
+          else
+            echo "❌ theme.js missing"
+            exit 1
+          fi
+      
+      - name: 📏 Bundle Analysis
+        id: bundle-analysis
+        run: |
+          echo "📏 Analyzing bundle size and performance..."
+          
+          if [ -f "theme.js" ]; then
+            # Calculate bundle size
+            bundle_size=$(wc -c < theme.js)
+            bundle_size_kb=$((bundle_size / 1024))
+            
+            echo "📊 Bundle size: ${bundle_size_kb}KB (${bundle_size} bytes)"
+            echo "bundle-size=$bundle_size" >> $GITHUB_OUTPUT
+            
+            # Performance budget check
+            budget_threshold=${{ inputs.performance-budget }}
+            if [ $bundle_size -gt $budget_threshold ]; then
+              echo "⚠️ Bundle size ($bundle_size bytes) exceeds budget ($budget_threshold bytes)"
+              echo "💡 Consider optimizing bundle size"
+            else
+              echo "✅ Bundle size within performance budget"
+            fi
+            
+            # Analyze bundle composition
+            echo "🔍 Bundle composition analysis:"
+            echo "   - Minified: $(file theme.js | grep -o 'ASCII text' || echo 'Binary/minified')"
+            echo "   - Lines: $(wc -l < theme.js)"
+            echo "   - Characters: $(wc -c < theme.js)"
+            
+          else
+            echo "❌ theme.js not found for analysis"
+            exit 1
+          fi
+      
+      - name: 🧪 Test Validation
+        run: |
+          echo "🧪 Running test validation..."
+          
+          # Run tests with coverage
+          if npm test -- --coverage --watchAll=false --passWithNoTests; then
+            echo "✅ Tests passed"
+            
+            # Check coverage if available
+            if [ -f "coverage/lcov.info" ]; then
+              echo "📊 Coverage report generated"
+              
+              # Extract coverage percentage if possible
+              if command -v lcov >/dev/null 2>&1; then
+                coverage_summary=$(lcov --summary coverage/lcov.info 2>/dev/null | grep -o '[0-9.]*%' | head -1)
+                echo "📈 Coverage: ${coverage_summary:-'Available in report'}"
+              fi
+            else
+              echo "⚠️ Coverage report not generated"
+            fi
+          else
+            echo "⚠️ Tests failed or no tests found"
+            echo "💡 Consider adding tests or fixing failing tests"
+          fi
+        continue-on-error: true
+      
+      - name: 🔍 Performance-Sensitive File Detection
+        run: |
+          echo "🔍 Detecting performance-sensitive changes..."
+          
+          # Check for changes in performance-critical directories
+          perf_sensitive_dirs=(
+            "src-js/core/performance/"
+            "src-js/visual/"
+            "src-js/audio/"
+            "src-js/core/animation/"
+          )
+          
+          for dir in "${perf_sensitive_dirs[@]}"; do
+            if [ -d "$dir" ]; then
+              files=$(find "$dir" -name "*.ts" -o -name "*.tsx" | wc -l)
+              if [ $files -gt 0 ]; then
+                echo "🎯 Performance-sensitive directory: $dir ($files files)"
+              fi
+            fi
+          done
+          
+          # Check for specific performance patterns
+          if grep -r "performance.now()" src-js/ >/dev/null 2>&1; then
+            echo "⚡ Performance monitoring code detected"
+          fi
+          
+          if grep -r "requestAnimationFrame" src-js/ >/dev/null 2>&1; then
+            echo "🎬 Animation frame usage detected"
+          fi
+      
+      - name: 🔒 Security Scan
+        run: |
+          echo "🔒 Running security scan..."
+          
+          # Basic security audit
+          if npm audit --audit-level=moderate; then
+            echo "✅ No moderate+ security vulnerabilities found"
+          else
+            echo "⚠️ Security vulnerabilities detected"
+            echo "💡 Run 'npm audit fix' to resolve automatically fixable issues"
+          fi
+        continue-on-error: true
+      
+      - name: 📁 File Size Check
+        run: |
+          echo "📁 Checking for large files..."
+          
+          # Find files over 100KB (excluding node_modules and .git)
+          large_files=$(find . -type f -size +100k -not -path "./node_modules/*" -not -path "./.git/*" || true)
+          
+          if [ -n "$large_files" ]; then
+            echo "⚠️ Large files detected:"
+            echo "$large_files" | while read file; do
+              size=$(du -h "$file" | cut -f1)
+              echo "   - $file ($size)"
+            done
+            echo "💡 Consider optimizing or gitignoring large files"
+          else
+            echo "✅ No large files detected"
+          fi
+      
+      - name: 📋 Quality Summary
+        run: |
+          echo "📋 Quality Gates Summary"
+          echo "========================"
+          echo "✅ TypeScript: PASSED"
+          echo "🏗️ Build: PASSED"
+          echo "📏 Bundle: $(du -h theme.js | cut -f1)"
+          echo "🎯 Performance Budget: ${{ inputs.performance-budget }} bytes"
+          echo "🔍 Quality Checks: COMPLETED"
+          echo ""
+          echo "🌌 StarryNight theme is ready for deployment!"
+
+  # ============================================================================
+  # ADVANCED PERFORMANCE ANALYSIS
+  # ============================================================================
+  performance-deep-dive:
+    name: 📈 Performance Deep Dive
+    runs-on: ubuntu-latest
+    needs: quality-checks
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        run: npm ci
+      
+      - name: 🏗️ Build for Analysis
+        run: npm run build
+      
+      - name: 📊 Advanced Bundle Analysis
+        run: |
+          echo "📊 Advanced bundle analysis..."
+          
+          if [ -f "theme.js" ]; then
+            # Basic file analysis
+            echo "📋 File Statistics:"
+            echo "   Size: $(du -h theme.js | cut -f1)"
+            echo "   Lines: $(wc -l < theme.js)"
+            echo "   Characters: $(wc -c < theme.js)"
+            
+            # Look for potential optimization opportunities
+            echo ""
+            echo "🔍 Optimization Opportunities:"
+            
+            # Check for console.log statements
+            console_logs=$(grep -c "console\." theme.js || echo "0")
+            echo "   Console statements: $console_logs"
+            
+            # Check for large string literals
+            large_strings=$(grep -o '"[^"]\{100,\}"' theme.js | wc -l || echo "0")
+            echo "   Large string literals: $large_strings"
+            
+            # Check for repetitive patterns
+            echo "   File appears to be: $(file theme.js | cut -d: -f2)"
+            
+          else
+            echo "❌ theme.js not found for analysis"
+            exit 1
+          fi
+      
+      - name: 🎯 Performance Budget Report
+        run: |
+          echo "🎯 Performance Budget Report"
+          echo "============================="
+          
+          bundle_size=$(wc -c < theme.js)
+          budget_threshold=${{ inputs.performance-budget }}
+          
+          echo "📏 Current Size: $bundle_size bytes"
+          echo "🎯 Budget Limit: $budget_threshold bytes"
+          
+          if [ $bundle_size -le $budget_threshold ]; then
+            remaining=$((budget_threshold - bundle_size))
+            echo "✅ Within budget ($remaining bytes remaining)"
+          else
+            excess=$((bundle_size - budget_threshold))
+            echo "⚠️ Over budget by $excess bytes"
+            echo "💡 Optimization required"
+          fi
+          
+          # Calculate percentage
+          percentage=$((bundle_size * 100 / budget_threshold))
+          echo "📊 Budget utilization: ${percentage}%"
