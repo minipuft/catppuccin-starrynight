@@ -12,7 +12,7 @@
     "typecheck:watch": "tsc --noEmit --watch",
     "lint:js": "eslint \"src-js/**/*.{ts,tsx}\" --max-warnings 0",
     "lint:js:fix": "eslint \"src-js/**/*.{ts,tsx}\" --fix",
-    "install": "npm run build && ./install-hybrid.sh",
+    "install": "if [ \"$CI\" = \"true\" ]; then npm run build; else npm run build && ./install-hybrid.sh; fi",
     "install:force": "npm run build && ./install-hybrid.sh mocha true",
     "sass:watch": "sass --watch app.scss:user.css",
     "lint:css": "stylelint \"src/**/*.scss\"",
