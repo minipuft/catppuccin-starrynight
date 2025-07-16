@@ -65,7 +65,7 @@ jobs:
           
           # Build with timing
           start_time=$(date +%s%N)
-          npm run build
+          npm run build:ci
           end_time=$(date +%s%N)
           
           build_duration=$(( (end_time - start_time) / 1000000 ))
@@ -274,7 +274,7 @@ jobs:
         run: npm ci
       
       - name: 🏗️ Build Current Version
-        run: npm run build
+        run: npm run build:ci
       
       - name: 📏 Compare with Baseline
         run: |
@@ -353,7 +353,7 @@ jobs:
       - name: 🏗️ Build with Detailed Analysis
         run: |
           echo "🏗️ Building with detailed performance analysis..."
-          npm run build
+          npm run build:ci
       
       - name: 🔬 Deep Bundle Analysis
         run: |

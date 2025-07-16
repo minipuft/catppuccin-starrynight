@@ -69,7 +69,7 @@ jobs:
           fi
           
           # Build check
-          if npm run build; then
+          if npm run build:ci; then
             echo "✅ Build successful"
           else
             echo "❌ Build failed"
@@ -264,18 +264,18 @@ jobs:
           
           case "${{ matrix.variant }}" in
             "standard")
-              npm run build
+              npm run build:ci
               ;;
             "minimal")
               # Build with minimal features
               echo "🔧 Building minimal variant..."
-              npm run build
+              npm run build:ci
               # TODO: Add minimal build logic
               ;;
             "performance")
               # Build with performance optimizations
               echo "🚀 Building performance variant..."
-              npm run build
+              npm run build:ci
               # TODO: Add performance build logic
               ;;
           esac

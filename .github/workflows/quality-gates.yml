@@ -123,7 +123,7 @@ jobs:
           rm -f theme.js user.css
           
           # Build the theme
-          if npm run build; then
+          if npm run build:ci; then
             echo "✅ Build successful"
           else
             echo "❌ Build failed"

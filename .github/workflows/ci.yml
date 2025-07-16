@@ -97,7 +97,7 @@ jobs:
       - name: 🏗️ Build Theme
         run: |
           echo "🌌 Building Catppuccin StarryNight theme..."
-          npm run build
+          npm run build:ci
           
           # Verify build output
           if [ -f "theme.js" ]; then
