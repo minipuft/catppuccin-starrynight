@@ -8,6 +8,7 @@
 
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
 import { MODERN_SELECTORS } from "@/debug/SpotifyDOMSelectors";
 
 interface PendingUpdate {
@@ -43,13 +44,21 @@ export class SidebarPerformanceCoordinator {
   private flushCount: number = 0;
   private totalFlushTime: number = 0;
   private lastFlushTimestamp: number = 0;
+  private budgetManager: PerformanceBudgetManager | null = null;
 
   // DOM observation for reactive refresh and temporal play
   private domObserver: MutationObserver | null = null;
   private sidebarElement: Element | null = null;
   private visibilityObserver: IntersectionObserver | null = null;
+  private observationThrottleTimer: number | null = null;
+  private lastObservationTime: number = 0;
+  private readonly OBSERVATION_THROTTLE_MS = 100; // Throttle observations to 10 Hz
   private isFirstOpen: boolean = true;
   private lastScrollUpdate: number = 0;
+  
+  // Timeout tracking for proper cleanup
+  private activeTimeouts: Set<NodeJS.Timeout> = new Set();
+  private domObservationRetryTimeout: NodeJS.Timeout | null = null;
 
   constructor(config: CoordinatorConfig = {}) {
     this.config = {
@@ -59,6 +68,11 @@ export class SidebarPerformanceCoordinator {
     };
 
     this.performanceAnalyzer = config.performanceAnalyzer || null;
+    
+    // Initialize budget manager if performance analyzer is available
+    if (this.performanceAnalyzer) {
+      this.budgetManager = PerformanceBudgetManager.getInstance(undefined, this.performanceAnalyzer);
+    }
 
     if (this.config.enableDebug) {
       console.log(
@@ -297,39 +311,54 @@ export class SidebarPerformanceCoordinator {
         );
       }
 
+      // Clear any existing retry timeout
+      if (this.domObservationRetryTimeout) {
+        clearTimeout(this.domObservationRetryTimeout);
+        this.activeTimeouts.delete(this.domObservationRetryTimeout);
+      }
+
       // Retry after a short delay
-      setTimeout(() => this.setupDOMObservation(), 1000);
+      this.domObservationRetryTimeout = setTimeout(() => {
+        this.setupDOMObservation();
+        this.domObservationRetryTimeout = null;
+      }, 1000);
+      this.activeTimeouts.add(this.domObservationRetryTimeout);
       return;
     }
 
-    // Mutation observer for structural changes
+    // Mutation observer for structural changes (throttled for performance)
     this.domObserver = new MutationObserver((mutations) => {
-      // Force refresh when DOM structure changes
-      this.queueUpdate("--sn-rs-force-refresh", Date.now().toString());
+      this.throttleObservationUpdate(() => {
+        // Force refresh when DOM structure changes
+        this.queueUpdate("--sn-rs-force-refresh", Date.now().toString());
 
-      // Check for visibility changes (aria-hidden, style.display)
-      for (const mutation of mutations) {
-        if (
-          mutation.type === "attributes" &&
-          (mutation.attributeName === "aria-hidden" ||
-            mutation.attributeName === "style")
-        ) {
-          this.handleVisibilityChange();
+        // Check for visibility changes (aria-hidden, style.display)
+        for (const mutation of mutations) {
+          if (
+            mutation.type === "attributes" &&
+            (mutation.attributeName === "aria-hidden" ||
+              mutation.attributeName === "style")
+          ) {
+            this.handleVisibilityChange();
+          }
         }
-      }
 
-      if (this.config.enableDebug) {
-        console.log(
-          "🌌 [SidebarPerformanceCoordinator] DOM change detected, forcing refresh"
-        );
-      }
+        if (this.config.enableDebug) {
+          console.log(
+            "🌌 [SidebarPerformanceCoordinator] DOM change detected, forcing refresh"
+          );
+        }
+      });
     });
 
     this.domObserver.observe(this.sidebarElement, {
       childList: true,
-      subtree: true,
+      subtree: false, // Optimize: Only observe direct children
       attributes: true, // Watch for aria-hidden and style changes
       attributeFilter: ["aria-hidden", "style", "class"],
+      // Optimize: Don't observe attribute old values
+      attributeOldValue: false,
+      characterData: false, // Don't observe text changes
     });
 
     // Intersection observer for visibility changes
@@ -355,8 +384,19 @@ export class SidebarPerformanceCoordinator {
       (entries) => {
         const entry = entries[0];
         if (entry && entry.isIntersecting && this.isFirstOpen) {
-          this.triggerTemporalEcho();
-          this.isFirstOpen = false;
+          // Use requestIdleCallback for non-critical visual effects
+          if (window.requestIdleCallback) {
+            window.requestIdleCallback(() => {
+              this.triggerTemporalEcho();
+              this.isFirstOpen = false;
+            });
+          } else {
+            // Fallback with setTimeout for older browsers
+            setTimeout(() => {
+              this.triggerTemporalEcho();
+              this.isFirstOpen = false;
+            }, 0);
+          }
         }
       },
       { threshold: 0.1 }
@@ -398,9 +438,33 @@ export class SidebarPerformanceCoordinator {
     if (window.requestIdleCallback) {
       window.requestIdleCallback(() => {
         this.queueUpdate("--sn-rs-scroll-ratio", Math.random().toString());
-      });
+      }, { timeout: 100 }); // Add timeout to ensure execution
     } else {
       this.queueUpdate("--sn-rs-scroll-ratio", Math.random().toString());
+    }
+  }
+
+  /**
+   * Throttle DOM observation updates to reduce CPU overhead
+   */
+  private throttleObservationUpdate(callback: () => void): void {
+    const now = performance.now();
+    if (now - this.lastObservationTime < this.OBSERVATION_THROTTLE_MS) {
+      // Clear existing throttle timer
+      if (this.observationThrottleTimer) {
+        clearTimeout(this.observationThrottleTimer);
+      }
+      
+      // Schedule update for later
+      this.observationThrottleTimer = window.setTimeout(() => {
+        callback();
+        this.lastObservationTime = performance.now();
+        this.observationThrottleTimer = null;
+      }, this.OBSERVATION_THROTTLE_MS);
+    } else {
+      // Execute immediately
+      callback();
+      this.lastObservationTime = now;
     }
   }
 
@@ -451,10 +515,12 @@ export class SidebarPerformanceCoordinator {
     }
 
     // Clean up after animation
-    setTimeout(() => {
+    const cleanupTimeout = setTimeout(() => {
       this.sidebarElement?.classList.remove("sn-future-preview");
       this.queueUpdate("--sn-kinetic-intensity", "0");
+      this.activeTimeouts.delete(cleanupTimeout);
     }, 2000);
+    this.activeTimeouts.add(cleanupTimeout);
   }
 
   /**
@@ -493,6 +559,24 @@ export class SidebarPerformanceCoordinator {
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;
+    }
+
+    // Clear all active timeouts
+    this.activeTimeouts.forEach(timeout => {
+      clearTimeout(timeout);
+    });
+    this.activeTimeouts.clear();
+
+    // Clear specific tracked timeouts
+    if (this.domObservationRetryTimeout) {
+      clearTimeout(this.domObservationRetryTimeout);
+      this.domObservationRetryTimeout = null;
+    }
+
+    // Clear observation throttle timer
+    if (this.observationThrottleTimer) {
+      clearTimeout(this.observationThrottleTimer);
+      this.observationThrottleTimer = null;
     }
 
     if (this.domObserver) {

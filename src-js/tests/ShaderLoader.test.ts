@@ -266,9 +266,9 @@ describe('createGradientTexture', () => {
           width: 0,
           height: 0,
           getContext: jest.fn().mockReturnValue(null)
-        };
+        } as any;
       }
-      return {};
+      return {} as any;
     });
 
     const stops = [{ r: 1, g: 0, b: 0, a: 1, position: 0 }];

@@ -126,7 +126,10 @@ export class MorphingPatternLibrary {
       const entries = Array.from(this.patternCache.entries());
       entries.sort((a, b) => a[1].expiry - b[1].expiry);
       for (let i = 0; i < 10; i++) {
-        this.patternCache.delete(entries[i][0]);
+        const entry = entries[i];
+        if (entry) {
+          this.patternCache.delete(entry[0]);
+        }
       }
     }
     

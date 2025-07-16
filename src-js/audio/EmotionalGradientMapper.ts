@@ -392,9 +392,12 @@ export class EmotionalGradientMapper {
       const current = this.emotionalHistory[this.emotionalHistory.length - i];
       const previous = this.emotionalHistory[this.emotionalHistory.length - i - 1];
       
-      variance += Math.abs(current.valence - previous.valence);
-      variance += Math.abs(current.energy - previous.energy);
-      variance += Math.abs(current.arousal - previous.arousal);
+      // Add null/undefined checks for array access
+      if (current && previous) {
+        variance += Math.abs(current.valence - previous.valence);
+        variance += Math.abs(current.energy - previous.energy);
+        variance += Math.abs(current.arousal - previous.arousal);
+      }
     }
     
     return Math.max(0, Math.min(1, 1 - (variance / (recentFrames * 3))));
@@ -410,11 +413,17 @@ export class EmotionalGradientMapper {
     
     // Check for trend consistency
     for (let i = 1; i < recent.length; i++) {
-      const valenceTrend = recent[i].valence - recent[i-1].valence;
-      const energyTrend = recent[i].energy - recent[i-1].energy;
+      const current = recent[i];
+      const previous = recent[i-1];
       
-      if (Math.abs(valenceTrend) < 0.1 && Math.abs(energyTrend) < 0.1) {
-        patterns++;
+      // Add null/undefined checks for array access
+      if (current && previous) {
+        const valenceTrend = current.valence - previous.valence;
+        const energyTrend = current.energy - previous.energy;
+        
+        if (Math.abs(valenceTrend) < 0.1 && Math.abs(energyTrend) < 0.1) {
+          patterns++;
+        }
       }
     }
     

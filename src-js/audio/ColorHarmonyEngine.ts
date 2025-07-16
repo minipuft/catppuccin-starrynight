@@ -434,8 +434,8 @@ export class ColorHarmonyEngine
     await super.initialize();
     
     // Initialize SemanticColorManager with CSSVariableBatcher from parent system
-    const cssVariableBatcher = this.performanceAnalyzer ? 
-      (this.performanceAnalyzer as any).cssVariableBatcher : undefined;
+    const cssVariableBatcher = this.performanceMonitor ? 
+      (this.performanceMonitor as any).cssVariableBatcher : undefined;
     this.semanticColorManager.initialize(cssVariableBatcher);
     
     // Initial semantic color setup
@@ -1006,7 +1006,7 @@ export class ColorHarmonyEngine
    * Applies CSS variable with fallback to direct style application
    */
   private applyCSSVariable(property: string, value: string): void {
-    const cssVariableBatcher = (this.performanceAnalyzer as any)?.cssVariableBatcher;
+    const cssVariableBatcher = (this.performanceMonitor as any)?.cssVariableBatcher;
     if (cssVariableBatcher) {
       cssVariableBatcher.queueCSSVariableUpdate(property, value);
     } else {

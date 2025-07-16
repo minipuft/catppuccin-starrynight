@@ -185,7 +185,12 @@ export class CSSVariableBatcher {
 
     const target = element || document.documentElement;
     if (!this._cssVariableBatcher.enabled) {
-      target.style.setProperty(property, value);
+      if (CSSVariableBatcher.nativeSetProperty) {
+        CSSVariableBatcher.nativeSetProperty.call(target.style, property, value);
+      } else {
+        // Fallback if native reference not available
+        target.style.setProperty(property, value);
+      }
       return;
     }
 
@@ -270,7 +275,11 @@ export class CSSVariableBatcher {
           element.style.cssText = cssText;
         } else {
           for (const update of elementUpdates) {
-            element.style.setProperty(update.property, update.value);
+            if (CSSVariableBatcher.nativeSetProperty) {
+              CSSVariableBatcher.nativeSetProperty.call(element.style, update.property, update.value);
+            } else {
+              element.style.setProperty(update.property, update.value);
+            }
           }
         }
       }
@@ -295,7 +304,11 @@ export class CSSVariableBatcher {
       );
       for (const update of updates) {
         try {
-          update.element.style.setProperty(update.property, update.value);
+          if (CSSVariableBatcher.nativeSetProperty) {
+            CSSVariableBatcher.nativeSetProperty.call(update.element.style, update.property, update.value);
+          } else {
+            update.element.style.setProperty(update.property, update.value);
+          }
         } catch (e) {
           console.warn(
             `[CSSVariableBatcher] Failed to apply CSS property ${update.property}:`,

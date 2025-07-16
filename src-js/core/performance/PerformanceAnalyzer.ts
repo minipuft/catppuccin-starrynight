@@ -122,6 +122,24 @@ export class PerformanceAnalyzer {
   private static _isLowEndCache: boolean | null = null;
 
   // -------------------------------------------------------------------
+  // Performance budgets and monitoring -------------------------------
+  // -------------------------------------------------------------------
+
+  // Performance budgets (in milliseconds)
+  private performanceBudgets = {
+    animationFrame: 16.67, // 60 FPS target
+    cssVariableUpdate: 2,   // CSS variable batching
+    domObservation: 5,      // DOM mutation handling
+    audioAnalysis: 10,      // Audio processing
+    visualEffects: 8,       // Visual system updates
+    userInteraction: 100,   // User interaction response
+  };
+
+  // Budget tracking
+  private budgetViolations = new Map<string, number>();
+  private budgetHistory = new Map<string, number[]>();
+
+  // -------------------------------------------------------------------
   // Simple metric recorder for external systems -----------------------
   // -------------------------------------------------------------------
 
@@ -387,6 +405,108 @@ export class PerformanceAnalyzer {
       return true;
     }
     return false;
+  }
+
+  // --- Performance Budget Methods ---
+
+  /**
+   * Check if an operation is within performance budget
+   */
+  public isWithinBudget(operation: string, duration: number): boolean {
+    const budget = this.performanceBudgets[operation as keyof typeof this.performanceBudgets];
+    if (!budget) return true; // No budget defined, allow operation
+
+    const withinBudget = duration <= budget;
+    
+    if (!withinBudget) {
+      // Track budget violation
+      this.budgetViolations.set(operation, (this.budgetViolations.get(operation) || 0) + 1);
+      
+      if (this.config.enableDebug) {
+        console.warn(`📊 [PerformanceAnalyzer] Budget violation: ${operation} took ${duration.toFixed(2)}ms (budget: ${budget}ms)`);
+      }
+    }
+
+    // Track performance history
+    const history = this.budgetHistory.get(operation) || [];
+    history.push(duration);
+    if (history.length > 100) history.shift(); // Keep last 100 samples
+    this.budgetHistory.set(operation, history);
+
+    return withinBudget;
+  }
+
+  /**
+   * Time an operation and check against budget
+   */
+  public timeOperation<T>(operation: string, fn: () => T): T {
+    const start = performance.now();
+    const result = fn();
+    const duration = performance.now() - start;
+    
+    this.isWithinBudget(operation, duration);
+    return result;
+  }
+
+  /**
+   * Time an async operation and check against budget
+   */
+  public async timeOperationAsync<T>(operation: string, fn: () => Promise<T>): Promise<T> {
+    const start = performance.now();
+    const result = await fn();
+    const duration = performance.now() - start;
+    
+    this.isWithinBudget(operation, duration);
+    return result;
+  }
+
+  /**
+   * Get performance budget violations
+   */
+  public getBudgetViolations(): Map<string, number> {
+    return new Map(this.budgetViolations);
+  }
+
+  /**
+   * Get performance budget statistics
+   */
+  public getBudgetStats(): Record<string, { budget: number; violations: number; averageTime: number; maxTime: number }> {
+    const stats: Record<string, { budget: number; violations: number; averageTime: number; maxTime: number }> = {};
+    
+    for (const [operation, budget] of Object.entries(this.performanceBudgets)) {
+      const violations = this.budgetViolations.get(operation) || 0;
+      const history = this.budgetHistory.get(operation) || [];
+      const averageTime = history.length > 0 ? history.reduce((a, b) => a + b, 0) / history.length : 0;
+      const maxTime = history.length > 0 ? Math.max(...history) : 0;
+      
+      stats[operation] = {
+        budget,
+        violations,
+        averageTime,
+        maxTime
+      };
+    }
+    
+    return stats;
+  }
+
+  /**
+   * Update performance budget for an operation
+   */
+  public updateBudget(operation: string, budgetMs: number): void {
+    (this.performanceBudgets as any)[operation] = budgetMs;
+    
+    if (this.config.enableDebug) {
+      console.log(`📊 [PerformanceAnalyzer] Updated budget for ${operation}: ${budgetMs}ms`);
+    }
+  }
+
+  /**
+   * Clear budget violation history
+   */
+  public clearBudgetHistory(): void {
+    this.budgetViolations.clear();
+    this.budgetHistory.clear();
   }
 
   // --- End of migrated methods ---

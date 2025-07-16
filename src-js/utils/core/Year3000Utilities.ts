@@ -48,6 +48,18 @@ export function throttle<T extends (...args: any[]) => any>(
   };
 }
 
+// Centralized debounce function
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: number | undefined;
+  return function debounced(...args: Parameters<T>): void {
+    clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => func(...args), delay);
+  };
+}
+
 export function hexToRgb(hex: string): RgbColor | null {
   if (typeof hex !== "string") {
     console.warn(

@@ -276,7 +276,11 @@ export class ConstellationPatterns {
       for (let j = i + 1; j < points.length; j++) {
         if (connectionsFromThisStar >= maxConnectionsPerStar) break;
         
-        const distance = this.calculateDistance(points[i], points[j]);
+        const point1 = points[i];
+        const point2 = points[j];
+        if (!point1 || !point2) continue;
+        
+        const distance = this.calculateDistance(point1, point2);
         
         if (distance < maxDistance) {
           // Probability decreases with distance

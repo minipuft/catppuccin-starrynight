@@ -105,6 +105,10 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
   private currentEchoCount: number = 0;
   private static readonly BASE_MAX_ECHOES = 4;
   private _elementsWithActiveEcho: WeakSet<HTMLElement> = new WeakSet();
+  
+  // Year 3000 System reference for timer consolidation
+  private year3000System: Year3000System | null;
+  private echoTimerCounter: number = 0;
 
   constructor(
     config: Year3000Config,
@@ -129,6 +133,7 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
     );
 
     this.systemName = "PredictiveMaterializationSystem";
+    this.year3000System = year3000System;
     this.materializationState = {
       imminence: 0,
       clarity: 0,
@@ -288,6 +293,16 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
   }
 
   public override destroy(): void {
+    // Clean up all pending echo timers
+    if (this.year3000System?.timerConsolidationSystem) {
+      // Clean up all echo timers by iterating through possible timer IDs
+      for (let i = 0; i < this.echoTimerCounter; i++) {
+        this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer(
+          `PredictiveMaterializationSystem-echo-${i}`
+        );
+      }
+    }
+    
     super.destroy();
     if (this.config?.enableDebug) {
       console.log(`[${this.systemName}] Destroyed and cleaned up.`);
@@ -417,11 +432,24 @@ export class PredictiveMaterializationSystem extends BaseVisualSystem {
     this.currentEchoCount++;
     this._elementsWithActiveEcho.add(element);
 
-    setTimeout(() => {
+    // Use TimerConsolidationSystem if available, otherwise fall back to setTimeout
+    const timerId = `PredictiveMaterializationSystem-echo-${this.echoTimerCounter++}`;
+    const cleanup = () => {
       if (echo.parentElement) echo.parentElement.removeChild(echo);
       this.currentEchoCount--;
       this._releaseEchoElement(echo);
       this._elementsWithActiveEcho.delete(element);
-    }, 1300);
+    };
+    
+    if (this.year3000System?.timerConsolidationSystem) {
+      this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
+        timerId,
+        cleanup,
+        1300,
+        "background"
+      );
+    } else {
+      setTimeout(cleanup, 1300);
+    }
   }
 }

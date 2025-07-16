@@ -59,10 +59,11 @@ interface IManagedSystem {
 - **`TimerConsolidationSystem.ts`** - Consolidated timer management
 - **`VisualSystemRegistry.ts`** - Manages visual system lifecycle
 
-#### Visual Systems (`src-js/systems/visual/`)
-- **`BeatSyncVisualSystem.ts`** - Beat-synchronized animations
+#### Visual Systems (`src-js/visual/`)
+- **`BeatSyncVisualSystem.ts`** - Beat-synchronized animations (preserved for music sync)
 - **`LightweightParticleSystem.ts`** - Optimized particle effects
 - **`RightSidebarConsciousnessSystem.ts`** - Sidebar-specific visual enhancements
+- **`VisualFrameCoordinator.ts`** - Animation coordination and performance management (preserved)
 
 #### Managers (`src-js/managers/`)
 - **`SettingsManager.ts`** - User configuration persistence
@@ -83,6 +84,41 @@ interface IManagedSystem {
 - **CSS Variable System** - Extensive use of CSS custom properties for dynamic theming
 - **Catppuccin Integration** - Maintains Catppuccin color palette while allowing dynamic album art adaptation
 
+### Performance Optimization History
+
+#### **Recently Removed Systems (2025-07-16)**
+To improve performance and reduce system complexity, the following high-impact systems were removed:
+
+**Removed TypeScript Systems:**
+- **`DataGlyphSystem.ts`** - Performance-heavy glyph animation system with continuous loops
+- **`RippleController.ts`** - Canvas-based ripple physics system
+- **`RippleCanvas.ts`** - Canvas rendering for ripple effects
+- **`RipplePhysicsEngine.ts`** - Physics calculations for ripple interactions
+- **`OrganicRippleRenderer.ts`** - Organic ripple rendering system
+- **`RippleVariantSystem.ts`** - Ripple variant management
+- **`RippleEffect.ts`** - Core ripple effect implementation
+
+**Disabled CSS Animations:**
+- **`year3000-temporal-echo`** - Temporal echo keyframe animations
+- **`sn-temporal-echo`** - Temporal echo CSS classes and pseudo-elements
+- **`sn-glyph-pulse`** - Data glyph pulsing animations
+- **`year3000-ripple`** - Core ripple animations
+- **`year3000-ripple-pulse`** - Ripple pulse effects
+- **`css-interaction-ripple`** - CSS-based interaction ripples
+- **`liquid-ripple-propagation`** - Liquid morphing ripple effects
+
+**Performance Impact:**
+- **Build Time**: Reduced to 20-24ms (fast compilation)
+- **Bundle Size**: Maintained at 712.6kb (reasonable size)
+- **Eliminated**: High-frequency animation loops, canvas operations, physics calculations
+- **Preserved**: Core music sync, frame coordination, and performance infrastructure
+
+**Systems Preserved for Future Enhancement:**
+- **`BeatSyncVisualSystem`** - Music synchronization foundation
+- **`VisualFrameCoordinator`** - Animation coordination infrastructure
+- **`PerformanceAnalyzer`** - Performance monitoring capabilities
+- **`CSSVariableBatcher`** - Efficient CSS variable updates
+
 ## Development Standards
 
 ### Performance Requirements (Non-Negotiable)
@@ -92,6 +128,8 @@ interface IManagedSystem {
 - **GPU Usage**: <25% on mid-range hardware during normal playback
 - **Responsiveness**: UI interactions <100ms, color transitions <500ms
 - **Progressive degradation**: Auto-detect capabilities, graceful fallbacks
+- **Build Performance**: <30ms compilation time, <1MB bundle size
+- **Animation Philosophy**: Prefer CSS-based animations over JavaScript loops for better performance
 
 ### Code Quality Standards
 - **TypeScript Coverage**: 100% with no `any` types allowed
@@ -124,6 +162,8 @@ interface IManagedSystem {
 - **Build Tools**: Webpack, Rollup (esbuild only)
 - **Styling**: CSS-in-JS libraries, styled-components
 - **Dependencies**: Any library that increases bundle >50KB or affects startup time
+- **Performance-Heavy Patterns**: Continuous animation loops, canvas-based physics, high-frequency DOM manipulation
+- **Deprecated Systems**: DataGlyphSystem, RippleController, temporal echo animations (removed for performance)
 
 ### Development Environment
 - Built for Spicetify CLI with manual SCSS compilation
@@ -179,3 +219,54 @@ The framework enforces:
 - **Security**: Defensive coding practices, input validation, graceful degradation
 
 For detailed framework documentation, see `docs/development/AI_FRAMEWORK.md`.
+
+## Future Development Guidelines
+
+### **Recommended Approach for New Animation Systems**
+
+When implementing new glyph or interaction animation systems, follow these performance-optimized patterns:
+
+#### **✅ Preferred Patterns:**
+1. **CSS-First Animations**: Use CSS keyframes with `will-change` hints and `contain` properties
+2. **Batched Updates**: Leverage the existing `CSSVariableBatcher` for variable changes
+3. **Intersection Observer**: Use for viewport-based optimizations instead of continuous polling
+4. **Event-Driven**: Respond to user interactions rather than continuous loops
+5. **Configurable Intensity**: Allow users to adjust animation intensity or disable entirely
+
+#### **✅ Performance-Optimized Architecture:**
+```typescript
+// Example: Lightweight animation system
+class OptimizedAnimationSystem implements IManagedSystem {
+  private observer: IntersectionObserver;
+  private batcher: CSSVariableBatcher;
+  
+  initialize() {
+    // Setup intersection observer for viewport detection
+    this.observer = new IntersectionObserver(this.handleVisibilityChange);
+    // Use existing CSS variable batcher
+    this.batcher = this.year3000System.cssVariableBatcher;
+  }
+  
+  // Event-driven updates instead of continuous loops
+  onUserInteraction(event: InteractionEvent) {
+    this.batcher.queueCSSVariableUpdate('--animation-intensity', event.intensity);
+  }
+}
+```
+
+#### **❌ Avoid These Patterns:**
+- Continuous `requestAnimationFrame` loops for non-visual calculations
+- Canvas-based physics unless absolutely necessary
+- High-frequency DOM manipulation (>60fps)
+- Unbounded element pools or caches
+- Complex pseudo-element animations with multiple layers
+
+#### **🔄 Migration Path for Removed Systems:**
+If you need to implement glyph or ripple-like functionality:
+1. **Start with CSS**: Use CSS transforms and opacity changes
+2. **Use Existing Infrastructure**: Leverage `BeatSyncVisualSystem` for music sync
+3. **Batch Updates**: Use `CSSVariableBatcher` for performance
+4. **Progressive Enhancement**: Build fallbacks for reduced-motion preferences
+5. **Monitor Performance**: Use `PerformanceAnalyzer` to track impact
+
+This approach maintains the visual richness while ensuring optimal performance across all device types.

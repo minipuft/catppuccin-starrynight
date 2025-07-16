@@ -3,7 +3,8 @@
  * Provides enhanced notification system with semantic colors and variants
  */
 
-import type { SemanticColor } from "../../../types/spicetify";
+// Import spicetify types via triple-slash directive
+/// <reference path="../../../types/spicetify.d.ts" />
 import { SemanticColorManager } from "./SemanticColorManager";
 
 declare const Spicetify: any;
@@ -21,15 +22,15 @@ export interface NotificationOptions {
   type?: NotificationType;
   timeout?: number;
   isHTML?: boolean;
-  variant?: 'bass' | 'forte' | 'brio' | 'canon' | 'cello';
-  semanticColor?: SemanticColor;
+  variant?: Spicetify.Variant;
+  semanticColor?: Spicetify.SemanticColor;
   icon?: string;
   persistent?: boolean;
   onClose?: () => void;
   actions?: Array<{
     label: string;
     action: () => void;
-    variant?: 'bass' | 'forte' | 'brio';
+    variant?: Spicetify.Variant;
   }>;
 }
 
@@ -41,7 +42,7 @@ export class NotificationManager {
   private spicetifyAvailable: boolean = false;
 
   // Type to semantic color mapping
-  private static readonly TYPE_COLOR_MAP: Record<NotificationType, SemanticColor> = {
+  private static readonly TYPE_COLOR_MAP: Record<NotificationType, Spicetify.SemanticColor> = {
     info: 'textAnnouncement',
     success: 'textPositive',
     warning: 'textWarning',
@@ -185,13 +186,15 @@ export class NotificationManager {
 
   private async processNotificationOptions(options: NotificationOptions): Promise<NotificationOptions> {
     const processed: NotificationOptions = {
-      type: 'info',
-      timeout: this.config.defaultTimeout,
-      isHTML: false,
-      variant: 'brio',
-      persistent: false,
       ...options
     };
+    
+    // Apply defaults conditionally to handle exactOptionalPropertyTypes
+    if (processed.type === undefined) processed.type = 'info';
+    if (processed.timeout === undefined) processed.timeout = this.config.defaultTimeout || 4000;
+    if (processed.isHTML === undefined) processed.isHTML = false;
+    if (processed.variant === undefined) processed.variant = 'brio';
+    if (processed.persistent === undefined) processed.persistent = false;
 
     // Set timeout based on type if not specified
     if (!options.timeout && processed.type) {

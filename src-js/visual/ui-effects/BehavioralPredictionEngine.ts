@@ -233,11 +233,30 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
   }
 
   startOptimizedPredictiveHighlighting() {
-    if (this.predictionTimer) clearInterval(this.predictionTimer);
-    this.predictionTimer = setInterval(() => {
-      this.applySelectivePredictiveHighlighting();
-    }, this.quantumEmpathy.predictionUpdateMs);
-    this._activeTimers.push(this.predictionTimer);
+    if (this.predictionTimer) {
+      clearInterval(this.predictionTimer);
+      // Remove from active timers array
+      const index = this._activeTimers.indexOf(this.predictionTimer);
+      if (index > -1) {
+        this._activeTimers.splice(index, 1);
+      }
+    }
+
+    // Use TimerConsolidationSystem if available, otherwise fall back to setInterval
+    if (this.year3000System?.timerConsolidationSystem) {
+      this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
+        "BehavioralPredictionEngine-prediction",
+        () => this.applySelectivePredictiveHighlighting(),
+        this.quantumEmpathy.predictionUpdateMs,
+        "normal"
+      );
+      this.predictionTimer = null; // Timer is managed by consolidation system
+    } else {
+      this.predictionTimer = setInterval(() => {
+        this.applySelectivePredictiveHighlighting();
+      }, this.quantumEmpathy.predictionUpdateMs);
+      this._activeTimers.push(this.predictionTimer);
+    }
   }
 
   calculateOptimizedPredictions(): Prediction[] {
@@ -342,28 +361,66 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
   }
 
   setupSelectiveAnticipatoryAnimations() {
-    if (this.animationTimer) clearInterval(this.animationTimer);
-    this.animationTimer = setInterval(() => {
-      if (
-        this.quantumEmpathy.currentActiveAnimations <
-        this.quantumEmpathy.maxActiveAnimations
-      ) {
-        const predictions = this.calculateOptimizedPredictions();
-        const prediction = predictions[0];
-        if (prediction) {
-          const elements = this.findElementsBySignature(prediction.target);
-          const firstElement = elements[0];
-          if (firstElement && prediction.type) {
-            this.triggerOptimizedAnticipatoryAnimation(
-              firstElement,
-              prediction.type,
-              prediction.confidence
-            );
+    if (this.animationTimer) {
+      clearInterval(this.animationTimer);
+      // Remove from active timers array
+      const index = this._activeTimers.indexOf(this.animationTimer);
+      if (index > -1) {
+        this._activeTimers.splice(index, 1);
+      }
+    }
+
+    // Use TimerConsolidationSystem if available, otherwise fall back to setInterval
+    if (this.year3000System?.timerConsolidationSystem) {
+      this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
+        "BehavioralPredictionEngine-animation",
+        () => {
+          if (
+            this.quantumEmpathy.currentActiveAnimations <
+            this.quantumEmpathy.maxActiveAnimations
+          ) {
+            const predictions = this.calculateOptimizedPredictions();
+            const prediction = predictions[0];
+            if (prediction) {
+              const elements = this.findElementsBySignature(prediction.target);
+              const firstElement = elements[0];
+              if (firstElement && prediction.type) {
+                this.triggerOptimizedAnticipatoryAnimation(
+                  firstElement,
+                  prediction.type,
+                  prediction.confidence
+                );
+              }
+            }
+          }
+        },
+        this.quantumEmpathy.predictionUpdateMs * 2,
+        "background"
+      );
+      this.animationTimer = null; // Timer is managed by consolidation system
+    } else {
+      this.animationTimer = setInterval(() => {
+        if (
+          this.quantumEmpathy.currentActiveAnimations <
+          this.quantumEmpathy.maxActiveAnimations
+        ) {
+          const predictions = this.calculateOptimizedPredictions();
+          const prediction = predictions[0];
+          if (prediction) {
+            const elements = this.findElementsBySignature(prediction.target);
+            const firstElement = elements[0];
+            if (firstElement && prediction.type) {
+              this.triggerOptimizedAnticipatoryAnimation(
+                firstElement,
+                prediction.type,
+                prediction.confidence
+              );
+            }
           }
         }
-      }
-    }, this.quantumEmpathy.predictionUpdateMs * 2);
-    this._activeTimers.push(this.animationTimer);
+      }, this.quantumEmpathy.predictionUpdateMs * 2);
+      this._activeTimers.push(this.animationTimer);
+    }
   }
 
   triggerOptimizedAnticipatoryAnimation(
@@ -532,13 +589,45 @@ export class BehavioralPredictionEngine extends BaseVisualSystem {
 
   override destroy() {
     super.destroy();
+    
+    // Unregister timers from consolidation system
+    if (this.year3000System?.timerConsolidationSystem) {
+      this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("BehavioralPredictionEngine-prediction");
+      this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("BehavioralPredictionEngine-animation");
+    }
+    
+    // Clear all active timers (fallback for systems without consolidation)
     this._activeTimers.forEach(clearInterval);
+    this._activeTimers = [];
+    
+    // Clear individual timer references
+    if (this.predictionTimer) {
+      clearInterval(this.predictionTimer);
+      this.predictionTimer = null;
+    }
+    if (this.animationTimer) {
+      clearInterval(this.animationTimer);
+      this.animationTimer = null;
+    }
+    
+    // Remove all event listeners
     this._eventListeners.forEach(({ element, event, handler }) => {
       element.removeEventListener(event, handler);
     });
-    this._activeTimers = [];
     this._eventListeners = [];
+    
+    // Reset quantum empathy state
     this.quantumEmpathyInitialized = false;
+    this.quantumEmpathy.currentActiveAnimations = 0;
+    this.quantumEmpathy.patternDatabase.clear();
+    this.quantumEmpathy.actionProbabilities.clear();
+    this.quantumEmpathy.interactionHistory = [];
+    
+    // Clear any remaining highlights
+    document.querySelectorAll('.sn-predictive-highlight, .sn-predictive-highlight-strong, .sn-anticipatory-warmth').forEach(el => {
+      el.classList.remove('sn-predictive-highlight', 'sn-predictive-highlight-strong', 'sn-anticipatory-warmth');
+    });
+    
     if (this.config?.enableDebug) {
       console.log(
         `[${this.systemName}] Destroyed. No longer predicting user behavior.`

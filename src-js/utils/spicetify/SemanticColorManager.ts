@@ -3,7 +3,8 @@
  * Provides a bridge between Spicetify's semantic color system and our theming architecture
  */
 
-import type { SemanticColor, ColorSet } from "../../../types/spicetify";
+// Import spicetify types via triple-slash directive
+/// <reference path="../../../types/spicetify.d.ts" />
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 import * as Utils from "@/utils/core/Year3000Utilities";
 
@@ -16,7 +17,7 @@ export interface SemanticColorConfig {
 }
 
 export interface SemanticColorMapping {
-  semanticColor: SemanticColor;
+  semanticColor: Spicetify.SemanticColor;
   cssVariable: string;
   fallbackColor: string;
   description: string;
@@ -25,7 +26,7 @@ export interface SemanticColorMapping {
 export class SemanticColorManager {
   private config: SemanticColorConfig;
   private cssVariableBatcher: CSSVariableBatcher | null = null;
-  private colorCache: Map<SemanticColor, string> = new Map();
+  private colorCache: Map<Spicetify.SemanticColor, string> = new Map();
   private lastCacheUpdate: number = 0;
   private initialized: boolean = false;
 
@@ -118,7 +119,7 @@ export class SemanticColorManager {
     }
   }
 
-  public async getSemanticColor(semanticColor: SemanticColor): Promise<string> {
+  public async getSemanticColor(semanticColor: Spicetify.SemanticColor): Promise<string> {
     // Check cache first
     const cached = this.colorCache.get(semanticColor);
     if (cached && (Date.now() - this.lastCacheUpdate) < (this.config.cacheDuration || 5000)) {
@@ -148,7 +149,7 @@ export class SemanticColorManager {
     return color;
   }
 
-  private getFallbackColor(semanticColor: SemanticColor): string {
+  private getFallbackColor(semanticColor: Spicetify.SemanticColor): string {
     const mapping = SemanticColorManager.SEMANTIC_MAPPINGS.find(m => m.semanticColor === semanticColor);
     if (mapping) {
       return mapping.fallbackColor;

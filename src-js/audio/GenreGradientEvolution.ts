@@ -470,10 +470,14 @@ export class GenreGradientEvolution {
     
     // Find the best matching genre
     const sortedGenres = Object.entries(genreScores).sort(([,a], [,b]) => b - a);
-    const [bestGenre, bestScore] = sortedGenres[0];
+    const bestMatch = sortedGenres[0];
     
-    // Update genre with confidence based on score and consistency
-    this.updateGenreDetection(bestGenre as MusicGenre, bestScore);
+    // Add null/undefined check for array access
+    if (bestMatch) {
+      const [bestGenre, bestScore] = bestMatch;
+      // Update genre with confidence based on score and consistency
+      this.updateGenreDetection(bestGenre as MusicGenre, bestScore);
+    }
   }
 
   private calculateAverageSpectralData(): SpectralData {
@@ -623,8 +627,8 @@ export class GenreGradientEvolution {
     let bestScore = 0;
     
     for (const [genre, weight] of Object.entries(genreWeights)) {
-      if (weight! > bestScore) {
-        bestScore = weight!;
+      if (weight !== undefined && weight > bestScore) {
+        bestScore = weight;
         bestGenre = genre as MusicGenre;
       }
     }
@@ -636,7 +640,7 @@ export class GenreGradientEvolution {
     if (this.currentGenre === "unknown") return;
     
     const genreStyle = this.genreVisualStyles[this.currentGenre];
-    const emotionalProfile = this.emotionalGradientMapper?.getCurrentEmotionalProfile();
+    const emotionalProfile = this.emotionalGradientMapper?.getCurrentEmotionalProfile() || null;
     
     // Apply genre-specific visual parameters
     this.applyGenreVisualStyle(genreStyle, emotionalProfile);

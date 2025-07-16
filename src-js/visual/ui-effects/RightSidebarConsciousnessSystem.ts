@@ -93,7 +93,7 @@ export class RightSidebarConsciousnessSystem extends BaseVisualSystem {
   private _tryRegisterWithMasterAnimation() {
     if (
       this.year3000System?.registerAnimationSystem &&
-      this.year3000System.masterAnimationCoordinator
+      this.year3000System.animationConductor
     ) {
       const ok = this.year3000System.registerAnimationSystem(
         "RightSidebarConsciousnessSystem",

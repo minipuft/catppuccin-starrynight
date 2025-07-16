@@ -31,7 +31,6 @@ import { WebGLGradientBackgroundSystem } from "@/visual/backgrounds/WebGLGradien
 import { applyStarryNightSettings } from "@/visual/base/starryNightEffects";
 import { BeatSyncVisualSystem } from "@/visual/beat-sync/BeatSyncVisualSystem";
 import { BehavioralPredictionEngine } from "@/visual/ui-effects/BehavioralPredictionEngine";
-import { DataGlyphSystem } from "@/visual/ui-effects/DataGlyphSystem";
 import { InteractionTrackingSystem } from "@/visual/ui-effects/InteractionTrackingSystem";
 import { PredictiveMaterializationSystem } from "@/visual/ui-effects/PredictiveMaterializationSystem";
 import { SidebarConsciousnessSystem } from "@/visual/ui-effects/SidebarConsciousnessSystem";
@@ -59,7 +58,6 @@ interface VisualSystemConfig {
   property:
     | "lightweightParticleSystem"
     | "interactionTrackingSystem"
-    | "dataGlyphSystem"
     | "beatSyncVisualSystem"
     | "behavioralPredictionEngine"
     | "predictiveMaterializationSystem"
@@ -97,7 +95,6 @@ export class Year3000System {
   // Visual Systems
   public lightweightParticleSystem: LightweightParticleSystem | null;
   public interactionTrackingSystem: InteractionTrackingSystem | null;
-  public dataGlyphSystem: DataGlyphSystem | null;
   public beatSyncVisualSystem: BeatSyncVisualSystem | null;
   public behavioralPredictionEngine: BehavioralPredictionEngine | null;
   public predictiveMaterializationSystem: PredictiveMaterializationSystem | null;
@@ -166,7 +163,6 @@ export class Year3000System {
 
     this.lightweightParticleSystem = null;
     this.interactionTrackingSystem = null;
-    this.dataGlyphSystem = null;
     this.beatSyncVisualSystem = null;
     this.behavioralPredictionEngine = null;
     this.predictiveMaterializationSystem = null;
@@ -555,7 +551,6 @@ export class Year3000System {
       const visualSystems = [
         "LightweightParticleSystem",
         "InteractionTrackingSystem",
-        "DataGlyphSystem",
         "BeatSyncVisualSystem",
         "BehavioralPredictionEngine",
         "PredictiveMaterializationSystem",
@@ -576,11 +571,6 @@ export class Year3000System {
         name: "InteractionTrackingSystem",
         Class: InteractionTrackingSystem,
         property: "interactionTrackingSystem",
-      },
-      {
-        name: "DataGlyphSystem",
-        Class: DataGlyphSystem,
-        property: "dataGlyphSystem",
       },
       {
         name: "BeatSyncVisualSystem",
@@ -627,14 +617,20 @@ export class Year3000System {
     for (const config of visualSystemConfigs) {
       const { name, Class, property } = config;
       try {
-        const instance = new Class(
-          this.YEAR3000_CONFIG,
-          this.utils,
-          this.performanceAnalyzer,
-          this.musicSyncService,
-          this.settingsManager,
-          this
-        );
+        // Special case for SpotifyUIApplicationSystem - it has a different constructor signature
+        let instance;
+        if (name === "SpotifyUIApplicationSystem") {
+          instance = new Class(this);
+        } else {
+          instance = new Class(
+            this.YEAR3000_CONFIG,
+            this.utils,
+            this.performanceAnalyzer,
+            this.musicSyncService,
+            this.settingsManager,
+            this
+          );
+        }
         await instance.initialize();
 
         if (instance.initialized) {
@@ -688,7 +684,6 @@ export class Year3000System {
     const allSystems = [
       this.lightweightParticleSystem,
       this.interactionTrackingSystem,
-      this.dataGlyphSystem,
       this.beatSyncVisualSystem,
       this.behavioralPredictionEngine,
       this.predictiveMaterializationSystem,
@@ -1284,11 +1279,6 @@ export class Year3000System {
         priority: "background",
       },
       {
-        name: "DataGlyphSystem",
-        system: this.dataGlyphSystem,
-        priority: "background",
-      },
-      {
         name: "SpotifyUIApplicationSystem",
         system: this.spotifyUIApplicationSystem,
         priority: "normal",
@@ -1763,7 +1753,6 @@ export class Year3000System {
       this.card3DManager,
       this.lightweightParticleSystem,
       this.interactionTrackingSystem,
-      this.dataGlyphSystem,
       this.beatSyncVisualSystem,
       this.behavioralPredictionEngine,
       this.predictiveMaterializationSystem,

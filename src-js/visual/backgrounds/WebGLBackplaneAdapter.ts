@@ -580,7 +580,6 @@ export class WebGLBackplaneAdapter implements ShaderBackplane {
       return {
         webgl: false,
         webgl2: false,
-        webgpu: false,
         highPerformance: false,
         maxTextureSize: 0,
         maxShaderComplexity: "low",
@@ -594,7 +593,6 @@ export class WebGLBackplaneAdapter implements ShaderBackplane {
     return {
       webgl: true,
       webgl2: isWebGL2,
-      webgpu: false, // WebGPU not supported by this adapter
       highPerformance: deviceQuality === "high",
       maxTextureSize,
       maxShaderComplexity:

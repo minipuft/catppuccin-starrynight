@@ -62,7 +62,7 @@ export class FluxSpectralAnalyzer {
   private maxMemorySize = 100; // Keep 100 frames of history
   
   private isActive = false;
-  private analysisInterval: number | null = null;
+  private analysisInterval: ReturnType<typeof setInterval> | null = null;
   private analysisRate = 60; // 60 FPS analysis
   
   // Genre-based stellar drift mapping
@@ -226,7 +226,12 @@ export class FluxSpectralAnalyzer {
     // Analyze frequency bands
     for (let i = 0; i < binCount; i++) {
       const frequency = i * binWidth;
-      const amplitude = this.frequencyData![i] / 255; // Normalize to 0-1
+      const frequencyValue = this.frequencyData![i];
+      
+      // Add null/undefined check for array access
+      if (frequencyValue === undefined) continue;
+      
+      const amplitude = frequencyValue / 255; // Normalize to 0-1
       
       if (frequency >= this.BASS_RANGE.min && frequency <= this.BASS_RANGE.max) {
         bassTotal += amplitude;
@@ -287,7 +292,8 @@ export class FluxSpectralAnalyzer {
         const fundamentalLevel = this.frequencyData[fundamentalBin];
         const harmonicLevel = this.frequencyData[harmonicBin];
         
-        if (fundamentalLevel > 0) {
+        // Add null/undefined checks for array access and ensure both values exist
+        if (fundamentalLevel !== undefined && harmonicLevel !== undefined && fundamentalLevel > 0) {
           harmonicStrength += (harmonicLevel / fundamentalLevel) / harmonic;
         }
       }
@@ -305,8 +311,9 @@ export class FluxSpectralAnalyzer {
     
     // Find the strongest frequency component
     for (let i = 0; i < this.frequencyData.length; i++) {
-      if (this.frequencyData[i] > maxValue) {
-        maxValue = this.frequencyData[i];
+      const value = this.frequencyData[i];
+      if (value !== undefined && value > maxValue) {
+        maxValue = value;
         maxBin = i;
       }
     }
@@ -318,8 +325,11 @@ export class FluxSpectralAnalyzer {
     
     for (let i = Math.max(0, maxBin - windowSize); i <= Math.min(this.frequencyData.length - 1, maxBin + windowSize); i++) {
       if (i !== maxBin) {
-        surroundingAverage += this.frequencyData[i];
-        count++;
+        const value = this.frequencyData[i];
+        if (value !== undefined) {
+          surroundingAverage += value;
+          count++;
+        }
       }
     }
     
@@ -339,10 +349,15 @@ export class FluxSpectralAnalyzer {
     const threshold = 100; // Minimum amplitude to consider
     
     for (let i = 1; i < this.frequencyData.length - 1; i++) {
-      if (this.frequencyData[i] > threshold) {
+      const current = this.frequencyData[i];
+      const previous = this.frequencyData[i - 1];
+      const next = this.frequencyData[i + 1];
+      
+      // Add null/undefined checks for array access
+      if (current !== undefined && previous !== undefined && next !== undefined && current > threshold) {
         // Check for nearby conflicting frequencies
-        const prevDiff = Math.abs(this.frequencyData[i] - this.frequencyData[i - 1]);
-        const nextDiff = Math.abs(this.frequencyData[i] - this.frequencyData[i + 1]);
+        const prevDiff = Math.abs(current - previous);
+        const nextDiff = Math.abs(current - next);
         
         if (prevDiff > 50 || nextDiff > 50) {
           conflicts++;
@@ -450,10 +465,13 @@ export class FluxSpectralAnalyzer {
       const current = this.temporalMemory[this.temporalMemory.length - i];
       const previous = this.temporalMemory[this.temporalMemory.length - i - 1];
       
-      const energyDiff = Math.abs(current.energyLevel - previous.energyLevel);
-      const valenceDiff = Math.abs(current.emotionalValence - previous.emotionalValence);
-      
-      stability += 1 - (energyDiff + valenceDiff) / 2;
+      // Add null/undefined checks for array access
+      if (current && previous) {
+        const energyDiff = Math.abs(current.energyLevel - previous.energyLevel);
+        const valenceDiff = Math.abs(current.emotionalValence - previous.emotionalValence);
+        
+        stability += 1 - (energyDiff + valenceDiff) / 2;
+      }
     }
     
     return stability / (recentFrames - 1);

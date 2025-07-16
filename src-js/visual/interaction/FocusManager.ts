@@ -1,5 +1,5 @@
 import type { Year3000Config } from "@/types/models";
-import type { IManagedSystem } from "@/types/systems";
+import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 
 interface FocusState {
@@ -265,11 +265,16 @@ export class FocusManager implements IManagedSystem {
       issues.push("Focus tracking disabled");
     }
 
-    return {
-      ok: this.initialized && this.config.trackingEnabled,
+    const result: HealthCheckResult = {
+      ok: this.initialized && (this.config.trackingEnabled || false),
       details: `Focus state: ${this.focusState.isFocusVisible ? 'visible' : 'hidden'}, Events: ${metrics.focusCount + metrics.hoverCount}`,
-      issues: issues.length > 0 ? issues : undefined,
     };
+    
+    if (issues.length > 0) {
+      result.issues = issues;
+    }
+    
+    return result;
   }
 
   public updateAnimation(deltaTime: number): void {

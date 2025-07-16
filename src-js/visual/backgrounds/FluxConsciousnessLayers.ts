@@ -84,8 +84,8 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
     this.loadSettings();
 
     // Performance check - disable if FPS is too low
-    const currentFPS = this.performanceMonitor?.getFPS?.() || 60;
-    const isLowEndDevice = this.performanceMonitor?.isLowEndDevice?.() || false;
+    const currentFPS = (this.performanceMonitor as any)?.averageFPS || 60;
+    const isLowEndDevice = PerformanceAnalyzer.isLowEndDevice();
     const shouldReduceQuality = this.performanceMonitor?.shouldReduceQuality?.() || false;
 
     if (currentFPS < 45 || isLowEndDevice || shouldReduceQuality) {
@@ -305,7 +305,7 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
     }
   }
 
-  private handleSettingsChange(event: Event): void {
+  public override handleSettingsChange(event: Event): void {
     const customEvent = event as CustomEvent;
     const { key, value } = customEvent.detail;
 
@@ -319,7 +319,7 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
     if (!this.cssVariableBatcher) return;
 
     // Runtime performance check - disable if performance degrades
-    const currentFPS = this.performanceMonitor?.getFPS?.() || 60;
+    const currentFPS = (this.performanceMonitor as any)?.currentFPS || 60;
     if (currentFPS < 40 && this.settings.enabled) {
       this.settings.enabled = false;
       this.destroyConsciousnessLayers();
@@ -353,7 +353,9 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
 
     // Apply updates in batch
     updates.forEach(([property, value]) => {
-      this.cssVariableBatcher.setProperty(property, value);
+      if (property && value !== undefined) {
+        this.cssVariableBatcher.setProperty(property, value);
+      }
     });
   }
 

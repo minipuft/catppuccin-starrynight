@@ -196,7 +196,7 @@ export class FluxMusicVisualization extends BaseVisualSystem {
   }
 
   private createFrequencyBands(): HTMLElement[] {
-    const bands = [];
+    const bands: HTMLElement[] = [];
     const bandNames = ['bass', 'mid', 'treble', 'vocal'];
     
     bandNames.forEach((name, index) => {
@@ -329,7 +329,7 @@ export class FluxMusicVisualization extends BaseVisualSystem {
     this.triggerBeatPulse(intensity);
   }
 
-  private handleSettingsChange(event: Event): void {
+  public override handleSettingsChange(event: Event): void {
     const customEvent = event as CustomEvent;
     const { key, value } = customEvent.detail;
     
@@ -386,7 +386,7 @@ export class FluxMusicVisualization extends BaseVisualSystem {
       const band = this.visualizationElements.find(el => el.className.includes(`sn-frequency-${name}`));
       if (!band) return;
       
-      const level = levels[index] * this.settings.beatSyncIntensity;
+      const level = (levels[index] || 0) * this.settings.beatSyncIntensity;
       const scaleY = 0.1 + (level * 0.9);
       const opacity = level * 0.8;
       

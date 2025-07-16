@@ -1422,6 +1422,7 @@
     calculateOklabDerivedProperties: () => calculateOklabDerivedProperties,
     calculateRhythmPhase: () => calculateRhythmPhase,
     colorDifference: () => colorDifference,
+    debounce: () => debounce,
     easeBeatAnimation: () => easeBeatAnimation,
     findRequiredLuminance: () => findRequiredLuminance,
     generateHarmonicOklabColors: () => generateHarmonicOklabColors,
@@ -1456,6 +1457,13 @@
         inThrottle = true;
         setTimeout(() => inThrottle = false, limit);
       }
+    };
+  }
+  function debounce(func, delay) {
+    let timeoutId;
+    return function debounced(...args) {
+      clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => func(...args), delay);
     };
   }
   function hexToRgb(hex) {
@@ -1871,17 +1879,164 @@
     }
   });
 
+  // src-js/utils/spicetify/SemanticColorManager.ts
+  var _SemanticColorManager, SemanticColorManager;
+  var init_SemanticColorManager = __esm({
+    "src-js/utils/spicetify/SemanticColorManager.ts"() {
+      "use strict";
+      init_Year3000Utilities();
+      _SemanticColorManager = class _SemanticColorManager {
+        constructor(config = {}) {
+          this.cssVariableBatcher = null;
+          this.colorCache = /* @__PURE__ */ new Map();
+          this.lastCacheUpdate = 0;
+          this.initialized = false;
+          this.config = {
+            enableDebug: false,
+            fallbackToSpiceColors: true,
+            cacheDuration: 5e3,
+            // 5 seconds
+            ...config
+          };
+        }
+        initialize(cssVariableBatcher) {
+          this.cssVariableBatcher = cssVariableBatcher || null;
+          this.initialized = true;
+          if (this.config.enableDebug) {
+            console.log("\u{1F3A8} [SemanticColorManager] Initialized with", {
+              mappings: _SemanticColorManager.SEMANTIC_MAPPINGS.length,
+              batcherAvailable: !!this.cssVariableBatcher,
+              spicetifyAvailable: this.isSpicetifyAvailable()
+            });
+          }
+        }
+        async updateSemanticColors() {
+          if (!this.initialized) {
+            console.warn("[SemanticColorManager] Not initialized, cannot update colors");
+            return;
+          }
+          const now = Date.now();
+          if (now - this.lastCacheUpdate < (this.config.cacheDuration || 5e3)) {
+            return;
+          }
+          try {
+            for (const mapping of _SemanticColorManager.SEMANTIC_MAPPINGS) {
+              const color = await this.getSemanticColor(mapping.semanticColor);
+              this.applyColorToCSS(mapping.cssVariable, color);
+              const rgbColor = hexToRgb(color);
+              if (rgbColor) {
+                const rgbVariable = mapping.cssVariable.replace("--spice-", "--spice-rgb-");
+                this.applyColorToCSS(rgbVariable, `${rgbColor.r},${rgbColor.g},${rgbColor.b}`);
+              }
+            }
+            this.lastCacheUpdate = now;
+            if (this.config.enableDebug) {
+              console.log("\u{1F3A8} [SemanticColorManager] Updated all semantic colors");
+            }
+          } catch (error) {
+            console.error("[SemanticColorManager] Failed to update semantic colors:", error);
+          }
+        }
+        async getSemanticColor(semanticColor) {
+          const cached = this.colorCache.get(semanticColor);
+          if (cached && Date.now() - this.lastCacheUpdate < (this.config.cacheDuration || 5e3)) {
+            return cached;
+          }
+          let color;
+          try {
+            if (this.isSpicetifyAvailable() && Spicetify.Platform?.getSemanticColors) {
+              const semanticColors = await Spicetify.Platform.getSemanticColors();
+              color = semanticColors[semanticColor];
+            } else {
+              color = this.getFallbackColor(semanticColor);
+            }
+          } catch (error) {
+            if (this.config.enableDebug) {
+              console.warn(`[SemanticColorManager] Failed to get semantic color ${semanticColor}:`, error);
+            }
+            color = this.getFallbackColor(semanticColor);
+          }
+          this.colorCache.set(semanticColor, color);
+          return color;
+        }
+        getFallbackColor(semanticColor) {
+          const mapping = _SemanticColorManager.SEMANTIC_MAPPINGS.find((m) => m.semanticColor === semanticColor);
+          if (mapping) {
+            return mapping.fallbackColor;
+          }
+          if (semanticColor.startsWith("text")) {
+            return "#cdd6f4";
+          } else if (semanticColor.startsWith("background")) {
+            return "#1e1e2e";
+          } else if (semanticColor.startsWith("essential")) {
+            return "#cba6f7";
+          } else if (semanticColor.startsWith("decorative")) {
+            return "#9399b2";
+          }
+          return "#cdd6f4";
+        }
+        applyColorToCSS(cssVariable, color) {
+          if (this.cssVariableBatcher) {
+            this.cssVariableBatcher.queueCSSVariableUpdate(cssVariable, color);
+          } else {
+            document.documentElement.style.setProperty(cssVariable, color);
+          }
+        }
+        isSpicetifyAvailable() {
+          return typeof Spicetify !== "undefined" && Spicetify.Platform && typeof Spicetify.Platform.getSemanticColors === "function";
+        }
+        flushUpdates() {
+          if (this.cssVariableBatcher) {
+            this.cssVariableBatcher.flushCSSVariableBatch();
+          }
+        }
+        clearCache() {
+          this.colorCache.clear();
+          this.lastCacheUpdate = 0;
+        }
+        getColorMappings() {
+          return _SemanticColorManager.SEMANTIC_MAPPINGS;
+        }
+        destroy() {
+          this.clearCache();
+          this.cssVariableBatcher = null;
+          this.initialized = false;
+        }
+      };
+      // Semantic color mappings to our CSS variables
+      _SemanticColorManager.SEMANTIC_MAPPINGS = [
+        // Text colors
+        { semanticColor: "textBase", cssVariable: "--spice-text", fallbackColor: "#cdd6f4", description: "Primary text color" },
+        { semanticColor: "textSubdued", cssVariable: "--spice-subtext", fallbackColor: "#a6adc8", description: "Secondary text color" },
+        { semanticColor: "textBrightAccent", cssVariable: "--spice-accent", fallbackColor: "#cba6f7", description: "Accent text color" },
+        { semanticColor: "textNegative", cssVariable: "--spice-red", fallbackColor: "#f38ba8", description: "Error text color" },
+        { semanticColor: "textWarning", cssVariable: "--spice-yellow", fallbackColor: "#f9e2af", description: "Warning text color" },
+        { semanticColor: "textPositive", cssVariable: "--spice-green", fallbackColor: "#a6e3a1", description: "Success text color" },
+        { semanticColor: "textAnnouncement", cssVariable: "--spice-blue", fallbackColor: "#89b4fa", description: "Info text color" },
+        // Essential colors (for icons, controls)
+        { semanticColor: "essentialBase", cssVariable: "--spice-button", fallbackColor: "#cdd6f4", description: "Primary button color" },
+        { semanticColor: "essentialSubdued", cssVariable: "--spice-button-disabled", fallbackColor: "#6c7086", description: "Disabled button color" },
+        { semanticColor: "essentialBrightAccent", cssVariable: "--spice-button-active", fallbackColor: "#cba6f7", description: "Active button color" },
+        { semanticColor: "essentialNegative", cssVariable: "--spice-notification-error", fallbackColor: "#f38ba8", description: "Error button color" },
+        { semanticColor: "essentialWarning", cssVariable: "--spice-notification-warning", fallbackColor: "#f9e2af", description: "Warning button color" },
+        { semanticColor: "essentialPositive", cssVariable: "--spice-notification-success", fallbackColor: "#a6e3a1", description: "Success button color" },
+        // Background colors
+        { semanticColor: "backgroundBase", cssVariable: "--spice-main", fallbackColor: "#1e1e2e", description: "Main background color" },
+        { semanticColor: "backgroundHighlight", cssVariable: "--spice-highlight", fallbackColor: "#313244", description: "Highlight background color" },
+        { semanticColor: "backgroundPress", cssVariable: "--spice-press", fallbackColor: "#45475a", description: "Press state background color" },
+        { semanticColor: "backgroundElevatedBase", cssVariable: "--spice-card", fallbackColor: "#181825", description: "Card background color" },
+        { semanticColor: "backgroundElevatedHighlight", cssVariable: "--spice-card-highlight", fallbackColor: "#313244", description: "Card highlight background" },
+        { semanticColor: "backgroundTintedBase", cssVariable: "--spice-sidebar", fallbackColor: "#313244", description: "Sidebar background color" },
+        { semanticColor: "backgroundTintedHighlight", cssVariable: "--spice-sidebar-highlight", fallbackColor: "#45475a", description: "Sidebar highlight background" },
+        // Decorative colors
+        { semanticColor: "decorativeBase", cssVariable: "--spice-decorative", fallbackColor: "#cdd6f4", description: "Decorative element color" },
+        { semanticColor: "decorativeSubdued", cssVariable: "--spice-decorative-subdued", fallbackColor: "#9399b2", description: "Subdued decorative color" }
+      ];
+      SemanticColorManager = _SemanticColorManager;
+    }
+  });
+
   // src-js/utils/graphics/VisualCanvasFactory.ts
-  function detectWebGPUSupport() {
-    if (!navigator.gpu) {
-      return false;
-    }
-    try {
-      return typeof navigator.gpu.requestAdapter === "function";
-    } catch (e) {
-      return false;
-    }
-  }
   function detectWebGL2Support() {
     try {
       const testCanvas = document.createElement("canvas");
@@ -1891,42 +2046,6 @@
       return true;
     } catch (e) {
       return false;
-    }
-  }
-  async function createWebGPUContext(canvas, options) {
-    try {
-      if (!navigator.gpu) return null;
-      const adapter = await navigator.gpu.requestAdapter({
-        powerPreference: "high-performance"
-      });
-      if (!adapter) return null;
-      const device = await adapter.requestDevice();
-      const context = canvas.getContext("webgpu");
-      if (!context || !("configure" in context)) return null;
-      const gpuContext = context;
-      const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
-      gpuContext.configure({
-        device,
-        format: canvasFormat,
-        alphaMode: options.alpha ? "premultiplied" : "opaque"
-      });
-      return {
-        canvas,
-        ctx: gpuContext,
-        type: "webgpu",
-        capabilities: {
-          supportsGPUAcceleration: true,
-          supports3D: true,
-          maxTextureSize: adapter.limits.maxTextureDimension2D || 8192,
-          preferredFormat: canvasFormat
-        }
-      };
-    } catch (error) {
-      console.warn(
-        "[VisualCanvasFactory] WebGPU context creation failed:",
-        error
-      );
-      return null;
     }
   }
   function createWebGL2Context(canvas, options) {
@@ -1987,7 +2106,7 @@
     canvas.id = options.id;
     canvas.width = options.width ?? window.innerWidth;
     canvas.height = options.height ?? window.innerHeight;
-    const fallbackChain = options.fallbackChain ?? ["webgpu", "webgl2", "2d"];
+    const fallbackChain = options.fallbackChain ?? ["webgl2", "2d"];
     if (options.preferredType) {
       const chain = [
         options.preferredType,
@@ -1998,11 +2117,6 @@
     for (const contextType of fallbackChain) {
       let result = null;
       switch (contextType) {
-        case "webgpu":
-          if (detectWebGPUSupport()) {
-            result = await createWebGPUContext(canvas, options);
-          }
-          break;
         case "webgl2":
           if (detectWebGL2Support()) {
             result = createWebGL2Context(canvas, options);
@@ -2019,15 +2133,12 @@
     return create2DContext(canvas, options);
   }
   function detectRenderingCapabilities() {
-    const webgpu = detectWebGPUSupport();
     const webgl2 = detectWebGL2Support();
     let recommendedType = "2d";
-    if (webgpu) {
-      recommendedType = "webgpu";
-    } else if (webgl2) {
+    if (webgl2) {
       recommendedType = "webgl2";
     }
-    return { webgpu, webgl2, recommendedType };
+    return { webgl2, recommendedType };
   }
   var init_VisualCanvasFactory = __esm({
     "src-js/utils/graphics/VisualCanvasFactory.ts"() {
@@ -2163,7 +2274,7 @@
           this.canvasCapabilities = detectRenderingCapabilities();
           if (this.canvasCapabilities) {
             this.performanceMonitor?.emitTrace?.(
-              `[${this.systemName}] Canvas capabilities detected: WebGPU=${this.canvasCapabilities.webgpu}, WebGL2=${this.canvasCapabilities.webgl2}, Recommended=${this.canvasCapabilities.recommendedType}`
+              `[${this.systemName}] Canvas capabilities detected: WebGL2=${this.canvasCapabilities.webgl2}, Recommended=${this.canvasCapabilities.recommendedType}`
             );
           }
         }
@@ -2290,7 +2401,7 @@
         }
         /**
          * Create GPU-accelerated optimized canvas with kinetic styling.
-         * This method prioritizes WebGPU > WebGL2 > 2D Canvas based on device capabilities.
+         * This method prioritizes WebGL2 > 2D Canvas based on device capabilities.
          */
         async _createOptimizedKineticCanvas(id, zIndex = 5, blendMode = "screen", kineticMode = "pulse") {
           const existing = document.getElementById(id);
@@ -2300,17 +2411,7 @@
           let preferredType = "2d";
           if (this.canvasCapabilities && this.currentPerformanceProfile) {
             const quality = this.currentPerformanceProfile.quality || "balanced";
-            let webgpuAllowed = false;
-            try {
-              if (this.settingsManager) {
-                webgpuAllowed = this.settingsManager.get("sn-enable-webgpu") !== "false";
-              }
-            } catch (e) {
-              webgpuAllowed = true;
-            }
-            if (webgpuAllowed && quality === "high" && this.canvasCapabilities.webgpu) {
-              preferredType = "webgpu";
-            } else if (quality !== "low" && this.canvasCapabilities.webgl2) {
+            if (quality !== "low" && this.canvasCapabilities.webgl2) {
               preferredType = "webgl2";
             }
           }
@@ -2367,7 +2468,7 @@
          * Check if GPU acceleration is available and active.
          */
         hasGPUAcceleration() {
-          return this.canvasCapabilities?.webgpu || this.canvasCapabilities?.webgl2 || false;
+          return this.canvasCapabilities?.webgl2 || false;
         }
         _createKineticCanvas(id, zIndex = 5, blendMode = "screen", kineticMode = "pulse") {
           const canvas = this._createCanvasElement(id, zIndex, blendMode);
@@ -2499,6 +2600,7 @@
       init_EventBus();
       init_PaletteExtensionManager();
       init_Year3000Utilities();
+      init_SemanticColorManager();
       init_BaseVisualSystem();
       _ColorHarmonyEngine = class _ColorHarmonyEngine extends BaseVisualSystem {
         constructor(config, utils, performanceMonitor, musicAnalysisService, settingsManager) {
@@ -2523,6 +2625,11 @@
             this.config,
             this.utils
           );
+          this.semanticColorManager = new SemanticColorManager({
+            enableDebug: this.config.enableDebug,
+            fallbackToSpiceColors: true,
+            cacheDuration: 5e3
+          });
           this.currentTheme = this.detectCurrentTheme();
           if (config && typeof config.harmonicIntensity === "number" && Number.isFinite(config.harmonicIntensity)) {
             const clamped = Math.max(
@@ -2767,9 +2874,12 @@
         }
         async initialize() {
           await super.initialize();
+          const cssVariableBatcher = this.performanceMonitor ? this.performanceMonitor.cssVariableBatcher : void 0;
+          this.semanticColorManager.initialize(cssVariableBatcher);
+          await this.semanticColorManager.updateSemanticColors();
           if (this.config.enableDebug) {
             console.log(
-              "\u{1F3A8} [ColorHarmonyEngine] Initialized with Year 3000 Quantum Empathy via BaseVisualSystem."
+              "\u{1F3A8} [ColorHarmonyEngine] Initialized with Year 3000 Quantum Empathy via BaseVisualSystem and SemanticColorManager."
             );
           }
           this.initialized = true;
@@ -3131,7 +3241,70 @@
           this.performanceMonitor?.emitTrace?.(
             "[ColorHarmonyEngine] Completed blendWithCatppuccin"
           );
+          this.updateSemanticColorsWithHarmonizedPalette(harmonizedColors);
           return harmonizedColors;
+        }
+        /**
+         * Updates semantic colors using the harmonized palette
+         * Integrates with Spicetify's semantic color system for consistent theming
+         */
+        updateSemanticColorsWithHarmonizedPalette(harmonizedColors) {
+          if (!this.semanticColorManager) {
+            return;
+          }
+          try {
+            this.semanticColorManager.updateSemanticColors();
+            const primaryColor = harmonizedColors["VIBRANT"] || harmonizedColors["PRIMARY"];
+            const secondaryColor = harmonizedColors["DARK_VIBRANT"] || harmonizedColors["SECONDARY"];
+            const accentColor = harmonizedColors["VIBRANT_NON_ALARMING"] || harmonizedColors["LIGHT_VIBRANT"];
+            if (primaryColor) {
+              this.semanticColorManager.getSemanticColor("essentialBrightAccent").then((color) => {
+                const blendedColor = this.blendWithSemanticColor(primaryColor, color, 0.7);
+                this.applyCSSVariable("--spice-accent", blendedColor);
+                this.applyCSSVariable("--spice-button-active", blendedColor);
+              });
+            }
+            if (secondaryColor) {
+              this.semanticColorManager.getSemanticColor("backgroundElevatedHighlight").then((color) => {
+                const blendedColor = this.blendWithSemanticColor(secondaryColor, color, 0.5);
+                this.applyCSSVariable("--spice-highlight", blendedColor);
+              });
+            }
+            if (accentColor) {
+              this.semanticColorManager.getSemanticColor("textBrightAccent").then((color) => {
+                const blendedColor = this.blendWithSemanticColor(accentColor, color, 0.6);
+                this.applyCSSVariable("--spice-text-accent", blendedColor);
+              });
+            }
+            this.semanticColorManager.flushUpdates();
+          } catch (error) {
+            if (this.config.enableDebug) {
+              console.warn("[ColorHarmonyEngine] Failed to update semantic colors:", error);
+            }
+          }
+        }
+        /**
+         * Blends a harmonized color with a semantic color for consistency
+         */
+        blendWithSemanticColor(harmonizedHex, semanticHex, blendRatio) {
+          const harmonizedRgb = this.utils.hexToRgb(harmonizedHex);
+          const semanticRgb = this.utils.hexToRgb(semanticHex);
+          if (!harmonizedRgb || !semanticRgb) {
+            return harmonizedHex;
+          }
+          const blendedRgb = this.blendColors(harmonizedRgb, semanticRgb, blendRatio);
+          return this.utils.rgbToHex(blendedRgb.r, blendedRgb.g, blendedRgb.b);
+        }
+        /**
+         * Applies CSS variable with fallback to direct style application
+         */
+        applyCSSVariable(property, value) {
+          const cssVariableBatcher = this.performanceMonitor?.cssVariableBatcher;
+          if (cssVariableBatcher) {
+            cssVariableBatcher.queueCSSVariableUpdate(property, value);
+          } else {
+            document.documentElement.style.setProperty(property, value);
+          }
         }
         generateRecommendations(color, contrastRatio, harmonyScore, requirements) {
           const recommendations = [];
@@ -3536,6 +3709,9 @@
             "year3000ArtisticModeChanged",
             this._boundArtisticModeHandler
           );
+          if (this.semanticColorManager) {
+            this.semanticColorManager.destroy();
+          }
           super.destroy?.();
         }
         /**
@@ -4724,7 +4900,6 @@
         "--sn.color.accent.hex",
         "--sn.color.accent.rgb",
         "--sn.bg.webgl.ready",
-        "--sn.bg.webgpu.ready",
         "--sn.bg.active-backend"
       ]);
       _CSSVariableBatcher = class _CSSVariableBatcher {
@@ -4802,7 +4977,11 @@
           }
           const target = element || document.documentElement;
           if (!this._cssVariableBatcher.enabled) {
-            target.style.setProperty(property, value);
+            if (_CSSVariableBatcher.nativeSetProperty) {
+              _CSSVariableBatcher.nativeSetProperty.call(target.style, property, value);
+            } else {
+              target.style.setProperty(property, value);
+            }
             return;
           }
           const elementKey = element ? `element_${element.id || element.className || "unnamed"}` : "root";
@@ -4859,7 +5038,11 @@
                 element.style.cssText = cssText;
               } else {
                 for (const update of elementUpdates) {
-                  element.style.setProperty(update.property, update.value);
+                  if (_CSSVariableBatcher.nativeSetProperty) {
+                    _CSSVariableBatcher.nativeSetProperty.call(element.style, update.property, update.value);
+                  } else {
+                    element.style.setProperty(update.property, update.value);
+                  }
                 }
               }
             }
@@ -4879,7 +5062,11 @@
             );
             for (const update of updates) {
               try {
-                update.element.style.setProperty(update.property, update.value);
+                if (_CSSVariableBatcher.nativeSetProperty) {
+                  _CSSVariableBatcher.nativeSetProperty.call(update.element.style, update.property, update.value);
+                } else {
+                  update.element.style.setProperty(update.property, update.value);
+                }
               } catch (e) {
                 console.warn(
                   `[CSSVariableBatcher] Failed to apply CSS property ${update.property}:`,
@@ -5186,9 +5373,6 @@
         setPerformanceTokens(perf) {
           if (perf.webglReady !== void 0) {
             this.setProperty("--sn.bg.webgl.ready", perf.webglReady ? "1" : "0");
-          }
-          if (perf.webgpuReady !== void 0) {
-            this.setProperty("--sn.bg.webgpu.ready", perf.webgpuReady ? "1" : "0");
           }
           if (perf.activeBackend) {
             this.setProperty("--sn.bg.active-backend", perf.activeBackend);
@@ -6257,6 +6441,221 @@
     }
   });
 
+  // src-js/core/performance/PerformanceBudgetManager.ts
+  var _PerformanceBudgetManager, PerformanceBudgetManager;
+  var init_PerformanceBudgetManager = __esm({
+    "src-js/core/performance/PerformanceBudgetManager.ts"() {
+      "use strict";
+      _PerformanceBudgetManager = class _PerformanceBudgetManager {
+        constructor(config = {}, performanceAnalyzer) {
+          this.cssVariableBatcher = null;
+          // Optimization state
+          this.optimizationLevel = "none";
+          this.disabledFeatures = /* @__PURE__ */ new Set();
+          this.config = {
+            budgets: {
+              animationFrame: 16.67,
+              // 60 FPS
+              cssVariableUpdate: 2,
+              domObservation: 5,
+              audioAnalysis: 10,
+              visualEffects: 8,
+              userInteraction: 100
+            },
+            autoOptimize: {
+              enabled: true,
+              violationThreshold: 5,
+              recoveryThreshold: 80
+            },
+            enableDebug: false,
+            ...config
+          };
+          this.performanceAnalyzer = performanceAnalyzer;
+          this.setupBudgetMonitoring();
+        }
+        static getInstance(config, performanceAnalyzer) {
+          if (!_PerformanceBudgetManager.instance && performanceAnalyzer) {
+            _PerformanceBudgetManager.instance = new _PerformanceBudgetManager(
+              config,
+              performanceAnalyzer
+            );
+          }
+          return _PerformanceBudgetManager.instance;
+        }
+        /**
+         * Register CSS Variable Batcher for optimization
+         */
+        registerCSSVariableBatcher(batcher) {
+          this.cssVariableBatcher = batcher;
+        }
+        /**
+         * Set up automatic budget monitoring and optimization
+         */
+        setupBudgetMonitoring() {
+          if (!this.config.autoOptimize.enabled) return;
+          setInterval(() => {
+            this.checkBudgets();
+          }, 5e3);
+        }
+        /**
+         * Check budget violations and trigger optimizations
+         */
+        checkBudgets() {
+          const violations = this.performanceAnalyzer.getBudgetViolations();
+          const healthScore = this.performanceAnalyzer.calculateHealthScore();
+          let totalViolations = 0;
+          for (const [operation, count] of violations) {
+            totalViolations += count;
+            if (count >= this.config.autoOptimize.violationThreshold) {
+              this.optimizeOperation(operation);
+            }
+          }
+          if (totalViolations >= this.config.autoOptimize.violationThreshold * 2) {
+            this.escalateOptimization();
+          }
+          if (healthScore >= this.config.autoOptimize.recoveryThreshold) {
+            this.recoverOptimizations();
+          }
+        }
+        /**
+         * Optimize a specific operation that's violating budget
+         */
+        optimizeOperation(operation) {
+          if (this.disabledFeatures.has(operation)) return;
+          switch (operation) {
+            case "cssVariableUpdate":
+              this.optimizeCSSVariableUpdates();
+              break;
+            case "domObservation":
+              this.optimizeDOMObservation();
+              break;
+            case "visualEffects":
+              this.optimizeVisualEffects();
+              break;
+            case "audioAnalysis":
+              this.optimizeAudioAnalysis();
+              break;
+          }
+          this.disabledFeatures.add(operation);
+          if (this.config.enableDebug) {
+            console.log(`\u{1F3AF} [PerformanceBudgetManager] Optimized ${operation} due to budget violations`);
+          }
+        }
+        /**
+         * Optimize CSS variable updates
+         */
+        optimizeCSSVariableUpdates() {
+          if (!this.cssVariableBatcher) return;
+          this.cssVariableBatcher.updateConfig({
+            batchIntervalMs: 32,
+            // Reduce to 30 FPS
+            maxBatchSize: 25
+            // Smaller batches
+          });
+        }
+        /**
+         * Optimize DOM observation
+         */
+        optimizeDOMObservation() {
+          document.dispatchEvent(new CustomEvent("year3000:optimize-dom-observation", {
+            detail: { level: this.optimizationLevel }
+          }));
+        }
+        /**
+         * Optimize visual effects
+         */
+        optimizeVisualEffects() {
+          document.dispatchEvent(new CustomEvent("year3000:optimize-visual-effects", {
+            detail: { level: this.optimizationLevel }
+          }));
+        }
+        /**
+         * Optimize audio analysis
+         */
+        optimizeAudioAnalysis() {
+          document.dispatchEvent(new CustomEvent("year3000:optimize-audio-analysis", {
+            detail: { level: this.optimizationLevel }
+          }));
+        }
+        /**
+         * Escalate optimization level
+         */
+        escalateOptimization() {
+          if (this.optimizationLevel === "none") {
+            this.optimizationLevel = "conservative";
+          } else if (this.optimizationLevel === "conservative") {
+            this.optimizationLevel = "aggressive";
+          }
+          if (this.config.enableDebug) {
+            console.log(`\u{1F3AF} [PerformanceBudgetManager] Escalated to ${this.optimizationLevel} optimization`);
+          }
+        }
+        /**
+         * Recover from optimizations when performance improves
+         */
+        recoverOptimizations() {
+          if (this.optimizationLevel === "none") return;
+          this.disabledFeatures.clear();
+          if (this.cssVariableBatcher) {
+            this.cssVariableBatcher.updateConfig({
+              batchIntervalMs: 16,
+              maxBatchSize: 50
+            });
+          }
+          document.dispatchEvent(new CustomEvent("year3000:recover-optimizations", {
+            detail: { previousLevel: this.optimizationLevel }
+          }));
+          this.optimizationLevel = "none";
+          if (this.config.enableDebug) {
+            console.log("\u{1F3AF} [PerformanceBudgetManager] Recovered from optimizations");
+          }
+        }
+        /**
+         * Get current optimization status
+         */
+        getOptimizationStatus() {
+          return {
+            level: this.optimizationLevel,
+            disabledFeatures: Array.from(this.disabledFeatures),
+            budgetViolations: this.performanceAnalyzer.getBudgetViolations(),
+            healthScore: this.performanceAnalyzer.calculateHealthScore()
+          };
+        }
+        /**
+         * Manually trigger optimization for testing
+         */
+        manualOptimize(operation) {
+          this.optimizeOperation(operation);
+        }
+        /**
+         * Manually recover from optimizations
+         */
+        manualRecover() {
+          this.recoverOptimizations();
+        }
+        /**
+         * Update performance budgets
+         */
+        updateBudgets(budgets) {
+          this.config.budgets = { ...this.config.budgets, ...budgets };
+          for (const [operation, budget] of Object.entries(budgets)) {
+            this.performanceAnalyzer.updateBudget(operation, budget);
+          }
+        }
+        /**
+         * Destroy and cleanup
+         */
+        destroy() {
+          this.disabledFeatures.clear();
+          this.cssVariableBatcher = null;
+          _PerformanceBudgetManager.instance = null;
+        }
+      };
+      _PerformanceBudgetManager.instance = null;
+      PerformanceBudgetManager = _PerformanceBudgetManager;
+    }
+  });
+
   // src-js/utils/dom/getScrollNode.ts
   function getScrollNode() {
     return document.querySelector(SCROLL_NODE_SELECTORS);
@@ -6282,6 +6681,7 @@
     "src-js/core/lifecycle/VisualFrameCoordinator.ts"() {
       "use strict";
       init_EventBus();
+      init_PerformanceBudgetManager();
       init_getScrollNode();
       PRIORITY_SORT = {
         critical: 0,
@@ -6308,6 +6708,9 @@
           this._reduceTransparencyMQ = null;
           this._reduceTransparencyHandler = null;
           this.frameBudgetMs = this._resolveFrameBudget();
+          if (this.perfAnalyzer) {
+            this.budgetManager = PerformanceBudgetManager.getInstance(void 0, this.perfAnalyzer);
+          }
           this._setupOrientationListeners();
           this._setupReducedMotionListener();
           this._startLoop();
@@ -6382,9 +6785,6 @@
             this._reduceTransparencyMQ = null;
           }
         }
-        // -------------------------------------------------------------------------
-        // Internal loop & helpers
-        // -------------------------------------------------------------------------
         _startLoop() {
           const loop = (timestamp) => {
             const deltaMs = timestamp - this.lastTimestamp;
@@ -6405,11 +6805,18 @@
             };
             GlobalEventBus.publish("cdf:frameContext", context);
             let remaining = this.frameBudgetMs;
+            const frameStart = performance.now();
             for (const wrapper of this.systems) {
               if (remaining <= 0 && wrapper.priority === "background") break;
               const start = performance.now();
               try {
-                wrapper.system.onAnimate(deltaMs, context);
+                if (this.perfAnalyzer) {
+                  this.perfAnalyzer.timeOperation("animationFrame", () => {
+                    wrapper.system.onAnimate(deltaMs, context);
+                  });
+                } else {
+                  wrapper.system.onAnimate(deltaMs, context);
+                }
               } catch (err) {
                 console.error(
                   `[VisualFrameCoordinator] Error in system ${wrapper.system.systemName}:`,
@@ -6420,6 +6827,10 @@
               remaining -= execTime;
               wrapper.lastExec = execTime;
               wrapper.averageTime = wrapper.averageTime === 0 ? execTime : wrapper.averageTime * 0.9 + execTime * 0.1;
+            }
+            const totalFrameTime = performance.now() - frameStart;
+            if (this.perfAnalyzer) {
+              this.perfAnalyzer.isWithinBudget("animationFrame", totalFrameTime);
             }
             if (timestamp % 1e3 < deltaMs) {
               this._evaluatePerformanceMode();
@@ -6864,6 +7275,27 @@
           this.timedOperations = /* @__PURE__ */ new Map();
           this._buckets = /* @__PURE__ */ new Map();
           // -------------------------------------------------------------------
+          // Performance budgets and monitoring -------------------------------
+          // -------------------------------------------------------------------
+          // Performance budgets (in milliseconds)
+          this.performanceBudgets = {
+            animationFrame: 16.67,
+            // 60 FPS target
+            cssVariableUpdate: 2,
+            // CSS variable batching
+            domObservation: 5,
+            // DOM mutation handling
+            audioAnalysis: 10,
+            // Audio processing
+            visualEffects: 8,
+            // Visual system updates
+            userInteraction: 100
+            // User interaction response
+          };
+          // Budget tracking
+          this.budgetViolations = /* @__PURE__ */ new Map();
+          this.budgetHistory = /* @__PURE__ */ new Map();
+          // -------------------------------------------------------------------
           // Simple metric recorder for external systems -----------------------
           // -------------------------------------------------------------------
           /**
@@ -7086,6 +7518,87 @@
             return true;
           }
           return false;
+        }
+        // --- Performance Budget Methods ---
+        /**
+         * Check if an operation is within performance budget
+         */
+        isWithinBudget(operation, duration) {
+          const budget = this.performanceBudgets[operation];
+          if (!budget) return true;
+          const withinBudget = duration <= budget;
+          if (!withinBudget) {
+            this.budgetViolations.set(operation, (this.budgetViolations.get(operation) || 0) + 1);
+            if (this.config.enableDebug) {
+              console.warn(`\u{1F4CA} [PerformanceAnalyzer] Budget violation: ${operation} took ${duration.toFixed(2)}ms (budget: ${budget}ms)`);
+            }
+          }
+          const history = this.budgetHistory.get(operation) || [];
+          history.push(duration);
+          if (history.length > 100) history.shift();
+          this.budgetHistory.set(operation, history);
+          return withinBudget;
+        }
+        /**
+         * Time an operation and check against budget
+         */
+        timeOperation(operation, fn) {
+          const start = performance.now();
+          const result = fn();
+          const duration = performance.now() - start;
+          this.isWithinBudget(operation, duration);
+          return result;
+        }
+        /**
+         * Time an async operation and check against budget
+         */
+        async timeOperationAsync(operation, fn) {
+          const start = performance.now();
+          const result = await fn();
+          const duration = performance.now() - start;
+          this.isWithinBudget(operation, duration);
+          return result;
+        }
+        /**
+         * Get performance budget violations
+         */
+        getBudgetViolations() {
+          return new Map(this.budgetViolations);
+        }
+        /**
+         * Get performance budget statistics
+         */
+        getBudgetStats() {
+          const stats = {};
+          for (const [operation, budget] of Object.entries(this.performanceBudgets)) {
+            const violations = this.budgetViolations.get(operation) || 0;
+            const history = this.budgetHistory.get(operation) || [];
+            const averageTime = history.length > 0 ? history.reduce((a, b) => a + b, 0) / history.length : 0;
+            const maxTime = history.length > 0 ? Math.max(...history) : 0;
+            stats[operation] = {
+              budget,
+              violations,
+              averageTime,
+              maxTime
+            };
+          }
+          return stats;
+        }
+        /**
+         * Update performance budget for an operation
+         */
+        updateBudget(operation, budgetMs) {
+          this.performanceBudgets[operation] = budgetMs;
+          if (this.config.enableDebug) {
+            console.log(`\u{1F4CA} [PerformanceAnalyzer] Updated budget for ${operation}: ${budgetMs}ms`);
+          }
+        }
+        /**
+         * Clear budget violation history
+         */
+        clearBudgetHistory() {
+          this.budgetViolations.clear();
+          this.budgetHistory.clear();
         }
         // --- End of migrated methods ---
         destroy() {
@@ -8597,7 +9110,6 @@
             "sn-harmonic-intensity": "0.7",
             "sn-harmonic-evolution": "true",
             "sn-harmonic-manual-base-color": "",
-            "sn-enable-webgpu": "true",
             "sn-enable-aberration": "true",
             "sn-nebula-aberration-strength": "0.4",
             "sn-echo-intensity": "2",
@@ -8686,10 +9198,6 @@
               allowedValues: ["true", "false"]
             },
             "sn-harmonic-manual-base-color": { default: "" },
-            "sn-enable-webgpu": {
-              default: "true",
-              allowedValues: ["true", "false"]
-            },
             "sn-enable-aberration": {
               default: "true",
               allowedValues: ["true", "false"]
@@ -10159,320 +10667,6 @@ void main() {
     }
   });
 
-  // src-js/utils/graphics/NoiseField.ts
-  function sample(u, v) {
-    const x = Math.max(0, Math.min(0.9999, u)) * (GRID_SIZE - 1);
-    const y = Math.max(0, Math.min(0.9999, v)) * (GRID_SIZE - 1);
-    const x0 = Math.floor(x);
-    const y0 = Math.floor(y);
-    const x1 = x0 + 1;
-    const y1 = y0 + 1;
-    const sx = x - x0;
-    const sy = y - y0;
-    const v00 = vectors[y0 * GRID_SIZE + x0];
-    const v10 = vectors[y0 * GRID_SIZE + x1 % GRID_SIZE];
-    const v01 = vectors[y1 % GRID_SIZE * GRID_SIZE + x0];
-    const v11 = vectors[y1 % GRID_SIZE * GRID_SIZE + x1 % GRID_SIZE];
-    const lerp2 = (a, b, t) => a + (b - a) * t;
-    const ix0x = lerp2(v00.x, v10.x, sx);
-    const ix0y = lerp2(v00.y, v10.y, sx);
-    const ix1x = lerp2(v01.x, v11.x, sx);
-    const ix1y = lerp2(v01.y, v11.y, sx);
-    return {
-      x: lerp2(ix0x, ix1x, sy),
-      y: lerp2(ix0y, ix1y, sy)
-    };
-  }
-  var GRID_SIZE, vectors;
-  var init_NoiseField = __esm({
-    "src-js/utils/graphics/NoiseField.ts"() {
-      "use strict";
-      GRID_SIZE = 64;
-      vectors = new Array(GRID_SIZE * GRID_SIZE);
-      (function init() {
-        for (let i = 0; i < vectors.length; i++) {
-          const angle = Math.random() * Math.PI * 2;
-          vectors[i] = {
-            x: Math.cos(angle),
-            y: Math.sin(angle)
-          };
-        }
-      })();
-    }
-  });
-
-  // src-js/visual/backgrounds/WebGPUBackgroundSystem.ts
-  var WebGPUBackgroundSystem;
-  var init_WebGPUBackgroundSystem = __esm({
-    "src-js/visual/backgrounds/WebGPUBackgroundSystem.ts"() {
-      "use strict";
-      init_NoiseField();
-      WebGPUBackgroundSystem = class {
-        constructor(config, utils, performanceAnalyzer, musicSyncService, settingsManager, rootSystem) {
-          this.config = config;
-          this.utils = utils;
-          this.performanceAnalyzer = performanceAnalyzer;
-          this.musicSyncService = musicSyncService;
-          this.settingsManager = settingsManager;
-          this.rootSystem = rootSystem;
-          this.initialized = false;
-          this._canvas = null;
-          this._device = null;
-          this._ctx = null;
-          this._animationFrame = null;
-          this._uniformBuffer = null;
-          this._bindGroup = null;
-          this._frame = 0;
-          this._pipeline = null;
-          this.systemName = "WebGPUBackgroundSystem";
-          // Helper caches
-          this._primary = [0.5, 0.4, 0.9];
-          this._secondary = [0.35, 0.35, 0.75];
-          this._accent = [0.3, 0.55, 0.9];
-          this._energy = 0.5;
-          this._valence = 0.5;
-          // Phase 4 – nebula drift direction
-          this._driftVec = [0, 0];
-          this._lastDriftUpdate = 0;
-        }
-        forceRepaint(reason) {
-          throw new Error("Method not implemented.");
-        }
-        // ---------------------------------------------------------------------------
-        // IManagedSystem lifecycle
-        // ---------------------------------------------------------------------------
-        async initialize() {
-          if (!this._shouldActivate()) {
-            return;
-          }
-          try {
-            await this._initWebGPU();
-            this._startRenderLoop();
-            this.initialized = true;
-            if (this.rootSystem?.registerVisualSystem) {
-              this.rootSystem.registerVisualSystem(this, "background");
-            }
-          } catch (err) {
-            console.warn("[WebGPUBackgroundSystem] Initialization failed", err);
-            this.initialized = false;
-            this.destroy();
-          }
-        }
-        updateAnimation(_deltaMs) {
-        }
-        async healthCheck() {
-          return {
-            ok: this.initialized,
-            details: this.initialized ? "WebGPU canvas active" : "WebGPU background inactive or failed to initialise"
-          };
-        }
-        destroy() {
-          if (this._animationFrame !== null) {
-            cancelAnimationFrame(this._animationFrame);
-            this._animationFrame = null;
-          }
-          if (this._canvas && this._canvas.parentElement) {
-            this._canvas.parentElement.removeChild(this._canvas);
-          }
-          this._device = null;
-          this._ctx = null;
-          this._canvas = null;
-          this.initialized = false;
-          if (this.config.enableDebug) {
-            console.log("[WebGPUBackgroundSystem] Destroyed");
-          }
-        }
-        // ---------------------------------------------------------------------------
-        // Private helpers
-        // ---------------------------------------------------------------------------
-        _shouldActivate() {
-          const webgpuSetting = this.settingsManager.get("sn-enable-webgpu");
-          return webgpuSetting === "true" && typeof navigator !== "undefined" && navigator.gpu;
-        }
-        async _initWebGPU() {
-          const adapter = await navigator.gpu.requestAdapter();
-          if (!adapter) throw new Error("GPU adapter unavailable");
-          const device = await adapter.requestDevice();
-          this._device = device;
-          const canvas = document.createElement("canvas");
-          canvas.style.position = "fixed";
-          canvas.style.top = "0";
-          canvas.style.left = "0";
-          canvas.style.width = "100%";
-          canvas.style.height = "100%";
-          canvas.style.pointerEvents = "none";
-          canvas.style.zIndex = "-1";
-          canvas.id = "sn-webgpu-nebula";
-          document.body.appendChild(canvas);
-          this._canvas = canvas;
-          const ctx = canvas.getContext("webgpu");
-          if (!ctx) throw new Error("Failed to get WebGPU context");
-          this._ctx = ctx;
-          const format = navigator.gpu.getPreferredCanvasFormat();
-          ctx.configure({
-            device,
-            format,
-            alphaMode: "premultiplied"
-          });
-          const shaderModule = device.createShaderModule({
-            code: `@fragment fn fs_main(@builtin(position) pos: vec4<f32>) -> @location(0) vec4<f32> {
-        // Simple time-based RGB noise placeholder
-        let r = fract(sin(dot(pos.xy, vec2<f32>(12.9898,78.233))) * 43758.5453);
-        let g = fract(sin(dot(pos.xy, vec2<f32>(93.9898,67.345))) * 24634.6345);
-        let b = fract(sin(dot(pos.xy, vec2<f32>(45.1131,98.245))) * 31415.9265);
-        return vec4<f32>(r, g, b, 0.14);
-      }
-      @vertex fn vs_main(@builtin(vertex_index) idx : u32) -> @builtin(position) vec4<f32> {
-        var pos = array<vec2<f32>, 3>(vec2<f32>(-1.0, -1.0), vec2<f32>(3.0, -1.0), vec2<f32>(-1.0, 3.0));
-        return vec4<f32>(pos[idx], 0.0, 1.0);
-      }`
-          });
-          const pipeline = device.createRenderPipeline({
-            layout: "auto",
-            vertex: { module: shaderModule, entryPoint: "vs_main" },
-            fragment: {
-              module: shaderModule,
-              entryPoint: "fs_main",
-              targets: [{ format }]
-            },
-            primitive: { topology: "triangle-list" }
-          });
-          const uniformBuffer = device.createBuffer({
-            size: 64,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-          });
-          const bindGroupLayout = pipeline.getBindGroupLayout(0);
-          const bindGroup = device.createBindGroup({
-            layout: bindGroupLayout,
-            entries: [{ binding: 0, resource: { buffer: uniformBuffer } }]
-          });
-          this._pipeline = pipeline;
-          this._uniformBuffer = uniformBuffer;
-          this._bindGroup = bindGroup;
-        }
-        _startRenderLoop() {
-          const render = (time) => {
-            if (!this._device || !this._ctx || !this._pipeline) return;
-            if (this._frame % 30 === 0) {
-              this._refreshThemeColors();
-            }
-            if (time - this._lastDriftUpdate > 2e3) {
-              this._lastDriftUpdate = time;
-              this._updateDriftVector();
-            }
-            this._frame++;
-            const uni = new Float32Array(16);
-            uni.set([this._primary[0], this._primary[1], this._primary[2], 1]);
-            uni.set(
-              [this._secondary[0], this._secondary[1], this._secondary[2], 1],
-              4
-            );
-            uni.set([this._accent[0], this._accent[1], this._accent[2], 1], 8);
-            uni.set(
-              [
-                time * 1e-3,
-                this._energy,
-                this._valence,
-                Math.atan2(this._driftVec[1], this._driftVec[0])
-              ],
-              12
-            );
-            this._device.queue.writeBuffer(
-              this._uniformBuffer,
-              0,
-              uni.buffer
-            );
-            const encoder = this._device.createCommandEncoder();
-            const textureView = this._ctx.getCurrentTexture().createView();
-            const pass = encoder.beginRenderPass({
-              colorAttachments: [
-                {
-                  view: textureView,
-                  clearValue: { r: 0, g: 0, b: 0, a: 0 },
-                  loadOp: "clear",
-                  storeOp: "store"
-                }
-              ]
-            });
-            pass.setPipeline(this._pipeline);
-            pass.setBindGroup(0, this._bindGroup);
-            pass.draw(3);
-            pass.end();
-            this._device.queue.submit([encoder.finish()]);
-            this._animationFrame = requestAnimationFrame(render);
-          };
-          this._animationFrame = requestAnimationFrame(render);
-        }
-        _refreshThemeColors() {
-          const root = document.documentElement;
-          const styles = getComputedStyle(root);
-          const parseRgb = (v) => {
-            const parts = v.trim().split(/\s*,\s*/).map(Number);
-            if (parts.length === 3 && parts.every((n) => !isNaN(n))) {
-              return [parts[0] / 255, parts[1] / 255, parts[2] / 255];
-            }
-            return null;
-          };
-          const p = parseRgb(styles.getPropertyValue("--sn-gradient-primary-rgb"));
-          const s = parseRgb(styles.getPropertyValue("--sn-gradient-secondary-rgb"));
-          const a = parseRgb(styles.getPropertyValue("--sn-gradient-accent-rgb"));
-          if (p) this._primary = p;
-          if (s) this._secondary = s;
-          if (a) this._accent = a;
-          const energyVar = parseFloat(
-            styles.getPropertyValue("--sn-harmony-energy") || "0.5"
-          );
-          const valenceVar = parseFloat(
-            styles.getPropertyValue("--sn-harmony-valence") || "0.5"
-          );
-          if (!isNaN(energyVar)) this._energy = energyVar;
-          if (!isNaN(valenceVar)) this._valence = valenceVar;
-        }
-        /**
-         * Phase 4 – Derive a new nebula drift vector every ~2 seconds.
-         * Combines pseudo-random noise sampling with the current beat vector so that
-         * background motion loosely follows the music's momentum.
-         */
-        _updateDriftVector() {
-          try {
-            const noiseVec = sample(Math.random(), performance.now() * 1e-4);
-            const noiseVec2 = sample(performance.now() * 1e-4, Math.random());
-            const noiseX = (noiseVec.x + noiseVec2.x) * 0.5;
-            const noiseY = (noiseVec.y + noiseVec2.y) * 0.5;
-            const beat = this.musicSyncService?.getCurrentBeatVector?.() || {
-              x: 0,
-              y: 0
-            };
-            const vx = noiseX * 0.6 + beat.x * 0.4;
-            const vy = noiseY * 0.6 + beat.y * 0.4;
-            const len = Math.hypot(vx, vy) || 1;
-            this._driftVec = [vx / len, vy / len];
-            const root = document.documentElement;
-            root.style.setProperty(
-              "--sn-nebula-drift-x",
-              this._driftVec[0].toFixed(3)
-            );
-            root.style.setProperty(
-              "--sn-nebula-drift-y",
-              this._driftVec[1].toFixed(3)
-            );
-          } catch (err) {
-            if (this.config?.enableDebug) {
-              console.warn("[WebGPUBackgroundSystem] Drift update failed", err);
-            }
-          }
-        }
-        // -----------------------------------------------------------------------
-        // CDF VisualSystemRegistry hook – delegate to existing GPU render schedule
-        // -----------------------------------------------------------------------
-        onAnimate(_delta, _context) {
-        }
-        onPerformanceModeChange(mode) {
-        }
-      };
-    }
-  });
-
   // src-js/visual/base/starryNightEffects.ts
   function injectStarContainer() {
     const existingContainer = document.querySelector(
@@ -10533,6 +10727,48 @@ void main() {
       "use strict";
       init_SettingsManager();
       init_globalConfig();
+    }
+  });
+
+  // src-js/utils/graphics/NoiseField.ts
+  function sample(u, v) {
+    const x = Math.max(0, Math.min(0.9999, u)) * (GRID_SIZE - 1);
+    const y = Math.max(0, Math.min(0.9999, v)) * (GRID_SIZE - 1);
+    const x0 = Math.floor(x);
+    const y0 = Math.floor(y);
+    const x1 = x0 + 1;
+    const y1 = y0 + 1;
+    const sx = x - x0;
+    const sy = y - y0;
+    const v00 = vectors[y0 * GRID_SIZE + x0];
+    const v10 = vectors[y0 * GRID_SIZE + x1 % GRID_SIZE];
+    const v01 = vectors[y1 % GRID_SIZE * GRID_SIZE + x0];
+    const v11 = vectors[y1 % GRID_SIZE * GRID_SIZE + x1 % GRID_SIZE];
+    const lerp2 = (a, b, t) => a + (b - a) * t;
+    const ix0x = lerp2(v00.x, v10.x, sx);
+    const ix0y = lerp2(v00.y, v10.y, sx);
+    const ix1x = lerp2(v01.x, v11.x, sx);
+    const ix1y = lerp2(v01.y, v11.y, sx);
+    return {
+      x: lerp2(ix0x, ix1x, sy),
+      y: lerp2(ix0y, ix1y, sy)
+    };
+  }
+  var GRID_SIZE, vectors;
+  var init_NoiseField = __esm({
+    "src-js/utils/graphics/NoiseField.ts"() {
+      "use strict";
+      GRID_SIZE = 64;
+      vectors = new Array(GRID_SIZE * GRID_SIZE);
+      (function init() {
+        for (let i = 0; i < vectors.length; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          vectors[i] = {
+            x: Math.cos(angle),
+            y: Math.sin(angle)
+          };
+        }
+      })();
     }
   });
 
@@ -10699,6 +10935,7 @@ void main() {
             const currentTime = performance.now();
             const actualDeltaTime = currentTime - this.lastAnimationTime;
             this.lastAnimationTime = currentTime;
+            this.processAudioAnalysis();
             const latestMusicData = this.musicSyncService?.getLatestProcessedData();
             const processedEnergy = latestMusicData?.processedEnergy || 0.5;
             const animationSpeedFactor = latestMusicData?.animationSpeedFactor || 1;
@@ -10722,6 +10959,11 @@ void main() {
                 this._triggerBeat(now);
                 this._scheduleNextBeat();
               }
+            }
+            if (this.harmonicSyncInitialized) {
+              this.updateHarmonicFrequencies();
+              this.calculateHarmonicValues(timestamp);
+              this.dispatchHarmonicSync(timestamp);
             }
             if (this.beatIntensity > 0 && this.beatFlashElement) {
               this.beatIntensity -= 0.025;
@@ -10758,37 +11000,39 @@ void main() {
           }
         }
         _startFallbackAnimationLoop() {
-          const loop = () => {
-            this.updateAnimation(performance.now(), 16.67);
-            this.animationFrameId = requestAnimationFrame(loop);
-          };
-          this.animationFrameId = requestAnimationFrame(loop);
+          console.warn(`[${this.systemName}] Fallback animation loop requested but animation is handled by AnimationConductor`);
+        }
+        /**
+         * Process audio analysis for loudness smoothing (moved from update() method)
+         * This consolidates the audio analysis logic into the main animation loop
+         */
+        processAudioAnalysis() {
+          if (!this.analysis || !Spicetify.Player.isPlaying()) {
+            this.smoothedLoudness = 0;
+            document.documentElement.style.setProperty(
+              "--sn-feed-bloom-intensity",
+              "0"
+            );
+            return;
+          }
+          const progress = Spicetify.Player.getProgress() / 1e3;
+          const segment = this.analysis.segments.find(
+            (s) => progress >= s.start && progress < s.start + s.duration
+          );
+          let currentLoudness = 0;
+          if (segment) {
+            const normalizedLoudness = (segment.loudness_max + 60) / 60;
+            currentLoudness = Math.max(0, Math.min(1, normalizedLoudness));
+          }
+          this.smoothedLoudness = currentLoudness * this.SMOOTHING_FACTOR + this.smoothedLoudness * (1 - this.SMOOTHING_FACTOR);
+          const bloomIntensity = this.smoothedLoudness * 0.4;
+          document.documentElement.style.setProperty(
+            "--sn-feed-bloom-intensity",
+            bloomIntensity.toFixed(3)
+          );
         }
         _animationLoop() {
-          if (!this.isAnimating) return;
-          const timestamp = performance.now();
-          const deltaTime = timestamp - this.lastAnimationTime;
-          this.lastAnimationTime = timestamp;
-          const latestMusicData = this.musicSyncService?.getLatestProcessedData();
-          const processedEnergy = latestMusicData?.processedEnergy || 0.5;
-          const animationSpeedFactor = latestMusicData?.animationSpeedFactor || 1;
-          this.currentRhythmPhase = calculateRhythmPhase(
-            timestamp,
-            animationSpeedFactor
-          );
-          const breathingScale = calculateBreathingScale(
-            this.currentRhythmPhase,
-            processedEnergy
-          );
-          this._updateCSSVariables(
-            breathingScale,
-            this.currentRhythmPhase,
-            deltaTime,
-            processedEnergy
-          );
-          this.animationFrameId = requestAnimationFrame(
-            this._animationLoop.bind(this)
-          );
+          console.warn(`[${this.systemName}] _animationLoop called but animation is handled by AnimationConductor`);
         }
         _updateCSSVariables(breathingScale, rhythmPhase, deltaTime, processedEnergy) {
           if (deltaTime > 50) return;
@@ -10952,6 +11196,11 @@ void main() {
           this.disableHarmonicSync();
           this._stopBeatSync();
           this._stopAnimationLoop();
+          if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = 0;
+          }
+          this.stop();
           if (this.crystallineOverlayElement && this.crystallineOverlayElement.parentElement) {
             this.crystallineOverlayElement.parentElement.removeChild(
               this.crystallineOverlayElement
@@ -11092,15 +11341,9 @@ void main() {
           }
         }
         startHarmonicLoop() {
-          if (!this.harmonicSync) return;
-          const harmonicLoop = (timestamp) => {
-            if (!this.initialized || !this.harmonicSync || !this.modeConfig) return;
-            this.updateHarmonicFrequencies();
-            this.calculateHarmonicValues(timestamp);
-            this.dispatchHarmonicSync(timestamp);
-            this.harmonicLoopId = requestAnimationFrame(harmonicLoop);
-          };
-          this.harmonicLoopId = requestAnimationFrame(harmonicLoop);
+          if (this.config.enableDebug) {
+            console.log(`[${this.systemName}] Harmonic sync integrated into main animation loop`);
+          }
         }
         updateHarmonicFrequencies() {
           if (!this.initialized || !this.harmonicSync || !this.modeConfig) return;
@@ -11280,11 +11523,13 @@ void main() {
           Spicetify.Player.removeEventListener("songchange", this.onSongChange);
           if (this.rafId) {
             cancelAnimationFrame(this.rafId);
+            this.rafId = 0;
           }
         }
         async onSongChange() {
           if (this.rafId) {
             cancelAnimationFrame(this.rafId);
+            this.rafId = 0;
           }
           const currentTrack = Spicetify.Player.data?.item;
           if (!currentTrack || !currentTrack.uri) {
@@ -11292,40 +11537,13 @@ void main() {
           }
           try {
             this.analysis = await Spicetify.getAudioData(currentTrack.uri);
-            if (this.analysis && this.analysis.segments) {
-              this.update();
-            }
           } catch (error) {
             console.error("StarryNight: Failed to get audio data", error);
             this.analysis = null;
           }
         }
         update() {
-          if (!this.analysis || !Spicetify.Player.isPlaying()) {
-            this.smoothedLoudness = 0;
-            document.documentElement.style.setProperty(
-              "--sn-feed-bloom-intensity",
-              "0"
-            );
-            this.rafId = requestAnimationFrame(this.update);
-            return;
-          }
-          const progress = Spicetify.Player.getProgress() / 1e3;
-          const segment = this.analysis.segments.find(
-            (s) => progress >= s.start && progress < s.start + s.duration
-          );
-          let currentLoudness = 0;
-          if (segment) {
-            const normalizedLoudness = (segment.loudness_max + 60) / 60;
-            currentLoudness = Math.max(0, Math.min(1, normalizedLoudness));
-          }
-          this.smoothedLoudness = currentLoudness * this.SMOOTHING_FACTOR + this.smoothedLoudness * (1 - this.SMOOTHING_FACTOR);
-          const bloomIntensity = this.smoothedLoudness * 0.4;
-          document.documentElement.style.setProperty(
-            "--sn-feed-bloom-intensity",
-            bloomIntensity.toFixed(3)
-          );
-          this.rafId = requestAnimationFrame(this.update);
+          console.warn(`[${this.systemName}] update() called but audio analysis is handled in updateAnimation`);
         }
         // -------------------------------------------------------------------------
         // ⚡ TEMPORAL ECHO HELPERS
@@ -11566,11 +11784,27 @@ void main() {
           }
         }
         startOptimizedPredictiveHighlighting() {
-          if (this.predictionTimer) clearInterval(this.predictionTimer);
-          this.predictionTimer = setInterval(() => {
-            this.applySelectivePredictiveHighlighting();
-          }, this.quantumEmpathy.predictionUpdateMs);
-          this._activeTimers.push(this.predictionTimer);
+          if (this.predictionTimer) {
+            clearInterval(this.predictionTimer);
+            const index = this._activeTimers.indexOf(this.predictionTimer);
+            if (index > -1) {
+              this._activeTimers.splice(index, 1);
+            }
+          }
+          if (this.year3000System?.timerConsolidationSystem) {
+            this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
+              "BehavioralPredictionEngine-prediction",
+              () => this.applySelectivePredictiveHighlighting(),
+              this.quantumEmpathy.predictionUpdateMs,
+              "normal"
+            );
+            this.predictionTimer = null;
+          } else {
+            this.predictionTimer = setInterval(() => {
+              this.applySelectivePredictiveHighlighting();
+            }, this.quantumEmpathy.predictionUpdateMs);
+            this._activeTimers.push(this.predictionTimer);
+          }
         }
         calculateOptimizedPredictions() {
           const currentContext = this.getCurrentMusicContext();
@@ -11663,25 +11897,57 @@ void main() {
           return [];
         }
         setupSelectiveAnticipatoryAnimations() {
-          if (this.animationTimer) clearInterval(this.animationTimer);
-          this.animationTimer = setInterval(() => {
-            if (this.quantumEmpathy.currentActiveAnimations < this.quantumEmpathy.maxActiveAnimations) {
-              const predictions = this.calculateOptimizedPredictions();
-              const prediction = predictions[0];
-              if (prediction) {
-                const elements = this.findElementsBySignature(prediction.target);
-                const firstElement = elements[0];
-                if (firstElement && prediction.type) {
-                  this.triggerOptimizedAnticipatoryAnimation(
-                    firstElement,
-                    prediction.type,
-                    prediction.confidence
-                  );
+          if (this.animationTimer) {
+            clearInterval(this.animationTimer);
+            const index = this._activeTimers.indexOf(this.animationTimer);
+            if (index > -1) {
+              this._activeTimers.splice(index, 1);
+            }
+          }
+          if (this.year3000System?.timerConsolidationSystem) {
+            this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
+              "BehavioralPredictionEngine-animation",
+              () => {
+                if (this.quantumEmpathy.currentActiveAnimations < this.quantumEmpathy.maxActiveAnimations) {
+                  const predictions = this.calculateOptimizedPredictions();
+                  const prediction = predictions[0];
+                  if (prediction) {
+                    const elements = this.findElementsBySignature(prediction.target);
+                    const firstElement = elements[0];
+                    if (firstElement && prediction.type) {
+                      this.triggerOptimizedAnticipatoryAnimation(
+                        firstElement,
+                        prediction.type,
+                        prediction.confidence
+                      );
+                    }
+                  }
+                }
+              },
+              this.quantumEmpathy.predictionUpdateMs * 2,
+              "background"
+            );
+            this.animationTimer = null;
+          } else {
+            this.animationTimer = setInterval(() => {
+              if (this.quantumEmpathy.currentActiveAnimations < this.quantumEmpathy.maxActiveAnimations) {
+                const predictions = this.calculateOptimizedPredictions();
+                const prediction = predictions[0];
+                if (prediction) {
+                  const elements = this.findElementsBySignature(prediction.target);
+                  const firstElement = elements[0];
+                  if (firstElement && prediction.type) {
+                    this.triggerOptimizedAnticipatoryAnimation(
+                      firstElement,
+                      prediction.type,
+                      prediction.confidence
+                    );
+                  }
                 }
               }
-            }
-          }, this.quantumEmpathy.predictionUpdateMs * 2);
-          this._activeTimers.push(this.animationTimer);
+            }, this.quantumEmpathy.predictionUpdateMs * 2);
+            this._activeTimers.push(this.animationTimer);
+          }
         }
         triggerOptimizedAnticipatoryAnimation(element, actionType, confidence) {
           if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -11817,13 +12083,32 @@ void main() {
         }
         destroy() {
           super.destroy();
+          if (this.year3000System?.timerConsolidationSystem) {
+            this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("BehavioralPredictionEngine-prediction");
+            this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("BehavioralPredictionEngine-animation");
+          }
           this._activeTimers.forEach(clearInterval);
+          this._activeTimers = [];
+          if (this.predictionTimer) {
+            clearInterval(this.predictionTimer);
+            this.predictionTimer = null;
+          }
+          if (this.animationTimer) {
+            clearInterval(this.animationTimer);
+            this.animationTimer = null;
+          }
           this._eventListeners.forEach(({ element, event, handler }) => {
             element.removeEventListener(event, handler);
           });
-          this._activeTimers = [];
           this._eventListeners = [];
           this.quantumEmpathyInitialized = false;
+          this.quantumEmpathy.currentActiveAnimations = 0;
+          this.quantumEmpathy.patternDatabase.clear();
+          this.quantumEmpathy.actionProbabilities.clear();
+          this.quantumEmpathy.interactionHistory = [];
+          document.querySelectorAll(".sn-predictive-highlight, .sn-predictive-highlight-strong, .sn-anticipatory-warmth").forEach((el) => {
+            el.classList.remove("sn-predictive-highlight", "sn-predictive-highlight-strong", "sn-anticipatory-warmth");
+          });
           if (this.config?.enableDebug) {
             console.log(
               `[${this.systemName}] Destroyed. No longer predicting user behavior.`
@@ -11888,738 +12173,6 @@ void main() {
           }
         }
       };
-    }
-  });
-
-  // src-js/utils/animation/animationUtils.ts
-  function restartCssAnimation(el) {
-    try {
-      const anims = el.getAnimations?.();
-      if (anims && anims.length) {
-        anims.forEach((a) => {
-          try {
-            a.cancel();
-            a.play();
-          } catch {
-          }
-        });
-        return;
-      }
-    } catch {
-    }
-    const prev = el.style.animation;
-    el.style.animation = "none";
-    requestAnimationFrame(() => {
-      el.style.animation = prev;
-    });
-  }
-  var init_animationUtils = __esm({
-    "src-js/utils/animation/animationUtils.ts"() {
-      "use strict";
-    }
-  });
-
-  // src-js/visual/ui-effects/DataGlyphSystem.ts
-  var _DataGlyphSystem, DataGlyphSystem;
-  var init_DataGlyphSystem = __esm({
-    "src-js/visual/ui-effects/DataGlyphSystem.ts"() {
-      "use strict";
-      init_SpotifyDOMSelectors();
-      init_animationUtils();
-      init_NoiseField();
-      init_BaseVisualSystem();
-      _DataGlyphSystem = class _DataGlyphSystem extends BaseVisualSystem {
-        constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System2 = null) {
-          super(config, utils, performanceMonitor, musicSyncService, settingsManager);
-          this.masterAnimationRegistered = false;
-          this.animationFrameId = null;
-          this.isUsingMasterAnimation = false;
-          this.itemObserver = null;
-          this.hoverTimeouts = /* @__PURE__ */ new WeakMap();
-          // Active echo elements tracked for the low-cost lifecycle maintenance loop.
-          this.activeEchoElements = /* @__PURE__ */ new Set();
-          // Timestamp gate for throttling maintenance pass (ms since epoch) – avoids running heavy DOM ops every frame.
-          this._lastEchoMaintenance = 0;
-          this.currentEchoCount = 0;
-          // --- Phase4: recent echo timestamps per element for clustering -----------
-          this.recentEchoes = /* @__PURE__ */ new WeakMap();
-          // Tracks which elements currently host an active echo to avoid rapid re-spawning
-          this._elementsWithActiveEcho = /* @__PURE__ */ new WeakSet();
-          // Pool of detached .sn-temporal-echo elements reused to cut GC churn.
-          this.echoPool = [];
-          // --- Phase4 -------------------------------------------------------------
-          /** Flag toggled by MasterAnimationCoordinator – echo spawning is skipped
-           *  entirely while in performance mode to preserve frame budget. */
-          this._performanceMode = false;
-          // === Performance-Optimisation Additions (Phase Patch DG-P1) ===
-          /** Elements currently intersecting viewport (incl. small rootMargin buffer). */
-          this._visibleItems = /* @__PURE__ */ new Set();
-          /** IntersectionObserver instance used to maintain _visibleItems. */
-          this._intersectionObserver = null;
-          /** Style element used to batch per-glyph CSS variable updates. */
-          this._styleElement = null;
-          /** Cache of last emitted CSS for diff detection to avoid useless DOM writes. */
-          this._lastGlyphBatchCss = "";
-          /** Mapping of last intensity value per glyph to allow <0.01 early-out. */
-          this._lastIntensityMap = /* @__PURE__ */ new Map();
-          /** Throttle gate – last time (ms, performance.now) we executed a glyph batch. */
-          this._lastGlyphUpdate = 0;
-          /** Minimum interval between glyph batches (ms). 10 Hz ⇒ 100 ms. */
-          this._maxUpdateInterval = 100;
-          /** Running counter for data-sn-glyph-id generation (ensures uniqueness). */
-          this._glyphIdCounter = 0;
-          this.year3000System = year3000System2;
-          this.observedItems = /* @__PURE__ */ new Map();
-          this.glyphDataCache = /* @__PURE__ */ new WeakMap();
-          this.itemInteractionData = /* @__PURE__ */ new Map();
-          this.activeEchoTimers = /* @__PURE__ */ new WeakMap();
-          this.glyphElements = /* @__PURE__ */ new Map();
-          this.interactionHistory = [];
-          this.modeIntensity = 0.5;
-          this.lastHeavyUpdateTime = 0;
-          this.heavyUpdateInterval = 1e3;
-          this._eventListeners = [];
-          this._domEventListeners = [];
-          this.memoryOptimization = {
-            maxCacheSize: 100,
-            cleanupInterval: 3e4,
-            lastCleanup: Date.now(),
-            maxEchoTimers: 50,
-            maxObservedItems: 200,
-            staleItemThreshold: 3e5
-          };
-          this.performanceMetrics = {
-            glyphUpdates: 0,
-            echoEffects: 0,
-            memoryCleanups: 0,
-            cacheHits: 0,
-            cacheMisses: 0,
-            animationFrames: 0,
-            maxFrameTime: 0,
-            averageFrameTime: 0,
-            frameTimeHistory: [],
-            observedItemsCleanups: 0
-          };
-          this.deviceCapabilities = {
-            maxParticles: this._detectMaxParticles(),
-            supportsCSSFilter: this._detectCSSFilterSupport(),
-            supportsWebGL: this._detectWebGLSupport(),
-            performanceLevel: this._detectPerformanceLevel(),
-            reducedMotion: this._detectReducedMotion()
-          };
-          const healthMonitor = this.utils.getHealthMonitor?.();
-          if (healthMonitor) {
-            healthMonitor.registerSystem("DataGlyphSystem", this, {
-              criticalLevel: "MEDIUM",
-              requiredSelectors: ["[data-sn-glyph]"]
-            });
-          }
-        }
-        _detectMaxParticles() {
-          const memory = navigator.deviceMemory || 4;
-          const baseParticles = 50;
-          return Math.min(200, Math.max(20, baseParticles * (memory / 4)));
-        }
-        _detectCSSFilterSupport() {
-          const testElement = document.createElement("div");
-          testElement.style.filter = "blur(1px)";
-          return testElement.style.filter === "blur(1px)";
-        }
-        _detectWebGLSupport() {
-          try {
-            const canvas = document.createElement("canvas");
-            return !!(canvas.getContext("webgl") || canvas.getContext("experimental-webgl"));
-          } catch (e) {
-            return false;
-          }
-        }
-        _detectPerformanceLevel() {
-          const memory = navigator.deviceMemory || 4;
-          const cores = navigator.hardwareConcurrency || 2;
-          if (memory >= 8 && cores >= 8) return "high";
-          if (memory >= 4 && cores >= 4) return "medium";
-          return "low";
-        }
-        _detectReducedMotion() {
-          return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        }
-        // === Helper: ensure <style id="sn-glyph-style"> element exists ===
-        _ensureStyleElement() {
-          if (this._styleElement && document.contains(this._styleElement)) return;
-          const existing = document.getElementById(
-            "sn-glyph-style"
-          );
-          if (existing) {
-            this._styleElement = existing;
-            return;
-          }
-          const style = document.createElement("style");
-          style.id = "sn-glyph-style";
-          document.head.appendChild(style);
-          this._styleElement = style;
-        }
-        // === Helper: set up IntersectionObserver to cap glyph work to viewport ===
-        _setupIntersectionObserver() {
-          if (this._intersectionObserver) return;
-          this._intersectionObserver = new IntersectionObserver(
-            (entries) => {
-              entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                  this._visibleItems.add(entry.target);
-                } else {
-                  this._visibleItems.delete(entry.target);
-                }
-              });
-            },
-            {
-              root: null,
-              rootMargin: "200px"
-              // small look-ahead buffer for smoothness
-            }
-          );
-        }
-        async initialize() {
-          await super.initialize();
-          this._tryRegisterWithMasterAnimation();
-          this.setupItemObserver();
-          this._ensureStyleElement();
-          this._setupIntersectionObserver();
-        }
-        _tryRegisterWithMasterAnimation() {
-          if (this.year3000System && this.year3000System.registerAnimationSystem) {
-            try {
-              this.year3000System.registerAnimationSystem(
-                "DataGlyphSystem",
-                this,
-                "background",
-                30
-              );
-              this.masterAnimationRegistered = true;
-              this.isUsingMasterAnimation = true;
-            } catch (error) {
-            }
-          }
-        }
-        // Conforms to MasterAnimationCoordinator – delegates to updateAnimation
-        onAnimate(deltaMs) {
-          if (!this.performanceMonitor || this.performanceMonitor.shouldUpdate("glyph-maint", 100)) {
-            this.updateAnimation(performance.now(), deltaMs);
-          }
-        }
-        updateAnimation(timestamp, deltaTime) {
-          const frameStartTime = performance.now();
-          try {
-            const maxFrameTime = this.deviceCapabilities.performanceLevel === "high" ? 8 : this.deviceCapabilities.performanceLevel === "medium" ? 12 : 16;
-            if (deltaTime > maxFrameTime * 2) {
-              this.performanceMetrics.animationFrames++;
-              return;
-            }
-            if (timestamp - this.lastHeavyUpdateTime > this.heavyUpdateInterval) {
-              this.lastHeavyUpdateTime = timestamp;
-              this._updateGlyphTargetsOptimized();
-            }
-            this.animateAllGlyphs();
-            this.updateActiveEchoesAndResonance();
-            if (timestamp - this.memoryOptimization.lastCleanup > this.memoryOptimization.cleanupInterval) {
-              this.performOptimizedCleanup();
-            }
-            const frameTime = performance.now() - frameStartTime;
-            this.updatePerformanceMetrics(frameTime);
-          } catch (error) {
-            console.error(`[${this.systemName}] Animation update error:`, error);
-          }
-        }
-        onPerformanceModeChange(mode) {
-          if (mode === "performance") {
-            this.heavyUpdateInterval = 1500;
-            this.memoryOptimization.maxObservedItems = 100;
-            this._performanceMode = true;
-          } else {
-            this.heavyUpdateInterval = 1e3;
-            this.memoryOptimization.maxObservedItems = 200;
-            this._performanceMode = false;
-          }
-        }
-        /**
-         * Optimized maintenance pass executed at a relatively low frequency (default 1 s).
-         * Responsibilities:
-         *   1. Detach glyphs whose host elements have been removed from the DOM.
-         *   2. Ensure we respect the `maxObservedItems` cap.
-         *   3. NO full-document `querySelectorAll` – MutationObserver already attaches new glyphs.
-         *
-         *  This change aligns with the Year 3000 "Kinetic Verbs" ethos—moving lightly through the
-         *  DOM constellation instead of flooding it with scans every 50 ms.
-         */
-        _updateGlyphTargetsOptimized() {
-          this.observedItems.forEach((_, itemElement) => {
-            if (!document.contains(itemElement)) {
-              const glyph = this.glyphElements.get(itemElement);
-              if (glyph) {
-                this.detachGlyph(itemElement, glyph);
-              }
-            }
-          });
-          if (this.observedItems.size > this.memoryOptimization.maxObservedItems) {
-            const overflow = this.observedItems.size - this.memoryOptimization.maxObservedItems;
-            const iterator = this.observedItems.keys();
-            let pruned = 0;
-            while (pruned < overflow) {
-              const elem = iterator.next().value;
-              if (!elem) break;
-              if (this._isElementInViewport(elem)) continue;
-              const glyph = this.glyphElements.get(elem);
-              if (glyph) {
-                this.detachGlyph(elem, glyph);
-                pruned++;
-              }
-            }
-          }
-        }
-        _isElementInViewport(element) {
-          const rect = element.getBoundingClientRect();
-          return rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
-        }
-        setupItemObserver() {
-          const observerCallback = (mutationsList, observer) => {
-            for (const mutation of mutationsList) {
-              if (mutation.type === "childList") {
-                mutation.addedNodes.forEach((node) => {
-                  if (node.nodeType === 1) {
-                    this._scanAndAttachGlyphs(node);
-                  }
-                });
-                mutation.removedNodes.forEach((node) => {
-                  if (node.nodeType === 1) {
-                    this._scanAndDetachGlyphs(node);
-                  }
-                });
-              }
-            }
-          };
-          this.itemObserver = new MutationObserver(observerCallback);
-          this.itemObserver.observe(document.body, {
-            childList: true,
-            subtree: true
-          });
-        }
-        _scanAndAttachGlyphs(rootElement) {
-          const selector = Object.values(MODERN_SELECTORS).join(", ");
-          if (!selector) return;
-          const items = rootElement.matches(selector) ? [rootElement] : Array.from(rootElement.querySelectorAll(selector));
-          items.forEach((item) => this.attachGlyph(item));
-        }
-        _scanAndDetachGlyphs(rootElement) {
-          const selector = Object.values(MODERN_SELECTORS).join(", ");
-          if (!selector) return;
-          const items = rootElement.matches(selector) ? [rootElement] : Array.from(rootElement.querySelectorAll(selector));
-          items.forEach((item) => {
-            const glyph = this.glyphElements.get(item);
-            if (glyph) this.detachGlyph(item, glyph);
-          });
-        }
-        attachGlyph(itemElement) {
-          if (this.glyphElements.has(itemElement) || this.observedItems.size >= this.memoryOptimization.maxObservedItems)
-            return;
-          itemElement.setAttribute("data-sn-glyph", "");
-          if (!itemElement.hasAttribute("data-sn-glyph-id")) {
-            this._glyphIdCounter += 1;
-            itemElement.setAttribute("data-sn-glyph-id", `g${this._glyphIdCounter}`);
-          }
-          if (this._intersectionObserver) {
-            this._intersectionObserver.observe(itemElement);
-          }
-          this.glyphElements.set(itemElement, null);
-          const data = this.updateGlyphData(itemElement, {});
-          this.glyphDataCache.set(itemElement, data);
-          const boundHandleInteraction = (event) => this.handleItemInteraction(itemElement, event);
-          itemElement.addEventListener("mouseenter", boundHandleInteraction);
-          itemElement.addEventListener("mouseleave", boundHandleInteraction);
-          const removeListeners = () => {
-            itemElement.removeEventListener("mouseenter", boundHandleInteraction);
-            itemElement.removeEventListener("mouseleave", boundHandleInteraction);
-          };
-          this.observedItems.set(itemElement, { removeListeners });
-        }
-        detachGlyph(itemElement, _glyphElement) {
-          if (itemElement instanceof HTMLElement) {
-            itemElement.removeAttribute("data-sn-glyph");
-          }
-          if (this._intersectionObserver) {
-            this._intersectionObserver.unobserve(itemElement);
-          }
-          this._visibleItems.delete(itemElement);
-          this._lastIntensityMap.delete(itemElement);
-          const observation = this.observedItems.get(itemElement);
-          if (observation) {
-            observation.removeListeners();
-            this.observedItems.delete(itemElement);
-          }
-          this.glyphDataCache.delete(itemElement);
-          this.itemInteractionData.delete(itemElement);
-        }
-        /**
-         * Batched glyph animation pass (≤ 10 Hz).
-         * – Updates only items currently intersecting the viewport (+200 px buffer).
-         * – Builds a single <style> rule string to avoid per-element style mutation.
-         * – Skips emission when Δ intensity < 0.01 to minimise layout thrash.
-         */
-        animateAllGlyphs() {
-          const now = performance.now();
-          if (now - this._lastGlyphUpdate < this._maxUpdateInterval) return;
-          this._lastGlyphUpdate = now;
-          this._ensureStyleElement();
-          if (!this._styleElement) return;
-          const rules = [];
-          this._visibleItems.forEach((item) => {
-            const itemData = this.glyphDataCache.get(item);
-            if (!itemData) return;
-            const musicData = this.musicSyncService?.getLatestProcessedData();
-            let intensity = 0;
-            if (musicData) {
-              intensity = musicData.energy * 0.5 + musicData.valence * 0.5;
-            }
-            intensity = (intensity + itemData.attentionScore) / 2;
-            const prev = this._lastIntensityMap.get(item);
-            if (prev !== void 0 && Math.abs(prev - intensity) < 0.01) return;
-            this._lastIntensityMap.set(item, intensity);
-            const glow = intensity * 0.8;
-            const id = item.getAttribute("data-sn-glyph-id");
-            if (!id) return;
-            rules.push(
-              `[data-sn-glyph-id="${id}"]{--sn-glyph-intensity:${intensity.toFixed(
-                3
-              )};--sn-glyph-glow:${glow.toFixed(3)};}`
-            );
-          });
-          const cssText = rules.join("");
-          if (cssText && cssText !== this._lastGlyphBatchCss) {
-            this._styleElement.textContent = cssText;
-            this._lastGlyphBatchCss = cssText;
-          }
-        }
-        updateGlyphVisuals(itemElement, itemData) {
-          const targetEl = this.glyphElements.get(itemElement) ?? null ? this.glyphElements.get(itemElement) : itemElement;
-          const musicData = this.musicSyncService?.getLatestProcessedData();
-          let intensity = 0;
-          if (musicData) {
-            intensity = musicData.energy * 0.5 + musicData.valence * 0.5;
-          }
-          intensity = (intensity + itemData.attentionScore) / 2;
-        }
-        updateGlyphData(itemElement, data) {
-          let glyphData = this.glyphDataCache.get(itemElement);
-          if (!glyphData) {
-            glyphData = {
-              id: itemElement.getAttribute("data-uri") || `glyph-${Date.now()}`,
-              type: "track",
-              lastInteracted: 0,
-              intensity: 0,
-              kineticState: { velocity: { x: 0, y: 0 }, rotation: 0, scale: 1 },
-              musicContext: {},
-              attentionScore: 0
-            };
-          }
-          const updatedData = { ...glyphData, ...data };
-          this.glyphDataCache.set(itemElement, updatedData);
-          return updatedData;
-        }
-        handleItemInteraction(itemElement, event) {
-          const glyphData = this.updateGlyphData(itemElement, {
-            lastInteracted: Date.now(),
-            attentionScore: event.type === "mouseenter" ? 1 : 0
-          });
-          if (event.type === "mouseenter") {
-            const timerSystem = this.year3000System?.timerConsolidationSystem;
-            if (timerSystem && timerSystem.registerConsolidatedTimer) {
-              const dwellId = `dgs-dwell-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-              timerSystem.registerConsolidatedTimer(
-                dwellId,
-                () => {
-                  this.addTemporalEcho(itemElement);
-                  timerSystem.unregisterConsolidatedTimer(dwellId);
-                },
-                120,
-                "background"
-              );
-              this.hoverTimeouts.set(itemElement, dwellId);
-            } else {
-              const dwell = setTimeout(() => {
-                this.addTemporalEcho(itemElement);
-              }, 120);
-              this.hoverTimeouts.set(itemElement, dwell);
-            }
-          } else if (event.type === "mouseleave") {
-            const h = this.hoverTimeouts.get(itemElement);
-            if (h) {
-              const timerSystem = this.year3000System?.timerConsolidationSystem;
-              if (typeof h === "string" && timerSystem) {
-                timerSystem.unregisterConsolidatedTimer(h);
-              } else if (typeof h !== "string") {
-                clearTimeout(h);
-              }
-            }
-            this.hoverTimeouts.delete(itemElement);
-          }
-        }
-        updateActiveEchoesAndResonance() {
-          if (this.currentEchoCount === 0 || this.echoIntensitySetting === 0) return;
-          if (this.deviceCapabilities.reducedMotion) return;
-          const now = Date.now();
-          if (now - this._lastEchoMaintenance < 400) return;
-          this._lastEchoMaintenance = now;
-          this.activeEchoElements.forEach((echo) => {
-            const created = parseInt(echo.dataset.created ?? "0", 10);
-            const stale = now - created > 1600;
-            const disconnected = !document.contains(echo);
-            if (stale || disconnected) {
-              try {
-                if (echo.parentElement) echo.parentElement.removeChild(echo);
-              } catch (_) {
-              }
-              this.releaseEchoElement(echo);
-              this.activeEchoElements.delete(echo);
-              this.currentEchoCount = Math.max(0, this.currentEchoCount - 1);
-            }
-          });
-        }
-        destroy() {
-          super.destroy();
-          if (this.itemObserver) this.itemObserver.disconnect();
-          this.observedItems.forEach(
-            (val, key) => this.detachGlyph(key, this.glyphElements.get(key))
-          );
-          if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
-        }
-        performOptimizedCleanup() {
-          const now = Date.now();
-          for (const [element, data] of this.itemInteractionData.entries()) {
-            if (now - data.lastInteraction > this.memoryOptimization.staleItemThreshold) {
-              this.itemInteractionData.delete(element);
-            }
-          }
-          if (this.observedItems.size > this.memoryOptimization.maxObservedItems) {
-            for (const [element, data] of this.observedItems.entries()) {
-              const glyphData = this.glyphDataCache.get(element);
-              if (!glyphData || now - glyphData.lastInteracted > this.memoryOptimization.staleItemThreshold) {
-                this.detachGlyph(element, this.glyphElements.get(element));
-              }
-              if (this.observedItems.size <= this.memoryOptimization.maxObservedItems)
-                break;
-            }
-          }
-          this.memoryOptimization.lastCleanup = now;
-        }
-        updatePerformanceMetrics(frameTime) {
-          this.performanceMetrics.animationFrames++;
-          this.performanceMetrics.frameTimeHistory.push(frameTime);
-          if (this.performanceMetrics.frameTimeHistory.length > 100) {
-            this.performanceMetrics.frameTimeHistory.shift();
-          }
-          this.performanceMetrics.maxFrameTime = Math.max(
-            this.performanceMetrics.maxFrameTime,
-            frameTime
-          );
-          this.performanceMetrics.averageFrameTime = this.performanceMetrics.frameTimeHistory.reduce((a, b) => a + b, 0) / this.performanceMetrics.frameTimeHistory.length;
-        }
-        calculateGlyphComplexity() {
-          return this.observedItems.size;
-        }
-        estimateMemoryUsage() {
-          return this.observedItems.size * 5 + this.itemInteractionData.size * 2;
-        }
-        updateModeConfiguration(modeConfig) {
-          super.updateModeConfiguration(modeConfig);
-          if (modeConfig.glyphIntensity) {
-            this.modeIntensity = modeConfig.glyphIntensity;
-          }
-          this.applyModeToExistingGlyphs();
-        }
-        applyModeToExistingGlyphs() {
-          this.observedItems.forEach((_, item) => {
-            const glyph = this.glyphElements.get(item);
-            if (glyph) {
-              glyph.setAttribute(
-                "data-glyph-mode",
-                this.modeConfig.activeMode || "default"
-              );
-            }
-          });
-        }
-        addTemporalEcho(element) {
-          if (this.deviceCapabilities.reducedMotion) return;
-          if (this._performanceMode) return;
-          if (this._elementsWithActiveEcho.has(element)) return;
-          const now = Date.now();
-          const bucket = this.recentEchoes.get(element) ?? [];
-          const filtered = bucket.filter((t) => now - t < 300);
-          filtered.push(now);
-          this.recentEchoes.set(element, filtered);
-          const spawnMega = filtered.length >= 3;
-          if (spawnMega) {
-            this.recentEchoes.set(element, []);
-          }
-          if (this.currentEchoCount >= this.dynamicMaxEchoes) return;
-          if (this.performanceMonitor?.shouldReduceQuality?.()) return;
-          if (this.echoIntensitySetting === 0) return;
-          const echo = this.acquireEchoElement();
-          echo.setAttribute("data-sn-echo", "1");
-          const musicData = this.musicSyncService?.getLatestProcessedData();
-          const energy = musicData?.energy ?? 0;
-          const valence = musicData?.valence ?? 0.5;
-          const intensityFactor = 0.2 * this.echoIntensitySetting;
-          let radius = Math.min(1.6, 1 + energy * 0.4 + intensityFactor);
-          const hueShift = ((valence - 0.5) * 40).toFixed(1);
-          const beatVec = this.musicSyncService?.getCurrentBeatVector?.();
-          let offsetX = 0, offsetY = 0, skewDeg = 0;
-          try {
-            const rect = element.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            const normX = Math.min(Math.max(centerX / window.innerWidth, 0), 1);
-            const normY = Math.min(Math.max(centerY / window.innerHeight, 0), 1);
-            const vec = sample(normX, normY);
-            const intensityMult = this.echoIntensitySetting;
-            const offsetMagnitude = 6 + energy * 6 + intensityMult * 2;
-            offsetX = vec.x * offsetMagnitude;
-            offsetY = vec.y * offsetMagnitude;
-            if (beatVec) {
-              offsetX += beatVec.x * 10;
-              offsetY += beatVec.y * 10;
-            }
-            skewDeg = vec.x * 6;
-          } catch (e) {
-          }
-          if (spawnMega) {
-            radius = Math.min(radius * 1.6, 2.4);
-            echo.style.setProperty("--sn-kinetic-intensity", "0.4");
-            try {
-              const pmSystem = this.year3000System?.predictiveMaterializationSystem;
-              if (pmSystem && typeof pmSystem.triggerAnticipatoryWarmth === "function") {
-                pmSystem.triggerAnticipatoryWarmth(element, {
-                  hue: parseFloat(hueShift),
-                  intensity: 0.18,
-                  durationMs: 1200
-                });
-              }
-            } catch (err) {
-              if (this.config?.enableDebug) {
-                console.warn(
-                  `[${this.systemName}] Failed to trigger resonance:`,
-                  err
-                );
-              }
-            }
-          }
-          const baseAngle = (Math.random() * 360).toFixed(1);
-          echo.style.setProperty("--sn-echo-radius-multiplier", radius.toFixed(2));
-          echo.style.setProperty("--sn-echo-hue-shift", `${hueShift}deg`);
-          echo.style.setProperty("--sn-echo-offset-x", `${offsetX.toFixed(1)}px`);
-          echo.style.setProperty("--sn-echo-offset-y", `${offsetY.toFixed(1)}px`);
-          echo.style.setProperty("--sn-echo-skew", `${skewDeg.toFixed(2)}deg`);
-          echo.style.setProperty("--sn-echo-rotate", `${baseAngle}deg`);
-          this.activeEchoElements.add(echo);
-          echo.dataset.created = `${Date.now()}`;
-          element.appendChild(echo);
-          this.currentEchoCount++;
-          this._elementsWithActiveEcho.add(element);
-          const timerSystem = this.year3000System?.timerConsolidationSystem;
-          if (timerSystem && typeof timerSystem.registerConsolidatedTimer === "function") {
-            const timerId = `dgs-echo-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-            timerSystem.registerConsolidatedTimer(
-              timerId,
-              () => {
-                try {
-                  if (echo.parentElement) echo.parentElement.removeChild(echo);
-                } catch (_) {
-                }
-                this.currentEchoCount--;
-                this.activeEchoElements.delete(echo);
-                this.releaseEchoElement(echo);
-                this._elementsWithActiveEcho.delete(element);
-                timerSystem.unregisterConsolidatedTimer(timerId);
-              },
-              1300,
-              // slightly longer than longest layer duration
-              "background"
-            );
-          } else {
-            setTimeout(() => {
-              try {
-                if (echo.parentElement) echo.parentElement.removeChild(echo);
-              } catch (_) {
-              }
-              this.currentEchoCount--;
-              this.activeEchoElements.delete(echo);
-              this.releaseEchoElement(echo);
-              this._elementsWithActiveEcho.delete(element);
-            }, 1300);
-          }
-        }
-        get echoIntensitySetting() {
-          const val = this.settingsManager?.get?.("sn-echo-intensity") ?? "2";
-          const parsed = parseInt(val, 10);
-          return isNaN(parsed) ? 2 : parsed;
-        }
-        get dynamicMaxEchoes() {
-          switch (this.echoIntensitySetting) {
-            case 0:
-              return 0;
-            case 1:
-              return Math.ceil(_DataGlyphSystem.BASE_MAX_ECHOES / 2);
-            case 3:
-              return _DataGlyphSystem.BASE_MAX_ECHOES * 2;
-            default:
-              return _DataGlyphSystem.BASE_MAX_ECHOES;
-          }
-        }
-        // --- Phase3 helper methods ---------------------------------------
-        /** Obtain an echo element from pool or create */
-        acquireEchoElement() {
-          let el = this.echoPool.pop();
-          if (el) {
-            restartCssAnimation(el);
-          } else {
-            el = document.createElement("div");
-            el.className = "sn-temporal-echo";
-          }
-          return el;
-        }
-        /** Return echo element to pool (bounded) */
-        releaseEchoElement(el) {
-          this.echoPool.push(el);
-          const limit = this.dynamicMaxEchoes * 2;
-          if (this.echoPool.length > limit) {
-            this.echoPool.shift();
-          }
-        }
-        /**
-         * Expose a lightweight snapshot of runtime metrics for external baselines.
-         * Consumers (e.g. MasterAnimationCoordinator perf overlay) can poll this
-         * method at low frequency (≤1 Hz) to log FPS, memory delta & echo counts
-         * without trolling the render thread.
-         */
-        getMetricsSnapshot() {
-          return {
-            ...this.performanceMetrics,
-            echoCount: this.currentEchoCount,
-            timestamp: Date.now()
-          };
-        }
-        /**
-         * SystemHealthMonitor hook – returns basic health metrics.
-         */
-        healthCheck() {
-          const echoesOk = this.currentEchoCount <= this.dynamicMaxEchoes;
-          const poolOk = this.echoPool.length <= this.dynamicMaxEchoes * 2;
-          const ok = echoesOk && poolOk;
-          return {
-            ok,
-            details: ok ? "Echo and pool within limits" : `Counts \u2013 echo:${this.currentEchoCount}, pool:${this.echoPool.length}`
-          };
-        }
-      };
-      _DataGlyphSystem.BASE_MAX_ECHOES = 6;
-      DataGlyphSystem = _DataGlyphSystem;
     }
   });
 
@@ -13072,7 +12625,9 @@ void main() {
           this.echoPool = [];
           this.currentEchoCount = 0;
           this._elementsWithActiveEcho = /* @__PURE__ */ new WeakSet();
+          this.echoTimerCounter = 0;
           this.systemName = "PredictiveMaterializationSystem";
+          this.year3000System = year3000System2;
           this.materializationState = {
             imminence: 0,
             clarity: 0,
@@ -13239,6 +12794,13 @@ void main() {
           }
         }
         destroy() {
+          if (this.year3000System?.timerConsolidationSystem) {
+            for (let i = 0; i < this.echoTimerCounter; i++) {
+              this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer(
+                `PredictiveMaterializationSystem-echo-${i}`
+              );
+            }
+          }
           super.destroy();
           if (this.config?.enableDebug) {
             console.log(`[${this.systemName}] Destroyed and cleaned up.`);
@@ -13337,12 +12899,23 @@ void main() {
           element.appendChild(echo);
           this.currentEchoCount++;
           this._elementsWithActiveEcho.add(element);
-          setTimeout(() => {
+          const timerId = `PredictiveMaterializationSystem-echo-${this.echoTimerCounter++}`;
+          const cleanup = () => {
             if (echo.parentElement) echo.parentElement.removeChild(echo);
             this.currentEchoCount--;
             this._releaseEchoElement(echo);
             this._elementsWithActiveEcho.delete(element);
-          }, 1300);
+          };
+          if (this.year3000System?.timerConsolidationSystem) {
+            this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
+              timerId,
+              cleanup,
+              1300,
+              "background"
+            );
+          } else {
+            setTimeout(cleanup, 1300);
+          }
         }
       };
       _PredictiveMaterializationSystem.BASE_MAX_ECHOES = 4;
@@ -13373,6 +12946,8 @@ void main() {
           this._elementsWithActiveEcho = /* @__PURE__ */ new WeakSet();
           // Stores nav interaction handler reference for clean removal.
           this._navInteractionHandler = null;
+          // Timer counter for unique timer IDs
+          this.echoTimerCounter = 0;
           /** Flag used to skip re-applying motion-disabled class when already set */
           this._lastMotionDisabled = false;
           this.year3000System = year3000System2;
@@ -13637,6 +13212,13 @@ void main() {
           if (this.consciousnessAnimationFrame) {
             cancelAnimationFrame(this.consciousnessAnimationFrame);
           }
+          if (this.year3000System?.timerConsolidationSystem) {
+            for (let i = 0; i < this.echoTimerCounter; i++) {
+              this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer(
+                `SidebarConsciousnessSystem-echo-${i}`
+              );
+            }
+          }
           if (this.rootNavBar && this._navInteractionHandler) {
             this.rootNavBar.removeEventListener(
               "focusin",
@@ -13742,12 +13324,23 @@ void main() {
           element.appendChild(echo);
           this.currentEchoCount++;
           this._elementsWithActiveEcho.add(element);
-          setTimeout(() => {
+          const timerId = `SidebarConsciousnessSystem-echo-${this.echoTimerCounter++}`;
+          const cleanup = () => {
             if (echo.parentElement) echo.parentElement.removeChild(echo);
             this.currentEchoCount--;
             this._releaseEchoElement(echo);
             this._elementsWithActiveEcho.delete(element);
-          }, 1100);
+          };
+          if (this.year3000System?.timerConsolidationSystem) {
+            this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
+              timerId,
+              cleanup,
+              1100,
+              "background"
+            );
+          } else {
+            setTimeout(cleanup, 1100);
+          }
         }
         // ---------------------------------------------------------------------
         // 🏎️  Performance-Aware Animation Gate
@@ -13796,6 +13389,7 @@ void main() {
     "src-js/visual/ui-effects/SidebarPerformanceCoordinator.ts"() {
       "use strict";
       init_CSSVariableBatcher();
+      init_PerformanceBudgetManager();
       init_SpotifyDOMSelectors();
       _SidebarPerformanceCoordinator = class _SidebarPerformanceCoordinator {
         constructor(config = {}) {
@@ -13813,18 +13407,29 @@ void main() {
           this.flushCount = 0;
           this.totalFlushTime = 0;
           this.lastFlushTimestamp = 0;
+          this.budgetManager = null;
           // DOM observation for reactive refresh and temporal play
           this.domObserver = null;
           this.sidebarElement = null;
           this.visibilityObserver = null;
+          this.observationThrottleTimer = null;
+          this.lastObservationTime = 0;
+          this.OBSERVATION_THROTTLE_MS = 100;
+          // Throttle observations to 10 Hz
           this.isFirstOpen = true;
           this.lastScrollUpdate = 0;
+          // Timeout tracking for proper cleanup
+          this.activeTimeouts = /* @__PURE__ */ new Set();
+          this.domObservationRetryTimeout = null;
           this.config = {
             enableDebug: config.enableDebug ?? false,
             maxBatchSize: config.maxBatchSize ?? 50,
             ...config
           };
           this.performanceAnalyzer = config.performanceAnalyzer || null;
+          if (this.performanceAnalyzer) {
+            this.budgetManager = PerformanceBudgetManager.getInstance(void 0, this.performanceAnalyzer);
+          }
           if (this.config.enableDebug) {
             console.log(
               "\u{1F30C} [SidebarPerformanceCoordinator] Initialized with RAF-based batching"
@@ -14013,28 +13618,43 @@ void main() {
                 "\u{1F30C} [SidebarPerformanceCoordinator] Sidebar not found, deferring DOM observation"
               );
             }
-            setTimeout(() => this.setupDOMObservation(), 1e3);
+            if (this.domObservationRetryTimeout) {
+              clearTimeout(this.domObservationRetryTimeout);
+              this.activeTimeouts.delete(this.domObservationRetryTimeout);
+            }
+            this.domObservationRetryTimeout = setTimeout(() => {
+              this.setupDOMObservation();
+              this.domObservationRetryTimeout = null;
+            }, 1e3);
+            this.activeTimeouts.add(this.domObservationRetryTimeout);
             return;
           }
           this.domObserver = new MutationObserver((mutations) => {
-            this.queueUpdate("--sn-rs-force-refresh", Date.now().toString());
-            for (const mutation of mutations) {
-              if (mutation.type === "attributes" && (mutation.attributeName === "aria-hidden" || mutation.attributeName === "style")) {
-                this.handleVisibilityChange();
+            this.throttleObservationUpdate(() => {
+              this.queueUpdate("--sn-rs-force-refresh", Date.now().toString());
+              for (const mutation of mutations) {
+                if (mutation.type === "attributes" && (mutation.attributeName === "aria-hidden" || mutation.attributeName === "style")) {
+                  this.handleVisibilityChange();
+                }
               }
-            }
-            if (this.config.enableDebug) {
-              console.log(
-                "\u{1F30C} [SidebarPerformanceCoordinator] DOM change detected, forcing refresh"
-              );
-            }
+              if (this.config.enableDebug) {
+                console.log(
+                  "\u{1F30C} [SidebarPerformanceCoordinator] DOM change detected, forcing refresh"
+                );
+              }
+            });
           });
           this.domObserver.observe(this.sidebarElement, {
             childList: true,
-            subtree: true,
+            subtree: false,
+            // Optimize: Only observe direct children
             attributes: true,
             // Watch for aria-hidden and style changes
-            attributeFilter: ["aria-hidden", "style", "class"]
+            attributeFilter: ["aria-hidden", "style", "class"],
+            // Optimize: Don't observe attribute old values
+            attributeOldValue: false,
+            characterData: false
+            // Don't observe text changes
           });
           this.setupVisibilityObserver();
           this.setupScrollObservation();
@@ -14053,8 +13673,17 @@ void main() {
             (entries) => {
               const entry = entries[0];
               if (entry && entry.isIntersecting && this.isFirstOpen) {
-                this.triggerTemporalEcho();
-                this.isFirstOpen = false;
+                if (window.requestIdleCallback) {
+                  window.requestIdleCallback(() => {
+                    this.triggerTemporalEcho();
+                    this.isFirstOpen = false;
+                  });
+                } else {
+                  setTimeout(() => {
+                    this.triggerTemporalEcho();
+                    this.isFirstOpen = false;
+                  }, 0);
+                }
               }
             },
             { threshold: 0.1 }
@@ -14088,9 +13717,28 @@ void main() {
           if (window.requestIdleCallback) {
             window.requestIdleCallback(() => {
               this.queueUpdate("--sn-rs-scroll-ratio", Math.random().toString());
-            });
+            }, { timeout: 100 });
           } else {
             this.queueUpdate("--sn-rs-scroll-ratio", Math.random().toString());
+          }
+        }
+        /**
+         * Throttle DOM observation updates to reduce CPU overhead
+         */
+        throttleObservationUpdate(callback) {
+          const now = performance.now();
+          if (now - this.lastObservationTime < this.OBSERVATION_THROTTLE_MS) {
+            if (this.observationThrottleTimer) {
+              clearTimeout(this.observationThrottleTimer);
+            }
+            this.observationThrottleTimer = window.setTimeout(() => {
+              callback();
+              this.lastObservationTime = performance.now();
+              this.observationThrottleTimer = null;
+            }, this.OBSERVATION_THROTTLE_MS);
+          } else {
+            callback();
+            this.lastObservationTime = now;
           }
         }
         /**
@@ -14125,10 +13773,12 @@ void main() {
               "\u{1F30C} [SidebarPerformanceCoordinator] Triggering temporal echo effect"
             );
           }
-          setTimeout(() => {
+          const cleanupTimeout = setTimeout(() => {
             this.sidebarElement?.classList.remove("sn-future-preview");
             this.queueUpdate("--sn-kinetic-intensity", "0");
+            this.activeTimeouts.delete(cleanupTimeout);
           }, 2e3);
+          this.activeTimeouts.add(cleanupTimeout);
         }
         /**
          * Get performance metrics for monitoring
@@ -14158,6 +13808,18 @@ void main() {
           if (this.rafId) {
             cancelAnimationFrame(this.rafId);
             this.rafId = null;
+          }
+          this.activeTimeouts.forEach((timeout) => {
+            clearTimeout(timeout);
+          });
+          this.activeTimeouts.clear();
+          if (this.domObservationRetryTimeout) {
+            clearTimeout(this.domObservationRetryTimeout);
+            this.domObservationRetryTimeout = null;
+          }
+          if (this.observationThrottleTimer) {
+            clearTimeout(this.observationThrottleTimer);
+            this.observationThrottleTimer = null;
           }
           if (this.domObserver) {
             this.domObserver.disconnect();
@@ -14440,10 +14102,21 @@ void main() {
             });
           });
         }
+        /**
+         * Helper method to safely call Year3000System's queueCSSVariableUpdate
+         */
+        safeQueueCSSVariableUpdate(property, value, element) {
+          if (this.year3000System?.queueCSSVariableUpdate) {
+            this.year3000System.queueCSSVariableUpdate(property, value, element || null);
+          } else {
+            const target = element || document.documentElement;
+            target.style.setProperty(property, value);
+          }
+        }
         applyEffectToElement(element, layer) {
           if (!(element instanceof HTMLElement)) return;
           Object.entries(layer.cssVariables).forEach(([property, value]) => {
-            this.year3000System.queueCSSVariableUpdate(property, value, element);
+            this.safeQueueCSSVariableUpdate(property, value, element);
           });
           element.classList.add(`sn-${layer.name}`);
           element.classList.add("sn-ui-enhanced");
@@ -14455,7 +14128,7 @@ void main() {
         }
         addInteractionEffects(element, layer) {
           if (layer.name === "interactive-elements" || layer.name === "now-playing-effects") {
-            this.year3000System.queueCSSVariableUpdate(
+            this.safeQueueCSSVariableUpdate(
               "--sn-beat-response",
               "var(--sn-music-intensity)",
               element
@@ -14463,7 +14136,7 @@ void main() {
             element.classList.add("sn-beat-responsive");
           }
           element.addEventListener("mouseenter", () => {
-            this.year3000System.queueCSSVariableUpdate(
+            this.safeQueueCSSVariableUpdate(
               "--sn-hover-intensity",
               "1",
               element
@@ -14471,7 +14144,7 @@ void main() {
             element.classList.add("sn-hover-active");
           });
           element.addEventListener("mouseleave", () => {
-            this.year3000System.queueCSSVariableUpdate(
+            this.safeQueueCSSVariableUpdate(
               "--sn-hover-intensity",
               "0",
               element
@@ -14479,14 +14152,14 @@ void main() {
             element.classList.remove("sn-hover-active");
           });
           element.addEventListener("click", () => {
-            this.year3000System.queueCSSVariableUpdate(
+            this.safeQueueCSSVariableUpdate(
               "--sn-click-intensity",
               "1",
               element
             );
             element.classList.add("sn-click-active");
             setTimeout(() => {
-              this.year3000System.queueCSSVariableUpdate(
+              this.safeQueueCSSVariableUpdate(
                 "--sn-click-intensity",
                 "0",
                 element
@@ -14561,12 +14234,26 @@ void main() {
             };
           }
           if (this.year3000System.beatSyncVisualSystem) {
-            setInterval(() => {
-              const intensity = this.getCurrentMusicIntensity();
-              if (intensity > 0.5) {
-                this.triggerBeatEffects({ intensity });
-              }
-            }, 200);
+            if (this.year3000System.timerConsolidationSystem) {
+              this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
+                "SpotifyUIApplicationSystem-beatEffects",
+                () => {
+                  const intensity = this.getCurrentMusicIntensity();
+                  if (intensity > 0.5) {
+                    this.triggerBeatEffects({ intensity });
+                  }
+                },
+                200,
+                "normal"
+              );
+            } else {
+              setInterval(() => {
+                const intensity = this.getCurrentMusicIntensity();
+                if (intensity > 0.5) {
+                  this.triggerBeatEffects({ intensity });
+                }
+              }, 200);
+            }
           }
         }
         getCurrentMusicIntensity() {
@@ -14578,17 +14265,17 @@ void main() {
           const enhancedElements = document.querySelectorAll(".sn-ui-enhanced");
           enhancedElements.forEach((element) => {
             if (element instanceof HTMLElement) {
-              this.year3000System.queueCSSVariableUpdate(
+              this.safeQueueCSSVariableUpdate(
                 "--sn-accent-primary",
                 colorData.primary || "var(--spice-accent)",
                 element
               );
-              this.year3000System.queueCSSVariableUpdate(
+              this.safeQueueCSSVariableUpdate(
                 "--sn-accent-secondary",
                 colorData.secondary || "var(--spice-accent)",
                 element
               );
-              this.year3000System.queueCSSVariableUpdate(
+              this.safeQueueCSSVariableUpdate(
                 "--sn-accent-tertiary",
                 colorData.tertiary || "var(--spice-accent)",
                 element
@@ -14601,7 +14288,7 @@ void main() {
           const intensityElements = document.querySelectorAll(".sn-beat-responsive");
           intensityElements.forEach((element) => {
             if (element instanceof HTMLElement) {
-              this.year3000System.queueCSSVariableUpdate(
+              this.safeQueueCSSVariableUpdate(
                 "--sn-music-intensity",
                 intensity.toString(),
                 element
@@ -14613,14 +14300,14 @@ void main() {
           const beatElements = document.querySelectorAll(".sn-beat-responsive");
           beatElements.forEach((element) => {
             if (element instanceof HTMLElement) {
-              this.year3000System.queueCSSVariableUpdate(
+              this.safeQueueCSSVariableUpdate(
                 "--sn-beat-pulse",
                 "1",
                 element
               );
               element.classList.add("sn-beat-active");
               setTimeout(() => {
-                this.year3000System.queueCSSVariableUpdate(
+                this.safeQueueCSSVariableUpdate(
                   "--sn-beat-pulse",
                   "0",
                   element
@@ -14641,6 +14328,9 @@ void main() {
           });
         }
         async destroy() {
+          if (this.year3000System?.timerConsolidationSystem) {
+            this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("SpotifyUIApplicationSystem-beatEffects");
+          }
           this.observerRegistry.forEach((observer) => {
             observer.disconnect();
           });
@@ -14691,11 +14381,9 @@ void main() {
       init_LightweightParticleSystem();
       init_ParticleFieldSystem();
       init_WebGLGradientBackgroundSystem();
-      init_WebGPUBackgroundSystem();
       init_starryNightEffects();
       init_BeatSyncVisualSystem();
       init_BehavioralPredictionEngine();
-      init_DataGlyphSystem();
       init_InteractionTrackingSystem();
       init_PredictiveMaterializationSystem();
       init_SidebarConsciousnessSystem();
@@ -14742,13 +14430,11 @@ void main() {
           this.card3DManager = null;
           this.lightweightParticleSystem = null;
           this.interactionTrackingSystem = null;
-          this.dataGlyphSystem = null;
           this.beatSyncVisualSystem = null;
           this.behavioralPredictionEngine = null;
           this.predictiveMaterializationSystem = null;
           this.sidebarConsciousnessSystem = null;
           this.webGLGradientBackgroundSystem = null;
-          this.webGPUBackgroundSystem = null;
           this.particleFieldSystem = null;
           this.emergentChoreographyEngine = null;
           this.spotifyUIApplicationSystem = null;
@@ -15064,12 +14750,10 @@ void main() {
             const visualSystems = [
               "LightweightParticleSystem",
               "InteractionTrackingSystem",
-              "DataGlyphSystem",
               "BeatSyncVisualSystem",
               "BehavioralPredictionEngine",
               "PredictiveMaterializationSystem",
               "SidebarConsciousnessSystem",
-              "WebGPUBackgroundSystem",
               "EmergentChoreographyEngine"
             ];
             visualSystems.forEach((s) => results.skipped.push(s));
@@ -15085,11 +14769,6 @@ void main() {
               name: "InteractionTrackingSystem",
               Class: InteractionTrackingSystem,
               property: "interactionTrackingSystem"
-            },
-            {
-              name: "DataGlyphSystem",
-              Class: DataGlyphSystem,
-              property: "dataGlyphSystem"
             },
             {
               name: "BeatSyncVisualSystem",
@@ -15122,11 +14801,6 @@ void main() {
               property: "webGLGradientBackgroundSystem"
             },
             {
-              name: "WebGPUBackgroundSystem",
-              Class: WebGPUBackgroundSystem,
-              property: "webGPUBackgroundSystem"
-            },
-            {
               name: "ParticleFieldSystem",
               Class: ParticleFieldSystem,
               property: "particleFieldSystem"
@@ -15140,14 +14814,19 @@ void main() {
           for (const config of visualSystemConfigs) {
             const { name, Class, property } = config;
             try {
-              const instance2 = new Class(
-                this.YEAR3000_CONFIG,
-                this.utils,
-                this.performanceAnalyzer,
-                this.musicSyncService,
-                this.settingsManager,
-                this
-              );
+              let instance2;
+              if (name === "SpotifyUIApplicationSystem") {
+                instance2 = new Class(this);
+              } else {
+                instance2 = new Class(
+                  this.YEAR3000_CONFIG,
+                  this.utils,
+                  this.performanceAnalyzer,
+                  this.musicSyncService,
+                  this.settingsManager,
+                  this
+                );
+              }
               await instance2.initialize();
               if (instance2.initialized) {
                 this[property] = instance2;
@@ -15195,7 +14874,6 @@ void main() {
           const allSystems = [
             this.lightweightParticleSystem,
             this.interactionTrackingSystem,
-            this.dataGlyphSystem,
             this.beatSyncVisualSystem,
             this.behavioralPredictionEngine,
             this.predictiveMaterializationSystem,
@@ -15208,7 +14886,6 @@ void main() {
             this.deviceCapabilityDetector,
             this.cssVariableBatcher,
             this.webGLGradientBackgroundSystem,
-            this.webGPUBackgroundSystem,
             this.particleFieldSystem,
             this.emergentChoreographyEngine,
             this.spotifyUIApplicationSystem
@@ -15655,11 +15332,6 @@ void main() {
               priority: "background"
             },
             {
-              name: "DataGlyphSystem",
-              system: this.dataGlyphSystem,
-              priority: "background"
-            },
-            {
               name: "SpotifyUIApplicationSystem",
               system: this.spotifyUIApplicationSystem,
               priority: "normal"
@@ -16036,13 +15708,11 @@ void main() {
             this.card3DManager,
             this.lightweightParticleSystem,
             this.interactionTrackingSystem,
-            this.dataGlyphSystem,
             this.beatSyncVisualSystem,
             this.behavioralPredictionEngine,
             this.predictiveMaterializationSystem,
             this.sidebarConsciousnessSystem,
-            this.particleFieldSystem,
-            this.webGPUBackgroundSystem
+            this.particleFieldSystem
           ];
           systems.forEach((sys) => {
             if (sys && typeof sys.applyUpdatedSettings === "function") {
@@ -16068,7 +15738,7 @@ void main() {
         _applyPerformanceProfile() {
         }
         /**
-         * Refresh conditional visual systems (WebGPU, ParticleField, etc.) depending
+         * Refresh conditional visual systems (WebGL, ParticleField, etc.) depending
          * on capability and artistic mode settings.
          */
         _refreshConditionalSystems() {
@@ -17364,22 +17034,6 @@ void main() {
         }
       }
     );
-    const enableGpu = settingsManager.get("sn-enable-webgpu") === "true";
-    section.addToggle(
-      "sn-enable-webgpu",
-      "Enable WebGPU acceleration (experimental)",
-      enableGpu,
-      {
-        onClick: (e) => {
-          const checked = e.currentTarget.checked;
-          settingsManager.set(
-            "sn-enable-webgpu",
-            checked ? "true" : "false"
-          );
-          console.info("[StarryNight] WebGPU setting changed \u2013 reload required");
-        }
-      }
-    );
     const enableAb = settingsManager.get("sn-enable-aberration") === "true";
     section.addToggle(
       "sn-enable-aberration",
@@ -17565,7 +17219,7 @@ void main() {
           this._tryRegisterWithMasterAnimation();
         }
         _tryRegisterWithMasterAnimation() {
-          if (this.year3000System?.registerAnimationSystem && this.year3000System.masterAnimationCoordinator) {
+          if (this.year3000System?.registerAnimationSystem && this.year3000System.animationConductor) {
             const ok = this.year3000System.registerAnimationSystem(
               "RightSidebarConsciousnessSystem",
               this,
@@ -18779,7 +18433,9 @@ void main() {
       const cueOpacity = 0.18 * this.intensityFactor;
       this._queueVar("--sn-nebula-layer-0-opacity", cueOpacity.toFixed(3));
       const clearCue = () => {
-        if (this.activeGlowTimeout) {
+        if (this.year3000System?.timerConsolidationSystem) {
+          this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("AudioVisualController-glowTimeout");
+        } else if (this.activeGlowTimeout) {
           clearTimeout(this.activeGlowTimeout);
           this.activeGlowTimeout = null;
         }
@@ -18790,7 +18446,17 @@ void main() {
           this.interactionOffHandler = null;
         }
       };
-      this.activeGlowTimeout = setTimeout(clearCue, 4e3);
+      if (this.year3000System?.timerConsolidationSystem) {
+        this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
+          "AudioVisualController-glowTimeout",
+          clearCue,
+          4e3,
+          "normal"
+        );
+        this.activeGlowTimeout = null;
+      } else {
+        this.activeGlowTimeout = setTimeout(clearCue, 4e3);
+      }
       this.interactionOffHandler = () => clearCue();
       document.addEventListener("pointerdown", this.interactionOffHandler, {
         once: true
@@ -18848,6 +18514,18 @@ void main() {
       this.perf?.shouldUpdate("nebulaCtr", 1e3) && this.perf?.endTiming("AudioVisualController", start);
     }
     destroy() {
+      if (this.year3000System?.timerConsolidationSystem) {
+        this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("AudioVisualController-glowTimeout");
+      }
+      if (this.activeGlowTimeout) {
+        clearTimeout(this.activeGlowTimeout);
+        this.activeGlowTimeout = null;
+      }
+      if (this.interactionOffHandler) {
+        document.removeEventListener("pointerdown", this.interactionOffHandler);
+        document.removeEventListener("keydown", this.interactionOffHandler);
+        this.interactionOffHandler = null;
+      }
       this.unsubscribers.forEach((u) => u());
       this.unsubscribers = [];
     }

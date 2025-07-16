@@ -10,6 +10,20 @@ import { SettingsManager } from "@/ui/managers/SettingsManager";
 import * as Utils from "@/utils/core/Year3000Utilities";
 import { sample as sampleNoise } from "@/utils/graphics/NoiseField";
 
+// WebGPU type declarations for environments without built-in support
+declare global {
+  interface GPUDevice {
+    createBuffer(descriptor: any): any;
+    createBindGroup(descriptor: any): any;
+    createRenderPipeline(descriptor: any): any;
+    queue: { writeBuffer(buffer: any, offset: number, data: ArrayBuffer): void };
+  }
+  interface GPUCanvasContext {
+    configure(configuration: any): void;
+    getCurrentTexture(): any;
+  }
+}
+
 /**
  * WebGPUBackgroundSystem (Phase-1 scaffold)
  * -----------------------------------------
@@ -25,8 +39,8 @@ import { sample as sampleNoise } from "@/utils/graphics/NoiseField";
 export class WebGPUBackgroundSystem implements IManagedSystem, IVisualSystem {
   public initialized = false;
   private _canvas: HTMLCanvasElement | null = null;
-  private _device: GPUDevice | null = null;
-  private _ctx: GPUCanvasContext | null = null;
+  private _device: any | null = null;
+  private _ctx: any | null = null;
   private _animationFrame: number | null = null;
   private _uniformBuffer: GPUBuffer | null = null;
   private _bindGroup: GPUBindGroup | null = null;
@@ -115,7 +129,7 @@ export class WebGPUBackgroundSystem implements IManagedSystem, IVisualSystem {
   // Private helpers
   // ---------------------------------------------------------------------------
   private _shouldActivate(): boolean {
-    const webgpuSetting = this.settingsManager.get("sn-enable-webgpu");
+    const webgpuSetting = this.settingsManager.get("sn-enable-webgpu" as any);
     return (
       webgpuSetting === "true" &&
       typeof navigator !== "undefined" &&
@@ -142,7 +156,7 @@ export class WebGPUBackgroundSystem implements IManagedSystem, IVisualSystem {
     document.body.appendChild(canvas);
     this._canvas = canvas;
 
-    const ctx = canvas.getContext("webgpu") as unknown as GPUCanvasContext;
+    const ctx = canvas.getContext("webgpu") as any;
     if (!ctx) throw new Error("Failed to get WebGPU context");
     this._ctx = ctx;
 

@@ -3,7 +3,7 @@
  * Verifies no scroll jank and proper click pass-through
  */
 
-import { WebGLGradientBackgroundSystem } from '@/systems/visual/WebGLGradientBackgroundSystem';
+import { WebGLGradientBackgroundSystem } from '@/visual/backgrounds/WebGLGradientBackgroundSystem';
 import { PerformanceAnalyzer } from '@/core/performance/PerformanceAnalyzer';
 import { SettingsManager } from '@/ui/managers/SettingsManager';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';
@@ -81,9 +81,9 @@ Object.defineProperty(document, 'createElement', {
     if (tagName === 'div') {
       return {
         style: { 
-          cssText: '',
-          set cssText(value: string) { this._cssText = value; },
-          get cssText() { return this._cssText || ''; }
+          _cssText: '',
+          set cssText(value: string) { (this as any)._cssText = value; },
+          get cssText() { return (this as any)._cssText || ''; }
         },
         className: '',
         appendChild: jest.fn(),
@@ -93,9 +93,9 @@ Object.defineProperty(document, 'createElement', {
     if (tagName === 'canvas') {
       return {
         style: { 
-          cssText: '',
-          set cssText(value: string) { this._cssText = value; },
-          get cssText() { return this._cssText || ''; }
+          _cssText: '',
+          set cssText(value: string) { (this as any)._cssText = value; },
+          get cssText() { return (this as any)._cssText || ''; }
         },
         className: '',
         parentNode: null,
@@ -222,7 +222,11 @@ describe('WebGL Gradient Wrapper Performance', () => {
       const wrapper = system['wrapper'];
       const mockParent = { removeChild: jest.fn() };
       if (wrapper) {
-        wrapper.parentNode = mockParent as any;
+        Object.defineProperty(wrapper, 'parentNode', {
+          value: mockParent,
+          writable: true,
+          configurable: true
+        });
       }
 
       system.destroy();

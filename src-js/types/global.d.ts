@@ -1,4 +1,4 @@
-import { Year3000System } from "../core/year3000System";
+import { Year3000System } from "../core/lifecycle/year3000System";
 
 declare global {
   var year3000System: Year3000System | undefined;

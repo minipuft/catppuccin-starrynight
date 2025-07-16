@@ -166,36 +166,81 @@
   --sn-gradient-primary-rgb: var(--spice-rgb-accent);
   --sn-gradient-secondary-rgb: var(--spice-rgb-surface0);
   --sn-gradient-accent-rgb: var(--spice-rgb-surface1);
-  /* 🌌 YEAR 3000 ARTISTIC PARAMETERS - BEATSYNC ENHANCED Bold Expression Mode!*/
+  /* 🌌 YEAR 3000 ARTISTIC PARAMETERS - CONSCIOUSNESS ENHANCED Bold Expression Mode!*/
   --sn-gradient-opacity: calc(
-    0.28 + (var(--gradient-beat-intensity) * 0.15)
-  ); /* PULSES with beats!*/
+    0.28 + (var(--gradient-beat-intensity) * 0.15) + (var(--sn-gradient-consciousness-level) * 0.1)
+  ); /* PULSES with beats and consciousness!*/
   --sn-gradient-blur: calc(
-    35px + (var(--gradient-beat-intensity) * 10px)
-  ); /* Dynamic blur with rhythm*/
+    35px + (var(--gradient-beat-intensity) * 10px) + (var(--sn-gradient-nebula-density) * 15px)
+  ); /* Dynamic blur with rhythm and nebula density*/
   --sn-gradient-saturation: calc(
-    1.45 + (var(--gradient-beat-intensity) * 0.25)
-  ); /* VIBRANT with rhythm!*/
+    1.45 + (var(--gradient-beat-intensity) * 0.25) + (var(--sn-gradient-emotional-valence) * 0.3)
+  ); /* VIBRANT with rhythm and emotional valence!*/
   --sn-gradient-brightness: calc(
-    1.25 + (var(--gradient-beat-intensity) * 0.15)
-  ); /* LUMINOUS with beats!*/
+    1.25 + (var(--gradient-beat-intensity) * 0.15) + (var(--sn-gradient-cosmic-energy) * 0.2)
+  ); /* LUMINOUS with beats and cosmic energy!*/
   --sn-gradient-contrast: calc(
-    1.35 + (var(--gradient-beat-intensity) * 0.2)
-  ); /* IMPACTFUL with rhythm!*/
+    1.35 + (var(--gradient-beat-intensity) * 0.2) + (var(--sn-gradient-harmonic-resonance) * 0.15)
+  ); /* IMPACTFUL with rhythm and harmonic resonance!*/
   /* 🎵 MUSIC-RESPONSIVE VARIABLES - Cosmic Synchronization*/
   --sn-music-energy: 0.5; /* Set by music analysis (0.0 - 1.0)*/
   --sn-music-valence: 0.5; /* Musical positivity (0.0 - 1.0)*/
   --sn-music-intensity-boost: 1; /* Dynamic multiplier from music*/
   --sn-cosmic-sync-enabled: 1; /* 1 = enabled, 0 = disabled*/
-  /* 🌟 DYNAMIC ARTISTIC INTENSITY - Scales with music and mode*/
+  /* 🌟 DYNAMIC ARTISTIC INTENSITY - Scales with music, consciousness, and cosmic forces*/
   --sn-dynamic-opacity: calc(
-    var(--sn-gradient-opacity) * var(--sn-music-intensity-boost, 1)
+    var(--sn-gradient-opacity) * var(--sn-music-intensity-boost, 1) * var(--sn-gradient-layer-consciousness)
   );
   --sn-dynamic-saturation: calc(
-    var(--sn-gradient-saturation) * (1 + (var(--sn-music-energy, 0.5) * 0.3))
+    var(--sn-gradient-saturation) * (1 + (var(--sn-music-energy, 0.5) * 0.3)) *
+    (1 + (var(--sn-gradient-emotional-valence) * 0.2)) * var(--sn-dynamic-genre-saturation)
   );
   --sn-dynamic-brightness: calc(
-    var(--sn-gradient-brightness) * (1 + (var(--sn-music-valence, 0.5) * 0.2))
+    var(--sn-gradient-brightness) * (1 + (var(--sn-music-valence, 0.5) * 0.2)) *
+    (1 + (var(--sn-gradient-cosmic-energy) * 0.15)) * var(--sn-dynamic-genre-brightness)
+  );
+  --sn-dynamic-contrast: calc(
+    var(--sn-gradient-contrast) * (1 + (var(--gradient-beat-intensity) * 0.2)) *
+    (1 + (var(--sn-gradient-harmonic-resonance) * 0.15)) * var(--sn-dynamic-genre-contrast)
+  );
+  /* 🌌 CONSCIOUSNESS FIELD DYNAMICS - Temporal and harmonic responsiveness */
+  --sn-dynamic-temporal-shift: calc(
+    var(--sn-gradient-temporal-phase) * 360deg + var(--sn-gradient-stellar-drift) + var(--sn-dynamic-genre-hue-shift)
+  );
+  --sn-dynamic-harmonic-scale: calc(
+    1 + (var(--sn-gradient-harmonic-resonance) * 0.1) + (var(--sn-gradient-bass-response) * 0.05)
+  );
+  --sn-dynamic-quantum-coherence: calc(
+    var(--sn-gradient-quantum-coherence) * var(--sn-gradient-consciousness-level)
+  );
+  /* 🎭 EMOTIONAL GRADIENT DYNAMICS - Mood-based visual transformations */
+  --sn-dynamic-emotional-animation-duration: calc(
+    var(--sn-gradient-transition) / var(--sn-emotional-animation-speed)
+  );
+  --sn-dynamic-emotional-flow: calc(
+    var(--sn-gradient-temporal-phase) * 360deg + var(--sn-emotional-flow-direction)
+  );
+  --sn-dynamic-layer-discord: calc(
+    var(--sn-emotional-discord-level) * var(--sn-mood-confidence)
+  );
+  /* 🎼 GENRE GRADIENT EVOLUTION DYNAMICS - Musical Style Visual Adaptation */
+  --sn-dynamic-genre-hue-shift: calc(
+    var(--sn-genre-base-hue) + (var(--sn-gradient-temporal-phase) * var(--sn-genre-hue-range) / 6) + var(--sn-emotional-hue-shift)
+  );
+  --sn-dynamic-genre-saturation: calc(
+    var(--sn-genre-saturation-base) * (1 + (var(--sn-music-energy) * var(--sn-genre-saturation-variation))) * var(--sn-emotional-saturation-multiplier)
+  );
+  --sn-dynamic-genre-brightness: calc(
+    var(--sn-genre-brightness-base) * (1 + (var(--sn-music-valence) * var(--sn-genre-brightness-variation))) * var(--sn-emotional-brightness-multiplier)
+  );
+  --sn-dynamic-genre-contrast: calc(
+    var(--sn-genre-contrast-level) * (1 + (var(--gradient-beat-intensity) * 0.3)) * var(--sn-emotional-contrast-multiplier)
+  );
+  --sn-dynamic-genre-animation-speed: calc(
+    var(--sn-genre-animation-speed) * var(--sn-emotional-animation-speed) * (0.5 + var(--sn-music-energy) * 1.5)
+  );
+  --sn-dynamic-genre-layer-harmony: calc(
+    var(--sn-genre-layer-harmony) * var(--sn-emotional-layer-harmony) * var(--sn-genre-confidence)
   );
   /* YEAR 3000: Organic transition system with cosmic enhancement*/
   --sn-gradient-transition: 2400ms
@@ -205,6 +250,111 @@
   --sn-breathing-inhale: 1200ms;
   --sn-breathing-hold: 600ms;
   --sn-breathing-exhale: 600ms;
+  /* ✨ FLUX CONSCIOUSNESS VARIABLES - Year 3000 Musical Gradient System */
+  /* Musical Consciousness Variables - The gradient's ability to perceive and respond to music */
+  --sn-gradient-temporal-phase: 0; /* 0-1 temporal phase shift across song timeline */
+  --sn-gradient-harmonic-resonance: 0; /* 0-1 harmonic frequency response intensity */
+  --sn-gradient-emotional-valence: 0.5; /* 0-1 music emotional mapping (sad->happy) */
+  --sn-gradient-cosmic-energy: 0; /* 0-1 beat energy constellation magnitude */
+  --sn-gradient-dimensional-depth: 3; /* 1-5 layer depth perception level */
+  --sn-gradient-stellar-drift: 0deg; /* -30deg to +30deg hue drift with genre changes */
+  /* Consciousness Field State Variables - Control the gradient's awareness level */
+  --sn-gradient-consciousness-level: 0.7; /* 0-1 overall consciousness intensity */
+  --sn-gradient-temporal-memory: 0.3; /* 0-1 how much past colors influence current */
+  --sn-gradient-predictive-flow: 0.2; /* 0-1 anticipation of musical changes */
+  --sn-gradient-quantum-coherence: 0; /* 0-1 quantum state synchronization */
+  /* Spectral Analysis Variables - Frequency band responses */
+  --sn-gradient-bass-response: 0; /* 0-1 bass frequency influence */
+  --sn-gradient-mid-response: 0; /* 0-1 mid frequency influence */
+  --sn-gradient-treble-response: 0; /* 0-1 treble frequency influence */
+  --sn-gradient-vocal-presence: 0; /* 0-1 vocal frequency detection */
+  /* Stellar Phenomena Variables - Cosmic visual effects */
+  --sn-gradient-nebula-density: 0.5; /* 0-1 nebula cloud density */
+  --sn-gradient-aurora-intensity: 0; /* 0-1 aurora borealis effect */
+  --sn-gradient-cosmic-dust: 0.3; /* 0-1 interstellar dust particle density */
+  --sn-gradient-star-formation: 0; /* 0-1 new star birth animation */
+  /* Dimensional Layer Controls - Multi-dimensional gradient management */
+  --sn-gradient-layer-consciousness: 1; /* 0-1 base consciousness layer opacity */
+  --sn-gradient-layer-temporal: 0.8; /* 0-1 temporal flow layer opacity */
+  --sn-gradient-layer-harmonic: 0.6; /* 0-1 harmonic resonance layer opacity */
+  --sn-gradient-layer-quantum: 0.4; /* 0-1 quantum effects layer opacity */
+  --sn-gradient-layer-stellar: 0.2; /* 0-1 stellar phenomena layer opacity */
+  /* 🎭 EMOTIONAL GRADIENT MAPPING - Phase 4 Musical Mood Response */
+  /* Color transformation parameters - respond to musical emotions */
+  --sn-emotional-hue-shift: 0deg; /* -180deg to +180deg mood-based hue rotation */
+  --sn-emotional-saturation-multiplier: 1; /* 0.5-2.0 mood-based saturation adjustment */
+  --sn-emotional-brightness-multiplier: 1; /* 0.5-2.0 mood-based brightness adjustment */
+  --sn-emotional-contrast-multiplier: 1; /* 0.5-2.0 mood-based contrast adjustment */
+  /* Animation parameters - mood affects movement and timing */
+  --sn-emotional-animation-speed: 1; /* 0.1-3.0 mood-based animation speed multiplier */
+  --sn-emotional-pulse-intensity: 0.5; /* 0-1 mood-based pulse strength */
+  --sn-emotional-flow-direction: 0deg; /* 0-360deg mood-based flow direction */
+  /* Layer behavior - emotional harmony and discord */
+  --sn-emotional-layer-harmony: 0.75; /* 0-1 how well layers blend emotionally */
+  --sn-emotional-discord-level: 0.25; /* 0-1 intentional emotional color conflicts */
+  --sn-emotional-depth-perception: 0.5; /* 0-1 3D depth illusion based on mood */
+  /* Transition behavior - emotional responsiveness */
+  --sn-emotional-transition-speed: 1.5; /* 0.1-5.0 mood-based transition speed multiplier */
+  /* Current mood information - for debugging and advanced effects */
+  --sn-current-mood: "neutral"; /* Current detected mood string */
+  --sn-mood-confidence: 0.5; /* 0-1 confidence in mood detection */
+  --sn-emotional-valence: 0.5; /* 0-1 current emotional valence (sad->happy) */
+  --sn-emotional-energy: 0.5; /* 0-1 current emotional energy (calm->energetic) */
+  /* 🎼 GENRE GRADIENT EVOLUTION - Phase 4 Musical Genre Visual Adaptation */
+  /* Genre-specific color parameters - adapt to music style */
+  --sn-genre-base-hue: 0deg; /* 0-360deg genre-specific base hue */
+  --sn-genre-hue-range: 60deg; /* 0-360deg hue variation range for genre */
+  --sn-genre-saturation-base: 1.0; /* 0.5-2.0 genre-specific saturation foundation */
+  --sn-genre-saturation-variation: 0.3; /* 0-1 saturation variation amplitude */
+  --sn-genre-brightness-base: 1.0; /* 0.5-2.0 genre-specific brightness foundation */
+  --sn-genre-brightness-variation: 0.3; /* 0-1 brightness variation amplitude */
+  --sn-genre-contrast-level: 0.7; /* 0-1 genre-specific contrast intensity */
+  /* Genre animation characteristics - movement style adaptation */
+  --sn-genre-animation-speed: 1.0; /* 0.1-3.0 genre-specific animation speed */
+  --sn-genre-pulse-intensity: 0.5; /* 0-1 genre-specific pulse strength */
+  --sn-genre-edge-sharpness: 0.5; /* 0-1 gradient edge definition (geometric vs organic) */
+  --sn-genre-gradient-complexity: 0.6; /* 0-1 number of gradient layers complexity */
+  /* Genre layer interaction - visual harmony adaptation */
+  --sn-genre-layer-harmony: 0.7; /* 0-1 layer blending harmony for genre */
+  --sn-genre-depth-illusion: 0.6; /* 0-1 3D depth perception for genre */
+  --sn-genre-particle-influence: 0.5; /* 0-1 cosmic particle prominence for genre */
+  /* Genre temporal behavior - adaptation and evolution */
+  --sn-genre-memory-influence: 0.5; /* 0-1 how much past genre states influence current */
+  --sn-genre-adaptation-speed: 0.5; /* 0-1 how quickly visual style adapts to genre changes */
+  --sn-genre-stability-preference: 0.6; /* 0-1 stability vs dynamic change preference */
+  /* Current genre information - for debugging and advanced effects */
+  --sn-current-genre: "unknown"; /* Current detected music genre string */
+  --sn-genre-confidence: 0.0; /* 0-1 confidence in genre detection */
+  /* 🌐 INTEGRATION SYSTEM VARIABLES - Phase 6 WebGL ↔ CSS Transition System */
+  /* Integration state and backend management */
+  --sn-integration-active: 0; /* 0/1 integration system active */
+  --sn-integration-mode: "progressive"; /* progressive, performance-first, quality-first, battery-optimized */
+  --sn-current-backend: "css"; /* css, webgl, hybrid */
+  --sn-webgl-enabled: 0; /* 0/1 WebGL backend enabled */
+  --sn-hybrid-mode: 0; /* 0/1 hybrid rendering mode */
+  /* Transition system controls */
+  --sn-gradient-transition-active: 0; /* 0/1 backend transition in progress */
+  --sn-gradient-transition-duration: 800ms; /* Transition duration */
+  --sn-gradient-transition-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Transition easing */
+  --sn-gradient-transition-progress: 0; /* 0-1 transition progress for progressive mode */
+  --sn-gradient-crossfade-opacity: 0; /* 0-1 crossfade opacity control */
+  /* Performance monitoring and adaptation */
+  --sn-system-health: "good"; /* excellent, good, degraded, critical */
+  --sn-system-health-score: 70; /* 0-100 numeric health score */
+  --sn-current-fps: 60; /* Current frame rate */
+  --sn-memory-usage: 0; /* Memory usage in MB */
+  --sn-adaptive-quality: 0.6; /* 0-1 current adaptive quality level */
+  --sn-adaptive-fps: 60; /* Current adaptive target FPS */
+  /* Integration mode flags */
+  --sn-performance-mode: 0; /* 0/1 performance-first mode active */
+  --sn-quality-mode: 0; /* 0/1 quality-first mode active */
+  --sn-battery-mode: 0; /* 0/1 battery-optimized mode active */
+  --sn-progressive-mode: 0; /* 0/1 progressive mode active */
+  /* Backend capability flags */
+  --sn-webgl2-available: 0; /* 0/1 WebGL2 support available */
+  --sn-high-performance-device: 0; /* 0/1 high-performance device detected */
+  --sn-thermal-throttling: 0; /* 0/1 thermal throttling active */
+  --sn-reduced-motion-detected: 0; /* 0/1 user prefers reduced motion */
   /* Phase 2: Natural easing curves – now alias to the canonical emergence easing */
   --sn-easing-emergence: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --sn-easing-organic: var(--sn-easing-emergence);
@@ -223,11 +373,118 @@
   --sn-webgl-ready: 0;
 }
 
-/* 🌌 YEAR 3000: Main gradient background overlay - BOLD COSMIC PRESENCE!*/
+/* 🌐 INTEGRATION SYSTEM RESPONSIVE STYLING - Phase 6 Backend Adaptation */
+/* Performance-first mode optimizations */
+:root[data-sn-mode=performance-first],
+html[style*="--sn-performance-mode: 1"] {
+  /* Reduce visual complexity for performance */
+  --sn-gradient-blur: 20px;
+  --sn-gradient-saturation: 1.2;
+  --sn-gradient-brightness: 1.1;
+  --sn-gradient-contrast: 1.1;
+  --sn-gradient-layer-harmonic: 0.3;
+  --sn-gradient-layer-quantum: 0.2;
+  --sn-gradient-layer-stellar: 0.1;
+}
+
+/* Quality-first mode enhancements */
+:root[data-sn-mode=quality-first],
+html[style*="--sn-quality-mode: 1"] {
+  /* Maximum visual quality */
+  --sn-gradient-blur: 50px;
+  --sn-gradient-saturation: 1.6;
+  --sn-gradient-brightness: 1.3;
+  --sn-gradient-contrast: 1.4;
+  --sn-gradient-layer-harmonic: 0.8;
+  --sn-gradient-layer-quantum: 0.6;
+  --sn-gradient-layer-stellar: 0.4;
+}
+
+/* Battery-optimized mode minimal styling */
+:root[data-sn-mode=battery-optimized],
+html[style*="--sn-battery-mode: 1"] {
+  /* Minimal resource usage */
+  --sn-gradient-blur: 15px;
+  --sn-gradient-saturation: 1.0;
+  --sn-gradient-brightness: 1.0;
+  --sn-gradient-contrast: 1.0;
+  --sn-gradient-layer-harmonic: 0.2;
+  --sn-gradient-layer-quantum: 0;
+  --sn-gradient-layer-stellar: 0;
+  --sn-gradient-transition: 1000ms ease;
+  /* Disable expensive animations */
+}
+:root[data-sn-mode=battery-optimized] *,
+html[style*="--sn-battery-mode: 1"] * {
+  animation-duration: 0.1s !important;
+  transition-duration: 0.3s !important;
+}
+
+/* WebGL enabled state - prepare for crossfade */
+html[style*="--sn-webgl-enabled: 1"] .Root__main-view::before {
+  /* Prepare CSS layer for potential fade-out */
+  transition: opacity var(--sn-gradient-transition-duration) var(--sn-gradient-transition-easing);
+}
+html[style*="--sn-webgl-enabled: 1"] .Root__main-view::after {
+  /* Temporal layer also participates in crossfade */
+  transition: opacity var(--sn-gradient-transition-duration) var(--sn-gradient-transition-easing);
+}
+
+/* Transition active state - smooth animations during backend switches */
+html[style*="--sn-gradient-transition-active: 1"] .Root__main-view::before,
+html[style*="--sn-gradient-transition-active: 1"] .Root__main-view::after,
+html[style*="--sn-gradient-transition-active: 1"] .sn-harmonic-layer,
+html[style*="--sn-gradient-transition-active: 1"] .sn-quantum-layer,
+html[style*="--sn-gradient-transition-active: 1"] .sn-stellar-layer {
+  transition: all var(--sn-gradient-transition-duration) var(--sn-gradient-transition-easing) !important;
+}
+
+/* System health responsive styling */
+html[style*="--sn-system-health: excellent"] {
+  /* Enhance visuals when system is performing well */
+  --sn-gradient-layer-consciousness: 1.1;
+  --sn-gradient-layer-temporal: 0.9;
+}
+
+html[style*="--sn-system-health: degraded"],
+html[style*="--sn-system-health: critical"] {
+  /* Reduce visuals when system is struggling */
+  --sn-gradient-layer-harmonic: calc(var(--sn-gradient-layer-harmonic) * 0.7);
+  --sn-gradient-layer-quantum: calc(var(--sn-gradient-layer-quantum) * 0.5);
+  --sn-gradient-layer-stellar: calc(var(--sn-gradient-layer-stellar) * 0.3);
+  --sn-gradient-transition: 500ms ease;
+}
+
+/* Reduced motion integration */
+html[style*="--sn-reduced-motion-detected: 1"] .Root__main-view::before,
+html[style*="--sn-reduced-motion-detected: 1"] .Root__main-view::after {
+  animation: none !important;
+  /* No transforms needed - background only */
+}
+
+/* Thermal throttling active - emergency performance mode */
+html[style*="--sn-thermal-throttling: 1"] {
+  /* Emergency resource conservation */
+  --sn-gradient-blur: 10px;
+  --sn-gradient-saturation: 1.0;
+  --sn-gradient-brightness: 1.0;
+  --sn-gradient-contrast: 1.0;
+  --sn-gradient-layer-harmonic: 0.1;
+  --sn-gradient-layer-quantum: 0;
+  --sn-gradient-layer-stellar: 0;
+  --sn-gradient-layer-temporal: 0.5;
+}
+html[style*="--sn-thermal-throttling: 1"] .Root__main-view::before,
+html[style*="--sn-thermal-throttling: 1"] .Root__main-view::after {
+  animation: none !important;
+  filter: blur(var(--sn-gradient-blur)) !important;
+}
+
+/* 🌌 YEAR 3000: Multi-Dimensional Gradient Consciousness System - FLUX AWAKENING!*/
 .Root__main-view {
   position: relative;
-  /* Primary gradient layer - YEAR 3000 RHYTHMIC CONSCIOUSNESS (Beats & Breathes!)*/
-  /* 🌟 YEAR 3000: Secondary accent gradient - Enhanced Cosmic Depth*/
+  /* CONSCIOUSNESS LAYER - Base reality perception (z-index: -10)*/
+  /* TEMPORAL LAYER - Time-flow perception (z-index: -9)*/
 }
 .Root__main-view::before {
   content: "";
@@ -236,42 +493,27 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(ellipse at calc(50% + var(--gradient-rhythm-phase) * 5% + var(--sn-gradient-flow-x)) calc(50% + var(--gradient-rhythm-phase) * 3% + var(--sn-gradient-flow-y)), rgba(var(--sn-gradient-primary-rgb), calc(0.35 + var(--gradient-beat-intensity) * 0.15)) 0%, rgba(var(--sn-gradient-secondary-rgb), calc(0.18 + var(--gradient-beat-intensity) * 0.08)) 40%, rgba(var(--sn-gradient-primary-rgb), calc(0.08 + var(--gradient-beat-intensity) * 0.04)) 70%, var(--spice-base) 100%);
-  background-size: calc(100% * var(--sn-gradient-flow-scale)) calc(100% * var(--sn-gradient-flow-scale));
-  opacity: var(--sn-dynamic-opacity);
+  background: radial-gradient(ellipse at calc(50% + var(--gradient-rhythm-phase) * 5% + var(--sn-gradient-flow-x)) calc(50% + var(--gradient-rhythm-phase) * 3% + var(--sn-gradient-flow-y)), rgba(var(--sn-gradient-primary-rgb), calc(0.35 + var(--gradient-beat-intensity) * 0.15 + var(--sn-gradient-consciousness-level) * 0.1)) 0%, rgba(var(--sn-gradient-secondary-rgb), calc(0.18 + var(--gradient-beat-intensity) * 0.08 + var(--sn-gradient-consciousness-level) * 0.05)) 40%, rgba(var(--sn-gradient-primary-rgb), calc(0.08 + var(--gradient-beat-intensity) * 0.04 + var(--sn-gradient-consciousness-level) * 0.03)) 70%, var(--spice-base) 100%);
+  background-size: calc(100% * var(--sn-gradient-flow-scale) * var(--sn-dynamic-harmonic-scale)) calc(100% * var(--sn-gradient-flow-scale) * var(--sn-dynamic-harmonic-scale));
+  opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-consciousness) * (1 - var(--sn-webgl-enabled) * var(--sn-gradient-crossfade-opacity)));
   z-index: -10;
-  transition: all var(--sn-gradient-transition), background-position calc(var(--sn-gradient-transition) * 0.6) linear;
-  filter: blur(var(--sn-gradient-blur)) saturate(var(--sn-dynamic-saturation)) brightness(var(--sn-dynamic-brightness)) contrast(var(--sn-gradient-contrast));
+  transition: all var(--sn-gradient-transition), background-position calc(var(--sn-gradient-transition) * 0.6) linear, opacity var(--sn-gradient-transition-duration) var(--sn-gradient-transition-easing);
+  filter: blur(var(--sn-gradient-blur)) saturate(var(--sn-dynamic-saturation)) brightness(var(--sn-dynamic-brightness)) contrast(var(--sn-dynamic-contrast)) hue-rotate(var(--sn-dynamic-temporal-shift));
   will-change: var(--sn-gpu-acceleration);
-  /* Phase 2: Match WebGL wrapper skew transform for visual consistency*/
-  transform: skewY(-6deg) translateZ(0);
-  transform-origin: center center;
-  /* Responsive: Disable skew on mobile (<= 768px)*/
+  /* Gradient backgrounds only - no DOM transforms */
+  /* Keep all filter effects for visual beauty */
   /* Accessibility: Honor reduced motion preference*/
-}
-@media (max-width: 768px) {
-  .Root__main-view::before {
-    transform: skewY(0deg) translateZ(0);
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .Root__main-view::before {
-    transform: skewY(0deg) translateZ(0);
     animation: none;
+    filter: blur(var(--sn-gradient-blur)) saturate(var(--sn-dynamic-saturation)) brightness(var(--sn-dynamic-brightness)) contrast(var(--sn-gradient-contrast));
   }
 }
 @media (prefers-reduced-motion: no-preference) {
   .Root__main-view::before {
-    animation: cosmic-pulse calc(4s * var(--gradient-breathing-scale)) ease-in-out infinite;
-    animation-duration: calc(4s * var(--gradient-breathing-scale) / (var(--sn-music-energy, 0.5) + 0.5));
-    /* Enhanced transform with skew + breathing + rotation*/
-    transform: skewY(-6deg) translateZ(0) scale(var(--gradient-breathing-scale)) rotate(calc(var(--gradient-rhythm-phase) * 0.5deg));
-    /* Responsive: Disable skew but keep other transforms on mobile*/
-  }
-}
-@media (prefers-reduced-motion: no-preference) and (max-width: 768px) {
-  .Root__main-view::before {
-    transform: skewY(0deg) translateZ(0) scale(var(--gradient-breathing-scale)) rotate(calc(var(--gradient-rhythm-phase) * 0.5deg));
+    animation: consciousness-pulse calc(4s * var(--gradient-breathing-scale) / var(--sn-emotional-animation-speed)) ease-in-out infinite;
+    animation-duration: calc(4s * var(--gradient-breathing-scale) / (var(--sn-music-energy, 0.5) + 0.5) / var(--sn-emotional-animation-speed));
   }
 }
 .Root__main-view::after {
@@ -281,29 +523,456 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(var(--sn-gradient-accent-rgb), 0.22) 0%, transparent 30%, transparent 70%, rgba(var(--sn-gradient-accent-rgb), 0.12) 100%);
-  opacity: calc(var(--sn-dynamic-opacity) * 0.8); /* Music-responsive with 80% intensity*/
+  background: linear-gradient(calc(135deg + var(--sn-gradient-temporal-phase) * 90deg), rgba(var(--sn-gradient-accent-rgb), calc(0.15 * var(--sn-gradient-temporal-memory))) 0%, transparent 30%, transparent 70%, rgba(var(--sn-gradient-accent-rgb), calc(0.08 * var(--sn-gradient-temporal-memory))) 100%);
+  opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-temporal) * (1 - var(--sn-webgl-enabled) * var(--sn-gradient-crossfade-opacity)));
   z-index: -9;
-  transition: all var(--sn-gradient-transition);
-  /* Phase 2: GPU acceleration for organic transitions*/
+  transition: all calc(var(--sn-gradient-transition) * 1.5), opacity var(--sn-gradient-transition-duration) var(--sn-gradient-transition-easing);
   will-change: var(--sn-gpu-acceleration);
-  transform: translateZ(0); /* Force GPU layer*/
-  will-change: transform, opacity, filter;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  perspective: 1000px;
-  contain: style paint;
+  transform: translateZ(0) scale(calc(1 + var(--sn-gradient-predictive-flow) * 0.1));
+  /* Temporal flow animation */
+}
+@media (prefers-reduced-motion: no-preference) {
+  .Root__main-view::after {
+    animation: temporal-flow calc(8s * var(--gradient-breathing-scale)) linear infinite;
+  }
 }
 
-/* 🌌 COSMIC PULSE ANIMATION - Music-Responsive Breathing*/
-@keyframes cosmic-pulse {
+/* 🌌 FLUX COSMIC NOISE SIMULATION - Multi-layer CSS Stardust System */
+.sn-cosmic-noise-field {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -13;
+  pointer-events: none;
+  opacity: calc(var(--sn-gradient-layer-quantum) * var(--sn-gradient-cosmic-dust, 0.3));
+  /* Base noise using layered radial gradients */
+  background: radial-gradient(circle 2px at 23% 31%, rgba(var(--sn-gradient-primary-rgb), 0.04) 0%, transparent 50%), radial-gradient(circle 1px at 67% 73%, rgba(var(--sn-gradient-secondary-rgb), 0.03) 0%, transparent 40%), radial-gradient(circle 3px at 89% 17%, rgba(var(--sn-gradient-accent-rgb), 0.02) 0%, transparent 60%), radial-gradient(circle 1px at 12% 88%, rgba(var(--sn-gradient-primary-rgb), 0.03) 0%, transparent 45%), radial-gradient(circle 2px at 78% 34%, rgba(var(--sn-gradient-secondary-rgb), 0.02) 0%, transparent 35%), radial-gradient(circle 6px at 34% 67%, rgba(var(--sn-gradient-primary-rgb), 0.06) 0%, transparent 70%), radial-gradient(circle 4px at 82% 91%, rgba(var(--sn-gradient-secondary-rgb), 0.04) 0%, transparent 55%), radial-gradient(circle 8px at 16% 45%, rgba(var(--sn-gradient-accent-rgb), 0.03) 0%, transparent 80%), radial-gradient(circle 5px at 91% 23%, rgba(var(--sn-gradient-primary-rgb), 0.05) 0%, transparent 65%), radial-gradient(circle 7px at 45% 12%, rgba(var(--sn-gradient-secondary-rgb), 0.04) 0%, transparent 75%), radial-gradient(circle 15px at 56% 78%, rgba(var(--sn-gradient-primary-rgb), 0.08) 0%, transparent 85%), radial-gradient(circle 12px at 23% 34%, rgba(var(--sn-gradient-secondary-rgb), 0.06) 0%, transparent 80%), radial-gradient(circle 18px at 78% 56%, rgba(var(--sn-gradient-accent-rgb), 0.05) 0%, transparent 90%), radial-gradient(circle 10px at 34% 89%, rgba(var(--sn-gradient-primary-rgb), 0.07) 0%, transparent 75%), radial-gradient(circle 14px at 89% 12%, rgba(var(--sn-gradient-secondary-rgb), 0.06) 0%, transparent 85%), radial-gradient(circle 40px at 45% 55%, rgba(var(--sn-gradient-primary-rgb), 0.1) 0%, transparent 95%), radial-gradient(circle 35px at 75% 25%, rgba(var(--sn-gradient-secondary-rgb), 0.08) 0%, transparent 90%), radial-gradient(circle 50px at 25% 75%, rgba(var(--sn-gradient-accent-rgb), 0.06) 0%, transparent 100%);
+  /* Animated noise movement */
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 120% 120%, 120% 120%, 120% 120%, 120% 120%, 120% 120%, 150% 150%, 150% 150%, 150% 150%, 150% 150%, 150% 150%, 200% 200%, 200% 200%, 200% 200%; /* Ultra-low freq */
+  will-change: transform, opacity;
+  transition: opacity calc(var(--sn-gradient-transition) * 2);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sn-cosmic-noise-field {
+    animation: cosmic-noise-drift calc(30s * var(--gradient-breathing-scale)) linear infinite;
+  }
+}
+
+/* Additional noise layers for increased complexity */
+.sn-cosmic-noise-field::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Fractal noise pattern */
+  background: radial-gradient(circle 1px at 11% 22%, rgba(var(--sn-gradient-primary-rgb), 0.02) 0%, transparent 30%), radial-gradient(circle 1px at 33% 44%, rgba(var(--sn-gradient-secondary-rgb), 0.02) 0%, transparent 30%), radial-gradient(circle 1px at 55% 66%, rgba(var(--sn-gradient-accent-rgb), 0.02) 0%, transparent 30%), radial-gradient(circle 1px at 77% 88%, rgba(var(--sn-gradient-primary-rgb), 0.02) 0%, transparent 30%), radial-gradient(circle 1px at 99% 11%, rgba(var(--sn-gradient-secondary-rgb), 0.02) 0%, transparent 30%), radial-gradient(circle 1px at 22% 77%, rgba(var(--sn-gradient-accent-rgb), 0.02) 0%, transparent 30%), radial-gradient(circle 1px at 44% 99%, rgba(var(--sn-gradient-primary-rgb), 0.02) 0%, transparent 30%), radial-gradient(circle 1px at 66% 33%, rgba(var(--sn-gradient-secondary-rgb), 0.02) 0%, transparent 30%), radial-gradient(circle 1px at 88% 55%, rgba(var(--sn-gradient-accent-rgb), 0.02) 0%, transparent 30%);
+  background-size: 80% 80%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sn-cosmic-noise-field::before {
+    animation: cosmic-noise-drift calc(45s * var(--gradient-breathing-scale)) linear infinite reverse;
+  }
+}
+
+.sn-cosmic-noise-field::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Stellar dust particles */
+  background: radial-gradient(circle 0.5px at 15% 25%, rgba(var(--sn-gradient-primary-rgb), 0.06) 0%, transparent 25%), radial-gradient(circle 0.5px at 35% 45%, rgba(var(--sn-gradient-secondary-rgb), 0.06) 0%, transparent 25%), radial-gradient(circle 0.5px at 55% 65%, rgba(var(--sn-gradient-accent-rgb), 0.06) 0%, transparent 25%), radial-gradient(circle 0.5px at 75% 85%, rgba(var(--sn-gradient-primary-rgb), 0.06) 0%, transparent 25%), radial-gradient(circle 0.5px at 95% 15%, rgba(var(--sn-gradient-secondary-rgb), 0.06) 0%, transparent 25%), radial-gradient(circle 0.5px at 25% 75%, rgba(var(--sn-gradient-accent-rgb), 0.06) 0%, transparent 25%), radial-gradient(circle 0.5px at 45% 95%, rgba(var(--sn-gradient-primary-rgb), 0.06) 0%, transparent 25%), radial-gradient(circle 0.5px at 65% 35%, rgba(var(--sn-gradient-secondary-rgb), 0.06) 0%, transparent 25%), radial-gradient(circle 0.5px at 85% 55%, rgba(var(--sn-gradient-accent-rgb), 0.06) 0%, transparent 25%);
+  background-size: 60% 60%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sn-cosmic-noise-field::after {
+    animation: cosmic-noise-drift calc(60s * var(--gradient-breathing-scale)) linear infinite;
+  }
+}
+
+/* 🌊 HARMONIC LAYER - Frequency resonance visualization */
+.Root__main-view .sn-harmonic-layer {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -8;
+  opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-harmonic));
+  background: conic-gradient(from calc(var(--sn-gradient-harmonic-resonance) * 360deg), rgba(var(--sn-gradient-primary-rgb), calc(0.12 * var(--sn-gradient-bass-response))) 0%, rgba(var(--sn-gradient-secondary-rgb), calc(0.08 * var(--sn-gradient-mid-response))) 120deg, rgba(var(--sn-gradient-accent-rgb), calc(0.06 * var(--sn-gradient-treble-response))) 240deg, rgba(var(--sn-gradient-primary-rgb), calc(0.12 * var(--sn-gradient-bass-response))) 360deg);
+  background-size: 150% 150%;
+  background-position: center;
+  transition: all calc(var(--sn-gradient-transition) * 0.8);
+  will-change: var(--sn-gpu-acceleration);
+  transform: translateZ(0) rotate(calc(var(--sn-gradient-harmonic-resonance) * 45deg));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .Root__main-view .sn-harmonic-layer {
+    animation: harmonic-resonance calc(6s * var(--gradient-breathing-scale)) ease-in-out infinite;
+  }
+}
+
+/* ⚡ QUANTUM LAYER - Probability state visualization */
+.Root__main-view .sn-quantum-layer {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -7;
+  opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-quantum));
+  background: radial-gradient(circle at 20% 30%, rgba(var(--sn-gradient-primary-rgb), calc(0.05 * var(--sn-gradient-quantum-coherence))) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(var(--sn-gradient-secondary-rgb), calc(0.04 * var(--sn-gradient-quantum-coherence))) 0%, transparent 35%), radial-gradient(circle at 50% 80%, rgba(var(--sn-gradient-accent-rgb), calc(0.03 * var(--sn-gradient-quantum-coherence))) 0%, transparent 30%);
+  transition: all calc(var(--sn-gradient-transition) * 2);
+  will-change: var(--sn-gpu-acceleration);
+  transform: translateZ(0) scale(calc(1 + var(--sn-dynamic-quantum-coherence) * 0.2));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .Root__main-view .sn-quantum-layer {
+    animation: quantum-fluctuation calc(10s * var(--gradient-breathing-scale)) linear infinite;
+  }
+}
+
+/* 🌊 WAVE DYNAMICS LAYER - Musical Flow Effects */
+.Root__main-view .sn-wave-dynamics {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -5;
+  opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-wave-intensity, 0.4));
+  /* Bass-responsive wave pattern using clip-path */
+  background: linear-gradient(calc(90deg + var(--sn-gradient-temporal-phase) * 180deg), rgba(var(--sn-gradient-primary-rgb), calc(0.08 * var(--sn-gradient-bass-response))) 0%, rgba(var(--sn-gradient-secondary-rgb), calc(0.06 * var(--sn-gradient-mid-response))) 50%, rgba(var(--sn-gradient-accent-rgb), calc(0.04 * var(--sn-gradient-treble-response))) 100%);
+  /* Wave clip-path animation - creates flowing wave effects */
+  clip-path: polygon(0% calc(50% + var(--sn-gradient-bass-response) * 20%), 10% calc(45% + var(--sn-gradient-mid-response) * 15%), 20% calc(55% + var(--sn-gradient-treble-response) * 10%), 30% calc(48% + var(--sn-gradient-bass-response) * 18%), 40% calc(52% + var(--sn-gradient-mid-response) * 12%), 50% calc(46% + var(--sn-gradient-treble-response) * 8%), 60% calc(54% + var(--sn-gradient-bass-response) * 16%), 70% calc(49% + var(--sn-gradient-mid-response) * 14%), 80% calc(51% + var(--sn-gradient-treble-response) * 6%), 90% calc(47% + var(--sn-gradient-bass-response) * 20%), 100% calc(53% + var(--sn-gradient-mid-response) * 15%), 100% 100%, 0% 100%);
+  transition: all calc(var(--sn-gradient-transition) * 0.5);
+  will-change: var(--sn-gpu-acceleration);
+  transform: translateZ(0) translateY(calc(var(--sn-gradient-temporal-phase) * 20px));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .Root__main-view .sn-wave-dynamics {
+    animation: wave-flow calc(12s * var(--gradient-breathing-scale)) ease-in-out infinite;
+  }
+}
+
+/* 🌊 FLOW EFFECTS LAYER - Advanced Temporal Patterns */
+.Root__main-view .sn-flow-effects {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -4;
+  opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-flow-intensity, 0.3));
+  /* Multi-directional flow pattern */
+  background: linear-gradient(to bottom, transparent 0%, rgba(var(--sn-gradient-primary-rgb), calc(0.04 * var(--sn-gradient-temporal-flow-speed, 1))) 30%, transparent 50%, rgba(var(--sn-gradient-secondary-rgb), calc(0.03 * var(--sn-gradient-temporal-flow-speed, 1))) 70%, transparent 100%), linear-gradient(to right, transparent 0%, rgba(var(--sn-gradient-accent-rgb), calc(0.02 * var(--sn-gradient-temporal-flow-speed, 1))) 25%, transparent 50%, rgba(var(--sn-gradient-primary-rgb), calc(0.03 * var(--sn-gradient-temporal-flow-speed, 1))) 75%, transparent 100%);
+  /* Dynamic clipping based on harmonic content */
+  clip-path: ellipse(calc(40% + var(--sn-gradient-harmonic-resonance) * 30%) calc(60% + var(--sn-gradient-consciousness-level) * 20%) at calc(50% + var(--sn-gradient-emotional-valence) * 20% - 10%) calc(50% + var(--sn-gradient-cosmic-energy) * 15% - 7.5%));
+  transition: all calc(var(--sn-gradient-transition) * 1.5);
+  will-change: var(--sn-gpu-acceleration);
+  transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.5));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .Root__main-view .sn-flow-effects {
+    animation: flow-evolution calc(16s * var(--gradient-breathing-scale)) linear infinite;
+  }
+}
+
+/* 🌌 PROCEDURAL NEBULA LAYER - Dynamic cosmic cloud generation */
+.Root__main-view .sn-procedural-nebula {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -3;
+  opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-nebula-intensity, 0.2));
+  /* Multi-layer procedural nebula system */
+  background: radial-gradient(ellipse calc(60% + var(--sn-gradient-consciousness-level) * 40%) calc(40% + var(--sn-gradient-nebula-density) * 30%) at calc(20% + var(--sn-gradient-emotional-valence) * 60%) calc(30% + var(--sn-gradient-cosmic-energy) * 50%), rgba(var(--sn-gradient-primary-rgb), calc(0.12 * var(--sn-gradient-nebula-density))) 0%, rgba(var(--sn-gradient-secondary-rgb), calc(0.08 * var(--sn-gradient-nebula-density))) 30%, rgba(var(--sn-gradient-accent-rgb), calc(0.04 * var(--sn-gradient-nebula-density))) 60%, transparent 100%), radial-gradient(ellipse calc(40% + var(--sn-gradient-harmonic-resonance) * 35%) calc(70% + var(--sn-gradient-quantum-coherence) * 25%) at calc(70% + var(--sn-gradient-temporal-phase) * 20% - 10%) calc(60% + var(--sn-gradient-stellar-drift) * 0.5% + 20%), rgba(var(--sn-gradient-secondary-rgb), calc(0.1 * var(--sn-gradient-nebula-density))) 0%, rgba(var(--sn-gradient-accent-rgb), calc(0.06 * var(--sn-gradient-nebula-density))) 40%, rgba(var(--sn-gradient-primary-rgb), calc(0.03 * var(--sn-gradient-nebula-density))) 70%, transparent 100%), radial-gradient(ellipse calc(25% + var(--sn-gradient-bass-response) * 30%) calc(50% + var(--sn-gradient-mid-response) * 25%) at calc(40% + var(--sn-gradient-treble-response) * 30%) calc(80% + var(--sn-gradient-consciousness-level) * 15% - 7.5%), rgba(var(--sn-gradient-accent-rgb), calc(0.08 * var(--sn-gradient-nebula-density))) 0%, rgba(var(--sn-gradient-primary-rgb), calc(0.05 * var(--sn-gradient-nebula-density))) 50%, transparent 100%), linear-gradient(calc(135deg + var(--sn-gradient-stellar-drift) * 2), rgba(var(--sn-gradient-primary-rgb), calc(0.06 * var(--sn-gradient-nebula-density))) 0%, transparent 25%, rgba(var(--sn-gradient-secondary-rgb), calc(0.04 * var(--sn-gradient-nebula-density))) 50%, transparent 75%, rgba(var(--sn-gradient-accent-rgb), calc(0.02 * var(--sn-gradient-nebula-density))) 100%);
+  /* Dynamic nebula movement and morphing */
+  background-size: 180% 150%, 120% 160%, 100% 130%, 200% 100%; /* Atmospheric layers */
+  background-position: calc(0% + var(--sn-gradient-temporal-phase) * 20%) calc(0% + var(--sn-gradient-cosmic-energy) * 15%), calc(20% + var(--sn-gradient-harmonic-resonance) * 30%) calc(30% + var(--sn-gradient-emotional-valence) * 25%), calc(40% + var(--sn-gradient-bass-response) * 40%) calc(60% + var(--sn-gradient-mid-response) * 35%), calc(60% + var(--sn-gradient-treble-response) * 20%) calc(80% + var(--sn-gradient-quantum-coherence) * 15%);
+  transition: all calc(var(--sn-gradient-transition) * 4);
+  will-change: var(--sn-gpu-acceleration);
+  transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.3)) scale(calc(1 + var(--sn-gradient-consciousness-level) * 0.1));
+  /* Nebula density controls via CSS variable */
+  filter: blur(calc(8px + var(--sn-gradient-nebula-blur, 0) * 12px)) contrast(calc(1 + var(--sn-gradient-nebula-contrast, 0) * 0.3));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .Root__main-view .sn-procedural-nebula {
+    animation: nebula-evolution calc(35s * var(--gradient-breathing-scale)) ease-in-out infinite;
+  }
+}
+
+/* Additional nebula detail layers */
+.Root__main-view .sn-procedural-nebula::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Micro-nebula structures - fine detail layer */
+  background: radial-gradient(circle calc(8% + var(--sn-gradient-stellar-birth-rate, 0.3) * 12%) at calc(15% + var(--sn-gradient-consciousness-level) * 70%) calc(25% + var(--sn-gradient-cosmic-energy) * 60%), rgba(var(--sn-gradient-primary-rgb), calc(0.15 * var(--sn-gradient-nebula-density))) 0%, rgba(var(--sn-gradient-accent-rgb), calc(0.08 * var(--sn-gradient-nebula-density))) 40%, transparent 80%), radial-gradient(circle calc(6% + var(--sn-gradient-stellar-birth-rate, 0.3) * 8%) at calc(85% + var(--sn-gradient-harmonic-resonance) * 10% - 5%) calc(75% + var(--sn-gradient-temporal-phase) * 20% - 10%), rgba(var(--sn-gradient-secondary-rgb), calc(0.12 * var(--sn-gradient-nebula-density))) 0%, rgba(var(--sn-gradient-primary-rgb), calc(0.06 * var(--sn-gradient-nebula-density))) 50%, transparent 85%), radial-gradient(ellipse calc(30% + var(--sn-gradient-dark-matter, 0.2) * 20%) calc(15% + var(--sn-gradient-quantum-coherence) * 25%) at calc(60% + var(--sn-gradient-emotional-valence) * 30% - 15%) calc(40% + var(--sn-gradient-bass-response) * 40% - 20%), rgba(0, 0, 0, calc(0.08 * var(--sn-gradient-nebula-density))) 0%, rgba(0, 0, 0, calc(0.04 * var(--sn-gradient-nebula-density))) 60%, transparent 100%);
+  background-size: 150% 120%, 130% 140%, 180% 160%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .Root__main-view .sn-procedural-nebula::before {
+    animation: nebula-evolution calc(50s * var(--gradient-breathing-scale)) ease-in-out infinite reverse;
+  }
+}
+
+.Root__main-view .sn-procedural-nebula::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Emission nebula highlights - ionized gas regions */
+  background: radial-gradient(circle calc(4% + var(--sn-gradient-ionization-level, 0.4) * 8%) at calc(30% + var(--sn-gradient-bass-response) * 50%) calc(70% + var(--sn-gradient-mid-response) * 25%), rgba(255, 100, 100, calc(0.1 * var(--sn-gradient-nebula-density))) 0%, rgba(255, 150, 120, calc(0.05 * var(--sn-gradient-nebula-density))) 50%, transparent 100%), radial-gradient(circle calc(3% + var(--sn-gradient-ionization-level, 0.4) * 6%) at calc(75% + var(--sn-gradient-treble-response) * 20% - 10%) calc(30% + var(--sn-gradient-consciousness-level) * 40% - 20%), rgba(100, 255, 200, calc(0.08 * var(--sn-gradient-nebula-density))) 0%, rgba(150, 255, 220, calc(0.04 * var(--sn-gradient-nebula-density))) 60%, transparent 100%), radial-gradient(ellipse calc(12% + var(--sn-gradient-reflection-intensity, 0.3) * 18%) calc(8% + var(--sn-gradient-quantum-coherence) * 12%) at calc(50% + var(--sn-gradient-stellar-drift) * 0.8% + 25%) calc(85% + var(--sn-gradient-harmonic-resonance) * 10% - 5%), rgba(120, 150, 255, calc(0.06 * var(--sn-gradient-nebula-density))) 0%, rgba(100, 130, 255, calc(0.03 * var(--sn-gradient-nebula-density))) 70%, transparent 100%);
+  background-size: 110% 130%, 140% 110%, 160% 120%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .Root__main-view .sn-procedural-nebula::after {
+    animation: nebula-evolution calc(40s * var(--gradient-breathing-scale)) ease-in-out infinite;
+  }
+}
+
+/* 🌌 STELLAR LAYER - Cosmic phenomena visualization */
+.Root__main-view .sn-stellar-layer {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -6;
+  opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-stellar));
+  background: radial-gradient(ellipse at 10% 20%, rgba(var(--sn-gradient-primary-rgb), calc(0.03 * var(--sn-gradient-nebula-density))) 0%, transparent 50%), radial-gradient(ellipse at 90% 80%, rgba(var(--sn-gradient-secondary-rgb), calc(0.02 * var(--sn-gradient-nebula-density))) 0%, transparent 45%), linear-gradient(180deg, rgba(var(--sn-gradient-accent-rgb), calc(0.01 * var(--sn-gradient-aurora-intensity))) 0%, transparent 20%);
+  transition: all calc(var(--sn-gradient-transition) * 3);
+  will-change: var(--sn-gpu-acceleration);
+  transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.1));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .Root__main-view .sn-stellar-layer {
+    animation: stellar-drift calc(20s * var(--gradient-breathing-scale)) linear infinite;
+  }
+}
+
+/* 🌌 FLUX CONSCIOUSNESS ANIMATIONS - Multi-Dimensional Awareness */
+/* Consciousness Layer - Base reality breathing */
+@keyframes consciousness-pulse {
   0%, 100% {
-    opacity: var(--sn-dynamic-opacity);
-    transform: translateZ(0) scale(1);
+    opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-consciousness));
+    /* No transforms - background colors only */
   }
   50% {
-    opacity: calc(var(--sn-dynamic-opacity) * 1.2);
-    transform: translateZ(0) scale(1.01);
+    opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-consciousness) * 1.2);
+    /* No transforms - background colors only */
+  }
+}
+/* Temporal Layer - Time-flow animation */
+@keyframes temporal-flow {
+  0% {
+    background-position: 0% 0%;
+    transform: translateZ(0) scale(calc(1 + var(--sn-gradient-predictive-flow) * 0.1));
+  }
+  50% {
+    background-position: 100% 100%;
+    transform: translateZ(0) scale(calc(1 + var(--sn-gradient-predictive-flow) * 0.1 + 0.02));
+  }
+  100% {
+    background-position: 0% 0%;
+    transform: translateZ(0) scale(calc(1 + var(--sn-gradient-predictive-flow) * 0.1));
+  }
+}
+/* Harmonic Layer - Frequency resonance */
+@keyframes harmonic-resonance {
+  0% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-harmonic-resonance) * 45deg));
+    background-size: 150% 150%;
+  }
+  33% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-harmonic-resonance) * 45deg + 15deg));
+    background-size: 160% 160%;
+  }
+  66% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-harmonic-resonance) * 45deg - 10deg));
+    background-size: 140% 140%;
+  }
+  100% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-harmonic-resonance) * 45deg));
+    background-size: 150% 150%;
+  }
+}
+/* Quantum Layer - Probability fluctuation */
+@keyframes quantum-fluctuation {
+  0% {
+    transform: translateZ(0) scale(calc(1 + var(--sn-dynamic-quantum-coherence) * 0.2));
+    opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-quantum));
+  }
+  25% {
+    transform: translateZ(0) scale(calc(1 + var(--sn-dynamic-quantum-coherence) * 0.2 + 0.05));
+    opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-quantum) * 1.3);
+  }
+  50% {
+    transform: translateZ(0) scale(calc(1 + var(--sn-dynamic-quantum-coherence) * 0.2 - 0.03));
+    opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-quantum) * 0.7);
+  }
+  75% {
+    transform: translateZ(0) scale(calc(1 + var(--sn-dynamic-quantum-coherence) * 0.2 + 0.08));
+    opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-quantum) * 1.1);
+  }
+  100% {
+    transform: translateZ(0) scale(calc(1 + var(--sn-dynamic-quantum-coherence) * 0.2));
+    opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-quantum));
+  }
+}
+/* Stellar Layer - Cosmic drift */
+@keyframes stellar-drift {
+  0% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.1));
+    background-position: 0% 0%, 100% 100%, 50% 0%;
+  }
+  33% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.1 + 2deg));
+    background-position: 30% 20%, 70% 80%, 50% 10%;
+  }
+  66% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.1 - 1deg));
+    background-position: 60% 40%, 40% 60%, 50% 5%;
+  }
+  100% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.1));
+    background-position: 0% 0%, 100% 100%, 50% 0%;
+  }
+}
+/* Cosmic Noise Drift - Multi-layer stardust movement */
+@keyframes cosmic-noise-drift {
+  0% {
+    transform: translateZ(0) rotate(0deg) scale(1);
+    background-position: 0% 0%;
+  }
+  25% {
+    transform: translateZ(0) rotate(1deg) scale(1.01);
+    background-position: 25% 25%;
+  }
+  50% {
+    transform: translateZ(0) rotate(0deg) scale(1);
+    background-position: 50% 50%;
+  }
+  75% {
+    transform: translateZ(0) rotate(-1deg) scale(0.99);
+    background-position: 75% 75%;
+  }
+  100% {
+    transform: translateZ(0) rotate(0deg) scale(1);
+    background-position: 100% 100%;
+  }
+}
+/* Wave Flow - Dynamic wave patterns responding to bass */
+@keyframes wave-flow {
+  0% {
+    transform: translateZ(0) translateY(0px) scaleY(1);
+    clip-path: polygon(0% calc(50% + var(--sn-gradient-bass-response) * 20%), 25% calc(45% + var(--sn-gradient-mid-response) * 15%), 50% calc(55% + var(--sn-gradient-treble-response) * 10%), 75% calc(48% + var(--sn-gradient-bass-response) * 18%), 100% calc(52% + var(--sn-gradient-mid-response) * 12%), 100% 100%, 0% 100%);
+  }
+  25% {
+    transform: translateZ(0) translateY(calc(var(--sn-gradient-temporal-phase) * 15px)) scaleY(1.02);
+    clip-path: polygon(0% calc(48% + var(--sn-gradient-bass-response) * 25%), 25% calc(52% + var(--sn-gradient-mid-response) * 18%), 50% calc(46% + var(--sn-gradient-treble-response) * 12%), 75% calc(54% + var(--sn-gradient-bass-response) * 22%), 100% calc(49% + var(--sn-gradient-mid-response) * 16%), 100% 100%, 0% 100%);
+  }
+  50% {
+    transform: translateZ(0) translateY(calc(var(--sn-gradient-temporal-phase) * 20px)) scaleY(1);
+    clip-path: polygon(0% calc(52% + var(--sn-gradient-bass-response) * 22%), 25% calc(46% + var(--sn-gradient-mid-response) * 20%), 50% calc(54% + var(--sn-gradient-treble-response) * 14%), 75% calc(47% + var(--sn-gradient-bass-response) * 24%), 100% calc(53% + var(--sn-gradient-mid-response) * 18%), 100% 100%, 0% 100%);
+  }
+  75% {
+    transform: translateZ(0) translateY(calc(var(--sn-gradient-temporal-phase) * 10px)) scaleY(0.98);
+    clip-path: polygon(0% calc(49% + var(--sn-gradient-bass-response) * 18%), 25% calc(53% + var(--sn-gradient-mid-response) * 14%), 50% calc(47% + var(--sn-gradient-treble-response) * 16%), 75% calc(51% + var(--sn-gradient-bass-response) * 20%), 100% calc(48% + var(--sn-gradient-mid-response) * 22%), 100% 100%, 0% 100%);
+  }
+  100% {
+    transform: translateZ(0) translateY(0px) scaleY(1);
+    clip-path: polygon(0% calc(50% + var(--sn-gradient-bass-response) * 20%), 25% calc(45% + var(--sn-gradient-mid-response) * 15%), 50% calc(55% + var(--sn-gradient-treble-response) * 10%), 75% calc(48% + var(--sn-gradient-bass-response) * 18%), 100% calc(52% + var(--sn-gradient-mid-response) * 12%), 100% 100%, 0% 100%);
+  }
+}
+/* Flow Evolution - Advanced temporal flow patterns */
+@keyframes flow-evolution {
+  0% {
+    transform: translateZ(0) rotate(0deg) scale(1);
+    clip-path: ellipse(calc(40% + var(--sn-gradient-harmonic-resonance) * 30%) calc(60% + var(--sn-gradient-consciousness-level) * 20%) at 50% 50%);
+    background-position: 0% 0%, 0% 0%;
+  }
+  20% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.3)) scale(1.05);
+    clip-path: ellipse(calc(50% + var(--sn-gradient-harmonic-resonance) * 25%) calc(55% + var(--sn-gradient-consciousness-level) * 25%) at calc(45% + var(--sn-gradient-emotional-valence) * 10%) 55%);
+    background-position: 20% 10%, 10% 20%;
+  }
+  40% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.6)) scale(0.95);
+    clip-path: ellipse(calc(35% + var(--sn-gradient-harmonic-resonance) * 40%) calc(70% + var(--sn-gradient-consciousness-level) * 15%) at calc(55% + var(--sn-gradient-emotional-valence) * 15%) 45%);
+    background-position: 40% 30%, 30% 40%;
+  }
+  60% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.4)) scale(1.08);
+    clip-path: ellipse(calc(60% + var(--sn-gradient-harmonic-resonance) * 20%) calc(45% + var(--sn-gradient-consciousness-level) * 30%) at calc(40% + var(--sn-gradient-emotional-valence) * 20%) 60%);
+    background-position: 60% 50%, 50% 60%;
+  }
+  80% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.2)) scale(1.02);
+    clip-path: ellipse(calc(45% + var(--sn-gradient-harmonic-resonance) * 35%) calc(65% + var(--sn-gradient-consciousness-level) * 18%) at calc(60% + var(--sn-gradient-emotional-valence) * 5%) 40%);
+    background-position: 80% 70%, 70% 80%;
+  }
+  100% {
+    transform: translateZ(0) rotate(0deg) scale(1);
+    clip-path: ellipse(calc(40% + var(--sn-gradient-harmonic-resonance) * 30%) calc(60% + var(--sn-gradient-consciousness-level) * 20%) at 50% 50%);
+    background-position: 100% 100%, 100% 100%;
+  }
+}
+/* Nebula Evolution - Procedural cosmic cloud morphing */
+@keyframes nebula-evolution {
+  0% {
+    transform: translateZ(0) rotate(0deg) scale(1);
+    background-position: 0% 0%, 20% 30%, 40% 60%, 60% 80%, 15% 25%, 85% 75%, 60% 40%, 30% 70%, 75% 30%, 50% 85%; /* Emission regions */
+    filter: blur(8px) contrast(1);
+  }
+  16% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.2)) scale(1.03);
+    background-position: 5% 10%, 25% 25%, 35% 65%, 65% 75%, 20% 30%, 80% 70%, 55% 45%, 35% 65%, 70% 35%, 45% 80%;
+    filter: blur(calc(8px + var(--sn-gradient-nebula-blur, 0) * 6px)) contrast(calc(1 + var(--sn-gradient-consciousness-level) * 0.2));
+  }
+  33% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.4)) scale(0.97);
+    background-position: 15% 5%, 30% 35%, 45% 55%, 55% 85%, 10% 35%, 90% 65%, 65% 35%, 25% 75%, 80% 25%, 55% 90%;
+    filter: blur(calc(12px + var(--sn-gradient-nebula-blur, 0) * 4px)) contrast(calc(1 + var(--sn-gradient-harmonic-resonance) * 0.15));
+  }
+  50% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.6)) scale(1.05);
+    background-position: 10% 20%, 40% 40%, 30% 70%, 70% 60%, 25% 20%, 75% 80%, 50% 50%, 40% 60%, 65% 40%, 35% 75%;
+    filter: blur(calc(6px + var(--sn-gradient-nebula-blur, 0) * 8px)) contrast(calc(1 + var(--sn-gradient-emotional-valence) * 0.25));
+  }
+  66% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.3)) scale(1.01);
+    background-position: 25% 15%, 35% 50%, 50% 45%, 45% 90%, 30% 40%, 70% 60%, 40% 30%, 20% 80%, 85% 20%, 60% 70%;
+    filter: blur(calc(10px + var(--sn-gradient-nebula-blur, 0) * 2px)) contrast(calc(1 + var(--sn-gradient-cosmic-energy) * 0.3));
+  }
+  83% {
+    transform: translateZ(0) rotate(calc(var(--sn-gradient-stellar-drift) * 0.1)) scale(0.99);
+    background-position: 20% 25%, 45% 20%, 25% 80%, 80% 40%, 5% 60%, 95% 50%, 70% 20%, 45% 85%, 60% 15%, 25% 65%;
+    filter: blur(calc(14px + var(--sn-gradient-nebula-blur, 0) * 6px)) contrast(calc(1 + var(--sn-gradient-quantum-coherence) * 0.2));
+  }
+  100% {
+    transform: translateZ(0) rotate(0deg) scale(1);
+    background-position: 0% 0%, 20% 30%, 40% 60%, 60% 80%, 15% 25%, 85% 75%, 60% 40%, 30% 70%, 75% 30%, 50% 85%;
+    filter: blur(8px) contrast(1);
   }
 }
 /* YEAR 3000: Enhanced gradient for main content areas - BOLD ARTISTIC PRESENCE*/
@@ -369,9 +1038,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  /* Phase 2: GPU acceleration for organic transitions*/
-  will-change: var(--sn-gpu-acceleration);
-  transform: translateZ(0);
+  /* Background gradients only - no transforms */
   will-change: transform, opacity, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -428,8 +1095,7 @@
 .sn-performance-mode .Root__main-view::after,
 .sn-performance-mode .main-gridContainer-gridContainer::before,
 .sn-performance-mode .Root__now-playing-bar::before {
-  will-change: auto !important; /* Disable GPU acceleration*/
-  filter: none !important; /* Disable filters for performance*/
+  /* Background gradients only - no transforms or filters */
   --sn-gradient-transition: 1000ms ease !important; /* Simpler transition*/
 }
 
@@ -450,31 +1116,14 @@
   z-index: -11;
   pointer-events: none;
   overflow: hidden;
-  /* Default: Apply sleek skew transform*/
-  transform: skewY(-6deg) translateZ(0);
-  transform-origin: center center;
-  will-change: transform;
-  /* Smooth transitions for responsive changes*/
-  transition: transform 300ms var(--sn-easing-emergence, ease-out);
-  /* Responsive: Disable skew on mobile (<= 768px)*/
-  /* Accessibility: Honor reduced motion preference*/
+  /* Background gradients only - no DOM layout transforms */
+  /* Keep all visual effects without affecting interactive elements */
   /* Performance optimization for GPU layers*/
   will-change: transform, opacity, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
   contain: style paint;
-}
-@media (max-width: 768px) {
-  .sn-flow-gradient-wrapper {
-    transform: skewY(0deg) translateZ(0);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .sn-flow-gradient-wrapper {
-    transform: skewY(0deg) translateZ(0);
-    transition: none;
-  }
 }
 
 :root {
@@ -1048,14 +1697,7 @@ li[aria-selected=true] .main-navBar-navBarLink span {
   }
 }
 @keyframes year3000-ripple {
-  0% {
-    transform: scale(0);
-    opacity: var(--sn-kinetic-intensity, 0.6);
-  }
-  50% {
-    opacity: calc(var(--sn-kinetic-intensity, 0.6) * 0.8);
-  }
-  100% {
+  0%, 100% {
     transform: scale(1);
     opacity: 0;
   }
@@ -1063,11 +1705,7 @@ li[aria-selected=true] .main-navBar-navBarLink span {
 @keyframes year3000-ripple-pulse {
   0%, 100% {
     transform: scale(1);
-    opacity: var(--sn-kinetic-intensity, 0.3);
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: calc(var(--sn-kinetic-intensity, 0.3) * 1.5);
+    opacity: 0;
   }
 }
 @keyframes year3000-bloom {
@@ -1185,15 +1823,10 @@ li[aria-selected=true] .main-navBar-navBarLink span {
   }
 }
 @keyframes year3000-temporal-echo {
-  0% {
-    opacity: calc(var(--sn-kinetic-intensity, 1) * 0.3);
-    transform: scale(1.05);
-    filter: blur(1px);
-  }
-  100% {
+  0%, 100% {
     opacity: 0;
-    transform: scale(1.15);
-    filter: blur(3px);
+    transform: scale(1);
+    filter: none;
   }
 }
 @keyframes year3000-future-preview {
@@ -1294,17 +1927,9 @@ aside[data-testid=now-playing-bar] .main-shuffleButton-button:hover,
 }
 
 .sn-temporal-echo, .main-card-card:hover::after, .main-card-card:active::after, body:not(:has(.main-searchPage-content)) .main-card-card:hover::after, body:not(:has(.main-searchPage-content)) .main-card-card:active::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after {
-  animation: year3000-temporal-echo 800ms ease-out forwards;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
+  animation: none;
+  opacity: 0;
   pointer-events: none;
-  border-radius: inherit;
-  transform-origin: center;
-  z-index: 0;
-  animation: year3000-echo-core 800ms var(--sn-echo-decay-curve) forwards;
 }
 
 .sn-temporal-echo::before,
@@ -1316,21 +1941,9 @@ body:not(:has(.main-searchPage-content)) .main-card-card:active::after,
 body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after,
 body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after,
 body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-.sn-temporal-echo::before {
-  animation: year3000-echo-core 1000ms 80ms var(--sn-echo-decay-curve) forwards;
-  opacity: 0.6;
-}
-
-.sn-temporal-echo::after, .main-card-card:hover::after, .main-card-card:active::after, body:not(:has(.main-searchPage-content)) .main-card-card:hover::after, body:not(:has(.main-searchPage-content)) .main-card-card:active::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after {
-  animation: year3000-echo-core 1200ms 160ms var(--sn-echo-decay-curve) forwards;
-  opacity: 0.3;
+  content: none;
+  animation: none;
+  opacity: 0;
 }
 
 .sn-future-preview {
@@ -1480,21 +2093,9 @@ body:not(:has(.main-searchPage-content)) .main-card-card:active::after,
 body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after,
 body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after,
 body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-.sn-temporal-echo::before {
-  animation: year3000-echo-core 1000ms 80ms var(--sn-echo-decay-curve) forwards;
-  opacity: 0.6;
-}
-
-.sn-temporal-echo::after, .main-card-card:hover::after, .main-card-card:active::after, body:not(:has(.main-searchPage-content)) .main-card-card:hover::after, body:not(:has(.main-searchPage-content)) .main-card-card:active::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:hover::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow[aria-selected=true]::after, body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:has(.main-trackList-playingIcon)::after {
-  animation: year3000-echo-core 1200ms 160ms var(--sn-echo-decay-curve) forwards;
-  opacity: 0.3;
+  content: none;
+  animation: none;
+  opacity: 0;
 }
 
 @keyframes year3000-grain-shift {
@@ -10434,11 +11035,6 @@ body:not(:has(.main-searchPage-content)) .sn-3d-floating .main-card-card {
   position: relative;
   overflow: visible;
   position: relative;
-  overflow: visible;
-  background: radial-gradient(ellipse at 30% 20%, rgba(var(--sn-accent-rgb), 0.2) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(var(--sn-accent-rgb), 0.15) 0%, transparent 60%), radial-gradient(ellipse at 50% 50%, rgba(var(--sn-accent-rgb), 0.1) 0%, transparent 70%);
-  background-size: 200% 200%, 250% 250%, 300% 300%;
-  animation: energy-field-flow calc(var(--liquid-flow-speed) * 2) linear infinite;
-  position: relative;
   margin: 8px 0;
   border-radius: 15px 50px 25px 60px/30px 15px 45px 20px;
   background: linear-gradient(90deg, rgba(var(--sn-accent-rgb), 0.05) 0%, rgba(var(--sn-accent-rgb), 0.08) 50%, transparent 100%);
@@ -10504,41 +11100,6 @@ body:not(:has(.main-searchPage-content)) .sn-3d-floating .main-card-card {
   pointer-events: none;
   z-index: 1;
   animation: liquid-morph calc(var(--liquid-flow-speed) * 1.3) ease-in-out infinite reverse;
-}
-.main-trackList-trackListRow::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  right: -50%;
-  bottom: -50%;
-  background: conic-gradient(from 0deg, transparent 0deg, rgba(var(--sn-accent-rgb), 0.05) 60deg, transparent 120deg, rgba(var(--sn-accent-rgb), 0.05) 180deg, transparent 240deg, rgba(var(--sn-accent-rgb), 0.05) 300deg, transparent 360deg);
-  animation: energy-field-flow calc(var(--liquid-flow-speed) * 1.5) linear infinite reverse;
-  pointer-events: none;
-  z-index: -1;
-  filter: blur(20px);
-}
-.main-trackList-trackListRow::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 300%;
-  height: 300%;
-  background: radial-gradient(circle, transparent 0%, rgba(var(--sn-accent-rgb), 0.02) 30%, rgba(var(--sn-accent-rgb), 0.03) 60%, transparent 100%);
-  transform: translate(-50%, -50%);
-  animation: energy-field-flow calc(var(--liquid-flow-speed) * 0.8) ease-in-out infinite;
-  pointer-events: none;
-  z-index: -2;
-  opacity: var(--energy-resonance);
-}
-.main-trackList-trackListRow:hover {
-  --energy-field-intensity: 1.8;
-  --energy-resonance: 1;
-}
-.main-trackList-trackListRow:hover ~ * {
-  --energy-field-intensity: 1.3;
-  animation-duration: calc(var(--liquid-flow-speed) * 1.5);
 }
 .main-trackList-trackListRow:hover {
   transform-style: preserve-3d;
@@ -11237,12 +11798,8 @@ body {
 
 @keyframes sn-glyph-pulse {
   0%, 100% {
-    transform: scale(calc(0.6 + 0.4 * var(--sn-glyph-pulse-intensity)));
-    opacity: calc(0.5 + 0.5 * var(--sn-glyph-pulse-intensity));
-  }
-  50% {
-    transform: scale(calc(0.8 + 0.2 * var(--sn-glyph-pulse-intensity)));
-    opacity: calc(0.7 + 0.3 * var(--sn-glyph-pulse-intensity));
+    transform: scale(1);
+    opacity: 0;
   }
 }
 /* Sidebar Digital Meditation State*/
@@ -11280,28 +11837,6 @@ nav[aria-label=Main] ul li a.sn-absorbing-energy {
   -moz-transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
   -ms-transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
   -o-transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
-}
-
-/* ---------------------------------------------------------------------------*/
-/* NEW: Glyph rendered via pseudo-element to avoid DOM churn (2025-06-19)*/
-/* ---------------------------------------------------------------------------*/
-[data-sn-glyph] {
-  position: relative;
-}
-[data-sn-glyph]::after {
-  content: "";
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: var(--sn-glyph-base-size, 6px);
-  height: var(--sn-glyph-base-size, 6px);
-  border-radius: 50%;
-  background-color: rgba(var(--sn-glyph-color-rgb, 140, 170, 238), var(--sn-glyph-glow, 0.5));
-  opacity: var(--sn-glyph-glow);
-  transform: scale(calc(0.8 + 0.4 * var(--sn-glyph-intensity))) rotate(var(--sn-glyph-rotation, 0deg));
-  transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
-  pointer-events: none;
-  z-index: 5;
 }
 
 /* ████████████████████████████████████████████████████████████████████████████████*/

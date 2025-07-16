@@ -38,7 +38,6 @@ export class CSSGradientBackgroundSystem implements VisualBackplane {
   public readonly capabilities: BackendCapabilities = {
     webgl: false,
     webgl2: false,
-    webgpu: false,
     highPerformance: false,
     maxTextureSize: 0,
     maxShaderComplexity: 'low'
@@ -59,4 +58,451 @@ export class CSSGradientBackgroundSystem implements VisualBackplane {
   private frameCount = 0;
   private memoryUsage = 0;
   
-  constructor(\n    cssVariableBatcher: CSSVariableBatcher,\n    config: Partial<CSSGradientConfig> = {}\n  ) {\n    this.cssVariableBatcher = cssVariableBatcher;\n    \n    this.config = {\n      enableMusicSync: true,\n      enableAnimations: true,\n      fadeTransitions: true,\n      quality: 'medium',\n      ...config\n    };\n    \n    this.constraints = {\n      targetFPS: 60,\n      maxMemoryMB: 5, // Very low memory usage\n      cpuBudgetPercent: 2, // Minimal CPU usage\n      gpuBudgetPercent: 0, // No GPU usage\n      qualityLevel: 'medium'\n    };\n  }\n  \n  /**\n   * Initialize CSS gradient system\n   */\n  async initialize(): Promise<void> {\n    if (this.initialized) return;\n    \n    try {\n      // CSS is always \"ready\" - no async initialization needed\n      this.initialized = true;\n      \n      console.log('[CSSGradientBackgroundSystem] Initialized (fallback backend)');\n    } catch (error) {\n      console.error('[CSSGradientBackgroundSystem] Initialization failed:', error);\n      throw error;\n    }\n  }\n  \n  /**\n   * Initialize with DOM element\n   */\n  async init(root: HTMLElement, constraints?: PerformanceConstraints): Promise<void> {\n    this.rootElement = root;\n    \n    if (constraints) {\n      this.constraints = { ...constraints };\n    }\n    \n    await this.initialize();\n    this.createBackgroundElement();\n    this.setupAccessibilitySupport();\n    \n    console.log('[CSSGradientBackgroundSystem] Backend initialized with root element');\n  }\n  \n  /**\n   * Update color palette via CSS custom properties\n   */\n  setPalette(stops: RGBStop[], transition: number = 500): void {\n    this.currentPalette = [...stops];\n    \n    if (stops.length === 0) return;\n    \n    // Convert RGBStops to CSS gradient\n    const gradientStops = stops.map(stop => \n      `rgb(${Math.round(stop.r)}, ${Math.round(stop.g)}, ${Math.round(stop.b)}) ${Math.round(stop.position * 100)}%`\n    ).join(', ');\n    \n    // Create multiple gradient variants for visual interest\n    const primaryGradient = `linear-gradient(135deg, ${gradientStops})`;\n    const secondaryGradient = `radial-gradient(ellipse at 30% 70%, ${gradientStops})`;\n    const accentGradient = `conic-gradient(from 45deg at 50% 50%, ${gradientStops})`;\n    \n    // Update CSS variables with graceful transition\n    this.cssVariableBatcher.setProperty('--sn.bg.css.primary-gradient', primaryGradient);\n    this.cssVariableBatcher.setProperty('--sn.bg.css.secondary-gradient', secondaryGradient);\n    this.cssVariableBatcher.setProperty('--sn.bg.css.accent-gradient', accentGradient);\n    \n    // Set transition duration\n    if (this.config.fadeTransitions) {\n      this.cssVariableBatcher.setProperty('--sn.bg.css.transition-duration', `${transition}ms`);\n    }\n    \n    // Update background element directly for immediate visual feedback\n    if (this.backgroundElement && this.enabled) {\n      this.updateBackgroundElement();\n    }\n    \n    console.log('[CSSGradientBackgroundSystem] Palette updated', {\n      stops: stops.length,\n      transition,\n      enabled: this.enabled\n    });\n  }\n  \n  /**\n   * Update music synchronization (minimal CPU impact)\n   */\n  setMusicMetrics(metrics: MusicMetrics): void {\n    this.currentMusicMetrics = metrics;\n    \n    if (!this.config.enableMusicSync || !this.enabled) return;\n    \n    // Only update critical music variables for CSS animations\n    if (metrics.beatIntensity !== undefined) {\n      // Scale beat intensity for subtle CSS effects\n      const scaledIntensity = Math.min(metrics.beatIntensity * 0.3, 0.3); // Max 30% intensity\n      this.cssVariableBatcher.setProperty(\n        '--sn.bg.css.beat-intensity', \n        scaledIntensity.toString()\n      );\n    }\n    \n    if (metrics.energy !== undefined) {\n      // Use energy for gradient saturation\n      const saturation = 0.8 + (metrics.energy * 0.4); // 0.8 to 1.2 range\n      this.cssVariableBatcher.setProperty(\n        '--sn.bg.css.energy-saturation', \n        saturation.toString()\n      );\n    }\n    \n    if (metrics.valence !== undefined) {\n      // Use valence for gradient brightness\n      const brightness = 0.9 + (metrics.valence * 0.2); // 0.9 to 1.1 range\n      this.cssVariableBatcher.setProperty(\n        '--sn.bg.css.valence-brightness', \n        brightness.toString()\n      );\n    }\n  }\n  \n  /**\n   * Update performance constraints\n   */\n  setPerformanceConstraints(constraints: PerformanceConstraints): void {\n    this.constraints = { ...constraints };\n    \n    // Adjust quality based on constraints\n    switch (constraints.qualityLevel) {\n      case 'low':\n        this.config.enableAnimations = false;\n        this.config.enableMusicSync = false;\n        break;\n      case 'medium':\n        this.config.enableAnimations = true;\n        this.config.enableMusicSync = false;\n        break;\n      case 'high':\n      case 'ultra':\n        this.config.enableAnimations = true;\n        this.config.enableMusicSync = true;\n        break;\n    }\n    \n    this.updateQualitySettings();\n    \n    console.log('[CSSGradientBackgroundSystem] Performance constraints updated', {\n      quality: constraints.qualityLevel,\n      animations: this.config.enableAnimations,\n      musicSync: this.config.enableMusicSync\n    });\n  }\n  \n  /**\n   * Enable/disable the CSS backend\n   */\n  setEnabled(enabled: boolean, fadeMs: number = 500): void {\n    if (this.enabled === enabled) return;\n    \n    this.enabled = enabled;\n    \n    if (this.backgroundElement) {\n      if (enabled) {\n        // Fade in\n        this.backgroundElement.style.transition = `opacity ${fadeMs}ms ease-in-out`;\n        this.backgroundElement.style.opacity = '1';\n        this.backgroundElement.style.pointerEvents = 'none';\n        \n        // Apply current palette\n        if (this.currentPalette.length > 0) {\n          this.updateBackgroundElement();\n        }\n      } else {\n        // Fade out\n        this.backgroundElement.style.transition = `opacity ${fadeMs}ms ease-in-out`;\n        this.backgroundElement.style.opacity = '0';\n        \n        // Clean up after fade\n        setTimeout(() => {\n          if (!this.enabled && this.backgroundElement) {\n            this.backgroundElement.style.pointerEvents = 'none';\n          }\n        }, fadeMs);\n      }\n    }\n    \n    // Update global CSS variable\n    this.cssVariableBatcher.setProperty('--sn.bg.css.enabled', enabled ? '1' : '0');\n    \n    console.log(`[CSSGradientBackgroundSystem] ${enabled ? 'Enabled' : 'Disabled'} with ${fadeMs}ms fade`);\n  }\n  \n  /**\n   * Get performance metrics (minimal for CSS)\n   */\n  getPerformanceMetrics() {\n    return {\n      fps: 60, // CSS is always smooth\n      memoryUsageMB: this.memoryUsage,\n      cpuUsagePercent: this.config.enableAnimations ? 1 : 0,\n      gpuUsagePercent: 0, // No GPU usage\n      frameTimeMs: this.lastFrameTime\n    };\n  }\n  \n  /**\n   * Handle resize events\n   */\n  resize(width: number, height: number): void {\n    if (this.backgroundElement) {\n      this.backgroundElement.style.width = `${width}px`;\n      this.backgroundElement.style.height = `${height}px`;\n    }\n  }\n  \n  /**\n   * Apply accessibility preferences\n   */\n  applyAccessibilityPreferences(preferences: {\n    reducedMotion: boolean;\n    highContrast: boolean;\n    prefersTransparency: boolean;\n  }): void {\n    if (preferences.reducedMotion) {\n      this.config.enableAnimations = false;\n      this.config.enableMusicSync = false;\n      \n      // Disable all animations via CSS\n      this.cssVariableBatcher.setProperty('--sn.bg.css.animations-enabled', '0');\n    } else {\n      this.config.enableAnimations = true;\n      this.cssVariableBatcher.setProperty('--sn.bg.css.animations-enabled', '1');\n    }\n    \n    if (preferences.highContrast) {\n      // Increase contrast for accessibility\n      this.cssVariableBatcher.setProperty('--sn.bg.css.contrast-boost', '1.3');\n    } else {\n      this.cssVariableBatcher.setProperty('--sn.bg.css.contrast-boost', '1.0');\n    }\n    \n    if (preferences.prefersTransparency) {\n      this.cssVariableBatcher.setProperty('--sn.bg.css.transparency-factor', '0.9');\n    } else {\n      this.cssVariableBatcher.setProperty('--sn.bg.css.transparency-factor', '1.0');\n    }\n    \n    this.updateBackgroundElement();\n  }\n  \n  /**\n   * Animation update (minimal processing)\n   */\n  updateAnimation(deltaTime: number): void {\n    this.lastFrameTime = deltaTime;\n    this.frameCount++;\n    \n    // No heavy animation processing needed for CSS backend\n    // CSS handles animations natively\n  }\n  \n  /**\n   * Health check (always healthy)\n   */\n  async healthCheck(): Promise<HealthCheckResult> {\n    const issues: string[] = [];\n    \n    // Check if DOM element exists\n    if (!this.backgroundElement && this.initialized) {\n      issues.push('Background element not created');\n    }\n    \n    // Check if CSS variables are set\n    if (this.currentPalette.length === 0) {\n      issues.push('No color palette set');\n    }\n    \n    return {\n      ok: issues.length === 0,\n      details: issues.length > 0 ? 'CSS backend has minor issues' : 'CSS backend healthy',\n      issues\n    };\n  }\n  \n  /**\n   * Cleanup resources\n   */\n  destroy(): void {\n    // Remove DOM element\n    if (this.backgroundElement) {\n      this.backgroundElement.remove();\n      this.backgroundElement = null;\n    }\n    \n    this.rootElement = null;\n    this.currentPalette = [];\n    this.currentMusicMetrics = null;\n    this.enabled = false;\n    this.initialized = false;\n    \n    console.log('[CSSGradientBackgroundSystem] Destroyed');\n  }\n  \n  // ========================================================================\n  // PRIVATE METHODS\n  // ========================================================================\n  \n  private createBackgroundElement(): void {\n    if (!this.rootElement) {\n      console.warn('[CSSGradientBackgroundSystem] No root element provided');\n      return;\n    }\n    \n    // Create background container\n    this.backgroundElement = document.createElement('div');\n    this.backgroundElement.className = 'sn-css-gradient-background';\n    this.backgroundElement.style.cssText = `\n      position: fixed;\n      top: 0;\n      left: 0;\n      width: 100vw;\n      height: 100vh;\n      z-index: var(--sn.layout.z.background, -11);\n      opacity: 0;\n      pointer-events: none;\n      transition: opacity 500ms ease-in-out;\n      will-change: opacity;\n    `;\n    \n    // Insert at the beginning of root element\n    this.rootElement.insertBefore(this.backgroundElement, this.rootElement.firstChild);\n    \n    // Apply initial styles\n    this.updateBackgroundElement();\n    \n    console.log('[CSSGradientBackgroundSystem] Background element created');\n  }\n  \n  private updateBackgroundElement(): void {\n    if (!this.backgroundElement) return;\n    \n    // Build CSS background based on quality settings\n    let backgroundCSS = '';\n    \n    if (this.config.quality === 'low') {\n      // Simple linear gradient\n      backgroundCSS = `\n        background: var(--sn.bg.css.primary-gradient, linear-gradient(135deg, #1e1e2e 0%, #313244 100%));\n      `;\n    } else if (this.config.quality === 'medium') {\n      // Dual gradient blend\n      backgroundCSS = `\n        background: \n          var(--sn.bg.css.primary-gradient, linear-gradient(135deg, #1e1e2e 0%, #313244 100%)),\n          var(--sn.bg.css.secondary-gradient, radial-gradient(ellipse at 30% 70%, #1e1e2e 0%, #313244 100%));\n        background-blend-mode: overlay;\n      `;\n    } else {\n      // Triple gradient blend with effects\n      backgroundCSS = `\n        background: \n          var(--sn.bg.css.primary-gradient, linear-gradient(135deg, #1e1e2e 0%, #313244 100%)),\n          var(--sn.bg.css.secondary-gradient, radial-gradient(ellipse at 30% 70%, #1e1e2e 0%, #313244 100%)),\n          var(--sn.bg.css.accent-gradient, conic-gradient(from 45deg, #1e1e2e 0%, #313244 100%));\n        background-blend-mode: overlay, multiply;\n        background-size: 100% 100%, 150% 150%, 200% 200%;\n      `;\n    }\n    \n    // Add music synchronization effects if enabled\n    if (this.config.enableMusicSync && this.config.enableAnimations) {\n      backgroundCSS += `\n        filter: \n          saturate(var(--sn.bg.css.energy-saturation, 1.0))\n          brightness(var(--sn.bg.css.valence-brightness, 1.0))\n          contrast(var(--sn.bg.css.contrast-boost, 1.0));\n        transform: scale(calc(1 + var(--sn.bg.css.beat-intensity, 0) * 0.02));\n      `;\n    }\n    \n    // Add transition properties\n    if (this.config.fadeTransitions) {\n      backgroundCSS += `\n        transition: \n          background var(--sn.bg.css.transition-duration, 500ms) ease-in-out,\n          filter 200ms ease-out,\n          transform 100ms ease-out;\n      `;\n    }\n    \n    this.backgroundElement.style.cssText += backgroundCSS;\n    \n    // Update memory usage estimate\n    this.memoryUsage = 0.5; // Minimal memory usage\n  }\n  \n  private setupAccessibilitySupport(): void {\n    // Listen for media query changes\n    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');\n    const highContrastQuery = window.matchMedia('(prefers-contrast: high)');\n    \n    const updateAccessibility = () => {\n      this.applyAccessibilityPreferences({\n        reducedMotion: reducedMotionQuery.matches,\n        highContrast: highContrastQuery.matches,\n        prefersTransparency: false // No standard media query for this\n      });\n    };\n    \n    reducedMotionQuery.addEventListener('change', updateAccessibility);\n    highContrastQuery.addEventListener('change', updateAccessibility);\n    \n    // Initial setup\n    updateAccessibility();\n  }\n  \n  private updateQualitySettings(): void {\n    // Update CSS variables based on quality settings\n    this.cssVariableBatcher.setProperty(\n      '--sn.bg.css.quality-level', \n      this.constraints.qualityLevel\n    );\n    this.cssVariableBatcher.setProperty(\n      '--sn.bg.css.animations-enabled', \n      this.config.enableAnimations ? '1' : '0'\n    );\n    this.cssVariableBatcher.setProperty(\n      '--sn.bg.css.music-sync-enabled', \n      this.config.enableMusicSync ? '1' : '0'\n    );\n    \n    // Update background element to reflect new settings\n    this.updateBackgroundElement();\n  }\n}
+  constructor(
+    cssVariableBatcher: CSSVariableBatcher,
+    config: Partial<CSSGradientConfig> = {}
+  ) {
+    this.cssVariableBatcher = cssVariableBatcher;
+    
+    this.config = {
+      enableMusicSync: true,
+      enableAnimations: true,
+      fadeTransitions: true,
+      quality: 'medium',
+      ...config
+    };
+    
+    this.constraints = {
+      targetFPS: 60,
+      maxMemoryMB: 5, // Very low memory usage
+      cpuBudgetPercent: 2, // Minimal CPU usage
+      gpuBudgetPercent: 0, // No GPU usage
+      qualityLevel: 'medium'
+    };
+  }
+  
+  /**
+   * Initialize CSS gradient system
+   */
+  async initialize(): Promise<void> {
+    if (this.initialized) return;
+    
+    try {
+      // CSS is always \"ready\" - no async initialization needed
+      this.initialized = true;
+      
+      console.log('[CSSGradientBackgroundSystem] Initialized (fallback backend)');
+    } catch (error) {
+      console.error('[CSSGradientBackgroundSystem] Initialization failed:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Initialize with DOM element
+   */
+  async init(root: HTMLElement, constraints?: PerformanceConstraints): Promise<void> {
+    this.rootElement = root;
+    
+    if (constraints) {
+      this.constraints = { ...constraints };
+    }
+    
+    await this.initialize();
+    this.createBackgroundElement();
+    this.setupAccessibilitySupport();
+    
+    console.log('[CSSGradientBackgroundSystem] Backend initialized with root element');
+  }
+  
+  /**
+   * Update color palette via CSS custom properties
+   */
+  setPalette(stops: RGBStop[], transition: number = 500): void {
+    this.currentPalette = [...stops];
+    
+    if (stops.length === 0) return;
+    
+    // Convert RGBStops to CSS gradient
+    const gradientStops = stops.map(stop => 
+      `rgb(${Math.round(stop.r)}, ${Math.round(stop.g)}, ${Math.round(stop.b)}) ${Math.round(stop.position * 100)}%`
+    ).join(', ');
+    
+    // Create multiple gradient variants for visual interest
+    const primaryGradient = `linear-gradient(135deg, ${gradientStops})`;
+    const secondaryGradient = `radial-gradient(ellipse at 30% 70%, ${gradientStops})`;
+    const accentGradient = `conic-gradient(from 45deg at 50% 50%, ${gradientStops})`;
+    
+    // Update CSS variables with graceful transition
+    this.cssVariableBatcher.setProperty('--sn.bg.css.primary-gradient', primaryGradient);
+    this.cssVariableBatcher.setProperty('--sn.bg.css.secondary-gradient', secondaryGradient);
+    this.cssVariableBatcher.setProperty('--sn.bg.css.accent-gradient', accentGradient);
+    
+    // Set transition duration
+    if (this.config.fadeTransitions) {
+      this.cssVariableBatcher.setProperty('--sn.bg.css.transition-duration', `${transition}ms`);
+    }
+    
+    // Update background element directly for immediate visual feedback
+    if (this.backgroundElement && this.enabled) {
+      this.updateBackgroundElement();
+    }
+    
+    console.log('[CSSGradientBackgroundSystem] Palette updated', {
+      stops: stops.length,
+      transition,
+      enabled: this.enabled
+    });
+  }
+  
+  /**
+   * Update music synchronization (minimal CPU impact)
+   */
+  setMusicMetrics(metrics: MusicMetrics): void {
+    this.currentMusicMetrics = metrics;
+    
+    if (!this.config.enableMusicSync || !this.enabled) return;
+    
+    // Only update critical music variables for CSS animations
+    if (metrics.beatIntensity !== undefined) {
+      // Scale beat intensity for subtle CSS effects
+      const scaledIntensity = Math.min(metrics.beatIntensity * 0.3, 0.3); // Max 30% intensity
+      this.cssVariableBatcher.setProperty(
+        '--sn.bg.css.beat-intensity', 
+        scaledIntensity.toString()
+      );
+    }
+    
+    if (metrics.energy !== undefined) {
+      // Use energy for gradient saturation
+      const saturation = 0.8 + (metrics.energy * 0.4); // 0.8 to 1.2 range
+      this.cssVariableBatcher.setProperty(
+        '--sn.bg.css.energy-saturation', 
+        saturation.toString()
+      );
+    }
+    
+    if (metrics.valence !== undefined) {
+      // Use valence for gradient brightness
+      const brightness = 0.9 + (metrics.valence * 0.2); // 0.9 to 1.1 range
+      this.cssVariableBatcher.setProperty(
+        '--sn.bg.css.valence-brightness', 
+        brightness.toString()
+      );
+    }
+  }
+  
+  /**
+   * Update performance constraints
+   */
+  setPerformanceConstraints(constraints: PerformanceConstraints): void {
+    this.constraints = { ...constraints };
+    
+    // Adjust quality based on constraints
+    switch (constraints.qualityLevel) {
+      case 'low':
+        this.config.enableAnimations = false;
+        this.config.enableMusicSync = false;
+        break;
+      case 'medium':
+        this.config.enableAnimations = true;
+        this.config.enableMusicSync = false;
+        break;
+      case 'high':
+      case 'ultra':
+        this.config.enableAnimations = true;
+        this.config.enableMusicSync = true;
+        break;
+    }
+    
+    this.updateQualitySettings();
+    
+    console.log('[CSSGradientBackgroundSystem] Performance constraints updated', {
+      quality: constraints.qualityLevel,
+      animations: this.config.enableAnimations,
+      musicSync: this.config.enableMusicSync
+    });
+  }
+  
+  /**
+   * Enable/disable the CSS backend
+   */
+  setEnabled(enabled: boolean, fadeMs: number = 500): void {
+    if (this.enabled === enabled) return;
+    
+    this.enabled = enabled;
+    
+    if (this.backgroundElement) {
+      if (enabled) {
+        // Fade in
+        this.backgroundElement.style.transition = `opacity ${fadeMs}ms ease-in-out`;
+        this.backgroundElement.style.opacity = '1';
+        this.backgroundElement.style.pointerEvents = 'none';
+        
+        // Apply current palette
+        if (this.currentPalette.length > 0) {
+          this.updateBackgroundElement();
+        }
+      } else {
+        // Fade out
+        this.backgroundElement.style.transition = `opacity ${fadeMs}ms ease-in-out`;
+        this.backgroundElement.style.opacity = '0';
+        
+        // Clean up after fade
+        setTimeout(() => {
+          if (!this.enabled && this.backgroundElement) {
+            this.backgroundElement.style.pointerEvents = 'none';
+          }
+        }, fadeMs);
+      }
+    }
+    
+    // Update global CSS variable
+    this.cssVariableBatcher.setProperty('--sn.bg.css.enabled', enabled ? '1' : '0');
+    
+    console.log(`[CSSGradientBackgroundSystem] ${enabled ? 'Enabled' : 'Disabled'} with ${fadeMs}ms fade`);
+  }
+  
+  /**
+   * Get performance metrics (minimal for CSS)
+   */
+  getPerformanceMetrics() {
+    return {
+      fps: 60, // CSS is always smooth
+      memoryUsageMB: this.memoryUsage,
+      cpuUsagePercent: this.config.enableAnimations ? 1 : 0,
+      gpuUsagePercent: 0, // No GPU usage
+      frameTimeMs: this.lastFrameTime
+    };
+  }
+  
+  /**
+   * Handle resize events
+   */
+  resize(width: number, height: number): void {
+    if (this.backgroundElement) {
+      this.backgroundElement.style.width = `${width}px`;
+      this.backgroundElement.style.height = `${height}px`;
+    }
+  }
+  
+  /**
+   * Apply accessibility preferences
+   */
+  applyAccessibilityPreferences(preferences: {
+    reducedMotion: boolean;
+    highContrast: boolean;
+    prefersTransparency: boolean;
+  }): void {
+    if (preferences.reducedMotion) {
+      this.config.enableAnimations = false;
+      this.config.enableMusicSync = false;
+      
+      // Disable all animations via CSS
+      this.cssVariableBatcher.setProperty('--sn.bg.css.animations-enabled', '0');
+    } else {
+      this.config.enableAnimations = true;
+      this.cssVariableBatcher.setProperty('--sn.bg.css.animations-enabled', '1');
+    }
+    
+    if (preferences.highContrast) {
+      // Increase contrast for accessibility
+      this.cssVariableBatcher.setProperty('--sn.bg.css.contrast-boost', '1.3');
+    } else {
+      this.cssVariableBatcher.setProperty('--sn.bg.css.contrast-boost', '1.0');
+    }
+    
+    if (preferences.prefersTransparency) {
+      this.cssVariableBatcher.setProperty('--sn.bg.css.transparency-factor', '0.9');
+    } else {
+      this.cssVariableBatcher.setProperty('--sn.bg.css.transparency-factor', '1.0');
+    }
+    
+    this.updateBackgroundElement();
+  }
+  
+  /**
+   * Animation update (minimal processing)
+   */
+  updateAnimation(deltaTime: number): void {
+    this.lastFrameTime = deltaTime;
+    this.frameCount++;
+    
+    // No heavy animation processing needed for CSS backend
+    // CSS handles animations natively
+  }
+  
+  /**
+   * Health check (always healthy)
+   */
+  async healthCheck(): Promise<HealthCheckResult> {
+    const issues: string[] = [];
+    
+    // Check if DOM element exists
+    if (!this.backgroundElement && this.initialized) {
+      issues.push('Background element not created');
+    }
+    
+    // Check if CSS variables are set
+    if (this.currentPalette.length === 0) {
+      issues.push('No color palette set');
+    }
+    
+    return {
+      ok: issues.length === 0,
+      details: issues.length > 0 ? 'CSS backend has minor issues' : 'CSS backend healthy',
+      issues
+    };
+  }
+  
+  /**
+   * Cleanup resources
+   */
+  destroy(): void {
+    // Remove DOM element
+    if (this.backgroundElement) {
+      this.backgroundElement.remove();
+      this.backgroundElement = null;
+    }
+    
+    this.rootElement = null;
+    this.currentPalette = [];
+    this.currentMusicMetrics = null;
+    this.enabled = false;
+    this.initialized = false;
+    
+    console.log('[CSSGradientBackgroundSystem] Destroyed');
+  }
+  
+  // ========================================================================
+  // PRIVATE METHODS
+  // ========================================================================
+  
+  private createBackgroundElement(): void {
+    if (!this.rootElement) {
+      console.warn('[CSSGradientBackgroundSystem] No root element provided');
+      return;
+    }
+    
+    // Create background container
+    this.backgroundElement = document.createElement('div');
+    this.backgroundElement.className = 'sn-css-gradient-background';
+    this.backgroundElement.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: var(--sn.layout.z.background, -11);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 500ms ease-in-out;
+      will-change: opacity;
+    `;
+    
+    // Insert at the beginning of root element
+    this.rootElement.insertBefore(this.backgroundElement, this.rootElement.firstChild);
+    
+    // Apply initial styles
+    this.updateBackgroundElement();
+    
+    console.log('[CSSGradientBackgroundSystem] Background element created');
+  }
+  
+  private updateBackgroundElement(): void {
+    if (!this.backgroundElement) return;
+    
+    // Build CSS background based on quality settings
+    let backgroundCSS = '';
+    
+    if (this.config.quality === 'low') {
+      // Simple linear gradient
+      backgroundCSS = `
+        background: var(--sn.bg.css.primary-gradient, linear-gradient(135deg, #1e1e2e 0%, #313244 100%));
+      `;
+    } else if (this.config.quality === 'medium') {
+      // Dual gradient blend
+      backgroundCSS = `
+        background: 
+          var(--sn.bg.css.primary-gradient, linear-gradient(135deg, #1e1e2e 0%, #313244 100%)),
+          var(--sn.bg.css.secondary-gradient, radial-gradient(ellipse at 30% 70%, #1e1e2e 0%, #313244 100%));
+        background-blend-mode: overlay;
+      `;
+    } else {
+      // Triple gradient blend with effects
+      backgroundCSS = `
+        background: 
+          var(--sn.bg.css.primary-gradient, linear-gradient(135deg, #1e1e2e 0%, #313244 100%)),
+          var(--sn.bg.css.secondary-gradient, radial-gradient(ellipse at 30% 70%, #1e1e2e 0%, #313244 100%)),
+          var(--sn.bg.css.accent-gradient, conic-gradient(from 45deg, #1e1e2e 0%, #313244 100%));
+        background-blend-mode: overlay, multiply;
+        background-size: 100% 100%, 150% 150%, 200% 200%;
+      `;
+    }
+    
+    // Add music synchronization effects if enabled
+    if (this.config.enableMusicSync && this.config.enableAnimations) {
+      backgroundCSS += `
+        filter: 
+          saturate(var(--sn.bg.css.energy-saturation, 1.0))
+          brightness(var(--sn.bg.css.valence-brightness, 1.0))
+          contrast(var(--sn.bg.css.contrast-boost, 1.0));
+        transform: scale(calc(1 + var(--sn.bg.css.beat-intensity, 0) * 0.02));
+      `;
+    }
+    
+    // Add transition properties
+    if (this.config.fadeTransitions) {
+      backgroundCSS += `
+        transition: 
+          background var(--sn.bg.css.transition-duration, 500ms) ease-in-out,
+          filter 200ms ease-out,
+          transform 100ms ease-out;
+      `;
+    }
+    
+    this.backgroundElement.style.cssText += backgroundCSS;
+    
+    // Update memory usage estimate
+    this.memoryUsage = 0.5; // Minimal memory usage
+  }
+  
+  private setupAccessibilitySupport(): void {
+    // Listen for media query changes
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const highContrastQuery = window.matchMedia('(prefers-contrast: high)');
+    
+    const updateAccessibility = () => {
+      this.applyAccessibilityPreferences({
+        reducedMotion: reducedMotionQuery.matches,
+        highContrast: highContrastQuery.matches,
+        prefersTransparency: false // No standard media query for this
+      });
+    };
+    
+    reducedMotionQuery.addEventListener('change', updateAccessibility);
+    highContrastQuery.addEventListener('change', updateAccessibility);
+    
+    // Initial setup
+    updateAccessibility();
+  }
+  
+  private updateQualitySettings(): void {
+    // Update CSS variables based on quality settings
+    this.cssVariableBatcher.setProperty(
+      '--sn.bg.css.quality-level', 
+      this.constraints.qualityLevel
+    );
+    this.cssVariableBatcher.setProperty(
+      '--sn.bg.css.animations-enabled', 
+      this.config.enableAnimations ? '1' : '0'
+    );
+    this.cssVariableBatcher.setProperty(
+      '--sn.bg.css.music-sync-enabled', 
+      this.config.enableMusicSync ? '1' : '0'
+    );
+    
+    // Update background element to reflect new settings
+    this.updateBackgroundElement();
+  }
+}

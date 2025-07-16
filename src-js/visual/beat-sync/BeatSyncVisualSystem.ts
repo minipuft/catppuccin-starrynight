@@ -230,6 +230,9 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
       const actualDeltaTime = currentTime - this.lastAnimationTime;
       this.lastAnimationTime = currentTime;
 
+      // Process audio analysis for loudness smoothing (moved from update() method)
+      this.processAudioAnalysis();
+
       const latestMusicData = this.musicSyncService?.getLatestProcessedData();
       const processedEnergy = latestMusicData?.processedEnergy || 0.5;
       const animationSpeedFactor = latestMusicData?.animationSpeedFactor || 1.0;
@@ -257,6 +260,13 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
           this._triggerBeat(now);
           this._scheduleNextBeat();
         }
+      }
+
+      // Update harmonic sync within the animation loop
+      if (this.harmonicSyncInitialized) {
+        this.updateHarmonicFrequencies();
+        this.calculateHarmonicValues(timestamp);
+        this.dispatchHarmonicSync(timestamp);
       }
 
       if (this.beatIntensity > 0 && this.beatFlashElement) {
@@ -307,44 +317,56 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
   }
 
   private _startFallbackAnimationLoop() {
-    const loop = () => {
-      this.updateAnimation(performance.now(), 16.67); // Assume ~60fps
-      this.animationFrameId = requestAnimationFrame(loop);
-    };
-    this.animationFrameId = requestAnimationFrame(loop);
+    // This method is now deprecated - animation is handled by AnimationConductor
+    // Keep this empty for backward compatibility but don't start independent loops
+    console.warn(`[${this.systemName}] Fallback animation loop requested but animation is handled by AnimationConductor`);
+  }
+
+  /**
+   * Process audio analysis for loudness smoothing (moved from update() method)
+   * This consolidates the audio analysis logic into the main animation loop
+   */
+  private processAudioAnalysis(): void {
+    if (!this.analysis || !Spicetify.Player.isPlaying()) {
+      this.smoothedLoudness = 0; // Reset when paused
+      document.documentElement.style.setProperty(
+        "--sn-feed-bloom-intensity",
+        "0"
+      );
+      return;
+    }
+
+    const progress = Spicetify.Player.getProgress() / 1000; // in seconds
+    const segment = this.analysis.segments.find(
+      (s: AudioSegment) =>
+        progress >= s.start && progress < s.start + s.duration
+    );
+
+    let currentLoudness = 0;
+    if (segment) {
+      // Normalize loudness from [-60, 0] dB to [0, 1]
+      const normalizedLoudness = (segment.loudness_max + 60) / 60;
+      currentLoudness = Math.max(0, Math.min(1, normalizedLoudness));
+    }
+
+    // Apply exponential smoothing
+    this.smoothedLoudness =
+      currentLoudness * this.SMOOTHING_FACTOR +
+      this.smoothedLoudness * (1 - this.SMOOTHING_FACTOR);
+
+    // Map smoothed loudness [0, 1] to bloom intensity [0, 0.4]
+    const bloomIntensity = this.smoothedLoudness * 0.4;
+
+    document.documentElement.style.setProperty(
+      "--sn-feed-bloom-intensity",
+      bloomIntensity.toFixed(3)
+    );
   }
 
   private _animationLoop() {
-    if (!this.isAnimating) return;
-
-    const timestamp = performance.now();
-    const deltaTime = timestamp - this.lastAnimationTime;
-    this.lastAnimationTime = timestamp;
-
-    const latestMusicData = this.musicSyncService?.getLatestProcessedData();
-    const processedEnergy = latestMusicData?.processedEnergy || 0.5;
-    const animationSpeedFactor = latestMusicData?.animationSpeedFactor || 1.0;
-
-    this.currentRhythmPhase = Year3000Utilities.calculateRhythmPhase(
-      timestamp,
-      animationSpeedFactor
-    );
-
-    const breathingScale = Year3000Utilities.calculateBreathingScale(
-      this.currentRhythmPhase,
-      processedEnergy
-    );
-
-    this._updateCSSVariables(
-      breathingScale,
-      this.currentRhythmPhase,
-      deltaTime,
-      processedEnergy
-    );
-
-    this.animationFrameId = requestAnimationFrame(
-      this._animationLoop.bind(this)
-    );
+    // This method is now deprecated - animation logic moved to updateAnimation
+    // which is called by AnimationConductor through onAnimate
+    console.warn(`[${this.systemName}] _animationLoop called but animation is handled by AnimationConductor`);
   }
 
   private _updateCSSVariables(
@@ -598,6 +620,15 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
     this.disableHarmonicSync();
     this._stopBeatSync();
     this._stopAnimationLoop();
+    
+    // Clean up all RAF loops
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = 0;
+    }
+    
+    // Remove Spicetify event listeners
+    this.stop();
 
     if (
       this.crystallineOverlayElement &&
@@ -774,19 +805,11 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
   }
 
   private startHarmonicLoop() {
-    if (!this.harmonicSync) return;
-
-    const harmonicLoop = (timestamp: number) => {
-      if (!this.initialized || !this.harmonicSync || !this.modeConfig) return;
-
-      this.updateHarmonicFrequencies();
-      this.calculateHarmonicValues(timestamp);
-      this.dispatchHarmonicSync(timestamp);
-
-      this.harmonicLoopId = requestAnimationFrame(harmonicLoop);
-    };
-
-    this.harmonicLoopId = requestAnimationFrame(harmonicLoop);
+    // Harmonic sync is now handled within the main animation loop
+    // No need for independent RAF loops
+    if (this.config.enableDebug) {
+      console.log(`[${this.systemName}] Harmonic sync integrated into main animation loop`);
+    }
   }
 
   private updateHarmonicFrequencies() {
@@ -1019,12 +1042,14 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
     Spicetify.Player.removeEventListener("songchange", this.onSongChange);
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
+      this.rafId = 0;
     }
   }
 
   private async onSongChange(): Promise<void> {
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
+      this.rafId = 0;
     }
 
     const currentTrack = Spicetify.Player.data?.item;
@@ -1034,9 +1059,8 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
 
     try {
       this.analysis = await Spicetify.getAudioData(currentTrack.uri);
-      if (this.analysis && this.analysis.segments) {
-        this.update();
-      }
+      // Audio analysis is now handled in updateAnimation() method
+      // No need to call update() here - let AnimationConductor handle it
     } catch (error) {
       console.error("StarryNight: Failed to get audio data", error);
       this.analysis = null;
@@ -1044,43 +1068,9 @@ export class BeatSyncVisualSystem extends BaseVisualSystem {
   }
 
   private update(): void {
-    if (!this.analysis || !Spicetify.Player.isPlaying()) {
-      this.smoothedLoudness = 0; // Reset when paused
-      document.documentElement.style.setProperty(
-        "--sn-feed-bloom-intensity",
-        "0"
-      );
-      this.rafId = requestAnimationFrame(this.update);
-      return;
-    }
-
-    const progress = Spicetify.Player.getProgress() / 1000; // in seconds
-    const segment = this.analysis.segments.find(
-      (s: AudioSegment) =>
-        progress >= s.start && progress < s.start + s.duration
-    );
-
-    let currentLoudness = 0;
-    if (segment) {
-      // Normalize loudness from [-60, 0] dB to [0, 1]
-      const normalizedLoudness = (segment.loudness_max + 60) / 60;
-      currentLoudness = Math.max(0, Math.min(1, normalizedLoudness));
-    }
-
-    // Apply exponential smoothing
-    this.smoothedLoudness =
-      currentLoudness * this.SMOOTHING_FACTOR +
-      this.smoothedLoudness * (1 - this.SMOOTHING_FACTOR);
-
-    // Map smoothed loudness [0, 1] to bloom intensity [0, 0.4]
-    const bloomIntensity = this.smoothedLoudness * 0.4;
-
-    document.documentElement.style.setProperty(
-      "--sn-feed-bloom-intensity",
-      bloomIntensity.toFixed(3)
-    );
-
-    this.rafId = requestAnimationFrame(this.update);
+    // This method is now deprecated - audio analysis is handled in updateAnimation
+    // Keep this empty for backward compatibility
+    console.warn(`[${this.systemName}] update() called but audio analysis is handled in updateAnimation`);
   }
 
   // -------------------------------------------------------------------------

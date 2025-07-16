@@ -6,7 +6,7 @@
 import { WebGLGradientBackgroundSystem } from '@/visual/backgrounds/WebGLGradientBackgroundSystem';
 import { PerformanceAnalyzer } from '@/core/performance/PerformanceAnalyzer';
 import { SettingsManager } from '@/ui/managers/SettingsManager';
-import { ColorHarmonyEngine } from '@/systems/ColorHarmonyEngine';
+import { ColorHarmonyEngine } from '@/audio/ColorHarmonyEngine';
 import { DeviceCapabilityDetector } from '@/core/performance/DeviceCapabilityDetector';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';
 
@@ -138,9 +138,9 @@ const setupCanvasMocks = () => {
           height: 1080,
           id: '',
           style: { 
-            cssText: '',
-            set cssText(value: string) { this._cssText = value; },
-            get cssText() { return this._cssText || ''; }
+            _cssText: '',
+            set cssText(value: string) { (this as any)._cssText = value; },
+            get cssText() { return (this as any)._cssText || ''; }
           },
           parentNode: null,
           remove: jest.fn(),
@@ -165,16 +165,16 @@ const setupCanvasMocks = () => {
         return {
           className: '',
           style: { 
-            cssText: '',
-            set cssText(value: string) { this._cssText = value; },
-            get cssText() { return this._cssText || ''; }
+            _cssText: '',
+            set cssText(value: string) { (this as any)._cssText = value; },
+            get cssText() { return (this as any)._cssText || ''; }
           },
           appendChild: jest.fn(),
           parentNode: null,
           removeChild: jest.fn()
         };
       }
-      return {};
+      return {} as any;
     }),
     configurable: true
   });
@@ -267,9 +267,9 @@ describe('WebGLGradientBackgroundSystem', () => {
         if (tagName === 'canvas') {
           return {
             getContext: jest.fn().mockReturnValue(null)
-          };
+          } as any;
         }
-        return {};
+        return {} as any;
       });
 
       await system.initialize();
@@ -436,7 +436,11 @@ describe('WebGLGradientBackgroundSystem', () => {
     it('should remove wrapper from DOM', () => {
       const mockWrapper = document.createElement('div');
       const mockParent = { removeChild: jest.fn() };
-      mockWrapper.parentNode = mockParent as any;
+      Object.defineProperty(mockWrapper, 'parentNode', {
+        value: mockParent,
+        writable: true,
+        configurable: true
+      });
       system['wrapper'] = mockWrapper;
 
       system.destroy();
@@ -602,9 +606,9 @@ describe('WebGLGradientBackgroundSystem', () => {
             getContext: jest.fn().mockImplementation((type: string) => {
               return type === 'webgl2' ? mockGL : null;
             })
-          };
+          } as any;
         }
-        return {};
+        return {} as any;
       });
 
       await system.initialize();

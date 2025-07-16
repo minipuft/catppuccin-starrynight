@@ -65,6 +65,8 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
   private _elementsWithActiveEcho: WeakSet<HTMLElement> = new WeakSet();
   // Stores nav interaction handler reference for clean removal.
   private _navInteractionHandler: ((evt: Event) => void) | null = null;
+  // Timer counter for unique timer IDs
+  private echoTimerCounter: number = 0;
   /** Flag used to skip re-applying motion-disabled class when already set */
   private _lastMotionDisabled = false;
 
@@ -404,6 +406,16 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     if (this.consciousnessAnimationFrame) {
       cancelAnimationFrame(this.consciousnessAnimationFrame);
     }
+    
+    // Clean up all pending echo timers
+    if (this.year3000System?.timerConsolidationSystem) {
+      for (let i = 0; i < this.echoTimerCounter; i++) {
+        this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer(
+          `SidebarConsciousnessSystem-echo-${i}`
+        );
+      }
+    }
+    
     // Clean up nav interaction listener
     if (this.rootNavBar && this._navInteractionHandler) {
       this.rootNavBar.removeEventListener(
@@ -529,12 +541,25 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     this.currentEchoCount++;
     this._elementsWithActiveEcho.add(element);
 
-    setTimeout(() => {
+    // Use TimerConsolidationSystem if available, otherwise fall back to setTimeout
+    const timerId = `SidebarConsciousnessSystem-echo-${this.echoTimerCounter++}`;
+    const cleanup = () => {
       if (echo.parentElement) echo.parentElement.removeChild(echo);
       this.currentEchoCount--;
       this._releaseEchoElement(echo);
       this._elementsWithActiveEcho.delete(element);
-    }, 1100);
+    };
+    
+    if (this.year3000System?.timerConsolidationSystem) {
+      this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
+        timerId,
+        cleanup,
+        1100,
+        "background"
+      );
+    } else {
+      setTimeout(cleanup, 1100);
+    }
   }
 
   // ---------------------------------------------------------------------

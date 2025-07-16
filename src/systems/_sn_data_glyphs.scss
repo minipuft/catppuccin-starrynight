@@ -68,14 +68,9 @@
 }
 
 @keyframes sn-glyph-pulse {
-  0%,
-  100% {
-    transform: scale(calc(0.6 + 0.4 * var(--sn-glyph-pulse-intensity)));
-    opacity: calc(0.5 + 0.5 * var(--sn-glyph-pulse-intensity));
-  }
-  50% {
-    transform: scale(calc(0.8 + 0.2 * var(--sn-glyph-pulse-intensity)));
-    opacity: calc(0.7 + 0.3 * var(--sn-glyph-pulse-intensity));
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0;
   }
 }
 
@@ -129,12 +124,4 @@ nav[aria-label="Main"] ul li a {
     -ms-transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
     -o-transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3);
 }
-}
-
-/* ---------------------------------------------------------------------------*/
-/* NEW: Glyph rendered via pseudo-element to avoid DOM churn (2025-06-19)*/
-/* ---------------------------------------------------------------------------*/
-
-[data-sn-glyph] {
-  @include glyph-consciousness();
 }

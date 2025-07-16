@@ -4,7 +4,8 @@
  */
 
 import React, { useEffect, useRef } from "react";
-import type { Variant } from "@/types/spicetify";
+// Import spicetify types via triple-slash directive
+/// <reference path="../../../types/spicetify.d.ts" />
 import { VariantResolver } from "@/utils/spicetify/VariantResolver";
 
 // Create a singleton instance for performance
@@ -23,7 +24,7 @@ function getVariantResolver(): VariantResolver {
 }
 
 interface VariantTextProps {
-  variant: Variant;
+  variant: Spicetify.Variant;
   children: React.ReactNode;
   className?: string;
   component?: keyof JSX.IntrinsicElements;
@@ -77,24 +78,45 @@ export const VariantText: React.FC<VariantTextProps> = ({
 };
 
 // Convenient preset components for common use cases
-export const VariantHeading: React.FC<Omit<VariantTextProps, 'component'>> = (props) => (
-  <VariantText {...props} component="h2" />
-);
+export const VariantHeading: React.FC<Omit<VariantTextProps, 'component'>> = (props) => {
+  // Provide defaults for required props if not provided
+  const propsWithDefaults = {
+    variant: 'forte' as Spicetify.Variant,
+    children: '',
+    ...props
+  };
+  return <VariantText {...propsWithDefaults} component="h2" />;
+};
 
-export const VariantLabel: React.FC<Omit<VariantTextProps, 'component'>> = (props) => (
-  <VariantText {...props} component="label" />
-);
+export const VariantLabel: React.FC<Omit<VariantTextProps, 'component'>> = (props) => {
+  const propsWithDefaults = {
+    variant: 'bass' as Spicetify.Variant,
+    children: '',
+    ...props
+  };
+  return <VariantText {...propsWithDefaults} component="label" />;
+};
 
-export const VariantButton: React.FC<Omit<VariantTextProps, 'component'>> = (props) => (
-  <VariantText {...props} component="button" />
-);
+export const VariantButton: React.FC<Omit<VariantTextProps, 'component'>> = (props) => {
+  const propsWithDefaults = {
+    variant: 'brio' as Spicetify.Variant,
+    children: '',
+    ...props
+  };
+  return <VariantText {...propsWithDefaults} component="button" />;
+};
 
-export const VariantSpan: React.FC<Omit<VariantTextProps, 'component'>> = (props) => (
-  <VariantText {...props} component="span" />
-);
+export const VariantSpan: React.FC<Omit<VariantTextProps, 'component'>> = (props) => {
+  const propsWithDefaults = {
+    variant: 'bass' as Spicetify.Variant,
+    children: '',
+    ...props
+  };
+  return <VariantText {...propsWithDefaults} component="span" />;
+};
 
 // Hook for getting variant CSS directly
-export const useVariantCSS = (variant: Variant, musicContext?: VariantTextProps['musicContext']) => {
+export const useVariantCSS = (variant: Spicetify.Variant, musicContext?: VariantTextProps['musicContext']) => {
   const resolver = getVariantResolver();
   const context = musicContext ? {
     component: 'span',
@@ -106,7 +128,7 @@ export const useVariantCSS = (variant: Variant, musicContext?: VariantTextProps[
 };
 
 // Hook for getting recommended variant based on usage
-export const useRecommendedVariant = (usage: string): Variant | null => {
+export const useRecommendedVariant = (usage: string): Spicetify.Variant | null => {
   const resolver = getVariantResolver();
   return resolver.getRecommendedVariant(usage);
 };

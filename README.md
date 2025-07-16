@@ -52,7 +52,7 @@ _The theme adapts to your music and color preferences in real time._
 - **🎨 Dynamic Color Pipeline**: UI colors adapt in real-time to album art, harmonized with your chosen Catppuccin flavor.
 - **🌊 WebGL Flow Gradient**: Revolutionary flowing gradient system with dual time-offset waves, dynamic blur, and hardware acceleration.
 - **🎵 BeatSync Visuals**: UI elements pulse, bloom, and animate in sync with the music's BPM and energy.
-- **🚀 Performance Core**: A unified animation loop and batched CSS variable updates ensure a smooth 60 FPS experience.
+- **🚀 Performance Core**: A unified animation loop and batched CSS variable updates ensure a smooth 60 FPS experience. Recently optimized by removing performance-heavy glyph and ripple systems.
 - **⚙️ Graceful Degradation**: Automatically scales visual fidelity for reduced-motion settings, low-end hardware, and fallback modes.
 - **🔮 Modular Visual Systems**: Includes 3D card effects, glassmorphism, nebula glows, wave stack blending, and more, all configurable.
 - **🔧 In-App Settings**: Tweak theme options directly in Spotify's preferences menu—no manual file editing required.

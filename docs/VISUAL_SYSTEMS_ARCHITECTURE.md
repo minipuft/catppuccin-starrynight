@@ -134,9 +134,11 @@ Below is a breakdown of each distinct visual system, outlining its specific cont
   - **Forecasting Logic**: The `generatePredictions(context)` method embodies the core prediction algorithm. This could range from simple heuristic rules (e.g., a rapid increase in energy and loudness might signal an impending drop) to more sophisticated analyses.
   - **Subtle Visual Cues**: Predictions are translated into visual highlights via the `applyHighlights(predictions)` method. This usually involves applying specific CSS classes (obtained via `getHighlightClasses(type)`) to UI elements. These classes might trigger subtle animations, color shifts, or glows that prime the user for the predicted musical change without being overly distracting.
 
-### 4. `DataGlyphSystem`
+### 4. `DataGlyphSystem` ⚠️ **REMOVED (2025-07-16)**
 
-- **Purpose**: To attach small, dynamic visual markers or "glyphs" to various UI elements, such as items in playlists, navigation links, or cards. These glyphs can serve multiple functions: representing underlying data, providing additional context, visually enhancing interactivity, or reacting to the music.
+> **Performance Optimization Notice**: The DataGlyphSystem has been removed due to performance concerns. This system was causing high CPU usage with continuous animation loops and high-frequency DOM manipulation. The core music sync and visual coordination infrastructure has been preserved for future optimized implementations.
+
+- **Previous Purpose**: To attach small, dynamic visual markers or "glyphs" to various UI elements, such as items in playlists, navigation links, or cards. These glyphs served multiple functions: representing underlying data, providing additional context, visually enhancing interactivity, or reacting to the music.
 - **Implementation Highlights**:
   - **DOM Awareness**: It uses a `MutationObserver` (configured via `setupItemObserver`) to monitor the DOM for the appearance or modification of specific UI elements that should host a glyph.
   - **Glyph Lifecycle**: When a designated element is detected, `attachGlyph(itemElement)` is called to create the glyph and append it to the element. The `updateGlyphData(itemElement, data)` method allows the glyph's appearance or state to be changed dynamically, often driven by data from `updateFromMusicAnalysis`.
@@ -210,9 +212,11 @@ This system lives under `src-js/effects/Aberration/` and was finalised in **Phas
 
 ## 🌠 Temporal Echo Contract (Phase 4)
 
-The **Temporal Echo** is the canonical ripple / pulse primitive used across all
+The **Temporal Echo** ⚠️ **DISABLED (2025-07-16)** was the canonical ripple / pulse primitive used across all
 visual systems. A single SCSS class (`.sn-temporal-echo`) together with a small
-set of CSS custom properties replaces a dozen bespoke key-frames. Every system now spawns an echo via DOM (JS) or extends the class
+set of CSS custom properties replaced a dozen bespoke key-frames. 
+
+> **Performance Optimization**: Temporal echo animations have been disabled due to performance concerns. The CSS class and animations are now no-op to eliminate performance overhead while preserving the infrastructure for future optimized implementations.
 in CSS.
 
 | CSS Variable                  | Purpose                                       | Typical Range                                         |

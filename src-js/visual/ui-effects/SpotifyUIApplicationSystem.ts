@@ -319,12 +319,29 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
     });
   }
 
+  /**
+   * Helper method to safely call Year3000System's queueCSSVariableUpdate
+   */
+  private safeQueueCSSVariableUpdate(
+    property: string,
+    value: string,
+    element?: HTMLElement
+  ): void {
+    if (this.year3000System?.queueCSSVariableUpdate) {
+      this.year3000System.queueCSSVariableUpdate(property, value, element || null);
+    } else {
+      // Fallback: apply directly if Year3000System not available
+      const target = element || document.documentElement;
+      target.style.setProperty(property, value);
+    }
+  }
+
   private applyEffectToElement(element: Element, layer: EffectLayer): void {
     if (!(element instanceof HTMLElement)) return;
 
     // Apply CSS variables from the layer using Year3000System's unified batcher
     Object.entries(layer.cssVariables).forEach(([property, value]) => {
-      this.year3000System.queueCSSVariableUpdate(property, value, element);
+      this.safeQueueCSSVariableUpdate(property, value, element);
     });
 
     // Add CSS classes for effect coordination
@@ -350,7 +367,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
       layer.name === "interactive-elements" ||
       layer.name === "now-playing-effects"
     ) {
-      this.year3000System.queueCSSVariableUpdate(
+      this.safeQueueCSSVariableUpdate(
         "--sn-beat-response",
         "var(--sn-music-intensity)",
         element
@@ -360,7 +377,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
 
     // Hover effects
     element.addEventListener("mouseenter", () => {
-      this.year3000System.queueCSSVariableUpdate(
+      this.safeQueueCSSVariableUpdate(
         "--sn-hover-intensity",
         "1",
         element
@@ -369,7 +386,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
     });
 
     element.addEventListener("mouseleave", () => {
-      this.year3000System.queueCSSVariableUpdate(
+      this.safeQueueCSSVariableUpdate(
         "--sn-hover-intensity",
         "0",
         element
@@ -379,7 +396,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
 
     // Click effects
     element.addEventListener("click", () => {
-      this.year3000System.queueCSSVariableUpdate(
+      this.safeQueueCSSVariableUpdate(
         "--sn-click-intensity",
         "1",
         element
@@ -387,7 +404,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
       element.classList.add("sn-click-active");
 
       setTimeout(() => {
-        this.year3000System.queueCSSVariableUpdate(
+        this.safeQueueCSSVariableUpdate(
           "--sn-click-intensity",
           "0",
           element
@@ -492,13 +509,29 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
     // Listen for beat detection from existing systems
     if (this.year3000System.beatSyncVisualSystem) {
       // Hook into beat sync system if it has beat detection
-      setInterval(() => {
-        // Trigger beat effects periodically based on music intensity
-        const intensity = this.getCurrentMusicIntensity();
-        if (intensity > 0.5) {
-          this.triggerBeatEffects({ intensity });
-        }
-      }, 200);
+      // Use TimerConsolidationSystem if available, otherwise fall back to setInterval
+      if (this.year3000System.timerConsolidationSystem) {
+        this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
+          "SpotifyUIApplicationSystem-beatEffects",
+          () => {
+            // Trigger beat effects periodically based on music intensity
+            const intensity = this.getCurrentMusicIntensity();
+            if (intensity > 0.5) {
+              this.triggerBeatEffects({ intensity });
+            }
+          },
+          200,
+          "normal"
+        );
+      } else {
+        setInterval(() => {
+          // Trigger beat effects periodically based on music intensity
+          const intensity = this.getCurrentMusicIntensity();
+          if (intensity > 0.5) {
+            this.triggerBeatEffects({ intensity });
+          }
+        }, 200);
+      }
     }
   }
 
@@ -516,17 +549,17 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
     enhancedElements.forEach((element) => {
       if (element instanceof HTMLElement) {
         // Use Year3000System's unified variable system
-        this.year3000System.queueCSSVariableUpdate(
+        this.safeQueueCSSVariableUpdate(
           "--sn-accent-primary",
           colorData.primary || "var(--spice-accent)",
           element
         );
-        this.year3000System.queueCSSVariableUpdate(
+        this.safeQueueCSSVariableUpdate(
           "--sn-accent-secondary",
           colorData.secondary || "var(--spice-accent)",
           element
         );
-        this.year3000System.queueCSSVariableUpdate(
+        this.safeQueueCSSVariableUpdate(
           "--sn-accent-tertiary",
           colorData.tertiary || "var(--spice-accent)",
           element
@@ -540,7 +573,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
     const intensityElements = document.querySelectorAll(".sn-beat-responsive");
     intensityElements.forEach((element) => {
       if (element instanceof HTMLElement) {
-        this.year3000System.queueCSSVariableUpdate(
+        this.safeQueueCSSVariableUpdate(
           "--sn-music-intensity",
           intensity.toString(),
           element
@@ -553,7 +586,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
     const beatElements = document.querySelectorAll(".sn-beat-responsive");
     beatElements.forEach((element) => {
       if (element instanceof HTMLElement) {
-        this.year3000System.queueCSSVariableUpdate(
+        this.safeQueueCSSVariableUpdate(
           "--sn-beat-pulse",
           "1",
           element
@@ -561,7 +594,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
         element.classList.add("sn-beat-active");
 
         setTimeout(() => {
-          this.year3000System.queueCSSVariableUpdate(
+          this.safeQueueCSSVariableUpdate(
             "--sn-beat-pulse",
             "0",
             element
@@ -587,6 +620,11 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
   }
 
   async destroy(): Promise<void> {
+    // Unregister timers from consolidation system
+    if (this.year3000System?.timerConsolidationSystem) {
+      this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("SpotifyUIApplicationSystem-beatEffects");
+    }
+
     // Clean up observers
     this.observerRegistry.forEach((observer) => {
       observer.disconnect();

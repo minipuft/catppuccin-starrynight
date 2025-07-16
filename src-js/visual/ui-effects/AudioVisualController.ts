@@ -17,15 +17,11 @@ import { GlobalEventBus } from "@/core/events/EventBus";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { Year3000System } from "@/core/lifecycle/year3000System";
 import { UserGenreHistory } from "@/utils/platform/UserHistory";
+import type { BeatPayload } from "@/types/systems";
 
 // -----------------------------
 // Payload typings (lightweight) – kept in-file to avoid tight coupling.
 // -----------------------------
-interface BeatPayload {
-  energy?: number; // 0-1
-  bpm?: number;
-  valence?: number;
-}
 
 interface GenreChangePayload {
   genre: string;
@@ -189,7 +185,10 @@ export class AudioVisualController {
     this._queueVar("--sn-nebula-layer-0-opacity", cueOpacity.toFixed(3));
 
     const clearCue = () => {
-      if (this.activeGlowTimeout) {
+      // Clear timeout from either system
+      if (this.year3000System?.timerConsolidationSystem) {
+        this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("AudioVisualController-glowTimeout");
+      } else if (this.activeGlowTimeout) {
         clearTimeout(this.activeGlowTimeout);
         this.activeGlowTimeout = null;
       }
@@ -202,7 +201,18 @@ export class AudioVisualController {
     };
 
     // Auto-clear after 4 seconds
-    this.activeGlowTimeout = setTimeout(clearCue, 4000);
+    // Use TimerConsolidationSystem if available, otherwise fall back to setTimeout
+    if (this.year3000System?.timerConsolidationSystem) {
+      this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
+        "AudioVisualController-glowTimeout",
+        clearCue,
+        4000,
+        "normal"
+      );
+      this.activeGlowTimeout = null; // Timer is managed by consolidation system
+    } else {
+      this.activeGlowTimeout = setTimeout(clearCue, 4000);
+    }
 
     // Also clear on first user interaction
     this.interactionOffHandler = () => clearCue();
@@ -285,6 +295,24 @@ export class AudioVisualController {
   }
 
   public destroy(): void {
+    // Unregister timer from consolidation system
+    if (this.year3000System?.timerConsolidationSystem) {
+      this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("AudioVisualController-glowTimeout");
+    }
+    
+    // Clear active timeout (fallback)
+    if (this.activeGlowTimeout) {
+      clearTimeout(this.activeGlowTimeout);
+      this.activeGlowTimeout = null;
+    }
+    
+    // Remove event listeners
+    if (this.interactionOffHandler) {
+      document.removeEventListener("pointerdown", this.interactionOffHandler);
+      document.removeEventListener("keydown", this.interactionOffHandler);
+      this.interactionOffHandler = null;
+    }
+    
     this.unsubscribers.forEach((u) => u());
     this.unsubscribers = [];
   }

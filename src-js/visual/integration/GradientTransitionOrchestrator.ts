@@ -564,6 +564,7 @@ export class GradientTransitionOrchestrator {
   private startPerformanceMonitoring(): void {
     if (this.performanceCheckInterval) {
       clearInterval(this.performanceCheckInterval);
+      this.performanceCheckInterval = null;
     }
 
     this.performanceCheckInterval = window.setInterval(this.boundPerformanceCheck!, 1000);

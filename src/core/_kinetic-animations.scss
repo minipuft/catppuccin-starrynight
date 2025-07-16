@@ -4,14 +4,7 @@
 // ===== RIPPLE ANIMATIONS =====
 
 @keyframes year3000-ripple {
-  0% {
-    transform: scale(0);
-    opacity: var(--sn-kinetic-intensity, 0.6);
-  }
-  50% {
-    opacity: calc(var(--sn-kinetic-intensity, 0.6) * 0.8);
-  }
-  100% {
+  0%, 100% {
     transform: scale(1);
     opacity: 0;
   }
@@ -20,11 +13,7 @@
 @keyframes year3000-ripple-pulse {
   0%, 100% {
     transform: scale(1);
-    opacity: var(--sn-kinetic-intensity, 0.3);
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: calc(var(--sn-kinetic-intensity, 0.3) * 1.5);
+    opacity: 0;
   }
 }
 
@@ -193,15 +182,10 @@
 // ===== TEMPORAL ECHO ANIMATIONS =====
 
 @keyframes year3000-temporal-echo {
-  0% {
-    opacity: calc(var(--sn-kinetic-intensity, 1) * 0.3);
-    transform: scale(1.05);
-    filter: blur(1px);
-  }
-  100% {
+  0%, 100% {
     opacity: 0;
-    transform: scale(1.15);
-    filter: blur(3px);
+    transform: scale(1);
+    filter: none;
   }
 }
 
@@ -326,38 +310,19 @@
 
 // Temporal Echo Classes
 .sn-temporal-echo {
-  animation: year3000-temporal-echo 800ms ease-out forwards;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
+  animation: none;
+  opacity: 0;
   pointer-events: none;
-  border-radius: inherit;
-  transform-origin: center;
-  z-index: 0;
-  animation: year3000-echo-core 800ms var(--sn-echo-decay-curve) forwards;
 }
 
 .sn-temporal-echo::before,
 .sn-temporal-echo::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
+  content: none;
+  animation: none;
+  opacity: 0;
 }
 
-.sn-temporal-echo::before {
-  animation: year3000-echo-core 1000ms 80ms var(--sn-echo-decay-curve) forwards;
-  opacity: 0.6;
-}
 
-.sn-temporal-echo::after {
-  animation: year3000-echo-core 1200ms 160ms var(--sn-echo-decay-curve)
-    forwards;
-  opacity: 0.3;
-}
 
 // The curve approximates lerpSmooth's exponential ease-out (base 2) for CSS
 
@@ -531,23 +496,12 @@
 
 .sn-temporal-echo::before,
 .sn-temporal-echo::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
+  content: none;
+  animation: none;
+  opacity: 0;
 }
 
-.sn-temporal-echo::before {
-  animation: year3000-echo-core 1000ms 80ms var(--sn-echo-decay-curve) forwards;
-  opacity: 0.6;
-}
 
-.sn-temporal-echo::after {
-  animation: year3000-echo-core 1200ms 160ms var(--sn-echo-decay-curve)
-    forwards;
-  opacity: 0.3;
-}
 
 // The curve approximates lerpSmooth's exponential ease-out (base 2) for CSS
 

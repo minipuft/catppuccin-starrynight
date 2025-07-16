@@ -217,7 +217,7 @@ export class Year3000IntegrationBridge {
         );
         await this.transitionOrchestrator.initialize(
           this.fluxConsciousnessLayers,
-          this.webglBackgroundSystem
+          this.webglBackgroundSystem || undefined
         );
       }
 

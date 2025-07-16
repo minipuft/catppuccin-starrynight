@@ -16,6 +16,7 @@
 import { GlobalEventBus } from "@/core/events/EventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
 import { getScrollNode } from "@/utils/dom/getScrollNode";
 
 // ---------------------------------------------------------------------------
@@ -97,6 +98,11 @@ export class VisualFrameCoordinator {
   ) {
     // Decide initial budget based on perf analyzer if available.
     this.frameBudgetMs = this._resolveFrameBudget();
+    
+    // Initialize budget manager if performance analyzer is available
+    if (this.perfAnalyzer) {
+      this.budgetManager = PerformanceBudgetManager.getInstance(undefined, this.perfAnalyzer);
+    }
 
     this._setupOrientationListeners();
     this._setupReducedMotionListener();
@@ -196,8 +202,10 @@ export class VisualFrameCoordinator {
   }
 
   // -------------------------------------------------------------------------
-  // Internal loop & helpers
+  // Internal loop & helpers with Performance Budget Management
   // -------------------------------------------------------------------------
+  
+  private budgetManager?: PerformanceBudgetManager;
 
   private _startLoop(): void {
     const loop = (timestamp: number) => {
@@ -226,12 +234,21 @@ export class VisualFrameCoordinator {
 
       // Execute registered systems respecting priority & budget.
       let remaining = this.frameBudgetMs;
+      const frameStart = performance.now();
+      
       for (const wrapper of this.systems) {
         if (remaining <= 0 && wrapper.priority === "background") break;
 
         const start = performance.now();
         try {
-          wrapper.system.onAnimate(deltaMs, context);
+          // Use performance monitoring for individual systems
+          if (this.perfAnalyzer) {
+            this.perfAnalyzer.timeOperation('animationFrame', () => {
+              wrapper.system.onAnimate(deltaMs, context);
+            });
+          } else {
+            wrapper.system.onAnimate(deltaMs, context);
+          }
         } catch (err) {
           console.error(
             `[VisualFrameCoordinator] Error in system ${wrapper.system.systemName}:`,
@@ -245,6 +262,12 @@ export class VisualFrameCoordinator {
           wrapper.averageTime === 0
             ? execTime
             : wrapper.averageTime * 0.9 + execTime * 0.1;
+      }
+      
+      // Monitor total frame time
+      const totalFrameTime = performance.now() - frameStart;
+      if (this.perfAnalyzer) {
+        this.perfAnalyzer.isWithinBudget('animationFrame', totalFrameTime);
       }
 
       // Re-evaluate perf mode every second.

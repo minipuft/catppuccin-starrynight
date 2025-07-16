@@ -3,7 +3,8 @@
  * Integrates with Year 3000 System's theming architecture for consistent typography
  */
 
-import type { Variant } from "../../../types/spicetify";
+// Import spicetify types via triple-slash directive
+/// <reference path="../../../types/spicetify.d.ts" />
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 
 declare const Spicetify: any;
@@ -16,7 +17,7 @@ export interface VariantConfig {
 }
 
 export interface VariantMapping {
-  variant: Variant;
+  variant: Spicetify.Variant;
   fontSize: string;
   fontWeight: string;
   lineHeight: string;
@@ -273,11 +274,11 @@ export class VariantResolver {
     }
   }
 
-  public getVariantMapping(variant: Variant): VariantMapping | null {
+  public getVariantMapping(variant: Spicetify.Variant): VariantMapping | null {
     return VariantResolver.VARIANT_MAPPINGS.find(m => m.variant === variant) || null;
   }
 
-  public getVariantCSS(variant: Variant, context?: VariantContext): string {
+  public getVariantCSS(variant: Spicetify.Variant, context?: VariantContext): string {
     const mapping = this.getVariantMapping(variant);
     if (!mapping) {
       if (this.config.enableDebug) {
@@ -300,12 +301,12 @@ export class VariantResolver {
     `.trim();
   }
 
-  public getVariantClass(variant: Variant): string {
+  public getVariantClass(variant: Spicetify.Variant): string {
     const mapping = this.getVariantMapping(variant);
     return mapping?.cssClass || `sn-text-${variant}`;
   }
 
-  public applyVariantToElement(element: HTMLElement, variant: Variant, context?: VariantContext): void {
+  public applyVariantToElement(element: HTMLElement, variant: Spicetify.Variant, context?: VariantContext): void {
     const css = this.getVariantCSS(variant, context);
     const className = this.getVariantClass(variant);
     
@@ -365,7 +366,7 @@ export class VariantResolver {
     }
   }
 
-  public getRecommendedVariant(usage: string): Variant | null {
+  public getRecommendedVariant(usage: string): Spicetify.Variant | null {
     for (const mapping of VariantResolver.VARIANT_MAPPINGS) {
       if (mapping.contextualUsage.includes(usage)) {
         return mapping.variant;

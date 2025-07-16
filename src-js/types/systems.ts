@@ -4,6 +4,12 @@ export interface HealthCheckResult {
   issues?: string[];
 }
 
+export interface BeatPayload {
+  energy?: number; // 0-1
+  bpm?: number;
+  valence?: number;
+}
+
 export interface IManagedSystem {
   initialized: boolean;
 
