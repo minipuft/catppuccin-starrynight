@@ -5,8 +5,10 @@
   "main": "theme.js",
   "scripts": {
     "test": "jest",
-    "build": "npm run typecheck && esbuild src-js/theme.entry.ts --bundle --outfile=theme.js --format=iife --target=es2020 --external:react --external:react-dom --loader:.fs=text",
-    "build:fast": "esbuild src-js/theme.entry.ts --bundle --outfile=theme.js --format=iife --target=es2020 --external:react --external:react-dom --loader:.fs=text",
+    "build": "npm run build:css && npm run build:js",
+    "build:js": "npm run typecheck && esbuild src-js/theme.entry.ts --bundle --outfile=theme.js --format=iife --target=es2020 --external:react --external:react-dom --loader:.fs=text",
+    "build:css": "sass app.scss user.css --style=compressed --quiet",
+    "build:fast": "npm run build:css && esbuild src-js/theme.entry.ts --bundle --outfile=theme.js --format=iife --target=es2020 --external:react --external:react-dom --loader:.fs=text",
     "build:ci": "npm run build",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "tsc --noEmit --watch",
@@ -24,7 +26,12 @@
     "fill-dispositions": "ts-node scripts/fillDispositions.ts --mode merge",
     "prune-css": "ts-node scripts/pruneDuplicateDecls.ts",
     "validate": "npm run typecheck && npm run lint:css && npm run test",
-    "validate:fix": "npm run lint:js:fix && npm run validate"
+    "validate:fix": "npm run lint:js:fix && npm run validate",
+    "test:comprehensive": "node scripts/run-comprehensive-tests.js",
+    "test:theme": "node scripts/validate-theme-structure.js && node scripts/validate-color-schemes.js",
+    "ci:full": "npm run test:comprehensive",
+    "prepare:release": "node scripts/prepare-release.js",
+    "release:dry-run": "npm run prepare:release"
   },
   "devDependencies": {
     "@rollup/plugin-url": "^8.0.2",
