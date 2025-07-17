@@ -56,6 +56,12 @@ jobs:
           # Install system dependencies for performance analysis
           sudo apt-get update && sudo apt-get install -y bc
           
+          # Check if sass is available
+          if ! npx sass --version > /dev/null 2>&1; then
+            echo "⚠️ SASS not found via npx, checking if installed..."
+            npm ls sass || echo "ℹ️ SASS may need to be installed"
+          fi
+          
           # Install additional performance analysis tools
           npm install -g bundlesize || echo "⚠️ bundlesize not available"
       
@@ -66,20 +72,26 @@ jobs:
           # Clean previous builds
           rm -f theme.js user.css
           
-          # Verify build command exists
-          if ! npm run build:ci --dry-run > /dev/null 2>&1; then
-            echo "❌ build:ci script not found in package.json"
-            exit 1
-          fi
-          
-          # Build with timing
+          # Build with timing and verbose output
           start_time=$(date +%s%N)
+          echo "🏗️ Running build command..."
           if npm run build:ci; then
             end_time=$(date +%s%N)
             build_duration=$(( (end_time - start_time) / 1000000 ))
             echo "⏱️ Build completed in ${build_duration}ms"
           else
-            echo "❌ Build failed"
+            echo "❌ Build failed with exit code $?"
+            echo "🔍 Checking for common issues..."
+            
+            # Check if required files exist
+            [ ! -f "package.json" ] && echo "   Missing package.json"
+            [ ! -f "app.scss" ] && echo "   Missing app.scss"
+            [ ! -f "src-js/theme.entry.ts" ] && echo "   Missing theme.entry.ts"
+            
+            # Check npm and node versions
+            echo "   Node version: $(node --version)"
+            echo "   NPM version: $(npm --version)"
+            
             exit 1
           fi
           
