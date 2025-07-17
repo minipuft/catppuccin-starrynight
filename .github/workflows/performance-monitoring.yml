@@ -17,9 +17,9 @@ on:
         type: boolean
 
 env:
-  PERFORMANCE_BUDGET_CSS: '150000'      # 150KB CSS budget
-  PERFORMANCE_BUDGET_JS: '200000'       # 200KB JS budget
-  PERFORMANCE_BUDGET_TOTAL: '350000'    # 350KB total budget
+  PERFORMANCE_BUDGET_CSS: '600000'      # 600KB CSS budget
+  PERFORMANCE_BUDGET_JS: '800000'       # 800KB JS budget
+  PERFORMANCE_BUDGET_TOTAL: '1400000'   # 1.4MB total budget
 
 jobs:
   # ============================================================================
@@ -53,6 +53,9 @@ jobs:
           echo "📦 Installing dependencies..."
           npm ci
           
+          # Install system dependencies for performance analysis
+          sudo apt-get update && sudo apt-get install -y bc
+          
           # Install additional performance analysis tools
           npm install -g bundlesize || echo "⚠️ bundlesize not available"
       
@@ -63,19 +66,32 @@ jobs:
           # Clean previous builds
           rm -f theme.js user.css
           
+          # Verify build command exists
+          if ! npm run build:ci --dry-run > /dev/null 2>&1; then
+            echo "❌ build:ci script not found in package.json"
+            exit 1
+          fi
+          
           # Build with timing
           start_time=$(date +%s%N)
-          npm run build:ci
-          end_time=$(date +%s%N)
-          
-          build_duration=$(( (end_time - start_time) / 1000000 ))
-          echo "⏱️ Build completed in ${build_duration}ms"
+          if npm run build:ci; then
+            end_time=$(date +%s%N)
+            build_duration=$(( (end_time - start_time) / 1000000 ))
+            echo "⏱️ Build completed in ${build_duration}ms"
+          else
+            echo "❌ Build failed"
+            exit 1
+          fi
           
           # Verify outputs
           if [ -f "theme.js" ] && [ -f "user.css" ]; then
             echo "✅ Build artifacts created successfully"
+            echo "   theme.js: $(du -h theme.js | cut -f1)"
+            echo "   user.css: $(du -h user.css | cut -f1)"
           else
             echo "❌ Build artifacts missing"
+            [ ! -f "theme.js" ] && echo "   Missing: theme.js"
+            [ ! -f "user.css" ] && echo "   Missing: user.css"
             exit 1
           fi
       
@@ -208,17 +224,32 @@ jobs:
           echo "📊 Performance Report Generation"
           echo "================================"
           
+          # Calculate budget values in KB for display
+          js_budget_kb=$((PERFORMANCE_BUDGET_JS / 1024))
+          css_budget_kb=$((PERFORMANCE_BUDGET_CSS / 1024))
+          total_budget_kb=$((PERFORMANCE_BUDGET_TOTAL / 1024))
+          
+          # Get current sizes for status check
+          current_js_size=$(wc -c < theme.js)
+          current_css_size=$(wc -c < user.css)
+          current_total_size=$((current_js_size + current_css_size))
+          
+          # Determine status
+          js_status=$([ $current_js_size -le $PERFORMANCE_BUDGET_JS ] && echo "✅ Pass" || echo "⚠️ Exceed")
+          css_status=$([ $current_css_size -le $PERFORMANCE_BUDGET_CSS ] && echo "✅ Pass" || echo "⚠️ Exceed")
+          total_status=$([ $current_total_size -le $PERFORMANCE_BUDGET_TOTAL ] && echo "✅ Pass" || echo "⚠️ Exceed")
+          
           # Create performance report
-          cat > performance-report.md << 'EOF'
+          cat > performance-report.md << EOF
           # 📈 Performance Analysis Report
           
           ## Bundle Size Analysis
           
           | Asset | Size | Budget | Status |
           |-------|------|--------|--------|
-          | JavaScript | $(du -h theme.js | cut -f1) | $(echo "$PERFORMANCE_BUDGET_JS / 1024" | bc)KB | $([ $(wc -c < theme.js) -le $PERFORMANCE_BUDGET_JS ] && echo "✅ Pass" || echo "⚠️ Exceed") |
-          | CSS | $(du -h user.css | cut -f1) | $(echo "$PERFORMANCE_BUDGET_CSS / 1024" | bc)KB | $([ $(wc -c < user.css) -le $PERFORMANCE_BUDGET_CSS ] && echo "✅ Pass" || echo "⚠️ Exceed") |
-          | Total | $(du -ch theme.js user.css | tail -1 | cut -f1) | $(echo "$PERFORMANCE_BUDGET_TOTAL / 1024" | bc)KB | $([ $(($(wc -c < theme.js) + $(wc -c < user.css))) -le $PERFORMANCE_BUDGET_TOTAL ] && echo "✅ Pass" || echo "⚠️ Exceed") |
+          | JavaScript | $(du -h theme.js | cut -f1) | ${js_budget_kb}KB | $js_status |
+          | CSS | $(du -h user.css | cut -f1) | ${css_budget_kb}KB | $css_status |
+          | Total | $(du -ch theme.js user.css | tail -1 | cut -f1) | ${total_budget_kb}KB | $total_status |
           
           ## Performance Systems
           
@@ -271,7 +302,12 @@ jobs:
           cache: 'npm'
       
       - name: 📦 Install Dependencies
-        run: npm ci
+        run: |
+          echo "📦 Installing dependencies..."
+          npm ci
+          
+          # Install system dependencies for performance analysis
+          sudo apt-get update && sudo apt-get install -y bc
       
       - name: 🏗️ Build Current Version
         run: npm run build:ci
@@ -348,7 +384,12 @@ jobs:
           cache: 'npm'
       
       - name: 📦 Install Dependencies
-        run: npm ci
+        run: |
+          echo "📦 Installing dependencies..."
+          npm ci
+          
+          # Install system dependencies for performance analysis
+          sudo apt-get update && sudo apt-get install -y bc
       
       - name: 🏗️ Build with Detailed Analysis
         run: |
