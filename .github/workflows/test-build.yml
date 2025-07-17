@@ -1,0 +1,85 @@
+name: 🧪 Test Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-build:
+    name: 🧪 Test Build Process
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          echo "📦 Installing dependencies..."
+          npm ci
+          
+          # Check installations
+          echo "✅ Node version: $(node --version)"
+          echo "✅ NPM version: $(npm --version)"
+          echo "✅ SASS version: $(npx sass --version)"
+          
+          # Check key files exist
+          echo "🔍 Checking key files:"
+          ls -la app.scss || echo "❌ Missing app.scss"
+          ls -la package.json || echo "❌ Missing package.json"
+          ls -la src-js/theme.entry.ts || echo "❌ Missing theme.entry.ts"
+      
+      - name: 🏗️ Test Build Components
+        run: |
+          echo "🏗️ Testing build components separately..."
+          
+          # Test CSS build
+          echo "🎨 Testing CSS build..."
+          if npx sass app.scss user.css --style=compressed; then
+            echo "✅ CSS build successful"
+            ls -la user.css
+          else
+            echo "❌ CSS build failed"
+            exit 1
+          fi
+          
+          # Test TypeScript check
+          echo "🔍 Testing TypeScript check..."
+          if npm run typecheck; then
+            echo "✅ TypeScript check successful"
+          else
+            echo "❌ TypeScript check failed"
+            exit 1
+          fi
+          
+          # Test JavaScript build
+          echo "📦 Testing JavaScript build..."
+          if npx esbuild src-js/theme.entry.ts --bundle --outfile=theme.js --format=iife --target=es2020 --external:react --external:react-dom --loader:.fs=text; then
+            echo "✅ JavaScript build successful"
+            ls -la theme.js
+          else
+            echo "❌ JavaScript build failed"
+            exit 1
+          fi
+      
+      - name: 🎯 Test Full Build
+        run: |
+          echo "🎯 Testing full build command..."
+          rm -f theme.js user.css
+          
+          if npm run build:ci; then
+            echo "✅ Full build successful"
+            echo "📊 Build artifacts:"
+            ls -la theme.js user.css
+            echo "📏 File sizes:"
+            du -h theme.js user.css
+          else
+            echo "❌ Full build failed"
+            exit 1
+          fi
