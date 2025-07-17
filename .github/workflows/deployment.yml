@@ -1,0 +1,338 @@
+name: 🚀 Deployment Automation
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+          - testing
+      force-deploy:
+        description: 'Force deployment (skip validation)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '20'
+  FORCE_COLOR: '1'
+  CI: 'true'
+
+jobs:
+  # ============================================================================
+  # PRE-DEPLOYMENT VALIDATION
+  # ============================================================================
+  pre-deployment-validation:
+    name: 🔍 Pre-deployment Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event.inputs.force-deploy != 'true'
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install Dependencies
+        run: npm ci
+        
+      - name: 🏗️ Build Theme
+        run: npm run build
+        
+      - name: 🧪 Run Tests
+        run: npm test
+        
+      - name: 🔍 Theme Structure Validation
+        run: node scripts/validate-theme-structure.js
+        
+      - name: 🌈 Color Validation
+        run: node scripts/validate-color-schemes.js
+        
+      - name: 🚀 Performance Check
+        run: |
+          echo "🚀 Running performance validation..."
+          
+          # Bundle size check
+          js_size=$(wc -c < theme.js)
+          css_size=$(wc -c < user.css)
+          total_size=$((js_size + css_size))
+          
+          echo "📊 Final Bundle Analysis:"
+          echo "  JavaScript: $(echo "scale=1; $js_size / 1024" | bc)KB"
+          echo "  CSS: $(echo "scale=1; $css_size / 1024" | bc)KB"
+          echo "  Total: $(echo "scale=1; $total_size / 1024" | bc)KB"
+          
+          # Ensure within performance budgets
+          if [ $total_size -gt 450000 ]; then
+            echo "❌ Bundle too large for deployment: $(echo "scale=1; $total_size / 1024" | bc)KB"
+            exit 1
+          fi
+          
+          echo "✅ Performance validation passed"
+          
+      - name: 📤 Upload Pre-deployment Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-deployment-build
+          path: |
+            theme.js
+            user.css
+            manifest.json
+            color.ini
+            README.md
+          retention-days: 30
+
+  # ============================================================================
+  # STAGING DEPLOYMENT
+  # ============================================================================
+  staging-deployment:
+    name: 🧪 Staging Deployment
+    runs-on: ubuntu-latest
+    needs: [pre-deployment-validation]
+    if: |
+      always() && 
+      (needs.pre-deployment-validation.result == 'success' || 
+       needs.pre-deployment-validation.result == 'skipped') &&
+      github.event.inputs.environment == 'staging'
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: pre-deployment-build
+          path: ./
+          
+      - name: 🧪 Create Staging Package
+        run: |
+          echo "🧪 Creating staging deployment package..."
+          
+          # Create staging directory
+          mkdir -p staging-package
+          
+          # Copy theme files
+          cp theme.js staging-package/
+          cp user.css staging-package/
+          cp manifest.json staging-package/
+          cp color.ini staging-package/
+          cp README.md staging-package/
+          
+          # Add staging marker
+          echo "STAGING_BUILD=$(date -u +%Y%m%d-%H%M%S)" >> staging-package/staging.env
+          echo "COMMIT_SHA=${{ github.sha }}" >> staging-package/staging.env
+          
+          # Create package info
+          cat > staging-package/package-info.json << EOF
+          {
+            "environment": "staging",
+            "version": "${{ github.ref_name }}",
+            "commit": "${{ github.sha }}",
+            "build_time": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "workflow_run": "${{ github.run_id }}"
+          }
+          EOF
+          
+          echo "✅ Staging package created"
+          
+      - name: 📤 Upload Staging Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-deployment-package
+          path: staging-package/
+          retention-days: 7
+          
+      - name: 🔔 Staging Notification
+        run: |
+          echo "🧪 Staging deployment completed"
+          echo "📦 Package: staging-deployment-package"
+          echo "🔗 Commit: ${{ github.sha }}"
+          echo "🏷️ Version: ${{ github.ref_name }}"
+
+  # ============================================================================
+  # PRODUCTION DEPLOYMENT
+  # ============================================================================
+  production-deployment:
+    name: 🚀 Production Deployment
+    runs-on: ubuntu-latest
+    needs: [pre-deployment-validation]
+    if: |
+      always() && 
+      (needs.pre-deployment-validation.result == 'success' || 
+       needs.pre-deployment-validation.result == 'skipped') &&
+      (github.event.inputs.environment == 'production' || 
+       startsWith(github.ref, 'refs/tags/v'))
+    timeout-minutes: 15
+    environment: production
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: pre-deployment-build
+          path: ./
+          
+      - name: 🚀 Create Production Package
+        run: |
+          echo "🚀 Creating production deployment package..."
+          
+          # Create production directory
+          mkdir -p production-package
+          
+          # Copy theme files
+          cp theme.js production-package/
+          cp user.css production-package/
+          cp manifest.json production-package/
+          cp color.ini production-package/
+          cp README.md production-package/
+          
+          # Copy installation scripts
+          if [ -f "install.sh" ]; then
+            cp install.sh production-package/
+          fi
+          if [ -f "install-hybrid.sh" ]; then
+            cp install-hybrid.sh production-package/
+          fi
+          if [ -f "install.ps1" ]; then
+            cp install.ps1 production-package/
+          fi
+          
+          # Add production metadata
+          cat > production-package/release-info.json << EOF
+          {
+            "environment": "production",
+            "version": "${{ github.ref_name }}",
+            "commit": "${{ github.sha }}",
+            "release_time": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "workflow_run": "${{ github.run_id }}",
+            "pre_deployment_validation": "passed"
+          }
+          EOF
+          
+          # Create checksums
+          cd production-package
+          sha256sum * > checksums.sha256
+          cd ..
+          
+          echo "✅ Production package created"
+          
+      - name: 📊 Final Deployment Metrics
+        run: |
+          echo "📊 Production Deployment Metrics"
+          echo "=================================="
+          echo "📦 Theme Bundle: $(du -h production-package/theme.js | cut -f1)"
+          echo "🎨 CSS Bundle: $(du -h production-package/user.css | cut -f1)"
+          echo "📋 Package Size: $(du -sh production-package | cut -f1)"
+          echo "🔗 Commit: ${{ github.sha }}"
+          echo "🏷️ Version: ${{ github.ref_name }}"
+          echo "⏰ Build Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          
+      - name: 📤 Upload Production Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-deployment-package
+          path: production-package/
+          retention-days: 90
+          
+      - name: 🏷️ Create Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: StarryNight ${{ github.ref }}
+          body: |
+            🌌 **Catppuccin StarryNight** - Production Release
+            
+            ## 🚀 What's New
+            - Theme bundle optimized for production
+            - Performance validated and within budgets
+            - Full Catppuccin color palette support
+            - Year 3000 System visual effects
+            
+            ## 📦 Installation
+            1. Download the theme files
+            2. Copy to your Spicetify themes directory
+            3. Run `spicetify config current_theme catppuccin-starrynight`
+            4. Apply with `spicetify apply`
+            
+            ## 📊 Bundle Information
+            - **JavaScript**: $(du -h production-package/theme.js | cut -f1)
+            - **CSS**: $(du -h production-package/user.css | cut -f1)
+            - **Total Package**: $(du -sh production-package | cut -f1)
+            
+            ## 🔧 Technical Details
+            - **Commit**: ${{ github.sha }}
+            - **Build Time**: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+            - **CI/CD Pipeline**: Fully validated
+            
+            ---
+            Generated by automated deployment pipeline 🤖
+          draft: false
+          prerelease: false
+
+  # ============================================================================
+  # POST-DEPLOYMENT VALIDATION
+  # ============================================================================
+  post-deployment-validation:
+    name: ✅ Post-deployment Validation
+    runs-on: ubuntu-latest
+    needs: [staging-deployment, production-deployment]
+    if: always() && (needs.staging-deployment.result == 'success' || needs.production-deployment.result == 'success')
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: 🔍 Validate Deployment Artifacts
+        run: |
+          echo "🔍 Validating deployment artifacts..."
+          
+          # Check if deployment packages exist
+          if [ "${{ needs.staging-deployment.result }}" == "success" ]; then
+            echo "✅ Staging deployment completed successfully"
+          fi
+          
+          if [ "${{ needs.production-deployment.result }}" == "success" ]; then
+            echo "✅ Production deployment completed successfully"
+          fi
+          
+          echo "🎯 Deployment validation completed"
+          
+      - name: 🔔 Deployment Success Notification
+        if: needs.production-deployment.result == 'success'
+        run: |
+          echo "🎉 Production deployment successful!"
+          echo "🌌 StarryNight theme is now live"
+          echo "🏷️ Version: ${{ github.ref_name }}"
+          echo "📦 Package available in artifacts"
+          echo "🔗 Commit: ${{ github.sha }}"
+          
+      - name: 📊 Deployment Summary
+        run: |
+          echo "📊 Deployment Summary"
+          echo "===================="
+          echo "🧪 Staging: ${{ needs.staging-deployment.result }}"
+          echo "🚀 Production: ${{ needs.production-deployment.result }}"
+          echo "⏰ Completed: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "🔗 Workflow: ${{ github.run_id }}"

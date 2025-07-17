@@ -1,4 +1,4 @@
-import { getCanonicalAccent } from "../src-js/utils/Year3000Utilities";
+import { getCanonicalAccent } from "../src-js/utils/core/Year3000Utilities";
 
 /**
  * Ensures the canonical accent variables remain in sync. If either the HEX or

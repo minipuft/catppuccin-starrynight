@@ -1,25 +1,27 @@
-[
-  {
-    "name": "Catppuccin StarryNight",
-    "description": "A hybrid theme combining Catppuccin's beautiful color palette with StarryNight's dynamic visual effects for an immersive Spotify experience. Now with modern Spicetify APIs and CORS-free color extraction.",
-    "preview": "assets/home.png",
-    "readme": "README.md",
-    "usercss": "user.css",
-    "schemes": "color.ini",
-    "authors": [
-      {
-        "name": "Catppuccin StarryNight Contributors",
-        "url": "https://github.com/catppuccin/spicetify"
-      }
-    ],
-    "tags": [
-      "catppuccin",
-      "dynamic",
-      "animated",
-      "starrynight",
-      "gradient",
-      "modern",
-      "spice-variables"
-    ]
-  }
-]
+{
+  "name": "Catppuccin StarryNight",
+  "description": "A hybrid theme combining Catppuccin's beautiful color palette with StarryNight's dynamic visual effects for an immersive Spotify experience. Now with modern Spicetify APIs and CORS-free color extraction.",
+  "version": "1.1.0",
+  "author": "Catppuccin StarryNight Contributors",
+  "preview": "assets/home.png",
+  "readme": "README.md",
+  "usercss": "user.css",
+  "schemes": "color.ini",
+  "schemeNames": ["mocha", "macchiato", "frappe", "latte"],
+  "starryNightVersion": "3.0.0",
+  "authors": [
+    {
+      "name": "Catppuccin StarryNight Contributors",
+      "url": "https://github.com/catppuccin/spicetify"
+    }
+  ],
+  "tags": [
+    "catppuccin",
+    "dynamic",
+    "animated",
+    "starrynight",
+    "gradient",
+    "modern",
+    "spice-variables"
+  ]
+}

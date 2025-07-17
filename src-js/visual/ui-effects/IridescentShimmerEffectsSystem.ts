@@ -128,9 +128,9 @@ export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
           mixBlendMode: 'multiply'
         },
         { 
-          background: 'linear-gradient(135deg, rgba(0,255,150,0.15) 0%, rgba(255,0,255,0.15) 50%, rgba(0,150,255,0.15) 100%)',
+          background: 'linear-gradient(135deg, rgba(0,255,150,0.12) 0%, rgba(255,0,255,0.12) 50%, rgba(0,150,255,0.12) 100%)',
           transform: 'rotate(120deg) scale(1.1)',
-          mixBlendMode: 'screen'
+          mixBlendMode: 'overlay' // Changed from 'screen' to prevent white bleeding
         },
         { 
           background: 'linear-gradient(225deg, rgba(255,150,0,0.12) 0%, rgba(150,255,0,0.12) 50%, rgba(255,0,150,0.12) 100%)',

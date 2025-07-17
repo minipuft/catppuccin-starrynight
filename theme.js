@@ -17993,8 +17993,11 @@ void main() {
         position: "absolute",
         inset: "0",
         pointerEvents: "none",
-        mixBlendMode: "screen",
-        zIndex: "-1"
+        mixBlendMode: "overlay",
+        // Changed from "screen" to prevent white bleeding
+        zIndex: "-1",
+        opacity: "0.6"
+        // Reduced opacity to prevent harsh effects
       });
       this.parent.appendChild(this.canvas);
       this.perf = y3k?.performanceAnalyzer ?? null;
@@ -18061,7 +18064,8 @@ void main() {
         0,
         gl.RGBA,
         gl.UNSIGNED_BYTE,
-        new Uint8Array([255, 255, 255, 255])
+        new Uint8Array([0, 0, 0, 0])
+        // Changed from white [255,255,255,255] to transparent [0,0,0,0]
       );
       this.tex = tex;
     }
@@ -18086,6 +18090,7 @@ void main() {
       const gl = this.gl;
       if (this.perf) this.frameStart = performance.now();
       gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+      gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.useProgram(this.program);
       const uTexLoc = gl.getUniformLocation(this.program, "uTex");

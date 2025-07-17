@@ -1,9 +1,52 @@
 // @ts-nocheck – test hooks into private members intentionally
-import { PerformanceAnalyzer } from "../src-js/core/PerformanceAnalyzer";
-import { SettingsManager } from "../src-js/managers/SettingsManager";
-import { MusicSyncService } from "../src-js/services/MusicSyncService";
-import { SidebarConsciousnessSystem } from "../src-js/systems/visual/SidebarConsciousnessSystem";
-import * as Year3000Utilities from "../src-js/utils/Year3000Utilities";
+
+// Mock Spicetify global first
+const mockSpicetify = {
+  Player: { data: { item: { uri: "spotify:track:test" } } },
+  LocalStorage: {
+    get: jest.fn().mockReturnValue("default"),
+    set: jest.fn(),
+  },
+  colorExtractor: jest.fn().mockResolvedValue({}),
+  CosmosAsync: {
+    get: jest.fn().mockResolvedValue({ audio_features: [{ tempo: 120 }] }),
+  },
+  showNotification: jest.fn(),
+};
+
+// @ts-ignore
+global.Spicetify = mockSpicetify;
+
+// Mock window.matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
+// Mock ResizeObserver
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
+
+// Mock Canvas getContext
+HTMLCanvasElement.prototype.getContext = jest.fn().mockReturnValue(null);
+
+import { PerformanceAnalyzer } from "../src-js/core/performance/PerformanceAnalyzer";
+import { SettingsManager } from "../src-js/ui/managers/SettingsManager";
+import { MusicSyncService } from "../src-js/audio/MusicSyncService";
+import { SidebarConsciousnessSystem } from "../src-js/visual/ui-effects/SidebarConsciousnessSystem";
+import * as Year3000Utilities from "../src-js/utils/core/Year3000Utilities";
 
 // Dummy dependencies --------------------------------------------------------
 class DummyMusicSync implements Partial<MusicSyncService> {
@@ -12,6 +55,12 @@ class DummyMusicSync implements Partial<MusicSyncService> {
   }
   getCurrentBeatVector() {
     return { x: 0, y: 0 };
+  }
+  subscribe() {
+    // Mock subscribe method
+  }
+  unsubscribe() {
+    // Mock unsubscribe method
   }
 }
 

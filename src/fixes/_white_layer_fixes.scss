@@ -1,0 +1,228 @@
+/**
+ * White Layer Fixes - Prevents white layer interference with gradients
+ * Part of the Reality Bleeding Gradients system
+ * 
+ * Fixes common sources of white layer interference:
+ * - Chromatic aberration white textures
+ * - Screen blend mode white bleeding
+ * - Backdrop filter white fallbacks
+ * - WebGL context failure white renders
+ */
+
+/* Fix chromatic aberration white texture issues */
+.sn-chromatic-aberration-fix {
+  /* Override screen blend mode with safer overlay */
+  canvas[style*="mix-blend-mode: screen"] {
+    mix-blend-mode: overlay !important;
+    opacity: 0.6 !important;
+  }
+  
+  /* Ensure transparent backgrounds instead of white */
+  canvas[style*="mix-blend-mode"] {
+    background: transparent !important;
+  }
+}
+
+/* Fix screen blend mode white bleeding */
+.sn-screen-blend-fix {
+  /* Limit screen blend mode usage */
+  [style*="mix-blend-mode: screen"] {
+    &:not(:first-of-type) {
+      mix-blend-mode: overlay !important;
+      opacity: 0.8 !important;
+    }
+  }
+  
+  /* Reduce intensity of screen blend modes */
+  [style*="mix-blend-mode: screen"] {
+    opacity: 0.7 !important;
+  }
+}
+
+/* Fix backdrop filter white fallbacks */
+.sn-backdrop-filter-fix {
+  /* Provide transparent fallbacks for backdrop-filter */
+  @supports not (backdrop-filter: blur(1px)) {
+    [style*="backdrop-filter"] {
+      background: rgba(0, 0, 0, 0.1) !important;
+      backdrop-filter: none !important;
+    }
+  }
+  
+  /* Ensure backdrop filters don't create white layers */
+  [style*="backdrop-filter"] {
+    background: transparent !important;
+    
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.05);
+      z-index: -1;
+    }
+  }
+}
+
+/* Fix WebGL context failure white renders */
+.sn-webgl-context-fix {
+  /* Hide WebGL canvases that might render white on failure */
+  canvas {
+    &[style*="mix-blend-mode"] {
+      /* Ensure transparent background for WebGL canvases */
+      background: transparent !important;
+      
+      /* Hide canvas if WebGL context is lost */
+      &:not([data-webgl-ready="true"]) {
+        opacity: 0 !important;
+      }
+    }
+  }
+}
+
+/* Fix floating crystal white backgrounds */
+.sn-floating-crystal-fix {
+  /* Override white gradients in floating crystals */
+  .floating-crystal {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(203, 166, 247, 0.1) 0%,
+      rgba(203, 166, 247, 0) 70%
+    ) !important;
+  }
+}
+
+/* Fix white layer z-index conflicts */
+.sn-z-index-fix {
+  /* Ensure gradient layers have proper z-index hierarchy */
+  .sn-webgl-gradient,
+  .sn-css-gradient {
+    z-index: -10 !important;
+  }
+  
+  .sn-depth-background-container {
+    z-index: -20 !important;
+  }
+  
+  .sn-shimmer-layer {
+    z-index: 1 !important;
+  }
+  
+  /* Ensure aberration canvas stays below other effects but above deep backgrounds */
+  canvas[style*="mix-blend-mode"] {
+    z-index: -5 !important;
+  }
+  
+  /* Fix Reality Bleeding Gradients system z-index hierarchy */
+  .sn-liquid-consciousness-layer {
+    z-index: -8 !important;
+  }
+  
+  .sn-flow-gradient-layer {
+    z-index: -7 !important;
+  }
+  
+  .sn-iridescent-shimmer-layer {
+    z-index: -6 !important;
+  }
+  
+  /* Ensure consciousness layers don't conflict */
+  .sn-consciousness-layer {
+    z-index: -10 !important;
+  }
+  
+  .sn-temporal-layer {
+    z-index: -9 !important;
+  }
+  
+  /* Fix cosmic consciousness background layers */
+  .sn-cosmic-consciousness-layer {
+    z-index: -1000 !important;
+  }
+  
+  /* Ensure floating crystals don't interfere with gradients */
+  .floating-crystal {
+    z-index: -15 !important;
+  }
+}
+
+/* Emergency white layer suppression */
+.sn-emergency-white-fix {
+  /* Hide any elements that might be causing white layer issues */
+  *[style*="background: white"],
+  *[style*="background-color: white"],
+  *[style*="background-color: #fff"],
+  *[style*="background-color: #ffffff"] {
+    background: transparent !important;
+  }
+  
+  /* Ensure mix-blend-mode effects don't cause white bleeding */
+  *[style*="mix-blend-mode"] {
+    &:not(.sn-shimmer-layer):not(.sn-liquid-consciousness) {
+      mix-blend-mode: overlay !important;
+      opacity: 0.6 !important;
+    }
+  }
+}
+
+/* Apply fixes globally */
+body {
+  @include sn-chromatic-aberration-fix;
+  @include sn-screen-blend-fix;
+  @include sn-backdrop-filter-fix;
+  @include sn-webgl-context-fix;
+  @include sn-floating-crystal-fix;
+  @include sn-z-index-fix;
+  
+  /* Apply emergency fixes if white layers are detected */
+  &.sn-white-layer-emergency {
+    @include sn-emergency-white-fix;
+  }
+}
+
+/* CSS variables for white layer diagnostics */
+:root {
+  --sn-white-layer-critical-issues: 0;
+  --sn-white-layer-high-issues: 0;
+  --sn-white-layer-total-issues: 0;
+  --sn-white-layer-status: "ok";
+}
+
+/* Visual indicator for white layer issues */
+.sn-white-layer-indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 9999;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  
+  &[data-status="ok"] {
+    background: rgba(166, 227, 161, 0.2);
+    color: var(--spice-green);
+    border: 1px solid var(--spice-green);
+    opacity: 0;
+  }
+  
+  &[data-status="warning"] {
+    background: rgba(250, 179, 135, 0.2);
+    color: var(--spice-peach);
+    border: 1px solid var(--spice-peach);
+    opacity: 1;
+  }
+  
+  &[data-status="critical"] {
+    background: rgba(243, 139, 168, 0.2);
+    color: var(--spice-pink);
+    border: 1px solid var(--spice-pink);
+    opacity: 1;
+  }
+}
+
+/* Hide white layer indicator in production */
+body:not(.sn-debug-mode) .sn-white-layer-indicator {
+  display: none;
+}

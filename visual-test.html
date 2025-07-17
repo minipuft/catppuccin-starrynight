@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>StarryNight Visual Test</title>
+  <link rel="stylesheet" href="user.css">
+  <style>
+    body { 
+      margin: 0; 
+      padding: 20px; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--spice-base, #1e1e2e);
+      color: var(--spice-text, #cdd6f4);
+    }
+    .test-container { 
+      margin: 20px 0; 
+      padding: 20px; 
+      border: 1px solid var(--spice-text, #cdd6f4); 
+      border-radius: 8px; 
+      background: var(--spice-surface, #313244);
+    }
+    .color-test { 
+      width: 50px; 
+      height: 50px; 
+      border-radius: 50%; 
+      margin: 10px; 
+      display: inline-block; 
+    }
+    .gradient-test { 
+      width: 200px; 
+      height: 100px; 
+      margin: 10px; 
+      border-radius: 8px; 
+    }
+    .animation-test {
+      width: 100px;
+      height: 100px;
+      background: var(--sn-accent, #89b4fa);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🌌 StarryNight Visual Test Suite</h1>
+  
+  <div class="test-container">
+    <h2>Color Variables Test</h2>
+    <div class="color-test" style="background: var(--spice-text, #cdd6f4);"></div>
+    <div class="color-test" style="background: var(--spice-base, #1e1e2e);"></div>
+    <div class="color-test" style="background: var(--spice-accent, #89b4fa);"></div>
+    <div class="color-test" style="background: var(--spice-surface, #313244);"></div>
+  </div>
+  
+  <div class="test-container">
+    <h2>Gradient Tests</h2>
+    <div class="gradient-test" style="background: var(--sn-gradient, linear-gradient(45deg, #89b4fa, #b4befe));"></div>
+    <div class="gradient-test" style="background: radial-gradient(circle, var(--spice-accent, #89b4fa), var(--spice-base, #1e1e2e));"></div>
+  </div>
+  
+  <div class="test-container">
+    <h2>Animation Tests</h2>
+    <div class="animation-test"></div>
+  </div>
+  
+  <div class="test-container">
+    <h2>StarryNight Features</h2>
+    <div class="gradient-test" style="background: var(--sn-accent, #89b4fa); box-shadow: 0 0 20px var(--sn-glow, rgba(137, 180, 250, 0.3));"></div>
+  </div>
+</body>
+</html>

@@ -1,5 +1,5 @@
-import { CSSVariableBatcher } from "../src-js/core/CSSVariableBatcher";
-import year3000System from "../src-js/core/year3000System";
+import { CSSVariableBatcher } from "../src-js/core/performance/CSSVariableBatcher";
+import year3000System from "../src-js/core/lifecycle/year3000System";
 
 /**
  * When writeLegacyAccentVars=false the pipeline should emit ONLY the canonical

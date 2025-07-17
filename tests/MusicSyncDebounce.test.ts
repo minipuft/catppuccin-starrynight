@@ -3,7 +3,7 @@
  * Verifies that rapid track changes are debounced to prevent visual inconsistencies
  */
 
-import { MusicSyncService } from '../src-js/services/MusicSyncService';
+import { MusicSyncService } from '../src-js/audio/MusicSyncService';
 
 // Mock Spicetify global
 const mockSpicetify = {

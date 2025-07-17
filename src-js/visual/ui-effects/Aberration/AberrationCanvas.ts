@@ -41,8 +41,9 @@ export class AberrationCanvas {
       position: "absolute",
       inset: "0",
       pointerEvents: "none",
-      mixBlendMode: "screen",
+      mixBlendMode: "overlay", // Changed from "screen" to prevent white bleeding
       zIndex: "-1",
+      opacity: "0.6", // Reduced opacity to prevent harsh effects
     } as CSSStyleDeclaration);
 
     this.parent.appendChild(this.canvas);
@@ -108,7 +109,7 @@ export class AberrationCanvas {
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
 
-    // Create texture placeholder (single white pixel)
+    // Create texture placeholder (transparent black pixel instead of white)
     const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -122,7 +123,7 @@ export class AberrationCanvas {
       0,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
-      new Uint8Array([255, 255, 255, 255])
+      new Uint8Array([0, 0, 0, 0]) // Changed from white [255,255,255,255] to transparent [0,0,0,0]
     );
     this.tex = tex;
 
@@ -158,6 +159,8 @@ export class AberrationCanvas {
     if (this.perf) this.frameStart = performance.now();
 
     gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    // Set clear color to transparent black instead of default white
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.useProgram(this.program);
 
