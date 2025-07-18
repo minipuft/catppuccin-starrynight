@@ -85,8 +85,8 @@
     position: relative;
     transform: translateZ(0);
     @include magnetic-hover-invitation;
-    transition: transform 300ms var(--sn-easing-explorer, cubic-bezier(0.25, 0.46, 0.45, 0.94)),
-                background 300ms var(--sn-easing-explorer, cubic-bezier(0.25, 0.46, 0.45, 0.94));
+    transition: transform 300ms var(--sn-easing-explorer, var(--sn-anim-easing-organic)),
+                background 300ms var(--sn-easing-explorer, var(--sn-anim-easing-organic));
 
     /* Add this wrapper around the hover and selected states*/
     body:not([data-bloom="off"]) & {

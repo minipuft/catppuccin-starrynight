@@ -7,7 +7,7 @@
 // ============================================================================
 
 import { GlobalEventBus } from "@/core/events/EventBus";
-import type { FrameContext } from "@/core/lifecycle/VisualFrameCoordinator";
+import type { FrameContext } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 
 export class CDFVariableBridge {

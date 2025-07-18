@@ -18,8 +18,11 @@ global.cancelAnimationFrame = jest.fn();
 // Mock document
 const mockElement = {
   style: {
-    setProperty: jest.fn(),
-    getPropertyValue: jest.fn(),
+    setProperty: jest.fn().mockImplementation((property, value) => {
+      // Mock successful CSS property setting
+      return true;
+    }),
+    getPropertyValue: jest.fn().mockReturnValue(''),
   },
   querySelector: jest.fn(),
   classList: {

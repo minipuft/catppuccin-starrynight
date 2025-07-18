@@ -1,0 +1,370 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 UNIFIED SYSTEM VARIABLES - Standardized CSS Variable Groups
+// ═══════════════════════════════════════════════════════════════════════════════
+// This file defines the standardized CSS variable naming convention that aligns
+// with the unified system architecture- All variables follow the pattern:
+// --sn-group-system-property
+//
+// This integrates with UnifiedCSSVariableManager for priority-based updates
+// and batched DOM manipulation-
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🎵 MUSIC SYSTEM VARIABLES (Priority: Critical)
+  // Real-time audio synchronization and beat detection
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  // Beat synchronization (critical for real-time updates)
+  --sn-music-beat-pulse-intensity: 0;      // 0-1, current beat intensity
+  --sn-music-beat-frequency: 120;          // BPM value
+  --sn-music-beat-phase: 0;                // Current beat phase (0-1)
+  --sn-music-beat-confidence: 0;           // Beat detection confidence (0-1)
+  
+  // Audio spectrum analysis
+  --sn-music-spectrum-phase: 0deg;         // Hue shift based on spectrum
+  --sn-music-spectrum-energy: 0;           // Overall energy level (0-1)
+  --sn-music-spectrum-bass: 0;             // Bass frequency energy (0-1)
+  --sn-music-spectrum-mids: 0;             // Mid frequency energy (0-1)
+  --sn-music-spectrum-treble: 0;           // Treble frequency energy (0-1)
+  
+  // Breathing and rhythm
+  --sn-music-breathing-scale: 1;           // Breathing scale factor (0-95-1-05)
+  --sn-music-breathing-rate: 4s;           // Breathing animation duration
+  --sn-music-rhythm-phase: 0;              // Rhythm phase (radians)
+  --sn-music-rhythm-intensity: 0;          // Rhythm intensity (0-1)
+  
+  // Music metadata
+  --sn-music-tempo-bpm: 120;               // Current song BPM
+  --sn-music-energy-level: 0.5;            // Song energy level (0-1)
+  --sn-music-valence: 0.5;                 // Song valence/mood (0-1)
+  --sn-music-danceability: 0.5;            // Song danceability (0-1)
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🎨 COLOR SYSTEM VARIABLES (Priority: High)
+  // Dynamic color extraction and palette management
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  // Primary color values
+  --sn-color-accent-hex: #cba6f7;          // Current accent color (hex)
+  --sn-color-accent-rgb: 203, 166, 247;    // Current accent color (RGB)
+  --sn-color-accent-hsl: 267, 84%, 81%;    // Current accent color (HSL)
+  --sn-color-accent-oklch: 0.75, 0.15, 295; // Current accent color (OKLCH)
+  
+  // Extracted colors from album art
+  --sn-color-extracted-primary-rgb: 203, 166, 247;
+  --sn-color-extracted-secondary-rgb: 166, 227, 161;
+  --sn-color-extracted-tertiary-rgb: 250, 179, 135;
+  --sn-color-extracted-dominant-rgb: 203, 166, 247;
+  --sn-color-extracted-vibrant-rgb: 203, 166, 247;
+  
+  // Color harmony and blending
+  --sn-color-harmony-complementary-rgb: 166, 227, 161;
+  --sn-color-harmony-analogous-rgb: 243, 166, 247;
+  --sn-color-harmony-triadic-rgb: 247, 203, 166;
+  --sn-color-harmony-blend-intensity: 0.8;
+  
+  // Dynamic color shifts
+  --sn-color-shift-hue: 0deg;              // Global hue shift
+  --sn-color-shift-saturation: 1;          // Global saturation multiplier
+  --sn-color-shift-lightness: 1;           // Global lightness multiplier
+  --sn-color-shift-temperature: 0;         // Color temperature (-1 to 1)
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🌌 BACKGROUND SYSTEM VARIABLES (Priority: Normal)
+  // Gradient, WebGL, and background effects
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  // Gradient system
+  --sn-bg-gradient-primary-rgb: 203, 166, 247;
+  --sn-bg-gradient-secondary-rgb: 166, 227, 161;
+  --sn-bg-gradient-tertiary-rgb: 250, 179, 135;
+  --sn-bg-gradient-opacity: 0.15;
+  --sn-bg-gradient-blur: 40px;
+  --sn-bg-gradient-angle: 135deg;
+  --sn-bg-gradient-flow-direction: 0deg;
+  --sn-bg-gradient-flow-speed: 1;
+  
+  // WebGL background system
+  --sn-bg-webgl-ready: 0;                  // WebGL system ready state (0/1)
+  --sn-bg-webgl-quality: 1;                // Quality level (0-1)
+  --sn-bg-webgl-noise-scale: 1;            // Noise scale factor
+  --sn-bg-webgl-noise-intensity: 0.1;      // Noise intensity
+  --sn-bg-webgl-flow-speed: 0.5;           // Flow animation speed
+  --sn-bg-webgl-flow-direction: 0deg;      // Flow direction
+  
+  // Background state
+  --sn-bg-active-backend: "css";           // Active backend (css/webgl)
+  --sn-bg-transition-duration: 0.8s;       // Background transition duration
+  --sn-bg-transition-easing: ease-in-out;  // Background transition easing
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🎭 ANIMATION SYSTEM VARIABLES (Priority: Normal)
+  // Animation coordination and effects
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  // Animation timing
+  --sn-anim-duration-fast: 0.2s;           // Fast animations
+  --sn-anim-duration-normal: 0.4s;         // Normal animations
+  --sn-anim-duration-slow: 0.8s;           // Slow animations
+  --sn-anim-duration-breathing: 4s;        // Breathing animations
+  
+  // Animation easing
+  --sn-anim-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --sn-anim-easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --sn-anim-easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --sn-anim-easing-bounce: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  
+  // Motion preferences
+  --sn-anim-motion-reduced: 0;             // Reduced motion preference (0/1)
+  --sn-anim-motion-scale: 1;               // Global animation scale
+  --sn-anim-motion-blur: 0;                // Motion blur intensity
+  
+  // Frame coordination
+  --sn-anim-frame-budget: 16.67ms;         // Target frame budget
+  --sn-anim-frame-priority: normal;        // Animation priority
+  --sn-anim-frame-fps: 60;                 // Target FPS
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🏗️ LAYOUT SYSTEM VARIABLES (Priority: Normal)
+  // Layout, spacing, and responsive design
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  // Sidebar layout
+  --sn-layout-sidebar-width: 280px;        // Sidebar width
+  --sn-layout-sidebar-collapsed-width: 72px; // Collapsed sidebar width
+  --sn-layout-sidebar-transition: 0.3s;    // Sidebar transition duration
+  
+  // Content layout
+  --sn-layout-content-padding: 24px;       // Content padding
+  --sn-layout-content-max-width: 1200px;   // Content max width
+  --sn-layout-content-gap: 16px;           // Content gap
+  
+  // Card layout
+  --sn-layout-card-border-radius: 12px;    // Card border radius
+  --sn-layout-card-padding: 16px;          // Card padding
+  --sn-layout-card-gap: 12px;              // Card gap
+  --sn-layout-card-hover-lift: 8px;        // Card hover lift distance
+  
+  // Responsive breakpoints
+  --sn-layout-breakpoint-mobile: 768px;    // Mobile breakpoint
+  --sn-layout-breakpoint-tablet: 1024px;   // Tablet breakpoint
+  --sn-layout-breakpoint-desktop: 1200px;  // Desktop breakpoint
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // ⚡ PERFORMANCE SYSTEM VARIABLES (Priority: High)
+  // Performance monitoring and optimization
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  // Performance modes
+  --sn-perf-mode: quality;                 // Performance mode (quality/performance)
+  --sn-perf-quality-level: 1;              // Quality level (0-1)
+  --sn-perf-fps-target: 60;                // Target FPS
+  --sn-perf-frame-budget: 16.67;           // Frame budget (ms)
+  
+  // GPU acceleration
+  --sn-perf-gpu-acceleration-enabled: 1;   // GPU acceleration enabled (0/1)
+  --sn-perf-gpu-memory-budget: 100;        // GPU memory budget (MB)
+  --sn-perf-gpu-shader-quality: 1;         // Shader quality (0-1)
+  
+  // Thermal management
+  --sn-perf-thermal-throttle: 0;           // Thermal throttling active (0/1)
+  --sn-perf-thermal-temperature: 0;        // Estimated temperature (0-1)
+  --sn-perf-thermal-threshold: 0.8;        // Thermal threshold (0-1)
+  
+  // Battery optimization
+  --sn-perf-battery-saver: 0;              // Battery saver mode (0/1)
+  --sn-perf-battery-level: 1;              // Battery level (0-1)
+  --sn-perf-battery-charging: 0;           // Battery charging state (0/1)
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🧠 CONSCIOUSNESS SYSTEM VARIABLES (Priority: Normal)
+  // Consciousness fields and magnetic depth
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  // Magnetic depth
+  --sn-consciousness-depth-field: 800px;           // 3D perspective depth
+  --sn-consciousness-depth-near: 12px;             // Near depth distance
+  --sn-consciousness-depth-far: -10px;             // Far depth distance
+  --sn-consciousness-depth-neutral: 0px;           // Neutral depth position
+  
+  // Consciousness field
+  --sn-consciousness-field-intensity: 0.4;         // Field intensity (0-1)
+  --sn-consciousness-field-breathing-rate: 12s;    // Field breathing rate
+  --sn-consciousness-field-sensitivity: 0.8;       // Response sensitivity
+  
+  // Bilateral consciousness
+  --sn-consciousness-bilateral-left-lead: -150ms;  // Left sidebar lead time
+  --sn-consciousness-bilateral-right-delay: 150ms; // Right sidebar delay
+  --sn-consciousness-bilateral-sync: 1;            // Bilateral sync enabled
+  
+  // Interaction magnetism
+  --sn-consciousness-hover-pull: 12px;             // Hover pull distance
+  --sn-consciousness-focus-pull: 18px;             // Focus pull distance
+  --sn-consciousness-transition-speed: 0.6s;       // Transition speed
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🔧 UTILITY SYSTEM VARIABLES (Priority: Low)
+  // Utility classes and helper variables
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  // Debug and development
+  --sn-debug-enabled: 0;                   // Debug mode enabled (0/1)
+  --sn-debug-verbose: 0;                   // Verbose debug mode (0/1)
+  --sn-debug-performance: 0;               // Performance debug mode (0/1)
+  --sn-debug-grid-visible: 0;              // Debug grid visible (0/1)
+  
+  // Accessibility
+  --sn-a11y-contrast-enhanced: 0;          // Enhanced contrast (0/1)
+  --sn-a11y-focus-visible: 1;              // Focus visible (0/1)
+  --sn-a11y-motion-reduced: 0;             // Reduced motion (0/1)
+  --sn-a11y-text-size-scale: 1;            // Text size scale factor
+  
+  // Feature flags
+  --sn-feature-webgl-enabled: 1;           // WebGL features enabled (0/1)
+  --sn-feature-consciousness-enabled: 1;   // Consciousness features enabled (0/1)
+  --sn-feature-music-sync-enabled: 1;      // Music sync enabled (0/1)
+  --sn-feature-animations-enabled: 1;      // Animations enabled (0/1)
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎯 LEGACY VARIABLE ALIASES
+// Maintain compatibility with existing CSS while migrating to new naming
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // Beat sync legacy aliases
+  --sn-beat-pulse-intensity: var(--sn-music-beat-pulse-intensity);
+  --sn-rhythm-phase: var(--sn-music-rhythm-phase);
+  --sn-spectrum-phase: var(--sn-music-spectrum-phase);
+  --sn-breathing-scale: var(--sn-music-breathing-scale);
+  --sn-feed-bloom-intensity: var(--sn-music-beat-pulse-intensity);
+  
+  // Color legacy aliases
+  --sn-accent-hex: var(--sn-color-accent-hex);
+  --sn-accent-rgb: var(--sn-color-accent-rgb);
+  --sn-gradient-primary-rgb: var(--sn-bg-gradient-primary-rgb);
+  --sn-gradient-secondary-rgb: var(--sn-bg-gradient-secondary-rgb);
+  --sn-gradient-accent-rgb: var(--sn-color-accent-rgb);
+  
+  // Background legacy aliases
+  --sn-gradient-opacity: var(--sn-bg-gradient-opacity);
+  --sn-gradient-blur: var(--sn-bg-gradient-blur);
+  --sn-gradient-transition: var(--sn-bg-transition-duration);
+  
+  // Consciousness legacy aliases
+  --magnetic-depth-field: var(--sn-consciousness-depth-field);
+  --magnetic-hover-pull: var(--sn-consciousness-hover-pull);
+  --magnetic-focus-pull: var(--sn-consciousness-focus-pull);
+  --magnetic-transition-speed: var(--sn-consciousness-transition-speed);
+  --consciousness-field-intensity: var(--sn-consciousness-field-intensity);
+  --consciousness-breathing-rate: var(--sn-consciousness-field-breathing-rate);
+  
+  // Animation legacy aliases
+  --sn-transition-timing-default: var(--sn-anim-easing-standard);
+  --sn-transition-duration-fast: var(--sn-anim-duration-fast);
+  --sn-transition-duration-normal: var(--sn-anim-duration-normal);
+  --sn-transition-duration-slow: var(--sn-anim-duration-slow);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 📱 RESPONSIVE OVERRIDES
+// Adjust unified variables for different screen sizes and preferences
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@media (max-width: 768px) {
+  :root {
+    // Reduce consciousness effects on mobile
+    --sn-consciousness-field-intensity: 0.25;
+    --sn-consciousness-hover-pull: 8px;
+    --sn-consciousness-focus-pull: 12px;
+    --sn-consciousness-depth-field: 600px;
+    
+    // Optimize performance on mobile
+    --sn-perf-quality-level: 0.8;
+    --sn-perf-fps-target: 30;
+    --sn-bg-webgl-quality: 0.6;
+    
+    // Adjust layout for mobile
+    --sn-layout-sidebar-width: 100vw;
+    --sn-layout-content-padding: 16px;
+    --sn-layout-card-padding: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    // Reduce all animation intensities
+    --sn-anim-motion-reduced: 1;
+    --sn-anim-motion-scale: 0.3;
+    --sn-anim-duration-fast: 0.01s;
+    --sn-anim-duration-normal: 0.01s;
+    --sn-anim-duration-slow: 0.01s;
+    --sn-anim-duration-breathing: 20s;
+    
+    // Reduce consciousness effects
+    --sn-consciousness-field-intensity: 0.1;
+    --sn-consciousness-hover-pull: 2px;
+    --sn-consciousness-focus-pull: 4px;
+    --sn-consciousness-transition-speed: 0.01s;
+    
+    // Disable complex animations
+    --sn-music-beat-pulse-intensity: 0;
+    --sn-music-breathing-scale: 1;
+    --sn-bg-webgl-flow-speed: 0;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    // Enhance contrast and visibility
+    --sn-a11y-contrast-enhanced: 1;
+    --sn-consciousness-field-intensity: 0.6;
+    --sn-color-shift-saturation: 1.2;
+    --sn-bg-gradient-opacity: 0.25;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    // Optimize for dark mode
+    --sn-bg-gradient-opacity: 0.12;
+    --sn-consciousness-field-intensity: 0.35;
+    --sn-color-shift-lightness: 0.9;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🔋 BATTERY AND PERFORMANCE OVERRIDES
+// Automatically adjust variables based on system performance
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@media (update: slow) {
+  :root {
+    // Reduce effects on slow update devices
+    --sn-perf-quality-level: 0.6;
+    --sn-perf-fps-target: 30;
+    --sn-bg-webgl-quality: 0.4;
+    --sn-consciousness-field-intensity: 0.2;
+    --sn-anim-motion-scale: 0.7;
+  }
+}
+
+@media (hover: none) {
+  :root {
+    // Optimize for touch devices
+    --sn-consciousness-hover-pull: 0px;
+    --sn-anim-duration-fast: 0.1s;
+    --sn-anim-duration-normal: 0.2s;
+    --sn-layout-card-hover-lift: 0px;
+  }
+}
+
+@media (pointer: coarse) {
+  :root {
+    // Optimize for coarse pointers (touch)
+    --sn-layout-card-padding: 20px;
+    --sn-layout-content-gap: 20px;
+    --sn-consciousness-focus-pull: 24px;
+  }
+}

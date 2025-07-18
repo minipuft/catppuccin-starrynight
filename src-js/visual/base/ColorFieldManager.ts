@@ -8,7 +8,7 @@ import type { MusicSyncService } from "@/audio/MusicSyncService";
 import type {
   FrameContext,
   IVisualSystem,
-} from "@/core/lifecycle/VisualFrameCoordinator";
+} from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import type { Year3000System } from "@/core/lifecycle/year3000System";
 import type { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import type { Year3000Config } from "@/types/models";

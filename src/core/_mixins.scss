@@ -107,7 +107,7 @@
 // =============================================================================
 
 // Enhanced transition system for card interactions
-@mixin card-transition($duration: 0.4s, $timing: var(--sn-transition-timing-default, cubic-bezier(0.4, 0, 0.2, 1))) {
+@mixin card-transition($duration: 0.4s, $timing: var(--sn-transition-timing-default, var(--sn-anim-easing-standard))) {
   transition: transform $duration $timing, box-shadow $duration $timing,
     background-color $duration $timing, backdrop-filter $duration $timing,
     opacity $duration $timing;
@@ -197,7 +197,7 @@
 // Morphing animation system for card state changes
 @mixin morphing-transition(
   $duration: 0.8s,
-  $timing: var(--sn-transition-timing-default, cubic-bezier(0.25, 0.46, 0.45, 0.94))
+  $timing: var(--sn-transition-timing-default, var(--sn-anim-easing-organic))
 ) {
   transition: transform $duration $timing, background $duration $timing,
     backdrop-filter $duration $timing, box-shadow $duration $timing,
@@ -206,7 +206,7 @@
 
 // Interactive 3D hover effect with mouse tracking
 @mixin interactive-3d-hover($max-rotate: 0deg, $depth: 50px) {
-  transition: all 0.3s var(--sn-transition-timing-default, cubic-bezier(0.25, 0.46, 0.45, 0.94));
+  transition: all 0.3s var(--sn-transition-timing-default, var(--sn-anim-easing-organic));
 
   &:hover {
     transform-style: preserve-3d;
@@ -332,7 +332,7 @@
     opacity: 0;
     pointer-events: none;
     z-index: 2;
-    transition: all var(--ripple-duration, 0.4s) cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--ripple-duration, 0.4s) var(--sn-anim-easing-standard);
   }
 
   &:active::after {
@@ -600,7 +600,7 @@
 // Hover invitation – gently pulls element toward the user
 @mixin magnetic-hover-invitation {
   transition: transform var(--magnetic-transition-speed, 0.6s)
-      cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      var(--sn-anim-easing-organic);
 
   &:hover {
     transform: translateZ(var(--magnetic-hover-pull, 12px))

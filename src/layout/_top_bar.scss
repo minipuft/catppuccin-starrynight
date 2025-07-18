@@ -102,7 +102,7 @@
   transform: scale(var(--sn-topbar-breathing-scale));
 
   // Smooth consciousness transitions
-  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+  transition: all 0.8s var(--sn-anim-easing-organic),
     filter 0.3s ease-out, transform 0.2s ease-out;
 
   // Cosmic atmosphere enhancement layer
@@ -194,7 +194,7 @@
 
     // BLOOM scale with beats
     transform: scale(var(--sn-search-focus-bloom));
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: all 0.3s var(--sn-anim-easing-organic);
 
     // Enhanced placeholder consciousness
     &::placeholder {
@@ -277,7 +277,7 @@
     border-radius: 8px;
 
     // Smooth consciousness transitions
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: all 0.3s var(--sn-anim-easing-organic);
 
     // Cosmic shimmer effect
     &::before {

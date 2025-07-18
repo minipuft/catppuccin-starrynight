@@ -8,7 +8,7 @@
 // event overhead.
 // ---------------------------------------------------------------------------
 
-import type { FrameContext, IVisualSystem } from "@/core/lifecycle/VisualFrameCoordinator";
+import type { FrameContext, IVisualSystem } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import year3000System from "@/core/lifecycle/year3000System";
 
 // Default cycle length in pixels before the ratio loops back to 0.

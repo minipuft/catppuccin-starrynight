@@ -22,7 +22,7 @@
   // Timing curves are now referenced via the shared easing tokens which other
   // SCSS modules already consume (see _sn_root_variables.scss & _sn_gradient.scss)
   // These remain as fallbacks so nothing breaks if the variables are unset.
-  --sn-transition-timing-default: var(--sn-easing-explorer, cubic-bezier(0.25, 0.46, 0.45, 0.94));
+  --sn-transition-timing-default: var(--sn-easing-explorer, var(--sn-anim-easing-organic));
 
   // Composite transition helpers (duration + timing) for convenience.  These
   // map 1-to-1 with the previous public tokens so no downstream refactor is
@@ -33,9 +33,9 @@
 
   // Legacy specialized easings kept for semantics – consider consolidating into
   // _sn_root_variables.scss in a later housekeeping pass.
-  --sn-ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --sn-ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --sn-ease-sharp: cubic-bezier(0.4, 0, 0.6, 1);
+  --sn-ease-bounce: var(--sn-anim-easing-bounce-gentle);
+  --sn-ease-smooth: var(--sn-anim-easing-organic);
+  --sn-ease-sharp: var(--sn-anim-easing-custom-1);
 }
 
 // Apply performance optimizations to key animated elements

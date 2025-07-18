@@ -1,0 +1,538 @@
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/* SIDEBAR SPATIAL NEXUS MODULE*/
+/* 3D Spatial Navigation & Dimensional Positioning System*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/**/
+/* This module implements the 3D spatial navigation system for the sidebar.*/
+/* It provides multi-dimensional interface layouts that respond to:*/
+/* - Gesture-based navigation controls*/
+/* - Spatial depth layer positioning (5 layers)*/
+/* - Parallax scrolling effects*/
+/* - Proximity-based interaction zones*/
+/**/
+/* Enhanced Year 3000 features:*/
+/* - Infinite space illusion through depth layering*/
+/* - Context-aware spatial arrangement*/
+/* - Gesture recognition integration*/
+/* - Performance-optimized 3D transforms*/
+/**/
+/* Dependencies:*/
+/* - SidebarDimensionalNexusSystem TypeScript integration*/
+/* - CSS 3D transforms and perspective*/
+/* - Intersection Observer API support*/
+/**/
+/* ████████████████████████████████████████████████████████████████████████████████*/
+@use "../core/_mixins" as *;
+
+:root {
+  /* === SPATIAL NAVIGATION CORE VARIABLES ===*/
+  --spatial-perspective: 1000px; /* 3D perspective distance */
+  --spatial-viewport-depth: 500px; /* Total depth of spatial viewport */
+  --spatial-gesture-sensitivity: 1; /* 0-2 gesture response multiplier */
+  --spatial-parallax-intensity: 0.5; /* 0-1 parallax effect strength */
+  
+  /* === DIMENSIONAL LAYER POSITIONING ===*/
+  --spatial-layer-0-z: 0px; /* Surface layer (active items) */
+  --spatial-layer-1-z: -100px; /* Primary navigation */
+  --spatial-layer-2-z: -200px; /* Secondary navigation */
+  --spatial-layer-3-z: -300px; /* Context items */
+  --spatial-layer-4-z: -400px; /* Background elements */
+  
+  /* === GESTURE INTERACTION VARIABLES ===*/
+  --gesture-rotation-x: 0deg; /* Vertical tilt from gestures */
+  --gesture-rotation-y: 0deg; /* Horizontal rotation from gestures */
+  --gesture-scale: 1; /* Scale factor from pinch gestures */
+  --gesture-translation-x: 0px; /* Horizontal pan offset */
+  --gesture-translation-y: 0px; /* Vertical pan offset */
+  
+  /* === PROXIMITY DETECTION ZONES ===*/
+  --proximity-zone-inner: 50px; /* Immediate interaction zone */
+  --proximity-zone-middle: 150px; /* Preparation zone */
+  --proximity-zone-outer: 300px; /* Awareness zone */
+  
+  /* === SPATIAL NAVIGATION STATES ===*/
+  --spatial-focus-item: none; /* Currently focused navigation item */
+  --spatial-focus-depth: 0; /* Depth of focused item */
+  --spatial-zoom-level: 1; /* Current zoom level (0.5-2.0) */
+  --spatial-transition-duration: 400ms; /* Smooth transition timing */
+  
+  /* === DIMENSIONAL RIFT VARIABLES (Enhanced) ===*/
+  --dimensional-rift-intensity: 0; /* 0-1 rift portal strength */
+  --dimensional-rift-radius: 100px; /* Rift portal size */
+  --dimensional-rift-rotation: 0deg; /* Rift portal rotation */
+  --dimensional-rift-distortion: 0; /* 0-1 space distortion amount */
+  
+  /* === CONTEXTUAL SPATIAL ARRANGEMENT ===*/
+  --spatial-context-mode: "navigation"; /* "navigation" | "search" | "discovery" */
+  --spatial-arrangement-algorithm: "hierarchical"; /* "hierarchical" | "cloud" | "spiral" */
+  --spatial-item-spacing: 60px; /* Base spacing between items */
+}
+
+/* ============================================================================ */
+/* 3D SPATIAL VIEWPORT CONTAINER */
+/* ============================================================================ */
+
+.spatial-nexus-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: var(--spatial-perspective, 1000px);
+  perspective-origin: 50% 50%;
+  overflow: hidden;
+  contain: layout style paint;
+  
+  /* Enable 3D transformations */
+  transform-style: preserve-3d;
+  
+  /* Smooth transitions for spatial changes */
+  transition: perspective var(--spatial-transition-duration, 400ms) ease-out;
+}
+
+.spatial-nexus-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  
+  /* Apply gesture transformations */
+  transform: 
+    translateX(var(--gesture-translation-x, 0px))
+    translateY(var(--gesture-translation-y, 0px))
+    rotateX(var(--gesture-rotation-x, 0deg))
+    rotateY(var(--gesture-rotation-y, 0deg))
+    scale3d(var(--gesture-scale, 1), var(--gesture-scale, 1), 1);
+  
+  /* Smooth gesture response */
+  transition: transform var(--spatial-transition-duration, 400ms) var(--sn-anim-easing-elastic);
+}
+
+/* ============================================================================ */
+/* DIMENSIONAL LAYER SYSTEM */
+/* ============================================================================ */
+
+.spatial-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform-style: preserve-3d;
+  
+  /* Layer-specific depth positioning */
+  transform: translateZ(var(--layer-depth, 0px));
+  
+  /* Depth-based visual effects */
+  opacity: calc(1 - abs(var(--layer-depth, 0px)) / 1000);
+  filter: blur(calc(abs(var(--layer-depth, 0px)) / 200));
+  
+  /* Smooth depth transitions */
+  transition: 
+    transform var(--spatial-transition-duration, 400ms) ease-out,
+    opacity var(--spatial-transition-duration, 400ms) ease-out,
+    filter var(--spatial-transition-duration, 400ms) ease-out;
+}
+
+/* Individual layer depth assignments */
+.spatial-layer[data-layer="0"] { --layer-depth: var(--spatial-layer-0-z, 0px); }
+.spatial-layer[data-layer="1"] { --layer-depth: var(--spatial-layer-1-z, -100px); }
+.spatial-layer[data-layer="2"] { --layer-depth: var(--spatial-layer-2-z, -200px); }
+.spatial-layer[data-layer="3"] { --layer-depth: var(--spatial-layer-3-z, -300px); }
+.spatial-layer[data-layer="4"] { --layer-depth: var(--spatial-layer-4-z, -400px); }
+
+/* ============================================================================ */
+/* SPATIAL NAVIGATION ITEMS */
+/* ============================================================================ */
+
+.spatial-nav-item {
+  position: relative;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  
+  /* Base spatial positioning */
+  transform: 
+    translate3d(
+      var(--item-x, 0px), 
+      var(--item-y, 0px), 
+      var(--item-z, 0px)
+    )
+    scale3d(
+      var(--item-scale, 1), 
+      var(--item-scale, 1), 
+      1
+    );
+  
+  /* Smooth spatial transitions */
+  transition: 
+    transform var(--spatial-transition-duration, 400ms) var(--sn-anim-easing-elastic),
+    box-shadow var(--spatial-transition-duration, 400ms) ease-out;
+  
+  /* Spatial depth shadows */
+  box-shadow: 
+    0 calc(var(--item-z, 0px) / -20) calc(abs(var(--item-z, 0px)) / 10) 
+    rgba(0, 0, 0, calc(0.3 * abs(var(--item-z, 0px)) / 400));
+}
+
+/* Focused spatial item */
+.spatial-nav-item.focused {
+  --item-scale: 1.05;
+  z-index: 10;
+  
+  /* Enhanced depth shadow for focus */
+  box-shadow: 
+    0 calc(var(--item-z, 0px) / -15) calc(abs(var(--item-z, 0px)) / 8) 
+    rgba(var(--spice-rgb-accent, 203, 214, 244), 0.4),
+    0 0 20px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.2);
+}
+
+/* Hover spatial interactions */
+.spatial-nav-item:hover {
+  --item-scale: 1.02;
+  
+  /* Subtle approach animation */
+  animation: spatial-hover-approach 0.6s ease-out;
+}
+
+/* ============================================================================ */
+/* PROXIMITY INTERACTION ZONES */
+/* ============================================================================ */
+
+.proximity-zone {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+/* Inner proximity zone (immediate interaction) */
+.proximity-zone.inner {
+  width: calc(var(--proximity-zone-inner, 50px) * 2);
+  height: calc(var(--proximity-zone-inner, 50px) * 2);
+  background: radial-gradient(
+    circle,
+    rgba(var(--spice-rgb-accent, 203, 214, 244), 0.3) 0%,
+    rgba(var(--spice-rgb-accent, 203, 214, 244), 0.1) 70%,
+    transparent 100%
+  );
+}
+
+/* Middle proximity zone (preparation) */
+.proximity-zone.middle {
+  width: calc(var(--proximity-zone-middle, 150px) * 2);
+  height: calc(var(--proximity-zone-middle, 150px) * 2);
+  background: radial-gradient(
+    circle,
+    rgba(var(--spice-rgb-accent, 203, 214, 244), 0.1) 0%,
+    rgba(var(--spice-rgb-accent, 203, 214, 244), 0.05) 70%,
+    transparent 100%
+  );
+}
+
+/* Outer proximity zone (awareness) */
+.proximity-zone.outer {
+  width: calc(var(--proximity-zone-outer, 300px) * 2);
+  height: calc(var(--proximity-zone-outer, 300px) * 2);
+  background: radial-gradient(
+    circle,
+    rgba(var(--spice-rgb-accent, 203, 214, 244), 0.05) 0%,
+    transparent 80%
+  );
+}
+
+/* Active proximity zones */
+.spatial-nav-item:hover .proximity-zone,
+.spatial-nav-item.proximity-active .proximity-zone {
+  opacity: 1;
+}
+
+/* ============================================================================ */
+/* DIMENSIONAL RIFT PORTALS */
+/* ============================================================================ */
+
+.dimensional-rift {
+  position: absolute;
+  width: calc(var(--dimensional-rift-radius, 100px) * 2);
+  height: calc(var(--dimensional-rift-radius, 100px) * 2);
+  border-radius: 50%;
+  pointer-events: none;
+  
+  /* Rift visual effect */
+  background: 
+    radial-gradient(
+      circle,
+      rgba(var(--spice-rgb-accent, 203, 214, 244), var(--dimensional-rift-intensity, 0)) 0%,
+      rgba(var(--spice-rgb-accent, 203, 214, 244), calc(var(--dimensional-rift-intensity, 0) * 0.6)) 30%,
+      rgba(var(--spice-rgb-player, 24, 24, 37), calc(var(--dimensional-rift-intensity, 0) * 0.8)) 60%,
+      transparent 100%
+    );
+  
+  /* Space distortion effect */
+  filter: 
+    blur(calc(5px * (1 - var(--dimensional-rift-intensity, 0))))
+    contrast(calc(1 + var(--dimensional-rift-distortion, 0) * 0.5));
+  
+  /* Rift rotation */
+  transform: 
+    translate(-50%, -50%) 
+    rotate(var(--dimensional-rift-rotation, 0deg))
+    scale(var(--dimensional-rift-intensity, 0));
+  
+  /* Rift pulsing animation */
+  animation: dimensional-rift-pulse 
+    calc(4s / max(var(--dimensional-rift-intensity, 0.1), 0.1)) 
+    infinite ease-in-out;
+}
+
+/* ============================================================================ */
+/* CONTEXTUAL SPATIAL ARRANGEMENTS */
+/* ============================================================================ */
+
+/* Hierarchical arrangement (default navigation) */
+.spatial-nexus-container[data-arrangement="hierarchical"] {
+  .spatial-nav-item {
+    --item-spacing: var(--spatial-item-spacing, 60px);
+    
+    /* Calculate hierarchical positioning */
+    --item-x: calc(var(--hierarchy-level, 0) * var(--item-spacing));
+    --item-y: calc(var(--hierarchy-index, 0) * var(--item-spacing));
+    --item-z: calc(var(--hierarchy-level, 0) * -50px);
+  }
+}
+
+/* Cloud arrangement (discovery mode) */
+.spatial-nexus-container[data-arrangement="cloud"] {
+  .spatial-nav-item {
+    /* Pseudo-random cloud positioning */
+    --item-x: calc(sin(var(--item-hash, 0)) * 200px);
+    --item-y: calc(cos(var(--item-hash, 0)) * 150px);
+    --item-z: calc(sin(var(--item-hash, 0) * 2) * 100px);
+    
+    /* Cloud item floating animation */
+    animation: spatial-cloud-float 
+      calc(10s + var(--item-hash, 0) * 5s) 
+      infinite ease-in-out;
+  }
+}
+
+/* Spiral arrangement (search mode) */
+.spatial-nexus-container[data-arrangement="spiral"] {
+  .spatial-nav-item {
+    /* Spiral positioning calculation */
+    --spiral-angle: calc(var(--item-index, 0) * 45deg);
+    --spiral-radius: calc(var(--item-index, 0) * 20px + 80px);
+    
+    --item-x: calc(cos(var(--spiral-angle)) * var(--spiral-radius));
+    --item-y: calc(sin(var(--spiral-angle)) * var(--spiral-radius));
+    --item-z: calc(var(--item-index, 0) * -30px);
+  }
+}
+
+/* ============================================================================ */
+/* GESTURE-BASED INTERACTIONS */
+/* ============================================================================ */
+
+/* Pinch zoom gesture */
+.spatial-nexus-viewport[data-gesture="pinch"] {
+  .spatial-nexus-container {
+    transform: scale3d(var(--gesture-scale, 1), var(--gesture-scale, 1), 1);
+  }
+}
+
+/* Pan gesture */
+.spatial-nexus-viewport[data-gesture="pan"] {
+  .spatial-nexus-container {
+    transform: 
+      translateX(var(--gesture-translation-x, 0px))
+      translateY(var(--gesture-translation-y, 0px));
+  }
+}
+
+/* Rotate gesture */
+.spatial-nexus-viewport[data-gesture="rotate"] {
+  .spatial-nexus-container {
+    transform: 
+      rotateX(var(--gesture-rotation-x, 0deg))
+      rotateY(var(--gesture-rotation-y, 0deg));
+  }
+}
+
+/* ============================================================================ */
+/* SPATIAL NAVIGATION ANIMATIONS */
+/* ============================================================================ */
+
+@keyframes spatial-hover-approach {
+  0% {
+    transform: 
+      translate3d(var(--item-x, 0px), var(--item-y, 0px), var(--item-z, 0px))
+      scale3d(1, 1, 1);
+  }
+  50% {
+    transform: 
+      translate3d(var(--item-x, 0px), var(--item-y, 0px), calc(var(--item-z, 0px) + 20px))
+      scale3d(1.02, 1.02, 1);
+  }
+  100% {
+    transform: 
+      translate3d(var(--item-x, 0px), var(--item-y, 0px), var(--item-z, 0px))
+      scale3d(1.02, 1.02, 1);
+  }
+}
+
+@keyframes dimensional-rift-pulse {
+  0%, 100% {
+    transform: 
+      translate(-50%, -50%) 
+      rotate(var(--dimensional-rift-rotation, 0deg))
+      scale(var(--dimensional-rift-intensity, 0));
+    filter: 
+      blur(calc(5px * (1 - var(--dimensional-rift-intensity, 0))))
+      hue-rotate(0deg);
+  }
+  25% {
+    transform: 
+      translate(-50%, -50%) 
+      rotate(calc(var(--dimensional-rift-rotation, 0deg) + 15deg))
+      scale(calc(var(--dimensional-rift-intensity, 0) * 1.1));
+    filter: 
+      blur(calc(3px * (1 - var(--dimensional-rift-intensity, 0))))
+      hue-rotate(30deg);
+  }
+  50% {
+    transform: 
+      translate(-50%, -50%) 
+      rotate(calc(var(--dimensional-rift-rotation, 0deg) + 30deg))
+      scale(calc(var(--dimensional-rift-intensity, 0) * 1.2));
+    filter: 
+      blur(calc(2px * (1 - var(--dimensional-rift-intensity, 0))))
+      hue-rotate(60deg);
+  }
+  75% {
+    transform: 
+      translate(-50%, -50%) 
+      rotate(calc(var(--dimensional-rift-rotation, 0deg) + 45deg))
+      scale(calc(var(--dimensional-rift-intensity, 0) * 1.1));
+    filter: 
+      blur(calc(3px * (1 - var(--dimensional-rift-intensity, 0))))
+      hue-rotate(30deg);
+  }
+}
+
+@keyframes spatial-cloud-float {
+  0%, 100% {
+    transform: 
+      translate3d(var(--item-x, 0px), var(--item-y, 0px), var(--item-z, 0px))
+      rotateY(0deg);
+  }
+  25% {
+    transform: 
+      translate3d(
+        calc(var(--item-x, 0px) + 10px), 
+        calc(var(--item-y, 0px) - 5px), 
+        calc(var(--item-z, 0px) + 15px)
+      )
+      rotateY(5deg);
+  }
+  50% {
+    transform: 
+      translate3d(
+        calc(var(--item-x, 0px) + 5px), 
+        calc(var(--item-y, 0px) + 10px), 
+        calc(var(--item-z, 0px) - 10px)
+      )
+      rotateY(-3deg);
+  }
+  75% {
+    transform: 
+      translate3d(
+        calc(var(--item-x, 0px) - 8px), 
+        calc(var(--item-y, 0px) + 3px), 
+        calc(var(--item-z, 0px) + 8px)
+      )
+      rotateY(7deg);
+  }
+}
+
+/* ============================================================================ */
+/* PERFORMANCE OPTIMIZATIONS */
+/* ============================================================================ */
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .spatial-nexus-container,
+  .spatial-layer,
+  .spatial-nav-item,
+  .dimensional-rift {
+    animation: none !important;
+    transition: opacity 0.3s ease-out !important;
+  }
+  
+  .spatial-nav-item {
+    transform: none !important;
+  }
+}
+
+/* Performance mode optimizations */
+.spatial-nexus-viewport[data-performance-mode="optimized"] {
+  .spatial-layer {
+    filter: none;
+  }
+  
+  .dimensional-rift {
+    animation: none;
+    filter: none;
+  }
+  
+  .spatial-nav-item {
+    box-shadow: none;
+  }
+}
+
+/* GPU acceleration hints */
+.spatial-nexus-container,
+.spatial-layer,
+.spatial-nav-item {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d;
+}
+
+/* ============================================================================ */
+/* ACCESSIBILITY ENHANCEMENTS */
+/* ============================================================================ */
+
+/* Focus management for spatial navigation */
+.spatial-nav-item:focus-visible {
+  outline: 2px solid rgba(var(--spice-rgb-accent, 203, 214, 244), 0.8);
+  outline-offset: 4px;
+  z-index: 20;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .proximity-zone,
+  .dimensional-rift {
+    opacity: 0.8 !important;
+    filter: contrast(2);
+  }
+}
+
+/* Print styles */
+@media print {
+  .spatial-nexus-viewport {
+    perspective: none;
+    transform-style: flat;
+  }
+  
+  .spatial-layer,
+  .spatial-nav-item {
+    transform: none !important;
+    filter: none !important;
+    position: static !important;
+  }
+  
+  .proximity-zone,
+  .dimensional-rift {
+    display: none !important;
+  }
+}

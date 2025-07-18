@@ -2,7 +2,7 @@
  * Design Token System - Catppuccin StarryNight
  * 
  * Unified design token source providing structured, namespaced CSS custom properties
- * for the Year 3000 System architecture. All visual systems derive from these tokens.
+ * for the Year 3000 System architecture- All visual systems derive from these tokens-
  * 
  * @architecture Year3000System
  * @performance Critical variables bypass CSSVariableBatcher for real-time updates
@@ -17,251 +17,319 @@
 
 :root {
   // -------------------------------------------------------------------------
-  // Background System (--sn.bg.*) 
+  // Background System (--sn-bg-*) 
   // -------------------------------------------------------------------------
   
   // WebGL/WebGPU Status
-  --sn.bg.webgl.ready: 0;
-  --sn.bg.webgpu.ready: 0;
-  --sn.bg.active-backend: "css"; // "css" | "webgl" | "webgpu"
+  --sn-bg-webgl-ready: 0;
+  --sn-bg-webgpu-ready: 0;
+  --sn-bg-active-backend: "css"; // "css" | "webgl" | "webgpu"
   
   // Gradient Configuration
-  --sn.bg.gradient.primary.rgb: var(--spice-rgb-accent, 139, 233, 253);
-  --sn.bg.gradient.secondary.rgb: var(--spice-rgb-base, 17, 17, 27);
-  --sn.bg.gradient.accent.rgb: var(--spice-rgb-accent, 139, 233, 253);
-  --sn.bg.gradient.opacity: 0.8;
-  --sn.bg.gradient.blur: 120px;
-  --sn.bg.gradient.saturation: 1.2;
-  --sn.bg.gradient.brightness: 1.0;
-  --sn.bg.gradient.contrast: 1.1;
+  --sn-bg-gradient-primary-rgb: var(--spice-rgb-accent, 139, 233, 253);
+  --sn-bg-gradient-secondary-rgb: var(--spice-rgb-base, 17, 17, 27);
+  --sn-bg-gradient-accent-rgb: var(--spice-rgb-accent, 139, 233, 253);
+  --sn-bg-gradient-opacity: 0.8;
+  --sn-bg-gradient-blur: 120px;
+  --sn-bg-gradient-saturation: 1.2;
+  --sn-bg-gradient-brightness: 1.0;
+  --sn-bg-gradient-contrast: 1.1;
   
   // Gradient Flow Animation
-  --sn.bg.gradient.flow.x: 0;
-  --sn.bg.gradient.flow.y: 0;
-  --sn.bg.gradient.flow.scale: 1.0;
-  --sn.bg.gradient.flow.speed: 1.0;
+  --sn-bg-gradient-flow-x: 0;
+  --sn-bg-gradient-flow-y: 0;
+  --sn-bg-gradient-flow-scale: 1.0;
+  --sn-bg-gradient-flow-speed: 1.0;
   
   // Nebula Layer System  
-  --sn.bg.nebula.layer.0.opacity: 0.3;
-  --sn.bg.nebula.layer.1.opacity: 0.2;
-  --sn.bg.nebula.layer.2.opacity: 0.15;
-  --sn.bg.nebula.layer.3.opacity: 0.1;
-  --sn.bg.nebula.max-blur: 40px;
+  --sn-bg-nebula-layer-0-opacity: 0.3;
+  --sn-bg-nebula-layer-1-opacity: 0.2;
+  --sn-bg-nebula-layer-2-opacity: 0.15;
+  --sn-bg-nebula-layer-3-opacity: 0.1;
+  --sn-bg-nebula-max-blur: 40px;
   
   // Particle System
-  --sn.bg.particle.density: 0.6;
-  --sn.bg.particle.energy.intensity: 0;
-  --sn.bg.particle.cluster.size: 1.0;
-  --sn.bg.particle.network.opacity: 0.4;
-  --sn.bg.particle.focus.dampening: 0.8;
+  --sn-bg-particle-density: 0.6;
+  --sn-bg-particle-energy-intensity: 0;
+  --sn-bg-particle-cluster-size: 1.0;
+  --sn-bg-particle-network-opacity: 0.4;
+  --sn-bg-particle-focus-dampening: 0.8;
   
   // -------------------------------------------------------------------------
-  // Music System (--sn.music.*) - Critical Real-time Variables
+  // Music System (--sn-music-*) - Critical Real-time Variables
   // -------------------------------------------------------------------------
   
   // Beat Synchronization (Fast-path in CSSVariableBatcher)
-  --sn.music.beat.pulse.intensity: 0; // ⚡ Real-time
-  --sn.music.rhythm.phase: 0deg; // ⚡ Real-time  
-  --sn.music.breathing.scale: 1.0; // ⚡ Real-time
-  --sn.music.spectrum.phase: 0deg; // ⚡ Real-time
+  --sn-music-beat-pulse-intensity: 0; // ⚡ Real-time
+  --sn-music-rhythm-phase: 0deg; // ⚡ Real-time  
+  --sn-music-breathing-scale: 1.0; // ⚡ Real-time
+  --sn-music-spectrum-phase: 0deg; // ⚡ Real-time
   
   // Music Analysis
-  --sn.music.energy.level: 0.5;
-  --sn.music.valence: 0.5;
-  --sn.music.tempo.bpm: 120;
-  --sn.music.intensity.boost: 1.0;
-  --sn.music.sync.enabled: 1;
+  --sn-music-energy-level: 0.5;
+  --sn-music-valence: 0.5;
+  --sn-music-tempo-bpm: 120;
+  --sn-music-intensity-boost: 1.0;
+  --sn-music-sync-enabled: 1;
   
   // Micro-beat System
-  --sn.music.micro.beat.intensity: 0;
-  --sn.music.micro.rhythm.phase: 0deg;
-  --sn.music.micro.breathing.scale: 1.0;
+  --sn-music-micro-beat-intensity: 0;
+  --sn-music-micro-rhythm-phase: 0deg;
+  --sn-music-micro-breathing-scale: 1.0;
   
   // Feed & Content Response
-  --sn.music.feed.bloom.intensity: 0;
-  --sn.music.energy.modulation: 1.0;
+  --sn-music-feed-bloom-intensity: 0;
+  --sn-music-energy-modulation: 1.0;
   
   // -------------------------------------------------------------------------
-  // Animation System (--sn.anim.*)
+  // Animation System (--sn-anim-*)
   // -------------------------------------------------------------------------
   
   // Easing Functions
-  --sn.anim.easing.emergence: cubic-bezier(0.23, 1, 0.32, 1);
-  --sn.anim.easing.organic: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --sn.anim.easing.breathing: cubic-bezier(0.37, 0, 0.63, 1);
-  --sn.anim.easing.harmony: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --sn-anim-easing-emergence: cubic-bezier(0.23, 1, 0.32, 1);
+  --sn-anim-easing-organic: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --sn-anim-easing-breathing: cubic-bezier(0.37, 0, 0.63, 1);
+  --sn-anim-easing-harmony: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --sn-anim-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --sn-anim-easing-bounce-playful: cubic-bezier(0.1, 0.7, 0.5, 1.3);
+  --sn-anim-easing-elastic: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --sn-anim-easing-bounce-smooth: cubic-bezier(0.175, 0.885, 0.32, 1.4);
+  --sn-anim-easing-bounce-medium: cubic-bezier(0.175, 0.885, 0.32, 1.375);
+  --sn-anim-easing-bounce-gentle: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --sn-anim-easing-bounce-strong: cubic-bezier(0.175, 0.885, 0.32, 1.5);
+  --sn-anim-easing-custom-1: cubic-bezier(0.4, 0, 0.6, 1);
+  --sn-anim-easing-custom-2: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sn-anim-easing-custom-3: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   
   // Transition Durations
-  --sn.anim.transition.fast: 200ms;
-  --sn.anim.transition.standard: 400ms;
-  --sn.anim.transition.slow: 800ms;
-  --sn.anim.transition.cosmic: 1200ms;
+  --sn-anim-transition-fast: 200ms;
+  --sn-anim-transition-standard: 400ms;
+  --sn-anim-transition-slow: 800ms;
+  --sn-anim-transition-cosmic: 1200ms;
   
   // 3D System
-  --sn.anim.3d.depth.near: translateZ(10px);
-  --sn.anim.3d.depth.mid: translateZ(20px);
-  --sn.anim.3d.depth.far: translateZ(40px);
-  --sn.anim.3d.perspective: 1000px;
+  --sn-anim-3d-depth-near: translateZ(10px);
+  --sn-anim-3d-depth-mid: translateZ(20px);
+  --sn-anim-3d-depth-far: translateZ(40px);
+  --sn-anim-3d-perspective: 1000px;
   
   // Motion Intelligence
-  --sn.anim.motion.intelligence.level: 3; // 0-5 scale
-  --sn.anim.motion.reduced: 0; // 0 = full motion, 1 = reduced
+  --sn-anim-motion-intelligence-level: 3; // 0.5 scale
+  --sn-anim-motion-reduced: 0; // 0 = full motion, 1 = reduced
   
   // -------------------------------------------------------------------------
-  // Performance System (--sn.perf.*)
+  // Performance System (--sn-perf-*)
   // -------------------------------------------------------------------------
   
   // GPU & Hardware
-  --sn.perf.gpu.acceleration.enabled: 1;
-  --sn.perf.webgl.context.ready: 0;
-  --sn.perf.webgpu.context.ready: 0;
+  --sn-perf-gpu-acceleration-enabled: 1;
+  --sn-perf-webgl-context-ready: 0;
+  --sn-perf-webgpu-context-ready: 0;
   
   // Performance Modes
-  --sn.perf.mode: "auto"; // "auto" | "high" | "medium" | "low"
-  --sn.perf.fps.target: 60;
-  --sn.perf.memory.optimization: 1;
-  --sn.perf.batch.enabled: 1;
+  --sn-perf-mode: "auto"; // "auto" | "high" | "medium" | "low"
+  --sn-perf-fps-target: 60;
+  --sn-perf-memory-optimization: 1;
+  --sn-perf-batch-enabled: 1;
   
   // CDF (Cosmic Discovery Framework)
-  --sn.perf.cdf.enabled: 1;
-  --sn.perf.cdf.energy: 0.5;
-  --sn.perf.cdf.scroll.ratio: 0;
-  --sn.perf.cdf.aberration.strength: 0.1;
+  --sn-perf-cdf-enabled: 1;
+  --sn-perf-cdf-energy: 0.5;
+  --sn-perf-cdf-scroll-ratio: 0;
+  --sn-perf-cdf-aberration-strength: 0.1;
   
   // Quality Scaling
-  --sn.perf.quality.particles: 1.0;
-  --sn.perf.quality.shadows: 1.0;
-  --sn.perf.quality.blur: 1.0;
+  --sn-perf-quality-particles: 1.0;
+  --sn-perf-quality-shadows: 1.0;
+  --sn-perf-quality-blur: 1.0;
   
   // -------------------------------------------------------------------------
-  // UI Component System (--sn.ui.*)
+  // UI Component System (--sn-ui-*)
   // -------------------------------------------------------------------------
   
   // Card System
-  --sn.ui.card.energy.level: 0;
-  --sn.ui.card.rhythm.phase: 0deg;
-  --sn.ui.card.beat.intensity: 0;
-  --sn.ui.card.constellation.opacity: 0.3;
-  --sn.ui.card.harmonic.saturation: 1.0;
-  --sn.ui.card.3d.enabled: 1;
+  --sn-ui-card-energy-level: 0;
+  --sn-ui-card-rhythm-phase: 0deg;
+  --sn-ui-card-beat-intensity: 0;
+  --sn-ui-card-constellation-opacity: 0.3;
+  --sn-ui-card-harmonic-saturation: 1.0;
+  --sn-ui-card-3d-enabled: 1;
   
   // Glass Effects
-  --sn.ui.glass.opacity: 0.1;
-  --sn.ui.glass.blur: 20px;
-  --sn.ui.glass.pulse.enabled: 1;
-  --sn.ui.glass.beat.opacity: 0;
-  --sn.ui.glass.frost.intensity: 0.5;
+  --sn-ui-glass-opacity: 0.1;
+  --sn-ui-glass-blur: 20px;
+  --sn-ui-glass-pulse-enabled: 1;
+  --sn-ui-glass-beat-opacity: 0;
+  --sn-ui-glass-frost-intensity: 0.5;
   
   // Navigation System
-  --sn.ui.nav.glow.intensity: 0;
-  --sn.ui.nav.echo.opacity: 0;
-  --sn.ui.nav.magnetic.pull: 1.0;
-  --sn.ui.nav.neural.primary.rgb: 139, 233, 253;
-  --sn.ui.nav.neural.secondary.rgb: 250, 179, 135;
+  --sn-ui-nav-glow-intensity: 0;
+  --sn-ui-nav-echo-opacity: 0;
+  --sn-ui-nav-magnetic-pull: 1.0;
+  --sn-ui-nav-neural-primary-rgb: 139, 233, 253;
+  --sn-ui-nav-neural-secondary-rgb: 250, 179, 135;
   
   // Sidebar Consciousness
-  --sn.ui.sidebar.consciousness.opacity: 0.8;
-  --sn.ui.sidebar.consciousness.deep.rgb: 17, 17, 27;
-  --sn.ui.sidebar.magnetic.hover.pull: 1.2;
-  --sn.ui.sidebar.magnetic.focus.pull: 1.5;
+  --sn-ui-sidebar-consciousness-opacity: 0.8;
+  --sn-ui-sidebar-consciousness-deep-rgb: 17, 17, 27;
+  --sn-ui-sidebar-magnetic-hover-pull: 1.2;
+  --sn-ui-sidebar-magnetic-focus-pull: 1.5;
   
   // Button System
-  --sn.ui.button.cosmic.glow: 0;
-  --sn.ui.button.energy.brightness: 1.0;
-  --sn.ui.button.hologram.opacity: 0;
+  --sn-ui-button-cosmic-glow: 0;
+  --sn-ui-button-energy-brightness: 1.0;
+  --sn-ui-button-hologram-opacity: 0;
   
   // -------------------------------------------------------------------------
-  // Text System (--sn.text.*)
+  // Text System (--sn-text-*)
   // -------------------------------------------------------------------------
   
   // Text Effects
-  --sn.text.glow.intensity: 0; // ⚡ Dynamic via ColorHarmonyEngine
-  --sn.text.gradient.angle: 45deg;
-  --sn.text.energy.brightness: 1.0;
-  --sn.text.rhythm.hue: 0deg;
-  --sn.text.cosmic.blur: 0px;
-  --sn.text.harmonic.saturation: 1.0;
+  --sn-text-glow-intensity: 0; // ⚡ Dynamic via ColorHarmonyEngine
+  --sn-text-gradient-angle: 45deg;
+  --sn-text-energy-brightness: 1.0;
+  --sn-text-rhythm-hue: 0deg;
+  --sn-text-cosmic-blur: 0px;
+  --sn-text-harmonic-saturation: 1.0;
   
   // Typography Scale  
-  --sn.text.scale.xs: 0.75rem;
-  --sn.text.scale.sm: 0.875rem;
-  --sn.text.scale.base: 1rem;
-  --sn.text.scale.lg: 1.125rem;
-  --sn.text.scale.xl: 1.25rem;
-  --sn.text.scale.2xl: 1.5rem;
+  --sn-text-scale-xs: 0.75rem;
+  --sn-text-scale-sm: 0.875rem;
+  --sn-text-scale-base: 1rem;
+  --sn-text-scale-lg: 1.125rem;
+  --sn-text-scale-xl: 1.25rem;
+  --sn-text-scale-2xl: 1.5rem;
   
   // -------------------------------------------------------------------------
-  // Interaction System (--sn.ix.*)
+  // Interaction System (--sn-ix-*)
   // -------------------------------------------------------------------------
   
   // Feedback Intensity
-  --sn.ix.feedback.subtle: 0.2;
-  --sn.ix.feedback.moderate: 0.5;
-  --sn.ix.feedback.prominent: 0.8;
+  --sn-ix-feedback-subtle: 0.2;
+  --sn-ix-feedback-moderate: 0.5;
+  --sn-ix-feedback-prominent: 0.8;
   
   // Ripple Effects
-  --sn.ix.ripple.intensity: 0.6;
-  --sn.ix.ripple.duration: 600ms;
-  --sn.ix.ripple.color.rgb: var(--sn.bg.gradient.accent.rgb);
+  --sn-ix-ripple-intensity: 0.6;
+  --sn-ix-ripple-duration: 600ms;
+  --sn-ix-ripple-color-rgb: var(--sn-bg-gradient-accent-rgb);
   
   // Magnetic Interactions
-  --sn.ix.magnetic.hover.pull: 1.05;
-  --sn.ix.magnetic.focus.pull: 1.1;
-  --sn.ix.magnetic.active.pull: 0.95;
+  --sn-ix-magnetic-hover-pull: 1.05;
+  --sn-ix-magnetic-focus-pull: 1.1;
+  --sn-ix-magnetic-active-pull: 0.95;
   
   // Temporal Echo System
-  --sn.ix.echo.past.opacity: 0.3;
-  --sn.ix.echo.present.opacity: 1.0;
-  --sn.ix.echo.future.opacity: 0.1;
+  --sn-ix-echo-past-opacity: 0.3;
+  --sn-ix-echo-present-opacity: 1.0;
+  --sn-ix-echo-future-opacity: 0.1;
   
   // -------------------------------------------------------------------------
-  // Color System (--sn.color.*) - Dynamic Accent Management
+  // Color System (--sn-color-*) - Dynamic Accent Management
   // -------------------------------------------------------------------------
   
   // Dynamic Accent (⚡ Real-time via ColorHarmonyEngine)
-  --sn.color.accent.hex: #8be9fd; // ⚡ Dynamic
-  --sn.color.accent.rgb: 139, 233, 253; // ⚡ Dynamic
+  --sn-color-accent-hex: #8be9fd; // ⚡ Dynamic
+  --sn-color-accent-rgb: 139, 233, 253; // ⚡ Dynamic
   
   // OKLab Processed Colors
-  --sn.color.oklab.bright.highlight.rgb: 139, 233, 253;
-  --sn.color.oklab.dynamic.shadow.rgb: 17, 17, 27;
+  --sn-color-oklab-bright-highlight-rgb: 139, 233, 253;
+  --sn-color-oklab-dynamic-shadow-rgb: 17, 17, 27;
   
   // Temporal Color System
-  --sn.color.temporal.past.rgb: 98, 114, 164;
-  --sn.color.temporal.present.rgb: var(--sn.color.accent.rgb);
-  --sn.color.temporal.future.rgb: 139, 233, 253;
+  --sn-color-temporal-past-rgb: 98, 114, 164;
+  --sn-color-temporal-present-rgb: var(--sn-color-accent-rgb);
+  --sn-color-temporal-future-rgb: 139, 233, 253;
   
   // Consciousness Field Colors
-  --sn.color.consciousness.deep.rgb: 17, 17, 27;
-  --sn.color.consciousness.surface.rgb: 30, 30, 46;
-  --sn.color.consciousness.glow.rgb: var(--sn.color.accent.rgb);
+  --sn-color-consciousness-deep-rgb: 17, 17, 27;
+  --sn-color-consciousness-surface-rgb: 30, 30, 46;
+  --sn-color-consciousness-glow-rgb: var(--sn-color-accent-rgb);
   
   // -------------------------------------------------------------------------
-  // Layout System (--sn.layout.*)
+  // Layout System (--sn-layout-*)
   // -------------------------------------------------------------------------
   
   // Z-Index Management
-  --sn.layout.z.background: -11;
-  --sn.layout.z.nebula: -10;
-  --sn.layout.z.particles: -9;
-  --sn.layout.z.content: 0;
-  --sn.layout.z.ui: 10;
-  --sn.layout.z.modal: 100;
+  --sn-layout-z-background: -11;
+  --sn-layout-z-nebula: -10;
+  --sn-layout-z-particles: -9;
+  --sn-layout-z-content: 0;
+  --sn-layout-z-ui: 10;
+  --sn-layout-z-modal: 100;
   
   // Spacing Scale
-  --sn.layout.space.xs: 0.25rem;
-  --sn.layout.space.sm: 0.5rem;
-  --sn.layout.space.md: 1rem;
-  --sn.layout.space.lg: 1.5rem;
-  --sn.layout.space.xl: 2rem;
-  --sn.layout.space.2xl: 3rem;
+  --sn-layout-space-xs: 0.25rem;
+  --sn-layout-space-sm: 0.5rem;
+  --sn-layout-space-md: 1rem;
+  --sn-layout-space-lg: 1.5rem;
+  --sn-layout-space-xl: 2rem;
+  --sn-layout-space-2xl: 3rem;
   
   // Border Radius
-  --sn.layout.radius.sm: 4px;
-  --sn.layout.radius.md: 8px;
-  --sn.layout.radius.lg: 12px;
-  --sn.layout.radius.xl: 16px;
-  --sn.layout.radius.full: 9999px;
+  --sn-layout-radius-sm: 4px;
+  --sn-layout-radius-md: 8px;
+  --sn-layout-radius-lg: 12px;
+  --sn-layout-radius-xl: 16px;
+  --sn-layout-radius-full: 9999px;
+  
+  // -------------------------------------------------------------------------
+  // Consciousness Field System (--sn-consciousness-*) - Magnetic Depth
+  // -------------------------------------------------------------------------
+  
+  // 3D Perspective & Depth
+  --sn-consciousness-depth-field: 800px; // Comfortable 3D perspective for readability
+  --sn-consciousness-depth-approach: 20px;
+  --sn-consciousness-depth-recede: -10px;
+  --sn-consciousness-depth-neutral: 0px;
+  
+  // Magnetic Interaction Forces
+  --sn-consciousness-magnetic-hover-pull: 12px;
+  --sn-consciousness-magnetic-focus-pull: 18px;
+  --sn-consciousness-magnetic-interest-pull: 8px;
+  --sn-consciousness-magnetic-transition-speed: 0.6s;
+  
+  // Depth Hierarchy (translateZ values)
+  --sn-consciousness-depth-priority-high: translateZ(8px);
+  --sn-consciousness-depth-priority-medium: translateZ(4px);
+  --sn-consciousness-depth-priority-low: translateZ(0px);
+  --sn-consciousness-depth-priority-receded: translateZ(-6px);
+  
+  // Readability & Accessibility
+  --sn-consciousness-magnetic-max-rotation: 2deg;
+  --sn-consciousness-text-clarity: 1;
+  --sn-consciousness-contrast-boost: 1.05;
+  
+  // Field Dynamics
+  --sn-consciousness-field-intensity: 0.4;
+  --sn-consciousness-breathing-rate: 12s;
+  --sn-consciousness-response-sensitivity: 0.8;
+  
+  // Performance & Mobile
+  --sn-consciousness-performance-mode: 1;
+  --sn-consciousness-accessibility-scale: 1;
+  --sn-consciousness-mobile-reduction: 0.6;
+  
+  // -------------------------------------------------------------------------
+  // Serendipity Discovery System (--sn-serendipity-*)
+  // -------------------------------------------------------------------------
+  
+  // Idle State Discovery
+  --sn-serendipity-idle-threshold: 2000ms;
+  --sn-serendipity-animation-duration: 600ms;
+  --sn-serendipity-start-z: -60px;
+  --sn-serendipity-end-z: -10px;
+  
+  // -------------------------------------------------------------------------
+  // Glyph Consciousness System (--sn-glyph-*)
+  // -------------------------------------------------------------------------
+  
+  // Core Glyph Controls
+  --sn-glyph-intensity: 0; // 0.1 base intensity
+  --sn-glyph-glow: 0; // 0.1 glow factor (usually intensity * 0.8)
+  --sn-glyph-base-size: 6px;
+  --sn-glyph-color-rgb: 140, 170, 238;
+  --sn-glyph-rotation: 0deg;
 }
 
 // =============================================================================
@@ -271,29 +339,36 @@
 @media (prefers-reduced-motion: reduce) {
   :root {
     // Disable all motion-sensitive variables
-    --sn.music.beat.pulse.intensity: 0 !important;
-    --sn.music.rhythm.phase: 0deg !important;
-    --sn.music.breathing.scale: 1.0 !important;
-    --sn.anim.motion.reduced: 1;
+    --sn-music-beat-pulse-intensity: 0 !important;
+    --sn-music-rhythm-phase: 0deg !important;
+    --sn-music-breathing-scale: 1.0 !important;
+    --sn-anim-motion-reduced: 1;
     
     // Use conservative transitions
-    --sn.anim.transition.fast: 0ms;
-    --sn.anim.transition.standard: 0ms;
-    --sn.anim.transition.slow: 0ms;
+    --sn-anim-transition-fast: 0ms;
+    --sn-anim-transition-standard: 0ms;
+    --sn-anim-transition-slow: 0ms;
     
     // Disable particle effects
-    --sn.bg.particle.density: 0;
-    --sn.perf.quality.particles: 0;
+    --sn-bg-particle-density: 0;
+    --sn-perf-quality-particles: 0;
+    
+    // Reduce consciousness field motion
+    --sn-consciousness-magnetic-hover-pull: 4px;
+    --sn-consciousness-magnetic-focus-pull: 6px;
+    --sn-consciousness-magnetic-transition-speed: 1.2s;
+    --sn-consciousness-breathing-rate: 30s;
+    --sn-consciousness-field-intensity: 0.2;
   }
 }
 
 @media (prefers-contrast: high) {
   :root {
     // Enhanced contrast ratios
-    --sn.ui.glass.opacity: 0.3;
-    --sn.text.glow.intensity: 0;
-    --sn.bg.gradient.contrast: 1.5;
-    --sn.color.consciousness.surface.rgb: 45, 45, 69;
+    --sn-ui-glass-opacity: 0.3;
+    --sn-text-glow-intensity: 0;
+    --sn-bg-gradient-contrast: 1.5;
+    --sn-color-consciousness-surface-rgb: 45, 45, 69;
   }
 }
 
@@ -303,34 +378,66 @@
 
 :root {
   // Maintain backward compatibility during migration
-  // These will be deprecated in v3.0
+  // These will be deprecated in v3-0
   
   // Critical real-time variables (Phase 1 migration)
-  --sn-beat-pulse-intensity: var(--sn.music.beat.pulse.intensity);
-  --sn-rhythm-phase: var(--sn.music.rhythm.phase);
-  --sn-breathing-scale: var(--sn.music.breathing.scale);
-  --sn-accent-hex: var(--sn.color.accent.hex);
-  --sn-accent-rgb: var(--sn.color.accent.rgb);
+  --sn-beat-pulse-intensity: var(--sn-music-beat-pulse-intensity);
+  --sn-rhythm-phase: var(--sn-music-rhythm-phase);
+  --sn-breathing-scale: var(--sn-music-breathing-scale);
+  --sn-accent-hex: var(--sn-color-accent-hex);
+  --sn-accent-rgb: var(--sn-color-accent-rgb);
   
   // Background system (Phase 2 migration)
-  --sn-gradient-primary-rgb: var(--sn.bg.gradient.primary.rgb);
-  --sn-gradient-secondary-rgb: var(--sn.bg.gradient.secondary.rgb);
-  --sn-gradient-accent-rgb: var(--sn.bg.gradient.accent.rgb);
-  --sn-gradient-flow-x: var(--sn.bg.gradient.flow.x);
-  --sn-gradient-flow-y: var(--sn.bg.gradient.flow.y);
-  --sn-webgl-ready: var(--sn.bg.webgl.ready);
+  --sn-gradient-primary-rgb: var(--sn-bg-gradient-primary-rgb);
+  --sn-gradient-secondary-rgb: var(--sn-bg-gradient-secondary-rgb);
+  --sn-gradient-accent-rgb: var(--sn-bg-gradient-accent-rgb);
+  --sn-gradient-flow-x: var(--sn-bg-gradient-flow-x);
+  --sn-gradient-flow-y: var(--sn-bg-gradient-flow-y);
+  --sn-webgl-ready: var(--sn-bg-webgl-ready);
   
   // UI Components (Phase 3 migration)
-  --sn-text-glow-intensity: var(--sn.text.glow.intensity);
-  --sn-glass-beat-opacity: var(--sn.ui.glass.beat.opacity);
-  --card-energy-level: var(--sn.ui.card.energy.level);
+  --sn-text-glow-intensity: var(--sn-text-glow-intensity);
+  --sn-glass-beat-opacity: var(--sn-ui-glass-beat-opacity);
+  --card-energy-level: var(--sn-ui-card-energy-level);
+  
+  // Consciousness Field System (Phase 4 migration)
+  --magnetic-depth-field: var(--sn-consciousness-depth-field);
+  --magnetic-approach-distance: var(--sn-consciousness-depth-approach);
+  --magnetic-recede-distance: var(--sn-consciousness-depth-recede);
+  --magnetic-neutral-position: var(--sn-consciousness-depth-neutral);
+  --magnetic-hover-pull: var(--sn-consciousness-magnetic-hover-pull);
+  --magnetic-focus-pull: var(--sn-consciousness-magnetic-focus-pull);
+  --magnetic-interest-pull: var(--sn-consciousness-magnetic-interest-pull);
+  --magnetic-transition-speed: var(--sn-consciousness-magnetic-transition-speed);
+  --consciousness-field-intensity: var(--sn-consciousness-field-intensity);
+  --consciousness-breathing-rate: var(--sn-consciousness-breathing-rate);
+  --consciousness-response-sensitivity: var(--sn-consciousness-response-sensitivity);
+  
+  // Depth Priority System
+  --depth-priority-high: var(--sn-consciousness-depth-priority-high);
+  --depth-priority-medium: var(--sn-consciousness-depth-priority-medium);
+  --depth-priority-low: var(--sn-consciousness-depth-priority-low);
+  --depth-priority-receded: var(--sn-consciousness-depth-priority-receded);
+  
+  // Glyph System (Phase 4 migration)
+  --sn-glyph-intensity: var(--sn-glyph-intensity);
+  --sn-glyph-glow: var(--sn-glyph-glow);
+  --sn-glyph-base-size: var(--sn-glyph-base-size);
+  --sn-glyph-color-rgb: var(--sn-glyph-color-rgb);
+  --sn-glyph-rotation: var(--sn-glyph-rotation);
+  
+  // Serendipity System
+  --serendipity-idle-threshold: var(--sn-serendipity-idle-threshold);
+  --serendipity-animation-duration: var(--sn-serendipity-animation-duration);
+  --serendipity-start-z: var(--sn-serendipity-start-z);
+  --serendipity-end-z: var(--sn-serendipity-end-z);
 }
 
 // =============================================================================
 // CATPPUCCIN FLAVOR INTEGRATION
 // =============================================================================
 
-// Default to Mocha flavor, other flavors override via color.ini
+// Default to Mocha flavor, other flavors override via color-ini
 :root {
   // Base Catppuccin colors that integrate with dynamic system
   --catppuccin-base: #1e1e2e;
@@ -347,7 +454,29 @@
   --catppuccin-text: #cdd6f4;
   
   // Map to system variables for consistency
-  --sn.bg.gradient.secondary.rgb: 30, 30, 46; // catppuccin-base
-  --sn.color.consciousness.deep.rgb: 17, 17, 27; // catppuccin-crust
-  --sn.color.consciousness.surface.rgb: 49, 50, 68; // catppuccin-surface0
+  --sn-bg-gradient-secondary-rgb: 30, 30, 46; // catppuccin-base
+  --sn-color-consciousness-deep-rgb: 17, 17, 27; // catppuccin-crust
+  --sn-color-consciousness-surface-rgb: 49, 50, 68; // catppuccin-surface0
+}
+
+// =============================================================================
+// RESPONSIVE DESIGN OVERRIDES
+// =============================================================================
+
+@media (max-width: 768px) {
+  :root {
+    // Mobile consciousness field optimization
+    --sn-consciousness-depth-field: 600px;
+    --sn-consciousness-magnetic-hover-pull: calc(12px * var(--sn-consciousness-mobile-reduction));
+    --sn-consciousness-magnetic-focus-pull: calc(18px * var(--sn-consciousness-mobile-reduction));
+    --sn-consciousness-field-intensity: calc(0.4 * var(--sn-consciousness-mobile-reduction));
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    // Enhanced consciousness field contrast
+    --sn-consciousness-contrast-boost: 1.15;
+    --sn-consciousness-field-intensity: 0.6;
+  }
 }

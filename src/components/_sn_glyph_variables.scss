@@ -1,12 +1,25 @@
-// StarryNight – Glyph Variable Map & Mixin
-// Provides canonical --sn-glyph-* CSS custom properties and helper mixin.
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 GLYPH VARIABLES - Consciousness Indicators
+// 🔄 MIGRATED TO UNIFIED DESIGN TOKENS SYSTEM
+// ████████████████████████████████████████████████████████████████████████████████
+
+// DEPRECATION NOTICE: This file now references the unified design tokens system.
+// All authoritative variable definitions are in: src/design-tokens/tokens.scss
+// These aliases maintain backward compatibility during migration to Year 3000 architecture.
+
+// Import the unified design tokens
+@use "../design-tokens/tokens" as *;
 
 :root {
-  // Core glyph visual controls written by DataGlyphSystem (JS)
-  --sn-glyph-intensity: 0; // 0–1 base intensity
-  --sn-glyph-glow: 0;      // 0–1 glow factor (usually intensity * 0.8)
-
-  // Legacy tokens removed – use --sn-glyph-glow instead.
+  // === LEGACY COMPATIBILITY ALIASES ===
+  // Following Year 3000 "Kinetic Verbs" principle - glyphs ripple and pulse with system state
+  
+  // Core glyph controls (reference --sn.glyph.* system)
+  --sn-glyph-intensity: var(--sn.glyph.intensity);  // 0-1 base intensity
+  --sn-glyph-glow: var(--sn.glyph.glow);            // 0-1 glow factor
+  --sn-glyph-base-size: var(--sn.glyph.base.size);  // Base size
+  --sn-glyph-color-rgb: var(--sn.glyph.color.rgb);  // RGB color values
+  --sn-glyph-rotation: var(--sn.glyph.rotation);    // Rotation angle
 }
 
 // ===================================================================

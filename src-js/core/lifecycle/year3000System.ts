@@ -11,13 +11,19 @@ import {
   HARMONIC_MODE_KEY,
   MANUAL_BASE_COLOR_KEY,
 } from "@/config/settingKeys";
-import { AnimationConductor } from "@/core/animation/AnimationConductor";
 import { EmergentChoreographyEngine } from "@/core/animation/EmergentChoreographyEngine";
-import { VisualFrameCoordinator } from "@/core/lifecycle/VisualFrameCoordinator";
+import { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
+import { PerformanceCSSIntegration } from "@/core/css/PerformanceCSSIntegration";
+import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+// ContextMenuSystem removed
+import { SidebarSystemsIntegration } from "@/core/integration/SidebarSystemsIntegration";
+import { UnifiedSystemIntegration } from "@/core/integration/UnifiedSystemIntegration";
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import { PerformanceOptimizationManager } from "@/core/performance/PerformanceOptimizationManager";
 import { TimerConsolidationSystem } from "@/core/performance/TimerConsolidationSystem";
+import { UnifiedPerformanceCoordinator } from "@/core/performance/UnifiedPerformanceCoordinator";
 import { SystemHealthMonitor } from "@/debug/SystemHealthMonitor";
 import type { HarmonicModes, Year3000Config } from "@/types/models";
 import { Card3DManager } from "@/ui/managers/Card3DManager";
@@ -33,7 +39,6 @@ import { BeatSyncVisualSystem } from "@/visual/beat-sync/BeatSyncVisualSystem";
 import { BehavioralPredictionEngine } from "@/visual/ui-effects/BehavioralPredictionEngine";
 import { InteractionTrackingSystem } from "@/visual/ui-effects/InteractionTrackingSystem";
 import { PredictiveMaterializationSystem } from "@/visual/ui-effects/PredictiveMaterializationSystem";
-import { SidebarConsciousnessSystem } from "@/visual/ui-effects/SidebarConsciousnessSystem";
 import { getSidebarPerformanceCoordinator } from "@/visual/ui-effects/SidebarPerformanceCoordinator";
 import { SpotifyUIApplicationSystem } from "@/visual/ui-effects/SpotifyUIApplicationSystem";
 
@@ -61,11 +66,10 @@ interface VisualSystemConfig {
     | "beatSyncVisualSystem"
     | "behavioralPredictionEngine"
     | "predictiveMaterializationSystem"
-    | "sidebarConsciousnessSystem"
     | "webGLGradientBackgroundSystem"
     | "particleFieldSystem"
     | "emergentChoreographyEngine"
-    | "spotifyUIApplicationSystem";
+    | "spotifyUIApplicationSystem"; // contextMenuSystem removed
 }
 
 export class Year3000System {
@@ -75,14 +79,18 @@ export class Year3000System {
   public initialized: boolean;
 
   // Performance Systems
-  public animationConductor: AnimationConductor | null;
+  public enhancedMasterAnimationCoordinator: EnhancedMasterAnimationCoordinator | null;
   public timerConsolidationSystem: TimerConsolidationSystem | null;
-  public cssVariableBatcher: CSSVariableBatcher | null;
+  public cssVariableBatcher: CSSVariableBatcher | null; // Used internally by UnifiedCSSVariableManager
+  public unifiedCSSManager: UnifiedCSSVariableManager | null;
+  public performanceCoordinator: UnifiedPerformanceCoordinator | null;
   public deviceCapabilityDetector: DeviceCapabilityDetector | null;
   public performanceAnalyzer: PerformanceAnalyzer | null;
+  public performanceOptimizationManager: PerformanceOptimizationManager | null;
+  public performanceCSSIntegration: PerformanceCSSIntegration | null;
 
   // Cosmic Discovery Framework – central visual registry
-  public visualFrameCoordinator: VisualFrameCoordinator | null;
+  // visualFrameCoordinator functionality merged into EnhancedMasterAnimationCoordinator
 
   // Managers and Services
   public systemHealthMonitor: SystemHealthMonitor | null;
@@ -98,14 +106,20 @@ export class Year3000System {
   public beatSyncVisualSystem: BeatSyncVisualSystem | null;
   public behavioralPredictionEngine: BehavioralPredictionEngine | null;
   public predictiveMaterializationSystem: PredictiveMaterializationSystem | null;
-  public sidebarConsciousnessSystem: SidebarConsciousnessSystem | null;
   public webGLGradientBackgroundSystem: WebGLGradientBackgroundSystem | null;
   public particleFieldSystem: ParticleFieldSystem | null;
   public emergentChoreographyEngine: EmergentChoreographyEngine | null;
   public spotifyUIApplicationSystem: SpotifyUIApplicationSystem | null;
+  // contextMenuSystem removed
+
+  // Unified Sidebar Systems Integration
+  public sidebarSystemsIntegration: SidebarSystemsIntegration | null;
 
   // API availability tracking
   public availableAPIs: AvailableAPIs | null = null;
+
+  // Unified System Integration
+  public unifiedSystemIntegration: UnifiedSystemIntegration | null = null;
 
   private initializationResults: InitializationResults | null;
   private _songChangeHandler: (() => Promise<void>) | null = null;
@@ -148,11 +162,15 @@ export class Year3000System {
     this.initialized = false;
     this._systemStartTime = Date.now();
 
-    this.animationConductor = null;
+    this.enhancedMasterAnimationCoordinator = null;
     this.timerConsolidationSystem = null;
-    this.cssVariableBatcher = null;
+    this.cssVariableBatcher = null; // Used internally by UnifiedCSSVariableManager
+    this.unifiedCSSManager = null;
+    this.performanceCoordinator = null;
     this.deviceCapabilityDetector = null;
     this.performanceAnalyzer = null;
+    this.performanceOptimizationManager = null;
+    this.performanceCSSIntegration = null;
 
     this.systemHealthMonitor = null;
     this.settingsManager = null;
@@ -166,19 +184,21 @@ export class Year3000System {
     this.beatSyncVisualSystem = null;
     this.behavioralPredictionEngine = null;
     this.predictiveMaterializationSystem = null;
-    this.sidebarConsciousnessSystem = null;
     this.webGLGradientBackgroundSystem = null;
     this.particleFieldSystem = null;
     this.emergentChoreographyEngine = null;
     this.spotifyUIApplicationSystem = null;
+    // contextMenuSystem removed
+
+    this.sidebarSystemsIntegration = null;
 
     this.initializationResults = null;
 
-    this.visualFrameCoordinator = null;
+    this.unifiedSystemIntegration = null;
 
     if (this.YEAR3000_CONFIG?.enableDebug) {
       console.log(
-        "🌟 [Year3000System] Constructor: Instance created with Master Animation Coordinator"
+        "🌟 [Year3000System] Constructor: Instance created with Enhanced Master Animation Coordinator"
       );
     }
 
@@ -304,16 +324,6 @@ export class Year3000System {
         },
       },
       {
-        name: "CSSVariableBatcher",
-        init: () => {
-          this.cssVariableBatcher = new CSSVariableBatcher({
-            enableDebug: this.YEAR3000_CONFIG.enableDebug,
-            batchIntervalMs: 100,
-            autoHijack: true,
-          });
-        },
-      },
-      {
         name: "PerformanceAnalyzer",
         init: () => {
           this.performanceAnalyzer = new PerformanceAnalyzer({
@@ -326,12 +336,83 @@ export class Year3000System {
         },
       },
       {
-        name: "VisualFrameCoordinator",
+        name: "UnifiedCSSVariableManager",
         init: () => {
-          this.visualFrameCoordinator = new VisualFrameCoordinator(
-            this.performanceAnalyzer,
-            this.deviceCapabilityDetector
+          this.unifiedCSSManager = UnifiedCSSVariableManager.getInstance(
+            this.YEAR3000_CONFIG
           );
+
+          // Initialize with performance analyzer and CSS variable batcher
+          if (this.performanceAnalyzer && this.cssVariableBatcher) {
+            this.unifiedCSSManager.initialize(
+              this.performanceAnalyzer,
+              this.cssVariableBatcher
+            );
+          }
+        },
+      },
+      {
+        name: "UnifiedPerformanceCoordinator",
+        init: () => {
+          if (this.performanceAnalyzer) {
+            this.performanceCoordinator =
+              UnifiedPerformanceCoordinator.getInstance(
+                this.YEAR3000_CONFIG,
+                this.performanceAnalyzer
+              );
+
+            // Enable adaptive optimization
+            this.performanceCoordinator.enableAdaptiveOptimization();
+
+            if (this.YEAR3000_CONFIG.enableDebug) {
+              console.log(
+                "[Year3000System] UnifiedPerformanceCoordinator initialized with adaptive optimization"
+              );
+            }
+          }
+        },
+      },
+      {
+        name: "PerformanceOptimizationManager",
+        init: () => {
+          if (
+            this.unifiedCSSManager &&
+            this.enhancedMasterAnimationCoordinator &&
+            this.performanceCoordinator
+          ) {
+            this.performanceOptimizationManager =
+              PerformanceOptimizationManager.getInstance(
+                this.YEAR3000_CONFIG,
+                this.unifiedCSSManager,
+                this.enhancedMasterAnimationCoordinator,
+                this.performanceCoordinator
+              );
+
+            if (this.YEAR3000_CONFIG.enableDebug) {
+              console.log(
+                "[Year3000System] PerformanceOptimizationManager initialized with device optimization"
+              );
+            }
+          }
+        },
+      },
+      {
+        name: "PerformanceCSSIntegration",
+        init: () => {
+          if (this.unifiedCSSManager && this.performanceOptimizationManager) {
+            this.performanceCSSIntegration =
+              PerformanceCSSIntegration.getInstance(
+                this.YEAR3000_CONFIG,
+                this.unifiedCSSManager,
+                this.performanceOptimizationManager
+              );
+
+            if (this.YEAR3000_CONFIG.enableDebug) {
+              console.log(
+                "[Year3000System] PerformanceCSSIntegration initialized with CSS performance coordination"
+              );
+            }
+          }
         },
       },
       {
@@ -347,25 +428,29 @@ export class Year3000System {
         },
       },
       {
-        name: "AnimationConductor",
+        name: "EnhancedMasterAnimationCoordinator",
         init: () => {
-          if (!this.performanceAnalyzer) {
+          if (!this.performanceCoordinator) {
             throw new Error(
-              "PerformanceAnalyzer is required for AnimationConductor."
-            );
-          }
-          this.animationConductor = new AnimationConductor({
-            enableDebug: this.YEAR3000_CONFIG.enableDebug,
-          });
-
-          // Inject capability detector so AnimationConductor can quality-gate systems
-          if (this.deviceCapabilityDetector) {
-            this.animationConductor.setDeviceCapabilityDetector(
-              this.deviceCapabilityDetector
+              "UnifiedPerformanceCoordinator is required for EnhancedMasterAnimationCoordinator."
             );
           }
 
-          this.animationConductor.startMasterAnimationLoop();
+          // Create singleton instance of EnhancedMasterAnimationCoordinator
+          this.enhancedMasterAnimationCoordinator =
+            EnhancedMasterAnimationCoordinator.getInstance(
+              this.YEAR3000_CONFIG,
+              this.performanceCoordinator
+            );
+
+          // Start the master animation loop
+          this.enhancedMasterAnimationCoordinator.startMasterAnimationLoop();
+
+          if (this.YEAR3000_CONFIG.enableDebug) {
+            console.log(
+              "[Year3000System] EnhancedMasterAnimationCoordinator initialized for Phase 4 consolidation"
+            );
+          }
         },
       },
       {
@@ -458,6 +543,7 @@ export class Year3000System {
           }
         },
       },
+      // ContextMenuSystem removed
     ];
 
     for (const { name, init } of systemInitializers) {
@@ -472,17 +558,39 @@ export class Year3000System {
 
     await this._initializeVisualSystems(initializationResults);
 
-    // Animation System Registration Phase - after all systems are initialized
-    if (this.animationConductor) {
-      await this._registerAnimationSystems();
+    // Initialize Unified System Integration
+    try {
+      this.unifiedSystemIntegration = new UnifiedSystemIntegration(this);
+      await this.unifiedSystemIntegration.initialize();
+      initializationResults.success.push("UnifiedSystemIntegration");
+
       if (this.YEAR3000_CONFIG.enableDebug) {
         console.log(
-          "🎬 [Year3000System] Animation system registration phase complete"
+          "🔧 [Year3000System] Unified system integration initialized"
+        );
+      }
+    } catch (error) {
+      initializationResults.failed.push("UnifiedSystemIntegration");
+      console.error(
+        "[Year3000System] Failed to initialize unified system integration:",
+        error
+      );
+    }
+
+    // Legacy Animation System Registration Phase - deprecated
+    // Note: Animation registration now handled by EnhancedMasterAnimationCoordinator
+
+    // Phase 4: Enhanced Animation System Registration
+    if (this.enhancedMasterAnimationCoordinator) {
+      await this._registerEnhancedAnimationSystems();
+      if (this.YEAR3000_CONFIG.enableDebug) {
+        console.log(
+          "🎬 [Year3000System] Enhanced animation system registration phase complete"
         );
       }
     } else {
       console.warn(
-        "[Year3000System] MasterAnimationCoordinator not available for registration phase"
+        "[Year3000System] EnhancedMasterAnimationCoordinator not available for enhanced registration phase"
       );
     }
 
@@ -537,6 +645,45 @@ export class Year3000System {
     }
   }
 
+  /**
+   * Determines if prediction systems should be skipped for performance optimization
+   */
+  private _shouldSkipPredictionSystem(systemName: string): boolean {
+    // List of prediction systems that are performance-heavy
+    const predictionSystems = [
+      "BehavioralPredictionEngine",
+      "PredictiveMaterializationSystem",
+    ];
+
+    // Only check prediction systems
+    if (!predictionSystems.includes(systemName)) {
+      return false;
+    }
+
+    // Skip if device capability detector is not available
+    if (!this.deviceCapabilityDetector) {
+      return false; // Default to allowing on unknown devices
+    }
+
+    // Get device performance recommendation
+    const performanceLevel =
+      this.deviceCapabilityDetector.recommendPerformanceQuality();
+
+    // Skip prediction systems on low-end devices
+    if (performanceLevel === "low") {
+      return true;
+    }
+
+    // Also check if user has reduced motion preferences (accessibility)
+    if (
+      this.deviceCapabilityDetector.deviceCapabilities?.display?.reducedMotion
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
   private async _initializeVisualSystems(
     results: InitializationResults
   ): Promise<void> {
@@ -554,7 +701,7 @@ export class Year3000System {
         "BeatSyncVisualSystem",
         "BehavioralPredictionEngine",
         "PredictiveMaterializationSystem",
-        "SidebarConsciousnessSystem",
+        "SidebarSystemsIntegration",
         "EmergentChoreographyEngine",
       ];
       visualSystems.forEach((s) => results.skipped.push(s));
@@ -593,11 +740,6 @@ export class Year3000System {
         property: "predictiveMaterializationSystem",
       },
       {
-        name: "SidebarConsciousnessSystem",
-        Class: SidebarConsciousnessSystem,
-        property: "sidebarConsciousnessSystem",
-      },
-      {
         name: "WebGLGradientBackgroundSystem",
         Class: WebGLGradientBackgroundSystem,
         property: "webGLGradientBackgroundSystem",
@@ -612,10 +754,23 @@ export class Year3000System {
         Class: SpotifyUIApplicationSystem,
         property: "spotifyUIApplicationSystem",
       },
+      // ContextMenuSystem removed
     ];
 
     for (const config of visualSystemConfigs) {
       const { name, Class, property } = config;
+
+      // Skip prediction systems on low-end devices for better performance
+      if (this._shouldSkipPredictionSystem(name)) {
+        results.skipped.push(name);
+        if (this.YEAR3000_CONFIG.enableDebug) {
+          console.info(
+            `[Year3000System] Skipping ${name} on low-end device for performance optimization`
+          );
+        }
+        continue;
+      }
+
       try {
         // Special case for SpotifyUIApplicationSystem - it has a different constructor signature
         let instance;
@@ -657,6 +812,40 @@ export class Year3000System {
       }
     }
 
+    // Initialize Sidebar Systems Integration (handles all sidebar systems as unified unit)
+    try {
+      this.sidebarSystemsIntegration = new SidebarSystemsIntegration(
+        this.YEAR3000_CONFIG
+      );
+      await this.sidebarSystemsIntegration._baseInitialize();
+
+      // Register with enhanced animation coordinator if available
+      if (this.enhancedMasterAnimationCoordinator) {
+        // Note: SidebarSystemsIntegration will be registered via _registerEnhancedAnimationSystems
+      }
+
+      if (this.systemHealthMonitor) {
+        this.systemHealthMonitor.registerSystem(
+          "SidebarSystemsIntegration",
+          this.sidebarSystemsIntegration
+        );
+      }
+
+      results.success.push("SidebarSystemsIntegration");
+
+      if (this.YEAR3000_CONFIG.enableDebug) {
+        console.log(
+          "🔧 [Year3000System] Sidebar systems integration initialized with bilateral consciousness"
+        );
+      }
+    } catch (error) {
+      results.failed.push("SidebarSystemsIntegration");
+      console.error(
+        "[Year3000System] Failed to initialize sidebar systems integration:",
+        error
+      );
+    }
+
     // After all visual systems are initialized, link the engines
     if (this.colorHarmonyEngine && this.emergentChoreographyEngine) {
       this.colorHarmonyEngine.setEmergentEngine(
@@ -671,8 +860,21 @@ export class Year3000System {
   }
 
   public async destroyAllSystems(): Promise<void> {
-    if (this.animationConductor) {
-      this.animationConductor.stopMasterAnimationLoop();
+    // Destroy unified system integration first
+    if (this.unifiedSystemIntegration) {
+      await this.unifiedSystemIntegration.destroy();
+      this.unifiedSystemIntegration = null;
+    }
+
+    // Destroy sidebar systems integration
+    if (this.sidebarSystemsIntegration) {
+      this.sidebarSystemsIntegration._baseDestroy();
+      this.sidebarSystemsIntegration = null;
+    }
+
+    if (this.enhancedMasterAnimationCoordinator) {
+      this.enhancedMasterAnimationCoordinator.destroy();
+      this.enhancedMasterAnimationCoordinator = null;
     }
     if (this.timerConsolidationSystem) {
       this.timerConsolidationSystem.destroy();
@@ -699,6 +901,7 @@ export class Year3000System {
       this.particleFieldSystem,
       this.emergentChoreographyEngine,
       this.spotifyUIApplicationSystem,
+      // contextMenuSystem removed
     ];
 
     for (const system of allSystems) {
@@ -1022,8 +1225,16 @@ export class Year3000System {
     value: string,
     element: HTMLElement | null = null
   ): void {
-    if (this.cssVariableBatcher) {
-      // Use the batching system for maximum performance
+    if (this.unifiedCSSManager) {
+      // Use the unified CSS manager for maximum performance
+      this.unifiedCSSManager.queueUpdate(
+        property,
+        value,
+        "normal",
+        "Year3000System"
+      );
+    } else if (this.cssVariableBatcher) {
+      // Fallback to CSS variable batcher
       this.cssVariableBatcher.queueCSSVariableUpdate(
         property,
         value,
@@ -1184,14 +1395,14 @@ export class Year3000System {
     priority: "background" | "normal" | "critical" = "normal",
     targetFPS: number = 60
   ): boolean {
-    if (!this.animationConductor) {
+    if (!this.enhancedMasterAnimationCoordinator) {
       console.warn(
-        `[Year3000System] Cannot register ${name} - MasterAnimationCoordinator not ready`
+        `[Year3000System] Cannot register ${name} - EnhancedMasterAnimationCoordinator not ready`
       );
       return false;
     }
 
-    this.animationConductor.registerAnimationSystem(
+    this.enhancedMasterAnimationCoordinator.registerAnimationSystem(
       name,
       system,
       priority,
@@ -1201,11 +1412,11 @@ export class Year3000System {
   }
 
   public unregisterAnimationSystem(name: string): boolean {
-    if (!this.animationConductor) {
+    if (!this.enhancedMasterAnimationCoordinator) {
       return false;
     }
 
-    this.animationConductor.unregisterAnimationSystem(name);
+    this.enhancedMasterAnimationCoordinator.unregisterAnimationSystem(name);
     return true;
   }
 
@@ -1219,11 +1430,17 @@ export class Year3000System {
   public getSystem<T = any>(name: string): T | null {
     if (!name) return null;
 
-    // 1) Try camel-cased property convention (e.g. "PredictiveMaterializationSystem" → "predictiveMaterializationSystem")
+    // 1) Try unified system registry first
+    if (this.unifiedSystemIntegration) {
+      const unifiedSystem = this.unifiedSystemIntegration.getSystem(name);
+      if (unifiedSystem) return unifiedSystem as T;
+    }
+
+    // 2) Try camel-cased property convention (e.g. "PredictiveMaterializationSystem" → "predictiveMaterializationSystem")
     const camel = name.charAt(0).toLowerCase() + name.slice(1);
     if ((this as any)[camel]) return (this as any)[camel] as T;
 
-    // 2) Fallback: iterate own properties and match by constructor name
+    // 3) Fallback: iterate own properties and match by constructor name
     for (const key of Object.keys(this)) {
       const maybeInstance = (this as any)[key];
       if (maybeInstance && maybeInstance.constructor?.name === name) {
@@ -1234,10 +1451,24 @@ export class Year3000System {
     return null;
   }
 
+  /**
+   * Get the unified system registry for direct access
+   */
+  public getUnifiedSystemRegistry() {
+    return this.unifiedSystemIntegration?.getRegistry();
+  }
+
+  /**
+   * Get health status of all unified systems
+   */
+  public async getUnifiedSystemHealthStatus() {
+    return this.unifiedSystemIntegration?.getHealthStatus();
+  }
+
   private async _registerAnimationSystems(): Promise<void> {
-    if (!this.animationConductor) {
+    if (!this.enhancedMasterAnimationCoordinator) {
       console.warn(
-        "[Year3000System] MasterAnimationCoordinator not available for visual system registration"
+        "[Year3000System] EnhancedMasterAnimationCoordinator not available for visual system registration"
       );
       return;
     }
@@ -1264,8 +1495,8 @@ export class Year3000System {
         priority: "normal",
       },
       {
-        name: "SidebarConsciousnessSystem",
-        system: this.sidebarConsciousnessSystem,
+        name: "SidebarSystemsIntegration",
+        system: this.sidebarSystemsIntegration,
         priority: "normal",
       },
       {
@@ -1316,7 +1547,7 @@ export class Year3000System {
           targetFPS = Math.min(targetFPS, 30); // Cap background systems at 30fps
         }
 
-        this.animationConductor.registerAnimationSystem(
+        this.enhancedMasterAnimationCoordinator.registerAnimationSystem(
           name,
           system as any,
           optimizedPriority,
@@ -1325,11 +1556,116 @@ export class Year3000System {
 
         if (this.YEAR3000_CONFIG.enableDebug) {
           console.log(
-            `🎬 [Year3000System] Registered ${name} with Master Animation Coordinator (${optimizedPriority} priority, ${targetFPS}fps) - using ${
+            `🎬 [Year3000System] Registered ${name} with Enhanced Master Animation Coordinator (${optimizedPriority} priority, ${targetFPS}fps) - using ${
               typeof (system as any).onAnimate === "function"
                 ? "onAnimate"
                 : "updateAnimation"
             } hook`
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * Register visual systems with the EnhancedMasterAnimationCoordinator
+   * Phase 4: Animation System Consolidation
+   */
+  private async _registerEnhancedAnimationSystems(): Promise<void> {
+    if (!this.enhancedMasterAnimationCoordinator) {
+      console.warn(
+        "[Year3000System] EnhancedMasterAnimationCoordinator not available for enhanced visual system registration"
+      );
+      return;
+    }
+
+    // Migration approach: Register systems with the new coordinator
+    // while keeping existing AnimationConductor for compatibility
+    const enhancedVisualSystems = [
+      {
+        name: "BeatSyncVisualSystem",
+        system: this.beatSyncVisualSystem,
+        priority: "critical" as const,
+        type: "animation" as const,
+      },
+      {
+        name: "EmergentChoreographyEngine",
+        system: this.emergentChoreographyEngine,
+        priority: "critical" as const,
+        type: "animation" as const,
+      },
+      {
+        name: "SidebarSystemsIntegration",
+        system: this.sidebarSystemsIntegration,
+        priority: "normal" as const,
+        type: "animation" as const,
+      },
+      {
+        name: "BehavioralPredictionEngine",
+        system: this.behavioralPredictionEngine,
+        priority: "normal" as const,
+        type: "animation" as const,
+      },
+      {
+        name: "PredictiveMaterializationSystem",
+        system: this.predictiveMaterializationSystem,
+        priority: "normal" as const,
+        type: "animation" as const,
+      },
+      {
+        name: "LightweightParticleSystem",
+        system: this.lightweightParticleSystem,
+        priority: "background" as const,
+        type: "animation" as const,
+      },
+      {
+        name: "InteractionTrackingSystem",
+        system: this.interactionTrackingSystem,
+        priority: "background" as const,
+        type: "animation" as const,
+      },
+      {
+        name: "SpotifyUIApplicationSystem",
+        system: this.spotifyUIApplicationSystem,
+        priority: "normal" as const,
+        type: "animation" as const,
+      },
+    ];
+
+    for (const { name, system, priority, type } of enhancedVisualSystems) {
+      if (system) {
+        try {
+          let registered = false;
+
+          // Register based on system type - all systems now use animation type
+          if (
+            type === "animation" &&
+            (typeof (system as any).onAnimate === "function" ||
+              typeof (system as any).updateAnimation === "function")
+          ) {
+            // Register as animation system (for IManagedSystem pattern)
+            registered =
+              this.enhancedMasterAnimationCoordinator.registerAnimationSystem(
+                name,
+                system as any,
+                priority,
+                60 // Default 60fps
+              );
+          }
+
+          if (registered && this.YEAR3000_CONFIG.enableDebug) {
+            console.log(
+              `🎬 [Year3000System] Enhanced registration: ${name} (${priority} priority, ${type} type)`
+            );
+          } else if (!registered) {
+            console.warn(
+              `[Year3000System] Failed to register ${name} with EnhancedMasterAnimationCoordinator`
+            );
+          }
+        } catch (error) {
+          console.error(
+            `[Year3000System] Error registering ${name} with EnhancedMasterAnimationCoordinator:`,
+            error
           );
         }
       }
@@ -1404,16 +1740,6 @@ export class Year3000System {
         },
       },
       {
-        name: "CSSVariableBatcher",
-        init: () => {
-          this.cssVariableBatcher = new CSSVariableBatcher({
-            enableDebug: this.YEAR3000_CONFIG.enableDebug,
-            batchIntervalMs: 100,
-            autoHijack: true,
-          });
-        },
-      },
-      {
         name: "PerformanceAnalyzer",
         init: () => {
           this.performanceAnalyzer = new PerformanceAnalyzer({
@@ -1422,17 +1748,19 @@ export class Year3000System {
         },
       },
       {
-        name: "MasterAnimationCoordinator",
+        name: "EnhancedMasterAnimationCoordinator",
         init: () => {
           if (!this.performanceAnalyzer) {
             throw new Error(
-              "PerformanceAnalyzer is required for MasterAnimationCoordinator."
+              "PerformanceAnalyzer is required for EnhancedMasterAnimationCoordinator."
             );
           }
-          this.animationConductor = new AnimationConductor({
-            enableDebug: this.YEAR3000_CONFIG.enableDebug,
-          });
-          this.animationConductor.startMasterAnimationLoop();
+          // In degraded mode, we don't have UnifiedPerformanceCoordinator, so pass undefined
+          this.enhancedMasterAnimationCoordinator =
+            EnhancedMasterAnimationCoordinator.getInstance(
+              this.YEAR3000_CONFIG
+            );
+          this.enhancedMasterAnimationCoordinator.startMasterAnimationLoop();
         },
       },
     ];
@@ -1623,7 +1951,7 @@ export class Year3000System {
         await this._initializeVisualSystems(upgradeResults);
 
         // Register animation systems
-        if (this.animationConductor) {
+        if (this.enhancedMasterAnimationCoordinator) {
           await this._registerAnimationSystems();
         }
       }
@@ -1756,8 +2084,9 @@ export class Year3000System {
       this.beatSyncVisualSystem,
       this.behavioralPredictionEngine,
       this.predictiveMaterializationSystem,
-      this.sidebarConsciousnessSystem,
+      this.sidebarSystemsIntegration,
       this.particleFieldSystem,
+      // contextMenuSystem removed
     ];
 
     systems.forEach((sys) => {

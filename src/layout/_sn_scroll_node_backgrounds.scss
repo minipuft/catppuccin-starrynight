@@ -97,7 +97,7 @@
 
     transition-property: background, --sn-nebula-ease-t;
     transition-duration: 600ms, 800ms;
-    transition-timing-function: ease, cubic-bezier(0.4, 0, 0.2, 1);
+    transition-timing-function: ease, var(--sn-anim-easing-standard);
 
     /* Apply softening blur & hint to compositor */
     filter: blur(var(--sn-nebula-layer-3-blur, var(--sn-nebula-max-blur, 12px)));

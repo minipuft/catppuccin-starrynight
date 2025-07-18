@@ -37,7 +37,7 @@
   --max-rotate-y: 0deg;
   --depth-hover: calc(12px + var(--sn-beat-pulse-intensity, 0) * 8px);
   --morph-duration: calc(0.3s - var(--sn-beat-pulse-intensity, 0) * 0.1s);
-  --morph-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --morph-easing: var(--sn-anim-easing-organic);
 
   // === BEATSYNC CONSCIOUSNESS VARIABLES (New) ===
   --sn-3d-beat-depth: calc(var(--sn-beat-pulse-intensity, 0) * 20px);

@@ -46,7 +46,7 @@
   
   // Use animation-play-state for performance optimization
   // When paused, animation has zero CPU cost
-  animation: sn-beat-scale 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: sn-beat-scale 300ms var(--sn-anim-easing-standard) forwards;
   animation-play-state: var(--_sn-pulse-intensity, paused);
   
   // Accessibility: Respect reduced motion preference
@@ -62,7 +62,7 @@
 .sn-beat-responsive--subtle {
   --_sn-pulse-intensity: var(--sn-beat-pulse, 0);
   
-  animation: sn-beat-pulse-subtle 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: sn-beat-pulse-subtle 250ms var(--sn-anim-easing-standard) forwards;
   animation-play-state: var(--_sn-pulse-intensity, paused);
   
   @media (prefers-reduced-motion: reduce) {
@@ -82,8 +82,8 @@
   
   // Smooth transitions when kinetic energy changes
   transition: 
-    transform 100ms cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 100ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform 100ms var(--sn-anim-easing-standard),
+    opacity 100ms var(--sn-anim-easing-standard);
   
   @media (prefers-reduced-motion: reduce) {
     transform: scale(1) !important;
@@ -102,7 +102,7 @@
     0 0 calc(var(--_sn-glow-intensity) * 20px) 
     rgba(var(--sn-accent-rgb, 140, 170, 238), var(--_sn-glow-intensity));
   
-  transition: box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: box-shadow 150ms var(--sn-anim-easing-standard);
   
   @media (prefers-reduced-motion: reduce) {
     box-shadow: none !important;

@@ -3,8 +3,10 @@
 // ████████████████████████████████████████████████████████████████████████████████
 
 // === CORE MODULES ===
+@use "_sn_unified_variables" as *; // 🎯 UNIFIED SYSTEM VARIABLES (Phase 1)
 @use "_variables" as *;
 @use "_mixins" as *;
+@use "_performance_mixins" as *; // 🚀 PHASE 3 PERFORMANCE OPTIMIZATION MIXINS
 @use "_breathing_scale" as *;
 @use "_beat_sync_variables" as *;
 @use "_sn_root_variables" as *;
@@ -64,6 +66,9 @@
 @use "../systems/_sn_performance_optimization" as *;
 @use "../systems/_sn_quantum_consciousness" as *;
 @use "../systems/_sn_data_glyphs" as *;
+
+// === UI EFFECTS MODULES ===
+// Context menu implementation removed
 
 // === SEARCH MODULES ===
 @use "../search/_sn_search_future" as *; // Lightweight Year3000 search styling

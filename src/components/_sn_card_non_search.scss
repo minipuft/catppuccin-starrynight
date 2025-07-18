@@ -145,9 +145,9 @@ body:not(:has(.main-searchPage-content)) .main-card-card {
     nebula-drift calc(var(--sn-card-stellar-breath-duration) * 3) ease-in-out infinite;
 
   transition:
-    box-shadow var(--sn-card-gravitational-transition) cubic-bezier(0.4, 0, 0.2, 1),
-    border-color var(--sn-card-gravitational-transition) cubic-bezier(0.4, 0, 0.2, 1),
-    transform var(--sn-card-gravitational-transition) cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow var(--sn-card-gravitational-transition) var(--sn-anim-easing-standard),
+    border-color var(--sn-card-gravitational-transition) var(--sn-anim-easing-standard),
+    transform var(--sn-card-gravitational-transition) var(--sn-anim-easing-standard);
 
   // === Constellation Particles ===
   &::before {
@@ -217,7 +217,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card {
       stellar-breathing calc(var(--sn-card-stellar-breath-duration) * 0.6) ease-in-out infinite,
       nebula-drift calc(var(--sn-card-stellar-breath-duration) * 1.2) ease-in-out infinite,
       chromatic-harmony-shift calc(var(--sn-card-chromatic-shift-duration) * 0.8) ease-in-out infinite,
-      cosmic-resonance-pulse calc(var(--sn-card-stellar-breath-duration) * 3) cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      cosmic-resonance-pulse calc(var(--sn-card-stellar-breath-duration) * 3) var(--sn-anim-easing-custom-1) infinite;
   }
 
   // === FOCUS STATE ===

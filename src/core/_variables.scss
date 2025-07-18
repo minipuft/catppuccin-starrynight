@@ -1,13 +1,31 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 LEGACY VARIABLES - Color & Text System
+// 🔄 MIGRATED TO UNIFIED DESIGN TOKENS SYSTEM
+// ████████████████████████████████████████████████████████████████████████████████
+
+// DEPRECATION NOTICE: This file now references the unified design tokens system.
+// All authoritative variable definitions are in: src/design-tokens/tokens.scss
+// These aliases maintain backward compatibility during migration to Year 3000 architecture.
+
+// Import the unified design tokens
+@use "../design-tokens/tokens" as *;
+
 :root {
-  /* Year 3000 — unified dynamic accent variable available to every visual system.*/
-  /* It will be set at runtime by Year3000System; falls back to gradient or spice accent.*/
-  --sn-dynamic-accent-rgb: var(--sn-gradient-accent-rgb, var(--spice-rgb-accent));
-
-  /* Ensure legacy systems referencing the nav text energy color get correct default.*/
-
-  /* === Year 3000 – Text Glow & Gradient Controls === */
-  --sn-text-glow-intensity: 0; /* 0 → no glow, 1 → full */
-  --sn-text-gradient-angle: 135deg;
-
-  /* Future scope: migrate other shared variables here for single-source-of-truth.*/
+  // === LEGACY COMPATIBILITY ALIASES ===
+  // Following "Aesthetic Gravity" principle - colors form gravitational relationships
+  
+  // Dynamic accent system (references --sn.color.accent.rgb)
+  --sn-dynamic-accent-rgb: var(--sn.color.accent.rgb);
+  
+  // Text glow system (references --sn.text.glow.intensity)
+  --sn-text-glow-intensity: var(--sn.text.glow.intensity);
+  
+  // Text gradient system (references --sn.text.gradient.angle)
+  --sn-text-gradient-angle: var(--sn.text.gradient.angle);
 }
+
+// NOTE: In Year 3000 architecture v3.0, these aliases will be removed.
+// Update your code to reference the unified tokens directly:
+// - Use: --sn.color.accent.rgb instead of --sn-dynamic-accent-rgb  
+// - Use: --sn.text.glow.intensity instead of --sn-text-glow-intensity
+// - Use: --sn.text.gradient.angle instead of --sn-text-gradient-angle

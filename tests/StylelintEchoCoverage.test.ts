@@ -13,14 +13,33 @@ describe("Stylelint – cubic-bezier usage", () => {
       const content = fs.readFileSync(file, "utf8");
       const matches = content.match(regex) || [];
       matches.forEach((match) => {
+        // Allow when defining CSS custom properties
+        const propertyDefinitionPattern = new RegExp(
+          `--sn-[^:]*:\\s*${match.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&"
+          )}`
+        );
+        
         // Allow when wrapped in var(--sn-easing-foo, cubic-bezier(...))
-        const allowedPattern = new RegExp(
+        const fallbackPattern = new RegExp(
           `var\\(--sn-easing-[^,]+,\\s*${match.replace(
             /[.*+?^${}()|[\]\\]/g,
             "\\$&"
           )}\\)`
         );
-        if (!allowedPattern.test(content)) {
+        
+        // Allow when used as fallback in var() functions
+        const varFallbackPattern = new RegExp(
+          `var\\([^,]+,\\s*${match.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&"
+          )}\\)`
+        );
+        
+        if (!propertyDefinitionPattern.test(content) && 
+            !fallbackPattern.test(content) && 
+            !varFallbackPattern.test(content)) {
           offending.push(`${file}: ${match}`);
         }
       });

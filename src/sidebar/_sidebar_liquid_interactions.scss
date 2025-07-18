@@ -1,0 +1,587 @@
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/* SIDEBAR LIQUID INTERACTIONS MODULE*/
+/* Advanced Liquid Consciousness & Organic Interaction Patterns*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/**/
+/* This module implements liquid consciousness interaction patterns that flow*/
+/* like organic matter rather than discrete state changes. It provides:*/
+/* - Viscous flow animations with configurable viscosity*/
+/* - Proximity-aware interactions with predictive preparation*/
+/* - Contextual micro-interactions based on user behavior patterns*/
+/* - Adaptive responsiveness that learns from interaction history*/
+/* - Music-synchronized flow dynamics*/
+/**/
+/* Year 3000 Enhanced Features:*/
+/* - Liquid consciousness effects that respond to music energy*/
+/* - Ripple-less interaction patterns (performance-optimized)*/
+/* - Adaptive flow based on user interaction patterns*/
+/* - Seamless integration with bilateral consciousness*/
+/**/
+/* Dependencies:*/
+/* - SidebarInteractiveFlowSystem TypeScript integration*/
+/* - CSS-first animations for optimal performance*/
+/* - Intersection Observer API for proximity detection*/
+/**/
+/* ████████████████████████████████████████████████████████████████████████████████*/
+@use "../core/_mixins" as *;
+
+:root {
+  /* === LIQUID CONSCIOUSNESS CORE VARIABLES ===*/
+  --liquid-viscosity: 0.7; /* 0-1 liquid thickness (0=water, 1=honey) */
+  --liquid-surface-tension: 0.5; /* 0-1 surface cohesion strength */
+  --liquid-flow-speed: 1; /* 0-3 flow animation speed multiplier */
+  --liquid-density: 0.8; /* 0-1 visual density of liquid effects */
+  
+  /* === FLOW DYNAMICS ===*/
+  --flow-direction: 0deg; /* 0-360deg primary flow direction */
+  --flow-intensity: 0.5; /* 0-1 current flow strength */
+  --flow-turbulence: 0.1; /* 0-1 chaotic flow variation */
+  --flow-cohesion: 0.6; /* 0-1 how much flow elements stick together */
+  
+  /* === PROXIMITY INTERACTION VARIABLES ===*/
+  --proximity-detection-radius: 150px; /* Cursor proximity detection range */
+  --proximity-influence-strength: 1; /* 0-2 how much proximity affects flow */
+  --proximity-anticipation-time: 200ms; /* Predictive interaction delay */
+  --proximity-fade-distance: 300px; /* Distance for proximity effects to fade */
+  
+  /* === INTERACTION PATTERN VARIABLES ===*/
+  --interaction-pressure: 0; /* 0-1 current interaction pressure */
+  --interaction-momentum: 0; /* 0-1 momentum from recent interactions */
+  --interaction-frequency: 0; /* 0-1 rate of recent interactions */
+  --interaction-pattern-type: "organic"; /* "organic" | "geometric" | "chaotic" */
+  
+  /* === LIQUID MORPHING EFFECTS ===*/
+  --morphing-elasticity: 0.8; /* 0-1 how elastic liquid deformations are */
+  --morphing-recovery-time: 600ms; /* Time for liquid to return to rest state */
+  --morphing-amplitude: 10px; /* Maximum deformation distance */
+  --morphing-frequency: 1; /* 0-3 morphing animation frequency */
+  
+  /* === CONTEXTUAL ADAPTATION VARIABLES ===*/
+  --adaptation-learning-rate: 0.1; /* 0-1 how quickly system adapts to user */
+  --adaptation-memory-decay: 0.95; /* 0-1 how long adaptation memory lasts */
+  --adaptation-confidence: 0.5; /* 0-1 confidence in user pattern predictions */
+  
+  /* === MUSIC SYNCHRONIZATION ===*/
+  --music-flow-sync: 0; /* 0-1 how much music affects flow */
+  --music-beat-influence: 0.3; /* 0-1 beat impact on liquid interactions */
+  --music-energy-boost: 1; /* 0-2 energy level flow multiplier */
+  --music-harmonic-resonance: 0deg; /* 0-360deg harmonic flow direction shift */
+}
+
+/* ============================================================================ */
+/* LIQUID CONSCIOUSNESS BASE CONTAINER */
+/* ============================================================================ */
+
+.liquid-interaction-field {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  contain: layout style paint;
+  
+  /* Liquid surface properties */
+  background: 
+    radial-gradient(
+      ellipse at var(--cursor-x, 50%) var(--cursor-y, 50%),
+      rgba(var(--spice-rgb-accent, 203, 214, 244), var(--liquid-density, 0.8)) 0%,
+      rgba(var(--spice-rgb-accent, 203, 214, 244), calc(var(--liquid-density, 0.8) * 0.4)) 30%,
+      transparent 70%
+    );
+  
+  /* Liquid flow animation */
+  background-size: 300% 300%;
+  background-position: 
+    calc(50% + sin(var(--flow-direction, 0deg)) * 20%) 
+    calc(50% + cos(var(--flow-direction, 0deg)) * 20%);
+  
+  /* Viscosity-based transition timing */
+  transition: 
+    background-position calc(var(--liquid-viscosity, 0.7) * 2s) ease-out,
+    background-size calc(var(--liquid-viscosity, 0.7) * 1s) ease-out;
+  
+  /* Flow animation */
+  animation: liquid-base-flow 
+    calc(10s / max(var(--liquid-flow-speed, 1), 0.1)) 
+    infinite linear;
+}
+
+/* ============================================================================ */
+/* PROXIMITY-AWARE LIQUID ELEMENTS */
+/* ============================================================================ */
+
+.liquid-interaction-element {
+  position: relative;
+  display: block;
+  padding: 12px 16px;
+  margin: 4px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  
+  /* Liquid surface simulation */
+  background: 
+    linear-gradient(
+      135deg,
+      rgba(var(--spice-rgb-surface1, 69, 71, 90), 0.8) 0%,
+      rgba(var(--spice-rgb-surface0, 49, 50, 68), 0.6) 100%
+    );
+  
+  /* Surface tension effect */
+  border: 1px solid rgba(var(--spice-rgb-accent, 203, 214, 244), var(--liquid-surface-tension, 0.5));
+  
+  /* Morphing transitions */
+  transition: 
+    transform var(--morphing-recovery-time, 600ms) var(--sn-anim-easing-elastic),
+    background var(--morphing-recovery-time, 600ms) ease-out,
+    border-color var(--morphing-recovery-time, 600ms) ease-out,
+    box-shadow var(--morphing-recovery-time, 600ms) ease-out;
+  
+  /* Interaction state tracking */
+  --element-pressure: 0;
+  --element-proximity: 1; /* 0-1 distance from cursor */
+  --element-momentum: 0;
+  --element-deformation: 0; /* 0-1 current deformation amount */
+}
+
+/* Proximity states */
+.liquid-interaction-element.proximity-far {
+  --element-proximity: 1;
+  opacity: 0.7;
+  transform: scale(0.98);
+}
+
+.liquid-interaction-element.proximity-medium {
+  --element-proximity: 0.5;
+  opacity: 0.85;
+  transform: scale(0.99);
+  
+  /* Anticipatory glow */
+  box-shadow: 0 0 10px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.2);
+}
+
+.liquid-interaction-element.proximity-near {
+  --element-proximity: 0.2;
+  opacity: 1;
+  transform: scale(1.01);
+  
+  /* Strong anticipatory effect */
+  box-shadow: 
+    0 0 20px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.4),
+    inset 0 0 10px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.1);
+}
+
+.liquid-interaction-element.proximity-immediate {
+  --element-proximity: 0;
+  opacity: 1;
+  transform: scale(1.02);
+  
+  /* Immediate interaction preparation */
+  background: 
+    linear-gradient(
+      135deg,
+      rgba(var(--spice-rgb-accent, 203, 214, 244), 0.3) 0%,
+      rgba(var(--spice-rgb-surface1, 69, 71, 90), 0.8) 50%,
+      rgba(var(--spice-rgb-surface0, 49, 50, 68), 0.6) 100%
+    );
+  
+  box-shadow: 
+    0 0 30px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.6),
+    inset 0 0 15px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.2);
+}
+
+/* ============================================================================ */
+/* LIQUID MORPHING INTERACTIONS */
+/* ============================================================================ */
+
+/* Hover morphing */
+.liquid-interaction-element:hover {
+  --element-pressure: 0.5;
+  --element-deformation: 0.3;
+  
+  /* Elastic deformation */
+  transform: 
+    scale(1.02) 
+    perspective(500px) 
+    rotateX(calc(var(--cursor-y-offset, 0) * 2deg))
+    rotateY(calc(var(--cursor-x-offset, 0) * 2deg));
+  
+  /* Liquid surface disturbance */
+  background: 
+    radial-gradient(
+      circle at var(--cursor-local-x, 50%) var(--cursor-local-y, 50%),
+      rgba(var(--spice-rgb-accent, 203, 214, 244), 0.4) 0%,
+      rgba(var(--spice-rgb-surface1, 69, 71, 90), 0.8) 30%,
+      rgba(var(--spice-rgb-surface0, 49, 50, 68), 0.6) 100%
+    );
+  
+  /* Enhanced surface tension */
+  border-color: rgba(var(--spice-rgb-accent, 203, 214, 244), calc(var(--liquid-surface-tension, 0.5) * 1.5));
+  
+  /* Morphing animation */
+  animation: liquid-morph-hover 
+    calc(2s / max(var(--morphing-frequency, 1), 0.1)) 
+    infinite ease-in-out;
+}
+
+/* Active/pressed morphing */
+.liquid-interaction-element:active,
+.liquid-interaction-element.pressed {
+  --element-pressure: 1;
+  --element-deformation: 0.8;
+  
+  /* Compression effect */
+  transform: 
+    scale(0.98) 
+    perspective(500px) 
+    rotateX(calc(var(--cursor-y-offset, 0) * 5deg))
+    rotateY(calc(var(--cursor-x-offset, 0) * 5deg));
+  
+  /* Pressure wave effect */
+  background: 
+    radial-gradient(
+      circle at var(--cursor-local-x, 50%) var(--cursor-local-y, 50%),
+      rgba(var(--spice-rgb-accent, 203, 214, 244), 0.6) 0%,
+      rgba(var(--spice-rgb-accent, 203, 214, 244), 0.3) 20%,
+      rgba(var(--spice-rgb-surface1, 69, 71, 90), 0.8) 50%,
+      rgba(var(--spice-rgb-surface0, 49, 50, 68), 0.6) 100%
+    );
+  
+  /* Pressure ring */
+  box-shadow: 
+    0 0 40px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.8),
+    inset 0 0 20px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.3),
+    0 0 0 4px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.2);
+  
+  /* Pressure wave animation */
+  animation: liquid-pressure-wave 0.6s ease-out;
+}
+
+/* ============================================================================ */
+/* CONTEXTUAL INTERACTION PATTERNS */
+/* ============================================================================ */
+
+/* Organic interaction pattern (default) */
+.liquid-interaction-field[data-pattern="organic"] {
+  .liquid-interaction-element {
+    border-radius: 
+      calc(8px + var(--element-deformation, 0) * 12px)
+      calc(8px + var(--element-deformation, 0) * 8px)
+      calc(8px + var(--element-deformation, 0) * 15px)
+      calc(8px + var(--element-deformation, 0) * 6px);
+    
+    /* Organic flow disturbances */
+    --morphing-amplitude: calc(10px + var(--element-pressure, 0) * 15px);
+  }
+}
+
+/* Geometric interaction pattern */
+.liquid-interaction-field[data-pattern="geometric"] {
+  .liquid-interaction-element {
+    border-radius: 4px;
+    
+    /* Precise geometric deformations */
+    transform: 
+      scale(calc(1 + var(--element-pressure, 0) * 0.05))
+      skewX(calc(var(--element-deformation, 0) * 2deg))
+      skewY(calc(var(--element-deformation, 0) * 1deg));
+  }
+}
+
+/* Chaotic interaction pattern */
+.liquid-interaction-field[data-pattern="chaotic"] {
+  .liquid-interaction-element {
+    /* Chaotic morphing */
+    transform: 
+      scale(calc(1 + var(--element-pressure, 0) * 0.1))
+      rotate(calc(var(--element-deformation, 0) * 10deg))
+      translate(
+        calc(var(--element-deformation, 0) * var(--chaos-x, 5px)),
+        calc(var(--element-deformation, 0) * var(--chaos-y, -3px))
+      );
+    
+    /* Chaotic flow effects */
+    animation: liquid-chaos-flow 
+      calc(3s + var(--element-deformation, 0) * 2s) 
+      infinite ease-in-out;
+  }
+}
+
+/* ============================================================================ */
+/* MUSIC-SYNCHRONIZED FLOW EFFECTS */
+/* ============================================================================ */
+
+.liquid-interaction-field.music-sync-enabled {
+  /* Music-responsive flow direction */
+  --flow-direction: calc(var(--music-harmonic-resonance, 0deg) + var(--flow-direction, 0deg));
+  
+  /* Beat-synchronized pulsing */
+  animation: liquid-music-pulse 
+    calc(60s / max(var(--music-bpm, 120), 60)) 
+    infinite ease-in-out;
+  
+  .liquid-interaction-element {
+    /* Energy-based deformation */
+    --element-energy-boost: var(--music-energy-boost, 1);
+    --element-beat-intensity: var(--music-beat-influence, 0.3);
+    
+    /* Music-synchronized morphing */
+    animation: 
+      liquid-morph-hover calc(2s / max(var(--morphing-frequency, 1), 0.1)) infinite ease-in-out,
+      liquid-beat-response calc(60s / max(var(--music-bpm, 120), 60)) infinite ease-in-out;
+  }
+}
+
+/* ============================================================================ */
+/* ADAPTIVE BEHAVIOR PATTERNS */
+/* ============================================================================ */
+
+/* Learning user interaction patterns */
+.liquid-interaction-field.adaptive-enabled {
+  /* Confidence-based responsiveness */
+  --proximity-influence-strength: calc(1 + var(--adaptation-confidence, 0.5) * 0.5);
+  --morphing-elasticity: calc(0.8 + var(--adaptation-confidence, 0.5) * 0.2);
+  
+  .liquid-interaction-element {
+    /* Learned interaction timing */
+    transition-duration: calc(
+      var(--morphing-recovery-time, 600ms) * 
+      (1 - var(--adaptation-confidence, 0.5) * 0.3)
+    );
+    
+    /* Predictive preparation intensity */
+    --element-anticipation: calc(var(--adaptation-confidence, 0.5) * var(--element-proximity, 1));
+  }
+}
+
+/* High-confidence adaptive state */
+.liquid-interaction-field.adaptive-confident {
+  .liquid-interaction-element {
+    /* Faster, more precise responses */
+    transition-duration: calc(var(--morphing-recovery-time, 600ms) * 0.7);
+    
+    /* Enhanced anticipatory effects */
+    --element-anticipation: calc(var(--element-proximity, 1) * 1.2);
+  }
+}
+
+/* ============================================================================ */
+/* LIQUID FLOW ANIMATIONS */
+/* ============================================================================ */
+
+@keyframes liquid-base-flow {
+  0% {
+    background-position: 
+      calc(50% + sin(var(--flow-direction, 0deg)) * 20%) 
+      calc(50% + cos(var(--flow-direction, 0deg)) * 20%);
+    filter: hue-rotate(0deg);
+  }
+  25% {
+    background-position: 
+      calc(50% + sin(var(--flow-direction, 0deg) + 90deg) * 25%) 
+      calc(50% + cos(var(--flow-direction, 0deg) + 90deg) * 25%);
+    filter: hue-rotate(5deg);
+  }
+  50% {
+    background-position: 
+      calc(50% + sin(var(--flow-direction, 0deg) + 180deg) * 20%) 
+      calc(50% + cos(var(--flow-direction, 0deg) + 180deg) * 20%);
+    filter: hue-rotate(0deg);
+  }
+  75% {
+    background-position: 
+      calc(50% + sin(var(--flow-direction, 0deg) + 270deg) * 25%) 
+      calc(50% + cos(var(--flow-direction, 0deg) + 270deg) * 25%);
+    filter: hue-rotate(-5deg);
+  }
+  100% {
+    background-position: 
+      calc(50% + sin(var(--flow-direction, 0deg)) * 20%) 
+      calc(50% + cos(var(--flow-direction, 0deg)) * 20%);
+    filter: hue-rotate(0deg);
+  }
+}
+
+@keyframes liquid-morph-hover {
+  0%, 100% {
+    border-radius: 
+      calc(8px + var(--element-deformation, 0) * 12px)
+      calc(8px + var(--element-deformation, 0) * 8px)
+      calc(8px + var(--element-deformation, 0) * 15px)
+      calc(8px + var(--element-deformation, 0) * 6px);
+  }
+  25% {
+    border-radius: 
+      calc(8px + var(--element-deformation, 0) * 8px)
+      calc(8px + var(--element-deformation, 0) * 15px)
+      calc(8px + var(--element-deformation, 0) * 6px)
+      calc(8px + var(--element-deformation, 0) * 12px);
+  }
+  50% {
+    border-radius: 
+      calc(8px + var(--element-deformation, 0) * 15px)
+      calc(8px + var(--element-deformation, 0) * 6px)
+      calc(8px + var(--element-deformation, 0) * 12px)
+      calc(8px + var(--element-deformation, 0) * 8px);
+  }
+  75% {
+    border-radius: 
+      calc(8px + var(--element-deformation, 0) * 6px)
+      calc(8px + var(--element-deformation, 0) * 12px)
+      calc(8px + var(--element-deformation, 0) * 8px)
+      calc(8px + var(--element-deformation, 0) * 15px);
+  }
+}
+
+@keyframes liquid-pressure-wave {
+  0% {
+    box-shadow: 
+      0 0 0 0 rgba(var(--spice-rgb-accent, 203, 214, 244), 0.8),
+      inset 0 0 20px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 0 0 20px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.4),
+      inset 0 0 20px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.3);
+  }
+  100% {
+    box-shadow: 
+      0 0 0 40px rgba(var(--spice-rgb-accent, 203, 214, 244), 0),
+      inset 0 0 20px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.1);
+  }
+}
+
+@keyframes liquid-chaos-flow {
+  0% { 
+    --chaos-x: 5px; 
+    --chaos-y: -3px; 
+    filter: hue-rotate(0deg);
+  }
+  20% { 
+    --chaos-x: -3px; 
+    --chaos-y: 7px; 
+    filter: hue-rotate(20deg);
+  }
+  40% { 
+    --chaos-x: 8px; 
+    --chaos-y: 2px; 
+    filter: hue-rotate(-10deg);
+  }
+  60% { 
+    --chaos-x: -6px; 
+    --chaos-y: -5px; 
+    filter: hue-rotate(30deg);
+  }
+  80% { 
+    --chaos-x: 4px; 
+    --chaos-y: 9px; 
+    filter: hue-rotate(-5deg);
+  }
+  100% { 
+    --chaos-x: 5px; 
+    --chaos-y: -3px; 
+    filter: hue-rotate(0deg);
+  }
+}
+
+@keyframes liquid-music-pulse {
+  0%, 100% {
+    --flow-intensity: var(--baseline-flow-intensity, 0.5);
+    --liquid-density: var(--baseline-liquid-density, 0.8);
+  }
+  50% {
+    --flow-intensity: calc(var(--baseline-flow-intensity, 0.5) * var(--music-energy-boost, 1));
+    --liquid-density: calc(var(--baseline-liquid-density, 0.8) * var(--music-energy-boost, 1));
+  }
+}
+
+@keyframes liquid-beat-response {
+  0%, 90%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  5% {
+    transform: scale(calc(1 + var(--element-beat-intensity, 0.3) * 0.02));
+    filter: brightness(calc(1 + var(--element-beat-intensity, 0.3) * 0.1));
+  }
+}
+
+/* ============================================================================ */
+/* PERFORMANCE OPTIMIZATIONS */
+/* ============================================================================ */
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .liquid-interaction-field,
+  .liquid-interaction-element {
+    animation: none !important;
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out !important;
+  }
+  
+  .liquid-interaction-element:hover {
+    animation: none !important;
+    transform: scale(1.01) !important;
+  }
+}
+
+/* Performance mode */
+.liquid-interaction-field[data-performance="optimized"] {
+  .liquid-interaction-element {
+    animation: none;
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+    
+    &:hover {
+      animation: none;
+      transform: scale(1.01);
+      background: rgba(var(--spice-rgb-accent, 203, 214, 244), 0.2);
+    }
+  }
+}
+
+/* GPU acceleration hints */
+.liquid-interaction-element {
+  will-change: transform, opacity, background;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+/* ============================================================================ */
+/* ACCESSIBILITY ENHANCEMENTS */
+/* ============================================================================ */
+
+/* Focus management */
+.liquid-interaction-element:focus-visible {
+  outline: 2px solid rgba(var(--spice-rgb-accent, 203, 214, 244), 0.8);
+  outline-offset: 4px;
+  
+  /* Enhanced focus indication */
+  box-shadow: 
+    0 0 0 4px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.3),
+    inset 0 0 10px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.2);
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .liquid-interaction-element {
+    border-width: 2px;
+    border-color: rgba(var(--spice-rgb-accent, 203, 214, 244), 1);
+  }
+  
+  .liquid-interaction-element:hover,
+  .liquid-interaction-element:focus {
+    background: rgba(var(--spice-rgb-accent, 203, 214, 244), 0.5);
+  }
+}
+
+/* Print styles */
+@media print {
+  .liquid-interaction-field {
+    background: none !important;
+    animation: none !important;
+  }
+  
+  .liquid-interaction-element {
+    background: rgba(var(--spice-rgb-surface1, 69, 71, 90), 1) !important;
+    transform: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+}

@@ -71,7 +71,7 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
     transition: opacity var(--sn-nav-item-transition-duration) ease,
       background-color var(--sn-nav-item-transition-duration) ease,
       transform var(--sn-nav-item-transition-duration)
-        cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        var(--sn-anim-easing-organic),
       box-shadow var(--sn-nav-item-transition-duration) ease;
 
     /* Quantum glow effect via pseudo-element*/
@@ -193,7 +193,7 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
 .main-yourLibraryX-listItem,
 nav[aria-label="Main"] ul li a {
   &.sn-absorbing-energy {
-    transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.5, 1.3); /* Quick, bouncy feel*/
+    transition: transform 0.1s var(--sn-anim-easing-bounce-playful); /* Quick, bouncy feel*/
     transform: scale(var(--sn-item-energy-absorption-scale));
     /* Potentially add a subtle glow change too*/
     box-shadow: 0 0 calc(5px + 8px * var(--sn-nav-item-glow-intensity))

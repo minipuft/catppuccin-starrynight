@@ -249,12 +249,12 @@
 }
 
 .sn-ocean-ripple-once {
-  animation: year3000-ripple 1200ms var(--sn-easing-explorer, cubic-bezier(0.25, 0.46, 0.45, 0.94));
+  animation: year3000-ripple 1200ms var(--sn-easing-explorer, var(--sn-anim-easing-organic));
 }
 
 // Bloom Classes
 .sn-bloom-active {
-  animation: year3000-bloom calc(var(--sn-bloom-intensity, 1) * 1500ms) cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  animation: year3000-bloom calc(var(--sn-bloom-intensity, 1) * 1500ms) var(--sn-anim-easing-organic);
 }
 
 .sn-bloom-subtle {
@@ -343,7 +343,7 @@
 // ===== KINETIC CANVAS ANIMATIONS =====
 
 .year3000-kinetic-canvas {
-  transition: all 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 150ms var(--sn-anim-easing-organic);
 }
 
 .year3000-kinetic-canvas[data-kinetic-mode="pulse"] {
@@ -426,7 +426,7 @@
 // Cosmic Maximum Mode: Enhanced kinetic effects
 [data-artistic-mode="cosmic-maximum"] .sn-bloom-active {
   animation:
-    year3000-bloom calc(var(--sn-bloom-intensity, 1) * 1000ms) cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    year3000-bloom calc(var(--sn-bloom-intensity, 1) * 1000ms) var(--sn-anim-easing-organic),
     year3000-bloom-subtle calc(var(--sn-kinetic-tempo-multiplier, 1) * 3s) ease-in-out infinite;
 }
 
@@ -442,7 +442,7 @@
   // Scales radius 1 → 1.4 depending on music energy
   --sn-echo-radius-multiplier: 1;
   // Shared easing so design can tweak in one place
-  --sn-echo-decay-curve: var(--sn-easing-emergence, cubic-bezier(0.25, 0.46, 0.45, 0.94));
+  --sn-echo-decay-curve: var(--sn-easing-emergence, var(--sn-anim-easing-organic));
 }
 
 // ══════════════════════════════════════════════════════════════════════

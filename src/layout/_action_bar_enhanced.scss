@@ -25,7 +25,7 @@
   ) !important;
   backdrop-filter: blur(15px)
     saturate(calc(1.15 + (var(--sn-breathing-scale, 1) - 1) * 0.3));
-  transition: background 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: background 800ms var(--sn-anim-easing-organic);
 
   // Kinetic Verb: REFRACT - Subtle hue breathing with rhythm
   filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 2deg))
@@ -59,7 +59,7 @@
     transform: scale(
       calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.12))
     ); // Enhanced pulse: max 12% size increase - sell the effect!
-    transition: transform 120ms cubic-bezier(0.175, 0.885, 0.32, 1.375); // Snappier, bouncier pulse
+    transition: transform 120ms var(--sn-anim-easing-bounce-medium); // Snappier, bouncier pulse
 
     // Additional enhancement: subtle glow pulse
     box-shadow: 0 0 calc(8px * var(--sn-beat-pulse-intensity, 0))
@@ -83,7 +83,7 @@
       0.7
     ); // Solid color for the bar, using a dynamic theme color
     border-radius: 2px; // Rounded edges for the bar
-    transition: transform 120ms cubic-bezier(0.175, 0.885, 0.32, 1.375); // Snappy pulse
+    transition: transform 120ms var(--sn-anim-easing-bounce-medium); // Snappy pulse
     z-index: -1; // Behind the buttons
   }
 }

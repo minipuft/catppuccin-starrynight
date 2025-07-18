@@ -284,19 +284,19 @@
   
   // Intelligent animation selection based on musical state
   animation: 
-    meditative-liquid-breathing var(--meditation-rhythm) cubic-bezier(0.4, 0, 0.2, 1) infinite,
+    meditative-liquid-breathing var(--meditation-rhythm) var(--sn-anim-easing-standard) infinite,
     holographic-consciousness-light calc(var(--holographic-pulse-rhythm) * 1.5) ease-in-out infinite;
   
   // Smooth state transitions with organic easing
   transition: 
-    border-radius 2.5s cubic-bezier(0.4, 0, 0.2, 1),
+    border-radius 2.5s var(--sn-anim-easing-standard),
     background 3s ease-out,
     animation-duration 2s ease-in-out;
   
   // Musical awakening override - activate when threshold is met
   .Root[style*="--sn-beat-pulse-intensity"] & {
     animation: 
-      musical-liquid-awakening calc(var(--meditation-rhythm) / var(--music-flow-acceleration)) cubic-bezier(0.4, 0, 0.2, 1) infinite,
+      musical-liquid-awakening calc(var(--meditation-rhythm) / var(--music-flow-acceleration)) var(--sn-anim-easing-standard) infinite,
       holographic-consciousness-light calc(var(--holographic-pulse-rhythm) / max(var(--music-liquid-resonance), 0.1)) ease-in-out infinite;
     
     // Enhanced background intensity during musical state

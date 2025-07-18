@@ -38,6 +38,17 @@ interface ShimmerSettings {
   rotationSpeed: number;
   blurRadius: number;
   saturationBoost: number;
+  // Enhanced oil-on-water effects
+  oilSlickIntensity: number;
+  chromaticAberration: number;
+  refractionStrength: number;
+  interferencePattern: boolean;
+  surfaceTension: number;
+  // Performance optimization
+  useGPUAcceleration: boolean;
+  maxSimultaneousShimmers: number;
+  adaptiveQuality: boolean;
+  poolingEnabled: boolean;
 }
 
 interface ShimmerKeyframes {
@@ -76,7 +87,7 @@ export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
     this.shimmerElements = new Map();
     this.cssVariableBatcher = new CSSVariableBatcher();
     
-    // Initialize settings
+    // Initialize settings with enhanced oil-on-water effects
     this.shimmerSettings = {
       enabled: true,
       intensity: "balanced",
@@ -94,7 +105,18 @@ export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
       scaleRange: [0.8, 1.2],
       rotationSpeed: 0.2,
       blurRadius: 8,
-      saturationBoost: 1.5
+      saturationBoost: 1.5,
+      // Enhanced oil-on-water effects
+      oilSlickIntensity: 0.7,
+      chromaticAberration: 2.0,
+      refractionStrength: 1.5,
+      interferencePattern: true,
+      surfaceTension: 0.8,
+      // Performance optimization
+      useGPUAcceleration: true,
+      maxSimultaneousShimmers: 12,
+      adaptiveQuality: true,
+      poolingEnabled: true
     };
     
     // Initialize keyframes

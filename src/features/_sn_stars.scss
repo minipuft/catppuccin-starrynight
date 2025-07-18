@@ -16,7 +16,7 @@
 
   // === Organic Flow Variables ===
   --particle-flow-variance: 15deg;
-  --particle-organic-curve: var(--sn-easing-organic, cubic-bezier(0.25, 0.46, 0.45, 0.94));
+  --particle-organic-curve: var(--sn-easing-organic, var(--sn-anim-easing-organic));
   --particle-life-cycle: 12s;
   --particle-emergence-delay: 3s;
 

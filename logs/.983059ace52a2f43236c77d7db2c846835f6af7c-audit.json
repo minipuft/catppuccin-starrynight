@@ -44,6 +44,16 @@
             "date": 1752668631277,
             "name": "/home/minipuft/Applications/catppuccin-starrynight/logs/mcp-puppeteer-2025-07-16.log",
             "hash": "2b802c960792d31fedcb12a0f2e23958bd395843136e05233762867a30acb229"
+        },
+        {
+            "date": 1752765811536,
+            "name": "/home/minipuft/Applications/catppuccin-starrynight/logs/mcp-puppeteer-2025-07-17.log",
+            "hash": "461d3c7f5671003072b77ea53677a164b471a4adb8c439d0fa3d6b6ae84f2d95"
+        },
+        {
+            "date": 1752836396725,
+            "name": "/home/minipuft/Applications/catppuccin-starrynight/logs/mcp-puppeteer-2025-07-18.log",
+            "hash": "38db21ed47b3259576992a881c5c99a1c757c5810491b334ec8faefad4c21764"
         }
     ],
     "hashType": "sha256"

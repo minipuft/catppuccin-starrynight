@@ -1,55 +1,62 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🧠 YEAR 3000 CONSCIOUSNESS FIELD VARIABLES (Magnetic Depth)
-// Defines global CSS custom properties that power the Magnetic Depth system.
-// No mixins are declared here (they live in _mixins.scss). This file exists so
-// that `app.scss` can `@forward` it, making the variables available project-wide.
+// 🔄 MIGRATED TO UNIFIED DESIGN TOKENS SYSTEM
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// DEPRECATION NOTICE: This file now references the unified design tokens system.
+// All authoritative variable definitions are in: src/design-tokens/tokens.scss
+// These aliases maintain backward compatibility during migration to Year 3000 architecture.
+
+// Import the unified design tokens
+@use "../design-tokens/tokens" as *;
+
 :root {
+  // === LEGACY COMPATIBILITY ALIASES ===
+  // Following "Quantum Empathy" principle - consciousness responds contextually
+  
   // === INVITATION DEPTH LAYERS ===
-  --magnetic-depth-field: 800px; // Comfortable 3D perspective for readability
-  --magnetic-approach-distance: 20px;
-  --magnetic-recede-distance: -10px;
-  --magnetic-neutral-position: 0px;
+  --magnetic-depth-field: var(--sn.consciousness.depth.field);
+  --magnetic-approach-distance: var(--sn.consciousness.depth.approach);
+  --magnetic-recede-distance: var(--sn.consciousness.depth.recede);
+  --magnetic-neutral-position: var(--sn.consciousness.depth.neutral);
 
   // === USER INTERACTION MAGNETISM ===
-  --magnetic-hover-pull: 12px;
-  --magnetic-focus-pull: 18px;
-  --magnetic-interest-pull: 8px;
-  --magnetic-transition-speed: 0.6s;
+  --magnetic-hover-pull: var(--sn.consciousness.magnetic.hover.pull);
+  --magnetic-focus-pull: var(--sn.consciousness.magnetic.focus.pull);
+  --magnetic-interest-pull: var(--sn.consciousness.magnetic.interest.pull);
+  --magnetic-transition-speed: var(--sn.consciousness.magnetic.transition.speed);
 
   // === DEPTH HIERARCHY SYSTEM ===
-  --depth-priority-high: translateZ(8px);
-  --depth-priority-medium: translateZ(4px);
-  --depth-priority-low: translateZ(0px);
-  --depth-priority-receded: translateZ(-6px);
+  --depth-priority-high: var(--sn.consciousness.depth.priority.high);
+  --depth-priority-medium: var(--sn.consciousness.depth.priority.medium);
+  --depth-priority-low: var(--sn.consciousness.depth.priority.low);
+  --depth-priority-receded: var(--sn.consciousness.depth.priority.receded);
 
   // === READABILITY PRESERVATION ===
-  --magnetic-max-rotation: 2deg;
-  --magnetic-text-clarity: 1;
-  --magnetic-contrast-boost: 1.05;
+  --magnetic-max-rotation: var(--sn.consciousness.magnetic.max.rotation);
+  --magnetic-text-clarity: var(--sn.consciousness.text.clarity);
+  --magnetic-contrast-boost: var(--sn.consciousness.contrast.boost);
 
   // === COSMIC CONSCIOUSNESS INTEGRATION ===
-  --consciousness-field-intensity: 0.4;
-  --consciousness-breathing-rate: 12s;
-  --consciousness-response-sensitivity: 0.8;
+  --consciousness-field-intensity: var(--sn.consciousness.field.intensity);
+  --consciousness-breathing-rate: var(--sn.consciousness.breathing.rate);
+  --consciousness-response-sensitivity: var(--sn.consciousness.response.sensitivity);
 
   // === PERFORMANCE & ACCESSIBILITY ===
-  --magnetic-performance-mode: 1;
-  --magnetic-accessibility-scale: 1;
-  --magnetic-mobile-reduction: 0.6;
-
+  --magnetic-performance-mode: var(--sn.consciousness.performance.mode);
+  --magnetic-accessibility-scale: var(--sn.consciousness.accessibility.scale);
+  --magnetic-mobile-reduction: var(--sn.consciousness.mobile.reduction);
 }
 
 // =============================================================================
-// PHASE 3: SERENDIPITY STREAMS
-// Variables for surfacing "approaching" suggestions during user idle time.
+// SERENDIPITY STREAMS (Migrated to Unified Tokens)
 // =============================================================================
 :root {
-  --serendipity-idle-threshold: 2000ms;
-  --serendipity-animation-duration: 600ms;
-  --serendipity-start-z: -60px;
-  --serendipity-end-z: -10px;
+  // === SERENDIPITY DISCOVERY SYSTEM ===
+  --serendipity-idle-threshold: var(--sn.serendipity.idle.threshold);
+  --serendipity-animation-duration: var(--sn.serendipity.animation.duration);
+  --serendipity-start-z: var(--sn.serendipity.start.z);
+  --serendipity-end-z: var(--sn.serendipity.end.z);
 }
 
 // Accessibility overrides

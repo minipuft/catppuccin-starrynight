@@ -243,7 +243,7 @@
   filter: hue-rotate(var(--micro-hue-shift))
     brightness(calc(1 + (var(--micro-beat-intensity) * 0.12)))
     saturate(calc(1.1 + (var(--micro-beat-intensity) * 0.2)));
-  transition: all var(--micro-fast) cubic-bezier(0.175, 0.885, 0.32, 1.4);
+  transition: all var(--micro-fast) var(--sn-anim-easing-bounce-smooth);
 
   // Prominent glow effect with rhythm
   &:hover {

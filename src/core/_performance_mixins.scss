@@ -1,0 +1,366 @@
+// StarryNight Performance Optimization Mixins
+// Phase 3: Unified Performance Optimization Integration
+// Provides performance-aware mixins that work with PerformanceOptimizationManager
+
+@use "_mixins" as *;
+
+// ============================================================================
+// PERFORMANCE MODE OPTIMIZATIONS
+// ============================================================================
+
+// Adaptive performance optimization that responds to unified performance variables
+@mixin performance-adaptive($property: all, $high-value: 1, $balanced-value: 0.8, $battery-value: 0.4) {
+  // Use CSS custom properties that are updated by PerformanceOptimizationManager
+  // Note: Actual mode-specific values are set by CSS classes applied by PerformanceCSSIntegration
+  #{$property}: var(--sn-performance-quality-level, #{$balanced-value});
+}
+
+// Device-tier aware styling
+@mixin device-tier-optimization($low-tier-styles: (), $medium-tier-styles: (), $high-tier-styles: (), $premium-tier-styles: ()) {
+  // Low-end device optimizations
+  @if length($low-tier-styles) > 0 {
+    .device-tier-low & {
+      @each $property, $value in $low-tier-styles {
+        #{$property}: #{$value};
+      }
+    }
+  }
+  
+  // Medium-tier device optimizations
+  @if length($medium-tier-styles) > 0 {
+    .device-tier-medium & {
+      @each $property, $value in $medium-tier-styles {
+        #{$property}: #{$value};
+      }
+    }
+  }
+  
+  // High-tier device optimizations
+  @if length($high-tier-styles) > 0 {
+    .device-tier-high & {
+      @each $property, $value in $high-tier-styles {
+        #{$property}: #{$value};
+      }
+    }
+  }
+  
+  // Premium device enhancements
+  @if length($premium-tier-styles) > 0 {
+    .device-tier-premium & {
+      @each $property, $value in $premium-tier-styles {
+        #{$property}: #{$value};
+      }
+    }
+  }
+}
+
+// Thermal throttling optimization
+@mixin thermal-aware($property: animation-duration, $normal-value: 1s, $warm-factor: 1.2, $hot-factor: 1.5, $critical-disable: true) {
+  // Default value - will be overridden by thermal state classes
+  #{$property}: #{$normal-value};
+  
+  // Use thermal state classes set by PerformanceCSSIntegration
+  .thermal-warm & {
+    #{$property}: calc(#{$normal-value} * #{$warm-factor});
+  }
+  
+  .thermal-hot & {
+    #{$property}: calc(#{$normal-value} * #{$hot-factor});
+  }
+  
+  @if $critical-disable {
+    .thermal-critical & {
+      #{$property}: none !important;
+    }
+  }
+}
+
+// Battery-aware optimization
+@mixin battery-aware($property: animation-play-state, $normal-value: running, $low-battery-value: paused) {
+  // Default value
+  #{$property}: #{$normal-value};
+  
+  // Use battery state classes set by PerformanceCSSIntegration
+  .battery-low & {
+    #{$property}: #{$low-battery-value};
+    animation-duration: calc(var(--base-duration, 1s) * 2) !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+// Frame rate adaptive optimization
+@mixin framerate-adaptive($base-duration: 1s) {
+  animation-duration: calc(#{$base-duration} * (60 / var(--sn-performance-fps-target, 60)));
+  
+  // Default timing function
+  animation-timing-function: var(--sn-anim-easing-organic);
+  
+  // Reduce complexity at lower frame rates using CSS classes
+  .performance-mode-battery & {
+    animation-timing-function: steps(4, end);
+  }
+  
+  .performance-mode-balanced & {
+    animation-timing-function: ease-out;
+  }
+}
+
+// ============================================================================
+// QUALITY LEVEL OPTIMIZATIONS
+// ============================================================================
+
+// Adaptive blur optimization
+@mixin blur-adaptive($base-blur: 10px) {
+  filter: blur(calc(#{$base-blur} * var(--sn-performance-blur-quality, 1)));
+  backdrop-filter: blur(calc(#{$base-blur} * var(--sn-performance-blur-quality, 1)));
+  
+  // Disable blur completely in battery mode or low-end devices
+  .performance-mode-battery &,
+  .device-tier-low & {
+    filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+// Adaptive shadow optimization
+@mixin shadow-adaptive($base-shadow: 0 4px 20px rgba(0, 0, 0, 0.3)) {
+  box-shadow: #{$base-shadow} * var(--sn-performance-shadow-quality, 1);
+  
+  // Simplified shadows for performance mode
+  .performance-mode-battery & {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, calc(0.3 * var(--sn-performance-shadow-quality, 0.2))) !important;
+  }
+  
+  .device-tier-low & {
+    box-shadow: none !important;
+  }
+}
+
+// Adaptive animation complexity
+@mixin animation-complexity($complex-keyframes, $simple-keyframes: null) {
+  // Default to complex animations
+  animation-name: #{$complex-keyframes};
+  
+  // Use simple animations in performance modes
+  @if $simple-keyframes != null {
+    .performance-mode-battery &,
+    .device-tier-low &,
+    .thermal-hot &,
+    .thermal-critical & {
+      animation-name: #{$simple-keyframes} !important;
+    }
+  } @else {
+    // Disable animations if no simple alternative
+    .performance-mode-battery &,
+    .device-tier-low &,
+    .thermal-critical & {
+      animation: none !important;
+    }
+  }
+}
+
+// ============================================================================
+// HARDWARE ACCELERATION OPTIMIZATION
+// ============================================================================
+
+// Conditional hardware acceleration
+@mixin hardware-acceleration-adaptive {
+  // Only apply hardware acceleration on capable devices
+  .device-tier-high &,
+  .device-tier-premium & {
+    @include hardware-accelerated;
+  }
+  
+  // Simplified transforms for lower-end devices
+  .device-tier-low &,
+  .device-tier-medium & {
+    will-change: auto;
+    transform: none;
+    backface-visibility: visible;
+  }
+}
+
+// GPU-aware effects
+@mixin gpu-aware-effect($property, $gpu-value, $fallback-value) {
+  // Default fallback value
+  #{$property}: #{$fallback-value};
+  
+  // Use GPU effect on capable devices
+  .device-tier-high &,
+  .device-tier-premium & {
+    #{$property}: #{$gpu-value};
+  }
+  
+  // Disable effects entirely in critical thermal state
+  .thermal-critical & {
+    filter: none !important;
+    backdrop-filter: none !important;
+    transform: none !important;
+  }
+}
+
+// ============================================================================
+// MEMORY OPTIMIZATION
+// ============================================================================
+
+// Memory-aware transform optimization
+@mixin memory-optimized-transform($transform) {
+  transform: #{$transform};
+  will-change: transform;
+  
+  // Simplify transforms under memory pressure using CSS classes
+  @supports (content-visibility: auto) {
+    content-visibility: visible;
+    
+    .memory-pressure-high & {
+      content-visibility: auto;
+    }
+  }
+  
+  // Disable complex transforms at high memory usage
+  .memory-pressure-high & {
+    will-change: auto;
+  }
+}
+
+// Conditional containment optimization
+@mixin containment-adaptive {
+  // Full containment on capable devices
+  .device-tier-high &,
+  .device-tier-premium & {
+    contain: layout style paint;
+  }
+  
+  // Limited containment on medium devices
+  .device-tier-medium & {
+    contain: style paint;
+  }
+  
+  // No containment on low-end devices
+  .device-tier-low & {
+    contain: none;
+  }
+}
+
+// ============================================================================
+// PERFORMANCE MONITORING INTEGRATION
+// ============================================================================
+
+// Debug performance impact visualization
+@mixin performance-debug($impact-level: medium) {
+  @if $impact-level == high {
+    .debug-performance & {
+      outline: 2px solid red !important;
+    }
+  } @else if $impact-level == medium {
+    .debug-performance & {
+      outline: 2px solid orange !important;
+    }
+  } @else {
+    .debug-performance & {
+      outline: 2px solid green !important;
+    }
+  }
+}
+
+// Performance-tracked animation
+@mixin tracked-animation($name, $duration: 1s, $timing: ease-in-out, $impact: medium) {
+  @include performance-debug($impact);
+  
+  animation: #{$name} #{$duration} #{$timing};
+  
+  // Integrate with performance tracking
+  will-change: transform, opacity;
+  
+  // Auto-optimize based on performance metrics
+  @include framerate-adaptive($duration);
+  @include thermal-aware(animation-duration, $duration);
+  @include battery-aware(animation-play-state);
+}
+
+// ============================================================================
+// ACCESSIBILITY INTEGRATION
+// ============================================================================
+
+// Motion-safe animations that respect user preferences
+@mixin motion-safe-animation($animation, $reduced-motion-alternative: none) {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: #{$animation};
+    
+    // Still respect performance constraints
+    @include framerate-adaptive;
+    @include thermal-aware;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    animation: #{$reduced-motion-alternative};
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  }
+}
+
+// Contrast-aware effects
+@mixin contrast-safe-effect($high-contrast-alternative: none) {
+  // Normal effects for standard contrast
+  @media (prefers-contrast: no-preference) {
+    @include blur-adaptive;
+    @include shadow-adaptive;
+  }
+  
+  // Simplified effects for high contrast
+  @media (prefers-contrast: high) {
+    filter: #{$high-contrast-alternative};
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+}
+
+// ============================================================================
+// UNIFIED PERFORMANCE COORDINATION
+// ============================================================================
+
+// Master performance mixin that coordinates all optimizations
+@mixin unified-performance-optimization {
+  // Apply hardware acceleration conditionally
+  @include hardware-acceleration-adaptive;
+  
+  // Apply containment optimization
+  @include containment-adaptive;
+  
+  // Respect user preferences
+  @media (prefers-reduced-motion: reduce) {
+    animation: none !important;
+    transition: opacity 0.3s ease-out, color 0.3s ease-out !important;
+  }
+  
+  // Critical thermal state emergency fallback
+  .thermal-critical & {
+    animation: none !important;
+    transition: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
+}
+
+// Performance mode specific base styles
+@mixin performance-mode-base($mode: auto) {
+  @if $mode == performance {
+    --sn-performance-quality-level: 1;
+    --sn-performance-animation-quality: 1;
+    --sn-performance-effect-quality: 1;
+  } @else if $mode == balanced {
+    --sn-performance-quality-level: 0.8;
+    --sn-performance-animation-quality: 0.8;
+    --sn-performance-effect-quality: 0.7;
+  } @else if $mode == battery {
+    --sn-performance-quality-level: 0.4;
+    --sn-performance-animation-quality: 0.3;
+    --sn-performance-effect-quality: 0.2;
+  } @else {
+    // Auto mode - dynamically adjusted by PerformanceOptimizationManager
+    --sn-performance-quality-level: var(--sn-performance-auto-quality, 0.8);
+    --sn-performance-animation-quality: var(--sn-performance-auto-animation, 0.8);
+    --sn-performance-effect-quality: var(--sn-performance-auto-effect, 0.8);
+  }
+}

@@ -80,7 +80,7 @@
       color: var(--spice-text);
       position: relative;
       transition: color 0.3s ease-out, text-shadow 0.3s ease-out,
-        transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transform 0.2s var(--sn-anim-easing-organic);
 
       // Kinetic Verb: BLOOM - Hover enhancement
       &:hover {

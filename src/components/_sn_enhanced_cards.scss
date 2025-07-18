@@ -17,7 +17,7 @@
   --card-energy-field-radius: 20px;
   --card-nexus-connection-strength: 0.8;
   --card-bloom-expansion: 1.08;
-  --card-morphing-fluidity: cubic-bezier(0.23, 1, 0.32, 1);
+  --card-morphing-fluidity: var(--sn-anim-easing-emergence);
 
   // === Organic Dimension System ===
   --card-organic-corners: 16px;
