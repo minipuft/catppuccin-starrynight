@@ -462,12 +462,14 @@ export class WebGLBackplaneAdapter implements ShaderBackplane {
     }
 
     return {
+      healthy: issues.length === 0,
       ok: issues.length === 0,
       details:
         issues.length > 0
           ? `${issues.length} WebGL issues detected`
           : "WebGL backend healthy",
       issues,
+      system: 'WebGLBackplaneAdapter',
     };
   }
 

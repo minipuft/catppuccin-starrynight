@@ -1,9 +1,9 @@
 /**
- * UnifiedSystemIntegrationFacade Test Suite
+ * NonVisualSystemFacade Test Suite
  * Tests for Phase 3 non-visual systems factory pattern implementation
  */
 
-import { UnifiedSystemIntegrationFacade, NonVisualSystemKey, NonVisualSystemConfig } from '@/core/integration/UnifiedSystemIntegrationFacade';
+import { NonVisualSystemFacade, NonVisualSystemKey, NonVisualSystemConfig } from '@/core/integration/NonVisualSystemFacade';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';
 import * as Utils from '@/utils/core/Year3000Utilities';
 
@@ -17,7 +17,7 @@ jest.mock('@/core/performance/DeviceCapabilityDetector');
 jest.mock('@/core/performance/PerformanceAnalyzer');
 jest.mock('@/core/performance/PerformanceOptimizationManager');
 jest.mock('@/core/css/PerformanceCSSIntegration');
-jest.mock('@/debug/SystemHealthMonitor');
+jest.mock('@/debug/UnifiedDebugManager');
 jest.mock('@/ui/managers/SettingsManager');
 jest.mock('@/audio/ColorHarmonyEngine');
 jest.mock('@/audio/MusicSyncService');
@@ -27,7 +27,7 @@ jest.mock('@/core/integration/SidebarSystemsIntegration');
 jest.mock('@/core/integration/UnifiedSystemIntegration');
 
 // Mock debug system
-jest.mock('@/debug/SystemHealthMonitor', () => ({
+jest.mock('@/debug/UnifiedDebugManager', () => ({
   Y3K: {
     debug: {
       log: jest.fn(),
@@ -47,8 +47,8 @@ Object.defineProperty(window, 'performance', {
   }
 });
 
-describe('UnifiedSystemIntegrationFacade', () => {
-  let facade: UnifiedSystemIntegrationFacade;
+describe('NonVisualSystemFacade', () => {
+  let facade: NonVisualSystemFacade;
   let mockYear3000System: any;
 
   beforeEach(() => {
@@ -62,7 +62,7 @@ describe('UnifiedSystemIntegrationFacade', () => {
     };
 
     // Create facade instance
-    facade = new UnifiedSystemIntegrationFacade(
+    facade = new NonVisualSystemFacade(
       YEAR3000_CONFIG,
       Utils,
       mockYear3000System
@@ -71,7 +71,7 @@ describe('UnifiedSystemIntegrationFacade', () => {
 
   describe('Construction and Initialization', () => {
     it('should initialize with correct dependencies', () => {
-      expect(facade).toBeInstanceOf(UnifiedSystemIntegrationFacade);
+      expect(facade).toBeInstanceOf(NonVisualSystemFacade);
       expect(facade.getSystemStatus().initialized).toBe(false);
     });
 
@@ -286,7 +286,7 @@ describe('UnifiedSystemIntegrationFacade', () => {
       (window.performance.now as jest.Mock) = mockPerformanceNow;
       
       // Create new facade with high init time
-      const slowFacade = new UnifiedSystemIntegrationFacade(
+      const slowFacade = new NonVisualSystemFacade(
         YEAR3000_CONFIG,
         Utils,
         mockYear3000System

@@ -10,7 +10,7 @@
  * - Implements intelligent quality scaling algorithms
  */
 
-import { Y3K } from "@/debug/SystemHealthMonitor";
+import { Y3K } from "@/debug/UnifiedDebugManager";
 import { DeviceCapabilityDetector } from "./DeviceCapabilityDetector";
 import { PerformanceAnalyzer } from "./PerformanceAnalyzer";
 

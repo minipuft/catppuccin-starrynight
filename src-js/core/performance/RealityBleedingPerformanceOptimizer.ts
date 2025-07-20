@@ -12,7 +12,7 @@
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
-import { Y3K } from "@/debug/SystemHealthMonitor";
+import { Y3K } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
 
 interface PerformanceMetrics {

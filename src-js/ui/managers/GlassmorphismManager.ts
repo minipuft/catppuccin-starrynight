@@ -64,7 +64,13 @@ export class GlassmorphismManager implements IManagedSystem {
   }
 
   public async healthCheck(): Promise<HealthCheckResult> {
-    return { ok: true, details: "GlassmorphismManager is operational." };
+    return { 
+      healthy: true,
+      ok: true, 
+      details: "GlassmorphismManager is operational.",
+      issues: [],
+      system: 'GlassmorphismManager',
+    };
   }
 
   public updateAnimation(deltaTime: number): void {

@@ -146,9 +146,11 @@ export class RightSidebarConsciousnessSystemUnified extends UnifiedSystemBase {
     }
     
     return {
+      healthy: issues.length === 0,
       ok: issues.length === 0,
       details: `System health: ${issues.length === 0 ? 'healthy' : 'issues detected'}`,
-      ...(issues.length > 0 && { issues })
+      issues: issues,
+      system: 'RightSidebarConsciousnessSystemUnified'
     };
   }
   

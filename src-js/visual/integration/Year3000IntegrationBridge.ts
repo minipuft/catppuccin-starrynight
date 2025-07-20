@@ -20,7 +20,7 @@
  * - Comprehensive health monitoring and auto-recovery
  */
 
-import { Y3K } from "@/debug/SystemHealthMonitor";
+import { Y3K } from "@/debug/UnifiedDebugManager";
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";

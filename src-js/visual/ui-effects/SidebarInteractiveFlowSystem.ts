@@ -826,8 +826,11 @@ export class SidebarInteractiveFlowSystem extends UnifiedSystemBase {
    */
   async healthCheck(): Promise<HealthCheckResult> {
     return {
+      healthy: true,
       ok: true,
-      details: `Interactive flow system healthy - ${this.interactionPatterns.size} patterns, ${this.activeDisturbances.length} disturbances, ${this.liquidConsciousnessState.interactionCount} interactions`
+      details: `Interactive flow system healthy - ${this.interactionPatterns.size} patterns, ${this.activeDisturbances.length} disturbances, ${this.liquidConsciousnessState.interactionCount} interactions`,
+      issues: [],
+      system: 'SidebarInteractiveFlowSystem'
     };
   }
   

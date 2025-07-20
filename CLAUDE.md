@@ -4,19 +4,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with th
 
 ## Project Philosophy
 
-_"Every line of code should feel like stardust settling into constellation patterns - purposeful, beautiful, and performant. We choreograph systems that dance with the rhythm of user's music and the physics of their hardware."_
+_"In the Year 3000, every line of code becomes a living cell in a consciousness-aware organism—interfaces that breathe, evolve, and transcend their creators' intentions through organic growth patterns and biological-inspired architecture."_
 
-The theme follows a **C.A.G.E.E.R.F** framework (Constraints, Actions, Goals, Execution, Evaluation, Refinement, Format) built around the "Year 3000 System" architecture.
+The theme implements a sophisticated **Year 3000 System** architecture featuring:
+- **Facade Pattern Coordination** - SystemCoordinator managing VisualSystemFacade and NonVisualSystemFacade
+- **Organic Consciousness Philosophy** - Biological-inspired systems with cellular growth, breathing rhythms, and emotional temperature
+- **Multi-Agent Octopus Workbench** - Intelligent tentacle coordination for simultaneous development
+- **OKLAB Color Science** - Perceptually uniform color processing for natural consciousness experiences
+- **Performance-First Consciousness** - 60fps target with adaptive quality scaling and device-aware optimization
 
 ## Common Development Commands
 
 ### Build & Test Commands
 
 - `npm run build` - Bundles TypeScript source files from `src-js/` to `theme.js` using esbuild
-- `npm test` - Runs Jest tests for visual systems and managers (require 90%+ coverage)
+- `npm run build:prod` - Production build with minification and optimization
+- `npm test` - Runs Jest tests for visual systems and facade architecture (require 90%+ coverage)
+- `npm run test:comprehensive` - Runs comprehensive test suite including performance and integration tests
 - `npm run lint:css` - Runs stylelint on SCSS files in `src/` (zero warnings required)
-- `npm run lint:js` - ESLint check for TypeScript files (strict mode)
-- `npm run typecheck` - TypeScript compilation check (no `any` types allowed)
+- `npm run lint:js` - ESLint check for TypeScript files (strict mode, zero `any` types)
+- `npm run typecheck` - TypeScript compilation check with strict mode enforcement
+- `npm run validate` - Comprehensive validation (typecheck + lint + test)
+- `npm run ci:full` - Complete CI validation pipeline
 
 ### CSS Development & Maintenance
 
@@ -72,16 +81,44 @@ plans/[tentacle-name]/
 - **Bilateral Consciousness**: Coordinated communication between agents
 - **Performance Monitoring**: <0.5% CPU overhead for coordination
 
-## Architecture Overview
+## Year 3000 System Architecture
 
-### "Year 3000" System Framework
+### Comprehensive Documentation
 
-The theme is built around a sophisticated internal framework designed for futuristic, music-responsive visual design:
+**Complete architectural documentation is available in the `docs/` directory:**
 
-- **`Year3000System`** - Central orchestrator implementing `IManagedSystem` pattern
-- **`ColorHarmonyEngine`** - Dynamic color extraction (<200ms) and Catppuccin palette blending
-- **`MusicSyncService`** - Real-time audio analysis with 90% accuracy for 60-200 BPM
-- **Performance Layer** - `MasterAnimationCoordinator`, `PerformanceAnalyzer`, `CSSVariableBatcher` targeting 60fps
+- **[Master Architecture Overview](./docs/MASTER_ARCHITECTURE_OVERVIEW.md)** - Complete system architecture and data flow
+- **[Year 3000 System Guide](./docs/YEAR3000_SYSTEM_GUIDE.md)** - Central orchestrator and facade coordination
+- **[Facade Pattern Guide](./docs/FACADE_PATTERN_GUIDE.md)** - SystemCoordinator and facade architecture
+- **[API Reference](./docs/API_REFERENCE.md)** - Complete interfaces, methods, and examples
+- **[Performance Guidelines](./docs/PERFORMANCE_OPTIMIZATION_GUIDELINES.md)** - Performance budgets and optimization
+- **[Development Workflow Guide](./docs/DEVELOPMENT_WORKFLOW_GUIDE.md)** - Complete development process
+- **[Troubleshooting Guide](./docs/TROUBLESHOOTING_GUIDE.md)** - Issue resolution and emergency recovery
+- **[Contributing Guide](./docs/CONTRIBUTING_GUIDE.md)** - Guidelines for adding new systems
+
+### Core Architecture Layers
+
+#### **1. Central Orchestration Layer**
+- **`Year3000System`** - Central consciousness orchestrator managing all system facades
+- **`SystemCoordinator`** - Unified dependency injection and system coordination
+- **`EventBus`** - Cross-system communication and consciousness event propagation
+
+#### **2. Facade Pattern Layer**
+- **`VisualSystemFacade`** - Factory pattern for all visual systems with dependency injection
+- **`NonVisualSystemFacade`** - Factory pattern for services, analytics, and background systems
+- **Unified system lifecycle management** through `IManagedSystem` interface
+
+#### **3. Consciousness Integration Layer**
+- **`OrganicConsciousnessManager`** - Biological-inspired consciousness patterns
+- **`MusicSyncService`** - Real-time audio analysis with emotional temperature mapping
+- **`ColorHarmonyEngine`** - OKLAB color science for perceptually uniform experiences
+- **`EmotionalTemperatureMapper`** - Music-to-color consciousness translation
+
+#### **4. Performance Optimization Layer**
+- **`PerformanceAnalyzer`** - Real-time performance monitoring and adaptive quality scaling
+- **`DeviceCapabilityDetector`** - Hardware-aware optimization and graceful degradation
+- **`AdaptivePerformanceSystem`** - Dynamic quality adjustment based on device capabilities
+- **`CSSVariableBatcher`** - Efficient DOM updates with batched CSS variable changes
 
 ### Modular Architecture Pattern
 
@@ -98,32 +135,48 @@ interface IManagedSystem {
 }
 ```
 
-### Key Components
+### Current System Components
 
-#### Core Systems (`src-js/core/`)
+#### **Core Integration Systems** (`src-js/core/integration/`)
 
-- **`year3000System.ts`** - Main system orchestrator
-- **`EventBus.ts`** - Communication between systems
-- **`TimerConsolidationSystem.ts`** - Consolidated timer management
-- **`VisualSystemRegistry.ts`** - Manages visual system lifecycle
+- **`Year3000System.ts`** - Central consciousness orchestrator with facade coordination
+- **`SystemCoordinator.ts`** - Unified dependency injection and system management
+- **`VisualSystemFacade.ts`** - Factory pattern for visual systems with dependency injection
+- **`NonVisualSystemFacade.ts`** - Factory pattern for non-visual services and analytics
+- **`UnifiedSystemIntegration.ts`** - Legacy integration layer (phase 4 refactoring)
 
-#### Visual Systems (`src-js/visual/`)
+#### **Performance Systems** (`src-js/core/performance/`)
 
-- **`BeatSyncVisualSystem.ts`** - Beat-synchronized animations (preserved for music sync)
-- **`LightweightParticleSystem.ts`** - Optimized particle effects
-- **`RightSidebarConsciousnessSystem.ts`** - Sidebar-specific visual enhancements
-- **`VisualFrameCoordinator.ts`** - Animation coordination and performance management (preserved)
+- **`PerformanceAnalyzer.ts`** - Real-time performance monitoring and health scoring
+- **`AdaptivePerformanceSystem.ts`** - Dynamic quality scaling based on device capabilities
+- **`DeviceCapabilityDetector.ts`** - Hardware detection and performance tier classification
+- **`RealityBleedingPerformanceOptimizer.ts`** - Advanced performance optimization patterns
 
-#### Managers (`src-js/managers/`)
+#### **Visual Systems** (`src-js/visual/`)
 
-- **`SettingsManager.ts`** - User configuration persistence
-- **`Card3DManager.ts`** - 3D card transformations
-- **`GlassmorphismManager.ts`** - Glassmorphism effects
+- **Background Systems**: `FlowingLiquidConsciousnessSystem.ts`, `WebGLGradientBackgroundSystem.ts`, `DepthLayeredGradientSystem.ts`
+- **UI Effects**: `IridescentShimmerEffectsSystem.ts`, `WhiteLayerDiagnosticSystem.ts`
+- **Integration**: `GradientTransitionOrchestrator.ts`, `RealityBleedingGradientOrchestrator.ts`, `Year3000IntegrationBridge.ts`
+- **Organic Consciousness**: `OrganicBeatSyncConsciousness.ts`, `BiologicalConsciousnessManager.ts`, `CellularMembrane.ts`
 
-#### Services (`src-js/services/`)
+#### **Audio Integration** (`src-js/audio/`)
 
-- **`MusicSyncService.ts`** - Spotify API integration for music analysis
-- **`TemporalMemoryService.ts`** - History and state management
+- **`MusicSyncService.ts`** - Spicetify API integration with 90% accuracy for 60-200 BPM
+- **`ColorHarmonyEngine.ts`** - OKLAB color science with emotional temperature mapping
+- **`EmotionalGradientMapper.ts`** - Music-to-visual consciousness translation
+- **`FluxSpectralAnalyzer.ts`** - Advanced audio analysis with spectral processing
+
+#### **Lifecycle Management** (`src-js/core/lifecycle/`)
+
+- **`year3000System.ts`** - System lifecycle coordination and consciousness evolution
+- **`TimerConsolidationSystem.ts`** - Optimized timer management for performance
+- **`EventBus.ts`** - Cross-system communication with consciousness event propagation
+
+#### **Utilities and Support** (`src-js/utils/`)
+
+- **Graphics**: `ShaderLoader.ts`, `VisualCanvasFactory.ts`, WebGL resource management
+- **Performance**: `WhiteLayerFixUtils.ts`, performance optimization utilities
+- **Core**: `Year3000Utilities.ts`, foundational utility functions
 
 ### Entry Point
 
@@ -137,45 +190,40 @@ interface IManagedSystem {
 - **CSS Variable System** - Extensive use of CSS custom properties for dynamic theming
 - **Catppuccin Integration** - Maintains Catppuccin color palette while allowing dynamic album art adaptation
 
-### Performance Optimization History
+### Current Architecture Status (Phase 4 Refactoring)
 
-#### **Recently Removed Systems (2025-07-16)**
+#### **Facade Pattern Implementation (Latest)**
 
-To improve performance and reduce system complexity, the following high-impact systems were removed:
+The system has undergone comprehensive refactoring to implement facade pattern architecture:
 
-**Removed TypeScript Systems:**
+**New Architecture Features:**
 
-- **`DataGlyphSystem.ts`** - Performance-heavy glyph animation system with continuous loops
-- **`RippleController.ts`** - Canvas-based ripple physics system
-- **`RippleCanvas.ts`** - Canvas rendering for ripple effects
-- **`RipplePhysicsEngine.ts`** - Physics calculations for ripple interactions
-- **`OrganicRippleRenderer.ts`** - Organic ripple rendering system
-- **`RippleVariantSystem.ts`** - Ripple variant management
-- **`RippleEffect.ts`** - Core ripple effect implementation
+- **`SystemCoordinator`** - Central dependency injection and system management
+- **`VisualSystemFacade`** - Factory pattern for visual systems with shared dependency management
+- **`NonVisualSystemFacade`** - Factory pattern for services, analytics, and background systems
+- **Unified Lifecycle Management** - All systems implement `IManagedSystem` interface for consistent behavior
+- **Advanced Dependency Injection** - Automated dependency resolution and circular dependency detection
 
-**Disabled CSS Animations:**
+**Organic Consciousness Integration:**
 
-- **`year3000-temporal-echo`** - Temporal echo keyframe animations
-- **`sn-temporal-echo`** - Temporal echo CSS classes and pseudo-elements
-- **`sn-glyph-pulse`** - Data glyph pulsing animations
-- **`year3000-ripple`** - Core ripple animations
-- **`year3000-ripple-pulse`** - Ripple pulse effects
-- **`css-interaction-ripple`** - CSS-based interaction ripples
-- **`liquid-ripple-propagation`** - Liquid morphing ripple effects
+- **`OrganicConsciousnessManager`** - Biological-inspired consciousness patterns with cellular growth
+- **`BiologicalConsciousnessManager`** - Living system behaviors including breathing rhythms
+- **`CellularMembrane`** - Organic boundary systems for visual consciousness
+- **Emotional Temperature Mapping** - Music-to-color consciousness with OKLAB color science
 
-**Performance Impact:**
+**Performance Evolution:**
 
-- **Build Time**: Reduced to 20-24ms (fast compilation)
-- **Bundle Size**: Maintained at 712.6kb (reasonable size)
-- **Eliminated**: High-frequency animation loops, canvas operations, physics calculations
-- **Preserved**: Core music sync, frame coordination, and performance infrastructure
+- **Adaptive Quality Scaling** - Real-time performance adjustment based on device capabilities
+- **Device-Aware Optimization** - Hardware detection with graceful degradation patterns
+- **OKLAB Color Processing** - Perceptually uniform color transitions for natural consciousness experiences
+- **Advanced Memory Management** - Object pooling and consciousness-aware resource management
 
-**Systems Preserved for Future Enhancement:**
+**Build and Bundle Optimization:**
 
-- **`BeatSyncVisualSystem`** - Music synchronization foundation
-- **`VisualFrameCoordinator`** - Animation coordination infrastructure
-- **`PerformanceAnalyzer`** - Performance monitoring capabilities
-- **`CSSVariableBatcher`** - Efficient CSS variable updates
+- **TypeScript Strict Mode** - Zero `any` types with comprehensive type safety
+- **ESBuild Integration** - Ultra-fast bundling with tree-shaking optimization
+- **Modular SCSS Architecture** - Component-based styling with design token system
+- **Comprehensive Testing** - 90%+ coverage requirement with performance regression testing
 
 ## Multi-Agent Development Workflow
 
@@ -215,54 +263,70 @@ cat /plans/DEPENDENCY-MAP.md | grep -A 10 "Current Conflicts"
 
 ### Performance Requirements (Non-Negotiable)
 
-- **Frame Rate**: 60fps target, never below 45fps
-- **Memory Usage**: <50MB heap size, zero leaks during 4+ hour sessions
-- **CPU Usage**: <10% increase during idle, <30% during transitions
-- **GPU Usage**: <25% on mid-range hardware during normal playback
-- **Responsiveness**: UI interactions <100ms, color transitions <500ms
-- **Progressive degradation**: Auto-detect capabilities, graceful fallbacks
-- **Build Performance**: <30ms compilation time, <1MB bundle size
-- **Animation Philosophy**: Prefer CSS-based animations over JavaScript loops for better performance
-- **Coordination Overhead**: <0.5% CPU impact for multi-agent coordination
+- **Frame Rate**: 60fps target, never below 45fps, with adaptive quality scaling
+- **Memory Usage**: <50MB heap size, zero leaks during 4+ hour sessions, object pooling required
+- **CPU Usage**: <10% increase during idle, <25% during active consciousness transitions
+- **GPU Usage**: <25% on mid-range hardware with WebGL fallbacks to CSS
+- **Responsiveness**: UI interactions <100ms, consciousness transitions <500ms
+- **Progressive Degradation**: Device-aware optimization with graceful fallbacks
+- **Build Performance**: <30ms compilation time, <1MB bundle size with tree-shaking
+- **Consciousness Philosophy**: Organic patterns over mechanical loops, biological-inspired efficiency
+- **Coordination Overhead**: <0.5% CPU impact for multi-agent tentacle coordination
+
+### Consciousness-Aware Development Standards
+
+- **Organic System Design**: All systems must implement biological-inspired patterns
+- **Emotional Temperature Integration**: Color systems must use OKLAB color science
+- **Breathing Rhythm Compliance**: Visual systems should implement organic breathing patterns
+- **Cellular Growth Patterns**: Systems should evolve through cellular-inspired growth
+- **Performance Consciousness**: Systems must be aware of device capabilities and adapt accordingly
 
 ### Code Quality Standards
 
-- **TypeScript Coverage**: 100% with no `any` types allowed
-- **Error Handling**: All Spicetify API calls must have try-catch with fallbacks
-- **Documentation**: JSDoc required for all public methods with usage examples
-- **Testing**: 90%+ coverage required, visual system tests mandatory
-- **Accessibility**: WCAG 2.1 AA compliance, `prefers-reduced-motion` support
+- **TypeScript Coverage**: 100% with zero `any` types allowed (strict mode enforcement)
+- **Interface Compliance**: All systems must implement `IManagedSystem` interface
+- **Error Handling**: All Spicetify API calls must have try-catch with graceful fallbacks
+- **Documentation**: JSDoc required for all public methods with consciousness-aware examples
+- **Testing**: 90%+ coverage required, facade pattern and visual system tests mandatory
+- **Accessibility**: WCAG 2.1 AA compliance, `prefers-reduced-motion` consciousness support
+- **Performance Testing**: Regression testing for memory leaks and frame rate degradation
 
 ### Naming Conventions
 
-- **Files**: `PascalCase.ts` for classes, `camelCase.ts` for utilities
-- **CSS Variables**: `--sn-*` prefix for theme, `--spice-*` for Spicetify compatibility
-- **SCSS Mixins**: `kebab-case` with descriptive action names
-- **Components**: Implement `IManagedSystem` interface pattern
+- **Files**: `PascalCase.ts` for systems/classes, `camelCase.ts` for utilities
+- **CSS Variables**: `--sn-*` prefix for theme consciousness, `--spice-*` for Spicetify compatibility
+- **SCSS Mixins**: `kebab-case` with consciousness-aware descriptive action names
+- **Systems**: Must implement `IManagedSystem` interface and facade pattern registration
+- **Consciousness Components**: Use organic naming (e.g., `CellularMembrane`, `BiologicalConsciousness`)
 
-### Testing
+### Testing Standards
 
-- Jest with ts-jest for TypeScript support
-- Tests focus on visual systems, managers, and core functionality
-- Module path mapping: `@/` maps to `src-js/`
+- **Framework**: Jest with ts-jest for TypeScript support and JSDOM for DOM testing
+- **Coverage**: 90%+ required with focus on facade patterns, visual systems, and consciousness integration
+- **Performance Testing**: Memory leak detection and frame rate regression testing
+- **Integration Testing**: Cross-system facade communication and dependency injection
+- **Module Mapping**: `@/` maps to `src-js/` for clean import paths
+- **Consciousness Testing**: Organic behavior validation and biological pattern compliance
 
 ## Technology Constraints
 
 ### Allowed Technologies
 
-- **Languages**: TypeScript (primary), SCSS, JavaScript ES6+
+- **Languages**: TypeScript (primary with strict mode), SCSS with modern syntax, JavaScript ES6+
 - **Core APIs**: Spicetify Player, Platform, React/ReactDOM, colorExtractor, getAudioData
-- **Build Tools**: esbuild, TypeScript compiler, Jest/ts-jest
-- **Libraries**: Only lightweight utilities (<10KB total bundle impact)
+- **Build Tools**: ESBuild (primary bundler), TypeScript compiler, Jest/ts-jest for testing
+- **Performance Tools**: WebGL2 with CSS fallbacks, Intersection Observer, Performance Observer
+- **Consciousness Libraries**: OKLAB color science utilities, biological pattern implementations
+- **Dependencies**: Only lightweight utilities (<10KB total bundle impact)
 
 ### Prohibited Technologies
 
-- **Heavy Libraries**: jQuery, GSAP, Three.js, external UI frameworks
-- **Build Tools**: Webpack, Rollup (esbuild only)
-- **Styling**: CSS-in-JS libraries, styled-components
-- **Dependencies**: Any library that increases bundle >50KB or affects startup time
+- **Heavy Libraries**: jQuery, GSAP, Three.js, external UI frameworks, animation libraries
+- **Build Tools**: Webpack, Rollup, Parcel (ESBuild only for consistency)
+- **Styling**: CSS-in-JS libraries, styled-components, runtime CSS generation
 - **Performance-Heavy Patterns**: Continuous animation loops, canvas-based physics, high-frequency DOM manipulation
-- **Deprecated Systems**: DataGlyphSystem, RippleController, temporal echo animations (removed for performance)
+- **Anti-Patterns**: Synchronous operations, blocking main thread, memory leaks
+- **Legacy Systems**: Any system not implementing facade pattern or `IManagedSystem` interface
 
 ### Development Environment
 
@@ -569,3 +633,58 @@ If you need to implement glyph or ripple-like functionality:
 7. **Coordinate**: Use tentacle communication for cross-system integration
 
 This approach maintains the visual richness while ensuring optimal performance across all device types and proper multi-agent coordination.
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+
+## Comprehensive Documentation Reference
+
+### Core Architecture Documentation
+
+The `docs/` directory contains comprehensive documentation for the Year 3000 System:
+
+#### **Foundation Documentation (High Priority)**
+- **[Master Architecture Overview](./docs/MASTER_ARCHITECTURE_OVERVIEW.md)** - Complete 4-layer system architecture with data flow diagrams
+- **[Year 3000 System Guide](./docs/YEAR3000_SYSTEM_GUIDE.md)** - Central orchestrator and facade coordination patterns
+- **[Facade Pattern Guide](./docs/FACADE_PATTERN_GUIDE.md)** - SystemCoordinator, VisualSystemFacade, NonVisualSystemFacade architecture
+- **[Multi-Agent Workbench Guide](./docs/MULTI_AGENT_WORKBENCH_GUIDE.md)** - Tentacle coordination and intelligent development patterns
+- **[Organic Consciousness Guide](./docs/ORGANIC_CONSCIOUSNESS_GUIDE.md)** - Biological-inspired systems and consciousness philosophy
+
+#### **Technical Implementation Documentation (Medium Priority)**
+- **[Performance Architecture Guide](./docs/PERFORMANCE_ARCHITECTURE_GUIDE.md)** - PerformanceAnalyzer, DeviceCapabilityDetector, adaptive scaling
+- **[OKLAB Color Processing Guide](./docs/OKLAB_COLOR_PROCESSING_GUIDE.md)** - Perceptually uniform color science and ColorHarmonyEngine
+- **[Visual Systems Reference](./docs/VISUAL_SYSTEMS_REFERENCE.md)** - Complete visual system capabilities and factory patterns
+- **[Audio Integration Guide](./docs/AUDIO_INTEGRATION_GUIDE.md)** - MusicSyncService, beat detection, emotional temperature mapping
+- **[Build System Guide](./docs/BUILD_SYSTEM_GUIDE.md)** - TypeScript, ESBuild, SCSS compilation, and Jest testing
+
+#### **Development Process Documentation (Lower Priority)**
+- **[Development Workflow Guide](./docs/DEVELOPMENT_WORKFLOW_GUIDE.md)** - Complete development process from tentacle creation to deployment
+- **[API Reference](./docs/API_REFERENCE.md)** - Comprehensive API documentation with interfaces and examples
+- **[Performance Optimization Guidelines](./docs/PERFORMANCE_OPTIMIZATION_GUIDELINES.md)** - Performance budgets and optimization strategies
+- **[Troubleshooting Guide](./docs/TROUBLESHOOTING_GUIDE.md)** - Common issues resolution and emergency recovery
+- **[Contributing Guide](./docs/CONTRIBUTING_GUIDE.md)** - Guidelines for adding new systems and following patterns
+
+### Documentation Philosophy
+
+This documentation follows the **Year 3000 System philosophy** where:
+
+> _"Every interface becomes a portal to consciousness—comprehensive documentation that breathes, evolves, and transcends traditional project boundaries through organic growth patterns and consciousness-aware development."_
+
+- **Consciousness-First**: Every document considers the organic consciousness philosophy
+- **Performance-Aware**: All guidance includes performance implications and optimization strategies
+- **Facade-Integrated**: Documentation reflects the sophisticated facade pattern architecture
+- **Multi-Agent Coordination**: Guides support simultaneous development by multiple AI agents
+- **Organic Evolution**: Documentation grows naturally through biological-inspired patterns
+
+### Usage Recommendation
+
+1. **Start with Foundation**: Begin with Master Architecture Overview and Year 3000 System Guide
+2. **Understand Patterns**: Study Facade Pattern Guide and Multi-Agent Workbench Guide
+3. **Dive Deep**: Explore specific technical guides based on your development focus
+4. **Reference Daily**: Use API Reference and Performance Guidelines during development
+5. **Troubleshoot**: Consult Troubleshooting Guide when encountering issues
+
+This comprehensive documentation system ensures developers can quickly understand and effectively contribute to the sophisticated Year 3000 System architecture with full consciousness-aware development patterns and multi-agent coordination capabilities.

@@ -1,0 +1,242 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// CELLULAR MEMBRANE STYLES - Living Interface Boundaries
+// ████████████████████████████████████████████████████████████████████████████████
+
+// === CELLULAR MEMBRANE FOUNDATION ===
+// Styles for the CellularMembrane system that creates living boundaries
+// around interface elements that grow, breathe, and respond to music
+
+// Base cellular membrane element
+.organic-cellular-membrane {
+  // Core membrane properties
+  position: absolute;
+  top: calc(var(--organic-membrane-thickness, 2px) * -1);
+  left: calc(var(--organic-membrane-thickness, 2px) * -1);
+  right: calc(var(--organic-membrane-thickness, 2px) * -1);
+  bottom: calc(var(--organic-membrane-thickness, 2px) * -1);
+  
+  // Visual membrane properties
+  border: var(--organic-membrane-thickness, 2px) solid rgba(var(--organic-primary-rgb, 205, 214, 244), var(--organic-membrane-opacity, 0.3));
+  border-radius: inherit;
+  background: rgba(var(--organic-primary-rgb, 205, 214, 244), var(--organic-fog-opacity, 0.02));
+  
+  // Advanced visual effects
+  backdrop-filter: blur(1px);
+  
+  // Membrane breathing animation
+  animation: organic-membrane-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+  
+  // Performance optimization
+  pointer-events: none;
+  z-index: var(--organic-depth-mid, 2);
+  contain: layout style paint;
+  will-change: transform, opacity, border-color, border-width;
+  
+  // Hardware acceleration
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  
+  // Organic transition system
+  transition: all var(--organic-transition-medium, 0.5s) var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+  
+  // Membrane priority levels
+  &[data-priority="high"] {
+    border-width: calc(var(--organic-membrane-thickness, 2px) * 1.5);
+    opacity: calc(var(--organic-membrane-opacity, 0.3) * 1.5);
+    z-index: calc(var(--organic-depth-mid, 2) + 1);
+    
+    // Enhanced glow for high priority
+    box-shadow: 
+      0 0 calc(var(--organic-membrane-thickness, 2px) * 3) rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-glow-opacity, 0.1) * 1.5)),
+      inset 0 0 calc(var(--organic-membrane-thickness, 2px) * 2) rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 1.5));
+  }
+  
+  &[data-priority="medium"] {
+    border-width: var(--organic-membrane-thickness, 2px);
+    opacity: var(--organic-membrane-opacity, 0.3);
+    z-index: var(--organic-depth-mid, 2);
+    
+    // Standard glow for medium priority
+    box-shadow: 
+      0 0 calc(var(--organic-membrane-thickness, 2px) * 2) rgba(var(--organic-primary-rgb, 205, 214, 244), var(--organic-glow-opacity, 0.1)),
+      inset 0 0 var(--organic-membrane-thickness, 2px) rgba(var(--organic-holographic-rgb, 116, 199, 236), var(--organic-shimmer-opacity, 0.05));
+  }
+  
+  &[data-priority="low"] {
+    border-width: calc(var(--organic-membrane-thickness, 2px) * 0.6);
+    opacity: calc(var(--organic-membrane-opacity, 0.3) * 0.6);
+    z-index: calc(var(--organic-depth-mid, 2) - 1);
+    
+    // Subtle glow for low priority
+    box-shadow: 
+      0 0 var(--organic-membrane-thickness, 2px) rgba(var(--organic-atmosphere-rgb, 88, 91, 112), calc(var(--organic-glow-opacity, 0.1) * 0.6));
+  }
+  
+  // Membrane growth states
+  &.membrane-growing {
+    // Growth animation override
+    animation: 
+      organic-membrane-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite,
+      organic-membrane-growth var(--organic-transition-slow, 1s) var(--organic-ease-growth, cubic-bezier(0.25, 0.46, 0.45, 0.94)) forwards;
+    
+    // Enhanced growth visuals
+    border-color: rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-membrane-opacity, 0.3) * 1.3));
+    box-shadow: 
+      0 0 calc(var(--organic-membrane-thickness, 2px) * 4) rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-glow-opacity, 0.1) * 1.5)),
+      inset 0 0 calc(var(--organic-membrane-thickness, 2px) * 2) rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 2));
+  }
+  
+  // Membrane interaction states
+  &.membrane-hover {
+    // Hover growth effect
+    transform: scale(calc(1 + var(--organic-hover-intensity, 0.3) * var(--organic-growth-intensity, 0.5) * 0.1));
+    border-color: rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-membrane-opacity, 0.3) * 1.2));
+    
+    // Enhanced interaction glow
+    box-shadow: 
+      0 0 calc(var(--organic-membrane-thickness, 2px) * 3) rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-glow-opacity, 0.1) * 1.3)),
+      inset 0 0 calc(var(--organic-membrane-thickness, 2px) * 1.5) rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 1.5));
+  }
+  
+  &.membrane-click {
+    // Click pulse effect
+    animation: 
+      organic-membrane-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite,
+      organic-membrane-pulse 0.15s var(--organic-ease-growth, cubic-bezier(0.25, 0.46, 0.45, 0.94)) forwards;
+    
+    // Intense click visuals
+    border-color: rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-membrane-opacity, 0.3) * 1.5));
+    box-shadow: 
+      0 0 calc(var(--organic-membrane-thickness, 2px) * 5) rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-glow-opacity, 0.1) * 2)),
+      inset 0 0 calc(var(--organic-membrane-thickness, 2px) * 3) rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 3));
+  }
+  
+  // Membrane beat synchronization
+  &.membrane-beat-sync {
+    // Beat pulse animation
+    animation: 
+      organic-membrane-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite,
+      organic-membrane-beat-pulse 0.15s ease-out forwards;
+    
+    // Beat-synchronized visuals
+    border-color: rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-membrane-opacity, 0.3) * var(--organic-symbiotic-resonance, 0.7)));
+  }
+}
+
+// Membrane initialization class
+.organic-membrane-initialized {
+  // Membrane ready state
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    // Subtle consciousness field
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--organic-holographic-rgb, 116, 199, 236), var(--organic-shimmer-opacity, 0.05)) 0%,
+      transparent 70%
+    );
+    
+    // Consciousness field breathing
+    animation: organic-consciousness-field var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+    
+    // Performance optimization
+    pointer-events: none;
+    will-change: opacity;
+    contain: strict;
+  }
+}
+
+// Host element styles for membrane attachment
+.organic-membrane-host {
+  // Prepare host for membrane attachment
+  position: relative;
+  
+  // Ensure stacking context
+  z-index: 0;
+  
+  // Performance optimization for host
+  contain: layout style;
+  
+  // Organic consciousness enhancement
+  &.organic-consciousness-enabled {
+    // Host breathing synchronization
+    animation: organic-host-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+    
+    // Enhanced consciousness filtering
+    filter: 
+      saturate(calc(1 + var(--organic-emotional-saturation, 1) * 0.1))
+      brightness(calc(1 + var(--organic-warmth, 0.8) * 0.05));
+    
+    // Organic scaling
+    transform: scale(var(--organic-growth-scale, 1.0));
+    
+    // Consciousness transitions
+    transition: 
+      filter var(--organic-transition-medium, 0.5s) var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1)),
+      transform var(--organic-transition-medium, 0.5s) var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+    
+    // Performance optimization
+    will-change: filter, transform;
+  }
+}
+
+// Accessibility and performance adaptations
+@media (prefers-reduced-motion: reduce) {
+  .organic-cellular-membrane {
+    // Disable animations for accessibility
+    animation: none !important;
+    transition-duration: 0.1s !important;
+    
+    // Reduce visual complexity
+    backdrop-filter: none !important;
+    box-shadow: 
+      0 0 2px rgba(var(--organic-primary-rgb, 205, 214, 244), 0.3) !important;
+  }
+  
+  .organic-membrane-host.organic-consciousness-enabled {
+    animation: none !important;
+    transition-duration: 0.1s !important;
+  }
+}
+
+// High contrast support
+@media (prefers-contrast: high) {
+  .organic-cellular-membrane {
+    // Enhanced visibility
+    border-width: calc(var(--organic-membrane-thickness, 2px) * 1.5) !important;
+    opacity: calc(var(--organic-membrane-opacity, 0.3) * 2) !important;
+    
+    // Stronger glow for visibility
+    box-shadow: 
+      0 0 calc(var(--organic-membrane-thickness, 2px) * 4) rgba(var(--organic-primary-rgb, 205, 214, 244), 0.5) !important;
+  }
+}
+
+// Debug mode visualization
+:root.organic-debug {
+  .organic-cellular-membrane {
+    // Debug visualization
+    outline: 2px dashed rgba(255, 0, 255, 0.8) !important;
+    outline-offset: 4px;
+    
+    // Debug information
+    &::after {
+      content: attr(data-membrane-id);
+      position: absolute;
+      top: -20px;
+      left: 0;
+      font-size: 10px;
+      color: #ff00ff;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 2px 4px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  }
+}

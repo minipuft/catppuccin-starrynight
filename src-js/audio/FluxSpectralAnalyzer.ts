@@ -10,7 +10,7 @@
  * - Musical structure analysis
  */
 
-import { Y3K } from "@/debug/SystemHealthMonitor";
+import { Y3K } from "@/debug/UnifiedDebugManager";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 

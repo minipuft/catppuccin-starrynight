@@ -14,7 +14,7 @@
  * - User preference and accessibility consideration
  */
 
-import { Y3K } from "@/debug/SystemHealthMonitor";
+import { Y3K } from "@/debug/UnifiedDebugManager";
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";

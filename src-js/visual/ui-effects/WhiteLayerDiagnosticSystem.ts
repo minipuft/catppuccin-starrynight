@@ -9,7 +9,7 @@
  * - Z-index conflicts and layering issues
  */
 
-import { Y3K } from "@/debug/SystemHealthMonitor";
+import { Y3K } from "@/debug/UnifiedDebugManager";
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 
 interface WhiteLayerDiagnostics {

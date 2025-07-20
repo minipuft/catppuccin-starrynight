@@ -1,0 +1,2647 @@
+{
+  "inputs": {
+    "src-js/utils/platform/StorageManager.ts": {
+      "bytes": 12829,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/config/globalConfig.ts": {
+      "bytes": 21750,
+      "imports": [
+        {
+          "path": "src-js/utils/platform/StorageManager.ts",
+          "kind": "import-statement",
+          "original": "@/utils/platform/StorageManager"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/debug/UnifiedDebugManager.ts": {
+      "bytes": 18034,
+      "imports": [
+        {
+          "path": "@/core/base/UnifiedSystemBase",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/performance/DeviceCapabilityDetector.ts": {
+      "bytes": 12510,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/graphics/VisualCanvasFactory.ts": {
+      "bytes": 4760,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/core/Year3000Utilities.ts": {
+      "bytes": 18513,
+      "imports": [
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/animation/visualPerformance.ts": {
+      "bytes": 2081,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/base/BaseVisualSystem.ts": {
+      "bytes": 19979,
+      "imports": [
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "@/core/performance/DeviceCapabilityDetector",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/ui/managers/SettingsManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/audio/MusicSyncService",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/utils/graphics/VisualCanvasFactory.ts",
+          "kind": "import-statement",
+          "original": "@/utils/graphics/VisualCanvasFactory"
+        },
+        {
+          "path": "src-js/utils/core/Year3000Utilities.ts",
+          "kind": "import-statement",
+          "original": "@/utils/core/Year3000Utilities"
+        },
+        {
+          "path": "src-js/utils/animation/visualPerformance.ts",
+          "kind": "import-statement",
+          "original": "@/utils/animation/visualPerformance"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/backgrounds/LightweightParticleSystem.ts": {
+      "bytes": 7361,
+      "imports": [
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/lifecycle/year3000System",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/ui/managers/SettingsManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/audio/MusicSyncService",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/visual/base/BaseVisualSystem.ts",
+          "kind": "import-statement",
+          "original": "../base/BaseVisualSystem"
+        },
+        {
+          "path": "src-js/utils/core/Year3000Utilities.ts",
+          "kind": "import-statement",
+          "original": "@/utils/core/Year3000Utilities"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/performance/PerformanceAnalyzer.ts": {
+      "bytes": 20053,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/backgrounds/ParticleFieldSystem.ts": {
+      "bytes": 8822,
+      "imports": [
+        {
+          "path": "@/audio/MusicSyncService",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/core/performance/PerformanceAnalyzer.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/PerformanceAnalyzer"
+        },
+        {
+          "path": "@/ui/managers/SettingsManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/utils/core/Year3000Utilities",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/performance/CSSVariableBatcher.ts": {
+      "bytes": 26525,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/graphics/ShaderLoader.ts": {
+      "bytes": 7243,
+      "imports": [
+        {
+          "path": "src-js/debug/UnifiedDebugManager.ts",
+          "kind": "import-statement",
+          "original": "@/debug/UnifiedDebugManager"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/backgrounds/WebGLGradientBackgroundSystem.ts": {
+      "bytes": 28929,
+      "imports": [
+        {
+          "path": "@/audio/ColorHarmonyEngine",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/audio/MusicSyncService",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "src-js/core/performance/CSSVariableBatcher.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/CSSVariableBatcher"
+        },
+        {
+          "path": "src-js/core/performance/DeviceCapabilityDetector.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/DeviceCapabilityDetector"
+        },
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/debug/UnifiedDebugManager.ts",
+          "kind": "import-statement",
+          "original": "@/debug/UnifiedDebugManager"
+        },
+        {
+          "path": "@/ui/managers/SettingsManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/utils/graphics/ShaderLoader.ts",
+          "kind": "import-statement",
+          "original": "@/utils/graphics/ShaderLoader"
+        },
+        {
+          "path": "src-js/visual/base/BaseVisualSystem.ts",
+          "kind": "import-statement",
+          "original": "../base/BaseVisualSystem"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/events/EventBus.ts": {
+      "bytes": 2775,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/animation/EnhancedMasterAnimationCoordinator.ts": {
+      "bytes": 23008,
+      "imports": [
+        {
+          "path": "@/core/performance/UnifiedPerformanceCoordinator",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "@/config/globalConfig",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/css/UnifiedVariableGroups.ts": {
+      "bytes": 29668,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/css/UnifiedCSSVariableManager.ts": {
+      "bytes": 26870,
+      "imports": [
+        {
+          "path": "@/core/performance/CSSVariableBatcher",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "src-js/core/css/UnifiedVariableGroups.ts",
+          "kind": "import-statement",
+          "original": "./UnifiedVariableGroups"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/performance/UnifiedPerformanceCoordinator.ts": {
+      "bytes": 22686,
+      "imports": [
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "@/config/globalConfig",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/base/UnifiedSystemBase.ts": {
+      "bytes": 15936,
+      "imports": [
+        {
+          "path": "src-js/core/performance/PerformanceAnalyzer.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/PerformanceAnalyzer"
+        },
+        {
+          "path": "src-js/core/performance/CSSVariableBatcher.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/CSSVariableBatcher"
+        },
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "src-js/core/animation/EnhancedMasterAnimationCoordinator.ts",
+          "kind": "import-statement",
+          "original": "@/core/animation/EnhancedMasterAnimationCoordinator"
+        },
+        {
+          "path": "src-js/core/css/UnifiedCSSVariableManager.ts",
+          "kind": "import-statement",
+          "original": "@/core/css/UnifiedCSSVariableManager"
+        },
+        {
+          "path": "src-js/core/performance/UnifiedPerformanceCoordinator.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/UnifiedPerformanceCoordinator"
+        },
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/organic-consciousness/OrganicBeatSyncConsciousness.ts": {
+      "bytes": 26198,
+      "imports": [
+        {
+          "path": "src-js/core/base/UnifiedSystemBase.ts",
+          "kind": "import-statement",
+          "original": "@/core/base/UnifiedSystemBase"
+        },
+        {
+          "path": "@/core/events/EventBus",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/utils/core/Year3000Utilities.ts",
+          "kind": "import-statement",
+          "original": "@/utils/core/Year3000Utilities"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/dom/domCache.ts": {
+      "bytes": 3846,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/debug/SpotifyDOMSelectors.ts": {
+      "bytes": 12168,
+      "imports": [
+        {
+          "path": "src-js/utils/dom/domCache.ts",
+          "kind": "import-statement",
+          "original": "@/utils/dom/domCache"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/BehavioralPredictionEngine.ts": {
+      "bytes": 24080,
+      "imports": [
+        {
+          "path": "@/audio/MusicSyncService",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/lifecycle/year3000System",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/debug/SpotifyDOMSelectors.ts",
+          "kind": "import-statement",
+          "original": "@/debug/SpotifyDOMSelectors"
+        },
+        {
+          "path": "@/ui/managers/SettingsManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/utils/core/Year3000Utilities",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/visual/base/BaseVisualSystem.ts",
+          "kind": "import-statement",
+          "original": "@/visual/base/BaseVisualSystem"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/InteractionTrackingSystem.ts": {
+      "bytes": 18312,
+      "imports": [
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/lifecycle/year3000System",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/ui/managers/SettingsManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/audio/MusicSyncService",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/utils/core/Year3000Utilities",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/visual/base/BaseVisualSystem.ts",
+          "kind": "import-statement",
+          "original": "../base/BaseVisualSystem"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/ui/managers/SettingsManager.ts": {
+      "bytes": 11725,
+      "imports": [
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "src-js/utils/core/Year3000Utilities.ts",
+          "kind": "import-statement",
+          "original": "@/utils/core/Year3000Utilities"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/platform/SpicetifyCompat.ts": {
+      "bytes": 1830,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/audio/GenreProfileManager.ts": {
+      "bytes": 4463,
+      "imports": [
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/audio/MusicSyncService.ts": {
+      "bytes": 41072,
+      "imports": [
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "@/core/lifecycle/year3000System",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/ui/managers/SettingsManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/utils/core/Year3000Utilities.ts",
+          "kind": "import-statement",
+          "original": "@/utils/core/Year3000Utilities"
+        },
+        {
+          "path": "src-js/utils/platform/SpicetifyCompat.ts",
+          "kind": "import-statement",
+          "original": "@/utils/platform/SpicetifyCompat"
+        },
+        {
+          "path": "src-js/utils/platform/StorageManager.ts",
+          "kind": "import-statement",
+          "original": "@/utils/platform/StorageManager"
+        },
+        {
+          "path": "src-js/audio/GenreProfileManager.ts",
+          "kind": "import-statement",
+          "original": "./GenreProfileManager"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/graphics/NoiseField.ts": {
+      "bytes": 1808,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/PredictiveMaterializationSystem.ts": {
+      "bytes": 14715,
+      "imports": [
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "src-js/core/performance/PerformanceAnalyzer.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/PerformanceAnalyzer"
+        },
+        {
+          "path": "@/core/lifecycle/year3000System",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/ui/managers/SettingsManager.ts",
+          "kind": "import-statement",
+          "original": "@/ui/managers/SettingsManager"
+        },
+        {
+          "path": "src-js/audio/MusicSyncService.ts",
+          "kind": "import-statement",
+          "original": "@/audio/MusicSyncService"
+        },
+        {
+          "path": "@/utils/core/Year3000Utilities",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/utils/graphics/NoiseField.ts",
+          "kind": "import-statement",
+          "original": "@/utils/graphics/NoiseField"
+        },
+        {
+          "path": "src-js/visual/base/BaseVisualSystem.ts",
+          "kind": "import-statement",
+          "original": "../base/BaseVisualSystem"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/SpotifyUIApplicationSystem.ts": {
+      "bytes": 22903,
+      "imports": [
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "../../core/events/EventBus"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/types/signature.ts": {
+      "bytes": 2375,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/idb/build/index.js": {
+      "bytes": 11656,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/audio/TemporalMemoryService.ts": {
+      "bytes": 4007,
+      "imports": [
+        {
+          "path": "src-js/types/signature.ts",
+          "kind": "import-statement",
+          "original": "@/types/signature"
+        },
+        {
+          "path": "node_modules/idb/build/index.js",
+          "kind": "import-statement",
+          "original": "idb"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/animation/EmergentChoreographyEngine.ts": {
+      "bytes": 7743,
+      "imports": [
+        {
+          "path": "src-js/audio/TemporalMemoryService.ts",
+          "kind": "import-statement",
+          "original": "@/audio/TemporalMemoryService"
+        },
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/ui/managers/SettingsManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/utils/core/Year3000Utilities.ts",
+          "kind": "import-statement",
+          "original": "@/utils/core/Year3000Utilities"
+        },
+        {
+          "path": "src-js/visual/base/BaseVisualSystem.ts",
+          "kind": "import-statement",
+          "original": "@/visual/base/BaseVisualSystem"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/performance/AdaptivePerformanceSystem.ts": {
+      "bytes": 26799,
+      "imports": [
+        {
+          "path": "src-js/debug/UnifiedDebugManager.ts",
+          "kind": "import-statement",
+          "original": "@/debug/UnifiedDebugManager"
+        },
+        {
+          "path": "src-js/core/performance/DeviceCapabilityDetector.ts",
+          "kind": "import-statement",
+          "original": "./DeviceCapabilityDetector"
+        },
+        {
+          "path": "src-js/core/performance/PerformanceAnalyzer.ts",
+          "kind": "import-statement",
+          "original": "./PerformanceAnalyzer"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/integration/VisualSystemFacade.ts": {
+      "bytes": 28082,
+      "imports": [
+        {
+          "path": "src-js/debug/UnifiedDebugManager.ts",
+          "kind": "import-statement",
+          "original": "@/debug/UnifiedDebugManager"
+        },
+        {
+          "path": "@/core/performance/CSSVariableBatcher",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/core/performance/DeviceCapabilityDetector.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/DeviceCapabilityDetector"
+        },
+        {
+          "path": "@/audio/MusicSyncService",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/ui/managers/SettingsManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/audio/ColorHarmonyEngine",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/config/globalConfig",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/utils/core/Year3000Utilities",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/visual/backgrounds/LightweightParticleSystem.ts",
+          "kind": "import-statement",
+          "original": "@/visual/backgrounds/LightweightParticleSystem"
+        },
+        {
+          "path": "src-js/visual/backgrounds/ParticleFieldSystem.ts",
+          "kind": "import-statement",
+          "original": "@/visual/backgrounds/ParticleFieldSystem"
+        },
+        {
+          "path": "src-js/visual/backgrounds/WebGLGradientBackgroundSystem.ts",
+          "kind": "import-statement",
+          "original": "@/visual/backgrounds/WebGLGradientBackgroundSystem"
+        },
+        {
+          "path": "src-js/visual/organic-consciousness/OrganicBeatSyncConsciousness.ts",
+          "kind": "import-statement",
+          "original": "@/visual/organic-consciousness/OrganicBeatSyncConsciousness"
+        },
+        {
+          "path": "src-js/visual/ui-effects/BehavioralPredictionEngine.ts",
+          "kind": "import-statement",
+          "original": "@/visual/ui-effects/BehavioralPredictionEngine"
+        },
+        {
+          "path": "src-js/visual/ui-effects/InteractionTrackingSystem.ts",
+          "kind": "import-statement",
+          "original": "@/visual/ui-effects/InteractionTrackingSystem"
+        },
+        {
+          "path": "src-js/visual/ui-effects/PredictiveMaterializationSystem.ts",
+          "kind": "import-statement",
+          "original": "@/visual/ui-effects/PredictiveMaterializationSystem"
+        },
+        {
+          "path": "src-js/visual/ui-effects/SpotifyUIApplicationSystem.ts",
+          "kind": "import-statement",
+          "original": "@/visual/ui-effects/SpotifyUIApplicationSystem"
+        },
+        {
+          "path": "src-js/core/animation/EmergentChoreographyEngine.ts",
+          "kind": "import-statement",
+          "original": "@/core/animation/EmergentChoreographyEngine"
+        },
+        {
+          "path": "@/types/systems",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/core/performance/AdaptivePerformanceSystem.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/AdaptivePerformanceSystem"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/performance/TimerConsolidationSystem.ts": {
+      "bytes": 6861,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/performance/PerformanceOptimizationManager.ts": {
+      "bytes": 22322,
+      "imports": [
+        {
+          "path": "@/core/css/UnifiedCSSVariableManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/animation/EnhancedMasterAnimationCoordinator",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "./UnifiedPerformanceCoordinator",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/css/PerformanceCSSIntegration.ts": {
+      "bytes": 13567,
+      "imports": [
+        {
+          "path": "@/core/performance/PerformanceOptimizationManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "./UnifiedCSSVariableManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/config/settingKeys.ts": {
+      "bytes": 1221,
+      "imports": [],
+      "format": "esm"
+    },
+    "src-js/visual/integration/ColorOrchestrator.ts": {
+      "bytes": 13913,
+      "imports": [
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "src-js/debug/UnifiedDebugManager.ts",
+          "kind": "import-statement",
+          "original": "@/debug/UnifiedDebugManager"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/core/PaletteExtensionManager.ts": {
+      "bytes": 13289,
+      "imports": [
+        {
+          "path": "./Year3000Utilities",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/spicetify/SemanticColorManager.ts": {
+      "bytes": 9226,
+      "imports": [
+        {
+          "path": "@/core/performance/CSSVariableBatcher",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/utils/core/Year3000Utilities.ts",
+          "kind": "import-statement",
+          "original": "@/utils/core/Year3000Utilities"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/audio/ColorHarmonyEngine.ts": {
+      "bytes": 59755,
+      "imports": [
+        {
+          "path": "src-js/config/settingKeys.ts",
+          "kind": "import-statement",
+          "original": "@/config/settingKeys"
+        },
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/visual/integration/ColorOrchestrator.ts",
+          "kind": "import-statement",
+          "original": "@/visual/integration/ColorOrchestrator"
+        },
+        {
+          "path": "@/ui/managers/SettingsManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/utils/core/PaletteExtensionManager.ts",
+          "kind": "import-statement",
+          "original": "@/utils/core/PaletteExtensionManager"
+        },
+        {
+          "path": "src-js/utils/core/Year3000Utilities.ts",
+          "kind": "import-statement",
+          "original": "@/utils/core/Year3000Utilities"
+        },
+        {
+          "path": "src-js/utils/spicetify/SemanticColorManager.ts",
+          "kind": "import-statement",
+          "original": "@/utils/spicetify/SemanticColorManager"
+        },
+        {
+          "path": "src-js/visual/base/BaseVisualSystem.ts",
+          "kind": "import-statement",
+          "original": "@/visual/base/BaseVisualSystem"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/ui/managers/GlassmorphismManager.ts": {
+      "bytes": 8501,
+      "imports": [
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "src-js/config/settingKeys.ts",
+          "kind": "import-statement",
+          "original": "@/config/settingKeys"
+        },
+        {
+          "path": "@/core/performance/CSSVariableBatcher",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/utils/core/Year3000Utilities.ts",
+          "kind": "import-statement",
+          "original": "@/utils/core/Year3000Utilities"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/ui/managers/Card3DManager.ts": {
+      "bytes": 7877,
+      "imports": [
+        {
+          "path": "src-js/config/settingKeys.ts",
+          "kind": "import-statement",
+          "original": "@/config/settingKeys"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/SidebarDimensionalNexusSystem.ts": {
+      "bytes": 26145,
+      "imports": [
+        {
+          "path": "src-js/core/base/UnifiedSystemBase.ts",
+          "kind": "import-statement",
+          "original": "@/core/base/UnifiedSystemBase"
+        },
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/SidebarInteractiveFlowSystem.ts": {
+      "bytes": 27753,
+      "imports": [
+        {
+          "path": "src-js/core/base/UnifiedSystemBase.ts",
+          "kind": "import-statement",
+          "original": "@/core/base/UnifiedSystemBase"
+        },
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/performance/PerformanceBudgetManager.ts": {
+      "bytes": 8511,
+      "imports": [
+        {
+          "path": "./PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "./CSSVariableBatcher",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/SidebarPerformanceCoordinator.ts": {
+      "bytes": 19943,
+      "imports": [
+        {
+          "path": "src-js/core/performance/CSSVariableBatcher.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/CSSVariableBatcher"
+        },
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/core/performance/PerformanceBudgetManager.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/PerformanceBudgetManager"
+        },
+        {
+          "path": "src-js/debug/SpotifyDOMSelectors.ts",
+          "kind": "import-statement",
+          "original": "@/debug/SpotifyDOMSelectors"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/RightSidebarConsciousnessEnhanced.ts": {
+      "bytes": 13867,
+      "imports": [
+        {
+          "path": "src-js/core/base/UnifiedSystemBase.ts",
+          "kind": "import-statement",
+          "original": "@/core/base/UnifiedSystemBase"
+        },
+        {
+          "path": "src-js/visual/ui-effects/SidebarPerformanceCoordinator.ts",
+          "kind": "import-statement",
+          "original": "./SidebarPerformanceCoordinator"
+        },
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/integration/SidebarSystemsIntegration.ts": {
+      "bytes": 29623,
+      "imports": [
+        {
+          "path": "src-js/core/base/UnifiedSystemBase.ts",
+          "kind": "import-statement",
+          "original": "@/core/base/UnifiedSystemBase"
+        },
+        {
+          "path": "src-js/visual/ui-effects/SidebarDimensionalNexusSystem.ts",
+          "kind": "import-statement",
+          "original": "@/visual/ui-effects/SidebarDimensionalNexusSystem"
+        },
+        {
+          "path": "src-js/visual/ui-effects/SidebarInteractiveFlowSystem.ts",
+          "kind": "import-statement",
+          "original": "@/visual/ui-effects/SidebarInteractiveFlowSystem"
+        },
+        {
+          "path": "src-js/visual/ui-effects/RightSidebarConsciousnessEnhanced.ts",
+          "kind": "import-statement",
+          "original": "@/visual/ui-effects/RightSidebarConsciousnessEnhanced"
+        },
+        {
+          "path": "src-js/visual/ui-effects/SidebarPerformanceCoordinator.ts",
+          "kind": "import-statement",
+          "original": "@/visual/ui-effects/SidebarPerformanceCoordinator"
+        },
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/migration/SystemMigrationHelper.ts": {
+      "bytes": 10739,
+      "imports": [
+        {
+          "path": "src-js/core/base/UnifiedSystemBase.ts",
+          "kind": "import-statement",
+          "original": "@/core/base/UnifiedSystemBase"
+        },
+        {
+          "path": "@/visual/base/BaseVisualSystem",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/registry/UnifiedSystemRegistry.ts": {
+      "bytes": 12384,
+      "imports": [
+        {
+          "path": "@/core/base/UnifiedSystemBase",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/core/migration/SystemMigrationHelper.ts",
+          "kind": "import-statement",
+          "original": "@/core/migration/SystemMigrationHelper"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/RightSidebarConsciousnessSystemUnified.ts": {
+      "bytes": 8526,
+      "imports": [
+        {
+          "path": "src-js/core/base/UnifiedSystemBase.ts",
+          "kind": "import-statement",
+          "original": "@/core/base/UnifiedSystemBase"
+        },
+        {
+          "path": "src-js/visual/ui-effects/SidebarPerformanceCoordinator.ts",
+          "kind": "import-statement",
+          "original": "./SidebarPerformanceCoordinator"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/integration/UnifiedSystemIntegration.ts": {
+      "bytes": 12291,
+      "imports": [
+        {
+          "path": "@/core/lifecycle/year3000System",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/core/registry/UnifiedSystemRegistry.ts",
+          "kind": "import-statement",
+          "original": "@/core/registry/UnifiedSystemRegistry"
+        },
+        {
+          "path": "@/core/base/UnifiedSystemBase",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/migration/SystemMigrationHelper",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/visual/ui-effects/RightSidebarConsciousnessSystemUnified.ts",
+          "kind": "import-statement",
+          "original": "@/visual/ui-effects/RightSidebarConsciousnessSystemUnified"
+        },
+        {
+          "path": "src-js/visual/organic-consciousness/OrganicBeatSyncConsciousness.ts",
+          "kind": "import-statement",
+          "original": "@/visual/organic-consciousness/OrganicBeatSyncConsciousness"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/types/systemCreationStrategy.ts": {
+      "bytes": 13457,
+      "imports": [
+        {
+          "path": "@/utils/core/Year3000Utilities",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/creation/SystemCreationStrategies.ts": {
+      "bytes": 22002,
+      "imports": [
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "src-js/debug/UnifiedDebugManager.ts",
+          "kind": "import-statement",
+          "original": "@/debug/UnifiedDebugManager"
+        },
+        {
+          "path": "src-js/types/systemCreationStrategy.ts",
+          "kind": "import-statement",
+          "original": "@/types/systemCreationStrategy"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/creation/StrategyBasedFactory.ts": {
+      "bytes": 13288,
+      "imports": [
+        {
+          "path": "src-js/debug/UnifiedDebugManager.ts",
+          "kind": "import-statement",
+          "original": "@/debug/UnifiedDebugManager"
+        },
+        {
+          "path": "src-js/core/creation/SystemCreationStrategies.ts",
+          "kind": "import-statement",
+          "original": "./SystemCreationStrategies"
+        },
+        {
+          "path": "src-js/types/systemCreationStrategy.ts",
+          "kind": "import-statement",
+          "original": "@/types/systemCreationStrategy"
+        },
+        {
+          "path": "@/utils/core/Year3000Utilities",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/integration/FacadeAdapter.ts": {
+      "bytes": 11301,
+      "imports": [
+        {
+          "path": "src-js/debug/UnifiedDebugManager.ts",
+          "kind": "import-statement",
+          "original": "@/debug/UnifiedDebugManager"
+        },
+        {
+          "path": "src-js/core/creation/StrategyBasedFactory.ts",
+          "kind": "import-statement",
+          "original": "@/core/creation/StrategyBasedFactory"
+        },
+        {
+          "path": "@/utils/core/Year3000Utilities",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/integration/NonVisualSystemFacade.ts": {
+      "bytes": 28917,
+      "imports": [
+        {
+          "path": "src-js/debug/UnifiedDebugManager.ts",
+          "kind": "import-statement",
+          "original": "@/debug/UnifiedDebugManager"
+        },
+        {
+          "path": "@/utils/core/Year3000Utilities",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/core/animation/EnhancedMasterAnimationCoordinator.ts",
+          "kind": "import-statement",
+          "original": "@/core/animation/EnhancedMasterAnimationCoordinator"
+        },
+        {
+          "path": "src-js/core/performance/TimerConsolidationSystem.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/TimerConsolidationSystem"
+        },
+        {
+          "path": "src-js/core/performance/CSSVariableBatcher.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/CSSVariableBatcher"
+        },
+        {
+          "path": "src-js/core/css/UnifiedCSSVariableManager.ts",
+          "kind": "import-statement",
+          "original": "@/core/css/UnifiedCSSVariableManager"
+        },
+        {
+          "path": "src-js/core/performance/UnifiedPerformanceCoordinator.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/UnifiedPerformanceCoordinator"
+        },
+        {
+          "path": "src-js/core/performance/DeviceCapabilityDetector.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/DeviceCapabilityDetector"
+        },
+        {
+          "path": "src-js/core/performance/PerformanceAnalyzer.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/PerformanceAnalyzer"
+        },
+        {
+          "path": "src-js/core/performance/PerformanceOptimizationManager.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/PerformanceOptimizationManager"
+        },
+        {
+          "path": "src-js/core/css/PerformanceCSSIntegration.ts",
+          "kind": "import-statement",
+          "original": "@/core/css/PerformanceCSSIntegration"
+        },
+        {
+          "path": "src-js/debug/UnifiedDebugManager.ts",
+          "kind": "import-statement",
+          "original": "@/debug/UnifiedDebugManager"
+        },
+        {
+          "path": "src-js/ui/managers/SettingsManager.ts",
+          "kind": "import-statement",
+          "original": "@/ui/managers/SettingsManager"
+        },
+        {
+          "path": "src-js/audio/ColorHarmonyEngine.ts",
+          "kind": "import-statement",
+          "original": "@/audio/ColorHarmonyEngine"
+        },
+        {
+          "path": "src-js/audio/MusicSyncService.ts",
+          "kind": "import-statement",
+          "original": "@/audio/MusicSyncService"
+        },
+        {
+          "path": "src-js/ui/managers/GlassmorphismManager.ts",
+          "kind": "import-statement",
+          "original": "@/ui/managers/GlassmorphismManager"
+        },
+        {
+          "path": "src-js/ui/managers/Card3DManager.ts",
+          "kind": "import-statement",
+          "original": "@/ui/managers/Card3DManager"
+        },
+        {
+          "path": "src-js/core/integration/SidebarSystemsIntegration.ts",
+          "kind": "import-statement",
+          "original": "@/core/integration/SidebarSystemsIntegration"
+        },
+        {
+          "path": "src-js/core/integration/UnifiedSystemIntegration.ts",
+          "kind": "import-statement",
+          "original": "@/core/integration/UnifiedSystemIntegration"
+        },
+        {
+          "path": "src-js/core/integration/FacadeAdapter.ts",
+          "kind": "import-statement",
+          "original": "@/core/integration/FacadeAdapter"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/integration/SystemCoordinator.ts": {
+      "bytes": 25126,
+      "imports": [
+        {
+          "path": "src-js/debug/UnifiedDebugManager.ts",
+          "kind": "import-statement",
+          "original": "@/debug/UnifiedDebugManager"
+        },
+        {
+          "path": "src-js/visual/integration/VisualSystemFacade.ts",
+          "kind": "import-statement",
+          "original": "@/visual/integration/VisualSystemFacade"
+        },
+        {
+          "path": "src-js/core/integration/NonVisualSystemFacade.ts",
+          "kind": "import-statement",
+          "original": "@/core/integration/NonVisualSystemFacade"
+        },
+        {
+          "path": "src-js/core/performance/CSSVariableBatcher.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/CSSVariableBatcher"
+        },
+        {
+          "path": "src-js/core/performance/PerformanceAnalyzer.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/PerformanceAnalyzer"
+        },
+        {
+          "path": "src-js/audio/MusicSyncService.ts",
+          "kind": "import-statement",
+          "original": "@/audio/MusicSyncService"
+        },
+        {
+          "path": "src-js/ui/managers/SettingsManager.ts",
+          "kind": "import-statement",
+          "original": "@/ui/managers/SettingsManager"
+        },
+        {
+          "path": "src-js/audio/ColorHarmonyEngine.ts",
+          "kind": "import-statement",
+          "original": "@/audio/ColorHarmonyEngine"
+        },
+        {
+          "path": "@/utils/core/Year3000Utilities",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/dom/NowPlayingDomWatcher.ts": {
+      "bytes": 1226,
+      "imports": [
+        {
+          "path": "src-js/debug/SpotifyDOMSelectors.ts",
+          "kind": "import-statement",
+          "original": "@/debug/SpotifyDOMSelectors"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/base/starryNightEffects.ts": {
+      "bytes": 3241,
+      "imports": [
+        {
+          "path": "src-js/ui/managers/SettingsManager.ts",
+          "kind": "import-statement",
+          "original": "@/ui/managers/SettingsManager"
+        },
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/lifecycle/year3000System.ts": {
+      "bytes": 84155,
+      "imports": [
+        {
+          "path": "src-js/core/integration/SystemCoordinator.ts",
+          "kind": "import-statement",
+          "original": "@/core/integration/SystemCoordinator"
+        },
+        {
+          "path": "@/visual/integration/VisualSystemFacade",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/integration/NonVisualSystemFacade",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/visual/integration/ColorOrchestrator.ts",
+          "kind": "import-statement",
+          "original": "@/visual/integration/ColorOrchestrator"
+        },
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "src-js/utils/core/Year3000Utilities.ts",
+          "kind": "import-statement",
+          "original": "@/utils/core/Year3000Utilities"
+        },
+        {
+          "path": "src-js/utils/dom/NowPlayingDomWatcher.ts",
+          "kind": "import-statement",
+          "original": "@/utils/dom/NowPlayingDomWatcher"
+        },
+        {
+          "path": "src-js/visual/base/starryNightEffects.ts",
+          "kind": "import-statement",
+          "original": "@/visual/base/starryNightEffects"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/Aberration/AberrationCanvas.ts": {
+      "bytes": 11471,
+      "imports": [
+        {
+          "path": "@/core/lifecycle/year3000System",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/Aberration/AberrationVisualSystem.ts": {
+      "bytes": 3010,
+      "imports": [
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/visual/ui-effects/Aberration/AberrationCanvas",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/dom/getScrollNode.ts": {
+      "bytes": 677,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/Aberration/AberrationManager.ts": {
+      "bytes": 4814,
+      "imports": [
+        {
+          "path": "@/core/lifecycle/year3000System",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/visual/ui-effects/Aberration/AberrationCanvas.ts",
+          "kind": "import-statement",
+          "original": "./AberrationCanvas"
+        },
+        {
+          "path": "src-js/visual/ui-effects/Aberration/AberrationVisualSystem.ts",
+          "kind": "import-statement",
+          "original": "./AberrationVisualSystem"
+        },
+        {
+          "path": "src-js/utils/dom/getScrollNode.ts",
+          "kind": "import-statement",
+          "original": "@/utils/dom/getScrollNode"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/platform/UserHistory.ts": {
+      "bytes": 1316,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/AudioVisualController.ts": {
+      "bytes": 12550,
+      "imports": [
+        {
+          "path": "src-js/config/settingKeys.ts",
+          "kind": "import-statement",
+          "original": "@/config/settingKeys"
+        },
+        {
+          "path": "src-js/core/performance/CSSVariableBatcher.ts",
+          "kind": "import-statement",
+          "original": "@/core/performance/CSSVariableBatcher"
+        },
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/lifecycle/year3000System",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/utils/platform/UserHistory.ts",
+          "kind": "import-statement",
+          "original": "@/utils/platform/UserHistory"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/platform/spicetifyReady.ts": {
+      "bytes": 749,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/prismaticScrollSheen.ts": {
+      "bytes": 3166,
+      "imports": [
+        {
+          "path": "src-js/core/lifecycle/year3000System.ts",
+          "kind": "import-statement",
+          "original": "@/core/lifecycle/year3000System"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/debug/DragCartographer.ts": {
+      "bytes": 4319,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/graphics/CanvasGhostBuilder.ts": {
+      "bytes": 3535,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/ui/interactions/EnhancedDragPreview.ts": {
+      "bytes": 4756,
+      "imports": [
+        {
+          "path": "src-js/utils/graphics/CanvasGhostBuilder.ts",
+          "kind": "import-statement",
+          "original": "@/utils/graphics/CanvasGhostBuilder"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/animation/flipSpring.ts": {
+      "bytes": 2243,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/utils/dom/sidebarDetector.ts": {
+      "bytes": 1415,
+      "imports": [
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/ui/interactions/SidebarCloneOverlay.ts": {
+      "bytes": 8737,
+      "imports": [
+        {
+          "path": "src-js/utils/animation/flipSpring.ts",
+          "kind": "import-statement",
+          "original": "@/utils/animation/flipSpring"
+        },
+        {
+          "path": "src-js/utils/dom/sidebarDetector.ts",
+          "kind": "import-statement",
+          "original": "@/utils/dom/sidebarDetector"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/ui/interactions/QuickAddRadialMenu.ts": {
+      "bytes": 9696,
+      "imports": [
+        {
+          "path": "src-js/utils/animation/flipSpring.ts",
+          "kind": "import-statement",
+          "original": "@/utils/animation/flipSpring"
+        },
+        {
+          "path": "src-js/utils/dom/sidebarDetector.ts",
+          "kind": "import-statement",
+          "original": "@/utils/dom/sidebarDetector"
+        },
+        {
+          "path": "src-js/ui/interactions/SidebarCloneOverlay.ts",
+          "kind": "dynamic-import",
+          "original": "./SidebarCloneOverlay"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/ui/components/SettingsSection.tsx": {
+      "bytes": 8698,
+      "imports": [
+        {
+          "path": "react",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "react-dom",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "./settings-field",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/ui/components/StarryNightSettings.ts": {
+      "bytes": 14907,
+      "imports": [
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "@/config/globalConfig"
+        },
+        {
+          "path": "src-js/ui/components/SettingsSection.tsx",
+          "kind": "import-statement",
+          "original": "@/ui/components/SettingsSection"
+        },
+        {
+          "path": "src-js/ui/managers/SettingsManager.ts",
+          "kind": "import-statement",
+          "original": "@/ui/managers/SettingsManager"
+        },
+        {
+          "path": "src-js/visual/base/starryNightEffects.ts",
+          "kind": "import-statement",
+          "original": "@/visual/base/starryNightEffects"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/visual/ui-effects/RightSidebarConsciousnessSystem.ts": {
+      "bytes": 6857,
+      "imports": [
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "@/core/performance/PerformanceAnalyzer",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/core/lifecycle/year3000System",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/ui/managers/SettingsManager",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/audio/MusicSyncService",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@/utils/core/Year3000Utilities",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src-js/visual/base/BaseVisualSystem.ts",
+          "kind": "import-statement",
+          "original": "../base/BaseVisualSystem"
+        },
+        {
+          "path": "src-js/visual/ui-effects/SidebarPerformanceCoordinator.ts",
+          "kind": "import-statement",
+          "original": "./SidebarPerformanceCoordinator"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/core/performance/CDFVariableBridge.ts": {
+      "bytes": 3248,
+      "imports": [
+        {
+          "path": "src-js/core/events/EventBus.ts",
+          "kind": "import-statement",
+          "original": "@/core/events/EventBus"
+        },
+        {
+          "path": "@/core/performance/CSSVariableBatcher",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src-js/theme.entry.ts": {
+      "bytes": 10140,
+      "imports": [
+        {
+          "path": "src-js/config/globalConfig.ts",
+          "kind": "import-statement",
+          "original": "./config/globalConfig"
+        },
+        {
+          "path": "src-js/core/lifecycle/year3000System.ts",
+          "kind": "import-statement",
+          "original": "./core/lifecycle/year3000System"
+        },
+        {
+          "path": "src-js/debug/UnifiedDebugManager.ts",
+          "kind": "import-statement",
+          "original": "./debug/UnifiedDebugManager"
+        },
+        {
+          "path": "src-js/visual/ui-effects/Aberration/AberrationManager.ts",
+          "kind": "import-statement",
+          "original": "./visual/ui-effects/Aberration/AberrationManager"
+        },
+        {
+          "path": "src-js/visual/ui-effects/AudioVisualController.ts",
+          "kind": "import-statement",
+          "original": "./visual/ui-effects/AudioVisualController"
+        },
+        {
+          "path": "src-js/utils/platform/spicetifyReady.ts",
+          "kind": "import-statement",
+          "original": "./utils/platform/spicetifyReady"
+        },
+        {
+          "path": "src-js/utils/core/Year3000Utilities.ts",
+          "kind": "import-statement",
+          "original": "./utils/core/Year3000Utilities"
+        },
+        {
+          "path": "src-js/visual/ui-effects/prismaticScrollSheen.ts",
+          "kind": "dynamic-import",
+          "original": "./visual/ui-effects/prismaticScrollSheen"
+        },
+        {
+          "path": "src-js/debug/DragCartographer.ts",
+          "kind": "dynamic-import",
+          "original": "./debug/DragCartographer"
+        },
+        {
+          "path": "src-js/ui/interactions/EnhancedDragPreview.ts",
+          "kind": "dynamic-import",
+          "original": "./ui/interactions/EnhancedDragPreview"
+        },
+        {
+          "path": "src-js/ui/interactions/QuickAddRadialMenu.ts",
+          "kind": "dynamic-import",
+          "original": "./ui/interactions/QuickAddRadialMenu"
+        },
+        {
+          "path": "src-js/ui/components/StarryNightSettings.ts",
+          "kind": "dynamic-import",
+          "original": "./ui/components/StarryNightSettings"
+        },
+        {
+          "path": "src-js/visual/ui-effects/RightSidebarConsciousnessSystem.ts",
+          "kind": "dynamic-import",
+          "original": "./visual/ui-effects/RightSidebarConsciousnessSystem"
+        },
+        {
+          "path": "src-js/visual/ui-effects/SidebarPerformanceCoordinator.ts",
+          "kind": "dynamic-import",
+          "original": "./visual/ui-effects/SidebarPerformanceCoordinator"
+        },
+        {
+          "path": "src-js/core/performance/CDFVariableBridge.ts",
+          "kind": "dynamic-import",
+          "original": "./core/performance/CDFVariableBridge"
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    }
+  },
+  "outputs": {
+    "theme.js": {
+      "imports": [
+        {
+          "path": "react",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "react-dom",
+          "kind": "require-call",
+          "external": true
+        }
+      ],
+      "exports": [],
+      "entryPoint": "src-js/theme.entry.ts",
+      "inputs": {
+        "src-js/utils/platform/StorageManager.ts": {
+          "bytesInOutput": 12588
+        },
+        "src-js/config/globalConfig.ts": {
+          "bytesInOutput": 24378
+        },
+        "src-js/debug/UnifiedDebugManager.ts": {
+          "bytesInOutput": 16985
+        },
+        "src-js/core/performance/DeviceCapabilityDetector.ts": {
+          "bytesInOutput": 11311
+        },
+        "src-js/utils/graphics/VisualCanvasFactory.ts": {
+          "bytesInOutput": 3295
+        },
+        "src-js/utils/core/Year3000Utilities.ts": {
+          "bytesInOutput": 18241
+        },
+        "src-js/utils/animation/visualPerformance.ts": {
+          "bytesInOutput": 1037
+        },
+        "src-js/visual/base/BaseVisualSystem.ts": {
+          "bytesInOutput": 16956
+        },
+        "src-js/visual/backgrounds/LightweightParticleSystem.ts": {
+          "bytesInOutput": 6566
+        },
+        "src-js/core/performance/PerformanceAnalyzer.ts": {
+          "bytesInOutput": 19961
+        },
+        "src-js/visual/backgrounds/ParticleFieldSystem.ts": {
+          "bytesInOutput": 7876
+        },
+        "src-js/core/performance/CSSVariableBatcher.ts": {
+          "bytesInOutput": 24051
+        },
+        "src-js/utils/graphics/ShaderLoader.ts": {
+          "bytesInOutput": 6784
+        },
+        "src-js/visual/backgrounds/WebGLGradientBackgroundSystem.ts": {
+          "bytesInOutput": 28008
+        },
+        "src-js/core/events/EventBus.ts": {
+          "bytesInOutput": 2479
+        },
+        "src-js/core/animation/EnhancedMasterAnimationCoordinator.ts": {
+          "bytesInOutput": 19870
+        },
+        "src-js/core/css/UnifiedVariableGroups.ts": {
+          "bytesInOutput": 31611
+        },
+        "src-js/core/css/UnifiedCSSVariableManager.ts": {
+          "bytesInOutput": 21343
+        },
+        "src-js/core/performance/UnifiedPerformanceCoordinator.ts": {
+          "bytesInOutput": 20110
+        },
+        "src-js/core/base/UnifiedSystemBase.ts": {
+          "bytesInOutput": 13614
+        },
+        "src-js/visual/organic-consciousness/OrganicBeatSyncConsciousness.ts": {
+          "bytesInOutput": 23538
+        },
+        "src-js/utils/dom/domCache.ts": {
+          "bytesInOutput": 1182
+        },
+        "src-js/debug/SpotifyDOMSelectors.ts": {
+          "bytesInOutput": 11056
+        },
+        "src-js/visual/ui-effects/BehavioralPredictionEngine.ts": {
+          "bytesInOutput": 23635
+        },
+        "src-js/visual/ui-effects/InteractionTrackingSystem.ts": {
+          "bytesInOutput": 16928
+        },
+        "src-js/ui/managers/SettingsManager.ts": {
+          "bytesInOutput": 9677
+        },
+        "src-js/utils/platform/SpicetifyCompat.ts": {
+          "bytesInOutput": 2100
+        },
+        "src-js/audio/GenreProfileManager.ts": {
+          "bytesInOutput": 3864
+        },
+        "src-js/audio/MusicSyncService.ts": {
+          "bytesInOutput": 38833
+        },
+        "src-js/utils/graphics/NoiseField.ts": {
+          "bytesInOutput": 1401
+        },
+        "src-js/visual/ui-effects/PredictiveMaterializationSystem.ts": {
+          "bytesInOutput": 14276
+        },
+        "src-js/visual/ui-effects/SpotifyUIApplicationSystem.ts": {
+          "bytesInOutput": 22477
+        },
+        "src-js/types/signature.ts": {
+          "bytesInOutput": 683
+        },
+        "node_modules/idb/build/index.js": {
+          "bytesInOutput": 9535
+        },
+        "src-js/audio/TemporalMemoryService.ts": {
+          "bytesInOutput": 3883
+        },
+        "src-js/core/animation/EmergentChoreographyEngine.ts": {
+          "bytesInOutput": 6702
+        },
+        "src-js/core/performance/AdaptivePerformanceSystem.ts": {
+          "bytesInOutput": 23030
+        },
+        "src-js/visual/integration/VisualSystemFacade.ts": {
+          "bytesInOutput": 22283
+        },
+        "src-js/core/performance/TimerConsolidationSystem.ts": {
+          "bytesInOutput": 6610
+        },
+        "src-js/core/performance/PerformanceOptimizationManager.ts": {
+          "bytesInOutput": 18375
+        },
+        "src-js/core/css/PerformanceCSSIntegration.ts": {
+          "bytesInOutput": 11750
+        },
+        "src-js/config/settingKeys.ts": {
+          "bytesInOutput": 557
+        },
+        "src-js/visual/integration/ColorOrchestrator.ts": {
+          "bytesInOutput": 11458
+        },
+        "src-js/utils/core/PaletteExtensionManager.ts": {
+          "bytesInOutput": 12145
+        },
+        "src-js/utils/spicetify/SemanticColorManager.ts": {
+          "bytesInOutput": 8501
+        },
+        "src-js/audio/ColorHarmonyEngine.ts": {
+          "bytesInOutput": 54672
+        },
+        "src-js/ui/managers/GlassmorphismManager.ts": {
+          "bytesInOutput": 8388
+        },
+        "src-js/ui/managers/Card3DManager.ts": {
+          "bytesInOutput": 6646
+        },
+        "src-js/visual/ui-effects/SidebarDimensionalNexusSystem.ts": {
+          "bytesInOutput": 22259
+        },
+        "src-js/visual/ui-effects/SidebarInteractiveFlowSystem.ts": {
+          "bytesInOutput": 23704
+        },
+        "src-js/core/performance/PerformanceBudgetManager.ts": {
+          "bytesInOutput": 7468
+        },
+        "src-js/visual/ui-effects/SidebarPerformanceCoordinator.ts": {
+          "bytesInOutput": 18542
+        },
+        "src-js/visual/ui-effects/RightSidebarConsciousnessEnhanced.ts": {
+          "bytesInOutput": 11676
+        },
+        "src-js/core/integration/SidebarSystemsIntegration.ts": {
+          "bytesInOutput": 25766
+        },
+        "src-js/core/migration/SystemMigrationHelper.ts": {
+          "bytesInOutput": 9654
+        },
+        "src-js/core/registry/UnifiedSystemRegistry.ts": {
+          "bytesInOutput": 12217
+        },
+        "src-js/visual/ui-effects/RightSidebarConsciousnessSystemUnified.ts": {
+          "bytesInOutput": 7486
+        },
+        "src-js/core/integration/UnifiedSystemIntegration.ts": {
+          "bytesInOutput": 11229
+        },
+        "src-js/types/systemCreationStrategy.ts": {
+          "bytesInOutput": 1862
+        },
+        "src-js/core/creation/SystemCreationStrategies.ts": {
+          "bytesInOutput": 19450
+        },
+        "src-js/core/creation/StrategyBasedFactory.ts": {
+          "bytesInOutput": 12170
+        },
+        "src-js/core/integration/FacadeAdapter.ts": {
+          "bytesInOutput": 9442
+        },
+        "src-js/core/integration/NonVisualSystemFacade.ts": {
+          "bytesInOutput": 23090
+        },
+        "src-js/core/integration/SystemCoordinator.ts": {
+          "bytesInOutput": 20320
+        },
+        "src-js/utils/dom/NowPlayingDomWatcher.ts": {
+          "bytesInOutput": 1120
+        },
+        "src-js/visual/base/starryNightEffects.ts": {
+          "bytesInOutput": 1980
+        },
+        "src-js/core/lifecycle/year3000System.ts": {
+          "bytesInOutput": 62793
+        },
+        "src-js/visual/ui-effects/prismaticScrollSheen.ts": {
+          "bytesInOutput": 2051
+        },
+        "src-js/debug/DragCartographer.ts": {
+          "bytesInOutput": 3607
+        },
+        "src-js/utils/graphics/CanvasGhostBuilder.ts": {
+          "bytesInOutput": 2167
+        },
+        "src-js/ui/interactions/EnhancedDragPreview.ts": {
+          "bytesInOutput": 3567
+        },
+        "src-js/utils/animation/flipSpring.ts": {
+          "bytesInOutput": 1212
+        },
+        "src-js/utils/dom/sidebarDetector.ts": {
+          "bytesInOutput": 758
+        },
+        "src-js/ui/interactions/SidebarCloneOverlay.ts": {
+          "bytesInOutput": 6666
+        },
+        "src-js/ui/interactions/QuickAddRadialMenu.ts": {
+          "bytesInOutput": 9293
+        },
+        "src-js/ui/components/SettingsSection.tsx": {
+          "bytesInOutput": 9524
+        },
+        "src-js/ui/components/StarryNightSettings.ts": {
+          "bytesInOutput": 13040
+        },
+        "src-js/visual/ui-effects/RightSidebarConsciousnessSystem.ts": {
+          "bytesInOutput": 5536
+        },
+        "src-js/core/performance/CDFVariableBridge.ts": {
+          "bytesInOutput": 2674
+        },
+        "src-js/theme.entry.ts": {
+          "bytesInOutput": 8064
+        },
+        "src-js/visual/ui-effects/Aberration/AberrationCanvas.ts": {
+          "bytesInOutput": 7396
+        },
+        "src-js/visual/ui-effects/Aberration/AberrationVisualSystem.ts": {
+          "bytesInOutput": 1834
+        },
+        "src-js/utils/dom/getScrollNode.ts": {
+          "bytesInOutput": 384
+        },
+        "src-js/visual/ui-effects/Aberration/AberrationManager.ts": {
+          "bytesInOutput": 3161
+        },
+        "src-js/visual/ui-effects/AudioVisualController.ts": {
+          "bytesInOutput": 8471
+        },
+        "src-js/utils/platform/UserHistory.ts": {
+          "bytesInOutput": 794
+        },
+        "src-js/utils/platform/spicetifyReady.ts": {
+          "bytesInOutput": 437
+        }
+      },
+      "bytes": 1080628
+    }
+  }
+}

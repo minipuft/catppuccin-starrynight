@@ -1,0 +1,798 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// STAR WARS ORGANICS - Technological Consciousness Integration
+// ████████████████████████████████████████████████████████████████████████████████
+
+// === ORGANIC-TECH FUSION FOUNDATION ===
+// Inspired by Star Wars' blend of organic and technological elements:
+// • Holographic displays with organic flow
+// • Bioluminescent technology interfaces
+// • Crystalline structures with living properties
+// • Energy fields that feel both ancient and futuristic
+
+// Holographic display system
+.organic-holographic-display {
+  // Core holographic properties
+  position: relative;
+  contain: layout style paint;
+  
+  // Holographic base enhancement
+  background: linear-gradient(
+    135deg,
+    rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 3)) 0%,
+    rgba(var(--organic-primary-rgb, 205, 214, 244), calc(var(--organic-shimmer-opacity, 0.05) * 2)) 50%,
+    rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * 3)) 100%
+  );
+  
+  // Holographic filter effects
+  filter: 
+    saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.3))
+    brightness(calc(1.0 + var(--organic-warmth, 0.8) * 0.15))
+    hue-rotate(calc(var(--organic-symbiotic-resonance, 0.7) * 10deg));
+  
+  // Holographic breathing
+  animation: organic-holographic-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+  
+  // Performance optimization
+  will-change: filter, background;
+  transform: translateZ(0);
+  backdrop-filter: blur(1px);
+  
+  // Holographic scanlines
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    // Scanline pattern
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 2)) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+    
+    // Scanline animation
+    animation: organic-holographic-scanlines 2s linear infinite;
+    
+    // Performance optimization
+    pointer-events: none;
+    z-index: var(--organic-depth-near, 1);
+    will-change: opacity, background-position;
+    contain: strict;
+    mix-blend-mode: screen;
+    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.3);
+  }
+  
+  // Holographic shimmer effect
+  &::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    
+    // Shimmer gradient
+    background: linear-gradient(
+      45deg,
+      transparent 0%,
+      rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 4)) 25%,
+      rgba(255, 255, 255, calc(var(--organic-shimmer-opacity, 0.05) * 6)) 50%,
+      rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 4)) 75%,
+      transparent 100%
+    );
+    
+    // Shimmer animation
+    animation: organic-holographic-shimmer calc(var(--organic-breathing-cycle, 1s) * 3) ease-in-out infinite;
+    
+    pointer-events: none;
+    z-index: var(--organic-depth-far, 3);
+    will-change: transform, opacity;
+    contain: strict;
+    border-radius: inherit;
+  }
+  
+  // Holographic quality levels
+  &[data-holo-quality="low"] {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.1))
+      brightness(0.9)
+      blur(0.5px);
+    
+    &::before {
+      opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.1);
+    }
+  }
+  
+  &[data-holo-quality="medium"] {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.2))
+      brightness(1.0);
+  }
+  
+  &[data-holo-quality="high"] {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.4))
+      brightness(calc(1.0 + var(--organic-warmth, 0.8) * 0.2))
+      hue-rotate(calc(var(--organic-symbiotic-resonance, 0.7) * 15deg));
+    
+    &::before {
+      opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.5);
+    }
+    
+    // Enhanced outer glow for high quality
+    box-shadow: 
+      0 0 10px rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-glow-opacity, 0.1) * 2)),
+      0 0 20px rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-glow-opacity, 0.1) * 1));
+  }
+}
+
+// Bioluminescent technology system
+.organic-bioluminescent-tech {
+  // Core bioluminescent properties
+  position: relative;
+  
+  // Organic bio-glow enhancement
+  filter: 
+    saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.5))
+    brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.3));
+  
+  // Bio-luminescent base glow
+  background: radial-gradient(
+    ellipse at center,
+    rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 4)) 0%,
+    rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * 2)) 40%,
+    rgba(var(--organic-primary-rgb, 205, 214, 244), calc(var(--organic-shimmer-opacity, 0.05) * 1)) 70%,
+    transparent 90%
+  );
+  
+  // Bio-luminescent breathing
+  animation: organic-bioluminescent-pulse var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+  
+  // Performance optimization
+  will-change: filter, background;
+  transform: translateZ(0);
+  
+  // Bio-circuit pattern overlay
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    // Organic circuit pattern
+    background: 
+      radial-gradient(circle at 25% 25%, rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 2)) 1px, transparent 2px),
+      radial-gradient(circle at 75% 25%, rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * 2)) 1px, transparent 2px),
+      radial-gradient(circle at 25% 75%, rgba(var(--organic-primary-rgb, 205, 214, 244), calc(var(--organic-shimmer-opacity, 0.05) * 2)) 1px, transparent 2px),
+      radial-gradient(circle at 75% 75%, rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 2)) 1px, transparent 2px),
+      // Connecting lines
+      linear-gradient(45deg, transparent 0%, rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 1)) 48%, transparent 52%),
+      linear-gradient(-45deg, transparent 0%, rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * 1)) 48%, transparent 52%);
+    
+    background-size: 60px 60px, 60px 60px, 60px 60px, 60px 60px, 120px 120px, 120px 120px;
+    
+    // Bio-circuit energy flow
+    animation: organic-bio-circuit-flow calc(var(--organic-breathing-cycle, 1s) * 2) linear infinite;
+    
+    // Performance optimization
+    pointer-events: none;
+    z-index: var(--organic-depth-mid, 2);
+    will-change: background-position, opacity;
+    contain: strict;
+    mix-blend-mode: screen;
+    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.6);
+  }
+  
+  // Energy pulse nodes
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    // Energy node pattern
+    background: 
+      radial-gradient(circle at 33% 33%, rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-glow-opacity, 0.1) * 3)) 2px, transparent 4px),
+      radial-gradient(circle at 66% 66%, rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-glow-opacity, 0.1) * 3)) 2px, transparent 4px);
+    
+    background-size: 90px 90px, 90px 90px;
+    
+    // Energy node pulsing
+    animation: organic-energy-nodes calc(var(--organic-breathing-cycle, 1s) * 1.5) ease-in-out infinite;
+    
+    pointer-events: none;
+    z-index: var(--organic-depth-far, 3);
+    will-change: opacity, transform;
+    contain: strict;
+  }
+  
+  // Bio-luminescent intensity levels
+  &[data-bio-intensity="dormant"] {
+    --bio-multiplier: 0.2;
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.1))
+      brightness(0.7);
+  }
+  
+  &[data-bio-intensity="active"] {
+    --bio-multiplier: 0.8;
+  }
+  
+  &[data-bio-intensity="energized"] {
+    --bio-multiplier: 1.5;
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.7))
+      brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.5))
+      hue-rotate(calc(var(--bio-multiplier, 1.5) * 20deg));
+  }
+}
+
+// Crystalline consciousness system
+.organic-crystalline-consciousness {
+  // Core crystalline properties
+  position: relative;
+  
+  // Crystalline enhancement
+  background: linear-gradient(
+    60deg,
+    rgba(var(--organic-primary-rgb, 205, 214, 244), calc(var(--organic-shimmer-opacity, 0.05) * 3)) 0%,
+    rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 4)) 33%,
+    rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * 3)) 66%,
+    rgba(var(--organic-primary-rgb, 205, 214, 244), calc(var(--organic-shimmer-opacity, 0.05) * 3)) 100%
+  );
+  
+  // Crystalline filtering
+  filter: 
+    saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.4))
+    brightness(calc(1.0 + var(--organic-warmth, 0.8) * 0.2))
+    hue-rotate(calc(var(--organic-symbiotic-resonance, 0.7) * 15deg));
+  
+  // Crystalline facet reflections
+  backdrop-filter: 
+    blur(0.5px) 
+    saturate(1.3);
+  
+  // Crystalline breathing
+  animation: organic-crystalline-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+  
+  // Performance optimization
+  will-change: filter, background, backdrop-filter;
+  transform: translateZ(0);
+  
+  // Crystal facet overlay
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    // Faceted crystal pattern
+    background: 
+      linear-gradient(30deg, transparent 40%, rgba(255, 255, 255, calc(var(--organic-shimmer-opacity, 0.05) * 4)) 50%, transparent 60%),
+      linear-gradient(60deg, transparent 40%, rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 3)) 50%, transparent 60%),
+      linear-gradient(90deg, transparent 40%, rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * 3)) 50%, transparent 60%),
+      linear-gradient(120deg, transparent 40%, rgba(255, 255, 255, calc(var(--organic-shimmer-opacity, 0.05) * 4)) 50%, transparent 60%);
+    
+    background-size: 40px 40px, 60px 60px, 80px 80px, 50px 50px;
+    
+    // Crystal facet animation
+    animation: organic-crystal-facets calc(var(--organic-breathing-cycle, 1s) * 4) linear infinite;
+    
+    // Performance optimization
+    pointer-events: none;
+    z-index: var(--organic-depth-mid, 2);
+    will-change: background-position;
+    contain: strict;
+    mix-blend-mode: overlay;
+    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.4);
+  }
+  
+  // Crystal energy resonance
+  &::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    
+    // Energy resonance field
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-glow-opacity, 0.1) * 2)) 0%,
+      rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-glow-opacity, 0.1) * 1.5)) 40%,
+      transparent 70%
+    );
+    
+    // Resonance pulsing
+    animation: organic-crystal-resonance calc(var(--organic-breathing-cycle, 1s) * 1.5) ease-in-out infinite;
+    
+    pointer-events: none;
+    z-index: var(--organic-depth-atmosphere, 0);
+    will-change: opacity, transform;
+    contain: strict;
+    border-radius: inherit;
+  }
+  
+  // Crystal growth states
+  &[data-crystal-growth="emerging"] {
+    --crystal-multiplier: 0.3;
+    transform: scale(0.95);
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.1))
+      brightness(0.8);
+  }
+  
+  &[data-crystal-growth="mature"] {
+    --crystal-multiplier: 1.0;
+  }
+  
+  &[data-crystal-growth="transcendent"] {
+    --crystal-multiplier: 1.8;
+    transform: scale(1.05);
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.6))
+      brightness(calc(1.0 + var(--organic-warmth, 0.8) * 0.3))
+      hue-rotate(calc(var(--crystal-multiplier, 1.8) * 25deg));
+    
+    // Enhanced transcendent glow
+    box-shadow: 
+      0 0 15px rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-glow-opacity, 0.1) * 3)),
+      0 0 30px rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-glow-opacity, 0.1) * 2)),
+      inset 0 0 10px rgba(255, 255, 255, calc(var(--organic-shimmer-opacity, 0.05) * 6));
+  }
+}
+
+// Energy field consciousness system
+.organic-energy-field {
+  // Core energy field properties
+  position: relative;
+  
+  // Energy field base
+  background: radial-gradient(
+    ellipse at center,
+    rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 5)) 0%,
+    rgba(var(--organic-primary-rgb, 205, 214, 244), calc(var(--organic-shimmer-opacity, 0.05) * 3)) 30%,
+    rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * 2)) 60%,
+    transparent 90%
+  );
+  
+  // Energy field enhancement
+  filter: 
+    saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.6))
+    brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.4));
+  
+  // Energy field pulsing
+  animation: organic-energy-field-pulse var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+  
+  // Performance optimization
+  will-change: filter, background, transform;
+  transform: translateZ(0);
+  
+  // Energy field fluctuations
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    
+    // Energy fluctuation pattern
+    background: 
+      radial-gradient(circle at 30% 20%, rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 3)) 0%, transparent 30%),
+      radial-gradient(circle at 70% 80%, rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * 3)) 0%, transparent 30%),
+      radial-gradient(circle at 20% 70%, rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 3)) 0%, transparent 30%),
+      radial-gradient(circle at 80% 30%, rgba(var(--organic-primary-rgb, 205, 214, 244), calc(var(--organic-shimmer-opacity, 0.05) * 3)) 0%, transparent 30%);
+    
+    // Energy fluctuation animation
+    animation: organic-energy-fluctuations calc(var(--organic-breathing-cycle, 1s) * 3) ease-in-out infinite;
+    
+    pointer-events: none;
+    z-index: var(--organic-depth-mid, 2);
+    will-change: opacity, transform;
+    contain: strict;
+    mix-blend-mode: screen;
+  }
+  
+  // Energy field types
+  &[data-field-type="protective"] {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(var(--organic-primary-rgb, 205, 214, 244), calc(var(--organic-shimmer-opacity, 0.05) * 4)) 0%,
+      rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 2)) 50%,
+      transparent 80%
+    );
+  }
+  
+  &[data-field-type="aggressive"] {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 6)) 0%,
+      rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * 4)) 40%,
+      transparent 70%
+    );
+    
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.8))
+      brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.6))
+      hue-rotate(15deg);
+  }
+  
+  &[data-field-type="mystical"] {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * 5)) 0%,
+      rgba(var(--organic-primary-rgb, 205, 214, 244), calc(var(--organic-shimmer-opacity, 0.05) * 3)) 40%,
+      transparent 80%
+    );
+    
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.5))
+      brightness(calc(1.0 + var(--organic-warmth, 0.8) * 0.3))
+      hue-rotate(-10deg);
+  }
+}
+
+// === STAR WARS KEYFRAMES ===
+
+// Holographic breathing animation
+@keyframes organic-holographic-breathing {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.3))
+      brightness(calc(1.0 + var(--organic-warmth, 0.8) * 0.15));
+    background-size: 100% 100%;
+  }
+  
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.4))
+      brightness(calc(1.0 + var(--organic-warmth, 0.8) * 0.2))
+      hue-rotate(calc(var(--organic-symbiotic-resonance, 0.7) * 15deg));
+    background-size: 105% 105%;
+  }
+  
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.3))
+      brightness(calc(1.0 + var(--organic-warmth, 0.8) * 0.15));
+    background-size: 100% 100%;
+  }
+}
+
+// Holographic scanlines animation
+@keyframes organic-holographic-scanlines {
+  0% {
+    background-position: 0px 0px;
+    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.3);
+  }
+  
+  50% {
+    background-position: 0px 2px;
+    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.5);
+  }
+  
+  100% {
+    background-position: 0px 4px;
+    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.3);
+  }
+}
+
+// Holographic shimmer animation
+@keyframes organic-holographic-shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+    opacity: 0;
+  }
+  
+  50% {
+    opacity: calc(var(--organic-shimmer-opacity, 0.05) * 6);
+  }
+  
+  100% {
+    transform: translateX(200%) skewX(-15deg);
+    opacity: 0;
+  }
+}
+
+// Bioluminescent pulse animation
+@keyframes organic-bioluminescent-pulse {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.5))
+      brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.3));
+    background-size: 100% 100%;
+  }
+  
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.7))
+      brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.5))
+      hue-rotate(calc(var(--bio-multiplier, 1) * 10deg));
+    background-size: 102% 102%;
+  }
+  
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.5))
+      brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.3));
+    background-size: 100% 100%;
+  }
+}
+
+// Bio-circuit flow animation
+@keyframes organic-bio-circuit-flow {
+  0% {
+    background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px;
+    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.6);
+  }
+  
+  50% {
+    background-position: 30px 30px, 30px 30px, 30px 30px, 30px 30px, 60px 60px, 60px 60px;
+    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.8);
+  }
+  
+  100% {
+    background-position: 60px 60px, 60px 60px, 60px 60px, 60px 60px, 120px 120px, 120px 120px;
+    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.6);
+  }
+}
+
+// Energy nodes animation
+@keyframes organic-energy-nodes {
+  0% {
+    opacity: calc(var(--organic-glow-opacity, 0.1) * 3);
+    transform: scale(1.0);
+  }
+  
+  50% {
+    opacity: calc(var(--organic-glow-opacity, 0.1) * 5);
+    transform: scale(1.1);
+  }
+  
+  100% {
+    opacity: calc(var(--organic-glow-opacity, 0.1) * 3);
+    transform: scale(1.0);
+  }
+}
+
+// Crystalline breathing animation
+@keyframes organic-crystalline-breathing {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.4))
+      brightness(calc(1.0 + var(--organic-warmth, 0.8) * 0.2));
+    backdrop-filter: blur(0.5px) saturate(1.3);
+  }
+  
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.6))
+      brightness(calc(1.0 + var(--organic-warmth, 0.8) * 0.3))
+      hue-rotate(calc(var(--crystal-multiplier, 1) * 20deg));
+    backdrop-filter: blur(0.3px) saturate(1.5);
+  }
+  
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.4))
+      brightness(calc(1.0 + var(--organic-warmth, 0.8) * 0.2));
+    backdrop-filter: blur(0.5px) saturate(1.3);
+  }
+}
+
+// Crystal facets animation
+@keyframes organic-crystal-facets {
+  0% {
+    background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px;
+  }
+  
+  25% {
+    background-position: 10px 10px, 15px 15px, 20px 20px, 12px 12px;
+  }
+  
+  50% {
+    background-position: 20px 20px, 30px 30px, 40px 40px, 25px 25px;
+  }
+  
+  75% {
+    background-position: 30px 30px, 45px 45px, 60px 60px, 37px 37px;
+  }
+  
+  100% {
+    background-position: 40px 40px, 60px 60px, 80px 80px, 50px 50px;
+  }
+}
+
+// Crystal resonance animation
+@keyframes organic-crystal-resonance {
+  0% {
+    opacity: calc(var(--organic-glow-opacity, 0.1) * 2);
+    transform: scale(1.0);
+  }
+  
+  50% {
+    opacity: calc(var(--organic-glow-opacity, 0.1) * 3);
+    transform: scale(1.03);
+  }
+  
+  100% {
+    opacity: calc(var(--organic-glow-opacity, 0.1) * 2);
+    transform: scale(1.0);
+  }
+}
+
+// Energy field pulse animation
+@keyframes organic-energy-field-pulse {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.6))
+      brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.4));
+    transform: scale(1.0);
+  }
+  
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.8))
+      brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.6))
+      hue-rotate(calc(var(--organic-symbiotic-resonance, 0.7) * 12deg));
+    transform: scale(1.02);
+  }
+  
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.6))
+      brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.4));
+    transform: scale(1.0);
+  }
+}
+
+// Energy fluctuations animation
+@keyframes organic-energy-fluctuations {
+  0% {
+    opacity: calc(var(--organic-shimmer-opacity, 0.05) * 3);
+    transform: scale(1.0) rotate(0deg);
+  }
+  
+  33% {
+    opacity: calc(var(--organic-shimmer-opacity, 0.05) * 5);
+    transform: scale(1.1) rotate(120deg);
+  }
+  
+  66% {
+    opacity: calc(var(--organic-shimmer-opacity, 0.05) * 4);
+    transform: scale(0.9) rotate(240deg);
+  }
+  
+  100% {
+    opacity: calc(var(--organic-shimmer-opacity, 0.05) * 3);
+    transform: scale(1.0) rotate(360deg);
+  }
+}
+
+// === ACCESSIBILITY AND PERFORMANCE ===
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .organic-holographic-display,
+  .organic-bioluminescent-tech,
+  .organic-crystalline-consciousness,
+  .organic-energy-field {
+    animation: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    
+    &::before,
+    &::after {
+      animation: none !important;
+      opacity: 0.1 !important;
+    }
+  }
+}
+
+// High contrast support
+@media (prefers-contrast: high) {
+  .organic-holographic-display {
+    filter: 
+      contrast(2.0) !important
+      saturate(2.0) !important;
+    
+    &::before {
+      opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.8) !important;
+    }
+  }
+  
+  .organic-crystalline-consciousness {
+    filter: 
+      contrast(2.5) !important
+      saturate(1.8) !important
+      brightness(1.3) !important;
+  }
+}
+
+// Debug mode for Star Wars organics
+:root.organic-debug {
+  .organic-holographic-display {
+    outline: 2px dashed rgba(116, 199, 236, 0.8) !important;
+    
+    &::after {
+      content: '📺 HOLO';
+      position: absolute;
+      top: -35px;
+      left: 0;
+      font-size: 10px;
+      color: #74c7ec;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 2px 4px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  }
+  
+  .organic-bioluminescent-tech {
+    outline: 2px dashed rgba(203, 166, 247, 0.8) !important;
+    
+    &::after {
+      content: '🧬 BIO-TECH';
+      position: absolute;
+      top: -35px;
+      right: 0;
+      font-size: 10px;
+      color: #cba6f7;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 2px 4px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  }
+  
+  .organic-crystalline-consciousness {
+    outline: 2px dashed rgba(255, 255, 255, 0.8) !important;
+    
+    &::after {
+      content: '💎 CRYSTAL';
+      position: absolute;
+      bottom: -35px;
+      left: 0;
+      font-size: 10px;
+      color: white;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 2px 4px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  }
+  
+  .organic-energy-field {
+    outline: 2px dashed rgba(116, 199, 236, 0.8) !important;
+    
+    &::after {
+      content: '⚡ ENERGY';
+      position: absolute;
+      bottom: -35px;
+      right: 0;
+      font-size: 10px;
+      color: #74c7ec;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 2px 4px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  }
+}

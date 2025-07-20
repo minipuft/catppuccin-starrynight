@@ -1,6 +1,6 @@
 import { HARMONIC_MODES, YEAR3000_CONFIG } from "./config/globalConfig";
 import { Year3000System } from "./core/lifecycle/year3000System";
-import { Year3000Debug } from "./debug/SystemIntegrationTester";
+import { Y3K } from "./debug/UnifiedDebugManager";
 import { initializeAberrationManager } from "./visual/ui-effects/Aberration/AberrationManager";
 import { initializeAudioVisualController } from "./visual/ui-effects/AudioVisualController";
 import { waitForSpicetifyReady } from "./utils/platform/spicetifyReady";
@@ -133,7 +133,7 @@ patchReactRequire();
   }
 
   // 1. Instantiate the main system. It will handle its own internal dependencies.
-  const year3000System = new Year3000System(YEAR3000_CONFIG, HARMONIC_MODES);
+  const year3000System = new Year3000System(YEAR3000_CONFIG);
 
   // 1a. 🎆 Initialise AudioVisualController (Phase 2)
   initializeAudioVisualController(year3000System);
@@ -206,7 +206,7 @@ patchReactRequire();
       music: year3000System.musicSyncService,
       settings: year3000System.settingsManager,
       // Expose the superior, specialized debug tools directly
-      debug: Year3000Debug,
+      debug: Y3K.debug,
       health: year3000System.systemHealthMonitor,
       // Add degraded mode info
       mode: degradedMode ? "degraded" : "full",

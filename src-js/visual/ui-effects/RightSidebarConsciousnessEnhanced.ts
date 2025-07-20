@@ -341,8 +341,11 @@ export class RightSidebarConsciousnessEnhanced extends UnifiedSystemBase {
    */
   async healthCheck(): Promise<HealthCheckResult> {
     return {
+      healthy: true,
       ok: true,
-      details: `Enhanced right sidebar consciousness healthy - Level: ${this.consciousnessState.level}, Beat: ${this.consciousnessState.beatIntensity.toFixed(2)}, Bilateral sync: ${this.consciousnessState.bilateralSync}`
+      details: `Enhanced right sidebar consciousness healthy - Level: ${this.consciousnessState.level}, Beat: ${this.consciousnessState.beatIntensity.toFixed(2)}, Bilateral sync: ${this.consciousnessState.bilateralSync}`,
+      issues: [],
+      system: 'RightSidebarConsciousnessEnhanced'
     };
   }
   

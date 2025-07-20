@@ -786,8 +786,11 @@ export class SidebarDimensionalNexusSystem extends UnifiedSystemBase {
    */
   async healthCheck(): Promise<HealthCheckResult> {
     return {
+      healthy: true,
       ok: true,
-      details: `Dimensional nexus system healthy - ${this.spatialLayers.size} layers, ${this.navigationElements.size} elements, depth ${this.spatialState.currentDepth}`
+      details: `Dimensional nexus system healthy - ${this.spatialLayers.size} layers, ${this.navigationElements.size} elements, depth ${this.spatialState.currentDepth}`,
+      issues: [],
+      system: 'SidebarDimensionalNexusSystem'
     };
   }
   

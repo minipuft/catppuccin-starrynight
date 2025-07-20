@@ -1,9 +1,9 @@
 /**
- * VisualIntegrationBridge Test Suite
+ * VisualSystemFacade Test Suite
  * Tests for Phase 2 factory pattern implementation
  */
 
-import { VisualIntegrationBridge, VisualSystemKey, VisualSystemConfig } from '@/visual/integration/VisualIntegrationBridge';
+import { VisualSystemFacade, VisualSystemKey, VisualSystemConfig } from '@/visual/integration/VisualSystemFacade';
 import { CSSVariableBatcher } from '@/core/performance/CSSVariableBatcher';
 import { PerformanceAnalyzer } from '@/core/performance/PerformanceAnalyzer';
 import { MusicSyncService } from '@/audio/MusicSyncService';
@@ -26,7 +26,7 @@ jest.mock('@/core/performance/AdaptivePerformanceSystem');
 jest.mock('@/visual/backgrounds/LightweightParticleSystem');
 jest.mock('@/visual/backgrounds/ParticleFieldSystem');
 jest.mock('@/visual/backgrounds/WebGLGradientBackgroundSystem');
-jest.mock('@/visual/beat-sync/BeatSyncVisualSystem');
+jest.mock('@/visual/organic-consciousness/OrganicBeatSyncConsciousness');
 jest.mock('@/visual/ui-effects/BehavioralPredictionEngine');
 jest.mock('@/visual/ui-effects/InteractionTrackingSystem');
 jest.mock('@/visual/ui-effects/PredictiveMaterializationSystem');
@@ -34,7 +34,7 @@ jest.mock('@/visual/ui-effects/SpotifyUIApplicationSystem');
 jest.mock('@/core/animation/EmergentChoreographyEngine');
 
 // Mock debug system
-jest.mock('@/debug/SystemHealthMonitor', () => ({
+jest.mock('@/debug/UnifiedDebugManager', () => ({
   Y3K: {
     debug: {
       log: jest.fn(),
@@ -54,8 +54,8 @@ Object.defineProperty(window, 'performance', {
   }
 });
 
-describe('VisualIntegrationBridge', () => {
-  let bridge: VisualIntegrationBridge;
+describe('VisualSystemFacade', () => {
+  let bridge: VisualSystemFacade;
   let mockCSSVariableBatcher: jest.Mocked<CSSVariableBatcher>;
   let mockPerformanceAnalyzer: jest.Mocked<PerformanceAnalyzer>;
   let mockMusicSyncService: jest.Mocked<MusicSyncService>;
@@ -101,7 +101,7 @@ describe('VisualIntegrationBridge', () => {
     };
 
     // Create bridge instance
-    bridge = new VisualIntegrationBridge(
+    bridge = new VisualSystemFacade(
       YEAR3000_CONFIG,
       Utils,
       mockYear3000System,
@@ -115,7 +115,7 @@ describe('VisualIntegrationBridge', () => {
 
   describe('Construction and Initialization', () => {
     it('should initialize with correct dependencies', () => {
-      expect(bridge).toBeInstanceOf(VisualIntegrationBridge);
+      expect(bridge).toBeInstanceOf(VisualSystemFacade);
       expect(bridge.getSystemStatus().initialized).toBe(false);
     });
 
@@ -215,7 +215,7 @@ describe('VisualIntegrationBridge', () => {
     it('should inject event bus when available', () => {
       const mockEventBus = { subscribe: jest.fn(), emit: jest.fn() };
       
-      const bridgeWithEventBus = new VisualIntegrationBridge(
+      const bridgeWithEventBus = new VisualSystemFacade(
         YEAR3000_CONFIG,
         Utils,
         mockYear3000System,

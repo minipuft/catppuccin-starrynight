@@ -15,7 +15,7 @@
  * - Funk: Groovy, rhythmic gradients with syncopated patterns
  */
 
-import { Y3K } from "@/debug/SystemHealthMonitor";
+import { Y3K } from "@/debug/UnifiedDebugManager";
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { EmotionalGradientMapper, EmotionalProfile } from "@/audio/EmotionalGradientMapper";

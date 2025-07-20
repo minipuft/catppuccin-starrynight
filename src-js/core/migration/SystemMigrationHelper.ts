@@ -118,13 +118,22 @@ export class SystemMigrationHelper {
       override async healthCheck(): Promise<HealthCheckResult> {
         const isDestroyed = 'isDestroyed' in this.originalSystem ? 
           (this.originalSystem as any).isDestroyed : false;
-        const result: HealthCheckResult = {
-          ok: this.originalSystem.initialized && !isDestroyed,
-          details: `${this.systemName} health check`,
-        };
+        const isHealthy = this.originalSystem.initialized && !isDestroyed;
+        const issues = [];
         if (!this.originalSystem.initialized) {
-          result.issues = ['System not initialized'];
+          issues.push('System not initialized');
         }
+        if (isDestroyed) {
+          issues.push('System is destroyed');
+        }
+        
+        const result: HealthCheckResult = {
+          healthy: isHealthy,
+          ok: isHealthy,
+          details: `${this.systemName} health check`,
+          issues,
+          system: this.systemName,
+        };
         return result;
       }
       

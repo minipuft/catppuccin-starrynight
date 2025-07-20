@@ -1,0 +1,554 @@
+/**
+ * Natural Harmony Engine CSS - Phase 2.4
+ * 
+ * Gentle color breathing for peaceful content.
+ * Creates organic, earth-connected breathing rhythms that sync with natural frequencies.
+ * 
+ * @performance 60fps organic breathing with nature-inspired timing
+ * @consciousness Natural rhythms that breathe with musical serenity
+ */
+
+/* === Natural Harmony CSS Variables === */
+:root {
+  /* Natural Color Palette - Earth-Connected Catppuccin */
+  --natural-earthy-r: 166;         /* Green (spring earthy) */
+  --natural-earthy-g: 227;
+  --natural-earthy-b: 161;
+  --natural-forest-r: 64;          /* Deep forest green */
+  --natural-forest-g: 160;
+  --natural-forest-b: 43;
+  --natural-sky-r: 137;            /* Sky blue (natural) */
+  --natural-sky-g: 220;
+  --natural-sky-b: 235;
+  --natural-sunset-r: 250;         /* Peach (sunset glow) */
+  --natural-sunset-g: 179;
+  --natural-sunset-b: 135;
+  --natural-stone-r: 108;          /* Overlay0 (stone gray) */
+  --natural-stone-g: 112;
+  --natural-stone-b: 134;
+  
+  /* Dynamic Natural Variables */
+  --natural-serenity-level: 0;          /* 0-1 current serenity intensity */
+  --natural-breathing-frequency: 0.4;   /* Hz - natural breathing frequency */
+  --natural-earth-connection: 0;        /* 0-1 earth-connected feeling */
+  --natural-breathing-depth: 0.8;       /* 0-1 breathing depth amplitude */
+  --natural-breathing-phase: 0;         /* -1 to 1 breathing cycle value */
+  --natural-seasonal-shift: 0;          /* 0-1 seasonal color transitions */
+  --natural-forest-atmosphere: 0;       /* 0-1 forest-like ambiance */
+  --natural-organic-transparency: 0.85; /* Overall natural transparency */
+  
+  /* Calculated Composite Values */
+  --natural-earthy-rgb: var(--natural-earthy-r), var(--natural-earthy-g), var(--natural-earthy-b);
+  --natural-forest-rgb: var(--natural-forest-r), var(--natural-forest-g), var(--natural-forest-b);
+  --natural-sky-rgb: var(--natural-sky-r), var(--natural-sky-g), var(--natural-sky-b);
+  --natural-sunset-rgb: var(--natural-sunset-r), var(--natural-sunset-g), var(--natural-sunset-b);
+  --natural-stone-rgb: var(--natural-stone-r), var(--natural-stone-g), var(--natural-stone-b);
+}
+
+/* === Natural Harmony Keyframes === */
+@keyframes natural-breathing-cycle {
+  0% { 
+    transform: scale(1);
+    opacity: calc(var(--natural-organic-transparency) - var(--natural-breathing-depth) * 0.05);
+    box-shadow: 
+      0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.3)),
+      inset 0 0 calc(var(--natural-serenity-level) * 8px) rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.2));
+  }
+  50% { 
+    transform: scale(calc(1 + var(--natural-breathing-depth) * 0.02));
+    opacity: calc(var(--natural-organic-transparency) + var(--natural-breathing-depth) * 0.05);
+    box-shadow: 
+      0 0 calc(var(--natural-serenity-level) * 25px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.4)),
+      inset 0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.3));
+  }
+  100% { 
+    transform: scale(1);
+    opacity: calc(var(--natural-organic-transparency) - var(--natural-breathing-depth) * 0.05);
+    box-shadow: 
+      0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.3)),
+      inset 0 0 calc(var(--natural-serenity-level) * 8px) rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.2));
+  }
+}
+
+@keyframes natural-forest-sway {
+  0% { 
+    transform: translateY(0) rotateZ(0deg);
+    filter: 
+      hue-rotate(0deg) 
+      saturate(1);
+  }
+  33% { 
+    transform: translateY(calc(var(--natural-forest-atmosphere) * -1px)) rotateZ(calc(var(--natural-forest-atmosphere) * 0.5deg));
+    filter: 
+      hue-rotate(calc(var(--natural-forest-atmosphere) * 3deg)) 
+      saturate(calc(1 + var(--natural-forest-atmosphere) * 0.15));
+  }
+  66% { 
+    transform: translateY(calc(var(--natural-forest-atmosphere) * 0.5px)) rotateZ(calc(var(--natural-forest-atmosphere) * -0.3deg));
+    filter: 
+      hue-rotate(calc(var(--natural-forest-atmosphere) * -2deg)) 
+      saturate(calc(1 + var(--natural-forest-atmosphere) * 0.1));
+  }
+  100% { 
+    transform: translateY(0) rotateZ(0deg);
+    filter: 
+      hue-rotate(0deg) 
+      saturate(1);
+  }
+}
+
+@keyframes natural-earth-pulse {
+  0% { 
+    border-color: rgba(var(--natural-earthy-rgb), calc(var(--natural-earth-connection) * 0.3));
+    background-position: 0% 0%;
+  }
+  50% { 
+    border-color: rgba(var(--natural-earthy-rgb), calc(var(--natural-earth-connection) * 0.5));
+    background-position: 100% 100%;
+  }
+  100% { 
+    border-color: rgba(var(--natural-earthy-rgb), calc(var(--natural-earth-connection) * 0.3));
+    background-position: 0% 0%;
+  }
+}
+
+@keyframes natural-seasonal-shift {
+  0% { 
+    --natural-season-hue: 120deg; /* Spring green */
+    --natural-season-saturation: 1.0;
+    --natural-season-brightness: 1.0;
+  }
+  25% { 
+    --natural-season-hue: 60deg; /* Summer yellow */
+    --natural-season-saturation: 1.1;
+    --natural-season-brightness: 1.1;
+  }
+  50% { 
+    --natural-season-hue: 30deg; /* Autumn orange */
+    --natural-season-saturation: 1.2;
+    --natural-season-brightness: 0.9;
+  }
+  75% { 
+    --natural-season-hue: 200deg; /* Winter blue */
+    --natural-season-saturation: 0.8;
+    --natural-season-brightness: 0.8;
+  }
+  100% { 
+    --natural-season-hue: 120deg; /* Back to spring */
+    --natural-season-saturation: 1.0;
+    --natural-season-brightness: 1.0;
+  }
+}
+
+@keyframes natural-organic-flow {
+  0% { 
+    background-position: 0% 50%;
+    background-size: 200% 200%;
+  }
+  50% { 
+    background-position: 100% 50%;
+    background-size: 250% 250%;
+  }
+  100% { 
+    background-position: 0% 50%;
+    background-size: 200% 200%;
+  }
+}
+
+@keyframes natural-serenity-glow {
+  0% { 
+    filter: 
+      drop-shadow(0 0 calc(var(--natural-serenity-level) * 8px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.4)))
+      brightness(1);
+  }
+  50% { 
+    filter: 
+      drop-shadow(0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.6)))
+      brightness(calc(1 + var(--natural-serenity-level) * 0.1));
+  }
+  100% { 
+    filter: 
+      drop-shadow(0 0 calc(var(--natural-serenity-level) * 8px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.4)))
+      brightness(1);
+  }
+}
+
+/* === Natural Harmony Base Classes === */
+
+/* Natural Breathing Effect */
+.natural-breathing {
+  position: relative;
+  
+  animation: natural-breathing-cycle calc(1s / max(var(--natural-breathing-frequency), 0.1)) ease-in-out infinite;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: inherit;
+    background: linear-gradient(
+      45deg,
+      rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.15)) 0%,
+      rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.1)) 50%,
+      rgba(var(--natural-sky-rgb), calc(var(--natural-serenity-level) * 0.08)) 100%
+    );
+    pointer-events: none;
+    opacity: var(--natural-serenity-level);
+    
+    animation: natural-serenity-glow calc(2s / max(var(--natural-breathing-frequency), 0.1)) ease-in-out infinite;
+  }
+}
+
+/* Forest Atmosphere Effect */
+.natural-forest-atmosphere {
+  position: relative;
+  
+  animation: natural-forest-sway 8s ease-in-out infinite;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      circle at 30% 70%,
+      rgba(var(--natural-forest-rgb), calc(var(--natural-forest-atmosphere) * 0.2)) 0%,
+      rgba(var(--natural-earthy-rgb), calc(var(--natural-forest-atmosphere) * 0.1)) 40%,
+      transparent 70%
+    );
+    pointer-events: none;
+    opacity: var(--natural-forest-atmosphere);
+    
+    animation: natural-organic-flow 12s ease-in-out infinite;
+  }
+}
+
+/* Earth Connection Effect */
+.natural-earth-connection {
+  position: relative;
+  border: 1px solid rgba(var(--natural-earthy-rgb), calc(var(--natural-earth-connection) * 0.4));
+  
+  background: linear-gradient(
+    180deg,
+    rgba(var(--natural-earthy-rgb), calc(var(--natural-earth-connection) * 0.05)) 0%,
+    rgba(var(--natural-forest-rgb), calc(var(--natural-earth-connection) * 0.08)) 100%
+  );
+  
+  animation: natural-earth-pulse 4s ease-in-out infinite;
+}
+
+/* Seasonal Shift Effect */
+.natural-seasonal-shift {
+  position: relative;
+  
+  animation: natural-seasonal-shift 60s linear infinite;
+  
+  filter: 
+    hue-rotate(calc(var(--natural-seasonal-shift) * 60deg))
+    saturate(calc(1 + var(--natural-seasonal-shift) * 0.2))
+    brightness(calc(1 + var(--natural-seasonal-shift) * 0.1));
+}
+
+/* Organic Flow Background */
+.natural-organic-flow {
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      calc(var(--natural-seasonal-shift) * 90deg + 45deg),
+      rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.1)) 0%,
+      rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.15)) 25%,
+      rgba(var(--natural-sky-rgb), calc(var(--natural-serenity-level) * 0.08)) 50%,
+      rgba(var(--natural-sunset-rgb), calc(var(--natural-serenity-level) * 0.12)) 75%,
+      rgba(var(--natural-stone-rgb), calc(var(--natural-serenity-level) * 0.06)) 100%
+    );
+    pointer-events: none;
+    border-radius: inherit;
+    
+    animation: natural-organic-flow 20s ease-in-out infinite;
+  }
+}
+
+/* Natural Serenity Glow */
+.natural-serenity-glow {
+  filter: drop-shadow(0 0 calc(var(--natural-serenity-level) * 12px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.5)));
+  
+  animation: natural-serenity-glow calc(3s / max(var(--natural-breathing-frequency), 0.1)) ease-in-out infinite;
+}
+
+/* === Specific UI Element Targeting === */
+
+/* Main View Container - Natural Background Flow */
+.main-view-container {
+  &[data-natural-mode="active"] {
+    @extend .natural-organic-flow;
+    @extend .natural-seasonal-shift;
+    
+    background-blend-mode: multiply;
+    
+    &::before {
+      opacity: calc(var(--natural-serenity-level) * 0.6);
+    }
+  }
+}
+
+/* Now Playing Bar - Natural Breathing */
+.Root__now-playing-bar {
+  &[data-natural-mode="active"] {
+    @extend .natural-breathing;
+    @extend .natural-earth-connection;
+    
+    background: linear-gradient(
+      90deg,
+      rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.1)) 0%,
+      rgba(var(--natural-sunset-rgb), calc(var(--natural-serenity-level) * 0.12)) 50%,
+      rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.1)) 100%
+    );
+    
+    border-radius: 6px;
+    backdrop-filter: blur(calc(var(--natural-serenity-level) * 4px));
+  }
+}
+
+/* Album Art - Natural Frame */
+.cover-art,
+.main-trackInfo-container img {
+  &[data-natural-mode="active"] {
+    @extend .natural-serenity-glow;
+    @extend .natural-seasonal-shift;
+    
+    border: 2px solid rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.5));
+    border-radius: 8px;
+    
+    &::before {
+      border-radius: 6px;
+    }
+  }
+}
+
+/* Progress Bar - Natural Flow */
+.progress-bar {
+  &[data-natural-mode="active"] {
+    @extend .natural-organic-flow;
+    @extend .natural-breathing;
+    
+    background: rgba(var(--natural-stone-rgb), 0.3);
+    border-radius: 8px;
+    
+    .progress-bar-fill {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--natural-earthy-rgb), 0.8) 0%,
+        rgba(var(--natural-forest-rgb), 0.9) 30%,
+        rgba(var(--natural-sky-rgb), 0.7) 70%,
+        rgba(var(--natural-sunset-rgb), 0.8) 100%
+      );
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.5));
+      
+      animation: natural-organic-flow 15s ease-in-out infinite;
+    }
+  }
+}
+
+/* Navigation Sidebar - Forest Atmosphere */
+.Root__nav-bar {
+  &[data-natural-mode="active"] {
+    @extend .natural-forest-atmosphere;
+    @extend .natural-earth-connection;
+    
+    border-right: 1px solid rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.4));
+    
+    .nav-item {
+      position: relative;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.08));
+        border-radius: 4px;
+        
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 20%;
+          width: 3px;
+          height: 60%;
+          background: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.8)) 50%,
+            transparent 100%
+          );
+          border-radius: 0 2px 2px 0;
+        }
+      }
+    }
+  }
+}
+
+/* Player Controls - Natural Harmony */
+.player-controls {
+  &[data-natural-mode="active"] {
+    @extend .natural-breathing;
+    
+    .control-button {
+      position: relative;
+      transition: all 0.3s ease;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 1px solid rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.3));
+        border-radius: 50%;
+        opacity: 0;
+        pointer-events: none;
+        
+        transition: opacity 0.3s ease;
+      }
+      
+      &:hover::before {
+        opacity: calc(var(--natural-serenity-level) * 0.6);
+        animation: natural-serenity-glow 1.5s ease-in-out;
+      }
+      
+      &:active {
+        transform: scale(0.95);
+        filter: brightness(1.1) saturate(1.1);
+        
+        animation: natural-breathing-cycle 0.4s ease-out;
+      }
+    }
+  }
+}
+
+/* Track Information - Natural Text Flow */
+.main-trackInfo-container {
+  &[data-natural-mode="active"] {
+    @extend .natural-organic-flow;
+    
+    .track-title,
+    .artist-name {
+      text-shadow: 0 0 6px rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.4));
+      color: rgba(var(--natural-earthy-rgb), calc(0.9 + var(--natural-serenity-level) * 0.1));
+      
+      &::selection {
+        background: rgba(var(--natural-forest-rgb), 0.3);
+      }
+    }
+  }
+}
+
+/* Volume Controls - Natural Breathing */
+.volume-bar {
+  &[data-natural-mode="active"] {
+    @extend .natural-breathing;
+    @extend .natural-earth-connection;
+    
+    .volume-bar-fill {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--natural-earthy-rgb), 0.6) 0%,
+        rgba(var(--natural-forest-rgb), 0.8) 100%
+      );
+      
+      animation: natural-serenity-glow calc(4s / max(var(--natural-breathing-frequency), 0.1)) ease-in-out infinite;
+    }
+  }
+}
+
+/* === Responsive Adaptations === */
+
+/* Reduce effects for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .natural-breathing,
+  .natural-forest-atmosphere,
+  .natural-earth-connection,
+  .natural-seasonal-shift,
+  .natural-organic-flow,
+  .natural-serenity-glow {
+    animation: none !important;
+    
+    &::before,
+    &::after {
+      animation: none !important;
+    }
+  }
+}
+
+/* High performance mode */
+@media (min-width: 1920px) and (min-height: 1080px) {
+  :root {
+    --natural-quality-multiplier: 1.2;
+  }
+  
+  .natural-breathing::before {
+    filter: blur(calc(var(--natural-serenity-level) * 1px));
+  }
+  
+  .natural-organic-flow::before {
+    background-size: 300% 300%;
+  }
+}
+
+/* Mobile adaptations - lighter natural effects */
+@media (max-width: 768px) {
+  :root {
+    --natural-quality-multiplier: 0.7;
+  }
+  
+  .natural-breathing,
+  .natural-forest-atmosphere {
+    &::before,
+    &::after {
+      opacity: calc(var(--natural-serenity-level) * 0.7);
+    }
+  }
+}
+
+/* === Accessibility === */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --natural-earthy-r: 100;
+    --natural-earthy-g: 255;
+    --natural-earthy-b: 100;
+    --natural-forest-r: 0;
+    --natural-forest-g: 200;
+    --natural-forest-b: 0;
+  }
+}
+
+/* === Debug Mode === */
+
+/* Debug mode - shows natural effect boundaries */
+[data-debug="natural"] {
+  .natural-breathing,
+  .natural-forest-atmosphere,
+  .natural-earth-connection {
+    outline: 1px dashed rgba(var(--natural-earthy-rgb), 0.5) !important;
+    
+    &::before,
+    &::after {
+      outline: 1px dotted rgba(var(--natural-forest-rgb), 0.3) !important;
+    }
+  }
+}

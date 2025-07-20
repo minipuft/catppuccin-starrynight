@@ -201,7 +201,7 @@ class ThemeStructureValidator {
         'ColorHarmonyEngine',
         'MusicSyncService',
         'PerformanceAnalyzer',
-        'BeatSyncVisualSystem'
+        'OrganicBeatSyncConsciousness'
       ];
 
       for (const component of requiredComponents) {

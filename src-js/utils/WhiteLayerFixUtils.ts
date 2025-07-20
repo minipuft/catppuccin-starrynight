@@ -9,7 +9,7 @@
  * - Apply emergency white layer suppression
  */
 
-import { Y3K } from "@/debug/SystemHealthMonitor";
+import { Y3K } from "@/debug/UnifiedDebugManager";
 
 export class WhiteLayerFixUtils {
   

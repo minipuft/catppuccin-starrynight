@@ -349,9 +349,11 @@ export class CSSGradientBackgroundSystem implements VisualBackplane {
     }
     
     return {
+      healthy: issues.length === 0,
       ok: issues.length === 0,
       details: issues.length > 0 ? 'CSS backend has minor issues' : 'CSS backend healthy',
-      issues
+      issues,
+      system: 'CSSGradientBackgroundSystem'
     };
   }
   

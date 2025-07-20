@@ -3,7 +3,7 @@ import { UnifiedSystemRegistry } from '@/core/registry/UnifiedSystemRegistry';
 import { UnifiedSystemBase } from '@/core/base/UnifiedSystemBase';
 import { SystemMigrationHelper } from '@/core/migration/SystemMigrationHelper';
 import { RightSidebarConsciousnessSystemUnified } from '@/visual/ui-effects/RightSidebarConsciousnessSystemUnified';
-import { BeatSyncVisualSystemUnified } from '@/visual/beat-sync/BeatSyncVisualSystemUnified';
+import { OrganicBeatSyncConsciousness } from '@/visual/organic-consciousness/OrganicBeatSyncConsciousness';
 import type { HealthCheckResult } from '@/types/systems';
 
 /**
@@ -105,24 +105,24 @@ export class UnifiedSystemIntegration {
       }
     }
     
-    // Priority 2: Migrate BeatSyncVisualSystem to unified version
+    // Priority 2: Migrate BeatSyncVisualSystem to organic consciousness version
     if (this.year3000System.beatSyncVisualSystem) {
       try {
-        const unifiedBeatSyncSystem = new BeatSyncVisualSystemUnified(
+        const organicBeatSyncSystem = new OrganicBeatSyncConsciousness(
           this.year3000System.YEAR3000_CONFIG
         );
         
         this.unifiedRegistry.register(
-          'BeatSyncVisualSystem',
-          unifiedBeatSyncSystem,
+          'OrganicBeatSyncConsciousness',
+          organicBeatSyncSystem,
           [] // No dependencies for now
         );
         
         // Queue for replacement
-        this.migrationQueue.set('beatSyncVisualSystem', unifiedBeatSyncSystem);
+        this.migrationQueue.set('beatSyncVisualSystem', organicBeatSyncSystem);
         
         if (this.year3000System.YEAR3000_CONFIG.enableDebug) {
-          console.log('[UnifiedSystemIntegration] ✓ Migrated BeatSyncVisualSystem');
+          console.log('[UnifiedSystemIntegration] ✓ Migrated BeatSyncVisualSystem to OrganicBeatSyncConsciousness');
         }
       } catch (error) {
         console.error('[UnifiedSystemIntegration] Failed to migrate BeatSyncVisualSystem:', error);
@@ -263,13 +263,12 @@ export class UnifiedSystemIntegration {
       const healthResult = await this.unifiedRegistry.performHealthCheck();
       
       const result: HealthCheckResult = {
+        healthy: healthResult.unhealthy.length === 0,
         ok: healthResult.unhealthy.length === 0,
-        details: `Unified systems: ${healthResult.healthy.length} healthy, ${healthResult.unhealthy.length} unhealthy`
+        details: `Unified systems: ${healthResult.healthy.length} healthy, ${healthResult.unhealthy.length} unhealthy`,
+        issues: healthResult.unhealthy.length > 0 ? healthResult.unhealthy : [],
+        system: 'UnifiedSystemIntegration'
       };
-      
-      if (healthResult.unhealthy.length > 0) {
-        result.issues = healthResult.unhealthy;
-      }
       
       return result;
     };

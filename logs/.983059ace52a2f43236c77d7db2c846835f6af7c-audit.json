@@ -6,16 +6,6 @@
     "auditLog": "/home/minipuft/Applications/catppuccin-starrynight/logs/.983059ace52a2f43236c77d7db2c846835f6af7c-audit.json",
     "files": [
         {
-            "date": 1751640525121,
-            "name": "/home/minipuft/Applications/catppuccin-starrynight/logs/mcp-puppeteer-2025-07-04.log",
-            "hash": "ed114e0c6a5d25e9723e4d6fa1997dbca31557fef0de1ffb3463c3aeafc972d4"
-        },
-        {
-            "date": 1751723598738,
-            "name": "/home/minipuft/Applications/catppuccin-starrynight/logs/mcp-puppeteer-2025-07-05.log",
-            "hash": "2b33b878f64c3a2f4e8447ad2a388d50164519edb89dce8884f32c088cb99e7b"
-        },
-        {
             "date": 1752058465392,
             "name": "/home/minipuft/Applications/catppuccin-starrynight/logs/mcp-puppeteer-2025-07-09.log",
             "hash": "d77fca59ef255462387f7a1f6076e568176a048fd57b4d72b488a8f52c4985d0"
@@ -54,6 +44,11 @@
             "date": 1752836396725,
             "name": "/home/minipuft/Applications/catppuccin-starrynight/logs/mcp-puppeteer-2025-07-18.log",
             "hash": "38db21ed47b3259576992a881c5c99a1c757c5810491b334ec8faefad4c21764"
+        },
+        {
+            "date": 1753023599989,
+            "name": "/home/minipuft/Applications/catppuccin-starrynight/logs/mcp-puppeteer-2025-07-20.log",
+            "hash": "39065612050f1628f16129610cd84c17e855eb90b7f9cca1329857ab37c06291"
         }
     ],
     "hashType": "sha256"

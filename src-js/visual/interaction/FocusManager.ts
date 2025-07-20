@@ -249,11 +249,7 @@ export class FocusManager implements IManagedSystem {
   }
 
   // Health check for SystemHealthMonitor integration
-  public async healthCheck(): Promise<{
-    ok: boolean;
-    details?: string;
-    issues?: string[];
-  }> {
+  public async healthCheck(): Promise<HealthCheckResult> {
     const metrics = this.getFocusMetrics();
     const timeSinceLastFocus = performance.now() - this.focusState.lastFocusTime;
     const issues: string[] = [];
@@ -265,16 +261,14 @@ export class FocusManager implements IManagedSystem {
       issues.push("Focus tracking disabled");
     }
 
-    const result: HealthCheckResult = {
-      ok: this.initialized && (this.config.trackingEnabled || false),
+    const isHealthy = this.initialized && (this.config.trackingEnabled || false);
+    return {
+      healthy: isHealthy,
+      ok: isHealthy,
       details: `Focus state: ${this.focusState.isFocusVisible ? 'visible' : 'hidden'}, Events: ${metrics.focusCount + metrics.hoverCount}`,
+      issues: issues,
+      system: 'FocusManager',
     };
-    
-    if (issues.length > 0) {
-      result.issues = issues;
-    }
-    
-    return result;
   }
 
   public updateAnimation(deltaTime: number): void {

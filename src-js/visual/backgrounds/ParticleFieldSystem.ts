@@ -100,7 +100,13 @@ export class ParticleFieldSystem implements IManagedSystem, IVisualSystem {
   }
 
   async healthCheck(): Promise<HealthCheckResult> {
-    return { ok: this.initialized, details: "Particle field running" };
+    return { 
+      healthy: this.initialized,
+      ok: this.initialized, 
+      details: "Particle field running",
+      issues: this.initialized ? [] : ['System not initialized'],
+      system: 'ParticleFieldSystem'
+    };
   }
 
   destroy(): void {

@@ -382,12 +382,14 @@ export class GradientConductor implements IManagedSystem {
     }
 
     return {
+      healthy: issues.length === 0,
       ok: issues.length === 0,
       details:
         issues.length > 0
           ? `${issues.length} backend issues detected`
           : "All backends healthy",
       issues,
+      system: 'GradientConductor',
     };
   }
 

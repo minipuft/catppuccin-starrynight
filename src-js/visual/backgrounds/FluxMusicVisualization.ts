@@ -17,7 +17,7 @@ import { YEAR3000_CONFIG } from "@/config/globalConfig";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
-import { Y3K } from "@/debug/SystemHealthMonitor";
+import { Y3K } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
 
 export interface MusicVisualizationSettings {

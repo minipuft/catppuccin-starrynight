@@ -86,9 +86,11 @@ export abstract class BaseVisualSystem {
   async initialize() {
     if (this.config.enableDebug) {
       console.log(`[${this.systemName}] Initializing...`);
-      this._initializationStartTime = this.performanceMonitor.startTiming(
-        `initialize_${this.systemName}`
-      );
+      if (this.performanceMonitor) {
+        this._initializationStartTime = this.performanceMonitor.startTiming(
+          `initialize_${this.systemName}`
+        );
+      }
     }
 
     // Phase 1: Set up settings manager and performance profile listener.
@@ -143,7 +145,7 @@ export abstract class BaseVisualSystem {
       }
     }
 
-    if (this.config.enableDebug && this._initializationStartTime !== null) {
+    if (this.config.enableDebug && this._initializationStartTime !== null && this.performanceMonitor) {
       this.performanceMonitor.endTiming(
         `initialize_${this.systemName}`,
         this._initializationStartTime

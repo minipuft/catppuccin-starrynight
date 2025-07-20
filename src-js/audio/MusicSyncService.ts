@@ -1,4 +1,4 @@
-import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
+import type { ColorContext } from "@/types/colorStrategy";
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
 import { GlobalEventBus } from "@/core/events/EventBus";
 import { Year3000System } from "@/core/lifecycle/year3000System";
@@ -214,7 +214,6 @@ const MUSIC_SYNC_CONFIG: MusicSyncConfig = {
 export class MusicSyncService {
   private config: Year3000Config;
   private utils: typeof Utils;
-  private colorHarmonyEngine?: ColorHarmonyEngine;
   private settingsManager?: SettingsManager;
   private year3000System?: Year3000System;
   private genreProfileManager: GenreProfileManager;
@@ -271,7 +270,6 @@ export class MusicSyncService {
   constructor(dependencies: any = {}) {
     this.config = dependencies.YEAR3000_CONFIG || YEAR3000_CONFIG;
     this.utils = dependencies.Year3000Utilities || Utils;
-    this.colorHarmonyEngine = dependencies.colorHarmonyEngine;
     this.settingsManager = dependencies.settingsManager;
     this.year3000System = dependencies.year3000System;
 
@@ -1054,14 +1052,38 @@ export class MusicSyncService {
         (rawColors as Record<string, string>) || {}
       );
 
-      if (
-        this.colorHarmonyEngine &&
-        this.year3000System &&
-        Object.keys(colors).length > 0
-      ) {
-        const blendedColors =
-          this.colorHarmonyEngine.blendWithCatppuccin(colors);
-        this.year3000System.applyColorsToTheme(blendedColors);
+      // Publish color extraction event for strategy pattern processing
+      if (Object.keys(colors).length > 0) {
+        const colorContext: ColorContext = {
+          rawColors: colors,
+          trackUri,
+          timestamp: Date.now(),
+          harmonicMode: this.config.currentHarmonicMode || 'catppuccin',
+          musicData: audioFeatures ? {
+            energy: audioFeatures.energy,
+            valence: audioFeatures.valence,
+            tempo: audioFeatures.tempo,
+            genre: this.genreProfileManager.detectGenre(audioFeatures)
+          } : undefined,
+          performanceHints: {
+            preferLightweight: false,
+            enableAdvancedBlending: true,
+            maxProcessingTime: 100 // 100ms max for color processing
+          }
+        };
+
+        // Publish event for color processing via strategy pattern
+        GlobalEventBus.publish('colors/extracted', {
+          type: 'colors/extracted',
+          payload: colorContext
+        });
+
+        if (this.config.enableDebug) {
+          console.log(
+            '🎵 [MusicSyncService] Published colors/extracted event for strategy processing',
+            { trackUri, colorCount: Object.keys(colors).length }
+          );
+        }
       }
 
       if (audioFeatures) {
@@ -1200,13 +1222,14 @@ export class MusicSyncService {
     this.cacheCleanupInterval = null;
   }
 
-  public setColorHarmonyEngine(engine: ColorHarmonyEngine) {
-    this.colorHarmonyEngine = engine;
+  // Legacy method for backward compatibility - now uses event-driven pattern
+  public setColorHarmonyEngine(engine: any) {
     if (this.config.enableDebug) {
       console.log(
-        "🎵 [MusicSyncService] ColorHarmonyEngine dependency injected."
+        "🎵 [MusicSyncService] setColorHarmonyEngine called - now using event-driven pattern instead of direct dependency."
       );
     }
+    // No-op: ColorHarmonyEngine integration now handled via GlobalEventBus
   }
 
   public getLatestProcessedData(): any {
@@ -1328,5 +1351,24 @@ export class MusicSyncService {
   public updateMetrics(metrics: any): void {
     // Intentionally lightweight; store latest metrics for retrieval.
     this.latestProcessedData = metrics;
+  }
+
+  /**
+   * Get current music state for consciousness systems
+   */
+  public getCurrentMusicState(): { emotion: any; beat: any; intensity: number } | null {
+    if (!this.latestProcessedData || !this.audioData) {
+      return null;
+    }
+
+    return {
+      emotion: this.latestProcessedData.emotion || null,
+      beat: {
+        tempo: this.latestProcessedData.bpm || this.audioData.tempo || 120,
+        energy: this.latestProcessedData.energy || this.audioData.energy || 0.5,
+        timestamp: Date.now()
+      },
+      intensity: this.latestProcessedData.intensity || this.audioData.energy || 0.5
+    };
   }
 }

@@ -359,7 +359,7 @@ class ComprehensiveTestSuite {
         'ColorHarmonyEngine',
         'MusicSyncService',
         'PerformanceAnalyzer',
-        'BeatSyncVisualSystem',
+        'OrganicBeatSyncConsciousness',
         'CSSVariableBatcher'
       ];
       

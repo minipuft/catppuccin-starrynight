@@ -1,4 +1,3 @@
-import { MusicSyncService } from "@/audio/MusicSyncService";
 import {
   HARMONIC_EVOLUTION_KEY,
   HARMONIC_INTENSITY_KEY,
@@ -8,6 +7,13 @@ import { GlobalEventBus } from "@/core/events/EventBus";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import type { Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
+import type { 
+  IColorProcessor, 
+  ColorContext, 
+  ColorResult,
+  ColorExtractedEvent
+} from "@/types/colorStrategy";
+import { globalColorOrchestrator } from "@/visual/integration/ColorOrchestrator";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { PaletteExtensionManager } from "@/utils/core/PaletteExtensionManager";
 import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
@@ -56,7 +62,7 @@ type ValidationResult = {
 
 export class ColorHarmonyEngine
   extends BaseVisualSystem
-  implements IManagedSystem
+  implements IManagedSystem, IColorProcessor
 {
   /**
    * Canonical accent CSS custom property names.
@@ -120,14 +126,13 @@ export class ColorHarmonyEngine
     config?: Year3000Config,
     utils?: typeof Year3000Utilities,
     performanceMonitor?: PerformanceAnalyzer,
-    musicAnalysisService?: MusicSyncService,
     settingsManager?: SettingsManager
   ) {
     super(
       config,
       utils || Year3000Utilities,
       performanceMonitor!,
-      musicAnalysisService || null,
+      null, // No direct music service dependency
       settingsManager || null
     );
     this.systemName = "ColorHarmonyEngine";
@@ -441,9 +446,25 @@ export class ColorHarmonyEngine
     // Initial semantic color setup
     await this.semanticColorManager.updateSemanticColors();
     
+    // Subscribe to color extraction events for strategy pattern
+    GlobalEventBus.subscribe('colors/extracted', this.handleColorExtraction.bind(this));
+    
+    // Register with ColorOrchestrator for strategy pattern coordination
+    try {
+      globalColorOrchestrator.registerStrategy(this);
+      if (this.config.enableDebug) {
+        console.log("🎨 [ColorHarmonyEngine] Registered with ColorOrchestrator as strategy processor.");
+      }
+    } catch (error) {
+      console.warn("🎨 [ColorHarmonyEngine] Failed to register with ColorOrchestrator:", error);
+    }
+    
     if (this.config.enableDebug) {
       console.log(
         "🎨 [ColorHarmonyEngine] Initialized with Year 3000 Quantum Empathy via BaseVisualSystem and SemanticColorManager."
+      );
+      console.log(
+        "🎨 [ColorHarmonyEngine] Subscribed to 'colors/extracted' events for strategy pattern processing."
       );
     }
     this.initialized = true;
@@ -452,11 +473,186 @@ export class ColorHarmonyEngine
   public async healthCheck(): Promise<HealthCheckResult> {
     if (!this.catppuccinPalettes[this.currentTheme]) {
       return {
+        healthy: false,
         ok: false,
         details: `Current theme '${this.currentTheme}' not found in palettes.`,
+        issues: [`Current theme '${this.currentTheme}' not found in palettes.`],
+        system: 'ColorHarmonyEngine',
       };
     }
-    return { ok: true, details: "Palettes are loaded correctly." };
+    return { 
+      healthy: true,
+      ok: true, 
+      details: "Palettes are loaded correctly.",
+      issues: [],
+      system: 'ColorHarmonyEngine',
+    };
+  }
+
+  // ============================================================================
+  // IColorProcessor Strategy Pattern Implementation
+  // ============================================================================
+
+  /**
+   * Process colors according to Catppuccin harmony strategy
+   * Implements the Strategy pattern for color processing
+   */
+  public async processColors(context: ColorContext): Promise<ColorResult> {
+    const startTime = performance.now();
+    
+    try {
+      // Extract relevant data from context
+      const { rawColors, trackUri, musicData } = context;
+      
+      // Use existing blendWithCatppuccin method for strategy implementation
+      const processedColors = this.blendWithCatppuccin(rawColors, musicData);
+      
+      // Extract primary accent color
+      const accentHex = processedColors['VIBRANT'] || 
+                       processedColors['PROMINENT'] || 
+                       Object.values(processedColors)[0] || 
+                       '#a6adc8'; // Catppuccin fallback
+      
+      // Convert to RGB for transparency support
+      const rgb = this.utils.hexToRgb(accentHex);
+      const accentRgb = rgb ? `${rgb.r},${rgb.g},${rgb.b}` : '166,173,200';
+      
+      const processingTime = performance.now() - startTime;
+      
+      // Update metrics
+      this.harmonyMetrics.totalHarmonyCalculations++;
+      this.harmonyMetrics.performance.push(processingTime);
+      
+      const result: ColorResult = {
+        processedColors,
+        accentHex,
+        accentRgb,
+        metadata: {
+          strategy: 'CatppuccinHarmony',
+          processingTime,
+          cacheKey: `catppuccin-${trackUri}-${this.currentTheme}`,
+          harmonicIntensity: this.userIntensity
+        },
+        context
+      };
+      
+      // Publish processed result event
+      GlobalEventBus.publish('colors/harmonized', {
+        type: 'colors/harmonized',
+        payload: {
+          ...result,
+          cssVariables: this.generateCSSVariables(result)
+        }
+      });
+      
+      if (this.config.enableDebug) {
+        console.log(
+          `🎨 [ColorHarmonyEngine] Processed colors via strategy pattern in ${processingTime.toFixed(2)}ms`,
+          { accentHex, strategy: 'CatppuccinHarmony' }
+        );
+      }
+      
+      return result;
+      
+    } catch (error) {
+      console.error('[ColorHarmonyEngine] Strategy processing failed:', error);
+      
+      // Return fallback result
+      return {
+        processedColors: { VIBRANT: '#a6adc8' },
+        accentHex: '#a6adc8',
+        accentRgb: '166,173,200',
+        metadata: {
+          strategy: 'CatppuccinHarmony',
+          processingTime: performance.now() - startTime,
+          error: String(error)
+        },
+        context
+      };
+    }
+  }
+
+  /**
+   * Get strategy name for identification
+   */
+  public getStrategyName(): string {
+    return 'CatppuccinHarmony';
+  }
+
+  /**
+   * Check if this strategy can process the given context
+   */
+  public canProcess(context: ColorContext): boolean {
+    // Can process any context with raw colors
+    return context && 
+           context.rawColors && 
+           Object.keys(context.rawColors).length > 0;
+  }
+
+  /**
+   * Get estimated processing time for performance planning
+   */
+  public getEstimatedProcessingTime(context: ColorContext): number {
+    // Base time + complexity factor
+    const baseTime = 5; // ms
+    const colorCount = Object.keys(context.rawColors || {}).length;
+    const complexityFactor = Math.max(1, colorCount / 5);
+    
+    return baseTime * complexityFactor;
+  }
+
+  /**
+   * Handle color extraction events from GlobalEventBus
+   * Event-driven entry point for strategy pattern
+   */
+  private async handleColorExtraction(event: ColorExtractedEvent): Promise<void> {
+    try {
+      if (!this.initialized) {
+        if (this.config.enableDebug) {
+          console.warn('[ColorHarmonyEngine] Received color extraction event but not initialized');
+        }
+        return;
+      }
+
+      const context = event.payload || event;
+      
+      if (this.canProcess(context)) {
+        await this.processColors(context);
+      } else {
+        if (this.config.enableDebug) {
+          console.warn('[ColorHarmonyEngine] Cannot process color context:', context);
+        }
+      }
+      
+    } catch (error) {
+      console.error('[ColorHarmonyEngine] Error handling color extraction event:', error);
+    }
+  }
+
+  /**
+   * Generate CSS variables from color result
+   */
+  private generateCSSVariables(result: ColorResult): Record<string, string> {
+    const cssVars: Record<string, string> = {};
+    
+    // Core accent variables
+    cssVars['--sn-accent-hex'] = result.accentHex;
+    cssVars['--sn-accent-rgb'] = result.accentRgb;
+    
+    // Canonical accent variables
+    cssVars[ColorHarmonyEngine.CANONICAL_HEX_VAR] = result.accentHex;
+    cssVars[ColorHarmonyEngine.CANONICAL_RGB_VAR] = result.accentRgb;
+    
+    // Legacy Spicetify compatibility
+    cssVars['--spice-accent'] = result.accentHex;
+    cssVars['--spice-button'] = result.accentHex;
+    cssVars['--spice-button-active'] = result.accentHex;
+    
+    // RGB variants for transparency
+    cssVars['--spice-rgb-accent'] = result.accentRgb;
+    cssVars['--spice-rgb-button'] = result.accentRgb;
+    
+    return cssVars;
   }
 
   detectCurrentTheme(): CatppuccinFlavor {

@@ -11,7 +11,7 @@ import { MusicSyncService } from "@/audio/MusicSyncService";
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
-import { Y3K } from "@/debug/SystemHealthMonitor";
+import { Y3K } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { ShaderLoader } from "@/utils/graphics/ShaderLoader";

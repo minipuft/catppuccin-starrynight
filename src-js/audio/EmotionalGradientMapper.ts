@@ -11,7 +11,7 @@
  * - Dynamics (soft ↔ loud) affects opacity and scale
  */
 
-import { Y3K } from "@/debug/SystemHealthMonitor";
+import { Y3K } from "@/debug/UnifiedDebugManager";
 import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { FluxSpectralAnalyzer, SpectralData } from "@/audio/FluxSpectralAnalyzer";

@@ -1,0 +1,457 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// SYMBIOTIC LISTENING EFFECTS - Musical Empathy Visualization
+// ████████████████████████████████████████████████████████████████████████████████
+
+// === SYMBIOTIC RESONANCE FOUNDATION ===
+// Visual effects that create the feeling that the interface is experiencing
+// music alongside the user through empathetic responses and musical memory
+
+// Base symbiotic resonance effect
+.organic-symbiotic-resonance {
+  // Core symbiotic properties
+  position: relative;
+  contain: layout style paint;
+  
+  // Symbiotic consciousness enhancement
+  filter: 
+    saturate(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.2))
+    brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.1));
+  
+  // Resonance breathing
+  animation: organic-symbiotic-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+  
+  // Performance optimization
+  will-change: filter, transform;
+  transform: translateZ(0);
+  
+  // Symbiotic transition system
+  transition: filter var(--organic-transition-medium, 0.5s) var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+  
+  // Symbiotic empathy visualization
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    // Empathy field gradient
+    background: radial-gradient(
+      ellipse at center,
+      rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * var(--organic-symbiotic-resonance, 0.7))) 0%,
+      rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * var(--organic-symbiotic-resonance, 0.7) * 0.5)) 40%,
+      transparent 70%
+    );
+    
+    // Empathy field animation
+    animation: organic-empathy-field var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+    
+    // Performance optimization
+    pointer-events: none;
+    z-index: var(--organic-depth-atmosphere, 0);
+    will-change: opacity, transform;
+    contain: strict;
+  }
+  
+  // Resonance level variations
+  &[data-resonance="low"] {
+    --symbiotic-resonance-multiplier: 0.3;
+    filter: 
+      saturate(calc(1.0 + var(--symbiotic-resonance-multiplier, 0.3) * 0.1))
+      brightness(calc(1.0 + var(--symbiotic-resonance-multiplier, 0.3) * 0.05));
+  }
+  
+  &[data-resonance="medium"] {
+    --symbiotic-resonance-multiplier: 0.7;
+    filter: 
+      saturate(calc(1.0 + var(--symbiotic-resonance-multiplier, 0.7) * 0.15))
+      brightness(calc(1.0 + var(--symbiotic-resonance-multiplier, 0.7) * 0.08));
+  }
+  
+  &[data-resonance="high"] {
+    --symbiotic-resonance-multiplier: 1.0;
+    filter: 
+      saturate(calc(1.0 + var(--symbiotic-resonance-multiplier, 1.0) * 0.25))
+      brightness(calc(1.0 + var(--symbiotic-resonance-multiplier, 1.0) * 0.12))
+      hue-rotate(calc(var(--symbiotic-resonance-multiplier, 1.0) * 5deg));
+    
+    // Enhanced empathy visualization for high resonance
+    &::before {
+      background: radial-gradient(
+        ellipse at center,
+        rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 2)) 0%,
+        rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * 1.5)) 30%,
+        rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 1)) 60%,
+        transparent 80%
+      );
+    }
+  }
+}
+
+// Musical memory visualization
+.organic-musical-memory {
+  // Memory consciousness enhancement
+  position: relative;
+  
+  // Memory pattern overlay
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    // Memory pattern visualization
+    background: 
+      repeating-linear-gradient(
+        45deg,
+        transparent 0px,
+        rgba(var(--organic-primary-rgb, 205, 214, 244), calc(var(--organic-shimmer-opacity, 0.05) * 0.3)) 1px,
+        transparent 2px,
+        transparent 10px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        transparent 0px,
+        rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * 0.2)) 1px,
+        transparent 2px,
+        transparent 15px
+      );
+    
+    // Memory pattern animation
+    animation: organic-memory-pattern 3s linear infinite;
+    
+    // Performance optimization
+    pointer-events: none;
+    z-index: var(--organic-depth-near, 1);
+    will-change: background-position;
+    contain: strict;
+    opacity: calc(var(--organic-symbiotic-resonance, 0.7) * 0.5);
+  }
+  
+  // Memory strength levels
+  &[data-memory-strength="weak"] {
+    &::after {
+      opacity: calc(var(--organic-symbiotic-resonance, 0.7) * 0.2);
+      animation-duration: 5s;
+    }
+  }
+  
+  &[data-memory-strength="strong"] {
+    &::after {
+      opacity: calc(var(--organic-symbiotic-resonance, 0.7) * 0.8);
+      animation-duration: 2s;
+    }
+  }
+}
+
+// Emotional empathy visualization
+.organic-emotional-empathy {
+  // Empathy consciousness field
+  position: relative;
+  
+  // Emotional resonance enhancement
+  filter: 
+    saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * var(--organic-symbiotic-resonance, 0.7) * 0.15))
+    hue-rotate(calc(var(--organic-emotional-temperature, 6500) / 100 - 65deg));
+  
+  // Emotional empathy field
+  &::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    
+    // Empathy aura
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--organic-primary-rgb, 205, 214, 244), calc(var(--organic-shimmer-opacity, 0.05) * var(--organic-symbiotic-resonance, 0.7))) 0%,
+      rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * var(--organic-symbiotic-resonance, 0.7) * 0.7)) 50%,
+      transparent 100%
+    );
+    
+    // Empathy pulsation
+    animation: organic-empathy-pulse var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+    
+    // Performance optimization
+    pointer-events: none;
+    z-index: var(--organic-depth-atmosphere, 0);
+    will-change: opacity, transform;
+    contain: strict;
+    border-radius: inherit;
+  }
+  
+  // Emotion type visualizations
+  &[data-emotion="calm"] {
+    --emotion-hue-shift: 0deg;
+    --emotion-saturation: 0.8;
+    animation-timing-function: ease-in-out;
+  }
+  
+  &[data-emotion="energetic"] {
+    --emotion-hue-shift: 15deg;
+    --emotion-saturation: 1.3;
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  &[data-emotion="melancholy"] {
+    --emotion-hue-shift: -10deg;
+    --emotion-saturation: 0.6;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  
+  &[data-emotion="happy"] {
+    --emotion-hue-shift: 25deg;
+    --emotion-saturation: 1.2;
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  
+  &[data-emotion="mysterious"] {
+    --emotion-hue-shift: -20deg;
+    --emotion-saturation: 1.1;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  &[data-emotion="epic"] {
+    --emotion-hue-shift: 30deg;
+    --emotion-saturation: 1.5;
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+}
+
+// Beat synchronization visualization
+.organic-beat-sync {
+  // Beat synchronization effects
+  position: relative;
+  
+  // Beat pulse enhancement
+  &.beat-pulse {
+    animation: 
+      organic-symbiotic-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite,
+      organic-beat-pulse 0.15s ease-out forwards;
+  }
+  
+  // Beat visualization
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    
+    // Beat indicator
+    background: rgba(var(--organic-neon-glow-rgb, 116, 199, 236), var(--organic-symbiotic-resonance, 0.7));
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    
+    // Beat pulse animation
+    animation: organic-beat-indicator 0.15s ease-out forwards;
+    
+    // Performance optimization
+    pointer-events: none;
+    z-index: var(--organic-depth-far, 3);
+    will-change: transform, opacity;
+    contain: strict;
+  }
+  
+  // Beat strength levels
+  &[data-beat-strength="weak"] {
+    &::after {
+      opacity: calc(var(--organic-symbiotic-resonance, 0.7) * 0.3);
+      animation-duration: 0.3s;
+    }
+  }
+  
+  &[data-beat-strength="strong"] {
+    &::after {
+      opacity: var(--organic-symbiotic-resonance, 0.7);
+      animation-duration: 0.1s;
+      box-shadow: 
+        0 0 8px rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-symbiotic-resonance, 0.7) * 0.5));
+    }
+  }
+}
+
+// === SYMBIOTIC LISTENING KEYFRAMES ===
+
+// Symbiotic breathing animation
+@keyframes organic-symbiotic-breathing {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.2))
+      brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.1));
+    transform: scale(1.0);
+  }
+  
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.25))
+      brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.12))
+      hue-rotate(calc(var(--organic-symbiotic-resonance, 0.7) * 2deg));
+    transform: scale(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.02));
+  }
+  
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.2))
+      brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.1));
+    transform: scale(1.0);
+  }
+}
+
+// Empathy field animation
+@keyframes organic-empathy-field {
+  0% {
+    opacity: calc(var(--organic-shimmer-opacity, 0.05) * var(--organic-symbiotic-resonance, 0.7));
+    transform: scale(1.0) rotate(0deg);
+  }
+  
+  25% {
+    opacity: calc(var(--organic-shimmer-opacity, 0.05) * var(--organic-symbiotic-resonance, 0.7) * 1.2);
+    transform: scale(1.02) rotate(1deg);
+  }
+  
+  50% {
+    opacity: calc(var(--organic-shimmer-opacity, 0.05) * var(--organic-symbiotic-resonance, 0.7) * 1.5);
+    transform: scale(1.05) rotate(0deg);
+  }
+  
+  75% {
+    opacity: calc(var(--organic-shimmer-opacity, 0.05) * var(--organic-symbiotic-resonance, 0.7) * 1.2);
+    transform: scale(1.02) rotate(-1deg);
+  }
+  
+  100% {
+    opacity: calc(var(--organic-shimmer-opacity, 0.05) * var(--organic-symbiotic-resonance, 0.7));
+    transform: scale(1.0) rotate(0deg);
+  }
+}
+
+// Empathy pulse animation
+@keyframes organic-empathy-pulse {
+  0% {
+    opacity: calc(var(--organic-shimmer-opacity, 0.05) * var(--organic-symbiotic-resonance, 0.7));
+    transform: scale(1.0);
+  }
+  
+  50% {
+    opacity: calc(var(--organic-shimmer-opacity, 0.05) * var(--organic-symbiotic-resonance, 0.7) * 1.3);
+    transform: scale(1.03);
+  }
+  
+  100% {
+    opacity: calc(var(--organic-shimmer-opacity, 0.05) * var(--organic-symbiotic-resonance, 0.7));
+    transform: scale(1.0);
+  }
+}
+
+// Memory pattern animation
+@keyframes organic-memory-pattern {
+  0% {
+    background-position: 0px 0px, 0px 0px;
+  }
+  
+  100% {
+    background-position: 20px 20px, -20px 20px;
+  }
+}
+
+// Beat pulse animation
+@keyframes organic-beat-pulse {
+  0% {
+    transform: scale(1.0);
+    filter: brightness(1.0);
+  }
+  
+  50% {
+    transform: scale(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.05));
+    filter: brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.2));
+  }
+  
+  100% {
+    transform: scale(1.0);
+    filter: brightness(1.0);
+  }
+}
+
+// Beat indicator animation
+@keyframes organic-beat-indicator {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  
+  50% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: var(--organic-symbiotic-resonance, 0.7);
+  }
+  
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+  }
+}
+
+// === ACCESSIBILITY AND PERFORMANCE ===
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .organic-symbiotic-resonance,
+  .organic-musical-memory,
+  .organic-emotional-empathy,
+  .organic-beat-sync {
+    animation: none !important;
+    filter: none !important;
+    transition-duration: 0.1s !important;
+    
+    &::before,
+    &::after {
+      animation: none !important;
+      opacity: 0.1 !important;
+    }
+  }
+}
+
+// High contrast support
+@media (prefers-contrast: high) {
+  .organic-symbiotic-resonance {
+    filter: 
+      saturate(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.5)) !important
+      contrast(1.5) !important;
+    
+    &::before {
+      opacity: calc(var(--organic-shimmer-opacity, 0.05) * 3) !important;
+    }
+  }
+}
+
+// Debug mode for symbiotic listening
+:root.organic-debug {
+  .organic-symbiotic-resonance {
+    outline: 1px dashed rgba(0, 255, 0, 0.8) !important;
+    
+    &::after {
+      content: '🎵 SYMBIOTIC';
+      position: absolute;
+      top: -40px;
+      left: 0;
+      font-size: 10px;
+      color: lime;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 2px 4px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  }
+  
+  .organic-beat-sync.beat-pulse {
+    outline: 2px solid red !important;
+    outline-offset: 2px;
+  }
+}

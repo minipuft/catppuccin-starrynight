@@ -38,11 +38,20 @@ export class EmergentChoreographyEngine
 
   public async healthCheck(): Promise<HealthCheckResult> {
     if (!GlobalEventBus) {
-      return { ok: false, details: "GlobalEventBus is not available." };
+      return { 
+        healthy: false,
+        ok: false, 
+        details: "GlobalEventBus is not available.",
+        issues: ["GlobalEventBus is not available."],
+        system: 'EmergentChoreographyEngine',
+      };
     }
     return {
+      healthy: true,
       ok: true,
       details: "Emergent Choreography Engine is operational.",
+      issues: [],
+      system: 'EmergentChoreographyEngine',
     };
   }
 

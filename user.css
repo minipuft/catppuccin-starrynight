@@ -12113,6 +12113,1664 @@ body {
     transform: none !important;
   }
 }
+/**
+ * Cinematic Drama Engine CSS - Phase 2.2
+ * 
+ * Red energy bursts with holographic interfaces for intense musical moments.
+ * Blade Runner-style CRT interference with consciousness-driven intensity.
+ * 
+ * @performance 60fps animations with CSS-first approach
+ * @consciousness Red energy that breathes with musical soul
+ */
+/* === Cinematic Drama CSS Variables === */
+:root {
+  /* Red Energy Burst Colors */
+  --cinematic-red-r: 255;
+  --cinematic-red-g: 50;
+  --cinematic-red-b: 50;
+  --cinematic-amber-r: 255;
+  --cinematic-amber-g: 140;
+  --cinematic-amber-b: 0;
+  --cinematic-blue-r: 0;
+  --cinematic-blue-g: 100;
+  --cinematic-blue-b: 200;
+  --cinematic-cyan-r: 0;
+  --cinematic-cyan-g: 255;
+  --cinematic-cyan-b: 255;
+  /* Dynamic Intensity Variables */
+  --cinematic-glow-intensity: 0; /* 0-1 holographic glow strength */
+  --cinematic-flicker-rate: 0.5; /* Hz CRT flicker frequency */
+  --cinematic-scanline-speed: 1.0; /* Scanline animation velocity */
+  --cinematic-interference: 0; /* 0-1 CRT interference level */
+  --cinematic-depth: 0; /* 0-1 atmospheric depth */
+  --cinematic-dramatic-tension: 0; /* 0-1 dramatic moment intensity */
+  --cinematic-energy-stability: 1.0; /* 0-1 chaos vs stability */
+  /* Calculated Composite Values */
+  --cinematic-red-rgb: var(--cinematic-red-r), var(--cinematic-red-g), var(--cinematic-red-b);
+  --cinematic-amber-rgb: var(--cinematic-amber-r), var(--cinematic-amber-g), var(--cinematic-amber-b);
+  --cinematic-blue-rgb: var(--cinematic-blue-r), var(--cinematic-blue-g), var(--cinematic-blue-b);
+  --cinematic-cyan-rgb: var(--cinematic-cyan-r), var(--cinematic-cyan-g), var(--cinematic-cyan-b);
+}
+
+/* === Red Energy Burst Keyframes === */
+@keyframes cinematic-energy-burst {
+  0% {
+    box-shadow: 0 0 10px rgba(var(--cinematic-red-rgb), 0.3), inset 0 0 5px rgba(var(--cinematic-amber-rgb), 0.2);
+    border-color: rgba(var(--cinematic-red-rgb), 0.4);
+  }
+  50% {
+    box-shadow: 0 0 calc(var(--cinematic-glow-intensity) * 60px) rgba(var(--cinematic-red-rgb), calc(var(--cinematic-glow-intensity) * 0.8)), inset 0 0 calc(var(--cinematic-glow-intensity) * 30px) rgba(var(--cinematic-amber-rgb), calc(var(--cinematic-glow-intensity) * 0.6));
+    border-color: rgba(var(--cinematic-red-rgb), var(--cinematic-glow-intensity));
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(var(--cinematic-red-rgb), 0.3), inset 0 0 5px rgba(var(--cinematic-amber-rgb), 0.2);
+    border-color: rgba(var(--cinematic-red-rgb), 0.4);
+  }
+}
+@keyframes cinematic-crt-flicker {
+  0% {
+    opacity: 1;
+  }
+  2% {
+    opacity: 0.9;
+  }
+  4% {
+    opacity: 1;
+  }
+  19% {
+    opacity: 1;
+  }
+  21% {
+    opacity: 0.95;
+  }
+  23% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  83% {
+    opacity: 0.92;
+  }
+  87% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes cinematic-dramatic-scanlines {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 4px;
+  }
+}
+@keyframes cinematic-interference-noise {
+  0% {
+    filter: drop-shadow(1px 0 0 rgba(255, 0, 0, 0.3)) drop-shadow(-1px 0 0 rgba(0, 255, 255, 0.3));
+    transform: translateX(0);
+  }
+  10% {
+    filter: drop-shadow(2px 0 0 rgba(255, 0, 0, 0.5)) drop-shadow(-2px 0 0 rgba(0, 255, 255, 0.4));
+    transform: translateX(1px);
+  }
+  20% {
+    filter: drop-shadow(-1px 0 0 rgba(255, 0, 0, 0.4)) drop-shadow(1px 0 0 rgba(0, 255, 255, 0.3));
+    transform: translateX(-1px);
+  }
+  30% {
+    filter: drop-shadow(0px 0 0 rgba(255, 0, 0, 0.3)) drop-shadow(0px 0 0 rgba(0, 255, 255, 0.3));
+    transform: translateX(0);
+  }
+  100% {
+    filter: drop-shadow(1px 0 0 rgba(255, 0, 0, 0.3)) drop-shadow(-1px 0 0 rgba(0, 255, 255, 0.3));
+    transform: translateX(0);
+  }
+}
+@keyframes cinematic-holographic-depth {
+  0% {
+    backdrop-filter: blur(0px);
+    background: rgba(var(--cinematic-red-rgb), 0.05);
+  }
+  50% {
+    backdrop-filter: blur(calc(var(--cinematic-depth) * 4px));
+    background: rgba(var(--cinematic-red-rgb), calc(var(--cinematic-depth) * 0.15));
+  }
+  100% {
+    backdrop-filter: blur(0px);
+    background: rgba(var(--cinematic-red-rgb), 0.05);
+  }
+}
+/* === Cinematic Drama Base Classes === */
+/* Red Energy Burst Effect */
+.cinematic-energy-burst, .player-controls[data-cinematic-mode=active], .Root__now-playing-bar[data-cinematic-mode=active] {
+  position: relative;
+}
+.cinematic-energy-burst::before, .player-controls[data-cinematic-mode=active]::before, .Root__now-playing-bar[data-cinematic-mode=active]::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 1px solid rgba(var(--cinematic-red-rgb), 0.4);
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--cinematic-glow-intensity);
+  animation: cinematic-energy-burst calc(1s / var(--cinematic-flicker-rate)) ease-in-out infinite, cinematic-crt-flicker 0.15s linear infinite;
+}
+.cinematic-energy-burst::after, .player-controls[data-cinematic-mode=active]::after, .Root__now-playing-bar[data-cinematic-mode=active]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(var(--cinematic-red-rgb), calc(var(--cinematic-glow-intensity) * 0.1));
+  border-radius: inherit;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: cinematic-holographic-depth 2s ease-in-out infinite;
+}
+
+/* CRT Interference Effect */
+.cinematic-crt-interference, .cover-art[data-cinematic-mode=active],
+.main-trackInfo-container img[data-cinematic-mode=active], .Root__nav-bar[data-cinematic-mode=active], .main-view-container[data-cinematic-mode=active] {
+  position: relative;
+  filter: drop-shadow(calc(var(--cinematic-interference) * 2px) 0 0 rgba(255, 0, 0, calc(var(--cinematic-interference) * 0.6))) drop-shadow(calc(var(--cinematic-interference) * -2px) 0 0 rgba(0, 255, 255, calc(var(--cinematic-interference) * 0.4)));
+}
+.cinematic-crt-interference[data-interference=high], [data-interference=high].cover-art[data-cinematic-mode=active],
+.main-trackInfo-container img[data-interference=high][data-cinematic-mode=active], [data-interference=high].Root__nav-bar[data-cinematic-mode=active], [data-interference=high].main-view-container[data-cinematic-mode=active] {
+  animation: cinematic-interference-noise 0.1s linear infinite;
+}
+.cinematic-crt-interference::before, .cover-art[data-cinematic-mode=active]::before,
+.main-trackInfo-container img[data-cinematic-mode=active]::before, .Root__nav-bar[data-cinematic-mode=active]::before, .main-view-container[data-cinematic-mode=active]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(var(--cinematic-amber-rgb), calc(var(--cinematic-interference) * 0.1)) 4px);
+  pointer-events: none;
+  animation: cinematic-dramatic-scanlines calc(2s / var(--cinematic-scanline-speed)) linear infinite;
+}
+
+/* Dramatic Scanlines */
+.cinematic-dramatic-scanlines, .main-view-container[data-cinematic-mode=active] {
+  position: relative;
+}
+.cinematic-dramatic-scanlines::after, .main-view-container[data-cinematic-mode=active]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(var(--cinematic-amber-rgb), calc(var(--cinematic-glow-intensity) * 0.2)) 4px, rgba(var(--cinematic-amber-rgb), calc(var(--cinematic-glow-intensity) * 0.2)) 4px);
+  pointer-events: none;
+  opacity: var(--cinematic-glow-intensity);
+  animation: cinematic-dramatic-scanlines calc(1s / var(--cinematic-scanline-speed)) linear infinite;
+}
+
+/* Holographic Red Data Stream */
+.cinematic-red-data-stream, .Root__nav-bar[data-cinematic-mode=active] {
+  position: relative;
+  overflow: hidden;
+}
+.cinematic-red-data-stream::before, .Root__nav-bar[data-cinematic-mode=active]::before {
+  content: "01010011 01110100 01100001 01110010 01110010 01111001 01001110 01101001 01100111 01101000 01110100";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", monospace;
+  font-size: 8px;
+  line-height: 12px;
+  color: rgba(var(--cinematic-red-rgb), calc(var(--cinematic-glow-intensity) * 0.6));
+  text-shadow: 0 0 2px rgba(var(--cinematic-red-rgb), calc(var(--cinematic-glow-intensity) * 0.8));
+  word-wrap: break-word;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: var(--cinematic-glow-intensity);
+  animation: cinematic-dramatic-scanlines calc(3s / var(--cinematic-scanline-speed)) linear infinite, cinematic-crt-flicker 0.2s linear infinite;
+}
+
+/* Atmospheric Depth Effect */
+.cinematic-atmospheric-depth, .Root__now-playing-bar[data-cinematic-mode=active] {
+  backdrop-filter: blur(calc(var(--cinematic-depth) * 3px));
+  background: linear-gradient(45deg, rgba(var(--cinematic-red-rgb), calc(var(--cinematic-depth) * 0.1)) 0%, transparent 50%, rgba(var(--cinematic-amber-rgb), calc(var(--cinematic-depth) * 0.05)) 100%);
+}
+
+/* === Specific UI Element Targeting === */
+/* Now Playing Bar - Energy Barrier */
+.Root__now-playing-bar[data-cinematic-mode=active] {
+  background: linear-gradient(90deg, rgba(var(--cinematic-red-rgb), calc(var(--cinematic-glow-intensity) * 0.15)) 0%, rgba(var(--cinematic-amber-rgb), calc(var(--cinematic-glow-intensity) * 0.1)) 50%, rgba(var(--cinematic-red-rgb), calc(var(--cinematic-glow-intensity) * 0.15)) 100%);
+  background-size: 200% 100%;
+  animation: cinematic-energy-burst calc(1s / var(--cinematic-flicker-rate)) ease-in-out infinite, cinematic-holographic-depth 3s ease-in-out infinite;
+}
+
+/* Main View Container - Cinematic Overlay */
+.main-view-container[data-cinematic-mode=active]::before {
+  opacity: calc(var(--cinematic-interference) * 0.8);
+}
+
+/* Navigation Bar - Red Data Stream */
+.Root__nav-bar[data-cinematic-mode=active] {
+  border-right: 1px solid rgba(var(--cinematic-red-rgb), calc(var(--cinematic-glow-intensity) * 0.6));
+  box-shadow: inset -2px 0 4px rgba(var(--cinematic-red-rgb), calc(var(--cinematic-glow-intensity) * 0.3)), 2px 0 8px rgba(var(--cinematic-red-rgb), calc(var(--cinematic-glow-intensity) * 0.2));
+}
+
+/* Player Controls - Dramatic Interface */
+.player-controls[data-cinematic-mode=active] .control-button {
+  position: relative;
+}
+.player-controls[data-cinematic-mode=active] .control-button::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 1px solid rgba(var(--cinematic-red-rgb), calc(var(--cinematic-glow-intensity) * 0.5));
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.player-controls[data-cinematic-mode=active] .control-button:hover::after {
+  opacity: 1;
+  animation: cinematic-energy-burst 0.5s ease-in-out infinite;
+}
+.player-controls[data-cinematic-mode=active] .control-button:active {
+  box-shadow: 0 0 10px rgba(var(--cinematic-red-rgb), 0.8), inset 0 0 5px rgba(var(--cinematic-amber-rgb), 0.6);
+  animation: cinematic-crt-flicker 0.1s linear 3;
+}
+
+/* Album Art - Cinematic Frame */
+.cover-art[data-cinematic-mode=active],
+.main-trackInfo-container img[data-cinematic-mode=active] {
+  position: relative;
+}
+.cover-art[data-cinematic-mode=active]::before,
+.main-trackInfo-container img[data-cinematic-mode=active]::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 2px solid rgba(var(--cinematic-red-rgb), calc(var(--cinematic-glow-intensity) * 0.7));
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: var(--cinematic-glow-intensity);
+  animation: cinematic-energy-burst calc(1.5s / var(--cinematic-flicker-rate)) ease-in-out infinite, cinematic-crt-flicker 0.3s linear infinite;
+}
+
+/* === Responsive Adaptations === */
+/* Reduce effects on lower-end devices */
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-energy-burst, .Root__now-playing-bar[data-cinematic-mode=active], .player-controls[data-cinematic-mode=active],
+  .cinematic-crt-interference,
+  .main-view-container[data-cinematic-mode=active],
+  .Root__nav-bar[data-cinematic-mode=active],
+  .cover-art[data-cinematic-mode=active],
+  .main-trackInfo-container img[data-cinematic-mode=active],
+  .cinematic-dramatic-scanlines,
+  .cinematic-red-data-stream,
+  .cinematic-atmospheric-depth {
+    animation: none !important;
+  }
+  .cinematic-energy-burst::before, .Root__now-playing-bar[data-cinematic-mode=active]::before, .player-controls[data-cinematic-mode=active]::before, .cinematic-energy-burst::after, .Root__now-playing-bar[data-cinematic-mode=active]::after, .player-controls[data-cinematic-mode=active]::after,
+  .cinematic-crt-interference::before,
+  .main-view-container[data-cinematic-mode=active]::before,
+  .Root__nav-bar[data-cinematic-mode=active]::before,
+  .cover-art[data-cinematic-mode=active]::before,
+  .main-trackInfo-container img[data-cinematic-mode=active]::before,
+  .cinematic-crt-interference::after,
+  .main-view-container[data-cinematic-mode=active]::after,
+  .Root__nav-bar[data-cinematic-mode=active]::after,
+  .cover-art[data-cinematic-mode=active]::after,
+  .main-trackInfo-container img[data-cinematic-mode=active]::after,
+  .cinematic-dramatic-scanlines::before,
+  .cinematic-dramatic-scanlines::after,
+  .cinematic-red-data-stream::before,
+  .cinematic-red-data-stream::after,
+  .cinematic-atmospheric-depth::before,
+  .cinematic-atmospheric-depth::after {
+    animation: none !important;
+  }
+}
+/* High performance mode */
+@media (min-width: 1920px) and (min-height: 1080px) {
+  :root {
+    --cinematic-quality-multiplier: 1.5;
+  }
+  .cinematic-energy-burst::before, .Root__now-playing-bar[data-cinematic-mode=active]::before, .player-controls[data-cinematic-mode=active]::before {
+    filter: blur(calc(var(--cinematic-depth) * 2px));
+  }
+  .cinematic-atmospheric-depth, .Root__now-playing-bar[data-cinematic-mode=active] {
+    backdrop-filter: blur(calc(var(--cinematic-depth) * 4px)) saturate(calc(1 + var(--cinematic-glow-intensity) * 0.3));
+  }
+}
+/* Mobile adaptations */
+@media (max-width: 768px) {
+  :root {
+    --cinematic-quality-multiplier: 0.7;
+  }
+  .cinematic-energy-burst::before, .Root__now-playing-bar[data-cinematic-mode=active]::before, .player-controls[data-cinematic-mode=active]::before, .cinematic-energy-burst::after, .Root__now-playing-bar[data-cinematic-mode=active]::after, .player-controls[data-cinematic-mode=active]::after,
+  .cinematic-crt-interference::before,
+  .main-view-container[data-cinematic-mode=active]::before,
+  .Root__nav-bar[data-cinematic-mode=active]::before,
+  .cover-art[data-cinematic-mode=active]::before,
+  .main-trackInfo-container img[data-cinematic-mode=active]::before,
+  .cinematic-crt-interference::after,
+  .main-view-container[data-cinematic-mode=active]::after,
+  .Root__nav-bar[data-cinematic-mode=active]::after,
+  .cover-art[data-cinematic-mode=active]::after,
+  .main-trackInfo-container img[data-cinematic-mode=active]::after {
+    opacity: calc(var(--cinematic-glow-intensity) * 0.7);
+  }
+}
+/* === Accessibility === */
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --cinematic-red-r: 255;
+    --cinematic-red-g: 0;
+    --cinematic-red-b: 0;
+    --cinematic-amber-r: 255;
+    --cinematic-amber-g: 255;
+    --cinematic-amber-b: 0;
+  }
+}
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  .cinematic-energy-burst, .Root__now-playing-bar[data-cinematic-mode=active], .player-controls[data-cinematic-mode=active],
+  .cinematic-crt-interference,
+  .main-view-container[data-cinematic-mode=active],
+  .Root__nav-bar[data-cinematic-mode=active],
+  .cover-art[data-cinematic-mode=active],
+  .main-trackInfo-container img[data-cinematic-mode=active] {
+    background-blend-mode: screen;
+  }
+}
+/* === Debug and Development === */
+/* Debug mode - shows cinematic effect boundaries */
+[data-debug=cinematic] .cinematic-energy-burst, [data-debug=cinematic] .Root__now-playing-bar[data-cinematic-mode=active], [data-debug=cinematic] .player-controls[data-cinematic-mode=active],
+[data-debug=cinematic] .cinematic-crt-interference,
+[data-debug=cinematic] .main-view-container[data-cinematic-mode=active],
+[data-debug=cinematic] .Root__nav-bar[data-cinematic-mode=active],
+[data-debug=cinematic] .cover-art[data-cinematic-mode=active],
+[data-debug=cinematic] .main-trackInfo-container img[data-cinematic-mode=active],
+.main-trackInfo-container [data-debug=cinematic] img[data-cinematic-mode=active],
+[data-debug=cinematic] .cinematic-dramatic-scanlines {
+  outline: 1px dashed rgba(var(--cinematic-red-rgb), 0.5) !important;
+}
+[data-debug=cinematic] .cinematic-energy-burst::before, [data-debug=cinematic] .Root__now-playing-bar[data-cinematic-mode=active]::before, [data-debug=cinematic] .player-controls[data-cinematic-mode=active]::before, [data-debug=cinematic] .cinematic-energy-burst::after, [data-debug=cinematic] .Root__now-playing-bar[data-cinematic-mode=active]::after, [data-debug=cinematic] .player-controls[data-cinematic-mode=active]::after,
+[data-debug=cinematic] .cinematic-crt-interference::before,
+[data-debug=cinematic] .main-view-container[data-cinematic-mode=active]::before,
+[data-debug=cinematic] .Root__nav-bar[data-cinematic-mode=active]::before,
+[data-debug=cinematic] .cover-art[data-cinematic-mode=active]::before,
+[data-debug=cinematic] .main-trackInfo-container img[data-cinematic-mode=active]::before,
+.main-trackInfo-container [data-debug=cinematic] img[data-cinematic-mode=active]::before,
+[data-debug=cinematic] .cinematic-crt-interference::after,
+[data-debug=cinematic] .main-view-container[data-cinematic-mode=active]::after,
+[data-debug=cinematic] .Root__nav-bar[data-cinematic-mode=active]::after,
+[data-debug=cinematic] .cover-art[data-cinematic-mode=active]::after,
+[data-debug=cinematic] .main-trackInfo-container img[data-cinematic-mode=active]::after,
+.main-trackInfo-container [data-debug=cinematic] img[data-cinematic-mode=active]::after,
+[data-debug=cinematic] .cinematic-dramatic-scanlines::before,
+[data-debug=cinematic] .cinematic-dramatic-scanlines::after {
+  outline: 1px dotted rgba(var(--cinematic-amber-rgb), 0.3) !important;
+}
+
+/**
+ * Ethereal Beauty Engine CSS - Phase 2.3
+ * 
+ * Soft glows and flowing gradients for emotional musical moments.
+ * Creates mystical, dreamy effects that expand during emotional peaks.
+ * 
+ * @performance 60fps flowing animations with CSS-first approach
+ * @consciousness Gentle beauty that breathes with musical soul
+ */
+/* === Ethereal Beauty CSS Variables === */
+:root {
+  /* Ethereal Color Palette - Soft Catppuccin */
+  --ethereal-soft-r: 203; /* Mauve (soft primary) */
+  --ethereal-soft-g: 166;
+  --ethereal-soft-b: 247;
+  --ethereal-mystical-r: 148; /* Teal (mystical glow) */
+  --ethereal-mystical-g: 226;
+  --ethereal-mystical-b: 213;
+  --ethereal-dreamy-r: 245; /* Rosewater (dreamy mist) */
+  --ethereal-dreamy-g: 224;
+  --ethereal-dreamy-b: 220;
+  --ethereal-emotional-r: 249; /* Yellow (emotional heart) */
+  --ethereal-emotional-g: 226;
+  --ethereal-emotional-b: 175;
+  --ethereal-highlight-r: 180; /* Lavender (ethereal highlight) */
+  --ethereal-highlight-g: 190;
+  --ethereal-highlight-b: 254;
+  /* Dynamic Ethereal Variables */
+  --ethereal-beauty-level: 0; /* 0-1 ethereal beauty strength */
+  --ethereal-mystical-shimmer: 0; /* 0-1 mystical particle flow */
+  --ethereal-gentle-transparency: 0.9; /* 0-1 dreamy transparency level */
+  --ethereal-flowing-phase: 0; /* 0-2π flowing gradient phase */
+  --ethereal-emotional-pulse: 0; /* -1 to 1 emotional pulse wave */
+  --ethereal-softness-factor: 1.0; /* 0-1 overall softness multiplier */
+  /* Calculated Composite Values */
+  --ethereal-soft-rgb: var(--ethereal-soft-r), var(--ethereal-soft-g), var(--ethereal-soft-b);
+  --ethereal-mystical-rgb: var(--ethereal-mystical-r), var(--ethereal-mystical-g), var(--ethereal-mystical-b);
+  --ethereal-dreamy-rgb: var(--ethereal-dreamy-r), var(--ethereal-dreamy-g), var(--ethereal-dreamy-b);
+  --ethereal-emotional-rgb: var(--ethereal-emotional-r), var(--ethereal-emotional-g), var(--ethereal-emotional-b);
+  --ethereal-highlight-rgb: var(--ethereal-highlight-r), var(--ethereal-highlight-g), var(--ethereal-highlight-b);
+}
+
+/* === Ethereal Beauty Keyframes === */
+@keyframes ethereal-gentle-glow {
+  0% {
+    box-shadow: 0 0 calc(var(--ethereal-beauty-level) * 20px) rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-beauty-level) * 0.4)), inset 0 0 calc(var(--ethereal-beauty-level) * 15px) rgba(var(--ethereal-mystical-rgb), calc(var(--ethereal-beauty-level) * 0.2));
+  }
+  50% {
+    box-shadow: 0 0 calc(var(--ethereal-beauty-level) * 35px) rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-beauty-level) * 0.6)), inset 0 0 calc(var(--ethereal-beauty-level) * 25px) rgba(var(--ethereal-mystical-rgb), calc(var(--ethereal-beauty-level) * 0.3));
+  }
+  100% {
+    box-shadow: 0 0 calc(var(--ethereal-beauty-level) * 20px) rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-beauty-level) * 0.4)), inset 0 0 calc(var(--ethereal-beauty-level) * 15px) rgba(var(--ethereal-mystical-rgb), calc(var(--ethereal-beauty-level) * 0.2));
+  }
+}
+@keyframes ethereal-mystical-shimmer {
+  0% {
+    transform: translate(0, 0) scale(1);
+    filter: hue-rotate(0deg) saturate(1) blur(0px);
+  }
+  25% {
+    transform: translate(calc(var(--ethereal-mystical-shimmer) * 2px), calc(var(--ethereal-mystical-shimmer) * 1px)) scale(calc(1 + var(--ethereal-mystical-shimmer) * 0.02));
+    filter: hue-rotate(calc(var(--ethereal-mystical-shimmer) * 8deg)) saturate(calc(1 + var(--ethereal-mystical-shimmer) * 0.2)) blur(calc(var(--ethereal-mystical-shimmer) * 1px));
+  }
+  75% {
+    transform: translate(calc(var(--ethereal-mystical-shimmer) * -1px), calc(var(--ethereal-mystical-shimmer) * 2px)) scale(calc(1 + var(--ethereal-mystical-shimmer) * 0.01));
+    filter: hue-rotate(calc(var(--ethereal-mystical-shimmer) * -5deg)) saturate(calc(1 + var(--ethereal-mystical-shimmer) * 0.15)) blur(calc(var(--ethereal-mystical-shimmer) * 0.5px));
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    filter: hue-rotate(0deg) saturate(1) blur(0px);
+  }
+}
+@keyframes ethereal-flowing-gradients {
+  0% {
+    background-position: 0% 50%;
+    background-size: 200% 200%;
+  }
+  50% {
+    background-position: 100% 50%;
+    background-size: 300% 300%;
+  }
+  100% {
+    background-position: 0% 50%;
+    background-size: 200% 200%;
+  }
+}
+@keyframes ethereal-dreamy-pulse {
+  0% {
+    opacity: var(--ethereal-gentle-transparency);
+    backdrop-filter: blur(0px);
+  }
+  50% {
+    opacity: calc(var(--ethereal-gentle-transparency) + var(--ethereal-beauty-level) * 0.1);
+    backdrop-filter: blur(calc(var(--ethereal-beauty-level) * 4px));
+  }
+  100% {
+    opacity: var(--ethereal-gentle-transparency);
+    backdrop-filter: blur(0px);
+  }
+}
+@keyframes ethereal-emotional-breathing {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(calc(1 + var(--ethereal-beauty-level) * 0.03));
+    filter: brightness(calc(1 + var(--ethereal-beauty-level) * 0.2));
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+@keyframes ethereal-soft-particles {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  50% {
+    opacity: calc(var(--ethereal-mystical-shimmer) * 0.6);
+    transform: translateY(-10px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.5);
+  }
+}
+/* === Ethereal Beauty Base Classes === */
+/* Gentle Ethereal Glow */
+.ethereal-gentle-glow, .Root__now-playing-bar[data-ethereal-mode=active] {
+  position: relative;
+}
+.ethereal-gentle-glow::before, .Root__now-playing-bar[data-ethereal-mode=active]::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: inherit;
+  background: linear-gradient(45deg, rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-beauty-level) * 0.3)) 0%, rgba(var(--ethereal-mystical-rgb), calc(var(--ethereal-beauty-level) * 0.2)) 50%, rgba(var(--ethereal-dreamy-rgb), calc(var(--ethereal-beauty-level) * 0.1)) 100%);
+  pointer-events: none;
+  opacity: var(--ethereal-beauty-level);
+  animation: ethereal-gentle-glow 4s ease-in-out infinite;
+}
+.ethereal-gentle-glow::after, .Root__now-playing-bar[data-ethereal-mode=active]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-beauty-level) * 0.05));
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  animation: ethereal-dreamy-pulse 6s ease-in-out infinite;
+}
+
+/* Mystical Shimmer Effect */
+.ethereal-mystical-shimmer, .Root__nav-bar[data-ethereal-mode=active], .cover-art[data-ethereal-mode=active],
+.main-trackInfo-container img[data-ethereal-mode=active] {
+  position: relative;
+  animation: ethereal-mystical-shimmer 8s ease-in-out infinite;
+}
+.ethereal-mystical-shimmer::before, .Root__nav-bar[data-ethereal-mode=active]::before, .cover-art[data-ethereal-mode=active]::before,
+.main-trackInfo-container img[data-ethereal-mode=active]::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 50%, rgba(var(--ethereal-mystical-rgb), calc(var(--ethereal-mystical-shimmer) * 0.4)) 0%, rgba(var(--ethereal-highlight-rgb), calc(var(--ethereal-mystical-shimmer) * 0.2)) 50%, transparent 70%);
+  pointer-events: none;
+  opacity: var(--ethereal-mystical-shimmer);
+  animation: ethereal-soft-particles 3s ease-in-out infinite;
+}
+
+/* Flowing Gradients */
+.ethereal-flowing-gradients, .progress-bar[data-ethereal-mode=active], .main-trackInfo-container[data-ethereal-mode=active], .main-view-container[data-ethereal-mode=active] {
+  position: relative;
+  overflow: hidden;
+}
+.ethereal-flowing-gradients::before, .progress-bar[data-ethereal-mode=active]::before, .main-trackInfo-container[data-ethereal-mode=active]::before, .main-view-container[data-ethereal-mode=active]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(calc(var(--ethereal-flowing-phase) * 45deg), rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-beauty-level) * 0.15)) 0%, rgba(var(--ethereal-mystical-rgb), calc(var(--ethereal-beauty-level) * 0.25)) 25%, rgba(var(--ethereal-dreamy-rgb), calc(var(--ethereal-beauty-level) * 0.1)) 50%, rgba(var(--ethereal-emotional-rgb), calc(var(--ethereal-beauty-level) * 0.2)) 75%, rgba(var(--ethereal-highlight-rgb), calc(var(--ethereal-beauty-level) * 0.15)) 100%);
+  pointer-events: none;
+  border-radius: inherit;
+  animation: ethereal-flowing-gradients 12s ease-in-out infinite;
+}
+
+/* Dreamy Translucency */
+.ethereal-dreamy-translucency, .Root__nav-bar[data-ethereal-mode=active], .main-view-container[data-ethereal-mode=active] {
+  backdrop-filter: blur(calc(var(--ethereal-beauty-level) * 6px));
+  background: rgba(var(--ethereal-dreamy-rgb), calc(var(--ethereal-gentle-transparency) * 0.1));
+  animation: ethereal-dreamy-pulse 5s ease-in-out infinite;
+}
+
+/* Emotional Breathing */
+.ethereal-emotional-breathing, .Root__now-playing-bar[data-ethereal-mode=active] {
+  animation: ethereal-emotional-breathing calc(3s / max(var(--ethereal-beauty-level), 0.1)) ease-in-out infinite;
+}
+
+/* Soft Particle Field */
+.ethereal-soft-particles, .player-controls[data-ethereal-mode=active] {
+  position: relative;
+}
+.ethereal-soft-particles::after, .player-controls[data-ethereal-mode=active]::after {
+  content: "✦ ✧ ⟡ ✦ ✧ ⟡ ✦ ✧ ⟡ ✦ ✧ ⟡";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-size: 8px;
+  color: rgba(var(--ethereal-mystical-rgb), calc(var(--ethereal-mystical-shimmer) * 0.5));
+  text-shadow: 0 0 4px rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-mystical-shimmer) * 0.8));
+  word-wrap: break-word;
+  overflow: hidden;
+  pointer-events: none;
+  line-height: 1.8;
+  opacity: var(--ethereal-mystical-shimmer);
+  animation: ethereal-soft-particles 4s ease-in-out infinite;
+}
+
+/* === Specific UI Element Targeting === */
+/* Main View Container - Ethereal Background */
+.main-view-container[data-ethereal-mode=active] {
+  background-blend-mode: soft-light;
+}
+.main-view-container[data-ethereal-mode=active]::before {
+  opacity: calc(var(--ethereal-beauty-level) * 0.8);
+}
+
+/* Now Playing Bar - Gentle Emotional Glow */
+.Root__now-playing-bar[data-ethereal-mode=active] {
+  background: linear-gradient(90deg, rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-beauty-level) * 0.1)) 0%, rgba(var(--ethereal-emotional-rgb), calc(var(--ethereal-beauty-level) * 0.15)) 50%, rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-beauty-level) * 0.1)) 100%);
+  border: 1px solid rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-beauty-level) * 0.4));
+  border-radius: 8px;
+}
+
+/* Album Art - Mystical Frame */
+.cover-art[data-ethereal-mode=active],
+.main-trackInfo-container img[data-ethereal-mode=active] {
+  border: 2px solid rgba(var(--ethereal-mystical-rgb), calc(var(--ethereal-beauty-level) * 0.6));
+  border-radius: 8px;
+}
+.cover-art[data-ethereal-mode=active]::before,
+.main-trackInfo-container img[data-ethereal-mode=active]::before {
+  border-radius: 6px;
+}
+
+/* Player Controls - Soft Ethereal Interactions */
+.player-controls[data-ethereal-mode=active] .control-button {
+  position: relative;
+}
+.player-controls[data-ethereal-mode=active] .control-button::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 1px solid rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-beauty-level) * 0.3));
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.player-controls[data-ethereal-mode=active] .control-button:hover::before {
+  opacity: calc(var(--ethereal-beauty-level) * 0.8);
+  animation: ethereal-gentle-glow 1s ease-in-out;
+}
+.player-controls[data-ethereal-mode=active] .control-button:active {
+  transform: scale(0.95);
+  filter: brightness(1.2);
+  animation: ethereal-emotional-breathing 0.3s ease-out;
+}
+
+/* Track Information - Flowing Text */
+.main-trackInfo-container[data-ethereal-mode=active] .track-title,
+.main-trackInfo-container[data-ethereal-mode=active] .artist-name {
+  text-shadow: 0 0 8px rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-beauty-level) * 0.6));
+  color: rgba(var(--ethereal-soft-rgb), calc(0.9 + var(--ethereal-beauty-level) * 0.1));
+}
+.main-trackInfo-container[data-ethereal-mode=active] .track-title::selection,
+.main-trackInfo-container[data-ethereal-mode=active] .artist-name::selection {
+  background: rgba(var(--ethereal-mystical-rgb), 0.3);
+}
+
+/* Navigation Sidebar - Mystical Presence */
+.Root__nav-bar[data-ethereal-mode=active] {
+  border-right: 1px solid rgba(var(--ethereal-mystical-rgb), calc(var(--ethereal-beauty-level) * 0.4));
+}
+.Root__nav-bar[data-ethereal-mode=active] .nav-item {
+  position: relative;
+}
+.Root__nav-bar[data-ethereal-mode=active] .nav-item:hover {
+  background: rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-beauty-level) * 0.1));
+  border-radius: 4px;
+}
+.Root__nav-bar[data-ethereal-mode=active] .nav-item:hover::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 3px;
+  height: 60%;
+  transform: translateY(-50%);
+  background: linear-gradient(180deg, transparent 0%, rgba(var(--ethereal-mystical-rgb), calc(var(--ethereal-beauty-level) * 0.8)) 50%, transparent 100%);
+  border-radius: 0 2px 2px 0;
+}
+
+/* Progress Bar - Flowing Energy */
+.progress-bar[data-ethereal-mode=active] {
+  background: rgba(var(--ethereal-dreamy-rgb), 0.3);
+  border-radius: 10px;
+}
+.progress-bar[data-ethereal-mode=active] .progress-bar-fill {
+  background: linear-gradient(90deg, rgba(var(--ethereal-soft-rgb), 0.8) 0%, rgba(var(--ethereal-mystical-rgb), 0.9) 50%, rgba(var(--ethereal-emotional-rgb), 0.8) 100%);
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(var(--ethereal-soft-rgb), calc(var(--ethereal-beauty-level) * 0.6));
+  animation: ethereal-flowing-gradients 8s ease-in-out infinite;
+}
+
+/* === Responsive Adaptations === */
+/* Reduce effects for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .ethereal-gentle-glow, .Root__now-playing-bar[data-ethereal-mode=active],
+  .ethereal-mystical-shimmer,
+  .cover-art[data-ethereal-mode=active],
+  .main-trackInfo-container img[data-ethereal-mode=active],
+  .Root__nav-bar[data-ethereal-mode=active],
+  .ethereal-flowing-gradients,
+  .main-view-container[data-ethereal-mode=active],
+  .main-trackInfo-container[data-ethereal-mode=active],
+  .progress-bar[data-ethereal-mode=active],
+  .ethereal-dreamy-translucency,
+  .ethereal-emotional-breathing,
+  .ethereal-soft-particles,
+  .player-controls[data-ethereal-mode=active] {
+    animation: none !important;
+  }
+  .ethereal-gentle-glow::before, .Root__now-playing-bar[data-ethereal-mode=active]::before, .ethereal-gentle-glow::after, .Root__now-playing-bar[data-ethereal-mode=active]::after,
+  .ethereal-mystical-shimmer::before,
+  .cover-art[data-ethereal-mode=active]::before,
+  .main-trackInfo-container img[data-ethereal-mode=active]::before,
+  .Root__nav-bar[data-ethereal-mode=active]::before,
+  .ethereal-mystical-shimmer::after,
+  .cover-art[data-ethereal-mode=active]::after,
+  .main-trackInfo-container img[data-ethereal-mode=active]::after,
+  .Root__nav-bar[data-ethereal-mode=active]::after,
+  .ethereal-flowing-gradients::before,
+  .main-view-container[data-ethereal-mode=active]::before,
+  .main-trackInfo-container[data-ethereal-mode=active]::before,
+  .progress-bar[data-ethereal-mode=active]::before,
+  .ethereal-flowing-gradients::after,
+  .main-view-container[data-ethereal-mode=active]::after,
+  .main-trackInfo-container[data-ethereal-mode=active]::after,
+  .progress-bar[data-ethereal-mode=active]::after,
+  .ethereal-dreamy-translucency::before,
+  .ethereal-dreamy-translucency::after,
+  .ethereal-emotional-breathing::before,
+  .ethereal-emotional-breathing::after,
+  .ethereal-soft-particles::before,
+  .player-controls[data-ethereal-mode=active]::before,
+  .ethereal-soft-particles::after,
+  .player-controls[data-ethereal-mode=active]::after {
+    animation: none !important;
+  }
+}
+/* High performance mode */
+@media (min-width: 1920px) and (min-height: 1080px) {
+  :root {
+    --ethereal-quality-multiplier: 1.3;
+  }
+  .ethereal-gentle-glow::before, .Root__now-playing-bar[data-ethereal-mode=active]::before {
+    filter: blur(calc(var(--ethereal-beauty-level) * 2px));
+  }
+  .ethereal-flowing-gradients::before, .main-view-container[data-ethereal-mode=active]::before, .main-trackInfo-container[data-ethereal-mode=active]::before, .progress-bar[data-ethereal-mode=active]::before {
+    background-size: 400% 400%;
+  }
+}
+/* Mobile adaptations - lighter effects */
+@media (max-width: 768px) {
+  :root {
+    --ethereal-quality-multiplier: 0.6;
+  }
+  .ethereal-gentle-glow::before, .Root__now-playing-bar[data-ethereal-mode=active]::before, .ethereal-gentle-glow::after, .Root__now-playing-bar[data-ethereal-mode=active]::after,
+  .ethereal-mystical-shimmer::before,
+  .cover-art[data-ethereal-mode=active]::before,
+  .main-trackInfo-container img[data-ethereal-mode=active]::before,
+  .Root__nav-bar[data-ethereal-mode=active]::before,
+  .ethereal-mystical-shimmer::after,
+  .cover-art[data-ethereal-mode=active]::after,
+  .main-trackInfo-container img[data-ethereal-mode=active]::after,
+  .Root__nav-bar[data-ethereal-mode=active]::after {
+    opacity: calc(var(--ethereal-beauty-level) * 0.6);
+  }
+}
+/* === Accessibility === */
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --ethereal-soft-r: 255;
+    --ethereal-soft-g: 255;
+    --ethereal-soft-b: 255;
+    --ethereal-mystical-r: 100;
+    --ethereal-mystical-g: 255;
+    --ethereal-mystical-b: 255;
+  }
+}
+/* === Debug Mode === */
+/* Debug mode - shows ethereal effect boundaries */
+[data-debug=ethereal] .ethereal-gentle-glow, [data-debug=ethereal] .Root__now-playing-bar[data-ethereal-mode=active],
+[data-debug=ethereal] .ethereal-mystical-shimmer,
+[data-debug=ethereal] .cover-art[data-ethereal-mode=active],
+[data-debug=ethereal] .main-trackInfo-container img[data-ethereal-mode=active],
+.main-trackInfo-container [data-debug=ethereal] img[data-ethereal-mode=active],
+[data-debug=ethereal] .Root__nav-bar[data-ethereal-mode=active],
+[data-debug=ethereal] .ethereal-flowing-gradients,
+[data-debug=ethereal] .main-view-container[data-ethereal-mode=active],
+[data-debug=ethereal] .main-trackInfo-container[data-ethereal-mode=active],
+[data-debug=ethereal] .progress-bar[data-ethereal-mode=active] {
+  outline: 1px dashed rgba(var(--ethereal-soft-rgb), 0.5) !important;
+}
+[data-debug=ethereal] .ethereal-gentle-glow::before, [data-debug=ethereal] .Root__now-playing-bar[data-ethereal-mode=active]::before, [data-debug=ethereal] .ethereal-gentle-glow::after, [data-debug=ethereal] .Root__now-playing-bar[data-ethereal-mode=active]::after,
+[data-debug=ethereal] .ethereal-mystical-shimmer::before,
+[data-debug=ethereal] .cover-art[data-ethereal-mode=active]::before,
+[data-debug=ethereal] .main-trackInfo-container img[data-ethereal-mode=active]::before,
+.main-trackInfo-container [data-debug=ethereal] img[data-ethereal-mode=active]::before,
+[data-debug=ethereal] .Root__nav-bar[data-ethereal-mode=active]::before,
+[data-debug=ethereal] .ethereal-mystical-shimmer::after,
+[data-debug=ethereal] .cover-art[data-ethereal-mode=active]::after,
+[data-debug=ethereal] .main-trackInfo-container img[data-ethereal-mode=active]::after,
+.main-trackInfo-container [data-debug=ethereal] img[data-ethereal-mode=active]::after,
+[data-debug=ethereal] .Root__nav-bar[data-ethereal-mode=active]::after,
+[data-debug=ethereal] .ethereal-flowing-gradients::before,
+[data-debug=ethereal] .main-view-container[data-ethereal-mode=active]::before,
+[data-debug=ethereal] .main-trackInfo-container[data-ethereal-mode=active]::before,
+[data-debug=ethereal] .progress-bar[data-ethereal-mode=active]::before,
+[data-debug=ethereal] .ethereal-flowing-gradients::after,
+[data-debug=ethereal] .main-view-container[data-ethereal-mode=active]::after,
+[data-debug=ethereal] .main-trackInfo-container[data-ethereal-mode=active]::after,
+[data-debug=ethereal] .progress-bar[data-ethereal-mode=active]::after {
+  outline: 1px dotted rgba(var(--ethereal-mystical-rgb), 0.3) !important;
+}
+
+/**
+ * Natural Harmony Engine CSS - Phase 2.4
+ * 
+ * Gentle color breathing for peaceful content.
+ * Creates organic, earth-connected breathing rhythms that sync with natural frequencies.
+ * 
+ * @performance 60fps organic breathing with nature-inspired timing
+ * @consciousness Natural rhythms that breathe with musical serenity
+ */
+/* === Natural Harmony CSS Variables === */
+:root {
+  /* Natural Color Palette - Earth-Connected Catppuccin */
+  --natural-earthy-r: 166; /* Green (spring earthy) */
+  --natural-earthy-g: 227;
+  --natural-earthy-b: 161;
+  --natural-forest-r: 64; /* Deep forest green */
+  --natural-forest-g: 160;
+  --natural-forest-b: 43;
+  --natural-sky-r: 137; /* Sky blue (natural) */
+  --natural-sky-g: 220;
+  --natural-sky-b: 235;
+  --natural-sunset-r: 250; /* Peach (sunset glow) */
+  --natural-sunset-g: 179;
+  --natural-sunset-b: 135;
+  --natural-stone-r: 108; /* Overlay0 (stone gray) */
+  --natural-stone-g: 112;
+  --natural-stone-b: 134;
+  /* Dynamic Natural Variables */
+  --natural-serenity-level: 0; /* 0-1 current serenity intensity */
+  --natural-breathing-frequency: 0.4; /* Hz - natural breathing frequency */
+  --natural-earth-connection: 0; /* 0-1 earth-connected feeling */
+  --natural-breathing-depth: 0.8; /* 0-1 breathing depth amplitude */
+  --natural-breathing-phase: 0; /* -1 to 1 breathing cycle value */
+  --natural-seasonal-shift: 0; /* 0-1 seasonal color transitions */
+  --natural-forest-atmosphere: 0; /* 0-1 forest-like ambiance */
+  --natural-organic-transparency: 0.85; /* Overall natural transparency */
+  /* Calculated Composite Values */
+  --natural-earthy-rgb: var(--natural-earthy-r), var(--natural-earthy-g), var(--natural-earthy-b);
+  --natural-forest-rgb: var(--natural-forest-r), var(--natural-forest-g), var(--natural-forest-b);
+  --natural-sky-rgb: var(--natural-sky-r), var(--natural-sky-g), var(--natural-sky-b);
+  --natural-sunset-rgb: var(--natural-sunset-r), var(--natural-sunset-g), var(--natural-sunset-b);
+  --natural-stone-rgb: var(--natural-stone-r), var(--natural-stone-g), var(--natural-stone-b);
+}
+
+/* === Natural Harmony Keyframes === */
+@keyframes natural-breathing-cycle {
+  0% {
+    transform: scale(1);
+    opacity: calc(var(--natural-organic-transparency) - var(--natural-breathing-depth) * 0.05);
+    box-shadow: 0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.3)), inset 0 0 calc(var(--natural-serenity-level) * 8px) rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.2));
+  }
+  50% {
+    transform: scale(calc(1 + var(--natural-breathing-depth) * 0.02));
+    opacity: calc(var(--natural-organic-transparency) + var(--natural-breathing-depth) * 0.05);
+    box-shadow: 0 0 calc(var(--natural-serenity-level) * 25px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.4)), inset 0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.3));
+  }
+  100% {
+    transform: scale(1);
+    opacity: calc(var(--natural-organic-transparency) - var(--natural-breathing-depth) * 0.05);
+    box-shadow: 0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.3)), inset 0 0 calc(var(--natural-serenity-level) * 8px) rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.2));
+  }
+}
+@keyframes natural-forest-sway {
+  0% {
+    transform: translateY(0) rotateZ(0deg);
+    filter: hue-rotate(0deg) saturate(1);
+  }
+  33% {
+    transform: translateY(calc(var(--natural-forest-atmosphere) * -1px)) rotateZ(calc(var(--natural-forest-atmosphere) * 0.5deg));
+    filter: hue-rotate(calc(var(--natural-forest-atmosphere) * 3deg)) saturate(calc(1 + var(--natural-forest-atmosphere) * 0.15));
+  }
+  66% {
+    transform: translateY(calc(var(--natural-forest-atmosphere) * 0.5px)) rotateZ(calc(var(--natural-forest-atmosphere) * -0.3deg));
+    filter: hue-rotate(calc(var(--natural-forest-atmosphere) * -2deg)) saturate(calc(1 + var(--natural-forest-atmosphere) * 0.1));
+  }
+  100% {
+    transform: translateY(0) rotateZ(0deg);
+    filter: hue-rotate(0deg) saturate(1);
+  }
+}
+@keyframes natural-earth-pulse {
+  0% {
+    border-color: rgba(var(--natural-earthy-rgb), calc(var(--natural-earth-connection) * 0.3));
+    background-position: 0% 0%;
+  }
+  50% {
+    border-color: rgba(var(--natural-earthy-rgb), calc(var(--natural-earth-connection) * 0.5));
+    background-position: 100% 100%;
+  }
+  100% {
+    border-color: rgba(var(--natural-earthy-rgb), calc(var(--natural-earth-connection) * 0.3));
+    background-position: 0% 0%;
+  }
+}
+@keyframes natural-seasonal-shift {
+  0% {
+    --natural-season-hue: 120deg; /* Spring green */
+    --natural-season-saturation: 1.0;
+    --natural-season-brightness: 1.0;
+  }
+  25% {
+    --natural-season-hue: 60deg; /* Summer yellow */
+    --natural-season-saturation: 1.1;
+    --natural-season-brightness: 1.1;
+  }
+  50% {
+    --natural-season-hue: 30deg; /* Autumn orange */
+    --natural-season-saturation: 1.2;
+    --natural-season-brightness: 0.9;
+  }
+  75% {
+    --natural-season-hue: 200deg; /* Winter blue */
+    --natural-season-saturation: 0.8;
+    --natural-season-brightness: 0.8;
+  }
+  100% {
+    --natural-season-hue: 120deg; /* Back to spring */
+    --natural-season-saturation: 1.0;
+    --natural-season-brightness: 1.0;
+  }
+}
+@keyframes natural-organic-flow {
+  0% {
+    background-position: 0% 50%;
+    background-size: 200% 200%;
+  }
+  50% {
+    background-position: 100% 50%;
+    background-size: 250% 250%;
+  }
+  100% {
+    background-position: 0% 50%;
+    background-size: 200% 200%;
+  }
+}
+@keyframes natural-serenity-glow {
+  0% {
+    filter: drop-shadow(0 0 calc(var(--natural-serenity-level) * 8px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.4))) brightness(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.6))) brightness(calc(1 + var(--natural-serenity-level) * 0.1));
+  }
+  100% {
+    filter: drop-shadow(0 0 calc(var(--natural-serenity-level) * 8px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.4))) brightness(1);
+  }
+}
+/* === Natural Harmony Base Classes === */
+/* Natural Breathing Effect */
+.natural-breathing, .volume-bar[data-natural-mode=active], .player-controls[data-natural-mode=active], .progress-bar[data-natural-mode=active], .Root__now-playing-bar[data-natural-mode=active] {
+  position: relative;
+  animation: natural-breathing-cycle calc(1s / max(var(--natural-breathing-frequency), 0.1)) ease-in-out infinite;
+}
+.natural-breathing::before, .volume-bar[data-natural-mode=active]::before, .player-controls[data-natural-mode=active]::before, .progress-bar[data-natural-mode=active]::before, .Root__now-playing-bar[data-natural-mode=active]::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: inherit;
+  background: linear-gradient(45deg, rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.15)) 0%, rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.1)) 50%, rgba(var(--natural-sky-rgb), calc(var(--natural-serenity-level) * 0.08)) 100%);
+  pointer-events: none;
+  opacity: var(--natural-serenity-level);
+  animation: natural-serenity-glow calc(2s / max(var(--natural-breathing-frequency), 0.1)) ease-in-out infinite;
+}
+
+/* Forest Atmosphere Effect */
+.natural-forest-atmosphere, .Root__nav-bar[data-natural-mode=active] {
+  position: relative;
+  animation: natural-forest-sway 8s ease-in-out infinite;
+}
+.natural-forest-atmosphere::before, .Root__nav-bar[data-natural-mode=active]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 30% 70%, rgba(var(--natural-forest-rgb), calc(var(--natural-forest-atmosphere) * 0.2)) 0%, rgba(var(--natural-earthy-rgb), calc(var(--natural-forest-atmosphere) * 0.1)) 40%, transparent 70%);
+  pointer-events: none;
+  opacity: var(--natural-forest-atmosphere);
+  animation: natural-organic-flow 12s ease-in-out infinite;
+}
+
+/* Earth Connection Effect */
+.natural-earth-connection, .volume-bar[data-natural-mode=active], .Root__nav-bar[data-natural-mode=active], .Root__now-playing-bar[data-natural-mode=active] {
+  position: relative;
+  border: 1px solid rgba(var(--natural-earthy-rgb), calc(var(--natural-earth-connection) * 0.4));
+  background: linear-gradient(180deg, rgba(var(--natural-earthy-rgb), calc(var(--natural-earth-connection) * 0.05)) 0%, rgba(var(--natural-forest-rgb), calc(var(--natural-earth-connection) * 0.08)) 100%);
+  animation: natural-earth-pulse 4s ease-in-out infinite;
+}
+
+/* Seasonal Shift Effect */
+.natural-seasonal-shift, .cover-art[data-natural-mode=active],
+.main-trackInfo-container img[data-natural-mode=active], .main-view-container[data-natural-mode=active] {
+  position: relative;
+  animation: natural-seasonal-shift 60s linear infinite;
+  filter: hue-rotate(calc(var(--natural-seasonal-shift) * 60deg)) saturate(calc(1 + var(--natural-seasonal-shift) * 0.2)) brightness(calc(1 + var(--natural-seasonal-shift) * 0.1));
+}
+
+/* Organic Flow Background */
+.natural-organic-flow, .main-trackInfo-container[data-natural-mode=active], .progress-bar[data-natural-mode=active], .main-view-container[data-natural-mode=active] {
+  position: relative;
+  overflow: hidden;
+}
+.natural-organic-flow::before, .main-trackInfo-container[data-natural-mode=active]::before, .progress-bar[data-natural-mode=active]::before, .main-view-container[data-natural-mode=active]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(calc(var(--natural-seasonal-shift) * 90deg + 45deg), rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.1)) 0%, rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.15)) 25%, rgba(var(--natural-sky-rgb), calc(var(--natural-serenity-level) * 0.08)) 50%, rgba(var(--natural-sunset-rgb), calc(var(--natural-serenity-level) * 0.12)) 75%, rgba(var(--natural-stone-rgb), calc(var(--natural-serenity-level) * 0.06)) 100%);
+  pointer-events: none;
+  border-radius: inherit;
+  animation: natural-organic-flow 20s ease-in-out infinite;
+}
+
+/* Natural Serenity Glow */
+.natural-serenity-glow, .cover-art[data-natural-mode=active],
+.main-trackInfo-container img[data-natural-mode=active] {
+  filter: drop-shadow(0 0 calc(var(--natural-serenity-level) * 12px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.5)));
+  animation: natural-serenity-glow calc(3s / max(var(--natural-breathing-frequency), 0.1)) ease-in-out infinite;
+}
+
+/* === Specific UI Element Targeting === */
+/* Main View Container - Natural Background Flow */
+.main-view-container[data-natural-mode=active] {
+  background-blend-mode: multiply;
+}
+.main-view-container[data-natural-mode=active]::before {
+  opacity: calc(var(--natural-serenity-level) * 0.6);
+}
+
+/* Now Playing Bar - Natural Breathing */
+.Root__now-playing-bar[data-natural-mode=active] {
+  background: linear-gradient(90deg, rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.1)) 0%, rgba(var(--natural-sunset-rgb), calc(var(--natural-serenity-level) * 0.12)) 50%, rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.1)) 100%);
+  border-radius: 6px;
+  backdrop-filter: blur(calc(var(--natural-serenity-level) * 4px));
+}
+
+/* Album Art - Natural Frame */
+.cover-art[data-natural-mode=active],
+.main-trackInfo-container img[data-natural-mode=active] {
+  border: 2px solid rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.5));
+  border-radius: 8px;
+}
+.cover-art[data-natural-mode=active]::before,
+.main-trackInfo-container img[data-natural-mode=active]::before {
+  border-radius: 6px;
+}
+
+/* Progress Bar - Natural Flow */
+.progress-bar[data-natural-mode=active] {
+  background: rgba(var(--natural-stone-rgb), 0.3);
+  border-radius: 8px;
+}
+.progress-bar[data-natural-mode=active] .progress-bar-fill {
+  background: linear-gradient(90deg, rgba(var(--natural-earthy-rgb), 0.8) 0%, rgba(var(--natural-forest-rgb), 0.9) 30%, rgba(var(--natural-sky-rgb), 0.7) 70%, rgba(var(--natural-sunset-rgb), 0.8) 100%);
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.5));
+  animation: natural-organic-flow 15s ease-in-out infinite;
+}
+
+/* Navigation Sidebar - Forest Atmosphere */
+.Root__nav-bar[data-natural-mode=active] {
+  border-right: 1px solid rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.4));
+}
+.Root__nav-bar[data-natural-mode=active] .nav-item {
+  position: relative;
+  transition: all 0.3s ease;
+}
+.Root__nav-bar[data-natural-mode=active] .nav-item:hover {
+  background: rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.08));
+  border-radius: 4px;
+}
+.Root__nav-bar[data-natural-mode=active] .nav-item:hover::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20%;
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, transparent 0%, rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.8)) 50%, transparent 100%);
+  border-radius: 0 2px 2px 0;
+}
+
+/* Player Controls - Natural Harmony */
+.player-controls[data-natural-mode=active] .control-button {
+  position: relative;
+  transition: all 0.3s ease;
+}
+.player-controls[data-natural-mode=active] .control-button::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 1px solid rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.3));
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.player-controls[data-natural-mode=active] .control-button:hover::before {
+  opacity: calc(var(--natural-serenity-level) * 0.6);
+  animation: natural-serenity-glow 1.5s ease-in-out;
+}
+.player-controls[data-natural-mode=active] .control-button:active {
+  transform: scale(0.95);
+  filter: brightness(1.1) saturate(1.1);
+  animation: natural-breathing-cycle 0.4s ease-out;
+}
+
+/* Track Information - Natural Text Flow */
+.main-trackInfo-container[data-natural-mode=active] .track-title,
+.main-trackInfo-container[data-natural-mode=active] .artist-name {
+  text-shadow: 0 0 6px rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.4));
+  color: rgba(var(--natural-earthy-rgb), calc(0.9 + var(--natural-serenity-level) * 0.1));
+}
+.main-trackInfo-container[data-natural-mode=active] .track-title::selection,
+.main-trackInfo-container[data-natural-mode=active] .artist-name::selection {
+  background: rgba(var(--natural-forest-rgb), 0.3);
+}
+
+/* Volume Controls - Natural Breathing */
+.volume-bar[data-natural-mode=active] .volume-bar-fill {
+  background: linear-gradient(90deg, rgba(var(--natural-earthy-rgb), 0.6) 0%, rgba(var(--natural-forest-rgb), 0.8) 100%);
+  animation: natural-serenity-glow calc(4s / max(var(--natural-breathing-frequency), 0.1)) ease-in-out infinite;
+}
+
+/* === Responsive Adaptations === */
+/* Reduce effects for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .natural-breathing, .Root__now-playing-bar[data-natural-mode=active], .progress-bar[data-natural-mode=active], .player-controls[data-natural-mode=active], .volume-bar[data-natural-mode=active],
+  .natural-forest-atmosphere,
+  .Root__nav-bar[data-natural-mode=active],
+  .natural-earth-connection,
+  .natural-seasonal-shift,
+  .main-view-container[data-natural-mode=active],
+  .cover-art[data-natural-mode=active],
+  .main-trackInfo-container img[data-natural-mode=active],
+  .natural-organic-flow,
+  .main-trackInfo-container[data-natural-mode=active],
+  .natural-serenity-glow,
+  .main-trackInfo-container img[data-natural-mode=active] {
+    animation: none !important;
+  }
+  .natural-breathing::before, .Root__now-playing-bar[data-natural-mode=active]::before, .progress-bar[data-natural-mode=active]::before, .player-controls[data-natural-mode=active]::before, .volume-bar[data-natural-mode=active]::before, .natural-breathing::after, .Root__now-playing-bar[data-natural-mode=active]::after, .progress-bar[data-natural-mode=active]::after, .player-controls[data-natural-mode=active]::after, .volume-bar[data-natural-mode=active]::after,
+  .natural-forest-atmosphere::before,
+  .Root__nav-bar[data-natural-mode=active]::before,
+  .natural-forest-atmosphere::after,
+  .Root__nav-bar[data-natural-mode=active]::after,
+  .natural-earth-connection::before,
+  .natural-earth-connection::after,
+  .natural-seasonal-shift::before,
+  .main-view-container[data-natural-mode=active]::before,
+  .cover-art[data-natural-mode=active]::before,
+  .main-trackInfo-container img[data-natural-mode=active]::before,
+  .natural-seasonal-shift::after,
+  .main-view-container[data-natural-mode=active]::after,
+  .cover-art[data-natural-mode=active]::after,
+  .main-trackInfo-container img[data-natural-mode=active]::after,
+  .natural-organic-flow::before,
+  .main-trackInfo-container[data-natural-mode=active]::before,
+  .natural-organic-flow::after,
+  .main-trackInfo-container[data-natural-mode=active]::after,
+  .natural-serenity-glow::before,
+  .natural-serenity-glow::after {
+    animation: none !important;
+  }
+}
+/* High performance mode */
+@media (min-width: 1920px) and (min-height: 1080px) {
+  :root {
+    --natural-quality-multiplier: 1.2;
+  }
+  .natural-breathing::before, .Root__now-playing-bar[data-natural-mode=active]::before, .progress-bar[data-natural-mode=active]::before, .player-controls[data-natural-mode=active]::before, .volume-bar[data-natural-mode=active]::before {
+    filter: blur(calc(var(--natural-serenity-level) * 1px));
+  }
+  .natural-organic-flow::before, .main-view-container[data-natural-mode=active]::before, .progress-bar[data-natural-mode=active]::before, .main-trackInfo-container[data-natural-mode=active]::before {
+    background-size: 300% 300%;
+  }
+}
+/* Mobile adaptations - lighter natural effects */
+@media (max-width: 768px) {
+  :root {
+    --natural-quality-multiplier: 0.7;
+  }
+  .natural-breathing::before, .Root__now-playing-bar[data-natural-mode=active]::before, .progress-bar[data-natural-mode=active]::before, .player-controls[data-natural-mode=active]::before, .volume-bar[data-natural-mode=active]::before, .natural-breathing::after, .Root__now-playing-bar[data-natural-mode=active]::after, .progress-bar[data-natural-mode=active]::after, .player-controls[data-natural-mode=active]::after, .volume-bar[data-natural-mode=active]::after,
+  .natural-forest-atmosphere::before,
+  .Root__nav-bar[data-natural-mode=active]::before,
+  .natural-forest-atmosphere::after,
+  .Root__nav-bar[data-natural-mode=active]::after {
+    opacity: calc(var(--natural-serenity-level) * 0.7);
+  }
+}
+/* === Accessibility === */
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --natural-earthy-r: 100;
+    --natural-earthy-g: 255;
+    --natural-earthy-b: 100;
+    --natural-forest-r: 0;
+    --natural-forest-g: 200;
+    --natural-forest-b: 0;
+  }
+}
+/* === Debug Mode === */
+/* Debug mode - shows natural effect boundaries */
+[data-debug=natural] .natural-breathing, [data-debug=natural] .Root__now-playing-bar[data-natural-mode=active], [data-debug=natural] .progress-bar[data-natural-mode=active], [data-debug=natural] .player-controls[data-natural-mode=active], [data-debug=natural] .volume-bar[data-natural-mode=active],
+[data-debug=natural] .natural-forest-atmosphere,
+[data-debug=natural] .Root__nav-bar[data-natural-mode=active],
+[data-debug=natural] .natural-earth-connection {
+  outline: 1px dashed rgba(var(--natural-earthy-rgb), 0.5) !important;
+}
+[data-debug=natural] .natural-breathing::before, [data-debug=natural] .Root__now-playing-bar[data-natural-mode=active]::before, [data-debug=natural] .progress-bar[data-natural-mode=active]::before, [data-debug=natural] .player-controls[data-natural-mode=active]::before, [data-debug=natural] .volume-bar[data-natural-mode=active]::before, [data-debug=natural] .natural-breathing::after, [data-debug=natural] .Root__now-playing-bar[data-natural-mode=active]::after, [data-debug=natural] .progress-bar[data-natural-mode=active]::after, [data-debug=natural] .player-controls[data-natural-mode=active]::after, [data-debug=natural] .volume-bar[data-natural-mode=active]::after,
+[data-debug=natural] .natural-forest-atmosphere::before,
+[data-debug=natural] .Root__nav-bar[data-natural-mode=active]::before,
+[data-debug=natural] .natural-forest-atmosphere::after,
+[data-debug=natural] .Root__nav-bar[data-natural-mode=active]::after,
+[data-debug=natural] .natural-earth-connection::before,
+[data-debug=natural] .natural-earth-connection::after {
+  outline: 1px dotted rgba(var(--natural-forest-rgb), 0.3) !important;
+}
+
+:root {
+  --organic-holographic-rgb: 100, 255, 200;
+  --holographic-scanline-rgb: 255, 150, 100;
+  --holographic-glow-intensity: 0.5;
+  --holographic-flicker-rate: 5Hz;
+  --holographic-atmospheric-depth: 0.3;
+  --holographic-breathing-frequency: 0.5Hz;
+  --holographic-chromatic-shift: 2px;
+  --holographic-perspective-depth: 1200px;
+  --volumetric-layer-spacing: 20px;
+  --volumetric-depth-intensity: 0.8;
+  --consciousness-depth-offset: 50px;
+  --temperature-depth-offset: 25px;
+  --volumetric-shadow-blur: 30px;
+  --atmospheric-blur-distance: 4px;
+  --consciousness-data-opacity: 0.8;
+  --data-stream-intensity: 0.5;
+  --consciousness-scanline-density: 0.5;
+  --consciousness-scanline-frequency: 4px;
+  --consciousness-scanline-opacity: 0.15;
+  --consciousness-scanline-speed: 1s;
+  --consciousness-scanline-resonance: 0.5;
+  --consciousness-scanline-temperature: 6000K;
+  --consciousness-scanline-musical-intensity: 0.5;
+  --consciousness-scanline-breathing: 0.25;
+  --temperature-scanline-color-shift: 0deg;
+  --musical-scanline-pulse: 0.5;
+  --consciousness-scanline-interference: none;
+  --consciousness-scanline-complexity: 0;
+  --holographic-music-flicker-intensity: 0.3;
+  --holographic-breathing-intensity: 0;
+  --holographic-breathing-phase: 0;
+  --holographic-cosmic-glow: calc(var(--holographic-glow-intensity) * 0.8);
+  --holographic-cinematic-drama: calc(var(--holographic-glow-intensity) * 1.2);
+  --holographic-ethereal-softness: calc(var(--holographic-glow-intensity) * 0.6);
+  --holographic-natural-warmth: calc(var(--holographic-glow-intensity) * 0.7);
+}
+
+@keyframes consciousness-holographic-flicker {
+  0% {
+    opacity: var(--holographic-glow-intensity);
+    filter: drop-shadow(0 0 5px rgba(var(--organic-holographic-rgb), 0.4)) hue-rotate(0deg);
+  }
+  25% {
+    opacity: calc(var(--holographic-glow-intensity) + var(--holographic-music-flicker-intensity) * 0.2);
+    filter: drop-shadow(0 0 8px rgba(var(--organic-holographic-rgb), 0.6)) hue-rotate(5deg);
+  }
+  50% {
+    opacity: calc(var(--holographic-glow-intensity) + var(--holographic-music-flicker-intensity) * 0.3);
+    filter: drop-shadow(0 0 12px rgba(var(--organic-holographic-rgb), 0.8)) hue-rotate(10deg);
+  }
+  75% {
+    opacity: calc(var(--holographic-glow-intensity) + var(--holographic-music-flicker-intensity) * 0.2);
+    filter: drop-shadow(0 0 8px rgba(var(--organic-holographic-rgb), 0.6)) hue-rotate(5deg);
+  }
+  100% {
+    opacity: var(--holographic-glow-intensity);
+    filter: drop-shadow(0 0 5px rgba(var(--organic-holographic-rgb), 0.4)) hue-rotate(0deg);
+  }
+}
+@keyframes consciousness-breathing-scanlines {
+  0% {
+    background-position: 0 0;
+    opacity: calc(0.1 + var(--holographic-breathing-intensity) * 0.1);
+  }
+  50% {
+    background-position: 0 2px;
+    opacity: calc(0.15 + var(--holographic-breathing-intensity) * 0.15);
+  }
+  100% {
+    background-position: 0 4px;
+    opacity: calc(0.1 + var(--holographic-breathing-intensity) * 0.1);
+  }
+}
+@keyframes consciousness-chromatic-aberration {
+  0% {
+    filter: drop-shadow(var(--holographic-chromatic-shift) 0 0 rgba(255, 0, 0, 0.3)) drop-shadow(calc(var(--holographic-chromatic-shift) * -1) 0 0 rgba(0, 255, 255, 0.3));
+  }
+  33% {
+    filter: drop-shadow(0 var(--holographic-chromatic-shift) 0 rgba(0, 255, 0, 0.3)) drop-shadow(0 calc(var(--holographic-chromatic-shift) * -1) 0 rgba(255, 0, 255, 0.3));
+  }
+  66% {
+    filter: drop-shadow(calc(var(--holographic-chromatic-shift) * -1) 0 0 rgba(0, 0, 255, 0.3)) drop-shadow(var(--holographic-chromatic-shift) 0 0 rgba(255, 255, 0, 0.3));
+  }
+  100% {
+    filter: drop-shadow(var(--holographic-chromatic-shift) 0 0 rgba(255, 0, 0, 0.3)) drop-shadow(calc(var(--holographic-chromatic-shift) * -1) 0 0 rgba(0, 255, 255, 0.3));
+  }
+}
+@keyframes consciousness-atmospheric-depth {
+  0% {
+    box-shadow: 0 0 calc(var(--holographic-atmospheric-depth) * 20px) rgba(var(--organic-holographic-rgb), 0.2), inset 0 0 calc(var(--holographic-atmospheric-depth) * 10px) rgba(var(--organic-holographic-rgb), 0.1);
+  }
+  50% {
+    box-shadow: 0 0 calc(var(--holographic-atmospheric-depth) * 30px) rgba(var(--organic-holographic-rgb), 0.3), inset 0 0 calc(var(--holographic-atmospheric-depth) * 15px) rgba(var(--organic-holographic-rgb), 0.15);
+  }
+  100% {
+    box-shadow: 0 0 calc(var(--holographic-atmospheric-depth) * 20px) rgba(var(--organic-holographic-rgb), 0.2), inset 0 0 calc(var(--holographic-atmospheric-depth) * 10px) rgba(var(--organic-holographic-rgb), 0.1);
+  }
+}
+@keyframes volumetric-consciousness-pulse {
+  0% {
+    transform: translateZ(calc(var(--consciousness-depth-offset) * var(--volumetric-depth-intensity) * 1.2)) scale(1);
+    filter: brightness(1) blur(0px);
+  }
+  50% {
+    transform: translateZ(calc(var(--consciousness-depth-offset) * var(--volumetric-depth-intensity) * 1.4)) scale(calc(1 + var(--volumetric-depth-intensity) * 0.03));
+    filter: brightness(calc(1 + var(--volumetric-depth-intensity) * 0.15)) blur(calc(var(--atmospheric-blur-distance) * 0.5));
+  }
+  100% {
+    transform: translateZ(calc(var(--consciousness-depth-offset) * var(--volumetric-depth-intensity) * 1.2)) scale(1);
+    filter: brightness(1) blur(0px);
+  }
+}
+@keyframes holographic-lens-enhancement {
+  0% {
+    backdrop-filter: contrast(calc(1 + var(--consciousness-scanline-density) * 0.15)) saturate(calc(1 + var(--consciousness-scanline-density) * 0.2)) brightness(calc(1 + var(--consciousness-scanline-density) * 0.05)) hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.3));
+    opacity: calc(var(--consciousness-scanline-opacity) * (1 - var(--musical-scanline-pulse) * 0.05));
+  }
+  25% {
+    backdrop-filter: contrast(calc(1 + var(--consciousness-scanline-density) * 0.18)) saturate(calc(1 + var(--consciousness-scanline-density) * 0.25)) brightness(calc(1 + var(--consciousness-scanline-density) * 0.08)) hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.4));
+    opacity: calc(var(--consciousness-scanline-opacity) * (1 + var(--musical-scanline-pulse) * 0.1));
+  }
+  50% {
+    backdrop-filter: contrast(calc(1 + var(--consciousness-scanline-density) * 0.22)) saturate(calc(1 + var(--consciousness-scanline-density) * 0.3)) brightness(calc(1 + var(--consciousness-scanline-density) * 0.12)) hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.5));
+    opacity: calc(var(--consciousness-scanline-opacity) * (1 + var(--musical-scanline-pulse) * 0.15));
+  }
+  75% {
+    backdrop-filter: contrast(calc(1 + var(--consciousness-scanline-density) * 0.18)) saturate(calc(1 + var(--consciousness-scanline-density) * 0.25)) brightness(calc(1 + var(--consciousness-scanline-density) * 0.08)) hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.4));
+    opacity: calc(var(--consciousness-scanline-opacity) * (1 + var(--musical-scanline-pulse) * 0.1));
+  }
+  100% {
+    backdrop-filter: contrast(calc(1 + var(--consciousness-scanline-density) * 0.15)) saturate(calc(1 + var(--consciousness-scanline-density) * 0.2)) brightness(calc(1 + var(--consciousness-scanline-density) * 0.05)) hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.3));
+    opacity: calc(var(--consciousness-scanline-opacity) * (1 - var(--musical-scanline-pulse) * 0.05));
+  }
+}
+@keyframes organic-consciousness-interference {
+  0% {
+    transform: scale(calc(1 + var(--consciousness-scanline-complexity) * 0.01)) rotate(calc(var(--consciousness-scanline-complexity) * -0.5deg));
+    filter: contrast(calc(1 + var(--consciousness-scanline-complexity) * 0.05)) saturate(calc(1 + var(--consciousness-scanline-complexity) * 0.1)) hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.8));
+    opacity: calc(var(--consciousness-scanline-complexity) * 0.4);
+  }
+  33% {
+    transform: scale(calc(1 + var(--consciousness-scanline-complexity) * 0.015)) rotate(calc(var(--consciousness-scanline-complexity) * 0.3deg));
+    filter: contrast(calc(1 + var(--consciousness-scanline-complexity) * 0.08)) saturate(calc(1 + var(--consciousness-scanline-complexity) * 0.15)) hue-rotate(calc(var(--temperature-scanline-color-shift) * 1.1));
+    opacity: calc(var(--consciousness-scanline-complexity) * 0.5);
+  }
+  67% {
+    transform: scale(calc(1 + var(--consciousness-scanline-complexity) * 0.02)) rotate(calc(var(--consciousness-scanline-complexity) * 0.8deg));
+    filter: contrast(calc(1 + var(--consciousness-scanline-complexity) * 0.1)) saturate(calc(1 + var(--consciousness-scanline-complexity) * 0.2)) hue-rotate(calc(var(--temperature-scanline-color-shift) * 1.3));
+    opacity: calc(var(--consciousness-scanline-complexity) * 0.6);
+  }
+  100% {
+    transform: scale(calc(1 + var(--consciousness-scanline-complexity) * 0.01)) rotate(calc(var(--consciousness-scanline-complexity) * -0.5deg));
+    filter: contrast(calc(1 + var(--consciousness-scanline-complexity) * 0.05)) saturate(calc(1 + var(--consciousness-scanline-complexity) * 0.1)) hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.8));
+    opacity: calc(var(--consciousness-scanline-complexity) * 0.4);
+  }
+}
+.aesthetic-mode-cosmic .holographic-element, .aesthetic-mode-cosmic .Root__main-view .main-view-container__scroll-node-child, .Root__main-view .aesthetic-mode-cosmic .main-view-container__scroll-node-child, .aesthetic-mode-cosmic .main-view-container__scroll-node, .aesthetic-mode-cosmic .Root__now-playing-bar, .aesthetic-mode-cosmic .Root__nav-bar, .aesthetic-mode-cosmic .main-view-container {
+  animation: consciousness-holographic-flicker calc(1s / var(--holographic-flicker-rate, 5)) ease-in-out infinite, consciousness-atmospheric-depth calc(1s / var(--holographic-breathing-frequency, 0.5)) ease-in-out infinite;
+}
+.aesthetic-mode-cosmic .holographic-element::before, .aesthetic-mode-cosmic .Root__main-view .main-view-container__scroll-node-child::before, .Root__main-view .aesthetic-mode-cosmic .main-view-container__scroll-node-child::before, .aesthetic-mode-cosmic .main-view-container__scroll-node::before, .aesthetic-mode-cosmic .Root__now-playing-bar::before, .aesthetic-mode-cosmic .Root__nav-bar::before, .aesthetic-mode-cosmic .main-view-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(var(--organic-holographic-rgb), 0.1) 4px);
+  animation: consciousness-breathing-scanlines calc(1s / var(--holographic-breathing-frequency, 0.5)) ease-in-out infinite;
+  pointer-events: none;
+}
+
+.aesthetic-mode-cinematic .holographic-element, .aesthetic-mode-cinematic .Root__main-view .main-view-container__scroll-node-child, .Root__main-view .aesthetic-mode-cinematic .main-view-container__scroll-node-child, .aesthetic-mode-cinematic .main-view-container__scroll-node, .aesthetic-mode-cinematic .Root__now-playing-bar, .aesthetic-mode-cinematic .Root__nav-bar, .aesthetic-mode-cinematic .main-view-container {
+  animation: consciousness-holographic-flicker calc(0.5s / var(--holographic-flicker-rate, 8)) ease-in-out infinite, consciousness-chromatic-aberration calc(2s / var(--holographic-flicker-rate, 8)) ease-in-out infinite;
+}
+.aesthetic-mode-cinematic .holographic-element::after, .aesthetic-mode-cinematic .Root__main-view .main-view-container__scroll-node-child::after, .Root__main-view .aesthetic-mode-cinematic .main-view-container__scroll-node-child::after, .aesthetic-mode-cinematic .main-view-container__scroll-node::after, .aesthetic-mode-cinematic .Root__now-playing-bar::after, .aesthetic-mode-cinematic .Root__nav-bar::after, .aesthetic-mode-cinematic .main-view-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255, 0, 100, var(--holographic-cinematic-drama)) 0%, transparent 30%, transparent 70%, rgba(0, 255, 255, var(--holographic-cinematic-drama)) 100%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.aesthetic-mode-ethereal .holographic-element, .aesthetic-mode-ethereal .Root__main-view .main-view-container__scroll-node-child, .Root__main-view .aesthetic-mode-ethereal .main-view-container__scroll-node-child, .aesthetic-mode-ethereal .main-view-container__scroll-node, .aesthetic-mode-ethereal .Root__now-playing-bar, .aesthetic-mode-ethereal .Root__nav-bar, .aesthetic-mode-ethereal .main-view-container {
+  animation: consciousness-atmospheric-depth calc(2s / var(--holographic-breathing-frequency, 0.3)) ease-in-out infinite;
+  filter: blur(calc(var(--holographic-ethereal-softness) * 0.5px)) brightness(calc(1 + var(--holographic-ethereal-softness) * 0.2));
+}
+.aesthetic-mode-ethereal .holographic-element::before, .aesthetic-mode-ethereal .Root__main-view .main-view-container__scroll-node-child::before, .Root__main-view .aesthetic-mode-ethereal .main-view-container__scroll-node-child::before, .aesthetic-mode-ethereal .main-view-container__scroll-node::before, .aesthetic-mode-ethereal .Root__now-playing-bar::before, .aesthetic-mode-ethereal .Root__nav-bar::before, .aesthetic-mode-ethereal .main-view-container::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: radial-gradient(circle at 20% 80%, rgba(var(--organic-holographic-rgb), 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(var(--holographic-scanline-rgb), 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(var(--organic-holographic-rgb), 0.05) 0%, transparent 30%);
+  animation: consciousness-atmospheric-depth calc(3s / var(--holographic-breathing-frequency, 0.3)) ease-in-out infinite;
+  pointer-events: none;
+}
+
+.aesthetic-mode-natural .holographic-element, .aesthetic-mode-natural .Root__main-view .main-view-container__scroll-node-child, .Root__main-view .aesthetic-mode-natural .main-view-container__scroll-node-child, .aesthetic-mode-natural .main-view-container__scroll-node, .aesthetic-mode-natural .Root__now-playing-bar, .aesthetic-mode-natural .Root__nav-bar, .aesthetic-mode-natural .main-view-container {
+  animation: consciousness-holographic-flicker calc(1.5s / var(--holographic-flicker-rate, 4)) ease-in-out infinite;
+}
+.aesthetic-mode-natural .holographic-element::before, .aesthetic-mode-natural .Root__main-view .main-view-container__scroll-node-child::before, .Root__main-view .aesthetic-mode-natural .main-view-container__scroll-node-child::before, .aesthetic-mode-natural .main-view-container__scroll-node::before, .aesthetic-mode-natural .Root__now-playing-bar::before, .aesthetic-mode-natural .Root__nav-bar::before, .aesthetic-mode-natural .main-view-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(120deg, rgba(var(--organic-holographic-rgb), var(--holographic-natural-warmth)) 0%, transparent 50%, rgba(var(--holographic-scanline-rgb), var(--holographic-natural-warmth)) 100%);
+  background-size: 200% 200%;
+  background-position: 0% 0%;
+  animation: consciousness-breathing-scanlines calc(2s / var(--holographic-breathing-frequency, 0.4)) ease-in-out infinite, simple-gradient-flow calc(4s / var(--holographic-breathing-frequency, 0.4)) linear infinite;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.music-energy-high .holographic-element, .music-energy-high .Root__main-view .main-view-container__scroll-node-child, .Root__main-view .music-energy-high .main-view-container__scroll-node-child, .music-energy-high .main-view-container__scroll-node, .music-energy-high .Root__now-playing-bar, .music-energy-high .Root__nav-bar, .music-energy-high .main-view-container {
+  --holographic-music-flicker-intensity: 0.8;
+  animation-duration: calc(0.3s / var(--holographic-flicker-rate, 10)) !important;
+}
+
+.music-energy-medium .holographic-element, .music-energy-medium .Root__main-view .main-view-container__scroll-node-child, .Root__main-view .music-energy-medium .main-view-container__scroll-node-child, .music-energy-medium .main-view-container__scroll-node, .music-energy-medium .Root__now-playing-bar, .music-energy-medium .Root__nav-bar, .music-energy-medium .main-view-container {
+  --holographic-music-flicker-intensity: 0.5;
+}
+
+.music-energy-low .holographic-element, .music-energy-low .Root__main-view .main-view-container__scroll-node-child, .Root__main-view .music-energy-low .main-view-container__scroll-node-child, .music-energy-low .main-view-container__scroll-node, .music-energy-low .Root__now-playing-bar, .music-energy-low .Root__nav-bar, .music-energy-low .main-view-container {
+  --holographic-music-flicker-intensity: 0.2;
+  animation-duration: calc(2s / var(--holographic-flicker-rate, 3)) !important;
+}
+
+.beat-detected .holographic-element, .beat-detected .Root__main-view .main-view-container__scroll-node-child, .Root__main-view .beat-detected .main-view-container__scroll-node-child, .beat-detected .main-view-container__scroll-node, .beat-detected .Root__now-playing-bar, .beat-detected .Root__nav-bar, .beat-detected .main-view-container {
+  animation: consciousness-holographic-flicker 0.1s ease-out, consciousness-atmospheric-depth calc(1s / var(--holographic-breathing-frequency, 0.5)) ease-in-out infinite !important;
+}
+
+.main-view-container {
+  perspective: var(--holographic-perspective-depth);
+  transform-style: preserve-3d;
+  background: rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.05)), linear-gradient(135deg, transparent 0%, rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.02)) 50%, transparent 100%);
+  border: 1px solid rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.3));
+  transform: translateZ(calc(var(--consciousness-depth-offset) * var(--volumetric-depth-intensity)));
+  box-shadow: 0 0 calc(var(--holographic-atmospheric-depth) * 25px) rgba(var(--organic-holographic-rgb), var(--holographic-glow-intensity)), inset 0 0 calc(var(--holographic-atmospheric-depth) * 12px) rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.3)), 0 calc(var(--consciousness-depth-offset) * 0.3) calc(var(--volumetric-shadow-blur)) rgba(var(--organic-holographic-rgb), calc(var(--volumetric-depth-intensity) * 0.3));
+}
+.main-view-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+  backdrop-filter: contrast(calc(1 + var(--consciousness-scanline-density) * 0.15)) saturate(calc(1 + var(--consciousness-scanline-density) * 0.2)) brightness(calc(1 + var(--consciousness-scanline-density) * 0.05)) hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.3));
+  background: radial-gradient(ellipse 200px 120px at 45% 60%, hsla(calc(180 + var(--temperature-scanline-color-shift)), 60%, 70%, calc(var(--consciousness-scanline-opacity) * 0.08)) 0%, hsla(calc(180 + var(--temperature-scanline-color-shift)), 60%, 70%, calc(var(--consciousness-scanline-opacity) * 0.03)) 40%, transparent 80%), radial-gradient(ellipse 150px 90px at 70% 35%, hsla(calc(200 + var(--temperature-scanline-color-shift)), 70%, 60%, calc(var(--consciousness-scanline-opacity) * 0.06)) 0%, hsla(calc(200 + var(--temperature-scanline-color-shift)), 70%, 60%, calc(var(--consciousness-scanline-opacity) * 0.02)) 50%, transparent 90%);
+  mix-blend-mode: color-dodge;
+  animation: holographic-lens-enhancement var(--consciousness-scanline-speed) ease-in-out infinite;
+  filter: none;
+}
+.main-view-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: calc(var(--consciousness-scanline-complexity) * 0.3);
+  backdrop-filter: sepia(calc(var(--consciousness-scanline-complexity) * 0.1)) contrast(calc(1 + var(--consciousness-scanline-complexity) * 0.1)) saturate(calc(1 + var(--consciousness-scanline-complexity) * 0.15));
+  background: linear-gradient(45deg, transparent 0%, hsla(calc(220 + var(--temperature-scanline-color-shift)), 80%, 60%, calc(var(--consciousness-scanline-complexity) * 0.03)) 30%, transparent 70%, hsla(calc(160 + var(--temperature-scanline-color-shift)), 80%, 60%, calc(var(--consciousness-scanline-complexity) * 0.02)) 85%, transparent 100%);
+  mix-blend-mode: overlay;
+  animation-play-state: var(--consciousness-scanline-interference);
+}
+
+.Root__nav-bar {
+  position: relative;
+}
+.Root__nav-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(90deg, transparent 0px, rgba(var(--holographic-scanline-rgb), 0.1) 2px, transparent 4px, transparent 20px);
+  background-size: 40px 100%;
+  animation: simple-gradient-flow calc(2s / var(--holographic-breathing-frequency, 0.5)) linear infinite, consciousness-breathing-scanlines calc(1s / var(--holographic-breathing-frequency, 0.5)) ease-in-out infinite;
+  pointer-events: none;
+}
+
+.Root__now-playing-bar {
+  transform: translateZ(calc(var(--consciousness-depth-offset) * var(--volumetric-depth-intensity) * 1.2));
+  box-shadow: 0 0 calc(var(--holographic-atmospheric-depth) * 25px) rgba(var(--organic-holographic-rgb), var(--holographic-glow-intensity)), inset 0 0 calc(var(--holographic-atmospheric-depth) * 12px) rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.3)), 0 calc(var(--consciousness-depth-offset) * 0.4) calc(var(--volumetric-shadow-blur) * 1.2) rgba(var(--organic-holographic-rgb), calc(var(--volumetric-depth-intensity) * 0.4));
+}
+.Root__now-playing-bar[data-consciousness-level=high] {
+  animation: consciousness-atmospheric-depth calc(0.5s / var(--holographic-breathing-frequency, 1)) ease-in-out infinite, volumetric-consciousness-pulse calc(1s / var(--holographic-breathing-frequency, 1)) ease-in-out infinite;
+}
+
+.main-view-container__scroll-node .main-trackList-trackListRow {
+  transition: all 0.3s ease-out;
+}
+.main-view-container__scroll-node .main-trackList-trackListRow:hover, .main-view-container__scroll-node .main-trackList-trackListRow.main-trackList-selected {
+  background: rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.1));
+  box-shadow: 0 0 15px rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.3)), inset 0 0 8px rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.1));
+  animation: consciousness-atmospheric-depth calc(1s / var(--holographic-breathing-frequency, 0.5)) ease-in-out infinite;
+}
+
+.Root__main-view .main-view-container__scroll-node-child::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(var(--holographic-scanline-rgb), calc(var(--holographic-glow-intensity) * 0.08)) 2px, rgba(var(--holographic-scanline-rgb), calc(var(--holographic-glow-intensity) * 0.08)) 2px);
+  animation: consciousness-breathing-scanlines calc(1s / var(--holographic-breathing-frequency, 0.5)) ease-in-out infinite;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .holographic-element, .main-view-container, .Root__nav-bar, .Root__now-playing-bar, .main-view-container__scroll-node, .Root__main-view .main-view-container__scroll-node-child {
+    animation: none !important;
+  }
+  .holographic-element::before, .main-view-container::before, .Root__nav-bar::before, .Root__now-playing-bar::before, .main-view-container__scroll-node::before, .Root__main-view .main-view-container__scroll-node-child::before, .holographic-element::after, .main-view-container::after, .Root__nav-bar::after, .Root__now-playing-bar::after, .main-view-container__scroll-node::after, .Root__main-view .main-view-container__scroll-node-child::after {
+    animation: none !important;
+  }
+  .main-view-container,
+  .Root__now-playing-bar {
+    box-shadow: 0 0 10px rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.5)), inset 0 0 5px rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.2));
+  }
+}
+@media (max-width: 768px) {
+  :root {
+    --holographic-atmospheric-depth: calc(var(--holographic-atmospheric-depth) * 0.7);
+    --holographic-chromatic-shift: calc(var(--holographic-chromatic-shift) * 0.5);
+  }
+  .holographic-element, .main-view-container, .Root__nav-bar, .Root__now-playing-bar, .main-view-container__scroll-node, .Root__main-view .main-view-container__scroll-node-child {
+    animation-duration: calc(var(--holographic-breathing-frequency) * 2s) !important;
+  }
+  .holographic-element::before, .main-view-container::before, .Root__nav-bar::before, .Root__now-playing-bar::before, .main-view-container__scroll-node::before, .Root__main-view .main-view-container__scroll-node-child::before, .holographic-element::after, .main-view-container::after, .Root__nav-bar::after, .Root__now-playing-bar::after, .main-view-container__scroll-node::after, .Root__main-view .main-view-container__scroll-node-child::after {
+    opacity: calc(var(--holographic-glow-intensity) * 0.5) !important;
+  }
+}
+@media (prefers-contrast: high) {
+  :root {
+    --holographic-glow-intensity: 0.8;
+    --holographic-atmospheric-depth: 0.6;
+  }
+  .holographic-element, .main-view-container, .Root__nav-bar, .Root__now-playing-bar, .main-view-container__scroll-node, .Root__main-view .main-view-container__scroll-node-child {
+    border: 2px solid rgba(var(--organic-holographic-rgb), 0.8) !important;
+    box-shadow: 0 0 20px rgba(var(--organic-holographic-rgb), 0.6), inset 0 0 10px rgba(var(--organic-holographic-rgb), 0.3) !important;
+  }
+}
 .sn-predicted-active {
   transition-duration: 150ms !important;
 }

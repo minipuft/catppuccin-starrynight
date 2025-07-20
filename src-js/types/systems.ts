@@ -1,7 +1,10 @@
 export interface HealthCheckResult {
-  ok: boolean;
+  system?: string;
+  healthy: boolean;
+  ok?: boolean;
   details?: string;
   issues?: string[];
+  metrics?: Record<string, any>;
 }
 
 export interface BeatPayload {

@@ -105,11 +105,20 @@ export class Card3DManager implements IManagedSystem {
   public async healthCheck(): Promise<HealthCheckResult> {
     const elements = document.querySelectorAll(this.cardQuerySelector);
     if (elements.length > 0) {
-      return { ok: true, details: `Found ${elements.length} cards to manage.` };
+      return { 
+        healthy: true,
+        ok: true, 
+        details: `Found ${elements.length} cards to manage.`,
+        issues: [],
+        system: 'Card3DManager',
+      };
     }
     return {
+      healthy: false,
       ok: false,
       details: "No card elements found with the configured selector.",
+      issues: ["No card elements found with the configured selector."],
+      system: 'Card3DManager',
     };
   }
 

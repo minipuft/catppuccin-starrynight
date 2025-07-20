@@ -227,12 +227,20 @@ export class SettingsManager implements IManagedSystem {
     try {
       // A simple check to ensure localStorage is accessible
       Spicetify.LocalStorage.get("spicetify-exp-features");
-      return { ok: true, details: "LocalStorage is accessible." };
+      return { 
+        healthy: true,
+        ok: true, 
+        details: "LocalStorage is accessible.",
+        issues: [],
+        system: 'SettingsManager',
+      };
     } catch (e: any) {
       return {
+        healthy: false,
         ok: false,
         details: "Failed to access Spicetify.LocalStorage.",
         issues: [e.message],
+        system: 'SettingsManager',
       };
     }
   }

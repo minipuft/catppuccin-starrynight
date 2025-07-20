@@ -35,7 +35,13 @@ class MockLeftSidebarConsciousnessSystem extends UnifiedSystemBase {
   }
   
   async healthCheck(): Promise<HealthCheckResult> {
-    return { ok: true, details: 'Mock left sidebar consciousness healthy' };
+    return { 
+      healthy: true,
+      ok: true, 
+      details: 'Mock left sidebar consciousness healthy',
+      issues: [],
+      system: 'MockLeftSidebarConsciousnessSystem'
+    };
   }
   
   getConsciousnessState() {
@@ -64,7 +70,13 @@ class MockSidebarSystemsOrchestrator extends UnifiedSystemBase {
   }
   
   async healthCheck(): Promise<HealthCheckResult> {
-    return { ok: true, details: 'Mock sidebar orchestrator healthy' };
+    return { 
+      healthy: true,
+      ok: true, 
+      details: 'Mock sidebar orchestrator healthy',
+      issues: [],
+      system: 'MockBilateralSidebarOrchestrator'
+    };
   }
   
   getBilateralState() {
@@ -559,8 +571,11 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
           systemHealthChecks[systemName] = await systemDef.system.healthCheck();
         } catch (error) {
           systemHealthChecks[systemName] = {
+            healthy: false,
             ok: false,
-            details: `Health check failed: ${(error as Error).message}`
+            details: `Health check failed: ${(error as Error).message}`,
+            issues: [`Health check failed: ${(error as Error).message}`],
+            system: systemName
           };
         }
       }
@@ -571,8 +586,11 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
     const isHealthy = unhealthySystems.length === 0;
     
     return {
+      healthy: isHealthy,
       ok: isHealthy,
-      details: `Sidebar integration ${isHealthy ? 'healthy' : 'degraded'} - ${this.performanceMetrics.activeSystems}/${this.performanceMetrics.totalSystems} systems active, bilateral sync: ${this.performanceMetrics.bilateralSyncEnabled}`
+      details: `Sidebar integration ${isHealthy ? 'healthy' : 'degraded'} - ${this.performanceMetrics.activeSystems}/${this.performanceMetrics.totalSystems} systems active, bilateral sync: ${this.performanceMetrics.bilateralSyncEnabled}`,
+      issues: unhealthySystems.map(check => check.details || 'Unknown issue'),
+      system: 'SidebarSystemsIntegration'
     };
   }
   

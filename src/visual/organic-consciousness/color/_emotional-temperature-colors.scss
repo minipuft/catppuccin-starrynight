@@ -1,0 +1,458 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// EMOTIONAL TEMPERATURE COLORS - Dynamic Color Temperature System
+// ████████████████████████████████████████████████████████████████████████████████
+
+// === EMOTIONAL COLOR TEMPERATURE FOUNDATION ===
+// Dynamic color system that maps music emotions to color temperatures (1000K-20000K)
+// and generates cinematic palettes that evolve with the user's musical journey
+
+:root {
+  // === EMOTION-SPECIFIC COLOR TEMPERATURES ===
+  // Each emotion maps to a specific color temperature range
+  
+  // Calm/Meditative States (2700K-4000K - Warm, soothing)
+  --organic-emotion-calm-temp: 3200;
+  --organic-emotion-calm-primary: 255, 248, 220;      // Warm white
+  --organic-emotion-calm-accent: 255, 218, 185;       // Soft peach
+  --organic-emotion-calm-atmosphere: 139, 125, 96;    // Warm gray
+  
+  // Melancholy States (2200K-3500K - Deep, introspective)
+  --organic-emotion-melancholy-temp: 2800;
+  --organic-emotion-melancholy-primary: 255, 234, 191;    // Amber glow
+  --organic-emotion-melancholy-accent: 204, 153, 102;     // Muted gold
+  --organic-emotion-melancholy-atmosphere: 102, 87, 66;   // Deep brown-gray
+  
+  // Energetic States (5500K-7500K - Bright, vibrant)
+  --organic-emotion-energetic-temp: 6500;
+  --organic-emotion-energetic-primary: 255, 255, 255;     // Pure white
+  --organic-emotion-energetic-accent: 173, 216, 230;      // Light blue
+  --organic-emotion-energetic-atmosphere: 119, 136, 153;  // Light gray
+  
+  // Aggressive States (8000K-12000K - Cool, intense)
+  --organic-emotion-aggressive-temp: 10000;
+  --organic-emotion-aggressive-primary: 201, 226, 255;    // Cool blue-white
+  --organic-emotion-aggressive-accent: 135, 206, 235;     // Sky blue
+  --organic-emotion-aggressive-atmosphere: 105, 105, 105; // Cool gray
+  
+  // Happy States (4500K-6500K - Balanced, joyful)
+  --organic-emotion-happy-temp: 5500;
+  --organic-emotion-happy-primary: 255, 250, 240;         // Floral white
+  --organic-emotion-happy-accent: 255, 228, 181;          // Warm yellow
+  --organic-emotion-happy-atmosphere: 169, 169, 169;      // Light gray
+  
+  // Romantic States (2500K-3500K - Soft, intimate)
+  --organic-emotion-romantic-temp: 3000;
+  --organic-emotion-romantic-primary: 255, 244, 229;      // Seashell
+  --organic-emotion-romantic-accent: 255, 192, 203;       // Pink
+  --organic-emotion-romantic-atmosphere: 128, 108, 96;    // Warm taupe
+  
+  // Mysterious States (1800K-2800K - Deep, enigmatic)
+  --organic-emotion-mysterious-temp: 2300;
+  --organic-emotion-mysterious-primary: 255, 214, 170;    // Deep amber
+  --organic-emotion-mysterious-accent: 138, 43, 226;      // Deep purple
+  --organic-emotion-mysterious-atmosphere: 75, 63, 48;    // Dark brown
+  
+  // Epic States (7000K-15000K - Grand, cinematic)
+  --organic-emotion-epic-temp: 11000;
+  --organic-emotion-epic-primary: 191, 211, 255;          // Electric blue
+  --organic-emotion-epic-accent: 255, 215, 0;             // Gold
+  --organic-emotion-epic-atmosphere: 112, 128, 144;       // Slate gray
+  
+  // Ambient States (3000K-5000K - Atmospheric, floating)
+  --organic-emotion-ambient-temp: 4000;
+  --organic-emotion-ambient-primary: 255, 248, 220;       // Cornsilk
+  --organic-emotion-ambient-accent: 176, 196, 222;        // Light steel blue
+  --organic-emotion-ambient-atmosphere: 128, 128, 128;    // Neutral gray
+}
+
+// === EMOTIONAL TEMPERATURE MIXINS ===
+
+// Apply emotional temperature to element
+@mixin emotional-temperature($emotion: 'ambient', $intensity: 1.0) {
+  // Get emotion-specific color temperature
+  $temp-var: --organic-emotion-#{$emotion}-temp;
+  $primary-var: --organic-emotion-#{$emotion}-primary;
+  $accent-var: --organic-emotion-#{$emotion}-accent;
+  $atmosphere-var: --organic-emotion-#{$emotion}-atmosphere;
+  
+  // Apply temperature-based coloring
+  color: rgb(var(#{$primary-var}));
+  
+  // Emotional enhancement based on intensity
+  filter: 
+    saturate(calc(1.0 + #{$intensity} * var(--organic-emotional-saturation, 1) * 0.2))
+    brightness(calc(1.0 + #{$intensity} * 0.1))
+    hue-rotate(calc(#{$intensity} * var(--organic-warmth, 0.8) * 5deg));
+  
+  // Temperature-based text shadow
+  text-shadow: 
+    0 0 calc(#{$intensity} * 2px) rgba(var(#{$accent-var}), calc(#{$intensity} * 0.3)),
+    0 0 calc(#{$intensity} * 4px) rgba(var(#{$atmosphere-var}), calc(#{$intensity} * 0.1));
+  
+  // Smooth temperature transitions
+  transition: 
+    color var(--organic-transition-medium, 0.5s) var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1)),
+    filter var(--organic-transition-medium, 0.5s) var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1)),
+    text-shadow var(--organic-transition-medium, 0.5s) var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+// Cinematic color grading for backgrounds
+@mixin cinematic-color-grading($emotion: 'ambient', $intensity: 1.0) {
+  $primary-var: --organic-emotion-#{$emotion}-primary;
+  $accent-var: --organic-emotion-#{$emotion}-accent;
+  $atmosphere-var: --organic-emotion-#{$emotion}-atmosphere;
+  
+  // Cinematic background gradient
+  background: 
+    radial-gradient(
+      ellipse at center,
+      rgba(var(#{$primary-var}), calc(#{$intensity} * 0.05)) 0%,
+      rgba(var(#{$accent-var}), calc(#{$intensity} * 0.03)) 40%,
+      rgba(var(#{$atmosphere-var}), calc(#{$intensity} * 0.02)) 80%,
+      transparent 100%
+    );
+  
+  // Cinematic color enhancement
+  filter: 
+    contrast(calc(1.0 + #{$intensity} * var(--organic-cinematic-contrast, 1) * 0.2))
+    saturate(calc(1.0 + #{$intensity} * var(--organic-emotional-saturation, 1) * 0.15));
+  
+  // Performance optimization
+  will-change: background, filter;
+  contain: layout style paint;
+}
+
+// Dynamic color evolution for elements
+@mixin color-evolution($emotion: 'ambient', $evolution-speed: 1.0) {
+  $primary-var: --organic-emotion-#{$emotion}-primary;
+  $accent-var: --organic-emotion-#{$emotion}-accent;
+  
+  // Color evolution animation
+  animation: emotional-color-evolution calc(3s / #{$evolution-speed}) ease-in-out infinite;
+  
+  // Custom color evolution properties
+  --evolution-primary: var(#{$primary-var});
+  --evolution-accent: var(#{$accent-var});
+  --evolution-speed: #{$evolution-speed};
+  
+  // Performance optimization
+  will-change: color, background-color, border-color;
+}
+
+// === EMOTIONAL COLOR CLASSES ===
+
+// Calm emotional state
+.organic-emotion-calm {
+  @include emotional-temperature('calm', var(--organic-emotional-intensity, 1.0));
+  
+  // Calm-specific enhancements
+  animation: organic-calm-breathing calc(var(--organic-breathing-cycle, 1s) * 1.2) ease-in-out infinite;
+  
+  // Calm color variations
+  &.organic-calm-soft {
+    filter: 
+      saturate(0.8)
+      brightness(1.1)
+      blur(0.5px);
+  }
+  
+  &.organic-calm-deep {
+    filter: 
+      saturate(1.2)
+      brightness(0.9)
+      hue-rotate(-5deg);
+  }
+}
+
+// Energetic emotional state
+.organic-emotion-energetic {
+  @include emotional-temperature('energetic', var(--organic-emotional-intensity, 1.0));
+  
+  // Energetic-specific enhancements
+  animation: organic-energetic-pulse calc(var(--organic-breathing-cycle, 1s) * 0.8) cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  
+  // Energetic color variations
+  &.organic-energetic-burst {
+    filter: 
+      saturate(1.5)
+      brightness(1.2)
+      hue-rotate(10deg);
+    
+    animation-duration: calc(var(--organic-breathing-cycle, 1s) * 0.5);
+  }
+}
+
+// Melancholy emotional state
+.organic-emotion-melancholy {
+  @include emotional-temperature('melancholy', var(--organic-emotional-intensity, 1.0));
+  
+  // Melancholy-specific enhancements
+  animation: organic-melancholy-drift calc(var(--organic-breathing-cycle, 1s) * 1.5) ease-in-out infinite;
+  
+  // Melancholy color variations
+  &.organic-melancholy-deep {
+    filter: 
+      saturate(0.6)
+      brightness(0.8)
+      hue-rotate(-10deg)
+      sepia(0.2);
+  }
+}
+
+// Happy emotional state
+.organic-emotion-happy {
+  @include emotional-temperature('happy', var(--organic-emotional-intensity, 1.0));
+  
+  // Happy-specific enhancements
+  animation: organic-happy-bounce calc(var(--organic-breathing-cycle, 1s) * 0.9) cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+  
+  // Happy color variations
+  &.organic-happy-vibrant {
+    filter: 
+      saturate(1.4)
+      brightness(1.15)
+      hue-rotate(15deg);
+  }
+}
+
+// Mysterious emotional state
+.organic-emotion-mysterious {
+  @include emotional-temperature('mysterious', var(--organic-emotional-intensity, 1.0));
+  
+  // Mysterious-specific enhancements
+  animation: organic-mysterious-shimmer calc(var(--organic-breathing-cycle, 1s) * 2) ease-in-out infinite;
+  
+  // Mysterious color variations
+  &.organic-mysterious-deep {
+    filter: 
+      saturate(1.1)
+      brightness(0.7)
+      hue-rotate(-20deg)
+      contrast(1.3);
+  }
+}
+
+// Epic emotional state
+.organic-emotion-epic {
+  @include emotional-temperature('epic', var(--organic-emotional-intensity, 1.0));
+  
+  // Epic-specific enhancements
+  animation: organic-epic-grandeur calc(var(--organic-breathing-cycle, 1s) * 0.6) cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+  
+  // Epic color variations
+  &.organic-epic-cinematic {
+    filter: 
+      saturate(1.6)
+      brightness(1.3)
+      hue-rotate(25deg)
+      contrast(1.4);
+    
+    // Enhanced cinematic glow
+    box-shadow: 
+      0 0 20px rgba(var(--organic-emotion-epic-accent), 0.3),
+      inset 0 0 15px rgba(var(--organic-emotion-epic-primary), 0.1);
+  }
+}
+
+// === EMOTIONAL COLOR ANIMATIONS ===
+
+// Calm breathing animation
+@keyframes organic-calm-breathing {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.1))
+      brightness(1.0);
+  }
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.15))
+      brightness(1.05);
+  }
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.1))
+      brightness(1.0);
+  }
+}
+
+// Energetic pulsing animation
+@keyframes organic-energetic-pulse {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.2))
+      brightness(1.0)
+      hue-rotate(0deg);
+  }
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.35))
+      brightness(1.15)
+      hue-rotate(5deg);
+  }
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.2))
+      brightness(1.0)
+      hue-rotate(0deg);
+  }
+}
+
+// Melancholy drifting animation
+@keyframes organic-melancholy-drift {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.05))
+      brightness(0.95)
+      hue-rotate(-5deg);
+  }
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.1))
+      brightness(1.0)
+      hue-rotate(0deg);
+  }
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.05))
+      brightness(0.95)
+      hue-rotate(-5deg);
+  }
+}
+
+// Happy bouncing animation
+@keyframes organic-happy-bounce {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.15))
+      brightness(1.05)
+      hue-rotate(0deg);
+    transform: scale(1.0);
+  }
+  25% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.25))
+      brightness(1.1)
+      hue-rotate(8deg);
+    transform: scale(1.02);
+  }
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.3))
+      brightness(1.15)
+      hue-rotate(15deg);
+    transform: scale(1.03);
+  }
+  75% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.25))
+      brightness(1.1)
+      hue-rotate(8deg);
+    transform: scale(1.02);
+  }
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.15))
+      brightness(1.05)
+      hue-rotate(0deg);
+    transform: scale(1.0);
+  }
+}
+
+// Mysterious shimmering animation
+@keyframes organic-mysterious-shimmer {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.1))
+      brightness(0.8)
+      hue-rotate(-15deg);
+  }
+  33% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.2))
+      brightness(0.9)
+      hue-rotate(-10deg);
+  }
+  66% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.15))
+      brightness(0.85)
+      hue-rotate(-20deg);
+  }
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.1))
+      brightness(0.8)
+      hue-rotate(-15deg);
+  }
+}
+
+// Epic grandeur animation
+@keyframes organic-epic-grandeur {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.3))
+      brightness(1.1)
+      hue-rotate(0deg)
+      contrast(1.2);
+    transform: scale(1.0);
+  }
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.5))
+      brightness(1.25)
+      hue-rotate(20deg)
+      contrast(1.4);
+    transform: scale(1.05);
+  }
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.3))
+      brightness(1.1)
+      hue-rotate(0deg)
+      contrast(1.2);
+    transform: scale(1.0);
+  }
+}
+
+// Color evolution animation
+@keyframes emotional-color-evolution {
+  0% {
+    color: rgb(var(--evolution-primary));
+  }
+  50% {
+    color: rgb(var(--evolution-accent));
+  }
+  100% {
+    color: rgb(var(--evolution-primary));
+  }
+}
+
+// === ACCESSIBILITY AND PERFORMANCE ===
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .organic-emotion-calm,
+  .organic-emotion-energetic,
+  .organic-emotion-melancholy,
+  .organic-emotion-happy,
+  .organic-emotion-mysterious,
+  .organic-emotion-epic {
+    animation: none !important;
+    transition-duration: 0.1s !important;
+  }
+}
+
+// High contrast support
+@media (prefers-contrast: high) {
+  .organic-emotion-calm,
+  .organic-emotion-energetic,
+  .organic-emotion-melancholy,
+  .organic-emotion-happy,
+  .organic-emotion-mysterious,
+  .organic-emotion-epic {
+    filter: 
+      saturate(2.0) !important
+      contrast(2.0) !important
+      brightness(1.2) !important;
+  }
+}

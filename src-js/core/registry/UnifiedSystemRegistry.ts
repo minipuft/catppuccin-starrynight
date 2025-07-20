@@ -278,9 +278,11 @@ export class UnifiedSystemRegistry {
     for (const [name, system] of this.systems) {
       if (!system.isInitialized || system.isDestroyed) {
         const result: HealthCheckResult = {
+          healthy: false,
           ok: false,
           details: `System ${name} not initialized or destroyed`,
-          issues: ['System not ready']
+          issues: ['System not ready'],
+          system: name
         };
         results.set(name, result);
         unhealthy.push(name);
@@ -299,9 +301,11 @@ export class UnifiedSystemRegistry {
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         const result: HealthCheckResult = {
+          healthy: false,
           ok: false,
           details: `Health check failed: ${errorMessage}`,
-          issues: [errorMessage]
+          issues: [errorMessage],
+          system: name
         };
         results.set(name, result);
         unhealthy.push(name);

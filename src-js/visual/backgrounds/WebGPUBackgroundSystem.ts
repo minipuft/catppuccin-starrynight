@@ -101,10 +101,13 @@ export class WebGPUBackgroundSystem implements IManagedSystem, IVisualSystem {
 
   public async healthCheck(): Promise<HealthCheckResult> {
     return {
+      healthy: this.initialized,
       ok: this.initialized,
       details: this.initialized
         ? "WebGPU canvas active"
         : "WebGPU background inactive or failed to initialise",
+      issues: this.initialized ? [] : ["WebGPU background inactive or failed to initialise"],
+      system: 'WebGPUBackgroundSystem',
     };
   }
 

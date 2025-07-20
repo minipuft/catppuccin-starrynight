@@ -8,6 +8,10 @@
 import type { Year3000System } from "../../core/lifecycle/year3000System";
 import type { HealthCheckResult, IManagedSystem } from "../../types/systems";
 
+// Event-driven integration imports
+import { GlobalEventBus } from "../../core/events/EventBus";
+import type { ColorHarmonizedEvent } from "../../types/colorStrategy";
+
 interface SpotifyUITargets {
   nowPlaying: Element[];
   sidebar: Element[];
@@ -64,23 +68,29 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
         0
       );
 
-      const result: HealthCheckResult = {
-        ok: this.initialized && totalElements > 0,
+      const isHealthy = this.initialized && totalElements > 0;
+      const issues: string[] = [];
+      
+      if (totalElements === 0) {
+        issues.push("No UI elements discovered");
+      }
+
+      return {
+        healthy: isHealthy,
+        ok: isHealthy,
         details: `UI Application System ${
           this.initialized ? "active" : "inactive"
         }, ${totalElements} elements enhanced`,
+        issues: issues,
+        system: 'SpotifyUIApplicationSystem',
       };
-
-      if (totalElements === 0) {
-        result.issues = ["No UI elements discovered"];
-      }
-
-      return result;
     } catch (error) {
       return {
+        healthy: false,
         ok: false,
         details: "Health check failed",
         issues: [error instanceof Error ? error.message : "Unknown error"],
+        system: 'SpotifyUIApplicationSystem',
       };
     }
   }
@@ -477,19 +487,31 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
   }
 
   /**
-   * Registers for updates from unified systems - connects to existing Year3000System events
+   * Registers for updates from unified systems - connects to event-driven architecture
    */
   private registerSystemCallbacks(): void {
-    // Listen for color harmony updates from existing ColorHarmonyEngine
-    if (this.year3000System.colorHarmonyEngine) {
-      // Hook into existing color application flow
-      const originalApplyColors = this.year3000System.applyColorsToTheme.bind(
-        this.year3000System
-      );
-      this.year3000System.applyColorsToTheme = (extractedColors: any = {}) => {
-        originalApplyColors(extractedColors);
-        this.updateColorVariables(extractedColors);
-      };
+    // Listen for color harmony updates via event-driven pattern (NEW ARCHITECTURE)
+    try {
+      GlobalEventBus.subscribe('colors/harmonized', (event: ColorHarmonizedEvent) => {
+        this.handleColorHarmonizedEvent(event);
+      });
+      
+      console.log("🎨 [SpotifyUIApplicationSystem] Subscribed to colors/harmonized events");
+    } catch (error) {
+      console.error("[SpotifyUIApplicationSystem] Failed to subscribe to colors/harmonized events:", error);
+      
+      // Fallback to legacy method interception for compatibility
+      if (this.year3000System.colorHarmonyEngine) {
+        const originalApplyColors = this.year3000System.applyColorsToTheme.bind(
+          this.year3000System
+        );
+        this.year3000System.applyColorsToTheme = (extractedColors: any = {}) => {
+          originalApplyColors(extractedColors);
+          this.updateColorVariables(extractedColors);
+        };
+        
+        console.warn("[SpotifyUIApplicationSystem] Using legacy color application hook as fallback");
+      }
     }
 
     // Listen for music sync updates from existing MusicSyncService
@@ -541,6 +563,73 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
       .getPropertyValue("--sn-kinetic-energy")
       .trim();
     return parseFloat(intensity) || 0;
+  }
+
+  /**
+   * Handle colors/harmonized event from ColorOrchestrator (Event-driven architecture)
+   */
+  private handleColorHarmonizedEvent(event: ColorHarmonizedEvent): void {
+    if (event.type !== 'colors/harmonized') return;
+    
+    const { processedColors, cssVariables, metadata } = event.payload;
+    
+    console.log("🎨 [SpotifyUIApplicationSystem] Received harmonized colors via event-driven pattern", {
+      strategy: metadata.strategy,
+      colorsCount: Object.keys(processedColors).length,
+      cssVariablesCount: Object.keys(cssVariables).length
+    });
+    
+    try {
+      // Update color variables for Spotify UI elements
+      this.updateColorVariables(processedColors);
+      
+      // Apply CSS variables directly if provided (optimization)
+      if (cssVariables && Object.keys(cssVariables).length > 0) {
+        this.applyCSSVariablesToSpotifyUI(cssVariables);
+      }
+      
+    } catch (error) {
+      console.error("[SpotifyUIApplicationSystem] Failed to apply harmonized colors from event:", error);
+      
+      // Fallback to basic color application
+      this.updateColorVariables(processedColors);
+    }
+  }
+
+  /**
+   * Apply CSS variables directly to Spotify UI elements (optimization for event-driven pattern)
+   */
+  private applyCSSVariablesToSpotifyUI(cssVariables: Record<string, string>): void {
+    try {
+      const root = document.documentElement;
+      const enhancedElements = document.querySelectorAll(".sn-ui-enhanced");
+      
+      // Apply to root for global availability
+      for (const [variable, value] of Object.entries(cssVariables)) {
+        if (variable && value) {
+          root.style.setProperty(variable, value);
+        }
+      }
+      
+      // Apply to enhanced Spotify UI elements
+      enhancedElements.forEach((element) => {
+        if (element instanceof HTMLElement) {
+          for (const [variable, value] of Object.entries(cssVariables)) {
+            if (variable && value) {
+              element.style.setProperty(variable, value);
+            }
+          }
+        }
+      });
+      
+      console.log("🎨 [SpotifyUIApplicationSystem] Applied CSS variables to Spotify UI", {
+        variablesCount: Object.keys(cssVariables).length,
+        enhancedElementsCount: enhancedElements.length
+      });
+      
+    } catch (error) {
+      console.error("[SpotifyUIApplicationSystem] Failed to apply CSS variables to Spotify UI:", error);
+    }
   }
 
   private updateColorVariables(colorData: any): void {
