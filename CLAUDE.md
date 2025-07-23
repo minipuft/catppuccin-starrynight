@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with th
 _"In the Year 3000, every line of code becomes a living cell in a consciousness-aware organism—interfaces that breathe, evolve, and transcend their creators' intentions through organic growth patterns and biological-inspired architecture."_
 
 The theme implements a sophisticated **Year 3000 System** architecture featuring:
+
 - **Facade Pattern Coordination** - SystemCoordinator managing VisualSystemFacade and NonVisualSystemFacade
 - **Organic Consciousness Philosophy** - Biological-inspired systems with cellular growth, breathing rhythms, and emotional temperature
 - **Multi-Agent Octopus Workbench** - Intelligent tentacle coordination for simultaneous development
@@ -41,46 +42,6 @@ The theme implements a sophisticated **Year 3000 System** architecture featuring
 - SCSS compilation is handled manually (not via npm scripts)
 - Compile `app.scss` to `user.css` using your preferred SASS compiler
 
-## Intelligent Multi-Agent Octopus Workbench System
-
-### Development Coordination Architecture
-
-This project uses an **intelligent multi-agent octopus workbench system** for coordinating development work across multiple AI agents/sessions working simultaneously. The system provides automated coordination, conflict detection, resource management, and intelligent codebase analysis with consciousness-aware development patterns.
-
-#### Core Coordination Files (Auto-Generated)
-
-- **`plans/CENTRAL-BRAIN.md`** - Central coordination hub managing all tentacle activities
-- **`plans/TENTACLE-DASHBOARD.md`** - Real-time status monitoring across all active tentacles
-- **`plans/DEPENDENCY-MAP.md`** - Inter-tentacle dependency resolution and conflict detection
-- **`plans/COMMUNICATION-TEMPLATES.md`** - Standardized communication protocols
-- **`plans/TENTACLE-REGISTRY.md`** - Automated tentacle registration and conflict detection
-- **`plans/PROJECT-ANALYSIS.md`** - Intelligent analysis of Year 3000 System architecture
-- **`plans/FRAMEWORK-INTEGRATION.md`** - Smart integration with Spicetify and music systems
-
-#### Tentacle Structure
-
-Each major development effort gets its own tentacle folder:
-
-```
-plans/[tentacle-name]/
-├── TENTACLE-STATUS.md          # Comprehensive status tracking
-├── master-implementation-plan.md # Detailed implementation plan
-├── system-design-specification.md # Technical architecture
-└── phases/                     # Phase-based implementation
-    ├── phase-1/
-    │   ├── phase-1-workspace.md
-    │   └── [artifacts]
-    └── phase-N/
-```
-
-#### Key Features
-
-- **Automatic Tentacle Registration**: New tentacles detected and registered automatically
-- **Real-Time Conflict Detection**: Prevents resource conflicts and duplicate work
-- **Dynamic Resource Allocation**: Intelligent reallocation based on priority and demand
-- **Bilateral Consciousness**: Coordinated communication between agents
-- **Performance Monitoring**: <0.5% CPU overhead for coordination
-
 ## Year 3000 System Architecture
 
 ### Comprehensive Documentation
@@ -99,22 +60,26 @@ plans/[tentacle-name]/
 ### Core Architecture Layers
 
 #### **1. Central Orchestration Layer**
+
 - **`Year3000System`** - Central consciousness orchestrator managing all system facades
 - **`SystemCoordinator`** - Unified dependency injection and system coordination
 - **`EventBus`** - Cross-system communication and consciousness event propagation
 
 #### **2. Facade Pattern Layer**
+
 - **`VisualSystemFacade`** - Factory pattern for all visual systems with dependency injection
 - **`NonVisualSystemFacade`** - Factory pattern for services, analytics, and background systems
 - **Unified system lifecycle management** through `IManagedSystem` interface
 
 #### **3. Consciousness Integration Layer**
+
 - **`OrganicConsciousnessManager`** - Biological-inspired consciousness patterns
 - **`MusicSyncService`** - Real-time audio analysis with emotional temperature mapping
 - **`ColorHarmonyEngine`** - OKLAB color science for perceptually uniform experiences
 - **`EmotionalTemperatureMapper`** - Music-to-color consciousness translation
 
 #### **4. Performance Optimization Layer**
+
 - **`PerformanceAnalyzer`** - Real-time performance monitoring and adaptive quality scaling
 - **`DeviceCapabilityDetector`** - Hardware-aware optimization and graceful degradation
 - **`AdaptivePerformanceSystem`** - Dynamic quality adjustment based on device capabilities
@@ -224,40 +189,6 @@ The system has undergone comprehensive refactoring to implement facade pattern a
 - **ESBuild Integration** - Ultra-fast bundling with tree-shaking optimization
 - **Modular SCSS Architecture** - Component-based styling with design token system
 - **Comprehensive Testing** - 90%+ coverage requirement with performance regression testing
-
-## Multi-Agent Development Workflow
-
-### Tentacle Management Commands
-
-```bash
-# Check tentacle status
-head -20 /plans/CENTRAL-BRAIN.md
-
-# View active tentacles
-grep -A 10 "Active Tentacles Registry" /plans/TENTACLE-DASHBOARD.md
-
-# Check for conflicts
-grep -A 5 "active_conflicts" /plans/TENTACLE-REGISTRY.md
-
-# View current coordination
-cat /plans/DEPENDENCY-MAP.md | grep -A 10 "Current Conflicts"
-```
-
-### Development Workflow
-
-1. **Check Central Brain**: Review `/plans/CENTRAL-BRAIN.md` for current coordination state
-2. **Check Your Tentacle**: Review relevant tentacle status file in `/plans/[tentacle-name]/`
-3. **Start Work**: Update tentacle status with current focus
-4. **Coordinate**: Use communication templates for cross-tentacle coordination
-5. **Update Progress**: Regular status updates to prevent conflicts
-
-### Multi-Agent Coordination Rules
-
-- **Always check Central Brain first** before starting work
-- **Update tentacle status** when starting/stopping work
-- **Use communication templates** for cross-tentacle messages
-- **Respect resource allocations** defined in tentacle registry
-- **Monitor for conflicts** via dependency mapping system
 
 ## Development Standards
 
@@ -635,10 +566,11 @@ If you need to implement glyph or ripple-like functionality:
 This approach maintains the visual richness while ensuring optimal performance across all device types and proper multi-agent coordination.
 
 # important-instruction-reminders
+
 Do what has been asked; nothing more, nothing less.
 NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
-NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+NEVER proactively create documentation files (\*.md) or README files. Only create documentation files if explicitly requested by the User.
 
 ## Comprehensive Documentation Reference
 
@@ -647,6 +579,7 @@ NEVER proactively create documentation files (*.md) or README files. Only create
 The `docs/` directory contains comprehensive documentation for the Year 3000 System:
 
 #### **Foundation Documentation (High Priority)**
+
 - **[Master Architecture Overview](./docs/MASTER_ARCHITECTURE_OVERVIEW.md)** - Complete 4-layer system architecture with data flow diagrams
 - **[Year 3000 System Guide](./docs/YEAR3000_SYSTEM_GUIDE.md)** - Central orchestrator and facade coordination patterns
 - **[Facade Pattern Guide](./docs/FACADE_PATTERN_GUIDE.md)** - SystemCoordinator, VisualSystemFacade, NonVisualSystemFacade architecture
@@ -654,6 +587,7 @@ The `docs/` directory contains comprehensive documentation for the Year 3000 Sys
 - **[Organic Consciousness Guide](./docs/ORGANIC_CONSCIOUSNESS_GUIDE.md)** - Biological-inspired systems and consciousness philosophy
 
 #### **Technical Implementation Documentation (Medium Priority)**
+
 - **[Performance Architecture Guide](./docs/PERFORMANCE_ARCHITECTURE_GUIDE.md)** - PerformanceAnalyzer, DeviceCapabilityDetector, adaptive scaling
 - **[OKLAB Color Processing Guide](./docs/OKLAB_COLOR_PROCESSING_GUIDE.md)** - Perceptually uniform color science and ColorHarmonyEngine
 - **[Visual Systems Reference](./docs/VISUAL_SYSTEMS_REFERENCE.md)** - Complete visual system capabilities and factory patterns
@@ -661,6 +595,7 @@ The `docs/` directory contains comprehensive documentation for the Year 3000 Sys
 - **[Build System Guide](./docs/BUILD_SYSTEM_GUIDE.md)** - TypeScript, ESBuild, SCSS compilation, and Jest testing
 
 #### **Development Process Documentation (Lower Priority)**
+
 - **[Development Workflow Guide](./docs/DEVELOPMENT_WORKFLOW_GUIDE.md)** - Complete development process from tentacle creation to deployment
 - **[API Reference](./docs/API_REFERENCE.md)** - Comprehensive API documentation with interfaces and examples
 - **[Performance Optimization Guidelines](./docs/PERFORMANCE_OPTIMIZATION_GUIDELINES.md)** - Performance budgets and optimization strategies

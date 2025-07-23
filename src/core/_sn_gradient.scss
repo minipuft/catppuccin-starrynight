@@ -35,8 +35,8 @@
     0.28 + (var(--gradient-beat-intensity) * 0.15) + (var(--sn-gradient-consciousness-level) * 0.1)
   ); /* PULSES with beats and consciousness!*/
   --sn-gradient-blur: calc(
-    35px + (var(--gradient-beat-intensity) * 10px) + (var(--sn-gradient-nebula-density) * 15px)
-  ); /* Dynamic blur with rhythm and nebula density*/
+    8px + (var(--gradient-beat-intensity) * 3px) + (var(--sn-gradient-nebula-density) * 4px)
+  ); /* Dynamic blur with rhythm and nebula density - reduced for visibility*/
   --sn-gradient-saturation: calc(
     1.45 + (var(--gradient-beat-intensity) * 0.25) + (var(--sn-gradient-emotional-valence) * 0.3)
   ); /* VIBRANT with rhythm and emotional valence!*/
@@ -218,7 +218,7 @@
   --sn-integration-mode: "progressive";      /* progressive, performance-first, quality-first, battery-optimized */
   --sn-current-backend: "css";               /* css, webgl, hybrid */
   --sn-webgl-enabled: 0;                     /* 0/1 WebGL backend enabled */
-  --sn-hybrid-mode: 0;                       /* 0/1 hybrid rendering mode */
+  --sn-hybrid-mode: 1;                       /* 0/1 hybrid rendering mode - ALWAYS ENABLED for seamless coordination */
   
   /* Transition system controls */
   --sn-gradient-transition-active: 0;        /* 0/1 backend transition in progress */
@@ -262,7 +262,7 @@
      ② lerp-smoothed CSS keyframes as a safe fallback.           */
   --sn-gradient-flow-x: 0%;   /* −25 % → +25 % */
   --sn-gradient-flow-y: 0%;   /* −25 % → +25 % */
-  --sn-gradient-flow-scale: 1;/* 1 = 100 %, 1.3 = gentle zoom */
+  --sn-gradient-flow-scale: 1.15;/* 1 = 100 %, 1.15 = gentle zoom for more movement */
   /* WebGL readiness flag (0 = CSS-only, 1 = WebGL active)*/
   --sn-webgl-ready: 0;
 }
@@ -397,10 +397,10 @@ html[style*="--sn-thermal-throttling: 1"] {
     bottom: 0;
     background: radial-gradient(
       ellipse at calc(
-        50% + (var(--gradient-rhythm-phase) * 5%) + var(--sn-gradient-flow-x)
+        50% + (var(--gradient-rhythm-phase) * 8%) + var(--sn-gradient-flow-x)
       )
       calc(
-        50% + (var(--gradient-rhythm-phase) * 3%) + var(--sn-gradient-flow-y)
+        50% + (var(--gradient-rhythm-phase) * 6%) + var(--sn-gradient-flow-y)
       ),
       rgba(
           var(--sn-gradient-primary-rgb),
@@ -422,7 +422,7 @@ html[style*="--sn-thermal-throttling: 1"] {
     background-size: calc(100% * var(--sn-gradient-flow-scale) * var(--sn-dynamic-harmonic-scale))
       calc(100% * var(--sn-gradient-flow-scale) * var(--sn-dynamic-harmonic-scale));
     opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-consciousness) * 
-             (1 - var(--sn-webgl-enabled) * var(--sn-gradient-crossfade-opacity)));
+             (0.6 + 0.4 * (1 - var(--sn-webgl-enabled) * var(--sn-gradient-crossfade-opacity))));
     z-index: -10;
     transition: all var(--sn-gradient-transition),
                  background-position calc(var(--sn-gradient-transition) * .6) linear,
@@ -472,7 +472,7 @@ html[style*="--sn-thermal-throttling: 1"] {
       rgba(var(--sn-gradient-accent-rgb), calc(0.08 * var(--sn-gradient-temporal-memory))) 100%
     );
     opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-temporal) * 
-             (1 - var(--sn-webgl-enabled) * var(--sn-gradient-crossfade-opacity)));
+             (0.7 + 0.3 * (1 - var(--sn-webgl-enabled) * var(--sn-gradient-crossfade-opacity))));
     z-index: -9;
     transition: all calc(var(--sn-gradient-transition) * 1.5),
                  opacity var(--sn-gradient-transition-duration) var(--sn-gradient-transition-easing);

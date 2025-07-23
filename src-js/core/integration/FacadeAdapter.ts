@@ -206,19 +206,34 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
     Y3K?.debug?.warn("NonVisualSystemFacadeAdapter", 
       `Using legacy creation for ${systemKey} - should migrate to strategy pattern`);
 
-    // Hardcoded constructor logic (deprecated)
+    // Minimal legacy fallback logic (most systems now use strategy pattern)
     switch (systemKey) {
-      case 'UnifiedSystemIntegration':
-        return new SystemClass(context.year3000System) as T;
-
+      // Simple systems with no dependencies
       case 'DeviceCapabilityDetector':
       case 'PerformanceAnalyzer':
       case 'CSSVariableBatcher':
       case 'SettingsManager':
+      case 'TimerConsolidationSystem':
         return new SystemClass() as T;
 
+      // Systems with single dependency
+      case 'UnifiedSystemIntegration':
+        return new SystemClass(context.year3000System) as T;
+      
+      case 'UnifiedCSSVariableManager':
+      case 'SidebarSystemsIntegration':
+        return new SystemClass(context.dependencies.cssVariableBatcher) as T;
+      
+
+      // Systems with multiple dependencies
+      case 'PerformanceCSSIntegration':
+        return new SystemClass(
+          context.config,
+          context.dependencies.cssVariableBatcher,
+          context.dependencies.performanceCoordinator
+        ) as T;
+
       case 'ColorHarmonyEngine':
-        // ColorHarmonyEngine now uses Strategy pattern - 4-parameter constructor
         return new SystemClass(
           context.config,
           context.utils,
@@ -238,6 +253,22 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
           context.dependencies.performanceAnalyzer
         ) as T;
 
+      case 'GlassmorphismManager':
+        return new SystemClass(
+          context.config,
+          context.utils,
+          context.dependencies.cssVariableBatcher,
+          context.dependencies.performanceAnalyzer,
+          context.dependencies.settingsManager
+        ) as T;
+
+      case 'Card3DManager':
+        return new SystemClass(
+          context.dependencies.performanceAnalyzer,
+          context.dependencies.settingsManager,
+          context.utils
+        ) as T;
+
       case 'MusicSyncService':
         // MusicSyncService uses object dependencies pattern
         return new SystemClass({
@@ -249,15 +280,18 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
         }) as T;
 
       default:
-        // Standard 6-parameter constructor
-        return new SystemClass(
-          context.config,
-          context.utils,
-          context.dependencies.performanceAnalyzer,
-          context.dependencies.musicSyncService,
-          context.dependencies.settingsManager,
-          context.year3000System
-        ) as T;
+        // Last resort: try no-args constructor
+        try {
+          return new SystemClass() as T;
+        } catch (error) {
+          // If that fails, try with basic dependencies
+          return new SystemClass(
+            context.config,
+            context.utils,
+            context.dependencies.performanceAnalyzer,
+            context.dependencies.settingsManager
+          ) as T;
+        }
     }
   }
 

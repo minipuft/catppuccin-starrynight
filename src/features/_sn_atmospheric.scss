@@ -341,7 +341,7 @@
 /* Atmospheric now playing bar*/
 @include now-playing-bar-root {
   /* CSS custom properties first*/
-  --glass-blur: 30px;
+  --glass-blur: 6px;
   --glass-saturation: 1.3;
   --glass-opacity: 0.2;
   transition: all var(--atmospheric-transition);
@@ -351,7 +351,7 @@
   @include glassmorphism-dynamic;
 
   &:hover {
-    --glass-blur: 35px;
+    --glass-blur: 8px;
     --glass-saturation: 1.5;
     --glass-opacity: 0.25;
   }

@@ -27,9 +27,8 @@ jest.mock('@/visual/backgrounds/LightweightParticleSystem');
 jest.mock('@/visual/backgrounds/ParticleFieldSystem');
 jest.mock('@/visual/backgrounds/WebGLGradientBackgroundSystem');
 jest.mock('@/visual/organic-consciousness/OrganicBeatSyncConsciousness');
-jest.mock('@/visual/ui-effects/BehavioralPredictionEngine');
 jest.mock('@/visual/ui-effects/InteractionTrackingSystem');
-jest.mock('@/visual/ui-effects/PredictiveMaterializationSystem');
+// Removed BehavioralPredictionEngine and PredictiveMaterializationSystem - overhead systems eliminated
 jest.mock('@/visual/ui-effects/SpotifyUIApplicationSystem');
 jest.mock('@/core/animation/EmergentChoreographyEngine');
 

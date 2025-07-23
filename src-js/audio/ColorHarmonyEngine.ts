@@ -2,7 +2,8 @@ import {
   HARMONIC_EVOLUTION_KEY,
   HARMONIC_INTENSITY_KEY,
 } from "@/config/settingKeys";
-import type { EmergentChoreographyEngine } from "@/core/animation/EmergentChoreographyEngine";
+// EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
+import type { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import { GlobalEventBus } from "@/core/events/EventBus";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import type { Year3000Config } from "@/types/models";
@@ -106,7 +107,7 @@ export class ColorHarmonyEngine
   private vibrancyConfig: any;
   private paletteExtensionManager: PaletteExtensionManager;
   private semanticColorManager: SemanticColorManager;
-  private emergentEngine: EmergentChoreographyEngine | null = null;
+  private emergentEngine: EnhancedMasterAnimationCoordinator | null = null;
 
   // User-specified harmonic intensity (0-1). Multiplies defaultBlendRatio.
   private userIntensity: number = 0.7;
@@ -1840,7 +1841,7 @@ export class ColorHarmonyEngine
     }
   }
 
-  public setEmergentEngine(engine: EmergentChoreographyEngine): void {
+  public setEmergentEngine(engine: EnhancedMasterAnimationCoordinator): void {
     this.emergentEngine = engine;
   }
 

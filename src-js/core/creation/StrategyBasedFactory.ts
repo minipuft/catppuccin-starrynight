@@ -46,8 +46,8 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
   constructor(strategyRegistry?: ISystemCreationStrategyRegistry) {
     this.strategyRegistry = strategyRegistry || globalSystemCreationRegistry;
     
-    // Register default system configurations
-    this.registerDefaultSystemConfigs();
+    // System configurations are now managed by individual strategies
+    // No need for duplicate registration here
     
     Y3K?.debug?.log("StrategyBasedFactory", "Factory initialized with strategy registry");
   }
@@ -173,30 +173,50 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
   // ============================================================================
 
   /**
-   * Build selection criteria based on system configuration and context
+   * Build selection criteria based on system key and context
+   * No longer relies on factory's own systemConfig - strategies manage their own configurations
    */
   private buildSelectionCriteria(
     systemKey: string,
     systemConfig: SystemCreationConfig | null,
     context: SystemCreationContext
   ): CreationStrategySelectionCriteria {
-    // Determine complexity based on dependencies
-    let complexity: 'simple' | 'medium' | 'complex' = 'simple';
-    const depCount = (systemConfig?.requiredDependencies.length || 0) + 
-                    (systemConfig?.optionalDependencies.length || 0);
+    // For system-specific selection criteria, rely on the strategies themselves
+    // rather than trying to duplicate their configuration logic here
     
-    if (depCount === 0) complexity = 'simple';
-    else if (depCount <= 3) complexity = 'medium';
-    else complexity = 'complex';
+    // Determine complexity based on well-known system patterns
+    let complexity: 'simple' | 'medium' | 'complex' = 'medium'; // Default to medium
     
-    // Determine dependency requirements
+    // Simple systems (no dependencies)
+    const simpleSystems = [
+      'DeviceCapabilityDetector',
+      'PerformanceAnalyzer', 
+      'CSSVariableBatcher',
+      'SettingsManager',
+      'TimerConsolidationSystem'
+    ];
+    
+    // Complex systems (multiple dependencies or special patterns)
+    const complexSystems = [
+      'GlassmorphismManager',
+      'Card3DManager',
+      'PerformanceCSSIntegration',
+      'EnhancedMasterAnimationCoordinator'
+    ];
+    
+    if (simpleSystems.includes(systemKey)) {
+      complexity = 'simple';
+    } else if (complexSystems.includes(systemKey)) {
+      complexity = 'complex';
+    }
+    
+    // Determine dependency requirements based on known patterns
     let dependencyRequirements: 'none' | 'basic' | 'advanced' | 'event-driven' = 'basic';
     
-    if (systemConfig?.creationPreferences.eventDriven) {
+    // Systems that use event-driven patterns
+    if (systemKey === 'MusicSyncService' || systemKey === 'ColorHarmonyEngine') {
       dependencyRequirements = 'event-driven';
-    } else if (systemConfig?.creationPreferences.builderPattern) {
-      dependencyRequirements = 'advanced';
-    } else if (depCount === 0) {
+    } else if (simpleSystems.includes(systemKey)) {
       dependencyRequirements = 'none';
     }
     
@@ -237,175 +257,11 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
 
   /**
    * Register default system configurations for known systems
+   * DEPRECATED: System configurations are now managed by individual strategies
    */
   private registerDefaultSystemConfigs(): void {
-    // Performance Systems
-    this.registerSystemConfig({
-      systemKey: 'PerformanceAnalyzer',
-      requiredDependencies: [],
-      optionalDependencies: [],
-      creationPreferences: {
-        useSingleton: false,
-        lazyInit: false,
-        eventDriven: false,
-        builderPattern: false
-      }
-    });
-
-    this.registerSystemConfig({
-      systemKey: 'CSSVariableBatcher',
-      requiredDependencies: [],
-      optionalDependencies: [],
-      creationPreferences: {
-        useSingleton: false,
-        lazyInit: false,
-        eventDriven: false,
-        builderPattern: false
-      }
-    });
-
-    this.registerSystemConfig({
-      systemKey: 'DeviceCapabilityDetector',
-      requiredDependencies: [],
-      optionalDependencies: [],
-      creationPreferences: {
-        useSingleton: false,
-        lazyInit: false,
-        eventDriven: false,
-        builderPattern: false
-      }
-    });
-
-    // Settings and Core Services
-    this.registerSystemConfig({
-      systemKey: 'SettingsManager',
-      requiredDependencies: [],
-      optionalDependencies: [],
-      creationPreferences: {
-        useSingleton: false,
-        lazyInit: false,
-        eventDriven: false,
-        builderPattern: false
-      }
-    });
-
-    // Event-driven systems
-    this.registerSystemConfig({
-      systemKey: 'ColorHarmonyEngine',
-      requiredDependencies: ['config', 'utils', 'performanceAnalyzer', 'settingsManager'],
-      optionalDependencies: [],
-      eventSubscriptions: ['colors/extracted'],
-      constructorMapping: {
-        parameterNames: ['config', 'utils', 'performanceAnalyzer', 'settingsManager'],
-        dependencyMapping: {
-          'config': 'config',
-          'utils': 'utils', 
-          'performanceAnalyzer': 'performanceAnalyzer',
-          'settingsManager': 'settingsManager'
-        }
-      },
-      creationPreferences: {
-        useSingleton: false,
-        lazyInit: false,
-        eventDriven: true,
-        builderPattern: false
-      }
-    });
-
-    this.registerSystemConfig({
-      systemKey: 'MusicSyncService',
-      requiredDependencies: ['config', 'utils', 'settingsManager', 'year3000System'],
-      optionalDependencies: [],
-      creationPreferences: {
-        useSingleton: false,
-        lazyInit: false,
-        eventDriven: true,
-        builderPattern: false
-      }
-    });
-
-    // Complex systems with multiple dependencies
-    this.registerSystemConfig({
-      systemKey: 'EnhancedMasterAnimationCoordinator',
-      requiredDependencies: ['config', 'performanceCoordinator'],
-      optionalDependencies: [],
-      constructorMapping: {
-        parameterNames: ['config', 'performanceCoordinator'],
-        dependencyMapping: {
-          'config': 'config',
-          'performanceCoordinator': 'performanceCoordinator'
-        }
-      },
-      creationPreferences: {
-        useSingleton: true,
-        lazyInit: false,
-        eventDriven: false,
-        builderPattern: false
-      }
-    });
-
-    this.registerSystemConfig({
-      systemKey: 'UnifiedPerformanceCoordinator',
-      requiredDependencies: ['config', 'performanceAnalyzer'],
-      optionalDependencies: [],
-      constructorMapping: {
-        parameterNames: ['config', 'performanceAnalyzer'],
-        dependencyMapping: {
-          'config': 'config',
-          'performanceAnalyzer': 'performanceAnalyzer'
-        }
-      },
-      creationPreferences: {
-        useSingleton: true,
-        lazyInit: false,
-        eventDriven: false,
-        builderPattern: false
-      }
-    });
-
-    // UI Managers
-    this.registerSystemConfig({
-      systemKey: 'GlassmorphismManager',
-      requiredDependencies: ['cssVariableBatcher'],
-      optionalDependencies: ['config', 'utils', 'performanceAnalyzer', 'settingsManager'],
-      creationPreferences: {
-        useSingleton: false,
-        lazyInit: true,
-        eventDriven: false,
-        builderPattern: false
-      }
-    });
-
-    this.registerSystemConfig({
-      systemKey: 'Card3DManager',
-      requiredDependencies: ['cssVariableBatcher'],
-      optionalDependencies: ['config', 'utils', 'performanceAnalyzer', 'settingsManager'],
-      creationPreferences: {
-        useSingleton: false,
-        lazyInit: true,
-        eventDriven: false,
-        builderPattern: false
-      }
-    });
-
-    // Integration Systems
-    this.registerSystemConfig({
-      systemKey: 'UnifiedSystemIntegration',
-      requiredDependencies: ['year3000System'],
-      optionalDependencies: [],
-      constructorMapping: {
-        parameterNames: ['year3000System'],
-        dependencyMapping: {
-          'year3000System': 'year3000System'
-        }
-      },
-      creationPreferences: {
-        useSingleton: false,
-        lazyInit: false,
-        eventDriven: false,
-        builderPattern: false
-      }
-    });
+    // This method is no longer used - configurations are managed by individual strategies
+    // in SystemCreationStrategies.ts to eliminate configuration duplication and conflicts
   }
 }
 

@@ -676,8 +676,8 @@
     0.28 + (var(--gradient-beat-intensity) * 0.15) + (var(--sn-gradient-consciousness-level) * 0.1)
   ); /* PULSES with beats and consciousness!*/
   --sn-gradient-blur: calc(
-    35px + (var(--gradient-beat-intensity) * 10px) + (var(--sn-gradient-nebula-density) * 15px)
-  ); /* Dynamic blur with rhythm and nebula density*/
+    8px + (var(--gradient-beat-intensity) * 3px) + (var(--sn-gradient-nebula-density) * 4px)
+  ); /* Dynamic blur with rhythm and nebula density - reduced for visibility*/
   --sn-gradient-saturation: calc(
     1.45 + (var(--gradient-beat-intensity) * 0.25) + (var(--sn-gradient-emotional-valence) * 0.3)
   ); /* VIBRANT with rhythm and emotional valence!*/
@@ -836,7 +836,7 @@
   --sn-integration-mode: "progressive"; /* progressive, performance-first, quality-first, battery-optimized */
   --sn-current-backend: "css"; /* css, webgl, hybrid */
   --sn-webgl-enabled: 0; /* 0/1 WebGL backend enabled */
-  --sn-hybrid-mode: 0; /* 0/1 hybrid rendering mode */
+  --sn-hybrid-mode: 1; /* 0/1 hybrid rendering mode - ALWAYS ENABLED for seamless coordination */
   /* Transition system controls */
   --sn-gradient-transition-active: 0; /* 0/1 backend transition in progress */
   --sn-gradient-transition-duration: 800ms; /* Transition duration */
@@ -873,7 +873,7 @@
      ② lerp-smoothed CSS keyframes as a safe fallback.           */
   --sn-gradient-flow-x: 0%; /* −25 % → +25 % */
   --sn-gradient-flow-y: 0%; /* −25 % → +25 % */
-  --sn-gradient-flow-scale: 1; /* 1 = 100 %, 1.3 = gentle zoom */
+  --sn-gradient-flow-scale: 1.15; /* 1 = 100 %, 1.15 = gentle zoom for more movement */
   /* WebGL readiness flag (0 = CSS-only, 1 = WebGL active)*/
   --sn-webgl-ready: 0;
 }
@@ -998,9 +998,9 @@ html[style*="--sn-thermal-throttling: 1"] .Root__main-view::after {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(ellipse at calc(50% + var(--gradient-rhythm-phase) * 5% + var(--sn-gradient-flow-x)) calc(50% + var(--gradient-rhythm-phase) * 3% + var(--sn-gradient-flow-y)), rgba(var(--sn-gradient-primary-rgb), calc(0.35 + var(--gradient-beat-intensity) * 0.15 + var(--sn-gradient-consciousness-level) * 0.1)) 0%, rgba(var(--sn-gradient-secondary-rgb), calc(0.18 + var(--gradient-beat-intensity) * 0.08 + var(--sn-gradient-consciousness-level) * 0.05)) 40%, rgba(var(--sn-gradient-primary-rgb), calc(0.08 + var(--gradient-beat-intensity) * 0.04 + var(--sn-gradient-consciousness-level) * 0.03)) 70%, var(--spice-base) 100%);
+  background: radial-gradient(ellipse at calc(50% + var(--gradient-rhythm-phase) * 8% + var(--sn-gradient-flow-x)) calc(50% + var(--gradient-rhythm-phase) * 6% + var(--sn-gradient-flow-y)), rgba(var(--sn-gradient-primary-rgb), calc(0.35 + var(--gradient-beat-intensity) * 0.15 + var(--sn-gradient-consciousness-level) * 0.1)) 0%, rgba(var(--sn-gradient-secondary-rgb), calc(0.18 + var(--gradient-beat-intensity) * 0.08 + var(--sn-gradient-consciousness-level) * 0.05)) 40%, rgba(var(--sn-gradient-primary-rgb), calc(0.08 + var(--gradient-beat-intensity) * 0.04 + var(--sn-gradient-consciousness-level) * 0.03)) 70%, var(--spice-base) 100%);
   background-size: calc(100% * var(--sn-gradient-flow-scale) * var(--sn-dynamic-harmonic-scale)) calc(100% * var(--sn-gradient-flow-scale) * var(--sn-dynamic-harmonic-scale));
-  opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-consciousness) * (1 - var(--sn-webgl-enabled) * var(--sn-gradient-crossfade-opacity)));
+  opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-consciousness) * (0.6 + 0.4 * (1 - var(--sn-webgl-enabled) * var(--sn-gradient-crossfade-opacity))));
   z-index: -10;
   transition: all var(--sn-gradient-transition), background-position calc(var(--sn-gradient-transition) * 0.6) linear, opacity var(--sn-gradient-transition-duration) var(--sn-gradient-transition-easing);
   filter: blur(var(--sn-gradient-blur)) saturate(var(--sn-dynamic-saturation)) brightness(var(--sn-dynamic-brightness)) contrast(var(--sn-dynamic-contrast)) hue-rotate(var(--sn-dynamic-temporal-shift));
@@ -1029,7 +1029,7 @@ html[style*="--sn-thermal-throttling: 1"] .Root__main-view::after {
   right: 0;
   bottom: 0;
   background: linear-gradient(calc(135deg + var(--sn-gradient-temporal-phase) * 90deg), rgba(var(--sn-gradient-accent-rgb), calc(0.15 * var(--sn-gradient-temporal-memory))) 0%, transparent 30%, transparent 70%, rgba(var(--sn-gradient-accent-rgb), calc(0.08 * var(--sn-gradient-temporal-memory))) 100%);
-  opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-temporal) * (1 - var(--sn-webgl-enabled) * var(--sn-gradient-crossfade-opacity)));
+  opacity: calc(var(--sn-dynamic-opacity) * var(--sn-gradient-layer-temporal) * (0.7 + 0.3 * (1 - var(--sn-webgl-enabled) * var(--sn-gradient-crossfade-opacity))));
   z-index: -9;
   transition: all calc(var(--sn-gradient-transition) * 1.5), opacity var(--sn-gradient-transition-duration) var(--sn-gradient-transition-easing);
   will-change: var(--sn-gpu-acceleration);
@@ -3893,7 +3893,7 @@ body:has(.main-entityHeader-container) .main-view-container::before {
   z-index: -10;
   pointer-events: none;
   background: radial-gradient(ellipse 800% 300% at 50% 20%, var(--artist-aura-signature-primary) 0%, transparent 35%), linear-gradient(180deg, var(--artist-aura-signature-secondary) 0%, transparent 25%, var(--artist-aura-signature-accent) 75%, transparent 100%), conic-gradient(from 0deg at 50% 20%, transparent 0%, var(--artist-aura-signature-primary) 25%, transparent 50%, var(--artist-aura-signature-accent) 75%, transparent 100%);
-  filter: blur(calc(var(--header-cosmic-blur, 12px) * 1.5)) saturate(calc(var(--cosmic-saturation, 1.4) * 0.6)) brightness(calc(1 + 0.04 * var(--artist-aura-intensity)));
+  filter: blur(calc(var(--header-cosmic-blur, 4px) * 1.5)) saturate(calc(var(--cosmic-saturation, 1.4) * 0.6)) brightness(calc(1 + 0.04 * var(--artist-aura-intensity)));
   animation: artist-aura-breathing var(--artist-aura-breathing-sync) ease-in-out infinite;
   opacity: calc(var(--artist-aura-intensity) * var(--aura-performance-mode) * 0.4);
   transition: all var(--aura-cascade-transition);
@@ -7634,8 +7634,8 @@ div.Root__right-sidebar[data-testid=right-sidebar]:not([aria-busy=true]):not(.lo
 
 :root aside[data-testid=now-playing-bar],
 :root .Root__now-playing-bar {
-  backdrop-filter: blur(calc(var(--glass-blur, 20px) + var(--sn-glass-beat-boost, 0) * 5px)) saturate(var(--glass-saturation, 1.2)) brightness(var(--glass-brightness, 1.1));
-  -webkit-backdrop-filter: blur(calc(var(--glass-blur, 20px) + var(--sn-glass-beat-boost, 0) * 5px)) saturate(var(--glass-saturation, 1.2)) brightness(var(--glass-brightness, 1.1));
+  backdrop-filter: blur(calc(var(--glass-blur, 6px) + var(--sn-glass-beat-boost, 0) * 5px)) saturate(var(--glass-saturation, 1.2)) brightness(var(--glass-brightness, 1.1));
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur, 6px) + var(--sn-glass-beat-boost, 0) * 5px)) saturate(var(--glass-saturation, 1.2)) brightness(var(--glass-brightness, 1.1));
   background: var(--glass-background, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1));
   border: 1px solid var(--glass-border, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2));
   transition: backdrop-filter 400ms ease-out, -webkit-backdrop-filter 400ms ease-out, background var(--sn-gradient-transition, 0.8s ease-in-out), border var(--sn-gradient-transition, 0.8s ease-in-out);
@@ -9023,7 +9023,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card:hover {
 aside[data-testid=now-playing-bar],
 .Root__now-playing-bar {
   /* CSS custom properties first*/
-  --glass-blur: 30px;
+  --glass-blur: 6px;
   --glass-saturation: 1.3;
   --glass-opacity: 0.2;
   transition: all var(--atmospheric-transition);
@@ -9033,8 +9033,8 @@ aside[data-testid=now-playing-bar],
   backface-visibility: hidden;
   perspective: 1000px;
   contain: style paint;
-  backdrop-filter: blur(calc(var(--glass-blur, 20px) + var(--sn-glass-beat-boost, 0) * 5px)) saturate(var(--glass-saturation, 1.2)) brightness(var(--glass-brightness, 1.1));
-  -webkit-backdrop-filter: blur(calc(var(--glass-blur, 20px) + var(--sn-glass-beat-boost, 0) * 5px)) saturate(var(--glass-saturation, 1.2)) brightness(var(--glass-brightness, 1.1));
+  backdrop-filter: blur(calc(var(--glass-blur, 6px) + var(--sn-glass-beat-boost, 0) * 5px)) saturate(var(--glass-saturation, 1.2)) brightness(var(--glass-brightness, 1.1));
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur, 6px) + var(--sn-glass-beat-boost, 0) * 5px)) saturate(var(--glass-saturation, 1.2)) brightness(var(--glass-brightness, 1.1));
   background: var(--glass-background, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1));
   border: 1px solid var(--glass-border, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2));
   transition: backdrop-filter 400ms ease-out, -webkit-backdrop-filter 400ms ease-out, background var(--sn-gradient-transition, 0.8s ease-in-out), border var(--sn-gradient-transition, 0.8s ease-in-out);
@@ -9056,7 +9056,7 @@ aside[data-testid=now-playing-bar],
 }
 aside[data-testid=now-playing-bar]:hover,
 .Root__now-playing-bar:hover {
-  --glass-blur: 35px;
+  --glass-blur: 8px;
   --glass-saturation: 1.5;
   --glass-opacity: 0.25;
 }
@@ -13600,11 +13600,11 @@ body {
   pointer-events: none;
 }
 
-.aesthetic-mode-ethereal .holographic-element, .aesthetic-mode-ethereal .Root__main-view .main-view-container__scroll-node-child, .Root__main-view .aesthetic-mode-ethereal .main-view-container__scroll-node-child, .aesthetic-mode-ethereal .main-view-container__scroll-node, .aesthetic-mode-ethereal .Root__now-playing-bar, .aesthetic-mode-ethereal .Root__nav-bar, .aesthetic-mode-ethereal .main-view-container {
+.aesthetic-mode-ethereal .holographic-element:not(.main-view-container):not(.main-view-container__scroll-node), .aesthetic-mode-ethereal .Root__main-view .main-view-container__scroll-node-child:not(.main-view-container):not(.main-view-container__scroll-node), .Root__main-view .aesthetic-mode-ethereal .main-view-container__scroll-node-child:not(.main-view-container):not(.main-view-container__scroll-node), .aesthetic-mode-ethereal .main-view-container__scroll-node:not(.main-view-container):not(.main-view-container__scroll-node), .aesthetic-mode-ethereal .Root__now-playing-bar:not(.main-view-container):not(.main-view-container__scroll-node), .aesthetic-mode-ethereal .Root__nav-bar:not(.main-view-container):not(.main-view-container__scroll-node), .aesthetic-mode-ethereal .main-view-container:not(.main-view-container):not(.main-view-container__scroll-node) {
   animation: consciousness-atmospheric-depth calc(2s / var(--holographic-breathing-frequency, 0.3)) ease-in-out infinite;
   filter: blur(calc(var(--holographic-ethereal-softness) * 0.5px)) brightness(calc(1 + var(--holographic-ethereal-softness) * 0.2));
 }
-.aesthetic-mode-ethereal .holographic-element::before, .aesthetic-mode-ethereal .Root__main-view .main-view-container__scroll-node-child::before, .Root__main-view .aesthetic-mode-ethereal .main-view-container__scroll-node-child::before, .aesthetic-mode-ethereal .main-view-container__scroll-node::before, .aesthetic-mode-ethereal .Root__now-playing-bar::before, .aesthetic-mode-ethereal .Root__nav-bar::before, .aesthetic-mode-ethereal .main-view-container::before {
+.aesthetic-mode-ethereal .holographic-element:not(.main-view-container):not(.main-view-container__scroll-node)::before, .aesthetic-mode-ethereal .Root__main-view .main-view-container__scroll-node-child:not(.main-view-container):not(.main-view-container__scroll-node)::before, .Root__main-view .aesthetic-mode-ethereal .main-view-container__scroll-node-child:not(.main-view-container):not(.main-view-container__scroll-node)::before, .aesthetic-mode-ethereal .main-view-container__scroll-node:not(.main-view-container):not(.main-view-container__scroll-node)::before, .aesthetic-mode-ethereal .Root__now-playing-bar:not(.main-view-container):not(.main-view-container__scroll-node)::before, .aesthetic-mode-ethereal .Root__nav-bar:not(.main-view-container):not(.main-view-container__scroll-node)::before, .aesthetic-mode-ethereal .main-view-container:not(.main-view-container):not(.main-view-container__scroll-node)::before {
   content: "";
   position: absolute;
   top: -10px;
@@ -13991,7 +13991,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation .sn-
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation .sn-neural-flow-layer,
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation .sn-quantum-foam-layer, div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation::before, div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation::after {
   /* and ::after*/
-  filter: blur(var(--sn-sidebar-blur-intensity, 25px)) saturate(calc(var(--sn-gradient-saturation) * (1 - var(--sn-sidebar-meditation-desaturation)))) brightness(var(--sn-gradient-brightness)) contrast(var(--sn-gradient-contrast));
+  filter: blur(var(--sn-sidebar-blur-intensity, 3px)) saturate(calc(var(--sn-gradient-saturation) * (1 - var(--sn-sidebar-meditation-desaturation)))) brightness(var(--sn-gradient-brightness)) contrast(var(--sn-gradient-contrast));
   animation-duration: calc(var(--original-animation-duration, 20s) / var(--sn-sidebar-meditation-slowdown));
   /* Need to ensure other animation properties also respect this slowdown if not using a single duration property.*/
 }
@@ -14283,7 +14283,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar::after {
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation .sn-consciousness-layer,
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation .sn-neural-flow-layer,
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation .sn-quantum-foam-layer, div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation::before, div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation::after {
-  filter: blur(var(--sn-sidebar-blur-intensity, 25px)) saturate(calc(var(--sn-gradient-saturation) * (1 - var(--sn-sidebar-meditation-desaturation)))) brightness(var(--sn-gradient-brightness)) contrast(var(--sn-gradient-contrast));
+  filter: blur(var(--sn-sidebar-blur-intensity, 3px)) saturate(calc(var(--sn-gradient-saturation) * (1 - var(--sn-sidebar-meditation-desaturation)))) brightness(var(--sn-gradient-brightness)) contrast(var(--sn-gradient-contrast));
   animation-duration: calc(var(--original-animation-duration, 20s) / var(--sn-sidebar-meditation-slowdown));
 }
 
@@ -14793,7 +14793,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation .sn-
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation .sn-neural-flow-layer,
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation .sn-quantum-foam-layer, div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation::before, div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-digital-meditation::after {
   /* and ::after*/
-  filter: blur(var(--sn-sidebar-blur-intensity, 25px)) saturate(calc(var(--sn-gradient-saturation) * (1 - var(--sn-sidebar-meditation-desaturation)))) brightness(var(--sn-gradient-brightness)) contrast(var(--sn-gradient-contrast));
+  filter: blur(var(--sn-sidebar-blur-intensity, 3px)) saturate(calc(var(--sn-gradient-saturation) * (1 - var(--sn-sidebar-meditation-desaturation)))) brightness(var(--sn-gradient-brightness)) contrast(var(--sn-gradient-contrast));
   animation-duration: calc(var(--original-animation-duration, 20s) / var(--sn-sidebar-meditation-slowdown));
   /* Need to ensure other animation properties also respect this slowdown if not using a single duration property.*/
 }

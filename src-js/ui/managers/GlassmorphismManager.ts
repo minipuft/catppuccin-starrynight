@@ -137,18 +137,18 @@ export class GlassmorphismManager implements IManagedSystem {
         root.style.removeProperty("--glass-saturation");
         return;
       case "minimal":
-        blurValue = shouldReduceQuality ? "8px" : "10px";
+        blurValue = shouldReduceQuality ? "2px" : "3px";
         opacityValue = "0.05";
         saturationValue = "1.05";
         break;
       case "intense":
-        blurValue = shouldReduceQuality ? "20px" : "30px";
+        blurValue = shouldReduceQuality ? "6px" : "8px";
         opacityValue = "0.15";
         saturationValue = "1.4";
         break;
       case "balanced":
       default:
-        blurValue = shouldReduceQuality ? "15px" : "20px";
+        blurValue = shouldReduceQuality ? "4px" : "6px";
         opacityValue = "0.1";
         saturationValue = "1.2";
         break;

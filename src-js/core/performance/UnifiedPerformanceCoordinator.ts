@@ -3,6 +3,45 @@ import { GlobalEventBus } from '@/core/events/EventBus';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';
 import type { Year3000Config } from '@/types/models';
 
+// Enhanced interfaces from PerformanceOptimizationManager integration
+export interface DeviceCapabilities {
+  performanceTier: 'low' | 'medium' | 'high' | 'premium';
+  memoryGB: number;
+  cpuCores: number;
+  gpuAcceleration: boolean;
+  isMobile: boolean;
+  supportsWebGL: boolean;
+  supportsBackdropFilter: boolean;
+  maxTextureSize: number;
+  devicePixelRatio: number;
+}
+
+export interface ThermalState {
+  temperature: 'normal' | 'warm' | 'hot' | 'critical';
+  throttleLevel: number; // 0-1
+  cpuUsage: number; // 0-1
+  gpuUsage: number; // 0-1
+  memoryUsage: number; // 0-1
+}
+
+export interface BatteryState {
+  level: number; // 0-1
+  charging: boolean;
+  chargingTime?: number;
+  dischargingTime?: number;
+}
+
+export interface PerformanceMode {
+  name: 'battery' | 'balanced' | 'performance' | 'auto';
+  qualityLevel: number; // 0-1
+  animationQuality: number; // 0-1
+  effectQuality: number; // 0-1
+  blurQuality: number; // 0-1
+  shadowQuality: number; // 0-1
+  frameRate: number; // Target FPS
+  optimizationLevel: number; // 0-3
+}
+
 interface SubsystemMetrics {
   name: string;
   frameTime: number;
@@ -90,6 +129,16 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
   private healthCheckInterval: NodeJS.Timeout | null = null;
   private readonly HEALTH_CHECK_INTERVAL = 5000; // 5 seconds
   
+  // Enhanced capabilities from PerformanceOptimizationManager consolidation
+  private deviceCapabilities!: DeviceCapabilities; // Initialized in initializeDeviceCapabilities
+  private thermalState!: ThermalState; // Initialized in initializeThermalMonitoring
+  private batteryState: BatteryState | null = null;
+  private currentPerformanceMode!: PerformanceMode; // Initialized in constructor
+  private frameTimeHistory: number[] = [];
+  private memoryUsageHistory: number[] = [];
+  private lastOptimizationTime = 0;
+  private optimizationCooldown = 5000; // 5 seconds
+  
   // Performance thresholds
   private readonly PERFORMANCE_THRESHOLDS = {
     frameTime: {
@@ -110,10 +159,60 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     },
   };
   
+  // Performance modes configuration (from PerformanceOptimizationManager)
+  private readonly PERFORMANCE_MODES: Record<string, PerformanceMode> = {
+    battery: {
+      name: 'battery',
+      qualityLevel: 0.4,
+      animationQuality: 0.3,
+      effectQuality: 0.2,
+      blurQuality: 0.3,
+      shadowQuality: 0.2,
+      frameRate: 30,
+      optimizationLevel: 3,
+    },
+    balanced: {
+      name: 'balanced',
+      qualityLevel: 0.8,
+      animationQuality: 0.8,
+      effectQuality: 0.7,
+      blurQuality: 0.8,
+      shadowQuality: 0.7,
+      frameRate: 60,
+      optimizationLevel: 1,
+    },
+    performance: {
+      name: 'performance',
+      qualityLevel: 1.0,
+      animationQuality: 1.0,
+      effectQuality: 1.0,
+      blurQuality: 1.0,
+      shadowQuality: 1.0,
+      frameRate: 60,
+      optimizationLevel: 0,
+    },
+    auto: {
+      name: 'auto',
+      qualityLevel: 0.8, // Will be dynamically adjusted
+      animationQuality: 0.8,
+      effectQuality: 0.8,
+      blurQuality: 0.8,
+      shadowQuality: 0.8,
+      frameRate: 60,
+      optimizationLevel: 1,
+    },
+  };
+  
   constructor(config: Year3000Config, performanceAnalyzer: PerformanceAnalyzer) {
     this.config = config;
     this.performanceAnalyzer = performanceAnalyzer;
     this.eventBus = GlobalEventBus;
+    
+    // Initialize enhanced capabilities from PerformanceOptimizationManager
+    this.initializeDeviceCapabilities();
+    this.initializeThermalMonitoring();
+    this.initializeBatteryMonitoring();
+    this.currentPerformanceMode = this.PERFORMANCE_MODES.auto!;
     
     // Initialize default optimization strategies
     this.initializeDefaultStrategies();
@@ -125,7 +224,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     this.subscribeToEvents();
     
     if (this.config.enableDebug) {
-      console.log('[UnifiedPerformanceCoordinator] Initialized with centralized monitoring');
+      console.log('[UnifiedPerformanceCoordinator] Initialized with enhanced device capabilities, thermal monitoring, and battery optimization');
     }
   }
   
@@ -699,5 +798,219 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
         });
       }
     });
+  }
+  
+  // ===============================================================================
+  // ENHANCED CAPABILITIES FROM PERFORMANCEOPTIMIZATIONMANAGER CONSOLIDATION
+  // ===============================================================================
+  
+  /**
+   * Initialize device capabilities detection
+   */
+  private initializeDeviceCapabilities(): void {
+    const nav = navigator as any;
+    const memory = (performance as any).memory;
+    
+    // Detect device capabilities
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+    
+    let maxTextureSize = 2048; // Safe default
+    if (gl) {
+      maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE) || 2048;
+    }
+    
+    // Estimate memory from available browser info
+    const estimatedMemory = memory ? Math.round(memory.jsHeapSizeLimit / (1024 * 1024 * 1024)) : 4;
+    
+    // Determine performance tier based on capabilities
+    let performanceTier: 'low' | 'medium' | 'high' | 'premium' = 'medium';
+    if (estimatedMemory >= 8 && nav.hardwareConcurrency >= 8 && maxTextureSize >= 4096) {
+      performanceTier = 'premium';
+    } else if (estimatedMemory >= 4 && nav.hardwareConcurrency >= 4) {
+      performanceTier = 'high';
+    } else if (estimatedMemory >= 2 && nav.hardwareConcurrency >= 2) {
+      performanceTier = 'medium';
+    } else {
+      performanceTier = 'low';
+    }
+    
+    this.deviceCapabilities = {
+      performanceTier,
+      memoryGB: estimatedMemory,
+      cpuCores: nav.hardwareConcurrency || 4,
+      gpuAcceleration: !!gl,
+      isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(nav.userAgent),
+      supportsWebGL: !!gl,
+      supportsBackdropFilter: CSS.supports('backdrop-filter', 'blur(10px)'),
+      maxTextureSize,
+      devicePixelRatio: window.devicePixelRatio || 1,
+    };
+    
+    if (this.config.enableDebug) {
+      console.log('[UnifiedPerformanceCoordinator] Device capabilities detected:', this.deviceCapabilities);
+    }
+  }
+  
+  /**
+   * Initialize thermal state monitoring
+   */
+  private initializeThermalMonitoring(): void {
+    this.thermalState = {
+      temperature: 'normal',
+      throttleLevel: 0,
+      cpuUsage: 0,
+      gpuUsage: 0,
+      memoryUsage: 0,
+    };
+    
+    // Monitor performance metrics to estimate thermal state
+    setInterval(() => {
+      this.updateThermalState();
+    }, 10000); // Check every 10 seconds
+  }
+  
+  /**
+   * Initialize battery monitoring if available
+   */
+  private async initializeBatteryMonitoring(): Promise<void> {
+    try {
+      const nav = navigator as any;
+      if ('getBattery' in nav) {
+        const battery = await nav.getBattery();
+        this.batteryState = {
+          level: battery.level,
+          charging: battery.charging,
+          chargingTime: battery.chargingTime,
+          dischargingTime: battery.dischargingTime,
+        };
+        
+        // Listen for battery changes
+        battery.addEventListener('levelchange', () => {
+          if (this.batteryState) {
+            this.batteryState.level = battery.level;
+            this.adjustPerformanceModeForBattery();
+          }
+        });
+        
+        battery.addEventListener('chargingchange', () => {
+          if (this.batteryState) {
+            this.batteryState.charging = battery.charging;
+            this.adjustPerformanceModeForBattery();
+          }
+        });
+        
+        if (this.config.enableDebug) {
+          console.log('[UnifiedPerformanceCoordinator] Battery monitoring initialized');
+        }
+      }
+    } catch (error) {
+      if (this.config.enableDebug) {
+        console.log('[UnifiedPerformanceCoordinator] Battery API not available');
+      }
+    }
+  }
+  
+  /**
+   * Update thermal state based on performance metrics
+   */
+  private updateThermalState(): void {
+    const currentFPS = this.performanceAnalyzer.getMedianFPS() || 60;
+    const memory = (performance as any).memory;
+    const memoryUsage = memory ? memory.usedJSHeapSize / memory.jsHeapSizeLimit : 0;
+    
+    // Estimate thermal state from performance degradation
+    let temperature: 'normal' | 'warm' | 'hot' | 'critical' = 'normal';
+    let throttleLevel = 0;
+    
+    if (currentFPS < 30 || memoryUsage > 0.9) {
+      temperature = 'critical';
+      throttleLevel = 0.8;
+    } else if (currentFPS < 45 || memoryUsage > 0.7) {
+      temperature = 'hot';
+      throttleLevel = 0.4;
+    } else if (currentFPS < 55 || memoryUsage > 0.5) {
+      temperature = 'warm';
+      throttleLevel = 0.2;
+    }
+    
+    this.thermalState = {
+      temperature,
+      throttleLevel,
+      cpuUsage: Math.min(1 - (currentFPS / 60), 1),
+      gpuUsage: 0, // TODO: Implement GPU usage detection
+      memoryUsage,
+    };
+    
+    // Adjust performance mode based on thermal state
+    if (temperature === 'critical' && this.currentPerformanceMode.name !== 'battery') {
+      this.setPerformanceMode('battery');
+    } else if (temperature === 'normal' && this.currentPerformanceMode.name === 'battery') {
+      this.setPerformanceMode('auto');
+    }
+  }
+  
+  /**
+   * Adjust performance mode based on battery state
+   */
+  private adjustPerformanceModeForBattery(): void {
+    if (!this.batteryState) return;
+    
+    if (!this.batteryState.charging && this.batteryState.level < 0.2) {
+      // Low battery, switch to battery mode
+      this.setPerformanceMode('battery');
+    } else if (this.batteryState.charging && this.currentPerformanceMode.name === 'battery') {
+      // Charging, switch back to auto mode
+      this.setPerformanceMode('auto');
+    }
+  }
+  
+  /**
+   * Set performance mode
+   */
+  public setPerformanceMode(modeName: 'battery' | 'balanced' | 'performance' | 'auto'): void {
+    const mode = this.PERFORMANCE_MODES[modeName];
+    if (!mode) return;
+    
+    this.currentPerformanceMode = mode;
+    
+    // Emit performance mode change event
+    this.eventBus.emit('performance:mode-changed', {
+      mode: modeName,
+      qualityLevel: mode.qualityLevel,
+      frameRate: mode.frameRate,
+    });
+    
+    if (this.config.enableDebug) {
+      console.log(`[UnifiedPerformanceCoordinator] Performance mode changed to: ${modeName}`);
+    }
+  }
+  
+  /**
+   * Get current device capabilities
+   */
+  public getDeviceCapabilities(): DeviceCapabilities {
+    return { ...this.deviceCapabilities };
+  }
+  
+  /**
+   * Get current thermal state
+   */
+  public getThermalState(): ThermalState {
+    return { ...this.thermalState };
+  }
+  
+  /**
+   * Get current battery state
+   */
+  public getBatteryState(): BatteryState | null {
+    return this.batteryState ? { ...this.batteryState } : null;
+  }
+  
+  /**
+   * Get current performance mode
+   */
+  public getCurrentPerformanceMode(): PerformanceMode {
+    return { ...this.currentPerformanceMode };
   }
 }

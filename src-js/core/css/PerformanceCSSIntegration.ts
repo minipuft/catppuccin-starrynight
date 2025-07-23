@@ -1,4 +1,4 @@
-import { PerformanceOptimizationManager, type DeviceCapabilities, type PerformanceMode } from '@/core/performance/PerformanceOptimizationManager';
+import { UnifiedPerformanceCoordinator, type DeviceCapabilities, type PerformanceMode } from '@/core/performance/UnifiedPerformanceCoordinator';
 import { UnifiedCSSVariableManager } from './UnifiedCSSVariableManager';
 import { GlobalEventBus } from '@/core/events/EventBus';
 import type { Year3000Config } from '@/types/models';
@@ -14,7 +14,7 @@ export interface PerformanceCSSConfig {
 /**
  * PerformanceCSSIntegration - Phase 3 Performance CSS Bridge
  * 
- * Bridges the PerformanceOptimizationManager with CSS performance mixins:
+ * Bridges the UnifiedPerformanceCoordinator with CSS performance mixins:
  * - Updates CSS variables based on performance optimization state
  * - Applies CSS classes for device tier and performance modes
  * - Coordinates CSS performance optimizations with TypeScript systems
@@ -29,7 +29,7 @@ export class PerformanceCSSIntegration {
   private config: Year3000Config;
   private cssConfig: PerformanceCSSConfig;
   private cssVariableManager: UnifiedCSSVariableManager;
-  private performanceManager: PerformanceOptimizationManager;
+  private performanceCoordinator: UnifiedPerformanceCoordinator;
   private eventBus: typeof GlobalEventBus;
   
   // Performance state tracking
@@ -44,11 +44,11 @@ export class PerformanceCSSIntegration {
   constructor(
     config: Year3000Config,
     cssVariableManager: UnifiedCSSVariableManager,
-    performanceManager: PerformanceOptimizationManager
+    performanceCoordinator: UnifiedPerformanceCoordinator
   ) {
     this.config = config;
     this.cssVariableManager = cssVariableManager;
-    this.performanceManager = performanceManager;
+    this.performanceCoordinator = performanceCoordinator;
     this.eventBus = GlobalEventBus;
     
     // Initialize CSS configuration
@@ -61,8 +61,8 @@ export class PerformanceCSSIntegration {
     };
     
     // Get initial device capabilities and performance mode
-    this.currentDeviceCapabilities = this.performanceManager.getDeviceCapabilities();
-    this.currentPerformanceMode = this.performanceManager.getCurrentPerformanceMode();
+    this.currentDeviceCapabilities = this.performanceCoordinator.getDeviceCapabilities();
+    this.currentPerformanceMode = this.performanceCoordinator.getCurrentPerformanceMode();
     
     // Subscribe to events
     this.subscribeToEvents();
@@ -81,16 +81,16 @@ export class PerformanceCSSIntegration {
   public static getInstance(
     config?: Year3000Config,
     cssVariableManager?: UnifiedCSSVariableManager,
-    performanceManager?: PerformanceOptimizationManager
+    performanceCoordinator?: UnifiedPerformanceCoordinator
   ): PerformanceCSSIntegration {
     if (!PerformanceCSSIntegration.instance) {
-      if (!config || !cssVariableManager || !performanceManager) {
+      if (!config || !cssVariableManager || !performanceCoordinator) {
         throw new Error('PerformanceCSSIntegration requires all dependencies for first initialization');
       }
       PerformanceCSSIntegration.instance = new PerformanceCSSIntegration(
         config,
         cssVariableManager,
-        performanceManager
+        performanceCoordinator
       );
     }
     return PerformanceCSSIntegration.instance;
@@ -263,7 +263,7 @@ export class PerformanceCSSIntegration {
   private subscribeToEvents(): void {
     // Subscribe to performance mode changes
     this.eventBus.subscribe('performance:mode-changed', (payload: any) => {
-      this.currentPerformanceMode = this.performanceManager.getCurrentPerformanceMode();
+      this.currentPerformanceMode = this.performanceCoordinator.getCurrentPerformanceMode();
       this.applyPerformanceModeOptimizations();
       this.updateCSSPerformanceVariables();
     });
@@ -275,7 +275,7 @@ export class PerformanceCSSIntegration {
     
     // Subscribe to auto-optimization events
     this.eventBus.subscribe('performance:auto-optimized', (payload: any) => {
-      this.currentPerformanceMode = this.performanceManager.getCurrentPerformanceMode();
+      this.currentPerformanceMode = this.performanceCoordinator.getCurrentPerformanceMode();
       this.applyCurrentOptimizations();
       this.updateCSSPerformanceVariables();
     });
@@ -308,14 +308,15 @@ export class PerformanceCSSIntegration {
     this.applyPerformanceModeOptimizations();
     
     // Get current performance metrics and apply optimizations
-    const metrics = this.performanceManager.getPerformanceMetrics();
+    const batteryState = this.performanceCoordinator.getBatteryState();
+    const thermalState = this.performanceCoordinator.getThermalState();
     
-    if (metrics.batteryState) {
-      this.applyBatteryOptimizations(metrics.batteryState.level, metrics.batteryState.charging);
+    if (batteryState) {
+      this.applyBatteryOptimizations(batteryState.level, batteryState.charging);
     }
     
     // Apply thermal state
-    const thermalTemp = (metrics.thermalState as any).temperature || 'normal';
+    const thermalTemp = thermalState.temperature || 'normal';
     this.applyThermalOptimizations(thermalTemp);
   }
   

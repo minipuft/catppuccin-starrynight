@@ -315,8 +315,11 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
       this.subscribeToEvents();
       this.startAnimation();
 
-      // WebGL initialised; flag readiness (fade-in handled via CSS)
+      // WebGL initialised; enable hybrid coordination for dynamic and living feel
       document.documentElement.style.setProperty("--sn-webgl-ready", "1");
+      document.documentElement.style.setProperty("--sn-webgl-enabled", "1");
+      document.documentElement.style.setProperty("--sn-current-backend", "hybrid");
+      document.documentElement.style.setProperty("--sn-gradient-crossfade-opacity", "0.5"); // 50% blend
 
       Y3K?.debug?.log(
         "WebGLGradientBackgroundSystem",
@@ -714,10 +717,13 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
     // Bind VAO
     this.gl.bindVertexArray(this.vao);
 
-    // First successful draw → mark WebGL ready (only once)
+    // First successful draw → establish hybrid coordination (only once)
     if (!this.webglReady) {
       this.webglReady = true;
       document.documentElement.style.setProperty("--sn-webgl-ready", "1");
+      document.documentElement.style.setProperty("--sn-webgl-enabled", "1");
+      document.documentElement.style.setProperty("--sn-current-backend", "hybrid");
+      document.documentElement.style.setProperty("--sn-gradient-crossfade-opacity", "0.5"); // Balanced hybrid blend
     }
 
     // Update uniforms
@@ -803,8 +809,11 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
   };
 
   private fallbackToCSSGradient(): void {
-    // Ensure CSS knows WebGL is not active
+    // Switch to pure CSS mode - gradients take full control for complete fallback
     document.documentElement.style.setProperty("--sn-webgl-ready", "0");
+    document.documentElement.style.setProperty("--sn-webgl-enabled", "0");
+    document.documentElement.style.setProperty("--sn-current-backend", "css");
+    document.documentElement.style.setProperty("--sn-gradient-crossfade-opacity", "0"); // Full CSS opacity
     // Update CSS variables for fallback gradient animation
     if (this.cssVariableBatcher) {
       this.startCSSFallbackAnimation();
@@ -824,9 +833,9 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
       if (!this.isActive) return;
 
       const time = performance.now() / 1000;
-      const flowX = Math.sin(time * 0.02) * 25; // -25% to +25%
-      const flowY = Math.cos(time * 0.03) * 25;
-      const scale = 1 + Math.sin(time * 0.01) * 0.15; // 1 to 1.3
+      const flowX = Math.sin(time * 0.04) * 20 + Math.sin(time * 0.07) * 8; // More organic movement
+      const flowY = Math.cos(time * 0.05) * 20 + Math.cos(time * 0.09) * 6;
+      const scale = 1.15 + Math.sin(time * 0.03) * 0.2; // Enhanced base scale with more variation
 
       const batcher = this.cssVariableBatcher;
       if (!batcher) return;
@@ -924,8 +933,11 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
 
     this.gl = null;
 
-    // Reset WebGL readiness flag so CSS fallback regains prominence
+    // Reset all hybrid coordination flags so CSS regains full control
     document.documentElement.style.setProperty("--sn-webgl-ready", "0");
+    document.documentElement.style.setProperty("--sn-webgl-enabled", "0");
+    document.documentElement.style.setProperty("--sn-current-backend", "css");
+    document.documentElement.style.setProperty("--sn-gradient-crossfade-opacity", "0");
   }
 
   public override forceRepaint(reason: string = "settings-change"): void {

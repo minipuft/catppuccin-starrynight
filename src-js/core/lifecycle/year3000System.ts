@@ -86,8 +86,8 @@ export class Year3000System {
   public get performanceAnalyzer() {
     return this.facadeCoordinator?.getCachedNonVisualSystem('PerformanceAnalyzer') || null;
   }
-  public get performanceOptimizationManager() {
-    return this.facadeCoordinator?.getCachedNonVisualSystem('PerformanceOptimizationManager') || null;
+  public get unifiedPerformanceCoordinator() {
+    return this.facadeCoordinator?.getCachedNonVisualSystem('UnifiedPerformanceCoordinator') || null;
   }
   public get performanceCSSIntegration() {
     return this.facadeCoordinator?.getCachedNonVisualSystem('PerformanceCSSIntegration') || null;
@@ -123,12 +123,6 @@ export class Year3000System {
   public get beatSyncVisualSystem() {
     return this.facadeCoordinator?.getVisualSystem('OrganicBeatSync') || null;
   }
-  public get behavioralPredictionEngine() {
-    return this.facadeCoordinator?.getVisualSystem('BehavioralPrediction') || null;
-  }
-  public get predictiveMaterializationSystem() {
-    return this.facadeCoordinator?.getVisualSystem('PredictiveMaterialization') || null;
-  }
   public get webGLGradientBackgroundSystem() {
     return this.facadeCoordinator?.getVisualSystem('WebGLBackground') || null;
   }
@@ -136,7 +130,8 @@ export class Year3000System {
     return this.facadeCoordinator?.getVisualSystem('ParticleField') || null;
   }
   public get emergentChoreographyEngine() {
-    return this.facadeCoordinator?.getVisualSystem('EmergentChoreography') || null;
+    // EmergentChoreography functionality integrated into EnhancedMasterAnimationCoordinator
+    return this.enhancedMasterAnimationCoordinator || null;
   }
   public get spotifyUIApplicationSystem() {
     return this.facadeCoordinator?.getVisualSystem('SpotifyUIApplication') || null;
@@ -417,39 +412,16 @@ export class Year3000System {
           }
         },
       },
-      {
-        name: "PerformanceOptimizationManager",
-        init: () => {
-          if (
-            this.unifiedCSSManager &&
-            this.enhancedMasterAnimationCoordinator &&
-            this.performanceCoordinator
-          ) {
-            this.performanceOptimizationManager =
-              PerformanceOptimizationManager.getInstance(
-                this.YEAR3000_CONFIG,
-                this.unifiedCSSManager,
-                this.enhancedMasterAnimationCoordinator,
-                this.performanceCoordinator
-              );
-
-            if (this.YEAR3000_CONFIG.enableDebug) {
-              console.log(
-                "[Year3000System] PerformanceOptimizationManager initialized with device optimization"
-              );
-            }
-          }
-        },
-      },
+      // PerformanceOptimizationManager consolidated into UnifiedPerformanceCoordinator
       {
         name: "PerformanceCSSIntegration",
         init: () => {
-          if (this.unifiedCSSManager && this.performanceOptimizationManager) {
+          if (this.unifiedCSSManager && this.unifiedPerformanceCoordinator) {
             this.performanceCSSIntegration =
               PerformanceCSSIntegration.getInstance(
                 this.YEAR3000_CONFIG,
                 this.unifiedCSSManager,
-                this.performanceOptimizationManager
+                this.unifiedPerformanceCoordinator
               );
 
             if (this.YEAR3000_CONFIG.enableDebug) {
@@ -822,8 +794,8 @@ export class Year3000System {
         'WebGLBackground',         // 🌌 Enable WebGL gradient backgrounds
         'SpotifyUIApplication',    // 🎨 Core UI color application
         'OrganicBeatSync',
-        'InteractionTracking',
-        'EmergentChoreography'
+        'InteractionTracking'
+        // EmergentChoreography integrated into EnhancedMasterAnimationCoordinator
       ];
 
       for (const systemKey of essentialVisualSystems) {
@@ -871,11 +843,13 @@ export class Year3000System {
         }
       }
 
-      // Link ColorHarmonyEngine to EmergentChoreographyEngine (if available)
-      if (this.colorHarmonyEngine && this.emergentChoreographyEngine) {
-        this.colorHarmonyEngine.setEmergentEngine(this.emergentChoreographyEngine);
+      // Link ColorHarmonyEngine to EnhancedMasterAnimationCoordinator (emergent functionality)
+      if (this.colorHarmonyEngine && this.enhancedMasterAnimationCoordinator) {
+        // Note: ColorHarmonyEngine expects EmergentChoreographyEngine interface
+        // but now gets EnhancedMasterAnimationCoordinator with emergent functionality
+        this.colorHarmonyEngine.setEmergentEngine(this.enhancedMasterAnimationCoordinator as any);
         if (this.YEAR3000_CONFIG.enableDebug) {
-          console.log("🌌 [Year3000System] EmergentChoreographyEngine linked to ColorHarmonyEngine");
+          console.log("🌌 [Year3000System] EnhancedMasterAnimationCoordinator (with emergent functionality) linked to ColorHarmonyEngine");
         }
       }
 
@@ -904,19 +878,11 @@ export class Year3000System {
   }
 
   /**
-   * Determines if prediction systems should be skipped for performance optimization
+   * Legacy function - removed prediction systems entirely for performance optimization
    */
   private _shouldSkipPredictionSystem(systemName: string): boolean {
-    // List of prediction systems that are performance-heavy
-    const predictionSystems = [
-      "BehavioralPredictionEngine",
-      "PredictiveMaterializationSystem",
-    ];
-
-    // Only check prediction systems
-    if (!predictionSystems.includes(systemName)) {
-      return false;
-    }
+    // All prediction systems have been removed for performance optimization
+    return false;
 
     // Skip if device capability detector is not available
     if (!this.deviceCapabilityDetector) {
@@ -957,10 +923,8 @@ export class Year3000System {
         "LightweightParticleSystem",
         "InteractionTrackingSystem",
         "BeatSyncVisualSystem",
-        "BehavioralPredictionEngine",
-        "PredictiveMaterializationSystem",
-        "SidebarSystemsIntegration",
-        "EmergentChoreographyEngine",
+        "SidebarSystemsIntegration"
+        // "EmergentChoreographyEngine", // Consolidated into EnhancedMasterAnimationCoordinator
       ];
       visualSystems.forEach((s) => results.skipped.push(s));
       return;
@@ -983,21 +947,7 @@ export class Year3000System {
         Class: BeatSyncVisualSystem,
         property: "beatSyncVisualSystem",
       },
-      {
-        name: "EmergentChoreographyEngine",
-        Class: EmergentChoreographyEngine,
-        property: "emergentChoreographyEngine",
-      },
-      {
-        name: "BehavioralPredictionEngine",
-        Class: BehavioralPredictionEngine,
-        property: "behavioralPredictionEngine",
-      },
-      {
-        name: "PredictiveMaterializationSystem",
-        Class: PredictiveMaterializationSystem,
-        property: "predictiveMaterializationSystem",
-      },
+      // EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
       {
         name: "WebGLGradientBackgroundSystem",
         Class: WebGLGradientBackgroundSystem,
@@ -1108,13 +1058,14 @@ export class Year3000System {
     } */
 
     // After all visual systems are initialized, link the engines
-    if (this.colorHarmonyEngine && this.emergentChoreographyEngine) {
+    // Note: EmergentChoreography now integrated into EnhancedMasterAnimationCoordinator
+    if (this.colorHarmonyEngine && this.enhancedMasterAnimationCoordinator) {
       this.colorHarmonyEngine.setEmergentEngine(
-        this.emergentChoreographyEngine
+        this.enhancedMasterAnimationCoordinator as any
       );
       if (this.YEAR3000_CONFIG.enableDebug) {
         console.log(
-          "🔗 [Year3000System] EmergentChoreographyEngine linked to ColorHarmonyEngine."
+          "🔗 [Year3000System] EnhancedMasterAnimationCoordinator (emergent functionality) linked to ColorHarmonyEngine."
         );
       }
     }
@@ -1772,21 +1723,7 @@ export class Year3000System {
         system: this.beatSyncVisualSystem,
         priority: "critical",
       },
-      {
-        name: "EmergentChoreographyEngine",
-        system: this.emergentChoreographyEngine,
-        priority: "critical",
-      },
-      {
-        name: "BehavioralPredictionEngine",
-        system: this.behavioralPredictionEngine,
-        priority: "normal",
-      },
-      {
-        name: "PredictiveMaterializationSystem",
-        system: this.predictiveMaterializationSystem,
-        priority: "normal",
-      },
+      // EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
       {
         name: "SidebarSystemsIntegration",
         system: this.sidebarSystemsIntegration,
@@ -1881,27 +1818,10 @@ export class Year3000System {
         priority: "critical" as const,
         type: "animation" as const,
       },
-      {
-        name: "EmergentChoreographyEngine",
-        system: this.emergentChoreographyEngine,
-        priority: "critical" as const,
-        type: "animation" as const,
-      },
+      // EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
       {
         name: "SidebarSystemsIntegration",
         system: this.sidebarSystemsIntegration,
-        priority: "normal" as const,
-        type: "animation" as const,
-      },
-      {
-        name: "BehavioralPredictionEngine",
-        system: this.behavioralPredictionEngine,
-        priority: "normal" as const,
-        type: "animation" as const,
-      },
-      {
-        name: "PredictiveMaterializationSystem",
-        system: this.predictiveMaterializationSystem,
         priority: "normal" as const,
         type: "animation" as const,
       },
@@ -2409,8 +2329,6 @@ export class Year3000System {
       this.lightweightParticleSystem,
       this.interactionTrackingSystem,
       this.beatSyncVisualSystem,
-      this.behavioralPredictionEngine,
-      this.predictiveMaterializationSystem,
       this.sidebarSystemsIntegration,
       this.particleFieldSystem,
       // contextMenuSystem removed

@@ -32,7 +32,7 @@ import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager"
 import { UnifiedPerformanceCoordinator } from "@/core/performance/UnifiedPerformanceCoordinator";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
-import { PerformanceOptimizationManager } from "@/core/performance/PerformanceOptimizationManager";
+// PerformanceOptimizationManager consolidated into UnifiedPerformanceCoordinator
 import { PerformanceCSSIntegration } from "@/core/css/PerformanceCSSIntegration";
 
 // Core Services imports
@@ -65,7 +65,6 @@ export type NonVisualSystemKey =
   | 'UnifiedPerformanceCoordinator'
   | 'DeviceCapabilityDetector'
   | 'PerformanceAnalyzer'
-  | 'PerformanceOptimizationManager'
   | 'PerformanceCSSIntegration'
   
   // Core Services
@@ -228,7 +227,7 @@ export class NonVisualSystemFacade {
     this.systemDependencies.set('UnifiedCSSVariableManager', ['cssVariableBatcher']);
     
     this.systemRegistry.set('UnifiedPerformanceCoordinator', UnifiedPerformanceCoordinator);
-    this.systemDependencies.set('UnifiedPerformanceCoordinator', ['performanceAnalyzer']);
+    this.systemDependencies.set('UnifiedPerformanceCoordinator', []);
     
     this.systemRegistry.set('DeviceCapabilityDetector', DeviceCapabilityDetector);
     this.systemDependencies.set('DeviceCapabilityDetector', []);
@@ -236,8 +235,7 @@ export class NonVisualSystemFacade {
     this.systemRegistry.set('PerformanceAnalyzer', PerformanceAnalyzer);
     this.systemDependencies.set('PerformanceAnalyzer', []);
     
-    this.systemRegistry.set('PerformanceOptimizationManager', PerformanceOptimizationManager);
-    this.systemDependencies.set('PerformanceOptimizationManager', ['performanceAnalyzer']);
+    // PerformanceOptimizationManager consolidated into UnifiedPerformanceCoordinator
     
     this.systemRegistry.set('PerformanceCSSIntegration', PerformanceCSSIntegration);
     this.systemDependencies.set('PerformanceCSSIntegration', ['cssVariableBatcher', 'performanceAnalyzer']);
@@ -258,10 +256,10 @@ export class NonVisualSystemFacade {
     
     // UI Managers
     this.systemRegistry.set('GlassmorphismManager', GlassmorphismManager);
-    this.systemDependencies.set('GlassmorphismManager', ['cssVariableBatcher']);
+    this.systemDependencies.set('GlassmorphismManager', ['cssVariableBatcher', 'performanceAnalyzer', 'settingsManager']);
     
     this.systemRegistry.set('Card3DManager', Card3DManager);
-    this.systemDependencies.set('Card3DManager', ['cssVariableBatcher']);
+    this.systemDependencies.set('Card3DManager', ['performanceAnalyzer', 'settingsManager']);
     
     // Integration Systems
     this.systemRegistry.set('SidebarSystemsIntegration', SidebarSystemsIntegration);
@@ -428,15 +426,33 @@ export class NonVisualSystemFacade {
 
       // Prepare context for strategy-based creation
       const context = {
+        systemKey: key,
         config: this.config,
         utils: this.utils,
         dependencies: {
+          config: this.config,
+          utils: this.utils,
           performanceAnalyzer: this.performanceAnalyzer,
           settingsManager: this.settingsManager,
           musicSyncService: this.musicSyncService,
           year3000System: this.year3000System,
           cssVariableBatcher: this.cssVariableBatcher,
           performanceCoordinator: this.performanceCoordinator
+        },
+        preferences: {
+          lazyInit: false,
+          validateDependencies: true,
+          creationTimeout: 5000,
+          monitorCreation: true
+        },
+        metadata: {
+          timestamp: Date.now(),
+          reason: 'startup',
+          priority: 'medium',
+          resourceConstraints: {
+            maxMemoryMB: 50,
+            maxInitTimeMs: 1000
+          }
         },
         year3000System: this.year3000System
       };

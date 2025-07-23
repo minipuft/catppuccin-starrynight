@@ -4666,6 +4666,9 @@ void main() {
             this.subscribeToEvents();
             this.startAnimation();
             document.documentElement.style.setProperty("--sn-webgl-ready", "1");
+            document.documentElement.style.setProperty("--sn-webgl-enabled", "1");
+            document.documentElement.style.setProperty("--sn-current-backend", "hybrid");
+            document.documentElement.style.setProperty("--sn-gradient-crossfade-opacity", "0.5");
             Y3K?.debug?.log(
               "WebGLGradientBackgroundSystem",
               "WebGL gradient system initialized successfully"
@@ -4976,6 +4979,9 @@ void main() {
           if (!this.webglReady) {
             this.webglReady = true;
             document.documentElement.style.setProperty("--sn-webgl-ready", "1");
+            document.documentElement.style.setProperty("--sn-webgl-enabled", "1");
+            document.documentElement.style.setProperty("--sn-current-backend", "hybrid");
+            document.documentElement.style.setProperty("--sn-gradient-crossfade-opacity", "0.5");
           }
           const time = this.prefersReducedMotion ? 0 : (currentTime - this.startTime) / 1e3;
           if (this.uniforms.u_time) {
@@ -5022,6 +5028,9 @@ void main() {
         }
         fallbackToCSSGradient() {
           document.documentElement.style.setProperty("--sn-webgl-ready", "0");
+          document.documentElement.style.setProperty("--sn-webgl-enabled", "0");
+          document.documentElement.style.setProperty("--sn-current-backend", "css");
+          document.documentElement.style.setProperty("--sn-gradient-crossfade-opacity", "0");
           if (this.cssVariableBatcher) {
             this.startCSSFallbackAnimation();
           }
@@ -5035,9 +5044,9 @@ void main() {
           const animateCSS = /* @__PURE__ */ __name(() => {
             if (!this.isActive) return;
             const time = performance.now() / 1e3;
-            const flowX = Math.sin(time * 0.02) * 25;
-            const flowY = Math.cos(time * 0.03) * 25;
-            const scale = 1 + Math.sin(time * 0.01) * 0.15;
+            const flowX = Math.sin(time * 0.04) * 20 + Math.sin(time * 0.07) * 8;
+            const flowY = Math.cos(time * 0.05) * 20 + Math.cos(time * 0.09) * 6;
+            const scale = 1.15 + Math.sin(time * 0.03) * 0.2;
             const batcher = this.cssVariableBatcher;
             if (!batcher) return;
             batcher.queueCSSVariableUpdate("--sn-gradient-flow-x", `${flowX}%`);
@@ -5107,6 +5116,9 @@ void main() {
           window.removeEventListener("resize", this.resize);
           this.gl = null;
           document.documentElement.style.setProperty("--sn-webgl-ready", "0");
+          document.documentElement.style.setProperty("--sn-webgl-enabled", "0");
+          document.documentElement.style.setProperty("--sn-current-backend", "css");
+          document.documentElement.style.setProperty("--sn-gradient-crossfade-opacity", "0");
         }
         forceRepaint(reason = "settings-change") {
           if (this.isActive && this.gradientTexture) {
@@ -5252,14 +5264,389 @@ void main() {
     }
   });
 
+  // src-js/types/signature.ts
+  var createDefaultSignature;
+  var init_signature = __esm({
+    "src-js/types/signature.ts"() {
+      "use strict";
+      createDefaultSignature = /* @__PURE__ */ __name((userId) => ({
+        version: "1.0.0",
+        userId,
+        createdAt: Date.now(),
+        lastModified: Date.now(),
+        colorMemories: /* @__PURE__ */ new Map(),
+        rhythmicPreferences: /* @__PURE__ */ new Map(),
+        emotionalResonanceProfile: {},
+        evolutionaryTrajectory: {
+          adaptability: 0.5,
+          // Start balanced
+          explorationFactor: 0.5,
+          // Start balanced
+          lastUpdate: Date.now()
+        }
+      }), "createDefaultSignature");
+    }
+  });
+
+  // node_modules/idb/build/index.js
+  function getIdbProxyableTypes() {
+    return idbProxyableTypes || (idbProxyableTypes = [
+      IDBDatabase,
+      IDBObjectStore,
+      IDBIndex,
+      IDBCursor,
+      IDBTransaction
+    ]);
+  }
+  function getCursorAdvanceMethods() {
+    return cursorAdvanceMethods || (cursorAdvanceMethods = [
+      IDBCursor.prototype.advance,
+      IDBCursor.prototype.continue,
+      IDBCursor.prototype.continuePrimaryKey
+    ]);
+  }
+  function promisifyRequest(request) {
+    const promise = new Promise((resolve, reject) => {
+      const unlisten = /* @__PURE__ */ __name(() => {
+        request.removeEventListener("success", success);
+        request.removeEventListener("error", error);
+      }, "unlisten");
+      const success = /* @__PURE__ */ __name(() => {
+        resolve(wrap(request.result));
+        unlisten();
+      }, "success");
+      const error = /* @__PURE__ */ __name(() => {
+        reject(request.error);
+        unlisten();
+      }, "error");
+      request.addEventListener("success", success);
+      request.addEventListener("error", error);
+    });
+    reverseTransformCache.set(promise, request);
+    return promise;
+  }
+  function cacheDonePromiseForTransaction(tx) {
+    if (transactionDoneMap.has(tx))
+      return;
+    const done = new Promise((resolve, reject) => {
+      const unlisten = /* @__PURE__ */ __name(() => {
+        tx.removeEventListener("complete", complete);
+        tx.removeEventListener("error", error);
+        tx.removeEventListener("abort", error);
+      }, "unlisten");
+      const complete = /* @__PURE__ */ __name(() => {
+        resolve();
+        unlisten();
+      }, "complete");
+      const error = /* @__PURE__ */ __name(() => {
+        reject(tx.error || new DOMException("AbortError", "AbortError"));
+        unlisten();
+      }, "error");
+      tx.addEventListener("complete", complete);
+      tx.addEventListener("error", error);
+      tx.addEventListener("abort", error);
+    });
+    transactionDoneMap.set(tx, done);
+  }
+  function replaceTraps(callback) {
+    idbProxyTraps = callback(idbProxyTraps);
+  }
+  function wrapFunction(func) {
+    if (getCursorAdvanceMethods().includes(func)) {
+      return function(...args) {
+        func.apply(unwrap(this), args);
+        return wrap(this.request);
+      };
+    }
+    return function(...args) {
+      return wrap(func.apply(unwrap(this), args));
+    };
+  }
+  function transformCachableValue(value) {
+    if (typeof value === "function")
+      return wrapFunction(value);
+    if (value instanceof IDBTransaction)
+      cacheDonePromiseForTransaction(value);
+    if (instanceOfAny(value, getIdbProxyableTypes()))
+      return new Proxy(value, idbProxyTraps);
+    return value;
+  }
+  function wrap(value) {
+    if (value instanceof IDBRequest)
+      return promisifyRequest(value);
+    if (transformCache.has(value))
+      return transformCache.get(value);
+    const newValue = transformCachableValue(value);
+    if (newValue !== value) {
+      transformCache.set(value, newValue);
+      reverseTransformCache.set(newValue, value);
+    }
+    return newValue;
+  }
+  function openDB(name, version, { blocked, upgrade, blocking, terminated } = {}) {
+    const request = indexedDB.open(name, version);
+    const openPromise = wrap(request);
+    if (upgrade) {
+      request.addEventListener("upgradeneeded", (event) => {
+        upgrade(wrap(request.result), event.oldVersion, event.newVersion, wrap(request.transaction), event);
+      });
+    }
+    if (blocked) {
+      request.addEventListener("blocked", (event) => blocked(
+        // Casting due to https://github.com/microsoft/TypeScript-DOM-lib-generator/pull/1405
+        event.oldVersion,
+        event.newVersion,
+        event
+      ));
+    }
+    openPromise.then((db) => {
+      if (terminated)
+        db.addEventListener("close", () => terminated());
+      if (blocking) {
+        db.addEventListener("versionchange", (event) => blocking(event.oldVersion, event.newVersion, event));
+      }
+    }).catch(() => {
+    });
+    return openPromise;
+  }
+  function getMethod(target, prop) {
+    if (!(target instanceof IDBDatabase && !(prop in target) && typeof prop === "string")) {
+      return;
+    }
+    if (cachedMethods.get(prop))
+      return cachedMethods.get(prop);
+    const targetFuncName = prop.replace(/FromIndex$/, "");
+    const useIndex = prop !== targetFuncName;
+    const isWrite = writeMethods.includes(targetFuncName);
+    if (
+      // Bail if the target doesn't exist on the target. Eg, getAll isn't in Edge.
+      !(targetFuncName in (useIndex ? IDBIndex : IDBObjectStore).prototype) || !(isWrite || readMethods.includes(targetFuncName))
+    ) {
+      return;
+    }
+    const method = /* @__PURE__ */ __name(async function(storeName, ...args) {
+      const tx = this.transaction(storeName, isWrite ? "readwrite" : "readonly");
+      let target2 = tx.store;
+      if (useIndex)
+        target2 = target2.index(args.shift());
+      return (await Promise.all([
+        target2[targetFuncName](...args),
+        isWrite && tx.done
+      ]))[0];
+    }, "method");
+    cachedMethods.set(prop, method);
+    return method;
+  }
+  async function* iterate(...args) {
+    let cursor = this;
+    if (!(cursor instanceof IDBCursor)) {
+      cursor = await cursor.openCursor(...args);
+    }
+    if (!cursor)
+      return;
+    cursor = cursor;
+    const proxiedCursor = new Proxy(cursor, cursorIteratorTraps);
+    ittrProxiedCursorToOriginalProxy.set(proxiedCursor, cursor);
+    reverseTransformCache.set(proxiedCursor, unwrap(cursor));
+    while (cursor) {
+      yield proxiedCursor;
+      cursor = await (advanceResults.get(proxiedCursor) || cursor.continue());
+      advanceResults.delete(proxiedCursor);
+    }
+  }
+  function isIteratorProp(target, prop) {
+    return prop === Symbol.asyncIterator && instanceOfAny(target, [IDBIndex, IDBObjectStore, IDBCursor]) || prop === "iterate" && instanceOfAny(target, [IDBIndex, IDBObjectStore]);
+  }
+  var instanceOfAny, idbProxyableTypes, cursorAdvanceMethods, transactionDoneMap, transformCache, reverseTransformCache, idbProxyTraps, unwrap, readMethods, writeMethods, cachedMethods, advanceMethodProps, methodMap, advanceResults, ittrProxiedCursorToOriginalProxy, cursorIteratorTraps;
+  var init_build = __esm({
+    "node_modules/idb/build/index.js"() {
+      instanceOfAny = /* @__PURE__ */ __name((object, constructors) => constructors.some((c) => object instanceof c), "instanceOfAny");
+      __name(getIdbProxyableTypes, "getIdbProxyableTypes");
+      __name(getCursorAdvanceMethods, "getCursorAdvanceMethods");
+      transactionDoneMap = /* @__PURE__ */ new WeakMap();
+      transformCache = /* @__PURE__ */ new WeakMap();
+      reverseTransformCache = /* @__PURE__ */ new WeakMap();
+      __name(promisifyRequest, "promisifyRequest");
+      __name(cacheDonePromiseForTransaction, "cacheDonePromiseForTransaction");
+      idbProxyTraps = {
+        get(target, prop, receiver) {
+          if (target instanceof IDBTransaction) {
+            if (prop === "done")
+              return transactionDoneMap.get(target);
+            if (prop === "store") {
+              return receiver.objectStoreNames[1] ? void 0 : receiver.objectStore(receiver.objectStoreNames[0]);
+            }
+          }
+          return wrap(target[prop]);
+        },
+        set(target, prop, value) {
+          target[prop] = value;
+          return true;
+        },
+        has(target, prop) {
+          if (target instanceof IDBTransaction && (prop === "done" || prop === "store")) {
+            return true;
+          }
+          return prop in target;
+        }
+      };
+      __name(replaceTraps, "replaceTraps");
+      __name(wrapFunction, "wrapFunction");
+      __name(transformCachableValue, "transformCachableValue");
+      __name(wrap, "wrap");
+      unwrap = /* @__PURE__ */ __name((value) => reverseTransformCache.get(value), "unwrap");
+      __name(openDB, "openDB");
+      readMethods = ["get", "getKey", "getAll", "getAllKeys", "count"];
+      writeMethods = ["put", "add", "delete", "clear"];
+      cachedMethods = /* @__PURE__ */ new Map();
+      __name(getMethod, "getMethod");
+      replaceTraps((oldTraps) => ({
+        ...oldTraps,
+        get: /* @__PURE__ */ __name((target, prop, receiver) => getMethod(target, prop) || oldTraps.get(target, prop, receiver), "get"),
+        has: /* @__PURE__ */ __name((target, prop) => !!getMethod(target, prop) || oldTraps.has(target, prop), "has")
+      }));
+      advanceMethodProps = ["continue", "continuePrimaryKey", "advance"];
+      methodMap = {};
+      advanceResults = /* @__PURE__ */ new WeakMap();
+      ittrProxiedCursorToOriginalProxy = /* @__PURE__ */ new WeakMap();
+      cursorIteratorTraps = {
+        get(target, prop) {
+          if (!advanceMethodProps.includes(prop))
+            return target[prop];
+          let cachedFunc = methodMap[prop];
+          if (!cachedFunc) {
+            cachedFunc = methodMap[prop] = function(...args) {
+              advanceResults.set(this, ittrProxiedCursorToOriginalProxy.get(this)[prop](...args));
+            };
+          }
+          return cachedFunc;
+        }
+      };
+      __name(iterate, "iterate");
+      __name(isIteratorProp, "isIteratorProp");
+      replaceTraps((oldTraps) => ({
+        ...oldTraps,
+        get(target, prop, receiver) {
+          if (isIteratorProp(target, prop))
+            return iterate;
+          return oldTraps.get(target, prop, receiver);
+        },
+        has(target, prop) {
+          return isIteratorProp(target, prop) || oldTraps.has(target, prop);
+        }
+      }));
+    }
+  });
+
+  // src-js/audio/TemporalMemoryService.ts
+  var DB_NAME, DB_VERSION, SIGNATURE_STORE, SIGNATURE_KEY, _TemporalMemoryService, TemporalMemoryService, temporalMemoryService;
+  var init_TemporalMemoryService = __esm({
+    "src-js/audio/TemporalMemoryService.ts"() {
+      "use strict";
+      init_signature();
+      init_build();
+      DB_NAME = "Year3000-TemporalMemory";
+      DB_VERSION = 1;
+      SIGNATURE_STORE = "aestheticSignatures";
+      SIGNATURE_KEY = "currentUser";
+      _TemporalMemoryService = class _TemporalMemoryService {
+        constructor() {
+          this.dbPromise = openDB(DB_NAME, DB_VERSION, {
+            upgrade(db) {
+              if (!db.objectStoreNames.contains(SIGNATURE_STORE)) {
+                db.createObjectStore(SIGNATURE_STORE);
+              }
+            }
+          });
+        }
+        async getSignature(userId = "defaultUser") {
+          try {
+            const db = await this.dbPromise;
+            const signature = await db.get(SIGNATURE_STORE, SIGNATURE_KEY);
+            if (signature) {
+              return signature;
+            } else {
+              const defaultSignature = createDefaultSignature(userId);
+              await this.saveSignature(defaultSignature);
+              return defaultSignature;
+            }
+          } catch (error) {
+            console.error(
+              "[TemporalMemoryService] Failed to get signature from IndexedDB. Returning default.",
+              error
+            );
+            return createDefaultSignature(userId);
+          }
+        }
+        async saveSignature(signature) {
+          try {
+            const db = await this.dbPromise;
+            signature.lastModified = Date.now();
+            await db.put(SIGNATURE_STORE, signature, SIGNATURE_KEY);
+          } catch (error) {
+            console.error(
+              "[TemporalMemoryService] Failed to save signature to IndexedDB.",
+              error
+            );
+          }
+        }
+        async resetSignature(userId = "defaultUser") {
+          const defaultSignature = createDefaultSignature(userId);
+          await this.saveSignature(defaultSignature);
+          console.log("[TemporalMemoryService] Aesthetic signature has been reset.");
+          return defaultSignature;
+        }
+        async getSignatureTrends(signature) {
+          if (!signature) return null;
+          const trends = {
+            dominantColor: null,
+            dominantRhythm: null,
+            avgEnergy: 0,
+            avgValence: 0
+          };
+          let dominantColor = null;
+          signature.colorMemories.forEach((mem, hex) => {
+            if (!dominantColor || mem.count > dominantColor.count) {
+              dominantColor = { hex, count: mem.count };
+            }
+            trends.avgValence += mem.emotionalValence * mem.count;
+          });
+          let totalColorCount = 0;
+          signature.colorMemories.forEach((mem) => totalColorCount += mem.count);
+          if (totalColorCount > 0) {
+            trends.avgValence /= totalColorCount;
+          }
+          trends.dominantColor = dominantColor;
+          let dominantRhythm = null;
+          signature.rhythmicPreferences.forEach((pattern, id) => {
+            if (!dominantRhythm || pattern.count > dominantRhythm.count) {
+              dominantRhythm = { id, count: pattern.count };
+            }
+            trends.avgEnergy += pattern.associatedEnergy * pattern.count;
+          });
+          let totalRhythmCount = 0;
+          signature.rhythmicPreferences.forEach((p) => totalRhythmCount += p.count);
+          if (totalRhythmCount > 0) {
+            trends.avgEnergy /= totalRhythmCount;
+          }
+          trends.dominantRhythm = dominantRhythm;
+          return trends;
+        }
+      };
+      __name(_TemporalMemoryService, "TemporalMemoryService");
+      TemporalMemoryService = _TemporalMemoryService;
+      temporalMemoryService = new TemporalMemoryService();
+    }
+  });
+
   // src-js/core/animation/EnhancedMasterAnimationCoordinator.ts
   var _EnhancedMasterAnimationCoordinator, EnhancedMasterAnimationCoordinator;
   var init_EnhancedMasterAnimationCoordinator = __esm({
     "src-js/core/animation/EnhancedMasterAnimationCoordinator.ts"() {
       "use strict";
       init_EventBus();
+      init_TemporalMemoryService();
       _EnhancedMasterAnimationCoordinator = class _EnhancedMasterAnimationCoordinator {
-        // 1 second at 60fps
         constructor(config, performanceCoordinator) {
           this.performanceCoordinator = null;
           // Animation management
@@ -5301,6 +5688,16 @@ void main() {
           // Performance tracking
           this.performanceHistory = [];
           this.MAX_HISTORY_SIZE = 60;
+          // 1 second at 60fps
+          // ===================================================================
+          // EMERGENT CHOREOGRAPHY ENGINE INTEGRATION (from consolidation)
+          // ===================================================================
+          // Emergent choreography state
+          this.signature = null;
+          this.saveInterval = null;
+          this.currentBpm = 120;
+          this.currentIntensity = 0.5;
+          this.emergentEventSubscriptions = [];
           // =========================================================================
           // PRIVATE METHODS
           // =========================================================================
@@ -5320,6 +5717,7 @@ void main() {
             const frameStartTime = performance.now();
             this.executeFrameCallbacks(deltaTime, currentTime);
             this.executeAnimationSystems(deltaTime, currentTime);
+            this.processEmergentTick(deltaTime);
             const frameTime = performance.now() - frameStartTime;
             this.updatePerformanceMetrics(frameTime);
             if (this.performanceCoordinator) {
@@ -5339,10 +5737,12 @@ void main() {
           this.performanceCoordinator = performanceCoordinator || null;
           this.startTime = performance.now();
           this.lastTimestamp = this.startTime;
+          this.currentMultipliers = this.config.cosmicMultipliers;
           this.subscribeToEvents();
+          this.initializeEmergentChoreography();
           this.updateFrameBudget();
           if (this.config.enableDebug) {
-            console.log("[EnhancedMasterAnimationCoordinator] Initialized with unified animation coordination");
+            console.log("[EnhancedMasterAnimationCoordinator] Initialized with unified animation coordination and emergent choreography");
           }
         }
         /**
@@ -5595,10 +5995,23 @@ void main() {
           return false;
         }
         /**
+         * Get current multipliers for emergent choreography
+         */
+        getCurrentMultipliers() {
+          return this.currentMultipliers;
+        }
+        /**
+         * Force update evolutionary trajectory
+         */
+        async updateEvolutionaryTrajectory() {
+          await this._updateEvolutionaryTrajectory();
+        }
+        /**
          * Destroy the coordinator and clean up resources
          */
         destroy() {
           this.stopMasterAnimationLoop();
+          this.destroyEmergentChoreography();
           for (const registration of this.animations.values()) {
             if (registration.type === "visual" && "destroy" in registration.system) {
               try {
@@ -5740,6 +6153,166 @@ void main() {
           this.eventBus.subscribe("performance:reduce-quality", (payload) => {
             this.setPerformanceMode("performance");
           });
+        }
+        // =========================================================================
+        // EMERGENT CHOREOGRAPHY ENGINE METHODS (from consolidation)
+        // =========================================================================
+        /**
+         * Initialize emergent choreography functionality
+         */
+        async initializeEmergentChoreography() {
+          try {
+            this.signature = await temporalMemoryService.getSignature();
+            this.registerEmergentEventListeners();
+            this.saveInterval = setInterval(() => {
+              if (this.signature) {
+                temporalMemoryService.saveSignature(this.signature);
+              }
+            }, 3e4);
+            if (this.config.enableDebug) {
+              console.log("[EnhancedMasterAnimationCoordinator] Emergent choreography initialized");
+            }
+          } catch (error) {
+            console.error("[EnhancedMasterAnimationCoordinator] Failed to initialize emergent choreography:", error);
+          }
+        }
+        /**
+         * Register emergent choreography event listeners
+         */
+        registerEmergentEventListeners() {
+          const beatFrameSub = this.eventBus.subscribe(
+            "beat/frame",
+            (payload) => this.handleBeatFrame(payload)
+          );
+          const harmonyFrameSub = this.eventBus.subscribe(
+            "colorharmony/frame",
+            (payload) => this.handleHarmonyFrame(payload)
+          );
+          const bpmSub = this.eventBus.subscribe(
+            "beat/bpm",
+            (payload) => {
+              this.currentBpm = payload.bpm;
+            }
+          );
+          const intensitySub = this.eventBus.subscribe(
+            "beat/intensity",
+            (payload) => {
+              this.currentIntensity = payload.intensity;
+            }
+          );
+          this.emergentEventSubscriptions.push(
+            beatFrameSub,
+            harmonyFrameSub,
+            bpmSub,
+            intensitySub
+          );
+        }
+        /**
+         * Handle beat frame events for emergent adaptation
+         */
+        handleBeatFrame(payload) {
+          if (!this.signature) return;
+          this.signature.lastModified = Date.now();
+        }
+        /**
+         * Handle harmony frame events for emergent adaptation
+         */
+        handleHarmonyFrame(payload) {
+          if (!this.signature) return;
+          const { kineticState } = payload;
+          this.signature.lastModified = Date.now();
+        }
+        /**
+         * Update evolutionary trajectory based on signature trends
+         */
+        async _updateEvolutionaryTrajectory() {
+          if (!this.signature) return;
+          const trends = await temporalMemoryService.getSignatureTrends(
+            this.signature
+          );
+          if (!trends) return;
+          const { avgEnergy, avgValence } = trends;
+          const explorationFactor = 0.5 + (avgEnergy - 0.5) * 0.2;
+          this.signature.evolutionaryTrajectory.explorationFactor = Math.max(
+            0.1,
+            Math.min(0.9, explorationFactor)
+          );
+          const adaptability = 0.5 + (Math.abs(avgValence) - 0.2) * 0.3;
+          this.signature.evolutionaryTrajectory.adaptability = Math.max(
+            0.1,
+            Math.min(0.9, adaptability)
+          );
+          this.signature.evolutionaryTrajectory.lastUpdate = Date.now();
+        }
+        /**
+         * Calculate visual pulse based on current BPM and intensity
+         */
+        _calculateVisualPulse(deltaMs) {
+          const beatInterval = 6e4 / this.currentBpm;
+          const phase = performance.now() % beatInterval / beatInterval;
+          const hueShift = Math.sin(phase * 2 * Math.PI + Math.PI / 2) * 15 * this.currentIntensity;
+          return {
+            timestamp: performance.now(),
+            bpm: this.currentBpm,
+            intensity: this.currentIntensity,
+            phase,
+            hueShift
+          };
+        }
+        /**
+         * Calculate adaptive coefficients based on signature
+         */
+        _calculateAdaptiveCoefficients() {
+          if (!this.signature) return;
+          const { adaptability, explorationFactor } = this.signature.evolutionaryTrajectory;
+          const kineticIntensity = 0.5 + adaptability * 0.5;
+          const visualIntensityBase = 0.8 + explorationFactor * 0.4;
+          this.currentMultipliers = {
+            ...this.config.cosmicMultipliers,
+            kineticIntensity,
+            visualIntensityBase
+          };
+          this.eventBus.publish(
+            "emergent/multipliersUpdated",
+            this.currentMultipliers
+          );
+        }
+        /**
+         * Process emergent choreography tick within animation loop
+         */
+        processEmergentTick(deltaMs) {
+          if (!this.signature) return;
+          this._calculateAdaptiveCoefficients();
+          if (this.signature && Date.now() - this.signature.evolutionaryTrajectory.lastUpdate > 6e4) {
+            this._updateEvolutionaryTrajectory();
+          }
+          const visualPulse = this._calculateVisualPulse(deltaMs);
+          if (visualPulse) {
+            this.eventBus.publish("visual/pulse", visualPulse);
+          }
+          const emergentPayload = {
+            timestamp: performance.now(),
+            deltaMs
+            // ...other emergent data to be calculated in later phases
+          };
+          this.eventBus.publish("emergent/frame", emergentPayload);
+        }
+        /**
+         * Clean up emergent choreography resources
+         */
+        destroyEmergentChoreography() {
+          if (this.signature) {
+            temporalMemoryService.saveSignature(this.signature);
+          }
+          if (this.saveInterval) {
+            clearInterval(this.saveInterval);
+            this.saveInterval = null;
+          }
+          this.emergentEventSubscriptions.forEach((unsubscribe) => unsubscribe());
+          this.emergentEventSubscriptions = [];
+          if (this.config.enableDebug) {
+            console.log("[EnhancedMasterAnimationCoordinator] Emergent choreography destroyed");
+          }
         }
       };
       __name(_EnhancedMasterAnimationCoordinator, "EnhancedMasterAnimationCoordinator");
@@ -7196,6 +7769,13 @@ void main() {
           this.lastHealthCheck = 0;
           this.healthCheckInterval = null;
           this.HEALTH_CHECK_INTERVAL = 5e3;
+          // Initialized in initializeThermalMonitoring
+          this.batteryState = null;
+          // Initialized in constructor
+          this.frameTimeHistory = [];
+          this.memoryUsageHistory = [];
+          this.lastOptimizationTime = 0;
+          this.optimizationCooldown = 5e3;
           // 5 seconds
           // Performance thresholds
           this.PERFORMANCE_THRESHOLDS = {
@@ -7222,14 +7802,62 @@ void main() {
               critical: 30
             }
           };
+          // Performance modes configuration (from PerformanceOptimizationManager)
+          this.PERFORMANCE_MODES = {
+            battery: {
+              name: "battery",
+              qualityLevel: 0.4,
+              animationQuality: 0.3,
+              effectQuality: 0.2,
+              blurQuality: 0.3,
+              shadowQuality: 0.2,
+              frameRate: 30,
+              optimizationLevel: 3
+            },
+            balanced: {
+              name: "balanced",
+              qualityLevel: 0.8,
+              animationQuality: 0.8,
+              effectQuality: 0.7,
+              blurQuality: 0.8,
+              shadowQuality: 0.7,
+              frameRate: 60,
+              optimizationLevel: 1
+            },
+            performance: {
+              name: "performance",
+              qualityLevel: 1,
+              animationQuality: 1,
+              effectQuality: 1,
+              blurQuality: 1,
+              shadowQuality: 1,
+              frameRate: 60,
+              optimizationLevel: 0
+            },
+            auto: {
+              name: "auto",
+              qualityLevel: 0.8,
+              // Will be dynamically adjusted
+              animationQuality: 0.8,
+              effectQuality: 0.8,
+              blurQuality: 0.8,
+              shadowQuality: 0.8,
+              frameRate: 60,
+              optimizationLevel: 1
+            }
+          };
           this.config = config;
           this.performanceAnalyzer = performanceAnalyzer;
           this.eventBus = GlobalEventBus;
+          this.initializeDeviceCapabilities();
+          this.initializeThermalMonitoring();
+          this.initializeBatteryMonitoring();
+          this.currentPerformanceMode = this.PERFORMANCE_MODES.auto;
           this.initializeDefaultStrategies();
           this.startHealthMonitoring();
           this.subscribeToEvents();
           if (this.config.enableDebug) {
-            console.log("[UnifiedPerformanceCoordinator] Initialized with centralized monitoring");
+            console.log("[UnifiedPerformanceCoordinator] Initialized with enhanced device capabilities, thermal monitoring, and battery optimization");
           }
         }
         /**
@@ -7672,6 +8300,182 @@ void main() {
               });
             }
           });
+        }
+        // ===============================================================================
+        // ENHANCED CAPABILITIES FROM PERFORMANCEOPTIMIZATIONMANAGER CONSOLIDATION
+        // ===============================================================================
+        /**
+         * Initialize device capabilities detection
+         */
+        initializeDeviceCapabilities() {
+          const nav = navigator;
+          const memory = performance.memory;
+          const canvas = document.createElement("canvas");
+          const gl = canvas.getContext("webgl2") || canvas.getContext("webgl");
+          let maxTextureSize = 2048;
+          if (gl) {
+            maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE) || 2048;
+          }
+          const estimatedMemory = memory ? Math.round(memory.jsHeapSizeLimit / (1024 * 1024 * 1024)) : 4;
+          let performanceTier = "medium";
+          if (estimatedMemory >= 8 && nav.hardwareConcurrency >= 8 && maxTextureSize >= 4096) {
+            performanceTier = "premium";
+          } else if (estimatedMemory >= 4 && nav.hardwareConcurrency >= 4) {
+            performanceTier = "high";
+          } else if (estimatedMemory >= 2 && nav.hardwareConcurrency >= 2) {
+            performanceTier = "medium";
+          } else {
+            performanceTier = "low";
+          }
+          this.deviceCapabilities = {
+            performanceTier,
+            memoryGB: estimatedMemory,
+            cpuCores: nav.hardwareConcurrency || 4,
+            gpuAcceleration: !!gl,
+            isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(nav.userAgent),
+            supportsWebGL: !!gl,
+            supportsBackdropFilter: CSS.supports("backdrop-filter", "blur(10px)"),
+            maxTextureSize,
+            devicePixelRatio: window.devicePixelRatio || 1
+          };
+          if (this.config.enableDebug) {
+            console.log("[UnifiedPerformanceCoordinator] Device capabilities detected:", this.deviceCapabilities);
+          }
+        }
+        /**
+         * Initialize thermal state monitoring
+         */
+        initializeThermalMonitoring() {
+          this.thermalState = {
+            temperature: "normal",
+            throttleLevel: 0,
+            cpuUsage: 0,
+            gpuUsage: 0,
+            memoryUsage: 0
+          };
+          setInterval(() => {
+            this.updateThermalState();
+          }, 1e4);
+        }
+        /**
+         * Initialize battery monitoring if available
+         */
+        async initializeBatteryMonitoring() {
+          try {
+            const nav = navigator;
+            if ("getBattery" in nav) {
+              const battery = await nav.getBattery();
+              this.batteryState = {
+                level: battery.level,
+                charging: battery.charging,
+                chargingTime: battery.chargingTime,
+                dischargingTime: battery.dischargingTime
+              };
+              battery.addEventListener("levelchange", () => {
+                if (this.batteryState) {
+                  this.batteryState.level = battery.level;
+                  this.adjustPerformanceModeForBattery();
+                }
+              });
+              battery.addEventListener("chargingchange", () => {
+                if (this.batteryState) {
+                  this.batteryState.charging = battery.charging;
+                  this.adjustPerformanceModeForBattery();
+                }
+              });
+              if (this.config.enableDebug) {
+                console.log("[UnifiedPerformanceCoordinator] Battery monitoring initialized");
+              }
+            }
+          } catch (error) {
+            if (this.config.enableDebug) {
+              console.log("[UnifiedPerformanceCoordinator] Battery API not available");
+            }
+          }
+        }
+        /**
+         * Update thermal state based on performance metrics
+         */
+        updateThermalState() {
+          const currentFPS = this.performanceAnalyzer.getMedianFPS() || 60;
+          const memory = performance.memory;
+          const memoryUsage = memory ? memory.usedJSHeapSize / memory.jsHeapSizeLimit : 0;
+          let temperature = "normal";
+          let throttleLevel = 0;
+          if (currentFPS < 30 || memoryUsage > 0.9) {
+            temperature = "critical";
+            throttleLevel = 0.8;
+          } else if (currentFPS < 45 || memoryUsage > 0.7) {
+            temperature = "hot";
+            throttleLevel = 0.4;
+          } else if (currentFPS < 55 || memoryUsage > 0.5) {
+            temperature = "warm";
+            throttleLevel = 0.2;
+          }
+          this.thermalState = {
+            temperature,
+            throttleLevel,
+            cpuUsage: Math.min(1 - currentFPS / 60, 1),
+            gpuUsage: 0,
+            // TODO: Implement GPU usage detection
+            memoryUsage
+          };
+          if (temperature === "critical" && this.currentPerformanceMode.name !== "battery") {
+            this.setPerformanceMode("battery");
+          } else if (temperature === "normal" && this.currentPerformanceMode.name === "battery") {
+            this.setPerformanceMode("auto");
+          }
+        }
+        /**
+         * Adjust performance mode based on battery state
+         */
+        adjustPerformanceModeForBattery() {
+          if (!this.batteryState) return;
+          if (!this.batteryState.charging && this.batteryState.level < 0.2) {
+            this.setPerformanceMode("battery");
+          } else if (this.batteryState.charging && this.currentPerformanceMode.name === "battery") {
+            this.setPerformanceMode("auto");
+          }
+        }
+        /**
+         * Set performance mode
+         */
+        setPerformanceMode(modeName) {
+          const mode = this.PERFORMANCE_MODES[modeName];
+          if (!mode) return;
+          this.currentPerformanceMode = mode;
+          this.eventBus.emit("performance:mode-changed", {
+            mode: modeName,
+            qualityLevel: mode.qualityLevel,
+            frameRate: mode.frameRate
+          });
+          if (this.config.enableDebug) {
+            console.log(`[UnifiedPerformanceCoordinator] Performance mode changed to: ${modeName}`);
+          }
+        }
+        /**
+         * Get current device capabilities
+         */
+        getDeviceCapabilities() {
+          return { ...this.deviceCapabilities };
+        }
+        /**
+         * Get current thermal state
+         */
+        getThermalState() {
+          return { ...this.thermalState };
+        }
+        /**
+         * Get current battery state
+         */
+        getBatteryState() {
+          return this.batteryState ? { ...this.batteryState } : null;
+        }
+        /**
+         * Get current performance mode
+         */
+        getCurrentPerformanceMode() {
+          return { ...this.currentPerformanceMode };
         }
       };
       __name(_UnifiedPerformanceCoordinator, "UnifiedPerformanceCoordinator");
@@ -8570,865 +9374,6 @@ void main() {
     }
   });
 
-  // src-js/utils/dom/domCache.ts
-  function $$(selector, options = {}) {
-    if (!SUPPORTS_WEAKREF) {
-      return Array.from(document.querySelectorAll(selector));
-    }
-    let entry = CACHE.get(selector);
-    let elements = entry?.ref?.deref();
-    if (options.force || !elements) {
-      elements = Array.from(document.querySelectorAll(selector));
-      const ref = new WeakRef(elements);
-      entry = { ref, lastUpdate: Date.now() };
-      CACHE.set(selector, entry);
-      registry?.register(elements, selector);
-    }
-    return elements;
-  }
-  var CACHE, SUPPORTS_WEAKREF, SUPPORTS_REGISTRY, registry;
-  var init_domCache = __esm({
-    "src-js/utils/dom/domCache.ts"() {
-      "use strict";
-      CACHE = /* @__PURE__ */ new Map();
-      SUPPORTS_WEAKREF = typeof WeakRef !== "undefined";
-      SUPPORTS_REGISTRY = typeof FinalizationRegistry !== "undefined";
-      registry = SUPPORTS_REGISTRY ? (
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore – lib dom may not include FinalizationRegistry in older TS bundlers
-        new FinalizationRegistry((selector) => {
-          CACHE.delete(selector);
-        })
-      ) : null;
-      __name($$, "$$");
-    }
-  });
-
-  // src-js/debug/SpotifyDOMSelectors.ts
-  function elementExists(selector) {
-    return $$(selector).length > 0;
-  }
-  function findElementsWithFallback(modernSelector, legacySelector, options) {
-    let elements = $$(modernSelector, options);
-    if (elements.length === 0 && legacySelector) {
-      elements = $$(legacySelector, options);
-      if (elements.length > 0) {
-        console.warn(
-          `\u{1F30C} [SpotifyDOMSelectors] Using legacy selector: ${legacySelector}. Consider updating to: ${modernSelector}`
-        );
-      }
-    }
-    return elements;
-  }
-  function validateSpotifyDOM() {
-    console.group("\u{1F30C} [SpotifyDOMSelectors] DOM Validation");
-    const results = {
-      found: 0,
-      missing: 0,
-      details: {}
-    };
-    Object.entries(MODERN_SELECTORS).forEach(([key, selector]) => {
-      const exists = elementExists(selector);
-      results.details[key] = {
-        selector,
-        exists,
-        element: exists ? $$(selector)[0] || null : null
-      };
-      if (exists) {
-        results.found++;
-        console.log(`\u2705 ${key}: ${selector}`);
-      } else {
-        results.missing++;
-        console.warn(`\u274C ${key}: ${selector}`);
-      }
-    });
-    console.log(`\u{1F4CA} Summary: ${results.found} found, ${results.missing} missing`);
-    console.groupEnd();
-    return results;
-  }
-  function testGravitySystemSelectors() {
-    console.group("\u{1F30C} [Phase 1] Testing Gravity System Selectors");
-    console.log("\u{1F3AF} Primary gravity well targets:");
-    if (GRAVITY_WELL_TARGETS["primary"]) {
-      GRAVITY_WELL_TARGETS["primary"].forEach((selector) => {
-        const element = $$(selector)[0] || null;
-        console.log(`${element ? "\u2705" : "\u274C"} ${selector}`, element);
-      });
-    }
-    console.log("\u{1F3AF} Secondary gravity well targets:");
-    if (GRAVITY_WELL_TARGETS["secondary"]) {
-      GRAVITY_WELL_TARGETS["secondary"].forEach((selector) => {
-        const element = $$(selector)[0] || null;
-        console.log(`${element ? "\u2705" : "\u274C"} ${selector}`, element);
-      });
-    }
-    console.log("\u{1F6F8} Orbital elements:");
-    Object.entries(ORBITAL_ELEMENTS).forEach(([key, selector]) => {
-      const elements = $$(selector);
-      console.log(
-        `${elements.length > 0 ? "\u2705" : "\u274C"} ${key} (${selector}): ${elements.length} found`
-      );
-    });
-    console.groupEnd();
-  }
-  function validatePredictionTargets() {
-    console.group(
-      "\u{1F52E} [SpotifyDOMSelectors] Phase 2 - Prediction Target Validation"
-    );
-    const testSelectors = [
-      { name: "Track Rows", selector: ORBITAL_ELEMENTS["trackRows"] },
-      { name: "Progress Bar", selector: MODERN_SELECTORS["progressBar"] },
-      { name: "Play Button", selector: MODERN_SELECTORS["playButton"] },
-      { name: "Heart Button", selector: MODERN_SELECTORS["heartButton"] },
-      { name: "Album Cover", selector: MODERN_SELECTORS["albumCover"] },
-      {
-        name: "Now Playing Widget",
-        selector: MODERN_SELECTORS["nowPlayingWidget"]
-      },
-      { name: "Now Playing Left", selector: MODERN_SELECTORS["nowPlayingLeft"] },
-      { name: "Left Sidebar", selector: MODERN_SELECTORS["leftSidebar"] },
-      { name: "Library Items", selector: ORBITAL_ELEMENTS["libraryItems"] }
-    ];
-    const results = {
-      found: 0,
-      missing: 0,
-      details: {}
-    };
-    testSelectors.forEach(({ name, selector }) => {
-      if (!selector) return;
-      const elements = findElementsWithFallback(selector);
-      const count = elements.length;
-      results.details[name] = {
-        selector,
-        count,
-        exists: count > 0
-      };
-      if (count > 0) {
-        results.found++;
-        console.log(`\u2705 ${name}: ${count} elements found (${selector})`);
-      } else {
-        results.missing++;
-        console.warn(`\u274C ${name}: No elements found (${selector})`);
-      }
-    });
-    console.log(
-      `\u{1F4CA} Prediction Targets Summary: ${results.found} types found, ${results.missing} missing`
-    );
-    console.groupEnd();
-    return results;
-  }
-  function testPhase2Systems() {
-    console.group("\u{1F30C} [SpotifyDOMSelectors] Phase 2 - System Integration Test");
-    const systemTests = {
-      behavioralPrediction: validatePredictionTargets(),
-      dimensionalNexus: {
-        sidebarElement: MODERN_SELECTORS["leftSidebar"] ? elementExists(MODERN_SELECTORS["leftSidebar"]) : false
-      },
-      dataGlyph: {
-        navLinks: MODERN_SELECTORS["navBarLink"] ? elementExists(MODERN_SELECTORS["navBarLink"]) : false,
-        trackRows: ORBITAL_ELEMENTS["trackRows"] ? elementExists(ORBITAL_ELEMENTS["trackRows"]) : false,
-        cards: ORBITAL_ELEMENTS["cards"] ? elementExists(ORBITAL_ELEMENTS["cards"]) : false
-      }
-    };
-    let totalIssues = 0;
-    Object.values(systemTests).forEach((tests) => {
-      if (typeof tests === "object" && tests.missing) {
-        totalIssues += tests.missing;
-      }
-    });
-    console.log(
-      `\u{1F3AF} Phase 2 Integration Health: ${totalIssues === 0 ? "\u2705 All systems operational" : `\u26A0\uFE0F ${totalIssues} issues detected`}`
-    );
-    console.groupEnd();
-    return systemTests;
-  }
-  var MODERN_SELECTORS, SELECTOR_MAPPINGS, ORBITAL_ELEMENTS, GRAVITY_WELL_TARGETS, ANTI_GRAVITY_ZONES;
-  var init_SpotifyDOMSelectors = __esm({
-    "src-js/debug/SpotifyDOMSelectors.ts"() {
-      "use strict";
-      init_domCache();
-      MODERN_SELECTORS = {
-        // Main Layout Structure
-        nowPlayingBar: ".Root__now-playing-bar",
-        leftSidebar: ".Root__nav-bar",
-        mainView: ".Root__main-view",
-        rightSidebar: ".Root__right-sidebar",
-        // Now Playing Components
-        nowPlayingWidget: "[data-testid='now-playing-widget']",
-        nowPlayingLeft: ".main-nowPlayingBar-left",
-        nowPlayingCenter: ".main-nowPlayingBar-center",
-        nowPlayingRight: ".main-nowPlayingBar-right",
-        coverArt: ".main-coverSlotCollapsed-container",
-        trackInfo: ".main-trackInfo-container",
-        // Navigation & Library
-        navMain: "nav[aria-label='Main']",
-        yourLibrary: ".main-yourLibraryX-libraryContainer",
-        libraryItems: ".main-yourLibraryX-listItem",
-        libraryHeader: ".main-yourLibraryX-header",
-        playlistList: ".main-rootlist-wrapper",
-        // Track Lists & Content
-        trackListContainer: "[role='grid'][aria-label*='tracks']",
-        trackRow: ".main-trackList-trackListRow",
-        trackListHeader: ".main-trackList-trackListHeaderRow",
-        trackNumber: ".main-trackList-rowSectionIndex",
-        trackTitle: ".main-trackList-rowTitle",
-        trackArtist: ".main-trackList-rowSubTitle",
-        // Entity Headers (Playlist/Album/Artist Pages)
-        entityHeader: ".main-entityHeader-container",
-        entityTitle: ".main-entityHeader-title",
-        entityMetadata: ".main-entityHeader-metaData",
-        entityImage: ".main-entityHeader-imageContainer",
-        // Action Bar & Controls
-        actionBar: ".main-actionBar-ActionBarRow",
-        actionBarInner: ".main-actionBar-ActionBar",
-        playButton: "[data-testid='play-button']",
-        pauseButton: "[data-testid='pause-button']",
-        shuffleButton: "[data-testid='shuffle-button']",
-        likeButton: ".control-button-heart",
-        // Queue & Right Sidebar
-        queue: ".main-queue-trackList",
-        queueContainer: "[aria-label='Next in queue']",
-        aboutArtist: "[aria-label='About the artist']",
-        credits: "[aria-label='Credits']",
-        // Search & Filtering
-        searchInput: "[data-testid='search-input']",
-        searchPage: "[data-testid='search-container']",
-        filterPills: ".main-genre-chip",
-        sortButton: "[data-testid='sort-button']",
-        // Cards & Media
-        card: ".main-card-card",
-        cardImage: ".main-cardImage-image",
-        albumArt: ".main-trackList-albumArt",
-        // Modal & Overlay
-        modal: ".main-modal-container",
-        overlay: ".main-overlay-container"
-      };
-      SELECTOR_MAPPINGS = Object.entries({
-        // Migration mapping: legacy → modern
-        ".main-nowPlayingWidget-nowPlaying": MODERN_SELECTORS["nowPlayingBar"],
-        ".main-navBar-navBar": MODERN_SELECTORS["leftSidebar"],
-        ".main-search-searchBar": MODERN_SELECTORS["searchInput"],
-        ".main-topBar-topBar": MODERN_SELECTORS["actionBar"],
-        ".main-queue-queue": MODERN_SELECTORS["queue"],
-        ".main-trackList-trackList": MODERN_SELECTORS["trackListContainer"]
-      }).reduce((acc, [key, value]) => {
-        if (typeof value === "string") {
-          acc[key] = value;
-        }
-        return acc;
-      }, {});
-      ORBITAL_ELEMENTS = {
-        // Elements that can have orbital gravity effects
-        trackRows: MODERN_SELECTORS["trackRow"] ?? "",
-        libraryItems: MODERN_SELECTORS["libraryItems"] ?? "",
-        cards: MODERN_SELECTORS["card"] ?? "",
-        navLinks: ".main-navBar-navBarLink"
-        // This one still works
-      };
-      GRAVITY_WELL_TARGETS = {
-        // Major UI elements that should have gravity wells
-        primary: [
-          MODERN_SELECTORS["nowPlayingBar"],
-          MODERN_SELECTORS["leftSidebar"],
-          MODERN_SELECTORS["entityHeader"]
-        ].filter((s) => !!s),
-        secondary: [
-          MODERN_SELECTORS["actionBar"],
-          MODERN_SELECTORS["queue"],
-          MODERN_SELECTORS["searchInput"]
-        ].filter((s) => !!s),
-        tertiary: [
-          MODERN_SELECTORS["playButton"],
-          MODERN_SELECTORS["trackListHeader"]
-        ].filter((s) => !!s)
-      };
-      ANTI_GRAVITY_ZONES = {
-        // Areas where anti-gravity effects should be applied
-        searchAreas: [
-          MODERN_SELECTORS["searchInput"],
-          MODERN_SELECTORS["searchPage"]
-        ].filter((s) => !!s),
-        notifications: [
-          "[data-testid='notification-bar']",
-          ".main-topBar-notifications"
-        ],
-        dropdowns: [".main-dropdown-menu", "[role='menu']", "[role='listbox']"]
-      };
-      __name(elementExists, "elementExists");
-      __name(findElementsWithFallback, "findElementsWithFallback");
-      __name(validateSpotifyDOM, "validateSpotifyDOM");
-      __name(testGravitySystemSelectors, "testGravitySystemSelectors");
-      __name(validatePredictionTargets, "validatePredictionTargets");
-      __name(testPhase2Systems, "testPhase2Systems");
-      if (typeof window !== "undefined") {
-        window.SpotifyDOMSelectors = {
-          validate: validateSpotifyDOM,
-          testGravity: testGravitySystemSelectors,
-          validatePredictionTargets,
-          testPhase2Systems,
-          selectors: MODERN_SELECTORS,
-          targets: GRAVITY_WELL_TARGETS,
-          orbital: ORBITAL_ELEMENTS,
-          antiGravity: ANTI_GRAVITY_ZONES
-        };
-        console.log("\u{1F3AF} [SpotifyDOMSelectors] Debug functions available:");
-        console.log("  window.SpotifyDOMSelectors.validate() - Test all selectors");
-        console.log(
-          "  window.SpotifyDOMSelectors.testGravity() - Test gravity selectors"
-        );
-      }
-    }
-  });
-
-  // src-js/visual/ui-effects/BehavioralPredictionEngine.ts
-  var _BehavioralPredictionEngine, BehavioralPredictionEngine;
-  var init_BehavioralPredictionEngine = __esm({
-    "src-js/visual/ui-effects/BehavioralPredictionEngine.ts"() {
-      "use strict";
-      init_SpotifyDOMSelectors();
-      init_BaseVisualSystem();
-      _BehavioralPredictionEngine = class _BehavioralPredictionEngine extends BaseVisualSystem {
-        constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System2 = null) {
-          super(config, utils, performanceMonitor, musicSyncService, settingsManager);
-          this.quantumEmpathyInitialized = false;
-          this.predictionTimer = null;
-          this.animationTimer = null;
-          this.lastPredictionTime = 0;
-          this.year3000System = year3000System2;
-          this.modeConfig = {};
-          this.predictionModel = this.initializePredictionModel();
-          this.activeHighlights = /* @__PURE__ */ new WeakMap();
-          this.predictionSensitivity = 0.5;
-          this.highlightResponsiveness = 0.8;
-          this._activeTimers = [];
-          this._eventListeners = [];
-          this.quantumEmpathy = {
-            enabled: false,
-            empathyScore: 0.5,
-            confidenceThreshold: 0.6,
-            learningCurve: 0.8,
-            patternDatabase: /* @__PURE__ */ new Map(),
-            actionProbabilities: /* @__PURE__ */ new Map(),
-            interactionHistory: [],
-            maxHistoryLength: 50,
-            learningThrottleMs: 1e3,
-            predictionUpdateMs: 500,
-            maxActiveAnimations: 5,
-            maxWarmthIntensity: 0.8,
-            currentActiveAnimations: 0
-          };
-          this._predictiveSystem = year3000System2 && year3000System2.getSystem ? year3000System2.getSystem("PredictiveMaterializationSystem") : null;
-          if (this.config?.enableDebug) {
-            console.log(
-              `\u{1F30C} [${this.systemName}] Optimized Quantum Empathy system initialized.`
-            );
-          }
-        }
-        // TODO: Implement abstract onAnimate method for Year 3000 MasterAnimationCoordinator
-        onAnimate(deltaMs) {
-        }
-        async initialize() {
-          await super.initialize();
-          if (this.modeConfig?.quantumEmpathyEnabled) {
-            this.initializeOptimizedQuantumEmpathy();
-          }
-          if (this.config?.enableDebug) {
-            console.log(
-              `\u{1F9E0} [${this.systemName}] Initialized with empathy status: ${this.modeConfig?.quantumEmpathyEnabled ? "COSMIC ACTIVE" : "DORMANT"}.`
-            );
-          }
-        }
-        initializeOptimizedQuantumEmpathy() {
-          if (this.quantumEmpathyInitialized) return;
-          this.setupOptimizedInteractionTracking();
-          this.startOptimizedPredictiveHighlighting();
-          this.setupSelectiveAnticipatoryAnimations();
-          this.quantumEmpathyInitialized = true;
-          if (this.config?.enableDebug) {
-            console.log(
-              `\u{1F31F} [${this.systemName}] Optimized Quantum Empathy online - sensing with cosmic efficiency...`
-            );
-          }
-        }
-        setupOptimizedInteractionTracking() {
-          const keyInteractionEvents = ["click", "focus"];
-          let lastLearningTime = 0;
-          keyInteractionEvents.forEach((eventType) => {
-            const handler = /* @__PURE__ */ __name((event) => {
-              const now = Date.now();
-              if (now - lastLearningTime > this.quantumEmpathy.learningThrottleMs) {
-                this.recordOptimizedInteraction(event);
-                lastLearningTime = now;
-              }
-            }, "handler");
-            document.addEventListener(eventType, handler, { passive: true });
-            this._eventListeners.push({
-              element: document,
-              event: eventType,
-              handler
-            });
-          });
-        }
-        recordOptimizedInteraction(event) {
-          if (!this.modeConfig?.quantumEmpathyEnabled) return;
-          const interaction = {
-            type: event.type,
-            target: this.getElementSignature(event.target),
-            timestamp: Date.now(),
-            context: this.getCurrentMusicContext()
-          };
-          this.quantumEmpathy.interactionHistory.push(interaction);
-          if (this.quantumEmpathy.interactionHistory.length > this.quantumEmpathy.maxHistoryLength) {
-            this.quantumEmpathy.interactionHistory.shift();
-          }
-          this.learnFromInteractionOptimized(interaction);
-        }
-        getElementSignature(element) {
-          if (!element) return "unknown";
-          const signatures = [];
-          if (element.className && typeof element.className === "string")
-            signatures.push(`class:${element.className.split(" ")[0]}`);
-          if (element.tagName)
-            signatures.push(`tag:${element.tagName.toLowerCase()}`);
-          return signatures.join("|") || "anonymous";
-        }
-        getCurrentMusicContext() {
-          const latestMusicData = this.musicSyncService?.getLatestProcessedData?.() || {};
-          return {
-            energy: latestMusicData.processedEnergy || 0.5,
-            valence: latestMusicData.valence || 0.5,
-            timeSegment: Math.floor((/* @__PURE__ */ new Date()).getHours() / 6)
-          };
-        }
-        learnFromInteractionOptimized(interaction) {
-          const patternKey = `${interaction.target}:${interaction.type}`;
-          if (!this.quantumEmpathy.patternDatabase.has(patternKey)) {
-            this.quantumEmpathy.patternDatabase.set(patternKey, {
-              frequency: 0,
-              contexts: [],
-              lastUsed: 0,
-              confidence: 0.1
-            });
-          }
-          const pattern = this.quantumEmpathy.patternDatabase.get(patternKey);
-          pattern.frequency += 1;
-          pattern.lastUsed = Date.now();
-          pattern.contexts.push(interaction.context);
-          if (pattern.contexts.length > 3) {
-            pattern.contexts.shift();
-          }
-          const recencyFactor = Math.exp(-(Date.now() - pattern.lastUsed) / 6e4);
-          pattern.confidence = Math.min(1, pattern.frequency / 5 * recencyFactor);
-          if (this.quantumEmpathy.patternDatabase.size > 100) {
-            this.cleanupOldPatterns();
-          }
-        }
-        cleanupOldPatterns() {
-          const cutoffTime = Date.now() - 3e5;
-          for (const [
-            key,
-            pattern
-          ] of this.quantumEmpathy.patternDatabase.entries()) {
-            if (pattern.lastUsed < cutoffTime && pattern.confidence < 0.3) {
-              this.quantumEmpathy.patternDatabase.delete(key);
-            }
-          }
-        }
-        startOptimizedPredictiveHighlighting() {
-          if (this.predictionTimer) {
-            clearInterval(this.predictionTimer);
-            const index = this._activeTimers.indexOf(this.predictionTimer);
-            if (index > -1) {
-              this._activeTimers.splice(index, 1);
-            }
-          }
-          if (this.year3000System?.timerConsolidationSystem) {
-            this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
-              "BehavioralPredictionEngine-prediction",
-              () => this.applySelectivePredictiveHighlighting(),
-              this.quantumEmpathy.predictionUpdateMs,
-              "normal"
-            );
-            this.predictionTimer = null;
-          } else {
-            this.predictionTimer = setInterval(() => {
-              this.applySelectivePredictiveHighlighting();
-            }, this.quantumEmpathy.predictionUpdateMs);
-            this._activeTimers.push(this.predictionTimer);
-          }
-        }
-        calculateOptimizedPredictions() {
-          const currentContext = this.getCurrentMusicContext();
-          const predictions = [];
-          if (!this.quantumEmpathy.patternDatabase) return predictions;
-          for (const [
-            key,
-            pattern
-          ] of this.quantumEmpathy.patternDatabase.entries()) {
-            const confidence = pattern.confidence || 0;
-            if (confidence < this.quantumEmpathy.confidenceThreshold) continue;
-            const contextSimilarity = this.calculateSimplifiedContextSimilarity(
-              pattern.contexts,
-              currentContext
-            );
-            const finalConfidence = confidence * contextSimilarity;
-            if (finalConfidence > this.predictionSensitivity) {
-              const [target, type] = key.split(":");
-              if (target && type) {
-                predictions.push({
-                  target,
-                  type,
-                  confidence: finalConfidence
-                });
-              }
-            }
-          }
-          return predictions.sort((a, b) => b.confidence - a.confidence);
-        }
-        calculateSimplifiedContextSimilarity(pastContexts, currentContext) {
-          if (pastContexts.length === 0) return 0.5;
-          let totalSimilarity = 0;
-          for (const pContext of pastContexts) {
-            const energyDiff = Math.abs(pContext.energy - currentContext.energy);
-            const valenceDiff = Math.abs(pContext.valence - currentContext.valence);
-            const timeDiff = pContext.timeSegment === currentContext.timeSegment ? 0 : 1;
-            const similarity = 1 - (energyDiff + valenceDiff + timeDiff) / 3;
-            totalSimilarity += similarity;
-          }
-          return totalSimilarity / pastContexts.length;
-        }
-        applySelectivePredictiveHighlighting() {
-          const predictions = this.calculateOptimizedPredictions();
-          const topPredictions = predictions.slice(0, 5);
-          const elementsToHighlight = /* @__PURE__ */ new Map();
-          for (const prediction of topPredictions) {
-            const elements = this.findElementsBySignature(prediction.target);
-            for (const element of elements) {
-              if (!elementsToHighlight.has(element) || (elementsToHighlight.get(element) ?? 0) < prediction.confidence) {
-                elementsToHighlight.set(element, prediction.confidence);
-              }
-            }
-          }
-          document.querySelectorAll(".sn-predictive-highlight").forEach((el) => {
-            if (!elementsToHighlight.has(el)) {
-              el.classList.remove("sn-predictive-highlight");
-              el.classList.remove("sn-predictive-highlight-strong");
-            }
-          });
-          for (const [element, confidence] of elementsToHighlight.entries()) {
-            element.classList.add("sn-predictive-highlight");
-            if (confidence > 0.75) {
-              element.classList.add("sn-predictive-highlight-strong");
-            }
-          }
-        }
-        findElementsBySignature(signature) {
-          if (!signature || typeof signature !== "string") return [];
-          try {
-            const parts = signature.split("|");
-            let selector = "";
-            parts.forEach((part) => {
-              const [type, value] = part.split(":");
-              if (type === "class" && value) {
-                selector += `.${value}`;
-              } else if (type === "tag" && value) {
-                selector += `${value}`;
-              }
-            });
-            if (selector) {
-              return Array.from(document.querySelectorAll(selector));
-            }
-          } catch (error) {
-            console.warn(
-              `[${this.systemName}] Invalid selector signature:`,
-              signature,
-              error
-            );
-          }
-          return [];
-        }
-        setupSelectiveAnticipatoryAnimations() {
-          if (this.animationTimer) {
-            clearInterval(this.animationTimer);
-            const index = this._activeTimers.indexOf(this.animationTimer);
-            if (index > -1) {
-              this._activeTimers.splice(index, 1);
-            }
-          }
-          if (this.year3000System?.timerConsolidationSystem) {
-            this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
-              "BehavioralPredictionEngine-animation",
-              () => {
-                if (this.quantumEmpathy.currentActiveAnimations < this.quantumEmpathy.maxActiveAnimations) {
-                  const predictions = this.calculateOptimizedPredictions();
-                  const prediction = predictions[0];
-                  if (prediction) {
-                    const elements = this.findElementsBySignature(prediction.target);
-                    const firstElement = elements[0];
-                    if (firstElement && prediction.type) {
-                      this.triggerOptimizedAnticipatoryAnimation(
-                        firstElement,
-                        prediction.type,
-                        prediction.confidence
-                      );
-                    }
-                  }
-                }
-              },
-              this.quantumEmpathy.predictionUpdateMs * 2,
-              "background"
-            );
-            this.animationTimer = null;
-          } else {
-            this.animationTimer = setInterval(() => {
-              if (this.quantumEmpathy.currentActiveAnimations < this.quantumEmpathy.maxActiveAnimations) {
-                const predictions = this.calculateOptimizedPredictions();
-                const prediction = predictions[0];
-                if (prediction) {
-                  const elements = this.findElementsBySignature(prediction.target);
-                  const firstElement = elements[0];
-                  if (firstElement && prediction.type) {
-                    this.triggerOptimizedAnticipatoryAnimation(
-                      firstElement,
-                      prediction.type,
-                      prediction.confidence
-                    );
-                  }
-                }
-              }
-            }, this.quantumEmpathy.predictionUpdateMs * 2);
-            this._activeTimers.push(this.animationTimer);
-          }
-        }
-        triggerOptimizedAnticipatoryAnimation(element, actionType, confidence) {
-          if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-            return;
-          }
-          if (this._predictiveSystem?.setTargetElement) {
-            this._predictiveSystem.setTargetElement(element);
-          }
-          this.quantumEmpathy.currentActiveAnimations++;
-          const clamped = Math.max(0.6, Math.min(1, confidence));
-          const intensity = 0.15 + (clamped - 0.6) / 0.4 * 0.2;
-          const durationMs = 1500 - (clamped - 0.6) / 0.4 * 600;
-          const hueShift = (Math.random() * 40 - 20).toFixed(1);
-          if (this._predictiveSystem?.triggerAnticipatoryWarmth) {
-            this._predictiveSystem.triggerAnticipatoryWarmth(element, {
-              hue: parseFloat(hueShift),
-              intensity,
-              durationMs
-            });
-          } else {
-            element.classList.add("sn-anticipatory-warmth");
-            element.style.setProperty(
-              "--sn-anticipatory-intensity",
-              intensity.toFixed(3)
-            );
-            element.style.setProperty(
-              "--sn-anticipatory-hue",
-              `${hueShift}deg`
-            );
-            element.style.setProperty(
-              "--sn-warmth-intensity",
-              intensity.toFixed(3)
-            );
-            element.style.setProperty(
-              "--sn-warmth-duration",
-              `${durationMs}ms`
-            );
-            const animationEndHandler = /* @__PURE__ */ __name(() => {
-              element.classList.remove("sn-anticipatory-warmth");
-              this.quantumEmpathy.currentActiveAnimations--;
-              element.removeEventListener("animationend", animationEndHandler);
-            }, "animationEndHandler");
-            element.addEventListener("animationend", animationEndHandler);
-          }
-        }
-        updateFromMusicAnalysis(processedMusicData, timestamp) {
-          if (!this.initialized || !this.modeConfig?.quantumEmpathyEnabled) return;
-          const now = Date.now();
-          if (now - this.lastPredictionTime > this.quantumEmpathy.predictionUpdateMs) {
-            this.predictUserInteractions(
-              processedMusicData,
-              now - this.lastPredictionTime
-            );
-            this.lastPredictionTime = now;
-          }
-        }
-        generatePredictions(context) {
-          const predictions = [];
-          Object.keys(this.predictionModel).forEach((action) => {
-            const actionModel = this.predictionModel[action];
-            let score = actionModel.base;
-            Object.keys(context).forEach((feature) => {
-              if (actionModel[feature]) {
-                score += actionModel[feature] * context[feature] / 100;
-              }
-            });
-            if (score > (actionModel.threshold ?? this.predictionSensitivity)) {
-              predictions.push({
-                target: action,
-                type: "highlight",
-                confidence: score
-              });
-            }
-          });
-          return predictions;
-        }
-        applyHighlights(predictions) {
-          const elementsToDeactivate = new Set(
-            Object.keys(MODERN_SELECTORS).map((key) => key.toLowerCase())
-          );
-          predictions.forEach((prediction) => {
-            const key = prediction.target.toLowerCase();
-            const selector = MODERN_SELECTORS[key] || ORBITAL_ELEMENTS[key];
-            if (selector) {
-              elementsToDeactivate.delete(key);
-              const elements = findElementsWithFallback(key);
-              elements.forEach((element) => {
-                const highlightClass = this.getHighlightClasses(
-                  prediction.confidence > 0.7 ? "strong" : "default"
-                );
-                if (!this.activeHighlights.has(element)) {
-                  element.classList.add(...highlightClass);
-                  this.activeHighlights.set(element, highlightClass.join(" "));
-                }
-              });
-            }
-          });
-          elementsToDeactivate.forEach((key) => {
-            const elements = findElementsWithFallback(key);
-            elements.forEach((element) => {
-              const classes = this.activeHighlights.get(element);
-              if (classes) {
-                element.classList.remove(...classes.split(" "));
-                this.activeHighlights.delete(element);
-              }
-            });
-          });
-        }
-        /**
-         * Map confidence buckets to CSS classes defined in _sn_prediction_effects.scss.
-         * The naming now aligns with the unified "sn-predict-" convention.
-         */
-        getHighlightClasses(_type = "default") {
-          return ["sn-anticipatory-warmth"];
-        }
-        updateModeConfiguration(modeConfig) {
-          super.updateModeConfiguration(modeConfig);
-          this.updatePredictionBehaviorForMode();
-          if (this.modeConfig?.quantumEmpathyEnabled) {
-            this.initializeOptimizedQuantumEmpathy();
-          } else {
-            this.destroy();
-          }
-        }
-        updatePredictionBehaviorForMode() {
-          if (!this.modeConfig) return;
-          const settings = this.modeConfig.predictionSettings;
-          if (settings) {
-            this.predictionSensitivity = settings.sensitivity ?? 0.5;
-            this.highlightResponsiveness = settings.responsiveness ?? 0.8;
-            this.quantumEmpathy.confidenceThreshold = settings.confidenceThreshold ?? 0.6;
-          }
-        }
-        destroy() {
-          super.destroy();
-          if (this.year3000System?.timerConsolidationSystem) {
-            this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("BehavioralPredictionEngine-prediction");
-            this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("BehavioralPredictionEngine-animation");
-          }
-          this._activeTimers.forEach(clearInterval);
-          this._activeTimers = [];
-          if (this.predictionTimer) {
-            clearInterval(this.predictionTimer);
-            this.predictionTimer = null;
-          }
-          if (this.animationTimer) {
-            clearInterval(this.animationTimer);
-            this.animationTimer = null;
-          }
-          this._eventListeners.forEach(({ element, event, handler }) => {
-            element.removeEventListener(event, handler);
-          });
-          this._eventListeners = [];
-          this.quantumEmpathyInitialized = false;
-          this.quantumEmpathy.currentActiveAnimations = 0;
-          this.quantumEmpathy.patternDatabase.clear();
-          this.quantumEmpathy.actionProbabilities.clear();
-          this.quantumEmpathy.interactionHistory = [];
-          document.querySelectorAll(".sn-predictive-highlight, .sn-predictive-highlight-strong, .sn-anticipatory-warmth").forEach((el) => {
-            el.classList.remove("sn-predictive-highlight", "sn-predictive-highlight-strong", "sn-anticipatory-warmth");
-          });
-          if (this.config?.enableDebug) {
-            console.log(
-              `[${this.systemName}] Destroyed. No longer predicting user behavior.`
-            );
-          }
-        }
-        testUpdatedSelectors() {
-          console.log("===== BehavioralPredictionEngine: Selector Test =====");
-          let allFound = true;
-          Object.keys(MODERN_SELECTORS).forEach((key) => {
-            const elements = findElementsWithFallback(key);
-            if (elements.length > 0) {
-              console.log(`\u2705 Found ${elements.length} for key: ${key}`);
-            } else {
-              console.error(`\u274C Missing element for key: ${key}`);
-              allFound = false;
-            }
-          });
-          console.log(
-            allFound ? "\u2705 All primary selectors are valid." : "\u274C Some selectors failed."
-          );
-        }
-        simulateHighlighting() {
-          const mockPredictions = Object.keys(MODERN_SELECTORS).map((key) => ({
-            target: key,
-            type: "highlight",
-            confidence: Math.random()
-          })).slice(0, 3);
-          console.log(
-            "Simulating highlights for:",
-            mockPredictions.map((p) => p.target)
-          );
-          this.applyHighlights(mockPredictions);
-          setTimeout(() => {
-            console.log("Clearing simulated highlights.");
-            this.applyHighlights([]);
-          }, 2e3);
-        }
-        initializePredictionModel() {
-          return {
-            playButton: { base: 60, energy: 20, tempo: -10, threshold: 65 },
-            nextButton: { base: 40, energy: 15, valence: -15, threshold: 50 },
-            progressBar: { base: 30, energy: -10, loudness: 10 },
-            likeButton: { base: 50, valence: 30, energy: 10, threshold: 60 },
-            sidebarPlaylists: { base: 25, acousticness: -15 }
-          };
-        }
-        updateAnimation(timestamp, deltaTime) {
-          if (!this.initialized || !this.modeConfig?.quantumEmpathyEnabled) return;
-        }
-        predictUserInteractions(musicData, deltaTime) {
-          if (!musicData) return;
-          const context = {
-            energy: musicData.energy || 0,
-            valence: musicData.valence || 0,
-            tempo: musicData.tempo || 0,
-            loudness: musicData.loudness || 0
-          };
-          const predictions = this.generatePredictions(context);
-          if (predictions.length > 0) {
-            this.applyHighlights(predictions);
-          }
-        }
-      };
-      __name(_BehavioralPredictionEngine, "BehavioralPredictionEngine");
-      BehavioralPredictionEngine = _BehavioralPredictionEngine;
-    }
-  });
-
   // src-js/visual/ui-effects/InteractionTrackingSystem.ts
   var _InteractionTrackingSystem, InteractionTrackingSystem;
   var init_InteractionTrackingSystem = __esm({
@@ -9843,1785 +9788,6 @@ void main() {
       };
       __name(_InteractionTrackingSystem, "InteractionTrackingSystem");
       InteractionTrackingSystem = _InteractionTrackingSystem;
-    }
-  });
-
-  // src-js/ui/managers/SettingsManager.ts
-  var _SettingsManager, SettingsManager;
-  var init_SettingsManager = __esm({
-    "src-js/ui/managers/SettingsManager.ts"() {
-      "use strict";
-      init_globalConfig();
-      init_Year3000Utilities();
-      _SettingsManager = class _SettingsManager {
-        constructor(config = YEAR3000_CONFIG, harmonicModes = HARMONIC_MODES, utils = Year3000Utilities_exports) {
-          this.initialized = false;
-          this.config = config;
-          this.harmonicModes = harmonicModes;
-          this.utils = utils;
-          this.defaults = {
-            "catppuccin-flavor": "mocha",
-            "catppuccin-accentColor": "mauve",
-            "sn-star-density": "balanced",
-            "sn-gradient-intensity": "balanced",
-            "sn-glassmorphism-level": "moderate",
-            "sn-3d-effects-level": "full",
-            "sn-nebula-intensity": "balanced",
-            "sn-artistic-mode": "artist-vision",
-            "sn-current-harmonic-mode": "analogous-flow",
-            "sn-harmonic-intensity": "0.7",
-            "sn-harmonic-evolution": "true",
-            "sn-harmonic-manual-base-color": "",
-            "sn-enable-aberration": "true",
-            "sn-nebula-aberration-strength": "0.4",
-            "sn-echo-intensity": "2",
-            "sn-visual-intensity": (() => {
-              try {
-                const detector = globalThis.year3000System?.deviceCapabilityDetector;
-                const overall = detector?.deviceCapabilities?.overall;
-                switch (overall) {
-                  case "high":
-                    return "1";
-                  case "medium":
-                    return "0.7";
-                  case "low":
-                    return "0.4";
-                  default:
-                    return "0.8";
-                }
-              } catch (e) {
-                return "0.8";
-              }
-            })(),
-            "sn-animation-quality": "auto",
-            "sn-glass-beat-pulse": "true",
-            "sn-glass-base-intensity": "0.5",
-            "sn-flow-gradient": "balanced"
-          };
-          this.validationSchemas = {
-            "catppuccin-flavor": {
-              default: "mocha",
-              allowedValues: ["latte", "frappe", "macchiato", "mocha"]
-            },
-            "catppuccin-accentColor": {
-              default: "mauve",
-              allowedValues: [
-                "rosewater",
-                "flamingo",
-                "pink",
-                "mauve",
-                "red",
-                "maroon",
-                "peach",
-                "yellow",
-                "green",
-                "teal",
-                "sky",
-                "sapphire",
-                "blue",
-                "lavender",
-                "text",
-                "none"
-              ]
-            },
-            "sn-star-density": {
-              default: "balanced",
-              allowedValues: ["disabled", "minimal", "balanced", "intense"]
-            },
-            "sn-gradient-intensity": {
-              default: "balanced",
-              allowedValues: ["disabled", "minimal", "balanced", "intense"]
-            },
-            "sn-glassmorphism-level": {
-              default: "moderate",
-              allowedValues: ["disabled", "minimal", "moderate", "intense"]
-            },
-            "sn-3d-effects-level": {
-              default: "full",
-              allowedValues: ["full", "minimal", "disabled"]
-            },
-            "sn-nebula-intensity": {
-              default: "balanced",
-              allowedValues: ["disabled", "minimal", "balanced", "intense"]
-            },
-            "sn-artistic-mode": {
-              default: "artist-vision",
-              allowedValues: Object.keys(ARTISTIC_MODE_PROFILES)
-            },
-            "sn-current-harmonic-mode": {
-              default: "analogous-flow",
-              allowedValues: Object.keys(
-                this.harmonicModes
-              )
-            },
-            "sn-harmonic-intensity": { default: "0.7" },
-            "sn-harmonic-evolution": {
-              default: "true",
-              allowedValues: ["true", "false"]
-            },
-            "sn-harmonic-manual-base-color": { default: "" },
-            "sn-enable-aberration": {
-              default: "true",
-              allowedValues: ["true", "false"]
-            },
-            "sn-nebula-aberration-strength": { default: "0.4" },
-            "sn-echo-intensity": {
-              default: "2",
-              allowedValues: ["0", "1", "2", "3"]
-            },
-            "sn-visual-intensity": { default: "0.8" },
-            "sn-animation-quality": {
-              default: "auto",
-              allowedValues: ["auto", "low", "high"]
-            },
-            "sn-glass-beat-pulse": {
-              default: "true",
-              allowedValues: ["true", "false"]
-            },
-            "sn-glass-base-intensity": { default: "0.5" },
-            "sn-flow-gradient": {
-              default: "balanced",
-              allowedValues: ["disabled", "minimal", "balanced", "intense"]
-            }
-          };
-          this.validateAndRepair();
-          this.initialized = true;
-        }
-        forceRepaint(reason) {
-          throw new Error("Method not implemented.");
-        }
-        async initialize() {
-          this.initialized = true;
-        }
-        async healthCheck() {
-          try {
-            Spicetify.LocalStorage.get("spicetify-exp-features");
-            return {
-              healthy: true,
-              ok: true,
-              details: "LocalStorage is accessible.",
-              issues: [],
-              system: "SettingsManager"
-            };
-          } catch (e) {
-            return {
-              healthy: false,
-              ok: false,
-              details: "Failed to access Spicetify.LocalStorage.",
-              issues: [e.message],
-              system: "SettingsManager"
-            };
-          }
-        }
-        get(key) {
-          try {
-            const value = Spicetify.LocalStorage.get(key);
-            const schema = this.validationSchemas[key];
-            if (!schema) {
-              console.warn(`StarryNight: No validation schema for key: ${key}.`);
-              return value;
-            }
-            if (value === null || schema.allowedValues && !schema.allowedValues.includes(value)) {
-              return schema.default;
-            }
-            return value;
-          } catch (error) {
-            console.error(`StarryNight: Error reading key ${key}:`, error);
-            return this.validationSchemas[key]?.default;
-          }
-        }
-        getAllowedValues(key) {
-          return this.validationSchemas[key]?.allowedValues;
-        }
-        set(key, value) {
-          try {
-            const schema = this.validationSchemas[key];
-            if (!schema) {
-              Spicetify.LocalStorage.set(key, value);
-              return true;
-            }
-            if (key === "sn-harmonic-manual-base-color") {
-              if (value !== "" && !/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)) {
-                return false;
-              }
-            } else if (schema.allowedValues && !schema.allowedValues.includes(value)) {
-              return false;
-            }
-            Spicetify.LocalStorage.set(key, value);
-            document.dispatchEvent(
-              new CustomEvent("year3000SystemSettingsChanged", {
-                detail: { key, value }
-              })
-            );
-            return true;
-          } catch (error) {
-            console.error(`StarryNight: Error setting key ${key}:`, error);
-            return false;
-          }
-        }
-        getAllSettings() {
-          const settings = {};
-          for (const key in this.validationSchemas) {
-            settings[key] = this.get(key);
-          }
-          return settings;
-        }
-        validateAndRepair() {
-          let repairedCount = 0;
-          for (const key in this.validationSchemas) {
-            const aKey = key;
-            const currentValue = Spicetify.LocalStorage.get(aKey);
-            const validatedValue = this.get(aKey);
-            if (currentValue !== validatedValue) {
-              this.set(aKey, validatedValue);
-              repairedCount++;
-            }
-          }
-          if (repairedCount > 0) {
-            console.log(`StarryNight: Repaired ${repairedCount} invalid settings.`);
-          }
-        }
-        resetAllToDefaults() {
-          for (const key of Object.keys(this.defaults)) {
-            this.set(
-              key,
-              this.defaults[key]
-            );
-          }
-          console.log("StarryNight: All settings reset to defaults.");
-        }
-        // To satisfy the SystemHealthMonitor, which expects all registered systems
-        // to have these lifecycle methods.
-        updateAnimation() {
-        }
-        destroy() {
-          console.log("StarryNight: SettingsManager destroyed (no-op).");
-        }
-        // === NEW: Harmonic mode helpers ===========================================
-        /**
-         * Return the full HarmonicMode object for the currently selected mode.
-         * Falls back to the default entry ("analogous-flow") if the key is missing.
-         */
-        getCurrentHarmonicMode() {
-          const key = this.get("sn-current-harmonic-mode");
-          return this.harmonicModes[key] || this.harmonicModes["analogous-flow"];
-        }
-        /**
-         * Retrieve a HarmonicMode definition by key, or undefined if not found.
-         */
-        getHarmonicMode(key) {
-          return this.harmonicModes[key];
-        }
-      };
-      __name(_SettingsManager, "SettingsManager");
-      SettingsManager = _SettingsManager;
-    }
-  });
-
-  // src-js/utils/platform/SpicetifyCompat.ts
-  var _SpicetifyCompat, SpicetifyCompat;
-  var init_SpicetifyCompat = __esm({
-    "src-js/utils/platform/SpicetifyCompat.ts"() {
-      "use strict";
-      _SpicetifyCompat = class _SpicetifyCompat {
-        /**
-         * Get audio data with fallback handling
-         * Uses correct Spicetify.getAudioData() API with fallback to legacy patterns
-         */
-        static async getAudioData() {
-          try {
-            if (typeof Spicetify !== "undefined" && Spicetify.getAudioData) {
-              return await Spicetify.getAudioData();
-            } else {
-              console.warn("[SpicetifyCompat] Spicetify.getAudioData not available");
-              return null;
-            }
-          } catch (error) {
-            console.error("[SpicetifyCompat] Error fetching audio data:", error);
-            return null;
-          }
-        }
-        /**
-         * Check if Spicetify APIs are available
-         */
-        static isAvailable() {
-          return typeof Spicetify !== "undefined" && !!Spicetify.getAudioData;
-        }
-        /**
-         * Retry wrapper for audio data fetching
-         */
-        static async getAudioDataWithRetry(retryDelay = 200, maxRetries = 10) {
-          for (let attempt = 0; attempt < maxRetries; attempt++) {
-            try {
-              const audioData = await this.getAudioData();
-              if (audioData) {
-                return audioData;
-              }
-            } catch (error) {
-              if (attempt < maxRetries - 1) {
-                console.log(
-                  `[SpicetifyCompat] Retrying audio data fetch (${attempt + 1}/${maxRetries})...`
-                );
-                await new Promise((resolve) => setTimeout(resolve, retryDelay));
-              } else {
-                console.warn(
-                  `[SpicetifyCompat] Audio data fetch failed after ${maxRetries} attempts:`,
-                  error
-                );
-              }
-            }
-          }
-          return null;
-        }
-      };
-      __name(_SpicetifyCompat, "SpicetifyCompat");
-      SpicetifyCompat = _SpicetifyCompat;
-    }
-  });
-
-  // src-js/audio/GenreProfileManager.ts
-  var GENRE_PROFILES, _GenreProfileManager, GenreProfileManager;
-  var init_GenreProfileManager = __esm({
-    "src-js/audio/GenreProfileManager.ts"() {
-      "use strict";
-      init_globalConfig();
-      GENRE_PROFILES = {
-        electronic: { energyBoost: 1.1, beatEmphasis: 1.2, precision: 0.9 },
-        dance: { energyBoost: 1.2, beatEmphasis: 1.25, precision: 0.95 },
-        house: { energyBoost: 1.2, beatEmphasis: 1.25, precision: 0.95 },
-        techno: { energyBoost: 1.15, beatEmphasis: 1.3, precision: 1 },
-        trance: { energyBoost: 1.15, beatEmphasis: 1.1, precision: 0.85 },
-        rock: { energyBoost: 1.05, intensityMultiplier: 1.1, dynamicRange: 1.1 },
-        metal: { energyBoost: 1.15, intensityMultiplier: 1.2, dynamicRange: 1.2 },
-        punk: { energyBoost: 1.2, intensityMultiplier: 1.1, precision: 0.8 },
-        hiphop: { beatEmphasis: 1.3, grooveFactor: 1.2, tempoMultiplier: 0.95 },
-        rap: { beatEmphasis: 1.3, grooveFactor: 1.2, tempoMultiplier: 0.95 },
-        jazz: { adaptiveVariation: true, complexity: 1.2, smoothingFactor: 1.3 },
-        classical: {
-          gentleMode: true,
-          dynamicRange: 1.4,
-          tempoVariationHandling: "adaptive"
-        },
-        ambient: { subtleMode: true, intensityReduction: 0.7, smoothingFactor: 1.5 },
-        pop: { energyBoost: 1.05, beatEmphasis: 1.1, precision: 0.85 },
-        rnb: { grooveFactor: 1.25, smoothingFactor: 1.1 },
-        soul: { grooveFactor: 1.3, smoothingFactor: 1.15 },
-        default: {
-          balanced: true,
-          energyBoost: 1,
-          beatEmphasis: 1,
-          precision: 1
-        }
-      };
-      _GenreProfileManager = class _GenreProfileManager {
-        constructor(dependencies = {}) {
-          this.config = dependencies.YEAR3000_CONFIG || YEAR3000_CONFIG;
-          if (this.config.enableDebug) {
-            console.log("\u{1F9EC} [GenreProfileManager] Initialized");
-          }
-        }
-        _getGenreFromAudioFeatures(features) {
-          if (!features) return "default";
-          const { danceability, energy, acousticness, instrumentalness, tempo } = features;
-          if (instrumentalness > 0.6 && acousticness < 0.2 && energy > 0.6) {
-            if (tempo > 120) return "techno";
-            return "electronic";
-          }
-          if (danceability > 0.7 && energy > 0.7) return "dance";
-          if (acousticness > 0.7 && energy < 0.4) return "classical";
-          if (acousticness > 0.5 && instrumentalness < 0.1) return "jazz";
-          if (energy > 0.7 && instrumentalness < 0.1 && danceability > 0.5)
-            return "rock";
-          if (danceability > 0.7 && instrumentalness < 0.2 && energy > 0.5 && tempo < 110)
-            return "hiphop";
-          return "default";
-        }
-        getProfileForTrack(audioFeatures) {
-          const genre = this._getGenreFromAudioFeatures(audioFeatures);
-          const profile = GENRE_PROFILES[genre];
-          if (this.config.enableDebug) {
-            console.log(
-              `[GenreProfileManager] Detected genre: '${genre}'. Applying profile.`
-            );
-          }
-          if (profile) {
-            return profile;
-          }
-          const defaultProfile = GENRE_PROFILES.default;
-          if (defaultProfile) {
-            return defaultProfile;
-          }
-          throw new Error(
-            "[GenreProfileManager] Critical: Default genre profile is missing."
-          );
-        }
-        /**
-         * Public helper that returns the genre string detected for the given audio-features without
-         * allocating a full profile. Useful for colour/palette routing.
-         */
-        detectGenre(features) {
-          return this._getGenreFromAudioFeatures(features);
-        }
-      };
-      __name(_GenreProfileManager, "GenreProfileManager");
-      GenreProfileManager = _GenreProfileManager;
-    }
-  });
-
-  // src-js/audio/MusicSyncService.ts
-  var MUSIC_SYNC_CONFIG, _MusicSyncService, MusicSyncService;
-  var init_MusicSyncService = __esm({
-    "src-js/audio/MusicSyncService.ts"() {
-      "use strict";
-      init_globalConfig();
-      init_EventBus();
-      init_Year3000Utilities();
-      init_SpicetifyCompat();
-      init_StorageManager();
-      init_GenreProfileManager();
-      MUSIC_SYNC_CONFIG = {
-        enableDebug: true,
-        enableBeatSynchronization: true,
-        enableGenreAnalysis: true,
-        enableMoodAdaptation: true,
-        bpmCalculation: {
-          useEnhancedAlgorithm: true,
-          danceabilityWeight: 0.9,
-          energyWeight: 0.6,
-          bpmWeight: 0.6,
-          energyThreshold: 0.5,
-          danceabilityThreshold: 0.5,
-          bpmThreshold: 0.8,
-          maxBPM: 180,
-          minBPM: 60
-        },
-        performance: {
-          cacheSize: 100,
-          cacheTTL: 3e5,
-          maxRetries: 10,
-          retryDelay: 200,
-          enableMetrics: true,
-          processingTimeTarget: 50
-        },
-        synchronization: {
-          beatAccuracyTarget: 50,
-          maxSyncDelay: 1e3,
-          adaptiveQuality: true,
-          predictiveCaching: true,
-          debounceRapidChanges: 200
-        },
-        genreProfiles: {
-          electronic: { intensityMultiplier: 1.2, precisionBoost: 1.1 },
-          jazz: { smoothingFactor: 1.3, adaptiveVariation: true },
-          classical: { gentleMode: true, tempoVariationHandling: "adaptive" },
-          rock: { energyBoost: 1.15, consistentTiming: true },
-          ambient: { subtleMode: true, intensityReduction: 0.7 },
-          hiphop: { beatEmphasis: 1.25, rhythmPrecision: "high" },
-          default: { balanced: true }
-        },
-        musicVisualSync: {
-          enhancedBPM: {
-            fallbacks: {
-              tempo: 120,
-              loudness: -5,
-              key: 0,
-              timeSignature: 4
-            },
-            danceabilityEstimation: {
-              highDance: { min: 125, max: 145, value: 0.8 },
-              mediumDance: { min: 100, max: 124, value: 0.7 },
-              lowMediumDance: { min: 80, max: 99, value: 0.6 },
-              lowDance: { value: 0.5 }
-            },
-            energyEstimation: {
-              tempoRange: { min: 80, max: 160 },
-              loudnessRange: { min: -15, max: 0 },
-              tempoWeight: 0.6,
-              loudnessWeight: 0.4
-            }
-          }
-        }
-      };
-      _MusicSyncService = class _MusicSyncService {
-        constructor(dependencies = {}) {
-          this.isInitialized = false;
-          this.currentTrack = null;
-          this.audioData = null;
-          this.currentTrackUri = null;
-          this.latestProcessedData = null;
-          // High-precision beat scheduling
-          this.beatSchedulerTimer = null;
-          // Phase 1: Song Change Debouncing
-          this.songChangeDebounceTimer = null;
-          this.nextBeatIndex = 0;
-          this.currentSongBeats = [];
-          this.songStartTimestamp = 0;
-          this.metrics = {
-            bpmCalculations: 0,
-            beatSyncs: 0,
-            cacheHits: 0,
-            cacheMisses: 0,
-            avgProcessingTime: 0,
-            performance: [],
-            errors: 0,
-            updates: 0
-          };
-          this.unifiedCache = /* @__PURE__ */ new Map();
-          this.subscribers = /* @__PURE__ */ new Map();
-          this.beatSync = {
-            lastBeatTime: 0,
-            nextBeatTime: 0,
-            beatInterval: 0,
-            confidence: 0,
-            isActive: false
-          };
-          this.performanceInterval = null;
-          this.cacheCleanupInterval = null;
-          // Increment this prefix whenever cache schema changes to avoid stale data
-          this.CACHE_KEY_VERSION_PREFIX = "v3";
-          /** Current unit beat direction vector (updated each beat). */
-          this.currentBeatVector = { x: 0, y: 0 };
-          this.config = dependencies.YEAR3000_CONFIG || YEAR3000_CONFIG;
-          this.utils = dependencies.Year3000Utilities || Year3000Utilities_exports;
-          this.settingsManager = dependencies.settingsManager;
-          this.year3000System = dependencies.year3000System;
-          this.genreProfileManager = dependencies.genreProfileManager || new GenreProfileManager({ YEAR3000_CONFIG: this.config });
-          this.cacheTTL = MUSIC_SYNC_CONFIG.performance.cacheTTL;
-          this.userPreferences = this.loadUserPreferences();
-          if (this.config.enableDebug) {
-            console.log("\u{1F3B5} MusicSyncService constructor called");
-            console.log(
-              "\u{1F3B5} [MusicSyncService] Initialized with GenreProfileManager support"
-            );
-          }
-        }
-        async initialize() {
-          try {
-            if (this.config.enableDebug) {
-              console.log("\u{1F3B5} Initializing unified MusicSyncService...");
-            }
-            if (!SpicetifyCompat.isAvailable()) {
-              console.warn(
-                "[MusicSyncService] Spicetify audio data API not available at initialization. Some features may be limited."
-              );
-            }
-            this.setupCacheManagement();
-            if (MUSIC_SYNC_CONFIG.performance.enableMetrics) {
-              this.setupPerformanceMonitoring();
-            }
-            this.isInitialized = true;
-            if (this.config.enableDebug) {
-              console.log("\u{1F31F} MusicSyncService initialized successfully!");
-            }
-          } catch (error) {
-            console.error("\u274C MusicSyncService initialization failed:", error);
-            this.metrics.errors++;
-          }
-        }
-        // === SUBSCRIBER MANAGEMENT ===
-        subscribe(systemInstance, systemName) {
-          if (!systemInstance || typeof systemInstance.updateFromMusicAnalysis !== "function") {
-            console.warn(
-              `[MusicSyncService] Invalid system or missing updateFromMusicAnalysis method: ${systemName}`
-            );
-            return;
-          }
-          if (this.subscribers.has(systemName)) {
-            if (this.config.enableDebug) {
-              console.warn(
-                `[MusicSyncService] System ${systemName} already subscribed.`
-              );
-            }
-            return;
-          }
-          this.subscribers.set(systemName, systemInstance);
-          if (this.config.enableDebug) {
-            console.log(`[MusicSyncService] System subscribed: ${systemName}`);
-          }
-          if (this.latestProcessedData && systemInstance.initialized) {
-            try {
-              systemInstance.updateFromMusicAnalysis(
-                this.latestProcessedData,
-                null,
-                this.currentTrackUri
-              );
-            } catch (error) {
-              console.error(
-                `[MusicSyncService] Error notifying new subscriber ${systemName}:`,
-                error
-              );
-            }
-          }
-        }
-        unsubscribe(systemName) {
-          if (this.subscribers.has(systemName)) {
-            this.subscribers.delete(systemName);
-            if (this.config.enableDebug) {
-              console.log(`[MusicSyncService] System unsubscribed: ${systemName}`);
-            }
-          }
-        }
-        notifySubscribers(processedData, rawFeatures, trackUri) {
-          if (!this.isInitialized) {
-            console.warn(
-              "[MusicSyncService] Not initialized, cannot notify subscribers."
-            );
-            return;
-          }
-          this.latestProcessedData = processedData;
-          for (const [name, system] of this.subscribers) {
-            try {
-              if (system.initialized && typeof system.updateFromMusicAnalysis === "function") {
-                system.updateFromMusicAnalysis(processedData, rawFeatures, trackUri);
-              }
-            } catch (error) {
-              console.error(
-                `[MusicSyncService] Error notifying subscriber ${name}:`,
-                error
-              );
-              this.metrics.errors++;
-            }
-          }
-        }
-        // === DATA FETCHING & CACHING ===
-        async fetchAudioData(options = {}) {
-          const {
-            retryDelay = MUSIC_SYNC_CONFIG.performance.retryDelay,
-            maxRetries = MUSIC_SYNC_CONFIG.performance.maxRetries
-          } = options;
-          const currentTrackUri = Spicetify.Player.data?.item?.uri;
-          if (!currentTrackUri) {
-            if (this.config.enableDebug) {
-              console.warn(
-                "[MusicSyncService] No current track URI to fetch audio data."
-              );
-            }
-            return null;
-          }
-          const cacheKey = this.generateCacheKey(currentTrackUri, "audioData");
-          const cached = this.getFromCache(cacheKey);
-          if (cached?.audioData) {
-            if (this.isValidAudioData(cached.audioData)) {
-              this.metrics.cacheHits++;
-              if (this.config.enableDebug) {
-                console.log(
-                  `[MusicSyncService] Cache hit for audioData: ${cacheKey}`
-                );
-              }
-              return cached.audioData;
-            }
-            this.unifiedCache.delete(cacheKey);
-          }
-          this.metrics.cacheMisses++;
-          for (let attempt = 0; attempt < maxRetries; attempt++) {
-            try {
-              const audioData = await SpicetifyCompat.getAudioData();
-              if (this.isValidAudioData(audioData)) {
-                this.setInCache(cacheKey, { audioData });
-                return audioData;
-              }
-              if (this.config.enableDebug) {
-                console.log(
-                  `[MusicSyncService] Audio analysis unavailable (attempt ${attempt + 1}/${maxRetries}). Retrying\u2026`
-                );
-              }
-            } catch (error) {
-              if (attempt === maxRetries - 1) {
-                if (this.config.enableDebug) {
-                  console.warn(
-                    `[MusicSyncService] Audio data fetch error on final attempt:`,
-                    error
-                  );
-                }
-                this.metrics.errors++;
-                const fallback = {
-                  tempo: 120,
-                  energy: 0.5,
-                  valence: 0.5,
-                  loudness: -10,
-                  key: 0,
-                  time_signature: 4,
-                  danceability: 0.5,
-                  acousticness: 0.5,
-                  instrumentalness: 0,
-                  speechiness: 0.05,
-                  liveness: 0.2,
-                  mode: 1
-                };
-                if (this.config.enableDebug) {
-                  console.warn(
-                    `[MusicSyncService] All audio-data attempts failed \u2013 using fallback defaults`
-                  );
-                }
-                return fallback;
-              }
-            }
-            await new Promise((resolve) => setTimeout(resolve, retryDelay));
-          }
-          return null;
-        }
-        async getAudioFeatures() {
-          try {
-            const currentTrack = Spicetify.Player.data?.item;
-            if (!currentTrack?.uri) return null;
-            const trackId = currentTrack.uri.split(":")[2] || "fallback";
-            const cacheKey = this.generateCacheKey(trackId, "features");
-            const cached = this.getFromCache(
-              cacheKey
-            );
-            if (cached?.audioFeatures) {
-              this.metrics.cacheHits++;
-              if (this.config.enableDebug) {
-                console.log(
-                  `[MusicSyncService] Cache hit for audioFeatures: ${cacheKey}`
-                );
-              }
-              return cached.audioFeatures;
-            }
-            this.metrics.cacheMisses++;
-            const response = await Spicetify.CosmosAsync.get(
-              `https://api.spotify.com/v1/audio-features/${trackId}`
-            );
-            const features = {
-              danceability: response.danceability,
-              energy: response.energy,
-              valence: response.valence,
-              acousticness: response.acousticness,
-              instrumentalness: response.instrumentalness,
-              tempo: response.tempo
-            };
-            this.setInCache(cacheKey, { audioFeatures: features });
-            return features;
-          } catch (error) {
-            if (this.config.enableDebug) {
-              console.warn(
-                "[MusicSyncService] Could not fetch audio features:",
-                error
-              );
-            }
-            return null;
-          }
-        }
-        generateCacheKey(identifier, type = "default") {
-          return `${this.CACHE_KEY_VERSION_PREFIX}-${identifier}-${type}`;
-        }
-        getFromCache(key) {
-          const cached = this.unifiedCache.get(key);
-          if (cached && Date.now() - cached.timestamp < this.cacheTTL) {
-            return cached.data;
-          }
-          if (cached) {
-            this.unifiedCache.delete(key);
-          }
-          return null;
-        }
-        setInCache(key, data) {
-          this.unifiedCache.set(key, {
-            data,
-            timestamp: Date.now()
-          });
-        }
-        // === ENHANCED BPM CALCULATION ===
-        async calculateEnhancedBPM(audioData, options = {}) {
-          const startTime = performance.now();
-          try {
-            if (!audioData?.tempo) {
-              if (this.config.enableDebug) {
-                console.warn("[MusicSyncService] No BPM data available for track");
-              }
-              return this.getFallbackBPM();
-            }
-            const trackBPM = audioData.tempo;
-            const config = {
-              ...MUSIC_SYNC_CONFIG.bpmCalculation,
-              ...options
-            };
-            const audioFeatures = await this.getAudioFeatures();
-            if (!audioFeatures) {
-              if (this.config.enableDebug) {
-                console.log("[MusicSyncService] Using basic BPM calculation");
-              }
-              return this.validateBPM(trackBPM);
-            }
-            const { danceability, energy, valence = 0.5 } = audioFeatures;
-            if (this.config.enableDebug) {
-              console.log(
-                `[MusicSyncService] Audio features - Danceability: ${danceability}, Energy: ${energy}, Valence: ${valence}`
-              );
-            }
-            const profile = this.genreProfileManager.getProfileForTrack(
-              audioFeatures || void 0
-            );
-            const detectedGenre = this.genreProfileManager.detectGenre(
-              audioFeatures || void 0
-            );
-            const enhancedBPM = this.computeAdvancedBPM({
-              trackBPM,
-              danceability,
-              energy,
-              valence,
-              config,
-              profile
-            });
-            const currentTrack = Spicetify.Player.data?.item || Spicetify.Player.data;
-            const uriParts = currentTrack?.uri?.split(":") ?? [];
-            const trackId = uriParts.length > 2 && uriParts[2] ? uriParts[2] : "fallback";
-            const cacheKey = this.generateCacheKey(trackId, "bpm");
-            this.setInCache(cacheKey, {
-              bpm: enhancedBPM,
-              audioFeatures
-            });
-            this.metrics.bpmCalculations++;
-            if (this.config.enableDebug) {
-              console.log(
-                `[MusicSyncService] Enhanced BPM: ${enhancedBPM} (original: ${trackBPM})`
-              );
-            }
-            return enhancedBPM;
-          } catch (error) {
-            console.error("[MusicSyncService] BPM calculation failed:", error);
-            this.metrics.errors++;
-            return this.getFallbackBPM();
-          }
-        }
-        computeAdvancedBPM(params) {
-          const { trackBPM, danceability, energy, valence, config, profile } = params;
-          const {
-            danceabilityWeight,
-            energyWeight,
-            bpmWeight,
-            energyThreshold,
-            danceabilityThreshold,
-            bpmThreshold,
-            maxBPM,
-            minBPM
-          } = config;
-          const normalizedBPM = Math.min(trackBPM / 120, 2);
-          let adjustedDanceabilityWeight = danceabilityWeight;
-          let adjustedEnergyWeight = energyWeight;
-          let adjustedBpmWeight = bpmWeight;
-          if (danceability < danceabilityThreshold) {
-            adjustedDanceabilityWeight *= danceability;
-          }
-          if (energy < energyThreshold) {
-            adjustedEnergyWeight *= energy;
-          }
-          if (normalizedBPM < bpmThreshold) {
-            adjustedBpmWeight = 0.9;
-          }
-          let valenceInfluence = 1;
-          if (valence > 0.6) {
-            valenceInfluence = 1.05;
-          } else if (valence < 0.4 && energy < 0.5) {
-            valenceInfluence = 0.95;
-          }
-          const weightSum = adjustedDanceabilityWeight + adjustedEnergyWeight + adjustedBpmWeight;
-          const weightedAverage = (danceability * adjustedDanceabilityWeight + energy * adjustedEnergyWeight + normalizedBPM * adjustedBpmWeight) / weightSum;
-          let enhancedBPM = weightedAverage * 120 * valenceInfluence;
-          if (profile.beatEmphasis) {
-            enhancedBPM *= profile.beatEmphasis;
-          }
-          enhancedBPM = Math.max(minBPM, Math.min(maxBPM, enhancedBPM));
-          return Math.round(enhancedBPM * 100) / 100;
-        }
-        validateBPM(bpm) {
-          const { minBPM, maxBPM } = MUSIC_SYNC_CONFIG.bpmCalculation;
-          return Math.max(minBPM, Math.min(maxBPM * 2, Math.round(bpm * 100) / 100));
-        }
-        getFallbackBPM() {
-          return 75;
-        }
-        // === FEATURE ESTIMATION & FALLBACKS ===
-        estimateDanceabilityFromTempo(tempo) {
-          const config = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.danceabilityEstimation;
-          if (tempo >= config.highDance.min && tempo <= config.highDance.max) {
-            return config.highDance.value;
-          }
-          if (tempo >= config.mediumDance.min && tempo <= config.mediumDance.max) {
-            return config.mediumDance.value;
-          }
-          if (tempo >= config.lowMediumDance.min && tempo <= config.lowMediumDance.max) {
-            return config.lowMediumDance.value;
-          }
-          return config.lowDance.value;
-        }
-        estimateEnergyFromTempoLoudness(tempo, loudness) {
-          const config = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.energyEstimation;
-          const tempoFactor = Math.max(
-            0,
-            Math.min(
-              1,
-              (tempo - config.tempoRange.min) / (config.tempoRange.max - config.tempoRange.min)
-            )
-          );
-          const loudnessFactor = Math.max(
-            0,
-            Math.min(
-              1,
-              (loudness - config.loudnessRange.min) / (config.loudnessRange.max - config.loudnessRange.min)
-            )
-          );
-          return tempoFactor * config.tempoWeight + loudnessFactor * config.loudnessWeight;
-        }
-        estimateValenceFromKey(key) {
-          const majorKeys = [0, 2, 4, 5, 7, 9, 11];
-          return majorKeys.includes(key) ? 0.6 : 0.4;
-        }
-        getFallbackProcessedData(trackUri) {
-          const fallbacks = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.fallbacks;
-          const fallbackBeatInterval = 6e4 / fallbacks.tempo;
-          return {
-            trackUri,
-            timestamp: Date.now(),
-            tempo: fallbacks.tempo,
-            loudness: fallbacks.loudness,
-            key: fallbacks.key,
-            timeSignature: fallbacks.timeSignature,
-            estimatedDanceability: this.estimateDanceabilityFromTempo(
-              fallbacks.tempo
-            ),
-            estimatedEnergy: this.estimateEnergyFromTempoLoudness(
-              fallbacks.tempo,
-              fallbacks.loudness
-            ),
-            estimatedValence: 0.5,
-            energy: 0.5,
-            valence: 0.5,
-            processedEnergy: 0.5,
-            visualIntensity: 0.5,
-            moodIdentifier: "neutral",
-            baseBPM: fallbacks.tempo,
-            enhancedBPM: fallbacks.tempo,
-            beatInterval: fallbackBeatInterval,
-            bmpCalculationMethod: "fallback",
-            dataSource: "fallback"
-          };
-        }
-        // === MAIN PROCESSING PIPELINE ===
-        async processAudioFeatures(rawSpicetifyAudioFeatures, trackUri, trackDurationMs) {
-          if (!this.isInitialized) {
-            console.warn("[MusicSyncService] Not initialized, skipping processing.");
-            return;
-          }
-          this.stopBeatScheduler();
-          this.currentTrackUri = trackUri;
-          const cacheKey = this.generateCacheKey(trackUri, "processed");
-          const cached = this.getFromCache(cacheKey);
-          if (cached?.processedData) {
-            this.notifySubscribers(cached.processedData, null, trackUri);
-            return;
-          }
-          try {
-            let audioAnalysisData = rawSpicetifyAudioFeatures;
-            if (!audioAnalysisData) {
-              audioAnalysisData = await this.fetchAudioData();
-            }
-            if (!audioAnalysisData) {
-              throw new Error("Failed to fetch or receive audio data.");
-            }
-            if (audioAnalysisData.beats && audioAnalysisData.beats.length > 0) {
-              this.currentSongBeats = audioAnalysisData.beats;
-              this.songStartTimestamp = Date.now();
-              this.nextBeatIndex = 0;
-              this.scheduleNextBeatEvent();
-            }
-            const enhancedBPM = await this.calculateEnhancedBPM(audioAnalysisData);
-            const beatInterval = enhancedBPM > 0 ? 6e4 / enhancedBPM : 0;
-            const trackData = audioAnalysisData;
-            const {
-              tempo = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.fallbacks.tempo,
-              loudness = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.fallbacks.loudness,
-              key = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.fallbacks.key,
-              time_signature: timeSignature = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.fallbacks.timeSignature
-            } = trackData;
-            const audioFeatures = await this.getAudioFeatures();
-            const estimatedDanceability = audioFeatures?.danceability ?? this.estimateDanceabilityFromTempo(tempo);
-            const estimatedEnergy = audioFeatures?.energy ?? this.estimateEnergyFromTempoLoudness(tempo, loudness);
-            const estimatedValence = audioFeatures?.valence ?? this.estimateValenceFromKey(key);
-            const artisticMultipliers = this.config.getCurrentMultipliers?.() || {
-              musicEnergyBoost: 1,
-              visualIntensityBase: 1
-            };
-            const processedEnergy = Math.max(
-              0.1,
-              Math.min(
-                1,
-                estimatedEnergy * (artisticMultipliers.musicEnergyBoost || 1)
-              )
-            );
-            const baseIntensity = estimatedEnergy * 0.6 + estimatedDanceability * 0.4;
-            const visualIntensity = baseIntensity * (artisticMultipliers.visualIntensityBase || 1);
-            let moodIdentifier = "neutral";
-            if (estimatedValence > 0.6 && estimatedEnergy > 0.6) {
-              moodIdentifier = "energetic-happy";
-            } else if (estimatedValence > 0.6 && estimatedEnergy <= 0.6) {
-              moodIdentifier = "calm-happy";
-            } else if (estimatedValence <= 0.4 && estimatedEnergy > 0.6) {
-              moodIdentifier = "intense-moody";
-            } else if (estimatedValence <= 0.4 && estimatedEnergy <= 0.4) {
-              moodIdentifier = "calm-melancholy";
-            }
-            const animationSpeedFactor = Math.max(0.5, 0.8 + visualIntensity * 0.4);
-            const genreTag = this.genreProfileManager.detectGenre(
-              audioFeatures || void 0
-            );
-            const processedData = {
-              trackUri,
-              timestamp: Date.now(),
-              tempo,
-              loudness,
-              key,
-              timeSignature,
-              duration: trackDurationMs,
-              estimatedDanceability,
-              estimatedEnergy,
-              estimatedValence,
-              energy: estimatedEnergy,
-              valence: estimatedValence,
-              processedEnergy,
-              visualIntensity,
-              moodIdentifier,
-              baseBPM: tempo,
-              enhancedBPM,
-              beatInterval,
-              bmpCalculationMethod: "unified-service",
-              dataSource: "unified-music-sync-service",
-              beatOccurred: false,
-              animationSpeedFactor,
-              genre: genreTag
-            };
-            this.setInCache(cacheKey, { processedData });
-            this.latestProcessedData = processedData;
-            if (this.config.enableDebug) {
-              console.log("\u{1F3B5} [MusicSyncService] Processed music data:", {
-                baseTempo: tempo,
-                enhancedBPM,
-                mood: moodIdentifier,
-                energy: estimatedEnergy.toFixed(2),
-                visualIntensity: visualIntensity.toFixed(2)
-              });
-            }
-            this.notifySubscribers(
-              processedData,
-              rawSpicetifyAudioFeatures,
-              trackUri
-            );
-            GlobalEventBus.publish("beat/frame", {
-              timestamp: performance.now(),
-              trackUri,
-              processedData,
-              rawData: rawSpicetifyAudioFeatures
-            });
-            GlobalEventBus.publish("beat/bpm", { bpm: processedData.enhancedBPM });
-            GlobalEventBus.publish("beat/intensity", {
-              intensity: processedData.visualIntensity
-            });
-            if (this.config.enableDebug) {
-              console.log(
-                "[MusicSyncService] Successfully processed audio features.",
-                {
-                  baseTempo: tempo,
-                  enhancedBPM,
-                  mood: moodIdentifier,
-                  energy: estimatedEnergy.toFixed(2),
-                  visualIntensity: visualIntensity.toFixed(2)
-                }
-              );
-            }
-          } catch (error) {
-            console.error("[MusicSyncService] Processing failed:", error);
-            this.metrics.errors++;
-            const fallbackData = this.getFallbackProcessedData(trackUri);
-            this.latestProcessedData = fallbackData;
-            this.notifySubscribers(fallbackData, null, trackUri);
-          }
-        }
-        /**
-         * Re-extract colours & (optionally) recompute beat analysis for the current
-         * track.  When `force === true` the method runs even if the track URI hasn't
-         * changed (used after live settings updates so gradients repaint instantly).
-         */
-        async processSongUpdate(force = false) {
-          const trackUri = Spicetify.Player?.data?.item?.uri;
-          if (!trackUri) return;
-          if (!force && trackUri === this.currentTrackUri) {
-            return;
-          }
-          if (this.songChangeDebounceTimer) {
-            clearTimeout(this.songChangeDebounceTimer);
-          }
-          if (force) {
-            await this._processSongUpdateInternal(trackUri);
-            return;
-          }
-          this.songChangeDebounceTimer = setTimeout(async () => {
-            this.songChangeDebounceTimer = null;
-            await this._processSongUpdateInternal(trackUri);
-          }, MUSIC_SYNC_CONFIG.synchronization.debounceRapidChanges);
-        }
-        /**
-         * Internal implementation of song processing, extracted for debouncing.
-         */
-        async _processSongUpdateInternal(trackUri) {
-          this.invalidateTrackCaches(trackUri);
-          try {
-            const trackDuration = Spicetify.Player.data?.item?.duration?.milliseconds || 0;
-            const [audioFeatures, rawColors] = await Promise.all([
-              this.getAudioFeatures(),
-              Spicetify.colorExtractor(trackUri)
-            ]);
-            const colors = this.utils.sanitizeColorMap(
-              rawColors || {}
-            );
-            if (Object.keys(colors).length > 0) {
-              const colorContext = {
-                rawColors: colors,
-                trackUri,
-                timestamp: Date.now(),
-                harmonicMode: this.config.currentHarmonicMode || "catppuccin",
-                musicData: audioFeatures ? {
-                  energy: audioFeatures.energy,
-                  valence: audioFeatures.valence,
-                  tempo: audioFeatures.tempo,
-                  genre: this.genreProfileManager.detectGenre(audioFeatures)
-                } : void 0,
-                performanceHints: {
-                  preferLightweight: false,
-                  enableAdvancedBlending: true,
-                  maxProcessingTime: 100
-                  // 100ms max for color processing
-                }
-              };
-              GlobalEventBus.publish("colors/extracted", {
-                type: "colors/extracted",
-                payload: colorContext
-              });
-              if (this.config.enableDebug) {
-                console.log(
-                  "\u{1F3B5} [MusicSyncService] Published colors/extracted event for strategy processing",
-                  { trackUri, colorCount: Object.keys(colors).length }
-                );
-              }
-            }
-            if (audioFeatures) {
-              const provisionalAudioData = this.convertFeaturesToAudioData(audioFeatures);
-              await this.processAudioFeatures(
-                provisionalAudioData,
-                trackUri,
-                trackDuration
-              );
-            }
-            (async () => {
-              const fullAnalysis = await this.fetchAudioData();
-              if (this.isValidAudioData(fullAnalysis)) {
-                await this.processAudioFeatures(
-                  fullAnalysis,
-                  trackUri,
-                  trackDuration
-                );
-              }
-            })();
-          } catch (error) {
-            console.error(
-              `[MusicSyncService] Error processing song update for ${trackUri}:`,
-              error
-            );
-            this.metrics.errors++;
-          }
-        }
-        // === LIFECYCLE & HELPERS ===
-        setupCacheManagement() {
-          this.cacheCleanupInterval = setInterval(() => {
-            const now = Date.now();
-            for (const [key, cacheEntry] of this.unifiedCache.entries()) {
-              if (now - cacheEntry.timestamp > this.cacheTTL) {
-                this.unifiedCache.delete(key);
-              }
-            }
-          }, this.cacheTTL);
-        }
-        setupPerformanceMonitoring() {
-          this.performanceInterval = setInterval(() => {
-            if (this.metrics.performance.length > 0) {
-              const avg = this.metrics.performance.reduce((a, b) => a + b, 0) / this.metrics.performance.length;
-              this.metrics.avgProcessingTime = avg;
-              this.metrics.performance = [];
-            }
-          }, 6e4);
-        }
-        loadUserPreferences() {
-          try {
-            const prefs = StorageManager.get("sn-music-sync-prefs");
-            return prefs ? JSON.parse(prefs) : {};
-          } catch (e) {
-            return {};
-          }
-        }
-        saveUserPreferences() {
-          try {
-            StorageManager.set(
-              "sn-music-sync-prefs",
-              JSON.stringify(this.userPreferences)
-            );
-          } catch (error) {
-            if (this.config.enableDebug) {
-              console.warn(
-                "[MusicSyncService] Could not save user preferences:",
-                error
-              );
-            }
-          }
-        }
-        updateConfiguration(newConfig) {
-          const previousConfig = { ...MUSIC_SYNC_CONFIG };
-          Object.assign(MUSIC_SYNC_CONFIG, newConfig);
-          if (this.config.enableDebug) {
-            console.log("\u{1F3B5} [MusicSyncService] Configuration updated", {
-              from: previousConfig,
-              to: MUSIC_SYNC_CONFIG
-            });
-          }
-          this.cacheTTL = MUSIC_SYNC_CONFIG.performance.cacheTTL;
-          if (previousConfig.performance.enableMetrics !== MUSIC_SYNC_CONFIG.performance.enableMetrics) {
-            if (MUSIC_SYNC_CONFIG.performance.enableMetrics) {
-              this.setupPerformanceMonitoring();
-            } else if (this.performanceInterval) {
-              clearInterval(this.performanceInterval);
-              this.performanceInterval = null;
-            }
-          }
-        }
-        destroy() {
-          if (this.songChangeDebounceTimer) {
-            clearTimeout(this.songChangeDebounceTimer);
-            this.songChangeDebounceTimer = null;
-          }
-          this.stopBeatScheduler();
-          if (this.performanceInterval) clearInterval(this.performanceInterval);
-          if (this.cacheCleanupInterval) clearInterval(this.cacheCleanupInterval);
-          this.subscribers.clear();
-          this.unifiedCache.clear();
-          this.isInitialized = false;
-          this.latestProcessedData = null;
-          this.metrics = {
-            bpmCalculations: 0,
-            beatSyncs: 0,
-            cacheHits: 0,
-            cacheMisses: 0,
-            avgProcessingTime: 0,
-            performance: [],
-            errors: 0,
-            updates: 0
-          };
-          this.cacheCleanupInterval = null;
-        }
-        // Legacy method for backward compatibility - now uses event-driven pattern
-        setColorHarmonyEngine(engine) {
-          if (this.config.enableDebug) {
-            console.log(
-              "\u{1F3B5} [MusicSyncService] setColorHarmonyEngine called - now using event-driven pattern instead of direct dependency."
-            );
-          }
-        }
-        getLatestProcessedData() {
-          return this.latestProcessedData;
-        }
-        /**
-         * Get the latest beat vector (unit direction) for visual systems that need
-         * directional rhythm cues. Falls back to {0,0} when unavailable.
-         */
-        getCurrentBeatVector() {
-          return { ...this.currentBeatVector };
-        }
-        stopBeatScheduler() {
-          if (this.beatSchedulerTimer) {
-            clearTimeout(this.beatSchedulerTimer);
-            this.beatSchedulerTimer = null;
-          }
-        }
-        triggerBeatEvent() {
-          const GOLDEN_RATIO = 0.61803398875;
-          const angle = this.nextBeatIndex * GOLDEN_RATIO % 1 * Math.PI * 2;
-          this.currentBeatVector = { x: Math.cos(angle), y: Math.sin(angle) };
-          if (this.latestProcessedData) {
-            const beatUpdate = {
-              ...this.latestProcessedData,
-              beatOccurred: true,
-              beatVector: this.currentBeatVector
-            };
-            this.notifySubscribers(beatUpdate, null, this.currentTrackUri);
-          }
-          this.nextBeatIndex++;
-          this.scheduleNextBeatEvent();
-        }
-        scheduleNextBeatEvent() {
-          if (this.nextBeatIndex >= this.currentSongBeats.length) {
-            return;
-          }
-          const nextBeat = this.currentSongBeats[this.nextBeatIndex];
-          const timeSinceSongStart = Date.now() - this.songStartTimestamp;
-          const delay = nextBeat.start * 1e3 - timeSinceSongStart;
-          if (delay >= 0) {
-            this.beatSchedulerTimer = setTimeout(
-              () => this.triggerBeatEvent(),
-              delay
-            );
-          } else {
-            this.nextBeatIndex++;
-            this.scheduleNextBeatEvent();
-          }
-        }
-        /**
-         * Validate that the returned audio analysis object actually contains usable
-         * information (primarily tempo). Spotify may return an empty object when the
-         * analysis is not ready yet – treating that as valid poisons the cache.
-         */
-        isValidAudioData(data) {
-          return !!data && typeof data.tempo === "number" && data.tempo > 0;
-        }
-        /**
-         * Remove any cached entries (audioData, features, bpm, processed) belonging
-         * to the provided track URI. Useful when switching tracks to ensure we do
-         * not reuse stale or invalid data cached under the previous song.
-         */
-        invalidateTrackCaches(trackUri) {
-          if (!trackUri) return;
-          for (const key of this.unifiedCache.keys()) {
-            if (key.includes(trackUri)) {
-              this.unifiedCache.delete(key);
-            }
-          }
-        }
-        /**
-         * Convert the lightweight `audio-features` payload into a pseudo `AudioData`
-         * object so the rest of the pipeline (which expects full analysis) can work
-         * immediately. Missing properties are filled with sensible defaults.
-         */
-        convertFeaturesToAudioData(features) {
-          const fb = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.fallbacks;
-          return {
-            tempo: features.tempo,
-            energy: features.energy,
-            valence: features.valence,
-            loudness: fb.loudness,
-            key: fb.key,
-            time_signature: fb.timeSignature,
-            danceability: features.danceability,
-            acousticness: features.acousticness,
-            instrumentalness: features.instrumentalness,
-            speechiness: 0,
-            liveness: 0,
-            mode: 0
-            // Optional arrays left undefined – beat grid will arrive later
-          };
-        }
-        // -------------------------------------------------------------------
-        // External adapter integration helpers ------------------------------
-        // -------------------------------------------------------------------
-        /**
-         * Adapter-facing helper to push music metrics without relying on the
-         * full processing pipeline.  Currently a no-op placeholder that may be
-         * expanded in future phases.
-         */
-        updateMetrics(metrics) {
-          this.latestProcessedData = metrics;
-        }
-        /**
-         * Get current music state for consciousness systems
-         */
-        getCurrentMusicState() {
-          if (!this.latestProcessedData || !this.audioData) {
-            return null;
-          }
-          return {
-            emotion: this.latestProcessedData.emotion || null,
-            beat: {
-              tempo: this.latestProcessedData.bpm || this.audioData.tempo || 120,
-              energy: this.latestProcessedData.energy || this.audioData.energy || 0.5,
-              timestamp: Date.now()
-            },
-            intensity: this.latestProcessedData.intensity || this.audioData.energy || 0.5
-          };
-        }
-      };
-      __name(_MusicSyncService, "MusicSyncService");
-      MusicSyncService = _MusicSyncService;
-    }
-  });
-
-  // src-js/utils/graphics/NoiseField.ts
-  function sample(u, v) {
-    const x = Math.max(0, Math.min(0.9999, u)) * (GRID_SIZE - 1);
-    const y = Math.max(0, Math.min(0.9999, v)) * (GRID_SIZE - 1);
-    const x0 = Math.floor(x);
-    const y0 = Math.floor(y);
-    const x1 = x0 + 1;
-    const y1 = y0 + 1;
-    const sx = x - x0;
-    const sy = y - y0;
-    const v00 = vectors[y0 * GRID_SIZE + x0];
-    const v10 = vectors[y0 * GRID_SIZE + x1 % GRID_SIZE];
-    const v01 = vectors[y1 % GRID_SIZE * GRID_SIZE + x0];
-    const v11 = vectors[y1 % GRID_SIZE * GRID_SIZE + x1 % GRID_SIZE];
-    const lerp2 = /* @__PURE__ */ __name((a, b, t) => a + (b - a) * t, "lerp");
-    const ix0x = lerp2(v00.x, v10.x, sx);
-    const ix0y = lerp2(v00.y, v10.y, sx);
-    const ix1x = lerp2(v01.x, v11.x, sx);
-    const ix1y = lerp2(v01.y, v11.y, sx);
-    return {
-      x: lerp2(ix0x, ix1x, sy),
-      y: lerp2(ix0y, ix1y, sy)
-    };
-  }
-  var GRID_SIZE, vectors;
-  var init_NoiseField = __esm({
-    "src-js/utils/graphics/NoiseField.ts"() {
-      "use strict";
-      GRID_SIZE = 64;
-      vectors = new Array(GRID_SIZE * GRID_SIZE);
-      (/* @__PURE__ */ __name(function init() {
-        for (let i = 0; i < vectors.length; i++) {
-          const angle = Math.random() * Math.PI * 2;
-          vectors[i] = {
-            x: Math.cos(angle),
-            y: Math.sin(angle)
-          };
-        }
-      }, "init"))();
-      __name(sample, "sample");
-    }
-  });
-
-  // src-js/visual/ui-effects/PredictiveMaterializationSystem.ts
-  var _PredictiveMaterializationSystem, PredictiveMaterializationSystem;
-  var init_PredictiveMaterializationSystem = __esm({
-    "src-js/visual/ui-effects/PredictiveMaterializationSystem.ts"() {
-      "use strict";
-      init_globalConfig();
-      init_PerformanceAnalyzer();
-      init_SettingsManager();
-      init_MusicSyncService();
-      init_NoiseField();
-      init_BaseVisualSystem();
-      _PredictiveMaterializationSystem = class _PredictiveMaterializationSystem extends BaseVisualSystem {
-        constructor(config, utils, performanceMonitor, musicSyncService, settingsManager, year3000System2 = null) {
-          super(
-            config,
-            utils,
-            performanceMonitor ?? new PerformanceAnalyzer(),
-            musicSyncService ?? new MusicSyncService({
-              YEAR3000_CONFIG: config,
-              Year3000Utilities: utils,
-              colorHarmonyEngine: null,
-              settingsManager
-            }),
-            settingsManager ?? new SettingsManager(config, HARMONIC_MODES, utils)
-          );
-          // Time tracking for resonance triggers
-          this._resonanceCooldownMs = 1200;
-          this._timeSinceLastResonance = 0;
-          this.materializationIntensity = 1;
-          this.materializationSpeed = 1;
-          // === Temporal Echo Pool ===
-          this.echoPool = [];
-          this.currentEchoCount = 0;
-          this._elementsWithActiveEcho = /* @__PURE__ */ new WeakSet();
-          this.echoTimerCounter = 0;
-          this.systemName = "PredictiveMaterializationSystem";
-          this.year3000System = year3000System2;
-          this.materializationState = {
-            imminence: 0,
-            clarity: 0,
-            targetElement: null
-          };
-          this.rootElement = this.utils.getRootStyle();
-          if (this.config?.enableDebug) {
-            console.log(`[${this.systemName} Constructor] Initialized.`);
-          }
-        }
-        // TODO[Y3K-PH3]: Allow external callers (e.g., Navigation system) to set the element that receives resonance
-        setTargetElement(el) {
-          this.materializationState.targetElement = el;
-        }
-        // Frame-level animation hook used by MasterAnimationCoordinator
-        onAnimate(deltaMs) {
-          if (!this.materializationState.targetElement) return;
-          this._timeSinceLastResonance += deltaMs;
-          const imminence = this.materializationState.imminence;
-          const clarity = this.materializationState.clarity;
-          const threshold = 0.6;
-          if (imminence * 0.7 + clarity * 0.3 > threshold && this._timeSinceLastResonance >= this._resonanceCooldownMs) {
-            this._maybeTriggerResonance();
-            this._timeSinceLastResonance = 0;
-          }
-        }
-        _maybeTriggerResonance() {
-          const target = this.materializationState.targetElement;
-          if (!target) return;
-          if (this.materializationState.imminence >= 0.7) {
-            this._spawnMegaEcho(target);
-          } else {
-            target.classList.add("sn-materialize-resonance");
-            const handleEnd = /* @__PURE__ */ __name(() => {
-              target.classList.remove("sn-materialize-resonance");
-              target.removeEventListener("animationend", handleEnd);
-            }, "handleEnd");
-            target.addEventListener("animationend", handleEnd, { once: true });
-          }
-          if (this.config?.enableDebug) {
-            console.debug(
-              `[${this.systemName}] Materialization event on`,
-              target,
-              `imminence=${this.materializationState.imminence.toFixed(
-                2
-              )}, clarity=${this.materializationState.clarity.toFixed(2)}`
-            );
-          }
-        }
-        async initialize() {
-          await super.initialize();
-          this._setInitialMaterializationCSS();
-          if (this.config?.enableDebug) {
-            console.log(
-              `[${this.systemName}] Initialized and initial CSS variables set.`
-            );
-          }
-        }
-        _setInitialMaterializationCSS() {
-          const applyCss = /* @__PURE__ */ __name((prop, val) => {
-            try {
-              if (this.year3000System && this.year3000System.queueCSSVariableUpdate) {
-                this.year3000System.queueCSSVariableUpdate(
-                  prop,
-                  val,
-                  this.rootElement
-                );
-              } else {
-                this.rootElement.style.setProperty(prop, val);
-              }
-            } catch (e) {
-              if (this.config?.enableDebug) {
-                console.warn(
-                  `[${this.systemName}] Error setting CSS variable ${prop}:`,
-                  e.message
-                );
-              }
-            }
-          }, "applyCss");
-          applyCss("--sn-materialize-imminence", "0");
-          applyCss("--sn-materialize-clarity", "0");
-        }
-        updateFromMusicAnalysis(processedMusicData) {
-          if (!this.initialized || !processedMusicData) return;
-          super.updateFromMusicAnalysis(processedMusicData);
-          const { segmentTransitionConfidence, visualIntensity, energy, valence } = processedMusicData;
-          let targetImminence = (segmentTransitionConfidence || 0) * 0.6 + energy * 0.3 + visualIntensity * 0.1;
-          let targetClarity = valence * 0.5 + visualIntensity * 0.3 + energy * 0.2;
-          this.materializationState.imminence = this.utils.lerpSmooth(
-            this.materializationState.imminence,
-            targetImminence,
-            0.1,
-            0.2
-          );
-          this.materializationState.clarity = this.utils.lerpSmooth(
-            this.materializationState.clarity,
-            targetClarity,
-            0.1,
-            0.25
-          );
-          this.materializationState.imminence = Math.max(
-            0,
-            Math.min(1, this.materializationState.imminence)
-          );
-          this.materializationState.clarity = Math.max(
-            0,
-            Math.min(1, this.materializationState.clarity)
-          );
-          const applyCss = /* @__PURE__ */ __name((prop, val) => {
-            try {
-              if (this.year3000System && this.year3000System.queueCSSVariableUpdate) {
-                this.year3000System.queueCSSVariableUpdate(
-                  prop,
-                  val,
-                  this.rootElement
-                );
-              } else {
-                this.rootElement.style.setProperty(prop, val);
-              }
-            } catch (e) {
-              if (this.config?.enableDebug) {
-                console.warn(
-                  `[${this.systemName}] Error setting CSS variable ${prop} during update:`,
-                  e.message
-                );
-              }
-            }
-          }, "applyCss");
-          applyCss(
-            "--sn-materialize-imminence",
-            `${this.materializationState.imminence.toFixed(3)}`
-          );
-          applyCss(
-            "--sn-materialize-clarity",
-            `${this.materializationState.clarity.toFixed(3)}`
-          );
-        }
-        updateModeConfiguration(modeConfig) {
-          if (!modeConfig) return;
-          const { enabled, animations, intensity } = modeConfig;
-          if (this.config?.enableDebug) {
-            console.log(
-              `\u{1F3A8} [${this.systemName}] Updating mode configuration:`,
-              modeConfig
-            );
-          }
-          this.modeConfig = {
-            ...this.modeConfig,
-            systemEnabled: enabled !== false,
-            materializationAnimationsEnabled: !!animations,
-            intensityMultiplier: intensity || 1
-          };
-          this.updateMaterializationForMode();
-        }
-        updateMaterializationForMode() {
-          if (!this.modeConfig) return;
-          const baseIntensity = this.modeConfig.intensityMultiplier || 1;
-          this.materializationIntensity = baseIntensity;
-          this.materializationSpeed = this.modeConfig.materializationAnimationsEnabled ? baseIntensity * 1.3 : baseIntensity * 0.8;
-          if (this.config?.enableDebug) {
-            console.log(
-              `\u2728 [${this.systemName}] Updated materialization - Intensity: ${this.materializationIntensity}, Speed: ${this.materializationSpeed}`
-            );
-          }
-        }
-        destroy() {
-          if (this.year3000System?.timerConsolidationSystem) {
-            for (let i = 0; i < this.echoTimerCounter; i++) {
-              this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer(
-                `PredictiveMaterializationSystem-echo-${i}`
-              );
-            }
-          }
-          super.destroy();
-          if (this.config?.enableDebug) {
-            console.log(`[${this.systemName}] Destroyed and cleaned up.`);
-          }
-        }
-        // TODO[Y3K-PH2]: Public helper to trigger anticipatory shimmer on a target element.
-        // This seeds two-way integration with BehavioralPredictionEngine while keeping
-        // backward-compatibility (calling code can still add the CSS class directly).
-        triggerAnticipatoryWarmth(target, {
-          hue = 0,
-          intensity = 0.18,
-          durationMs = 1200
-        } = {}) {
-          if (!target) return;
-          const clamped = Math.max(0, Math.min(0.3, intensity));
-          target.style.setProperty("--sn-anticipatory-intensity", clamped.toFixed(3));
-          target.style.setProperty("--sn-anticipatory-hue", `${hue.toFixed(1)}deg`);
-          target.classList.add("sn-anticipatory-warmth");
-          const handleEnd = /* @__PURE__ */ __name(() => {
-            target.classList.remove("sn-anticipatory-warmth");
-            target.removeEventListener("animationend", handleEnd);
-          }, "handleEnd");
-          target.addEventListener("animationend", handleEnd);
-          if (this.config?.enableDebug) {
-            console.debug(
-              `[${this.systemName}] Anticipatory shimmer fired (hue=${hue}, intensity=${clamped}) on`,
-              target
-            );
-          }
-        }
-        // -------------------------------------------------------------------------
-        // ⚡ TEMPORAL ECHO HELPERS
-        // -------------------------------------------------------------------------
-        get echoIntensitySetting() {
-          const val = this.settingsManager?.get?.("sn-echo-intensity") ?? "2";
-          const parsed = parseInt(val, 10);
-          return isNaN(parsed) ? 2 : parsed;
-        }
-        get dynamicMaxEchoes() {
-          switch (this.echoIntensitySetting) {
-            case 0:
-              return 0;
-            case 1:
-              return Math.ceil(_PredictiveMaterializationSystem.BASE_MAX_ECHOES / 2);
-            case 3:
-              return _PredictiveMaterializationSystem.BASE_MAX_ECHOES * 2;
-            default:
-              return _PredictiveMaterializationSystem.BASE_MAX_ECHOES;
-          }
-        }
-        _acquireEchoElement() {
-          let el = this.echoPool.pop();
-          if (el) {
-            el.style.animation = "none";
-            void el.offsetWidth;
-            el.style.animation = "";
-          } else {
-            el = document.createElement("div");
-            el.className = "sn-temporal-echo";
-          }
-          return el;
-        }
-        _releaseEchoElement(el) {
-          if (this.echoPool.length < 20) this.echoPool.push(el);
-        }
-        _spawnMegaEcho(element) {
-          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || this.performanceMonitor.shouldReduceQuality()) {
-            return;
-          }
-          if (this.currentEchoCount >= this.dynamicMaxEchoes) return;
-          if (this.echoIntensitySetting === 0) return;
-          if (this._elementsWithActiveEcho.has(element)) return;
-          const musicData = this.musicSyncService?.getLatestProcessedData() ?? {};
-          const energy = musicData.energy ?? 0.5;
-          const valence = musicData.valence ?? 0.5;
-          const baseRadius = Math.min(1.6, 1 + energy * 0.4);
-          const radius = Math.min(baseRadius * 2, 2.4);
-          const hueShift = ((valence - 0.5) * 40).toFixed(1);
-          const rect = element.getBoundingClientRect();
-          const normX = rect.left / window.innerWidth;
-          const normY = rect.top / window.innerHeight;
-          const vec = sample(normX, normY);
-          const offsetMagnitude = 10 + energy * 10;
-          let offsetX = vec.x * offsetMagnitude;
-          let offsetY = vec.y * offsetMagnitude;
-          const skewDeg = vec.x * 6;
-          const baseAngle = (Math.random() * 360).toFixed(1);
-          const echo = this._acquireEchoElement();
-          echo.style.setProperty("--sn-echo-radius-multiplier", radius.toFixed(2));
-          echo.style.setProperty("--sn-echo-hue-shift", `${hueShift}deg`);
-          echo.style.setProperty("--sn-echo-offset-x", `${offsetX.toFixed(1)}px`);
-          echo.style.setProperty("--sn-echo-offset-y", `${offsetY.toFixed(1)}px`);
-          echo.style.setProperty("--sn-echo-skew", `${skewDeg.toFixed(2)}deg`);
-          echo.style.setProperty("--sn-echo-rotate", `${baseAngle}deg`);
-          echo.style.setProperty("--sn-kinetic-intensity", "0.4");
-          element.appendChild(echo);
-          this.currentEchoCount++;
-          this._elementsWithActiveEcho.add(element);
-          const timerId = `PredictiveMaterializationSystem-echo-${this.echoTimerCounter++}`;
-          const cleanup = /* @__PURE__ */ __name(() => {
-            if (echo.parentElement) echo.parentElement.removeChild(echo);
-            this.currentEchoCount--;
-            this._releaseEchoElement(echo);
-            this._elementsWithActiveEcho.delete(element);
-          }, "cleanup");
-          if (this.year3000System?.timerConsolidationSystem) {
-            this.year3000System.timerConsolidationSystem.registerConsolidatedTimer(
-              timerId,
-              cleanup,
-              1300,
-              "background"
-            );
-          } else {
-            setTimeout(cleanup, 1300);
-          }
-        }
-      };
-      __name(_PredictiveMaterializationSystem, "PredictiveMaterializationSystem");
-      _PredictiveMaterializationSystem.BASE_MAX_ECHOES = 4;
-      PredictiveMaterializationSystem = _PredictiveMaterializationSystem;
     }
   });
 
@@ -12200,565 +10366,6 @@ void main() {
     }
   });
 
-  // src-js/types/signature.ts
-  var createDefaultSignature;
-  var init_signature = __esm({
-    "src-js/types/signature.ts"() {
-      "use strict";
-      createDefaultSignature = /* @__PURE__ */ __name((userId) => ({
-        version: "1.0.0",
-        userId,
-        createdAt: Date.now(),
-        lastModified: Date.now(),
-        colorMemories: /* @__PURE__ */ new Map(),
-        rhythmicPreferences: /* @__PURE__ */ new Map(),
-        emotionalResonanceProfile: {},
-        evolutionaryTrajectory: {
-          adaptability: 0.5,
-          // Start balanced
-          explorationFactor: 0.5,
-          // Start balanced
-          lastUpdate: Date.now()
-        }
-      }), "createDefaultSignature");
-    }
-  });
-
-  // node_modules/idb/build/index.js
-  function getIdbProxyableTypes() {
-    return idbProxyableTypes || (idbProxyableTypes = [
-      IDBDatabase,
-      IDBObjectStore,
-      IDBIndex,
-      IDBCursor,
-      IDBTransaction
-    ]);
-  }
-  function getCursorAdvanceMethods() {
-    return cursorAdvanceMethods || (cursorAdvanceMethods = [
-      IDBCursor.prototype.advance,
-      IDBCursor.prototype.continue,
-      IDBCursor.prototype.continuePrimaryKey
-    ]);
-  }
-  function promisifyRequest(request) {
-    const promise = new Promise((resolve, reject) => {
-      const unlisten = /* @__PURE__ */ __name(() => {
-        request.removeEventListener("success", success);
-        request.removeEventListener("error", error);
-      }, "unlisten");
-      const success = /* @__PURE__ */ __name(() => {
-        resolve(wrap(request.result));
-        unlisten();
-      }, "success");
-      const error = /* @__PURE__ */ __name(() => {
-        reject(request.error);
-        unlisten();
-      }, "error");
-      request.addEventListener("success", success);
-      request.addEventListener("error", error);
-    });
-    reverseTransformCache.set(promise, request);
-    return promise;
-  }
-  function cacheDonePromiseForTransaction(tx) {
-    if (transactionDoneMap.has(tx))
-      return;
-    const done = new Promise((resolve, reject) => {
-      const unlisten = /* @__PURE__ */ __name(() => {
-        tx.removeEventListener("complete", complete);
-        tx.removeEventListener("error", error);
-        tx.removeEventListener("abort", error);
-      }, "unlisten");
-      const complete = /* @__PURE__ */ __name(() => {
-        resolve();
-        unlisten();
-      }, "complete");
-      const error = /* @__PURE__ */ __name(() => {
-        reject(tx.error || new DOMException("AbortError", "AbortError"));
-        unlisten();
-      }, "error");
-      tx.addEventListener("complete", complete);
-      tx.addEventListener("error", error);
-      tx.addEventListener("abort", error);
-    });
-    transactionDoneMap.set(tx, done);
-  }
-  function replaceTraps(callback) {
-    idbProxyTraps = callback(idbProxyTraps);
-  }
-  function wrapFunction(func) {
-    if (getCursorAdvanceMethods().includes(func)) {
-      return function(...args) {
-        func.apply(unwrap(this), args);
-        return wrap(this.request);
-      };
-    }
-    return function(...args) {
-      return wrap(func.apply(unwrap(this), args));
-    };
-  }
-  function transformCachableValue(value) {
-    if (typeof value === "function")
-      return wrapFunction(value);
-    if (value instanceof IDBTransaction)
-      cacheDonePromiseForTransaction(value);
-    if (instanceOfAny(value, getIdbProxyableTypes()))
-      return new Proxy(value, idbProxyTraps);
-    return value;
-  }
-  function wrap(value) {
-    if (value instanceof IDBRequest)
-      return promisifyRequest(value);
-    if (transformCache.has(value))
-      return transformCache.get(value);
-    const newValue = transformCachableValue(value);
-    if (newValue !== value) {
-      transformCache.set(value, newValue);
-      reverseTransformCache.set(newValue, value);
-    }
-    return newValue;
-  }
-  function openDB(name, version, { blocked, upgrade, blocking, terminated } = {}) {
-    const request = indexedDB.open(name, version);
-    const openPromise = wrap(request);
-    if (upgrade) {
-      request.addEventListener("upgradeneeded", (event) => {
-        upgrade(wrap(request.result), event.oldVersion, event.newVersion, wrap(request.transaction), event);
-      });
-    }
-    if (blocked) {
-      request.addEventListener("blocked", (event) => blocked(
-        // Casting due to https://github.com/microsoft/TypeScript-DOM-lib-generator/pull/1405
-        event.oldVersion,
-        event.newVersion,
-        event
-      ));
-    }
-    openPromise.then((db) => {
-      if (terminated)
-        db.addEventListener("close", () => terminated());
-      if (blocking) {
-        db.addEventListener("versionchange", (event) => blocking(event.oldVersion, event.newVersion, event));
-      }
-    }).catch(() => {
-    });
-    return openPromise;
-  }
-  function getMethod(target, prop) {
-    if (!(target instanceof IDBDatabase && !(prop in target) && typeof prop === "string")) {
-      return;
-    }
-    if (cachedMethods.get(prop))
-      return cachedMethods.get(prop);
-    const targetFuncName = prop.replace(/FromIndex$/, "");
-    const useIndex = prop !== targetFuncName;
-    const isWrite = writeMethods.includes(targetFuncName);
-    if (
-      // Bail if the target doesn't exist on the target. Eg, getAll isn't in Edge.
-      !(targetFuncName in (useIndex ? IDBIndex : IDBObjectStore).prototype) || !(isWrite || readMethods.includes(targetFuncName))
-    ) {
-      return;
-    }
-    const method = /* @__PURE__ */ __name(async function(storeName, ...args) {
-      const tx = this.transaction(storeName, isWrite ? "readwrite" : "readonly");
-      let target2 = tx.store;
-      if (useIndex)
-        target2 = target2.index(args.shift());
-      return (await Promise.all([
-        target2[targetFuncName](...args),
-        isWrite && tx.done
-      ]))[0];
-    }, "method");
-    cachedMethods.set(prop, method);
-    return method;
-  }
-  async function* iterate(...args) {
-    let cursor = this;
-    if (!(cursor instanceof IDBCursor)) {
-      cursor = await cursor.openCursor(...args);
-    }
-    if (!cursor)
-      return;
-    cursor = cursor;
-    const proxiedCursor = new Proxy(cursor, cursorIteratorTraps);
-    ittrProxiedCursorToOriginalProxy.set(proxiedCursor, cursor);
-    reverseTransformCache.set(proxiedCursor, unwrap(cursor));
-    while (cursor) {
-      yield proxiedCursor;
-      cursor = await (advanceResults.get(proxiedCursor) || cursor.continue());
-      advanceResults.delete(proxiedCursor);
-    }
-  }
-  function isIteratorProp(target, prop) {
-    return prop === Symbol.asyncIterator && instanceOfAny(target, [IDBIndex, IDBObjectStore, IDBCursor]) || prop === "iterate" && instanceOfAny(target, [IDBIndex, IDBObjectStore]);
-  }
-  var instanceOfAny, idbProxyableTypes, cursorAdvanceMethods, transactionDoneMap, transformCache, reverseTransformCache, idbProxyTraps, unwrap, readMethods, writeMethods, cachedMethods, advanceMethodProps, methodMap, advanceResults, ittrProxiedCursorToOriginalProxy, cursorIteratorTraps;
-  var init_build = __esm({
-    "node_modules/idb/build/index.js"() {
-      instanceOfAny = /* @__PURE__ */ __name((object, constructors) => constructors.some((c) => object instanceof c), "instanceOfAny");
-      __name(getIdbProxyableTypes, "getIdbProxyableTypes");
-      __name(getCursorAdvanceMethods, "getCursorAdvanceMethods");
-      transactionDoneMap = /* @__PURE__ */ new WeakMap();
-      transformCache = /* @__PURE__ */ new WeakMap();
-      reverseTransformCache = /* @__PURE__ */ new WeakMap();
-      __name(promisifyRequest, "promisifyRequest");
-      __name(cacheDonePromiseForTransaction, "cacheDonePromiseForTransaction");
-      idbProxyTraps = {
-        get(target, prop, receiver) {
-          if (target instanceof IDBTransaction) {
-            if (prop === "done")
-              return transactionDoneMap.get(target);
-            if (prop === "store") {
-              return receiver.objectStoreNames[1] ? void 0 : receiver.objectStore(receiver.objectStoreNames[0]);
-            }
-          }
-          return wrap(target[prop]);
-        },
-        set(target, prop, value) {
-          target[prop] = value;
-          return true;
-        },
-        has(target, prop) {
-          if (target instanceof IDBTransaction && (prop === "done" || prop === "store")) {
-            return true;
-          }
-          return prop in target;
-        }
-      };
-      __name(replaceTraps, "replaceTraps");
-      __name(wrapFunction, "wrapFunction");
-      __name(transformCachableValue, "transformCachableValue");
-      __name(wrap, "wrap");
-      unwrap = /* @__PURE__ */ __name((value) => reverseTransformCache.get(value), "unwrap");
-      __name(openDB, "openDB");
-      readMethods = ["get", "getKey", "getAll", "getAllKeys", "count"];
-      writeMethods = ["put", "add", "delete", "clear"];
-      cachedMethods = /* @__PURE__ */ new Map();
-      __name(getMethod, "getMethod");
-      replaceTraps((oldTraps) => ({
-        ...oldTraps,
-        get: /* @__PURE__ */ __name((target, prop, receiver) => getMethod(target, prop) || oldTraps.get(target, prop, receiver), "get"),
-        has: /* @__PURE__ */ __name((target, prop) => !!getMethod(target, prop) || oldTraps.has(target, prop), "has")
-      }));
-      advanceMethodProps = ["continue", "continuePrimaryKey", "advance"];
-      methodMap = {};
-      advanceResults = /* @__PURE__ */ new WeakMap();
-      ittrProxiedCursorToOriginalProxy = /* @__PURE__ */ new WeakMap();
-      cursorIteratorTraps = {
-        get(target, prop) {
-          if (!advanceMethodProps.includes(prop))
-            return target[prop];
-          let cachedFunc = methodMap[prop];
-          if (!cachedFunc) {
-            cachedFunc = methodMap[prop] = function(...args) {
-              advanceResults.set(this, ittrProxiedCursorToOriginalProxy.get(this)[prop](...args));
-            };
-          }
-          return cachedFunc;
-        }
-      };
-      __name(iterate, "iterate");
-      __name(isIteratorProp, "isIteratorProp");
-      replaceTraps((oldTraps) => ({
-        ...oldTraps,
-        get(target, prop, receiver) {
-          if (isIteratorProp(target, prop))
-            return iterate;
-          return oldTraps.get(target, prop, receiver);
-        },
-        has(target, prop) {
-          return isIteratorProp(target, prop) || oldTraps.has(target, prop);
-        }
-      }));
-    }
-  });
-
-  // src-js/audio/TemporalMemoryService.ts
-  var DB_NAME, DB_VERSION, SIGNATURE_STORE, SIGNATURE_KEY, _TemporalMemoryService, TemporalMemoryService, temporalMemoryService;
-  var init_TemporalMemoryService = __esm({
-    "src-js/audio/TemporalMemoryService.ts"() {
-      "use strict";
-      init_signature();
-      init_build();
-      DB_NAME = "Year3000-TemporalMemory";
-      DB_VERSION = 1;
-      SIGNATURE_STORE = "aestheticSignatures";
-      SIGNATURE_KEY = "currentUser";
-      _TemporalMemoryService = class _TemporalMemoryService {
-        constructor() {
-          this.dbPromise = openDB(DB_NAME, DB_VERSION, {
-            upgrade(db) {
-              if (!db.objectStoreNames.contains(SIGNATURE_STORE)) {
-                db.createObjectStore(SIGNATURE_STORE);
-              }
-            }
-          });
-        }
-        async getSignature(userId = "defaultUser") {
-          try {
-            const db = await this.dbPromise;
-            const signature = await db.get(SIGNATURE_STORE, SIGNATURE_KEY);
-            if (signature) {
-              return signature;
-            } else {
-              const defaultSignature = createDefaultSignature(userId);
-              await this.saveSignature(defaultSignature);
-              return defaultSignature;
-            }
-          } catch (error) {
-            console.error(
-              "[TemporalMemoryService] Failed to get signature from IndexedDB. Returning default.",
-              error
-            );
-            return createDefaultSignature(userId);
-          }
-        }
-        async saveSignature(signature) {
-          try {
-            const db = await this.dbPromise;
-            signature.lastModified = Date.now();
-            await db.put(SIGNATURE_STORE, signature, SIGNATURE_KEY);
-          } catch (error) {
-            console.error(
-              "[TemporalMemoryService] Failed to save signature to IndexedDB.",
-              error
-            );
-          }
-        }
-        async resetSignature(userId = "defaultUser") {
-          const defaultSignature = createDefaultSignature(userId);
-          await this.saveSignature(defaultSignature);
-          console.log("[TemporalMemoryService] Aesthetic signature has been reset.");
-          return defaultSignature;
-        }
-        async getSignatureTrends(signature) {
-          if (!signature) return null;
-          const trends = {
-            dominantColor: null,
-            dominantRhythm: null,
-            avgEnergy: 0,
-            avgValence: 0
-          };
-          let dominantColor = null;
-          signature.colorMemories.forEach((mem, hex) => {
-            if (!dominantColor || mem.count > dominantColor.count) {
-              dominantColor = { hex, count: mem.count };
-            }
-            trends.avgValence += mem.emotionalValence * mem.count;
-          });
-          let totalColorCount = 0;
-          signature.colorMemories.forEach((mem) => totalColorCount += mem.count);
-          if (totalColorCount > 0) {
-            trends.avgValence /= totalColorCount;
-          }
-          trends.dominantColor = dominantColor;
-          let dominantRhythm = null;
-          signature.rhythmicPreferences.forEach((pattern, id) => {
-            if (!dominantRhythm || pattern.count > dominantRhythm.count) {
-              dominantRhythm = { id, count: pattern.count };
-            }
-            trends.avgEnergy += pattern.associatedEnergy * pattern.count;
-          });
-          let totalRhythmCount = 0;
-          signature.rhythmicPreferences.forEach((p) => totalRhythmCount += p.count);
-          if (totalRhythmCount > 0) {
-            trends.avgEnergy /= totalRhythmCount;
-          }
-          trends.dominantRhythm = dominantRhythm;
-          return trends;
-        }
-      };
-      __name(_TemporalMemoryService, "TemporalMemoryService");
-      TemporalMemoryService = _TemporalMemoryService;
-      temporalMemoryService = new TemporalMemoryService();
-    }
-  });
-
-  // src-js/core/animation/EmergentChoreographyEngine.ts
-  var _EmergentChoreographyEngine, EmergentChoreographyEngine;
-  var init_EmergentChoreographyEngine = __esm({
-    "src-js/core/animation/EmergentChoreographyEngine.ts"() {
-      "use strict";
-      init_TemporalMemoryService();
-      init_EventBus();
-      init_Year3000Utilities();
-      init_BaseVisualSystem();
-      _EmergentChoreographyEngine = class _EmergentChoreographyEngine extends BaseVisualSystem {
-        constructor(config, utils, performanceMonitor, settingsManager) {
-          super(
-            config,
-            utils || Year3000Utilities_exports,
-            performanceMonitor,
-            null,
-            settingsManager || null
-          );
-          this.eventSubscriptions = [];
-          this.signature = null;
-          this.saveInterval = null;
-          this.currentBpm = 120;
-          this.currentIntensity = 0.5;
-          this.systemName = "EmergentChoreographyEngine";
-          this.currentMultipliers = this.config.cosmicMultipliers;
-        }
-        async healthCheck() {
-          if (!GlobalEventBus) {
-            return {
-              healthy: false,
-              ok: false,
-              details: "GlobalEventBus is not available.",
-              issues: ["GlobalEventBus is not available."],
-              system: "EmergentChoreographyEngine"
-            };
-          }
-          return {
-            healthy: true,
-            ok: true,
-            details: "Emergent Choreography Engine is operational.",
-            issues: [],
-            system: "EmergentChoreographyEngine"
-          };
-        }
-        async initialize() {
-          await super.initialize();
-          if (this.config.enableDebug) {
-            console.log(`[${this.systemName}] Initializing...`);
-          }
-          this.signature = await temporalMemoryService.getSignature();
-          this.registerEventListeners();
-          this.saveInterval = setInterval(() => {
-            if (this.signature) {
-              temporalMemoryService.saveSignature(this.signature);
-            }
-          }, 3e4);
-        }
-        registerEventListeners() {
-          const beatFrameSub = GlobalEventBus.subscribe(
-            "beat/frame",
-            (payload) => this.handleBeatFrame(payload)
-          );
-          const harmonyFrameSub = GlobalEventBus.subscribe(
-            "colorharmony/frame",
-            (payload) => this.handleHarmonyFrame(payload)
-          );
-          const bpmSub = GlobalEventBus.subscribe(
-            "beat/bpm",
-            (payload) => {
-              this.currentBpm = payload.bpm;
-            }
-          );
-          const intensitySub = GlobalEventBus.subscribe(
-            "beat/intensity",
-            (payload) => {
-              this.currentIntensity = payload.intensity;
-            }
-          );
-          this.eventSubscriptions.push(
-            beatFrameSub,
-            harmonyFrameSub,
-            bpmSub,
-            intensitySub
-          );
-        }
-        handleBeatFrame(payload) {
-          if (!this.signature) return;
-          this.signature.lastModified = Date.now();
-        }
-        handleHarmonyFrame(payload) {
-          if (!this.signature) return;
-          const { kineticState } = payload;
-          this.signature.lastModified = Date.now();
-        }
-        async _updateEvolutionaryTrajectory() {
-          if (!this.signature) return;
-          const trends = await temporalMemoryService.getSignatureTrends(
-            this.signature
-          );
-          if (!trends) return;
-          const { avgEnergy, avgValence } = trends;
-          const explorationFactor = 0.5 + (avgEnergy - 0.5) * 0.2;
-          this.signature.evolutionaryTrajectory.explorationFactor = Math.max(
-            0.1,
-            Math.min(0.9, explorationFactor)
-          );
-          const adaptability = 0.5 + (Math.abs(avgValence) - 0.2) * 0.3;
-          this.signature.evolutionaryTrajectory.adaptability = Math.max(
-            0.1,
-            Math.min(0.9, adaptability)
-          );
-          this.signature.evolutionaryTrajectory.lastUpdate = Date.now();
-        }
-        _calculateVisualPulse(deltaMs) {
-          if (!this.initialized) return null;
-          const beatInterval = 6e4 / this.currentBpm;
-          const phase = performance.now() % beatInterval / beatInterval;
-          const hueShift = Math.sin(phase * 2 * Math.PI + Math.PI / 2) * 15 * this.currentIntensity;
-          return {
-            timestamp: performance.now(),
-            bpm: this.currentBpm,
-            intensity: this.currentIntensity,
-            phase,
-            hueShift
-          };
-        }
-        _calculateAdaptiveCoefficients() {
-          if (!this.signature) return;
-          const { adaptability, explorationFactor } = this.signature.evolutionaryTrajectory;
-          const kineticIntensity = 0.5 + adaptability * 0.5;
-          const visualIntensityBase = 0.8 + explorationFactor * 0.4;
-          this.currentMultipliers = {
-            ...this.config.cosmicMultipliers,
-            kineticIntensity,
-            visualIntensityBase
-          };
-          GlobalEventBus.publish(
-            "emergent/multipliersUpdated",
-            this.currentMultipliers
-          );
-        }
-        getCurrentMultipliers() {
-          return this.currentMultipliers;
-        }
-        updateAnimation(deltaTime) {
-          this.onTick(deltaTime);
-        }
-        onTick(deltaMs) {
-          if (!this.initialized) return;
-          this._calculateAdaptiveCoefficients();
-          if (this.signature && Date.now() - this.signature.evolutionaryTrajectory.lastUpdate > 6e4) {
-            this._updateEvolutionaryTrajectory();
-          }
-          const visualPulse = this._calculateVisualPulse(deltaMs);
-          if (visualPulse) {
-            GlobalEventBus.publish("visual/pulse", visualPulse);
-          }
-          const emergentPayload = {
-            timestamp: performance.now(),
-            deltaMs
-            // ...other emergent data to be calculated in later phases
-          };
-          GlobalEventBus.publish("emergent/frame", emergentPayload);
-        }
-        destroy() {
-          if (this.config.enableDebug) {
-            console.log(`[${this.systemName}] Destroying...`);
-          }
-          if (this.signature) {
-            temporalMemoryService.saveSignature(this.signature);
-          }
-          if (this.saveInterval) {
-            clearInterval(this.saveInterval);
-          }
-          this.eventSubscriptions.forEach((unsubscribe) => unsubscribe());
-          this.eventSubscriptions = [];
-          super.destroy?.();
-        }
-      };
-      __name(_EmergentChoreographyEngine, "EmergentChoreographyEngine");
-      EmergentChoreographyEngine = _EmergentChoreographyEngine;
-    }
-  });
-
   // src-js/core/performance/AdaptivePerformanceSystem.ts
   var _AdaptivePerformanceSystem, AdaptivePerformanceSystem;
   var init_AdaptivePerformanceSystem = __esm({
@@ -13291,11 +10898,8 @@ void main() {
       init_ParticleFieldSystem();
       init_WebGLGradientBackgroundSystem();
       init_OrganicBeatSyncConsciousness();
-      init_BehavioralPredictionEngine();
       init_InteractionTrackingSystem();
-      init_PredictiveMaterializationSystem();
       init_SpotifyUIApplicationSystem();
-      init_EmergentChoreographyEngine();
       init_AdaptivePerformanceSystem();
       _VisualSystemFacade = class _VisualSystemFacade {
         constructor(config, utils, year3000System2, cssVariableBatcher, performanceAnalyzer, musicSyncService, settingsManager, colorHarmonyEngine, eventBus) {
@@ -13359,16 +10963,10 @@ void main() {
           this.systemDependencies.set("WebGLBackground", ["performanceAnalyzer", "eventBus"]);
           this.systemRegistry.set("OrganicBeatSync", OrganicBeatSyncConsciousness);
           this.systemDependencies.set("OrganicBeatSync", ["performanceAnalyzer", "cssVariableBatcher", "eventBus", "musicSyncService", "colorHarmonyEngine"]);
-          this.systemRegistry.set("BehavioralPrediction", BehavioralPredictionEngine);
-          this.systemDependencies.set("BehavioralPrediction", ["performanceAnalyzer", "cssVariableBatcher", "eventBus"]);
           this.systemRegistry.set("InteractionTracking", InteractionTrackingSystem);
           this.systemDependencies.set("InteractionTracking", ["performanceAnalyzer", "cssVariableBatcher"]);
-          this.systemRegistry.set("PredictiveMaterialization", PredictiveMaterializationSystem);
-          this.systemDependencies.set("PredictiveMaterialization", ["performanceAnalyzer", "cssVariableBatcher", "eventBus"]);
           this.systemRegistry.set("SpotifyUIApplication", SpotifyUIApplicationSystem);
           this.systemDependencies.set("SpotifyUIApplication", ["year3000System"]);
-          this.systemRegistry.set("EmergentChoreography", EmergentChoreographyEngine);
-          this.systemDependencies.set("EmergentChoreography", ["performanceAnalyzer", "cssVariableBatcher", "eventBus"]);
         }
         async initialize(config) {
           if (this.isInitialized) {
@@ -13960,467 +11558,6 @@ void main() {
     }
   });
 
-  // src-js/core/performance/PerformanceOptimizationManager.ts
-  var _PerformanceOptimizationManager, PerformanceOptimizationManager;
-  var init_PerformanceOptimizationManager = __esm({
-    "src-js/core/performance/PerformanceOptimizationManager.ts"() {
-      "use strict";
-      init_EventBus();
-      _PerformanceOptimizationManager = class _PerformanceOptimizationManager {
-        constructor(config, cssVariableManager, animationCoordinator, performanceCoordinator) {
-          this.batteryState = null;
-          // Performance monitoring
-          this.frameTimeHistory = [];
-          this.memoryUsageHistory = [];
-          this.lastOptimizationTime = 0;
-          this.optimizationCooldown = 5e3;
-          // 5 seconds
-          // Performance thresholds
-          this.PERFORMANCE_THRESHOLDS = {
-            FRAME_TIME_CRITICAL: 33.33,
-            // 30fps
-            FRAME_TIME_WARNING: 20,
-            // 50fps
-            MEMORY_CRITICAL: 0.9,
-            // 90% memory usage
-            MEMORY_WARNING: 0.7,
-            // 70% memory usage
-            CPU_CRITICAL: 0.8,
-            // 80% CPU usage
-            CPU_WARNING: 0.6,
-            // 60% CPU usage
-            THERMAL_THROTTLE: 0.7
-            // 70% thermal threshold
-          };
-          // Performance modes configuration
-          this.PERFORMANCE_MODES = {
-            battery: {
-              name: "battery",
-              qualityLevel: 0.4,
-              animationQuality: 0.3,
-              effectQuality: 0.2,
-              blurQuality: 0.3,
-              shadowQuality: 0.2,
-              frameRate: 30,
-              optimizationLevel: 3
-            },
-            balanced: {
-              name: "balanced",
-              qualityLevel: 0.8,
-              animationQuality: 0.8,
-              effectQuality: 0.7,
-              blurQuality: 0.8,
-              shadowQuality: 0.7,
-              frameRate: 60,
-              optimizationLevel: 1
-            },
-            performance: {
-              name: "performance",
-              qualityLevel: 1,
-              animationQuality: 1,
-              effectQuality: 1,
-              blurQuality: 1,
-              shadowQuality: 1,
-              frameRate: 60,
-              optimizationLevel: 0
-            },
-            auto: {
-              name: "auto",
-              qualityLevel: 0.8,
-              // Will be dynamically adjusted
-              animationQuality: 0.8,
-              effectQuality: 0.8,
-              blurQuality: 0.8,
-              shadowQuality: 0.8,
-              frameRate: 60,
-              optimizationLevel: 1
-            }
-          };
-          this.config = config;
-          this.cssVariableManager = cssVariableManager;
-          this.animationCoordinator = animationCoordinator;
-          this.performanceCoordinator = performanceCoordinator;
-          this.eventBus = GlobalEventBus;
-          this.settings = {
-            autoOptimization: true,
-            thermalThrottling: true,
-            batteryOptimization: true,
-            frameSkipThreshold: 45,
-            memoryThreshold: 0.8,
-            cpuThreshold: 0.7,
-            adaptiveQuality: true,
-            debugMode: this.config.enableDebug
-          };
-          this.deviceCapabilities = this.detectDeviceCapabilities();
-          this.thermalState = {
-            temperature: "normal",
-            throttleLevel: 0,
-            cpuUsage: 0,
-            gpuUsage: 0,
-            memoryUsage: 0
-          };
-          this.currentPerformanceMode = this.PERFORMANCE_MODES.auto;
-          this.initializeBatteryMonitoring();
-          this.subscribeToEvents();
-          this.applyPerformanceMode(this.currentPerformanceMode);
-          if (this.config.enableDebug) {
-            console.log("[PerformanceOptimizationManager] Initialized with device capabilities:", this.deviceCapabilities);
-          }
-        }
-        /**
-         * Get or create singleton instance
-         */
-        static getInstance(config, cssVariableManager, animationCoordinator, performanceCoordinator) {
-          if (!_PerformanceOptimizationManager.instance) {
-            if (!config || !cssVariableManager || !animationCoordinator || !performanceCoordinator) {
-              throw new Error("PerformanceOptimizationManager requires all dependencies for first initialization");
-            }
-            _PerformanceOptimizationManager.instance = new _PerformanceOptimizationManager(
-              config,
-              cssVariableManager,
-              animationCoordinator,
-              performanceCoordinator
-            );
-          }
-          return _PerformanceOptimizationManager.instance;
-        }
-        /**
-         * Set performance mode manually
-         */
-        setPerformanceMode(mode) {
-          const performanceMode = this.PERFORMANCE_MODES[mode];
-          if (!performanceMode) {
-            console.warn(`[PerformanceOptimizationManager] Unknown performance mode: ${mode}`);
-            return;
-          }
-          this.currentPerformanceMode = performanceMode;
-          this.applyPerformanceMode(performanceMode);
-          this.eventBus.publish("performance:mode-changed", {
-            mode: performanceMode.name,
-            timestamp: Date.now()
-          });
-          if (this.config.enableDebug) {
-            console.log(`[PerformanceOptimizationManager] Performance mode set to: ${mode}`);
-          }
-        }
-        /**
-         * Update performance metrics and trigger optimization if needed
-         */
-        updatePerformanceMetrics(metrics) {
-          this.frameTimeHistory.push(metrics.frameTime);
-          if (this.frameTimeHistory.length > 60) {
-            this.frameTimeHistory.shift();
-          }
-          this.memoryUsageHistory.push(metrics.memoryUsage);
-          if (this.memoryUsageHistory.length > 60) {
-            this.memoryUsageHistory.shift();
-          }
-          this.thermalState.cpuUsage = metrics.cpuUsage;
-          this.thermalState.gpuUsage = metrics.gpuUsage;
-          this.thermalState.memoryUsage = metrics.memoryUsage;
-          if (this.settings.autoOptimization && this.shouldOptimize(metrics)) {
-            this.performAutoOptimization(metrics);
-          }
-          this.updatePerformanceVariables(metrics);
-        }
-        /**
-         * Get current device capabilities
-         */
-        getDeviceCapabilities() {
-          return { ...this.deviceCapabilities };
-        }
-        /**
-         * Get current performance mode
-         */
-        getCurrentPerformanceMode() {
-          return { ...this.currentPerformanceMode };
-        }
-        /**
-         * Get performance optimization settings
-         */
-        getSettings() {
-          return { ...this.settings };
-        }
-        /**
-         * Update performance optimization settings
-         */
-        updateSettings(newSettings) {
-          this.settings = { ...this.settings, ...newSettings };
-          if (this.config.enableDebug) {
-            console.log("[PerformanceOptimizationManager] Settings updated:", this.settings);
-          }
-        }
-        /**
-         * Force performance optimization
-         */
-        forceOptimization() {
-          const avgFrameTime = this.frameTimeHistory.reduce((sum, time) => sum + time, 0) / this.frameTimeHistory.length;
-          const avgMemoryUsage = this.memoryUsageHistory.reduce((sum, usage) => sum + usage, 0) / this.memoryUsageHistory.length;
-          this.performAutoOptimization({
-            frameTime: avgFrameTime,
-            memoryUsage: avgMemoryUsage,
-            cpuUsage: this.thermalState.cpuUsage
-          });
-        }
-        /**
-         * Get performance metrics summary
-         */
-        getPerformanceMetrics() {
-          const avgFrameTime = this.frameTimeHistory.length > 0 ? this.frameTimeHistory.reduce((sum, time) => sum + time, 0) / this.frameTimeHistory.length : 0;
-          const avgMemoryUsage = this.memoryUsageHistory.length > 0 ? this.memoryUsageHistory.reduce((sum, usage) => sum + usage, 0) / this.memoryUsageHistory.length : 0;
-          return {
-            averageFrameTime: avgFrameTime,
-            averageMemoryUsage: avgMemoryUsage,
-            thermalState: { ...this.thermalState },
-            batteryState: this.batteryState ? { ...this.batteryState } : null,
-            currentMode: this.currentPerformanceMode.name,
-            optimizationLevel: this.currentPerformanceMode.optimizationLevel
-          };
-        }
-        /**
-         * Destroy the manager
-         */
-        destroy() {
-          if (_PerformanceOptimizationManager.instance === this) {
-            _PerformanceOptimizationManager.instance = null;
-          }
-          if (this.config.enableDebug) {
-            console.log("[PerformanceOptimizationManager] Destroyed");
-          }
-        }
-        // =========================================================================
-        // PRIVATE METHODS
-        // =========================================================================
-        /**
-         * Detect device capabilities
-         */
-        detectDeviceCapabilities() {
-          const canvas = document.createElement("canvas");
-          const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-          const memoryGB = navigator.deviceMemory || 4;
-          const cpuCores = navigator.hardwareConcurrency || 4;
-          const devicePixelRatio = window.devicePixelRatio || 1;
-          let performanceTier = "medium";
-          if (memoryGB >= 16 && cpuCores >= 8) {
-            performanceTier = "premium";
-          } else if (memoryGB >= 8 && cpuCores >= 4) {
-            performanceTier = "high";
-          } else if (memoryGB >= 4 && cpuCores >= 2) {
-            performanceTier = "medium";
-          } else {
-            performanceTier = "low";
-          }
-          const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-          const supportsWebGL = !!gl;
-          const maxTextureSize = gl ? gl.getParameter(gl.MAX_TEXTURE_SIZE) : 2048;
-          const supportsBackdropFilter = CSS.supports("backdrop-filter", "blur(1px)");
-          return {
-            performanceTier,
-            memoryGB,
-            cpuCores,
-            gpuAcceleration: supportsWebGL,
-            isMobile,
-            supportsWebGL,
-            supportsBackdropFilter,
-            maxTextureSize,
-            devicePixelRatio
-          };
-        }
-        /**
-         * Initialize battery monitoring
-         */
-        async initializeBatteryMonitoring() {
-          try {
-            const battery = await navigator.getBattery?.();
-            if (battery) {
-              this.batteryState = {
-                level: battery.level,
-                charging: battery.charging,
-                chargingTime: battery.chargingTime,
-                dischargingTime: battery.dischargingTime
-              };
-              battery.addEventListener("levelchange", () => {
-                if (this.batteryState) {
-                  this.batteryState.level = battery.level;
-                  this.checkBatteryOptimization();
-                }
-              });
-              battery.addEventListener("chargingchange", () => {
-                if (this.batteryState) {
-                  this.batteryState.charging = battery.charging;
-                  this.checkBatteryOptimization();
-                }
-              });
-            }
-          } catch (error) {
-            if (this.config.enableDebug) {
-              console.log("[PerformanceOptimizationManager] Battery API not available");
-            }
-          }
-        }
-        /**
-         * Subscribe to performance events
-         */
-        subscribeToEvents() {
-          this.eventBus.subscribe("performance:metrics-updated", (payload) => {
-            this.updatePerformanceMetrics(payload);
-          });
-          this.eventBus.subscribe("performance:thermal-warning", (payload) => {
-            this.handleThermalWarning(payload.temperature);
-          });
-          this.eventBus.subscribe("performance:memory-pressure", (payload) => {
-            this.handleMemoryPressure(payload.level);
-          });
-          this.eventBus.subscribe("animation:performance-metrics", (payload) => {
-            this.updatePerformanceMetrics({
-              frameTime: payload.avgFrameTime,
-              memoryUsage: 0,
-              // Not available from animation coordinator
-              cpuUsage: payload.avgFrameTime > 16.67 ? 0.7 : 0.3,
-              gpuUsage: 0.2
-            });
-          });
-        }
-        /**
-         * Apply performance mode settings
-         */
-        applyPerformanceMode(mode) {
-          this.cssVariableManager.updatePerformanceVariables({
-            "mode": mode.name,
-            "quality.level": mode.qualityLevel,
-            "fps.target": mode.frameRate,
-            "frame.budget": 1e3 / mode.frameRate
-          });
-          this.animationCoordinator.setPerformanceMode(mode.qualityLevel > 0.7 ? "quality" : "performance");
-          document.body.className = document.body.className.replace(/performance-mode-\w+/g, "");
-          document.body.classList.add(`performance-mode-${mode.name}`);
-          document.body.className = document.body.className.replace(/device-tier-\w+/g, "");
-          document.body.classList.add(`device-tier-${this.deviceCapabilities.performanceTier}`);
-          document.body.className = document.body.className.replace(/thermal-\w+/g, "");
-          document.body.classList.add(`thermal-${this.thermalState.temperature}`);
-          if (this.batteryState) {
-            document.body.className = document.body.className.replace(/battery-\w+/g, "");
-            if (this.batteryState.level < 0.2) {
-              document.body.classList.add("battery-low");
-            } else if (this.batteryState.charging) {
-              document.body.classList.add("battery-charging");
-            }
-          }
-        }
-        /**
-         * Check if optimization is needed
-         */
-        shouldOptimize(metrics) {
-          const now = Date.now();
-          if (now - this.lastOptimizationTime < this.optimizationCooldown) {
-            return false;
-          }
-          if (metrics.frameTime > this.PERFORMANCE_THRESHOLDS.FRAME_TIME_CRITICAL) {
-            return true;
-          }
-          if (metrics.memoryUsage > this.PERFORMANCE_THRESHOLDS.MEMORY_CRITICAL) {
-            return true;
-          }
-          if (metrics.cpuUsage > this.PERFORMANCE_THRESHOLDS.CPU_CRITICAL) {
-            return true;
-          }
-          return false;
-        }
-        /**
-         * Perform automatic optimization
-         */
-        performAutoOptimization(metrics) {
-          this.lastOptimizationTime = Date.now();
-          let newMode = this.currentPerformanceMode;
-          if (metrics.frameTime > this.PERFORMANCE_THRESHOLDS.FRAME_TIME_CRITICAL || metrics.memoryUsage > this.PERFORMANCE_THRESHOLDS.MEMORY_CRITICAL) {
-            newMode = this.PERFORMANCE_MODES.battery;
-          } else if (metrics.frameTime > this.PERFORMANCE_THRESHOLDS.FRAME_TIME_WARNING || metrics.memoryUsage > this.PERFORMANCE_THRESHOLDS.MEMORY_WARNING) {
-            newMode = this.PERFORMANCE_MODES.balanced;
-          }
-          if (this.settings.batteryOptimization && this.batteryState && this.batteryState.level < 0.2 && !this.batteryState.charging) {
-            newMode = this.PERFORMANCE_MODES.battery;
-          }
-          if (newMode.name !== this.currentPerformanceMode.name) {
-            this.currentPerformanceMode = newMode;
-            this.applyPerformanceMode(newMode);
-            this.eventBus.publish("performance:auto-optimized", {
-              mode: newMode.name,
-              reason: "performance-metrics",
-              metrics,
-              timestamp: Date.now()
-            });
-            if (this.config.enableDebug) {
-              console.log(`[PerformanceOptimizationManager] Auto-optimized to ${newMode.name} mode`);
-            }
-          }
-        }
-        /**
-         * Update performance-related CSS variables
-         */
-        updatePerformanceVariables(metrics) {
-          this.cssVariableManager.updatePerformanceVariables({
-            "frame.budget": 1e3 / this.currentPerformanceMode.frameRate,
-            "fps.target": this.currentPerformanceMode.frameRate,
-            "thermal.temperature": this.thermalState.cpuUsage,
-            "thermal.throttle": this.thermalState.throttleLevel > 0
-          });
-          if (this.batteryState) {
-            this.cssVariableManager.updatePerformanceVariables({
-              "battery.level": this.batteryState.level,
-              "battery.charging": this.batteryState.charging,
-              "battery.saver": this.batteryState.level < 0.2 && !this.batteryState.charging
-            });
-          }
-        }
-        /**
-         * Handle thermal warnings
-         */
-        handleThermalWarning(temperature) {
-          this.thermalState.temperature = temperature;
-          if (this.settings.thermalThrottling) {
-            switch (temperature) {
-              case "warm":
-                this.thermalState.throttleLevel = 0.2;
-                break;
-              case "hot":
-                this.thermalState.throttleLevel = 0.5;
-                break;
-              case "critical":
-                this.thermalState.throttleLevel = 1;
-                this.setPerformanceMode("battery");
-                break;
-            }
-            this.applyPerformanceMode(this.currentPerformanceMode);
-          }
-        }
-        /**
-         * Handle memory pressure
-         */
-        handleMemoryPressure(level) {
-          if (level === "high") {
-            this.setPerformanceMode("battery");
-          } else if (level === "medium") {
-            this.setPerformanceMode("balanced");
-          }
-        }
-        /**
-         * Check battery optimization
-         */
-        checkBatteryOptimization() {
-          if (!this.settings.batteryOptimization || !this.batteryState) return;
-          if (this.batteryState.level < 0.2 && !this.batteryState.charging) {
-            this.setPerformanceMode("battery");
-          } else if (this.batteryState.charging && this.currentPerformanceMode.name === "battery") {
-            this.setPerformanceMode("balanced");
-          }
-        }
-      };
-      __name(_PerformanceOptimizationManager, "PerformanceOptimizationManager");
-      _PerformanceOptimizationManager.instance = null;
-      PerformanceOptimizationManager = _PerformanceOptimizationManager;
-    }
-  });
-
   // src-js/core/css/PerformanceCSSIntegration.ts
   var _PerformanceCSSIntegration, PerformanceCSSIntegration;
   var init_PerformanceCSSIntegration = __esm({
@@ -14428,7 +11565,7 @@ void main() {
       "use strict";
       init_EventBus();
       _PerformanceCSSIntegration = class _PerformanceCSSIntegration {
-        constructor(config, cssVariableManager, performanceManager) {
+        constructor(config, cssVariableManager, performanceCoordinator) {
           // Performance state tracking
           this.currentDeviceCapabilities = null;
           this.currentPerformanceMode = null;
@@ -14439,7 +11576,7 @@ void main() {
           this.appliedClasses = /* @__PURE__ */ new Set();
           this.config = config;
           this.cssVariableManager = cssVariableManager;
-          this.performanceManager = performanceManager;
+          this.performanceCoordinator = performanceCoordinator;
           this.eventBus = GlobalEventBus;
           this.cssConfig = {
             enableAdaptiveOptimization: true,
@@ -14448,8 +11585,8 @@ void main() {
             enableDeviceTierOptimization: true,
             debugPerformanceClasses: this.config.enableDebug
           };
-          this.currentDeviceCapabilities = this.performanceManager.getDeviceCapabilities();
-          this.currentPerformanceMode = this.performanceManager.getCurrentPerformanceMode();
+          this.currentDeviceCapabilities = this.performanceCoordinator.getDeviceCapabilities();
+          this.currentPerformanceMode = this.performanceCoordinator.getCurrentPerformanceMode();
           this.subscribeToEvents();
           this.applyInitialOptimizations();
           if (this.config.enableDebug) {
@@ -14459,15 +11596,15 @@ void main() {
         /**
          * Get or create singleton instance
          */
-        static getInstance(config, cssVariableManager, performanceManager) {
+        static getInstance(config, cssVariableManager, performanceCoordinator) {
           if (!_PerformanceCSSIntegration.instance) {
-            if (!config || !cssVariableManager || !performanceManager) {
+            if (!config || !cssVariableManager || !performanceCoordinator) {
               throw new Error("PerformanceCSSIntegration requires all dependencies for first initialization");
             }
             _PerformanceCSSIntegration.instance = new _PerformanceCSSIntegration(
               config,
               cssVariableManager,
-              performanceManager
+              performanceCoordinator
             );
           }
           return _PerformanceCSSIntegration.instance;
@@ -14594,7 +11731,7 @@ void main() {
          */
         subscribeToEvents() {
           this.eventBus.subscribe("performance:mode-changed", (payload) => {
-            this.currentPerformanceMode = this.performanceManager.getCurrentPerformanceMode();
+            this.currentPerformanceMode = this.performanceCoordinator.getCurrentPerformanceMode();
             this.applyPerformanceModeOptimizations();
             this.updateCSSPerformanceVariables();
           });
@@ -14602,7 +11739,7 @@ void main() {
             this.applyThermalOptimizations(payload.temperature);
           });
           this.eventBus.subscribe("performance:auto-optimized", (payload) => {
-            this.currentPerformanceMode = this.performanceManager.getCurrentPerformanceMode();
+            this.currentPerformanceMode = this.performanceCoordinator.getCurrentPerformanceMode();
             this.applyCurrentOptimizations();
             this.updateCSSPerformanceVariables();
           });
@@ -14627,11 +11764,12 @@ void main() {
         applyCurrentOptimizations() {
           this.applyDeviceOptimizations();
           this.applyPerformanceModeOptimizations();
-          const metrics = this.performanceManager.getPerformanceMetrics();
-          if (metrics.batteryState) {
-            this.applyBatteryOptimizations(metrics.batteryState.level, metrics.batteryState.charging);
+          const batteryState = this.performanceCoordinator.getBatteryState();
+          const thermalState = this.performanceCoordinator.getThermalState();
+          if (batteryState) {
+            this.applyBatteryOptimizations(batteryState.level, batteryState.charging);
           }
-          const thermalTemp = metrics.thermalState.temperature || "normal";
+          const thermalTemp = thermalState.temperature || "normal";
           this.applyThermalOptimizations(thermalTemp);
         }
         /**
@@ -14711,6 +11849,278 @@ void main() {
       __name(_PerformanceCSSIntegration, "PerformanceCSSIntegration");
       _PerformanceCSSIntegration.instance = null;
       PerformanceCSSIntegration = _PerformanceCSSIntegration;
+    }
+  });
+
+  // src-js/ui/managers/SettingsManager.ts
+  var _SettingsManager, SettingsManager;
+  var init_SettingsManager = __esm({
+    "src-js/ui/managers/SettingsManager.ts"() {
+      "use strict";
+      init_globalConfig();
+      init_Year3000Utilities();
+      _SettingsManager = class _SettingsManager {
+        constructor(config = YEAR3000_CONFIG, harmonicModes = HARMONIC_MODES, utils = Year3000Utilities_exports) {
+          this.initialized = false;
+          this.config = config;
+          this.harmonicModes = harmonicModes;
+          this.utils = utils;
+          this.defaults = {
+            "catppuccin-flavor": "mocha",
+            "catppuccin-accentColor": "mauve",
+            "sn-star-density": "balanced",
+            "sn-gradient-intensity": "balanced",
+            "sn-glassmorphism-level": "moderate",
+            "sn-3d-effects-level": "full",
+            "sn-nebula-intensity": "balanced",
+            "sn-artistic-mode": "artist-vision",
+            "sn-current-harmonic-mode": "analogous-flow",
+            "sn-harmonic-intensity": "0.7",
+            "sn-harmonic-evolution": "true",
+            "sn-harmonic-manual-base-color": "",
+            "sn-enable-aberration": "true",
+            "sn-nebula-aberration-strength": "0.4",
+            "sn-echo-intensity": "2",
+            "sn-visual-intensity": (() => {
+              try {
+                const detector = globalThis.year3000System?.deviceCapabilityDetector;
+                const overall = detector?.deviceCapabilities?.overall;
+                switch (overall) {
+                  case "high":
+                    return "1";
+                  case "medium":
+                    return "0.7";
+                  case "low":
+                    return "0.4";
+                  default:
+                    return "0.8";
+                }
+              } catch (e) {
+                return "0.8";
+              }
+            })(),
+            "sn-animation-quality": "auto",
+            "sn-glass-beat-pulse": "true",
+            "sn-glass-base-intensity": "0.5",
+            "sn-flow-gradient": "balanced"
+          };
+          this.validationSchemas = {
+            "catppuccin-flavor": {
+              default: "mocha",
+              allowedValues: ["latte", "frappe", "macchiato", "mocha"]
+            },
+            "catppuccin-accentColor": {
+              default: "mauve",
+              allowedValues: [
+                "rosewater",
+                "flamingo",
+                "pink",
+                "mauve",
+                "red",
+                "maroon",
+                "peach",
+                "yellow",
+                "green",
+                "teal",
+                "sky",
+                "sapphire",
+                "blue",
+                "lavender",
+                "text",
+                "none"
+              ]
+            },
+            "sn-star-density": {
+              default: "balanced",
+              allowedValues: ["disabled", "minimal", "balanced", "intense"]
+            },
+            "sn-gradient-intensity": {
+              default: "balanced",
+              allowedValues: ["disabled", "minimal", "balanced", "intense"]
+            },
+            "sn-glassmorphism-level": {
+              default: "moderate",
+              allowedValues: ["disabled", "minimal", "moderate", "intense"]
+            },
+            "sn-3d-effects-level": {
+              default: "full",
+              allowedValues: ["full", "minimal", "disabled"]
+            },
+            "sn-nebula-intensity": {
+              default: "balanced",
+              allowedValues: ["disabled", "minimal", "balanced", "intense"]
+            },
+            "sn-artistic-mode": {
+              default: "artist-vision",
+              allowedValues: Object.keys(ARTISTIC_MODE_PROFILES)
+            },
+            "sn-current-harmonic-mode": {
+              default: "analogous-flow",
+              allowedValues: Object.keys(
+                this.harmonicModes
+              )
+            },
+            "sn-harmonic-intensity": { default: "0.7" },
+            "sn-harmonic-evolution": {
+              default: "true",
+              allowedValues: ["true", "false"]
+            },
+            "sn-harmonic-manual-base-color": { default: "" },
+            "sn-enable-aberration": {
+              default: "true",
+              allowedValues: ["true", "false"]
+            },
+            "sn-nebula-aberration-strength": { default: "0.4" },
+            "sn-echo-intensity": {
+              default: "2",
+              allowedValues: ["0", "1", "2", "3"]
+            },
+            "sn-visual-intensity": { default: "0.8" },
+            "sn-animation-quality": {
+              default: "auto",
+              allowedValues: ["auto", "low", "high"]
+            },
+            "sn-glass-beat-pulse": {
+              default: "true",
+              allowedValues: ["true", "false"]
+            },
+            "sn-glass-base-intensity": { default: "0.5" },
+            "sn-flow-gradient": {
+              default: "balanced",
+              allowedValues: ["disabled", "minimal", "balanced", "intense"]
+            }
+          };
+          this.validateAndRepair();
+          this.initialized = true;
+        }
+        forceRepaint(reason) {
+          throw new Error("Method not implemented.");
+        }
+        async initialize() {
+          this.initialized = true;
+        }
+        async healthCheck() {
+          try {
+            Spicetify.LocalStorage.get("spicetify-exp-features");
+            return {
+              healthy: true,
+              ok: true,
+              details: "LocalStorage is accessible.",
+              issues: [],
+              system: "SettingsManager"
+            };
+          } catch (e) {
+            return {
+              healthy: false,
+              ok: false,
+              details: "Failed to access Spicetify.LocalStorage.",
+              issues: [e.message],
+              system: "SettingsManager"
+            };
+          }
+        }
+        get(key) {
+          try {
+            const value = Spicetify.LocalStorage.get(key);
+            const schema = this.validationSchemas[key];
+            if (!schema) {
+              console.warn(`StarryNight: No validation schema for key: ${key}.`);
+              return value;
+            }
+            if (value === null || schema.allowedValues && !schema.allowedValues.includes(value)) {
+              return schema.default;
+            }
+            return value;
+          } catch (error) {
+            console.error(`StarryNight: Error reading key ${key}:`, error);
+            return this.validationSchemas[key]?.default;
+          }
+        }
+        getAllowedValues(key) {
+          return this.validationSchemas[key]?.allowedValues;
+        }
+        set(key, value) {
+          try {
+            const schema = this.validationSchemas[key];
+            if (!schema) {
+              Spicetify.LocalStorage.set(key, value);
+              return true;
+            }
+            if (key === "sn-harmonic-manual-base-color") {
+              if (value !== "" && !/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)) {
+                return false;
+              }
+            } else if (schema.allowedValues && !schema.allowedValues.includes(value)) {
+              return false;
+            }
+            Spicetify.LocalStorage.set(key, value);
+            document.dispatchEvent(
+              new CustomEvent("year3000SystemSettingsChanged", {
+                detail: { key, value }
+              })
+            );
+            return true;
+          } catch (error) {
+            console.error(`StarryNight: Error setting key ${key}:`, error);
+            return false;
+          }
+        }
+        getAllSettings() {
+          const settings = {};
+          for (const key in this.validationSchemas) {
+            settings[key] = this.get(key);
+          }
+          return settings;
+        }
+        validateAndRepair() {
+          let repairedCount = 0;
+          for (const key in this.validationSchemas) {
+            const aKey = key;
+            const currentValue = Spicetify.LocalStorage.get(aKey);
+            const validatedValue = this.get(aKey);
+            if (currentValue !== validatedValue) {
+              this.set(aKey, validatedValue);
+              repairedCount++;
+            }
+          }
+          if (repairedCount > 0) {
+            console.log(`StarryNight: Repaired ${repairedCount} invalid settings.`);
+          }
+        }
+        resetAllToDefaults() {
+          for (const key of Object.keys(this.defaults)) {
+            this.set(
+              key,
+              this.defaults[key]
+            );
+          }
+          console.log("StarryNight: All settings reset to defaults.");
+        }
+        // To satisfy the SystemHealthMonitor, which expects all registered systems
+        // to have these lifecycle methods.
+        updateAnimation() {
+        }
+        destroy() {
+          console.log("StarryNight: SettingsManager destroyed (no-op).");
+        }
+        // === NEW: Harmonic mode helpers ===========================================
+        /**
+         * Return the full HarmonicMode object for the currently selected mode.
+         * Falls back to the default entry ("analogous-flow") if the key is missing.
+         */
+        getCurrentHarmonicMode() {
+          const key = this.get("sn-current-harmonic-mode");
+          return this.harmonicModes[key] || this.harmonicModes["analogous-flow"];
+        }
+        /**
+         * Retrieve a HarmonicMode definition by key, or undefined if not found.
+         */
+        getHarmonicMode(key) {
+          return this.harmonicModes[key];
+        }
+      };
+      __name(_SettingsManager, "SettingsManager");
+      SettingsManager = _SettingsManager;
     }
   });
 
@@ -16838,6 +14248,1137 @@ void main() {
     }
   });
 
+  // src-js/utils/platform/SpicetifyCompat.ts
+  var _SpicetifyCompat, SpicetifyCompat;
+  var init_SpicetifyCompat = __esm({
+    "src-js/utils/platform/SpicetifyCompat.ts"() {
+      "use strict";
+      _SpicetifyCompat = class _SpicetifyCompat {
+        /**
+         * Get audio data with fallback handling
+         * Uses correct Spicetify.getAudioData() API with fallback to legacy patterns
+         */
+        static async getAudioData() {
+          try {
+            if (typeof Spicetify !== "undefined" && Spicetify.getAudioData) {
+              return await Spicetify.getAudioData();
+            } else {
+              console.warn("[SpicetifyCompat] Spicetify.getAudioData not available");
+              return null;
+            }
+          } catch (error) {
+            console.error("[SpicetifyCompat] Error fetching audio data:", error);
+            return null;
+          }
+        }
+        /**
+         * Check if Spicetify APIs are available
+         */
+        static isAvailable() {
+          return typeof Spicetify !== "undefined" && !!Spicetify.getAudioData;
+        }
+        /**
+         * Retry wrapper for audio data fetching
+         */
+        static async getAudioDataWithRetry(retryDelay = 200, maxRetries = 10) {
+          for (let attempt = 0; attempt < maxRetries; attempt++) {
+            try {
+              const audioData = await this.getAudioData();
+              if (audioData) {
+                return audioData;
+              }
+            } catch (error) {
+              if (attempt < maxRetries - 1) {
+                console.log(
+                  `[SpicetifyCompat] Retrying audio data fetch (${attempt + 1}/${maxRetries})...`
+                );
+                await new Promise((resolve) => setTimeout(resolve, retryDelay));
+              } else {
+                console.warn(
+                  `[SpicetifyCompat] Audio data fetch failed after ${maxRetries} attempts:`,
+                  error
+                );
+              }
+            }
+          }
+          return null;
+        }
+      };
+      __name(_SpicetifyCompat, "SpicetifyCompat");
+      SpicetifyCompat = _SpicetifyCompat;
+    }
+  });
+
+  // src-js/audio/GenreProfileManager.ts
+  var GENRE_PROFILES, _GenreProfileManager, GenreProfileManager;
+  var init_GenreProfileManager = __esm({
+    "src-js/audio/GenreProfileManager.ts"() {
+      "use strict";
+      init_globalConfig();
+      GENRE_PROFILES = {
+        electronic: { energyBoost: 1.1, beatEmphasis: 1.2, precision: 0.9 },
+        dance: { energyBoost: 1.2, beatEmphasis: 1.25, precision: 0.95 },
+        house: { energyBoost: 1.2, beatEmphasis: 1.25, precision: 0.95 },
+        techno: { energyBoost: 1.15, beatEmphasis: 1.3, precision: 1 },
+        trance: { energyBoost: 1.15, beatEmphasis: 1.1, precision: 0.85 },
+        rock: { energyBoost: 1.05, intensityMultiplier: 1.1, dynamicRange: 1.1 },
+        metal: { energyBoost: 1.15, intensityMultiplier: 1.2, dynamicRange: 1.2 },
+        punk: { energyBoost: 1.2, intensityMultiplier: 1.1, precision: 0.8 },
+        hiphop: { beatEmphasis: 1.3, grooveFactor: 1.2, tempoMultiplier: 0.95 },
+        rap: { beatEmphasis: 1.3, grooveFactor: 1.2, tempoMultiplier: 0.95 },
+        jazz: { adaptiveVariation: true, complexity: 1.2, smoothingFactor: 1.3 },
+        classical: {
+          gentleMode: true,
+          dynamicRange: 1.4,
+          tempoVariationHandling: "adaptive"
+        },
+        ambient: { subtleMode: true, intensityReduction: 0.7, smoothingFactor: 1.5 },
+        pop: { energyBoost: 1.05, beatEmphasis: 1.1, precision: 0.85 },
+        rnb: { grooveFactor: 1.25, smoothingFactor: 1.1 },
+        soul: { grooveFactor: 1.3, smoothingFactor: 1.15 },
+        default: {
+          balanced: true,
+          energyBoost: 1,
+          beatEmphasis: 1,
+          precision: 1
+        }
+      };
+      _GenreProfileManager = class _GenreProfileManager {
+        constructor(dependencies = {}) {
+          this.config = dependencies.YEAR3000_CONFIG || YEAR3000_CONFIG;
+          if (this.config.enableDebug) {
+            console.log("\u{1F9EC} [GenreProfileManager] Initialized");
+          }
+        }
+        _getGenreFromAudioFeatures(features) {
+          if (!features) return "default";
+          const { danceability, energy, acousticness, instrumentalness, tempo } = features;
+          if (instrumentalness > 0.6 && acousticness < 0.2 && energy > 0.6) {
+            if (tempo > 120) return "techno";
+            return "electronic";
+          }
+          if (danceability > 0.7 && energy > 0.7) return "dance";
+          if (acousticness > 0.7 && energy < 0.4) return "classical";
+          if (acousticness > 0.5 && instrumentalness < 0.1) return "jazz";
+          if (energy > 0.7 && instrumentalness < 0.1 && danceability > 0.5)
+            return "rock";
+          if (danceability > 0.7 && instrumentalness < 0.2 && energy > 0.5 && tempo < 110)
+            return "hiphop";
+          return "default";
+        }
+        getProfileForTrack(audioFeatures) {
+          const genre = this._getGenreFromAudioFeatures(audioFeatures);
+          const profile = GENRE_PROFILES[genre];
+          if (this.config.enableDebug) {
+            console.log(
+              `[GenreProfileManager] Detected genre: '${genre}'. Applying profile.`
+            );
+          }
+          if (profile) {
+            return profile;
+          }
+          const defaultProfile = GENRE_PROFILES.default;
+          if (defaultProfile) {
+            return defaultProfile;
+          }
+          throw new Error(
+            "[GenreProfileManager] Critical: Default genre profile is missing."
+          );
+        }
+        /**
+         * Public helper that returns the genre string detected for the given audio-features without
+         * allocating a full profile. Useful for colour/palette routing.
+         */
+        detectGenre(features) {
+          return this._getGenreFromAudioFeatures(features);
+        }
+      };
+      __name(_GenreProfileManager, "GenreProfileManager");
+      GenreProfileManager = _GenreProfileManager;
+    }
+  });
+
+  // src-js/audio/MusicSyncService.ts
+  var MUSIC_SYNC_CONFIG, _MusicSyncService, MusicSyncService;
+  var init_MusicSyncService = __esm({
+    "src-js/audio/MusicSyncService.ts"() {
+      "use strict";
+      init_globalConfig();
+      init_EventBus();
+      init_Year3000Utilities();
+      init_SpicetifyCompat();
+      init_StorageManager();
+      init_GenreProfileManager();
+      MUSIC_SYNC_CONFIG = {
+        enableDebug: true,
+        enableBeatSynchronization: true,
+        enableGenreAnalysis: true,
+        enableMoodAdaptation: true,
+        bpmCalculation: {
+          useEnhancedAlgorithm: true,
+          danceabilityWeight: 0.9,
+          energyWeight: 0.6,
+          bpmWeight: 0.6,
+          energyThreshold: 0.5,
+          danceabilityThreshold: 0.5,
+          bpmThreshold: 0.8,
+          maxBPM: 180,
+          minBPM: 60
+        },
+        performance: {
+          cacheSize: 100,
+          cacheTTL: 3e5,
+          maxRetries: 10,
+          retryDelay: 200,
+          enableMetrics: true,
+          processingTimeTarget: 50
+        },
+        synchronization: {
+          beatAccuracyTarget: 50,
+          maxSyncDelay: 1e3,
+          adaptiveQuality: true,
+          predictiveCaching: true,
+          debounceRapidChanges: 200
+        },
+        genreProfiles: {
+          electronic: { intensityMultiplier: 1.2, precisionBoost: 1.1 },
+          jazz: { smoothingFactor: 1.3, adaptiveVariation: true },
+          classical: { gentleMode: true, tempoVariationHandling: "adaptive" },
+          rock: { energyBoost: 1.15, consistentTiming: true },
+          ambient: { subtleMode: true, intensityReduction: 0.7 },
+          hiphop: { beatEmphasis: 1.25, rhythmPrecision: "high" },
+          default: { balanced: true }
+        },
+        musicVisualSync: {
+          enhancedBPM: {
+            fallbacks: {
+              tempo: 120,
+              loudness: -5,
+              key: 0,
+              timeSignature: 4
+            },
+            danceabilityEstimation: {
+              highDance: { min: 125, max: 145, value: 0.8 },
+              mediumDance: { min: 100, max: 124, value: 0.7 },
+              lowMediumDance: { min: 80, max: 99, value: 0.6 },
+              lowDance: { value: 0.5 }
+            },
+            energyEstimation: {
+              tempoRange: { min: 80, max: 160 },
+              loudnessRange: { min: -15, max: 0 },
+              tempoWeight: 0.6,
+              loudnessWeight: 0.4
+            }
+          }
+        }
+      };
+      _MusicSyncService = class _MusicSyncService {
+        constructor(dependencies = {}) {
+          this.isInitialized = false;
+          this.currentTrack = null;
+          this.audioData = null;
+          this.currentTrackUri = null;
+          this.latestProcessedData = null;
+          // High-precision beat scheduling
+          this.beatSchedulerTimer = null;
+          // Phase 1: Song Change Debouncing
+          this.songChangeDebounceTimer = null;
+          this.nextBeatIndex = 0;
+          this.currentSongBeats = [];
+          this.songStartTimestamp = 0;
+          this.metrics = {
+            bpmCalculations: 0,
+            beatSyncs: 0,
+            cacheHits: 0,
+            cacheMisses: 0,
+            avgProcessingTime: 0,
+            performance: [],
+            errors: 0,
+            updates: 0
+          };
+          this.unifiedCache = /* @__PURE__ */ new Map();
+          this.subscribers = /* @__PURE__ */ new Map();
+          this.beatSync = {
+            lastBeatTime: 0,
+            nextBeatTime: 0,
+            beatInterval: 0,
+            confidence: 0,
+            isActive: false
+          };
+          this.performanceInterval = null;
+          this.cacheCleanupInterval = null;
+          // Increment this prefix whenever cache schema changes to avoid stale data
+          this.CACHE_KEY_VERSION_PREFIX = "v3";
+          /** Current unit beat direction vector (updated each beat). */
+          this.currentBeatVector = { x: 0, y: 0 };
+          this.config = dependencies.YEAR3000_CONFIG || YEAR3000_CONFIG;
+          this.utils = dependencies.Year3000Utilities || Year3000Utilities_exports;
+          this.settingsManager = dependencies.settingsManager;
+          this.year3000System = dependencies.year3000System;
+          this.genreProfileManager = dependencies.genreProfileManager || new GenreProfileManager({ YEAR3000_CONFIG: this.config });
+          this.cacheTTL = MUSIC_SYNC_CONFIG.performance.cacheTTL;
+          this.userPreferences = this.loadUserPreferences();
+          if (this.config.enableDebug) {
+            console.log("\u{1F3B5} MusicSyncService constructor called");
+            console.log(
+              "\u{1F3B5} [MusicSyncService] Initialized with GenreProfileManager support"
+            );
+          }
+        }
+        async initialize() {
+          try {
+            if (this.config.enableDebug) {
+              console.log("\u{1F3B5} Initializing unified MusicSyncService...");
+            }
+            if (!SpicetifyCompat.isAvailable()) {
+              console.warn(
+                "[MusicSyncService] Spicetify audio data API not available at initialization. Some features may be limited."
+              );
+            }
+            this.setupCacheManagement();
+            if (MUSIC_SYNC_CONFIG.performance.enableMetrics) {
+              this.setupPerformanceMonitoring();
+            }
+            this.isInitialized = true;
+            if (this.config.enableDebug) {
+              console.log("\u{1F31F} MusicSyncService initialized successfully!");
+            }
+          } catch (error) {
+            console.error("\u274C MusicSyncService initialization failed:", error);
+            this.metrics.errors++;
+          }
+        }
+        // === SUBSCRIBER MANAGEMENT ===
+        subscribe(systemInstance, systemName) {
+          if (!systemInstance || typeof systemInstance.updateFromMusicAnalysis !== "function") {
+            console.warn(
+              `[MusicSyncService] Invalid system or missing updateFromMusicAnalysis method: ${systemName}`
+            );
+            return;
+          }
+          if (this.subscribers.has(systemName)) {
+            if (this.config.enableDebug) {
+              console.warn(
+                `[MusicSyncService] System ${systemName} already subscribed.`
+              );
+            }
+            return;
+          }
+          this.subscribers.set(systemName, systemInstance);
+          if (this.config.enableDebug) {
+            console.log(`[MusicSyncService] System subscribed: ${systemName}`);
+          }
+          if (this.latestProcessedData && systemInstance.initialized) {
+            try {
+              systemInstance.updateFromMusicAnalysis(
+                this.latestProcessedData,
+                null,
+                this.currentTrackUri
+              );
+            } catch (error) {
+              console.error(
+                `[MusicSyncService] Error notifying new subscriber ${systemName}:`,
+                error
+              );
+            }
+          }
+        }
+        unsubscribe(systemName) {
+          if (this.subscribers.has(systemName)) {
+            this.subscribers.delete(systemName);
+            if (this.config.enableDebug) {
+              console.log(`[MusicSyncService] System unsubscribed: ${systemName}`);
+            }
+          }
+        }
+        notifySubscribers(processedData, rawFeatures, trackUri) {
+          if (!this.isInitialized) {
+            console.warn(
+              "[MusicSyncService] Not initialized, cannot notify subscribers."
+            );
+            return;
+          }
+          this.latestProcessedData = processedData;
+          for (const [name, system] of this.subscribers) {
+            try {
+              if (system.initialized && typeof system.updateFromMusicAnalysis === "function") {
+                system.updateFromMusicAnalysis(processedData, rawFeatures, trackUri);
+              }
+            } catch (error) {
+              console.error(
+                `[MusicSyncService] Error notifying subscriber ${name}:`,
+                error
+              );
+              this.metrics.errors++;
+            }
+          }
+        }
+        // === DATA FETCHING & CACHING ===
+        async fetchAudioData(options = {}) {
+          const {
+            retryDelay = MUSIC_SYNC_CONFIG.performance.retryDelay,
+            maxRetries = MUSIC_SYNC_CONFIG.performance.maxRetries
+          } = options;
+          const currentTrackUri = Spicetify.Player.data?.item?.uri;
+          if (!currentTrackUri) {
+            if (this.config.enableDebug) {
+              console.warn(
+                "[MusicSyncService] No current track URI to fetch audio data."
+              );
+            }
+            return null;
+          }
+          const cacheKey = this.generateCacheKey(currentTrackUri, "audioData");
+          const cached = this.getFromCache(cacheKey);
+          if (cached?.audioData) {
+            if (this.isValidAudioData(cached.audioData)) {
+              this.metrics.cacheHits++;
+              if (this.config.enableDebug) {
+                console.log(
+                  `[MusicSyncService] Cache hit for audioData: ${cacheKey}`
+                );
+              }
+              return cached.audioData;
+            }
+            this.unifiedCache.delete(cacheKey);
+          }
+          this.metrics.cacheMisses++;
+          for (let attempt = 0; attempt < maxRetries; attempt++) {
+            try {
+              const audioData = await SpicetifyCompat.getAudioData();
+              if (this.isValidAudioData(audioData)) {
+                this.setInCache(cacheKey, { audioData });
+                return audioData;
+              }
+              if (this.config.enableDebug) {
+                console.log(
+                  `[MusicSyncService] Audio analysis unavailable (attempt ${attempt + 1}/${maxRetries}). Retrying\u2026`
+                );
+              }
+            } catch (error) {
+              if (attempt === maxRetries - 1) {
+                if (this.config.enableDebug) {
+                  console.warn(
+                    `[MusicSyncService] Audio data fetch error on final attempt:`,
+                    error
+                  );
+                }
+                this.metrics.errors++;
+                const fallback = {
+                  tempo: 120,
+                  energy: 0.5,
+                  valence: 0.5,
+                  loudness: -10,
+                  key: 0,
+                  time_signature: 4,
+                  danceability: 0.5,
+                  acousticness: 0.5,
+                  instrumentalness: 0,
+                  speechiness: 0.05,
+                  liveness: 0.2,
+                  mode: 1
+                };
+                if (this.config.enableDebug) {
+                  console.warn(
+                    `[MusicSyncService] All audio-data attempts failed \u2013 using fallback defaults`
+                  );
+                }
+                return fallback;
+              }
+            }
+            await new Promise((resolve) => setTimeout(resolve, retryDelay));
+          }
+          return null;
+        }
+        async getAudioFeatures() {
+          try {
+            const currentTrack = Spicetify.Player.data?.item;
+            if (!currentTrack?.uri) return null;
+            const trackId = currentTrack.uri.split(":")[2] || "fallback";
+            const cacheKey = this.generateCacheKey(trackId, "features");
+            const cached = this.getFromCache(
+              cacheKey
+            );
+            if (cached?.audioFeatures) {
+              this.metrics.cacheHits++;
+              if (this.config.enableDebug) {
+                console.log(
+                  `[MusicSyncService] Cache hit for audioFeatures: ${cacheKey}`
+                );
+              }
+              return cached.audioFeatures;
+            }
+            this.metrics.cacheMisses++;
+            const response = await Spicetify.CosmosAsync.get(
+              `https://api.spotify.com/v1/audio-features/${trackId}`
+            );
+            const features = {
+              danceability: response.danceability,
+              energy: response.energy,
+              valence: response.valence,
+              acousticness: response.acousticness,
+              instrumentalness: response.instrumentalness,
+              tempo: response.tempo
+            };
+            this.setInCache(cacheKey, { audioFeatures: features });
+            return features;
+          } catch (error) {
+            if (this.config.enableDebug) {
+              console.warn(
+                "[MusicSyncService] Could not fetch audio features:",
+                error
+              );
+            }
+            return null;
+          }
+        }
+        generateCacheKey(identifier, type = "default") {
+          return `${this.CACHE_KEY_VERSION_PREFIX}-${identifier}-${type}`;
+        }
+        getFromCache(key) {
+          const cached = this.unifiedCache.get(key);
+          if (cached && Date.now() - cached.timestamp < this.cacheTTL) {
+            return cached.data;
+          }
+          if (cached) {
+            this.unifiedCache.delete(key);
+          }
+          return null;
+        }
+        setInCache(key, data) {
+          this.unifiedCache.set(key, {
+            data,
+            timestamp: Date.now()
+          });
+        }
+        // === ENHANCED BPM CALCULATION ===
+        async calculateEnhancedBPM(audioData, options = {}) {
+          const startTime = performance.now();
+          try {
+            if (!audioData?.tempo) {
+              if (this.config.enableDebug) {
+                console.warn("[MusicSyncService] No BPM data available for track");
+              }
+              return this.getFallbackBPM();
+            }
+            const trackBPM = audioData.tempo;
+            const config = {
+              ...MUSIC_SYNC_CONFIG.bpmCalculation,
+              ...options
+            };
+            const audioFeatures = await this.getAudioFeatures();
+            if (!audioFeatures) {
+              if (this.config.enableDebug) {
+                console.log("[MusicSyncService] Using basic BPM calculation");
+              }
+              return this.validateBPM(trackBPM);
+            }
+            const { danceability, energy, valence = 0.5 } = audioFeatures;
+            if (this.config.enableDebug) {
+              console.log(
+                `[MusicSyncService] Audio features - Danceability: ${danceability}, Energy: ${energy}, Valence: ${valence}`
+              );
+            }
+            const profile = this.genreProfileManager.getProfileForTrack(
+              audioFeatures || void 0
+            );
+            const detectedGenre = this.genreProfileManager.detectGenre(
+              audioFeatures || void 0
+            );
+            const enhancedBPM = this.computeAdvancedBPM({
+              trackBPM,
+              danceability,
+              energy,
+              valence,
+              config,
+              profile
+            });
+            const currentTrack = Spicetify.Player.data?.item || Spicetify.Player.data;
+            const uriParts = currentTrack?.uri?.split(":") ?? [];
+            const trackId = uriParts.length > 2 && uriParts[2] ? uriParts[2] : "fallback";
+            const cacheKey = this.generateCacheKey(trackId, "bpm");
+            this.setInCache(cacheKey, {
+              bpm: enhancedBPM,
+              audioFeatures
+            });
+            this.metrics.bpmCalculations++;
+            if (this.config.enableDebug) {
+              console.log(
+                `[MusicSyncService] Enhanced BPM: ${enhancedBPM} (original: ${trackBPM})`
+              );
+            }
+            return enhancedBPM;
+          } catch (error) {
+            console.error("[MusicSyncService] BPM calculation failed:", error);
+            this.metrics.errors++;
+            return this.getFallbackBPM();
+          }
+        }
+        computeAdvancedBPM(params) {
+          const { trackBPM, danceability, energy, valence, config, profile } = params;
+          const {
+            danceabilityWeight,
+            energyWeight,
+            bpmWeight,
+            energyThreshold,
+            danceabilityThreshold,
+            bpmThreshold,
+            maxBPM,
+            minBPM
+          } = config;
+          const normalizedBPM = Math.min(trackBPM / 120, 2);
+          let adjustedDanceabilityWeight = danceabilityWeight;
+          let adjustedEnergyWeight = energyWeight;
+          let adjustedBpmWeight = bpmWeight;
+          if (danceability < danceabilityThreshold) {
+            adjustedDanceabilityWeight *= danceability;
+          }
+          if (energy < energyThreshold) {
+            adjustedEnergyWeight *= energy;
+          }
+          if (normalizedBPM < bpmThreshold) {
+            adjustedBpmWeight = 0.9;
+          }
+          let valenceInfluence = 1;
+          if (valence > 0.6) {
+            valenceInfluence = 1.05;
+          } else if (valence < 0.4 && energy < 0.5) {
+            valenceInfluence = 0.95;
+          }
+          const weightSum = adjustedDanceabilityWeight + adjustedEnergyWeight + adjustedBpmWeight;
+          const weightedAverage = (danceability * adjustedDanceabilityWeight + energy * adjustedEnergyWeight + normalizedBPM * adjustedBpmWeight) / weightSum;
+          let enhancedBPM = weightedAverage * 120 * valenceInfluence;
+          if (profile.beatEmphasis) {
+            enhancedBPM *= profile.beatEmphasis;
+          }
+          enhancedBPM = Math.max(minBPM, Math.min(maxBPM, enhancedBPM));
+          return Math.round(enhancedBPM * 100) / 100;
+        }
+        validateBPM(bpm) {
+          const { minBPM, maxBPM } = MUSIC_SYNC_CONFIG.bpmCalculation;
+          return Math.max(minBPM, Math.min(maxBPM * 2, Math.round(bpm * 100) / 100));
+        }
+        getFallbackBPM() {
+          return 75;
+        }
+        // === FEATURE ESTIMATION & FALLBACKS ===
+        estimateDanceabilityFromTempo(tempo) {
+          const config = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.danceabilityEstimation;
+          if (tempo >= config.highDance.min && tempo <= config.highDance.max) {
+            return config.highDance.value;
+          }
+          if (tempo >= config.mediumDance.min && tempo <= config.mediumDance.max) {
+            return config.mediumDance.value;
+          }
+          if (tempo >= config.lowMediumDance.min && tempo <= config.lowMediumDance.max) {
+            return config.lowMediumDance.value;
+          }
+          return config.lowDance.value;
+        }
+        estimateEnergyFromTempoLoudness(tempo, loudness) {
+          const config = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.energyEstimation;
+          const tempoFactor = Math.max(
+            0,
+            Math.min(
+              1,
+              (tempo - config.tempoRange.min) / (config.tempoRange.max - config.tempoRange.min)
+            )
+          );
+          const loudnessFactor = Math.max(
+            0,
+            Math.min(
+              1,
+              (loudness - config.loudnessRange.min) / (config.loudnessRange.max - config.loudnessRange.min)
+            )
+          );
+          return tempoFactor * config.tempoWeight + loudnessFactor * config.loudnessWeight;
+        }
+        estimateValenceFromKey(key) {
+          const majorKeys = [0, 2, 4, 5, 7, 9, 11];
+          return majorKeys.includes(key) ? 0.6 : 0.4;
+        }
+        getFallbackProcessedData(trackUri) {
+          const fallbacks = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.fallbacks;
+          const fallbackBeatInterval = 6e4 / fallbacks.tempo;
+          return {
+            trackUri,
+            timestamp: Date.now(),
+            tempo: fallbacks.tempo,
+            loudness: fallbacks.loudness,
+            key: fallbacks.key,
+            timeSignature: fallbacks.timeSignature,
+            estimatedDanceability: this.estimateDanceabilityFromTempo(
+              fallbacks.tempo
+            ),
+            estimatedEnergy: this.estimateEnergyFromTempoLoudness(
+              fallbacks.tempo,
+              fallbacks.loudness
+            ),
+            estimatedValence: 0.5,
+            energy: 0.5,
+            valence: 0.5,
+            processedEnergy: 0.5,
+            visualIntensity: 0.5,
+            moodIdentifier: "neutral",
+            baseBPM: fallbacks.tempo,
+            enhancedBPM: fallbacks.tempo,
+            beatInterval: fallbackBeatInterval,
+            bmpCalculationMethod: "fallback",
+            dataSource: "fallback"
+          };
+        }
+        // === MAIN PROCESSING PIPELINE ===
+        async processAudioFeatures(rawSpicetifyAudioFeatures, trackUri, trackDurationMs) {
+          if (!this.isInitialized) {
+            console.warn("[MusicSyncService] Not initialized, skipping processing.");
+            return;
+          }
+          this.stopBeatScheduler();
+          this.currentTrackUri = trackUri;
+          const cacheKey = this.generateCacheKey(trackUri, "processed");
+          const cached = this.getFromCache(cacheKey);
+          if (cached?.processedData) {
+            this.notifySubscribers(cached.processedData, null, trackUri);
+            return;
+          }
+          try {
+            let audioAnalysisData = rawSpicetifyAudioFeatures;
+            if (!audioAnalysisData) {
+              audioAnalysisData = await this.fetchAudioData();
+            }
+            if (!audioAnalysisData) {
+              throw new Error("Failed to fetch or receive audio data.");
+            }
+            if (audioAnalysisData.beats && audioAnalysisData.beats.length > 0) {
+              this.currentSongBeats = audioAnalysisData.beats;
+              this.songStartTimestamp = Date.now();
+              this.nextBeatIndex = 0;
+              this.scheduleNextBeatEvent();
+            }
+            const enhancedBPM = await this.calculateEnhancedBPM(audioAnalysisData);
+            const beatInterval = enhancedBPM > 0 ? 6e4 / enhancedBPM : 0;
+            const trackData = audioAnalysisData;
+            const {
+              tempo = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.fallbacks.tempo,
+              loudness = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.fallbacks.loudness,
+              key = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.fallbacks.key,
+              time_signature: timeSignature = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.fallbacks.timeSignature
+            } = trackData;
+            const audioFeatures = await this.getAudioFeatures();
+            const estimatedDanceability = audioFeatures?.danceability ?? this.estimateDanceabilityFromTempo(tempo);
+            const estimatedEnergy = audioFeatures?.energy ?? this.estimateEnergyFromTempoLoudness(tempo, loudness);
+            const estimatedValence = audioFeatures?.valence ?? this.estimateValenceFromKey(key);
+            const artisticMultipliers = this.config.getCurrentMultipliers?.() || {
+              musicEnergyBoost: 1,
+              visualIntensityBase: 1
+            };
+            const processedEnergy = Math.max(
+              0.1,
+              Math.min(
+                1,
+                estimatedEnergy * (artisticMultipliers.musicEnergyBoost || 1)
+              )
+            );
+            const baseIntensity = estimatedEnergy * 0.6 + estimatedDanceability * 0.4;
+            const visualIntensity = baseIntensity * (artisticMultipliers.visualIntensityBase || 1);
+            let moodIdentifier = "neutral";
+            if (estimatedValence > 0.6 && estimatedEnergy > 0.6) {
+              moodIdentifier = "energetic-happy";
+            } else if (estimatedValence > 0.6 && estimatedEnergy <= 0.6) {
+              moodIdentifier = "calm-happy";
+            } else if (estimatedValence <= 0.4 && estimatedEnergy > 0.6) {
+              moodIdentifier = "intense-moody";
+            } else if (estimatedValence <= 0.4 && estimatedEnergy <= 0.4) {
+              moodIdentifier = "calm-melancholy";
+            }
+            const animationSpeedFactor = Math.max(0.5, 0.8 + visualIntensity * 0.4);
+            const genreTag = this.genreProfileManager.detectGenre(
+              audioFeatures || void 0
+            );
+            const processedData = {
+              trackUri,
+              timestamp: Date.now(),
+              tempo,
+              loudness,
+              key,
+              timeSignature,
+              duration: trackDurationMs,
+              estimatedDanceability,
+              estimatedEnergy,
+              estimatedValence,
+              energy: estimatedEnergy,
+              valence: estimatedValence,
+              processedEnergy,
+              visualIntensity,
+              moodIdentifier,
+              baseBPM: tempo,
+              enhancedBPM,
+              beatInterval,
+              bmpCalculationMethod: "unified-service",
+              dataSource: "unified-music-sync-service",
+              beatOccurred: false,
+              animationSpeedFactor,
+              genre: genreTag
+            };
+            this.setInCache(cacheKey, { processedData });
+            this.latestProcessedData = processedData;
+            if (this.config.enableDebug) {
+              console.log("\u{1F3B5} [MusicSyncService] Processed music data:", {
+                baseTempo: tempo,
+                enhancedBPM,
+                mood: moodIdentifier,
+                energy: estimatedEnergy.toFixed(2),
+                visualIntensity: visualIntensity.toFixed(2)
+              });
+            }
+            this.notifySubscribers(
+              processedData,
+              rawSpicetifyAudioFeatures,
+              trackUri
+            );
+            GlobalEventBus.publish("beat/frame", {
+              timestamp: performance.now(),
+              trackUri,
+              processedData,
+              rawData: rawSpicetifyAudioFeatures
+            });
+            GlobalEventBus.publish("beat/bpm", { bpm: processedData.enhancedBPM });
+            GlobalEventBus.publish("beat/intensity", {
+              intensity: processedData.visualIntensity
+            });
+            if (this.config.enableDebug) {
+              console.log(
+                "[MusicSyncService] Successfully processed audio features.",
+                {
+                  baseTempo: tempo,
+                  enhancedBPM,
+                  mood: moodIdentifier,
+                  energy: estimatedEnergy.toFixed(2),
+                  visualIntensity: visualIntensity.toFixed(2)
+                }
+              );
+            }
+          } catch (error) {
+            console.error("[MusicSyncService] Processing failed:", error);
+            this.metrics.errors++;
+            const fallbackData = this.getFallbackProcessedData(trackUri);
+            this.latestProcessedData = fallbackData;
+            this.notifySubscribers(fallbackData, null, trackUri);
+          }
+        }
+        /**
+         * Re-extract colours & (optionally) recompute beat analysis for the current
+         * track.  When `force === true` the method runs even if the track URI hasn't
+         * changed (used after live settings updates so gradients repaint instantly).
+         */
+        async processSongUpdate(force = false) {
+          const trackUri = Spicetify.Player?.data?.item?.uri;
+          if (!trackUri) return;
+          if (!force && trackUri === this.currentTrackUri) {
+            return;
+          }
+          if (this.songChangeDebounceTimer) {
+            clearTimeout(this.songChangeDebounceTimer);
+          }
+          if (force) {
+            await this._processSongUpdateInternal(trackUri);
+            return;
+          }
+          this.songChangeDebounceTimer = setTimeout(async () => {
+            this.songChangeDebounceTimer = null;
+            await this._processSongUpdateInternal(trackUri);
+          }, MUSIC_SYNC_CONFIG.synchronization.debounceRapidChanges);
+        }
+        /**
+         * Internal implementation of song processing, extracted for debouncing.
+         */
+        async _processSongUpdateInternal(trackUri) {
+          this.invalidateTrackCaches(trackUri);
+          try {
+            const trackDuration = Spicetify.Player.data?.item?.duration?.milliseconds || 0;
+            const [audioFeatures, rawColors] = await Promise.all([
+              this.getAudioFeatures(),
+              Spicetify.colorExtractor(trackUri)
+            ]);
+            const colors = this.utils.sanitizeColorMap(
+              rawColors || {}
+            );
+            if (Object.keys(colors).length > 0) {
+              const colorContext = {
+                rawColors: colors,
+                trackUri,
+                timestamp: Date.now(),
+                harmonicMode: this.config.currentHarmonicMode || "catppuccin",
+                musicData: audioFeatures ? {
+                  energy: audioFeatures.energy,
+                  valence: audioFeatures.valence,
+                  tempo: audioFeatures.tempo,
+                  genre: this.genreProfileManager.detectGenre(audioFeatures)
+                } : void 0,
+                performanceHints: {
+                  preferLightweight: false,
+                  enableAdvancedBlending: true,
+                  maxProcessingTime: 100
+                  // 100ms max for color processing
+                }
+              };
+              GlobalEventBus.publish("colors/extracted", {
+                type: "colors/extracted",
+                payload: colorContext
+              });
+              if (this.config.enableDebug) {
+                console.log(
+                  "\u{1F3B5} [MusicSyncService] Published colors/extracted event for strategy processing",
+                  { trackUri, colorCount: Object.keys(colors).length }
+                );
+              }
+            }
+            if (audioFeatures) {
+              const provisionalAudioData = this.convertFeaturesToAudioData(audioFeatures);
+              await this.processAudioFeatures(
+                provisionalAudioData,
+                trackUri,
+                trackDuration
+              );
+            }
+            (async () => {
+              const fullAnalysis = await this.fetchAudioData();
+              if (this.isValidAudioData(fullAnalysis)) {
+                await this.processAudioFeatures(
+                  fullAnalysis,
+                  trackUri,
+                  trackDuration
+                );
+              }
+            })();
+          } catch (error) {
+            console.error(
+              `[MusicSyncService] Error processing song update for ${trackUri}:`,
+              error
+            );
+            this.metrics.errors++;
+          }
+        }
+        // === LIFECYCLE & HELPERS ===
+        setupCacheManagement() {
+          this.cacheCleanupInterval = setInterval(() => {
+            const now = Date.now();
+            for (const [key, cacheEntry] of this.unifiedCache.entries()) {
+              if (now - cacheEntry.timestamp > this.cacheTTL) {
+                this.unifiedCache.delete(key);
+              }
+            }
+          }, this.cacheTTL);
+        }
+        setupPerformanceMonitoring() {
+          this.performanceInterval = setInterval(() => {
+            if (this.metrics.performance.length > 0) {
+              const avg = this.metrics.performance.reduce((a, b) => a + b, 0) / this.metrics.performance.length;
+              this.metrics.avgProcessingTime = avg;
+              this.metrics.performance = [];
+            }
+          }, 6e4);
+        }
+        loadUserPreferences() {
+          try {
+            const prefs = StorageManager.get("sn-music-sync-prefs");
+            return prefs ? JSON.parse(prefs) : {};
+          } catch (e) {
+            return {};
+          }
+        }
+        saveUserPreferences() {
+          try {
+            StorageManager.set(
+              "sn-music-sync-prefs",
+              JSON.stringify(this.userPreferences)
+            );
+          } catch (error) {
+            if (this.config.enableDebug) {
+              console.warn(
+                "[MusicSyncService] Could not save user preferences:",
+                error
+              );
+            }
+          }
+        }
+        updateConfiguration(newConfig) {
+          const previousConfig = { ...MUSIC_SYNC_CONFIG };
+          Object.assign(MUSIC_SYNC_CONFIG, newConfig);
+          if (this.config.enableDebug) {
+            console.log("\u{1F3B5} [MusicSyncService] Configuration updated", {
+              from: previousConfig,
+              to: MUSIC_SYNC_CONFIG
+            });
+          }
+          this.cacheTTL = MUSIC_SYNC_CONFIG.performance.cacheTTL;
+          if (previousConfig.performance.enableMetrics !== MUSIC_SYNC_CONFIG.performance.enableMetrics) {
+            if (MUSIC_SYNC_CONFIG.performance.enableMetrics) {
+              this.setupPerformanceMonitoring();
+            } else if (this.performanceInterval) {
+              clearInterval(this.performanceInterval);
+              this.performanceInterval = null;
+            }
+          }
+        }
+        destroy() {
+          if (this.songChangeDebounceTimer) {
+            clearTimeout(this.songChangeDebounceTimer);
+            this.songChangeDebounceTimer = null;
+          }
+          this.stopBeatScheduler();
+          if (this.performanceInterval) clearInterval(this.performanceInterval);
+          if (this.cacheCleanupInterval) clearInterval(this.cacheCleanupInterval);
+          this.subscribers.clear();
+          this.unifiedCache.clear();
+          this.isInitialized = false;
+          this.latestProcessedData = null;
+          this.metrics = {
+            bpmCalculations: 0,
+            beatSyncs: 0,
+            cacheHits: 0,
+            cacheMisses: 0,
+            avgProcessingTime: 0,
+            performance: [],
+            errors: 0,
+            updates: 0
+          };
+          this.cacheCleanupInterval = null;
+        }
+        // Legacy method for backward compatibility - now uses event-driven pattern
+        setColorHarmonyEngine(engine) {
+          if (this.config.enableDebug) {
+            console.log(
+              "\u{1F3B5} [MusicSyncService] setColorHarmonyEngine called - now using event-driven pattern instead of direct dependency."
+            );
+          }
+        }
+        getLatestProcessedData() {
+          return this.latestProcessedData;
+        }
+        /**
+         * Get the latest beat vector (unit direction) for visual systems that need
+         * directional rhythm cues. Falls back to {0,0} when unavailable.
+         */
+        getCurrentBeatVector() {
+          return { ...this.currentBeatVector };
+        }
+        stopBeatScheduler() {
+          if (this.beatSchedulerTimer) {
+            clearTimeout(this.beatSchedulerTimer);
+            this.beatSchedulerTimer = null;
+          }
+        }
+        triggerBeatEvent() {
+          const GOLDEN_RATIO = 0.61803398875;
+          const angle = this.nextBeatIndex * GOLDEN_RATIO % 1 * Math.PI * 2;
+          this.currentBeatVector = { x: Math.cos(angle), y: Math.sin(angle) };
+          if (this.latestProcessedData) {
+            const beatUpdate = {
+              ...this.latestProcessedData,
+              beatOccurred: true,
+              beatVector: this.currentBeatVector
+            };
+            this.notifySubscribers(beatUpdate, null, this.currentTrackUri);
+          }
+          this.nextBeatIndex++;
+          this.scheduleNextBeatEvent();
+        }
+        scheduleNextBeatEvent() {
+          if (this.nextBeatIndex >= this.currentSongBeats.length) {
+            return;
+          }
+          const nextBeat = this.currentSongBeats[this.nextBeatIndex];
+          const timeSinceSongStart = Date.now() - this.songStartTimestamp;
+          const delay = nextBeat.start * 1e3 - timeSinceSongStart;
+          if (delay >= 0) {
+            this.beatSchedulerTimer = setTimeout(
+              () => this.triggerBeatEvent(),
+              delay
+            );
+          } else {
+            this.nextBeatIndex++;
+            this.scheduleNextBeatEvent();
+          }
+        }
+        /**
+         * Validate that the returned audio analysis object actually contains usable
+         * information (primarily tempo). Spotify may return an empty object when the
+         * analysis is not ready yet – treating that as valid poisons the cache.
+         */
+        isValidAudioData(data) {
+          return !!data && typeof data.tempo === "number" && data.tempo > 0;
+        }
+        /**
+         * Remove any cached entries (audioData, features, bpm, processed) belonging
+         * to the provided track URI. Useful when switching tracks to ensure we do
+         * not reuse stale or invalid data cached under the previous song.
+         */
+        invalidateTrackCaches(trackUri) {
+          if (!trackUri) return;
+          for (const key of this.unifiedCache.keys()) {
+            if (key.includes(trackUri)) {
+              this.unifiedCache.delete(key);
+            }
+          }
+        }
+        /**
+         * Convert the lightweight `audio-features` payload into a pseudo `AudioData`
+         * object so the rest of the pipeline (which expects full analysis) can work
+         * immediately. Missing properties are filled with sensible defaults.
+         */
+        convertFeaturesToAudioData(features) {
+          const fb = MUSIC_SYNC_CONFIG.musicVisualSync.enhancedBPM.fallbacks;
+          return {
+            tempo: features.tempo,
+            energy: features.energy,
+            valence: features.valence,
+            loudness: fb.loudness,
+            key: fb.key,
+            time_signature: fb.timeSignature,
+            danceability: features.danceability,
+            acousticness: features.acousticness,
+            instrumentalness: features.instrumentalness,
+            speechiness: 0,
+            liveness: 0,
+            mode: 0
+            // Optional arrays left undefined – beat grid will arrive later
+          };
+        }
+        // -------------------------------------------------------------------
+        // External adapter integration helpers ------------------------------
+        // -------------------------------------------------------------------
+        /**
+         * Adapter-facing helper to push music metrics without relying on the
+         * full processing pipeline.  Currently a no-op placeholder that may be
+         * expanded in future phases.
+         */
+        updateMetrics(metrics) {
+          this.latestProcessedData = metrics;
+        }
+        /**
+         * Get current music state for consciousness systems
+         */
+        getCurrentMusicState() {
+          if (!this.latestProcessedData || !this.audioData) {
+            return null;
+          }
+          return {
+            emotion: this.latestProcessedData.emotion || null,
+            beat: {
+              tempo: this.latestProcessedData.bpm || this.audioData.tempo || 120,
+              energy: this.latestProcessedData.energy || this.audioData.energy || 0.5,
+              timestamp: Date.now()
+            },
+            intensity: this.latestProcessedData.intensity || this.audioData.energy || 0.5
+          };
+        }
+      };
+      __name(_MusicSyncService, "MusicSyncService");
+      MusicSyncService = _MusicSyncService;
+    }
+  });
+
   // src-js/ui/managers/GlassmorphismManager.ts
   var _GlassmorphismManager, GlassmorphismManager;
   var init_GlassmorphismManager = __esm({
@@ -16938,18 +15479,18 @@ void main() {
               root.style.removeProperty("--glass-saturation");
               return;
             case "minimal":
-              blurValue = shouldReduceQuality ? "8px" : "10px";
+              blurValue = shouldReduceQuality ? "2px" : "3px";
               opacityValue = "0.05";
               saturationValue = "1.05";
               break;
             case "intense":
-              blurValue = shouldReduceQuality ? "20px" : "30px";
+              blurValue = shouldReduceQuality ? "6px" : "8px";
               opacityValue = "0.15";
               saturationValue = "1.4";
               break;
             case "balanced":
             default:
-              blurValue = shouldReduceQuality ? "15px" : "20px";
+              blurValue = shouldReduceQuality ? "4px" : "6px";
               opacityValue = "0.1";
               saturationValue = "1.2";
               break;
@@ -18653,6 +17194,316 @@ void main() {
       __name(_PerformanceBudgetManager, "PerformanceBudgetManager");
       _PerformanceBudgetManager.instance = null;
       PerformanceBudgetManager = _PerformanceBudgetManager;
+    }
+  });
+
+  // src-js/utils/dom/domCache.ts
+  function $$(selector, options = {}) {
+    if (!SUPPORTS_WEAKREF) {
+      return Array.from(document.querySelectorAll(selector));
+    }
+    let entry = CACHE.get(selector);
+    let elements = entry?.ref?.deref();
+    if (options.force || !elements) {
+      elements = Array.from(document.querySelectorAll(selector));
+      const ref = new WeakRef(elements);
+      entry = { ref, lastUpdate: Date.now() };
+      CACHE.set(selector, entry);
+      registry?.register(elements, selector);
+    }
+    return elements;
+  }
+  var CACHE, SUPPORTS_WEAKREF, SUPPORTS_REGISTRY, registry;
+  var init_domCache = __esm({
+    "src-js/utils/dom/domCache.ts"() {
+      "use strict";
+      CACHE = /* @__PURE__ */ new Map();
+      SUPPORTS_WEAKREF = typeof WeakRef !== "undefined";
+      SUPPORTS_REGISTRY = typeof FinalizationRegistry !== "undefined";
+      registry = SUPPORTS_REGISTRY ? (
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore – lib dom may not include FinalizationRegistry in older TS bundlers
+        new FinalizationRegistry((selector) => {
+          CACHE.delete(selector);
+        })
+      ) : null;
+      __name($$, "$$");
+    }
+  });
+
+  // src-js/debug/SpotifyDOMSelectors.ts
+  function elementExists(selector) {
+    return $$(selector).length > 0;
+  }
+  function findElementsWithFallback(modernSelector, legacySelector, options) {
+    let elements = $$(modernSelector, options);
+    if (elements.length === 0 && legacySelector) {
+      elements = $$(legacySelector, options);
+      if (elements.length > 0) {
+        console.warn(
+          `\u{1F30C} [SpotifyDOMSelectors] Using legacy selector: ${legacySelector}. Consider updating to: ${modernSelector}`
+        );
+      }
+    }
+    return elements;
+  }
+  function validateSpotifyDOM() {
+    console.group("\u{1F30C} [SpotifyDOMSelectors] DOM Validation");
+    const results = {
+      found: 0,
+      missing: 0,
+      details: {}
+    };
+    Object.entries(MODERN_SELECTORS).forEach(([key, selector]) => {
+      const exists = elementExists(selector);
+      results.details[key] = {
+        selector,
+        exists,
+        element: exists ? $$(selector)[0] || null : null
+      };
+      if (exists) {
+        results.found++;
+        console.log(`\u2705 ${key}: ${selector}`);
+      } else {
+        results.missing++;
+        console.warn(`\u274C ${key}: ${selector}`);
+      }
+    });
+    console.log(`\u{1F4CA} Summary: ${results.found} found, ${results.missing} missing`);
+    console.groupEnd();
+    return results;
+  }
+  function testGravitySystemSelectors() {
+    console.group("\u{1F30C} [Phase 1] Testing Gravity System Selectors");
+    console.log("\u{1F3AF} Primary gravity well targets:");
+    if (GRAVITY_WELL_TARGETS["primary"]) {
+      GRAVITY_WELL_TARGETS["primary"].forEach((selector) => {
+        const element = $$(selector)[0] || null;
+        console.log(`${element ? "\u2705" : "\u274C"} ${selector}`, element);
+      });
+    }
+    console.log("\u{1F3AF} Secondary gravity well targets:");
+    if (GRAVITY_WELL_TARGETS["secondary"]) {
+      GRAVITY_WELL_TARGETS["secondary"].forEach((selector) => {
+        const element = $$(selector)[0] || null;
+        console.log(`${element ? "\u2705" : "\u274C"} ${selector}`, element);
+      });
+    }
+    console.log("\u{1F6F8} Orbital elements:");
+    Object.entries(ORBITAL_ELEMENTS).forEach(([key, selector]) => {
+      const elements = $$(selector);
+      console.log(
+        `${elements.length > 0 ? "\u2705" : "\u274C"} ${key} (${selector}): ${elements.length} found`
+      );
+    });
+    console.groupEnd();
+  }
+  function validatePredictionTargets() {
+    console.group(
+      "\u{1F52E} [SpotifyDOMSelectors] Phase 2 - Prediction Target Validation"
+    );
+    const testSelectors = [
+      { name: "Track Rows", selector: ORBITAL_ELEMENTS["trackRows"] },
+      { name: "Progress Bar", selector: MODERN_SELECTORS["progressBar"] },
+      { name: "Play Button", selector: MODERN_SELECTORS["playButton"] },
+      { name: "Heart Button", selector: MODERN_SELECTORS["heartButton"] },
+      { name: "Album Cover", selector: MODERN_SELECTORS["albumCover"] },
+      {
+        name: "Now Playing Widget",
+        selector: MODERN_SELECTORS["nowPlayingWidget"]
+      },
+      { name: "Now Playing Left", selector: MODERN_SELECTORS["nowPlayingLeft"] },
+      { name: "Left Sidebar", selector: MODERN_SELECTORS["leftSidebar"] },
+      { name: "Library Items", selector: ORBITAL_ELEMENTS["libraryItems"] }
+    ];
+    const results = {
+      found: 0,
+      missing: 0,
+      details: {}
+    };
+    testSelectors.forEach(({ name, selector }) => {
+      if (!selector) return;
+      const elements = findElementsWithFallback(selector);
+      const count = elements.length;
+      results.details[name] = {
+        selector,
+        count,
+        exists: count > 0
+      };
+      if (count > 0) {
+        results.found++;
+        console.log(`\u2705 ${name}: ${count} elements found (${selector})`);
+      } else {
+        results.missing++;
+        console.warn(`\u274C ${name}: No elements found (${selector})`);
+      }
+    });
+    console.log(
+      `\u{1F4CA} Prediction Targets Summary: ${results.found} types found, ${results.missing} missing`
+    );
+    console.groupEnd();
+    return results;
+  }
+  function testPhase2Systems() {
+    console.group("\u{1F30C} [SpotifyDOMSelectors] Phase 2 - System Integration Test");
+    const systemTests = {
+      behavioralPrediction: validatePredictionTargets(),
+      dimensionalNexus: {
+        sidebarElement: MODERN_SELECTORS["leftSidebar"] ? elementExists(MODERN_SELECTORS["leftSidebar"]) : false
+      },
+      dataGlyph: {
+        navLinks: MODERN_SELECTORS["navBarLink"] ? elementExists(MODERN_SELECTORS["navBarLink"]) : false,
+        trackRows: ORBITAL_ELEMENTS["trackRows"] ? elementExists(ORBITAL_ELEMENTS["trackRows"]) : false,
+        cards: ORBITAL_ELEMENTS["cards"] ? elementExists(ORBITAL_ELEMENTS["cards"]) : false
+      }
+    };
+    let totalIssues = 0;
+    Object.values(systemTests).forEach((tests) => {
+      if (typeof tests === "object" && tests.missing) {
+        totalIssues += tests.missing;
+      }
+    });
+    console.log(
+      `\u{1F3AF} Phase 2 Integration Health: ${totalIssues === 0 ? "\u2705 All systems operational" : `\u26A0\uFE0F ${totalIssues} issues detected`}`
+    );
+    console.groupEnd();
+    return systemTests;
+  }
+  var MODERN_SELECTORS, SELECTOR_MAPPINGS, ORBITAL_ELEMENTS, GRAVITY_WELL_TARGETS, ANTI_GRAVITY_ZONES;
+  var init_SpotifyDOMSelectors = __esm({
+    "src-js/debug/SpotifyDOMSelectors.ts"() {
+      "use strict";
+      init_domCache();
+      MODERN_SELECTORS = {
+        // Main Layout Structure
+        nowPlayingBar: ".Root__now-playing-bar",
+        leftSidebar: ".Root__nav-bar",
+        mainView: ".Root__main-view",
+        rightSidebar: ".Root__right-sidebar",
+        // Now Playing Components
+        nowPlayingWidget: "[data-testid='now-playing-widget']",
+        nowPlayingLeft: ".main-nowPlayingBar-left",
+        nowPlayingCenter: ".main-nowPlayingBar-center",
+        nowPlayingRight: ".main-nowPlayingBar-right",
+        coverArt: ".main-coverSlotCollapsed-container",
+        trackInfo: ".main-trackInfo-container",
+        // Navigation & Library
+        navMain: "nav[aria-label='Main']",
+        yourLibrary: ".main-yourLibraryX-libraryContainer",
+        libraryItems: ".main-yourLibraryX-listItem",
+        libraryHeader: ".main-yourLibraryX-header",
+        playlistList: ".main-rootlist-wrapper",
+        // Track Lists & Content
+        trackListContainer: "[role='grid'][aria-label*='tracks']",
+        trackRow: ".main-trackList-trackListRow",
+        trackListHeader: ".main-trackList-trackListHeaderRow",
+        trackNumber: ".main-trackList-rowSectionIndex",
+        trackTitle: ".main-trackList-rowTitle",
+        trackArtist: ".main-trackList-rowSubTitle",
+        // Entity Headers (Playlist/Album/Artist Pages)
+        entityHeader: ".main-entityHeader-container",
+        entityTitle: ".main-entityHeader-title",
+        entityMetadata: ".main-entityHeader-metaData",
+        entityImage: ".main-entityHeader-imageContainer",
+        // Action Bar & Controls
+        actionBar: ".main-actionBar-ActionBarRow",
+        actionBarInner: ".main-actionBar-ActionBar",
+        playButton: "[data-testid='play-button']",
+        pauseButton: "[data-testid='pause-button']",
+        shuffleButton: "[data-testid='shuffle-button']",
+        likeButton: ".control-button-heart",
+        // Queue & Right Sidebar
+        queue: ".main-queue-trackList",
+        queueContainer: "[aria-label='Next in queue']",
+        aboutArtist: "[aria-label='About the artist']",
+        credits: "[aria-label='Credits']",
+        // Search & Filtering
+        searchInput: "[data-testid='search-input']",
+        searchPage: "[data-testid='search-container']",
+        filterPills: ".main-genre-chip",
+        sortButton: "[data-testid='sort-button']",
+        // Cards & Media
+        card: ".main-card-card",
+        cardImage: ".main-cardImage-image",
+        albumArt: ".main-trackList-albumArt",
+        // Modal & Overlay
+        modal: ".main-modal-container",
+        overlay: ".main-overlay-container"
+      };
+      SELECTOR_MAPPINGS = Object.entries({
+        // Migration mapping: legacy → modern
+        ".main-nowPlayingWidget-nowPlaying": MODERN_SELECTORS["nowPlayingBar"],
+        ".main-navBar-navBar": MODERN_SELECTORS["leftSidebar"],
+        ".main-search-searchBar": MODERN_SELECTORS["searchInput"],
+        ".main-topBar-topBar": MODERN_SELECTORS["actionBar"],
+        ".main-queue-queue": MODERN_SELECTORS["queue"],
+        ".main-trackList-trackList": MODERN_SELECTORS["trackListContainer"]
+      }).reduce((acc, [key, value]) => {
+        if (typeof value === "string") {
+          acc[key] = value;
+        }
+        return acc;
+      }, {});
+      ORBITAL_ELEMENTS = {
+        // Elements that can have orbital gravity effects
+        trackRows: MODERN_SELECTORS["trackRow"] ?? "",
+        libraryItems: MODERN_SELECTORS["libraryItems"] ?? "",
+        cards: MODERN_SELECTORS["card"] ?? "",
+        navLinks: ".main-navBar-navBarLink"
+        // This one still works
+      };
+      GRAVITY_WELL_TARGETS = {
+        // Major UI elements that should have gravity wells
+        primary: [
+          MODERN_SELECTORS["nowPlayingBar"],
+          MODERN_SELECTORS["leftSidebar"],
+          MODERN_SELECTORS["entityHeader"]
+        ].filter((s) => !!s),
+        secondary: [
+          MODERN_SELECTORS["actionBar"],
+          MODERN_SELECTORS["queue"],
+          MODERN_SELECTORS["searchInput"]
+        ].filter((s) => !!s),
+        tertiary: [
+          MODERN_SELECTORS["playButton"],
+          MODERN_SELECTORS["trackListHeader"]
+        ].filter((s) => !!s)
+      };
+      ANTI_GRAVITY_ZONES = {
+        // Areas where anti-gravity effects should be applied
+        searchAreas: [
+          MODERN_SELECTORS["searchInput"],
+          MODERN_SELECTORS["searchPage"]
+        ].filter((s) => !!s),
+        notifications: [
+          "[data-testid='notification-bar']",
+          ".main-topBar-notifications"
+        ],
+        dropdowns: [".main-dropdown-menu", "[role='menu']", "[role='listbox']"]
+      };
+      __name(elementExists, "elementExists");
+      __name(findElementsWithFallback, "findElementsWithFallback");
+      __name(validateSpotifyDOM, "validateSpotifyDOM");
+      __name(testGravitySystemSelectors, "testGravitySystemSelectors");
+      __name(validatePredictionTargets, "validatePredictionTargets");
+      __name(testPhase2Systems, "testPhase2Systems");
+      if (typeof window !== "undefined") {
+        window.SpotifyDOMSelectors = {
+          validate: validateSpotifyDOM,
+          testGravity: testGravitySystemSelectors,
+          validatePredictionTargets,
+          testPhase2Systems,
+          selectors: MODERN_SELECTORS,
+          targets: GRAVITY_WELL_TARGETS,
+          orbital: ORBITAL_ELEMENTS,
+          antiGravity: ANTI_GRAVITY_ZONES
+        };
+        console.log("\u{1F3AF} [SpotifyDOMSelectors] Debug functions available:");
+        console.log("  window.SpotifyDOMSelectors.validate() - Test all selectors");
+        console.log(
+          "  window.SpotifyDOMSelectors.testGravity() - Test gravity selectors"
+        );
+      }
     }
   });
 
@@ -21349,8 +20200,8 @@ void main() {
           });
           this.registerSystemConfig({
             systemKey: "UnifiedPerformanceCoordinator",
-            requiredDependencies: ["config", "performanceAnalyzer"],
-            optionalDependencies: [],
+            requiredDependencies: ["config"],
+            optionalDependencies: ["performanceAnalyzer"],
             constructorMapping: {
               parameterNames: ["config", "performanceAnalyzer"],
               dependencyMapping: {
@@ -21388,6 +20239,132 @@ void main() {
               }
             });
           }
+          this.registerSystemConfig({
+            systemKey: "TimerConsolidationSystem",
+            requiredDependencies: [],
+            optionalDependencies: [],
+            constructorMapping: {
+              parameterNames: [],
+              dependencyMapping: {}
+            },
+            creationPreferences: {
+              useSingleton: false,
+              lazyInit: false,
+              eventDriven: false,
+              builderPattern: false
+            }
+          });
+          this.registerSystemConfig({
+            systemKey: "GlassmorphismManager",
+            requiredDependencies: ["config", "utils", "cssVariableBatcher", "performanceAnalyzer", "settingsManager"],
+            optionalDependencies: [],
+            constructorMapping: {
+              parameterNames: ["config", "utils", "cssVariableBatcher", "performanceAnalyzer", "settingsManager"],
+              dependencyMapping: {
+                "config": "config",
+                "utils": "utils",
+                "cssVariableBatcher": "cssVariableBatcher",
+                "performanceAnalyzer": "performanceAnalyzer",
+                "settingsManager": "settingsManager"
+              }
+            },
+            creationPreferences: {
+              useSingleton: false,
+              lazyInit: false,
+              eventDriven: false,
+              builderPattern: false
+            }
+          });
+          this.registerSystemConfig({
+            systemKey: "Card3DManager",
+            requiredDependencies: ["performanceAnalyzer", "settingsManager", "utils"],
+            optionalDependencies: [],
+            constructorMapping: {
+              parameterNames: ["performanceAnalyzer", "settingsManager", "utils"],
+              dependencyMapping: {
+                "performanceAnalyzer": "performanceAnalyzer",
+                "settingsManager": "settingsManager",
+                "utils": "utils"
+              }
+            },
+            creationPreferences: {
+              useSingleton: false,
+              lazyInit: false,
+              eventDriven: false,
+              builderPattern: false
+            }
+          });
+          this.registerSystemConfig({
+            systemKey: "UnifiedCSSVariableManager",
+            requiredDependencies: ["cssVariableBatcher"],
+            optionalDependencies: [],
+            constructorMapping: {
+              parameterNames: ["cssVariableBatcher"],
+              dependencyMapping: {
+                "cssVariableBatcher": "cssVariableBatcher"
+              }
+            },
+            creationPreferences: {
+              useSingleton: false,
+              lazyInit: false,
+              eventDriven: false,
+              builderPattern: false
+            }
+          });
+          this.registerSystemConfig({
+            systemKey: "PerformanceCSSIntegration",
+            requiredDependencies: ["config", "cssVariableBatcher", "performanceCoordinator"],
+            optionalDependencies: [],
+            constructorMapping: {
+              parameterNames: ["config", "cssVariableManager", "performanceCoordinator"],
+              dependencyMapping: {
+                "config": "config",
+                "cssVariableManager": "cssVariableBatcher",
+                // Map cssVariableBatcher to cssVariableManager parameter
+                "performanceCoordinator": "performanceCoordinator"
+              }
+            },
+            creationPreferences: {
+              useSingleton: false,
+              lazyInit: false,
+              eventDriven: false,
+              builderPattern: false
+            }
+          });
+          this.registerSystemConfig({
+            systemKey: "SidebarSystemsIntegration",
+            requiredDependencies: ["cssVariableBatcher"],
+            optionalDependencies: [],
+            constructorMapping: {
+              parameterNames: ["cssVariableBatcher"],
+              dependencyMapping: {
+                "cssVariableBatcher": "cssVariableBatcher"
+              }
+            },
+            creationPreferences: {
+              useSingleton: false,
+              lazyInit: false,
+              eventDriven: false,
+              builderPattern: false
+            }
+          });
+          this.registerSystemConfig({
+            systemKey: "UnifiedSystemIntegration",
+            requiredDependencies: ["year3000System"],
+            optionalDependencies: [],
+            constructorMapping: {
+              parameterNames: ["year3000System"],
+              dependencyMapping: {
+                "year3000System": "year3000System"
+              }
+            },
+            creationPreferences: {
+              useSingleton: false,
+              lazyInit: false,
+              eventDriven: false,
+              builderPattern: false
+            }
+          });
         }
       };
       __name(_StandardConstructorStrategy, "StandardConstructorStrategy");
@@ -21503,8 +20480,8 @@ void main() {
         registerObjectDependencySystems() {
           this.registerSystemConfig({
             systemKey: "MusicSyncService",
-            requiredDependencies: ["config", "utils", "settingsManager", "year3000System"],
-            optionalDependencies: [],
+            requiredDependencies: ["config", "utils"],
+            optionalDependencies: ["settingsManager", "year3000System"],
             creationPreferences: {
               useSingleton: false,
               lazyInit: false,
@@ -21646,7 +20623,6 @@ void main() {
             strategyUsage: {}
           };
           this.strategyRegistry = strategyRegistry || globalSystemCreationRegistry;
-          this.registerDefaultSystemConfigs();
           Y3K?.debug?.log("StrategyBasedFactory", "Factory initialized with strategy registry");
         }
         /**
@@ -21738,20 +20714,33 @@ void main() {
         // Private Helper Methods
         // ============================================================================
         /**
-         * Build selection criteria based on system configuration and context
+         * Build selection criteria based on system key and context
+         * No longer relies on factory's own systemConfig - strategies manage their own configurations
          */
         buildSelectionCriteria(systemKey, systemConfig, context) {
-          let complexity = "simple";
-          const depCount = (systemConfig?.requiredDependencies.length || 0) + (systemConfig?.optionalDependencies.length || 0);
-          if (depCount === 0) complexity = "simple";
-          else if (depCount <= 3) complexity = "medium";
-          else complexity = "complex";
+          let complexity = "medium";
+          const simpleSystems = [
+            "DeviceCapabilityDetector",
+            "PerformanceAnalyzer",
+            "CSSVariableBatcher",
+            "SettingsManager",
+            "TimerConsolidationSystem"
+          ];
+          const complexSystems = [
+            "GlassmorphismManager",
+            "Card3DManager",
+            "PerformanceCSSIntegration",
+            "EnhancedMasterAnimationCoordinator"
+          ];
+          if (simpleSystems.includes(systemKey)) {
+            complexity = "simple";
+          } else if (complexSystems.includes(systemKey)) {
+            complexity = "complex";
+          }
           let dependencyRequirements = "basic";
-          if (systemConfig?.creationPreferences.eventDriven) {
+          if (systemKey === "MusicSyncService" || systemKey === "ColorHarmonyEngine") {
             dependencyRequirements = "event-driven";
-          } else if (systemConfig?.creationPreferences.builderPattern) {
-            dependencyRequirements = "advanced";
-          } else if (depCount === 0) {
+          } else if (simpleSystems.includes(systemKey)) {
             dependencyRequirements = "none";
           }
           let performance2 = "standard";
@@ -21784,159 +20773,9 @@ void main() {
         }
         /**
          * Register default system configurations for known systems
+         * DEPRECATED: System configurations are now managed by individual strategies
          */
         registerDefaultSystemConfigs() {
-          this.registerSystemConfig({
-            systemKey: "PerformanceAnalyzer",
-            requiredDependencies: [],
-            optionalDependencies: [],
-            creationPreferences: {
-              useSingleton: false,
-              lazyInit: false,
-              eventDriven: false,
-              builderPattern: false
-            }
-          });
-          this.registerSystemConfig({
-            systemKey: "CSSVariableBatcher",
-            requiredDependencies: [],
-            optionalDependencies: [],
-            creationPreferences: {
-              useSingleton: false,
-              lazyInit: false,
-              eventDriven: false,
-              builderPattern: false
-            }
-          });
-          this.registerSystemConfig({
-            systemKey: "DeviceCapabilityDetector",
-            requiredDependencies: [],
-            optionalDependencies: [],
-            creationPreferences: {
-              useSingleton: false,
-              lazyInit: false,
-              eventDriven: false,
-              builderPattern: false
-            }
-          });
-          this.registerSystemConfig({
-            systemKey: "SettingsManager",
-            requiredDependencies: [],
-            optionalDependencies: [],
-            creationPreferences: {
-              useSingleton: false,
-              lazyInit: false,
-              eventDriven: false,
-              builderPattern: false
-            }
-          });
-          this.registerSystemConfig({
-            systemKey: "ColorHarmonyEngine",
-            requiredDependencies: ["config", "utils", "performanceAnalyzer", "settingsManager"],
-            optionalDependencies: [],
-            eventSubscriptions: ["colors/extracted"],
-            constructorMapping: {
-              parameterNames: ["config", "utils", "performanceAnalyzer", "settingsManager"],
-              dependencyMapping: {
-                "config": "config",
-                "utils": "utils",
-                "performanceAnalyzer": "performanceAnalyzer",
-                "settingsManager": "settingsManager"
-              }
-            },
-            creationPreferences: {
-              useSingleton: false,
-              lazyInit: false,
-              eventDriven: true,
-              builderPattern: false
-            }
-          });
-          this.registerSystemConfig({
-            systemKey: "MusicSyncService",
-            requiredDependencies: ["config", "utils", "settingsManager", "year3000System"],
-            optionalDependencies: [],
-            creationPreferences: {
-              useSingleton: false,
-              lazyInit: false,
-              eventDriven: true,
-              builderPattern: false
-            }
-          });
-          this.registerSystemConfig({
-            systemKey: "EnhancedMasterAnimationCoordinator",
-            requiredDependencies: ["config", "performanceCoordinator"],
-            optionalDependencies: [],
-            constructorMapping: {
-              parameterNames: ["config", "performanceCoordinator"],
-              dependencyMapping: {
-                "config": "config",
-                "performanceCoordinator": "performanceCoordinator"
-              }
-            },
-            creationPreferences: {
-              useSingleton: true,
-              lazyInit: false,
-              eventDriven: false,
-              builderPattern: false
-            }
-          });
-          this.registerSystemConfig({
-            systemKey: "UnifiedPerformanceCoordinator",
-            requiredDependencies: ["config", "performanceAnalyzer"],
-            optionalDependencies: [],
-            constructorMapping: {
-              parameterNames: ["config", "performanceAnalyzer"],
-              dependencyMapping: {
-                "config": "config",
-                "performanceAnalyzer": "performanceAnalyzer"
-              }
-            },
-            creationPreferences: {
-              useSingleton: true,
-              lazyInit: false,
-              eventDriven: false,
-              builderPattern: false
-            }
-          });
-          this.registerSystemConfig({
-            systemKey: "GlassmorphismManager",
-            requiredDependencies: ["cssVariableBatcher"],
-            optionalDependencies: ["config", "utils", "performanceAnalyzer", "settingsManager"],
-            creationPreferences: {
-              useSingleton: false,
-              lazyInit: true,
-              eventDriven: false,
-              builderPattern: false
-            }
-          });
-          this.registerSystemConfig({
-            systemKey: "Card3DManager",
-            requiredDependencies: ["cssVariableBatcher"],
-            optionalDependencies: ["config", "utils", "performanceAnalyzer", "settingsManager"],
-            creationPreferences: {
-              useSingleton: false,
-              lazyInit: true,
-              eventDriven: false,
-              builderPattern: false
-            }
-          });
-          this.registerSystemConfig({
-            systemKey: "UnifiedSystemIntegration",
-            requiredDependencies: ["year3000System"],
-            optionalDependencies: [],
-            constructorMapping: {
-              parameterNames: ["year3000System"],
-              dependencyMapping: {
-                "year3000System": "year3000System"
-              }
-            },
-            creationPreferences: {
-              useSingleton: false,
-              lazyInit: false,
-              eventDriven: false,
-              builderPattern: false
-            }
-          });
         }
       };
       __name(_StrategyBasedFactory, "StrategyBasedFactory");
@@ -22077,13 +20916,23 @@ void main() {
             `Using legacy creation for ${systemKey} - should migrate to strategy pattern`
           );
           switch (systemKey) {
-            case "UnifiedSystemIntegration":
-              return new SystemClass(context.year3000System);
             case "DeviceCapabilityDetector":
             case "PerformanceAnalyzer":
             case "CSSVariableBatcher":
             case "SettingsManager":
+            case "TimerConsolidationSystem":
               return new SystemClass();
+            case "UnifiedSystemIntegration":
+              return new SystemClass(context.year3000System);
+            case "UnifiedCSSVariableManager":
+            case "SidebarSystemsIntegration":
+              return new SystemClass(context.dependencies.cssVariableBatcher);
+            case "PerformanceCSSIntegration":
+              return new SystemClass(
+                context.config,
+                context.dependencies.cssVariableBatcher,
+                context.dependencies.performanceCoordinator
+              );
             case "ColorHarmonyEngine":
               return new SystemClass(
                 context.config,
@@ -22101,6 +20950,20 @@ void main() {
                 context.config,
                 context.dependencies.performanceAnalyzer
               );
+            case "GlassmorphismManager":
+              return new SystemClass(
+                context.config,
+                context.utils,
+                context.dependencies.cssVariableBatcher,
+                context.dependencies.performanceAnalyzer,
+                context.dependencies.settingsManager
+              );
+            case "Card3DManager":
+              return new SystemClass(
+                context.dependencies.performanceAnalyzer,
+                context.dependencies.settingsManager,
+                context.utils
+              );
             case "MusicSyncService":
               return new SystemClass({
                 YEAR3000_CONFIG: context.config,
@@ -22110,14 +20973,16 @@ void main() {
                 // NOTE: colorHarmonyEngine deliberately omitted - using event-driven pattern
               });
             default:
-              return new SystemClass(
-                context.config,
-                context.utils,
-                context.dependencies.performanceAnalyzer,
-                context.dependencies.musicSyncService,
-                context.dependencies.settingsManager,
-                context.year3000System
-              );
+              try {
+                return new SystemClass();
+              } catch (error) {
+                return new SystemClass(
+                  context.config,
+                  context.utils,
+                  context.dependencies.performanceAnalyzer,
+                  context.dependencies.settingsManager
+                );
+              }
           }
         }
         /**
@@ -22210,7 +21075,6 @@ void main() {
       init_UnifiedPerformanceCoordinator();
       init_DeviceCapabilityDetector();
       init_PerformanceAnalyzer();
-      init_PerformanceOptimizationManager();
       init_PerformanceCSSIntegration();
       init_UnifiedDebugManager();
       init_SettingsManager();
@@ -22279,13 +21143,11 @@ void main() {
           this.systemRegistry.set("UnifiedCSSVariableManager", UnifiedCSSVariableManager);
           this.systemDependencies.set("UnifiedCSSVariableManager", ["cssVariableBatcher"]);
           this.systemRegistry.set("UnifiedPerformanceCoordinator", UnifiedPerformanceCoordinator);
-          this.systemDependencies.set("UnifiedPerformanceCoordinator", ["performanceAnalyzer"]);
+          this.systemDependencies.set("UnifiedPerformanceCoordinator", []);
           this.systemRegistry.set("DeviceCapabilityDetector", DeviceCapabilityDetector);
           this.systemDependencies.set("DeviceCapabilityDetector", []);
           this.systemRegistry.set("PerformanceAnalyzer", PerformanceAnalyzer);
           this.systemDependencies.set("PerformanceAnalyzer", []);
-          this.systemRegistry.set("PerformanceOptimizationManager", PerformanceOptimizationManager);
-          this.systemDependencies.set("PerformanceOptimizationManager", ["performanceAnalyzer"]);
           this.systemRegistry.set("PerformanceCSSIntegration", PerformanceCSSIntegration);
           this.systemDependencies.set("PerformanceCSSIntegration", ["cssVariableBatcher", "performanceAnalyzer"]);
           this.systemDependencies.set("UnifiedDebugManager", []);
@@ -22296,9 +21158,9 @@ void main() {
           this.systemRegistry.set("MusicSyncService", MusicSyncService);
           this.systemDependencies.set("MusicSyncService", []);
           this.systemRegistry.set("GlassmorphismManager", GlassmorphismManager);
-          this.systemDependencies.set("GlassmorphismManager", ["cssVariableBatcher"]);
+          this.systemDependencies.set("GlassmorphismManager", ["cssVariableBatcher", "performanceAnalyzer", "settingsManager"]);
           this.systemRegistry.set("Card3DManager", Card3DManager);
-          this.systemDependencies.set("Card3DManager", ["cssVariableBatcher"]);
+          this.systemDependencies.set("Card3DManager", ["performanceAnalyzer", "settingsManager"]);
           this.systemRegistry.set("SidebarSystemsIntegration", SidebarSystemsIntegration);
           this.systemDependencies.set("SidebarSystemsIntegration", ["cssVariableBatcher"]);
           this.systemRegistry.set("UnifiedSystemIntegration", UnifiedSystemIntegration);
@@ -22412,15 +21274,33 @@ void main() {
               throw new Error(`Non-visual system '${key}' not found in registry`);
             }
             const context = {
+              systemKey: key,
               config: this.config,
               utils: this.utils,
               dependencies: {
+                config: this.config,
+                utils: this.utils,
                 performanceAnalyzer: this.performanceAnalyzer,
                 settingsManager: this.settingsManager,
                 musicSyncService: this.musicSyncService,
                 year3000System: this.year3000System,
                 cssVariableBatcher: this.cssVariableBatcher,
                 performanceCoordinator: this.performanceCoordinator
+              },
+              preferences: {
+                lazyInit: false,
+                validateDependencies: true,
+                creationTimeout: 5e3,
+                monitorCreation: true
+              },
+              metadata: {
+                timestamp: Date.now(),
+                reason: "startup",
+                priority: "medium",
+                resourceConstraints: {
+                  maxMemoryMB: 50,
+                  maxInitTimeMs: 1e3
+                }
               },
               year3000System: this.year3000System
             };
@@ -23381,8 +22261,8 @@ void main() {
         get performanceAnalyzer() {
           return this.facadeCoordinator?.getCachedNonVisualSystem("PerformanceAnalyzer") || null;
         }
-        get performanceOptimizationManager() {
-          return this.facadeCoordinator?.getCachedNonVisualSystem("PerformanceOptimizationManager") || null;
+        get unifiedPerformanceCoordinator() {
+          return this.facadeCoordinator?.getCachedNonVisualSystem("UnifiedPerformanceCoordinator") || null;
         }
         get performanceCSSIntegration() {
           return this.facadeCoordinator?.getCachedNonVisualSystem("PerformanceCSSIntegration") || null;
@@ -23416,12 +22296,6 @@ void main() {
         get beatSyncVisualSystem() {
           return this.facadeCoordinator?.getVisualSystem("OrganicBeatSync") || null;
         }
-        get behavioralPredictionEngine() {
-          return this.facadeCoordinator?.getVisualSystem("BehavioralPrediction") || null;
-        }
-        get predictiveMaterializationSystem() {
-          return this.facadeCoordinator?.getVisualSystem("PredictiveMaterialization") || null;
-        }
         get webGLGradientBackgroundSystem() {
           return this.facadeCoordinator?.getVisualSystem("WebGLBackground") || null;
         }
@@ -23429,7 +22303,7 @@ void main() {
           return this.facadeCoordinator?.getVisualSystem("ParticleField") || null;
         }
         get emergentChoreographyEngine() {
-          return this.facadeCoordinator?.getVisualSystem("EmergentChoreography") || null;
+          return this.enhancedMasterAnimationCoordinator || null;
         }
         get spotifyUIApplicationSystem() {
           return this.facadeCoordinator?.getVisualSystem("SpotifyUIApplication") || null;
@@ -23691,8 +22565,8 @@ void main() {
               "SpotifyUIApplication",
               // 🎨 Core UI color application
               "OrganicBeatSync",
-              "InteractionTracking",
-              "EmergentChoreography"
+              "InteractionTracking"
+              // EmergentChoreography integrated into EnhancedMasterAnimationCoordinator
             ];
             for (const systemKey of essentialVisualSystems) {
               try {
@@ -23731,10 +22605,10 @@ void main() {
                 console.log("\u{1F30C} [Year3000System] ColorHarmonyEngine linked to MusicSyncService");
               }
             }
-            if (this.colorHarmonyEngine && this.emergentChoreographyEngine) {
-              this.colorHarmonyEngine.setEmergentEngine(this.emergentChoreographyEngine);
+            if (this.colorHarmonyEngine && this.enhancedMasterAnimationCoordinator) {
+              this.colorHarmonyEngine.setEmergentEngine(this.enhancedMasterAnimationCoordinator);
               if (this.YEAR3000_CONFIG.enableDebug) {
-                console.log("\u{1F30C} [Year3000System] EmergentChoreographyEngine linked to ColorHarmonyEngine");
+                console.log("\u{1F30C} [Year3000System] EnhancedMasterAnimationCoordinator (with emergent functionality) linked to ColorHarmonyEngine");
               }
             }
             if (this.systemHealthMonitor) {
@@ -23757,16 +22631,10 @@ void main() {
           }
         }
         /**
-         * Determines if prediction systems should be skipped for performance optimization
+         * Legacy function - removed prediction systems entirely for performance optimization
          */
         _shouldSkipPredictionSystem(systemName) {
-          const predictionSystems = [
-            "BehavioralPredictionEngine",
-            "PredictiveMaterializationSystem"
-          ];
-          if (!predictionSystems.includes(systemName)) {
-            return false;
-          }
+          return false;
           if (!this.deviceCapabilityDetector) {
             return false;
           }
@@ -23788,21 +22656,19 @@ void main() {
               "LightweightParticleSystem",
               "InteractionTrackingSystem",
               "BeatSyncVisualSystem",
-              "BehavioralPredictionEngine",
-              "PredictiveMaterializationSystem",
-              "SidebarSystemsIntegration",
-              "EmergentChoreographyEngine"
+              "SidebarSystemsIntegration"
+              // "EmergentChoreographyEngine", // Consolidated into EnhancedMasterAnimationCoordinator
             ];
             visualSystems.forEach((s) => results.skipped.push(s));
             return;
           }
-          if (this.colorHarmonyEngine && this.emergentChoreographyEngine) {
+          if (this.colorHarmonyEngine && this.enhancedMasterAnimationCoordinator) {
             this.colorHarmonyEngine.setEmergentEngine(
-              this.emergentChoreographyEngine
+              this.enhancedMasterAnimationCoordinator
             );
             if (this.YEAR3000_CONFIG.enableDebug) {
               console.log(
-                "\u{1F517} [Year3000System] EmergentChoreographyEngine linked to ColorHarmonyEngine."
+                "\u{1F517} [Year3000System] EnhancedMasterAnimationCoordinator (emergent functionality) linked to ColorHarmonyEngine."
               );
             }
           }
@@ -24293,21 +23159,7 @@ void main() {
               system: this.beatSyncVisualSystem,
               priority: "critical"
             },
-            {
-              name: "EmergentChoreographyEngine",
-              system: this.emergentChoreographyEngine,
-              priority: "critical"
-            },
-            {
-              name: "BehavioralPredictionEngine",
-              system: this.behavioralPredictionEngine,
-              priority: "normal"
-            },
-            {
-              name: "PredictiveMaterializationSystem",
-              system: this.predictiveMaterializationSystem,
-              priority: "normal"
-            },
+            // EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
             {
               name: "SidebarSystemsIntegration",
               system: this.sidebarSystemsIntegration,
@@ -24378,27 +23230,10 @@ void main() {
               priority: "critical",
               type: "animation"
             },
-            {
-              name: "EmergentChoreographyEngine",
-              system: this.emergentChoreographyEngine,
-              priority: "critical",
-              type: "animation"
-            },
+            // EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
             {
               name: "SidebarSystemsIntegration",
               system: this.sidebarSystemsIntegration,
-              priority: "normal",
-              type: "animation"
-            },
-            {
-              name: "BehavioralPredictionEngine",
-              system: this.behavioralPredictionEngine,
-              priority: "normal",
-              type: "animation"
-            },
-            {
-              name: "PredictiveMaterializationSystem",
-              system: this.predictiveMaterializationSystem,
               priority: "normal",
               type: "animation"
             },
@@ -24725,8 +23560,6 @@ void main() {
             this.lightweightParticleSystem,
             this.interactionTrackingSystem,
             this.beatSyncVisualSystem,
-            this.behavioralPredictionEngine,
-            this.predictiveMaterializationSystem,
             this.sidebarSystemsIntegration,
             this.particleFieldSystem
             // contextMenuSystem removed

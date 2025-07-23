@@ -31,11 +31,9 @@ import { LightweightParticleSystem } from "@/visual/backgrounds/LightweightParti
 import { ParticleFieldSystem } from "@/visual/backgrounds/ParticleFieldSystem";
 import { WebGLGradientBackgroundSystem } from "@/visual/backgrounds/WebGLGradientBackgroundSystem";
 import { OrganicBeatSyncConsciousness } from "@/visual/organic-consciousness/OrganicBeatSyncConsciousness";
-import { BehavioralPredictionEngine } from "@/visual/ui-effects/BehavioralPredictionEngine";
 import { InteractionTrackingSystem } from "@/visual/ui-effects/InteractionTrackingSystem";
-import { PredictiveMaterializationSystem } from "@/visual/ui-effects/PredictiveMaterializationSystem";
 import { SpotifyUIApplicationSystem } from "@/visual/ui-effects/SpotifyUIApplicationSystem";
-import { EmergentChoreographyEngine } from "@/core/animation/EmergentChoreographyEngine";
+// EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
 
 // Interface imports
 import { IManagedSystem } from "@/types/systems";
@@ -47,11 +45,9 @@ export type VisualSystemKey =
   | 'ParticleField'
   | 'WebGLBackground'
   | 'OrganicBeatSync'
-  | 'BehavioralPrediction'
   | 'InteractionTracking'
-  | 'PredictiveMaterialization'
-  | 'SpotifyUIApplication'
-  | 'EmergentChoreography';
+  | 'SpotifyUIApplication';
+  // EmergentChoreography consolidated into EnhancedMasterAnimationCoordinator
 
 export type SystemHealth = "excellent" | "good" | "degraded" | "critical";
 export type IntegrationMode = "progressive" | "performance-first" | "quality-first" | "battery-optimized";
@@ -214,20 +210,13 @@ export class VisualSystemFacade {
     this.systemRegistry.set('OrganicBeatSync', OrganicBeatSyncConsciousness);
     this.systemDependencies.set('OrganicBeatSync', ['performanceAnalyzer', 'cssVariableBatcher', 'eventBus', 'musicSyncService', 'colorHarmonyEngine']);
     
-    this.systemRegistry.set('BehavioralPrediction', BehavioralPredictionEngine);
-    this.systemDependencies.set('BehavioralPrediction', ['performanceAnalyzer', 'cssVariableBatcher', 'eventBus']);
-    
     this.systemRegistry.set('InteractionTracking', InteractionTrackingSystem);
     this.systemDependencies.set('InteractionTracking', ['performanceAnalyzer', 'cssVariableBatcher']);
-    
-    this.systemRegistry.set('PredictiveMaterialization', PredictiveMaterializationSystem);
-    this.systemDependencies.set('PredictiveMaterialization', ['performanceAnalyzer', 'cssVariableBatcher', 'eventBus']);
     
     this.systemRegistry.set('SpotifyUIApplication', SpotifyUIApplicationSystem);
     this.systemDependencies.set('SpotifyUIApplication', ['year3000System']); // Special case
     
-    this.systemRegistry.set('EmergentChoreography', EmergentChoreographyEngine);
-    this.systemDependencies.set('EmergentChoreography', ['performanceAnalyzer', 'cssVariableBatcher', 'eventBus']);
+    // EmergentChoreography consolidated into EnhancedMasterAnimationCoordinator
   }
 
   public async initialize(config?: Partial<VisualSystemConfig>): Promise<void> {

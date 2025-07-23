@@ -334,7 +334,7 @@
 
 // Ethereal Mode: Soft mystical elements with gentle glow
 .aesthetic-mode-ethereal {
-  .holographic-element {
+  .holographic-element:not(.main-view-container):not(.main-view-container__scroll-node) {
     animation: 
       consciousness-atmospheric-depth calc(2s / var(--holographic-breathing-frequency, 0.3)) ease-in-out infinite;
     

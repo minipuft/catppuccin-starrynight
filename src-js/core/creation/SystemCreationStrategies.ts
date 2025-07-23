@@ -312,8 +312,8 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
     // UnifiedPerformanceCoordinator
     this.registerSystemConfig({
       systemKey: 'UnifiedPerformanceCoordinator',
-      requiredDependencies: ['config', 'performanceAnalyzer'],
-      optionalDependencies: [],
+      requiredDependencies: ['config'],
+      optionalDependencies: ['performanceAnalyzer'],
       constructorMapping: {
         parameterNames: ['config', 'performanceAnalyzer'],
         dependencyMapping: {
@@ -354,6 +354,146 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
         }
       });
     }
+
+    // TimerConsolidationSystem - simple system with no dependencies
+    this.registerSystemConfig({
+      systemKey: 'TimerConsolidationSystem',
+      requiredDependencies: [],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: [],
+        dependencyMapping: {}
+      },
+      creationPreferences: {
+        useSingleton: false,
+        lazyInit: false,
+        eventDriven: false,
+        builderPattern: false
+      }
+    });
+
+    // GlassmorphismManager - requires cssVariableBatcher, performanceAnalyzer, and settingsManager
+    this.registerSystemConfig({
+      systemKey: 'GlassmorphismManager',
+      requiredDependencies: ['config', 'utils', 'cssVariableBatcher', 'performanceAnalyzer', 'settingsManager'],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: ['config', 'utils', 'cssVariableBatcher', 'performanceAnalyzer', 'settingsManager'],
+        dependencyMapping: {
+          'config': 'config',
+          'utils': 'utils',
+          'cssVariableBatcher': 'cssVariableBatcher',
+          'performanceAnalyzer': 'performanceAnalyzer',
+          'settingsManager': 'settingsManager'
+        }
+      },
+      creationPreferences: {
+        useSingleton: false,
+        lazyInit: false,
+        eventDriven: false,
+        builderPattern: false
+      }
+    });
+
+    // Card3DManager - requires performanceAnalyzer and settingsManager
+    this.registerSystemConfig({
+      systemKey: 'Card3DManager',
+      requiredDependencies: ['performanceAnalyzer', 'settingsManager', 'utils'],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: ['performanceAnalyzer', 'settingsManager', 'utils'],
+        dependencyMapping: {
+          'performanceAnalyzer': 'performanceAnalyzer',
+          'settingsManager': 'settingsManager',
+          'utils': 'utils'
+        }
+      },
+      creationPreferences: {
+        useSingleton: false,
+        lazyInit: false,
+        eventDriven: false,
+        builderPattern: false
+      }
+    });
+
+    // UnifiedCSSVariableManager - requires cssVariableBatcher
+    this.registerSystemConfig({
+      systemKey: 'UnifiedCSSVariableManager',
+      requiredDependencies: ['cssVariableBatcher'],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: ['cssVariableBatcher'],
+        dependencyMapping: {
+          'cssVariableBatcher': 'cssVariableBatcher'
+        }
+      },
+      creationPreferences: {
+        useSingleton: false,
+        lazyInit: false,
+        eventDriven: false,
+        builderPattern: false
+      }
+    });
+
+
+    // PerformanceCSSIntegration - requires config, cssVariableManager, and performanceCoordinator
+    this.registerSystemConfig({
+      systemKey: 'PerformanceCSSIntegration',
+      requiredDependencies: ['config', 'cssVariableBatcher', 'performanceCoordinator'],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: ['config', 'cssVariableManager', 'performanceCoordinator'],
+        dependencyMapping: {
+          'config': 'config',
+          'cssVariableManager': 'cssVariableBatcher', // Map cssVariableBatcher to cssVariableManager parameter
+          'performanceCoordinator': 'performanceCoordinator'
+        }
+      },
+      creationPreferences: {
+        useSingleton: false,
+        lazyInit: false,
+        eventDriven: false,
+        builderPattern: false
+      }
+    });
+
+    // SidebarSystemsIntegration - requires cssVariableBatcher
+    this.registerSystemConfig({
+      systemKey: 'SidebarSystemsIntegration',
+      requiredDependencies: ['cssVariableBatcher'],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: ['cssVariableBatcher'],
+        dependencyMapping: {
+          'cssVariableBatcher': 'cssVariableBatcher'
+        }
+      },
+      creationPreferences: {
+        useSingleton: false,
+        lazyInit: false,
+        eventDriven: false,
+        builderPattern: false
+      }
+    });
+
+    // UnifiedSystemIntegration - requires year3000System
+    this.registerSystemConfig({
+      systemKey: 'UnifiedSystemIntegration',
+      requiredDependencies: ['year3000System'],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: ['year3000System'],
+        dependencyMapping: {
+          'year3000System': 'year3000System'
+        }
+      },
+      creationPreferences: {
+        useSingleton: false,
+        lazyInit: false,
+        eventDriven: false,
+        builderPattern: false
+      }
+    });
   }
 }
 
@@ -516,8 +656,8 @@ export class ObjectDependenciesStrategy extends BaseCreationStrategy {
   private registerObjectDependencySystems(): void {
     this.registerSystemConfig({
       systemKey: 'MusicSyncService',
-      requiredDependencies: ['config', 'utils', 'settingsManager', 'year3000System'],
-      optionalDependencies: [],
+      requiredDependencies: ['config', 'utils'],
+      optionalDependencies: ['settingsManager', 'year3000System'],
       creationPreferences: {
         useSingleton: false,
         lazyInit: false,

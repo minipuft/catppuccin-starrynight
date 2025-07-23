@@ -165,7 +165,7 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
     &::before, /* If layers are directly on ::before*/
     &::after {
       /* and ::after*/
-      filter: blur(var(--sn-sidebar-blur-intensity, 25px))
+      filter: blur(var(--sn-sidebar-blur-intensity, 3px))
         saturate(
           calc(
             var(--sn-gradient-saturation) *

@@ -101,7 +101,7 @@ body:has(.main-entityHeader-container) .main-view-container {
       );
 
     // TODO: Add enhanced aura breathing animations synced with existing soul consciousness
-    filter: blur(calc(var(--header-cosmic-blur, 12px) * 1.5))
+    filter: blur(calc(var(--header-cosmic-blur, 4px) * 1.5))
       saturate(calc(var(--cosmic-saturation, 1.4) * 0.6))
       brightness(calc(1 + 0.04 * var(--artist-aura-intensity)));
 
