@@ -1,13 +1,22 @@
-import type { ColorContext } from "@/types/colorStrategy";
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
-import { GlobalEventBus } from "@/core/events/EventBus";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Year3000System } from "@/core/lifecycle/year3000System";
+import type { ColorContext } from "@/types/colorStrategy";
 import type { Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import * as Utils from "@/utils/core/Year3000Utilities";
 import { SpicetifyCompat } from "@/utils/platform/SpicetifyCompat";
 import { StorageManager } from "@/utils/platform/StorageManager";
 import { GenreProfileManager } from "./GenreProfileManager";
+import { 
+  OKLABColorProcessor, 
+  type EnhancementPreset, 
+  type OKLABProcessingResult 
+} from "@/utils/color/OKLABColorProcessor";
+import { 
+  EmotionalTemperatureMapper, 
+  type EmotionalTemperatureResult 
+} from "@/utils/color/EmotionalTemperatureMapper";
 
 // Interfaces
 interface MusicSyncConfig {
@@ -217,6 +226,10 @@ export class MusicSyncService {
   private settingsManager?: SettingsManager;
   private year3000System?: Year3000System;
   private genreProfileManager: GenreProfileManager;
+  
+  // OKLAB integration for perceptually uniform color processing
+  private oklabProcessor: OKLABColorProcessor;
+  private emotionalTemperatureMapper: EmotionalTemperatureMapper;
 
   private isInitialized: boolean = false;
   private currentTrack: any = null;
@@ -264,6 +277,17 @@ export class MusicSyncService {
   // Increment this prefix whenever cache schema changes to avoid stale data
   private readonly CACHE_KEY_VERSION_PREFIX = "v3";
 
+  // Phase 1: Event Processing State Tracking for Loop Prevention
+  private eventProcessingState = {
+    isProcessingEvent: false,
+    eventChain: [] as string[],
+    lastEventTime: 0,
+    consecutiveEvents: 0
+  };
+
+  private readonly MAX_CONSECUTIVE_EVENTS = 5;
+  private readonly EVENT_RESET_TIMEOUT = 3000;
+
   /** Current unit beat direction vector (updated each beat). */
   private currentBeatVector: { x: number; y: number } = { x: 0, y: 0 };
 
@@ -277,6 +301,10 @@ export class MusicSyncService {
       dependencies.genreProfileManager ||
       new GenreProfileManager({ YEAR3000_CONFIG: this.config });
 
+    // Initialize OKLAB integration for perceptually uniform color processing
+    this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+    this.emotionalTemperatureMapper = new EmotionalTemperatureMapper(this.config.enableDebug);
+
     this.cacheTTL = MUSIC_SYNC_CONFIG.performance.cacheTTL;
     this.userPreferences = this.loadUserPreferences();
 
@@ -286,6 +314,13 @@ export class MusicSyncService {
         "🎵 [MusicSyncService] Initialized with GenreProfileManager support"
       );
     }
+  }
+
+  /**
+   * Public getter for initialization status (required for AdaptivePerformanceSystem dependency validation)
+   */
+  public get initialized(): boolean {
+    return this.isInitialized;
   }
 
   public async initialize(): Promise<void> {
@@ -819,6 +854,196 @@ export class MusicSyncService {
     };
   }
 
+  // === OKLAB-ENHANCED COLOR PROCESSING ===
+
+  /**
+   * Create OKLAB-enhanced fallback colors based on music emotional context
+   * Uses EmotionalTemperatureMapper to determine appropriate emotional state and OKLAB processing
+   */
+  private async createOKLABEnhancedFallbackColors(audioFeatures: any): Promise<Record<string, string>> {
+    // Base Catppuccin fallback colors for OKLAB processing
+    const baseFallbackColors = {
+      VIBRANT: "#f2cdcd", // Catppuccin rosewater
+      DARK_VIBRANT: "#cba6f7", // Catppuccin mauve  
+      LIGHT_VIBRANT: "#f5c2e7", // Catppuccin pink
+      PROMINENT: "#cba6f7", // Catppuccin mauve
+      VIBRANT_NON_ALARMING: "#f2cdcd", // Catppuccin rosewater
+      DESATURATED: "#9399b2", // Catppuccin overlay1
+    };
+
+    // If no audio features, process with standard preset
+    if (!audioFeatures || typeof audioFeatures.energy !== 'number' || typeof audioFeatures.valence !== 'number') {
+      const standardPreset = OKLABColorProcessor.getPreset('STANDARD');
+      const processedColors: Record<string, string> = {};
+      
+      for (const [key, color] of Object.entries(baseFallbackColors)) {
+        try {
+          const oklabResult = this.oklabProcessor.processColor(color, standardPreset);
+          processedColors[key] = oklabResult.enhancedHex;
+        } catch (error) {
+          if (this.config.enableDebug) {
+            console.warn(`🎨 [MusicSyncService] OKLAB processing failed for ${key}:`, error);
+          }
+          processedColors[key] = color; // Fallback to original color
+        }
+      }
+      
+      return processedColors;
+    }
+
+    // Use EmotionalTemperatureMapper to determine emotional context
+    const musicAnalysisData = {
+      energy: audioFeatures.energy,
+      valence: audioFeatures.valence,
+      danceability: audioFeatures.danceability,
+      tempo: audioFeatures.tempo,
+      mode: audioFeatures.mode,
+      genre: this.genreProfileManager.detectGenre(audioFeatures)
+    };
+
+    const emotionalResult = this.emotionalTemperatureMapper.mapMusicToEmotionalTemperature(musicAnalysisData);
+    
+    // Get optimal OKLAB preset based on emotional intensity
+    let preset: EnhancementPreset;
+    if (emotionalResult.intensity >= 1.0) {
+      preset = OKLABColorProcessor.getPreset('COSMIC');
+    } else if (emotionalResult.intensity >= 0.7) {
+      preset = OKLABColorProcessor.getPreset('VIBRANT');
+    } else if (emotionalResult.intensity >= 0.5) {
+      preset = OKLABColorProcessor.getPreset('STANDARD');
+    } else {
+      preset = OKLABColorProcessor.getPreset('SUBTLE');
+    }
+
+    // Process base colors through OKLAB with emotional context
+    const processedColors: Record<string, string> = {};
+    
+    for (const [key, color] of Object.entries(baseFallbackColors)) {
+      try {
+        const oklabResult = this.oklabProcessor.processColor(color, preset);
+        processedColors[key] = oklabResult.enhancedHex;
+      } catch (error) {
+        if (this.config.enableDebug) {
+          console.warn(`🎨 [MusicSyncService] OKLAB processing failed for ${key}:`, error);
+        }
+        processedColors[key] = color; // Fallback to original color
+      }
+    }
+
+    // Add emotional temperature CSS variables to the color context
+    processedColors['--sn-emotional-primary'] = emotionalResult.perceptualColorHex || emotionalResult.primaryEmotion;
+    processedColors['--sn-emotional-intensity'] = emotionalResult.intensity.toString();
+    processedColors['--sn-emotional-preset'] = preset.name;
+
+    if (this.config.enableDebug) {
+      console.log('🎨 [MusicSyncService] Created OKLAB-enhanced fallback colors:', {
+        emotion: emotionalResult.primaryEmotion,
+        intensity: emotionalResult.intensity,
+        preset: preset.name,
+        oklabCoordination: processedColors,
+        musicContext: { energy: audioFeatures.energy, valence: audioFeatures.valence }
+      });
+    }
+
+    return processedColors;
+  }
+
+  /**
+   * Enhance successfully extracted colors with OKLAB processing based on music emotional context
+   * Applies perceptually uniform color processing while preserving the original color relationships
+   */
+  private async enhanceExtractedColorsWithOKLAB(extractedColors: Record<string, string>, audioFeatures: any): Promise<Record<string, string>> {
+    const enhancedColors: Record<string, string> = {};
+
+    // Determine OKLAB preset based on music context
+    let preset: EnhancementPreset = OKLABColorProcessor.getPreset('STANDARD'); // Default preset
+    
+    if (audioFeatures && typeof audioFeatures.energy === 'number' && typeof audioFeatures.valence === 'number') {
+      // Use EmotionalTemperatureMapper to get contextual preset
+      const musicAnalysisData = {
+        energy: audioFeatures.energy,
+        valence: audioFeatures.valence,
+        danceability: audioFeatures.danceability,
+        tempo: audioFeatures.tempo,
+        mode: audioFeatures.mode,
+        genre: this.genreProfileManager.detectGenre(audioFeatures)
+      };
+
+      const emotionalResult = this.emotionalTemperatureMapper.mapMusicToEmotionalTemperature(musicAnalysisData);
+      
+      // Select preset based on emotional intensity
+      if (emotionalResult.intensity >= 1.0) {
+        preset = OKLABColorProcessor.getPreset('COSMIC');
+      } else if (emotionalResult.intensity >= 0.7) {
+        preset = OKLABColorProcessor.getPreset('VIBRANT');
+      } else if (emotionalResult.intensity >= 0.5) {
+        preset = OKLABColorProcessor.getPreset('STANDARD');
+      } else {
+        preset = OKLABColorProcessor.getPreset('SUBTLE');
+      }
+
+      // Add emotional CSS variables
+      enhancedColors['--sn-emotional-primary'] = emotionalResult.perceptualColorHex || `oklabColorProcessor-${emotionalResult.primaryEmotion}`;
+      enhancedColors['--sn-emotional-intensity'] = emotionalResult.intensity.toString();
+      enhancedColors['--sn-emotional-temperature'] = emotionalResult.temperature.toString();
+      
+      if (this.config.enableDebug) {
+        console.log('🎨 [MusicSyncService] Applying OKLAB enhancement with emotional context:', {
+          emotion: emotionalResult.primaryEmotion,
+          intensity: emotionalResult.intensity,
+          preset: preset.name,
+          colorCount: Object.keys(extractedColors).length
+        });
+      }
+    }
+
+    // Process each extracted color through OKLAB
+    for (const [key, color] of Object.entries(extractedColors)) {
+      if (!color || typeof color !== 'string' || !color.startsWith('#')) {
+        enhancedColors[key] = color; // Keep non-color values as-is
+        continue;
+      }
+
+      try {
+        const oklabResult = this.oklabProcessor.processColor(color, preset);
+        enhancedColors[key] = oklabResult.enhancedHex;
+        
+        // Add OKLAB coordinates as additional CSS variables for advanced effects
+        enhancedColors[`${key}-oklab-l`] = oklabResult.oklabEnhanced.L.toFixed(3);
+        enhancedColors[`${key}-oklab-a`] = oklabResult.oklabEnhanced.a.toFixed(3);
+        enhancedColors[`${key}-oklab-b`] = oklabResult.oklabEnhanced.b.toFixed(3);
+        
+        // Add OKLCH representation for hue-based animations
+        enhancedColors[`${key}-oklch-c`] = oklabResult.oklchEnhanced.C.toFixed(3);
+        enhancedColors[`${key}-oklch-h`] = oklabResult.oklchEnhanced.H.toFixed(1);
+        
+      } catch (error) {
+        if (this.config.enableDebug) {
+          console.warn(`🎨 [MusicSyncService] OKLAB processing failed for ${key} (${color}):`, error);
+        }
+        enhancedColors[key] = color; // Fallback to original color
+      }
+    }
+
+    // Add OKLAB metadata
+    enhancedColors['--sn-oklab-preset'] = preset.name;
+    enhancedColors['--sn-oklab-enhanced'] = 'true';
+
+    if (this.config.enableDebug) {
+      console.log('🎨 [MusicSyncService] OKLAB color enhancement completed:', {
+        originalCount: Object.keys(extractedColors).length,
+        enhancedCount: Object.keys(enhancedColors).length,
+        preset: preset.name,
+        sampleEnhanced: {
+          original: extractedColors.VIBRANT || extractedColors[Object.keys(extractedColors)[0] || ''],
+          enhanced: enhancedColors.VIBRANT || enhancedColors[Object.keys(enhancedColors)[0] || '']
+        }
+      });
+    }
+
+    return enhancedColors;
+  }
+
   // === MAIN PROCESSING PIPELINE ===
   public async processAudioFeatures(
     rawSpicetifyAudioFeatures: AudioData | null,
@@ -961,18 +1186,27 @@ export class MusicSyncService {
         trackUri
       );
 
-      // Publish beat/frame event for EmergentChoreographyEngine
-      GlobalEventBus.publish("beat/frame", {
+      // Emit unified music events for modern systems
+      unifiedEventBus.emitSync("music:beat", {
+        bpm: processedData.enhancedBPM,
+        intensity: processedData.visualIntensity,
         timestamp: performance.now(),
-        trackUri: trackUri,
-        processedData: processedData,
-        rawData: rawSpicetifyAudioFeatures,
+        confidence: 0.8
       });
 
-      // Publish more granular events for Phase 4
-      GlobalEventBus.publish("beat/bpm", { bpm: processedData.enhancedBPM });
-      GlobalEventBus.publish("beat/intensity", {
-        intensity: processedData.visualIntensity,
+      unifiedEventBus.emitSync("music:energy", {
+        energy: processedData.energy || 0.5,
+        valence: processedData.valence || 0.5,
+        tempo: processedData.enhancedBPM,
+        timestamp: performance.now()
+      });
+
+      // Emit performance frame data
+      unifiedEventBus.emitSync("performance:frame", {
+        deltaTime: 16, // Approximate frame time
+        fps: 60,
+        memoryUsage: (performance as any).memory?.usedJSHeapSize || 0,
+        timestamp: performance.now()
       });
 
       if (this.config.enableDebug) {
@@ -1032,58 +1266,239 @@ export class MusicSyncService {
 
   /**
    * Internal implementation of song processing, extracted for debouncing.
+   * 🔧 PHASE 1: Enhanced with event loop prevention and chain tracking
    */
   private async _processSongUpdateInternal(trackUri: string): Promise<void> {
-    // New track detected – clear any stale cache entries for it
-    this.invalidateTrackCaches(trackUri);
+    // Phase 1: Loop Prevention - Check if already processing
+    if (this.eventProcessingState.isProcessingEvent) {
+      if (this.config.enableDebug) {
+        console.warn("🔄 [MusicSyncService] Already processing song update - skipping to prevent recursion");
+      }
+      return;
+    }
+
+    // Phase 1: Set processing state and tracking
+    this.eventProcessingState.isProcessingEvent = true;
+    this.eventProcessingState.lastEventTime = Date.now();
+    this.eventProcessingState.consecutiveEvents++;
+    this.eventProcessingState.eventChain.push('_processSongUpdateInternal');
+
+    // Phase 1: Check for consecutive event overflow (circuit breaker)
+    if (this.eventProcessingState.consecutiveEvents > this.MAX_CONSECUTIVE_EVENTS) {
+      console.error("🔄 [MusicSyncService] CRITICAL: Too many consecutive events - circuit breaker activated", {
+        consecutiveEvents: this.eventProcessingState.consecutiveEvents,
+        eventChain: this.eventProcessingState.eventChain
+      });
+      this._resetEventProcessingState();
+      return;
+    }
+
+    // Phase 1: Set safety timeout for auto-reset
+    const resetTimeout = setTimeout(() => {
+      if (this.config.enableDebug) {
+        console.warn("🔄 [MusicSyncService] Event processing timeout - resetting state");
+      }
+      this._resetEventProcessingState();
+    }, this.EVENT_RESET_TIMEOUT);
 
     try {
+      // New track detected – clear any stale cache entries for it
+      this.invalidateTrackCaches(trackUri);
       const trackDuration =
         Spicetify.Player.data?.item?.duration?.milliseconds || 0;
 
       // Phase 1 – instant colour update + provisional BPM from audio-features
-      const [audioFeatures, rawColors] = await Promise.all([
+      // Use Promise.allSettled for graceful degradation - continue with partial success
+      const results = await Promise.allSettled([
         this.getAudioFeatures(),
-        Spicetify.colorExtractor(trackUri),
+        this.robustColorExtraction(trackUri), // 🔧 IMPROVED: More robust color extraction
       ]);
+
+      const audioFeatures =
+        results[0].status === "fulfilled" ? results[0].value : null;
+      const rawColors =
+        results[1].status === "fulfilled" ? results[1].value : null;
+
+      // Log warnings for failed strategies but continue processing
+      if (results[0].status === "rejected") {
+        if (this.config.enableDebug) {
+          console.warn(
+            "[MusicSyncService] Audio features retrieval failed, continuing without music analysis:",
+            results[0].reason
+          );
+        }
+      }
+      if (results[1].status === "rejected") {
+        if (this.config.enableDebug) {
+          console.warn(
+            "[MusicSyncService] Color extraction failed, continuing without color processing:",
+            results[1].reason
+          );
+        }
+      }
+
+      // Log successful graceful degradation
+      if (this.config.enableDebug) {
+        const successCount = (audioFeatures ? 1 : 0) + (rawColors ? 1 : 0);
+        if (successCount === 1) {
+          console.log(
+            `[MusicSyncService] Graceful degradation: Continuing with ${
+              audioFeatures ? "audio features only" : "color extraction only"
+            }`
+          );
+        } else if (successCount === 2) {
+          console.log("[MusicSyncService] Full feature extraction successful");
+        } else {
+          console.warn(
+            "[MusicSyncService] Both strategies failed, will use fallback data"
+          );
+        }
+      }
+
+      // 🎨 CRITICAL: Log raw colors before sanitization
+      console.log("🎨 [MusicSyncService] Raw colors BEFORE sanitization:", {
+        rawColors,
+        rawColorType: typeof rawColors,
+        rawColorKeys: rawColors ? Object.keys(rawColors) : [],
+        rawColorEntries: rawColors ? Object.entries(rawColors) : []
+      });
 
       // Sanitize extracted colours to remove undefined / malformed values
       const colors = this.utils.sanitizeColorMap(
         (rawColors as Record<string, string>) || {}
       );
 
-      // Publish color extraction event for strategy pattern processing
-      if (Object.keys(colors).length > 0) {
-        const colorContext: ColorContext = {
-          rawColors: colors,
+      // 🎨 CRITICAL: Log colors after sanitization
+      console.log("🎨 [MusicSyncService] Colors AFTER sanitization:", {
+        sanitizedColors: colors,
+        sanitizedColorType: typeof colors,
+        sanitizedColorKeys: Object.keys(colors),
+        sanitizedColorEntries: Object.entries(colors),
+        colorCount: Object.keys(colors).length,
+        droppedCount: rawColors ? Object.keys(rawColors).length - Object.keys(colors).length : 0
+      });
+
+      // 🎨 DEBUG: Color extraction pipeline logging
+      if (this.config.enableDebug) {
+        console.log("🎨 [MusicSyncService] Color extraction debug:", {
           trackUri,
-          timestamp: Date.now(),
-          harmonicMode: this.config.currentHarmonicMode || 'catppuccin',
-          musicData: audioFeatures ? {
-            energy: audioFeatures.energy,
-            valence: audioFeatures.valence,
-            tempo: audioFeatures.tempo,
-            genre: this.genreProfileManager.detectGenre(audioFeatures)
-          } : undefined,
-          performanceHints: {
-            preferLightweight: false,
-            enableAdvancedBlending: true,
-            maxProcessingTime: 100 // 100ms max for color processing
-          }
-        };
-
-        // Publish event for color processing via strategy pattern
-        GlobalEventBus.publish('colors/extracted', {
-          type: 'colors/extracted',
-          payload: colorContext
+          rawColorsReceived: rawColors,
+          sanitizedColors: colors,
+          colorCount: Object.keys(colors).length,
+          colorExtractorFailed: results[1].status === "rejected",
         });
+      }
 
-        if (this.config.enableDebug) {
-          console.log(
-            '🎵 [MusicSyncService] Published colors/extracted event for strategy processing',
-            { trackUri, colorCount: Object.keys(colors).length }
-          );
+      // 🎨 OKLAB ENHANCEMENT: Process successfully extracted colors through OKLAB for perceptual uniformity
+      let finalColors = colors;
+      let usingFallback = false;
+      
+      if (Object.keys(colors).length > 0) {
+        try {
+          // Apply OKLAB processing to extracted colors with emotional context
+          finalColors = await this.enhanceExtractedColorsWithOKLAB(colors, audioFeatures);
+          
+          if (this.config.enableDebug) {
+            console.log("🎨 [MusicSyncService] Successfully enhanced extracted colors with OKLAB processing");
+          }
+        } catch (oklabError) {
+          if (this.config.enableDebug) {
+            console.warn("🎨 [MusicSyncService] OKLAB enhancement failed, using original extracted colors:", oklabError);
+          }
+          // Continue with original colors if OKLAB processing fails
+          finalColors = colors;
         }
+      }
+
+      if (Object.keys(colors).length === 0) {
+        // 🎨 OKLAB-ENHANCED FALLBACK: Use OKLAB-processed Catppuccin colors with emotional context
+        try {
+          // Create OKLAB-enhanced fallback colors based on music emotional context
+          const fallbackColors = await this.createOKLABEnhancedFallbackColors(audioFeatures);
+          finalColors = fallbackColors;
+          usingFallback = true;
+
+          if (this.config.enableDebug) {
+            console.warn(
+              "🎨 [MusicSyncService] Color extraction failed, using OKLAB-enhanced Catppuccin fallback colors with emotional context"
+            );
+          }
+        } catch (oklabError) {
+          if (this.config.enableDebug) {
+            console.warn("🎨 [MusicSyncService] OKLAB fallback processing failed, using static fallback colors:", oklabError);
+          }
+          // Static fallback as last resort
+          finalColors = {
+            VIBRANT: "#f2cdcd", // Catppuccin rosewater
+            DARK_VIBRANT: "#cba6f7", // Catppuccin mauve
+            LIGHT_VIBRANT: "#f5c2e7", // Catppuccin pink
+            PROMINENT: "#cba6f7", // Catppuccin mauve
+            VIBRANT_NON_ALARMING: "#f2cdcd", // Catppuccin rosewater
+            DESATURATED: "#9399b2", // Catppuccin overlay1
+          };
+          usingFallback = true;
+        }
+      }
+
+      const colorContext: ColorContext = {
+        rawColors: finalColors,
+        trackUri,
+        timestamp: Date.now(),
+        harmonicMode: this.config.currentHarmonicMode || "catppuccin",
+        musicData: audioFeatures
+          ? {
+              energy: audioFeatures.energy,
+              valence: audioFeatures.valence,
+              tempo: audioFeatures.tempo,
+              genre: this.genreProfileManager.detectGenre(audioFeatures),
+            }
+          : undefined,
+        performanceHints: {
+          preferLightweight: false,
+          enableAdvancedBlending: true,
+          maxProcessingTime: 100, // 100ms max for color processing
+        },
+      };
+
+      // 🎨 CRITICAL: Log final colors before event emission
+      console.log("🎨 [MusicSyncService] FINAL colors before event emission:", {
+        finalColors,
+        finalColorKeys: Object.keys(finalColors),
+        finalColorEntries: Object.entries(finalColors),
+        usingFallback,
+        extractionFailed: Object.keys(colors).length === 0
+      });
+
+      // Always emit event for color processing via strategy pattern
+      const eventData: any = {
+        rawColors: colorContext.rawColors,
+        trackUri: colorContext.trackUri,
+        timestamp: Date.now()
+      };
+      
+      if (colorContext.musicData) {
+        eventData.musicData = colorContext.musicData;
+      }
+      
+      // 🎨 CRITICAL: Log event data being emitted
+      console.log("🎨 [MusicSyncService] Emitting colors:extracted event with data:", {
+        eventData,
+        rawColorKeys: eventData.rawColors ? Object.keys(eventData.rawColors) : [],
+        rawColorEntries: eventData.rawColors ? Object.entries(eventData.rawColors) : []
+      });
+      
+      unifiedEventBus.emitSync("colors:extracted", eventData);
+
+      if (this.config.enableDebug) {
+        console.log(
+          "🎵 [MusicSyncService] Emitted colors:extracted event for strategy processing",
+          {
+            trackUri,
+            colorCount: Object.keys(finalColors).length,
+            usingFallback,
+            extractionFailed: Object.keys(colors).length === 0,
+          }
+        );
       }
 
       if (audioFeatures) {
@@ -1114,6 +1529,45 @@ export class MusicSyncService {
         error
       );
       this.metrics.errors++;
+    } finally {
+      // Phase 1: Always clean up processing state and clear timeout
+      clearTimeout(resetTimeout);
+      this._resetEventProcessingState();
+      
+      // Phase 1: Remove from event chain
+      const chainIndex = this.eventProcessingState.eventChain.indexOf('_processSongUpdateInternal');
+      if (chainIndex > -1) {
+        this.eventProcessingState.eventChain.splice(chainIndex, 1);
+      }
+    }
+  }
+
+  /**
+   * Phase 1: Reset event processing state for loop prevention
+   */
+  private _resetEventProcessingState(): void {
+    this.eventProcessingState.isProcessingEvent = false;
+    this.eventProcessingState.eventChain = [];
+    
+    // Reset consecutive events counter with exponential backoff
+    const now = Date.now();
+    const timeSinceLastEvent = now - this.eventProcessingState.lastEventTime;
+    
+    if (timeSinceLastEvent > this.EVENT_RESET_TIMEOUT) {
+      this.eventProcessingState.consecutiveEvents = 0;
+    } else {
+      // Gradual decay of consecutive count if events are spaced apart
+      const decayFactor = Math.min(1, timeSinceLastEvent / this.EVENT_RESET_TIMEOUT);
+      this.eventProcessingState.consecutiveEvents = Math.floor(
+        this.eventProcessingState.consecutiveEvents * (1 - decayFactor)
+      );
+    }
+
+    if (this.config.enableDebug && this.eventProcessingState.consecutiveEvents > 0) {
+      console.log("🔄 [MusicSyncService] Event processing state reset", {
+        consecutiveEvents: this.eventProcessingState.consecutiveEvents,
+        timeSinceLastEvent
+      });
     }
   }
 
@@ -1229,7 +1683,7 @@ export class MusicSyncService {
         "🎵 [MusicSyncService] setColorHarmonyEngine called - now using event-driven pattern instead of direct dependency."
       );
     }
-    // No-op: ColorHarmonyEngine integration now handled via GlobalEventBus
+    // No-op: ColorHarmonyEngine integration now handled via unifiedEventBus
   }
 
   public getLatestProcessedData(): any {
@@ -1339,6 +1793,91 @@ export class MusicSyncService {
     } as AudioData;
   }
 
+  /**
+   * 🔧 IMPROVED: Robust color extraction with retry logic and fallbacks
+   */
+  private async robustColorExtraction(
+    trackUri: string,
+    maxRetries: number = 3
+  ): Promise<Record<string, string> | null> {
+    // 🎨 ENHANCED LOGGING: Track complete color extraction flow
+    console.log("🎨 [MusicSyncService] Starting robust color extraction:", {
+      trackUri,
+      maxRetries,
+      timestamp: Date.now()
+    });
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        if (!trackUri) {
+          console.warn(
+            "🎨 [MusicSyncService] Empty trackUri provided to color extraction"
+          );
+          return null;
+        }
+
+        // 🎨 CRITICAL: Log before Spicetify call
+        console.log(`🎨 [MusicSyncService] Calling Spicetify.colorExtractor (attempt ${attempt})...`);
+        
+        const colors = await Spicetify.colorExtractor(trackUri);
+
+        // 🎨 CRITICAL: Log raw extraction result
+        console.log(
+          `🎨 [MusicSyncService] Raw color extraction result (attempt ${attempt}):`,
+          {
+            trackUri,
+            success: !!colors,
+            colorsType: typeof colors,
+            colorsIsNull: colors === null,
+            colorsIsUndefined: colors === undefined,
+            colorCount: colors ? Object.keys(colors).length : 0,
+            rawColors: colors,
+            colorKeys: colors ? Object.keys(colors) : [],
+            colorValues: colors ? Object.values(colors) : []
+          }
+        );
+
+        // Check if we got meaningful colors (not empty or null)
+        if (
+          colors &&
+          typeof colors === "object" &&
+          Object.keys(colors).length > 0
+        ) {
+          // 🎨 CRITICAL: Log each extracted color
+          Object.entries(colors).forEach(([key, value]) => {
+            console.log(`🎨 [MusicSyncService] Extracted color: ${key} = ${value}`);
+          });
+          
+          return colors as Record<string, string>;
+        } else {
+          console.warn(`🎨 [MusicSyncService] Color extraction returned empty/invalid data on attempt ${attempt}`);
+        }
+      } catch (error) {
+        console.error(
+          `🎨 [MusicSyncService] Color extraction attempt ${attempt} failed with error:`,
+          error,
+          {
+            errorMessage: error instanceof Error ? error.message : String(error),
+            errorStack: error instanceof Error ? error.stack : undefined
+          }
+        );
+
+        // Wait before retry (exponential backoff)
+        if (attempt < maxRetries) {
+          const waitTime = 100 * attempt;
+          console.log(`🎨 [MusicSyncService] Waiting ${waitTime}ms before retry...`);
+          await new Promise((resolve) => setTimeout(resolve, waitTime));
+        }
+      }
+    }
+
+    // All attempts failed
+    console.error(
+      `🎨 [MusicSyncService] CRITICAL: All color extraction attempts failed for ${trackUri}`
+    );
+    return null;
+  }
+
   // -------------------------------------------------------------------
   // External adapter integration helpers ------------------------------
   // -------------------------------------------------------------------
@@ -1356,7 +1895,11 @@ export class MusicSyncService {
   /**
    * Get current music state for consciousness systems
    */
-  public getCurrentMusicState(): { emotion: any; beat: any; intensity: number } | null {
+  public getCurrentMusicState(): {
+    emotion: any;
+    beat: any;
+    intensity: number;
+  } | null {
     if (!this.latestProcessedData || !this.audioData) {
       return null;
     }
@@ -1366,9 +1909,89 @@ export class MusicSyncService {
       beat: {
         tempo: this.latestProcessedData.bpm || this.audioData.tempo || 120,
         energy: this.latestProcessedData.energy || this.audioData.energy || 0.5,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       },
-      intensity: this.latestProcessedData.intensity || this.audioData.energy || 0.5
+      intensity:
+        this.latestProcessedData.intensity || this.audioData.energy || 0.5,
     };
+  }
+
+  /**
+   * Health check method for system status reporting
+   */
+  public async healthCheck(): Promise<{ status: 'healthy' | 'degraded' | 'critical'; message: string; details?: any }> {
+    try {
+      const isSpicetifyAvailable = SpicetifyCompat.isAvailable();
+      const hasSubscribers = this.subscribers.size > 0;
+      const hasRecentData = this.latestProcessedData !== null;
+      const totalOperations = this.metrics.bpmCalculations + this.metrics.beatSyncs + this.metrics.cacheHits + this.metrics.cacheMisses;
+      const errorRate = totalOperations > 0 ? this.metrics.errors / totalOperations : 0;
+
+      // Determine health status
+      if (!this.isInitialized) {
+        return {
+          status: 'critical',
+          message: 'System not initialized',
+          details: { initialized: this.isInitialized, spicetifyAvailable: isSpicetifyAvailable }
+        };
+      }
+
+      if (!isSpicetifyAvailable) {
+        return {
+          status: 'degraded',
+          message: 'Spicetify audio data API not available - running in limited mode',
+          details: { 
+            initialized: this.isInitialized, 
+            spicetifyAvailable: isSpicetifyAvailable, 
+            subscribers: hasSubscribers,
+            recentData: hasRecentData,
+            errorRate: errorRate
+          }
+        };
+      }
+
+      if (errorRate > 0.5) {
+        return {
+          status: 'degraded',
+          message: `High error rate detected: ${(errorRate * 100).toFixed(1)}%`,
+          details: { 
+            initialized: this.isInitialized, 
+            spicetifyAvailable: isSpicetifyAvailable, 
+            subscribers: hasSubscribers,
+            recentData: hasRecentData,
+            errorRate: errorRate,
+            errors: this.metrics.errors,
+            totalOperations: totalOperations
+          }
+        };
+      }
+
+      return {
+        status: 'healthy',
+        message: 'Music sync service operational',
+        details: { 
+          initialized: this.isInitialized, 
+          spicetifyAvailable: isSpicetifyAvailable, 
+          subscribers: hasSubscribers,
+          subscriberCount: this.subscribers.size,
+          recentData: hasRecentData,
+          errorRate: errorRate,
+          bpmCalculations: this.metrics.bpmCalculations,
+          beatSyncs: this.metrics.beatSyncs,
+          cacheHits: this.metrics.cacheHits,
+          cacheMisses: this.metrics.cacheMisses,
+          avgProcessingTime: this.metrics.avgProcessingTime,
+          errors: this.metrics.errors,
+          updates: this.metrics.updates
+        }
+      };
+
+    } catch (error) {
+      return {
+        status: 'critical',
+        message: `Health check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        details: { error: error instanceof Error ? error.message : 'Unknown error' }
+      };
+    }
   }
 }

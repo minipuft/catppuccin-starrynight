@@ -2,7 +2,7 @@
 // 🎆 AUDIO VISUAL CONTROLLER – Phase 2 of Cosmic Mood Field
 // ============================================================================
 // Maps beat, genre, and scroll events to Nebula-related CSS custom properties.
-// Keeps scripting cost low by batching variable writes via CSSVariableBatcher.
+// Keeps scripting cost low by batching variable writes via UnifiedCSSConsciousnessController.
 // ---------------------------------------------------------------------------
 // BACKWARD-COMPATIBILITY CONTRACT:
 //  • No existing public interfaces are modified.
@@ -12,11 +12,12 @@
 // ---------------------------------------------------------------------------
 
 import { NEBULA_INTENSITY_KEY } from "@/config/settingKeys";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { GlobalEventBus } from "@/core/events/EventBus";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { Year3000System } from "@/core/lifecycle/year3000System";
 import { UserGenreHistory } from "@/utils/platform/UserHistory";
+import { Y3K } from "@/debug/UnifiedDebugManager";
 import type { BeatPayload } from "@/types/systems";
 
 // -----------------------------
@@ -50,8 +51,8 @@ function median(values: number[]): number {
 
 export class AudioVisualController {
   // TODO: Expand settings integration in Phase 4 (intensity toggle)
-  private batcher: CSSVariableBatcher;
-  private perf: PerformanceAnalyzer | null;
+  private batcher: UnifiedCSSConsciousnessController | null = null;
+  private perf: PerformanceAnalyzer | null = null;
   private year3000System: Year3000System | null;
   private unsubscribers: (() => void)[] = [];
   private frameDurations: number[] = [];
@@ -66,7 +67,7 @@ export class AudioVisualController {
 
   constructor(
     y3k: Year3000System | null = null,
-    batcher?: CSSVariableBatcher,
+    batcher?: UnifiedCSSConsciousnessController,
     perf?: PerformanceAnalyzer
   ) {
     this.year3000System = y3k;
@@ -76,14 +77,21 @@ export class AudioVisualController {
     if (batcher) {
       this.batcher = batcher;
     } else {
-      const sharedBatcher = y3k?.cssVariableBatcher;
+      const sharedBatcher = y3k?.cssConsciousnessController;
       if (sharedBatcher) {
         this.batcher = sharedBatcher;
       } else {
-        this.batcher = new CSSVariableBatcher({
-          batchIntervalMs: 16,
-          maxBatchSize: 40,
-        });
+        // Can't create UnifiedCSSConsciousnessController without proper dependencies
+        // Use getInstance to try to get an existing one or null
+        const fallbackController = UnifiedCSSConsciousnessController.getInstance();
+        if (fallbackController) {
+          this.batcher = fallbackController;
+        } else {
+          // Disable this controller if no CSS consciousness is available
+          this.enabled = false;
+          this.batcher = null;
+          Y3K?.debug?.warn("AudioVisualController", "No UnifiedCSSConsciousnessController available, disabling audio visual effects");
+        }
       }
     }
 
@@ -263,8 +271,11 @@ export class AudioVisualController {
     if (!this.enabled) return;
     if (this.year3000System) {
       this.year3000System.queueCSSVariableUpdate(prop, value);
-    } else {
+    } else if (this.batcher) {
       this.batcher.queueCSSVariableUpdate(prop, value);
+    } else {
+      // Fallback to direct style update
+      document.documentElement.style.setProperty(prop, value);
     }
   }
 

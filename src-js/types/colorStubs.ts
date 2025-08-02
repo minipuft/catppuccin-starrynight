@@ -61,19 +61,6 @@ export interface CinematicPalette {
 // CELLULAR STUBS
 // =========================================================================
 
-export interface CellularMembrane {
-  id: string;
-  element: HTMLElement;
-  growthScale: number;
-  opacity: number;
-  isGrowing: boolean;
-  growthDuration: number;
-  isActive?: boolean;
-  updateAnimation?(deltaTime: number): void;
-  growWithMusic?(musicData: any): void;
-  synchronizeBreathing?(breathingPhase: number): void;
-  synchronizeWithBeat?(beatData: BeatData): void;
-}
 
 export interface BreathingRhythmEngine {
   updateBreathing(intensity: number): void;
@@ -125,7 +112,6 @@ export class CinematicPaletteGenerator {
 export class BiologicalConsciousnessManager {
   private breathingEngine: BreathingRhythmEngine;
   private symbioticCore: SymbioticListeningCore;
-  private membranes: CellularMembrane[] = [];
   
   constructor() {
     this.breathingEngine = new StubBreathingEngine();
@@ -141,10 +127,6 @@ export class BiologicalConsciousnessManager {
       symbioticResonance: 0.5,
       cinematicIntensity: 0.5
     };
-  }
-  
-  public createMembrane(): CellularMembrane {
-    return new StubCellularMembrane();
   }
 }
 
@@ -169,20 +151,6 @@ class StubSymbioticCore implements SymbioticListeningCore {
   updateSymbioticEffects?(effects: any): void { /* stub */ }
 }
 
-class StubCellularMembrane implements CellularMembrane {
-  id = 'stub-membrane';
-  element = document.createElement('div');
-  growthScale = 1.0;
-  opacity = 1.0;
-  isGrowing = false;
-  growthDuration = 1000;
-  isActive = true;
-  
-  updateAnimation?(deltaTime: number): void { /* stub */ }
-  growWithMusic?(musicData: any): void { /* stub */ }
-  synchronizeBreathing?(breathingPhase: number): void { /* stub */ }
-  synchronizeWithBeat?(beatData: BeatData): void { /* stub */ }
-}
 
 // Export consolidated types for compatibility
 export type { ColorValue as PaletteColor };

@@ -1,0 +1,418 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// FLUX MUSIC VISUALIZATION - Modern CSS-Native Music Consciousness Effects
+// ████████████████████████████████████████████████████████████████████████████████
+
+// 🎵 FLUX MUSIC VISUALIZATION SYSTEM
+// Modern CSS-native approach replacing DOM manipulation with consciousness-aware effects
+// Integrates with Year 3000 consciousness field and emotional temperature system
+
+// ===================================================================
+// CONSCIOUSNESS PULSE VISUALIZATION
+// ===================================================================
+
+// Main consciousness pulse effect - replaces manually created DOM element
+.Root__main-view::before {
+  content: '';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  margin: -50px 0 0 -50px;
+  border-radius: 50%;
+  background: radial-gradient(circle, 
+    rgba(var(--sn-gradient-primary-rgb), 0.1) 0%, 
+    rgba(var(--sn-gradient-secondary-rgb), 0.05) 50%, 
+    transparent 100%);
+  z-index: -12;
+  pointer-events: none;
+  will-change: transform, opacity;
+  
+  // Consciousness pulse scaling
+  transform: translate(-50%, -50%) scale(var(--sn-flux-consciousness-pulse, 0));
+  opacity: calc(var(--sn-flux-consciousness-pulse, 0) * 0.8);
+  
+  // Smooth transitions
+  transition: 
+    transform 0.1s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1)),
+    opacity 0.1s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+  
+  // Beat pulse animation when active
+  &:where(.sn-flux-beat-active) {
+    animation: flux-consciousness-beat-pulse 0.5s ease-out;
+  }
+}
+
+// ===================================================================
+// FREQUENCY BAND VISUALIZATIONS
+// ===================================================================
+
+// Frequency bands container - replaces manually created frequency band elements
+.main-view-container::after {
+  content: '';
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 240px;
+  height: 200px;
+  z-index: -11;
+  pointer-events: none;
+  will-change: opacity;
+  
+  // Multi-layered frequency visualization using CSS gradients
+  background: 
+    // Bass band (0-60px)
+    linear-gradient(to top, 
+      rgba(var(--sn-gradient-primary-rgb), var(--sn-flux-spectral-bass, 0)) 0px,
+      transparent calc(var(--sn-flux-spectral-bass, 0) * 60px)
+    ) 0px 0px / 60px 100% no-repeat,
+    
+    // Mid band (60-120px)  
+    linear-gradient(to top,
+      rgba(var(--sn-gradient-secondary-rgb), var(--sn-flux-spectral-mid, 0)) 0px,
+      transparent calc(var(--sn-flux-spectral-mid, 0) * 60px)
+    ) 60px 0px / 60px 100% no-repeat,
+    
+    // Treble band (120-180px)
+    linear-gradient(to top,
+      rgba(var(--sn-gradient-accent-rgb), var(--sn-flux-spectral-treble, 0)) 0px, 
+      transparent calc(var(--sn-flux-spectral-treble, 0) * 60px)
+    ) 120px 0px / 60px 100% no-repeat,
+    
+    // Vocal band (180-240px)
+    linear-gradient(to top,
+      rgba(var(--sn-gradient-primary-rgb), var(--sn-flux-spectral-vocal, 0)) 0px,
+      transparent calc(var(--sn-flux-spectral-vocal, 0) * 60px) 
+    ) 180px 0px / 60px 100% no-repeat;
+  
+  // Show/hide based on spectral visualization setting
+  opacity: var(--sn-flux-spectral-enabled, 1);
+  transition: opacity 0.3s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+// ===================================================================
+// TEMPORAL FLOW VISUALIZATION  
+// ===================================================================
+
+// Temporal flow progress bar - replaces manually created temporal flow element
+.Root__top-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, 
+    rgba(var(--sn-gradient-primary-rgb), 0.6) 0%, 
+    rgba(var(--sn-gradient-accent-rgb), 0.4) 100%);
+  z-index: -10;
+  pointer-events: none;
+  will-change: transform, opacity;
+  
+  // Temporal flow progress
+  transform: scaleX(var(--sn-flux-temporal-flow-progress, 0));
+  transform-origin: left;
+  opacity: calc(var(--sn-flux-temporal-flow-progress, 0) * var(--sn-flux-energy-level, 0.5));
+  
+  // Smooth flow animation
+  transition: 
+    transform 0.2s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1)),
+    opacity 0.2s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+// ===================================================================
+// HARMONIC RESONANCE VISUALIZATION
+// ===================================================================
+
+// Harmonic resonance spinner - replaces manually created harmonic resonance element  
+.Root__top-container::after {
+  content: '';
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 100px;
+  height: 100px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(var(--sn-gradient-primary-rgb), 0.3) 0deg,
+    rgba(var(--sn-gradient-secondary-rgb), 0.2) 120deg,
+    rgba(var(--sn-gradient-accent-rgb), 0.1) 240deg,
+    rgba(var(--sn-gradient-primary-rgb), 0.3) 360deg
+  );
+  border-radius: 50%;
+  z-index: -11;
+  pointer-events: none;
+  will-change: transform, opacity;
+  
+  // Harmonic resonance effects
+  transform: 
+    scale(calc(0.5 + var(--sn-flux-harmonic-resonance, 0) * 0.5))
+    rotate(var(--sn-flux-harmonic-rotation, 0deg));
+  opacity: calc(var(--sn-flux-harmonic-resonance, 0) * 0.7);
+  
+  // Smooth harmonic transitions
+  transition: 
+    transform 0.2s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1)),
+    opacity 0.2s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+// ===================================================================
+// BEAT PULSE ANIMATIONS
+// ===================================================================
+
+// Consciousness pulse beat animation
+@keyframes flux-consciousness-beat-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(var(--sn-flux-consciousness-pulse, 0));
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(calc(var(--sn-flux-consciousness-pulse, 0) * 1.5));
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(var(--sn-flux-consciousness-pulse, 0));
+  }
+}
+
+// Beat pulse for all flux elements
+.sn-flux-beat-active {
+  .Root__main-view::before,
+  .main-view-container::after,
+  .Root__top-container::before,
+  .Root__top-container::after {
+    animation: flux-beat-pulse 0.2s ease-out;
+  }
+}
+
+@keyframes flux-beat-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(calc(1 + var(--sn-flux-beat-intensity, 0.5) * 0.1)); }
+  100% { transform: scale(1); }
+}
+
+// ===================================================================
+// CONSCIOUSNESS MODE VARIATIONS
+// ===================================================================
+
+// Dormant consciousness mode - minimal effects
+.sn-consciousness-dormant {
+  .Root__main-view::before,
+  .main-view-container::after,
+  .Root__top-container::before,
+  .Root__top-container::after {
+    opacity: calc(var(--sn-flux-consciousness-pulse, 0) * 0.3);
+    filter: blur(1px);
+  }
+}
+
+// Aware consciousness mode - normal effects (default)
+.sn-consciousness-aware {
+  .Root__main-view::before,
+  .main-view-container::after, 
+  .Root__top-container::before,
+  .Root__top-container::after {
+    opacity: calc(var(--sn-flux-consciousness-pulse, 0) * 0.7);
+  }
+}
+
+// Transcendent consciousness mode - enhanced effects
+.sn-consciousness-transcendent {
+  .Root__main-view::before {
+    background: radial-gradient(circle,
+      rgba(var(--sn-gradient-primary-rgb), 0.15) 0%,
+      rgba(var(--sn-gradient-secondary-rgb), 0.1) 30%,
+      rgba(var(--sn-gradient-accent-rgb), 0.05) 60%,
+      transparent 100%);
+    filter: 
+      drop-shadow(0 0 20px rgba(var(--sn-gradient-primary-rgb), 0.3))
+      saturate(1.2)
+      brightness(1.1);
+  }
+  
+  .main-view-container::after {
+    filter: 
+      drop-shadow(0 0 10px rgba(var(--sn-gradient-primary-rgb), 0.2))
+      saturate(1.3);
+  }
+  
+  .Root__top-container::before {
+    height: 6px;
+    filter: 
+      drop-shadow(0 0 8px rgba(var(--sn-gradient-accent-rgb), 0.4))
+      brightness(1.2);
+  }
+  
+  .Root__top-container::after {
+    filter: 
+      drop-shadow(0 0 15px rgba(var(--sn-gradient-primary-rgb), 0.4))
+      saturate(1.4)
+      brightness(1.15);
+  }
+}
+
+// ===================================================================
+// TEMPORAL FLOW VARIATIONS
+// ===================================================================
+
+// Linear temporal flow - steady progression
+.sn-temporal-linear {
+  .Root__top-container::before {
+    transition: transform 0.1s linear;
+  }
+}
+
+// Organic temporal flow - natural easing (default)
+.sn-temporal-organic {
+  .Root__top-container::before {
+    transition: transform 0.2s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+}
+
+// Quantum temporal flow - stepped progression
+.sn-temporal-quantum {
+  .Root__top-container::before {
+    transition: transform 0.05s steps(4, end);
+  }
+}
+
+// ===================================================================
+// HARMONIC SENSITIVITY VARIATIONS
+// ===================================================================
+
+// Subtle harmonic sensitivity - minimal response
+.sn-harmonic-subtle {
+  .Root__top-container::after {
+    transform: 
+      scale(calc(0.7 + var(--sn-flux-harmonic-resonance, 0) * 0.2))
+      rotate(calc(var(--sn-flux-harmonic-rotation, 0deg) * 0.5));
+    opacity: calc(var(--sn-flux-harmonic-resonance, 0) * 0.4);
+  }
+}
+
+// Responsive harmonic sensitivity - normal response (default)
+.sn-harmonic-responsive {
+  .Root__top-container::after {
+    transform: 
+      scale(calc(0.5 + var(--sn-flux-harmonic-resonance, 0) * 0.5))
+      rotate(var(--sn-flux-harmonic-rotation, 0deg));
+    opacity: calc(var(--sn-flux-harmonic-resonance, 0) * 0.7);
+  }
+}
+
+// Psychedelic harmonic sensitivity - enhanced response
+.sn-harmonic-psychedelic {
+  .Root__top-container::after {
+    transform: 
+      scale(calc(0.3 + var(--sn-flux-harmonic-resonance, 0) * 0.8))
+      rotate(calc(var(--sn-flux-harmonic-rotation, 0deg) * 1.5));
+    opacity: calc(var(--sn-flux-harmonic-resonance, 0) * 1.0);
+    filter: 
+      hue-rotate(calc(var(--sn-flux-harmonic-rotation, 0deg) * 0.5))
+      saturate(calc(1 + var(--sn-flux-harmonic-resonance, 0) * 0.5))
+      brightness(calc(1 + var(--sn-flux-harmonic-resonance, 0) * 0.2));
+  }
+}
+
+// ===================================================================
+// PERFORMANCE AND ACCESSIBILITY OPTIMIZATIONS
+// ===================================================================
+
+// Reduced motion support - disable all flux animations
+@media (prefers-reduced-motion: reduce) {
+  .Root__main-view::before,
+  .main-view-container::after,
+  .Root__top-container::before,
+  .Root__top-container::after {
+    animation: none !important;
+    transition-duration: 0.1s !important;
+  }
+  
+  // Keep basic visualization but reduce intensity
+  .Root__main-view::before {
+    transform: translate(-50%, -50%) scale(calc(var(--sn-flux-consciousness-pulse, 0) * 0.5)) !important;
+  }
+  
+  .Root__top-container::after {
+    transform: scale(0.5) !important;
+  }
+}
+
+// High contrast mode - enhance visibility
+@media (prefers-contrast: high) {
+  .Root__main-view::before {
+    background: radial-gradient(circle,
+      rgba(var(--sn-gradient-primary-rgb), 0.3) 0%,
+      rgba(var(--sn-gradient-secondary-rgb), 0.15) 50%,
+      transparent 100%) !important;
+  }
+  
+  .main-view-container::after {
+    filter: contrast(2.0) saturate(1.5) !important;
+  }
+  
+  .Root__top-container::before {
+    background: linear-gradient(to right,
+      rgba(var(--sn-gradient-primary-rgb), 1.0) 0%,
+      rgba(var(--sn-gradient-accent-rgb), 0.8) 100%) !important;
+  }
+  
+  .Root__top-container::after {
+    filter: contrast(1.5) saturate(2.0) brightness(1.2) !important;
+  }
+}
+
+// Performance mode - simplified effects for resource-constrained devices
+.sn-performance-mode {
+  .Root__main-view::before,
+  .main-view-container::after,
+  .Root__top-container::before,
+  .Root__top-container::after {
+    animation: none !important;
+    transition-duration: 50ms !important;
+    filter: none !important;
+  }
+  
+  // Simplified gradients for performance
+  .Root__main-view::before {
+    background: rgba(var(--sn-gradient-primary-rgb), 0.1) !important;
+  }
+  
+  .main-view-container::after {
+    background: 
+      linear-gradient(to top, rgba(var(--sn-gradient-primary-rgb), var(--sn-flux-spectral-bass, 0))) !important;
+  }
+}
+
+// Disable flux visualization completely when disabled
+.sn-flux-disabled {
+  .Root__main-view::before,
+  .main-view-container::after,
+  .Root__top-container::before,
+  .Root__top-container::after {
+    display: none !important;
+  }
+}
+
+// ===================================================================
+// CSS VARIABLE DEFAULTS
+// ===================================================================
+
+:root {
+  // Flux music visualization variables with fallback values
+  --sn-flux-consciousness-pulse: 0;
+  --sn-flux-temporal-flow-progress: 0;
+  --sn-flux-harmonic-rotation: 0deg;
+  --sn-flux-harmonic-resonance: 0;
+  --sn-flux-energy-level: 0.5;
+  --sn-flux-beat-intensity: 0.5;
+  
+  // Spectral data variables
+  --sn-flux-spectral-bass: 0;
+  --sn-flux-spectral-mid: 0;
+  --sn-flux-spectral-treble: 0;
+  --sn-flux-spectral-vocal: 0;
+  --sn-flux-spectral-enabled: 1;
+  
+  // Emotional mapping variables
+  --sn-flux-emotional-intensity: 0.5;
+  --sn-flux-emotional-valence: 0.5;
+}

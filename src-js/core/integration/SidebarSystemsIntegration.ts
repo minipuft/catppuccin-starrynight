@@ -1,7 +1,7 @@
 import { UnifiedSystemBase } from '@/core/base/UnifiedSystemBase';
-import { SidebarDimensionalNexusSystem } from '@/visual/ui-effects/SidebarDimensionalNexusSystem';
 import { SidebarInteractiveFlowSystem } from '@/visual/ui-effects/SidebarInteractiveFlowSystem';
-import { RightSidebarConsciousnessEnhanced } from '@/visual/ui-effects/RightSidebarConsciousnessEnhanced';
+// RightSidebarConsciousnessEnhanced consolidated into UnifiedSidebarConsciousnessController
+// import { RightSidebarConsciousnessEnhanced } from '@/visual/ui-effects/RightSidebarConsciousnessEnhanced';
 import { SidebarPerformanceCoordinator } from '@/visual/ui-effects/SidebarPerformanceCoordinator';
 import type { Year3000Config } from '@/types/models';
 import type { HealthCheckResult } from '@/types/systems';
@@ -9,6 +9,11 @@ import { YEAR3000_CONFIG } from '@/config/globalConfig';
 
 // Temporary interfaces for systems that couldn't be created due to build issues
 interface LeftSidebarConsciousnessSystem extends UnifiedSystemBase {
+  getConsciousnessState(): any;
+  getAnimationMetrics(): any;
+}
+
+interface RightSidebarConsciousnessSystem extends UnifiedSystemBase {
   getConsciousnessState(): any;
   getAnimationMetrics(): any;
 }
@@ -45,6 +50,43 @@ class MockLeftSidebarConsciousnessSystem extends UnifiedSystemBase {
   }
   
   getConsciousnessState() {
+    return { level: 'aware', intensity: 0.5 };
+  }
+  
+  getAnimationMetrics() {
+    return { beatIntensity: 0.5, explorationLevel: 0.3 };
+  }
+}
+
+class MockRightSidebarConsciousnessSystem extends UnifiedSystemBase {
+  async initialize(): Promise<void> {
+    console.log('[MockRightSidebarConsciousnessSystem] Right sidebar now handled by facade pattern');
+  }
+  
+  destroy(): void {
+    console.log('[MockRightSidebarConsciousnessSystem] Destroyed');
+  }
+  
+  onAnimate(deltaTime: number): void {
+    // Right sidebar consciousness now handled by UnifiedSidebarConsciousnessController via facade
+  }
+  
+  async healthCheck(): Promise<HealthCheckResult> {
+    return { 
+      healthy: true,
+      ok: true, 
+      details: 'Right sidebar consciousness managed by facade pattern',
+      issues: [],
+      system: 'MockRightSidebarConsciousnessSystem'
+    };
+  }
+  
+  getConsciousnessState() {
+    // Access facade pattern right sidebar consciousness
+    const year3000System = (globalThis as any).year3000System;
+    if (year3000System?.sidebarConsciousnessController) {
+      return year3000System.sidebarConsciousnessController.getConsciousnessState();
+    }
     return { level: 'aware', intensity: 0.5 };
   }
   
@@ -143,9 +185,8 @@ interface SidebarIntegrationMetrics {
 export class SidebarSystemsIntegration extends UnifiedSystemBase {
   // Core sidebar systems
   private leftSidebarConsciousness: LeftSidebarConsciousnessSystem;
-  private rightSidebarConsciousness: RightSidebarConsciousnessEnhanced;
+  private rightSidebarConsciousness: RightSidebarConsciousnessSystem;
   private sidebarOrchestrator: SidebarSystemsOrchestrator;
-  private dimensionalNexus: SidebarDimensionalNexusSystem;
   private interactiveFlow: SidebarInteractiveFlowSystem;
   
   // Performance coordination
@@ -173,14 +214,13 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
     
     // Initialize core systems
     this.leftSidebarConsciousness = new MockLeftSidebarConsciousnessSystem(config);
-    this.rightSidebarConsciousness = new RightSidebarConsciousnessEnhanced(config);
+    this.rightSidebarConsciousness = new MockRightSidebarConsciousnessSystem(config);
     this.sidebarOrchestrator = new MockSidebarSystemsOrchestrator(config);
-    this.dimensionalNexus = new SidebarDimensionalNexusSystem(config);
     this.interactiveFlow = new SidebarInteractiveFlowSystem(config);
     
     // Initialize performance metrics
     this.performanceMetrics = {
-      totalSystems: 5,
+      totalSystems: 4,
       activeSystems: 0,
       bilateralSyncEnabled: false,
       averageFrameTime: 0,
@@ -272,15 +312,6 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
       priority: 'critical',
       enabled: true,
       dependencies: ['leftSidebarConsciousness', 'rightSidebarConsciousness']
-    });
-    
-    // Dimensional nexus (spatial navigation)
-    this.sidebarSystems.set('dimensionalNexus', {
-      name: 'dimensionalNexus',
-      system: this.dimensionalNexus,
-      priority: 'normal',
-      enabled: true,
-      dependencies: ['sidebarOrchestrator']
     });
     
     // Interactive flow (liquid consciousness)
@@ -595,39 +626,13 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   }
   
   /**
-   * Phase 3: Register sidebar systems with UnifiedSystemRegistry
+   * Phase 3: Register sidebar systems with facade (UnifiedSystemRegistry is deprecated)
    */
   private async registerWithUnifiedRegistry(): Promise<void> {
-    // Access unified system registry from global Year3000System
-    const year3000System = (globalThis as any).year3000System;
-    if (!year3000System?.unifiedSystemIntegration) {
-      if (this.config.enableDebug) {
-        console.log(`[${this.systemName}] UnifiedSystemRegistry not available, skipping registration`);
-      }
-      return;
-    }
-    
-    try {
-      const registry = year3000System.getUnifiedSystemRegistry();
-      if (registry) {
-        // Register each sidebar system with dependencies
-        for (const [systemName, systemDef] of this.sidebarSystems) {
-          registry.register(
-            `sidebar:${systemName}`,
-            systemDef.system,
-            systemDef.dependencies?.map(dep => `sidebar:${dep}`) || []
-          );
-          
-          if (this.config.enableDebug) {
-            console.log(`[${this.systemName}] Registered ${systemName} with UnifiedSystemRegistry`);
-          }
-        }
-        
-        // Register the integration itself as a master system
-        registry.register('sidebar:integration', this, []);
-      }
-    } catch (error) {
-      console.error(`[${this.systemName}] Failed to register with UnifiedSystemRegistry:`, error);
+    // Note: Sidebar systems are now properly managed by VisualSystemFacade
+    // This method is maintained for legacy compatibility but no longer performs registration
+    if (this.config.enableDebug) {
+      console.log(`[${this.systemName}] Sidebar systems are now managed by VisualSystemFacade`);
     }
   }
   
@@ -759,7 +764,6 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
     if (payload.severity === 'critical') {
       // Emergency performance mode - disable non-essential systems
       this.setSidebarSystemEnabled('interactiveFlow', false);
-      this.setSidebarSystemEnabled('dimensionalNexus', false);
       
       this.performanceMetrics.healthStatus = 'critical';
       
@@ -768,8 +772,6 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
       }
     } else if (payload.severity === 'warning' && this.performanceMetrics.healthStatus === 'critical') {
       // Recovery mode - re-enable systems gradually
-      this.setSidebarSystemEnabled('dimensionalNexus', true);
-      
       setTimeout(() => {
         this.setSidebarSystemEnabled('interactiveFlow', true);
       }, 2000);

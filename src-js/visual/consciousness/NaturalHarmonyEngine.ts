@@ -13,7 +13,7 @@ import { HolographicUISystem, type HolographicState } from "@/visual/organic-con
 import { type ColorConsciousnessState, colorConsciousnessManager } from "@/visual/consciousness/ColorConsciousnessState";
 import type { RGB, MusicEmotion, BeatData, CinematicPalette } from "@/types/colorStubs";
 import { GlobalEventBus } from "@/core/events/EventBus";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 
@@ -54,7 +54,7 @@ export class NaturalHarmonyEngine implements IManagedSystem {
   
   private holographicSystem: HolographicUISystem;
   // Using shared colorConsciousnessManager instead of injected orchestrator
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController;
   private musicSyncService: MusicSyncService;
   
   private breathingState: NaturalBreathingState;
@@ -113,11 +113,11 @@ export class NaturalHarmonyEngine implements IManagedSystem {
 
   constructor(
     holographicSystem: HolographicUISystem,
-    cssVariableBatcher: CSSVariableBatcher,
+    cssConsciousnessController: UnifiedCSSConsciousnessController,
     musicSyncService: MusicSyncService
   ) {
     this.holographicSystem = holographicSystem;
-    this.cssVariableBatcher = cssVariableBatcher;
+    this.cssConsciousnessController = cssConsciousnessController;
     this.musicSyncService = musicSyncService;
     
     // Initialize natural breathing state
@@ -443,28 +443,28 @@ export class NaturalHarmonyEngine implements IManagedSystem {
    */
   private updateNaturalColors(mapping: NaturalColorMapping): void {
     // Update natural color CSS variables
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--natural-earthy-r',
       mapping.earthyWarm.r.toString()
     );
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--natural-earthy-g',
       mapping.earthyWarm.g.toString()
     );
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--natural-earthy-b',
       mapping.earthyWarm.b.toString()
     );
     
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--natural-forest-r',
       mapping.forestGreen.r.toString()
     );
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--natural-forest-g',
       mapping.forestGreen.g.toString()
     );
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--natural-forest-b',
       mapping.forestGreen.b.toString()
     );
@@ -514,7 +514,7 @@ export class NaturalHarmonyEngine implements IManagedSystem {
     };
     
     for (const [variable, value] of Object.entries(baseVariables)) {
-      this.cssVariableBatcher.queueCSSVariableUpdate(variable, value);
+      this.cssConsciousnessController.queueCSSVariableUpdate(variable, value);
     }
   }
 
@@ -522,34 +522,34 @@ export class NaturalHarmonyEngine implements IManagedSystem {
    * Update natural CSS variables
    */
   private updateNaturalCSSVariables(mapping: NaturalColorMapping): void {
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--natural-serenity-level',
       this.breathingState.serenityLevel.toString()
     );
     
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--natural-breathing-frequency',
       this.breathingState.breathingFrequency.toString()
     );
     
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--natural-earth-connection',
       this.breathingState.earthConnection.toString()
     );
     
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--natural-breathing-depth',
       this.breathingState.organicDepth.toString()
     );
     
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--natural-seasonal-shift',
       this.breathingState.seasonalShift.toString()
     );
     
     // Update breathing phase for CSS animations
     const breathingValue = Math.sin(this.animationState.breathingPhase) * this.breathingState.organicDepth;
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--natural-breathing-phase',
       breathingValue.toString()
     );
@@ -709,7 +709,7 @@ export class NaturalHarmonyEngine implements IManagedSystem {
     this.updateNaturalElements();
     
     // Trigger CSS variable batch flush
-    this.cssVariableBatcher.flushCSSVariableBatch();
+    this.cssConsciousnessController.flushCSSVariableBatch();
   }
 
   /**

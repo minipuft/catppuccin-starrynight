@@ -1,14 +1,16 @@
 /**
- * OptimizedCSSVariableBatcher - Enhanced CSS Variable Batching with Performance Budgets
+ * OptimizedUnifiedCSSConsciousnessController - Enhanced CSS Variable Batching with Performance Budgets
  * 
- * Extends the base CSSVariableBatcher with advanced performance optimizations:
+ * Extends the base UnifiedCSSConsciousnessController with advanced performance optimizations:
  * - Automatic performance budget monitoring
  * - Intelligent batching strategy selection
  * - Adaptive throttling based on system performance
  * - Priority-based variable processing
  */
 
-import { CSSVariableBatcher } from './CSSVariableBatcher';
+import { UnifiedCSSConsciousnessController } from '../css/UnifiedCSSConsciousnessController';
+import { UnifiedPerformanceCoordinator } from './UnifiedPerformanceCoordinator';
+import type { Year3000Config } from '@/types/models';
 import { PerformanceAnalyzer } from './PerformanceAnalyzer';
 import { PerformanceBudgetManager } from './PerformanceBudgetManager';
 
@@ -39,7 +41,7 @@ export interface OptimizedBatcherConfig {
   };
 }
 
-export class OptimizedCSSVariableBatcher extends CSSVariableBatcher {
+export class OptimizedUnifiedCSSConsciousnessController extends UnifiedCSSConsciousnessController {
   private optimizedConfig: OptimizedBatcherConfig;
   private performanceAnalyzer?: PerformanceAnalyzer;
   private budgetManager?: PerformanceBudgetManager;
@@ -52,22 +54,19 @@ export class OptimizedCSSVariableBatcher extends CSSVariableBatcher {
   // Priority queues
   private priorityQueues: Map<string, Map<string, { property: string; value: string; timestamp: number }>> = new Map();
   
-  constructor(config: Partial<OptimizedBatcherConfig> = {}) {
-    // Set up base configuration
-    const baseConfig = {
-      batchIntervalMs: config.batchIntervalMs ?? 16,
-      maxBatchSize: config.maxBatchSize ?? 50,
-      enableDebug: config.enableDebug ?? false,
-      performanceAnalyzer: config.performanceAnalyzer,
-    };
-    
-    super(baseConfig);
+  constructor(
+    year3000Config: Year3000Config,
+    performanceCoordinator: UnifiedPerformanceCoordinator,
+    optimizedConfig: Partial<OptimizedBatcherConfig> = {}
+  ) {
+    // Call parent constructor with required dependencies
+    super(year3000Config, performanceCoordinator);
     
     // Extended configuration for optimization
     this.optimizedConfig = {
       batchIntervalMs: 16,
       maxBatchSize: 50,
-      enableDebug: false,
+      enableDebug: year3000Config.enableDebug,
       enableAdaptiveThrottling: true,
       priorityMappings: {
         critical: ['--sn-rs-glow-alpha', '--sn-rs-beat-intensity', '--sn-rs-hue-shift'],
@@ -80,15 +79,15 @@ export class OptimizedCSSVariableBatcher extends CSSVariableBatcher {
         goodFPS: 45,       // 45+ FPS = good
         poorFPS: 30        // <30 FPS = poor
       },
-      ...config,
+      ...optimizedConfig,
     };
     
     // Handle exactOptionalPropertyTypes by conditional assignment
-    if (config.performanceAnalyzer) {
-      this.performanceAnalyzer = config.performanceAnalyzer;
+    if (optimizedConfig.performanceAnalyzer) {
+      this.performanceAnalyzer = optimizedConfig.performanceAnalyzer;
     }
-    if (config.budgetManager) {
-      this.budgetManager = config.budgetManager;
+    if (optimizedConfig.budgetManager) {
+      this.budgetManager = optimizedConfig.budgetManager;
     }
     
     // Initialize priority queues
@@ -141,7 +140,7 @@ export class OptimizedCSSVariableBatcher extends CSSVariableBatcher {
     
     // Log performance level changes
     if (previousLevel !== this.currentPerformanceLevel && this.optimizedConfig.enableDebug) {
-      console.log(`🎨 [OptimizedCSSVariableBatcher] Performance level changed: ${previousLevel} → ${this.currentPerformanceLevel} (${currentFPS} FPS)`);
+      console.log(`🎨 [OptimizedUnifiedCSSConsciousnessController] Performance level changed: ${previousLevel} → ${this.currentPerformanceLevel} (${currentFPS} FPS)`);
     }
   }
   
@@ -247,7 +246,7 @@ export class OptimizedCSSVariableBatcher extends CSSVariableBatcher {
         element.style.setProperty(property, value);
       }
     } catch (error) {
-      console.error(`🎨 [OptimizedCSSVariableBatcher] Critical update failed for ${property}:`, error);
+      console.error(`🎨 [OptimizedUnifiedCSSConsciousnessController] Critical update failed for ${property}:`, error);
     }
   }
   
@@ -296,7 +295,7 @@ export class OptimizedCSSVariableBatcher extends CSSVariableBatcher {
     
     // Process updates in batch
     for (const update of updates) {
-      super.queueCSSVariableUpdate(update.property, update.value);
+      super.queueCSSVariableUpdate(update.property, update.value, null, 'normal', update.timestamp.toString());
     }
   }
   
@@ -337,7 +336,7 @@ export class OptimizedCSSVariableBatcher extends CSSVariableBatcher {
     }
     
     // Also flush the base batcher
-    this.flushNow();
+    this.flushUpdates();
   }
   
   /**

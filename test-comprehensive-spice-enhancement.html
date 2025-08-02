@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Spice Variable Enhancement Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1e1e2e;
+            color: #cdd6f4;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .color-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .color-preview {
+            width: 100%;
+            height: 60px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .variable-name {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #89dceb;
+            margin-bottom: 5px;
+        }
+        
+        .color-value {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #a6adc8;
+            margin-top: 5px;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #cba6f7, #89b4fa);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(203, 166, 247, 0.3);
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .status.success { background: rgba(166, 227, 161, 0.2); color: #a6e3a1; }
+        .status.error { background: rgba(243, 139, 168, 0.2); color: #f38ba8; }
+        .status.info { background: rgba(137, 180, 250, 0.2); color: #89b4fa; }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #cba6f7;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #a6adc8;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="header">
+            <h1>🎨 Comprehensive Spice Variable Enhancement Test</h1>
+            <p>Testing intelligent color distribution for comprehensive Spicetify variable override protection. 
+               This simulates the enhanced SemanticColorManager functionality with OKLAB-inspired color science.</p>
+        </div>
+        
+        <div class="test-controls">
+            <button class="test-button" onclick="testColorDistribution('#cba6f7')">Test Purple Album</button>
+            <button class="test-button" onclick="testColorDistribution('#89b4fa')">Test Blue Album</button>
+            <button class="test-button" onclick="testColorDistribution('#a6e3a1')">Test Green Album</button>
+            <button class="test-button" onclick="testColorDistribution('#f38ba8')">Test Pink Album</button>
+            <button class="test-button" onclick="testColorDistribution('#fab387')">Test Orange Album</button>
+        </div>
+        
+        <div id="status" class="status info">
+            Ready to test comprehensive Spicetify variable enhancement...
+        </div>
+        
+        <div class="test-grid" id="colorGrid">
+            <!-- Color sections will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Simulated SemanticColorManager color distribution logic
+        class ColorDistributionTester {
+            
+            hexToRgbObject(hex) {
+                const cleanHex = hex.replace('#', '');
+                if (cleanHex.length !== 6) return null;
+                
+                return {
+                    r: parseInt(cleanHex.substring(0, 2), 16),
+                    g: parseInt(cleanHex.substring(2, 4), 16),
+                    b: parseInt(cleanHex.substring(4, 6), 16)
+                };
+            }
+            
+            rgbToHex(r, g, b) {
+                const toHex = (n) => {
+                    const hex = Math.round(Math.max(0, Math.min(255, n))).toString(16);
+                    return hex.length === 1 ? '0' + hex : hex;
+                };
+                return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+            }
+            
+            generateDarkerVariant(hexColor, factor) {
+                const rgb = this.hexToRgbObject(hexColor);
+                if (!rgb) return hexColor;
+                
+                const r = Math.max(0, Math.round(rgb.r * (1 - factor)));
+                const g = Math.max(0, Math.round(rgb.g * (1 - factor)));
+                const b = Math.max(0, Math.round(rgb.b * (1 - factor)));
+                
+                return this.rgbToHex(r, g, b);
+            }
+            
+            generateLighterVariant(hexColor, factor) {
+                const rgb = this.hexToRgbObject(hexColor);
+                if (!rgb) return hexColor;
+                
+                const r = Math.min(255, Math.round(rgb.r + (255 - rgb.r) * factor));
+                const g = Math.min(255, Math.round(rgb.g + (255 - rgb.g) * factor));
+                const b = Math.min(255, Math.round(rgb.b + (255 - rgb.b) * factor));
+                
+                return this.rgbToHex(r, g, b);
+            }
+            
+            rgbToHsl(r, g, b) {
+                r /= 255; g /= 255; b /= 255;
+                const max = Math.max(r, g, b);
+                const min = Math.min(r, g, b);
+                let h = 0, s = 0;
+                const l = (max + min) / 2;
+                
+                if (max !== min) {
+                    const d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                    
+                    switch (max) {
+                        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                        case g: h = (b - r) / d + 2; break;
+                        case b: h = (r - g) / d + 4; break;
+                    }
+                    h /= 6;
+                }
+                
+                return { h: h * 360, s: s * 100, l: l * 100 };
+            }
+            
+            hslToRgb(h, s, l) {
+                h /= 360; s /= 100; l /= 100;
+                
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+                
+                let r, g, b;
+                if (s === 0) {
+                    r = g = b = l;
+                } else {
+                    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                    const p = 2 * l - q;
+                    r = hue2rgb(p, q, h + 1/3);
+                    g = hue2rgb(p, q, h);
+                    b = hue2rgb(p, q, h - 1/3);
+                }
+                
+                return {
+                    r: Math.round(r * 255),
+                    g: Math.round(g * 255),
+                    b: Math.round(b * 255)
+                };
+            }
+            
+            generateHueRotatedColor(hexColor, hueDegrees) {
+                const rgb = this.hexToRgbObject(hexColor);
+                if (!rgb) return hexColor;
+                
+                const hsl = this.rgbToHsl(rgb.r, rgb.g, rgb.b);
+                hsl.h = (hsl.h + hueDegrees) % 360;
+                if (hsl.h < 0) hsl.h += 360;
+                
+                const rotatedRgb = this.hslToRgb(hsl.h, hsl.s, hsl.l);
+                return this.rgbToHex(rotatedRgb.r, rotatedRgb.g, rotatedRgb.b);
+            }
+            
+            generateIntelligentColorDistribution(primaryColor, accentColor, shadowColor, highlightColor) {
+                const primary = primaryColor;
+                const accent = accentColor || primaryColor;
+                const shadow = shadowColor || this.generateDarkerVariant(primaryColor, 0.3);
+                const highlight = highlightColor || this.generateLighterVariant(primaryColor, 0.2);
+                
+                // Generate depth progression
+                const base = this.generateDarkerVariant(primaryColor, 0.6);
+                const surface0 = this.generateDarkerVariant(primaryColor, 0.4);
+                const surface1 = accent;
+                const surface2 = this.generateLighterVariant(accent, 0.15);
+                
+                // Generate neural consciousness colors
+                const neuralPrimary = this.generateHueRotatedColor(primaryColor, 120);
+                const neuralSecondary = this.generateHueRotatedColor(primaryColor, -60);
+                const neuralTertiary = this.generateHueRotatedColor(primaryColor, 180);
+                
+                return {
+                    primary, surface0, surface1, surface2, base, shadow, highlight,
+                    neuralPrimary, neuralSecondary, neuralTertiary
+                };
+            }
+        }
+        
+        const tester = new ColorDistributionTester();
+        
+        function testColorDistribution(primaryColor) {
+            try {
+                const distribution = tester.generateIntelligentColorDistribution(primaryColor);
+                
+                document.getElementById('status').innerHTML = 
+                    `<div class="status success">✅ Successfully generated color distribution for ${primaryColor}</div>`;
+                
+                displayColorDistribution(distribution);
+            } catch (error) {
+                document.getElementById('status').innerHTML = 
+                    `<div class="status error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function displayColorDistribution(distribution) {
+            const grid = document.getElementById('colorGrid');
+            
+            const sections = [
+                {
+                    title: "Core Colors",
+                    colors: {
+                        '--spice-accent': distribution.primary,
+                        '--spice-highlight': distribution.highlight,
+                        '--spice-press': distribution.shadow
+                    }
+                },
+                {
+                    title: "Surface Progression (Depth)",
+                    colors: {
+                        '--spice-base': distribution.base,
+                        '--spice-surface0': distribution.surface0,
+                        '--spice-surface1': distribution.surface1,
+                        '--spice-surface2': distribution.surface2
+                    }
+                },
+                {
+                    title: "Neural Consciousness",
+                    colors: {
+                        '--spice-blue': distribution.neuralPrimary,
+                        '--spice-mauve': distribution.neuralSecondary,
+                        '--spice-teal': distribution.neuralTertiary
+                    }
+                }
+            ];
+            
+            grid.innerHTML = sections.map(section => `
+                <div class="color-section">
+                    <h3>${section.title}</h3>
+                    ${Object.entries(section.colors).map(([variable, color]) => `
+                        <div class="variable-name">${variable}</div>
+                        <div class="color-preview" style="background-color: ${color};">
+                            ${color.toUpperCase()}
+                        </div>
+                        <div class="color-value">RGB: ${tester.hexToRgbObject(color) ? 
+                            `${tester.hexToRgbObject(color).r}, ${tester.hexToRgbObject(color).g}, ${tester.hexToRgbObject(color).b}` : 'Invalid'}</div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+        
+        // Test with default purple color on load
+        window.addEventListener('load', () => {
+            testColorDistribution('#cba6f7');
+        });
+    </script>
+</body>
+</html>

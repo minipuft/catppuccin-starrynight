@@ -4,7 +4,7 @@
  */
 
 import { VisualSystemFacade, VisualSystemKey, VisualSystemConfig } from '@/visual/integration/VisualSystemFacade';
-import { CSSVariableBatcher } from '@/core/performance/CSSVariableBatcher';
+import { OptimizedCSSVariableBatcher as CSSVariableBatcher } from '@/core/performance/OptimizedCSSVariableBatcher';
 import { PerformanceAnalyzer } from '@/core/performance/PerformanceAnalyzer';
 import { MusicSyncService } from '@/audio/MusicSyncService';
 import { SettingsManager } from '@/ui/managers/SettingsManager';
@@ -14,7 +14,7 @@ import * as Utils from '@/utils/core/Year3000Utilities';
 import { IManagedSystem } from '@/types/IManagedSystem';
 
 // Mock dependencies
-jest.mock('@/core/performance/CSSVariableBatcher');
+jest.mock('@/core/performance/OptimizedCSSVariableBatcher');
 jest.mock('@/core/performance/PerformanceAnalyzer');
 jest.mock('@/core/performance/DeviceCapabilityDetector');
 jest.mock('@/audio/MusicSyncService');
@@ -23,8 +23,7 @@ jest.mock('@/audio/ColorHarmonyEngine');
 jest.mock('@/core/performance/AdaptivePerformanceSystem');
 
 // Mock visual systems
-jest.mock('@/visual/backgrounds/LightweightParticleSystem');
-jest.mock('@/visual/backgrounds/ParticleFieldSystem');
+jest.mock('@/visual/consciousness/ParticleConsciousnessModule');
 jest.mock('@/visual/backgrounds/WebGLGradientBackgroundSystem');
 jest.mock('@/visual/organic-consciousness/OrganicBeatSyncConsciousness');
 jest.mock('@/visual/ui-effects/InteractionTrackingSystem');

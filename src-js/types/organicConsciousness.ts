@@ -88,28 +88,6 @@ export interface OrganicConsciousnessMetrics {
 // CELLULAR CONSCIOUSNESS TYPES
 // =========================================================================
 
-/**
- * Cellular membrane state and behavior
- */
-export interface CellularMembrane {
-  /** Unique identifier for the membrane */
-  id: string;
-  
-  /** DOM element representing the membrane */
-  element: HTMLElement;
-  
-  /** Current growth scale (1.0 = normal) */
-  growthScale: number;
-  
-  /** Current opacity level (0-1) */
-  opacity: number;
-  
-  /** Whether the membrane is actively growing */
-  isGrowing: boolean;
-  
-  /** Growth animation duration in milliseconds */
-  growthDuration: number;
-}
 
 /**
  * Breathing organism representing rhythmic consciousness

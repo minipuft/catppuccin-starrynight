@@ -40,29 +40,104 @@
   --sn-music-valence: 0.5;                 // Song valence/mood (0-1)
   --sn-music-danceability: 0.5;            // Song danceability (0-1)
   
+  // === MUSICAL COLOR HARMONY COORDINATION ===
+  // Real-time color coordination between MusicSyncService and ColorHarmonyEngine
+  
+  // Album art color extraction (updated by ColorHarmonyEngine)
+  --sn-music-album-dominant-rgb: var(--sn-color-extracted-dominant-rgb);
+  --sn-music-album-vibrant-rgb: var(--sn-color-extracted-vibrant-rgb);
+  --sn-music-album-muted-rgb: var(--sn-color-extracted-secondary-rgb);
+  --sn-music-album-accent-rgb: var(--sn-color-extracted-primary-rgb);
+  
+  // Musical genre color mapping (ColorHarmonyEngine genre detection)
+  --sn-music-genre-primary-rgb: var(--sn-musical-harmony-primary-rgb);
+  --sn-music-genre-secondary-rgb: var(--sn-musical-harmony-secondary-rgb);
+  --sn-music-genre-accent-rgb: var(--sn-musical-harmony-tertiary-rgb);
+  --sn-music-genre-atmosphere-rgb: var(--sn-musical-harmony-quaternary-rgb);
+  
+  // Real-time musical color responsiveness
+  --sn-music-color-intensity: var(--sn-musical-harmony-intensity); // Musical color intensity
+  --sn-music-color-saturation: var(--sn-musical-harmony-saturation-boost); // Saturation boost
+  --sn-music-color-contrast: var(--sn-musical-harmony-contrast-ratio); // Contrast adjustment
+  --sn-music-color-temperature: 0.5; // Color temperature shift (-1 to 1)
+  
+  // Beat-synchronized color pulsing (MusicSyncService integration)
+  --sn-music-beat-color-pulse: 0; // Beat pulse color intensity (0-1)
+  --sn-music-beat-color-phase: 0; // Beat color phase (0-1)
+  --sn-music-beat-color-frequency: var(--sn-music-beat-frequency); // Beat frequency for color sync
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🎨 OKLAB COLOR VARIABLES (Updated by ColorHarmonyEngine TypeScript)
+  // These variables receive processed album colors from the OKLAB color engine
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // OKLAB processed album colors (updated by ColorHarmonyEngine.ts)
+  --sn-musical-oklab-primary-rgb: var(--sn-cosmic-accent-rgb);       // Fallback to cosmic accent
+  --sn-musical-oklab-accent-rgb: var(--sn-cosmic-secondary-rgb);     // Fallback to cosmic secondary  
+  --sn-musical-oklab-highlight-rgb: var(--sn-cosmic-surface-rgb);    // Fallback to cosmic surface
+  --sn-musical-oklab-shadow-rgb: var(--sn-cosmic-base-rgb);          // Fallback to cosmic base
+  --sn-musical-oklab-intensity: 0.5;                                 // Musical intensity (0-1)
+
+  // OKLAB complementary colors for advanced harmony
+  --sn-musical-oklab-complementary-rgb: var(--sn-cosmic-secondary-rgb);
+  --sn-musical-oklab-triadic-rgb: var(--sn-cosmic-surface-rgb);
+
   // ═══════════════════════════════════════════════════════════════════════════════
   // 🎨 COLOR SYSTEM VARIABLES (Priority: High)
   // Dynamic color extraction and palette management
   // ═══════════════════════════════════════════════════════════════════════════════
   
-  // Primary color values
-  --sn-color-accent-hex: #cba6f7;          // Current accent color (hex)
-  --sn-color-accent-rgb: 203, 166, 247;    // Current accent color (RGB)
-  --sn-color-accent-hsl: 267, 84%, 81%;    // Current accent color (HSL)
-  --sn-color-accent-oklch: 0.75, 0.15, 295; // Current accent color (OKLCH)
+  // Primary color values - OKLAB album colors take priority
+  --sn-color-accent-hex: var(--sn-musical-harmony-primary-hex, var(--sn-dynamic-accent-hex, var(--sn-cosmic-accent-hex)));
+  --sn-color-accent-rgb: var(--sn-musical-harmony-primary-rgb, var(--sn-dynamic-accent-rgb, var(--sn-cosmic-accent-rgb)));
+  --sn-color-accent-hsl: 267, 84%, 81%;    // Current accent color (HSL) - calculated dynamically
+  --sn-color-accent-oklch: 0.75, 0.15, 295; // Current accent color (OKLCH) - calculated dynamically
   
-  // Extracted colors from album art
-  --sn-color-extracted-primary-rgb: 203, 166, 247;
-  --sn-color-extracted-secondary-rgb: 166, 227, 161;
-  --sn-color-extracted-tertiary-rgb: 250, 179, 135;
-  --sn-color-extracted-dominant-rgb: 203, 166, 247;
-  --sn-color-extracted-vibrant-rgb: 203, 166, 247;
+  // Extracted colors from album art - updated by ColorHarmonyEngine
+  --sn-color-extracted-primary-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-color-extracted-secondary-rgb: var(--sn-cosmic-secondary-rgb);
+  --sn-color-extracted-tertiary-rgb: var(--sn-cosmic-surface-rgb);
+  --sn-color-extracted-dominant-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-color-extracted-vibrant-rgb: var(--sn-cosmic-accent-rgb);
   
-  // Color harmony and blending
-  --sn-color-harmony-complementary-rgb: 166, 227, 161;
-  --sn-color-harmony-analogous-rgb: 243, 166, 247;
-  --sn-color-harmony-triadic-rgb: 247, 203, 166;
+  // Color harmony and blending - inherit from design tokens
+  --sn-color-harmony-complementary-rgb: var(--sn-cosmic-secondary-rgb);
+  --sn-color-harmony-analogous-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-color-harmony-triadic-rgb: var(--sn-cosmic-surface-rgb);
   --sn-color-harmony-blend-intensity: 0.8;
+  
+  // === MUSICAL COLOR HARMONY INTEGRATION ===
+  // Real-time color harmony updated by ColorHarmonyEngine and MusicalOKLABCoordinator
+  
+  // Musical color harmony schemes (updated by ColorHarmonyEngine)
+  --sn-musical-harmony-primary-rgb: var(--sn-musical-oklab-primary-rgb);
+  --sn-musical-harmony-secondary-rgb: var(--sn-musical-oklab-accent-rgb);
+  --sn-musical-harmony-tertiary-rgb: var(--sn-musical-oklab-highlight-rgb);
+  --sn-musical-harmony-quaternary-rgb: var(--sn-musical-oklab-shadow-rgb);
+  
+  // Advanced musical color relationships (ColorHarmonyEngine output)
+  --sn-musical-harmony-complementary-rgb: var(--sn-color-extracted-secondary-rgb);
+  --sn-musical-harmony-analogous-warm-rgb: var(--sn-color-extracted-tertiary-rgb);
+  --sn-musical-harmony-analogous-cool-rgb: var(--sn-color-extracted-vibrant-rgb);
+  --sn-musical-harmony-triadic-a-rgb: var(--sn-color-extracted-dominant-rgb);
+  --sn-musical-harmony-triadic-b-rgb: var(--sn-color-extracted-primary-rgb);
+  
+  // Musical color harmony intensity and blending
+  --sn-musical-harmony-intensity: var(--sn-musical-oklab-intensity); // 0-1 musical intensity
+  --sn-musical-harmony-blend-factor: 0.7; // ColorHarmony blend strength
+  --sn-musical-harmony-saturation-boost: 1.2; // Musical saturation enhancement
+  --sn-musical-harmony-contrast-ratio: 1.1; // Musical contrast adjustment
+  
+  // Musical emotion-based color coordination
+  --sn-musical-emotion-primary-rgb: var(--sn-emotion-current-primary);
+  --sn-musical-emotion-accent-rgb: var(--sn-emotion-current-accent);
+  --sn-musical-emotion-highlight-rgb: var(--sn-emotion-current-highlight);
+  --sn-musical-emotion-shadow-rgb: var(--sn-emotion-current-shadow);
+  
+  // Real-time musical color transitions (updated by ColorHarmonyEngine)
+  --sn-musical-transition-duration: 800ms; // Color transition timing
+  --sn-musical-transition-easing: cubic-bezier(0.4, 0, 0.2, 1); // Consciousness-aware easing
+  --sn-musical-color-evolution-speed: 1.0; // Color evolution multiplier
   
   // Dynamic color shifts
   --sn-color-shift-hue: 0deg;              // Global hue shift
@@ -75,15 +150,35 @@
   // Gradient, WebGL, and background effects
   // ═══════════════════════════════════════════════════════════════════════════════
   
-  // Gradient system
-  --sn-bg-gradient-primary-rgb: 203, 166, 247;
-  --sn-bg-gradient-secondary-rgb: 166, 227, 161;
-  --sn-bg-gradient-tertiary-rgb: 250, 179, 135;
+  // Gradient system - OKLAB album colors take priority
+  --sn-bg-gradient-primary-rgb: var(--sn-musical-harmony-primary-rgb, var(--sn-dynamic-accent-rgb));
+  --sn-bg-gradient-secondary-rgb: var(--sn-musical-harmony-secondary-rgb, var(--sn-cosmic-secondary-rgb));
+  --sn-bg-gradient-tertiary-rgb: var(--sn-musical-harmony-tertiary-rgb, var(--sn-cosmic-surface-rgb));
   --sn-bg-gradient-opacity: 0.15;
   --sn-bg-gradient-blur: 40px;
   --sn-bg-gradient-angle: 135deg;
   --sn-bg-gradient-flow-direction: 0deg;
   --sn-bg-gradient-flow-speed: 1;
+  
+  // === MUSICAL BACKGROUND HARMONY INTEGRATION ===
+  // Musical color coordination for background systems
+  
+  // Musical gradient colors (updated by ColorHarmonyEngine)
+  --sn-bg-musical-primary-rgb: var(--sn-musical-harmony-primary-rgb);
+  --sn-bg-musical-secondary-rgb: var(--sn-musical-harmony-secondary-rgb);
+  --sn-bg-musical-tertiary-rgb: var(--sn-musical-harmony-tertiary-rgb);
+  --sn-bg-musical-accent-rgb: var(--sn-musical-harmony-quaternary-rgb);
+  
+  // Musical gradient flow and animation (MusicSyncService coordination)
+  --sn-bg-musical-flow-direction: calc(var(--sn-music-rhythm-phase) * 45deg); // Musical flow direction
+  --sn-bg-musical-flow-speed: var(--sn-musical-color-evolution-speed); // Musical flow speed
+  --sn-bg-musical-opacity: calc(0.15 * var(--sn-music-color-intensity)); // Musical opacity
+  --sn-bg-musical-blur: calc(40px * (1 + var(--sn-music-energy-level) * 0.5)); // Energy-responsive blur
+  
+  // Beat-synchronized background effects
+  --sn-bg-beat-pulse-intensity: var(--sn-music-beat-color-pulse); // Beat pulse intensity
+  --sn-bg-beat-pulse-scale: calc(1 + var(--sn-music-beat-pulse-intensity) * 0.1); // Beat scale
+  --sn-bg-beat-color-shift: calc(var(--sn-music-beat-color-phase) * 10deg); // Beat color shift
   
   // WebGL background system
   --sn-bg-webgl-ready: 0;                  // WebGL system ready state (0/1)
@@ -108,6 +203,24 @@
   --sn-anim-duration-normal: 0.4s;         // Normal animations
   --sn-anim-duration-slow: 0.8s;           // Slow animations
   --sn-anim-duration-breathing: 4s;        // Breathing animations
+  
+  // === MUSICAL ANIMATION COORDINATION ===
+  // Musical timing and color animation coordination
+  
+  // Musical animation timing (synced with MusicSyncService)
+  --sn-anim-musical-beat-duration: calc(60s / var(--sn-music-tempo-bpm)); // Beat-based duration
+  --sn-anim-musical-measure-duration: calc(var(--sn-anim-musical-beat-duration) * 4); // Measure duration
+  --sn-anim-musical-phrase-duration: calc(var(--sn-anim-musical-measure-duration) * 4); // Phrase duration
+  
+  // Musical color transition timing (ColorHarmonyEngine coordination)
+  --sn-anim-musical-color-transition: var(--sn-musical-transition-duration); // Musical color transitions
+  --sn-anim-musical-color-easing: var(--sn-musical-transition-easing); // Musical easing
+  --sn-anim-musical-color-speed: var(--sn-musical-color-evolution-speed); // Color evolution speed
+  
+  // Beat-synchronized animation variables
+  --sn-anim-beat-sync-enabled: 1; // Beat synchronization enabled (0/1)
+  --sn-anim-beat-sync-intensity: var(--sn-music-beat-pulse-intensity); // Beat sync intensity
+  --sn-anim-beat-sync-phase: var(--sn-music-beat-phase); // Beat sync phase
   
   // Animation easing
   --sn-anim-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
@@ -225,6 +338,7 @@
   --sn-feature-consciousness-enabled: 1;   // Consciousness features enabled (0/1)
   --sn-feature-music-sync-enabled: 1;      // Music sync enabled (0/1)
   --sn-feature-animations-enabled: 1;      // Animations enabled (0/1)
+  --sn-feature-musical-color-harmony: 1;   // Musical ColorHarmony integration enabled (0/1)
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -265,6 +379,32 @@
   --sn-transition-duration-fast: var(--sn-anim-duration-fast);
   --sn-transition-duration-normal: var(--sn-anim-duration-normal);
   --sn-transition-duration-slow: var(--sn-anim-duration-slow);
+  
+  // === MUSICAL COLOR HARMONY LEGACY ALIASES ===
+  // Maintain compatibility with existing musical color systems
+  
+  // Musical color harmony legacy aliases
+  --sn-musical-primary: var(--sn-musical-harmony-primary-rgb);
+  --sn-musical-secondary: var(--sn-musical-harmony-secondary-rgb);
+  --sn-musical-accent: var(--sn-musical-harmony-tertiary-rgb);
+  --sn-musical-atmosphere: var(--sn-musical-harmony-quaternary-rgb);
+  
+  // Album art color legacy aliases
+  --sn-album-dominant: var(--sn-music-album-dominant-rgb);
+  --sn-album-vibrant: var(--sn-music-album-vibrant-rgb);
+  --sn-album-muted: var(--sn-music-album-muted-rgb);
+  --sn-album-accent: var(--sn-music-album-accent-rgb);
+  
+  // Musical animation legacy aliases
+  --sn-beat-duration: var(--sn-anim-musical-beat-duration);
+  --sn-musical-transition: var(--sn-anim-musical-color-transition);
+  --sn-musical-easing: var(--sn-anim-musical-color-easing);
+  --sn-beat-sync-intensity: var(--sn-anim-beat-sync-intensity);
+  
+  // Background musical coordination legacy aliases
+  --sn-bg-musical-primary: var(--sn-bg-musical-primary-rgb);
+  --sn-bg-musical-flow: var(--sn-bg-musical-flow-direction);
+  --sn-bg-beat-pulse: var(--sn-bg-beat-pulse-intensity);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

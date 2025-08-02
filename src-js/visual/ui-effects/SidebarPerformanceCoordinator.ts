@@ -6,10 +6,11 @@
  * sidebar element performance and extensible to multiple sidebar locations.
  */
 
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
 import { MODERN_SELECTORS } from "@/debug/SpotifyDOMSelectors";
+import { GlobalEventBus } from "@/core/events/EventBus";
 
 interface PendingUpdate {
   property: string;
@@ -52,13 +53,16 @@ export class SidebarPerformanceCoordinator {
   private visibilityObserver: IntersectionObserver | null = null;
   private observationThrottleTimer: number | null = null;
   private lastObservationTime: number = 0;
-  private readonly OBSERVATION_THROTTLE_MS = 100; // Throttle observations to 10 Hz
+  private readonly OBSERVATION_THROTTLE_MS = 200; // Throttle observations to 5 Hz for better performance
   private isFirstOpen: boolean = true;
   private lastScrollUpdate: number = 0;
   
   // Timeout tracking for proper cleanup
   private activeTimeouts: Set<NodeJS.Timeout> = new Set();
   private domObservationRetryTimeout: NodeJS.Timeout | null = null;
+  
+  // Event-driven coordination for music changes
+  private musicChangeUnsubscribe: (() => void) | null = null;
 
   constructor(config: CoordinatorConfig = {}) {
     this.config = {
@@ -110,9 +114,10 @@ export class SidebarPerformanceCoordinator {
       return;
     }
 
-    // Delegate non-critical vars to global CSSVariableBatcher for sync flush
-    if (CSSVariableBatcher.instance) {
-      CSSVariableBatcher.instance.queueCSSVariableUpdate(
+    // Delegate non-critical vars to global UnifiedCSSConsciousnessController for sync flush
+    const cssController = UnifiedCSSConsciousnessController.getInstance();
+    if (cssController) {
+      cssController.queueCSSVariableUpdate(
         property,
         value,
         this.getSidebarElement() as HTMLElement
@@ -293,12 +298,57 @@ export class SidebarPerformanceCoordinator {
   }
 
   /**
+   * Setup event-driven music change coordination
+   * This replaces pure DOM watching to prevent cascade loops
+   */
+  private setupMusicChangeCoordination(): void {
+    if (this.musicChangeUnsubscribe) {
+      return; // Already subscribed
+    }
+
+    this.musicChangeUnsubscribe = GlobalEventBus.on('music:now-playing-changed', (eventData: {
+      timestamp: number;
+      source: string;
+      reason: string;
+    }) => {
+      // Handle music change event without triggering DOM mutation cascades
+      this.handleMusicChange(eventData);
+    });
+
+    if (this.config.enableDebug) {
+      console.log("🌌 [SidebarPerformanceCoordinator] Event-driven music coordination active");
+    }
+  }
+
+  /**
+   * Handle music change events from the global event bus
+   */
+  private handleMusicChange(eventData: { timestamp: number; source: string; reason: string }): void {
+    // Process music change without causing DOM mutation cascade
+    // Only trigger visibility check and organic effects
+    if (this.sidebarElement) {
+      this.handleVisibilityChange();
+      
+      if (this.config.enableDebug) {
+        console.log("🌌 [SidebarPerformanceCoordinator] Music change coordinated via event", {
+          source: eventData.source,
+          reason: eventData.reason,
+          timestamp: eventData.timestamp
+        });
+      }
+    }
+  }
+
+  /**
    * Setup DOM observation for reactive refresh and temporal play
    */
   public setupDOMObservation(): void {
     if (this.domObserver) {
       return; // Already observing
     }
+
+    // Setup event-driven music change coordination first
+    this.setupMusicChangeCoordination();
 
     this.sidebarElement = document.querySelector(
       MODERN_SELECTORS.rightSidebar as string
@@ -328,12 +378,16 @@ export class SidebarPerformanceCoordinator {
 
     // Mutation observer for structural changes (throttled for performance)
     this.domObserver = new MutationObserver((mutations) => {
-      this.throttleObservationUpdate(() => {
-        // Force refresh when DOM structure changes
-        this.queueUpdate("--sn-rs-force-refresh", Date.now().toString());
+      // Filter mutations to only process relevant changes
+      const relevantMutations = mutations.filter(mutation => this.isRelevantMutation(mutation));
+      
+      if (relevantMutations.length === 0) {
+        return; // Skip throttled update if no relevant changes
+      }
 
+      this.throttleObservationUpdate(() => {
         // Check for visibility changes (aria-hidden, style.display)
-        for (const mutation of mutations) {
+        for (const mutation of relevantMutations) {
           if (
             mutation.type === "attributes" &&
             (mutation.attributeName === "aria-hidden" ||
@@ -345,7 +399,8 @@ export class SidebarPerformanceCoordinator {
 
         if (this.config.enableDebug) {
           console.log(
-            "🌌 [SidebarPerformanceCoordinator] DOM change detected, forcing refresh"
+            "🌌 [SidebarPerformanceCoordinator] Relevant DOM change detected - visibility/structure only",
+            { mutationCount: relevantMutations.length, types: relevantMutations.map(m => m.type) }
           );
         }
       });
@@ -353,11 +408,10 @@ export class SidebarPerformanceCoordinator {
 
     this.domObserver.observe(this.sidebarElement, {
       childList: true,
-      subtree: false, // Optimize: Only observe direct children
-      attributes: true, // Watch for aria-hidden and style changes
-      attributeFilter: ["aria-hidden", "style", "class"],
-      // Optimize: Don't observe attribute old values
-      attributeOldValue: false,
+      subtree: false, // Optimize: Only observe direct children to reduce mutation volume
+      attributes: true, // Watch for visibility and style changes
+      attributeFilter: ["aria-hidden", "style", "class"], // Only observe attributes we care about
+      attributeOldValue: false, // Optimize: Don't observe attribute old values
       characterData: false, // Don't observe text changes
     });
 
@@ -442,6 +496,46 @@ export class SidebarPerformanceCoordinator {
     } else {
       this.queueUpdate("--sn-rs-scroll-ratio", Math.random().toString());
     }
+  }
+
+  /**
+   * Filter mutations to only process changes that actually affect UI structure or visibility
+   * Prevents cascade loops from CSS variable updates and other non-visual changes
+   */
+  private isRelevantMutation(mutation: MutationRecord): boolean {
+    // Handle attribute changes - only care about visibility and layout attributes
+    if (mutation.type === 'attributes') {
+      const attrName = mutation.attributeName;
+      
+      // Always respond to visibility changes
+      if (attrName === 'aria-hidden' || attrName === 'style') {
+        return true;
+      }
+      
+      // Respond to class changes that might affect layout/visibility
+      if (attrName === 'class') {
+        return true;
+      }
+      
+      // Ignore CSS custom property changes (these cause cascade loops)
+      if (attrName?.startsWith('--') || attrName === 'data-style') {
+        return false;
+      }
+      
+      return false; // Ignore other attribute changes
+    }
+    
+    // Handle structural changes - always relevant for sidebar content
+    if (mutation.type === 'childList') {
+      // Check if actual elements were added/removed (not just text nodes)
+      const hasElementChanges = 
+        (mutation.addedNodes && Array.from(mutation.addedNodes).some(node => node.nodeType === Node.ELEMENT_NODE)) ||
+        (mutation.removedNodes && Array.from(mutation.removedNodes).some(node => node.nodeType === Node.ELEMENT_NODE));
+      
+      return hasElementChanges;
+    }
+    
+    return false; // Ignore other mutation types
   }
 
   /**
@@ -589,6 +683,12 @@ export class SidebarPerformanceCoordinator {
       this.visibilityObserver = null;
     }
 
+    // Clean up event subscription
+    if (this.musicChangeUnsubscribe) {
+      this.musicChangeUnsubscribe();
+      this.musicChangeUnsubscribe = null;
+    }
+
     this.pendingUpdates.clear();
     this.isFlushScheduled = false;
     this.sidebarElement = null;
@@ -609,24 +709,6 @@ export class SidebarPerformanceCoordinator {
   }
 }
 
-// ========================================================================
-// LEGACY ALIAS - RightSidebarCoordinator (Deprecated)
-// ========================================================================
-// Temporary alias for backward compatibility during migration
-// TODO: Remove after all references are updated
-
-/** @deprecated Use SidebarPerformanceCoordinator instead */
-export const RightSidebarCoordinator = SidebarPerformanceCoordinator;
-
-/**
- * Global helper function for easy access
- * @deprecated Use getSidebarPerformanceCoordinator instead
- */
-export function getRightSidebarCoordinator(
-  config?: CoordinatorConfig
-): SidebarPerformanceCoordinator {
-  return SidebarPerformanceCoordinator.getInstance(config);
-}
 
 /**
  * Global helper function for easy access

@@ -1,0 +1,398 @@
+/**
+ * Depth Consciousness System - Year 3000 Organic Architecture
+ * Transforms blur into intentional depth consciousness with content protection
+ * 
+ * Philosophy: "Consciousness that enhances human experience through intelligent,
+ * beautiful interfaces that adapt to serve the user's current need."
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   🌊 DEPTH CONSCIOUSNESS VARIABLES - Foundation Architecture
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Core depth consciousness parameters */
+  --depth-foreground-clarity: 1.0;        /* Content layer clarity (0-1) */
+  --depth-midground-intensity: 0.3;       /* Holographic atmosphere intensity */
+  --depth-background-blur: 8px;           /* Background consciousness blur */
+  
+  /* Content protection system */
+  --content-protection-level: 0.95;       /* How much to protect content (0-1) */
+  --chrome-enhancement-level: 2.0;        /* How much to enhance UI chrome */
+  --text-sanctuary-active: 0;             /* 0/1 flag for text protection mode */
+  
+  /* Breathing consciousness */
+  --consciousness-breath-rate: 4s;        /* Breathing animation duration */
+  --musical-sync-intensity: 0.5;          /* Music synchronization level */
+  --reading-mode-active: 0;               /* 0/1 emergency clarity override */
+  
+  /* Adaptive intelligence */
+  --user-interaction-detected: 0;         /* 0/1 user actively interacting */
+  --content-type-intensity-multiplier: 1; /* Adjust based on content type */
+  --device-capability-scaling: 1;         /* Scale based on device performance */
+  
+  /* Layer z-index management */
+  --content-layer-index: 10;              /* Content always on top */
+  --chrome-layer-index: 5;                /* UI chrome middle layer */
+  --background-layer-index: -5;           /* Background consciousness deep */
+  
+  /* Enhanced holographic variables for consciousness */
+  --consciousness-intensity: calc(
+    var(--holographic-glow-intensity, 0.5) * 
+    var(--content-type-intensity-multiplier) * 
+    var(--device-capability-scaling) *
+    (1 - var(--reading-mode-active) * 0.9)
+  );
+  
+  /* Adaptive protection based on interaction */
+  --adaptive-protection: calc(
+    var(--content-protection-level) + 
+    (var(--user-interaction-detected) * 0.03) +
+    (var(--text-sanctuary-active) * 0.05)
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   🏗️ CONSCIOUSNESS DEPTH SYSTEM - Base Architecture
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.consciousness-depth-system {
+  position: relative;
+  
+  /* Content Sanctuary - Protected Area for Text & Interactions */
+  .content-sanctuary {
+    position: relative;
+    z-index: var(--content-layer-index);
+    backdrop-filter: none; /* No effects on content */
+    
+    /* Text clarity enhancement */
+    text-shadow: none;
+    filter: none;
+    
+    /* Ensure content is always accessible */
+    &, * {
+      /* Override any inherited blur or distortion */
+      backdrop-filter: none !important;
+      filter: contrast(1) saturate(1) brightness(1) !important;
+    }
+    
+    /* Emergency clarity mode - complete effect disable */
+    &.reading-mode-active {
+      --holographic-intensity: 0.01;
+      --consciousness-scanline-opacity: 0.01;
+      --consciousness-scanline-density: 0.01;
+      
+      /* Force clarity on all descendants */
+      * {
+        opacity: 1 !important;
+        backdrop-filter: none !important;
+        filter: none !important;
+      }
+    }
+    
+    /* Interactive element clarity boost */
+    &:hover, &:focus-within {
+      --consciousness-intensity: calc(var(--consciousness-intensity) * 0.5);
+      
+      /* Immediate clarity for interactive elements */
+      transition: all 0.2s ease-out;
+    }
+  }
+  
+  /* Consciousness Chrome - Enhanced UI Areas */
+  .consciousness-chrome {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--chrome-layer-index);
+    pointer-events: none; /* Don't interfere with interactions */
+    
+    /* Holographic enhancement lens */
+    backdrop-filter: 
+      contrast(calc(1 + var(--consciousness-intensity) * 0.05))
+      saturate(calc(1 + var(--consciousness-intensity) * 0.08))
+      brightness(calc(1 + var(--consciousness-intensity) * 0.02));
+    
+    /* Subtle consciousness breathing */
+    opacity: calc(var(--consciousness-intensity) * 0.6);
+    animation: consciousness-breathing var(--consciousness-breath-rate) ease-in-out infinite;
+    
+    /* Enhanced effects in non-content areas only */
+    &:not(.content-area-detected) {
+      backdrop-filter: 
+        contrast(calc(1 + var(--consciousness-intensity) * 0.15))
+        saturate(calc(1 + var(--consciousness-intensity) * 0.2))
+        brightness(calc(1 + var(--consciousness-intensity) * 0.05));
+      
+      opacity: calc(var(--consciousness-intensity) * var(--chrome-enhancement-level) * 0.3);
+    }
+  }
+  
+  /* Background Consciousness - Deep Atmospheric Layer */
+  .consciousness-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--background-layer-index);
+    pointer-events: none;
+    
+    /* Beautiful deep consciousness effects */
+    backdrop-filter: 
+      blur(var(--depth-background-blur))
+      contrast(calc(1 + var(--consciousness-intensity) * 0.1))
+      saturate(calc(1 + var(--consciousness-intensity) * 0.2));
+    
+    /* Cinematic depth enhancement */
+    background: 
+      radial-gradient(
+        ellipse 40% 30% at 30% 70%,
+        rgba(var(--organic-holographic-rgb, 136, 57, 239), calc(var(--consciousness-intensity) * 0.08)) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 50% 40% at 70% 30%,
+        rgba(var(--holographic-scanline-rgb, 180, 142, 173), calc(var(--consciousness-intensity) * 0.06)) 0%,
+        transparent 80%
+      );
+    
+    /* Cinematic blend modes for depth */
+    mix-blend-mode: color-dodge;
+    opacity: calc(var(--consciousness-intensity) * 0.4);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   🎵 BREATHING CONSCIOUSNESS ANIMATIONS
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@keyframes consciousness-breathing {
+  0% {
+    transform: scale(1);
+    opacity: calc(var(--consciousness-intensity) * 0.6);
+  }
+  50% {
+    transform: scale(calc(1 + var(--consciousness-intensity) * 0.02));
+    opacity: calc(var(--consciousness-intensity) * 0.8);
+  }
+  100% {
+    transform: scale(1);
+    opacity: calc(var(--consciousness-intensity) * 0.6);
+  }
+}
+
+/* Gentle breathing for content-adjacent areas */
+@keyframes gentle-consciousness-breathing {
+  0% {
+    backdrop-filter: 
+      contrast(calc(1 + var(--consciousness-intensity) * 0.02))
+      saturate(calc(1 + var(--consciousness-intensity) * 0.03));
+  }
+  50% {
+    backdrop-filter: 
+      contrast(calc(1 + var(--consciousness-intensity) * 0.05))
+      saturate(calc(1 + var(--consciousness-intensity) * 0.08));
+  }
+  100% {
+    backdrop-filter: 
+      contrast(calc(1 + var(--consciousness-intensity) * 0.02))
+      saturate(calc(1 + var(--consciousness-intensity) * 0.03));
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   🎯 CONTENT-AWARE ENHANCEMENT ZONES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Text-heavy content areas - Maximum protection */
+.text-content-area,
+.main-trackList-trackListRow,
+.main-view-container__scroll-node,
+[data-testid*="tracklist"],
+[data-testid*="playlist"] {
+  @extend .content-sanctuary;
+  
+  /* Enhanced text protection */
+  --holographic-intensity: calc(var(--holographic-intensity, 0.5) * 0.1);
+  --consciousness-scanline-opacity: calc(var(--consciousness-scanline-opacity, 0.15) * 0.1);
+  --consciousness-intensity: calc(var(--consciousness-intensity) * 0.1);
+  
+  /* Subtle background enhancement only */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    pointer-events: none;
+    
+    /* Minimal atmospheric enhancement */
+    background: rgba(var(--organic-holographic-rgb, 136, 57, 239), 0.01);
+    animation: gentle-consciousness-breathing calc(var(--consciousness-breath-rate) * 2) ease-in-out infinite;
+  }
+}
+
+/* UI Chrome areas - Enhanced consciousness */
+.ui-chrome-area,
+.Root__nav-bar,
+.Root__top-bar,
+.Root__now-playing-bar,
+.main-topBar-container,
+.main-navBar-navBar {
+  /* Enhanced holographic effects for UI chrome */
+  --holographic-intensity: calc(var(--holographic-intensity, 0.5) * var(--chrome-enhancement-level));
+  --consciousness-scanline-opacity: calc(var(--consciousness-scanline-opacity, 0.15) * var(--chrome-enhancement-level));
+  --consciousness-intensity: calc(var(--consciousness-intensity) * var(--chrome-enhancement-level));
+  
+  /* Full consciousness chrome enhancement */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    pointer-events: none;
+    
+    /* Enhanced chrome consciousness */
+    @extend .consciousness-chrome;
+    
+    /* Stronger atmospheric effects for chrome */
+    background: 
+      linear-gradient(135deg,
+        transparent 0%,
+        rgba(var(--organic-holographic-rgb, 136, 57, 239), calc(var(--consciousness-intensity) * 0.1)) 30%,
+        transparent 70%
+      );
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   🌊 ADAPTIVE CONSCIOUSNESS BEHAVIOR
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* High energy music - More chrome effects, same content protection */
+.music-energy-high {
+  --consciousness-intensity: calc(var(--consciousness-intensity) * 1.3);
+  --chrome-enhancement-level: 2.5;
+  --consciousness-breath-rate: calc(var(--consciousness-breath-rate) * 0.7);
+  
+  /* Content protection increases with energy */
+  .content-sanctuary {
+    --content-protection-level: 0.98;
+    --holographic-intensity: calc(var(--holographic-intensity, 0.5) * 0.05);
+  }
+}
+
+/* Calm music - Gentle effects everywhere */
+.music-energy-calm {
+  --consciousness-intensity: calc(var(--consciousness-intensity) * 0.6);
+  --chrome-enhancement-level: 1.2;
+  --consciousness-breath-rate: calc(var(--consciousness-breath-rate) * 1.8);
+  
+  .content-sanctuary {
+    --content-protection-level: 0.9;
+    --holographic-intensity: calc(var(--holographic-intensity, 0.5) * 0.15);
+  }
+}
+
+/* User interaction detected - Reduce all effects */
+:root[data-user-interacting="true"] {
+  --consciousness-intensity: calc(var(--consciousness-intensity) * 0.7);
+  --user-interaction-detected: 1;
+}
+
+/* Reading mode - Emergency clarity */
+:root[data-reading-mode="true"] {
+  --reading-mode-active: 1;
+  --consciousness-intensity: calc(var(--consciousness-intensity) * 0.1);
+  
+  .consciousness-chrome {
+    opacity: 0.02;
+    animation: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ♿ ACCESSIBILITY & PERFORMANCE CONSCIOUSNESS
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .consciousness-depth-system {
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+  
+  .consciousness-chrome {
+    opacity: calc(var(--consciousness-intensity) * 0.3);
+  }
+}
+
+/* High contrast mode - Enhanced clarity */
+@media (prefers-contrast: high) {
+  :root {
+    --content-protection-level: 0.99;
+    --consciousness-intensity: calc(var(--consciousness-intensity) * 0.5);
+  }
+  
+  .content-sanctuary {
+    background: var(--spice-base);
+    border: 1px solid var(--spice-text);
+  }
+}
+
+/* Low-end device optimization */
+@media (max-width: 768px), (max-height: 600px) {
+  :root {
+    --device-capability-scaling: 0.6;
+    --consciousness-breath-rate: calc(var(--consciousness-breath-rate) * 2);
+  }
+  
+  .consciousness-background {
+    display: none; /* Remove heavy background effects on mobile */
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   🎬 CINEMATIC DEPTH CONSCIOUSNESS INTEGRATION
+   "Interface consciousness that breathes with cellular life while serving the user."
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Integration with existing holographic system */
+.main-view-container {
+  @extend .consciousness-depth-system;
+  
+  /* Override previous problematic effects with consciousness system */
+  &::before {
+    /* Replace old enhancement lens with content-aware consciousness */
+    @extend .consciousness-chrome;
+    
+    /* Content-aware positioning - avoid text overlap */
+    clip-path: polygon(
+      0% 0%, 100% 0%, 100% 20%,    /* Top edge enhancement */
+      80% 20%, 80% 80%,            /* Right edge enhancement */
+      100% 80%, 100% 100%, 0% 100% /* Bottom edge enhancement */
+    );
+    
+    /* Enhanced consciousness only in non-content areas */
+    backdrop-filter: 
+      contrast(calc(1 + var(--consciousness-scanline-density, 0.5) * 0.03))
+      saturate(calc(1 + var(--consciousness-scanline-density, 0.5) * 0.05))
+      brightness(calc(1 + var(--consciousness-scanline-density, 0.5) * 0.01));
+  }
+}
+
+/* Ensure all content areas are protected */
+.main-view-container__scroll-node,
+.main-view-container__scroll-node-child {
+  @extend .content-sanctuary;
+}

@@ -191,7 +191,7 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
     const simpleSystems = [
       'DeviceCapabilityDetector',
       'PerformanceAnalyzer', 
-      'CSSVariableBatcher',
+      'UnifiedCSSConsciousnessController',
       'SettingsManager',
       'TimerConsolidationSystem'
     ];
@@ -200,7 +200,7 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
     const complexSystems = [
       'GlassmorphismManager',
       'Card3DManager',
-      'PerformanceCSSIntegration',
+      'UnifiedCSSConsciousnessController',
       'EnhancedMasterAnimationCoordinator'
     ];
     

@@ -1,6 +1,6 @@
 import { CSSAnimationManager } from './CSSAnimationManager';
 import { EnhancedMasterAnimationCoordinator } from './EnhancedMasterAnimationCoordinator';
-import { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
+import { UnifiedCSSConsciousnessController } from '@/core/css/UnifiedCSSConsciousnessController';
 import { GlobalEventBus } from '@/core/events/EventBus';
 import type { Year3000Config } from '@/types/models';
 
@@ -22,7 +22,7 @@ export class CSSAnimationIntegration {
   private config: Year3000Config;
   private cssAnimationManager: CSSAnimationManager | null = null;
   private animationCoordinator: EnhancedMasterAnimationCoordinator | null = null;
-  private cssVariableManager: UnifiedCSSVariableManager | null = null;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController | null = null;
   private eventBus: typeof GlobalEventBus;
   
   private initialized = false;
@@ -53,18 +53,18 @@ export class CSSAnimationIntegration {
    * Initialize the CSS animation integration
    */
   public initialize(
-    cssVariableManager: UnifiedCSSVariableManager,
+    cssConsciousnessController: UnifiedCSSConsciousnessController,
     animationCoordinator: EnhancedMasterAnimationCoordinator
   ): void {
     if (this.initialized) return;
     
-    this.cssVariableManager = cssVariableManager;
+    this.cssConsciousnessController = cssConsciousnessController;
     this.animationCoordinator = animationCoordinator;
     
     // Create CSS animation manager
     this.cssAnimationManager = new CSSAnimationManager(
       this.config,
-      this.cssVariableManager,
+      this.cssConsciousnessController,
       this.animationCoordinator
     );
     
@@ -85,7 +85,7 @@ export class CSSAnimationIntegration {
     if (!this.cssAnimationManager) return;
     
     // Update bloom intensity
-    this.cssVariableManager?.updateMusicVariables({
+    this.cssConsciousnessController?.updateMusicVariables({
       'beat.pulse.intensity': intensity,
     });
     
@@ -108,7 +108,7 @@ export class CSSAnimationIntegration {
     const duration = options?.duration || 1200;
     
     // Update ripple variables
-    this.cssVariableManager?.updateMusicVariables({
+    this.cssConsciousnessController?.updateMusicVariables({
       'spectrum.phase': intensity * 30,
     });
     
@@ -127,7 +127,7 @@ export class CSSAnimationIntegration {
     this.cssAnimationManager.enableBeatSync(enabled);
     
     // Update CSS variables
-    this.cssVariableManager?.updateUtilityVariables({
+    this.cssConsciousnessController?.updateUtilityVariables({
       'feature.music.sync.enabled': enabled,
     });
   }
@@ -141,7 +141,7 @@ export class CSSAnimationIntegration {
     this.cssAnimationManager.setAnimationIntensity(intensity);
     
     // Update performance variables
-    this.cssVariableManager?.updatePerformanceVariables({
+    this.cssConsciousnessController?.updatePerformanceVariables({
       'quality.level': intensity,
     });
   }
@@ -155,7 +155,7 @@ export class CSSAnimationIntegration {
     this.cssAnimationManager.onPerformanceModeChange(mode);
     
     // Update performance variables
-    this.cssVariableManager?.updatePerformanceVariables({
+    this.cssConsciousnessController?.updatePerformanceVariables({
       'mode': mode,
     });
   }
@@ -168,7 +168,7 @@ export class CSSAnimationIntegration {
     
     // Update tempo-based variables
     const tempoMultiplier = tempo / 120;
-    this.cssVariableManager?.updateMusicVariables({
+    this.cssConsciousnessController?.updateMusicVariables({
       'tempo.bpm': tempo,
     });
     
@@ -185,7 +185,7 @@ export class CSSAnimationIntegration {
     if (!this.cssAnimationManager) return;
     
     // Update refract variables
-    this.cssVariableManager?.updateColorVariables({
+    this.cssConsciousnessController?.updateColorVariables({
       'shift.hue': intensity * 15,
     });
     
@@ -202,7 +202,7 @@ export class CSSAnimationIntegration {
     if (!this.cssAnimationManager) return;
     
     // Update echo variables
-    this.cssVariableManager?.updateMusicVariables({
+    this.cssConsciousnessController?.updateMusicVariables({
       'energy.level': energy,
     });
     
@@ -219,7 +219,7 @@ export class CSSAnimationIntegration {
     if (!this.cssAnimationManager) return;
     
     // Update gravity variables
-    this.cssVariableManager?.updateConsciousnessVariables({
+    this.cssConsciousnessController?.updateConsciousnessVariables({
       'hover.pull': `${Math.abs(mouseX - 0.5) * 20}px`,
       'focus.pull': `${Math.abs(mouseY - 0.5) * 20}px`,
     });

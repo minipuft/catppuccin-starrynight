@@ -141,7 +141,7 @@ export class RightSidebarConsciousnessSystemUnified extends UnifiedSystemBase {
     }
     
     // Check CSS variable system
-    if (!this.cssVariableBatcher) {
+    if (!this.cssConsciousnessController) {
       issues.push('CSS variable batcher not available');
     }
     

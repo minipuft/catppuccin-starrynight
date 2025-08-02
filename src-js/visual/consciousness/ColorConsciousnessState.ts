@@ -8,7 +8,7 @@
  * consciousness-aware atmospheric perspective, and transcendent visual experiences.
  */
 
-import { GlobalEventBus } from "@/core/events/EventBus";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import type { RGB } from "@/types/colorStubs";
 
 export interface ColorConsciousnessState {
@@ -176,12 +176,40 @@ export class ColorConsciousnessManager {
   };
 
   constructor() {
-    // Subscribe to our clean ColorOrchestrator events
-    GlobalEventBus.subscribe('colors/harmonized', this.handleColorUpdate.bind(this));
+    // 🔧 PHASE 1: Migrate to UnifiedEventBus for consciousness integration
+    unifiedEventBus.subscribe('colors:harmonized', (data) => {
+      this.handleUnifiedColorUpdate(data);
+    }, 'ColorConsciousnessManager');
+    
+    // Legacy bridge: Keep GlobalEventBus temporarily during transition
+    // TODO: Remove after Phase 1 validation complete
+    // GlobalEventBus.subscribe('colors/harmonized', this.handleColorUpdate.bind(this));
   }
 
   /**
-   * Handle color updates from our clean ColorOrchestrator
+   * 🔧 PHASE 1: Handle unified color events (New Method)
+   * Processes colors:harmonized events from UnifiedEventBus
+   */
+  private handleUnifiedColorUpdate(data: any): void {
+    const { processedColors, accentHex, accentRgb, coordinationMetrics } = data;
+    
+    // Extract music emotion and beat data from coordination metrics
+    const musicEmotion = coordinationMetrics?.emotionalState || 'neutral';
+    const beatData = coordinationMetrics?.musicInfluenceStrength || 0.5;
+    
+    // Update consciousness state based on musical input
+    this.updateConsciousnessFromMusic(musicEmotion, beatData);
+    
+    // Convert processed colors to consciousness format
+    this.updatePaletteFromUnifiedColors(processedColors, accentHex, accentRgb);
+    
+    // Publish consciousness update for dependent systems
+    this.publishConsciousnessUpdate();
+  }
+
+  /**
+   * Handle color updates from our clean ColorOrchestrator (Legacy Method)
+   * TODO: Remove after Phase 1 validation complete
    */
   private handleColorUpdate(event: any): void {
     const { palette, musicEmotion, beatData } = event.payload;
@@ -240,6 +268,37 @@ export class ColorConsciousnessManager {
       this.consciousnessState.volumetricDepth = 
         Math.min(1.0, beatData.strength * 0.8);
     }
+  }
+
+  /**
+   * 🔧 PHASE 1: Convert unified processed colors to consciousness format
+   * Enhanced with transcendent color properties for UnifiedEventBus integration
+   */
+  private updatePaletteFromUnifiedColors(processedColors: Record<string, string>, accentHex: string, accentRgb: string): void {
+    // Convert processedColors object to palette array
+    const paletteColors = [
+      { hex: accentHex, rgb: this.hexToRgb(accentHex) },
+      { hex: processedColors['primary'] || accentHex, rgb: this.hexToRgb(processedColors['primary'] || accentHex) },
+      { hex: processedColors['secondary'] || accentHex, rgb: this.hexToRgb(processedColors['secondary'] || accentHex) }
+    ].filter(color => color.hex); // Remove any null/undefined colors
+    
+    // Use existing harmony processing logic
+    this.updatePaletteFromHarmony(paletteColors);
+  }
+
+  /**
+   * 🔧 PHASE 1: Helper method to convert hex to RGB
+   */
+  private hexToRgb(hex: string): RGB {
+    // Remove # if present
+    hex = hex.replace('#', '');
+    
+    // Parse hex values
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    return { r, g, b };
   }
 
   /**
@@ -326,9 +385,11 @@ export class ColorConsciousnessManager {
   /**
    * Publish consciousness update for dependent systems
    * Enhanced with transcendent consciousness data
+   * 🔧 PHASE 1: Migrated to UnifiedEventBus
    */
   private publishConsciousnessUpdate(): void {
-    GlobalEventBus.publish('colorConsciousnessUpdate', {
+    // 🔧 PHASE 1: Use UnifiedEventBus for consciousness updates
+    unifiedEventBus.emit('consciousness:updated', {
       type: 'colorConsciousnessUpdate',
       payload: {
         // === Core Data (preserved for compatibility) ===
@@ -355,9 +416,9 @@ export class ColorConsciousnessManager {
     
     // === Specialized Events for Transcendent Systems ===
     
-    // Holographic data stream update
+    // 🔧 PHASE 1: Holographic data stream update via UnifiedEventBus
     if (this.consciousnessState.dataStreamIntensity > 0.5) {
-      GlobalEventBus.publish('holographicStreamUpdate', {
+      unifiedEventBus.emit('consciousness:holographic-stream', {
         type: 'holographicStreamUpdate',
         payload: {
           intensity: this.consciousnessState.dataStreamIntensity,
@@ -367,9 +428,9 @@ export class ColorConsciousnessManager {
       });
     }
     
-    // Temporal pattern recognition
+    // 🔧 PHASE 1: Temporal pattern recognition via UnifiedEventBus
     if (this.consciousnessState.paletteEvolution.temporalPatterns.length > 3) {
-      GlobalEventBus.publish('temporalPatternDetected', {
+      unifiedEventBus.emit('consciousness:temporal-pattern', {
         type: 'temporalPatternDetected',
         payload: {
           patterns: this.consciousnessState.paletteEvolution.temporalPatterns,
@@ -378,9 +439,9 @@ export class ColorConsciousnessManager {
       });
     }
     
-    // Transcendence level changes
+    // 🔧 PHASE 1: Transcendence level changes via UnifiedEventBus
     if (this.consciousnessState.transcendenceLevel > 0.8) {
-      GlobalEventBus.publish('transcendenceLevelHigh', {
+      unifiedEventBus.emit('consciousness:transcendence-high', {
         type: 'transcendenceLevelHigh',
         payload: {
           level: this.consciousnessState.transcendenceLevel,

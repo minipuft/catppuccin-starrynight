@@ -27,11 +27,12 @@ Spotify Web API → MusicSyncService → Audio Processing Pipeline → Visual Sy
 
 ### Core Components
 
-1. **`MusicSyncService`** - Central audio data orchestrator
+1. **`MusicSyncService`** - Central audio data orchestrator with graceful degradation
 2. **`FluxSpectralAnalyzer`** - Advanced frequency domain analysis
 3. **`EmotionalBeatMapping`** - Emotion-to-visual translation
 4. **`ColorHarmonyEngine`** - Audio-driven color processing
 5. **`GenreProfileManager`** - Genre-specific optimization
+6. **Robust Extraction System** - Retry logic and fallback mechanisms
 
 ## MusicSyncService Deep Dive
 
@@ -39,13 +40,18 @@ Spotify Web API → MusicSyncService → Audio Processing Pipeline → Visual Sy
 
 ### Core Capabilities
 
-The `MusicSyncService` is the central nervous system for all audio-visual synchronization:
+The `MusicSyncService` is the central nervous system for all audio-visual synchronization with **robust graceful degradation**:
 
 ```typescript
 interface MusicSyncService {
   // Core audio data processing
   initialize(): Promise<void>;
-  updateAudioData(audioData: AudioData): Promise<void>;
+  processAudioFeatures(audioData: AudioData, trackUri: string, duration: number): Promise<void>;
+  
+  // Robust data extraction with graceful degradation
+  robustColorExtraction(trackUri: string, maxRetries?: number): Promise<Record<string, string> | null>;
+  fetchAudioData(options?: { retryDelay?: number; maxRetries?: number }): Promise<AudioData | null>;
+  getAudioFeatures(): Promise<AudioFeatures | null>;
   
   // Beat synchronization
   startBeatScheduler(): void;
@@ -417,6 +423,132 @@ private updateCinematicEffects(musicData: any): void {
 7. CSSVariableBatcher.setColorTokens()
    ↓
 8. Visual Systems Update
+```
+
+## Graceful Degradation & Resilient Processing
+
+### Overview
+
+The audio integration system implements **comprehensive graceful degradation** to ensure visual systems continue functioning even when individual audio/color extraction strategies fail.
+
+### Promise.allSettled Architecture
+
+**Problem Solved**: Previously, the system used `Promise.all()` which caused complete failure if any single strategy failed.
+
+**Solution**: Replaced with `Promise.allSettled()` for true **partial success handling**:
+
+```typescript
+// OLD: Fail-fast behavior - any failure crashes entire system
+const [audioFeatures, rawColors] = await Promise.all([
+  this.getAudioFeatures(),
+  Spicetify.colorExtractor(trackUri),
+]);
+
+// NEW: Graceful degradation - continue with whatever succeeds
+const results = await Promise.allSettled([
+  this.getAudioFeatures(),
+  this.robustColorExtraction(trackUri),
+]);
+
+const audioFeatures = results[0].status === 'fulfilled' ? results[0].value : null;
+const rawColors = results[1].status === 'fulfilled' ? results[1].value : null;
+```
+
+### Resilient Processing Scenarios
+
+#### ✅ Audio Features Success + Color Extraction Failure
+- **Behavior**: Continue with music analysis, use Catppuccin fallback colors
+- **Visual Result**: Full music synchronization with default theme colors
+- **Performance**: No degradation in music-responsive behaviors
+
+#### ✅ Color Extraction Success + Audio Features Failure
+- **Behavior**: Continue with album color processing, use default music data
+- **Visual Result**: Album-responsive colors with moderate music synchronization
+- **Performance**: Visual updates continue, beat sync uses fallback 120 BPM
+
+#### ✅ Both Success (Normal Operation)
+- **Behavior**: Full processing with complete audio and color data
+- **Visual Result**: Optimal experience with music-responsive album colors
+- **Performance**: Full feature set active
+
+#### ✅ Both Failure (Complete Fallback)
+- **Behavior**: Use hard-coded Catppuccin defaults and synthetic music data
+- **Visual Result**: Static but beautiful Catppuccin theme with breathing animations
+- **Performance**: Minimal resource usage, guaranteed functionality
+
+### Robust Color Extraction System
+
+**Location**: `src-js/audio/MusicSyncService.ts:robustColorExtraction()`
+
+#### Features
+- **Retry Logic**: Exponential backoff with configurable retry attempts (default: 3)
+- **Validation**: Ensures meaningful color data before accepting results
+- **Timeout Protection**: Prevents hanging on unresponsive color extraction
+- **Debug Logging**: Comprehensive logging for troubleshooting extraction issues
+
+```typescript
+async robustColorExtraction(trackUri: string, maxRetries: number = 3): Promise<Record<string, string> | null> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      if (!trackUri) return null;
+      
+      const colors = await Spicetify.colorExtractor(trackUri);
+      
+      // Validate meaningful color data
+      if (colors && typeof colors === 'object' && Object.keys(colors).length > 0) {
+        return colors as Record<string, string>;
+      }
+      
+    } catch (error) {
+      // Log error and wait before retry with exponential backoff
+      if (attempt < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, 100 * attempt));
+      }
+    }
+  }
+  
+  return null; // All attempts failed
+}
+```
+
+### Fallback Color System
+
+When color extraction completely fails, the system uses a carefully selected **Catppuccin fallback palette**:
+
+```typescript
+const FALLBACK_COLORS = {
+  'VIBRANT': '#f2cdcd',          // Catppuccin rosewater - warm primary
+  'DARK_VIBRANT': '#cba6f7',     // Catppuccin mauve - rich accent
+  'LIGHT_VIBRANT': '#f5c2e7',    // Catppuccin pink - bright highlight
+  'PROMINENT': '#cba6f7',        // Catppuccin mauve - consistent accent
+  'VIBRANT_NON_ALARMING': '#f2cdcd', // Catppuccin rosewater - calm primary
+  'DESATURATED': '#9399b2'       // Catppuccin overlay1 - subtle background
+};
+```
+
+**Benefits**:
+- **Guaranteed Aesthetics**: Always beautiful, never jarring or broken
+- **Accessibility**: Maintains proper contrast ratios
+- **Performance**: No processing overhead for fallback colors
+- **Consistency**: Preserves Catppuccin design language
+
+### Error Logging & Debugging
+
+The system provides comprehensive debugging information:
+
+```typescript
+// Strategy failure logging
+if (results[0].status === 'rejected') {
+  console.warn('[MusicSyncService] Audio features retrieval failed, continuing without music analysis:', results[0].reason);
+}
+
+// Success/failure summary
+const successCount = (audioFeatures ? 1 : 0) + (rawColors ? 1 : 0);
+if (successCount === 1) {
+  console.log(`[MusicSyncService] Graceful degradation: Continuing with ${audioFeatures ? 'audio features only' : 'color extraction only'}`);
+} else if (successCount === 0) {
+  console.warn('[MusicSyncService] Both strategies failed, will use fallback data');
+}
 ```
 
 ### Performance Targets

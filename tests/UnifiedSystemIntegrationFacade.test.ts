@@ -10,8 +10,8 @@ import * as Utils from '@/utils/core/Year3000Utilities';
 // Mock all non-visual system imports
 jest.mock('@/core/animation/EnhancedMasterAnimationCoordinator');
 jest.mock('@/core/performance/TimerConsolidationSystem');
-jest.mock('@/core/performance/CSSVariableBatcher');
-jest.mock('@/core/css/UnifiedCSSVariableManager');
+jest.mock('@/core/performance/OptimizedCSSVariableBatcher');
+jest.mock('@/core/css/UnifiedCSSConsciousnessController');
 jest.mock('@/core/performance/UnifiedPerformanceCoordinator');
 jest.mock('@/core/performance/DeviceCapabilityDetector');
 jest.mock('@/core/performance/PerformanceAnalyzer');

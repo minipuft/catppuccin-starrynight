@@ -11,7 +11,7 @@
  */
 
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { MusicSyncService } from "@/audio/MusicSyncService";
@@ -38,9 +38,9 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
   private flowEffectsLayer: HTMLDivElement | null = null;
   private proceduralNebulaLayer: HTMLDivElement | null = null;
   private stellarLayer: HTMLDivElement | null = null;
-  private cssVariableBatcher: CSSVariableBatcher;
-  private emotionalGradientMapper: EmotionalGradientMapper;
-  private genreGradientEvolution: GenreGradientEvolution;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController | null;
+  private emotionalGradientMapper: EmotionalGradientMapper | null;
+  private genreGradientEvolution: GenreGradientEvolution | null;
   private boundMusicSyncHandler: ((event: Event) => void) | null = null;
   private boundSettingsHandler: ((event: Event) => void) | null = null;
 
@@ -70,9 +70,18 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
   ) {
     super(config, utils, performanceMonitor, musicSyncService, settingsManager);
     
-    this.cssVariableBatcher = new CSSVariableBatcher();
-    this.emotionalGradientMapper = new EmotionalGradientMapper(this.cssVariableBatcher, musicSyncService, settingsManager);
-    this.genreGradientEvolution = new GenreGradientEvolution(this.cssVariableBatcher, musicSyncService, this.emotionalGradientMapper, settingsManager);
+    // Initialize CSS Consciousness Controller if available
+    const cssController = UnifiedCSSConsciousnessController.getInstance();
+    if (cssController) {
+      this.cssConsciousnessController = cssController;
+      this.emotionalGradientMapper = new EmotionalGradientMapper(this.cssConsciousnessController, musicSyncService, settingsManager);
+      this.genreGradientEvolution = new GenreGradientEvolution(this.cssConsciousnessController, musicSyncService, this.emotionalGradientMapper, settingsManager);
+    } else {
+      Y3K?.debug?.warn("FluxConsciousnessLayers", "UnifiedCSSConsciousnessController not available, CSS consciousness disabled");
+      this.cssConsciousnessController = null;
+      this.emotionalGradientMapper = null;
+      this.genreGradientEvolution = null;
+    }
     this.boundMusicSyncHandler = this.handleMusicSync.bind(this);
     this.boundSettingsHandler = this.handleSettingsChange.bind(this);
   }
@@ -99,10 +108,14 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
     }
 
     // Initialize emotional gradient mapper
-    await this.emotionalGradientMapper.initialize();
+    if (this.emotionalGradientMapper) {
+      await this.emotionalGradientMapper.initialize();
+    }
     
     // Initialize genre gradient evolution
-    await this.genreGradientEvolution.initialize();
+    if (this.genreGradientEvolution) {
+      await this.genreGradientEvolution.initialize();
+    }
     
     // Create the additional gradient layers
     this.createConsciousnessLayers();
@@ -316,7 +329,7 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
   }
 
   private updateConsciousnessVariables(): void {
-    if (!this.cssVariableBatcher) return;
+    if (!this.cssConsciousnessController) return;
 
     // Runtime performance check - disable if performance degrades
     const currentFPS = (this.performanceMonitor as any)?.currentFPS || 60;
@@ -353,32 +366,34 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
 
     // Apply updates in batch
     updates.forEach(([property, value]) => {
-      if (property && value !== undefined) {
-        this.cssVariableBatcher.setProperty(property, value);
+      if (property && value !== undefined && this.cssConsciousnessController) {
+        this.cssConsciousnessController.setProperty(property, value);
       }
     });
   }
 
   private updateSpectralVariables(): void {
-    if (!this.cssVariableBatcher) return;
+    if (!this.cssConsciousnessController) return;
 
     // Update spectral analysis variables
-    this.cssVariableBatcher.setProperty("--sn-gradient-bass-response", this.spectralData.bassResponse.toString());
-    this.cssVariableBatcher.setProperty("--sn-gradient-mid-response", this.spectralData.midResponse.toString());
-    this.cssVariableBatcher.setProperty("--sn-gradient-treble-response", this.spectralData.trebleResponse.toString());
-    this.cssVariableBatcher.setProperty("--sn-gradient-vocal-presence", this.spectralData.vocalPresence.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-bass-response", this.spectralData.bassResponse.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-mid-response", this.spectralData.midResponse.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-treble-response", this.spectralData.trebleResponse.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-vocal-presence", this.spectralData.vocalPresence.toString());
   }
 
   private updateQuantumCoherence(beatIntensity: number): void {
-    if (!this.cssVariableBatcher) return;
+    if (!this.cssConsciousnessController) return;
 
     // Quantum coherence increases with beat intensity
     const coherence = Math.min(this.settings.quantumCoherence + (beatIntensity * 0.3), 1.0);
-    this.cssVariableBatcher.setProperty("--sn-gradient-quantum-coherence", coherence.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-quantum-coherence", coherence.toString());
     
     // Gradually decay back to base level
     setTimeout(() => {
-      this.cssVariableBatcher.setProperty("--sn-gradient-quantum-coherence", this.settings.quantumCoherence.toString());
+      if (this.cssConsciousnessController) {
+        this.cssConsciousnessController.setProperty("--sn-gradient-quantum-coherence", this.settings.quantumCoherence.toString());
+      }
     }, 500);
   }
 
@@ -389,8 +404,8 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
     const currentTime = performance.now();
     const temporalPhase = (currentTime / 10000) % 1; // 10 second cycle
     
-    if (this.cssVariableBatcher) {
-      this.cssVariableBatcher.setProperty("--sn-gradient-temporal-phase", temporalPhase.toString());
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.setProperty("--sn-gradient-temporal-phase", temporalPhase.toString());
     }
   }
 
@@ -398,10 +413,14 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
     super._performSystemSpecificCleanup();
 
     // Cleanup emotional gradient mapper
-    this.emotionalGradientMapper.destroy();
+    if (this.emotionalGradientMapper) {
+      this.emotionalGradientMapper.destroy();
+    }
     
     // Cleanup genre gradient evolution
-    this.genreGradientEvolution.destroy();
+    if (this.genreGradientEvolution) {
+      this.genreGradientEvolution.destroy();
+    }
 
     // Remove event listeners
     if (this.boundMusicSyncHandler) {
@@ -469,13 +488,13 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
     }
 
     // Set all consciousness variables to disabled state
-    if (this.cssVariableBatcher) {
-      this.cssVariableBatcher.setProperty("--sn-gradient-consciousness-level", "0");
-      this.cssVariableBatcher.setProperty("--sn-gradient-layer-consciousness", "0");
-      this.cssVariableBatcher.setProperty("--sn-gradient-layer-temporal", "0");
-      this.cssVariableBatcher.setProperty("--sn-gradient-layer-harmonic", "0");
-      this.cssVariableBatcher.setProperty("--sn-gradient-layer-quantum", "0");
-      this.cssVariableBatcher.setProperty("--sn-gradient-layer-stellar", "0");
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.setProperty("--sn-gradient-consciousness-level", "0");
+      this.cssConsciousnessController.setProperty("--sn-gradient-layer-consciousness", "0");
+      this.cssConsciousnessController.setProperty("--sn-gradient-layer-temporal", "0");
+      this.cssConsciousnessController.setProperty("--sn-gradient-layer-harmonic", "0");
+      this.cssConsciousnessController.setProperty("--sn-gradient-layer-quantum", "0");
+      this.cssConsciousnessController.setProperty("--sn-gradient-layer-stellar", "0");
     }
   }
 
@@ -495,8 +514,8 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
   }
 
   public setStellarDrift(drift: number): void {
-    if (this.cssVariableBatcher) {
-      this.cssVariableBatcher.setProperty("--sn-gradient-stellar-drift", `${drift}deg`);
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.setProperty("--sn-gradient-stellar-drift", `${drift}deg`);
     }
   }
 
@@ -509,19 +528,19 @@ export class FluxConsciousnessLayers extends BaseVisualSystem {
       stellarDensity: this.settings.stellarDensity,
       dimensionalDepth: this.settings.dimensionalDepth,
       spectralData: { ...this.spectralData },
-      emotionalProfile: this.emotionalGradientMapper.getCurrentEmotionalProfile(),
-      gradientState: this.emotionalGradientMapper.getCurrentGradientState(),
-      currentGenre: this.genreGradientEvolution.getCurrentGenre(),
-      genreConfidence: this.genreGradientEvolution.getGenreConfidence(),
-      genreHistory: this.genreGradientEvolution.getGenreHistory()
+      emotionalProfile: this.emotionalGradientMapper?.getCurrentEmotionalProfile() || null,
+      gradientState: this.emotionalGradientMapper?.getCurrentGradientState() || null,
+      currentGenre: this.genreGradientEvolution?.getCurrentGenre() || null,
+      genreConfidence: this.genreGradientEvolution?.getGenreConfidence() || 0,
+      genreHistory: this.genreGradientEvolution?.getGenreHistory() || []
     };
   }
 
-  public getEmotionalGradientMapper(): EmotionalGradientMapper {
+  public getEmotionalGradientMapper(): EmotionalGradientMapper | null {
     return this.emotionalGradientMapper;
   }
 
-  public getGenreGradientEvolution(): GenreGradientEvolution {
+  public getGenreGradientEvolution(): GenreGradientEvolution | null {
     return this.genreGradientEvolution;
   }
 }

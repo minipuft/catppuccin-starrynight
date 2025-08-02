@@ -11,7 +11,7 @@ This comprehensive troubleshooting guide addresses common issues in the Catppucc
 1. **Organic Debugging** - Understanding issues as consciousness imbalances rather than mere errors
 2. **System-Wide Analysis** - Examining issues across the entire facade pattern architecture
 3. **Performance-Conscious Solutions** - Fixing issues while maintaining performance targets
-4. **Multi-Agent Awareness** - Considering tentacle coordination when diagnosing problems
+4. **Multi-Agent Awareness** - Considering agent coordination when diagnosing problems
 5. **Graceful Recovery** - Implementing self-healing mechanisms for robust operation
 
 ## Common Issues and Solutions
@@ -605,16 +605,16 @@ class MusicSyncDiagnostic {
 - Multiple agents working on same files simultaneously
 - Git merge conflicts
 - Resource allocation conflicts
-- Communication breakdown between tentacles
+- Communication breakdown between agents
 
 **Diagnosis:**
 ```typescript
 // Tentacle coordination diagnostic
 class TentacleCoordinationDiagnostic {
-  static async diagnoseTentacleIssues(): Promise<void> {
-    // Check tentacle registry
-    const registry = await this.readTentacleRegistry();
-    console.log('Active tentacles:', registry.activeTentacles);
+  static async diagnoseAgentIssues(): Promise<void> {
+    // Check agent coordination
+    const coordination = await this.readAgentCoordination();
+    console.log('Active agents:', coordination.activeAgents);
     console.log('Resource allocations:', registry.resourceAllocations);
     
     // Check for conflicts
@@ -630,14 +630,14 @@ class TentacleCoordinationDiagnostic {
   
   private static async readTentacleRegistry(): Promise<TentacleRegistry> {
     try {
-      // Read tentacle registry from plans/TENTACLE-REGISTRY.md
-      const response = await fetch('/plans/TENTACLE-REGISTRY.md');
+      // Read agent coordination from plans/agent-coordination.md
+      const response = await fetch('/plans/agent-coordination.md');
       const content = await response.text();
       
       return this.parseTentacleRegistry(content);
     } catch (error) {
-      console.error('Failed to read tentacle registry:', error);
-      return { activeTentacles: [], resourceAllocations: [] };
+      console.error('Failed to read agent coordination:', error);
+      return { activeAgents: [], resourceAllocations: [] };
     }
   }
   
@@ -652,17 +652,17 @@ class TentacleCoordinationDiagnostic {
         if (!resourceMap.has(resource)) {
           resourceMap.set(resource, []);
         }
-        resourceMap.get(resource)!.push(allocation.tentacleId);
+        resourceMap.get(resource)!.push(allocation.agentId);
       });
     });
     
     // Find conflicting resources
-    resourceMap.forEach((tentacles, resource) => {
-      if (tentacles.length > 1) {
+    resourceMap.forEach((agents, resource) => {
+      if (agents.length > 1) {
         conflicts.push({
           type: 'resource-conflict',
           resource,
-          conflictingTentacles: tentacles
+          conflictingAgents: agents
         });
       }
     });
@@ -702,35 +702,35 @@ class TentacleCoordinationDiagnostic {
      
      private static async resolveResourceConflict(conflict: TentacleConflict): Promise<void> {
        // Implement priority-based resource allocation
-       const tentacles = conflict.conflictingTentacles;
+       const agents = conflict.conflictingAgents;
        const priorities = await Promise.all(
-         tentacles.map(id => this.getTentaclePriority(id))
+         agents.map(id => this.getAgentPriority(id))
        );
        
        // Sort by priority (highest first)
-       const sortedTentacles = tentacles
+       const sortedAgents = agents
          .map((id, index) => ({ id, priority: priorities[index] }))
          .sort((a, b) => b.priority - a.priority);
        
-       // Allocate resource to highest priority tentacle
-       const winner = sortedTentacles[0];
-       const losers = sortedTentacles.slice(1);
+       // Allocate resource to highest priority agent
+       const winner = sortedAgents[0];
+       const losers = sortedAgents.slice(1);
        
        console.log(`Resolving resource conflict: ${conflict.resource} -> ${winner.id}`);
        
-       // Notify losing tentacles
+       // Notify losing agents
        for (const loser of losers) {
-         await this.notifyTentacleResourceLoss(loser.id, conflict.resource);
+         await this.notifyAgentResourceLoss(loser.id, conflict.resource);
        }
        
        // Update registry
        await this.updateResourceAllocation(winner.id, conflict.resource);
      }
      
-     private static async getTentaclePriority(tentacleId: string): Promise<number> {
-       // Read tentacle priority from status file
+     private static async getAgentPriority(agentId: string): Promise<number> {
+       // Read agent priority from status file
        try {
-         const response = await fetch(`/plans/${tentacleId}/TENTACLE-STATUS.md`);
+         const response = await fetch(`/plans/tasks/${agentId}/status.md`);
          const content = await response.text();
          
          const priorityMatch = content.match(/Priority:\s*(\w+)/i);
@@ -739,7 +739,7 @@ class TentacleCoordinationDiagnostic {
            return priority === 'high' ? 3 : priority === 'medium' ? 2 : 1;
          }
        } catch (error) {
-         console.warn(`Failed to read priority for ${tentacleId}:`, error);
+         console.warn(`Failed to read priority for ${agentId}:`, error);
        }
        
        return 1; // Default priority
@@ -755,7 +755,7 @@ class TentacleCoordinationDiagnostic {
      private static maxLogSize = 100;
      
      static async restoreCommunication(): Promise<void> {
-       console.log('Restoring tentacle communication...');
+       console.log('Restoring agent communication...');
        
        // 1. Clear communication backlog
        this.clearCommunicationBacklog();
@@ -763,8 +763,8 @@ class TentacleCoordinationDiagnostic {
        // 2. Re-establish communication channels
        await this.reestablishChannels();
        
-       // 3. Synchronize tentacle states
-       await this.synchronizeTentacleStates();
+       // 3. Synchronize agent states
+       await this.synchronizeAgentStates();
        
        // 4. Resume normal operation
        this.resumeNormalOperation();
@@ -775,11 +775,11 @@ class TentacleCoordinationDiagnostic {
        this.communicationLog = [];
        
        // Reset communication timers
-       document.querySelectorAll('[data-tentacle-timer]').forEach(element => {
-         const timerId = element.getAttribute('data-tentacle-timer');
+       document.querySelectorAll('[data-agent-timer]').forEach(element => {
+         const timerId = element.getAttribute('data-agent-timer');
          if (timerId) {
            clearTimeout(parseInt(timerId));
-           element.removeAttribute('data-tentacle-timer');
+           element.removeAttribute('data-agent-timer');
          }
        });
      }

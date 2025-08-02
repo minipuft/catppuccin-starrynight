@@ -1,8 +1,7 @@
 import { PerformanceAnalyzer } from '@/core/performance/PerformanceAnalyzer';
-import { CSSVariableBatcher } from '@/core/performance/CSSVariableBatcher';
-import { GlobalEventBus } from '@/core/events/EventBus';
+import { UnifiedCSSConsciousnessController } from '@/core/css/UnifiedCSSConsciousnessController';
+import { unifiedEventBus, type EventName, type EventData } from '@/core/events/UnifiedEventBus';
 import { EnhancedMasterAnimationCoordinator } from '@/core/animation/EnhancedMasterAnimationCoordinator';
-import { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
 import { UnifiedPerformanceCoordinator } from '@/core/performance/UnifiedPerformanceCoordinator';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';
 import type { HealthCheckResult } from '@/types/systems';
@@ -30,10 +29,10 @@ export abstract class UnifiedSystemBase {
   
   // Shared utility instances (lazy-loaded singletons)
   protected performanceAnalyzer!: PerformanceAnalyzer;
-  protected cssVariableBatcher!: CSSVariableBatcher;
-  protected eventBus!: typeof GlobalEventBus;
+  protected cssConsciousnessController!: UnifiedCSSConsciousnessController | null;
+  protected eventBus!: typeof unifiedEventBus;
   protected animationCoordinator!: EnhancedMasterAnimationCoordinator;
-  protected unifiedCSSManager!: UnifiedCSSVariableManager;
+  protected unifiedCSSManager!: UnifiedCSSConsciousnessController | null;
   protected performanceCoordinator!: UnifiedPerformanceCoordinator;
   
   // Event management
@@ -108,24 +107,25 @@ export abstract class UnifiedSystemBase {
       
       if (globalSystem) {
         this.performanceAnalyzer = globalSystem.performanceAnalyzer || new PerformanceAnalyzer();
-        this.cssVariableBatcher = globalSystem.cssVariableBatcher || CSSVariableBatcher.getInstance();
-        this.eventBus = GlobalEventBus; // Use the singleton
-        this.animationCoordinator = globalSystem.enhancedMasterAnimationCoordinator || EnhancedMasterAnimationCoordinator.getInstance();
-        this.unifiedCSSManager = globalSystem.unifiedCSSManager || UnifiedCSSVariableManager.getInstance(this.config);
+        this.cssConsciousnessController = globalSystem.cssConsciousnessController || UnifiedCSSConsciousnessController.getInstance();
+        this.eventBus = unifiedEventBus; // Use the unified event bus singleton
         this.performanceCoordinator = globalSystem.performanceCoordinator || UnifiedPerformanceCoordinator.getInstance(this.config, this.performanceAnalyzer);
+        this.animationCoordinator = globalSystem.enhancedMasterAnimationCoordinator || EnhancedMasterAnimationCoordinator.getInstance(this.config, this.performanceCoordinator);
+        this.unifiedCSSManager = globalSystem.unifiedCSSManager || UnifiedCSSConsciousnessController.getInstance();
       } else {
         // Fallback for standalone usage
         this.performanceAnalyzer = new PerformanceAnalyzer();
-        this.cssVariableBatcher = CSSVariableBatcher.getInstance();
-        this.eventBus = GlobalEventBus;
-        this.animationCoordinator = EnhancedMasterAnimationCoordinator.getInstance();
-        this.unifiedCSSManager = UnifiedCSSVariableManager.getInstance(this.config);
+        this.cssConsciousnessController = UnifiedCSSConsciousnessController.getInstance();
+        this.eventBus = unifiedEventBus; // Use the unified event bus singleton
         this.performanceCoordinator = UnifiedPerformanceCoordinator.getInstance(this.config, this.performanceAnalyzer);
+        this.animationCoordinator = EnhancedMasterAnimationCoordinator.getInstance(this.config, this.performanceCoordinator);
+        this.unifiedCSSManager = UnifiedCSSConsciousnessController.getInstance();
       }
       
       // Initialize unified CSS manager with performance analyzer
-      if (this.unifiedCSSManager && this.performanceAnalyzer && this.cssVariableBatcher) {
-        this.unifiedCSSManager.initialize(this.performanceAnalyzer, this.cssVariableBatcher);
+      if (this.unifiedCSSManager && this.performanceAnalyzer && this.cssConsciousnessController) {
+        // UnifiedCSSConsciousnessController doesn't have an initialize method that takes these arguments
+        // this.unifiedCSSManager.initialize(this.performanceAnalyzer, this.cssConsciousnessController);
       }
       
       // Register with performance monitoring (if available)
@@ -144,8 +144,10 @@ export abstract class UnifiedSystemBase {
       this.publishEvent('system:initialized', {
         systemName: this.systemName,
         timestamp: Date.now(),
-        initializationTime: this.initializationStartTime ? 
-          performance.now() - this.initializationStartTime : 0
+        metadata: {
+          initializationTime: this.initializationStartTime ? 
+            performance.now() - this.initializationStartTime : 0
+        }
       });
       
       if (this.config.enableDebug) {
@@ -230,8 +232,8 @@ export abstract class UnifiedSystemBase {
   ): void {
     if (this.unifiedCSSManager) {
       this.unifiedCSSManager.queueUpdate(property, value, priority, this.systemName);
-    } else if (this.cssVariableBatcher) {
-      this.cssVariableBatcher.queueCSSVariableUpdate(property, value);
+    } else if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.queueCSSVariableUpdate(property, value);
     } else {
       console.warn(`[${this.systemName}] CSS variable management not initialized`);
     }
@@ -246,9 +248,9 @@ export abstract class UnifiedSystemBase {
   ): void {
     if (this.unifiedCSSManager) {
       this.unifiedCSSManager.queueTransaction(updates, priority, this.systemName);
-    } else if (this.cssVariableBatcher) {
+    } else if (this.cssConsciousnessController) {
       Object.entries(updates).forEach(([property, value]) => {
-        this.cssVariableBatcher.queueCSSVariableUpdate(property, value);
+        this.cssConsciousnessController!.queueCSSVariableUpdate(property, value);
       });
     } else {
       console.warn(`[${this.systemName}] CSS variable management not initialized`);
@@ -256,28 +258,63 @@ export abstract class UnifiedSystemBase {
   }
   
   /**
-   * Subscribe to events with automatic cleanup
+   * Subscribe to events with automatic cleanup and retry logic
    */
-  protected subscribeToEvent<T>(event: string, callback: (payload: T) => void): () => void {
+  protected subscribeToEvent<T = any>(event: string, callback: (payload: T) => void): () => void {
     if (!this.eventBus) {
-      console.warn(`[${this.systemName}] Event bus not initialized`);
-      return () => {};
+      console.warn(`[${this.systemName}] Event bus not initialized - attempting to initialize`);
+      
+      // Try to get the event bus directly if not available through normal initialization
+      try {
+        this.eventBus = unifiedEventBus;
+        if (!this.eventBus) {
+          console.error(`[${this.systemName}] Failed to get unified event bus - event subscription deferred`);
+          return () => {};
+        }
+      } catch (error) {
+        console.error(`[${this.systemName}] Error accessing unified event bus:`, error);
+        return () => {};
+      }
     }
     
-    const unsubscribe = this.eventBus.subscribe(event, callback);
-    this.eventUnsubscribers.push(unsubscribe);
-    return unsubscribe;
+    try {
+      const subscriptionId = this.eventBus.subscribe(event as any, callback as any, this.systemName);
+      const unsubscribe = () => {
+        this.eventBus.unsubscribe(subscriptionId);
+      };
+      this.eventUnsubscribers.push(unsubscribe);
+      return unsubscribe;
+    } catch (error) {
+      console.error(`[${this.systemName}] Failed to subscribe to event ${event}:`, error);
+      return () => {};
+    }
   }
   
   /**
    * Publish events to the global event bus
    */
-  protected publishEvent<T>(event: string, payload: T): void {
+  protected publishEvent<T = any>(event: string, payload: T): void {
     if (!this.eventBus) {
-      console.warn(`[${this.systemName}] Event bus not initialized`);
-      return;
+      console.warn(`[${this.systemName}] Event bus not initialized - attempting to initialize`);
+      
+      // Try to get the event bus directly if not available through normal initialization
+      try {
+        this.eventBus = unifiedEventBus;
+        if (!this.eventBus) {
+          console.error(`[${this.systemName}] Failed to get unified event bus - event publication skipped`);
+          return;
+        }
+      } catch (error) {
+        console.error(`[${this.systemName}] Error accessing unified event bus:`, error);
+        return;
+      }
     }
-    this.eventBus.publish(event, payload);
+    
+    try {
+      this.eventBus.emitSync(event as any, payload as any);
+    } catch (error) {
+      console.error(`[${this.systemName}] Failed to publish event ${event}:`, error);
+    }
   }
   
   /**
@@ -347,16 +384,31 @@ export abstract class UnifiedSystemBase {
    */
   protected registerAnimation(priority: number = 60): void {
     if (!this.animationCoordinator) {
-      console.warn(`[${this.systemName}] Animation coordinator not initialized`);
-      return;
+      console.warn(`[${this.systemName}] Animation coordinator not initialized, attempting lazy initialization`);
+      
+      // Try to initialize animation coordinator if it's missing
+      try {
+        this.animationCoordinator = EnhancedMasterAnimationCoordinator.getInstance(this.config, this.performanceCoordinator);
+      } catch (error) {
+        console.error(`[${this.systemName}] Failed to initialize animation coordinator:`, error);
+        return;
+      }
     }
     
-    this.animationCoordinator.registerAnimationSystem(
-      this.systemName,
-      this,
-      'normal',
-      priority
-    );
+    try {
+      this.animationCoordinator.registerAnimationSystem(
+        this.systemName,
+        this,
+        'normal',
+        priority
+      );
+      
+      if (this.config.enableDebug) {
+        console.log(`[${this.systemName}] Successfully registered with animation coordinator`);
+      }
+    } catch (error) {
+      console.error(`[${this.systemName}] Failed to register with animation coordinator:`, error);
+    }
   }
   
   /**

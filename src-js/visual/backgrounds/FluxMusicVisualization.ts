@@ -1,24 +1,38 @@
 /**
- * FluxMusicVisualization - CSS-Native Music Consciousness Visualization
+ * FluxMusicVisualization - Modern CSS-Native Music Consciousness Visualization
  * Part of the Year 3000 Musical Gradient System
  *
- * Creates pure CSS music visualization effects that respond to spectral analysis:
- * - Consciousness-pulse animations synced to music
- * - Frequency-reactive visual elements
- * - Temporal flow visualization
- * - Harmonic resonance display
- * - Emotional gradient morphing
+ * Modern consciousness-aware music visualization system that integrates with:
+ * - VisualSystemFacade for proper dependency injection
+ * - BackgroundConsciousnessChoreographer for unified consciousness
+ * - CSS-native effects through SCSS instead of DOM manipulation
+ * - Unified event bus for music synchronization
+ * - Performance monitoring and adaptive quality scaling
+ *
+ * @architecture Year 3000 System - Phase 4 Facade Integration
+ * @replaces Legacy DOM manipulation with CSS consciousness variables
  */
 
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
-import { FluxSpectralAnalyzer, SpectralData } from "@/audio/FluxSpectralAnalyzer";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { Y3K } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
+import type { HealthCheckResult } from "@/types/systems";
+import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+
+// Consciousness integration imports
+import type { BackgroundConsciousnessChoreographer } from "@/visual/consciousness/BackgroundConsciousnessChoreographer";
+import type { 
+  ConsciousnessField, 
+  BackgroundSystemParticipant 
+} from "@/visual/consciousness/BackgroundConsciousnessChoreographer";
+import {
+  ChoreographyEventResponder,
+  MusicSyncUtilities
+} from "@/visual/consciousness/SharedBackgroundConsciousnessUtilities";
 
 export interface MusicVisualizationSettings {
   enabled: boolean;
@@ -31,14 +45,40 @@ export interface MusicVisualizationSettings {
   emotionalMorphing: boolean; // Morph based on emotional content
 }
 
-export class FluxMusicVisualization extends BaseVisualSystem {
-  private spectralAnalyzer: FluxSpectralAnalyzer;
-  private cssVariableBatcher: CSSVariableBatcher;
-  private visualizationElements: HTMLElement[] = [];
-  private boundSpectralHandler: ((event: Event) => void) | null = null;
-  private boundBeatHandler: ((event: Event) => void) | null = null;
-  private boundSettingsHandler: ((event: Event) => void) | null = null;
+export interface FluxVisualizationMetrics {
+  isActive: boolean;
+  consciousnessLevel: number;
+  temporalProgress: number;
+  harmonicResonance: number;
+  spectralData: {
+    bass: number;
+    mid: number;
+    treble: number;
+    vocal: number;
+  };
+  emotionalState: {
+    intensity: number;
+    valence: number;
+  };
+}
+
+export class FluxMusicVisualization extends BaseVisualSystem implements BackgroundSystemParticipant {
+  // Required BackgroundSystemParticipant implementation
+  public override readonly systemName: string = 'FluxMusicVisualization';
+  public get systemPriority(): 'low' | 'normal' | 'high' | 'critical' {
+    return 'low'; // Music visualization is low priority for performance
+  }
+
+  // Modern dependencies (injected through facade)
+  private cssConsciousnessController: any = null; // Will be injected by facade
+  private eventBus: any = null; // Will be injected by facade
+  private consciousnessChoreographer: BackgroundConsciousnessChoreographer | null = null;
+  private currentConsciousnessField: ConsciousnessField | null = null;
   
+  // CSS class management
+  private appliedCSSClasses: Set<string> = new Set();
+  private targetElement: HTMLElement | null = null;
+
   private settings: MusicVisualizationSettings = {
     enabled: true,
     consciousnessMode: "aware",
@@ -50,25 +90,36 @@ export class FluxMusicVisualization extends BaseVisualSystem {
     emotionalMorphing: true
   };
 
-  private lastSpectralData: SpectralData | null = null;
-  private animationFrameId: number | null = null;
-  private isAnimating = false;
+  // Modern state management
+  private currentMetrics: FluxVisualizationMetrics;
+  private lastMusicUpdate = 0;
+  private animationPhase = 0;
+  public override isActive = false; // Override base class property
+  
+  // Performance tracking
+  private updateCount = 0;
+  private averageUpdateTime = 0;
 
   constructor(
     config: Year3000Config = YEAR3000_CONFIG,
-    utils: typeof import("@/utils/core/Year3000Utilities"),
+    utils: typeof Year3000Utilities,
     performanceMonitor: PerformanceAnalyzer,
     musicSyncService: MusicSyncService | null = null,
-    settingsManager: SettingsManager | null = null
+    settingsManager: SettingsManager | null = null,
+    year3000System: any = null
   ) {
     super(config, utils, performanceMonitor, musicSyncService, settingsManager);
     
-    this.cssVariableBatcher = new CSSVariableBatcher();
-    this.spectralAnalyzer = new FluxSpectralAnalyzer(this.cssVariableBatcher, musicSyncService);
+    // Get consciousness choreographer from year3000System if available
+    this.consciousnessChoreographer = year3000System?.backgroundConsciousnessChoreographer || null;
     
-    this.boundSpectralHandler = this.handleSpectralData.bind(this);
-    this.boundBeatHandler = this.handleBeatDetection.bind(this);
-    this.boundSettingsHandler = this.handleSettingsChange.bind(this);
+    // Initialize current metrics
+    this.currentMetrics = this.createInitialMetrics();
+    
+    // Find target element for CSS class application
+    this.targetElement = document.body; // Fallback to body
+    
+    Y3K?.debug?.log('FluxMusicVisualization', 'Modern CSS-native music visualization initialized');
   }
 
   public override async _performSystemSpecificInitialization(): Promise<void> {
@@ -83,22 +134,21 @@ export class FluxMusicVisualization extends BaseVisualSystem {
     }
 
     try {
-      // Initialize spectral analyzer
-      await this.spectralAnalyzer.initialize();
+      // Initialize CSS class management
+      this.initializeCSSIntegration();
       
-      // Create visualization elements
-      this.createVisualizationElements();
-      
-      // Subscribe to events
+      // Subscribe to unified event bus
       this.subscribeToEvents();
       
-      // Start spectral analysis
-      this.spectralAnalyzer.start();
+      // Register with consciousness choreographer
+      this.registerWithConsciousnessChoreographer();
       
-      // Start animation loop
-      this.startAnimation();
+      // Apply initial CSS state
+      this.updateCSSState();
       
-      Y3K?.debug?.log("FluxMusicVisualization", "Music visualization system activated");
+      this.isActive = true;
+      
+      Y3K?.debug?.log("FluxMusicVisualization", "Modern CSS-native visualization system activated");
       
     } catch (error) {
       Y3K?.debug?.error("FluxMusicVisualization", "Failed to initialize:", error);
@@ -122,6 +172,51 @@ export class FluxMusicVisualization extends BaseVisualSystem {
     }
   }
 
+  /**
+   * Initialize CSS integration and target element discovery
+   */
+  private initializeCSSIntegration(): void {
+    // Find best target element for CSS class application
+    const containers = [
+      ".Root__main-view",
+      ".main-view-container", 
+      ".Root__top-container",
+      "body"
+    ];
+
+    for (const selector of containers) {
+      const element = document.querySelector(selector) as HTMLElement;
+      if (element) {
+        this.targetElement = element;
+        break;
+      }
+    }
+
+    Y3K?.debug?.log("FluxMusicVisualization", `CSS target element: ${this.targetElement?.tagName || 'body'}`);
+  }
+
+  /**
+   * Create initial metrics object
+   */
+  private createInitialMetrics(): FluxVisualizationMetrics {
+    return {
+      isActive: this.isActive,
+      consciousnessLevel: 0,
+      temporalProgress: 0,
+      harmonicResonance: 0,
+      spectralData: {
+        bass: 0,
+        mid: 0,
+        treble: 0,
+        vocal: 0
+      },
+      emotionalState: {
+        intensity: 0.5,
+        valence: 0.5
+      }
+    };
+  }
+
   private mapComplexity(mode: "dormant" | "aware" | "transcendent"): number {
     switch (mode) {
       case "dormant": return 0.3;
@@ -140,419 +235,613 @@ export class FluxMusicVisualization extends BaseVisualSystem {
     }
   }
 
-  private createVisualizationElements(): void {
-    const targetContainer = this.findSpotifyContainer();
-    
-    // Create consciousness pulse element
-    const consciousnessPulse = this.createConsciousnessPulse();
-    targetContainer.appendChild(consciousnessPulse);
-    this.visualizationElements.push(consciousnessPulse);
-    
-    // Create frequency band visualizers
-    if (this.settings.spectralVisualization) {
-      const frequencyBands = this.createFrequencyBands();
-      frequencyBands.forEach(band => {
-        targetContainer.appendChild(band);
-        this.visualizationElements.push(band);
-      });
+  /**
+   * Register with consciousness choreographer for unified consciousness
+   */
+  private registerWithConsciousnessChoreographer(): void {
+    if (!this.consciousnessChoreographer) {
+      Y3K?.debug?.log('FluxMusicVisualization', 'Consciousness choreographer not available, skipping registration');
+      return;
     }
     
-    // Create temporal flow visualizer
-    const temporalFlow = this.createTemporalFlow();
-    targetContainer.appendChild(temporalFlow);
-    this.visualizationElements.push(temporalFlow);
-    
-    // Create harmonic resonance visualizer
-    const harmonicResonance = this.createHarmonicResonance();
-    targetContainer.appendChild(harmonicResonance);
-    this.visualizationElements.push(harmonicResonance);
-    
-    Y3K?.debug?.log("FluxMusicVisualization", `Created ${this.visualizationElements.length} visualization elements`);
+    try {
+      this.consciousnessChoreographer.registerConsciousnessParticipant(this);
+      Y3K?.debug?.log('FluxMusicVisualization', 'Successfully registered with consciousness choreographer');
+    } catch (error) {
+      Y3K?.debug?.error('FluxMusicVisualization', 'Failed to register with consciousness choreographer:', error);
+    }
   }
 
-  private createConsciousnessPulse(): HTMLElement {
-    const pulse = document.createElement("div");
-    pulse.className = "sn-consciousness-pulse";
-    pulse.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      width: 100px;
-      height: 100px;
-      margin: -50px 0 0 -50px;
-      border-radius: 50%;
-      background: radial-gradient(circle, 
-        rgba(var(--sn-gradient-primary-rgb), 0.1) 0%, 
-        rgba(var(--sn-gradient-secondary-rgb), 0.05) 50%, 
-        transparent 100%);
-      z-index: -12;
-      pointer-events: none;
-      will-change: transform, opacity;
-      transition: all 0.1s ease-out;
-      opacity: 0;
-    `;
-    
-    return pulse;
-  }
+  /**
+   * Update CSS state and classes based on current settings and metrics
+   */
+  private updateCSSState(): void {
+    if (!this.targetElement || !this.cssConsciousnessController) return;
 
-  private createFrequencyBands(): HTMLElement[] {
-    const bands: HTMLElement[] = [];
-    const bandNames = ['bass', 'mid', 'treble', 'vocal'];
+    // Apply consciousness mode class
+    this.applyCSSClass(`sn-consciousness-${this.settings.consciousnessMode}`);
     
-    bandNames.forEach((name, index) => {
-      const band = document.createElement("div");
-      band.className = `sn-frequency-band sn-frequency-${name}`;
-      band.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        left: ${20 + index * 60}px;
-        width: 50px;
-        height: 200px;
-        background: linear-gradient(to top, 
-          rgba(var(--sn-gradient-primary-rgb), 0.8) 0%, 
-          rgba(var(--sn-gradient-secondary-rgb), 0.4) 100%);
-        z-index: -11;
-        pointer-events: none;
-        will-change: transform, opacity;
-        transform: scaleY(0.1);
-        transform-origin: bottom;
-        transition: transform 0.1s ease-out;
-        opacity: 0;
-      `;
-      
-      bands.push(band);
-    });
+    // Apply temporal flow class
+    this.applyCSSClass(`sn-temporal-${this.settings.temporalFlow}`);
     
-    return bands;
-  }
-
-  private createTemporalFlow(): HTMLElement {
-    const flow = document.createElement("div");
-    flow.className = "sn-temporal-flow";
-    flow.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(to right, 
-        rgba(var(--sn-gradient-primary-rgb), 0.6) 0%, 
-        rgba(var(--sn-gradient-accent-rgb), 0.4) 100%);
-      z-index: -10;
-      pointer-events: none;
-      will-change: transform;
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.2s ease-out;
-      opacity: 0;
-    `;
+    // Apply harmonic sensitivity class
+    this.applyCSSClass(`sn-harmonic-${this.settings.harmonicSensitivity}`);
     
-    return flow;
-  }
-
-  private createHarmonicResonance(): HTMLElement {
-    const resonance = document.createElement("div");
-    resonance.className = "sn-harmonic-resonance";
-    resonance.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 100px;
-      height: 100px;
-      background: conic-gradient(
-        from 0deg,
-        rgba(var(--sn-gradient-primary-rgb), 0.3) 0deg,
-        rgba(var(--sn-gradient-secondary-rgb), 0.2) 120deg,
-        rgba(var(--sn-gradient-accent-rgb), 0.1) 240deg,
-        rgba(var(--sn-gradient-primary-rgb), 0.3) 360deg
-      );
-      border-radius: 50%;
-      z-index: -11;
-      pointer-events: none;
-      will-change: transform, opacity;
-      transform: scale(0.5) rotate(0deg);
-      transition: transform 0.2s ease-out;
-      opacity: 0;
-    `;
-    
-    return resonance;
-  }
-
-  private findSpotifyContainer(): HTMLElement {
-    const containers = [
-      ".Root__main-view",
-      ".main-view-container",
-      ".main-gridContainer-gridContainer",
-      ".Root__top-container",
-      "body"
-    ];
-
-    for (const selector of containers) {
-      const element = document.querySelector(selector) as HTMLElement;
-      if (element) {
-        return element;
-      }
+    // Apply enabled/disabled state
+    if (this.settings.enabled) {
+      this.removeCSSClass('sn-flux-disabled');
+    } else {
+      this.applyCSSClass('sn-flux-disabled');
     }
 
-    return document.body;
+    // Update CSS variables
+    this.updateCSSVariables();
   }
 
+  /**
+   * Apply CSS class with tracking
+   */
+  private applyCSSClass(className: string): void {
+    if (!this.targetElement || this.appliedCSSClasses.has(className)) return;
+    
+    this.targetElement.classList.add(className);
+    this.appliedCSSClasses.add(className);
+  }
+
+  /**
+   * Remove CSS class with tracking
+   */
+  private removeCSSClass(className: string): void {
+    if (!this.targetElement || !this.appliedCSSClasses.has(className)) return;
+    
+    this.targetElement.classList.remove(className);
+    this.appliedCSSClasses.delete(className);
+  }
+
+  /**
+   * Update CSS variables for visualization effects
+   */
+  private updateCSSVariables(): void {
+    if (!this.cssConsciousnessController) return;
+
+    const metrics = this.currentMetrics;
+    
+    // Core visualization variables
+    this.cssConsciousnessController.queueCSSVariableUpdate(
+      "--sn-flux-consciousness-pulse", 
+      metrics.consciousnessLevel.toString()
+    );
+    
+    this.cssConsciousnessController.queueCSSVariableUpdate(
+      "--sn-flux-temporal-flow-progress", 
+      metrics.temporalProgress.toString()
+    );
+    
+    this.cssConsciousnessController.queueCSSVariableUpdate(
+      "--sn-flux-harmonic-rotation", 
+      `${metrics.harmonicResonance * 360}deg`
+    );
+    
+    this.cssConsciousnessController.queueCSSVariableUpdate(
+      "--sn-flux-harmonic-resonance", 
+      metrics.harmonicResonance.toString()
+    );
+    
+    // Spectral data variables
+    this.cssConsciousnessController.queueCSSVariableUpdate(
+      "--sn-flux-spectral-bass", 
+      metrics.spectralData.bass.toString()
+    );
+    
+    this.cssConsciousnessController.queueCSSVariableUpdate(
+      "--sn-flux-spectral-mid", 
+      metrics.spectralData.mid.toString()
+    );
+    
+    this.cssConsciousnessController.queueCSSVariableUpdate(
+      "--sn-flux-spectral-treble", 
+      metrics.spectralData.treble.toString()
+    );
+    
+    this.cssConsciousnessController.queueCSSVariableUpdate(
+      "--sn-flux-spectral-vocal", 
+      metrics.spectralData.vocal.toString()
+    );
+    
+    // Emotional state variables
+    this.cssConsciousnessController.queueCSSVariableUpdate(
+      "--sn-flux-emotional-intensity", 
+      metrics.emotionalState.intensity.toString()
+    );
+    
+    this.cssConsciousnessController.queueCSSVariableUpdate(
+      "--sn-flux-emotional-valence", 
+      metrics.emotionalState.valence.toString()
+    );
+    
+    // Settings-based variables
+    this.cssConsciousnessController.queueCSSVariableUpdate(
+      "--sn-flux-beat-intensity", 
+      this.settings.beatSyncIntensity.toString()
+    );
+    
+    this.cssConsciousnessController.queueCSSVariableUpdate(
+      "--sn-flux-spectral-enabled", 
+      this.settings.spectralVisualization ? "1" : "0"
+    );
+  }
+
+  /**
+   * Subscribe to unified event bus for music and consciousness events
+   */
   private subscribeToEvents(): void {
-    if (this.boundSpectralHandler) {
-      document.addEventListener("music-sync:spectral-data", this.boundSpectralHandler);
+    // Subscribe to music sync events through event bus
+    if (this.eventBus) {
+      this.eventBus.subscribe('music-sync:beat-detected', this.handleBeatEvent.bind(this));
+      this.eventBus.subscribe('music-sync:energy-changed', this.handleEnergyChange.bind(this));
+      this.eventBus.subscribe('music-sync:valence-changed', this.handleValenceChange.bind(this));
+      this.eventBus.subscribe('music-sync:spectral-data', this.handleSpectralData.bind(this));
+    } else {
+      // Fallback to direct event listeners if event bus not available
+      document.addEventListener('music-sync:beat-detected', this.handleBeatEvent.bind(this));
+      document.addEventListener('music-sync:energy-changed', this.handleEnergyChange.bind(this));
+      document.addEventListener('music-sync:valence-changed', this.handleValenceChange.bind(this));
+      document.addEventListener('music-sync:spectral-data', this.handleSpectralData.bind(this));
     }
     
-    if (this.boundBeatHandler) {
-      document.addEventListener("music-sync:beat-detected", this.boundBeatHandler);
+    // Subscribe to settings changes
+    if (this.settingsManager) {
+      document.addEventListener("year3000SystemSettingsChanged", this.handleSettingsChange.bind(this));
     }
     
-    if (this.boundSettingsHandler) {
-      document.addEventListener("year3000SystemSettingsChanged", this.boundSettingsHandler);
-    }
+    Y3K?.debug?.log("FluxMusicVisualization", "Subscribed to unified event system");
   }
 
+  /**
+   * Handle beat detection events with consciousness awareness
+   */
+  private handleBeatEvent(event: Event): void {
+    const currentTime = performance.now();
+    
+    // Throttle beat updates for performance
+    if (!MusicSyncUtilities.shouldUpdateMusic(this.lastMusicUpdate, 100)) return;
+    this.lastMusicUpdate = currentTime;
+    
+    const customEvent = event as CustomEvent;
+    const { intensity = 0.5 } = customEvent.detail || {};
+    
+    // Increment animation phase
+    this.animationPhase = MusicSyncUtilities.incrementAnimationPhase(
+      this.animationPhase, intensity, 0.1
+    );
+    
+    // Update consciousness level based on beat intensity
+    this.currentMetrics.consciousnessLevel = Math.min(1.0, intensity * this.settings.visualComplexity);
+    
+    // Apply beat pulse class temporarily
+    this.applyCSSClass('sn-flux-beat-active');
+    setTimeout(() => {
+      this.removeCSSClass('sn-flux-beat-active');
+    }, 500);
+    
+    // Update CSS variables
+    this.updateCSSVariables();
+  }
+
+  /**
+   * Handle energy changes with consciousness adaptation
+   */
+  private handleEnergyChange(event: Event): void {
+    const customEvent = event as CustomEvent;
+    const { energy = 0 } = customEvent.detail || {};
+    
+    // Update temporal flow progress based on energy
+    this.currentMetrics.temporalProgress = energy;
+    this.currentMetrics.emotionalState.intensity = energy;
+    
+    // Update CSS variables
+    this.updateCSSVariables();
+  }
+
+  /**
+   * Handle valence changes for emotional mapping
+   */
+  private handleValenceChange(event: Event): void {
+    const customEvent = event as CustomEvent;
+    const { valence = 0.5 } = customEvent.detail || {};
+    
+    // Update emotional valence and harmonic resonance
+    this.currentMetrics.emotionalState.valence = valence;
+    this.currentMetrics.harmonicResonance = valence;
+    
+    // Update CSS variables
+    this.updateCSSVariables();
+  }
+
+  /**
+   * Handle spectral data for frequency visualization
+   */
   private handleSpectralData(event: Event): void {
     const customEvent = event as CustomEvent;
-    const spectralData = customEvent.detail as SpectralData;
+    const spectralData = customEvent.detail;
     
     if (!spectralData) return;
     
-    this.lastSpectralData = spectralData;
-    this.updateVisualization(spectralData);
+    // Map spectral data to metrics
+    this.currentMetrics.spectralData = {
+      bass: spectralData.bassLevel || 0,
+      mid: spectralData.midLevel || 0,
+      treble: spectralData.trebleLevel || 0,
+      vocal: spectralData.vocalLevel || 0
+    };
+    
+    // Update consciousness level based on overall energy
+    const averageEnergy = (this.currentMetrics.spectralData.bass + 
+                          this.currentMetrics.spectralData.mid + 
+                          this.currentMetrics.spectralData.treble + 
+                          this.currentMetrics.spectralData.vocal) / 4;
+    
+    this.currentMetrics.consciousnessLevel = averageEnergy * this.settings.visualComplexity;
+    
+    // Update CSS variables
+    this.updateCSSVariables();
   }
 
-  private handleBeatDetection(event: Event): void {
-    const customEvent = event as CustomEvent;
-    const { intensity } = customEvent.detail;
-    
-    // Trigger beat-synchronized effects
-    this.triggerBeatPulse(intensity);
+  /**
+   * Set CSS consciousness controller (injected by facade)
+   */
+  public setUnifiedCSSConsciousnessController(controller: any): void {
+    this.cssConsciousnessController = controller;
+    Y3K?.debug?.log("FluxMusicVisualization", "CSS consciousness controller injected");
+  }
+
+  /**
+   * Set event bus (injected by facade)
+   */
+  public setEventBus(eventBus: any): void {
+    this.eventBus = eventBus;
+    Y3K?.debug?.log("FluxMusicVisualization", "Event bus injected");
   }
 
   public override handleSettingsChange(event: Event): void {
     const customEvent = event as CustomEvent;
-    const { key, value } = customEvent.detail;
+    const { key } = customEvent.detail;
     
     if (key.startsWith("sn-gradient-")) {
       this.loadSettings();
-      this.updateVisualizationSettings();
+      this.updateCSSState();
     }
-  }
-
-  private updateVisualization(spectralData: SpectralData): void {
-    // Update consciousness pulse
-    this.updateConsciousnessPulse(spectralData);
-    
-    // Update frequency bands
-    if (this.settings.spectralVisualization) {
-      this.updateFrequencyBands(spectralData);
-    }
-    
-    // Update temporal flow
-    this.updateTemporalFlow(spectralData);
-    
-    // Update harmonic resonance
-    this.updateHarmonicResonance(spectralData);
-    
-    // Update CSS variables for gradient consciousness
-    this.updateCSSVariables(spectralData);
-  }
-
-  private updateConsciousnessPulse(spectralData: SpectralData): void {
-    const pulse = this.visualizationElements.find(el => el.className === "sn-consciousness-pulse");
-    if (!pulse) return;
-    
-    const intensity = spectralData.consciousnessLevel * this.settings.visualComplexity;
-    const scale = 1 + (spectralData.energyLevel * 2);
-    const opacity = intensity * 0.8;
-    
-    pulse.style.transform = `translate(-50%, -50%) scale(${scale})`;
-    pulse.style.opacity = opacity.toString();
-    
-    // Add pulsing animation based on beat prediction
-    if (spectralData.predictedBeatTime < 100) {
-      pulse.style.animation = `consciousness-pulse 0.5s ease-out`;
-      setTimeout(() => {
-        pulse.style.animation = "";
-      }, 500);
-    }
-  }
-
-  private updateFrequencyBands(spectralData: SpectralData): void {
-    const bands = ['bass', 'mid', 'treble', 'vocal'];
-    const levels = [spectralData.bassLevel, spectralData.midLevel, spectralData.trebleLevel, spectralData.vocalLevel];
-    
-    bands.forEach((name, index) => {
-      const band = this.visualizationElements.find(el => el.className.includes(`sn-frequency-${name}`));
-      if (!band) return;
-      
-      const level = (levels[index] || 0) * this.settings.beatSyncIntensity;
-      const scaleY = 0.1 + (level * 0.9);
-      const opacity = level * 0.8;
-      
-      band.style.transform = `scaleY(${scaleY})`;
-      band.style.opacity = opacity.toString();
-    });
-  }
-
-  private updateTemporalFlow(spectralData: SpectralData): void {
-    const flow = this.visualizationElements.find(el => el.className === "sn-temporal-flow");
-    if (!flow) return;
-    
-    const progress = spectralData.temporalPhase;
-    const opacity = spectralData.energyLevel * 0.6;
-    
-    flow.style.transform = `scaleX(${progress})`;
-    flow.style.opacity = opacity.toString();
-  }
-
-  private updateHarmonicResonance(spectralData: SpectralData): void {
-    const resonance = this.visualizationElements.find(el => el.className === "sn-harmonic-resonance");
-    if (!resonance) return;
-    
-    const scale = 0.5 + (spectralData.harmonicResonance * 0.5);
-    const rotation = spectralData.harmonicResonance * 180;
-    const opacity = spectralData.harmonicResonance * 0.7;
-    
-    resonance.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
-    resonance.style.opacity = opacity.toString();
-  }
-
-  private updateCSSVariables(spectralData: SpectralData): void {
-    // Update advanced CSS variables for gradient consciousness
-    this.cssVariableBatcher.setProperty("--sn-gradient-consciousness-pulse", spectralData.consciousnessLevel.toString());
-    this.cssVariableBatcher.setProperty("--sn-gradient-temporal-flow-speed", (spectralData.energyLevel * 2).toString());
-    this.cssVariableBatcher.setProperty("--sn-gradient-harmonic-rotation", `${spectralData.harmonicResonance * 360}deg`);
-    this.cssVariableBatcher.setProperty("--sn-gradient-emotional-intensity", spectralData.emotionalValence.toString());
-    
-    // Update consciousness mode multipliers
-    const modeMultiplier = this.settings.visualComplexity;
-    this.cssVariableBatcher.setProperty("--sn-gradient-consciousness-multiplier", modeMultiplier.toString());
-    
-    // Update beat sync intensity
-    this.cssVariableBatcher.setProperty("--sn-gradient-beat-sync-intensity", this.settings.beatSyncIntensity.toString());
-  }
-
-  private triggerBeatPulse(intensity: number): void {
-    // Trigger beat-synchronized effects on all visualization elements
-    this.visualizationElements.forEach(element => {
-      element.style.transform += ` scale(${1 + intensity * 0.1})`;
-      
-      // Reset after a short duration
-      setTimeout(() => {
-        element.style.transform = element.style.transform.replace(/ scale\([^)]*\)$/, "");
-      }, 200);
-    });
-  }
-
-  private updateVisualizationSettings(): void {
-    // Update visualization complexity based on settings
-    const complexityMultiplier = this.settings.visualComplexity;
-    
-    this.visualizationElements.forEach(element => {
-      const currentOpacity = parseFloat(element.style.opacity) || 1;
-      element.style.opacity = (currentOpacity * complexityMultiplier).toString();
-    });
-  }
-
-  private startAnimation(): void {
-    if (this.isAnimating) return;
-    
-    this.isAnimating = true;
-    
-    const animate = () => {
-      if (!this.isAnimating) return;
-      
-      // Update animation frame
-      this.updateAnimation(performance.now());
-      
-      this.animationFrameId = requestAnimationFrame(animate);
-    };
-    
-    animate();
   }
 
   public override updateAnimation(deltaTime: number): void {
-    if (!this.isAnimating || !this.lastSpectralData) return;
+    if (!this.isActive) return;
     
-    // Apply smooth interpolation to visualization elements
-    this.visualizationElements.forEach(element => {
-      // Add subtle breathing animation
-      const breathingScale = 1 + Math.sin(deltaTime * 0.001) * 0.02;
-      
-      if (element.className === "sn-consciousness-pulse") {
-        const currentTransform = element.style.transform;
-        element.style.transform = currentTransform + ` scale(${breathingScale})`;
-      }
-    });
+    // Update performance metrics
+    this.updatePerformanceMetrics(deltaTime);
+    
+    // Apply organic breathing effects through CSS variables
+    this.applyBreathingEffects(deltaTime);
+  }
+
+  /**
+   * Update performance metrics for monitoring
+   */
+  private updatePerformanceMetrics(deltaTime: number): void {
+    this.updateCount++;
+    
+    // Track average update time
+    this.averageUpdateTime = (this.averageUpdateTime * 0.9) + (deltaTime * 0.1);
+    
+    // Report performance metrics periodically
+    if (this.updateCount % 300 === 0) { // Every ~5 seconds at 60fps
+      this.performanceMonitor?.recordMetric(
+        'FluxMusicVisualization_Update',
+        this.averageUpdateTime
+      );
+    }
+  }
+
+  /**
+   * Apply organic breathing effects through CSS variables
+   */
+  private applyBreathingEffects(deltaTime: number): void {
+    if (!this.cssConsciousnessController || !this.currentConsciousnessField) return;
+    
+    // Calculate breathing modulation
+    const breathingPhase = (deltaTime * 0.001) % (Math.PI * 2);
+    const breathingScale = 1 + Math.sin(breathingPhase) * 0.02;
+    
+    // Apply breathing to energy level for subtle effects
+    const energyWithBreathing = this.currentMetrics.emotionalState.intensity * breathingScale;
+    
+    this.cssConsciousnessController.queueCSSVariableUpdate(
+      "--sn-flux-energy-level", 
+      energyWithBreathing.toString()
+    );
   }
 
   public override _performSystemSpecificCleanup(): void {
     super._performSystemSpecificCleanup();
     
-    // Stop animation
-    this.isAnimating = false;
-    if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = null;
+    // Unregister from consciousness choreographer
+    if (this.consciousnessChoreographer) {
+      try {
+        this.consciousnessChoreographer.unregisterConsciousnessParticipant('FluxMusicVisualization');
+        Y3K?.debug?.log('FluxMusicVisualization', 'Unregistered from consciousness choreographer');
+      } catch (error) {
+        Y3K?.debug?.error('FluxMusicVisualization', 'Error unregistering from consciousness choreographer:', error);
+      }
     }
-    
-    // Stop spectral analyzer
-    this.spectralAnalyzer.stop();
-    this.spectralAnalyzer.destroy();
     
     // Remove event listeners
-    if (this.boundSpectralHandler) {
-      document.removeEventListener("music-sync:spectral-data", this.boundSpectralHandler);
+    if (this.eventBus) {
+      this.eventBus.unsubscribe('music-sync:beat-detected');
+      this.eventBus.unsubscribe('music-sync:energy-changed');
+      this.eventBus.unsubscribe('music-sync:valence-changed');
+      this.eventBus.unsubscribe('music-sync:spectral-data');
+    } else {
+      // Clean up fallback direct listeners
+      document.removeEventListener('music-sync:beat-detected', this.handleBeatEvent.bind(this));
+      document.removeEventListener('music-sync:energy-changed', this.handleEnergyChange.bind(this));
+      document.removeEventListener('music-sync:valence-changed', this.handleValenceChange.bind(this));
+      document.removeEventListener('music-sync:spectral-data', this.handleSpectralData.bind(this));
     }
     
-    if (this.boundBeatHandler) {
-      document.removeEventListener("music-sync:beat-detected", this.boundBeatHandler);
+    document.removeEventListener("year3000SystemSettingsChanged", this.handleSettingsChange.bind(this));
+    
+    // Remove applied CSS classes
+    if (this.targetElement) {
+      this.appliedCSSClasses.forEach(className => {
+        this.targetElement!.classList.remove(className);
+      });
     }
     
-    if (this.boundSettingsHandler) {
-      document.removeEventListener("year3000SystemSettingsChanged", this.boundSettingsHandler);
-    }
+    this.appliedCSSClasses.clear();
+    this.isActive = false;
     
-    // Remove DOM elements
-    this.visualizationElements.forEach(element => {
-      if (element.parentNode) {
-        element.parentNode.removeChild(element);
-      }
-    });
-    
-    this.visualizationElements = [];
-    this.lastSpectralData = null;
+    Y3K?.debug?.log('FluxMusicVisualization', 'Modern CSS-native system cleanup completed');
   }
 
+  // ===================================================================
+  // BACKGROUND SYSTEM PARTICIPANT INTERFACE IMPLEMENTATION
+  // ===================================================================
+
+  public getConsciousnessContribution(): any {
+    return {
+      visualizationIntensity: this.currentMetrics.consciousnessLevel,
+      temporalFlow: this.currentMetrics.temporalProgress,
+      harmonicResonance: this.currentMetrics.harmonicResonance,
+      spectralContribution: this.currentMetrics.spectralData,
+      emotionalContribution: this.currentMetrics.emotionalState,
+      systemLoad: this.isActive ? 0.2 : 0 // Low load as it's CSS-native
+    };
+  }
+
+  public onConsciousnessFieldUpdate(field: ConsciousnessField): void {
+    try {
+      this.currentConsciousnessField = field;
+      
+      // Update metrics based on consciousness field
+      this.adaptToConsciousnessField(field);
+      
+      // Update CSS variables
+      this.updateCSSVariables();
+      
+      Y3K?.debug?.log('FluxMusicVisualization', 'Updated from consciousness field:', {
+        rhythmicPulse: field.rhythmicPulse,
+        energyResonance: field.energyResonance,
+        isActive: this.isActive
+      });
+    } catch (error) {
+      Y3K?.debug?.error('FluxMusicVisualization', 'Error updating from consciousness field:', error);
+    }
+  }
+
+  public onChoreographyEvent(eventType: string, payload: any): void {
+    try {
+      switch (eventType) {
+        case 'choreography:rhythm-shift':
+          this.handleRhythmShift(payload);
+          break;
+          
+        case 'choreography:energy-surge':
+          this.handleEnergySurge(payload);
+          break;
+          
+        case 'consciousness:breathing-cycle':
+          this.handleBreathingCycle(payload);
+          break;
+          
+        case 'consciousness:performance-adapt':
+          this.handlePerformanceAdapt(payload);
+          break;
+      }
+      
+      Y3K?.debug?.log('FluxMusicVisualization', `Handled choreography event: ${eventType}`, payload);
+    } catch (error) {
+      Y3K?.debug?.error('FluxMusicVisualization', `Error handling choreography event ${eventType}:`, error);
+    }
+  }
+
+  /**
+   * Adapt visualization to consciousness field changes
+   */
+  private adaptToConsciousnessField(field: ConsciousnessField): void {
+    // Update consciousness level based on field energy
+    this.currentMetrics.consciousnessLevel = Math.min(1.0, 
+      field.energyResonance * this.settings.visualComplexity
+    );
+    
+    // Update temporal flow based on musical flow
+    const flowMagnitude = Math.sqrt(field.musicalFlow.x ** 2 + field.musicalFlow.y ** 2);
+    this.currentMetrics.temporalProgress = Math.min(1.0, flowMagnitude);
+    
+    // Update harmonic resonance based on rhythmic pulse
+    this.currentMetrics.harmonicResonance = field.rhythmicPulse;
+    
+    // Update emotional state based on consciousness field
+    this.currentMetrics.emotionalState.intensity = field.energyResonance;
+  }
+
+  /**
+   * Handle rhythm shift events
+   */
+  private handleRhythmShift(payload: any): void {
+    const newBPM = payload.newRhythm?.bpm || 120;
+    const rhythmMultiplier = ChoreographyEventResponder.handleRhythmShift(1.0, newBPM);
+    
+    // Adjust visualization intensity based on rhythm
+    this.currentMetrics.consciousnessLevel *= rhythmMultiplier;
+    this.updateCSSVariables();
+  }
+
+  /**
+   * Handle energy surge events
+   */
+  private handleEnergySurge(payload: any): void {
+    const surgeIntensity = payload.intensity || 1.0;
+    
+    // Enhance visualization during energy surges
+    this.currentMetrics.consciousnessLevel = Math.min(1.0, 
+      this.currentMetrics.consciousnessLevel + surgeIntensity * 0.3
+    );
+    
+    this.currentMetrics.emotionalState.intensity = Math.min(1.0,
+      this.currentMetrics.emotionalState.intensity + surgeIntensity * 0.2
+    );
+    
+    this.updateCSSVariables();
+  }
+
+  /**
+   * Handle breathing cycle events
+   */
+  private handleBreathingCycle(payload: any): void {
+    const breathingPhase = payload.phase || 0;
+    const breathingIntensity = payload.intensity || 0.5;
+    
+    // Apply breathing modulation to consciousness level
+    const breathingEffect = ChoreographyEventResponder.handleBreathingCycle(
+      1.0, breathingPhase, breathingIntensity
+    );
+    
+    this.currentMetrics.consciousnessLevel *= breathingEffect;
+    this.updateCSSVariables();
+  }
+
+  /**
+   * Handle performance adaptation events
+   */
+  private handlePerformanceAdapt(payload: any): void {
+    const newMode = payload.newMode;
+    if (!newMode) return;
+    
+    // Adapt visualization complexity based on performance mode
+    if (newMode.qualityLevel < 0.3) {
+      this.settings.visualComplexity = 0.3;
+      this.applyCSSClass('sn-performance-mode');
+    } else if (newMode.qualityLevel < 0.7) {
+      this.settings.visualComplexity = 0.6;
+      this.removeCSSClass('sn-performance-mode');
+    } else {
+      this.settings.visualComplexity = 1.0;
+      this.removeCSSClass('sn-performance-mode');
+    }
+    
+    this.updateCSSVariables();
+    
+    Y3K?.debug?.log('FluxMusicVisualization', `Adapted to performance mode: ${newMode.name}`, {
+      complexity: this.settings.visualComplexity
+    });
+  }
+
+  // ===================================================================
+  // PUBLIC API FOR COMPATIBILITY AND CONTROL
+  // ===================================================================
+
+  /**
+   * Set consciousness mode and update CSS classes
+   */
   public setConsciousnessMode(mode: "dormant" | "aware" | "transcendent"): void {
+    // Remove old mode class
+    this.removeCSSClass(`sn-consciousness-${this.settings.consciousnessMode}`);
+    
+    // Update settings
     this.settings.consciousnessMode = mode;
     this.settings.visualComplexity = this.mapComplexity(mode);
-    this.updateVisualizationSettings();
+    
+    // Apply new mode class
+    this.applyCSSClass(`sn-consciousness-${mode}`);
+    
+    // Update CSS variables
+    this.updateCSSVariables();
   }
 
+  /**
+   * Set harmonic sensitivity and update CSS classes
+   */
   public setHarmonicSensitivity(sensitivity: "subtle" | "responsive" | "psychedelic"): void {
+    // Remove old sensitivity class
+    this.removeCSSClass(`sn-harmonic-${this.settings.harmonicSensitivity}`);
+    
+    // Update settings
     this.settings.harmonicSensitivity = sensitivity;
     this.settings.beatSyncIntensity = this.mapSensitivity(sensitivity);
+    
+    // Apply new sensitivity class
+    this.applyCSSClass(`sn-harmonic-${sensitivity}`);
+    
+    // Update CSS variables
+    this.updateCSSVariables();
   }
 
+  /**
+   * Toggle spectral visualization
+   */
   public toggleSpectralVisualization(enabled: boolean): void {
     this.settings.spectralVisualization = enabled;
     
-    // Show/hide frequency bands
-    this.visualizationElements.forEach(element => {
-      if (element.className.includes("sn-frequency-")) {
-        element.style.display = enabled ? "block" : "none";
-      }
-    });
+    // Update CSS variable
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        "--sn-flux-spectral-enabled", 
+        enabled ? "1" : "0"
+      );
+    }
   }
 
-  public getVisualizationMetrics() {
+  /**
+   * Get current visualization metrics
+   */
+  public getVisualizationMetrics(): FluxVisualizationMetrics & {
+    settings: MusicVisualizationSettings;
+    updateCount: number;
+    averageUpdateTime: number;
+  } {
     return {
+      ...this.currentMetrics,
       settings: { ...this.settings },
-      lastSpectralData: this.lastSpectralData ? { ...this.lastSpectralData } : null,
-      elementsCount: this.visualizationElements.length,
-      isAnimating: this.isAnimating
+      updateCount: this.updateCount,
+      averageUpdateTime: this.averageUpdateTime
+    };
+  }
+
+  /**
+   * Health check for system monitoring
+   */
+  public async healthCheck(): Promise<HealthCheckResult> {
+    const isHealthy = this.isActive && 
+                     this.targetElement !== null && 
+                     this.cssConsciousnessController !== null &&
+                     this.averageUpdateTime < 16.67; // 60fps target
+    
+    return {
+      healthy: isHealthy,
+      ok: isHealthy,
+      details: `Active: ${this.isActive}, Updates: ${this.updateCount}, ` +
+               `AvgTime: ${this.averageUpdateTime.toFixed(1)}ms, ` +
+               `Consciousness: ${this.currentMetrics.consciousnessLevel.toFixed(2)}`,
+      system: 'FluxMusicVisualization'
     };
   }
 }

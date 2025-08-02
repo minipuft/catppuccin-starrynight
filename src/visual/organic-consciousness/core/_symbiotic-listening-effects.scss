@@ -18,7 +18,7 @@
     brightness(calc(1.0 + var(--organic-symbiotic-resonance, 0.7) * 0.1));
   
   // Resonance breathing
-  animation: organic-symbiotic-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+  // animation: organic-symbiotic-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
   
   // Performance optimization
   will-change: filter, transform;
@@ -45,7 +45,7 @@
     );
     
     // Empathy field animation
-    animation: organic-empathy-field var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+    // animation: organic-empathy-field var(--organic-breathing-cycle, 1s) ease-in-out infinite;
     
     // Performance optimization
     pointer-events: none;
@@ -121,7 +121,7 @@
       );
     
     // Memory pattern animation
-    animation: organic-memory-pattern 3s linear infinite;
+    // animation: organic-memory-pattern 3s linear infinite;
     
     // Performance optimization
     pointer-events: none;
@@ -175,7 +175,7 @@
     );
     
     // Empathy pulsation
-    animation: organic-empathy-pulse var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+    // animation: organic-empathy-pulse var(--organic-breathing-cycle, 1s) ease-in-out infinite;
     
     // Performance optimization
     pointer-events: none;
@@ -250,7 +250,7 @@
     transform: translate(-50%, -50%);
     
     // Beat pulse animation
-    animation: organic-beat-indicator 0.15s ease-out forwards;
+    // animation: organic-beat-indicator 0.15s ease-out forwards;
     
     // Performance optimization
     pointer-events: none;

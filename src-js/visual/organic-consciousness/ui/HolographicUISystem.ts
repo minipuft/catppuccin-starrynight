@@ -1,4 +1,29 @@
 import type { CinematicPalette, MusicEmotion, BeatData, RGB, BiologicalConsciousnessManager } from '@/types/colorStubs'
+import type { QualityScalingCapable, QualityLevel, QualityCapability, PerformanceMetrics } from '@/core/performance/PerformanceOrchestrator'
+
+import { Y3K } from '@/debug/UnifiedDebugManager'
+import { SettingsManager } from '@/ui/managers/SettingsManager'
+import { MusicSyncService } from '@/audio/MusicSyncService'
+import { unifiedEventBus } from '@/core/events/UnifiedEventBus'
+// IManagedSystem interface (inline definition for now)
+interface IManagedSystem {
+  initialized: boolean
+  initialize(): Promise<void>
+  updateAnimation(deltaTime: number): void
+  healthCheck(): Promise<HealthCheckResult>
+  destroy(): void
+}
+
+interface HealthCheckResult {
+  healthy: boolean
+  message: string
+  details?: any
+}
+
+// OKLAB integration for perceptually uniform holographic colors
+import { OKLABColorProcessor, type EnhancementPreset } from '@/utils/color/OKLABColorProcessor'
+import { EmotionalTemperatureMapper } from '@/utils/color/EmotionalTemperatureMapper'
+import { GenreProfileManager } from '@/audio/GenreProfileManager'
 
 export interface HolographicState {
   flickerIntensity: number      // 0-1 holographic flicker intensity
@@ -78,14 +103,12 @@ export interface InterferencePattern {
  * - Sync with music and consciousness for dynamic effects
  * - Maintain Star Wars and Blade Runner holographic aesthetics
  */
-export class HolographicUISystem {
+export class HolographicUISystem implements QualityScalingCapable, IManagedSystem {
   private manager: BiologicalConsciousnessManager
   private holographicState: HolographicState
   private holographicElements: Map<string, HolographicElement> = new Map()
   private interfaceContainer: HTMLElement | null = null
-  private scanlineOverlay: HTMLElement | null = null
-  private chromaticCanvas: HTMLCanvasElement | null = null
-  private dataStreamCanvas: HTMLCanvasElement | null = null
+  // Removed scanlineOverlay, chromaticCanvas and dataStreamCanvas - converted to CSS-only implementations
   private isInitialized = false
   private isEnabled = true
   
@@ -149,9 +172,51 @@ export class HolographicUISystem {
       projectionDistance: 0.9
     }
   }
+  
+  // OKLAB integration components
+  private oklabProcessor: OKLABColorProcessor
+  private emotionalMapper: EmotionalTemperatureMapper
+  private genreManager: GenreProfileManager
+  private holographicPreset: EnhancementPreset
+  private lastMusicalContext: any = null
+  private eventSubscriptionIds: string[] = []
+  private settingsManager: SettingsManager
+  private musicSyncService: MusicSyncService
+  
+  // User interaction tracking for content-aware effects
+  private lastScrollPosition: number = 0
+  private lastMouseMovement: number = 0
+  private lastUIClick: number = 0
+  
+  // Required by IManagedSystem
+  public initialized: boolean = false
+  
+  // Quality scaling properties
+  private currentQualityLevel: QualityLevel | null = null
+  private qualityCapabilities: QualityCapability[] = [
+    { name: 'holographic-effects', impact: 'medium', enabled: true, canToggle: true },
+    { name: 'scanline-overlay', impact: 'low', enabled: true, canToggle: true },
+    { name: 'chromatic-aberration', impact: 'low', enabled: true, canToggle: true },
+    { name: 'data-streams', impact: 'medium', enabled: true, canToggle: true },
+    { name: 'interference-patterns', impact: 'low', enabled: true, canToggle: true },
+    { name: 'organic-integration', impact: 'high', enabled: true, canToggle: true }
+  ]
+  private qualityAdjustments: { [key: string]: number } = {}
 
-  constructor(manager: BiologicalConsciousnessManager) {
+  constructor(
+    manager: BiologicalConsciousnessManager,
+    settingsManager?: SettingsManager,
+    musicSyncService?: MusicSyncService
+  ) {
     this.manager = manager
+    this.settingsManager = settingsManager || new SettingsManager()
+    this.musicSyncService = musicSyncService || new MusicSyncService()
+    
+    // Initialize OKLAB components
+    this.oklabProcessor = new OKLABColorProcessor(true)
+    this.emotionalMapper = new EmotionalTemperatureMapper(true)
+    this.genreManager = new GenreProfileManager()
+    this.holographicPreset = OKLABColorProcessor.getPreset('COSMIC') // Default to cosmic preset
     
     // Initialize holographic state
     this.holographicState = {
@@ -203,33 +268,35 @@ export class HolographicUISystem {
 
   // Initialize holographic UI system
   public async initialize(): Promise<void> {
-    if (this.isInitialized) return
+    if (this.initialized) return
     
     try {
       // Create interface container
       await this.createInterfaceContainer()
       
-      // Create scanline overlay
-      await this.createScanlineOverlay()
+      // Note: Scanline effects now applied directly to elements via CSS classes
       
-      // Create chromatic aberration canvas
-      await this.createChromaticCanvas()
-      
-      // Create data stream canvas
-      await this.createDataStreamCanvas()
+      // Note: Chromatic and data stream effects now handled via CSS-only implementations
       
       // Initialize holographic elements
       await this.initializeHolographicElements()
       
+      // Setup OKLAB event subscriptions
+      this.setupOKLABEventSubscriptions()
+      
+      // Setup user interaction tracking for content-aware effects
+      this.setupUserInteractionTracking()
+      
       // Start holographic animation
       this.startHolographicAnimation()
       
+      this.initialized = true
       this.isInitialized = true
       
-      console.log('[HolographicUISystem] Initialized holographic interface system')
+      Y3K?.debug?.log('HolographicUISystem', 'Initialized holographic interface system with OKLAB integration')
       
     } catch (error) {
-      console.error('[HolographicUISystem] Failed to initialize:', error)
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to initialize:', error)
       throw error
     }
   }
@@ -448,8 +515,8 @@ export class HolographicUISystem {
     // Holographic glow
     const glowIntensity = intensity * 0.3
     element.style.boxShadow = `
-      0 0 ${glowIntensity * 20}px rgba(var(--organic-holographic-rgb, 100, 255, 200), ${glowIntensity}),
-      inset 0 0 ${glowIntensity * 10}px rgba(var(--organic-holographic-rgb, 100, 255, 200), ${glowIntensity * 0.5})
+      0 0 ${glowIntensity * 20}px rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${glowIntensity}),
+      inset 0 0 ${glowIntensity * 10}px rgba(var(--spice-rgb-holographic-accent, var(--organic-holographic-rgb, 100, 255, 200)), ${glowIntensity * 0.5})
     `
   }
 
@@ -458,14 +525,15 @@ export class HolographicUISystem {
     const transparency = this.holographicState.transparency * intensity
     
     element.style.background = `
-      rgba(var(--organic-holographic-rgb, 100, 255, 200), ${transparency * 0.1}),
+      rgba(var(--spice-rgb-holographic-primary, var(--organic-holographic-rgb, 100, 255, 200)), ${transparency * 0.1}),
       linear-gradient(45deg, 
         transparent 0%, 
-        rgba(var(--organic-holographic-rgb, 100, 255, 200), ${transparency * 0.05}) 50%,
+        rgba(var(--spice-rgb-holographic-accent, var(--organic-holographic-rgb, 100, 255, 200)), ${transparency * 0.05}) 50%,
         transparent 100%)
     `
-    element.style.backdropFilter = `blur(${intensity * 8}px)`
-    element.style.border = `1px solid rgba(var(--organic-holographic-rgb, 100, 255, 200), ${transparency * 0.6})`
+    // Reduce backdrop blur to prevent excessive visual interference
+    element.style.backdropFilter = `blur(${Math.min(intensity * 2, 3)}px)`
+    element.style.border = `1px solid rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${transparency * 0.6})`
   }
 
   // Apply data stream effect
@@ -605,8 +673,8 @@ export class HolographicUISystem {
         0deg,
         transparent 0px,
         transparent ${scanlineFrequency - 1}px,
-        rgba(var(--organic-holographic-rgb, 100, 255, 200), ${scanlineIntensity * 0.1}) ${scanlineFrequency}px,
-        rgba(var(--organic-holographic-rgb, 100, 255, 200), ${scanlineIntensity * 0.1}) ${scanlineFrequency}px
+        rgba(var(--spice-rgb-holographic-accent, var(--organic-holographic-rgb, 100, 255, 200)), ${scanlineIntensity * 0.1}) ${scanlineFrequency}px,
+        rgba(var(--spice-rgb-holographic-accent, var(--organic-holographic-rgb, 100, 255, 200)), ${scanlineIntensity * 0.1}) ${scanlineFrequency}px
       )
     `
     
@@ -669,10 +737,17 @@ export class HolographicUISystem {
     const organicPhase = this.animationState.organicPhase
     const organicIntensity = this.holographicState.energyStability * intensity
     
-    // Organic blur breathing
+    // Organic blur breathing - consolidate with existing filters to prevent stacking
     const blurPhase = organicPhase * 1.2
-    const blurAmount = Math.sin(blurPhase) * organicIntensity * 2
-    element.style.filter = (element.style.filter || '') + ` blur(${Math.max(0, blurAmount)}px)`
+    const organicBlurAmount = Math.sin(blurPhase) * organicIntensity * 2
+    
+    // Parse existing filter to avoid blur stacking
+    const currentFilter = element.style.filter || '';
+    const hasExistingBlur = currentFilter.includes('blur(');
+    
+    if (!hasExistingBlur && organicBlurAmount > 0) {
+      element.style.filter = currentFilter + ` blur(${Math.max(0, organicBlurAmount)}px)`;
+    }
     
     // Organic opacity pulsing
     const opacityPhase = organicPhase * 0.7
@@ -693,7 +768,8 @@ export class HolographicUISystem {
       const character = characters[Math.floor(Math.random() * characters.length)]
       const opacity = 0.1 + (Math.random() * 0.3)
       
-      gradient += `rgba(var(--organic-holographic-rgb, 100, 255, 200), ${opacity}) ${position}%, `
+      const streamColor = this.getOKLABEnhancedDataStreamColor(opacity, this.lastMusicalContext)
+      gradient += `${streamColor} ${position}%, `
     }
     
     gradient = gradient.slice(0, -2) + ')'
@@ -711,68 +787,16 @@ export class HolographicUISystem {
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 9998;
-      mix-blend-mode: screen;
+      z-index: 1000;
+      mix-blend-mode: normal;
     `
     
     document.body.appendChild(this.interfaceContainer)
   }
 
-  // Create scanline overlay
-  private async createScanlineOverlay(): Promise<void> {
-    this.scanlineOverlay = document.createElement('div')
-    this.scanlineOverlay.id = 'holographic-scanline-overlay'
-    this.scanlineOverlay.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      opacity: 0.5;
-    `
-    
-    this.interfaceContainer?.appendChild(this.scanlineOverlay)
-  }
+  // Scanline overlay removed - effects now applied directly to elements via CSS classes
 
-  // Create chromatic aberration canvas
-  private async createChromaticCanvas(): Promise<void> {
-    this.chromaticCanvas = document.createElement('canvas')
-    this.chromaticCanvas.id = 'holographic-chromatic-canvas'
-    this.chromaticCanvas.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    `
-    
-    this.chromaticCanvas.width = window.innerWidth
-    this.chromaticCanvas.height = window.innerHeight
-    
-    this.interfaceContainer?.appendChild(this.chromaticCanvas)
-  }
-
-  // Create data stream canvas
-  private async createDataStreamCanvas(): Promise<void> {
-    this.dataStreamCanvas = document.createElement('canvas')
-    this.dataStreamCanvas.id = 'holographic-datastream-canvas'
-    this.dataStreamCanvas.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      opacity: 0.3;
-    `
-    
-    this.dataStreamCanvas.width = window.innerWidth
-    this.dataStreamCanvas.height = window.innerHeight
-    
-    this.interfaceContainer?.appendChild(this.dataStreamCanvas)
-  }
+  // Canvas methods removed - effects now implemented via CSS-only approach for better text clarity
 
   // Initialize holographic elements
   private async initializeHolographicElements(): Promise<void> {
@@ -821,73 +845,17 @@ export class HolographicUISystem {
     this.animationState.interferencePhase += deltaSeconds * this.interferencePattern.frequency
     this.animationState.organicPhase += deltaSeconds * 0.5
     
-    // Update scanline overlay
-    this.updateScanlineOverlay()
+    // Note: Scanline effects now handled via CSS classes on individual elements
     
-    // Update data stream canvas
-    this.updateDataStreamCanvas()
+    // Note: Data stream effects now handled via CSS-only per-element implementation
     
     // Update performance metrics
     this.performanceMetrics.lastUpdate = performance.now()
   }
 
-  // Update scanline overlay
-  private updateScanlineOverlay(): void {
-    if (!this.scanlineOverlay) return
-    
-    const scanlineIntensity = this.holographicState.scanlineIntensity
-    const scanlineFrequency = this.scanlineEffect.frequency
-    
-    this.scanlineOverlay.style.background = `
-      repeating-linear-gradient(
-        0deg,
-        transparent 0px,
-        transparent ${scanlineFrequency - 1}px,
-        rgba(var(--organic-holographic-rgb, 100, 255, 200), ${scanlineIntensity * 0.1}) ${scanlineFrequency}px
-      )
-    `
-    
-    // Animate scanlines
-    if (this.scanlineEffect.animation) {
-      const offset = this.animationState.scanlinePhase * scanlineFrequency
-      this.scanlineOverlay.style.backgroundPosition = `0 ${offset}px`
-    }
-  }
+  // Scanline overlay update method removed - effects now applied via CSS classes to individual elements
 
-  // Update data stream canvas
-  private updateDataStreamCanvas(): void {
-    if (!this.dataStreamCanvas) return
-    
-    const ctx = this.dataStreamCanvas.getContext('2d')
-    if (!ctx) return
-    
-    // Clear canvas
-    ctx.clearRect(0, 0, this.dataStreamCanvas.width, this.dataStreamCanvas.height)
-    
-    // Draw data stream characters
-    const streamDensity = this.dataStream.density
-    const streamSpeed = this.dataStream.speed
-    const characters = this.dataStream.characters
-    
-    ctx.fillStyle = `rgba(var(--organic-holographic-rgb, 100, 255, 200), 0.3)`
-    ctx.font = '12px monospace'
-    
-    const columnCount = Math.floor(this.dataStreamCanvas.width / 20)
-    
-    for (let i = 0; i < columnCount; i++) {
-      const x = i * 20
-      const characterCount = Math.floor(streamDensity * 10)
-      
-      for (let j = 0; j < characterCount; j++) {
-        const y = (j * 20 + (this.animationState.dataStreamPhase * 100)) % this.dataStreamCanvas.height
-        const character = characters[Math.floor(Math.random() * characters.length)]
-        
-        if (character) {
-          ctx.fillText(character, x, y)
-        }
-      }
-    }
-  }
+  // Data stream canvas method removed - now implemented via CSS-only per-element effects
 
   // Start holographic animation
   private startHolographicAnimation(): void {
@@ -1031,7 +999,7 @@ export class HolographicUISystem {
     const shadowOffset = finalDepth > 0 ? shadowIntensity * 5 : -shadowIntensity * 3;
     
     const existingShadow = element.style.boxShadow || '';
-    const volumetricShadow = `0 ${shadowOffset}px ${shadowBlur}px rgba(var(--organic-holographic-rgb, 100, 255, 200), ${shadowIntensity * 0.3})`;
+    const volumetricShadow = `0 ${shadowOffset}px ${shadowBlur}px rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${shadowIntensity * 0.3})`;
     
     if (existingShadow) {
       element.style.boxShadow = `${existingShadow}, ${volumetricShadow}`;
@@ -1052,20 +1020,27 @@ export class HolographicUISystem {
     const blurAmount = Math.max(0, (depthLevel - 0.5) * 4); // Blur distant elements
     const brightnessAdjust = 1 + (depthLevel - 0.5) * 0.3; // Brighten near elements
     
-    // Apply atmospheric filters
+    // Apply atmospheric filters - avoid blur stacking
     const currentFilter = element.style.filter || '';
+    const hasExistingBlur = currentFilter.includes('blur(');
+    
     const atmosphericFilters = [
-      blurAmount > 0 ? `blur(${blurAmount}px)` : '',
+      // Only add blur if no existing blur effect
+      (blurAmount > 0 && !hasExistingBlur) ? `blur(${blurAmount}px)` : '',
       `brightness(${brightnessAdjust})`,
       `saturate(${1 + atmosphereIntensity * 0.2})`
     ].filter(f => f).join(' ');
     
-    // Merge with existing filters
-    if (currentFilter && !currentFilter.includes('brightness')) {
+    // Merge with existing filters, avoiding duplicate effects
+    const hasBrightness = currentFilter.includes('brightness');
+    const hasSaturate = currentFilter.includes('saturate');
+    
+    if (currentFilter && !hasBrightness && !hasSaturate) {
       element.style.filter = `${currentFilter} ${atmosphericFilters}`;
     } else if (!currentFilter) {
       element.style.filter = atmosphericFilters;
     }
+    // Skip if filters already exist to prevent stacking
     
     // Add depth-based opacity scaling for atmospheric perspective
     const baseOpacity = parseFloat(element.style.opacity || '1');
@@ -1074,176 +1049,82 @@ export class HolographicUISystem {
   }
 
   /**
-   * Update consciousness data stream with real-time data
-   * Phase 4.2b: Consciousness Data Integration
+   * Consciousness data stream functionality converted to CSS-only implementation
+   * Data is now integrated into element-native effects for better text clarity
    */
-  public updateConsciousnessDataStream(consciousnessState: any): void {
-    if (!this.dataStreamCanvas) {
-      this.createConsciousnessDataStreamCanvas();
-    }
-    
-    // Generate consciousness data text
-    const consciousnessData = this.generateConsciousnessDataText(consciousnessState);
-    
-    // Update data stream with consciousness information
-    this.renderConsciousnessDataStream(consciousnessData);
-    
-    console.log('[HolographicUISystem] 🌊 Consciousness data stream updated');
-  }
 
-  /**
-   * Generate consciousness data text for Matrix-style display
-   */
-  private generateConsciousnessDataText(consciousnessState: any): string[] {
-    const dataLines: string[] = [];
-    
-    // Extract consciousness data
-    const { 
-      consciousnessResonance = 0,
-      dominantEmotionalTemperature = 6000,
-      totalIntensity = 0,
-      activeLayerCount = 0,
-      currentPalette = []
-    } = consciousnessState;
-    
-    // Format RGB data from current palette
-    if (currentPalette.length > 0) {
-      const primaryColor = currentPalette[0];
-      if (primaryColor && primaryColor.rgb) {
-        dataLines.push(`RGB: ${primaryColor.rgb.r},${primaryColor.rgb.g},${primaryColor.rgb.b}`);
-      }
-      
-      // OKLAB data if available
-      if (primaryColor && primaryColor.oklab) {
-        const { L, a, b } = primaryColor.oklab;
-        dataLines.push(`OKLAB: ${L.toFixed(2)},${a.toFixed(2)},${b.toFixed(2)}`);
-      }
-    }
-    
-    // Consciousness metrics
-    dataLines.push(`CONSCIOUSNESS: ${Math.round(consciousnessResonance * 100)}%`);
-    dataLines.push(`TEMP: ${Math.round(dominantEmotionalTemperature)}K`);
-    dataLines.push(`INTENSITY: ${Math.round(totalIntensity * 100)}%`);
-    dataLines.push(`LAYERS: ${activeLayerCount}`);
-    
-    // Musical emotion data (placeholder - will be enhanced when musical data is available)
-    dataLines.push(`STATUS: CONSCIOUS`);
-    dataLines.push(`MODE: HOLOGRAPHIC`);
-    
-    return dataLines;
-  }
-
-  /**
-   * Create consciousness data stream canvas
-   */
-  private createConsciousnessDataStreamCanvas(): void {
-    if (this.dataStreamCanvas) return;
-    
-    this.dataStreamCanvas = document.createElement('canvas');
-    this.dataStreamCanvas.style.position = 'fixed';
-    this.dataStreamCanvas.style.top = '0';
-    this.dataStreamCanvas.style.left = '0';
-    this.dataStreamCanvas.style.width = '200px';
-    this.dataStreamCanvas.style.height = '100%';
-    this.dataStreamCanvas.style.pointerEvents = 'none';
-    this.dataStreamCanvas.style.opacity = '0.6';
-    this.dataStreamCanvas.style.zIndex = '9999';
-    this.dataStreamCanvas.style.fontFamily = 'monospace';
-    
-    // Set canvas size
-    this.dataStreamCanvas.width = 200;
-    this.dataStreamCanvas.height = window.innerHeight;
-    
-    // Add to interface container
-    if (this.interfaceContainer) {
-      this.interfaceContainer.appendChild(this.dataStreamCanvas);
-    } else {
-      document.body.appendChild(this.dataStreamCanvas);
-    }
-  }
-
-  /**
-   * Render consciousness data stream on canvas
-   */
-  private renderConsciousnessDataStream(dataLines: string[]): void {
-    if (!this.dataStreamCanvas) return;
-    
-    const ctx = this.dataStreamCanvas.getContext('2d');
-    if (!ctx) return;
-    
-    // Clear canvas
-    ctx.clearRect(0, 0, this.dataStreamCanvas.width, this.dataStreamCanvas.height);
-    
-    // Set text properties
-    ctx.font = '12px monospace';
-    ctx.fillStyle = `rgba(var(--organic-holographic-rgb, 100, 255, 200), 0.8)`;
-    ctx.textAlign = 'left';
-    
-    // Render data lines with Matrix-style streaming effect
-    const lineHeight = 16;
-    const startY = 50;
-    const streamOffset = (Date.now() * 0.05) % (lineHeight * 2); // Continuous scrolling
-    
-    dataLines.forEach((line, index) => {
-      const y = startY + (index * lineHeight * 2) - streamOffset;
-      
-      // Only render if within canvas bounds
-      if (y > -lineHeight && y < this.dataStreamCanvas!.height + lineHeight) {
-        // Add streaming effect with character-by-character reveal
-        const revealProgress = (Date.now() * 0.01 + index) % 1;
-        const revealLength = Math.floor(line.length * revealProgress);
-        const visibleText = line.substring(0, revealLength);
-        
-        // Render main text
-        ctx.fillStyle = `rgba(var(--organic-holographic-rgb, 100, 255, 200), 0.9)`;
-        ctx.fillText(visibleText, 10, y);
-        
-        // Add cursor effect
-        if (revealLength < line.length) {
-          ctx.fillStyle = `rgba(var(--organic-holographic-rgb, 100, 255, 200), 1.0)`;
-          ctx.fillText('_', 10 + (revealLength * 7), y);
-        }
-        
-        // Add trailing characters for Matrix effect
-        for (let i = 0; i < 3; i++) {
-          const trailY = y + (i + 1) * lineHeight;
-          if (trailY < this.dataStreamCanvas!.height) {
-            const randomChar = this.dataStream.characters[Math.floor(Math.random() * this.dataStream.characters.length)];
-            const trailOpacity = 0.3 - (i * 0.1);
-            ctx.fillStyle = `rgba(var(--organic-holographic-rgb, 100, 255, 200), ${trailOpacity})`;
-            if (randomChar) {
-              ctx.fillText(randomChar, 10 + Math.random() * 150, trailY);
-            }
-          }
-        }
-      }
-    });
-    
-    // Schedule next frame
-    requestAnimationFrame(() => this.renderConsciousnessDataStream(dataLines));
-  }
+  // Canvas-based consciousness data stream methods removed - now handled via CSS-only implementations
 
   /**
    * Organic consciousness atmospheric effects system
    * Phase 4.2c: Advanced Atmospheric Enhancement - flowing, seamless, organic
+   * Now updates CSS variables for element-native consciousness effects
    */
   public updateConsciousnessScanlines(consciousnessLevel: number, emotionalTemperature: number, musicalIntensity: number): void {
-    if (!this.scanlineOverlay) return;
+    // Update CSS variables for element-native consciousness effects
+    const consciousnessDensity = Math.max(0.2, consciousnessLevel * 1.5);
+    const temperatureFrequency = this.mapTemperatureToFrequency(emotionalTemperature);
+    const musicalPulse = Math.sin(performance.now() * 0.005 * musicalIntensity) * 0.3 + 0.7;
 
-    // Calculate consciousness-driven atmospheric parameters
-    const consciousnessDensity = Math.max(0.2, consciousnessLevel * 1.5); // Denser atmosphere for higher consciousness
-    const temperatureFrequency = this.mapTemperatureToFrequency(emotionalTemperature); // Flow speed based on emotional temperature
-    const musicalPulse = Math.sin(performance.now() * 0.005 * musicalIntensity) * 0.3 + 0.7; // Musical pulse modulation
+    // Update CSS variables that elements can use for consciousness effects
+    const root = document.documentElement;
+    root.style.setProperty('--consciousness-scanline-density', consciousnessDensity.toString());
+    root.style.setProperty('--consciousness-scanline-frequency', `${temperatureFrequency}px`);
+    root.style.setProperty('--consciousness-scanline-opacity', (consciousnessLevel * 0.15).toString());
+    root.style.setProperty('--musical-scanline-pulse', musicalPulse.toString());
+    root.style.setProperty('--temperature-scanline-color-shift', `${((emotionalTemperature - 5000) / 3000) * 30}deg`);
+  }
 
-    // Update organic atmospheric effect parameters
-    this.scanlineEffect.frequency = temperatureFrequency * consciousnessDensity;
-    this.scanlineEffect.opacity = Math.min(0.15, consciousnessLevel * 0.2 * musicalPulse); // Reduced for organic subtlety
-    this.scanlineEffect.speed = 0.2 + (musicalIntensity * 0.8) + (consciousnessLevel * 0.3);
-
-    // Apply organic consciousness-responsive atmospheric pattern
-    this.applySophisticatedScanlines(consciousnessLevel, emotionalTemperature, musicalIntensity);
+  /**
+   * Update enhanced aberration system CSS variables based on consciousness and musical data
+   * Phase 4.2g: Enhanced CSS-Only Aberration Integration
+   */
+  public updateAberrationEffects(consciousnessLevel: number, emotionalTemperature: number, musicalIntensity: number, beatDetected: boolean = false): void {
+    const root = document.documentElement;
     
-    console.log(`[HolographicUISystem] 🌊 Organic atmosphere updated: density=${consciousnessDensity.toFixed(2)}, flow=${temperatureFrequency.toFixed(1)}Hz, pulse=${musicalPulse.toFixed(2)}`);
+    // Base aberration intensity controlled by consciousness level
+    const baseIntensity = Math.min(1, consciousnessLevel * 1.2);
+    
+    // Musical synchronization affects color separation and pulse
+    const musicalSync = Math.min(1, musicalIntensity * 1.5);
+    const colorSeparation = 2 + (musicalSync * 3); // 2-5px range
+    
+    // Emotional temperature affects RGB channel shifts
+    const tempNormalized = Math.max(3000, Math.min(8000, emotionalTemperature));
+    const tempRatio = (tempNormalized - 5500) / 2500; // -1 to 1 range around neutral 5500K
+    
+    // Calculate individual channel shifts based on temperature
+    const redShift = 1.5 + (tempRatio * 2); // More red shift for warm temperatures
+    const blueShift = -1.5 - (tempRatio * 2); // More blue shift for cool temperatures  
+    const greenShift = tempRatio * 0.5; // Subtle green adjustment
+    
+    // Musical pulse calculation with beat detection enhancement
+    const musicalPulse = Math.sin(performance.now() * 0.003 * musicalIntensity) * 0.4 + 0.6;
+    const beatBoost = beatDetected ? 1.5 : 1.0;
+    
+    // Wave frequency affected by consciousness and music
+    const waveFrequency = 1000 + (consciousnessLevel * 2000) + (musicalIntensity * 1000); // 1-4s range
+    
+    // Update aberration CSS variables
+    root.style.setProperty('--aberration-intensity', (baseIntensity * beatBoost).toString());
+    root.style.setProperty('--aberration-color-separation', `${colorSeparation}px`);
+    root.style.setProperty('--aberration-musical-sync', musicalSync.toString());
+    root.style.setProperty('--aberration-emotional-temperature', `${emotionalTemperature}K`);
+    root.style.setProperty('--aberration-consciousness-level', consciousnessLevel.toString());
+    
+    // Individual channel control
+    root.style.setProperty('--aberration-red-shift', `${redShift}px`);
+    root.style.setProperty('--aberration-green-shift', `${greenShift}px`);
+    root.style.setProperty('--aberration-blue-shift', `${blueShift}px`);
+    
+    // Animation timing control
+    root.style.setProperty('--aberration-wave-frequency', `${waveFrequency}ms`);
+    root.style.setProperty('--aberration-pulse-intensity', (musicalPulse * beatBoost).toString());
+    
+    // Reading mode integration (already handled by existing reading mode detection)
+    const readingModeActive = parseFloat(root.style.getPropertyValue('--reading-mode-active') || '0');
+    const readingModeReduction = Math.min(0.8, readingModeActive * 0.6);
+    root.style.setProperty('--aberration-reading-mode-reduction', readingModeReduction.toString());
   }
 
   /**
@@ -1258,122 +1139,7 @@ export class HolographicUISystem {
     return 2 + (tempRatio * 10); // 2-12Hz range
   }
 
-  /**
-   * Apply organic consciousness-responsive atmospheric effects
-   * Redesigned to match visualGuide.png aesthetic - flowing, atmospheric, seamless
-   */
-  private applySophisticatedScanlines(consciousnessLevel: number, emotionalTemperature: number, musicalIntensity: number): void {
-    if (!this.scanlineOverlay) return;
-
-    const time = performance.now() * 0.001;
-    const baseOpacity = this.scanlineEffect.opacity;
-
-    // Create organic atmospheric interference layers
-    let atmosphericPattern = '';
-
-    // Primary consciousness enhancement zone - subtle color grading enhancement
-    const enhancementIntensity = consciousnessLevel * baseOpacity * 0.3; // Much more subtle
-    const enhancementSize = 150 + (consciousnessLevel * 100); // Larger, softer zones
-    const flowSpeed = musicalIntensity * 0.2 + 0.05; // Slower, more cinematic
-    
-    atmosphericPattern += `
-      radial-gradient(
-        ellipse ${enhancementSize * 1.8}px ${enhancementSize * 1.2}px at 
-        ${50 + Math.sin(time * flowSpeed) * 15}% 
-        ${50 + Math.cos(time * flowSpeed * 0.8) * 18}%,
-        hsla(${180 + ((emotionalTemperature - 5000) / 3000) * 40}, 50%, 65%, ${enhancementIntensity}) 0%,
-        hsla(${180 + ((emotionalTemperature - 5000) / 3000) * 40}, 50%, 65%, ${enhancementIntensity * 0.3}) 50%,
-        transparent 85%
-      )`;
-
-    // Secondary emotional temperature enhancement layer - subtle color shift
-    if (consciousnessLevel > 0.4) {
-      const tempIntensity = (consciousnessLevel - 0.4) * baseOpacity * 0.2; // Much more subtle
-      const tempSize = 120 + ((emotionalTemperature - 5000) / 3000) * 60; // Larger, softer enhancement
-      const tempHue = ((emotionalTemperature - 4000) / 4000) * 30; // Reduced hue shift
-      
-      atmosphericPattern += `, 
-        radial-gradient(
-          ellipse ${tempSize * 2}px ${tempSize * 1.5}px at 
-          ${30 + Math.sin(time * flowSpeed * 1.1) * 12}% 
-          ${70 + Math.cos(time * flowSpeed * 0.7) * 15}%,
-          hsla(${200 + tempHue}, 40%, 70%, ${tempIntensity}) 0%,
-          hsla(${200 + tempHue}, 40%, 70%, ${tempIntensity * 0.2}) 60%,
-          transparent 90%
-        )`;
-    }
-
-    // Tertiary musical energy enhancement - gentle breathing pulse
-    if (consciousnessLevel > 0.6) {
-      const musicalIntensityAdj = musicalIntensity * baseOpacity * 0.15; // Much more subtle
-      const pulseSize = 80 + (musicalIntensity * 80); // Larger, softer
-      const pulsePhase = Math.sin(time * musicalIntensity * 1.5) * 0.3 + 0.7; // Gentle pulse
-      
-      atmosphericPattern += `, 
-        radial-gradient(
-          circle ${pulseSize * (0.8 + pulsePhase * 0.2)}px at 
-          ${70 + Math.sin(time * flowSpeed * 1.3) * 8}% 
-          ${30 + Math.cos(time * flowSpeed * 0.9) * 12}%,
-          hsla(${40 + ((emotionalTemperature - 5000) / 3000) * 20}, 45%, 75%, ${musicalIntensityAdj * pulsePhase}) 0%,
-          hsla(${40 + ((emotionalTemperature - 5000) / 3000) * 20}, 45%, 75%, ${musicalIntensityAdj * pulsePhase * 0.2}) 40%,
-          transparent 80%
-        )`;
-    }
-
-    // Advanced consciousness subtle enhancement for very high levels (>0.8) - gentle complexity
-    if (consciousnessLevel > 0.8) {
-      const complexityIntensity = (consciousnessLevel - 0.8) * baseOpacity * 0.1; // Very subtle
-      const complexityScale = 60 + Math.sin(time * 0.3) * 15; // Gentler variation
-      
-      // Create subtle complexity enhancement zones
-      for (let i = 0; i < 2; i++) { // Reduced from 3 to 2 for subtlety
-        const complexityOffset = i * 3.7; // Different prime for organic distribution
-        const complexityPhase = time * (0.2 + i * 0.05); // Slower, more cinematic
-        atmosphericPattern += `, 
-          radial-gradient(
-            ellipse ${complexityScale * (1 + i * 0.5)}px ${complexityScale * (0.8 + i * 0.3)}px at 
-            ${25 + i * 35 + Math.sin(complexityPhase + complexityOffset) * 6}% 
-            ${30 + i * 25 + Math.cos(complexityPhase * 1.1 + complexityOffset) * 8}%,
-            hsla(${160 + i * 40 + ((emotionalTemperature - 5000) / 3000) * 15}, 30%, 80%, ${complexityIntensity * (0.7 + Math.sin(complexityPhase) * 0.2)}) 0%,
-            transparent 70%
-          )`;
-      }
-    }
-
-    // Apply the organic atmospheric pattern
-    this.scanlineOverlay.style.background = atmosphericPattern;
-
-    // Organic transform effects
-    const organicScale = 1 + (consciousnessLevel * 0.02); // Subtle breathing scale
-    const organicRotation = Math.sin(time * flowSpeed * 0.5) * (consciousnessLevel * 2); // Gentle rotation
-    const organicTranslateX = Math.sin(time * flowSpeed * 0.7) * (musicalIntensity * 3);
-    const organicTranslateY = Math.cos(time * flowSpeed * 0.9) * (consciousnessLevel * 2);
-    
-    this.scanlineOverlay.style.transform = `
-      scale(${organicScale}) 
-      rotate(${organicRotation}deg) 
-      translate(${organicTranslateX}px, ${organicTranslateY}px)
-    `;
-
-    // Enhancement lens effects - no blur, only enhancement filters
-    const brightness = 1 + (musicalIntensity * consciousnessLevel * 0.05); // Subtle brightness boost
-    const contrast = 1 + (consciousnessLevel * 0.1); // Enhanced contrast
-    const saturation = 1 + (consciousnessLevel * 0.15); // Enhanced saturation
-    
-    // Use backdrop-filter for lens effect that enhances underlying content
-    this.scanlineOverlay.style.backdropFilter = `
-      brightness(${brightness}) 
-      contrast(${contrast})
-      saturate(${saturation})
-      hue-rotate(${((emotionalTemperature - 5000) / 3000) * 20}deg)
-    `;
-    
-    // Remove filter blur that was causing overlay effect
-    this.scanlineOverlay.style.filter = 'none';
-
-    // Update CSS variables for cross-system integration
-    this.updateScanlineCSSVariables(consciousnessLevel, emotionalTemperature, musicalIntensity);
-  }
+  // applySophisticatedScanlines method removed - converted to CSS-only implementation
 
   /**
    * Update CSS variables for scanline system integration
@@ -1399,6 +1165,116 @@ export class HolographicUISystem {
       root.style.setProperty('--consciousness-scanline-interference', 'none');
       root.style.setProperty('--consciousness-scanline-complexity', '0');
     }
+  }
+
+  /**
+   * Detect reading mode based on user activity and content area
+   * Updates CSS variables for reading-mode-aware holographic effects
+   */
+  public detectReadingMode(): void {
+    const root = document.documentElement;
+    
+    // Check if user is actively reading (scrolling, text selection, long hover)
+    const isTextSelected = (window.getSelection()?.toString() || '').length > 0;
+    const isUserScrolling = this.isUserCurrentlyScrolling();
+    const isHoveringTextContent = this.isHoveringTextContent();
+    
+    // Calculate reading mode intensity (0-1)
+    let readingModeActive = 0;
+    
+    if (isTextSelected) readingModeActive += 0.6;
+    if (isUserScrolling) readingModeActive += 0.3;
+    if (isHoveringTextContent) readingModeActive += 0.4;
+    
+    // Smooth reading mode transitions
+    readingModeActive = Math.min(1, readingModeActive);
+    
+    // Update CSS variable for holographic effect intensity reduction during reading
+    root.style.setProperty('--reading-mode-active', readingModeActive.toString());
+  }
+
+  /**
+   * Track user interaction patterns for content-aware holographic effects
+   */
+  public trackUserInteraction(): void {
+    const root = document.documentElement;
+    
+    // Detect various interaction types
+    const isMouseMoving = this.isMouseCurrentlyMoving();
+    const isClickingUI = this.wasRecentUIClick();
+    const isFocusedOnInput = this.isFocusedOnInputElement();
+    
+    // Calculate interaction intensity (0-1)
+    let interactionIntensity = 0;
+    
+    if (isMouseMoving) interactionIntensity += 0.4;
+    if (isClickingUI) interactionIntensity += 0.5;
+    if (isFocusedOnInput) interactionIntensity += 0.6;
+    
+    // Smooth interaction intensity for natural holographic response
+    interactionIntensity = Math.min(1, interactionIntensity);
+    
+    // Update CSS variable for interaction-aware holographic effects
+    root.style.setProperty('--user-interaction-detected', interactionIntensity.toString());
+  }
+
+  /**
+   * Check if user is currently scrolling (used for reading mode detection)
+   */
+  private isUserCurrentlyScrolling(): boolean {
+    // Simple scroll detection - can be enhanced with more sophisticated timing
+    const scrollContainer = document.querySelector('.main-view-container__scroll-node');
+    if (!scrollContainer) return false;
+    
+    // Check if scroll position has changed recently
+    const currentScrollTop = scrollContainer.scrollTop;
+    const lastScrollTop = this.lastScrollPosition || 0;
+    this.lastScrollPosition = currentScrollTop;
+    
+    return Math.abs(currentScrollTop - lastScrollTop) > 5;
+  }
+
+  /**
+   * Check if user is hovering over text content
+   */
+  private isHoveringTextContent(): boolean {
+    const hoveredElement = document.querySelector(':hover');
+    if (!hoveredElement) return false;
+    
+    // Check if hovered element contains significant text content
+    const textContent = hoveredElement.textContent?.trim() || '';
+    return textContent.length > 20; // Threshold for "significant" text
+  }
+
+  /**
+   * Check if mouse is currently moving
+   */
+  private isMouseCurrentlyMoving(): boolean {
+    // Track mouse movement with simple timestamp check
+    const now = performance.now();
+    const lastMovement = this.lastMouseMovement || 0;
+    return (now - lastMovement) < 2000; // Movement within last 2 seconds
+  }
+
+  /**
+   * Check if there was a recent UI click
+   */
+  private wasRecentUIClick(): boolean {
+    const now = performance.now();
+    const lastClick = this.lastUIClick || 0;
+    return (now - lastClick) < 1000; // Click within last 1 second
+  }
+
+  /**
+   * Check if user is focused on an input element
+   */
+  private isFocusedOnInputElement(): boolean {
+    const activeElement = document.activeElement;
+    if (!activeElement) return false;
+    
+    const inputElements = ['input', 'textarea', 'select'];
+    return inputElements.includes(activeElement.tagName.toLowerCase()) ||
+           activeElement.getAttribute('contenteditable') === 'true';
   }
 
   public setTransparency(transparency: number): void {
@@ -1447,5 +1323,915 @@ export class HolographicUISystem {
     })
     
     this.isInitialized = false
+    this.initialized = false
+    
+    // Cleanup OKLAB event subscriptions
+    this.eventSubscriptionIds.forEach(id => {
+      unifiedEventBus.unsubscribe(id)
+    })
+    this.eventSubscriptionIds = []
+  }
+
+  // ========================================================================
+  // QUALITY SCALING INTERFACE IMPLEMENTATION
+  // ========================================================================
+
+  /**
+   * Set quality level for holographic effects
+   */
+  public setQualityLevel(level: QualityLevel): void {
+    this.currentQualityLevel = level
+    
+    // Adjust holographic settings based on quality level
+    switch (level.level) {
+      case 'minimal':
+        this.holographicState.flickerIntensity = 0.1
+        this.holographicState.transparency = 0.9
+        this.holographicState.chromatic = 0.1
+        this.holographicState.scanlineIntensity = 0.2
+        this.holographicState.dataStreamFlow = 0.2
+        this.holographicState.interferenceLevel = 0.0
+        this.scanlineEffect.animation = false
+        break
+        
+      case 'low':
+        this.holographicState.flickerIntensity = 0.2
+        this.holographicState.transparency = 0.85
+        this.holographicState.chromatic = 0.2
+        this.holographicState.scanlineIntensity = 0.3
+        this.holographicState.dataStreamFlow = 0.3
+        this.holographicState.interferenceLevel = 0.1
+        this.scanlineEffect.animation = true
+        this.scanlineEffect.speed = 0.3
+        break
+        
+      case 'medium':
+        this.holographicState.flickerIntensity = 0.4
+        this.holographicState.transparency = 0.8
+        this.holographicState.chromatic = 0.3
+        this.holographicState.scanlineIntensity = 0.6
+        this.holographicState.dataStreamFlow = 0.5
+        this.holographicState.interferenceLevel = 0.2
+        this.scanlineEffect.animation = true
+        this.scanlineEffect.speed = 0.5
+        break
+        
+      case 'high':
+        this.holographicState.flickerIntensity = 0.6
+        this.holographicState.transparency = 0.7
+        this.holographicState.chromatic = 0.5
+        this.holographicState.scanlineIntensity = 0.8
+        this.holographicState.dataStreamFlow = 0.8
+        this.holographicState.interferenceLevel = 0.4
+        this.scanlineEffect.animation = true
+        this.scanlineEffect.speed = 0.8
+        break
+        
+      case 'ultra':
+        this.holographicState.flickerIntensity = 0.8
+        this.holographicState.transparency = 0.6
+        this.holographicState.chromatic = 0.7
+        this.holographicState.scanlineIntensity = 1.0
+        this.holographicState.dataStreamFlow = 1.0
+        this.holographicState.interferenceLevel = 0.6
+        this.scanlineEffect.animation = true
+        this.scanlineEffect.speed = 1.0
+        break
+    }
+    
+    // Update quality capabilities
+    this.updateQualityCapabilities(level)
+  }
+
+  /**
+   * Get current performance impact metrics
+   */
+  public getPerformanceImpact(): PerformanceMetrics {
+    const activeElements = this.holographicElements.size
+    const averageProcessingTime = this.calculateProcessingTime()
+    
+    return {
+      fps: 60, // Holographic effects typically maintain 60fps
+      frameTime: averageProcessingTime,
+      memoryUsageMB: this.estimateMemoryUsage(),
+      cpuUsagePercent: this.estimateCPUUsage(activeElements),
+      gpuUsagePercent: this.holographicState.chromatic > 0.3 ? 20 : 10,
+      renderTime: averageProcessingTime,
+      timestamp: performance.now()
+    }
+  }
+
+  /**
+   * Reduce quality by specified amount
+   */
+  public reduceQuality(amount: number): void {
+    // Apply quality reduction adjustments
+    this.qualityAdjustments['flicker-reduction'] = (this.qualityAdjustments['flicker-reduction'] || 0) + amount
+    this.qualityAdjustments['effect-reduction'] = (this.qualityAdjustments['effect-reduction'] || 0) + amount * 0.8
+    
+    // Apply reductions to current settings
+    this.holographicState.flickerIntensity = Math.max(0.1, this.holographicState.flickerIntensity * (1 - amount * 0.8))
+    this.holographicState.chromatic = Math.max(0.0, this.holographicState.chromatic * (1 - amount))
+    this.holographicState.scanlineIntensity = Math.max(0.1, this.holographicState.scanlineIntensity * (1 - amount * 0.6))
+    this.holographicState.dataStreamFlow = Math.max(0.1, this.holographicState.dataStreamFlow * (1 - amount * 0.4))
+    this.holographicState.interferenceLevel = Math.max(0.0, this.holographicState.interferenceLevel * (1 - amount))
+    
+    // Disable animation for significant reductions
+    if (amount > 0.5) {
+      this.scanlineEffect.animation = false
+    }
+  }
+
+  /**
+   * Increase quality by specified amount
+   */
+  public increaseQuality(amount: number): void {
+    // Remove previous reductions first
+    Object.keys(this.qualityAdjustments).forEach(key => {
+      this.qualityAdjustments[key] = Math.max(0, (this.qualityAdjustments[key] || 0) - amount)
+    })
+    
+    // Restore quality settings based on current level
+    if (this.currentQualityLevel) {
+      const preset = this.getPresetForLevel(this.currentQualityLevel.level)
+      
+      // Gradually restore towards preset settings
+      this.holographicState.flickerIntensity = Math.min(preset.flickerIntensity, 
+        this.holographicState.flickerIntensity * (1 + amount * 0.3))
+      this.holographicState.chromatic = Math.min(preset.chromatic,
+        this.holographicState.chromatic * (1 + amount * 0.4))
+      this.holographicState.scanlineIntensity = Math.min(preset.scanlineIntensity,
+        this.holographicState.scanlineIntensity * (1 + amount * 0.2))
+      this.holographicState.dataStreamFlow = Math.min(preset.dataStreamFlow,
+        this.holographicState.dataStreamFlow * (1 + amount * 0.2))
+      
+      // Re-enable animation if quality is sufficient
+      if (amount > 0.3) {
+        this.scanlineEffect.animation = true
+      }
+    }
+  }
+
+  /**
+   * Get quality capabilities for this system
+   */
+  public getQualityCapabilities(): QualityCapability[] {
+    return [...this.qualityCapabilities]
+  }
+
+  // ========================================================================
+  // QUALITY SCALING HELPER METHODS
+  // ========================================================================
+
+  private updateQualityCapabilities(level: QualityLevel): void {
+    this.qualityCapabilities.forEach(capability => {
+      switch (capability.name) {
+        case 'holographic-effects':
+          capability.enabled = this.holographicState.flickerIntensity > 0.2
+          break
+        case 'scanline-overlay':
+          capability.enabled = this.holographicState.scanlineIntensity > 0.3
+          break
+        case 'chromatic-aberration':
+          capability.enabled = this.holographicState.chromatic > 0.2
+          break
+        case 'data-streams':
+          capability.enabled = this.holographicState.dataStreamFlow > 0.3
+          break
+        case 'interference-patterns':
+          capability.enabled = this.holographicState.interferenceLevel > 0.1
+          break
+        case 'organic-integration':
+          capability.enabled = level.level !== 'minimal'
+          break
+      }
+    })
+  }
+
+  private getPresetForLevel(level: string): HolographicState {
+    switch (level) {
+      case 'minimal':
+        return this.holographicPresets['organic-consciousness']
+      case 'low':
+        return this.holographicPresets['organic-consciousness']
+      case 'medium':
+        return this.holographicPresets['star-wars']
+      case 'high':
+        return this.holographicPresets['blade-runner']
+      case 'ultra':
+        return this.holographicPresets['blade-runner']
+      default:
+        return this.holographicPresets['star-wars']
+    }
+  }
+
+  private calculateProcessingTime(): number {
+    const activeElements = this.holographicElements.size
+    const complexityFactor = (this.holographicState.flickerIntensity + 
+                             this.holographicState.chromatic + 
+                             this.holographicState.scanlineIntensity) / 3
+    
+    return Math.max(2, activeElements * complexityFactor * 0.5)
+  }
+
+  private estimateMemoryUsage(): number {
+    const activeElements = this.holographicElements.size
+    const baseMemoryPerElement = 0.3 // MB per holographic element
+    const canvasMemory = 0 // Canvas overlays removed - now using CSS-only approach
+    
+    return (baseMemoryPerElement * activeElements) + canvasMemory
+  }
+
+  private estimateCPUUsage(activeElements: number): number {
+    const baseUsage = 2 // Base CPU usage percentage
+    const complexityFactor = (this.holographicState.flickerIntensity + 
+                             this.holographicState.chromatic + 
+                             this.holographicState.scanlineIntensity) / 3
+    const animationMultiplier = this.scanlineEffect.animation ? 1.5 : 1.0
+    
+    return Math.min(30, baseUsage * activeElements * complexityFactor * animationMultiplier)
+  }
+  
+  /**
+   * Convert hex color to RGB string for CSS variables
+   */
+  private hexToRgb(hex: string): string {
+    try {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+      if (result && result[1] && result[2] && result[3]) {
+        return `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+      }
+      return '100, 255, 200' // Fallback holographic cyan
+    } catch (error) {
+      Y3K?.debug?.warn('HolographicUISystem', 'Failed to convert hex to RGB:', error)
+      return '100, 255, 200'
+    }
+  }
+  
+  /**
+   * Setup OKLAB event subscriptions for holographic consciousness
+   */
+  private setupOKLABEventSubscriptions(): void {
+    try {
+      // Subscribe to unified OKLAB color events (with type assertion for now)
+      const oklabColorId = unifiedEventBus.subscribe(
+        'colors:oklab-enhanced' as any,
+        this.handleOKLABColorEvent.bind(this),
+        'HolographicUISystem'
+      )
+      this.eventSubscriptionIds.push(oklabColorId)
+      
+      // Subscribe to musical OKLAB coordination events (with type assertion for now)
+      const musicalOklabId = unifiedEventBus.subscribe(
+        'colors:musical-oklab-coordinated' as any,
+        this.handleMusicalOKLABEvent.bind(this),
+        'HolographicUISystem'
+      )
+      this.eventSubscriptionIds.push(musicalOklabId)
+      
+      // Subscribe to emotional temperature mapping events (with type assertion for now)
+      const emotionalTempId = unifiedEventBus.subscribe(
+        'colors:emotional-temperature-mapped' as any,
+        this.handleEmotionalTemperatureEvent.bind(this),
+        'HolographicUISystem'
+      )
+      this.eventSubscriptionIds.push(emotionalTempId)
+      
+      // Subscribe to genre detection events for preset adjustment (with type assertion for now)
+      const genreDetectedId = unifiedEventBus.subscribe(
+        'audio:genre-detected' as any,
+        this.handleGenreDetectionEvent.bind(this),
+        'HolographicUISystem'
+      )
+      this.eventSubscriptionIds.push(genreDetectedId)
+      
+      Y3K?.debug?.log('HolographicUISystem', 'OKLAB event subscriptions established', {
+        subscriptionCount: this.eventSubscriptionIds.length
+      })
+      
+    } catch (error) {
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to setup OKLAB event subscriptions:', error)
+    }
+  }
+  
+  /**
+   * Setup user interaction tracking for content-aware holographic effects
+   */
+  private setupUserInteractionTracking(): void {
+    try {
+      // Track mouse movement for interaction awareness
+      document.addEventListener('mousemove', () => {
+        this.lastMouseMovement = performance.now();
+      }, { passive: true });
+      
+      // Track clicks for UI interaction detection
+      document.addEventListener('click', () => {
+        this.lastUIClick = performance.now();
+      }, { passive: true });
+      
+      // Setup periodic reading mode and interaction detection
+      setInterval(() => {
+        this.detectReadingMode();
+        this.trackUserInteraction();
+      }, 500); // Check every 500ms for smooth responsiveness
+      
+      Y3K?.debug?.log('HolographicUISystem', 'User interaction tracking initialized');
+    } catch (error) {
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to setup user interaction tracking:', error);
+    }
+  }
+  
+  /**
+   * Handle unified OKLAB color events
+   */
+  private async handleOKLABColorEvent(data: any): Promise<void> {
+    try {
+      const { enhancedColors, oklabPreset, rawColors, trackUri } = data
+      
+      // Update holographic preset based on OKLAB enhancement
+      if (oklabPreset) {
+        this.holographicPreset = oklabPreset
+      }
+      
+      // Extract perceptually uniform colors for holographic effects
+      if (enhancedColors) {
+        await this.updateHolographicColorsFromOKLAB(enhancedColors)
+      }
+      
+      Y3K?.debug?.log('HolographicUISystem', 'Updated holographic colors from OKLAB event', {
+        preset: oklabPreset?.name,
+        trackUri,
+        colorCount: Object.keys(enhancedColors || {}).length
+      })
+      
+    } catch (error) {
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to handle OKLAB color event:', error)
+    }
+  }
+  
+  /**
+   * Handle musical OKLAB coordination events
+   */
+  private async handleMusicalOKLABEvent(data: any): Promise<void> {
+    try {
+      const { 
+        coordinatedColors, 
+        detectedGenre, 
+        emotionalResult, 
+        oklabPreset, 
+        musicInfluenceStrength,
+        coordinationStrategy
+      } = data
+      
+      // Store musical context for holographic responsiveness
+      this.lastMusicalContext = {
+        genre: detectedGenre,
+        emotion: emotionalResult?.primaryEmotion,
+        preset: oklabPreset,
+        influence: musicInfluenceStrength,
+        strategy: coordinationStrategy,
+        timestamp: Date.now()
+      }
+      
+      // Update holographic preset based on musical context
+      if (oklabPreset) {
+        this.holographicPreset = oklabPreset
+      }
+      
+      // Apply musical OKLAB colors to holographic system
+      if (coordinatedColors) {
+        await this.updateHolographicColorsFromMusicalOKLAB(coordinatedColors, this.lastMusicalContext)
+      }
+      
+      // Update enhanced aberration effects with musical data
+      if (emotionalResult && musicInfluenceStrength !== undefined) {
+        const consciousnessLevel = this.holographicState.flickerIntensity || 0.5; // Use current holographic state
+        const emotionalTemperature = emotionalResult.emotionalTemperature || 6000;
+        const musicalIntensity = musicInfluenceStrength;
+        const beatDetected = emotionalResult.beatDetected || false;
+        
+        this.updateAberrationEffects(consciousnessLevel, emotionalTemperature, musicalIntensity, beatDetected);
+      }
+      
+      Y3K?.debug?.log('HolographicUISystem', 'Updated holographic effects from musical OKLAB coordination', {
+        genre: detectedGenre,
+        emotion: emotionalResult?.primaryEmotion,
+        preset: oklabPreset?.name,
+        influence: musicInfluenceStrength
+      })
+      
+    } catch (error) {
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to handle musical OKLAB event:', error)
+    }
+  }
+  
+  /**
+   * Handle emotional temperature mapping events
+   */
+  private async handleEmotionalTemperatureEvent(data: any): Promise<void> {
+    try {
+      const { 
+        emotionalTemperature, 
+        primaryEmotion, 
+        perceptualColorHex, 
+        oklabPreset, 
+        cssVariables 
+      } = data
+      
+      // Update holographic emotional responsiveness
+      await this.updateHolographicEmotionalTemperature(emotionalTemperature, primaryEmotion)
+      
+      // Apply emotional OKLAB color
+      if (perceptualColorHex) {
+        await this.updateHolographicColorFromEmotionalOKLAB(perceptualColorHex, emotionalTemperature)
+      }
+      
+      // Update aberration effects with emotional temperature data
+      const consciousnessLevel = this.holographicState.flickerIntensity || 0.5;
+      const musicalIntensity = this.lastMusicalContext?.influence || 0.5;
+      this.updateAberrationEffects(consciousnessLevel, emotionalTemperature, musicalIntensity, false);
+      
+      Y3K?.debug?.log('HolographicUISystem', 'Updated holographic emotional temperature', {
+        temperature: emotionalTemperature,
+        emotion: primaryEmotion,
+        color: perceptualColorHex
+      })
+      
+    } catch (error) {
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to handle emotional temperature event:', error)
+    }
+  }
+  
+  /**
+   * Handle genre detection events for preset adjustment
+   */
+  private async handleGenreDetectionEvent(data: any): Promise<void> {
+    try {
+      const { detectedGenre, confidence, audioFeatures } = data
+      
+      // Get genre-specific OKLAB preset
+      const genrePreset = this.genreManager.getOKLABPresetForGenre(detectedGenre)
+      if (genrePreset) {
+        this.holographicPreset = genrePreset
+        
+        // Adjust holographic effects based on genre characteristics
+        await this.adjustHolographicEffectsForGenre(detectedGenre, audioFeatures)
+      }
+      
+      Y3K?.debug?.log('HolographicUISystem', 'Adjusted holographic effects for detected genre', {
+        genre: detectedGenre,
+        confidence,
+        preset: genrePreset?.name
+      })
+      
+    } catch (error) {
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to handle genre detection event:', error)
+    }
+  }
+  
+  /**
+   * Update holographic colors from OKLAB-enhanced colors
+   */
+  private async updateHolographicColorsFromOKLAB(enhancedColors: Record<string, string>): Promise<void> {
+    try {
+      const root = document.documentElement
+      
+      // Process enhanced colors through OKLAB for perceptual uniformity
+      Object.entries(enhancedColors).forEach(([key, hexColor]) => {
+        if (hexColor && typeof hexColor === 'string') {
+          // Convert hex to OKLAB-enhanced CSS variables
+          const oklabResult = this.oklabProcessor.processColor(hexColor, this.holographicPreset)
+          
+          if (oklabResult.enhancedHex) {
+            // Update holographic CSS variables with OKLAB-enhanced colors
+            root.style.setProperty(`--holographic-${key.toLowerCase()}`, oklabResult.enhancedHex)
+            root.style.setProperty(`--holographic-${key.toLowerCase()}-rgb`, this.hexToRgb(oklabResult.enhancedHex))
+            
+            // Update OKLAB-specific variables
+            if (oklabResult.oklabEnhanced) {
+              const { L, a, b } = oklabResult.oklabEnhanced
+              root.style.setProperty(`--holographic-${key.toLowerCase()}-oklab`, `${L.toFixed(3)} ${a.toFixed(3)} ${b.toFixed(3)}`)
+            }
+          }
+        }
+      })
+      
+      // Update primary holographic variables for backward compatibility
+      if (enhancedColors['VIBRANT'] || enhancedColors['PRIMARY']) {
+        const primaryColor = enhancedColors['VIBRANT'] || enhancedColors['PRIMARY']
+        if (primaryColor) {
+          const oklabResult = this.oklabProcessor.processColor(primaryColor, this.holographicPreset)
+        
+          if (oklabResult.enhancedHex) {
+            root.style.setProperty('--organic-holographic-rgb', this.hexToRgb(oklabResult.enhancedHex))
+            root.style.setProperty('--sn-holographic-primary', oklabResult.enhancedHex)
+          }
+        }
+      }
+      
+    } catch (error) {
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to update holographic colors from OKLAB:', error)
+    }
+  }
+  
+  /**
+   * Update holographic colors from musical OKLAB coordination
+   */
+  private async updateHolographicColorsFromMusicalOKLAB(coordinatedColors: Record<string, string>, musicalContext: any): Promise<void> {
+    try {
+      // Apply coordinated colors with musical responsiveness
+      await this.updateHolographicColorsFromOKLAB(coordinatedColors)
+      
+      // Adjust holographic intensity based on musical influence
+      if (musicalContext.influence) {
+        this.adjustHolographicIntensityFromMusicalInfluence(musicalContext.influence)
+      }
+      
+      // Apply genre-specific holographic modifications
+      if (musicalContext.genre) {
+        await this.applyGenreSpecificHolographicEffects(musicalContext.genre, musicalContext.emotion)
+      }
+      
+    } catch (error) {
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to update holographic colors from musical OKLAB:', error)
+    }
+  }
+  
+  /**
+   * Update holographic color from emotional OKLAB mapping
+   */
+  private async updateHolographicColorFromEmotionalOKLAB(perceptualColorHex: string, emotionalTemperature: number): Promise<void> {
+    try {
+      const root = document.documentElement
+      
+      // Process emotional color through OKLAB
+      const oklabResult = this.oklabProcessor.processColor(perceptualColorHex, this.holographicPreset)
+      
+      if (oklabResult.enhancedHex) {
+        // Set emotional OKLAB holographic color
+        root.style.setProperty('--holographic-emotional-primary', oklabResult.enhancedHex)
+        root.style.setProperty('--holographic-emotional-rgb', this.hexToRgb(oklabResult.enhancedHex))
+        root.style.setProperty('--holographic-emotional-temperature', `${emotionalTemperature}K`)
+        
+        // Update holographic emotional temperature effects
+        await this.updateHolographicEmotionalTemperature(emotionalTemperature, null)
+      }
+      
+    } catch (error) {
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to update holographic color from emotional OKLAB:', error)
+    }
+  }
+  
+  /**
+   * Update holographic emotional temperature responsiveness
+   */
+  private async updateHolographicEmotionalTemperature(temperature: number, emotion: string | null): Promise<void> {
+    try {
+      // Map temperature to holographic effects
+      const temperatureNormalized = Math.max(3000, Math.min(8000, temperature))
+      const tempRatio = (temperatureNormalized - 3000) / 5000 // 0-1 range
+      
+      // Adjust holographic state based on emotional temperature
+      this.holographicState.flickerIntensity = 0.2 + (tempRatio * 0.4) // Warmer = more flicker
+      this.holographicState.chromatic = 0.1 + (tempRatio * 0.3) // Warmer = more chromatic
+      this.holographicState.energyStability = 1.0 - (tempRatio * 0.3) // Warmer = less stable
+      
+      // Cool temperatures enhance transparency and flow
+      if (tempRatio < 0.4) {
+        this.holographicState.transparency = 0.9 + (tempRatio * 0.1)
+        this.holographicState.dataStreamFlow = 0.3 + (tempRatio * 0.2)
+      } else {
+        // Warm temperatures enhance intensity and interference
+        this.holographicState.transparency = 0.8 - ((tempRatio - 0.4) * 0.2)
+        this.holographicState.interferenceLevel = 0.1 + ((tempRatio - 0.4) * 0.3)
+      }
+      
+      Y3K?.debug?.log('HolographicUISystem', 'Updated holographic effects from emotional temperature', {
+        temperature,
+        tempRatio,
+        flicker: this.holographicState.flickerIntensity,
+        chromatic: this.holographicState.chromatic
+      })
+      
+    } catch (error) {
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to update holographic emotional temperature:', error)
+    }
+  }
+  
+  /**
+   * Adjust holographic effects for detected genre
+   */
+  private async adjustHolographicEffectsForGenre(genre: string, audioFeatures?: any): Promise<void> {
+    try {
+      // Genre-specific holographic effect adjustments
+      switch (genre.toLowerCase()) {
+        case 'electronic':
+        case 'techno':
+        case 'edm':
+          this.holographicState.dataStreamFlow = 0.8
+          this.holographicState.scanlineIntensity = 0.7
+          this.holographicState.interferenceLevel = 0.4
+          this.scanlineEffect.speed = 0.8
+          break
+          
+        case 'classical':
+        case 'orchestral':
+          this.holographicState.transparency = 0.9
+          this.holographicState.energyStability = 0.8
+          this.holographicState.flickerIntensity = 0.2
+          this.scanlineEffect.organic = true
+          break
+          
+        case 'rock':
+        case 'metal':
+          this.holographicState.flickerIntensity = 0.6
+          this.holographicState.chromatic = 0.5
+          this.holographicState.interferenceLevel = 0.5
+          this.scanlineEffect.animation = true
+          break
+          
+        case 'ambient':
+        case 'atmospheric':
+          this.holographicState.transparency = 0.95
+          this.holographicState.dataStreamFlow = 0.3
+          this.holographicState.energyStability = 0.9
+          this.scanlineEffect.organic = true
+          this.scanlineEffect.speed = 0.2
+          break
+          
+        case 'jazz':
+        case 'blues':
+          this.holographicState.flickerIntensity = 0.4
+          this.holographicState.energyStability = 0.6
+          this.interferencePattern.type = 'organic'
+          this.scanlineEffect.organic = true
+          break
+          
+        default:
+          // Use balanced settings for unknown genres
+          this.holographicState.flickerIntensity = 0.4
+          this.holographicState.transparency = 0.8
+          this.holographicState.chromatic = 0.3
+          break
+      }
+      
+      Y3K?.debug?.log('HolographicUISystem', 'Adjusted holographic effects for genre', {
+        genre,
+        flicker: this.holographicState.flickerIntensity,
+        transparency: this.holographicState.transparency,
+        dataFlow: this.holographicState.dataStreamFlow
+      })
+      
+    } catch (error) {
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to adjust holographic effects for genre:', error)
+    }
+  }
+  
+  /**
+   * Adjust holographic intensity from musical influence strength
+   */
+  private adjustHolographicIntensityFromMusicalInfluence(influenceStrength: number): void {
+    try {
+      // Scale all holographic effects by musical influence (0-1)
+      const influenceMultiplier = 0.5 + (influenceStrength * 0.5) // 0.5-1.0 range
+      
+      this.holographicState.flickerIntensity *= influenceMultiplier
+      this.holographicState.chromatic *= influenceMultiplier
+      this.holographicState.scanlineIntensity *= influenceMultiplier
+      this.holographicState.dataStreamFlow *= influenceMultiplier
+      this.holographicState.interferenceLevel *= influenceMultiplier
+      
+      Y3K?.debug?.log('HolographicUISystem', 'Adjusted holographic intensity from musical influence', {
+        influence: influenceStrength,
+        multiplier: influenceMultiplier
+      })
+      
+    } catch (error) {
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to adjust holographic intensity from musical influence:', error)
+    }
+  }
+  
+  /**
+   * Apply genre-specific holographic effects
+   */
+  private async applyGenreSpecificHolographicEffects(genre: string, emotion?: string): Promise<void> {
+    try {
+      // Combine genre and emotion for nuanced holographic effects
+      const effectKey = `${genre.toLowerCase()}-${emotion || 'neutral'}`
+      
+      // Apply custom holographic presets based on genre-emotion combination
+      if (genre === 'electronic' && emotion === 'energetic') {
+        this.setHolographicPreset('blade-runner')
+        this.holographicState.dataStreamFlow = 1.0
+        this.holographicState.interferenceLevel = 0.6
+      } else if (genre === 'classical' && emotion === 'calm') {
+        this.setHolographicPreset('organic-consciousness')
+        this.holographicState.transparency = 0.95
+        this.holographicState.energyStability = 0.9
+      } else if (genre === 'rock' && emotion === 'aggressive') {
+        this.setHolographicPreset('star-wars')
+        this.holographicState.flickerIntensity = 0.8
+        this.holographicState.chromatic = 0.6
+      }
+      
+      Y3K?.debug?.log('HolographicUISystem', 'Applied genre-specific holographic effects', {
+        genre,
+        emotion,
+        effectKey
+      })
+      
+    } catch (error) {
+      Y3K?.debug?.error('HolographicUISystem', 'Failed to apply genre-specific holographic effects:', error)
+    }
+  }
+  
+  /**
+   * Update animation with delta time (IManagedSystem interface)
+   */
+  public updateAnimation(deltaTime: number): void {
+    this.updateHolographicAnimation(deltaTime)
+  }
+  
+  /**
+   * Health check for holographic system (IManagedSystem interface)
+   */
+  public async healthCheck(): Promise<HealthCheckResult> {
+    try {
+      const memoryUsage = this.estimateMemoryUsage()
+      const cpuUsage = this.estimateCPUUsage(this.holographicElements.size)
+      const activeElements = this.holographicElements.size
+      
+      const isHealthy = 
+        this.initialized &&
+        memoryUsage < 10 && // Less than 10MB
+        cpuUsage < 25 && // Less than 25% CPU
+        activeElements < 100 // Less than 100 active elements
+      
+      return {
+        healthy: isHealthy,
+        message: isHealthy ? 'Holographic UI system operating normally' : 'Holographic UI system performance degraded',
+        details: {
+          initialized: this.initialized,
+          activeElements,
+          memoryUsageMB: memoryUsage,
+          cpuUsagePercent: cpuUsage,
+          oklabIntegration: this.eventSubscriptionIds.length > 0,
+          lastUpdate: this.performanceMetrics.lastUpdate
+        }
+      }
+    } catch (error) {
+      return {
+        healthy: false,
+        message: `Holographic UI system health check failed: ${error}`,
+        details: { error: error instanceof Error ? error.message : String(error) }
+      }
+    }
+  }
+  
+  // ========================================================================
+  // OKLAB COLOR HELPER METHODS
+  // ========================================================================
+  
+  /**
+   * Get OKLAB-enhanced glow color for holographic effects
+   */
+  private getOKLABEnhancedGlowColor(intensity: number): string {
+    try {
+      // Get current holographic color from CSS variables or use fallback
+      const currentColor = getComputedStyle(document.documentElement)
+        .getPropertyValue('--sn-holographic-primary')?.trim() || '#64ffcc'
+      
+      // Process through OKLAB for perceptual enhancement
+      const oklabResult = this.oklabProcessor.processColor(currentColor, this.holographicPreset)
+      
+      if (oklabResult.enhancedHex) {
+        // Convert to RGBA with intensity
+        const rgb = this.hexToRgb(oklabResult.enhancedHex)
+        return `rgba(${rgb}, ${intensity})`
+      }
+      
+      // Fallback to spice variables with organic variable as final fallback
+      return `rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${intensity})`
+      
+    } catch (error) {
+      Y3K?.debug?.warn('HolographicUISystem', 'Failed to get OKLAB enhanced glow color:', error)
+      return `rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${intensity})`
+    }
+  }
+  
+  /**
+   * Get OKLAB-enhanced panel colors for translucent effects
+   */
+  private getOKLABEnhancedPanelColor(transparency: number): { background: string; gradient: string; border: string } {
+    try {
+      // Get current holographic color
+      const currentColor = getComputedStyle(document.documentElement)
+        .getPropertyValue('--sn-holographic-primary')?.trim() || '#64ffcc'
+      
+      // Process through OKLAB
+      const oklabResult = this.oklabProcessor.processColor(currentColor, this.holographicPreset)
+      
+      if (oklabResult.enhancedHex) {
+        const rgb = this.hexToRgb(oklabResult.enhancedHex)
+        return {
+          background: `rgba(${rgb}, ${transparency * 0.1})`,
+          gradient: `rgba(${rgb}, ${transparency * 0.05})`,
+          border: `rgba(${rgb}, ${transparency * 0.6})`
+        }
+      }
+      
+      // Fallback to spice variables with organic variable as final fallback
+      return {
+        background: `rgba(var(--spice-rgb-holographic-primary, var(--organic-holographic-rgb, 100, 255, 200)), ${transparency * 0.1})`,
+        gradient: `rgba(var(--spice-rgb-holographic-accent, var(--organic-holographic-rgb, 100, 255, 200)), ${transparency * 0.05})`,
+        border: `rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${transparency * 0.6})`
+      }
+      
+    } catch (error) {
+      Y3K?.debug?.warn('HolographicUISystem', 'Failed to get OKLAB enhanced panel color:', error)
+      return {
+        background: `rgba(var(--spice-rgb-holographic-primary, var(--organic-holographic-rgb, 100, 255, 200)), ${transparency * 0.1})`,
+        gradient: `rgba(var(--spice-rgb-holographic-accent, var(--organic-holographic-rgb, 100, 255, 200)), ${transparency * 0.05})`,
+        border: `rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${transparency * 0.6})`
+      }
+    }
+  }
+  
+  /**
+   * Get OKLAB consciousness-responsive glow colors
+   */
+  private getOKLABConsciousnessGlow(intensity: number, resonance: number): { outer: string; inner: string } {
+    try {
+      // Get consciousness accent color or fallback
+      const accentColor = getComputedStyle(document.documentElement)
+        .getPropertyValue('--sn-accent-hex')?.trim() || '#cba6f7'
+      
+      // Process through OKLAB with consciousness enhancement
+      const consciousnessPreset: EnhancementPreset = {
+        ...this.holographicPreset,
+        chromaBoost: this.holographicPreset.chromaBoost * (1 + resonance * 0.5),
+        lightnessBoost: this.holographicPreset.lightnessBoost * (1 + resonance * 0.3)
+      }
+      
+      const oklabResult = this.oklabProcessor.processColor(accentColor, consciousnessPreset)
+      
+      if (oklabResult.enhancedHex) {
+        const rgb = this.hexToRgb(oklabResult.enhancedHex)
+        return {
+          outer: `rgba(${rgb}, ${intensity})`,
+          inner: `rgba(${rgb}, ${intensity * 0.3})`
+        }
+      }
+      
+      // Fallback
+      return {
+        outer: `rgba(var(--organic-accent-rgb, 203, 166, 247), ${intensity})`,
+        inner: `rgba(var(--organic-accent-rgb, 203, 166, 247), ${intensity * 0.3})`
+      }
+      
+    } catch (error) {
+      Y3K?.debug?.warn('HolographicUISystem', 'Failed to get OKLAB consciousness glow:', error)
+      return {
+        outer: `rgba(var(--organic-accent-rgb, 203, 166, 247), ${intensity})`,
+        inner: `rgba(var(--organic-accent-rgb, 203, 166, 247), ${intensity * 0.3})`
+      }
+    }
+  }
+  
+  /**
+   * Get OKLAB-enhanced color for data streams with musical responsiveness
+   */
+  private getOKLABEnhancedDataStreamColor(intensity: number, musicalContext?: any): string {
+    try {
+      let baseColor = '#64ffcc' // Default holographic cyan
+      
+      // Use musical context if available
+      if (musicalContext?.emotion) {
+        const emotionalResult = this.emotionalMapper.mapMusicToEmotionalTemperature({
+          energy: 0.5,
+          valence: 0.5,
+          tempo: 120,
+          genre: musicalContext.genre || 'default'
+        })
+        
+        if (emotionalResult.perceptualColorHex) {
+          baseColor = emotionalResult.perceptualColorHex
+        }
+      }
+      
+      // Process through OKLAB
+      const oklabResult = this.oklabProcessor.processColor(baseColor, this.holographicPreset)
+      
+      if (oklabResult.enhancedHex) {
+        const rgb = this.hexToRgb(oklabResult.enhancedHex)
+        return `rgba(${rgb}, ${intensity})`
+      }
+      
+      return `rgba(var(--spice-rgb-holographic-primary, var(--organic-holographic-rgb, 100, 255, 200)), ${intensity})`
+      
+    } catch (error) {
+      Y3K?.debug?.warn('HolographicUISystem', 'Failed to get OKLAB enhanced data stream color:', error)
+      return `rgba(var(--spice-rgb-holographic-primary, var(--organic-holographic-rgb, 100, 255, 200)), ${intensity})`
+    }
   }
 }

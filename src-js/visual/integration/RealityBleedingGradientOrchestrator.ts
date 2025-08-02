@@ -14,7 +14,7 @@ import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { GradientDirectionalFlowSystem } from "@/audio/GradientDirectionalFlowSystem";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { RealityBleedingPerformanceOptimizer } from "@/core/performance/RealityBleedingPerformanceOptimizer";
 import { Y3K } from "@/debug/UnifiedDebugManager";
@@ -68,7 +68,7 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
   private depthLayeredSystem: DepthLayeredGradientSystem | null = null;
   private performanceOptimizer: RealityBleedingPerformanceOptimizer | null = null;
   
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
   private realityBleedingState: RealityBleedingState;
   private systemHealth: SystemHealth;
@@ -93,7 +93,14 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
     super(config, utils, performanceMonitor, musicSyncService, settingsManager);
     
     this.colorHarmonyEngine = year3000System?.colorHarmonyEngine || null;
-    this.cssVariableBatcher = new CSSVariableBatcher();
+    // Initialize CSS Consciousness Controller if available
+    const cssController = UnifiedCSSConsciousnessController.getInstance();
+    if (cssController) {
+      this.cssConsciousnessController = cssController;
+    } else {
+      Y3K?.debug?.warn("RealityBleedingGradientOrchestrator", "UnifiedCSSConsciousnessController not available, CSS consciousness disabled");
+      this.cssConsciousnessController = null;
+    }
     
     // Initialize state
     this.realityBleedingState = {
@@ -455,37 +462,41 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
   }
   
   private updatePerformanceVariables(): void {
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-reality-bleeding-performance-score',
-      this.metrics.performanceScore.toString()
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-reality-bleeding-quality',
-      this.metrics.effectsQuality
-    );
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-reality-bleeding-performance-score',
+        this.metrics.performanceScore.toString()
+      );
+      
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-reality-bleeding-quality',
+        this.metrics.effectsQuality
+      );
+    }
   }
   
   private updateMetricsVariables(): void {
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-reality-bleeding-systems-active',
-      this.metrics.totalSystemsActive.toString()
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-reality-bleeding-memory-usage',
-      this.metrics.memoryUsage.toFixed(1)
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-reality-bleeding-render-time',
-      this.metrics.renderTime.toFixed(1)
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-reality-bleeding-music-sync',
-      this.metrics.musicSyncStrength.toFixed(2)
-    );
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-reality-bleeding-systems-active',
+        this.metrics.totalSystemsActive.toString()
+      );
+      
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-reality-bleeding-memory-usage',
+        this.metrics.memoryUsage.toFixed(1)
+      );
+      
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-reality-bleeding-render-time',
+        this.metrics.renderTime.toFixed(1)
+      );
+      
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-reality-bleeding-music-sync',
+        this.metrics.musicSyncStrength.toFixed(2)
+      );
+    }
   }
   
   public override updateAnimation(deltaTime: number): void {

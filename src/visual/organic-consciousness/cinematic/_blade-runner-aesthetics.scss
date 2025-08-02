@@ -22,7 +22,7 @@
     hue-rotate(calc(var(--organic-emotional-temperature, 6500) / 100 - 65deg));
   
   // Neon breathing effect
-  animation: organic-blade-runner-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+  // animation: organic-blade-runner-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
   
   // Performance optimization
   will-change: filter, box-shadow;
@@ -47,7 +47,7 @@
     );
     
     // Neon flicker animation
-    animation: organic-neon-flicker calc(var(--organic-breathing-cycle, 1s) * 0.3) ease-in-out infinite;
+    // animation: organic-neon-flicker calc(var(--organic-breathing-cycle, 1s) * 0.3) ease-in-out infinite;
     
     // Performance optimization
     pointer-events: none;
@@ -106,7 +106,7 @@
       pointer-events: none;
       z-index: calc(var(--organic-depth-atmosphere, 0) - 1);
       border-radius: inherit;
-      animation: organic-neon-outer-glow calc(var(--organic-breathing-cycle, 1s) * 0.7) ease-in-out infinite;
+      // animation: organic-neon-outer-glow calc(var(--organic-breathing-cycle, 1s) * 0.7) ease-in-out infinite;
     }
   }
 }
@@ -140,7 +140,7 @@
     );
     
     // Noir breathing
-    animation: organic-noir-shadow-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+    // animation: organic-noir-shadow-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
     
     // Performance optimization
     pointer-events: none;
@@ -171,7 +171,7 @@
       );
       
       // Subtle animation
-      animation: organic-venetian-drift 3s linear infinite;
+      // animation: organic-venetian-drift 3s linear infinite;
       opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.3);
       
       pointer-events: none;
@@ -210,7 +210,7 @@
     background-size: 50px 50px, 30px 30px, 70px 70px, 40px 40px;
     
     // Rain animation
-    animation: organic-rain-movement 4s linear infinite;
+    // animation: organic-rain-movement 4s linear infinite;
     
     // Performance optimization
     pointer-events: none;
@@ -238,7 +238,7 @@
     );
     
     // Reflection movement
-    animation: organic-reflection-shimmer calc(var(--organic-breathing-cycle, 1s) * 2) ease-in-out infinite;
+    // animation: organic-reflection-shimmer calc(var(--organic-breathing-cycle, 1s) * 2) ease-in-out infinite;
     
     pointer-events: none;
     z-index: var(--organic-depth-mid, 2);
@@ -271,7 +271,7 @@
     );
     
     // Fog movement
-    animation: organic-fog-drift calc(var(--organic-breathing-cycle, 1s) * 3) ease-in-out infinite;
+    // animation: organic-fog-drift calc(var(--organic-breathing-cycle, 1s) * 3) ease-in-out infinite;
     
     // Performance optimization
     pointer-events: none;
@@ -313,7 +313,7 @@
         transparent 80%
       );
       
-      animation: organic-fog-drift calc(var(--organic-breathing-cycle, 1s) * 2) ease-in-out infinite reverse;
+      // animation: organic-fog-drift calc(var(--organic-breathing-cycle, 1s) * 2) ease-in-out infinite reverse;
       pointer-events: none;
       z-index: calc(var(--organic-depth-atmosphere, 0) + 1);
     }
@@ -498,7 +498,7 @@
 // Debug mode for Blade Runner aesthetics
 :root.organic-debug {
   .organic-blade-runner-neon {
-    outline: 2px dashed rgba(0, 255, 255, 0.8) !important;
+    outline: 2px dashed rgba(var(--sn-musical-harmony-analogous-cool-rgb), 0.8) !important;
     
     &::after {
       content: '⚡ NEON';
@@ -506,8 +506,8 @@
       top: -35px;
       left: 0;
       font-size: 10px;
-      color: cyan;
-      background: rgba(0, 0, 0, 0.8);
+      color: rgb(var(--sn-musical-harmony-analogous-cool-rgb));
+      background: rgba(var(--spice-rgb-base), 0.9);
       padding: 2px 4px;
       border-radius: 2px;
       pointer-events: none;
@@ -516,7 +516,7 @@
   }
   
   .organic-volumetric-fog {
-    outline: 1px dashed rgba(128, 128, 128, 0.8) !important;
+    outline: 1px dashed rgba(var(--sn-musical-harmony-tertiary-rgb), 0.8) !important;
     
     &::after {
       content: '🌫️ FOG';
@@ -524,8 +524,8 @@
       top: -35px;
       right: 0;
       font-size: 10px;
-      color: #888;
-      background: rgba(0, 0, 0, 0.8);
+      color: rgb(var(--sn-musical-harmony-tertiary-rgb));
+      background: rgba(var(--spice-rgb-base), 0.9);
       padding: 2px 4px;
       border-radius: 2px;
       pointer-events: none;

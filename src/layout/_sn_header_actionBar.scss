@@ -29,9 +29,15 @@
   /* === DEFAULT SOUL TOKENS – ensure graceful fallback before JS initializes === */
   --header-soul-intensity: 0.8; /* 0 → off, 1 → full */
   --header-soul-breath-rate: 8s;
-  --header-soul-primary: var(--sn-accent-hex, var(--spice-accent));
-  --header-soul-secondary: var(--sn-accent-hex, var(--spice-subtext));
-  --header-soul-accent: var(--sn-accent-hex, var(--spice-accent));
+  --header-soul-primary: var(--sn-color-accent-hex, var(--spice-accent));
+  --header-soul-secondary: var(--sn-color-accent-hex, var(--spice-subtext));
+  --header-soul-accent: var(--sn-color-accent-hex, var(--spice-accent));
+  
+  /* === YEAR 3000 CONSCIOUSNESS VARIABLES === */
+  --header-consciousness-flow-speed: calc(var(--header-soul-breath-rate) * 0.8);
+  --header-consciousness-energy: 0.5; /* Updated by MusicSyncService */
+  --header-consciousness-harmony: 0deg; /* Hue rotation based on musical harmony */
+  --header-consciousness-depth: 1; /* Z-depth consciousness multiplier */
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════*/
@@ -87,8 +93,8 @@ body:not(:has(.main-searchPage-content)) {
         saturate(calc(var(--cosmic-saturation, 1.4) * 0.9))
         brightness(calc(1 + 0.08 * var(--header-soul-intensity)));
 
-      /* Conscious breathing - always alive but subtle*/
-      animation: header-soul-breathing var(--header-soul-breath-rate)
+      /* Year 3000 Consciousness - Internal energy flow synchronized with music */
+      animation: header-cosmic-consciousness var(--header-consciousness-flow-speed)
         ease-in-out infinite;
 
       opacity: calc(var(--header-soul-intensity) * 0.6);
@@ -157,9 +163,9 @@ body:not(:has(.main-searchPage-content)) {
       filter: blur(var(--header-cosmic-blur))
         saturate(calc(var(--cosmic-saturation, 1.4) * 0.8));
 
-      /* Gentle breathing presence*/
-      animation: header-soul-breathing
-        calc(var(--header-soul-breath-rate) * 1.3) ease-in-out infinite;
+      /* Year 3000 Entity Consciousness - Organic energy responding to musical harmony */
+      animation: header-entity-consciousness
+        calc(var(--header-consciousness-flow-speed) * 1.3) ease-in-out infinite;
 
       opacity: 0;
       transform: scale(1.01);
@@ -302,22 +308,73 @@ body:not(:has(.main-searchPage-content)) {
 /* Movements that feel alive and emotionally connected*/
 /* ═══════════════════════════════════════════════════════════════════════════════*/
 
-@keyframes header-soul-breathing {
-  0%,
-  100% {
-    transform: scale(1.02) translate(0, 0);
-    opacity: 0.6;
-    filter: brightness(1) hue-rotate(0deg);
+/* Year 3000 Consciousness Animations - Internal energy flow without layout disruption */
+
+@keyframes header-cosmic-consciousness {
+  0%, 100% {
+    filter: blur(var(--header-cosmic-blur))
+      saturate(calc(var(--cosmic-saturation, 1.4) * (0.9 + var(--header-consciousness-energy) * 0.1)))
+      brightness(calc(1 + 0.08 * var(--header-soul-intensity) + var(--header-consciousness-energy) * 0.05))
+      hue-rotate(calc(var(--header-consciousness-harmony) + 0deg))
+      contrast(calc(1 + var(--header-consciousness-energy) * 0.05));
+    opacity: calc(var(--header-soul-intensity) * (0.6 + var(--header-consciousness-energy) * 0.1));
+  }
+  25% {
+    filter: blur(calc(var(--header-cosmic-blur) * (1.1 - var(--header-consciousness-energy) * 0.05)))
+      saturate(calc(var(--cosmic-saturation, 1.4) * (1.1 + var(--header-consciousness-energy) * 0.2)))
+      brightness(calc(1 + 0.12 * var(--header-soul-intensity) + var(--header-consciousness-energy) * 0.08))
+      hue-rotate(calc(var(--header-consciousness-harmony) + 8deg))
+      contrast(calc(1.05 + var(--header-consciousness-energy) * 0.1));
+    opacity: calc(var(--header-soul-intensity) * (0.75 + var(--header-consciousness-energy) * 0.15));
+  }
+  50% {
+    filter: blur(calc(var(--header-cosmic-blur) * (0.9 + var(--header-consciousness-energy) * 0.1)))
+      saturate(calc(var(--cosmic-saturation, 1.4) * (1.0 + var(--header-consciousness-energy) * 0.3)))
+      brightness(calc(1 + 0.15 * var(--header-soul-intensity) + var(--header-consciousness-energy) * 0.12))
+      hue-rotate(calc(var(--header-consciousness-harmony) + 15deg))
+      contrast(calc(1.08 + var(--header-consciousness-energy) * 0.15));
+    opacity: calc(var(--header-soul-intensity) * (0.8 + var(--header-consciousness-energy) * 0.2));
+  }
+  75% {
+    filter: blur(calc(var(--header-cosmic-blur) * (1.05 - var(--header-consciousness-energy) * 0.03)))
+      saturate(calc(var(--cosmic-saturation, 1.4) * (0.95 + var(--header-consciousness-energy) * 0.15)))
+      brightness(calc(1 + 0.10 * var(--header-soul-intensity) + var(--header-consciousness-energy) * 0.06))
+      hue-rotate(calc(var(--header-consciousness-harmony) + -5deg))
+      contrast(calc(1.03 + var(--header-consciousness-energy) * 0.08));
+    opacity: calc(var(--header-soul-intensity) * (0.7 + var(--header-consciousness-energy) * 0.12));
+  }
+}
+
+@keyframes header-entity-consciousness {
+  0%, 100% {
+    filter: blur(var(--header-cosmic-blur))
+      saturate(calc(var(--cosmic-saturation, 1.4) * (0.8 + var(--header-consciousness-energy) * 0.1)))
+      brightness(calc(1 + var(--header-consciousness-energy) * 0.03))
+      hue-rotate(calc(var(--header-consciousness-harmony) + 0deg));
+    background-position: 
+      calc(0% + var(--header-consciousness-energy) * 5%) 50%, 
+      calc(100% - var(--header-consciousness-energy) * 5%) 50%, 
+      0% 0%;
   }
   33% {
-    transform: scale(1.04) translate(1px, -0.5px);
-    opacity: 0.8;
-    filter: brightness(1.05) hue-rotate(15deg);
+    filter: blur(calc(var(--header-cosmic-blur) * (0.95 + var(--header-consciousness-energy) * 0.05)))
+      saturate(calc(var(--cosmic-saturation, 1.4) * (0.9 + var(--header-consciousness-energy) * 0.2)))
+      brightness(calc(1.03 + var(--header-consciousness-energy) * 0.05))
+      hue-rotate(calc(var(--header-consciousness-harmony) + 10deg));
+    background-position: 
+      calc(20% + var(--header-consciousness-energy) * 10%) calc(40% + var(--header-consciousness-energy) * 5%), 
+      calc(80% - var(--header-consciousness-energy) * 10%) calc(60% - var(--header-consciousness-energy) * 5%), 
+      calc(15% + var(--header-consciousness-energy) * 8%) calc(85% - var(--header-consciousness-energy) * 8%);
   }
   66% {
-    transform: scale(1.03) translate(-0.5px, 1px);
-    opacity: 0.7;
-    filter: brightness(1.02) hue-rotate(-10deg);
+    filter: blur(calc(var(--header-cosmic-blur) * (1.1 - var(--header-consciousness-energy) * 0.05)))
+      saturate(calc(var(--cosmic-saturation, 1.4) * (0.85 + var(--header-consciousness-energy) * 0.15)))
+      brightness(calc(1.05 + var(--header-consciousness-energy) * 0.08))
+      hue-rotate(calc(var(--header-consciousness-harmony) + -8deg));
+    background-position: 
+      calc(40% + var(--header-consciousness-energy) * 15%) calc(30% + var(--header-consciousness-energy) * 10%), 
+      calc(60% - var(--header-consciousness-energy) * 15%) calc(70% - var(--header-consciousness-energy) * 10%), 
+      calc(30% + var(--header-consciousness-energy) * 12%) calc(70% - var(--header-consciousness-energy) * 12%);
   }
 }
 

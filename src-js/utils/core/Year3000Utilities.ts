@@ -60,12 +60,36 @@ export function debounce<T extends (...args: any[]) => any>(
   };
 }
 
+/**
+ * Validates if a string is a valid hex color format
+ * @param value - The value to validate
+ * @returns true if the value is a valid hex color, false otherwise
+ */
+export function isValidHexColor(value: any): value is string {
+  if (typeof value !== "string") {
+    return false;
+  }
+  
+  const trimmed = value.trim();
+  
+  // Must start with # or be a valid hex without #
+  const withHash = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+  
+  // Valid hex patterns: #RGB, #RRGGBB, #RRGGBBAA
+  const hexPattern = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
+  
+  return hexPattern.test(withHash);
+}
+
 export function hexToRgb(hex: string): RgbColor | null {
   if (typeof hex !== "string") {
-    console.warn(
-      "[StarryNight hexToRgb] Input is not a string. Using fallback color (black). Hex:",
-      hex
-    );
+    // Reduced logging for non-string inputs to avoid console spam
+    return { r: 0, g: 0, b: 0 }; // Fallback to black
+  }
+
+  // Early validation using our hex color validator
+  if (!isValidHexColor(hex)) {
+    // Only warn in debug scenarios, as this is now expected to filter out non-hex values
     return { r: 0, g: 0, b: 0 }; // Fallback to black
   }
 
@@ -92,21 +116,11 @@ export function hexToRgb(hex: string): RgbColor | null {
       };
       return rgb;
     } catch (e) {
-      console.error(
-        "[StarryNight hexToRgb] ERROR during parseInt:",
-        e,
-        "for hex:",
-        processedHex,
-        ". Using fallback color (black)."
-      );
+      // Reduced error logging since we now pre-validate inputs
       return { r: 0, g: 0, b: 0 }; // Fallback to black
     }
   } else {
-    console.warn(
-      "[StarryNight hexToRgb] REGEX failed for hex:",
-      processedHex,
-      ". Using fallback color (black)."
-    );
+    // This should rarely happen now due to pre-validation with isValidHexColor
     return { r: 0, g: 0, b: 0 }; // Fallback to black
   }
 }
@@ -114,24 +128,55 @@ export function hexToRgb(hex: string): RgbColor | null {
 export function sanitizeColorMap(input: {
   [key: string]: string | undefined | null;
 }): { [key: string]: string } {
+  // 🎨 CRITICAL: Enhanced logging for color sanitization
+  console.log("🎨 [Year3000Utilities] sanitizeColorMap input:", {
+    input,
+    inputKeys: input ? Object.keys(input) : [],
+    inputEntries: input ? Object.entries(input) : []
+  });
+
   // Accepts 3- or 6-digit hex strings, with or without a leading '#'.
   const validHex = /^#?[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$/;
   const sanitized: { [key: string]: string } = {};
 
   if (!input || typeof input !== "object") {
+    console.warn("🎨 [Year3000Utilities] sanitizeColorMap: Invalid input type");
     return sanitized;
   }
 
+  const droppedEntries: Array<[string, any]> = [];
+
   Object.entries(input).forEach(([key, value]) => {
-    if (typeof value !== "string") return;
+    if (typeof value !== "string") {
+      droppedEntries.push([key, value]);
+      console.warn(`🎨 [Year3000Utilities] Dropped non-string color: ${key} = ${value} (type: ${typeof value})`);
+      return;
+    }
     const trimmed = value.trim();
     // Discard obviously invalid placeholders returned by upstream extractors
-    if (!trimmed || trimmed === "undefined") return;
-    if (!validHex.test(trimmed)) return;
+    if (!trimmed || trimmed === "undefined") {
+      droppedEntries.push([key, value]);
+      console.warn(`🎨 [Year3000Utilities] Dropped empty/undefined color: ${key} = "${value}"`);
+      return;
+    }
+    if (!validHex.test(trimmed)) {
+      droppedEntries.push([key, value]);
+      console.warn(`🎨 [Year3000Utilities] Dropped invalid hex color: ${key} = "${value}"`);
+      return;
+    }
 
     // Normalise: ensure single leading '#'
     const normalised = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
     sanitized[key] = normalised;
+  });
+
+  // 🎨 CRITICAL: Log sanitization results
+  console.log("🎨 [Year3000Utilities] sanitizeColorMap output:", {
+    sanitized,
+    sanitizedKeys: Object.keys(sanitized),
+    sanitizedEntries: Object.entries(sanitized),
+    droppedCount: droppedEntries.length,
+    droppedEntries
   });
 
   if (
@@ -275,6 +320,109 @@ export function lerpSmooth(
   const result =
     target + (current - target) * Math.pow(2, -deltaTime / halfLife);
   return result;
+}
+
+/**
+ * Musical Consciousness LERP Smoothing - Year 3000 Enhanced Smoothing
+ * 
+ * Enhanced LERP function that adapts to musical characteristics, creating
+ * organic consciousness that breathes and flows with music rather than using
+ * static smoothing values.
+ * 
+ * @param current Current value to smooth from
+ * @param target Target value to smooth towards  
+ * @param deltaTime Time elapsed since last frame (seconds)
+ * @param musicContext Musical characteristics for consciousness calculation
+ * @param animationType Type of animation for appropriate smoothing profile
+ * @param baseHalfLife Optional override for base half-life value
+ * @returns Smoothed value with musical consciousness
+ */
+export function lerpSmoothMusical(
+  current: number,
+  target: number,
+  deltaTime: number,
+  musicContext: import("./MusicalLerpOrchestrator").MusicalContext,
+  animationType: import("./MusicalLerpOrchestrator").AnimationType = 'flow',
+  baseHalfLife?: number
+): number {
+  // Import orchestrator dynamically to avoid circular dependencies
+  const { musicalLerpOrchestrator } = require("./MusicalLerpOrchestrator");
+  
+  // Calculate music-aware LERP parameters
+  const musicalParams = musicalLerpOrchestrator.calculateMusicalLerp(
+    musicContext,
+    animationType,
+    baseHalfLife
+  );
+  
+  // Apply musical consciousness to smoothing
+  return lerpSmooth(current, target, deltaTime, musicalParams.halfLife);
+}
+
+/**
+ * Performance-aware Musical LERP with full consciousness and performance optimization
+ * Integrates with PerformanceAwareLerpCoordinator for device-aware smoothing
+ * 
+ * @param current Current value to smooth from
+ * @param target Target value to smooth towards  
+ * @param deltaTime Time elapsed since last frame (seconds)
+ * @param musicContext Musical characteristics for consciousness calculation
+ * @param performanceCoordinator Performance coordinator for optimization
+ * @param animationType Type of animation for appropriate smoothing profile
+ * @param baseHalfLife Optional override for base half-life value
+ * @returns Performance-optimized smoothed value with musical consciousness
+ */
+export function lerpSmoothMusicalPerformance(
+  current: number,
+  target: number,
+  deltaTime: number,
+  musicContext: import("./MusicalLerpOrchestrator").MusicalContext,
+  performanceCoordinator: any, // PerformanceAwareLerpCoordinator
+  animationType: import("./MusicalLerpOrchestrator").AnimationType = 'flow',
+  baseHalfLife?: number
+): number {
+  if (!performanceCoordinator?.calculatePerformanceAwareMusicalLerp) {
+    // Fallback to standard musical LERP if coordinator not available
+    return lerpSmoothMusical(current, target, deltaTime, musicContext, animationType, baseHalfLife);
+  }
+
+  // Use performance-aware coordinator for optimized calculation
+  return performanceCoordinator.calculatePerformanceAwareMusicalLerp(
+    current,
+    target,
+    deltaTime,
+    musicContext,
+    animationType,
+    baseHalfLife
+  );
+}
+
+/**
+ * Simplified Musical LERP for cases where full musical context isn't available
+ * Uses basic tempo and energy information for consciousness calculation
+ * 
+ * @param current Current value to smooth from
+ * @param target Target value to smooth towards
+ * @param deltaTime Time elapsed since last frame (seconds)
+ * @param tempo BPM of current music (60-200+)
+ * @param energy Energy level of music (0-1)
+ * @param baseHalfLife Base half-life for calculation
+ * @returns Smoothed value with basic musical awareness
+ */
+export function lerpSmoothSimpleMusical(
+  current: number,
+  target: number,
+  deltaTime: number,
+  tempo: number = 120,
+  energy: number = 0.5,
+  baseHalfLife: number = 0.15
+): number {
+  // Calculate tempo-responsive half-life
+  const tempoFactor = Math.pow(tempo / 120, 0.3); // Normalize to 120 BPM
+  const energyFactor = 1 + (energy * 0.3); // Energy affects responsiveness
+  const musicalHalfLife = (baseHalfLife / tempoFactor) * energyFactor;
+  
+  return lerpSmooth(current, target, deltaTime, musicalHalfLife);
 }
 
 export function bpmToInterval(bpm: number): number {

@@ -12,7 +12,7 @@
 
 import { Y3K } from "@/debug/UnifiedDebugManager";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 
 export interface SpectralData {
   // Frequency Band Analysis
@@ -54,7 +54,7 @@ export class FluxSpectralAnalyzer {
   private audioContext: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
   private frequencyData: Uint8Array | null = null;
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController;
   private musicSyncService: MusicSyncService | null = null;
   
   private lastSpectralData: SpectralData | null = null;
@@ -86,10 +86,10 @@ export class FluxSpectralAnalyzer {
   private readonly VOCAL_RANGE = { min: 85, max: 1100 };
 
   constructor(
-    cssVariableBatcher: CSSVariableBatcher,
+    cssConsciousnessController: UnifiedCSSConsciousnessController,
     musicSyncService: MusicSyncService | null = null
   ) {
-    this.cssVariableBatcher = cssVariableBatcher;
+    this.cssConsciousnessController = cssConsciousnessController;
     this.musicSyncService = musicSyncService;
   }
 
@@ -479,18 +479,18 @@ export class FluxSpectralAnalyzer {
 
   private updateGradientVariables(spectralData: SpectralData): void {
     // Update CSS variables for gradient consciousness
-    this.cssVariableBatcher.setProperty("--sn-gradient-bass-response", spectralData.bassLevel.toString());
-    this.cssVariableBatcher.setProperty("--sn-gradient-mid-response", spectralData.midLevel.toString());
-    this.cssVariableBatcher.setProperty("--sn-gradient-treble-response", spectralData.trebleLevel.toString());
-    this.cssVariableBatcher.setProperty("--sn-gradient-vocal-presence", spectralData.vocalLevel.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-bass-response", spectralData.bassLevel.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-mid-response", spectralData.midLevel.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-treble-response", spectralData.trebleLevel.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-vocal-presence", spectralData.vocalLevel.toString());
     
-    this.cssVariableBatcher.setProperty("--sn-gradient-harmonic-resonance", spectralData.harmonicResonance.toString());
-    this.cssVariableBatcher.setProperty("--sn-gradient-temporal-phase", spectralData.temporalPhase.toString());
-    this.cssVariableBatcher.setProperty("--sn-gradient-emotional-valence", spectralData.emotionalValence.toString());
-    this.cssVariableBatcher.setProperty("--sn-gradient-cosmic-energy", spectralData.energyLevel.toString());
-    this.cssVariableBatcher.setProperty("--sn-gradient-stellar-drift", `${spectralData.stellarDrift}deg`);
-    this.cssVariableBatcher.setProperty("--sn-gradient-quantum-coherence", spectralData.quantumCoherence.toString());
-    this.cssVariableBatcher.setProperty("--sn-gradient-consciousness-level", spectralData.consciousnessLevel.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-harmonic-resonance", spectralData.harmonicResonance.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-temporal-phase", spectralData.temporalPhase.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-emotional-valence", spectralData.emotionalValence.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-cosmic-energy", spectralData.energyLevel.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-stellar-drift", `${spectralData.stellarDrift}deg`);
+    this.cssConsciousnessController.setProperty("--sn-gradient-quantum-coherence", spectralData.quantumCoherence.toString());
+    this.cssConsciousnessController.setProperty("--sn-gradient-consciousness-level", spectralData.consciousnessLevel.toString());
   }
 
   private storeInMemory(spectralData: SpectralData): void {
@@ -562,7 +562,7 @@ export class FluxSpectralAnalyzer {
   public setGenreHint(genre: string): void {
     // Update stellar drift based on genre
     const hueShift = this.genreHueMap[genre.toLowerCase()] || 0;
-    this.cssVariableBatcher.setProperty("--sn-gradient-stellar-drift", `${hueShift}deg`);
+    this.cssConsciousnessController.setProperty("--sn-gradient-stellar-drift", `${hueShift}deg`);
   }
 
   public destroy(): void {

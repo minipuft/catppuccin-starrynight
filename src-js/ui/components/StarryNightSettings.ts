@@ -73,10 +73,9 @@ export async function initializeStarryNightSettings(): Promise<void> {
           const stars = settingsManager.get("sn-star-density");
           applyStarryNightSettings(grad as any, stars as any);
 
-          // Trigger the main Year3000System to re-apply colours so that the
-          // accent variables (e.g. --spice-button-active) update instantly.
+          // Trigger the main Year3000System to re-apply accent colors selectively
           try {
-            (globalThis as any).Y3K?.system?.applyInitialSettings?.();
+            (globalThis as any).Y3K?.system?.applyInitialSettings?.('accent');
           } catch (applyErr) {
             console.warn(
               "[StarryNight] Unable to trigger Year3000System colour refresh",
@@ -158,6 +157,46 @@ export async function initializeStarryNightSettings(): Promise<void> {
     }
   );
 
+  // --- Brightness mode drop-down ------------------------------------------
+  const brightnessOptions = ["bright", "balanced", "dark"] as const;
+  const currentBrightness = settingsManager.get("sn-brightness-mode") || "dark";
+
+  (section as any).addDropDown(
+    "sn-brightness-mode",
+    "Brightness mode",
+    brightnessOptions as unknown as string[],
+    Math.max(0, brightnessOptions.indexOf(currentBrightness as any)),
+    undefined,
+    {
+      onChange: (e: any) => {
+        const idx = e?.currentTarget?.selectedIndex ?? 0;
+        const newBrightness = brightnessOptions[idx] ?? "bright";
+        settingsManager.set("sn-brightness-mode", newBrightness as any);
+
+        // Apply brightness mode via CSS variable and data attribute
+        document.documentElement.style.setProperty(
+          "--sn-brightness-mode", 
+          `"${newBrightness}"`
+        );
+        document.documentElement.setAttribute(
+          "data-sn-brightness", 
+          newBrightness
+        );
+
+        // Trigger Year3000System to refresh brightness-dependent systems
+        try {
+          (globalThis as any).Y3K?.system?.applyInitialSettings?.('brightness');
+          console.log(`[StarryNight] Brightness mode changed to: ${newBrightness}`);
+        } catch (applyErr) {
+          console.warn(
+            "[StarryNight] Unable to trigger Year3000System brightness refresh",
+            applyErr
+          );
+        }
+      },
+    }
+  );
+
   // ---------------- Additional settings ------------------------------
 
   // Catppuccin flavour
@@ -173,7 +212,12 @@ export async function initializeStarryNightSettings(): Promise<void> {
       onChange: (e: any) => {
         const idx = e?.currentTarget?.selectedIndex ?? 0;
         settingsManager.set("catppuccin-flavor", flavourOptions[idx] as any);
-        (globalThis as any).Y3K?.system?.applyInitialSettings?.();
+        // Trigger selective flavor update instead of full settings reload
+        try {
+          (globalThis as any).Y3K?.system?.applyInitialSettings?.('flavor');
+        } catch (applyErr) {
+          console.warn("[StarryNight] Unable to trigger flavor refresh", applyErr);
+        }
       },
     }
   );
@@ -294,9 +338,9 @@ export async function initializeStarryNightSettings(): Promise<void> {
     }
   );
 
-  // Manual base color input
+  // Manual base color input - DEFAULT TO EMPTY (not white!) to allow album art colors
   const currentManual =
-    settingsManager.get("sn-harmonic-manual-base-color") || "#ffffff";
+    settingsManager.get("sn-harmonic-manual-base-color") || "";
   (section as any).addInput(
     "sn-harmonic-manual-base-color",
     "Manual base colour",
@@ -434,6 +478,18 @@ export async function initializeStarryNightSettings(): Promise<void> {
   // Push the section into the DOM.
   await (section as any).pushSettings();
   console.log("✨ [StarryNight] spcr-settings panel initialised");
+
+  // Initialize brightness mode on load
+  const initialBrightness = settingsManager.get("sn-brightness-mode") || "dark";
+  document.documentElement.style.setProperty(
+    "--sn-brightness-mode", 
+    `"${initialBrightness}"`
+  );
+  document.documentElement.setAttribute(
+    "data-sn-brightness", 
+    initialBrightness
+  );
+  console.log(`[StarryNight] Initial brightness mode set to: ${initialBrightness}`);
 
   // ---- Ensure the section renders when navigating to /settings ----------
   const rerender = () => (section as any).rerender();

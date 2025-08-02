@@ -1,4 +1,4 @@
-import { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
+import { UnifiedCSSConsciousnessController } from '@/core/css/UnifiedCSSConsciousnessController';
 import { EnhancedMasterAnimationCoordinator, type IVisualSystem, type FrameContext } from './EnhancedMasterAnimationCoordinator';
 import { GlobalEventBus } from '@/core/events/EventBus';
 import type { Year3000Config } from '@/types/models';
@@ -32,7 +32,7 @@ export interface KineticAnimationState {
  * 
  * Bridges CSS animations with the unified animation system:
  * - Coordinates CSS keyframe animations with TypeScript systems
- * - Manages CSS animation variables through UnifiedCSSVariableManager
+ * - Manages CSS animation variables through UnifiedCSSConsciousnessController
  * - Synchronizes CSS animations with music beat detection
  * - Provides performance-aware animation enabling/disabling
  * 
@@ -43,7 +43,7 @@ export class CSSAnimationManager implements IVisualSystem {
   public readonly systemName = 'CSSAnimationManager';
   
   private config: Year3000Config;
-  private cssVariableManager: UnifiedCSSVariableManager;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController;
   private animationCoordinator: EnhancedMasterAnimationCoordinator;
   private eventBus: typeof GlobalEventBus;
   
@@ -143,11 +143,11 @@ export class CSSAnimationManager implements IVisualSystem {
   
   constructor(
     config: Year3000Config,
-    cssVariableManager: UnifiedCSSVariableManager,
+    cssConsciousnessController: UnifiedCSSConsciousnessController,
     animationCoordinator: EnhancedMasterAnimationCoordinator
   ) {
     this.config = config;
-    this.cssVariableManager = cssVariableManager;
+    this.cssConsciousnessController = cssConsciousnessController;
     this.animationCoordinator = animationCoordinator;
     this.eventBus = GlobalEventBus;
     
@@ -263,7 +263,7 @@ export class CSSAnimationManager implements IVisualSystem {
     }
     
     // Update CSS variables
-    this.cssVariableManager.updateMusicVariables({
+    this.cssConsciousnessController.updateMusicVariables({
       'beat.pulse.intensity': enable ? this.beatSyncState.intensity : 0,
     });
     
@@ -285,11 +285,11 @@ export class CSSAnimationManager implements IVisualSystem {
     }
     
     // Update CSS variables
-    this.cssVariableManager.updateAnimationVariables({
+    this.cssConsciousnessController.updateAnimationVariables({
       'motion.scale': clampedIntensity,
     });
     
-    this.cssVariableManager.updateMusicVariables({
+    this.cssConsciousnessController.updateMusicVariables({
       'beat.pulse.intensity': clampedIntensity,
     });
     
@@ -307,7 +307,7 @@ export class CSSAnimationManager implements IVisualSystem {
     }
     
     // Update CSS variables
-    this.cssVariableManager.updateAnimationVariables({
+    this.cssConsciousnessController.updateAnimationVariables({
       'motion.scale': 0,
     });
     
@@ -325,7 +325,7 @@ export class CSSAnimationManager implements IVisualSystem {
     }
     
     // Restore CSS variables
-    this.cssVariableManager.updateAnimationVariables({
+    this.cssConsciousnessController.updateAnimationVariables({
       'motion.scale': 1,
     });
     
@@ -436,7 +436,7 @@ export class CSSAnimationManager implements IVisualSystem {
     }
     
     // Update CSS variables for beat sync
-    this.cssVariableManager.updateMusicVariables({
+    this.cssConsciousnessController.updateMusicVariables({
       'beat.pulse.intensity': this.beatSyncState.intensity,
       'beat.phase': this.beatSyncState.phase,
     });
@@ -453,11 +453,11 @@ export class CSSAnimationManager implements IVisualSystem {
     const tempoMultiplier = newTempo / 120; // Normalize to 120 BPM
     
     // Update CSS variables
-    this.cssVariableManager.updateMusicVariables({
+    this.cssConsciousnessController.updateMusicVariables({
       'tempo.bpm': newTempo,
     });
     
-    this.cssVariableManager.updateAnimationVariables({
+    this.cssConsciousnessController.updateAnimationVariables({
       'motion.scale': tempoMultiplier,
     });
     
@@ -476,7 +476,7 @@ export class CSSAnimationManager implements IVisualSystem {
     this.beatSyncState.lastBeatTime = timestamp;
     
     // Update CSS variables for beat sync
-    this.cssVariableManager.updateMusicVariables({
+    this.cssConsciousnessController.updateMusicVariables({
       'beat.pulse.intensity': intensity,
     });
   }
@@ -486,14 +486,14 @@ export class CSSAnimationManager implements IVisualSystem {
    */
   private updateAnimationVariables(context: FrameContext): void {
     // Update frame-based variables
-    this.cssVariableManager.updateAnimationVariables({
+    this.cssConsciousnessController.updateAnimationVariables({
       'frame.fps': Math.round(1000 / context.deltaMs),
       'frame.budget': `${context.frameBudget}ms`,
     });
     
     // Update consciousness variables if available
     if (context.tiltXY) {
-      this.cssVariableManager.updateConsciousnessVariables({
+      this.cssConsciousnessController.updateConsciousnessVariables({
         'hover.pull': `${Math.abs(context.tiltXY.x) + Math.abs(context.tiltXY.y)}px`,
       });
     }
@@ -523,22 +523,22 @@ export class CSSAnimationManager implements IVisualSystem {
     const qualityLevel = mode === 'performance' ? 0.6 : 1.0;
     
     // Update CSS variables
-    this.cssVariableManager.updatePerformanceVariables({
+    this.cssConsciousnessController.updatePerformanceVariables({
       'quality.level': qualityLevel,
       'mode': mode,
     });
     
-    this.cssVariableManager.updateAnimationVariables({
+    this.cssConsciousnessController.updateAnimationVariables({
       'motion.scale': qualityLevel,
     });
     
     // Disable complex animations in performance mode
     if (mode === 'performance') {
-      this.cssVariableManager.updateUtilityVariables({
+      this.cssConsciousnessController.updateUtilityVariables({
         'feature.animations.enabled': false,
       });
     } else {
-      this.cssVariableManager.updateUtilityVariables({
+      this.cssConsciousnessController.updateUtilityVariables({
         'feature.animations.enabled': true,
       });
     }

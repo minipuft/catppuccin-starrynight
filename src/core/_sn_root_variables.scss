@@ -87,20 +87,20 @@
   // safe defaults that will be overridden once the runtime calculation is
   // ready.  Keep the values lightweight and universally accessible.
   --sn-oklab-processed-bright-highlight-rgb: var(
-    --sn-gradient-primary-rgb,
-    var(--spice-rgb-accent)
-  ); // Fallback to current primary accent
+    --sn-color-accent-rgb,
+    var(--sn-cosmic-accent-rgb)
+  ); // Fallback to cosmic accent
   --sn-oklab-processed-dynamic-shadow-rgb: var(
-    --spice-rgb-base,
-    "0,0,0"
-  ); // Neutral shadow base until JS refines
+    --sn-cosmic-base-rgb,
+    "13,17,23"
+  ); // Cosmic base until JS refines
 
   // === SHARED SECTION BACKGROUND ===========================================
   // Provides a unified base colour for elevated card/section surfaces.
-  // Falls back to Catppuccin surface token when Spotify variable is missing.
+  // Uses cosmic theme defaults with Spicetify compatibility.
   --section-background-base: var(
     --background-elevated-base,
-    var(--spice-rgb-surface1, "69,71,90")
+    var(--spice-rgb-surface1, var(--sn-cosmic-surface-rgb))
   );
 }
 
@@ -126,10 +126,10 @@
   );
 
   // RGB for modal glow/text, can be dynamically updated by JS to be distinct or harmonious
-  --sn-modal-glow-color-rgb: var(--sn-nav-item-glow-color-rgb, "202,158,230");
+  --sn-modal-glow-color-rgb: var(--sn-nav-item-glow-color-rgb, var(--sn-cosmic-accent-rgb));
   --sn-modal-text-energy-color-rgb: var(
     --sn-nav-text-energy-color-rgb,
-    "140,170,238"
+    var(--sn-cosmic-secondary-rgb)
   );
 
   --sn-modal-emergence-duration: 0.5s;
@@ -139,11 +139,11 @@
   --sn-nav-item-base-opacity: 0.7;
   --sn-nav-item-transform-scale: 1;
   --sn-nav-item-transition-duration: 0.3s;
-  --sn-nav-item-glow-color-rgb: var(--sn-gradient-primary-rgb, "202,158,230");
+  --sn-nav-item-glow-color-rgb: var(--sn-color-accent-rgb, var(--sn-cosmic-accent-rgb));
   --sn-nav-item-hover-bg-opacity: 0.15;
   --sn-nav-item-active-bg-opacity: 0.2;
   --sn-nav-item-glow-intensity: 0.3;
-  --sn-nav-text-energy-color-rgb: var(--sn-gradient-accent-rgb, "140,170,238");
+  --sn-nav-text-energy-color-rgb: var(--sn-color-accent-rgb, var(--sn-cosmic-accent-rgb));
   --sn-nav-text-energy-opacity: 0.2;
 
   // Sidebar Consciousness Field Variables
@@ -155,8 +155,8 @@
   --sn-sidebar-energy-glow-opacity: 0.3;
 
   // StarryNight Visual Effects Variables
-  --sn-glow: 0 0 20px rgba(137, 180, 250, 0.3);
-  --sn-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  --sn-glow: 0 0 20px rgba(var(--sn-cosmic-accent-rgb), 0.3);
+  --sn-shadow: 0 4px 8px rgba(var(--sn-cosmic-base-rgb), 0.3);
   
   // Easing Functions are now defined in _sn_gradient.scss (canonical source)
   // This prevents duplication and ensures single source of truth

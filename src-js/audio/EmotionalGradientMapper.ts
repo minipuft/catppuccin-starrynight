@@ -12,10 +12,11 @@
  */
 
 import { Y3K } from "@/debug/UnifiedDebugManager";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { FluxSpectralAnalyzer, SpectralData } from "@/audio/FluxSpectralAnalyzer";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
+import { EmotionalTemperatureMapper, type MusicAnalysisData, type EmotionalTemperatureResult, type EmotionalState } from "@/utils/color/EmotionalTemperatureMapper";
 
 export interface EmotionalProfile {
   // Core emotional dimensions (0-1 range)
@@ -77,7 +78,7 @@ export interface EmotionalGradientState {
 }
 
 export class EmotionalGradientMapper {
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController;
   private musicSyncService: MusicSyncService | null = null;
   private settingsManager: SettingsManager | null = null;
   
@@ -89,6 +90,11 @@ export class EmotionalGradientMapper {
   private isActive = false;
   private boundSpectralHandler: ((event: Event) => void) | null = null;
   private boundSettingsHandler: ((event: Event) => void) | null = null;
+  
+  // 🌡️ EMOTIONAL TEMPERATURE INTEGRATION
+  private emotionalTemperatureMapper: EmotionalTemperatureMapper;
+  private currentEmotionalTemperature: EmotionalTemperatureResult | null = null;
+  private moodToEmotionMap: Record<MoodType, EmotionalState>;
   
   // Mood-to-gradient mapping profiles
   private moodProfiles: { [key in MoodType]: Partial<EmotionalGradientState> } = {
@@ -238,16 +244,36 @@ export class EmotionalGradientMapper {
   };
 
   constructor(
-    cssVariableBatcher: CSSVariableBatcher,
+    cssConsciousnessController: UnifiedCSSConsciousnessController,
     musicSyncService: MusicSyncService | null = null,
     settingsManager: SettingsManager | null = null
   ) {
-    this.cssVariableBatcher = cssVariableBatcher;
+    this.cssConsciousnessController = cssConsciousnessController;
     this.musicSyncService = musicSyncService;
     this.settingsManager = settingsManager;
     
     // Initialize with neutral gradient state
     this.currentGradientState = this.createNeutralGradientState();
+    
+    // 🌡️ Initialize emotional temperature mapper
+    this.emotionalTemperatureMapper = new EmotionalTemperatureMapper(true); // Enable debug
+    
+    // Create mood-to-emotional-state mapping
+    this.moodToEmotionMap = {
+      euphoric: 'energetic',
+      content: 'happy',
+      melancholic: 'melancholy',
+      aggressive: 'aggressive',
+      mysterious: 'mysterious',
+      peaceful: 'calm',
+      dramatic: 'epic',
+      ambient: 'ambient',
+      chaotic: 'aggressive', // Map chaotic to aggressive for high energy
+      nostalgic: 'melancholy',
+      heroic: 'epic',
+      contemplative: 'calm',
+      neutral: 'ambient'
+    };
     
     this.boundSpectralHandler = this.handleSpectralData.bind(this);
     this.boundSettingsHandler = this.handleSettingsChange.bind(this);
@@ -296,10 +322,42 @@ export class EmotionalGradientMapper {
     // Analyze emotional content from spectral data
     const emotionalProfile = this.analyzeEmotionalContent(spectralData);
     
+    // 🌡️ EMOTIONAL TEMPERATURE INTEGRATION: Convert emotional profile to temperature result
+    try {
+      const musicAnalysisData: MusicAnalysisData = {
+        energy: emotionalProfile.energy,
+        valence: emotionalProfile.valence,
+        danceability: emotionalProfile.arousal, // Map arousal to danceability
+        tempo: 120, // Default, could be enhanced with actual tempo detection
+        loudness: emotionalProfile.dynamics,
+        acousticness: 1 - emotionalProfile.complexity, // Inverse relationship
+        instrumentalness: 0.5, // Default
+        speechiness: 0.1, // Default low
+        mode: emotionalProfile.mode === 'major' ? 1 : 0,
+        key: 0, // Default
+        genre: this.inferGenreFromProfile(emotionalProfile)
+      };
+      
+      this.currentEmotionalTemperature = this.emotionalTemperatureMapper.mapMusicToEmotionalTemperature(musicAnalysisData);
+      
+      // Apply emotional temperature CSS classes and variables to document
+      this.applyEmotionalTemperatureToDocument(this.currentEmotionalTemperature);
+      
+      Y3K?.debug?.log("EmotionalGradientMapper", "🌡️ Applied emotional temperature:", {
+        mood: emotionalProfile.mood,
+        emotionalState: this.currentEmotionalTemperature.primaryEmotion,
+        temperature: this.currentEmotionalTemperature.temperature,
+        intensity: this.currentEmotionalTemperature.intensity
+      });
+      
+    } catch (error) {
+      Y3K?.debug?.warn("EmotionalGradientMapper", "🌡️ Failed to apply emotional temperature:", error);
+    }
+    
     // Store in history for temporal analysis
     this.storeEmotionalHistory(emotionalProfile);
     
-    // Map emotion to gradient state
+    // Map emotion to gradient state (enhanced with temperature data)
     const newGradientState = this.mapEmotionToGradient(emotionalProfile);
     
     // Apply temporal smoothing
@@ -309,7 +367,7 @@ export class EmotionalGradientMapper {
       emotionalProfile.stability
     );
     
-    // Update CSS variables
+    // Update CSS variables (now includes emotional temperature integration)
     this.updateGradientVariables();
     
     this.currentEmotionalProfile = emotionalProfile;
@@ -511,31 +569,88 @@ export class EmotionalGradientMapper {
   private updateGradientVariables(): void {
     const state = this.currentGradientState;
     
-    // Update emotional gradient variables
-    this.cssVariableBatcher.setProperty("--sn-emotional-hue-shift", `${state.hueShift}deg`);
-    this.cssVariableBatcher.setProperty("--sn-emotional-saturation-multiplier", state.saturationMultiplier.toString());
-    this.cssVariableBatcher.setProperty("--sn-emotional-brightness-multiplier", state.brightnessMultiplier.toString());
-    this.cssVariableBatcher.setProperty("--sn-emotional-contrast-multiplier", state.contrastMultiplier.toString());
+    // Update emotional gradient modifier variables
+    this.cssConsciousnessController.setProperty("--sn-emotional-hue-shift", `${state.hueShift}deg`);
+    this.cssConsciousnessController.setProperty("--sn-emotional-saturation-multiplier", state.saturationMultiplier.toString());
+    this.cssConsciousnessController.setProperty("--sn-emotional-brightness-multiplier", state.brightnessMultiplier.toString());
+    this.cssConsciousnessController.setProperty("--sn-emotional-contrast-multiplier", state.contrastMultiplier.toString());
     
     // Update animation parameters
-    this.cssVariableBatcher.setProperty("--sn-emotional-animation-speed", state.animationSpeed.toString());
-    this.cssVariableBatcher.setProperty("--sn-emotional-pulse-intensity", state.pulseIntensity.toString());
-    this.cssVariableBatcher.setProperty("--sn-emotional-flow-direction", `${state.flowDirection}deg`);
+    this.cssConsciousnessController.setProperty("--sn-emotional-animation-speed", state.animationSpeed.toString());
+    this.cssConsciousnessController.setProperty("--sn-emotional-pulse-intensity", state.pulseIntensity.toString());
+    this.cssConsciousnessController.setProperty("--sn-emotional-flow-direction", `${state.flowDirection}deg`);
     
     // Update layer behavior
-    this.cssVariableBatcher.setProperty("--sn-emotional-layer-harmony", state.layerHarmony.toString());
-    this.cssVariableBatcher.setProperty("--sn-emotional-discord-level", state.discordLevel.toString());
-    this.cssVariableBatcher.setProperty("--sn-emotional-depth-perception", state.depthPerception.toString());
+    this.cssConsciousnessController.setProperty("--sn-emotional-layer-harmony", state.layerHarmony.toString());
+    this.cssConsciousnessController.setProperty("--sn-emotional-discord-level", state.discordLevel.toString());
+    this.cssConsciousnessController.setProperty("--sn-emotional-depth-perception", state.depthPerception.toString());
     
     // Update transition behavior
-    this.cssVariableBatcher.setProperty("--sn-emotional-transition-speed", state.transitionSpeed.toString());
+    this.cssConsciousnessController.setProperty("--sn-emotional-transition-speed", state.transitionSpeed.toString());
+    
+    // 🌡️ EMOTIONAL TEMPERATURE INTEGRATION: Apply temperature-based CSS variables
+    if (this.currentEmotionalTemperature) {
+      // Apply all emotional temperature CSS variables
+      Object.entries(this.currentEmotionalTemperature.cssVariables).forEach(([property, value]) => {
+        this.cssConsciousnessController.setProperty(property, value);
+      });
+      
+      // Set specific temperature-enhanced variables
+      this.cssConsciousnessController.setProperty("--sn-emotional-temperature", this.currentEmotionalTemperature.temperature.toString());
+      this.cssConsciousnessController.setProperty("--sn-emotional-temperature-intensity", this.currentEmotionalTemperature.intensity.toString());
+      this.cssConsciousnessController.setProperty("--sn-emotional-temperature-class", this.currentEmotionalTemperature.cssClass);
+      
+      // Blend gradient state with temperature intensity
+      const temperatureInfluence = this.currentEmotionalTemperature.intensity;
+      this.cssConsciousnessController.setProperty("--sn-emotional-temperature-blend", temperatureInfluence.toString());
+      
+      Y3K?.debug?.log("EmotionalGradientMapper", "🌡️ Applied temperature CSS variables:", {
+        temperature: this.currentEmotionalTemperature.temperature,
+        intensity: this.currentEmotionalTemperature.intensity,
+        cssClass: this.currentEmotionalTemperature.cssClass,
+        variableCount: Object.keys(this.currentEmotionalTemperature.cssVariables).length
+      });
+    }
+    
+    // 🔧 CRITICAL ENHANCEMENT: Coordinate with consolidated gradient system
+    // Apply emotional modifications to background gradient variables
+    this.updateEmotionalGradientCoordination(state);
     
     // Update current mood information
     if (this.currentEmotionalProfile) {
-      this.cssVariableBatcher.setProperty("--sn-current-mood", this.currentEmotionalProfile.mood);
-      this.cssVariableBatcher.setProperty("--sn-mood-confidence", this.currentEmotionalProfile.confidence.toString());
-      this.cssVariableBatcher.setProperty("--sn-emotional-valence", this.currentEmotionalProfile.valence.toString());
-      this.cssVariableBatcher.setProperty("--sn-emotional-energy", this.currentEmotionalProfile.energy.toString());
+      this.cssConsciousnessController.setProperty("--sn-current-mood", this.currentEmotionalProfile.mood);
+      this.cssConsciousnessController.setProperty("--sn-mood-confidence", this.currentEmotionalProfile.confidence.toString());
+      this.cssConsciousnessController.setProperty("--sn-emotional-valence", this.currentEmotionalProfile.valence.toString());
+      this.cssConsciousnessController.setProperty("--sn-emotional-energy", this.currentEmotionalProfile.energy.toString());
+    }
+  }
+
+  /**
+   * Coordinate emotional modifications with the consolidated --sn-bg-gradient-* system
+   */
+  private updateEmotionalGradientCoordination(state: EmotionalGradientState): void {
+    // Get current background gradient colors (set by ColorHarmonyEngine/Year3000System)
+    const rootStyle = getComputedStyle(document.documentElement);
+    const currentPrimary = rootStyle.getPropertyValue('--sn-bg-gradient-primary').trim();
+    const currentSecondary = rootStyle.getPropertyValue('--sn-bg-gradient-secondary').trim();
+    const currentAccent = rootStyle.getPropertyValue('--sn-bg-gradient-accent').trim();
+    
+    // Only proceed if we have base gradient colors to modify
+    if (currentPrimary || currentSecondary || currentAccent) {
+      // Set emotional gradient flow variables that CSS can use with the base colors
+      this.cssConsciousnessController.setProperty("--sn-bg-gradient-flow-x", (state.flowDirection! * 0.01).toString());
+      this.cssConsciousnessController.setProperty("--sn-bg-gradient-flow-y", (Math.sin(state.flowDirection! * Math.PI / 180) * 0.5).toString());
+      
+      // Set emotional opacity and blur modifiers
+      this.cssConsciousnessController.setProperty("--sn-bg-gradient-opacity", (0.8 * state.layerHarmony!).toString());
+      this.cssConsciousnessController.setProperty("--sn-bg-gradient-blur", `${120 * (1 + state.depthPerception! * 0.5)}px`);
+      
+      // Set emotional saturation and brightness modifiers
+      this.cssConsciousnessController.setProperty("--sn-bg-gradient-saturation", state.saturationMultiplier!.toString());
+      this.cssConsciousnessController.setProperty("--sn-bg-gradient-brightness", state.brightnessMultiplier!.toString());
+      this.cssConsciousnessController.setProperty("--sn-bg-gradient-contrast", state.contrastMultiplier!.toString());
+      
+      Y3K?.debug?.log("EmotionalGradientMapper", `Coordinated emotional modifications with gradient system: flow=${state.flowDirection}°, opacity=${0.8 * state.layerHarmony!}`);
     }
   }
 
@@ -583,6 +698,120 @@ export class EmotionalGradientMapper {
     }
   }
 
+  /**
+   * 🌡️ Apply emotional temperature CSS classes and variables to the document
+   */
+  private applyEmotionalTemperatureToDocument(emotionalTemperature: EmotionalTemperatureResult): void {
+    // Remove existing emotional temperature classes from body
+    const existingClasses = Array.from(document.body.classList).filter(cls => 
+      cls.startsWith('organic-emotion-')
+    );
+    document.body.classList.remove(...existingClasses);
+    
+    // Apply primary emotional temperature class
+    document.body.classList.add(emotionalTemperature.cssClass);
+    
+    // Apply secondary emotion blend class if present
+    if (emotionalTemperature.secondaryEmotion) {
+      document.body.classList.add(`organic-emotion-blend-${emotionalTemperature.secondaryEmotion}`);
+    }
+    
+    // Apply CSS variables to document root
+    Object.entries(emotionalTemperature.cssVariables).forEach(([property, value]) => {
+      document.documentElement.style.setProperty(property, value);
+    });
+    
+    Y3K?.debug?.log("EmotionalGradientMapper", "🌡️ Applied emotional temperature to document:", {
+      primaryClass: emotionalTemperature.cssClass,
+      secondaryEmotion: emotionalTemperature.secondaryEmotion,
+      cssVariableCount: Object.keys(emotionalTemperature.cssVariables).length
+    });
+  }
+  
+  /**
+   * 🌡️ Infer genre from emotional profile for temperature mapping
+   */
+  private inferGenreFromProfile(profile: EmotionalProfile): string {
+    const { mood, energy, valence, tension, arousal, mode } = profile;
+    
+    // Map mood and characteristics to likely genre
+    if (mood === 'aggressive' || (energy > 0.8 && valence < 0.4)) {
+      return tension > 0.7 ? 'metal' : 'hard-rock';
+    }
+    
+    if (mood === 'euphoric' || (energy > 0.7 && valence > 0.7)) {
+      return arousal > 0.8 ? 'edm' : 'pop';
+    }
+    
+    if (mood === 'melancholic' || (energy < 0.4 && valence < 0.4)) {
+      return mode === 'minor' ? 'blues' : 'folk';
+    }
+    
+    if (mood === 'peaceful' || (energy < 0.3 && valence > 0.6)) {
+      return 'ambient';
+    }
+    
+    if (mood === 'dramatic' || (tension > 0.6 && energy > 0.5)) {
+      return 'classical';
+    }
+    
+    if (mood === 'mysterious' || (valence < 0.5 && tension > 0.5)) {
+      return 'jazz';
+    }
+    
+    if (mood === 'heroic' || (mode === 'major' && energy > 0.6)) {
+      return 'soundtrack';
+    }
+    
+    // Default to indie for neutral/contemplative moods
+    return 'indie-pop';
+  }
+  
+  /**
+   * Get current emotional temperature result
+   */
+  public getCurrentEmotionalTemperature(): EmotionalTemperatureResult | null {
+    return this.currentEmotionalTemperature;
+  }
+  
+  /**
+   * Set emotional temperature override (for testing or manual control)
+   */
+  public setEmotionalTemperatureOverride(emotionalState: EmotionalState, intensity: number = 1.0, duration: number = 5000): void {
+    try {
+      const mockMusicData: MusicAnalysisData = {
+        energy: intensity,
+        valence: intensity > 0.5 ? 0.7 : 0.3, // High intensity usually positive
+        genre: 'override'
+      };
+      
+      const overrideTemperature = this.emotionalTemperatureMapper.mapMusicToEmotionalTemperature(mockMusicData);
+      
+      // Force the primary emotion to the requested state
+      overrideTemperature.primaryEmotion = emotionalState;
+      overrideTemperature.intensity = intensity;
+      overrideTemperature.cssClass = `organic-emotion-${emotionalState}`;
+      
+      this.currentEmotionalTemperature = overrideTemperature;
+      this.applyEmotionalTemperatureToDocument(overrideTemperature);
+      
+      Y3K?.debug?.log("EmotionalGradientMapper", "🌡️ Applied emotional temperature override:", {
+        emotion: emotionalState,
+        intensity,
+        duration
+      });
+      
+      // Reset after duration
+      setTimeout(() => {
+        Y3K?.debug?.log("EmotionalGradientMapper", "🌡️ Emotional temperature override expired");
+        // The next spectral data event will restore automatic detection
+      }, duration);
+      
+    } catch (error) {
+      Y3K?.debug?.warn("EmotionalGradientMapper", "🌡️ Failed to apply emotional temperature override:", error);
+    }
+  }
+
   public destroy(): void {
     this.isActive = false;
     
@@ -594,8 +823,17 @@ export class EmotionalGradientMapper {
       document.removeEventListener("year3000SystemSettingsChanged", this.boundSettingsHandler);
     }
     
+    // Clean up emotional temperature classes from document
+    if (this.currentEmotionalTemperature) {
+      const existingClasses = Array.from(document.body.classList).filter(cls => 
+        cls.startsWith('organic-emotion-')
+      );
+      document.body.classList.remove(...existingClasses);
+    }
+    
     this.emotionalHistory = [];
     this.currentEmotionalProfile = null;
+    this.currentEmotionalTemperature = null;
     
     Y3K?.debug?.log("EmotionalGradientMapper", "Emotional mapping system destroyed");
   }

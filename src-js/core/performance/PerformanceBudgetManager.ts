@@ -6,7 +6,7 @@
  */
 
 import { PerformanceAnalyzer } from './PerformanceAnalyzer';
-import { CSSVariableBatcher } from './CSSVariableBatcher';
+import { UnifiedCSSConsciousnessController } from '@/core/css/UnifiedCSSConsciousnessController';
 
 export interface PerformanceBudgetConfig {
   // System-wide budgets (in milliseconds)
@@ -34,7 +34,7 @@ export class PerformanceBudgetManager {
   
   private config: PerformanceBudgetConfig;
   private performanceAnalyzer: PerformanceAnalyzer;
-  private cssVariableBatcher: CSSVariableBatcher | null = null;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController | null = null;
   
   // Optimization state
   private optimizationLevel: 'none' | 'conservative' | 'aggressive' = 'none';
@@ -84,8 +84,8 @@ export class PerformanceBudgetManager {
   /**
    * Register CSS Variable Batcher for optimization
    */
-  public registerCSSVariableBatcher(batcher: CSSVariableBatcher): void {
-    this.cssVariableBatcher = batcher;
+  public registerUnifiedCSSConsciousnessController(batcher: UnifiedCSSConsciousnessController): void {
+    this.cssConsciousnessController = batcher;
   }
   
   /**
@@ -159,10 +159,10 @@ export class PerformanceBudgetManager {
    * Optimize CSS variable updates
    */
   private optimizeCSSVariableUpdates(): void {
-    if (!this.cssVariableBatcher) return;
+    if (!this.cssConsciousnessController) return;
     
     // Increase batch interval to reduce update frequency
-    this.cssVariableBatcher.updateConfig({
+    this.cssConsciousnessController.updateConfig({
       batchIntervalMs: 32, // Reduce to 30 FPS
       maxBatchSize: 25,    // Smaller batches
     });
@@ -223,8 +223,8 @@ export class PerformanceBudgetManager {
     this.disabledFeatures.clear();
     
     // Reset CSS variable batcher to normal settings
-    if (this.cssVariableBatcher) {
-      this.cssVariableBatcher.updateConfig({
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.updateConfig({
         batchIntervalMs: 16,
         maxBatchSize: 50,
       });
@@ -290,7 +290,7 @@ export class PerformanceBudgetManager {
    */
   public destroy(): void {
     this.disabledFeatures.clear();
-    this.cssVariableBatcher = null;
+    this.cssConsciousnessController = null;
     PerformanceBudgetManager.instance = null;
   }
 }

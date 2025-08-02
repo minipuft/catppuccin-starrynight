@@ -9,6 +9,7 @@
 @use "./_sn_card_base";
 @use "./_sn_harmonic_aura" as *;
 @use "../core/_kinetic-animations" as *;
+@use "../visual/organic-consciousness/color/perceptual-blending" as *;
 
 // Year 3000 Nexus Cards System Variables
 :root {
@@ -175,12 +176,22 @@
 
   // Attach lightweight, beat-aware glow
   @include harmonic-aura;
+  
+  // Add perceptual blending for enhanced consciousness
+  @extend .oklab-perceptual-gradient;
+  
+  // Enhanced consciousness blending for special contexts
+  &[data-consciousness-enhanced] {
+    @extend .oklab-consciousness-blend;
+  }
 
   // === YEAR 3000 RHYTHMIC FOUNDATION ===
   // Kinetic Verb: OSCILLATE - Cards breathe with the music
   transform: scale(var(--card-rhythm-breathing))
     rotateY(calc(var(--card-rhythm-phase) * 0.5deg))
     rotateX(calc(var(--card-rhythm-phase) * 0.3deg));
+  
+  // Breathing removed - focusing on key music elements instead
 
   // TODO: Add constellation node styling that builds on existing card holographics
   // === PHASE 2: CONSTELLATION NODE ENHANCEMENT ===
@@ -406,6 +417,10 @@
   // === Enhanced Image with Contextual Scaling ===
   .main-image-image,
   .main-cardImage-image {
+    // Standard breathing for album art - key music element (1.0x strength)
+    animation: organic-element-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+    --breathing-context-multiplier: var(--organic-breathing-standard, 1.0);
+    
     transition: transform var(--calculated-transition)
         var(--card-morphing-fluidity),
       filter var(--calculated-transition) ease;
@@ -445,7 +460,7 @@
           rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.8),
         0 0 8px
           rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.2);
-      color: rgba(255, 255, 255, 0.95);
+      color: rgba(var(--sn-musical-harmony-contrast-rgb), 0.95);
       transition: all 300ms ease;
 
       &:hover {
@@ -786,6 +801,10 @@ body:not(:has(.main-searchPage-content)) {
     // === Enhanced Image ===
     .main-image-image,
     .main-cardImage-image {
+      // Standard breathing for album art - key music element (1.0x strength)
+      animation: organic-element-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+      --breathing-context-multiplier: var(--organic-breathing-standard, 1.0);
+      
       transition: filter var(--card-transition-speed) ease;
       filter: contrast(1) saturate(1);
 

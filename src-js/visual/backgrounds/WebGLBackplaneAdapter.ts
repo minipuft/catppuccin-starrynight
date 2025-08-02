@@ -9,7 +9,7 @@
  * @accessibility Supports reduced motion and high contrast
  */
 
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import {
   BackendCapabilities,
@@ -29,7 +29,7 @@ export class WebGLBackplaneAdapter implements ShaderBackplane {
   public initialized = false;
 
   private webglSystem: WebGLGradientBackgroundSystem;
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController;
   private deviceDetector: DeviceCapabilityDetector;
 
   private _isReady = false;
@@ -53,10 +53,10 @@ export class WebGLBackplaneAdapter implements ShaderBackplane {
 
   constructor(
     webglSystem: WebGLGradientBackgroundSystem,
-    cssVariableBatcher: CSSVariableBatcher
+    cssConsciousnessController: UnifiedCSSConsciousnessController
   ) {
     this.webglSystem = webglSystem;
-    this.cssVariableBatcher = cssVariableBatcher;
+    this.cssConsciousnessController = cssConsciousnessController;
     this.deviceDetector = new DeviceCapabilityDetector();
 
     this._capabilities = this.detectCapabilities();
@@ -94,7 +94,7 @@ export class WebGLBackplaneAdapter implements ShaderBackplane {
       this.initialized = true;
 
       // Update CSS variable to indicate WebGL readiness
-      this.cssVariableBatcher.setProperty(
+      this.cssConsciousnessController.setProperty(
         "--sn.bg.webgl.ready",
         this._isReady ? "1" : "0"
       );
@@ -106,7 +106,7 @@ export class WebGLBackplaneAdapter implements ShaderBackplane {
     } catch (error) {
       console.error("[WebGLBackplaneAdapter] Initialization failed:", error);
       this._isReady = false;
-      this.cssVariableBatcher.setProperty("--sn.bg.webgl.ready", "0");
+      this.cssConsciousnessController.setProperty("--sn.bg.webgl.ready", "0");
       throw error;
     }
   }
@@ -170,21 +170,21 @@ export class WebGLBackplaneAdapter implements ShaderBackplane {
     try {
       // Update CSS variables that the WebGL system reads
       if (metrics.beatIntensity !== undefined) {
-        this.cssVariableBatcher.setProperty(
+        this.cssConsciousnessController.setProperty(
           "--sn.music.beat.pulse.intensity",
           metrics.beatIntensity.toString()
         );
       }
 
       if (metrics.rhythmPhase !== undefined) {
-        this.cssVariableBatcher.setProperty(
+        this.cssConsciousnessController.setProperty(
           "--sn.music.rhythm.phase",
           `${metrics.rhythmPhase}deg`
         );
       }
 
       if (metrics.breathingScale !== undefined) {
-        this.cssVariableBatcher.setProperty(
+        this.cssConsciousnessController.setProperty(
           "--sn.music.breathing.scale",
           metrics.breathingScale.toString()
         );
@@ -264,7 +264,7 @@ export class WebGLBackplaneAdapter implements ShaderBackplane {
     try {
       if (enabled) {
         // Enable WebGL rendering
-        this.cssVariableBatcher.setProperty("--sn.bg.webgl.enabled", "1");
+        this.cssConsciousnessController.setProperty("--sn.bg.webgl.enabled", "1");
 
         // Start WebGL animation if not already running
         if (!this.webglSystem["animationId"]) {
@@ -274,7 +274,7 @@ export class WebGLBackplaneAdapter implements ShaderBackplane {
         console.log("[WebGLBackplaneAdapter] Enabled WebGL backend");
       } else {
         // Disable WebGL rendering
-        this.cssVariableBatcher.setProperty("--sn.bg.webgl.enabled", "0");
+        this.cssConsciousnessController.setProperty("--sn.bg.webgl.enabled", "0");
 
         // Stop WebGL animation
         if (this.webglSystem["animationId"]) {
@@ -366,7 +366,7 @@ export class WebGLBackplaneAdapter implements ShaderBackplane {
     try {
       if (preferences.reducedMotion) {
         // Disable or reduce WebGL animations
-        this.cssVariableBatcher.setProperty(
+        this.cssConsciousnessController.setProperty(
           "--sn.bg.webgl.reduced-motion",
           "1"
         );
@@ -377,7 +377,7 @@ export class WebGLBackplaneAdapter implements ShaderBackplane {
           this.webglSystem["settings"].noiseScale *= 0.5;
         }
       } else {
-        this.cssVariableBatcher.setProperty(
+        this.cssConsciousnessController.setProperty(
           "--sn.bg.webgl.reduced-motion",
           "0"
         );
@@ -385,9 +385,9 @@ export class WebGLBackplaneAdapter implements ShaderBackplane {
 
       if (preferences.highContrast) {
         // Increase contrast in shaders
-        this.cssVariableBatcher.setProperty("--sn.bg.webgl.high-contrast", "1");
+        this.cssConsciousnessController.setProperty("--sn.bg.webgl.high-contrast", "1");
       } else {
-        this.cssVariableBatcher.setProperty("--sn.bg.webgl.high-contrast", "0");
+        this.cssConsciousnessController.setProperty("--sn.bg.webgl.high-contrast", "0");
       }
     } catch (error) {
       console.error(

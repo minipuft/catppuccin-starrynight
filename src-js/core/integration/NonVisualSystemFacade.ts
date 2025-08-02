@@ -27,13 +27,17 @@ import * as Utils from "@/utils/core/Year3000Utilities";
 // Performance System imports
 import { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import { TimerConsolidationSystem } from "@/core/performance/TimerConsolidationSystem";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
-import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { UnifiedPerformanceCoordinator } from "@/core/performance/UnifiedPerformanceCoordinator";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
-// PerformanceOptimizationManager consolidated into UnifiedPerformanceCoordinator
-import { PerformanceCSSIntegration } from "@/core/css/PerformanceCSSIntegration";
+import { PerformanceOrchestrator } from "@/core/performance/PerformanceOrchestrator";
+import { QualityScalingManager } from "@/core/performance/QualityScalingManager";
+import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
+// CSS systems consolidated into UnifiedCSSConsciousnessController:
+// - UnifiedCSSConsciousnessController (batching layer)
+// - UnifiedCSSConsciousnessController (management layer)  
+// - UnifiedCSSConsciousnessController (performance layer)
 
 // Core Services imports
 import UnifiedDebugManager from "@/debug/UnifiedDebugManager";
@@ -41,13 +45,21 @@ import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 
+// Consciousness Systems imports
+import { GenreGradientEvolution } from "@/audio/GenreGradientEvolution";
+import { MusicEmotionAnalyzer } from "@/visual/organic-consciousness/integration/MusicEmotionAnalyzer";
+import { UnifiedConsciousnessCoordinator } from "@/core/consciousness/UnifiedConsciousnessCoordinator";
+
+// Color Strategy imports
+import { globalColorOrchestrator } from "@/visual/integration/ColorOrchestrator";
+import { UnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
+
 // UI Managers imports
 import { GlassmorphismManager } from "@/ui/managers/GlassmorphismManager";
 import { Card3DManager } from "@/ui/managers/Card3DManager";
 
 // Integration Systems imports
 import { SidebarSystemsIntegration } from "@/core/integration/SidebarSystemsIntegration";
-import { UnifiedSystemIntegration } from "@/core/integration/UnifiedSystemIntegration";
 
 // Strategy-based creation imports
 import { globalFacadeAdapter } from "@/core/integration/FacadeAdapter";
@@ -60,26 +72,34 @@ export type NonVisualSystemKey =
   // Performance Systems
   | 'EnhancedMasterAnimationCoordinator'
   | 'TimerConsolidationSystem'
-  | 'CSSVariableBatcher'
-  | 'UnifiedCSSVariableManager'
+  | 'UnifiedCSSConsciousnessController'
   | 'UnifiedPerformanceCoordinator'
   | 'DeviceCapabilityDetector'
   | 'PerformanceAnalyzer'
-  | 'PerformanceCSSIntegration'
+  | 'PerformanceOrchestrator'
+  | 'QualityScalingManager'
+  | 'PerformanceBudgetManager'
+  // CSS systems consolidated into UnifiedCSSConsciousnessController
   
   // Core Services
   | 'UnifiedDebugManager'
   | 'SettingsManager'
   | 'ColorHarmonyEngine'
   | 'MusicSyncService'
+  | 'ColorOrchestrator'
+  | 'UnifiedColorProcessingEngine'
+  
+  // Consciousness Systems
+  | 'GenreGradientEvolution'
+  | 'MusicEmotionAnalyzer'
+  | 'UnifiedConsciousnessCoordinator'
   
   // UI Managers
   | 'GlassmorphismManager'
   | 'Card3DManager'
   
   // Integration Systems
-  | 'SidebarSystemsIntegration'
-  | 'UnifiedSystemIntegration';
+  | 'SidebarSystemsIntegration';
 
 export type SystemHealth = "excellent" | "good" | "degraded" | "critical";
 export type IntegrationMode = "progressive" | "performance-first" | "quality-first" | "battery-optimized";
@@ -142,7 +162,7 @@ export class NonVisualSystemFacade {
   private year3000System: any; // Reference to main system
   
   // Core shared dependencies (will be injected from main system)
-  private cssVariableBatcher: CSSVariableBatcher | null = null;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController | null = null;
   private performanceAnalyzer: PerformanceAnalyzer | null = null;
   private performanceCoordinator: UnifiedPerformanceCoordinator | null = null;
   private musicSyncService: MusicSyncService | null = null;
@@ -215,16 +235,13 @@ export class NonVisualSystemFacade {
   private registerNonVisualSystems(): void {
     // Performance Systems
     this.systemRegistry.set('EnhancedMasterAnimationCoordinator', EnhancedMasterAnimationCoordinator);
-    this.systemDependencies.set('EnhancedMasterAnimationCoordinator', ['performanceAnalyzer', 'cssVariableBatcher']);
+    this.systemDependencies.set('EnhancedMasterAnimationCoordinator', ['performanceAnalyzer', 'cssConsciousnessController']);
     
     this.systemRegistry.set('TimerConsolidationSystem', TimerConsolidationSystem);
     this.systemDependencies.set('TimerConsolidationSystem', ['performanceAnalyzer']);
     
-    this.systemRegistry.set('CSSVariableBatcher', CSSVariableBatcher);
-    this.systemDependencies.set('CSSVariableBatcher', []);
-    
-    this.systemRegistry.set('UnifiedCSSVariableManager', UnifiedCSSVariableManager);
-    this.systemDependencies.set('UnifiedCSSVariableManager', ['cssVariableBatcher']);
+    this.systemRegistry.set('UnifiedCSSConsciousnessController', UnifiedCSSConsciousnessController);
+    this.systemDependencies.set('UnifiedCSSConsciousnessController', ['performanceCoordinator']);
     
     this.systemRegistry.set('UnifiedPerformanceCoordinator', UnifiedPerformanceCoordinator);
     this.systemDependencies.set('UnifiedPerformanceCoordinator', []);
@@ -235,10 +252,19 @@ export class NonVisualSystemFacade {
     this.systemRegistry.set('PerformanceAnalyzer', PerformanceAnalyzer);
     this.systemDependencies.set('PerformanceAnalyzer', []);
     
-    // PerformanceOptimizationManager consolidated into UnifiedPerformanceCoordinator
+    this.systemRegistry.set('PerformanceBudgetManager', PerformanceBudgetManager);
+    this.systemDependencies.set('PerformanceBudgetManager', ['performanceAnalyzer']);
     
-    this.systemRegistry.set('PerformanceCSSIntegration', PerformanceCSSIntegration);
-    this.systemDependencies.set('PerformanceCSSIntegration', ['cssVariableBatcher', 'performanceAnalyzer']);
+    this.systemRegistry.set('PerformanceOrchestrator', PerformanceOrchestrator);
+    this.systemDependencies.set('PerformanceOrchestrator', ['performanceAnalyzer', 'performanceCoordinator', 'deviceCapabilityDetector', 'performanceBudgetManager']);
+    
+    this.systemRegistry.set('QualityScalingManager', QualityScalingManager);
+    this.systemDependencies.set('QualityScalingManager', ['performanceAnalyzer', 'deviceCapabilityDetector']);
+    
+    // CSS systems consolidated into UnifiedCSSConsciousnessController:
+    // - UnifiedCSSConsciousnessController → batching layer
+    // - UnifiedCSSConsciousnessController → management layer
+    // - UnifiedCSSConsciousnessController → performance layer
     
     // Core Services
     // Note: UnifiedDebugManager is a singleton handled as special case in createNonVisualSystem
@@ -254,19 +280,35 @@ export class NonVisualSystemFacade {
     this.systemRegistry.set('MusicSyncService', MusicSyncService);
     this.systemDependencies.set('MusicSyncService', []);
     
+    // ColorOrchestrator - Strategy pattern coordinator (singleton)
+    // Note: Uses globalColorOrchestrator singleton, handled as special case in createSystem
+    this.systemDependencies.set('ColorOrchestrator', []);
+    
+    // 🔧 PHASE 3: UnifiedColorProcessingEngine - Consolidates all color orchestrators
+    this.systemRegistry.set('UnifiedColorProcessingEngine', UnifiedColorProcessingEngine);
+    this.systemDependencies.set('UnifiedColorProcessingEngine', ['settingsManager', 'performanceAnalyzer']);
+    
+    // Consciousness Systems
+    this.systemRegistry.set('GenreGradientEvolution', GenreGradientEvolution);
+    this.systemDependencies.set('GenreGradientEvolution', ['cssConsciousnessController', 'musicSyncService', 'settingsManager']);
+    
+    this.systemRegistry.set('MusicEmotionAnalyzer', MusicEmotionAnalyzer);
+    this.systemDependencies.set('MusicEmotionAnalyzer', ['musicSyncService', 'settingsManager']);
+    
+    // 🔧 PHASE 4: UnifiedConsciousnessCoordinator - Consolidates ColorConsciousnessState and DynamicCatppuccinBridge
+    this.systemRegistry.set('UnifiedConsciousnessCoordinator', UnifiedConsciousnessCoordinator);
+    this.systemDependencies.set('UnifiedConsciousnessCoordinator', ['settingsManager']);
+    
     // UI Managers
     this.systemRegistry.set('GlassmorphismManager', GlassmorphismManager);
-    this.systemDependencies.set('GlassmorphismManager', ['cssVariableBatcher', 'performanceAnalyzer', 'settingsManager']);
+    this.systemDependencies.set('GlassmorphismManager', ['cssConsciousnessController', 'performanceAnalyzer', 'settingsManager']);
     
     this.systemRegistry.set('Card3DManager', Card3DManager);
     this.systemDependencies.set('Card3DManager', ['performanceAnalyzer', 'settingsManager']);
     
     // Integration Systems
     this.systemRegistry.set('SidebarSystemsIntegration', SidebarSystemsIntegration);
-    this.systemDependencies.set('SidebarSystemsIntegration', ['cssVariableBatcher']);
-    
-    this.systemRegistry.set('UnifiedSystemIntegration', UnifiedSystemIntegration);
-    this.systemDependencies.set('UnifiedSystemIntegration', ['year3000System']);
+    this.systemDependencies.set('SidebarSystemsIntegration', ['cssConsciousnessController']);
   }
 
   public async initialize(config?: Partial<NonVisualSystemConfig>): Promise<void> {
@@ -314,13 +356,14 @@ export class NonVisualSystemFacade {
   private async initializeSharedDependencies(): Promise<void> {
     // Initialize core systems first (these are needed by others)
     // CRITICAL: PerformanceAnalyzer MUST be created before UnifiedPerformanceCoordinator
+    // CRITICAL: UnifiedPerformanceCoordinator MUST be created before UnifiedCSSConsciousnessController
     const coreSystemsOrder = [
       'PerformanceAnalyzer',
-      'CSSVariableBatcher',
+      'UnifiedPerformanceCoordinator',
+      'UnifiedCSSConsciousnessController',
       'SettingsManager',
       'UnifiedDebugManager',
-      'MusicSyncService',
-      'UnifiedPerformanceCoordinator'
+      'MusicSyncService'
     ];
 
     for (const systemKey of coreSystemsOrder) {
@@ -335,8 +378,8 @@ export class NonVisualSystemFacade {
           case 'PerformanceAnalyzer':
             this.performanceAnalyzer = system;
             break;
-          case 'CSSVariableBatcher':
-            this.cssVariableBatcher = system;
+          case 'UnifiedCSSConsciousnessController':
+            this.cssConsciousnessController = system;
             break;
           case 'SettingsManager':
             this.settingsManager = system;
@@ -418,6 +461,22 @@ export class NonVisualSystemFacade {
         return system;
       }
 
+      if (key === 'ColorOrchestrator') {
+        // ColorOrchestrator is a singleton - use globalColorOrchestrator
+        const system = globalColorOrchestrator as T;
+        
+        // Inject additional dependencies
+        this.injectDependencies(system, key);
+        
+        // Integrate performance monitoring
+        this.integratePerformanceMonitoring(system, key);
+        
+        const endTime = performance.now();
+        this.currentMetrics.dependencyResolutionTime += endTime - startTime;
+        
+        return system;
+      }
+
       // Use strategy-based creation for all other systems
       const SystemClass = this.systemRegistry.get(key);
       if (!SystemClass) {
@@ -436,7 +495,7 @@ export class NonVisualSystemFacade {
           settingsManager: this.settingsManager,
           musicSyncService: this.musicSyncService,
           year3000System: this.year3000System,
-          cssVariableBatcher: this.cssVariableBatcher,
+          cssConsciousnessController: this.cssConsciousnessController,
           performanceCoordinator: this.performanceCoordinator
         },
         preferences: {
@@ -527,8 +586,8 @@ export class NonVisualSystemFacade {
     }
     
     // Inject CSS variable batcher
-    if (dependencies.includes('cssVariableBatcher') && this.cssVariableBatcher && system.setCSSVariableBatcher) {
-      system.setCSSVariableBatcher(this.cssVariableBatcher);
+    if (dependencies.includes('cssConsciousnessController') && this.cssConsciousnessController && system.setCSSConsciousnessController) {
+      system.setCSSConsciousnessController(this.cssConsciousnessController);
     }
     
     // Inject music sync service
@@ -777,7 +836,7 @@ export class NonVisualSystemFacade {
     }
     
     // Clear references
-    this.cssVariableBatcher = null;
+    this.cssConsciousnessController = null;
     this.performanceAnalyzer = null;
     this.musicSyncService = null;
     this.settingsManager = null;

@@ -554,7 +554,7 @@ export class EnhancedMasterAnimationCoordinator {
   // =========================================================================
   
   /**
-   * Main animation loop
+   * Main animation loop with proper frame time budgeting
    */
   private animate = (): void => {
     if (!this.isRunning) return;
@@ -572,17 +572,34 @@ export class EnhancedMasterAnimationCoordinator {
     this.frameContext.timestamp = currentTime;
     this.frameContext.deltaMs = deltaTime;
     
-    // Track frame time for performance monitoring
+    // Track frame time for performance monitoring and budgeting
     const frameStartTime = performance.now();
+    const FRAME_BUDGET = this.frameTimeBudget; // 8ms for performance mode, 16ms for quality
     
-    // Execute frame callbacks first (highest priority)
+    // Execute frame callbacks first (highest priority) - always execute
+    const callbackStartTime = performance.now();
     this.executeFrameCallbacks(deltaTime, currentTime);
+    const callbackTime = performance.now() - callbackStartTime;
     
-    // Execute animation systems
-    this.executeAnimationSystems(deltaTime, currentTime);
+    // Check remaining budget after callbacks
+    const remainingBudget = FRAME_BUDGET - callbackTime;
     
-    // Process emergent choreography tick (integrated from EmergentChoreographyEngine)
-    this.processEmergentTick(deltaTime);
+    if (remainingBudget > 2) { // Need at least 2ms for animation systems
+      // Execute animation systems with remaining budget
+      this.executeAnimationSystemsWithBudget(deltaTime, currentTime, remainingBudget);
+    } else {
+      // Skip non-critical animation systems to maintain frame rate
+      this.metrics.droppedFrames++;
+      if (this.config.enableDebug && Math.random() < 0.1) {
+        console.warn(`[EnhancedMasterAnimationCoordinator] Skipped animation systems - budget exceeded: ${callbackTime.toFixed(2)}ms`);
+      }
+    }
+    
+    // Process emergent choreography only if we have budget remaining
+    const midFrameTime = performance.now() - frameStartTime;
+    if (midFrameTime < FRAME_BUDGET * 0.8) { // Reserve 20% for cleanup
+      this.processEmergentTick(deltaTime);
+    }
     
     // Update performance metrics
     const frameTime = performance.now() - frameStartTime;
@@ -602,8 +619,16 @@ export class EnhancedMasterAnimationCoordinator {
     this.lastTimestamp = currentTime;
     this.frameCount++;
     
-    // Schedule next frame
-    this.animationFrameId = requestAnimationFrame(this.animate);
+    // Adaptive frame scheduling based on performance
+    if (frameTime > FRAME_BUDGET * 1.5) {
+      // Use setTimeout for next frame to give browser time to recover
+      setTimeout(() => {
+        this.animationFrameId = requestAnimationFrame(this.animate);
+      }, 4);
+    } else {
+      // Schedule next frame normally
+      this.animationFrameId = requestAnimationFrame(this.animate);
+    }
   };
   
   /**
@@ -697,6 +722,91 @@ export class EnhancedMasterAnimationCoordinator {
       } catch (error) {
         console.error(`[EnhancedMasterAnimationCoordinator] Error in system ${animation.name}:`, error);
       }
+    }
+  }
+  
+  /**
+   * Execute animation systems with frame time budget enforcement
+   */
+  private executeAnimationSystemsWithBudget(deltaTime: number, timestamp: number, budget: number): void {
+    const startTime = performance.now();
+    
+    // Sort systems by priority
+    const sortedSystems = Array.from(this.animations.values())
+      .filter(animation => animation.enabled)
+      .sort((a, b) => {
+        const priorityOrder = { critical: 0, normal: 1, background: 2 };
+        return priorityOrder[a.priority] - priorityOrder[b.priority];
+      });
+    
+    let processedCount = 0;
+    let skippedCount = 0;
+    
+    for (const animation of sortedSystems) {
+      // Check remaining budget before processing each system
+      const elapsed = performance.now() - startTime;
+      if (elapsed >= budget * 0.9) { // Reserve 10% for cleanup
+        skippedCount = sortedSystems.length - processedCount;
+        if (this.config.enableDebug && skippedCount > 0) {
+          console.warn(`[EnhancedMasterAnimationCoordinator] Budget exhausted: skipped ${skippedCount} systems`);
+        }
+        break;
+      }
+      
+      // FPS throttling
+      if (timestamp - animation.lastUpdate < animation.frameInterval) {
+        animation.skippedFrames++;
+        continue;
+      }
+      
+      const systemStartTime = performance.now();
+      
+      try {
+        if (animation.type === 'visual') {
+          // Visual system with frame context
+          (animation.system as IVisualSystem).onAnimate(deltaTime, this.frameContext);
+        } else {
+          // Animation system
+          const animationSystem = animation.system as AnimationSystem;
+          if (animationSystem.onAnimate) {
+            animationSystem.onAnimate(deltaTime);
+          }
+          if (animationSystem.updateAnimation) {
+            animationSystem.updateAnimation(timestamp, deltaTime);
+          }
+        }
+        
+        // Update system metrics
+        const systemTime = performance.now() - systemStartTime;
+        animation.totalTime += systemTime;
+        animation.frameCount++;
+        animation.lastUpdate = timestamp;
+        animation.averageFrameTime = animation.totalTime / animation.frameCount;
+        animation.maxFrameTime = Math.max(animation.maxFrameTime, systemTime);
+        
+        processedCount++;
+        
+        // Per-system budget check for future optimization
+        if (systemTime > budget * 0.3) { // Single system taking >30% of budget
+          if (this.config.enableDebug) {
+            console.warn(`[EnhancedMasterAnimationCoordinator] System ${animation.name} consuming excessive budget: ${systemTime.toFixed(2)}ms`);
+          }
+        }
+        
+      } catch (error) {
+        console.error(`[EnhancedMasterAnimationCoordinator] Error in system ${animation.name}:`, error);
+        processedCount++;
+      }
+    }
+    
+    // Track budget efficiency metrics
+    const totalTime = performance.now() - startTime;
+    if (skippedCount > 0) {
+      this.metrics.droppedFrames += skippedCount;
+    }
+    
+    if (this.config.enableDebug && Math.random() < 0.02) { // 2% sampling
+      console.log(`[EnhancedMasterAnimationCoordinator] Budget usage: ${totalTime.toFixed(2)}ms/${budget.toFixed(2)}ms, processed: ${processedCount}/${sortedSystems.length}`);
     }
   }
   

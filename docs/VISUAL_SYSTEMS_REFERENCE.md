@@ -18,32 +18,150 @@ The Catppuccin StarryNight theme implements a sophisticated **Visual Systems Arc
 
 ```
 VisualSystemFacade (Factory & Coordinator)
-├── Background Systems
-│   ├── LightweightParticleSystem
-│   ├── ParticleFieldSystem
-│   ├── WebGLGradientBackgroundSystem
-│   ├── FlowingLiquidConsciousnessSystem
-│   └── DepthLayeredGradientSystem
+├── Background Systems (Progressive Enhancement)
+│   ├── ParticleConsciousnessModule (unified particle system)
+│   ├── WebGLGradientBackgroundSystem (primary WebGL backend)
+│   ├── CSSGradientBackgroundSystem (universal fallback)
+│   ├── FlowingLiquidConsciousnessSystem (organic animations)
+│   └── DepthLayeredGradientSystem (multi-depth effects)
+├── Color Processing (Strategy Pattern)
+│   ├── LivingGradientStrategy (breathing foundation)
+│   ├── DynamicCatppuccinStrategy (Catppuccin harmonization)
+│   ├── WebGLGradientStrategy (WebGL-specific processing)
+│   └── ColorOrchestrator (strategy coordination)
+├── Reality Bleeding Integration
+│   ├── RealityBleedingGradientOrchestrator (master coordinator)
+│   ├── GradientDirectionalFlowSystem (music-sync directional)
+│   ├── IridescentShimmerEffectsSystem (shimmer overlays)
+│   └── BackgroundConsciousnessChoreographer (consciousness field)
 ├── Organic Consciousness Systems
-│   ├── OrganicBeatSyncConsciousness
-│   ├── BiologicalConsciousnessManager
-│   ├── CellularBeatResponse
-│   └── BreathingRhythmEngine
-├── UI Effects Systems
-│   ├── IridescentShimmerEffectsSystem
-│   ├── BehavioralPredictionEngine
-│   ├── InteractionTrackingSystem
-│   ├── PredictiveMaterializationSystem
-│   └── SpotifyUIApplicationSystem
-├── Color Consciousness Systems
-│   ├── EmotionalTemperatureEngine
-│   ├── ColorConsciousnessOrchestrator
-│   ├── CinematicColorGrading
-│   └── DynamicColorPipeline
-└── Integration & Coordination
-    ├── Year3000IntegrationBridge
-    ├── RealityBleedingGradientOrchestrator
-    └── GradientTransitionOrchestrator
+│   ├── OrganicBeatSyncConsciousness (beat-responsive behaviors)
+│   ├── UnifiedSidebarConsciousnessController (sidebar consciousness)
+│   ├── ConsciousnessUIEffectsController (UI consciousness)
+│   └── ParticleConsciousnessModule (particle consciousness)
+├── UI Integration Systems
+│   ├── InteractionTrackingSystem (user interaction awareness)
+│   ├── SpotifyUIApplicationSystem (Spotify DOM integration)
+│   └── UnifiedCSSConsciousnessController (CSS variable coordination)
+└── Performance & Quality Management
+    ├── AdaptivePerformanceSystem (device-aware optimization)
+    ├── QualityScalingCapable (quality level management)
+    └── DeviceCapabilityDetector (hardware detection)
+```
+
+## Color Processing Strategy Pattern
+
+### Overview
+
+The theme uses a sophisticated **Strategy Pattern** for color processing, allowing different color harmonization algorithms to be applied based on context, music data, and user preferences.
+
+### Color Processing Pipeline
+
+```
+Track Change → MusicSyncService.robustColorExtraction() → 
+ColorContext Creation → colors/extracted Event → 
+Strategy Selection → Color Processing → 
+CSS Variable Updates → Visual System Updates
+```
+
+### Strategy Implementations
+
+#### LivingGradientStrategy
+**Purpose**: Transforms static backgrounds into breathing, organic foundations
+
+**Location**: `src-js/visual/strategies/LivingGradientStrategy.ts`
+
+**Features**:
+- **Breathing Animations**: Synchronized to music tempo with organic cycles
+- **Base Transformation**: Dynamic foundation colors that evolve with music
+- **WebGL Integration**: Coordinates with WebGL systems for hybrid rendering
+- **Consciousness Awareness**: Responds to consciousness intensity and musical energy
+
+```typescript
+interface LivingGradientConfig {
+  baseTransformationEnabled: boolean;
+  webglIntegrationEnabled: boolean;
+  breathingAnimationEnabled: boolean;
+  consciousnessLayerOpacity: number; // 0-1
+  organicFlowIntensity: number; // 0-2
+  musicResponsiveness: number; // 0-2
+}
+```
+
+#### DynamicCatppuccinStrategy
+**Purpose**: Maintains Catppuccin aesthetic while allowing dynamic color adaptation
+
+**Location**: `src-js/visual/strategies/DynamicCatppuccinStrategy.ts`
+
+**Features**:
+- **Catppuccin Harmonization**: Preserves Catppuccin color relationships
+- **Album Art Integration**: Blends extracted colors with Catppuccin palette
+- **Flavor Adaptation**: Supports all Catppuccin flavors (Latte, Frappé, Macchiato, Mocha)
+- **Accessibility**: Maintains contrast ratios and readability
+
+#### WebGLGradientStrategy
+**Purpose**: WebGL-specific color processing for GPU-accelerated rendering
+
+**Location**: `src-js/visual/strategies/WebGLGradientStrategy.ts`
+
+**Features**:
+- **OKLAB Color Processing**: Perceptually uniform color interpolation
+- **Gradient Texture Generation**: Creates seamless gradient textures for WebGL
+- **Performance Optimization**: GPU-optimized color calculations
+- **Multi-layer Composition**: Supports multiple gradient layers with blend modes
+
+### ColorContext Interface
+
+```typescript
+interface ColorContext {
+  rawColors: Record<string, string>;      // Extracted album colors
+  trackUri: string;                       // Current track identifier
+  timestamp: number;                      // Processing timestamp
+  harmonicMode: 'catppuccin' | 'dynamic'; // Color harmony mode
+  musicData?: {                          // Optional music analysis
+    energy: number;                      // Track energy (0-1)
+    valence: number;                     // Track positivity (0-1)
+    tempo: number;                       // BPM
+    genre: string;                       // Detected genre
+  };
+  performanceHints: {                    // Performance optimization hints
+    preferLightweight: boolean;
+    enableAdvancedBlending: boolean;
+    maxProcessingTime: number;           // Max processing time in ms
+  };
+}
+```
+
+### Graceful Degradation in Color Processing
+
+The color processing system implements **robust graceful degradation**:
+
+#### Fallback Chain
+1. **Primary**: Album art color extraction with strategy processing
+2. **Secondary**: Catppuccin default colors with strategy processing
+3. **Tertiary**: Hard-coded Catppuccin mauve/rosewater palette
+4. **Ultimate**: CSS default colors (browser fallback)
+
+#### Robust Color Extraction
+```typescript
+// MusicSyncService implements robust color extraction with retries
+async robustColorExtraction(trackUri: string, maxRetries = 3): Promise<Record<string, string> | null> {
+  // Exponential backoff retry logic
+  // Validation of meaningful color data
+  // Graceful failure handling
+}
+```
+
+#### Fallback Color Set
+```typescript
+const FALLBACK_COLORS = {
+  'VIBRANT': '#f2cdcd',          // Catppuccin rosewater
+  'DARK_VIBRANT': '#cba6f7',     // Catppuccin mauve  
+  'LIGHT_VIBRANT': '#f5c2e7',    // Catppuccin pink
+  'PROMINENT': '#cba6f7',        // Catppuccin mauve
+  'VIBRANT_NON_ALARMING': '#f2cdcd', // Catppuccin rosewater
+  'DESATURATED': '#9399b2'       // Catppuccin overlay1
+};
 ```
 
 ## Factory Pattern Architecture
@@ -195,34 +313,60 @@ const canvasResult = await this._createOptimizedKineticCanvas(
 - **Medium devices**: 200-300 particles at 45fps
 - **Low-end devices**: 50-100 particles at 30fps
 
-### ParticleFieldSystem
+### WebGLGradientBackgroundSystem (Primary Backend)
 
-**Purpose**: Advanced particle field generation with physics simulation
-
-**Location**: `src-js/visual/backgrounds/ParticleFieldSystem.ts`
-
-#### Features
-- **3D particle physics** with collision detection
-- **Force field simulation** responding to audio analysis
-- **Constellation patterns** forming geometric shapes
-- **Dynamic color mapping** from album art colors
-
-### WebGLGradientBackgroundSystem
-
-**Purpose**: GPU-accelerated gradient backgrounds with real-time color transitions
+**Purpose**: Advanced WebGL gradient backgrounds with consciousness integration and hybrid coordination
 
 **Location**: `src-js/visual/backgrounds/WebGLGradientBackgroundSystem.ts`
 
-#### Shader Features
-- **OKLAB color interpolation** for perceptually uniform gradients
-- **Multi-layer composition** with blend modes
-- **Real-time color extraction** from album artwork
-- **Performance-adaptive quality** (highp/mediump/lowp precision)
+#### Progressive Enhancement Architecture
+- **WebGL2 Primary**: Advanced GPU-accelerated flowing gradients using Alex Harri's technique
+- **Hybrid Coordination**: Seamless coordination with CSS fallback through CSS variables
+- **Quality Scaling**: Adaptive quality based on device capabilities and performance
+- **Consciousness Integration**: Responds to consciousness fields and choreography events
 
-#### WebGL2 Enhancements
-- **Compute shaders** for complex gradient calculations
-- **Texture arrays** for multiple gradient layers
-- **Instanced rendering** for performance optimization
+#### Current WebGL Features
+- **Flowing Gradient Technique**: Implementation of Alex Harri's flowing gradient algorithm
+- **Consciousness Shader Library**: Shared shader management with organic consciousness patterns
+- **Music Synchronization**: Beat-responsive flow strength and wave parameters
+- **Performance Monitoring**: Real-time FPS and memory usage tracking
+- **Device Adaptation**: Automatic fallback to CSS on low-performance devices
+
+#### Quality Scaling Levels
+```typescript
+interface QualityLevels {
+  minimal: { fps: 20, flowStrength: 0.3, features: { webgl: false } },
+  low: { fps: 30, flowStrength: 0.5, features: { webgl: true, shaders: 'basic' } },
+  medium: { fps: 45, flowStrength: 0.7, features: { webgl: true, shaders: 'full' } },
+  high: { fps: 60, flowStrength: 0.9, features: { webgl: true, shaders: 'enhanced' } },
+  ultra: { fps: 60, flowStrength: 1.0, features: { webgl: true, shaders: 'premium' } }
+}
+```
+
+### CSSGradientBackgroundSystem (Universal Fallback)
+
+**Purpose**: Pure CSS gradient system providing universal compatibility
+
+**Location**: `src-js/visual/backgrounds/CSSGradientBackgroundSystem.ts`
+
+#### Fallback Features
+- **Universal Compatibility**: Works on all devices and browsers
+- **Ultra-lightweight**: <5MB memory usage, 2% CPU budget
+- **CSS Animation**: Fallback animations using CSS transforms and opacity
+- **Strategy Integration**: Receives processed colors from strategy pattern
+- **Reduced Motion Support**: Full `prefers-reduced-motion` compliance
+
+### ParticleConsciousnessModule (Unified Particle System)
+
+**Purpose**: Consolidated particle system combining lightweight and field-based particles
+
+**Location**: `src-js/visual/consciousness/ParticleConsciousnessModule.ts`
+
+#### Unified Architecture
+- **Lightweight Mode**: Basic particle rendering for low-end devices
+- **Field Mode**: Advanced physics simulation for high-end devices
+- **Consciousness Integration**: Responds to consciousness choreographer events
+- **Performance Adaptation**: Dynamic quality scaling based on device capabilities
 
 ### FlowingLiquidConsciousnessSystem
 

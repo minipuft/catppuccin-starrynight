@@ -1,4 +1,4 @@
-import { GlobalEventBus } from "@/core/events/EventBus";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import type { Year3000Config } from "@/types/models";
 import { Year3000System } from "@/core/lifecycle/year3000System";
@@ -7,25 +7,15 @@ import { MusicSyncService } from "@/audio/MusicSyncService";
 import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 
-// Type definitions
+// Type definitions - Simplified to only include actually used state
 interface NexusState {
-  complexity: number;
-  coherence: number;
-  volatility: number;
-  timeDistortionFactor: number;
   currentNavigationScale: number;
-  targetComplexity: number;
-  targetCoherence: number;
-  targetVolatility: number;
-  targetTimeDistortionFactor: number;
   targetNavigationScale: number;
   userInfluence: number;
   lastEnergy: number;
   lastValence: number;
   lastVisualIntensity: number;
   lastMoodIdentifier: string;
-  responsiveness: number;
-  temporalSensitivity: number;
 }
 
 interface BiometricState {
@@ -98,23 +88,13 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     this.year3000System = year3000System;
 
     this.nexusState = {
-      complexity: 0.1,
-      coherence: 0.8,
-      volatility: 0.05,
-      timeDistortionFactor: 1.0,
       currentNavigationScale: 1.0,
-      targetComplexity: 0.1,
-      targetCoherence: 0.8,
-      targetVolatility: 0.05,
-      targetTimeDistortionFactor: 1.0,
       targetNavigationScale: 1.0,
       userInfluence: 0,
       lastEnergy: 0.5,
       lastValence: 0.5,
       lastVisualIntensity: 0.5,
-      lastMoodIdentifier: "neutral",
-      responsiveness: 1.0,
-      temporalSensitivity: 1.0,
+      lastMoodIdentifier: "neutral"
     };
 
     this.biometricState = {
@@ -185,27 +165,22 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
   }
 
   private initializeOptimizedQuantumSpace() {
+    // Initialize only the CSS variables that are actually used in the CSS
     const root = this.utils.getRootStyle();
     if (!root) return;
 
-    const safeSetProperty = (name: string, value: any) => {
+    const safeSetProperty = (name: string, value: string) => {
       try {
         root.style.setProperty(name, value);
-      } catch (e) {}
+      } catch (e) {
+        console.warn(`[InteractionTrackingSystem] Failed to set CSS property ${name}:`, e);
+      }
     };
 
-    safeSetProperty("--sn-nexus-complexity", this.nexusState.complexity);
-    safeSetProperty("--sn-nexus-coherence", this.nexusState.coherence);
-    safeSetProperty("--sn-nexus-volatility", this.nexusState.volatility);
-    safeSetProperty(
-      "--sn-nexus-time-distortion",
-      this.nexusState.timeDistortionFactor
-    );
+    // Set initial values for CSS variables used by the system
     safeSetProperty("--sn-nav-item-transform-scale", "1.0");
     safeSetProperty("--sn-sidebar-meditation-desaturation", "0");
     safeSetProperty("--sn-sidebar-meditation-slowdown", "1");
-    safeSetProperty("--sn-nexus-pattern-complexity", "0.5");
-    safeSetProperty("--sn-nexus-pattern-rotation", "0deg");
   }
 
   private recordUserInteraction(event: Event) {
@@ -221,9 +196,11 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
           ? (newTop - (this._lastScrollTop ?? 0)) / (now - this._lastScrollTime)
           : 0;
         const direction = velocity < 0 ? "up" : "down";
-        GlobalEventBus.publish("user:scroll", {
-          velocity: velocity * 1000, // pixels per second
+        unifiedEventBus.emit("user:scroll", {
+          velocity: { x: 0, y: velocity * 1000 }, // pixels per second, normalized to x/y format
           direction,
+          element: target.tagName || 'unknown',
+          timestamp: now
         });
         this._lastScrollTop = newTop;
         this._lastScrollTime = now;
@@ -237,11 +214,7 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     }
     this.lastInteractionRecordTime = now;
     this.nexusState.userInfluence += 0.005;
-    this.nexusState.volatility = Math.min(1, this.nexusState.volatility + 0.01);
-    this.nexusState.userInfluence = Math.min(
-      0.5,
-      this.nexusState.userInfluence
-    );
+    this.nexusState.userInfluence = Math.min(0.5, this.nexusState.userInfluence);
     this.biometricState.lastUserInteractionTime = Date.now();
     this.biometricState.isMeditating = false;
   }
@@ -256,8 +229,8 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
       for (const mutation of mutationsList) {
         if (mutation.type === "childList") {
           const hasModal = modalRoot.children.length > 0;
-          this.nexusState.timeDistortionFactor = hasModal ? 0.2 : 1.0;
-          this.nexusState.coherence = hasModal ? 0.2 : 0.8;
+          // Modal state affects navigation scaling - reduce scale when modal is open
+          this.nexusState.targetNavigationScale = hasModal ? 0.95 : 1.0;
         }
       }
     };
@@ -329,17 +302,16 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
       energy,
       valence,
       visualIntensity,
-      animationSpeedFactor,
       moodIdentifier,
     } = processedMusicData;
 
-    this.nexusState.targetComplexity =
-      (energy * 0.6 + visualIntensity * 0.4) * 0.9 + 0.1;
-    this.nexusState.targetCoherence =
-      1.0 - (energy * 0.5 + visualIntensity * 0.5) * 0.6;
-    this.nexusState.targetVolatility =
-      (1.0 - valence) * 0.1 + (energy - 0.5) * 0.05;
-    this.nexusState.targetTimeDistortionFactor = animationSpeedFactor;
+    // Store music data for state tracking
+    this.nexusState.lastEnergy = energy;
+    this.nexusState.lastValence = valence;
+    this.nexusState.lastVisualIntensity = visualIntensity;
+    this.nexusState.lastMoodIdentifier = moodIdentifier;
+
+    // Calculate navigation scale based on music intensity
     this.nexusState.targetNavigationScale =
       this.calculateOptimizedNavigationScale(visualIntensity, moodIdentifier);
   }
@@ -408,27 +380,14 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
   private animateOptimizedNexusFrame(deltaTimeMs: number | null) {
     const lerpFactor = Math.min(((deltaTimeMs ?? 16.67) / 1000) * 5, 1);
 
-    this.nexusState.complexity = this.utils.lerp(
-      this.nexusState.complexity,
-      this.nexusState.targetComplexity,
-      lerpFactor
-    );
-    this.nexusState.coherence = this.utils.lerp(
-      this.nexusState.coherence,
-      this.nexusState.targetCoherence,
-      lerpFactor
-    );
-    this.nexusState.volatility = this.utils.lerp(
-      this.nexusState.volatility,
-      this.nexusState.targetVolatility,
-      lerpFactor
-    );
+    // Update navigation scale animation
     this.nexusState.currentNavigationScale = this.utils.lerp(
       this.nexusState.currentNavigationScale,
       this.nexusState.targetNavigationScale,
       lerpFactor
     );
 
+    // Update meditation state animation
     this.biometricState.desaturation = this.utils.lerp(
       this.biometricState.desaturation,
       this.biometricState.targetDesaturation,
@@ -440,45 +399,24 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
       lerpFactor
     );
 
+    // Apply state to CSS variables
     this.applyOptimizedStateToCSS();
   }
 
   private applyOptimizedStateToCSS() {
-    const queueCSSUpdate = (property: string, value: any) => {
-      if ((this.year3000System as any)?.queueCSSVariableUpdate) {
-        (this.year3000System as any).queueCSSVariableUpdate(
-          property,
-          value.toString()
-        );
-      } else {
-        this.rootElement.style.setProperty(property, value.toString());
+    // Apply CSS variables directly to the DOM (modernized direct approach)
+    const safeSetProperty = (property: string, value: string) => {
+      try {
+        this.rootElement.style.setProperty(property, value);
+      } catch (e) {
+        console.warn(`[InteractionTrackingSystem] Failed to set CSS property ${property}:`, e);
       }
     };
 
-    queueCSSUpdate(
-      "--sn-nexus-complexity",
-      this.nexusState.complexity.toFixed(3)
-    );
-    queueCSSUpdate(
-      "--sn-nexus-coherence",
-      this.nexusState.coherence.toFixed(3)
-    );
-    queueCSSUpdate(
-      "--sn-nexus-volatility",
-      this.nexusState.volatility.toFixed(3)
-    );
-    queueCSSUpdate(
-      "--sn-nav-item-transform-scale",
-      this.nexusState.currentNavigationScale.toFixed(3)
-    );
-    queueCSSUpdate(
-      "--sn-sidebar-meditation-desaturation",
-      this.biometricState.desaturation.toFixed(3)
-    );
-    queueCSSUpdate(
-      "--sn-sidebar-meditation-slowdown",
-      this.biometricState.slowdown.toFixed(3)
-    );
+    // Only update variables that are actually used in CSS
+    safeSetProperty("--sn-nav-item-transform-scale", this.nexusState.currentNavigationScale.toFixed(3));
+    safeSetProperty("--sn-sidebar-meditation-desaturation", this.biometricState.desaturation.toFixed(3));
+    safeSetProperty("--sn-sidebar-meditation-slowdown", this.biometricState.slowdown.toFixed(3));
   }
 
   private validateMusicData(data: any): boolean {
@@ -494,8 +432,10 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     const safeSetProperty = (name: string, value: string) => {
       if (this.rootElement) this.rootElement.style.setProperty(name, value);
     };
-    safeSetProperty("--sn-nexus-complexity", "0.1");
-    safeSetProperty("--sn-nexus-coherence", "0.8");
+    // Apply safe defaults for actually used CSS variables
+    safeSetProperty("--sn-nav-item-transform-scale", "1.0");
+    safeSetProperty("--sn-sidebar-meditation-desaturation", "0");
+    safeSetProperty("--sn-sidebar-meditation-slowdown", "1");
   }
 
   private updateIntegrationMetrics() {
@@ -504,7 +444,9 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
 
   private calculateIntegrationComplexity(): number {
     let complexity = 0;
-    complexity += this.nexusState.complexity * 10;
+    // Base complexity on user interaction level and music intensity
+    complexity += this.nexusState.userInfluence * 10;
+    complexity += this.nexusState.lastVisualIntensity * 5;
     if (this.biometricState.isMeditating) complexity += 5;
     return complexity;
   }

@@ -1,7 +1,7 @@
 import { HARMONIC_MODES, YEAR3000_CONFIG } from "./config/globalConfig";
 import { Year3000System } from "./core/lifecycle/year3000System";
 import { Y3K } from "./debug/UnifiedDebugManager";
-import { initializeAberrationManager } from "./visual/ui-effects/Aberration/AberrationManager";
+import { initializeAberrationManager } from "./visual/ui-effects/Aberration/AberrationManager"; // Re-enabled for hybrid CSS+WebGL approach
 import { initializeAudioVisualController } from "./visual/ui-effects/AudioVisualController";
 import { waitForSpicetifyReady } from "./utils/platform/spicetifyReady";
 import * as Year3000Utilities from "./utils/core/Year3000Utilities";
@@ -14,22 +14,112 @@ function isHistoryAvailable(platform: any): platform is { History: any } {
   return platform && typeof platform.History?.listen === "function";
 }
 
-// Progressive API detection with timeout fallbacks
+// Enhanced progressive API detection with comprehensive error handling
 async function waitForAPI(apiPath: string, timeout = 5000): Promise<any> {
   const start = Date.now();
+  let lastError: Error | null = null;
+  let attemptCount = 0;
 
   while (Date.now() - start < timeout) {
+    attemptCount++;
     try {
       const api = apiPath
         .split(".")
         .reduce((obj: any, prop: string) => obj?.[prop], window as any);
-      if (api) return api;
+      
+      if (api) {
+        console.log(`✅ [StarryNight] API ${apiPath} available after ${attemptCount} attempts (${Date.now() - start}ms)`);
+        return api;
+      }
     } catch (e) {
-      // Continue waiting
+      lastError = e as Error;
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
+  
+  // Enhanced error logging for debugging
+  console.warn(`❌ [StarryNight] API ${apiPath} timeout after ${timeout}ms (${attemptCount} attempts)`);
+  if (lastError) {
+    console.warn(`❌ [StarryNight] Last error for ${apiPath}:`, lastError.message);
+  }
+  
+  // Additional diagnostic information
+  const pathParts = apiPath.split(".");
+  let currentObj: any = window;
+  for (let i = 0; i < pathParts.length; i++) {
+    const part = pathParts[i];
+    if (!part || !currentObj || typeof currentObj !== 'object' || currentObj[part] === undefined) {
+      console.warn(`❌ [StarryNight] API path ${apiPath} breaks at '${part}' (step ${i + 1}/${pathParts.length})`);
+      break;
+    }
+    currentObj = currentObj[part];
+  }
+  
   return null;
+}
+
+// Enhanced DOM element waiting function
+async function waitForDOMElement(selector: string, timeout = 5000): Promise<Element | null> {
+  const start = Date.now();
+  let attemptCount = 0;
+
+  while (Date.now() - start < timeout) {
+    attemptCount++;
+    try {
+      const element = document.querySelector(selector);
+      if (element) {
+        console.log(`✅ [StarryNight] DOM element '${selector}' found after ${attemptCount} attempts (${Date.now() - start}ms)`);
+        return element;
+      }
+    } catch (e) {
+      console.warn(`❌ [StarryNight] DOM query error for '${selector}':`, e);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
+  
+  console.warn(`❌ [StarryNight] DOM element '${selector}' not found after ${timeout}ms (${attemptCount} attempts)`);
+  return null;
+}
+
+// 🔧 CRITICAL FIX: Wait for Catppuccin theme to be fully loaded
+async function waitForCatppuccinTheme(timeout = 5000): Promise<boolean> {
+  const start = Date.now();
+  
+  while (Date.now() - start < timeout) {
+    try {
+      const rootStyle = getComputedStyle(document.documentElement);
+      
+      // Check for key Catppuccin variables to ensure theme is loaded
+      const baseColor = rootStyle.getPropertyValue('--spice-base').trim();
+      const accentColor = rootStyle.getPropertyValue('--spice-accent').trim();
+      const textColor = rootStyle.getPropertyValue('--spice-text').trim();
+      
+      // Ensure we have non-default, non-white colors
+      const isValidColor = (color: string) => {
+        const normalized = color.toLowerCase();
+        return color && 
+               !normalized.includes('#ffffff') && 
+               !normalized.includes('#fff') && 
+               !normalized.includes('white') &&
+               normalized.match(/^#[0-9a-f]{6}$/i);
+      };
+      
+      if (isValidColor(baseColor) && isValidColor(accentColor) && isValidColor(textColor)) {
+        console.log(`🎨 [StarryNight] Catppuccin theme loaded: base=${baseColor}, accent=${accentColor}, text=${textColor}`);
+        return true;
+      }
+      
+      // If colors are still default/white, continue waiting
+      console.log(`🎨 [StarryNight] Waiting for Catppuccin theme... (base=${baseColor}, accent=${accentColor})`);
+      
+    } catch (e) {
+      // Continue waiting
+    }
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
+  
+  console.warn(`🎨 [StarryNight] Catppuccin theme not fully loaded after ${timeout}ms - proceeding with fallbacks`);
+  return false;
 }
 
 // -----------------------------------------------------------------------------
@@ -74,9 +164,33 @@ patchReactRequire();
   // 🚦 Wait until Spicetify signals that its registry is fully initialised
   const spicetifyReady = await waitForSpicetifyReady(10000);
   if (!spicetifyReady) {
-    console.warn(
-      "🌟 [StarryNight] Spicetify not fully ready after 10s – proceeding with degraded visual-only mode."
+    console.error(
+      "❌ [StarryNight] CRITICAL: Spicetify not fully ready after 10s – proceeding with degraded visual-only mode."
     );
+    console.error("❌ [StarryNight] Available Spicetify objects:", {
+      Spicetify: !!(window as any).Spicetify,
+      showNotification: !!(window as any).Spicetify?.showNotification,
+      Platform: !!(window as any).Spicetify?.Platform
+    });
+  } else {
+    console.log("✅ [StarryNight] Spicetify platform fully ready");
+  }
+
+  // 🔧 CRITICAL FIX: Wait for Catppuccin theme to be fully loaded before initializing color systems
+  const themeReady = await waitForCatppuccinTheme(8000);
+  if (!themeReady) {
+    console.error(
+      "❌ [StarryNight] CRITICAL: Catppuccin theme not fully loaded after 8s – may experience color issues"
+    );
+    // Additional diagnostic information
+    const rootStyle = getComputedStyle(document.documentElement);
+    console.error("❌ [StarryNight] Current CSS variables:", {
+      base: rootStyle.getPropertyValue('--spice-base').trim(),
+      accent: rootStyle.getPropertyValue('--spice-accent').trim(),
+      text: rootStyle.getPropertyValue('--spice-text').trim()
+    });
+  } else {
+    console.log("✅ [StarryNight] Catppuccin theme fully loaded");
   }
 
   // Progressive API detection with reasonable timeouts
@@ -88,37 +202,70 @@ patchReactRequire();
     reactDOM: await waitForAPI("Spicetify.ReactDOM", 2000),
   };
 
-  // Check for main UI container with timeout
-  const mainContainer = await waitForAPI(
-    'document.querySelector(".main-viewContainer-scrollNode, .main-view-container__scroll-node-child")',
-    10000
-  );
+  // Check for main UI container (optional for enhanced features, not required for core functionality)
+  // Try multiple potential selectors for better compatibility across Spotify versions
+  const mainContainerSelectors = [
+    ".main-viewContainer-scrollNode", 
+    ".main-view-container__scroll-node-child",
+    ".main-view-container",
+    ".main-container",
+    "#main",
+    "[data-testid='main-container']"
+  ];
+  
+  let mainContainer: Element | null = null;
+  for (const selector of mainContainerSelectors) {
+    mainContainer = await waitForDOMElement(selector, 1000); // Shorter timeout per selector
+    if (mainContainer) {
+      console.log(`✅ [StarryNight] Found main container using selector: ${selector}`);
+      break;
+    }
+  }
 
-  // Initialize light-weight prismatic scroll sheen once scroll node is confirmed.
-  import("./visual/ui-effects/prismaticScrollSheen").then((m) =>
-    m.initializePrismaticScrollSheen?.()
-  );
+  // Initialize enhanced UI features if main container is available
+  if (mainContainer) {
+    try {
+      // Initialize prismatic scroll sheen
+      import("./visual/ui-effects/prismaticScrollSheen").then((m) =>
+        m.initializePrismaticScrollSheen?.()
+      );
+      
+      // Could add other DOM-dependent features here in the future
+      console.log("✅ [StarryNight] Enhanced UI features initialized with DOM container");
+    } catch (error) {
+      console.warn("⚠️ [StarryNight] Failed to initialize enhanced UI features:", error);
+    }
+  } else {
+    console.warn("⚠️ [StarryNight] No suitable main container found - enhanced UI features disabled");
+    console.warn("⚠️ [StarryNight] Tried selectors:", mainContainerSelectors.join(", "));
+    console.warn("⚠️ [StarryNight] Core functionality (music sync, color extraction) will still work");
+  }
 
   // Determine if we can run in full mode or degraded mode
-  const hasRequiredAPIs =
-    requiredAPIs.player && requiredAPIs.platform && mainContainer;
+  // Core functionality (music sync, color extraction) only requires Spicetify APIs
+  const hasRequiredAPIs = requiredAPIs.player && requiredAPIs.platform;
   const degradedMode = !hasRequiredAPIs;
 
   if (degradedMode) {
-    console.log(
-      "🌟 [StarryNight] Initializing in DEGRADED MODE due to missing APIs"
+    console.error(
+      "❌ [StarryNight] DEGRADED MODE: Initializing with limited functionality due to missing APIs"
     );
-    console.log("🌟 [StarryNight] Available APIs:", {
+    console.error("❌ [StarryNight] API availability status:", {
       player: !!requiredAPIs.player,
-      platform: !!requiredAPIs.platform,
+      platform: !!requiredAPIs.platform, 
       menu: !!requiredAPIs.menu,
       react: !!requiredAPIs.react,
       reactDOM: !!requiredAPIs.reactDOM,
-      mainContainer: !!mainContainer,
+      mainContainer: !!mainContainer + " (optional)",
     });
+    console.error("❌ [StarryNight] DEGRADED MODE limitations:");
+    console.error("  - Music synchronization disabled");
+    console.error("  - Advanced visual effects may not function");
+    console.error("  - UI integration features disabled");
+    console.error("  - Color extraction from album art disabled");
   } else {
     console.log(
-      "🌟 [StarryNight] All required APIs available - initializing in FULL MODE"
+      "✅ [StarryNight] FULL MODE: All required APIs available - initializing complete functionality"
     );
   }
 
@@ -138,8 +285,8 @@ patchReactRequire();
   // 1a. 🎆 Initialise AudioVisualController (Phase 2)
   initializeAudioVisualController(year3000System);
 
-  // 1a-b. 🌈 Initialise Adaptive Chromatic Aberration Canvas (Phase 2)
-  initializeAberrationManager(year3000System);
+  // 1a-b. 🌈 Adaptive Chromatic Aberration (Phase 2) - Hybrid CSS+WebGL approach
+  initializeAberrationManager(year3000System); // Re-enabled with enhanced CSS integration
 
   // 1b. 🌠 Enable Enhanced Drag Preview (Phase 2)
   import("./ui/interactions/EnhancedDragPreview").then((m) =>
@@ -165,6 +312,9 @@ patchReactRequire();
       console.log(
         "🌟 [StarryNight] Initialized in degraded mode - visual systems only"
       );
+      
+      // Set up progressive enhancement to upgrade to full mode when APIs become available
+      setupProgressiveEnhancement(year3000System, requiredAPIs);
     } else {
       // Full initialization if all APIs are available
       await year3000System.initializeAllSystems();
@@ -258,13 +408,105 @@ patchReactRequire();
     );
   }
 
+  // 3c. 🌊 Initialize Depth Consciousness Controller (Phase 4.2e)
+  try {
+    const { DepthConsciousnessController } = await import(
+      "./visual/consciousness/DepthConsciousnessController"
+    );
+    
+    const depthConsciousness = new DepthConsciousnessController(
+      YEAR3000_CONFIG,
+      Year3000Utilities,
+      year3000System.performanceAnalyzer,
+      year3000System.musicSyncService as any,
+      year3000System.settingsManager as any
+    );
+    await depthConsciousness.initialize();
+    (year3000System as any).depthConsciousnessController = depthConsciousness;
+    
+    console.log("🌊 [StarryNight] Depth Consciousness Controller awakened");
+  } catch (err) {
+    console.error(
+      "[StarryNight] Failed to initialize DepthConsciousnessController",
+      err
+    );
+  }
+
+  // 3d. 🎨 Initialize Dynamic Catppuccin Bridge (Phase 2.1)
+  try {
+    const { DynamicCatppuccinBridge } = await import(
+      "./visual/consciousness/DynamicCatppuccinBridge"
+    );
+    
+    const dynamicBridge = new DynamicCatppuccinBridge(
+      YEAR3000_CONFIG,
+      Year3000Utilities,
+      year3000System.performanceAnalyzer,
+      year3000System.musicSyncService as any,
+      year3000System.settingsManager as any
+    );
+    await dynamicBridge.initialize();
+    
+    // Link with other consciousness systems
+    if (year3000System.colorHarmonyEngine) {
+      dynamicBridge.linkWithColorHarmonyEngine(year3000System.colorHarmonyEngine);
+    }
+    if ((year3000System as any).depthConsciousnessController) {
+      dynamicBridge.linkWithDepthConsciousness((year3000System as any).depthConsciousnessController);
+    }
+    
+    (year3000System as any).dynamicCatppuccinBridge = dynamicBridge;
+    
+    console.log("🎨 [StarryNight] Dynamic Catppuccin Bridge connected");
+  } catch (err) {
+    console.error(
+      "[StarryNight] Failed to initialize DynamicCatppuccinBridge",
+      err
+    );
+  }
+
+  // 3e. 🌊 Initialize Living Gradient Base System (Phase 2.2)
+  try {
+    const { LivingGradientBaseSystem } = await import(
+      "./visual/consciousness/LivingGradientBaseSystem"
+    );
+    
+    const livingBase = new LivingGradientBaseSystem(
+      YEAR3000_CONFIG,
+      Year3000Utilities,
+      year3000System.performanceAnalyzer,
+      year3000System.musicSyncService as any,
+      year3000System.settingsManager as any
+    );
+    await livingBase.initialize();
+    
+    // Link with other consciousness systems
+    if ((year3000System as any).dynamicCatppuccinBridge) {
+      // The living base system will listen to events from the dynamic bridge
+      console.log("🌊 [StarryNight] Living Gradient Base linked with Dynamic Catppuccin Bridge");
+    }
+    if ((year3000System as any).depthConsciousnessController) {
+      // The living base system coordinates with depth consciousness
+      console.log("🌊 [StarryNight] Living Gradient Base linked with Depth Consciousness");
+    }
+    
+    (year3000System as any).livingGradientBaseSystem = livingBase;
+    
+    console.log("🌊 [StarryNight] Living Gradient Base System awakened - static #1e1e2e transformed into organic consciousness");
+  } catch (err) {
+    console.error(
+      "[StarryNight] Failed to initialize LivingGradientBaseSystem",
+      err
+    );
+  }
+
   // -----------------------------------------------------------------------
   // 🌠 CDF Variable Bridge – start syncing canonical --sn-cdf-* props.
   // -----------------------------------------------------------------------
   try {
     const { CDFVariableBridge } = await import("./core/performance/CDFVariableBridge");
-    if (year3000System.cssVariableBatcher) {
-      new CDFVariableBridge(year3000System.cssVariableBatcher);
+    if (year3000System.cssConsciousnessController) {
+      new CDFVariableBridge(year3000System.cssConsciousnessController);
     }
   } catch (err) {
     console.error("[StarryNight] Failed to initialize CDFVariableBridge", err);
@@ -277,3 +519,168 @@ patchReactRequire();
     } mode). Welcome to the future of sound!`
   );
 })();
+
+/**
+ * Progressive Enhancement System - Upgrade from degraded mode to full mode
+ * when Spicetify APIs become available
+ */
+function setupProgressiveEnhancement(
+  year3000System: any,
+  requiredAPIs: { player: any; platform: any; menu: any; react: any; reactDOM: any }
+): void {
+  console.log("🔄 [StarryNight] Setting up progressive enhancement monitoring...");
+  
+  let upgradeAttempts = 0;
+  const maxUpgradeAttempts = 30; // 5 minutes at 10-second intervals
+  const upgradeCheckInterval = 10000; // 10 seconds
+  
+  const checkForUpgrade = () => {
+    upgradeAttempts++;
+    
+    // Check if APIs are now available
+    const currentAPIs = {
+      player: (window as any).Spicetify?.Player,
+      platform: (window as any).Spicetify?.Platform,
+      menu: (window as any).Spicetify?.Menu,
+      react: (window as any).Spicetify?.React,
+      reactDOM: (window as any).Spicetify?.ReactDOM,
+    };
+    
+    const hasRequiredAPIs = currentAPIs.player && currentAPIs.platform;
+    
+    if (hasRequiredAPIs) {
+      console.log("✅ [StarryNight] Required APIs now available - upgrading to full mode!");
+      
+      // Clear the monitoring interval
+      clearInterval(upgradeInterval);
+      
+      // Attempt to upgrade the system to full mode
+      upgradeToFullMode(year3000System, currentAPIs)
+        .then(() => {
+          console.log("🌟 [StarryNight] Successfully upgraded from degraded mode to full mode!");
+          
+          // Update global debug object to reflect the mode change
+          if ((window as any).Y3K) {
+            (window as any).Y3K.mode = "full";
+            (window as any).Y3K.availableAPIs = currentAPIs;
+          }
+        })
+        .catch((error) => {
+          console.error("❌ [StarryNight] Failed to upgrade to full mode:", error);
+          // Continue in degraded mode
+        });
+      
+      return;
+    }
+    
+    // Stop checking after max attempts
+    if (upgradeAttempts >= maxUpgradeAttempts) {
+      console.log(`⏰ [StarryNight] Progressive enhancement monitoring ended after ${upgradeAttempts} attempts (${(upgradeAttempts * upgradeCheckInterval) / 1000}s)`);
+      clearInterval(upgradeInterval);
+      return;
+    }
+    
+    // Log progress every 5 attempts
+    if (upgradeAttempts % 5 === 0) {
+      console.log(`🔄 [StarryNight] Still monitoring for API availability... (attempt ${upgradeAttempts}/${maxUpgradeAttempts})`);
+      console.log("🔄 [StarryNight] Current API status:", {
+        player: !!currentAPIs.player,
+        platform: !!currentAPIs.platform,
+        menu: !!currentAPIs.menu,
+        react: !!currentAPIs.react,
+        reactDOM: !!currentAPIs.reactDOM,
+      });
+    }
+  };
+  
+  // Start monitoring for API availability
+  const upgradeInterval = setInterval(checkForUpgrade, upgradeCheckInterval);
+  
+  // Also listen for Spicetify events that might indicate the platform is ready
+  const spicetifyReadyHandler = () => {
+    console.log("🎵 [StarryNight] Spicetify ready event detected - checking for upgrade...");
+    checkForUpgrade();
+  };
+  
+  // Add event listeners for Spicetify ready events
+  if ((window as any).Spicetify) {
+    if ((window as any).Spicetify.Player) {
+      (window as any).Spicetify.Player.addEventListener?.('songchange', spicetifyReadyHandler);
+    }
+  }
+  
+  // Clean up event listeners when the interval ends
+  setTimeout(() => {
+    if ((window as any).Spicetify?.Player) {
+      (window as any).Spicetify.Player.removeEventListener?.('songchange', spicetifyReadyHandler);
+    }
+  }, maxUpgradeAttempts * upgradeCheckInterval);
+}
+
+/**
+ * Upgrade the Year3000System from degraded mode to full mode
+ */
+async function upgradeToFullMode(
+  year3000System: any,
+  availableAPIs: { player: any; platform: any; menu: any; react: any; reactDOM: any }
+): Promise<void> {
+  try {
+    console.log("🚀 [StarryNight] Beginning upgrade to full mode...");
+    
+    // First, verify the system is actually in degraded mode
+    if (!year3000System) {
+      throw new Error("Year3000System instance not available");
+    }
+    
+    // Check if the system has an upgrade method
+    if (typeof year3000System.upgradeToFullMode === 'function') {
+      console.log("🔧 [StarryNight] Using system's built-in upgrade method...");
+      await year3000System.upgradeToFullMode({
+        player: availableAPIs.player,
+        platform: availableAPIs.platform,
+        config: (window as any).Spicetify?.Config,
+        degradedMode: false,
+      });
+    } else {
+      console.log("🔧 [StarryNight] System upgrade method not available - attempting manual initialization...");
+      
+      // Manually initialize systems that require Spicetify APIs
+      if (year3000System.setupMusicAnalysisAndColorExtraction) {
+        console.log("🎵 [StarryNight] Setting up music analysis and color extraction...");
+        await year3000System.setupMusicAnalysisAndColorExtraction();
+      }
+      
+      // Initialize settings UI if React APIs are available
+      if (availableAPIs.react && availableAPIs.reactDOM) {
+        try {
+          console.log("⚙️ [StarryNight] Initializing settings UI...");
+          const settingsUiModule = await import("./ui/components/StarryNightSettings");
+          await (settingsUiModule as any).initializeStarryNightSettings?.();
+          console.log("✅ [StarryNight] Settings UI initialized successfully");
+        } catch (error) {
+          console.warn("⚠️ [StarryNight] Failed to initialize settings UI during upgrade:", error);
+        }
+      }
+    }
+    
+    // Emit upgrade event
+    if (year3000System.eventBus?.emitSync) {
+      year3000System.eventBus.emitSync('system:upgraded-to-full-mode', {
+        timestamp: Date.now(),
+        availableAPIs: {
+          player: !!availableAPIs.player,
+          platform: !!availableAPIs.platform,
+          menu: !!availableAPIs.menu,
+          react: !!availableAPIs.react,
+          reactDOM: !!availableAPIs.reactDOM,
+        }
+      });
+    }
+    
+    console.log("🌟 [StarryNight] Upgrade to full mode completed successfully!");
+    
+  } catch (error) {
+    console.error("❌ [StarryNight] Upgrade to full mode failed:", error);
+    throw error;
+  }
+}

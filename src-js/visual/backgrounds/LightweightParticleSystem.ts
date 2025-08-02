@@ -40,6 +40,14 @@ export class LightweightParticleSystem extends BaseVisualSystem {
   private lastSpawnTime: number = 0;
   private spawnCooldown: number = 80;
   private year3000System: Year3000System | null;
+  
+  // LERP smoothing half-life values (in seconds) for framerate-independent particle animation
+  private lerpHalfLifeValues = {
+    position: 0.15,    // Fast position response for fluid movement
+    size: 0.20,        // Moderate size transitions for smooth scaling
+    opacity: 0.25,     // Gradual opacity changes for natural fading
+    rotation: 0.18     // Quick rotation response for organic motion
+  };
 
   constructor(
     config: Year3000Config,
@@ -115,16 +123,25 @@ export class LightweightParticleSystem extends BaseVisualSystem {
       accentRgbStr;
 
     particle.active = true;
+    // Initialize current and target positions
     particle.currentX = Math.random() * this.canvas.width;
     particle.currentY = this.canvas.height + Math.random() * 30 + 20;
+    particle.targetX = particle.currentX; // Start with no movement target
+    particle.targetY = particle.currentY;
+    
+    // Velocity for physics-based movement
     particle.vx = (Math.random() - 0.5) * 3 * (speedFactor || 1);
     particle.vy =
       -(1.5 + Math.random() * 2.5 + energy * 3) * (speedFactor || 1);
     particle.maxLife = 2500 + Math.random() * 3500 * intensity;
     particle.life = particle.maxLife;
+    
+    // Initialize size with LERP targets - start small and grow
     particle.baseSize = 1.5 + Math.random() * 2.5 + intensity * 2.5;
     particle.currentSize = 0;
     particle.targetSize = particle.baseSize;
+    
+    // Initialize opacity with LERP targets - fade in smoothly
     particle.baseOpacity = 0.4 + Math.random() * 0.5;
     particle.currentOpacity = 0;
     particle.targetOpacity = particle.baseOpacity;
@@ -133,7 +150,10 @@ export class LightweightParticleSystem extends BaseVisualSystem {
         ? primaryRgbStr
         : accentRgbStr;
     particle.color = `rgba(${baseColor},1)`;
+    
+    // Initialize rotation with LERP targets
     particle.currentRotation = Math.random() * Math.PI * 2;
+    particle.targetRotation = particle.currentRotation;
     particle.vr = (Math.random() - 0.5) * 0.08 * (speedFactor || 1);
   }
 
@@ -155,6 +175,8 @@ export class LightweightParticleSystem extends BaseVisualSystem {
     if (!this.ctx || !this.canvas) return;
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+    const deltaTimeSeconds = deltaTime / 1000;
+
     for (const p of this.particlePool) {
       const particle = p as Particle;
       if (!particle.active) continue;
@@ -165,10 +187,34 @@ export class LightweightParticleSystem extends BaseVisualSystem {
         continue;
       }
 
-      particle.currentX += particle.vx * (deltaTime / 16);
-      particle.currentY += particle.vy * (deltaTime / 16);
-      particle.currentRotation += particle.vr * (deltaTime / 16);
+      // Update target positions based on physics
+      particle.targetX += particle.vx * (deltaTime / 16);
+      particle.targetY += particle.vy * (deltaTime / 16);
+      particle.targetRotation += particle.vr * (deltaTime / 16);
+      
+      // Apply LERP smoothing for framerate-independent particle movement
+      particle.currentX = Year3000Utilities.lerpSmooth(
+        particle.currentX,
+        particle.targetX,
+        deltaTimeSeconds,
+        this.lerpHalfLifeValues.position
+      );
+      
+      particle.currentY = Year3000Utilities.lerpSmooth(
+        particle.currentY,
+        particle.targetY,
+        deltaTimeSeconds,
+        this.lerpHalfLifeValues.position
+      );
+      
+      particle.currentRotation = Year3000Utilities.lerpSmooth(
+        particle.currentRotation,
+        particle.targetRotation,
+        deltaTimeSeconds,
+        this.lerpHalfLifeValues.rotation
+      );
 
+      // Calculate life-based opacity and size factors
       const lifeRatio = particle.life / particle.maxLife;
       const fadeInDuration = 0.2;
       const fadeOutDuration = 0.5;
@@ -180,8 +226,24 @@ export class LightweightParticleSystem extends BaseVisualSystem {
         opacityFactor = lifeRatio / fadeOutDuration;
       }
 
-      particle.currentOpacity = particle.targetOpacity * opacityFactor;
-      particle.currentSize = particle.targetSize * opacityFactor;
+      // Update target values for LERP smoothing
+      particle.targetOpacity = particle.baseOpacity * opacityFactor;
+      particle.targetSize = particle.baseSize * opacityFactor;
+      
+      // Apply LERP smoothing for size and opacity transitions
+      particle.currentOpacity = Year3000Utilities.lerpSmooth(
+        particle.currentOpacity,
+        particle.targetOpacity,
+        deltaTimeSeconds,
+        this.lerpHalfLifeValues.opacity
+      );
+      
+      particle.currentSize = Year3000Utilities.lerpSmooth(
+        particle.currentSize,
+        particle.targetSize,
+        deltaTimeSeconds,
+        this.lerpHalfLifeValues.size
+      );
 
       this.ctx.save();
       this.ctx.translate(particle.currentX, particle.currentY);

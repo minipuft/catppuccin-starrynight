@@ -16,7 +16,7 @@
  */
 
 import { Y3K } from "@/debug/UnifiedDebugManager";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { MusicSyncService } from "@/audio/MusicSyncService";
@@ -27,12 +27,17 @@ import type { Year3000Config } from "@/types/models";
 import * as Utils from "@/utils/core/Year3000Utilities";
 
 // Visual System imports
-import { LightweightParticleSystem } from "@/visual/backgrounds/LightweightParticleSystem";
-import { ParticleFieldSystem } from "@/visual/backgrounds/ParticleFieldSystem";
+// import { ParticleConsciousnessModule } from "@/visual/consciousness/ParticleConsciousnessModule"; // Disabled - converted to CSS-only
+import { UnifiedSidebarConsciousnessController } from "@/visual/consciousness/UnifiedSidebarConsciousnessController";
+import { ConsciousnessUIEffectsController } from "@/visual/consciousness/ConsciousnessUIEffectsController";
+import { HeaderConsciousnessController } from "@/visual/consciousness/HeaderConsciousnessController";
 import { WebGLGradientBackgroundSystem } from "@/visual/backgrounds/WebGLGradientBackgroundSystem";
+// import { FluxMusicVisualization } from "@/visual/backgrounds/FluxMusicVisualization"; // Disabled - potential canvas overlay
 import { OrganicBeatSyncConsciousness } from "@/visual/organic-consciousness/OrganicBeatSyncConsciousness";
+import { OrganicBreathingController } from "@/visual/consciousness/OrganicBreathingController";
 import { InteractionTrackingSystem } from "@/visual/ui-effects/InteractionTrackingSystem";
 import { SpotifyUIApplicationSystem } from "@/visual/ui-effects/SpotifyUIApplicationSystem";
+import { GradientConductor } from "@/visual/backbone/GradientConductor";
 // EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
 
 // Interface imports
@@ -42,12 +47,19 @@ import { AdaptivePerformanceSystem, AdaptationEvent, QualitySettings } from "@/c
 // Type definitions
 export type VisualSystemKey = 
   | 'Particle'
-  | 'ParticleField'
+  | 'SidebarConsciousness'
+  | 'UIEffectsConsciousness'
+  | 'HeaderConsciousness'
   | 'WebGLBackground'
+  | 'FluxMusicVisualization'
   | 'OrganicBeatSync'
+  | 'OrganicBreathing'
   | 'InteractionTracking'
-  | 'SpotifyUIApplication';
+  | 'SpotifyUIApplication'
+  | 'GradientConductor';
+  // ParticleField consolidated into Particle (ParticleConsciousnessModule)
   // EmergentChoreography consolidated into EnhancedMasterAnimationCoordinator
+  // Sidebar systems consolidated into SidebarConsciousness (UnifiedSidebarConsciousnessController)
 
 export type SystemHealth = "excellent" | "good" | "degraded" | "critical";
 export type IntegrationMode = "progressive" | "performance-first" | "quality-first" | "battery-optimized";
@@ -105,7 +117,7 @@ export class VisualSystemFacade {
   private year3000System: any; // Reference to main system
   
   // Injected dependencies
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController;
   private performanceAnalyzer: PerformanceAnalyzer;
   private musicSyncService: MusicSyncService;
   private settingsManager: SettingsManager;
@@ -144,7 +156,7 @@ export class VisualSystemFacade {
     config: Year3000Config,
     utils: typeof Utils,
     year3000System: any,
-    cssVariableBatcher: CSSVariableBatcher,
+    cssConsciousnessController: UnifiedCSSConsciousnessController,
     performanceAnalyzer: PerformanceAnalyzer,
     musicSyncService: MusicSyncService,
     settingsManager: SettingsManager,
@@ -154,7 +166,7 @@ export class VisualSystemFacade {
     this.config = config;
     this.utils = utils;
     this.year3000System = year3000System;
-    this.cssVariableBatcher = cssVariableBatcher;
+    this.cssConsciousnessController = cssConsciousnessController;
     this.performanceAnalyzer = performanceAnalyzer;
     this.musicSyncService = musicSyncService;
     this.settingsManager = settingsManager;
@@ -198,25 +210,41 @@ export class VisualSystemFacade {
 
   private registerVisualSystems(): void {
     // Register all visual systems with their dependencies
-    this.systemRegistry.set('Particle', LightweightParticleSystem);
-    this.systemDependencies.set('Particle', ['performanceAnalyzer', 'cssVariableBatcher']);
+    // this.systemRegistry.set('Particle', ParticleConsciousnessModule); // Disabled - converted to CSS-only
+    // this.systemDependencies.set('Particle', ['performanceAnalyzer', 'cssConsciousnessController', 'eventBus', 'musicSyncService', 'colorHarmonyEngine']); // Disabled - converted to CSS-only
     
-    this.systemRegistry.set('ParticleField', ParticleFieldSystem);
-    this.systemDependencies.set('ParticleField', ['performanceAnalyzer', 'cssVariableBatcher']);
+    this.systemRegistry.set('SidebarConsciousness', UnifiedSidebarConsciousnessController);
+    this.systemDependencies.set('SidebarConsciousness', ['eventBus', 'musicSyncService']);
+    
+    this.systemRegistry.set('UIEffectsConsciousness', ConsciousnessUIEffectsController);
+    this.systemDependencies.set('UIEffectsConsciousness', ['eventBus', 'musicSyncService', 'cssConsciousnessController']);
+    
+    this.systemRegistry.set('HeaderConsciousness', HeaderConsciousnessController);
+    this.systemDependencies.set('HeaderConsciousness', ['eventBus', 'musicSyncService', 'colorHarmonyEngine']);
     
     this.systemRegistry.set('WebGLBackground', WebGLGradientBackgroundSystem);
     this.systemDependencies.set('WebGLBackground', ['performanceAnalyzer', 'eventBus']);
     
+    // this.systemRegistry.set('FluxMusicVisualization', FluxMusicVisualization); // Disabled - potential canvas overlay
+    // this.systemDependencies.set('FluxMusicVisualization', ['cssConsciousnessController', 'eventBus', 'musicSyncService', 'performanceAnalyzer']); // Disabled - potential canvas overlay
+    
     this.systemRegistry.set('OrganicBeatSync', OrganicBeatSyncConsciousness);
-    this.systemDependencies.set('OrganicBeatSync', ['performanceAnalyzer', 'cssVariableBatcher', 'eventBus', 'musicSyncService', 'colorHarmonyEngine']);
+    this.systemDependencies.set('OrganicBeatSync', ['performanceAnalyzer', 'cssConsciousnessController', 'eventBus', 'musicSyncService', 'colorHarmonyEngine']);
+    
+    this.systemRegistry.set('OrganicBreathing', OrganicBreathingController);
+    this.systemDependencies.set('OrganicBreathing', ['performanceAnalyzer', 'cssConsciousnessController', 'eventBus', 'musicSyncService']);
     
     this.systemRegistry.set('InteractionTracking', InteractionTrackingSystem);
-    this.systemDependencies.set('InteractionTracking', ['performanceAnalyzer', 'cssVariableBatcher']);
+    this.systemDependencies.set('InteractionTracking', ['performanceAnalyzer', 'cssConsciousnessController']);
     
     this.systemRegistry.set('SpotifyUIApplication', SpotifyUIApplicationSystem);
     this.systemDependencies.set('SpotifyUIApplication', ['year3000System']); // Special case
     
+    this.systemRegistry.set('GradientConductor', GradientConductor);
+    this.systemDependencies.set('GradientConductor', ['cssConsciousnessController', 'colorHarmonyEngine', 'musicSyncService', 'performanceAnalyzer', 'eventBus']);
+    
     // EmergentChoreography consolidated into EnhancedMasterAnimationCoordinator
+    // ParticleField consolidated into Particle (ParticleConsciousnessModule)
   }
 
   public async initialize(config?: Partial<VisualSystemConfig>): Promise<void> {
@@ -257,8 +285,8 @@ export class VisualSystemFacade {
       this.isInitialized = true;
       
       // Update CSS to indicate bridge is active
-      this.cssVariableBatcher.queueCSSVariableUpdate("--sn-visual-bridge-active", "1");
-      this.cssVariableBatcher.queueCSSVariableUpdate("--sn-visual-bridge-mode", this.bridgeConfig.mode);
+      this.cssConsciousnessController.queueCSSVariableUpdate("--sn-visual-bridge-active", "1");
+      this.cssConsciousnessController.queueCSSVariableUpdate("--sn-visual-bridge-mode", this.bridgeConfig.mode);
       
       Y3K?.debug?.log("VisualSystemFacade", "Facade fully initialized", {
         mode: this.bridgeConfig.mode,
@@ -326,6 +354,20 @@ export class VisualSystemFacade {
       return system;
     }
 
+    // Special handling for GradientConductor with custom dependency injection
+    if (key === 'GradientConductor') {
+      const system = new SystemClass(
+        this.eventBus,
+        this.cssConsciousnessController,
+        this.colorHarmonyEngine,
+        this.musicSyncService,
+        this.performanceAnalyzer,
+        {} // Default config
+      ) as T;
+      this.injectDependencies(system, key);
+      return system;
+    }
+
     // Standard 6-parameter constructor for legacy systems
     const system = new SystemClass(
       this.config,
@@ -354,8 +396,8 @@ export class VisualSystemFacade {
     }
     
     // Inject CSS variable batcher
-    if (dependencies.includes('cssVariableBatcher') && (system as any).setCSSVariableBatcher) {
-      (system as any).setCSSVariableBatcher(this.cssVariableBatcher);
+    if (dependencies.includes('cssConsciousnessController') && (system as any).setUnifiedCSSConsciousnessController) {
+      (system as any).setUnifiedCSSConsciousnessController(this.cssConsciousnessController);
     }
     
     // Inject event bus
@@ -383,8 +425,8 @@ export class VisualSystemFacade {
   private injectUnifiedSystemDependencies(system: any, key: VisualSystemKey): void {
     // Set up shared utilities directly on the system (before _baseInitialize)
     // This ensures the system has access to CSS variable management
-    if (this.cssVariableBatcher) {
-      system.cssVariableBatcher = this.cssVariableBatcher;
+    if (this.cssConsciousnessController) {
+      system.cssConsciousnessController = this.cssConsciousnessController;
     }
     
     if (this.performanceAnalyzer) {
@@ -394,6 +436,12 @@ export class VisualSystemFacade {
     if (this.year3000System) {
       // Set global reference so UnifiedSystemBase._baseInitialize can find shared systems
       (globalThis as any).year3000System = this.year3000System;
+    }
+    
+    // Special injection for OrganicBeatSync system - inject breathing controller
+    if (key === 'OrganicBeatSync' && system.setBreathingController) {
+      const breathingController = this.getVisualSystem('OrganicBreathing');
+      system.setBreathingController(breathingController);
     }
     
     // Integrate performance monitoring for UnifiedSystemBase systems
@@ -486,8 +534,8 @@ export class VisualSystemFacade {
     }
     
     // Update CSS variables
-    this.cssVariableBatcher.queueCSSVariableUpdate("--sn-adaptive-quality", event.newSettings.gradientComplexity.toString());
-    this.cssVariableBatcher.queueCSSVariableUpdate("--sn-adaptive-fps", event.newSettings.animationFPS.toString());
+    this.cssConsciousnessController.queueCSSVariableUpdate("--sn-adaptive-quality", event.newSettings.gradientComplexity.toString());
+    this.cssConsciousnessController.queueCSSVariableUpdate("--sn-adaptive-fps", event.newSettings.animationFPS.toString());
   }
 
   /**
@@ -535,6 +583,90 @@ export class VisualSystemFacade {
     const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
     
     Y3K?.debug?.log("VisualSystemFacade", `Visual systems initialized: ${successCount}/${results.length}`);
+    
+    // Register quality scaling capable systems with PerformanceOrchestrator
+    await this.registerQualityScalingSystems();
+  }
+
+  /**
+   * Register QualityScalingCapable systems with PerformanceOrchestrator
+   */
+  private async registerQualityScalingSystems(): Promise<void> {
+    try {
+      // Get PerformanceOrchestrator and QualityScalingManager from the year3000System
+      const performanceOrchestrator = this.year3000System?.getCachedNonVisualSystem?.('PerformanceOrchestrator');
+      const qualityScalingManager = this.year3000System?.getCachedNonVisualSystem?.('QualityScalingManager');
+      
+      if (!performanceOrchestrator) {
+        Y3K?.debug?.warn("VisualSystemFacade", "PerformanceOrchestrator not available for quality scaling registration");
+        return;
+      }
+      
+      if (!qualityScalingManager) {
+        Y3K?.debug?.warn("VisualSystemFacade", "QualityScalingManager not available for quality scaling registration");
+        return;
+      }
+
+      // Register each quality scaling capable system
+      for (const [key, system] of this.systemCache.entries()) {
+        try {
+          // Check if system implements QualityScalingCapable
+          const qualityScalingSystem = system as any;
+          if (
+            typeof qualityScalingSystem.setQualityLevel === 'function' &&
+            typeof qualityScalingSystem.getPerformanceImpact === 'function' &&
+            typeof qualityScalingSystem.getQualityCapabilities === 'function'
+          ) {
+            // Register with both systems for comprehensive quality management
+            performanceOrchestrator.registerSystem(key, qualityScalingSystem);
+            qualityScalingManager.registerSystem(key, qualityScalingSystem);
+            Y3K?.debug?.log("VisualSystemFacade", `Registered ${key} for quality scaling and performance orchestration`);
+          }
+        } catch (error) {
+          Y3K?.debug?.error("VisualSystemFacade", `Failed to register ${key} for quality scaling:`, error);
+        }
+      }
+      
+      // Initialize consciousness-aware quality adaptation
+      await this.initializeConsciousnessAwareAdaptation(qualityScalingManager);
+    } catch (error) {
+      Y3K?.debug?.error("VisualSystemFacade", "Failed to register quality scaling systems:", error);
+    }
+  }
+
+  /**
+   * Initialize consciousness-aware quality adaptation with music sync integration
+   */
+  private async initializeConsciousnessAwareAdaptation(qualityScalingManager: any): Promise<void> {
+    try {
+      const musicSyncService = this.year3000System?.getCachedNonVisualSystem?.('MusicSyncService');
+      
+      if (!musicSyncService) {
+        Y3K?.debug?.warn("VisualSystemFacade", "MusicSyncService not available for consciousness-aware adaptation");
+        return;
+      }
+
+      // Setup consciousness adaptation interval
+      const adaptationInterval = setInterval(() => {
+        try {
+          // Get current consciousness metrics
+          const consciousnessIntensity = musicSyncService.getOverallIntensity?.() || 0.5;
+          const musicEnergy = musicSyncService.getBeatStrength?.() || 0.5;
+          
+          // Apply consciousness-aware quality adaptation
+          qualityScalingManager.adaptToConsciousnessState(consciousnessIntensity, musicEnergy);
+        } catch (error) {
+          Y3K?.debug?.error("VisualSystemFacade", "Error in consciousness-aware adaptation:", error);
+        }
+      }, 2000); // Run every 2 seconds
+      
+      // Store interval for cleanup
+      (this as any)._consciousnessAdaptationInterval = adaptationInterval;
+      
+      Y3K?.debug?.log("VisualSystemFacade", "Consciousness-aware quality adaptation initialized");
+    } catch (error) {
+      Y3K?.debug?.error("VisualSystemFacade", "Failed to initialize consciousness-aware adaptation:", error);
+    }
   }
 
   /**
@@ -603,7 +735,7 @@ export class VisualSystemFacade {
     this.lastHealthCheck = healthCheck;
     
     // Update CSS health indicator
-    this.cssVariableBatcher.queueCSSVariableUpdate("--sn-visual-health", healthCheck.overall);
+    this.cssConsciousnessController.queueCSSVariableUpdate("--sn-visual-health", healthCheck.overall);
     
     return healthCheck;
   }
@@ -726,6 +858,12 @@ export class VisualSystemFacade {
       this.metricsUpdateInterval = null;
     }
     
+    // Clean up consciousness adaptation interval
+    if ((this as any)._consciousnessAdaptationInterval) {
+      clearInterval((this as any)._consciousnessAdaptationInterval);
+      (this as any)._consciousnessAdaptationInterval = null;
+    }
+    
     // Remove event listeners
     if (this.boundSettingsHandler) {
       document.removeEventListener("year3000SystemSettingsChanged", this.boundSettingsHandler);
@@ -739,7 +877,7 @@ export class VisualSystemFacade {
     }
     
     // Reset CSS state
-    this.cssVariableBatcher.queueCSSVariableUpdate("--sn-visual-bridge-active", "0");
+    this.cssConsciousnessController.queueCSSVariableUpdate("--sn-visual-bridge-active", "0");
   }
 
   // Public API

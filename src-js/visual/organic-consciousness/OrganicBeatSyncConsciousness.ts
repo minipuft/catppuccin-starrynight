@@ -3,6 +3,8 @@ import { GlobalEventBus } from '@/core/events/EventBus';
 import type { Year3000Config } from '@/types/models';
 import type { HealthCheckResult } from '@/types/systems';
 import * as Year3000Utilities from '@/utils/core/Year3000Utilities';
+import { musicalLerpOrchestrator, type MusicalContext, type AnimationType } from '@/utils/core/MusicalLerpOrchestrator';
+import type { MusicSyncService } from '@/audio/MusicSyncService';
 
 /**
  * Organic BeatSync Consciousness System
@@ -54,10 +56,13 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
   private currentBPM: number = 120;
   private breathingCycleDuration: number = 2000; // 2 seconds default
   
-  // Cinematic consciousness elements
-  private atmosphericParticles: HTMLElement[] = [];
-  private cellularMembranes: HTMLElement[] = [];
-  private breathingOrganisms: HTMLElement[] = [];
+  // Breathing controller (CSS-based, performance optimized)
+  private breathingController: any = null; // Will be injected by facade
+  
+  // Musical consciousness integration
+  private musicSyncService: MusicSyncService | null = null;
+  private currentMusicalContext: MusicalContext | null = null;
+  private lastBeatPhaseUpdate: number = 0;
   
   // Performance metrics
   private performanceMetrics = {
@@ -87,6 +92,16 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
     }
   }
   
+  /**
+   * Inject MusicSyncService for musical consciousness integration
+   */
+  public setMusicSyncService(musicSyncService: MusicSyncService): void {
+    this.musicSyncService = musicSyncService;
+    if (this.config.enableDebug) {
+      console.log('[OrganicBeatSyncConsciousness] 🎵 Musical consciousness integration activated');
+    }
+  }
+  
   // =========================================================================
   // UNIFIED SYSTEM LIFECYCLE
   // =========================================================================
@@ -106,10 +121,7 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
     this.registerCSSVariableGroup('emotional-temperature', 'normal');
     this.registerCSSVariableGroup('membrane-fluidity', 'normal');
     
-    // Create organic consciousness elements
-    this.growCellularMembranes();
-    this.cultivateBreathingOrganisms();
-    this.manifestAtmosphericParticles();
+    // Breathing controller will be injected by facade pattern
     
     // Subscribe to music consciousness events
     this.subscribeToEvent('music:beat', (payload: any) => this.onBeatConsciousness(payload));
@@ -133,14 +145,7 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
       console.log('[OrganicBeatSyncConsciousness] 🍃 Dissolving organic consciousness...');
     }
     
-    // Dissolve cellular membranes
-    this.dissolveCellularMembranes();
-    
-    // Release breathing organisms
-    this.releaseBreathingOrganisms();
-    
-    // Disperse atmospheric particles
-    this.disperseAtmosphericParticles();
+    // Breathing controller cleanup handled by facade pattern
     
     // Reset consciousness state
     this.organicIntensity = 0;
@@ -159,20 +164,23 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
   onAnimate(deltaTime: number): void {
     const startTime = performance.now();
     
-    // Update organic consciousness state
+    // Update musical consciousness context
+    this.updateMusicalContext();
+    
+    // Update organic consciousness state with musical awareness
     this.updateOrganicConsciousness(deltaTime);
     
     // Process cellular growth
     this.processCellularGrowth(deltaTime);
-    
-    // Animate breathing rhythms
-    this.animateBreathingRhythms(deltaTime);
     
     // Update emotional temperature
     this.updateEmotionalTemperature(deltaTime);
     
     // Animate membrane fluidity
     this.animateMembraneFluidty(deltaTime);
+    
+    // Delegate breathing events to breathing controller
+    this.delegateBreathingEvents();
     
     // Apply organic CSS variables
     this.applyOrganicCSSVariables();
@@ -195,14 +203,9 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
   async healthCheck(): Promise<HealthCheckResult> {
     const issues: string[] = [];
     
-    // Check cellular membrane health
-    if (this.cellularMembranes.length === 0) {
-      issues.push('Cellular membranes not cultivated');
-    }
-    
-    // Check breathing organism health
-    if (this.breathingOrganisms.length === 0) {
-      issues.push('Breathing organisms not cultivated');
+    // Check breathing controller health
+    if (!this.breathingController) {
+      issues.push('Breathing controller not injected by facade');
     }
     
     // Check performance health
@@ -247,9 +250,6 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
     
     // Set target cellular growth based on energy
     this.targetCellularGrowth = 1 + ((energy || 0.5) * 0.3); // 1.0 to 1.3 scale
-    
-    // Trigger cellular growth burst
-    this.triggerCellularGrowthBurst(energy || 0.5);
     
     // Synchronize breathing rhythm
     this.synchronizeBreathingRhythm(bpm || 120);
@@ -319,140 +319,59 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
   }
   
   // =========================================================================
-  // CELLULAR CONSCIOUSNESS METHODS
+  // BREATHING INTEGRATION METHODS
   // =========================================================================
   
   /**
-   * Grow cellular membranes
+   * Set breathing controller (injected by facade)
    */
-  private growCellularMembranes(): void {
-    // Create organic cellular membranes
-    for (let i = 0; i < 3; i++) {
-      const membrane = document.createElement('div');
-      membrane.className = 'organic-cellular-membrane';
-      membrane.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: ${990 + i};
-        background: radial-gradient(circle at ${50 + i * 20}% ${50 + i * 15}%, 
-          rgba(var(--spice-rgb-accent, 168, 173, 200), 0.08) 0%, 
-          transparent 70%);
-        opacity: 0;
-        transform: scale(0.8);
-        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-      `;
-      
-      document.body.appendChild(membrane);
-      this.cellularMembranes.push(membrane);
-    }
-  }
-  
-  /**
-   * Cultivate breathing organisms
-   */
-  private cultivateBreathingOrganisms(): void {
-    // Create breathing organisms that pulse with organic rhythm
-    for (let i = 0; i < 5; i++) {
-      const organism = document.createElement('div');
-      organism.className = 'organic-breathing-organism';
-      organism.style.cssText = `
-        position: fixed;
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        background: linear-gradient(45deg, 
-          rgba(var(--spice-rgb-accent, 168, 173, 200), 0.1) 0%, 
-          rgba(var(--spice-rgb-accent, 168, 173, 200), 0.05) 100%);
-        pointer-events: none;
-        z-index: 985;
-        opacity: 0;
-        transform: scale(0.5);
-        transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-        top: ${Math.random() * 80 + 10}%;
-        left: ${Math.random() * 80 + 10}%;
-      `;
-      
-      document.body.appendChild(organism);
-      this.breathingOrganisms.push(organism);
-    }
-  }
-  
-  /**
-   * Manifest atmospheric particles
-   */
-  private manifestAtmosphericParticles(): void {
-    // Create atmospheric particles for cinematic depth
-    for (let i = 0; i < 8; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'organic-atmospheric-particle';
-      particle.style.cssText = `
-        position: fixed;
-        width: 4px;
-        height: 4px;
-        border-radius: 50%;
-        background: rgba(var(--spice-rgb-accent, 168, 173, 200), 0.6);
-        pointer-events: none;
-        z-index: 980;
-        opacity: 0;
-        transform: scale(0);
-        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        top: ${Math.random() * 100}%;
-        left: ${Math.random() * 100}%;
-      `;
-      
-      document.body.appendChild(particle);
-      this.atmosphericParticles.push(particle);
-    }
-  }
-  
-  /**
-   * Trigger cellular growth burst
-   */
-  private triggerCellularGrowthBurst(energy: number): void {
-    const growthIntensity = energy * this.organicConfig.cellularResponseSensitivity;
+  public setBreathingController(controller: any): void {
+    this.breathingController = controller;
     
-    this.cellularMembranes.forEach((membrane, index) => {
-      const scale = 0.8 + (growthIntensity * 0.4); // 0.8 to 1.2 scale
-      const opacity = Math.min(0.15, growthIntensity * 0.2);
-      
-      membrane.style.opacity = opacity.toString();
-      membrane.style.transform = `scale(${scale})`;
-      
-      // Auto-fade after growth burst
-      setTimeout(() => {
-        membrane.style.opacity = '0';
-        membrane.style.transform = 'scale(0.8)';
-      }, 200 + (index * 50));
-    });
+    if (this.config.enableDebug) {
+      console.log('[OrganicBeatSyncConsciousness] 🫁 Breathing controller injected');
+    }
   }
   
   /**
-   * Synchronize breathing rhythm
+   * Synchronize breathing rhythm (delegates to breathing controller)
    */
   private synchronizeBreathingRhythm(bpm: number): void {
-    // Calculate breathing cycle based on BPM
-    const cycleSpeed = Math.max(0.5, Math.min(4.0, bpm / 120)); // 0.5x to 4x speed
-    
-    this.breathingOrganisms.forEach((organism, index) => {
-      const delay = index * 100; // Stagger breathing
-      
-      setTimeout(() => {
-        organism.style.opacity = '0.8';
-        organism.style.transform = 'scale(1.2)';
-        
-        // Breathing out
-        setTimeout(() => {
-          organism.style.opacity = '0.3';
-          organism.style.transform = 'scale(0.8)';
-        }, this.breathingCycleDuration * 0.5);
-      }, delay);
-    });
+    // Delegate breathing rhythm synchronization to the CSS-based controller
+    if (this.breathingController?.onTempoConsciousness) {
+      this.breathingController.onTempoConsciousness({ bpm, enhancedBPM: bpm });
+    }
     
     this.performanceMetrics.breathingCycles++;
+    
+    if (this.config.enableDebug) {
+      console.log(`[OrganicBeatSyncConsciousness] 🎶 Delegated breathing rhythm to controller: ${bpm} BPM`);
+    }
+  }
+  
+  /**
+   * Delegate breathing events to controller
+   */
+  private delegateBreathingEvents(): void {
+    if (!this.breathingController) return;
+    
+    // Delegate energy consciousness for breathing response
+    if (this.breathingController.onEnergyConsciousness) {
+      this.breathingController.onEnergyConsciousness({
+        energy: this.cellularGrowth - 1, // Convert cellular growth back to energy
+        valence: this.membraneFluidityLevel
+      });
+    }
+    
+    // Delegate emotional consciousness for breathing saturation
+    if (this.breathingController.onEmotionalConsciousness) {
+      this.breathingController.onEmotionalConsciousness({
+        emotion: 'organic',
+        valence: this.membraneFluidityLevel,
+        energy: (this.cellularGrowth - 1) / 0.3, // Normalize back to 0-1
+        arousal: this.organicIntensity
+      });
+    }
   }
   
   // =========================================================================
@@ -517,25 +436,6 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
     );
   }
   
-  /**
-   * Animate breathing rhythms
-   */
-  private animateBreathingRhythms(deltaTime: number): void {
-    // Calculate breathing intensity based on phase
-    const breathingIntensity = (Math.sin(this.breathingPhase) + 1) / 2; // 0 to 1
-    
-    // Update breathing organisms
-    this.breathingOrganisms.forEach((organism, index) => {
-      const phaseOffset = (index * Math.PI) / 4; // Stagger phases
-      const localIntensity = (Math.sin(this.breathingPhase + phaseOffset) + 1) / 2;
-      
-      const scale = 0.8 + (localIntensity * 0.4); // 0.8 to 1.2 scale
-      const opacity = 0.2 + (localIntensity * 0.3); // 0.2 to 0.5 opacity
-      
-      organism.style.transform = `scale(${scale})`;
-      organism.style.opacity = opacity.toString();
-    });
-  }
   
   /**
    * Update emotional temperature using framerate-independent LERP smoothing
@@ -581,17 +481,7 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
     const fluidityWave = Math.sin(this.breathingPhase * 0.5) * 0.1;
     const currentFluidity = this.membraneFluidityLevel + fluidityWave;
     
-    // Update atmospheric particles for membrane fluidity effect
-    this.atmosphericParticles.forEach((particle, index) => {
-      const phaseOffset = (index * Math.PI) / 4;
-      const intensity = (Math.sin(this.breathingPhase + phaseOffset) + 1) / 2;
-      
-      const scale = 0.5 + (intensity * currentFluidity);
-      const opacity = 0.3 + (intensity * 0.4);
-      
-      particle.style.transform = `scale(${scale})`;
-      particle.style.opacity = opacity.toString();
-    });
+    // Membrane fluidity now handled through CSS variables only
   }
   
   /**
@@ -634,41 +524,6 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
   // CLEANUP METHODS
   // =========================================================================
   
-  /**
-   * Dissolve cellular membranes
-   */
-  private dissolveCellularMembranes(): void {
-    this.cellularMembranes.forEach(membrane => {
-      if (membrane.parentNode) {
-        membrane.parentNode.removeChild(membrane);
-      }
-    });
-    this.cellularMembranes = [];
-  }
-  
-  /**
-   * Release breathing organisms
-   */
-  private releaseBreathingOrganisms(): void {
-    this.breathingOrganisms.forEach(organism => {
-      if (organism.parentNode) {
-        organism.parentNode.removeChild(organism);
-      }
-    });
-    this.breathingOrganisms = [];
-  }
-  
-  /**
-   * Disperse atmospheric particles
-   */
-  private disperseAtmosphericParticles(): void {
-    this.atmosphericParticles.forEach(particle => {
-      if (particle.parentNode) {
-        particle.parentNode.removeChild(particle);
-      }
-    });
-    this.atmosphericParticles = [];
-  }
   
   // =========================================================================
   // PUBLIC API METHODS
@@ -731,6 +586,38 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
     
     if (this.config.enableDebug) {
       console.log(`[OrganicBeatSyncConsciousness] 🔄 Organic consciousness repaint: ${reason}`);
+    }
+  }
+  
+  
+  // =========================================================================
+  // MUSICAL CONSCIOUSNESS INTEGRATION
+  // =========================================================================
+  
+  /**
+   * Update musical consciousness context for music-aware LERP calculations
+   */
+  private updateMusicalContext(): void {
+    if (!this.musicSyncService) {
+      this.currentMusicalContext = null;
+      return;
+    }
+    
+    // Only update context periodically to avoid excessive calculations
+    const now = Date.now();
+    if (now - this.lastBeatPhaseUpdate < 16) { // Update max 60fps
+      return;
+    }
+    
+    this.lastBeatPhaseUpdate = now;
+    this.currentMusicalContext = musicalLerpOrchestrator.createMusicalContext(
+      this.musicSyncService,
+      this.lastBeatTime
+    );
+    
+    if (this.config.enableDebug && this.currentMusicalContext) {
+      const ctx = this.currentMusicalContext;
+      console.log(`[OrganicBeatSyncConsciousness] 🎵 Musical context: tempo=${ctx.tempo}, energy=${ctx.energy.toFixed(2)}, phase=${ctx.beatPhase}`);
     }
   }
 }

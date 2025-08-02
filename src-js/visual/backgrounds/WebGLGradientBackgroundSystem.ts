@@ -8,9 +8,16 @@
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
+import { unifiedEventBus, type EventData } from "@/core/events/UnifiedEventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import type {
+  PerformanceMetrics,
+  QualityCapability,
+  QualityLevel,
+  QualityScalingCapable,
+} from "@/core/performance/PerformanceOrchestrator";
 import { Y3K } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
@@ -20,74 +27,38 @@ import {
   ShaderLoader,
 } from "@/utils/graphics/ShaderLoader";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
+import type {
+  BackgroundConsciousnessChoreographer,
+  BackgroundSystemParticipant,
+  ConsciousnessField,
+} from "../consciousness/BackgroundConsciousnessChoreographer";
 
-// Import raw shader source
-// Note: esbuild with --loader:.fs=text will handle this import
-const flowGradientShader = `#version 300 es
-precision mediump float;
+// Import shared consciousness utilities
+import {
+  CONSCIOUSNESS_SHADER_LIBRARY,
+  ConsciousnessShaderTemplate,
+} from "../consciousness/ConsolidatedShaderLibrary";
 
-uniform float u_time;
+// WebGL-specific shader using shared consciousness library
+const webglConsciousnessShader =
+  ConsciousnessShaderTemplate.buildFragmentShader({
+    additionalUniforms: `
+// WebGL-specific uniforms
 uniform sampler2D u_gradientTex;
-uniform vec2 u_resolution;
 uniform float u_flowStrength;
 uniform float u_noiseScale;
+uniform float u_colorIntensity;
+uniform float u_patternScale;
+uniform float u_animationSpeed;
 
 // Wave stack uniforms
 uniform float u_waveY[2];
 uniform float u_waveHeight[2];
 uniform float u_waveOffset[2];
 uniform float u_blurExp;
-uniform float u_blurMax;
+uniform float u_blurMax;`,
 
-out vec4 fragColor;
-
-// Simplex noise implementation
-vec3 mod289(vec3 x) {
-  return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec2 mod289(vec2 x) {
-  return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec3 permute(vec3 x) {
-  return mod289(((x*34.0)+1.0)*x);
-}
-
-float snoise(vec2 v) {
-  const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
-                      0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
-                     -0.577350269189626,  // -1.0 + 2.0 * C.x
-                      0.024390243902439); // 1.0 / 41.0
-  vec2 i  = floor(v + dot(v, C.yy) );
-  vec2 x0 = v -   i + dot(i, C.xx);
-
-  vec2 i1;
-  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-  vec4 x12 = x0.xyxy + C.xxzz;
-  x12.xy -= i1;
-
-  i = mod289(i);
-  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
-		+ i.x + vec3(0.0, i1.x, 1.0 ));
-
-  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
-  m = m*m ;
-  m = m*m ;
-
-  vec3 x = 2.0 * fract(p * C.www) - 1.0;
-  vec3 h = abs(x) - 0.5;
-  vec3 ox = floor(x + 0.5);
-  vec3 a0 = x - ox;
-
-  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
-
-  vec3 g;
-  g.x  = a0.x  * x0.x  + h.x  * x0.y;
-  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-  return 130.0 * dot(m, g);
-}
-
+    additionalFunctions: `
 // Octave noise for richer detail
 float octaveNoise(vec2 uv, float octaves, float persistence, float scale) {
   float value = 0.0;
@@ -105,85 +76,27 @@ float octaveNoise(vec2 uv, float octaves, float persistence, float scale) {
   return value / maxValue;
 }
 
-// Wave alpha calculation with smooth transitions
-float wave_alpha(vec2 uv, int waveIndex) {
+// Wave alpha calculation
+float waveAlpha(vec2 uv, int waveIndex) {
   float y = uv.y;
   float waveCenter = u_waveY[waveIndex];
   float waveHeight = u_waveHeight[waveIndex];
 
   float distance = abs(y - waveCenter);
-  float alpha = 1.0 - smoothstep(0.0, waveHeight * 0.5, distance);
-
-  return alpha;
+  return 1.0 - smoothstep(0.0, waveHeight * 0.5, distance);
 }
 
-// Dynamic blur calculation using power function
-float calc_blur(vec2 uv) {
+// Dynamic blur calculation
+float calculateBlur(vec2 uv) {
   vec2 center = vec2(0.5, 0.5);
   float distance = length(uv - center);
-
   float blur = pow(distance, u_blurExp);
-  blur = clamp(blur, 0.0, u_blurMax);
+  return clamp(blur, 0.0, u_blurMax);
+}`,
 
-  return blur;
-}
-
-// Background noise generator with time offset
-float background_noise(vec2 uv, float timeOffset) {
-  vec2 flowUV = uv;
-  float adjustedTime = u_time + timeOffset;
-
-  flowUV.x += adjustedTime * 0.02 * u_flowStrength;
-  flowUV.y += sin(adjustedTime * 0.03 + uv.x * 3.14159) * 0.01 * u_flowStrength;
-
-  float noise1 = octaveNoise(flowUV * u_noiseScale, 4.0, 0.5, 1.0);
-  float noise2 = octaveNoise(flowUV * u_noiseScale * 2.0 + vec2(100.0), 3.0, 0.4, 1.0);
-
-  return (noise1 + noise2 * 0.3) * 0.5 + 0.5;
-}
-
-void main() {
-  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-
-  // Generate three distinct background noise fields with time offsets
-  float noise1 = background_noise(uv, u_waveOffset[0]);
-  float noise2 = background_noise(uv, u_waveOffset[1]);
-  float noise3 = background_noise(uv, 0.0); // Base noise without offset
-
-  // Calculate wave alphas for blending
-  float alpha1 = wave_alpha(uv, 0);
-  float alpha2 = wave_alpha(uv, 1);
-  float alpha3 = 1.0 - alpha1 - alpha2; // Remaining area
-  alpha3 = max(alpha3, 0.0); // Ensure non-negative
-
-  // Normalize alphas to ensure they sum to 1.0
-  float totalAlpha = alpha1 + alpha2 + alpha3;
-  if (totalAlpha > 0.0) {
-    alpha1 /= totalAlpha;
-    alpha2 /= totalAlpha;
-    alpha3 /= totalAlpha;
-  }
-
-  // Blend the three noise fields based on wave alphas
-  float t = noise1 * alpha1 + noise2 * alpha2 + noise3 * alpha3;
-  t = clamp(t, 0.0, 1.0);
-
-  // Sample gradient texture
-  vec4 color = texture(u_gradientTex, vec2(t, 0.5));
-
-  // Apply dynamic blur based on position
-  float blurAmount = calc_blur(uv);
-
-  // Apply subtle vignette with blur modulation
-  vec2 center = uv - 0.5;
-  float vignette = 1.0 - dot(center, center) * (0.3 + blurAmount * 0.2);
-  color.rgb *= vignette;
-
-  // Apply blur effect to alpha channel for depth
-  color.a *= (1.0 - blurAmount * 0.3);
-
-  fragColor = color;
-}`;
+    mainShaderLogic:
+      CONSCIOUSNESS_SHADER_LIBRARY.Fragments.webglGradientFragment(),
+  });
 
 interface FlowGradientSettings {
   enabled: boolean;
@@ -197,36 +110,17 @@ interface FlowGradientSettings {
   blurMax: number;
 }
 
-interface FlowGradientUniforms {
-  u_time: WebGLUniformLocation | null;
-  u_gradientTex: WebGLUniformLocation | null;
-  u_resolution: WebGLUniformLocation | null;
-  u_flowStrength: WebGLUniformLocation | null;
-  u_noiseScale: WebGLUniformLocation | null;
-  u_waveY: WebGLUniformLocation | null;
-  u_waveHeight: WebGLUniformLocation | null;
-  u_waveOffset: WebGLUniformLocation | null;
-  u_blurExp: WebGLUniformLocation | null;
-  u_blurMax: WebGLUniformLocation | null;
-}
+// Using shared consciousness shader management - no need for duplicate uniform interface
 
-export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
+export class WebGLGradientBackgroundSystem
+  extends BaseVisualSystem
+  implements BackgroundSystemParticipant, QualityScalingCapable
+{
   private canvas: HTMLCanvasElement | null = null;
   private wrapper: HTMLDivElement | null = null;
   private gl: WebGL2RenderingContext | null = null;
   private shaderProgram: WebGLProgram | null = null;
-  private uniforms: FlowGradientUniforms = {
-    u_time: null,
-    u_gradientTex: null,
-    u_resolution: null,
-    u_flowStrength: null,
-    u_noiseScale: null,
-    u_waveY: null,
-    u_waveHeight: null,
-    u_waveOffset: null,
-    u_blurExp: null,
-    u_blurMax: null,
-  };
+  private uniforms: { [key: string]: WebGLUniformLocation | null } = {};
 
   private gradientTexture: WebGLTexture | null = null;
   private vertexBuffer: WebGLBuffer | null = null;
@@ -251,11 +145,52 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
   private frameThrottleInterval = 1000 / 45; // 45 FPS target
 
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
-  private cssVariableBatcher: CSSVariableBatcher | null = null;
-  private boundColorHarmonyHandler: ((event: Event) => void) | null = null;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController | null =
+    null;
+  private eventSubscriptionIds: string[] = [];
   private prefersReducedMotion = false;
 
+  // Consciousness choreographer integration
+  private consciousnessChoreographer: BackgroundConsciousnessChoreographer | null =
+    null;
+  private currentConsciousnessField: ConsciousnessField | null = null;
+
   private webglReady = false;
+
+  // Texture creation throttling and debouncing
+  private textureUpdatePending = false;
+  private lastTextureUpdate = 0;
+  private textureUpdateDebounceTimer: number | null = null;
+  private readonly textureUpdateThrottleMs = 50; // Minimum time between texture updates
+  private readonly textureUpdateDebounceMs = 300; // Debounce time for rapid events
+  private textureCreationInProgress = false;
+
+  // WebGL context management
+  private contextLost = false;
+  private pendingContextRestore = false;
+
+  // Quality scaling properties
+  private currentQualityLevel: QualityLevel | null = null;
+  private qualityCapabilities: QualityCapability[] = [
+    { name: "webgl-rendering", impact: "high", enabled: true, canToggle: true },
+    {
+      name: "shader-complexity",
+      impact: "high",
+      enabled: true,
+      canToggle: true,
+    },
+    { name: "noise-octaves", impact: "medium", enabled: true, canToggle: true },
+    { name: "wave-layers", impact: "medium", enabled: true, canToggle: true },
+    { name: "blur-effects", impact: "low", enabled: true, canToggle: true },
+    { name: "flow-strength", impact: "low", enabled: true, canToggle: true },
+  ];
+  private qualityAdjustments: { [key: string]: number } = {};
+
+  // Required BackgroundSystemParticipant implementation
+  public override readonly systemName: string = "WebGLGradientBackgroundSystem";
+  public get systemPriority(): "low" | "normal" | "high" | "critical" {
+    return "high"; // WebGL is high priority for performance
+  }
 
   constructor(
     config: Year3000Config = YEAR3000_CONFIG,
@@ -269,15 +204,17 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
 
     // Get ColorHarmonyEngine from year3000System if available
     this.colorHarmonyEngine = year3000System?.colorHarmonyEngine || null;
-    this.cssVariableBatcher = new CSSVariableBatcher();
+
+    // Get consciousness choreographer from year3000System if available
+    this.consciousnessChoreographer =
+      year3000System?.backgroundConsciousnessChoreographer || null;
 
     // Check for reduced motion preference
     this.prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
-    // Bind event handlers
-    this.boundColorHarmonyHandler = this.handleColorHarmonyChange.bind(this);
+    // Event subscriptions will be set up during initialization
   }
 
   public override async _performSystemSpecificInitialization(): Promise<void> {
@@ -313,13 +250,20 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
     try {
       await this.initializeWebGL();
       this.subscribeToEvents();
+      this.registerWithConsciousnessChoreographer();
       this.startAnimation();
 
       // WebGL initialised; enable hybrid coordination for dynamic and living feel
       document.documentElement.style.setProperty("--sn-webgl-ready", "1");
       document.documentElement.style.setProperty("--sn-webgl-enabled", "1");
-      document.documentElement.style.setProperty("--sn-current-backend", "hybrid");
-      document.documentElement.style.setProperty("--sn-gradient-crossfade-opacity", "0.5"); // 50% blend
+      document.documentElement.style.setProperty(
+        "--sn-current-backend",
+        "hybrid"
+      );
+      document.documentElement.style.setProperty(
+        "--sn-gradient-crossfade-opacity",
+        "0.5"
+      ); // 50% blend
 
       Y3K?.debug?.log(
         "WebGLGradientBackgroundSystem",
@@ -336,9 +280,60 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
   }
 
   private checkWebGL2Support(): boolean {
-    const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl2");
-    return gl !== null;
+    try {
+      const canvas = document.createElement("canvas");
+      const gl = canvas.getContext("webgl2");
+
+      if (!gl) {
+        Y3K?.debug?.warn(
+          "WebGLGradientBackgroundSystem",
+          "WebGL2 context creation failed"
+        );
+        return false;
+      }
+
+      // Additional checks for critical WebGL2 features
+      const requiredExtensions = ["EXT_color_buffer_float"];
+      const missingExtensions: string[] = [];
+
+      for (const ext of requiredExtensions) {
+        if (!gl.getExtension(ext)) {
+          missingExtensions.push(ext);
+        }
+      }
+
+      if (missingExtensions.length > 0) {
+        Y3K?.debug?.warn(
+          "WebGLGradientBackgroundSystem",
+          "Missing WebGL2 extensions:",
+          missingExtensions
+        );
+      }
+
+      // Check for basic WebGL functionality
+      const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+      const maxRenderbufferSize = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+
+      Y3K?.debug?.log(
+        "WebGLGradientBackgroundSystem",
+        "WebGL2 capability check:",
+        {
+          maxTextureSize,
+          maxRenderbufferSize,
+          missingExtensions:
+            missingExtensions.length > 0 ? missingExtensions : "none",
+        }
+      );
+
+      return true;
+    } catch (error) {
+      Y3K?.debug?.error(
+        "WebGLGradientBackgroundSystem",
+        "WebGL2 support check failed:",
+        error
+      );
+      return false;
+    }
   }
 
   private findSpotifyContainer(): HTMLElement {
@@ -450,17 +445,53 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
     // Wrap canvas in the wrapper
     this.wrapper.appendChild(this.canvas);
 
-    // Get WebGL2 context
-    this.gl = this.canvas.getContext("webgl2", {
-      alpha: true,
-      antialias: false,
-      depth: false,
-      stencil: false,
-      powerPreference: "default",
-    });
+    // Get WebGL2 context with enhanced error handling
+    try {
+      this.gl = this.canvas.getContext("webgl2", {
+        alpha: true,
+        antialias: false,
+        depth: false,
+        stencil: false,
+        powerPreference: "default",
+      });
 
-    if (!this.gl) {
-      throw new Error("Failed to get WebGL2 context");
+      if (!this.gl) {
+        throw new Error(
+          "WebGL2 context creation returned null - likely unsupported"
+        );
+      }
+
+      // Setup context loss and restore handlers
+      this.setupContextLossHandlers();
+
+      // Verify context is functional
+      const testResult = this.gl.getParameter(this.gl.VERSION);
+      if (!testResult) {
+        throw new Error(
+          "WebGL2 context appears non-functional - getParameter failed"
+        );
+      }
+
+      Y3K?.debug?.log(
+        "WebGLGradientBackgroundSystem",
+        "WebGL2 context created successfully:",
+        {
+          version: testResult,
+          renderer: this.gl.getParameter(this.gl.RENDERER),
+          vendor: this.gl.getParameter(this.gl.VENDOR),
+        }
+      );
+    } catch (error) {
+      Y3K?.debug?.error(
+        "WebGLGradientBackgroundSystem",
+        "WebGL2 context creation failed:",
+        error
+      );
+      throw new Error(
+        `Failed to create WebGL2 context: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
 
     // Compile shaders
@@ -495,7 +526,7 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
     );
     const fragmentShader = ShaderLoader.loadFragment(
       this.gl,
-      flowGradientShader
+      webglConsciousnessShader
     );
 
     if (!vertexShader || !fragmentShader) {
@@ -590,62 +621,491 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
   }
 
   private async updateGradientTexture(): Promise<void> {
-    if (!this.gl) return;
+    if (!this.gl) {
+      Y3K?.debug?.warn(
+        "WebGLGradientBackgroundSystem",
+        "No WebGL context available"
+      );
+      return;
+    }
 
-    // Get current gradient from ColorHarmonyEngine
-    let colorStops = this.getDefaultGradientStops();
+    // Enhanced WebGL context validation
+    if (!this.isContextValid()) {
+      Y3K?.debug?.warn(
+        "WebGLGradientBackgroundSystem",
+        "WebGL context invalid, attempting recovery"
+      );
 
-    if (this.colorHarmonyEngine) {
-      try {
-        const currentGradient = this.colorHarmonyEngine.getCurrentGradient(5);
-        if (currentGradient && currentGradient.length > 0) {
-          colorStops = currentGradient.map((color, index) => ({
-            r: color.r / 255,
-            g: color.g / 255,
-            b: color.b / 255,
-            a: 1.0,
-            position: index / (currentGradient.length - 1),
-          }));
-
-          Y3K?.debug?.log(
-            "WebGLGradientBackgroundSystem",
-            `Updated gradient texture with ${colorStops.length} stops from ColorHarmonyEngine`
-          );
-        }
-      } catch (error) {
-        Y3K?.debug?.warn(
+      // Try to recover context if possible
+      if (this.contextLost && !this.pendingContextRestore) {
+        Y3K?.debug?.log(
           "WebGLGradientBackgroundSystem",
-          "Failed to get gradient from ColorHarmonyEngine:",
-          error
+          "Attempting WebGL context recovery"
         );
+        this.fallbackToCSSGradient();
+      }
+      return;
+    }
+
+    // Check for WebGL errors before starting
+    const preError = this.gl.getError();
+    if (preError !== this.gl.NO_ERROR) {
+      Y3K?.debug?.warn(
+        "WebGLGradientBackgroundSystem",
+        `WebGL error detected before texture update: ${preError}`
+      );
+      // Clear the error and continue - some errors are recoverable
+      while (this.gl.getError() !== this.gl.NO_ERROR) {
+        // Clear all pending errors
       }
     }
 
-    // Clean up old texture
-    if (this.gradientTexture) {
-      this.gl.deleteTexture(this.gradientTexture);
-    }
-
-    // Create new gradient texture
-    this.gradientTexture = createGradientTexture(this.gl, colorStops);
-
-    if (!this.gradientTexture) {
-      throw new Error("Failed to create gradient texture");
-    }
-
-    // Expose gradient stops to CSS for the fallback layer (max 8 stops)
-    const root = document.documentElement;
-    const maxStops = Math.min(8, colorStops.length);
-    root.style.setProperty("--sn-grad-stop-count", String(maxStops));
-    for (let i = 0; i < maxStops; i++) {
-      const c = colorStops[i]!; // non-null as i < maxStops
-      root.style.setProperty(
-        `--sn-grad-stop-${i}-rgb`,
-        `${Math.round(c.r * 255)},${Math.round(c.g * 255)},${Math.round(
-          c.b * 255
-        )}`
+    // Prevent overlapping texture creation operations
+    if (this.textureCreationInProgress) {
+      Y3K?.debug?.log(
+        "WebGLGradientBackgroundSystem",
+        "Texture creation already in progress, skipping update"
       );
+      return;
     }
+
+    this.textureCreationInProgress = true;
+
+    try {
+      // Enhanced color acquisition with fallback chain:
+      // 1. ColorHarmonyEngine (primary source)
+      // 2. CSS variables (fallback when engine fails)
+      // 3. Default gradient (final fallback)
+      let colorStops = this.getDefaultGradientStops();
+      let colorSource = "default";
+
+      // Try ColorHarmonyEngine first
+      if (this.colorHarmonyEngine) {
+        try {
+          const currentGradient = this.colorHarmonyEngine.getCurrentGradient(5);
+          if (currentGradient && currentGradient.length > 0) {
+            colorStops = currentGradient.map((color, index) => ({
+              r: color.r / 255,
+              g: color.g / 255,
+              b: color.b / 255,
+              a: 1.0,
+              position: index / (currentGradient.length - 1),
+            }));
+            colorSource = "ColorHarmonyEngine";
+
+            Y3K?.debug?.log(
+              "WebGLGradientBackgroundSystem",
+              `Updated gradient texture with ${colorStops.length} stops from ColorHarmonyEngine`
+            );
+          } else {
+            // ColorHarmonyEngine available but returned empty - try CSS fallback
+            const cssColorStops = this.getCSSGradientStops();
+            if (cssColorStops && cssColorStops.length > 0) {
+              colorStops = cssColorStops;
+              colorSource = "CSS variables";
+              Y3K?.debug?.log(
+                "WebGLGradientBackgroundSystem",
+                `ColorHarmonyEngine returned empty, using CSS gradient fallback with ${colorStops.length} stops`
+              );
+            }
+          }
+        } catch (error) {
+          Y3K?.debug?.warn(
+            "WebGLGradientBackgroundSystem",
+            "Failed to get gradient from ColorHarmonyEngine, trying CSS fallback:",
+            error
+          );
+
+          // ColorHarmonyEngine failed - try CSS variables fallback
+          const cssColorStops = this.getCSSGradientStops();
+          if (cssColorStops && cssColorStops.length > 0) {
+            colorStops = cssColorStops;
+            colorSource = "CSS variables (engine failed)";
+            Y3K?.debug?.log(
+              "WebGLGradientBackgroundSystem",
+              `Using CSS gradient fallback after ColorHarmonyEngine error with ${colorStops.length} stops`
+            );
+          }
+        }
+      } else {
+        // No ColorHarmonyEngine available - try CSS fallback
+        const cssColorStops = this.getCSSGradientStops();
+        if (cssColorStops && cssColorStops.length > 0) {
+          colorStops = cssColorStops;
+          colorSource = "CSS variables (no engine)";
+          Y3K?.debug?.log(
+            "WebGLGradientBackgroundSystem",
+            `No ColorHarmonyEngine available, using CSS gradient fallback with ${colorStops.length} stops`
+          );
+        }
+      }
+
+      Y3K?.debug?.log(
+        "WebGLGradientBackgroundSystem",
+        `Final color source: ${colorSource}, stops: ${colorStops.length}`
+      );
+
+      // Validate WebGL context is still valid before texture operations
+      if (this.gl.isContextLost()) {
+        throw new Error("WebGL context was lost during gradient preparation");
+      }
+
+      // Clean up old texture with error checking
+      if (this.gradientTexture) {
+        try {
+          this.gl.deleteTexture(this.gradientTexture);
+        } catch (error) {
+          Y3K?.debug?.warn(
+            "WebGLGradientBackgroundSystem",
+            "Error deleting old texture:",
+            error
+          );
+        }
+        this.gradientTexture = null as any; // Clear reference
+      }
+
+      // Validate color stops before proceeding
+      if (!colorStops || colorStops.length === 0) {
+        Y3K?.debug?.warn(
+          "WebGLGradientBackgroundSystem",
+          "No valid color stops, using defaults"
+        );
+        colorStops = this.getDefaultGradientStops();
+      }
+
+      // Create new gradient texture with enhanced error handling and retry logic
+      let newTexture = null;
+      let attempts = 0;
+      const maxAttempts = 3;
+
+      while (!newTexture && attempts < maxAttempts) {
+        attempts++;
+
+        try {
+          // Check context validity before each attempt
+          if (this.gl.isContextLost()) {
+            throw new Error(
+              "WebGL context lost during texture creation attempt"
+            );
+          }
+
+          newTexture = createGradientTexture(this.gl, colorStops);
+
+          if (newTexture) {
+            Y3K?.debug?.log(
+              "WebGLGradientBackgroundSystem",
+              `Gradient texture created successfully on attempt ${attempts}`
+            );
+            break;
+          }
+        } catch (error) {
+          Y3K?.debug?.warn(
+            "WebGLGradientBackgroundSystem",
+            `Texture creation attempt ${attempts} failed:`,
+            error
+          );
+
+          // Wait a bit before retrying (progressive backoff)
+          if (attempts < maxAttempts) {
+            await new Promise((resolve) => setTimeout(resolve, attempts * 10));
+          }
+        }
+      }
+
+      if (!newTexture) {
+        Y3K?.debug?.error(
+          "WebGLGradientBackgroundSystem",
+          "Failed to create gradient texture after all attempts - trying default colors"
+        );
+
+        // Final fallback: try with default gradient
+        try {
+          const defaultStops = this.getDefaultGradientStops();
+          const fallbackTexture = createGradientTexture(this.gl, defaultStops);
+
+          if (!fallbackTexture) {
+            throw new Error(
+              "Failed to create gradient texture even with default colors"
+            );
+          }
+
+          this.gradientTexture = fallbackTexture;
+          colorStops = defaultStops;
+
+          Y3K?.debug?.log(
+            "WebGLGradientBackgroundSystem",
+            "Using default gradient fallback after all attempts failed"
+          );
+        } catch (fallbackError) {
+          Y3K?.debug?.error(
+            "WebGLGradientBackgroundSystem",
+            "Default gradient fallback failed:",
+            fallbackError
+          );
+          throw new Error(
+            `Gradient texture creation completely failed: ${fallbackError}`
+          );
+        }
+      } else {
+        this.gradientTexture = newTexture;
+      }
+
+      // Update last texture update timestamp
+      this.lastTextureUpdate = performance.now();
+
+      Y3K?.debug?.log(
+        "WebGLGradientBackgroundSystem",
+        `Gradient texture updated successfully using ${colorSource}`,
+        {
+          colorStops: colorStops.length,
+          source: colorSource,
+          firstColor: colorStops[0]
+            ? `rgb(${Math.round(colorStops[0].r * 255)},${Math.round(
+                colorStops[0].g * 255
+              )},${Math.round(colorStops[0].b * 255)})`
+            : "none",
+        }
+      );
+    } catch (error) {
+      Y3K?.debug?.error(
+        "WebGLGradientBackgroundSystem",
+        "Critical error in updateGradientTexture:",
+        error
+      );
+
+      // Attempt to recover by falling back to CSS gradient
+      if (error instanceof Error && error.message.includes("context")) {
+        Y3K?.debug?.log(
+          "WebGLGradientBackgroundSystem",
+          "WebGL context-related error detected, switching to CSS fallback"
+        );
+        this.fallbackToCSSGradient();
+      } else {
+        // For non-context errors, try a simple recovery
+        Y3K?.debug?.log(
+          "WebGLGradientBackgroundSystem",
+          "Attempting simple texture recovery with default colors"
+        );
+
+        try {
+          // Clear any invalid state
+          this.gradientTexture = null as any;
+
+          // Try once more with default colors
+          const defaultStops = this.getDefaultGradientStops();
+          if (this.gl && !this.gl.isContextLost()) {
+            this.gradientTexture = createGradientTexture(this.gl, defaultStops);
+
+            if (this.gradientTexture) {
+              Y3K?.debug?.log(
+                "WebGLGradientBackgroundSystem",
+                "Successfully recovered with default gradient"
+              );
+            } else {
+              throw new Error("Recovery attempt failed");
+            }
+          } else {
+            throw new Error("WebGL context unavailable for recovery");
+          }
+        } catch (recoveryError) {
+          Y3K?.debug?.error(
+            "WebGLGradientBackgroundSystem",
+            "Recovery attempt failed, falling back to CSS:",
+            recoveryError
+          );
+          this.fallbackToCSSGradient();
+        }
+      }
+    } finally {
+      this.textureCreationInProgress = false;
+    }
+  }
+
+  /**
+   * Throttled texture update to prevent rapid-fire texture creation
+   */
+  private async updateGradientTextureThrottled(): Promise<void> {
+    const now = performance.now();
+
+    // Check if we're within throttle window
+    if (now - this.lastTextureUpdate < this.textureUpdateThrottleMs) {
+      // Schedule update for later if not already pending
+      if (!this.textureUpdatePending) {
+        this.textureUpdatePending = true;
+
+        const timeToWait =
+          this.textureUpdateThrottleMs - (now - this.lastTextureUpdate);
+        setTimeout(() => {
+          this.textureUpdatePending = false;
+          this.updateGradientTexture().catch((error) => {
+            Y3K?.debug?.error(
+              "WebGLGradientBackgroundSystem",
+              "Throttled texture update failed:",
+              error
+            );
+          });
+        }, timeToWait);
+      }
+      return;
+    }
+
+    // Update immediately if not within throttle window
+    await this.updateGradientTexture();
+  }
+
+  /**
+   * Debounced texture update to handle rapid event sequences
+   */
+  private debouncedUpdateGradientTexture(): void {
+    // Clear existing debounce timer
+    if (this.textureUpdateDebounceTimer) {
+      clearTimeout(this.textureUpdateDebounceTimer);
+    }
+
+    // Set new debounce timer
+    this.textureUpdateDebounceTimer = window.setTimeout(() => {
+      this.textureUpdateDebounceTimer = null;
+      this.updateGradientTextureThrottled().catch((error) => {
+        Y3K?.debug?.error(
+          "WebGLGradientBackgroundSystem",
+          "Debounced texture update failed:",
+          error
+        );
+      });
+    }, this.textureUpdateDebounceMs);
+  }
+
+  /**
+   * Setup WebGL context loss and restore event handlers
+   */
+  private setupContextLossHandlers(): void {
+    if (!this.canvas) return;
+
+    this.canvas.addEventListener(
+      "webglcontextlost",
+      async (event) => {
+        Y3K?.debug?.warn("WebGLGradientBackgroundSystem", "WebGL context lost");
+        event.preventDefault(); // Prevent default context loss behavior
+
+        this.contextLost = true;
+        this.textureCreationInProgress = false;
+
+        // Clear shader cache immediately when context is lost
+        if (this.gl) {
+          try {
+            const { ShaderLoader } = await import(
+              "../../utils/graphics/ShaderLoader"
+            );
+            ShaderLoader.clearContextCache(this.gl);
+          } catch (e) {
+            // Import might fail during shutdown, ignore
+          }
+        }
+
+        // Clear any pending texture updates
+        if (this.textureUpdateDebounceTimer) {
+          clearTimeout(this.textureUpdateDebounceTimer);
+          this.textureUpdateDebounceTimer = null;
+        }
+        this.textureUpdatePending = false;
+
+        // Stop animation loop
+        if (this.animationId) {
+          cancelAnimationFrame(this.animationId);
+          this.animationId = null;
+        }
+      },
+      false
+    );
+
+    this.canvas.addEventListener(
+      "webglcontextrestored",
+      async () => {
+        Y3K?.debug?.log(
+          "WebGLGradientBackgroundSystem",
+          "WebGL context restored, reinitializing"
+        );
+
+        this.contextLost = false;
+        this.pendingContextRestore = true;
+
+        try {
+          // Re-verify context functionality
+          if (!this.gl || this.gl.isContextLost()) {
+            throw new Error("Context is still lost after restore event");
+          }
+
+          // Reinitialize WebGL resources
+          await this.reinitializeWebGLResources();
+
+          // Restart animation
+          this.startAnimation();
+
+          this.pendingContextRestore = false;
+
+          Y3K?.debug?.log(
+            "WebGLGradientBackgroundSystem",
+            "WebGL context restore completed successfully"
+          );
+        } catch (error) {
+          Y3K?.debug?.error(
+            "WebGLGradientBackgroundSystem",
+            "Failed to restore WebGL context:",
+            error
+          );
+          this.pendingContextRestore = false;
+          this.fallbackToCSSGradient();
+        }
+      },
+      false
+    );
+  }
+
+  /**
+   * Reinitialize WebGL resources after context restore
+   */
+  private async reinitializeWebGLResources(): Promise<void> {
+    if (!this.gl) throw new Error("WebGL context not available");
+
+    // Clear any existing resources (they're invalid after context loss)
+    this.shaderProgram = null as any;
+    this.vertexBuffer = null as any;
+    this.vao = null as any;
+    this.gradientTexture = null as any;
+
+    // CRITICAL: Clear shader cache to prevent reusing invalid shader objects
+    const { ShaderLoader } = await import("../../utils/graphics/ShaderLoader");
+    ShaderLoader.clearContextCache(this.gl);
+
+    // Recompile shaders (now will create fresh shader objects)
+    await this.compileShaders();
+
+    // Recreate geometry
+    this.createGeometry();
+
+    // Recreate gradient texture
+    await this.updateGradientTexture();
+
+    // Setup uniforms again
+    this.setupUniforms();
+
+    Y3K?.debug?.log(
+      "WebGLGradientBackgroundSystem",
+      "WebGL resources reinitialized after context restore"
+    );
+  }
+
+  /**
+   * Check if WebGL context is available and functional
+   */
+  private isContextValid(): boolean {
+    if (!this.gl) return false;
+    if (this.contextLost) return false;
+    if (this.gl.isContextLost()) {
+      this.contextLost = true;
+      return false;
+    }
+    return true;
   }
 
   private getDefaultGradientStops() {
@@ -658,24 +1118,195 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
     ];
   }
 
-  private subscribeToEvents(): void {
-    if (this.colorHarmonyEngine && this.boundColorHarmonyHandler) {
-      document.addEventListener(
-        "color-harmony:gradient-changed",
-        this.boundColorHarmonyHandler
+  /**
+   * Get gradient color stops from CSS variables that inherit from ColorHarmonyEngine
+   * These variables are set by OKLAB processing and represent the actual background gradient colors
+   */
+  private getCSSGradientStops(): Array<{
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+    position: number;
+  }> | null {
+    try {
+      const root = document.documentElement;
+      const computedStyle = getComputedStyle(root);
+
+      // Read the actual background gradient variables that inherit from ColorHarmonyEngine
+      const gradientVariables = [
+        "--sn-bg-gradient-primary-rgb",
+        "--sn-bg-gradient-secondary-rgb",
+        "--sn-bg-gradient-tertiary-rgb",
+      ];
+
+      const colorStops: Array<{
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+        position: number;
+      }> = [];
+
+      for (let i = 0; i < gradientVariables.length; i++) {
+        const variableName =
+          gradientVariables[i] || "--sn-bg-gradient-primary-rgb";
+        const rgbStr = computedStyle.getPropertyValue(variableName).trim();
+
+        if (!rgbStr) {
+          Y3K?.debug?.log(
+            "WebGLGradientBackgroundSystem",
+            `CSS variable ${variableName} not set, trying without CSS fallback`
+          );
+          continue;
+        }
+
+        // Parse RGB string like "203,166,247" or "203, 166, 247"
+        const rgbValues = rgbStr.split(",").map((v) => parseInt(v.trim(), 10));
+        if (
+          rgbValues.length !== 3 ||
+          rgbValues.some((v) => isNaN(v) || v < 0 || v > 255)
+        ) {
+          Y3K?.debug?.warn(
+            "WebGLGradientBackgroundSystem",
+            `Invalid RGB values in ${variableName}: ${rgbStr}, skipping this color`
+          );
+          continue;
+        }
+
+        colorStops.push({
+          r: (rgbValues[0] ?? 0) / 255,
+          g: (rgbValues[1] ?? 0) / 255,
+          b: (rgbValues[2] ?? 0) / 255,
+          a: 1.0,
+          position: i / (gradientVariables.length - 1),
+        });
+      }
+
+      // Need at least 2 colors for a valid gradient
+      if (colorStops.length < 2) {
+        Y3K?.debug?.log(
+          "WebGLGradientBackgroundSystem",
+          `Only ${colorStops.length} valid CSS colors found, need at least 2 for gradient`
+        );
+        return null;
+      }
+
+      // Add additional background settings if available
+      const opacityStr = computedStyle
+        .getPropertyValue("--sn-bg-gradient-opacity")
+        .trim();
+      const opacity = opacityStr ? parseFloat(opacityStr) : 1.0;
+
+      // Apply opacity to all color stops
+      if (opacity !== 1.0 && opacity > 0 && opacity <= 1.0) {
+        colorStops.forEach((stop) => {
+          stop.a = opacity;
+        });
+      }
+
+      Y3K?.debug?.log(
+        "WebGLGradientBackgroundSystem",
+        `Successfully parsed ${colorStops.length} CSS background gradient stops from OKLAB inheritance`,
+        {
+          colors: colorStops.map(
+            (stop) =>
+              `rgba(${Math.round(stop.r * 255)},${Math.round(
+                stop.g * 255
+              )},${Math.round(stop.b * 255)},${stop.a})`
+          ),
+          opacity: opacity !== 1.0 ? opacity : "default",
+        }
       );
+
+      return colorStops;
+    } catch (error) {
+      Y3K?.debug?.warn(
+        "WebGLGradientBackgroundSystem",
+        "Failed to parse CSS background gradient variables:",
+        error
+      );
+      return null;
     }
   }
 
-  private handleColorHarmonyChange(event: Event): void {
-    // Update gradient texture with new colors
-    this.updateGradientTexture().catch((error) => {
-      Y3K?.debug?.error(
+  private subscribeToEvents(): void {
+    // Subscribe to color harmonization events
+    const colorHarmonizedSub = unifiedEventBus.subscribe(
+      "colors:harmonized",
+      this.handleColorHarmonized.bind(this),
+      "WebGLGradientBackgroundSystem"
+    );
+    this.eventSubscriptionIds.push(colorHarmonizedSub);
+
+    // Subscribe to color application events for coordination
+    const colorAppliedSub = unifiedEventBus.subscribe(
+      "colors:applied",
+      this.handleColorApplied.bind(this),
+      "WebGLGradientBackgroundSystem"
+    );
+    this.eventSubscriptionIds.push(colorAppliedSub);
+
+    Y3K?.debug?.log(
+      "WebGLGradientBackgroundSystem",
+      "Subscribed to unified events",
+      {
+        subscriptionCount: this.eventSubscriptionIds.length,
+      }
+    );
+  }
+
+  // Event deduplication tracking
+  private lastColorHarmonizedData: string | null = null;
+  private lastColorHarmonizedTime = 0;
+
+  private handleColorHarmonized(data: EventData<"colors:harmonized">): void {
+    // Event deduplication - skip if same data received recently
+    const currentTime = performance.now();
+    const dataHash = `${data.accentHex}-${
+      data.processingTime
+    }-${data.strategies.join(",")}`;
+
+    if (
+      this.lastColorHarmonizedData === dataHash &&
+      currentTime - this.lastColorHarmonizedTime < 100
+    ) {
+      // 100ms deduplication window
+      Y3K?.debug?.log(
         "WebGLGradientBackgroundSystem",
-        "Failed to update gradient texture:",
-        error
+        "Duplicate color harmonization event detected, skipping"
       );
-    });
+      return;
+    }
+
+    this.lastColorHarmonizedData = dataHash;
+    this.lastColorHarmonizedTime = currentTime;
+
+    // Update gradient texture with new harmonized colors using debounced method
+    this.debouncedUpdateGradientTexture();
+
+    Y3K?.debug?.log(
+      "WebGLGradientBackgroundSystem",
+      "Color harmonization processed",
+      {
+        strategies: data.strategies,
+        processingTime: data.processingTime,
+        accentHex: data.accentHex,
+        deduplicationHash: dataHash.substring(0, 16) + "...",
+      }
+    );
+  }
+
+  private handleColorApplied(data: EventData<"colors:applied">): void {
+    // Coordinate with CSS variables for hybrid rendering
+    Y3K?.debug?.log(
+      "WebGLGradientBackgroundSystem",
+      "Color application coordinated",
+      {
+        accentHex: data.accentHex,
+        appliedAt: data.appliedAt,
+      }
+    );
   }
 
   private startAnimation(): void {
@@ -722,8 +1353,14 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
       this.webglReady = true;
       document.documentElement.style.setProperty("--sn-webgl-ready", "1");
       document.documentElement.style.setProperty("--sn-webgl-enabled", "1");
-      document.documentElement.style.setProperty("--sn-current-backend", "hybrid");
-      document.documentElement.style.setProperty("--sn-gradient-crossfade-opacity", "0.5"); // Balanced hybrid blend
+      document.documentElement.style.setProperty(
+        "--sn-current-backend",
+        "hybrid"
+      );
+      document.documentElement.style.setProperty(
+        "--sn-gradient-crossfade-opacity",
+        "0.5"
+      ); // Balanced hybrid blend
     }
 
     // Update uniforms
@@ -813,9 +1450,12 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
     document.documentElement.style.setProperty("--sn-webgl-ready", "0");
     document.documentElement.style.setProperty("--sn-webgl-enabled", "0");
     document.documentElement.style.setProperty("--sn-current-backend", "css");
-    document.documentElement.style.setProperty("--sn-gradient-crossfade-opacity", "0"); // Full CSS opacity
+    document.documentElement.style.setProperty(
+      "--sn-gradient-crossfade-opacity",
+      "0"
+    ); // Full CSS opacity
     // Update CSS variables for fallback gradient animation
-    if (this.cssVariableBatcher) {
+    if (this.cssConsciousnessController) {
       this.startCSSFallbackAnimation();
     }
 
@@ -826,7 +1466,7 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
   }
 
   private startCSSFallbackAnimation(): void {
-    if (!this.cssVariableBatcher) return;
+    if (!this.cssConsciousnessController) return;
 
     // Animate CSS variables to simulate flow
     const animateCSS = () => {
@@ -837,7 +1477,7 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
       const flowY = Math.cos(time * 0.05) * 20 + Math.cos(time * 0.09) * 6;
       const scale = 1.15 + Math.sin(time * 0.03) * 0.2; // Enhanced base scale with more variation
 
-      const batcher = this.cssVariableBatcher;
+      const batcher = this.cssConsciousnessController;
       if (!batcher) return;
       batcher.queueCSSVariableUpdate("--sn-gradient-flow-x", `${flowX}%`);
       batcher.queueCSSVariableUpdate("--sn-gradient-flow-y", `${flowY}%`);
@@ -881,11 +1521,41 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
   public override _performSystemSpecificCleanup(): void {
     super._performSystemSpecificCleanup();
 
+    // Unregister from consciousness choreographer
+    if (this.consciousnessChoreographer) {
+      try {
+        this.consciousnessChoreographer.unregisterConsciousnessParticipant(
+          "WebGLGradientBackgroundSystem"
+        );
+        Y3K?.debug?.log(
+          "WebGLGradientBackgroundSystem",
+          "Unregistered from consciousness choreographer"
+        );
+      } catch (error) {
+        Y3K?.debug?.error(
+          "WebGLGradientBackgroundSystem",
+          "Error unregistering from consciousness choreographer:",
+          error
+        );
+      }
+    }
+
     // Stop animation
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
     }
+
+    // Clean up texture update timers
+    if (this.textureUpdateDebounceTimer) {
+      clearTimeout(this.textureUpdateDebounceTimer);
+      this.textureUpdateDebounceTimer = null;
+    }
+
+    // Reset texture update state
+    this.textureUpdatePending = false;
+    this.textureCreationInProgress = false;
+    this.lastColorHarmonizedData = null;
 
     // Clean up WebGL resources
     if (this.gl) {
@@ -920,14 +1590,16 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
     }
     this.canvas = null;
 
-    // Remove event listeners
-    if (this.boundColorHarmonyHandler) {
-      document.removeEventListener(
-        "color-harmony:gradient-changed",
-        this.boundColorHarmonyHandler
-      );
-      this.boundColorHarmonyHandler = null;
-    }
+    // Clean up unified event subscriptions
+    this.eventSubscriptionIds.forEach((subscriptionId) => {
+      unifiedEventBus.unsubscribe(subscriptionId);
+    });
+    this.eventSubscriptionIds = [];
+
+    Y3K?.debug?.log(
+      "WebGLGradientBackgroundSystem",
+      "Unified event subscriptions cleaned up"
+    );
 
     window.removeEventListener("resize", this.resize);
 
@@ -937,10 +1609,13 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
     document.documentElement.style.setProperty("--sn-webgl-ready", "0");
     document.documentElement.style.setProperty("--sn-webgl-enabled", "0");
     document.documentElement.style.setProperty("--sn-current-backend", "css");
-    document.documentElement.style.setProperty("--sn-gradient-crossfade-opacity", "0");
+    document.documentElement.style.setProperty(
+      "--sn-gradient-crossfade-opacity",
+      "0"
+    );
   }
 
-  public override forceRepaint(reason: string = "settings-change"): void {
+  public override forceRepaint(_reason: string = "settings-change"): void {
     if (this.isActive && this.gradientTexture) {
       this.updateGradientTexture().catch((error) => {
         Y3K?.debug?.error(
@@ -1016,5 +1691,435 @@ export class WebGLGradientBackgroundSystem extends BaseVisualSystem {
     this.canvas.height = height;
     // Trigger any additional resize handling logic via existing arrow fn.
     (this as any).resize?.();
+  }
+
+  // ===================================================================
+  // CONSCIOUSNESS CHOREOGRAPHER INTEGRATION
+  // ===================================================================
+
+  /**
+   * Register this WebGL system as a consciousness participant
+   */
+  private registerWithConsciousnessChoreographer(): void {
+    if (!this.consciousnessChoreographer) {
+      Y3K?.debug?.log(
+        "WebGLGradientBackgroundSystem",
+        "Consciousness choreographer not available, skipping registration"
+      );
+      return;
+    }
+
+    try {
+      this.consciousnessChoreographer.registerConsciousnessParticipant(this);
+      Y3K?.debug?.log(
+        "WebGLGradientBackgroundSystem",
+        "Successfully registered with consciousness choreographer"
+      );
+    } catch (error) {
+      Y3K?.debug?.error(
+        "WebGLGradientBackgroundSystem",
+        "Failed to register with consciousness choreographer:",
+        error
+      );
+    }
+  }
+
+  // ===================================================================
+  // BACKGROUND SYSTEM PARTICIPANT INTERFACE IMPLEMENTATION
+  // ===================================================================
+
+  // SystemName and systemPriority already declared above
+
+  public getConsciousnessContribution(): any {
+    return {
+      webglLuminosity: this.settings.flowStrength || 0.5,
+      shaderComplexity: this.isWebGLAvailable ? 0.8 : 0,
+      gpuUtilization: this.isWebGLAvailable ? 0.6 : 0,
+      renderingPipeline: "forward",
+      textureResolution: 1.0,
+    };
+  }
+
+  public onConsciousnessFieldUpdate(field: ConsciousnessField): void {
+    if (!this.isWebGLAvailable || !this.webglReady) return;
+
+    try {
+      this.currentConsciousnessField = field;
+
+      // Update shader uniforms based on consciousness field
+      this.updateShaderFromConsciousness(field);
+
+      Y3K?.debug?.log(
+        "WebGLGradientBackgroundSystem",
+        "Updated from consciousness field:",
+        {
+          rhythmicPulse: field.rhythmicPulse,
+          webglLuminosity: field.webglLuminosity,
+          emotionalTemperature: field.emotionalTemperature,
+        }
+      );
+    } catch (error) {
+      Y3K?.debug?.error(
+        "WebGLGradientBackgroundSystem",
+        "Error updating from consciousness field:",
+        error
+      );
+    }
+  }
+
+  public onChoreographyEvent(eventType: string, payload: any): void {
+    if (!this.isWebGLAvailable || !this.webglReady) return;
+
+    try {
+      switch (eventType) {
+        case "choreography:rhythm-shift":
+          // Adjust animation timing based on rhythm changes
+          this.frameThrottleInterval =
+            1000 / Math.max(30, Math.min(60, payload.newRhythm?.bpm / 2 || 45));
+          break;
+
+        case "choreography:energy-surge":
+          // Boost visual intensity during energy surges
+          if (this.cssConsciousnessController) {
+            const surgeIntensity = payload.intensity || 1.0;
+            this.cssConsciousnessController.queueCSSVariableUpdate(
+              "--sn-webgl-energy-surge",
+              surgeIntensity.toString()
+            );
+          }
+          break;
+
+        case "consciousness:breathing-cycle":
+          // Synchronize with breathing patterns
+          const breathingPhase = payload.phase || 0;
+          if (this.cssConsciousnessController) {
+            this.cssConsciousnessController.queueCSSVariableUpdate(
+              "--sn-webgl-breathing-sync",
+              breathingPhase.toString()
+            );
+          }
+          break;
+      }
+
+      Y3K?.debug?.log(
+        "WebGLGradientBackgroundSystem",
+        `Handled choreography event: ${eventType}`,
+        payload
+      );
+    } catch (error) {
+      Y3K?.debug?.error(
+        "WebGLGradientBackgroundSystem",
+        `Error handling choreography event ${eventType}:`,
+        error
+      );
+    }
+  }
+
+  /**
+   * Update WebGL shader parameters based on consciousness field
+   */
+  private updateShaderFromConsciousness(field: ConsciousnessField): void {
+    if (!this.gl || !this.shaderProgram) return;
+
+    // Modulate flow strength with rhythmic pulse
+    const consciousFlowStrength =
+      this.settings.flowStrength * (0.5 + field.rhythmicPulse * 0.5);
+    const flowStrengthLocation = this.gl.getUniformLocation(
+      this.shaderProgram,
+      "u_flowStrength"
+    );
+    if (flowStrengthLocation) {
+      this.gl.uniform1f(flowStrengthLocation, consciousFlowStrength);
+    }
+
+    // Modulate noise scale with musical flow
+    const consciousNoiseScale =
+      this.settings.noiseScale * (0.8 + field.musicalFlow.x * 0.4);
+    const noiseScaleLocation = this.gl.getUniformLocation(
+      this.shaderProgram,
+      "u_noiseScale"
+    );
+    if (noiseScaleLocation) {
+      this.gl.uniform1f(noiseScaleLocation, consciousNoiseScale);
+    }
+
+    // Update wave parameters with breathing cycle
+    const breathingModulation =
+      Math.sin(Date.now() * 0.001 * field.breathingCycle) * 0.1;
+    const waveYLocation = this.gl.getUniformLocation(
+      this.shaderProgram,
+      "u_waveY"
+    );
+    if (waveYLocation) {
+      const modulatedWaveY = [
+        this.settings.waveY[0] + breathingModulation,
+        this.settings.waveY[1] - breathingModulation,
+      ];
+      this.gl.uniform1fv(waveYLocation, modulatedWaveY);
+    }
+
+    // Apply consciousness-aware CSS variables for hybrid coordination
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        "--sn-webgl-consciousness-flow",
+        consciousFlowStrength.toString()
+      );
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        "--sn-webgl-consciousness-noise",
+        consciousNoiseScale.toString()
+      );
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        "--sn-webgl-breathing-phase",
+        breathingModulation.toString()
+      );
+    }
+  }
+
+  // ========================================================================
+  // QUALITY SCALING INTERFACE IMPLEMENTATION
+  // ========================================================================
+
+  /**
+   * Set quality level for WebGL rendering
+   */
+  public setQualityLevel(level: QualityLevel): void {
+    this.currentQualityLevel = level;
+
+    // Adjust WebGL settings based on quality level
+    switch (level.level) {
+      case "minimal":
+        this.settings.flowStrength = 0.3;
+        this.settings.noiseScale = 0.8;
+        this.settings.waveHeight = [0.2, 0.15];
+        this.settings.blurExp = 0.8;
+        this.settings.blurMax = 0.3;
+        this.frameThrottleInterval = 1000 / 20; // 20 FPS
+        // Disable WebGL if necessary
+        if (!level.features.webgl) {
+          this.fallbackToCSSGradient();
+          return;
+        }
+        break;
+
+      case "low":
+        this.settings.flowStrength = 0.5;
+        this.settings.noiseScale = 1.0;
+        this.settings.waveHeight = [0.3, 0.2];
+        this.settings.blurExp = 1.0;
+        this.settings.blurMax = 0.4;
+        this.frameThrottleInterval = 1000 / 30; // 30 FPS
+        break;
+
+      case "medium":
+        this.settings.flowStrength = 0.7;
+        this.settings.noiseScale = 1.2;
+        this.settings.waveHeight = [0.4, 0.3];
+        this.settings.blurExp = 1.2;
+        this.settings.blurMax = 0.6;
+        this.frameThrottleInterval = 1000 / 45; // 45 FPS
+        break;
+
+      case "high":
+        this.settings.flowStrength = 0.9;
+        this.settings.noiseScale = 1.4;
+        this.settings.waveHeight = [0.5, 0.4];
+        this.settings.blurExp = 1.3;
+        this.settings.blurMax = 0.7;
+        this.frameThrottleInterval = 1000 / 60; // 60 FPS
+        break;
+
+      case "ultra":
+        this.settings.flowStrength = 1.0;
+        this.settings.noiseScale = 1.6;
+        this.settings.waveHeight = [0.6, 0.5];
+        this.settings.blurExp = 1.4;
+        this.settings.blurMax = 0.8;
+        this.frameThrottleInterval = 1000 / 60; // 60 FPS
+        break;
+    }
+
+    // Update quality capabilities based on current level
+    this.updateQualityCapabilities(level);
+
+    Y3K?.debug?.log(
+      "WebGLGradientBackgroundSystem",
+      `Quality level set to: ${level.level}`,
+      {
+        flowStrength: this.settings.flowStrength,
+        frameRate: 1000 / this.frameThrottleInterval,
+      }
+    );
+  }
+
+  /**
+   * Get current performance impact metrics
+   */
+  public getPerformanceImpact(): PerformanceMetrics {
+    const currentFPS = this.lastFrameTime > 0 ? 1000 / this.lastFrameTime : 60;
+    const memoryUsage = this.estimateMemoryUsage();
+
+    return {
+      fps: currentFPS,
+      frameTime: this.lastFrameTime,
+      memoryUsageMB: memoryUsage,
+      cpuUsagePercent: this.estimateCPUUsage(),
+      gpuUsagePercent: this.isWebGLAvailable ? 25 : 5,
+      renderTime: this.lastFrameTime,
+      timestamp: performance.now(),
+    };
+  }
+
+  /**
+   * Reduce quality by specified amount
+   */
+  public reduceQuality(amount: number): void {
+    // Apply quality reduction adjustments
+    this.qualityAdjustments["flow-reduction"] =
+      (this.qualityAdjustments["flow-reduction"] || 0) + amount;
+    this.qualityAdjustments["noise-reduction"] =
+      (this.qualityAdjustments["noise-reduction"] || 0) + amount * 0.8;
+    this.qualityAdjustments["wave-reduction"] =
+      (this.qualityAdjustments["wave-reduction"] || 0) + amount * 0.6;
+
+    // Apply reductions to current settings
+    this.settings.flowStrength = Math.max(
+      0.1,
+      this.settings.flowStrength * (1 - amount)
+    );
+    this.settings.noiseScale = Math.max(
+      0.5,
+      this.settings.noiseScale * (1 - amount * 0.8)
+    );
+    this.settings.waveHeight = [
+      Math.max(0.1, this.settings.waveHeight[0] * (1 - amount * 0.6)),
+      Math.max(0.1, this.settings.waveHeight[1] * (1 - amount * 0.6)),
+    ];
+
+    // Reduce frame rate if necessary
+    if (amount > 0.5) {
+      this.frameThrottleInterval = Math.min(
+        1000 / 15,
+        this.frameThrottleInterval * (1 + amount)
+      );
+    }
+
+    Y3K?.debug?.log(
+      "WebGLGradientBackgroundSystem",
+      `Quality reduced by ${amount}`,
+      this.settings
+    );
+  }
+
+  /**
+   * Increase quality by specified amount
+   */
+  public increaseQuality(amount: number): void {
+    // Remove previous reductions first
+    Object.keys(this.qualityAdjustments).forEach((key) => {
+      this.qualityAdjustments[key] = Math.max(
+        0,
+        (this.qualityAdjustments[key] || 0) - amount
+      );
+    });
+
+    // Restore quality settings based on current level
+    if (this.currentQualityLevel) {
+      const baseSettings =
+        this.getBaseSettingsForLevel(this.currentQualityLevel.level) ||
+        this.settings;
+
+      // Gradually restore towards base settings
+      this.settings.flowStrength = Math.min(
+        baseSettings.flowStrength,
+        this.settings.flowStrength * (1 + amount * 0.5)
+      );
+      this.settings.noiseScale = Math.min(
+        baseSettings.noiseScale,
+        this.settings.noiseScale * (1 + amount * 0.3)
+      );
+
+      // Restore frame rate
+      this.frameThrottleInterval = Math.max(
+        1000 / this.currentQualityLevel.targetFPS,
+        this.frameThrottleInterval * (1 - amount * 0.3)
+      );
+    }
+
+    Y3K?.debug?.log(
+      "WebGLGradientBackgroundSystem",
+      `Quality increased by ${amount}`,
+      this.settings
+    );
+  }
+
+  /**
+   * Get quality capabilities for this system
+   */
+  public getQualityCapabilities(): QualityCapability[] {
+    return [...this.qualityCapabilities];
+  }
+
+  // ========================================================================
+  // QUALITY SCALING HELPER METHODS
+  // ========================================================================
+
+  private updateQualityCapabilities(level: QualityLevel): void {
+    // Update capability states based on quality level
+    this.qualityCapabilities.forEach((capability) => {
+      switch (capability.name) {
+        case "webgl-rendering":
+          capability.enabled = level.features.webgl;
+          break;
+        case "shader-complexity":
+          capability.enabled = level.features.shaders;
+          break;
+        case "blur-effects":
+          capability.enabled = level.features.blur;
+          break;
+        default:
+          capability.enabled = level.level !== "minimal";
+      }
+    });
+  }
+
+  private getBaseSettingsForLevel(level: string): FlowGradientSettings {
+    const baseSettings = { ...this.settings };
+
+    switch (level) {
+      case "minimal":
+        return { ...baseSettings, flowStrength: 0.3, noiseScale: 0.8 };
+      case "low":
+        return { ...baseSettings, flowStrength: 0.5, noiseScale: 1.0 };
+      case "medium":
+        return { ...baseSettings, flowStrength: 0.7, noiseScale: 1.2 };
+      case "high":
+        return { ...baseSettings, flowStrength: 0.9, noiseScale: 1.4 };
+      case "ultra":
+        return { ...baseSettings, flowStrength: 1.0, noiseScale: 1.6 };
+      default:
+        return baseSettings;
+    }
+  }
+
+  private estimateMemoryUsage(): number {
+    let usage = 5; // Base WebGL context memory
+
+    if (this.canvas && this.gl) {
+      const pixels = this.canvas.width * this.canvas.height;
+      usage += (pixels * 4) / (1024 * 1024); // RGBA texture memory
+
+      if (this.gradientTexture) usage += 1; // Gradient texture
+      if (this.vertexBuffer) usage += 0.1; // Vertex buffer
+    }
+
+    return usage;
+  }
+
+  private estimateCPUUsage(): number {
+    const baseUsage = this.isWebGLAvailable ? 5 : 15; // WebGL vs CSS
+    const qualityMultiplier =
+      this.settings.flowStrength + this.settings.noiseScale / 2;
+
+    return Math.min(50, baseUsage * qualityMultiplier);
   }
 }

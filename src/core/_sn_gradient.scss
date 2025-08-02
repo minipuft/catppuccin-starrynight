@@ -25,27 +25,27 @@
   --sn-gradient-primary: var(--spice-accent);
   --sn-gradient-secondary: var(--spice-surface0);
 
-  /* RGB versions for components that need them*/
-  --sn-gradient-primary-rgb: var(--spice-rgb-accent);
-  --sn-gradient-secondary-rgb: var(--spice-rgb-surface0);
-  --sn-gradient-accent-rgb: var(--spice-rgb-surface1);
+  /* RGB versions for components - now inherit from OKLAB musical harmony*/
+  --sn-gradient-primary-rgb: var(--sn-musical-harmony-primary-rgb, var(--spice-rgb-accent));
+  --sn-gradient-secondary-rgb: var(--sn-musical-harmony-secondary-rgb, var(--spice-rgb-surface0));
+  --sn-gradient-accent-rgb: var(--sn-musical-harmony-tertiary-rgb, var(--spice-rgb-surface1));
 
-  /* 🌌 YEAR 3000 ARTISTIC PARAMETERS - CONSCIOUSNESS ENHANCED Bold Expression Mode!*/
+  /* 🌌 YEAR 3000 ARTISTIC PARAMETERS - CONSCIOUSNESS ENHANCED with Brightness Mode Integration!*/
   --sn-gradient-opacity: calc(
-    0.28 + (var(--gradient-beat-intensity) * 0.15) + (var(--sn-gradient-consciousness-level) * 0.1)
-  ); /* PULSES with beats and consciousness!*/
+    var(--sn-bg-gradient-opacity, 0.28) + (var(--gradient-beat-intensity) * 0.15) + (var(--sn-gradient-consciousness-level) * 0.1)
+  ); /* PULSES with beats and consciousness, respects brightness mode!*/
   --sn-gradient-blur: calc(
     8px + (var(--gradient-beat-intensity) * 3px) + (var(--sn-gradient-nebula-density) * 4px)
   ); /* Dynamic blur with rhythm and nebula density - reduced for visibility*/
   --sn-gradient-saturation: calc(
-    1.45 + (var(--gradient-beat-intensity) * 0.25) + (var(--sn-gradient-emotional-valence) * 0.3)
-  ); /* VIBRANT with rhythm and emotional valence!*/
+    var(--sn-bg-gradient-saturation, 1.45) + (var(--gradient-beat-intensity) * 0.25) + (var(--sn-gradient-emotional-valence) * 0.3)
+  ); /* VIBRANT with rhythm and emotional valence, respects brightness mode!*/
   --sn-gradient-brightness: calc(
-    1.25 + (var(--gradient-beat-intensity) * 0.15) + (var(--sn-gradient-cosmic-energy) * 0.2)
-  ); /* LUMINOUS with beats and cosmic energy!*/
+    var(--sn-bg-gradient-brightness, 1.25) + (var(--gradient-beat-intensity) * 0.15) + (var(--sn-gradient-cosmic-energy) * 0.2)
+  ); /* LUMINOUS with beats and cosmic energy, respects brightness mode!*/
   --sn-gradient-contrast: calc(
-    1.35 + (var(--gradient-beat-intensity) * 0.2) + (var(--sn-gradient-harmonic-resonance) * 0.15)
-  ); /* IMPACTFUL with rhythm and harmonic resonance!*/
+    var(--sn-bg-gradient-contrast, 1.35) + (var(--gradient-beat-intensity) * 0.2) + (var(--sn-gradient-harmonic-resonance) * 0.15)
+  ); /* IMPACTFUL with rhythm and harmonic resonance, respects brightness mode!*/
 
   /* 🎵 MUSIC-RESPONSIVE VARIABLES - Cosmic Synchronization*/
   --sn-music-energy: 0.5; /* Set by music analysis (0.0 - 1.0)*/

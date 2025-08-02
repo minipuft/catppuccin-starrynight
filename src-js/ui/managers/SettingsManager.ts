@@ -3,6 +3,7 @@ import {
   YEAR3000_CONFIG as Config,
   HARMONIC_MODES as Modes,
 } from "@/config/globalConfig";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import type { HarmonicMode } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import * as Utils from "@/utils/core/Year3000Utilities";
@@ -52,6 +53,8 @@ export interface ThemeSettings {
   "sn-glass-base-intensity": string;
   /** Flow Gradient: WebGL flowing gradient background intensity */
   "sn-flow-gradient": "disabled" | "minimal" | "balanced" | "intense";
+  /** Brightness Mode: Controls overall theme brightness and contrast levels */
+  "sn-brightness-mode": "bright" | "balanced" | "dark";
 }
 
 type ValidationSchema = {
@@ -118,6 +121,7 @@ export class SettingsManager implements IManagedSystem {
       "sn-glass-beat-pulse": "true",
       "sn-glass-base-intensity": "0.5",
       "sn-flow-gradient": "balanced",
+      "sn-brightness-mode": "bright",
     };
 
     this.validationSchemas = {
@@ -208,6 +212,10 @@ export class SettingsManager implements IManagedSystem {
       "sn-flow-gradient": {
         default: "balanced",
         allowedValues: ["disabled", "minimal", "balanced", "intense"],
+      },
+      "sn-brightness-mode": {
+        default: "bright",
+        allowedValues: ["bright", "balanced", "dark"],
       },
     };
 
@@ -300,13 +308,25 @@ export class SettingsManager implements IManagedSystem {
         return false;
       }
 
+      // Get old value for change tracking
+      const oldValue = Spicetify.LocalStorage.get(key);
+      
       Spicetify.LocalStorage.set(key, value as string);
 
+      // Emit legacy DOM event for backward compatibility
       document.dispatchEvent(
         new CustomEvent("year3000SystemSettingsChanged", {
           detail: { key, value },
         })
       );
+
+      // Emit type-safe UnifiedEventBus event for optimized systems
+      unifiedEventBus.emitSync('settings:changed', {
+        settingKey: key,
+        oldValue,
+        newValue: value,
+        timestamp: Date.now()
+      });
 
       return true;
     } catch (error) {

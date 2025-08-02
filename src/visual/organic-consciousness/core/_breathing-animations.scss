@@ -5,23 +5,38 @@
 // === CORE BREATHING KEYFRAMES ===
 // Fundamental breathing patterns synchronized with music tempo and user consciousness
 
-// Global organic breathing (for main containers)
+// Global organic breathing (for main containers) - NO TRANSFORMS to prevent UI bouncing
 @keyframes organic-global-breathing {
   0% {
-    transform: scale(1.0);
     filter: saturate(1.0) brightness(1.0);
   }
   
   50% {
-    transform: scale(calc(1.0 + var(--organic-breathing-amplitude, 0.05) * 0.5));
     filter: 
       saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.05))
-      brightness(calc(1.0 + var(--organic-breathing-amplitude, 0.05) * 0.5));
+      brightness(calc(1.0 + var(--organic-breathing-amplitude, 0.05) * 0.1));
+  }
+  
+  100% {
+    filter: saturate(1.0) brightness(1.0);
+  }
+}
+
+// Root background breathing (for transform effects without affecting UI position)
+@keyframes organic-root-background-breathing {
+  0% {
+    transform: scale(1.0);
+    opacity: var(--organic-fog-opacity, 0.02);
+  }
+  
+  50% {
+    transform: scale(calc(1.0 + var(--organic-breathing-amplitude, 0.05) * 0.5));
+    opacity: calc(var(--organic-fog-opacity, 0.02) * 1.5);
   }
   
   100% {
     transform: scale(1.0);
-    filter: saturate(1.0) brightness(1.0);
+    opacity: var(--organic-fog-opacity, 0.02);
   }
 }
 
@@ -34,26 +49,26 @@
   }
   
   25% {
-    transform: scale(calc(var(--organic-growth-scale, 1.0) * (1.0 + var(--organic-breathing-amplitude, 0.05) * 0.3)));
-    opacity: calc(1.0 + var(--organic-breathing-amplitude, 0.05) * 0.1);
+    transform: scale(calc(var(--organic-growth-scale, 1.0) * (1.0 + var(--organic-breathing-amplitude, 0.015) * var(--breathing-context-multiplier, 1.0) * 0.3)));
+    opacity: calc(1.0 + var(--organic-breathing-amplitude, 0.015) * var(--breathing-context-multiplier, 1.0) * 0.1);
     filter: 
-      blur(calc(var(--organic-breathing-amplitude, 0.05) * 0.5px))
+      blur(calc(var(--organic-breathing-amplitude, 0.015) * var(--breathing-context-multiplier, 1.0) * 0.5px))
       saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.1));
   }
   
   50% {
-    transform: scale(calc(var(--organic-growth-scale, 1.0) * (1.0 + var(--organic-breathing-amplitude, 0.05) * 0.5)));
-    opacity: calc(1.0 + var(--organic-breathing-amplitude, 0.05) * 0.2);
+    transform: scale(calc(var(--organic-growth-scale, 1.0) * (1.0 + var(--organic-breathing-amplitude, 0.015) * var(--breathing-context-multiplier, 1.0) * 0.5)));
+    opacity: calc(1.0 + var(--organic-breathing-amplitude, 0.015) * var(--breathing-context-multiplier, 1.0) * 0.2);
     filter: 
-      blur(calc(var(--organic-breathing-amplitude, 0.05) * 1px))
+      blur(calc(var(--organic-breathing-amplitude, 0.015) * var(--breathing-context-multiplier, 1.0) * 1px))
       saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.15));
   }
   
   75% {
-    transform: scale(calc(var(--organic-growth-scale, 1.0) * (1.0 + var(--organic-breathing-amplitude, 0.05) * 0.3)));
-    opacity: calc(1.0 + var(--organic-breathing-amplitude, 0.05) * 0.1);
+    transform: scale(calc(var(--organic-growth-scale, 1.0) * (1.0 + var(--organic-breathing-amplitude, 0.015) * var(--breathing-context-multiplier, 1.0) * 0.3)));
+    opacity: calc(1.0 + var(--organic-breathing-amplitude, 0.015) * var(--breathing-context-multiplier, 1.0) * 0.1);
     filter: 
-      blur(calc(var(--organic-breathing-amplitude, 0.05) * 0.5px))
+      blur(calc(var(--organic-breathing-amplitude, 0.015) * var(--breathing-context-multiplier, 1.0) * 0.5px))
       saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.1));
   }
   
@@ -74,8 +89,8 @@
   }
   
   50% {
-    border-width: calc(var(--organic-membrane-thickness, 2px) * (1.0 + var(--organic-breathing-amplitude, 0.05) * 2));
-    opacity: calc(var(--organic-membrane-opacity, 0.3) * (1.0 + var(--organic-breathing-amplitude, 0.05) * 1.5));
+    border-width: calc(var(--organic-membrane-thickness, 2px) * (1.0 + var(--organic-breathing-amplitude, 0.015) * var(--breathing-context-multiplier, 1.0) * 2));
+    opacity: calc(var(--organic-membrane-opacity, 0.3) * (1.0 + var(--organic-breathing-amplitude, 0.015) * var(--breathing-context-multiplier, 1.0) * 1.5));
     box-shadow: 
       0 0 calc(var(--organic-membrane-thickness, 2px) * 3) rgba(var(--organic-primary-rgb, 205, 214, 244), calc(var(--organic-glow-opacity, 0.1) * 1.5)),
       inset 0 0 calc(var(--organic-membrane-thickness, 2px) * 1.5) rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 2));
@@ -242,6 +257,29 @@
   }
 }
 
+// === CONTEXT-AWARE BREATHING CLASSES ===
+
+// Subtle breathing for background elements
+.organic-breathing-subtle {
+  --breathing-context-multiplier: var(--organic-breathing-subtle, 0.5);
+}
+
+// Standard breathing for core music elements  
+.organic-breathing-standard {
+  --breathing-context-multiplier: var(--organic-breathing-standard, 1.0);
+}
+
+// Enhanced breathing for emotional elements
+.organic-breathing-enhanced {
+  --breathing-context-multiplier: var(--organic-breathing-enhanced, 1.5);
+}
+
+// Disabled breathing for static elements
+.organic-breathing-disabled {
+  --breathing-context-multiplier: var(--organic-breathing-disabled, 0.0);
+  animation: none !important;
+}
+
 // === BREATHING TYPE VARIATIONS ===
 
 // Gentle breathing (for calm/meditative states)
@@ -291,7 +329,6 @@
 @media (prefers-reduced-motion: reduce) {
   // Disable all breathing animations
   [class*="organic-breathing"],
-  .organic-cellular-membrane,
   .organic-membrane-host.organic-consciousness-enabled {
     animation: none !important;
     transition-duration: 0.1s !important;
@@ -317,7 +354,6 @@
 // Performance optimization for low-end devices
 @media (update: slow) {
   // Simplified breathing for low-power devices
-  .organic-cellular-membrane,
   [class*="organic-breathing"] {
     animation-duration: calc(var(--organic-breathing-cycle, 1s) * 2) !important;
     animation-fill-mode: both !important;
@@ -346,20 +382,4 @@
     outline-offset: 1px;
   }
   
-  .organic-cellular-membrane {
-    // Debug breathing indicators
-    &::before {
-      content: '🫁 BREATHING';
-      position: absolute;
-      top: -30px;
-      right: 0;
-      font-size: 10px;
-      color: cyan;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 2px 4px;
-      border-radius: 2px;
-      pointer-events: none;
-      z-index: 9999;
-    }
-  }
 }

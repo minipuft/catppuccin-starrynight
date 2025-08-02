@@ -16,7 +16,13 @@
   // === BREATHING RHYTHM VARIABLES ===
   --organic-breathing-cycle: 1.0s;               // Breathing cycle duration
   --organic-breathing-frequency: 1.0;            // Breathing frequency (Hz)
-  --organic-breathing-amplitude: 0.05;           // Breathing amplitude (0-0.2)
+  --organic-breathing-amplitude: 0.015;          // Breathing amplitude (0-0.2) - Subtle for Year 3000 design
+  
+  // === CONTEXT-AWARE BREATHING STRENGTH ===
+  --organic-breathing-subtle: 0.5;               // Subtle breathing (0.5x amplitude) - background elements
+  --organic-breathing-standard: 1.0;             // Standard breathing (1.0x amplitude) - music elements
+  --organic-breathing-enhanced: 1.5;             // Enhanced breathing (1.5x amplitude) - emotional elements
+  --organic-breathing-disabled: 0.0;             // Disabled breathing (0x amplitude) - static elements
   
   // === EMOTIONAL TEMPERATURE VARIABLES ===
   --organic-emotional-temperature: 6500;         // Color temperature in Kelvin (1000K-20000K)
@@ -98,8 +104,8 @@
   transform: translateZ(0);
   backface-visibility: hidden;
   
-  // Organic consciousness breathing
-  animation: organic-element-breathing var(--organic-breathing-cycle) ease-in-out infinite;
+  // Organic consciousness breathing - DISABLED: Caused global app bouncing
+  // animation: organic-element-breathing var(--organic-breathing-cycle) ease-in-out infinite;
   
   // Consciousness enhancement
   filter: saturate(calc(1 + var(--organic-emotional-saturation) * 0.1));
@@ -110,64 +116,30 @@
     transform var(--organic-transition-medium) var(--organic-ease-consciousness);
 }
 
-// Cellular membrane mixin
-@mixin organic-cellular-membrane($priority: 'medium') {
-  // Membrane properties
-  position: absolute;
-  top: calc(var(--organic-membrane-thickness) * -1);
-  left: calc(var(--organic-membrane-thickness) * -1);
-  right: calc(var(--organic-membrane-thickness) * -1);
-  bottom: calc(var(--organic-membrane-thickness) * -1);
-  
-  // Visual membrane
-  border: var(--organic-membrane-thickness) solid rgba(var(--organic-primary-rgb), var(--organic-membrane-opacity));
-  border-radius: inherit;
-  
-  // Membrane breathing
-  animation: organic-membrane-breathing var(--organic-breathing-cycle) ease-in-out infinite;
-  
-  // Pointer events
-  pointer-events: none;
-  z-index: var(--organic-depth-mid);
-  
-  // Performance
-  contain: strict;
-  will-change: border-color, border-width, opacity;
-  
-  // Priority-based intensity
-  @if $priority == 'high' {
-    --membrane-priority-multiplier: 1.5;
-  } @else if $priority == 'medium' {
-    --membrane-priority-multiplier: 1.0;
-  } @else {
-    --membrane-priority-multiplier: 0.6;
-  }
-  
-  border-width: calc(var(--organic-membrane-thickness) * var(--membrane-priority-multiplier, 1.0));
-  opacity: calc(var(--organic-membrane-opacity) * var(--membrane-priority-multiplier, 1.0));
-}
 
 // Organic glow effect mixin
 @mixin organic-glow-effect($color: 'primary', $intensity: 1.0) {
   // Glow properties based on color
+  $glow-rgb: null;
   @if $color == 'primary' {
-    $glow-rgb: var(--organic-primary-rgb);
+    $glow-rgb: var(--organic-primary-rgb) !global;
   } @else if $color == 'accent' {
-    $glow-rgb: var(--organic-accent-rgb);
+    $glow-rgb: var(--organic-accent-rgb) !global;
   } @else if $color == 'neon' {
-    $glow-rgb: var(--organic-neon-glow-rgb);
+    $glow-rgb: var(--organic-neon-glow-rgb) !global;
   } @else {
-    $glow-rgb: $color;
+    $glow-rgb: $color !global;
   }
   
-  // Multi-layered organic glow
+  // Multi-layered organic glow (using CSS custom properties for dynamic color values)
+  --glow-intensity: #{$intensity};
   box-shadow:
-    0 0 calc(var(--organic-membrane-thickness) * 2 * #{$intensity}) rgba(#{$glow-rgb}, calc(var(--organic-glow-opacity) * #{$intensity})),
-    0 0 calc(var(--organic-membrane-thickness) * 4 * #{$intensity}) rgba(#{$glow-rgb}, calc(var(--organic-glow-opacity) * #{$intensity} * 0.5)),
-    inset 0 0 calc(var(--organic-membrane-thickness) * 1 * #{$intensity}) rgba(#{$glow-rgb}, calc(var(--organic-glow-opacity) * #{$intensity} * 0.3));
+    0 0 calc(var(--organic-membrane-thickness) * 2 * var(--glow-intensity)) rgba(var(--organic-accent-rgb), calc(var(--organic-glow-opacity) * var(--glow-intensity))),
+    0 0 calc(var(--organic-membrane-thickness) * 4 * var(--glow-intensity)) rgba(var(--organic-accent-rgb), calc(var(--organic-glow-opacity) * var(--glow-intensity) * 0.5)),
+    inset 0 0 calc(var(--organic-membrane-thickness) * 1 * var(--glow-intensity)) rgba(var(--organic-accent-rgb), calc(var(--organic-glow-opacity) * var(--glow-intensity) * 0.3));
   
   // Glow breathing
-  animation: organic-glow-pulse var(--organic-breathing-cycle) ease-in-out infinite;
+  // animation: organic-glow-pulse var(--organic-breathing-cycle) ease-in-out infinite; // DISABLED: Caused global app bouncing
 }
 
 // Organic interaction states mixin

@@ -5,7 +5,7 @@
 
 // Import spicetify types via triple-slash directive
 /// <reference path="../../../types/spicetify.d.ts" />
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 
 declare const Spicetify: any;
 
@@ -39,7 +39,7 @@ export interface VariantContext {
 
 export class VariantResolver {
   private config: VariantConfig;
-  private cssVariableBatcher: CSSVariableBatcher | null = null;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController | null = null;
   private variantCache: Map<string, VariantMapping> = new Map();
   private initialized: boolean = false;
 
@@ -258,8 +258,8 @@ export class VariantResolver {
     };
   }
 
-  public initialize(cssVariableBatcher?: CSSVariableBatcher): void {
-    this.cssVariableBatcher = cssVariableBatcher || null;
+  public initialize(cssConsciousnessController?: UnifiedCSSConsciousnessController): void {
+    this.cssConsciousnessController = cssConsciousnessController || null;
     this.initialized = true;
     
     // Generate CSS variables for all variants
@@ -268,7 +268,7 @@ export class VariantResolver {
     if (this.config.enableDebug) {
       console.log("📝 [VariantResolver] Initialized with", {
         variants: VariantResolver.VARIANT_MAPPINGS.length,
-        batcherAvailable: !!this.cssVariableBatcher,
+        batcherAvailable: !!this.cssConsciousnessController,
         config: this.config
       });
     }
@@ -353,16 +353,16 @@ export class VariantResolver {
   }
 
   private setCSSVariable(property: string, value: string): void {
-    if (this.cssVariableBatcher) {
-      this.cssVariableBatcher.queueCSSVariableUpdate(property, value);
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.queueCSSVariableUpdate(property, value);
     } else {
       document.documentElement.style.setProperty(property, value);
     }
   }
 
   public flushUpdates(): void {
-    if (this.cssVariableBatcher) {
-      this.cssVariableBatcher.flushCSSVariableBatch();
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.flushCSSVariableBatch();
     }
   }
 
@@ -381,7 +381,7 @@ export class VariantResolver {
 
   public destroy(): void {
     this.variantCache.clear();
-    this.cssVariableBatcher = null;
+    this.cssConsciousnessController = null;
     this.initialized = false;
   }
 }

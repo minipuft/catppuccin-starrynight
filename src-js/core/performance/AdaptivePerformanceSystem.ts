@@ -118,6 +118,15 @@ export class AdaptivePerformanceSystem {
   private boundPerformanceCheck: (() => void) | null = null;
   private boundThermalCheck: (() => void) | null = null;
   
+  // Circuit breaker for dependency validation
+  private dependencyCircuitBreaker = {
+    failures: 0,
+    lastFailure: 0,
+    isOpen: false,
+    openDuration: 30000, // 30 seconds
+    maxFailures: 5
+  };
+  
   // Quality scaling algorithms
   private qualityScales = {
     ultra: { complexity: 1.0, particles: 1.0, fps: 60, precision: "highp" as const },
@@ -422,10 +431,22 @@ export class AdaptivePerformanceSystem {
     if (performance.now() - this.lastAdaptation < this.adaptationCooldown) return;
     if (this.performanceHistory.length < 5) return;
     
+    // Dependency validation: Don't adapt if core systems aren't ready
+    if (!this.validateCoreDependencies()) {
+      Y3K?.debug?.log("AdaptivePerformanceSystem", "Skipping adaptation - core dependencies not ready");
+      return;
+    }
+    
     const recent = this.performanceHistory.slice(-5);
     const avgFPS = recent.reduce((sum, entry) => sum + entry.fps, 0) / recent.length;
     const avgMemory = recent.reduce((sum, entry) => sum + entry.memoryUsage, 0) / recent.length;
     const avgFrameTime = recent.reduce((sum, entry) => sum + entry.frameTime, 0) / recent.length;
+    
+    // Enhanced validation: Skip adaptation if we're in a degraded state
+    if (this.isInDegradedState(avgFPS, avgFrameTime)) {
+      Y3K?.debug?.log("AdaptivePerformanceSystem", "Skipping adaptation - system in degraded state");
+      return;
+    }
     
     // Check for performance issues
     const fpsIssue = avgFPS < this.currentProfile.targetFPS * 0.8;
@@ -450,15 +471,146 @@ export class AdaptivePerformanceSystem {
     return fpsHeadroom && memoryHeadroom && frameTimeHeadroom && noThermalIssues;
   }
 
+  /**
+   * Check if circuit breaker is open (preventing dependency checks)
+   */
+  private isCircuitBreakerOpen(): boolean {
+    const now = performance.now();
+    
+    if (this.dependencyCircuitBreaker.isOpen) {
+      // Check if enough time has passed to try again
+      if (now - this.dependencyCircuitBreaker.lastFailure > this.dependencyCircuitBreaker.openDuration) {
+        this.dependencyCircuitBreaker.isOpen = false;
+        this.dependencyCircuitBreaker.failures = 0;
+        Y3K?.debug?.log("AdaptivePerformanceSystem", "Circuit breaker reset - attempting dependency validation");
+        return false;
+      }
+      return true;
+    }
+    
+    return false;
+  }
+  
+  /**
+   * Record dependency validation failure
+   */
+  private recordDependencyFailure(): void {
+    this.dependencyCircuitBreaker.failures++;
+    this.dependencyCircuitBreaker.lastFailure = performance.now();
+    
+    if (this.dependencyCircuitBreaker.failures >= this.dependencyCircuitBreaker.maxFailures) {
+      this.dependencyCircuitBreaker.isOpen = true;
+      Y3K?.debug?.warn("AdaptivePerformanceSystem", `Circuit breaker opened after ${this.dependencyCircuitBreaker.failures} failures`);
+    }
+  }
+  
+  /**
+   * Validate that core dependencies are properly initialized before making performance adaptations
+   * Prevents cascade loops when systems report as "loaded" but not fully initialized
+   */
+  private validateCoreDependencies(): boolean {
+    // Check circuit breaker first
+    if (this.isCircuitBreakerOpen()) {
+      return false;
+    }
+    
+    try {
+      const year3000System = (globalThis as any).year3000System;
+      if (!year3000System) {
+        this.recordDependencyFailure();
+        return false;
+      }
+
+      // Check if facade coordinator is available and initialized
+      const facadeCoordinator = year3000System.facadeCoordinator;
+      if (!facadeCoordinator) {
+        this.recordDependencyFailure();
+        return false;
+      }
+
+      // Check critical systems that affect performance measurements
+      const criticalSystems = [
+        'MusicSyncService',
+        'ColorHarmonyEngine', 
+        'UnifiedCSSConsciousnessController',
+        'PerformanceAnalyzer'
+      ];
+
+      for (const systemName of criticalSystems) {
+        try {
+          // Check if system is available via facade
+          let system = null;
+          try {
+            system = facadeCoordinator.getCachedNonVisualSystem?.(systemName);
+          } catch (e) {
+            // If facade method fails, try alternative access
+            const camelCaseName = systemName.charAt(0).toLowerCase() + systemName.slice(1);
+            system = year3000System[camelCaseName];
+          }
+
+          if (!system) {
+            this.recordDependencyFailure();
+            return false;
+          }
+
+          // Check if system is actually initialized (not just loaded)
+          if (typeof system.initialized === 'boolean' && !system.initialized) {
+            this.recordDependencyFailure();
+            return false;
+          }
+        } catch (error) {
+          this.recordDependencyFailure();
+          return false;
+        }
+      }
+
+      // Reset circuit breaker on success
+      this.dependencyCircuitBreaker.failures = 0;
+      return true;
+    } catch (error) {
+      Y3K?.debug?.error("AdaptivePerformanceSystem", "Dependency validation failed:", error);
+      this.recordDependencyFailure();
+      return false;
+    }
+  }
+
+  /**
+   * Check if system is in a degraded state that should prevent performance adaptations
+   * Prevents endless downgrading when performance data is unreliable
+   */
+  private isInDegradedState(avgFPS: number, avgFrameTime: number): boolean {
+    // If we're already at minimum quality settings, don't keep adapting down
+    const isMinimalQuality = this.currentQuality.gradientComplexity <= 0.15 &&
+                            this.currentQuality.particleDensity <= 0.15 &&
+                            this.currentQuality.animationFPS <= 20;
+
+    // If performance is extremely poor, this might indicate system issues rather than load
+    const isExtremelyPoor = avgFPS < 10 || avgFrameTime > 100;
+
+    // Circuit breaker: if we've adapted down too many times recently, stop
+    const recentAdaptations = this.performanceHistory.filter(entry => 
+      entry.timestamp > performance.now() - 30000 // Last 30 seconds
+    ).length;
+    const tooManyAdaptations = recentAdaptations > 10;
+
+    return isMinimalQuality || isExtremelyPoor || tooManyAdaptations;
+  }
+
   private adaptPerformanceDown(): void {
     const oldQuality = { ...this.currentQuality };
+    
+    // Circuit breaker: if we're already at minimum settings, stop adapting down
+    if (this.isInDegradedState(0, 0)) {
+      Y3K?.debug?.warn("AdaptivePerformanceSystem", "Circuit breaker activated - preventing further quality reduction");
+      return;
+    }
     
     // Reduce quality settings
     this.currentQuality.gradientComplexity = Math.max(0.1, this.currentQuality.gradientComplexity * 0.8);
     this.currentQuality.particleDensity = Math.max(0.1, this.currentQuality.particleDensity * 0.8);
     
     if (this.currentQuality.animationFPS > 24) {
-      this.currentQuality.animationFPS = Math.max(24, this.currentQuality.animationFPS - 15);
+      this.currentQuality.animationFPS = Math.max(15, this.currentQuality.animationFPS - 15);
     }
     
     // Disable expensive effects
@@ -490,6 +642,12 @@ export class AdaptivePerformanceSystem {
   private adaptPerformanceUp(): void {
     const oldQuality = { ...this.currentQuality };
     
+    // Enhanced recovery conditions: Only scale up if systems are stable
+    if (!this.canRecoverQuality()) {
+      Y3K?.debug?.log("AdaptivePerformanceSystem", "Skipping quality recovery - conditions not met");
+      return;
+    }
+    
     // Increase quality settings gradually
     this.currentQuality.gradientComplexity = Math.min(1.0, this.currentQuality.gradientComplexity * 1.1);
     this.currentQuality.particleDensity = Math.min(1.0, this.currentQuality.particleDensity * 1.1);
@@ -519,6 +677,32 @@ export class AdaptivePerformanceSystem {
       complexity: this.currentQuality.gradientComplexity,
       fps: this.currentQuality.animationFPS
     });
+  }
+
+  /**
+   * Determine if quality can be recovered safely
+   * Prevents premature scaling up when system is still unstable
+   */
+  private canRecoverQuality(): boolean {
+    // Require longer stability period before recovering quality
+    const stableHistoryRequired = 10; // 10 seconds of good performance
+    const stabilityWindow = performance.now() - 10000;
+    
+    const stableHistory = this.performanceHistory.filter(entry => 
+      entry.timestamp > stabilityWindow && 
+      entry.fps >= this.currentProfile.targetFPS * 0.9 &&
+      entry.frameTime <= this.currentBudget.frameTimeMs
+    );
+    
+    const hasStableHistory = stableHistory.length >= stableHistoryRequired;
+    
+    // Don't recover if we just adapted down recently
+    const recentAdaptationDown = performance.now() - this.lastAdaptation < 20000; // 20 second cooldown
+    
+    // Ensure dependencies are still valid
+    const dependenciesValid = this.validateCoreDependencies();
+    
+    return hasStableHistory && !recentAdaptationDown && dependenciesValid;
   }
 
   private async initializePowerManagement(): Promise<void> {

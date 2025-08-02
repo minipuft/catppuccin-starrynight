@@ -134,7 +134,7 @@ export class RightSidebarConsciousnessEnhanced extends UnifiedSystemBase {
     });
     
     // Set up CSS variable performance budget
-    // Note: setSubsystemBudget is not available in current CSSVariableBatcher
+    // Note: setSubsystemBudget is not available in current UnifiedCSSConsciousnessController
     
     // Register for animation coordination
     this.registerAnimation(60); // Same priority as original

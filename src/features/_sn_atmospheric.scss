@@ -1,7 +1,8 @@
 /* StarryNight Atmospheric Module - Phase 4.5: Atmospheric Main Feed*/
 /* PHASE 1 ENHANCEMENT: Artist Aura Field Integration*/
+/* 🌡️ EMOTIONAL TEMPERATURE INTEGRATION: Enhanced with emotional temperature color evolution*/
 /* Creates floating content grids and enhanced spatial layouts for a futuristic feel*/
-/* Now enhanced with artist aura field atmospheric influence*/
+/* Now enhanced with artist aura field atmospheric influence and emotional temperature breathing*/
 
 @use "../core/_mixins" as *;
 @use "../core/_kinetic-animations" as *;
@@ -30,31 +31,165 @@
     var(--artist-aura-intensity, 0.6) * var(--aura-cascade-strength, 0.3)
   );
   --atmospheric-aura-breathing: var(--artist-aura-breathing-sync, 8s);
+  
+  /* 🌡️ EMOTIONAL TEMPERATURE ATMOSPHERIC INTEGRATION */
+  --atmospheric-emotional-intensity: var(--organic-emotional-intensity, 0.5);
+  --atmospheric-temperature-influence: var(--organic-current-temperature, 4000);
+  --atmospheric-breathing-sync: var(--organic-breathing-cycle, 8s);
+  --atmospheric-warmth: var(--organic-warmth, 0.8);
+  --atmospheric-emotional-saturation: var(--organic-emotional-saturation, 1.0);
+  --atmospheric-temperature-brightness: var(--organic-temperature-brightness, 1.0);
 }
 
 /* PHASE 4.5: Atmospheric Layout Mixins*/
 /* =============================================================================*/
 
+/* 🌡️ EMOTIONAL TEMPERATURE ENHANCED ANIMATIONS */
 /* Keyframes definitions (must be outside mixins to avoid mixed-decls warnings)*/
 @keyframes floating {
   0%, 100% {
     transform: translateY(0px);
-    filter: brightness(1);
+    filter: 
+      brightness(var(--atmospheric-temperature-brightness, 1))
+      saturate(var(--atmospheric-emotional-saturation, 1))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) * 0.3));
   }
   50% {
     transform: translateY(calc(-1 * var(--ambient-float-range)));
-    filter: brightness(1.05);
+    filter: 
+      brightness(calc(var(--atmospheric-temperature-brightness, 1) * 1.05))
+      saturate(calc(var(--atmospheric-emotional-saturation, 1) * 1.1))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) * 0.5));
+  }
+}
+
+/* 🌡️ Emotional temperature floating animation */
+@keyframes floating-emotional-temperature {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    filter: 
+      brightness(var(--atmospheric-temperature-brightness, 1))
+      saturate(var(--atmospheric-emotional-saturation, 1))
+      hue-rotate(var(--organic-temperature-hue-shift, 0deg));
+    box-shadow: 
+      0 2px 8px rgba(var(--organic-emotion-ambient-primary), calc(var(--atmospheric-emotional-intensity) * 0.1)),
+      0 0 20px rgba(var(--organic-emotion-ambient-accent), calc(var(--atmospheric-emotional-intensity) * 0.05));
+  }
+  25% {
+    transform: translateY(calc(-0.3 * var(--ambient-float-range))) scale(1.01);
+    filter: 
+      brightness(calc(var(--atmospheric-temperature-brightness, 1) * 1.02))
+      saturate(calc(var(--atmospheric-emotional-saturation, 1) * 1.05))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) * 1.2));
+  }
+  50% {
+    transform: translateY(calc(-1 * var(--ambient-float-range))) scale(1.02);
+    filter: 
+      brightness(calc(var(--atmospheric-temperature-brightness, 1) * 1.05))
+      saturate(calc(var(--atmospheric-emotional-saturation, 1) * 1.1))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) * 1.5));
+    box-shadow: 
+      0 4px 16px rgba(var(--organic-emotion-ambient-primary), calc(var(--atmospheric-emotional-intensity) * 0.15)),
+      0 0 30px rgba(var(--organic-emotion-ambient-accent), calc(var(--atmospheric-emotional-intensity) * 0.08));
+  }
+  75% {
+    transform: translateY(calc(-0.6 * var(--ambient-float-range))) scale(1.01);
+    filter: 
+      brightness(calc(var(--atmospheric-temperature-brightness, 1) * 1.03))
+      saturate(calc(var(--atmospheric-emotional-saturation, 1) * 1.07))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) * 1.2));
   }
 }
 
 @keyframes floating-subtle {
   0%, 100% {
     transform: translateY(0px);
-    filter: brightness(1);
+    filter: 
+      brightness(var(--atmospheric-temperature-brightness, 1))
+      saturate(var(--atmospheric-emotional-saturation, 1))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) * 0.2));
   }
   50% {
     transform: translateY(calc(-0.7 * var(--ambient-float-range)));
-    filter: brightness(1.03);
+    filter: 
+      brightness(calc(var(--atmospheric-temperature-brightness, 1) * 1.03))
+      saturate(calc(var(--atmospheric-emotional-saturation, 1) * 1.05))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) * 0.3));
+  }
+}
+
+/* 🌡️ Emotional temperature specific atmosphere animations */
+@keyframes atmospheric-calm-breathing {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    filter: 
+      brightness(var(--organic-temperature-brightness, 1))
+      saturate(var(--organic-emotional-saturation, 1))
+      blur(0.5px);
+  }
+  50% {
+    transform: translateY(calc(-0.5 * var(--ambient-float-range))) scale(1.005);
+    filter: 
+      brightness(calc(var(--organic-temperature-brightness, 1) * 1.02))
+      saturate(calc(var(--organic-emotional-saturation, 1) * 1.05))
+      blur(0.3px);
+  }
+}
+
+@keyframes atmospheric-energetic-pulse {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    filter: 
+      brightness(var(--organic-temperature-brightness, 1))
+      saturate(var(--organic-emotional-saturation, 1))
+      hue-rotate(var(--organic-temperature-hue-shift, 0deg));
+  }
+  20% {
+    transform: translateY(calc(-0.2 * var(--ambient-float-range))) scale(1.01);
+    filter: 
+      brightness(calc(var(--organic-temperature-brightness, 1) * 1.08))
+      saturate(calc(var(--organic-emotional-saturation, 1) * 1.15))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) * 1.3));
+  }
+  40% {
+    transform: translateY(calc(-0.8 * var(--ambient-float-range))) scale(1.02);
+    filter: 
+      brightness(calc(var(--organic-temperature-brightness, 1) * 1.12))
+      saturate(calc(var(--organic-emotional-saturation, 1) * 1.25))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) * 1.5));
+  }
+  60% {
+    transform: translateY(calc(-1.2 * var(--ambient-float-range))) scale(1.025);
+    filter: 
+      brightness(calc(var(--organic-temperature-brightness, 1) * 1.15))
+      saturate(calc(var(--organic-emotional-saturation, 1) * 1.3))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) * 1.8));
+  }
+  80% {
+    transform: translateY(calc(-0.6 * var(--ambient-float-range))) scale(1.01);
+    filter: 
+      brightness(calc(var(--organic-temperature-brightness, 1) * 1.10))
+      saturate(calc(var(--organic-emotional-saturation, 1) * 1.2))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) * 1.4));
+  }
+}
+
+@keyframes atmospheric-melancholy-drift {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    filter: 
+      brightness(calc(var(--organic-temperature-brightness, 1) * 0.95))
+      saturate(calc(var(--organic-emotional-saturation, 1) * 0.8))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) + -10deg))
+      sepia(0.1);
+  }
+  50% {
+    transform: translateY(calc(-0.8 * var(--ambient-float-range))) scale(1.01);
+    filter: 
+      brightness(calc(var(--organic-temperature-brightness, 1) * 1.0))
+      saturate(calc(var(--organic-emotional-saturation, 1) * 0.9))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) + -5deg))
+      sepia(0.15);
   }
 }
 
@@ -105,7 +240,8 @@
   @include performance-optimized;
 }
 
-/* Atmospheric Item Styling (Year 3000 Compatible)*/
+/* 🌡️ EMOTIONAL TEMPERATURE ENHANCED ATMOSPHERIC ITEM */
+/* Atmospheric Item Styling (Year 3000 Compatible with Emotional Temperature)*/
 /* Applies to individual items within the atmospheric grid*/
 @mixin atmospheric-item($index: 0) {
   /* ALL CSS declarations must come first, before any @include or nested rules*/
@@ -113,26 +249,56 @@
   opacity: 0; /* Start hidden, will be revealed by animation*/
   /* Base transform for animation entry (no Z-transform here to avoid complexity)*/
   transform: translateY(var(--ambient-float-range, 20px));
-  /* Animation driven by CSS variables for dynamic control*/
-  animation: floating var(--ambient-float-duration, 6s)
-      var(--ambient-float-timing, ease-in-out) infinite alternate,
+  
+  /* 🌡️ Enhanced animation with emotional temperature integration*/
+  animation: 
+    floating-emotional-temperature calc(var(--atmospheric-breathing-sync, 8s) * (1 + var(--atmospheric-emotional-intensity) * 0.3))
+      var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1)) infinite,
     atmospheric-fade-in 0.8s var(--sn-easing-emergence, var(--sn-anim-easing-organic)) forwards;
   animation-delay: calc(var(--ambient-float-stagger, 0.1s) * #{$index});
 
-  /* Include dynamic glassmorphism (Year 3000 compatible)*/
-  /* @include glassmorphism-dynamic; // COMMENTED OUT: Let _sn_enhanced_cards.scss handle card glassmorphism*/
+  /* 🌡️ Apply emotional temperature specific animations based on body classes */
+  :where(.organic-emotion-calm) & {
+    animation-name: atmospheric-calm-breathing, atmospheric-fade-in;
+    animation-duration: calc(var(--organic-breathing-cycle, 6s) * 1.2), 0.8s;
+  }
+  
+  :where(.organic-emotion-energetic, .organic-emotion-aggressive) & {
+    animation-name: atmospheric-energetic-pulse, atmospheric-fade-in;
+    animation-duration: calc(var(--organic-breathing-cycle, 2s) * 0.8), 0.8s;
+  }
+  
+  :where(.organic-emotion-melancholy, .organic-emotion-mysterious) & {
+    animation-name: atmospheric-melancholy-drift, atmospheric-fade-in;
+    animation-duration: calc(var(--organic-breathing-cycle, 8s) * 1.5), 0.8s;
+  }
 
   /* Include performance optimizations (these don't contain nested rules)*/
   @include performance-optimized;
 
-  /* Enhanced hover effect (Year 3000 compatible)*/
+  /* 🌡️ Enhanced hover effect with emotional temperature response */
   &:hover {
-    /* ALL CSS declarations must come first, before any @include or nested rules*/
-    /* Dynamic hover effects using CSS variables*/
-    filter: brightness(var(--hover-brightness, 1.05))
-      saturate(var(--hover-saturation, 1.15));
-    /* Keep transition smooth for hover effects*/
-    transition: filter 0.3s ease, transform 0.3s ease; /* Ensure transform is part of transition if changed on hover*/
+    /* Enhanced hover effects using emotional temperature variables*/
+    filter: 
+      brightness(calc(var(--atmospheric-temperature-brightness, 1.05) * 1.05))
+      saturate(calc(var(--atmospheric-emotional-saturation, 1.15) * 1.1))
+      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) * 0.8));
+    
+    /* Enhanced transform with emotional intensity influence */
+    transform: translateY(calc(-1 * var(--atmospheric-hover-lift) * (1 + var(--atmospheric-emotional-intensity) * 0.5)));
+    
+    /* 🌡️ Emotional temperature enhanced glow */
+    box-shadow: 
+      0 calc(var(--atmospheric-hover-lift) * 2) calc(var(--atmospheric-hover-lift) * 4) 
+      rgba(var(--organic-emotion-ambient-primary), calc(var(--atmospheric-emotional-intensity) * 0.2)),
+      0 0 calc(var(--atmospheric-hover-lift) * 6) 
+      rgba(var(--organic-emotion-ambient-accent), calc(var(--atmospheric-emotional-intensity) * 0.1));
+    
+    /* Keep transition smooth for hover effects with emotional temperature timing*/
+    transition: 
+      filter calc(var(--organic-transition-medium, 0.3s)) ease, 
+      transform calc(var(--organic-transition-medium, 0.3s)) ease,
+      box-shadow calc(var(--organic-transition-medium, 0.3s)) ease;
   }
 }
 
@@ -563,15 +729,45 @@
 /* SEARCH EXCLUSION GUARD - Atmospheric Effects DISABLED in Search*/
 /* =============================================================================*/
 
+/* 🌡️ EMOTIONAL TEMPERATURE ENHANCED ATMOSPHERIC EFFECTS */
 /* Only apply atmospheric effects OUTSIDE of search pages*/
 body:not(:has(.main-searchPage-content)) {
-  /* Atmospheric enhancements for non-search areas only*/
+  /* 🌡️ Atmospheric enhancements with emotional temperature integration */
   .main-card-card {
-    animation: floating var(--ambient-duration) ease-in-out infinite;
+    animation: floating-emotional-temperature var(--atmospheric-breathing-sync, 8s) 
+      var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1)) infinite;
     transition: transform var(--atmospheric-transition);
+    
+    /* 🌡️ Apply specific emotional temperature animations */
+    &:where(.organic-emotion-calm) {
+      animation-name: atmospheric-calm-breathing;
+      animation-duration: calc(var(--organic-breathing-cycle, 6s) * 1.2);
+    }
+    
+    &:where(.organic-emotion-energetic, .organic-emotion-aggressive) {
+      animation-name: atmospheric-energetic-pulse;
+      animation-duration: calc(var(--organic-breathing-cycle, 2s) * 0.8);
+    }
+    
+    &:where(.organic-emotion-melancholy, .organic-emotion-mysterious) {
+      animation-name: atmospheric-melancholy-drift;
+      animation-duration: calc(var(--organic-breathing-cycle, 8s) * 1.5);
+    }
 
     &:hover {
-      transform: translateY(calc(-1 * var(--atmospheric-hover-lift)));
+      transform: translateY(
+        calc(
+          -1 * var(--atmospheric-hover-lift) * 
+          (1 + var(--atmospheric-emotional-intensity, 0.5) * 0.5)
+        )
+      );
+      
+      /* 🌡️ Enhanced emotional temperature glow on hover */
+      box-shadow: 
+        0 calc(var(--atmospheric-hover-lift) * 3) calc(var(--atmospheric-hover-lift) * 6) 
+        rgba(var(--organic-emotion-ambient-primary), calc(var(--atmospheric-emotional-intensity, 0.5) * 0.15)),
+        0 0 calc(var(--atmospheric-hover-lift) * 8) 
+        rgba(var(--organic-emotion-ambient-accent), calc(var(--atmospheric-emotional-intensity, 0.5) * 0.08));
     }
   }
 

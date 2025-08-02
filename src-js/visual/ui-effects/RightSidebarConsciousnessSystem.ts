@@ -23,7 +23,7 @@ interface EnergyPayload {
  * Phase-2 implementation that animates the right-sidebar gradient variables in
  * real-time, staying within <1 ms / frame budget.
  * – Subscribes to GlobalEventBus topics: `music:beat`, `music:energy`
- * – Uses RightSidebarCoordinator for optimized CSS variable batching
+ * – Uses SidebarPerformanceCoordinator for optimized CSS variable batching
  * – Registers with MasterAnimationCoordinator when available; otherwise falls
  *   back to its own rAF loop.
  */

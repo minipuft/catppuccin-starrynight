@@ -13,12 +13,14 @@
 
 // === CORE FOUNDATION ===
 @import "core/organic-consciousness-variables";
-@import "core/cellular-membrane-styles";
 @import "core/breathing-animations";
 @import "core/symbiotic-listening-effects";
 
 // === COLOR SYSTEM ===
 @import "color/emotional-temperature-colors";
+@import "color/genre-specific-presets";
+@import "color/oklab-animations";
+@import "color/perceptual-blending";
 
 // === CINEMATIC EFFECTS ===
 @import "cinematic/blade-runner-aesthetics";
@@ -56,8 +58,7 @@
     // Core organic consciousness properties
     @include organic-consciousness-base;
     
-    // Breathing foundation
-    animation: organic-global-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+    // Global consciousness foundation (breathing moved to components)
     
     // Global consciousness field
     &::before {
@@ -76,13 +77,13 @@
         transparent 80%
       );
       
-      // Global consciousness breathing
-      animation: organic-global-consciousness-field calc(var(--organic-breathing-cycle, 1s) * 2) ease-in-out infinite;
+      // Global consciousness breathing with transforms (safe on pseudo-element) - DISABLED: Caused global app bouncing
+      // animation: organic-root-background-breathing calc(var(--organic-breathing-cycle, 1s) * 2) ease-in-out infinite;
       
       // Performance optimization
       pointer-events: none;
       z-index: calc(var(--organic-depth-atmosphere, 0) - 10);
-      will-change: opacity;
+      will-change: transform, opacity;
       contain: strict;
       mix-blend-mode: overlay;
     }
@@ -96,10 +97,14 @@
       @extend .organic-blade-runner-neon;
       @extend .organic-volumetric-fog;
       
-      // Enhanced cinematic breathing
-      animation: 
-        organic-global-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite,
-        organic-blade-runner-breathing calc(var(--organic-breathing-cycle, 1s) * 1.5) ease-in-out infinite;
+      // Cinematic consciousness (breathing applied to components instead)
+      
+      // Apply transform breathing to pseudo-element only
+      &::before {
+        animation: 
+          organic-root-background-breathing calc(var(--organic-breathing-cycle, 1s) * 2) ease-in-out infinite,
+          organic-blade-runner-breathing calc(var(--organic-breathing-cycle, 1s) * 1.5) ease-in-out infinite;
+      }
     }
     
     &[data-consciousness-mode="atmospheric"] {
@@ -152,8 +157,8 @@
           rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-shimmer-opacity, 0.05) * 1.5)) 100%
         );
         
-        // Main view consciousness breathing
-        animation: organic-main-view-consciousness calc(var(--organic-breathing-cycle, 1s) * 3) ease-in-out infinite;
+        // Main view consciousness breathing - DISABLED: Caused global app bouncing
+        // animation: organic-main-view-consciousness calc(var(--organic-breathing-cycle, 1s) * 3) ease-in-out infinite;
         
         pointer-events: none;
         z-index: calc(var(--organic-depth-atmosphere, 0) - 5);
@@ -170,14 +175,19 @@
     &.organic-consciousness-enabled {
       position: relative;
       
-      // Cellular membrane for player
+      // Player consciousness enhancement
       &::before {
-        @include organic-cellular-membrane('high');
-        // Player-specific membrane enhancements
-        border-color: rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-membrane-opacity, 0.3) * 1.2));
-        box-shadow: 
-          0 0 calc(var(--organic-membrane-thickness, 2px) * 3) rgba(var(--organic-neon-glow-rgb, 116, 199, 236), var(--organic-glow-opacity, 0.1)),
-          inset 0 0 calc(var(--organic-membrane-thickness, 2px) * 2) rgba(var(--organic-holographic-rgb, 116, 199, 236), var(--organic-shimmer-opacity, 0.05));
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-membrane-opacity, 0.3) * 1.2));
+        border-radius: inherit;
+        background: rgba(var(--organic-primary-rgb, 205, 214, 244), var(--organic-fog-opacity, 0.02));
+        pointer-events: none;
+        z-index: var(--organic-depth-mid, 2);
       }
       
       // Player consciousness enhancement
@@ -196,7 +206,7 @@
     // Apply organic consciousness to sidebar
     &.organic-consciousness-enabled {
       // Sidebar atmospheric enhancement
-      @extend .organic-atmospheric-fog[data-fog-type="light"];
+      @extend .organic-atmospheric-fog, [data-fog-type="light"];
       
       // Sidebar consciousness field
       &::after {
@@ -239,16 +249,28 @@
       // Card membrane host
       @extend .organic-membrane-host;
       
-      // Card-specific membrane
+      // Card consciousness enhancement  
       &::before {
-        @include organic-cellular-membrane('medium');
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid rgba(var(--organic-primary-rgb, 205, 214, 244), var(--organic-membrane-opacity, 0.3));
+        border-radius: inherit;
+        background: rgba(var(--organic-primary-rgb, 205, 214, 244), var(--organic-fog-opacity, 0.02));
+        pointer-events: none;
+        z-index: var(--organic-depth-mid, 2);
+        transition: all var(--organic-transition-medium, 0.5s) ease-out;
       }
       
       // Card interaction enhancements
       &:hover {
-        // Enhanced hover membrane growth
+        // Enhanced hover consciousness
         &::before {
-          @extend .membrane-hover;
+          transform: scale(1.05);
+          border-color: rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-membrane-opacity, 0.3) * 1.2));
         }
         
         // Card hover consciousness
@@ -258,16 +280,17 @@
       }
       
       &:active {
-        // Click membrane pulse
+        // Click consciousness pulse
         &::before {
-          @extend .membrane-click;
+          transform: scale(0.95);
+          border-color: rgba(var(--organic-neon-glow-rgb, 116, 199, 236), calc(var(--organic-membrane-opacity, 0.3) * 1.5));
         }
       }
     }
     
-    // Breathing synchronization
+    // Breathing synchronization - DISABLED: Caused global app bouncing
     &.organic-breathing-enabled {
-      animation: organic-element-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+      // animation: organic-element-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
     }
   }
 
@@ -284,11 +307,20 @@
       // Button text consciousness
       @include organic-text-consciousness('medium');
       
-      // Button membrane
+      // Button consciousness enhancement
       &::before {
-        @include organic-cellular-membrane('high');
-        // Button-specific membrane styling
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid rgba(var(--organic-accent-rgb, 203, 166, 247), calc(var(--organic-membrane-opacity, 0.3) * 1.5));
         border-radius: inherit;
+        background: rgba(var(--organic-primary-rgb, 205, 214, 244), var(--organic-fog-opacity, 0.02));
+        pointer-events: none;
+        z-index: var(--organic-depth-mid, 2);
+        transition: all var(--organic-transition-medium, 0.5s) ease-out;
       }
       
       // Button symbiotic listening
@@ -382,11 +414,11 @@
   
   // Enhanced atmospheric effects in maximum mode
   .organic-atmospheric-particles {
-    @extend .organic-atmospheric-particles[data-particle-density="dense"];
+    @extend .organic-atmospheric-particles, [data-particle-density="dense"];
   }
   
   .organic-volumetric-lighting {
-    @extend .organic-volumetric-lighting[data-light-intensity="dramatic"];
+    @extend .organic-volumetric-lighting, [data-light-intensity="dramatic"];
   }
 }
 
@@ -485,11 +517,6 @@
       saturate(1.5) !important;
   }
   
-  // Enhanced visibility for membrane borders
-  .organic-cellular-membrane {
-    border-width: calc(var(--organic-membrane-thickness, 2px) * 1.5) !important;
-    opacity: calc(var(--organic-membrane-opacity, 0.3) * 2) !important;
-  }
   
   // Enhanced text visibility
   h1, h2, h3, h4, h5, h6,
@@ -520,7 +547,6 @@
 @layer organic-consciousness.performance {
   // GPU acceleration for consciousness elements
   .organic-consciousness-enabled,
-  .organic-cellular-membrane,
   .organic-breathing-enabled {
     // Hardware acceleration
     transform: translateZ(0);
@@ -590,21 +616,16 @@
       top: 90px;
       left: 10px;
       font-size: 11px;
-      color: yellow;
-      background: rgba(0, 0, 0, 0.9);
+      color: rgb(var(--sn-musical-harmony-analogous-warm-rgb));
+      background: rgba(var(--spice-rgb-base), 0.9);
       padding: 4px 8px;
       border-radius: 3px;
       z-index: 99997;
       pointer-events: none;
-      border: 1px solid yellow;
+      border: 1px solid rgb(var(--sn-musical-harmony-analogous-warm-rgb));
     }
   }
   
-  // Debug visualization for components
-  .organic-cellular-membrane {
-    outline: 2px dashed rgba(255, 0, 255, 0.5) !important;
-    outline-offset: 2px;
-  }
   
   .organic-consciousness-enabled {
     position: relative;
@@ -615,10 +636,10 @@
       top: 4px;
       right: 4px;
       font-size: 10px;
-      color: #ff00ff;
+      color: rgb(var(--sn-musical-harmony-complementary-rgb));
       pointer-events: none;
       z-index: 9999;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(var(--spice-rgb-base), 0.9);
       padding: 2px 4px;
       border-radius: 2px;
     }
@@ -629,7 +650,7 @@
 @layer organic-consciousness.debug {
   :root.organic-debug {
     // Debug system integration
-    @extend :root.organic-debug;
+    @extend :root, .organic-debug;
   }
 }
 

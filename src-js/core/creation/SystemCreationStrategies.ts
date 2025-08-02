@@ -234,8 +234,8 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
         case 'year3000System':
           params.push(context.dependencies.year3000System);
           break;
-        case 'cssVariableBatcher':
-          params.push(context.dependencies.cssVariableBatcher);
+        case 'cssConsciousnessController':
+          params.push(context.dependencies.cssConsciousnessController);
           break;
         case 'performanceCoordinator':
           params.push(context.dependencies.performanceCoordinator);
@@ -333,7 +333,6 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
     const simpleSystemKeys = [
       'DeviceCapabilityDetector',
       'PerformanceAnalyzer',
-      'CSSVariableBatcher',
       'SettingsManager'
     ];
 
@@ -372,17 +371,17 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
       }
     });
 
-    // GlassmorphismManager - requires cssVariableBatcher, performanceAnalyzer, and settingsManager
+    // GlassmorphismManager - requires cssConsciousnessController, performanceAnalyzer, and settingsManager
     this.registerSystemConfig({
       systemKey: 'GlassmorphismManager',
-      requiredDependencies: ['config', 'utils', 'cssVariableBatcher', 'performanceAnalyzer', 'settingsManager'],
+      requiredDependencies: ['config', 'utils', 'cssConsciousnessController', 'performanceAnalyzer', 'settingsManager'],
       optionalDependencies: [],
       constructorMapping: {
-        parameterNames: ['config', 'utils', 'cssVariableBatcher', 'performanceAnalyzer', 'settingsManager'],
+        parameterNames: ['config', 'utils', 'cssConsciousnessController', 'performanceAnalyzer', 'settingsManager'],
         dependencyMapping: {
           'config': 'config',
           'utils': 'utils',
-          'cssVariableBatcher': 'cssVariableBatcher',
+          'cssConsciousnessController': 'cssConsciousnessController',
           'performanceAnalyzer': 'performanceAnalyzer',
           'settingsManager': 'settingsManager'
         }
@@ -416,56 +415,35 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
       }
     });
 
-    // UnifiedCSSVariableManager - requires cssVariableBatcher
+    // UnifiedCSSConsciousnessController - requires config and performanceCoordinator
     this.registerSystemConfig({
-      systemKey: 'UnifiedCSSVariableManager',
-      requiredDependencies: ['cssVariableBatcher'],
+      systemKey: 'UnifiedCSSConsciousnessController',
+      requiredDependencies: ['config', 'performanceCoordinator'],
       optionalDependencies: [],
       constructorMapping: {
-        parameterNames: ['cssVariableBatcher'],
-        dependencyMapping: {
-          'cssVariableBatcher': 'cssVariableBatcher'
-        }
-      },
-      creationPreferences: {
-        useSingleton: false,
-        lazyInit: false,
-        eventDriven: false,
-        builderPattern: false
-      }
-    });
-
-
-    // PerformanceCSSIntegration - requires config, cssVariableManager, and performanceCoordinator
-    this.registerSystemConfig({
-      systemKey: 'PerformanceCSSIntegration',
-      requiredDependencies: ['config', 'cssVariableBatcher', 'performanceCoordinator'],
-      optionalDependencies: [],
-      constructorMapping: {
-        parameterNames: ['config', 'cssVariableManager', 'performanceCoordinator'],
+        parameterNames: ['config', 'performanceCoordinator'],
         dependencyMapping: {
           'config': 'config',
-          'cssVariableManager': 'cssVariableBatcher', // Map cssVariableBatcher to cssVariableManager parameter
           'performanceCoordinator': 'performanceCoordinator'
         }
       },
       creationPreferences: {
-        useSingleton: false,
+        useSingleton: true,
         lazyInit: false,
         eventDriven: false,
         builderPattern: false
       }
     });
 
-    // SidebarSystemsIntegration - requires cssVariableBatcher
+    // SidebarSystemsIntegration - requires cssConsciousnessController
     this.registerSystemConfig({
       systemKey: 'SidebarSystemsIntegration',
-      requiredDependencies: ['cssVariableBatcher'],
+      requiredDependencies: ['cssConsciousnessController'],
       optionalDependencies: [],
       constructorMapping: {
-        parameterNames: ['cssVariableBatcher'],
+        parameterNames: ['cssConsciousnessController'],
         dependencyMapping: {
-          'cssVariableBatcher': 'cssVariableBatcher'
+          'cssConsciousnessController': 'cssConsciousnessController'
         }
       },
       creationPreferences: {

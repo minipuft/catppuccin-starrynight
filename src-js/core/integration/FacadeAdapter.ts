@@ -96,7 +96,7 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
         settingsManager?: any;
         musicSyncService?: any;
         year3000System?: any;
-        cssVariableBatcher?: any;
+        cssConsciousnessController?: any;
         performanceCoordinator?: any;
       };
       year3000System: any;
@@ -193,7 +193,7 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
         settingsManager?: any;
         musicSyncService?: any;
         year3000System?: any;
-        cssVariableBatcher?: any;
+        cssConsciousnessController?: any;
         performanceCoordinator?: any;
       };
       year3000System: any;
@@ -211,27 +211,25 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
       // Simple systems with no dependencies
       case 'DeviceCapabilityDetector':
       case 'PerformanceAnalyzer':
-      case 'CSSVariableBatcher':
       case 'SettingsManager':
       case 'TimerConsolidationSystem':
         return new SystemClass() as T;
 
       // Systems with single dependency
-      case 'UnifiedSystemIntegration':
-        return new SystemClass(context.year3000System) as T;
-      
-      case 'UnifiedCSSVariableManager':
       case 'SidebarSystemsIntegration':
-        return new SystemClass(context.dependencies.cssVariableBatcher) as T;
+        return new SystemClass(context.dependencies.cssConsciousnessController) as T;
       
-
-      // Systems with multiple dependencies
-      case 'PerformanceCSSIntegration':
+      // CSS Consciousness Controller with performance coordinator dependency
+      case 'UnifiedCSSConsciousnessController':
         return new SystemClass(
           context.config,
-          context.dependencies.cssVariableBatcher,
           context.dependencies.performanceCoordinator
         ) as T;
+
+      // Systems consolidated into UnifiedCSSConsciousnessController:
+      // - UnifiedCSSConsciousnessController (batching layer)
+      // - UnifiedCSSConsciousnessController (management layer)  
+      // - UnifiedCSSConsciousnessController (performance layer)
 
       case 'ColorHarmonyEngine':
         return new SystemClass(
@@ -257,7 +255,7 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
         return new SystemClass(
           context.config,
           context.utils,
-          context.dependencies.cssVariableBatcher,
+          context.dependencies.cssConsciousnessController,
           context.dependencies.performanceAnalyzer,
           context.dependencies.settingsManager
         ) as T;
@@ -360,7 +358,7 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
     const migrationOrder = [
       // Simple systems (no dependencies)
       'PerformanceAnalyzer',
-      'CSSVariableBatcher', 
+      'UnifiedCSSConsciousnessController', 
       'DeviceCapabilityDetector',
       'SettingsManager',
       

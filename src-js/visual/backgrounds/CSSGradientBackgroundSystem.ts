@@ -18,7 +18,7 @@ import {
   PerformanceConstraints, 
   BackendCapabilities 
 } from '@/types/systems';
-import { CSSVariableBatcher } from '@/core/performance/CSSVariableBatcher';
+import { UnifiedCSSConsciousnessController } from '@/core/css/UnifiedCSSConsciousnessController';
 
 export interface CSSGradientConfig {
   enableMusicSync: boolean;
@@ -43,7 +43,7 @@ export class CSSGradientBackgroundSystem implements VisualBackplane {
     maxShaderComplexity: 'low'
   };
   
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController;
   private rootElement: HTMLElement | null = null;
   private backgroundElement: HTMLDivElement | null = null;
   
@@ -59,10 +59,10 @@ export class CSSGradientBackgroundSystem implements VisualBackplane {
   private memoryUsage = 0;
   
   constructor(
-    cssVariableBatcher: CSSVariableBatcher,
+    cssConsciousnessController: UnifiedCSSConsciousnessController,
     config: Partial<CSSGradientConfig> = {}
   ) {
-    this.cssVariableBatcher = cssVariableBatcher;
+    this.cssConsciousnessController = cssConsciousnessController;
     
     this.config = {
       enableMusicSync: true,
@@ -134,13 +134,13 @@ export class CSSGradientBackgroundSystem implements VisualBackplane {
     const accentGradient = `conic-gradient(from 45deg at 50% 50%, ${gradientStops})`;
     
     // Update CSS variables with graceful transition
-    this.cssVariableBatcher.setProperty('--sn.bg.css.primary-gradient', primaryGradient);
-    this.cssVariableBatcher.setProperty('--sn.bg.css.secondary-gradient', secondaryGradient);
-    this.cssVariableBatcher.setProperty('--sn.bg.css.accent-gradient', accentGradient);
+    this.cssConsciousnessController.setProperty('--sn.bg.css.primary-gradient', primaryGradient);
+    this.cssConsciousnessController.setProperty('--sn.bg.css.secondary-gradient', secondaryGradient);
+    this.cssConsciousnessController.setProperty('--sn.bg.css.accent-gradient', accentGradient);
     
     // Set transition duration
     if (this.config.fadeTransitions) {
-      this.cssVariableBatcher.setProperty('--sn.bg.css.transition-duration', `${transition}ms`);
+      this.cssConsciousnessController.setProperty('--sn.bg.css.transition-duration', `${transition}ms`);
     }
     
     // Update background element directly for immediate visual feedback
@@ -167,7 +167,7 @@ export class CSSGradientBackgroundSystem implements VisualBackplane {
     if (metrics.beatIntensity !== undefined) {
       // Scale beat intensity for subtle CSS effects
       const scaledIntensity = Math.min(metrics.beatIntensity * 0.3, 0.3); // Max 30% intensity
-      this.cssVariableBatcher.setProperty(
+      this.cssConsciousnessController.setProperty(
         '--sn.bg.css.beat-intensity', 
         scaledIntensity.toString()
       );
@@ -176,7 +176,7 @@ export class CSSGradientBackgroundSystem implements VisualBackplane {
     if (metrics.energy !== undefined) {
       // Use energy for gradient saturation
       const saturation = 0.8 + (metrics.energy * 0.4); // 0.8 to 1.2 range
-      this.cssVariableBatcher.setProperty(
+      this.cssConsciousnessController.setProperty(
         '--sn.bg.css.energy-saturation', 
         saturation.toString()
       );
@@ -185,7 +185,7 @@ export class CSSGradientBackgroundSystem implements VisualBackplane {
     if (metrics.valence !== undefined) {
       // Use valence for gradient brightness
       const brightness = 0.9 + (metrics.valence * 0.2); // 0.9 to 1.1 range
-      this.cssVariableBatcher.setProperty(
+      this.cssConsciousnessController.setProperty(
         '--sn.bg.css.valence-brightness', 
         brightness.toString()
       );
@@ -258,7 +258,7 @@ export class CSSGradientBackgroundSystem implements VisualBackplane {
     }
     
     // Update global CSS variable
-    this.cssVariableBatcher.setProperty('--sn.bg.css.enabled', enabled ? '1' : '0');
+    this.cssConsciousnessController.setProperty('--sn.bg.css.enabled', enabled ? '1' : '0');
     
     console.log(`[CSSGradientBackgroundSystem] ${enabled ? 'Enabled' : 'Disabled'} with ${fadeMs}ms fade`);
   }
@@ -299,23 +299,23 @@ export class CSSGradientBackgroundSystem implements VisualBackplane {
       this.config.enableMusicSync = false;
       
       // Disable all animations via CSS
-      this.cssVariableBatcher.setProperty('--sn.bg.css.animations-enabled', '0');
+      this.cssConsciousnessController.setProperty('--sn.bg.css.animations-enabled', '0');
     } else {
       this.config.enableAnimations = true;
-      this.cssVariableBatcher.setProperty('--sn.bg.css.animations-enabled', '1');
+      this.cssConsciousnessController.setProperty('--sn.bg.css.animations-enabled', '1');
     }
     
     if (preferences.highContrast) {
       // Increase contrast for accessibility
-      this.cssVariableBatcher.setProperty('--sn.bg.css.contrast-boost', '1.3');
+      this.cssConsciousnessController.setProperty('--sn.bg.css.contrast-boost', '1.3');
     } else {
-      this.cssVariableBatcher.setProperty('--sn.bg.css.contrast-boost', '1.0');
+      this.cssConsciousnessController.setProperty('--sn.bg.css.contrast-boost', '1.0');
     }
     
     if (preferences.prefersTransparency) {
-      this.cssVariableBatcher.setProperty('--sn.bg.css.transparency-factor', '0.9');
+      this.cssConsciousnessController.setProperty('--sn.bg.css.transparency-factor', '0.9');
     } else {
-      this.cssVariableBatcher.setProperty('--sn.bg.css.transparency-factor', '1.0');
+      this.cssConsciousnessController.setProperty('--sn.bg.css.transparency-factor', '1.0');
     }
     
     this.updateBackgroundElement();
@@ -491,15 +491,15 @@ export class CSSGradientBackgroundSystem implements VisualBackplane {
   
   private updateQualitySettings(): void {
     // Update CSS variables based on quality settings
-    this.cssVariableBatcher.setProperty(
+    this.cssConsciousnessController.setProperty(
       '--sn.bg.css.quality-level', 
       this.constraints.qualityLevel
     );
-    this.cssVariableBatcher.setProperty(
+    this.cssConsciousnessController.setProperty(
       '--sn.bg.css.animations-enabled', 
       this.config.enableAnimations ? '1' : '0'
     );
-    this.cssVariableBatcher.setProperty(
+    this.cssConsciousnessController.setProperty(
       '--sn.bg.css.music-sync-enabled', 
       this.config.enableMusicSync ? '1' : '0'
     );

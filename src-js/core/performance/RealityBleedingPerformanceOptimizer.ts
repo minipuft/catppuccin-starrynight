@@ -11,7 +11,7 @@
 
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { Y3K } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
 
@@ -66,7 +66,7 @@ interface PerformanceAction {
 export class RealityBleedingPerformanceOptimizer {
   private performanceAnalyzer: PerformanceAnalyzer;
   private deviceCapabilities: DeviceCapabilityDetector;
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController | null;
   
   private currentMetrics: PerformanceMetrics;
   private qualitySettings: QualitySettings;
@@ -87,7 +87,14 @@ export class RealityBleedingPerformanceOptimizer {
   ) {
     this.performanceAnalyzer = performanceAnalyzer;
     this.deviceCapabilities = new DeviceCapabilityDetector();
-    this.cssVariableBatcher = new CSSVariableBatcher();
+    // Initialize CSS Consciousness Controller if available
+    const cssController = UnifiedCSSConsciousnessController.getInstance();
+    if (cssController) {
+      this.cssConsciousnessController = cssController;
+    } else {
+      Y3K?.debug?.warn("RealityBleedingPerformanceOptimizer", "UnifiedCSSConsciousnessController not available, CSS consciousness disabled");
+      this.cssConsciousnessController = null;
+    }
     
     // Initialize performance metrics
     this.currentMetrics = {
@@ -497,31 +504,34 @@ export class RealityBleedingPerformanceOptimizer {
   }
   
   private updatePerformanceVariables(): void {
-    // Update CSS variables for performance monitoring
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-performance-fps',
-      this.currentMetrics.fps.toFixed(1)
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-performance-memory',
-      this.currentMetrics.memoryUsage.toFixed(1)
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-performance-render-time',
-      this.currentMetrics.renderTime.toFixed(1)
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-performance-thermal-state',
-      this.currentMetrics.thermalState
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-performance-quality-level',
-      this.qualitySettings.level
-    );
+    // Update CSS variables for performance monitoring (if controller is available)
+    const controller = this.cssConsciousnessController;
+    if (controller) {
+      controller.queueCSSVariableUpdate(
+        '--sn-performance-fps',
+        this.currentMetrics.fps.toFixed(1)
+      );
+      
+      controller.queueCSSVariableUpdate(
+        '--sn-performance-memory',
+        this.currentMetrics.memoryUsage.toFixed(1)
+      );
+      
+      controller.queueCSSVariableUpdate(
+        '--sn-performance-render-time',
+        this.currentMetrics.renderTime.toFixed(1)
+      );
+      
+      controller.queueCSSVariableUpdate(
+        '--sn-performance-thermal-state',
+        this.currentMetrics.thermalState
+      );
+      
+      controller.queueCSSVariableUpdate(
+        '--sn-performance-quality-level',
+        this.qualitySettings.level
+      );
+    }
   }
   
   private notifyQualityChange(): void {

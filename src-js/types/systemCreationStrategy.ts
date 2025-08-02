@@ -36,7 +36,7 @@ export interface SystemCreationContext {
     settingsManager?: SettingsManager;
     musicSyncService?: any;
     year3000System?: any;
-    cssVariableBatcher?: any;
+    cssConsciousnessController?: any;
     performanceCoordinator?: any;
   };
   

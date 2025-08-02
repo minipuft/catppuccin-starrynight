@@ -11,7 +11,7 @@ Welcome to the Catppuccin StarryNight theme contribution ecosystem. This guide p
 1. **Consciousness-First Development** - Every contribution considers user and system consciousness
 2. **Organic Pattern Evolution** - Contributions grow naturally from existing architectural patterns
 3. **Performance-Aware Innovation** - New features respect strict performance budgets
-4. **Multi-Agent Collaboration** - Contributions work seamlessly with the tentacle coordination system
+4. **Multi-Agent Collaboration** - Contributions work seamlessly with the streamlined agent coordination system
 5. **Biological Inspiration** - Systems evolve using principles from living organisms
 
 ## Getting Started
@@ -57,21 +57,20 @@ npm run test:comprehensive
 #### Development Workflow Setup
 
 ```bash
-# Create your tentacle workspace
-mkdir -p plans/tentacle-your-feature
-cd plans/tentacle-your-feature
+# Create your task workspace
+mkdir -p plans/tasks/your-feature
+cd plans/tasks/your-feature
 
-# Initialize tentacle structure
-cp ../COMMUNICATION-TEMPLATES.md ./TENTACLE-STATUS.md
-touch master-implementation-plan.md
-touch system-design-specification.md
-mkdir -p phases/phase-1
+# Initialize task structure
+touch status.md
+touch notes.md
+touch implementation-plan.md
 
-# Register with central brain
-echo "## Tentacle: your-feature" >> ../CENTRAL-BRAIN.md
-echo "- **Status**: 🔄 ACTIVE" >> ../CENTRAL-BRAIN.md
-echo "- **Agent**: $(git config user.name)" >> ../CENTRAL-BRAIN.md
-echo "- **Started**: $(date)" >> ../CENTRAL-BRAIN.md
+# Update agent coordination
+echo "## Agent Assignment: your-feature" >> ../../agent-coordination.md
+echo "- **Status**: 🔄 IN PROGRESS" >> ../../agent-coordination.md
+echo "- **Agent**: $(git config user.name)" >> ../../agent-coordination.md
+echo "- **Started**: $(date)" >> ../../agent-coordination.md
 ```
 
 ### Understanding the Architecture
@@ -85,7 +84,7 @@ Before contributing, familiarize yourself with the core architecture:
 3. **IManagedSystem Interface** - All systems implement this unified lifecycle
 4. **Organic Consciousness** - Biological-inspired behavioral patterns
 5. **Performance Budgets** - Strict performance targets for all components
-6. **Tentacle Coordination** - Multi-agent development workflow
+6. **Agent Coordination** - Multi-agent development workflow
 
 #### Required Reading
 
@@ -104,10 +103,10 @@ Visual systems provide consciousness-aware visual effects that respond to music 
 
 **Step 1: Design and Planning**
 
-Create your tentacle implementation plan:
+Create your task implementation plan:
 
 ```markdown
-# Tentacle: Cosmic Particle Waves - Master Implementation Plan
+# Feature: Cosmic Particle Waves - Implementation Plan
 
 ## Consciousness-Aware Requirements Analysis
 
@@ -1086,8 +1085,8 @@ npm run docs:validate       # Validate documentation
 ```markdown
 # [Feature/Fix/Enhancement]: Brief Description
 
-## Tentacle Information
-- **Tentacle ID**: tentacle-cosmic-particles
+## Task Information
+- **Task ID**: cosmic-particles-integration
 - **Agent**: @your-username
 - **Priority**: High/Medium/Low
 - **Implementation Time**: X hours/days
@@ -1137,14 +1136,14 @@ Explain integration with existing facade patterns and consciousness systems.
 
 ## Multi-Agent Coordination
 
-### Tentacle Coordination
-- [ ] Updated TENTACLE-STATUS.md
-- [ ] Coordinated with other active tentacles
+### Agent Coordination
+- [ ] Updated task status.md
+- [ ] Coordinated with other active agents
 - [ ] No resource conflicts detected
 - [ ] Communication protocols followed
 
 ### Dependencies
-- [ ] No conflicts with other tentacles
+- [ ] No conflicts with other agents
 - [ ] Shared dependencies properly managed
 - [ ] Event coordination tested
 
@@ -1202,7 +1201,7 @@ Related to #YYY
 ### Review Process
 
 1. **Automated Checks**: CI/CD pipeline validates code quality, tests, and performance
-2. **Tentacle Coordination Review**: Check for conflicts with other active tentacles
+2. **Agent Coordination Review**: Check for conflicts with other active agents
 3. **Architecture Review**: Ensure compliance with facade pattern and consciousness principles
 4. **Performance Review**: Validate performance budgets and optimization
 5. **Code Review**: Manual review of implementation quality and patterns
@@ -1220,7 +1219,7 @@ Related to #YYY
 
 ### Collaboration Patterns
 
-- **Tentacle Coordination**: Use tentacle system for organized collaboration
+- **Agent Coordination**: Use streamlined coordination system for organized collaboration
 - **Knowledge Sharing**: Share patterns and solutions with other contributors
 - **Organic Evolution**: Let contributions grow naturally from existing patterns
 - **Quality First**: Prioritize quality over speed
@@ -1419,7 +1418,7 @@ export class ConsciousnessFeatureFlags {
 - **Consciousness-Aware Development**: Share patterns and insights
 - **Performance Optimization**: Collaborate on performance improvements
 - **Organic Evolution**: Contribute to the natural growth of the system
-- **Multi-Agent Coordination**: Work together using tentacle patterns
+- **Multi-Agent Coordination**: Work together using streamlined coordination patterns
 
 ---
 
@@ -1431,7 +1430,7 @@ Remember:
 - **Consciousness First** - Always consider the user and system consciousness impact
 - **Performance Aware** - Respect strict performance budgets and optimization
 - **Organic Patterns** - Let your contributions grow naturally from existing architecture
-- **Multi-Agent Friendly** - Work harmoniously with other contributors using tentacle coordination
+- **Multi-Agent Friendly** - Work harmoniously with other contributors using agent coordination
 - **Quality Focused** - Prioritize code quality, testing, and documentation
 
 Welcome to the future of interface development. Let's create something transcendent together.

@@ -19,7 +19,7 @@ interface FocusManagerConfig {
 /**
  * FocusManager subsystem for reliable --focus-visible CSS variable emission.
  * Tracks keyboard focus and pointer hover states with throttled writes for performance.
- * Integrates with Year3000System's CSSVariableBatcher for optimal batching.
+ * Integrates with Year3000System's UnifiedCSSConsciousnessController for optimal batching.
  */
 export class FocusManager implements IManagedSystem {
   public initialized: boolean = false;
@@ -186,9 +186,9 @@ export class FocusManager implements IManagedSystem {
   private writeFocusVariable(): void {
     const value = this.focusState.isFocusVisible ? "1" : "0";
 
-    if (this.year3000System?.cssVariableBatcher?.queueCSSVariableUpdate) {
+    if (this.year3000System?.cssConsciousnessController?.queueCSSVariableUpdate) {
       // Use Year3000System's batching system for optimal performance
-      this.year3000System.cssVariableBatcher.queueCSSVariableUpdate("--focus-visible", value);
+      this.year3000System.cssConsciousnessController.queueCSSVariableUpdate("--focus-visible", value);
     } else {
       // Fallback - direct DOM update
       document.documentElement.style.setProperty("--focus-visible", value);

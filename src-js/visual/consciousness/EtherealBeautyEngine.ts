@@ -13,9 +13,10 @@ import { HolographicUISystem, type HolographicState } from "@/visual/organic-con
 import { type ColorConsciousnessState, colorConsciousnessManager } from "@/visual/consciousness/ColorConsciousnessState";
 import type { RGB, MusicEmotion, BeatData, CinematicPalette } from "@/types/colorStubs";
 import { GlobalEventBus } from "@/core/events/EventBus";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
+import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 
 export interface EtherealState {
   emotionalIntensity: number;    // 0-1 current emotional intensity
@@ -26,6 +27,11 @@ export interface EtherealState {
   flowingGradientPhase: number;  // 0-2π flowing gradient animation phase
   emotionalResonance: number;    // 0-1 emotional connection strength
   softnessFactor: number;        // 0-1 overall softness multiplier
+  
+  // Target values for LERP smoothing
+  targetEmotionalIntensity: number;
+  targetBeautyLevel: number;
+  targetMysticalShimmer: number;
 }
 
 export interface EtherealEffectConfig {
@@ -54,7 +60,7 @@ export class EtherealBeautyEngine implements IManagedSystem {
   
   private holographicSystem: HolographicUISystem;
   // Using shared colorConsciousnessManager instead of injected orchestrator
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController;
   private musicSyncService: MusicSyncService;
   
   private etherealState: EtherealState;
@@ -77,6 +83,13 @@ export class EtherealBeautyEngine implements IManagedSystem {
     emotionalPulsePhase: 0,
     lastFrameTime: 0,
     isAnimating: false
+  };
+  
+  // LERP smoothing half-life values (in seconds) for framerate-independent decay
+  private lerpHalfLifeValues = {
+    emotionalIntensity: 0.25,    // Fast emotional response
+    beautyLevel: 0.35,           // Moderate beauty transitions
+    mysticalShimmer: 0.20        // Quick shimmer response
   };
   
   // Ethereal color palettes
@@ -106,14 +119,14 @@ export class EtherealBeautyEngine implements IManagedSystem {
 
   constructor(
     holographicSystem: HolographicUISystem,
-    cssVariableBatcher: CSSVariableBatcher,
+    cssConsciousnessController: UnifiedCSSConsciousnessController,
     musicSyncService: MusicSyncService
   ) {
     this.holographicSystem = holographicSystem;
-    this.cssVariableBatcher = cssVariableBatcher;
+    this.cssConsciousnessController = cssConsciousnessController;
     this.musicSyncService = musicSyncService;
     
-    // Initialize ethereal state
+    // Initialize ethereal state with LERP target values
     this.etherealState = {
       emotionalIntensity: 0,
       beautyLevel: 0,
@@ -122,7 +135,12 @@ export class EtherealBeautyEngine implements IManagedSystem {
       dreamyTranslucency: 0.9,  // High translucency for dreamy effect
       flowingGradientPhase: 0,
       emotionalResonance: 0,
-      softnessFactor: 1.0
+      softnessFactor: 1.0,
+      
+      // Initialize target values to current values (no animation initially)
+      targetEmotionalIntensity: 0,
+      targetBeautyLevel: 0,
+      targetMysticalShimmer: 0
     };
     
     // Initialize ethereal configuration
@@ -183,6 +201,9 @@ export class EtherealBeautyEngine implements IManagedSystem {
     
     // Update ethereal state from music
     this.updateEtherealFromMusic();
+    
+    // Apply LERP smoothing for framerate-independent animation
+    this.updateEtherealStateWithLERP(deltaSeconds);
     
     // Update mystical effects
     this.updateMysticalEffects();
@@ -284,19 +305,22 @@ export class EtherealBeautyEngine implements IManagedSystem {
   private triggerEtherealBeauty(intensity: number, valence: number): void {
     const startTime = performance.now();
     
-    // Set ethereal parameters for emotional moment
-    this.etherealState.emotionalIntensity = intensity;
-    this.etherealState.beautyLevel = Math.min(
-      this.etherealConfig.maxBeautyIntensity,
-      valence * intensity
-    );
-    this.etherealState.mysticalShimmer = valence * 0.6;
+    // Set non-LERP ethereal parameters for emotional moment
     this.etherealState.dreamyTranslucency = 0.8 + (valence * 0.2);
     
-    // Schedule gentle decay
-    setTimeout(() => {
-      this.gentleDecayEtherealBeauty();
-    }, this.etherealConfig.gentleTransitionDuration);
+    // Update target values for LERP animation (replaces old decay scheduling)
+    this.etherealState.targetEmotionalIntensity = Math.max(
+      this.etherealState.targetEmotionalIntensity,
+      intensity * 0.8
+    );
+    this.etherealState.targetBeautyLevel = Math.max(
+      this.etherealState.targetBeautyLevel, 
+      valence * 0.9
+    );
+    this.etherealState.targetMysticalShimmer = Math.max(
+      this.etherealState.targetMysticalShimmer,
+      valence * 0.6
+    );
     
     // Update performance metrics
     this.performanceMetrics.emotionalMomentCount++;
@@ -306,27 +330,55 @@ export class EtherealBeautyEngine implements IManagedSystem {
   }
 
   /**
-   * Gentle decay of ethereal beauty over time
+   * Update ethereal state with LERP smoothing towards target values
+   * This replaces the old frame-rate dependent decay system
    */
-  private gentleDecayEtherealBeauty(): void {
-    const decayRate = 0.02; // Very gentle 2% per frame
+  private updateEtherealStateWithLERP(deltaTimeSeconds: number): void {
+    // LERP current values towards targets for framerate-independent animation
+    this.etherealState.emotionalIntensity = Year3000Utilities.lerpSmooth(
+      this.etherealState.emotionalIntensity,
+      this.etherealState.targetEmotionalIntensity,
+      deltaTimeSeconds,
+      this.lerpHalfLifeValues.emotionalIntensity
+    );
     
-    const decay = () => {
-      this.etherealState.emotionalIntensity *= (1.0 - decayRate);
-      this.etherealState.beautyLevel *= (1.0 - decayRate * 0.8);
-      this.etherealState.mysticalShimmer *= (1.0 - decayRate * 0.6);
-      
-      if (this.etherealState.beautyLevel > 0.05) {
-        requestAnimationFrame(decay);
-      } else {
-        // Reset to gentle baseline
-        this.etherealState.emotionalIntensity = 0;
-        this.etherealState.beautyLevel = 0;
-        this.etherealState.mysticalShimmer = 0;
-      }
-    };
+    this.etherealState.beautyLevel = Year3000Utilities.lerpSmooth(
+      this.etherealState.beautyLevel,
+      this.etherealState.targetBeautyLevel,
+      deltaTimeSeconds,
+      this.lerpHalfLifeValues.beautyLevel
+    );
     
-    requestAnimationFrame(decay);
+    this.etherealState.mysticalShimmer = Year3000Utilities.lerpSmooth(
+      this.etherealState.mysticalShimmer,
+      this.etherealState.targetMysticalShimmer,
+      deltaTimeSeconds,
+      this.lerpHalfLifeValues.mysticalShimmer
+    );
+    
+    // Auto-decay targets when not actively being updated by music
+    // This creates natural decay without frame-rate dependency
+    const autoDecayHalfLife = 1.5; // Half-life of 1.5 seconds for target decay
+    this.etherealState.targetEmotionalIntensity = Year3000Utilities.lerpSmooth(
+      this.etherealState.targetEmotionalIntensity,
+      0, // Decay towards zero
+      deltaTimeSeconds,
+      autoDecayHalfLife
+    );
+    
+    this.etherealState.targetBeautyLevel = Year3000Utilities.lerpSmooth(
+      this.etherealState.targetBeautyLevel,
+      0, // Decay towards zero
+      deltaTimeSeconds,
+      autoDecayHalfLife * 1.2 // Slower decay for beauty
+    );
+    
+    this.etherealState.targetMysticalShimmer = Year3000Utilities.lerpSmooth(
+      this.etherealState.targetMysticalShimmer,
+      0, // Decay towards zero
+      deltaTimeSeconds,
+      autoDecayHalfLife * 0.8 // Faster decay for shimmer
+    );
   }
 
   /**
@@ -419,28 +471,28 @@ export class EtherealBeautyEngine implements IManagedSystem {
    */
   private updateEtherealColors(mapping: EtherealColorMapping): void {
     // Update ethereal color CSS variables
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--ethereal-soft-r',
       mapping.primarySoft.r.toString()
     );
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--ethereal-soft-g',
       mapping.primarySoft.g.toString()
     );
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--ethereal-soft-b',
       mapping.primarySoft.b.toString()
     );
     
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--ethereal-mystical-r',
       mapping.mysticalGlow.r.toString()
     );
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--ethereal-mystical-g',
       mapping.mysticalGlow.g.toString()
     );
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--ethereal-mystical-b',
       mapping.mysticalGlow.b.toString()
     );
@@ -490,7 +542,7 @@ export class EtherealBeautyEngine implements IManagedSystem {
     };
     
     for (const [variable, value] of Object.entries(baseVariables)) {
-      this.cssVariableBatcher.queueCSSVariableUpdate(variable, value);
+      this.cssConsciousnessController.queueCSSVariableUpdate(variable, value);
     }
   }
 
@@ -498,27 +550,27 @@ export class EtherealBeautyEngine implements IManagedSystem {
    * Update ethereal CSS variables
    */
   private updateEtherealCSSVariables(mapping: EtherealColorMapping): void {
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--ethereal-beauty-level',
       this.etherealState.beautyLevel.toString()
     );
     
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--ethereal-mystical-shimmer',
       this.etherealState.mysticalShimmer.toString()
     );
     
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--ethereal-gentle-transparency',
       mapping.gentleTransparency.toString()
     );
     
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--ethereal-flowing-phase',
       this.animationState.flowingPhase.toString()
     );
     
-    this.cssVariableBatcher.queueCSSVariableUpdate(
+    this.cssConsciousnessController.queueCSSVariableUpdate(
       '--ethereal-emotional-pulse',
       Math.sin(this.animationState.emotionalPulsePhase).toString()
     );
@@ -676,7 +728,7 @@ export class EtherealBeautyEngine implements IManagedSystem {
     this.updateEtherealElements();
     
     // Trigger CSS variable batch flush
-    this.cssVariableBatcher.flushCSSVariableBatch();
+    this.cssConsciousnessController.flushCSSVariableBatch();
   }
 
   /**
@@ -700,7 +752,12 @@ export class EtherealBeautyEngine implements IManagedSystem {
       dreamyTranslucency: 0.9,
       flowingGradientPhase: 0,
       emotionalResonance: 0,
-      softnessFactor: 1.0
+      softnessFactor: 1.0,
+      
+      // Reset target values too
+      targetEmotionalIntensity: 0,
+      targetBeautyLevel: 0,
+      targetMysticalShimmer: 0
     };
     
     this.initialized = false;

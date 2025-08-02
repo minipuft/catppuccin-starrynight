@@ -16,7 +16,7 @@
  */
 
 import { Y3K } from "@/debug/UnifiedDebugManager";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { EmotionalGradientMapper, EmotionalProfile } from "@/audio/EmotionalGradientMapper";
 import { FluxSpectralAnalyzer, SpectralData } from "@/audio/FluxSpectralAnalyzer";
@@ -108,7 +108,7 @@ export interface GenreVisualStyle {
 }
 
 export class GenreGradientEvolution {
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController;
   private musicSyncService: MusicSyncService | null = null;
   private emotionalGradientMapper: EmotionalGradientMapper | null = null;
   private settingsManager: SettingsManager | null = null;
@@ -400,12 +400,12 @@ export class GenreGradientEvolution {
   };
 
   constructor(
-    cssVariableBatcher: CSSVariableBatcher,
+    cssConsciousnessController: UnifiedCSSConsciousnessController,
     musicSyncService: MusicSyncService | null = null,
     emotionalGradientMapper: EmotionalGradientMapper | null = null,
     settingsManager: SettingsManager | null = null
   ) {
-    this.cssVariableBatcher = cssVariableBatcher;
+    this.cssConsciousnessController = cssConsciousnessController;
     this.musicSyncService = musicSyncService;
     this.emotionalGradientMapper = emotionalGradientMapper;
     this.settingsManager = settingsManager;
@@ -652,42 +652,148 @@ export class GenreGradientEvolution {
     const baseHue = style.primaryHueRange[0] + (hueRange * 0.5);
     const emotionalHueShift = emotionalProfile ? (emotionalProfile.valence - 0.5) * hueRange * 0.3 : 0;
     
-    this.cssVariableBatcher.setProperty("--sn-genre-base-hue", `${baseHue + emotionalHueShift}deg`);
-    this.cssVariableBatcher.setProperty("--sn-genre-hue-range", `${hueRange}deg`);
+    this.cssConsciousnessController.setProperty("--sn-genre-base-hue", `${baseHue + emotionalHueShift}deg`);
+    this.cssConsciousnessController.setProperty("--sn-genre-hue-range", `${hueRange}deg`);
     
     // Apply saturation and brightness profiles
     const emotionalSatBoost = emotionalProfile ? emotionalProfile.arousal * 0.3 : 0;
     const emotionalBrightBoost = emotionalProfile ? emotionalProfile.energy * 0.2 : 0;
     
-    this.cssVariableBatcher.setProperty("--sn-genre-saturation-base", (style.saturationProfile[0] + emotionalSatBoost).toString());
-    this.cssVariableBatcher.setProperty("--sn-genre-saturation-variation", style.saturationProfile[1].toString());
-    this.cssVariableBatcher.setProperty("--sn-genre-brightness-base", (style.brightnessProfile[0] + emotionalBrightBoost).toString());
-    this.cssVariableBatcher.setProperty("--sn-genre-brightness-variation", style.brightnessProfile[1].toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-saturation-base", (style.saturationProfile[0] + emotionalSatBoost).toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-saturation-variation", style.saturationProfile[1].toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-brightness-base", (style.brightnessProfile[0] + emotionalBrightBoost).toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-brightness-variation", style.brightnessProfile[1].toString());
     
     // Apply contrast and geometry
-    this.cssVariableBatcher.setProperty("--sn-genre-contrast-level", style.contrastLevel.toString());
-    this.cssVariableBatcher.setProperty("--sn-genre-edge-sharpness", style.edgeSharpness.toString());
-    this.cssVariableBatcher.setProperty("--sn-genre-gradient-complexity", style.gradientComplexity.toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-contrast-level", style.contrastLevel.toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-edge-sharpness", style.edgeSharpness.toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-gradient-complexity", style.gradientComplexity.toString());
     
     // Apply animation characteristics
     const emotionalSpeedMod = emotionalProfile ? 0.5 + emotionalProfile.energy : 1;
-    this.cssVariableBatcher.setProperty("--sn-genre-animation-speed", emotionalSpeedMod.toString());
-    this.cssVariableBatcher.setProperty("--sn-genre-pulse-intensity", style.depthIllusion.toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-animation-speed", emotionalSpeedMod.toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-pulse-intensity", style.depthIllusion.toString());
     
     // Apply layer interaction
     const layerHarmony = this.mapLayerBlending(style.layerBlending);
-    this.cssVariableBatcher.setProperty("--sn-genre-layer-harmony", layerHarmony.toString());
-    this.cssVariableBatcher.setProperty("--sn-genre-depth-illusion", style.depthIllusion.toString());
-    this.cssVariableBatcher.setProperty("--sn-genre-particle-influence", style.particleInfluence.toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-layer-harmony", layerHarmony.toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-depth-illusion", style.depthIllusion.toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-particle-influence", style.particleInfluence.toString());
     
     // Apply temporal behavior
-    this.cssVariableBatcher.setProperty("--sn-genre-memory-influence", style.memoryInfluence.toString());
-    this.cssVariableBatcher.setProperty("--sn-genre-adaptation-speed", style.adaptationSpeed.toString());
-    this.cssVariableBatcher.setProperty("--sn-genre-stability-preference", style.stabilityPreference.toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-memory-influence", style.memoryInfluence.toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-adaptation-speed", style.adaptationSpeed.toString());
+    this.cssConsciousnessController.setProperty("--sn-genre-stability-preference", style.stabilityPreference.toString());
     
     // Update genre identity
-    this.cssVariableBatcher.setProperty("--sn-current-genre", this.currentGenre);
-    this.cssVariableBatcher.setProperty("--sn-genre-confidence", this.genreConfidence.toString());
+    this.cssConsciousnessController.setProperty("--sn-current-genre", this.currentGenre);
+    this.cssConsciousnessController.setProperty("--sn-genre-confidence", this.genreConfidence.toString());
+    
+    // 🔧 CRITICAL ENHANCEMENT: Coordinate with consolidated gradient system
+    // Apply genre-specific modifications to background gradient variables
+    this.updateGenreGradientCoordination(style, emotionalProfile);
+  }
+
+  /**
+   * Coordinate genre-specific modifications with the consolidated --sn-bg-gradient-* system
+   */
+  private updateGenreGradientCoordination(style: GenreVisualStyle, emotionalProfile: EmotionalProfile | null): void {
+    // Get current background gradient colors (set by ColorHarmonyEngine/Year3000System)
+    const rootStyle = getComputedStyle(document.documentElement);
+    const currentPrimary = rootStyle.getPropertyValue('--sn-bg-gradient-primary').trim();
+    const currentSecondary = rootStyle.getPropertyValue('--sn-bg-gradient-secondary').trim();
+    const currentAccent = rootStyle.getPropertyValue('--sn-bg-gradient-accent').trim();
+    
+    // Only proceed if we have base gradient colors to modify
+    if (currentPrimary || currentSecondary || currentAccent) {
+      // Apply genre-specific gradient style parameters
+      const emotionalSpeedMod = emotionalProfile ? 0.5 + emotionalProfile.energy : 1;
+      
+      // Set genre-specific gradient angle based on style characteristics
+      const genreAngle = this.calculateGenreAngle(style);
+      this.cssConsciousnessController.setProperty("--sn-bg-gradient-angle", `${genreAngle}deg`);
+      
+      // Set genre-specific opacity based on style characteristics
+      const genreOpacity = this.calculateGenreOpacity(style, emotionalProfile);
+      this.cssConsciousnessController.setProperty("--sn-bg-gradient-opacity", genreOpacity.toString());
+      
+      // Set genre-specific blur based on edge sharpness
+      const genreBlur = Math.max(60, 120 * (1 - style.edgeSharpness));
+      this.cssConsciousnessController.setProperty("--sn-bg-gradient-blur", `${genreBlur}px`);
+      
+      // Set genre-specific saturation and brightness modifiers
+      const emotionalSatBoost = emotionalProfile ? emotionalProfile.arousal * 0.3 : 0;
+      const emotionalBrightBoost = emotionalProfile ? emotionalProfile.energy * 0.2 : 0;
+      
+      this.cssConsciousnessController.setProperty("--sn-bg-gradient-saturation", (style.saturationProfile[0] + emotionalSatBoost).toString());
+      this.cssConsciousnessController.setProperty("--sn-bg-gradient-brightness", (style.brightnessProfile[0] + emotionalBrightBoost).toString());
+      this.cssConsciousnessController.setProperty("--sn-bg-gradient-contrast", style.contrastLevel.toString());
+      
+      Y3K?.debug?.log("GenreGradientEvolution", `Coordinated genre "${this.currentGenre}" modifications with gradient system: angle=${genreAngle}°, opacity=${genreOpacity}`);
+    }
+  }
+
+  /**
+   * Calculate gradient angle based on genre characteristics
+   */
+  private calculateGenreAngle(style: GenreVisualStyle): number {
+    // Different genres have different natural gradient flows
+    const genreAngles: { [key in MusicGenre]: number } = {
+      electronic: 135,   // Digital diagonal flow
+      rock: 45,          // Bold upward energy
+      classical: 90,     // Elegant vertical flow
+      jazz: 120,         // Complex angular flow
+      "hip-hop": 0,      // Horizontal urban flow
+      ambient: 180,      // Ethereal downward flow
+      pop: 315,          // Catchy diagonal up-right
+      metal: 225,        // Aggressive diagonal down
+      folk: 60,          // Natural organic angle
+      funk: 30,          // Groovy slight angle
+      indie: 150,        // Alternative angle
+      reggae: 210,       // Laid-back flow
+      blues: 270,        // Deep downward emotion
+      country: 45,       // Simple upward angle
+      techno: 135,       // Digital diagonal
+      house: 315,        // Dance energy up-right
+      trance: 90,        // Uplifting vertical
+      dubstep: 180,      // Heavy downward
+      unknown: 45        // Default diagonal
+    };
+    
+    return genreAngles[this.currentGenre] || 45;
+  }
+
+  /**
+   * Calculate gradient opacity based on genre and emotional characteristics
+   */
+  private calculateGenreOpacity(style: GenreVisualStyle, emotionalProfile: EmotionalProfile | null): number {
+    let baseOpacity = 0.8;
+    
+    // Genre-specific opacity adjustments
+    switch (this.currentGenre) {
+      case "ambient":
+      case "classical":
+        baseOpacity = 0.6; // Subtle, ethereal
+        break;
+      case "metal":
+      case "rock":
+      case "dubstep":
+        baseOpacity = 0.9; // Intense, bold
+        break;
+      case "jazz":
+      case "blues":
+        baseOpacity = 0.75; // Sophisticated, moderate
+        break;
+      default:
+        baseOpacity = 0.8; // Standard intensity
+    }
+    
+    // Apply emotional modulation
+    if (emotionalProfile) {
+      baseOpacity *= (0.7 + emotionalProfile.energy * 0.3); // Energy affects intensity
+    }
+    
+    return Math.max(0.3, Math.min(1.0, baseOpacity));
   }
 
   private mapLayerBlending(blending: GenreVisualStyle["layerBlending"]): number {

@@ -12,7 +12,7 @@
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { Y3K } from "@/debug/UnifiedDebugManager";
 import type { 
@@ -92,7 +92,7 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
   private genreFlowPatterns: GenreFlowPatterns;
   private spectralFlowMapping: SpectralFlowMapping;
   
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
   
   private lastBeatTime = 0;
@@ -117,7 +117,14 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     super(config, utils, performanceMonitor, musicSyncService, settingsManager);
     
     this.colorHarmonyEngine = null; // Initialize as null, will be set later
-    this.cssVariableBatcher = new CSSVariableBatcher();
+    // Initialize CSS Consciousness Controller if available
+    const cssController = UnifiedCSSConsciousnessController.getInstance();
+    if (cssController) {
+      this.cssConsciousnessController = cssController;
+    } else {
+      Y3K?.debug?.warn("GradientDirectionalFlowSystem", "UnifiedCSSConsciousnessController not available, CSS consciousness disabled");
+      this.cssConsciousnessController = null;
+    }
     
     // Initialize flow settings
     this.flowSettings = {
@@ -416,34 +423,36 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     if (currentTime - this.lastFlowUpdate < this.updateThrottleInterval) return;
     this.lastFlowUpdate = currentTime;
     
-    // Update flow direction CSS variables
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-flow-direction-x',
-      this.currentFlowVector.x.toFixed(3)
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-flow-direction-y',
-      this.currentFlowVector.y.toFixed(3)
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-flow-intensity',
-      this.currentFlowVector.intensity.toFixed(3)
-    );
-    
-    // Update flow strength for WebGL systems
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-flow-strength',
-      (this.currentFlowVector.intensity * 0.8).toFixed(3)
-    );
-    
-    // Update flow angle for CSS transforms
-    const flowAngle = Math.atan2(this.currentFlowVector.y, this.currentFlowVector.x);
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-flow-angle',
-      `${(flowAngle * 180 / Math.PI).toFixed(1)}deg`
-    );
+    // Update flow direction CSS variables (if controller is available)
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-flow-direction-x',
+        this.currentFlowVector.x.toFixed(3)
+      );
+      
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-flow-direction-y',
+        this.currentFlowVector.y.toFixed(3)
+      );
+      
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-flow-intensity',
+        this.currentFlowVector.intensity.toFixed(3)
+      );
+      
+      // Update flow strength for WebGL systems
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-flow-strength',
+        (this.currentFlowVector.intensity * 0.8).toFixed(3)
+      );
+      
+      // Update flow angle for CSS transforms
+      const flowAngle = Math.atan2(this.currentFlowVector.y, this.currentFlowVector.x);
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-flow-angle',
+        `${(flowAngle * 180 / Math.PI).toFixed(1)}deg`
+      );
+    }
   }
   
   private adaptFlowToGenre(genre: GenreClassification): void {
@@ -490,16 +499,18 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     const animatedX = baseX + Math.sin(animationPhase) * 0.05;
     const animatedY = baseY + Math.cos(animationPhase) * 0.05;
     
-    // Update CSS variables with animation
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-flow-animated-x',
-      animatedX.toFixed(3)
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-flow-animated-y',
-      animatedY.toFixed(3)
-    );
+    // Update CSS variables with animation (if controller is available)
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-flow-animated-x',
+        animatedX.toFixed(3)
+      );
+      
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-flow-animated-y',
+        animatedY.toFixed(3)
+      );
+    }
   }
   
   public override updateAnimation(deltaTime: number): void {

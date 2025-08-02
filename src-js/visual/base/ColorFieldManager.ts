@@ -407,7 +407,7 @@ export class ColorFieldManager implements IVisualSystem {
     const prefix = `--sn-zone-${zoneId}`;
     Object.entries(harmoniousColors).forEach(([edge, color]) => {
       if (color && typeof color === "string") {
-        this.year3000System.cssVariableBatcher?.queueCSSVariableUpdate(
+        this.year3000System.cssConsciousnessController?.queueCSSVariableUpdate(
           `${prefix}-${edge}-color`,
           color,
           zone.element

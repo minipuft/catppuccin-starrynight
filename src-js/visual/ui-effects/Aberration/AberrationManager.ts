@@ -30,8 +30,9 @@ function isAberrationEnabled(): boolean {
 
 function attach(y3k: Year3000System | null): void {
   if (!isAberrationEnabled()) {
-    // Ensure noise overlay is disabled if setting off
+    // Ensure noise overlay and CSS effects are disabled if setting off
     setNebulaNoiseEnabled(false, y3k);
+    setCSSAberrationEnabled(false, y3k);
     return;
   }
 
@@ -46,6 +47,9 @@ function attach(y3k: Year3000System | null): void {
 
   // Enable noise overlay only when WebGL canvas is active
   setNebulaNoiseEnabled(true, y3k);
+
+  // Enable CSS-based aberration effects to complement WebGL
+  setCSSAberrationEnabled(true, y3k);
 
   // ----- Year 3000 Phase-1: register visual system -----
   if (y3k && instance) {
@@ -78,12 +82,39 @@ function setNebulaNoiseEnabled(
   }
 }
 
+/** Enable CSS-based aberration effects to complement WebGL canvas aberration. */
+function setCSSAberrationEnabled(
+  enabled: boolean,
+  y3k: Year3000System | null
+): void {
+  const variables = {
+    "--aberration-webgl-active": enabled ? "1" : "0",
+    "--aberration-css-enabled": enabled ? "1" : "0",
+    "--aberration-hybrid-mode": enabled ? "1" : "0"
+  };
+
+  if (y3k) {
+    // Use the system's CSS variable batching for performance
+    Object.entries(variables).forEach(([key, value]) => {
+      y3k.queueCSSVariableUpdate(key, value);
+    });
+  } else {
+    // Fallback when Year3000System not yet ready
+    Object.entries(variables).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(key, value);
+    });
+  }
+}
+
 export function initializeAberrationManager(y3k: Year3000System | null = null) {
   // Immediate attempt (first page)
   attach(y3k);
 
-  // If attach failed (no instance), disable noise overlay to avoid bright wash
-  if (!instance) setNebulaNoiseEnabled(false, y3k);
+  // If attach failed (no instance), disable noise overlay and CSS effects to avoid bright wash
+  if (!instance) {
+    setNebulaNoiseEnabled(false, y3k);
+    setCSSAberrationEnabled(false, y3k);
+  }
 
   // React-Router style – newer Spotify builds
   const history = (window as any).Spicetify?.Platform?.History;
@@ -98,7 +129,10 @@ export function initializeAberrationManager(y3k: Year3000System | null = null) {
   const observer = new MutationObserver(() => {
     if (!instance) {
       attach(y3k);
-      if (!instance) setNebulaNoiseEnabled(false, y3k);
+      if (!instance) {
+        setNebulaNoiseEnabled(false, y3k);
+        setCSSAberrationEnabled(false, y3k);
+      }
     } else {
       observer.disconnect();
     }
@@ -125,6 +159,7 @@ export function initializeAberrationManager(y3k: Year3000System | null = null) {
         y3k?.performanceAnalyzer?.emitTrace("AberrationCanvasDetached");
       }
       setNebulaNoiseEnabled(enable && !!instance, y3k);
+      setCSSAberrationEnabled(enable && !!instance, y3k);
     }
     // Phase-3: Live strength updates via SettingsManager
     if (key === "sn-nebula-aberration-strength") {

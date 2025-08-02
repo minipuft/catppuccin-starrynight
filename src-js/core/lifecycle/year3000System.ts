@@ -7,9 +7,12 @@ import { NonVisualSystemFacade } from "@/core/integration/NonVisualSystemFacade"
 
 // Color orchestration imports for Strategy pattern
 import { globalColorOrchestrator } from "@/visual/integration/ColorOrchestrator";
+import { globalColorStateManager } from "@/core/css/ColorStateManager";
 
 // Event-driven integration imports
 import { GlobalEventBus } from "@/core/events/EventBus";
+import { EventMigrationManager } from "@/core/events/EventMigrationManager";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import type { ColorHarmonizedEvent } from "@/types/colorStrategy";
 
 // Essential configuration imports
@@ -55,12 +58,35 @@ export class Year3000System {
   public YEAR3000_CONFIG: Year3000Config;
   public utils: typeof Utils;
   public initialized: boolean;
+  private healthCheckInterval: number | null = null;
 
   // Phase 4: Facade Coordination System (replaces direct system properties)
   public facadeCoordinator: SystemCoordinator | null = null;
   
+  // Color State Management System
+  public colorStateManager: typeof globalColorStateManager | null = null;
+  
   // Private initialization results storage
   private _initializationResults: any | null = null;
+
+  // Phase 1: Loop Prevention System - Processing State Tracking
+  private processingState = {
+    isProcessingSongChange: false,
+    lastProcessedTrackUri: null as string | null,
+    lastProcessingTime: 0,
+    processingChain: [] as string[],
+    eventLoopDetected: false
+  };
+
+  private colorEventState = {
+    processedEvents: new Map<string, number>(),
+    isProcessingColorEvent: false,
+    eventTimeout: null as number | null
+  };
+
+  private readonly PROCESSING_TIMEOUT = 5000; // 5 second safety timeout
+  private readonly MAX_CHAIN_LENGTH = 10; // Prevent infinite chains
+  private readonly COLOR_EVENT_CACHE_TTL = 2000; // 2 second cache
 
   // Phase 4: Pure Facade Access Property Getters
 
@@ -71,11 +97,12 @@ export class Year3000System {
   public get timerConsolidationSystem() {
     return this.facadeCoordinator?.getCachedNonVisualSystem('TimerConsolidationSystem') || null;
   }
-  public get cssVariableBatcher() {
-    return this.facadeCoordinator?.getCachedNonVisualSystem('CSSVariableBatcher') || null;
+  public get cssConsciousnessController() {
+    return this.facadeCoordinator?.getCachedNonVisualSystem('UnifiedCSSConsciousnessController') || null;
   }
+  // Legacy compatibility getters
   public get unifiedCSSManager() {
-    return this.facadeCoordinator?.getCachedNonVisualSystem('UnifiedCSSVariableManager') || null;
+    return this.cssConsciousnessController || null;
   }
   public get performanceCoordinator() {
     return this.facadeCoordinator?.getCachedNonVisualSystem('UnifiedPerformanceCoordinator') || null;
@@ -90,7 +117,16 @@ export class Year3000System {
     return this.facadeCoordinator?.getCachedNonVisualSystem('UnifiedPerformanceCoordinator') || null;
   }
   public get performanceCSSIntegration() {
-    return this.facadeCoordinator?.getCachedNonVisualSystem('PerformanceCSSIntegration') || null;
+    return this.cssConsciousnessController || null;
+  }
+  public get performanceOrchestrator() {
+    return this.facadeCoordinator?.getCachedNonVisualSystem('PerformanceOrchestrator') || null;
+  }
+  public get qualityScalingManager() {
+    return this.facadeCoordinator?.getCachedNonVisualSystem('QualityScalingManager') || null;
+  }
+  public get performanceBudgetManager() {
+    return this.facadeCoordinator?.getCachedNonVisualSystem('PerformanceBudgetManager') || null;
   }
 
   // Managers and Services
@@ -103,6 +139,42 @@ export class Year3000System {
   public get colorHarmonyEngine() {
     return this.facadeCoordinator?.getCachedNonVisualSystem('ColorHarmonyEngine') || null;
   }
+  
+  // 🔧 PHASE 3: Unified Color Processing Access 
+  public get unifiedColorProcessingEngine() {
+    return this.facadeCoordinator?.getCachedNonVisualSystem('UnifiedColorProcessingEngine') || null;
+  }
+
+  public get musicColorIntegrationBridge() {
+    // TODO: Return actual MusicColorIntegrationBridge once implemented
+    // Temporarily return null until the unified systems are created
+    return null;
+  }
+
+  // 🔧 PHASE 3: Legacy Compatibility - Delegate to Unified Systems
+  public get colorEventOrchestrator() {
+    // Delegate to unified processing engine during transition
+    const unified = this.unifiedColorProcessingEngine;
+    return unified ? unified as any : null; // Type compatibility shim
+  }
+
+  public get colorOrchestrator() {
+    // Delegate to unified processing engine during transition
+    const unified = this.unifiedColorProcessingEngine;
+    return unified ? unified as any : null;
+  }
+
+  public get enhancedColorOrchestrator() {
+    // Delegate to unified processing engine during transition
+    const unified = this.unifiedColorProcessingEngine;
+    return unified ? unified as any : null;
+  }
+
+  public get colorConsciousnessState() {
+    // 🔧 PHASE 4: Delegate to unified consciousness coordinator
+    return this.unifiedConsciousnessCoordinator || null;
+  }
+
   public get musicSyncService() {
     return this.facadeCoordinator?.getCachedNonVisualSystem('MusicSyncService') || null;
   }
@@ -112,13 +184,64 @@ export class Year3000System {
   public get card3DManager() {
     return this.facadeCoordinator?.getCachedNonVisualSystem('Card3DManager') || null;
   }
+  
+  // Consciousness Systems
+  public get genreGradientEvolution() {
+    return this.facadeCoordinator?.getCachedNonVisualSystem('GenreGradientEvolution') || null;
+  }
+  public get musicEmotionAnalyzer() {
+    return this.facadeCoordinator?.getCachedNonVisualSystem('MusicEmotionAnalyzer') || null;
+  }
+  
+  // 🔧 PHASE 4: Unified Consciousness Coordination
+  public get unifiedConsciousnessCoordinator() {
+    return this.facadeCoordinator?.getCachedNonVisualSystem('UnifiedConsciousnessCoordinator') || null;
+  }
+  
+  // 🔧 PHASE 4: Backward compatibility delegation for consolidated consciousness systems
+  public get colorConsciousnessManager() {
+    return this.unifiedConsciousnessCoordinator || null;
+  }
+  public get dynamicCatppuccinBridge() {
+    return this.unifiedConsciousnessCoordinator || null;
+  }
 
   // Visual Systems
+  public get particleConsciousnessModule() {
+    return this.facadeCoordinator?.getVisualSystem('Particle') || null;
+  }
+  public get sidebarConsciousnessController() {
+    return this.facadeCoordinator?.getVisualSystem('SidebarConsciousness') || null;
+  }
+
+  public get uiEffectsConsciousnessController() {
+    return this.facadeCoordinator?.getVisualSystem('UIEffectsConsciousness') || null;
+  }
+
+  public get headerConsciousnessController() {
+    return this.facadeCoordinator?.getVisualSystem('HeaderConsciousness') || null;
+  }
+  
+  // Legacy compatibility getters
   public get lightweightParticleSystem() {
     return this.facadeCoordinator?.getVisualSystem('Particle') || null;
   }
+  
+  // UI Effects systems now consolidated into ConsciousnessUIEffectsController
+  public get iridescentShimmerEffectsSystem() {
+    return this.facadeCoordinator?.getVisualSystem('UIEffectsConsciousness') || null;
+  }
   public get interactionTrackingSystem() {
-    return this.facadeCoordinator?.getVisualSystem('InteractionTracking') || null;
+    return this.facadeCoordinator?.getVisualSystem('UIEffectsConsciousness') || null;
+  }
+  public get whiteLayerDiagnosticSystem() {
+    return this.facadeCoordinator?.getVisualSystem('UIEffectsConsciousness') || null;
+  }
+  public get audioVisualController() {
+    return this.facadeCoordinator?.getVisualSystem('UIEffectsConsciousness') || null;
+  }
+  public get prismaticScrollSheenSystem() {
+    return this.facadeCoordinator?.getVisualSystem('UIEffectsConsciousness') || null;
   }
   public get beatSyncVisualSystem() {
     return this.facadeCoordinator?.getVisualSystem('OrganicBeatSync') || null;
@@ -126,8 +249,9 @@ export class Year3000System {
   public get webGLGradientBackgroundSystem() {
     return this.facadeCoordinator?.getVisualSystem('WebGLBackground') || null;
   }
+  // Legacy compatibility - particleFieldSystem consolidated into particleConsciousnessModule
   public get particleFieldSystem() {
-    return this.facadeCoordinator?.getVisualSystem('ParticleField') || null;
+    return this.facadeCoordinator?.getVisualSystem('Particle') || null;
   }
   public get emergentChoreographyEngine() {
     // EmergentChoreography functionality integrated into EnhancedMasterAnimationCoordinator
@@ -145,9 +269,6 @@ export class Year3000System {
   // Integration Systems Getters
   public get sidebarSystemsIntegration() {
     return this.facadeCoordinator?.getCachedNonVisualSystem('SidebarSystemsIntegration') || null;
-  }
-  public get unifiedSystemIntegration() {
-    return this.facadeCoordinator?.getCachedNonVisualSystem('UnifiedSystemIntegration') || null;
   }
 
   // API availability tracking
@@ -228,7 +349,16 @@ export class Year3000System {
 
     // Start NowPlaying DOM watcher (force-refresh variable)
     this._disposeNowPlayingWatcher = startNowPlayingWatcher(() => {
-      this.queueCSSVariableUpdate("--sn-force-refresh", Date.now().toString());
+      const timestamp = Date.now().toString();
+      this.queueCSSVariableUpdate("--sn-force-refresh", timestamp);
+      
+      // Publish event for systems that need to react to music changes
+      // This replaces DOM watching with event-driven coordination
+      GlobalEventBus.emit('music:now-playing-changed', {
+        timestamp: parseInt(timestamp),
+        source: 'NowPlayingDomWatcher',
+        reason: 'Music track or state changed'
+      });
     }, this.YEAR3000_CONFIG.enableDebug);
 
     // Keep local convenience flag in sync with config default
@@ -324,6 +454,13 @@ export class Year3000System {
         enableCrossFacadeCommunication: true,
         enableUnifiedPerformanceMonitoring: true,
         enableResourceOptimization: true,
+        orchestration: {
+          enforceSequentialInitialization: true,
+          dependencyValidation: true,
+          enableInitializationGates: true,
+          systemReadinessTimeout: 5000,
+          phaseTransitionTimeout: 10000,
+        },
         performanceThresholds: {
           maxTotalMemoryMB: 100,
           maxTotalInitTime: 5000,
@@ -340,6 +477,30 @@ export class Year3000System {
         console.log("🌌 [Year3000System] Facade Coordination System initialized successfully");
       }
       
+      // Initialize EventMigrationManager for bridging legacy and unified event systems
+      const eventMigrationManager = EventMigrationManager.getInstance();
+      if (this.YEAR3000_CONFIG.enableDebug) {
+        console.log("🌌 [Year3000System] EventMigrationManager initialized for event bridging");
+      }
+      
+      // Initialize ColorStateManager
+      if (this.YEAR3000_CONFIG.enableDebug) {
+        console.log("🌌 [Year3000System] Initializing ColorStateManager...");
+      }
+      try {
+        this.colorStateManager = globalColorStateManager;
+        if (!this.colorStateManager.initialized) {
+          await this.colorStateManager.initialize();
+        }
+        initializationResults.success.push("ColorStateManager");
+        if (this.YEAR3000_CONFIG.enableDebug) {
+          console.log("🌌 [Year3000System] ColorStateManager initialized successfully");
+        }
+      } catch (error) {
+        console.error("🌌 [Year3000System] Failed to initialize ColorStateManager:", error);
+        initializationResults.failed.push("ColorStateManager");
+      }
+
       // Phase 4: Initialize core systems through facades
       await this._initializeFacadeSystems();
       
@@ -376,17 +537,17 @@ export class Year3000System {
         },
       },
       {
-        name: "UnifiedCSSVariableManager",
+        name: "UnifiedCSSConsciousnessController",
         init: () => {
-          this.unifiedCSSManager = UnifiedCSSVariableManager.getInstance(
+          this.unifiedCSSManager = UnifiedCSSConsciousnessController.getInstance(
             this.YEAR3000_CONFIG
           );
 
           // Initialize with performance analyzer and CSS variable batcher
-          if (this.performanceAnalyzer && this.cssVariableBatcher) {
+          if (this.performanceAnalyzer && this.cssConsciousnessController) {
             this.unifiedCSSManager.initialize(
               this.performanceAnalyzer,
-              this.cssVariableBatcher
+              this.cssConsciousnessController
             );
           }
         },
@@ -414,11 +575,11 @@ export class Year3000System {
       },
       // PerformanceOptimizationManager consolidated into UnifiedPerformanceCoordinator
       {
-        name: "PerformanceCSSIntegration",
+        name: "UnifiedCSSConsciousnessController",
         init: () => {
           if (this.unifiedCSSManager && this.unifiedPerformanceCoordinator) {
             this.performanceCSSIntegration =
-              PerformanceCSSIntegration.getInstance(
+              UnifiedCSSConsciousnessController.getInstance(
                 this.YEAR3000_CONFIG,
                 this.unifiedCSSManager,
                 this.unifiedPerformanceCoordinator
@@ -426,7 +587,7 @@ export class Year3000System {
 
             if (this.YEAR3000_CONFIG.enableDebug) {
               console.log(
-                "[Year3000System] PerformanceCSSIntegration initialized with CSS performance coordination"
+                "[Year3000System] UnifiedCSSConsciousnessController initialized with CSS performance coordination"
               );
             }
           }
@@ -525,7 +686,7 @@ export class Year3000System {
           this.glassmorphismManager = new GlassmorphismManager(
             this.YEAR3000_CONFIG,
             this.utils,
-            this.cssVariableBatcher,
+            this.cssConsciousnessController,
             this.performanceAnalyzer,
             this.settingsManager
           );
@@ -690,7 +851,7 @@ export class Year3000System {
       // Initialize only essential systems that don't require Spicetify APIs
       const essentialSystems = [
         'PerformanceAnalyzer',
-        'CSSVariableBatcher',
+        'UnifiedCSSConsciousnessController',
         'UnifiedDebugManager',
         'DeviceCapabilityDetector',
         'TimerConsolidationSystem'
@@ -742,7 +903,7 @@ export class Year3000System {
       // Initialize essential non-visual systems first
       const essentialNonVisualSystems = [
         'PerformanceAnalyzer',
-        'CSSVariableBatcher', 
+        'UnifiedCSSConsciousnessController', 
         'UnifiedDebugManager',
         'SettingsManager',
         'DeviceCapabilityDetector',
@@ -750,8 +911,10 @@ export class Year3000System {
         'UnifiedPerformanceCoordinator',
         'MusicSyncService',
         'ColorHarmonyEngine',
-        'GlassmorphismManager',   // 🌊 Essential glassmorphism effects
-        'Card3DManager'           // 🎴 Essential 3D card transformations
+        'GenreGradientEvolution',  // 🎵 Genre-specific visual consciousness
+        'MusicEmotionAnalyzer',    // 🎭 Emotional intelligence for music analysis
+        'GlassmorphismManager',    // 🌊 Essential glassmorphism effects
+        'Card3DManager'            // 🎴 Essential 3D card transformations
       ];
 
       for (const systemKey of essentialNonVisualSystems) {
@@ -789,11 +952,11 @@ export class Year3000System {
 
       // Initialize visual systems
       const essentialVisualSystems = [
-        'Particle',
-        'ParticleField', 
+        'Particle',               // ParticleField consolidated into Particle (ParticleConsciousnessModule)
         'WebGLBackground',         // 🌌 Enable WebGL gradient backgrounds
         'SpotifyUIApplication',    // 🎨 Core UI color application
         'OrganicBeatSync',
+        'HeaderConsciousness',     // 🎭 Music-responsive header consciousness animations
         'InteractionTracking'
         // EmergentChoreography integrated into EnhancedMasterAnimationCoordinator
       ];
@@ -1120,7 +1283,7 @@ export class Year3000System {
     }
   }
 
-  public async applyInitialSettings(): Promise<void> {
+  public async applyInitialSettings(trigger?: 'flavor' | 'brightness' | 'accent' | 'full'): Promise<void> {
     if (!this.settingsManager) {
       console.warn(
         "[Year3000System] SettingsManager not ready, cannot apply initial settings."
@@ -1129,15 +1292,44 @@ export class Year3000System {
     }
     if (this.YEAR3000_CONFIG.enableDebug) {
       console.log(
-        "🎨 [Year3000System] Inside applyInitialSettings. SettingsManager valid:",
+        `🎨 [Year3000System] Inside applyInitialSettings. Trigger: ${trigger || 'full'}, SettingsManager valid:`,
         !!this.settingsManager
       );
     }
+
     try {
+      // Handle selective updates for color-related changes
+      if (trigger === 'flavor' || trigger === 'brightness' || trigger === 'accent') {
+        console.log(`🎨 [Year3000System] Selective update for trigger: ${trigger}`);
+        await this.updateColorStateOnly(trigger);
+        await this.refreshColorDependentSystems(trigger);
+        return;
+      }
+
+      // Full settings application (original behavior)
       console.log(
         "🎨 [Year3000System] applyInitialSettings: Getting initial settings..."
       );
-      const accent = this.settingsManager.get("catppuccin-accentColor");
+
+      // Initialize ColorStateManager if available
+      if (this.colorStateManager && !this.colorStateManager.initialized) {
+        console.log("🎨 [Year3000System] Initializing ColorStateManager...");
+        await this.colorStateManager.initialize();
+      }
+
+      // Apply color state first (replaces old _applyCatppuccinAccent logic)
+      if (this.colorStateManager?.initialized) {
+        console.log("🎨 [Year3000System] Applying initial color state via ColorStateManager...");
+        await this.colorStateManager.applyInitialColorState();
+      } else {
+        console.warn("🎨 [Year3000System] ColorStateManager not available, using legacy color application");
+        // Fallback to legacy accent application
+        const accent = this.settingsManager.get("catppuccin-accentColor");
+        if ((accent as string) !== "dynamic") {
+          await this._applyCatppuccinAccent(accent);
+        }
+      }
+
       const gradient = this.settingsManager.get("sn-gradient-intensity");
       const stars = this.settingsManager.get("sn-star-density");
 
@@ -1154,15 +1346,9 @@ export class Year3000System {
       }
 
       console.log(
-        `🎨 [Year3000System] applyInitialSettings: Accent=${accent}, Gradient=${gradient}, Stars=${stars}`
+        `🎨 [Year3000System] applyInitialSettings: Gradient=${gradient}, Stars=${stars}, ColorState=${!!this.colorStateManager?.initialized}`
       );
-      if ((accent as string) !== "dynamic") {
-        await this._applyCatppuccinAccent(accent);
-      } else if (this.YEAR3000_CONFIG.enableDebug) {
-        console.log(
-          "🎨 [Year3000System] Skipping static accent application because 'dynamic' accent is selected."
-        );
-      }
+      
       await this._applyStarryNightSettings(
         gradient as "disabled" | "minimal" | "balanced" | "intense",
         stars as "disabled" | "minimal" | "balanced" | "intense"
@@ -1190,6 +1376,32 @@ export class Year3000System {
     }
   }
 
+  /**
+   * Update only color state without full settings reload
+   */
+  private async updateColorStateOnly(trigger: 'flavor' | 'brightness' | 'accent'): Promise<void> {
+    if (!this.colorStateManager?.initialized) {
+      console.warn(`🎨 [Year3000System] ColorStateManager not available for ${trigger} update`);
+      return;
+    }
+
+    console.log(`🎨 [Year3000System] Updating color state for trigger: ${trigger}`);
+    await this.colorStateManager.updateColorState(trigger);
+  }
+
+  /**
+   * Refresh only color-dependent systems efficiently
+   */
+  private async refreshColorDependentSystems(trigger: string): Promise<void> {
+    if (!this.facadeCoordinator) {
+      console.warn(`🎨 [Year3000System] No facade coordinator available for ${trigger} refresh`);
+      return;
+    }
+
+    console.log(`🎨 [Year3000System] Refreshing color-dependent systems for trigger: ${trigger}`);
+    await this.facadeCoordinator.refreshColorDependentSystems(trigger);
+  }
+
   private async _applyCatppuccinAccent(selectedAccent: string): Promise<void> {
     if (selectedAccent === "dynamic") {
       if (this.YEAR3000_CONFIG.enableDebug) {
@@ -1211,19 +1423,19 @@ export class Year3000System {
       ? `url('https://github.com/catppuccin/spicetify/blob/main/catppuccin/assets/${colorScheme}/equalizer-animated-${accent}.gif?raw=true')`
       : `url('${colorScheme}/equalizer-animated-${accent}.gif')`;
 
-    this.cssVariableBatcher?.queueCSSVariableUpdate(
+    this.cssConsciousnessController?.queueCSSVariableUpdate(
       "--spice-text",
       `var(--spice-${accent})`
     );
-    this.cssVariableBatcher?.queueCSSVariableUpdate(
+    this.cssConsciousnessController?.queueCSSVariableUpdate(
       "--spice-button-active",
       `var(--spice-${accent})`
     );
-    this.cssVariableBatcher?.queueCSSVariableUpdate(
+    this.cssConsciousnessController?.queueCSSVariableUpdate(
       "--spice-equalizer",
       equalizerUrl
     );
-    this.cssVariableBatcher?.flushCSSVariableBatch();
+    this.cssConsciousnessController?.flushCSSVariableBatch();
     console.log(
       `🎨 [Year3000System] _applyCatppuccinAccent: Flushed CSS variables for accent color.`
     );
@@ -1257,40 +1469,363 @@ export class Year3000System {
       }
     }
 
-    this._applyHarmonizedColorsToCss(harmonizedColors);
+    // Extract accent colors from harmonized colors for facade system
+    const accentHex = harmonizedColors.accentHex || 
+                     harmonizedColors.VIBRANT || 
+                     harmonizedColors.PROMINENT || 
+                     Object.values(harmonizedColors)[0] || 
+                     '#a6adc8'; // Catppuccin fallback
+    
+    const accentRgb = harmonizedColors.accentRgb || (() => {
+      const rgb = this.utils.hexToRgb(accentHex as string);
+      return rgb ? `${rgb.r},${rgb.g},${rgb.b}` : '166,173,200';
+    })();
+
+    this._applyColorsViaFacadeSystem(harmonizedColors, accentHex as string, accentRgb as string);
   }
 
   /**
-   * Handle colors/harmonized event from ColorOrchestrator (Event-driven architecture)
+   * Handle colors:harmonized event from ColorHarmonyEngine (Event-driven architecture)
+   * 🔧 PHASE 1: Enhanced with loop prevention and recursion protection
    */
-  private handleColorHarmonizedEvent(event: ColorHarmonizedEvent): void {
-    if (event.type !== 'colors/harmonized') return;
-    
-    const { processedColors, cssVariables, metadata } = event.payload;
-    
-    if (this.YEAR3000_CONFIG.enableDebug) {
-      console.log("🎨 [Year3000System] Received harmonized colors via event-driven pattern", {
-        strategy: metadata.strategy,
-        processingTime: metadata.processingTime,
-        colorsCount: Object.keys(processedColors).length,
-        cssVariablesCount: Object.keys(cssVariables).length
-      });
+  private handleColorHarmonizedEvent(data: any): void {
+    // Phase 1: Loop Prevention - Check if already processing
+    if (this.colorEventState.isProcessingColorEvent) {
+      if (this.YEAR3000_CONFIG.enableDebug) {
+        console.warn("🔄 [Year3000System] Already processing color event - skipping to prevent recursion");
+      }
+      return;
     }
+
+    // Phase 1: Generate event context hash for caching
+    const eventContext = JSON.stringify(data).substring(0, 100);
+    const eventHash = this._generateEventHash(eventContext);
+    const now = Date.now();
+
+    // Phase 1: Check event cache to prevent duplicate processing
+    if (this.colorEventState.processedEvents.has(eventHash)) {
+      const lastProcessed = this.colorEventState.processedEvents.get(eventHash)!;
+      if (now - lastProcessed < this.COLOR_EVENT_CACHE_TTL) {
+        if (this.YEAR3000_CONFIG.enableDebug) {
+          console.warn("🔄 [Year3000System] Event recently processed - skipping duplicate");
+        }
+        return;
+      }
+    }
+
+    // Phase 1: Set processing state and cache event
+    this.colorEventState.isProcessingColorEvent = true;
+    this.colorEventState.processedEvents.set(eventHash, now);
     
+    // Phase 1: Set safety timeout
+    this.colorEventState.eventTimeout = window.setTimeout(() => {
+      if (this.YEAR3000_CONFIG.enableDebug) {
+        console.warn("🔄 [Year3000System] Color event processing timeout - resetting state");
+      }
+      this._resetColorEventState();
+    }, this.PROCESSING_TIMEOUT);
+
     try {
-      // Apply harmonized colors using the new event-driven flow
-      this._applyHarmonizedColorsToCss(processedColors);
+      // Phase 1: Add to processing chain for loop detection
+      this.processingState.processingChain.push('handleColorHarmonizedEvent');
       
-      // Apply CSS variables directly if provided (optimization)
-      if (cssVariables && Object.keys(cssVariables).length > 0) {
+      // Phase 1: Check for processing chain overflow
+      if (this.processingState.processingChain.length > this.MAX_CHAIN_LENGTH) {
+        this.processingState.eventLoopDetected = true;
+        console.error("🔄 [Year3000System] CRITICAL: Event loop detected - chain length exceeded", this.processingState.processingChain);
+        this._resetProcessingState();
+        return;
+      }
+
+      // 🔧 CRITICAL FIX: Support both event format variations
+      let processedColors: Record<string, string>;
+      let accentHex: string;
+      let accentRgb: string;
+      let strategies: string[];
+      let processingTime: number;
+      
+      // Handle new UnifiedEventBus format from ColorHarmonyEngine
+      if (data.processedColors && data.accentHex && data.accentRgb) {
+        processedColors = data.processedColors;
+        accentHex = data.accentHex;
+        accentRgb = data.accentRgb;
+        strategies = data.strategies || ['ColorHarmonyEngine'];
+        processingTime = data.processingTime || 0;
+      }
+      // Handle legacy ColorOrchestrator event format
+      else if (data.payload && data.payload.processedColors) {
+        processedColors = data.payload.processedColors;
+        accentHex = data.payload.accentHex || Object.values(processedColors)[0] || '#a6adc8';
+        accentRgb = this.utils.hexToRgb(accentHex)?.r + ',' + this.utils.hexToRgb(accentHex)?.g + ',' + this.utils.hexToRgb(accentHex)?.b || '166,173,200';
+        strategies = [data.payload.metadata?.strategy || 'Unknown'];
+        processingTime = data.payload.metadata?.processingTime || 0;
+      }
+      // Handle direct data format
+      else if (data.type === 'colors/harmonized') {
+        return; // Legacy format, skip processing
+      }
+      else {
+        if (this.YEAR3000_CONFIG.enableDebug) {
+          console.warn("🎨 [Year3000System] Unrecognized colors:harmonized event format:", data);
+        }
+        return;
+      }
+      
+      if (this.YEAR3000_CONFIG.enableDebug) {
+        console.log("🎨 [Year3000System] Processing colors:harmonized event:", {
+          strategies: strategies,
+          processingTime: processingTime,
+          colorsCount: Object.keys(processedColors).length,
+          accentHex: accentHex,
+          accentRgb: accentRgb,
+          chainLength: this.processingState.processingChain.length
+        });
+      }
+      
+      // 🔧 CRITICAL FIX: Apply colors via unified CSS variable system (OKLAB-enabled)
+      this._applyColorsViaFacadeSystem(processedColors, accentHex, accentRgb);
+      
+    } catch (error) {
+      console.error("[Year3000System] Failed to handle colors:harmonized event:", error);
+    } finally {
+      // Phase 1: Always clean up processing state
+      this._resetColorEventState();
+      
+      // Phase 1: Remove from processing chain
+      const chainIndex = this.processingState.processingChain.indexOf('handleColorHarmonizedEvent');
+      if (chainIndex > -1) {
+        this.processingState.processingChain.splice(chainIndex, 1);
+      }
+    }
+  }
+
+  /**
+   * Phase 1: Helper method to generate simple hash for event caching
+   */
+  private _generateEventHash(context: string): string {
+    let hash = 0;
+    for (let i = 0; i < context.length; i++) {
+      const char = context.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return hash.toString();
+  }
+
+  /**
+   * Phase 1: Reset color event processing state
+   */
+  private _resetColorEventState(): void {
+    this.colorEventState.isProcessingColorEvent = false;
+    
+    if (this.colorEventState.eventTimeout) {
+      clearTimeout(this.colorEventState.eventTimeout);
+      this.colorEventState.eventTimeout = null;
+    }
+
+    // Clean up old cache entries (older than TTL)
+    const now = Date.now();
+    for (const [hash, timestamp] of this.colorEventState.processedEvents.entries()) {
+      if (now - timestamp > this.COLOR_EVENT_CACHE_TTL) {
+        this.colorEventState.processedEvents.delete(hash);
+      }
+    }
+  }
+
+  /**
+   * Phase 1: Reset processing state after loop detection or timeout
+   */
+  private _resetProcessingState(): void {
+    this.processingState.isProcessingSongChange = false;
+    this.processingState.processingChain = [];
+    this.processingState.eventLoopDetected = false;
+    this.processingState.lastProcessingTime = Date.now();
+
+    if (this.YEAR3000_CONFIG.enableDebug) {
+      console.log("🔄 [Year3000System] Processing state reset");
+    }
+  }
+
+  /**
+   * Apply colors via the facade system for comprehensive UI component update
+   * 🔧 CRITICAL FIX: New method to ensure colors reach all UI components
+   */
+  private _applyColorsViaFacadeSystem(processedColors: Record<string, string>, accentHex: string, accentRgb: string): void {
+    try {
+      // Create comprehensive CSS variables for all UI components
+      const cssVariables: Record<string, string> = {
+        // Core accent variables
+        '--sn-accent-hex': accentHex,
+        '--sn-accent-rgb': accentRgb,
+        '--sn-dynamic-accent-hex': accentHex,
+        '--sn-dynamic-accent-rgb': accentRgb,
+        
+        // Spicetify core variables for broad compatibility
+        '--spice-accent': accentHex,
+        '--spice-button': accentHex,
+        '--spice-button-active': accentHex,
+        '--spice-rgb-accent': accentRgb,
+        '--spice-rgb-button': accentRgb,
+        '--spice-text-accent': accentHex,
+        
+        // Sidebar-specific variables
+        '--sn-sidebar-entanglement-color-rgb': accentRgb,
+        '--sn-sidebar-accent-color': accentHex,
+        '--sn-sidebar-accent-rgb': accentRgb,
+        '--sn-sidebar-dynamic-accent': accentHex,
+        
+        // Now-playing specific variables
+        '--sn-nowplaying-accent-color': accentHex,
+        '--sn-nowplaying-accent-rgb': accentRgb,
+        '--sn-nowplaying-primary-color': accentHex,
+        '--sn-nowplaying-primary-rgb': accentRgb,
+        
+        // Main feed / content variables
+        '--sn-main-feed-accent-color': accentHex,
+        '--sn-main-feed-accent-rgb': accentRgb,
+        '--sn-content-accent-color': accentHex,
+        '--sn-content-accent-rgb': accentRgb,
+      };
+      
+      // Add processed colors to CSS variables (filter for valid hex colors only)
+      Object.entries(processedColors).forEach(([key, value]) => {
+        // Only process values that are valid hex colors
+        if (this.utils.isValidHexColor(value)) {
+          const rgb = this.utils.hexToRgb(value);
+          if (rgb) {
+            cssVariables[`--sn-processed-${key.toLowerCase()}-hex`] = value;
+            cssVariables[`--sn-processed-${key.toLowerCase()}-rgb`] = `${rgb.r},${rgb.g},${rgb.b}`;
+          }
+        } else if (this.YEAR3000_CONFIG.enableDebug) {
+          // Log skipped non-hex values for debugging (only in debug mode)
+          console.debug(`[Year3000System] Skipping non-hex processedColor: ${key}=${value}`);
+        }
+      });
+
+      // 🎨 OKLAB VARIABLE PUBLISHING: Extract specific colors and map to OKLAB CSS variables
+      // FIXED: Use ColorHarmonyEngine's actual output keys (uppercase: VIBRANT, PRIMARY, etc.)
+      const oklabMapping: Record<string, string> = {
+        // Primary album colors from OKLAB processing - fixed key mapping
+        '--sn-musical-oklab-primary-rgb': (processedColors.VIBRANT || processedColors.PRIMARY || processedColors.PROMINENT || accentRgb) as string,
+        '--sn-musical-oklab-accent-rgb': (processedColors.DARK_VIBRANT || processedColors.DESATURATED || accentRgb) as string,
+        '--sn-musical-oklab-highlight-rgb': (processedColors.VIBRANT_NON_ALARMING || processedColors.LIGHT_VIBRANT || accentRgb) as string,
+        '--sn-musical-oklab-shadow-rgb': (processedColors.DARK_VIBRANT || processedColors.DESATURATED || accentRgb) as string,
+        
+        // Complementary colors for advanced harmony - fixed key mapping
+        '--sn-musical-oklab-complementary-rgb': (processedColors.SECONDARY || processedColors.EMOTIONAL_BLEND || accentRgb) as string,
+        '--sn-musical-oklab-triadic-rgb': (processedColors.LIGHT_VIBRANT || processedColors.VIBRANT_NON_ALARMING || accentRgb) as string,
+      };
+
+      // 🎵 MUSICAL HARMONY VARIABLE PUBLISHING: Bridge OKLAB to gradient system
+      // This ensures the complete CSS variable chain works: OKLAB → Musical Harmony → Gradient
+      const musicalHarmonyMapping: Record<string, string> = {
+        // Musical harmony RGB variables for complete CSS chain
+        '--sn-musical-harmony-primary-rgb': (processedColors.VIBRANT || processedColors.PRIMARY || accentRgb) as string,
+        '--sn-musical-harmony-secondary-rgb': (processedColors.DARK_VIBRANT || processedColors.SECONDARY || accentRgb) as string,
+        '--sn-musical-harmony-tertiary-rgb': (processedColors.VIBRANT_NON_ALARMING || processedColors.LIGHT_VIBRANT || accentRgb) as string,
+        '--sn-musical-harmony-quaternary-rgb': (processedColors.DESATURATED || processedColors.EMOTIONAL_BLEND || accentRgb) as string,
+
+        // Musical harmony hex variables for complete coverage
+        '--sn-musical-harmony-primary-hex': (processedColors.VIBRANT || processedColors.PRIMARY || accentHex) as string,
+        '--sn-musical-harmony-secondary-hex': (processedColors.DARK_VIBRANT || processedColors.SECONDARY || accentHex) as string,
+        '--sn-musical-harmony-tertiary-hex': (processedColors.VIBRANT_NON_ALARMING || processedColors.LIGHT_VIBRANT || accentHex) as string,
+        '--sn-musical-harmony-quaternary-hex': (processedColors.DESATURATED || processedColors.EMOTIONAL_BLEND || accentHex) as string,
+      };
+
+      // Process OKLAB variables and convert hex to RGB format
+      Object.entries(oklabMapping).forEach(([cssVar, colorValue]) => {
+        if (!colorValue || typeof colorValue !== 'string') return;
+        
+        if (cssVar.includes('-rgb')) {
+          // Convert to RGB format for RGB variables
+          if (this.utils.isValidHexColor(colorValue)) {
+            const rgb = this.utils.hexToRgb(colorValue);
+            if (rgb) {
+              cssVariables[cssVar] = `${rgb.r},${rgb.g},${rgb.b}`;
+            }
+          } else if ((colorValue as string).includes(',')) {
+            // Already in RGB format
+            cssVariables[cssVar] = colorValue;
+          }
+        }
+      });
+
+      // Process Musical Harmony variables for complete CSS bridge
+      Object.entries(musicalHarmonyMapping).forEach(([cssVar, colorValue]) => {
+        if (!colorValue || typeof colorValue !== 'string') return;
+        
+        if (cssVar.includes('-hex')) {
+          // Direct hex assignment for hex variables
+          cssVariables[cssVar] = colorValue;
+        } else if (cssVar.includes('-rgb')) {
+          // Convert to RGB format for RGB variables
+          if (this.utils.isValidHexColor(colorValue)) {
+            const rgb = this.utils.hexToRgb(colorValue);
+            if (rgb) {
+              cssVariables[cssVar] = `${rgb.r},${rgb.g},${rgb.b}`;
+            }
+          } else if ((colorValue as string).includes(',')) {
+            // Already in RGB format
+            cssVariables[cssVar] = colorValue;
+          }
+        }
+      });
+      
+      if (this.YEAR3000_CONFIG.enableDebug) {
+        console.log("🎨 [Year3000System] Complete Album Color Flow:", {
+          // ColorHarmonyEngine output
+          colorHarmonyKeys: Object.keys(processedColors),
+          colorHarmonyValues: processedColors,
+          
+          // OKLAB variable mapping
+          oklabVariables: oklabMapping,
+          
+          // Musical harmony bridge
+          musicalHarmonyVariables: musicalHarmonyMapping,
+          
+          // CSS variable chain status
+          expectedCSSChain: [
+            '--sn-musical-oklab-primary-rgb',
+            '--sn-musical-harmony-primary-rgb', 
+            '--sn-gradient-primary-rgb'
+          ],
+
+          // Total variables set
+          totalVariablesSet: Object.keys(cssVariables).length
+        });
+      }
+      
+      // Apply via CSS consciousness controller if available
+      if (this.cssConsciousnessController && typeof this.cssConsciousnessController.batchSetVariables === 'function') {
+        this.cssConsciousnessController.batchSetVariables(
+          'Year3000System-ColorHarmonized',
+          cssVariables,
+          'high',
+          'color-harmony-event-application'
+        );
+      } else {
+        // Fallback to direct application
         this._applyCSSVariables(cssVariables);
       }
       
-    } catch (error) {
-      console.error("[Year3000System] Failed to apply harmonized colors from event:", error);
+      if (this.YEAR3000_CONFIG.enableDebug) {
+        console.log("🔧 [Year3000System] Applied colors via facade system:", {
+          totalVariables: Object.keys(cssVariables).length,
+          accentColor: accentHex,
+          facadeSystemUsed: !!this.cssConsciousnessController
+        });
+      }
       
-      // Fallback to basic color application
-      this._applyHarmonizedColorsToCss(processedColors);
+    } catch (error) {
+      console.error("[Year3000System] Failed to apply colors via facade system:", error);
+      
+      // Ultimate fallback - direct CSS variable application
+      const fallbackVariables = {
+        '--spice-accent': accentHex,
+        '--sn-accent-hex': accentHex,
+        '--sn-accent-rgb': accentRgb
+      };
+      this._applyCSSVariables(fallbackVariables);
     }
   }
 
@@ -1320,129 +1855,15 @@ export class Year3000System {
   }
 
   // =============================================
-  // 🎨 INTERNAL – APPLY COLOR MAP TO CSS VARIABLES
+  // 🎨 LEGACY METHOD REMOVED: _applyHarmonizedColorsToCss()
+  // Replaced by comprehensive OKLAB-enabled _applyColorsViaFacadeSystem()
   // =============================================
-  private _applyHarmonizedColorsToCss(
-    colors: { [key: string]: string } = {}
-  ): void {
-    if (!colors || Object.keys(colors).length === 0) {
-      colors = { VIBRANT: "#a6adc8" }; // neutral fallback accent
-    }
-
-    // Heuristic mapping – favour extractor roles first, then fallbacks
-    const primaryHex =
-      colors["VIBRANT"] ||
-      colors["PROMINENT"] ||
-      colors["PRIMARY"] ||
-      Object.values(colors)[0];
-    const secondaryHex =
-      colors["DARK_VIBRANT"] ||
-      colors["DESATURATED"] ||
-      colors["SECONDARY"] ||
-      primaryHex;
-    const accentHex =
-      colors["VIBRANT_NON_ALARMING"] || colors["LIGHT_VIBRANT"] || primaryHex;
-
-    const queueUpdate = (prop: string, value: string) => {
-      if (this.cssVariableBatcher) {
-        this.cssVariableBatcher.queueCSSVariableUpdate(prop, value);
-      } else {
-        document.documentElement.style.setProperty(prop, value);
-      }
-    };
-
-    // Phase 5 – Legacy StarryNight gradient tokens have been removed. Only
-    // canonical `--sn-accent-*` variables are now emitted. Hex gradients for
-    // primary/secondary are no longer required by any visual system.
-
-    // Mirror accent into core Spicetify vars (buttons, sliders, etc.)
-    if (accentHex) {
-      queueUpdate("--spice-accent", accentHex);
-      queueUpdate("--spice-button", accentHex);
-      queueUpdate("--spice-button-active", accentHex);
-      if (primaryHex) queueUpdate("--spice-player", primaryHex);
-    }
-    // Preserve text colour; do NOT overwrite --spice-main (maintains Catppuccin readability)
-
-    // RGB variants for transparency support
-    const addRgb = (prop: string, hex: string | undefined) => {
-      if (!hex) return;
-      const rgb = this.utils.hexToRgb(hex);
-      if (rgb) {
-        queueUpdate(prop, `${rgb.r},${rgb.g},${rgb.b}`);
-      }
-    };
-
-    // Phase 1 — Canonical accent token (single source-of-truth)
-    if (accentHex) {
-      queueUpdate('--sn-canonical-accent-hex', accentHex);
-    }
-    addRgb('--sn-canonical-accent-rgb', accentHex);
-
-    // Generate RGB versions of all spice variables for SCSS compatibility
-    addRgb("--spice-rgb-accent", accentHex);
-    addRgb("--spice-rgb-button", accentHex);
-
-    // Explicit RGB for player colour so SCSS gradients have guaranteed source
-    addRgb("--spice-rgb-player", primaryHex);
-
-    // Generate RGB versions of existing spice variables by reading their current hex values
-    const root = this.utils.getRootStyle();
-    if (root) {
-      const computedStyle = getComputedStyle(root);
-
-      // Helper to safely get and convert existing spice variables to RGB
-      const addSpiceRgb = (
-        rgbProp: string,
-        hexProp: string,
-        fallbackHex: string
-      ) => {
-        const hexValue =
-          computedStyle.getPropertyValue(hexProp).trim() || fallbackHex;
-        addRgb(rgbProp, hexValue);
-      };
-
-      // Add RGB versions of all spice variables that SCSS files expect
-      addSpiceRgb("--spice-rgb-main", "--spice-main", "#cdd6f4");
-      addSpiceRgb("--spice-rgb-base", "--spice-base", "#1e1e2e");
-      addSpiceRgb("--spice-rgb-player", "--spice-player", "#181825");
-      addSpiceRgb("--spice-rgb-sidebar", "--spice-sidebar", "#313244");
-      addSpiceRgb("--spice-rgb-surface0", "--spice-surface0", "#313244");
-      addSpiceRgb("--spice-rgb-surface1", "--spice-surface1", "#45475a");
-      addSpiceRgb("--spice-rgb-text", "--spice-text", "#cdd6f4");
-    }
-
-    // Flush batched updates immediately for visual responsiveness
-    if (this.cssVariableBatcher) {
-      this.cssVariableBatcher.flushCSSVariableBatch();
-    }
-
-    // Notify glassmorphism manager so its colours stay in sync
-    try {
-      if (this.glassmorphismManager && primaryHex && secondaryHex) {
-        this.glassmorphismManager.updateGlassColors(primaryHex, secondaryHex);
-      }
-    } catch (e) {
-      console.warn(
-        "[Year3000System] GlassmorphismManager colour update failed:",
-        e
-      );
-    }
-
-    if (this.YEAR3000_CONFIG.enableDebug) {
-      console.log("🎨 [Year3000System] Applied harmonized colours", {
-        primaryHex,
-        secondaryHex,
-        accentHex,
-      });
-    }
-  }
 
   // =============================================
   // 🆕 PUBLIC WRAPPER – UNIFIED CSS VARIABLE BATCH API
   // =============================================
   /**
-   * Queue a CSS variable update through the shared CSSVariableBatcher. Falls
+   * Queue a CSS variable update through the shared UnifiedCSSConsciousnessController. Falls
    * back to an immediate style mutation when the batcher is unavailable
    * (degraded mode or very early boot).
    *
@@ -1464,9 +1885,9 @@ export class Year3000System {
         "normal",
         "Year3000System"
       );
-    } else if (this.cssVariableBatcher) {
+    } else if (this.cssConsciousnessController) {
       // Fallback to CSS variable batcher
-      this.cssVariableBatcher.queueCSSVariableUpdate(
+      this.cssConsciousnessController.queueCSSVariableUpdate(
         property,
         value,
         element || undefined
@@ -1520,31 +1941,76 @@ export class Year3000System {
   }
 
   public updateHarmonicBaseColor(hexColor: string): void {
-    if (this.colorHarmonyEngine && this.cssVariableBatcher) {
+    if (this.colorHarmonyEngine && this.cssConsciousnessController) {
       const rgb = this.utils.hexToRgb(hexColor);
       if (rgb) {
         const variations =
           this.colorHarmonyEngine.generateHarmonicVariations(rgb);
-        this.cssVariableBatcher.queueCSSVariableUpdate(
+        this.cssConsciousnessController.queueCSSVariableUpdate(
           "--sn-harmonic-base-dark-vibrant",
           variations.darkVibrantHex
         );
-        this.cssVariableBatcher.queueCSSVariableUpdate(
+        this.cssConsciousnessController.queueCSSVariableUpdate(
           "--sn-harmonic-base-light-vibrant",
           variations.lightVibrantHex
         );
-        this.cssVariableBatcher.flushCSSVariableBatch();
+        this.cssConsciousnessController.flushCSSVariableBatch();
+      }
+    }
+  }
+
+  /**
+   * Process colors through the existing facade pattern architecture
+   * Phase 1: Integration with SystemCoordinator and ColorOrchestrator
+   */
+  public async processColorsViaFacade(context: any): Promise<void> {
+    try {
+      // Use existing facadeCoordinator to get ColorOrchestrator
+      const colorOrchestrator = await this.facadeCoordinator?.getNonVisualSystem('ColorOrchestrator');
+      
+      if (colorOrchestrator && typeof colorOrchestrator.handleColorExtraction === 'function') {
+        // Route through existing ColorOrchestrator strategy pattern
+        await colorOrchestrator.handleColorExtraction(context);
+        
+        if (this.YEAR3000_CONFIG.enableDebug) {
+          console.log("🎨 [Year3000System] Color processing routed through facade pattern - ColorOrchestrator", {
+            context: context?.trackUri || 'unknown',
+            rawColorsCount: context?.rawColors ? Object.keys(context.rawColors).length : 0
+          });
+        }
+      } else {
+        // Fallback to direct ColorHarmonyEngine if orchestrator not available
+        if (this.colorHarmonyEngine && typeof this.colorHarmonyEngine.processColors === 'function') {
+          await this.colorHarmonyEngine.processColors(context);
+          
+          if (this.YEAR3000_CONFIG.enableDebug) {
+            console.log("🎨 [Year3000System] Color processing fallback to direct ColorHarmonyEngine");
+          }
+        } else {
+          console.warn("[Year3000System] No color processing system available via facade pattern");
+        }
+      }
+    } catch (error) {
+      console.error("[Year3000System] Failed to process colors via facade pattern:", error);
+      
+      // Final fallback to legacy method
+      if (context?.rawColors) {
+        this.applyColorsToTheme(context.rawColors);
       }
     }
   }
 
   public setupMusicAnalysisAndColorExtraction(): void {
+    console.log("🎵 [Year3000System] setupMusicAnalysisAndColorExtraction called");
+    
     if (!this.musicSyncService) {
       console.error(
         "[Year3000System] MusicSyncService is not available to set up song change handler."
       );
       return;
     }
+    
+    console.log("🎵 [Year3000System] MusicSyncService available, checking Spicetify Player...");
 
     // Check if Spicetify.Player is available (might not be in degraded mode)
     if (!(window as any).Spicetify?.Player) {
@@ -1556,20 +2022,25 @@ export class Year3000System {
 
     // Set up event-driven color harmonization (NEW ARCHITECTURE)
     try {
-      GlobalEventBus.subscribe('colors/harmonized', (event: any) => {
-        this.handleColorHarmonizedEvent(event);
-      });
+      unifiedEventBus.subscribe('colors:harmonized', (data: any) => {
+        this.handleColorHarmonizedEvent(data);
+      }, 'Year3000System');
       
       if (this.YEAR3000_CONFIG.enableDebug) {
-        console.log("🎨 [Year3000System] Subscribed to colors/harmonized events for event-driven color application");
+        console.log("🎨 [Year3000System] Subscribed to colors:harmonized events for event-driven color application");
       }
     } catch (error) {
-      console.error("[Year3000System] Failed to subscribe to colors/harmonized events:", error);
+      console.error("[Year3000System] Failed to subscribe to colors:harmonized events:", error);
     }
 
     const processSongUpdate = async () => {
+      console.log("🎵 [Year3000System] processSongUpdate triggered - checking MusicSyncService...");
       if (this.musicSyncService) {
+        console.log("🎵 [Year3000System] Calling musicSyncService.processSongUpdate()");
         await this.musicSyncService.processSongUpdate();
+        console.log("✅ [Year3000System] musicSyncService.processSongUpdate() completed");
+      } else {
+        console.error("❌ [Year3000System] MusicSyncService not available in processSongUpdate");
       }
     };
 
@@ -1577,18 +2048,16 @@ export class Year3000System {
     this._songChangeHandler = processSongUpdate;
 
     try {
+      console.log("🎵 [Year3000System] Adding songchange event listener...");
       (window as any).Spicetify.Player.addEventListener(
         "songchange",
         this._songChangeHandler
       );
 
-      if (this.YEAR3000_CONFIG.enableDebug) {
-        console.log(
-          "[Year3000System] Music analysis and color extraction set up successfully"
-        );
-      }
+      console.log("✅ [Year3000System] Music analysis and color extraction set up successfully - song change listener active");
 
       // Initial run for the currently playing track
+      console.log("🎵 [Year3000System] Triggering initial song processing...");
       setTimeout(processSongUpdate, 1000);
     } catch (error) {
       console.error("[Year3000System] Failed to set up music analysis:", error);
@@ -1674,10 +2143,15 @@ export class Year3000System {
   public getSystem<T = any>(name: string): T | null {
     if (!name) return null;
 
-    // 1) Try unified system registry first
-    if (this.unifiedSystemIntegration) {
-      const unifiedSystem = this.unifiedSystemIntegration.getSystem(name);
-      if (unifiedSystem) return unifiedSystem as T;
+    // 1) Try facade systems first
+    if (this.facadeCoordinator) {
+      // Try visual systems
+      const visualSystem = this.facadeCoordinator.getVisualSystem(name as any);
+      if (visualSystem) return visualSystem as T;
+      
+      // Try non-visual systems
+      const nonVisualSystem = this.facadeCoordinator.getCachedNonVisualSystem(name as any);
+      if (nonVisualSystem) return nonVisualSystem as T;
     }
 
     // 2) Try camel-cased property convention (e.g. "PredictiveMaterializationSystem" → "predictiveMaterializationSystem")
@@ -1696,17 +2170,11 @@ export class Year3000System {
   }
 
   /**
-   * Get the unified system registry for direct access
+   * Get health status of all facade systems
    */
-  public getUnifiedSystemRegistry() {
-    return this.unifiedSystemIntegration?.getRegistry();
-  }
-
-  /**
-   * Get health status of all unified systems
-   */
-  public async getUnifiedSystemHealthStatus() {
-    return this.unifiedSystemIntegration?.getHealthStatus();
+  public async getFacadeSystemHealthStatus() {
+    if (!this.facadeCoordinator) return null;
+    return await this.facadeCoordinator.performHealthCheck();
   }
 
   private async _registerAnimationSystems(): Promise<void> {
@@ -1730,8 +2198,8 @@ export class Year3000System {
         priority: "normal",
       },
       {
-        name: "LightweightParticleSystem",
-        system: this.lightweightParticleSystem,
+        name: "ParticleConsciousnessModule",
+        system: this.particleConsciousnessModule,
         priority: "background",
       },
       {
@@ -1826,8 +2294,8 @@ export class Year3000System {
         type: "animation" as const,
       },
       {
-        name: "LightweightParticleSystem",
-        system: this.lightweightParticleSystem,
+        name: "ParticleConsciousnessModule",
+        system: this.particleConsciousnessModule,
         priority: "background" as const,
         type: "animation" as const,
       },
@@ -2204,8 +2672,22 @@ export class Year3000System {
       }
 
       // Set up music analysis if available
+      if (this.YEAR3000_CONFIG.enableDebug) {
+        console.log("[Year3000System] Checking music analysis setup conditions:", {
+          musicSyncService: !!this.musicSyncService,
+          playerAPI: !!this.availableAPIs.player,
+          musicSyncInitialized: this.musicSyncService?.initialized
+        });
+      }
+      
       if (this.musicSyncService && this.availableAPIs.player) {
+        console.log("🎵 [Year3000System] Setting up music analysis and color extraction...");
         this.setupMusicAnalysisAndColorExtraction();
+      } else {
+        console.warn("⚠️ [Year3000System] Music analysis setup skipped - missing dependencies:", {
+          musicSyncService: !!this.musicSyncService,
+          playerAPI: !!this.availableAPIs.player
+        });
       }
 
       // Apply initial settings if available
@@ -2290,8 +2772,14 @@ export class Year3000System {
         break;
       }
       case 'manualBaseColor': {
-        if (typeof value === "string" && value.startsWith("#")) {
+        // 🔧 FIXED: Only apply manual color if it's not empty - allow album art colors when empty
+        if (typeof value === "string" && value.trim() !== "" && value.startsWith("#")) {
           this.updateHarmonicBaseColor(value);
+          if (this.YEAR3000_CONFIG.enableDebug) {
+            console.log('🎨 [Year3000System] Manual base color applied:', value);
+          }
+        } else if (this.YEAR3000_CONFIG.enableDebug) {
+          console.log('🎨 [Year3000System] Manual base color cleared - using album art colors');
         }
         break;
       }
@@ -2388,12 +2876,12 @@ export class Year3000System {
 
     try {
       // Flush global batched CSS variables first
-      this.cssVariableBatcher?.flushCSSVariableBatch?.();
+      this.cssConsciousnessController?.flushCSSVariableBatch?.();
 
       // Force-flush NowPlayingCoordinator to avoid frame skew
-      // NowPlayingCoordinator removed – its flush is handled via CSSVariableBatcher
+      // NowPlayingCoordinator removed – its flush is handled via UnifiedCSSConsciousnessController
 
-      // Force-flush RightSidebarCoordinator if present
+      // Force-flush SidebarPerformanceCoordinator if present
       try {
         // getSidebarPerformanceCoordinator()?.forceFlush(); // Phase 4: Managed by facade
       } catch {}
@@ -2407,6 +2895,28 @@ export class Year3000System {
       if (this.YEAR3000_CONFIG?.enableDebug) {
         console.warn("[Year3000System] VisibilityChange flush error", e);
       }
+    }
+  }
+
+  /**
+   * Destroy method for proper cleanup during testing
+   */
+  public async destroy(): Promise<void> {
+    try {
+      // Stop monitoring (facade coordinator handles its own cleanup)
+
+      // Cleanup facade coordinator
+      await this.destroyAllSystems();
+
+      // Clear event listeners
+      document.removeEventListener("visibilitychange", this._handleVisibilityChange.bind(this));
+
+      // Reset state
+      this.initialized = false;
+
+      console.log("🌟 [Year3000System] System destroyed successfully");
+    } catch (error) {
+      console.error("❌ [Year3000System] Error during destroy:", error);
     }
   }
 } // ← end of Year3000System class

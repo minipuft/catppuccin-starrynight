@@ -104,12 +104,12 @@ graph TD
 
 ---
 
-## 🧠 Multi-Agent Octopus Workbench System
+## 🤝 Multi-Agent Coordination System
 
-### Central Brain Coordination
-The **Central Brain** (`plans/CENTRAL-BRAIN.md`) coordinates multiple AI agents (tentacles) working simultaneously on different aspects of the theme:
+### Project Status Coordination
+The **Project Status** (`plans/project-status.md`) coordinates multiple AI agents working simultaneously on different aspects of the theme:
 
-#### Tentacle Categories
+#### Agent Specializations
 1. **🎨 Visual Systems** (30% brain cycles)
    - Organic consciousness effects
    - Beat synchronization

@@ -20,7 +20,7 @@
   --micro-rhythm-phase: var(--sn-rhythm-phase, 0); // Harmonic oscillation
 
   // === Enhanced Microinteraction Variables (BeatSync Enabled) ===
-  --ripple-color: var(--sn-accent-hex);
+  --ripple-color: var(--sn-color-accent-hex);
   --ripple-duration: calc(
     var(--sn-gradient-transition) * (1 - (var(--micro-beat-intensity) * 0.3))
   ); // Faster on beats
@@ -56,6 +56,8 @@
   // Kinetic Verb: OSCILLATE - Base breathing with rhythm
   transform: scale(var(--micro-breathing-scale));
   transition: transform var(--micro-medium) var(--sn-easing-explorer, ease-out);
+  
+  // Breathing removed - too many elements, creates visual chaos
 
   // Apply gradient ripple with beat sync
   @include gradient-ripple(
@@ -63,7 +65,7 @@
   );
 
   // Enhanced hover glow with rhythmic intensity
-  @include gradient-glow(var(--sn-accent-hex), var(--feedback-subtle));
+  @include gradient-glow(var(--sn-color-accent-hex), var(--feedback-subtle));
 
   // Add cosmic filter effects
   filter: hue-rotate(var(--micro-hue-shift))

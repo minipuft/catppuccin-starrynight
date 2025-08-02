@@ -213,16 +213,91 @@ export class UnifiedDebugManager {
 
     for (const [name, system] of this.registeredSystems) {
       try {
-        // Try to get the actual system instance for health check
-        const actualSystem = (globalThis as any).year3000System?.[name] || 
-                            (globalThis as any)[name];
+        // Dynamic system access with facade pattern integration
+        let actualSystem = null;
+        let dynamicInitializedStatus = system.initialized; // fallback to cached value
+        
+        // Enhanced facade-aware system resolution
+        const year3000System = (globalThis as any).year3000System;
+        if (year3000System) {
+          // 1. Try facade coordinator first (facade-managed systems)
+          if (year3000System.facadeCoordinator) {
+            // Check non-visual systems via facade
+            try {
+              actualSystem = year3000System.facadeCoordinator.getCachedNonVisualSystem?.(name) ||
+                            await year3000System.facadeCoordinator.getNonVisualSystem?.(name);
+            } catch (e) {
+              // Ignore facade errors, try other methods
+            }
+            
+            // Check visual systems via facade if not found
+            if (!actualSystem) {
+              try {
+                actualSystem = year3000System.facadeCoordinator.getVisualSystem?.(name);
+              } catch (e) {
+                // Ignore facade errors, try other methods
+              }
+            }
+          }
+          
+          // 2. Try direct property access (legacy systems)
+          if (!actualSystem) {
+            // Convert system name to camelCase property (e.g., MusicSyncService -> musicSyncService)
+            const camelCaseName = name.charAt(0).toLowerCase() + name.slice(1);
+            actualSystem = year3000System[camelCaseName] || year3000System[name];
+          }
+        }
+        
+        // 3. Try global scope as fallback
+        if (!actualSystem) {
+          actualSystem = (globalThis as any)[name];
+        }
+        
+        // Update initialization status dynamically from actual system
+        if (actualSystem) {
+          // Check various initialization status patterns
+          if (typeof actualSystem.initialized === 'boolean') {
+            dynamicInitializedStatus = actualSystem.initialized;
+          } else if (typeof actualSystem.isInitialized === 'function') {
+            try {
+              dynamicInitializedStatus = await actualSystem.isInitialized();
+            } catch (e) {
+              // Keep cached value on error
+            }
+          } else if (typeof actualSystem.getInitializationStatus === 'function') {
+            try {
+              const status = await actualSystem.getInitializationStatus();
+              dynamicInitializedStatus = status?.initialized ?? status?.ready ?? false;
+            } catch (e) {
+              // Keep cached value on error
+            }
+          }
+        }
+        
+        // Update system info with dynamic status
+        const oldStatus = system.initialized;
+        system.initialized = dynamicInitializedStatus;
+        system.lastUpdate = timestamp;
+        
+        if (this.config.verboseLogging && oldStatus !== dynamicInitializedStatus) {
+          console.log(`🔧 [UnifiedDebugManager] ${name} initialization status updated: ${oldStatus} → ${dynamicInitializedStatus}`);
+        }
 
+        // Perform health check if system has the capability
         if (actualSystem && typeof actualSystem.healthCheck === 'function') {
           const healthResult: HealthCheckResult = await actualSystem.healthCheck();
           system.healthy = healthResult.healthy ?? healthResult.ok;
           
           if (!healthResult.ok) {
             system.issues = [healthResult.details || 'Health check failed'];
+          } else {
+            system.issues = [];
+          }
+        } else {
+          // Default health assessment based on initialization status
+          system.healthy = dynamicInitializedStatus;
+          if (!dynamicInitializedStatus) {
+            system.issues = ['System not initialized'];
           } else {
             system.issues = [];
           }
@@ -268,6 +343,12 @@ export class UnifiedDebugManager {
     else overallHealth = 'critical';
 
     // Generate recommendations
+    if (this.config.verboseLogging) {
+      console.log('🔧 [UnifiedDebugManager] System initialization status for recommendations:');
+      for (const system of systemDetails) {
+        console.log(`   ${system.name}: ${system.initialized ? '✅' : '❌'} initialized`);
+      }
+    }
     const recommendations = this.generateRecommendations(systemDetails, overallHealth);
 
     const report: DebugReport = {

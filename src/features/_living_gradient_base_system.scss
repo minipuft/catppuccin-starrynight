@@ -1,0 +1,588 @@
+/* Living Gradient Base System - Phase 2.2 Base Transformation */
+/* Transform static Catppuccin #1e1e2e into organic consciousness foundation */
+
+// Import OKLAB animation and blending mixins
+@use "../visual/organic-consciousness/color/oklab-animations" as oklab-anims;
+@use "../visual/organic-consciousness/color/perceptual-blending" as oklab-blend;
+
+/* ============================================================================ */
+/* LIVING BASE CONSCIOUSNESS VARIABLES */
+/* ============================================================================ */
+
+:root {
+  /* === Core Living Base Variables === */
+  --living-base-gradient: linear-gradient(var(--spice-base), var(--spice-base)); /* Default fallback */
+  --consciousness-base-primary-rgb: var(--spice-rgb-accent); /* Dynamic primary from extracted colors */
+  --consciousness-base-rgb: var(--spice-rgb-base); /* Base background RGB */
+
+  /* === OKLAB-Enhanced Living Base Variables === */
+  --consciousness-oklab-primary-rgb: var(--sn-musical-oklab-primary-rgb); /* OKLAB-processed primary color */
+  --consciousness-oklab-accent-rgb: var(--sn-musical-oklab-accent-rgb); /* OKLAB-processed accent color */
+  --consciousness-oklab-highlight-rgb: var(--sn-musical-oklab-highlight-rgb); /* OKLAB-processed highlight color */
+  --consciousness-oklab-shadow-rgb: var(--sn-musical-oklab-shadow-rgb); /* OKLAB-processed shadow color */
+
+  /* OKLAB perceptual uniformity variables */
+  --consciousness-oklab-luminance: var(--sn-musical-oklab-luminance); /* Perceptual lightness */
+  --consciousness-oklab-chroma: var(--sn-musical-oklab-chroma); /* Perceptual colorfulness */
+  --consciousness-oklab-hue: var(--sn-musical-oklab-hue); /* Perceptual hue angle */
+
+  /* Musical OKLAB coordination for living gradient */
+  --consciousness-musical-emotion: var(--sn-musical-oklab-emotion); /* Current musical emotion */
+  --consciousness-musical-genre: var(--sn-musical-oklab-genre); /* Current musical genre */
+  --consciousness-musical-intensity: var(--sn-musical-oklab-intensity); /* Musical intensity level */
+  --consciousness-musical-preset: var(--sn-musical-oklab-preset-name); /* Active OKLAB preset */
+
+  /* === Breathing Animation Variables === */
+  --consciousness-breathing-intensity: 0.08; /* Dynamic breathing intensity */
+  --consciousness-breathing-phase: 0; /* -1 to 1 breathing phase */
+  --consciousness-breathing-duration: 4000ms; /* Music-responsive breathing cycle */
+
+  /* === Organic Flow Variables === */
+  --consciousness-flow-x: 0%; /* Horizontal organic flow */
+  --consciousness-flow-y: 0%; /* Vertical organic flow */
+  --consciousness-flow-scale: 1; /* Breathing-responsive scale */
+
+  /* === Music Responsiveness Variables === */
+  --consciousness-music-energy: 0.5; /* 0-1 current music energy */
+  --consciousness-music-intensity: 0.5; /* 0-1 consciousness response to music */
+
+  /* === WebGL Coordination Variables === */
+  --consciousness-webgl-coordination: 0; /* 0-1 WebGL integration level */
+  --consciousness-css-fallback: 1.0; /* 1-0 CSS fallback strength */
+  --consciousness-webgl-flow-x: 0%; /* WebGL synchronized flow X */
+  --consciousness-webgl-flow-y: 0%; /* WebGL synchronized flow Y */
+  --consciousness-webgl-scale: 1; /* WebGL synchronized scale */
+
+  /* === Global Consciousness Variables === */
+  --consciousness-intensity-global: 0.5; /* Global consciousness intensity */
+  --consciousness-layer-opacity: 0.08; /* Layer opacity control */
+}
+
+/* ============================================================================ */
+/* LIVING BASE BACKGROUND TRANSFORMATION */
+/* ============================================================================ */
+
+/* Transform the base application background into living consciousness */
+body,
+.Root__main-view,
+.main-rootContainer-rootContainer {
+  position: relative;
+
+  /* Apply living base gradient as foundation */
+  background: var(--living-base-gradient);
+
+  /* Ensure smooth transitions */
+  transition: background 800ms var(--sn-anim-easing-organic, ease-out);
+}
+
+/* Enhanced living consciousness layer for main application */
+.Root__main-view {
+  /* Living consciousness foundation layer */
+  &::before {
+    /* OKLAB-enhanced living consciousness background */
+    background:
+      /* Primary OKLAB-enhanced living gradient */
+      var(--living-base-gradient),
+      /* OKLAB-processed perceptually uniform radial gradient */
+      radial-gradient(
+        ellipse at calc(
+          50% + (var(--gradient-rhythm-phase) * 8%) + var(--consciousness-flow-x)
+        )
+        calc(
+          50% + (var(--gradient-rhythm-phase) * 6%) + var(--consciousness-flow-y)
+        ),
+        /* OKLAB primary with perceptual breathing intensity */
+        rgba(
+            var(--consciousness-oklab-primary-rgb),
+            calc(var(--consciousness-breathing-intensity) * var(--consciousness-css-fallback) * var(--consciousness-oklab-luminance))
+          )
+          0%,
+        /* OKLAB accent with perceptual chroma adjustment */
+        rgba(
+            var(--consciousness-oklab-accent-rgb),
+            calc(var(--consciousness-breathing-intensity) * 0.6 * var(--consciousness-css-fallback) * var(--consciousness-oklab-chroma))
+          )
+          40%,
+        /* OKLAB highlight with perceptual uniformity */
+        rgba(
+            var(--consciousness-oklab-highlight-rgb),
+            calc(var(--consciousness-breathing-intensity) * 0.3 * var(--consciousness-css-fallback) * var(--consciousness-oklab-luminance) * 0.8)
+          )
+          70%,
+        /* Base color with OKLAB shadow blend */
+        rgba(var(--consciousness-oklab-shadow-rgb), 0.02) 85%,
+        var(--spice-base) 100%
+      );
+
+    /* Breathing animation scale */
+    transform: translateZ(0) scale(var(--consciousness-flow-scale));
+
+    /* OKLAB-enhanced opacity with perceptual breathing and musical responsiveness */
+    opacity: calc(
+      var(--sn-dynamic-opacity, 0.5) *
+      var(--consciousness-css-fallback) *
+      (0.8 + var(--consciousness-breathing-phase) * 0.2) *
+      (0.8 + var(--consciousness-music-energy) * 0.4) *
+      var(--consciousness-oklab-luminance)
+    );
+
+    /* OKLAB-based perceptual color enhancement filters */
+    filter:
+      saturate(calc(1.0 + var(--consciousness-oklab-chroma) * 0.3))
+      brightness(calc(var(--consciousness-oklab-luminance) * 1.1))
+      hue-rotate(calc(var(--consciousness-oklab-hue) * 0.01deg))
+      contrast(calc(1.0 + var(--consciousness-musical-intensity, 0.5) * var(--consciousness-oklab-chroma) * 0.2));
+  }
+}
+
+/* ============================================================================ */
+/* OKLAB-ENHANCED CONSCIOUSNESS ANIMATIONS */
+/* ============================================================================ */
+
+/* OKLAB perceptually uniform color transitions for organic consciousness */
+.living-gradient-oklab-animated {
+  /* Apply OKLAB color transition mixins */
+  @include oklab-anims.oklab-transition(background, var(--consciousness-breathing-duration, 4000ms));
+  @include oklab-anims.musical-oklab-animation(--consciousness-oklab-primary-rgb, --consciousness-oklab-accent-rgb, var(--consciousness-breathing-duration, 4000ms));
+  
+  /* Enhanced OKLAB breathing with perceptual uniformity */
+  animation: 
+    consciousness-oklab-breathing var(--consciousness-breathing-duration, 4000ms) ease-in-out infinite,
+    consciousness-oklab-color-flow calc(var(--consciousness-breathing-duration, 4000ms) * 2) ease-in-out infinite;
+}
+
+/* Perceptual blending variants for living gradients */
+.living-gradient-perceptual-blend {
+  /* Apply perceptual gradient blending */
+  @include oklab-blend.oklab-gradient-blend(135deg, screen, 0.8);
+  
+  /* Enhanced consciousness variant */
+  &.consciousness-enhanced {
+    @extend .oklab-consciousness-blend;
+    @include oklab-blend.musical-gradient-blend(var(--consciousness-musical-intensity, 0.8));
+  }
+  
+  /* Musical responsiveness with perceptual uniformity */
+  &.musical-responsive {
+    @extend .oklab-perceptual-gradient;
+    animation: 
+      consciousness-oklab-breathing var(--consciousness-breathing-duration, 4000ms) ease-in-out infinite,
+      oklab-perceptual-gradient-flow calc(var(--consciousness-breathing-duration, 4000ms) * 3) ease-in-out infinite;
+  }
+}
+
+/* OKLAB-based gradient flow animation */
+@keyframes consciousness-oklab-color-flow {
+  0% {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--consciousness-oklab-primary-rgb), calc(var(--consciousness-breathing-intensity) * 0.8)) 0%,
+      rgba(var(--consciousness-oklab-accent-rgb), calc(var(--consciousness-breathing-intensity) * 0.6)) 25%,
+      rgba(var(--consciousness-oklab-shadow-rgb), calc(var(--consciousness-breathing-intensity) * 0.4)) 50%,
+      rgba(var(--consciousness-oklab-highlight-rgb), calc(var(--consciousness-breathing-intensity) * 0.7)) 75%,
+      rgba(var(--consciousness-oklab-primary-rgb), calc(var(--consciousness-breathing-intensity) * 0.8)) 100%
+    );
+    filter: 
+      saturate(calc(1.0 + var(--consciousness-oklab-chroma) * 0.2))
+      brightness(calc(var(--consciousness-oklab-luminance) * 1.0))
+      hue-rotate(calc(var(--consciousness-oklab-hue) * 0.005deg));
+  }
+  
+  25% {
+    background: linear-gradient(
+      165deg,
+      rgba(var(--consciousness-oklab-accent-rgb), calc(var(--consciousness-breathing-intensity) * 0.9)) 0%,
+      rgba(var(--consciousness-oklab-highlight-rgb), calc(var(--consciousness-breathing-intensity) * 0.7)) 25%,
+      rgba(var(--consciousness-oklab-primary-rgb), calc(var(--consciousness-breathing-intensity) * 0.5)) 50%,
+      rgba(var(--consciousness-oklab-shadow-rgb), calc(var(--consciousness-breathing-intensity) * 0.6)) 75%,
+      rgba(var(--consciousness-oklab-accent-rgb), calc(var(--consciousness-breathing-intensity) * 0.9)) 100%
+    );
+    filter: 
+      saturate(calc(1.0 + var(--consciousness-oklab-chroma) * 0.3))
+      brightness(calc(var(--consciousness-oklab-luminance) * 1.05))
+      hue-rotate(calc(var(--consciousness-oklab-hue) * 0.01deg));
+  }
+  
+  50% {
+    background: linear-gradient(
+      45deg,
+      rgba(var(--consciousness-oklab-highlight-rgb), calc(var(--consciousness-breathing-intensity) * 1.0)) 0%,
+      rgba(var(--consciousness-oklab-shadow-rgb), calc(var(--consciousness-breathing-intensity) * 0.8)) 25%,
+      rgba(var(--consciousness-oklab-accent-rgb), calc(var(--consciousness-breathing-intensity) * 0.6)) 50%,
+      rgba(var(--consciousness-oklab-primary-rgb), calc(var(--consciousness-breathing-intensity) * 0.7)) 75%,
+      rgba(var(--consciousness-oklab-highlight-rgb), calc(var(--consciousness-breathing-intensity) * 1.0)) 100%
+    );
+    filter: 
+      saturate(calc(1.0 + var(--consciousness-oklab-chroma) * 0.4))
+      brightness(calc(var(--consciousness-oklab-luminance) * 1.1))
+      hue-rotate(calc(var(--consciousness-oklab-hue) * 0.015deg));
+  }
+  
+  75% {
+    background: linear-gradient(
+      225deg,
+      rgba(var(--consciousness-oklab-shadow-rgb), calc(var(--consciousness-breathing-intensity) * 0.7)) 0%,
+      rgba(var(--consciousness-oklab-primary-rgb), calc(var(--consciousness-breathing-intensity) * 0.9)) 25%,
+      rgba(var(--consciousness-oklab-highlight-rgb), calc(var(--consciousness-breathing-intensity) * 0.5)) 50%,
+      rgba(var(--consciousness-oklab-accent-rgb), calc(var(--consciousness-breathing-intensity) * 0.8)) 75%,
+      rgba(var(--consciousness-oklab-shadow-rgb), calc(var(--consciousness-breathing-intensity) * 0.7)) 100%
+    );
+    filter: 
+      saturate(calc(1.0 + var(--consciousness-oklab-chroma) * 0.3))
+      brightness(calc(var(--consciousness-oklab-luminance) * 1.05))
+      hue-rotate(calc(var(--consciousness-oklab-hue) * 0.01deg));
+  }
+  
+  100% {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--consciousness-oklab-primary-rgb), calc(var(--consciousness-breathing-intensity) * 0.8)) 0%,
+      rgba(var(--consciousness-oklab-accent-rgb), calc(var(--consciousness-breathing-intensity) * 0.6)) 25%,
+      rgba(var(--consciousness-oklab-shadow-rgb), calc(var(--consciousness-breathing-intensity) * 0.4)) 50%,
+      rgba(var(--consciousness-oklab-highlight-rgb), calc(var(--consciousness-breathing-intensity) * 0.7)) 75%,
+      rgba(var(--consciousness-oklab-primary-rgb), calc(var(--consciousness-breathing-intensity) * 0.8)) 100%
+    );
+    filter: 
+      saturate(calc(1.0 + var(--consciousness-oklab-chroma) * 0.2))
+      brightness(calc(var(--consciousness-oklab-luminance) * 1.0))
+      hue-rotate(calc(var(--consciousness-oklab-hue) * 0.005deg));
+  }
+}
+
+/* OKLAB breathing animation with perceptual uniformity */
+@keyframes consciousness-oklab-breathing {
+  0% {
+    transform: translateZ(0) scale(1) rotate(0deg);
+    opacity: calc(var(--consciousness-layer-opacity) * var(--consciousness-oklab-luminance) * 0.9);
+  }
+  25% {
+    transform: translateZ(0) scale(calc(1 + var(--consciousness-breathing-intensity) * 0.5)) rotate(calc(var(--consciousness-oklab-hue) * 0.001deg));
+    opacity: calc(var(--consciousness-layer-opacity) * var(--consciousness-oklab-luminance) * 1.1);
+  }
+  50% {
+    transform: translateZ(0) scale(calc(1 + var(--consciousness-breathing-intensity) * 1.0)) rotate(0deg);
+    opacity: calc(var(--consciousness-layer-opacity) * var(--consciousness-oklab-luminance) * 1.2);
+  }
+  75% {
+    transform: translateZ(0) scale(calc(1 + var(--consciousness-breathing-intensity) * 0.5)) rotate(calc(var(--consciousness-oklab-hue) * -0.001deg));
+    opacity: calc(var(--consciousness-layer-opacity) * var(--consciousness-oklab-luminance) * 1.1);
+  }
+  100% {
+    transform: translateZ(0) scale(1) rotate(0deg);
+    opacity: calc(var(--consciousness-layer-opacity) * var(--consciousness-oklab-luminance) * 0.9);
+  }
+}
+
+/* ============================================================================ */
+/* ORGANIC CONSCIOUSNESS BREATHING ANIMATIONS */
+/* ============================================================================ */
+
+@keyframes consciousness-base-breathing {
+  0% {
+    transform: translateZ(0) scale(1) rotate(0deg);
+    opacity: calc(var(--consciousness-layer-opacity) * 0.9);
+  }
+  25% {
+    transform: translateZ(0) scale(1.02) rotate(0.5deg);
+    opacity: calc(var(--consciousness-layer-opacity) * 1.1);
+  }
+  50% {
+    transform: translateZ(0) scale(1.05) rotate(0deg);
+    opacity: calc(var(--consciousness-layer-opacity) * 1.2);
+  }
+  75% {
+    transform: translateZ(0) scale(1.03) rotate(-0.5deg);
+    opacity: calc(var(--consciousness-layer-opacity) * 1.0);
+  }
+  100% {
+    transform: translateZ(0) scale(1) rotate(0deg);
+    opacity: calc(var(--consciousness-layer-opacity) * 0.9);
+  }
+}
+
+@keyframes consciousness-organic-flow {
+  0% {
+    background-position:
+      0% 0%,
+      calc(0% + var(--consciousness-webgl-flow-x)) calc(0% + var(--consciousness-webgl-flow-y));
+  }
+  25% {
+    background-position:
+      25% 10%,
+      calc(15% + var(--consciousness-webgl-flow-x)) calc(25% + var(--consciousness-webgl-flow-y));
+  }
+  50% {
+    background-position:
+      50% 50%,
+      calc(50% + var(--consciousness-webgl-flow-x)) calc(50% + var(--consciousness-webgl-flow-y));
+  }
+  75% {
+    background-position:
+      75% 25%,
+      calc(75% + var(--consciousness-webgl-flow-x)) calc(25% + var(--consciousness-webgl-flow-y));
+  }
+  100% {
+    background-position:
+      100% 0%,
+      calc(100% + var(--consciousness-webgl-flow-x)) calc(0% + var(--consciousness-webgl-flow-y));
+  }
+}
+
+/* Apply breathing animation to living consciousness */
+.Root__main-view::before {
+  @media (prefers-reduced-motion: no-preference) {
+    animation:
+      consciousness-base-breathing var(--consciousness-breathing-duration) ease-in-out infinite,
+      consciousness-organic-flow calc(var(--consciousness-breathing-duration) * 2) linear infinite;
+  }
+}
+
+/* ============================================================================ */
+/* WEBGL INTEGRATION COORDINATION */
+/* ============================================================================ */
+
+/* WebGL active state - coordinate CSS and WebGL layers */
+html[style*="--sn-webgl-enabled: 1"] {
+  .Root__main-view::before {
+    /* Reduce CSS layer opacity when WebGL is active */
+    opacity: calc(
+      var(--sn-dynamic-opacity, 0.5) *
+      var(--consciousness-css-fallback) *
+      (1 - var(--consciousness-webgl-coordination) * 0.7)
+    );
+
+    /* Coordinate with WebGL positioning */
+    transform: translateZ(0)
+               scale(calc(var(--consciousness-flow-scale) * var(--consciousness-webgl-scale)))
+               translate(var(--consciousness-webgl-flow-x), var(--consciousness-webgl-flow-y));
+  }
+
+  /* Create OKLAB-enhanced coordination layer for smooth WebGL-CSS blending */
+  .Root__main-view::after {
+    background:
+      linear-gradient(
+        135deg,
+        /* OKLAB primary with perceptual WebGL coordination */
+        rgba(var(--consciousness-oklab-primary-rgb), calc(0.04 * var(--consciousness-webgl-coordination) * var(--consciousness-oklab-luminance))) 0%,
+        /* OKLAB accent transition */
+        rgba(var(--consciousness-oklab-accent-rgb), calc(0.015 * var(--consciousness-webgl-coordination) * var(--consciousness-oklab-chroma))) 20%,
+        transparent 30%,
+        /* OKLAB highlight with perceptual uniformity */
+        rgba(var(--consciousness-oklab-highlight-rgb), calc(0.02 * var(--consciousness-webgl-coordination) * var(--consciousness-oklab-luminance) * 0.8))) 70%,
+        /* OKLAB shadow blend */
+        rgba(var(--consciousness-oklab-shadow-rgb), calc(0.01 * var(--consciousness-webgl-coordination))) 90%,
+        transparent 100%
+      ;
+
+    /* OKLAB-based WebGL coordination filter */
+    filter:
+      saturate(calc(1.0 + var(--consciousness-webgl-coordination) * var(--consciousness-oklab-chroma) * 0.2))
+      brightness(calc(var(--consciousness-oklab-luminance) * 1.05))
+      hue-rotate(calc(var(--consciousness-oklab-hue) * var(--consciousness-webgl-coordination) * 0.02deg));
+  }
+}
+
+/* ============================================================================ */
+/* CONSCIOUSNESS INTENSITY RESPONSIVE STYLING */
+/* ============================================================================ */
+
+/* High consciousness intensity - enhanced living base */
+html[style*="--consciousness-intensity-global: 1"],
+html[data-consciousness-level="high"] {
+  --consciousness-layer-opacity: 0.12;
+  --consciousness-breathing-intensity: 0.15;
+
+  .Root__main-view::before {
+    /* OKLAB-enhanced high consciousness intensity with perceptual uniformity */
+    filter:
+      saturate(calc(1.2 + var(--consciousness-oklab-chroma) * 0.4))
+      brightness(calc(1.1 * var(--consciousness-oklab-luminance)))
+      contrast(calc(1.1 + var(--consciousness-oklab-chroma) * 0.2))
+      hue-rotate(calc(var(--consciousness-music-energy) * var(--consciousness-oklab-hue) * 0.03deg));
+  }
+}
+
+/* Medium consciousness intensity - balanced living base */
+html[style*="--consciousness-intensity-global: 0.5"],
+html[data-consciousness-level="medium"] {
+  --consciousness-layer-opacity: 0.08;
+  --consciousness-breathing-intensity: 0.10;
+}
+
+/* Low consciousness intensity - subtle living base */
+html[style*="--consciousness-intensity-global: 0"],
+html[data-consciousness-level="low"] {
+  --consciousness-layer-opacity: 0.04;
+  --consciousness-breathing-intensity: 0.06;
+
+  .Root__main-view::before {
+    filter: saturate(1.0) brightness(1.0) contrast(1.0);
+  }
+}
+
+/* ============================================================================ */
+/* MUSIC ENERGY RESPONSIVE ENHANCEMENTS */
+/* ============================================================================ */
+
+/* High energy music - vibrant living base */
+html[style*="--consciousness-music-energy: 1"] {
+  --consciousness-breathing-duration: 2000ms; /* Faster breathing */
+
+  .Root__main-view::before {
+    animation-duration: 2000ms, 4000ms; /* Faster animations */
+    /* OKLAB-enhanced high energy music with perceptual color processing */
+    filter:
+      saturate(calc(1.0 + var(--consciousness-music-energy) * var(--consciousness-oklab-chroma) * 0.5))
+      brightness(calc(1.0 + var(--consciousness-music-energy) * var(--consciousness-oklab-luminance) * 0.3))
+      contrast(calc(1.0 + var(--consciousness-music-energy) * var(--consciousness-oklab-chroma) * 0.3))
+      hue-rotate(calc(var(--consciousness-music-energy) * var(--consciousness-oklab-hue) * 0.02deg));
+  }
+}
+
+/* Low energy music - calm living base */
+html[style*="--consciousness-music-energy: 0"] {
+  --consciousness-breathing-duration: 6000ms; /* Slower breathing */
+
+  .Root__main-view::before {
+    animation-duration: 6000ms, 12000ms; /* Slower animations */
+  }
+}
+
+/* ============================================================================ */
+/* ACCESSIBILITY AND PERFORMANCE OPTIMIZATIONS */
+/* ============================================================================ */
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .Root__main-view::before {
+    animation: none !important;
+    transform: translateZ(0) scale(1) !important;
+    transition: opacity 300ms ease !important;
+  }
+
+  :root {
+    --consciousness-breathing-phase: 0 !important;
+    --consciousness-flow-x: 0% !important;
+    --consciousness-flow-y: 0% !important;
+    --consciousness-flow-scale: 1 !important;
+  }
+}
+
+/* Performance mode - simplified living base */
+.sn-performance-mode {
+  .Root__main-view::before {
+    animation: none !important;
+    transform: translateZ(0) !important;
+    filter: none !important;
+    background: var(--living-base-gradient) !important;
+  }
+
+  :root {
+    --consciousness-breathing-duration: 8000ms !important; /* Slower for performance */
+  }
+}
+
+/* Battery optimization - minimal living base */
+:root[data-sn-mode="battery-optimized"] {
+  --consciousness-layer-opacity: 0.02 !important;
+  --consciousness-breathing-intensity: 0.01 !important;
+  --consciousness-breathing-duration: 10000ms !important;
+
+  .Root__main-view::before {
+    animation: none !important;
+    filter: none !important;
+    transform: translateZ(0) !important;
+  }
+}
+
+/* ============================================================================ */
+/* UTILITY CLASSES FOR DYNAMIC CONTROL */
+/* ============================================================================ */
+
+/* Disable living base system */
+.living-base-disabled {
+  .Root__main-view::before {
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      rgba(var(--spice-rgb-accent), 0.1) 0%,
+      var(--spice-base) 100%
+    ) !important;
+    animation: none !important;
+    transform: translateZ(0) !important;
+  }
+}
+
+/* OKLAB-enhanced living base for dramatic moments */
+.living-base-enhanced {
+  --consciousness-layer-opacity: 0.15 !important;
+  --consciousness-breathing-intensity: 0.20 !important;
+  --consciousness-breathing-duration: 3000ms !important;
+
+  .Root__main-view::before {
+    /* OKLAB-enhanced dramatic consciousness with perceptual uniformity */
+    filter:
+      saturate(calc(1.3 + var(--consciousness-oklab-chroma) * 0.5))
+      brightness(calc(1.2 * var(--consciousness-oklab-luminance)))
+      contrast(calc(1.2 + var(--consciousness-oklab-chroma) * 0.3))
+      hue-rotate(calc(var(--consciousness-music-energy) * var(--consciousness-oklab-hue) * 0.04deg)) !important;
+
+    /* Enhanced OKLAB-based background for dramatic effect */
+    background:
+      radial-gradient(
+        ellipse at center,
+        rgba(var(--consciousness-oklab-primary-rgb), calc(0.15 * var(--consciousness-oklab-luminance))) 0%,
+        rgba(var(--consciousness-oklab-accent-rgb), calc(0.12 * var(--consciousness-oklab-chroma))) 30%,
+        rgba(var(--consciousness-oklab-highlight-rgb), calc(0.08 * var(--consciousness-oklab-luminance))) 60%,
+        rgba(var(--consciousness-oklab-shadow-rgb), 0.03) 85%,
+        var(--spice-base) 100%
+      ) !important;
+  }
+}
+
+/* Minimal living base for content focus */
+.living-base-minimal {
+  --consciousness-layer-opacity: 0.03 !important;
+  --consciousness-breathing-intensity: 0.02 !important;
+
+  .Root__main-view::before {
+    filter: saturate(1.0) brightness(1.0) contrast(1.0) !important;
+  }
+}
+
+/* ============================================================================ */
+/* DEBUG AND DEVELOPMENT UTILITIES */
+/* ============================================================================ */
+
+/* Development mode - show OKLAB-enhanced consciousness boundaries */
+html[data-debug="true"] {
+  .Root__main-view::before {
+    outline: 1px dashed rgba(var(--consciousness-oklab-primary-rgb), calc(0.3 * var(--consciousness-oklab-chroma)));
+  }
+
+  .Root__main-view::after {
+    outline: 1px dashed rgba(var(--consciousness-oklab-accent-rgb), calc(0.2 * var(--consciousness-oklab-luminance)));
+  }
+}
+
+/* OKLAB-enhanced consciousness visualization for debugging */
+.consciousness-debug {
+  .Root__main-view::before {
+    background:
+      /* Show OKLAB-enhanced living base gradient boundaries */
+      var(--living-base-gradient),
+      /* OKLAB-based consciousness area highlighting */
+      radial-gradient(
+        circle at 50% 50%,
+        rgba(var(--consciousness-oklab-primary-rgb), calc(0.15 * var(--consciousness-oklab-chroma))) 0%,
+        rgba(var(--consciousness-oklab-accent-rgb), calc(0.1 * var(--consciousness-oklab-luminance))) 25%,
+        rgba(var(--consciousness-oklab-highlight-rgb), calc(0.05 * var(--consciousness-oklab-chroma))) 50%,
+        transparent 75%
+      );
+
+    /* OKLAB-enhanced debug filter */
+    filter:
+      saturate(calc(1.5 + var(--consciousness-oklab-chroma)))
+      brightness(calc(1.3 * var(--consciousness-oklab-luminance)))
+      hue-rotate(calc(var(--consciousness-oklab-hue) * 0.05deg));
+  }
+}

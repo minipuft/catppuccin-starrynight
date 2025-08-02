@@ -31,7 +31,6 @@
 @use "../layout/_sn_header_actionBar" as *;
 @use "../layout/_artist_aura_fields" as *;
 @use "../layout/_sn_scroll_node_backgrounds" as *;
-@use "../layout/_sn_right_sidebar_consciousness" as *;
 
 // === COMPONENT MODULES ===
 @use "../components/_track_list_enhanced" as *;
@@ -49,6 +48,7 @@
 @use "../features/_sn_depth_layers" as *;
 @use "../features/_sn_z_index_management" as *;
 @use "../features/_sn_glassmorphism" as *;
+@use "../features/_flux_music_visualization" as *;
 @use "../features/_sn_atmospheric" as *;
 @use "../features/_sn_stars" as *;
 @use "../features/_sn_3d_morphing" as *;
@@ -61,12 +61,18 @@
 @use "../features/_consciousness_field_matrix" as *; // Consciousness field matrix
 @use "../features/_sn_constellation_network" as *; // Constellation network effects
 @use "../features/_holographic_consciousness_integration" as *; // 🛸 Holographic consciousness integration
+@use "../features/_depth_consciousness_system" as *; // 🌊 Depth consciousness system - Content-aware intelligence
+@use "../features/_living_gradient_base_system" as *; // 🌊 Living Gradient Base System - Transform static #1e1e2e into organic consciousness
+@use "../features/_genre-aware-ui-integration" as *; // 🎵 Genre-aware UI integration - Dynamic musical consciousness
 
 // === SYSTEMS MODULES ===
 @use "../systems/_sn_behavioral_prediction" as *;
 @use "../systems/_sn_performance_optimization" as *;
 @use "../systems/_sn_quantum_consciousness" as *;
 @use "../systems/_sn_data_glyphs" as *;
+
+// === VISUAL CONSCIOUSNESS MODULES ===
+@use "../visual/organic-consciousness/organic-consciousness-main" as *;
 
 // === UI EFFECTS MODULES ===
 // Context menu implementation removed

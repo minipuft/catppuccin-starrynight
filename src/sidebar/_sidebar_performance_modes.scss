@@ -383,7 +383,7 @@
   right: 10px;
   padding: 4px 8px;
   background: rgba(0, 0, 0, 0.8);
-  color: white;
+  color: rgb(var(--sn-musical-harmony-contrast-rgb));
   font-size: 10px;
   border-radius: 4px;
   pointer-events: none;
@@ -504,7 +504,7 @@
   right: 10px;
   padding: 4px 8px;
   background: rgba(0, 0, 0, 0.8);
-  color: white;
+  color: rgb(var(--sn-musical-harmony-contrast-rgb));
   font-size: 10px;
   border-radius: 4px;
   opacity: 0;

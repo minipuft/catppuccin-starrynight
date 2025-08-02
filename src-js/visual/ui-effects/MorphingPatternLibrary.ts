@@ -8,6 +8,9 @@
  * refract, and harmonize to guide user attention and provide feedback.
  */
 
+import { ConstellationPatterns } from '@/visual/interaction/ConstellationPatterns';
+import type { ConstellationPattern } from '@/visual/interaction/types';
+
 export interface MorphingPattern {
   name: string;
   purpose: string;
@@ -28,6 +31,13 @@ export interface PatternOptions {
   speed?: number;
   musicSync?: boolean;
   accessibility?: boolean;
+  // Constellation-specific options
+  constellationType?: string;
+  musicContext?: {
+    intensity?: number;
+    bpm?: number;
+    harmonicMode?: string;
+  };
 }
 
 export class MorphingPatternLibrary {
@@ -196,6 +206,13 @@ export class MorphingPatternLibrary {
       purpose: 'Provide gentle, meditative visual flow for calm music',
       render: this._renderCalmFlow.bind(this),
     });
+    
+    // Constellation Ripple - Dynamic constellation patterns with music sync
+    this.patterns.set('constellation-ripple', {
+      name: 'Constellation Ripple',
+      purpose: 'Create dynamic constellation patterns that sync with music and respond to user interactions',
+      render: this._renderConstellationRipple.bind(this),
+    });
   }
   
   public getPattern(name: string): MorphingPattern | undefined {
@@ -272,7 +289,7 @@ export class MorphingPatternLibrary {
   
   private _shouldCachePattern(patternName: string, intensity: number): boolean {
     // Cache patterns that are frequently repeated or computationally expensive
-    const cacheablePatterns = ['interaction-ripple', 'beat-pulse', 'focus-flow'];
+    const cacheablePatterns = ['interaction-ripple', 'beat-pulse', 'focus-flow', 'constellation-ripple'];
     return cacheablePatterns.includes(patternName) && intensity > 0.1;
   }
   
@@ -528,5 +545,124 @@ export class MorphingPatternLibrary {
     }
     
     context.stroke();
+  }
+  
+  private _renderConstellationRipple(
+    context: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    intensity: number,
+    time: number,
+    options: PatternOptions = {}
+  ): void {
+    const { 
+      color = 'rgba(var(--sn-accent-rgb), 0.4)', 
+      size = 120, 
+      speed = 1,
+      constellationType = 'ursa',
+      musicContext = {}
+    } = options;
+    
+    try {
+      // Generate constellation pattern with dynamic music context
+      const fullMusicContext = {
+        intensity: intensity,
+        bpm: musicContext.bpm || 120,
+        harmonicMode: musicContext.harmonicMode || 'monochromatic',
+        ...musicContext
+      };
+      
+      // Generate constellation based on type and music context
+      let constellation: ConstellationPattern;
+      
+      if (musicContext.harmonicMode) {
+        constellation = ConstellationPatterns.generateHarmonicConstellation(
+          0, 0, size * 0.5, musicContext.harmonicMode, fullMusicContext
+        );
+      } else if (musicContext.bpm && intensity > 0.7) {
+        // Use beat-sync constellation for high intensity
+        constellation = ConstellationPatterns.generateBeatSyncConstellation(
+          0, 0, size * 0.5, intensity, musicContext.bpm
+        );
+      } else {
+        constellation = ConstellationPatterns.generatePattern(
+          constellationType, 0, 0, size * 0.5, fullMusicContext
+        );
+      }
+      
+      // Save context for transformation
+      context.save();
+      context.translate(x, y);
+      
+      // Apply time-based rotation for organic feel
+      const rotation = (time * speed * 0.0005) % (Math.PI * 2);
+      context.rotate(rotation);
+      
+      // Render constellation connections
+      if (constellation.connections && constellation.connections.length > 0) {
+        context.strokeStyle = color.replace(/[\d.]+\)$/, `${intensity * 0.3})`);
+        context.lineWidth = 1 + intensity;
+        context.lineCap = 'round';
+        
+        constellation.connections.forEach(([startIdx, endIdx]) => {
+          const startPoint = constellation.points[startIdx];
+          const endPoint = constellation.points[endIdx];
+          if (startPoint && endPoint) {
+            context.beginPath();
+            context.moveTo(startPoint.x, startPoint.y);
+            context.lineTo(endPoint.x, endPoint.y);
+            context.stroke();
+          }
+        });
+      }
+      
+      // Render constellation stars with twinkle effect
+      constellation.points.forEach((point, index) => {
+        const starLuminosity = constellation.luminosity[index] || 0.8;
+        const twinklePhase = Math.sin(time * constellation.twinkleRate * 0.001 + index * 0.5) * 0.5 + 0.5;
+        const starOpacity = starLuminosity * intensity * (0.7 + twinklePhase * 0.3);
+        const starSize = (2 + starLuminosity * 3) * intensity;
+        
+        // Create star glow effect
+        const gradient = context.createRadialGradient(
+          point.x, point.y, 0,
+          point.x, point.y, starSize * 2
+        );
+        gradient.addColorStop(0, color.replace(/[\d.]+\)$/, `${starOpacity})`));
+        gradient.addColorStop(1, color.replace(/[\d.]+\)$/, '0)'));
+        
+        context.fillStyle = gradient;
+        context.beginPath();
+        context.arc(point.x, point.y, starSize * 2, 0, Math.PI * 2);
+        context.fill();
+        
+        // Add bright star center
+        context.fillStyle = color.replace(/[\d.]+\)$/, `${starOpacity * 1.5})`);
+        context.beginPath();
+        context.arc(point.x, point.y, starSize * 0.5, 0, Math.PI * 2);
+        context.fill();
+      });
+      
+      // Add expanding ripple effect around constellation
+      const rippleProgress = (time * speed * 0.002) % 1;
+      const rippleRadius = size * rippleProgress;
+      const rippleOpacity = Math.max(0, (1 - rippleProgress) * intensity * 0.2);
+      
+      if (rippleOpacity > 0) {
+        context.strokeStyle = color.replace(/[\d.]+\)$/, `${rippleOpacity})`);
+        context.lineWidth = 1;
+        context.beginPath();
+        context.arc(0, 0, rippleRadius, 0, Math.PI * 2);
+        context.stroke();
+      }
+      
+      // Restore context
+      context.restore();
+      
+    } catch (error) {
+      console.warn('[MorphingPatternLibrary] Error rendering constellation ripple:', error);
+      // Fallback to simple ripple
+      this._renderInteractionRipple(context, x, y, intensity, time, { color, size: size * 0.5, speed });
+    }
   }
 }

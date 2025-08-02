@@ -7,7 +7,7 @@
 
 import { OrganicBeatSyncConsciousness } from '@/visual/organic-consciousness/OrganicBeatSyncConsciousness';
 // Using stub implementations from colorStubs
-import type { CellularMembrane, BreathingRhythmEngine, SymbioticListeningCore } from '@/types/colorStubs';
+import type { BreathingRhythmEngine, SymbioticListeningCore } from '@/types/colorStubs';
 import { Year3000System } from '@/core/lifecycle/year3000System';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';
 import * as Utils from '@/utils/core/Year3000Utilities';
@@ -178,15 +178,11 @@ describe('Organic Consciousness Integration', () => {
     it('should properly clean up resources on destroy', async () => {
       await organicConsciousness.initialize();
       
-      // Create some cellular membranes through animation
+      // Trigger organic consciousness through animation
       organicConsciousness.onAnimate(16.67);
       
       // Destroy the system
       organicConsciousness.destroy();
-      
-      // Check that DOM elements were cleaned up
-      const membranes = document.querySelectorAll('.organic-cellular-membrane');
-      expect(membranes.length).toBe(0);
       
       const organisms = document.querySelectorAll('.organic-breathing-organism');
       expect(organisms.length).toBe(0);

@@ -10,9 +10,11 @@ The theme implements a sophisticated **Year 3000 System** architecture featuring
 
 - **Facade Pattern Coordination** - SystemCoordinator managing VisualSystemFacade and NonVisualSystemFacade
 - **Organic Consciousness Philosophy** - Biological-inspired systems with cellular growth, breathing rhythms, and emotional temperature
-- **Multi-Agent Octopus Workbench** - Intelligent tentacle coordination for simultaneous development
+- **Enhanced Multi-Agent Workbench** - Systematic A/I/M comprehensive phases with intelligent coordination
 - **OKLAB Color Science** - Perceptually uniform color processing for natural consciousness experiences
 - **Performance-First Consciousness** - 60fps target with adaptive quality scaling and device-aware optimization
+- **Context Memory System** - Cognitive architecture with working, episodic, semantic, and procedural memory
+- **Neural Workbench Integration** - Continuous monitoring, pattern broadcasting, and adaptive learning
 
 ## Common Development Commands
 
@@ -27,6 +29,16 @@ The theme implements a sophisticated **Year 3000 System** architecture featuring
 - `npm run typecheck` - TypeScript compilation check with strict mode enforcement
 - `npm run validate` - Comprehensive validation (typecheck + lint + test)
 - `npm run ci:full` - Complete CI validation pipeline
+
+### Neural Workbench Commands
+
+- `neural-init` - Initialize project with neural workbench integration
+- `neural-validate` - Validate neural workbench setup and architecture
+- `neural-monitor` - Start continuous project health monitoring
+- `neural-status` - Check system health and integration status
+- `neural-doctor` - Diagnose and fix common neural workbench issues
+- `neural-sync` - Sync global architecture to project
+- `neural-broadcast` - Share successful patterns with other projects
 
 ### CSS Development & Maintenance
 
@@ -202,15 +214,7 @@ The system has undergone comprehensive refactoring to implement facade pattern a
 - **Progressive Degradation**: Device-aware optimization with graceful fallbacks
 - **Build Performance**: <30ms compilation time, <1MB bundle size with tree-shaking
 - **Consciousness Philosophy**: Organic patterns over mechanical loops, biological-inspired efficiency
-- **Coordination Overhead**: <0.5% CPU impact for multi-agent tentacle coordination
-
-### Consciousness-Aware Development Standards
-
-- **Organic System Design**: All systems must implement biological-inspired patterns
-- **Emotional Temperature Integration**: Color systems must use OKLAB color science
-- **Breathing Rhythm Compliance**: Visual systems should implement organic breathing patterns
-- **Cellular Growth Patterns**: Systems should evolve through cellular-inspired growth
-- **Performance Consciousness**: Systems must be aware of device capabilities and adapt accordingly
+- **Coordination Overhead**: <0.5% CPU impact for multi-agent workbench coordination
 
 ### Code Quality Standards
 
@@ -228,7 +232,7 @@ The system has undergone comprehensive refactoring to implement facade pattern a
 - **CSS Variables**: `--sn-*` prefix for theme consciousness, `--spice-*` for Spicetify compatibility
 - **SCSS Mixins**: `kebab-case` with consciousness-aware descriptive action names
 - **Systems**: Must implement `IManagedSystem` interface and facade pattern registration
-- **Consciousness Components**: Use organic naming (e.g., `CellularMembrane`, `BiologicalConsciousness`)
+- **Naming Conventions**: Use unambigous naming following best developer conventions
 
 ### Testing Standards
 
@@ -322,49 +326,121 @@ The framework enforces:
 
 For detailed framework documentation, see `docs/development/AI_FRAMEWORK.md`.
 
-## Multi-Agent Coordination Guidelines
+## Enhanced Multi-Agent Coordination Guidelines
 
 ### **Starting a New Development Session**
 
-1. **Check Central Brain Status**: Always start by reviewing `/plans/CENTRAL-BRAIN.md`
-2. **Review Active Tentacles**: Check `/plans/TENTACLE-DASHBOARD.md` for current work
-3. **Identify Your Tentacle**: Find or create appropriate tentacle folder
-4. **Check Dependencies**: Review `/plans/DEPENDENCY-MAP.md` for conflicts
-5. **Update Status**: Update your tentacle's `TENTACLE-STATUS.md` file
-6. **Begin Work**: Start development with coordination awareness
+1. **Check Comprehensive Phases**: Review active comprehensive phases with `scripts/phase-status-dashboard.sh`
+2. **Assess Phase Status**: Identify current section focus (Analysis/Implementation/Migration)
+3. **Review Project Status**: Check `/plans/project-status.md` for overall project state
+4. **Validate Dependencies**: Use `/plans/dependencies.md` for potential conflicts
+5. **Update Coordination**: Update your status in the relevant phase/task coordination
+6. **Choose Development Mode**: Select between comprehensive phase or standard task approach
 
-### **Creating a New Tentacle**
+### **Enhanced Development Approaches**
 
-For new major development efforts:
+#### **Comprehensive Phase Development (Recommended for Major Work)**
+
+For significant system consolidation, architecture changes, or multi-system integration:
 
 ```bash
-# Create tentacle folder
-mkdir -p /plans/[tentacle-name]/
+# Create new comprehensive phase
+scripts/create-comprehensive-phase.sh phase-name \
+  -d "Brief description of phase purpose" \
+  -t "Target bundle reduction or performance goal"
 
-# Create status file from template
-cp /plans/COMMUNICATION-TEMPLATES.md /plans/[tentacle-name]/TENTACLE-STATUS.md
+# View phase status dashboard
+scripts/phase-status-dashboard.sh
 
-# Register with central brain
-echo "New tentacle: [tentacle-name]" >> /plans/CENTRAL-BRAIN.md
+# Progress through sections systematically
+scripts/progress-section.sh phase-name analysis implementation
+scripts/progress-section.sh phase-name implementation migration
+scripts/progress-section.sh phase-name migration
 ```
 
-### **Cross-Tentacle Communication**
+**When to Use Comprehensive Phases**:
 
-Use communication templates from `/plans/COMMUNICATION-TEMPLATES.md`:
+- System consolidation requiring 3+ systems
+- Major architecture changes affecting multiple components
+- Bundle optimization targeting >10KB reduction
+- Integration work requiring extensive backwards compatibility
+- Any work following the proven A/I/M pattern from Phase 2.4A/2.4B
 
-- **Status Updates**: Regular progress reports to central brain
-- **Resource Requests**: Request additional brain cycles/memory
-- **Conflict Alerts**: Report potential conflicts with other tentacles
-- **Knowledge Transfer**: Share patterns and implementations
-- **Completion Notifications**: Announce work completion
+#### **Standard Task Development (For Focused Work)**
 
-### **Conflict Resolution Protocol**
+For individual features, bug fixes, or isolated improvements:
 
-1. **Automatic Detection**: System monitors for conflicts via `/plans/TENTACLE-REGISTRY.md`
-2. **Alert Generation**: Conflicts automatically logged and reported
-3. **Priority-Based Resolution**: Higher priority tentacles get resources
-4. **Manual Intervention**: Complex conflicts require coordination
-5. **Resolution Verification**: Confirm conflicts are resolved
+```bash
+# Create standard task folder
+mkdir -p /plans/tasks/[task-name]/
+
+# Use existing task templates
+cp /plans/task-templates/[relevant-template].md /plans/tasks/[task-name]/
+
+# Update standard coordination
+# Edit /plans/agent-coordination.md to add your active work
+```
+
+**When to Use Standard Tasks**:
+
+- Single feature implementation
+- Bug fixes or maintenance work
+- Small performance optimizations
+- Documentation updates
+- Testing and validation work
+
+### **Enhanced Agent Communication**
+
+#### **Comprehensive Phase Coordination**
+
+For work within comprehensive phases, use section-specific communication:
+
+- **Analysis Section**: Update `/plans/[phase-name]/analysis/section-status.md` with discoveries and blocking issues
+- **Implementation Section**: Track progress in `/plans/[phase-name]/implementation/implementation-progress.md`
+- **Migration Section**: Document integration results in `/plans/[phase-name]/migration/testing-validation.md`
+- **Cross-Section**: Use phase-level `PHASE-STATUS.md` for coordination across sections
+
+#### **Standard Communication Protocols**
+
+Use communication templates from `/plans/communication-templates.md`:
+
+- **Status Updates**: Regular progress reports (every 2-3 hours of active work)
+- **Section Progression**: Coordinate phase section transitions using `scripts/progress-section.sh`
+- **Gating Validation**: Use `scripts/validate-phase-gating.sh` before section progression
+- **Dashboard Updates**: Monitor overall progress with `scripts/phase-status-dashboard.sh`
+- **Conflict Alerts**: Report blocking issues immediately with context
+- **Knowledge Transfer**: Share discoveries and implementation patterns in section artifacts
+
+### **Enhanced Conflict Resolution Protocol**
+
+#### **Comprehensive Phase Conflicts**
+
+1. **Section Gating Conflicts**: Use `scripts/validate-phase-gating.sh --strict` to identify issues
+2. **Cross-Section Dependencies**: Check section status files for prerequisite completion
+3. **Integration Conflicts**: Review `/migration/integration-updates.md` for system conflicts
+4. **Performance Regression**: Compare `/artifacts/before-metrics.md` vs current state
+
+#### **Standard System Conflicts**
+
+1. **Build System Conflicts**: TypeScript compilation errors indicate import/type conflicts
+2. **SCSS Conflicts**: Compilation warnings indicate variable conflicts
+3. **Performance Conflicts**: Monitoring system detects resource usage issues
+4. **API Conflicts**: Runtime checks detect Spicetify availability problems
+5. **Resolution Strategy**: Use gating validation and section coordination for systematic resolution
+
+#### **Success Metrics Tracking**
+
+Each comprehensive phase should achieve measurable success:
+
+- **Code Consolidation**: 60%+ reduction in total lines (Phase 2.4A/2.4B achieved this)
+- **Bundle Optimization**: Target bundle size reduction with maintained functionality
+- **API Compatibility**: 100% backwards compatibility through delegation patterns
+- **Build Performance**: TypeScript compilation remains fast (<30ms target)
+- **Test Coverage**: Maintain 90%+ coverage throughout migration
+
+- **Analysis Gate**: System understanding complete, consolidation targets validated
+- **Implementation Gate**: TypeScript compilation clean, unified controllers complete
+- **Migration Gate**: All tests passing, performance targets met, integration complete
 
 ## Intelligent Project Analysis for Year 3000 System
 
@@ -417,12 +493,12 @@ interface Year3000SystemAnalysis {
     >;
   };
 
-  // Smart Tentacle Recommendations
-  recommendedTentacles: Array<{
-    tentacleType:
-      | "LiquidConsciousness"
-      | "ChromaticConsciousness"
-      | "DimensionalInfinity";
+  // Smart Phase Recommendations
+  recommendedPhases: Array<{
+    phaseType:
+      | "LiquidConsciousnessIntegration"
+      | "ChromaticConsciousnessIntegration"
+      | "DimensionalInfinityIntegration";
     priority: "high" | "medium" | "low";
     estimatedImplementationTime: string;
     consciousnessImpact: number; // 0-10 transcendence impact
@@ -465,38 +541,38 @@ interface SpicetifyIntegrationAnalysis {
 }
 ```
 
-### Automated Tentacle Generation Rules
+### Automated Phase Generation Rules
 
-Based on analysis, the system automatically generates appropriate tentacle structures:
+Based on analysis, the system automatically generates appropriate comprehensive phase structures:
 
 ```markdown
-# Intelligent Tentacle Generation for Year 3000 System
+# Intelligent Phase Generation for Year 3000 System
 
 ## Generation Rules
 
 ### Rule 1: Consciousness-First Architecture
 
-- **High Consciousness Projects**: Generate comprehensive consciousness tentacles
-- **Medium Consciousness Projects**: Generate focused consciousness enhancements
-- **Low Consciousness Projects**: Generate consciousness foundation tentacles
+- **High Consciousness Projects**: Generate comprehensive consciousness integration phases
+- **Medium Consciousness Projects**: Generate focused consciousness enhancement phases
+- **Low Consciousness Projects**: Generate consciousness foundation phases
 
 ### Rule 2: Performance-Aware Generation
 
-- **High Performance Requirements**: Generate performance-optimized tentacles
-- **Medium Performance Requirements**: Generate balanced tentacles
-- **Low Performance Requirements**: Generate feature-rich tentacles
+- **High Performance Requirements**: Generate performance-optimized comprehensive phases
+- **Medium Performance Requirements**: Generate balanced A/I/M phases
+- **Low Performance Requirements**: Generate feature-rich integration phases
 
 ### Rule 3: Integration-Aware Generation
 
-- **Complex Integration**: Generate modular, well-documented tentacles
-- **Simple Integration**: Generate streamlined, efficient tentacles
-- **Legacy Integration**: Generate compatibility-focused tentacles
+- **Complex Integration**: Generate modular, well-documented comprehensive phases
+- **Simple Integration**: Generate streamlined, efficient A/I/M phases
+- **Legacy Integration**: Generate compatibility-focused migration phases
 
 ### Rule 4: Spicetify-Specific Optimization
 
-- **Theme Projects**: Generate visual consciousness tentacles
-- **Extension Projects**: Generate service consciousness tentacles
-- **Hybrid Projects**: Generate unified consciousness tentacles
+- **Theme Projects**: Generate visual consciousness integration phases
+- **Extension Projects**: Generate service consciousness integration phases
+- **Hybrid Projects**: Generate unified consciousness integration phases
 ```
 
 ## Future Development Guidelines
@@ -512,19 +588,19 @@ When implementing new glyph or interaction animation systems, follow these perfo
 3. **Intersection Observer**: Use for viewport-based optimizations instead of continuous polling
 4. **Event-Driven**: Respond to user interactions rather than continuous loops
 5. **Configurable Intensity**: Allow users to adjust animation intensity or disable entirely
-6. **Tentacle Coordination**: Create tentacle folder for major animation system development
+6. **Workbench Coordination**: Create comprehensive phase folder for major animation system development
 
 #### **✅ Performance-Optimized Architecture:**
 
 ```typescript
-// Example: Lightweight animation system with tentacle coordination
+// Example: Lightweight animation system with workbench coordination
 class OptimizedAnimationSystem implements IManagedSystem {
   private observer: IntersectionObserver;
   private batcher: CSSVariableBatcher;
 
   initialize() {
-    // Register with tentacle system
-    this.registerTentacle("animation-system", "Animation Implementation");
+    // Register with workbench system
+    this.registerWithWorkbench("animation-system", "Animation Implementation");
 
     // Setup intersection observer for viewport detection
     this.observer = new IntersectionObserver(this.handleVisibilityChange);
@@ -549,28 +625,71 @@ class OptimizedAnimationSystem implements IManagedSystem {
 - High-frequency DOM manipulation (>60fps)
 - Unbounded element pools or caches
 - Complex pseudo-element animations with multiple layers
-- **Working without tentacle coordination** for major features
-
-#### **🔄 Migration Path for Removed Systems:**
-
-If you need to implement glyph or ripple-like functionality:
-
-1. **Create Tentacle**: Set up proper tentacle folder for the work
-2. **Start with CSS**: Use CSS transforms and opacity changes
-3. **Use Existing Infrastructure**: Leverage `BeatSyncVisualSystem` for music sync
-4. **Batch Updates**: Use `CSSVariableBatcher` for performance
-5. **Progressive Enhancement**: Build fallbacks for reduced-motion preferences
-6. **Monitor Performance**: Use `PerformanceAnalyzer` to track impact
-7. **Coordinate**: Use tentacle communication for cross-system integration
-
-This approach maintains the visual richness while ensuring optimal performance across all device types and proper multi-agent coordination.
-
-# important-instruction-reminders
+- **Working without comprehensive phase coordination** for major features
 
 Do what has been asked; nothing more, nothing less.
 NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
 NEVER proactively create documentation files (\*.md) or README files. Only create documentation files if explicitly requested by the User.
+
+## Context Memory System
+
+This project implements the global cognitive architecture for enhanced LLM performance through structured memory systems.
+
+### Memory Architecture
+
+The project maintains context memory in `./context-memory/` with four distinct memory types:
+
+1. **Working Memory** (`working-memory.md`)
+
+   - Current tasks and immediate context
+   - Session-based, cleared on completion
+   - Updated continuously during work
+
+2. **Episodic Memory** (`episodic-memory.md`)
+
+   - Historical development events and outcomes
+   - Includes Phase 2.4A/B successes (60% code reduction)
+   - Summarized weekly to maintain size limits
+
+3. **Semantic Memory** (`semantic-memory.md`)
+
+   - Technical knowledge and patterns
+   - Architecture patterns (Facade, Year 3000, A/I/M)
+   - Performance optimizations (CSS batching, OKLAB)
+   - Reusable across sessions
+
+4. **Procedural Memory** (`procedural-memory.md`)
+   - Step-by-step workflows
+   - Build procedures, testing workflows
+   - Troubleshooting guides
+
+### Neural Workbench Integration
+
+The project is integrated with the Neural Workbench system for:
+
+- **Continuous Monitoring**: Real-time project health tracking
+- **Pattern Broadcasting**: Sharing successful patterns across projects
+- **Adaptive Learning**: Learning from development patterns
+
+### Usage
+
+```bash
+# Monitor project health continuously
+/home/minipuft/Applications/neural-workbench/scripts/neural-monitor.sh .
+
+# Broadcast successful patterns
+/home/minipuft/Applications/neural-workbench/scripts/synaptic-broadcast.sh
+
+# Update working memory for current session
+$EDITOR context-memory/working-memory.md
+```
+
+### Context References
+
+- **Project Configuration**: `context-memory/PROJECT-CONTEXT.yaml`
+- **Global Architecture**: `/home/minipuft/.claude/context-engineering/COGNITIVE-ARCHITECTURE.yaml`
+- **Neural Workbench**: `/home/minipuft/Applications/neural-workbench/NEURAL-WORKBENCH.yaml`
 
 ## Comprehensive Documentation Reference
 
@@ -583,7 +702,7 @@ The `docs/` directory contains comprehensive documentation for the Year 3000 Sys
 - **[Master Architecture Overview](./docs/MASTER_ARCHITECTURE_OVERVIEW.md)** - Complete 4-layer system architecture with data flow diagrams
 - **[Year 3000 System Guide](./docs/YEAR3000_SYSTEM_GUIDE.md)** - Central orchestrator and facade coordination patterns
 - **[Facade Pattern Guide](./docs/FACADE_PATTERN_GUIDE.md)** - SystemCoordinator, VisualSystemFacade, NonVisualSystemFacade architecture
-- **[Multi-Agent Workbench Guide](./docs/MULTI_AGENT_WORKBENCH_GUIDE.md)** - Tentacle coordination and intelligent development patterns
+- **[Enhanced Workbench Guide](./docs/ENHANCED_WORKBENCH_GUIDE.md)** - Comprehensive phase coordination and A/I/M development patterns
 - **[Organic Consciousness Guide](./docs/ORGANIC_CONSCIOUSNESS_GUIDE.md)** - Biological-inspired systems and consciousness philosophy
 
 #### **Technical Implementation Documentation (Medium Priority)**
@@ -596,7 +715,7 @@ The `docs/` directory contains comprehensive documentation for the Year 3000 Sys
 
 #### **Development Process Documentation (Lower Priority)**
 
-- **[Development Workflow Guide](./docs/DEVELOPMENT_WORKFLOW_GUIDE.md)** - Complete development process from tentacle creation to deployment
+- **[Development Workflow Guide](./docs/DEVELOPMENT_WORKFLOW_GUIDE.md)** - Complete development process from comprehensive phase creation to deployment
 - **[API Reference](./docs/API_REFERENCE.md)** - Comprehensive API documentation with interfaces and examples
 - **[Performance Optimization Guidelines](./docs/PERFORMANCE_OPTIMIZATION_GUIDELINES.md)** - Performance budgets and optimization strategies
 - **[Troubleshooting Guide](./docs/TROUBLESHOOTING_GUIDE.md)** - Common issues resolution and emergency recovery
@@ -623,3 +742,13 @@ This documentation follows the **Year 3000 System philosophy** where:
 5. **Troubleshoot**: Consult Troubleshooting Guide when encountering issues
 
 This comprehensive documentation system ensures developers can quickly understand and effectively contribute to the sophisticated Year 3000 System architecture with full consciousness-aware development patterns and multi-agent coordination capabilities.
+
+## Context Engineering Integration
+
+This project implements the global cognitive architecture defined in:
+
+- Global Architecture: `/home/minipuft/.claude/context-engineering/COGNITIVE-ARCHITECTURE.yaml`
+- Memory Types: `/home/minipuft/.claude/context-engineering/memory-types.md`
+- Best Practices: `/home/minipuft/.claude/context-engineering/best-practices.md`
+
+Project-specific context is maintained in `./context-memory/` following the global patterns.

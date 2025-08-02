@@ -3,7 +3,7 @@
  * 
  * This module defines the standardized CSS variable groups that align with
  * the unified system architecture. It provides type-safe access to variable
- * names and group management for the UnifiedCSSVariableManager.
+ * names and group management for the UnifiedCSSConsciousnessController.
  * 
  * @architecture Phase 1 of CSS module refactoring
  * @performance Enables priority-based CSS variable updates

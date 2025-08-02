@@ -12,13 +12,17 @@
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { Y3K } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
+import type { BackgroundConsciousnessChoreographer } from "../consciousness/BackgroundConsciousnessChoreographer";
+import type { ConsciousnessField, BackgroundSystemParticipant } from "../consciousness/BackgroundConsciousnessChoreographer";
+import { unifiedEventBus, type EventData } from "@/core/events/UnifiedEventBus";
+import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 
 interface DepthLayer {
   id: string;
@@ -32,6 +36,18 @@ interface DepthLayer {
   blurAmount: number;
   animationPhase: number;
   enabled: boolean;
+  
+  // LERP smoothing properties for framerate-independent animations
+  currentOffsetY: number;
+  targetOffsetY: number;
+  currentOpacity: number;
+  targetOpacity: number;
+  currentBlur: number;
+  targetBlur: number;
+  currentHueRotate: number;
+  targetHueRotate: number;
+  currentScale: number;
+  targetScale: number;
 }
 
 interface DepthSettings {
@@ -61,10 +77,10 @@ interface InfiniteSpaceMetrics {
  * - Performance-optimized layer management
  * - Music-responsive depth animation
  */
-export class DepthLayeredGradientSystem extends BaseVisualSystem {
+export class DepthLayeredGradientSystem extends BaseVisualSystem implements BackgroundSystemParticipant {
   private depthSettings: DepthSettings;
   private depthLayers: Map<string, DepthLayer>;
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
   private containerElement: HTMLElement | null = null;
   private backgroundContainer: HTMLElement | null = null;
@@ -78,7 +94,23 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
   
   private boundScrollHandler: ((event: Event) => void) | null = null;
   private boundResizeHandler: ((event: Event) => void) | null = null;
-  private boundMusicHandler: ((event: Event) => void) | null = null;
+  private eventSubscriptionIds: string[] = [];
+  
+  // Consciousness choreographer integration
+  private consciousnessChoreographer: BackgroundConsciousnessChoreographer | null = null;
+  private currentConsciousnessField: ConsciousnessField | null = null;
+  
+  // LERP smoothing half-life values (in seconds) for framerate-independent animations
+  private lerpHalfLifeValues = {
+    parallaxOffset: 0.15,     // Smooth parallax movement
+    opacity: 0.20,            // Gentle opacity transitions
+    blur: 0.25,               // Smooth blur changes
+    hueRotate: 0.30,          // Gradual color shifts
+    scale: 0.18               // Smooth scale transitions
+  };
+  
+  // Make systemName publicly accessible for the interface
+  public override readonly systemName: string = 'DepthLayeredGradientSystem';
   
   private layerTemplates = {
     cosmic: {
@@ -124,7 +156,18 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
     super(config, utils, performanceMonitor, musicSyncService, settingsManager);
     
     this.colorHarmonyEngine = year3000System?.colorHarmonyEngine || null;
-    this.cssVariableBatcher = new CSSVariableBatcher();
+    
+    // Get consciousness choreographer from year3000System if available
+    this.consciousnessChoreographer = year3000System?.backgroundConsciousnessChoreographer || null;
+    
+    // Initialize CSS Consciousness Controller if available
+    const cssController = UnifiedCSSConsciousnessController.getInstance();
+    if (cssController) {
+      this.cssConsciousnessController = cssController;
+    } else {
+      Y3K?.debug?.warn("DepthLayeredGradientSystem", "UnifiedCSSConsciousnessController not available, CSS consciousness disabled");
+      this.cssConsciousnessController = null;
+    }
     this.deviceCapabilities = new DeviceCapabilityDetector();
     this.depthLayers = new Map();
     
@@ -153,7 +196,6 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
     // Bind event handlers
     this.boundScrollHandler = this.handleScroll.bind(this);
     this.boundResizeHandler = this.handleResize.bind(this);
-    this.boundMusicHandler = this.handleMusicSync.bind(this);
     
     // Adjust settings based on device capabilities
     this.adaptToDeviceCapabilities();
@@ -176,6 +218,9 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
     
     // Setup event listeners
     this.setupEventListeners();
+    
+    // Register with consciousness choreographer
+    this.registerWithConsciousnessChoreographer();
     
     // Start animation loop
     this.startAnimationLoop();
@@ -378,7 +423,7 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
         animation-delay: ${i * 0.5}s;
       `;
       
-      // Create depth layer object
+      // Create depth layer object with LERP smoothing properties
       const depthLayer: DepthLayer = {
         id: `depth-layer-${i}`,
         element: layerElement,
@@ -390,7 +435,19 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
         colorShift: i * 30,
         blurAmount: blur,
         animationPhase: (i * Math.PI) / 4,
-        enabled: true
+        enabled: true,
+        
+        // Initialize LERP smoothing properties (current = target initially)
+        currentOffsetY: 0,
+        targetOffsetY: 0,
+        currentOpacity: opacity,
+        targetOpacity: opacity,
+        currentBlur: blur,
+        targetBlur: blur,
+        currentHueRotate: 0,
+        targetHueRotate: 0,
+        currentScale: scale,
+        targetScale: scale
       };
       
       // Store layer
@@ -407,6 +464,7 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
   }
   
   private setupEventListeners(): void {
+    // Standard browser events (keep as DOM events)
     if (this.boundScrollHandler) {
       window.addEventListener('scroll', this.boundScrollHandler, { passive: true });
     }
@@ -415,10 +473,24 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
       window.addEventListener('resize', this.boundResizeHandler, { passive: true });
     }
     
-    if (this.boundMusicHandler) {
-      document.addEventListener('music-sync:energy-changed', this.boundMusicHandler);
-      document.addEventListener('music-sync:beat', this.boundMusicHandler);
-    }
+    // Music events via unified event system
+    const musicBeatSub = unifiedEventBus.subscribe(
+      'music:beat',
+      this.handleMusicBeat.bind(this),
+      'DepthLayeredGradientSystem'
+    );
+    this.eventSubscriptionIds.push(musicBeatSub);
+    
+    const musicEnergySub = unifiedEventBus.subscribe(
+      'music:energy',
+      this.handleMusicEnergy.bind(this),
+      'DepthLayeredGradientSystem'
+    );
+    this.eventSubscriptionIds.push(musicEnergySub);
+    
+    Y3K?.debug?.log('DepthLayeredGradientSystem', 'Event listeners set up', {
+      unifiedEventSubscriptions: this.eventSubscriptionIds.length
+    });
   }
   
   private handleScroll(event: Event): void {
@@ -434,19 +506,22 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
     this.updateLayerDimensions();
   }
   
-  private handleMusicSync(event: Event): void {
-    const customEvent = event as CustomEvent;
-    const { type, detail } = customEvent;
+  private handleMusicBeat(data: EventData<'music:beat'>): void {
+    this.pulseDepthLayers(data.intensity);
     
-    switch (type) {
-      case 'music-sync:energy-changed':
-        this.updateDepthWithMusicEnergy(detail.energy || 0);
-        break;
-        
-      case 'music-sync:beat':
-        this.pulseDepthLayers(detail.intensity || 0);
-        break;
-    }
+    Y3K?.debug?.log('DepthLayeredGradientSystem', 'Music beat processed', {
+      bpm: data.bpm,
+      intensity: data.intensity
+    });
+  }
+  
+  private handleMusicEnergy(data: EventData<'music:energy'>): void {
+    this.updateDepthWithMusicEnergy(data.energy);
+    
+    Y3K?.debug?.log('DepthLayeredGradientSystem', 'Music energy processed', {
+      energy: data.energy,
+      valence: data.valence
+    });
   }
   
   private updateParallaxEffects(): void {
@@ -552,17 +627,125 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
   }
   
   private updateDepthAnimations(deltaTime: number): void {
+    const deltaTimeSeconds = deltaTime / 1000; // Convert to seconds for LERP
+    
     this.depthLayers.forEach(layer => {
-      // Update animation phase
+      // Update animation phase for organic breathing patterns
       layer.animationPhase += layer.rotationSpeed * deltaTime * 0.001;
       
-      // Apply subtle depth breathing
-      const breathingFactor = Math.sin(layer.animationPhase) * 0.05;
-      const currentOpacity = parseFloat(layer.element.style.opacity);
-      const newOpacity = currentOpacity + breathingFactor;
+      // Calculate target values based on music and consciousness state
+      this.updateLayerTargetsFromMusic(layer);
       
-      layer.element.style.opacity = Math.max(0, Math.min(1, newOpacity)).toString();
+      // Apply LERP smoothing to all properties for framerate-independent animation
+      layer.currentOffsetY = Year3000Utilities.lerpSmooth(
+        layer.currentOffsetY,
+        layer.targetOffsetY,
+        deltaTimeSeconds,
+        this.lerpHalfLifeValues.parallaxOffset
+      );
+      
+      layer.currentOpacity = Year3000Utilities.lerpSmooth(
+        layer.currentOpacity,
+        layer.targetOpacity,
+        deltaTimeSeconds,
+        this.lerpHalfLifeValues.opacity
+      );
+      
+      layer.currentBlur = Year3000Utilities.lerpSmooth(
+        layer.currentBlur,
+        layer.targetBlur,
+        deltaTimeSeconds,
+        this.lerpHalfLifeValues.blur
+      );
+      
+      layer.currentHueRotate = Year3000Utilities.lerpSmooth(
+        layer.currentHueRotate,
+        layer.targetHueRotate,
+        deltaTimeSeconds,
+        this.lerpHalfLifeValues.hueRotate
+      );
+      
+      layer.currentScale = Year3000Utilities.lerpSmooth(
+        layer.currentScale,
+        layer.targetScale,
+        deltaTimeSeconds,
+        this.lerpHalfLifeValues.scale
+      );
+      
+      // Apply the smoothed current values to CSS
+      this.applyLayerProperties(layer);
     });
+  }
+  
+  /**
+   * Update layer target values based on music analysis and consciousness state
+   */
+  private updateLayerTargetsFromMusic(layer: DepthLayer): void {
+    // Get music state for consciousness-driven animation
+    const musicState = this.musicSyncService?.getCurrentMusicState();
+    
+    if (musicState) {
+      const { intensity, beat, emotion } = musicState;
+      
+      // Calculate organic breathing effect based on music
+      const breathingFactor = Math.sin(layer.animationPhase) * 0.05 * intensity;
+      const baseOpacity = layer.opacityRange[0] + 
+        (layer.opacityRange[1] - layer.opacityRange[0]) * 0.5;
+      
+      // Update target opacity with breathing
+      layer.targetOpacity = Math.max(0, Math.min(1, baseOpacity + breathingFactor));
+      
+      // Parallax offset based on scroll and music intensity
+      layer.targetOffsetY = (this.scrollY * layer.parallaxFactor) + 
+        (Math.sin(layer.animationPhase * 0.5) * intensity * 10);
+      
+      // Scale variations based on music energy
+      const baseScale = layer.scaleRange[0] + 
+        (layer.scaleRange[1] - layer.scaleRange[0]) * 0.5;
+      layer.targetScale = baseScale + (intensity * 0.05);
+      
+      // Blur adjustments for depth perception
+      layer.targetBlur = layer.blurAmount + (intensity * 2);
+      
+      // Color temperature shifts based on emotion
+      if (emotion) {
+        // Map emotion to hue rotation (simplified emotional color mapping)
+        const emotionHue = emotion === 'energetic' ? 15 : 
+                          emotion === 'calm' ? -10 : 
+                          emotion === 'melancholy' ? -20 : 0;
+        layer.targetHueRotate = emotionHue + (layer.colorShift * 0.1);
+      }
+    } else {
+      // Fallback to gentle baseline animation when no music
+      const breathingFactor = Math.sin(layer.animationPhase) * 0.02;
+      const baseOpacity = layer.opacityRange[0] + 
+        (layer.opacityRange[1] - layer.opacityRange[0]) * 0.5;
+      
+      layer.targetOpacity = Math.max(0, Math.min(1, baseOpacity + breathingFactor));
+      layer.targetOffsetY = this.scrollY * layer.parallaxFactor;
+      layer.targetScale = layer.scaleRange[0] + 
+        (layer.scaleRange[1] - layer.scaleRange[0]) * 0.5;
+      layer.targetBlur = layer.blurAmount;
+      layer.targetHueRotate = 0;
+    }
+  }
+  
+  /**
+   * Apply the current smoothed properties to the layer element
+   */
+  private applyLayerProperties(layer: DepthLayer): void {
+    // Apply transform with smooth values
+    layer.element.style.transform = 
+      `translate3d(0, ${layer.currentOffsetY}px, ${-layer.depth}px) ` +
+      `scale(${layer.currentScale})`;
+    
+    // Apply opacity
+    layer.element.style.opacity = layer.currentOpacity.toString();
+    
+    // Apply filter effects
+    layer.element.style.filter = 
+      `blur(${layer.currentBlur}px) ` +
+      `hue-rotate(${layer.currentHueRotate}deg)`;
   }
   
   private updatePerformanceMetrics(): void {
@@ -576,16 +759,18 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
     this.performanceMetrics.parallaxRange = this.depthSettings.parallaxStrength;
     this.performanceMetrics.renderTime = performance.now() - this.lastAnimationTime;
     
-    // Update CSS variables for debugging
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-depth-layers-total',
-      this.performanceMetrics.totalLayers.toString()
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-depth-layers-visible',
-      this.performanceMetrics.visibleLayers.toString()
-    );
+    // Update CSS variables for debugging (if controller is available)
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-depth-layers-total',
+        this.performanceMetrics.totalLayers.toString()
+      );
+      
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-depth-layers-visible',
+        this.performanceMetrics.visibleLayers.toString()
+      );
+    }
   }
   
   public override updateAnimation(deltaTime: number): void {
@@ -608,6 +793,16 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
   public override _performSystemSpecificCleanup(): void {
     super._performSystemSpecificCleanup();
     
+    // Unregister from consciousness choreographer
+    if (this.consciousnessChoreographer) {
+      try {
+        this.consciousnessChoreographer.unregisterConsciousnessParticipant('DepthLayeredGradientSystem');
+        Y3K?.debug?.log('DepthLayeredGradientSystem', 'Unregistered from consciousness choreographer');
+      } catch (error) {
+        Y3K?.debug?.error('DepthLayeredGradientSystem', 'Error unregistering from consciousness choreographer:', error);
+      }
+    }
+    
     // Stop animation loop
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
@@ -623,10 +818,11 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
       window.removeEventListener('resize', this.boundResizeHandler);
     }
     
-    if (this.boundMusicHandler) {
-      document.removeEventListener('music-sync:energy-changed', this.boundMusicHandler);
-      document.removeEventListener('music-sync:beat', this.boundMusicHandler);
-    }
+    // Clean up unified event subscriptions
+    this.eventSubscriptionIds.forEach(subscriptionId => {
+      unifiedEventBus.unsubscribe(subscriptionId);
+    });
+    this.eventSubscriptionIds = [];
     
     // Clean up depth layers
     this.depthLayers.forEach(layer => {
@@ -646,7 +842,6 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
     // Clear bound handlers
     this.boundScrollHandler = null;
     this.boundResizeHandler = null;
-    this.boundMusicHandler = null;
   }
   
   // Public API
@@ -708,5 +903,204 @@ export class DepthLayeredGradientSystem extends BaseVisualSystem {
   
   public getVisibleLayerCount(): number {
     return this.performanceMetrics.visibleLayers;
+  }
+  
+  // ===================================================================
+  // CONSCIOUSNESS CHOREOGRAPHER INTEGRATION
+  // ===================================================================
+  
+  /**
+   * Register this depth system as a consciousness participant
+   */
+  private registerWithConsciousnessChoreographer(): void {
+    if (!this.consciousnessChoreographer) {
+      Y3K?.debug?.log('DepthLayeredGradientSystem', 'Consciousness choreographer not available, skipping registration');
+      return;
+    }
+    
+    try {
+      this.consciousnessChoreographer.registerConsciousnessParticipant(this);
+      Y3K?.debug?.log('DepthLayeredGradientSystem', 'Successfully registered with consciousness choreographer');
+    } catch (error) {
+      Y3K?.debug?.error('DepthLayeredGradientSystem', 'Failed to register with consciousness choreographer:', error);
+    }
+  }
+  
+  // ===================================================================
+  // BACKGROUND SYSTEM PARTICIPANT INTERFACE IMPLEMENTATION
+  // ===================================================================
+  
+  public get systemPriority(): 'low' | 'normal' | 'high' | 'critical' {
+    return 'high'; // Depth perception is high priority for spatial consciousness
+  }
+  
+  public getConsciousnessContribution(): any {
+    return {
+      depthPerception: this.depthSettings.maxDepth / 10, // Normalize to 0-1
+      layerCount: this.depthLayers.size,
+      parallaxStrength: this.depthSettings.parallaxStrength,
+      fogDensity: this.depthSettings.depthFogIntensity,
+      infinityPerception: this.depthSettings.infiniteScrolling ? 1.0 : 0.5,
+      spatialAwareness: this.performanceMetrics.visibleLayers / this.performanceMetrics.totalLayers
+    };
+  }
+  
+  public onConsciousnessFieldUpdate(field: ConsciousnessField): void {
+    try {
+      this.currentConsciousnessField = field;
+      
+      // Update depth layers based on consciousness field
+      this.updateDepthFromConsciousness(field);
+      
+      Y3K?.debug?.log('DepthLayeredGradientSystem', 'Updated from consciousness field:', {
+        rhythmicPulse: field.rhythmicPulse,
+        depthPerception: field.depthPerception,
+        breathingCycle: field.breathingCycle
+      });
+    } catch (error) {
+      Y3K?.debug?.error('DepthLayeredGradientSystem', 'Error updating from consciousness field:', error);
+    }
+  }
+  
+  public onChoreographyEvent(eventType: string, payload: any): void {
+    try {
+      switch (eventType) {
+        case 'choreography:rhythm-shift':
+          // Adjust parallax speed based on rhythm changes
+          const newRhythm = payload.newRhythm?.bpm || 120;
+          const rhythmFactor = Math.max(0.5, Math.min(2.0, newRhythm / 120));
+          
+          // Update all layers with new rhythm-based parallax
+          for (const layer of this.depthLayers.values()) {
+            layer.parallaxFactor = layer.parallaxFactor * rhythmFactor;
+            layer.rotationSpeed = layer.rotationSpeed * rhythmFactor;
+          }
+          break;
+          
+        case 'choreography:energy-surge':
+          // Intensify depth fog during energy surges
+          const surgeIntensity = payload.intensity || 1.0;
+          this.depthSettings.depthFogIntensity = Math.min(1.0, this.depthSettings.depthFogIntensity * (1.0 + surgeIntensity * 0.3));
+          this.updateDepthFogIntensity();
+          break;
+          
+        case 'consciousness:breathing-cycle':
+          // Synchronize layer scale with consciousness breathing
+          const breathingPhase = payload.phase || 0;
+          this.updateLayerScalesWithBreathing(breathingPhase);
+          break;
+          
+        case 'consciousness:cellular-growth':
+          // Adjust depth perception during growth phases
+          const growthRate = payload.growthRate || 1.0;
+          this.depthSettings.maxDepth = Math.max(5, Math.min(20, this.depthSettings.maxDepth * growthRate));
+          this.updateDepthPerception();
+          break;
+      }
+      
+      Y3K?.debug?.log('DepthLayeredGradientSystem', `Handled choreography event: ${eventType}`, payload);
+    } catch (error) {
+      Y3K?.debug?.error('DepthLayeredGradientSystem', `Error handling choreography event ${eventType}:`, error);
+    }
+  }
+  
+  /**
+   * Update depth layers based on consciousness field
+   */
+  private updateDepthFromConsciousness(field: ConsciousnessField): void {
+    // Modulate parallax strength with rhythmic pulse
+    const consciousParallax = this.depthSettings.parallaxStrength * (0.7 + field.rhythmicPulse * 0.6);
+    
+    // Update layer properties based on consciousness
+    for (const [layerId, layer] of this.depthLayers.entries()) {
+      if (!layer.element) continue;
+      
+      // Modulate opacity with musical flow
+      const baseOpacity = layer.opacityRange[0] + (layer.opacityRange[1] - layer.opacityRange[0]) * field.musicalFlow.x;
+      const consciousOpacity = baseOpacity * (0.8 + field.depthPerception * 0.4);
+      
+      // Modulate scale with breathing cycle
+      const breathingScale = 1.0 + Math.sin(field.breathingCycle * Math.PI * 2) * 0.05;
+      const baseScale = layer.scaleRange[0] + (layer.scaleRange[1] - layer.scaleRange[0]) * field.energyResonance;
+      const consciousScale = baseScale * breathingScale;
+      
+      // Apply transformations
+      layer.element.style.opacity = consciousOpacity.toString();
+      layer.element.style.transform = `
+        scale(${consciousScale}) 
+        translateZ(${layer.depth * consciousParallax}px)
+        rotateZ(${layer.animationPhase * layer.rotationSpeed}deg)
+      `;
+      
+      // Update blur based on depth perception
+      const consciousBlur = layer.blurAmount * (1.0 + field.depthPerception * 0.5);
+      layer.element.style.filter = `blur(${consciousBlur}px)`;
+    }
+    
+    // Apply consciousness-aware CSS variables for hybrid coordination
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.queueCSSVariableUpdate('--sn-depth-consciousness-parallax', consciousParallax.toString());
+      this.cssConsciousnessController.queueCSSVariableUpdate('--sn-depth-perception-intensity', field.depthPerception.toString());
+      this.cssConsciousnessController.queueCSSVariableUpdate('--sn-depth-fog-consciousness', this.depthSettings.depthFogIntensity.toString());
+      this.cssConsciousnessController.queueCSSVariableUpdate('--sn-depth-spatial-awareness', (this.performanceMetrics.visibleLayers / this.performanceMetrics.totalLayers).toString());
+    }
+  }
+  
+  /**
+   * Update layer scales with breathing pattern
+   */
+  private updateLayerScalesWithBreathing(breathingPhase: number): void {
+    const breathingModulation = Math.sin(breathingPhase * Math.PI * 2) * 0.03; // Subtle breathing
+    
+    for (const layer of this.depthLayers.values()) {
+      if (!layer.element) continue;
+      
+      const currentTransform = layer.element.style.transform;
+      const baseScale = layer.scaleRange[0] + (layer.scaleRange[1] - layer.scaleRange[0]) * 0.5;
+      const breathingScale = baseScale * (1.0 + breathingModulation);
+      
+      // Update only the scale part of the transform
+      layer.element.style.transform = currentTransform.replace(
+        /scale\([^)]+\)/,
+        `scale(${breathingScale})`
+      );
+    }
+  }
+  
+  /**
+   * Update depth fog intensity across all layers
+   */
+  private updateDepthFogIntensity(): void {
+    for (const layer of this.depthLayers.values()) {
+      if (!layer.element) continue;
+      
+      // Calculate fog intensity based on depth
+      const fogIntensity = (layer.depth / this.depthSettings.maxDepth) * this.depthSettings.depthFogIntensity;
+      const fogOpacity = Math.max(0, Math.min(0.8, fogIntensity));
+      
+      // Apply fog effect as box-shadow
+      layer.element.style.boxShadow = `inset 0 0 ${50 * fogIntensity}px rgba(30, 30, 46, ${fogOpacity})`;
+    }
+  }
+  
+  /**
+   * Update depth perception settings
+   */
+  private updateDepthPerception(): void {
+    // Recalculate layer depths based on new max depth
+    const layerArray = Array.from(this.depthLayers.values()).sort((a, b) => a.depth - b.depth);
+    
+    layerArray.forEach((layer, index) => {
+      const depthRatio = index / (layerArray.length - 1);
+      layer.depth = depthRatio * this.depthSettings.maxDepth;
+      
+      if (layer.element) {
+        // Update perspective transform
+        layer.element.style.transform = layer.element.style.transform.replace(
+          /translateZ\([^)]+\)/,
+          `translateZ(${layer.depth * this.depthSettings.parallaxStrength}px)`
+        );
+      }
+    });
   }
 }

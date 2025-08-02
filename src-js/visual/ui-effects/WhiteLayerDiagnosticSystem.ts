@@ -10,7 +10,7 @@
  */
 
 import { Y3K } from "@/debug/UnifiedDebugManager";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 
 interface WhiteLayerDiagnostics {
   aberrationSystem: boolean;
@@ -38,14 +38,21 @@ interface DiagnosticResult {
  * - Implements prevention strategies
  */
 export class WhiteLayerDiagnosticSystem {
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController | null;
   private diagnostics: WhiteLayerDiagnostics;
   private diagnosticResults: DiagnosticResult[];
   private monitoringInterval: number | null = null;
   private lastDiagnosticCheck = 0;
   
   constructor() {
-    this.cssVariableBatcher = new CSSVariableBatcher();
+    // Initialize CSS Consciousness Controller if available
+    const cssController = UnifiedCSSConsciousnessController.getInstance();
+    if (cssController) {
+      this.cssConsciousnessController = cssController;
+    } else {
+      Y3K?.debug?.warn("WhiteLayerDiagnosticSystem", "UnifiedCSSConsciousnessController not available, CSS consciousness disabled");
+      this.cssConsciousnessController = null;
+    }
     
     // Initialize diagnostics
     this.diagnostics = {
@@ -294,25 +301,28 @@ export class WhiteLayerDiagnosticSystem {
     const highIssues = this.diagnosticResults.filter(r => r.severity === "high").length;
     const totalIssues = this.diagnosticResults.length;
     
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-white-layer-critical-issues',
-      criticalIssues.toString()
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-white-layer-high-issues',
-      highIssues.toString()
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-white-layer-total-issues',
-      totalIssues.toString()
-    );
-    
-    this.cssVariableBatcher.queueCSSVariableUpdate(
-      '--sn-white-layer-status',
-      criticalIssues > 0 ? "critical" : highIssues > 0 ? "warning" : "ok"
-    );
+    // Update CSS variables (if controller is available)
+    if (this.cssConsciousnessController) {
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-white-layer-critical-issues',
+        criticalIssues.toString()
+      );
+      
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-white-layer-high-issues',
+        highIssues.toString()
+      );
+      
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-white-layer-total-issues',
+        totalIssues.toString()
+      );
+      
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-white-layer-status',
+        criticalIssues > 0 ? "critical" : highIssues > 0 ? "warning" : "ok"
+      );
+    }
   }
   
   // Public API

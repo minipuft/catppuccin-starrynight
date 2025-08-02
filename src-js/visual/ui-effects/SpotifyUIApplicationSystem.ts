@@ -43,6 +43,10 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
   private targets: SpotifyUITargets;
   private effectLayers: EffectLayer[] = [];
   private observerRegistry: Map<string, MutationObserver> = new Map();
+  
+  // Performance optimization
+  private lastDiscoveryLogTime: number = 0;
+  private lastRefreshLogTime: number = 0;
 
   constructor(private year3000System: Year3000System) {
     this.targets = this.initializeEmptyTargets();
@@ -147,7 +151,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
   }
 
   /**
-   * DOM Intelligence Layer - Discovers current Spotify UI elements
+   * DOM Intelligence Layer - Discovers current Spotify UI elements (OPTIMIZED)
    */
   private async discoverUITargets(): Promise<void> {
     const selectors = {
@@ -204,37 +208,54 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
       ],
     };
 
-    // Discover elements for each target category
+    // Use combined selectors to minimize DOM queries (optimization)
+    const combinedQueries: Record<string, string> = {};
     for (const [category, selectorArray] of Object.entries(selectors)) {
-      const elements: Element[] = [];
-
-      for (const selector of selectorArray) {
-        try {
-          const found = document.querySelectorAll(selector);
-          elements.push(...Array.from(found));
-        } catch (error) {
-          // Invalid selector, skip
-          continue;
-        }
-      }
-
-      // Remove duplicates
-      const uniqueElements = Array.from(new Set(elements));
-      this.targets[category as keyof SpotifyUITargets] = uniqueElements;
+      combinedQueries[category] = selectorArray.join(', ');
     }
 
-    console.log("🎯 UI targets discovered", {
-      nowPlaying: this.targets.nowPlaying.length,
-      sidebar: this.targets.sidebar.length,
-      mainContent: this.targets.mainContent.length,
-      buttons: this.targets.buttons.length,
-      cards: this.targets.cards.length,
-      headers: this.targets.headers.length,
-      textElements: this.targets.textElements.length,
-      iconElements: this.targets.iconElements.length,
-      playbackControls: this.targets.playbackControls.length,
-      trackRows: this.targets.trackRows.length,
-    });
+    // Execute all queries in a single pass to reduce DOM overhead
+    const elementMap = new Map<Element, string[]>();
+    
+    for (const [category, combinedSelector] of Object.entries(combinedQueries)) {
+      try {
+        const found = document.querySelectorAll(combinedSelector);
+        for (const element of found) {
+          if (!elementMap.has(element)) {
+            elementMap.set(element, []);
+          }
+          elementMap.get(element)!.push(category);
+        }
+      } catch (error) {
+        // Invalid selector, skip
+        continue;
+      }
+    }
+
+    // Populate targets from elementMap
+    this.targets = this.initializeEmptyTargets();
+    for (const [element, categories] of elementMap) {
+      for (const category of categories) {
+        this.targets[category as keyof SpotifyUITargets].push(element);
+      }
+    }
+
+    // Throttled debug logging (only every 5 seconds max)
+    if (performance.now() - this.lastDiscoveryLogTime >= 5000) {
+      console.log("🎯 UI targets discovered", {
+        nowPlaying: this.targets.nowPlaying.length,
+        sidebar: this.targets.sidebar.length,
+        mainContent: this.targets.mainContent.length,
+        buttons: this.targets.buttons.length,
+        cards: this.targets.cards.length,
+        headers: this.targets.headers.length,
+        textElements: this.targets.textElements.length,
+        iconElements: this.targets.iconElements.length,
+        playbackControls: this.targets.playbackControls.length,
+        trackRows: this.targets.trackRows.length,
+      });
+      this.lastDiscoveryLogTime = performance.now();
+    }
   }
 
   /**
@@ -425,27 +446,39 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
   }
 
   /**
-   * Sets up DOM mutation observers for dynamic Spotify UI updates
+   * Sets up DOM mutation observers for dynamic Spotify UI updates (OPTIMIZED)
    */
   private setupDOMObservers(): void {
     const observerConfig = {
       childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["class", "data-testid"],
+      subtree: false, // Reduced to immediate children only
+      attributes: false, // Disabled attribute watching for performance
     };
 
-    // Main content observer
+    // Main content observer with more intelligent filtering
     const mainObserver = new MutationObserver((mutations) => {
-      let needsRefresh = false;
+      let significantChange = false;
 
       mutations.forEach((mutation) => {
         if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
-          needsRefresh = true;
+          // Only refresh for significant DOM additions
+          const hasSignificantNodes = Array.from(mutation.addedNodes).some(node => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as Element;
+              // Look for elements that might contain our target selectors
+              return element.matches('[data-testid*="card"], [data-testid*="track"], [data-testid*="header"], [role="button"]') ||
+                     element.querySelector('[data-testid*="card"], [data-testid*="track"], [data-testid*="header"], [role="button"]');
+            }
+            return false;
+          });
+          
+          if (hasSignificantNodes) {
+            significantChange = true;
+          }
         }
       });
 
-      if (needsRefresh) {
+      if (significantChange) {
         this.debounceRefresh();
       }
     });
@@ -456,9 +489,10 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
     this.observerRegistry.set("main", mainObserver);
   }
 
+  // Increased debounce time to reduce frequency
   private debounceRefresh = this.debounce(() => {
     this.refreshUITargets();
-  }, 500);
+  }, 2000); // Increased from 500ms to 2000ms
 
   private debounce(func: Function, wait: number): Function {
     let timeout: NodeJS.Timeout;
@@ -474,16 +508,32 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
 
   private async refreshUITargets(): Promise<void> {
     try {
+      // Calculate hash of current targets to avoid redundant refreshes
+      const previousTargetHash = this.calculateTargetHash();
+      
       // Rediscover targets
       await this.discoverUITargets();
 
-      // Reapply effects to new elements
-      this.applyUnifiedState();
-
-      console.log("🔄 UI targets refreshed");
+      // Only reapply effects if targets actually changed
+      const currentTargetHash = this.calculateTargetHash();
+      if (previousTargetHash !== currentTargetHash) {
+        this.applyUnifiedState();
+        
+        // Throttled refresh logging (only every 10 seconds)
+        if (performance.now() - this.lastRefreshLogTime >= 10000) {
+          console.log("🔄 UI targets refreshed");
+          this.lastRefreshLogTime = performance.now();
+        }
+      }
     } catch (error) {
       console.error("Failed to refresh UI targets", error);
     }
+  }
+  
+  private calculateTargetHash(): string {
+    // Quick hash based on total elements found in each category
+    const counts = Object.values(this.targets).map(arr => arr.length);
+    return counts.join('-');
   }
 
   /**

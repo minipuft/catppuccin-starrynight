@@ -10,12 +10,13 @@
  */
 
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { Y3K } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
+import type { QualityScalingCapable, QualityLevel, QualityCapability, PerformanceMetrics } from "@/core/performance/PerformanceOrchestrator";
 
 interface ShimmerElement {
   element: HTMLElement;
@@ -25,6 +26,7 @@ interface ShimmerElement {
   lastUpdate: number;
   isVisible: boolean;
   bounds: DOMRect;
+  animation?: Animation; // Optional animation for playback rate control
 }
 
 interface ShimmerSettings {
@@ -65,10 +67,10 @@ interface ShimmerKeyframes {
  * - Provides configurable intensity levels
  * - Supports accessibility preferences
  */
-export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
+export class IridescentShimmerEffectsSystem extends BaseVisualSystem implements QualityScalingCapable {
   private shimmerSettings: ShimmerSettings;
   private shimmerElements: Map<Element, ShimmerElement>;
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController | null;
   private intersectionObserver: IntersectionObserver | null = null;
   private animationFrameId: number | null = null;
   private lastAnimationTime = 0;
@@ -76,6 +78,18 @@ export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
   private styleElement: HTMLStyleElement | null = null;
   private prefersReducedMotion = false;
   
+  // Quality scaling properties
+  private currentQualityLevel: QualityLevel | null = null;
+  private qualityCapabilities: QualityCapability[] = [
+    { name: 'shimmer-effects', impact: 'medium', enabled: true, canToggle: true },
+    { name: 'oil-slick-intensity', impact: 'medium', enabled: true, canToggle: true },
+    { name: 'chromatic-aberration', impact: 'low', enabled: true, canToggle: true },
+    { name: 'interference-patterns', impact: 'low', enabled: true, canToggle: true },
+    { name: 'gpu-acceleration', impact: 'medium', enabled: true, canToggle: true },
+    { name: 'element-pooling', impact: 'low', enabled: true, canToggle: true }
+  ];
+  private qualityAdjustments: { [key: string]: number } = {};
+
   constructor(
     config: Year3000Config = YEAR3000_CONFIG,
     utils: typeof import("@/utils/core/Year3000Utilities"),
@@ -85,7 +99,14 @@ export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
     super(config, utils, performanceMonitor, null, settingsManager);
     
     this.shimmerElements = new Map();
-    this.cssVariableBatcher = new CSSVariableBatcher();
+    // Initialize CSS Consciousness Controller if available
+    const cssController = UnifiedCSSConsciousnessController.getInstance();
+    if (cssController) {
+      this.cssConsciousnessController = cssController;
+    } else {
+      Y3K?.debug?.warn("IridescentShimmerEffectsSystem", "UnifiedCSSConsciousnessController not available, CSS consciousness disabled");
+      this.cssConsciousnessController = null;
+    }
     
     // Initialize settings with enhanced oil-on-water effects
     this.shimmerSettings = {
@@ -145,22 +166,22 @@ export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
       ],
       prism: [
         { 
-          background: 'linear-gradient(45deg, rgba(255,0,150,0.1) 0%, rgba(0,255,255,0.1) 50%, rgba(255,255,0,0.1) 100%)',
+          background: 'linear-gradient(45deg, rgba(var(--spice-rgb-shimmer-primary, 255, 0, 150), 0.1) 0%, rgba(var(--spice-rgb-shimmer-secondary, 0, 255, 255), 0.1) 50%, rgba(var(--spice-rgb-shimmer-tertiary, 255, 255, 0), 0.1) 100%)',
           transform: 'rotate(0deg) scale(1)',
           mixBlendMode: 'multiply'
         },
         { 
-          background: 'linear-gradient(135deg, rgba(0,255,150,0.12) 0%, rgba(255,0,255,0.12) 50%, rgba(0,150,255,0.12) 100%)',
+          background: 'linear-gradient(135deg, rgba(var(--spice-rgb-shimmer-secondary, 0, 255, 150), 0.12) 0%, rgba(var(--spice-rgb-shimmer-quaternary, 255, 0, 255), 0.12) 50%, rgba(var(--spice-rgb-shimmer-tertiary, 0, 150, 255), 0.12) 100%)',
           transform: 'rotate(120deg) scale(1.1)',
           mixBlendMode: 'overlay' // Changed from 'screen' to prevent white bleeding
         },
         { 
-          background: 'linear-gradient(225deg, rgba(255,150,0,0.12) 0%, rgba(150,255,0,0.12) 50%, rgba(255,0,150,0.12) 100%)',
+          background: 'linear-gradient(225deg, rgba(var(--spice-rgb-shimmer-tertiary, 255, 150, 0), 0.12) 0%, rgba(var(--spice-rgb-shimmer-quaternary, 150, 255, 0), 0.12) 50%, rgba(var(--spice-rgb-shimmer-primary, 255, 0, 150), 0.12) 100%)',
           transform: 'rotate(240deg) scale(0.9)',
           mixBlendMode: 'overlay'
         },
         { 
-          background: 'linear-gradient(315deg, rgba(150,0,255,0.08) 0%, rgba(255,255,0,0.08) 50%, rgba(0,255,150,0.08) 100%)',
+          background: 'linear-gradient(315deg, rgba(var(--spice-rgb-shimmer-quaternary, 150, 0, 255), 0.08) 0%, rgba(var(--spice-rgb-shimmer-tertiary, 255, 255, 0), 0.08) 50%, rgba(var(--spice-rgb-shimmer-secondary, 0, 255, 150), 0.08) 100%)',
           transform: 'rotate(360deg) scale(1)',
           mixBlendMode: 'multiply'
         }
@@ -228,8 +249,7 @@ export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
     // Find and setup shimmer elements
     this.setupShimmerElements();
     
-    // Start animation loop
-    this.startAnimationLoop();
+    // No animation loop needed - using CSS-only animations
     
     Y3K?.debug?.log("IridescentShimmerEffectsSystem", "Iridescent shimmer system initialized");
   }
@@ -299,102 +319,76 @@ export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
         height: 100%;
         pointer-events: none;
         z-index: 1;
+        opacity: calc(var(--shimmer-intensity, 0.3) * 0.6);
+        will-change: transform, filter;
+      }
+      
+      /* Single unified shimmer effect - replaces 3 separate layers */
+      .sn-shimmer-unified {
+        background: 
+          conic-gradient(
+            from var(--shimmer-phase, 0deg) at 50% 50%,
+            rgba(var(--spice-rgb-shimmer-primary, 255, 0, 150), 0.08) 0%,
+            rgba(var(--spice-rgb-shimmer-secondary, 0, 255, 255), 0.12) 25%,
+            rgba(var(--spice-rgb-shimmer-tertiary, 255, 255, 0), 0.08) 50%,
+            rgba(var(--spice-rgb-shimmer-quaternary, 150, 0, 255), 0.10) 75%,
+            rgba(var(--spice-rgb-shimmer-primary, 255, 0, 150), 0.08) 100%
+          ),
+          linear-gradient(
+            45deg,
+            rgba(var(--spice-rgb-shimmer-primary, 255, 0, 150), 0.06) 0%,
+            rgba(var(--spice-rgb-shimmer-secondary, 0, 255, 255), 0.04) 50%,
+            rgba(var(--spice-rgb-shimmer-primary, 255, 0, 150), 0.06) 100%
+          );
+        backdrop-filter: 
+          blur(calc(var(--shimmer-intensity, 0.3) * 6px)) 
+          saturate(calc(1 + var(--shimmer-intensity, 0.3) * 0.8));
         mix-blend-mode: overlay;
-        opacity: var(--sn-shimmer-opacity, 0.2);
+        animation: 
+          sn-shimmer-unified var(--shimmer-duration, 10s) ease-in-out infinite,
+          sn-shimmer-rotation calc(var(--shimmer-duration, 10s) * 1.5) linear infinite;
+        animation-delay: calc(var(--shimmer-phase, 0deg) / 360deg * var(--shimmer-duration, 10s));
       }
       
-      .sn-shimmer-prism {
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: conic-gradient(
-          from 0deg,
-          rgba(255, 0, 150, 0.1) 0%,
-          rgba(0, 255, 255, 0.1) 120%,
-          rgba(255, 255, 0, 0.1) 240%,
-          rgba(255, 0, 150, 0.1) 360%
-        );
-        animation: sn-shimmer-prism 8s linear infinite;
-      }
-      
-      .sn-shimmer-oil {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        backdrop-filter: blur(var(--sn-shimmer-blur, 4px)) saturate(var(--sn-shimmer-saturation, 1.5));
-        animation: sn-shimmer-oil 12s ease-in-out infinite;
-      }
-      
-      .sn-shimmer-rainbow {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          45deg,
-          rgba(255, 0, 150, 0.05) 0%,
-          rgba(0, 255, 255, 0.05) 16.66%,
-          rgba(255, 255, 0, 0.05) 33.33%,
-          rgba(255, 0, 150, 0.05) 50%,
-          rgba(0, 255, 255, 0.05) 66.66%,
-          rgba(255, 255, 0, 0.05) 83.33%,
-          rgba(255, 0, 150, 0.05) 100%
-        );
-        animation: sn-shimmer-rainbow 6s linear infinite;
-      }
-      
-      @keyframes sn-shimmer-prism {
-        0% { transform: rotate(0deg) scale(1); opacity: 0.8; }
-        25% { transform: rotate(90deg) scale(1.1); opacity: 0.6; }
-        50% { transform: rotate(180deg) scale(0.9); opacity: 0.7; }
-        75% { transform: rotate(270deg) scale(1.05); opacity: 0.5; }
-        100% { transform: rotate(360deg) scale(1); opacity: 0.8; }
-      }
-      
-      @keyframes sn-shimmer-oil {
-        0% { 
-          backdrop-filter: blur(2px) hue-rotate(0deg) saturate(1.5);
-          transform: scaleX(1) scaleY(1) rotate(0deg);
+      @keyframes sn-shimmer-unified {
+        0%, 100% { 
+          transform: scale(1) translateX(0%) translateY(0%);
+          filter: hue-rotate(0deg) brightness(1.05);
         }
         25% { 
-          backdrop-filter: blur(6px) hue-rotate(90deg) saturate(2.2);
-          transform: scaleX(1.02) scaleY(0.98) rotate(1deg);
+          transform: scale(1.02) translateX(0.5%) translateY(-0.5%);
+          filter: hue-rotate(90deg) brightness(1.15);
         }
         50% { 
-          backdrop-filter: blur(8px) hue-rotate(180deg) saturate(1.8);
-          transform: scaleX(0.98) scaleY(1.02) rotate(-1deg);
+          transform: scale(0.98) translateX(-0.3%) translateY(0.3%);
+          filter: hue-rotate(180deg) brightness(1.1);
         }
         75% { 
-          backdrop-filter: blur(4px) hue-rotate(270deg) saturate(1.3);
-          transform: scaleX(1.01) scaleY(0.99) rotate(0.5deg);
-        }
-        100% { 
-          backdrop-filter: blur(2px) hue-rotate(360deg) saturate(1.5);
-          transform: scaleX(1) scaleY(1) rotate(0deg);
+          transform: scale(1.01) translateX(0.2%) translateY(-0.2%);
+          filter: hue-rotate(270deg) brightness(1.08);
         }
       }
       
-      @keyframes sn-shimmer-rainbow {
-        0% { filter: hue-rotate(0deg) saturate(1.2) brightness(1.1); }
-        16.66% { filter: hue-rotate(60deg) saturate(1.8) brightness(1.2); }
-        33.33% { filter: hue-rotate(120deg) saturate(1.5) brightness(1.1); }
-        50% { filter: hue-rotate(180deg) saturate(1.9) brightness(1.3); }
-        66.66% { filter: hue-rotate(240deg) saturate(1.4) brightness(1.1); }
-        83.33% { filter: hue-rotate(300deg) saturate(1.6) brightness(1.2); }
-        100% { filter: hue-rotate(360deg) saturate(1.2) brightness(1.1); }
+      @keyframes sn-shimmer-rotation {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
       
+      /* Performance optimization for reduced motion */
       @media (prefers-reduced-motion: reduce) {
-        .sn-shimmer-prism,
-        .sn-shimmer-oil,
-        .sn-shimmer-rainbow {
+        .sn-shimmer-unified {
           animation: none;
+          transform: none;
+          filter: none;
+          opacity: calc(var(--shimmer-intensity, 0.3) * 0.3);
         }
+      }
+      
+      /* GPU acceleration hints */
+      .sn-shimmer-unified {
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        perspective: 1000px;
       }
     `;
     
@@ -466,37 +460,30 @@ export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
   private addShimmerToElement(element: HTMLElement): void {
     if (this.shimmerElements.has(element)) return;
     
-    // Create shimmer layer
+    // Create single optimized shimmer layer with CSS-only animations
     const shimmerLayer = document.createElement('div');
-    shimmerLayer.className = 'sn-shimmer-layer';
+    shimmerLayer.className = 'sn-shimmer-layer sn-shimmer-unified';
     
-    // Create shimmer effects
-    const prismEffect = document.createElement('div');
-    prismEffect.className = 'sn-shimmer-prism';
+    // Set CSS variables for per-element customization
+    const intensity = this.getIntensityValue();
+    const phase = Math.random() * 360; // Random phase offset for variety
     
-    const oilEffect = document.createElement('div');
-    oilEffect.className = 'sn-shimmer-oil';
+    shimmerLayer.style.setProperty('--shimmer-intensity', intensity.toString());
+    shimmerLayer.style.setProperty('--shimmer-phase', `${phase}deg`);
+    shimmerLayer.style.setProperty('--shimmer-duration', `${8 + Math.random() * 4}s`); // Slight variation
     
-    const rainbowEffect = document.createElement('div');
-    rainbowEffect.className = 'sn-shimmer-rainbow';
-    
-    // Append effects to layer
-    shimmerLayer.appendChild(prismEffect);
-    shimmerLayer.appendChild(oilEffect);
-    shimmerLayer.appendChild(rainbowEffect);
-    
-    // Add container class to element
+    // Add container class to element with minimal DOM impact
     element.classList.add('sn-shimmer-container');
     
-    // Insert shimmer layer
+    // Use more efficient insertion method
     element.appendChild(shimmerLayer);
     
-    // Create shimmer element data
+    // Create lightweight shimmer element data (removed unused properties)
     const shimmerElement: ShimmerElement = {
       element,
       shimmerLayer,
-      animationPhase: Math.random() * Math.PI * 2,
-      intensity: this.getIntensityValue(),
+      animationPhase: phase,
+      intensity,
       lastUpdate: 0,
       isVisible: false,
       bounds: element.getBoundingClientRect()
@@ -510,7 +497,9 @@ export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
       this.intersectionObserver.observe(element);
     }
     
-    Y3K?.debug?.log("IridescentShimmerEffectsSystem", `Added shimmer to element: ${element.tagName}.${element.className}`);
+    if (this.config.enableDebug) {
+      Y3K?.debug?.log("IridescentShimmerEffectsSystem", `Added optimized shimmer to ${element.tagName}.${element.className.substring(0, 20)}`);
+    }
   }
   
   private getIntensityValue(): number {
@@ -524,81 +513,73 @@ export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
   
   private activateShimmer(shimmerElement: ShimmerElement): void {
     if (this.prefersReducedMotion) {
-      // Static shimmer for reduced motion
+      // Static shimmer for reduced motion - minimal opacity
+      shimmerElement.shimmerLayer.style.setProperty('--shimmer-intensity', '0.1');
       shimmerElement.shimmerLayer.style.opacity = '0.1';
       return;
     }
     
-    shimmerElement.shimmerLayer.style.opacity = shimmerElement.intensity.toString();
-    shimmerElement.lastUpdate = performance.now();
+    // CSS-only activation - set intensity and enable
+    shimmerElement.shimmerLayer.style.setProperty('--shimmer-intensity', shimmerElement.intensity.toString());
+    shimmerElement.shimmerLayer.style.opacity = '1';
+    shimmerElement.shimmerLayer.style.animationPlayState = 'running';
   }
   
   private deactivateShimmer(shimmerElement: ShimmerElement): void {
+    // CSS-only deactivation - pause animations and fade out
     shimmerElement.shimmerLayer.style.opacity = '0';
+    shimmerElement.shimmerLayer.style.animationPlayState = 'paused';
   }
   
-  private startAnimationLoop(): void {
-    const animate = () => {
-      if (!this.isActive) return;
-      
-      const currentTime = performance.now();
-      const deltaTime = currentTime - this.lastAnimationTime;
-      
-      // Throttle to 30 FPS for performance
-      if (deltaTime < 33) {
-        this.animationFrameId = requestAnimationFrame(animate);
-        return;
-      }
-      
-      this.lastAnimationTime = currentTime;
-      
-      // Update shimmer elements
-      this.updateShimmerElements();
-      
-      // Continue animation
-      this.animationFrameId = requestAnimationFrame(animate);
-    };
-    
-    this.animationFrameId = requestAnimationFrame(animate);
-  }
-  
+  /**
+   * Update shimmer settings efficiently using CSS variables only
+   */
   private updateShimmerElements(): void {
-    if (!this.shimmerSettings.enabled || this.prefersReducedMotion) return;
+    if (!this.shimmerSettings.enabled) {
+      this.disableAllShimmers();
+      return;
+    }
     
-    const currentTime = performance.now();
+    // Update CSS variables globally for all shimmers
+    if (this.cssConsciousnessController) {
+      // Update global shimmer variables based on settings
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-shimmer-global-intensity',
+        this.getIntensityValue().toString()
+      );
+      
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-shimmer-global-speed',
+        `${this.shimmerSettings.animationSpeed}s`
+      );
+      
+      this.cssConsciousnessController.queueCSSVariableUpdate(
+        '--sn-shimmer-global-blur',
+        `${this.shimmerSettings.blurRadius}px`
+      );
+    }
     
-    this.shimmerElements.forEach((shimmerElement, element) => {
-      if (!shimmerElement.isVisible) return;
-      
-      // Update animation phase
-      shimmerElement.animationPhase += this.shimmerSettings.animationSpeed * 0.01;
-      
-      // Calculate shimmer properties
-      const intensity = shimmerElement.intensity;
-      const phase = shimmerElement.animationPhase;
-      
-      // Update CSS variables
-      this.cssVariableBatcher.queueCSSVariableUpdate(
-        '--sn-shimmer-opacity',
-        (intensity * (0.5 + Math.sin(phase) * 0.3)).toFixed(3)
-      );
-      
-      this.cssVariableBatcher.queueCSSVariableUpdate(
-        '--sn-shimmer-blur',
-        `${this.shimmerSettings.blurRadius + Math.sin(phase * 0.7) * 2}px`
-      );
-      
-      this.cssVariableBatcher.queueCSSVariableUpdate(
-        '--sn-shimmer-saturation',
-        (this.shimmerSettings.saturationBoost + Math.cos(phase * 0.5) * 0.3).toFixed(2)
-      );
-      
-      shimmerElement.lastUpdate = currentTime;
+    // Update individual shimmer elements if visibility changed
+    this.shimmerElements.forEach((shimmerElement) => {
+      if (shimmerElement.isVisible) {
+        this.activateShimmer(shimmerElement);
+      } else {
+        this.deactivateShimmer(shimmerElement);
+      }
+    });
+  }
+  
+  /**
+   * Efficiently disable all shimmers
+   */
+  private disableAllShimmers(): void {
+    this.shimmerElements.forEach((shimmerElement) => {
+      this.deactivateShimmer(shimmerElement);
     });
   }
   
   public override updateAnimation(deltaTime: number): void {
-    // Animation is handled by the animation loop
+    // No update needed - animations are handled by CSS only
   }
   
   public async healthCheck(): Promise<{ ok: boolean; details: string }> {
@@ -616,11 +597,7 @@ export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
   public override _performSystemSpecificCleanup(): void {
     super._performSystemSpecificCleanup();
     
-    // Stop animation loop
-    if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = null;
-    }
+    // No animation loop cleanup needed - using CSS-only animations
     
     // Clean up intersection observer
     if (this.intersectionObserver) {
@@ -698,5 +675,322 @@ export class IridescentShimmerEffectsSystem extends BaseVisualSystem {
   
   public getShimmerElementCount(): number {
     return this.shimmerElements.size;
+  }
+
+  // ========================================================================
+  // QUALITY SCALING INTERFACE IMPLEMENTATION
+  // ========================================================================
+
+  /**
+   * Set quality level for shimmer effects
+   */
+  public setQualityLevel(level: QualityLevel): void {
+    this.currentQualityLevel = level;
+    
+    // Adjust shimmer settings based on quality level
+    switch (level.level) {
+      case 'minimal':
+        this.shimmerSettings.enabled = false;
+        this.shimmerSettings.maxSimultaneousShimmers = 3;
+        this.shimmerSettings.animationSpeed = 0.2;
+        this.shimmerSettings.oilSlickIntensity = 0.3;
+        this.shimmerSettings.chromaticAberration = 0.5;
+        this.shimmerSettings.useGPUAcceleration = false;
+        break;
+        
+      case 'low':
+        this.shimmerSettings.enabled = true;
+        this.shimmerSettings.intensity = 'minimal';
+        this.shimmerSettings.maxSimultaneousShimmers = 5;
+        this.shimmerSettings.animationSpeed = 0.3;
+        this.shimmerSettings.oilSlickIntensity = 0.4;
+        this.shimmerSettings.chromaticAberration = 1.0;
+        this.shimmerSettings.useGPUAcceleration = false;
+        this.shimmerSettings.interferencePattern = false;
+        break;
+        
+      case 'medium':
+        this.shimmerSettings.enabled = true;
+        this.shimmerSettings.intensity = 'balanced';
+        this.shimmerSettings.maxSimultaneousShimmers = 8;
+        this.shimmerSettings.animationSpeed = 0.5;
+        this.shimmerSettings.oilSlickIntensity = 0.7;
+        this.shimmerSettings.chromaticAberration = 2.0;
+        this.shimmerSettings.useGPUAcceleration = true;
+        this.shimmerSettings.interferencePattern = true;
+        break;
+        
+      case 'high':
+        this.shimmerSettings.enabled = true;
+        this.shimmerSettings.intensity = 'intense';
+        this.shimmerSettings.maxSimultaneousShimmers = 12;
+        this.shimmerSettings.animationSpeed = 0.7;
+        this.shimmerSettings.oilSlickIntensity = 0.9;
+        this.shimmerSettings.chromaticAberration = 2.5;
+        this.shimmerSettings.useGPUAcceleration = true;
+        this.shimmerSettings.interferencePattern = true;
+        break;
+        
+      case 'ultra':
+        this.shimmerSettings.enabled = true;
+        this.shimmerSettings.intensity = 'intense';
+        this.shimmerSettings.maxSimultaneousShimmers = 16;
+        this.shimmerSettings.animationSpeed = 1.0;
+        this.shimmerSettings.oilSlickIntensity = 1.0;
+        this.shimmerSettings.chromaticAberration = 3.0;
+        this.shimmerSettings.useGPUAcceleration = true;
+        this.shimmerSettings.interferencePattern = true;
+        break;
+    }
+    
+    // Update quality capabilities based on current level
+    this.updateQualityCapabilities(level);
+    
+    // Apply quality changes to existing shimmer elements
+    this.applyQualityToExistingElements();
+    
+    Y3K?.debug?.log('IridescentShimmerEffectsSystem', `Quality level set to: ${level.level}`, {
+      maxShimmers: this.shimmerSettings.maxSimultaneousShimmers,
+      oilSlickIntensity: this.shimmerSettings.oilSlickIntensity,
+      gpuAcceleration: this.shimmerSettings.useGPUAcceleration
+    });
+  }
+
+  /**
+   * Get current performance impact metrics
+   */
+  public getPerformanceImpact(): PerformanceMetrics {
+    const activeShimmers = Array.from(this.shimmerElements.values()).filter(el => el.isVisible).length;
+    const averageProcessingTime = this.calculateAverageProcessingTime();
+    const memoryUsage = this.estimateMemoryUsage();
+    
+    return {
+      fps: 60, // CSS-based animations typically maintain 60fps
+      frameTime: averageProcessingTime,
+      memoryUsageMB: memoryUsage,
+      cpuUsagePercent: this.estimateCPUUsage(activeShimmers),
+      gpuUsagePercent: this.shimmerSettings.useGPUAcceleration ? 15 : 5,
+      renderTime: averageProcessingTime,
+      timestamp: performance.now()
+    };
+  }
+
+  /**
+   * Reduce quality by specified amount
+   */
+  public reduceQuality(amount: number): void {
+    // Apply quality reduction adjustments
+    this.qualityAdjustments['shimmer-reduction'] = (this.qualityAdjustments['shimmer-reduction'] || 0) + amount;
+    this.qualityAdjustments['animation-reduction'] = (this.qualityAdjustments['animation-reduction'] || 0) + amount * 0.8;
+    this.qualityAdjustments['effect-reduction'] = (this.qualityAdjustments['effect-reduction'] || 0) + amount * 0.6;
+    
+    // Apply reductions to current settings
+    this.shimmerSettings.maxSimultaneousShimmers = Math.max(2, 
+      Math.floor(this.shimmerSettings.maxSimultaneousShimmers * (1 - amount * 0.5)));
+    this.shimmerSettings.animationSpeed = Math.max(0.1, 
+      this.shimmerSettings.animationSpeed * (1 - amount * 0.4));
+    this.shimmerSettings.oilSlickIntensity = Math.max(0.2, 
+      this.shimmerSettings.oilSlickIntensity * (1 - amount * 0.6));
+    this.shimmerSettings.chromaticAberration = Math.max(0.5, 
+      this.shimmerSettings.chromaticAberration * (1 - amount * 0.5));
+    
+    // Disable GPU acceleration for significant reductions
+    if (amount > 0.6) {
+      this.shimmerSettings.useGPUAcceleration = false;
+    }
+    
+    // Disable interference patterns for moderate reductions
+    if (amount > 0.4) {
+      this.shimmerSettings.interferencePattern = false;
+    }
+    
+    // Apply changes to existing elements
+    this.applyQualityToExistingElements();
+    
+    Y3K?.debug?.log('IridescentShimmerEffectsSystem', `Quality reduced by ${amount}`, this.shimmerSettings);
+  }
+
+  /**
+   * Increase quality by specified amount
+   */
+  public increaseQuality(amount: number): void {
+    // Remove previous reductions first
+    Object.keys(this.qualityAdjustments).forEach(key => {
+      this.qualityAdjustments[key] = Math.max(0, (this.qualityAdjustments[key] || 0) - amount);
+    });
+    
+    // Restore quality settings based on current level
+    if (this.currentQualityLevel) {
+      const baseSettings = this.getBaseSettingsForLevel(this.currentQualityLevel.level);
+      
+      // Gradually restore towards base settings
+      this.shimmerSettings.maxSimultaneousShimmers = Math.min(baseSettings.maxSimultaneousShimmers || this.shimmerSettings.maxSimultaneousShimmers,
+        Math.floor(this.shimmerSettings.maxSimultaneousShimmers * (1 + amount * 0.3)));
+      this.shimmerSettings.animationSpeed = Math.min(baseSettings.animationSpeed || this.shimmerSettings.animationSpeed,
+        this.shimmerSettings.animationSpeed * (1 + amount * 0.2));
+      this.shimmerSettings.oilSlickIntensity = Math.min(baseSettings.oilSlickIntensity || this.shimmerSettings.oilSlickIntensity,
+        this.shimmerSettings.oilSlickIntensity * (1 + amount * 0.3));
+      this.shimmerSettings.chromaticAberration = Math.min(baseSettings.chromaticAberration || this.shimmerSettings.chromaticAberration,
+        this.shimmerSettings.chromaticAberration * (1 + amount * 0.2));
+      
+      // Re-enable features if quality is sufficient
+      if (amount > 0.3) {
+        this.shimmerSettings.interferencePattern = baseSettings.interferencePattern || false;
+      }
+      if (amount > 0.5) {
+        this.shimmerSettings.useGPUAcceleration = baseSettings.useGPUAcceleration || false;
+      }
+    }
+    
+    // Apply changes to existing elements
+    this.applyQualityToExistingElements();
+    
+    Y3K?.debug?.log('IridescentShimmerEffectsSystem', `Quality increased by ${amount}`, this.shimmerSettings);
+  }
+
+  /**
+   * Get quality capabilities for this system
+   */
+  public getQualityCapabilities(): QualityCapability[] {
+    return [...this.qualityCapabilities];
+  }
+
+  // ========================================================================
+  // QUALITY SCALING HELPER METHODS
+  // ========================================================================
+
+  private updateQualityCapabilities(level: QualityLevel): void {
+    // Update capability states based on quality level
+    this.qualityCapabilities.forEach(capability => {
+      switch (capability.name) {
+        case 'shimmer-effects':
+          capability.enabled = this.shimmerSettings.enabled;
+          break;
+        case 'oil-slick-intensity':
+          capability.enabled = this.shimmerSettings.oilSlickIntensity > 0.3;
+          break;
+        case 'chromatic-aberration':
+          capability.enabled = this.shimmerSettings.chromaticAberration > 1.0;
+          break;
+        case 'interference-patterns':
+          capability.enabled = this.shimmerSettings.interferencePattern;
+          break;
+        case 'gpu-acceleration':
+          capability.enabled = this.shimmerSettings.useGPUAcceleration;
+          break;
+        case 'element-pooling':
+          capability.enabled = this.shimmerSettings.poolingEnabled;
+          break;
+      }
+    });
+  }
+
+  private getBaseSettingsForLevel(level: string): Partial<ShimmerSettings> {
+    switch (level) {
+      case 'minimal':
+        return {
+          maxSimultaneousShimmers: 3,
+          animationSpeed: 0.2,
+          oilSlickIntensity: 0.3,
+          chromaticAberration: 0.5,
+          useGPUAcceleration: false,
+          interferencePattern: false
+        };
+      case 'low':
+        return {
+          maxSimultaneousShimmers: 5,
+          animationSpeed: 0.3,
+          oilSlickIntensity: 0.4,
+          chromaticAberration: 1.0,
+          useGPUAcceleration: false,
+          interferencePattern: false
+        };
+      case 'medium':
+        return {
+          maxSimultaneousShimmers: 8,
+          animationSpeed: 0.5,
+          oilSlickIntensity: 0.7,
+          chromaticAberration: 2.0,
+          useGPUAcceleration: true,
+          interferencePattern: true
+        };
+      case 'high':
+        return {
+          maxSimultaneousShimmers: 12,
+          animationSpeed: 0.7,
+          oilSlickIntensity: 0.9,
+          chromaticAberration: 2.5,
+          useGPUAcceleration: true,
+          interferencePattern: true
+        };
+      case 'ultra':
+        return {
+          maxSimultaneousShimmers: 16,
+          animationSpeed: 1.0,
+          oilSlickIntensity: 1.0,
+          chromaticAberration: 3.0,
+          useGPUAcceleration: true,
+          interferencePattern: true
+        };
+      default:
+        return {};
+    }
+  }
+
+  private applyQualityToExistingElements(): void {
+    // Update existing shimmer elements with new quality settings
+    this.shimmerElements.forEach((shimmerElement, element) => {
+      // Update animation speed
+      if (shimmerElement.animation) {
+        shimmerElement.animation.playbackRate = this.shimmerSettings.animationSpeed;
+      }
+      
+      // Update intensity
+      shimmerElement.intensity = this.shimmerSettings.oilSlickIntensity;
+      
+      // Update CSS variables for the shimmer layer
+      if (this.cssConsciousnessController) {
+        this.cssConsciousnessController.queueCSSVariableUpdate(
+          '--sn-shimmer-intensity', 
+          this.shimmerSettings.oilSlickIntensity.toString()
+        );
+        this.cssConsciousnessController.queueCSSVariableUpdate(
+          '--sn-shimmer-chromatic', 
+          this.shimmerSettings.chromaticAberration.toString()
+        );
+        this.cssConsciousnessController.queueCSSVariableUpdate(
+          '--sn-shimmer-speed', 
+          this.shimmerSettings.animationSpeed.toString()
+        );
+      }
+    });
+  }
+
+  private calculateAverageProcessingTime(): number {
+    // Estimate processing time based on active shimmer count and complexity
+    const activeShimmers = Array.from(this.shimmerElements.values()).filter(el => el.isVisible).length;
+    const baseTime = 2; // Base processing time in ms
+    const complexityMultiplier = (this.shimmerSettings.oilSlickIntensity + 
+                                this.shimmerSettings.chromaticAberration / 3 + 
+                                this.shimmerSettings.animationSpeed) / 3;
+    
+    return baseTime * activeShimmers * complexityMultiplier;
+  }
+
+  private estimateMemoryUsage(): number {
+    const activeShimmers = Array.from(this.shimmerElements.values()).filter(el => el.isVisible).length;
+    const baseMemoryPerShimmer = 0.5; // MB per shimmer element
+    const textureMemory = this.shimmerSettings.useGPUAcceleration ? 2 : 0; // GPU texture memory
+    
+    return (baseMemoryPerShimmer * activeShimmers) + textureMemory;
+  }
+
+  private estimateCPUUsage(activeShimmers: number): number {
+    const baseUsage = 3; // Base CPU usage percentage
+    const complexityFactor = (this.shimmerSettings.oilSlickIntensity + 
+                            this.shimmerSettings.chromaticAberration / 3) / 2;
+    const gpuOffload = this.shimmerSettings.useGPUAcceleration ? 0.5 : 1.0; // GPU reduces CPU load
+    
+    return Math.min(40, baseUsage * activeShimmers * complexityFactor * gpuOffload);
   }
 }

@@ -25,15 +25,42 @@
   --sn-bg-webgpu-ready: 0;
   --sn-bg-active-backend: "css"; // "css" | "webgl" | "webgpu"
   
-  // Gradient Configuration
-  --sn-bg-gradient-primary-rgb: var(--spice-rgb-accent, 139, 233, 253);
-  --sn-bg-gradient-secondary-rgb: var(--spice-rgb-base, 17, 17, 27);
-  --sn-bg-gradient-accent-rgb: var(--spice-rgb-accent, 139, 233, 253);
+  // Gradient Configuration - cascades from dynamic > cosmic > spicetify
+  --sn-bg-gradient-primary-rgb: var(--sn-dynamic-accent-rgb);
+  --sn-bg-gradient-secondary-rgb: var(--sn-cosmic-secondary-rgb);
+  --sn-bg-gradient-accent-rgb: var(--sn-dynamic-accent-rgb);
   --sn-bg-gradient-opacity: 0.8;
   --sn-bg-gradient-blur: 120px;
-  --sn-bg-gradient-saturation: 1.2;
-  --sn-bg-gradient-brightness: 1.0;
-  --sn-bg-gradient-contrast: 1.1;
+  
+  // -------------------------------------------------------------------------
+  // Brightness Mode System (--sn-brightness-*)
+  // -------------------------------------------------------------------------
+  
+  // Brightness mode selection (bright/balanced/dark)
+  --sn-brightness-mode: "dark"; // Default to dark mode for better UX
+  
+  // Bright mode values (current vibrant settings)
+  --sn-brightness-bright-saturation: 1.6;
+  --sn-brightness-bright-brightness: 1.3;
+  --sn-brightness-bright-contrast: 1.4;
+  --sn-brightness-bright-opacity: 0.28;
+  
+  // Balanced mode values (moderate settings)
+  --sn-brightness-balanced-saturation: 1.2;
+  --sn-brightness-balanced-brightness: 1.1;
+  --sn-brightness-balanced-contrast: 1.1;
+  --sn-brightness-balanced-opacity: 0.20;
+  
+  // Dark mode values (subtle settings)
+  --sn-brightness-dark-saturation: 1.0;
+  --sn-brightness-dark-brightness: 0.9;
+  --sn-brightness-dark-contrast: 1.0;
+  --sn-brightness-dark-opacity: 0.15;
+  
+  // Active brightness values (set by brightness mode)
+  --sn-bg-gradient-saturation: var(--sn-brightness-bright-saturation);
+  --sn-bg-gradient-brightness: var(--sn-brightness-bright-brightness);
+  --sn-bg-gradient-contrast: var(--sn-brightness-bright-contrast);
   
   // Gradient Flow Animation
   --sn-bg-gradient-flow-x: 0;
@@ -225,25 +252,254 @@
   --sn-ix-echo-future-opacity: 0.1;
   
   // -------------------------------------------------------------------------
-  // Color System (--sn-color-*) - Dynamic Accent Management
+  // Color System (--sn-color-*) - StarryNight Cosmic Theme
   // -------------------------------------------------------------------------
   
-  // Dynamic Accent (⚡ Real-time via ColorHarmonyEngine)
-  --sn-color-accent-hex: #8be9fd; // ⚡ Dynamic
-  --sn-color-accent-rgb: 139, 233, 253; // ⚡ Dynamic
+  // === CATPPUCCIN THEME DEFAULTS ===
+  // Catppuccin Mocha palette - used as fallbacks, will be dynamically updated by ColorStateManager
+  // These values are replaced at runtime based on flavor + brightness mode selection
+  --sn-cosmic-base-hex: #1e1e2e;                    // Catppuccin Mocha base
+  --sn-cosmic-base-rgb: 30, 30, 46;                 // Catppuccin Mocha base RGB
+  --sn-cosmic-surface-hex: #313244;                 // Catppuccin Mocha surface0
+  --sn-cosmic-surface-rgb: 49, 50, 68;              // Catppuccin Mocha surface0 RGB
+  --sn-cosmic-accent-hex: #cba6f7;                  // Catppuccin Mocha mauve (more balanced than cosmic purple)
+  --sn-cosmic-accent-rgb: 203, 166, 247;            // Catppuccin Mocha mauve RGB
+  --sn-cosmic-secondary-hex: #45475a;               // Catppuccin Mocha surface1
+  --sn-cosmic-secondary-rgb: 69, 71, 90;            // Catppuccin Mocha surface1 RGB
+  --sn-cosmic-text-hex: #cdd6f4;                    // Catppuccin Mocha text
+  --sn-cosmic-text-rgb: 205, 214, 244;              // Catppuccin Mocha text RGB
   
-  // OKLab Processed Colors
-  --sn-color-oklab-bright-highlight-rgb: 139, 233, 253;
-  --sn-color-oklab-dynamic-shadow-rgb: 17, 17, 27;
+  // === DYNAMIC COLOR VARIABLES ===
+  // These are updated in real-time by ColorHarmonyEngine and music systems
+  // When music is playing, these override cosmic defaults
+  --sn-dynamic-accent-hex: var(--sn-cosmic-accent-hex);
+  --sn-dynamic-accent-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-dynamic-primary-hex: var(--sn-cosmic-accent-hex);
+  --sn-dynamic-primary-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-dynamic-secondary-hex: var(--sn-cosmic-secondary-hex);
+  --sn-dynamic-secondary-rgb: var(--sn-cosmic-secondary-rgb);
   
-  // Temporal Color System
-  --sn-color-temporal-past-rgb: 98, 114, 164;
+  // === UNIFIED COLOR INTERFACE ===
+  // Three-tier cascade: dynamic > cosmic > spicetify
+  --sn-color-accent-hex: var(--sn-dynamic-accent-hex);
+  --sn-color-accent-rgb: var(--sn-dynamic-accent-rgb);
+  --sn-color-primary-hex: var(--sn-dynamic-primary-hex);
+  --sn-color-primary-rgb: var(--sn-dynamic-primary-rgb);
+  --sn-color-base-hex: var(--sn-cosmic-base-hex);
+  --sn-color-base-rgb: var(--sn-cosmic-base-rgb);
+  
+  // === EXTRACTED COLORS FROM ALBUM ART ===
+  // Updated by ColorHarmonyEngine during music playback
+  --sn-color-extracted-primary-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-color-extracted-secondary-rgb: var(--sn-cosmic-secondary-rgb);
+  --sn-color-extracted-tertiary-rgb: var(--sn-cosmic-surface-rgb);
+  --sn-color-extracted-dominant-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-color-extracted-vibrant-rgb: var(--sn-cosmic-accent-rgb);
+  
+  // === COLOR HARMONY SYSTEM ===
+  --sn-color-harmony-complementary-rgb: var(--sn-cosmic-secondary-rgb);
+  --sn-color-harmony-analogous-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-color-harmony-triadic-rgb: var(--sn-cosmic-surface-rgb);
+  --sn-color-harmony-blend-intensity: 0.8;
+  
+  // === OKLAB PROCESSED COLORS ===
+  --sn-color-oklab-bright-highlight-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-color-oklab-dynamic-shadow-rgb: var(--sn-cosmic-base-rgb);
+  
+  // OKLAB processed individual RGB components (updated by ColorHarmonyEngine)
+  --sn-color-oklab-primary-r: 124;     // R component of processed primary
+  --sn-color-oklab-primary-g: 58;      // G component of processed primary  
+  --sn-color-oklab-primary-b: 237;     // B component of processed primary
+  --sn-color-oklab-accent-r: 124;      // R component of processed accent
+  --sn-color-oklab-accent-g: 58;       // G component of processed accent
+  --sn-color-oklab-accent-b: 237;      // B component of processed accent
+  
+  // OKLAB processed luminance values
+  --sn-color-oklab-base-luminance: 0.08;      // Base luminance (cosmic base)
+  --sn-color-oklab-accent-luminance: 0.45;    // Accent luminance (cosmic accent)
+  
+  // === OKLCH COLOR SYSTEM ===
+  // OKLCH (OKLab LCH) - Lightness, Chroma, Hue representation
+  --sn-color-oklch-accent-l: 0.65;           // Lightness (0-1)
+  --sn-color-oklch-accent-c: 0.15;           // Chroma (0-0.4 typical)
+  --sn-color-oklch-accent-h: 295;            // Hue (0-360 degrees)
+  --sn-color-oklch-primary-l: 0.65;          // Primary lightness
+  --sn-color-oklch-primary-c: 0.15;          // Primary chroma  
+  --sn-color-oklch-primary-h: 295;           // Primary hue
+  
+  // === MUSICAL OKLAB COORDINATION ===
+  // Variables updated by MusicalOKLABCoordinator for real-time color processing
+  --sn-musical-oklab-enabled: 1;             // Musical OKLAB coordination enabled (0/1)
+  --sn-musical-oklab-preset-name: "STANDARD"; // Current OKLAB preset name
+  --sn-musical-oklab-genre: "ambient";       // Detected music genre
+  --sn-musical-oklab-emotion: "neutral";     // Primary detected emotion
+  --sn-musical-oklab-intensity: 0.5;         // Musical influence intensity (0-1)
+  
+  // Musical OKLAB processed colors (updated in real-time)
+  --sn-musical-oklab-primary-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-musical-oklab-secondary-rgb: var(--sn-cosmic-secondary-rgb);
+  --sn-musical-oklab-accent-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-musical-oklab-highlight-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-musical-oklab-shadow-rgb: var(--sn-cosmic-base-rgb);
+  
+  // === EMOTIONAL TEMPERATURE OKLAB VARIABLES ===
+  // OKLAB-enhanced emotional color temperatures (perceptually uniform)
+  
+  // Calm/Meditative (warm, soothing) - OKLAB enhanced
+  --sn-emotion-calm-oklab-primary-rgb: 255, 248, 220;
+  --sn-emotion-calm-oklab-accent-rgb: 255, 218, 185;
+  --sn-emotion-calm-oklab-atmosphere-rgb: 139, 125, 96;
+  --sn-emotion-calm-oklab-luminance: 0.92;
+  --sn-emotion-calm-oklab-chroma: 0.08;
+  --sn-emotion-calm-oklab-hue: 85;
+  
+  // Energetic (bright, vibrant) - OKLAB enhanced
+  --sn-emotion-energetic-oklab-primary-rgb: 255, 255, 255;
+  --sn-emotion-energetic-oklab-accent-rgb: 173, 216, 230;
+  --sn-emotion-energetic-oklab-atmosphere-rgb: 119, 136, 153;
+  --sn-emotion-energetic-oklab-luminance: 1.0;
+  --sn-emotion-energetic-oklab-chroma: 0.12;
+  --sn-emotion-energetic-oklab-hue: 210;
+  
+  // Melancholy (deep, introspective) - OKLAB enhanced
+  --sn-emotion-melancholy-oklab-primary-rgb: 255, 234, 191;
+  --sn-emotion-melancholy-oklab-accent-rgb: 204, 153, 102;
+  --sn-emotion-melancholy-oklab-atmosphere-rgb: 102, 87, 66;
+  --sn-emotion-melancholy-oklab-luminance: 0.88;
+  --sn-emotion-melancholy-oklab-chroma: 0.15;
+  --sn-emotion-melancholy-oklab-hue: 70;
+  
+  // Happy (balanced, joyful) - OKLAB enhanced
+  --sn-emotion-happy-oklab-primary-rgb: 255, 250, 240;
+  --sn-emotion-happy-oklab-accent-rgb: 255, 228, 181;
+  --sn-emotion-happy-oklab-atmosphere-rgb: 169, 169, 169;
+  --sn-emotion-happy-oklab-luminance: 0.95;
+  --sn-emotion-happy-oklab-chroma: 0.10;
+  --sn-emotion-happy-oklab-hue: 60;
+  
+  // Aggressive (cool, intense) - OKLAB enhanced
+  --sn-emotion-aggressive-oklab-primary-rgb: 201, 226, 255;
+  --sn-emotion-aggressive-oklab-accent-rgb: 135, 206, 235;
+  --sn-emotion-aggressive-oklab-atmosphere-rgb: 105, 105, 105;
+  --sn-emotion-aggressive-oklab-luminance: 0.85;
+  --sn-emotion-aggressive-oklab-chroma: 0.18;
+  --sn-emotion-aggressive-oklab-hue: 240;
+  
+  // Mysterious (deep, enigmatic) - OKLAB enhanced
+  --sn-emotion-mysterious-oklab-primary-rgb: 255, 214, 170;
+  --sn-emotion-mysterious-oklab-accent-rgb: 138, 43, 226;
+  --sn-emotion-mysterious-oklab-atmosphere-rgb: 75, 63, 48;
+  --sn-emotion-mysterious-oklab-luminance: 0.78;
+  --sn-emotion-mysterious-oklab-chroma: 0.25;
+  --sn-emotion-mysterious-oklab-hue: 285;
+  
+  // Romantic (soft, intimate) - OKLAB enhanced
+  --sn-emotion-romantic-oklab-primary-rgb: 255, 244, 229;
+  --sn-emotion-romantic-oklab-accent-rgb: 255, 192, 203;
+  --sn-emotion-romantic-oklab-atmosphere-rgb: 128, 108, 96;
+  --sn-emotion-romantic-oklab-luminance: 0.90;
+  --sn-emotion-romantic-oklab-chroma: 0.12;
+  --sn-emotion-romantic-oklab-hue: 15;
+  
+  // Epic (grand, cinematic) - OKLAB enhanced
+  --sn-emotion-epic-oklab-primary-rgb: 191, 211, 255;
+  --sn-emotion-epic-oklab-accent-rgb: 255, 215, 0;
+  --sn-emotion-epic-oklab-atmosphere-rgb: 112, 128, 144;
+  --sn-emotion-epic-oklab-luminance: 0.80;
+  --sn-emotion-epic-oklab-chroma: 0.22;
+  --sn-emotion-epic-oklab-hue: 50;
+  
+  // Ambient (atmospheric, floating) - OKLAB enhanced
+  --sn-emotion-ambient-oklab-primary-rgb: 255, 248, 220;
+  --sn-emotion-ambient-oklab-accent-rgb: 176, 196, 222;
+  --sn-emotion-ambient-oklab-atmosphere-rgb: 128, 128, 128;
+  --sn-emotion-ambient-oklab-luminance: 0.85;
+  --sn-emotion-ambient-oklab-chroma: 0.09;
+  --sn-emotion-ambient-oklab-hue: 220;
+  
+  // === GENRE-SPECIFIC OKLAB PRESETS ===
+  // OKLAB presets optimized for different music genres (updated by GenreProfileManager)
+  
+  // Electronic/EDM - Vibrant, high-energy OKLAB processing
+  --sn-genre-electronic-oklab-preset: "COSMIC";
+  --sn-genre-electronic-oklab-chroma-boost: 1.6;
+  --sn-genre-electronic-oklab-lightness-boost: 1.2;
+  --sn-genre-electronic-oklab-hue-shift: 15;
+  --sn-genre-electronic-oklab-primary-rgb: var(--sn-emotion-energetic-oklab-primary-rgb);
+  --sn-genre-electronic-oklab-accent-rgb: var(--sn-emotion-energetic-oklab-accent-rgb);
+  
+  // Classical - Subtle, refined OKLAB processing
+  --sn-genre-classical-oklab-preset: "SUBTLE";
+  --sn-genre-classical-oklab-chroma-boost: 1.1;
+  --sn-genre-classical-oklab-lightness-boost: 1.05;
+  --sn-genre-classical-oklab-hue-shift: 5;
+  --sn-genre-classical-oklab-primary-rgb: var(--sn-emotion-romantic-oklab-primary-rgb);
+  --sn-genre-classical-oklab-accent-rgb: var(--sn-emotion-romantic-oklab-accent-rgb);
+  
+  // Rock/Metal - Bold, intense OKLAB processing
+  --sn-genre-rock-oklab-preset: "VIBRANT";
+  --sn-genre-rock-oklab-chroma-boost: 1.4;
+  --sn-genre-rock-oklab-lightness-boost: 1.1;
+  --sn-genre-rock-oklab-hue-shift: 10;
+  --sn-genre-rock-oklab-primary-rgb: var(--sn-emotion-aggressive-oklab-primary-rgb);
+  --sn-genre-rock-oklab-accent-rgb: var(--sn-emotion-aggressive-oklab-accent-rgb);
+  
+  // Jazz - Sophisticated, warm OKLAB processing
+  --sn-genre-jazz-oklab-preset: "STANDARD";
+  --sn-genre-jazz-oklab-chroma-boost: 1.25;
+  --sn-genre-jazz-oklab-lightness-boost: 1.08;
+  --sn-genre-jazz-oklab-hue-shift: 8;
+  --sn-genre-jazz-oklab-primary-rgb: var(--sn-emotion-mysterious-oklab-primary-rgb);
+  --sn-genre-jazz-oklab-accent-rgb: var(--sn-emotion-mysterious-oklab-accent-rgb);
+  
+  // Hip-Hop/Rap - Dynamic, punchy OKLAB processing
+  --sn-genre-hiphop-oklab-preset: "VIBRANT";
+  --sn-genre-hiphop-oklab-chroma-boost: 1.5;
+  --sn-genre-hiphop-oklab-lightness-boost: 1.15;
+  --sn-genre-hiphop-oklab-hue-shift: 12;
+  --sn-genre-hiphop-oklab-primary-rgb: var(--sn-emotion-epic-oklab-primary-rgb);
+  --sn-genre-hiphop-oklab-accent-rgb: var(--sn-emotion-epic-oklab-accent-rgb);
+  
+  // Ambient/Drone - Atmospheric, ethereal OKLAB processing
+  --sn-genre-ambient-oklab-preset: "SUBTLE";
+  --sn-genre-ambient-oklab-chroma-boost: 1.05;
+  --sn-genre-ambient-oklab-lightness-boost: 1.02;
+  --sn-genre-ambient-oklab-hue-shift: 3;
+  --sn-genre-ambient-oklab-primary-rgb: var(--sn-emotion-ambient-oklab-primary-rgb);
+  --sn-genre-ambient-oklab-accent-rgb: var(--sn-emotion-ambient-oklab-accent-rgb);
+  
+  // Folk/Acoustic - Natural, warm OKLAB processing
+  --sn-genre-folk-oklab-preset: "STANDARD";
+  --sn-genre-folk-oklab-chroma-boost: 1.15;
+  --sn-genre-folk-oklab-lightness-boost: 1.05;
+  --sn-genre-folk-oklab-hue-shift: 5;
+  --sn-genre-folk-oklab-primary-rgb: var(--sn-emotion-calm-oklab-primary-rgb);
+  --sn-genre-folk-oklab-accent-rgb: var(--sn-emotion-calm-oklab-accent-rgb);
+  
+  // Pop - Balanced, pleasant OKLAB processing
+  --sn-genre-pop-oklab-preset: "STANDARD";
+  --sn-genre-pop-oklab-chroma-boost: 1.3;
+  --sn-genre-pop-oklab-lightness-boost: 1.1;
+  --sn-genre-pop-oklab-hue-shift: 8;
+  --sn-genre-pop-oklab-primary-rgb: var(--sn-emotion-happy-oklab-primary-rgb);
+  --sn-genre-pop-oklab-accent-rgb: var(--sn-emotion-happy-oklab-accent-rgb);
+  
+  // Default fallback genre - Balanced OKLAB processing
+  --sn-genre-default-oklab-preset: "STANDARD";
+  --sn-genre-default-oklab-chroma-boost: 1.2;
+  --sn-genre-default-oklab-lightness-boost: 1.05;
+  --sn-genre-default-oklab-hue-shift: 5;
+  --sn-genre-default-oklab-primary-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-genre-default-oklab-accent-rgb: var(--sn-cosmic-accent-rgb);
+  
+  // === TEMPORAL COLOR SYSTEM ===
+  --sn-color-temporal-past-rgb: var(--sn-cosmic-secondary-rgb);
   --sn-color-temporal-present-rgb: var(--sn-color-accent-rgb);
-  --sn-color-temporal-future-rgb: 139, 233, 253;
+  --sn-color-temporal-future-rgb: var(--sn-cosmic-accent-rgb);
   
-  // Consciousness Field Colors
-  --sn-color-consciousness-deep-rgb: 17, 17, 27;
-  --sn-color-consciousness-surface-rgb: 30, 30, 46;
+  // === CONSCIOUSNESS FIELD COLORS ===
+  --sn-color-consciousness-deep-rgb: var(--sn-cosmic-base-rgb);
+  --sn-color-consciousness-surface-rgb: var(--sn-cosmic-surface-rgb);
   --sn-color-consciousness-glow-rgb: var(--sn-color-accent-rgb);
   
   // -------------------------------------------------------------------------
@@ -387,6 +643,26 @@
   --sn-accent-hex: var(--sn-color-accent-hex);
   --sn-accent-rgb: var(--sn-color-accent-rgb);
   
+  // Legacy dynamic color aliases
+  --sn-dynamic-accent: var(--sn-dynamic-accent-hex);
+  --sn-cosmic-accent: var(--sn-cosmic-accent-hex);
+  --sn-cosmic-base: var(--sn-cosmic-base-hex);
+  
+  // OKLAB processed color aliases (Phase 4 migration)
+  --sn-oklab-processed-bright-highlight-rgb: var(--sn-color-oklab-bright-highlight-rgb);
+  --sn-oklab-processed-dynamic-shadow-rgb: var(--sn-color-oklab-dynamic-shadow-rgb);
+  
+  // OKLAB individual RGB component aliases
+  --sn-oklab-processed-primary-rgb-r: var(--sn-color-oklab-primary-r);
+  --sn-oklab-processed-primary-rgb-g: var(--sn-color-oklab-primary-g);
+  --sn-oklab-processed-primary-rgb-b: var(--sn-color-oklab-primary-b);
+  --sn-oklab-processed-accent-rgb-r: var(--sn-color-oklab-accent-r);
+  --sn-oklab-processed-accent-rgb-g: var(--sn-color-oklab-accent-g);
+  --sn-oklab-processed-accent-rgb-b: var(--sn-color-oklab-accent-b);
+  
+  // OKLAB luminance aliases
+  --sn-oklab-processed-dynamic-base-luminance: var(--sn-color-oklab-base-luminance);
+  
   // Background system (Phase 2 migration)
   --sn-gradient-primary-rgb: var(--sn-bg-gradient-primary-rgb);
   --sn-gradient-secondary-rgb: var(--sn-bg-gradient-secondary-rgb);
@@ -434,29 +710,68 @@
 }
 
 // =============================================================================
-// CATPPUCCIN FLAVOR INTEGRATION
+// SPICETIFY THEME INTEGRATION
 // =============================================================================
 
-// Default to Mocha flavor, other flavors override via color-ini
+// StarryNight integrates with any Spicetify theme as the base layer
+// The cosmic colors serve as neutral fallbacks that work with any theme
 :root {
-  // Base Catppuccin colors that integrate with dynamic system
+  // Spicetify variable bridge - these get overridden by user's theme
+  --spicetify-base: var(--spice-base, var(--sn-cosmic-base-hex));
+  --spicetify-surface: var(--spice-surface1, var(--sn-cosmic-surface-hex));
+  --spicetify-accent: var(--spice-accent, var(--sn-cosmic-accent-hex));
+  --spicetify-text: var(--spice-text, var(--sn-cosmic-text-hex));
+  
+  // Optional Catppuccin compatibility layer
+  // These are only used if user has Catppuccin as their base Spicetify theme
   --catppuccin-base: #1e1e2e;
   --catppuccin-mantle: #181825;  
   --catppuccin-crust: #11111b;
   --catppuccin-surface0: #313244;
   --catppuccin-surface1: #45475a;
   --catppuccin-surface2: #585b70;
-  --catppuccin-overlay0: #6c7086;
-  --catppuccin-overlay1: #7f849c;
-  --catppuccin-overlay2: #9399b2;
-  --catppuccin-subtext0: #a6adc8;
-  --catppuccin-subtext1: #bac2de;
   --catppuccin-text: #cdd6f4;
+}
+
+// =============================================================================
+// BRIGHTNESS MODE SELECTORS
+// =============================================================================
+
+// Bright mode (lighter base colors with vibrant effects)
+:root[data-sn-brightness="bright"],
+html[style*="--sn-brightness-mode: \"bright\""] {
+  // Use ColorStateManager-provided base colors (will be lighter variants)
+  // These are set by ColorStateManager.applyColorStateToCSSVariables()
   
-  // Map to system variables for consistency
-  --sn-bg-gradient-secondary-rgb: 30, 30, 46; // catppuccin-base
-  --sn-color-consciousness-deep-rgb: 17, 17, 27; // catppuccin-crust
-  --sn-color-consciousness-surface-rgb: 49, 50, 68; // catppuccin-surface0
+  // Gradient effect modifiers (vibrant)
+  --sn-bg-gradient-saturation: var(--sn-brightness-bright-saturation);
+  --sn-bg-gradient-brightness: var(--sn-brightness-bright-brightness);
+  --sn-bg-gradient-contrast: var(--sn-brightness-bright-contrast);
+  --sn-bg-gradient-opacity: var(--sn-brightness-bright-opacity);
+}
+
+// Balanced mode (standard base colors with moderate effects)
+:root[data-sn-brightness="balanced"],
+html[style*="--sn-brightness-mode: \"balanced\""] {
+  // Use ColorStateManager-provided base colors (standard variants)
+  
+  // Gradient effect modifiers (moderate)
+  --sn-bg-gradient-saturation: var(--sn-brightness-balanced-saturation);
+  --sn-bg-gradient-brightness: var(--sn-brightness-balanced-brightness);
+  --sn-bg-gradient-contrast: var(--sn-brightness-balanced-contrast);
+  --sn-bg-gradient-opacity: var(--sn-brightness-balanced-opacity);
+}
+
+// Dark mode (darker base colors with subtle effects)
+:root[data-sn-brightness="dark"],
+html[style*="--sn-brightness-mode: \"dark\""] {
+  // Use ColorStateManager-provided base colors (darker variants)
+  
+  // Gradient effect modifiers (subtle)
+  --sn-bg-gradient-saturation: var(--sn-brightness-dark-saturation);
+  --sn-bg-gradient-brightness: var(--sn-brightness-dark-brightness);
+  --sn-bg-gradient-contrast: var(--sn-brightness-dark-contrast);
+  --sn-bg-gradient-opacity: var(--sn-brightness-dark-opacity);
 }
 
 // =============================================================================

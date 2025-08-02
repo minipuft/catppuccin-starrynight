@@ -7,7 +7,7 @@
 import { CinematicDramaEngine } from '@/visual/consciousness/CinematicDramaEngine';
 import { colorConsciousnessManager } from '@/visual/consciousness/ColorConsciousnessState';
 import { HolographicUISystem } from '@/visual/organic-consciousness/ui/HolographicUISystem';
-import { CSSVariableBatcher } from '@/core/performance/CSSVariableBatcher';
+import { UnifiedCSSConsciousnessController } from '@/core/css/UnifiedCSSConsciousnessController';
 import { MusicSyncService } from '@/audio/MusicSyncService';
 import type { MusicEmotion, BeatData } from '@/types/colorStubs';
 
@@ -38,7 +38,7 @@ const mockColorOrchestrator = {
   }))
 } as any;
 
-const mockCSSVariableBatcher = {
+const mockUnifiedCSSConsciousnessController = {
   queueCSSVariableUpdate: jest.fn(),
   flushBatch: jest.fn()
 } as any;
@@ -69,7 +69,7 @@ describe('CinematicDramaEngine', () => {
 
     cinematicEngine = new CinematicDramaEngine(
       mockHolographicSystem,
-      mockCSSVariableBatcher,
+      mockUnifiedCSSConsciousnessController,
       mockMusicSyncService
     );
   });
@@ -84,11 +84,11 @@ describe('CinematicDramaEngine', () => {
     test('should setup cinematic CSS variables', async () => {
       await cinematicEngine.initialize();
       
-      expect(mockCSSVariableBatcher.queueCSSVariableUpdate).toHaveBeenCalledWith(
+      expect(mockUnifiedCSSConsciousnessController.queueCSSVariableUpdate).toHaveBeenCalledWith(
         '--cinematic-red-r',
         '255'
       );
-      expect(mockCSSVariableBatcher.queueCSSVariableUpdate).toHaveBeenCalledWith(
+      expect(mockUnifiedCSSConsciousnessController.queueCSSVariableUpdate).toHaveBeenCalledWith(
         '--cinematic-glow-intensity',
         '0'
       );
@@ -176,7 +176,7 @@ describe('CinematicDramaEngine', () => {
         emotionalTemperature: 3000
       });
 
-      expect(mockCSSVariableBatcher.queueCSSVariableUpdate).toHaveBeenCalledWith(
+      expect(mockUnifiedCSSConsciousnessController.queueCSSVariableUpdate).toHaveBeenCalledWith(
         '--cinematic-red-r',
         expect.any(String)
       );
@@ -284,7 +284,7 @@ describe('CinematicDramaEngine Integration', () => {
   test('should integrate with ColorConsciousnessManager', () => {
     const cinematicEngine = new CinematicDramaEngine(
       mockHolographicSystem,
-      mockCSSVariableBatcher,
+      mockUnifiedCSSConsciousnessController,
       mockMusicSyncService
     );
 

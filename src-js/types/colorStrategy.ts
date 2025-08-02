@@ -62,6 +62,8 @@ export interface ColorResult {
     cacheKey?: string;
     harmonicIntensity?: number;
     error?: string;
+    // Strategy-specific metadata
+    [key: string]: any;
   };
   
   /** Original context for reference */

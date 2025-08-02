@@ -7,7 +7,7 @@
 import { EtherealBeautyEngine } from '@/visual/consciousness/EtherealBeautyEngine';
 import { colorConsciousnessManager } from '@/visual/consciousness/ColorConsciousnessState';
 import { HolographicUISystem } from '@/visual/organic-consciousness/ui/HolographicUISystem';
-import { CSSVariableBatcher } from '@/core/performance/CSSVariableBatcher';
+import { UnifiedCSSConsciousnessController } from '@/core/css/UnifiedCSSConsciousnessController';
 import { MusicSyncService } from '@/audio/MusicSyncService';
 import type { MusicEmotion, BeatData } from '@/types/colorStubs';
 
@@ -38,7 +38,7 @@ const mockColorOrchestrator = {
   }))
 } as any;
 
-const mockCSSVariableBatcher = {
+const mockUnifiedCSSConsciousnessController = {
   queueCSSVariableUpdate: jest.fn(),
   flushBatch: jest.fn()
 } as any;
@@ -69,7 +69,7 @@ describe('EtherealBeautyEngine', () => {
 
     etherealEngine = new EtherealBeautyEngine(
       mockHolographicSystem,
-      mockCSSVariableBatcher,
+      mockUnifiedCSSConsciousnessController,
       mockMusicSyncService
     );
   });
@@ -84,11 +84,11 @@ describe('EtherealBeautyEngine', () => {
     test('should setup ethereal CSS variables', async () => {
       await etherealEngine.initialize();
       
-      expect(mockCSSVariableBatcher.queueCSSVariableUpdate).toHaveBeenCalledWith(
+      expect(mockUnifiedCSSConsciousnessController.queueCSSVariableUpdate).toHaveBeenCalledWith(
         '--ethereal-soft-r',
         '203'
       );
-      expect(mockCSSVariableBatcher.queueCSSVariableUpdate).toHaveBeenCalledWith(
+      expect(mockUnifiedCSSConsciousnessController.queueCSSVariableUpdate).toHaveBeenCalledWith(
         '--ethereal-beauty-level',
         '0'
       );
@@ -171,7 +171,7 @@ describe('EtherealBeautyEngine', () => {
         emotionalTemperature: 6500
       });
 
-      expect(mockCSSVariableBatcher.queueCSSVariableUpdate).toHaveBeenCalledWith(
+      expect(mockUnifiedCSSConsciousnessController.queueCSSVariableUpdate).toHaveBeenCalledWith(
         '--ethereal-soft-r',
         expect.any(String)
       );
@@ -227,12 +227,12 @@ describe('EtherealBeautyEngine', () => {
       etherealEngine['etherealState'].beautyLevel = 0.8;
       etherealEngine['etherealState'].mysticalShimmer = 0.6;
 
-      const decaySpy = jest.spyOn(etherealEngine as any, 'gentleDecayEtherealBeauty');
+      const lerpUpdateSpy = jest.spyOn(etherealEngine as any, 'updateEtherealStateWithLERP');
       
-      // Trigger decay
-      etherealEngine['gentleDecayEtherealBeauty']();
+      // Trigger LERP update with deltaTime
+      etherealEngine['updateEtherealStateWithLERP'](0.016); // 16ms frame time
 
-      expect(decaySpy).toHaveBeenCalled();
+      expect(lerpUpdateSpy).toHaveBeenCalled();
     });
   });
 
@@ -340,7 +340,7 @@ describe('EtherealBeautyEngine Integration', () => {
   test('should integrate with ColorConsciousnessOrchestrator', () => {
     const etherealEngine = new EtherealBeautyEngine(
       mockHolographicSystem,
-      mockCSSVariableBatcher,
+      mockUnifiedCSSConsciousnessController,
       mockMusicSyncService
     );
 

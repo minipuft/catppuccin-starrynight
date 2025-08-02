@@ -7,6 +7,37 @@ export interface HealthCheckResult {
   metrics?: Record<string, any>;
 }
 
+/**
+ * Interface for processed color data from color harmony engines
+ * Separates hex color values from metadata and processing parameters
+ */
+export interface ProcessedColorsData {
+  /** Valid hex color values that can be converted to RGB */
+  colors: Record<string, string>;
+  /** Metadata and processing parameters (not color values) */
+  metadata?: {
+    strategy?: string;
+    processingTime?: number;
+    parameters?: Record<string, any>;
+  };
+}
+
+/**
+ * Event data structure for color harmonization events
+ */
+export interface ColorHarmonizedEventData {
+  /** Processed color palette containing only hex color values */
+  processedColors: Record<string, string>;
+  /** Primary accent color in hex format */
+  accentHex: string;
+  /** Primary accent color in RGB format (r,g,b) */
+  accentRgb: string;
+  /** Color processing strategies used */
+  strategies?: string[];
+  /** Time taken to process colors in milliseconds */
+  processingTime?: number;
+}
+
 export interface BeatPayload {
   energy?: number; // 0-1
   bpm?: number;
@@ -235,6 +266,26 @@ export interface VisualBackplane extends IManagedSystem {
     highContrast: boolean;
     prefersTransparency: boolean;
   }): void;
+
+  /**
+   * Set emotional state for consciousness-aware rendering
+   * 
+   * Called by GradientConductor when emotion analysis is updated.
+   * Backends can use this for emotion-driven visual effects.
+   * 
+   * @param emotion - Current emotional state from MusicEmotionAnalyzer
+   */
+  setEmotionalState?(emotion: any): void;
+
+  /**
+   * Set emotional color context for advanced consciousness processing
+   * 
+   * Called by GradientConductor for detailed emotional color mapping.
+   * Backends can use this for sophisticated consciousness-aware visuals.
+   * 
+   * @param context - Detailed emotional color context
+   */
+  setEmotionalContext?(context: any): void;
 }
 
 /**

@@ -1,10 +1,10 @@
 /**
  * GradientTransitionOrchestrator - Seamless WebGL ↔ CSS Transition System
- * Part of the Year 3000 PHASE 6 Final Integration
+
  *
  * Orchestrates intelligent transitions between CSS gradients and WebGL-powered visuals
  * based on hardware capabilities, performance metrics, and user preferences.
- * 
+ *
  * Features:
  * - Automatic capability detection and quality scaling
  * - Real-time performance monitoring with fallback triggers
@@ -15,7 +15,7 @@
  */
 
 import { Y3K } from "@/debug/UnifiedDebugManager";
-import { CSSVariableBatcher } from "@/core/performance/CSSVariableBatcher";
+import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
 import { WebGLGradientBackgroundSystem } from "@/visual/backgrounds/WebGLGradientBackgroundSystem";
@@ -24,6 +24,7 @@ import { WebGLBackplaneAdapter } from "@/visual/backgrounds/WebGLBackplaneAdapte
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
+import { unifiedEventBus, type EventData } from "@/core/events/UnifiedEventBus";
 
 export type GradientBackend = "css" | "webgl" | "hybrid";
 export type TransitionMode = "instant" | "crossfade" | "progressive";
@@ -31,18 +32,18 @@ export type QualityLevel = "auto" | "low" | "balanced" | "high" | "ultra";
 
 export interface TransitionConfig {
   mode: TransitionMode;
-  duration: number;          // Transition duration in ms
-  easing: string;           // CSS easing function
-  preserveState: boolean;   // Whether to preserve gradient state during transition
-  fallbackDelay: number;    // Delay before falling back on performance issues (ms)
+  duration: number; // Transition duration in ms
+  easing: string; // CSS easing function
+  preserveState: boolean; // Whether to preserve gradient state during transition
+  fallbackDelay: number; // Delay before falling back on performance issues (ms)
 }
 
 export interface PerformanceThresholds {
-  minFPS: number;           // Minimum FPS to maintain WebGL
-  maxMemoryMB: number;      // Maximum memory usage for WebGL
-  maxCPUPercent: number;    // Maximum CPU usage
-  maxGPUPercent: number;    // Maximum GPU usage
-  stabilityWindow: number;  // Time window for performance stability check (ms)
+  minFPS: number; // Minimum FPS to maintain WebGL
+  maxMemoryMB: number; // Maximum memory usage for WebGL
+  maxCPUPercent: number; // Maximum CPU usage
+  maxGPUPercent: number; // Maximum GPU usage
+  stabilityWindow: number; // Time window for performance stability check (ms)
 }
 
 export interface BackendCapabilities {
@@ -55,7 +56,13 @@ export interface BackendCapabilities {
 }
 
 export interface GradientState {
-  colors: Array<{ r: number; g: number; b: number; a: number; position: number }>;
+  colors: Array<{
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+    position: number;
+  }>;
   emotionalProfile: any;
   genreInfo: any;
   musicMetrics: any;
@@ -64,7 +71,7 @@ export interface GradientState {
 }
 
 export class GradientTransitionOrchestrator {
-  private cssVariableBatcher: CSSVariableBatcher;
+  private cssConsciousnessController: UnifiedCSSConsciousnessController;
   private deviceDetector: DeviceCapabilityDetector;
   private performanceAnalyzer: PerformanceAnalyzer;
   private musicSyncService: MusicSyncService | null = null;
@@ -89,7 +96,7 @@ export class GradientTransitionOrchestrator {
     duration: 800,
     easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
     preserveState: true,
-    fallbackDelay: 2000
+    fallbackDelay: 2000,
   };
 
   private performanceThresholds: PerformanceThresholds = {
@@ -97,7 +104,7 @@ export class GradientTransitionOrchestrator {
     maxMemoryMB: 50,
     maxCPUPercent: 15,
     maxGPUPercent: 30,
-    stabilityWindow: 5000
+    stabilityWindow: 5000,
   };
 
   // Performance tracking
@@ -111,10 +118,13 @@ export class GradientTransitionOrchestrator {
   private performanceCheckInterval: number | null = null;
   private fallbackTimer: number | null = null;
 
-  // Event listeners
+  // Event listeners (legacy DOM events - being phased out)
   private boundPerformanceCheck: (() => void) | null = null;
   private boundSettingsChange: ((event: Event) => void) | null = null;
   private boundVisibilityChange: (() => void) | null = null;
+
+  // Unified Event Bus subscriptions
+  private eventSubscriptionIds: string[] = [];
 
   // User preferences
   private userPreferences = {
@@ -122,17 +132,17 @@ export class GradientTransitionOrchestrator {
     qualityLevel: "auto" as QualityLevel,
     reducedMotion: false,
     batteryConservation: false,
-    accessibilityMode: false
+    accessibilityMode: false,
   };
 
   constructor(
-    cssVariableBatcher: CSSVariableBatcher,
+    cssConsciousnessController: UnifiedCSSConsciousnessController,
     performanceAnalyzer: PerformanceAnalyzer,
     musicSyncService: MusicSyncService | null = null,
     settingsManager: SettingsManager | null = null,
     colorHarmonyEngine: ColorHarmonyEngine | null = null
   ) {
-    this.cssVariableBatcher = cssVariableBatcher;
+    this.cssConsciousnessController = cssConsciousnessController;
     this.performanceAnalyzer = performanceAnalyzer;
     this.musicSyncService = musicSyncService;
     this.settingsManager = settingsManager;
@@ -145,7 +155,11 @@ export class GradientTransitionOrchestrator {
     this.boundSettingsChange = this.handleSettingsChange.bind(this);
     this.boundVisibilityChange = this.handleVisibilityChange.bind(this);
 
-    Y3K?.debug?.log("GradientTransitionOrchestrator", "Initialized with capabilities:", this.capabilities);
+    Y3K?.debug?.log(
+      "GradientTransitionOrchestrator",
+      "Initialized with capabilities:",
+      this.capabilities
+    );
   }
 
   public async initialize(
@@ -159,7 +173,7 @@ export class GradientTransitionOrchestrator {
     if (this.webglBackgroundSystem) {
       this.webglAdapter = new WebGLBackplaneAdapter(
         this.webglBackgroundSystem,
-        this.cssVariableBatcher
+        this.cssConsciousnessController
       );
     }
 
@@ -179,35 +193,48 @@ export class GradientTransitionOrchestrator {
     // Update CSS variables to reflect current state
     this.updateCSSTransitionState();
 
-    Y3K?.debug?.log("GradientTransitionOrchestrator", `Initialized with backend: ${this.targetBackend}`);
+    Y3K?.debug?.log(
+      "GradientTransitionOrchestrator",
+      `Initialized with backend: ${this.targetBackend}`
+    );
   }
 
   private detectCapabilities(): BackendCapabilities {
     const canvas = document.createElement("canvas");
     const gl = canvas.getContext("webgl2") || canvas.getContext("webgl");
-    
+
     const webglAvailable = !!gl;
     const webgl2Supported = gl instanceof WebGL2RenderingContext;
-    const deviceTier = this.deviceDetector.recommendPerformanceQuality() as "low" | "medium" | "high";
+    const deviceTier = this.deviceDetector.recommendPerformanceQuality() as
+      | "low"
+      | "medium"
+      | "high";
 
     let maxTextureSize = 0;
     let memoryEstimateMB = 16; // Conservative fallback
 
     if (gl) {
       maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-      
+
       // Estimate available GPU memory (rough approximation)
       const renderer = gl.getParameter(gl.RENDERER) || "";
       if (renderer.toLowerCase().includes("intel")) {
         memoryEstimateMB = deviceTier === "high" ? 64 : 32;
-      } else if (renderer.toLowerCase().includes("nvidia") || renderer.toLowerCase().includes("amd")) {
-        memoryEstimateMB = deviceTier === "high" ? 128 : deviceTier === "medium" ? 64 : 32;
+      } else if (
+        renderer.toLowerCase().includes("nvidia") ||
+        renderer.toLowerCase().includes("amd")
+      ) {
+        memoryEstimateMB =
+          deviceTier === "high" ? 128 : deviceTier === "medium" ? 64 : 32;
       }
     }
 
-    const shaderComplexity: "low" | "medium" | "high" = 
-      deviceTier === "high" ? "high" : 
-      deviceTier === "medium" ? "medium" : "low";
+    const shaderComplexity: "low" | "medium" | "high" =
+      deviceTier === "high"
+        ? "high"
+        : deviceTier === "medium"
+        ? "medium"
+        : "low";
 
     return {
       webglAvailable,
@@ -215,7 +242,7 @@ export class GradientTransitionOrchestrator {
       maxTextureSize,
       shaderComplexity,
       deviceTier,
-      memoryEstimateMB
+      memoryEstimateMB,
     };
   }
 
@@ -224,46 +251,73 @@ export class GradientTransitionOrchestrator {
 
     try {
       // Check for reduced motion preference
-      this.userPreferences.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      
+      this.userPreferences.reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
       // Check battery conservation (if supported)
       if ("getBattery" in navigator) {
-        (navigator as any).getBattery().then((battery: any) => {
-          this.userPreferences.batteryConservation = !battery.charging && battery.level < 0.3;
-        }).catch(() => {
-          // Battery API not available or permission denied
-        });
+        (navigator as any)
+          .getBattery()
+          .then((battery: any) => {
+            this.userPreferences.batteryConservation =
+              !battery.charging && battery.level < 0.3;
+          })
+          .catch(() => {
+            // Battery API not available or permission denied
+          });
       }
 
       // Load user-specific settings
-      const preferredBackend = this.settingsManager.get("sn-gradient-backend" as any);
+      const preferredBackend = this.settingsManager.get(
+        "sn-gradient-backend" as any
+      );
       if (preferredBackend) {
         this.userPreferences.preferredBackend = preferredBackend as any;
       }
 
-      const qualityLevel = this.settingsManager.get("sn-gradient-quality" as any);
+      const qualityLevel = this.settingsManager.get(
+        "sn-gradient-quality" as any
+      );
       if (qualityLevel) {
         this.userPreferences.qualityLevel = qualityLevel as any;
       }
 
-      Y3K?.debug?.log("GradientTransitionOrchestrator", "User preferences loaded:", this.userPreferences);
+      Y3K?.debug?.log(
+        "GradientTransitionOrchestrator",
+        "User preferences loaded:",
+        this.userPreferences
+      );
     } catch (error) {
-      Y3K?.debug?.warn("GradientTransitionOrchestrator", "Failed to load user preferences:", error);
+      Y3K?.debug?.warn(
+        "GradientTransitionOrchestrator",
+        "Failed to load user preferences:",
+        error
+      );
     }
   }
 
   private determineOptimalBackend(): GradientBackend {
     // User has explicit preference
     if (this.userPreferences.preferredBackend !== "auto") {
-      if (this.userPreferences.preferredBackend === "webgl" && !this.capabilities.webglAvailable) {
-        Y3K?.debug?.warn("GradientTransitionOrchestrator", "User prefers WebGL but it's not available, falling back to CSS");
+      if (
+        this.userPreferences.preferredBackend === "webgl" &&
+        !this.capabilities.webglAvailable
+      ) {
+        Y3K?.debug?.warn(
+          "GradientTransitionOrchestrator",
+          "User prefers WebGL but it's not available, falling back to CSS"
+        );
         return "css";
       }
       return this.userPreferences.preferredBackend;
     }
 
     // Accessibility considerations
-    if (this.userPreferences.reducedMotion || this.userPreferences.accessibilityMode) {
+    if (
+      this.userPreferences.reducedMotion ||
+      this.userPreferences.accessibilityMode
+    ) {
       return "css";
     }
 
@@ -305,8 +359,12 @@ export class GradientTransitionOrchestrator {
       }
       this.currentBackend = backend;
     } catch (error) {
-      Y3K?.debug?.error("GradientTransitionOrchestrator", `Failed to initialize ${backend} backend:`, error);
-      
+      Y3K?.debug?.error(
+        "GradientTransitionOrchestrator",
+        `Failed to initialize ${backend} backend:`,
+        error
+      );
+
       // Fallback to CSS if WebGL initialization fails
       if (backend !== "css") {
         await this.initializeCSSBackend();
@@ -317,11 +375,17 @@ export class GradientTransitionOrchestrator {
 
   private async initializeCSSBackend(): Promise<void> {
     // CSS backend is always available through FluxConsciousnessLayers
-    this.cssVariableBatcher.setProperty("--sn-gradient-backend", "css");
-    this.cssVariableBatcher.setProperty("--sn-webgl-ready", "0");
-    this.cssVariableBatcher.setProperty("--sn-gradient-transition-active", "0");
+    this.cssConsciousnessController.setProperty("--sn-gradient-backend", "css");
+    this.cssConsciousnessController.setProperty("--sn-webgl-ready", "0");
+    this.cssConsciousnessController.setProperty(
+      "--sn-gradient-transition-active",
+      "0"
+    );
 
-    Y3K?.debug?.log("GradientTransitionOrchestrator", "CSS backend initialized");
+    Y3K?.debug?.log(
+      "GradientTransitionOrchestrator",
+      "CSS backend initialized"
+    );
   }
 
   private async initializeWebGLBackend(): Promise<void> {
@@ -330,34 +394,56 @@ export class GradientTransitionOrchestrator {
     }
 
     await this.webglAdapter.initialize();
-    
-    this.cssVariableBatcher.setProperty("--sn-gradient-backend", "webgl");
-    this.cssVariableBatcher.setProperty("--sn-webgl-ready", "1");
-    this.cssVariableBatcher.setProperty("--sn-gradient-transition-active", "0");
+
+    this.cssConsciousnessController.setProperty(
+      "--sn-gradient-backend",
+      "webgl"
+    );
+    this.cssConsciousnessController.setProperty("--sn-webgl-ready", "1");
+    this.cssConsciousnessController.setProperty(
+      "--sn-gradient-transition-active",
+      "0"
+    );
 
     // Sync current gradient state
     await this.syncGradientState("css", "webgl");
 
-    Y3K?.debug?.log("GradientTransitionOrchestrator", "WebGL backend initialized");
+    Y3K?.debug?.log(
+      "GradientTransitionOrchestrator",
+      "WebGL backend initialized"
+    );
   }
 
   private async initializeHybridBackend(): Promise<void> {
     // Initialize both backends for hybrid mode
     await this.initializeCSSBackend();
-    
+
     if (this.webglAdapter) {
       try {
         await this.webglAdapter.initialize();
-        this.cssVariableBatcher.setProperty("--sn-gradient-backend", "hybrid");
-        this.cssVariableBatcher.setProperty("--sn-webgl-ready", "1");
+        this.cssConsciousnessController.setProperty(
+          "--sn-gradient-backend",
+          "hybrid"
+        );
+        this.cssConsciousnessController.setProperty("--sn-webgl-ready", "1");
       } catch (error) {
-        Y3K?.debug?.warn("GradientTransitionOrchestrator", "WebGL failed in hybrid mode, using CSS only:", error);
-        this.cssVariableBatcher.setProperty("--sn-gradient-backend", "css");
-        this.cssVariableBatcher.setProperty("--sn-webgl-ready", "0");
+        Y3K?.debug?.warn(
+          "GradientTransitionOrchestrator",
+          "WebGL failed in hybrid mode, using CSS only:",
+          error
+        );
+        this.cssConsciousnessController.setProperty(
+          "--sn-gradient-backend",
+          "css"
+        );
+        this.cssConsciousnessController.setProperty("--sn-webgl-ready", "0");
       }
     }
 
-    Y3K?.debug?.log("GradientTransitionOrchestrator", "Hybrid backend initialized");
+    Y3K?.debug?.log(
+      "GradientTransitionOrchestrator",
+      "Hybrid backend initialized"
+    );
   }
 
   public async transitionToBackend(
@@ -372,13 +458,25 @@ export class GradientTransitionOrchestrator {
     this.transitionInProgress = true;
     this.targetBackend = targetBackend;
 
-    Y3K?.debug?.log("GradientTransitionOrchestrator", `Transitioning from ${this.currentBackend} to ${targetBackend}`);
+    Y3K?.debug?.log(
+      "GradientTransitionOrchestrator",
+      `Transitioning from ${this.currentBackend} to ${targetBackend}`
+    );
 
     try {
       // Update CSS to indicate transition in progress
-      this.cssVariableBatcher.setProperty("--sn-gradient-transition-active", "1");
-      this.cssVariableBatcher.setProperty("--sn-gradient-transition-duration", `${transitionConfig.duration}ms`);
-      this.cssVariableBatcher.setProperty("--sn-gradient-transition-easing", transitionConfig.easing);
+      this.cssConsciousnessController.setProperty(
+        "--sn-gradient-transition-active",
+        "1"
+      );
+      this.cssConsciousnessController.setProperty(
+        "--sn-gradient-transition-duration",
+        `${transitionConfig.duration}ms`
+      );
+      this.cssConsciousnessController.setProperty(
+        "--sn-gradient-transition-easing",
+        transitionConfig.easing
+      );
 
       // Capture current state if preserving
       if (transitionConfig.preserveState) {
@@ -398,15 +496,18 @@ export class GradientTransitionOrchestrator {
       }
 
       this.currentBackend = targetBackend;
-      
+
       // Sync state to new backend
       if (transitionConfig.preserveState && this.lastGradientState) {
         await this.restoreGradientState(this.lastGradientState);
       }
-
     } catch (error) {
-      Y3K?.debug?.error("GradientTransitionOrchestrator", "Transition failed:", error);
-      
+      Y3K?.debug?.error(
+        "GradientTransitionOrchestrator",
+        "Transition failed:",
+        error
+      );
+
       // Fallback to CSS on transition failure
       if (targetBackend !== "css") {
         await this.initializeCSSBackend();
@@ -414,12 +515,17 @@ export class GradientTransitionOrchestrator {
       }
     } finally {
       this.transitionInProgress = false;
-      this.cssVariableBatcher.setProperty("--sn-gradient-transition-active", "0");
+      this.cssConsciousnessController.setProperty(
+        "--sn-gradient-transition-active",
+        "0"
+      );
       this.updateCSSTransitionState();
     }
   }
 
-  private async instantTransition(targetBackend: GradientBackend): Promise<void> {
+  private async instantTransition(
+    targetBackend: GradientBackend
+  ): Promise<void> {
     await this.initializeBackend(targetBackend);
   }
 
@@ -447,16 +553,22 @@ export class GradientTransitionOrchestrator {
     await this.initializeBackend(targetBackend);
 
     // Crossfade by adjusting opacity
-    this.cssVariableBatcher.setProperty("--sn-gradient-crossfade-opacity", "0");
-    
+    this.cssConsciousnessController.setProperty(
+      "--sn-gradient-crossfade-opacity",
+      "0"
+    );
+
     // Trigger crossfade
     requestAnimationFrame(() => {
       tempElement.style.opacity = "1";
-      this.cssVariableBatcher.setProperty("--sn-gradient-crossfade-opacity", "1");
+      this.cssConsciousnessController.setProperty(
+        "--sn-gradient-crossfade-opacity",
+        "1"
+      );
     });
 
     // Wait for transition to complete
-    await new Promise(resolve => setTimeout(resolve, config.duration));
+    await new Promise((resolve) => setTimeout(resolve, config.duration));
 
     // Clean up
     document.body.removeChild(tempElement);
@@ -472,22 +584,31 @@ export class GradientTransitionOrchestrator {
 
     for (let i = 0; i <= steps; i++) {
       const progress = i / steps;
-      
+
       // Update transition progress
-      this.cssVariableBatcher.setProperty("--sn-gradient-transition-progress", progress.toString());
-      
+      this.cssConsciousnessController.setProperty(
+        "--sn-gradient-transition-progress",
+        progress.toString()
+      );
+
       if (i === Math.floor(steps / 2)) {
         // Initialize new backend at midpoint
         await this.initializeBackend(targetBackend);
       }
-      
-      await new Promise(resolve => setTimeout(resolve, stepDuration));
+
+      await new Promise((resolve) => setTimeout(resolve, stepDuration));
     }
   }
 
   private async captureGradientState(): Promise<GradientState> {
-    const colors: Array<{ r: number; g: number; b: number; a: number; position: number }> = [];
-    
+    const colors: Array<{
+      r: number;
+      g: number;
+      b: number;
+      a: number;
+      position: number;
+    }> = [];
+
     // Extract current gradient colors from ColorHarmonyEngine
     if (this.colorHarmonyEngine) {
       try {
@@ -499,28 +620,33 @@ export class GradientTransitionOrchestrator {
               g: color.g,
               b: color.b,
               a: 1.0,
-              position: index / (currentGradient.length - 1)
+              position: index / (currentGradient.length - 1),
             });
           });
         }
       } catch (error) {
-        Y3K?.debug?.warn("GradientTransitionOrchestrator", "Failed to capture gradient colors:", error);
+        Y3K?.debug?.warn(
+          "GradientTransitionOrchestrator",
+          "Failed to capture gradient colors:",
+          error
+        );
       }
     }
 
     // Capture other state from FluxConsciousnessLayers
-    const consciousnessMetrics = this.fluxConsciousnessLayers?.getConsciousnessMetrics();
+    const consciousnessMetrics =
+      this.fluxConsciousnessLayers?.getConsciousnessMetrics();
 
     return {
       colors,
       emotionalProfile: consciousnessMetrics?.emotionalProfile || null,
       genreInfo: {
         genre: consciousnessMetrics?.currentGenre || "unknown",
-        confidence: consciousnessMetrics?.genreConfidence || 0
+        confidence: consciousnessMetrics?.genreConfidence || 0,
       },
       musicMetrics: consciousnessMetrics?.spectralData || null,
       consciousnessLevel: consciousnessMetrics?.consciousnessLevel || 0.7,
-      timestamp: performance.now()
+      timestamp: performance.now(),
     };
   }
 
@@ -530,19 +656,23 @@ export class GradientTransitionOrchestrator {
       try {
         // Update WebGL system with captured state
         this.webglAdapter.setPalette(state.colors);
-        
+
         if (state.musicMetrics) {
           this.webglAdapter.setMusicMetrics(state.musicMetrics);
         }
       } catch (error) {
-        Y3K?.debug?.warn("GradientTransitionOrchestrator", "Failed to restore WebGL state:", error);
+        Y3K?.debug?.warn(
+          "GradientTransitionOrchestrator",
+          "Failed to restore WebGL state:",
+          error
+        );
       }
     }
 
     // Update CSS variables for state continuity
     if (state.colors.length > 0) {
       state.colors.forEach((color, index) => {
-        this.cssVariableBatcher.setProperty(
+        this.cssConsciousnessController.setProperty(
           `--sn-transition-color-${index}`,
           `${color.r}, ${color.g}, ${color.b}`
         );
@@ -550,14 +680,24 @@ export class GradientTransitionOrchestrator {
     }
   }
 
-  private async syncGradientState(fromBackend: GradientBackend, toBackend: GradientBackend): Promise<void> {
+  private async syncGradientState(
+    fromBackend: GradientBackend,
+    toBackend: GradientBackend
+  ): Promise<void> {
     try {
       const state = await this.captureGradientState();
       await this.restoreGradientState(state);
-      
-      Y3K?.debug?.log("GradientTransitionOrchestrator", `Synced gradient state from ${fromBackend} to ${toBackend}`);
+
+      Y3K?.debug?.log(
+        "GradientTransitionOrchestrator",
+        `Synced gradient state from ${fromBackend} to ${toBackend}`
+      );
     } catch (error) {
-      Y3K?.debug?.warn("GradientTransitionOrchestrator", "Failed to sync gradient state:", error);
+      Y3K?.debug?.warn(
+        "GradientTransitionOrchestrator",
+        "Failed to sync gradient state:",
+        error
+      );
     }
   }
 
@@ -567,7 +707,10 @@ export class GradientTransitionOrchestrator {
       this.performanceCheckInterval = null;
     }
 
-    this.performanceCheckInterval = window.setInterval(this.boundPerformanceCheck!, 1000);
+    this.performanceCheckInterval = window.setInterval(
+      this.boundPerformanceCheck!,
+      1000
+    );
   }
 
   private performanceCheck(): void {
@@ -587,12 +730,15 @@ export class GradientTransitionOrchestrator {
       fps,
       memoryMB,
       cpuPercent,
-      gpuPercent
+      gpuPercent,
     });
 
     // Keep only recent history
-    const cutoff = performance.now() - this.performanceThresholds.stabilityWindow;
-    this.performanceHistory = this.performanceHistory.filter(entry => entry.timestamp > cutoff);
+    const cutoff =
+      performance.now() - this.performanceThresholds.stabilityWindow;
+    this.performanceHistory = this.performanceHistory.filter(
+      (entry) => entry.timestamp > cutoff
+    );
 
     // Check if performance degradation requires fallback
     this.checkPerformanceFallback();
@@ -604,17 +750,24 @@ export class GradientTransitionOrchestrator {
     }
 
     const recentMetrics = this.performanceHistory.slice(-3);
-    const avgFPS = recentMetrics.reduce((sum, m) => sum + m.fps, 0) / recentMetrics.length;
-    const avgMemory = recentMetrics.reduce((sum, m) => sum + m.memoryMB, 0) / recentMetrics.length;
+    const avgFPS =
+      recentMetrics.reduce((sum, m) => sum + m.fps, 0) / recentMetrics.length;
+    const avgMemory =
+      recentMetrics.reduce((sum, m) => sum + m.memoryMB, 0) /
+      recentMetrics.length;
 
-    const shouldFallback = 
+    const shouldFallback =
       avgFPS < this.performanceThresholds.minFPS ||
       avgMemory > this.performanceThresholds.maxMemoryMB;
 
     if (shouldFallback && !this.fallbackTimer) {
-      Y3K?.debug?.warn("GradientTransitionOrchestrator", 
-        `Performance degradation detected - FPS: ${avgFPS.toFixed(1)}, Memory: ${avgMemory.toFixed(1)}MB`);
-      
+      Y3K?.debug?.warn(
+        "GradientTransitionOrchestrator",
+        `Performance degradation detected - FPS: ${avgFPS.toFixed(
+          1
+        )}, Memory: ${avgMemory.toFixed(1)}MB`
+      );
+
       // Start fallback timer
       this.fallbackTimer = window.setTimeout(() => {
         this.performanceFallback();
@@ -624,45 +777,100 @@ export class GradientTransitionOrchestrator {
       // Cancel fallback if performance recovers
       clearTimeout(this.fallbackTimer);
       this.fallbackTimer = null;
-      Y3K?.debug?.log("GradientTransitionOrchestrator", "Performance recovered, fallback cancelled");
+      Y3K?.debug?.log(
+        "GradientTransitionOrchestrator",
+        "Performance recovered, fallback cancelled"
+      );
     }
   }
 
   private performanceFallback(): void {
-    Y3K?.debug?.log("GradientTransitionOrchestrator", "Executing performance fallback to CSS");
-    
+    Y3K?.debug?.log(
+      "GradientTransitionOrchestrator",
+      "Executing performance fallback to CSS"
+    );
+
     this.transitionToBackend("css", {
       mode: "crossfade",
       duration: 600,
-      preserveState: true
+      preserveState: true,
     });
   }
 
   private subscribeToEvents(): void {
-    if (this.settingsManager && this.boundSettingsChange) {
-      document.addEventListener("year3000SystemSettingsChanged", this.boundSettingsChange);
-    }
+    // Subscribe to unified event bus events for better coordination
+    const settingsChangedSub = unifiedEventBus.subscribe(
+      "settings:changed",
+      this.handleUnifiedSettingsChange.bind(this),
+      "GradientTransitionOrchestrator"
+    );
+    this.eventSubscriptionIds.push(settingsChangedSub);
 
+    // Subscribe to color events for gradient state coordination
+    const colorsHarmonizedSub = unifiedEventBus.subscribe(
+      "colors:harmonized",
+      this.handleColorsHarmonized.bind(this),
+      "GradientTransitionOrchestrator"
+    );
+    this.eventSubscriptionIds.push(colorsHarmonizedSub);
+
+    const colorsAppliedSub = unifiedEventBus.subscribe(
+      "colors:applied",
+      this.handleColorsApplied.bind(this),
+      "GradientTransitionOrchestrator"
+    );
+    this.eventSubscriptionIds.push(colorsAppliedSub);
+
+    // Subscribe to performance events for automatic backend switching
+    const performanceFrameSub = unifiedEventBus.subscribe(
+      "performance:frame",
+      this.handlePerformanceFrame.bind(this),
+      "GradientTransitionOrchestrator"
+    );
+    this.eventSubscriptionIds.push(performanceFrameSub);
+
+    // Subscribe to music events for enhanced gradient coordination
+    const musicTrackChangedSub = unifiedEventBus.subscribe(
+      "music:track-changed",
+      this.handleMusicTrackChanged.bind(this),
+      "GradientTransitionOrchestrator"
+    );
+    this.eventSubscriptionIds.push(musicTrackChangedSub);
+
+    // Keep some legacy DOM event listeners for system-level events
     if (this.boundVisibilityChange) {
       document.addEventListener("visibilitychange", this.boundVisibilityChange);
     }
 
     // Listen for battery changes
     if ("getBattery" in navigator) {
-      (navigator as any).getBattery().then((battery: any) => {
-        battery.addEventListener("chargingchange", () => {
-          this.userPreferences.batteryConservation = !battery.charging && battery.level < 0.3;
-          this.adaptToUserPreferences();
+      (navigator as any)
+        .getBattery()
+        .then((battery: any) => {
+          battery.addEventListener("chargingchange", () => {
+            this.userPreferences.batteryConservation =
+              !battery.charging && battery.level < 0.3;
+            this.adaptToUserPreferences();
+          });
+
+          battery.addEventListener("levelchange", () => {
+            this.userPreferences.batteryConservation =
+              !battery.charging && battery.level < 0.3;
+            this.adaptToUserPreferences();
+          });
+        })
+        .catch(() => {
+          // Battery API not available
         });
-        
-        battery.addEventListener("levelchange", () => {
-          this.userPreferences.batteryConservation = !battery.charging && battery.level < 0.3;
-          this.adaptToUserPreferences();
-        });
-      }).catch(() => {
-        // Battery API not available
-      });
     }
+
+    Y3K?.debug?.log(
+      "GradientTransitionOrchestrator",
+      "Subscribed to unified events",
+      {
+        subscriptionCount: this.eventSubscriptionIds.length,
+      }
+    );
   }
 
   private handleSettingsChange(event: Event): void {
@@ -676,6 +884,126 @@ export class GradientTransitionOrchestrator {
       this.userPreferences.qualityLevel = value;
       this.adaptToUserPreferences();
     }
+  }
+
+  // Unified Event Bus handlers for enhanced coordination
+  private handleUnifiedSettingsChange(data: EventData<"settings:changed">): void {
+    const { settingKey, newValue } = data;
+
+    if (settingKey === "sn-gradient-backend") {
+      this.userPreferences.preferredBackend = newValue;
+      this.adaptToUserPreferences();
+      Y3K?.debug?.log(
+        "GradientTransitionOrchestrator",
+        `Backend preference changed to: ${newValue}`
+      );
+    } else if (settingKey === "sn-gradient-quality") {
+      this.userPreferences.qualityLevel = newValue;
+      this.adaptToUserPreferences();
+      Y3K?.debug?.log(
+        "GradientTransitionOrchestrator",
+        `Quality preference changed to: ${newValue}`
+      );
+    }
+  }
+
+  private handleColorsHarmonized(data: EventData<"colors:harmonized">): void {
+    // Update gradient state when colors are harmonized
+    this.lastGradientState = {
+      colors: [], // Will be filled by the system
+      emotionalProfile: data.coordinationMetrics?.emotionalState || null,
+      genreInfo: data.coordinationMetrics?.detectedGenre || null,
+      musicMetrics: {
+        energy: data.coordinationMetrics?.musicInfluenceStrength || 0,
+        genre: data.coordinationMetrics?.detectedGenre,
+        processingMode: data.processingMode
+      },
+      consciousnessLevel: data.coordinationMetrics?.musicInfluenceStrength || 0,
+      timestamp: data.processingTime
+    };
+
+    // Emit gradient crossfade update
+    unifiedEventBus.emit("gradient:crossfade-changed", {
+      opacity: this.currentBackend === "hybrid" ? 0.5 : this.currentBackend === "webgl" ? 1.0 : 0.0,
+      sourceStrategy: data.strategies.join(", "),
+      webglEnabled: this.currentBackend !== "css",
+      timestamp: Date.now()
+    });
+
+    Y3K?.debug?.log(
+      "GradientTransitionOrchestrator",
+      "Processed color harmonization event",
+      {
+        strategies: data.strategies,
+        backend: this.currentBackend,
+        processingTime: data.processingTime
+      }
+    );
+  }
+
+  private handleColorsApplied(data: EventData<"colors:applied">): void {
+    // Coordinate gradient updates when colors are applied to CSS
+    Y3K?.debug?.log(
+      "GradientTransitionOrchestrator",
+      "Colors applied, coordinating gradient updates",
+      {
+        backend: this.currentBackend,
+        accentHex: data.accentHex
+      }
+    );
+  }
+
+  private handlePerformanceFrame(data: EventData<"performance:frame">): void {
+    // Monitor performance for automatic backend switching
+    if (data.fps < this.performanceThresholds.minFPS && this.currentBackend === "webgl") {
+      // Performance is below threshold - consider fallback
+      this.performanceHistory.push({
+        timestamp: data.timestamp,
+        fps: data.fps,
+        memoryMB: data.memoryUsage,
+        cpuPercent: 0, // Not available in this event
+        gpuPercent: 0  // Not available in this event
+      });
+
+      // Keep only recent history
+      const cutoffTime = data.timestamp - this.performanceThresholds.stabilityWindow;
+      this.performanceHistory = this.performanceHistory.filter(
+        entry => entry.timestamp > cutoffTime
+      );
+
+      // Check if we need to fallback
+      const recentLowPerformance = this.performanceHistory.filter(
+        entry => entry.fps < this.performanceThresholds.minFPS
+      );
+
+      if (recentLowPerformance.length > this.performanceHistory.length * 0.7) {
+        Y3K?.debug?.warn(
+          "GradientTransitionOrchestrator",
+          "Consistent low performance detected, switching to CSS fallback",
+          {
+            avgFPS: recentLowPerformance.reduce((sum, entry) => sum + entry.fps, 0) / recentLowPerformance.length,
+            threshold: this.performanceThresholds.minFPS
+          }
+        );
+        this.transitionToBackend("css", { mode: "instant", duration: 0, easing: "linear", preserveState: true, fallbackDelay: 0 });
+      }
+    }
+  }
+
+  private handleMusicTrackChanged(data: EventData<"music:track-changed">): void {
+    // Reset gradient state for new track
+    Y3K?.debug?.log(
+      "GradientTransitionOrchestrator",
+      "Track changed, preparing gradient for new colors",
+      {
+        trackUri: data.trackUri,
+        artist: data.artist,
+        title: data.title
+      }
+    );
+
+    // Clear old gradient state to allow fresh color extraction
+    this.lastGradientState = null;
   }
 
   private handleVisibilityChange(): void {
@@ -694,16 +1022,25 @@ export class GradientTransitionOrchestrator {
 
   private adaptToUserPreferences(): void {
     const optimalBackend = this.determineOptimalBackend();
-    
+
     if (optimalBackend !== this.currentBackend && !this.transitionInProgress) {
       this.transitionToBackend(optimalBackend);
     }
   }
 
   private updateCSSTransitionState(): void {
-    this.cssVariableBatcher.setProperty("--sn-current-backend", this.currentBackend);
-    this.cssVariableBatcher.setProperty("--sn-webgl-enabled", this.currentBackend === "webgl" ? "1" : "0");
-    this.cssVariableBatcher.setProperty("--sn-hybrid-mode", this.currentBackend === "hybrid" ? "1" : "0");
+    this.cssConsciousnessController.setProperty(
+      "--sn-current-backend",
+      this.currentBackend
+    );
+    this.cssConsciousnessController.setProperty(
+      "--sn-webgl-enabled",
+      this.currentBackend === "webgl" ? "1" : "0"
+    );
+    this.cssConsciousnessController.setProperty(
+      "--sn-hybrid-mode",
+      this.currentBackend === "hybrid" ? "1" : "0"
+    );
   }
 
   // Public API methods
@@ -733,8 +1070,13 @@ export class GradientTransitionOrchestrator {
     this.transitionConfig = { ...this.transitionConfig, ...config };
   }
 
-  public setPerformanceThresholds(thresholds: Partial<PerformanceThresholds>): void {
-    this.performanceThresholds = { ...this.performanceThresholds, ...thresholds };
+  public setPerformanceThresholds(
+    thresholds: Partial<PerformanceThresholds>
+  ): void {
+    this.performanceThresholds = {
+      ...this.performanceThresholds,
+      ...thresholds,
+    };
   }
 
   public destroy(): void {
@@ -749,22 +1091,42 @@ export class GradientTransitionOrchestrator {
       this.fallbackTimer = null;
     }
 
-    // Remove event listeners
+    // Remove unified event bus subscriptions
+    this.eventSubscriptionIds.forEach((subscriptionId) => {
+      unifiedEventBus.unsubscribe(subscriptionId);
+    });
+    this.eventSubscriptionIds = [];
+
+    Y3K?.debug?.log(
+      "GradientTransitionOrchestrator",
+      "Unified event subscriptions cleaned up"
+    );
+
+    // Remove legacy event listeners
     if (this.boundSettingsChange) {
-      document.removeEventListener("year3000SystemSettingsChanged", this.boundSettingsChange);
+      document.removeEventListener(
+        "year3000SystemSettingsChanged",
+        this.boundSettingsChange
+      );
     }
 
     if (this.boundVisibilityChange) {
-      document.removeEventListener("visibilitychange", this.boundVisibilityChange);
+      document.removeEventListener(
+        "visibilitychange",
+        this.boundVisibilityChange
+      );
     }
 
     // Clean up systems
     this.webglAdapter?.destroy();
 
     // Reset CSS state
-    this.cssVariableBatcher.setProperty("--sn-gradient-backend", "css");
-    this.cssVariableBatcher.setProperty("--sn-webgl-ready", "0");
-    this.cssVariableBatcher.setProperty("--sn-gradient-transition-active", "0");
+    this.cssConsciousnessController.setProperty("--sn-gradient-backend", "css");
+    this.cssConsciousnessController.setProperty("--sn-webgl-ready", "0");
+    this.cssConsciousnessController.setProperty(
+      "--sn-gradient-transition-active",
+      "0"
+    );
 
     Y3K?.debug?.log("GradientTransitionOrchestrator", "Destroyed");
   }
