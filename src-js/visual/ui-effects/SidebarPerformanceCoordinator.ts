@@ -6,11 +6,11 @@
  * sidebar element performance and extensible to multiple sidebar locations.
  */
 
-import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
-import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
 import { MODERN_SELECTORS } from "@/debug/SpotifyDOMSelectors";
-import { GlobalEventBus } from "@/core/events/EventBus";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 
 interface PendingUpdate {
   property: string;
@@ -21,7 +21,7 @@ interface PendingUpdate {
 interface CoordinatorConfig {
   enableDebug?: boolean;
   maxBatchSize?: number;
-  performanceAnalyzer?: PerformanceAnalyzer;
+  performanceAnalyzer?: SimplePerformanceCoordinator;
   onFlushComplete?: () => void;
 }
 
@@ -32,7 +32,8 @@ export class SidebarPerformanceCoordinator {
   private isFlushScheduled: boolean = false;
   private rafId: number | null = null;
   private config: CoordinatorConfig;
-  private performanceAnalyzer: PerformanceAnalyzer | null = null;
+  private performanceAnalyzer: SimplePerformanceCoordinator | null = null;
+  private cssController!: OptimizedCSSVariableManager;
 
   // Harmonic variable mapping for Year 3000 convergence
   private readonly harmonicVariableMap: Map<string, string> = new Map([
@@ -72,6 +73,10 @@ export class SidebarPerformanceCoordinator {
     };
 
     this.performanceAnalyzer = config.performanceAnalyzer || null;
+
+    // Initialize CSS coordination - use globalThis to access Year3000System
+    const year3000System = (globalThis as any).year3000System;
+    this.cssController = year3000System?.cssConsciousnessController || getGlobalOptimizedCSSController();
     
     // Initialize budget manager if performance analyzer is available
     if (this.performanceAnalyzer) {
@@ -114,15 +119,16 @@ export class SidebarPerformanceCoordinator {
       return;
     }
 
-    // Delegate non-critical vars to global UnifiedCSSConsciousnessController for sync flush
-    const cssController = UnifiedCSSConsciousnessController.getInstance();
-    if (cssController) {
+    // Delegate non-critical vars to global OptimizedCSSVariableManager for sync flush
+    try {
+      const cssController = getGlobalOptimizedCSSController();
       cssController.queueCSSVariableUpdate(
         property,
         value,
         this.getSidebarElement() as HTMLElement
       );
-    } else {
+    } catch (error) {
+      // Global CSS controller not available, use fallback
       this.pendingUpdates.set(property, {
         property,
         value,
@@ -143,16 +149,20 @@ export class SidebarPerformanceCoordinator {
    * Apply critical updates immediately to the sidebar element
    */
   private applyCriticalUpdate(property: string, value: string): void {
-    const sidebarElement = this.getSidebarElement();
-    if (sidebarElement) {
-      try {
-        (sidebarElement as HTMLElement).style.setProperty(property, value);
-      } catch (error) {
-        console.error(
-          `🌌 [SidebarPerformanceCoordinator] Failed to apply critical ${property}:`,
-          error
-        );
-      }
+    try {
+      // Apply critical updates using coordination (high performance path)
+      this.cssController.setVariable(
+        "SidebarPerformanceCoordinator",
+        property,
+        value,
+        "critical", // Critical priority for performance-critical sidebar updates
+        "sidebar-critical-update"
+      );
+    } catch (error) {
+      console.error(
+        `🌌 [SidebarPerformanceCoordinator] Failed to apply critical ${property}:`,
+        error
+      );
     }
   }
 
@@ -217,19 +227,20 @@ export class SidebarPerformanceCoordinator {
       );
     }
 
-    // Apply all updates atomically to the sidebar element with harmonic mapping
-    for (const update of this.pendingUpdates.values()) {
-      try {
-        // Apply the original variable to the sidebar element
-        (targetElement as HTMLElement).style.setProperty(
-          update.property,
-          update.value
-        );
+    // Apply all updates atomically using coordination with harmonic mapping
+    try {
+      // Prepare batched variables for sidebar element
+      const sidebarVariables: Record<string, string> = {};
+      const globalHarmonicVariables: Record<string, string> = {};
 
-        // Also apply to global harmonic if mapping exists
+      for (const update of this.pendingUpdates.values()) {
+        // Add to sidebar batch
+        sidebarVariables[update.property] = update.value;
+
+        // Check for global harmonic mapping
         const harmonicVar = this.harmonicVariableMap.get(update.property);
         if (harmonicVar) {
-          document.documentElement.style.setProperty(harmonicVar, update.value);
+          globalHarmonicVariables[harmonicVar] = update.value;
 
           if (this.config.enableDebug) {
             console.log(
@@ -237,12 +248,30 @@ export class SidebarPerformanceCoordinator {
             );
           }
         }
-      } catch (error) {
-        console.error(
-          `🌌 [SidebarPerformanceCoordinator] Failed to apply ${update.property}:`,
-          error
+      }
+
+      // Apply sidebar variables directly to sidebar element (atomic batching requirement)
+      if (Object.keys(sidebarVariables).length > 0) {
+        const sidebarElement = targetElement as HTMLElement;
+        for (const [property, value] of Object.entries(sidebarVariables)) {
+          sidebarElement.style.setProperty(property, value);
+        }
+      }
+
+      // Apply global harmonic variables using coordination (targeting document root)
+      if (Object.keys(globalHarmonicVariables).length > 0) {
+        this.cssController.batchSetVariables(
+          "SidebarPerformanceCoordinator",
+          globalHarmonicVariables,
+          "high", // High priority for harmonic variable mapping
+          "harmonic-variable-mapping"
         );
       }
+    } catch (error) {
+      console.error(
+        `🌌 [SidebarPerformanceCoordinator] Failed to apply batched updates:`,
+        error
+      );
     }
 
     // Clear pending updates
@@ -306,14 +335,18 @@ export class SidebarPerformanceCoordinator {
       return; // Already subscribed
     }
 
-    this.musicChangeUnsubscribe = GlobalEventBus.on('music:now-playing-changed', (eventData: {
-      timestamp: number;
-      source: string;
-      reason: string;
-    }) => {
+    this.musicChangeUnsubscribe = () => {
+      unifiedEventBus.unsubscribeAll('SidebarPerformanceCoordinator');
+    };
+    
+    unifiedEventBus.subscribe('music:track-changed', (data) => {
       // Handle music change event without triggering DOM mutation cascades
-      this.handleMusicChange(eventData);
-    });
+      this.handleMusicChange({
+        timestamp: data.timestamp,
+        source: 'track-changed',
+        reason: 'music:track-changed event'
+      });
+    }, 'SidebarPerformanceCoordinator');
 
     if (this.config.enableDebug) {
       console.log("🌌 [SidebarPerformanceCoordinator] Event-driven music coordination active");

@@ -1,6 +1,6 @@
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import type { Year3000Config } from "@/types/models";
@@ -29,7 +29,7 @@ interface SystemMetrics {
 export abstract class BaseVisualSystem {
   protected config: SystemConfig;
   protected utils: typeof Year3000Utilities;
-  protected performanceMonitor: PerformanceAnalyzer;
+  protected performanceMonitor: SimplePerformanceCoordinator;
   protected musicSyncService: MusicSyncService | null;
   protected settingsManager: SettingsManager | null;
   protected systemName: string;
@@ -41,7 +41,6 @@ export abstract class BaseVisualSystem {
   // Add missing properties from the original JS version for state management.
   protected metrics: SystemMetrics;
   private _resizeHandler: (() => void) | null;
-  private _initializationStartTime: number | null = null;
 
   // GPU-accelerated canvas support
   protected canvasCapabilities: {
@@ -53,7 +52,7 @@ export abstract class BaseVisualSystem {
   constructor(
     config: SystemConfig = YEAR3000_CONFIG,
     utils: typeof Year3000Utilities = Year3000Utilities,
-    performanceMonitor: PerformanceAnalyzer,
+    performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null,
     settingsManager: SettingsManager | null
   ) {
@@ -84,13 +83,9 @@ export abstract class BaseVisualSystem {
 
   // Replace the current skeletal `initialize` method with this complete, multi-phase version.
   async initialize() {
+    const initStartTime = this.config.enableDebug ? performance.now() : 0;
     if (this.config.enableDebug) {
       console.log(`[${this.systemName}] Initializing...`);
-      if (this.performanceMonitor) {
-        this._initializationStartTime = this.performanceMonitor.startTiming(
-          `initialize_${this.systemName}`
-        );
-      }
     }
 
     // Phase 1: Set up settings manager and performance profile listener.
@@ -109,9 +104,9 @@ export abstract class BaseVisualSystem {
           quality = detectorInstance.recommendPerformanceQuality();
         }
 
-        this.performanceMonitor?.emitTrace?.(
-          `[${this.systemName}] Auto-selected performance quality '${quality}' based on device capability.`
-        );
+        if (this.config.enableDebug) {
+          console.log(`[${this.systemName}] Auto-selected performance quality '${quality}' based on device capability.`);
+        }
 
         this._applyPerformanceProfile(quality);
       } catch (e) {
@@ -145,14 +140,9 @@ export abstract class BaseVisualSystem {
       }
     }
 
-    if (this.config.enableDebug && this._initializationStartTime !== null && this.performanceMonitor) {
-      this.performanceMonitor.endTiming(
-        `initialize_${this.systemName}`,
-        this._initializationStartTime
-      );
-      // We no longer get the time back directly, so we just log completion.
-      // The PerformanceAnalyzer will handle aggregation.
-      console.log(`[${this.systemName}] Initialization complete.`);
+    if (this.config.enableDebug) {
+      const duration = performance.now() - initStartTime;
+      console.log(`[${this.systemName}] Initialization complete in ${duration.toFixed(2)}ms`);
     }
   }
 

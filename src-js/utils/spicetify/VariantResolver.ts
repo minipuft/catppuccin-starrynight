@@ -5,7 +5,7 @@
 
 // Import spicetify types via triple-slash directive
 /// <reference path="../../../types/spicetify.d.ts" />
-import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
+import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
 
 declare const Spicetify: any;
 
@@ -39,7 +39,7 @@ export interface VariantContext {
 
 export class VariantResolver {
   private config: VariantConfig;
-  private cssConsciousnessController: UnifiedCSSConsciousnessController | null = null;
+  private cssConsciousnessController: OptimizedCSSVariableManager | null = null;
   private variantCache: Map<string, VariantMapping> = new Map();
   private initialized: boolean = false;
 
@@ -258,7 +258,7 @@ export class VariantResolver {
     };
   }
 
-  public initialize(cssConsciousnessController?: UnifiedCSSConsciousnessController): void {
+  public initialize(cssConsciousnessController?: OptimizedCSSVariableManager): void {
     this.cssConsciousnessController = cssConsciousnessController || null;
     this.initialized = true;
     

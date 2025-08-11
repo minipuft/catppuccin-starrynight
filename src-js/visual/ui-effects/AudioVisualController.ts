@@ -2,7 +2,7 @@
 // 🎆 AUDIO VISUAL CONTROLLER – Phase 2 of Cosmic Mood Field
 // ============================================================================
 // Maps beat, genre, and scroll events to Nebula-related CSS custom properties.
-// Keeps scripting cost low by batching variable writes via UnifiedCSSConsciousnessController.
+// Keeps scripting cost low by batching variable writes via UnifiedCSSVariableManager.
 // ---------------------------------------------------------------------------
 // BACKWARD-COMPATIBILITY CONTRACT:
 //  • No existing public interfaces are modified.
@@ -11,14 +11,14 @@
 //    it falls back to lightweight direct style writes.
 // ---------------------------------------------------------------------------
 
-import { NEBULA_INTENSITY_KEY } from "@/config/settingKeys";
-import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
-import { GlobalEventBus } from "@/core/events/EventBus";
-import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+// NOTE: NEBULA_INTENSITY_KEY has been removed in settings rationalization
+import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Year3000System } from "@/core/lifecycle/year3000System";
-import { UserGenreHistory } from "@/utils/platform/UserHistory";
-import { Y3K } from "@/debug/UnifiedDebugManager";
+import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
+import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { BeatPayload } from "@/types/systems";
+import { UserGenreHistory } from "@/utils/platform/UserHistory";
 
 // -----------------------------
 // Payload typings (lightweight) – kept in-file to avoid tight coupling.
@@ -50,50 +50,40 @@ function median(values: number[]): number {
 }
 
 export class AudioVisualController {
-  // TODO: Expand settings integration in Phase 4 (intensity toggle)
-  private batcher: UnifiedCSSConsciousnessController | null = null;
-  private perf: PerformanceAnalyzer | null = null;
+  // CSS coordination systems
+  private cssController: OptimizedCSSVariableManager;
+  
+  // Core systems
+  private perf: SimplePerformanceCoordinator | null = null;
   private year3000System: Year3000System | null;
+  
+  // Event management
   private unsubscribers: (() => void)[] = [];
+  
+  // Performance tracking
   private frameDurations: number[] = [];
   private static readonly FRAME_HISTORY = 120; // rolling window for medians
+  
+  // Configuration
   private enabled = true;
   private intensitySetting: "disabled" | "minimal" | "balanced" | "intense" =
     "balanced";
   private intensityFactor = 1;
+  
+  // State management
   private genreHistory = new UserGenreHistory();
   private activeGlowTimeout: ReturnType<typeof setTimeout> | null = null;
   private interactionOffHandler: (() => void) | null = null;
 
   constructor(
     y3k: Year3000System | null = null,
-    batcher?: UnifiedCSSConsciousnessController,
-    perf?: PerformanceAnalyzer
+    cssController?: OptimizedCSSVariableManager,
+    perf?: SimplePerformanceCoordinator
   ) {
     this.year3000System = y3k;
 
-    // Prefer caller-supplied batcher, else shared instance from Year3000System,
-    // else fall back to an internal self-owned batcher.
-    if (batcher) {
-      this.batcher = batcher;
-    } else {
-      const sharedBatcher = y3k?.cssConsciousnessController;
-      if (sharedBatcher) {
-        this.batcher = sharedBatcher;
-      } else {
-        // Can't create UnifiedCSSConsciousnessController without proper dependencies
-        // Use getInstance to try to get an existing one or null
-        const fallbackController = UnifiedCSSConsciousnessController.getInstance();
-        if (fallbackController) {
-          this.batcher = fallbackController;
-        } else {
-          // Disable this controller if no CSS consciousness is available
-          this.enabled = false;
-          this.batcher = null;
-          Y3K?.debug?.warn("AudioVisualController", "No UnifiedCSSConsciousnessController available, disabling audio visual effects");
-        }
-      }
-    }
+    // Initialize CSS controller - prefer shared instances from Year3000System
+    this.cssController = cssController ?? y3k?.cssConsciousnessController ?? getGlobalOptimizedCSSController();
 
     this.perf = perf ? perf : y3k?.performanceAnalyzer ?? null;
 
@@ -107,8 +97,9 @@ export class AudioVisualController {
     // Read user setting if available
     const settings = y3k?.settingsManager;
     if (settings) {
+      // NOTE: Nebula intensity setting has been removed - use gradient intensity instead
       this.intensitySetting =
-        (settings.get as any)(NEBULA_INTENSITY_KEY) ?? "balanced";
+        (settings.get as any)("sn-gradient-intensity") ?? "balanced";
     }
 
     switch (this.intensitySetting) {
@@ -134,27 +125,43 @@ export class AudioVisualController {
       this._subscribe();
     } else {
       // Ensure nebula vars stay neutral even when disabled
-      if (typeof document !== "undefined") {
-        document.documentElement.style.setProperty(
-          "--sn-nebula-beat-intensity",
-          "0"
-        );
-      }
+      this.cssController.setVariable(
+        "AudioVisualController",
+        "--sn-nebula-beat-intensity",
+        "0",
+        "low",
+        "disabled-initialization"
+      );
     }
   }
 
   private _subscribe(): void {
-    this.unsubscribers.push(
-      GlobalEventBus.subscribe<BeatPayload>("music:beat", (p) =>
-        this._handleBeat(p)
-      ),
-      GlobalEventBus.subscribe<GenreChangePayload>("music:genre-change", (p) =>
-        this._handleGenreChange(p)
-      ),
-      GlobalEventBus.subscribe<ScrollPayload>("user:scroll", (p) =>
-        this._handleScroll(p)
-      )
-    );
+    // Subscribe to unified event bus events
+    const subscriptionIds = [
+      unifiedEventBus.subscribe("music:beat", (data) => {
+        this._handleBeat({
+          energy: data.intensity,
+          bpm: data.bpm
+        });
+      }, 'AudioVisualController'),
+      
+      unifiedEventBus.subscribe("music:track-changed", (data) => {
+        // Simulate genre change for track changes - could be enhanced with genre detection
+        this._handleGenreChange({
+          genre: 'unknown' // Could be enhanced with actual genre detection
+        });
+      }, 'AudioVisualController'),
+      
+      unifiedEventBus.subscribe("user:scroll", (data) => {
+        this._handleScroll({
+          velocity: data.velocity?.x || data.velocity?.y || 0,
+          direction: data.direction === 'up' ? 'up' : 'down'
+        });
+      }, 'AudioVisualController')
+    ];
+
+    // Create unsubscriber functions
+    this.unsubscribers = subscriptionIds.map(id => () => unifiedEventBus.unsubscribe(id));
   }
 
   // ---------------------------------------------------------------------------
@@ -170,11 +177,22 @@ export class AudioVisualController {
     const intensity =
       (0.8 + Math.min(Math.max(safeEnergy, 0), 1) * 0.6) * this.intensityFactor;
 
-    this._queueVar("--sn-nebula-beat-intensity", intensity.toFixed(3));
+    // High priority for beat intensity (time-critical for music sync)
+    this._queueVar(
+      "--sn-nebula-beat-intensity", 
+      intensity.toFixed(3), 
+      "high", 
+      "beat-sync"
+    );
 
     // 🎨 Adaptive Chromatic Aberration – map beat energy to strength (0–0.6)
     const aberrationStrength = (safeEnergy * 0.6).toFixed(3);
-    this._queueVar("--sn-nebula-aberration-strength", aberrationStrength);
+    this._queueVar(
+      "--sn-nebula-aberration-strength", 
+      aberrationStrength, 
+      "normal", 
+      "beat-aberration"
+    );
 
     this._recordDuration(t0);
   }
@@ -190,17 +208,29 @@ export class AudioVisualController {
     this.genreHistory.markSeen(payload.genre);
 
     const cueOpacity = 0.18 * this.intensityFactor; // slightly stronger than phase2
-    this._queueVar("--sn-nebula-layer-0-opacity", cueOpacity.toFixed(3));
+    this._queueVar(
+      "--sn-nebula-layer-0-opacity", 
+      cueOpacity.toFixed(3), 
+      "high", 
+      "genre-discovery"
+    );
 
     const clearCue = () => {
       // Clear timeout from either system
       if (this.year3000System?.timerConsolidationSystem) {
-        this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("AudioVisualController-glowTimeout");
+        this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer(
+          "AudioVisualController-glowTimeout"
+        );
       } else if (this.activeGlowTimeout) {
         clearTimeout(this.activeGlowTimeout);
         this.activeGlowTimeout = null;
       }
-      this._queueVar("--sn-nebula-layer-0-opacity", "0.05");
+      this._queueVar(
+        "--sn-nebula-layer-0-opacity", 
+        "0.05", 
+        "normal", 
+        "genre-clear"
+      );
       if (this.interactionOffHandler) {
         document.removeEventListener("pointerdown", this.interactionOffHandler);
         document.removeEventListener("keydown", this.interactionOffHandler);
@@ -232,7 +262,12 @@ export class AudioVisualController {
     });
 
     // Trigger easing animation for smoother gradient stops (Phase 2)
-    this._queueVar("--sn-nebula-ease-t", "1");
+    this._queueVar(
+      "--sn-nebula-ease-t", 
+      "1", 
+      "normal", 
+      "ease-trigger"
+    );
 
     this._recordDuration(t0);
   }
@@ -247,7 +282,9 @@ export class AudioVisualController {
 
     this._queueVar(
       "--sn-nebula-layer-3-blur",
-      `calc(var(--sn-depth-layer-3-blur) + ${blurBoost.toFixed(2)}px)`
+      `calc(var(--sn-depth-layer-3-blur) + ${blurBoost.toFixed(2)}px)`,
+      "normal",
+      "scroll-blur"
     );
 
     // [Phase 1] Map scroll velocity (px/frame) → noise vertical scale.
@@ -259,7 +296,12 @@ export class AudioVisualController {
     const deltaScale = (clampedVel / 50) * 50; // -50..50
     const noiseScale = Math.max(140, Math.min(200, baseScaleY + deltaScale));
     // TODO(Phase-2): Profile GPU cost of color-dodge + large textures at >180%.
-    this._queueVar("--sn-nebula-noise-scale-y", `${noiseScale.toFixed(1)}%`);
+    this._queueVar(
+      "--sn-nebula-noise-scale-y", 
+      `${noiseScale.toFixed(1)}%`,
+      "normal",
+      "scroll-noise"
+    );
 
     this._recordDuration(t0);
   }
@@ -267,16 +309,22 @@ export class AudioVisualController {
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
-  private _queueVar(prop: string, value: string): void {
+  private _queueVar(
+    prop: string, 
+    value: string, 
+    priority: "low" | "normal" | "high" | "critical" = "normal",
+    source: string = "audio-visual"
+  ): void {
     if (!this.enabled) return;
-    if (this.year3000System) {
-      this.year3000System.queueCSSVariableUpdate(prop, value);
-    } else if (this.batcher) {
-      this.batcher.queueCSSVariableUpdate(prop, value);
-    } else {
-      // Fallback to direct style update
-      document.documentElement.style.setProperty(prop, value);
-    }
+    
+    // Use coordination-first approach with proper priority handling
+    this.cssController.setVariable(
+      "AudioVisualController",
+      prop,
+      value,
+      priority,
+      source
+    );
   }
 
   private _recordDuration(start: number): void {
@@ -296,34 +344,39 @@ export class AudioVisualController {
         );
 
         // 🚦 Performance guard: fallback blend mode to 'screen' to reduce GPU cost
-        this._queueVar("--sn-nebula-blend-mode", "screen");
+        this._queueVar(
+          "--sn-nebula-blend-mode", 
+          "screen",
+          "critical",
+          "performance-fallback"
+        );
       }
     }
 
-    // Emit to PerformanceAnalyzer bucket every ~60 fps
-    this.perf?.shouldUpdate("nebulaCtr", 1000) &&
-      this.perf?.endTiming("AudioVisualController", start);
+    // Performance monitoring integrated into tier-based system
   }
 
   public destroy(): void {
     // Unregister timer from consolidation system
     if (this.year3000System?.timerConsolidationSystem) {
-      this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("AudioVisualController-glowTimeout");
+      this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer(
+        "AudioVisualController-glowTimeout"
+      );
     }
-    
+
     // Clear active timeout (fallback)
     if (this.activeGlowTimeout) {
       clearTimeout(this.activeGlowTimeout);
       this.activeGlowTimeout = null;
     }
-    
+
     // Remove event listeners
     if (this.interactionOffHandler) {
       document.removeEventListener("pointerdown", this.interactionOffHandler);
       document.removeEventListener("keydown", this.interactionOffHandler);
       this.interactionOffHandler = null;
     }
-    
+
     this.unsubscribers.forEach((u) => u());
     this.unsubscribers = [];
   }

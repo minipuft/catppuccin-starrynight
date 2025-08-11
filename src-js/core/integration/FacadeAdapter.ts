@@ -1,23 +1,23 @@
 /**
  * Facade Adapter Implementation
- * 
+ *
  * Adapts existing facade systems to use Strategy-based creation patterns,
  * eliminating hardcoded constructor logic and "post-creation dependency linking".
- * 
+ *
  * This adapter implements the Adapter pattern to bridge the gap between
  * legacy facade systems and the new strategy-based architecture.
  */
 
-import { Y3K } from "@/debug/UnifiedDebugManager";
 import { globalStrategyBasedFactory } from "@/core/creation/StrategyBasedFactory";
+import type { NonVisualSystemKey } from "@/core/integration/NonVisualSystemFacade";
+import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import type { Year3000Config } from "@/types/models";
 import type {
   IFacadeAdapter,
   IStrategyBasedFactory,
   SystemCreationContext,
-  SystemCreationResult
+  SystemCreationResult,
 } from "@/types/systemCreationStrategy";
-import type { Year3000Config } from "@/types/models";
-import type { NonVisualSystemKey } from "@/core/integration/NonVisualSystemFacade";
 import * as Utils from "@/utils/core/Year3000Utilities";
 
 // ============================================================================
@@ -36,8 +36,12 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
   private systemsUsingLegacy: Set<string> = new Set();
 
   constructor(strategyBasedFactory?: IStrategyBasedFactory) {
-    this.strategyBasedFactory = strategyBasedFactory || globalStrategyBasedFactory;
-    Y3K?.debug?.log("NonVisualSystemFacadeAdapter", "Facade adapter initialized");
+    this.strategyBasedFactory =
+      strategyBasedFactory || globalStrategyBasedFactory;
+    Y3KDebug?.debug?.log(
+      "NonVisualSystemFacadeAdapter",
+      "Facade adapter initialized"
+    );
   }
 
   /**
@@ -47,8 +51,11 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
     this.strategyBasedFactory = factory;
     this.adapted = true;
     this.migrationProgress = 1.0; // Mark as fully adapted
-    
-    Y3K?.debug?.log("NonVisualSystemFacadeAdapter", "Facade adapted to strategy pattern");
+
+    Y3KDebug?.debug?.log(
+      "NonVisualSystemFacadeAdapter",
+      "Facade adapted to strategy pattern"
+    );
   }
 
   /**
@@ -64,7 +71,7 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
       adapted: this.adapted,
       systemsUsingStrategyPattern: Array.from(this.systemsUsingStrategy),
       systemsUsingLegacyPattern: Array.from(this.systemsUsingLegacy),
-      migrationProgress: this.migrationProgress
+      migrationProgress: this.migrationProgress,
     };
   }
 
@@ -75,11 +82,14 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
     if (!this.adapted) {
       this.adaptToStrategyPattern(this.strategyBasedFactory);
     }
-    
+
     this.migrationProgress = 1.0;
     this.systemsUsingLegacy.clear();
-    
-    Y3K?.debug?.log("NonVisualSystemFacadeAdapter", "Migration to strategy pattern completed");
+
+    Y3KDebug?.debug?.log(
+      "NonVisualSystemFacadeAdapter",
+      "Migration to strategy pattern completed"
+    );
   }
 
   /**
@@ -87,7 +97,7 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
    */
   async createSystemWithStrategy<T = any>(
     systemKey: NonVisualSystemKey,
-    SystemClass: new(...args: any[]) => T,
+    SystemClass: new (...args: any[]) => T,
     context: {
       config: Year3000Config;
       utils: typeof Utils;
@@ -98,6 +108,11 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
         year3000System?: any;
         cssConsciousnessController?: any;
         performanceCoordinator?: any;
+        // New simplified performance system dependencies
+        deviceCapabilityDetector?: any;
+        enhancedDeviceTierDetector?: any;
+        webglSystemsIntegration?: any;
+        simplePerformanceCoordinator?: any;
       };
       year3000System: any;
     }
@@ -112,17 +127,17 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
         lazyInit: false,
         validateDependencies: true,
         creationTimeout: 5000,
-        monitorCreation: true
+        monitorCreation: true,
       },
       metadata: {
         timestamp: Date.now(),
-        reason: 'startup',
-        priority: 'medium',
+        reason: "startup",
+        priority: "medium",
         resourceConstraints: {
           maxMemoryMB: 50,
-          maxInitTimeMs: 1000
-        }
-      }
+          maxInitTimeMs: 1000,
+        },
+      },
     };
 
     try {
@@ -143,37 +158,42 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
 
       this.updateMigrationProgress();
 
-      Y3K?.debug?.log("NonVisualSystemFacadeAdapter", 
-        `Created ${systemKey} via strategy pattern`, {
+      Y3KDebug?.debug?.log(
+        "NonVisualSystemFacadeAdapter",
+        `Created ${systemKey} via strategy pattern`,
+        {
           strategy: result.strategy,
           success: result.success,
-          creationTime: result.creationTime
-        });
+          creationTime: result.creationTime,
+        }
+      );
 
       return result;
-
     } catch (error) {
       // Fallback tracking
       this.systemsUsingLegacy.add(systemKey);
       this.updateMigrationProgress();
 
-      Y3K?.debug?.error("NonVisualSystemFacadeAdapter", 
-        `Failed to create ${systemKey} via strategy pattern:`, error);
+      Y3KDebug?.debug?.error(
+        "NonVisualSystemFacadeAdapter",
+        `Failed to create ${systemKey} via strategy pattern:`,
+        error
+      );
 
       // Return failed result
       return {
         system: null as any,
         success: false,
         creationTime: 0,
-        strategy: 'adapter-fallback',
+        strategy: "adapter-fallback",
         injectedDependencies: [],
         warnings: [`Strategy creation failed: ${error}`],
         error: error as Error,
         metadata: {
           requiresInitialization: false,
           pendingDependencies: [],
-          context: creationContext
-        }
+          context: creationContext,
+        },
       };
     }
   }
@@ -184,7 +204,7 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
    */
   createSystemLegacy<T = any>(
     systemKey: NonVisualSystemKey,
-    SystemClass: new(...args: any[]) => T,
+    SystemClass: new (...args: any[]) => T,
     context: {
       config: Year3000Config;
       utils: typeof Utils;
@@ -195,6 +215,11 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
         year3000System?: any;
         cssConsciousnessController?: any;
         performanceCoordinator?: any;
+        // New simplified performance system dependencies
+        deviceCapabilityDetector?: any;
+        enhancedDeviceTierDetector?: any;
+        webglSystemsIntegration?: any;
+        simplePerformanceCoordinator?: any;
       };
       year3000System: any;
     }
@@ -203,35 +228,39 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
     this.systemsUsingLegacy.add(systemKey);
     this.updateMigrationProgress();
 
-    Y3K?.debug?.warn("NonVisualSystemFacadeAdapter", 
-      `Using legacy creation for ${systemKey} - should migrate to strategy pattern`);
+    Y3KDebug?.debug?.warn(
+      "NonVisualSystemFacadeAdapter",
+      `Using legacy creation for ${systemKey} - should migrate to strategy pattern`
+    );
 
     // Minimal legacy fallback logic (most systems now use strategy pattern)
     switch (systemKey) {
       // Simple systems with no dependencies
-      case 'DeviceCapabilityDetector':
-      case 'PerformanceAnalyzer':
-      case 'SettingsManager':
-      case 'TimerConsolidationSystem':
+      case "DeviceCapabilityDetector":
+      case "PerformanceAnalyzer":
+      case "SettingsManager":
+      case "TimerConsolidationSystem":
         return new SystemClass() as T;
 
       // Systems with single dependency
-      case 'SidebarSystemsIntegration':
-        return new SystemClass(context.dependencies.cssConsciousnessController) as T;
-      
+      case "SidebarSystemsIntegration":
+        return new SystemClass(
+          context.dependencies.cssConsciousnessController
+        ) as T;
+
       // CSS Consciousness Controller with performance coordinator dependency
-      case 'UnifiedCSSConsciousnessController':
+      case "OptimizedCSSVariableManager":
         return new SystemClass(
           context.config,
           context.dependencies.performanceCoordinator
         ) as T;
 
-      // Systems consolidated into UnifiedCSSConsciousnessController:
-      // - UnifiedCSSConsciousnessController (batching layer)
-      // - UnifiedCSSConsciousnessController (management layer)  
-      // - UnifiedCSSConsciousnessController (performance layer)
+      // Systems consolidated into OptimizedCSSVariableManager:
+      // - OptimizedCSSVariableManager (unified CSS coordination)
+      // - UnifiedCSSVariableManager (management layer)
+      // - OptimizedCSSVariableManager (performance layer)
 
-      case 'ColorHarmonyEngine':
+      case "ColorHarmonyEngine":
         return new SystemClass(
           context.config,
           context.utils,
@@ -239,19 +268,19 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
           context.dependencies.settingsManager
         ) as T;
 
-      case 'EnhancedMasterAnimationCoordinator':
+      case "EnhancedMasterAnimationCoordinator":
         return new SystemClass(
           context.config,
           context.dependencies.performanceCoordinator
         ) as T;
 
-      case 'UnifiedPerformanceCoordinator':
+      case "UnifiedPerformanceCoordinator":
         return new SystemClass(
           context.config,
           context.dependencies.performanceAnalyzer
         ) as T;
 
-      case 'GlassmorphismManager':
+      case "GlassmorphismManager":
         return new SystemClass(
           context.config,
           context.utils,
@@ -260,14 +289,14 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
           context.dependencies.settingsManager
         ) as T;
 
-      case 'Card3DManager':
+      case "Card3DManager":
         return new SystemClass(
           context.dependencies.performanceAnalyzer,
           context.dependencies.settingsManager,
           context.utils
         ) as T;
 
-      case 'MusicSyncService':
+      case "MusicSyncService":
         // MusicSyncService uses object dependencies pattern
         return new SystemClass({
           YEAR3000_CONFIG: context.config,
@@ -276,6 +305,38 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
           year3000System: context.year3000System,
           // NOTE: colorHarmonyEngine deliberately omitted - using event-driven pattern
         }) as T;
+
+      // New simplified performance systems
+      case "EnhancedDeviceTierDetector":
+        // EnhancedDeviceTierDetector is a static class, return the class itself
+        return SystemClass as any as T;
+
+      case "WebGLSystemsIntegration":
+        // WebGLSystemsIntegration takes DeviceCapabilityDetector (not enhanced tier detector)
+        // Need to get the proper DeviceCapabilityDetector from dependencies
+        const deviceCapabilityDetector = context.dependencies.deviceCapabilityDetector;
+        if (!deviceCapabilityDetector) {
+          throw new Error("WebGLSystemsIntegration requires DeviceCapabilityDetector");
+        }
+        return new SystemClass(deviceCapabilityDetector) as T;
+
+      case "SimplePerformanceCoordinator":
+        // SimplePerformanceCoordinator takes EnhancedDeviceTierDetector and WebGLSystemsIntegration
+        const enhancedTierDetector = context.dependencies.enhancedDeviceTierDetector;
+        const webglIntegration = context.dependencies.webglSystemsIntegration;
+        
+        if (!enhancedTierDetector || !webglIntegration) {
+          throw new Error("SimplePerformanceCoordinator requires EnhancedDeviceTierDetector and WebGLSystemsIntegration");
+        }
+        return new SystemClass(enhancedTierDetector, webglIntegration) as T;
+
+      case "SimpleTierBasedPerformanceSystem":
+        // SimpleTierBasedPerformanceSystem takes EnhancedDeviceTierDetector
+        const tierDetector = context.dependencies.enhancedDeviceTierDetector;
+        if (!tierDetector) {
+          throw new Error("SimpleTierBasedPerformanceSystem requires EnhancedDeviceTierDetector");
+        }
+        return new SystemClass(tierDetector) as T;
 
       default:
         // Last resort: try no-args constructor
@@ -297,7 +358,8 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
    * Update migration progress based on strategy vs legacy usage
    */
   private updateMigrationProgress(): void {
-    const totalSystems = this.systemsUsingStrategy.size + this.systemsUsingLegacy.size;
+    const totalSystems =
+      this.systemsUsingStrategy.size + this.systemsUsingLegacy.size;
     if (totalSystems === 0) {
       this.migrationProgress = 0;
     } else {
@@ -317,35 +379,44 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
       legacy: string[];
     };
   } {
-    const totalSystems = this.systemsUsingStrategy.size + this.systemsUsingLegacy.size;
-    
+    const totalSystems =
+      this.systemsUsingStrategy.size + this.systemsUsingLegacy.size;
+
     return {
       totalSystemsAdapted: this.systemsUsingStrategy.size,
-      strategySuccessRate: totalSystems > 0 ? this.systemsUsingStrategy.size / totalSystems : 0,
+      strategySuccessRate:
+        totalSystems > 0 ? this.systemsUsingStrategy.size / totalSystems : 0,
       migrationProgress: this.migrationProgress,
       systemBreakdown: {
         strategy: Array.from(this.systemsUsingStrategy),
-        legacy: Array.from(this.systemsUsingLegacy)
-      }
+        legacy: Array.from(this.systemsUsingLegacy),
+      },
     };
   }
 
   /**
    * Force migration of specific system to strategy pattern
    */
-  async migrateSystemToStrategy(systemKey: NonVisualSystemKey): Promise<boolean> {
+  async migrateSystemToStrategy(
+    systemKey: NonVisualSystemKey
+  ): Promise<boolean> {
     try {
       // Remove from legacy tracking
       this.systemsUsingLegacy.delete(systemKey);
-      
-      Y3K?.debug?.log("NonVisualSystemFacadeAdapter", 
-        `Migrated ${systemKey} to strategy pattern`);
-      
+
+      Y3KDebug?.debug?.log(
+        "NonVisualSystemFacadeAdapter",
+        `Migrated ${systemKey} to strategy pattern`
+      );
+
       return true;
     } catch (error) {
-      Y3K?.debug?.error("NonVisualSystemFacadeAdapter", 
-        `Failed to migrate ${systemKey} to strategy pattern:`, error);
-      
+      Y3KDebug?.debug?.error(
+        "NonVisualSystemFacadeAdapter",
+        `Failed to migrate ${systemKey} to strategy pattern:`,
+        error
+      );
+
       return false;
     }
   }
@@ -357,28 +428,30 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
     // Prioritize simple systems first, then event-driven, then complex
     const migrationOrder = [
       // Simple systems (no dependencies)
-      'PerformanceAnalyzer',
-      'UnifiedCSSConsciousnessController', 
-      'DeviceCapabilityDetector',
-      'SettingsManager',
-      
+      "PerformanceAnalyzer",
+      "OptimizedCSSVariableManager",
+      "DeviceCapabilityDetector",
+      "SettingsManager",
+
       // Event-driven systems
-      'ColorHarmonyEngine',
-      'MusicSyncService',
-      
+      "ColorHarmonyEngine",
+      "MusicSyncService",
+
       // Complex systems
-      'UnifiedPerformanceCoordinator',
-      'EnhancedMasterAnimationCoordinator',
-      
+      "UnifiedPerformanceCoordinator",
+      "EnhancedMasterAnimationCoordinator",
+
       // Integration systems
-      'UnifiedSystemIntegration',
-      
+      "UnifiedSystemIntegration",
+
       // UI systems
-      'GlassmorphismManager',
-      'Card3DManager'
+      "GlassmorphismManager",
+      "Card3DManager",
     ];
-    
-    return migrationOrder.filter(system => this.systemsUsingLegacy.has(system));
+
+    return migrationOrder.filter((system) =>
+      this.systemsUsingLegacy.has(system)
+    );
   }
 }
 

@@ -90,9 +90,54 @@
 :root {
   // Ensure compatibility with older Spicetify themes
   --spice-rgb-base: var(--spice-base, "30,30,46");
-  --spice-rgb-button: var(--spice-button, "64,64,80");
   --spice-rgb-accent: var(--spice-accent, "140,170,238");
 
   // Fallback border radius if not defined
   --border-radius: var(--spice-border-radius, 6px);
+}
+
+// Enhanced Button System - Year 3000 Integration
+:root {
+  // Override core Spicetify button colors with Year 3000 accent system
+  --spice-button: rgba(var(--sn-accent-rgb), 0.15);
+  --spice-button-active: rgba(var(--sn-accent-rgb), 0.25);
+  --spice-button-disabled: rgba(var(--sn-accent-rgb), 0.05);
+  --spice-rgb-button: var(--sn-accent-rgb);
+  
+  // Button shadow and highlight system
+  --sn-button-shadow: 0 1px 3px rgba(var(--sn-accent-rgb), 0.2);
+  --sn-button-highlight: inset 0 1px 0 rgba(var(--sn-accent-rgb), 0.1);
+  --sn-button-hover-shadow: 0 2px 6px rgba(var(--sn-accent-rgb), 0.3);
+  --sn-button-hover-highlight: inset 0 1px 0 rgba(var(--sn-accent-rgb), 0.2);
+}
+
+// Apply shadow and highlight system to all buttons
+button,
+.Button,
+.main-playButton-PlayButton,
+select.main-dropDown-dropDown,
+.main-button-secondary,
+.main-button-primary {
+  // Base shadows and highlights for consciousness depth
+  box-shadow: var(--sn-button-shadow), var(--sn-button-highlight);
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+  
+  // Enhanced hover state with deeper shadows
+  &:hover:not(:disabled) {
+    box-shadow: var(--sn-button-hover-shadow), var(--sn-button-hover-highlight);
+    transform: translateY(-1px);
+  }
+  
+  // Active state with pressed effect
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--sn-button-shadow), var(--sn-button-highlight);
+  }
+  
+  // Disabled state with reduced shadows
+  &:disabled {
+    box-shadow: 0 1px 2px rgba(var(--sn-accent-rgb), 0.1), 
+                inset 0 1px 0 rgba(var(--sn-accent-rgb), 0.05);
+    opacity: 0.6;
+  }
 }

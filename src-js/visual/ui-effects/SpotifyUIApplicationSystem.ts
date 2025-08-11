@@ -9,7 +9,7 @@ import type { Year3000System } from "../../core/lifecycle/year3000System";
 import type { HealthCheckResult, IManagedSystem } from "../../types/systems";
 
 // Event-driven integration imports
-import { GlobalEventBus } from "../../core/events/EventBus";
+import { unifiedEventBus } from "../../core/events/UnifiedEventBus";
 import type { ColorHarmonizedEvent } from "../../types/colorStrategy";
 
 interface SpotifyUITargets {
@@ -542,13 +542,31 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
   private registerSystemCallbacks(): void {
     // Listen for color harmony updates via event-driven pattern (NEW ARCHITECTURE)
     try {
-      GlobalEventBus.subscribe('colors/harmonized', (event: ColorHarmonizedEvent) => {
-        this.handleColorHarmonizedEvent(event);
-      });
+      unifiedEventBus.subscribe('colors:harmonized', (data) => {
+        this.handleColorHarmonizedEvent({
+          type: 'colors/harmonized',
+          payload: {
+            processedColors: data.processedColors,
+            accentHex: data.accentHex || '#cba6f7',
+            accentRgb: data.accentRgb || '203,166,247',
+            context: {
+              rawColors: data.processedColors,
+              trackUri: '',
+              timestamp: Date.now()
+            },
+            cssVariables: {},
+            metadata: {
+              strategy: data.strategies[0] || 'unknown',
+              accentHex: data.accentHex,
+              processingTime: data.processingTime
+            }
+          }
+        });
+      }, 'SpotifyUIApplicationSystem');
       
-      console.log("🎨 [SpotifyUIApplicationSystem] Subscribed to colors/harmonized events");
+      console.log("🎨 [SpotifyUIApplicationSystem] Subscribed to colors:harmonized events");
     } catch (error) {
-      console.error("[SpotifyUIApplicationSystem] Failed to subscribe to colors/harmonized events:", error);
+      console.error("[SpotifyUIApplicationSystem] Failed to subscribe to colors:harmonized events:", error);
       
       // Fallback to legacy method interception for compatibility
       if (this.year3000System.colorHarmonyEngine) {

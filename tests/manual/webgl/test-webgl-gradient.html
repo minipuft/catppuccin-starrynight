@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGL Gradient Test - Flow Recovery</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1e1e2e;
+            color: #cdd6f4;
+            overflow: hidden;
+        }
+        
+        .debug-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(49, 50, 68, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            font-size: 12px;
+            line-height: 1.4;
+            z-index: 1000;
+            max-width: 300px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .debug-panel h3 {
+            margin: 0 0 10px 0;
+            color: #f38ba8;
+        }
+        
+        .status-item {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .status-ok { color: #a6e3a1; }
+        .status-error { color: #f38ba8; }
+        .status-warning { color: #f9e2af; }
+        
+        /* Simulate Spotify-like container */
+        .Root__main-view {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: #1e1e2e;
+        }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #f38ba8, #cba6f7, #89b4fa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .control-btn {
+            background: #45475a;
+            border: 1px solid #6c7086;
+            color: #cdd6f4;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .control-btn:hover {
+            background: #585b70;
+        }
+        
+        .control-btn.active {
+            background: #cba6f7;
+            color: #1e1e2e;
+        }
+    </style>
+</head>
+<body>
+    <div class="Root__main-view">
+        <div class="content">
+            <h1 class="title">WebGL Flowing Gradient Test</h1>
+            <p>Testing WebGL gradient recovery based on gradientGuide references</p>
+            
+            <div class="controls">
+                <button class="control-btn" id="testWebGL">Test WebGL Support</button>
+                <button class="control-btn" id="initStrategy">Initialize Strategy</button>
+                <button class="control-btn" id="testColors">Test Colors</button>
+                <button class="control-btn" id="forceWebGL">Force WebGL</button>
+                <button class="control-btn" id="resetTest">Reset</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="debug-panel">
+        <h3>🔍 WebGL Gradient Debug</h3>
+        <div id="debugOutput">
+            <div class="status-item">
+                <span>Status:</span>
+                <span id="debugStatus" class="status-warning">Initializing...</span>
+            </div>
+        </div>
+        <div id="logOutput" style="margin-top: 15px; font-size: 10px; max-height: 300px; overflow-y: auto;">
+            <div style="color: #6c7086; margin-bottom: 5px;">Console logs will appear here...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Mock Spicetify environment for testing
+        window.Spicetify = {
+            Platform: {
+                History: { listen: () => ({}) }
+            },
+            Player: {
+                addEventListener: () => {},
+                data: { item: { uri: 'test:track:123' } }
+            },
+            colorExtractor: () => Promise.resolve({
+                PROMINENT: '#f38ba8',
+                VIBRANT: '#cba6f7', 
+                VIBRANT_NON_ALARMING: '#89b4fa',
+                LIGHT_VIBRANT: '#a6e3a1',
+                DARK_VIBRANT: '#74c7ec',
+                PRIMARY: '#f38ba8'
+            })
+        };
+
+        // Mock React for theme compatibility
+        window.React = { createElement: () => null };
+        window.ReactDOM = { render: () => null };
+
+        // Debug output functions
+        const debugOutput = document.getElementById('debugOutput');
+        const logOutput = document.getElementById('logOutput');
+        const debugStatus = document.getElementById('debugStatus');
+        
+        function addDebugItem(label, value, status = 'ok') {
+            const item = document.createElement('div');
+            item.className = 'status-item';
+            item.innerHTML = `
+                <span>${label}:</span>
+                <span class="status-${status}">${value}</span>
+            `;
+            debugOutput.appendChild(item);
+        }
+        
+        function addLog(message, type = 'info') {
+            const logItem = document.createElement('div');
+            logItem.style.color = type === 'error' ? '#f38ba8' : 
+                                type === 'warn' ? '#f9e2af' : 
+                                type === 'success' ? '#a6e3a1' : '#cdd6f4';
+            logItem.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logOutput.appendChild(logItem);
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+        
+        function setStatus(status, type = 'ok') {
+            debugStatus.textContent = status;
+            debugStatus.className = `status-${type}`;
+        }
+        
+        // Override console methods to capture theme logs
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+        
+        console.log = (...args) => {
+            originalLog.apply(console, args);
+            const message = args.join(' ');
+            if (message.includes('WebGL') || message.includes('Strategy') || message.includes('gradient')) {
+                addLog(message, 'info');
+            }
+        };
+        
+        console.warn = (...args) => {
+            originalWarn.apply(console, args);
+            const message = args.join(' ');
+            if (message.includes('WebGL') || message.includes('Strategy') || message.includes('gradient')) {
+                addLog(message, 'warn');
+            }
+        };
+        
+        console.error = (...args) => {
+            originalError.apply(console, args);
+            const message = args.join(' ');
+            if (message.includes('WebGL') || message.includes('Strategy') || message.includes('gradient')) {
+                addLog(message, 'error');
+            }
+        };
+
+        // Test WebGL support
+        function testWebGLSupport() {
+            addLog('Testing WebGL2 support...');
+            
+            try {
+                const canvas = document.createElement('canvas');
+                const webgl2 = canvas.getContext('webgl2');
+                
+                if (webgl2) {
+                    addDebugItem('WebGL2 Support', 'Available', 'ok');
+                    addLog('✅ WebGL2 context created successfully', 'success');
+                    
+                    // Get WebGL info
+                    const renderer = webgl2.getParameter(webgl2.RENDERER);
+                    const vendor = webgl2.getParameter(webgl2.VENDOR);
+                    const version = webgl2.getParameter(webgl2.VERSION);
+                    
+                    addDebugItem('GPU Renderer', renderer, 'ok');
+                    addDebugItem('GPU Vendor', vendor, 'ok');
+                    addLog(`WebGL Version: ${version}`, 'info');
+                    
+                    return true;
+                } else {
+                    addDebugItem('WebGL2 Support', 'Not Available', 'error');
+                    addLog('❌ WebGL2 context failed', 'error');
+                    return false;
+                }
+            } catch (error) {
+                addDebugItem('WebGL2 Support', 'Error', 'error');
+                addLog(`❌ WebGL test error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        // Load the theme
+        async function loadTheme() {
+            try {
+                setStatus('Loading theme...', 'warning');
+                addLog('Loading StarryNight theme...');
+                
+                // Import the theme
+                await import('./theme.js');
+                
+                setStatus('Theme loaded', 'ok');
+                addLog('✅ Theme loaded successfully', 'success');
+                
+                // Wait for initialization
+                setTimeout(() => {
+                    checkWebGLGradient();
+                }, 2000);
+                
+            } catch (error) {
+                setStatus('Load failed', 'error');
+                addLog(`❌ Theme load error: ${error.message}`, 'error');
+            }
+        }
+        
+        function checkWebGLGradient() {
+            addLog('Checking for WebGL gradient canvas...');
+            
+            const webglCanvas = document.querySelector('#sn-webgl-gradient-strategy');
+            const webglWrapper = document.querySelector('.sn-webgl-gradient-wrapper');
+            
+            if (webglCanvas) {
+                addDebugItem('WebGL Canvas', 'Found', 'ok');
+                addLog('✅ WebGL gradient canvas found in DOM', 'success');
+                
+                if (webglWrapper) {
+                    addDebugItem('Canvas Wrapper', 'Found', 'ok');
+                    addLog(`Canvas wrapper opacity: ${getComputedStyle(webglWrapper).opacity}`, 'info');
+                }
+                
+                setStatus('WebGL Active', 'ok');
+            } else {
+                addDebugItem('WebGL Canvas', 'Not Found', 'error');
+                addLog('❌ WebGL gradient canvas not in DOM', 'error');
+                
+                // Check for CSS fallback
+                const cssGradient = document.querySelector('.Root__main-view::before');
+                if (cssGradient) {
+                    addLog('CSS gradient fallback detected', 'warn');
+                    setStatus('CSS Fallback', 'warning');
+                } else {
+                    setStatus('No Gradient', 'error');
+                }
+            }
+            
+            // Check CSS variables
+            const rootStyles = getComputedStyle(document.documentElement);
+            const webglReady = rootStyles.getPropertyValue('--sn-webgl-ready');
+            const webglEnabled = rootStyles.getPropertyValue('--sn-webgl-enabled');
+            
+            addDebugItem('--sn-webgl-ready', webglReady || '0', webglReady === '1' ? 'ok' : 'error');
+            addDebugItem('--sn-webgl-enabled', webglEnabled || '0', webglEnabled === '1' ? 'ok' : 'error');
+        }
+
+        // Button handlers
+        document.getElementById('testWebGL').onclick = () => {
+            addLog('Manual WebGL test triggered');
+            testWebGLSupport();
+        };
+        
+        document.getElementById('initStrategy').onclick = () => {
+            addLog('Manual strategy initialization triggered');
+            // Try to trigger color processing
+            if (window.Y3K?.colorHarmonyEngine) {
+                window.Y3K.colorHarmonyEngine.processColors({
+                    PRIMARY: '#f38ba8',
+                    VIBRANT: '#cba6f7',
+                    PROMINENT: '#89b4fa'
+                });
+            }
+        };
+        
+        document.getElementById('testColors').onclick = async () => {
+            addLog('Manual color test triggered');
+            try {
+                const colors = await Spicetify.colorExtractor();
+                addLog(`Extracted colors: ${JSON.stringify(colors)}`, 'info');
+            } catch (error) {
+                addLog(`Color extraction error: ${error.message}`, 'error');
+            }
+        };
+        
+        document.getElementById('forceWebGL').onclick = () => {
+            addLog('Force WebGL enabled');
+            // Set force WebGL setting
+            localStorage.setItem('sn-webgl-force-enabled', 'true');
+            addDebugItem('Force WebGL', 'Enabled', 'ok');
+        };
+        
+        document.getElementById('resetTest').onclick = () => {
+            location.reload();
+        };
+
+        // Initialize
+        addLog('WebGL Gradient Test initialized');
+        addDebugItem('Test Environment', 'Ready', 'ok');
+        
+        // Test WebGL immediately
+        testWebGLSupport();
+        
+        // Load theme
+        setTimeout(loadTheme, 500);
+    </script>
+</body>
+</html>

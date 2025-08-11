@@ -1,5 +1,5 @@
-import { PerformanceAnalyzer } from '@/core/performance/PerformanceAnalyzer';
-import { UnifiedCSSConsciousnessController } from '@/core/css/UnifiedCSSConsciousnessController';
+import { SimplePerformanceCoordinator } from '@/core/performance/SimplePerformanceCoordinator';
+import { getGlobalOptimizedCSSController, OptimizedCSSVariableManager } from '@/core/performance/OptimizedCSSVariableManager';
 import { unifiedEventBus, type EventName, type EventData } from '@/core/events/UnifiedEventBus';
 import { EnhancedMasterAnimationCoordinator } from '@/core/animation/EnhancedMasterAnimationCoordinator';
 import { UnifiedPerformanceCoordinator } from '@/core/performance/UnifiedPerformanceCoordinator';
@@ -28,11 +28,11 @@ export abstract class UnifiedSystemBase {
   protected config: Year3000Config;
   
   // Shared utility instances (lazy-loaded singletons)
-  protected performanceAnalyzer!: PerformanceAnalyzer;
-  protected cssConsciousnessController!: UnifiedCSSConsciousnessController | null;
+  protected performanceAnalyzer!: SimplePerformanceCoordinator;
+  protected cssConsciousnessController!: OptimizedCSSVariableManager | null;
   protected eventBus!: typeof unifiedEventBus;
   protected animationCoordinator!: EnhancedMasterAnimationCoordinator;
-  protected unifiedCSSManager!: UnifiedCSSConsciousnessController | null;
+  protected unifiedCSSManager!: OptimizedCSSVariableManager | null;
   protected performanceCoordinator!: UnifiedPerformanceCoordinator;
   
   // Event management
@@ -106,25 +106,27 @@ export abstract class UnifiedSystemBase {
       const globalSystem = (globalThis as any).year3000System;
       
       if (globalSystem) {
-        this.performanceAnalyzer = globalSystem.performanceAnalyzer || new PerformanceAnalyzer();
-        this.cssConsciousnessController = globalSystem.cssConsciousnessController || UnifiedCSSConsciousnessController.getInstance();
+        this.performanceAnalyzer = globalSystem.performanceAnalyzer || 
+                                   globalSystem.facadeCoordinator?.getCachedNonVisualSystem?.('SimplePerformanceCoordinator') ||
+                                   globalSystem.facadeCoordinator?.getCachedNonVisualSystem?.('PerformanceAnalyzer');
+        this.cssConsciousnessController = globalSystem.cssConsciousnessController || getGlobalOptimizedCSSController();
         this.eventBus = unifiedEventBus; // Use the unified event bus singleton
-        this.performanceCoordinator = globalSystem.performanceCoordinator || UnifiedPerformanceCoordinator.getInstance(this.config, this.performanceAnalyzer);
-        this.animationCoordinator = globalSystem.enhancedMasterAnimationCoordinator || EnhancedMasterAnimationCoordinator.getInstance(this.config, this.performanceCoordinator);
-        this.unifiedCSSManager = globalSystem.unifiedCSSManager || UnifiedCSSConsciousnessController.getInstance();
+        this.performanceCoordinator = globalSystem.performanceCoordinator || (this.performanceAnalyzer ? UnifiedPerformanceCoordinator.getInstance(this.config, this.performanceAnalyzer) : null);
+        this.animationCoordinator = globalSystem.enhancedMasterAnimationCoordinator || (this.performanceCoordinator ? EnhancedMasterAnimationCoordinator.getInstance(this.config, this.performanceCoordinator) : null);
+        this.unifiedCSSManager = globalSystem.unifiedCSSManager || getGlobalOptimizedCSSController();
       } else {
-        // Fallback for standalone usage
-        this.performanceAnalyzer = new PerformanceAnalyzer();
-        this.cssConsciousnessController = UnifiedCSSConsciousnessController.getInstance();
+        // Performance analyzer will be injected through factory pattern
+        // Note: performanceAnalyzer will be set by dependency injection
+        this.cssConsciousnessController = getGlobalOptimizedCSSController();
         this.eventBus = unifiedEventBus; // Use the unified event bus singleton
         this.performanceCoordinator = UnifiedPerformanceCoordinator.getInstance(this.config, this.performanceAnalyzer);
         this.animationCoordinator = EnhancedMasterAnimationCoordinator.getInstance(this.config, this.performanceCoordinator);
-        this.unifiedCSSManager = UnifiedCSSConsciousnessController.getInstance();
+        this.unifiedCSSManager = getGlobalOptimizedCSSController();
       }
       
       // Initialize unified CSS manager with performance analyzer
       if (this.unifiedCSSManager && this.performanceAnalyzer && this.cssConsciousnessController) {
-        // UnifiedCSSConsciousnessController doesn't have an initialize method that takes these arguments
+        // UnifiedCSSVariableManager doesn't have an initialize method that takes these arguments
         // this.unifiedCSSManager.initialize(this.performanceAnalyzer, this.cssConsciousnessController);
       }
       
@@ -135,7 +137,7 @@ export abstract class UnifiedSystemBase {
       
       // Track initialization performance
       await this.trackPerformanceAsync('initialize', async () => {
-        await this.initialize();
+        await this._performSystemSpecificInitialization();
       });
       
       this.initialized = true;
@@ -415,8 +417,8 @@ export abstract class UnifiedSystemBase {
    * Force a repaint - useful for settings changes
    */
   public forceRepaint(reason?: string): void {
-    if (this.performanceAnalyzer) {
-      this.performanceAnalyzer.emitTrace(`[${this.systemName}] Force repaint: ${reason || 'unknown'}`);
+    if (this.config.enableDebug) {
+      console.log(`[${this.systemName}] Force repaint: ${reason || 'unknown'}`);
     }
     
     // Force flush CSS variables first
@@ -506,7 +508,7 @@ export abstract class UnifiedSystemBase {
    * @deprecated Override initialize() directly
    */
   async _performSystemSpecificInitialization(): Promise<void> {
-    await this.initialize();
+    // Default implementation does nothing - subclasses can override
   }
   
   /**

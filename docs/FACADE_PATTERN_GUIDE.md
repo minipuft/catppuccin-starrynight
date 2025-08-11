@@ -188,7 +188,7 @@ The VisualSystemFacade manages all visual systems through factory patterns, prov
 ```typescript
 export type VisualSystemKey = 
   | 'Particle'                    // LightweightParticleSystem
-  | 'ParticleField'               // ParticleFieldSystem
+  | 'ParticleField'               // Consolidated into LightweightParticleSystem
   | 'WebGLBackground'             // WebGLGradientBackgroundSystem
   | 'OrganicBeatSync'             // OrganicBeatSyncConsciousness
   | 'BehavioralPrediction'        // BehavioralPredictionEngine
@@ -205,8 +205,8 @@ private registerVisualSystems(): void {
   this.systemRegistry.set('Particle', LightweightParticleSystem);
   this.systemDependencies.set('Particle', ['performanceAnalyzer', 'musicSyncService']);
   
-  this.systemRegistry.set('ParticleField', ParticleFieldSystem);
-  this.systemDependencies.set('ParticleField', ['performanceAnalyzer', 'settingsManager']);
+  // ParticleField consolidated into ParticleConsciousnessModule
+  // this.systemRegistry.set('ParticleField', ParticleFieldSystem); // REMOVED: Redundant system
   
   this.systemRegistry.set('WebGLBackground', WebGLGradientBackgroundSystem);
   this.systemDependencies.set('WebGLBackground', ['deviceCapabilityDetector']);

@@ -1,0 +1,376 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// 🎭 MOTION TOKENS - Consolidated Animation & Transition Variables
+// Unified motion system tokens for the StarryNight theme
+// ████████████████████████████████████████████████████████████████████████████████
+// 
+// This file consolidates:
+// - Animation variables (from _sn_animation_variables.scss)
+// - Beat synchronization variables (from _beat_sync_variables.scss) 
+// - Layered effect variables (from _sn_layered_effect_variables.scss)
+//
+// Maintains full backward compatibility while providing a centralized motion system
+// ████████████████████████████████████████████████████████████████████████████████
+
+:root {
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🎵 MUSICAL ANIMATION COORDINATION (Priority: Critical)
+  // Real-time beat synchronization and musical timing
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  // === BEAT SYNCHRONIZATION ===
+  // Beat-driven animation timing (synced with MusicSyncService)
+  --sn-anim-musical-beat-duration: calc(60s / var(--sn-music-tempo-bpm, 120)); // Beat-based duration
+  --sn-anim-musical-measure-duration: calc(var(--sn-anim-musical-beat-duration) * 4); // Measure duration
+  --sn-anim-musical-phrase-duration: calc(var(--sn-anim-musical-measure-duration) * 4); // Phrase duration
+  
+  // Musical color transition timing (ColorHarmonyEngine coordination)
+  --sn-anim-musical-color-transition: var(--sn-musical-transition-duration, 800ms); // Musical color transitions
+  --sn-anim-musical-color-easing: var(--sn-musical-transition-easing, cubic-bezier(0.4, 0, 0.2, 1)); // Musical easing
+  --sn-anim-musical-color-speed: var(--sn-musical-color-evolution-speed, 1.0); // Color evolution speed
+  
+  // Beat-synchronized animation variables
+  --sn-anim-beat-sync-enabled: 1; // Beat synchronization enabled (0/1)
+  --sn-anim-beat-sync-intensity: var(--sn-music-beat-pulse-intensity, 0); // Beat sync intensity
+  --sn-anim-beat-sync-phase: var(--sn-music-beat-phase, 0); // Beat sync phase
+  
+  // Beat-synchronized background effects
+  --sn-bg-beat-pulse-intensity: var(--sn-music-beat-color-pulse, 0); // Beat pulse intensity
+  --sn-bg-beat-pulse-scale: calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.1); // Beat scale
+  --sn-bg-beat-color-shift: calc(var(--sn-music-beat-color-phase, 0) * 10deg); // Beat color shift
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // ⏱️ ANIMATION TIMING SYSTEM (Priority: Normal)
+  // Standard animation durations and timing functions
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  // Standard animation timing
+  --sn-anim-duration-fast: 0.2s; // Fast animations
+  --sn-anim-duration-normal: 0.4s; // Normal animations
+  --sn-anim-duration-slow: 0.8s; // Slow animations
+  --sn-anim-duration-breathing: 4s; // Breathing animations
+  
+  // Easing functions (consciousness-aware transitions)
+  --sn-anim-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --sn-anim-easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --sn-anim-easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --sn-anim-easing-bounce: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --sn-anim-easing-organic: cubic-bezier(0.25, 0.1, 0.25, 1); // Natural, organic feel
+  --sn-anim-easing-consciousness: cubic-bezier(0.4, 0, 0.2, 1); // Consciousness-aware
+  --sn-anim-easing-emergence: cubic-bezier(0.25, 0.46, 0.45, 0.94); // Emergence effect
+  --sn-anim-easing-harmony: cubic-bezier(0.165, 0.84, 0.44, 1); // Harmonic transitions
+  
+  // Motion preferences and global controls
+  --sn-anim-motion-reduced: 0; // Reduced motion preference (0/1)
+  --sn-anim-motion-scale: 1; // Global animation scale
+  --sn-anim-motion-blur: 0; // Motion blur intensity
+  
+  // Frame coordination and performance
+  --sn-anim-frame-budget: 16.67ms; // Target frame budget (60fps)
+  --sn-anim-frame-priority: normal; // Animation priority
+  --sn-anim-frame-fps: 60; // Target FPS
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🧠 CONSCIOUSNESS FIELD ANIMATIONS (Magnetic Depth System)
+  // 3D depth, magnetic interactions, and consciousness-driven animations
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // === MAGNETIC DEPTH FIELD ===
+  // 3D perspective and depth layers
+  --sn-consciousness-depth-field: 800px; // 3D perspective depth
+  --sn-consciousness-depth-near: 12px; // Near depth distance
+  --sn-consciousness-depth-far: -10px; // Far depth distance
+  --sn-consciousness-depth-neutral: 0px; // Neutral depth position
+  
+  // Depth hierarchy system
+  --sn-consciousness-depth-priority-high: var(--sn-consciousness-depth-near);
+  --sn-consciousness-depth-priority-medium: var(--sn-consciousness-depth-neutral);
+  --sn-consciousness-depth-priority-low: calc(var(--sn-consciousness-depth-far) * 0.5);
+  --sn-consciousness-depth-priority-receded: var(--sn-consciousness-depth-far);
+
+  // === USER INTERACTION MAGNETISM ===
+  // Magnetic pull effects for user interactions
+  --sn-consciousness-hover-pull: 12px; // Hover pull distance
+  --sn-consciousness-focus-pull: 18px; // Focus pull distance
+  --sn-consciousness-interest-pull: 24px; // Interest/attention pull distance
+  --sn-consciousness-transition-speed: 0.6s; // Magnetic transition speed
+  
+  // === CONSCIOUSNESS FIELD PROPERTIES ===
+  // Field intensity and behavior
+  --sn-consciousness-field-intensity: 0.4; // Field intensity (0-1)
+  --sn-consciousness-field-breathing-rate: 12s; // Field breathing rate
+  --sn-consciousness-field-sensitivity: 0.8; // Response sensitivity
+  
+  // === BILATERAL CONSCIOUSNESS ===
+  // Left/right sidebar coordination
+  --sn-consciousness-bilateral-left-lead: -150ms; // Left sidebar lead time
+  --sn-consciousness-bilateral-right-delay: 150ms; // Right sidebar delay
+  --sn-consciousness-bilateral-sync: 1; // Bilateral sync enabled
+
+  // === READABILITY & ACCESSIBILITY ===
+  // Ensure text remains readable during animations
+  --sn-consciousness-max-rotation: 2deg; // Maximum rotation for readability
+  --sn-consciousness-text-clarity: 1.05; // Text clarity boost
+  --sn-consciousness-contrast-boost: 1.02; // Contrast enhancement
+  
+  // Performance and accessibility
+  --sn-consciousness-performance-mode: quality; // Performance mode
+  --sn-consciousness-accessibility-scale: 1; // Accessibility scale factor
+  --sn-consciousness-mobile-reduction: 0.7; // Mobile reduction factor
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🌊 BACKGROUND ANIMATION SYSTEM (Priority: Normal)
+  // Gradient flows, WebGL effects, and background motion
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // === GRADIENT FLOW ANIMATION ===
+  // Musical gradient colors (updated by ColorHarmonyEngine)
+  --sn-bg-musical-flow-direction: calc(var(--sn-music-rhythm-phase, 0) * 45deg); // Musical flow direction
+  --sn-bg-musical-flow-speed: var(--sn-musical-color-evolution-speed, 1.0); // Musical flow speed
+  --sn-bg-musical-opacity: calc(0.15 * var(--sn-music-color-intensity, 0.5)); // Musical opacity
+  --sn-bg-musical-blur: calc(40px * (1 + var(--sn-music-energy-level, 0.5) * 0.5)); // Energy-responsive blur
+
+  // === BACKGROUND SYSTEM VARIABLES ===
+  // Core gradient properties
+  --sn-bg-gradient-opacity: 0.15;
+  --sn-bg-gradient-blur: 40px;
+  --sn-bg-gradient-angle: 135deg;
+  --sn-bg-gradient-flow-direction: 0deg;
+  --sn-bg-gradient-flow-speed: 1;
+  
+  // WebGL background system
+  --sn-bg-webgl-ready: 0; // WebGL system ready state (0/1)
+  --sn-bg-webgl-quality: 1; // Quality level (0-1)
+  --sn-bg-webgl-noise-scale: 1; // Noise scale factor
+  --sn-bg-webgl-noise-intensity: 0.1; // Noise intensity
+  --sn-bg-webgl-flow-speed: 0.5; // Flow animation speed
+  --sn-bg-webgl-flow-direction: 0deg; // Flow direction
+  
+  // Background state and transitions
+  --sn-bg-active-backend: "css"; // Active backend (css/webgl)
+  --sn-bg-transition-duration: 0.8s; // Background transition duration
+  --sn-bg-transition-easing: ease-in-out; // Background transition easing
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // ✨ LAYERED EFFECTS SYSTEM (Nebula Field Variables)
+  // Multi-layer visual effects with depth and opacity control
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // === NEBULA LAYER SYSTEM (4-Layer Architecture) ===
+  // Layer 0 (outer-most, subtle accent glow)
+  --sn-nebula-layer-0-opacity: 0.05; // Set directly by NebulaController.ts
+  --sn-nebula-layer-0-blur: 2px; // Default value, modified by JS
+  --sn-nebula-layer-0-scale: 1; // Default value, modified by JS
+  
+  // Layer 1
+  --sn-nebula-layer-1-opacity: 0.05; // Default value, modified by JS
+  --sn-nebula-layer-1-blur: 4px; // Default value, modified by JS
+  --sn-nebula-layer-1-scale: 1; // Default value, modified by JS
+  
+  // Layer 2
+  --sn-nebula-layer-2-opacity: 0.04; // Default value, modified by JS
+  --sn-nebula-layer-2-blur: 6px; // Default value, modified by JS
+  --sn-nebula-layer-2-scale: 1; // Default value, modified by JS
+  
+  // Layer 3 (inner-most, highlight core)
+  --sn-nebula-layer-3-opacity: 0.03; // Default value, modified by JS
+  --sn-nebula-layer-3-blur: 8px; // Set directly by NebulaController.ts
+  --sn-nebula-layer-3-scale: 1; // Default value, modified by JS
+
+  // === NEBULA EFFECT PROPERTIES ===
+  // Beat-sync multiplier and global controls
+  --sn-nebula-beat-intensity: var(--sn-music-beat-pulse-intensity, 1);
+  --sn-nebula-max-blur: 12px; // Maximum blur applied to nebula pseudo-element
+  
+  // Nebula gradient smoothing and effects
+  --sn-nebula-noise-opacity: 0.06; // Base opacity for fractal noise overlay
+  --sn-nebula-noise-scale-y: 150%; // Base vertical scale for noise texture
+  --sn-nebula-aberration-strength: 0.4; // Base strength for chromatic aberration
+  --sn-nebula-ease-t: 0; // 0–1 easing factor for multi-radius stops
+  --sn-nebula-blend-mode: color-dodge; // Blend mode (auto-overridden by performance guard)
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🔍 SERENDIPITY & DISCOVERY ANIMATIONS
+  // Idle state discovery animations and serendipitous interactions
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // Serendipity discovery system
+  --sn-serendipity-idle-threshold: 3000ms; // Time before serendipity triggers
+  --sn-serendipity-animation-duration: 2s; // Serendipity animation duration
+  --sn-serendipity-start-z: -20px; // Starting Z position
+  --sn-serendipity-end-z: 0px; // Ending Z position
+  
+  // Discovery effect timing
+  --sn-serendipity-fade-in-duration: 0.8s;
+  --sn-serendipity-fade-out-duration: 1.2s;
+  --sn-serendipity-pulse-frequency: 4s;
+  --sn-serendipity-emergence-easing: var(--sn-anim-easing-emergence);
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🎯 TRANSITION PRESETS
+  // Commonly used transition combinations for consistency
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // Standard transition presets
+  --sn-transition-smooth: all var(--sn-anim-duration-normal) var(--sn-anim-easing-standard);
+  --sn-transition-fast: all var(--sn-anim-duration-fast) var(--sn-anim-easing-standard);
+  --sn-transition-slow: all var(--sn-anim-duration-slow) var(--sn-anim-easing-standard);
+  
+  // Consciousness-aware transitions
+  --sn-transition-magnetic: all var(--sn-consciousness-transition-speed) var(--sn-anim-easing-consciousness);
+  --sn-transition-organic: all var(--sn-anim-duration-normal) var(--sn-anim-easing-organic);
+  --sn-transition-emergence: all var(--sn-anim-duration-slow) var(--sn-anim-easing-emergence);
+  
+  // Musical transitions
+  --sn-transition-musical: all var(--sn-anim-musical-color-transition) var(--sn-anim-musical-color-easing);
+  --sn-transition-beat-sync: all var(--sn-anim-musical-beat-duration) var(--sn-anim-easing-standard);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🔄 LEGACY COMPATIBILITY ALIASES
+// Maintains backward compatibility with existing animation systems
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // === BEAT SYNC LEGACY ALIASES ===
+  --sn-beat-pulse-intensity: var(--sn-music-beat-pulse-intensity);
+  --sn-rhythm-phase: var(--sn-music-rhythm-phase);
+  --sn-spectrum-phase: var(--sn-music-spectrum-phase);
+  --sn-breathing-scale: var(--sn-music-breathing-scale);
+  --sn-feed-bloom-intensity: var(--sn-music-beat-pulse-intensity);
+
+  // === ANIMATION LEGACY ALIASES ===
+  --sn-transition-timing-default: var(--sn-anim-easing-standard);
+  --sn-transition-duration-fast: var(--sn-anim-duration-fast);
+  --sn-transition-duration-normal: var(--sn-anim-duration-normal);
+  --sn-transition-duration-slow: var(--sn-anim-duration-slow);
+
+  // === CONSCIOUSNESS LEGACY ALIASES ===
+  --magnetic-depth-field: var(--sn-consciousness-depth-field);
+  --magnetic-hover-pull: var(--sn-consciousness-hover-pull);
+  --magnetic-focus-pull: var(--sn-consciousness-focus-pull);
+  --magnetic-transition-speed: var(--sn-consciousness-transition-speed);
+  --consciousness-field-intensity: var(--sn-consciousness-field-intensity);
+  --consciousness-breathing-rate: var(--sn-consciousness-field-breathing-rate);
+
+  // Magnetic interaction aliases  
+  --magnetic-approach-distance: var(--sn-consciousness-depth-near);
+  --magnetic-recede-distance: var(--sn-consciousness-depth-far);
+  --magnetic-neutral-position: var(--sn-consciousness-depth-neutral);
+  --magnetic-interest-pull: var(--sn-consciousness-interest-pull);
+
+  // Depth hierarchy aliases
+  --depth-priority-high: var(--sn-consciousness-depth-priority-high);
+  --depth-priority-medium: var(--sn-consciousness-depth-priority-medium);
+  --depth-priority-low: var(--sn-consciousness-depth-priority-low);
+  --depth-priority-receded: var(--sn-consciousness-depth-priority-receded);
+
+  // Readability preservation aliases
+  --magnetic-max-rotation: var(--sn-consciousness-max-rotation);
+  --magnetic-text-clarity: var(--sn-consciousness-text-clarity);
+  --magnetic-contrast-boost: var(--sn-consciousness-contrast-boost);
+
+  // Performance aliases
+  --magnetic-performance-mode: var(--sn-consciousness-performance-mode);
+  --magnetic-accessibility-scale: var(--sn-consciousness-accessibility-scale);
+  --magnetic-mobile-reduction: var(--sn-consciousness-mobile-reduction);
+
+  // === MUSICAL ANIMATION LEGACY ALIASES ===
+  --sn-beat-duration: var(--sn-anim-musical-beat-duration);
+  --sn-musical-transition: var(--sn-anim-musical-color-transition);
+  --sn-musical-easing: var(--sn-anim-musical-color-easing);
+  --sn-beat-sync-intensity: var(--sn-anim-beat-sync-intensity);
+
+  // === BACKGROUND ANIMATION LEGACY ALIASES ===
+  --sn-bg-musical-flow: var(--sn-bg-musical-flow-direction);
+  --sn-bg-beat-pulse: var(--sn-bg-beat-pulse-intensity);
+  --sn-gradient-transition: var(--sn-bg-transition-duration);
+
+  // === SERENDIPITY LEGACY ALIASES ===
+  --serendipity-idle-threshold: var(--sn-serendipity-idle-threshold);
+  --serendipity-animation-duration: var(--sn-serendipity-animation-duration);
+  --serendipity-start-z: var(--sn-serendipity-start-z);
+  --serendipity-end-z: var(--sn-serendipity-end-z);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 📱 RESPONSIVE & ACCESSIBILITY OVERRIDES
+// Adjust motion tokens for different devices and preferences
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    // Reduce all animation intensities
+    --sn-anim-motion-reduced: 1;
+    --sn-anim-motion-scale: 0.3;
+    --sn-anim-duration-fast: 0.01s;
+    --sn-anim-duration-normal: 0.01s;
+    --sn-anim-duration-slow: 0.01s;
+    --sn-anim-duration-breathing: 20s;
+    
+    // Reduce consciousness effects
+    --sn-consciousness-field-intensity: 0.1;
+    --sn-consciousness-hover-pull: 2px;
+    --sn-consciousness-focus-pull: 4px;
+    --sn-consciousness-transition-speed: 0.01s;
+    
+    // Disable complex animations
+    --sn-music-beat-pulse-intensity: 0;
+    --sn-music-breathing-scale: 1;
+    --sn-bg-webgl-flow-speed: 0;
+
+    // Legacy aliases for reduced motion
+    --magnetic-hover-pull: 4px;
+    --magnetic-focus-pull: 6px;
+    --magnetic-transition-speed: 1.2s;
+    --consciousness-breathing-rate: 30s;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    // Mobile consciousness adjustments
+    --sn-consciousness-depth-field: 600px;
+    --sn-consciousness-hover-pull: calc(12px * var(--sn-consciousness-mobile-reduction));
+    --sn-consciousness-focus-pull: calc(18px * var(--sn-consciousness-mobile-reduction));
+    --sn-consciousness-field-intensity: calc(0.4 * var(--sn-consciousness-mobile-reduction));
+    
+    // Mobile animation performance
+    --sn-anim-frame-fps: 30;
+    --sn-nebula-max-blur: 6px;
+    --sn-bg-webgl-quality: 0.6;
+
+    // Legacy mobile aliases
+    --magnetic-depth-field: 600px;
+  }
+}
+
+@media (update: slow) {
+  :root {
+    // Reduce effects on slow update devices
+    --sn-anim-frame-fps: 30;
+    --sn-consciousness-field-intensity: 0.2;
+    --sn-anim-motion-scale: 0.7;
+    --sn-bg-webgl-quality: 0.4;
+  }
+}
+
+@media (hover: none) {
+  :root {
+    // Optimize for touch devices
+    --sn-consciousness-hover-pull: 0px;
+    --sn-anim-duration-fast: 0.1s;
+    --sn-anim-duration-normal: 0.2s;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    // Enhance visibility and contrast for motion elements
+    --sn-consciousness-contrast-boost: 1.15;
+    --sn-consciousness-field-intensity: 0.6;
+    --magnetic-contrast-boost: 1.15;
+  }
+}
+
+// NOTE: Legacy compatibility aliases maintain backward compatibility during migration.
+// Future versions may deprecate some aliases - update code to use the unified tokens directly.

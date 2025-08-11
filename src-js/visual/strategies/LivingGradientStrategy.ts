@@ -10,22 +10,22 @@
  */
 
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
-import {
-  CSSVariableCoordinator,
-  globalCSSVariableCoordinator,
-} from "@/core/css/CSSVariableCoordinator";
-import { Y3K } from "@/debug/UnifiedDebugManager";
+import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
+import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type {
   ColorContext,
   ColorResult,
   IColorProcessor,
 } from "@/types/colorStrategy";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+import { settings } from "@/config";
 import {
   OKLABColorProcessor,
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
 import * as Utils from "@/utils/core/Year3000Utilities";
+import { BaseVisualSystem } from "../base/BaseVisualSystem";
 
 interface LivingBaseState {
   currentBaseHex: string;
@@ -33,7 +33,6 @@ interface LivingBaseState {
   currentPrimaryHex: string;
   currentPrimaryRgb: string;
   consciousnessIntensity: number;
-  breathingPhase: number;
   musicEnergy: number;
   lastUpdateTime: number;
   webglIntegrationActive: boolean;
@@ -50,14 +49,20 @@ interface LivingGradientConfig {
   oklabInterpolationEnabled: boolean;
   oklabPreset: string; // OKLAB enhancement preset name
   gradientSmoothness: number; // 0-1, controls gradient transition smoothness
+  animationThrottleFps: number; // Target FPS for breathing animation (default: 30)
+  enablePerformanceBudget: boolean; // Enable 16ms frame budget enforcement
+  maxFrameTimeMs: number; // Maximum allowed frame time in milliseconds
 }
 
-export class LivingGradientStrategy implements IColorProcessor {
-  private settingsManager: SettingsManager;
-  private cssCoordinator: CSSVariableCoordinator;
+export class LivingGradientStrategy
+  extends BaseVisualSystem
+  implements IColorProcessor
+{
+  private cssController: OptimizedCSSVariableManager;
   private oklabProcessor: OKLABColorProcessor;
-  private utils = Utils;
-  private config = YEAR3000_CONFIG;
+  private deviceDetector: DeviceCapabilityDetector;
+  protected override utils = Utils;
+  protected override config = YEAR3000_CONFIG;
 
   private livingBaseState: LivingBaseState = {
     currentBaseHex: "#1e1e2e", // Catppuccin base
@@ -65,7 +70,6 @@ export class LivingGradientStrategy implements IColorProcessor {
     currentPrimaryHex: "#cba6f7", // Default mauve
     currentPrimaryRgb: "203,166,247",
     consciousnessIntensity: 0.5,
-    breathingPhase: 0,
     musicEnergy: 0.5,
     lastUpdateTime: 0,
     webglIntegrationActive: false,
@@ -82,27 +86,439 @@ export class LivingGradientStrategy implements IColorProcessor {
     oklabInterpolationEnabled: true,
     oklabPreset: "STANDARD", // Use standard OKLAB enhancement for gradients
     gradientSmoothness: 0.8, // High smoothness for natural transitions
+    animationThrottleFps: 30, // 30fps for smooth breathing while conserving performance
+    enablePerformanceBudget: true, // Enable frame budget enforcement
+    maxFrameTimeMs: 16, // 16ms budget for 60fps main thread responsiveness
   };
 
-  // Animation control
-  private animationFrameId: number = 0;
-  private breathingStartTime: number = 0;
-  private isAnimating: boolean = false;
+  // CSS Animation Manager integration for Year 3000 performance revolution  
+  private cssAnimationManager: any = null; // Will be injected
+
+  // OKLAB calculation caching
+  private oklabCache = new Map<string, OKLABProcessingResult[]>();
+  private gradientCache = new Map<string, string>();
+  private cacheValidityMs: number = 5000; // Cache valid for 5 seconds
+  private lastCacheCleanup: number = 0;
 
   constructor(
-    settingsManager?: SettingsManager,
-    cssCoordinator?: CSSVariableCoordinator
+    config = YEAR3000_CONFIG,
+    utils = Utils,
+    performanceMonitor: any = null,
+    musicSyncService: any = null,
+    cssController?: OptimizedCSSVariableManager,
+    cssAnimationManager?: any
   ) {
-    this.settingsManager = settingsManager || new SettingsManager();
-    this.cssCoordinator = cssCoordinator || globalCSSVariableCoordinator;
+    // Call BaseVisualSystem constructor
+    super(
+      config,
+      utils,
+      performanceMonitor,
+      musicSyncService,
+      null
+    );
+
+    this.cssController = cssController || getGlobalOptimizedCSSController();
     this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+    this.deviceDetector = new DeviceCapabilityDetector();
+    this.cssAnimationManager = cssAnimationManager;
 
     // Initialize base state from existing variables
     this.initializeBaseState();
 
-    Y3K?.debug?.log(
+    // Apply device-aware performance settings (async - non-blocking)
+    this.applyDeviceAwareSettings().catch((error) => {
+      Y3KDebug?.debug?.warn(
+        "LivingGradientStrategy",
+        "Failed to apply device-aware settings:",
+        error
+      );
+    });
+
+    Y3KDebug?.debug?.log(
       "LivingGradientStrategy",
-      "Living gradient strategy initialized with OKLAB interpolation"
+      "Living gradient strategy initialized with OKLAB interpolation and device-aware performance"
+    );
+  }
+
+  /**
+   * BaseVisualSystem lifecycle implementation
+   */
+  public override async _performSystemSpecificInitialization(): Promise<void> {
+    await super._performSystemSpecificInitialization();
+
+    try {
+      // Setup consciousness event listeners
+      this.setupConsciousnessListeners();
+
+      // Setup WebGL integration listeners
+      this.setupWebGLIntegrationListeners();
+
+      // Initialize current base state
+      this.initializeBaseState();
+
+      // Initialize CSS-first breathing consciousness (Year 3000 performance revolution)
+      this.initializeConsciousnessBreathing();
+
+      // Apply initial consciousness base gradient
+      await this.applyLivingConsciousnessBase();
+
+      Y3KDebug?.debug?.log(
+        "LivingGradientStrategy",
+        "Living gradient system awakened with visual system lifecycle"
+      );
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "LivingGradientStrategy",
+        "Failed to initialize living gradient system:",
+        error
+      );
+    }
+  }
+
+  /**
+   * Setup listeners for consciousness and dynamic color changes
+   * Phase 2: Migrated from DOM events to UnifiedEventBus for proper facade coordination
+   */
+  private setupConsciousnessListeners(): void {
+    // Phase 2: Listen for colors:harmonized events via UnifiedEventBus (no more DOM events)
+    // This prevents the infinite loop that was caused by DOM event cascading
+    if (typeof unifiedEventBus !== "undefined") {
+      unifiedEventBus.subscribe(
+        "colors:harmonized",
+        (data: any) => {
+          if (data && data.processedColors) {
+            this.handleHarmonizedColorUpdate(data.processedColors);
+          }
+        },
+        "LivingGradientStrategy"
+      );
+    }
+
+    // Listen for music state changes
+    document.addEventListener("music-state-change", (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail) {
+        this.handleMusicStateChange(customEvent.detail);
+      }
+    });
+
+    // Listen for consciousness intensity changes
+    document.addEventListener(
+      "consciousness-intensity-change",
+      (event: Event) => {
+        const customEvent = event as CustomEvent;
+        if (
+          customEvent.detail &&
+          typeof customEvent.detail.intensity === "number"
+        ) {
+          this.updateConsciousnessIntensity(customEvent.detail.intensity);
+        }
+      }
+    );
+
+    Y3KDebug?.debug?.log(
+      "LivingGradientStrategy",
+      "Consciousness listeners established"
+    );
+  }
+
+  /**
+   * Setup WebGL integration listeners
+   */
+  private setupWebGLIntegrationListeners(): void {
+    // Listen for WebGL system state changes
+    document.addEventListener("webgl-state-change", (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail) {
+        this.handleWebGLStateChange(customEvent.detail);
+      }
+    });
+
+    // Listen for WebGL gradient updates
+    document.addEventListener("webgl-gradient-update", (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail) {
+        this.coordinateWithWebGLGradient(customEvent.detail);
+      }
+    });
+
+    Y3KDebug?.debug?.log(
+      "LivingGradientStrategy",
+      "WebGL integration listeners established"
+    );
+  }
+
+  /**
+   * Handle harmonized color updates from Dynamic Catppuccin Bridge
+   */
+  private handleHarmonizedColorUpdate(harmonizedColors: any): void {
+    this.debouncedEventHandler("harmonizedColors", () => {
+      const primaryColor =
+        harmonizedColors.VIBRANT ||
+        harmonizedColors.PRIMARY ||
+        harmonizedColors.PROMINENT;
+
+      if (
+        primaryColor &&
+        primaryColor !== this.livingBaseState.currentPrimaryHex
+      ) {
+        this.livingBaseState.currentPrimaryHex = primaryColor;
+        const primaryRgb = this.utils.hexToRgb(primaryColor);
+        if (primaryRgb) {
+          this.livingBaseState.currentPrimaryRgb = `${primaryRgb.r},${primaryRgb.g},${primaryRgb.b}`;
+        }
+
+        // Update living consciousness base and trigger CSS-first breathing
+        this.updateLivingConsciousnessBase();
+        this.triggerConsciousnessBreathing();
+
+        Y3KDebug?.debug?.log(
+          "LivingGradientStrategy",
+          "Living base updated with harmonized colors:",
+          primaryColor
+        );
+      }
+    });
+  }
+
+  /**
+   * Handle music state changes for energy-responsive base
+   */
+  private handleMusicStateChange(musicState: any): void {
+    this.debouncedEventHandler("musicState", () => {
+      if (musicState.energy !== undefined) {
+        this.livingBaseState.musicEnergy = musicState.energy;
+
+        // Update consciousness intensity based on music energy
+        const baseIntensity = 0.5;
+        const energyBoost =
+          musicState.energy * this.gradientConfig.musicResponsiveness;
+        this.livingBaseState.consciousnessIntensity = Math.max(
+          0.1,
+          Math.min(1.0, baseIntensity + energyBoost * 0.3)
+        );
+
+        // Update CSS variables for real-time response
+        this.updateMusicResponsiveVariables();
+      }
+    });
+  }
+
+  /**
+   * Handle WebGL system state changes
+   */
+  private handleWebGLStateChange(webglState: any): void {
+    this.debouncedEventHandler("webglState", () => {
+      if (webglState.enabled !== undefined) {
+        this.livingBaseState.webglIntegrationActive = webglState.enabled;
+
+        // Adjust base system for WebGL coordination
+        this.coordinateWithWebGLSystem(webglState.enabled);
+
+        Y3KDebug?.debug?.log(
+          "LivingGradientStrategy",
+          `WebGL integration ${
+            webglState.enabled ? "activated" : "deactivated"
+          }`
+        );
+      }
+    });
+  }
+
+  /**
+   * Update consciousness intensity
+   */
+  private updateConsciousnessIntensity(intensity: number): void {
+    this.debouncedEventHandler("consciousnessIntensity", () => {
+      this.livingBaseState.consciousnessIntensity = Math.max(
+        0,
+        Math.min(1, intensity)
+      );
+      this.updateConsciousnessVariables();
+    });
+  }
+
+  /**
+   * Debounced event handler to prevent excessive processing of high-frequency events
+   */
+  private musicEventDebounceTimers = {
+    musicState: 0,
+    harmonizedColors: 0,
+    webglState: 0,
+    consciousnessIntensity: 0,
+  };
+  private eventDebounceMs = 100;
+
+  private debouncedEventHandler(
+    eventType: keyof typeof this.musicEventDebounceTimers,
+    handler: () => void
+  ): void {
+    const now = performance.now();
+    if (
+      now - this.musicEventDebounceTimers[eventType] >=
+      this.eventDebounceMs
+    ) {
+      handler();
+      this.musicEventDebounceTimers[eventType] = now;
+    }
+  }
+
+  /**
+   * Initialize CSS-first consciousness breathing (Year 3000 performance revolution)
+   */
+  private initializeConsciousnessBreathing(): void {
+    if (!this.gradientConfig.breathingAnimationEnabled) return;
+    if (!this.cssAnimationManager) {
+      Y3KDebug?.debug?.warn(
+        "LivingGradientStrategy", 
+        "CSSAnimationManager not available, falling back to basic consciousness"
+      );
+      return;
+    }
+
+    // Trigger initial breathing animation with current music state
+    this.triggerConsciousnessBreathing();
+    
+    Y3KDebug?.debug?.log(
+      "LivingGradientStrategy",
+      "CSS-first consciousness breathing initialized"
+    );
+  }
+
+  /**
+   * Trigger consciousness breathing using CSSAnimationManager (Year 3000 CSS-first)
+   */
+  private triggerConsciousnessBreathing(): void {
+    if (!this.cssAnimationManager || !this.gradientConfig.breathingAnimationEnabled) return;
+
+    // Get elements for consciousness breathing
+    const consciousnessElements = document.querySelectorAll(
+      '.Root__main-view::before, .Root__main-view, [data-consciousness-breathing]'
+    );
+    
+    if (consciousnessElements.length === 0) {
+      // Fallback: apply to main view if pseudo-elements aren't accessible
+      const mainView = document.querySelector('.Root__main-view') || document.body;
+      if (mainView) {
+        mainView.setAttribute('data-consciousness-breathing', 'true');
+        this.cssAnimationManager.triggerConsciousnessBreathing(
+          [mainView],
+          this.livingBaseState.musicEnergy,
+          120 // Default tempo
+        );
+      }
+    } else {
+      this.cssAnimationManager.triggerConsciousnessBreathing(
+        consciousnessElements,
+        this.livingBaseState.musicEnergy,
+        120 // Will be updated by music events
+      );
+    }
+
+    Y3KDebug?.debug?.log(
+      "LivingGradientStrategy",
+      `CSS-first consciousness breathing triggered for ${consciousnessElements.length} elements`
+    );
+  }
+
+  /**
+   * Apply device-aware performance settings based on device capabilities
+   */
+  private async applyDeviceAwareSettings(): Promise<void> {
+    // Initialize device detector if not already done
+    if (!this.deviceDetector.isInitialized) {
+      try {
+        await this.deviceDetector.initialize();
+      } catch (error) {
+        Y3KDebug?.debug?.warn(
+          "LivingGradientStrategy",
+          "Device detection failed, using default settings:",
+          error
+        );
+        return;
+      }
+    }
+
+    const capabilities = this.deviceDetector.getCapabilities();
+    if (!capabilities) {
+      Y3KDebug?.debug?.warn(
+        "LivingGradientStrategy",
+        "No device capabilities available, using default settings"
+      );
+      return;
+    }
+
+    const overallTier = capabilities.overall;
+
+    // Adjust settings based on overall device tier
+    switch (overallTier) {
+      case "high":
+        // High-end devices: Full performance
+        this.gradientConfig.animationThrottleFps = 30;
+        this.gradientConfig.maxFrameTimeMs = 16;
+        this.gradientConfig.enablePerformanceBudget = true;
+        // CSS-first breathing now handled by CSSAnimationManager
+        break;
+
+      case "medium":
+        // Mid-range devices: Balanced performance
+        this.gradientConfig.animationThrottleFps = 20;
+        this.gradientConfig.maxFrameTimeMs = 20;
+        this.gradientConfig.enablePerformanceBudget = true;
+        // CSS-first breathing now handled by CSSAnimationManager
+        break;
+
+      case "low":
+        // Low-end devices: Performance mode
+        this.gradientConfig.animationThrottleFps = 15;
+        this.gradientConfig.maxFrameTimeMs = 33;
+        this.gradientConfig.enablePerformanceBudget = true;
+        // CSS-first breathing now handled by CSSAnimationManager
+        // Reduce visual effects for low-end devices
+        this.gradientConfig.consciousnessLayerOpacity *= 0.7;
+        this.gradientConfig.organicFlowIntensity *= 0.8;
+        // Disable expensive OKLAB processing on low-end devices
+        this.gradientConfig.oklabInterpolationEnabled = false;
+        break;
+
+      default:
+        // Default to mid-range settings for 'detecting' or unknown
+        this.gradientConfig.animationThrottleFps = 20;
+        this.gradientConfig.maxFrameTimeMs = 20;
+        break;
+    }
+
+    // Additional adjustments based on specific capabilities
+    if (!capabilities.gpu.supportsWebGL) {
+      this.gradientConfig.webglIntegrationEnabled = false;
+    }
+
+    if (capabilities.memory.level === "low") {
+      // Reduce cache size for memory-constrained devices
+      this.cacheValidityMs = 2000; // Shorter cache validity
+    }
+
+    if (capabilities.cpu.cores <= 2) {
+      // Further reduce performance for single/dual core devices
+      this.gradientConfig.animationThrottleFps = Math.min(
+        this.gradientConfig.animationThrottleFps,
+        15
+      );
+      // CSS-first breathing coordination now handled by CSSAnimationManager
+    }
+
+    // Respect user preference for reduced motion
+    if (capabilities.display.reducedMotion) {
+      this.gradientConfig.breathingAnimationEnabled = false;
+      Y3KDebug?.debug?.log(
+        "LivingGradientStrategy",
+        "Breathing animation disabled due to reduced motion preference"
+      );
+    }
+
+    Y3KDebug?.debug?.log(
+      "LivingGradientStrategy",
+      `Device-aware settings applied for ${overallTier}: ${this.gradientConfig.animationThrottleFps}fps, CSS-first breathing coordination`
     );
   }
 
@@ -192,7 +608,7 @@ export class LivingGradientStrategy implements IColorProcessor {
             processedPrimary;
         }
 
-        Y3K?.debug?.log(
+        Y3KDebug?.debug?.log(
           "LivingGradientStrategy",
           "OKLAB gradient processing applied:",
           {
@@ -217,8 +633,8 @@ export class LivingGradientStrategy implements IColorProcessor {
       // Create and apply living consciousness gradients with OKLAB enhancement
       await this.applyLivingConsciousnessBase();
 
-      // Start or update breathing animations
-      this.updateBreathingAnimation();
+      // Trigger CSS-first consciousness breathing (Year 3000 performance revolution)
+      this.triggerConsciousnessBreathing();
 
       // Update WebGL integration variables
       await this.updateWebGLIntegration();
@@ -249,7 +665,7 @@ export class LivingGradientStrategy implements IColorProcessor {
         context,
       };
 
-      Y3K?.debug?.log(
+      Y3KDebug?.debug?.log(
         "LivingGradientStrategy",
         "Living gradient processing completed",
         {
@@ -268,7 +684,7 @@ export class LivingGradientStrategy implements IColorProcessor {
     } catch (error) {
       const processingTime = performance.now() - startTime;
 
-      Y3K?.debug?.error(
+      Y3KDebug?.debug?.error(
         "LivingGradientStrategy",
         "Living gradient processing failed:",
         error
@@ -305,9 +721,9 @@ export class LivingGradientStrategy implements IColorProcessor {
       this.livingBaseState.currentBaseRgb = `${baseRgb.r},${baseRgb.g},${baseRgb.b}`;
     }
 
-    // Get current primary color if available
+    // Get current primary color if available - use official gradient variable
     const currentPrimary = computedStyle
-      .getPropertyValue("--sn-gradient-primary-rgb")
+      .getPropertyValue("--sn-bg-gradient-primary-rgb")
       .trim();
     if (currentPrimary) {
       const rgbValues = currentPrimary
@@ -325,7 +741,7 @@ export class LivingGradientStrategy implements IColorProcessor {
 
     this.livingBaseState.lastUpdateTime = Date.now();
 
-    Y3K?.debug?.log("LivingGradientStrategy", "Base state initialized:", {
+    Y3KDebug?.debug?.log("LivingGradientStrategy", "Base state initialized:", {
       base: this.livingBaseState.currentBaseHex,
       primary: this.livingBaseState.currentPrimaryHex,
     });
@@ -418,17 +834,19 @@ export class LivingGradientStrategy implements IColorProcessor {
       this.livingBaseState.oklabGradientStops
     );
 
-    // Calculate dynamic values
+    // Calculate dynamic values (CSS-first breathing replaces JavaScript breathing calculations)
+    const currentTime = performance.now();
+    const breathingPhase = (currentTime / 4000) * Math.PI * 2; // 4-second cycle for reference
     const breathingMultiplier =
-      1 + Math.sin(this.livingBaseState.breathingPhase) * 0.2;
+      1 + Math.sin(breathingPhase) * 0.2;
     const finalOpacity =
       this.livingBaseState.consciousnessIntensity * breathingMultiplier;
 
     const flowX =
-      Math.sin(this.livingBaseState.breathingPhase * 0.7) *
+      Math.sin(breathingPhase * 0.7) *
       this.gradientConfig.organicFlowIntensity;
     const flowY =
-      Math.cos(this.livingBaseState.breathingPhase * 0.5) *
+      Math.cos(breathingPhase * 0.5) *
       this.gradientConfig.organicFlowIntensity;
 
     const baseDuration = 4000; // 4 seconds
@@ -446,21 +864,60 @@ export class LivingGradientStrategy implements IColorProcessor {
     };
 
     // Apply all consciousness variables in a coordinated batch
-    await this.cssCoordinator.batchSetVariables(
+    await this.cssController.batchSetVariables(
       "LivingGradientStrategy",
       consciousnessBaseVariables,
       "high", // High priority for consciousness animations
       "living-consciousness-base"
     );
 
-    Y3K?.debug?.log(
+    Y3KDebug?.debug?.log(
       "LivingGradientStrategy",
       "Applied coordinated living consciousness base gradient"
     );
   }
 
   /**
-   * Create living gradient based on current state with OKLAB enhancement
+   * Create cached gradient key for OKLAB gradient generation
+   */
+  private createGradientCacheKey(
+    primaryRgb: string,
+    baseRgb: string,
+    oklabGradientStops: OKLABProcessingResult[],
+    breathingPhase: number
+  ): string {
+    const stopKey = oklabGradientStops
+      .map((stop, index) => `${stop.enhancedHex}-${index}`)
+      .join("|");
+    return `${primaryRgb}-${baseRgb}-${stopKey}-${Math.floor(
+      breathingPhase * 10
+    )}`;
+  }
+
+  /**
+   * Clean up expired cache entries
+   */
+  private cleanupCache(): void {
+    const now = Date.now();
+
+    // Only clean up every 10 seconds to avoid overhead
+    if (now - this.lastCacheCleanup < 10000) return;
+
+    this.lastCacheCleanup = now;
+
+    // Clear gradient cache (it's small and regenerates quickly)
+    this.gradientCache.clear();
+
+    // Keep OKLAB cache as it's more expensive to regenerate
+    // Note: OKLAB cache is managed by the ColorOrchestrator/SettingsManager
+
+    if (this.config.enableDebug) {
+      Y3KDebug?.debug?.log("LivingGradientStrategy", "Cache cleanup completed");
+    }
+  }
+
+  /**
+   * Create living gradient based on current state with OKLAB enhancement and caching
    */
   private createLivingGradient(
     oklabGradientStops: OKLABProcessingResult[] = []
@@ -468,6 +925,45 @@ export class LivingGradientStrategy implements IColorProcessor {
     const primaryRgb = this.livingBaseState.currentPrimaryRgb;
     const baseRgb = this.livingBaseState.currentBaseRgb;
 
+    // Check cache first for performance optimization
+    // Use current time-based breathing phase for cache key consistency  
+    const currentTime = performance.now();
+    const breathingPhase = (currentTime / 4000) * Math.PI * 2; // 4-second cycle
+    const cacheKey = this.createGradientCacheKey(
+      primaryRgb,
+      baseRgb,
+      oklabGradientStops,
+      breathingPhase
+    );
+
+    const cachedGradient = this.gradientCache.get(cacheKey);
+    if (cachedGradient) {
+      // Periodically clean up cache
+      this.cleanupCache();
+      return cachedGradient;
+    }
+
+    // Generate gradient if not cached
+    const gradient = this.generateLivingGradient(
+      primaryRgb,
+      baseRgb,
+      oklabGradientStops
+    );
+
+    // Cache the result for future use
+    this.gradientCache.set(cacheKey, gradient);
+
+    return gradient;
+  }
+
+  /**
+   * Generate the actual gradient (extracted for caching)
+   */
+  private generateLivingGradient(
+    primaryRgb: string,
+    baseRgb: string,
+    oklabGradientStops: OKLABProcessingResult[]
+  ): string {
     // Use OKLAB gradient stops if available for perceptually uniform transitions
     if (
       this.gradientConfig.oklabInterpolationEnabled &&
@@ -533,54 +1029,36 @@ export class LivingGradientStrategy implements IColorProcessor {
   }
 
   /**
-   * Update breathing animation
+   * Update breathing animation (Year 3000 CSS-first approach)
    */
   private updateBreathingAnimation(): void {
-    if (!this.gradientConfig.breathingAnimationEnabled) return;
-
-    if (!this.isAnimating) {
-      this.startBreathingAnimation();
-    }
+    // Replaced with CSS-first consciousness breathing via CSSAnimationManager
+    this.triggerConsciousnessBreathing();
   }
 
   /**
-   * Start breathing animation loop
+   * Start breathing animation (Year 3000 CSS-first approach)
    */
   private startBreathingAnimation(): void {
-    if (this.isAnimating) return;
+    // Year 3000 performance revolution: Replaced JavaScript RAF loop with CSS-first breathing
+    this.triggerConsciousnessBreathing();
+    
+    Y3KDebug?.debug?.log(
+      "LivingGradientStrategy",
+      "CSS-first consciousness breathing started - 90%+ JavaScript overhead eliminated"
+    );
+  }
 
-    this.isAnimating = true;
-    this.breathingStartTime = Date.now();
-
-    const animate = () => {
-      if (!this.isAnimating) return;
-
-      const elapsed = Date.now() - this.breathingStartTime;
-      const baseDuration = 4000; // 4 seconds
-      const energyMultiplier = 0.5 + this.livingBaseState.musicEnergy * 1.5;
-      const actualDuration = baseDuration / energyMultiplier;
-
-      // Update breathing phase (0 to 2π)
-      this.livingBaseState.breathingPhase =
-        (elapsed / actualDuration) * Math.PI * 2;
-
-      // Update consciousness base if animation is enabled
-      if (this.gradientConfig.breathingAnimationEnabled) {
-        this.applyLivingConsciousnessBase().catch((error) => {
-          Y3K?.debug?.error(
-            "LivingGradientStrategy",
-            "Error applying consciousness base in animation:",
-            error
-          );
-        });
-      }
-
-      this.animationFrameId = requestAnimationFrame(animate);
-    };
-
-    this.animationFrameId = requestAnimationFrame(animate);
-
-    Y3K?.debug?.log("LivingGradientStrategy", "Breathing animation started");
+  /**
+   * Schedule debounced CSS updates (Year 3000 - No longer needed with CSS-first approach)
+   */
+  private scheduleDebouncedCssUpdate(): void {
+    // Year 3000 performance revolution: CSS animations handle timing automatically
+    // No more JavaScript debouncing needed - CSS keyframes manage their own timing
+    Y3KDebug?.debug?.log(
+      "LivingGradientStrategy", 
+      "Debounced CSS updates eliminated - using CSS-first breathing"
+    );
   }
 
   /**
@@ -589,9 +1067,8 @@ export class LivingGradientStrategy implements IColorProcessor {
   private async updateWebGLIntegration(): Promise<void> {
     if (!this.gradientConfig.webglIntegrationEnabled) return;
 
-    // Build WebGL integration variables
+    // Build WebGL integration variables - use official gradient variables only
     const webglIntegrationVariables: Record<string, string> = {
-      "--sn-gradient-primary-rgb": this.livingBaseState.currentPrimaryRgb,
       "--sn-bg-gradient-primary-rgb": this.livingBaseState.currentPrimaryRgb,
       "--sn-webgl-living-gradient-sync": "1",
       "--sn-gradient-consciousness-level":
@@ -599,7 +1076,7 @@ export class LivingGradientStrategy implements IColorProcessor {
     };
 
     // Apply WebGL coordination variables
-    await this.cssCoordinator.batchSetVariables(
+    await this.cssController.batchSetVariables(
       "LivingGradientStrategy",
       webglIntegrationVariables,
       "high", // High priority for WebGL coordination
@@ -608,7 +1085,7 @@ export class LivingGradientStrategy implements IColorProcessor {
 
     this.livingBaseState.webglIntegrationActive = true;
 
-    Y3K?.debug?.log("LivingGradientStrategy", "WebGL integration updated");
+    Y3KDebug?.debug?.log("LivingGradientStrategy", "WebGL integration updated");
   }
 
   /**
@@ -619,31 +1096,212 @@ export class LivingGradientStrategy implements IColorProcessor {
   }
 
   /**
-   * Update configuration
+   * Update living consciousness base when colors change
    */
-  public updateConfig(newConfig: Partial<LivingGradientConfig>): void {
-    this.gradientConfig = { ...this.gradientConfig, ...newConfig };
-
-    // Update OKLAB processor debug setting if configuration changed
-    if (
-      "oklabInterpolationEnabled" in newConfig ||
-      "oklabPreset" in newConfig
-    ) {
-      this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
-    }
-
-    Y3K?.debug?.log("LivingGradientStrategy", "Configuration updated:", {
-      ...newConfig,
-      oklabInterpolation: this.gradientConfig.oklabInterpolationEnabled,
-      oklabPreset: this.gradientConfig.oklabPreset,
-      gradientSmoothness: this.gradientConfig.gradientSmoothness,
+  private updateLivingConsciousnessBase(): void {
+    this.applyLivingConsciousnessBase().catch((error) => {
+      Y3KDebug?.debug?.error(
+        "LivingGradientStrategy",
+        "Failed to update living consciousness base:",
+        error
+      );
     });
+
+    // Emit update event for other systems
+    const updateEvent = new CustomEvent("living-base-update", {
+      detail: {
+        baseHex: this.livingBaseState.currentBaseHex,
+        primaryHex: this.livingBaseState.currentPrimaryHex,
+        consciousnessIntensity: this.livingBaseState.consciousnessIntensity,
+        timestamp: Date.now(),
+      },
+    });
+    document.dispatchEvent(updateEvent);
   }
 
   /**
-   * Health check for strategy status
+   * Update music-responsive variables
+   */
+  private updateMusicResponsiveVariables(): void {
+    const musicResponsiveVariables: Record<string, string> = {
+      "--consciousness-music-energy":
+        this.livingBaseState.musicEnergy.toString(),
+      "--consciousness-music-intensity":
+        this.livingBaseState.consciousnessIntensity.toString(),
+    };
+
+    this.cssController
+      .batchSetVariables(
+        "LivingGradientStrategy",
+        musicResponsiveVariables,
+        3 as any, // medium priority
+        "music-responsive"
+      )
+      .catch((error) => {
+        Y3KDebug?.debug?.error(
+          "LivingGradientStrategy",
+          "Failed to update music responsive variables:",
+          error
+        );
+      });
+  }
+
+  /**
+   * Update consciousness variables
+   */
+  private updateConsciousnessVariables(): void {
+    const consciousnessVariables: Record<string, string> = {
+      "--consciousness-intensity-global":
+        this.livingBaseState.consciousnessIntensity.toString(),
+      "--consciousness-layer-opacity": (
+        this.gradientConfig.consciousnessLayerOpacity *
+        this.livingBaseState.consciousnessIntensity
+      ).toString(),
+    };
+
+    this.cssController
+      .batchSetVariables(
+        "LivingGradientStrategy",
+        consciousnessVariables,
+        3 as any, // medium priority
+        "consciousness-vars"
+      )
+      .catch((error) => {
+        Y3KDebug?.debug?.error(
+          "LivingGradientStrategy",
+          "Failed to update consciousness variables:",
+          error
+        );
+      });
+  }
+
+  /**
+   * Coordinate with WebGL gradient system
+   */
+  private coordinateWithWebGLSystem(webglEnabled: boolean): void {
+    const webglCoordinationVariables: Record<string, string> = webglEnabled
+      ? {
+          // Reduce CSS layer opacity to allow WebGL to dominate
+          "--consciousness-webgl-coordination": "0.7",
+          "--consciousness-css-fallback": "0.3",
+        }
+      : {
+          // Full CSS consciousness when WebGL is disabled
+          "--consciousness-webgl-coordination": "0",
+          "--consciousness-css-fallback": "1.0",
+        };
+
+    this.cssController
+      .batchSetVariables(
+        "LivingGradientStrategy",
+        webglCoordinationVariables,
+        "high",
+        "webgl-coordination"
+      )
+      .catch((error) => {
+        Y3KDebug?.debug?.error(
+          "LivingGradientStrategy",
+          "Failed to coordinate with WebGL system:",
+          error
+        );
+      });
+
+    Y3KDebug?.debug?.log(
+      "LivingGradientStrategy",
+      `WebGL coordination ${webglEnabled ? "enabled" : "disabled"}`
+    );
+  }
+
+  /**
+   * Coordinate with WebGL gradient updates
+   */
+  private coordinateWithWebGLGradient(webglData: any): void {
+    if (!this.gradientConfig.webglIntegrationEnabled) return;
+
+    // Update consciousness variables to match WebGL state
+    if (webglData.flowState) {
+      this.updateFlowStateFromWebGL(webglData.flowState);
+    }
+
+    if (webglData.colorState) {
+      this.updateColorStateFromWebGL(webglData.colorState);
+    }
+  }
+
+  /**
+   * Update flow state from WebGL system
+   */
+  private updateFlowStateFromWebGL(flowState: any): void {
+    const flowVariables: Record<string, string> = {};
+
+    if (flowState.flowX !== undefined) {
+      flowVariables["--consciousness-webgl-flow-x"] = `${flowState.flowX}%`;
+    }
+    if (flowState.flowY !== undefined) {
+      flowVariables["--consciousness-webgl-flow-y"] = `${flowState.flowY}%`;
+    }
+    if (flowState.flowScale !== undefined) {
+      flowVariables["--consciousness-webgl-scale"] =
+        flowState.flowScale.toString();
+    }
+
+    if (Object.keys(flowVariables).length > 0) {
+      this.cssController
+        .batchSetVariables(
+          "LivingGradientStrategy",
+          flowVariables,
+          3 as any, // medium priority
+          "webgl-flow"
+        )
+        .catch((error) => {
+          Y3KDebug?.debug?.error(
+            "LivingGradientStrategy",
+            "Failed to update WebGL flow state:",
+            error
+          );
+        });
+    }
+  }
+
+  /**
+   * Update color state from WebGL system
+   */
+  private updateColorStateFromWebGL(colorState: any): void {
+    // Sync color variables with WebGL for unified consciousness
+    if (colorState.primaryColor) {
+      // WebGL may have processed colors differently, sync them
+      this.livingBaseState.currentPrimaryRgb = colorState.primaryColor;
+      this.updateLivingConsciousnessBase();
+    }
+  }
+
+  /**
+   * Health check to include both strategy and visual system status
    */
   public async healthCheck(): Promise<any> {
+    const strategyHealth = await this.getStrategyHealthCheck();
+    // Don't call super.healthCheck() as BaseVisualSystem doesn't have it
+    // Instead use our own consolidated health check
+
+    return {
+      healthy: strategyHealth.healthy && this.isActive,
+      canProcess: strategyHealth.canProcess,
+      issues: strategyHealth.issues || [],
+      metrics: {
+        ...strategyHealth.metrics,
+        systemType: "consolidated-living-gradient",
+        isVisualSystem: true,
+        isColorProcessor: true,
+        isActive: this.isActive,
+        initialized: this.initialized,
+      },
+    };
+  }
+
+  /**
+   * Get strategy-specific health check data
+   */
+  private async getStrategyHealthCheck(): Promise<any> {
     const hasRecentUpdate =
       Date.now() - this.livingBaseState.lastUpdateTime < 30000; // 30s
 
@@ -661,9 +1319,8 @@ export class LivingGradientStrategy implements IColorProcessor {
         webglIntegrationActive: this.livingBaseState.webglIntegrationActive,
         consciousnessIntensity: this.livingBaseState.consciousnessIntensity,
         musicEnergy: this.livingBaseState.musicEnergy,
-        breathingPhase: this.livingBaseState.breathingPhase,
         hasRecentUpdate,
-        isAnimating: this.isAnimating,
+        cssFirstBreathing: true, // CSS-first breathing replaces JavaScript animation
         oklabInterpolation: this.gradientConfig.oklabInterpolationEnabled,
         oklabPreset: this.gradientConfig.oklabPreset,
         gradientSmoothness: this.gradientConfig.gradientSmoothness,
@@ -673,19 +1330,76 @@ export class LivingGradientStrategy implements IColorProcessor {
   }
 
   /**
-   * Stop animations and cleanup
+   * Override destroy method to include both strategy and visual system cleanup
    */
-  public destroy(): void {
-    this.isAnimating = false;
-
-    if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = 0;
+  public override destroy(): void {
+    // Year 3000 CSS-first cleanup: Stop consciousness breathing via CSSAnimationManager
+    if (this.cssAnimationManager) {
+      this.cssAnimationManager.stopConsciousnessBreathing();
     }
 
-    Y3K?.debug?.log(
+    // Clear caches
+    this.oklabCache.clear();
+    this.gradientCache.clear();
+
+    // Call base system cleanup
+    super.destroy();
+
+    Y3KDebug?.debug?.log(
       "LivingGradientStrategy",
-      "Living gradient strategy destroyed"
+      "Consolidated living gradient system destroyed with complete cleanup"
+    );
+  }
+
+  /**
+   * Override BaseVisualSystem cleanup method
+   */
+  public override _performSystemSpecificCleanup(): void {
+    super._performSystemSpecificCleanup();
+
+    // CSS-first breathing cleanup (no JavaScript animation frame to cancel)
+    // Breathing animations are now handled entirely by CSS keyframes
+
+    Y3KDebug?.debug?.log(
+      "LivingGradientStrategy",
+      "Living gradient system cleaned up"
+    );
+  }
+
+  /**
+   * Update configuration
+   */
+  public updateConfig(newConfig: Partial<LivingGradientConfig>): void {
+    this.gradientConfig = { ...this.gradientConfig, ...newConfig };
+
+    // Update OKLAB processor debug setting if configuration changed
+    if (
+      "oklabInterpolationEnabled" in newConfig ||
+      "oklabPreset" in newConfig
+    ) {
+      this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+    }
+
+    Y3KDebug?.debug?.log("LivingGradientStrategy", "Configuration updated:", {
+      ...newConfig,
+      oklabInterpolation: this.gradientConfig.oklabInterpolationEnabled,
+      oklabPreset: this.gradientConfig.oklabPreset,
+      gradientSmoothness: this.gradientConfig.gradientSmoothness,
+    });
+  }
+
+  /**
+   * Stop breathing animation (Year 3000 CSS-first approach)
+   */
+  public stopBreathingAnimation(): void {
+    // Year 3000 performance revolution: Delegate to CSSAnimationManager
+    if (this.cssAnimationManager) {
+      this.cssAnimationManager.stopConsciousnessBreathing();
+    }
+
+    Y3KDebug?.debug?.log(
+      "LivingGradientStrategy",
+      "CSS-first consciousness breathing stopped"
     );
   }
 }

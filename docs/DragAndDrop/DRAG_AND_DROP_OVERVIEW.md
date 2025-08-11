@@ -53,7 +53,7 @@ flowchart TD
 - **Live Region:** `#sn-live` (polite) announces menu open & success states.
 - **Reduced-Motion:** Media query aborts FLIP & spring animations.
 - **Keyboard Mapping:** Numeric keys `1-5` activate corresponding playlist buttons.
-- **Hover Aura:** Houdini paint worklet (`quickAddAura.js`) provides non-essential glow that degrades silently.
+- **Hover Effect:** Houdini paint worklet (`quickAddEffect.js`) provides non-essential glow that degrades silently.
 
 ---
 

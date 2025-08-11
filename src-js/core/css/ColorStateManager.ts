@@ -10,38 +10,39 @@
  */
 
 import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
-import { OptimizedUnifiedCSSConsciousnessController } from '@/core/performance/OptimizedCSSVariableBatcher';
+import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from '@/core/performance/OptimizedCSSVariableManager';
 import { SettingsManager } from '@/ui/managers/SettingsManager';
 import type { IManagedSystem, HealthCheckResult } from '@/types/systems';
 import {
-  CATPPUCCIN_PALETTES,
+  paletteSystemManager,
   getBrightnessAdjustedBaseColor,
   getBrightnessAdjustedSurfaceColor,
-  getCatppuccinAccentColor,
+  getAccentColor,
   getDefaultAccentColor,
-  type CatppuccinFlavor,
-  type CatppuccinColorName,
-  type CatppuccinColor
-} from '@/utils/color/CatppuccinPalettes';
+  type UnifiedFlavor,
+  type UnifiedColorName,
+  type UnifiedColor,
+  type UnifiedPalette
+} from '@/utils/color/PaletteSystemManager';
 
 export interface ColorStateConfig {
-  catppuccinFlavor: CatppuccinFlavor;
+  paletteSystemFlavor: UnifiedFlavor;
   brightnessMode: 'bright' | 'balanced' | 'dark';
-  accentColor: CatppuccinColorName | 'dynamic';
+  accentColor: UnifiedColorName | 'dynamic';
   dynamicAlbumColors?: {
-    primary: CatppuccinColor;
-    secondary: CatppuccinColor;
-    accent: CatppuccinColor;
+    primary: UnifiedColor;
+    secondary: UnifiedColor;
+    accent: UnifiedColor;
   };
   preserveAlbumArt: boolean;
   enableTransitions: boolean;
 }
 
 export interface ColorStateResult {
-  baseColor: CatppuccinColor;
-  surfaceColor: CatppuccinColor;
-  accentColor: CatppuccinColor;
-  textColor: CatppuccinColor;
+  baseColor: UnifiedColor;
+  surfaceColor: UnifiedColor;
+  accentColor: UnifiedColor;
+  textColor: UnifiedColor;
   effectiveConfig: ColorStateConfig;
   timestamp: number;
 }
@@ -86,10 +87,8 @@ export class ColorStateManager implements IManagedSystem {
   private currentState: ColorStateResult | null = null;
   private isUpdating = false;
   
-  // 🔧 PHASE 2: CSS Authority Consolidation - Batched CSS Updates
-  private cssBatcher: OptimizedUnifiedCSSConsciousnessController | null = null;
-  private pendingCSSUpdates = new Map<string, string>();
-  private cssUpdateTimer: number | null = null;
+  // 🔧 PHASE 2: CSS Authority Consolidation - Single Optimized Controller
+  private cssController!: OptimizedCSSVariableManager;
   
   // Performance tracking
   private updateCount = 0;
@@ -101,6 +100,11 @@ export class ColorStateManager implements IManagedSystem {
 
   public async initialize(): Promise<void> {
     if (this.initialized) return;
+
+    // Initialize CSS controller - use globalThis to access Year3000System
+    const year3000System = (globalThis as any).year3000System;
+    this.cssController = year3000System?.cssConsciousnessController || 
+                        getGlobalOptimizedCSSController();
 
     // Listen for settings changes
     unifiedEventBus.subscribe('settings:changed', this.handleSettingsChange.bind(this), 'ColorStateManager');
@@ -167,13 +171,7 @@ export class ColorStateManager implements IManagedSystem {
   public destroy(): void {
     unifiedEventBus.unsubscribeAll('ColorStateManager');
     
-    // 🔧 PHASE 2: Clean up CSS batching resources
-    if (this.cssUpdateTimer) {
-      clearTimeout(this.cssUpdateTimer);
-      this.cssUpdateTimer = null;
-    }
-    this.pendingCSSUpdates.clear();
-    this.cssBatcher = null;
+    // CSS controller cleanup is handled by the system coordinator
     
     this.currentState = null;
     this.initialized = false;
@@ -184,20 +182,25 @@ export class ColorStateManager implements IManagedSystem {
    */
   private getCurrentConfig(): ColorStateConfig {
     if (!this.settingsManager) {
-      // Fallback to safe defaults
+      // Fallback to safe defaults using current palette system
+      const defaultFlavor = paletteSystemManager.getCurrentDefaultFlavor();
       return {
-        catppuccinFlavor: 'mocha',
-        brightnessMode: 'bright',
-        accentColor: 'mauve',
+        paletteSystemFlavor: defaultFlavor,
+        brightnessMode: 'dark', // Updated to use corrected default
+        accentColor: 'mauve' as UnifiedColorName,
         preserveAlbumArt: true,
         enableTransitions: true
       };
     }
 
+    // Get the current flavor from settings, or use palette system default
+    const settingsFlavor = this.settingsManager.get('catppuccin-flavor');
+    const currentFlavor = settingsFlavor as UnifiedFlavor || paletteSystemManager.getCurrentDefaultFlavor();
+
     return {
-      catppuccinFlavor: this.settingsManager.get('catppuccin-flavor') as CatppuccinFlavor,
+      paletteSystemFlavor: currentFlavor,
       brightnessMode: this.settingsManager.get('sn-brightness-mode') as 'bright' | 'balanced' | 'dark',
-      accentColor: this.settingsManager.get('catppuccin-accentColor') as CatppuccinColorName | 'dynamic',
+      accentColor: this.settingsManager.get('catppuccin-accentColor') as UnifiedColorName | 'dynamic',
       preserveAlbumArt: true, // TODO: Add setting for this
       enableTransitions: true
     };
@@ -207,25 +210,29 @@ export class ColorStateManager implements IManagedSystem {
    * Calculate the effective color state based on current configuration
    */
   private calculateColorState(config: ColorStateConfig): ColorStateResult {
-    const { catppuccinFlavor, brightnessMode, accentColor, dynamicAlbumColors } = config;
+    const { paletteSystemFlavor, brightnessMode, accentColor, dynamicAlbumColors } = config;
 
-    // Get brightness-adjusted base and surface colors
-    const baseColor = getBrightnessAdjustedBaseColor(catppuccinFlavor, brightnessMode);
-    const surfaceColor = getBrightnessAdjustedSurfaceColor(catppuccinFlavor, brightnessMode);
+    // Get brightness-adjusted base and surface colors using unified system
+    const baseColor = getBrightnessAdjustedBaseColor(paletteSystemFlavor, brightnessMode);
+    const surfaceColor = getBrightnessAdjustedSurfaceColor(paletteSystemFlavor, brightnessMode);
 
-    // Determine accent color
-    let effectiveAccentColor: CatppuccinColor;
+    // Determine accent color using unified system
+    let effectiveAccentColor: UnifiedColor;
     if (accentColor === 'dynamic' && dynamicAlbumColors) {
       effectiveAccentColor = dynamicAlbumColors.accent;
     } else if (accentColor === 'dynamic') {
-      effectiveAccentColor = getDefaultAccentColor(catppuccinFlavor);
+      effectiveAccentColor = getDefaultAccentColor(paletteSystemFlavor);
     } else {
-      effectiveAccentColor = getCatppuccinAccentColor(catppuccinFlavor, accentColor);
+      effectiveAccentColor = getAccentColor(accentColor, paletteSystemFlavor);
     }
 
-    // Get appropriate text color
-    const palette = CATPPUCCIN_PALETTES[catppuccinFlavor];
-    const textColor = palette['text' as keyof typeof palette];
+    // Get appropriate text color from current palette system
+    const currentPalette = paletteSystemManager.getCurrentPalette();
+    const flavorPalette = currentPalette[paletteSystemFlavor];
+    if (!flavorPalette) {
+      throw new Error(`Flavor '${paletteSystemFlavor}' not found in current palette system`);
+    }
+    const textColor = flavorPalette['text' as keyof typeof flavorPalette] as UnifiedColor;
 
     return {
       baseColor,
@@ -285,101 +292,106 @@ export class ColorStateManager implements IManagedSystem {
       '--sn-bg-gradient-accent-rgb': state.accentColor.rgb,
       
       // === LOW PRIORITY: Meta information for debugging ===
-      '--sn-color-state-flavor': `"${state.effectiveConfig.catppuccinFlavor}"`,
+      '--sn-color-state-flavor': `"${state.effectiveConfig.paletteSystemFlavor}"`,
       '--sn-color-state-brightness': `"${state.effectiveConfig.brightnessMode}"`,
       '--sn-color-state-accent': `"${state.effectiveConfig.accentColor}"`,
+      '--sn-color-state-palette-system': `"${paletteSystemManager.getCurrentPaletteSystem()}"`,
       '--sn-color-state-timestamp': state.timestamp.toString()
     };
 
-    // 🔧 PHASE 2: Use batched CSS updates if available, fallback to direct DOM
-    await this.applyCSSVariablesBatched(cssUpdates);
+    // Apply CSS variables through OptimizedCSSVariableManager with intelligent priority grouping
+    await this.applyColorVariablesWithPriorities(cssUpdates);
 
     const endTime = performance.now();
     const updateDuration = endTime - startTime;
 
-    console.log(`🎨 [ColorStateManager] Applied ${Object.keys(cssUpdates).length} CSS variables in ${updateDuration.toFixed(2)}ms (batched: ${!!this.cssBatcher})`);
+    console.log(`🎨 [ColorStateManager] Applied ${Object.keys(cssUpdates).length} CSS variables in ${updateDuration.toFixed(2)}ms (via OptimizedCSSVariableManager)`);
   }
 
   /**
-   * 🔧 PHASE 2: Batched CSS variable application with priority support
+   * Apply color variables through OptimizedCSSVariableManager with intelligent priority grouping
    */
-  private async applyCSSVariablesBatched(cssUpdates: Record<string, string>): Promise<void> {
-    // If no batcher available, apply directly (maintains compatibility)
-    if (!this.cssBatcher) {
-      Object.entries(cssUpdates).forEach(([key, value]) => {
-        document.documentElement.style.setProperty(key, value);
-      });
-      return;
-    }
-
-    // Group variables by priority for optimized batching
+  private async applyColorVariablesWithPriorities(cssUpdates: Record<string, string>): Promise<void> {
+    // Group variables by priority for optimized coordination
     const criticalVars = ['--sn-cosmic-base-hex', '--sn-cosmic-accent-hex', '--spice-accent', '--spice-base'];
     const highPriorityVars = ['--sn-color-', '--sn-dynamic-accent-'];
     
-    // Queue all variables - OptimizedCSSVariableBatcher will handle prioritization automatically
+    const criticalUpdates: Record<string, string> = {};
+    const highPriorityUpdates: Record<string, string> = {};
+    const normalUpdates: Record<string, string> = {};
+    const lowPriorityUpdates: Record<string, string> = {};
+
+    // Group variables by priority
     Object.entries(cssUpdates).forEach(([property, value]) => {
-      this.cssBatcher!.queueCSSVariableUpdate(property, value);
+      if (criticalVars.some(prefix => property.includes(prefix))) {
+        criticalUpdates[property] = value;
+      } else if (highPriorityVars.some(prefix => property.includes(prefix))) {
+        highPriorityUpdates[property] = value;
+      } else if (property.includes('state-') || property.includes('timestamp')) {
+        lowPriorityUpdates[property] = value;
+      } else {
+        normalUpdates[property] = value;
+      }
     });
+
+    // Apply updates in separate batches by priority using OptimizedCSSVariableManager
+    if (Object.keys(criticalUpdates).length > 0) {
+      this.cssController.batchSetVariables(
+        "ColorStateManager",
+        criticalUpdates,
+        "critical",
+        "color-state-critical"
+      );
+    }
+
+    if (Object.keys(highPriorityUpdates).length > 0) {
+      this.cssController.batchSetVariables(
+        "ColorStateManager",
+        highPriorityUpdates,
+        "high",
+        "color-state-high"
+      );
+    }
+
+    if (Object.keys(normalUpdates).length > 0) {
+      this.cssController.batchSetVariables(
+        "ColorStateManager",
+        normalUpdates,
+        "normal",
+        "color-state-normal"
+      );
+    }
+
+    if (Object.keys(lowPriorityUpdates).length > 0) {
+      this.cssController.batchSetVariables(
+        "ColorStateManager",
+        lowPriorityUpdates,
+        "low",
+        "color-state-meta"
+      );
+    }
   }
 
   /**
-   * 🔧 PHASE 2: Generic method for other systems to queue CSS updates through ColorStateManager
+   * 🔧 PHASE 2: Generic method for other systems to queue CSS updates through ColorStateManager using coordination
    * This makes ColorStateManager the single CSS authority for all color-related variables
    */
   public queueCSSVariableUpdate(property: string, value: string, priority: 'critical' | 'high' | 'normal' | 'low' = 'normal'): void {
-    if (this.cssBatcher) {
-      // OptimizedCSSVariableBatcher determines priority automatically, so we just queue it
-      this.cssBatcher.queueCSSVariableUpdate(property, value);
-    } else {
-      // Fallback: queue for later batch application
-      this.pendingCSSUpdates.set(property, value);
-      this.scheduleBatchUpdate();
-    }
+    // Use coordination-first approach with proper priority mapping
+    const mappedPriority: "low" | "normal" | "high" | "critical" = priority === 'critical' ? 'critical' : 
+                                           priority === 'high' ? 'high' :
+                                           priority === 'low' ? 'low' : 'normal';
+    
+    this.cssController.setVariable(
+      "ColorStateManager",
+      property,
+      value,
+      mappedPriority,
+      "color-state-queue"
+    );
   }
 
-  /**
-   * 🔧 PHASE 2: Schedule batched updates for pending CSS variables
-   */
-  private scheduleBatchUpdate(): void {
-    if (this.cssUpdateTimer) return;
-    
-    this.cssUpdateTimer = window.setTimeout(() => {
-      this.flushPendingCSSUpdates();
-      this.cssUpdateTimer = null;
-    }, 16); // 1 frame delay for batching
-  }
-
-  /**
-   * 🔧 PHASE 2: Flush pending CSS updates when no batcher is available
-   */
-  private flushPendingCSSUpdates(): void {
-    if (this.pendingCSSUpdates.size === 0) return;
-    
-    const startTime = performance.now();
-    this.pendingCSSUpdates.forEach((value, property) => {
-      document.documentElement.style.setProperty(property, value);
-    });
-    
-    const updateDuration = performance.now() - startTime;
-    console.log(`🎨 [ColorStateManager] Flushed ${this.pendingCSSUpdates.size} pending CSS variables in ${updateDuration.toFixed(2)}ms`);
-    
-    this.pendingCSSUpdates.clear();
-  }
-
-  /**
-   * 🔧 PHASE 2: Set CSS batcher for optimized performance
-   */
-  public setCSSBatcher(batcher: OptimizedUnifiedCSSConsciousnessController): void {
-    this.cssBatcher = batcher;
-    
-    // Flush any pending updates through the new batcher
-    if (this.pendingCSSUpdates.size > 0) {
-      this.pendingCSSUpdates.forEach((value, property) => {
-        this.cssBatcher!.queueCSSVariableUpdate(property, value);
-      });
-      this.pendingCSSUpdates.clear();
-    }
-  }
+  // All CSS variable updates now handled directly through OptimizedCSSVariableManager
 
   /**
    * Verify that critical CSS variables were actually applied to the DOM
@@ -425,7 +437,7 @@ export class ColorStateManager implements IManagedSystem {
         this.currentState.baseColor.hex !== newState.baseColor.hex ||
         this.currentState.surfaceColor.hex !== newState.surfaceColor.hex ||
         this.currentState.accentColor.hex !== newState.accentColor.hex ||
-        this.currentState.effectiveConfig.catppuccinFlavor !== newState.effectiveConfig.catppuccinFlavor ||
+        this.currentState.effectiveConfig.paletteSystemFlavor !== newState.effectiveConfig.paletteSystemFlavor ||
         this.currentState.effectiveConfig.brightnessMode !== newState.effectiveConfig.brightnessMode;
 
       if (hasChanged) {
@@ -454,9 +466,10 @@ export class ColorStateManager implements IManagedSystem {
         });
 
         console.log(`🎨 [ColorStateManager] Color state updated (${trigger}):`, {
-          flavor: newState.effectiveConfig.catppuccinFlavor,
+          flavor: newState.effectiveConfig.paletteSystemFlavor,
           brightness: newState.effectiveConfig.brightnessMode,
           accent: newState.effectiveConfig.accentColor,
+          paletteSystem: paletteSystemManager.getCurrentPaletteSystem(),
           base: newState.baseColor.hex,
           surface: newState.surfaceColor.hex,
           accentHex: newState.accentColor.hex

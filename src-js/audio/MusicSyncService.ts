@@ -6,7 +6,7 @@ import type { Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import * as Utils from "@/utils/core/Year3000Utilities";
 import { SpicetifyCompat } from "@/utils/platform/SpicetifyCompat";
-import { StorageManager } from "@/utils/platform/StorageManager";
+import { settings } from "@/config";
 import { GenreProfileManager } from "./GenreProfileManager";
 import { 
   OKLABColorProcessor, 
@@ -1597,19 +1597,30 @@ export class MusicSyncService {
 
   private loadUserPreferences(): any {
     try {
-      const prefs = StorageManager.get("sn-music-sync-prefs");
-      return prefs ? JSON.parse(prefs) : {};
+      // Use individual settings from the typed system instead of a single JSON blob
+      return {
+        enableMusicSync: true, // Always enabled since no specific setting exists
+        audioAnalysisQuality: settings.get("sn-webgl-quality") || "medium",
+        gradientIntensity: settings.get("sn-gradient-intensity") || "balanced",
+        artisticMode: settings.get("sn-artistic-mode") || "artist-vision",
+      };
     } catch (e) {
-      return {};
+      return {
+        enableMusicSync: true,
+        audioAnalysisQuality: "medium",
+        gradientIntensity: "balanced",
+        artisticMode: "artist-vision",
+      };
     }
   }
 
   private saveUserPreferences(): void {
     try {
-      StorageManager.set(
-        "sn-music-sync-prefs",
-        JSON.stringify(this.userPreferences)
-      );
+      // Music sync preferences are now managed by the core settings system
+      // Individual settings are saved automatically by the settings provider
+      if (this.config.enableDebug) {
+        console.log("[MusicSyncService] User preferences updated via settings system");
+      }
     } catch (error) {
       if (this.config.enableDebug) {
         console.warn(

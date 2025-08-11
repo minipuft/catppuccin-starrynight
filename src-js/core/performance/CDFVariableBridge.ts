@@ -3,24 +3,35 @@
 // ----------------------------------------------------------------------------
 // Listens for the `cdf:frameContext` event emitted by VisualSystemRegistry and
 // writes canonical --sn-cdf-* variables each animation frame through the
-// existing UnifiedCSSConsciousnessController to avoid excessive style recalculations.
+// existing OptimizedCSSVariableManager to avoid excessive style recalculations.
 // ============================================================================
 
-import { GlobalEventBus } from "@/core/events/EventBus";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import type { FrameContext } from "@/core/animation/EnhancedMasterAnimationCoordinator";
-import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
+import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
 
 export class CDFVariableBridge {
   private unsubscribe: () => void;
   private reduceMotionMQ: MediaQueryList | null = null;
   private _mqHandler: ((e: MediaQueryListEvent) => void) | null = null;
 
-  constructor(private batcher: UnifiedCSSConsciousnessController) {
+  constructor(private batcher: OptimizedCSSVariableManager) {
     // Subscribe to frame context broadcasts
-    this.unsubscribe = GlobalEventBus.subscribe<FrameContext>(
-      "cdf:frameContext",
-      (ctx) => this._handleFrame(ctx)
+    const subscriptionId = unifiedEventBus.subscribe(
+      "performance:frame",
+      (data) => {
+        // Map performance data to frame context
+        const ctx: FrameContext = {
+          deltaMs: data.deltaTime || 16.67,
+          timestamp: data.timestamp || Date.now(),
+          performanceMode: 'performance',
+          frameBudget: 16.67
+        };
+        this._handleFrame(ctx);
+      },
+      'CDFVariableBridge'
     );
+    this.unsubscribe = () => unifiedEventBus.unsubscribe(subscriptionId);
 
     // Initial reduced-motion sync + listener
     if (typeof window !== "undefined" && window.matchMedia) {
@@ -76,7 +87,7 @@ export class CDFVariableBridge {
     if (typeof ctx.beatIntensity === "number") {
       const val = ctx.beatIntensity.toFixed(3);
       this.batcher.queueCSSVariableUpdate("--sn-cdf-energy", val);
-      this.batcher.queueCSSVariableUpdate("--sn-nebula-beat-intensity", val);
+      this.batcher.queueCSSVariableUpdate("--sn-beat-intensity", val);
     }
   }
 

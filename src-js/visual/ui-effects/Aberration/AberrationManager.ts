@@ -9,6 +9,7 @@
  */
 
 import { Year3000System } from "@/core/lifecycle/year3000System";
+import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { AberrationCanvas } from "./AberrationCanvas";
 import { AberrationVisualSystem } from "./AberrationVisualSystem";
 import { getScrollNode } from "@/utils/dom/getScrollNode";
@@ -16,16 +17,19 @@ import { getScrollNode } from "@/utils/dom/getScrollNode";
 let instance: AberrationCanvas | null = null;
 let visualSystem: AberrationVisualSystem | null = null;
 
+// Helper to get CSS coordinator for coordination
+function getCSSController(y3k: Year3000System | null): OptimizedCSSVariableManager {
+  const year3000System = y3k || (globalThis as any).year3000System;
+  return year3000System?.cssConsciousnessController || getGlobalOptimizedCSSController();
+}
+
 // Helper to read current user preference without circular dep
+// NOTE: Aberration setting has been removed in settings rationalization
 function isAberrationEnabled(): boolean {
-  try {
-    const val = (window as any).Spicetify?.LocalStorage?.get?.(
-      "sn-enable-aberration"
-    );
-    return val !== "false"; // default to true when missing
-  } catch {
-    return true;
-  }
+  // Aberration effects are now disabled by default as the setting was removed
+  // as a technical/niche setting. The system can still function but won't
+  // be exposed to users for configuration.
+  return false; // Disabled by default after settings rationalization
 }
 
 function attach(y3k: Year3000System | null): void {
@@ -59,30 +63,27 @@ function attach(y3k: Year3000System | null): void {
     );
     // Register with Cosmic Discovery Framework
     (y3k as any)?.registerVisualSystem?.(visualSystem, "critical");
-    y3k.performanceAnalyzer?.emitTrace("AberrationCanvasAttached");
+    console.log("[AberrationManager] AberrationCanvas attached");
   }
 }
 
-/** Toggle Nebula noise overlay so that when Aberration fails we don't leave a bright wash. */
+/** Toggle Nebula noise overlay so that when Aberration fails we don't leave a bright wash using coordination. */
 function setNebulaNoiseEnabled(
   enabled: boolean,
   y3k: Year3000System | null
 ): void {
-  if (y3k) {
-    y3k.queueCSSVariableUpdate(
-      "--sn-nebula-noise-opacity",
-      enabled ? "0.03" : "0"
-    );
-  } else {
-    // Fallback when Year3000System not yet ready
-    document.documentElement.style.setProperty(
-      "--sn-nebula-noise-opacity",
-      enabled ? "0.03" : "0"
-    );
-  }
+  const cssController = getCSSController(y3k);
+  
+  cssController.setVariable(
+    "AberrationManager",
+    "--sn-nebula-noise-opacity",
+    enabled ? "0.03" : "0",
+    "normal", // Normal priority for nebula noise overlay
+    "nebula-noise-toggle"
+  );
 }
 
-/** Enable CSS-based aberration effects to complement WebGL canvas aberration. */
+/** Enable CSS-based aberration effects to complement WebGL canvas aberration using coordination. */
 function setCSSAberrationEnabled(
   enabled: boolean,
   y3k: Year3000System | null
@@ -93,17 +94,15 @@ function setCSSAberrationEnabled(
     "--aberration-hybrid-mode": enabled ? "1" : "0"
   };
 
-  if (y3k) {
-    // Use the system's CSS variable batching for performance
-    Object.entries(variables).forEach(([key, value]) => {
-      y3k.queueCSSVariableUpdate(key, value);
-    });
-  } else {
-    // Fallback when Year3000System not yet ready
-    Object.entries(variables).forEach(([key, value]) => {
-      document.documentElement.style.setProperty(key, value);
-    });
-  }
+  const cssController = getCSSController(y3k);
+  
+  // Use batched coordination for performance
+  cssController.batchSetVariables(
+    "AberrationManager",
+    variables,
+    "normal", // Normal priority for CSS aberration effects
+    "css-aberration-toggle"
+  );
 }
 
 export function initializeAberrationManager(y3k: Year3000System | null = null) {
@@ -156,21 +155,25 @@ export function initializeAberrationManager(y3k: Year3000System | null = null) {
         y3k?.unregisterAnimationSystem("AberrationCanvas");
         visualSystem?.destroy();
         visualSystem = null;
-        y3k?.performanceAnalyzer?.emitTrace("AberrationCanvasDetached");
+        console.log("[AberrationManager] AberrationCanvas detached");
       }
       setNebulaNoiseEnabled(enable && !!instance, y3k);
       setCSSAberrationEnabled(enable && !!instance, y3k);
     }
-    // Phase-3: Live strength updates via SettingsManager
+    // Phase-3: Live strength updates via SettingsManager using coordination
     if (key === "sn-nebula-aberration-strength") {
       const num = parseFloat(value);
       if (!Number.isNaN(num) && instance) {
         instance.setStrength(num);
       }
-      // Ensure CSS variable reflects setting (batched)
-      y3k?.queueCSSVariableUpdate(
+      // Ensure CSS variable reflects setting using coordination
+      const cssController = getCSSController(y3k);
+      cssController.setVariable(
+        "AberrationManager",
         "--sn-nebula-aberration-strength",
-        String(value)
+        String(value),
+        "normal", // Normal priority for strength settings
+        "aberration-strength-update"
       );
     }
   });

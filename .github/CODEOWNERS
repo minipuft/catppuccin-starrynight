@@ -32,7 +32,7 @@ src-js/types/ @catppuccin/starrynight-core-team
 src-js/core/performance/PerformanceAnalyzer.ts @catppuccin/starrynight-performance-team
 src-js/core/performance/PerformanceBudgetManager.ts @catppuccin/starrynight-performance-team
 src-js/core/performance/CSSVariableBatcher.ts @catppuccin/starrynight-performance-team
-src-js/core/performance/OptimizedCSSVariableBatcher.ts @catppuccin/starrynight-performance-team
+src-js/core/performance/OptimizedUnifiedCSSConsciousnessController.ts @catppuccin/starrynight-performance-team
 
 # =============================================================================
 # VISUAL SYSTEMS OWNERSHIP

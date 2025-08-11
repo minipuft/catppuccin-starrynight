@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palette Switching Test - Year 3000 vs Catppuccin</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 40px;
+            background: #1e1e2e;
+            color: #cdd6f4;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .palette-test {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #45475a;
+            border-radius: 10px;
+            background: #313244;
+        }
+        .color-sample {
+            height: 80px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+        .color-sample::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            filter: brightness(1.2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .color-sample:hover::before {
+            opacity: 1;
+        }
+        .switch-button {
+            background: linear-gradient(135deg, #6c5ce7, #a55eea);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+        }
+        .switch-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.6);
+        }
+        .current-system {
+            background: #45475a;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+        .status.catppuccin {
+            background: linear-gradient(135deg, #cba6f7, #f5c2e7);
+            color: #1e1e2e;
+        }
+        .status.year3000 {
+            background: linear-gradient(135deg, #6c5ce7, #ff6b9d);
+            color: #ffffff;
+        }
+        h1 {
+            text-align: center;
+            background: linear-gradient(135deg, #6c5ce7, #ff6b9d, #fd7f28);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        .info {
+            background: #45475a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #6c5ce7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Palette Switching Test</h1>
+        
+        <div class="current-system">
+            <h3>Current Palette System:</h3>
+            <span id="current-status" class="status catppuccin">Catppuccin Classic</span>
+        </div>
+        
+        <div style="text-align: center;">
+            <button class="switch-button" onclick="switchToCatppuccin()" id="catppuccin-btn">
+                🐱 Switch to Catppuccin Classic
+            </button>
+            <button class="switch-button" onclick="switchToYear3000()" id="year3000-btn">
+                🚀 Switch to Year 3000 Cinematic
+            </button>
+        </div>
+        
+        <div class="info">
+            <strong>Instructions:</strong> Click the buttons above to switch between palette systems. 
+            The color samples below should update to reflect the new palette colors.
+        </div>
+        
+        <h3>Color Palette Preview:</h3>
+        <div class="palette-test" id="palette-preview">
+            <!-- Colors will be dynamically generated here -->
+        </div>
+        
+        <div class="info">
+            <strong>Expected Behavior:</strong>
+            <ul>
+                <li><strong>Catppuccin:</strong> Soft, pastel colors with mauves, pinks, and gentle blues</li>
+                <li><strong>Year 3000:</strong> Vibrant, electric colors with deep purples, vivid magentas, and luminous oranges</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Mock implementation for testing palette system
+        // In real implementation, this would use the actual PaletteSystemManager
+        
+        let currentPaletteSystem = 'catppuccin';
+        
+        const palettes = {
+            catppuccin: {
+                name: 'Catppuccin Classic',
+                colors: {
+                    mauve: '#cba6f7',
+                    pink: '#f5c2e7', 
+                    blue: '#89b4fa',
+                    teal: '#94e2d5',
+                    green: '#a6e3a1',
+                    peach: '#fab387',
+                    red: '#f38ba8',
+                    yellow: '#f9e2af'
+                }
+            },
+            year3000: {
+                name: 'Year 3000 Cinematic',
+                colors: {
+                    mauve: '#6c5ce7',     // Electric Purple
+                    pink: '#ff6b9d',      // Vivid Magenta
+                    blue: '#74b9ff',      // Electric Blue
+                    teal: '#00cec9',      // Neon Cyan
+                    green: '#a6e3a1',     // Keep original green
+                    peach: '#fd7f28',     // Luminous Orange
+                    red: '#ff4757',       // Cosmic Red
+                    yellow: '#f39c12'     // Golden amber
+                }
+            }
+        };
+        
+        function updatePalettePreview() {
+            const preview = document.getElementById('palette-preview');
+            const currentPalette = palettes[currentPaletteSystem];
+            const statusElement = document.getElementById('current-status');
+            
+            // Update status
+            statusElement.textContent = currentPalette.name;
+            statusElement.className = `status ${currentPaletteSystem}`;
+            
+            // Update color samples
+            preview.innerHTML = '';
+            Object.entries(currentPalette.colors).forEach(([name, color]) => {
+                const colorSample = document.createElement('div');
+                colorSample.className = 'color-sample';
+                colorSample.style.backgroundColor = color;
+                colorSample.textContent = name.toUpperCase();
+                colorSample.title = `${name}: ${color}`;
+                preview.appendChild(colorSample);
+            });
+            
+            // Update button states
+            document.getElementById('catppuccin-btn').style.opacity = currentPaletteSystem === 'catppuccin' ? '0.5' : '1';
+            document.getElementById('year3000-btn').style.opacity = currentPaletteSystem === 'year3000' ? '0.5' : '1';
+        }
+        
+        function switchToCatppuccin() {
+            if (currentPaletteSystem !== 'catppuccin') {
+                currentPaletteSystem = 'catppuccin';
+                updatePalettePreview();
+                
+                // Simulate settings change (in real implementation, this would call SettingsManager)
+                console.log('🐱 Switched to Catppuccin Classic palette system');
+                console.log('In real implementation: SettingsManager.set("sn-palette-system", "catppuccin")');
+            }
+        }
+        
+        function switchToYear3000() {
+            if (currentPaletteSystem !== 'year3000') {
+                currentPaletteSystem = 'year3000';
+                updatePalettePreview();
+                
+                // Simulate settings change (in real implementation, this would call SettingsManager)
+                console.log('🚀 Switched to Year 3000 Cinematic palette system');
+                console.log('In real implementation: SettingsManager.set("sn-palette-system", "year3000")');
+            }
+        }
+        
+        // Initialize
+        updatePalettePreview();
+        
+        // Add some visual effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add subtle animations
+            const colorSamples = document.querySelectorAll('.color-sample');
+            colorSamples.forEach((sample, index) => {
+                sample.style.animationDelay = `${index * 0.1}s`;
+                sample.style.animation = 'fadeInUp 0.6s ease forwards';
+            });
+        });
+        
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

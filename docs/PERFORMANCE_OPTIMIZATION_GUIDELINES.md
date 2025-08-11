@@ -1063,7 +1063,8 @@ class SystemLoader {
         return import('@/visual/backgrounds/FlowingLiquidConsciousnessSystem');
       
       case 'ParticleField':
-        return import('@/visual/effects/ParticleFieldSystem');
+        // REMOVED: ParticleFieldSystem consolidated into ParticleConsciousnessModule
+        return import('@/visual/consciousness/ParticleConsciousnessModule');
       
       case 'IridescentShimmer':
         return import('@/visual/ui-effects/IridescentShimmerEffectsSystem');

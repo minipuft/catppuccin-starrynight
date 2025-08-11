@@ -113,7 +113,7 @@
   }
   
   /* Fix Reality Bleeding Gradients system z-index hierarchy */
-  .sn-liquid-consciousness-layer {
+  .sn-fluid-gradients-layer {
     z-index: -8 !important;
   }
   
@@ -157,7 +157,7 @@
   
   /* Ensure mix-blend-mode effects don't cause white bleeding */
   *[style*="mix-blend-mode"] {
-    &:not(.sn-shimmer-layer):not(.sn-liquid-consciousness) {
+    &:not(.sn-shimmer-layer):not(.sn-fluid-gradients) {
       mix-blend-mode: overlay !important;
       opacity: 0.6 !important;
     }

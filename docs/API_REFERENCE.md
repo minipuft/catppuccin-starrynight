@@ -439,7 +439,7 @@ Creates visual system instance through facade pattern.
 const coordinator = new SystemCoordinator(dependencies);
 await coordinator.initialize();
 
-const particleSystem = coordinator.createVisualSystem<ParticleFieldSystem>('Particle');
+const particleSystem = coordinator.createVisualSystem<LightweightParticleSystem>('Particle');
 if (particleSystem) {
   await particleSystem.initialize();
 }
@@ -499,7 +499,7 @@ const facade = new VisualSystemFacade(dependencies);
 await facade.initialize();
 
 // Create particle system with automatic dependency injection
-const particles = facade.getVisualSystem<ParticleFieldSystem>('Particle');
+const particles = facade.getVisualSystem<LightweightParticleSystem>('Particle');
 await particles?.initialize();
 
 // Create flowing liquid system
@@ -839,6 +839,115 @@ console.log(`WebGL2 support: ${detector.supportsWebGL2()}`);
 console.log(`Max texture size: ${detector.getMaxTextureSize()}`);
 ```
 
+### OptimizedUnifiedCSSConsciousnessController
+
+**Phase 2.6 Consolidation**: Unified CSS variable management system that consolidates three overlapping systems into one optimized controller with priority queues, adaptive throttling, and global instance management.
+
+**Location**: `src-js/core/performance/OptimizedUnifiedCSSConsciousnessController.ts`
+
+```typescript
+class OptimizedUnifiedCSSConsciousnessController {
+  constructor(config: Year3000Config, performanceAnalyzer: PerformanceAnalyzer);
+  
+  // Core CSS Variable Management
+  queueCSSVariableUpdate(
+    property: string, 
+    value: string, 
+    element?: HTMLElement | null, 
+    priority?: "low" | "normal" | "high" | "critical",
+    source?: string
+  ): void;
+  
+  updateVariables(
+    variables: Record<string, string>,
+    priority?: "low" | "normal" | "high" | "critical",
+    source?: string
+  ): void;
+  
+  // Legacy Compatibility Methods (from CSSVariableCoordinator)
+  async batchSetVariables(
+    caller: string,
+    variables: Record<string, string>, 
+    priority?: "low" | "normal" | "high" | "critical",
+    source?: string
+  ): Promise<void>;
+  
+  async setVariable(
+    caller: string,
+    property: string,
+    value: string,
+    priority?: "low" | "normal" | "high" | "critical", 
+    source?: string
+  ): Promise<void>;
+  
+  // Performance & Control
+  flushUpdates(): void;
+  setEnabled(enabled: boolean): void;
+  getPerformanceMetrics(): CSSPerformanceMetrics;
+  
+  // Global Instance Management
+  static getGlobalInstance(): OptimizedUnifiedCSSConsciousnessController;
+}
+
+// Global instance functions
+export function getGlobalOptimizedCSSController(): OptimizedUnifiedCSSConsciousnessController;
+export function setGlobalOptimizedCSSController(instance: OptimizedUnifiedCSSConsciousnessController): void;
+```
+
+#### Priority System
+
+The unified controller implements a sophisticated priority queue system:
+
+- **Critical** (0ms throttling): Beat sync, breathing, accent colors
+- **High** (8ms throttling): Now playing, track progress, volume
+- **Normal** (16ms throttling): General UI updates, settings changes  
+- **Low** (33ms throttling): Background effects, non-critical animations
+
+**Example Usage**:
+```typescript
+// Get global instance
+const cssController = getGlobalOptimizedCSSController();
+
+// Critical real-time music sync (no throttling)
+cssController.queueCSSVariableUpdate(
+  "--sn-beat-pulse-intensity", 
+  "0.8", 
+  null, 
+  "critical", 
+  "BeatSyncSystem"
+);
+
+// Batch update multiple variables
+await cssController.batchSetVariables("ColorSystem", {
+  "--sn-primary-color": "#ff6b9d",
+  "--sn-secondary-color": "#6bcf7f", 
+  "--sn-accent-color": "#ffd93d"
+}, "high", "AlbumArtExtraction");
+
+// Performance monitoring
+const metrics = cssController.getPerformanceMetrics();
+console.log(`CSS updates/sec: ${metrics.updatesPerSecond}`);
+console.log(`Average batch size: ${metrics.averageBatchSize}`);
+```
+
+#### Adaptive Throttling
+
+The system automatically adjusts throttling based on performance:
+
+```typescript
+// Throttling adapts to current FPS
+if (currentFPS < 45) {
+  // Emergency mode: More aggressive batching
+  throttleMultiplier = 2.0;
+} else if (currentFPS < 55) {
+  // Performance mode: Moderate batching
+  throttleMultiplier = 1.5;
+} else {
+  // Optimal mode: Standard throttling
+  throttleMultiplier = 1.0;
+}
+```
+
 ## Event System API
 
 ### Event Interfaces
@@ -1135,7 +1244,7 @@ const coordinator = new SystemCoordinator({
 await coordinator.initialize();
 
 // 4. Create and initialize visual systems
-const particleSystem = coordinator.createVisualSystem<ParticleFieldSystem>('Particle');
+const particleSystem = coordinator.createVisualSystem<LightweightParticleSystem>('Particle');
 const flowingSystem = coordinator.createVisualSystem<FlowingLiquidConsciousnessSystem>('FlowingLiquid');
 
 await Promise.all([

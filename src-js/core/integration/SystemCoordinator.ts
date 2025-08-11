@@ -15,20 +15,26 @@
  * Architecture:
  * - Manages both visual and non-visual system facades
  * - Provides unified interface for year3000System
- * - Optimizes shared resources (PerformanceAnalyzer, UnifiedCSSConsciousnessController)
+ * - Optimizes shared resources (PerformanceAnalyzer, UnifiedCSSVariableManager)
  * - Coordinates system lifecycle across facades
  */
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
+import { OptimizedCSSVariableManager, setGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import {
   NonVisualSystemFacade,
   NonVisualSystemKey,
 } from "@/core/integration/NonVisualSystemFacade";
-import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
-import { UnifiedPerformanceCoordinator } from "@/core/performance/UnifiedPerformanceCoordinator";
-import { Y3K } from "@/debug/UnifiedDebugManager";
+// Simplified performance system imports (replacing complex monitoring)
+import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
+import { SimpleTierBasedPerformanceSystem } from "@/core/performance/SimpleTierBasedPerformanceSystem";
+import { EnhancedDeviceTierDetector } from "@/core/performance/EnhancedDeviceTierDetector";
+import { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
+// Legacy imports for backward compatibility (will be deprecated)
+import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
+import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
+import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import * as Utils from "@/utils/core/Year3000Utilities";
@@ -38,6 +44,11 @@ import {
   VisualSystemKey,
 } from "@/visual/integration/VisualSystemFacade";
 
+// Consciousness engine imports for integration
+import { RedEnergyBurstSystem } from "@/visual/effects/RedEnergyBurstSystem";
+import { SoftGlowEffectsManager } from "@/visual/effects/SoftGlowEffectsManager";
+import { NaturalHarmonyEngine } from "@/visual/effects/NaturalHarmonyEngine";
+
 export type SystemType = "visual" | "non-visual";
 export type CoordinationMode =
   | "unified"
@@ -45,14 +56,14 @@ export type CoordinationMode =
   | "performance-optimized";
 
 // New orchestration types for enhanced coordination
-export type InitializationPhase = 
+export type InitializationPhase =
   | "core"
-  | "services"  
+  | "services"
   | "visual-systems"
   | "integration"
   | "completed";
 
-export type SystemState = 
+export type SystemState =
   | "uninitialized"
   | "initializing"
   | "ready"
@@ -118,10 +129,12 @@ export interface FacadeHealthCheck {
     nonVisual: { ok: boolean; details: string; systemCount: number };
   };
   sharedResources: {
-    performanceAnalyzer: { ok: boolean; details: string };
+    simplePerformanceCoordinator: { ok: boolean; details: string };
     cssConsciousnessController: { ok: boolean; details: string };
     musicSyncService: { ok: boolean; details: string };
     semanticColorManager?: { ok: boolean; details: string };
+    // Legacy systems (will be removed after migration)
+    performanceAnalyzer?: { ok: boolean; details: string };
   };
   recommendations: string[];
   timestamp: number;
@@ -138,11 +151,16 @@ export class SystemCoordinator {
   private nonVisualFacade: NonVisualSystemFacade | null = null;
 
   // Shared dependencies (centrally managed)
-  private sharedUnifiedCSSConsciousnessController: UnifiedCSSConsciousnessController | null =
+  private sharedUnifiedCSSVariableManager: OptimizedCSSVariableManager | null =
     null;
-  private sharedUnifiedPerformanceCoordinator: UnifiedPerformanceCoordinator | null =
-    null;
-  private sharedPerformanceAnalyzer: PerformanceAnalyzer | null = null;
+  // New simplified performance system
+  private sharedSimplePerformanceCoordinator: SimplePerformanceCoordinator | null = null;
+  private sharedWebGLSystemsIntegration: WebGLSystemsIntegration | null = null;
+  private sharedEnhancedDeviceTierDetector: EnhancedDeviceTierDetector | null = null;
+  // Legacy systems (deprecated, maintained for compatibility during migration)
+  // REMOVED: private sharedPerformanceAnalyzer: SimplePerformanceCoordinator | null = null; // Replaced with SimplePerformanceCoordinator
+  private sharedDeviceCapabilityDetector: DeviceCapabilityDetector | null = null;
+  private sharedPerformanceBudgetManager: PerformanceBudgetManager | null = null;
   private sharedMusicSyncService: MusicSyncService | null = null;
   private sharedSettingsManager: SettingsManager | null = null;
   private sharedColorHarmonyEngine: ColorHarmonyEngine | null = null;
@@ -156,12 +174,16 @@ export class SystemCoordinator {
 
   // Color system coordination
   private colorDependentSystems: Set<string> = new Set();
-  private colorSystemRefreshCallbacks: Map<string, (trigger: string) => Promise<void>> = new Map();
+  private colorSystemRefreshCallbacks: Map<
+    string,
+    (trigger: string) => Promise<void>
+  > = new Map();
 
   // Orchestration state
   private currentPhase: InitializationPhase = "core";
   private systemStates: Map<string, SystemState> = new Map();
-  private phaseCompletionPromises: Map<InitializationPhase, Promise<void>> = new Map();
+  private phaseCompletionPromises: Map<InitializationPhase, Promise<void>> =
+    new Map();
   private systemDependencies: Map<string, string[]> = new Map();
   private initializationOrder: Map<InitializationPhase, string[]> = new Map();
 
@@ -222,14 +244,14 @@ export class SystemCoordinator {
 
     this.currentMetrics = this.createInitialMetrics();
 
-    Y3K?.debug?.log("SystemCoordinator", "System coordinator initialized");
+    Y3KDebug?.debug?.log("SystemCoordinator", "System coordinator initialized");
   }
 
   public async initialize(
     config?: Partial<FacadeCoordinationConfig>
   ): Promise<void> {
     if (this.isInitialized) {
-      Y3K?.debug?.warn("SystemCoordinator", "Already initialized");
+      Y3KDebug?.debug?.warn("SystemCoordinator", "Already initialized");
       return;
     }
 
@@ -239,11 +261,19 @@ export class SystemCoordinator {
       // Update configuration
       this.coordinationConfig = { ...this.coordinationConfig, ...config };
 
-      if (this.coordinationConfig.orchestration.enforceSequentialInitialization) {
-        Y3K?.debug?.log("SystemCoordinator", "Starting orchestrated initialization");
+      if (
+        this.coordinationConfig.orchestration.enforceSequentialInitialization
+      ) {
+        Y3KDebug?.debug?.log(
+          "SystemCoordinator",
+          "Starting orchestrated initialization"
+        );
         await this.executeOrchestredInitialization();
       } else {
-        Y3K?.debug?.log("SystemCoordinator", "Starting legacy initialization");
+        Y3KDebug?.debug?.log(
+          "SystemCoordinator",
+          "Starting legacy initialization"
+        );
         await this.executeLegacyInitialization();
       }
 
@@ -252,12 +282,14 @@ export class SystemCoordinator {
 
       this.isInitialized = true;
 
-      Y3K?.debug?.log(
+      Y3KDebug?.debug?.log(
         "SystemCoordinator",
         "System coordination fully initialized",
         {
           mode: this.coordinationConfig.mode,
-          orchestrationEnabled: this.coordinationConfig.orchestration.enforceSequentialInitialization,
+          orchestrationEnabled:
+            this.coordinationConfig.orchestration
+              .enforceSequentialInitialization,
           currentPhase: this.currentPhase,
           visualSystems: this.currentMetrics.visualSystems,
           nonVisualSystems: this.currentMetrics.nonVisualSystems,
@@ -265,7 +297,11 @@ export class SystemCoordinator {
         }
       );
     } catch (error) {
-      Y3K?.debug?.error("SystemCoordinator", "Initialization failed:", error);
+      Y3KDebug?.debug?.error(
+        "SystemCoordinator",
+        "Initialization failed:",
+        error
+      );
       await this.cleanup();
       throw error;
     }
@@ -274,38 +310,120 @@ export class SystemCoordinator {
   private async initializeSharedDependencies(): Promise<void> {
     if (!this.coordinationConfig.enableSharedDependencies) return;
 
-    Y3K?.debug?.log("SystemCoordinator", "Initializing shared dependencies");
+    Y3KDebug?.debug?.log(
+      "SystemCoordinator",
+      "Initializing simplified shared dependencies"
+    );
 
     // Initialize shared dependencies in correct order
     try {
-      // Core performance systems
-      this.sharedPerformanceAnalyzer = new PerformanceAnalyzer();
-      // PerformanceAnalyzer doesn't have initialize method
+      // New simplified performance system initialization
+      
+      // Initialize device capability detector for WebGL integration
+      this.sharedDeviceCapabilityDetector = new DeviceCapabilityDetector({
+        enableDebug: true, // Enable debug for troubleshooting
+        spicetifyContext: true
+      });
+      await this.sharedDeviceCapabilityDetector.initialize();
+      
+      // Initialize enhanced device tier detector for simplified performance system
+      this.sharedEnhancedDeviceTierDetector = new EnhancedDeviceTierDetector();
+      
+      // Initialize WebGL systems integration with proper DeviceCapabilityDetector
+      this.sharedWebGLSystemsIntegration = new WebGLSystemsIntegration(
+        this.sharedDeviceCapabilityDetector
+      );
+      await this.sharedWebGLSystemsIntegration.initialize();
+      
+      // SimplePerformanceCoordinator will be initialized later in initializePerformanceAnalyzer()
 
-      // Initialize UnifiedPerformanceCoordinator
-      this.sharedUnifiedPerformanceCoordinator =
-        new UnifiedPerformanceCoordinator(
-          this.config,
-          this.sharedPerformanceAnalyzer
-        );
+      // Legacy system initialization removed - migrated to SimplePerformanceCoordinator
+      // Use SimplePerformanceCoordinator instead of complex PerformanceAnalyzer
+      // this.sharedSimplePerformanceCoordinator = new PerformanceAnalyzer(); // REMOVED: 1,252 lines of complex monitoring
 
-      // Initialize shared CSS consciousness controller with required dependencies
+      // Initialize legacy device capability detector
+      this.sharedDeviceCapabilityDetector = new DeviceCapabilityDetector({
+        enableDebug: this.config.enableDebug || false,
+        runStressTests: false
+      });
+      await this.sharedDeviceCapabilityDetector.initialize();
+
+      // Initialize performance budget manager
+      this.sharedPerformanceBudgetManager = new PerformanceBudgetManager({
+        budgets: {
+          animationFrame: 16,
+          cssVariableUpdate: 2,
+          domObservation: 1,
+          audioAnalysis: 5,
+          visualEffects: 8,
+          userInteraction: 100
+        },
+        autoOptimize: {
+          enabled: true,
+          violationThreshold: 3,
+          recoveryThreshold: 0.8
+        },
+        enableDebug: this.config.enableDebug || false
+      }, this.sharedSimplePerformanceCoordinator as any);
+      // PerformanceBudgetManager doesn't have initialize method
+
+      // Initialize SimplePerformanceCoordinator with correct parameters
+      this.sharedSimplePerformanceCoordinator = new SimplePerformanceCoordinator(
+        this.sharedEnhancedDeviceTierDetector,
+        this.sharedWebGLSystemsIntegration
+      );
+      await this.sharedSimplePerformanceCoordinator.initialize();
+
+      // Initialize shared CSS consciousness controller with simplified performance features
       try {
-        this.sharedUnifiedCSSConsciousnessController =
-          UnifiedCSSConsciousnessController.getInstance(
-            this.config,
-            this.sharedUnifiedPerformanceCoordinator
-          );
-        if (this.sharedUnifiedCSSConsciousnessController) {
-          await this.sharedUnifiedCSSConsciousnessController.initialize();
-        }
+        // Use the new simplified performance coordinator for CSS controller
+        // SimplePerformanceCoordinator provides necessary interface methods
+        const performanceCoordinatorCompat = this.sharedSimplePerformanceCoordinator as any;
+        
+        this.sharedUnifiedCSSVariableManager = new OptimizedCSSVariableManager(
+          this.config,
+          performanceCoordinatorCompat,
+          {
+            enableAdaptiveThrottling: true,
+            batchIntervalMs: 16,
+            maxBatchSize: 50,
+            priorityMappings: {
+              critical: [
+                '--sn-rs-glow-alpha', 
+                '--sn-rs-beat-intensity', 
+                '--sn-rs-hue-shift',
+                '--sn-cosmic-base-hex',
+                '--sn-cosmic-accent-hex'
+              ],
+              high: [
+                '--sn-gradient-primary', 
+                '--sn-gradient-secondary', 
+                '--sn-gradient-accent',
+                '--sn-color-base-hex',
+                '--sn-color-accent-hex'
+              ],
+              normal: ['--sn-gradient-', '--sn-rs-', '--sn-color-'],
+              low: ['--sn-debug-', '--sn-dev-', '--sn-meta-']
+            },
+            thresholds: {
+              excellentFPS: 55,
+              goodFPS: 45,
+              poorFPS: 30
+            }
+          }
+        );
+        
+        // Set global instance for systems that need global access
+        setGlobalOptimizedCSSController(this.sharedUnifiedCSSVariableManager);
+        
+        await this.sharedUnifiedCSSVariableManager.initialize();
       } catch (error) {
-        Y3K?.debug?.warn(
+        Y3KDebug?.debug?.warn(
           "SystemCoordinator",
-          "Failed to initialize UnifiedCSSConsciousnessController:",
+          "Failed to initialize OptimizedCSSVariableManager:",
           error
         );
-        this.sharedUnifiedCSSConsciousnessController = null;
+        this.sharedUnifiedCSSVariableManager = null;
       }
 
       // Core services
@@ -316,16 +434,21 @@ export class SystemCoordinator {
       await this.sharedMusicSyncService.initialize();
 
       // Color harmony engine (depends on music sync)
-      this.sharedColorHarmonyEngine = new ColorHarmonyEngine();
+      this.sharedColorHarmonyEngine = new ColorHarmonyEngine(
+        this.config,
+        this.utils,
+        this.sharedSimplePerformanceCoordinator as any,
+        this.sharedSettingsManager
+      );
       // ColorHarmonyEngine doesn't have setMusicSyncService method
       await this.sharedColorHarmonyEngine.initialize();
 
-      Y3K?.debug?.log(
+      Y3KDebug?.debug?.log(
         "SystemCoordinator",
         "Shared dependencies initialized successfully"
       );
     } catch (error) {
-      Y3K?.debug?.error(
+      Y3KDebug?.debug?.error(
         "SystemCoordinator",
         "Failed to initialize shared dependencies:",
         error
@@ -335,20 +458,24 @@ export class SystemCoordinator {
   }
 
   private async initializeFacades(): Promise<void> {
-    Y3K?.debug?.log("SystemCoordinator", "Initializing facades");
+    Y3KDebug?.debug?.log("SystemCoordinator", "Initializing facades");
 
     try {
+      // Get EnhancedMasterAnimationCoordinator from NonVisualSystemFacade for CSSAnimationManager integration
+      const animationCoordinator = this.nonVisualFacade?.getCachedSystem("EnhancedMasterAnimationCoordinator") || null;
+
       // Initialize Visual System Facade
       this.visualBridge = new VisualSystemFacade(
         this.config,
         this.utils,
         this.year3000System,
-        this.sharedUnifiedCSSConsciousnessController!,
-        this.sharedPerformanceAnalyzer!,
+        this.sharedUnifiedCSSVariableManager!,
+        this.sharedSimplePerformanceCoordinator as any,
         this.sharedMusicSyncService!,
         this.sharedSettingsManager!,
         this.sharedColorHarmonyEngine!,
-        this.eventBus
+        this.eventBus,
+        animationCoordinator
       );
 
       await this.visualBridge.initialize({
@@ -393,9 +520,12 @@ export class SystemCoordinator {
       // Inject shared dependencies into non-visual facade
       this.injectSharedDependencies();
 
-      Y3K?.debug?.log("SystemCoordinator", "Facades initialized successfully");
+      Y3KDebug?.debug?.log(
+        "SystemCoordinator",
+        "Facades initialized successfully"
+      );
     } catch (error) {
-      Y3K?.debug?.error(
+      Y3KDebug?.debug?.error(
         "SystemCoordinator",
         "Failed to initialize facades:",
         error
@@ -413,14 +543,32 @@ export class SystemCoordinator {
 
     // Inject shared dependencies into non-visual facade
     // This ensures both facades use the same instances
-    if (this.sharedPerformanceAnalyzer) {
-      (this.nonVisualFacade as any).performanceAnalyzer =
-        this.sharedPerformanceAnalyzer;
+    
+    // New simplified performance system injection
+    if (this.sharedSimplePerformanceCoordinator) {
+      (this.nonVisualFacade as any).simplePerformanceCoordinator =
+        this.sharedSimplePerformanceCoordinator;
     }
 
-    if (this.sharedUnifiedCSSConsciousnessController) {
+    if (this.sharedWebGLSystemsIntegration) {
+      (this.nonVisualFacade as any).webglSystemsIntegration =
+        this.sharedWebGLSystemsIntegration;
+    }
+
+    if (this.sharedEnhancedDeviceTierDetector) {
+      (this.nonVisualFacade as any).enhancedDeviceTierDetector =
+        this.sharedEnhancedDeviceTierDetector;
+    }
+
+    // Legacy system injection (for backward compatibility)
+    if (this.sharedSimplePerformanceCoordinator) {
+      (this.nonVisualFacade as any).performanceAnalyzer =
+        this.sharedSimplePerformanceCoordinator;
+    }
+
+    if (this.sharedUnifiedCSSVariableManager) {
       (this.nonVisualFacade as any).cssConsciousnessController =
-        this.sharedUnifiedCSSConsciousnessController;
+        this.sharedUnifiedCSSVariableManager;
     }
 
     if (this.sharedMusicSyncService) {
@@ -437,7 +585,7 @@ export class SystemCoordinator {
       (this.nonVisualFacade as any).colorHarmonyEngine =
         this.sharedColorHarmonyEngine;
     }
-    
+
     if (this.sharedSemanticColorManager) {
       (this.nonVisualFacade as any).semanticColorManager =
         this.sharedSemanticColorManager;
@@ -447,7 +595,7 @@ export class SystemCoordinator {
   private setupCrossFacadeCommunication(): void {
     if (!this.coordinationConfig.enableCrossFacadeCommunication) return;
 
-    Y3K?.debug?.log(
+    Y3KDebug?.debug?.log(
       "SystemCoordinator",
       "Setting up cross-facade communication"
     );
@@ -495,11 +643,11 @@ export class SystemCoordinator {
       this.onSystemCreated(type, key, system);
     }
 
-    Y3K?.debug?.log("SystemCoordinator", `System created: ${type}/${key}`);
+    Y3KDebug?.debug?.log("SystemCoordinator", `System created: ${type}/${key}`);
   }
 
   private handleHealthDegradation(event: any): void {
-    Y3K?.debug?.warn(
+    Y3KDebug?.debug?.warn(
       "SystemCoordinator",
       "Health degradation detected:",
       event
@@ -609,7 +757,7 @@ export class SystemCoordinator {
         try {
           listener(event);
         } catch (error) {
-          Y3K?.debug?.error(
+          Y3KDebug?.debug?.error(
             "SystemCoordinator",
             `Error in event listener for ${eventType}:`,
             error
@@ -639,9 +787,9 @@ export class SystemCoordinator {
         },
       },
       sharedResources: {
-        performanceAnalyzer: {
+        simplePerformanceCoordinator: {
           ok: true,
-          details: "Performance analyzer operational",
+          details: "Simple performance coordinator operational",
         },
         cssConsciousnessController: {
           ok: true,
@@ -650,6 +798,11 @@ export class SystemCoordinator {
         musicSyncService: {
           ok: true,
           details: "Music sync service operational",
+        },
+        // Legacy systems (optional for backward compatibility)
+        performanceAnalyzer: {
+          ok: true,
+          details: "Legacy performance analyzer operational",
         },
       },
       recommendations: [],
@@ -688,24 +841,43 @@ export class SystemCoordinator {
     }
 
     // Check shared resources
-    if (this.sharedPerformanceAnalyzer) {
+    // New simplified performance system health check
+    if (this.sharedSimplePerformanceCoordinator) {
       try {
-        // PerformanceAnalyzer doesn't have healthCheck method
-        healthCheck.sharedResources.performanceAnalyzer.ok = true;
-        healthCheck.sharedResources.performanceAnalyzer.details =
-          "Performance analyzer operational";
+        const performanceHealth = await this.sharedSimplePerformanceCoordinator.healthCheck();
+        healthCheck.sharedResources.simplePerformanceCoordinator.ok = performanceHealth.healthy;
+        healthCheck.sharedResources.simplePerformanceCoordinator.details = performanceHealth.details || "Simple performance coordinator operational";
       } catch (error) {
-        healthCheck.sharedResources.performanceAnalyzer.ok = false;
-        healthCheck.sharedResources.performanceAnalyzer.details = `Performance analyzer error: ${error}`;
+        healthCheck.sharedResources.simplePerformanceCoordinator.ok = false;
+        healthCheck.sharedResources.simplePerformanceCoordinator.details = `Simple performance coordinator error: ${error}`;
+      }
+    }
+
+    // Simple performance coordinator health check 
+    if (this.sharedSimplePerformanceCoordinator) {
+      try {
+        const performanceHealth = await this.sharedSimplePerformanceCoordinator.healthCheck();
+        healthCheck.sharedResources.performanceAnalyzer = {
+          ok: performanceHealth.healthy,
+          details: performanceHealth.details || "Simple performance coordinator operational"
+        };
+      } catch (error) {
+        healthCheck.sharedResources.performanceAnalyzer = {
+          ok: false,
+          details: `Simple performance coordinator error: ${error}`
+        };
       }
     }
 
     // Check shared CSS consciousness controller
-    if (this.sharedUnifiedCSSConsciousnessController) {
+    if (this.sharedUnifiedCSSVariableManager) {
       try {
-        const cssHealth = await this.sharedUnifiedCSSConsciousnessController.healthCheck();
-        healthCheck.sharedResources.cssConsciousnessController.ok = cssHealth.healthy || cssHealth.ok || false;
-        healthCheck.sharedResources.cssConsciousnessController.details = cssHealth.details || "CSS consciousness controller operational";
+        const cssHealth =
+          await this.sharedUnifiedCSSVariableManager.healthCheck();
+        healthCheck.sharedResources.cssConsciousnessController.ok =
+          cssHealth.healthy || cssHealth.ok || false;
+        healthCheck.sharedResources.cssConsciousnessController.details =
+          cssHealth.details || "CSS consciousness controller operational";
       } catch (error) {
         healthCheck.sharedResources.cssConsciousnessController.ok = false;
         healthCheck.sharedResources.cssConsciousnessController.details = `CSS consciousness controller error: ${error}`;
@@ -716,29 +888,33 @@ export class SystemCoordinator {
     if (this.sharedMusicSyncService) {
       try {
         const musicHealth = await this.sharedMusicSyncService.healthCheck();
-        healthCheck.sharedResources.musicSyncService.ok = musicHealth.status === 'healthy';
-        healthCheck.sharedResources.musicSyncService.details = musicHealth.message || "Music sync service operational";
+        healthCheck.sharedResources.musicSyncService.ok =
+          musicHealth.status === "healthy";
+        healthCheck.sharedResources.musicSyncService.details =
+          musicHealth.message || "Music sync service operational";
       } catch (error) {
         healthCheck.sharedResources.musicSyncService.ok = false;
         healthCheck.sharedResources.musicSyncService.details = `Music sync service error: ${error}`;
       }
     }
-    
+
     // Check SemanticColorManager
     if (this.sharedSemanticColorManager) {
       try {
-        const semanticColorHealth = await this.sharedSemanticColorManager.healthCheck();
+        const semanticColorHealth =
+          await this.sharedSemanticColorManager.healthCheck();
         const semanticColorOk = semanticColorHealth.healthy;
-        
+
         // Add SemanticColorManager to shared resources check
         healthCheck.sharedResources.semanticColorManager = {
           ok: semanticColorOk,
-          details: semanticColorHealth.details || "Semantic color manager operational"
+          details:
+            semanticColorHealth.details || "Semantic color manager operational",
         };
       } catch (error) {
         healthCheck.sharedResources.semanticColorManager = {
           ok: false,
-          details: `Semantic color manager error: ${error}`
+          details: `Semantic color manager error: ${error}`,
         };
       }
     }
@@ -747,10 +923,11 @@ export class SystemCoordinator {
     const facadeHealthy =
       healthCheck.facades.visual.ok && healthCheck.facades.nonVisual.ok;
     const resourcesHealthy =
-      healthCheck.sharedResources.performanceAnalyzer.ok &&
+      healthCheck.sharedResources.simplePerformanceCoordinator.ok &&
       healthCheck.sharedResources.cssConsciousnessController.ok &&
       healthCheck.sharedResources.musicSyncService.ok &&
-      (healthCheck.sharedResources.semanticColorManager?.ok !== false);
+      healthCheck.sharedResources.semanticColorManager?.ok !== false &&
+      healthCheck.sharedResources.performanceAnalyzer?.ok !== false;
 
     if (facadeHealthy && resourcesHealthy) {
       healthCheck.overall = "excellent";
@@ -871,31 +1048,35 @@ export class SystemCoordinator {
   private setupOrchestrationPhases(): void {
     // Define system dependencies for proper orchestration
     this.systemDependencies.set("MusicSyncService", []);
-    this.systemDependencies.set("ColorHarmonyEngine", ["MusicSyncService", "SemanticColorManager"]);
+    this.systemDependencies.set("ColorHarmonyEngine", [
+      "MusicSyncService",
+      "SemanticColorManager",
+    ]);
     this.systemDependencies.set("PerformanceAnalyzer", []);
-    this.systemDependencies.set("UnifiedCSSConsciousnessController", ["PerformanceAnalyzer"]);
+    this.systemDependencies.set("UnifiedCSSVariableManager", [
+      "PerformanceAnalyzer",
+    ]);
     this.systemDependencies.set("SettingsManager", []);
-    this.systemDependencies.set("SemanticColorManager", ["UnifiedCSSConsciousnessController"]);
-    
-    
+    this.systemDependencies.set("SemanticColorManager", [
+      "UnifiedCSSVariableManager",
+    ]);
+
     // Define initialization order by phase
     this.initializationOrder.set("core", [
       "PerformanceAnalyzer",
-      "UnifiedCSSConsciousnessController",
+      "UnifiedCSSVariableManager",
     ]);
     this.initializationOrder.set("services", [
       "SettingsManager",
       "MusicSyncService",
       "SemanticColorManager",
     ]);
-    this.initializationOrder.set("visual-systems", [
-      "ColorHarmonyEngine",
-    ]);
+    this.initializationOrder.set("visual-systems", ["ColorHarmonyEngine"]);
     this.initializationOrder.set("integration", [
       "VisualSystemFacade",
       "NonVisualSystemFacade",
     ]);
-    
+
     // Initialize all systems as uninitialized
     for (const [phase, systems] of this.initializationOrder.entries()) {
       for (const system of systems) {
@@ -903,43 +1084,59 @@ export class SystemCoordinator {
       }
     }
 
-    Y3K?.debug?.log("SystemCoordinator", "Orchestration phases configured", {
-      phases: Array.from(this.initializationOrder.keys()),
-      totalSystems: this.systemStates.size,
-      dependencies: Object.fromEntries(this.systemDependencies)
-    });
+    Y3KDebug?.debug?.log(
+      "SystemCoordinator",
+      "Orchestration phases configured",
+      {
+        phases: Array.from(this.initializationOrder.keys()),
+        totalSystems: this.systemStates.size,
+        dependencies: Object.fromEntries(this.systemDependencies),
+      }
+    );
   }
 
   private async executeOrchestredInitialization(): Promise<void> {
-    const phases: InitializationPhase[] = ["core", "services", "visual-systems", "integration"];
-    
+    const phases: InitializationPhase[] = [
+      "core",
+      "services",
+      "visual-systems",
+      "integration",
+    ];
+
     for (const phase of phases) {
-      Y3K?.debug?.log("SystemCoordinator", `Starting phase: ${phase}`);
+      Y3KDebug?.debug?.log("SystemCoordinator", `Starting phase: ${phase}`);
       this.currentPhase = phase;
-      
+
       try {
         await this.executePhase(phase);
-        Y3K?.debug?.log("SystemCoordinator", `Phase ${phase} completed successfully`);
+        Y3KDebug?.debug?.log(
+          "SystemCoordinator",
+          `Phase ${phase} completed successfully`
+        );
       } catch (error) {
-        Y3K?.debug?.error("SystemCoordinator", `Phase ${phase} failed:`, error);
+        Y3KDebug?.debug?.error(
+          "SystemCoordinator",
+          `Phase ${phase} failed:`,
+          error
+        );
         throw new Error(`Orchestration failed at phase ${phase}: ${error}`);
       }
     }
-    
+
     this.currentPhase = "completed";
-    
+
     // Set up cross-facade communication
     this.setupCrossFacadeCommunication();
-    
+
     // Setup gradient system coordination
     await this.setupGradientSystemCoordination();
-    
+
     // Setup default color-dependent systems
     this.setupDefaultColorDependentSystems();
-    
+
     // Start monitoring
     this.startMonitoring();
-    
+
     // Perform initial health check
     await this.performHealthCheck();
   }
@@ -958,17 +1155,21 @@ export class SystemCoordinator {
 
     // Wait for all systems in this phase to complete
     await Promise.all(initPromises);
-    
+
     // Validate all systems in this phase are ready
     for (const systemName of systems) {
       const state = this.systemStates.get(systemName);
       if (state !== "ready") {
-        throw new Error(`System ${systemName} not ready after phase ${phase} (state: ${state})`);
+        throw new Error(
+          `System ${systemName} not ready after phase ${phase} (state: ${state})`
+        );
       }
     }
   }
 
-  private async initializeSystemWithDependencies(systemName: string): Promise<void> {
+  private async initializeSystemWithDependencies(
+    systemName: string
+  ): Promise<void> {
     // Check if system is already initialized
     if (this.systemStates.get(systemName) === "ready") {
       return;
@@ -989,7 +1190,7 @@ export class SystemCoordinator {
         case "PerformanceAnalyzer":
           await this.initializePerformanceAnalyzer();
           break;
-        case "UnifiedCSSConsciousnessController": 
+        case "UnifiedCSSVariableManager":
           await this.initializeUnifiedCSSController();
           break;
         case "SettingsManager":
@@ -1015,17 +1216,24 @@ export class SystemCoordinator {
       }
 
       this.systemStates.set(systemName, "ready");
-      Y3K?.debug?.log("SystemCoordinator", `System ${systemName} initialized successfully`);
-
+      Y3KDebug?.debug?.log(
+        "SystemCoordinator",
+        `System ${systemName} initialized successfully`
+      );
     } catch (error) {
       this.systemStates.set(systemName, "failed");
-      Y3K?.debug?.error("SystemCoordinator", `System ${systemName} initialization failed:`, error);
+      Y3KDebug?.debug?.error(
+        "SystemCoordinator",
+        `System ${systemName} initialization failed:`,
+        error
+      );
       throw error;
     }
   }
 
   private async waitForSystemReady(systemName: string): Promise<void> {
-    const timeout = this.coordinationConfig.orchestration.systemReadinessTimeout;
+    const timeout =
+      this.coordinationConfig.orchestration.systemReadinessTimeout;
     const startTime = Date.now();
 
     while (Date.now() - startTime < timeout) {
@@ -1037,7 +1245,7 @@ export class SystemCoordinator {
         throw new Error(`Dependency ${systemName} failed to initialize`);
       }
       // Wait 50ms before checking again
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
 
     throw new Error(`Timeout waiting for dependency ${systemName} to be ready`);
@@ -1045,32 +1253,138 @@ export class SystemCoordinator {
 
   // Individual system initialization methods
   private async initializePerformanceAnalyzer(): Promise<void> {
-    this.sharedPerformanceAnalyzer = new PerformanceAnalyzer();
-    // PerformanceAnalyzer doesn't require async initialization
+    // Initialize both new simplified and legacy performance systems
+    
+    // Create DeviceCapabilityDetector for WebGL if not exists
+    if (!this.sharedDeviceCapabilityDetector) {
+      this.sharedDeviceCapabilityDetector = new DeviceCapabilityDetector({
+        enableDebug: true, // Enable debug for troubleshooting
+        spicetifyContext: true
+      });
+      await this.sharedDeviceCapabilityDetector.initialize();
+    }
+    
+    // Create enhanced tier detector for simplified performance system
+    this.sharedEnhancedDeviceTierDetector = new EnhancedDeviceTierDetector();
+    
+    // Initialize WebGL with proper DeviceCapabilityDetector
+    this.sharedWebGLSystemsIntegration = new WebGLSystemsIntegration(
+      this.sharedDeviceCapabilityDetector
+    );
+    await this.sharedWebGLSystemsIntegration.initialize();
+    
+    this.sharedSimplePerformanceCoordinator = new SimplePerformanceCoordinator(
+      this.sharedEnhancedDeviceTierDetector,
+      this.sharedWebGLSystemsIntegration
+    );
+    await this.sharedSimplePerformanceCoordinator.initialize();
+
+    // Legacy system removed - using SimplePerformanceCoordinator instead
+    // this.sharedSimplePerformanceCoordinator = new PerformanceAnalyzer(); // REMOVED: Complex monitoring replaced with tier-based system
   }
 
   private async initializeUnifiedCSSController(): Promise<void> {
-    if (!this.sharedPerformanceAnalyzer) {
-      throw new Error("PerformanceAnalyzer dependency not available");
+    if (!this.sharedSimplePerformanceCoordinator) {
+      throw new Error("SimplePerformanceCoordinator dependency not available");
     }
 
     try {
-      this.sharedUnifiedPerformanceCoordinator = new UnifiedPerformanceCoordinator(
-        this.config,
-        this.sharedPerformanceAnalyzer
-      );
+      // Initialize device capability detector for orchestrated initialization
+      this.sharedDeviceCapabilityDetector = new DeviceCapabilityDetector({
+        enableDebug: this.config.enableDebug || false,
+        runStressTests: false
+      });
+      await this.sharedDeviceCapabilityDetector.initialize();
 
-      this.sharedUnifiedCSSConsciousnessController = UnifiedCSSConsciousnessController.getInstance(
+      // Initialize performance budget manager for orchestrated initialization
+      this.sharedPerformanceBudgetManager = new PerformanceBudgetManager({
+        budgets: {
+          animationFrame: 16,
+          cssVariableUpdate: 2,
+          domObservation: 1,
+          audioAnalysis: 5,
+          visualEffects: 8,
+          userInteraction: 100
+        },
+        autoOptimize: {
+          enabled: true,
+          violationThreshold: 3,
+          recoveryThreshold: 0.8
+        },
+        enableDebug: this.config.enableDebug || false
+      }, this.sharedSimplePerformanceCoordinator as any);
+      // PerformanceBudgetManager doesn't have initialize method
+
+      // Create OptimizedCSSVariableManager first (before SimplePerformanceCoordinator)
+      // Create a minimal performance coordinator for CSS controller initialization
+      const deviceCapabilities = this.sharedDeviceCapabilityDetector.getCapabilities();
+      const minimalPerformanceCoordinator = {
+        getCurrentPerformanceMode: () => ({ 
+          name: 'balanced' as const,
+          qualityLevel: 0.8,
+          animationQuality: 0.8,
+          effectQuality: 0.8,
+          blurQuality: 0.8,
+          shadowQuality: 0.8,
+          frameRate: 60,
+          optimizationLevel: 1
+        }),
+        getDeviceCapabilities: () => deviceCapabilities || { 
+          performanceTier: 'mid' as const, 
+          memoryGB: 8, 
+          isMobile: false, 
+          gpuAcceleration: true 
+        },
+        getBatteryState: () => ({ level: 1, charging: false }),
+        getThermalState: () => ({ temperature: 'normal' as const })
+      };
+      
+      this.sharedUnifiedCSSVariableManager = new OptimizedCSSVariableManager(
         this.config,
-        this.sharedUnifiedPerformanceCoordinator
+        minimalPerformanceCoordinator as any,
+        {
+          enableAdaptiveThrottling: true,
+          batchIntervalMs: 16,
+          maxBatchSize: 50,
+          priorityMappings: {
+            critical: [
+              '--sn-rs-glow-alpha', 
+              '--sn-rs-beat-intensity', 
+              '--sn-rs-hue-shift',
+              '--sn-cosmic-base-hex',
+              '--sn-cosmic-accent-hex'
+            ],
+            high: [
+              '--sn-gradient-primary', 
+              '--sn-gradient-secondary', 
+              '--sn-gradient-accent',
+              '--sn-color-base-hex',
+              '--sn-color-accent-hex'
+            ],
+            normal: ['--sn-gradient-', '--sn-rs-', '--sn-color-'],
+            low: ['--sn-debug-', '--sn-dev-', '--sn-meta-']
+          },
+          thresholds: {
+            excellentFPS: 55,
+            goodFPS: 45,
+            poorFPS: 30
+          }
+        }
       );
       
-      if (this.sharedUnifiedCSSConsciousnessController) {
-        await this.sharedUnifiedCSSConsciousnessController.initialize();
-      }
+      // Set global instance for systems that need global access
+      setGlobalOptimizedCSSController(this.sharedUnifiedCSSVariableManager);
+      
+      await this.sharedUnifiedCSSVariableManager.initialize();
+
+      // SimplePerformanceCoordinator is already initialized above, no need to recreate
     } catch (error) {
-      Y3K?.debug?.warn("SystemCoordinator", "Failed to initialize UnifiedCSSController:", error);
-      this.sharedUnifiedCSSConsciousnessController = null;
+      Y3KDebug?.debug?.warn(
+        "SystemCoordinator",
+        "Failed to initialize OptimizedCSSVariableManager:",
+        error
+      );
+      this.sharedUnifiedCSSVariableManager = null;
     }
   }
 
@@ -1083,36 +1397,44 @@ export class SystemCoordinator {
     this.sharedMusicSyncService = new MusicSyncService({
       YEAR3000_CONFIG: this.config,
       Year3000Utilities: this.utils,
-      performanceMonitor: this.sharedPerformanceAnalyzer,
+      performanceMonitor: this.sharedSimplePerformanceCoordinator as any,
       settingsManager: this.sharedSettingsManager,
-      year3000System: this.year3000System
+      year3000System: this.year3000System,
     });
     await this.sharedMusicSyncService.initialize();
   }
 
   private async initializeSemanticColorManager(): Promise<void> {
-    if (!this.sharedUnifiedCSSConsciousnessController) {
-      throw new Error("UnifiedCSSConsciousnessController dependency not available");
+    if (!this.sharedUnifiedCSSVariableManager) {
+      throw new Error(
+        "OptimizedCSSVariableManager dependency not available"
+      );
     }
 
     this.sharedSemanticColorManager = new SemanticColorManager({
       enableDebug: this.config.enableDebug || false,
       fallbackToSpiceColors: true,
-      cacheDuration: 5000
+      cacheDuration: 5000,
     });
-    
-    await this.sharedSemanticColorManager.initialize(this.sharedUnifiedCSSConsciousnessController);
-    
-    Y3K?.debug?.log("SystemCoordinator", "SemanticColorManager initialized successfully", {
-      systemMetrics: this.sharedSemanticColorManager.getSystemMetrics()
-    });
+
+    await this.sharedSemanticColorManager.initialize(
+      this.sharedUnifiedCSSVariableManager
+    );
+
+    Y3KDebug?.debug?.log(
+      "SystemCoordinator",
+      "SemanticColorManager initialized successfully",
+      {
+        systemMetrics: this.sharedSemanticColorManager.getSystemMetrics(),
+      }
+    );
   }
-  
+
   private async initializeColorHarmonyEngine(): Promise<void> {
     if (!this.sharedMusicSyncService) {
       throw new Error("MusicSyncService dependency not available");
     }
-    
+
     if (!this.sharedSemanticColorManager) {
       throw new Error("SemanticColorManager dependency not available");
     }
@@ -1120,13 +1442,13 @@ export class SystemCoordinator {
     this.sharedColorHarmonyEngine = new ColorHarmonyEngine(
       this.config,
       this.utils,
-      this.sharedPerformanceAnalyzer || undefined,
+      (this.sharedSimplePerformanceCoordinator as any) || undefined,
       this.sharedSettingsManager || undefined
     );
-    
+
     // Note: SemanticColorManager integration will be handled through dependency injection
     // in ColorHarmonyEngine's constructor or through the Year3000System bridge
-    
+
     await this.sharedColorHarmonyEngine.initialize();
   }
 
@@ -1135,37 +1457,33 @@ export class SystemCoordinator {
       this.config,
       this.utils,
       this, // year3000System
-      this.sharedUnifiedCSSConsciousnessController!, // cssConsciousnessController
-      this.sharedPerformanceAnalyzer!,
+      this.sharedUnifiedCSSVariableManager!, // cssConsciousnessController
+      this.sharedSimplePerformanceCoordinator as any,
       this.sharedMusicSyncService!,
       this.sharedSettingsManager!,
       this.sharedColorHarmonyEngine || undefined, // optional
       this.eventBus // optional
     );
-    
+
     // Note: SemanticColorManager can be accessed through SystemCoordinator shared dependencies
     // Visual systems that need it can get it via getSharedSemanticColorManager()
-    
+
     await this.visualBridge.initialize();
   }
 
   private async initializeNonVisualFacade(): Promise<void> {
-    this.nonVisualFacade = new NonVisualSystemFacade(
-      this.config,
-      this.utils,
-      {
-        performanceAnalyzer: this.sharedPerformanceAnalyzer,
-        unifiedCSSConsciousnessController: this.sharedUnifiedCSSConsciousnessController,
-        musicSyncService: this.sharedMusicSyncService,
-        settingsManager: this.sharedSettingsManager,
-        colorHarmonyEngine: this.sharedColorHarmonyEngine,
-        unifiedPerformanceCoordinator: this.sharedUnifiedPerformanceCoordinator,
-        semanticColorManager: this.sharedSemanticColorManager,
-      }
-    );
+    this.nonVisualFacade = new NonVisualSystemFacade(this.config, this.utils, {
+      performanceAnalyzer: this.sharedSimplePerformanceCoordinator as any,
+      unifiedCSSConsciousnessController:
+        this.sharedUnifiedCSSVariableManager,
+      musicSyncService: this.sharedMusicSyncService,
+      settingsManager: this.sharedSettingsManager,
+      colorHarmonyEngine: this.sharedColorHarmonyEngine,
+      performanceOrchestrator: this.sharedSimplePerformanceCoordinator,
+      semanticColorManager: this.sharedSemanticColorManager,
+    });
     await this.nonVisualFacade.initialize();
   }
-
 
   private async executeLegacyInitialization(): Promise<void> {
     // Original initialization logic for backward compatibility
@@ -1192,7 +1510,8 @@ export class SystemCoordinator {
   }
 
   public isOrchestrationEnabled(): boolean {
-    return this.coordinationConfig.orchestration.enforceSequentialInitialization;
+    return this.coordinationConfig.orchestration
+      .enforceSequentialInitialization;
   }
 
   private async cleanup(): Promise<void> {
@@ -1219,45 +1538,69 @@ export class SystemCoordinator {
     }
 
     // Cleanup shared dependencies
+    
+    // Clean up new simplified performance systems first
+    if (this.sharedSimplePerformanceCoordinator) {
+      this.sharedSimplePerformanceCoordinator.destroy();
+      this.sharedSimplePerformanceCoordinator = null;
+    }
+
+    if (this.sharedWebGLSystemsIntegration) {
+      this.sharedWebGLSystemsIntegration.destroy();
+      this.sharedWebGLSystemsIntegration = null;
+    }
+
+    if (this.sharedEnhancedDeviceTierDetector) {
+      // EnhancedDeviceTierDetector doesn't have a destroy method (simple object)
+      this.sharedEnhancedDeviceTierDetector = null;
+    }
+
     if (this.sharedSemanticColorManager) {
       this.sharedSemanticColorManager.destroy();
       this.sharedSemanticColorManager = null;
     }
-    
+
     if (this.sharedColorHarmonyEngine) {
       // ColorHarmonyEngine has destroy method
       this.sharedColorHarmonyEngine.destroy();
       this.sharedColorHarmonyEngine = null;
     }
-    
+
     if (this.sharedMusicSyncService) {
       // MusicSyncService has destroy method
       this.sharedMusicSyncService.destroy();
       this.sharedMusicSyncService = null;
     }
-    
+
     if (this.sharedSettingsManager) {
       // SettingsManager has destroy method
       this.sharedSettingsManager.destroy();
       this.sharedSettingsManager = null;
     }
 
-    if (this.sharedPerformanceAnalyzer) {
-      // PerformanceAnalyzer has destroy method
-      this.sharedPerformanceAnalyzer.destroy();
-      this.sharedPerformanceAnalyzer = null;
+    if (this.sharedUnifiedCSSVariableManager) {
+      // UnifiedCSSVariableManager has destroy method
+      this.sharedUnifiedCSSVariableManager.destroy();
+      this.sharedUnifiedCSSVariableManager = null;
     }
 
-    if (this.sharedUnifiedCSSConsciousnessController) {
-      // UnifiedCSSConsciousnessController has destroy method
-      this.sharedUnifiedCSSConsciousnessController.destroy();
-      this.sharedUnifiedCSSConsciousnessController = null;
+    // Clean up legacy performance systems
+    if (this.sharedSimplePerformanceCoordinator) {
+      // SimplePerformanceCoordinator has destroy method
+      (this.sharedSimplePerformanceCoordinator as any).destroy();
+      this.sharedSimplePerformanceCoordinator = null;
     }
 
-    if (this.sharedUnifiedPerformanceCoordinator) {
-      // UnifiedPerformanceCoordinator has destroy method
-      this.sharedUnifiedPerformanceCoordinator.destroy();
-      this.sharedUnifiedPerformanceCoordinator = null;
+    if (this.sharedPerformanceBudgetManager) {
+      // PerformanceBudgetManager has destroy method
+      this.sharedPerformanceBudgetManager.destroy();
+      this.sharedPerformanceBudgetManager = null;
+    }
+
+    if (this.sharedDeviceCapabilityDetector) {
+      // DeviceCapabilityDetector has destroy method
+      this.sharedDeviceCapabilityDetector.destroy();
+      this.sharedDeviceCapabilityDetector = null;
     }
 
     // Clear event listeners
@@ -1330,11 +1673,17 @@ export class SystemCoordinator {
    */
   private async setupGradientSystemCoordination(): Promise<void> {
     if (!this.visualBridge) {
-      Y3K?.debug?.warn("SystemCoordinator", "VisualSystemFacade not available - skipping gradient system coordination");
+      Y3KDebug?.debug?.warn(
+        "SystemCoordinator",
+        "VisualSystemFacade not available - skipping gradient system coordination"
+      );
       return;
     }
 
-    Y3K?.debug?.log("SystemCoordinator", "Setting up gradient system coordination");
+    Y3KDebug?.debug?.log(
+      "SystemCoordinator",
+      "Setting up gradient system coordination"
+    );
 
     const gradientCoordinationStartTime = performance.now();
     let coordinatedSystems = 0;
@@ -1354,16 +1703,28 @@ export class SystemCoordinator {
       // 4. Setup cross-gradient system communication
       this.setupGradientSystemCommunication();
 
-      const coordinationDuration = performance.now() - gradientCoordinationStartTime;
-      
-      Y3K?.debug?.log("SystemCoordinator", "Gradient system coordination completed", {
-        coordinatedSystems,
-        duration: `${coordinationDuration.toFixed(2)}ms`,
-        systems: ['GradientConductor', 'WebGLGradientBackgroundSystem', 'GradientTransitionOrchestrator']
-      });
+      const coordinationDuration =
+        performance.now() - gradientCoordinationStartTime;
 
+      Y3KDebug?.debug?.log(
+        "SystemCoordinator",
+        "Gradient system coordination completed",
+        {
+          coordinatedSystems,
+          duration: `${coordinationDuration.toFixed(2)}ms`,
+          systems: [
+            "GradientConductor",
+            "WebGLGradientBackgroundSystem",
+            "GradientTransitionOrchestrator",
+          ],
+        }
+      );
     } catch (error) {
-      Y3K?.debug?.error("SystemCoordinator", "Failed to setup gradient system coordination:", error);
+      Y3KDebug?.debug?.error(
+        "SystemCoordinator",
+        "Failed to setup gradient system coordination:",
+        error
+      );
       throw error;
     }
   }
@@ -1374,43 +1735,71 @@ export class SystemCoordinator {
   private async coordinateGradientConductor(): Promise<void> {
     try {
       // Get GradientConductor through VisualSystemFacade factory pattern
-      const gradientConductor = this.visualBridge!.getVisualSystem('GradientConductor');
-      
+      const gradientConductor =
+        this.visualBridge!.getVisualSystem("GradientConductor");
+
       if (!gradientConductor) {
-        Y3K?.debug?.warn("SystemCoordinator", "GradientConductor not available via VisualSystemFacade");
+        Y3KDebug?.debug?.warn(
+          "SystemCoordinator",
+          "GradientConductor not available via VisualSystemFacade"
+        );
         return;
       }
 
       // Register with SystemCoordinator for cross-system communication
-      this.addEventListener('gradient-conductor-event', (event: any) => {
-        if (gradientConductor && typeof gradientConductor.handleSystemEvent === 'function') {
+      this.addEventListener("gradient-conductor-event", (event: any) => {
+        if (
+          gradientConductor &&
+          typeof gradientConductor.handleSystemEvent === "function"
+        ) {
           gradientConductor.handleSystemEvent(event);
         }
       });
 
       // Register color refresh callback
-      this.registerColorDependentSystem('GradientConductor', async (trigger: string) => {
-        if (gradientConductor && typeof gradientConductor.refreshColorState === 'function') {
-          await gradientConductor.refreshColorState(trigger);
-        } else if (gradientConductor && typeof gradientConductor.setPalette === 'function') {
-          // Fallback to setPalette if refreshColorState not available
-          const colorHarmonyEngine = this.sharedColorHarmonyEngine;
-          if (colorHarmonyEngine) {
-            try {
-              const currentGradient = await colorHarmonyEngine.getCurrentGradient();
-              if (currentGradient) {
-                gradientConductor.setPalette(currentGradient);
+      this.registerColorDependentSystem(
+        "GradientConductor",
+        async (trigger: string) => {
+          if (
+            gradientConductor &&
+            typeof gradientConductor.refreshColorState === "function"
+          ) {
+            await gradientConductor.refreshColorState(trigger);
+          } else if (
+            gradientConductor &&
+            typeof gradientConductor.setPalette === "function"
+          ) {
+            // Fallback to setPalette if refreshColorState not available
+            const colorHarmonyEngine = this.sharedColorHarmonyEngine;
+            if (colorHarmonyEngine) {
+              try {
+                const currentGradient =
+                  await colorHarmonyEngine.getCurrentGradient();
+                if (currentGradient) {
+                  gradientConductor.setPalette(currentGradient);
+                }
+              } catch (error) {
+                Y3KDebug?.debug?.warn(
+                  "SystemCoordinator",
+                  "Failed to refresh GradientConductor colors:",
+                  error
+                );
               }
-            } catch (error) {
-              Y3K?.debug?.warn("SystemCoordinator", "Failed to refresh GradientConductor colors:", error);
             }
           }
         }
-      });
+      );
 
-      Y3K?.debug?.log("SystemCoordinator", "GradientConductor coordination established");
+      Y3KDebug?.debug?.log(
+        "SystemCoordinator",
+        "GradientConductor coordination established"
+      );
     } catch (error) {
-      Y3K?.debug?.error("SystemCoordinator", "Failed to coordinate GradientConductor:", error);
+      Y3KDebug?.debug?.error(
+        "SystemCoordinator",
+        "Failed to coordinate GradientConductor:",
+        error
+      );
     }
   }
 
@@ -1420,33 +1809,55 @@ export class SystemCoordinator {
   private async coordinateWebGLGradientSystem(): Promise<void> {
     try {
       // Get WebGL system through VisualSystemFacade
-      const webglSystem = this.visualBridge!.getVisualSystem('WebGLBackground');
-      
+      const webglSystem = this.visualBridge!.getVisualSystem("WebGLBackground");
+
       if (!webglSystem) {
-        Y3K?.debug?.warn("SystemCoordinator", "WebGLGradientBackgroundSystem not available via VisualSystemFacade");
+        Y3KDebug?.debug?.warn(
+          "SystemCoordinator",
+          "WebGLGradientBackgroundSystem not available via VisualSystemFacade"
+        );
         return;
       }
 
       // Register cross-system event handling
-      this.addEventListener('webgl-gradient-event', (event: any) => {
-        if (webglSystem && typeof webglSystem.handleSystemEvent === 'function') {
+      this.addEventListener("webgl-gradient-event", (event: any) => {
+        if (
+          webglSystem &&
+          typeof webglSystem.handleSystemEvent === "function"
+        ) {
           webglSystem.handleSystemEvent(event);
         }
       });
 
       // Register color refresh callback
-      this.registerColorDependentSystem('WebGLGradientBackgroundSystem', async (trigger: string) => {
-        if (webglSystem && typeof webglSystem.refreshColorState === 'function') {
-          await webglSystem.refreshColorState(trigger);
-        } else if (webglSystem && typeof webglSystem.updateGradientTexture === 'function') {
-          // Fallback to updateGradientTexture if refreshColorState not available
-          await webglSystem.updateGradientTexture();
+      this.registerColorDependentSystem(
+        "WebGLGradientBackgroundSystem",
+        async (trigger: string) => {
+          if (
+            webglSystem &&
+            typeof webglSystem.refreshColorState === "function"
+          ) {
+            await webglSystem.refreshColorState(trigger);
+          } else if (
+            webglSystem &&
+            typeof webglSystem.updateGradientTexture === "function"
+          ) {
+            // Fallback to updateGradientTexture if refreshColorState not available
+            await webglSystem.updateGradientTexture();
+          }
         }
-      });
+      );
 
-      Y3K?.debug?.log("SystemCoordinator", "WebGLGradientBackgroundSystem coordination established");
+      Y3KDebug?.debug?.log(
+        "SystemCoordinator",
+        "WebGLGradientBackgroundSystem coordination established"
+      );
     } catch (error) {
-      Y3K?.debug?.error("SystemCoordinator", "Failed to coordinate WebGLGradientBackgroundSystem:", error);
+      Y3KDebug?.debug?.error(
+        "SystemCoordinator",
+        "Failed to coordinate WebGLGradientBackgroundSystem:",
+        error
+      );
     }
   }
 
@@ -1458,11 +1869,18 @@ export class SystemCoordinator {
     try {
       // GradientTransitionOrchestrator is typically managed by existing Year3000 system initialization
       // Register it for color-dependent updates without facade access
-      this.registerColorDependentSystem('GradientTransitionOrchestrator');
-      
-      Y3K?.debug?.log("SystemCoordinator", "GradientTransitionOrchestrator registered for color updates");
+      this.registerColorDependentSystem("GradientTransitionOrchestrator");
+
+      Y3KDebug?.debug?.log(
+        "SystemCoordinator",
+        "GradientTransitionOrchestrator registered for color updates"
+      );
     } catch (error) {
-      Y3K?.debug?.warn("SystemCoordinator", "Failed to register GradientTransitionOrchestrator:", error);
+      Y3KDebug?.debug?.warn(
+        "SystemCoordinator",
+        "Failed to register GradientTransitionOrchestrator:",
+        error
+      );
     }
   }
 
@@ -1471,36 +1889,51 @@ export class SystemCoordinator {
    */
   private setupGradientSystemCommunication(): void {
     // Listen for color harmony updates and propagate to gradient systems
-    this.addEventListener('color-harmony-updated', async (event: any) => {
+    this.addEventListener("color-harmony-updated", async (event: any) => {
       try {
         // Refresh all gradient systems when colors change
-        await this.refreshColorDependentSystems('color-harmony-update');
-        
+        await this.refreshColorDependentSystems("color-harmony-update");
+
         // Emit gradient coordination event
-        this.emitEvent('gradient-systems-updated', {
-          trigger: 'color-harmony-update',
+        this.emitEvent("gradient-systems-updated", {
+          trigger: "color-harmony-update",
           timestamp: Date.now(),
-          systems: ['GradientConductor', 'WebGLGradientBackgroundSystem', 'GradientTransitionOrchestrator']
+          systems: [
+            "GradientConductor",
+            "WebGLGradientBackgroundSystem",
+            "GradientTransitionOrchestrator",
+          ],
         });
       } catch (error) {
-        Y3K?.debug?.error("SystemCoordinator", "Failed to propagate color harmony update to gradient systems:", error);
+        Y3KDebug?.debug?.error(
+          "SystemCoordinator",
+          "Failed to propagate color harmony update to gradient systems:",
+          error
+        );
       }
     });
 
     // Listen for performance changes and coordinate gradient quality scaling
-    this.addEventListener('performance-event', (event: any) => {
+    this.addEventListener("performance-event", (event: any) => {
       try {
         // Propagate performance events to gradient systems for quality scaling
-        this.emitEvent('gradient-performance-event', {
+        this.emitEvent("gradient-performance-event", {
           ...event,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
       } catch (error) {
-        Y3K?.debug?.error("SystemCoordinator", "Failed to propagate performance event to gradient systems:", error);
+        Y3KDebug?.debug?.error(
+          "SystemCoordinator",
+          "Failed to propagate performance event to gradient systems:",
+          error
+        );
       }
     });
 
-    Y3K?.debug?.log("SystemCoordinator", "Gradient system communication established");
+    Y3KDebug?.debug?.log(
+      "SystemCoordinator",
+      "Gradient system communication established"
+    );
   }
 
   /**
@@ -1511,15 +1944,19 @@ export class SystemCoordinator {
     colorDependentGradientSystems: string[];
     communicationActive: boolean;
   } {
-    const gradientSystems = ['GradientConductor', 'WebGLGradientBackgroundSystem', 'GradientTransitionOrchestrator'];
-    const colorDependentGradientSystems = gradientSystems.filter(system => 
+    const gradientSystems = [
+      "GradientConductor",
+      "WebGLGradientBackgroundSystem",
+      "GradientTransitionOrchestrator",
+    ];
+    const colorDependentGradientSystems = gradientSystems.filter((system) =>
       this.colorDependentSystems.has(system)
     );
 
     return {
       coordinatedSystems: gradientSystems,
       colorDependentGradientSystems,
-      communicationActive: this.crossFacadeEventListeners.size > 0
+      communicationActive: this.crossFacadeEventListeners.size > 0,
     };
   }
 
@@ -1531,14 +1968,17 @@ export class SystemCoordinator {
    * Register a system as color-dependent for targeted updates
    */
   public registerColorDependentSystem(
-    systemKey: string, 
+    systemKey: string,
     refreshCallback?: (trigger: string) => Promise<void>
   ): void {
     this.colorDependentSystems.add(systemKey);
     if (refreshCallback) {
       this.colorSystemRefreshCallbacks.set(systemKey, refreshCallback);
     }
-    Y3K?.debug?.log("SystemCoordinator", `Registered color-dependent system: ${systemKey}`);
+    Y3KDebug?.debug?.log(
+      "SystemCoordinator",
+      `Registered color-dependent system: ${systemKey}`
+    );
   }
 
   /**
@@ -1547,7 +1987,10 @@ export class SystemCoordinator {
   public unregisterColorDependentSystem(systemKey: string): void {
     this.colorDependentSystems.delete(systemKey);
     this.colorSystemRefreshCallbacks.delete(systemKey);
-    Y3K?.debug?.log("SystemCoordinator", `Unregistered color-dependent system: ${systemKey}`);
+    Y3KDebug?.debug?.log(
+      "SystemCoordinator",
+      `Unregistered color-dependent system: ${systemKey}`
+    );
   }
 
   /**
@@ -1562,7 +2005,10 @@ export class SystemCoordinator {
    */
   public async refreshColorDependentSystems(trigger: string): Promise<void> {
     if (this.colorDependentSystems.size === 0) {
-      Y3K?.debug?.log("SystemCoordinator", "No color-dependent systems to refresh");
+      Y3KDebug?.debug?.log(
+        "SystemCoordinator",
+        "No color-dependent systems to refresh"
+      );
       return;
     }
 
@@ -1571,22 +2017,32 @@ export class SystemCoordinator {
     let successCount = 0;
     let failureCount = 0;
 
-    Y3K?.debug?.log("SystemCoordinator", `Refreshing ${this.colorDependentSystems.size} color-dependent systems for trigger: ${trigger}`);
+    Y3KDebug?.debug?.log(
+      "SystemCoordinator",
+      `Refreshing ${this.colorDependentSystems.size} color-dependent systems for trigger: ${trigger}`
+    );
 
     for (const systemKey of this.colorDependentSystems) {
       const refreshCallback = this.colorSystemRefreshCallbacks.get(systemKey);
-      
+
       if (refreshCallback) {
         // Use registered callback
         refreshPromises.push(
           refreshCallback(trigger)
             .then(() => {
               successCount++;
-              Y3K?.debug?.log("SystemCoordinator", `Successfully refreshed color system: ${systemKey}`);
+              Y3KDebug?.debug?.log(
+                "SystemCoordinator",
+                `Successfully refreshed color system: ${systemKey}`
+              );
             })
             .catch((error) => {
               failureCount++;
-              Y3K?.debug?.warn("SystemCoordinator", `Failed to refresh color system ${systemKey}:`, error);
+              Y3KDebug?.debug?.warn(
+                "SystemCoordinator",
+                `Failed to refresh color system ${systemKey}:`,
+                error
+              );
             })
         );
       } else {
@@ -1598,7 +2054,11 @@ export class SystemCoordinator {
             })
             .catch((error) => {
               failureCount++;
-              Y3K?.debug?.warn("SystemCoordinator", `Failed to refresh color system ${systemKey}:`, error);
+              Y3KDebug?.debug?.warn(
+                "SystemCoordinator",
+                `Failed to refresh color system ${systemKey}:`,
+                error
+              );
             })
         );
       }
@@ -1609,34 +2069,41 @@ export class SystemCoordinator {
     const endTime = performance.now();
     const duration = endTime - startTime;
 
-    Y3K?.debug?.log("SystemCoordinator", `Color system refresh completed`, {
-      trigger,
-      duration: `${duration.toFixed(2)}ms`,
-      success: successCount,
-      failures: failureCount,
-      totalSystems: this.colorDependentSystems.size
-    });
+    Y3KDebug?.debug?.log(
+      "SystemCoordinator",
+      `Color system refresh completed`,
+      {
+        trigger,
+        duration: `${duration.toFixed(2)}ms`,
+        success: successCount,
+        failures: failureCount,
+        totalSystems: this.colorDependentSystems.size,
+      }
+    );
 
     // Emit refresh completion event
-    this.emitEvent('color-systems-refreshed', {
+    this.emitEvent("color-systems-refreshed", {
       trigger,
       duration,
       successCount,
       failureCount,
       totalSystems: this.colorDependentSystems.size,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
   /**
    * Helper method to get system and call refresh method
    */
-  private async getSystemAndRefresh(systemKey: string, trigger: string): Promise<void> {
+  private async getSystemAndRefresh(
+    systemKey: string,
+    trigger: string
+  ): Promise<void> {
     // Try visual systems first
     if (this.visualBridge) {
       try {
         const system = this.visualBridge.getVisualSystem(systemKey as any);
-        if (system && typeof system.refreshColorState === 'function') {
+        if (system && typeof system.refreshColorState === "function") {
           await system.refreshColorState(trigger);
           return;
         }
@@ -1649,7 +2116,7 @@ export class SystemCoordinator {
     if (this.nonVisualFacade) {
       try {
         const system = await this.nonVisualFacade.getSystem(systemKey as any);
-        if (system && typeof system.refreshColorState === 'function') {
+        if (system && typeof system.refreshColorState === "function") {
           await system.refreshColorState(trigger);
           return;
         }
@@ -1659,7 +2126,10 @@ export class SystemCoordinator {
     }
 
     // System not found or doesn't support color refresh
-    Y3K?.debug?.warn("SystemCoordinator", `System ${systemKey} not found or doesn't support color refresh`);
+    Y3KDebug?.debug?.warn(
+      "SystemCoordinator",
+      `System ${systemKey} not found or doesn't support color refresh`
+    );
   }
 
   /**
@@ -1668,33 +2138,36 @@ export class SystemCoordinator {
   private setupDefaultColorDependentSystems(): void {
     // Register common visual systems that depend on colors
     const defaultColorSystems = [
-      'CinematicDramaEngine',
-      'EtherealBeautyEngine', 
-      'NaturalHarmonyEngine',
-      'FlowingLiquidConsciousnessSystem',
-      'WebGLGradientBackgroundSystem',
-      'IridescentShimmerEffectsSystem',
-      'ColorHarmonyEngine',
-      'GradientTransitionOrchestrator',
-      'GradientConductor',
-      'SemanticColorManager',
+      "CinematicDrama",
+      "EtherealBeauty",  
+      "NaturalHarmony",
+      "FluidGradientBackgroundSystem",
+      "WebGLGradientBackgroundSystem",
+      "IridescentShimmerEffectsSystem",
+      "ColorHarmonyEngine",
+      "GradientTransitionOrchestrator",
+      "GradientConductor",
+      "SemanticColorManager",
       // UI Managers with consciousness integration
-      'Card3DManager',
-      'GlassmorphismManager'
+      "Card3DManager",
+      "GlassmorphismManager",
     ];
 
     for (const systemKey of defaultColorSystems) {
       this.registerColorDependentSystem(systemKey);
     }
 
-    Y3K?.debug?.log("SystemCoordinator", `Auto-registered ${defaultColorSystems.length} default color-dependent systems`);
+    Y3KDebug?.debug?.log(
+      "SystemCoordinator",
+      `Auto-registered ${defaultColorSystems.length} default color-dependent systems`
+    );
   }
 
   public async destroy(): Promise<void> {
     await this.cleanup();
     this.isInitialized = false;
 
-    Y3K?.debug?.log("SystemCoordinator", "System coordinator destroyed");
+    Y3KDebug?.debug?.log("SystemCoordinator", "System coordinator destroyed");
   }
 
   // Shared service getter methods for testing and integration
@@ -1706,15 +2179,35 @@ export class SystemCoordinator {
     return this.sharedColorHarmonyEngine || undefined;
   }
 
-  public getSharedPerformanceAnalyzer(): PerformanceAnalyzer | undefined {
-    return this.sharedPerformanceAnalyzer || undefined;
-  }
-
   public getSharedSettingsManager(): SettingsManager | undefined {
     return this.sharedSettingsManager || undefined;
   }
-  
+
   public getSharedSemanticColorManager(): SemanticColorManager | undefined {
     return this.sharedSemanticColorManager || undefined;
+  }
+
+  // New simplified performance system getter methods
+  public getSharedSimplePerformanceCoordinator(): SimplePerformanceCoordinator | undefined {
+    return this.sharedSimplePerformanceCoordinator || undefined;
+  }
+
+  public getSharedWebGLSystemsIntegration(): WebGLSystemsIntegration | undefined {
+    return this.sharedWebGLSystemsIntegration || undefined;
+  }
+
+  public getSharedEnhancedDeviceTierDetector(): EnhancedDeviceTierDetector | undefined {
+    return this.sharedEnhancedDeviceTierDetector || undefined;
+  }
+
+  // Legacy performance system getter methods (deprecated, for backward compatibility)
+  /** @deprecated Use getSharedSimplePerformanceCoordinator() instead */
+  public getSharedPerformanceAnalyzer(): SimplePerformanceCoordinator | undefined {
+    return (this.sharedSimplePerformanceCoordinator as any) || undefined;
+  }
+
+  /** @deprecated Use getSharedSimplePerformanceCoordinator() instead */
+  public getSharedPerformanceOrchestrator(): SimplePerformanceCoordinator | undefined {
+    return this.sharedSimplePerformanceCoordinator || undefined;
   }
 }

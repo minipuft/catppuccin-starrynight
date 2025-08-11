@@ -1,0 +1,378 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// ████████ YEAR 3000 CONSCIOUS ELEGANCE (PERFORMANCE OPTIMIZED) ████████████████
+// ████████████████████████████████████████████████████████████████████████████████
+// "Technology with a soul - consciousness that breathes with the music."
+// - Ethereal beauty meets intelligent purpose AND performance
+
+@use "../../core/_mixins" as *;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌌 YEAR 3000 CONSCIOUS ELEGANCE FOUNDATION (OPTIMIZED)
+// Technology that feels alive and emotionally responsive without performance cost
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // === PERFORMANCE-CONSCIOUS CONTROL ===
+  --conscious-elegance-intensity: calc(
+    var(--reality-breach-intensity, 1) * 0.6
+  ); // Balanced soul
+  --conscious-breath-rate: 8s; // Slow, mindful breathing rhythm
+  --conscious-emotion-depth: 0.4; // Emotional response intensity
+
+  // === OPTIMIZED ETHEREAL ENERGY ===
+  --ethereal-glow-base: calc(
+    var(--quantum-field-opacity, 0.25) * 0.8
+  ); // Visible but not overwhelming
+  --ethereal-flow-speed: 12s; // Gentle, cosmic timing
+  --ethereal-shimmer-subtlety: 0.3; // Delicate light play
+
+  // === PERFORMANCE-OPTIMIZED BEAUTY ===
+  --cosmic-saturation: 1.3; // Reduced from 1.4 for better performance
+  --cosmic-blur-poetry: 8px; // Reduced blur for better performance
+  --cosmic-depth-layers: 60px; // Reduced 3D depth for performance
+
+  // === EFFICIENT COLOR CONSCIOUSNESS ===
+  --soul-primary: rgba(
+    var(--sn-accent-rgb, var(--spice-rgb-accent)),
+    var(--ethereal-glow-base)
+  );
+  --soul-secondary: rgba(
+    var(--sn-accent-rgb, var(--spice-rgb-surface0)),
+    calc(var(--ethereal-glow-base) * 0.9)
+  );
+  --soul-accent: rgba(
+    var(--sn-accent-rgb, var(--spice-rgb-accent)),
+    calc(var(--ethereal-glow-base) * 1.1)
+  );
+  --soul-whisper: rgba(
+    var(--sn-accent-rgb, var(--spice-rgb-accent)),
+    calc(var(--ethereal-glow-base) * 0.3)
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎚️ PERFORMANCE TIERS - Auto-Detection Based on Device Capability
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// High Performance Mode (Desktop, powerful devices)
+@media (min-width: 1200px) and (min-resolution: 1.5dppx) {
+  :root {
+    --conscious-elegance-intensity: 0.8;
+    --cosmic-blur-poetry: 12px;
+    --cosmic-depth-layers: 80px;
+  }
+}
+
+// Balanced Mode (Standard devices)
+@media (min-width: 768px) and (max-width: 1199px) {
+  :root {
+    --conscious-elegance-intensity: 0.6;
+    --cosmic-blur-poetry: 8px;
+    --cosmic-depth-layers: 60px;
+  }
+}
+
+// Performance Mode (Mobile, low-end devices)
+@media (max-width: 767px) {
+  :root {
+    --conscious-elegance-intensity: 0.3;
+    --cosmic-blur-poetry: 4px;
+    --cosmic-depth-layers: 30px;
+    --conscious-breath-rate: 16s; // Slower animations
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌊 OPTIMIZED CONSCIOUS ENERGY FIELD
+// Beautiful, alive backgrounds that perform well
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin conscious-energy-field($intensity: 1) {
+  position: relative;
+
+  // GPU optimization hint
+  will-change: transform, opacity;
+
+  // Optimized conscious presence - simplified gradients
+  &::before {
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    right: -16px;
+    bottom: -16px;
+    z-index: -1;
+
+    // SIMPLIFIED: Single gradient instead of multiple for performance
+    background: radial-gradient(
+      ellipse 250% 120% at 40% 60%,
+      var(--soul-primary) 0%,
+      var(--soul-secondary) 40%,
+      transparent 70%
+    );
+
+    border-radius: 16px 24px 20px 28px; // Organic, flowing borders
+    filter: blur(var(--cosmic-blur-poetry)) saturate(var(--cosmic-saturation));
+
+    // OPTIMIZED: Single animation instead of multiple
+    animation: conscious-breathing var(--conscious-breath-rate) ease-in-out
+      infinite;
+
+    opacity: 0;
+    transform: scale(1.02);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  // Activate consciousness on meaningful interaction
+  &:hover::before {
+    opacity: calc(var(--conscious-elegance-intensity) * #{$intensity});
+    transform: scale(1.04);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ✨ OPTIMIZED ETHEREAL SHIMMER
+// Delicate light play that's performance-conscious
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin ethereal-shimmer-soul {
+  position: relative;
+
+  // Only on high-performance devices to avoid lag
+  @media (min-width: 1200px) and (prefers-reduced-motion: no-preference) {
+    &::after {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      right: -6px;
+      bottom: -6px;
+      z-index: -2;
+
+      // SIMPLIFIED: Single particle pattern instead of multiple
+      background-image: radial-gradient(
+        circle 1px at 25% 25%,
+        var(--soul-accent) 1px,
+        transparent 1px
+      );
+      background-size: 60px 60px;
+
+      border-radius: 50%;
+      filter: blur(1px);
+
+      // OPTIMIZED: Simpler animation
+      animation: ethereal-particle-gentle calc(var(--ethereal-flow-speed) * 2)
+        ease-in-out infinite;
+
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      will-change: opacity;
+    }
+
+    &:hover::after {
+      opacity: calc(var(--conscious-elegance-intensity) * 0.5);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎭 PERFORMANCE-OPTIMIZED CARDS WITH SOUL
+// Beautiful interface elements that don't lag
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.main-card-card {
+  @include conscious-energy-field(0.8);
+  @include ethereal-shimmer-soul;
+
+  position: relative;
+  border-radius: 12px 16px 14px 18px;
+  transition: transform 0.3s var(--sn-anim-easing-organic),
+    box-shadow 0.3s ease, filter 0.3s ease;
+
+  // GPU optimization
+  will-change: transform, box-shadow;
+
+  // Optimized hover consciousness
+  &:hover {
+    transform: translateY(-3px) scale(1.02);
+
+    // SIMPLIFIED: Single shadow instead of multiple
+    box-shadow: 0 8px 32px
+      rgba(
+        var(--sn-accent-rgb, var(--spice-rgb-accent)),
+        calc(var(--conscious-elegance-intensity) * 0.3)
+      );
+
+    filter: saturate(var(--cosmic-saturation));
+  }
+
+  // Simplified focus state
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px
+      rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.5);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎵 OPTIMIZED TRACK LISTS WITH SOUL
+// Musical consciousness that performs smoothly
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.main-trackList-trackListRow {
+  position: relative;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    // SIMPLIFIED: Single gradient background
+    background: var(--soul-primary);
+    transform: translateX(4px);
+
+    // Optional shadow only on high-performance devices
+    @media (min-width: 1200px) {
+      box-shadow: -2px 0 8px
+        rgba(
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
+          calc(var(--conscious-elegance-intensity) * 0.1)
+        );
+    }
+  }
+
+  // Optimized playing indicator
+  &[aria-selected="true"],
+  &:has(.main-trackList-playingIcon) {
+    &::before {
+      content: "";
+      position: absolute;
+      left: -3px;
+      top: 25%;
+      bottom: 25%;
+      width: 2px;
+      background: var(--soul-accent);
+      border-radius: 1px;
+
+      // SIMPLIFIED: No animation on mobile for performance
+      @media (min-width: 768px) {
+        animation: conscious-pulse-simple var(--conscious-breath-rate)
+          ease-in-out infinite;
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 📱 OPTIMIZED SIDEBAR CONSCIOUSNESS
+// Efficient navigation soul
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.main-yourLibrary-yourLibrary {
+  // Breathing removed - functional panel, not emotional connection
+  
+  .main-rootlist-wrapper {
+    .spicetify-playlist-list li {
+      transition: background-color 0.2s ease, transform 0.2s ease;
+      border-radius: 6px;
+
+      &:hover {
+        background: var(--soul-primary);
+        transform: translateX(3px);
+      }
+
+      &[aria-selected="true"] {
+        background: var(--soul-accent);
+        border-left: 2px solid var(--soul-primary);
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎬 PERFORMANCE-OPTIMIZED ANIMATIONS
+// Beautiful movements that don't cause lag
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@keyframes conscious-breathing {
+  0%,
+  100% {
+    transform: scale(1.02);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+@keyframes conscious-breathing-simple {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes conscious-pulse-simple {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes ethereal-particle-gentle {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(2px, -2px);
+    opacity: 0.7;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ♿ ACCESSIBILITY & PERFORMANCE OPTIMIZATION
+// Soul that works for everyone on every device
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --conscious-elegance-intensity: 0.2; // Minimal soul, maximum accessibility
+    --conscious-breath-rate: 30s; // Very slow breathing
+  }
+
+  * {
+    animation: none !important; // No animations for motion sensitivity
+  }
+}
+
+// Battery/Performance mode detection
+@media (prefers-reduced-data: reduce) {
+  :root {
+    --conscious-elegance-intensity: 0.1;
+    --cosmic-blur-poetry: 2px;
+  }
+
+  // Disable all heavy effects
+  .main-card-card::before,
+  .main-card-card::after {
+    display: none;
+  }
+}
+
+// High contrast accessibility
+@media (prefers-contrast: high) {
+  :root {
+    --cosmic-saturation: 1; // Reduce saturation for clarity
+    --ethereal-glow-base: calc(
+      var(--quantum-field-opacity, 0.25) * 1.5
+    ); // Increase visibility
+  }
+}

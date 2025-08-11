@@ -37,11 +37,8 @@ export interface FeatureProfile {
   particleStreams: boolean;
   predictiveHighlights: boolean;
   glassEffects: boolean;
-  dataGlyphs: boolean;
   beatSync: boolean;
   colorHarmony: boolean;
-  dimensionalEffects: boolean;
-  quantumEmpathy: boolean;
   aestheticGravity: boolean;
   temporalPlay?: boolean; // Optional for cosmic-maximum
   blur?: string;
@@ -57,7 +54,6 @@ export interface MultiplierProfile {
   musicEnergyBoost: number;
   kineticIntensity: number;
   temporalPlayFactor: number;
-  quantumEmpathyLevel: number;
   aestheticGravityStrength: number;
   emergentChoreography: boolean;
   visualIntensityBase: number;
@@ -84,11 +80,26 @@ export type ArtisticMode =
   | "artist-vision"
   | "cosmic-maximum";
 
+// Palette system types for aesthetic switching
+export type PaletteSystem = 'catppuccin' | 'year3000';
+
+// Core theme type definitions for type-safe settings
+export type CatppuccinFlavor = "mocha" | "latte" | "frappe" | "macchiato";
+export type AccentColor = 
+  | "rosewater" | "flamingo" | "pink" | "mauve" | "red" | "maroon"
+  | "peach" | "yellow" | "green" | "teal" | "sky" | "sapphire" 
+  | "blue" | "lavender" | "text" | "none";
+export type BrightnessMode = "bright" | "balanced" | "dark";
+export type IntensityLevel = "disabled" | "minimal" | "balanced" | "intense";
+export type QualityLevel = "auto" | "low" | "high";
+export type WebGLQuality = "low" | "medium" | "high";
+
 // The main configuration object for the Year 3000 system.
 export interface Year3000Config {
   [key: string]: any; // Index signature for dynamic access
   enableDebug: boolean;
   enableContextualIntelligence: boolean;
+  paletteSystem: PaletteSystem;
   logging: {
     level: "off" | "error" | "warn" | "info" | "debug" | "verbose";
     performance: {

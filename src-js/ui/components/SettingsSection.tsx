@@ -6,7 +6,7 @@ import {
   ISettingsFieldDropdown,
   ISettingsFieldInput,
   ISettingsFieldToggle,
-} from "./settings-field";
+} from "./SettingsField";
 
 /**
  * StarryNight-internal replica of the SettingsSection helper from the
@@ -141,20 +141,37 @@ export class SettingsSection {
   };
 
   /* ----- generic storage helpers (use Spicetify.LocalStorage) -------- */
-  private storageKey(nameId: string) {
-    return `${this.settingsId}.${nameId}`;
-  }
   getFieldValue = <T,>(nameId: string): T | undefined => {
-    return JSON.parse(
-      (window as any).Spicetify?.LocalStorage.get(this.storageKey(nameId)) ||
-        "null"
-    )?.value;
+    // Use direct key without prefix to match SettingsManager
+    const value = (window as any).Spicetify?.LocalStorage.get(nameId);
+    
+    // Handle both old prefixed format and new direct format for backwards compatibility
+    if (value === null || value === undefined) {
+      // Try old prefixed format for migration
+      const legacyKey = `${this.settingsId}.${nameId}`;
+      const legacyValue = (window as any).Spicetify?.LocalStorage.get(legacyKey);
+      if (legacyValue) {
+        try {
+          const parsed = JSON.parse(legacyValue);
+          const extractedValue = parsed?.value ?? legacyValue;
+          // Migrate to new format
+          (window as any).Spicetify?.LocalStorage.set(nameId, extractedValue);
+          // Clean up old format
+          (window as any).Spicetify?.LocalStorage.remove(legacyKey);
+          return extractedValue as T;
+        } catch {
+          return legacyValue as T;
+        }
+      }
+      return undefined;
+    }
+    
+    return value as T;
   };
+  
   setFieldValue(nameId: string, newValue: any) {
-    (window as any).Spicetify?.LocalStorage.set(
-      this.storageKey(nameId),
-      JSON.stringify({ value: newValue })
-    );
+    // Use direct key without prefix to match SettingsManager
+    (window as any).Spicetify?.LocalStorage.set(nameId, newValue);
   }
 
   /* ---------------------- React wrappers ----------------------------- */
@@ -189,6 +206,17 @@ export class SettingsSection {
     const setValue = (v: any) => {
       setVal(v);
       this.setFieldValue(nameId, v);
+      
+      // Emit settings change event to notify SettingsManager and other systems
+      // This ensures the storage unification works properly
+      try {
+        const customEvent = new CustomEvent("year3000SystemSettingsChanged", {
+          detail: { key: nameId, value: v },
+        });
+        document.dispatchEvent(customEvent);
+      } catch (error) {
+        console.warn(`[SettingsSection] Failed to emit settings change event for ${nameId}:`, error);
+      }
     };
 
     if (field.type === "hidden") return <></>;

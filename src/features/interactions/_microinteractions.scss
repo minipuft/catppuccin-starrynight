@@ -1,0 +1,401 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 MICROINTERACTIONS - Rhythmic Consciousness in Every Touch
+// Kinetic Verbs: RIPPLE, BLOOM, REFRACT, HARMONIZE
+// Every interaction pulses with the heartbeat of the universe
+// ████████████████████████████████████████████████████████████████████████████████
+
+@use "../../core/_mixins" as *;
+
+// ══════════════════════════════════════════════════════════════════════════════
+// YEAR 3000 BEATSYNC MICROINTERACTION VARIABLES
+// ══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // === RHYTHMIC FOUNDATION VARIABLES ===
+  --micro-beat-intensity: var(
+    --sn-beat-pulse-intensity,
+    0
+  ); // Direct beat connection
+  --micro-breathing-scale: var(--sn-breathing-scale, 1); // Breathing rhythm
+  --micro-rhythm-phase: var(--sn-rhythm-phase, 0); // Harmonic oscillation
+
+  // === Enhanced Microinteraction Variables (BeatSync Enabled) ===
+  --ripple-color: var(--sn-color-accent-hex);
+  --ripple-duration: calc(
+    var(--sn-gradient-transition) * (1 - (var(--micro-beat-intensity) * 0.3))
+  ); // Faster on beats
+  --ripple-intensity: calc(
+    0.3 + (var(--micro-beat-intensity) * 0.4)
+  ); // More intense on beats
+  --interaction-feedback-delay: calc(
+    0.1s * (1 - (var(--micro-beat-intensity) * 0.5))
+  ); // Quicker response
+
+  // === Rhythmic Timing Variables ===
+  --micro-fast: calc(0.15s * (1 - (var(--micro-beat-intensity) * 0.3)));
+  --micro-medium: calc(0.3s * (1 - (var(--micro-beat-intensity) * 0.2)));
+  --micro-slow: calc(0.6s * (1 - (var(--micro-beat-intensity) * 0.1)));
+
+  // === Beat-Responsive Feedback Intensity ===
+  --feedback-subtle: calc(0.1 + (var(--micro-beat-intensity) * 0.05));
+  --feedback-moderate: calc(0.2 + (var(--micro-beat-intensity) * 0.1));
+  --feedback-prominent: calc(0.3 + (var(--micro-beat-intensity) * 0.2));
+
+  // === Cosmic Enhancement Variables ===
+  --micro-glow-radius: calc(8px + (12px * var(--micro-beat-intensity)));
+  --micro-scale-enhancement: calc(1 + (var(--micro-beat-intensity) * 0.02));
+  --micro-hue-shift: calc(var(--micro-rhythm-phase) * 1deg);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// YEAR 3000 ENHANCED CARD MICROINTERACTIONS - Cosmic Touch Symphony
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Enhanced main-card-card with YEAR 3000 rhythmic consciousness
+.main-card-card {
+  // Kinetic Verb: OSCILLATE - Base breathing with rhythm
+  transform: scale(var(--micro-breathing-scale));
+  transition: transform var(--micro-medium) var(--sn-easing-explorer, ease-out);
+  
+  // Breathing removed - too many elements, creates visual chaos
+
+  // Apply gradient ripple with beat sync
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-accent), var(--feedback-moderate))
+  );
+
+  // Enhanced hover glow with rhythmic intensity
+  @include gradient-glow(var(--sn-color-accent-hex), var(--feedback-subtle));
+
+  // Add cosmic filter effects
+  filter: hue-rotate(var(--micro-hue-shift))
+    saturate(calc(1 + (var(--micro-beat-intensity) * 0.1)))
+    brightness(calc(1 + (var(--micro-beat-intensity) * 0.05)));
+
+  // Kinetic Verb: BLOOM - Enhanced hover with rhythm
+  &:hover {
+    transform: scale(
+      calc(var(--micro-breathing-scale) * var(--micro-scale-enhancement))
+    );
+    box-shadow: 0 0 var(--micro-glow-radius)
+      rgba(
+        var(--sn-accent-rgb, var(--spice-rgb-accent)),
+        var(--feedback-moderate)
+      );
+  }
+
+  // Enhanced play button interaction with cosmic consciousness
+  .main-card-PlayButtonContainer,
+  .main-playButton-PlayButton {
+    @include interaction-feedback(
+      calc(1.05 + (var(--micro-beat-intensity) * 0.03)),
+      true
+    );
+
+    // Beat-responsive ripple enhancement
+    --ripple-color: var(--spice-accent);
+    --ripple-intensity: var(--feedback-prominent);
+
+    // Cosmic glow pulse
+    box-shadow: 0 0 calc(var(--micro-glow-radius) * 0.8)
+      rgba(
+        var(--spice-rgb-accent),
+        calc(var(--feedback-moderate) * var(--micro-beat-intensity))
+      );
+  }
+}
+
+// PHASE 4.1: Playlist Navigation Microinteractions
+// =============================================================================
+
+// Enhance existing playlist items (builds on _navbar.scss)
+.spicetify-playlist-list li {
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-surface1), var(--feedback-moderate))
+  );
+
+  // Enhanced hover state that builds on existing hover background
+  &:hover {
+    // Preserve existing hover background color
+    background-color: var(--spice-main);
+
+    // Add gradient overlay for enhanced depth
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(var(--spice-rgb-accent), 0.05) 0%,
+        rgba(var(--spice-rgb-accent), 0.1) 50%,
+        rgba(var(--spice-rgb-accent), 0.05) 100%
+      );
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 1;
+    }
+  }
+
+  // Enhanced focus state for accessibility
+  &:focus-visible {
+    outline: 2px solid rgba(var(--spice-rgb-accent), 0.6);
+    outline-offset: 2px;
+  }
+}
+
+// PHASE 4.1: Navigation Button Enhancements
+// =============================================================================
+
+// Enhance existing create playlist button
+.main-createPlaylistButton-button {
+  @include interaction-feedback(1.02, true);
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-accent), var(--feedback-moderate))
+  );
+
+  // Coordinate with existing button styling
+  border-radius: 6px;
+
+  &:hover {
+    // Enhanced glow effect
+    box-shadow: 0 0 12px rgba(var(--spice-rgb-accent), 0.3);
+  }
+}
+
+// Enhance existing nav bar links
+.main-navBar-navBarLink {
+  @include interaction-feedback(1.01, false);
+  border-radius: 4px;
+
+  // Subtle ripple for navigation
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-surface1), var(--feedback-subtle))
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// YEAR 3000 CONTROL BUTTON COSMIC ENHANCEMENT - The Hearts of Interaction
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Enhanced shuffle and transport buttons with YEAR 3000 consciousness
+.main-shuffleButton-button,
+.main-skipForwardButton-button,
+.main-skipBackButton-button {
+  // Kinetic Verb: OSCILLATE - Base breathing
+  transform: scale(var(--micro-breathing-scale));
+
+  @include interaction-feedback(
+    calc(1.05 + (var(--micro-beat-intensity) * 0.03)),
+    true
+  );
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-accent), var(--feedback-moderate))
+  );
+
+  // Cosmic filter enhancement
+  filter: hue-rotate(var(--micro-hue-shift))
+    brightness(calc(1 + (var(--micro-beat-intensity) * 0.08)));
+  transition: all var(--micro-fast) var(--sn-easing-explorer, ease-out);
+
+  // Kinetic Verb: BLOOM - Enhanced hover
+  &:hover {
+    transform: scale(calc(var(--micro-breathing-scale) * 1.08));
+    box-shadow: 0 0 var(--micro-glow-radius)
+      rgba(var(--spice-rgb-accent), var(--feedback-moderate));
+  }
+
+  // Enhanced active state for shuffle button with rhythm consciousness
+  &.main-shuffleButton-active {
+    --ripple-color: var(--spice-accent);
+
+    // Kinetic Verb: REFRACT - Rhythmic glow for active state
+    box-shadow: 0 0 calc(var(--micro-glow-radius) * 1.2)
+      rgba(
+        var(--spice-rgb-accent),
+        calc(0.4 + (var(--micro-beat-intensity) * 0.3))
+      );
+    text-shadow: 0 0 calc(4px * var(--micro-beat-intensity))
+      rgba(var(--spice-rgb-accent), var(--micro-beat-intensity));
+  }
+}
+
+// Enhanced main play button - THE COSMIC HEART 💫
+.main-playButton-PlayButton.main-playButton-primary {
+  // Kinetic Verb: BLOOM - Maximum love for the most important button
+  transform: scale(
+    calc(
+      var(--micro-breathing-scale) * (1 + (var(--micro-beat-intensity) * 0.05))
+    )
+  );
+
+  @include interaction-feedback(
+    calc(1.08 + (var(--micro-beat-intensity) * 0.05)),
+    true
+  );
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-accent), var(--feedback-prominent))
+  );
+
+  // Cosmic pulse enhancement
+  filter: hue-rotate(var(--micro-hue-shift))
+    brightness(calc(1 + (var(--micro-beat-intensity) * 0.12)))
+    saturate(calc(1.1 + (var(--micro-beat-intensity) * 0.2)));
+  transition: all var(--micro-fast) var(--sn-anim-easing-bounce-smooth);
+
+  // Prominent glow effect with rhythm
+  &:hover {
+    box-shadow: 0 0 calc(var(--micro-glow-radius) * 2)
+      rgba(
+        var(--spice-rgb-accent),
+        calc(0.5 + (var(--micro-beat-intensity) * 0.3))
+      );
+    transform: scale(calc(var(--micro-breathing-scale) * 1.12));
+  }
+}
+
+// PHASE 4.1: Search and Filter Enhancements
+// =============================================================================
+
+// Enhance filter and search inputs
+.x-filterBox-filterInput {
+  @include interaction-feedback(1.01, false);
+  border-radius: 6px;
+
+  &:focus {
+    // Enhanced focus glow
+    box-shadow: 0 0 8px rgba(var(--spice-rgb-accent), 0.3);
+    border-color: rgba(var(--spice-rgb-accent), 0.6);
+  }
+}
+
+// Enhance dropdown interactions
+.main-dropDown-dropDown {
+  @include interaction-feedback(1.01, false);
+
+  &:focus {
+    box-shadow: 0 0 6px rgba(var(--spice-rgb-accent), 0.2);
+  }
+}
+
+// PHASE 4.1: Track List Microinteractions
+// =============================================================================
+
+// Track list playing icon enhancement
+.main-trackList-playingIcon {
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-accent), var(--feedback-moderate))
+  );
+  border-radius: 4px;
+
+  // Animated glow for playing track
+  &::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(
+      45deg,
+      rgba(var(--spice-rgb-accent), 0.2) 0%,
+      transparent 50%,
+      rgba(var(--spice-rgb-accent), 0.2) 100%
+    );
+    border-radius: inherit;
+    z-index: -1;
+    animation: playing-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes playing-glow {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+}
+
+// PHASE 4.1: Context Menu Enhancement
+// =============================================================================
+
+// Enhance existing context menu buttons
+.main-contextMenu-menuItemButton {
+  @include interaction-feedback(1.02, false);
+  @include gradient-ripple(
+    rgba(var(--spice-rgb-surface1), var(--feedback-subtle))
+  );
+
+  border-radius: 4px;
+
+  &:hover {
+    // Subtle gradient background
+    background: linear-gradient(
+      90deg,
+      rgba(var(--spice-rgb-surface1), 0.8) 0%,
+      rgba(var(--spice-rgb-surface2), 0.6) 100%
+    );
+  }
+}
+
+// PHASE 4.1: Responsive and Accessibility Enhancements
+// =============================================================================
+
+// Mobile optimizations for microinteractions
+@media (max-width: 768px) {
+  :root {
+    --ripple-intensity: var(--feedback-subtle); // Reduce intensity on mobile
+    --interaction-feedback-delay: 0.05s; // Faster feedback on touch
+  }
+
+  // Simplify ripples on mobile for performance
+  .main-card-card,
+  .spicetify-playlist-list li {
+    &::after {
+      // Smaller ripple scale for mobile
+      transform: translate(-50%, -50%) scale(0);
+    }
+
+    &:active::after {
+      transform: translate(-50%, -50%) scale(15); // Reduced from 20
+    }
+  }
+}
+
+// Reduced motion preferences
+@media (prefers-reduced-motion: reduce) {
+  .main-card-card,
+  .spicetify-playlist-list li,
+  .main-createPlaylistButton-button,
+  .main-shuffleButton-button,
+  .main-playButton-PlayButton {
+    // Keep only opacity transitions (moved above nested rules)
+    transition: opacity var(--micro-medium) ease,
+      background-color var(--micro-medium) ease;
+
+    // Disable ripple animations
+    &::after {
+      display: none;
+    }
+
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  :root {
+    --ripple-intensity: var(--feedback-prominent); // Increase visibility
+    --feedback-subtle: 0.2;
+    --feedback-moderate: 0.4;
+    --feedback-prominent: 0.6;
+  }
+}

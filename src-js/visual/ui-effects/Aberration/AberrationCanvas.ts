@@ -10,7 +10,7 @@
  */
 
 import { Year3000System } from "@/core/lifecycle/year3000System";
-import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 
 /** Thin wrapper that owns the canvas and GL program.  */
 export class AberrationCanvas {
@@ -20,7 +20,7 @@ export class AberrationCanvas {
   private tex: WebGLTexture | null = null;
   private strength = 0.4; // default; overridden via CSS var
   private rafId: number | null = null;
-  private perf: PerformanceAnalyzer | null;
+  private perf: SimplePerformanceCoordinator | null;
   private frameStart = 0;
   private readonly _defaultSize = 256;
 
@@ -178,8 +178,6 @@ export class AberrationCanvas {
 
     if (this.perf) {
       const dur = performance.now() - this.frameStart;
-      this.perf.shouldUpdate("aberration", 500) &&
-        this.perf.endTiming("AberrationCanvas", this.frameStart);
       if (dur > 0.5) {
         console.warn(
           `[AberrationCanvas] Frame ${dur.toFixed(2)} ms exceeds 0.5 ms budget`

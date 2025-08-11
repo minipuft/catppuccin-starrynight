@@ -23,7 +23,7 @@ All visual components, organized by type:
 #### `visual/backgrounds/` - Background Rendering Systems
 - `WebGLGradientBackgroundSystem.ts` - GPU-accelerated flowing gradients
 - `LightweightParticleSystem.ts` - CPU-optimized particle effects
-- `ParticleFieldSystem.ts` - Advanced particle field rendering
+- `ParticleFieldSystem.ts` - REMOVED: Consolidated into ParticleConsciousnessModule
 
 #### `visual/beat-sync/` - Music-Reactive Visuals
 - `BeatSyncVisualSystem.ts` - Beat-synchronized visual effects and animations

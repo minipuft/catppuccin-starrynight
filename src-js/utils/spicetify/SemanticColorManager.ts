@@ -5,7 +5,7 @@
 
 // Import spicetify types via triple-slash directive
 /// <reference path="../../../types/spicetify.d.ts" />
-import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
+import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import * as Utils from "@/utils/core/Year3000Utilities";
@@ -27,7 +27,7 @@ export interface SemanticColorMapping {
 
 export class SemanticColorManager implements IManagedSystem {
   private config: SemanticColorConfig;
-  private cssConsciousnessController: UnifiedCSSConsciousnessController | null = null;
+  private cssController!: OptimizedCSSVariableManager;
   private colorCache: Map<Spicetify.SemanticColor, string> = new Map();
   private lastCacheUpdate: number = 0;
   
@@ -81,14 +81,14 @@ export class SemanticColorManager implements IManagedSystem {
     };
   }
 
-  public async initialize(cssConsciousnessController?: UnifiedCSSConsciousnessController): Promise<void> {
+  public async initialize(cssController?: OptimizedCSSVariableManager): Promise<void> {
     if (this.initialized) {
       console.warn("[SemanticColorManager] Already initialized, skipping");
       return;
     }
 
     try {
-      this.cssConsciousnessController = cssConsciousnessController || null;
+      this.cssController = cssController || getGlobalOptimizedCSSController();
       
       // Subscribe to UnifiedEventBus events for system integration
       this.setupEventSubscriptions();
@@ -99,7 +99,7 @@ export class SemanticColorManager implements IManagedSystem {
       if (this.config.enableDebug) {
         console.log("🎨 [SemanticColorManager] Initialized as IManagedSystem with", {
           mappings: SemanticColorManager.SEMANTIC_MAPPINGS.length,
-          batcherAvailable: !!this.cssConsciousnessController,
+          batcherAvailable: !!this.cssController,
           spicetifyAvailable: this.isSpicetifyAvailable(),
           eventSubscriptions: this.eventSubscriptionIds.length
         });
@@ -145,7 +145,10 @@ export class SemanticColorManager implements IManagedSystem {
 
     try {
       const colorUpdateLog: Record<string, any> = {};
+      const semanticColorUpdates: Record<string, string> = {};
+      const rgbColorUpdates: Record<string, string> = {};
 
+      // Collect all color updates first for batching
       for (const mapping of SemanticColorManager.SEMANTIC_MAPPINGS) {
         const color = await this.getSemanticColor(mapping.semanticColor);
         
@@ -157,16 +160,32 @@ export class SemanticColorManager implements IManagedSystem {
           description: mapping.description
         };
 
-        this.applyColorToCSS(mapping.cssVariable, color);
+        semanticColorUpdates[mapping.cssVariable] = color;
         
         // Also create RGB variant for transparency support
         const rgbColor = Utils.hexToRgb(color);
         if (rgbColor) {
           const rgbVariable = mapping.cssVariable.replace('--spice-', '--spice-rgb-');
-          this.applyColorToCSS(rgbVariable, `${rgbColor.r},${rgbColor.g},${rgbColor.b}`);
+          rgbColorUpdates[rgbVariable] = `${rgbColor.r},${rgbColor.g},${rgbColor.b}`;
           colorUpdateLog[rgbVariable] = `${rgbColor.r},${rgbColor.g},${rgbColor.b}`;
         }
       }
+
+      // Apply all semantic colors in batch with high priority for system colors
+      this.cssController.batchSetVariables(
+        "SemanticColorManager",
+        semanticColorUpdates,
+        "high", // High priority for semantic color system
+        "semantic-color-update"
+      );
+
+      // Apply all RGB variants in batch with high priority
+      this.cssController.batchSetVariables(
+        "SemanticColorManager",
+        rgbColorUpdates,
+        "high", // High priority for RGB color variants
+        "semantic-rgb-update"
+      );
 
       // 🎨 CRITICAL: Log all color updates
       console.log("🎨 [SemanticColorManager] Color update complete:", colorUpdateLog);
@@ -281,13 +300,20 @@ export class SemanticColorManager implements IManagedSystem {
     return '#cad3f5'; // Default fallback
   }
 
-  private applyColorToCSS(cssVariable: string, color: string): void {
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(cssVariable, color);
-    } else {
-      // Direct application fallback
-      document.documentElement.style.setProperty(cssVariable, color);
-    }
+  private applyColorToCSS(
+    cssVariable: string, 
+    color: string, 
+    priority: "low" | "normal" | "high" | "critical" = "normal",
+    source: string = "semantic-color-manager"
+  ): void {
+    // Use coordination-first approach with proper priority handling
+    this.cssController.setVariable(
+      "SemanticColorManager",
+      cssVariable,
+      color,
+      priority,
+      source
+    );
   }
 
   private isSpicetifyAvailable(): boolean {
@@ -297,8 +323,9 @@ export class SemanticColorManager implements IManagedSystem {
   }
 
   public flushUpdates(): void {
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.flushCSSVariableBatch();
+    // Flush through optimized controller for proper batching
+    if (this.cssController) {
+      this.cssController.flushUpdates();
     }
   }
 
@@ -481,24 +508,30 @@ export class SemanticColorManager implements IManagedSystem {
         ...effectsSpicetifyUpdates,
       };
 
-      // Apply updates via CSS Consciousness Controller for batching
-      Object.entries(allSpicetifyUpdates).forEach(([variable, value]) => {
-        this.applyColorToCSS(variable, value);
-      });
+      // Apply all Spicetify updates in a single batch with critical priority for album color coordination
+      this.cssController.batchSetVariables(
+        "SemanticColorManager",
+        allSpicetifyUpdates,
+        "critical", // Critical priority for album color coordination
+        "album-spicetify-update"
+      );
 
       // Also update our own StarryNight gradient variables to ensure consistency
       const starryNightUpdates = {
-        '--sn-gradient-accent': colorDistribution.primary,
-        '--sn-gradient-accent-rgb': rgbDistribution.primary,
-        '--sn-gradient-primary': colorDistribution.primary,
-        '--sn-gradient-primary-rgb': rgbDistribution.primary,
-        '--sn-gradient-secondary': colorDistribution.surface1,
-        '--sn-gradient-secondary-rgb': rgbDistribution.surface1,
+        '--sn-bg-gradient-accent': colorDistribution.primary,
+        '--sn-bg-gradient-accent-rgb': rgbDistribution.primary,
+        '--sn-bg-gradient-primary': colorDistribution.primary,
+        '--sn-bg-gradient-primary-rgb': rgbDistribution.primary,
+        '--sn-bg-gradient-secondary': colorDistribution.surface1,
+        '--sn-bg-gradient-secondary-rgb': rgbDistribution.surface1,
       };
 
-      Object.entries(starryNightUpdates).forEach(([variable, value]) => {
-        this.applyColorToCSS(variable, value);
-      });
+      this.cssController.batchSetVariables(
+        "SemanticColorManager",
+        starryNightUpdates,
+        "critical", // Critical priority for StarryNight gradient synchronization
+        "album-starrynight-update"
+      );
 
       // Enhanced SN Color Variables (Year 3000 System Integration - NAVBAR/HEADER FIX)
       const snColorUpdates = {
@@ -513,9 +546,12 @@ export class SemanticColorManager implements IManagedSystem {
         '--sn-color-harmony-triadic-rgb': rgbDistribution.neuralPrimary,
       };
 
-      Object.entries(snColorUpdates).forEach(([variable, value]) => {
-        this.applyColorToCSS(variable, value);
-      });
+      this.cssController.batchSetVariables(
+        "SemanticColorManager",
+        snColorUpdates,
+        "critical", // Critical priority for Year 3000 System integration
+        "album-y3k-integration-update"
+      );
 
       // Clear semantic color cache to force refresh
       this.clearCache();
@@ -1178,7 +1214,7 @@ export class SemanticColorManager implements IManagedSystem {
       
       // Clear caches and references
       this.clearCache();
-      this.cssConsciousnessController = null;
+      this.cssController = null as any;
       
       // Reset state
       this.initialized = false;
@@ -1221,7 +1257,7 @@ export class SemanticColorManager implements IManagedSystem {
       metrics: {
         initialized: this.initialized,
         spicetifyAvailable: this.isSpicetifyAvailable(),
-        cssConsciousnessAvailable: !!this.cssConsciousnessController,
+        cssConsciousnessAvailable: !!this.cssController,
         lastColorUpdate: this.lastColorUpdate,
         colorUpdateCount: this.colorUpdateCount,
         eventSubscriptions: this.eventSubscriptionIds.length,

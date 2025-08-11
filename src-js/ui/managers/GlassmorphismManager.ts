@@ -1,7 +1,8 @@
 import { YEAR3000_CONFIG as Config } from "@/config/globalConfig";
-import { GLASS_LEVEL_KEY, GLASS_LEVEL_OLD_KEY } from "@/config/settingKeys";
-import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
-import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import { GLASS_LEVEL_KEY } from "@/config/settingKeys";
+// NOTE: GLASS_LEVEL_OLD_KEY has been removed in settings rationalization
+import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { SimplePerformanceCoordinator, QualityCapability, QualityLevel, QualityScalingCapable, PerformanceMetrics } from "@/core/performance/SimplePerformanceCoordinator";
 import type { HealthCheckResult } from "@/types/systems";
 import type { SettingsManager } from "@/ui/managers/SettingsManager";
 import { ViewportAwareSystem, type ViewportSystemOptions } from "@/visual/base/ViewportAwareSystem";
@@ -12,7 +13,7 @@ import { EmotionalTemperatureMapper, type EmotionalTemperatureResult } from "@/u
 import { OKLABColorProcessor, type EnhancementPreset } from "@/utils/color/OKLABColorProcessor";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import type { BeatData, MusicEmotion } from "@/types/colorStubs";
-import type { QualityLevel, QualityScalingCapable, QualityCapability, PerformanceMetrics } from "@/core/performance/PerformanceOrchestrator";
+// NOTE: QualityLevel types imported from simplified performance system
 
 type GlassIntensity =
   | "disabled"
@@ -40,8 +41,9 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   private static instance: GlassmorphismManager;
   private config: typeof Config;
   private utils: typeof Utils;
-  private cssBatcher: UnifiedCSSConsciousnessController | null = null;
-  private performanceAnalyzer: PerformanceAnalyzer | null = null;
+  private cssBatcher: OptimizedCSSVariableManager | null = null;
+  private cssController!: OptimizedCSSVariableManager;
+  private performanceAnalyzer: SimplePerformanceCoordinator | null = null;
   private settingsManager: SettingsManager;
   private isSupported: boolean;
   private currentIntensity: GlassIntensity;
@@ -64,8 +66,8 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   constructor(
     config: typeof Config = Config,
     utils: typeof Utils = Utils,
-    cssBatcher: UnifiedCSSConsciousnessController | null = null,
-    performanceAnalyzer: PerformanceAnalyzer | null = null,
+    cssBatcher: OptimizedCSSVariableManager | null = null,
+    performanceAnalyzer: SimplePerformanceCoordinator | null = null,
     settingsManager: SettingsManager,
     viewportOptions: ViewportSystemOptions = {}
   ) {
@@ -115,6 +117,10 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
 
   // Implement abstract methods from ViewportAwareSystem
   protected async initializeSystem(): Promise<void> {
+    // Initialize CSS coordination - use globalThis to access Year3000System
+    const year3000System = (globalThis as any).year3000System;
+    this.cssController = year3000System?.cssConsciousnessController || getGlobalOptimizedCSSController();
+    
     const initialIntensity = this.settingsManager.get("sn-glassmorphism-level");
     this.applyGlassmorphismSettings(initialIntensity);
     
@@ -147,8 +153,11 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   protected performSettingsUpdate(event: Event): void {
     const customEvent = event as CustomEvent;
     const { key, value } = customEvent.detail || {};
-    if (key === GLASS_LEVEL_KEY || key === GLASS_LEVEL_OLD_KEY) {
+    if (key === GLASS_LEVEL_KEY) {
       this.applyGlassmorphismSettings(value);
+    // NOTE: Glass beat pulse setting has been removed
+      // Reapply glass variables when beat pulse setting changes
+      this.updateGlassVariables(this.currentIntensity);
     }
   }
 
@@ -218,6 +227,11 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
         opacityValue = "0.05";
         saturationValue = "1.05";
         break;
+      case "moderate":
+        blurValue = shouldReduceQuality ? "3px" : "5px";
+        opacityValue = "0.08";
+        saturationValue = "1.15";
+        break;
       case "intense":
         blurValue = shouldReduceQuality ? "6px" : "8px";
         opacityValue = "0.15";
@@ -231,7 +245,7 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
         break;
     }
 
-    // Apply Year 3000 consciousness modulations
+    // Apply Year 3000 consciousness modulations directly to dropdown values
     const consciousnessModulations = this.calculateConsciousnessModulations();
     
     // Apply emotional and musical modulations to glass properties
@@ -239,24 +253,41 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
     const finalOpacity = this.modulateOpacityValue(opacityValue, consciousnessModulations);
     const finalSaturation = this.modulateSaturationValue(saturationValue, consciousnessModulations);
 
-    root.style.setProperty("--glass-blur", finalBlur);
-    root.style.setProperty("--glass-opacity", finalOpacity);
-    root.style.setProperty("--glass-saturation", finalSaturation);
-    
-    // Set consciousness-aware breathing rate for organic glass effects
-    root.style.setProperty("--glass-breathing-rate", `${this.consciousnessState.breathingRate}s`);
-    root.style.setProperty("--glass-consciousness-level", this.consciousnessState.consciousnessLevel.toString());
+    // Apply glass properties using coordination
+    const glassPropertiesVariables = {
+      "--glass-blur": finalBlur,
+      "--glass-opacity": finalOpacity,
+      "--glass-saturation": finalSaturation,
+      "--glass-breathing-rate": `${this.consciousnessState.breathingRate}s`,
+      "--glass-consciousness-level": this.consciousnessState.consciousnessLevel.toString()
+    };
+
+    this.cssController.batchSetVariables(
+      "GlassmorphismManager",
+      glassPropertiesVariables,
+      "high", // High priority for glass effect properties - affects visual perception
+      "glass-properties-update"
+    );
   }
 
   public updateGlassColors(primaryColor: string, secondaryColor: string): void {
     if (this.currentIntensity === "disabled") return;
 
-    const root = document.documentElement;
     const glassPrimary = this.convertToGlassColor(primaryColor, 0.1);
     const glassSecondary = this.convertToGlassColor(secondaryColor, 0.08);
 
-    root.style.setProperty("--glass-background", glassPrimary);
-    root.style.setProperty("--glass-border", glassSecondary);
+    // Apply glass color variables using coordination
+    const glassColorVariables = {
+      "--glass-background": glassPrimary,
+      "--glass-border": glassSecondary
+    };
+
+    this.cssController.batchSetVariables(
+      "GlassmorphismManager",
+      glassColorVariables,
+      "high", // High priority for glass color updates - affects visual aesthetics
+      "glass-color-update"
+    );
   }
 
   private convertToGlassColor(color: string, opacity: number): string {
@@ -517,13 +548,22 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   }
 
   /**
-   * Apply beat-synchronized glass pulse effect
+   * Apply beat-synchronized glass pulse effect (respects user setting)
    */
   private applyBeatSyncGlassPulse(intensity: number): void {
     if (!this.cssBatcher) return;
     
-    const pulseBlur = intensity * 2; // +2px blur during pulse
-    const pulseOpacity = intensity * 0.05; // +5% opacity during pulse
+    // Check if user has enabled glass beat pulse
+    // NOTE: Glass beat pulse setting has been removed - always disabled
+    const beatPulseEnabled = false;
+    if (!beatPulseEnabled) {
+      return; // Skip beat pulse if user has disabled it
+    }
+    
+    // Use current glassmorphism level for pulse intensity scaling
+    const currentIntensityValue = this.getIntensityValue(this.currentIntensity);
+    const pulseBlur = intensity * 2 * (currentIntensityValue.opacity * 10); // Scale by current glass opacity
+    const pulseOpacity = intensity * 0.05 * currentIntensityValue.opacity;
     
     // Apply pulse effect through CSS variable updates
     this.cssBatcher.queueCSSVariableUpdate('--glass-beat-pulse-blur', `${pulseBlur}px`);
@@ -600,15 +640,19 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
    * Set quality level for glass effects
    */
   public setQualityLevel(level: QualityLevel): void {
+    this.adjustQuality(level);
+  }
+
+  /**
+   * Adjust quality level (QualityScalingCapable interface)
+   */
+  public adjustQuality(level: QualityLevel): void {
     this.currentQualityLevel = level;
     
     // Adjust glass intensity based on quality level
     let adjustedIntensity: GlassIntensity;
     
-    switch (level.level) {
-      case 'minimal':
-        adjustedIntensity = 'minimal';
-        break;
+    switch (level) {
       case 'low':
         adjustedIntensity = 'minimal';
         break;
@@ -618,15 +662,15 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
       case 'high':
         adjustedIntensity = 'intense';
         break;
-      case 'ultra':
-        adjustedIntensity = 'intense';
+      default:
+        adjustedIntensity = 'balanced';
         break;
     }
     
     // Apply the quality-adjusted intensity
     this.applyGlassmorphismSettings(adjustedIntensity);
     
-    console.log(`[GlassmorphismManager] Quality level set to: ${level.level} (intensity: ${adjustedIntensity})`);
+    console.log(`[GlassmorphismManager] Quality level set to: ${level} (intensity: ${adjustedIntensity})`);
   }
 
   /**
@@ -644,11 +688,8 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
     return {
       fps: 60,
       frameTime: intensityImpact + consciousnessImpact + breathingImpact,
-      memoryUsageMB: intensityImpact * 2, // Minimal memory impact
-      cpuUsagePercent: (intensityImpact + consciousnessImpact) * 50,
-      gpuUsagePercent: intensityImpact * 20, // Backdrop filter GPU usage
-      renderTime: intensityImpact * 1.5,
-      timestamp: Date.now()
+      memoryUsage: intensityImpact * 2, // Minimal memory impact
+      cpuUsage: (intensityImpact + consciousnessImpact) * 50
     };
   }
 
@@ -716,33 +757,28 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
       this.qualityCapabilities = [
         {
           name: 'Backdrop Filter Blur',
-          impact: 'high',
           enabled: this.isSupported && this.currentIntensity !== 'disabled',
-          canToggle: true
+          qualityLevel: 'high'
         },
         {
           name: 'Glass Saturation',
-          impact: 'low',
           enabled: this.currentIntensity !== 'disabled',
-          canToggle: true
+          qualityLevel: 'low'
         },
         {
           name: 'Consciousness Breathing',
-          impact: 'low',
           enabled: true,
-          canToggle: true
+          qualityLevel: 'low'
         },
         {
           name: 'Beat Sync Pulse',
-          impact: 'low',
           enabled: true,
-          canToggle: true
+          qualityLevel: 'low'
         },
         {
           name: 'Dramatic Distortion',
-          impact: 'medium',
           enabled: true,
-          canToggle: true
+          qualityLevel: 'medium'
         }
       ];
     }
@@ -1001,6 +1037,9 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   public applyUpdatedSettings?(key: string, value: any): void {
     if (key === "sn-glassmorphism-level") {
       this.applyGlassmorphismSettings(value as any);
+    // NOTE: Glass beat pulse setting has been removed
+      // Reapply glass variables when beat pulse setting changes
+      this.updateGlassVariables(this.currentIntensity);
     }
   }
 

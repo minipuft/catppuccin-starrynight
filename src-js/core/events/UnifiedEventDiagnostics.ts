@@ -7,10 +7,9 @@
  *
  */
 
-import { Y3K } from "@/debug/UnifiedDebugManager";
-import { unifiedEventBus, EventName } from "./UnifiedEventBus";
+import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import { colorEventOrchestrator } from "./ColorEventOrchestrator";
-import { eventMigrationManager } from "./EventMigrationManager";
+import { EventName, unifiedEventBus } from "./UnifiedEventBus";
 
 interface EventFlowMetrics {
   eventName: EventName;
@@ -86,7 +85,10 @@ export class UnifiedEventDiagnostics {
 
   private constructor() {
     this.setupEventInterceptors();
-    Y3K?.debug?.log("UnifiedEventDiagnostics", "Event diagnostics initialized");
+    Y3KDebug?.debug?.log(
+      "UnifiedEventDiagnostics",
+      "Event diagnostics initialized"
+    );
   }
 
   /**
@@ -117,7 +119,7 @@ export class UnifiedEventDiagnostics {
       this.performHealthChecks();
     }, 5000); // Every 5 seconds
 
-    Y3K?.debug?.log("UnifiedEventDiagnostics", "Event monitoring started");
+    Y3KDebug?.debug?.log("UnifiedEventDiagnostics", "Event monitoring started");
   }
 
   /**
@@ -138,7 +140,7 @@ export class UnifiedEventDiagnostics {
       this.healthCheckInterval = null;
     }
 
-    Y3K?.debug?.log("UnifiedEventDiagnostics", "Event monitoring stopped");
+    Y3KDebug?.debug?.log("UnifiedEventDiagnostics", "Event monitoring stopped");
   }
 
   /**
@@ -219,13 +221,10 @@ export class UnifiedEventDiagnostics {
       // Get color orchestrator metrics
       const colorMetrics = colorEventOrchestrator.getMetrics();
 
-      // Get migration manager metrics
-      const migrationMetrics = eventMigrationManager.getMetrics();
-
       // Update system load calculation based on all metrics
-      this.calculateSystemLoad(busMetrics, colorMetrics, migrationMetrics);
+      this.calculateSystemLoad(busMetrics, colorMetrics);
     } catch (error) {
-      Y3K?.debug?.error(
+      Y3KDebug?.debug?.error(
         "UnifiedEventDiagnostics",
         "Error collecting metrics:",
         error
@@ -244,13 +243,12 @@ export class UnifiedEventDiagnostics {
       // Check color orchestrator health
       await this.checkColorOrchestratorHealth();
 
-      // Check migration manager health
-      await this.checkMigrationManagerHealth();
+      // Migration manager was removed - no longer needed
 
       // Analyze overall system health
       this.analyzeSystemHealth();
     } catch (error) {
-      Y3K?.debug?.error(
+      Y3KDebug?.debug?.error(
         "UnifiedEventDiagnostics",
         "Error performing health checks:",
         error
@@ -340,41 +338,7 @@ export class UnifiedEventDiagnostics {
     }
   }
 
-  /**
-   * Check migration manager health
-   */
-  private async checkMigrationManagerHealth(): Promise<void> {
-    const startTime = performance.now();
-
-    try {
-      const metrics = eventMigrationManager.getMetrics();
-      const responseTime = performance.now() - startTime;
-
-      const health: SystemHealth = {
-        systemName: "EventMigrationManager",
-        isResponding: true,
-        averageResponseTime: responseTime,
-        errorRate: 0, // Migration manager doesn't track errors directly
-        lastHealthCheck: Date.now(),
-        subscriptionCount: 0,
-        memoryUsage: 0,
-        status: this.calculateHealthStatus(responseTime, 0, 0),
-      };
-
-      this.systemHealth.set("EventMigrationManager", health);
-    } catch (error) {
-      this.systemHealth.set("EventMigrationManager", {
-        systemName: "EventMigrationManager",
-        isResponding: false,
-        averageResponseTime: 0,
-        errorRate: 1.0,
-        lastHealthCheck: Date.now(),
-        subscriptionCount: 0,
-        memoryUsage: 0,
-        status: "offline",
-      });
-    }
-  }
+  // EventMigrationManager was removed - no longer needed
 
   /**
    * Calculate health status based on metrics
@@ -561,8 +525,7 @@ export class UnifiedEventDiagnostics {
    */
   private calculateSystemLoad(
     busMetrics: any,
-    colorMetrics: any,
-    migrationMetrics: any
+    colorMetrics: any
   ): void {
     // Simplified system load calculation
     const eventsPerSecond = busMetrics.eventsPerSecond || 0;
@@ -599,7 +562,6 @@ export class UnifiedEventDiagnostics {
   public getDiagnostics(): EventFlowDiagnostics {
     const busMetrics = unifiedEventBus.getMetrics();
     const colorMetrics = colorEventOrchestrator.getMetrics();
-    const migrationReport = eventMigrationManager.getMigrationReport();
 
     const healthySystems = Array.from(this.systemHealth.values()).filter(
       (h) => h.status === "healthy"
@@ -619,18 +581,7 @@ export class UnifiedEventDiagnostics {
       }
     });
 
-    // Add recommendations
-    if (migrationReport.systemsPending > 0) {
-      recommendations.push(
-        `${migrationReport.systemsPending} systems still need migration to unified events`
-      );
-    }
-
-    if (migrationReport.deprecatedMappings > 0) {
-      recommendations.push(
-        `${migrationReport.deprecatedMappings} deprecated event mappings should be updated`
-      );
-    }
+    // Migration complete - no additional recommendations needed from migration system
 
     return {
       totalEvents: busMetrics.totalEvents,
@@ -788,7 +739,10 @@ export class UnifiedEventDiagnostics {
     this.systemHealth.clear();
     this.eventTraces = [];
 
-    Y3K?.debug?.log("UnifiedEventDiagnostics", "Event diagnostics destroyed");
+    Y3KDebug?.debug?.log(
+      "UnifiedEventDiagnostics",
+      "Event diagnostics destroyed"
+    );
 
     UnifiedEventDiagnostics.instance = null;
   }

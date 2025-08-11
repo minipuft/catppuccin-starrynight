@@ -51,16 +51,16 @@
   --sn-brightness-balanced-contrast: 1.1;
   --sn-brightness-balanced-opacity: 0.20;
   
-  // Dark mode values (subtle settings)
-  --sn-brightness-dark-saturation: 1.0;
-  --sn-brightness-dark-brightness: 0.9;
+  // Dark mode values (subtle but refined settings)
+  --sn-brightness-dark-saturation: 1.1;
+  --sn-brightness-dark-brightness: 1.0;
   --sn-brightness-dark-contrast: 1.0;
   --sn-brightness-dark-opacity: 0.15;
   
-  // Active brightness values (set by brightness mode)
-  --sn-bg-gradient-saturation: var(--sn-brightness-bright-saturation);
-  --sn-bg-gradient-brightness: var(--sn-brightness-bright-brightness);
-  --sn-bg-gradient-contrast: var(--sn-brightness-bright-contrast);
+  // Active brightness values (set by brightness mode) - Default to dark mode for consistency
+  --sn-bg-gradient-saturation: var(--sn-brightness-dark-saturation);
+  --sn-bg-gradient-brightness: var(--sn-brightness-dark-brightness);
+  --sn-bg-gradient-contrast: var(--sn-brightness-dark-contrast);
   
   // Gradient Flow Animation
   --sn-bg-gradient-flow-x: 0;
@@ -203,6 +203,8 @@
   --sn-ui-sidebar-magnetic-focus-pull: 1.5;
   
   // Button System
+  --sn-ui-button-accent-hex: var(--sn-accent-hex);
+  --sn-ui-button-accent-rgb: var(--sn-accent-rgb);
   --sn-ui-button-cosmic-glow: 0;
   --sn-ui-button-energy-brightness: 1.0;
   --sn-ui-button-hologram-opacity: 0;
@@ -566,6 +568,20 @@
   --sn-consciousness-accessibility-scale: 1;
   --sn-consciousness-mobile-reduction: 0.6;
   
+  // Enhanced Organic Consciousness Patterns (Year 3000 System Extensions)
+  // Keep only genuinely new cellular/membrane concepts - remove duplicates
+  --sn-consciousness-membrane-elasticity: 0.7; // Membrane deformation intensity (0-1)
+  --sn-consciousness-cellular-growth: 0.8; // Cellular growth patterns (0-1)
+  --sn-consciousness-osmosis-rate: 0.5; // Cross-system consciousness flow (0-1)
+  --sn-consciousness-mitosis-frequency: 0.3; // Cellular division rate (0-1)
+  --sn-consciousness-viscosity: 0.4; // Consciousness flow resistance (0-1)
+  --sn-consciousness-surface-tension: 0.6; // Membrane surface tension (0-1)
+  --sn-consciousness-membrane-permeability: 0.6; // Consciousness permeability (0-1)
+  
+  // Organic modifier flags (extend existing systems without duplicating)
+  --sn-consciousness-organic-mode: 1; // Enable organic behavior in existing systems
+  --sn-consciousness-cellular-mode: 1; // Enable cellular patterns in existing systems
+  
   // -------------------------------------------------------------------------
   // Serendipity Discovery System (--sn-serendipity-*)
   // -------------------------------------------------------------------------
@@ -689,6 +705,18 @@
   --consciousness-breathing-rate: var(--sn-consciousness-breathing-rate);
   --consciousness-response-sensitivity: var(--sn-consciousness-response-sensitivity);
   
+  // Enhanced Organic Consciousness Aliases (Year 3000 System)
+  // Keep only aliases for genuinely new cellular/membrane concepts
+  --consciousness-membrane-elasticity: var(--sn-consciousness-membrane-elasticity);
+  --consciousness-cellular-growth: var(--sn-consciousness-cellular-growth);
+  --consciousness-osmosis-rate: var(--sn-consciousness-osmosis-rate);
+  --consciousness-mitosis-frequency: var(--sn-consciousness-mitosis-frequency);
+  --consciousness-viscosity: var(--sn-consciousness-viscosity);
+  --consciousness-surface-tension: var(--sn-consciousness-surface-tension);
+  --consciousness-membrane-permeability: var(--sn-consciousness-membrane-permeability);
+  --consciousness-organic-mode: var(--sn-consciousness-organic-mode);
+  --consciousness-cellular-mode: var(--sn-consciousness-cellular-mode);
+  
   // Depth Priority System
   --depth-priority-high: var(--sn-consciousness-depth-priority-high);
   --depth-priority-medium: var(--sn-consciousness-depth-priority-medium);
@@ -707,6 +735,19 @@
   --serendipity-animation-duration: var(--sn-serendipity-animation-duration);
   --serendipity-start-z: var(--sn-serendipity-start-z);
   --serendipity-end-z: var(--sn-serendipity-end-z);
+  
+  // Enhanced OKLAB Consciousness Integration (For CSS Blob System & Visual Effects)
+  --consciousness-oklab-primary-rgb: var(--sn-musical-oklab-primary-rgb);
+  --consciousness-oklab-accent-rgb: var(--sn-musical-oklab-accent-rgb);
+  --consciousness-oklab-highlight-rgb: var(--sn-musical-oklab-highlight-rgb);
+  --consciousness-oklab-shadow-rgb: var(--sn-musical-oklab-shadow-rgb);
+  --consciousness-oklab-luminance: var(--sn-color-oklab-accent-luminance);
+  --consciousness-oklab-chroma: 0.15; // Default chroma for consciousness effects
+  --consciousness-oklab-hue: 280; // Default consciousness hue (purple-like)
+  
+  // Consciousness CSS Fallback Coordination
+  --consciousness-css-fallback: 1.0; // CSS fallback system enabled
+  --consciousness-webgl-coordination: 0; // WebGL coordination level
 }
 
 // =============================================================================

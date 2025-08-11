@@ -1,25 +1,22 @@
 /**
  * Strategy-Based Factory Implementation
- * 
+ *
  * Replaces hardcoded constructor logic with configurable creation strategies.
  * Eliminates "post-creation dependency linking" by using proper dependency
  * injection patterns at creation time.
  */
 
-import { Y3K } from "@/debug/UnifiedDebugManager";
-import { globalSystemCreationRegistry } from "./SystemCreationStrategies";
+import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type {
+  CreationStrategySelectionCriteria,
   IStrategyBasedFactory,
   ISystemCreationStrategyRegistry,
+  SystemCreationConfig,
   SystemCreationContext,
   SystemCreationResult,
-  SystemCreationConfig,
-  CreationStrategySelectionCriteria,
-  SystemCreationError
 } from "@/types/systemCreationStrategy";
 import { StrategySelectionError } from "@/types/systemCreationStrategy";
-import type { Year3000Config } from "@/types/models";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import { globalSystemCreationRegistry } from "./SystemCreationStrategies";
 
 // ============================================================================
 // Strategy-Based Factory Implementation
@@ -40,16 +37,19 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
     totalCreations: 0,
     successfulCreations: 0,
     averageCreationTime: 0,
-    strategyUsage: {}
+    strategyUsage: {},
   };
 
   constructor(strategyRegistry?: ISystemCreationStrategyRegistry) {
     this.strategyRegistry = strategyRegistry || globalSystemCreationRegistry;
-    
+
     // System configurations are now managed by individual strategies
     // No need for duplicate registration here
-    
-    Y3K?.debug?.log("StrategyBasedFactory", "Factory initialized with strategy registry");
+
+    Y3KDebug?.debug?.log(
+      "StrategyBasedFactory",
+      "Factory initialized with strategy registry"
+    );
   }
 
   /**
@@ -57,71 +57,85 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
    */
   async createSystem<T = any>(
     systemKey: string,
-    SystemClass: new(...args: any[]) => T,
+    SystemClass: new (...args: any[]) => T,
     context: SystemCreationContext
   ): Promise<SystemCreationResult<T>> {
     const startTime = performance.now();
-    
+
     try {
       this.creationMetrics.totalCreations++;
-      
+
       // Get system configuration
       const systemConfig = this.getSystemConfig(systemKey);
-      
+
       // Determine selection criteria
-      const criteria = this.buildSelectionCriteria(systemKey, systemConfig, context);
-      
+      const criteria = this.buildSelectionCriteria(
+        systemKey,
+        systemConfig,
+        context
+      );
+
       // Select best strategy
-      const strategy = this.strategyRegistry.selectStrategy(systemKey, criteria);
+      const strategy = this.strategyRegistry.selectStrategy(
+        systemKey,
+        criteria
+      );
       if (!strategy) {
         throw new StrategySelectionError(systemKey, criteria);
       }
-      
+
       // Update strategy usage metrics
       const strategyName = strategy.getStrategyName();
-      this.creationMetrics.strategyUsage[strategyName] = 
+      this.creationMetrics.strategyUsage[strategyName] =
         (this.creationMetrics.strategyUsage[strategyName] || 0) + 1;
-      
+
       // Create system using selected strategy
       const result = await strategy.createSystem(SystemClass, context);
-      
+
       // Update metrics
       if (result.success) {
         this.creationMetrics.successfulCreations++;
       }
-      
+
       const endTime = performance.now();
       const totalTime = endTime - startTime;
       this.updateAverageCreationTime(totalTime);
-      
-      Y3K?.debug?.log("StrategyBasedFactory", `Created ${systemKey} using ${strategyName}`, {
-        success: result.success,
-        creationTime: result.creationTime,
-        totalTime
-      });
-      
+
+      Y3KDebug?.debug?.log(
+        "StrategyBasedFactory",
+        `Created ${systemKey} using ${strategyName}`,
+        {
+          success: result.success,
+          creationTime: result.creationTime,
+          totalTime,
+        }
+      );
+
       return result;
-      
     } catch (error) {
       const endTime = performance.now();
       const totalTime = endTime - startTime;
-      
-      Y3K?.debug?.error("StrategyBasedFactory", `Failed to create ${systemKey}:`, error);
-      
+
+      Y3KDebug?.debug?.error(
+        "StrategyBasedFactory",
+        `Failed to create ${systemKey}:`,
+        error
+      );
+
       // Return failed result
       return {
         system: null as any,
         success: false,
         creationTime: totalTime,
-        strategy: 'unknown',
+        strategy: "unknown",
         injectedDependencies: [],
         warnings: [],
         error: error as Error,
         metadata: {
           requiresInitialization: false,
           pendingDependencies: [],
-          context
-        }
+          context,
+        },
       };
     }
   }
@@ -131,7 +145,10 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
    */
   registerSystemConfig(config: SystemCreationConfig): void {
     this.systemConfigs.set(config.systemKey, config);
-    Y3K?.debug?.log("StrategyBasedFactory", `Registered config for ${config.systemKey}`);
+    Y3KDebug?.debug?.log(
+      "StrategyBasedFactory",
+      `Registered config for ${config.systemKey}`
+    );
   }
 
   /**
@@ -146,7 +163,7 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
    */
   setStrategyRegistry(registry: ISystemCreationStrategyRegistry): void {
     this.strategyRegistry = registry;
-    Y3K?.debug?.log("StrategyBasedFactory", "Strategy registry updated");
+    Y3KDebug?.debug?.log("StrategyBasedFactory", "Strategy registry updated");
   }
 
   /**
@@ -164,7 +181,7 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
       totalCreations: 0,
       successfulCreations: 0,
       averageCreationTime: 0,
-      strategyUsage: {}
+      strategyUsage: {},
     };
   }
 
@@ -183,64 +200,70 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
   ): CreationStrategySelectionCriteria {
     // For system-specific selection criteria, rely on the strategies themselves
     // rather than trying to duplicate their configuration logic here
-    
+
     // Determine complexity based on well-known system patterns
-    let complexity: 'simple' | 'medium' | 'complex' = 'medium'; // Default to medium
-    
+    let complexity: "simple" | "medium" | "complex" = "medium"; // Default to medium
+
     // Simple systems (no dependencies)
     const simpleSystems = [
-      'DeviceCapabilityDetector',
-      'PerformanceAnalyzer', 
-      'UnifiedCSSConsciousnessController',
-      'SettingsManager',
-      'TimerConsolidationSystem'
+      "DeviceCapabilityDetector",
+      "PerformanceAnalyzer",
+      "UnifiedCSSVariableManager",
+      "SettingsManager",
+      "TimerConsolidationSystem",
     ];
-    
+
     // Complex systems (multiple dependencies or special patterns)
     const complexSystems = [
-      'GlassmorphismManager',
-      'Card3DManager',
-      'UnifiedCSSConsciousnessController',
-      'EnhancedMasterAnimationCoordinator'
+      "GlassmorphismManager",
+      "Card3DManager",
+      "UnifiedCSSVariableManager",
+      "EnhancedMasterAnimationCoordinator",
     ];
-    
+
     if (simpleSystems.includes(systemKey)) {
-      complexity = 'simple';
+      complexity = "simple";
     } else if (complexSystems.includes(systemKey)) {
-      complexity = 'complex';
+      complexity = "complex";
     }
-    
+
     // Determine dependency requirements based on known patterns
-    let dependencyRequirements: 'none' | 'basic' | 'advanced' | 'event-driven' = 'basic';
-    
+    let dependencyRequirements: "none" | "basic" | "advanced" | "event-driven" =
+      "basic";
+
     // Systems that use event-driven patterns
-    if (systemKey === 'MusicSyncService' || systemKey === 'ColorHarmonyEngine') {
-      dependencyRequirements = 'event-driven';
+    if (
+      systemKey === "MusicSyncService" ||
+      systemKey === "ColorHarmonyEngine"
+    ) {
+      dependencyRequirements = "event-driven";
     } else if (simpleSystems.includes(systemKey)) {
-      dependencyRequirements = 'none';
+      dependencyRequirements = "none";
     }
-    
+
     // Determine performance requirements
-    let performance: 'standard' | 'optimized' | 'lightweight' = 'standard';
-    
-    if (context.metadata.priority === 'critical') {
-      performance = 'optimized';
+    let performance: "standard" | "optimized" | "lightweight" = "standard";
+
+    if (context.metadata.priority === "critical") {
+      performance = "optimized";
     } else if (context.preferences.monitorCreation) {
-      performance = 'optimized';
-    } else if (complexity === 'simple') {
-      performance = 'lightweight';
+      performance = "optimized";
+    } else if (complexity === "simple") {
+      performance = "lightweight";
     }
-    
+
     return {
       complexity,
       dependencyRequirements,
       performance,
       resourceConstraints: {
-        memoryLimited: context.metadata.resourceConstraints?.maxMemoryMB !== undefined,
-        timeLimited: context.metadata.resourceConstraints?.maxInitTimeMs !== undefined,
-        cpuLimited: context.metadata.priority === 'low'
+        memoryLimited:
+          context.metadata.resourceConstraints?.maxMemoryMB !== undefined,
+        timeLimited:
+          context.metadata.resourceConstraints?.maxInitTimeMs !== undefined,
+        cpuLimited: context.metadata.priority === "low",
       },
-      creationContext: context.metadata.reason
+      creationContext: context.metadata.reason,
     };
   }
 
@@ -250,9 +273,9 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
   private updateAverageCreationTime(newTime: number): void {
     const totalCreations = this.creationMetrics.totalCreations;
     const currentAverage = this.creationMetrics.averageCreationTime;
-    
-    this.creationMetrics.averageCreationTime = 
-      ((currentAverage * (totalCreations - 1)) + newTime) / totalCreations;
+
+    this.creationMetrics.averageCreationTime =
+      (currentAverage * (totalCreations - 1) + newTime) / totalCreations;
   }
 
   /**

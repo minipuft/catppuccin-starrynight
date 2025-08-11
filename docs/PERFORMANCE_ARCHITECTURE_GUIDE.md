@@ -19,7 +19,7 @@ The Performance Architecture is a sophisticated multi-layered system designed to
 ├── 🎛️  AdaptivePerformanceSystem     # Intelligent quality scaling
 ├── 📊  PerformanceAnalyzer           # Real-time metrics & monitoring
 ├── 🔍  DeviceCapabilityDetector      # Hardware detection & profiling
-├── 🎨  CSSVariableBatcher           # DOM optimization system
+├── 🎨  OptimizedUnifiedCSSConsciousnessController  # Unified CSS variable management with adaptive throttling
 ├── ⏱️  TimerConsolidationSystem      # Timer management
 ├── 💾  PerformanceBudgetManager      # Resource budgeting
 └── 🌡️  RealityBleedingOptimizer     # Advanced optimization
@@ -757,11 +757,42 @@ private adaptToBatterySaver(): void {
 
 ---
 
-## 🎨 CSSVariableBatcher
+## 🎨 OptimizedUnifiedCSSConsciousnessController
 
-**File Location**: `src-js/core/performance/CSSVariableBatcher.ts`
+**File Location**: `src-js/core/performance/OptimizedUnifiedCSSConsciousnessController.ts`
 
-Advanced DOM optimization system that consolidates CSS variable updates into efficient batches, reducing layout thrashing and improving rendering performance.
+**Phase 2.6 Consolidation**: Unified CSS variable management system that consolidates three overlapping systems (`CSSVariableCoordinator`, `UnifiedCSSConsciousnessController`, and CSS batching) into one optimized controller with priority queues, adaptive throttling, and global instance management.
+
+### Priority Queue System
+```typescript
+type VariablePriority = "low" | "normal" | "high" | "critical";
+
+interface PriorityQueueConfig {
+  critical: { throttleMs: 0 };    // Immediate updates (no throttling)
+  high: { throttleMs: 8 };        // 120fps equivalent
+  normal: { throttleMs: 16 };     // 60fps equivalent  
+  low: { throttleMs: 33 };        // 30fps equivalent
+}
+
+// Priority-based variable assignment
+const CRITICAL_VARIABLES = [
+  "--sn-beat-pulse-intensity",
+  "--sn-breathing-scale", 
+  "--sn-accent-hex"
+];
+
+const HIGH_PRIORITY_VARIABLES = [
+  "--sn-now-playing",
+  "--sn-track-progress",
+  "--sn-volume-level"
+];
+```
+
+### Adaptive Throttling
+- **FPS-Based Adjustment**: Throttling automatically adjusts based on current frame rate
+- **Device-Aware Scaling**: Low-end devices get more aggressive throttling
+- **Performance Budgeting**: Each priority level has dedicated performance budget
+- **Emergency Mode**: Critical performance drops trigger emergency batching
 
 ### Intelligent Batching Strategy
 ```typescript

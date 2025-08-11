@@ -1,5 +1,5 @@
-import { CARD_3D_LEVEL_KEY } from "@/config/settingKeys";
-import type { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+// NOTE: CARD_3D_LEVEL_KEY has been removed in settings rationalization
+import type { SimplePerformanceCoordinator, QualityCapability, QualityLevel, QualityScalingCapable, PerformanceMetrics } from "@/core/performance/SimplePerformanceCoordinator";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import type { SettingsManager } from "@/ui/managers/SettingsManager";
 import type * as Utils from "@/utils/core/Year3000Utilities";
@@ -8,7 +8,7 @@ import { EmotionalTemperatureMapper, type EmotionalTemperatureResult } from "@/u
 import { OKLABColorProcessor, type EnhancementPreset } from "@/utils/color/OKLABColorProcessor";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import type { BeatData, MusicEmotion } from "@/types/colorStubs";
-import type { QualityLevel, QualityScalingCapable, QualityCapability, PerformanceMetrics } from "@/core/performance/PerformanceOrchestrator";
+// NOTE: QualityLevel types imported from simplified performance system
 
 // ===================================================================
 // 🃏 3D CARD MANAGER - Year 3000 Visual System
@@ -44,7 +44,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   public initialized = false;
   private static instance: Card3DManager;
   private config: Card3DConfig;
-  private performanceMonitor: PerformanceAnalyzer;
+  private performanceMonitor: SimplePerformanceCoordinator;
   private settingsManager: SettingsManager;
   private utils: typeof Utils;
   private cards: NodeListOf<HTMLElement>;
@@ -75,7 +75,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   private consciousnessCoordinationCallbacks: Set<(state: Card3DConsciousnessState) => void> = new Set();
 
   public constructor(
-    performanceMonitor: PerformanceAnalyzer,
+    performanceMonitor: SimplePerformanceCoordinator,
     settingsManager: SettingsManager,
     utils: typeof Utils
   ) {
@@ -120,7 +120,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   }
 
   public static getInstance(
-    performanceMonitor: PerformanceAnalyzer,
+    performanceMonitor: SimplePerformanceCoordinator,
     settingsManager: SettingsManager,
     utils: typeof Utils
   ): Card3DManager {
@@ -139,7 +139,8 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
 
     const quality = this.performanceMonitor.shouldReduceQuality();
     if (quality) {
-      if (this.settingsManager.get("sn-3d-effects-level") !== "disabled") {
+      // NOTE: 3D effects setting has been removed - always disabled for performance
+      if (false) { // Always disabled since setting was removed
         console.log(
           `[Card3DManager] Performance is low. 3D effects disabled. Current quality: ${quality}`
         );
@@ -317,7 +318,8 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
 
   private handleSettingsChange(event: Event): void {
     const { key, value } = (event as CustomEvent).detail || {};
-    if (key === CARD_3D_LEVEL_KEY) {
+    // NOTE: 3D effects setting has been removed - this event handler is disabled
+    if (false) {
       this.apply3DMode(value);
     }
   }
@@ -538,15 +540,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
     this.currentQualityLevel = level;
     
     // Update 3D config based on quality level
-    switch (level.level) {
-      case 'minimal':
-        this.config.perspective = 800;
-        this.config.maxRotation = 2;
-        this.config.consciousnessDepthMultiplier = 1.0;
-        this.config.emotionalResponseStrength = 0.3;
-        this.config.beatSyncIntensity = 0.2;
-        this.config.cinematicDramaMultiplier = 0.5;
-        break;
+    switch (level) {
       case 'low':
         this.config.perspective = 900;
         this.config.maxRotation = 3;
@@ -571,17 +565,25 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
         this.config.beatSyncIntensity = 0.8;
         this.config.cinematicDramaMultiplier = 1.5;
         break;
-      case 'ultra':
-        this.config.perspective = 1500;
-        this.config.maxRotation = 10;
-        this.config.consciousnessDepthMultiplier = 2.0;
-        this.config.emotionalResponseStrength = 1.2;
-        this.config.beatSyncIntensity = 1.0;
-        this.config.cinematicDramaMultiplier = 2.0;
+      default:
+        // Default to medium quality for unknown levels
+        this.config.perspective = 1000;
+        this.config.maxRotation = 5;
+        this.config.consciousnessDepthMultiplier = 1.5;
+        this.config.emotionalResponseStrength = 0.8;
+        this.config.beatSyncIntensity = 0.6;
+        this.config.cinematicDramaMultiplier = 1.2;
         break;
     }
     
-    console.log(`[Card3DManager] Quality level set to: ${level.level}`);
+    console.log(`[Card3DManager] Quality level set to: ${level}`);
+  }
+
+  /**
+   * Adjust quality level (QualityScalingCapable interface)
+   */
+  public adjustQuality(level: QualityLevel): void {
+    this.setQualityLevel(level);
   }
 
   /**
@@ -597,11 +599,8 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
     return {
       fps: 60,
       frameTime: baseImpact + consciousnessImpact + emotionalImpact + cinematicImpact,
-      memoryUsageMB: cardCount * 0.05, // Minimal memory impact
-      cpuUsagePercent: (baseImpact + consciousnessImpact) * 100,
-      gpuUsagePercent: 5, // Minimal GPU usage for 3D transforms
-      renderTime: baseImpact * 2,
-      timestamp: Date.now()
+      memoryUsage: cardCount * 0.05, // Minimal memory impact
+      cpuUsage: (baseImpact + consciousnessImpact) * 100,
     };
   }
 
@@ -643,33 +642,28 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
       this.qualityCapabilities = [
         {
           name: '3D Perspective',
-          impact: 'medium',
           enabled: true,
-          canToggle: true
+          qualityLevel: 'medium'
         },
         {
           name: 'Consciousness Glow',
-          impact: 'low',
           enabled: true,
-          canToggle: true
+          qualityLevel: 'low'
         },
         {
           name: 'Beat Sync Effects',
-          impact: 'low',
           enabled: true,
-          canToggle: true
+          qualityLevel: 'low'
         },
         {
           name: 'Dramatic Distortion',
-          impact: 'medium',
           enabled: true,
-          canToggle: true
+          qualityLevel: 'medium'
         },
         {
           name: 'Emotional Modulation',
-          impact: 'low',
           enabled: true,
-          canToggle: true
+          qualityLevel: 'low'
         }
       ];
     }

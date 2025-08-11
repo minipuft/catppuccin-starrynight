@@ -1,20 +1,18 @@
 /**
  * UnifiedDebugManager - Consolidated Debug System for Year 3000 Architecture
- * 
- * Replaces the scattered debug systems (SystemHealthMonitor, SystemIntegrationTester, 
+ *
+ * Replaces the scattered debug systems (SystemHealthMonitor, SystemIntegrationTester,
  * PerformanceRegressionTester, OrganicConsciousnessVerification) with a single,
  * streamlined debug interface that properly integrates with UnifiedSystemBase
  * and provides meaningful console output.
- * 
+ *
  * @architecture Year3000System unified architecture integration
  * @performance <0.5% CPU overhead for debug operations
  * @consolidation Replaces 3000+ lines of scattered debug code with 400 lines
  */
 
-import { UnifiedSystemBase } from '@/core/base/UnifiedSystemBase';
-import { YEAR3000_CONFIG } from '@/config/globalConfig';
-import type { Year3000Config } from '@/types/models';
-import type { HealthCheckResult } from '@/types/systems';
+import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import type { HealthCheckResult } from "@/types/systems";
 
 // =========================================================================
 // UNIFIED DEBUG INTERFACES
@@ -22,7 +20,7 @@ import type { HealthCheckResult } from '@/types/systems';
 
 export interface SystemDebugInfo {
   name: string;
-  type: 'visual' | 'audio' | 'performance' | 'integration' | 'unified';
+  type: "visual" | "audio" | "performance" | "integration" | "unified";
   initialized: boolean;
   healthy: boolean;
   lastUpdate: number;
@@ -34,7 +32,7 @@ export interface SystemDebugInfo {
 
 export interface DebugReport {
   timestamp: number;
-  overallHealth: 'excellent' | 'good' | 'degraded' | 'critical';
+  overallHealth: "excellent" | "good" | "degraded" | "critical";
   systemCount: number;
   healthySystems: number;
   totalIssues: number;
@@ -77,15 +75,17 @@ export class UnifiedDebugManager {
       enableSystemHealthMonitoring: true,
       maxHistoryEntries: 50,
       verboseLogging: YEAR3000_CONFIG.enableDebug,
-      ...config
+      ...config,
     };
 
     if (this.config.enableConsoleReporting) {
-      console.log('🔧 [UnifiedDebugManager] Debug system initialized');
+      console.log("🔧 [UnifiedDebugManager] Debug system initialized");
     }
   }
 
-  public static getInstance(config?: Partial<DebugConfig>): UnifiedDebugManager {
+  public static getInstance(
+    config?: Partial<DebugConfig>
+  ): UnifiedDebugManager {
     if (!UnifiedDebugManager.instance) {
       UnifiedDebugManager.instance = new UnifiedDebugManager(config);
     }
@@ -100,9 +100,9 @@ export class UnifiedDebugManager {
    * Register a system for debug monitoring
    */
   public registerSystem(
-    name: string, 
-    system: any, 
-    type: SystemDebugInfo['type'] = 'unified'
+    name: string,
+    system: any,
+    type: SystemDebugInfo["type"] = "unified"
   ): void {
     const debugInfo: SystemDebugInfo = {
       name,
@@ -111,13 +111,15 @@ export class UnifiedDebugManager {
       healthy: true,
       lastUpdate: Date.now(),
       issues: [],
-      metrics: {}
+      metrics: {},
     };
 
     this.registeredSystems.set(name, debugInfo);
 
     if (this.config.verboseLogging) {
-      console.log(`🔧 [UnifiedDebugManager] Registered system: ${name} (${type})`);
+      console.log(
+        `🔧 [UnifiedDebugManager] Registered system: ${name} (${type})`
+      );
     }
 
     // Auto-start monitoring if this is the first system
@@ -157,7 +159,11 @@ export class UnifiedDebugManager {
   /**
    * Record performance metric for a system
    */
-  public recordMetric(systemName: string, metricName: string, value: number): void {
+  public recordMetric(
+    systemName: string,
+    metricName: string,
+    value: number
+  ): void {
     if (!this.config.enablePerformanceTracking) return;
 
     const system = this.registeredSystems.get(systemName);
@@ -170,12 +176,12 @@ export class UnifiedDebugManager {
     const key = `${systemName}_${metricName}`;
     const history = this.performanceMetrics.get(key) || [];
     history.push(value);
-    
+
     // Keep only recent values
     if (history.length > 100) {
       history.splice(0, history.length - 100);
     }
-    
+
     this.performanceMetrics.set(key, history);
   }
 
@@ -216,7 +222,7 @@ export class UnifiedDebugManager {
         // Dynamic system access with facade pattern integration
         let actualSystem = null;
         let dynamicInitializedStatus = system.initialized; // fallback to cached value
-        
+
         // Enhanced facade-aware system resolution
         const year3000System = (globalThis as any).year3000System;
         if (year3000System) {
@@ -224,72 +230,88 @@ export class UnifiedDebugManager {
           if (year3000System.facadeCoordinator) {
             // Check non-visual systems via facade
             try {
-              actualSystem = year3000System.facadeCoordinator.getCachedNonVisualSystem?.(name) ||
-                            await year3000System.facadeCoordinator.getNonVisualSystem?.(name);
+              actualSystem =
+                year3000System.facadeCoordinator.getCachedNonVisualSystem?.(
+                  name
+                ) ||
+                (await year3000System.facadeCoordinator.getNonVisualSystem?.(
+                  name
+                ));
             } catch (e) {
               // Ignore facade errors, try other methods
             }
-            
+
             // Check visual systems via facade if not found
             if (!actualSystem) {
               try {
-                actualSystem = year3000System.facadeCoordinator.getVisualSystem?.(name);
+                actualSystem =
+                  year3000System.facadeCoordinator.getVisualSystem?.(name);
               } catch (e) {
                 // Ignore facade errors, try other methods
               }
             }
           }
-          
+
           // 2. Try direct property access (legacy systems)
           if (!actualSystem) {
             // Convert system name to camelCase property (e.g., MusicSyncService -> musicSyncService)
             const camelCaseName = name.charAt(0).toLowerCase() + name.slice(1);
-            actualSystem = year3000System[camelCaseName] || year3000System[name];
+            actualSystem =
+              year3000System[camelCaseName] || year3000System[name];
           }
         }
-        
+
         // 3. Try global scope as fallback
         if (!actualSystem) {
           actualSystem = (globalThis as any)[name];
         }
-        
+
         // Update initialization status dynamically from actual system
         if (actualSystem) {
           // Check various initialization status patterns
-          if (typeof actualSystem.initialized === 'boolean') {
+          if (typeof actualSystem.initialized === "boolean") {
             dynamicInitializedStatus = actualSystem.initialized;
-          } else if (typeof actualSystem.isInitialized === 'function') {
+          } else if (typeof actualSystem.isInitialized === "function") {
             try {
               dynamicInitializedStatus = await actualSystem.isInitialized();
             } catch (e) {
               // Keep cached value on error
             }
-          } else if (typeof actualSystem.getInitializationStatus === 'function') {
+          } else if (
+            typeof actualSystem.getInitializationStatus === "function"
+          ) {
             try {
               const status = await actualSystem.getInitializationStatus();
-              dynamicInitializedStatus = status?.initialized ?? status?.ready ?? false;
+              dynamicInitializedStatus =
+                status?.initialized ?? status?.ready ?? false;
             } catch (e) {
               // Keep cached value on error
             }
           }
         }
-        
+
         // Update system info with dynamic status
         const oldStatus = system.initialized;
         system.initialized = dynamicInitializedStatus;
         system.lastUpdate = timestamp;
-        
-        if (this.config.verboseLogging && oldStatus !== dynamicInitializedStatus) {
-          console.log(`🔧 [UnifiedDebugManager] ${name} initialization status updated: ${oldStatus} → ${dynamicInitializedStatus}`);
+
+        if (
+          this.config.verboseLogging &&
+          oldStatus !== dynamicInitializedStatus
+        ) {
+          console.log(
+            `🔧 [UnifiedDebugManager] ${name} initialization status updated: ${oldStatus} → ${dynamicInitializedStatus}`
+          );
         }
 
         // Perform health check if system has the capability
-        if (actualSystem && typeof actualSystem.healthCheck === 'function') {
-          const healthResult: HealthCheckResult = await actualSystem.healthCheck();
+        if (actualSystem && typeof actualSystem.healthCheck === "function") {
+          const healthResult: HealthCheckResult =
+            await actualSystem.healthCheck();
           system.healthy = healthResult.healthy ?? healthResult.ok;
-          
+
           if (!healthResult.ok) {
-            system.issues = [healthResult.details || 'Health check failed'];
+            system.issues = [healthResult.details || "Health check failed"];
           } else {
             system.issues = [];
           }
@@ -297,7 +319,7 @@ export class UnifiedDebugManager {
           // Default health assessment based on initialization status
           system.healthy = dynamicInitializedStatus;
           if (!dynamicInitializedStatus) {
-            system.issues = ['System not initialized'];
+            system.issues = ["System not initialized"];
           } else {
             system.issues = [];
           }
@@ -320,12 +342,11 @@ export class UnifiedDebugManager {
         }
 
         systemDetails.push({ ...system });
-
       } catch (error) {
         system.healthy = false;
         system.issues = [`Health check error: ${error}`];
         totalIssues++;
-        
+
         if (this.config.verboseLogging) {
           console.error(`❌ [${name}] Health check failed:`, error);
         }
@@ -333,23 +354,32 @@ export class UnifiedDebugManager {
     }
 
     // Calculate overall health
-    const healthPercentage = this.registeredSystems.size > 0 ? 
-      healthySystems / this.registeredSystems.size : 1;
+    const healthPercentage =
+      this.registeredSystems.size > 0
+        ? healthySystems / this.registeredSystems.size
+        : 1;
 
-    let overallHealth: DebugReport['overallHealth'];
-    if (healthPercentage >= 0.9) overallHealth = 'excellent';
-    else if (healthPercentage >= 0.7) overallHealth = 'good';
-    else if (healthPercentage >= 0.5) overallHealth = 'degraded';
-    else overallHealth = 'critical';
+    let overallHealth: DebugReport["overallHealth"];
+    if (healthPercentage >= 0.9) overallHealth = "excellent";
+    else if (healthPercentage >= 0.7) overallHealth = "good";
+    else if (healthPercentage >= 0.5) overallHealth = "degraded";
+    else overallHealth = "critical";
 
     // Generate recommendations
     if (this.config.verboseLogging) {
-      console.log('🔧 [UnifiedDebugManager] System initialization status for recommendations:');
+      console.log(
+        "🔧 [UnifiedDebugManager] System initialization status for recommendations:"
+      );
       for (const system of systemDetails) {
-        console.log(`   ${system.name}: ${system.initialized ? '✅' : '❌'} initialized`);
+        console.log(
+          `   ${system.name}: ${system.initialized ? "✅" : "❌"} initialized`
+        );
       }
     }
-    const recommendations = this.generateRecommendations(systemDetails, overallHealth);
+    const recommendations = this.generateRecommendations(
+      systemDetails,
+      overallHealth
+    );
 
     const report: DebugReport = {
       timestamp,
@@ -361,15 +391,18 @@ export class UnifiedDebugManager {
       performance: {
         avgFrameTime: frameTimeCount > 0 ? totalFrameTime / frameTimeCount : 0,
         totalMemoryMB: totalMemory,
-        cpuUsageEstimate: this.estimateCPUUsage()
+        cpuUsageEstimate: this.estimateCPUUsage(),
       },
-      recommendations
+      recommendations,
     };
 
     // Store in history
     this.reportHistory.push(report);
     if (this.reportHistory.length > this.config.maxHistoryEntries) {
-      this.reportHistory.splice(0, this.reportHistory.length - this.config.maxHistoryEntries);
+      this.reportHistory.splice(
+        0,
+        this.reportHistory.length - this.config.maxHistoryEntries
+      );
     }
 
     return report;
@@ -378,30 +411,49 @@ export class UnifiedDebugManager {
   /**
    * Generate actionable recommendations based on system state
    */
-  private generateRecommendations(systems: SystemDebugInfo[], overallHealth: string): string[] {
+  private generateRecommendations(
+    systems: SystemDebugInfo[],
+    overallHealth: string
+  ): string[] {
     const recommendations: string[] = [];
 
-    if (overallHealth === 'critical') {
-      recommendations.push('🚨 Critical: Multiple systems failing - check console for errors');
+    if (overallHealth === "critical") {
+      recommendations.push(
+        "🚨 Critical: Multiple systems failing - check console for errors"
+      );
     }
 
-    const uninitializedSystems = systems.filter(s => !s.initialized);
+    const uninitializedSystems = systems.filter((s) => !s.initialized);
     if (uninitializedSystems.length > 0) {
-      recommendations.push(`⚠️ ${uninitializedSystems.length} systems not initialized: ${uninitializedSystems.map(s => s.name).join(', ')}`);
+      recommendations.push(
+        `⚠️ ${
+          uninitializedSystems.length
+        } systems not initialized: ${uninitializedSystems
+          .map((s) => s.name)
+          .join(", ")}`
+      );
     }
 
-    const highFrameTimes = systems.filter(s => s.frameTime && s.frameTime > 16.67);
+    const highFrameTimes = systems.filter(
+      (s) => s.frameTime && s.frameTime > 16.67
+    );
     if (highFrameTimes.length > 0) {
-      recommendations.push(`🐌 Performance: ${highFrameTimes.length} systems exceeding 16.67ms frame time`);
+      recommendations.push(
+        `🐌 Performance: ${highFrameTimes.length} systems exceeding 16.67ms frame time`
+      );
     }
 
-    const memoryIssues = systems.filter(s => s.memoryUsage && s.memoryUsage > 50);
+    const memoryIssues = systems.filter(
+      (s) => s.memoryUsage && s.memoryUsage > 50
+    );
     if (memoryIssues.length > 0) {
-      recommendations.push(`💾 Memory: ${memoryIssues.length} systems using >50MB`);
+      recommendations.push(
+        `💾 Memory: ${memoryIssues.length} systems using >50MB`
+      );
     }
 
     if (recommendations.length === 0) {
-      recommendations.push('✅ All systems operating within normal parameters');
+      recommendations.push("✅ All systems operating within normal parameters");
     }
 
     return recommendations;
@@ -440,7 +492,7 @@ export class UnifiedDebugManager {
 
     this.monitoring = true;
     this.monitoringInterval = window.setInterval(() => {
-      this.performHealthCheck().then(report => {
+      this.performHealthCheck().then((report) => {
         if (this.config.enableConsoleReporting) {
           this.logHealthReport(report);
         }
@@ -448,7 +500,7 @@ export class UnifiedDebugManager {
     }, this.config.reportingInterval);
 
     if (this.config.verboseLogging) {
-      console.log('🔧 [UnifiedDebugManager] Monitoring started');
+      console.log("🔧 [UnifiedDebugManager] Monitoring started");
     }
   }
 
@@ -465,7 +517,7 @@ export class UnifiedDebugManager {
     }
 
     if (this.config.verboseLogging) {
-      console.log('🔧 [UnifiedDebugManager] Monitoring stopped');
+      console.log("🔧 [UnifiedDebugManager] Monitoring stopped");
     }
   }
 
@@ -474,37 +526,51 @@ export class UnifiedDebugManager {
    */
   public logHealthReport(report?: DebugReport): void {
     if (!report) {
-      this.performHealthCheck().then(r => this.logHealthReport(r));
+      this.performHealthCheck().then((r) => this.logHealthReport(r));
       return;
     }
 
     const statusEmoji = {
-      excellent: '🌟',
-      good: '✅',
-      degraded: '⚠️',
-      critical: '🚨'
+      excellent: "🌟",
+      good: "✅",
+      degraded: "⚠️",
+      critical: "🚨",
     }[report.overallHealth];
 
-    console.group(`${statusEmoji} Year 3000 System Health Report - ${new Date().toLocaleTimeString()}`);
-    
-    console.log(`📊 Overall: ${report.overallHealth.toUpperCase()} (${report.healthySystems}/${report.systemCount} healthy)`);
-    
+    console.group(
+      `${statusEmoji} Year 3000 System Health Report - ${new Date().toLocaleTimeString()}`
+    );
+
+    console.log(
+      `📊 Overall: ${report.overallHealth.toUpperCase()} (${
+        report.healthySystems
+      }/${report.systemCount} healthy)`
+    );
+
     if (report.totalIssues > 0) {
       console.log(`🚨 Issues: ${report.totalIssues} total`);
     }
 
-    console.log(`⚡ Performance: ${report.performance.avgFrameTime.toFixed(2)}ms avg frame, ${report.performance.totalMemoryMB.toFixed(1)}MB memory, ~${report.performance.cpuUsageEstimate.toFixed(1)}% CPU`);
+    console.log(
+      `⚡ Performance: ${report.performance.avgFrameTime.toFixed(
+        2
+      )}ms avg frame, ${report.performance.totalMemoryMB.toFixed(
+        1
+      )}MB memory, ~${report.performance.cpuUsageEstimate.toFixed(1)}% CPU`
+    );
 
     // Log system details
     if (report.systemDetails.length > 0) {
-      console.group('🔧 System Details');
-      report.systemDetails.forEach(system => {
-        const emoji = system.healthy ? '✅' : '❌';
-        const frameInfo = system.frameTime ? ` (${system.frameTime.toFixed(2)}ms)` : '';
+      console.group("🔧 System Details");
+      report.systemDetails.forEach((system) => {
+        const emoji = system.healthy ? "✅" : "❌";
+        const frameInfo = system.frameTime
+          ? ` (${system.frameTime.toFixed(2)}ms)`
+          : "";
         console.log(`${emoji} ${system.name} [${system.type}]${frameInfo}`);
-        
+
         if (system.issues.length > 0) {
-          system.issues.forEach(issue => {
+          system.issues.forEach((issue) => {
             console.log(`    ⚠️ ${issue}`);
           });
         }
@@ -514,8 +580,8 @@ export class UnifiedDebugManager {
 
     // Log recommendations
     if (report.recommendations.length > 0) {
-      console.group('💡 Recommendations');
-      report.recommendations.forEach(rec => console.log(`  ${rec}`));
+      console.group("💡 Recommendations");
+      report.recommendations.forEach((rec) => console.log(`  ${rec}`));
       console.groupEnd();
     }
 
@@ -567,9 +633,9 @@ export class UnifiedDebugManager {
    */
   public updateConfig(config: Partial<DebugConfig>): void {
     this.config = { ...this.config, ...config };
-    
+
     if (this.config.verboseLogging) {
-      console.log('🔧 [UnifiedDebugManager] Configuration updated:', config);
+      console.log("🔧 [UnifiedDebugManager] Configuration updated:", config);
     }
   }
 
@@ -581,9 +647,9 @@ export class UnifiedDebugManager {
     this.registeredSystems.clear();
     this.reportHistory = [];
     this.performanceMetrics.clear();
-    
+
     if (this.config.verboseLogging) {
-      console.log('🔧 [UnifiedDebugManager] System reset');
+      console.log("🔧 [UnifiedDebugManager] System reset");
     }
   }
 
@@ -600,7 +666,7 @@ export class UnifiedDebugManager {
 // UNIFIED Y3K DEBUG INTERFACE
 // =========================================================================
 
-export const Y3K = {
+export const Y3KDebug = {
   debug: {
     log: (component: string, message: string, ...args: any[]) => {
       if (YEAR3000_CONFIG?.enableDebug) {
@@ -611,7 +677,10 @@ export const Y3K = {
       console.error(`[${component}] ${message}`, error);
       // Record as issue in debug manager
       const debugManager = UnifiedDebugManager.getInstance();
-      debugManager.recordIssue(component, `${message}${error ? `: ${error}` : ''}`);
+      debugManager.recordIssue(
+        component,
+        `${message}${error ? `: ${error}` : ""}`
+      );
     },
     warn: (component: string, message: string, ...args: any[]) => {
       console.warn(`[${component}] ${message}`, ...args);
@@ -623,7 +692,7 @@ export const Y3K = {
       const debugManager = UnifiedDebugManager.getInstance();
       debugManager.recordMetric(system, metric, value);
     },
-    register: (name: string, system: any, type?: SystemDebugInfo['type']) => {
+    register: (name: string, system: any, type?: SystemDebugInfo["type"]) => {
       const debugManager = UnifiedDebugManager.getInstance();
       debugManager.registerSystem(name, system, type);
     },
@@ -638,8 +707,8 @@ export const Y3K = {
     getReport: () => {
       const debugManager = UnifiedDebugManager.getInstance();
       return debugManager.getLatestReport();
-    }
-  }
+    },
+  },
 };
 
 // =========================================================================
@@ -647,14 +716,14 @@ export const Y3K = {
 // =========================================================================
 
 // Make debug manager available globally for console access
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   (window as any).UnifiedDebugManager = UnifiedDebugManager;
-  (window as any).Y3K = Y3K;
-  
-  console.log('🔧 [UnifiedDebugManager] Global debug interface available:');
-  console.log('  Y3K.debug.checkHealth() - Check system health');
-  console.log('  Y3K.debug.getReport() - Get latest debug report');
-  console.log('  UnifiedDebugManager.getInstance() - Get debug manager');
+  (window as any).Y3K = Y3KDebug;
+
+  console.log("🔧 [UnifiedDebugManager] Global debug interface available:");
+  console.log("  Y3K.debug.checkHealth() - Check system health");
+  console.log("  Y3K.debug.getReport() - Get latest debug report");
+  console.log("  UnifiedDebugManager.getInstance() - Get debug manager");
 }
 
 export default UnifiedDebugManager;

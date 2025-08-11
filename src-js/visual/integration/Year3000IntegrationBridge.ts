@@ -3,7 +3,7 @@
  * The Ultimate Coordinator for the Year 3000 Gradient Consciousness
  *
  * This is the master orchestrator that brings together all systems:
- * - FluxConsciousnessLayers (CSS gradients with emotional/genre intelligence)
+ * - DepthLayeredGradientSystem (Enhanced CSS gradients with musical consciousness)
  * - WebGLGradientBackgroundSystem (High-performance WebGL rendering)
  * - GradientTransitionOrchestrator (Seamless CSS ↔ WebGL transitions)
  * - AdaptivePerformanceSystem (Hardware detection and quality scaling)
@@ -20,22 +20,111 @@
  * - Comprehensive health monitoring and auto-recovery
  */
 
-import { Y3K } from "@/debug/UnifiedDebugManager";
-import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
-import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { MusicSyncService } from "@/audio/MusicSyncService";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
+import { MusicSyncService } from "@/audio/MusicSyncService";
+import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
+import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
+import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { SettingsManager } from "@/ui/managers/SettingsManager";
 
 // System imports
-import { FluxConsciousnessLayers } from "@/visual/backgrounds/FluxConsciousnessLayers";
 import { WebGLGradientBackgroundSystem } from "@/visual/backgrounds/WebGLGradientBackgroundSystem";
-import { GradientTransitionOrchestrator, GradientBackend } from "./GradientTransitionOrchestrator";
-import { AdaptivePerformanceSystem, AdaptationEvent, QualitySettings } from "@/core/performance/AdaptivePerformanceSystem";
+import {
+  GradientBackend,
+  GradientTransitionOrchestrator,
+} from "./GradientTransitionOrchestrator";
+// AdaptivePerformanceSystem functionality absorbed into SimplePerformanceCoordinator (Phase 3 consolidation)
+// Stub implementation for legacy compatibility
+class LegacyAdaptivePerformanceSystemStub {
+  async initialize() {
+    /* Legacy stub */
+  }
+  addEventListener(handler: any) {
+    /* Legacy stub */
+  }
+  removeEventListener(handler: any) {
+    /* Legacy stub */
+  }
+  destroy() {
+    /* Legacy stub */
+  }
+  getCurrentProfile() {
+    return {
+      targetFPS: 60,
+      memoryBudgetMB: 50,
+      thermalLimit: 70,
+      adaptiveScaling: true,
+    };
+  }
+  setProfile(profile: any) {
+    /* Legacy stub */
+  }
+  getCurrentQuality(): QualitySettings {
+    return {
+      level: "medium" as const,
+      gradientComplexity: 0.6,
+      particleDensity: 0.5,
+      animationFPS: 60,
+      postProcessing: false,
+      bloomEnabled: false,
+      antiAliasing: "none" as const,
+      shadowQuality: "medium" as const,
+      shaderPrecision: "medium" as const,
+      features: {
+        webgl: true,
+        particles: true,
+        shaders: false,
+        blur: true,
+        shadows: true,
+        animations: true,
+      },
+    };
+  }
+  setQuality(quality: any) {
+    /* Legacy stub */
+  }
+  getPerformanceHistory() {
+    return [];
+  }
+}
 
-export type IntegrationMode = "progressive" | "performance-first" | "quality-first" | "battery-optimized";
+export interface AdaptationEvent {
+  type: "quality-change" | "thermal-change" | "performance-change";
+  data: any;
+  reason?: string;
+  newSettings?: QualitySettings;
+}
+
+export interface QualitySettings {
+  level?: "minimal" | "low" | "medium" | "high" | "ultra";
+  gradientComplexity?: number;
+  particleDensity?: number;
+  animationFPS?: number;
+  postProcessing?: boolean;
+  bloomEnabled?: boolean;
+  antiAliasing?: "none" | "fxaa" | "msaa4x";
+  shadowQuality?: "off" | "medium" | "high";
+  shaderPrecision?: "low" | "medium" | "high";
+  textureResolution?: number;
+  transitionQuality?: "smooth" | "fast";
+  motionBlur?: boolean;
+  features?: {
+    webgl: boolean;
+    particles: boolean;
+    shaders: boolean;
+    blur: boolean;
+    shadows: boolean;
+    animations: boolean;
+  };
+}
+
+export type IntegrationMode =
+  | "progressive"
+  | "performance-first"
+  | "quality-first"
+  | "battery-optimized";
 export type SystemHealth = "excellent" | "good" | "degraded" | "critical";
 
 export interface IntegrationConfig {
@@ -64,28 +153,28 @@ export interface SystemMetrics {
   memoryUsageMB: number;
   cpuUsagePercent: number;
   gpuUsagePercent: number;
-  
+
   // System state
   activeBackend: GradientBackend;
   currentQuality: QualitySettings;
   systemHealth: SystemHealth;
-  
+
   // Feature status
   webglAvailable: boolean;
   webglActive: boolean;
   adaptiveScaling: boolean;
   performanceMonitoring: boolean;
-  
+
   // Musical intelligence
   emotionalState: any;
   currentGenre: string;
   musicSyncActive: boolean;
-  
+
   // Visual state
   consciousnessLevel: number;
   gradientComplexity: number;
   layerCount: number;
-  
+
   // Phase 5: Color coordination tracking
   lastColorUpdate: number;
 }
@@ -105,20 +194,20 @@ export interface HealthCheckResult {
 
 export class Year3000IntegrationBridge {
   // Core systems
-  private cssConsciousnessController: UnifiedCSSConsciousnessController;
-  private performanceAnalyzer: PerformanceAnalyzer;
+  private cssConsciousnessController: UnifiedCSSVariableManager;
+  private performanceAnalyzer: SimplePerformanceCoordinator;
   private deviceDetector: DeviceCapabilityDetector;
   private musicSyncService: MusicSyncService | null = null;
   private settingsManager: SettingsManager | null = null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
 
   // Visual systems
-  private fluxConsciousnessLayers: FluxConsciousnessLayers | null = null;
   private webglBackgroundSystem: WebGLGradientBackgroundSystem | null = null;
-  
+
   // Integration systems
   private transitionOrchestrator: GradientTransitionOrchestrator | null = null;
-  private adaptivePerformanceSystem: AdaptivePerformanceSystem | null = null;
+  private adaptivePerformanceSystem: LegacyAdaptivePerformanceSystemStub | null =
+    null;
 
   // State management
   private isInitialized = false;
@@ -130,17 +219,20 @@ export class Year3000IntegrationBridge {
   // Monitoring and events
   private healthCheckInterval: number | null = null;
   private metricsUpdateInterval: number | null = null;
-  private boundAdaptationHandler: ((event: AdaptationEvent) => void) | null = null;
+  private boundAdaptationHandler: ((event: AdaptationEvent) => void) | null =
+    null;
   private boundSettingsHandler: ((event: Event) => void) | null = null;
 
   // Event callbacks
   private onSystemAdaptation: ((metrics: SystemMetrics) => void) | null = null;
   private onHealthChange: ((health: HealthCheckResult) => void) | null = null;
-  private onBackendSwitch: ((oldBackend: GradientBackend, newBackend: GradientBackend) => void) | null = null;
+  private onBackendSwitch:
+    | ((oldBackend: GradientBackend, newBackend: GradientBackend) => void)
+    | null = null;
 
   constructor(
-    cssConsciousnessController: UnifiedCSSConsciousnessController,
-    performanceAnalyzer: PerformanceAnalyzer,
+    cssConsciousnessController: UnifiedCSSVariableManager,
+    performanceAnalyzer: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
     settingsManager: SettingsManager | null = null,
     colorHarmonyEngine: ColorHarmonyEngine | null = null
@@ -163,13 +255,13 @@ export class Year3000IntegrationBridge {
       performanceThresholds: {
         minFPS: 45,
         maxMemoryMB: 50,
-        thermalLimit: 70
+        thermalLimit: 70,
       },
       qualityPreferences: {
         preferHighQuality: true,
         allowDynamicScaling: true,
-        batteryConservation: false
-      }
+        batteryConservation: false,
+      },
     };
 
     // Initialize metrics
@@ -179,16 +271,18 @@ export class Year3000IntegrationBridge {
     this.boundAdaptationHandler = this.handleAdaptationEvent.bind(this);
     this.boundSettingsHandler = this.handleSettingsChange.bind(this);
 
-    Y3K?.debug?.log("Year3000IntegrationBridge", "Integration bridge initialized");
+    Y3KDebug?.debug?.log(
+      "Year3000IntegrationBridge",
+      "Integration bridge initialized"
+    );
   }
 
   public async initialize(
-    fluxConsciousnessLayers: FluxConsciousnessLayers,
     webglBackgroundSystem?: WebGLGradientBackgroundSystem,
     config?: Partial<IntegrationConfig>
   ): Promise<void> {
     if (this.isInitialized) {
-      Y3K?.debug?.warn("Year3000IntegrationBridge", "Already initialized");
+      Y3KDebug?.debug?.warn("Year3000IntegrationBridge", "Already initialized");
       return;
     }
 
@@ -197,17 +291,16 @@ export class Year3000IntegrationBridge {
       this.config = { ...this.config, ...config };
 
       // Store system references
-      this.fluxConsciousnessLayers = fluxConsciousnessLayers;
       this.webglBackgroundSystem = webglBackgroundSystem || null;
 
       // Initialize adaptive performance system
       if (this.config.enablePerformanceMonitoring) {
-        this.adaptivePerformanceSystem = new AdaptivePerformanceSystem(
-          this.deviceDetector,
-          this.performanceAnalyzer
-        );
+        this.adaptivePerformanceSystem =
+          new LegacyAdaptivePerformanceSystemStub();
         await this.adaptivePerformanceSystem.initialize();
-        this.adaptivePerformanceSystem.addEventListener(this.boundAdaptationHandler!);
+        this.adaptivePerformanceSystem.addEventListener(
+          this.boundAdaptationHandler!
+        );
       }
 
       // Initialize transition orchestrator
@@ -220,7 +313,6 @@ export class Year3000IntegrationBridge {
           this.colorHarmonyEngine
         );
         await this.transitionOrchestrator.initialize(
-          this.fluxConsciousnessLayers,
           this.webglBackgroundSystem || undefined
         );
       }
@@ -241,18 +333,31 @@ export class Year3000IntegrationBridge {
       this.isActive = true;
 
       // Update CSS to indicate integration is active
-      this.cssConsciousnessController.setProperty("--sn-integration-active", "1");
-      this.cssConsciousnessController.setProperty("--sn-integration-mode", this.config.mode);
+      this.cssConsciousnessController.setProperty(
+        "--sn-integration-active",
+        "1"
+      );
+      this.cssConsciousnessController.setProperty(
+        "--sn-integration-mode",
+        this.config.mode
+      );
 
-      Y3K?.debug?.log("Year3000IntegrationBridge", "Integration bridge fully initialized", {
-        mode: this.config.mode,
-        webglEnabled: this.config.enableWebGL,
-        performanceMonitoring: this.config.enablePerformanceMonitoring
-      });
-
+      Y3KDebug?.debug?.log(
+        "Year3000IntegrationBridge",
+        "Integration bridge fully initialized",
+        {
+          mode: this.config.mode,
+          webglEnabled: this.config.enableWebGL,
+          performanceMonitoring: this.config.enablePerformanceMonitoring,
+        }
+      );
     } catch (error) {
-      Y3K?.debug?.error("Year3000IntegrationBridge", "Initialization failed:", error);
-      
+      Y3KDebug?.debug?.error(
+        "Year3000IntegrationBridge",
+        "Initialization failed:",
+        error
+      );
+
       // Cleanup on failure
       await this.cleanup();
       throw error;
@@ -271,7 +376,7 @@ export class Year3000IntegrationBridge {
       currentQuality: {
         gradientComplexity: 0.6,
         particleDensity: 0.6,
-        shaderPrecision: "mediump",
+        shaderPrecision: "medium",
         textureResolution: 1.0,
         animationFPS: 60,
         transitionQuality: "smooth",
@@ -279,7 +384,7 @@ export class Year3000IntegrationBridge {
         bloomEnabled: true,
         shadowQuality: "medium",
         antiAliasing: "fxaa",
-        postProcessing: true
+        postProcessing: true,
       },
       systemHealth: "good",
       webglAvailable: false,
@@ -292,7 +397,7 @@ export class Year3000IntegrationBridge {
       consciousnessLevel: 0.7,
       gradientComplexity: 0.6,
       layerCount: 5,
-      lastColorUpdate: 0
+      lastColorUpdate: 0,
     };
   }
 
@@ -304,7 +409,7 @@ export class Year3000IntegrationBridge {
       profile.memoryBudgetMB = this.config.performanceThresholds.maxMemoryMB;
       profile.thermalLimit = this.config.performanceThresholds.thermalLimit;
       profile.adaptiveScaling = this.config.enableAdaptiveQuality;
-      
+
       this.adaptivePerformanceSystem.setProfile(profile);
     }
 
@@ -315,19 +420,23 @@ export class Year3000IntegrationBridge {
         maxMemoryMB: this.config.performanceThresholds.maxMemoryMB,
         maxCPUPercent: 15,
         maxGPUPercent: 30,
-        stabilityWindow: 5000
+        stabilityWindow: 5000,
       });
 
       // Set transition mode based on configuration
-      const transitionMode = this.config.mode === "performance-first" ? "instant" :
-                           this.config.mode === "quality-first" ? "progressive" : "crossfade";
-      
+      const transitionMode =
+        this.config.mode === "performance-first"
+          ? "instant"
+          : this.config.mode === "quality-first"
+          ? "progressive"
+          : "crossfade";
+
       this.transitionOrchestrator.setTransitionConfig({
         mode: transitionMode,
         duration: 800,
         easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
         preserveState: true,
-        fallbackDelay: 2000
+        fallbackDelay: 2000,
       });
     }
 
@@ -353,8 +462,11 @@ export class Year3000IntegrationBridge {
     // Prioritize performance over visual quality
     if (this.adaptivePerformanceSystem) {
       const quality = this.adaptivePerformanceSystem.getCurrentQuality();
-      quality.gradientComplexity = Math.min(0.5, quality.gradientComplexity);
-      quality.particleDensity = Math.min(0.4, quality.particleDensity);
+      quality.gradientComplexity = Math.min(
+        0.5,
+        quality.gradientComplexity || 0
+      );
+      quality.particleDensity = Math.min(0.4, quality.particleDensity || 0);
       quality.postProcessing = false;
       quality.antiAliasing = "none";
       this.adaptivePerformanceSystem.setQuality(quality);
@@ -409,15 +521,28 @@ export class Year3000IntegrationBridge {
 
   private subscribeToEvents(): void {
     if (this.settingsManager && this.boundSettingsHandler) {
-      document.addEventListener("year3000SystemSettingsChanged", this.boundSettingsHandler);
+      document.addEventListener(
+        "year3000SystemSettingsChanged",
+        this.boundSettingsHandler
+      );
     }
 
     // Listen for WebGL context loss
-    document.addEventListener("webglcontextlost", this.handleWebGLContextLoss.bind(this));
-    document.addEventListener("webglcontextrestored", this.handleWebGLContextRestored.bind(this));
-    
+    document.addEventListener(
+      "webglcontextlost",
+      this.handleWebGLContextLoss.bind(this)
+    );
+    document.addEventListener(
+      "webglcontextrestored",
+      this.handleWebGLContextRestored.bind(this)
+    );
+
     // Phase 5: Subscribe to color harmonization events for transition orchestration
-    unifiedEventBus.subscribe('colors:harmonized', this.handleColorHarmonizationEvent.bind(this), 'Year3000IntegrationBridge');
+    unifiedEventBus.subscribe(
+      "colors:harmonized",
+      this.handleColorHarmonizationEvent.bind(this),
+      "Year3000IntegrationBridge"
+    );
   }
 
   private startMonitoring(): void {
@@ -436,44 +561,29 @@ export class Year3000IntegrationBridge {
     const healthCheck: HealthCheckResult = {
       overall: "good",
       systems: {
-        fluxConsciousness: { ok: true, details: "CSS gradient system operational" },
+        fluxConsciousness: {
+          ok: true,
+          details: "CSS gradient system operational",
+        },
         webglSystem: { ok: true, details: "WebGL system operational" },
-        performanceMonitor: { ok: true, details: "Performance monitoring active" },
+        performanceMonitor: {
+          ok: true,
+          details: "Performance monitoring active",
+        },
         musicSync: { ok: true, details: "Music synchronization active" },
-        transitionOrchestrator: { ok: true, details: "Transition system operational" }
+        transitionOrchestrator: {
+          ok: true,
+          details: "Transition system operational",
+        },
       },
       recommendations: [],
-      timestamp: performance.now()
+      timestamp: performance.now(),
     };
 
     let healthySystemCount = 0;
     let totalSystems = 0;
 
-    // Check FluxConsciousnessLayers
-    totalSystems++;
-    try {
-      if (this.fluxConsciousnessLayers?.initialized) {
-        const metrics = this.fluxConsciousnessLayers.getConsciousnessMetrics();
-        if (metrics) {
-          healthySystemCount++;
-        } else {
-          healthCheck.systems.fluxConsciousness = { 
-            ok: false, 
-            details: "Consciousness metrics unavailable" 
-          };
-        }
-      } else {
-        healthCheck.systems.fluxConsciousness = { 
-          ok: false, 
-          details: "Flux consciousness system not initialized" 
-        };
-      }
-    } catch (error) {
-      healthCheck.systems.fluxConsciousness = { 
-        ok: false, 
-        details: `Flux consciousness error: ${error}` 
-      };
-    }
+    // Note: FluxConsciousnessLayers functionality consolidated into DepthLayeredGradientSystem
 
     // Check WebGL system
     totalSystems++;
@@ -482,20 +592,20 @@ export class Year3000IntegrationBridge {
         const webglHealth = await this.webglBackgroundSystem.healthCheck();
         healthCheck.systems.webglSystem = {
           ok: webglHealth.ok,
-          details: webglHealth.details
+          details: webglHealth.details,
         };
         if (webglHealth.ok) healthySystemCount++;
       } else {
-        healthCheck.systems.webglSystem = { 
-          ok: true, 
-          details: "WebGL system not enabled" 
+        healthCheck.systems.webglSystem = {
+          ok: true,
+          details: "WebGL system not enabled",
         };
         healthySystemCount++; // Not an error if intentionally disabled
       }
     } catch (error) {
-      healthCheck.systems.webglSystem = { 
-        ok: false, 
-        details: `WebGL system error: ${error}` 
+      healthCheck.systems.webglSystem = {
+        ok: false,
+        details: `WebGL system error: ${error}`,
       };
     }
 
@@ -503,25 +613,26 @@ export class Year3000IntegrationBridge {
     totalSystems++;
     try {
       if (this.adaptivePerformanceSystem) {
-        const perfMetrics = this.adaptivePerformanceSystem.getPerformanceHistory();
+        const perfMetrics =
+          this.adaptivePerformanceSystem.getPerformanceHistory();
         if (perfMetrics.length > 0) {
           healthySystemCount++;
         } else {
-          healthCheck.systems.performanceMonitor = { 
-            ok: false, 
-            details: "No performance data available" 
+          healthCheck.systems.performanceMonitor = {
+            ok: false,
+            details: "No performance data available",
           };
         }
       } else {
-        healthCheck.systems.performanceMonitor = { 
-          ok: false, 
-          details: "Performance monitoring not initialized" 
+        healthCheck.systems.performanceMonitor = {
+          ok: false,
+          details: "Performance monitoring not initialized",
         };
       }
     } catch (error) {
-      healthCheck.systems.performanceMonitor = { 
-        ok: false, 
-        details: `Performance monitor error: ${error}` 
+      healthCheck.systems.performanceMonitor = {
+        ok: false,
+        details: `Performance monitor error: ${error}`,
       };
     }
 
@@ -532,16 +643,16 @@ export class Year3000IntegrationBridge {
         // Assume healthy if service exists and no errors
         healthySystemCount++;
       } else {
-        healthCheck.systems.musicSync = { 
-          ok: true, 
-          details: "Music sync not enabled" 
+        healthCheck.systems.musicSync = {
+          ok: true,
+          details: "Music sync not enabled",
         };
         healthySystemCount++; // Not an error if not needed
       }
     } catch (error) {
-      healthCheck.systems.musicSync = { 
-        ok: false, 
-        details: `Music sync error: ${error}` 
+      healthCheck.systems.musicSync = {
+        ok: false,
+        details: `Music sync error: ${error}`,
       };
     }
 
@@ -553,27 +664,27 @@ export class Year3000IntegrationBridge {
         if (currentBackend) {
           healthySystemCount++;
         } else {
-          healthCheck.systems.transitionOrchestrator = { 
-            ok: false, 
-            details: "No active backend" 
+          healthCheck.systems.transitionOrchestrator = {
+            ok: false,
+            details: "No active backend",
           };
         }
       } else {
-        healthCheck.systems.transitionOrchestrator = { 
-          ok: false, 
-          details: "Transition orchestrator not initialized" 
+        healthCheck.systems.transitionOrchestrator = {
+          ok: false,
+          details: "Transition orchestrator not initialized",
         };
       }
     } catch (error) {
-      healthCheck.systems.transitionOrchestrator = { 
-        ok: false, 
-        details: `Transition orchestrator error: ${error}` 
+      healthCheck.systems.transitionOrchestrator = {
+        ok: false,
+        details: `Transition orchestrator error: ${error}`,
       };
     }
 
     // Determine overall health
     const healthPercentage = healthySystemCount / totalSystems;
-    
+
     if (healthPercentage >= 0.9) {
       healthCheck.overall = "excellent";
     } else if (healthPercentage >= 0.7) {
@@ -591,12 +702,18 @@ export class Year3000IntegrationBridge {
     const perfMetrics = this.adaptivePerformanceSystem?.getPerformanceHistory();
     if (perfMetrics && perfMetrics.length > 0) {
       const recent = perfMetrics.slice(-5);
-      const avgFPS = recent.reduce((sum, m) => sum + m.fps, 0) / recent.length;
-      
+      const avgFPS =
+        recent.reduce((sum: number, m: any) => sum + (m.fps || 0), 0) /
+        recent.length;
+
       if (avgFPS < 30) {
-        healthCheck.recommendations.push("Low FPS detected - consider reducing visual quality");
+        healthCheck.recommendations.push(
+          "Low FPS detected - consider reducing visual quality"
+        );
       } else if (avgFPS > 55 && healthCheck.overall === "excellent") {
-        healthCheck.recommendations.push("Performance headroom available - quality can be increased");
+        healthCheck.recommendations.push(
+          "Performance headroom available - quality can be increased"
+        );
       }
     }
 
@@ -608,92 +725,131 @@ export class Year3000IntegrationBridge {
     }
 
     // Update CSS variable for health status
-    this.cssConsciousnessController.setProperty("--sn-system-health", healthCheck.overall);
+    this.cssConsciousnessController.setProperty(
+      "--sn-system-health",
+      healthCheck.overall
+    );
 
     return healthCheck;
   }
 
   private updateMetrics(): void {
     // Update performance metrics
-    this.currentMetrics.currentFPS = this.performanceAnalyzer.getMedianFPS() || 0;
-    this.currentMetrics.frameTime = this.currentMetrics.currentFPS > 0 ? 1000 / this.currentMetrics.currentFPS : 1000;
+    this.currentMetrics.currentFPS =
+      this.performanceAnalyzer.getMedianFPS() || 0;
+    this.currentMetrics.frameTime =
+      this.currentMetrics.currentFPS > 0
+        ? 1000 / this.currentMetrics.currentFPS
+        : 1000;
 
     // Update memory usage
     const memoryInfo = (performance as any).memory;
     if (memoryInfo) {
-      this.currentMetrics.memoryUsageMB = memoryInfo.usedJSHeapSize / (1024 * 1024);
+      this.currentMetrics.memoryUsageMB =
+        memoryInfo.usedJSHeapSize / (1024 * 1024);
     }
 
     // Update adaptive performance metrics
     if (this.adaptivePerformanceSystem) {
-      const perfHistory = this.adaptivePerformanceSystem.getPerformanceHistory();
+      const perfHistory =
+        this.adaptivePerformanceSystem.getPerformanceHistory();
       if (perfHistory.length > 0) {
         const recent = perfHistory.slice(-10);
-        this.currentMetrics.averageFPS = recent.reduce((sum, m) => sum + m.fps, 0) / recent.length;
-        this.currentMetrics.cpuUsagePercent = recent.reduce((sum, m) => sum + m.cpuUsage, 0) / recent.length;
-        this.currentMetrics.gpuUsagePercent = recent.reduce((sum, m) => sum + m.gpuUsage, 0) / recent.length;
+        this.currentMetrics.averageFPS =
+          recent.reduce((sum: number, m: any) => sum + (m.fps || 0), 0) /
+          recent.length;
+        this.currentMetrics.cpuUsagePercent =
+          recent.reduce((sum: number, m: any) => sum + (m.cpuUsage || 0), 0) /
+          recent.length;
+        this.currentMetrics.gpuUsagePercent =
+          recent.reduce((sum: number, m: any) => sum + (m.gpuUsage || 0), 0) /
+          recent.length;
       }
 
-      this.currentMetrics.currentQuality = this.adaptivePerformanceSystem.getCurrentQuality();
-      this.currentMetrics.adaptiveScaling = this.adaptivePerformanceSystem.getCurrentProfile().adaptiveScaling;
+      this.currentMetrics.currentQuality =
+        this.adaptivePerformanceSystem.getCurrentQuality();
+      this.currentMetrics.adaptiveScaling =
+        this.adaptivePerformanceSystem.getCurrentProfile().adaptiveScaling;
     }
 
     // Update system state
     if (this.transitionOrchestrator) {
-      this.currentMetrics.activeBackend = this.transitionOrchestrator.getCurrentBackend();
-      this.currentMetrics.webglActive = this.currentMetrics.activeBackend === "webgl";
-      this.currentMetrics.webglAvailable = this.transitionOrchestrator.getCapabilities().webglAvailable;
+      this.currentMetrics.activeBackend =
+        this.transitionOrchestrator.getCurrentBackend();
+      this.currentMetrics.webglActive =
+        this.currentMetrics.activeBackend === "webgl";
+      this.currentMetrics.webglAvailable =
+        this.transitionOrchestrator.getCapabilities().webgl;
     }
 
     // Update consciousness metrics
-    if (this.fluxConsciousnessLayers) {
-      const consciousnessMetrics = this.fluxConsciousnessLayers.getConsciousnessMetrics();
-      if (consciousnessMetrics) {
-        this.currentMetrics.consciousnessLevel = consciousnessMetrics.consciousnessLevel;
-        this.currentMetrics.emotionalState = consciousnessMetrics.emotionalProfile;
-        this.currentMetrics.currentGenre = consciousnessMetrics.currentGenre || "unknown";
-        this.currentMetrics.gradientComplexity = consciousnessMetrics.dimensionalDepth / 5; // Normalize to 0-1
-        this.currentMetrics.layerCount = consciousnessMetrics.dimensionalDepth;
-      }
-    }
+    // Note: FluxConsciousnessLayers functionality consolidated into DepthLayeredGradientSystem
+    // TODO: Implement consciousness metrics capture from DepthLayeredGradientSystem
+    this.currentMetrics.consciousnessLevel = 0.7; // Default consciousness level
+    this.currentMetrics.emotionalState = null;
+    this.currentMetrics.currentGenre = "unknown";
+    this.currentMetrics.gradientComplexity = 0.6; // Default complexity
+    this.currentMetrics.layerCount = 6; // Default layer count from DepthLayeredGradientSystem
 
     // Update music sync status
     this.currentMetrics.musicSyncActive = !!this.musicSyncService;
-    this.currentMetrics.performanceMonitoring = !!this.adaptivePerformanceSystem;
+    this.currentMetrics.performanceMonitoring =
+      !!this.adaptivePerformanceSystem;
 
     // Determine system health based on metrics
     if (this.currentMetrics.currentFPS < 20) {
       this.currentMetrics.systemHealth = "critical";
     } else if (this.currentMetrics.currentFPS < 30) {
       this.currentMetrics.systemHealth = "degraded";
-    } else if (this.currentMetrics.currentFPS > 55 && this.currentMetrics.memoryUsageMB < 40) {
+    } else if (
+      this.currentMetrics.currentFPS > 55 &&
+      this.currentMetrics.memoryUsageMB < 40
+    ) {
       this.currentMetrics.systemHealth = "excellent";
     } else {
       this.currentMetrics.systemHealth = "good";
     }
 
     // Update CSS variables with current metrics
-    this.cssConsciousnessController.setProperty("--sn-current-fps", this.currentMetrics.currentFPS.toString());
-    this.cssConsciousnessController.setProperty("--sn-memory-usage", this.currentMetrics.memoryUsageMB.toFixed(1));
-    this.cssConsciousnessController.setProperty("--sn-system-health-score", this.getHealthScore().toString());
+    this.cssConsciousnessController.setProperty(
+      "--sn-current-fps",
+      this.currentMetrics.currentFPS.toString()
+    );
+    this.cssConsciousnessController.setProperty(
+      "--sn-memory-usage",
+      this.currentMetrics.memoryUsageMB.toFixed(1)
+    );
+    this.cssConsciousnessController.setProperty(
+      "--sn-system-health-score",
+      this.getHealthScore().toString()
+    );
   }
 
   private getHealthScore(): number {
     // Convert health to numeric score (0-100)
     switch (this.currentMetrics.systemHealth) {
-      case "excellent": return 90;
-      case "good": return 70;
-      case "degraded": return 40;
-      case "critical": return 20;
-      default: return 50;
+      case "excellent":
+        return 90;
+      case "good":
+        return 70;
+      case "degraded":
+        return 40;
+      case "critical":
+        return 20;
+      default:
+        return 50;
     }
   }
 
   private handleAdaptationEvent(event: AdaptationEvent): void {
-    Y3K?.debug?.log("Year3000IntegrationBridge", `Adaptation event: ${event.type}`, event.reason);
+    Y3KDebug?.debug?.log(
+      "Year3000IntegrationBridge",
+      `Adaptation event: ${event.type}`,
+      event.reason
+    );
 
     // Update metrics with new quality settings
-    this.currentMetrics.currentQuality = event.newSettings;
+    this.currentMetrics.currentQuality = event.newSettings!;
 
     // Emit adaptation callback if set
     if (this.onSystemAdaptation) {
@@ -701,8 +857,14 @@ export class Year3000IntegrationBridge {
     }
 
     // Update CSS variables to reflect changes
-    this.cssConsciousnessController.setProperty("--sn-adaptive-quality", event.newSettings.gradientComplexity.toString());
-    this.cssConsciousnessController.setProperty("--sn-adaptive-fps", event.newSettings.animationFPS.toString());
+    this.cssConsciousnessController.setProperty(
+      "--sn-adaptive-quality",
+      (event.newSettings!.gradientComplexity || 0).toString()
+    );
+    this.cssConsciousnessController.setProperty(
+      "--sn-adaptive-fps",
+      (event.newSettings!.animationFPS || 60).toString()
+    );
   }
 
   private handleSettingsChange(event: Event): void {
@@ -718,7 +880,14 @@ export class Year3000IntegrationBridge {
   private updateConfigurationFromSettings(key: string, value: any): void {
     switch (key) {
       case "sn-integration-mode":
-        if (["progressive", "performance-first", "quality-first", "battery-optimized"].includes(value)) {
+        if (
+          [
+            "progressive",
+            "performance-first",
+            "quality-first",
+            "battery-optimized",
+          ].includes(value)
+        ) {
           this.config.mode = value;
           this.applyConfiguration();
         }
@@ -733,8 +902,8 @@ export class Year3000IntegrationBridge {
   }
 
   private handleWebGLContextLoss(event: Event): void {
-    Y3K?.debug?.warn("Year3000IntegrationBridge", "WebGL context lost");
-    
+    Y3KDebug?.debug?.warn("Year3000IntegrationBridge", "WebGL context lost");
+
     // Fallback to CSS backend immediately
     if (this.transitionOrchestrator) {
       this.transitionOrchestrator.forceBackend("css");
@@ -742,8 +911,8 @@ export class Year3000IntegrationBridge {
   }
 
   private handleWebGLContextRestored(event: Event): void {
-    Y3K?.debug?.log("Year3000IntegrationBridge", "WebGL context restored");
-    
+    Y3KDebug?.debug?.log("Year3000IntegrationBridge", "WebGL context restored");
+
     // Attempt to restore WebGL backend if it was preferred
     if (this.config.enableWebGL && this.transitionOrchestrator) {
       setTimeout(() => {
@@ -759,31 +928,42 @@ export class Year3000IntegrationBridge {
   private handleColorHarmonizationEvent(data: any): void {
     if (!data || !this.transitionOrchestrator) return;
 
-    Y3K?.debug?.log("Year3000IntegrationBridge", "Coordinating color harmonization across visual systems", {
-      accentHex: data.accentHex,
-      strategies: data.strategies,
-      processingTime: data.processingTime,
-      trackUri: data.trackUri
-    });
+    Y3KDebug?.debug?.log(
+      "Year3000IntegrationBridge",
+      "Coordinating color harmonization across visual systems",
+      {
+        accentHex: data.accentHex,
+        strategies: data.strategies,
+        processingTime: data.processingTime,
+        trackUri: data.trackUri,
+      }
+    );
 
     try {
       // Coordinate smooth color transitions across all visual backends
       // The transition orchestrator will handle CSS and WebGL systems simultaneously
       this.coordinateColorTransition(data);
-      
+
       // Update CSS consciousness variables for unified color application
       this.updateGlobalColorState(data);
-      
+
       // Log performance-intensive color processing for monitoring
       if (data.processingTime > 100) {
-        Y3K?.debug?.warn("Year3000IntegrationBridge", "Intensive color processing detected", {
-          processingTime: data.processingTime,
-          trackUri: data.trackUri
-        });
+        Y3KDebug?.debug?.warn(
+          "Year3000IntegrationBridge",
+          "Intensive color processing detected",
+          {
+            processingTime: data.processingTime,
+            trackUri: data.trackUri,
+          }
+        );
       }
-      
     } catch (error) {
-      Y3K?.debug?.error("Year3000IntegrationBridge", "Failed to coordinate color harmonization:", error);
+      Y3KDebug?.debug?.error(
+        "Year3000IntegrationBridge",
+        "Failed to coordinate color harmonization:",
+        error
+      );
     }
   }
 
@@ -796,28 +976,40 @@ export class Year3000IntegrationBridge {
 
     // Get current backend to coordinate transition
     const currentBackend = this.transitionOrchestrator.getCurrentBackend();
-    
+
     // For CSS backend, let the CSS consciousness controller handle the update
-    if (currentBackend === "css" && this.fluxConsciousnessLayers) {
-      // FluxConsciousnessLayers should already be listening to colors:harmonized
+    if (currentBackend === "css") {
+      // DepthLayeredGradientSystem should already be listening to colors:harmonized
       // but we can ensure visual consistency by setting transition state
-      this.cssConsciousnessController.setProperty("--sn-color-transition-active", "1");
-      
+      this.cssConsciousnessController.setProperty(
+        "--sn-color-transition-active",
+        "1"
+      );
+
       // Reset after transition duration
       setTimeout(() => {
-        this.cssConsciousnessController.setProperty("--sn-color-transition-active", "0");
+        this.cssConsciousnessController.setProperty(
+          "--sn-color-transition-active",
+          "0"
+        );
       }, 800); // Match transition orchestrator duration
     }
-    
+
     // For WebGL backend, coordinate with WebGL system
     if (currentBackend === "webgl" && this.webglBackgroundSystem) {
       // WebGL system should already be listening to colors:harmonized
       // Set transition state for coordination
-      this.cssConsciousnessController.setProperty("--sn-webgl-color-transition-active", "1");
-      
+      this.cssConsciousnessController.setProperty(
+        "--sn-webgl-color-transition-active",
+        "1"
+      );
+
       // Reset after transition duration
       setTimeout(() => {
-        this.cssConsciousnessController.setProperty("--sn-webgl-color-transition-active", "0");
+        this.cssConsciousnessController.setProperty(
+          "--sn-webgl-color-transition-active",
+          "0"
+        );
       }, 800); // Match transition orchestrator duration
     }
   }
@@ -828,11 +1020,23 @@ export class Year3000IntegrationBridge {
    */
   private updateGlobalColorState(colorData: any): void {
     // Update global consciousness variables for cross-system coordination
-    this.cssConsciousnessController.setProperty("--sn-current-accent-hex", colorData.accentHex || "");
-    this.cssConsciousnessController.setProperty("--sn-current-accent-rgb", colorData.accentRgb || "");
-    this.cssConsciousnessController.setProperty("--sn-color-strategies", (colorData.strategies || []).join(","));
-    this.cssConsciousnessController.setProperty("--sn-color-processing-time", (colorData.processingTime || 0).toString());
-    
+    this.cssConsciousnessController.setProperty(
+      "--sn-current-accent-hex",
+      colorData.accentHex || ""
+    );
+    this.cssConsciousnessController.setProperty(
+      "--sn-current-accent-rgb",
+      colorData.accentRgb || ""
+    );
+    this.cssConsciousnessController.setProperty(
+      "--sn-color-strategies",
+      (colorData.strategies || []).join(",")
+    );
+    this.cssConsciousnessController.setProperty(
+      "--sn-color-processing-time",
+      (colorData.processingTime || 0).toString()
+    );
+
     // Update metrics for monitoring
     this.currentMetrics.lastColorUpdate = Date.now();
   }
@@ -850,20 +1054,28 @@ export class Year3000IntegrationBridge {
     return { ...this.config };
   }
 
-  public async setConfiguration(config: Partial<IntegrationConfig>): Promise<void> {
+  public async setConfiguration(
+    config: Partial<IntegrationConfig>
+  ): Promise<void> {
     this.config = { ...this.config, ...config };
     await this.applyConfiguration();
   }
 
-  public setOnSystemAdaptation(callback: (metrics: SystemMetrics) => void): void {
+  public setOnSystemAdaptation(
+    callback: (metrics: SystemMetrics) => void
+  ): void {
     this.onSystemAdaptation = callback;
   }
 
-  public setOnHealthChange(callback: (health: HealthCheckResult) => void): void {
+  public setOnHealthChange(
+    callback: (health: HealthCheckResult) => void
+  ): void {
     this.onHealthChange = callback;
   }
 
-  public setOnBackendSwitch(callback: (oldBackend: GradientBackend, newBackend: GradientBackend) => void): void {
+  public setOnBackendSwitch(
+    callback: (oldBackend: GradientBackend, newBackend: GradientBackend) => void
+  ): void {
     this.onBackendSwitch = callback;
   }
 
@@ -871,14 +1083,16 @@ export class Year3000IntegrationBridge {
     if (this.transitionOrchestrator) {
       const oldBackend = this.transitionOrchestrator.getCurrentBackend();
       await this.transitionOrchestrator.forceBackend(backend);
-      
+
       if (this.onBackendSwitch && oldBackend !== backend) {
         this.onBackendSwitch(oldBackend, backend);
       }
     }
   }
 
-  public async forceQualityLevel(quality: Partial<QualitySettings>): Promise<void> {
+  public async forceQualityLevel(
+    quality: Partial<QualitySettings>
+  ): Promise<void> {
     if (this.adaptivePerformanceSystem) {
       this.adaptivePerformanceSystem.setQuality(quality);
     }
@@ -888,11 +1102,17 @@ export class Year3000IntegrationBridge {
     return await this.performHealthCheck();
   }
 
-  public getSystemStatus(): { initialized: boolean; active: boolean; healthy: boolean } {
+  public getSystemStatus(): {
+    initialized: boolean;
+    active: boolean;
+    healthy: boolean;
+  } {
     return {
       initialized: this.isInitialized,
       active: this.isActive,
-      healthy: this.currentMetrics.systemHealth === "excellent" || this.currentMetrics.systemHealth === "good"
+      healthy:
+        this.currentMetrics.systemHealth === "excellent" ||
+        this.currentMetrics.systemHealth === "good",
     };
   }
 
@@ -912,18 +1132,29 @@ export class Year3000IntegrationBridge {
 
     // Remove event listeners
     if (this.boundSettingsHandler) {
-      document.removeEventListener("year3000SystemSettingsChanged", this.boundSettingsHandler);
+      document.removeEventListener(
+        "year3000SystemSettingsChanged",
+        this.boundSettingsHandler
+      );
     }
 
-    document.removeEventListener("webglcontextlost", this.handleWebGLContextLoss);
-    document.removeEventListener("webglcontextrestored", this.handleWebGLContextRestored);
-    
+    document.removeEventListener(
+      "webglcontextlost",
+      this.handleWebGLContextLoss
+    );
+    document.removeEventListener(
+      "webglcontextrestored",
+      this.handleWebGLContextRestored
+    );
+
     // Phase 5: Unsubscribe from UnifiedEventBus events
-    unifiedEventBus.unsubscribeAll('Year3000IntegrationBridge');
+    unifiedEventBus.unsubscribeAll("Year3000IntegrationBridge");
 
     // Cleanup systems
     if (this.adaptivePerformanceSystem) {
-      this.adaptivePerformanceSystem.removeEventListener(this.boundAdaptationHandler!);
+      this.adaptivePerformanceSystem.removeEventListener(
+        this.boundAdaptationHandler!
+      );
       this.adaptivePerformanceSystem.destroy();
       this.adaptivePerformanceSystem = null;
     }
@@ -935,9 +1166,15 @@ export class Year3000IntegrationBridge {
 
     // Reset CSS state
     this.cssConsciousnessController.setProperty("--sn-integration-active", "0");
-    this.cssConsciousnessController.setProperty("--sn-system-health", "unknown");
+    this.cssConsciousnessController.setProperty(
+      "--sn-system-health",
+      "unknown"
+    );
 
-    Y3K?.debug?.log("Year3000IntegrationBridge", "Integration bridge cleaned up");
+    Y3KDebug?.debug?.log(
+      "Year3000IntegrationBridge",
+      "Integration bridge cleaned up"
+    );
   }
 
   public async destroy(): Promise<void> {

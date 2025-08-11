@@ -1,0 +1,436 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// GLASSMORPHISM CONSCIOUSNESS SYSTEM - Year 3000 BeatSync Integration
+// Surface consciousness with rhythm-responsive glass effects
+// ████████████████████████████████████████████████████████████████████████████████
+//
+// This module transforms static glass surfaces into consciousness-aware interfaces that:
+// - REFRACT colors through rhythm-responsive spectrum effects
+// - OSCILLATE surface properties with music rhythm phase
+// - BLOOM transparency during musical intensity peaks
+// - HARMONIZE glass tinting with dynamic music analysis
+// - BREATHE with subtle scale effects synchronized to beats
+//
+// Dependencies:
+// - BeatSyncVisualSystem variables (--sn-beat-pulse-intensity, --sn-rhythm-phase, --sn-breathing-scale)
+// - Year 3000 gradient system variables (--sn-gradient-*-rgb)
+// - Base color enhancement system variables
+//
+// ████████████████████████████████████████████████████████████████████████████████
+
+@use "../../core/_mixins" as *;
+
+// ████████████████████████████████████████████████████████████████████████████████
+// CORE GLASSMORPHISM CONSCIOUSNESS VARIABLES
+// ████████████████████████████████████████████████████████████████████████████████
+
+// CSS custom properties for dynamic color control (Year 3000 compatible)
+:root {
+  // === BASIC COLOR ENHANCEMENT INTENSITIES (Existing) ===
+  --color-enhancement-saturation: 1.2;
+  --color-enhancement-brightness: 1.1;
+  --color-enhancement-opacity: 0.1;
+
+  // === BEATSYNC CONSCIOUSNESS VARIABLES (New) ===
+  // Phase 4: Gate beat effects behind user toggle
+  --sn-glass-beat-opacity: calc(
+    var(--color-enhancement-opacity) *
+      (1 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.5)
+  );
+  --sn-glass-rhythm-hue: calc(var(--sn-rhythm-phase, 0) * var(--sn-glass-pulse-enabled) * 20deg);
+  --sn-glass-breathing-scale: calc(
+    1 + (var(--sn-breathing-scale, 1) - 1) * var(--sn-glass-pulse-enabled)
+  );
+
+  // === COSMIC GLASS ENHANCEMENT ===
+  --sn-glass-cosmic-blur: calc(var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 3px);
+  --sn-glass-saturation: calc(1.2 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.3);
+  --sn-glass-brightness: calc(1.1 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.2);
+  --sn-glass-rhythm-shift: calc(var(--sn-rhythm-phase, 0) * var(--sn-glass-pulse-enabled) * 0.1);
+
+  // === PHASE 3: BEAT-BOOST GLASS INTEGRATION ===
+  // Dynamic glass variables that respond to beat-boost intensity
+  // Phase 4: Add user control variables for Glass Pulse toggle and base intensity
+  --sn-glass-pulse-enabled: var(--glass-pulse-toggle, 1); // 1 = enabled, 0 = disabled
+  --sn-glass-user-base-intensity: var(--glass-user-intensity, 0.5); // 0-1 user setting
+  
+  --glass-blur: calc(
+    var(--sn-glass-user-base-intensity) * 20px + 
+    var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 5px
+  );
+  --glass-saturation: calc(
+    1.2 + var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 0.2
+  );
+  --glass-brightness: calc(
+    1.1 + var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 0.15
+  );
+  --glass-background: rgba(
+    var(--sn-oklab-processed-bright-highlight-rgb),
+    calc(
+      var(--sn-glass-user-base-intensity) * 0.1 + 
+      var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 0.05
+    )
+  );
+  --glass-border: rgba(
+    var(--sn-oklab-processed-bright-highlight-rgb),
+    calc(
+      var(--sn-glass-user-base-intensity) * 0.2 + 
+      var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 0.1
+    )
+  );
+
+  // === REFRACTION SYSTEM VARIABLES ===
+  --sn-glass-refract-intensity: calc(var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 15deg);
+  --sn-glass-spectrum-shift: calc(var(--sn-rhythm-phase, 0) * var(--sn-glass-pulse-enabled) * 30deg);
+  --sn-glass-energy-pulse: calc(0.8 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.4);
+
+  // Background colors (adapts to existing color extraction with consciousness)
+  --enhanced-background: rgba(
+    var(--spice-rgb-surface0),
+    var(--sn-glass-beat-opacity)
+  );
+  --enhanced-border: rgba(
+    var(--spice-rgb-surface1),
+    calc(0.2 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.15)
+  );
+  --enhanced-shadow: rgba(
+    var(--sn-oklab-processed-dynamic-shadow-rgb),
+    calc(0.1 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.2)
+  );
+
+  // Performance and transition settings (uses existing transition timing)
+  --color-transition: all var(--sn-gradient-transition, 0.8s ease-in-out);
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// CORE CONSCIOUSNESS GLASS ENHANCEMENT ELEMENTS
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Enhanced navigation bar with consciousness-aware glass effects
+@include left-sidebar-root {
+  // Apply consciousness-enhanced glass effects without backdrop-filter interference
+  background: var(--enhanced-background) !important;
+
+  // OSCILLATE box shadow with rhythm
+  box-shadow: 0 8px 32px var(--enhanced-shadow),
+    0 2px calc(16px + var(--sn-beat-pulse-intensity, 0) * 8px)
+      rgba(
+        var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
+        calc(var(--sn-beat-pulse-intensity, 0) * 0.2)
+      );
+
+  // REFRACT color spectrum effects
+  filter: hue-rotate(var(--sn-glass-rhythm-hue))
+    saturate(var(--sn-glass-saturation)) brightness(var(--sn-glass-brightness));
+
+  // BREATHING scale effect
+  transform: scale(var(--sn-glass-breathing-scale));
+
+  // Enhanced consciousness transitions
+  transition: var(--color-transition), filter 0.4s ease-out,
+    transform 0.2s ease-out, box-shadow 0.3s ease-out;
+
+  // HARMONIZE atmosphere overlay
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      calc(135deg + var(--sn-glass-spectrum-shift)),
+            rgba(
+        var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
+        calc(var(--sn-beat-pulse-intensity, 0) * 0.1)
+      )
+        0%,
+      transparent 40%,
+            rgba(
+        var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
+        calc(var(--sn-beat-pulse-intensity, 0) * 0.08)
+      )
+        100%
+    );
+    animation: glassConsciousnessFlow
+      calc(15s / max(var(--sn-glass-energy-pulse), 0.1)) linear infinite;
+    opacity: var(--sn-beat-pulse-intensity, 0);
+    transition: opacity 0.5s ease-out;
+  }
+
+  // Maintain existing responsive behavior with consciousness
+  @media (max-width: 768px) {
+    --sn-glass-beat-opacity: calc(
+      0.12 * (1 + var(--sn-beat-pulse-intensity, 0) * 0.3)
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// NOW-PLAYING BAR GLASS INTEGRATION MOVED TO _now_playing.scss
+// ══════════════════════════════════════════════════════════════════════════════
+// The now-playing bar glassmorphism effects have been integrated directly
+// into the component file using the glassmorphism-dynamic mixin for better
+// modularity and to avoid CSS specificity conflicts.
+// 
+// This provides:
+// - Cleaner separation of concerns
+// - Proper mixin-based integration
+// - Avoids duplicate selectors
+// - Maintains consciousness-aware glass effects
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Modal overlays with consciousness-enhanced shadows
+.GenericModal,
+.main-contextMenu-container {
+  // BLOOM shadow effect during beats
+  box-shadow: 0 16px 64px
+      rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2),
+    0 8px calc(32px + var(--sn-beat-pulse-intensity, 0) * 16px)
+          rgba(
+      var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
+      calc(var(--sn-beat-pulse-intensity, 0) * 0.15)
+    );
+
+  // REFRACT border with rhythm
+  border: 1px solid
+    rgba(
+      var(--sn-accent-rgb, "140,170,238"),
+      calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+    );
+
+  // Subtle consciousness effects for modals
+  filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.3));
+  transition: all 0.4s ease-out;
+}
+
+// Enhanced cards with consciousness glass styling (NO BACKDROP FILTERS)
+.main-card-card {
+  // IMPORTANT: Let our Year 3000 search precision module handle search cards entirely
+  body:not(.main-searchPage-content) & {
+    // Apply consciousness-enhanced glass effects outside search pages
+    background: var(--enhanced-background);
+    border: 1px solid var(--enhanced-border);
+
+    // OSCILLATE shadow with rhythm
+    box-shadow: 0 4px 12px var(--enhanced-shadow),
+      0 2px calc(8px + var(--sn-beat-pulse-intensity, 0) * 4px)
+        rgba(
+          var(--sn-accent-rgb, "140,170,238"),
+          calc(var(--sn-beat-pulse-intensity, 0) * 0.1)
+        );
+
+    // REFRACT subtle filter effects
+    filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.2))
+      saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+
+    // BREATHING scale effect
+    transform: scale(var(--sn-glass-breathing-scale));
+
+    // Enhanced transitions
+    transition: all 0.3s ease-out, transform 0.2s ease-out, filter 0.4s ease-out;
+
+    &:hover,
+    &[data-context-menu-open="true"] {
+      // BLOOM enhanced hover state
+      background: var(
+        --dynamic-card-hover-bg,
+        rgba(
+          var(--spice-rgb-surface1),
+          calc(0.15 + var(--sn-beat-pulse-intensity, 0) * 0.05)
+        )
+      ) !important;
+
+      // Enhanced BLOOM shadow
+      box-shadow: 0 8px 24px var(--enhanced-shadow),
+        0 4px calc(16px + var(--sn-beat-pulse-intensity, 0) * 8px)
+          rgba(
+            var(--sn-accent-rgb, "202,158,230"),
+            calc(var(--sn-beat-pulse-intensity, 0) * 0.2)
+          );
+
+      // Enhanced REFRACT on hover
+      filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.4))
+        saturate(calc(1.1 + var(--sn-beat-pulse-intensity, 0) * 0.2))
+        brightness(calc(1.05 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+
+      // Slight BLOOM scale enhancement
+      transform: scale(calc(var(--sn-glass-breathing-scale) * 1.02));
+    }
+  }
+}
+
+// Right sidebar consciousness glass enhancement
+@include right-sidebar-root {
+  background: var(--enhanced-background) !important;
+  border-left: 1px solid var(--enhanced-border);
+
+  // BREATHING scale effect
+  transform: scale(var(--sn-glass-breathing-scale));
+
+  // REFRACT subtle color shifts
+  filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.2))
+    saturate(var(--sn-glass-saturation));
+
+  // Enhanced transitions
+  transition: var(--color-transition), transform 0.2s ease-out,
+    filter 0.4s ease-out;
+}
+
+// YEAR 3000: Color Enhancement Control Classes
+// =============================================================================
+
+// Color enhancement intensity controls (integrates with existing settings system)
+.sn-glass-disabled {
+  @include left-sidebar-root {
+    background: rgba(var(--spice-rgb-surface0), 0.8) !important;
+  }
+  // Now-playing bar glass controls moved to _now_playing.scss for better integration
+  @include right-sidebar-root {
+    background: rgba(var(--spice-rgb-surface0), 0.8) !important;
+  }
+  .main-card-card {
+    // REMOVED ALL BACKDROP FILTERS - use solid backgrounds instead
+    background: rgba(var(--spice-rgb-surface0), 0.8) !important;
+  }
+}
+
+.sn-glass-minimal {
+  --color-enhancement-opacity: 0.05;
+  --color-enhancement-saturation: 1.05;
+}
+
+.sn-glass-intense {
+  --color-enhancement-opacity: 0.15;
+  --color-enhancement-saturation: 1.4;
+  --color-enhancement-brightness: 1.2;
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// CONSCIOUSNESS ANIMATIONS
+// ████████████████████████████████████████████████████████████████████████████████
+
+@keyframes glassConsciousnessFlow {
+  from {
+    transform: translateX(-100%) rotate(0deg);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateX(100%) rotate(5deg);
+    opacity: 0.8;
+  }
+}
+
+@keyframes glassBreathing {
+  0%,
+  100% {
+    filter: hue-rotate(var(--sn-glass-rhythm-hue))
+      saturate(var(--sn-glass-saturation));
+  }
+  50% {
+    filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 1.2))
+      saturate(calc(var(--sn-glass-saturation) * 1.1));
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// PERFORMANCE & ACCESSIBILITY OPTIMIZATIONS
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Reduced motion support (enhanced with consciousness respect)
+@media (prefers-reduced-motion: reduce) {
+  .Root__nav-bar,
+  .main-card-card,
+  .Root__right-sidebar {
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+
+    &::before,
+    &::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+  // Now-playing bar reduced motion controls moved to _now_playing.scss
+}
+
+// High contrast mode support (enhanced)
+@media (prefers-contrast: high) {
+  :root {
+    --sn-glass-beat-opacity: calc(
+      0.25 * (1 + var(--sn-beat-pulse-intensity, 0) * 0.3)
+    );
+    --enhanced-border: rgba(var(--spice-rgb-text), 0.4);
+    --sn-glass-saturation: calc(1.4 + var(--sn-beat-pulse-intensity, 0) * 0.2);
+  }
+
+  // Enhanced borders for consciousness elements
+  .Root__nav-bar,
+  .main-card-card {
+    border-width: 2px !important;
+  }
+}
+
+// Mobile optimizations (respects existing responsive design with consciousness)
+@media (max-width: 768px) {
+  :root {
+    --sn-glass-beat-opacity: calc(
+      0.08 * (1 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+    );
+    --sn-glass-cosmic-blur: calc(var(--sn-beat-pulse-intensity, 0) * 2px);
+    --sn-glass-refract-intensity: calc(
+      var(--sn-beat-pulse-intensity, 0) * 10deg
+    );
+  }
+
+  .sn-glass-intense {
+    --sn-glass-beat-opacity: calc(
+      0.12 * (1 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+    );
+  }
+
+  // Simplified mobile consciousness effects
+  .Root__nav-bar,
+  .main-card-card {
+    filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.5));
+  }
+}
+
+// Performance optimization for lower-end devices
+@media (max-resolution: 1dppx) {
+  :root {
+    --sn-glass-cosmic-blur: calc(var(--sn-beat-pulse-intensity, 0) * 1px);
+  }
+
+  // Disable complex glass effects on low-resolution displays
+  .Root__nav-bar {
+    &::after {
+      display: none;
+    }
+  }
+  // Now-playing bar performance controls moved to _now_playing.scss
+}
+
+// Solid Fallbacks (NO BACKDROP FILTER DEPENDENCY)
+// =============================================================================
+
+// Solid backgrounds for all browsers (Year 3000 compatible)
+.Root__nav-bar {
+  background: rgba(var(--spice-rgb-surface0), 0.9) !important;
+  border-bottom: 1px solid rgba(var(--spice-rgb-surface1), 0.5);
+}
+
+// Now-playing bar fallbacks moved to _now_playing.scss for integrated control
+
+.main-card-card {
+  // Let Year 3000 search precision handle search cards
+  body:not(:has(.main-searchPage-content)) & {
+    background: rgba(var(--spice-rgb-surface0), 0.7) !important;
+
+    &:hover {
+      background: rgba(var(--spice-rgb-surface1), 0.8) !important;
+    }
+  }
+}
+
+// END OF GLASSMORPHISM CONSCIOUSNESS SYSTEM
+// ████████████████████████████████████████████████████████████████████████████████

@@ -1,7 +1,7 @@
 import { CSSAnimationManager } from './CSSAnimationManager';
 import { EnhancedMasterAnimationCoordinator } from './EnhancedMasterAnimationCoordinator';
-import { UnifiedCSSConsciousnessController } from '@/core/css/UnifiedCSSConsciousnessController';
-import { GlobalEventBus } from '@/core/events/EventBus';
+import { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
+import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
 import type { Year3000Config } from '@/types/models';
 
 /**
@@ -22,14 +22,14 @@ export class CSSAnimationIntegration {
   private config: Year3000Config;
   private cssAnimationManager: CSSAnimationManager | null = null;
   private animationCoordinator: EnhancedMasterAnimationCoordinator | null = null;
-  private cssConsciousnessController: UnifiedCSSConsciousnessController | null = null;
-  private eventBus: typeof GlobalEventBus;
+  private cssConsciousnessController: UnifiedCSSVariableManager | null = null;
+  private eventBus: typeof unifiedEventBus;
   
   private initialized = false;
   
   constructor(config: Year3000Config) {
     this.config = config;
-    this.eventBus = GlobalEventBus;
+    this.eventBus = unifiedEventBus;
     
     if (this.config.enableDebug) {
       console.log('[CSSAnimationIntegration] Created');
@@ -53,7 +53,7 @@ export class CSSAnimationIntegration {
    * Initialize the CSS animation integration
    */
   public initialize(
-    cssConsciousnessController: UnifiedCSSConsciousnessController,
+    cssConsciousnessController: UnifiedCSSVariableManager,
     animationCoordinator: EnhancedMasterAnimationCoordinator
   ): void {
     if (this.initialized) return;
@@ -299,50 +299,50 @@ export class CSSAnimationIntegration {
           this.triggerBloom(activeElements, payload.intensity);
         }
       }
-    });
+    }, 'CSSAnimationIntegration');
     
     // Listen for performance warnings
-    this.eventBus.subscribe('performance:reduce-quality', () => {
+    this.eventBus.subscribe('performance:frame', () => {
       this.setPerformanceMode('performance');
-    });
+    }, 'CSSAnimationIntegration');
     
-    this.eventBus.subscribe('performance:restore-quality', () => {
+    this.eventBus.subscribe('performance:frame', () => {
       this.setPerformanceMode('quality');
-    });
+    }, 'CSSAnimationIntegration');
     
     // Listen for user interactions
-    this.eventBus.subscribe('interaction:hover', (payload: any) => {
+    this.eventBus.subscribe('settings:changed', (payload: any) => {
       if (payload.element) {
         this.triggerGravity([payload.element], payload.mouseX || 0.5, payload.mouseY || 0.5);
       }
-    });
+    }, 'CSSAnimationIntegration');
     
-    this.eventBus.subscribe('interaction:click', (payload: any) => {
+    this.eventBus.subscribe('settings:changed', (payload: any) => {
       if (payload.element) {
         this.triggerRipple([payload.element], { intensity: 0.8 });
       }
-    });
+    }, 'CSSAnimationIntegration');
     
     // Listen for color changes
-    this.eventBus.subscribe('color:extracted', (payload: any) => {
-      if (payload.vibrant) {
+    this.eventBus.subscribe('colors:extracted', (payload: any) => {
+      if (payload.rawColors) {
         // Trigger refract on color changes
         const colorElements = document.querySelectorAll('.sn-color-responsive');
         if (colorElements.length > 0) {
           this.triggerRefract(colorElements, 0.6);
         }
       }
-    });
+    }, 'CSSAnimationIntegration');
     
     // Listen for consciousness field changes
-    this.eventBus.subscribe('consciousness:field-change', (payload: any) => {
-      if (payload.intensity > 0.5) {
+    this.eventBus.subscribe('emotion:analyzed', (payload: any) => {
+      if (payload.emotion && payload.emotion.intensity > 0.5) {
         // Trigger temporal echo on consciousness changes
         const consciousnessElements = document.querySelectorAll('.sn-consciousness-responsive');
         if (consciousnessElements.length > 0) {
-          this.triggerTemporalEcho(consciousnessElements, payload.intensity);
+          this.triggerTemporalEcho(consciousnessElements, payload.emotion.intensity);
         }
       }
-    });
+    }, 'CSSAnimationIntegration');
   }
 }

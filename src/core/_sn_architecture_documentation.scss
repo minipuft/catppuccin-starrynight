@@ -58,7 +58,7 @@ LAYER 4: FEATURE MODULES (src/features/)
 ├── _sn_glassmorphism.scss          - Glassmorphism effect system
 ├── _sn_atmospheric.scss            - Atmospheric fog & haze system
 ├── _sn_stars.scss                  - Star field generator
-├── _sn_3d_morphing.scss            - 3D shape morphing engine
+├── _3d_morphing_effects.scss       - 3D shape morphing engine
 ├── _sn_context_zones.scss          - Context-aware UI zones
 ├── _sn_microinteractions.scss      - Microinteraction patterns
 └── _advanced_visual_effects_layer.scss - Advanced VFX compositor
@@ -67,9 +67,9 @@ LAYER 5: SYSTEM MODULES (src/systems/)
 ├── _sn_behavioral_prediction.scss    - User interaction prediction system
 ├── _sn_performance_optimization.scss - GPU acceleration & accessibility
 ├── _sn_prediction_effects.scss       - Advanced glow & pulse systems
-├── _sn_quantum_consciousness.scss    - Quantum sidebar consciousness field
+├── _sn_advanced_visual_effects.scss    - Quantum sidebar consciousness field
 ├── _sn_data_glyphs.scss              - Data glyphs & biometric feedback
-└── _sidebar_dimensional_nexus.scss    - Sidebar dimensional nexus enhancements (consolidated)
+└── _sidebar_layered_effects.scss    - Sidebar layered effects enhancements (consolidated)
 
 LAYER 6: SEARCH MODULES (src/search/)
 ├── _sn_search_precision.scss        - Precision-mode search styling
@@ -212,5 +212,5 @@ Performance:             Optimized through modularization
 //   └───────────────┴──────────────────────────────────────────────────────────┘
 //
 // Controllers MAY update opacity / blur / scale at runtime; colour variables
-// should remain theme-driven via gradient tokens. See `src/core/_sn_nebula_variables.scss`.
+// should remain theme-driven via gradient tokens. See `src/core/_sn_layered_effect_variables.scss`.
 // ================================================================================================

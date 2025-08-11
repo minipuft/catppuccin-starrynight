@@ -1,0 +1,103 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 DEPTH LAYERS - Advanced 3D Visual System
+// ████████████████████████████████████████████████████████████████████████████████
+
+@use "../../core/_mixins" as *;
+
+:root {
+  // Define CSS variables for each depth layer (e.g., up to 4 layers).
+  // These will be controlled by the DepthLayerSystem in JS.
+  
+  // Right Sidebar Dedicated Depth Layer (Year 3000 Flux-Aligned)
+  --depth-layer-right-sidebar: 2.5;
+  --sn-depth-right-sidebar-z: 4px; // Medium magnetic depth as specified
+  --sn-depth-right-sidebar-opacity: 0.06;
+  --sn-depth-right-sidebar-blur: 1px;
+  
+  // Layer 0 (Furthest)
+  --sn-depth-layer-0-z: 75px;
+  --sn-depth-layer-0-opacity: 0.05;
+  --sn-depth-layer-0-blur: 2px;
+  --sn-depth-layer-0-offset-y: 0px;
+  --sn-depth-layer-0-hue-rotate: 0deg;
+  --sn-depth-layer-0-scale: 1;
+  // Layer 1
+  --sn-depth-layer-1-z: 150px;
+  --sn-depth-layer-1-opacity: 0.05;
+  --sn-depth-layer-1-blur: 4px;
+  --sn-depth-layer-1-offset-y: 0px;
+  --sn-depth-layer-1-hue-rotate: 0deg;
+  --sn-depth-layer-1-scale: 1;
+  // Layer 2 (Not visually represented by default ::before/::after, but vars are available for other elements)
+  --sn-depth-layer-2-z: 225px;
+  --sn-depth-layer-2-opacity: 0.04;
+  --sn-depth-layer-2-blur: 6px;
+  --sn-depth-layer-2-offset-y: 0px;
+  --sn-depth-layer-2-hue-rotate: 0deg;
+  --sn-depth-layer-2-scale: 1;
+  // Layer 3 (Innermost/closest if used this way)
+  --sn-depth-layer-3-z: 300px;
+  --sn-depth-layer-3-opacity: 0.03;
+  --sn-depth-layer-3-blur: 8px;
+  --sn-depth-layer-3-offset-y: 0px;
+  --sn-depth-layer-3-hue-rotate: 0deg;
+  --sn-depth-layer-3-scale: 1;
+
+  // Define a common transition for depth layers.
+  --sn-depth-layer-transition: opacity 700ms ease-out, transform 700ms ease-out,
+    filter 700ms ease-out;
+}
+
+@include main-view-scroll-node {
+  // Ensure perspective is set for 3D effects:
+  perspective: 1000px;
+  // Ensure overflow: hidden if necessary to contain blur from pseudo-elements.
+  overflow: hidden;
+
+  // Style pseudo-elements for the first two depth layers:
+  &::before {
+    // Furthest depth layer (Layer 0)
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: -2; // Ensure it's behind ::after and main content
+
+    transform: translateZ(calc(var(--sn-depth-layer-0-z, 75px) * -1))
+      // Move back in Z
+      translateY(var(--sn-depth-layer-0-offset-y, 0px))
+      scale(var(--sn-depth-layer-0-scale, 1));
+    filter: blur(var(--sn-depth-layer-0-blur, 2px))
+      hue-rotate(var(--sn-depth-layer-0-hue-rotate, 0deg));
+    // Opacity is already part of the background rgba, but can be an overall multiplier if needed here.
+    // opacity: var(--sn-depth-layer-0-opacity, 0.05); // Can be redundant if background uses it
+    transition: var(--sn-depth-layer-transition);
+  }
+
+  &::after {
+    // Closer depth layer (Layer 1)
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1; // Behind main content, but in front of ::before
+    background: radial-gradient(
+      ellipse at center,
+      rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.015) 0%,
+      transparent 50%
+    );
+    transform: translateZ(calc(var(--sn-depth-layer-1-z, 150px) * -1))
+      translateY(var(--sn-depth-layer-1-offset-y, 0px))
+      scale(var(--sn-depth-layer-1-scale, 1));
+    filter: blur(var(--sn-depth-layer-1-blur, 4px))
+      hue-rotate(var(--sn-depth-layer-1-hue-rotate, 0deg));
+    // opacity: var(--sn-depth-layer-1-opacity, 0.05);
+    transition: var(--sn-depth-layer-transition);
+  }
+
+  // If more than 2 layers are desired without JS-created elements,
+  // they would need to be applied to different nested elements within .main-view-container__scroll-node
+  // (e.g., .main-view-container__padding or specific section wrappers).
+  // For now, the JS `DepthLayerSystem` will define variables for more layers,
+  // but only the first two are directly styled via ::before/::after here.
+}

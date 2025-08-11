@@ -1,9 +1,10 @@
 import { UnifiedPerformanceCoordinator } from '@/core/performance/UnifiedPerformanceCoordinator';
-import { GlobalEventBus } from '@/core/events/EventBus';
+import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';
 import { temporalMemoryService } from "@/audio/TemporalMemoryService";
 import type { Year3000Config, MultiplierProfile } from '@/types/models';
 import type { PersonalAestheticSignature } from "@/types/signature";
+import type { CSSAnimationManager } from './CSSAnimationManager';
 
 export interface AnimationSystem {
   onAnimate(deltaMs: number): void;
@@ -88,8 +89,9 @@ export class EnhancedMasterAnimationCoordinator {
   private static instance: EnhancedMasterAnimationCoordinator | null = null;
   
   private config: Year3000Config;
-  private eventBus: typeof GlobalEventBus;
+  private eventBus: typeof unifiedEventBus;
   private performanceCoordinator: UnifiedPerformanceCoordinator | null = null;
+  private cssAnimationManager: CSSAnimationManager | null = null;
   
   // Animation management
   private animations: Map<string, AnimationRegistration> = new Map();
@@ -136,6 +138,50 @@ export class EnhancedMasterAnimationCoordinator {
   private readonly MAX_HISTORY_SIZE = 60; // 1 second at 60fps
   
   // ===================================================================
+  // CSS-FIRST BREATHING COORDINATION - YEAR 3000 PERFORMANCE REVOLUTION
+  // ===================================================================
+  
+  /**
+   * Coordinate consciousness breathing with CSSAnimationManager
+   * Integrates beat events with CSS-first breathing for 90%+ JavaScript overhead elimination
+   */
+  private coordinateConsciousnessBreathing(payload: any): void {
+    if (!this.cssAnimationManager) return;
+    
+    const energyLevel = payload.energy || payload.intensity || 0.5;
+    const tempo = payload.bpm || this.currentBpm || 120;
+    
+    // Only trigger breathing updates if significant change occurred
+    // This prevents excessive updates and maintains performance
+    const energyDelta = Math.abs(energyLevel - this.currentIntensity);
+    if (energyDelta < 0.1 && Math.abs(tempo - this.currentBpm) < 5) {
+      return; // Skip minor fluctuations
+    }
+    
+    // Get consciousness elements for breathing coordination
+    const consciousnessElements = document.querySelectorAll(
+      '.Root__main-view::before, .Root__main-view, [data-consciousness-breathing]'
+    );
+    
+    if (consciousnessElements.length > 0) {
+      // Coordinate breathing through CSSAnimationManager
+      this.cssAnimationManager.triggerConsciousnessBreathing(
+        consciousnessElements,
+        energyLevel,
+        tempo
+      );
+      
+      if (this.config.enableDebug) {
+        console.log(`[EnhancedMasterAnimationCoordinator] Consciousness breathing coordinated - Energy: ${energyLevel.toFixed(2)}, Tempo: ${tempo} BPM`);
+      }
+    }
+    
+    // Update current state for next comparison
+    this.currentIntensity = energyLevel;
+    this.currentBpm = tempo;
+  }
+
+  // ===================================================================
   // EMERGENT CHOREOGRAPHY ENGINE INTEGRATION (from consolidation)
   // ===================================================================
   
@@ -145,12 +191,13 @@ export class EnhancedMasterAnimationCoordinator {
   private currentMultipliers: MultiplierProfile;
   private currentBpm: number = 120;
   private currentIntensity: number = 0.5;
-  private emergentEventSubscriptions: (() => void)[] = [];
+  private emergentEventSubscriptions: string[] = [];
   
-  constructor(config: Year3000Config, performanceCoordinator?: UnifiedPerformanceCoordinator) {
+  constructor(config: Year3000Config, performanceCoordinator?: UnifiedPerformanceCoordinator, cssAnimationManager?: CSSAnimationManager) {
     this.config = config;
-    this.eventBus = GlobalEventBus;
+    this.eventBus = unifiedEventBus;
     this.performanceCoordinator = performanceCoordinator || null;
+    this.cssAnimationManager = cssAnimationManager || null;
     
     // Initialize timing
     this.startTime = performance.now();
@@ -176,16 +223,27 @@ export class EnhancedMasterAnimationCoordinator {
   /**
    * Get or create singleton instance
    */
-  public static getInstance(config?: Year3000Config, performanceCoordinator?: UnifiedPerformanceCoordinator): EnhancedMasterAnimationCoordinator {
+  public static getInstance(config?: Year3000Config, performanceCoordinator?: UnifiedPerformanceCoordinator, cssAnimationManager?: CSSAnimationManager): EnhancedMasterAnimationCoordinator {
     if (!EnhancedMasterAnimationCoordinator.instance) {
       if (!config) {
         throw new Error('EnhancedMasterAnimationCoordinator requires config for first initialization');
       }
-      EnhancedMasterAnimationCoordinator.instance = new EnhancedMasterAnimationCoordinator(config, performanceCoordinator);
+      EnhancedMasterAnimationCoordinator.instance = new EnhancedMasterAnimationCoordinator(config, performanceCoordinator, cssAnimationManager);
     }
     return EnhancedMasterAnimationCoordinator.instance;
   }
   
+  /**
+   * Register CSSAnimationManager for breathing coordination
+   */
+  public registerCSSAnimationManager(cssAnimationManager: CSSAnimationManager): void {
+    this.cssAnimationManager = cssAnimationManager;
+    
+    if (this.config.enableDebug) {
+      console.log('[EnhancedMasterAnimationCoordinator] CSSAnimationManager registered for breathing coordination');
+    }
+  }
+
   /**
    * Register an animation system (legacy AnimationConductor compatibility)
    */
@@ -374,12 +432,12 @@ export class EnhancedMasterAnimationCoordinator {
     
     this.animate();
     
-    // Emit start event
-    this.eventBus.publish('animation:loop-started', {
-      timestamp: Date.now(),
-      systems: this.animations.size,
-      callbacks: this.frameCallbacks.size,
-    });
+    // TODO: Add animation events to UnifiedEventBus when needed
+    // this.eventBus.emit('animation:loop-started', {
+    //   timestamp: Date.now(),
+    //   systems: this.animations.size,
+    //   callbacks: this.frameCallbacks.size,
+    // });
     
     if (this.config.enableDebug) {
       console.log('[EnhancedMasterAnimationCoordinator] Master animation loop started');
@@ -399,12 +457,12 @@ export class EnhancedMasterAnimationCoordinator {
       this.animationFrameId = null;
     }
     
-    // Emit stop event
-    this.eventBus.publish('animation:loop-stopped', {
-      timestamp: Date.now(),
-      totalFrames: this.frameCount,
-      duration: performance.now() - this.startTime,
-    });
+    // TODO: Add animation events to UnifiedEventBus when needed
+    // this.eventBus.emit('animation:loop-stopped', {
+    //   timestamp: Date.now(),
+    //   totalFrames: this.frameCount,
+    //   duration: performance.now() - this.startTime,
+    // });
     
     if (this.config.enableDebug) {
       console.log('[EnhancedMasterAnimationCoordinator] Master animation loop stopped');
@@ -454,10 +512,11 @@ export class EnhancedMasterAnimationCoordinator {
       }
     }
     
-    this.eventBus.publish('animation:performance-mode-changed', {
-      mode,
-      timestamp: Date.now(),
-    });
+    // TODO: Add animation events to UnifiedEventBus when needed
+    // this.eventBus.emit('animation:performance-mode-changed', {
+    //   mode,
+    //   timestamp: Date.now(),
+    // });
     
     if (this.config.enableDebug) {
       console.log(`[EnhancedMasterAnimationCoordinator] Performance mode set to: ${mode}`);
@@ -866,24 +925,26 @@ export class EnhancedMasterAnimationCoordinator {
    * Subscribe to performance events
    */
   private subscribeToEvents(): void {
-    // Subscribe to beat events for frame context
-    this.eventBus.subscribe('music:beat', (payload: any) => {
+    // Subscribe to beat events for frame context and breathing coordination
+    this.eventBus.subscribe('music:beat', (payload: { bpm: number; intensity: number; timestamp: number; confidence: number }) => {
       this.frameContext.beatIntensity = payload.intensity || 0;
-    });
+      
+      // Coordinate consciousness breathing with CSSAnimationManager
+      this.coordinateConsciousnessBreathing(payload);
+    }, 'EnhancedMasterAnimationCoordinator');
     
     // Subscribe to performance events
-    this.eventBus.subscribe('performance:throttle-updates', (payload: any) => {
-      // Reduce frame rates for affected systems
-      for (const animation of this.animations.values()) {
-        if (animation.name === payload.subsystem || payload.subsystem === '*') {
+    this.eventBus.subscribe('performance:frame', (payload: { deltaTime: number; fps: number; memoryUsage: number; timestamp: number }) => {
+      // Reduce frame rates for affected systems based on performance
+      if (payload.fps < 45) {
+        for (const animation of this.animations.values()) {
           animation.frameInterval = Math.min(animation.frameInterval * 1.5, 33.33); // Max 30fps
         }
+        this.setPerformanceMode("performance");
+      } else if (payload.fps > 55) {
+        this.setPerformanceMode("quality");
       }
-    });
-    
-    this.eventBus.subscribe('performance:reduce-quality', (payload: any) => {
-      this.setPerformanceMode("performance");
-    });
+    }, 'EnhancedMasterAnimationCoordinator');
   }
   
   // =========================================================================
@@ -917,24 +978,24 @@ export class EnhancedMasterAnimationCoordinator {
    * Register emergent choreography event listeners
    */
   private registerEmergentEventListeners(): void {
-    const beatFrameSub = this.eventBus.subscribe("beat/frame", (payload) =>
-      this.handleBeatFrame(payload)
+    const beatFrameSub = this.eventBus.subscribe("music:beat", (payload: { bpm: number; intensity: number; timestamp: number; confidence: number }) =>
+      this.handleBeatFrame(payload), 'EnhancedMasterAnimationCoordinator'
     );
     const harmonyFrameSub = this.eventBus.subscribe(
-      "colorharmony/frame",
-      (payload) => this.handleHarmonyFrame(payload)
+      "colors:harmonized",
+      (payload: any) => this.handleHarmonyFrame(payload), 'EnhancedMasterAnimationCoordinator'
     );
     const bpmSub = this.eventBus.subscribe(
-      "beat/bpm",
-      (payload: { bpm: number }) => {
-        this.currentBpm = payload.bpm;
-      }
+      "music:energy",
+      (payload: { energy: number; valence: number; tempo: number; timestamp: number }) => {
+        this.currentBpm = payload.tempo;
+      }, 'EnhancedMasterAnimationCoordinator'
     );
     const intensitySub = this.eventBus.subscribe(
-      "beat/intensity",
-      (payload: { intensity: number }) => {
+      "music:beat",
+      (payload: { bpm: number; intensity: number; timestamp: number; confidence: number }) => {
         this.currentIntensity = payload.intensity;
-      }
+      }, 'EnhancedMasterAnimationCoordinator'
     );
 
     this.emergentEventSubscriptions.push(
@@ -952,6 +1013,13 @@ export class EnhancedMasterAnimationCoordinator {
     if (!this.signature) return;
     // TODO: Process beat data and update signature in Phase 3
     this.signature.lastModified = Date.now();
+    
+    // Coordinate consciousness breathing with emergent choreography
+    this.coordinateConsciousnessBreathing({
+      intensity: payload.intensity || this.currentIntensity,
+      energy: payload.energy || this.currentIntensity,
+      bpm: this.currentBpm,
+    });
   }
 
   /**
@@ -1038,10 +1106,11 @@ export class EnhancedMasterAnimationCoordinator {
       visualIntensityBase,
     };
 
-    this.eventBus.publish(
-      "emergent/multipliersUpdated",
-      this.currentMultipliers
-    );
+    // TODO: Add emergent events to UnifiedEventBus when needed
+    // this.eventBus.emit(
+    //   "emergent/multipliersUpdated",
+    //   this.currentMultipliers
+    // );
   }
   
   /**
@@ -1064,7 +1133,8 @@ export class EnhancedMasterAnimationCoordinator {
 
     const visualPulse = this._calculateVisualPulse(deltaMs);
     if (visualPulse) {
-      this.eventBus.publish("visual/pulse", visualPulse);
+      // TODO: Add visual events to UnifiedEventBus when needed
+      // this.eventBus.emit("visual/pulse", visualPulse);
     }
 
     const emergentPayload = {
@@ -1072,7 +1142,8 @@ export class EnhancedMasterAnimationCoordinator {
       deltaMs,
       // ...other emergent data to be calculated in later phases
     };
-    this.eventBus.publish("emergent/frame", emergentPayload);
+    // TODO: Add emergent events to UnifiedEventBus when needed
+    // this.eventBus.emit("emergent/frame", emergentPayload);
   }
   
   /**
@@ -1088,7 +1159,7 @@ export class EnhancedMasterAnimationCoordinator {
       this.saveInterval = null;
     }
 
-    this.emergentEventSubscriptions.forEach((unsubscribe) => unsubscribe());
+    this.emergentEventSubscriptions.forEach((subscriptionId) => this.eventBus.unsubscribe(subscriptionId));
     this.emergentEventSubscriptions = [];
     
     if (this.config.enableDebug) {

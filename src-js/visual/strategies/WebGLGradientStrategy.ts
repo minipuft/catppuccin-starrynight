@@ -10,23 +10,20 @@
  */
 
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
-import {
-  CSSVariableCoordinator,
-  globalCSSVariableCoordinator,
-} from "@/core/css/CSSVariableCoordinator";
-import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
+import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { Y3K } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type {
   ColorContext,
   ColorResult,
   IColorProcessor,
 } from "@/types/colorStrategy";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+import { settings } from "@/config";
 import {
   OKLABColorProcessor,
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
+import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
 import * as Utils from "@/utils/core/Year3000Utilities";
 import {
   createGradientTexture,
@@ -211,7 +208,7 @@ interface WebGLGradientState {
   startTime: number;
   lastFrameTime: number;
   lastUpdateTime: number;
-  
+
   // LERP smoothing properties for framerate-independent uniform transitions
   currentFlowStrength: number;
   targetFlowStrength: number;
@@ -260,12 +257,10 @@ interface WebGLFlowSettings {
 }
 
 export class WebGLGradientStrategy implements IColorProcessor {
-  private settingsManager: SettingsManager;
   private utils = Utils;
   private config = YEAR3000_CONFIG;
   private deviceDetector: DeviceCapabilityDetector;
-  private cssController: UnifiedCSSConsciousnessController | null = null;
-  private cssCoordinator: CSSVariableCoordinator;
+  private cssController: OptimizedCSSVariableManager;
   private oklabProcessor: OKLABColorProcessor;
 
   private webglState: WebGLGradientState = {
@@ -282,7 +277,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
     startTime: 0,
     lastFrameTime: 0,
     lastUpdateTime: 0,
-    
+
     // Initialize LERP smoothing properties (current = target initially)
     currentFlowStrength: 0.3,
     targetFlowStrength: 0.3,
@@ -332,16 +327,14 @@ export class WebGLGradientStrategy implements IColorProcessor {
   private prefersReducedMotion = false;
 
   constructor(
-    settingsManager?: SettingsManager,
-    cssCoordinator?: CSSVariableCoordinator
+    cssController?: OptimizedCSSVariableManager
   ) {
-    this.settingsManager = settingsManager || new SettingsManager();
     this.deviceDetector = new DeviceCapabilityDetector();
-    this.cssCoordinator = cssCoordinator || globalCSSVariableCoordinator;
+    this.cssController = cssController || getGlobalOptimizedCSSController();
     this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
 
     // Get CSS consciousness controller
-    this.cssController = UnifiedCSSConsciousnessController.getInstance();
+    this.cssController = getGlobalOptimizedCSSController();
 
     // Check for reduced motion preference
     this.prefersReducedMotion = window.matchMedia(
@@ -354,13 +347,21 @@ export class WebGLGradientStrategy implements IColorProcessor {
     // Load settings
     this.loadFlowSettings();
 
-    Y3K?.debug?.log(
+    Y3KDebug?.debug?.log(
       "WebGLGradientStrategy",
-      "WebGL gradient strategy initialized with OKLAB processing",
+      "🌊 WebGL gradient strategy initialized - Flow Gradient Recovery Debug",
       {
         webglAvailable: this.webglState.isWebGLAvailable,
         deviceCapability: this.deviceDetector.recommendPerformanceQuality(),
         oklabProcessing: this.flowSettings.oklabProcessingEnabled,
+        flowSettings: {
+          enabled: this.flowSettings.enabled,
+          intensity: this.flowSettings.intensity,
+          flowStrength: this.flowSettings.flowStrength,
+          noiseScale: this.flowSettings.noiseScale,
+        },
+        prefersReducedMotion: this.prefersReducedMotion,
+        webgl2ContextTest: this.checkWebGL2Support(),
       }
     );
   }
@@ -374,14 +375,66 @@ export class WebGLGradientStrategy implements IColorProcessor {
 
   /**
    * Check if strategy can handle the given context
+   * Updated to respect force WebGL settings and remove hard-coded device restrictions
    */
   canProcess(context: ColorContext): boolean {
-    // Only process if WebGL is available, enabled, and device capability is sufficient
-    return (
-      this.webglState.isWebGLAvailable &&
-      this.flowSettings.enabled &&
-      this.deviceDetector.recommendPerformanceQuality() !== "low"
+    // Enhanced logging for WebGL gradient debugging
+    Y3KDebug?.debug?.log(
+      "WebGLGradientStrategy",
+      "🔍 canProcess() - WebGL Gradient Capability Check",
+      {
+        isWebGLAvailable: this.webglState.isWebGLAvailable,
+        flowSettingsEnabled: this.flowSettings.enabled,
+        webglReady: this.webglState.webglReady,
+        contextTrackUri: context.trackUri,
+        contextColorCount: Object.keys(context.rawColors).length,
+      }
     );
+
+    // WebGL support is required
+    if (!this.webglState.isWebGLAvailable) {
+      Y3KDebug?.debug?.warn(
+        "WebGLGradientStrategy",
+        "❌ canProcess: WebGL not available - failed WebGL2 context check"
+      );
+      return false;
+    }
+
+    // Strategy must be enabled
+    if (!this.flowSettings.enabled) {
+      Y3KDebug?.debug?.warn(
+        "WebGLGradientStrategy", 
+        "❌ canProcess: WebGL strategy disabled in settings"
+      );
+      return false;
+    }
+
+    // Check for force WebGL setting - bypass device performance restrictions
+    // WebGL is enabled by default unless disabled in settings
+    const webglEnabled = settings.get("sn-webgl-enabled");
+    
+    if (webglEnabled) {
+      Y3KDebug?.debug?.log(
+        "WebGLGradientStrategy",
+        "canProcess: WebGL force enabled - bypassing device restrictions"
+      );
+      return true;
+    }
+
+    // Normal device capability check (no longer hard-excludes "low" devices)
+    const performanceLevel = this.deviceDetector.recommendPerformanceQuality();
+    
+    // Allow WebGL on medium and high devices, log decision for low devices
+    if (performanceLevel === "low") {
+      Y3KDebug?.debug?.log(
+        "WebGLGradientStrategy",
+        `canProcess: Low performance device detected, allowing based on strategy selection (not force mode)`
+      );
+      // Strategy selector should handle degraded vs full WebGL - don't block here
+      return true;
+    }
+
+    return true;
   }
 
   /**
@@ -427,7 +480,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
           ])
         );
 
-        Y3K?.debug?.log(
+        Y3KDebug?.debug?.log(
           "WebGLGradientStrategy",
           "OKLAB color enhancement applied:",
           {
@@ -464,7 +517,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
       const processingTime = performance.now() - startTime;
 
       const primaryColor =
-        this.selectPrimaryColor(processedColors) || "#cba6f7";
+        this.selectPrimaryColor(processedColors) || paletteSystemManager.getDefaultAccentColor().hex;
 
       const result: ColorResult = {
         processedColors: {
@@ -491,7 +544,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
         context,
       };
 
-      Y3K?.debug?.log(
+      Y3KDebug?.debug?.log(
         "WebGLGradientStrategy",
         "WebGL gradient processing completed",
         {
@@ -505,26 +558,22 @@ export class WebGLGradientStrategy implements IColorProcessor {
     } catch (error) {
       const processingTime = performance.now() - startTime;
 
-      Y3K?.debug?.error(
+      Y3KDebug?.debug?.error(
         "WebGLGradientStrategy",
         "WebGL gradient processing failed:",
         error
       );
 
-      // Fall back to CSS gradient
-      await this.fallbackToCSSGradient();
-
+      // Progressive fallback chain: WebGL → CSS Gradients → Solid Color
+      const fallbackResult = await this.executeProgressiveFallback(context, error);
+      
       return {
-        processedColors: context.rawColors,
-        accentHex: this.selectPrimaryColor(context.rawColors) || "#cba6f7",
-        accentRgb: this.convertToRgbString(
-          this.selectPrimaryColor(context.rawColors) || "#cba6f7"
-        ),
+        ...fallbackResult,
         metadata: {
+          ...fallbackResult.metadata,
           strategy: this.getStrategyName(),
           processingTime,
           error: error instanceof Error ? error.message : "Unknown error",
-          fallbackMode: "css",
         },
         context,
       };
@@ -544,11 +593,9 @@ export class WebGLGradientStrategy implements IColorProcessor {
    * Load flow settings from settings manager
    */
   private loadFlowSettings(): void {
-    if (!this.settingsManager) return;
-
     try {
-      const intensitySetting = this.settingsManager.get(
-        "sn-flow-gradient" as any
+      const intensitySetting = settings.get(
+        "sn-gradient-intensity"
       );
 
       if (intensitySetting === "disabled") {
@@ -586,7 +633,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
           break;
       }
     } catch (error) {
-      Y3K?.debug?.warn(
+      Y3KDebug?.debug?.warn(
         "WebGLGradientStrategy",
         "Failed to load settings, using defaults:",
         error
@@ -628,7 +675,36 @@ export class WebGLGradientStrategy implements IColorProcessor {
 
     this.webglState.webglReady = true;
 
-    Y3K?.debug?.log(
+    // Announce WebGL readiness to CSS consciousness system
+    try {
+      const cssController = getGlobalOptimizedCSSController();
+      cssController.setPerformanceTokens({
+        webglReady: true,
+        activeBackend: "webgl-strategy",
+        qualityLevel: "high",
+        gpuAcceleration: true
+      });
+      
+      Y3KDebug?.debug?.log(
+        "WebGLGradientStrategy",
+        "🎨 WebGL readiness announced to CSS consciousness system - CSS Variables Set",
+        {
+          webglReady: true,
+          activeBackend: "webgl-strategy",
+          qualityLevel: "high", 
+          gpuAcceleration: true,
+          cssControllerReady: !!cssController,
+        }
+      );
+    } catch (error) {
+      Y3KDebug?.debug?.warn(
+        "WebGLGradientStrategy",
+        "❌ Failed to announce WebGL readiness - CSS Variables NOT Set:",
+        error
+      );
+    }
+
+    Y3KDebug?.debug?.log(
       "WebGLGradientStrategy",
       "WebGL gradient system initialized successfully"
     );
@@ -638,6 +714,11 @@ export class WebGLGradientStrategy implements IColorProcessor {
    * Create WebGL canvas and wrapper
    */
   private async createWebGLCanvas(): Promise<void> {
+    Y3KDebug?.debug?.log(
+      "WebGLGradientStrategy",
+      "🎨 Creating WebGL canvas and wrapper elements"
+    );
+
     // Create wrapper div
     this.webglState.wrapper = document.createElement("div");
     this.webglState.wrapper.className = "sn-webgl-gradient-wrapper";
@@ -654,7 +735,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
 
     // Create canvas
     this.webglState.canvas = document.createElement("canvas");
-    this.webglState.canvas.id = "sn-webgl-gradient";
+    this.webglState.canvas.id = "sn-webgl-gradient-strategy";
     this.webglState.canvas.style.cssText = `
       position: absolute;
       top: 0;
@@ -666,6 +747,16 @@ export class WebGLGradientStrategy implements IColorProcessor {
 
     // Wrap canvas
     this.webglState.wrapper.appendChild(this.webglState.canvas);
+
+    Y3KDebug?.debug?.log(
+      "WebGLGradientStrategy",
+      "✅ WebGL canvas and wrapper created successfully",
+      {
+        wrapperId: this.webglState.wrapper.className,
+        canvasId: this.webglState.canvas.id,
+        wrapperStyle: this.webglState.wrapper.style.cssText.replace(/\s+/g, " ").trim(),
+      }
+    );
   }
 
   /**
@@ -927,7 +1018,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
     }
 
     // Apply all gradient stop updates in a coordinated batch
-    await this.cssCoordinator.batchSetVariables(
+    await this.cssController.batchSetVariables(
       "WebGLGradientStrategy",
       gradientStopVariables,
       "normal", // Normal priority for gradient configuration
@@ -947,11 +1038,25 @@ export class WebGLGradientStrategy implements IColorProcessor {
       "--sn-gradient-crossfade-opacity": "0.5", // 50% blend
     };
 
-    await this.cssCoordinator.batchSetVariables(
+    Y3KDebug?.debug?.log(
+      "WebGLGradientStrategy",
+      "🔗 Setting hybrid coordination CSS variables - WebGL Gradient Activation",
+      {
+        variables: hybridCoordinationVariables,
+        cssControllerReady: !!this.cssController,
+      }
+    );
+
+    await this.cssController.batchSetVariables(
       "WebGLGradientStrategy",
       hybridCoordinationVariables,
       "high", // High priority for WebGL coordination
       "hybrid-coordination-enable"
+    );
+
+    Y3KDebug?.debug?.log(
+      "WebGLGradientStrategy",
+      "✅ Hybrid coordination CSS variables set successfully"
     );
   }
 
@@ -992,12 +1097,12 @@ export class WebGLGradientStrategy implements IColorProcessor {
 
   // LERP smoothing half-life values (in seconds) for WebGL uniform transitions
   private lerpHalfLifeValues = {
-    flowStrength: 0.25,    // Fast flow response
-    noiseScale: 0.30,      // Moderate noise transitions
-    blur: 0.20,            // Quick blur transitions
-    wave: 0.35             // Gentle wave movements
+    flowStrength: 0.25, // Fast flow response
+    noiseScale: 0.3, // Moderate noise transitions
+    blur: 0.2, // Quick blur transitions
+    wave: 0.35, // Gentle wave movements
   };
-  
+
   /**
    * Update WebGL uniform values with LERP smoothing for framerate-independent transitions
    */
@@ -1007,10 +1112,19 @@ export class WebGLGradientStrategy implements IColorProcessor {
     this.webglState.targetNoiseScale = this.flowSettings.noiseScale;
     this.webglState.targetBlurExp = this.flowSettings.blurExp;
     this.webglState.targetBlurMax = this.flowSettings.blurMax;
-    this.webglState.targetWaveY = [this.flowSettings.waveY[0], this.flowSettings.waveY[1]];
-    this.webglState.targetWaveHeight = [this.flowSettings.waveHeight[0], this.flowSettings.waveHeight[1]];
-    this.webglState.targetWaveOffset = [this.flowSettings.waveOffset[0], this.flowSettings.waveOffset[1]];
-    
+    this.webglState.targetWaveY = [
+      this.flowSettings.waveY[0],
+      this.flowSettings.waveY[1],
+    ];
+    this.webglState.targetWaveHeight = [
+      this.flowSettings.waveHeight[0],
+      this.flowSettings.waveHeight[1],
+    ];
+    this.webglState.targetWaveOffset = [
+      this.flowSettings.waveOffset[0],
+      this.flowSettings.waveOffset[1],
+    ];
+
     // Apply LERP smoothing to uniform values
     this.webglState.currentFlowStrength = Utils.lerpSmooth(
       this.webglState.currentFlowStrength,
@@ -1018,67 +1132,67 @@ export class WebGLGradientStrategy implements IColorProcessor {
       deltaTimeSeconds,
       this.lerpHalfLifeValues.flowStrength
     );
-    
+
     this.webglState.currentNoiseScale = Utils.lerpSmooth(
       this.webglState.currentNoiseScale,
       this.webglState.targetNoiseScale,
       deltaTimeSeconds,
       this.lerpHalfLifeValues.noiseScale
     );
-    
+
     this.webglState.currentBlurExp = Utils.lerpSmooth(
       this.webglState.currentBlurExp,
       this.webglState.targetBlurExp,
       deltaTimeSeconds,
       this.lerpHalfLifeValues.blur
     );
-    
+
     this.webglState.currentBlurMax = Utils.lerpSmooth(
       this.webglState.currentBlurMax,
       this.webglState.targetBlurMax,
       deltaTimeSeconds,
       this.lerpHalfLifeValues.blur
     );
-    
+
     // Smooth wave arrays (explicit type handling for TypeScript)
     const waveIndex0 = 0 as const;
     const waveIndex1 = 1 as const;
-    
+
     this.webglState.currentWaveY[waveIndex0] = Utils.lerpSmooth(
       this.webglState.currentWaveY[waveIndex0],
       this.webglState.targetWaveY[waveIndex0],
       deltaTimeSeconds,
       this.lerpHalfLifeValues.wave
     );
-    
+
     this.webglState.currentWaveY[waveIndex1] = Utils.lerpSmooth(
       this.webglState.currentWaveY[waveIndex1],
       this.webglState.targetWaveY[waveIndex1],
       deltaTimeSeconds,
       this.lerpHalfLifeValues.wave
     );
-    
+
     this.webglState.currentWaveHeight[waveIndex0] = Utils.lerpSmooth(
       this.webglState.currentWaveHeight[waveIndex0],
       this.webglState.targetWaveHeight[waveIndex0],
       deltaTimeSeconds,
       this.lerpHalfLifeValues.wave
     );
-    
+
     this.webglState.currentWaveHeight[waveIndex1] = Utils.lerpSmooth(
       this.webglState.currentWaveHeight[waveIndex1],
       this.webglState.targetWaveHeight[waveIndex1],
       deltaTimeSeconds,
       this.lerpHalfLifeValues.wave
     );
-    
+
     this.webglState.currentWaveOffset[waveIndex0] = Utils.lerpSmooth(
       this.webglState.currentWaveOffset[waveIndex0],
       this.webglState.targetWaveOffset[waveIndex0],
       deltaTimeSeconds,
       this.lerpHalfLifeValues.wave
     );
-    
+
     this.webglState.currentWaveOffset[waveIndex1] = Utils.lerpSmooth(
       this.webglState.currentWaveOffset[waveIndex1],
       this.webglState.targetWaveOffset[waveIndex1],
@@ -1086,7 +1200,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
       this.lerpHalfLifeValues.wave
     );
   }
-  
+
   /**
    * Render WebGL frame
    */
@@ -1099,9 +1213,10 @@ export class WebGLGradientStrategy implements IColorProcessor {
     ) {
       return;
     }
-    
+
     // Update uniform values with LERP smoothing
-    const deltaTimeSeconds = (currentTime - this.webglState.lastFrameTime) / 1000;
+    const deltaTimeSeconds =
+      (currentTime - this.webglState.lastFrameTime) / 1000;
     this.updateUniformsWithLERP(deltaTimeSeconds);
 
     // Clear canvas
@@ -1140,49 +1255,49 @@ export class WebGLGradientStrategy implements IColorProcessor {
     if (this.uniforms.u_flowStrength) {
       this.webglState.gl.uniform1f(
         this.uniforms.u_flowStrength,
-        this.webglState.currentFlowStrength  // Use smoothed value
+        this.webglState.currentFlowStrength // Use smoothed value
       );
     }
 
     if (this.uniforms.u_noiseScale) {
       this.webglState.gl.uniform1f(
         this.uniforms.u_noiseScale,
-        this.webglState.currentNoiseScale  // Use smoothed value
+        this.webglState.currentNoiseScale // Use smoothed value
       );
     }
 
     if (this.uniforms.u_waveY) {
       this.webglState.gl.uniform1fv(
         this.uniforms.u_waveY,
-        this.webglState.currentWaveY  // Use smoothed values
+        this.webglState.currentWaveY // Use smoothed values
       );
     }
 
     if (this.uniforms.u_waveHeight) {
       this.webglState.gl.uniform1fv(
         this.uniforms.u_waveHeight,
-        this.webglState.currentWaveHeight  // Use smoothed values
+        this.webglState.currentWaveHeight // Use smoothed values
       );
     }
 
     if (this.uniforms.u_waveOffset) {
       this.webglState.gl.uniform1fv(
         this.uniforms.u_waveOffset,
-        this.webglState.currentWaveOffset  // Use smoothed values
+        this.webglState.currentWaveOffset // Use smoothed values
       );
     }
 
     if (this.uniforms.u_blurExp) {
       this.webglState.gl.uniform1f(
         this.uniforms.u_blurExp,
-        this.webglState.currentBlurExp  // Use smoothed value
+        this.webglState.currentBlurExp // Use smoothed value
       );
     }
 
     if (this.uniforms.u_blurMax) {
       this.webglState.gl.uniform1f(
         this.uniforms.u_blurMax,
-        this.webglState.currentBlurMax  // Use smoothed value
+        this.webglState.currentBlurMax // Use smoothed value
       );
     }
 
@@ -1214,7 +1329,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
     const adjustedStrength = baseStrength * energyMultiplier;
 
     // Update CSS variable for real-time flow coordination using coordinated update
-    await this.cssCoordinator.setVariable(
+    await this.cssController.setVariable(
       "WebGLGradientStrategy",
       "--sn-flow-strength",
       adjustedStrength.toString(),
@@ -1243,7 +1358,18 @@ export class WebGLGradientStrategy implements IColorProcessor {
    * Attach WebGL canvas to DOM
    */
   private attachWebGLToDom(): void {
-    if (!this.webglState.wrapper) return;
+    if (!this.webglState.wrapper) {
+      Y3KDebug?.debug?.error(
+        "WebGLGradientStrategy",
+        "❌ Cannot attach to DOM - wrapper element not created"
+      );
+      return;
+    }
+
+    Y3KDebug?.debug?.log(
+      "WebGLGradientStrategy",
+      "🔗 Attaching WebGL canvas to DOM - Searching for container"
+    );
 
     // Find target container
     const containers = [
@@ -1255,8 +1381,11 @@ export class WebGLGradientStrategy implements IColorProcessor {
     ];
 
     let targetContainer: HTMLElement | null = null;
+    const containerResults: {selector: string, found: boolean}[] = [];
+    
     for (const selector of containers) {
       targetContainer = document.querySelector(selector) as HTMLElement;
+      containerResults.push({selector, found: !!targetContainer});
       if (targetContainer) break;
     }
 
@@ -1265,10 +1394,126 @@ export class WebGLGradientStrategy implements IColorProcessor {
     }
 
     targetContainer.appendChild(this.webglState.wrapper);
+
+    Y3KDebug?.debug?.log(
+      "WebGLGradientStrategy",
+      "✅ WebGL canvas attached to DOM successfully",
+      {
+        containerSearch: containerResults,
+        selectedContainer: targetContainer?.tagName || "unknown",
+        containerClass: targetContainer?.className || "none",
+        wrapperId: this.webglState.wrapper.className,
+        canvasId: this.webglState.canvas?.id || "not-created",
+      }
+    );
   }
 
   /**
-   * Fallback to CSS gradient
+   * Execute progressive fallback chain: WebGL → CSS Gradients → Solid Color
+   */
+  private async executeProgressiveFallback(context: ColorContext, originalError: any): Promise<ColorResult> {
+    const primaryColor = this.selectPrimaryColor(context.rawColors) || paletteSystemManager.getDefaultAccentColor().hex;
+    
+    try {
+      // Level 1: Try CSS Gradients fallback
+      Y3KDebug?.debug?.warn(
+        "WebGLGradientStrategy", 
+        "Attempting CSS gradient fallback"
+      );
+      
+      await this.fallbackToCSSGradient();
+      
+      return {
+        processedColors: {
+          ...context.rawColors,
+          fallbackMethod: "css-gradient",
+        },
+        accentHex: primaryColor,
+        accentRgb: this.convertToRgbString(primaryColor),
+        metadata: {
+          strategy: this.getStrategyName(),
+          processingTime: 0, // Will be updated in processColors
+          fallbackMode: "css-gradient",
+          fallbackReason: "webgl-failed",
+          gradientStops: Object.keys(context.rawColors).length,
+        },
+        context,
+      };
+    } catch (cssError) {
+      Y3KDebug?.debug?.error(
+        "WebGLGradientStrategy",
+        "CSS gradient fallback failed, using solid color:",
+        cssError
+      );
+      
+      // Level 2: Fall back to solid color
+      return await this.fallbackToSolidColor(context, primaryColor, originalError, cssError);
+    }
+  }
+
+  /**
+   * Final fallback to solid color when all gradient methods fail
+   */
+  private async fallbackToSolidColor(
+    context: ColorContext, 
+    primaryColor: string, 
+    webglError: any, 
+    cssError: any
+  ): Promise<ColorResult> {
+    try {
+      // Apply solid color using CSS consciousness controller
+      await this.cssController?.queueUpdate(
+        "--sn-accent-color",
+        primaryColor,
+        "critical",
+        "solid-color-fallback"
+      );
+      
+      return {
+        processedColors: {
+          accentColor: primaryColor,
+          fallbackMethod: "solid-color",
+          originalColors: JSON.stringify(context.rawColors),
+        },
+        accentHex: primaryColor,
+        accentRgb: this.convertToRgbString(primaryColor),
+        metadata: {
+          strategy: this.getStrategyName(),
+          processingTime: 0, // Will be updated in processColors
+          fallbackMode: "solid-color",
+          fallbackReason: "all-gradients-failed",
+          webglError: webglError instanceof Error ? webglError.message : "Unknown WebGL error",
+          cssError: cssError instanceof Error ? cssError.message : "Unknown CSS error",
+          emergencyMode: true,
+        },
+        context,
+      };
+    } catch (solidColorError) {
+      // Absolute emergency fallback - return basic result
+      Y3KDebug?.debug?.error(
+        "WebGLGradientStrategy",
+        "All fallback methods failed, using emergency mode:",
+        solidColorError
+      );
+      
+      return {
+        processedColors: { emergencyMode: "true" },
+        accentHex: "#ff6b9d", // Catppuccin pink fallback
+        accentRgb: "rgb(255, 107, 157)",
+        metadata: {
+          strategy: this.getStrategyName(),
+          processingTime: 0, // Will be updated in processColors
+          fallbackMode: "emergency",
+          fallbackReason: "complete-system-failure",
+          criticalError: true,
+        },
+        context,
+      };
+    }
+  }
+
+  /**
+   * Fallback to CSS gradient rendering when WebGL fails
    */
   private async fallbackToCSSGradient(): Promise<void> {
     // Switch to pure CSS mode using coordinated batch update
@@ -1279,7 +1524,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
       "--sn-gradient-crossfade-opacity": "0",
     };
 
-    await this.cssCoordinator.batchSetVariables(
+    await this.cssController.batchSetVariables(
       "WebGLGradientStrategy",
       cssGradientFallbackVariables,
       "critical", // Critical priority for fallback scenarios
@@ -1291,7 +1536,10 @@ export class WebGLGradientStrategy implements IColorProcessor {
       this.startCSSFallbackAnimation();
     }
 
-    Y3K?.debug?.log("WebGLGradientStrategy", "Using CSS gradient fallback");
+    Y3KDebug?.debug?.log(
+      "WebGLGradientStrategy",
+      "Using CSS gradient fallback"
+    );
   }
 
   /**
@@ -1368,7 +1616,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
       this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
     }
 
-    Y3K?.debug?.log("WebGLGradientStrategy", "Configuration updated:", {
+    Y3KDebug?.debug?.log("WebGLGradientStrategy", "Configuration updated:", {
       ...newConfig,
       oklabProcessing: this.flowSettings.oklabProcessingEnabled,
       oklabPreset: this.flowSettings.oklabPreset,
@@ -1468,7 +1716,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
       "--sn-gradient-crossfade-opacity": "0",
     };
 
-    this.cssCoordinator
+    this.cssController
       .batchSetVariables(
         "WebGLGradientStrategy",
         resetVariables,
@@ -1476,14 +1724,14 @@ export class WebGLGradientStrategy implements IColorProcessor {
         "strategy-destroy-cleanup"
       )
       .catch((error) => {
-        Y3K?.debug?.error(
+        Y3KDebug?.debug?.error(
           "WebGLGradientStrategy",
           "Error during destroy cleanup:",
           error
         );
       });
 
-    Y3K?.debug?.log(
+    Y3KDebug?.debug?.log(
       "WebGLGradientStrategy",
       "WebGL gradient strategy destroyed"
     );

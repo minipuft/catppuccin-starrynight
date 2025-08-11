@@ -5,8 +5,8 @@
  * automatic performance optimizations when budgets are exceeded.
  */
 
-import { PerformanceAnalyzer } from './PerformanceAnalyzer';
-import { UnifiedCSSConsciousnessController } from '@/core/css/UnifiedCSSConsciousnessController';
+import { SimplePerformanceCoordinator } from './SimplePerformanceCoordinator';
+import { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
 
 export interface PerformanceBudgetConfig {
   // System-wide budgets (in milliseconds)
@@ -33,8 +33,8 @@ export class PerformanceBudgetManager {
   private static instance: PerformanceBudgetManager | null = null;
   
   private config: PerformanceBudgetConfig;
-  private performanceAnalyzer: PerformanceAnalyzer;
-  private cssConsciousnessController: UnifiedCSSConsciousnessController | null = null;
+  private performanceAnalyzer: SimplePerformanceCoordinator;
+  private cssVariableManager: UnifiedCSSVariableManager | null = null;
   
   // Optimization state
   private optimizationLevel: 'none' | 'conservative' | 'aggressive' = 'none';
@@ -42,7 +42,7 @@ export class PerformanceBudgetManager {
   
   constructor(
     config: Partial<PerformanceBudgetConfig> = {},
-    performanceAnalyzer: PerformanceAnalyzer
+    performanceAnalyzer: SimplePerformanceCoordinator
   ) {
     this.config = {
       budgets: {
@@ -70,7 +70,7 @@ export class PerformanceBudgetManager {
   
   public static getInstance(
     config?: Partial<PerformanceBudgetConfig>,
-    performanceAnalyzer?: PerformanceAnalyzer
+    performanceAnalyzer?: SimplePerformanceCoordinator
   ): PerformanceBudgetManager {
     if (!PerformanceBudgetManager.instance && performanceAnalyzer) {
       PerformanceBudgetManager.instance = new PerformanceBudgetManager(
@@ -84,8 +84,8 @@ export class PerformanceBudgetManager {
   /**
    * Register CSS Variable Batcher for optimization
    */
-  public registerUnifiedCSSConsciousnessController(batcher: UnifiedCSSConsciousnessController): void {
-    this.cssConsciousnessController = batcher;
+  public registerUnifiedCSSVariableManager(batcher: UnifiedCSSVariableManager): void {
+    this.cssVariableManager = batcher;
   }
   
   /**
@@ -102,26 +102,14 @@ export class PerformanceBudgetManager {
   
   /**
    * Check budget violations and trigger optimizations
+   * Note: Tier-based system doesn't generate budget violations, 
+   * so this primarily monitors health score
    */
   private checkBudgets(): void {
-    const violations = this.performanceAnalyzer.getBudgetViolations();
     const healthScore = this.performanceAnalyzer.calculateHealthScore();
     
-    let totalViolations = 0;
-    for (const [operation, count] of violations) {
-      totalViolations += count;
-      
-      if (count >= this.config.autoOptimize.violationThreshold) {
-        this.optimizeOperation(operation);
-      }
-    }
-    
-    // Check if we need to escalate optimization level
-    if (totalViolations >= this.config.autoOptimize.violationThreshold * 2) {
-      this.escalateOptimization();
-    }
-    
-    // Check if we can recover from optimizations
+    // No budget violations in tier-based system, but monitor health
+    // Check if we can recover from optimizations based on health score
     if (healthScore >= this.config.autoOptimize.recoveryThreshold) {
       this.recoverOptimizations();
     }
@@ -159,10 +147,10 @@ export class PerformanceBudgetManager {
    * Optimize CSS variable updates
    */
   private optimizeCSSVariableUpdates(): void {
-    if (!this.cssConsciousnessController) return;
+    if (!this.cssVariableManager) return;
     
     // Increase batch interval to reduce update frequency
-    this.cssConsciousnessController.updateConfig({
+    this.cssVariableManager.updateConfig({
       batchIntervalMs: 32, // Reduce to 30 FPS
       maxBatchSize: 25,    // Smaller batches
     });
@@ -223,8 +211,8 @@ export class PerformanceBudgetManager {
     this.disabledFeatures.clear();
     
     // Reset CSS variable batcher to normal settings
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.updateConfig({
+    if (this.cssVariableManager) {
+      this.cssVariableManager.updateConfig({
         batchIntervalMs: 16,
         maxBatchSize: 50,
       });
@@ -248,13 +236,13 @@ export class PerformanceBudgetManager {
   public getOptimizationStatus(): {
     level: string;
     disabledFeatures: string[];
-    budgetViolations: Map<string, number>;
+    budgetViolations: string[];
     healthScore: number;
   } {
     return {
       level: this.optimizationLevel,
       disabledFeatures: Array.from(this.disabledFeatures),
-      budgetViolations: this.performanceAnalyzer.getBudgetViolations(),
+      budgetViolations: [], // Tier-based system doesn't generate budget violations
       healthScore: this.performanceAnalyzer.calculateHealthScore(),
     };
   }
@@ -290,7 +278,7 @@ export class PerformanceBudgetManager {
    */
   public destroy(): void {
     this.disabledFeatures.clear();
-    this.cssConsciousnessController = null;
+    this.cssVariableManager = null;
     PerformanceBudgetManager.instance = null;
   }
 }

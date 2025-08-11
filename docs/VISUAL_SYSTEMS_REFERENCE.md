@@ -21,7 +21,7 @@ VisualSystemFacade (Factory & Coordinator)
 ├── Background Systems (Progressive Enhancement)
 │   ├── ParticleConsciousnessModule (unified particle system)
 │   ├── WebGLGradientBackgroundSystem (primary WebGL backend)
-│   ├── CSSGradientBackgroundSystem (universal fallback)
+│   ├── CSSBlobFallbackSystem (organic CSS fallback with blobs)
 │   ├── FlowingLiquidConsciousnessSystem (organic animations)
 │   └── DepthLayeredGradientSystem (multi-depth effects)
 ├── Color Processing (Strategy Pattern)
@@ -343,16 +343,19 @@ interface QualityLevels {
 }
 ```
 
-### CSSGradientBackgroundSystem (Universal Fallback)
+### CSSBlobFallbackSystem (Organic CSS Fallback)
 
-**Purpose**: Pure CSS gradient system providing universal compatibility
+**Purpose**: Beautiful organic blob animations using pure CSS when WebGL is unavailable
 
-**Location**: `src-js/visual/backgrounds/CSSGradientBackgroundSystem.ts`
+**Location**: `src-js/visual/css-fallbacks/CSSBlobFallbackSystem.ts`
 
-#### Fallback Features
-- **Universal Compatibility**: Works on all devices and browsers
-- **Ultra-lightweight**: <5MB memory usage, 2% CPU budget
-- **CSS Animation**: Fallback animations using CSS transforms and opacity
+#### Organic Fallback Features
+- **Auto-Detection**: Automatically activates when WebGL is unavailable
+- **Organic Blobs**: 6 individual blob elements with unique animations and positioning
+- **Music Responsive**: Beat detection, energy changes, and genre-aware styling
+- **OKLAB Integration**: Perceptually uniform color processing
+- **Performance Aware**: Adapts quality based on device capabilities
+- **Year 3000 Vision**: Maintains organic consciousness experience without WebGL
 - **Strategy Integration**: Receives processed colors from strategy pattern
 - **Reduced Motion Support**: Full `prefers-reduced-motion` compliance
 

@@ -13,7 +13,7 @@ The Catppuccin StarryNight theme implements a sophisticated **multi-layered back
 ```
 Progressive Enhancement Stack (Bottom to Top)
 ├── CSS Foundation Layer (Universal Compatibility)
-│   ├── CSSGradientBackgroundSystem (always available)
+│   ├── CSSBlobFallbackSystem (organic blobs, auto-activates when needed)
 │   ├── Static Catppuccin gradients (browser fallback)
 │   └── CSS animations (reduced-motion aware)
 ├── WebGL Enhancement Layer (High Performance)
@@ -43,48 +43,60 @@ Device Capability Detection → System Selection → Quality Scaling
 
 ## Core Background Systems
 
-### 1. CSSGradientBackgroundSystem (Universal Foundation)
+### 1. CSSBlobFallbackSystem (Organic CSS Fallback)
 
-**Purpose**: Provides universal background rendering with zero dependencies
+**Purpose**: Beautiful organic blob animations using pure CSS when WebGL is unavailable
 
-**Location**: `src-js/visual/backgrounds/CSSGradientBackgroundSystem.ts`
+**Location**: `src-js/visual/css-fallbacks/CSSBlobFallbackSystem.ts`
 
 #### Architecture Features
-- **Zero Dependencies**: Pure CSS implementation, always available
-- **Ultra-Lightweight**: <5MB memory, <2% CPU usage
-- **Accessibility First**: Full `prefers-reduced-motion` support
-- **Fallback Animations**: CSS-based breathing and flow effects
-- **Strategy Integration**: Receives colors from strategy pattern
+- **Auto-Detection**: Automatically activates when WebGL is unavailable
+- **Organic Blobs**: 6 individual blob elements with unique animations and positioning
+- **Music Responsive**: Beat detection, energy changes, and genre-aware styling
+- **OKLAB Integration**: Perceptually uniform color processing
+- **Performance Aware**: Adapts quality based on device capabilities
+- **Year 3000 Vision**: Maintains organic consciousness experience without WebGL
 
-#### CSS Variable Integration
+#### CSS Blob Animation Architecture
 ```scss
-.sn-css-gradient-background {
-  background: linear-gradient(
-    135deg,
-    rgb(var(--sn-gradient-stop-0-rgb)) 0%,
-    rgb(var(--sn-gradient-stop-1-rgb)) 25%,
-    rgb(var(--sn-gradient-stop-2-rgb)) 50%,
-    rgb(var(--sn-gradient-stop-3-rgb)) 75%,
-    rgb(var(--sn-gradient-stop-4-rgb)) 100%
-  );
+.sn-css-blob-container {
+  // Container for 6 organic blob elements
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
   
-  // Breathing animation fallback
-  animation: sn-gradient-breath 4s ease-in-out infinite;
-  
-  // Flow animation fallback  
-  transform: 
-    translateX(var(--sn-gradient-flow-x, 0%))
-    translateY(var(--sn-gradient-flow-y, 0%))
-    scale(var(--sn-gradient-flow-scale, 1));
+  .sn-css-blob {
+    // Individual blob styling with organic animations
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+      rgb(var(--sn-gradient-stop-0-rgb)) 0%,
+      transparent 70%
+    );
+    
+    // Beat response animation
+    &.sn-beat-active {
+      animation: blob-beat-pulse 500ms ease-out;
+    }
+    
+    // Genre-specific styling
+    &.genre-electronic { /* Fast, sharp movements */ }
+    &.genre-ambient { /* Slow, flowing movements */ }
+    &.genre-classical { /* Elegant, structured movements */ }
+  }
 }
 ```
 
 #### Performance Characteristics
-- **Memory Usage**: 2-5MB (textures and buffers)
-- **CPU Usage**: 1-3% (animation calculations)
-- **GPU Usage**: 0% (pure CSS rendering)
-- **Frame Rate**: Synchronized to browser's rendering engine
-- **Compatibility**: 100% across all browsers and devices
+- **Memory Usage**: 1-3MB (DOM elements and CSS animations)
+- **CPU Usage**: 1-5% (CSS animation calculations and event handling)
+- **GPU Usage**: 0-15% (CSS transforms and filters, GPU compositing)
+- **Frame Rate**: 30-60fps (browser-optimized CSS animations)
+- **Compatibility**: 95%+ across modern browsers with graceful degradation
 
 ### 2. WebGLGradientBackgroundSystem (High-Performance Primary)
 
@@ -369,7 +381,7 @@ When `YEAR3000_CONFIG.enableDebug = true`, background systems expose comprehensi
 ```typescript
 // Global debug object access
 Y3K.backgroundSystems = {
-  css: CSSGradientBackgroundSystem,
+  css: CSSBlobFallbackSystem,
   webgl: WebGLGradientBackgroundSystem,
   particles: ParticleConsciousnessModule,
   consciousness: BackgroundConsciousnessChoreographer

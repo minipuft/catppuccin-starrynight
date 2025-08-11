@@ -7,35 +7,32 @@
  *
  * Architecture:
  * - Strategy Pattern: Multiple color processing algorithms
- * - Observer Pattern: Event-driven coordination via GlobalEventBus
+ * - Observer Pattern: Event-driven coordination via UnifiedEventBus
  * - Adapter Pattern: Clean interface between systems
  * - Mediator Pattern: Coordinates strategy selection and execution
  */
 
-import { GlobalEventBus } from "@/core/events/EventBus";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { Y3K } from "@/debug/UnifiedDebugManager";
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
-import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
-import { BackgroundStrategySelector } from "@/visual/strategies/BackgroundStrategySelector";
-import { 
-  OKLABColorProcessor, 
-  type EnhancementPreset, 
-  type OKLABProcessingResult 
-} from "@/utils/color/OKLABColorProcessor";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
+import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type {
-  IColorOrchestrator,
-  IColorStrategyRegistry,
-  IColorProcessor,
   ColorContext,
   ColorResult,
+  IColorOrchestrator,
+  IColorProcessor,
+  IColorStrategyRegistry,
   StrategySelectionCriteria,
-  ColorExtractedEvent,
-  ColorHarmonizedEvent,
 } from "@/types/colorStrategy";
+import { SettingsManager } from "@/ui/managers/SettingsManager";
+import {
+  OKLABColorProcessor,
+  type EnhancementPreset,
+  type OKLABProcessingResult,
+} from "@/utils/color/OKLABColorProcessor";
+import * as Utils from "@/utils/core/Year3000Utilities";
+import { BackgroundStrategySelector } from "@/visual/strategies/BackgroundStrategySelector";
 
 // ============================================================================
 // Enhanced Strategy Processing Interfaces
@@ -64,7 +61,7 @@ interface OrchestrationMetrics {
 
 interface ColorResultMergeOptions {
   priorityWeighting: boolean;
-  conflictResolution: 'override' | 'merge' | 'average';
+  conflictResolution: "override" | "merge" | "average";
   preserveMetadata: boolean;
   consciousnessBlending: boolean;
   oklabCoordination: boolean;
@@ -93,7 +90,10 @@ export class ColorStrategyRegistry implements IColorStrategyRegistry {
       this.defaultStrategy = strategy;
     }
 
-    Y3K?.debug?.log("ColorStrategyRegistry", `Registered strategy: ${name}`);
+    Y3KDebug?.debug?.log(
+      "ColorStrategyRegistry",
+      `Registered strategy: ${name}`
+    );
   }
 
   /**
@@ -188,7 +188,7 @@ export class ColorStrategyRegistry implements IColorStrategyRegistry {
 
 /**
  * Enhanced Color Orchestrator with Multi-Strategy Coordination
- * 
+ *
  * Orchestrates multiple background color processing strategies with intelligent
  * selection logic, OKLAB coordination, and performance optimization.
  */
@@ -202,10 +202,10 @@ export class ColorOrchestrator implements IColorOrchestrator {
 
   // Enhanced multi-strategy coordination
   private strategySelector: BackgroundStrategySelector;
-  private performanceAnalyzer: PerformanceAnalyzer;
+  private performanceAnalyzer: SimplePerformanceCoordinator | null;
   private deviceDetector: DeviceCapabilityDetector;
   private settingsManager: SettingsManager;
-  
+
   // OKLAB coordination system
   private oklabProcessor: OKLABColorProcessor;
   private oklabCoordinationEnabled: boolean = true;
@@ -230,7 +230,7 @@ export class ColorOrchestrator implements IColorOrchestrator {
     averageStrategyTime: 0,
     memoryUsage: 0,
     oklabCoordinations: 0,
-    oklabProcessingTime: 0
+    oklabProcessingTime: 0,
   };
 
   // Legacy performance tracking (maintained for compatibility)
@@ -240,12 +240,17 @@ export class ColorOrchestrator implements IColorOrchestrator {
 
   constructor() {
     this.registry = new ColorStrategyRegistry();
-    
+
     // Initialize enhanced components
     this.settingsManager = new SettingsManager();
-    this.performanceAnalyzer = new PerformanceAnalyzer(YEAR3000_CONFIG);
+    
+    // Try to get shared PerformanceAnalyzer from global system first
+    const globalSystem = (globalThis as any).year3000System;
+    this.performanceAnalyzer = globalSystem?.performanceAnalyzer || 
+                               globalSystem?.facadeCoordinator?.getCachedNonVisualSystem?.('SimplePerformanceCoordinator') ||
+                               null;
     this.deviceDetector = new DeviceCapabilityDetector();
-    this.strategySelector = new BackgroundStrategySelector(this.settingsManager);
+    this.strategySelector = new BackgroundStrategySelector();
     this.oklabProcessor = new OKLABColorProcessor(YEAR3000_CONFIG.enableDebug);
 
     // Enhanced default selection criteria with device awareness
@@ -267,7 +272,10 @@ export class ColorOrchestrator implements IColorOrchestrator {
     // Update device capabilities
     this.updateDeviceCapabilities();
 
-    Y3K?.debug?.log("ColorOrchestrator", "Enhanced color orchestrator created with multi-strategy coordination");
+    Y3KDebug?.debug?.log(
+      "ColorOrchestrator",
+      "Enhanced color orchestrator created with multi-strategy coordination"
+    );
   }
 
   /**
@@ -275,7 +283,7 @@ export class ColorOrchestrator implements IColorOrchestrator {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) {
-      Y3K?.debug?.warn("ColorOrchestrator", "Already initialized");
+      Y3KDebug?.debug?.warn("ColorOrchestrator", "Already initialized");
       return;
     }
 
@@ -290,26 +298,34 @@ export class ColorOrchestrator implements IColorOrchestrator {
 
       // Initialize enhanced device capabilities
       this.updateDeviceCapabilities();
-      
+
       // Load user preferences
       this.loadUserPreferences();
-      
-      // Start performance monitoring
-      this.performanceAnalyzer.startMonitoring();
+
+      // Performance monitoring is automatic in SimpleTierBasedPerformanceSystem
+      // (no explicit start needed)
 
       // Register default strategies (ColorHarmonyEngine will register itself)
       await this.registerDefaultStrategies();
 
       this.isInitialized = true;
 
-      Y3K?.debug?.log("ColorOrchestrator", "Enhanced color orchestrator initialized", {
-        strategies: this.registry.getStatus().strategyCount,
-        criteria: this.selectionCriteria,
-        oklabEnabled: this.oklabCoordinationEnabled,
-        deviceLevel: this.deviceDetector.recommendPerformanceQuality(),
-      });
+      Y3KDebug?.debug?.log(
+        "ColorOrchestrator",
+        "Enhanced color orchestrator initialized",
+        {
+          strategies: this.registry.getStatus().strategyCount,
+          criteria: this.selectionCriteria,
+          oklabEnabled: this.oklabCoordinationEnabled,
+          deviceLevel: this.deviceDetector.recommendPerformanceQuality(),
+        }
+      );
     } catch (error) {
-      Y3K?.debug?.error("ColorOrchestrator", "Enhanced initialization failed:", error);
+      Y3KDebug?.debug?.error(
+        "ColorOrchestrator",
+        "Enhanced initialization failed:",
+        error
+      );
       throw error;
     }
   }
@@ -332,10 +348,23 @@ export class ColorOrchestrator implements IColorOrchestrator {
     const now = Date.now();
     const contextKey = context.trackUri || "unknown";
 
+    Y3KDebug?.debug?.log(
+      "ColorOrchestrator",
+      "🎵 Color Extraction Event Received - WebGL Gradient Entry Point",
+      {
+        trackUri: contextKey,
+        rawColors: context.rawColors,
+        colorCount: Object.keys(context.rawColors).length,
+        isProcessing: this.isProcessing,
+        queueLength: this.processingQueue.length,
+        entryPoint: "handleColorExtraction",
+      }
+    );
+
     // Phase 4: Prevent recursive processing of the same context
     const lastProcessed = this.processedContexts.get(contextKey);
     if (lastProcessed && now - lastProcessed < this.CONTEXT_CACHE_TTL) {
-      Y3K?.debug?.warn(
+      Y3KDebug?.debug?.warn(
         "ColorOrchestrator",
         `Skipping recent context to prevent recursion: ${contextKey}`,
         {
@@ -349,17 +378,19 @@ export class ColorOrchestrator implements IColorOrchestrator {
     // Check cache first for improved performance
     const cacheKey = this.generateCacheKey(context);
     const cachedResult = this.getCachedResult(cacheKey);
-    
+
     if (cachedResult) {
       this.orchestrationMetrics.cacheHits++;
       await this.applyColorResult(cachedResult);
-      Y3K?.debug?.log("ColorOrchestrator", "Using cached color result", { cacheKey });
+      Y3KDebug?.debug?.log("ColorOrchestrator", "Using cached color result", {
+        cacheKey,
+      });
       return;
     }
 
     // Phase 4: Prevent queue overflow
     if (this.processingQueue.length >= this.MAX_QUEUE_SIZE) {
-      Y3K?.debug?.warn(
+      Y3KDebug?.debug?.warn(
         "ColorOrchestrator",
         `Queue overflow protection: dropping context ${contextKey}`,
         {
@@ -397,7 +428,11 @@ export class ColorOrchestrator implements IColorOrchestrator {
         await this.processColorContext(context);
       }
     } catch (error) {
-      Y3K?.debug?.error("ColorOrchestrator", "Queue processing failed:", error);
+      Y3KDebug?.debug?.error(
+        "ColorOrchestrator",
+        "Queue processing failed:",
+        error
+      );
     } finally {
       this.isProcessing = false;
       this.currentStrategy = null;
@@ -424,10 +459,22 @@ export class ColorOrchestrator implements IColorOrchestrator {
     const startTime = performance.now();
     const contextKey = context.trackUri || "unknown";
 
+    Y3KDebug?.debug?.log(
+      "ColorOrchestrator",
+      "🎨 Processing Color Context - WebGL Gradient Recovery Debug",
+      {
+        trackUri: contextKey,
+        rawColors: context.rawColors,
+        colorCount: Object.keys(context.rawColors).length,
+        musicData: context.musicData,
+        timestamp: new Date().toISOString(),
+      }
+    );
+
     try {
-      // Select multiple strategies using BackgroundStrategySelector
+      // Select multiple strategies using BackgroundStrategySelector  
       const selectedStrategies = this.strategySelector.selectStrategies(
-        context, 
+        context,
         this.buildStrategySelectionCriteria(context)
       );
 
@@ -437,25 +484,33 @@ export class ColorOrchestrator implements IColorOrchestrator {
         if (fallbackStrategy) {
           selectedStrategies.push(fallbackStrategy);
         } else {
-          throw new Error('No suitable strategies selected for color processing');
+          throw new Error(
+            "No suitable strategies selected for color processing"
+          );
         }
       }
 
       // Process with multiple strategies
-      const strategyResults = await this.processWithStrategies(context, selectedStrategies);
-      
+      const strategyResults = await this.processWithStrategies(
+        context,
+        selectedStrategies
+      );
+
       // Apply OKLAB coordination if enabled and multiple strategies succeeded
-      if (this.oklabCoordinationEnabled && strategyResults.filter(r => r.success).length > 1) {
+      if (
+        this.oklabCoordinationEnabled &&
+        strategyResults.filter((r) => r.success).length > 1
+      ) {
         await this.coordinateOKLABProcessing(strategyResults, context);
       }
-      
+
       // Merge strategy results intelligently
       const finalResult = this.mergeStrategyResults(strategyResults, context);
-      
+
       // Cache the result for performance
       const cacheKey = this.generateCacheKey(context);
       this.cacheResult(cacheKey, finalResult);
-      
+
       // Apply the final result
       await this.applyColorResult(finalResult);
 
@@ -465,30 +520,37 @@ export class ColorOrchestrator implements IColorOrchestrator {
       // Update enhanced metrics
       const totalTime = performance.now() - startTime;
       this.updateOrchestrationMetrics(strategyResults, totalTime);
-      
+
       // Update legacy metrics for compatibility
       this.lastProcessingTime = totalTime;
       this.totalProcessingTime += totalTime;
       this.processedCount++;
 
-      Y3K?.debug?.log("ColorOrchestrator", "Enhanced color processing completed", {
-        strategies: selectedStrategies.map(s => s.getStrategyName()),
-        processingTime: totalTime,
-        trackUri: context.trackUri,
-        oklabCoordination: this.oklabCoordinationEnabled,
-        successfulStrategies: strategyResults.filter(r => r.success).length,
-      });
-      
+      Y3KDebug?.debug?.log(
+        "ColorOrchestrator",
+        "Enhanced color processing completed",
+        {
+          strategies: selectedStrategies.map((s) => s.getStrategyName()),
+          processingTime: totalTime,
+          trackUri: context.trackUri,
+          oklabCoordination: this.oklabCoordinationEnabled,
+          successfulStrategies: strategyResults.filter((r) => r.success).length,
+        }
+      );
     } catch (error) {
       const endTime = performance.now();
       this.lastProcessingTime = endTime - startTime;
 
-      Y3K?.debug?.error("ColorOrchestrator", "Enhanced color processing failed:", {
-        error: error,
-        strategy: this.currentStrategy,
-        trackUri: context.trackUri,
-      });
-      
+      Y3KDebug?.debug?.error(
+        "ColorOrchestrator",
+        "Enhanced color processing failed:",
+        {
+          error: error,
+          strategy: this.currentStrategy,
+          trackUri: context.trackUri,
+        }
+      );
+
       // Try to apply fallback colors
       await this.applyFallbackColors(context);
     }
@@ -531,7 +593,7 @@ export class ColorOrchestrator implements IColorOrchestrator {
     // Note: ColorHarmonyEngine and other strategies should register themselves
     // when they are initialized. This method is for any built-in fallback strategies.
 
-    Y3K?.debug?.log(
+    Y3KDebug?.debug?.log(
       "ColorOrchestrator",
       "Default strategies registration completed"
     );
@@ -545,44 +607,47 @@ export class ColorOrchestrator implements IColorOrchestrator {
    * Process colors with multiple strategies in parallel
    */
   private async processWithStrategies(
-    context: ColorContext, 
+    context: ColorContext,
     strategies: IColorProcessor[]
   ): Promise<StrategyProcessingResult[]> {
     const results: StrategyProcessingResult[] = [];
-    
+
     // Process strategies in parallel for better performance
     const strategyPromises = strategies.map(async (strategy) => {
       const strategyStartTime = performance.now();
       this.currentStrategy = strategy.getStrategyName();
-      
+
       try {
         const result = await strategy.processColors(context);
         const processingTime = performance.now() - strategyStartTime;
-        
+
         return {
           strategy,
           result,
           processingTime,
-          success: true
+          success: true,
         };
-        
       } catch (error) {
         const processingTime = performance.now() - strategyStartTime;
-        
-        Y3K?.debug?.error("ColorOrchestrator", `Strategy ${strategy.getStrategyName()} failed:`, error);
-        
+
+        Y3KDebug?.debug?.error(
+          "ColorOrchestrator",
+          `Strategy ${strategy.getStrategyName()} failed:`,
+          error
+        );
+
         return {
           strategy,
           result: this.createErrorResult(context, strategy, error),
           processingTime,
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : "Unknown error",
         };
       }
     });
-    
+
     const strategyResults = await Promise.all(strategyPromises);
-    
+
     return strategyResults;
   }
 
@@ -590,30 +655,30 @@ export class ColorOrchestrator implements IColorOrchestrator {
    * Merge results from multiple strategies with intelligent conflict resolution
    */
   private mergeStrategyResults(
-    strategyResults: StrategyProcessingResult[], 
+    strategyResults: StrategyProcessingResult[],
     context: ColorContext
   ): ColorResult {
-    const successfulResults = strategyResults.filter(r => r.success);
-    
+    const successfulResults = strategyResults.filter((r) => r.success);
+
     if (successfulResults.length === 0) {
       // All strategies failed - return fallback result
       return this.createFallbackResult(context);
     }
-    
+
     if (successfulResults.length === 1) {
       // Only one successful result - return it directly
       return successfulResults[0]!.result;
     }
-    
+
     // Multiple successful results - merge intelligently
     const mergeOptions: ColorResultMergeOptions = {
       priorityWeighting: true,
-      conflictResolution: 'merge',
+      conflictResolution: "merge",
       preserveMetadata: true,
       consciousnessBlending: true,
-      oklabCoordination: this.oklabCoordinationEnabled
+      oklabCoordination: this.oklabCoordinationEnabled,
     };
-    
+
     return this.performResultMerge(successfulResults, context, mergeOptions);
   }
 
@@ -627,11 +692,15 @@ export class ColorOrchestrator implements IColorOrchestrator {
   ): ColorResult {
     // Sort results by strategy priority (higher priority first)
     const sortedResults = results.sort((a, b) => {
-      const aPriority = this.strategySelector.getStrategyMetadata(a.strategy.getStrategyName())?.priority || 0;
-      const bPriority = this.strategySelector.getStrategyMetadata(b.strategy.getStrategyName())?.priority || 0;
+      const aPriority =
+        this.strategySelector.getStrategyMetadata(a.strategy.getStrategyName())
+          ?.priority || 0;
+      const bPriority =
+        this.strategySelector.getStrategyMetadata(b.strategy.getStrategyName())
+          ?.priority || 0;
       return bPriority - aPriority;
     });
-    
+
     // Start with highest priority result as base
     const baseResult = sortedResults[0]!.result;
     const mergedResult: ColorResult = {
@@ -640,46 +709,52 @@ export class ColorOrchestrator implements IColorOrchestrator {
       accentRgb: baseResult.accentRgb,
       metadata: {
         ...baseResult.metadata,
-        strategy: 'enhanced-orchestrator',
-        mergedStrategies: sortedResults.map(r => r.strategy.getStrategyName()),
-        totalProcessingTime: sortedResults.reduce((sum, r) => sum + r.processingTime, 0)
+        strategy: "enhanced-orchestrator",
+        mergedStrategies: sortedResults.map((r) =>
+          r.strategy.getStrategyName()
+        ),
+        totalProcessingTime: sortedResults.reduce(
+          (sum, r) => sum + r.processingTime,
+          0
+        ),
       },
-      context
+      context,
     };
-    
+
     // Merge additional results
     for (let i = 1; i < sortedResults.length; i++) {
       const currentResult = sortedResults[i]!.result;
-      
+
       // Merge processed colors (avoid conflicts by using namespacing)
       Object.entries(currentResult.processedColors).forEach(([key, value]) => {
-        if (options.conflictResolution === 'override') {
+        if (options.conflictResolution === "override") {
           // Higher priority strategies override
           if (i === 1) mergedResult.processedColors[key] = value;
-        } else if (options.conflictResolution === 'merge') {
+        } else if (options.conflictResolution === "merge") {
           // Merge with strategy namespace to avoid conflicts
           const strategyName = currentResult.metadata.strategy;
           mergedResult.processedColors[`${strategyName}-${key}`] = value;
         }
       });
-      
+
       // Preserve important metadata
       if (options.preserveMetadata) {
         const strategyName = currentResult.metadata.strategy;
-        mergedResult.metadata[`${strategyName}-metadata`] = currentResult.metadata;
+        mergedResult.metadata[`${strategyName}-metadata`] =
+          currentResult.metadata;
       }
     }
-    
+
     // Apply consciousness blending if enabled
     if (options.consciousnessBlending) {
       this.applyConsciousnessBlending(mergedResult, sortedResults);
     }
-    
+
     // Apply OKLAB coordination if enabled
     if (options.oklabCoordination) {
       this.applyOKLABCoordination(mergedResult, sortedResults);
     }
-    
+
     return mergedResult;
   }
 
@@ -687,17 +762,21 @@ export class ColorOrchestrator implements IColorOrchestrator {
    * Apply consciousness-aware blending to merged results
    */
   private applyConsciousnessBlending(
-    mergedResult: ColorResult, 
+    mergedResult: ColorResult,
     strategyResults: StrategyProcessingResult[]
   ): void {
     // Calculate consciousness-weighted average for accent colors
     let totalWeight = 0;
-    let weightedR = 0, weightedG = 0, weightedB = 0;
-    
-    strategyResults.forEach(result => {
-      const strategyMetadata = this.strategySelector.getStrategyMetadata(result.strategy.getStrategyName());
+    let weightedR = 0,
+      weightedG = 0,
+      weightedB = 0;
+
+    strategyResults.forEach((result) => {
+      const strategyMetadata = this.strategySelector.getStrategyMetadata(
+        result.strategy.getStrategyName()
+      );
       const weight = (strategyMetadata?.qualityScore || 5) / 10; // Normalize to 0-1
-      
+
       const rgb = this.hexToRgb(result.result.accentHex);
       if (rgb) {
         weightedR += rgb.r * weight;
@@ -706,20 +785,20 @@ export class ColorOrchestrator implements IColorOrchestrator {
         totalWeight += weight;
       }
     });
-    
+
     if (totalWeight > 0) {
       const avgR = Math.round(weightedR / totalWeight);
       const avgG = Math.round(weightedG / totalWeight);
       const avgB = Math.round(weightedB / totalWeight);
-      
+
       mergedResult.accentHex = this.rgbToHex(avgR, avgG, avgB);
       mergedResult.accentRgb = `${avgR},${avgG},${avgB}`;
-      
+
       // Add consciousness blending metadata
       mergedResult.metadata.consciousnessBlending = {
         strategyCount: strategyResults.length,
         totalWeight,
-        blendedAccent: mergedResult.accentHex
+        blendedAccent: mergedResult.accentHex,
       };
     }
   }
@@ -732,51 +811,66 @@ export class ColorOrchestrator implements IColorOrchestrator {
     context: ColorContext
   ): Promise<void> {
     const oklabStartTime = performance.now();
-    
+
     try {
       // Extract and process colors from all successful strategies
-      const successfulResults = strategyResults.filter(r => r.success);
+      const successfulResults = strategyResults.filter((r) => r.success);
       const allColors: Record<string, string> = {};
-      
+
       // Collect all unique colors from all strategies
-      successfulResults.forEach(result => {
-        Object.entries(result.result.processedColors).forEach(([key, value]) => {
-          if (value && value.startsWith('#')) {
-            allColors[`${result.strategy.getStrategyName()}-${key}`] = value;
+      successfulResults.forEach((result) => {
+        Object.entries(result.result.processedColors).forEach(
+          ([key, value]) => {
+            if (value && value.startsWith("#")) {
+              allColors[`${result.strategy.getStrategyName()}-${key}`] = value;
+            }
           }
-        });
-      });
-      
-      // Get optimal OKLAB preset based on context
-      const preset = this.getOptimalOKLABPreset(context);
-      
-      // Process all colors through OKLAB for consistency
-      const oklabResults = this.oklabProcessor.processColorPalette(allColors, preset);
-      
-      // Store OKLAB data in strategy results for merging
-      successfulResults.forEach(result => {
-        const strategyName = result.strategy.getStrategyName();
-        result.oklabData = Object.values(oklabResults).filter(oklab => 
-          oklab.originalHex in allColors && 
-          Object.keys(allColors).find(key => 
-            key.startsWith(strategyName) && allColors[key] === oklab.originalHex
-          )
         );
       });
-      
+
+      // Get optimal OKLAB preset based on context
+      const preset = this.getOptimalOKLABPreset(context);
+
+      // Process all colors through OKLAB for consistency
+      const oklabResults = this.oklabProcessor.processColorPalette(
+        allColors,
+        preset
+      );
+
+      // Store OKLAB data in strategy results for merging
+      successfulResults.forEach((result) => {
+        const strategyName = result.strategy.getStrategyName();
+        result.oklabData = Object.values(oklabResults).filter(
+          (oklab) =>
+            oklab.originalHex in allColors &&
+            Object.keys(allColors).find(
+              (key) =>
+                key.startsWith(strategyName) &&
+                allColors[key] === oklab.originalHex
+            )
+        );
+      });
+
       const oklabProcessingTime = performance.now() - oklabStartTime;
       this.orchestrationMetrics.oklabCoordinations++;
       this.orchestrationMetrics.oklabProcessingTime += oklabProcessingTime;
-      
-      Y3K?.debug?.log('ColorOrchestrator', 'OKLAB coordination completed', {
-        strategiesCoordinated: successfulResults.length,
-        colorsProcessed: Object.keys(allColors).length,
-        preset: preset.name,
-        processingTime: oklabProcessingTime
-      });
-      
+
+      Y3KDebug?.debug?.log(
+        "ColorOrchestrator",
+        "OKLAB coordination completed",
+        {
+          strategiesCoordinated: successfulResults.length,
+          colorsProcessed: Object.keys(allColors).length,
+          preset: preset.name,
+          processingTime: oklabProcessingTime,
+        }
+      );
     } catch (error) {
-      Y3K?.debug?.error('ColorOrchestrator', 'OKLAB coordination failed:', error);
+      Y3KDebug?.debug?.error(
+        "ColorOrchestrator",
+        "OKLAB coordination failed:",
+        error
+      );
     }
   }
 
@@ -790,27 +884,30 @@ export class ColorOrchestrator implements IColorOrchestrator {
     try {
       // Collect all OKLAB data from strategies
       const allOKLABData: OKLABProcessingResult[] = [];
-      strategyResults.forEach(result => {
+      strategyResults.forEach((result) => {
         if (result.oklabData) {
           allOKLABData.push(...result.oklabData);
         }
       });
-      
+
       if (allOKLABData.length === 0) return;
-      
+
       // Calculate perceptually uniform accent color from all OKLAB data
       const oklabAccent = this.calculatePerceptuallyUniformAccent(allOKLABData);
-      
+
       if (oklabAccent) {
         mergedResult.accentHex = oklabAccent.enhancedHex;
         mergedResult.accentRgb = `${oklabAccent.enhancedRgb.r},${oklabAccent.enhancedRgb.g},${oklabAccent.enhancedRgb.b}`;
-        
+
         // Add OKLAB coordination variables to processed colors
-        const oklabCSSVars = this.oklabProcessor.generateCSSVariables(oklabAccent, 'sn-oklab-unified');
+        const oklabCSSVars = this.oklabProcessor.generateCSSVariables(
+          oklabAccent,
+          "sn-oklab-unified"
+        );
         Object.entries(oklabCSSVars).forEach(([key, value]) => {
           mergedResult.processedColors[key] = value;
         });
-        
+
         // Add OKLAB metadata
         mergedResult.metadata.oklabCoordination = {
           enabled: true,
@@ -819,51 +916,60 @@ export class ColorOrchestrator implements IColorOrchestrator {
           perceptualAccent: oklabAccent.enhancedHex,
           lightness: oklabAccent.oklabEnhanced.L,
           chroma: oklabAccent.oklchEnhanced.C,
-          hue: oklabAccent.oklchEnhanced.H
+          hue: oklabAccent.oklchEnhanced.H,
         };
       }
-      
     } catch (error) {
-      Y3K?.debug?.error('ColorOrchestrator', 'OKLAB coordination application failed:', error);
+      Y3KDebug?.debug?.error(
+        "ColorOrchestrator",
+        "OKLAB coordination application failed:",
+        error
+      );
     }
   }
 
   /**
    * Calculate perceptually uniform accent color from OKLAB data
    */
-  private calculatePerceptuallyUniformAccent(oklabData: OKLABProcessingResult[]): OKLABProcessingResult | null {
+  private calculatePerceptuallyUniformAccent(
+    oklabData: OKLABProcessingResult[]
+  ): OKLABProcessingResult | null {
     if (oklabData.length === 0) return null;
     if (oklabData.length === 1) return oklabData[0] || null;
-    
+
     // Calculate weighted average in OKLAB space for perceptual uniformity
     let totalWeight = 0;
-    let weightedL = 0, weightedA = 0, weightedB = 0;
-    
-    oklabData.forEach(oklab => {
+    let weightedL = 0,
+      weightedA = 0,
+      weightedB = 0;
+
+    oklabData.forEach((oklab) => {
       // Weight by chroma (more vibrant colors have higher weight)
-      const chroma = Math.sqrt(oklab.oklabEnhanced.a ** 2 + oklab.oklabEnhanced.b ** 2);
+      const chroma = Math.sqrt(
+        oklab.oklabEnhanced.a ** 2 + oklab.oklabEnhanced.b ** 2
+      );
       const weight = Math.max(0.1, chroma); // Minimum weight to include all colors
-      
+
       weightedL += oklab.oklabEnhanced.L * weight;
       weightedA += oklab.oklabEnhanced.a * weight;
       weightedB += oklab.oklabEnhanced.b * weight;
       totalWeight += weight;
     });
-    
+
     if (totalWeight === 0) return oklabData[0] || null;
-    
+
     const avgOklab = {
       L: weightedL / totalWeight,
       a: weightedA / totalWeight,
-      b: weightedB / totalWeight
+      b: weightedB / totalWeight,
     };
-    
+
     // Convert back to RGB and hex
     const avgRgb = Utils.oklabToRgb(avgOklab.L, avgOklab.a, avgOklab.b);
     const avgHex = Utils.rgbToHex(avgRgb.r, avgRgb.g, avgRgb.b);
-    
+
     // Process the averaged color for consistency
-    const preset = OKLABColorProcessor.getPreset('STANDARD');
+    const preset = OKLABColorProcessor.getPreset("STANDARD");
     return this.oklabProcessor.processColor(avgHex, preset);
   }
 
@@ -901,7 +1007,7 @@ export class ColorOrchestrator implements IColorOrchestrator {
   setSelectionCriteria(criteria: StrategySelectionCriteria): void {
     this.selectionCriteria = { ...this.selectionCriteria, ...criteria };
 
-    Y3K?.debug?.log(
+    Y3KDebug?.debug?.log(
       "ColorOrchestrator",
       "Selection criteria updated",
       criteria
@@ -981,21 +1087,36 @@ export class ColorOrchestrator implements IColorOrchestrator {
     return {
       ...this.selectionCriteria,
       settingsContext: {
-        dynamicAccentEnabled: this.settingsManager.get('sn-dynamic-accent-enabled' as any) ?? true,
-        gradientIntensity: this.settingsManager.get('sn-gradient-intensity' as any) ?? 'balanced',
-        webglEnabled: this.settingsManager.get('sn-webgl-enabled' as any) ?? true,
-        visualGuideMode: this.settingsManager.get('sn-visual-guide-mode' as any) ?? 'cosmic',
-        depthLayersEnabled: this.settingsManager.get('sn-depth-enabled' as any) ?? true,
-        consciousnessLevel: this.settingsManager.get('sn-consciousness-level' as any) ?? 0.8,
-        breathingAnimationEnabled: this.settingsManager.get('sn-breathing-enabled' as any) ?? true
+        dynamicAccentEnabled:
+          this.settingsManager.get("sn-dynamic-accent-enabled" as any) ?? true,
+        gradientIntensity:
+          this.settingsManager.get("sn-gradient-intensity" as any) ??
+          "balanced",
+        webglEnabled:
+          this.settingsManager.get("sn-webgl-enabled" as any) ?? true,
+        visualGuideMode:
+          this.settingsManager.get("sn-visual-guide-mode" as any) ?? "cosmic",
+        depthLayersEnabled:
+          this.settingsManager.get("sn-depth-enabled" as any) ?? true,
+        consciousnessLevel:
+          this.settingsManager.get("sn-consciousness-level" as any) ?? 0.8,
+        breathingAnimationEnabled:
+          this.settingsManager.get("sn-breathing-enabled" as any) ?? true,
       },
       musicContext: context.musicData,
       deviceContext: {
-        supportsWebGL: (this.deviceDetector as any).hasWebGLSupport ? (this.deviceDetector as any).hasWebGLSupport() : false,
+        supportsWebGL: (this.deviceDetector as any).hasWebGLSupport
+          ? (this.deviceDetector as any).hasWebGLSupport()
+          : false,
         performanceLevel: this.deviceDetector.recommendPerformanceQuality(),
-        memoryCapacity: (window.navigator as any).deviceMemory ? (window.navigator as any).deviceMemory * 1024 : 4096,
-        isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-      }
+        memoryCapacity: (window.navigator as any).deviceMemory
+          ? (window.navigator as any).deviceMemory * 1024
+          : 4096,
+        isMobile:
+          /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent
+          ),
+      },
     };
   }
 
@@ -1006,18 +1127,18 @@ export class ColorOrchestrator implements IColorOrchestrator {
     // Determine optimal preset based on music data and user preferences
     const intensity = this.selectionCriteria.userPreferences?.intensity || 0.8;
     const musicEnergy = context.musicData?.energy || 0.5;
-    
+
     // Calculate combined intensity
     const combinedIntensity = (intensity + musicEnergy) / 2;
-    
+
     if (combinedIntensity >= 0.8) {
-      return OKLABColorProcessor.getPreset('COSMIC');
+      return OKLABColorProcessor.getPreset("COSMIC");
     } else if (combinedIntensity >= 0.6) {
-      return OKLABColorProcessor.getPreset('VIBRANT');
+      return OKLABColorProcessor.getPreset("VIBRANT");
     } else if (combinedIntensity >= 0.4) {
-      return OKLABColorProcessor.getPreset('STANDARD');
+      return OKLABColorProcessor.getPreset("STANDARD");
     } else {
-      return OKLABColorProcessor.getPreset('SUBTLE');
+      return OKLABColorProcessor.getPreset("SUBTLE");
     }
   }
 
@@ -1029,40 +1150,43 @@ export class ColorOrchestrator implements IColorOrchestrator {
     try {
       // 🔧 PHASE 2: No longer apply CSS directly - emit events instead
       // ColorStateManager is now the single CSS authority
-      
+
       // Dispatch unified event for ColorStateManager
-      unifiedEventBus.emit('colors:harmonized', {
+      unifiedEventBus.emit("colors:harmonized", {
         processedColors: result.processedColors,
-        accentHex: result.accentHex || '#cba6f7',
-        accentRgb: result.accentRgb || '203,166,247',
+        accentHex: result.accentHex || "#cba6f7",
+        accentRgb: result.accentRgb || "203,166,247",
         strategies: [result.metadata.strategy],
         processingTime: result.metadata.processingTime,
         trackUri: result.metadata.trackUri,
         coordinationMetrics: {
-          detectedGenre: result.metadata.genre || 'unknown',
-          emotionalState: result.metadata.emotion || 'neutral',
-          oklabPreset: result.metadata.oklabPreset || 'default',
+          detectedGenre: result.metadata.genre || "unknown",
+          emotionalState: result.metadata.emotion || "neutral",
+          oklabPreset: result.metadata.oklabPreset || "default",
           coordinationStrategy: result.metadata.strategy,
-          musicInfluenceStrength: result.metadata.intensity || 0.5
+          musicInfluenceStrength: result.metadata.intensity || 0.5,
         },
-        processingMode: 'orchestrated'
+        processingMode: "orchestrated",
       });
-      
+
       // Dispatch legacy event for backwards compatibility (temporarily)
-      const event = new CustomEvent('colors/harmonized', {
+      const event = new CustomEvent("colors/harmonized", {
         detail: {
-          type: 'colors/harmonized',
+          type: "colors/harmonized",
           payload: {
             ...result,
-            cssVariables: result.processedColors
-          }
-        }
+            cssVariables: result.processedColors,
+          },
+        },
       });
-      
+
       document.dispatchEvent(event);
-      
     } catch (error) {
-      Y3K?.debug?.error('ColorOrchestrator', 'Failed to apply color result:', error);
+      Y3KDebug?.debug?.error(
+        "ColorOrchestrator",
+        "Failed to apply color result:",
+        error
+      );
     }
   }
 
@@ -1070,7 +1194,9 @@ export class ColorOrchestrator implements IColorOrchestrator {
    * Cache management methods
    */
   private generateCacheKey(context: ColorContext): string {
-    return `${context.trackUri}-${context.timestamp}-${JSON.stringify(context.musicData || {})}`;
+    return `${context.trackUri}-${context.timestamp}-${JSON.stringify(
+      context.musicData || {}
+    )}`;
   }
 
   private getCachedResult(cacheKey: string): ColorResult | null {
@@ -1083,9 +1209,9 @@ export class ColorOrchestrator implements IColorOrchestrator {
       const firstKey = this.resultCache.keys().next().value;
       if (firstKey) this.resultCache.delete(firstKey);
     }
-    
+
     this.resultCache.set(cacheKey, result);
-    
+
     // Set cache timeout
     setTimeout(() => {
       this.resultCache.delete(cacheKey);
@@ -1097,52 +1223,69 @@ export class ColorOrchestrator implements IColorOrchestrator {
    */
   private updateDeviceCapabilities(): void {
     this.selectionCriteria.deviceCapabilities = {
-      hasWebGL: (this.deviceDetector as any).hasWebGLSupport ? (this.deviceDetector as any).hasWebGLSupport() : false,
-      memoryMB: (window.navigator as any).deviceMemory ? (window.navigator as any).deviceMemory * 1024 : 4096,
-      isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      hasWebGL: (this.deviceDetector as any).hasWebGLSupport
+        ? (this.deviceDetector as any).hasWebGLSupport()
+        : false,
+      memoryMB: (window.navigator as any).deviceMemory
+        ? (window.navigator as any).deviceMemory * 1024
+        : 4096,
+      isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      ),
     };
   }
 
   private loadUserPreferences(): void {
     try {
       this.selectionCriteria.userPreferences = {
-        harmonicMode: this.settingsManager.get('sn-visual-guide-mode' as any) ?? 'cosmic',
-        intensity: this.settingsManager.get('sn-consciousness-level' as any) ?? 0.8,
-        enableAdvancedBlending: this.settingsManager.get('sn-advanced-blending' as any) ?? true
+        harmonicMode:
+          this.settingsManager.get("sn-visual-guide-mode" as any) ?? "cosmic",
+        intensity:
+          this.settingsManager.get("sn-consciousness-level" as any) ?? 0.8,
+        enableAdvancedBlending:
+          this.settingsManager.get("sn-advanced-blending" as any) ?? true,
       };
     } catch (error) {
-      Y3K?.debug?.warn('ColorOrchestrator', 'Failed to load user preferences:', error);
+      Y3KDebug?.debug?.warn(
+        "ColorOrchestrator",
+        "Failed to load user preferences:",
+        error
+      );
     }
   }
 
   /**
    * Error handling and fallback methods
    */
-  private createErrorResult(context: ColorContext, strategy: IColorProcessor, error: any): ColorResult {
+  private createErrorResult(
+    context: ColorContext,
+    strategy: IColorProcessor,
+    error: any
+  ): ColorResult {
     return {
       processedColors: context.rawColors,
-      accentHex: '#cba6f7', // Fallback mauve
-      accentRgb: '203,166,247',
+      accentHex: "#cba6f7", // Fallback mauve
+      accentRgb: "203,166,247",
       metadata: {
         strategy: strategy.getStrategyName(),
         processingTime: 0,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : "Unknown error",
       },
-      context
+      context,
     };
   }
 
   private createFallbackResult(context: ColorContext): ColorResult {
     return {
       processedColors: context.rawColors,
-      accentHex: '#cba6f7', // Fallback mauve
-      accentRgb: '203,166,247',
+      accentHex: "#cba6f7", // Fallback mauve
+      accentRgb: "203,166,247",
       metadata: {
-        strategy: 'fallback',
+        strategy: "fallback",
         processingTime: 0,
-        error: 'All strategies failed'
+        error: "All strategies failed",
       },
-      context
+      context,
     };
   }
 
@@ -1154,15 +1297,25 @@ export class ColorOrchestrator implements IColorOrchestrator {
   /**
    * Update orchestration metrics
    */
-  private updateOrchestrationMetrics(results: StrategyProcessingResult[], totalTime: number): void {
+  private updateOrchestrationMetrics(
+    results: StrategyProcessingResult[],
+    totalTime: number
+  ): void {
     this.orchestrationMetrics.totalProcessingTime += totalTime;
     this.orchestrationMetrics.strategiesProcessed += results.length;
-    this.orchestrationMetrics.strategiesSucceeded += results.filter(r => r.success).length;
-    this.orchestrationMetrics.strategiesFailed += results.filter(r => !r.success).length;
-    
-    const successfulTimes = results.filter(r => r.success).map(r => r.processingTime);
+    this.orchestrationMetrics.strategiesSucceeded += results.filter(
+      (r) => r.success
+    ).length;
+    this.orchestrationMetrics.strategiesFailed += results.filter(
+      (r) => !r.success
+    ).length;
+
+    const successfulTimes = results
+      .filter((r) => r.success)
+      .map((r) => r.processingTime);
     if (successfulTimes.length > 0) {
-      this.orchestrationMetrics.averageStrategyTime = successfulTimes.reduce((a, b) => a + b, 0) / successfulTimes.length;
+      this.orchestrationMetrics.averageStrategyTime =
+        successfulTimes.reduce((a, b) => a + b, 0) / successfulTimes.length;
     }
   }
 
@@ -1171,11 +1324,13 @@ export class ColorOrchestrator implements IColorOrchestrator {
    */
   private hexToRgb(hex: string): { r: number; g: number; b: number } | null {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1]!, 16),
-      g: parseInt(result[2]!, 16),
-      b: parseInt(result[3]!, 16)
-    } : null;
+    return result
+      ? {
+          r: parseInt(result[1]!, 16),
+          g: parseInt(result[2]!, 16),
+          b: parseInt(result[3]!, 16),
+        }
+      : null;
   }
 
   private rgbToHex(r: number, g: number, b: number): string {
@@ -1198,7 +1353,7 @@ export class ColorOrchestrator implements IColorOrchestrator {
    */
   clearCache(): void {
     this.resultCache.clear();
-    Y3K?.debug?.log('ColorOrchestrator', 'Result cache cleared');
+    Y3KDebug?.debug?.log("ColorOrchestrator", "Result cache cleared");
   }
 
   /**
@@ -1206,7 +1361,10 @@ export class ColorOrchestrator implements IColorOrchestrator {
    */
   setOKLABCoordinationEnabled(enabled: boolean): void {
     this.oklabCoordinationEnabled = enabled;
-    Y3K?.debug?.log('ColorOrchestrator', `OKLAB coordination ${enabled ? 'enabled' : 'disabled'}`);
+    Y3KDebug?.debug?.log(
+      "ColorOrchestrator",
+      `OKLAB coordination ${enabled ? "enabled" : "disabled"}`
+    );
   }
 
   /**
@@ -1243,7 +1401,10 @@ export class ColorOrchestrator implements IColorOrchestrator {
     // Cleanup strategy selector
     this.strategySelector.destroy();
 
-    Y3K?.debug?.log("ColorOrchestrator", "Enhanced color orchestrator destroyed");
+    Y3KDebug?.debug?.log(
+      "ColorOrchestrator",
+      "Enhanced color orchestrator destroyed"
+    );
   }
 }
 

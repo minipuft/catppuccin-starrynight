@@ -1,8 +1,7 @@
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
 
-type GradientIntensity = "disabled" | "minimal" | "balanced" | "intense";
-type StarDensity = "disabled" | "minimal" | "balanced" | "intense";
+type EffectIntensity = "disabled" | "minimal" | "balanced" | "intense";
 
 function injectStarContainer(): HTMLElement {
   const existingContainer = document.querySelector<HTMLElement>(
@@ -40,33 +39,35 @@ function createShootingStar(): void {
 
 function startShootingStars(): number {
   return window.setInterval(() => {
-    const starSetting =
-      getSettingsManager().get("sn-star-density") ?? "balanced";
-    if (starSetting !== "disabled" && Math.random() < 0.3) {
+    // Now reads consolidated gradient intensity setting
+    const effectSetting =
+      getSettingsManager().get("sn-gradient-intensity") ?? "balanced";
+    if (effectSetting !== "disabled" && Math.random() < 0.3) {
       createShootingStar();
     }
   }, 5000 + Math.random() * 10000);
 }
 
 function applyStarryNightSettings(
-  gradientIntensity: GradientIntensity,
-  starDensity: StarDensity
+  effectIntensity: EffectIntensity,
+  // Legacy parameter kept for backwards compatibility
+  _legacyStarDensity?: EffectIntensity
 ): void {
   if (YEAR3000_CONFIG.enableDebug) {
-    console.log("[StarryNightEffects] Applying settings:", {
-      gradientIntensity,
-      starDensity,
+    console.log("[StarryNightEffects] Applying consolidated effect settings:", {
+      effectIntensity,
     });
   }
   const body = document.body;
 
-  const gradientClasses: `sn-gradient-${GradientIntensity}`[] = [
+  // Apply consolidated intensity to both gradient and star classes
+  const gradientClasses: `sn-gradient-${EffectIntensity}`[] = [
     "sn-gradient-disabled",
     "sn-gradient-minimal",
     "sn-gradient-balanced",
     "sn-gradient-intense",
   ];
-  const starClasses: `sn-stars-${StarDensity}`[] = [
+  const starClasses: `sn-stars-${EffectIntensity}`[] = [
     "sn-stars-disabled",
     "sn-stars-minimal",
     "sn-stars-balanced",
@@ -75,16 +76,15 @@ function applyStarryNightSettings(
 
   body.classList.remove(...gradientClasses, ...starClasses);
 
-  if (gradientIntensity !== "balanced") {
-    body.classList.add(`sn-gradient-${gradientIntensity}`);
+  // Use the same intensity for both gradient and star effects (consolidated approach)
+  if (effectIntensity !== "balanced") {
+    body.classList.add(`sn-gradient-${effectIntensity}`);
+    body.classList.add(`sn-stars-${effectIntensity}`);
   }
 
-  if (starDensity !== "balanced") {
-    body.classList.add(`sn-stars-${starDensity}`);
-  }
-
+  // Star container management based on consolidated intensity
   const existingContainer = document.querySelector(".sn-stars-container");
-  if (starDensity === "disabled") {
+  if (effectIntensity === "disabled") {
     existingContainer?.remove();
   } else {
     if (!existingContainer) {

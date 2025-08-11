@@ -10,6 +10,8 @@
 
 import type { FrameContext, IVisualSystem } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import year3000System from "@/core/lifecycle/year3000System";
+import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController
+} from "@/core/performance/OptimizedCSSVariableManager";
 
 // Default cycle length in pixels before the ratio loops back to 0.
 // Designers can override at runtime via the CSS variable
@@ -26,12 +28,20 @@ export class PrismaticScrollSheenSystem implements IVisualSystem {
   public readonly systemName = "PrismaticScrollSheen";
 
   private _lastRatio = -1;
+  private cssController: OptimizedCSSVariableManager;
 
   constructor(private cyclePx = DEFAULT_CYCLE_PX) {
-    // Expose cycle length so SCSS authors can reference it.
-    document.documentElement.style.setProperty(
+    // Initialize CSS coordination - use globalThis to access Year3000System
+    const year3000System = (globalThis as any).year3000System;
+    this.cssController = year3000System?.cssConsciousnessController || getGlobalOptimizedCSSController();
+
+    // Expose cycle length so SCSS authors can reference it using coordination
+    this.cssController.setVariable(
+      "PrismaticScrollSheenSystem",
       "--sn-scroll-cycle-px",
-      String(cyclePx)
+      String(cyclePx),
+      "normal", // Normal priority for scroll cycle setup
+      "scroll-cycle-init"
     );
   }
 
@@ -43,10 +53,18 @@ export class PrismaticScrollSheenSystem implements IVisualSystem {
     if (Math.abs(ratio - this._lastRatio) < 0.001) return; // avoid spam
     this._lastRatio = ratio;
 
-    // Update canonical CDF var and legacy alias
-    const root = document.documentElement;
-    root.style.setProperty("--sn-cdf-scroll-ratio", ratio.toFixed(4));
-    root.style.setProperty("--sn-scroll-ratio", ratio.toFixed(4));
+    // Update canonical CDF var and legacy alias using coordination
+    const scrollRatioVariables = {
+      "--sn-cdf-scroll-ratio": ratio.toFixed(4),
+      "--sn-scroll-ratio": ratio.toFixed(4)
+    };
+
+    this.cssController.batchSetVariables(
+      "PrismaticScrollSheenSystem",
+      scrollRatioVariables,
+      "high", // High priority for scroll ratio updates - affects visual responsiveness
+      "scroll-ratio-update"
+    );
   }
 
   public onPerformanceModeChange(): void {

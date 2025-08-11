@@ -1,0 +1,67 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// ⭐ YEAR 3000 STELLAR CONSTELLATION MODE (Mode 2)
+// Subtle grid-spacing oscillation + gentle card drift driven by beat sync.
+// Activated when <body> (or parent) carries data-layout="constellation".
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@use "../../core/_mixins" as *;
+
+// ─── Tunable Variables ─────────────────────────────────────────────────────────
+:root {
+  // Base gap size for the feed grid
+  --stellar-gap-base: 24px;
+  // How much the gap can expand/contract with beat intensity (keep subtle)
+  --stellar-gap-range: 6px;
+  // Maximum per-card drift distance (px)
+  --stellar-drift-range: 2px;
+}
+
+// ─── Constellation Grid Behaviour ─────────────────────────────────────────────
+// Only when constellation mode is enabled
+[data-layout="constellation"] {
+  // Main grid container breathing with music
+  .main-gridContainer-gridContainer {
+    //Gaposcillateswithbeatintensity→elegant"breathing"gap: calc(      var(--stellar-gap-base) +      (var(--stellar-gap-range) * var(--sn-beat-pulse-intensity, 0))    );
+    transition: gap 400ms var(--sn-easing-explorer, ease-out);
+    //Slightoverallscaleusingexistingbreathingvariabletransform: scale(var(--sn-breathing-scale, 1));
+    transform-origin: center;
+    -webkit-transform: scale(var(--sn-breathing-scale, 1));
+    -moz-transform: scale(var(--sn-breathing-scale, 1));
+    -ms-transform: scale(var(--sn-breathing-scale, 1));
+    -o-transform: scale(var(--sn-breathing-scale, 1));
+}
+
+  // Individual card drift (very subtle, not distracting)
+  .main-gridContainer-gridContainer .main-card-card {
+    // Vertical drift ties to rhythm phase; horizontal ties to intensity
+    transform: translate3d(
+        calc(var(--stellar-drift-range) * (var(--sn-beat-pulse-intensity, 0) - 0.5)),
+        calc(var(--stellar-drift-range) * (var(--sn-rhythm-phase, 0) * 0.002)),
+        0
+      )
+      scale(var(--sn-breathing-scale, 1));
+
+    transition: transform 400ms ease-out;
+
+    // On hover: pull slightly forward (magnetic invitation)
+    &:hover {
+      transform: translate3d(0, 0, 0) scale(calc(var(--sn-breathing-scale, 1) * 1.02));
+    }
+  }
+}
+
+// ─── Accessibility Overrides ──────────────────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  [data-layout="constellation"] {
+    .main-gridContainer-gridContainer {
+      gap: var(--stellar-gap-base);
+      transform: none;
+      transition: none;
+    }
+
+    .main-card-card {
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+}

@@ -109,7 +109,7 @@ export class CinematicPaletteGenerator {
   }
 }
 
-export class BiologicalConsciousnessManager {
+export class VisualEffectsManager {
   private breathingEngine: BreathingRhythmEngine;
   private symbioticCore: SymbioticListeningCore;
   

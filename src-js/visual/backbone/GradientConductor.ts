@@ -6,15 +6,16 @@
  * and provides a single source of truth for gradient management.
  *
  * @architecture Year3000System
- * @performance Optimized for 60fps with UnifiedCSSConsciousnessController integration
+ * @performance Optimized for 60fps with UnifiedCSSVariableManager integration
  * @accessibility Full support for prefers-reduced-motion and quality scaling
  */
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { GlobalEventBus } from "@/core/events/EventBus";
-import { UnifiedCSSConsciousnessController } from "@/core/css/UnifiedCSSConsciousnessController";
-import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
+import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 import {
   BackendCapabilities,
   HealthCheckResult,
@@ -82,11 +83,11 @@ export class BackendSelector {
 export class GradientConductor implements IManagedSystem {
   public initialized: boolean = false;
 
-  private eventBus: typeof GlobalEventBus;
-  private cssConsciousnessController: UnifiedCSSConsciousnessController;
+  private eventBus: typeof unifiedEventBus;
+  private cssConsciousnessController: UnifiedCSSVariableManager;
   private colorHarmonyEngine: ColorHarmonyEngine;
   private musicSyncService: MusicSyncService;
-  private performanceAnalyzer: PerformanceAnalyzer;
+  private performanceAnalyzer: SimplePerformanceCoordinator;
 
   private registeredBackends: Map<string, BackendRegistration> = new Map();
   private activeBackend: VisualBackplane | null = null;
@@ -102,15 +103,17 @@ export class GradientConductor implements IManagedSystem {
   private frameCount: number = 0;
   private performanceCheckInterval: number | null = null;
 
+  // Removed: Dimensional Breathing State (breathing animations completely removed)
+
   constructor(
-    eventBus: typeof GlobalEventBus,
-    cssConsciousnessController: UnifiedCSSConsciousnessController,
+    eventBus: typeof unifiedEventBus,
+    cssConsciousnessController: UnifiedCSSVariableManager,
     colorHarmonyEngine: ColorHarmonyEngine,
     musicSyncService: MusicSyncService,
-    performanceAnalyzer: PerformanceAnalyzer,
+    performanceAnalyzer: SimplePerformanceCoordinator,
     config: Partial<GradientConductorConfig> = {}
   ) {
-    this.eventBus = eventBus || GlobalEventBus;
+    this.eventBus = eventBus || unifiedEventBus;
     this.cssConsciousnessController = cssConsciousnessController;
     this.colorHarmonyEngine = colorHarmonyEngine;
     this.musicSyncService = musicSyncService;
@@ -292,7 +295,12 @@ export class GradientConductor implements IManagedSystem {
     }
 
     // Emit event for other systems
-    this.eventBus.emit("musicMetricsUpdated", metrics);
+    this.eventBus.emit("music:energy", {
+      energy: metrics.energy,
+      valence: metrics.valence,
+      tempo: metrics.bpm,
+      timestamp: Date.now()
+    });
   }
 
   /**
@@ -426,6 +434,14 @@ export class GradientConductor implements IManagedSystem {
     }
   }
 
+  // Removed: updateDimensionalBreathing method (breathing animations completely removed)
+
+  // Removed: applyDimensionalBreathingToCSS method (breathing animations completely removed)
+
+  // Removed: onBeatDetected method (breathing animations completely removed)
+
+  // Removed: onEnergyChanged method (breathing animations completely removed)
+
   /**
    * Clean up resources and event listeners
    */
@@ -454,59 +470,95 @@ export class GradientConductor implements IManagedSystem {
 
   private setupEventListeners(): void {
     // Listen for color harmony updates
-    this.eventBus.on<RGBStop[]>("colorHarmonyUpdated", (palette: RGBStop[]) => {
-      if (palette && palette.length > 0) {
-        const stops: RGBStop[] = palette.map((color: any, index: number) => ({
-          r: color.r,
-          g: color.g,
-          b: color.b,
-          position: index / (palette.length - 1),
-        }));
+    this.eventBus.subscribe("colors:harmonized", (data) => {
+      if (data && data.processedColors) {
+        // Convert processed colors to RGBStop array - simplified conversion
+        const stops: RGBStop[] = Object.entries(data.processedColors).map(([key, value], index, arr) => {
+          // Parse RGB values from the color string
+          const color = value as string;
+          let r = 128, g = 128, b = 128; // Default fallback
+          
+          if (color.startsWith('#')) {
+            const hex = color.slice(1);
+            r = parseInt(hex.slice(0, 2), 16);
+            g = parseInt(hex.slice(2, 4), 16);
+            b = parseInt(hex.slice(4, 6), 16);
+          }
+          
+          return {
+            r,
+            g,
+            b,
+            position: index / (arr.length - 1),
+          };
+        });
         this.setPalette(stops);
       }
-    });
+    }, 'GradientConductor');
 
     // Listen for music sync updates
-    this.eventBus.on<MusicMetrics>(
-      "musicSyncUpdated",
-      (metrics: MusicMetrics) => {
-        this.setMusicMetrics(metrics);
-      }
-    );
+    this.eventBus.subscribe("music:energy", (data) => {
+      const metrics: MusicMetrics = {
+        energy: data.energy,
+        valence: data.valence,
+        bpm: data.tempo,
+        beatIntensity: data.energy,
+        rhythmPhase: 0,
+        breathingScale: 1 + data.energy * 0.2,
+      };
+      this.setMusicMetrics(metrics);
+    }, 'GradientConductor');
+
+    // Listen for beat events
+    this.eventBus.subscribe("music:beat", (data) => {
+      const metrics: MusicMetrics = {
+        energy: data.intensity,
+        valence: 0.5,
+        bpm: data.bpm,
+        beatIntensity: data.intensity,
+        rhythmPhase: (Date.now() / 16.67) % 360, // Rough phase calculation
+        breathingScale: 1 + data.intensity * 0.1,
+      };
+      this.setMusicMetrics(metrics);
+    }, 'GradientConductor');
 
     // Listen for performance constraint changes
-    this.eventBus.on<PerformanceConstraints>(
-      "performanceConstraintsChanged",
-      (constraints: PerformanceConstraints) => {
-        this.setPerformanceConstraints(constraints);
-      }
-    );
+    this.eventBus.subscribe("performance:tier-changed", (data) => {
+      const constraints: PerformanceConstraints = {
+        targetFPS: 60,
+        maxMemoryMB: 50,
+        cpuBudgetPercent: 10,
+        gpuBudgetPercent: 25,
+        qualityLevel: data.tier === "excellent" ? "ultra" : 
+                     data.tier === "good" ? "high" :
+                     data.tier === "degraded" ? "medium" : "low",
+      };
+      this.setPerformanceConstraints(constraints);
+    }, 'GradientConductor');
 
-    // Listen for accessibility preference changes
-    this.eventBus.on<any>(
-      "accessibilityPreferencesChanged",
-      (preferences: any) => {
+    // Listen for settings changes (accessibility preferences)
+    this.eventBus.subscribe("settings:changed", (data) => {
+      if (data.settingKey.includes('accessibility') || data.settingKey.includes('motion')) {
+        const preferences = {
+          reducedMotion: data.settingKey.includes('motion') && data.newValue === 'reduce',
+          highContrast: data.settingKey.includes('contrast') && data.newValue === 'high',
+          prefersTransparency: data.settingKey.includes('transparency') && data.newValue === 'reduce'
+        };
         for (const registration of this.registeredBackends.values()) {
           registration.backend.applyAccessibilityPreferences?.(preferences);
         }
       }
-    );
+    }, 'GradientConductor');
 
     // Listen for emotion analysis updates (Year 3000 consciousness flow)
-    this.eventBus.on<any>(
-      "emotion:analyzed", 
-      (emotionData: any) => {
-        this.handleEmotionUpdate(emotionData);
-      }
-    );
+    this.eventBus.subscribe("emotion:analyzed", (emotionData) => {
+      this.handleEmotionUpdate(emotionData);
+    }, 'GradientConductor');
 
     // Listen for emotional color context updates
-    this.eventBus.on<any>(
-      "emotionalColorContext:updated",
-      (context: any) => {
-        this.handleEmotionalColorContext(context);
-      }
-    );
+    this.eventBus.subscribe("emotionalColorContext:updated", (context) => {
+      this.handleEmotionalColorContext(context);
+    }, 'GradientConductor');
   }
 
   private setupCSSVariableUpdates(): void {
@@ -526,7 +578,7 @@ export class GradientConductor implements IManagedSystem {
       "--sn-cinematic-depth",
     ];
 
-    // Add critical variables to UnifiedCSSConsciousnessController fast-path
+    // Add critical variables to UnifiedCSSVariableManager fast-path
     criticalVariables.forEach((variable) => {
       this.cssConsciousnessController.addCriticalVariable(variable);
     });
@@ -755,10 +807,14 @@ export class GradientConductor implements IManagedSystem {
       );
 
       // Emit event for other systems
-      this.eventBus.emit("activeBackendChanged", {
-        previousBackend: this.activeBackend?.backendId,
-        newBackend: optimal.backendId,
-        capabilities: optimal.capabilities,
+      this.eventBus.emit("system:initialized", {
+        systemName: `GradientConductor-${optimal.backendId}`,
+        timestamp: Date.now(),
+        metadata: {
+          previousBackend: this.activeBackend?.backendId,
+          newBackend: optimal.backendId,
+          capabilities: optimal.capabilities,
+        }
       });
     }
   }

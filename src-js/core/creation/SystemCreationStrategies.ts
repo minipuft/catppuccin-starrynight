@@ -1,26 +1,23 @@
 /**
  * System Creation Strategies Implementation
- * 
+ *
  * Concrete implementations of creation strategies that eliminate
  * "post-creation dependency linking" by using proper dependency
  * injection patterns at creation time.
  */
 
-import { GlobalEventBus } from "@/core/events/EventBus";
-import { Y3K } from "@/debug/UnifiedDebugManager";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type {
-  ISystemCreationStrategy,
+  CreationStrategySelectionCriteria,
   IEventDrivenCreationStrategy,
-  IBuilderCreationStrategy,
-  ISingletonCreationStrategy,
+  ISystemCreationStrategy,
   ISystemCreationStrategyRegistry,
+  SystemCreationConfig,
   SystemCreationContext,
   SystemCreationResult,
-  SystemCreationConfig,
-  CreationStrategySelectionCriteria,
-  SystemCreationError
 } from "@/types/systemCreationStrategy";
-import { DependencyValidationError, StrategySelectionError } from "@/types/systemCreationStrategy";
+import { DependencyValidationError } from "@/types/systemCreationStrategy";
 
 // ============================================================================
 // Base Creation Strategy
@@ -36,7 +33,7 @@ export abstract class BaseCreationStrategy implements ISystemCreationStrategy {
   abstract canCreate(context: SystemCreationContext): boolean;
   abstract getEstimatedCreationTime(context: SystemCreationContext): number;
   abstract createSystem<T = any>(
-    SystemClass: new(...args: any[]) => T,
+    SystemClass: new (...args: any[]) => T,
     context: SystemCreationContext
   ): Promise<SystemCreationResult<T>>;
 
@@ -50,28 +47,34 @@ export abstract class BaseCreationStrategy implements ISystemCreationStrategy {
   } {
     const required = this.getRequiredDependencies(context.systemKey);
     const optional = this.getOptionalDependencies(context.systemKey);
-    
+
     const missing: string[] = [];
     const warnings: string[] = [];
-    
+
     // Check required dependencies
     for (const dep of required) {
-      if (!(dep in context.dependencies) || !context.dependencies[dep as keyof typeof context.dependencies]) {
+      if (
+        !(dep in context.dependencies) ||
+        !context.dependencies[dep as keyof typeof context.dependencies]
+      ) {
         missing.push(dep);
       }
     }
-    
+
     // Check optional dependencies
     for (const dep of optional) {
-      if (!(dep in context.dependencies) || !context.dependencies[dep as keyof typeof context.dependencies]) {
+      if (
+        !(dep in context.dependencies) ||
+        !context.dependencies[dep as keyof typeof context.dependencies]
+      ) {
         warnings.push(`Optional dependency missing: ${dep}`);
       }
     }
-    
+
     return {
       valid: missing.length === 0,
       missing,
-      warnings
+      warnings,
     };
   }
 
@@ -109,7 +112,7 @@ export abstract class BaseCreationStrategy implements ISystemCreationStrategy {
   ): SystemCreationResult<T> {
     const endTime = performance.now();
     const creationTime = endTime - startTime;
-    
+
     return {
       system: system as T,
       success: !error && system !== null,
@@ -121,8 +124,8 @@ export abstract class BaseCreationStrategy implements ISystemCreationStrategy {
       metadata: {
         requiresInitialization: true,
         pendingDependencies: [],
-        context
-      }
+        context,
+      },
     };
   }
 }
@@ -137,13 +140,13 @@ export abstract class BaseCreationStrategy implements ISystemCreationStrategy {
 export class StandardConstructorStrategy extends BaseCreationStrategy {
   constructor() {
     super();
-    
+
     // Register known system configurations
     this.registerKnownSystems();
   }
 
   getStrategyName(): string {
-    return 'StandardConstructor';
+    return "StandardConstructor";
   }
 
   canCreate(context: SystemCreationContext): boolean {
@@ -158,15 +161,18 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
   }
 
   async createSystem<T = any>(
-    SystemClass: new(...args: any[]) => T,
+    SystemClass: new (...args: any[]) => T,
     context: SystemCreationContext
   ): Promise<SystemCreationResult<T>> {
     const startTime = performance.now();
-    
+
     try {
       // Validate dependencies
       const validation = this.validateDependencies(context);
-      if (!validation.valid && context.preferences.validateDependencies !== false) {
+      if (
+        !validation.valid &&
+        context.preferences.validateDependencies !== false
+      ) {
         throw new DependencyValidationError(
           context.systemKey,
           this.getStrategyName(),
@@ -177,23 +183,35 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
 
       // Get constructor parameters
       const params = this.getConstructorParameters(context);
-      
+
       // Create system instance
       const system = new SystemClass(...params);
-      
+
       const result = this.createBaseResult(system, context, startTime);
       result.warnings = validation.warnings;
-      
-      Y3K?.debug?.log("StandardConstructorStrategy", `Created ${context.systemKey}`, {
-        creationTime: result.creationTime,
-        parametersUsed: params.length
-      });
-      
+
+      Y3KDebug?.debug?.log(
+        "StandardConstructorStrategy",
+        `Created ${context.systemKey}`,
+        {
+          creationTime: result.creationTime,
+          parametersUsed: params.length,
+        }
+      );
+
       return result;
-      
     } catch (error) {
-      const result = this.createBaseResult(null as any, context, startTime, error as Error);
-      Y3K?.debug?.error("StandardConstructorStrategy", `Failed to create ${context.systemKey}:`, error);
+      const result = this.createBaseResult(
+        null as any,
+        context,
+        startTime,
+        error as Error
+      );
+      Y3KDebug?.debug?.error(
+        "StandardConstructorStrategy",
+        `Failed to create ${context.systemKey}:`,
+        error
+      );
       return result;
     }
   }
@@ -210,41 +228,52 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
 
     const params: any[] = [];
     const { parameterNames, dependencyMapping } = config.constructorMapping;
-    
+
     for (const paramName of parameterNames) {
       const depKey = dependencyMapping[paramName] || paramName;
-      
+
       // Map dependencies to parameters
       switch (depKey) {
-        case 'config':
+        case "config":
           params.push(context.config);
           break;
-        case 'utils':
+        case "utils":
           params.push(context.utils);
           break;
-        case 'performanceAnalyzer':
-          params.push(context.dependencies.performanceAnalyzer);
+        case "performanceAnalyzer":
+        case "simplePerformanceCoordinator":
+          // Unified performance system - map both old and new dependency keys
+          params.push(context.dependencies.simplePerformanceCoordinator || context.dependencies.performanceAnalyzer);
           break;
-        case 'settingsManager':
+        case "settingsManager":
           params.push(context.dependencies.settingsManager);
           break;
-        case 'musicSyncService':
+        case "musicSyncService":
           params.push(context.dependencies.musicSyncService);
           break;
-        case 'year3000System':
+        case "year3000System":
           params.push(context.dependencies.year3000System);
           break;
-        case 'cssConsciousnessController':
+        case "cssConsciousnessController":
           params.push(context.dependencies.cssConsciousnessController);
           break;
-        case 'performanceCoordinator':
+        case "performanceCoordinator":
           params.push(context.dependencies.performanceCoordinator);
+          break;
+        case "enhancedDeviceTierDetector":
+          params.push(context.dependencies.enhancedDeviceTierDetector);
+          break;
+        case "webglSystemsIntegration":
+          params.push(context.dependencies.webglSystemsIntegration);
+          break;
+        case "deviceCapabilityDetector":
+          params.push(context.dependencies.deviceCapabilityDetector);
           break;
         default:
           params.push(undefined);
       }
     }
-    
+
     return params;
   }
 
@@ -252,14 +281,14 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
    * Get standard parameters for systems without explicit configuration
    */
   private getStandardParameters(context: SystemCreationContext): any[] {
-    // Default to most common parameter pattern
+    // Default to most common parameter pattern - prefer simplified performance system
     return [
       context.config,
       context.utils,
-      context.dependencies.performanceAnalyzer,
+      context.dependencies.simplePerformanceCoordinator || context.dependencies.performanceAnalyzer,
       context.dependencies.musicSyncService,
       context.dependencies.settingsManager,
-      context.dependencies.year3000System
+      context.dependencies.year3000System,
     ];
   }
 
@@ -269,71 +298,81 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
   private registerKnownSystems(): void {
     // ColorHarmonyEngine - no MusicSyncService dependency (Strategy pattern)
     this.registerSystemConfig({
-      systemKey: 'ColorHarmonyEngine',
-      requiredDependencies: ['config', 'utils', 'performanceAnalyzer', 'settingsManager'],
+      systemKey: "ColorHarmonyEngine",
+      requiredDependencies: [
+        "config",
+        "utils",
+        "simplePerformanceCoordinator",
+        "settingsManager",
+      ],
       optionalDependencies: [],
       constructorMapping: {
-        parameterNames: ['config', 'utils', 'performanceAnalyzer', 'settingsManager'],
+        parameterNames: [
+          "config",
+          "utils",
+          "simplePerformanceCoordinator",
+          "settingsManager",
+        ],
         dependencyMapping: {
-          'config': 'config',
-          'utils': 'utils',
-          'performanceAnalyzer': 'performanceAnalyzer',
-          'settingsManager': 'settingsManager'
-        }
+          config: "config",
+          utils: "utils",
+          simplePerformanceCoordinator: "simplePerformanceCoordinator",
+          settingsManager: "settingsManager",
+        },
       },
       creationPreferences: {
         useSingleton: false,
         lazyInit: false,
         eventDriven: true,
-        builderPattern: false
-      }
+        builderPattern: false,
+      },
     });
 
     // EnhancedMasterAnimationCoordinator
     this.registerSystemConfig({
-      systemKey: 'EnhancedMasterAnimationCoordinator',
-      requiredDependencies: ['config', 'performanceCoordinator'],
+      systemKey: "EnhancedMasterAnimationCoordinator",
+      requiredDependencies: ["config", "performanceCoordinator"],
       optionalDependencies: [],
       constructorMapping: {
-        parameterNames: ['config', 'performanceCoordinator'],
+        parameterNames: ["config", "performanceCoordinator"],
         dependencyMapping: {
-          'config': 'config',
-          'performanceCoordinator': 'performanceCoordinator'
-        }
+          config: "config",
+          performanceCoordinator: "performanceCoordinator",
+        },
       },
       creationPreferences: {
         useSingleton: true,
         lazyInit: false,
         eventDriven: false,
-        builderPattern: false
-      }
+        builderPattern: false,
+      },
     });
 
     // UnifiedPerformanceCoordinator
     this.registerSystemConfig({
-      systemKey: 'UnifiedPerformanceCoordinator',
-      requiredDependencies: ['config'],
-      optionalDependencies: ['performanceAnalyzer'],
+      systemKey: "UnifiedPerformanceCoordinator",
+      requiredDependencies: ["config"],
+      optionalDependencies: ["simplePerformanceCoordinator"],
       constructorMapping: {
-        parameterNames: ['config', 'performanceAnalyzer'],
+        parameterNames: ["config", "simplePerformanceCoordinator"],
         dependencyMapping: {
-          'config': 'config',
-          'performanceAnalyzer': 'performanceAnalyzer'
-        }
+          config: "config",
+          simplePerformanceCoordinator: "simplePerformanceCoordinator",
+        },
       },
       creationPreferences: {
         useSingleton: true,
         lazyInit: false,
         eventDriven: false,
-        builderPattern: false
-      }
+        builderPattern: false,
+      },
     });
 
     // Simple systems with no parameters
     const simpleSystemKeys = [
-      'DeviceCapabilityDetector',
-      'PerformanceAnalyzer',
-      'SettingsManager'
+      "DeviceCapabilityDetector",
+      "SettingsManager",
+      // NOTE: SimplePerformanceCoordinator removed - replaced with SimplePerformanceCoordinator (see below)
     ];
 
     for (const systemKey of simpleSystemKeys) {
@@ -343,134 +382,293 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
         optionalDependencies: [],
         constructorMapping: {
           parameterNames: [],
-          dependencyMapping: {}
+          dependencyMapping: {},
         },
         creationPreferences: {
           useSingleton: false,
           lazyInit: false,
           eventDriven: false,
-          builderPattern: false
-        }
+          builderPattern: false,
+        },
       });
     }
 
     // TimerConsolidationSystem - simple system with no dependencies
     this.registerSystemConfig({
-      systemKey: 'TimerConsolidationSystem',
+      systemKey: "TimerConsolidationSystem",
       requiredDependencies: [],
       optionalDependencies: [],
       constructorMapping: {
         parameterNames: [],
-        dependencyMapping: {}
+        dependencyMapping: {},
       },
       creationPreferences: {
         useSingleton: false,
         lazyInit: false,
         eventDriven: false,
-        builderPattern: false
-      }
+        builderPattern: false,
+      },
     });
 
-    // GlassmorphismManager - requires cssConsciousnessController, performanceAnalyzer, and settingsManager
+    // GlassmorphismManager - requires cssConsciousnessController, simplePerformanceCoordinator, and settingsManager
     this.registerSystemConfig({
-      systemKey: 'GlassmorphismManager',
-      requiredDependencies: ['config', 'utils', 'cssConsciousnessController', 'performanceAnalyzer', 'settingsManager'],
+      systemKey: "GlassmorphismManager",
+      requiredDependencies: [
+        "config",
+        "utils",
+        "cssConsciousnessController",
+        "simplePerformanceCoordinator",
+        "settingsManager",
+      ],
       optionalDependencies: [],
       constructorMapping: {
-        parameterNames: ['config', 'utils', 'cssConsciousnessController', 'performanceAnalyzer', 'settingsManager'],
+        parameterNames: [
+          "config",
+          "utils",
+          "cssConsciousnessController",
+          "simplePerformanceCoordinator",
+          "settingsManager",
+        ],
         dependencyMapping: {
-          'config': 'config',
-          'utils': 'utils',
-          'cssConsciousnessController': 'cssConsciousnessController',
-          'performanceAnalyzer': 'performanceAnalyzer',
-          'settingsManager': 'settingsManager'
-        }
+          config: "config",
+          utils: "utils",
+          cssConsciousnessController: "cssConsciousnessController",
+          simplePerformanceCoordinator: "simplePerformanceCoordinator",
+          settingsManager: "settingsManager",
+        },
       },
       creationPreferences: {
         useSingleton: false,
         lazyInit: false,
         eventDriven: false,
-        builderPattern: false
-      }
+        builderPattern: false,
+      },
     });
 
-    // Card3DManager - requires performanceAnalyzer and settingsManager
+    // Card3DManager - requires simplePerformanceCoordinator and settingsManager
     this.registerSystemConfig({
-      systemKey: 'Card3DManager',
-      requiredDependencies: ['performanceAnalyzer', 'settingsManager', 'utils'],
+      systemKey: "Card3DManager",
+      requiredDependencies: ["simplePerformanceCoordinator", "settingsManager", "utils"],
       optionalDependencies: [],
       constructorMapping: {
-        parameterNames: ['performanceAnalyzer', 'settingsManager', 'utils'],
+        parameterNames: ["simplePerformanceCoordinator", "settingsManager", "utils"],
         dependencyMapping: {
-          'performanceAnalyzer': 'performanceAnalyzer',
-          'settingsManager': 'settingsManager',
-          'utils': 'utils'
-        }
+          simplePerformanceCoordinator: "simplePerformanceCoordinator",
+          settingsManager: "settingsManager",
+          utils: "utils",
+        },
       },
       creationPreferences: {
         useSingleton: false,
         lazyInit: false,
         eventDriven: false,
-        builderPattern: false
-      }
+        builderPattern: false,
+      },
     });
 
-    // UnifiedCSSConsciousnessController - requires config and performanceCoordinator
+    // UnifiedCSSVariableManager - requires config and performanceCoordinator
     this.registerSystemConfig({
-      systemKey: 'UnifiedCSSConsciousnessController',
-      requiredDependencies: ['config', 'performanceCoordinator'],
+      systemKey: "UnifiedCSSVariableManager",
+      requiredDependencies: ["config", "performanceCoordinator"],
       optionalDependencies: [],
       constructorMapping: {
-        parameterNames: ['config', 'performanceCoordinator'],
+        parameterNames: ["config", "performanceCoordinator"],
         dependencyMapping: {
-          'config': 'config',
-          'performanceCoordinator': 'performanceCoordinator'
-        }
+          config: "config",
+          performanceCoordinator: "performanceCoordinator",
+        },
       },
       creationPreferences: {
         useSingleton: true,
         lazyInit: false,
         eventDriven: false,
-        builderPattern: false
-      }
+        builderPattern: false,
+      },
     });
 
     // SidebarSystemsIntegration - requires cssConsciousnessController
     this.registerSystemConfig({
-      systemKey: 'SidebarSystemsIntegration',
-      requiredDependencies: ['cssConsciousnessController'],
+      systemKey: "SidebarSystemsIntegration",
+      requiredDependencies: ["cssConsciousnessController"],
       optionalDependencies: [],
       constructorMapping: {
-        parameterNames: ['cssConsciousnessController'],
+        parameterNames: ["cssConsciousnessController"],
         dependencyMapping: {
-          'cssConsciousnessController': 'cssConsciousnessController'
-        }
+          cssConsciousnessController: "cssConsciousnessController",
+        },
       },
       creationPreferences: {
         useSingleton: false,
         lazyInit: false,
         eventDriven: false,
-        builderPattern: false
-      }
+        builderPattern: false,
+      },
     });
 
     // UnifiedSystemIntegration - requires year3000System
     this.registerSystemConfig({
-      systemKey: 'UnifiedSystemIntegration',
-      requiredDependencies: ['year3000System'],
+      systemKey: "UnifiedSystemIntegration",
+      requiredDependencies: ["year3000System"],
       optionalDependencies: [],
       constructorMapping: {
-        parameterNames: ['year3000System'],
+        parameterNames: ["year3000System"],
         dependencyMapping: {
-          'year3000System': 'year3000System'
-        }
+          year3000System: "year3000System",
+        },
       },
       creationPreferences: {
         useSingleton: false,
         lazyInit: false,
         eventDriven: false,
-        builderPattern: false
-      }
+        builderPattern: false,
+      },
+    });
+
+    // GenreGradientEvolution - requires config, utils, simplePerformanceCoordinator, settingsManager
+    this.registerSystemConfig({
+      systemKey: "GenreGradientEvolution",
+      requiredDependencies: [
+        "config",
+        "utils",
+        "simplePerformanceCoordinator",
+        "settingsManager",
+      ],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: [
+          "config",
+          "utils",
+          "simplePerformanceCoordinator",
+          "settingsManager",
+        ],
+        dependencyMapping: {
+          config: "config",
+          utils: "utils",
+          simplePerformanceCoordinator: "simplePerformanceCoordinator",
+          settingsManager: "settingsManager",
+        },
+      },
+      creationPreferences: {
+        useSingleton: false,
+        lazyInit: false,
+        eventDriven: true,
+        builderPattern: false,
+      },
+    });
+
+    // MusicEmotionAnalyzer - requires config, utils, simplePerformanceCoordinator, settingsManager
+    this.registerSystemConfig({
+      systemKey: "MusicEmotionAnalyzer",
+      requiredDependencies: [
+        "config",
+        "utils",
+        "simplePerformanceCoordinator",
+        "settingsManager",
+      ],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: [
+          "config",
+          "utils",
+          "simplePerformanceCoordinator",
+          "settingsManager",
+        ],
+        dependencyMapping: {
+          config: "config",
+          utils: "utils",
+          simplePerformanceCoordinator: "simplePerformanceCoordinator",
+          settingsManager: "settingsManager",
+        },
+      },
+      creationPreferences: {
+        useSingleton: false,
+        lazyInit: false,
+        eventDriven: true,
+        builderPattern: false,
+      },
+    });
+    
+    // New simplified performance systems
+    this.registerNewSimplifiedSystems();
+  }
+
+  /**
+   * Register new simplified performance system configurations
+   */
+  private registerNewSimplifiedSystems(): void {
+    // SimplePerformanceCoordinator - main simplified performance system
+    this.registerSystemConfig({
+      systemKey: "SimplePerformanceCoordinator",
+      requiredDependencies: ["enhancedDeviceTierDetector", "webglSystemsIntegration"],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: ["enhancedDeviceTierDetector", "webglSystemsIntegration"],
+        dependencyMapping: {
+          enhancedDeviceTierDetector: "enhancedDeviceTierDetector",
+          webglSystemsIntegration: "webglSystemsIntegration",
+        },
+      },
+      creationPreferences: {
+        useSingleton: true,
+        lazyInit: false,
+        eventDriven: false,
+        builderPattern: false,
+      },
+    });
+
+    // SimpleTierBasedPerformanceSystem - tier-based performance logic
+    this.registerSystemConfig({
+      systemKey: "SimpleTierBasedPerformanceSystem",
+      requiredDependencies: ["enhancedDeviceTierDetector"],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: ["enhancedDeviceTierDetector"],
+        dependencyMapping: {
+          enhancedDeviceTierDetector: "enhancedDeviceTierDetector",
+        },
+      },
+      creationPreferences: {
+        useSingleton: false,
+        lazyInit: false,
+        eventDriven: false,
+        builderPattern: false,
+      },
+    });
+
+    // EnhancedDeviceTierDetector - static class, no dependencies
+    this.registerSystemConfig({
+      systemKey: "EnhancedDeviceTierDetector",
+      requiredDependencies: [],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: [],
+        dependencyMapping: {},
+      },
+      creationPreferences: {
+        useSingleton: true,
+        lazyInit: false,
+        eventDriven: false,
+        builderPattern: false,
+      },
+    });
+
+    // WebGLSystemsIntegration - WebGL coordination
+    this.registerSystemConfig({
+      systemKey: "WebGLSystemsIntegration",
+      requiredDependencies: ["deviceCapabilityDetector"],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: ["deviceCapabilityDetector"],
+        dependencyMapping: {
+          deviceCapabilityDetector: "deviceCapabilityDetector",
+        },
+      },
+      creationPreferences: {
+        useSingleton: true,
+        lazyInit: false,
+        eventDriven: false,
+        builderPattern: false,
+      },
     });
   }
 }
@@ -482,9 +680,17 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
 /**
  * Event-driven creation strategy for systems that require event coordination
  */
-export class EventDrivenCreationStrategy extends BaseCreationStrategy implements IEventDrivenCreationStrategy {
+export class EventDrivenCreationStrategy
+  extends BaseCreationStrategy
+  implements IEventDrivenCreationStrategy
+{
+  constructor() {
+    super();
+    this.registerEventDrivenSystems();
+  }
+
   getStrategyName(): string {
-    return 'EventDriven';
+    return "EventDriven";
   }
 
   canCreate(context: SystemCreationContext): boolean {
@@ -498,33 +704,51 @@ export class EventDrivenCreationStrategy extends BaseCreationStrategy implements
   }
 
   async createSystem<T = any>(
-    SystemClass: new(...args: any[]) => T,
+    SystemClass: new (...args: any[]) => T,
     context: SystemCreationContext
   ): Promise<SystemCreationResult<T>> {
     const startTime = performance.now();
-    
+
     try {
       // Create system with standard parameters first
       const standardStrategy = new StandardConstructorStrategy();
-      const standardResult = await standardStrategy.createSystem(SystemClass, context);
-      
+      const standardResult = await standardStrategy.createSystem(
+        SystemClass,
+        context
+      );
+
       if (!standardResult.success) {
         return standardResult;
       }
 
       // Setup event subscriptions
       this.setupEventSubscriptions(standardResult.system, context);
-      
-      const result = this.createBaseResult(standardResult.system, context, startTime);
+
+      const result = this.createBaseResult(
+        standardResult.system,
+        context,
+        startTime
+      );
       result.warnings = standardResult.warnings;
-      
-      Y3K?.debug?.log("EventDrivenCreationStrategy", `Created ${context.systemKey} with event subscriptions`);
-      
+
+      Y3KDebug?.debug?.log(
+        "EventDrivenCreationStrategy",
+        `Created ${context.systemKey} with event subscriptions`
+      );
+
       return result;
-      
     } catch (error) {
-      const result = this.createBaseResult(null as any, context, startTime, error as Error);
-      Y3K?.debug?.error("EventDrivenCreationStrategy", `Failed to create ${context.systemKey}:`, error);
+      const result = this.createBaseResult(
+        null as any,
+        context,
+        startTime,
+        error as Error
+      );
+      Y3KDebug?.debug?.error(
+        "EventDrivenCreationStrategy",
+        `Failed to create ${context.systemKey}:`,
+        error
+      );
       return result;
     }
   }
@@ -534,27 +758,164 @@ export class EventDrivenCreationStrategy extends BaseCreationStrategy implements
    */
   setupEventSubscriptions(system: any, context: SystemCreationContext): void {
     const eventSubscriptions = this.getEventSubscriptions(context.systemKey);
-    
+
     for (const eventType of eventSubscriptions) {
-      if (typeof system.handleEvent === 'function') {
-        GlobalEventBus.subscribe(eventType, (event: any) => {
+      // Map old event types to new unified event types
+      const mappedEventType = this.mapEventType(eventType);
+      
+      if (typeof system.handleEvent === "function") {
+        unifiedEventBus.subscribe(mappedEventType as any, (event: any) => {
           system.handleEvent(event);
-        });
-      } else if (typeof system.handleColorExtraction === 'function' && eventType === 'colors/extracted') {
-        GlobalEventBus.subscribe(eventType, system.handleColorExtraction.bind(system));
+        }, `SystemCreation-${context.systemKey}`);
+      } else if (
+        typeof system.handleColorExtraction === "function" &&
+        (eventType === "colors/extracted" || mappedEventType === "colors:extracted")
+      ) {
+        unifiedEventBus.subscribe(
+          mappedEventType as any,
+          system.handleColorExtraction.bind(system),
+          `SystemCreation-${context.systemKey}`
+        );
       }
     }
+
+    Y3KDebug?.debug?.log(
+      "EventDrivenCreationStrategy",
+      `Setup event subscriptions for ${context.systemKey}:`,
+      eventSubscriptions
+    );
+  }
+
+  /**
+   * Map old event types to new unified event types
+   */
+  private mapEventType(eventType: string): string {
+    const eventMap: Record<string, string> = {
+      'colors/extracted': 'colors:extracted',
+      'colors/harmonized': 'colors:harmonized',
+      'music/beat': 'music:beat',
+      'music/energy': 'music:energy',
+      'music/track-changed': 'music:track-changed',
+      'performance/mode-changed': 'performance:tier-changed',
+      'performance/thermal-warning': 'performance:frame',
+      'settings/changed': 'settings:changed',
+    };
     
-    Y3K?.debug?.log("EventDrivenCreationStrategy", 
-      `Setup event subscriptions for ${context.systemKey}:`, eventSubscriptions);
+    return eventMap[eventType] || eventType;
   }
 
   /**
    * Get events that system will subscribe to
    */
   getEventSubscriptions(systemKey: string): string[] {
-    const config = this.systemConfigs.get(systemKey);
-    return config?.eventSubscriptions || [];
+    const eventSubscriptions: Record<string, string[]> = {
+      ColorHarmonyEngine: ["colors:extracted", "music:track-changed"],
+      GenreGradientEvolution: ["music:beat", "music:energy", "music:track-changed"],
+      MusicEmotionAnalyzer: ["music:beat", "music:energy", "music:track-changed"],
+    };
+    
+    return eventSubscriptions[systemKey] || [];
+  }
+
+  /**
+   * Register event-driven systems with their configurations
+   */
+  private registerEventDrivenSystems(): void {
+    // ColorHarmonyEngine - event-driven system with color and music events
+    this.registerSystemConfig({
+      systemKey: "ColorHarmonyEngine",
+      requiredDependencies: [
+        "config",
+        "utils",
+        "simplePerformanceCoordinator",
+        "settingsManager",
+      ],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: [
+          "config",
+          "utils",
+          "simplePerformanceCoordinator",
+          "settingsManager",
+        ],
+        dependencyMapping: {
+          config: "config",
+          utils: "utils",
+          simplePerformanceCoordinator: "simplePerformanceCoordinator",
+          settingsManager: "settingsManager",
+        },
+      },
+      creationPreferences: {
+        useSingleton: false,
+        lazyInit: false,
+        eventDriven: true,
+        builderPattern: false,
+      },
+    });
+
+    // GenreGradientEvolution - event-driven system with music events
+    this.registerSystemConfig({
+      systemKey: "GenreGradientEvolution",
+      requiredDependencies: [
+        "config",
+        "utils",
+        "simplePerformanceCoordinator",
+        "settingsManager",
+      ],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: [
+          "config",
+          "utils",
+          "simplePerformanceCoordinator",
+          "settingsManager",
+        ],
+        dependencyMapping: {
+          config: "config",
+          utils: "utils",
+          simplePerformanceCoordinator: "simplePerformanceCoordinator",
+          settingsManager: "settingsManager",
+        },
+      },
+      creationPreferences: {
+        useSingleton: false,
+        lazyInit: false,
+        eventDriven: true,
+        builderPattern: false,
+      },
+    });
+
+    // MusicEmotionAnalyzer - event-driven system with music events
+    this.registerSystemConfig({
+      systemKey: "MusicEmotionAnalyzer",
+      requiredDependencies: [
+        "config",
+        "utils",
+        "simplePerformanceCoordinator",
+        "settingsManager",
+      ],
+      optionalDependencies: [],
+      constructorMapping: {
+        parameterNames: [
+          "config",
+          "utils",
+          "simplePerformanceCoordinator",
+          "settingsManager",
+        ],
+        dependencyMapping: {
+          config: "config",
+          utils: "utils",
+          simplePerformanceCoordinator: "simplePerformanceCoordinator",
+          settingsManager: "settingsManager",
+        },
+      },
+      creationPreferences: {
+        useSingleton: false,
+        lazyInit: false,
+        eventDriven: true,
+        builderPattern: false,
+      },
+    });
   }
 }
 
@@ -572,11 +933,11 @@ export class ObjectDependenciesStrategy extends BaseCreationStrategy {
   }
 
   getStrategyName(): string {
-    return 'ObjectDependencies';
+    return "ObjectDependencies";
   }
 
   canCreate(context: SystemCreationContext): boolean {
-    return context.systemKey === 'MusicSyncService';
+    return context.systemKey === "MusicSyncService";
   }
 
   getEstimatedCreationTime(context: SystemCreationContext): number {
@@ -584,15 +945,18 @@ export class ObjectDependenciesStrategy extends BaseCreationStrategy {
   }
 
   async createSystem<T = any>(
-    SystemClass: new(...args: any[]) => T,
+    SystemClass: new (...args: any[]) => T,
     context: SystemCreationContext
   ): Promise<SystemCreationResult<T>> {
     const startTime = performance.now();
-    
+
     try {
       // Validate dependencies
       const validation = this.validateDependencies(context);
-      if (!validation.valid && context.preferences.validateDependencies !== false) {
+      if (
+        !validation.valid &&
+        context.preferences.validateDependencies !== false
+      ) {
         throw new DependencyValidationError(
           context.systemKey,
           this.getStrategyName(),
@@ -609,21 +973,32 @@ export class ObjectDependenciesStrategy extends BaseCreationStrategy {
         year3000System: context.dependencies.year3000System,
         // NOTE: colorHarmonyEngine deliberately omitted - using event-driven pattern instead
       };
-      
+
       // Create system instance with dependencies object
       const system = new SystemClass(dependencies);
-      
+
       const result = this.createBaseResult(system, context, startTime);
       result.warnings = validation.warnings;
       result.metadata.pendingDependencies = []; // No pending dependencies with event-driven pattern
-      
-      Y3K?.debug?.log("ObjectDependenciesStrategy", `Created ${context.systemKey} with event-driven dependencies`);
-      
+
+      Y3KDebug?.debug?.log(
+        "ObjectDependenciesStrategy",
+        `Created ${context.systemKey} with event-driven dependencies`
+      );
+
       return result;
-      
     } catch (error) {
-      const result = this.createBaseResult(null as any, context, startTime, error as Error);
-      Y3K?.debug?.error("ObjectDependenciesStrategy", `Failed to create ${context.systemKey}:`, error);
+      const result = this.createBaseResult(
+        null as any,
+        context,
+        startTime,
+        error as Error
+      );
+      Y3KDebug?.debug?.error(
+        "ObjectDependenciesStrategy",
+        `Failed to create ${context.systemKey}:`,
+        error
+      );
       return result;
     }
   }
@@ -633,15 +1008,15 @@ export class ObjectDependenciesStrategy extends BaseCreationStrategy {
    */
   private registerObjectDependencySystems(): void {
     this.registerSystemConfig({
-      systemKey: 'MusicSyncService',
-      requiredDependencies: ['config', 'utils'],
-      optionalDependencies: ['settingsManager', 'year3000System'],
+      systemKey: "MusicSyncService",
+      requiredDependencies: ["config", "utils"],
+      optionalDependencies: ["settingsManager", "year3000System"],
       creationPreferences: {
         useSingleton: false,
         lazyInit: false,
         eventDriven: true,
-        builderPattern: false
-      }
+        builderPattern: false,
+      },
     });
   }
 }
@@ -653,9 +1028,11 @@ export class ObjectDependenciesStrategy extends BaseCreationStrategy {
 /**
  * Registry for managing and selecting system creation strategies
  */
-export class SystemCreationStrategyRegistry implements ISystemCreationStrategyRegistry {
+export class SystemCreationStrategyRegistry
+  implements ISystemCreationStrategyRegistry
+{
   private strategies: Map<string, ISystemCreationStrategy> = new Map();
-  
+
   constructor() {
     // Register default strategies
     this.registerDefaultStrategies();
@@ -666,7 +1043,10 @@ export class SystemCreationStrategyRegistry implements ISystemCreationStrategyRe
    */
   register(strategy: ISystemCreationStrategy): void {
     this.strategies.set(strategy.getStrategyName(), strategy);
-    Y3K?.debug?.log("SystemCreationStrategyRegistry", `Registered strategy: ${strategy.getStrategyName()}`);
+    Y3KDebug?.debug?.log(
+      "SystemCreationStrategyRegistry",
+      `Registered strategy: ${strategy.getStrategyName()}`
+    );
   }
 
   /**
@@ -678,31 +1058,31 @@ export class SystemCreationStrategyRegistry implements ISystemCreationStrategyRe
   ): ISystemCreationStrategy | null {
     // Get strategies that can create this system
     const candidateStrategies = this.getStrategiesForSystem(systemKey);
-    
+
     if (candidateStrategies.length === 0) {
       return null;
     }
-    
+
     // Apply selection criteria
     let bestStrategy = candidateStrategies[0];
     if (!bestStrategy) {
       return null;
     }
-    
+
     let bestScore = this.scoreStrategy(bestStrategy, systemKey, criteria);
-    
+
     for (let i = 1; i < candidateStrategies.length; i++) {
       const strategy = candidateStrategies[i];
       if (!strategy) continue;
-      
+
       const score = this.scoreStrategy(strategy, systemKey, criteria);
-      
+
       if (score > bestScore) {
         bestStrategy = strategy;
         bestScore = score;
       }
     }
-    
+
     return bestStrategy;
   }
 
@@ -732,12 +1112,14 @@ export class SystemCreationStrategyRegistry implements ISystemCreationStrategyRe
       preferences: {},
       metadata: {
         timestamp: Date.now(),
-        reason: 'startup',
-        priority: 'medium'
-      }
+        reason: "startup",
+        priority: "medium",
+      },
     };
-    
-    return this.getStrategies().filter(strategy => strategy.canCreate(context));
+
+    return this.getStrategies().filter((strategy) =>
+      strategy.canCreate(context)
+    );
   }
 
   /**
@@ -749,30 +1131,30 @@ export class SystemCreationStrategyRegistry implements ISystemCreationStrategyRe
     criteria: CreationStrategySelectionCriteria
   ): number {
     let score = 0;
-    
+
     // Base score for being able to create the system
     score += 10;
-    
+
     // Prefer strategies that match dependency requirements
-    if (criteria.dependencyRequirements === 'event-driven') {
-      if (strategy.getStrategyName() === 'EventDriven') score += 20;
-      if (strategy.getStrategyName() === 'ObjectDependencies') score += 15;
-    } else if (criteria.dependencyRequirements === 'basic') {
-      if (strategy.getStrategyName() === 'StandardConstructor') score += 20;
+    if (criteria.dependencyRequirements === "event-driven") {
+      if (strategy.getStrategyName() === "EventDriven") score += 20;
+      if (strategy.getStrategyName() === "ObjectDependencies") score += 15;
+    } else if (criteria.dependencyRequirements === "basic") {
+      if (strategy.getStrategyName() === "StandardConstructor") score += 20;
     }
-    
+
     // Performance preferences
-    if (criteria.performance === 'lightweight') {
-      if (strategy.getStrategyName() === 'StandardConstructor') score += 15;
-    } else if (criteria.performance === 'optimized') {
-      if (strategy.getStrategyName() === 'EventDriven') score += 10;
+    if (criteria.performance === "lightweight") {
+      if (strategy.getStrategyName() === "StandardConstructor") score += 15;
+    } else if (criteria.performance === "optimized") {
+      if (strategy.getStrategyName() === "EventDriven") score += 10;
     }
-    
+
     // Context preferences
-    if (criteria.creationContext === 'startup') {
-      if (strategy.getStrategyName() === 'StandardConstructor') score += 5;
+    if (criteria.creationContext === "startup") {
+      if (strategy.getStrategyName() === "StandardConstructor") score += 5;
     }
-    
+
     return score;
   }
 
@@ -794,7 +1176,7 @@ export class SystemCreationStrategyRegistry implements ISystemCreationStrategyRe
   } {
     return {
       strategyCount: this.strategies.size,
-      strategies: Array.from(this.strategies.keys())
+      strategies: Array.from(this.strategies.keys()),
     };
   }
 }
@@ -806,4 +1188,5 @@ export class SystemCreationStrategyRegistry implements ISystemCreationStrategyRe
 /**
  * Global system creation strategy registry
  */
-export const globalSystemCreationRegistry = new SystemCreationStrategyRegistry();
+export const globalSystemCreationRegistry =
+  new SystemCreationStrategyRegistry();

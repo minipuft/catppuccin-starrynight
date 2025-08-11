@@ -3,21 +3,22 @@
 // ████████████████████████████████████████████████████████████████████████████████
 
 // === CORE MODULES ===
-@use "_sn_unified_variables" as *; // 🎯 UNIFIED SYSTEM VARIABLES (Phase 1)
-@use "_variables" as *;
+// 🎯 CONSOLIDATED TOKEN SYSTEM (Phase 2: Variable Consolidation)
+@use "_design-tokens" as *; // Consolidated design system (root, unified, base variables)
+@use "_motion-tokens" as *;  // Consolidated motion system (animation, beat sync, layered effects)
+@use "_visual-tokens" as *;  // Consolidated visual system (gradient, visual effects)
+
+// Utility modules
 @use "_mixins" as *;
 @use "_performance_mixins" as *; // 🚀 PHASE 3 PERFORMANCE OPTIMIZATION MIXINS
-@use "_breathing_scale" as *;
-@use "_beat_sync_variables" as *;
-@use "_sn_root_variables" as *;
-@use "_sn_gradient" as *;
 @use "_sn_typography" as *;
 @use "_kinetic-animations" as *;
 @use "_sn_legacy_support" as *;
 @use "_sn_architecture_documentation" as *;
-@use "_sn_nebula_variables" as *; // [Phase 1] Nebula alias tokens
 @use "_dom_selectors" as *; // Centralized DOM selector mixins
-@use "_sn_consciousness_variables" as *; // Consciousness field variables
+
+// Legacy compatibility (deprecated - will be removed after validation)
+@use "_variables" as *; // Legacy variables for backward compatibility
 
 // === LAYOUT MODULES ===
 @use "../layout/_main_view_container" as *;
@@ -29,7 +30,7 @@
 @use "../layout/_top_bar" as *;
 @use "../layout/_right_sidebar" as *;
 @use "../layout/_sn_header_actionBar" as *;
-@use "../layout/_artist_aura_fields" as *;
+@use "../layout/_artist_header_effects" as *;
 @use "../layout/_sn_scroll_node_backgrounds" as *;
 
 // === COMPONENT MODULES ===
@@ -40,39 +41,59 @@
 @use "../components/_sn_loading" as *;
 @use "../components/_now_playing" as *;
 @use "../components/_sn_glyph_variables" as *; // Glyph system variables
-@use "../components/_sn_harmonic_aura" as *; // Harmonic aura effects
+@use "../components/_sn_visual_accents" as *; // Visual accent effects
 
 // === FEATURE MODULES ===
-@use "../features/_themed_interactive_components" as *;
-@use "../features/_sn_beat_sync_enhanced" as *;
-@use "../features/_sn_depth_layers" as *;
-@use "../features/_sn_z_index_management" as *;
-@use "../features/_sn_glassmorphism" as *;
-@use "../features/_flux_music_visualization" as *;
-@use "../features/_sn_atmospheric" as *;
-@use "../features/_sn_stars" as *;
-@use "../features/_sn_3d_morphing" as *;
-@use "../features/_sn_context_zones" as *;
-@use "../features/_sn_microinteractions" as *;
-@use "../features/_advanced_visual_effects_layer" as *;
-@use "../features/_floating_crystals" as *;
-@use "../features/_stellar_constellation" as *;
-@use "../features/_year3000_temporal_stream" as *;
-@use "../features/_consciousness_field_matrix" as *; // Consciousness field matrix
-@use "../features/_sn_constellation_network" as *; // Constellation network effects
-@use "../features/_holographic_consciousness_integration" as *; // 🛸 Holographic consciousness integration
-@use "../features/_depth_consciousness_system" as *; // 🌊 Depth consciousness system - Content-aware intelligence
-@use "../features/_living_gradient_base_system" as *; // 🌊 Living Gradient Base System - Transform static #1e1e2e into organic consciousness
-@use "../features/_genre-aware-ui-integration" as *; // 🎵 Genre-aware UI integration - Dynamic musical consciousness
+
+// Animation & Motion
+@use "../features/animations/_3d_transforms" as *;
+@use "../features/animations/_field_matrix" as *;
+@use "../features/animations/_scrolling_effects" as *;
+@use "../features/animations/_shape_transitions" as *;
+
+// Background & Visual Layers
+@use "../features/backgrounds/_ambient_effects" as *;
+@use "../features/backgrounds/_connected_dots" as *;
+@use "../features/backgrounds/_cosmic_effects" as *;
+@use "../features/backgrounds/_depth_layers" as *; // Content-aware depth consciousness
+@use "../features/backgrounds/_3d_depth_layers" as *; // 3D layer system
+@use "../features/backgrounds/_dot_matrix" as *;
+@use "../features/backgrounds/_particle_field" as *;
+@use "../features/backgrounds/_stars" as *;
+
+// Visual Effects & Styling
+@use "../features/visual-effects/_advanced_layer" as *;
+@use "../features/visual-effects/_beat_sync_glassmorphism" as *;
+@use "../features/visual-effects/_crystalline_glassmorphism" as *;
+@use "../features/visual-effects/_css_blob_fallback" as *;
+@use "../features/visual-effects/_living_gradients" as *;
+@use "../features/visual-effects/_translucent_overlays" as *;
+
+// Music Integration
+@use "../features/music-sync/_beat_synchronization" as *;
+@use "../features/music-sync/_genre_aware_ui" as *;
+@use "../features/music-sync/_music_visualization" as *;
+
+// UI Components & Interaction
+@use "../features/interactions/_animated_icons" as *;
+@use "../features/interactions/_css_interactions" as *;
+@use "../features/interactions/_microinteractions" as *;
+@use "../features/interactions/_themed_components" as *;
+@use "../features/interactions/_ui_elements" as *;
+
+// System & Architecture
+@use "../features/system/_context_zones" as *;
+@use "../features/system/_visual_hierarchy" as *;
+@use "../features/system/_z_index_management" as *;
 
 // === SYSTEMS MODULES ===
 @use "../systems/_sn_behavioral_prediction" as *;
 @use "../systems/_sn_performance_optimization" as *;
-@use "../systems/_sn_quantum_consciousness" as *;
+@use "../systems/_sn_advanced_visual_effects" as *;
 @use "../systems/_sn_data_glyphs" as *;
 
 // === VISUAL CONSCIOUSNESS MODULES ===
-@use "../visual/organic-consciousness/organic-consciousness-main" as *;
+@use "../visual/music-sync/visual-effects-main" as *;
 
 // === UI EFFECTS MODULES ===
 // Context menu implementation removed
@@ -85,7 +106,7 @@
 @use "../sidebar/_sidebar_interactive" as *;
 
 // Sidebar Dimensional Nexus enhancement module (post-interactive)
-@use "../sidebar/_sidebar_dimensional_nexus" as *;
+@use "../sidebar/_sidebar_layered_effects" as *;
 
 // ARCHITECTURAL LAYERS:
 // 1. CORE MODULES      - Foundation utilities and variables

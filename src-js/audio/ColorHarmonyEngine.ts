@@ -3,49 +3,46 @@ import {
   HARMONIC_INTENSITY_KEY,
 } from "@/config/settingKeys";
 // EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
+import {
+  GenreGradientEvolution,
+  type GenreCharacteristics,
+  type GenreVisualStyle,
+  type MusicGenre,
+} from "@/audio/GenreGradientEvolution";
 import type { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { Y3K } from "@/debug/UnifiedDebugManager";
-import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
+import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import type {
+  ColorContext,
+  ColorResult,
+  IColorProcessor,
+} from "@/types/colorStrategy";
 import type { Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
-import type { 
-  IColorProcessor, 
-  ColorContext, 
-  ColorResult,
-  ColorExtractedEvent
-} from "@/types/colorStrategy";
-import { globalColorOrchestrator } from "@/visual/integration/ColorOrchestrator";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
+import {
+  EmotionalTemperatureMapper,
+  type EmotionalTemperatureResult,
+  type MusicAnalysisData,
+} from "@/utils/color/EmotionalTemperatureMapper";
+import {
+  OKLABColorProcessor,
+  type EnhancementPreset,
+  type OKLABProcessingResult,
+} from "@/utils/color/OKLABColorProcessor";
+import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
 import { PaletteExtensionManager } from "@/utils/core/PaletteExtensionManager";
 import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 import { SemanticColorManager } from "@/utils/spicetify/SemanticColorManager";
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
-import { 
-  EmotionalTemperatureMapper, 
-  type MusicAnalysisData, 
-  type EmotionalTemperatureResult 
-} from "@/utils/color/EmotionalTemperatureMapper";
-import { 
-  OKLABColorProcessor, 
-  type EnhancementPreset, 
-  type OKLABProcessingResult,
-  type OKLABColor,
-  type OKLCHColor 
-} from "@/utils/color/OKLABColorProcessor";
-import { 
+import { globalColorOrchestrator } from "@/visual/integration/ColorOrchestrator";
+import {
   MusicEmotionAnalyzer,
-  type EmotionalState,
-  type AudioFeatures,
   type AudioData,
-  type EmotionType
-} from "@/visual/organic-consciousness/integration/MusicEmotionAnalyzer";
-import { 
-  GenreGradientEvolution,
-  type MusicGenre,
-  type GenreCharacteristics,
-  type GenreVisualStyle
-} from "@/audio/GenreGradientEvolution";
+  type AudioFeatures,
+  type EmotionalState,
+} from "@/visual/music-sync/integration/MusicEmotionAnalyzer";
 // TODO: Phase 4 - Import WebGL and Worker support for performance
 
 // Type definitions for color structures
@@ -138,7 +135,7 @@ export class ColorHarmonyEngine
   private oklabProcessor: OKLABColorProcessor;
   private musicEmotionAnalyzer: MusicEmotionAnalyzer;
   private genreGradientEvolution: GenreGradientEvolution;
-  
+
   // Enhanced OKLAB processing state
   private oklabState: {
     currentPreset: EnhancementPreset;
@@ -160,7 +157,11 @@ export class ColorHarmonyEngine
   private genreState: {
     currentGenre: MusicGenre;
     genreConfidence: number;
-    genreHistory: { genre: MusicGenre; confidence: number; timestamp: number }[];
+    genreHistory: {
+      genre: MusicGenre;
+      confidence: number;
+      timestamp: number;
+    }[];
     lastGenreUpdate: number;
     genreInfluenceIntensity: number; // 0-1 how much genre affects visual aesthetics
   };
@@ -182,7 +183,7 @@ export class ColorHarmonyEngine
   constructor(
     config?: Year3000Config,
     utils?: typeof Year3000Utilities,
-    performanceMonitor?: PerformanceAnalyzer,
+    performanceMonitor?: SimplePerformanceCoordinator,
     settingsManager?: SettingsManager
   ) {
     super(
@@ -203,7 +204,7 @@ export class ColorHarmonyEngine
     this.semanticColorManager = new SemanticColorManager({
       enableDebug: this.config.enableDebug,
       fallbackToSpiceColors: true,
-      cacheDuration: 5000
+      cacheDuration: 5000,
     });
 
     this.currentTheme = this.detectCurrentTheme();
@@ -247,24 +248,24 @@ export class ColorHarmonyEngine
       visualMomentum: 0,
     };
 
-    // Enhanced Catppuccin palette definitions with higher saturation targets
+    // Enhanced Catppuccin palette with cinematic gradient color enhancements
     this.catppuccinPalettes = {
       frappe: {
         accents: {
           rosewater: "#f2d5cf",
           flamingo: "#eebebe",
-          pink: "#f4b8e4",
-          mauve: "#ca9ee6",
-          red: "#e78284",
+          pink: "#ff6b9d", // Enhanced magenta for gradient drama
+          mauve: "#c77dff", // Intensified purple for depth
+          red: "#ff4757", // Vivid red for cinematic contrast
           maroon: "#ea999c",
-          peach: "#ef9f76",
-          yellow: "#e5c890",
-          green: "#a6d189",
-          teal: "#81c8be",
-          sky: "#99d1db",
-          sapphire: "#85c1dc",
-          blue: "#8caaee",
-          lavender: "#babbf1",
+          peach: "#ff7675", // Warmer orange for gradient flows
+          yellow: "#fdcb6e", // Golden yellow for luminance
+          green: "#6c5ce7", // Purple-blue for unique gradients
+          teal: "#00cec9", // Cyan for electric contrast
+          sky: "#74b9ff", // Bright blue for sky gradients
+          sapphire: "#0984e3", // Deep blue for depth
+          blue: "#a29bfe", // Lavender-blue for softness
+          lavender: "#fd79a8", // Pink-lavender for warmth
         },
         neutrals: {
           base: "#303446",
@@ -277,18 +278,18 @@ export class ColorHarmonyEngine
         accents: {
           rosewater: "#dc8a78",
           flamingo: "#dd7878",
-          pink: "#ea76cb",
-          mauve: "#8839ef",
-          red: "#d20f39",
+          pink: "#e84393", // Vibrant magenta for light theme gradients
+          mauve: "#a55eea", // Rich purple for contrast
+          red: "#fd79a8", // Warm red-pink for luminous gradients
           maroon: "#e64553",
-          peach: "#fe640b",
-          yellow: "#df8e1d",
-          green: "#40a02b",
-          teal: "#179299",
-          sky: "#04a5e5",
-          sapphire: "#209fb5",
-          blue: "#1e66f5",
-          lavender: "#7287fd",
+          peach: "#fd7f28", // Bright orange for warmth
+          yellow: "#f39c12", // Golden amber for energy
+          green: "#00b894", // Teal-green for balance
+          teal: "#00cec9", // Cyan for freshness
+          sky: "#0984e3", // Deep sky blue
+          sapphire: "#6c5ce7", // Purple-blue for depth
+          blue: "#74b9ff", // Light blue for airiness
+          lavender: "#a29bfe", // Soft lavender for gentleness
         },
         neutrals: {
           base: "#eff1f5",
@@ -301,18 +302,18 @@ export class ColorHarmonyEngine
         accents: {
           rosewater: "#f4dbd6",
           flamingo: "#f0c6c6",
-          pink: "#f5bde6",
-          mauve: "#c6a0f6",
-          red: "#ed8796",
+          pink: "#ff6b9d", // Enhanced magenta for gradient drama
+          mauve: "#c77dff", // Intensified purple for depth
+          red: "#ff4757", // Vivid red for cinematic contrast
           maroon: "#ee99a0",
-          peach: "#f5a97f",
-          yellow: "#eed49f",
-          green: "#a6da95",
-          teal: "#8bd5ca",
-          sky: "#91d7e3",
-          sapphire: "#7dc4e4",
-          blue: "#8aadf4",
-          lavender: "#b7bdf8",
+          peach: "#ff7675", // Warmer orange for gradient flows
+          yellow: "#fdcb6e", // Golden yellow for luminance
+          green: "#6c5ce7", // Purple-blue for unique gradients
+          teal: "#00cec9", // Cyan for electric contrast
+          sky: "#74b9ff", // Bright blue for sky gradients
+          sapphire: "#0984e3", // Deep blue for depth
+          blue: "#a29bfe", // Lavender-blue for softness
+          lavender: "#fd79a8", // Pink-lavender for warmth
         },
         neutrals: {
           base: "#24273a",
@@ -325,18 +326,18 @@ export class ColorHarmonyEngine
         accents: {
           rosewater: "#f5e0dc",
           flamingo: "#f2cdcd",
-          pink: "#f5c2e7",
-          mauve: "#cba6f7",
-          red: "#f38ba8",
+          pink: "#ff6b9d", // Enhanced magenta for gradient drama
+          mauve: "#c77dff", // Intensified purple for depth
+          red: "#ff4757", // Vivid red for cinematic contrast
           maroon: "#eba0ac",
-          peach: "#fab387",
-          yellow: "#f9e2af",
-          green: "#a6e3a1",
-          teal: "#94e2d5",
-          sky: "#89dceb",
-          sapphire: "#74c7ec",
-          blue: "#89b4fa",
-          lavender: "#b4befe",
+          peach: "#ff7675", // Warmer orange for gradient flows
+          yellow: "#fdcb6e", // Golden yellow for luminance
+          green: "#6c5ce7", // Purple-blue for unique gradients
+          teal: "#00cec9", // Cyan for electric contrast
+          sky: "#74b9ff", // Bright blue for sky gradients
+          sapphire: "#0984e3", // Deep blue for depth
+          blue: "#a29bfe", // Lavender-blue for softness
+          lavender: "#fd79a8", // Pink-lavender for warmth
         },
         neutrals: {
           base: "#1e1e2e",
@@ -347,25 +348,25 @@ export class ColorHarmonyEngine
       },
     };
 
-    // 🌌 REVOLUTIONARY BLENDING CONFIGURATION - Year 3000 Artistic Boldness (FIXED)
+    // 🌌 REVOLUTIONARY BLENDING CONFIGURATION - Cinematic Gradient Aesthetics
     this.vibrancyConfig = {
-      defaultBlendRatio: 0.95, // BOLD! 95% extracted color dominance (was 0.85)
-      minimumSaturation: 0.3, // 🔧 FIXED: Allow muted colors (was 0.6 - too restrictive!)
-      maximumDesaturation: 0.2, // 🔧 FIXED: Allow more desaturated colors (was 0.05 - too strict!)
-      contrastBoostIntensity: 2.2, // STRONGER CONTRAST! Up from 1.8
-      harmonyTolerance: 0.5, // 🔧 FIXED: More flexible harmony (was 0.35 - too restrictive!)
+      defaultBlendRatio: 0.75, // Dramatic extracted color dominance for cinematic gradients
+      minimumSaturation: 0.6, // High saturation for vibrant gradient aesthetics
+      maximumDesaturation: 0.1, // Minimal desaturation to maintain intensity
+      contrastBoostIntensity: 1.4, // Enhanced contrast for dramatic depth
+      harmonyTolerance: 0.3, // Tighter harmony for cohesive gradient flows
 
-      // 🎨 NEW: Artistic Enhancement Factors
-      artisticSaturationBoost: 1.2, // 20% saturation enhancement for extracted colors
-      cosmicLuminanceBoost: 1.15, // 15% luminance boost for cosmic presence
-      energyResponsiveness: 0.8, // How much music energy affects color intensity
+      // 🎨 Cinematic Gradient Enhancement Factors
+      artisticSaturationBoost: 1.35, // Strong saturation for vibrant gradient aesthetics
+      cosmicLuminanceBoost: 1.25, // Enhanced luminance for gradient depth
+      energyResponsiveness: 0.8, // High energy responsiveness for dynamic gradients
 
-      // 🌟 Dynamic Blending Based on Artistic Mode
+      // 🌟 Cinematic Gradient Blending Based on Artistic Mode
       getBlendRatio(artisticMode: string = "artist-vision") {
         const ratios: { [key: string]: number } = {
-          "corporate-safe": 0.75, // Conservative: 75% extracted
-          "artist-vision": 0.95, // Bold: 95% extracted
-          "cosmic-maximum": 0.98, // Maximum: 98% extracted!
+          "corporate-safe": 0.6, // Moderate: 60% extracted for professional gradients
+          "artist-vision": 0.75, // Cinematic: 75% extracted for balanced drama
+          "cosmic-maximum": 0.85, // Maximum: 85% extracted for full intensity!
         };
         return ratios[artisticMode] || this.defaultBlendRatio;
       },
@@ -383,11 +384,13 @@ export class ColorHarmonyEngine
     }
 
     // Initialize emotional temperature mapper for music-to-emotion integration
-    this.emotionalTemperatureMapper = new EmotionalTemperatureMapper(this.config.enableDebug);
-    
+    this.emotionalTemperatureMapper = new EmotionalTemperatureMapper(
+      this.config.enableDebug
+    );
+
     // Initialize OKLAB processor for advanced color science
     this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
-    
+
     // Initialize music emotion analyzer for consciousness-aware color processing
     this.musicEmotionAnalyzer = new MusicEmotionAnalyzer({
       emotionSensitivity: 0.7,
@@ -395,24 +398,24 @@ export class ColorHarmonyEngine
       consciousnessAwareness: true,
       organicFlowDetection: true,
       cinematicAnalysis: true,
-      analysisInterval: 500 // 2Hz analysis rate
+      analysisInterval: 500, // 2Hz analysis rate
     });
 
-    // Initialize GenreGradientEvolution for aesthetic intelligence  
+    // Initialize GenreGradientEvolution for aesthetic intelligence
     this.genreGradientEvolution = new GenreGradientEvolution(
       undefined as any, // cssConsciousnessController will be set during initialize()
       null, // musicSyncService will be injected if available
       null, // emotionalGradientMapper will be injected if available
       this.settingsManager
     );
-    
+
     // Initialize OKLAB processing state
     this.oklabState = {
       currentPreset: OKLABColorProcessor.PRESETS.STANDARD!,
       processedPalette: {},
       perceptualGradientCache: new Map(),
       colorHarmonyCache: new Map(),
-      lastProcessingTime: 0
+      lastProcessingTime: 0,
     };
 
     // Initialize emotional state for consciousness-aware processing
@@ -420,7 +423,7 @@ export class ColorHarmonyEngine
       currentEmotion: null,
       emotionHistory: [],
       lastEmotionUpdate: 0,
-      emotionInfluenceIntensity: 0.8 // Strong emotion influence by default
+      emotionInfluenceIntensity: 0.8, // Strong emotion influence by default
     };
 
     // Initialize genre state for aesthetic-aware processing
@@ -429,7 +432,7 @@ export class ColorHarmonyEngine
       genreConfidence: 0.0,
       genreHistory: [],
       lastGenreUpdate: 0,
-      genreInfluenceIntensity: 0.7 // Moderate genre influence by default
+      genreInfluenceIntensity: 0.7, // Moderate genre influence by default
     };
 
     // Bind handlers once
@@ -448,6 +451,49 @@ export class ColorHarmonyEngine
     // Start evolution loop if allowed
     if (this.evolutionEnabled) {
       this._startEvolutionLoop();
+    }
+  }
+
+  /**
+   * Get current active palette from PaletteSystemManager
+   * Falls back to hardcoded catppuccinPalettes for compatibility
+   */
+  private getCurrentActivePalette(): CatppuccinPalette {
+    try {
+      const paletteSystem = paletteSystemManager.getCurrentPaletteSystem();
+      
+      if (paletteSystem === 'year3000') {
+        // Convert Year 3000 palette to legacy format for compatibility
+        const year3000Palette = paletteSystemManager.getCurrentPalette();
+        const currentFlavor = paletteSystemManager.getCurrentDefaultFlavor();
+        const activePalette = year3000Palette[currentFlavor];
+        
+        if (!activePalette) {
+          throw new Error(`No palette found for flavor: ${currentFlavor}`);
+        }
+        
+        // Convert to legacy CatppuccinPalette format
+        const accents: { [key: string]: string } = {};
+        const neutrals: { [key: string]: string } = {};
+        
+        // Map Year 3000 colors to legacy format
+        Object.entries(activePalette).forEach(([key, color]) => {
+          if (['base', 'surface0', 'surface1', 'surface2', 'mantle', 'crust'].includes(key)) {
+            neutrals[key] = color.hex;
+          } else {
+            accents[key] = color.hex;
+          }
+        });
+        
+        return { accents, neutrals } as CatppuccinPalette;
+      } else {
+        // Use hardcoded Catppuccin palettes
+        return (this.catppuccinPalettes as any)[this.currentTheme];
+      }
+    } catch (error) {
+      // Fallback to hardcoded palettes
+      console.warn('[ColorHarmonyEngine] Failed to get active palette, using fallback:', error);
+      return (this.catppuccinPalettes as any)[this.currentTheme];
     }
   }
   // TODO: Legacy interface method - delegates to new onAnimate
@@ -474,7 +520,7 @@ export class ColorHarmonyEngine
       deltaTime: deltaMs,
       fps: 60,
       memoryUsage: (performance as any).memory?.usedJSHeapSize || 0,
-      timestamp: performance.now()
+      timestamp: performance.now(),
     });
   }
 
@@ -484,21 +530,29 @@ export class ColorHarmonyEngine
     const harmonyVariables: Record<string, string> = {
       "--sn-harmony-energy": this.kineticState.visualMomentum.toFixed(3),
       "--sn-harmony-pulse": this.kineticState.currentPulse.toFixed(3),
-      "--sn-harmony-breathing-phase": (Math.sin(this.kineticState.breathingPhase) * 0.5 + 0.5).toFixed(3),
+      "--sn-harmony-breathing-phase": (
+        Math.sin(this.kineticState.breathingPhase) * 0.5 +
+        0.5
+      ).toFixed(3),
     };
 
     // Add music-aware dynamic variables if available
     if (this.kineticState.musicIntensityMultiplier !== undefined) {
-      harmonyVariables["--sn-harmony-intensity"] = this.kineticState.musicIntensityMultiplier.toFixed(3);
+      harmonyVariables["--sn-harmony-intensity"] =
+        this.kineticState.musicIntensityMultiplier.toFixed(3);
     }
     if (this.kineticState.valenceGravity !== undefined) {
-      harmonyVariables["--sn-harmony-valence"] = this.kineticState.valenceGravity.toFixed(3);
+      harmonyVariables["--sn-harmony-valence"] =
+        this.kineticState.valenceGravity.toFixed(3);
     }
     if (this.kineticState.beatPhase !== undefined) {
-      harmonyVariables["--sn-harmony-beat-phase"] = this.kineticState.beatPhase.toFixed(3);
+      harmonyVariables["--sn-harmony-beat-phase"] =
+        this.kineticState.beatPhase.toFixed(3);
     }
     if (this.kineticState.hueShift !== undefined) {
-      harmonyVariables["--sn-harmony-hue-shift"] = `${this.kineticState.hueShift.toFixed(1)}deg`;
+      harmonyVariables[
+        "--sn-harmony-hue-shift"
+      ] = `${this.kineticState.hueShift.toFixed(1)}deg`;
     }
 
     // Dynamic text glow intensity
@@ -506,10 +560,10 @@ export class ColorHarmonyEngine
     harmonyVariables["--sn-text-glow-intensity"] = glow.toFixed(3);
 
     // 🔧 PHASE 2: Emit harmony CSS event for ColorStateManager to handle
-    unifiedEventBus.emit('system:css-variables' as any, {
-      source: 'ColorHarmonyEngine',
+    unifiedEventBus.emit("system:css-variables" as any, {
+      source: "ColorHarmonyEngine",
       variables: harmonyVariables,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -523,60 +577,171 @@ export class ColorHarmonyEngine
     if (this.kineticState.breathingPhase > 2 * Math.PI) {
       this.kineticState.breathingPhase -= 2 * Math.PI;
     }
+
+    // Emit gradient breathing events for dimensional consciousness
+    this._emitGradientBreathingEvents(deltaMs);
+  }
+
+  /**
+   * Emit gradient breathing events for dimensional consciousness integration
+   */
+  private _emitGradientBreathingEvents(deltaMs: number): void {
+    // Calculate current energy level from various sources
+    const currentEnergy = this._calculateCurrentEnergyLevel();
+
+    // Check for beat detection based on audio analysis
+    const beatDetected = this._detectBeatFromAudioAnalysis();
+
+    // Emit energy consciousness events
+    if (Math.random() < 0.1) {
+      // Throttle to ~6Hz (10% of 60fps)
+      unifiedEventBus.emit("music:energy", {
+        energy: currentEnergy.energy,
+        valence: currentEnergy.valence,
+        tempo: 120,
+        timestamp: performance.now(),
+      });
+    }
+
+    // Emit beat events when detected
+    if (beatDetected.detected) {
+      unifiedEventBus.emit("music:beat", {
+        intensity: beatDetected.intensity,
+        confidence: beatDetected.confidence,
+        timestamp: performance.now(),
+        bpm: 120, // Default BPM value
+      });
+    }
+  }
+
+  /**
+   * Calculate current energy level from music analysis data
+   */
+  private _calculateCurrentEnergyLevel(): {
+    energy: number;
+    valence: number;
+    arousal: number;
+  } {
+    // Fall back to kinetic state and breathing pattern for now
+    // TODO: Integrate with actual music analysis data when available
+    const breathingEnergy =
+      0.5 + Math.sin(this.kineticState.breathingPhase) * 0.3;
+    return {
+      energy: Math.max(0.2, breathingEnergy),
+      valence: 0.5 + this.kineticState.currentPulse * 0.3,
+      arousal: 0.4 + this.kineticState.currentPulse * 0.4,
+    };
+  }
+
+  /**
+   * Detect beats from current audio analysis for gradient breathing
+   */
+  private _detectBeatFromAudioAnalysis(): {
+    detected: boolean;
+    intensity: number;
+    confidence: number;
+  } {
+    // Use current pulse as beat indicator
+    const pulseThreshold = 0.3;
+    const currentPulse = this.kineticState.currentPulse;
+
+    // Simple beat detection based on pulse strength
+    if (currentPulse > pulseThreshold) {
+      return {
+        detected: true,
+        intensity: Math.min(1.0, currentPulse * 1.5),
+        confidence: Math.min(
+          1.0,
+          (currentPulse - pulseThreshold) / (1.0 - pulseThreshold)
+        ),
+      };
+    }
+
+    // Check for natural breathing beats (every 2 seconds roughly)
+    const breathingBeat = Math.sin(this.kineticState.breathingPhase) > 0.8;
+    if (breathingBeat) {
+      return {
+        detected: true,
+        intensity: 0.4,
+        confidence: 0.6,
+      };
+    }
+
+    return { detected: false, intensity: 0, confidence: 0 };
   }
 
   public override async initialize(): Promise<void> {
     await super.initialize();
-    
-    // Initialize SemanticColorManager with UnifiedCSSConsciousnessController from parent system
-    const cssConsciousnessController = this.performanceMonitor ? 
-      (this.performanceMonitor as any).cssConsciousnessController : undefined;
+
+    // Initialize SemanticColorManager with UnifiedCSSVariableManager from parent system
+    const cssConsciousnessController = this.performanceMonitor
+      ? (this.performanceMonitor as any).cssConsciousnessController
+      : undefined;
     this.semanticColorManager.initialize(cssConsciousnessController);
-    
+
     // 🔧 CRITICAL FIX: Do NOT update semantic colors on initialization as it sets white/gray values
     // Initial semantic color setup - DISABLED to prevent color override
     // await this.semanticColorManager.updateSemanticColors();
-    
+
     // Subscribe to color extraction events for strategy pattern
-    unifiedEventBus.subscribe('colors:extracted', this.handleColorExtraction.bind(this), 'ColorHarmonyEngine');
-    
+    unifiedEventBus.subscribe(
+      "colors:extracted",
+      this.handleColorExtraction.bind(this),
+      "ColorHarmonyEngine"
+    );
+
     // Register with ColorOrchestrator for strategy pattern coordination
     try {
       globalColorOrchestrator.registerStrategy(this);
       if (this.config.enableDebug) {
-        console.log("🎨 [ColorHarmonyEngine] Registered with ColorOrchestrator as strategy processor.");
+        console.log(
+          "🎨 [ColorHarmonyEngine] Registered with ColorOrchestrator as strategy processor."
+        );
       }
     } catch (error) {
-      console.warn("🎨 [ColorHarmonyEngine] Failed to register with ColorOrchestrator:", error);
+      console.warn(
+        "🎨 [ColorHarmonyEngine] Failed to register with ColorOrchestrator:",
+        error
+      );
     }
-    
+
     // Initialize music emotion analyzer for consciousness-aware color processing
     try {
       await this.musicEmotionAnalyzer.initialize();
-      
+
       // Subscribe to emotion updates for consciousness-aware color processing
       this.musicEmotionAnalyzer.onEmotionUpdate((emotion: EmotionalState) => {
         this.handleEmotionUpdate(emotion);
       });
-      
+
       if (this.config.enableDebug) {
-        console.log("🎭 [ColorHarmonyEngine] MusicEmotionAnalyzer initialized with consciousness awareness");
+        console.log(
+          "🎭 [ColorHarmonyEngine] MusicEmotionAnalyzer initialized with consciousness awareness"
+        );
       }
     } catch (error) {
-      console.warn("🎭 [ColorHarmonyEngine] Failed to initialize MusicEmotionAnalyzer:", error);
+      console.warn(
+        "🎭 [ColorHarmonyEngine] Failed to initialize MusicEmotionAnalyzer:",
+        error
+      );
     }
 
     // Initialize GenreGradientEvolution for aesthetic intelligence
     try {
       await this.genreGradientEvolution.initialize();
-      
+
       if (this.config.enableDebug) {
-        console.log("🎶 [ColorHarmonyEngine] GenreGradientEvolution initialized with aesthetic intelligence");
+        console.log(
+          "🎶 [ColorHarmonyEngine] GenreGradientEvolution initialized with aesthetic intelligence"
+        );
       }
     } catch (error) {
-      console.warn("🎶 [ColorHarmonyEngine] Failed to initialize GenreGradientEvolution:", error);
+      console.warn(
+        "🎶 [ColorHarmonyEngine] Failed to initialize GenreGradientEvolution:",
+        error
+      );
     }
-    
+
     if (this.config.enableDebug) {
       console.log(
         "🎨 [ColorHarmonyEngine] Initialized with Year 3000 Quantum Empathy via BaseVisualSystem and SemanticColorManager."
@@ -603,28 +768,38 @@ export class ColorHarmonyEngine
 
       // Limit emotion history size for performance
       if (this.emotionalState.emotionHistory.length > 50) {
-        this.emotionalState.emotionHistory = this.emotionalState.emotionHistory.slice(-25);
+        this.emotionalState.emotionHistory =
+          this.emotionalState.emotionHistory.slice(-25);
       }
 
       // Emit emotion event for other systems (like GradientConductor)
-      unifiedEventBus.emit('emotion:analyzed', {
+      unifiedEventBus.emit("emotion:analyzed", {
         emotion,
         colorTemperature: emotion.colorTemperature,
-        consciousnessLevel: emotion.musicalCharacteristics.consciousnessResonance,
+        consciousnessLevel:
+          emotion.musicalCharacteristics.consciousnessResonance,
         organicFlow: emotion.musicalCharacteristics.organicFlow,
         cinematicDepth: emotion.musicalCharacteristics.cinematicDepth,
-        timestamp: emotion.timestamp
+        timestamp: emotion.timestamp,
       });
 
       if (this.config.enableDebug) {
-        console.log(`🎭 [ColorHarmonyEngine] Emotion updated: ${emotion.primary} (intensity: ${emotion.intensity.toFixed(2)}, confidence: ${emotion.confidence.toFixed(2)})`);
+        console.log(
+          `🎭 [ColorHarmonyEngine] Emotion updated: ${
+            emotion.primary
+          } (intensity: ${emotion.intensity.toFixed(
+            2
+          )}, confidence: ${emotion.confidence.toFixed(2)})`
+        );
       }
 
       // Trigger color harmony refresh with emotion influence
       this.triggerEmotionalColorUpdate(emotion);
-
     } catch (error) {
-      console.error("🎭 [ColorHarmonyEngine] Error handling emotion update:", error);
+      console.error(
+        "🎭 [ColorHarmonyEngine] Error handling emotion update:",
+        error
+      );
     }
   }
 
@@ -633,7 +808,10 @@ export class ColorHarmonyEngine
    */
   private triggerEmotionalColorUpdate(emotion: EmotionalState): void {
     // Only trigger if emotion influence is enabled and confidence is high enough
-    if (this.emotionalState.emotionInfluenceIntensity > 0 && emotion.confidence > 0.6) {
+    if (
+      this.emotionalState.emotionInfluenceIntensity > 0 &&
+      emotion.confidence > 0.6
+    ) {
       // Use a debounced approach to avoid excessive updates
       if (this._pendingPaletteRefresh) {
         clearTimeout(this._pendingPaletteRefresh);
@@ -649,7 +827,9 @@ export class ColorHarmonyEngine
   /**
    * Refresh palette with emotional influence
    */
-  private async refreshPaletteWithEmotion(emotion: EmotionalState): Promise<void> {
+  private async refreshPaletteWithEmotion(
+    emotion: EmotionalState
+  ): Promise<void> {
     try {
       // Create emotional color context based on current emotion
       const emotionalContext = {
@@ -661,37 +841,42 @@ export class ColorHarmonyEngine
         dominance: emotion.dominance,
         organicFlow: emotion.musicalCharacteristics.organicFlow,
         cinematicDepth: emotion.musicalCharacteristics.cinematicDepth,
-        consciousnessResonance: emotion.musicalCharacteristics.consciousnessResonance
+        consciousnessResonance:
+          emotion.musicalCharacteristics.consciousnessResonance,
       };
 
       // Emit emotional color context for other systems
-      unifiedEventBus.emit('emotionalColorContext:updated', emotionalContext);
+      unifiedEventBus.emit("emotionalColorContext:updated", emotionalContext);
 
       if (this.config.enableDebug) {
-        console.log(`🎭 [ColorHarmonyEngine] Refreshing colors with ${emotion.primary} emotion influence`);
+        console.log(
+          `🎭 [ColorHarmonyEngine] Refreshing colors with ${emotion.primary} emotion influence`
+        );
       }
-
     } catch (error) {
-      console.error("🎭 [ColorHarmonyEngine] Error refreshing palette with emotion:", error);
+      console.error(
+        "🎭 [ColorHarmonyEngine] Error refreshing palette with emotion:",
+        error
+      );
     }
   }
 
   public async healthCheck(): Promise<HealthCheckResult> {
-    if (!this.catppuccinPalettes[this.currentTheme]) {
+    if (!this.getCurrentActivePalette()) {
       return {
         healthy: false,
         ok: false,
         details: `Current theme '${this.currentTheme}' not found in palettes.`,
         issues: [`Current theme '${this.currentTheme}' not found in palettes.`],
-        system: 'ColorHarmonyEngine',
+        system: "ColorHarmonyEngine",
       };
     }
-    return { 
+    return {
       healthy: true,
-      ok: true, 
+      ok: true,
       details: "Palettes are loaded correctly.",
       issues: [],
-      system: 'ColorHarmonyEngine',
+      system: "ColorHarmonyEngine",
     };
   }
 
@@ -705,35 +890,44 @@ export class ColorHarmonyEngine
    */
   public async processColors(context: ColorContext): Promise<ColorResult> {
     const startTime = performance.now();
-    
+
     try {
       // Extract relevant data from context
       const { rawColors, trackUri, musicData } = context;
-      
+
       // 🔬 ENHANCED OKLAB PROCESSING: Determine optimal enhancement preset based on context
       const optimalPreset = this.determineOptimalOKLABPreset(context);
       this.oklabState.currentPreset = optimalPreset;
-      
+
       // 🎶 GENRE AESTHETIC INTELLIGENCE: Detect and apply genre-specific visual characteristics
       const genreData = await this.analyzeGenreAesthetics(musicData, rawColors);
-      
+
       // 🌡️ ADVANCED EMOTIONAL TEMPERATURE INTEGRATION: Get comprehensive emotional analysis
       // Enhanced with album art color psychology for multi-sensory emotion intelligence
-      const emotionalTemperature = await this.getAdvancedEmotionalTemperature(musicData, rawColors);
-      
+      const emotionalTemperature = await this.getAdvancedEmotionalTemperature(
+        musicData,
+        rawColors
+      );
+
       // 🎨 PERCEPTUAL COLOR PROCESSING: Use OKLAB-enhanced color blending with genre aesthetics
-      const processedColors = await this.blendWithAdvancedOKLAB(rawColors, musicData, emotionalTemperature, genreData || undefined);
-      
+      const processedColors = await this.blendWithAdvancedOKLAB(
+        rawColors,
+        musicData,
+        emotionalTemperature,
+        genreData || undefined
+      );
+
       // Extract primary accent color for event data
-      const accentHex = processedColors['VIBRANT'] || 
-                       processedColors['PROMINENT'] || 
-                       Object.values(processedColors)[0] || 
-                       '#a6adc8'; // Catppuccin fallback
-      
+      const accentHex =
+        processedColors["VIBRANT"] ||
+        processedColors["PROMINENT"] ||
+        Object.values(processedColors)[0] ||
+        "#a6adc8"; // Catppuccin fallback
+
       // Convert to RGB for transparency support
       const rgb = this.utils.hexToRgb(accentHex);
-      const accentRgb = rgb ? `${rgb.r},${rgb.g},${rgb.b}` : '166,173,200';
-      
+      const accentRgb = rgb ? `${rgb.r},${rgb.g},${rgb.b}` : "166,173,200";
+
       // 🔧 Phase 2: Proper UnifiedEventBus architecture - no DOM events
       try {
         // Emit colors:harmonized event through UnifiedEventBus only (no DOM events)
@@ -745,97 +939,111 @@ export class ColorHarmonyEngine
           trackUri: trackUri,
           musicData: musicData,
           timestamp: Date.now(),
-          strategies: ['ColorHarmonyEngine'],
+          strategies: ["ColorHarmonyEngine"],
           processingTime: performance.now() - startTime,
           coordinationMetrics: {
-            detectedGenre: genreData?.genre || 'unknown',
+            detectedGenre: genreData?.genre || "unknown",
             genreConfidence: genreData?.confidence || 0.0,
-            emotionalState: this.emotionalState.currentEmotion?.primary || 'neutral',
-            oklabPreset: optimalPreset?.name || 'standard',
-            coordinationStrategy: 'genre-emotion-color-unified',
-            musicInfluenceStrength: this.genreState.genreInfluenceIntensity
-          }
+            emotionalState:
+              this.emotionalState.currentEmotion?.primary || "neutral",
+            oklabPreset: optimalPreset?.name || "standard",
+            coordinationStrategy: "genre-emotion-color-unified",
+            musicInfluenceStrength: this.genreState.genreInfluenceIntensity,
+          },
         };
-        
+
         // Use UnifiedEventBus for proper facade coordination
-        unifiedEventBus.emitSync('colors:harmonized', harmonizedEventData);
-        
+        unifiedEventBus.emitSync("colors:harmonized", harmonizedEventData);
+
         if (this.config.enableDebug) {
-          console.log('🎨 [ColorHarmonyEngine] Emitted colors:harmonized via UnifiedEventBus (facade pattern):', {
-            processedColors: Object.keys(processedColors),
-            accentHex: accentHex,
-            noDomEvents: 'correct architecture'
-          });
+          console.log(
+            "🎨 [ColorHarmonyEngine] Emitted colors:harmonized via UnifiedEventBus (facade pattern):",
+            {
+              processedColors: Object.keys(processedColors),
+              accentHex: accentHex,
+              noDomEvents: "correct architecture",
+            }
+          );
         }
       } catch (eventError) {
         if (this.config.enableDebug) {
-          console.warn('[ColorHarmonyEngine] Failed to emit colors:harmonized event:', eventError);
+          console.warn(
+            "[ColorHarmonyEngine] Failed to emit colors:harmonized event:",
+            eventError
+          );
         }
       }
-      
+
       // Calculate processing time
       const processingTime = performance.now() - startTime;
-      
+
       // Update metrics
       this.harmonyMetrics.totalHarmonyCalculations++;
       this.harmonyMetrics.performance.push(processingTime);
-      
+
       const result: ColorResult = {
         processedColors,
         accentHex,
         accentRgb,
         metadata: {
-          strategy: 'CatppuccinHarmony',
+          strategy: "CatppuccinHarmony",
           processingTime,
           cacheKey: `catppuccin-${trackUri}-${this.currentTheme}`,
-          harmonicIntensity: this.userIntensity
+          harmonicIntensity: this.userIntensity,
         },
-        context
+        context,
       };
-      
+
       // 🔬 COMPREHENSIVE OKLAB CSS GENERATION: Generate advanced OKLAB variables
       const cssVariables = this.generateAdvancedOKLABCSSVariables(result);
       this.applyCSSVariablesToDOM(cssVariables);
-      
+
       // 🎯 PERCEPTUAL GRADIENT GENERATION: Generate OKLAB-based gradient data for WebGL systems
       this.generatePerceptualGradientData(result);
-      
+
       // 📊 COLOR HARMONY ANALYSIS: Update harmony metrics with perceptual analysis
       this.updateAdvancedHarmonyMetrics(result, processingTime);
-      
+
       // Emit processed result event
-      unifiedEventBus.emitSync('colors:harmonized', {
+      unifiedEventBus.emitSync("colors:harmonized", {
         processedColors: result.processedColors,
         accentHex: result.accentHex,
         accentRgb: result.accentRgb,
-        strategies: result.metadata?.strategy ? [result.metadata.strategy] : ['ColorHarmonyEngine'],
+        strategies: result.metadata?.strategy
+          ? [result.metadata.strategy]
+          : ["ColorHarmonyEngine"],
         processingTime: processingTime,
-        trackUri: result.context.trackUri
+        trackUri: result.context.trackUri,
       });
-      
+
       if (this.config.enableDebug) {
         console.log(
-          `🎨 [ColorHarmonyEngine] Processed colors via strategy pattern in ${processingTime.toFixed(2)}ms`,
-          { accentHex, strategy: 'CatppuccinHarmony', cssVariablesCount: Object.keys(cssVariables).length }
+          `🎨 [ColorHarmonyEngine] Processed colors via strategy pattern in ${processingTime.toFixed(
+            2
+          )}ms`,
+          {
+            accentHex,
+            strategy: "CatppuccinHarmony",
+            cssVariablesCount: Object.keys(cssVariables).length,
+          }
         );
       }
-      
+
       return result;
-      
     } catch (error) {
-      console.error('[ColorHarmonyEngine] Strategy processing failed:', error);
-      
+      console.error("[ColorHarmonyEngine] Strategy processing failed:", error);
+
       // Return fallback result
       return {
-        processedColors: { VIBRANT: '#a6adc8' },
-        accentHex: '#a6adc8',
-        accentRgb: '166,173,200',
+        processedColors: { VIBRANT: "#a6adc8" },
+        accentHex: "#a6adc8",
+        accentRgb: "166,173,200",
         metadata: {
-          strategy: 'CatppuccinHarmony',
+          strategy: "CatppuccinHarmony",
           processingTime: performance.now() - startTime,
-          error: String(error)
+          error: String(error),
         },
-        context
+        context,
       };
     }
   }
@@ -844,7 +1052,7 @@ export class ColorHarmonyEngine
    * Get strategy name for identification
    */
   public getStrategyName(): string {
-    return 'CatppuccinHarmony';
+    return "CatppuccinHarmony";
   }
 
   /**
@@ -852,9 +1060,9 @@ export class ColorHarmonyEngine
    */
   public canProcess(context: ColorContext): boolean {
     // Can process any context with raw colors
-    return context && 
-           context.rawColors && 
-           Object.keys(context.rawColors).length > 0;
+    return (
+      context && context.rawColors && Object.keys(context.rawColors).length > 0
+    );
   }
 
   /**
@@ -865,7 +1073,7 @@ export class ColorHarmonyEngine
     const baseTime = 5; // ms
     const colorCount = Object.keys(context.rawColors || {}).length;
     const complexityFactor = Math.max(1, colorCount / 5);
-    
+
     return baseTime * complexityFactor;
   }
 
@@ -887,7 +1095,9 @@ export class ColorHarmonyEngine
     try {
       if (!this.initialized) {
         if (this.config.enableDebug) {
-          console.warn('[ColorHarmonyEngine] Received color extraction event but not initialized');
+          console.warn(
+            "[ColorHarmonyEngine] Received color extraction event but not initialized"
+          );
         }
         return;
       }
@@ -902,20 +1112,25 @@ export class ColorHarmonyEngine
         performanceHints: {
           preferLightweight: false,
           enableAdvancedBlending: true,
-          maxProcessingTime: 100
-        }
+          maxProcessingTime: 100,
+        },
       };
-      
+
       if (this.canProcess(context)) {
         await this.processColors(context);
       } else {
         if (this.config.enableDebug) {
-          console.warn('[ColorHarmonyEngine] Cannot process color context:', context);
+          console.warn(
+            "[ColorHarmonyEngine] Cannot process color context:",
+            context
+          );
         }
       }
-      
     } catch (error) {
-      console.error('[ColorHarmonyEngine] Error handling color extraction event:', error);
+      console.error(
+        "[ColorHarmonyEngine] Error handling color extraction event:",
+        error
+      );
     }
   }
 
@@ -924,149 +1139,221 @@ export class ColorHarmonyEngine
    */
   private generateCSSVariables(result: ColorResult): Record<string, string> {
     const cssVars: Record<string, string> = {};
-    
+
     // Core accent variables
-    cssVars['--sn-accent-hex'] = result.accentHex;
-    cssVars['--sn-accent-rgb'] = result.accentRgb;
-    
+    cssVars["--sn-accent-hex"] = result.accentHex;
+    cssVars["--sn-accent-rgb"] = result.accentRgb;
+
     // Canonical accent variables
     cssVars[ColorHarmonyEngine.CANONICAL_HEX_VAR] = result.accentHex;
     cssVars[ColorHarmonyEngine.CANONICAL_RGB_VAR] = result.accentRgb;
-    
+
     // 🔧 CRITICAL FIX: Removed --spice-* variable setting to prevent conflicts
     // DynamicCatppuccinBridge is now the sole owner of --spice-* variables
     // This prevents timing issues and ensures consistent color application
-    
+
     // 🔧 CRITICAL FIX: Add gradient variables that CSS depends on
     // Extract secondary and tertiary colors from processedColors for gradients
     const processedColors = result.processedColors;
-    const primaryColor = processedColors['VIBRANT'] || processedColors['PROMINENT'] || result.accentHex;
-    const secondaryColor = processedColors['DARK_VIBRANT'] || processedColors['DESATURATED'] || primaryColor;
-    const accentColor = processedColors['VIBRANT_NON_ALARMING'] || processedColors['LIGHT_VIBRANT'] || primaryColor;
-    
+    const primaryColor =
+      processedColors["VIBRANT"] ||
+      processedColors["PROMINENT"] ||
+      result.accentHex;
+    const secondaryColor =
+      processedColors["DARK_VIBRANT"] ||
+      processedColors["DESATURATED"] ||
+      primaryColor;
+    const accentColor =
+      processedColors["VIBRANT_NON_ALARMING"] ||
+      processedColors["LIGHT_VIBRANT"] ||
+      primaryColor;
+
     // 🔧 CRITICAL FIX: Set background gradient variables (source variables)
     // The CSS mapping automatically updates --sn-gradient-* from these --sn-bg-gradient-* variables
-    cssVars['--sn-bg-gradient-primary'] = primaryColor;
-    cssVars['--sn-bg-gradient-secondary'] = secondaryColor;
-    cssVars['--sn-bg-gradient-accent'] = accentColor;
-    
+    cssVars["--sn-bg-gradient-primary"] = primaryColor;
+    cssVars["--sn-bg-gradient-secondary"] = secondaryColor;
+    cssVars["--sn-bg-gradient-accent"] = accentColor;
+
     // Set RGB variants for transparency support
     const primaryRgb = this.utils.hexToRgb(primaryColor);
     const secondaryRgb = this.utils.hexToRgb(secondaryColor);
     const accentRgb = this.utils.hexToRgb(accentColor);
-    
+
     if (primaryRgb) {
-      cssVars['--sn-bg-gradient-primary-rgb'] = `${primaryRgb.r},${primaryRgb.g},${primaryRgb.b}`;
+      cssVars[
+        "--sn-bg-gradient-primary-rgb"
+      ] = `${primaryRgb.r},${primaryRgb.g},${primaryRgb.b}`;
     }
     if (secondaryRgb) {
-      cssVars['--sn-bg-gradient-secondary-rgb'] = `${secondaryRgb.r},${secondaryRgb.g},${secondaryRgb.b}`;
+      cssVars[
+        "--sn-bg-gradient-secondary-rgb"
+      ] = `${secondaryRgb.r},${secondaryRgb.g},${secondaryRgb.b}`;
     }
     if (accentRgb) {
-      cssVars['--sn-bg-gradient-accent-rgb'] = `${accentRgb.r},${accentRgb.g},${accentRgb.b}`;
+      cssVars[
+        "--sn-bg-gradient-accent-rgb"
+      ] = `${accentRgb.r},${accentRgb.g},${accentRgb.b}`;
     }
-    
+
     // 🔧 OKLAB COLOR PROCESSING: Generate OKLAB-processed CSS variables
     // Process colors through OKLAB space for perceptually uniform color transitions
     this.generateOKLABVariables(cssVars, result);
-    
+
     if (this.config.enableDebug) {
-      console.log('🔧 [ColorHarmonyEngine] Generated background gradient CSS variables:', {
-        primary: `${primaryColor} -> ${cssVars['--sn-bg-gradient-primary-rgb']}`,
-        secondary: `${secondaryColor} -> ${cssVars['--sn-bg-gradient-secondary-rgb']}`,
-        accent: `${accentColor} -> ${cssVars['--sn-bg-gradient-accent-rgb']}`,
-        totalVariables: Object.keys(cssVars).length,
-        note: 'CSS mapping automatically updates --sn-gradient-* variables'
-      });
+      console.log(
+        "🔧 [ColorHarmonyEngine] Generated background gradient CSS variables:",
+        {
+          primary: `${primaryColor} -> ${cssVars["--sn-bg-gradient-primary-rgb"]}`,
+          secondary: `${secondaryColor} -> ${cssVars["--sn-bg-gradient-secondary-rgb"]}`,
+          accent: `${accentColor} -> ${cssVars["--sn-bg-gradient-accent-rgb"]}`,
+          totalVariables: Object.keys(cssVars).length,
+          note: "CSS mapping automatically updates --sn-gradient-* variables",
+        }
+      );
     }
-    
+
     return cssVars;
   }
 
   /**
    * Generate OKLAB-processed CSS variables for perceptual color processing
    */
-  private generateOKLABVariables(cssVars: Record<string, string>, result: ColorResult): void {
+  private generateOKLABVariables(
+    cssVars: Record<string, string>,
+    result: ColorResult
+  ): void {
     try {
       // Extract primary and accent colors for OKLAB processing
       const primaryHex = result.accentHex;
       const processedColors = result.processedColors;
-      const secondaryHex = processedColors['DARK_VIBRANT'] || processedColors['DESATURATED'] || primaryHex;
-      
+      const secondaryHex =
+        processedColors["DARK_VIBRANT"] ||
+        processedColors["DESATURATED"] ||
+        primaryHex;
+
       const primaryRgb = this.utils.hexToRgb(primaryHex);
       const secondaryRgb = this.utils.hexToRgb(secondaryHex);
-      
+
       if (primaryRgb) {
         // Process primary color through OKLAB space for enhanced vibrancy
-        const oklabPrimary = this.utils.rgbToOklab(primaryRgb.r, primaryRgb.g, primaryRgb.b);
-        
+        const oklabPrimary = this.utils.rgbToOklab(
+          primaryRgb.r,
+          primaryRgb.g,
+          primaryRgb.b
+        );
+
         // Apply aesthetic enhancements in OKLAB space
         const enhancedOklab = {
           L: Math.min(1, oklabPrimary.L * 1.1), // Slight lightness boost
           a: oklabPrimary.a * 1.15, // Enhanced chroma for vibrancy
-          b: oklabPrimary.b * 1.15
+          b: oklabPrimary.b * 1.15,
         };
-        
-        const enhancedRgb = this.utils.oklabToRgb(enhancedOklab.L, enhancedOklab.a, enhancedOklab.b);
-        
+
+        const enhancedRgb = this.utils.oklabToRgb(
+          enhancedOklab.L,
+          enhancedOklab.a,
+          enhancedOklab.b
+        );
+
         // Set OKLAB processed variables that SCSS files expect
-        cssVars['--sn-color-oklab-bright-highlight-rgb'] = `${enhancedRgb.r},${enhancedRgb.g},${enhancedRgb.b}`;
-        
+        cssVars[
+          "--sn-color-oklab-bright-highlight-rgb"
+        ] = `${enhancedRgb.r},${enhancedRgb.g},${enhancedRgb.b}`;
+
         // Individual RGB components for SCSS processing
-        cssVars['--sn-color-oklab-primary-r'] = Math.round(enhancedRgb.r).toString();
-        cssVars['--sn-color-oklab-primary-g'] = Math.round(enhancedRgb.g).toString();
-        cssVars['--sn-color-oklab-primary-b'] = Math.round(enhancedRgb.b).toString();
-        cssVars['--sn-color-oklab-accent-r'] = Math.round(enhancedRgb.r).toString();
-        cssVars['--sn-color-oklab-accent-g'] = Math.round(enhancedRgb.g).toString();
-        cssVars['--sn-color-oklab-accent-b'] = Math.round(enhancedRgb.b).toString();
-        
+        cssVars["--sn-color-oklab-primary-r"] = Math.round(
+          enhancedRgb.r
+        ).toString();
+        cssVars["--sn-color-oklab-primary-g"] = Math.round(
+          enhancedRgb.g
+        ).toString();
+        cssVars["--sn-color-oklab-primary-b"] = Math.round(
+          enhancedRgb.b
+        ).toString();
+        cssVars["--sn-color-oklab-accent-r"] = Math.round(
+          enhancedRgb.r
+        ).toString();
+        cssVars["--sn-color-oklab-accent-g"] = Math.round(
+          enhancedRgb.g
+        ).toString();
+        cssVars["--sn-color-oklab-accent-b"] = Math.round(
+          enhancedRgb.b
+        ).toString();
+
         // OKLAB luminance values for contrast calculations
-        cssVars['--sn-color-oklab-accent-luminance'] = enhancedOklab.L.toFixed(3);
-        
+        cssVars["--sn-color-oklab-accent-luminance"] =
+          enhancedOklab.L.toFixed(3);
+
         // OKLCH (LCH representation of OKLAB) for hue-based animations
         const oklch = this.convertOklabToOklch(enhancedOklab);
-        cssVars['--sn-color-oklch-accent-l'] = oklch.L.toFixed(3);
-        cssVars['--sn-color-oklch-accent-c'] = oklch.C.toFixed(3);
-        cssVars['--sn-color-oklch-accent-h'] = oklch.H.toFixed(1);
-        cssVars['--sn-color-oklch-primary-l'] = oklch.L.toFixed(3);
-        cssVars['--sn-color-oklch-primary-c'] = oklch.C.toFixed(3);
-        cssVars['--sn-color-oklch-primary-h'] = oklch.H.toFixed(1);
+        cssVars["--sn-color-oklch-accent-l"] = oklch.L.toFixed(3);
+        cssVars["--sn-color-oklch-accent-c"] = oklch.C.toFixed(3);
+        cssVars["--sn-color-oklch-accent-h"] = oklch.H.toFixed(1);
+        cssVars["--sn-color-oklch-primary-l"] = oklch.L.toFixed(3);
+        cssVars["--sn-color-oklch-primary-c"] = oklch.C.toFixed(3);
+        cssVars["--sn-color-oklch-primary-h"] = oklch.H.toFixed(1);
       }
-      
+
       if (secondaryRgb) {
         // Process secondary color for shadow/depth effects
-        const oklabSecondary = this.utils.rgbToOklab(secondaryRgb.r, secondaryRgb.g, secondaryRgb.b);
-        
+        const oklabSecondary = this.utils.rgbToOklab(
+          secondaryRgb.r,
+          secondaryRgb.g,
+          secondaryRgb.b
+        );
+
         // Create darker variant for shadows while preserving hue
         const shadowOklab = {
           L: Math.max(0.05, oklabSecondary.L * 0.3), // Much darker for shadow
           a: oklabSecondary.a * 0.8, // Slightly desaturated
-          b: oklabSecondary.b * 0.8
+          b: oklabSecondary.b * 0.8,
         };
-        
-        const shadowRgb = this.utils.oklabToRgb(shadowOklab.L, shadowOklab.a, shadowOklab.b);
-        cssVars['--sn-color-oklab-dynamic-shadow-rgb'] = `${shadowRgb.r},${shadowRgb.g},${shadowRgb.b}`;
-        cssVars['--sn-color-oklab-base-luminance'] = shadowOklab.L.toFixed(3);
+
+        const shadowRgb = this.utils.oklabToRgb(
+          shadowOklab.L,
+          shadowOklab.a,
+          shadowOklab.b
+        );
+        cssVars[
+          "--sn-color-oklab-dynamic-shadow-rgb"
+        ] = `${shadowRgb.r},${shadowRgb.g},${shadowRgb.b}`;
+        cssVars["--sn-color-oklab-base-luminance"] = shadowOklab.L.toFixed(3);
       }
-      
+
       if (this.config.enableDebug) {
-        console.log('🔬 [ColorHarmonyEngine] Generated OKLAB-processed variables:', {
-          primaryColor: primaryHex,
-          secondaryColor: secondaryHex,
-          oklabVariablesCount: Object.keys(cssVars).filter(k => k.includes('oklab')).length,
-          oklchVariablesCount: Object.keys(cssVars).filter(k => k.includes('oklch')).length
-        });
+        console.log(
+          "🔬 [ColorHarmonyEngine] Generated OKLAB-processed variables:",
+          {
+            primaryColor: primaryHex,
+            secondaryColor: secondaryHex,
+            oklabVariablesCount: Object.keys(cssVars).filter((k) =>
+              k.includes("oklab")
+            ).length,
+            oklchVariablesCount: Object.keys(cssVars).filter((k) =>
+              k.includes("oklch")
+            ).length,
+          }
+        );
       }
-      
     } catch (error) {
       if (this.config.enableDebug) {
-        console.warn('🔬 [ColorHarmonyEngine] OKLAB processing failed, using fallbacks:', error);
+        console.warn(
+          "🔬 [ColorHarmonyEngine] OKLAB processing failed, using fallbacks:",
+          error
+        );
       }
-      
+
       // Fallback to primary color if OKLAB processing fails
       const fallbackRgb = this.utils.hexToRgb(result.accentHex);
       if (fallbackRgb) {
-        cssVars['--sn-color-oklab-bright-highlight-rgb'] = `${fallbackRgb.r},${fallbackRgb.g},${fallbackRgb.b}`;
-        cssVars['--sn-color-oklab-dynamic-shadow-rgb'] = `${Math.round(fallbackRgb.r * 0.3)},${Math.round(fallbackRgb.g * 0.3)},${Math.round(fallbackRgb.b * 0.3)}`;
+        cssVars[
+          "--sn-color-oklab-bright-highlight-rgb"
+        ] = `${fallbackRgb.r},${fallbackRgb.g},${fallbackRgb.b}`;
+        cssVars["--sn-color-oklab-dynamic-shadow-rgb"] = `${Math.round(
+          fallbackRgb.r * 0.3
+        )},${Math.round(fallbackRgb.g * 0.3)},${Math.round(
+          fallbackRgb.b * 0.3
+        )}`;
       }
     }
   }
@@ -1074,14 +1361,18 @@ export class ColorHarmonyEngine
   /**
    * Convert OKLAB to OKLCH (cylindrical representation)
    */
-  private convertOklabToOklch(oklab: { L: number; a: number; b: number }): { L: number; C: number; H: number } {
+  private convertOklabToOklch(oklab: { L: number; a: number; b: number }): {
+    L: number;
+    C: number;
+    H: number;
+  } {
     const L = oklab.L;
     const C = Math.sqrt(oklab.a * oklab.a + oklab.b * oklab.b);
     let H = Math.atan2(oklab.b, oklab.a) * (180 / Math.PI);
-    
+
     // Normalize hue to 0-360 range
     if (H < 0) H += 360;
-    
+
     return { L, C, H };
   }
 
@@ -1164,7 +1455,7 @@ export class ColorHarmonyEngine
   private async _getGenreAwarePalette(
     genre?: string
   ): Promise<CatppuccinPalette> {
-    const basePalette = (this.catppuccinPalettes as any)[this.currentTheme];
+    const basePalette = this.getCurrentActivePalette();
 
     if (!genre || !basePalette) {
       return basePalette;
@@ -1238,7 +1529,7 @@ export class ColorHarmonyEngine
 
     const requirements =
       contextRequirements[context] || contextRequirements["general"];
-    const currentPalette = (this.catppuccinPalettes as any)[this.currentTheme];
+    const currentPalette = this.getCurrentActivePalette();
 
     if (!currentPalette?.neutrals?.base) {
       const errorMsg = `[StarryNight] Catppuccin palette or base neutral not found for theme: ${this.currentTheme}`;
@@ -1508,52 +1799,67 @@ export class ColorHarmonyEngine
           speechiness: musicContext.speechiness,
           mode: musicContext.mode,
           key: musicContext.key,
-          genre: musicContext.genre
+          genre: musicContext.genre,
         };
-        
-        emotionalTemperature = this.emotionalTemperatureMapper.mapMusicToEmotionalTemperature(musicAnalysis);
-        
+
+        emotionalTemperature =
+          this.emotionalTemperatureMapper.mapMusicToEmotionalTemperature(
+            musicAnalysis
+          );
+
         // 🔧 PHASE 2: Emit emotional temperature CSS variables instead of applying directly
         if (emotionalTemperature) {
           // 🔧 PHASE 2: Emit CSS variables for ColorStateManager
-          unifiedEventBus.emit('system:css-variables' as any, {
-            source: 'ColorHarmonyEngine',
+          unifiedEventBus.emit("system:css-variables" as any, {
+            source: "ColorHarmonyEngine",
             variables: emotionalTemperature.cssVariables,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           });
-          
+
           // Add emotional class to body for SCSS integration (keep direct DOM update for classes)
-          document.body.classList.remove(...Array.from(document.body.classList).filter(c => c.startsWith('organic-emotion-')));
+          document.body.classList.remove(
+            ...Array.from(document.body.classList).filter((c) =>
+              c.startsWith("organic-emotion-")
+            )
+          );
           document.body.classList.add(emotionalTemperature.cssClass);
-          
+
           if (emotionalTemperature.secondaryEmotion) {
-            document.body.classList.add(`organic-emotion-blend-${emotionalTemperature.secondaryEmotion}`);
+            document.body.classList.add(
+              `organic-emotion-blend-${emotionalTemperature.secondaryEmotion}`
+            );
           }
         }
-        
+
         if (this.config.enableDebug) {
-          console.log('🌡️ [ColorHarmonyEngine] Applied emotional temperature:', emotionalTemperature);
+          console.log(
+            "🌡️ [ColorHarmonyEngine] Applied emotional temperature:",
+            emotionalTemperature
+          );
         }
       } catch (error) {
         if (this.config.enableDebug) {
-          console.warn('🌡️ [ColorHarmonyEngine] Failed to apply emotional temperature:', error);
+          console.warn(
+            "🌡️ [ColorHarmonyEngine] Failed to apply emotional temperature:",
+            error
+          );
         }
       }
     }
 
     // 🎨 DEBUG: Log input colors and current config
     if (this.config.enableDebug) {
-      console.log('🎨 [ColorHarmonyEngine] blendWithCatppuccin debug:', {
+      console.log("🎨 [ColorHarmonyEngine] blendWithCatppuccin debug:", {
         extractedColors,
         musicContext,
         emotionalTemperature,
         currentTheme: this.currentTheme,
         vibrancyConfig: this.vibrancyConfig,
-        userIntensity: this.userIntensity
+        userIntensity: this.userIntensity,
       });
     }
 
-    const currentPalette = (this.catppuccinPalettes as any)[this.currentTheme];
+    const currentPalette = this.getCurrentActivePalette();
     if (!currentPalette) {
       console.error(
         `[StarryNight] Catppuccin palette not found for theme: ${this.currentTheme}`
@@ -1569,24 +1875,32 @@ export class ColorHarmonyEngine
       const extractedRgb = this.utils.hexToRgb(color);
       if (!extractedRgb) {
         if (this.config.enableDebug) {
-          console.warn(`🎨 [ColorHarmonyEngine] Failed to parse color for role ${role}: ${color}`);
+          console.warn(
+            `🎨 [ColorHarmonyEngine] Failed to parse color for role ${role}: ${color}`
+          );
         }
         harmonizedColors[role] = color;
         continue;
       }
 
-      // 🎨 DEBUG: Check saturation thresholds 
-      const extractedHsl = this.utils.rgbToHsl(extractedRgb.r, extractedRgb.g, extractedRgb.b);
-      const saturationCheck = extractedHsl.s >= this.vibrancyConfig.minimumSaturation * 100;
-      
+      // 🎨 DEBUG: Check saturation thresholds
+      const extractedHsl = this.utils.rgbToHsl(
+        extractedRgb.r,
+        extractedRgb.g,
+        extractedRgb.b
+      );
+      const saturationCheck =
+        extractedHsl.s >= this.vibrancyConfig.minimumSaturation * 100;
+
       if (this.config.enableDebug) {
         console.log(`🎨 [ColorHarmonyEngine] Processing color ${role}:`, {
           originalColor: color,
           rgb: extractedRgb,
           hsl: extractedHsl,
           saturationCheck,
-          minimumSaturationRequired: this.vibrancyConfig.minimumSaturation * 100,
-          actualSaturation: extractedHsl.s
+          minimumSaturationRequired:
+            this.vibrancyConfig.minimumSaturation * 100,
+          actualSaturation: extractedHsl.s,
         });
       }
 
@@ -1605,28 +1919,35 @@ export class ColorHarmonyEngine
       let blendRatio = this.vibrancyConfig.getBlendRatio(
         this.config.artisticMode
       );
-      
+
       // 🌡️ EMOTIONAL TEMPERATURE INTEGRATION: Use emotional intensity for blending
       if (emotionalTemperature) {
         // Use emotional temperature intensity instead of basic music intensity
         const emotionalIntensity = emotionalTemperature.intensity;
         blendRatio *= emotionalIntensity * this.userIntensity;
-        
+
         // Apply temperature-based blend adjustment
-        const temperatureInfluence = this.calculateTemperatureBlendInfluence(emotionalTemperature.temperature);
+        const temperatureInfluence = this.calculateTemperatureBlendInfluence(
+          emotionalTemperature.temperature
+        );
         blendRatio *= temperatureInfluence;
-        
+
         // Clamp ratio to prevent inverse effects
         blendRatio = Math.max(0, Math.min(1, blendRatio));
-        
+
         if (this.config.enableDebug) {
-          console.log('🌡️ [ColorHarmonyEngine] Emotional temperature blend adjustment:', {
-            originalRatio: this.vibrancyConfig.getBlendRatio(this.config.artisticMode),
-            emotionalIntensity: emotionalIntensity,
-            temperatureInfluence: temperatureInfluence,
-            finalBlendRatio: blendRatio,
-            temperature: emotionalTemperature.temperature
-          });
+          console.log(
+            "🌡️ [ColorHarmonyEngine] Emotional temperature blend adjustment:",
+            {
+              originalRatio: this.vibrancyConfig.getBlendRatio(
+                this.config.artisticMode
+              ),
+              emotionalIntensity: emotionalIntensity,
+              temperatureInfluence: temperatureInfluence,
+              finalBlendRatio: blendRatio,
+              temperature: emotionalTemperature.temperature,
+            }
+          );
         }
       } else if (musicContext) {
         // Fallback to basic music intensity if emotional temperature unavailable
@@ -1644,7 +1965,7 @@ export class ColorHarmonyEngine
           extractedRgb,
           bestAccent: bestAccent.hex,
           blendRatio,
-          artisticMode: this.config.artisticMode
+          artisticMode: this.config.artisticMode,
         });
       }
 
@@ -1657,7 +1978,9 @@ export class ColorHarmonyEngine
       harmonizedColors[role] = finalHex;
 
       if (this.config.enableDebug) {
-        console.log(`🎨 [ColorHarmonyEngine] Final color for ${role}: ${color} → ${finalHex}`);
+        console.log(
+          `🎨 [ColorHarmonyEngine] Final color for ${role}: ${color} → ${finalHex}`
+        );
       }
     }
 
@@ -1669,10 +1992,10 @@ export class ColorHarmonyEngine
 
     // 🎨 DEBUG: Log final harmonized result
     if (this.config.enableDebug) {
-      console.log('🎨 [ColorHarmonyEngine] Final harmonized result:', {
+      console.log("🎨 [ColorHarmonyEngine] Final harmonized result:", {
         inputColors: extractedColors,
         outputColors: harmonizedColors,
-        colorCount: Object.keys(harmonizedColors).length
+        colorCount: Object.keys(harmonizedColors).length,
       });
     }
 
@@ -1686,7 +2009,9 @@ export class ColorHarmonyEngine
    * Updates semantic colors using the harmonized palette
    * Integrates with Spicetify's semantic color system for consistent theming
    */
-  private updateSemanticColorsWithHarmonizedPalette(harmonizedColors: { [key: string]: string }): void {
+  private updateSemanticColorsWithHarmonizedPalette(harmonizedColors: {
+    [key: string]: string;
+  }): void {
     if (!this.semanticColorManager) {
       return;
     }
@@ -1695,45 +2020,69 @@ export class ColorHarmonyEngine
       // 🔧 CRITICAL FIX: Do NOT call updateSemanticColors() here as it overwrites our extracted colors
       // with Spicetify's semantic colors (which are often white/gray)
       // this.semanticColorManager.updateSemanticColors(); // DISABLED - causes white color override
-      
+
       // 🎯 CRITICAL FIX: Directly update Spicetify variables with OKLAB-processed album colors
       // This bypasses CSS fallback chains and prevents Spotify overrides
       this.semanticColorManager.updateWithAlbumColors(harmonizedColors);
-      
+
       // Apply harmonized colors to key semantic variables
-      const primaryColor = harmonizedColors['VIBRANT'] || harmonizedColors['PRIMARY'];
-      const secondaryColor = harmonizedColors['DARK_VIBRANT'] || harmonizedColors['SECONDARY'];
-      const accentColor = harmonizedColors['VIBRANT_NON_ALARMING'] || harmonizedColors['LIGHT_VIBRANT'];
-      
+      const primaryColor =
+        harmonizedColors["VIBRANT"] || harmonizedColors["PRIMARY"];
+      const secondaryColor =
+        harmonizedColors["DARK_VIBRANT"] || harmonizedColors["SECONDARY"];
+      const accentColor =
+        harmonizedColors["VIBRANT_NON_ALARMING"] ||
+        harmonizedColors["LIGHT_VIBRANT"];
+
       if (primaryColor) {
-        this.semanticColorManager.getSemanticColor('essentialBrightAccent').then(color => {
-          // Use the harmonized color as the base for semantic accent
-          const blendedColor = this.blendWithSemanticColor(primaryColor, color, 0.7);
-          this.applyCSSVariable('--spice-accent', blendedColor);
-          this.applyCSSVariable('--spice-button-active', blendedColor);
-        });
+        this.semanticColorManager
+          .getSemanticColor("essentialBrightAccent")
+          .then((color) => {
+            // Use the harmonized color as the base for semantic accent
+            const blendedColor = this.blendWithSemanticColor(
+              primaryColor,
+              color,
+              0.7
+            );
+            this.applyCSSVariable("--spice-accent", blendedColor);
+            this.applyCSSVariable("--spice-button-active", blendedColor);
+          });
       }
-      
+
       if (secondaryColor) {
-        this.semanticColorManager.getSemanticColor('backgroundElevatedHighlight').then(color => {
-          const blendedColor = this.blendWithSemanticColor(secondaryColor, color, 0.5);
-          this.applyCSSVariable('--spice-highlight', blendedColor);
-        });
+        this.semanticColorManager
+          .getSemanticColor("backgroundElevatedHighlight")
+          .then((color) => {
+            const blendedColor = this.blendWithSemanticColor(
+              secondaryColor,
+              color,
+              0.5
+            );
+            this.applyCSSVariable("--spice-highlight", blendedColor);
+          });
       }
-      
+
       if (accentColor) {
-        this.semanticColorManager.getSemanticColor('textBrightAccent').then(color => {
-          const blendedColor = this.blendWithSemanticColor(accentColor, color, 0.6);
-          this.applyCSSVariable('--spice-text-accent', blendedColor);
-        });
+        this.semanticColorManager
+          .getSemanticColor("textBrightAccent")
+          .then((color) => {
+            const blendedColor = this.blendWithSemanticColor(
+              accentColor,
+              color,
+              0.6
+            );
+            this.applyCSSVariable("--spice-text-accent", blendedColor);
+          });
       }
-      
+
       // Flush all semantic color updates
       this.semanticColorManager.flushUpdates();
-      
     } catch (error) {
       if (this.config.enableDebug) {
-        console.warn('[ColorHarmonyEngine] Failed to update semantic colors:', error);
+        console.warn(
+          "[ColorHarmonyEngine] Failed to update semantic colors:",
+          error
+        );
       }
     }
   }
@@ -1741,14 +2090,18 @@ export class ColorHarmonyEngine
   /**
    * Blends a harmonized color with a semantic color for consistency
    */
-  private blendWithSemanticColor(harmonizedHex: string, semanticHex: string, blendRatio: number): string {
+  private blendWithSemanticColor(
+    harmonizedHex: string,
+    semanticHex: string,
+    blendRatio: number
+  ): string {
     const harmonizedRgb = this.utils.hexToRgb(harmonizedHex);
     const semanticRgb = this.utils.hexToRgb(semanticHex);
-    
+
     if (!harmonizedRgb || !semanticRgb) {
       return harmonizedHex; // Fallback to harmonized color
     }
-    
+
     const blendedRgb = this.blendColors(harmonizedRgb, semanticRgb, blendRatio);
     return this.utils.rgbToHex(blendedRgb.r, blendedRgb.g, blendedRgb.b);
   }
@@ -1758,10 +2111,10 @@ export class ColorHarmonyEngine
    */
   private applyCSSVariable(property: string, value: string): void {
     // 🔧 PHASE 2: Emit single CSS variable for ColorStateManager
-    unifiedEventBus.emit('system:css-variables' as any, {
-      source: 'ColorHarmonyEngine',
+    unifiedEventBus.emit("system:css-variables" as any, {
+      source: "ColorHarmonyEngine",
       variables: { [property]: value },
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -1772,57 +2125,84 @@ export class ColorHarmonyEngine
   private applyCSSVariablesToDOM(cssVariables: Record<string, string>): void {
     // 🔧 CRITICAL FIX: Enhanced cssConsciousnessController detection
     const year3000System = (globalThis as any).year3000System;
-    const cssConsciousnessController = year3000System?.cssConsciousnessController || 
-                                      (this.performanceMonitor as any)?.cssConsciousnessController ||
-                                      year3000System?.facadeCoordinator?.getCachedNonVisualSystem?.('UnifiedCSSConsciousnessController');
-    
+    const cssConsciousnessController =
+      year3000System?.cssConsciousnessController ||
+      (this.performanceMonitor as any)?.cssConsciousnessController ||
+      year3000System?.facadeCoordinator?.getCachedNonVisualSystem?.(
+        "UnifiedCSSVariableManager"
+      );
+
     // 🔧 CRITICAL FIX: Add UI component-specific CSS variables for sidebar and now-playing
-    const enhancedCssVariables = this.enhanceCSSVariablesForUIComponents(cssVariables);
-    
-    if (cssConsciousnessController && typeof cssConsciousnessController.batchSetVariables === 'function') {
+    const enhancedCssVariables =
+      this.enhanceCSSVariablesForUIComponents(cssVariables);
+
+    if (
+      cssConsciousnessController &&
+      typeof cssConsciousnessController.batchSetVariables === "function"
+    ) {
       try {
         // Use batched CSS variable updates for better performance
         cssConsciousnessController.batchSetVariables(
-          'ColorHarmonyEngine',
+          "ColorHarmonyEngine",
           enhancedCssVariables,
-          'high', // High priority for color processing
-          'color-harmony-oklab-processing'
+          "high", // High priority for color processing
+          "color-harmony-oklab-processing"
         );
-        
+
         if (this.config.enableDebug) {
-          console.log('🔧 [ColorHarmonyEngine] Applied CSS variables via cssConsciousnessController batcher');
+          console.log(
+            "🔧 [ColorHarmonyEngine] Applied CSS variables via cssConsciousnessController batcher"
+          );
         }
       } catch (error) {
         if (this.config.enableDebug) {
-          console.warn('🔧 [ColorHarmonyEngine] cssConsciousnessController.batchSetVariables failed, using direct application:', error);
+          console.warn(
+            "🔧 [ColorHarmonyEngine] cssConsciousnessController.batchSetVariables failed, using direct application:",
+            error
+          );
         }
         this.applyVariablesDirectly(enhancedCssVariables);
       }
     } else {
       if (this.config.enableDebug) {
-        console.log('🔧 [ColorHarmonyEngine] cssConsciousnessController not available, using direct DOM application');
+        console.log(
+          "🔧 [ColorHarmonyEngine] cssConsciousnessController not available, using direct DOM application"
+        );
       }
       this.applyVariablesDirectly(enhancedCssVariables);
     }
-    
+
     // 🔧 CRITICAL FIX: Emit colors:applied event for UI components that need immediate notification
-    unifiedEventBus.emitSync('colors:applied', {
+    unifiedEventBus.emitSync("colors:applied", {
       cssVariables: enhancedCssVariables,
-      accentHex: enhancedCssVariables['--sn-accent-hex'] || '#a6adc8',
-      accentRgb: enhancedCssVariables['--sn-accent-rgb'] || '166,173,200',
-      appliedAt: Date.now()
+      accentHex: enhancedCssVariables["--sn-accent-hex"] || "#a6adc8",
+      accentRgb: enhancedCssVariables["--sn-accent-rgb"] || "166,173,200",
+      appliedAt: Date.now(),
     });
-    
+
     if (this.config.enableDebug) {
-      console.log('🔬 [ColorHarmonyEngine] Applied enhanced CSS variables to DOM:', {
-        totalVariables: Object.keys(enhancedCssVariables).length,
-        oklabVariables: Object.keys(enhancedCssVariables).filter(k => k.includes('oklab')).length,
-        oklchVariables: Object.keys(enhancedCssVariables).filter(k => k.includes('oklch')).length,
-        gradientVariables: Object.keys(enhancedCssVariables).filter(k => k.includes('gradient')).length,
-        spiceVariables: Object.keys(enhancedCssVariables).filter(k => k.includes('spice')).length,
-        sidebarVariables: Object.keys(enhancedCssVariables).filter(k => k.includes('sidebar')).length,
-        cssConsciousnessControllerUsed: !!cssConsciousnessController
-      });
+      console.log(
+        "🔬 [ColorHarmonyEngine] Applied enhanced CSS variables to DOM:",
+        {
+          totalVariables: Object.keys(enhancedCssVariables).length,
+          oklabVariables: Object.keys(enhancedCssVariables).filter((k) =>
+            k.includes("oklab")
+          ).length,
+          oklchVariables: Object.keys(enhancedCssVariables).filter((k) =>
+            k.includes("oklch")
+          ).length,
+          gradientVariables: Object.keys(enhancedCssVariables).filter((k) =>
+            k.includes("gradient")
+          ).length,
+          spiceVariables: Object.keys(enhancedCssVariables).filter((k) =>
+            k.includes("spice")
+          ).length,
+          sidebarVariables: Object.keys(enhancedCssVariables).filter((k) =>
+            k.includes("sidebar")
+          ).length,
+          cssConsciousnessControllerUsed: !!cssConsciousnessController,
+        }
+      );
     }
   }
 
@@ -1830,75 +2210,82 @@ export class ColorHarmonyEngine
    * Enhance CSS variables with UI component-specific mappings
    * Maps OKLAB-processed colors to variables that sidebar, now-playing, and other UI components expect
    */
-  private enhanceCSSVariablesForUIComponents(cssVariables: Record<string, string>): Record<string, string> {
+  private enhanceCSSVariablesForUIComponents(
+    cssVariables: Record<string, string>
+  ): Record<string, string> {
     const enhanced = { ...cssVariables };
-    
+
     // Extract primary colors for UI component mapping
-    const accentHex = enhanced['--sn-accent-hex'] || enhanced[ColorHarmonyEngine.CANONICAL_HEX_VAR];
-    const accentRgb = enhanced['--sn-accent-rgb'] || enhanced[ColorHarmonyEngine.CANONICAL_RGB_VAR];
-    const primaryHex = enhanced['--sn-bg-gradient-primary'];
-    const primaryRgb = enhanced['--sn-bg-gradient-primary-rgb'];
-    const secondaryHex = enhanced['--sn-bg-gradient-secondary'];
-    const secondaryRgb = enhanced['--sn-bg-gradient-secondary-rgb'];
-    
+    const accentHex =
+      enhanced["--sn-accent-hex"] ||
+      enhanced[ColorHarmonyEngine.CANONICAL_HEX_VAR];
+    const accentRgb =
+      enhanced["--sn-accent-rgb"] ||
+      enhanced[ColorHarmonyEngine.CANONICAL_RGB_VAR];
+    const primaryHex = enhanced["--sn-bg-gradient-primary"];
+    const primaryRgb = enhanced["--sn-bg-gradient-primary-rgb"];
+    const secondaryHex = enhanced["--sn-bg-gradient-secondary"];
+    const secondaryRgb = enhanced["--sn-bg-gradient-secondary-rgb"];
+
     if (accentHex && accentRgb) {
       // 🎯 SPICETIFY CORE VARIABLES - Critical for all UI components
-      enhanced['--spice-accent'] = accentHex;
-      enhanced['--spice-button'] = accentHex;
-      enhanced['--spice-button-active'] = accentHex;
-      enhanced['--spice-rgb-accent'] = accentRgb;
-      enhanced['--spice-rgb-button'] = accentRgb;
-      enhanced['--spice-text-accent'] = accentHex;
-      
+      enhanced["--spice-accent"] = accentHex;
+      enhanced["--spice-button"] = accentHex;
+      enhanced["--spice-button-active"] = accentHex;
+      enhanced["--spice-rgb-accent"] = accentRgb;
+      enhanced["--spice-rgb-button"] = accentRgb;
+      enhanced["--spice-text-accent"] = accentHex;
+
       // 🎯 SIDEBAR-SPECIFIC VARIABLES
-      enhanced['--sn-sidebar-entanglement-color-rgb'] = accentRgb;
-      enhanced['--sn-sidebar-accent-color'] = accentHex;
-      enhanced['--sn-sidebar-accent-rgb'] = accentRgb;
-      enhanced['--sn-sidebar-dynamic-accent'] = accentHex;
-      
-      // 🎯 NOW-PLAYING SPECIFIC VARIABLES  
-      enhanced['--sn-nowplaying-accent-color'] = accentHex;
-      enhanced['--sn-nowplaying-accent-rgb'] = accentRgb;
-      enhanced['--sn-nowplaying-primary-color'] = accentHex;
-      enhanced['--sn-nowplaying-primary-rgb'] = accentRgb;
-      
+      enhanced["--sn-sidebar-entanglement-color-rgb"] = accentRgb;
+      enhanced["--sn-sidebar-accent-color"] = accentHex;
+      enhanced["--sn-sidebar-accent-rgb"] = accentRgb;
+      enhanced["--sn-sidebar-dynamic-accent"] = accentHex;
+
+      // 🎯 NOW-PLAYING SPECIFIC VARIABLES
+      enhanced["--sn-nowplaying-accent-color"] = accentHex;
+      enhanced["--sn-nowplaying-accent-rgb"] = accentRgb;
+      enhanced["--sn-nowplaying-primary-color"] = accentHex;
+      enhanced["--sn-nowplaying-primary-rgb"] = accentRgb;
+
       // 🎯 MAIN FEED / CONTENT VARIABLES
-      enhanced['--sn-main-feed-accent-color'] = accentHex;
-      enhanced['--sn-main-feed-accent-rgb'] = accentRgb;
-      enhanced['--sn-content-accent-color'] = accentHex;
-      enhanced['--sn-content-accent-rgb'] = accentRgb;
+      enhanced["--sn-main-feed-accent-color"] = accentHex;
+      enhanced["--sn-main-feed-accent-rgb"] = accentRgb;
+      enhanced["--sn-content-accent-color"] = accentHex;
+      enhanced["--sn-content-accent-rgb"] = accentRgb;
     }
-    
+
     if (primaryHex && primaryRgb) {
       // 🎯 PRIMARY GRADIENT MAPPINGS for backgrounds
-      enhanced['--sn-primary-gradient-color'] = primaryHex;
-      enhanced['--sn-primary-gradient-rgb'] = primaryRgb;
-      enhanced['--sn-main-feed-primary-color'] = primaryHex;
-      enhanced['--sn-main-feed-primary-rgb'] = primaryRgb;
+      enhanced["--sn-primary-gradient-color"] = primaryHex;
+      enhanced["--sn-primary-gradient-rgb"] = primaryRgb;
+      enhanced["--sn-main-feed-primary-color"] = primaryHex;
+      enhanced["--sn-main-feed-primary-rgb"] = primaryRgb;
     }
-    
+
     if (secondaryHex && secondaryRgb) {
       // 🎯 SECONDARY GRADIENT MAPPINGS for depth effects
-      enhanced['--sn-secondary-gradient-color'] = secondaryHex;
-      enhanced['--sn-secondary-gradient-rgb'] = secondaryRgb;
-      enhanced['--sn-main-feed-secondary-color'] = secondaryHex;
-      enhanced['--sn-main-feed-secondary-rgb'] = secondaryRgb;
+      enhanced["--sn-secondary-gradient-color"] = secondaryHex;
+      enhanced["--sn-secondary-gradient-rgb"] = secondaryRgb;
+      enhanced["--sn-main-feed-secondary-color"] = secondaryHex;
+      enhanced["--sn-main-feed-secondary-rgb"] = secondaryRgb;
     }
-    
+
     // 🎯 OKLAB ENHANCED VARIABLES for consciousness effects
-    const oklabBrightHighlight = enhanced['--sn-color-oklab-bright-highlight-rgb'];
+    const oklabBrightHighlight =
+      enhanced["--sn-color-oklab-bright-highlight-rgb"];
     if (oklabBrightHighlight) {
-      enhanced['--sn-consciousness-bright-accent-rgb'] = oklabBrightHighlight;
-      enhanced['--sn-holographic-accent-rgb'] = oklabBrightHighlight;
-      enhanced['--organic-holographic-rgb'] = oklabBrightHighlight;
+      enhanced["--sn-consciousness-bright-accent-rgb"] = oklabBrightHighlight;
+      enhanced["--sn-holographic-accent-rgb"] = oklabBrightHighlight;
+      enhanced["--organic-holographic-rgb"] = oklabBrightHighlight;
     }
-    
-    const oklabDynamicShadow = enhanced['--sn-color-oklab-dynamic-shadow-rgb'];
+
+    const oklabDynamicShadow = enhanced["--sn-color-oklab-dynamic-shadow-rgb"];
     if (oklabDynamicShadow) {
-      enhanced['--sn-consciousness-shadow-rgb'] = oklabDynamicShadow;
-      enhanced['--sn-depth-shadow-rgb'] = oklabDynamicShadow;
+      enhanced["--sn-consciousness-shadow-rgb"] = oklabDynamicShadow;
+      enhanced["--sn-depth-shadow-rgb"] = oklabDynamicShadow;
     }
-    
+
     return enhanced;
   }
 
@@ -1907,10 +2294,10 @@ export class ColorHarmonyEngine
    */
   private applyVariablesDirectly(cssVariables: Record<string, string>): void {
     // 🔧 PHASE 2: Emit CSS variables for ColorStateManager to handle
-    unifiedEventBus.emit('system:css-variables' as any, {
-      source: 'ColorHarmonyEngine',
+    unifiedEventBus.emit("system:css-variables" as any, {
+      source: "ColorHarmonyEngine",
       variables: cssVariables,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -1921,8 +2308,8 @@ export class ColorHarmonyEngine
     requirements: any
   ): any[] {
     const recommendations = [];
-    const currentPalette = (this.catppuccinPalettes as any)[this.currentTheme];
-    const baseRgb = this.utils.hexToRgb(currentPalette.neutrals.base)!;
+    const currentPalette = this.getCurrentActivePalette();
+    const baseRgb = this.utils.hexToRgb(currentPalette?.neutrals?.base || '#1e1e2e')!;
 
     if (!baseRgb) {
       return [];
@@ -2142,27 +2529,15 @@ export class ColorHarmonyEngine
     const gravityStrength = visualIntensity;
 
     // 🔧 PHASE 2: Emit gravity CSS variables for ColorStateManager
-    unifiedEventBus.emit('system:css-variables' as any, {
-      source: 'ColorHarmonyEngine',
+    unifiedEventBus.emit("system:css-variables" as any, {
+      source: "ColorHarmonyEngine",
       variables: {
         "--sn-gravity-x": gravityX.toFixed(3),
         "--sn-gravity-y": gravityY.toFixed(3),
-        "--sn-gravity-strength": gravityStrength.toFixed(3)
+        "--sn-gravity-strength": gravityStrength.toFixed(3),
       },
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
-  }
-
-  getQuantumEmpathyMetrics(): any {
-    const avgEnergy =
-      this.musicalMemory.energyHistory.reduce((a, b) => a + b, 0) /
-        this.musicalMemory.energyHistory.length || 0;
-
-    return {
-      averageRecentEnergy: avgEnergy,
-      systemMomentum: this.kineticState.visualMomentum,
-      preferenceProfileSize: this.musicalMemory.userColorPreferences.size,
-    };
   }
 
   public generateHarmonicVariations(baseRgb: RGBColor): {
@@ -2198,7 +2573,7 @@ export class ColorHarmonyEngine
     stopCount: number = 5
   ): Array<{ r: number; g: number; b: number }> | null {
     try {
-      const currentPalette = this.catppuccinPalettes[this.currentTheme];
+      const currentPalette = this.getCurrentActivePalette();
       if (!currentPalette) {
         return null;
       }
@@ -2210,12 +2585,15 @@ export class ColorHarmonyEngine
       }
 
       const computedStyle = getComputedStyle(rootEl);
-      
+
       // Inherit from sophisticated OKLAB processed variables (consciousness-aware)
       const inheritedColors = this.getInheritedGradientColors(computedStyle);
-      
+
       if (!inheritedColors) {
-        Y3K?.debug?.warn('ColorHarmonyEngine', 'Failed to inherit processed gradient variables, using fallback');
+        Y3KDebug?.debug?.warn(
+          "ColorHarmonyEngine",
+          "Failed to inherit processed gradient variables, using fallback"
+        );
         return this.generateFallbackGradient(stopCount);
       }
 
@@ -2226,18 +2604,20 @@ export class ColorHarmonyEngine
       const musicInfluence = this.kineticState.musicIntensityMultiplier || 1.0;
       const hueShift = this.kineticState.hueShift || 0;
       const valenceGravity = this.kineticState.valenceGravity || 0.5;
-      const emotionalTemperature = this.emotionalState?.currentEmotion?.colorTemperature || 0.5;
+      const emotionalTemperature =
+        this.emotionalState?.currentEmotion?.colorTemperature || 0.5;
 
       // 🌈 CONSCIOUSNESS-AWARE GRADIENT GENERATION: Use inherited OKLAB processed colors
-      const { primary, secondary, accent, emotional, tertiary } = inheritedColors;
-      
+      const { primary, secondary, accent, emotional, tertiary } =
+        inheritedColors;
+
       // Create consciousness-aware color array for interpolation
       const baseColors = [
-        primary,    // Deep consciousness base
-        secondary,  // Harmonic transition
-        accent,     // Vibrational peak  
-        emotional,  // Emotional resonance
-        tertiary    // Transcendent highlight
+        primary, // Deep consciousness base
+        secondary, // Harmonic transition
+        accent, // Vibrational peak
+        emotional, // Emotional resonance
+        tertiary, // Transcendent highlight
       ];
 
       // Generate gradient stops using OKLAB interpolation
@@ -2246,7 +2626,7 @@ export class ColorHarmonyEngine
 
         // 🎨 OKLAB INTERPOLATION: Use perceptually uniform color interpolation
         let interpolatedColor: RGBColor;
-        
+
         if (stopCount === 1) {
           interpolatedColor = accent; // Single color fallback
         } else {
@@ -2255,20 +2635,24 @@ export class ColorHarmonyEngine
           const lowerIndex = Math.floor(colorIndex);
           const upperIndex = Math.min(lowerIndex + 1, baseColors.length - 1);
           const interpolationFactor = colorIndex - lowerIndex;
-          
+
           // Apply emotional temperature influence to interpolation
-          const temperatureInfluence = Math.sin(emotionalTemperature * Math.PI) * 0.3;
-          const adjustedFactor = Math.max(0, Math.min(1, interpolationFactor + temperatureInfluence));
-          
+          const temperatureInfluence =
+            Math.sin(emotionalTemperature * Math.PI) * 0.3;
+          const adjustedFactor = Math.max(
+            0,
+            Math.min(1, interpolationFactor + temperatureInfluence)
+          );
+
           // Use simple RGB interpolation (OKLAB methods not available)
           const color1 = baseColors[lowerIndex];
           const color2 = baseColors[upperIndex];
-          
+
           if (color1 && color2) {
             interpolatedColor = {
               r: color1.r + (color2.r - color1.r) * adjustedFactor,
               g: color1.g + (color2.g - color1.g) * adjustedFactor,
-              b: color1.b + (color2.b - color1.b) * adjustedFactor
+              b: color1.b + (color2.b - color1.b) * adjustedFactor,
             };
           } else {
             interpolatedColor = accent; // Fallback to accent color
@@ -2276,16 +2660,13 @@ export class ColorHarmonyEngine
         }
 
         // Apply consciousness state modulation (preserves OKLAB processing)
-        let finalColor = this._applyConsciousnessModulation(
-          interpolatedColor,
-          {
-            musicInfluence,
-            valenceGravity,
-            hueShift,
-            emotionalTemperature,
-            position
-          }
-        );
+        let finalColor = this._applyConsciousnessModulation(interpolatedColor, {
+          musicInfluence,
+          valenceGravity,
+          hueShift,
+          emotionalTemperature,
+          position,
+        });
 
         gradientColors.push({
           r: Math.round(Math.max(0, Math.min(255, finalColor.r))),
@@ -2303,18 +2684,19 @@ export class ColorHarmonyEngine
 
       return gradientColors;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       const errorDetails = {
-        method: 'getCurrentGradient',
+        method: "getCurrentGradient",
         stopCount,
         currentTheme: this.currentTheme,
         kineticState: this.kineticState,
         timestamp: Date.now(),
-        error: errorMessage
+        error: errorMessage,
       };
 
       // Enhanced logging with Y3K debug system
-      Y3K?.debug?.error(
+      Y3KDebug?.debug?.error(
         "ColorHarmonyEngine",
         "Failed to generate gradient colors",
         errorDetails
@@ -2325,22 +2707,22 @@ export class ColorHarmonyEngine
         systemName: "ColorHarmonyEngine",
         error: `Gradient generation failed: ${errorMessage}`,
         severity: "error" as const,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       // Attempt to provide meaningful fallback colors
       try {
         const fallbackColors = this.generateFallbackGradient(stopCount);
         if (fallbackColors && fallbackColors.length > 0) {
-          Y3K?.debug?.warn(
-            "ColorHarmonyEngine", 
+          Y3KDebug?.debug?.warn(
+            "ColorHarmonyEngine",
             "Using fallback gradient after error",
             { fallbackColorCount: fallbackColors.length }
           );
           return fallbackColors;
         }
       } catch (fallbackError) {
-        Y3K?.debug?.error(
+        Y3KDebug?.debug?.error(
           "ColorHarmonyEngine",
           "Fallback gradient generation also failed",
           fallbackError
@@ -2364,32 +2746,68 @@ export class ColorHarmonyEngine
   } | null {
     try {
       // Inherit from OKLAB processed variables (consciousness-aware hierarchy)
-      const primaryRgb = this.parseRGBVariable(computedStyle, '--sn-oklab-processed-primary-rgb') ||
-                         this.parseRGBVariable(computedStyle, '--sn-gradient-primary-rgb') ||
-                         this.parseRGBVariable(computedStyle, '--sn-musical-harmony-primary-rgb');
-      
-      const secondaryRgb = this.parseRGBVariable(computedStyle, '--sn-oklab-processed-secondary-rgb') ||
-                           this.parseRGBVariable(computedStyle, '--sn-gradient-secondary-rgb') ||
-                           this.parseRGBVariable(computedStyle, '--sn-musical-harmony-secondary-rgb');
-      
-      const accentRgb = this.parseRGBVariable(computedStyle, '--sn-oklab-processed-accent-rgb') ||
-                        this.parseRGBVariable(computedStyle, '--sn-gradient-accent-rgb') ||
-                        this.parseRGBVariable(computedStyle, '--sn-color-accent-rgb');
-      
-      const emotionalRgb = this.parseRGBVariable(computedStyle, '--sn-oklab-emotional-temperature-rgb') ||
-                           this.parseRGBVariable(computedStyle, '--sn-emotional-temperature-warm-rgb') ||
-                           accentRgb; // Fallback to accent
-      
-      const tertiaryRgb = this.parseRGBVariable(computedStyle, '--sn-oklab-processed-bright-highlight-rgb') ||
-                          this.parseRGBVariable(computedStyle, '--sn-consciousness-flow-rgb') ||
-                          this.parseRGBVariable(computedStyle, '--sn-musical-harmony-tertiary-rgb');
+      const primaryRgb =
+        this.parseRGBVariable(
+          computedStyle,
+          "--sn-oklab-processed-primary-rgb"
+        ) ||
+        this.parseRGBVariable(computedStyle, "--sn-bg-gradient-primary-rgb") ||
+        this.parseRGBVariable(
+          computedStyle,
+          "--sn-musical-harmony-primary-rgb"
+        );
+
+      const secondaryRgb =
+        this.parseRGBVariable(
+          computedStyle,
+          "--sn-oklab-processed-secondary-rgb"
+        ) ||
+        this.parseRGBVariable(computedStyle, "--sn-bg-gradient-secondary-rgb") ||
+        this.parseRGBVariable(
+          computedStyle,
+          "--sn-musical-harmony-secondary-rgb"
+        );
+
+      const accentRgb =
+        this.parseRGBVariable(
+          computedStyle,
+          "--sn-oklab-processed-accent-rgb"
+        ) ||
+        this.parseRGBVariable(computedStyle, "--sn-bg-gradient-accent-rgb") ||
+        this.parseRGBVariable(computedStyle, "--sn-color-accent-rgb");
+
+      const emotionalRgb =
+        this.parseRGBVariable(
+          computedStyle,
+          "--sn-oklab-emotional-temperature-rgb"
+        ) ||
+        this.parseRGBVariable(
+          computedStyle,
+          "--sn-emotional-temperature-warm-rgb"
+        ) ||
+        accentRgb; // Fallback to accent
+
+      const tertiaryRgb =
+        this.parseRGBVariable(
+          computedStyle,
+          "--sn-oklab-processed-bright-highlight-rgb"
+        ) ||
+        this.parseRGBVariable(computedStyle, "--sn-consciousness-flow-rgb") ||
+        this.parseRGBVariable(
+          computedStyle,
+          "--sn-musical-harmony-tertiary-rgb"
+        );
 
       // Verify we have at least primary and accent colors
       if (!primaryRgb || !accentRgb) {
-        Y3K?.debug?.warn('ColorHarmonyEngine', 'Missing essential inherited colors', {
-          hasPrimary: !!primaryRgb,
-          hasAccent: !!accentRgb
-        });
+        Y3KDebug?.debug?.warn(
+          "ColorHarmonyEngine",
+          "Missing essential inherited colors",
+          {
+            hasPrimary: !!primaryRgb,
+            hasAccent: !!accentRgb,
+          }
+        );
         return null;
       }
 
@@ -2398,10 +2816,14 @@ export class ColorHarmonyEngine
         secondary: secondaryRgb || primaryRgb,
         accent: accentRgb,
         emotional: emotionalRgb || accentRgb,
-        tertiary: tertiaryRgb || accentRgb
+        tertiary: tertiaryRgb || accentRgb,
       };
     } catch (error) {
-      Y3K?.debug?.error('ColorHarmonyEngine', 'Failed to inherit gradient colors:', error);
+      Y3KDebug?.debug?.error(
+        "ColorHarmonyEngine",
+        "Failed to inherit gradient colors:",
+        error
+      );
       return null;
     }
   }
@@ -2409,7 +2831,10 @@ export class ColorHarmonyEngine
   /**
    * Parse RGB variable from CSS computed style with fallback chain
    */
-  private parseRGBVariable(computedStyle: CSSStyleDeclaration, variableName: string): RGBColor | null {
+  private parseRGBVariable(
+    computedStyle: CSSStyleDeclaration,
+    variableName: string
+  ): RGBColor | null {
     try {
       const value = computedStyle.getPropertyValue(variableName).trim();
       if (!value) return null;
@@ -2419,7 +2844,7 @@ export class ColorHarmonyEngine
         return {
           r: parseInt(rgbMatch[1], 10),
           g: parseInt(rgbMatch[2], 10),
-          b: parseInt(rgbMatch[3], 10)
+          b: parseInt(rgbMatch[3], 10),
         };
       }
       return null;
@@ -2431,29 +2856,33 @@ export class ColorHarmonyEngine
   /**
    * Interpolate between two colors using perceptually aware interpolation
    */
-  private interpolateOKLABColors(color1: RGBColor, color2: RGBColor, factor: number): RGBColor {
+  private interpolateOKLABColors(
+    color1: RGBColor,
+    color2: RGBColor,
+    factor: number
+  ): RGBColor {
     // Simple RGB interpolation with gamma correction for better perceptual results
     const gamma = 2.2;
-    
+
     // Apply gamma correction
     const r1 = Math.pow(color1.r / 255, gamma);
     const g1 = Math.pow(color1.g / 255, gamma);
     const b1 = Math.pow(color1.b / 255, gamma);
-    
+
     const r2 = Math.pow(color2.r / 255, gamma);
     const g2 = Math.pow(color2.g / 255, gamma);
     const b2 = Math.pow(color2.b / 255, gamma);
-    
+
     // Interpolate in gamma space
     const rInterp = r1 + (r2 - r1) * factor;
     const gInterp = g1 + (g2 - g1) * factor;
     const bInterp = b1 + (b2 - b1) * factor;
-    
+
     // Convert back to sRGB
     return {
       r: Math.round(Math.pow(rInterp, 1 / gamma) * 255),
       g: Math.round(Math.pow(gInterp, 1 / gamma) * 255),
-      b: Math.round(Math.pow(bInterp, 1 / gamma) * 255)
+      b: Math.round(Math.pow(bInterp, 1 / gamma) * 255),
     };
   }
 
@@ -2473,26 +2902,33 @@ export class ColorHarmonyEngine
     try {
       // Convert to HSL for consciousness modulation
       const hsl = this.utils.rgbToHsl(color.r, color.g, color.b);
-      
+
       // Apply consciousness influences
       let { h, s, l } = hsl;
-      
+
       // Music influence affects saturation
       s = Math.max(0, Math.min(1, s * (0.7 + modulation.musicInfluence * 0.6)));
-      
+
       // Emotional temperature affects hue (warm/cool shift)
-      h = (h + modulation.hueShift + (modulation.emotionalTemperature - 0.5) * 60) % 360;
-      
+      h =
+        (h +
+          modulation.hueShift +
+          (modulation.emotionalTemperature - 0.5) * 60) %
+        360;
+
       // Valence gravity affects lightness based on position
-      const gravityEffect = modulation.valenceGravity * 0.2 * Math.sin(modulation.position * Math.PI);
+      const gravityEffect =
+        modulation.valenceGravity *
+        0.2 *
+        Math.sin(modulation.position * Math.PI);
       l = Math.max(0.1, Math.min(0.9, l + gravityEffect));
-      
+
       // Convert back to RGB
       const modulatedRgb = this.utils.hslToRgb(h, s, l);
       return {
         r: modulatedRgb.r,
         g: modulatedRgb.g,
-        b: modulatedRgb.b
+        b: modulatedRgb.b,
       };
     } catch (error) {
       // Return original color on error
@@ -2504,7 +2940,9 @@ export class ColorHarmonyEngine
    * Generate fallback gradient colors when primary generation fails
    * Uses safe Catppuccin colors to prevent complete gradient failure
    */
-  private generateFallbackGradient(stopCount: number): Array<{ r: number; g: number; b: number }> | null {
+  private generateFallbackGradient(
+    stopCount: number
+  ): Array<{ r: number; g: number; b: number }> | null {
     try {
       // Use default Catppuccin Mocha colors as absolute fallback
       const fallbackHexColors = [
@@ -2518,7 +2956,7 @@ export class ColorHarmonyEngine
       ];
 
       if (stopCount < 2 || stopCount > fallbackHexColors.length) {
-        Y3K?.debug?.warn(
+        Y3KDebug?.debug?.warn(
           "ColorHarmonyEngine",
           `Invalid fallback stopCount: ${stopCount}, using default`
         );
@@ -2526,19 +2964,23 @@ export class ColorHarmonyEngine
       }
 
       const fallbackColors: Array<{ r: number; g: number; b: number }> = [];
-      
+
       // Select colors evenly distributed across available fallback colors
       for (let i = 0; i < stopCount; i++) {
-        const colorIndex = Math.floor((i / (stopCount - 1)) * (fallbackHexColors.length - 1));
+        const colorIndex = Math.floor(
+          (i / (stopCount - 1)) * (fallbackHexColors.length - 1)
+        );
         const hex = fallbackHexColors[colorIndex];
         const rgb = hex ? this.utils.hexToRgb(hex) : null;
-        
+
         if (rgb) {
           fallbackColors.push(rgb);
         } else {
           // If hex conversion fails, use safe RGB values
           fallbackColors.push({
-            r: 203, g: 166, b: 247 // Mauve fallback
+            r: 203,
+            g: 166,
+            b: 247, // Mauve fallback
           });
         }
       }
@@ -2546,21 +2988,20 @@ export class ColorHarmonyEngine
       // Ensure we have at least 2 colors for a valid gradient
       if (fallbackColors.length < 2) {
         fallbackColors.push(
-          { r: 30, g: 30, b: 46 },   // Base
+          { r: 30, g: 30, b: 46 }, // Base
           { r: 203, g: 166, b: 247 } // Mauve
         );
       }
 
-      Y3K?.debug?.log(
+      Y3KDebug?.debug?.log(
         "ColorHarmonyEngine",
         `Generated fallback gradient with ${fallbackColors.length} colors`,
         fallbackColors
       );
 
       return fallbackColors;
-      
     } catch (error) {
-      Y3K?.debug?.error(
+      Y3KDebug?.debug?.error(
         "ColorHarmonyEngine",
         "Critical error in fallback gradient generation",
         error
@@ -2579,22 +3020,36 @@ export class ColorHarmonyEngine
   ): Promise<EmotionalState | null> {
     if (!this.initialized || !this.musicEmotionAnalyzer) {
       if (this.config.enableDebug) {
-        console.warn("🎭 [ColorHarmonyEngine] Cannot analyze music emotion: not initialized");
+        console.warn(
+          "🎭 [ColorHarmonyEngine] Cannot analyze music emotion: not initialized"
+        );
       }
       return null;
     }
 
     try {
       // Analyze emotion using MusicEmotionAnalyzer
-      const emotion = await this.musicEmotionAnalyzer.analyzeEmotion(audioFeatures, audioData);
-      
+      const emotion = await this.musicEmotionAnalyzer.analyzeEmotion(
+        audioFeatures,
+        audioData
+      );
+
       if (this.config.enableDebug) {
-        console.log(`🎭 [ColorHarmonyEngine] Analyzed music emotion: ${emotion.primary} (${emotion.intensity.toFixed(2)} intensity, ${emotion.confidence.toFixed(2)} confidence)`);
+        console.log(
+          `🎭 [ColorHarmonyEngine] Analyzed music emotion: ${
+            emotion.primary
+          } (${emotion.intensity.toFixed(
+            2
+          )} intensity, ${emotion.confidence.toFixed(2)} confidence)`
+        );
       }
 
       return emotion;
     } catch (error) {
-      console.error("🎭 [ColorHarmonyEngine] Error analyzing music emotion:", error);
+      console.error(
+        "🎭 [ColorHarmonyEngine] Error analyzing music emotion:",
+        error
+      );
       return null;
     }
   }
@@ -2619,9 +3074,14 @@ export class ColorHarmonyEngine
    */
   public setEmotionInfluenceIntensity(intensity: number): void {
     if (this.emotionalState) {
-      this.emotionalState.emotionInfluenceIntensity = Math.max(0, Math.min(1, intensity));
+      this.emotionalState.emotionInfluenceIntensity = Math.max(
+        0,
+        Math.min(1, intensity)
+      );
       if (this.config.enableDebug) {
-        console.log(`🎭 [ColorHarmonyEngine] Emotion influence intensity set to ${this.emotionalState.emotionInfluenceIntensity}`);
+        console.log(
+          `🎭 [ColorHarmonyEngine] Emotion influence intensity set to ${this.emotionalState.emotionInfluenceIntensity}`
+        );
       }
     }
   }
@@ -2795,23 +3255,23 @@ export class ColorHarmonyEngine
       "year3000ArtisticModeChanged",
       this._boundArtisticModeHandler
     );
-    
+
     // Clean up SemanticColorManager
     if (this.semanticColorManager) {
       this.semanticColorManager.destroy();
     }
-    
+
     // Clean up MusicEmotionAnalyzer
     if (this.musicEmotionAnalyzer) {
       this.musicEmotionAnalyzer.destroy();
     }
-    
+
     // Clear emotional state
     if (this.emotionalState) {
       this.emotionalState.currentEmotion = null;
       this.emotionalState.emotionHistory = [];
     }
-    
+
     super.destroy?.();
   }
 
@@ -2834,20 +3294,20 @@ export class ColorHarmonyEngine
       const styles = getComputedStyle(root);
       const primary = styles.getPropertyValue("--sn-gradient-primary").trim();
       if (primary) {
-        // Recompute RGB variant
+        // Recompute RGB variant using official gradient variables
         const rgb = this.utils.hexToRgb(primary);
         const variables: Record<string, string> = {
-          "--sn-gradient-primary": primary
+          "--sn-bg-gradient-primary": primary,
         };
         if (rgb) {
-          variables["--sn-gradient-primary-rgb"] = `${rgb.r},${rgb.g},${rgb.b}`;
+          variables["--sn-bg-gradient-primary-rgb"] = `${rgb.r},${rgb.g},${rgb.b}`;
         }
-        
+
         // 🔧 PHASE 2: Emit for ColorStateManager
-        unifiedEventBus.emit('system:css-variables' as any, {
-          source: 'ColorHarmonyEngine',
+        unifiedEventBus.emit("system:css-variables" as any, {
+          source: "ColorHarmonyEngine",
           variables,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
       }
     } catch (err) {
@@ -2867,6 +3327,7 @@ export class ColorHarmonyEngine
       if (!palette) return;
 
       // Replace current flavour palette in-memory then refresh CSS vars
+      // Note: This updates hardcoded palettes but getCurrentActivePalette() will use PaletteSystemManager when year3000 is active
       (this.catppuccinPalettes as any)[this.currentTheme] = palette;
       await this.refreshPalette();
 
@@ -2895,13 +3356,16 @@ export class ColorHarmonyEngine
    */
   private calculateTemperatureBlendInfluence(temperature: number): number {
     // Normalize temperature to 0-1 range
-    const normalized = Math.max(0, Math.min(1, (temperature - 1000) / (20000 - 1000)));
-    
+    const normalized = Math.max(
+      0,
+      Math.min(1, (temperature - 1000) / (20000 - 1000))
+    );
+
     // Create a curve that gives more intensity to extreme temperatures
     // Low temperatures (warm, 1000K-4000K): enhanced blending (1.0-1.3)
     // Mid temperatures (neutral, 4000K-8000K): normal blending (0.9-1.1)
     // High temperatures (cool, 8000K-20000K): enhanced blending (1.1-1.3)
-    
+
     if (temperature <= 4000) {
       // Warm temperatures: linear increase from 1.0 to 1.3
       const warmFactor = (4000 - temperature) / (4000 - 1000); // 1 to 0
@@ -2935,20 +3399,23 @@ export class ColorHarmonyEngine
   /**
    * Determine optimal OKLAB enhancement preset based on musical and visual context
    */
-  private determineOptimalOKLABPreset(context: ColorContext): EnhancementPreset {
+  private determineOptimalOKLABPreset(
+    context: ColorContext
+  ): EnhancementPreset {
     const musicData = context.musicData;
-    
+
     // Default to STANDARD preset
-    let selectedPreset: EnhancementPreset = OKLABColorProcessor.PRESETS.STANDARD!;
-    
+    let selectedPreset: EnhancementPreset =
+      OKLABColorProcessor.PRESETS.STANDARD!;
+
     if (musicData) {
       const { energy = 0.5, valence = 0.5 } = musicData;
-      
+
       // High energy + high valence = COSMIC (maximum enhancement for vibrant music)
       if (energy > 0.8 && valence > 0.7) {
         selectedPreset = OKLABColorProcessor.PRESETS.COSMIC!;
       }
-      // High energy + low valence = VIBRANT (enhanced vibrancy for intense music) 
+      // High energy + low valence = VIBRANT (enhanced vibrancy for intense music)
       else if (energy > 0.7 && valence < 0.4) {
         selectedPreset = OKLABColorProcessor.PRESETS.VIBRANT!;
       }
@@ -2958,21 +3425,21 @@ export class ColorHarmonyEngine
       }
       // Everything else = STANDARD
     }
-    
+
     // Performance hints can override musical analysis
     if (context.performanceHints?.preferLightweight) {
       selectedPreset = OKLABColorProcessor.PRESETS.SUBTLE!;
     }
-    
+
     if (this.config?.enableDebug) {
-      console.log('🔬 [ColorHarmonyEngine] OKLAB preset selection:', {
+      console.log("🔬 [ColorHarmonyEngine] OKLAB preset selection:", {
         energy: musicData?.energy,
         valence: musicData?.valence,
         selectedPreset: selectedPreset.name,
-        reason: this.getPresetSelectionReason(musicData, context)
+        reason: this.getPresetSelectionReason(musicData, context),
       });
     }
-    
+
     return selectedPreset;
   }
 
@@ -2980,7 +3447,10 @@ export class ColorHarmonyEngine
    * Get comprehensive emotional temperature analysis using EmotionalTemperatureMapper
    * Enhanced with album art color analysis for multi-sensory emotion intelligence
    */
-  private async getAdvancedEmotionalTemperature(musicData: any, albumArtColors?: Record<string, string>): Promise<EmotionalTemperatureResult | null> {
+  private async getAdvancedEmotionalTemperature(
+    musicData: any,
+    albumArtColors?: Record<string, string>
+  ): Promise<EmotionalTemperatureResult | null> {
     if (!this.emotionalTemperatureMapper || !musicData) {
       return null;
     }
@@ -2998,32 +3468,45 @@ export class ColorHarmonyEngine
         speechiness: musicData.speechiness,
         mode: musicData.mode,
         key: musicData.key,
-        genre: musicData.genre
+        genre: musicData.genre,
       };
 
       // 🎨 ALBUM ART ENHANCEMENT: Enhance emotion analysis with album art color psychology
-      const enhancedAnalysisData = await this.enhanceWithAlbumArtPsychology(analysisData, albumArtColors);
+      const enhancedAnalysisData = await this.enhanceWithAlbumArtPsychology(
+        analysisData,
+        albumArtColors
+      );
 
-      const emotionalResult = this.emotionalTemperatureMapper.mapMusicToEmotionalTemperature(enhancedAnalysisData);
-      
+      const emotionalResult =
+        this.emotionalTemperatureMapper.mapMusicToEmotionalTemperature(
+          enhancedAnalysisData
+        );
+
       if (this.config?.enableDebug) {
-        console.log('🌡️ [ColorHarmonyEngine] Advanced emotional temperature with album art enhancement:', {
-          input: analysisData,
-          enhanced: enhancedAnalysisData,
-          albumArtInfluence: albumArtColors ? Object.keys(albumArtColors).length + ' colors' : 'None',
-          emotion: emotionalResult.primaryEmotion,
-          secondaryEmotion: emotionalResult.secondaryEmotion,
-          intensity: emotionalResult.intensity,
-          temperature: emotionalResult.temperature,
-          oklabPreset: emotionalResult.oklabPreset.name,
-          perceptualColor: emotionalResult.perceptualColorHex
-        });
+        console.log(
+          "🌡️ [ColorHarmonyEngine] Advanced emotional temperature with album art enhancement:",
+          {
+            input: analysisData,
+            enhanced: enhancedAnalysisData,
+            albumArtInfluence: albumArtColors
+              ? Object.keys(albumArtColors).length + " colors"
+              : "None",
+            emotion: emotionalResult.primaryEmotion,
+            secondaryEmotion: emotionalResult.secondaryEmotion,
+            intensity: emotionalResult.intensity,
+            temperature: emotionalResult.temperature,
+            oklabPreset: emotionalResult.oklabPreset.name,
+            perceptualColor: emotionalResult.perceptualColorHex,
+          }
+        );
       }
-      
+
       return emotionalResult;
-      
     } catch (error) {
-      console.warn('[ColorHarmonyEngine] Advanced emotional temperature analysis failed:', error);
+      console.warn(
+        "[ColorHarmonyEngine] Advanced emotional temperature analysis failed:",
+        error
+      );
       return null;
     }
   }
@@ -3034,7 +3517,7 @@ export class ColorHarmonyEngine
    * Creating a multi-sensory approach to artist consciousness recognition
    */
   private async enhanceWithAlbumArtPsychology(
-    originalAnalysis: MusicAnalysisData, 
+    originalAnalysis: MusicAnalysisData,
     albumArtColors?: Record<string, string>
   ): Promise<MusicAnalysisData> {
     if (!albumArtColors || Object.keys(albumArtColors).length === 0) {
@@ -3044,7 +3527,7 @@ export class ColorHarmonyEngine
     try {
       // Analyze album art colors for psychological indicators
       const colorPsychology = this.analyzeAlbumArtPsychology(albumArtColors);
-      
+
       // Create enhanced analysis data with color-informed adjustments
       const enhanced: MusicAnalysisData = { ...originalAnalysis };
 
@@ -3054,21 +3537,36 @@ export class ColorHarmonyEngine
 
       // Warm colors (reds, oranges) typically increase energy and arousal
       if (colorPsychology.warmth > 0.6) {
-        enhanced.energy = Math.min(1.0, currentEnergy * (1 + colorPsychology.warmth * 0.3));
-        enhanced.valence = Math.min(1.0, currentValence + colorPsychology.warmth * 0.2);
+        enhanced.energy = Math.min(
+          1.0,
+          currentEnergy * (1 + colorPsychology.warmth * 0.3)
+        );
+        enhanced.valence = Math.min(
+          1.0,
+          currentValence + colorPsychology.warmth * 0.2
+        );
       }
 
       // Cool colors (blues, greens) typically create calming, reflective moods
       if (colorPsychology.coolness > 0.6) {
-        enhanced.energy = Math.max(0.0, currentEnergy * (1 - colorPsychology.coolness * 0.2));
+        enhanced.energy = Math.max(
+          0.0,
+          currentEnergy * (1 - colorPsychology.coolness * 0.2)
+        );
         if (colorPsychology.saturation > 0.5) {
-          enhanced.valence = Math.min(1.0, currentValence + colorPsychology.coolness * 0.15);
+          enhanced.valence = Math.min(
+            1.0,
+            currentValence + colorPsychology.coolness * 0.15
+          );
         }
       }
 
       // High saturation increases emotional intensity
       if (colorPsychology.saturation > 0.7) {
-        enhanced.energy = Math.min(1.0, currentEnergy + colorPsychology.saturation * 0.2);
+        enhanced.energy = Math.min(
+          1.0,
+          currentEnergy + colorPsychology.saturation * 0.2
+        );
       }
 
       // Low saturation (desaturated/monochromatic) suggests introspection
@@ -3085,40 +3583,66 @@ export class ColorHarmonyEngine
           enhanced.energy = Math.min(1.0, finalEnergy + 0.1);
         } else {
           // Low energy + dark colors = melancholic
-          enhanced.valence = Math.max(0.0, (enhanced.valence || currentValence) - 0.2);
+          enhanced.valence = Math.max(
+            0.0,
+            (enhanced.valence || currentValence) - 0.2
+          );
         }
       }
 
       // Bright colors typically increase positive valence
       if (colorPsychology.brightness > 0.8) {
-        enhanced.valence = Math.min(1.0, (enhanced.valence || currentValence) + colorPsychology.brightness * 0.2);
+        enhanced.valence = Math.min(
+          1.0,
+          (enhanced.valence || currentValence) +
+            colorPsychology.brightness * 0.2
+        );
       }
 
       // Color harmony affects emotional stability and coherence
       if (colorPsychology.harmony > 0.8) {
         // Harmonious colors suggest stable, pleasant emotions
-        enhanced.valence = Math.min(1.0, (enhanced.valence || currentValence) + 0.1);
+        enhanced.valence = Math.min(
+          1.0,
+          (enhanced.valence || currentValence) + 0.1
+        );
       } else if (colorPsychology.harmony < 0.3) {
         // Disharmonious colors might suggest tension or experimental art
-        enhanced.energy = Math.min(1.0, (enhanced.energy || currentEnergy) + 0.15);
+        enhanced.energy = Math.min(
+          1.0,
+          (enhanced.energy || currentEnergy) + 0.15
+        );
       }
 
       if (this.config?.enableDebug) {
-        console.log('🎨 [ColorHarmonyEngine] Album art psychology enhancement:', {
-          original: { energy: originalAnalysis.energy || 0.5, valence: originalAnalysis.valence || 0.5 },
-          enhanced: { energy: enhanced.energy || 0.5, valence: enhanced.valence || 0.5 },
-          colorPsychology,
-          adjustments: {
-            energyChange: (enhanced.energy || 0.5) - (originalAnalysis.energy || 0.5),
-            valenceChange: (enhanced.valence || 0.5) - (originalAnalysis.valence || 0.5)
+        console.log(
+          "🎨 [ColorHarmonyEngine] Album art psychology enhancement:",
+          {
+            original: {
+              energy: originalAnalysis.energy || 0.5,
+              valence: originalAnalysis.valence || 0.5,
+            },
+            enhanced: {
+              energy: enhanced.energy || 0.5,
+              valence: enhanced.valence || 0.5,
+            },
+            colorPsychology,
+            adjustments: {
+              energyChange:
+                (enhanced.energy || 0.5) - (originalAnalysis.energy || 0.5),
+              valenceChange:
+                (enhanced.valence || 0.5) - (originalAnalysis.valence || 0.5),
+            },
           }
-        });
+        );
       }
 
       return enhanced;
-
     } catch (error) {
-      console.warn('[ColorHarmonyEngine] Album art psychology enhancement failed:', error);
+      console.warn(
+        "[ColorHarmonyEngine] Album art psychology enhancement failed:",
+        error
+      );
       return originalAnalysis;
     }
   }
@@ -3129,28 +3653,28 @@ export class ColorHarmonyEngine
    * Based on color psychology research and artist expression patterns
    */
   private analyzeAlbumArtPsychology(albumArtColors: Record<string, string>): {
-    warmth: number;          // 0-1: How warm the color palette is
-    coolness: number;        // 0-1: How cool the color palette is  
-    saturation: number;      // 0-1: Average saturation level
-    brightness: number;      // 0-1: Average brightness level
-    darkness: number;        // 0-1: How dark the overall palette is
-    harmony: number;         // 0-1: How harmonious the color relationships are
-    dominantHue: number;     // 0-360: Primary hue in degrees
+    warmth: number; // 0-1: How warm the color palette is
+    coolness: number; // 0-1: How cool the color palette is
+    saturation: number; // 0-1: Average saturation level
+    brightness: number; // 0-1: Average brightness level
+    darkness: number; // 0-1: How dark the overall palette is
+    harmony: number; // 0-1: How harmonious the color relationships are
+    dominantHue: number; // 0-360: Primary hue in degrees
     emotionalIntensity: number; // 0-1: Overall emotional intensity
     // 🎨 PHASE 2.3: New genre and artist consciousness indicators
     genreIndicators: {
-      electronicLikelihood: number;    // 0-1: Likelihood of electronic/synthetic music
-      organicLikelihood: number;       // 0-1: Likelihood of organic/acoustic music
+      electronicLikelihood: number; // 0-1: Likelihood of electronic/synthetic music
+      organicLikelihood: number; // 0-1: Likelihood of organic/acoustic music
       metalHardcoreLikelihood: number; // 0-1: Likelihood of metal/hardcore music
       popCommercialLikelihood: number; // 0-1: Likelihood of pop/commercial music
       jazzClassicalLikelihood: number; // 0-1: Likelihood of jazz/classical music
-      folkAcousticLikelihood: number;  // 0-1: Likelihood of folk/acoustic music
+      folkAcousticLikelihood: number; // 0-1: Likelihood of folk/acoustic music
     };
     artistConsciousness: {
-      visualSophistication: number;    // 0-1: How sophisticated the visual choices are
-      artisticIntention: number;       // 0-1: How intentional the color choices appear
-      culturalIndicators: string[];    // Array of detected cultural/regional indicators
-      emotionalDepth: number;          // 0-1: Depth of emotional expression through colors
+      visualSophistication: number; // 0-1: How sophisticated the visual choices are
+      artisticIntention: number; // 0-1: How intentional the color choices appear
+      culturalIndicators: string[]; // Array of detected cultural/regional indicators
+      emotionalDepth: number; // 0-1: Depth of emotional expression through colors
     };
   } {
     try {
@@ -3158,26 +3682,42 @@ export class ColorHarmonyEngine
       if (colors.length === 0) {
         // Return neutral values if no colors
         return {
-          warmth: 0.5, coolness: 0.5, saturation: 0.5, brightness: 0.5,
-          darkness: 0.5, harmony: 0.5, dominantHue: 180, emotionalIntensity: 0.5,
+          warmth: 0.5,
+          coolness: 0.5,
+          saturation: 0.5,
+          brightness: 0.5,
+          darkness: 0.5,
+          harmony: 0.5,
+          dominantHue: 180,
+          emotionalIntensity: 0.5,
           genreIndicators: {
-            electronicLikelihood: 0.5, organicLikelihood: 0.5, metalHardcoreLikelihood: 0.5,
-            popCommercialLikelihood: 0.5, jazzClassicalLikelihood: 0.5, folkAcousticLikelihood: 0.5
+            electronicLikelihood: 0.5,
+            organicLikelihood: 0.5,
+            metalHardcoreLikelihood: 0.5,
+            popCommercialLikelihood: 0.5,
+            jazzClassicalLikelihood: 0.5,
+            folkAcousticLikelihood: 0.5,
           },
           artistConsciousness: {
-            visualSophistication: 0.5, artisticIntention: 0.5, culturalIndicators: [], emotionalDepth: 0.5
-          }
+            visualSophistication: 0.5,
+            artisticIntention: 0.5,
+            culturalIndicators: [],
+            emotionalDepth: 0.5,
+          },
         };
       }
 
-      let totalWarmth = 0, totalCoolness = 0, totalSaturation = 0;
-      let totalBrightness = 0, totalDarkness = 0;
+      let totalWarmth = 0,
+        totalCoolness = 0,
+        totalSaturation = 0;
+      let totalBrightness = 0,
+        totalDarkness = 0;
       const hues: number[] = [];
 
       for (const color of colors) {
         const rgb = this.utils.hexToRgb(color);
         if (!rgb) continue;
-        
+
         const hsl = this.utils.rgbToHsl(rgb.r, rgb.g, rgb.b);
         const { h, s, l } = hsl;
         hues.push(h);
@@ -3193,7 +3733,7 @@ export class ColorHarmonyEngine
 
         totalSaturation += s;
         totalBrightness += l;
-        totalDarkness += (1 - l);
+        totalDarkness += 1 - l;
       }
 
       const count = colors.length;
@@ -3210,7 +3750,10 @@ export class ColorHarmonyEngine
       const dominantHue = this.calculateDominantHue(hues);
 
       // Calculate emotional intensity based on saturation and brightness contrast
-      const emotionalIntensity = Math.min(1.0, (avgSaturation + this.calculateContrast(colors)) / 2);
+      const emotionalIntensity = Math.min(
+        1.0,
+        (avgSaturation + this.calculateContrast(colors)) / 2
+      );
 
       // 🎨 PHASE 2.3: Analyze genre indicators from color psychology
       const genreIndicators = this._analyzeGenreIndicatorsFromColors({
@@ -3221,7 +3764,7 @@ export class ColorHarmonyEngine
         darkness: avgDarkness,
         harmony,
         dominantHue,
-        emotionalIntensity
+        emotionalIntensity,
       });
 
       // 🎨 PHASE 2.3: Analyze artist consciousness from color choices
@@ -3230,7 +3773,7 @@ export class ColorHarmonyEngine
         avgBrightness,
         harmony,
         emotionalIntensity,
-        colorCount: colors.length
+        colorCount: colors.length,
       });
 
       return {
@@ -3243,21 +3786,36 @@ export class ColorHarmonyEngine
         dominantHue,
         emotionalIntensity,
         genreIndicators,
-        artistConsciousness
+        artistConsciousness,
       };
-
     } catch (error) {
-      console.warn('[ColorHarmonyEngine] Album art psychology analysis failed:', error);
+      console.warn(
+        "[ColorHarmonyEngine] Album art psychology analysis failed:",
+        error
+      );
       return {
-        warmth: 0.5, coolness: 0.5, saturation: 0.5, brightness: 0.5,
-        darkness: 0.5, harmony: 0.5, dominantHue: 180, emotionalIntensity: 0.5,
+        warmth: 0.5,
+        coolness: 0.5,
+        saturation: 0.5,
+        brightness: 0.5,
+        darkness: 0.5,
+        harmony: 0.5,
+        dominantHue: 180,
+        emotionalIntensity: 0.5,
         genreIndicators: {
-          electronicLikelihood: 0.5, organicLikelihood: 0.5, metalHardcoreLikelihood: 0.5,
-          popCommercialLikelihood: 0.5, jazzClassicalLikelihood: 0.5, folkAcousticLikelihood: 0.5
+          electronicLikelihood: 0.5,
+          organicLikelihood: 0.5,
+          metalHardcoreLikelihood: 0.5,
+          popCommercialLikelihood: 0.5,
+          jazzClassicalLikelihood: 0.5,
+          folkAcousticLikelihood: 0.5,
         },
         artistConsciousness: {
-          visualSophistication: 0.5, artisticIntention: 0.5, culturalIndicators: [], emotionalDepth: 0.5
-        }
+          visualSophistication: 0.5,
+          artisticIntention: 0.5,
+          culturalIndicators: [],
+          emotionalDepth: 0.5,
+        },
       };
     }
   }
@@ -3270,10 +3828,10 @@ export class ColorHarmonyEngine
 
     let harmonyScore = 0;
     const harmonyTypes = [
-      60,  // Complementary
-      120, // Triadic  
-      30,  // Analogous
-      90   // Tetradic
+      60, // Complementary
+      120, // Triadic
+      30, // Analogous
+      90, // Tetradic
     ];
 
     for (let i = 0; i < hues.length; i++) {
@@ -3281,10 +3839,10 @@ export class ColorHarmonyEngine
         const hue1 = hues[i];
         const hue2 = hues[j];
         if (hue1 === undefined || hue2 === undefined) continue;
-        
+
         const diff = Math.abs(hue1 - hue2);
         const minDiff = Math.min(diff, 360 - diff);
-        
+
         // Check if this difference is close to a harmonic relationship
         for (const harmonic of harmonyTypes) {
           if (Math.abs(minDiff - harmonic) <= 15) {
@@ -3307,7 +3865,7 @@ export class ColorHarmonyEngine
 
     // Group hues into 30-degree segments and find most frequent
     const segments = new Array(12).fill(0);
-    
+
     for (const hue of hues) {
       const segment = Math.floor(hue / 30);
       segments[segment]++;
@@ -3331,10 +3889,10 @@ export class ColorHarmonyEngine
         const color1 = colors[i];
         const color2 = colors[j];
         if (!color1 || !color2) continue;
-        
+
         const rgb1 = this.utils.hexToRgb(color1);
         const rgb2 = this.utils.hexToRgb(color2);
-        
+
         if (rgb1 && rgb2) {
           // Simple contrast calculation based on luminance difference
           const lum1 = (rgb1.r * 0.299 + rgb1.g * 0.587 + rgb1.b * 0.114) / 255;
@@ -3355,58 +3913,86 @@ export class ColorHarmonyEngine
     rawColors: Record<string, string>,
     musicData: any,
     emotionalTemperature: EmotionalTemperatureResult | null,
-    genreData?: { genre: MusicGenre; confidence: number; characteristics: GenreCharacteristics; visualStyle: GenreVisualStyle }
+    genreData?: {
+      genre: MusicGenre;
+      confidence: number;
+      characteristics: GenreCharacteristics;
+      visualStyle: GenreVisualStyle;
+    }
   ): Promise<Record<string, string>> {
     const processedColors: Record<string, string> = { ...rawColors };
-    
+
     try {
       // Use emotional temperature OKLAB preset if available, otherwise use determined preset
-      const optimalPreset = emotionalTemperature?.oklabPreset || this.oklabState.currentPreset;
-      
+      const optimalPreset =
+        emotionalTemperature?.oklabPreset || this.oklabState.currentPreset;
+
       // 🎶 GENRE AESTHETIC PROCESSING: Apply genre-specific color characteristics
       let genreAdjustedPreset = optimalPreset;
-      if (genreData && genreData.confidence > 0.5 && this.genreState.genreInfluenceIntensity > 0) {
-        genreAdjustedPreset = this.applyGenreColorAesthetics(optimalPreset, genreData);
+      if (
+        genreData &&
+        genreData.confidence > 0.5 &&
+        this.genreState.genreInfluenceIntensity > 0
+      ) {
+        genreAdjustedPreset = this.applyGenreColorAesthetics(
+          optimalPreset,
+          genreData
+        );
       }
-      
+
       // Process primary colors through OKLAB for enhanced vibrancy and perceptual uniformity
-      const colorPriorities = ['PRIMARY', 'VIBRANT', 'PROMINENT', 'VIBRANT_NON_ALARMING', 'LIGHT_VIBRANT'];
-      
+      const colorPriorities = [
+        "PRIMARY",
+        "VIBRANT",
+        "PROMINENT",
+        "VIBRANT_NON_ALARMING",
+        "LIGHT_VIBRANT",
+      ];
+
       for (const colorKey of colorPriorities) {
         const colorHex = rawColors[colorKey];
         if (colorHex && this.isValidHex(colorHex)) {
           try {
             // Check cache first for performance (include genre in cache key for aesthetic variety)
-            const genreKey = genreData ? `-${genreData.genre}` : '';
+            const genreKey = genreData ? `-${genreData.genre}` : "";
             const cacheKey = `${colorHex}-${genreAdjustedPreset.name}${genreKey}`;
             if (this.oklabState.processedPalette[cacheKey]) {
-              processedColors[colorKey] = this.oklabState.processedPalette[cacheKey].enhancedHex;
+              processedColors[colorKey] =
+                this.oklabState.processedPalette[cacheKey].enhancedHex;
               continue;
             }
-            
+
             // Process through OKLAB with genre-adjusted aesthetics
-            const oklabResult = this.oklabProcessor.processColor(colorHex, genreAdjustedPreset);
+            const oklabResult = this.oklabProcessor.processColor(
+              colorHex,
+              genreAdjustedPreset
+            );
             processedColors[colorKey] = oklabResult.enhancedHex;
-            
+
             // Cache result
             this.oklabState.processedPalette[cacheKey] = oklabResult;
-            
+
             if (this.config?.enableDebug) {
-              console.log(`🎨 [ColorHarmonyEngine] OKLAB enhanced ${colorKey}:`, {
-                original: colorHex,
-                enhanced: oklabResult.enhancedHex,
-                preset: optimalPreset.name,
-                processingTime: oklabResult.processingTime
-              });
+              console.log(
+                `🎨 [ColorHarmonyEngine] OKLAB enhanced ${colorKey}:`,
+                {
+                  original: colorHex,
+                  enhanced: oklabResult.enhancedHex,
+                  preset: optimalPreset.name,
+                  processingTime: oklabResult.processingTime,
+                }
+              );
             }
-            
           } catch (error) {
-            console.warn(`[ColorHarmonyEngine] OKLAB processing failed for ${colorKey}:`, error);
+            console.warn(
+              `[ColorHarmonyEngine] OKLAB processing failed for ${colorKey}:`,
+              error
+            );
             // Keep original color on error
           }
         }
       }
-      
+
       // If emotional temperature provides a perceptual color, blend it with primary
       if (emotionalTemperature?.perceptualColorHex && processedColors.PRIMARY) {
         try {
@@ -3416,155 +4002,206 @@ export class ColorHarmonyEngine
             emotionalTemperature.intensity * 0.3, // Blend factor based on intensity
             optimalPreset
           );
-          
+
           processedColors.EMOTIONAL_BLEND = blendResult.enhancedHex;
-          
+
           if (this.config?.enableDebug) {
-            console.log('🌡️ [ColorHarmonyEngine] Emotional color blending:', {
+            console.log("🌡️ [ColorHarmonyEngine] Emotional color blending:", {
               primary: processedColors.PRIMARY,
               emotionalColor: emotionalTemperature.perceptualColorHex,
               blendFactor: emotionalTemperature.intensity * 0.3,
-              result: blendResult.enhancedHex
+              result: blendResult.enhancedHex,
             });
           }
-          
         } catch (error) {
-          console.warn('[ColorHarmonyEngine] Emotional color blending failed:', error);
+          console.warn(
+            "[ColorHarmonyEngine] Emotional color blending failed:",
+            error
+          );
         }
       }
-      
+
       this.oklabState.lastProcessingTime = Date.now();
-      
+
       // 🎨 PHASE 2.2: Direct Album Color Blending in OKLAB Processing
       // Add album art color influence directly to final colors with perceptual blending
       const albumArtInfluence = this.getAlbumArtInfluenceSetting(); // 0-1 user control
-      
-      if (albumArtInfluence > 0 && rawColors && Object.keys(rawColors).length > 0) {
+
+      if (
+        albumArtInfluence > 0 &&
+        rawColors &&
+        Object.keys(rawColors).length > 0
+      ) {
         try {
           const albumBlendedColors = await this._applyDirectAlbumColorBlending(
-            processedColors, 
-            rawColors, 
+            processedColors,
+            rawColors,
             albumArtInfluence,
             genreAdjustedPreset
           );
-          
+
           // Replace processed colors with album-enhanced versions
           Object.assign(processedColors, albumBlendedColors);
-          
+
           if (this.config?.enableDebug) {
-            console.log('🎨 [ColorHarmonyEngine] Applied direct album color blending:', {
-              albumInfluence: (albumArtInfluence * 100).toFixed(1) + '%',
-              blendedKeys: Object.keys(albumBlendedColors),
-              note: 'album colors now directly influence final UI colors'
-            });
+            console.log(
+              "🎨 [ColorHarmonyEngine] Applied direct album color blending:",
+              {
+                albumInfluence: (albumArtInfluence * 100).toFixed(1) + "%",
+                blendedKeys: Object.keys(albumBlendedColors),
+                note: "album colors now directly influence final UI colors",
+              }
+            );
           }
-          
         } catch (error) {
-          console.warn('[ColorHarmonyEngine] Direct album color blending failed:', error);
+          console.warn(
+            "[ColorHarmonyEngine] Direct album color blending failed:",
+            error
+          );
         }
       }
-      
+
       // 🎯 CRITICAL FIX: Apply comprehensive Spicetify variable updates with OKLAB-processed colors
       // This ensures the new strategy pattern also benefits from our enhanced override protection
       if (this.semanticColorManager) {
         try {
           this.semanticColorManager.updateWithAlbumColors(processedColors);
-          
+
           if (this.config?.enableDebug) {
-            console.log('🎨 [ColorHarmonyEngine] Applied comprehensive Spicetify variable updates via strategy pattern:', {
-              processedColorCount: Object.keys(processedColors).length,
-              methodUsed: 'blendWithAdvancedOKLAB'
-            });
+            console.log(
+              "🎨 [ColorHarmonyEngine] Applied comprehensive Spicetify variable updates via strategy pattern:",
+              {
+                processedColorCount: Object.keys(processedColors).length,
+                methodUsed: "blendWithAdvancedOKLAB",
+              }
+            );
           }
         } catch (error) {
-          console.warn('[ColorHarmonyEngine] Failed to update Spicetify variables via strategy pattern:', error);
+          console.warn(
+            "[ColorHarmonyEngine] Failed to update Spicetify variables via strategy pattern:",
+            error
+          );
         }
       }
-      
     } catch (error) {
-      console.error('[ColorHarmonyEngine] Advanced OKLAB blending failed:', error);
+      console.error(
+        "[ColorHarmonyEngine] Advanced OKLAB blending failed:",
+        error
+      );
     }
-    
+
     return processedColors;
   }
 
   /**
    * Generate advanced CSS variables with comprehensive OKLAB integration
    */
-  private generateAdvancedOKLABCSSVariables(result: ColorResult): Record<string, string> {
+  private generateAdvancedOKLABCSSVariables(
+    result: ColorResult
+  ): Record<string, string> {
     const cssVariables: Record<string, string> = {};
-    
+
     try {
       // Add basic processed color variables
       Object.entries(result.processedColors).forEach(([key, value]) => {
-        if (value && typeof value === 'string') {
+        if (value && typeof value === "string") {
           cssVariables[`--sn-processed-${key.toLowerCase()}`] = value;
         }
       });
-      
+
       // Add enhanced OKLAB variables from processed palette
-      Object.entries(this.oklabState.processedPalette).forEach(([cacheKey, oklabResult]) => {
-        const [originalColor, presetName] = cacheKey.split('-');
-        if (originalColor && presetName) {
-          const prefix = `sn-oklab-${presetName.toLowerCase()}`;
-          const oklabVars = this.oklabProcessor.generateCSSVariables(oklabResult, prefix);
-          Object.assign(cssVariables, oklabVars);
+      Object.entries(this.oklabState.processedPalette).forEach(
+        ([cacheKey, oklabResult]) => {
+          const [originalColor, presetName] = cacheKey.split("-");
+          if (originalColor && presetName) {
+            const prefix = `sn-oklab-${presetName.toLowerCase()}`;
+            const oklabVars = this.oklabProcessor.generateCSSVariables(
+              oklabResult,
+              prefix
+            );
+            Object.assign(cssVariables, oklabVars);
+          }
         }
-      });
-      
+      );
+
       // Add perceptual gradient variables if available
       if (this.oklabState.perceptualGradientCache.size > 0) {
-        const gradientEntries = Array.from(this.oklabState.perceptualGradientCache.entries());
+        const gradientEntries = Array.from(
+          this.oklabState.perceptualGradientCache.entries()
+        );
         const [gradientKey, gradientStops] = gradientEntries[0] || [];
-        
+
         if (gradientStops && gradientStops.length > 0) {
           // Create CSS gradient stop variables
           gradientStops.forEach((stop, index) => {
             const percentage = (index / (gradientStops.length - 1)) * 100;
-            cssVariables[`--sn-oklab-gradient-stop-${index}`] = stop.enhancedHex;
-            cssVariables[`--sn-oklab-gradient-stop-${index}-rgb`] = `${stop.enhancedRgb.r},${stop.enhancedRgb.g},${stop.enhancedRgb.b}`;
-            cssVariables[`--sn-oklab-gradient-stop-${index}-pos`] = `${percentage}%`;
+            cssVariables[`--sn-oklab-gradient-stop-${index}`] =
+              stop.enhancedHex;
+            cssVariables[
+              `--sn-oklab-gradient-stop-${index}-rgb`
+            ] = `${stop.enhancedRgb.r},${stop.enhancedRgb.g},${stop.enhancedRgb.b}`;
+            cssVariables[
+              `--sn-oklab-gradient-stop-${index}-pos`
+            ] = `${percentage}%`;
           });
-          
+
           // Create complete gradient string
           const gradientString = gradientStops
             .map((stop, index) => {
               const percentage = (index / (gradientStops.length - 1)) * 100;
               return `${stop.enhancedHex} ${percentage}%`;
             })
-            .join(', ');
-          
-          cssVariables['--sn-oklab-perceptual-gradient'] = `linear-gradient(135deg, ${gradientString})`;
-          cssVariables['--sn-oklab-gradient-stop-count'] = gradientStops.length.toString();
+            .join(", ");
+
+          cssVariables[
+            "--sn-oklab-perceptual-gradient"
+          ] = `linear-gradient(135deg, ${gradientString})`;
+          cssVariables["--sn-oklab-gradient-stop-count"] =
+            gradientStops.length.toString();
         }
       }
-      
+
       // Add consciousness layer variables for integration with other systems
       if (result.processedColors.EMOTIONAL_BLEND) {
-        cssVariables['--sn-consciousness-emotional-color'] = result.processedColors.EMOTIONAL_BLEND;
-        const emotionalRgb = Year3000Utilities.hexToRgb(result.processedColors.EMOTIONAL_BLEND);
+        cssVariables["--sn-consciousness-emotional-color"] =
+          result.processedColors.EMOTIONAL_BLEND;
+        const emotionalRgb = Year3000Utilities.hexToRgb(
+          result.processedColors.EMOTIONAL_BLEND
+        );
         if (emotionalRgb) {
-          cssVariables['--sn-consciousness-emotional-rgb'] = `${emotionalRgb.r},${emotionalRgb.g},${emotionalRgb.b}`;
+          cssVariables[
+            "--sn-consciousness-emotional-rgb"
+          ] = `${emotionalRgb.r},${emotionalRgb.g},${emotionalRgb.b}`;
         }
       }
-      
+
       // Add current OKLAB processing state variables
-      cssVariables['--sn-oklab-preset-active'] = this.oklabState.currentPreset.name;
-      cssVariables['--sn-oklab-cache-size'] = Object.keys(this.oklabState.processedPalette).length.toString();
-      cssVariables['--sn-oklab-last-processing'] = this.oklabState.lastProcessingTime.toString();
-      
+      cssVariables["--sn-oklab-preset-active"] =
+        this.oklabState.currentPreset.name;
+      cssVariables["--sn-oklab-cache-size"] = Object.keys(
+        this.oklabState.processedPalette
+      ).length.toString();
+      cssVariables["--sn-oklab-last-processing"] =
+        this.oklabState.lastProcessingTime.toString();
+
       if (this.config?.enableDebug) {
-        console.log('🎨 [ColorHarmonyEngine] Generated advanced OKLAB CSS variables:', {
-          totalVariables: Object.keys(cssVariables).length,
-          gradientStops: this.oklabState.perceptualGradientCache.size,
-          oklabProcessedColors: Object.keys(this.oklabState.processedPalette).length
-        });
+        console.log(
+          "🎨 [ColorHarmonyEngine] Generated advanced OKLAB CSS variables:",
+          {
+            totalVariables: Object.keys(cssVariables).length,
+            gradientStops: this.oklabState.perceptualGradientCache.size,
+            oklabProcessedColors: Object.keys(this.oklabState.processedPalette)
+              .length,
+          }
+        );
       }
-      
     } catch (error) {
-      console.error('[ColorHarmonyEngine] Advanced OKLAB CSS variable generation failed:', error);
+      console.error(
+        "[ColorHarmonyEngine] Advanced OKLAB CSS variable generation failed:",
+        error
+      );
     }
-    
+
     return cssVariables;
   }
 
@@ -3574,25 +4211,28 @@ export class ColorHarmonyEngine
   private generatePerceptualGradientData(result: ColorResult): void {
     try {
       const primaryColor = result.processedColors.PRIMARY;
-      const secondaryColor = result.processedColors.SECONDARY || result.processedColors.EMOTIONAL_BLEND;
-      
+      const secondaryColor =
+        result.processedColors.SECONDARY ||
+        result.processedColors.EMOTIONAL_BLEND;
+
       if (!primaryColor || !this.isValidHex(primaryColor)) {
         return;
       }
-      
+
       // Determine gradient endpoints
       const startColor = primaryColor;
-      const endColor = secondaryColor && this.isValidHex(secondaryColor) 
-        ? secondaryColor 
-        : this.generateComplementaryColor(primaryColor);
-      
+      const endColor =
+        secondaryColor && this.isValidHex(secondaryColor)
+          ? secondaryColor
+          : this.generateComplementaryColor(primaryColor);
+
       const gradientKey = `${startColor}-${endColor}-${this.oklabState.currentPreset.name}`;
-      
+
       // Check cache first
       if (this.oklabState.perceptualGradientCache.has(gradientKey)) {
         return;
       }
-      
+
       // Generate OKLAB gradient with optimal stop count
       const stopCount = 7; // Optimal for smooth transitions while maintaining performance
       const gradientStops = this.oklabProcessor.generateOKLABGradient(
@@ -3601,45 +4241,55 @@ export class ColorHarmonyEngine
         stopCount,
         this.oklabState.currentPreset
       );
-      
+
       // Cache the gradient
       this.oklabState.perceptualGradientCache.set(gradientKey, gradientStops);
-      
+
       // Limit cache size for memory management
       if (this.oklabState.perceptualGradientCache.size > 10) {
-        const firstKey = this.oklabState.perceptualGradientCache.keys().next().value;
+        const firstKey = this.oklabState.perceptualGradientCache
+          .keys()
+          .next().value;
         if (firstKey) {
           this.oklabState.perceptualGradientCache.delete(firstKey);
         }
       }
-      
+
       if (this.config?.enableDebug) {
-        console.log('🌈 [ColorHarmonyEngine] Generated perceptual gradient data:', {
-          startColor,
-          endColor,
-          stopCount,
-          preset: this.oklabState.currentPreset.name,
-          cacheKey: gradientKey,
-          cacheSize: this.oklabState.perceptualGradientCache.size
-        });
+        console.log(
+          "🌈 [ColorHarmonyEngine] Generated perceptual gradient data:",
+          {
+            startColor,
+            endColor,
+            stopCount,
+            preset: this.oklabState.currentPreset.name,
+            cacheKey: gradientKey,
+            cacheSize: this.oklabState.perceptualGradientCache.size,
+          }
+        );
       }
-      
     } catch (error) {
-      console.error('[ColorHarmonyEngine] Perceptual gradient generation failed:', error);
+      console.error(
+        "[ColorHarmonyEngine] Perceptual gradient generation failed:",
+        error
+      );
     }
   }
 
   /**
    * Update advanced harmony metrics with comprehensive performance and quality tracking
    */
-  private updateAdvancedHarmonyMetrics(result: ColorResult, processingTime: number): void {
+  private updateAdvancedHarmonyMetrics(
+    result: ColorResult,
+    processingTime: number
+  ): void {
     try {
       // Color harmony quality metrics
       const primaryColor = result.processedColors.PRIMARY;
       const secondaryColor = result.processedColors.SECONDARY;
-      
+
       let harmonyScore = 0.5; // Default neutral score
-      
+
       if (primaryColor && this.isValidHex(primaryColor)) {
         const primaryRgb = Year3000Utilities.hexToRgb(primaryColor);
         if (primaryRgb) {
@@ -3648,28 +4298,34 @@ export class ColorHarmonyEngine
           harmonyScore = Math.min(1.0, vibrancy * 0.8 + 0.2);
         }
       }
-      
+
       // Update internal metrics
       const metrics = {
         processingTime,
         harmonyScore,
-        oklabProcessedColors: Object.keys(this.oklabState.processedPalette).length,
+        oklabProcessedColors: Object.keys(this.oklabState.processedPalette)
+          .length,
         perceptualGradientsCached: this.oklabState.perceptualGradientCache.size,
         currentPreset: this.oklabState.currentPreset.name,
-        lastUpdate: Date.now()
+        lastUpdate: Date.now(),
       };
-      
+
       // Store in metadata for external access
       if (result.metadata) {
         result.metadata.advancedHarmonyMetrics = metrics;
       }
-      
+
       if (this.config?.enableDebug) {
-        console.log('📊 [ColorHarmonyEngine] Advanced harmony metrics updated:', metrics);
+        console.log(
+          "📊 [ColorHarmonyEngine] Advanced harmony metrics updated:",
+          metrics
+        );
       }
-      
     } catch (error) {
-      console.error('[ColorHarmonyEngine] Advanced harmony metrics update failed:', error);
+      console.error(
+        "[ColorHarmonyEngine] Advanced harmony metrics update failed:",
+        error
+      );
     }
   }
 
@@ -3680,17 +4336,21 @@ export class ColorHarmonyEngine
   /**
    * Get preset selection reasoning for debugging
    */
-  private getPresetSelectionReason(musicData: any, context: ColorContext): string {
-    if (!musicData) return 'No music data available';
-    
+  private getPresetSelectionReason(
+    musicData: any,
+    context: ColorContext
+  ): string {
+    if (!musicData) return "No music data available";
+
     const { energy = 0.5, valence = 0.5 } = musicData;
-    
-    if (context.performanceHints?.preferLightweight) return 'Performance optimization requested';
-    if (energy > 0.8 && valence > 0.7) return 'High energy + positive valence';
-    if (energy > 0.7 && valence < 0.4) return 'High energy + negative valence';
-    if (energy < 0.3) return 'Low energy music';
-    
-    return 'Standard balanced processing';
+
+    if (context.performanceHints?.preferLightweight)
+      return "Performance optimization requested";
+    if (energy > 0.8 && valence > 0.7) return "High energy + positive valence";
+    if (energy > 0.7 && valence < 0.4) return "High energy + negative valence";
+    if (energy < 0.3) return "Low energy music";
+
+    return "Standard balanced processing";
   }
 
   /**
@@ -3700,20 +4360,26 @@ export class ColorHarmonyEngine
     try {
       const rgb = Year3000Utilities.hexToRgb(hexColor);
       if (!rgb) return hexColor;
-      
+
       // Convert to HSL for hue manipulation
       const hsl = this.rgbToHsl(rgb.r, rgb.g, rgb.b);
-      
+
       // Rotate hue by 180 degrees for complement
       const complementHue = (hsl.h + 180) % 360;
-      
+
       // Convert back to RGB
       const complementRgb = this.hslToRgb(complementHue, hsl.s, hsl.l);
-      
-      return Year3000Utilities.rgbToHex(complementRgb.r, complementRgb.g, complementRgb.b);
-      
+
+      return Year3000Utilities.rgbToHex(
+        complementRgb.r,
+        complementRgb.g,
+        complementRgb.b
+      );
     } catch (error) {
-      console.warn('[ColorHarmonyEngine] Complementary color generation failed:', error);
+      console.warn(
+        "[ColorHarmonyEngine] Complementary color generation failed:",
+        error
+      );
       return hexColor;
     }
   }
@@ -3721,20 +4387,24 @@ export class ColorHarmonyEngine
   /**
    * Calculate color vibrancy metric (0-1)
    */
-  private calculateColorVibrancy(rgb: { r: number; g: number; b: number }): number {
+  private calculateColorVibrancy(rgb: {
+    r: number;
+    g: number;
+    b: number;
+  }): number {
     // Calculate saturation and lightness components
     const max = Math.max(rgb.r, rgb.g, rgb.b);
     const min = Math.min(rgb.r, rgb.g, rgb.b);
     const delta = max - min;
-    
+
     if (max === 0) return 0;
-    
+
     const saturation = delta / max;
     const lightness = max / 255;
-    
+
     // Vibrancy is high when saturation is high and lightness is moderate
     const lightnessFactor = 1 - Math.abs(lightness - 0.5) * 2; // Peak at 0.5 lightness
-    
+
     return saturation * lightnessFactor;
   }
 
@@ -3748,64 +4418,78 @@ export class ColorHarmonyEngine
   /**
    * Convert RGB to HSL color space
    */
-  private rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+  private rgbToHsl(
+    r: number,
+    g: number,
+    b: number
+  ): { h: number; s: number; l: number } {
     r /= 255;
     g /= 255;
     b /= 255;
-    
+
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
     const delta = max - min;
-    
+
     let h = 0;
     let s = 0;
     const l = (max + min) / 2;
-    
+
     if (delta !== 0) {
       s = l > 0.5 ? delta / (2 - max - min) : delta / (max + min);
-      
+
       switch (max) {
-        case r: h = (g - b) / delta + (g < b ? 6 : 0); break;
-        case g: h = (b - r) / delta + 2; break;
-        case b: h = (r - g) / delta + 4; break;
+        case r:
+          h = (g - b) / delta + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / delta + 2;
+          break;
+        case b:
+          h = (r - g) / delta + 4;
+          break;
       }
       h /= 6;
     }
-    
+
     return { h: h * 360, s, l };
   }
 
   /**
    * Convert HSL to RGB color space
    */
-  private hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
+  private hslToRgb(
+    h: number,
+    s: number,
+    l: number
+  ): { r: number; g: number; b: number } {
     h /= 360;
-    
+
     const hue2rgb = (p: number, q: number, t: number): number => {
       if (t < 0) t += 1;
       if (t > 1) t -= 1;
-      if (t < 1/6) return p + (q - p) * 6 * t;
-      if (t < 1/2) return q;
-      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
       return p;
     };
-    
+
     let r, g, b;
-    
+
     if (s === 0) {
       r = g = b = l; // Achromatic
     } else {
       const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
       const p = 2 * l - q;
-      r = hue2rgb(p, q, h + 1/3);
+      r = hue2rgb(p, q, h + 1 / 3);
       g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1/3);
+      b = hue2rgb(p, q, h - 1 / 3);
     }
-    
+
     return {
       r: Math.round(r * 255),
       g: Math.round(g * 255),
-      b: Math.round(b * 255)
+      b: Math.round(b * 255),
     };
   }
 
@@ -3817,9 +4501,14 @@ export class ColorHarmonyEngine
    * Analyze current music for genre-specific aesthetic characteristics
    */
   private async analyzeGenreAesthetics(
-    musicData: any, 
+    musicData: any,
     albumArtColors?: Record<string, string>
-  ): Promise<{ genre: MusicGenre; confidence: number; characteristics: GenreCharacteristics; visualStyle: GenreVisualStyle } | null> {
+  ): Promise<{
+    genre: MusicGenre;
+    confidence: number;
+    characteristics: GenreCharacteristics;
+    visualStyle: GenreVisualStyle;
+  } | null> {
     try {
       if (!this.genreGradientEvolution) {
         return null;
@@ -3828,40 +4517,54 @@ export class ColorHarmonyEngine
       // Get current genre from GenreGradientEvolution
       const currentGenre = this.genreGradientEvolution.getCurrentGenre();
       const genreConfidence = this.genreGradientEvolution.getGenreConfidence();
-      
+
       // Only proceed if we have decent confidence
       if (genreConfidence < 0.3) {
         return null;
       }
 
       // Get genre characteristics and visual style
-      const genreCharacteristics = this.genreGradientEvolution.getGenreCharacteristics(currentGenre);
-      const genreVisualStyle = this.genreGradientEvolution.getGenreVisualStyle(currentGenre);
+      const genreCharacteristics =
+        this.genreGradientEvolution.getGenreCharacteristics(currentGenre);
+      const genreVisualStyle =
+        this.genreGradientEvolution.getGenreVisualStyle(currentGenre);
 
       // 🎨 PHASE 2.1: Album Color Enhancement - Use album colors to validate and enhance genre detection
       let albumGenreHarmonyScore = 1.0; // Default confidence multiplier
       let genreValidatedByAlbumColors = genreConfidence;
-      
+
       if (albumArtColors && Object.keys(albumArtColors).length > 0) {
         try {
           // Analyze album color harmony with detected genre
-          const albumColorAnalysis = this._analyzeAlbumGenreHarmony(albumArtColors, currentGenre, genreCharacteristics);
+          const albumColorAnalysis = this._analyzeAlbumGenreHarmony(
+            albumArtColors,
+            currentGenre,
+            genreCharacteristics
+          );
           albumGenreHarmonyScore = albumColorAnalysis.harmonyScore;
-          
+
           // Adjust genre confidence based on album color validation
-          genreValidatedByAlbumColors = genreConfidence * albumGenreHarmonyScore;
-          
+          genreValidatedByAlbumColors =
+            genreConfidence * albumGenreHarmonyScore;
+
           if (this.config.enableDebug) {
-            console.log(`🎨 [ColorHarmonyEngine] Album-Genre harmony analysis:`, {
-              genre: currentGenre,
-              originalConfidence: (genreConfidence * 100).toFixed(1) + '%',
-              harmonyScore: (albumGenreHarmonyScore * 100).toFixed(1) + '%',
-              validatedConfidence: (genreValidatedByAlbumColors * 100).toFixed(1) + '%',
-              albumColorCount: Object.keys(albumArtColors).length
-            });
+            console.log(
+              `🎨 [ColorHarmonyEngine] Album-Genre harmony analysis:`,
+              {
+                genre: currentGenre,
+                originalConfidence: (genreConfidence * 100).toFixed(1) + "%",
+                harmonyScore: (albumGenreHarmonyScore * 100).toFixed(1) + "%",
+                validatedConfidence:
+                  (genreValidatedByAlbumColors * 100).toFixed(1) + "%",
+                albumColorCount: Object.keys(albumArtColors).length,
+              }
+            );
           }
         } catch (error) {
-          console.warn("[ColorHarmonyEngine] Album-genre harmony analysis failed:", error);
+          console.warn(
+            "[ColorHarmonyEngine] Album-genre harmony analysis failed:",
+            error
+          );
         }
       }
 
@@ -3869,32 +4572,41 @@ export class ColorHarmonyEngine
       this.genreState.currentGenre = currentGenre;
       this.genreState.genreConfidence = genreValidatedByAlbumColors; // Use album-enhanced confidence
       this.genreState.lastGenreUpdate = Date.now();
-      
+
       // Add to genre history with album-enhanced confidence
       this.genreState.genreHistory.unshift({
         genre: currentGenre,
         confidence: genreValidatedByAlbumColors, // Use album-enhanced confidence
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       // Keep history manageable
       if (this.genreState.genreHistory.length > 10) {
-        this.genreState.genreHistory = this.genreState.genreHistory.slice(0, 10);
+        this.genreState.genreHistory = this.genreState.genreHistory.slice(
+          0,
+          10
+        );
       }
 
       if (this.config.enableDebug) {
-        console.log(`🎶 [ColorHarmonyEngine] Genre aesthetic analysis: ${currentGenre} (${(genreValidatedByAlbumColors * 100).toFixed(1)}% album-validated confidence)`);
+        console.log(
+          `🎶 [ColorHarmonyEngine] Genre aesthetic analysis: ${currentGenre} (${(
+            genreValidatedByAlbumColors * 100
+          ).toFixed(1)}% album-validated confidence)`
+        );
       }
 
       return {
         genre: currentGenre,
         confidence: genreValidatedByAlbumColors, // Return album-enhanced confidence
         characteristics: genreCharacteristics,
-        visualStyle: genreVisualStyle
+        visualStyle: genreVisualStyle,
       };
-
     } catch (error) {
-      console.warn("[ColorHarmonyEngine] Error analyzing genre aesthetics:", error);
+      console.warn(
+        "[ColorHarmonyEngine] Error analyzing genre aesthetics:",
+        error
+      );
       return null;
     }
   }
@@ -3904,15 +4616,20 @@ export class ColorHarmonyEngine
    */
   private applyGenreColorAesthetics(
     basePreset: EnhancementPreset,
-    genreData: { genre: MusicGenre; confidence: number; characteristics: GenreCharacteristics; visualStyle: GenreVisualStyle }
+    genreData: {
+      genre: MusicGenre;
+      confidence: number;
+      characteristics: GenreCharacteristics;
+      visualStyle: GenreVisualStyle;
+    }
   ): EnhancementPreset {
     const { characteristics, visualStyle, confidence } = genreData;
-    
+
     // Create a genre-adjusted preset based on the base preset
     const genreAdjustedPreset: EnhancementPreset = {
       ...basePreset,
       name: `${basePreset.name}-${genreData.genre}`,
-      description: `${basePreset.description} with ${genreData.genre} aesthetic characteristics`
+      description: `${basePreset.description} with ${genreData.genre} aesthetic characteristics`,
     };
 
     // Apply genre influence based on confidence and user settings
@@ -3921,46 +4638,76 @@ export class ColorHarmonyEngine
     // Adjust chroma boost based on genre characteristics
     if (characteristics.saturation > 0.7) {
       // High saturation genres (electronic, pop) - boost chroma
-      genreAdjustedPreset.chromaBoost = Math.min(2.0, basePreset.chromaBoost + (0.3 * genreInfluence));
+      genreAdjustedPreset.chromaBoost = Math.min(
+        2.0,
+        basePreset.chromaBoost + 0.3 * genreInfluence
+      );
     } else if (characteristics.saturation < 0.3) {
       // Low saturation genres (ambient, folk) - reduce chroma for natural feel
-      genreAdjustedPreset.chromaBoost = Math.max(0.8, basePreset.chromaBoost - (0.2 * genreInfluence));
+      genreAdjustedPreset.chromaBoost = Math.max(
+        0.8,
+        basePreset.chromaBoost - 0.2 * genreInfluence
+      );
     }
 
     // Adjust vibrant threshold based on genre complexity
     if (characteristics.harmonicComplexity > 0.7) {
       // Complex genres (jazz, classical) - lower threshold for more vibrancy
-      genreAdjustedPreset.vibrantThreshold = Math.max(0.05, basePreset.vibrantThreshold - (0.05 * genreInfluence));
+      genreAdjustedPreset.vibrantThreshold = Math.max(
+        0.05,
+        basePreset.vibrantThreshold - 0.05 * genreInfluence
+      );
     } else if (characteristics.harmonicComplexity < 0.3) {
       // Simple genres (pop, house) - higher threshold for cleaner colors
-      genreAdjustedPreset.vibrantThreshold = Math.min(0.2, basePreset.vibrantThreshold + (0.03 * genreInfluence));
+      genreAdjustedPreset.vibrantThreshold = Math.min(
+        0.2,
+        basePreset.vibrantThreshold + 0.03 * genreInfluence
+      );
     }
 
     // Adjust lightness based on emotional range and energy
-    if (characteristics.emotionalRange > 0.7 && characteristics.organicness > 0.6) {
+    if (
+      characteristics.emotionalRange > 0.7 &&
+      characteristics.organicness > 0.6
+    ) {
       // Emotionally rich organic genres (folk, blues) - natural lightness
-      genreAdjustedPreset.lightnessBoost = Math.max(0.9, basePreset.lightnessBoost - (0.1 * genreInfluence));
+      genreAdjustedPreset.lightnessBoost = Math.max(
+        0.9,
+        basePreset.lightnessBoost - 0.1 * genreInfluence
+      );
     } else if (characteristics.artificialProcessing > 0.7) {
       // Electronic genres - can handle higher lightness
-      genreAdjustedPreset.lightnessBoost = Math.min(1.4, basePreset.lightnessBoost + (0.2 * genreInfluence));
+      genreAdjustedPreset.lightnessBoost = Math.min(
+        1.4,
+        basePreset.lightnessBoost + 0.2 * genreInfluence
+      );
     }
 
     // Adjust shadow reduction based on genre contrast preferences
     if (visualStyle.contrastLevel > 0.7) {
       // High contrast genres (metal, rock) - more pronounced shadows
-      genreAdjustedPreset.shadowReduction = Math.max(0.1, basePreset.shadowReduction - (0.1 * genreInfluence));
+      genreAdjustedPreset.shadowReduction = Math.max(
+        0.1,
+        basePreset.shadowReduction - 0.1 * genreInfluence
+      );
     } else if (characteristics.organicness > 0.6) {
       // Organic genres (folk, acoustic) - softer shadows
-      genreAdjustedPreset.shadowReduction = Math.min(0.5, basePreset.shadowReduction + (0.1 * genreInfluence));
+      genreAdjustedPreset.shadowReduction = Math.min(
+        0.5,
+        basePreset.shadowReduction + 0.1 * genreInfluence
+      );
     }
 
     if (this.config.enableDebug) {
-      console.log(`🎨 [ColorHarmonyEngine] Applied ${genreData.genre} aesthetics to ${basePreset.name} preset:`, {
-        chromaBoost: `${basePreset.chromaBoost} → ${genreAdjustedPreset.chromaBoost}`,
-        lightnessBoost: `${basePreset.lightnessBoost} → ${genreAdjustedPreset.lightnessBoost}`,
-        vibrantThreshold: `${basePreset.vibrantThreshold} → ${genreAdjustedPreset.vibrantThreshold}`,
-        genreInfluence: `${(genreInfluence * 100).toFixed(1)}%`
-      });
+      console.log(
+        `🎨 [ColorHarmonyEngine] Applied ${genreData.genre} aesthetics to ${basePreset.name} preset:`,
+        {
+          chromaBoost: `${basePreset.chromaBoost} → ${genreAdjustedPreset.chromaBoost}`,
+          lightnessBoost: `${basePreset.lightnessBoost} → ${genreAdjustedPreset.lightnessBoost}`,
+          vibrantThreshold: `${basePreset.vibrantThreshold} → ${genreAdjustedPreset.vibrantThreshold}`,
+          genreInfluence: `${(genreInfluence * 100).toFixed(1)}%`,
+        }
+      );
     }
 
     return genreAdjustedPreset;
@@ -3979,95 +4726,138 @@ export class ColorHarmonyEngine
       let explanationParts: string[] = [];
 
       // Convert album colors to HSL for color psychology analysis
-      const albumHslColors = Object.entries(albumArtColors).map(([role, hex]) => {
-        const rgb = this.utils.hexToRgb(hex);
-        return rgb ? this.utils.rgbToHsl(rgb.r, rgb.g, rgb.b) : null;
-      }).filter(hsl => hsl !== null);
+      const albumHslColors = Object.entries(albumArtColors)
+        .map(([role, hex]) => {
+          const rgb = this.utils.hexToRgb(hex);
+          return rgb ? this.utils.rgbToHsl(rgb.r, rgb.g, rgb.b) : null;
+        })
+        .filter((hsl) => hsl !== null);
 
       if (albumHslColors.length === 0) {
-        return { harmonyScore: 1.0, explanation: 'No valid album colors found' };
+        return {
+          harmonyScore: 1.0,
+          explanation: "No valid album colors found",
+        };
       }
 
       // Analyze average saturation vs genre expectations
-      const avgSaturation = albumHslColors.reduce((sum, hsl) => sum + hsl!.s, 0) / albumHslColors.length;
+      const avgSaturation =
+        albumHslColors.reduce((sum, hsl) => sum + hsl!.s, 0) /
+        albumHslColors.length;
       const expectedSaturation = genreCharacteristics.saturation || 0.5;
       const saturationDiff = Math.abs(avgSaturation / 100 - expectedSaturation);
-      
+
       if (saturationDiff < 0.2) {
         harmonyScore *= 1.1; // Boost confidence for matching saturation
-        explanationParts.push(`album saturation matches genre (±${(saturationDiff * 100).toFixed(1)}%)`);
+        explanationParts.push(
+          `album saturation matches genre (±${(saturationDiff * 100).toFixed(
+            1
+          )}%)`
+        );
       } else if (saturationDiff > 0.4) {
         harmonyScore *= 0.85; // Reduce confidence for mismatched saturation
-        explanationParts.push(`album saturation differs from genre expectations (${(saturationDiff * 100).toFixed(1)}% diff)`);
+        explanationParts.push(
+          `album saturation differs from genre expectations (${(
+            saturationDiff * 100
+          ).toFixed(1)}% diff)`
+        );
       }
 
       // Analyze color temperature vs genre warmth
-      const avgHue = albumHslColors.reduce((sum, hsl) => sum + hsl!.h, 0) / albumHslColors.length;
-      const isWarmAlbum = (avgHue >= 15 && avgHue <= 45) || (avgHue >= 315 && avgHue <= 345); // Orange/red ranges
+      const avgHue =
+        albumHslColors.reduce((sum, hsl) => sum + hsl!.h, 0) /
+        albumHslColors.length;
+      const isWarmAlbum =
+        (avgHue >= 15 && avgHue <= 45) || (avgHue >= 315 && avgHue <= 345); // Orange/red ranges
       const isCoolAlbum = avgHue >= 180 && avgHue <= 270; // Blue/cyan ranges
-      
+
       const expectedWarmth = genreCharacteristics.energyLevel || 0.5;
       if (expectedWarmth > 0.6 && isWarmAlbum) {
         harmonyScore *= 1.15; // High-energy genre with warm album colors
-        explanationParts.push('warm album colors match high-energy genre');
+        explanationParts.push("warm album colors match high-energy genre");
       } else if (expectedWarmth < 0.4 && isCoolAlbum) {
         harmonyScore *= 1.1; // Low-energy genre with cool album colors
-        explanationParts.push('cool album colors match low-energy genre');
-      } else if ((expectedWarmth > 0.6 && isCoolAlbum) || (expectedWarmth < 0.4 && isWarmAlbum)) {
+        explanationParts.push("cool album colors match low-energy genre");
+      } else if (
+        (expectedWarmth > 0.6 && isCoolAlbum) ||
+        (expectedWarmth < 0.4 && isWarmAlbum)
+      ) {
         harmonyScore *= 0.9; // Color temperature mismatch
-        explanationParts.push('album color temperature differs from genre energy');
+        explanationParts.push(
+          "album color temperature differs from genre energy"
+        );
       }
 
       // Analyze brightness vs genre characteristics
-      const avgLightness = albumHslColors.reduce((sum, hsl) => sum + hsl!.l, 0) / albumHslColors.length;
+      const avgLightness =
+        albumHslColors.reduce((sum, hsl) => sum + hsl!.l, 0) /
+        albumHslColors.length;
       const isDarkAlbum = avgLightness < 40;
       const isBrightAlbum = avgLightness > 70;
-      
-      if (genre.includes('metal') || genre.includes('goth') || genre.includes('dark')) {
+
+      if (
+        genre.includes("metal") ||
+        genre.includes("goth") ||
+        genre.includes("dark")
+      ) {
         if (isDarkAlbum) {
           harmonyScore *= 1.2; // Dark album fits dark genre
-          explanationParts.push('dark album aesthetic matches genre');
+          explanationParts.push("dark album aesthetic matches genre");
         } else if (isBrightAlbum) {
           harmonyScore *= 0.8; // Bright album conflicts with dark genre
-          explanationParts.push('bright album conflicts with dark genre aesthetic');
+          explanationParts.push(
+            "bright album conflicts with dark genre aesthetic"
+          );
         }
-      } else if (genre.includes('pop') || genre.includes('dance') || genre.includes('electronic')) {
+      } else if (
+        genre.includes("pop") ||
+        genre.includes("dance") ||
+        genre.includes("electronic")
+      ) {
         if (isBrightAlbum) {
           harmonyScore *= 1.15; // Bright album fits energetic genre
-          explanationParts.push('bright album aesthetic matches energetic genre');
+          explanationParts.push(
+            "bright album aesthetic matches energetic genre"
+          );
         }
       }
 
       // Analyze color diversity vs genre complexity
-      const colorHues = albumHslColors.map(hsl => hsl!.h);
+      const colorHues = albumHslColors.map((hsl) => hsl!.h);
       const hueSpread = Math.max(...colorHues) - Math.min(...colorHues);
       const isMonochromatic = hueSpread < 30;
       const isPolychromatic = hueSpread > 120;
-      
+
       const expectedComplexity = genreCharacteristics.harmonicComplexity || 0.5;
       if (expectedComplexity > 0.7 && isPolychromatic) {
         harmonyScore *= 1.1; // Complex genre with diverse colors
-        explanationParts.push('diverse album colors match complex genre');
+        explanationParts.push("diverse album colors match complex genre");
       } else if (expectedComplexity < 0.3 && isMonochromatic) {
         harmonyScore *= 1.1; // Simple genre with unified colors
-        explanationParts.push('unified album colors match simple genre');
+        explanationParts.push("unified album colors match simple genre");
       }
 
       // Clamp final score to reasonable range
       harmonyScore = Math.max(0.7, Math.min(1.3, harmonyScore));
-      
-      const explanation = explanationParts.length > 0 
-        ? explanationParts.join('; ') 
-        : 'album colors analyzed for genre harmony';
+
+      const explanation =
+        explanationParts.length > 0
+          ? explanationParts.join("; ")
+          : "album colors analyzed for genre harmony";
 
       return {
         harmonyScore,
-        explanation
+        explanation,
       };
-
     } catch (error) {
-      console.warn("[ColorHarmonyEngine] Album-genre harmony analysis error:", error);
-      return { harmonyScore: 1.0, explanation: 'harmony analysis failed, using default confidence' };
+      console.warn(
+        "[ColorHarmonyEngine] Album-genre harmony analysis error:",
+        error
+      );
+      return {
+        harmonyScore: 1.0,
+        explanation: "harmony analysis failed, using default confidence",
+      };
     }
   }
 
@@ -4090,18 +4880,24 @@ export class ColorHarmonyEngine
     oklabPreset: any
   ): Promise<Record<string, string>> {
     const blendedColors: Record<string, string> = {};
-    
+
     try {
       // Get the dominant album colors for blending
-      const albumDominantColors = this._extractDominantAlbumColors(albumArtColors);
-      
+      const albumDominantColors =
+        this._extractDominantAlbumColors(albumArtColors);
+
       if (albumDominantColors.length === 0) {
         return {}; // No valid album colors to blend
       }
 
       // Apply album color blending to main color categories
-      const blendTargets = ['PRIMARY', 'VIBRANT', 'PROMINENT', 'VIBRANT_NON_ALARMING'];
-      
+      const blendTargets = [
+        "PRIMARY",
+        "VIBRANT",
+        "PROMINENT",
+        "VIBRANT_NON_ALARMING",
+      ];
+
       for (const colorKey of blendTargets) {
         const processedColor = processedColors[colorKey];
         if (!processedColor || !this.isValidHex(processedColor)) {
@@ -4110,8 +4906,11 @@ export class ColorHarmonyEngine
 
         try {
           // Select the most harmonious album color for this processed color
-          const bestAlbumColor = this._selectHarmoniousAlbumColor(processedColor, albumDominantColors);
-          
+          const bestAlbumColor = this._selectHarmoniousAlbumColor(
+            processedColor,
+            albumDominantColors
+          );
+
           if (bestAlbumColor) {
             // Use OKLAB interpolation for perceptually uniform blending
             const blendResult = this.oklabProcessor.interpolateOKLAB(
@@ -4120,21 +4919,26 @@ export class ColorHarmonyEngine
               albumInfluence * 0.6, // Scale down for subtle but noticeable effect
               oklabPreset
             );
-            
+
             blendedColors[colorKey] = blendResult.enhancedHex;
-            
+
             if (this.config?.enableDebug) {
-              console.log(`🎨 [ColorHarmonyEngine] Album-blended ${colorKey}:`, {
-                original: processedColor,
-                albumColor: bestAlbumColor,
-                blended: blendResult.enhancedHex,
-                blendFactor: (albumInfluence * 0.6).toFixed(2)
-              });
+              console.log(
+                `🎨 [ColorHarmonyEngine] Album-blended ${colorKey}:`,
+                {
+                  original: processedColor,
+                  albumColor: bestAlbumColor,
+                  blended: blendResult.enhancedHex,
+                  blendFactor: (albumInfluence * 0.6).toFixed(2),
+                }
+              );
             }
           }
-          
         } catch (error) {
-          console.warn(`[ColorHarmonyEngine] Album blending failed for ${colorKey}:`, error);
+          console.warn(
+            `[ColorHarmonyEngine] Album blending failed for ${colorKey}:`,
+            error
+          );
         }
       }
 
@@ -4142,27 +4946,36 @@ export class ColorHarmonyEngine
       if (albumDominantColors.length > 0 && albumInfluence > 0.3) {
         try {
           // Create ALBUM_ACCENT color from the most vibrant album color
-          const mostVibrantAlbum = this._selectMostVibrantColor(albumDominantColors);
+          const mostVibrantAlbum =
+            this._selectMostVibrantColor(albumDominantColors);
           if (mostVibrantAlbum) {
-            const albumAccentResult = this.oklabProcessor.processColor(mostVibrantAlbum, oklabPreset);
-            blendedColors['ALBUM_ACCENT'] = albumAccentResult.enhancedHex;
-            
+            const albumAccentResult = this.oklabProcessor.processColor(
+              mostVibrantAlbum,
+              oklabPreset
+            );
+            blendedColors["ALBUM_ACCENT"] = albumAccentResult.enhancedHex;
+
             if (this.config?.enableDebug) {
-              console.log('🎨 [ColorHarmonyEngine] Created ALBUM_ACCENT:', {
+              console.log("🎨 [ColorHarmonyEngine] Created ALBUM_ACCENT:", {
                 source: mostVibrantAlbum,
-                enhanced: albumAccentResult.enhancedHex
+                enhanced: albumAccentResult.enhancedHex,
               });
             }
           }
         } catch (error) {
-          console.warn('[ColorHarmonyEngine] Album accent creation failed:', error);
+          console.warn(
+            "[ColorHarmonyEngine] Album accent creation failed:",
+            error
+          );
         }
       }
 
       return blendedColors;
-      
     } catch (error) {
-      console.error('[ColorHarmonyEngine] Direct album color blending error:', error);
+      console.error(
+        "[ColorHarmonyEngine] Direct album color blending error:",
+        error
+      );
       return {};
     }
   }
@@ -4170,55 +4983,79 @@ export class ColorHarmonyEngine
   /**
    * 🎨 PHASE 2.2: Extract dominant colors from album art for blending
    */
-  private _extractDominantAlbumColors(albumArtColors: Record<string, string>): string[] {
+  private _extractDominantAlbumColors(
+    albumArtColors: Record<string, string>
+  ): string[] {
     const dominantColors: string[] = [];
-    
+
     // Priority order for album color extraction
-    const colorPriorities = ['VIBRANT', 'DOMINANT', 'PRIMARY', 'PROMINENT', 'LIGHT_VIBRANT', 'DARK_VIBRANT'];
-    
+    const colorPriorities = [
+      "VIBRANT",
+      "DOMINANT",
+      "PRIMARY",
+      "PROMINENT",
+      "LIGHT_VIBRANT",
+      "DARK_VIBRANT",
+    ];
+
     for (const priority of colorPriorities) {
       const color = albumArtColors[priority];
       if (color && this.isValidHex(color)) {
         dominantColors.push(color);
       }
     }
-    
+
     // Also include any other valid colors if we have few dominant ones
     if (dominantColors.length < 3) {
-      Object.values(albumArtColors).forEach(color => {
-        if (color && this.isValidHex(color) && !dominantColors.includes(color)) {
+      Object.values(albumArtColors).forEach((color) => {
+        if (
+          color &&
+          this.isValidHex(color) &&
+          !dominantColors.includes(color)
+        ) {
           dominantColors.push(color);
         }
       });
     }
-    
+
     return dominantColors.slice(0, 5); // Limit to 5 colors for performance
   }
 
   /**
    * 🎨 PHASE 2.2: Select the most harmonious album color for blending with a processed color
    */
-  private _selectHarmoniousAlbumColor(processedColor: string, albumColors: string[]): string | null {
+  private _selectHarmoniousAlbumColor(
+    processedColor: string,
+    albumColors: string[]
+  ): string | null {
     if (albumColors.length === 0) return null;
-    
+
     try {
       const processedRgb = this.utils.hexToRgb(processedColor);
       if (!processedRgb) return albumColors[0] || null; // Fallback to first album color
-      
-      const processedHsl = this.utils.rgbToHsl(processedRgb.r, processedRgb.g, processedRgb.b);
+
+      const processedHsl = this.utils.rgbToHsl(
+        processedRgb.r,
+        processedRgb.g,
+        processedRgb.b
+      );
       let bestColor = albumColors[0] || null;
       let bestHarmonyScore = 0;
-      
+
       for (const albumColor of albumColors) {
         const albumRgb = this.utils.hexToRgb(albumColor);
         if (!albumRgb) continue;
-        
-        const albumHsl = this.utils.rgbToHsl(albumRgb.r, albumRgb.g, albumRgb.b);
-        
+
+        const albumHsl = this.utils.rgbToHsl(
+          albumRgb.r,
+          albumRgb.g,
+          albumRgb.b
+        );
+
         // Calculate harmony based on complementary/analogous relationships
         const hueDiff = Math.abs(processedHsl.h - albumHsl.h);
         const normalizedHueDiff = Math.min(hueDiff, 360 - hueDiff);
-        
+
         // Score based on color harmony rules
         let harmonyScore = 0;
         if (normalizedHueDiff < 30) {
@@ -4230,23 +5067,25 @@ export class ColorHarmonyEngine
         } else {
           harmonyScore = 0.4; // Other relationships
         }
-        
+
         // Bonus for similar saturation levels
         const saturationDiff = Math.abs(processedHsl.s - albumHsl.s);
         if (saturationDiff < 20) {
           harmonyScore += 0.1;
         }
-        
+
         if (harmonyScore > bestHarmonyScore) {
           bestHarmonyScore = harmonyScore;
           bestColor = albumColor;
         }
       }
-      
+
       return bestColor;
-      
     } catch (error) {
-      console.warn('[ColorHarmonyEngine] Harmonious color selection failed:', error);
+      console.warn(
+        "[ColorHarmonyEngine] Harmonious color selection failed:",
+        error
+      );
       return albumColors[0] || null; // Fallback to first album color
     }
   }
@@ -4256,30 +5095,32 @@ export class ColorHarmonyEngine
    */
   private _selectMostVibrantColor(albumColors: string[]): string | null {
     if (albumColors.length === 0) return null;
-    
+
     try {
       let mostVibrant = albumColors[0] || null;
       let highestVibrancy = 0;
-      
+
       for (const color of albumColors) {
         const rgb = this.utils.hexToRgb(color);
         if (!rgb) continue;
-        
+
         const hsl = this.utils.rgbToHsl(rgb.r, rgb.g, rgb.b);
-        
+
         // Calculate vibrancy as combination of saturation and lightness
         const vibrancy = (hsl.s / 100) * (1 - Math.abs(hsl.l - 50) / 50);
-        
+
         if (vibrancy > highestVibrancy) {
           highestVibrancy = vibrancy;
           mostVibrant = color;
         }
       }
-      
+
       return mostVibrant;
-      
     } catch (error) {
-      console.warn('[ColorHarmonyEngine] Most vibrant color selection failed:', error);
+      console.warn(
+        "[ColorHarmonyEngine] Most vibrant color selection failed:",
+        error
+      );
       return albumColors[0] || null;
     }
   }
@@ -4295,122 +5136,151 @@ export class ColorHarmonyEngine
     jazzClassicalLikelihood: number;
     folkAcousticLikelihood: number;
   } {
-    const { warmth, coolness, saturation, brightness, darkness, harmony, dominantHue, emotionalIntensity } = colorPsychology;
-    
+    const {
+      warmth,
+      coolness,
+      saturation,
+      brightness,
+      darkness,
+      harmony,
+      dominantHue,
+      emotionalIntensity,
+    } = colorPsychology;
+
     // Electronic/Synthetic: High saturation, cool colors, artificial/bright palettes
-    const electronicLikelihood = Math.min(1.0, 
-      (saturation * 0.4) + 
-      (coolness * 0.3) + 
-      ((brightness > 0.7 || darkness < 0.3) ? 0.2 : 0) +
-      ((dominantHue >= 180 && dominantHue <= 270) ? 0.1 : 0) // Blues/cyans
+    const electronicLikelihood = Math.min(
+      1.0,
+      saturation * 0.4 +
+        coolness * 0.3 +
+        (brightness > 0.7 || darkness < 0.3 ? 0.2 : 0) +
+        (dominantHue >= 180 && dominantHue <= 270 ? 0.1 : 0) // Blues/cyans
     );
-    
+
     // Organic/Acoustic: Natural colors, earth tones, moderate saturation
-    const organicLikelihood = Math.min(1.0,
-      ((warmth > coolness ? warmth : 0) * 0.3) +
-      ((saturation >= 0.3 && saturation <= 0.7) ? 0.3 : 0) +
-      ((brightness >= 0.4 && brightness <= 0.7) ? 0.2 : 0) +
-      (harmony * 0.2) // Natural colors tend to be harmonious
+    const organicLikelihood = Math.min(
+      1.0,
+      (warmth > coolness ? warmth : 0) * 0.3 +
+        (saturation >= 0.3 && saturation <= 0.7 ? 0.3 : 0) +
+        (brightness >= 0.4 && brightness <= 0.7 ? 0.2 : 0) +
+        harmony * 0.2 // Natural colors tend to be harmonious
     );
-    
+
     // Metal/Hardcore: Dark colors, high contrast, reds/blacks
-    const metalHardcoreLikelihood = Math.min(1.0,
-      (darkness * 0.4) +
-      (emotionalIntensity * 0.3) +
-      ((dominantHue >= 0 && dominantHue <= 30) || (dominantHue >= 330) ? 0.2 : 0) + // Reds
-      ((saturation > 0.6 || saturation < 0.2) ? 0.1 : 0) // High contrast
+    const metalHardcoreLikelihood = Math.min(
+      1.0,
+      darkness * 0.4 +
+        emotionalIntensity * 0.3 +
+        ((dominantHue >= 0 && dominantHue <= 30) || dominantHue >= 330
+          ? 0.2
+          : 0) + // Reds
+        (saturation > 0.6 || saturation < 0.2 ? 0.1 : 0) // High contrast
     );
-    
+
     // Pop/Commercial: Bright, appealing colors, high saturation
-    const popCommercialLikelihood = Math.min(1.0,
-      ((brightness > 0.6) ? brightness * 0.3 : 0) +
-      (saturation * 0.3) +
-      ((warmth > 0.5) ? warmth * 0.2 : 0) +
-      ((emotionalIntensity > 0.5) ? 0.2 : 0)
+    const popCommercialLikelihood = Math.min(
+      1.0,
+      (brightness > 0.6 ? brightness * 0.3 : 0) +
+        saturation * 0.3 +
+        (warmth > 0.5 ? warmth * 0.2 : 0) +
+        (emotionalIntensity > 0.5 ? 0.2 : 0)
     );
-    
+
     // Jazz/Classical: Sophisticated color choices, good harmony, moderate values
-    const jazzClassicalLikelihood = Math.min(1.0,
-      (harmony * 0.4) +
-      ((saturation >= 0.4 && saturation <= 0.8) ? 0.3 : 0) +
-      ((brightness >= 0.3 && brightness <= 0.8) ? 0.2 : 0) +
-      ((warmth + coolness) / 2 * 0.1) // Balanced temperature
+    const jazzClassicalLikelihood = Math.min(
+      1.0,
+      harmony * 0.4 +
+        (saturation >= 0.4 && saturation <= 0.8 ? 0.3 : 0) +
+        (brightness >= 0.3 && brightness <= 0.8 ? 0.2 : 0) +
+        ((warmth + coolness) / 2) * 0.1 // Balanced temperature
     );
-    
+
     // Folk/Acoustic: Earth tones, natural harmony, warm colors
-    const folkAcousticLikelihood = Math.min(1.0,
-      (warmth * 0.4) +
-      ((saturation >= 0.2 && saturation <= 0.6) ? 0.3 : 0) +
-      (harmony * 0.2) +
-      ((dominantHue >= 15 && dominantHue <= 60) ? 0.1 : 0) // Earth tones (oranges/browns)
+    const folkAcousticLikelihood = Math.min(
+      1.0,
+      warmth * 0.4 +
+        (saturation >= 0.2 && saturation <= 0.6 ? 0.3 : 0) +
+        harmony * 0.2 +
+        (dominantHue >= 15 && dominantHue <= 60 ? 0.1 : 0) // Earth tones (oranges/browns)
     );
-    
+
     return {
       electronicLikelihood,
       organicLikelihood,
       metalHardcoreLikelihood,
       popCommercialLikelihood,
       jazzClassicalLikelihood,
-      folkAcousticLikelihood
+      folkAcousticLikelihood,
     };
   }
 
   /**
    * 🎨 PHASE 2.3: Analyze artist consciousness through color sophistication and intention
    */
-  private _analyzeArtistConsciousness(colors: string[], metrics: any): {
+  private _analyzeArtistConsciousness(
+    colors: string[],
+    metrics: any
+  ): {
     visualSophistication: number;
     artisticIntention: number;
     culturalIndicators: string[];
     emotionalDepth: number;
   } {
-    const { avgSaturation, avgBrightness, harmony, emotionalIntensity, colorCount } = metrics;
-    
+    const {
+      avgSaturation,
+      avgBrightness,
+      harmony,
+      emotionalIntensity,
+      colorCount,
+    } = metrics;
+
     // Visual Sophistication: Based on color harmony, complexity, and balance
-    const visualSophistication = Math.min(1.0,
-      (harmony * 0.4) + // Good color relationships indicate sophistication
-      ((colorCount > 2 && colorCount <= 5) ? 0.3 : 0.1) + // Appropriate complexity
-      ((avgSaturation >= 0.3 && avgSaturation <= 0.8) ? 0.2 : 0) + // Balanced saturation
-      ((avgBrightness >= 0.2 && avgBrightness <= 0.8) ? 0.1 : 0) // Appropriate brightness range
+    const visualSophistication = Math.min(
+      1.0,
+      harmony * 0.4 + // Good color relationships indicate sophistication
+        (colorCount > 2 && colorCount <= 5 ? 0.3 : 0.1) + // Appropriate complexity
+        (avgSaturation >= 0.3 && avgSaturation <= 0.8 ? 0.2 : 0) + // Balanced saturation
+        (avgBrightness >= 0.2 && avgBrightness <= 0.8 ? 0.1 : 0) // Appropriate brightness range
     );
-    
+
     // Artistic Intention: How deliberate the color choices appear
-    const artisticIntention = Math.min(1.0,
-      (harmony * 0.5) + // Harmonious colors suggest intention
-      (emotionalIntensity * 0.3) + // Strong emotional content suggests purpose
-      ((colorCount >= 2 && colorCount <= 4) ? 0.2 : 0) // Focused palette suggests curation
+    const artisticIntention = Math.min(
+      1.0,
+      harmony * 0.5 + // Harmonious colors suggest intention
+        emotionalIntensity * 0.3 + // Strong emotional content suggests purpose
+        (colorCount >= 2 && colorCount <= 4 ? 0.2 : 0) // Focused palette suggests curation
     );
-    
+
     // Cultural Indicators: Detect cultural/regional patterns
     const culturalIndicators: string[] = [];
-    
+
     // Check for specific cultural color patterns
     if (avgSaturation > 0.8 && emotionalIntensity > 0.7) {
-      culturalIndicators.push('high-energy-culture'); // Electronic, pop cultures
+      culturalIndicators.push("high-energy-culture"); // Electronic, pop cultures
     }
     if (harmony > 0.7 && avgSaturation < 0.6) {
-      culturalIndicators.push('minimalist-aesthetic'); // Nordic, Japanese aesthetics
+      culturalIndicators.push("minimalist-aesthetic"); // Nordic, Japanese aesthetics
     }
     if (avgBrightness < 0.3 && emotionalIntensity > 0.6) {
-      culturalIndicators.push('dark-artistic'); // Gothic, metal, alternative
+      culturalIndicators.push("dark-artistic"); // Gothic, metal, alternative
     }
     if (avgBrightness > 0.7 && avgSaturation > 0.6) {
-      culturalIndicators.push('commercial-pop'); // Mainstream, commercial
+      culturalIndicators.push("commercial-pop"); // Mainstream, commercial
     }
-    
+
     // Emotional Depth: How much emotional expression is conveyed through colors
-    const emotionalDepth = Math.min(1.0,
-      (emotionalIntensity * 0.5) +
-      ((avgSaturation > 0.4) ? 0.2 : 0) + // Saturated colors convey more emotion
-      (harmony > 0.5 ? 0.2 : 0) + // Harmonious colors suggest emotional maturity
-      ((colorCount >= 3) ? 0.1 : 0) // Multiple colors allow for emotional complexity
+    const emotionalDepth = Math.min(
+      1.0,
+      emotionalIntensity * 0.5 +
+        (avgSaturation > 0.4 ? 0.2 : 0) + // Saturated colors convey more emotion
+        (harmony > 0.5 ? 0.2 : 0) + // Harmonious colors suggest emotional maturity
+        (colorCount >= 3 ? 0.1 : 0) // Multiple colors allow for emotional complexity
     );
-    
+
     return {
       visualSophistication,
       artisticIntention,
       culturalIndicators,
-      emotionalDepth
+      emotionalDepth,
     };
   }
 }

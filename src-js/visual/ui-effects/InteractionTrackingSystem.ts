@@ -1,11 +1,12 @@
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type { Year3000Config } from "@/types/models";
 import { Year3000System } from "@/core/lifecycle/year3000System";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
+import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 
 // Type definitions - Simplified to only include actually used state
 interface NexusState {
@@ -75,11 +76,13 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
   private _scrollContainerElements: HTMLElement[] = [];
   // Stored throttled interaction handler for proper cleanup.
   private _interactionHandler: ((event: Event) => void) | null = null;
+  // CSS coordination system
+  private cssController!: OptimizedCSSVariableManager;
 
   constructor(
     config: Year3000Config,
     utils: typeof Year3000Utilities,
-    performanceMonitor: PerformanceAnalyzer,
+    performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService,
     settingsManager: SettingsManager,
     year3000System: Year3000System | null = null
@@ -141,6 +144,11 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
 
   public override async initialize() {
     await super.initialize();
+    
+    // Initialize CSS coordination - use globalThis to access Year3000System
+    const year3000System = (globalThis as any).year3000System;
+    this.cssController = year3000System?.cssConsciousnessController || getGlobalOptimizedCSSController();
+    
     this.initializeOptimizedQuantumSpace();
     this.setupModalObserver();
     this.setupOptimizedInteractionListener();
@@ -169,18 +177,19 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     const root = this.utils.getRootStyle();
     if (!root) return;
 
-    const safeSetProperty = (name: string, value: string) => {
-      try {
-        root.style.setProperty(name, value);
-      } catch (e) {
-        console.warn(`[InteractionTrackingSystem] Failed to set CSS property ${name}:`, e);
-      }
+    // Set initial values for CSS variables used by the system using coordination
+    const initialInteractionVariables = {
+      "--sn-nav-item-transform-scale": "1.0",
+      "--sn-sidebar-meditation-desaturation": "0",
+      "--sn-sidebar-meditation-slowdown": "1"
     };
 
-    // Set initial values for CSS variables used by the system
-    safeSetProperty("--sn-nav-item-transform-scale", "1.0");
-    safeSetProperty("--sn-sidebar-meditation-desaturation", "0");
-    safeSetProperty("--sn-sidebar-meditation-slowdown", "1");
+    this.cssController.batchSetVariables(
+      "InteractionTrackingSystem",
+      initialInteractionVariables,
+      "high", // High priority for interaction tracking initialization
+      "quantum-space-initialization"
+    );
   }
 
   private recordUserInteraction(event: Event) {
@@ -404,19 +413,19 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
   }
 
   private applyOptimizedStateToCSS() {
-    // Apply CSS variables directly to the DOM (modernized direct approach)
-    const safeSetProperty = (property: string, value: string) => {
-      try {
-        this.rootElement.style.setProperty(property, value);
-      } catch (e) {
-        console.warn(`[InteractionTrackingSystem] Failed to set CSS property ${property}:`, e);
-      }
+    // Apply CSS variables using coordination for optimized state updates
+    const interactionStateVariables = {
+      "--sn-nav-item-transform-scale": this.nexusState.currentNavigationScale.toFixed(3),
+      "--sn-sidebar-meditation-desaturation": this.biometricState.desaturation.toFixed(3),
+      "--sn-sidebar-meditation-slowdown": this.biometricState.slowdown.toFixed(3)
     };
 
-    // Only update variables that are actually used in CSS
-    safeSetProperty("--sn-nav-item-transform-scale", this.nexusState.currentNavigationScale.toFixed(3));
-    safeSetProperty("--sn-sidebar-meditation-desaturation", this.biometricState.desaturation.toFixed(3));
-    safeSetProperty("--sn-sidebar-meditation-slowdown", this.biometricState.slowdown.toFixed(3));
+    this.cssController.batchSetVariables(
+      "InteractionTrackingSystem",
+      interactionStateVariables,
+      "high", // High priority for real-time interaction state updates
+      "interaction-state-update"
+    );
   }
 
   private validateMusicData(data: any): boolean {
@@ -429,13 +438,19 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
   }
 
   private applySafeDefaults() {
-    const safeSetProperty = (name: string, value: string) => {
-      if (this.rootElement) this.rootElement.style.setProperty(name, value);
+    // Apply safe defaults for actually used CSS variables using coordination
+    const safeDefaultVariables = {
+      "--sn-nav-item-transform-scale": "1.0",
+      "--sn-sidebar-meditation-desaturation": "0",
+      "--sn-sidebar-meditation-slowdown": "1"
     };
-    // Apply safe defaults for actually used CSS variables
-    safeSetProperty("--sn-nav-item-transform-scale", "1.0");
-    safeSetProperty("--sn-sidebar-meditation-desaturation", "0");
-    safeSetProperty("--sn-sidebar-meditation-slowdown", "1");
+
+    this.cssController.batchSetVariables(
+      "InteractionTrackingSystem",
+      safeDefaultVariables,
+      "critical", // Critical priority for safe defaults - ensures fallback stability
+      "safe-defaults-fallback"
+    );
   }
 
   private updateIntegrationMetrics() {

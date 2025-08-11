@@ -10,7 +10,7 @@ import type {
   IVisualSystem,
 } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import type { Year3000System } from "@/core/lifecycle/year3000System";
-import type { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import type { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type { Year3000Config } from "@/types/models";
 import type { SettingsManager } from "@/ui/managers/SettingsManager";
 import type * as Utils from "@/utils/core/Year3000Utilities";
@@ -50,7 +50,7 @@ export class ColorFieldManager implements IVisualSystem {
 
   private config: Year3000Config;
   private utils: typeof Utils;
-  private performanceAnalyzer: PerformanceAnalyzer;
+  private performanceAnalyzer: SimplePerformanceCoordinator;
   private musicSyncService: MusicSyncService | null;
   private settingsManager: SettingsManager;
   private year3000System: Year3000System;
@@ -76,7 +76,7 @@ export class ColorFieldManager implements IVisualSystem {
   constructor(
     config: Year3000Config,
     utils: typeof Utils,
-    performanceAnalyzer: PerformanceAnalyzer,
+    performanceAnalyzer: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null,
     settingsManager: SettingsManager,
     year3000System: Year3000System

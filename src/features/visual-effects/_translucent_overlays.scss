@@ -1,0 +1,1039 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// 🛸 HOLOGRAPHIC CONSCIOUSNESS INTEGRATION
+// Enhanced holographic effects that breathe with Color Consciousness Flow
+// Phase 2.1: Enhanced HolographicUISystem Integration
+// Phase 2.2: Cinematic Drama Engine - Red energy bursts with holographic interfaces
+// ████████████████████████████████████████████████████████████████████████████████
+
+// Import Cinematic Drama Engine styles
+@import '../../visual/effects/red-energy-burst-effects';
+
+// Import Ethereal Beauty Engine styles
+@import '../../visual/effects/soft-glow-effects';
+
+// Import Natural Harmony Engine styles
+@import '../../visual/effects/soft-nature-effects';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌊 COLOR CONSCIOUSNESS INTEGRATION VARIABLES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // === HOLOGRAPHIC CONSCIOUSNESS VARIABLES (Set by HolographicConsciousnessIntegration) ===
+  --organic-holographic-rgb: 100, 255, 200; // Dynamic dominant color from ColorConsciousnessOrchestrator
+  --holographic-scanline-rgb: 255, 150, 100; // Dynamic scanline color (complementary)
+  --holographic-glow-intensity: 0.5; // 0-1 based on consciousness level
+  --holographic-flicker-rate: 5Hz; // 2-10Hz based on musical energy
+  --holographic-atmospheric-depth: 0.3; // Volumetric effect intensity
+  // Removed: holographic breathing frequency (breathing animations completely removed)
+  --holographic-chromatic-shift: 2px; // Chromatic aberration intensity
+  
+  // === ENHANCED ABERRATION SYSTEM VARIABLES (Phase 4.2g Enhancement) ===
+  --aberration-intensity: 0.5; // 0-1 overall aberration strength
+  --aberration-color-separation: 3px; // RGB channel separation distance
+  --aberration-musical-sync: 0.7; // Beat synchronization strength (0-1)
+  --aberration-emotional-temperature: 6000K; // Color temperature influence on RGB shifts
+  --aberration-consciousness-level: 0.8; // Consciousness-driven intensity multiplier
+  --aberration-reading-mode-reduction: 0.2; // Intensity reduction during reading (0-1)
+  --aberration-red-shift: 2px; // Individual red channel displacement
+  --aberration-green-shift: 0px; // Individual green channel displacement  
+  --aberration-blue-shift: -2px; // Individual blue channel displacement
+  --aberration-wave-frequency: 0.5s; // Organic wave motion frequency
+  --aberration-pulse-intensity: 0.3; // Musical pulse modulation strength
+  
+  // === HYBRID MODE INTEGRATION VARIABLES (WebGL + CSS Coordination) ===
+  --aberration-webgl-active: 0; // Set to 1 when WebGL canvas is active
+  --aberration-css-enabled: 0; // Set to 1 when CSS effects should be active
+  --aberration-hybrid-mode: 0; // Set to 1 when both WebGL and CSS work together
+  --aberration-css-opacity: calc(var(--aberration-css-enabled) * (1 - var(--aberration-webgl-active) * 0.7)); // Reduce CSS intensity when WebGL is active
+  
+  // === VOLUMETRIC DEPTH VARIABLES (Phase 4.2a Enhancement) ===
+  --holographic-perspective-depth: 1200px; // 3D perspective depth (800px-2000px)
+  --volumetric-layer-spacing: 20px; // Z-axis spacing between depth layers
+  --volumetric-depth-intensity: 0.8; // 0-1 overall volumetric effect strength
+  --consciousness-depth-offset: 50px; // Consciousness-driven depth adjustment
+  --temperature-depth-offset: 25px; // Emotional temperature depth influence
+  --volumetric-shadow-blur: 30px; // Depth-based shadow blur radius
+  --atmospheric-blur-distance: 4px; // Distance-based atmospheric blur
+  
+  // === CONSCIOUSNESS DATA STREAM VARIABLES (Phase 4.2b Enhancement) ===
+  --consciousness-data-opacity: 0.8; // Data stream visibility based on consciousness
+  --data-stream-intensity: 0.5; // Overall data stream animation intensity
+  
+  // === CONSCIOUSNESS SCANLINE VARIABLES (Phase 4.2c Enhancement) ===
+  --consciousness-scanline-density: 0.5; // Scanline density based on consciousness level
+  --consciousness-scanline-frequency: 4px; // Dynamic scanline frequency
+  --consciousness-scanline-opacity: 0.15; // Consciousness-driven scanline opacity
+  --consciousness-scanline-speed: 1s; // Scanline animation speed
+  --consciousness-scanline-resonance: 0.5; // Overall consciousness resonance level
+  --consciousness-scanline-temperature: 6000K; // Emotional temperature influence
+  --consciousness-scanline-musical-intensity: 0.5; // Musical intensity influence
+  // Removed: consciousness scanline breathing (breathing animations completely removed)
+  --temperature-scanline-color-shift: 0deg; // Color hue shift based on temperature
+  --musical-scanline-pulse: 0.5; // Musical pulse modulation
+  --consciousness-scanline-interference: none; // Advanced interference patterns
+  --consciousness-scanline-complexity: 0; // Scanline complexity level
+  
+  // === REAL-TIME MUSICAL RESPONSE ===
+  --holographic-music-flicker-intensity: 0.3; // Musical flicker response
+  // Removed: holographic breathing intensity and phase (breathing animations completely removed)
+
+  // === AESTHETIC MODE INTEGRATION ===
+  --holographic-cosmic-glow: calc(var(--holographic-glow-intensity) * 0.8);
+  --holographic-red-energy-burst-effects: calc(var(--holographic-glow-intensity) * 1.2);
+  --holographic-ethereal-softness: calc(var(--holographic-glow-intensity) * 0.6);
+  --holographic-natural-warmth: calc(var(--holographic-glow-intensity) * 0.7);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ✨ CONSCIOUSNESS-RESPONSIVE HOLOGRAPHIC ANIMATIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Consciousness-driven holographic flicker
+@keyframes consciousness-holographic-flicker {
+  0% {
+    opacity: var(--holographic-glow-intensity);
+    filter: 
+      drop-shadow(0 0 5px rgba(var(--organic-holographic-rgb), 0.4))
+      hue-rotate(0deg);
+  }
+  25% {
+    opacity: calc(var(--holographic-glow-intensity) + var(--holographic-music-flicker-intensity) * 0.2);
+    filter: 
+      drop-shadow(0 0 8px rgba(var(--organic-holographic-rgb), 0.6))
+      hue-rotate(5deg);
+  }
+  50% {
+    opacity: calc(var(--holographic-glow-intensity) + var(--holographic-music-flicker-intensity) * 0.3);
+    filter: 
+      drop-shadow(0 0 12px rgba(var(--organic-holographic-rgb), 0.8))
+      hue-rotate(10deg);
+  }
+  75% {
+    opacity: calc(var(--holographic-glow-intensity) + var(--holographic-music-flicker-intensity) * 0.2);
+    filter: 
+      drop-shadow(0 0 8px rgba(var(--organic-holographic-rgb), 0.6))
+      hue-rotate(5deg);
+  }
+  100% {
+    opacity: var(--holographic-glow-intensity);
+    filter: 
+      drop-shadow(0 0 5px rgba(var(--organic-holographic-rgb), 0.4))
+      hue-rotate(0deg);
+  }
+}
+
+// Removed: consciousness-breathing-scanlines keyframes (breathing animations completely removed)
+
+// Enhanced consciousness-responsive chromatic aberration with sophisticated color splitting
+@keyframes consciousness-chromatic-aberration {
+  0% {
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-red-shift) * var(--aberration-intensity) * (1 - var(--reading-mode-active, 0) * var(--aberration-reading-mode-reduction))) 
+        0 0 
+        rgba(255, 0, 0, calc(0.3 * var(--aberration-intensity) * var(--aberration-css-opacity, 1)))
+      )
+      drop-shadow(
+        calc(var(--aberration-blue-shift) * var(--aberration-intensity) * (1 - var(--reading-mode-active, 0) * var(--aberration-reading-mode-reduction))) 
+        0 0 
+        rgba(0, 100, 255, calc(0.3 * var(--aberration-intensity) * var(--aberration-css-opacity, 1)))
+      );
+  }
+  25% {
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-green-shift) * var(--aberration-intensity) * (1 - var(--reading-mode-active, 0) * var(--aberration-reading-mode-reduction))) 
+        calc(var(--aberration-red-shift) * var(--aberration-intensity) * 0.5) 
+        0 
+        rgba(0, 255, 50, calc(0.25 * var(--aberration-intensity) * var(--aberration-css-opacity, 1)))
+      )
+      drop-shadow(
+        calc(var(--aberration-red-shift) * var(--aberration-intensity) * -0.5) 
+        calc(var(--aberration-blue-shift) * var(--aberration-intensity) * (1 - var(--reading-mode-active, 0) * var(--aberration-reading-mode-reduction))) 
+        0 
+        rgba(255, 50, 150, calc(0.3 * var(--aberration-intensity) * var(--aberration-css-opacity, 1)))
+      );
+  }
+  50% {
+    filter: 
+      drop-shadow(
+        0 
+        calc(var(--aberration-color-separation) * var(--aberration-intensity) * (1 - var(--reading-mode-active, 0) * var(--aberration-reading-mode-reduction))) 
+        0 
+        rgba(100, 255, 100, calc(0.2 * var(--aberration-intensity)))
+      )
+      drop-shadow(
+        0 
+        calc(var(--aberration-color-separation) * var(--aberration-intensity) * -1 * (1 - var(--reading-mode-active, 0) * var(--aberration-reading-mode-reduction))) 
+        0 
+        rgba(255, 100, 255, calc(0.25 * var(--aberration-intensity)))
+      );
+  }
+  75% {
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-blue-shift) * var(--aberration-intensity) * 0.8 * (1 - var(--reading-mode-active, 0) * var(--aberration-reading-mode-reduction))) 
+        calc(var(--aberration-green-shift) * var(--aberration-intensity) * 0.3) 
+        0 
+        rgba(0, 150, 255, calc(0.35 * var(--aberration-intensity)))
+      )
+      drop-shadow(
+        calc(var(--aberration-red-shift) * var(--aberration-intensity) * 0.6 * (1 - var(--reading-mode-active, 0) * var(--aberration-reading-mode-reduction))) 
+        0 0 
+        rgba(255, 200, 0, calc(0.25 * var(--aberration-intensity)))
+      );
+  }
+  100% {
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-red-shift) * var(--aberration-intensity) * (1 - var(--reading-mode-active, 0) * var(--aberration-reading-mode-reduction))) 
+        0 0 
+        rgba(255, 0, 0, calc(0.3 * var(--aberration-intensity) * var(--aberration-css-opacity, 1)))
+      )
+      drop-shadow(
+        calc(var(--aberration-blue-shift) * var(--aberration-intensity) * (1 - var(--reading-mode-active, 0) * var(--aberration-reading-mode-reduction))) 
+        0 0 
+        rgba(0, 100, 255, calc(0.3 * var(--aberration-intensity) * var(--aberration-css-opacity, 1)))
+      );
+  }
+}
+
+// Musical beat-synchronized aberration pulses
+@keyframes musical-aberration-pulse {
+  0% {
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-red-shift) * var(--aberration-intensity) * var(--musical-scanline-pulse, 0.5)) 
+        0 0 
+        rgba(255, 0, 0, calc(0.2 * var(--aberration-intensity) * var(--musical-scanline-pulse, 0.5)))
+      );
+  }
+  50% {
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-red-shift) * var(--aberration-intensity) * var(--musical-scanline-pulse, 0.5) * 1.5) 
+        0 0 
+        rgba(255, 0, 0, calc(0.4 * var(--aberration-intensity) * var(--musical-scanline-pulse, 0.5)))
+      )
+      drop-shadow(
+        calc(var(--aberration-blue-shift) * var(--aberration-intensity) * var(--musical-scanline-pulse, 0.5) * 1.2) 
+        0 0 
+        rgba(0, 150, 255, calc(0.3 * var(--aberration-intensity) * var(--musical-scanline-pulse, 0.5)))
+      );
+  }
+  100% {
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-red-shift) * var(--aberration-intensity) * var(--musical-scanline-pulse, 0.5)) 
+        0 0 
+        rgba(255, 0, 0, calc(0.2 * var(--aberration-intensity) * var(--musical-scanline-pulse, 0.5)))
+      );
+  }
+}
+
+// Organic aberration waves that flow with consciousness
+@keyframes organic-aberration-waves {
+  0% {
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-red-shift) * var(--aberration-intensity) * sin(0)) 
+        calc(var(--aberration-green-shift) * var(--aberration-intensity) * cos(0)) 
+        0 
+        rgba(255, 100, 100, calc(0.25 * var(--aberration-intensity)))
+      );
+  }
+  25% {
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-red-shift) * var(--aberration-intensity) * 0.707) 
+        calc(var(--aberration-green-shift) * var(--aberration-intensity) * 0.707) 
+        0 
+        rgba(100, 255, 100, calc(0.25 * var(--aberration-intensity)))
+      );
+  }
+  50% {
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-red-shift) * var(--aberration-intensity) * 1) 
+        calc(var(--aberration-green-shift) * var(--aberration-intensity) * 0) 
+        0 
+        rgba(100, 100, 255, calc(0.25 * var(--aberration-intensity)))
+      );
+  }
+  75% {
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-red-shift) * var(--aberration-intensity) * 0.707) 
+        calc(var(--aberration-green-shift) * var(--aberration-intensity) * -0.707) 
+        0 
+        rgba(255, 255, 100, calc(0.25 * var(--aberration-intensity)))
+      );
+  }
+  100% {
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-red-shift) * var(--aberration-intensity) * 0) 
+        calc(var(--aberration-green-shift) * var(--aberration-intensity) * -1) 
+        0 
+        rgba(255, 100, 255, calc(0.25 * var(--aberration-intensity)))
+      );
+  }
+}
+
+// Volumetric atmospheric depth
+@keyframes consciousness-atmospheric-depth {
+  0% {
+    box-shadow: 
+      0 0 calc(var(--holographic-atmospheric-depth) * 20px) rgba(var(--organic-holographic-rgb), 0.2),
+      inset 0 0 calc(var(--holographic-atmospheric-depth) * 10px) rgba(var(--organic-holographic-rgb), 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 0 calc(var(--holographic-atmospheric-depth) * 30px) rgba(var(--organic-holographic-rgb), 0.3),
+      inset 0 0 calc(var(--holographic-atmospheric-depth) * 15px) rgba(var(--organic-holographic-rgb), 0.15);
+  }
+  100% {
+    box-shadow: 
+      0 0 calc(var(--holographic-atmospheric-depth) * 20px) rgba(var(--organic-holographic-rgb), 0.2),
+      inset 0 0 calc(var(--holographic-atmospheric-depth) * 10px) rgba(var(--organic-holographic-rgb), 0.1);
+  }
+}
+
+// Removed: volumetric-consciousness-pulse keyframes (breathing animations completely removed)
+
+// Phase 4.2e: Holographic Lens Enhancement - color grading that enhances underlying visuals
+@keyframes holographic-lens-enhancement {
+  0% {
+    backdrop-filter: 
+      contrast(calc(1 + var(--consciousness-scanline-density) * 0.15))
+      saturate(calc(1 + var(--consciousness-scanline-density) * 0.2))
+      brightness(calc(1 + var(--consciousness-scanline-density) * 0.05))
+      hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.3));
+    opacity: calc(var(--consciousness-scanline-opacity) * (1 - var(--musical-scanline-pulse) * 0.05));
+  }
+  25% {
+    backdrop-filter: 
+      contrast(calc(1 + var(--consciousness-scanline-density) * 0.18))
+      saturate(calc(1 + var(--consciousness-scanline-density) * 0.25))
+      brightness(calc(1 + var(--consciousness-scanline-density) * 0.08))
+      hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.4));
+    opacity: calc(var(--consciousness-scanline-opacity) * (1 + var(--musical-scanline-pulse) * 0.1));
+  }
+  50% {
+    backdrop-filter: 
+      contrast(calc(1 + var(--consciousness-scanline-density) * 0.22))
+      saturate(calc(1 + var(--consciousness-scanline-density) * 0.3))
+      brightness(calc(1 + var(--consciousness-scanline-density) * 0.12))
+      hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.5));
+    opacity: calc(var(--consciousness-scanline-opacity) * (1 + var(--musical-scanline-pulse) * 0.15));
+  }
+  75% {
+    backdrop-filter: 
+      contrast(calc(1 + var(--consciousness-scanline-density) * 0.18))
+      saturate(calc(1 + var(--consciousness-scanline-density) * 0.25))
+      brightness(calc(1 + var(--consciousness-scanline-density) * 0.08))
+      hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.4));
+    opacity: calc(var(--consciousness-scanline-opacity) * (1 + var(--musical-scanline-pulse) * 0.1));
+  }
+  100% {
+    backdrop-filter: 
+      contrast(calc(1 + var(--consciousness-scanline-density) * 0.15))
+      saturate(calc(1 + var(--consciousness-scanline-density) * 0.2))
+      brightness(calc(1 + var(--consciousness-scanline-density) * 0.05))
+      hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.3));
+    opacity: calc(var(--consciousness-scanline-opacity) * (1 - var(--musical-scanline-pulse) * 0.05));
+  }
+}
+
+// Removed: gentle-consciousness-breathing keyframes (breathing animations completely removed)
+
+// Phase 4.2c: Advanced organic interference for high consciousness - atmospheric noise
+@keyframes organic-consciousness-interference {
+  0% {
+    transform: 
+      scale(calc(1 + var(--consciousness-scanline-complexity) * 0.01)) 
+      rotate(calc(var(--consciousness-scanline-complexity) * -0.5deg));
+    filter: 
+      contrast(calc(1 + var(--consciousness-scanline-complexity) * 0.05)) 
+      saturate(calc(1 + var(--consciousness-scanline-complexity) * 0.1))
+      hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.8));
+    opacity: calc(var(--consciousness-scanline-complexity) * 0.4);
+  }
+  33% {
+    transform: 
+      scale(calc(1 + var(--consciousness-scanline-complexity) * 0.015)) 
+      rotate(calc(var(--consciousness-scanline-complexity) * 0.3deg));
+    filter: 
+      contrast(calc(1 + var(--consciousness-scanline-complexity) * 0.08)) 
+      saturate(calc(1 + var(--consciousness-scanline-complexity) * 0.15))
+      hue-rotate(calc(var(--temperature-scanline-color-shift) * 1.1));
+    opacity: calc(var(--consciousness-scanline-complexity) * 0.5);
+  }
+  67% {
+    transform: 
+      scale(calc(1 + var(--consciousness-scanline-complexity) * 0.02)) 
+      rotate(calc(var(--consciousness-scanline-complexity) * 0.8deg));
+    filter: 
+      contrast(calc(1 + var(--consciousness-scanline-complexity) * 0.1)) 
+      saturate(calc(1 + var(--consciousness-scanline-complexity) * 0.2))
+      hue-rotate(calc(var(--temperature-scanline-color-shift) * 1.3));
+    opacity: calc(var(--consciousness-scanline-complexity) * 0.6);
+  }
+  100% {
+    transform: 
+      scale(calc(1 + var(--consciousness-scanline-complexity) * 0.01)) 
+      rotate(calc(var(--consciousness-scanline-complexity) * -0.5deg));
+    filter: 
+      contrast(calc(1 + var(--consciousness-scanline-complexity) * 0.05)) 
+      saturate(calc(1 + var(--consciousness-scanline-complexity) * 0.1))
+      hue-rotate(calc(var(--temperature-scanline-color-shift) * 0.8));
+    opacity: calc(var(--consciousness-scanline-complexity) * 0.4);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎨 AESTHETIC MODE HOLOGRAPHIC PERSONALITIES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Cosmic Mode: Deep space aesthetics with ethereal blues and stellar aberration
+.aesthetic-mode-cosmic {
+  // Cosmic aberration variables for deep space aesthetics
+  --aberration-intensity: 0.6;
+  --aberration-color-separation: 2.5px;
+  --aberration-red-shift: 2px;
+  --aberration-blue-shift: -2px;
+  --aberration-green-shift: 0px;
+  --aberration-wave-frequency: 2s;
+  
+  .holographic-element {
+    animation: 
+      consciousness-holographic-flicker calc(1s / var(--holographic-flicker-rate, 5)) ease-in-out infinite,
+      consciousness-atmospheric-depth 2s ease-in-out infinite,
+      consciousness-chromatic-aberration calc(3s / var(--holographic-flicker-rate, 5)) ease-in-out infinite;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        repeating-linear-gradient(
+          0deg,
+          transparent 0px,
+          transparent 3px,
+          rgba(var(--organic-holographic-rgb), 0.1) 4px
+        );
+      // Removed: breathing scanlines animation
+      pointer-events: none;
+    }
+  }
+}
+
+// Cinematic Mode: Dramatic reds and high-contrast energy with enhanced aberration
+.aesthetic-mode-cinematic {
+  // Enhanced aberration variables for cinematic mode
+  --aberration-intensity: 0.8;
+  --aberration-color-separation: 4px;
+  --aberration-red-shift: 3px;
+  --aberration-blue-shift: -3px;
+  --aberration-musical-sync: 1.0;
+  
+  .holographic-element {
+    animation: 
+      consciousness-holographic-flicker calc(0.5s / var(--holographic-flicker-rate, 8)) ease-in-out infinite,
+      consciousness-chromatic-aberration calc(2s / var(--holographic-flicker-rate, 8)) ease-in-out infinite,
+      musical-aberration-pulse calc(0.3s / var(--holographic-flicker-rate, 10)) ease-in-out infinite;
+    
+    // Dramatic red energy overlay
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        linear-gradient(45deg, 
+          rgba(255, 0, 100, var(--holographic-red-energy-burst-effects)) 0%,
+          transparent 30%,
+          transparent 70%,
+          rgba(0, 255, 255, var(--holographic-red-energy-burst-effects)) 100%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+  }
+}
+
+// Ethereal Mode: Soft mystical elements with gentle glow and organic aberration
+.aesthetic-mode-ethereal {
+  // Soft aberration variables for ethereal mode
+  --aberration-intensity: 0.3;
+  --aberration-color-separation: 1.5px;
+  --aberration-red-shift: 1px;
+  --aberration-blue-shift: -1px;
+  --aberration-green-shift: 0.5px;
+  --aberration-wave-frequency: 3s;
+  
+  .holographic-element:not(.main-view-container):not(.main-view-container__scroll-node) {
+    animation: 
+      consciousness-atmospheric-depth 6s ease-in-out infinite,
+      organic-aberration-waves calc(var(--aberration-wave-frequency)) ease-in-out infinite;
+    
+    filter: 
+      blur(calc(var(--holographic-ethereal-softness) * 0.5px))
+      brightness(calc(1 + var(--holographic-ethereal-softness) * 0.2));
+    
+    // Mystical shimmer particles
+    &::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(var(--organic-holographic-rgb), 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(var(--holographic-scanline-rgb), 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(var(--organic-holographic-rgb), 0.05) 0%, transparent 30%);
+      // Removed: breathing animation
+      pointer-events: none;
+    }
+  }
+}
+
+// Natural Mode: Organic earth-connected holographics with subtle aberration
+.aesthetic-mode-natural {
+  // Gentle aberration variables for natural mode
+  --aberration-intensity: 0.4;
+  --aberration-color-separation: 2px;
+  --aberration-red-shift: 1.5px;
+  --aberration-blue-shift: -1.5px;
+  --aberration-green-shift: 0px;
+  --aberration-wave-frequency: 4s;
+  
+  .holographic-element {
+    animation: 
+      consciousness-holographic-flicker calc(1.5s / var(--holographic-flicker-rate, 4)) ease-in-out infinite,
+      organic-aberration-waves calc(var(--aberration-wave-frequency)) ease-in-out infinite;
+    
+    // Natural flow patterns
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        linear-gradient(120deg, 
+          rgba(var(--organic-holographic-rgb), var(--holographic-natural-warmth)) 0%,
+          transparent 50%,
+          rgba(var(--holographic-scanline-rgb), var(--holographic-natural-warmth)) 100%);
+      background-size: 200% 200%;
+      background-position: 0% 0%;
+      animation: 
+        simple-gradient-flow 10s linear infinite;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🎵 MUSICAL CONSCIOUSNESS INTEGRATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Enhanced holographic response during musical peaks
+.music-energy-high {
+  .holographic-element {
+    --holographic-music-flicker-intensity: 0.8;
+    animation-duration: calc(0.3s / var(--holographic-flicker-rate, 10)) !important;
+  }
+}
+
+.music-energy-medium {
+  .holographic-element {
+    --holographic-music-flicker-intensity: 0.5;
+  }
+}
+
+.music-energy-low {
+  .holographic-element {
+    --holographic-music-flicker-intensity: 0.2;
+    animation-duration: calc(2s / var(--holographic-flicker-rate, 3)) !important;
+  }
+}
+
+// Beat-synchronized holographic pulses
+.beat-detected {
+  .holographic-element {
+    animation: 
+      consciousness-holographic-flicker 0.1s ease-out,
+      consciousness-atmospheric-depth 2s ease-in-out infinite !important;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🛸 ENHANCED SPOTIFY UI HOLOGRAPHIC INTEGRATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Main view containers with consciousness-responsive holographics
+.main-view-container {
+  @extend .holographic-element;
+  
+  // Phase 4.2a: Volumetric 3D consciousness container
+  perspective: var(--holographic-perspective-depth);
+  transform-style: preserve-3d;
+  
+  // Subtle translucent holographic overlay with volumetric depth
+  background: 
+    rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.05)),
+    linear-gradient(135deg, 
+      transparent 0%, 
+      rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.02)) 50%,
+      transparent 100%);
+  // border: 1px solid rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.3)); // Removed to eliminate visible rectangle
+  
+  // Volumetric depth transform based on consciousness level
+  transform: translateZ(calc(var(--consciousness-depth-offset) * var(--volumetric-depth-intensity)));
+  
+  // Volumetric shadow for depth perception
+  box-shadow: 
+    0 0 calc(var(--holographic-atmospheric-depth) * 25px) rgba(var(--organic-holographic-rgb), var(--holographic-glow-intensity)),
+    inset 0 0 calc(var(--holographic-atmospheric-depth) * 12px) rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.3)),
+    0 calc(var(--consciousness-depth-offset) * 0.3) calc(var(--volumetric-shadow-blur)) rgba(var(--organic-holographic-rgb), calc(var(--volumetric-depth-intensity) * 0.3));
+  
+  // Phase 4.2e: Depth Consciousness Enhancement Lens - Content-aware holographic enhancement
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+    
+    // Content-aware positioning - enhanced effects only in edge areas to preserve readability
+    clip-path: polygon(
+      0% 0%, 100% 0%, 100% 15%,    /* Top edge enhancement */
+      85% 15%, 85% 85%,            /* Right edge enhancement */  
+      100% 85%, 100% 100%, 0% 100%, /* Bottom enhancement */
+      0% 85%, 15% 85%, 15% 15%,    /* Left edge enhancement */
+      0% 15%                       /* Back to start - creates frame effect */
+    );
+    
+    // Gentle enhancement that doesn't interfere with content reading
+    backdrop-filter: 
+      contrast(calc(1 + var(--consciousness-scanline-density, 0.5) * 0.03))
+      saturate(calc(1 + var(--consciousness-scanline-density, 0.5) * 0.05))
+      brightness(calc(1 + var(--consciousness-scanline-density, 0.5) * 0.01));
+    
+    // Edge-focused holographic zones that frame content beautifully
+    background: 
+      radial-gradient(
+        ellipse 100px 60px at 10% 20%, 
+        hsla(calc(180 + var(--temperature-scanline-color-shift, 0)), 60%, 70%, calc(var(--consciousness-scanline-opacity, 0.15) * 0.04)) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 100px 60px at 90% 80%, 
+        hsla(calc(200 + var(--temperature-scanline-color-shift, 0)), 70%, 60%, calc(var(--consciousness-scanline-opacity, 0.15) * 0.04)) 0%,
+        transparent 70%
+      );
+    
+    // Subtle enhancement blend mode
+    mix-blend-mode: color-dodge;
+    
+    // Reading-mode aware opacity - fades during active reading
+    opacity: calc(
+      var(--consciousness-scanline-opacity, 0.15) * 0.3 * 
+      (1 - var(--reading-mode-active, 0) * 0.8) *
+      (1 - var(--user-interaction-detected, 0) * 0.3)
+    );
+    
+    // Removed: gentle consciousness breathing animation
+    
+    // Ensure no blur overlay effects
+    filter: none;
+  }
+  
+  // Additional enhancement layer for high consciousness levels
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 2;
+    opacity: calc(var(--consciousness-scanline-complexity) * 0.3);
+    
+    // Advanced color grading enhancement
+    backdrop-filter: 
+      sepia(calc(var(--consciousness-scanline-complexity) * 0.1))
+      contrast(calc(1 + var(--consciousness-scanline-complexity) * 0.1))
+      saturate(calc(1 + var(--consciousness-scanline-complexity) * 0.15));
+    
+    // Holographic lens edge enhancement
+    background: 
+      linear-gradient(
+        45deg,
+        transparent 0%,
+        hsla(calc(220 + var(--temperature-scanline-color-shift)), 80%, 60%, calc(var(--consciousness-scanline-complexity) * 0.03)) 30%,
+        transparent 70%,
+        hsla(calc(160 + var(--temperature-scanline-color-shift)), 80%, 60%, calc(var(--consciousness-scanline-complexity) * 0.02)) 85%,
+        transparent 100%
+      );
+    
+    // Lens edge enhancement blend
+    mix-blend-mode: overlay;
+    
+    // Only active for high consciousness
+    animation-play-state: var(--consciousness-scanline-interference);
+  }
+}
+
+// Navigation bar with data stream holographics
+.Root__nav-bar {
+  @extend .holographic-element;
+  
+  position: relative;
+  
+  // Breathing removed - functional navigation, not emotional element
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        rgba(var(--holographic-scanline-rgb), 0.1) 2px,
+        transparent 4px,
+        transparent 20px
+      );
+    background-size: 40px 100%;
+    animation: 
+      simple-gradient-flow 4s linear infinite;
+    pointer-events: none;
+  }
+}
+
+// Now playing bar with consciousness interface holographics
+.Root__now-playing-bar {
+  @extend .holographic-element;
+  
+  // Breathing removed from bar - targeting specific music elements instead
+  
+  // Phase 4.2a: Volumetric depth for now playing consciousness
+  transform: translateZ(calc(var(--consciousness-depth-offset) * var(--volumetric-depth-intensity) * 1.2));
+  
+  // Consciousness-responsive glow that pulses with music (enhanced with volumetric shadows)
+  box-shadow: 
+    0 0 calc(var(--holographic-atmospheric-depth) * 25px) rgba(var(--organic-holographic-rgb), var(--holographic-glow-intensity)),
+    inset 0 0 calc(var(--holographic-atmospheric-depth) * 12px) rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.3)),
+    0 calc(var(--consciousness-depth-offset) * 0.4) calc(var(--volumetric-shadow-blur) * 1.2) rgba(var(--organic-holographic-rgb), calc(var(--volumetric-depth-intensity) * 0.4));
+  
+  // Enhanced pulsing during consciousness peaks with volumetric breathing
+  &[data-consciousness-level="high"] {
+    animation: 
+      consciousness-atmospheric-depth 0.5s ease-in-out infinite;
+  }
+}
+
+// Track rows with organic holographic breathing
+.main-view-container__scroll-node {
+  @extend .holographic-element;
+  
+  .main-trackList-trackListRow {
+    transition: all 0.3s ease-out;
+    
+    &:hover,
+    &.main-trackList-selected {
+      background: rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.1));
+      box-shadow: 
+        0 0 15px rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.3)),
+        inset 0 0 8px rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.1));
+      
+      // Removed: breathing effect on selected/hovered tracks
+    }
+  }
+}
+
+// Sidebar with dimensional nexus holographics
+.Root__main-view .main-view-container__scroll-node-child {
+  @extend .holographic-element;
+  
+  // Scanline overlay for authentic CRT feel
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 1px,
+        rgba(var(--holographic-scanline-rgb), calc(var(--holographic-glow-intensity) * 0.08)) 2px,
+        rgba(var(--holographic-scanline-rgb), calc(var(--holographic-glow-intensity) * 0.08)) 2px
+      );
+    // Removed: breathing scanlines animation
+    pointer-events: none;
+    opacity: 0.6;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 📖 READING MODE CONSCIOUSNESS ENHANCEMENTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌈 ADVANCED MULTI-LAYER ABERRATION TECHNIQUES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Enhanced aberration for high consciousness levels with multi-layer effects
+.holographic-element[data-consciousness-level="high"],
+.holographic-element[style*="--aberration-intensity"][style*="0.7"] {
+  position: relative;
+  
+  // Secondary aberration layer - enhanced RGB splitting
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: -1;
+    
+    // Sophisticated multi-directional aberration
+    background: 
+      linear-gradient(
+        45deg,
+        rgba(255, 50, 50, calc(var(--aberration-intensity, 0.5) * 0.1)) 0%,
+        transparent 30%,
+        transparent 70%,
+        rgba(50, 150, 255, calc(var(--aberration-intensity, 0.5) * 0.1)) 100%
+      );
+    
+    // Multi-axis chromatic shift
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-red-shift, 2px) * 0.5) 
+        calc(var(--aberration-red-shift, 2px) * 0.3) 
+        0 
+        rgba(255, 0, 0, calc(var(--aberration-intensity, 0.5) * 0.2))
+      )
+      drop-shadow(
+        calc(var(--aberration-blue-shift, -2px) * 0.7) 
+        calc(var(--aberration-blue-shift, -2px) * -0.2) 
+        0 
+        rgba(0, 100, 255, calc(var(--aberration-intensity, 0.5) * 0.2))
+      );
+    
+    // Organic movement synchronized with consciousness
+    animation: 
+      organic-aberration-waves calc(var(--aberration-wave-frequency, 2s)) ease-in-out infinite,
+      consciousness-chromatic-aberration calc(var(--aberration-wave-frequency, 2s) * 1.5) ease-in-out infinite;
+  }
+  
+  // Tertiary aberration layer - fine detail enhancement
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: -2;
+    
+    // Subtle color gradient bleeding
+    background: 
+      radial-gradient(
+        ellipse 200px 100px at 30% 70%, 
+        rgba(var(--organic-holographic-rgb), calc(var(--aberration-intensity, 0.5) * 0.08)) 0%,
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 150px 200px at 70% 30%, 
+        rgba(var(--holographic-scanline-rgb), calc(var(--aberration-intensity, 0.5) * 0.06)) 0%,
+        transparent 60%
+      );
+    
+    // Advanced directional aberration
+    filter: 
+      drop-shadow(
+        calc(var(--aberration-green-shift, 0px) * 2) 
+        calc(var(--aberration-red-shift, 2px) * -0.5) 
+        0 
+        rgba(100, 255, 100, calc(var(--aberration-intensity, 0.5) * 0.15))
+      );
+    
+    // Complex wave motion
+    animation: 
+      musical-aberration-pulse calc(var(--aberration-wave-frequency, 2s) * 0.7) ease-in-out infinite;
+    
+    // Blend mode for sophisticated color interaction
+    mix-blend-mode: color-dodge;
+  }
+}
+
+// High-energy aberration for beat detection
+.beat-detected .holographic-element,
+.music-energy-high .holographic-element {
+  // Temporary aberration boost during beats
+  --aberration-intensity: calc(var(--aberration-intensity, 0.5) * 1.4);
+  --aberration-color-separation: calc(var(--aberration-color-separation, 3px) * 1.2);
+  
+  // Enhanced multi-layer effects during beats
+  &::before,
+  &::after {
+    animation-duration: calc(var(--aberration-wave-frequency, 2s) * 0.3) !important;
+  }
+}
+
+// Consciousness-aware aberration scaling
+@media (min-width: 1200px) and (min-height: 800px) {
+  // Enhanced effects for larger screens
+  .holographic-element {
+    --aberration-color-separation: calc(var(--aberration-color-separation, 3px) * 1.2);
+    --aberration-red-shift: calc(var(--aberration-red-shift, 2px) * 1.1);
+    --aberration-blue-shift: calc(var(--aberration-blue-shift, -2px) * 1.1);
+  }
+}
+
+@media (max-width: 768px) {
+  // Reduced effects for mobile performance
+  .holographic-element {
+    --aberration-intensity: calc(var(--aberration-intensity, 0.5) * 0.7);
+    --aberration-color-separation: calc(var(--aberration-color-separation, 3px) * 0.8);
+    
+    &::before,
+    &::after {
+      display: none; // Disable multi-layer effects on mobile
+    }
+  }
+}
+
+// Enhanced text clarity during active reading sessions
+.main-view-container[data-reading-mode="active"],
+.main-view-container[style*="--reading-mode-active: 1"] {
+  // Reduce holographic interference during reading
+  &::before {
+    opacity: calc(var(--consciousness-scanline-opacity, 0.15) * 0.1);
+    animation-duration: 8s; // Slower animation
+  }
+  
+  &::after {
+    opacity: calc(var(--consciousness-scanline-complexity) * 0.05);
+  }
+  
+  // Enhance text contrast and readability
+  backdrop-filter: 
+    contrast(1.1) 
+    brightness(1.02) 
+    saturate(0.95); // Slightly reduce saturation for easier reading
+  
+  // Ensure text content is clear
+  .main-trackList-trackListRow,
+  .main-entityHeader-titleText,
+  .main-entityHeader-subtitle,
+  .Type__TypeElement {
+    text-shadow: 
+      0 0 1px rgba(0, 0, 0, 0.8),
+      0 0 2px rgba(0, 0, 0, 0.4);
+    backdrop-filter: contrast(1.15);
+  }
+}
+
+// Content-aware holographic zones - minimal effects in text-heavy areas
+.main-view-container .main-trackList-trackList,
+.main-view-container .main-entityHeader,
+.main-view-container [class*="lyrics"] {
+  // Reduce holographic effects in text-heavy content areas
+  &::before {
+    opacity: calc(var(--consciousness-scanline-opacity, 0.15) * 0.05);
+    clip-path: polygon(
+      0% 0%, 100% 0%, 100% 5%,    /* Minimal top edge */
+      95% 5%, 95% 95%,            /* Minimal right edge */  
+      100% 95%, 100% 100%, 0% 100%, /* Minimal bottom */
+      0% 95%, 5% 95%, 5% 5%,      /* Minimal left edge */
+      0% 5%                       /* Back to start - minimal frame */
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ⚡ PERFORMANCE & ACCESSIBILITY CONSCIOUSNESS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Reduced motion accessibility
+@media (prefers-reduced-motion: reduce) {
+  .holographic-element {
+    animation: none !important;
+    
+    &::before,
+    &::after {
+      animation: none !important;
+    }
+  }
+  
+  // Static holographic glow only
+  .main-view-container,
+  .Root__now-playing-bar {
+    box-shadow: 
+      0 0 10px rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.5)),
+      inset 0 0 5px rgba(var(--organic-holographic-rgb), calc(var(--holographic-glow-intensity) * 0.2));
+  }
+}
+
+// Mobile performance optimization
+@media (max-width: 768px) {
+  :root {
+    --holographic-atmospheric-depth: calc(var(--holographic-atmospheric-depth) * 0.7);
+    --holographic-chromatic-shift: calc(var(--holographic-chromatic-shift) * 0.5);
+  }
+  
+  .holographic-element {
+    animation-duration: 4s !important;
+    
+    &::before,
+    &::after {
+      opacity: calc(var(--holographic-glow-intensity) * 0.5) !important;
+    }
+  }
+}
+
+// High contrast accessibility
+@media (prefers-contrast: high) {
+  :root {
+    --holographic-glow-intensity: 0.8;
+    --holographic-atmospheric-depth: 0.6;
+  }
+  
+  .holographic-element {
+    // border: 2px solid rgba(var(--organic-holographic-rgb), 0.8) !important; // Removed to eliminate visible rectangle
+    box-shadow: 
+      0 0 20px rgba(var(--organic-holographic-rgb), 0.6),
+      inset 0 0 10px rgba(var(--organic-holographic-rgb), 0.3) !important;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌊 CONSCIOUSNESS AWAKENING COMPLETION
+// "The holographic interface now breathes with the soul of color itself."
+// ═══════════════════════════════════════════════════════════════════════════════

@@ -5,210 +5,26 @@ import type {
   HarmonicModes,
   Year3000Config,
 } from "@/types/models";
-import { StorageManager } from "@/utils/platform/StorageManager";
+import { settings } from "@/config";
 
-export const HARMONIC_MODES: HarmonicModes = {
-  "analogous-flow": {
-    rule: "analogous",
-    angle: 30,
-    description: "Gentle rivers of adjacent hues",
-  },
-  "triadic-trinity": {
-    rule: "triadic",
-    angle: 120,
-    description: "Three-point stellar equilibrium",
-  },
-  "complementary-yin-yang": {
-    rule: "complementary",
-    angle: 180,
-    description: "Opposing forces in harmony",
-  },
-  "tetradic-cosmic-cross": {
-    rule: "tetradic",
-    angle: 90,
-    description: "Four-dimensional color matrix",
-  },
-  "split-complementary-aurora": {
-    rule: "split-complementary",
-    angle: 150,
-    description: "Dancing polar opposites",
-  },
-  "monochromatic-meditation": {
-    rule: "monochromatic",
-    angle: 0,
-    description: "Single-hue consciousness expansion",
-  },
-};
+// Import modular configuration directly to avoid circular imports
+import { HARMONIC_MODES as MODULAR_HARMONIC_MODES, MUSIC_VISUAL_SYNC, ENHANCED_BPM_CONFIG } from "./harmonicModes";
+import { ARTISTIC_MODE_PROFILES as MODULAR_ARTISTIC_PROFILES } from "./artisticProfiles";
+import { PERFORMANCE_PROFILES, DEFAULT_LOGGING_CONFIG } from "./performanceProfiles";
 
-// Year 3000 Artistic Mode Profiles - Complete system definitions
-export const ARTISTIC_MODE_PROFILES: ArtisticModeProfiles = {
-  "corporate-safe": {
-    displayName: "Corporate Safe",
-    description:
-      "Elegant professional choreography with subtle Year 3000 enhancements",
-    philosophy:
-      "Refined efficiency that respects workspace harmony while providing gentle predictive assistance",
-    multipliers: {
-      opacity: 0.15,
-      saturation: 1.05,
-      brightness: 1.02,
-      contrast: 1.01,
-      musicEnergyBoost: 0.3,
-      // Year 3000 Kinetic Parameters
-      kineticIntensity: 0.2,
-      temporalPlayFactor: 0.1,
-      quantumEmpathyLevel: 0.3,
-      aestheticGravityStrength: 0.1,
-      emergentChoreography: false,
-      visualIntensityBase: 0.8,
-    },
-    features: {
-      rippleEffects: false,
-      temporalEcho: false,
-      particleStreams: false,
-      predictiveHighlights: true, // Subtle only
-      glassEffects: true, // Minimal
-      dataGlyphs: true, // Professional styling
-      beatSync: false,
-      colorHarmony: false,
-      dimensionalEffects: false,
-      quantumEmpathy: false, // Disabled for professional environments
-      aestheticGravity: false, // Disabled for professional environments
-    },
-    performance: {
-      maxParticles: 0,
-      animationThrottle: 32, // 30fps for efficiency
-      enableGPUAcceleration: false,
-      reducedMotion: true,
-    },
-  },
-  "artist-vision": {
-    displayName: "Artist Vision",
-    description:
-      "Balanced creative expression that enhances musical experience without overwhelming",
-    philosophy:
-      "Harmonic amplification that honors artistic intent while providing musical visual synchronization",
-    multipliers: {
-      opacity: 0.25,
-      saturation: 1.25,
-      brightness: 1.15,
-      contrast: 1.2,
-      musicEnergyBoost: 1.0,
-      // Year 3000 Kinetic Parameters
-      kineticIntensity: 0.7,
-      temporalPlayFactor: 0.5,
-      quantumEmpathyLevel: 0.6,
-      aestheticGravityStrength: 0.4,
-      emergentChoreography: true,
-      visualIntensityBase: 1.0,
-    },
-    features: {
-      rippleEffects: true, // Moderate intensity
-      temporalEcho: true, // Subtle trails
-      particleStreams: true, // Music-responsive
-      predictiveHighlights: true,
-      glassEffects: true,
-      dataGlyphs: true,
-      beatSync: true, // Musical harmony
-      colorHarmony: true, // Respectful blending
-      dimensionalEffects: true, // Moderate
-      quantumEmpathy: true, // Balanced empathy assistance
-      aestheticGravity: true, // Balanced gravitational effects
-    },
-    performance: {
-      maxParticles: 20,
-      animationThrottle: 16, // 60fps
-      enableGPUAcceleration: true,
-      reducedMotion: false,
-    },
-  },
-  "cosmic-maximum": {
-    displayName: "Cosmic Maximum",
-    description:
-      "Full Year 3000 emergent systems choreography with kinetic beauty and aesthetic gravity",
-    philosophy:
-      "Gravitational optimism through aesthetic attractor fields that create quantum empathy and temporal play",
-    multipliers: {
-      opacity: 0.45,
-      saturation: 1.75,
-      brightness: 1.5,
-      contrast: 1.6,
-      musicEnergyBoost: 2.0,
-      // Year 3000 Kinetic Parameters
-      kineticIntensity: 1.8,
-      temporalPlayFactor: 2.5,
-      quantumEmpathyLevel: 0.85,
-      aestheticGravityStrength: 1.6,
-      emergentChoreography: true,
-      visualIntensityBase: 1.4,
-    },
-    features: {
-      rippleEffects: true, // Full intensity
-      temporalEcho: true, // Visible trails
-      particleStreams: true, // Attention flow
-      predictiveHighlights: true, // Advanced prediction
-      glassEffects: true, // Intense
-      dataGlyphs: true, // Full animation
-      beatSync: true, // Full synchronization
-      colorHarmony: true, // Dynamic evolution
-      dimensionalEffects: true, // Full 3D
-      aestheticGravity: true, // Visual magnetism
-      quantumEmpathy: true, // Full prediction
-    },
-    performance: {
-      maxParticles: 50,
-      animationThrottle: 8, // 120fps for smoothness
-      enableGPUAcceleration: true,
-      reducedMotion: false,
-    },
-  },
-};
+// Re-export for backward compatibility
+export const HARMONIC_MODES: HarmonicModes = MODULAR_HARMONIC_MODES;
+export const ARTISTIC_MODE_PROFILES: ArtisticModeProfiles = MODULAR_ARTISTIC_PROFILES;
 
 export const YEAR3000_CONFIG: Year3000Config = {
   enableDebug: true,
   enableContextualIntelligence: true,
+  paletteSystem: 'catppuccin', // Default to maintain compatibility
 
-  performanceProfiles: {
-    low: {
-      maxParticles: 15,
-      animationThrottle: 32, // ~30fps
-      enableGPUAcceleration: false,
-      enableAdvancedShaders: false,
-      textureResolution: 0.5,
-    },
-    balanced: {
-      maxParticles: 40,
-      animationThrottle: 16, // ~60fps
-      enableGPUAcceleration: true,
-      enableAdvancedShaders: false,
-      textureResolution: 1.0,
-    },
-    high: {
-      maxParticles: 75,
-      animationThrottle: 16, // ~60fps
-      enableGPUAcceleration: true,
-      enableAdvancedShaders: true,
-      textureResolution: 1.0,
-    },
-    ultra: {
-      maxParticles: 150,
-      animationThrottle: 8, // ~120fps
-      enableGPUAcceleration: true,
-      enableAdvancedShaders: true,
-      textureResolution: 2.0, // High-res textures
-    },
-  },
+  performanceProfiles: PERFORMANCE_PROFILES,
 
   // Enhanced logging configuration
-  logging: {
-    level: "info", // "off", "error", "warn", "info", "debug", "verbose"
-    performance: {
-      enableFrameBudgetWarnings: true,
-      throttleWarnings: true, // Throttle frequent warnings
-      throttleInterval: 5000, // ms between repeated warnings
-      enableAdaptiveDegradation: true, // Auto-reduce quality when needed
-    },
-  },
+  logging: DEFAULT_LOGGING_CONFIG,
   healthCheckInterval: 10000,
   visual: {
     lightweightParticleSystem: { mode: "artist-vision" },
@@ -222,7 +38,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
   enableColorExtraction: true,
   enableMusicAnalysis: true,
   enableCosmicSync: true, // NEW: Music-driven visual intensity
-  musicModulationIntensity: 0.25,
+  musicModulationIntensity: 0.4, // Increased for dynamic gradient responsiveness
 
   // Active artistic mode for UX / visual presets
   artisticMode: "artist-vision", // "corporate-safe" | "artist-vision" | "cosmic-maximum"
@@ -241,6 +57,24 @@ export const YEAR3000_CONFIG: Year3000Config = {
     this.boundGetCurrentFeatures = this.getCurrentFeatures.bind(this);
     this.boundGetCurrentPerformanceSettings =
       this.getCurrentPerformanceSettings.bind(this);
+
+    // Only load artistic preferences on first initialization or if values are missing
+    const needsPreferenceLoad = 
+      !this.artisticMode || 
+      !this.paletteSystem;
+      
+    if (needsPreferenceLoad) {
+      if (this.enableDebug) {
+        console.log(
+          `🎨 [YEAR3000_CONFIG] Loading preferences (current: artistic=${this.artisticMode}, palette=${this.paletteSystem})`
+        );
+      }
+      this.loadArtisticPreference();
+    } else if (this.enableDebug) {
+      console.log(
+        `🎨 [YEAR3000_CONFIG] Skipping preference load (current: artistic=${this.artisticMode}, palette=${this.paletteSystem})`
+      );
+    }
 
     // Apply any pending artistic mode changes
     if (this._pendingArtisticMode && this.isFullyInitialized()) {
@@ -264,72 +98,13 @@ export const YEAR3000_CONFIG: Year3000Config = {
 
   currentHarmonicMode: "analogous-flow",
   harmonicBaseColor: null,
-  harmonicIntensity: 0.7,
+  harmonicIntensity: 0.85, // Enhanced for cinematic gradient harmonies
   harmonicEvolution: true,
 
+  // Music sync configuration imported from modular harmonic modes
   musicVisualSync: {
-    energyScaling: {
-      low: 0.6,
-      medium: 1.0,
-      high: 1.4,
-    },
-    valenceScaling: {
-      sad: 0.8,
-      neutral: 1.0,
-      happy: 1.3,
-    },
-    danceabilityEffects: {
-      enable: true,
-      animationSpeedMultiplier: 1.5,
-      blurVariation: 0.3,
-    },
-    // NEW: Enhanced BPM calculation (inspired by Cat Jam extension)
-    enhancedBPM: {
-      enable: true,
-      useSmartCalculation: true, // Toggle for enhanced vs basic tempo
-      useRealisticData: true, // Use actual Spicetify-available data only
-
-      // Tempo-based danceability estimation ranges
-      danceabilityEstimation: {
-        highDance: { min: 120, max: 140, value: 0.8 }, // House/Dance music
-        mediumDance: { min: 100, max: 160, value: 0.6 }, // Pop/Electronic
-        lowMediumDance: { min: 80, max: 180, value: 0.4 }, // General music
-        lowDance: { value: 0.2 }, // Very slow/fast
-      },
-
-      // Energy estimation from tempo + loudness
-      energyEstimation: {
-        tempoWeight: 0.6, // How much tempo affects energy estimate
-        loudnessWeight: 0.4, // How much loudness affects energy estimate
-        tempoRange: { min: 60, max: 180 }, // Expected tempo range
-        loudnessRange: { min: -60, max: 0 }, // Expected loudness range (dB)
-      },
-
-      // Enhanced BPM calculation parameters
-      danceabilityThresholds: {
-        high: 0.7, // High danceability - use full tempo
-        low: 0.3, // Low danceability - may reduce tempo
-      },
-      energyMultiplierRange: {
-        min: 0.8, // Minimum energy multiplier
-        max: 1.4, // Maximum energy multiplier
-      },
-      tempoMultipliers: {
-        highDance: 1.0, // Full tempo for danceable tracks
-        mediumDance: 0.75, // Moderate reduction
-        lowDance: 0.5, // Significant reduction for smooth visuals
-      },
-
-      // Fallback values when audio data is unavailable
-      fallbacks: {
-        tempo: 120,
-        loudness: -10,
-        danceability: 0.5,
-        energy: 0.5,
-        key: 0,
-        timeSignature: 4,
-      },
-    },
+    ...MUSIC_VISUAL_SYNC,
+    enhancedBPM: ENHANCED_BPM_CONFIG,
   },
 
   // Enhanced: Get current mode profile with full Year3000 parameters
@@ -670,19 +445,56 @@ export const YEAR3000_CONFIG: Year3000Config = {
   },
 
   loadArtisticPreference() {
-    // StorageManager provides consistent storage with migration from legacy keys
-    const saved = StorageManager.get("sn-artistic-mode");
-    const validModes = Object.keys(ARTISTIC_MODE_PROFILES);
-    if (saved && validModes.includes(saved)) {
-      this.artisticMode = saved as ArtisticMode;
-    } else {
-      this.artisticMode = "artist-vision"; // Default
-    }
+    try {
+      // Load artistic mode preference using new typed settings system
+      const saved = settings.get("sn-artistic-mode");
+      const validModes = Object.keys(ARTISTIC_MODE_PROFILES);
+      
+      // Only update if the loaded value is different to avoid unnecessary resets
+      if (saved && validModes.includes(String(saved)) && this.artisticMode !== saved) {
+        this.artisticMode = String(saved) as ArtisticMode;
+        if (this.enableDebug) {
+          console.log(`🎨 [YEAR3000_CONFIG] Updated artistic mode from storage: ${saved}`);
+        }
+      } else if (!saved && this.artisticMode !== "artist-vision") {
+        this.artisticMode = "artist-vision"; // Default
+        if (this.enableDebug) {
+          console.log(`🎨 [YEAR3000_CONFIG] Reset artistic mode to default: artist-vision`);
+        }
+      }
 
-    if (this.enableDebug) {
-      console.log(
-        `🎨 [YEAR3000_CONFIG] Loaded artistic preference: ${this.artisticMode}`
-      );
+      // Load palette system preference from appropriate setting
+      const savedPalette = settings.get("sn-palette-system");
+      const validPaletteSystems = ['catppuccin', 'year3000'];
+      
+      // Only update if the loaded value is different to avoid unnecessary resets
+      if (savedPalette && validPaletteSystems.includes(String(savedPalette)) && this.paletteSystem !== savedPalette) {
+        this.paletteSystem = String(savedPalette) as any;
+        if (this.enableDebug) {
+          console.log(`🎨 [YEAR3000_CONFIG] Updated palette system from storage: ${savedPalette}`);
+        }
+      } else if (!savedPalette && this.paletteSystem !== 'catppuccin') {
+        this.paletteSystem = 'catppuccin'; // Default for compatibility
+        if (this.enableDebug) {
+          console.log(`🎨 [YEAR3000_CONFIG] Reset palette system to default: catppuccin`);
+        }
+      }
+
+      if (this.enableDebug) {
+        console.log(
+          `🎨 [YEAR3000_CONFIG] Current artistic preference: ${this.artisticMode}`
+        );
+        console.log(
+          `🎨 [YEAR3000_CONFIG] Current palette system: ${this.paletteSystem}`
+        );
+      }
+    } catch (error) {
+      if (this.enableDebug) {
+        console.warn(`🎨 [YEAR3000_CONFIG] Failed to load preferences:`, error);
+      }
+      // Use fallback defaults
+      this.artisticMode = "artist-vision";
+      this.paletteSystem = 'catppuccin';
     }
   },
 };

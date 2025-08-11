@@ -1,5 +1,5 @@
-import { PerformanceAnalyzer } from '@/core/performance/PerformanceAnalyzer';
-import { GlobalEventBus } from '@/core/events/EventBus';
+import { SimplePerformanceCoordinator } from '@/core/performance/SimplePerformanceCoordinator';
+import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';
 import type { Year3000Config } from '@/types/models';
 
@@ -109,8 +109,8 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
   private static instance: UnifiedPerformanceCoordinator | null = null;
   
   private config: Year3000Config;
-  private performanceAnalyzer: PerformanceAnalyzer;
-  private eventBus: typeof GlobalEventBus;
+  private performanceAnalyzer: SimplePerformanceCoordinator;
+  private eventBus: typeof unifiedEventBus;
   
   // Subsystem tracking
   private subsystemMetrics: Map<string, SubsystemMetrics> = new Map();
@@ -203,10 +203,10 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     },
   };
   
-  constructor(config: Year3000Config, performanceAnalyzer: PerformanceAnalyzer) {
+  constructor(config: Year3000Config, performanceAnalyzer: SimplePerformanceCoordinator) {
     this.config = config;
     this.performanceAnalyzer = performanceAnalyzer;
-    this.eventBus = GlobalEventBus;
+    this.eventBus = unifiedEventBus;
     
     // Initialize enhanced capabilities from PerformanceOptimizationManager
     this.initializeDeviceCapabilities();
@@ -231,7 +231,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
   /**
    * Get or create singleton instance
    */
-  public static getInstance(config?: Year3000Config, performanceAnalyzer?: PerformanceAnalyzer): UnifiedPerformanceCoordinator {
+  public static getInstance(config?: Year3000Config, performanceAnalyzer?: SimplePerformanceCoordinator): UnifiedPerformanceCoordinator {
     if (!UnifiedPerformanceCoordinator.instance) {
       if (!config || !performanceAnalyzer) {
         throw new Error('UnifiedPerformanceCoordinator requires config and performanceAnalyzer for first initialization');
@@ -349,11 +349,29 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     this.lastHealthCheck = currentTime;
     
     // Emit health report event
-    this.eventBus.publish('performance:health-report', healthReport);
+    // TODO: Add performance events to UnifiedEventBus when needed
+    // this.eventBus.emit('performance:health-report', healthReport);
     
     return healthReport;
   }
   
+  /**
+   * Start monitoring (required by Year3000System interface)
+   */
+  public startMonitoring(): void {
+    // Enable adaptive optimization and health monitoring
+    this.enableAdaptiveOptimization();
+    
+    // Start health monitoring if not already started
+    if (!this.healthCheckInterval) {
+      this.startHealthMonitoring();
+    }
+    
+    if (this.config.enableDebug) {
+      console.log('[UnifiedPerformanceCoordinator] Monitoring started');
+    }
+  }
+
   /**
    * Enable adaptive optimization
    */
@@ -371,10 +389,11 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
       console.log('[UnifiedPerformanceCoordinator] Adaptive optimization enabled');
     }
     
-    this.eventBus.publish('performance:optimization-enabled', {
-      timestamp: Date.now(),
-      strategies: Array.from(this.optimizationStrategies.keys()),
-    });
+    // TODO: Add performance events to UnifiedEventBus when needed
+    // this.eventBus.emit('performance:optimization-enabled', {
+    //   timestamp: Date.now(),
+    //   strategies: Array.from(this.optimizationStrategies.keys()),
+    // });
   }
   
   /**
@@ -394,9 +413,10 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
       console.log('[UnifiedPerformanceCoordinator] Adaptive optimization disabled');
     }
     
-    this.eventBus.publish('performance:optimization-disabled', {
-      timestamp: Date.now(),
-    });
+    // TODO: Add performance events to UnifiedEventBus when needed
+    // this.eventBus.emit('performance:optimization-disabled', {
+    //   timestamp: Date.now(),
+    // });
   }
   
   /**
@@ -440,11 +460,12 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
           }
           
           // Emit optimization event
-          this.eventBus.publish('performance:optimization-applied', {
-            issue,
-            strategy: strategy.name,
-            timestamp: Date.now(),
-          });
+          // TODO: Add performance events to UnifiedEventBus when needed
+          // this.eventBus.emit('performance:optimization-applied', {
+          //   issue,
+          //   strategy: strategy.name,
+          //   timestamp: Date.now(),
+          // });
           
           break; // Only apply one strategy per issue
         } catch (error) {
@@ -514,11 +535,12 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
       condition: (metrics) => metrics.memoryUsage > this.PERFORMANCE_THRESHOLDS.memoryUsage.warning,
       action: (metrics) => {
         // Trigger memory cleanup
-        this.eventBus.publish('performance:memory-cleanup', {
-          subsystem: metrics.name,
-          memoryUsage: metrics.memoryUsage,
-          timestamp: Date.now(),
-        });
+        // TODO: Add performance events to UnifiedEventBus when needed
+        // this.eventBus.emit('performance:memory-cleanup', {
+        //   subsystem: metrics.name,
+        //   memoryUsage: metrics.memoryUsage,
+        //   timestamp: Date.now(),
+        // });
       },
     });
     
@@ -531,11 +553,12 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
       description: 'Reduce quality settings to improve FPS',
       condition: (metrics) => metrics.fps < this.PERFORMANCE_THRESHOLDS.fps.warning,
       action: (metrics) => {
-        this.eventBus.publish('performance:reduce-quality', {
-          subsystem: metrics.name,
-          fps: metrics.fps,
-          timestamp: Date.now(),
-        });
+        // TODO: Add performance events to UnifiedEventBus when needed
+        // this.eventBus.emit('performance:reduce-quality', {
+        //   subsystem: metrics.name,
+        //   fps: metrics.fps,
+        //   timestamp: Date.now(),
+        // });
       },
     });
     
@@ -548,11 +571,12 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
       description: 'Throttle update frequency to reduce CPU usage',
       condition: (metrics) => metrics.cpuUsage > this.PERFORMANCE_THRESHOLDS.cpuUsage.warning,
       action: (metrics) => {
-        this.eventBus.publish('performance:throttle-updates', {
-          subsystem: metrics.name,
-          cpuUsage: metrics.cpuUsage,
-          timestamp: Date.now(),
-        });
+        // TODO: Add performance events to UnifiedEventBus when needed
+        // this.eventBus.emit('performance:throttle-updates', {
+        //   subsystem: metrics.name,
+        //   cpuUsage: metrics.cpuUsage,
+        //   timestamp: Date.now(),
+        // });
       },
     });
   }
@@ -773,31 +797,32 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
    */
   private subscribeToEvents(): void {
     // Subscribe to system performance events
-    this.eventBus.subscribe('performance:memory-warning', (payload: any) => {
-      if (payload.subsystem) {
-        this.triggerOptimization({
-          type: 'memory',
-          severity: 'high',
-          subsystem: payload.subsystem,
-          message: `Memory usage warning: ${payload.usage}MB`,
-          timestamp: Date.now(),
-          resolved: false,
-        });
-      }
-    });
+    // TODO: Add performance events to UnifiedEventBus when needed
+    // this.eventBus.subscribe('performance:memory-warning', (payload: any) => {
+    //   if (payload.subsystem) {
+    //     this.triggerOptimization({
+    //       type: 'memory',
+    //       severity: 'high',
+    //       subsystem: payload.subsystem,
+    //       message: `Memory usage warning: ${payload.usage}MB`,
+    //       timestamp: Date.now(),
+    //       resolved: false,
+    //     });
+    //   }
+    // });
     
-    this.eventBus.subscribe('performance:fps-drop', (payload: any) => {
-      if (payload.subsystem) {
-        this.triggerOptimization({
-          type: 'fps',
-          severity: 'medium',
-          subsystem: payload.subsystem,
-          message: `FPS drop detected: ${payload.fps}`,
-          timestamp: Date.now(),
-          resolved: false,
-        });
-      }
-    });
+    // this.eventBus.subscribe('performance:fps-drop', (payload: any) => {
+    //   if (payload.subsystem) {
+    //     this.triggerOptimization({
+    //       type: 'fps',
+    //       severity: 'medium',
+    //       subsystem: payload.subsystem,
+    //       message: `FPS drop detected: ${payload.fps}`,
+    //       timestamp: Date.now(),
+    //       resolved: false,
+    //     });
+    //   }
+    // });
   }
   
   // ===============================================================================
@@ -975,11 +1000,12 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     this.currentPerformanceMode = mode;
     
     // Emit performance mode change event
-    this.eventBus.emit('performance:mode-changed', {
-      mode: modeName,
-      qualityLevel: mode.qualityLevel,
-      frameRate: mode.frameRate,
-    });
+    // TODO: Add performance events to UnifiedEventBus when needed
+    // this.eventBus.emit('performance:mode-changed', {
+    //   mode: modeName,
+    //   qualityLevel: mode.qualityLevel,
+    //   frameRate: mode.frameRate,
+    // });
     
     if (this.config.enableDebug) {
       console.log(`[UnifiedPerformanceCoordinator] Performance mode changed to: ${modeName}`);

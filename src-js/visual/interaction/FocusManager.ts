@@ -1,6 +1,7 @@
 import type { Year3000Config } from "@/types/models";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 
 interface FocusState {
   isFocusVisible: boolean;
@@ -19,7 +20,7 @@ interface FocusManagerConfig {
 /**
  * FocusManager subsystem for reliable --focus-visible CSS variable emission.
  * Tracks keyboard focus and pointer hover states with throttled writes for performance.
- * Integrates with Year3000System's UnifiedCSSConsciousnessController for optimal batching.
+ * Integrates with Year3000System's UnifiedCSSVariableManager for optimal batching.
  */
 export class FocusManager implements IManagedSystem {
   public initialized: boolean = false;
@@ -29,6 +30,7 @@ export class FocusManager implements IManagedSystem {
   private utils: typeof Year3000Utilities;
   private focusState: FocusState;
   private year3000System: any | null = null;
+  private cssController!: OptimizedCSSVariableManager;
 
   // Event handlers (stored for cleanup)
   private boundFocusInHandler: ((event: FocusEvent) => void) | null = null;
@@ -72,6 +74,10 @@ export class FocusManager implements IManagedSystem {
     if (this.initialized) return;
 
     try {
+      // Initialize CSS coordination - use globalThis to access Year3000System
+      const year3000System = (globalThis as any).year3000System;
+      this.cssController = year3000System?.cssConsciousnessController || this.year3000System?.cssConsciousnessController || getGlobalOptimizedCSSController();
+
       this.setupEventListeners();
       this.initialized = true;
 
@@ -186,13 +192,14 @@ export class FocusManager implements IManagedSystem {
   private writeFocusVariable(): void {
     const value = this.focusState.isFocusVisible ? "1" : "0";
 
-    if (this.year3000System?.cssConsciousnessController?.queueCSSVariableUpdate) {
-      // Use Year3000System's batching system for optimal performance
-      this.year3000System.cssConsciousnessController.queueCSSVariableUpdate("--focus-visible", value);
-    } else {
-      // Fallback - direct DOM update
-      document.documentElement.style.setProperty("--focus-visible", value);
-    }
+    // Use coordination-first approach for focus visibility
+    this.cssController.setVariable(
+      "FocusManager",
+      "--focus-visible",
+      value,
+      "high", // High priority for focus visibility - affects accessibility
+      "focus-state-update"
+    );
 
     if (this.config.enableDebug) {
       console.log(`🎯 [FocusManager] --focus-visible updated to: ${value}`);

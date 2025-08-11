@@ -9,7 +9,7 @@
  */
 
 import type { Year3000Config } from "@/types/models";
-import type { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import type { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type { SettingsManager } from "@/ui/managers/SettingsManager";
 import * as Utils from "@/utils/core/Year3000Utilities";
 
@@ -32,12 +32,17 @@ export interface SystemCreationContext {
   
   /** Available dependencies */
   dependencies: {
-    performanceAnalyzer?: PerformanceAnalyzer;
+    performanceAnalyzer?: SimplePerformanceCoordinator;
     settingsManager?: SettingsManager;
     musicSyncService?: any;
     year3000System?: any;
     cssConsciousnessController?: any;
     performanceCoordinator?: any;
+    // New simplified performance system dependencies
+    simplePerformanceCoordinator?: any;
+    enhancedDeviceTierDetector?: any;
+    webglSystemsIntegration?: any;
+    deviceCapabilityDetector?: any;
   };
   
   /** Creation preferences */

@@ -14,16 +14,16 @@ import type {
   FrameContext,
   IVisualSystem,
 } from "@/core/animation/EnhancedMasterAnimationCoordinator";
-import { PerformanceAnalyzer } from "@/core/performance/PerformanceAnalyzer";
+import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { AberrationCanvas } from "@/visual/ui-effects/Aberration/AberrationCanvas";
 
 export class AberrationVisualSystem implements IVisualSystem {
   public readonly systemName = "AberrationCanvas";
   private _canvas: AberrationCanvas;
   private _elapsed = 0;
-  private _perf: PerformanceAnalyzer | undefined;
+  private _perf: SimplePerformanceCoordinator | undefined;
 
-  constructor(canvas: AberrationCanvas, perf?: PerformanceAnalyzer) {
+  constructor(canvas: AberrationCanvas, perf?: SimplePerformanceCoordinator) {
     this._canvas = canvas;
     this._perf = perf;
   }
@@ -39,7 +39,7 @@ export class AberrationVisualSystem implements IVisualSystem {
    */
   public onAnimate(deltaMs: number, _context: FrameContext): void {
     this._elapsed += deltaMs;
-    let start = 0;
+    let start: string | number = 0;
     if (this._perf) start = this._perf.startTiming("AberrationVisualSystem");
 
     // Drive the canvas render
