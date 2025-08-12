@@ -47021,10 +47021,10 @@ uniform float u_noiseScale;`,
     }
   });
 
-  // src-js/visual/effects/RedEnergyBurstSystem.ts
+  // src-js/visual/effects/HighEnergyEffectsController.ts
   var _RedEnergyBurstSystem, RedEnergyBurstSystem;
-  var init_RedEnergyBurstSystem = __esm({
-    "src-js/visual/effects/RedEnergyBurstSystem.ts"() {
+  var init_HighEnergyEffectsController = __esm({
+    "src-js/visual/effects/HighEnergyEffectsController.ts"() {
       "use strict";
       init_UnifiedEventBus();
       init_EmotionalTemperatureMapper();
@@ -47777,10 +47777,10 @@ uniform float u_noiseScale;`,
     }
   });
 
-  // src-js/visual/effects/SoftGlowEffectsManager.ts
+  // src-js/visual/effects/GlowEffectsController.ts
   var _SoftGlowEffectsManager, SoftGlowEffectsManager;
-  var init_SoftGlowEffectsManager = __esm({
-    "src-js/visual/effects/SoftGlowEffectsManager.ts"() {
+  var init_GlowEffectsController = __esm({
+    "src-js/visual/effects/GlowEffectsController.ts"() {
       "use strict";
       init_UnifiedEventBus();
       init_Year3000Utilities();
@@ -48980,8 +48980,8 @@ uniform float u_noiseScale;`,
       init_HolographicUISystem();
       init_InteractionTrackingSystem();
       init_SpotifyUIApplicationSystem();
-      init_RedEnergyBurstSystem();
-      init_SoftGlowEffectsManager();
+      init_HighEnergyEffectsController();
+      init_GlowEffectsController();
       init_NaturalHarmonyEngine();
       _VisualSystemFacade = class _VisualSystemFacade {
         constructor(config, utils, year3000System2, cssConsciousnessController, performanceAnalyzer2, musicSyncService, settingsManager2, colorHarmonyEngine, eventBus, animationCoordinator) {

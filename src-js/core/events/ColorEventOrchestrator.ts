@@ -149,7 +149,7 @@ export class ColorEventOrchestrator {
   private registerDefaultStrategies(): void {
     try {
       // Import and register strategies dynamically to avoid circular dependencies
-      import("@/visual/strategies/DynamicCatppuccinStrategy").then(
+      import("@/visual/color/ThemeColorController").then(
         ({ DynamicCatppuccinStrategy }) => {
           this.strategyRegistry.register(
             new DynamicCatppuccinStrategy()

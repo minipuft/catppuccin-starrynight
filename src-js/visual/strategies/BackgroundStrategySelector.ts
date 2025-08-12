@@ -20,7 +20,7 @@ import { settings } from "@/config";
 
 // Import strategy implementations
 import { DepthLayeredStrategy } from "./DepthLayeredStrategy";
-import { DynamicCatppuccinStrategy } from "./DynamicCatppuccinStrategy";
+import { DynamicCatppuccinStrategy } from "../color/ThemeColorController";
 import { LivingGradientStrategy } from "./LivingGradientStrategy";
 import { WebGLGradientStrategy } from "./WebGLGradientStrategy";
 
