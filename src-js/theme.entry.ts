@@ -355,12 +355,12 @@ patchReactRequire();
         initializeAberrationManager(year3000System);
         
         // 🌠 Enable Enhanced Drag Preview (Phase 2)
-        import("./ui/interactions/EnhancedDragPreview").then((m) =>
+        import("./ui/interactions/DragPreviewManager").then((m) =>
           m.enableEnhancedDragPreview?.()
         );
         
         // 🎉 Enable Quick Add Radial Menu (Phase 2)
-        import("./ui/interactions/QuickAddRadialMenu").then((m) =>
+        import("./ui/interactions/PlaylistQuickAddMenu").then((m) =>
           m.enableQuickAddRadialMenu?.()
         );
         

@@ -116,7 +116,7 @@ function onDragStart(event: DragEvent): void {
     };
     window.addEventListener("dragend", cleanup, true);
   } catch (err) {
-    console.debug("[StarryNight] EnhancedDragPreview failed:", err);
+    console.debug("[StarryNight] DragPreviewManager failed:", err);
   }
 }
 
