@@ -45,7 +45,7 @@ import {
 } from "@/visual/integration/VisualSystemFacade";
 
 // Consciousness engine imports for integration
-import { RedEnergyBurstSystem } from "@/visual/effects/RedEnergyBurstSystem";
+import { RedEnergyBurstSystem } from "@/visual/effects/HighEnergyEffectsController";
 import { SoftGlowEffectsManager } from "@/visual/effects/SoftGlowEffectsManager";
 import { NaturalHarmonyEngine } from "@/visual/effects/NaturalHarmonyEngine";
 
