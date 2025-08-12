@@ -4,7 +4,7 @@
  * Tests the red energy burst system integration with ColorConsciousnessOrchestrator
  */
 
-import { RedEnergyBurstSystem } from '@/visual/effects/RedEnergyBurstSystem';
+import { RedEnergyBurstSystem } from '@/visual/effects/HighEnergyEffectsController';
 import { colorConsciousnessManager } from '@/visual/effects/ColorAnimationState';
 import { HolographicUISystem } from '@/visual/music-sync/ui/HolographicUISystem';
 import { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
