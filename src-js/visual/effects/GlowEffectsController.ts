@@ -9,7 +9,7 @@
  * @consciousness Gentle beauty that breathes with musical soul
  */
 
-import { HolographicUISystem } from "@/visual/music-sync/ui/HolographicUISystem";
+import { HolographicUISystem } from "@/visual/music/ui/HolographicUISystem";
 import { colorConsciousnessManager } from "@/visual/effects/ColorAnimationState";
 import type { RGB, MusicEmotion, BeatData, CinematicPalette } from "@/types/colorStubs";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";

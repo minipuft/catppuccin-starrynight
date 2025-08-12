@@ -5,7 +5,7 @@
  * with the existing Year3000 System architecture.
  */
 
-import { OrganicBeatSyncConsciousness } from '@/visual/music-sync/MusicSyncVisualEffects';
+import { OrganicBeatSyncConsciousness } from '@/visual/music/MusicSyncVisualEffects';
 // Using stub implementations from colorStubs
 import type { BreathingRhythmEngine, SymbioticListeningCore } from '@/types/colorStubs';
 import { Year3000System } from '@/core/lifecycle/year3000System';

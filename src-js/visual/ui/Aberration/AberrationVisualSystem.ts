@@ -15,7 +15,7 @@ import type {
   IVisualSystem,
 } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import { AberrationCanvas } from "@/visual/ui-effects/Aberration/AberrationCanvas";
+import { AberrationCanvas } from "@/visual/ui/Aberration/AberrationCanvas";
 
 export class AberrationVisualSystem implements IVisualSystem {
   public readonly systemName = "AberrationCanvas";

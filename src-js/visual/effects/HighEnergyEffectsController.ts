@@ -22,7 +22,7 @@ import {
 import {
   HolographicUISystem,
   type HolographicElement,
-} from "@/visual/music-sync/ui/HolographicUISystem";
+} from "@/visual/music/ui/HolographicUISystem";
 
 export interface EnergyBurstState {
   intensity: number; // 0-1 current burst intensity

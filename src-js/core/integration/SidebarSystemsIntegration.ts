@@ -1,8 +1,8 @@
 import { UnifiedSystemBase } from '@/core/base/UnifiedSystemBase';
-import { SidebarInteractiveFlowSystem } from '@/visual/ui-effects/SidebarInteractiveFlowSystem';
+import { SidebarInteractiveFlowSystem } from '@/visual/ui/SidebarInteractiveFlowSystem';
 // RightSidebarConsciousnessEnhanced consolidated into UnifiedSidebarConsciousnessController
 // import { RightSidebarConsciousnessEnhanced } from '@/visual/ui-effects/RightSidebarConsciousnessEnhanced';
-import { SidebarPerformanceCoordinator } from '@/visual/ui-effects/SidebarPerformanceCoordinator';
+import { SidebarPerformanceCoordinator } from '@/visual/ui/SidebarPerformanceCoordinator';
 import type { Year3000Config } from '@/types/models';
 import type { HealthCheckResult } from '@/types/systems';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';

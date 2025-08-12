@@ -10965,10 +10965,10 @@
     }
   });
 
-  // src-js/visual/strategies/DynamicCatppuccinStrategy.ts
+  // src-js/visual/color/ThemeColorController.ts
   var _DynamicCatppuccinStrategy, DynamicCatppuccinStrategy;
-  var init_DynamicCatppuccinStrategy = __esm({
-    "src-js/visual/strategies/DynamicCatppuccinStrategy.ts"() {
+  var init_ThemeColorController = __esm({
+    "src-js/visual/color/ThemeColorController.ts"() {
       "use strict";
       init_globalConfig();
       init_OptimizedCSSVariableManager();
@@ -14264,7 +14264,7 @@ void main() {
       init_UnifiedDebugManager();
       init_config();
       init_DepthLayeredStrategy();
-      init_DynamicCatppuccinStrategy();
+      init_ThemeColorController();
       init_LivingGradientStrategy();
       init_WebGLGradientStrategy();
       _BackgroundStrategySelector = class _BackgroundStrategySelector {
@@ -15760,10 +15760,10 @@ void main() {
     }
   });
 
-  // src-js/visual/music-sync/integration/MusicEmotionAnalyzer.ts
+  // src-js/visual/music/integration/MusicEmotionAnalyzer.ts
   var _MusicEmotionAnalyzer, MusicEmotionAnalyzer, _ValenceEnergyMapper, ValenceEnergyMapper, _AudioFeatureAnalyzer, AudioFeatureAnalyzer, _TemperatureCalculator, TemperatureCalculator, _ConsciousnessDetector, ConsciousnessDetector;
   var init_MusicEmotionAnalyzer = __esm({
-    "src-js/visual/music-sync/integration/MusicEmotionAnalyzer.ts"() {
+    "src-js/visual/music/integration/MusicEmotionAnalyzer.ts"() {
       "use strict";
       _MusicEmotionAnalyzer = class _MusicEmotionAnalyzer {
         constructor(config = {}) {
@@ -30785,10 +30785,10 @@ void main() {
     }
   });
 
-  // src-js/visual/ui-effects/SidebarInteractiveFlowSystem.ts
+  // src-js/visual/ui/SidebarInteractiveFlowSystem.ts
   var _SidebarInteractiveFlowSystem, SidebarInteractiveFlowSystem;
   var init_SidebarInteractiveFlowSystem = __esm({
-    "src-js/visual/ui-effects/SidebarInteractiveFlowSystem.ts"() {
+    "src-js/visual/ui/SidebarInteractiveFlowSystem.ts"() {
       "use strict";
       init_UnifiedSystemBase();
       init_globalConfig();
@@ -31724,7 +31724,7 @@ void main() {
     }
   });
 
-  // src-js/visual/ui-effects/SidebarPerformanceCoordinator.ts
+  // src-js/visual/ui/SidebarPerformanceCoordinator.ts
   var SidebarPerformanceCoordinator_exports = {};
   __export(SidebarPerformanceCoordinator_exports, {
     SidebarPerformanceCoordinator: () => SidebarPerformanceCoordinator,
@@ -31735,7 +31735,7 @@ void main() {
   }
   var _SidebarPerformanceCoordinator, SidebarPerformanceCoordinator;
   var init_SidebarPerformanceCoordinator = __esm({
-    "src-js/visual/ui-effects/SidebarPerformanceCoordinator.ts"() {
+    "src-js/visual/ui/SidebarPerformanceCoordinator.ts"() {
       "use strict";
       init_OptimizedCSSVariableManager();
       init_PerformanceBudgetManager();
@@ -37258,10 +37258,10 @@ ${precision}
     }
   });
 
-  // src-js/visual/backgrounds/WebGLGradientBackgroundSystem.ts
+  // src-js/visual/background/WebGLRenderer.ts
   var webglConsciousnessShader, corridorBubbleShader, _WebGLGradientBackgroundSystem, WebGLGradientBackgroundSystem;
-  var init_WebGLGradientBackgroundSystem = __esm({
-    "src-js/visual/backgrounds/WebGLGradientBackgroundSystem.ts"() {
+  var init_WebGLRenderer = __esm({
+    "src-js/visual/background/WebGLRenderer.ts"() {
       "use strict";
       init_globalConfig();
       init_OptimizedCSSVariableManager();
@@ -43607,10 +43607,10 @@ uniform float u_noiseScale;`,
     }
   });
 
-  // src-js/visual/music-sync/MusicSyncVisualEffects.ts
+  // src-js/visual/music/MusicSyncVisualEffects.ts
   var _OrganicBeatSyncConsciousness, OrganicBeatSyncConsciousness;
   var init_MusicSyncVisualEffects = __esm({
-    "src-js/visual/music-sync/MusicSyncVisualEffects.ts"() {
+    "src-js/visual/music/MusicSyncVisualEffects.ts"() {
       "use strict";
       init_UnifiedSystemBase();
       init_Year3000Utilities();
@@ -44012,10 +44012,10 @@ uniform float u_noiseScale;`,
     }
   });
 
-  // src-js/visual/music-sync/ui/HolographicUISystem.ts
+  // src-js/visual/music/ui/HolographicUISystem.ts
   var _HolographicUISystem, HolographicUISystem;
   var init_HolographicUISystem = __esm({
-    "src-js/visual/music-sync/ui/HolographicUISystem.ts"() {
+    "src-js/visual/music/ui/HolographicUISystem.ts"() {
       "use strict";
       init_MusicSyncService();
       init_UnifiedEventBus();
@@ -46017,10 +46017,10 @@ uniform float u_noiseScale;`,
     }
   });
 
-  // src-js/visual/ui-effects/InteractionTrackingSystem.ts
+  // src-js/visual/ui/InteractionTrackingSystem.ts
   var _InteractionTrackingSystem, InteractionTrackingSystem;
   var init_InteractionTrackingSystem = __esm({
-    "src-js/visual/ui-effects/InteractionTrackingSystem.ts"() {
+    "src-js/visual/ui/InteractionTrackingSystem.ts"() {
       "use strict";
       init_UnifiedEventBus();
       init_BaseVisualSystem();
@@ -46388,10 +46388,10 @@ uniform float u_noiseScale;`,
     }
   });
 
-  // src-js/visual/ui-effects/SpotifyUIApplicationSystem.ts
+  // src-js/visual/ui/SpotifyUIApplicationSystem.ts
   var _SpotifyUIApplicationSystem, SpotifyUIApplicationSystem;
   var init_SpotifyUIApplicationSystem = __esm({
-    "src-js/visual/ui-effects/SpotifyUIApplicationSystem.ts"() {
+    "src-js/visual/ui/SpotifyUIApplicationSystem.ts"() {
       "use strict";
       init_UnifiedEventBus();
       _SpotifyUIApplicationSystem = class _SpotifyUIApplicationSystem {
@@ -48970,7 +48970,7 @@ uniform float u_noiseScale;`,
       init_DeviceCapabilityDetector();
       init_UnifiedDebugManager();
       init_colorStubs();
-      init_WebGLGradientBackgroundSystem();
+      init_WebGLRenderer();
       init_CSSBlobFallbackSystem();
       init_UIVisualEffectsController();
       init_HeaderVisualEffectsController();
@@ -54872,7 +54872,7 @@ uniform float u_noiseScale;`,
     }
   });
 
-  // src-js/visual/ui-effects/prismaticScrollSheen.ts
+  // src-js/visual/ui/prismaticScrollSheen.ts
   var prismaticScrollSheen_exports = {};
   __export(prismaticScrollSheen_exports, {
     PrismaticScrollSheenSystem: () => PrismaticScrollSheenSystem,
@@ -54888,7 +54888,7 @@ uniform float u_noiseScale;`,
   }
   var DEFAULT_CYCLE_PX, _PrismaticScrollSheenSystem, PrismaticScrollSheenSystem;
   var init_prismaticScrollSheen = __esm({
-    "src-js/visual/ui-effects/prismaticScrollSheen.ts"() {
+    "src-js/visual/ui/prismaticScrollSheen.ts"() {
       "use strict";
       init_year3000System();
       init_OptimizedCSSVariableManager();
@@ -55530,14 +55530,14 @@ uniform float u_noiseScale;`,
     }
   });
 
-  // src-js/visual/ui-effects/RightSidebarVisualEffects.ts
+  // src-js/visual/ui/RightSidebarVisualEffects.ts
   var RightSidebarVisualEffects_exports = {};
   __export(RightSidebarVisualEffects_exports, {
     RightSidebarConsciousnessSystem: () => RightSidebarConsciousnessSystem
   });
   var _RightSidebarConsciousnessSystem, RightSidebarConsciousnessSystem;
   var init_RightSidebarVisualEffects = __esm({
-    "src-js/visual/ui-effects/RightSidebarVisualEffects.ts"() {
+    "src-js/visual/ui/RightSidebarVisualEffects.ts"() {
       "use strict";
       init_UnifiedEventBus();
       init_BaseVisualSystem();
@@ -57350,10 +57350,10 @@ uniform float u_noiseScale;`,
   }
   __name(waitForSpicetifyReady, "waitForSpicetifyReady");
 
-  // src-js/visual/ui-effects/Aberration/AberrationManager.ts
+  // src-js/visual/ui/Aberration/AberrationManager.ts
   init_OptimizedCSSVariableManager();
 
-  // src-js/visual/ui-effects/Aberration/AberrationCanvas.ts
+  // src-js/visual/ui/Aberration/AberrationCanvas.ts
   var _AberrationCanvas = class _AberrationCanvas {
     constructor(parent, y3k = null) {
       this.parent = parent;
@@ -57536,7 +57536,7 @@ uniform float u_noiseScale;`,
   __name(_AberrationCanvas, "AberrationCanvas");
   var AberrationCanvas = _AberrationCanvas;
 
-  // src-js/visual/ui-effects/Aberration/AberrationVisualSystem.ts
+  // src-js/visual/ui/Aberration/AberrationVisualSystem.ts
   var _AberrationVisualSystem = class _AberrationVisualSystem {
     constructor(canvas, perf) {
       this.systemName = "AberrationCanvas";
@@ -57598,7 +57598,7 @@ uniform float u_noiseScale;`,
   }
   __name(getScrollNode, "getScrollNode");
 
-  // src-js/visual/ui-effects/Aberration/AberrationManager.ts
+  // src-js/visual/ui/Aberration/AberrationManager.ts
   var instance = null;
   var visualSystem = null;
   function getCSSController(y3k) {
@@ -57726,7 +57726,7 @@ uniform float u_noiseScale;`,
   }
   __name(initializeAberrationManager, "initializeAberrationManager");
 
-  // src-js/visual/ui-effects/AudioVisualController.ts
+  // src-js/visual/ui/AudioVisualController.ts
   init_OptimizedCSSVariableManager();
   init_UnifiedEventBus();
 
@@ -57759,7 +57759,7 @@ uniform float u_noiseScale;`,
   __name(_UserGenreHistory, "UserGenreHistory");
   var UserGenreHistory = _UserGenreHistory;
 
-  // src-js/visual/ui-effects/AudioVisualController.ts
+  // src-js/visual/ui/AudioVisualController.ts
   function median(values) {
     if (!values.length) return 0;
     const sorted = [...values].sort((a, b) => a - b);

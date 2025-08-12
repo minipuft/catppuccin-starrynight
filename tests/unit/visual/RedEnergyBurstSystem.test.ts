@@ -6,7 +6,7 @@
 
 import { RedEnergyBurstSystem } from '@/visual/effects/HighEnergyEffectsController';
 import { colorConsciousnessManager } from '@/visual/effects/ColorAnimationState';
-import { HolographicUISystem } from '@/visual/music-sync/ui/HolographicUISystem';
+import { HolographicUISystem } from '@/visual/music/ui/HolographicUISystem';
 import { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
 import { MusicSyncService } from '@/audio/MusicSyncService';
 import type { MusicEmotion, BeatData } from '@/types/colorStubs';

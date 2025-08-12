@@ -36,10 +36,10 @@ import { ConsciousnessUIEffectsController } from "@/visual/effects/UIVisualEffec
 import { HeaderConsciousnessController } from "@/visual/effects/HeaderVisualEffectsController";
 import { UnifiedSidebarConsciousnessController } from "@/visual/effects/UnifiedSidebarEffectsController";
 import { GradientConductor } from "@/visual/backbone/GradientConductor";
-import { OrganicBeatSyncConsciousness } from "@/visual/music-sync/MusicSyncVisualEffects";
-import { HolographicUISystem } from "@/visual/music-sync/ui/HolographicUISystem";
-import { InteractionTrackingSystem } from "@/visual/ui-effects/InteractionTrackingSystem";
-import { SpotifyUIApplicationSystem } from "@/visual/ui-effects/SpotifyUIApplicationSystem";
+import { OrganicBeatSyncConsciousness } from "@/visual/music/MusicSyncVisualEffects";
+import { HolographicUISystem } from "@/visual/music/ui/HolographicUISystem";
+import { InteractionTrackingSystem } from "@/visual/ui/InteractionTrackingSystem";
+import { SpotifyUIApplicationSystem } from "@/visual/ui/SpotifyUIApplicationSystem";
 // EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
 
 // Consciousness engine imports for integration

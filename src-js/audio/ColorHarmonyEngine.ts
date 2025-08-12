@@ -42,7 +42,7 @@ import {
   type AudioData,
   type AudioFeatures,
   type EmotionalState,
-} from "@/visual/music-sync/integration/MusicEmotionAnalyzer";
+} from "@/visual/music/integration/MusicEmotionAnalyzer";
 // TODO: Phase 4 - Import WebGL and Worker support for performance
 
 // Type definitions for color structures

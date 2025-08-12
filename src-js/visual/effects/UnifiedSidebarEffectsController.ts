@@ -36,7 +36,7 @@ import type { Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
 import { sample as sampleNoise } from "@/utils/graphics/NoiseField";
 import { BackgroundAnimationCoordinator } from "@/visual/effects/BackgroundAnimationCoordinator";
-import { SidebarPerformanceCoordinator } from "@/visual/ui-effects/SidebarPerformanceCoordinator";
+import { SidebarPerformanceCoordinator } from "@/visual/ui/SidebarPerformanceCoordinator";
 
 // Enhanced device capability detection (from SidebarConsciousnessSystem)
 interface DeviceCapabilities {

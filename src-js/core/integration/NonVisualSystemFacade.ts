@@ -54,7 +54,7 @@ import { SettingsManager } from "@/ui/managers/SettingsManager";
 // Consciousness Systems imports
 import { GenreGradientEvolution } from "@/audio/GenreGradientEvolution";
 import { VisualEffectsCoordinator } from "@/core/consciousness/VisualEffectsCoordinator";
-import { MusicEmotionAnalyzer } from "@/visual/music-sync/integration/MusicEmotionAnalyzer";
+import { MusicEmotionAnalyzer } from "@/visual/music/integration/MusicEmotionAnalyzer";
 
 // Color Strategy imports
 import { UnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";

@@ -3,8 +3,8 @@ import { Year3000System } from "./core/lifecycle/year3000System";
 import { Y3KDebug } from "./debug/UnifiedDebugManager";
 import * as Year3000Utilities from "./utils/core/Year3000Utilities";
 import { waitForSpicetifyReady } from "./utils/platform/spicetifyReady";
-import { initializeAberrationManager } from "./visual/ui-effects/Aberration/AberrationManager"; // Re-enabled for hybrid CSS+WebGL approach
-import { initializeAudioVisualController } from "./visual/ui-effects/AudioVisualController";
+import { initializeAberrationManager } from "./visual/ui/Aberration/AberrationManager"; // Re-enabled for hybrid CSS+WebGL approach
+import { initializeAudioVisualController } from "./visual/ui/AudioVisualController";
 
 // A placeholder for the settings UI function until it can be properly typed.
 declare const initializeSettingsUI: (location: any) => void;
@@ -366,7 +366,7 @@ patchReactRequire();
         
         // ✨ Initialize Prismatic Scroll Sheen (requires global CSS controller)
         if (mainContainer) {
-          import("./visual/ui-effects/prismaticScrollSheen").then((m) =>
+          import("./visual/ui/prismaticScrollSheen").then((m) =>
             m.initializePrismaticScrollSheen?.()
           );
         }
@@ -424,10 +424,10 @@ patchReactRequire();
   // 3b. 🫧 Initialize Right Sidebar Consciousness System (Phase 2)
   try {
     const { RightSidebarConsciousnessSystem } = await import(
-      "./visual/ui-effects/RightSidebarVisualEffects"
+      "./visual/ui/RightSidebarVisualEffects"
     );
     const { SidebarPerformanceCoordinator } = await import(
-      "./visual/ui-effects/SidebarPerformanceCoordinator"
+      "./visual/ui/SidebarPerformanceCoordinator"
     );
 
     if (year3000System.performanceAnalyzer) {

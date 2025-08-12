@@ -23,7 +23,7 @@ import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { DepthLayeredGradientSystem } from "../backgrounds/DepthLayeredGradientSystem";
 import { FluidGradientBackgroundSystem } from "../backgrounds/FluidGradientBackgroundSystem";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
-import { IridescentShimmerEffectsSystem } from "../ui-effects/IridescentShimmerEffectsSystem";
+import { IridescentShimmerEffectsSystem } from "../ui/IridescentShimmerEffectsSystem";
 
 interface RealityBleedingState {
   liquidConsciousness: boolean;
