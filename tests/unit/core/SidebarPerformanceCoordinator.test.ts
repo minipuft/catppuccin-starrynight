@@ -1,7 +1,7 @@
-import { SidebarPerformanceCoordinator } from "../src-js/visual/ui-effects/SidebarPerformanceCoordinator";
+import { SidebarPerformanceCoordinator } from "@/visual/ui/SidebarPerformanceCoordinator";
 
 // Mock MODERN_SELECTORS
-jest.mock("../src-js/debug/SpotifyDOMSelectors", () => ({
+jest.mock("@/debug/SpotifyDOMSelectors", () => ({
   MODERN_SELECTORS: {
     rightSidebar: ".Root__right-sidebar",
   },

@@ -3,7 +3,7 @@
  * Verifies no scroll jank and proper click pass-through
  */
 
-import { WebGLGradientBackgroundSystem } from '@/visual/backgrounds/WebGLGradientBackgroundSystem';
+import { WebGLGradientBackgroundSystem } from '@/visual/background/WebGLRenderer';
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { SettingsManager } from '@/ui/managers/SettingsManager';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';

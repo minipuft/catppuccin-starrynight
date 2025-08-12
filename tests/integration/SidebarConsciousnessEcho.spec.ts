@@ -45,7 +45,7 @@ HTMLCanvasElement.prototype.getContext = jest.fn().mockReturnValue(null);
 import { UnifiedPerformanceCoordinator } from "@/core/performance/UnifiedPerformanceCoordinator";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { SidebarConsciousnessSystem } from "@/visual/ui-effects/SidebarVisualEffectsSystem";
+import { SidebarConsciousnessSystem } from "@/visual/ui/SidebarVisualEffectsSystem";
 import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 
 // Dummy dependencies --------------------------------------------------------

@@ -3,12 +3,12 @@
  * Tests the flowing WebGL gradient background system
  */
 
-import { ColorHarmonyEngine } from "../src-js/audio/ColorHarmonyEngine";
-import { YEAR3000_CONFIG } from "../src-js/config/globalConfig";
-import { DeviceCapabilityDetector } from "../src-js/core/performance/DeviceCapabilityDetector";
-import { SimplePerformanceCoordinator } from "../src-js/core/performance/SimplePerformanceCoordinator";
-import { SettingsManager } from "../src-js/ui/managers/SettingsManager";
-import { WebGLGradientBackgroundSystem } from "../src-js/visual/backgrounds/WebGLGradientBackgroundSystem";
+import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
+import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
+import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
+import { SettingsManager } from "@/ui/managers/SettingsManager";
+import { WebGLGradientBackgroundSystem } from "@/visual/background/WebGLRenderer";
 
 // Mock WebGL2 context
 const createMockWebGL2 = (): Partial<WebGL2RenderingContext> => {

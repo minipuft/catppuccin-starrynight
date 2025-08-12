@@ -22,7 +22,7 @@ jest.mock('@/audio/MusicSyncService');
 jest.mock('@/ui/managers/GlassmorphismManager');
 jest.mock('@/ui/managers/Card3DManager');
 jest.mock('@/core/integration/SidebarSystemsIntegration');
-jest.mock('@/core/integration/UnifiedSystemIntegration');
+// jest.mock('@/core/integration/UnifiedSystemIntegration'); // Module doesn't exist
 
 // Mock debug system
 jest.mock('@/debug/UnifiedDebugManager', () => ({
