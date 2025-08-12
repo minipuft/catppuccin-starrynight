@@ -4,7 +4,7 @@
  * Tests the gentle beauty system integration with ColorConsciousnessOrchestrator
  */
 
-import { SoftGlowEffectsManager } from '@/visual/effects/SoftGlowEffectsManager';
+import { SoftGlowEffectsManager } from '@/visual/effects/GlowEffectsController';
 import { colorConsciousnessManager } from '@/visual/effects/ColorAnimationState';
 import { HolographicUISystem } from '@/visual/music-sync/ui/HolographicUISystem';
 import { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';

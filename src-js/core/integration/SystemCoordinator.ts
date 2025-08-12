@@ -46,7 +46,7 @@ import {
 
 // Consciousness engine imports for integration
 import { RedEnergyBurstSystem } from "@/visual/effects/HighEnergyEffectsController";
-import { SoftGlowEffectsManager } from "@/visual/effects/SoftGlowEffectsManager";
+import { SoftGlowEffectsManager } from "@/visual/effects/GlowEffectsController";
 import { NaturalHarmonyEngine } from "@/visual/effects/NaturalHarmonyEngine";
 
 export type SystemType = "visual" | "non-visual";
