@@ -30,7 +30,7 @@ import * as Utils from "@/utils/core/Year3000Utilities";
 
 // Visual System imports
 // import "@/visual/effects/ParticleConsciousnessModule"; // Disabled - converted to CSS-only
-import { WebGLGradientBackgroundSystem } from "@/visual/backgrounds/WebGLGradientBackgroundSystem";
+import { WebGLGradientBackgroundSystem } from "@/visual/background/WebGLRenderer";
 import { CSSBlobFallbackSystem } from "@/visual/css-fallbacks/CSSBlobFallbackSystem";
 import { ConsciousnessUIEffectsController } from "@/visual/effects/UIVisualEffectsController";
 import { HeaderConsciousnessController } from "@/visual/effects/HeaderVisualEffectsController";

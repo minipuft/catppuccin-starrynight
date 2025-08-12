@@ -6,7 +6,7 @@
  */
 
 import { UnifiedWebGLController } from "./UnifiedWebGLController";
-import { WebGLGradientBackgroundSystem } from "@/visual/backgrounds/WebGLGradientBackgroundSystem";
+import { WebGLGradientBackgroundSystem } from "@/visual/background/WebGLRenderer";
 import { WebGLGradientAdapter } from "@/visual/backgrounds/WebGLGradientAdapter";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";

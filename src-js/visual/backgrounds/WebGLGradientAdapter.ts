@@ -6,7 +6,7 @@
  * all existing functionality.
  */
 
-import { WebGLGradientBackgroundSystem } from "./WebGLGradientBackgroundSystem";
+import { WebGLGradientBackgroundSystem } from "../background/WebGLRenderer";
 import type { WebGLSystemInterface } from "@/core/webgl/WebGLSystemInterface";
 import type { WebGLQuality } from "@/core/webgl/UnifiedWebGLController";
 import { WebGLQualityMapper } from "@/core/webgl/WebGLSystemInterface";

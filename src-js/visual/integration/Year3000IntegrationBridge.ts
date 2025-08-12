@@ -30,7 +30,7 @@ import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 
 // System imports
-import { WebGLGradientBackgroundSystem } from "@/visual/backgrounds/WebGLGradientBackgroundSystem";
+import { WebGLGradientBackgroundSystem } from "@/visual/background/WebGLRenderer";
 import {
   GradientBackend,
   GradientTransitionOrchestrator,

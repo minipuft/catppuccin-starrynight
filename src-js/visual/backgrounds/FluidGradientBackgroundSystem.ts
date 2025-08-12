@@ -21,7 +21,7 @@ import type {
   BackgroundSystemParticipant,
   ConsciousnessField,
 } from "../effects/BackgroundAnimationCoordinator";
-import { WebGLGradientBackgroundSystem } from "./WebGLGradientBackgroundSystem";
+import { WebGLGradientBackgroundSystem } from "../background/WebGLRenderer";
 
 // Enhanced shader with advanced liquid consciousness flow patterns
 const liquidConsciousnessShader = `#version 300 es

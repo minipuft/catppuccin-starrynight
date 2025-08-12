@@ -22,7 +22,7 @@ import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDet
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
-import { WebGLGradientBackgroundSystem } from "@/visual/backgrounds/WebGLGradientBackgroundSystem";
+import { WebGLGradientBackgroundSystem } from "@/visual/background/WebGLRenderer";
 import type {
   BackendCapabilities,
   HealthCheckResult,
