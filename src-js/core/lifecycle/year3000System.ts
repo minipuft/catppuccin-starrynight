@@ -5,7 +5,7 @@ import { SystemCoordinator } from "@/core/integration/SystemCoordinator";
 
 // Color orchestration imports for Strategy pattern
 import { globalColorStateManager } from "@/core/css/ColorStateManager";
-import { globalColorOrchestrator } from "@/visual/integration/ColorOrchestrator";
+import { globalColorOrchestrator } from "@/visual/coordination/ColorCoordinator";
 
 // Event-driven integration imports
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
@@ -362,7 +362,7 @@ export class Year3000System {
     );
   }
   public get beatSyncVisualSystem() {
-    return this.facadeCoordinator?.getVisualSystem("OrganicBeatSync") || null;
+    return this.facadeCoordinator?.getVisualSystem("MusicBeatSync") || null;
   }
   public get webGLGradientBackgroundSystem() {
     return this.facadeCoordinator?.getVisualSystem("WebGLBackground") || null;
@@ -381,10 +381,10 @@ export class Year3000System {
     );
   }
 
-  // Organic Consciousness System (Year 3000 Philosophy)
+  // Music Beat Synchronization System
   public get organicBeatSyncConsciousness() {
     return (
-      this.facadeCoordinator?.getVisualSystem("OrganicBeatSync") ||
+      this.facadeCoordinator?.getVisualSystem("MusicBeatSync") ||
       this.beatSyncVisualSystem
     );
   }

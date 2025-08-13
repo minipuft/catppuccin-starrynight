@@ -36,7 +36,7 @@ import { PaletteExtensionManager } from "@/utils/core/PaletteExtensionManager";
 import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 import { SemanticColorManager } from "@/utils/spicetify/SemanticColorManager";
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
-import { globalColorOrchestrator } from "@/visual/integration/ColorOrchestrator";
+import { globalColorOrchestrator } from "@/visual/coordination/ColorCoordinator";
 import {
   MusicEmotionAnalyzer,
   type AudioData,
@@ -861,7 +861,7 @@ export class ColorHarmonyEngine
     }
   }
 
-  public async healthCheck(): Promise<HealthCheckResult> {
+  public override async healthCheck(): Promise<HealthCheckResult> {
     if (!this.getCurrentActivePalette()) {
       return {
         healthy: false,

@@ -58,7 +58,7 @@ import { MusicEmotionAnalyzer } from "@/visual/music/integration/MusicEmotionAna
 
 // Color Strategy imports
 import { UnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
-import { globalColorOrchestrator } from "@/visual/integration/ColorOrchestrator";
+import { globalColorOrchestrator } from "@/visual/coordination/ColorCoordinator";
 
 // UI Managers imports
 import { Card3DManager } from "@/ui/managers/Card3DManager";
@@ -113,7 +113,10 @@ export type NonVisualSystemKey =
   | "Card3DManager"
 
   // Integration Systems
-  | "SidebarSystemsIntegration";
+  | "SidebarSystemsIntegration"
+  | "CSSVariableBatcher"
+  | "SystemHealthMonitor" 
+  | "UnifiedSystemIntegration";
 
 export type SystemHealth = "excellent" | "good" | "degraded" | "critical";
 export type IntegrationMode =
@@ -339,9 +342,21 @@ export class NonVisualSystemFacade {
     );
     this.systemDependencies.set("DeviceCapabilityDetector", []);
 
-    // PerformanceAnalyzer replaced by SimplePerformanceCoordinator
-    // this.systemRegistry.set("PerformanceAnalyzer", PerformanceAnalyzer);
-    // this.systemDependencies.set("PerformanceAnalyzer", []);
+    // PerformanceAnalyzer - alias for SimplePerformanceCoordinator (backward compatibility)
+    this.systemRegistry.set("PerformanceAnalyzer", SimplePerformanceCoordinator);
+    this.systemDependencies.set("PerformanceAnalyzer", []);
+
+    // CSSVariableBatcher - alias for OptimizedCSSVariableManager (backward compatibility)
+    this.systemRegistry.set("CSSVariableBatcher", OptimizedCSSVariableManager);
+    this.systemDependencies.set("CSSVariableBatcher", []);
+
+    // SystemHealthMonitor - alias for SimplePerformanceCoordinator (backward compatibility)
+    this.systemRegistry.set("SystemHealthMonitor", SimplePerformanceCoordinator);
+    this.systemDependencies.set("SystemHealthMonitor", []);
+
+    // UnifiedSystemIntegration - alias for SidebarSystemsIntegration (backward compatibility)
+    this.systemRegistry.set("UnifiedSystemIntegration", SidebarSystemsIntegration);
+    this.systemDependencies.set("UnifiedSystemIntegration", []);
 
     this.systemRegistry.set(
       "PerformanceBudgetManager",

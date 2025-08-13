@@ -7,203 +7,339 @@ import { musicalLerpOrchestrator, type MusicalContext } from '@/utils/core/Music
 import type { MusicSyncService } from '@/audio/MusicSyncService';
 
 /**
- * Organic BeatSync Consciousness System
+ * Music Beat Synchronizer System
  * 
- * Evolution from mechanical beat detection to organic consciousness that breathes 
- * with music. Implements Year 3000 philosophy of living, breathing interfaces that
- * experience music alongside users.
+ * Advanced music beat detection and synchronization system that creates
+ * responsive visual effects based on audio analysis. Provides smooth
+ * visual feedback synchronized with music tempo and energy.
  * 
- * Core Behaviors:
- * - Cellular growth/shrink with music energy
- * - Breathing rhythms synchronized with tempo
- * - Emotional temperature color shifts
- * - Liquid membrane fluidity between elements
- * - Symbiotic listening experience
+ * Technical Features:
+ * - Dynamic scaling with music energy levels
+ * - Animation rhythms synchronized with tempo detection
+ * - Color temperature shifts based on music emotional analysis
+ * - Smooth transitions between visual elements using LERP interpolation
+ * - Real-time audio-visual synchronization with <16ms latency
  * 
- * @philosophy "Interfaces are not built—they are grown"
- * @architecture Organic Consciousness replacing quantum mechanics
- * @performance 60fps, <75MB memory, <15% CPU targets
+ * @architecture Year3000System - Music Synchronization Integration
+ * @performance 60fps target, <75MB memory, <15% CPU usage
+ * @compatibility Spicetify Player API, WebGL2, CSS Variables
  */
-export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
+export class MusicBeatSynchronizer extends UnifiedSystemBase {
   // =========================================================================
-  // ORGANIC CONSCIOUSNESS STATE
+  // MUSIC SYNCHRONIZATION STATE MANAGEMENT
   // =========================================================================
   
-  // Core organic properties (current values)
-  private organicIntensity: number = 0;
-  private cellularGrowth: number = 1;
-  private breathingPhase: number = 0;
-  private emotionalTemperature: number = 4000; // 1000K-20000K range
-  private membraneFluidityLevel: number = 0.5;
+  // Current synchronization state (real-time values)
+  private musicIntensity: number = 0;          // 0-1 current music intensity
+  private scaleMultiplier: number = 1;         // Visual scale factor (1.0 = baseline)
+  private animationPhase: number = 0;          // Animation phase in radians (0-2π)
+  private colorTemperature: number = 4000;     // Color temperature 1000K-20000K
+  private transitionFluidityLevel: number = 0.5; // Transition smoothness 0-1
   
-  // Target values for smooth LERP interpolation
-  private targetOrganicIntensity: number = 0;
-  private targetCellularGrowth: number = 1;
-  private targetEmotionalTemperature: number = 4000;
-  private targetMembraneFluidityLevel: number = 0.5;
+  // Target values for smooth LERP interpolation (destination states)
+  private targetMusicIntensity: number = 0;      // Target intensity for smooth transitions
+  private targetScaleMultiplier: number = 1;     // Target scale for visual effects
+  private targetColorTemperature: number = 4000; // Target temperature for color shifts
+  private targetTransitionFluidityLevel: number = 0.5; // Target fluidity level
   
-  // LERP smoothing half-life values (in seconds)
+  // LERP smoothing configuration (framerate-independent timing)
   private lerpHalfLifeValues = {
-    intensityAttack: 0.05,    // Fast attack for beat response
-    intensityDecay: 0.15,     // Smooth decay
-    cellularGrowth: 0.08,     // Organic cellular response  
-    emotionalTemperature: 0.3, // Gradual temperature shifts
-    membraneFluidty: 0.12     // Fluid membrane transitions
+    intensityAttack: 0.05,    // Fast attack for immediate beat response (50ms)
+    intensityDecay: 0.15,     // Smooth decay for natural feel (150ms)
+    scaleMultiplier: 0.08,    // Visual scaling response timing (80ms)
+    colorTemperature: 0.3,    // Gradual temperature shifts (300ms)
+    transitionFluidity: 0.12  // Fluid transition timing (120ms)
   };
   
-  // Timing and rhythm
-  private lastBeatTime: number = 0;
-  private currentBPM: number = 120;
-  private breathingCycleDuration: number = 2000; // 2 seconds default
+  // Timing and rhythm tracking
+  private lastBeatTime: number = 0;              // Timestamp of last detected beat
+  private currentBPM: number = 120;              // Current beats per minute (60-200 range)
+  private animationCycleDuration: number = 2000; // Animation cycle length in milliseconds
   
-  // Removed: Breathing integration (breathing animations completely removed)
+  // Music synchronization service integration
   
-  // Musical consciousness integration
-  private musicSyncService: MusicSyncService | null = null;
-  private currentMusicalContext: MusicalContext | null = null;
-  private lastBeatPhaseUpdate: number = 0;
+  // External service integration for music analysis
+  private musicSyncService: MusicSyncService | null = null;  // Spicetify audio analysis service
+  private currentMusicalContext: MusicalContext | null = null; // Current musical analysis context
+  private lastBeatPhaseUpdate: number = 0;                    // Last context update timestamp
   
-  // Performance metrics
+  // Real-time performance monitoring
   private performanceMetrics = {
-    organicUpdates: 0,
-    cellularGrowthEvents: 0,
-    breathingCycles: 0,
-    emotionalShifts: 0,
-    averageFrameTime: 0,
-    memoryUsage: 0
+    syncUpdates: 0,          // Total synchronization updates processed
+    scaleEvents: 0,          // Number of visual scaling events
+    animationCycles: 0,      // Completed animation cycles
+    emotionalShifts: 0,      // Color temperature changes
+    averageFrameTime: 0,     // Rolling average frame processing time (ms)
+    memoryUsage: 0           // Current memory usage (bytes)
   };
   
-  // Organic consciousness configuration
-  private organicConfig = {
-    cellularResponseSensitivity: 0.7,
-    breathingRhythmIntensity: 0.8,
-    emotionalTemperatureRange: { min: 1000, max: 20000 },
-    membraneFluidityEnabled: true,
-    atmosphericParticlesEnabled: true,
-    cinematicEffectsEnabled: true
+  // System configuration for music synchronization
+  private syncConfig = {
+    responseSensitivity: 0.7,                        // Beat detection sensitivity (0-1)
+    animationIntensity: 0.8,                         // Maximum animation effect strength
+    colorTemperatureRange: { min: 1000, max: 20000 }, // Valid temperature range in Kelvin
+    transitionFluidityEnabled: true,                 // Enable smooth transitions
+    visualParticlesEnabled: true,                    // Enable particle effects
+    cinematicEffectsEnabled: true                    // Enable cinematic visual effects
   };
   
   constructor(config?: Year3000Config) {
     super(config);
     
     if (this.config.enableDebug) {
-      console.log('[OrganicBeatSyncConsciousness] 🌊 Organic consciousness awakening...');
+      console.log('[MusicBeatSynchronizer] 🎵 Music beat synchronizer initializing...');
     }
   }
   
   /**
-   * Inject MusicSyncService for musical consciousness integration
+   * Inject MusicSyncService for real-time audio analysis integration
+   * 
+   * @param musicSyncService - Spicetify-based music analysis service
+   * @public External dependency injection for music data
    */
   public setMusicSyncService(musicSyncService: MusicSyncService): void {
     this.musicSyncService = musicSyncService;
     if (this.config.enableDebug) {
-      console.log('[OrganicBeatSyncConsciousness] 🎵 Musical consciousness integration activated');
+      console.log('[MusicBeatSynchronizer] 🎵 Music synchronization service activated');
     }
   }
   
   // =========================================================================
-  // UNIFIED SYSTEM LIFECYCLE
+  // SYSTEM LIFECYCLE MANAGEMENT (IManagedSystem Interface)
   // =========================================================================
   
   /**
-   * Initialize organic consciousness system
+   * Handle detected music beat events from audio analysis
+   * 
+   * @param payload - Beat detection data from MusicSyncService
+   * @param payload.intensity - Beat intensity level (0-1)
+   * @param payload.bpm - Beats per minute (60-200 typical range)
+   * @param payload.energy - Music energy level (0-1)
+   * @param payload.timestamp - Beat detection timestamp
+   * @private Core music synchronization event handler
+   */
+  private onBeatDetected(payload: any): void {
+    const { intensity, bpm, energy, timestamp } = payload;
+    
+    // Update timing tracking
+    this.lastBeatTime = timestamp || Date.now();
+    this.currentBPM = bpm || this.currentBPM;
+    
+    // Set target music intensity with sensitivity scaling
+    this.targetMusicIntensity = Math.min(1, intensity * this.syncConfig.responseSensitivity);
+    
+    // Calculate visual scaling based on energy (baseline 1.0, max 1.3)
+    this.targetScaleMultiplier = 1 + ((energy || 0.5) * 0.3);
+    
+    this.performanceMetrics.scaleEvents++;
+    
+    if (this.config.enableDebug) {
+      console.log(`[MusicBeatSynchronizer] 🎵 Beat detected: intensity=${intensity}, energy=${energy}, bpm=${bpm}`);
+    }
+  }
+
+  /**
+   * Handle music energy level changes from audio analysis
+   * 
+   * @param payload - Energy analysis data
+   * @param payload.energy - Music energy level (0-1, low to high intensity)
+   * @param payload.valence - Musical valence (0-1, negative to positive emotion)
+   * @private Updates visual scaling and transition fluidity based on energy
+   */
+  private onEnergyChanged(payload: any): void {
+    const { energy, valence } = payload;
+    
+    // Update visual scaling based on energy intensity
+    this.targetScaleMultiplier = 1 + (energy * 0.3); // Baseline 1.0, energetic 1.3
+    
+    // Adjust transition fluidity based on musical valence
+    this.targetTransitionFluidityLevel = 0.3 + (valence * 0.4); // Range 0.3-0.7
+    
+    if (this.config.enableDebug) {
+      console.log(`[MusicBeatSynchronizer] ⚡ Energy change: energy=${energy}, valence=${valence}`);
+    }
+  }
+
+  /**
+   * Handle detected music emotion changes for color temperature mapping
+   * 
+   * @param payload - Emotional analysis data
+   * @param payload.valence - Emotional valence (-1 to 1, negative to positive)
+   * @param payload.energy - Music energy level (0-1, calm to intense)
+   * @private Maps musical emotion to color temperature for visual feedback
+   */
+  private onEmotionDetected(payload: any): void {
+    const { valence, energy } = payload;
+    
+    // Calculate target color temperature using emotional mapping
+    const baseTemp = 4000;                              // Neutral white temperature
+    const energyModulation = (energy - 0.5) * 8000;     // Energy affects warmth (-4000 to +4000K)
+    const valenceModulation = (valence - 0.5) * 6000;   // Valence affects tint (-3000 to +3000K)
+    
+    // Clamp result to valid color temperature range
+    this.targetColorTemperature = Math.max(1000, Math.min(20000, 
+      baseTemp + energyModulation + valenceModulation
+    ));
+    
+    this.performanceMetrics.emotionalShifts++;
+    
+    if (this.config.enableDebug) {
+      console.log(`[MusicBeatSynchronizer] 🌈 Emotion detected: ${this.colorTemperature}K temperature`);
+    }
+  }
+
+  /**
+   * Handle music tempo changes for animation timing synchronization
+   * 
+   * @param payload - Tempo analysis data
+   * @param payload.bpm - Base beats per minute detection
+   * @param payload.tempo - Tempo classification string
+   * @param payload.enhancedBPM - Enhanced BPM with improved accuracy
+   * @private Synchronizes animation cycles with musical tempo
+   */
+  private onTempoChanged(payload: any): void {
+    const { bpm, tempo, enhancedBPM } = payload;
+    
+    // Use most accurate BPM value available
+    this.currentBPM = enhancedBPM || bpm || tempo || 120;
+    
+    // Calculate animation cycle duration based on musical tempo
+    // Normalize around 120 BPM baseline, clamp to reasonable range
+    const bpmFactor = Math.max(0.3, Math.min(3.0, this.currentBPM / 120));
+    this.animationCycleDuration = 2000 / bpmFactor; // 667ms-6.67s range
+    
+    if (this.config.enableDebug) {
+      console.log(`[MusicBeatSynchronizer] 🎶 Tempo changed: ${this.currentBPM} BPM, ${this.animationCycleDuration.toFixed(0)}ms cycle`);
+    }
+  }
+
+  /**
+   * Initialize the music beat synchronizer system
+   * 
+   * Sets up event subscriptions, CSS variable groups, and animation coordination
+   * for real-time music-visual synchronization.
+   * 
+   * @returns Promise<void> Resolves when initialization is complete
+   * @throws Error if system fails to initialize properly
+   * @public IManagedSystem lifecycle method
    */
   async initialize(): Promise<void> {
     if (this.config.enableDebug) {
-      console.log('[OrganicBeatSyncConsciousness] 🧬 Initializing organic consciousness...');
+      console.log('[MusicBeatSynchronizer] 🎵 Initializing music synchronization system...');
     }
     
     // Register CSS variable groups with appropriate priorities
-    this.registerCSSVariableGroup('organic-core', 'critical');
-    this.registerCSSVariableGroup('cellular-growth', 'high');
+    this.registerCSSVariableGroup('music-sync-core', 'critical');
+    this.registerCSSVariableGroup('visual-scaling', 'high');
     // Removed: Breathing rhythm CSS variable group (breathing animations completely removed)
-    this.registerCSSVariableGroup('emotional-temperature', 'normal');
-    this.registerCSSVariableGroup('membrane-fluidity', 'normal');
+    this.registerCSSVariableGroup('color-temperature', 'normal');
+    this.registerCSSVariableGroup('transition-fluidity', 'normal');
     
-    // Breathing controller will be injected by facade pattern
+    // Initialize music synchronization state
+    this.musicIntensity = 0;
+    this.scaleMultiplier = 1;
+    this.animationPhase = 0;
+    this.colorTemperature = 4000;
+    this.transitionFluidityLevel = 0.5;
     
-    // Subscribe to music consciousness events
-    this.subscribeToEvent('music:beat', (payload: any) => this.onBeatConsciousness(payload));
-    this.subscribeToEvent('music:energy', (payload: any) => this.onEnergyConsciousness(payload));
-    this.subscribeToEvent('music:emotion', (payload: any) => this.onEmotionalConsciousness(payload));
-    this.subscribeToEvent('music:bpm-change', (payload: any) => this.onTempoConsciousness(payload));
+    // Subscribe to music synchronization events
+    this.subscribeToEvent('music:beat', (payload: any) => this.onBeatDetected(payload));
+    this.subscribeToEvent('music:energy', (payload: any) => this.onEnergyChanged(payload));
+    this.subscribeToEvent('music:emotion', (payload: any) => this.onEmotionDetected(payload));
+    this.subscribeToEvent('music:bpm-change', (payload: any) => this.onTempoChanged(payload));
     
-    // Register with animation coordinator (critical priority for organic consciousness)
+    // Register with animation coordinator (critical priority for music sync)
     this.registerAnimation(60); // 60fps target
     
     if (this.config.enableDebug) {
-      console.log('[OrganicBeatSyncConsciousness] 🌟 Organic consciousness fully awakened');
+      console.log('[MusicBeatSynchronizer] 🌟 Music synchronization system ready');
     }
   }
   
   /**
-   * Clean up organic consciousness
+   * Clean up and shut down the music beat synchronizer system
+   * 
+   * Resets all synchronization state to baseline values and performs cleanup.
+   * Called during system shutdown or when switching themes.
+   * 
+   * @public IManagedSystem lifecycle method
    */
   destroy(): void {
     if (this.config.enableDebug) {
-      console.log('[OrganicBeatSyncConsciousness] 🍃 Dissolving organic consciousness...');
+      console.log('[MusicBeatSynchronizer] 🍃 Shutting down music synchronizer...');
     }
     
-    // Breathing controller cleanup handled by facade pattern
+    // Music synchronization cleanup
     
-    // Reset consciousness state
-    this.organicIntensity = 0;
-    this.cellularGrowth = 1;
-    this.breathingPhase = 0;
-    this.emotionalTemperature = 4000;
+    // Reset synchronization state
+    this.musicIntensity = 0;
+    this.scaleMultiplier = 1;
+    this.animationPhase = 0;
+    this.colorTemperature = 4000;
+    this.transitionFluidityLevel = 0.5;
     
     if (this.config.enableDebug) {
-      console.log('[OrganicBeatSyncConsciousness] 🌌 Organic consciousness peacefully dissolved');
+      console.log('[MusicBeatSynchronizer] 🌌 Music synchronizer cleanly shut down');
     }
   }
   
   /**
-   * Organic consciousness animation frame
+   * Process music synchronization for current animation frame
+   * 
+   * Called by the master animation coordinator at 60fps. Updates all music-synchronized
+   * visual properties using LERP interpolation for smooth transitions.
+   * 
+   * @param deltaTime - Time elapsed since last frame in milliseconds
+   * @public IManagedSystem animation interface
    */
   onAnimate(deltaTime: number): void {
     const startTime = performance.now();
     
-    // Update musical consciousness context
+    // Update musical context
     this.updateMusicalContext();
     
-    // Update organic consciousness state with musical awareness
-    this.updateOrganicConsciousness(deltaTime);
+    // Update music synchronization state
+    this.updateMusicSyncState(deltaTime);
     
-    // Process cellular growth
-    this.processCellularGrowth(deltaTime);
+    // Process visual scaling
+    this.processVisualScaling(deltaTime);
     
-    // Update emotional temperature
-    this.updateEmotionalTemperature(deltaTime);
+    // Update color temperature
+    this.updateColorTemperature(deltaTime);
     
-    // Animate membrane fluidity
-    this.animateMembraneFluidty(deltaTime);
+    // Animate transition fluidity
+    this.animateTransitionFluidity(deltaTime);
     
-    // Removed: Breathing events emission (breathing animations completely removed)
-    
-    // Apply organic CSS variables
-    this.applyOrganicCSSVariables();
+    // Apply music sync CSS variables
+    this.applyMusicSyncCSSVariables();
     
     // Track performance
     const frameTime = performance.now() - startTime;
     this.performanceMetrics.averageFrameTime = 
       (this.performanceMetrics.averageFrameTime * 0.9) + (frameTime * 0.1);
-    this.performanceMetrics.organicUpdates++;
+    this.performanceMetrics.syncUpdates++;
     
-    // Performance warning for organic consciousness
+    // Performance warning for music synchronization
     if (frameTime > 2.0 && this.config.enableDebug) {
-      console.warn(`[OrganicBeatSyncConsciousness] 🐌 Organic consciousness frame took ${frameTime.toFixed(2)}ms (target: <2ms)`);
+      console.warn(`[MusicBeatSynchronizer] 🐌 Music sync frame took ${frameTime.toFixed(2)}ms (target: <2ms)`);
     }
   }
   
   /**
-   * Health check for organic consciousness
+   * Perform system health check for music synchronization
+   * 
+   * Validates EventBus connectivity, performance metrics, synchronization activity,
+   * and color temperature ranges for system health monitoring.
+   * 
+   * @returns Promise<HealthCheckResult> System health status and diagnostic details
+   * @public IManagedSystem monitoring interface
    */
   async healthCheck(): Promise<HealthCheckResult> {
     const issues: string[] = [];
     
-    // Check EventBus connection for breathing coordination
+    // Check EventBus connection for music coordination
     if (!this.eventBus) {
-      issues.push('EventBus not connected for breathing coordination');
+      issues.push('EventBus not connected for music coordination');
     }
     
     // Check performance health
@@ -211,109 +347,31 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
       issues.push(`Average frame time ${this.performanceMetrics.averageFrameTime.toFixed(2)}ms exceeds 2ms target`);
     }
     
-    // Check consciousness activity
-    if (this.organicIntensity === 0 && (Date.now() - this.lastBeatTime) > 10000) {
-      issues.push('No organic consciousness activity detected in last 10 seconds');
+    // Check music synchronization activity
+    if (this.musicIntensity === 0 && (Date.now() - this.lastBeatTime) > 10000) {
+      issues.push('No music synchronization activity detected in last 10 seconds');
     }
     
-    // Check emotional temperature range
-    if (this.emotionalTemperature < 1000 || this.emotionalTemperature > 20000) {
-      issues.push(`Emotional temperature ${this.emotionalTemperature}K outside 1000K-20000K range`);
+    // Check color temperature range
+    if (this.colorTemperature < 1000 || this.colorTemperature > 20000) {
+      issues.push(`Color temperature ${this.colorTemperature}K outside 1000K-20000K range`);
     }
     
     return {
       healthy: issues.length === 0,
       ok: issues.length === 0,
-      details: `Organic consciousness health: ${issues.length === 0 ? 'thriving' : 'needs attention'}`,
+      details: `Music synchronization health: ${issues.length === 0 ? 'optimal' : 'needs attention'}`,
       issues: issues,
-      system: 'OrganicBeatSyncConsciousness'
+      system: 'MusicBeatSynchronizer'
     };
   }
   
   // =========================================================================
-  // ORGANIC CONSCIOUSNESS BEHAVIORS
+  // MUSIC SYNCHRONIZATION BEHAVIORS (LEGACY METHODS - TO BE REMOVED)
   // =========================================================================
   
-  /**
-   * Handle beat consciousness - organic response to music beats
-   */
-  private onBeatConsciousness(payload: any): void {
-    const { intensity, bpm, energy, timestamp } = payload;
-    
-    this.lastBeatTime = timestamp || Date.now();
-    this.currentBPM = bpm || this.currentBPM;
-    
-    // Set target organic intensity for smooth LERP interpolation
-    this.targetOrganicIntensity = Math.min(1, intensity * this.organicConfig.cellularResponseSensitivity);
-    
-    // Set target cellular growth based on energy
-    this.targetCellularGrowth = 1 + ((energy || 0.5) * 0.3); // 1.0 to 1.3 scale
-    
-    // Removed: Breathing rhythm synchronization (breathing animations completely removed)
-    
-    this.performanceMetrics.cellularGrowthEvents++;
-    
-    if (this.config.enableDebug) {
-      console.log(`[OrganicBeatSyncConsciousness] 🎵 Beat consciousness: intensity=${intensity}, energy=${energy}, bpm=${bpm}`);
-    }
-  }
-  
-  /**
-   * Handle energy consciousness - organic response to music energy
-   */
-  private onEnergyConsciousness(payload: any): void {
-    const { energy, valence } = payload;
-    
-    // Set target cellular growth based on energy
-    this.targetCellularGrowth = 1 + (energy * 0.3); // 1.0 to 1.3 scale
-    
-    // Set target membrane fluidity based on valence  
-    this.targetMembraneFluidityLevel = 0.3 + (valence * 0.4); // 0.3 to 0.7 range
-    
-    if (this.config.enableDebug) {
-      console.log(`[OrganicBeatSyncConsciousness] ⚡ Energy consciousness: energy=${energy}, valence=${valence}`);
-    }
-  }
-  
-  /**
-   * Handle emotional consciousness - organic response to music emotion
-   */
-  private onEmotionalConsciousness(payload: any): void {
-    const { valence, energy } = payload;
-    
-    // Calculate emotional temperature (1000K-20000K)
-    const baseTemp = 4000; // Neutral temperature
-    const energyModulation = (energy - 0.5) * 8000; // -4000 to +4000
-    const valenceModulation = (valence - 0.5) * 6000; // -3000 to +3000
-    
-    this.targetEmotionalTemperature = Math.max(1000, Math.min(20000, 
-      baseTemp + energyModulation + valenceModulation
-    ));
-    
-    this.performanceMetrics.emotionalShifts++;
-    
-    if (this.config.enableDebug) {
-      console.log(`[OrganicBeatSyncConsciousness] 🌈 Emotional consciousness: ${this.emotionalTemperature}K temperature`);
-    }
-  }
-  
-  /**
-   * Handle tempo consciousness - organic response to BPM changes
-   */
-  private onTempoConsciousness(payload: any): void {
-    const { bpm, tempo, enhancedBPM } = payload;
-    
-    this.currentBPM = enhancedBPM || bpm || tempo || 120;
-    
-    // Adjust breathing cycle duration based on BPM
-    // Slow music = longer breathing cycles, fast music = shorter cycles
-    const bpmFactor = Math.max(0.3, Math.min(3.0, this.currentBPM / 120));
-    this.breathingCycleDuration = 2000 / bpmFactor; // 667ms to 6.67s range
-    
-    if (this.config.enableDebug) {
-      console.log(`[OrganicBeatSyncConsciousness] 🎶 Tempo consciousness: ${this.currentBPM} BPM, ${this.breathingCycleDuration.toFixed(0)}ms breathing cycle`);
-    }
-  }
+  // NOTE: These methods are now handled by the main event handlers above
+  // They remain for compatibility but should be phased out
   
   // =========================================================================
   // REMOVED: BREATHING INTEGRATION METHODS
@@ -325,33 +383,33 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
   // =========================================================================
   
   /**
-   * Update organic consciousness state using framerate-independent LERP smoothing
+   * Update music synchronization state using framerate-independent LERP smoothing
    */
-  private updateOrganicConsciousness(deltaTime: number): void {
-    // Update breathing phase (keep existing - this is natural oscillation)
-    this.breathingPhase += (deltaTime / this.breathingCycleDuration) * 2 * Math.PI;
-    if (this.breathingPhase > 2 * Math.PI) {
-      this.breathingPhase -= 2 * Math.PI;
+  private updateMusicSyncState(deltaTime: number): void {
+    // Update animation phase (continuous oscillation)
+    this.animationPhase += (deltaTime / this.animationCycleDuration) * 2 * Math.PI;
+    if (this.animationPhase > 2 * Math.PI) {
+      this.animationPhase -= 2 * Math.PI;
     }
     
-    // Smooth organic intensity using LERP with attack/decay
+    // Smooth music intensity using LERP with attack/decay
     const deltaTimeSeconds = deltaTime / 1000;
-    const halfLife = this.targetOrganicIntensity > this.organicIntensity 
+    const halfLife = this.targetMusicIntensity > this.musicIntensity 
       ? this.lerpHalfLifeValues.intensityAttack  // Fast attack
       : this.lerpHalfLifeValues.intensityDecay;  // Smooth decay
       
-    this.organicIntensity = Year3000Utilities.lerpSmooth(
-      this.organicIntensity,
-      this.targetOrganicIntensity,
+    this.musicIntensity = Year3000Utilities.lerpSmooth(
+      this.musicIntensity,
+      this.targetMusicIntensity,
       deltaTimeSeconds,
       halfLife
     );
     
-    // Auto-decay target when no recent beats (organic decay)
+    // Auto-decay target when no recent beats (natural decay)
     const timeSinceLastBeat = Date.now() - this.lastBeatTime;
     if (timeSinceLastBeat > 2000) { // 2 seconds
-      this.targetOrganicIntensity = Year3000Utilities.lerpSmooth(
-        this.targetOrganicIntensity,
+      this.targetMusicIntensity = Year3000Utilities.lerpSmooth(
+        this.targetMusicIntensity,
         0, // Decay to zero
         deltaTimeSeconds,
         this.lerpHalfLifeValues.intensityDecay
@@ -360,103 +418,99 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
   }
   
   /**
-   * Process cellular growth using framerate-independent LERP smoothing
+   * Process visual scaling using framerate-independent LERP smoothing
    */
-  private processCellularGrowth(deltaTime: number): void {
+  private processVisualScaling(deltaTime: number): void {
     const deltaTimeSeconds = deltaTime / 1000;
     
-    // Smooth cellular growth towards target
-    this.cellularGrowth = Year3000Utilities.lerpSmooth(
-      this.cellularGrowth,
-      this.targetCellularGrowth,
+    // Smooth scale multiplier towards target
+    this.scaleMultiplier = Year3000Utilities.lerpSmooth(
+      this.scaleMultiplier,
+      this.targetScaleMultiplier,
       deltaTimeSeconds,
-      this.lerpHalfLifeValues.cellularGrowth
+      this.lerpHalfLifeValues.scaleMultiplier
     );
     
-    // Auto-decay target cellular growth to baseline over time
-    this.targetCellularGrowth = Year3000Utilities.lerpSmooth(
-      this.targetCellularGrowth,
-      1.0, // Baseline growth
+    // Auto-decay target scale multiplier to baseline over time
+    this.targetScaleMultiplier = Year3000Utilities.lerpSmooth(
+      this.targetScaleMultiplier,
+      1.0, // Baseline scale
       deltaTimeSeconds,
-      this.lerpHalfLifeValues.cellularGrowth * 2 // Slower decay
+      this.lerpHalfLifeValues.scaleMultiplier * 2 // Slower decay
     );
   }
   
   
   /**
-   * Update emotional temperature using framerate-independent LERP smoothing
+   * Update color temperature using framerate-independent LERP smoothing
    */
-  private updateEmotionalTemperature(deltaTime: number): void {
+  private updateColorTemperature(deltaTime: number): void {
     const deltaTimeSeconds = deltaTime / 1000;
     
-    // Smooth emotional temperature towards target
-    this.emotionalTemperature = Year3000Utilities.lerpSmooth(
-      this.emotionalTemperature,
-      this.targetEmotionalTemperature,
+    // Smooth color temperature towards target
+    this.colorTemperature = Year3000Utilities.lerpSmooth(
+      this.colorTemperature,
+      this.targetColorTemperature,
       deltaTimeSeconds,
-      this.lerpHalfLifeValues.emotionalTemperature
+      this.lerpHalfLifeValues.colorTemperature
     );
     
     // Auto-decay target temperature toward neutral over time
     const neutral = 4000;
-    this.targetEmotionalTemperature = Year3000Utilities.lerpSmooth(
-      this.targetEmotionalTemperature,
+    this.targetColorTemperature = Year3000Utilities.lerpSmooth(
+      this.targetColorTemperature,
       neutral,
       deltaTimeSeconds,
-      this.lerpHalfLifeValues.emotionalTemperature * 3 // Slower neutral decay
+      this.lerpHalfLifeValues.colorTemperature * 3 // Slower neutral decay
     );
   }
   
   /**
-   * Animate membrane fluidity using framerate-independent LERP smoothing
+   * Animate transition fluidity using framerate-independent LERP smoothing
    */
-  private animateMembraneFluidty(deltaTime: number): void {
-    if (!this.organicConfig.membraneFluidityEnabled) return;
+  private animateTransitionFluidity(deltaTime: number): void {
+    if (!this.syncConfig.transitionFluidityEnabled) return;
     
     const deltaTimeSeconds = deltaTime / 1000;
     
-    // Smooth membrane fluidity towards target
-    this.membraneFluidityLevel = Year3000Utilities.lerpSmooth(
-      this.membraneFluidityLevel,
-      this.targetMembraneFluidityLevel,
+    // Smooth transition fluidity towards target
+    this.transitionFluidityLevel = Year3000Utilities.lerpSmooth(
+      this.transitionFluidityLevel,
+      this.targetTransitionFluidityLevel,
       deltaTimeSeconds,
-      this.lerpHalfLifeValues.membraneFluidty
+      this.lerpHalfLifeValues.transitionFluidity
     );
     
-    // Removed: breathing wave calculation (breathing animations completely disabled)
-    
-    // Membrane fluidity now handled through CSS variables only
+    // Transition fluidity now handled through CSS variables only
   }
   
   /**
-   * Apply organic CSS variables
+   * Apply music sync CSS variables
    */
-  private applyOrganicCSSVariables(): void {
-    // Core organic consciousness variables
-    this.updateCSSVariableGroup('organic-core', {
-      '--organic-intensity': this.organicIntensity.toFixed(3),
-      '--organic-bpm': this.currentBPM.toString(),
-      '--organic-breathing-phase': this.breathingPhase.toFixed(4),
+  private applyMusicSyncCSSVariables(): void {
+    // Core music synchronization variables
+    this.updateCSSVariableGroup('music-sync-core', {
+      '--sn-music-intensity': this.musicIntensity.toFixed(3),
+      '--sn-music-bpm': this.currentBPM.toString(),
+      '--sn-music-animation-phase': this.animationPhase.toFixed(4),
     });
     
-    // Cellular growth variables
-    this.updateCSSVariableGroup('cellular-growth', {
-      '--cellular-growth-scale': this.cellularGrowth.toFixed(3),
-      '--cellular-response-sensitivity': this.organicConfig.cellularResponseSensitivity.toFixed(2),
+    // Visual scaling variables
+    this.updateCSSVariableGroup('visual-scaling', {
+      '--sn-visual-scale': this.scaleMultiplier.toFixed(3),
+      '--sn-visual-response-sensitivity': this.syncConfig.responseSensitivity.toFixed(2),
     });
     
-    // Removed: Breathing rhythm variables (breathing animations completely removed)
-    
-    // Emotional temperature variables
-    this.updateCSSVariableGroup('emotional-temperature', {
-      '--emotional-temperature': `${this.emotionalTemperature.toFixed(0)}K`,
-      '--emotional-temperature-normalized': ((this.emotionalTemperature - 1000) / 19000).toFixed(3),
+    // Color temperature variables
+    this.updateCSSVariableGroup('color-temperature', {
+      '--sn-color-temperature': `${this.colorTemperature.toFixed(0)}K`,
+      '--sn-color-temperature-normalized': ((this.colorTemperature - 1000) / 19000).toFixed(3),
     });
     
-    // Membrane fluidity variables
-    this.updateCSSVariableGroup('membrane-fluidity', {
-      '--membrane-fluidity-level': this.membraneFluidityLevel.toFixed(3),
-      '--membrane-fluidity-enabled': this.organicConfig.membraneFluidityEnabled ? '1' : '0',
+    // Transition fluidity variables
+    this.updateCSSVariableGroup('transition-fluidity', {
+      '--sn-transition-fluidity': this.transitionFluidityLevel.toFixed(3),
+      '--sn-transition-fluidity-enabled': this.syncConfig.transitionFluidityEnabled ? '1' : '0',
     });
   }
   
@@ -470,72 +524,72 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
   // =========================================================================
   
   /**
-   * Get organic consciousness metrics
+   * Get music synchronization metrics
    */
-  public getOrganicMetrics(): typeof this.performanceMetrics {
+  public getMusicSyncMetrics(): typeof this.performanceMetrics {
     return { ...this.performanceMetrics };
   }
   
   /**
-   * Update organic consciousness configuration
+   * Update music synchronization configuration
    */
-  public updateOrganicConfig(config: Partial<typeof this.organicConfig>): void {
-    this.organicConfig = { ...this.organicConfig, ...config };
+  public updateSyncConfig(config: Partial<typeof this.syncConfig>): void {
+    this.syncConfig = { ...this.syncConfig, ...config };
     
     if (this.config.enableDebug) {
-      console.log('[OrganicBeatSyncConsciousness] 🔧 Organic configuration updated:', this.organicConfig);
+      console.log('[MusicBeatSynchronizer] 🔧 Sync configuration updated:', this.syncConfig);
     }
   }
   
   /**
-   * Get current organic consciousness state
+   * Get current music synchronization state
    */
-  public getOrganicState(): {
-    organicIntensity: number;
-    cellularGrowth: number;
-    breathingPhase: number;
-    emotionalTemperature: number;
-    membraneFluidityLevel: number;
+  public getMusicSyncState(): {
+    musicIntensity: number;
+    scaleMultiplier: number;
+    animationPhase: number;
+    colorTemperature: number;
+    transitionFluidityLevel: number;
     lastBeatTime: number;
     currentBPM: number;
   } {
     return {
-      organicIntensity: this.organicIntensity,
-      cellularGrowth: this.cellularGrowth,
-      breathingPhase: this.breathingPhase,
-      emotionalTemperature: this.emotionalTemperature,
-      membraneFluidityLevel: this.membraneFluidityLevel,
+      musicIntensity: this.musicIntensity,
+      scaleMultiplier: this.scaleMultiplier,
+      animationPhase: this.animationPhase,
+      colorTemperature: this.colorTemperature,
+      transitionFluidityLevel: this.transitionFluidityLevel,
       lastBeatTime: this.lastBeatTime,
       currentBPM: this.currentBPM,
     };
   }
   
   /**
-   * Force organic consciousness repaint
+   * Force music synchronization repaint
    */
   public override forceRepaint(reason?: string): void {
     super.forceRepaint(reason);
     
-    // Reset organic consciousness state
-    this.organicIntensity = 0;
-    this.cellularGrowth = 1;
-    this.breathingPhase = 0;
+    // Reset music synchronization state
+    this.musicIntensity = 0;
+    this.scaleMultiplier = 1;
+    this.animationPhase = 0;
     
-    // Force organic CSS update
-    this.applyOrganicCSSVariables();
+    // Force music sync CSS update
+    this.applyMusicSyncCSSVariables();
     
     if (this.config.enableDebug) {
-      console.log(`[OrganicBeatSyncConsciousness] 🔄 Organic consciousness repaint: ${reason}`);
+      console.log(`[MusicBeatSynchronizer] 🔄 Music synchronization repaint: ${reason}`);
     }
   }
   
   
   // =========================================================================
-  // MUSICAL CONSCIOUSNESS INTEGRATION
+  // MUSICAL CONTEXT INTEGRATION
   // =========================================================================
   
   /**
-   * Update musical consciousness context for music-aware LERP calculations
+   * Update musical context for music-aware LERP calculations
    */
   private updateMusicalContext(): void {
     if (!this.musicSyncService) {
@@ -557,7 +611,7 @@ export class OrganicBeatSyncConsciousness extends UnifiedSystemBase {
     
     if (this.config.enableDebug && this.currentMusicalContext) {
       const ctx = this.currentMusicalContext;
-      console.log(`[OrganicBeatSyncConsciousness] 🎵 Musical context: tempo=${ctx.tempo}, energy=${ctx.energy.toFixed(2)}, phase=${ctx.beatPhase}`);
+      console.log(`[MusicBeatSynchronizer] 🎵 Musical context: tempo=${ctx.tempo}, energy=${ctx.energy.toFixed(2)}, phase=${ctx.beatPhase}`);
     }
   }
 }

@@ -16,6 +16,7 @@ import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVari
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
+import type { HealthCheckResult } from "@/types/systems";
 import { BaseVisualSystem } from "../visual/base/BaseVisualSystem";
 
 // Local interfaces for this system
@@ -739,17 +740,26 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     this.animateFlowPatterns(deltaTime);
   }
 
-  public async healthCheck(): Promise<{ ok: boolean; details: string }> {
+  public override async healthCheck(): Promise<HealthCheckResult> {
     const isHealthy =
       this.flowSettings.enabled &&
       this.currentFlowVector.timestamp > 0 &&
       this.musicSyncService !== null;
 
     return {
-      ok: isHealthy,
-      details: isHealthy
-        ? "Gradient flow system operational"
-        : "Flow system inactive",
+      system: 'GradientDirectionalFlowSystem',
+      healthy: isHealthy,
+      metrics: {
+        enabled: this.flowSettings.enabled,
+        lastUpdateTime: this.currentFlowVector.timestamp,
+        musicSyncConnected: !!this.musicSyncService,
+        flowIntensity: this.currentFlowVector.intensity
+      },
+      issues: isHealthy ? [] : [
+        ...(this.flowSettings.enabled ? [] : ['System disabled']),
+        ...(this.currentFlowVector.timestamp > 0 ? [] : ['No flow updates']),
+        ...(this.musicSyncService ? [] : ['Music sync disconnected'])
+      ]
     };
   }
 

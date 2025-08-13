@@ -34,7 +34,62 @@ interface AnimationState {
   smoothingFactor: number;
 }
 
-export class SidebarConsciousnessSystem extends BaseVisualSystem {
+// === Visual Interaction System (simplified from complex flow physics) ===
+interface VisualInteractionState {
+  direction: 'horizontal' | 'vertical' | 'radial' | 'spiral';
+  intensity: number; // 0-1 scale
+  velocity: number; // pixels per second
+  smoothing: number; // animation smoothing factor (0-1)
+  effectPoints: EffectPoint[];
+}
+
+interface EffectPoint {
+  x: number;
+  y: number;
+  magnitude: number;
+  direction: number; // radians
+  influence: number; // 0-1 radius of influence
+}
+
+interface InteractionPattern {
+  id: string;
+  type: 'hover' | 'click' | 'focus' | 'proximity' | 'gesture';
+  response: VisualResponse;
+  duration: number; // milliseconds
+  easing: 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'smooth';
+  priority: number; // 0-10 for interaction priority
+}
+
+interface VisualResponse {
+  intensityChange: number; // -1 to 1
+  velocityChange: number; // -1 to 1
+  smoothingChange: number; // -1 to 1
+  visualEffects: VisualEffect[];
+  rippleEffect: boolean;
+  glowEffect: boolean;
+}
+
+interface VisualEffect {
+  center: { x: number; y: number };
+  radius: number;
+  strength: number; // 0-1
+  decay: number; // how fast it fades
+  type: 'wave' | 'spiral' | 'pulse' | 'vortex';
+}
+
+interface UserInteractionState {
+  globalIntensity: number;
+  dominantDirection: number; // radians
+  interactionCount: number;
+  lastInteractionTime: number;
+  proximityElements: Array<{
+    element: HTMLElement;
+    distance: number;
+    influence: number;
+  }>;
+}
+
+export class SidebarVisualEffectsSystem extends BaseVisualSystem {
   // TODO: Implement abstract onAnimate method for Year 3000 MasterAnimationCoordinator
   public override onAnimate(deltaMs: number): void {
     // Basic implementation - can be enhanced in future phases
@@ -45,9 +100,9 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
   private rootNavBar: HTMLElement | null = null;
   private overlayContainer: HTMLElement | null = null;
   private resizeObserver: ResizeObserver | null = null;
-  private consciousnessVisualizer: HTMLElement | null = null;
+  private visualEffectsElement: HTMLElement | null = null;
   private harmonicModeIndicator: HTMLElement | null = null;
-  public consciousnessAnimationFrame: number | null = null;
+  public visualEffectsAnimationFrame: number | null = null;
   private currentHarmonicModeClass: string;
   private currentEnergyClass: string;
   private currentHarmonicModeKey: string;
@@ -69,6 +124,32 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
   private echoTimerCounter: number = 0;
   /** Flag used to skip re-applying motion-disabled class when already set */
   private _lastMotionDisabled = false;
+
+  // === Visual Interaction System (simplified interaction detection) ===
+  private visualState: VisualInteractionState;
+  private interactionPatterns: Map<string, InteractionPattern> = new Map();
+  private userInteractionState: UserInteractionState;
+  private proximityObserver: IntersectionObserver | null = null;
+  private interactionElements: Map<string, HTMLElement> = new Map();
+  private activeEffects: VisualEffect[] = [];
+  
+  // Animation state tracking
+  private animationPhase = 0;
+  private localFrameCount = 0;
+  private musicBeatIntensity = 0;
+  private musicEnergyLevel = 0;
+  private cursorPosition = { x: 0, y: 0 };
+  private cursorVelocity = { x: 0, y: 0 };
+  private lastCursorUpdate = 0;
+  
+  // Performance parameters
+  private readonly MAX_EFFECT_POINTS = 50;
+  private readonly EFFECT_DECAY_RATE = 0.05;
+  private readonly PROXIMITY_THRESHOLD = 100; // pixels
+  private readonly INTERACTION_COOLDOWN = 16; // ms (~60fps)
+  private readonly ANIMATION_LERP = 0.08;
+  private readonly SMOOTHING_LERP = 0.12;
+  private readonly INTENSITY_LERP = 0.15;
 
   constructor(
     config: Year3000Config,
@@ -111,6 +192,33 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
       targetScale: 1.0,
       smoothingFactor: 0.15,
     };
+
+    // Initialize visual interaction system (simplified from complex flow physics)
+    this.visualState = {
+      direction: 'radial',
+      intensity: 0.3,
+      velocity: 50,
+      smoothing: 0.7,
+      effectPoints: []
+    };
+    
+    this.userInteractionState = {
+      globalIntensity: 0,
+      dominantDirection: 0,
+      interactionCount: 0,
+      lastInteractionTime: 0,
+      proximityElements: []
+    };
+    
+    // Initialize effect points for visual feedback
+    this.setupEffectPoints();
+    
+    // Initialize interaction patterns for user feedback
+    this.setupInteractionPatterns();
+
+    if (config.enableDebug) {
+      console.log(`[${this.systemName}] Enhanced with visual interaction system`);
+    }
   }
 
   private _detectCSSFilterSupport(): boolean {
@@ -145,7 +253,7 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
       return;
     }
     this._createOverlayContainer();
-    this._createConsciousnessVisualizer();
+    this._createVisualEffectsElement();
     this.createHarmonicModeDisplay();
     this.updateColors();
 
@@ -208,7 +316,7 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     ) {
       try {
         (this.year3000System as any).registerAnimationSystem(
-          "SidebarConsciousnessSystem",
+          "SidebarVisualEffectsSystem",
           this,
           "background",
           this.deviceCapabilities.performanceLevel === "high" ? 30 : 15
@@ -216,25 +324,26 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
         this.masterAnimationRegistered = true;
         this.isUsingMasterAnimation = true;
       } catch (error) {
-        this._startFallbackConsciousnessLoop();
+        this._startFallbackVisualEffectsLoop();
       }
     } else {
-      this._startFallbackConsciousnessLoop();
+      this._startFallbackVisualEffectsLoop();
     }
   }
 
-  private _startFallbackConsciousnessLoop() {
+  private _startFallbackVisualEffectsLoop() {
     this.isUsingMasterAnimation = false;
-    this.startConsciousnessLoop();
+    this.startVisualEffectsLoop();
   }
 
-  public override updateAnimation(timestamp: number, deltaTime: number) {
+  public override updateAnimation(deltaTime: number) {
     if (
       this.deviceCapabilities.reducedMotion ||
-      !this.consciousnessVisualizer ||
+      !this.visualEffectsElement ||
       !this.rootNavBar
     )
       return;
+    const timestamp = performance.now();
     const time = timestamp * 0.001;
     const pulse = Math.sin(time * 2) * 0.1 + 0.9;
     this.animationState.targetScale = pulse;
@@ -242,7 +351,7 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
       (this.animationState.targetScale - this.animationState.currentScale) *
       this.animationState.smoothingFactor;
 
-    this.consciousnessVisualizer.style.transform = `translateX(-50%) scale(${this.animationState.currentScale.toFixed(
+    this.visualEffectsElement.style.transform = `translateX(-50%) scale(${this.animationState.currentScale.toFixed(
       3
     )})`;
 
@@ -267,11 +376,11 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     }
   }
 
-  private _createConsciousnessVisualizer() {
+  private _createVisualEffectsElement() {
     if (!this.overlayContainer) return;
-    this.consciousnessVisualizer = document.createElement("div");
-    this.consciousnessVisualizer.className = "sidebar-consciousness-visualizer";
-    this.overlayContainer.appendChild(this.consciousnessVisualizer);
+    this.visualEffectsElement = document.createElement("div");
+    this.visualEffectsElement.className = "sidebar-visual-effects-element";
+    this.overlayContainer.appendChild(this.visualEffectsElement);
   }
 
   private createHarmonicModeDisplay() {
@@ -283,7 +392,7 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
 
   private updateColors() {
     if (
-      !this.consciousnessVisualizer ||
+      !this.visualEffectsElement ||
       !this.harmonicModeIndicator ||
       !this.rootNavBar
     )
@@ -292,10 +401,10 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     const bgColor = computedStyle.getPropertyValue("--spice-sidebar");
     const textColor = computedStyle.getPropertyValue("--spice-text");
 
-    this.consciousnessVisualizer.style.backgroundColor = bgColor;
-    this.consciousnessVisualizer.style.borderColor = textColor;
-    this.consciousnessVisualizer.style.borderWidth = "1px";
-    this.consciousnessVisualizer.style.borderStyle = "solid";
+    this.visualEffectsElement.style.backgroundColor = bgColor;
+    this.visualEffectsElement.style.borderColor = textColor;
+    this.visualEffectsElement.style.borderWidth = "1px";
+    this.visualEffectsElement.style.borderStyle = "solid";
 
     if (this.harmonicModeIndicator) {
       this.harmonicModeIndicator.style.backgroundColor = `rgba(${
@@ -307,14 +416,14 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     }
   }
 
-  private startConsciousnessLoop() {
-    if (this.consciousnessAnimationFrame)
-      cancelAnimationFrame(this.consciousnessAnimationFrame);
+  private startVisualEffectsLoop() {
+    if (this.visualEffectsAnimationFrame)
+      cancelAnimationFrame(this.visualEffectsAnimationFrame);
     const animate = (timestamp: number) => {
-      this.updateAnimation(timestamp, 16.67);
-      this.consciousnessAnimationFrame = requestAnimationFrame(animate);
+      this.updateAnimation(16.67);
+      this.visualEffectsAnimationFrame = requestAnimationFrame(animate);
     };
-    this.consciousnessAnimationFrame = requestAnimationFrame(animate);
+    this.visualEffectsAnimationFrame = requestAnimationFrame(animate);
   }
 
   public updateHarmonicModeDisplay(newModeKey: string) {
@@ -391,27 +500,27 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
   public override updateModeConfiguration(modeConfig: any) {
     super.updateModeConfiguration(modeConfig);
     this.currentHarmonicModeKey = modeConfig.activeMode || "artist-vision";
-    this.updateConsciousnessForMode();
+    this.updateVisualEffectsForMode();
     this.updateHarmonicModeDisplay(this.currentHarmonicModeKey);
   }
 
-  private updateConsciousnessForMode() {
-    if (this.consciousnessVisualizer) {
+  private updateVisualEffectsForMode() {
+    if (this.visualEffectsElement) {
       const intensity = (this.modeConfig as any)?.intensityMultiplier || 1.0;
-      this.consciousnessVisualizer.style.opacity = `${0.1 * intensity}`;
+      this.visualEffectsElement.style.opacity = `${0.1 * intensity}`;
     }
   }
 
   public override destroy() {
-    if (this.consciousnessAnimationFrame) {
-      cancelAnimationFrame(this.consciousnessAnimationFrame);
+    if (this.visualEffectsAnimationFrame) {
+      cancelAnimationFrame(this.visualEffectsAnimationFrame);
     }
     
     // Clean up all pending echo timers
     if (this.year3000System?.timerConsolidationSystem) {
       for (let i = 0; i < this.echoTimerCounter; i++) {
         this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer(
-          `SidebarConsciousnessSystem-echo-${i}`
+          `SidebarVisualEffectsSystem-echo-${i}`
         );
       }
     }
@@ -435,7 +544,7 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
       (this.year3000System as any).unregisterAnimationSystem
     ) {
       (this.year3000System as any).unregisterAnimationSystem(
-        "SidebarConsciousnessSystem"
+        "SidebarVisualEffectsSystem"
       );
     }
     if (this.resizeObserver && this.rootNavBar) {
@@ -474,11 +583,11 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
       case 0:
         return 0;
       case 1:
-        return Math.ceil(SidebarConsciousnessSystem.BASE_MAX_ECHOES / 2);
+        return Math.ceil(SidebarVisualEffectsSystem.BASE_MAX_ECHOES / 2);
       case 3:
-        return SidebarConsciousnessSystem.BASE_MAX_ECHOES * 2;
+        return SidebarVisualEffectsSystem.BASE_MAX_ECHOES * 2;
       default:
-        return SidebarConsciousnessSystem.BASE_MAX_ECHOES;
+        return SidebarVisualEffectsSystem.BASE_MAX_ECHOES;
     }
   }
 
@@ -543,7 +652,7 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
     this._elementsWithActiveEcho.add(element);
 
     // Use TimerConsolidationSystem if available, otherwise fall back to setTimeout
-    const timerId = `SidebarConsciousnessSystem-echo-${this.echoTimerCounter++}`;
+    const timerId = `SidebarVisualEffectsSystem-echo-${this.echoTimerCounter++}`;
     const cleanup = () => {
       if (echo.parentElement) echo.parentElement.removeChild(echo);
       this.currentEchoCount--;
@@ -588,5 +697,244 @@ export class SidebarConsciousnessSystem extends BaseVisualSystem {
         this._lastMotionDisabled = motionDisabled;
       }
     }
+  }
+
+  // =========================================================================
+  // FLOW PHYSICS SYSTEM (from SidebarInteractiveFlowSystem)
+  // =========================================================================
+
+  /**
+   * Setup effect points for visual interaction feedback
+   */
+  private setupEffectPoints(): void {
+    this.visualState.effectPoints = [];
+    
+    // Create a grid of effect points for visual feedback
+    const gridSize = 8;
+    const spacing = 20;
+    
+    for (let x = 0; x < gridSize; x++) {
+      for (let y = 0; y < gridSize; y++) {
+        const effectPoint: EffectPoint = {
+          x: x * spacing,
+          y: y * spacing,
+          magnitude: 0.5 + Math.random() * 0.5,
+          direction: Math.random() * Math.PI * 2,
+          influence: 0.3 + Math.random() * 0.4
+        };
+        
+        this.visualState.effectPoints.push(effectPoint);
+      }
+    }
+  }
+
+  /**
+   * Setup interaction patterns for user feedback responses
+   */
+  private setupInteractionPatterns(): void {
+    // Hover pattern - gentle visual feedback
+    this.interactionPatterns.set('hover', {
+      id: 'hover',
+      type: 'hover',
+      response: {
+        intensityChange: 0.2,
+        velocityChange: 0.1,
+        smoothingChange: -0.1,
+        visualEffects: [{
+          center: { x: 0, y: 0 },
+          radius: 30,
+          strength: 0.3,
+          decay: 0.05,
+          type: 'wave'
+        }],
+        rippleEffect: false,
+        glowEffect: true
+      },
+      duration: 300,
+      easing: 'smooth',
+      priority: 3
+    });
+    
+    // Click pattern - stronger visual response
+    this.interactionPatterns.set('click', {
+      id: 'click',
+      type: 'click',
+      response: {
+        intensityChange: 0.5,
+        velocityChange: 0.3,
+        smoothingChange: -0.2,
+        visualEffects: [{
+          center: { x: 0, y: 0 },
+          radius: 50,
+          strength: 0.7,
+          decay: 0.08,
+          type: 'pulse'
+        }],
+        rippleEffect: false,
+        glowEffect: true
+      },
+      duration: 500,
+      easing: 'smooth',
+      priority: 8
+    });
+    
+    // Focus pattern - sustained visual highlight
+    this.interactionPatterns.set('focus', {
+      id: 'focus',
+      type: 'focus',
+      response: {
+        intensityChange: 0.3,
+        velocityChange: 0.05,
+        smoothingChange: 0.1,
+        visualEffects: [{
+          center: { x: 0, y: 0 },
+          radius: 40,
+          strength: 0.4,
+          decay: 0.02,
+          type: 'spiral'
+        }],
+        rippleEffect: false,
+        glowEffect: true
+      },
+      duration: 1000,
+      easing: 'smooth',
+      priority: 6
+    });
+  }
+
+  /**
+   * Setup proximity detection using Intersection Observer
+   */
+  private setupProximityDetection(): void {
+    if (typeof IntersectionObserver !== 'undefined') {
+      this.proximityObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            const element = entry.target as HTMLElement;
+            const elementId = element.id || element.className;
+            
+            if (entry.isIntersecting) {
+              this.interactionElements.set(elementId, element);
+              this.handleProximityEnter(element);
+            } else {
+              this.interactionElements.delete(elementId);
+              this.handleProximityExit(element);
+            }
+          });
+        },
+        {
+          threshold: [0, 0.1, 0.5, 1.0],
+          rootMargin: `${this.PROXIMITY_THRESHOLD}px`
+        }
+      );
+    }
+  }
+
+  /**
+   * Handle proximity enter for visual feedback
+   */
+  private handleProximityEnter(element: HTMLElement): void {
+    const rect = element.getBoundingClientRect();
+    const center = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
+    };
+    
+    const distance = Math.sqrt(
+      Math.pow(center.x - this.cursorPosition.x, 2) +
+      Math.pow(center.y - this.cursorPosition.y, 2)
+    );
+    
+    this.userInteractionState.proximityElements.push({
+      element,
+      distance,
+      influence: Math.max(0, 1 - (distance / this.PROXIMITY_THRESHOLD))
+    });
+  }
+
+  /**
+   * Handle proximity exit for liquid consciousness
+   */
+  private handleProximityExit(element: HTMLElement): void {
+    this.userInteractionState.proximityElements = 
+      this.userInteractionState.proximityElements.filter(item => item.element !== element);
+  }
+
+  /**
+   * Update visual effects processing
+   */
+  private updateVisualEffects(): void {
+    this.activeEffects = this.activeEffects.filter(effect => {
+      effect.strength *= (1 - effect.decay);
+      return effect.strength > 0.01;
+    });
+    
+    this.activeEffects.forEach(effect => {
+      this.visualState.effectPoints.forEach(point => {
+        const distance = Math.sqrt(
+          Math.pow(point.x - effect.center.x, 2) +
+          Math.pow(point.y - effect.center.y, 2)
+        );
+        
+        if (distance < effect.radius) {
+          const influence = effect.strength * (1 - distance / effect.radius);
+          
+          switch (effect.type) {
+            case 'wave':
+              point.magnitude += influence * 0.3;
+              break;
+            case 'spiral':
+              point.direction += influence * 0.5;
+              break;
+            case 'pulse':
+              point.magnitude += influence * 0.5;
+              point.direction += influence * 0.2;
+              break;
+            case 'vortex':
+              const angle = Math.atan2(
+                point.y - effect.center.y,
+                point.x - effect.center.x
+              );
+              point.direction = angle + influence * Math.PI * 0.5;
+              break;
+          }
+        }
+      });
+    });
+  }
+
+  /**
+   * Update music visual effects
+   */
+  private updateMusicVisualEffects(): void {
+    const musicIntensity = this.musicBeatIntensity * 0.3;
+    this.visualState.intensity = Math.max(this.visualState.intensity, musicIntensity);
+    
+    const musicVelocityBoost = this.musicEnergyLevel * 30;
+    this.visualState.velocity = Math.min(200, this.visualState.velocity + musicVelocityBoost);
+    
+    const musicSmoothingAdjustment = (1 - this.musicEnergyLevel) * 0.2;
+    this.visualState.smoothing = Math.max(0.1, this.visualState.smoothing - musicSmoothingAdjustment);
+  }
+
+  /**
+   * Get current visual state for external access
+   */
+  public getVisualState(): VisualInteractionState {
+    return { ...this.visualState };
+  }
+
+  /**
+   * Get user interaction state for external access
+   */
+  public getUserInteractionState(): UserInteractionState {
+    return { ...this.userInteractionState };
+  }
+
+  /**
+   * Get active effects for external access
+   */
+  public getActiveEffects(): VisualEffect[] {
+    return [...this.activeEffects];
   }
 }

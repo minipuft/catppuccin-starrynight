@@ -1,7 +1,7 @@
 /**
  * SystemCoordinator - Phase 3 Integration Coordinator
  *
- * Coordinates interaction between VisualSystemFacade and NonVisualSystemFacade
+ * Coordinates interaction between VisualSystemCoordinator and NonVisualSystemFacade
  * to provide unified system management with shared dependencies and cross-facade communication.
  *
  * Key Features:
@@ -40,14 +40,14 @@ import { SettingsManager } from "@/ui/managers/SettingsManager";
 import * as Utils from "@/utils/core/Year3000Utilities";
 import { SemanticColorManager } from "@/utils/spicetify/SemanticColorManager";
 import {
-  VisualSystemFacade,
+  VisualSystemCoordinator,
   VisualSystemKey,
-} from "@/visual/integration/VisualSystemFacade";
+} from "@/visual/coordination/VisualSystemCoordinator";
 
 // Consciousness engine imports for integration
 import { RedEnergyBurstSystem } from "@/visual/effects/HighEnergyEffectsController";
-import { SoftGlowEffectsManager } from "@/visual/effects/GlowEffectsController";
-import { NaturalHarmonyEngine } from "@/visual/effects/NaturalHarmonyEngine";
+import { MusicGlowEffectsManager } from "@/visual/effects/GlowEffectsController";
+import { BreathingEffectsController } from "@/visual/effects/BreathingEffectsController";
 
 export type SystemType = "visual" | "non-visual";
 export type CoordinationMode =
@@ -147,7 +147,7 @@ export class SystemCoordinator {
   private year3000System: any;
 
   // Facade instances
-  private visualBridge: VisualSystemFacade | null = null;
+  private visualBridge: VisualSystemCoordinator | null = null;
   private nonVisualFacade: NonVisualSystemFacade | null = null;
 
   // Shared dependencies (centrally managed)
@@ -465,7 +465,7 @@ export class SystemCoordinator {
       const animationCoordinator = this.nonVisualFacade?.getCachedSystem("EnhancedMasterAnimationCoordinator") || null;
 
       // Initialize Visual System Facade
-      this.visualBridge = new VisualSystemFacade(
+      this.visualBridge = new VisualSystemCoordinator(
         this.config,
         this.utils,
         this.year3000System,
@@ -1073,7 +1073,7 @@ export class SystemCoordinator {
     ]);
     this.initializationOrder.set("visual-systems", ["ColorHarmonyEngine"]);
     this.initializationOrder.set("integration", [
-      "VisualSystemFacade",
+      "VisualSystemCoordinator",
       "NonVisualSystemFacade",
     ]);
 
@@ -1205,7 +1205,7 @@ export class SystemCoordinator {
         case "SemanticColorManager":
           await this.initializeSemanticColorManager();
           break;
-        case "VisualSystemFacade":
+        case "VisualSystemCoordinator":
           await this.initializeVisualFacade();
           break;
         case "NonVisualSystemFacade":
@@ -1453,7 +1453,7 @@ export class SystemCoordinator {
   }
 
   private async initializeVisualFacade(): Promise<void> {
-    this.visualBridge = new VisualSystemFacade(
+    this.visualBridge = new VisualSystemCoordinator(
       this.config,
       this.utils,
       this, // year3000System
@@ -1675,7 +1675,7 @@ export class SystemCoordinator {
     if (!this.visualBridge) {
       Y3KDebug?.debug?.warn(
         "SystemCoordinator",
-        "VisualSystemFacade not available - skipping gradient system coordination"
+        "VisualSystemCoordinator not available - skipping gradient system coordination"
       );
       return;
     }
@@ -1730,18 +1730,18 @@ export class SystemCoordinator {
   }
 
   /**
-   * Coordinate GradientConductor system through VisualSystemFacade
+   * Coordinate GradientConductor system through VisualSystemCoordinator
    */
   private async coordinateGradientConductor(): Promise<void> {
     try {
-      // Get GradientConductor through VisualSystemFacade factory pattern
+      // Get GradientConductor through VisualSystemCoordinator factory pattern
       const gradientConductor =
         this.visualBridge!.getVisualSystem("GradientConductor");
 
       if (!gradientConductor) {
         Y3KDebug?.debug?.warn(
           "SystemCoordinator",
-          "GradientConductor not available via VisualSystemFacade"
+          "GradientConductor not available via VisualSystemCoordinator"
         );
         return;
       }
@@ -1808,13 +1808,13 @@ export class SystemCoordinator {
    */
   private async coordinateWebGLGradientSystem(): Promise<void> {
     try {
-      // Get WebGL system through VisualSystemFacade
+      // Get WebGL system through VisualSystemCoordinator
       const webglSystem = this.visualBridge!.getVisualSystem("WebGLBackground");
 
       if (!webglSystem) {
         Y3KDebug?.debug?.warn(
           "SystemCoordinator",
-          "WebGLGradientBackgroundSystem not available via VisualSystemFacade"
+          "WebGLGradientBackgroundSystem not available via VisualSystemCoordinator"
         );
         return;
       }

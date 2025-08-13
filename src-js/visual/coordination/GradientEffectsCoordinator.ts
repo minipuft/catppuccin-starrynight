@@ -1,5 +1,5 @@
 /**
- * RealityBleedingGradientOrchestrator - Master System Integration
+ * GradientEffectsCoordinator - Master System Integration
  * Part of the Year 3000 System visual pipeline
  *
  * Orchestrates all Reality Bleeding Gradients components:
@@ -19,6 +19,7 @@ import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerforman
 import { GradientPerformanceOptimizer } from "@/core/performance/GradientPerformanceOptimizer";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
+import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { DepthLayeredGradientSystem } from "../backgrounds/DepthLayeredGradientSystem";
 import { FluidGradientBackgroundSystem } from "../backgrounds/FluidGradientBackgroundSystem";
@@ -34,11 +35,11 @@ interface RealityBleedingState {
 }
 
 interface SystemHealth {
-  liquidConsciousness: { ok: boolean; details: string };
-  directionalFlow: { ok: boolean; details: string };
-  shimmerEffects: { ok: boolean; details: string };
-  depthLayers: { ok: boolean; details: string };
-  performanceOptimization: { ok: boolean; details: string };
+  liquidConsciousness: HealthCheckResult;
+  directionalFlow: HealthCheckResult;
+  shimmerEffects: HealthCheckResult;
+  depthLayers: HealthCheckResult;
+  performanceOptimization: HealthCheckResult;
 }
 
 interface RealityBleedingMetrics {
@@ -61,7 +62,9 @@ interface RealityBleedingMetrics {
  * - Handles performance optimization across all systems
  * - Provides unified health monitoring and metrics
  */
-export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
+export class GradientEffectsCoordinator extends BaseVisualSystem implements IManagedSystem {
+  public override readonly systemName = "GradientEffectsCoordinator";
+  public override initialized = false;
   private liquidConsciousnessSystem: FluidGradientBackgroundSystem | null =
     null;
   private directionalFlowSystem: GradientDirectionalFlowSystem | null = null;
@@ -109,11 +112,11 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
 
     // Initialize health tracking
     this.systemHealth = {
-      liquidConsciousness: { ok: false, details: "Not initialized" },
-      directionalFlow: { ok: false, details: "Not initialized" },
-      shimmerEffects: { ok: false, details: "Not initialized" },
-      depthLayers: { ok: false, details: "Not initialized" },
-      performanceOptimization: { ok: false, details: "Not initialized" },
+      liquidConsciousness: { system: 'FluidGradientBackgroundSystem', healthy: false, issues: ['Not initialized'] },
+      directionalFlow: { system: 'GradientDirectionalFlowSystem', healthy: false, issues: ['Not initialized'] },
+      shimmerEffects: { system: 'IridescentShimmerEffectsSystem', healthy: false, issues: ['Not initialized'] },
+      depthLayers: { system: 'DepthLayeredGradientSystem', healthy: false, issues: ['Not initialized'] },
+      performanceOptimization: { system: 'GradientPerformanceOptimizer', healthy: false, issues: ['Not initialized'] },
     };
 
     // Initialize metrics
@@ -169,8 +172,11 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
       // Setup event listeners
       this.setupEventListeners();
 
+      // Mark as initialized for IManagedSystem compatibility
+      this.initialized = true;
+
       Y3KDebug?.debug?.log(
-        "RealityBleedingGradientOrchestrator",
+        "GradientEffectsCoordinator",
         "Reality Bleeding Gradients orchestrator initialized successfully"
       );
     } catch (error) {
@@ -199,8 +205,9 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
       );
 
       this.systemHealth.performanceOptimization = {
-        ok: true,
-        details: "Performance optimizer active",
+        system: 'GradientPerformanceOptimizer',
+        healthy: true,
+        issues: []
       };
     } catch (error) {
       Y3KDebug?.debug?.error(
@@ -209,8 +216,9 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
         error
       );
       this.systemHealth.performanceOptimization = {
-        ok: false,
-        details: `Error: ${error}`,
+        system: 'GradientPerformanceOptimizer',
+        healthy: false,
+        issues: [`Error: ${error}`]
       };
     }
   }
@@ -238,8 +246,9 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
         error
       );
       this.systemHealth.liquidConsciousness = {
-        ok: false,
-        details: `Error: ${error}`,
+        system: 'FluidGradientBackgroundSystem',
+        healthy: false,
+        issues: [`Error: ${error}`]
       };
     }
   }
@@ -266,8 +275,9 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
         error
       );
       this.systemHealth.directionalFlow = {
-        ok: false,
-        details: `Error: ${error}`,
+        system: 'GradientDirectionalFlowSystem',
+        healthy: false,
+        issues: [`Error: ${error}`]
       };
     }
   }
@@ -293,8 +303,9 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
         error
       );
       this.systemHealth.shimmerEffects = {
-        ok: false,
-        details: `Error: ${error}`,
+        system: 'IridescentShimmerEffectsSystem',
+        healthy: false,
+        issues: [`Error: ${error}`]
       };
     }
   }
@@ -328,7 +339,7 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
         "Failed to initialize depth layers:",
         error
       );
-      this.systemHealth.depthLayers = { ok: false, details: `Error: ${error}` };
+      this.systemHealth.depthLayers = { system: 'DepthLayeredGradientSystem', healthy: false, issues: [`Error: ${error}`] };
     }
   }
 
@@ -474,8 +485,8 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
   }
 
   private forceRepaintAllSystems(): void {
-    this.liquidConsciousnessSystem?.forceRepaint("color-harmony-change");
-    this.depthLayeredSystem?.forceRepaint("color-harmony-change");
+    this.liquidConsciousnessSystem?.forceRepaint?.("color-harmony-change");
+    this.depthLayeredSystem?.forceRepaint?.("color-harmony-change");
   }
 
   private startHealthMonitoring(): void {
@@ -514,11 +525,15 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
 
       if (this.performanceOptimizer) {
         const metrics = this.performanceOptimizer.getPerformanceMetrics();
+        const isOptimal = this.performanceOptimizer.isPerformanceOptimal();
         this.systemHealth.performanceOptimization = {
-          ok: this.performanceOptimizer.isPerformanceOptimal(),
-          details: `FPS: ${metrics.fps.toFixed(
-            1
-          )}, Memory: ${metrics.memoryUsage.toFixed(1)}MB`,
+          system: 'GradientPerformanceOptimizer',
+          healthy: isOptimal,
+          metrics: {
+            fps: metrics.fps,
+            memoryUsage: metrics.memoryUsage
+          },
+          issues: isOptimal ? [] : [`FPS: ${metrics.fps.toFixed(1)}, Memory: ${metrics.memoryUsage.toFixed(1)}MB`]
         };
       }
     } catch (error) {
@@ -603,16 +618,51 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
     this.depthLayeredSystem?.updateAnimation(deltaTime);
   }
 
-  public async healthCheck(): Promise<{ ok: boolean; details: string }> {
-    const healthySystems = Object.values(this.systemHealth).filter(
-      (h) => h.ok
-    ).length;
-    const totalSystems = Object.values(this.systemHealth).length;
+  /**
+   * IManagedSystem - Enhanced health check with proper return type
+   */
+  public override async healthCheck(): Promise<HealthCheckResult> {
+    try {
+      const healthySystems = Object.values(this.systemHealth).filter(
+        (h) => h.ok
+      ).length;
+      const totalSystems = Object.values(this.systemHealth).length;
+      
+      let status: "healthy" | "degraded" | "critical";
+      const healthPercentage = totalSystems > 0 ? healthySystems / totalSystems : 1;
+      
+      if (healthPercentage >= 0.8) {
+        status = "healthy";
+      } else if (healthPercentage >= 0.6) {
+        status = "degraded";
+      } else {
+        status = "critical";
+      }
 
-    return {
-      ok: healthySystems >= totalSystems * 0.6, // At least 60% systems healthy
-      details: `${healthySystems}/${totalSystems} systems healthy`,
-    };
+      return {
+        healthy: status === "healthy",
+        ok: status !== "critical",
+        details: `${healthySystems}/${totalSystems} gradient systems healthy (${(healthPercentage * 100).toFixed(1)}%) - Status: ${status}`,
+        system: "GradientEffectsCoordinator",
+        issues: status !== "healthy" ? [`${totalSystems - healthySystems} systems degraded/failed`] : [],
+        metrics: {
+          systemHealth: this.systemHealth,
+          gradientMetrics: this.metrics,
+          realityBleedingState: this.realityBleedingState,
+          healthPercentage,
+          activeSystemsCount: this.metrics.totalSystemsActive,
+          performanceScore: this.metrics.performanceScore,
+          status
+        }
+      };
+    } catch (error) {
+      return {
+        system: "GradientEffectsCoordinator",
+        healthy: false,
+        issues: [`Gradient effects health check failed: ${error}`],
+        metrics: { error: String(error) }
+      };
+    }
   }
 
   public override forceRepaint(reason: string = "orchestrator-update"): void {
@@ -621,6 +671,9 @@ export class RealityBleedingGradientOrchestrator extends BaseVisualSystem {
 
   public override _performSystemSpecificCleanup(): void {
     super._performSystemSpecificCleanup();
+
+    // Mark as uninitialized for IManagedSystem compatibility
+    this.initialized = false;
 
     // Stop monitoring
     if (this.healthCheckInterval) {

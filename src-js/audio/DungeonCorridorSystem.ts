@@ -16,6 +16,7 @@ import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVari
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
+import type { HealthCheckResult } from "@/types/systems";
 import { BaseVisualSystem } from "../visual/base/BaseVisualSystem";
 
 // Interfaces for dungeon corridor system
@@ -456,17 +457,26 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
     }
   }
 
-  public async healthCheck(): Promise<{ ok: boolean; details: string }> {
+  public override async healthCheck(): Promise<HealthCheckResult> {
     const isHealthy =
       this.dungeonSettings.enabled &&
       this.currentLightingState.timestamp > 0 &&
       this.musicSyncService !== null;
 
     return {
-      ok: isHealthy,
-      details: isHealthy
-        ? "Dungeon corridor system operational"
-        : "Dungeon system inactive",
+      system: 'DungeonCorridorSystem',
+      healthy: isHealthy,
+      metrics: {
+        enabled: this.dungeonSettings.enabled,
+        lastUpdateTime: this.currentLightingState.timestamp,
+        musicSyncConnected: !!this.musicSyncService,
+        endLightIntensity: this.currentLightingState.endLightIntensity
+      },
+      issues: isHealthy ? [] : [
+        ...(this.dungeonSettings.enabled ? [] : ['System disabled']),
+        ...(this.currentLightingState.timestamp > 0 ? [] : ['No updates received']),
+        ...(this.musicSyncService ? [] : ['Music sync disconnected'])
+      ]
     };
   }
 

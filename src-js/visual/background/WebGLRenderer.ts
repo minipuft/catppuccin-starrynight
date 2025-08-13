@@ -14,6 +14,7 @@ import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDet
 import { SimplePerformanceCoordinator, type QualityLevel, type QualityScalingCapable, type PerformanceMetrics, type QualityCapability } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
+import type { HealthCheckResult } from "@/types/systems";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import {
   createGradientTexture,
@@ -22,10 +23,10 @@ import {
 } from "@/utils/graphics/ShaderLoader";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 import type {
-  BackgroundAnimationCoordinator,
+  VisualEffectsCoordinator,
   BackgroundSystemParticipant,
-  ConsciousnessField,
-} from "../effects/BackgroundAnimationCoordinator";
+  VisualEffectState,
+} from "../effects/VisualEffectsCoordinator";
 
 // Import shared consciousness utilities
 import {
@@ -177,9 +178,9 @@ export class WebGLGradientBackgroundSystem
   private prefersReducedMotion = false;
 
   // Consciousness choreographer integration
-  private consciousnessChoreographer: BackgroundAnimationCoordinator | null =
+  private consciousnessChoreographer: VisualEffectsCoordinator | null =
     null;
-  private currentConsciousnessField: ConsciousnessField | null = null;
+  private currentConsciousnessField: VisualEffectState | null = null;
 
   private webglReady = false;
 
@@ -981,20 +982,19 @@ export class WebGLGradientBackgroundSystem
     const consciousnessField = this.currentConsciousnessField;
     
     // Rhythmic pulse from consciousness
-    const rhythmicPulse = consciousnessField?.rhythmicPulse ?? 0.5;
+    const rhythmicPulse = consciousnessField?.pulseRate ?? 0.5;
     if (uniforms.u_rhythmicPulse) {
       this.gl.uniform1f(uniforms.u_rhythmicPulse, rhythmicPulse);
     }
 
     // Musical flow direction
-    const musicalFlow = consciousnessField?.musicalFlow ?? [0.0, 0.0];
-    if (uniforms.u_musicalFlow && Array.isArray(musicalFlow)) {
-      const flowArray = musicalFlow as number[];
-      this.gl.uniform2f(uniforms.u_musicalFlow, flowArray[0] ?? 0.0, flowArray[1] ?? 0.0);
+    const musicalFlow = consciousnessField?.flowDirection ?? { x: 0.0, y: 0.0 };
+    if (uniforms.u_musicalFlow && musicalFlow) {
+      this.gl.uniform2f(uniforms.u_musicalFlow, musicalFlow.x ?? 0.0, musicalFlow.y ?? 0.0);
     }
 
     // Energy resonance for consciousness modulation
-    const energyResonance = consciousnessField?.energyResonance ?? 0.5;
+    const energyResonance = consciousnessField?.energyLevel ?? 0.5;
     if (uniforms.u_energyResonance) {
       this.gl.uniform1f(uniforms.u_energyResonance, energyResonance);
     }
@@ -1006,7 +1006,7 @@ export class WebGLGradientBackgroundSystem
     }
 
     // Membrane fluidity for organic effects
-    const membraneFluidityIndex = consciousnessField?.membraneFluidityIndex ?? 0.3;
+    const membraneFluidityIndex = consciousnessField?.fluidIntensity ?? 0.3;
     if (uniforms.u_membraneFluidityIndex) {
       this.gl.uniform1f(uniforms.u_membraneFluidityIndex, membraneFluidityIndex);
     }
@@ -2606,10 +2606,12 @@ export class WebGLGradientBackgroundSystem
    * Animation update method called by the master animation coordinator
    * This is the missing method that was causing the white background issue
    */
-  public override updateAnimation(timestamp: number, deltaTime: number): void {
+  public override updateAnimation(deltaTime: number): void {
     if (!this.isActive || !this.gl || !this.isWebGLAvailable) {
       return;
     }
+
+    const timestamp = performance.now();
 
     // Skip frames for quality scaling (emergency and minimal modes)
     if (this.shouldSkipFrame(timestamp)) {
@@ -2686,14 +2688,27 @@ export class WebGLGradientBackgroundSystem
   }
 
   /**
-   * Lightweight health check used by adapters; returns OK if WebGL is ready.
+   * IManagedSystem health check - returns health status using standard interface
    */
-  public async healthCheck(): Promise<{ ok: boolean; details: string }> {
+  public override async healthCheck(): Promise<HealthCheckResult> {
+    const isHealthy = this.webglReady && this.initialized && this.isActive;
+    
     return {
-      ok: this.webglReady,
-      details: this.webglReady
-        ? "WebGL system nominal"
-        : "WebGL not initialized",
+      system: 'WebGLGradientBackgroundSystem',
+      healthy: isHealthy,
+      metrics: {
+        webglReady: this.webglReady,
+        initialized: this.initialized,
+        active: this.isActive,
+        contextLost: this.contextLost,
+        canvasExists: !!this.canvas
+      },
+      issues: isHealthy ? [] : [
+        ...(this.webglReady ? [] : ['WebGL not ready']),
+        ...(this.initialized ? [] : ['System not initialized']),
+        ...(this.isActive ? [] : ['System not active']),
+        ...(this.contextLost ? ['WebGL context lost'] : [])
+      ]
     };
   }
 
@@ -2756,7 +2771,7 @@ export class WebGLGradientBackgroundSystem
     };
   }
 
-  public onConsciousnessFieldUpdate(field: ConsciousnessField): void {
+  public onConsciousnessFieldUpdate(field: VisualEffectState): void {
     if (!this.isWebGLAvailable || !this.webglReady) return;
 
     try {
@@ -2769,9 +2784,9 @@ export class WebGLGradientBackgroundSystem
         "WebGLGradientBackgroundSystem",
         "Updated from consciousness field:",
         {
-          rhythmicPulse: field.rhythmicPulse,
-          webglLuminosity: field.webglLuminosity,
-          emotionalTemperature: field.emotionalTemperature,
+          rhythmicPulse: field.pulseRate,
+          webglLuminosity: field.luminosity,
+          emotionalTemperature: field.colorTemperature,
         }
       );
     } catch (error) {
@@ -2836,12 +2851,12 @@ export class WebGLGradientBackgroundSystem
   /**
    * Update WebGL shader parameters based on consciousness field
    */
-  private updateShaderFromConsciousness(field: ConsciousnessField): void {
+  private updateShaderFromConsciousness(field: VisualEffectState): void {
     if (!this.gl || !this.shaderProgram) return;
 
     // Modulate flow strength with rhythmic pulse
     const consciousFlowStrength =
-      this.settings.flowStrength * (0.5 + field.rhythmicPulse * 0.5);
+      this.settings.flowStrength * (0.5 + field.pulseRate * 0.5);
     const flowStrengthLocation = this.gl.getUniformLocation(
       this.shaderProgram,
       "u_flowStrength"
@@ -2852,7 +2867,7 @@ export class WebGLGradientBackgroundSystem
 
     // Modulate noise scale with musical flow
     const consciousNoiseScale =
-      this.settings.noiseScale * (0.8 + field.musicalFlow.x * 0.4);
+      this.settings.noiseScale * (0.8 + field.flowDirection.x * 0.4);
     const noiseScaleLocation = this.gl.getUniformLocation(
       this.shaderProgram,
       "u_noiseScale"
@@ -2863,7 +2878,7 @@ export class WebGLGradientBackgroundSystem
 
     // Update wave parameters with breathing cycle
     const breathingModulation =
-      Math.sin(Date.now() * 0.001 * field.breathingCycle) * 0.1;
+      Math.sin(Date.now() * 0.001 * field.pulseRate) * 0.1;
     const waveYLocation = this.gl.getUniformLocation(
       this.shaderProgram,
       "u_waveY"
@@ -3458,6 +3473,42 @@ export class WebGLGradientBackgroundSystem
       memory: Math.min(1, (baseMemory + corridorMemory) * animationMultiplier),
       gpu: Math.min(1, (baseGPU + corridorGPU) * animationMultiplier),
       estimatedFPS,
+    };
+  }
+
+  // =========================================================================
+  // BACKGROUND SYSTEM PARTICIPANT INTERFACE
+  // =========================================================================
+
+  public onVisualStateUpdate(state: VisualEffectState): void {
+    // Update visual effects based on shared state
+    this.onConsciousnessFieldUpdate(state);
+  }
+
+  public onVisualEffectEvent(eventType: string, payload: any): void {
+    // Handle visual effect events from coordinator
+    switch (eventType) {
+      case "visual:rhythm-shift":
+        if (payload.intensity) {
+          this.settings.flowStrength = Math.min(5, payload.intensity * 3);
+        }
+        break;
+      case "visual:color-shift":
+        this.forceRepaint("color-shift");
+        break;
+      case "visual:energy-surge":
+        if (payload.intensity > 0.7) {
+          this.forceRepaint("energy-surge");
+        }
+        break;
+    }
+  }
+
+  public getVisualContribution(): Partial<VisualEffectState> {
+    return {
+      luminosity: this.settings.intensity === "intense" ? 0.8 : 0.5,
+      fluidIntensity: this.settings.flowStrength / 5,
+      effectDepth: this.getCurrentQualityImpact().cpu
     };
   }
 }

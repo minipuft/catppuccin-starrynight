@@ -18,6 +18,7 @@ import type {
   QualityLevel,
   QualityScalingCapable,
 } from "@/core/performance/SimplePerformanceCoordinator";
+import type { HealthCheckResult } from "@/types/systems";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
@@ -646,15 +647,22 @@ export class IridescentShimmerEffectsSystem
     // No update needed - animations are handled by CSS only
   }
 
-  public async healthCheck(): Promise<{ ok: boolean; details: string }> {
-    const elementCount = this.shimmerElements.size;
-    const isHealthy = this.shimmerSettings.enabled && elementCount > 0;
-
+  public override async healthCheck(): Promise<HealthCheckResult> {
+    const isHealthy = this.shimmerSettings.enabled && this.shimmerElements.size > 0;
+    
     return {
-      ok: isHealthy,
-      details: isHealthy
-        ? `Shimmer system active with ${elementCount} elements`
-        : "Shimmer system inactive",
+      system: 'IridescentShimmerEffectsSystem',
+      healthy: isHealthy,
+      metrics: {
+        enabled: this.shimmerSettings.enabled,
+        elementCount: this.shimmerElements.size,
+        intensity: this.shimmerSettings.intensity,
+        initialized: this.initialized
+      },
+      issues: isHealthy ? [] : [
+        ...(this.shimmerSettings.enabled ? [] : ['System disabled']),
+        ...(this.shimmerElements.size > 0 ? [] : ['No shimmer elements found'])
+      ]
     };
   }
 

@@ -8,8 +8,8 @@
  * refract, and harmonize to guide user attention and provide feedback.
  */
 
-import { ConstellationPatterns } from '@/visual/interaction/ConstellationPatterns';
-import type { ConstellationPattern } from '@/visual/interaction/types';
+import { ConstellationRenderer } from '@/visual/user-interaction/ConstellationRenderer';
+import type { ConstellationPattern } from '@/visual/user-interaction/types';
 
 export interface MorphingPattern {
   name: string;
@@ -576,16 +576,16 @@ export class MorphingPatternLibrary {
       let constellation: ConstellationPattern;
       
       if (musicContext.harmonicMode) {
-        constellation = ConstellationPatterns.generateHarmonicConstellation(
+        constellation = ConstellationRenderer.generateHarmonicConstellation(
           0, 0, size * 0.5, musicContext.harmonicMode, fullMusicContext
         );
       } else if (musicContext.bpm && intensity > 0.7) {
         // Use beat-sync constellation for high intensity
-        constellation = ConstellationPatterns.generateBeatSyncConstellation(
+        constellation = ConstellationRenderer.generateBeatSyncConstellation(
           0, 0, size * 0.5, intensity, musicContext.bpm
         );
       } else {
-        constellation = ConstellationPatterns.generatePattern(
+        constellation = ConstellationRenderer.generatePattern(
           constellationType, 0, 0, size * 0.5, fullMusicContext
         );
       }

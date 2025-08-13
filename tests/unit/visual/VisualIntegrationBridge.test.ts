@@ -1,9 +1,9 @@
 /**
- * VisualSystemFacade Test Suite
+ * VisualSystemCoordinator Test Suite
  * Tests for Phase 2 factory pattern implementation
  */
 
-import { VisualSystemFacade, VisualSystemKey, VisualSystemConfig } from '@/visual/integration/VisualSystemFacade';
+import { VisualSystemCoordinator, VisualSystemKey, VisualSystemConfig } from '@/visual/coordination/VisualSystemCoordinator';
 import { OptimizedCSSVariableManager as CSSVariableBatcher } from '@/core/performance/OptimizedCSSVariableManager';
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { MusicSyncService } from '@/audio/MusicSyncService';
@@ -11,7 +11,7 @@ import { SettingsManager } from '@/ui/managers/SettingsManager';
 import { ColorHarmonyEngine } from '@/audio/ColorHarmonyEngine';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';
 import * as Utils from '@/utils/core/Year3000Utilities';
-import { IManagedSystem } from '@/types/IManagedSystem';
+import { IManagedSystem } from '@/types/systems';
 
 // Mock dependencies
 jest.mock('@/core/performance/OptimizedCSSVariableManager');
@@ -29,7 +29,7 @@ jest.mock('@/visual/music/MusicSyncVisualEffects');
 jest.mock('@/visual/ui/InteractionTrackingSystem');
 // Removed BehavioralPredictionEngine and PredictiveMaterializationSystem - overhead systems eliminated
 jest.mock('@/visual/ui/SpotifyUIApplicationSystem');
-jest.mock('@/core/animation/EmergentChoreographyEngine');
+jest.mock('@/core/animation/EnhancedMasterAnimationCoordinator');
 
 // Mock debug system
 jest.mock('@/debug/UnifiedDebugManager', () => ({
@@ -52,10 +52,10 @@ Object.defineProperty(window, 'performance', {
   }
 });
 
-describe('VisualSystemFacade', () => {
-  let bridge: VisualSystemFacade;
+describe('VisualSystemCoordinator', () => {
+  let bridge: VisualSystemCoordinator;
   let mockCSSVariableBatcher: jest.Mocked<CSSVariableBatcher>;
-  let mockPerformanceAnalyzer: jest.Mocked<PerformanceAnalyzer>;
+  let mockPerformanceAnalyzer: jest.Mocked<SimplePerformanceCoordinator>;
   let mockMusicSyncService: jest.Mocked<MusicSyncService>;
   let mockSettingsManager: jest.Mocked<SettingsManager>;
   let mockColorHarmonyEngine: jest.Mocked<ColorHarmonyEngine>;
@@ -74,8 +74,10 @@ describe('VisualSystemFacade', () => {
     
     mockPerformanceAnalyzer = {
       getMedianFPS: jest.fn().mockReturnValue(60),
-      recordSystemPerformance: jest.fn(),
-      destroy: jest.fn()
+      recordMetric: jest.fn(),
+      destroy: jest.fn(),
+      initialized: true,
+      initialize: jest.fn()
     } as any;
     
     mockMusicSyncService = {
@@ -99,7 +101,7 @@ describe('VisualSystemFacade', () => {
     };
 
     // Create bridge instance
-    bridge = new VisualSystemFacade(
+    bridge = new VisualSystemCoordinator(
       YEAR3000_CONFIG,
       Utils,
       mockYear3000System,
@@ -113,7 +115,7 @@ describe('VisualSystemFacade', () => {
 
   describe('Construction and Initialization', () => {
     it('should initialize with correct dependencies', () => {
-      expect(bridge).toBeInstanceOf(VisualSystemFacade);
+      expect(bridge).toBeInstanceOf(VisualSystemCoordinator);
       expect(bridge.getSystemStatus().initialized).toBe(false);
     });
 
@@ -154,25 +156,25 @@ describe('VisualSystemFacade', () => {
     });
 
     it('should create visual systems using factory pattern', () => {
-      const particleSystem = bridge.getVisualSystem<IManagedSystem>('Particle');
+      const webglSystem = bridge.getVisualSystem<IManagedSystem>('WebGLBackground');
       
-      expect(particleSystem).toBeDefined();
+      expect(webglSystem).toBeDefined();
       expect(bridge.getSystemStatus().systemsActive).toBe(1);
     });
 
     it('should cache visual systems', () => {
-      const system1 = bridge.getVisualSystem<IManagedSystem>('Particle');
-      const system2 = bridge.getVisualSystem<IManagedSystem>('Particle');
+      const system1 = bridge.getVisualSystem<IManagedSystem>('WebGLBackground');
+      const system2 = bridge.getVisualSystem<IManagedSystem>('WebGLBackground');
       
       expect(system1).toBe(system2); // Same instance
       expect(bridge.getSystemStatus().systemsActive).toBe(1); // Only one cached
     });
 
     it('should create different instances for different system keys', () => {
-      const particleSystem = bridge.getVisualSystem<IManagedSystem>('Particle');
-      const beatSyncSystem = bridge.getVisualSystem<IManagedSystem>('BeatSync');
+      const webglSystem = bridge.getVisualSystem<IManagedSystem>('WebGLBackground');
+      const musicSyncSystem = bridge.getVisualSystem<IManagedSystem>('MusicBeatSync');
       
-      expect(particleSystem).not.toBe(beatSyncSystem);
+      expect(webglSystem).not.toBe(musicSyncSystem);
       expect(bridge.getSystemStatus().systemsActive).toBe(2);
     });
 
@@ -196,7 +198,7 @@ describe('VisualSystemFacade', () => {
     });
 
     it('should inject performance analyzer for systems that need it', () => {
-      const system = bridge.getVisualSystem<IManagedSystem>('Particle');
+      const system = bridge.getVisualSystem<IManagedSystem>('WebGLBackground');
       
       // Check if dependency injection was called
       expect(system).toBeDefined();
@@ -204,7 +206,7 @@ describe('VisualSystemFacade', () => {
     });
 
     it('should inject CSS variable batcher for systems that need it', () => {
-      const system = bridge.getVisualSystem<IManagedSystem>('BeatSync');
+      const system = bridge.getVisualSystem<IManagedSystem>('MusicBeatSync');
       
       expect(system).toBeDefined();
       // Note: In real implementation, we'd check if setCSSVariableBatcher was called
@@ -213,7 +215,7 @@ describe('VisualSystemFacade', () => {
     it('should inject event bus when available', () => {
       const mockEventBus = { subscribe: jest.fn(), emit: jest.fn() };
       
-      const bridgeWithEventBus = new VisualSystemFacade(
+      const bridgeWithEventBus = new VisualSystemCoordinator(
         YEAR3000_CONFIG,
         Utils,
         mockYear3000System,
@@ -236,7 +238,7 @@ describe('VisualSystemFacade', () => {
     });
 
     it('should wrap updateAnimation with performance monitoring', () => {
-      const system = bridge.getVisualSystem<IManagedSystem>('Particle');
+      const system = bridge.getVisualSystem<IManagedSystem>('WebGLBackground');
       
       // Mock system with updateAnimation method
       const mockSystem = system as any;
@@ -251,12 +253,12 @@ describe('VisualSystemFacade', () => {
     });
 
     it('should record performance metrics', () => {
-      const system = bridge.getVisualSystem<IManagedSystem>('BeatSync');
+      const system = bridge.getVisualSystem<IManagedSystem>('MusicBeatSync');
       
       // Performance monitoring should be integrated
       expect(system).toBeDefined();
-      expect(mockPerformanceAnalyzer.recordSystemPerformance).toHaveBeenCalledWith(
-        expect.stringContaining('Visual_BeatSync'),
+      expect(mockPerformanceAnalyzer.recordMetric).toHaveBeenCalledWith(
+        expect.stringContaining('Visual_MusicBeatSync'),
         expect.any(Number)
       );
     });
@@ -278,8 +280,8 @@ describe('VisualSystemFacade', () => {
 
     it('should perform health check on visual systems', async () => {
       // Create some systems
-      bridge.getVisualSystem<IManagedSystem>('Particle');
-      bridge.getVisualSystem<IManagedSystem>('BeatSync');
+      bridge.getVisualSystem<IManagedSystem>('WebGLBackground');
+      bridge.getVisualSystem<IManagedSystem>('MusicBeatSync');
       
       const healthCheck = await bridge.performVisualHealthCheck();
       
@@ -302,13 +304,13 @@ describe('VisualSystemFacade', () => {
 
     it('should detect system failures', async () => {
       // Create a system and mock its health check to fail
-      const system = bridge.getVisualSystem<IManagedSystem>('Particle');
+      const system = bridge.getVisualSystem<IManagedSystem>('WebGLBackground');
       (system as any).healthCheck = jest.fn().mockRejectedValue(new Error('System failed'));
       
       const healthCheck = await bridge.performVisualHealthCheck();
       
       expect(healthCheck.overall).toBe('degraded');
-      expect(healthCheck.systems.get('Particle')?.ok).toBe(false);
+      expect(healthCheck.systems.get('WebGLBackground')?.ok).toBe(false);
     });
   });
 
@@ -319,8 +321,8 @@ describe('VisualSystemFacade', () => {
 
     it('should propagate visual events to all systems', () => {
       // Create multiple systems
-      const system1 = bridge.getVisualSystem<IManagedSystem>('Particle');
-      const system2 = bridge.getVisualSystem<IManagedSystem>('BeatSync');
+      const system1 = bridge.getVisualSystem<IManagedSystem>('WebGLBackground');
+      const system2 = bridge.getVisualSystem<IManagedSystem>('MusicBeatSync');
       
       // Mock event handlers
       (system1 as any).handleVisualEvent = jest.fn();
@@ -394,8 +396,8 @@ describe('VisualSystemFacade', () => {
 
     it('should initialize all cached visual systems', async () => {
       // Create some systems
-      const system1 = bridge.getVisualSystem<IManagedSystem>('Particle');
-      const system2 = bridge.getVisualSystem<IManagedSystem>('BeatSync');
+      const system1 = bridge.getVisualSystem<IManagedSystem>('WebGLBackground');
+      const system2 = bridge.getVisualSystem<IManagedSystem>('MusicBeatSync');
       
       // Mock initialize methods
       system1.initialize = jest.fn().mockResolvedValue(undefined);
@@ -408,7 +410,7 @@ describe('VisualSystemFacade', () => {
     });
 
     it('should handle system initialization failures gracefully', async () => {
-      const system = bridge.getVisualSystem<IManagedSystem>('Particle');
+      const system = bridge.getVisualSystem<IManagedSystem>('WebGLBackground');
       system.initialize = jest.fn().mockRejectedValue(new Error('Init failed'));
       
       // Should not throw
@@ -438,14 +440,14 @@ describe('VisualSystemFacade', () => {
     });
 
     it('should handle system creation failures', () => {
-      // Mock system constructor failure for ParticleConsciousnessModule (replacement for LightweightParticleSystem)
-      const mockSystem = require('@/visual/effects/ParticleConsciousnessModule');
-      mockSystem.ParticleConsciousnessModule.mockImplementation(() => {
+      // Mock system constructor failure for WebGLGradientBackgroundSystem
+      const mockSystem = require('@/visual/background/WebGLRenderer');
+      mockSystem.WebGLGradientBackgroundSystem.mockImplementation(() => {
         throw new Error('System creation failed');
       });
 
       expect(() => {
-        bridge.getVisualSystem<IManagedSystem>('Particle');
+        bridge.getVisualSystem<IManagedSystem>('WebGLBackground');
       }).toThrow('System creation failed');
     });
   });

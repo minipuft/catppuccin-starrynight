@@ -35,7 +35,7 @@ import type { HealthCheckResult } from "@/types/systems";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
-import { BackgroundAnimationCoordinator } from "@/visual/effects/BackgroundAnimationCoordinator";
+import { VisualEffectsCoordinator as BackgroundAnimationCoordinator, type VisualEffectState } from "@/visual/effects/VisualEffectsCoordinator";
 
 // Consolidated UI effects state types
 export interface UIEffectsConsciousnessState {
@@ -1173,7 +1173,7 @@ export class ConsciousnessUIEffectsController
       this.currentConsciousnessField = field;
 
       // Modulate UI effects based on consciousness field
-      const fieldInfluence = field.rhythmicPulse * 0.2; // Moderate influence
+      const fieldInfluence = field.pulseRate * 0.2; // Moderate influence
 
       // Apply to shimmer effects
       this.consciousnessState.shimmer.intensity = Math.min(
@@ -1220,7 +1220,7 @@ export class ConsciousnessUIEffectsController
   }
 
   // Health check implementation
-  public async healthCheck(): Promise<HealthCheckResult> {
+  public override async healthCheck(): Promise<HealthCheckResult> {
     const state = this.consciousnessState;
     const isHealthy =
       this.initialized &&
@@ -1340,5 +1340,118 @@ export class ConsciousnessUIEffectsController
       "ConsciousnessUIEffectsController",
       "Unified UI effects controller destroyed"
     );
+  }
+
+  // =========================================================================
+  // BACKGROUND SYSTEM PARTICIPANT INTERFACE
+  // =========================================================================
+
+  public onVisualStateUpdate(state: VisualEffectState): void {
+    // Update UI effects based on shared visual state
+    if (state.musicIntensity > 0.6) {
+      this.triggerIntensityEffects(state.musicIntensity);
+    }
+    if (state.colorTemperature) {
+      this.updateTemperatureEffects(state.colorTemperature);
+    }
+  }
+
+  public onVisualEffectEvent(eventType: string, payload: any): void {
+    // Handle visual effect events from coordinator
+    switch (eventType) {
+      case "visual:rhythm-shift":
+        this.triggerShimmerEffects(payload.intensity || 0.5);
+        break;
+      case "visual:color-shift":
+        this.updateTemperatureEffects(payload.temperature || 6500);
+        break;
+      case "visual:energy-surge":
+        if (payload.intensity > 0.7) {
+          this.triggerIntensityEffects(payload.intensity);
+        }
+        break;
+    }
+  }
+
+  public getVisualContribution(): Partial<VisualEffectState> {
+    return {
+      visualCoherence: this.consciousnessState.consciousnessLevel === "transcendent" ? 1.0 : 0.7,
+      systemHarmony: this.consciousnessState.shimmer.intensity,
+      effectDepth: this.consciousnessState.audioVisual.nebulaEffectIntensity
+    };
+  }
+
+  // =========================================================================
+  // MISSING METHODS FOR VISUAL EFFECT INTEGRATION
+  // =========================================================================
+
+  private triggerIntensityEffects(intensity: number): void {
+    // Boost shimmer effects based on intensity
+    if (this.uiEffectsConfig.shimmerEnabled) {
+      this.consciousnessState.shimmer.intensity = Math.min(
+        this.consciousnessState.shimmer.intensity + (intensity * 0.3),
+        1.0
+      );
+    }
+
+    // Boost audio-visual effects
+    if (this.uiEffectsConfig.audioVisualEnabled) {
+      this.consciousnessState.audioVisual.nebulaEffectIntensity = Math.min(
+        this.consciousnessState.audioVisual.nebulaEffectIntensity + (intensity * 0.2),
+        1.0
+      );
+    }
+
+    // Apply intensity to scroll effects
+    if (this.uiEffectsConfig.scrollEffectsEnabled) {
+      this.consciousnessState.scroll.sheenIntensity = Math.min(
+        this.consciousnessState.scroll.sheenIntensity + (intensity * 0.1),
+        1.0
+      );
+    }
+  }
+
+  private updateTemperatureEffects(temperature: number): void {
+    // Map temperature to UI effect characteristics
+    const normalizedTemp = Math.max(1000, Math.min(10000, temperature));
+    
+    // Update shimmer effect type based on temperature
+    if (this.uiEffectsConfig.shimmerEnabled) {
+      if (normalizedTemp < 3000) {
+        this.consciousnessState.shimmer.effectType = "prism"; // Cool colors
+      } else if (normalizedTemp > 7000) {
+        this.consciousnessState.shimmer.effectType = "oil-slick"; // Warm colors
+      } else {
+        this.consciousnessState.shimmer.effectType = "rainbow"; // Neutral
+      }
+    }
+
+    // Apply temperature influence to other effects
+    const tempInfluence = (normalizedTemp - 1000) / 9000; // 0-1 scale
+    if (this.uiEffectsConfig.audioVisualEnabled) {
+      this.consciousnessState.audioVisual.nebulaEffectIntensity = Math.min(
+        this.consciousnessState.audioVisual.nebulaEffectIntensity + (tempInfluence * 0.1),
+        1.0
+      );
+    }
+  }
+
+  private triggerShimmerEffects(intensity: number): void {
+    if (!this.uiEffectsConfig.shimmerEnabled) return;
+
+    // Apply immediate shimmer boost
+    this.consciousnessState.shimmer.intensity = Math.min(
+      this.consciousnessState.shimmer.intensity + (intensity * 0.4),
+      1.0
+    );
+
+    // Temporarily switch to mixed effect for variety
+    const currentType = this.consciousnessState.shimmer.effectType;
+    this.consciousnessState.shimmer.effectType = "mixed";
+
+    // Revert effect type after brief period
+    setTimeout(() => {
+      this.consciousnessState.shimmer.effectType = currentType;
+    }, 2000);
   }
 }

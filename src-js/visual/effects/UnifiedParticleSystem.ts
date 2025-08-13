@@ -30,10 +30,10 @@ import { BaseVisualSystem } from "../base/BaseVisualSystem";
 
 // Import consciousness integration
 import type {
-  BackgroundAnimationCoordinator,
+  VisualEffectsCoordinator as BackgroundAnimationCoordinator,
   BackgroundSystemParticipant,
-  ConsciousnessField,
-} from "./BackgroundAnimationCoordinator";
+  VisualEffectState as ConsciousnessField,
+} from "./VisualEffectsCoordinator";
 import {
   ChoreographyEventResponder,
   BackgroundEventResponder,
@@ -315,14 +315,14 @@ class ConsciousnessParticleRenderer {
     const breathingAlpha =
       BackgroundEventResponder.calculateBreathingModulation(
         0.9,
-        field.breathingCycle,
+        field.pulseRate,
         0.1
       );
     this.ctx.globalAlpha = breathingAlpha;
 
     // Apply subtle global transformation based on musical flow
-    if (field.musicalFlow.x !== 0 || field.musicalFlow.y !== 0) {
-      this.ctx.translate(field.musicalFlow.x * 0.5, field.musicalFlow.y * 0.5);
+    if (field.flowDirection.x !== 0 || field.flowDirection.y !== 0) {
+      this.ctx.translate(field.flowDirection.x * 0.5, field.flowDirection.y * 0.5);
     }
   }
 
@@ -345,7 +345,7 @@ class ConsciousnessParticleRenderer {
       if (particle.currentRotation !== 0) {
         const consciousRotation = field
           ? particle.currentRotation +
-            field.rhythmicPulse * particle.consciousnessResonance * Math.PI
+            field.pulseRate * particle.consciousnessResonance * Math.PI
           : particle.currentRotation;
         this.ctx.rotate(consciousRotation);
       }
@@ -354,7 +354,7 @@ class ConsciousnessParticleRenderer {
       const consciousOpacity = field
         ? BackgroundEventResponder.calculateRhythmicResponse(
             particle.currentOpacity,
-            field.rhythmicPulse,
+            field.pulseRate,
             particle.flowResonance
           )
         : particle.currentOpacity;
@@ -540,7 +540,7 @@ class ConsciousnessParticleRenderer {
 
     // Pulse effect based on consciousness field
     const pulseSize = field
-      ? particle.currentSize * (1 + field.rhythmicPulse * 0.3)
+      ? particle.currentSize * (1 + field.pulseRate * 0.3)
       : particle.currentSize;
 
     if (quality === "high" && field) {
@@ -574,7 +574,7 @@ class ConsciousnessParticleRenderer {
     if (hasLightweight && hasField) {
       // Use lightweight color with field pulse behavior
       const pulseSize = field
-        ? particle.currentSize * (1 + field.rhythmicPulse * 0.2)
+        ? particle.currentSize * (1 + field.pulseRate * 0.2)
         : particle.currentSize;
 
       if (quality === "high") {
@@ -627,7 +627,7 @@ class ConsciousnessParticleRenderer {
 
     // Flow-responsive color temperature
     const flowIntensity = Math.sqrt(
-      field.musicalFlow.x ** 2 + field.musicalFlow.y ** 2
+      field.flowDirection.x ** 2 + field.flowDirection.y ** 2
     );
     const colorTemp = 0.5 + flowIntensity * 0.5;
 
@@ -1277,8 +1277,8 @@ export class ParticleConsciousnessModule
     // Apply musical flow influence
     if (this.consciousnessConfig.enableOrganicFlow) {
       const flowInfluence = particle.flowResonance * strength;
-      particle.vx += field.musicalFlow.x * flowInfluence * 0.01;
-      particle.vy += field.musicalFlow.y * flowInfluence * 0.01;
+      particle.vx += field.flowDirection.x * flowInfluence * 0.01;
+      particle.vy += field.flowDirection.y * flowInfluence * 0.01;
     }
 
     // Apply breathing synchronization
@@ -1286,7 +1286,7 @@ export class ParticleConsciousnessModule
       const breathingInfluence =
         BackgroundEventResponder.calculateBreathingModulation(
           1.0,
-          field.breathingCycle + particle.breathingPhase,
+          field.pulseRate + particle.breathingPhase,
           0.1
         );
       particle.targetSize *= breathingInfluence;
@@ -1295,7 +1295,7 @@ export class ParticleConsciousnessModule
     // Apply cellular growth
     if (this.consciousnessConfig.enableCellularGrowth) {
       const growthPhase =
-        particle.organicGrowthPhase + field.cellularGrowthRate;
+        particle.organicGrowthPhase + field.energyLevel;
       const growthInfluence = Math.sin(growthPhase) * 0.05 + 1.0;
       particle.targetSize *= growthInfluence;
       particle.organicGrowthPhase = growthPhase;
@@ -1305,7 +1305,7 @@ export class ParticleConsciousnessModule
     const rhythmicInfluence =
       BackgroundEventResponder.calculateRhythmicResponse(
         1.0,
-        field.rhythmicPulse,
+        field.pulseRate,
         particle.consciousnessResonance
       );
     particle.targetOpacity *= rhythmicInfluence;
@@ -1409,7 +1409,7 @@ export class ParticleConsciousnessModule
         "ParticleConsciousnessModule",
         "Updated from consciousness field:",
         {
-          rhythmicPulse: field.rhythmicPulse,
+          rhythmicPulse: field.pulseRate,
           particleCount: this.activeParticles.length,
           renderQuality: this.performanceConfig.renderQuality,
         }
@@ -1467,13 +1467,13 @@ export class ParticleConsciousnessModule
   private adaptToConsciousnessField(field: ConsciousnessField): void {
     // Adapt particle density based on energy resonance
     const targetParticleCount = Math.floor(
-      this.performanceConfig.maxParticles * (0.3 + field.energyResonance * 0.7)
+      this.performanceConfig.maxParticles * (0.3 + field.energyLevel * 0.7)
     );
 
     // Spawn more particles if needed
     while (this.activeParticles.length < targetParticleCount) {
-      const mode = field.liquidDensity > 0.7 ? "consciousness" : "hybrid";
-      this.spawnParticle(mode, field.rhythmicPulse);
+      const mode = field.fluidIntensity > 0.7 ? "consciousness" : "hybrid";
+      this.spawnParticle(mode, field.pulseRate);
     }
 
     // Update existing particles with field influence
@@ -1482,7 +1482,7 @@ export class ParticleConsciousnessModule
         // Update consciousness resonance based on field
         particle.consciousnessResonance = Math.min(
           1.0,
-          particle.consciousnessResonance + field.energyResonance * 0.1
+          particle.consciousnessResonance + field.energyLevel * 0.1
         );
       }
     });
@@ -1659,7 +1659,7 @@ export class ParticleConsciousnessModule
     };
   }
 
-  public async healthCheck(): Promise<HealthCheckResult> {
+  public override async healthCheck(): Promise<HealthCheckResult> {
     const activeCount = this.activeParticles.length;
     const poolCount = this.particlePool.length;
     const renderQuality = this.performanceConfig.renderQuality;
@@ -1792,6 +1792,26 @@ export class ParticleConsciousnessModule
       renderQuality: this.performanceConfig.renderQuality,
       avgFrameTime: this.averageFrameTime,
       consciousnessIntegration: this.currentConsciousnessField !== null,
+    };
+  }
+
+  // =========================================================================
+  // BACKGROUND SYSTEM PARTICIPANT INTERFACE
+  // =========================================================================
+
+  public onVisualStateUpdate(state: ConsciousnessField): void {
+    this.onConsciousnessFieldUpdate(state);
+  }
+
+  public onVisualEffectEvent(eventType: string, payload: any): void {
+    this.onChoreographyEvent(eventType, payload);
+  }
+
+  public getVisualContribution(): Partial<ConsciousnessField> {
+    return {
+      fluidIntensity: this.activeParticles.length / this.performanceConfig.maxParticles,
+      energyLevel: 0.5,
+      visualCoherence: this.averageFrameTime < 16.67 ? 1.0 : 0.5
     };
   }
 }

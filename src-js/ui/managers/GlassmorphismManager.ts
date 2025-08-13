@@ -23,8 +23,8 @@ type GlassIntensity =
   | "moderate";
 
 interface GlassEffectState {
-  currentEmotion: string;
-  emotionalIntensity: number;
+  currentMusicMood: string;
+  musicIntensity: number;
   beatPhase: number;
   lastBeatTime: number;
   effectIntensityLevel: number;
@@ -49,19 +49,19 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   private currentIntensity: GlassIntensity;
   private observers: MutationObserver[] = [];
   
-  // Year 3000 consciousness integration
+  // Year 3000 music integration
   private musicSyncService: MusicSyncService | null = null;
-  private emotionalMapper: EmotionalTemperatureMapper;
+  private musicTemperatureMapper: EmotionalTemperatureMapper;
   private oklabProcessor: OKLABColorProcessor;
   private effectState: GlassEffectState;
-  private cinematicPreset: EnhancementPreset;
+  private effectPreset: EnhancementPreset;
   
   // Quality scaling state
   private currentQualityLevel: QualityLevel | null = null;
   private qualityCapabilities: QualityCapability[] = [];
   
-  // Cross-system consciousness coordination
-  private consciousnessCoordinationCallbacks: Set<(state: GlassEffectState) => void> = new Set();
+  // Cross-system effect coordination
+  private effectCoordinationCallbacks: Set<(state: GlassEffectState) => void> = new Set();
 
   constructor(
     config: typeof Config = Config,
@@ -88,22 +88,22 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
     this.isSupported = this.detectBackdropFilterSupport();
     this.currentIntensity = "balanced";
     
-    // Initialize Year 3000 consciousness systems
-    this.emotionalMapper = new EmotionalTemperatureMapper(true);
+    // Initialize Year 3000 music analysis systems
+    this.musicTemperatureMapper = new EmotionalTemperatureMapper(true);
     this.oklabProcessor = new OKLABColorProcessor(true);
-    this.cinematicPreset = OKLABColorProcessor.getPreset('STANDARD');
+    this.effectPreset = OKLABColorProcessor.getPreset('STANDARD');
     
-    // Initialize consciousness state
+    // Initialize music effect state
     this.effectState = {
-      currentEmotion: 'neutral',
-      emotionalIntensity: 0.5,
+      currentMusicMood: 'neutral',
+      musicIntensity: 0.5,
       beatPhase: 0,
       lastBeatTime: 0,
       effectIntensityLevel: 0,
       dynamicAccentHex: '#cba6f7', // Catppuccin mauve fallback
       dynamicAccentRgb: '203,166,247',
       overallIntensityLevel: 0.5,
-      genreStyle: 'organic',
+      genreStyle: 'standard',
       animationRate: 1.0
     };
   }
@@ -124,8 +124,8 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
     const initialIntensity = this.settingsManager.get("sn-glassmorphism-level");
     this.applyGlassmorphismSettings(initialIntensity);
     
-    // Initialize Year 3000 consciousness integrations
-    await this.initializeConsciousnessIntegration();
+    // Initialize Year 3000 music integrations
+    await this.initializeMusicIntegration();
     
     // Event handling is now managed by ViewportAwareSystem via UnifiedEventBus
   }
@@ -246,12 +246,12 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
     }
 
     // Apply Year 3000 consciousness modulations directly to dropdown values
-    const consciousnessModulations = this.calculateConsciousnessModulations();
+    const musicModulations = this.calculateMusicModulations();
     
     // Apply emotional and musical modulations to glass properties
-    const finalBlur = this.modulateBlurValue(blurValue, consciousnessModulations);
-    const finalOpacity = this.modulateOpacityValue(opacityValue, consciousnessModulations);
-    const finalSaturation = this.modulateSaturationValue(saturationValue, consciousnessModulations);
+    const finalBlur = this.modulateBlurValue(blurValue, musicModulations);
+    const finalOpacity = this.modulateOpacityValue(opacityValue, musicModulations);
+    const finalSaturation = this.modulateSaturationValue(saturationValue, musicModulations);
 
     // Apply glass properties using coordination
     const glassPropertiesVariables = {
@@ -355,7 +355,7 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   /**
    * Initialize consciousness integration with music sync and emotional systems
    */
-  private async initializeConsciousnessIntegration(): Promise<void> {
+  private async initializeMusicIntegration(): Promise<void> {
     try {
       // Subscribe to unified color events
       unifiedEventBus.subscribe('colors:extracted', (event) => {
@@ -390,16 +390,16 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   /**
    * Calculate consciousness modulations for glass properties
    */
-  private calculateConsciousnessModulations(): {
-    emotionalModulation: number;
+  private calculateMusicModulations(): {
+    musicModulation: number;
     beatModulation: number;
     cinematicModulation: number;
-    breathingModulation: number;
+    animationModulation: number;
   } {
-    const { emotionalIntensity, beatPhase, effectIntensityLevel, overallIntensityLevel } = this.effectState;
+    const { musicIntensity, beatPhase, effectIntensityLevel, overallIntensityLevel } = this.effectState;
     
-    // Emotional modulation affects glass opacity and saturation
-    const emotionalModulation = 1 + (emotionalIntensity - 0.5) * 0.4; // ±20% based on emotion
+    // Music modulation affects glass opacity and saturation
+    const musicModulation = 1 + (musicIntensity - 0.5) * 0.4; // ±20% based on music mood
     
     // Beat modulation creates subtle rhythmic glass effects
     const beatModulation = 1 + Math.sin(beatPhase) * overallIntensityLevel * 0.15; // ±7.5% rhythmic variation
@@ -407,14 +407,14 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
     // Cinematic modulation for dramatic glass effects during intense moments
     const cinematicModulation = 1 + effectIntensityLevel * 0.3; // +30% during dramatic moments
     
-    // Organic breathing modulation for glass effects
-    const breathingModulation = 1 + Math.sin(Date.now() * this.effectState.animationRate * 0.001) * 0.08; // ±4% breathing
+    // Animation modulation for glass effects
+    const animationModulation = 1 + Math.sin(Date.now() * this.effectState.animationRate * 0.001) * 0.08; // ±4% animation
     
     return {
-      emotionalModulation,
+      musicModulation,
       beatModulation,
       cinematicModulation,
-      breathingModulation
+      animationModulation
     };
   }
 
@@ -423,10 +423,10 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
    */
   private modulateBlurValue(baseBlur: string, modulations: any): string {
     const blurValue = parseFloat(baseBlur.replace('px', ''));
-    const { emotionalModulation, beatModulation, breathingModulation } = modulations;
+    const { musicModulation, beatModulation, animationModulation } = modulations;
     
     // Apply modulations (emotional effects blur intensity, beat adds subtle pulse)
-    const finalBlur = blurValue * emotionalModulation * beatModulation * breathingModulation;
+    const finalBlur = blurValue * musicModulation * beatModulation * animationModulation;
     
     return `${Math.max(1, Math.round(finalBlur))}px`;
   }
@@ -436,10 +436,10 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
    */
   private modulateOpacityValue(baseOpacity: string, modulations: any): string {
     const opacityValue = parseFloat(baseOpacity);
-    const { emotionalModulation, cinematicModulation, breathingModulation } = modulations;
+    const { musicModulation, cinematicModulation, animationModulation } = modulations;
     
     // Apply modulations (emotional and cinematic effects are more subtle for opacity)
-    const finalOpacity = opacityValue * (1 + (emotionalModulation - 1) * 0.5) * cinematicModulation * breathingModulation;
+    const finalOpacity = opacityValue * (1 + (musicModulation - 1) * 0.5) * cinematicModulation * animationModulation;
     
     return Math.max(0.01, Math.min(1.0, finalOpacity)).toFixed(3);
   }
@@ -449,10 +449,10 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
    */
   private modulateSaturationValue(baseSaturation: string, modulations: any): string {
     const saturationValue = parseFloat(baseSaturation);
-    const { emotionalModulation, beatModulation, cinematicModulation } = modulations;
+    const { musicModulation, beatModulation, cinematicModulation } = modulations;
     
     // Apply modulations (all modulations affect saturation for rich consciousness effects)
-    const finalSaturation = saturationValue * emotionalModulation * beatModulation * cinematicModulation;
+    const finalSaturation = saturationValue * musicModulation * beatModulation * cinematicModulation;
     
     return Math.max(1.0, Math.min(3.0, finalSaturation)).toFixed(2);
   }
@@ -464,9 +464,9 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
     const { rawColors, musicData } = event;
     
     if (musicData) {
-      // Process emotional state
-      const emotionalResult = this.emotionalMapper.mapMusicToEmotionalTemperature(musicData);
-      this.updateEmotionalState(emotionalResult);
+      // Process music mood state
+      const musicResult = this.musicTemperatureMapper.mapMusicToEmotionalTemperature(musicData);
+      this.updateMusicState(musicResult);
     }
   }
 
@@ -478,7 +478,7 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
     
     // Update dynamic accent with OKLAB-processed colors
     if (processedColors.VIBRANT) {
-      const oklabResult = this.oklabProcessor.processColor(processedColors.VIBRANT, this.cinematicPreset);
+      const oklabResult = this.oklabProcessor.processColor(processedColors.VIBRANT, this.effectPreset);
       this.effectState.dynamicAccentHex = oklabResult.enhancedHex;
       this.effectState.dynamicAccentRgb = `${oklabResult.enhancedRgb.r},${oklabResult.enhancedRgb.g},${oklabResult.enhancedRgb.b}`;
       
@@ -525,25 +525,25 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   /**
    * Update emotional state from music analysis
    */
-  private updateEmotionalState(emotionalResult: EmotionalTemperatureResult): void {
-    this.effectState.currentEmotion = emotionalResult.primaryEmotion;
-    this.effectState.emotionalIntensity = emotionalResult.intensity;
+  private updateMusicState(musicResult: EmotionalTemperatureResult): void {
+    this.effectState.currentMusicMood = musicResult.primaryEmotion;
+    this.effectState.musicIntensity = musicResult.intensity;
     
-    // Adjust breathing rate based on emotion
-    switch (emotionalResult.primaryEmotion) {
+    // Adjust animation rate based on music mood
+    switch (musicResult.primaryEmotion) {
       case 'energetic':
       case 'aggressive':
-        this.effectState.animationRate = 1.5; // Faster breathing for high energy
-        this.cinematicPreset = OKLABColorProcessor.getPreset('COSMIC');
+        this.effectState.animationRate = 1.5; // Faster animation for high energy
+        this.effectPreset = OKLABColorProcessor.getPreset('COSMIC');
         break;
       case 'calm':
       case 'ambient':
-        this.effectState.animationRate = 0.7; // Slower breathing for calm
-        this.cinematicPreset = OKLABColorProcessor.getPreset('SUBTLE');
+        this.effectState.animationRate = 0.7; // Slower animation for calm
+        this.effectPreset = OKLABColorProcessor.getPreset('SUBTLE');
         break;
       default:
-        this.effectState.animationRate = 1.0; // Normal breathing
-        this.cinematicPreset = OKLABColorProcessor.getPreset('STANDARD');
+        this.effectState.animationRate = 1.0; // Normal animation rate
+        this.effectPreset = OKLABColorProcessor.getPreset('STANDARD');
     }
   }
 
@@ -797,7 +797,7 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
       if (this.effectState.dynamicAccentHex) {
         const oklabResult = this.oklabProcessor.processColor(
           this.effectState.dynamicAccentHex, 
-          this.cinematicPreset
+          this.effectPreset
         );
         this.effectState.dynamicAccentHex = oklabResult.enhancedHex;
         this.effectState.dynamicAccentRgb = `${oklabResult.enhancedRgb.r},${oklabResult.enhancedRgb.g},${oklabResult.enhancedRgb.b}`;
@@ -820,11 +820,11 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
    * Register for consciousness coordination updates
    */
   public onConsciousnessCoordination(callback: (state: GlassEffectState) => void): () => void {
-    this.consciousnessCoordinationCallbacks.add(callback);
+    this.effectCoordinationCallbacks.add(callback);
     
     // Return unsubscribe function
     return () => {
-      this.consciousnessCoordinationCallbacks.delete(callback);
+      this.effectCoordinationCallbacks.delete(callback);
     };
   }
 
@@ -833,11 +833,11 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
    */
   public synchronizeConsciousnessState(sharedState: Partial<GlassEffectState>): void {
     // Update our consciousness state with shared values
-    if (sharedState.currentEmotion) {
-      this.effectState.currentEmotion = sharedState.currentEmotion;
+    if (sharedState.currentMusicMood) {
+      this.effectState.currentMusicMood = sharedState.currentMusicMood;
     }
-    if (sharedState.emotionalIntensity !== undefined) {
-      this.effectState.emotionalIntensity = sharedState.emotionalIntensity;
+    if (sharedState.musicIntensity !== undefined) {
+      this.effectState.musicIntensity = sharedState.musicIntensity;
     }
     if (sharedState.beatPhase !== undefined) {
       this.effectState.beatPhase = sharedState.beatPhase;
@@ -872,7 +872,7 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
    * Broadcast consciousness state to coordinated systems
    */
   private broadcastConsciousnessState(): void {
-    this.consciousnessCoordinationCallbacks.forEach(callback => {
+    this.effectCoordinationCallbacks.forEach(callback => {
       try {
         callback(this.effectState);
       } catch (error) {
@@ -884,8 +884,8 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   /**
    * Enhanced emotional state update with coordination
    */
-  private updateEmotionalStateWithCoordination(emotionalResult: EmotionalTemperatureResult): void {
-    this.updateEmotionalState(emotionalResult);
+  private updateMusicStateWithCoordination(musicResult: EmotionalTemperatureResult): void {
+    this.updateMusicState(musicResult);
     
     // Broadcast updated state to coordinated systems
     this.broadcastConsciousnessState();
@@ -1051,7 +1051,7 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
    * Apply coordinated beat pulse to glass effects
    */
   private applyCoordinatedBeatPulse(beatPhase: number): void {
-    const modulations = this.calculateConsciousnessModulations();
+    const modulations = this.calculateMusicModulations();
     const baseIntensity = this.getIntensityValue(this.currentIntensity);
     
     // Create synchronized beat pulse effect
@@ -1068,7 +1068,7 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
    * Apply coordinated dramatic effects to glass systems
    */
   private applyCoordinatedDramaticEffects(dramaticLevel: number, type: string): void {
-    const modulations = this.calculateConsciousnessModulations();
+    const modulations = this.calculateMusicModulations();
     const baseIntensity = this.getIntensityValue(this.currentIntensity);
     
     // Calculate dramatic enhancement

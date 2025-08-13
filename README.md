@@ -18,7 +18,7 @@
 
 **Catppuccin StarryNight** is more than just a theme—it's a visual system designed to transform your Spotify client into a dynamic, music-reactive experience. Built on the beloved [Catppuccin](https://github.com/catppuccin) color palette, it synchronizes UI elements with your music's rhythm and energy, while adapting its colors to every song's album art.
 
-Engineered for performance and designed for immersion, StarryNight uses a sophisticated animation and color pipeline to deliver stunning visuals at a smooth 60 FPS, even on modest hardware. This project represents a significant effort in reverse-engineering Spotify's UI and building a robust, customizable, and beautiful experience for music lovers.
+Engineered for performance and designed for immersion, StarryNight uses a sophisticated Visual Effects Coordination system to deliver stunning visuals at a smooth 60 FPS, even on modest hardware. This project represents a significant effort in reverse-engineering Spotify's UI and building a robust, customizable, and beautiful experience for music lovers.
 
 ## 📸 Screenshots
 
@@ -50,16 +50,16 @@ _The theme adapts to your music and color preferences in real time._
 ## ✨ Features
 
 - **🎨 Dynamic Color Pipeline**: UI colors adapt in real-time to album art, harmonized with your chosen Catppuccin flavor.
-- **🌊 WebGL Flow Gradient**: Revolutionary flowing gradient system with dual time-offset waves, dynamic blur, and hardware acceleration.
-- **🎵 BeatSync Visuals**: UI elements pulse, bloom, and animate in sync with the music's BPM and energy.
-- **🚀 Performance Core**: A unified animation loop and batched CSS variable updates ensure a smooth 60 FPS experience. Recently optimized by removing performance-heavy glyph and ripple systems.
+- **🌊 Visual Effects Coordination**: Revolutionary background system with coordinated visual effects, hardware acceleration, and progressive enhancement.
+- **🎵 BeatSync Visuals**: UI elements pulse, bloom, and animate in sync with the music's BPM and energy through unified state management.
+- **🚀 Performance Core**: A unified animation loop and batched CSS variable updates ensure a smooth 60 FPS experience with intelligent quality scaling.
 - **⚙️ Graceful Degradation**: Automatically scales visual fidelity for reduced-motion settings, low-end hardware, and fallback modes.
-- **🔮 Modular Visual Systems**: Includes 3D card effects, glassmorphism, nebula glows, wave stack blending, and more, all configurable.
+- **🔮 Modular Visual Systems**: Background systems coordinate through shared state for unified visual experiences, all configurable.
 - **🔧 In-App Settings**: Tweak theme options directly in Spotify's preferences menu—no manual file editing required.
 - **🖐️ Advanced Drag-and-Drop**: Experience enhanced drag ghosts, a quick-add radial menu, and morphing sidebar interactions.
 - **♿ Accessibility**: Respects system motion/contrast preferences and provides full keyboard navigation.
 
-For a deeper dive, explore the [**Documentation Hub**](docs/README.md) and the [**Visual Systems Architecture**](docs/VISUAL_SYSTEMS_ARCHITECTURE.md).
+For a deeper dive, explore the [**Documentation Hub**](docs/README.md) and the [**Visual Systems Reference**](docs/VISUAL_SYSTEMS_REFERENCE.md).
 
 ## 🚀 Installation
 
@@ -154,7 +154,7 @@ See the [**Customization Guide**](docs/README.md) for more details.
 1.  Make sure the `catppuccin-starrynight.js` extension is enabled in your `config-xpui.ini` file.
 2.  In the theme's settings, ensure the Accent Color is set to "Dynamic".
 3.  Restart Spotify completely.
-4.  Check the Spicetify console for errors via `Spicetify > Advanced > Developer tools`. Look for "Year 3000 Color Harmony System initialized".
+4.  Check the Spicetify console for errors via `Spicetify > Advanced > Developer tools`. Look for "Visual Effects Coordination System initialized".
 
 **Performance issues?**
 
@@ -162,11 +162,11 @@ See the [**Customization Guide**](docs/README.md) for more details.
 - Set Flow Gradient to "minimal" or "disabled" for older hardware.
 - Enable "Eco Mode" to reduce animation intensity.
 
-**WebGL gradient not working?**
+**Visual effects not working?**
 
 - Check if WebGL2 is supported: Open browser console and run `!!document.createElement('canvas').getContext('webgl2')`
 - Update your graphics drivers to the latest version.
-- The theme automatically falls back to CSS gradients if WebGL is unavailable.
+- The theme automatically falls back to CSS-based effects if WebGL is unavailable.
 
 **PowerShell script error?**
 

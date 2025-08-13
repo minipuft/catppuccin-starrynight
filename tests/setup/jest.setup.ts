@@ -119,19 +119,129 @@ if (dom.window.document.documentElement && dom.window.document.documentElement.s
 // 6. Performance shim
 (global as any).performance = global.performance || { now: () => Date.now() };
 
-// 7. Minimal Spicetify stub – just enough for unit tests
+// 7. Comprehensive Spicetify mock for theme integration
 (global as any).Spicetify = {
   LocalStorage: {
-    get: () => null,
-    set: () => {},
+    get: jest.fn(() => null),
+    set: jest.fn(),
+    remove: jest.fn(),
+    clear: jest.fn(),
   },
+  
   Player: {
     data: {
-      item: {},
+      item: {
+        metadata: {
+          title: 'Test Track',
+          artist_name: 'Test Artist',
+          album_name: 'Test Album',
+        },
+        uri: 'spotify:track:test123'
+      },
+      track: {
+        metadata: {
+          title: 'Test Track',
+          artist_name: 'Test Artist', 
+          album_name: 'Test Album',
+        }
+      },
+      is_paused: false,
+      duration: 200000,
+      position: 100000,
+    },
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    next: jest.fn(),
+    previous: jest.fn(),
+    togglePlay: jest.fn(),
+    seekTo: jest.fn(),
+  },
+  
+  Platform: {
+    History: {
+      listen: jest.fn(() => jest.fn()), // Returns cleanup function
+      push: jest.fn(),
+      replace: jest.fn(),
+      goBack: jest.fn(),
+      goForward: jest.fn(),
+      location: {
+        pathname: '/test',
+        search: '',
+        hash: '',
+      },
+    },
+    ClipboardAPI: {
+      copy: jest.fn().mockResolvedValue(undefined),
     },
   },
-  colorExtractor: jest.fn().mockResolvedValue({}),
-  CosmosAsync: { get: jest.fn().mockResolvedValue({}) },
+  
+  // Color extraction API with realistic responses
+  colorExtractor: jest.fn().mockResolvedValue({
+    LIGHT_VIBRANT: { hex: '#ff6b6b', rgb: [255, 107, 107] },
+    VIBRANT: { hex: '#4ecdc4', rgb: [78, 205, 196] },
+    DARK_VIBRANT: { hex: '#45b7d1', rgb: [69, 183, 209] },
+    LIGHT_MUTED: { hex: '#a8e6cf', rgb: [168, 230, 207] },
+    MUTED: { hex: '#88d8c0', rgb: [136, 216, 192] },
+    DARK_MUTED: { hex: '#2c3e50', rgb: [44, 62, 80] },
+    DOMINANT: { hex: '#336699', rgb: [51, 102, 153] }
+  }),
+  
+  // Audio data API for music sync systems
+  getAudioData: jest.fn().mockReturnValue({
+    energy: 0.7,
+    valence: 0.6,
+    tempo: 128,
+    loudness: -5.5,
+    danceability: 0.8,
+    acousticness: 0.2,
+    instrumentalness: 0.1,
+    liveness: 0.3,
+    speechiness: 0.05,
+    key: 5,
+    mode: 1,
+    time_signature: 4,
+    // Raw audio analysis data
+    bars: [],
+    beats: [],
+    sections: [],
+    segments: [],
+    tatums: []
+  }),
+  
+  // Cosmos API for data fetching
+  CosmosAsync: { 
+    get: jest.fn().mockResolvedValue({}),
+    post: jest.fn().mockResolvedValue({}),
+    put: jest.fn().mockResolvedValue({}),
+    del: jest.fn().mockResolvedValue({}),
+  },
+  
+  // UI API
+  showNotification: jest.fn(),
+  Snackbar: {
+    enqueueSnackbar: jest.fn(),
+  },
+  
+  // Config and app info
+  Config: {
+    version: '1.2.1',
+    isDevMode: true,
+  },
+  
+  // React integration (provided by Spicetify)
+  React: global.React || {
+    createElement: jest.fn(),
+    useState: jest.fn(() => [null, jest.fn()]),
+    useEffect: jest.fn(),
+    useRef: jest.fn(() => ({ current: null })),
+    Component: class MockComponent {},
+  },
+  
+  ReactDOM: global.ReactDOM || {
+    render: jest.fn(),
+    unmountComponentAtNode: jest.fn(),
+    createPortal: jest.fn(),
+  },
 };
 
 // 8. indexedDB placeholder (TemporalMemoryService)
@@ -142,11 +252,34 @@ if (dom.window.document.documentElement && dom.window.document.documentElement.s
   supports: jest.fn().mockReturnValue(true)
 };
 
-// 10. Mock idb's openDB to avoid real IndexedDB usage in Node
+// 10. Enhanced IndexedDB Mock for TemporalMemoryService
+const mockDB = {
+  get: jest.fn().mockResolvedValue(undefined),
+  put: jest.fn().mockResolvedValue(undefined),
+  delete: jest.fn().mockResolvedValue(undefined),
+  clear: jest.fn().mockResolvedValue(undefined),
+  getAllKeys: jest.fn().mockResolvedValue([]),
+  getAll: jest.fn().mockResolvedValue([]),
+  count: jest.fn().mockResolvedValue(0),
+  transaction: jest.fn().mockReturnValue({
+    objectStore: jest.fn().mockReturnValue({
+      get: jest.fn().mockResolvedValue(undefined),
+      put: jest.fn().mockResolvedValue(undefined),
+      delete: jest.fn().mockResolvedValue(undefined),
+      clear: jest.fn().mockResolvedValue(undefined)
+    }),
+    complete: jest.fn().mockResolvedValue(undefined)
+  }),
+  close: jest.fn(),
+  version: 1,
+  name: 'TestDB',
+  objectStoreNames: ['testStore']
+};
+
 jest.mock("idb", () => ({
   __esModule: true,
-  openDB: jest.fn().mockResolvedValue({}),
-  deleteDB: jest.fn(),
+  openDB: jest.fn().mockResolvedValue(mockDB),
+  deleteDB: jest.fn().mockResolvedValue(undefined),
 }));
 
 // 11. Enhanced WebGL Mocking System
@@ -174,7 +307,7 @@ const createWebGLMock = () => {
     getShaderParameter: jest.fn((shader: any, param: number) => {
       return param === 35713 ? true : false; // COMPILE_STATUS = 35713
     }),
-    getShaderInfoLog: jest.fn(() => 'Mock shader info log'),
+    getShaderInfoLog: jest.fn(() => ''), // Return empty string for successful compilation
     
     // Program operations
     createProgram: jest.fn(() => mockProgram),
@@ -265,29 +398,165 @@ HTMLCanvasElement.prototype.getContext = jest.fn((contextType: string) => {
   }
   if (contextType === '2d') {
     return {
+      // Drawing operations
       fillRect: jest.fn(),
       clearRect: jest.fn(),
+      strokeRect: jest.fn(),
+      
+      // Image operations
       getImageData: jest.fn(() => ({ data: new Uint8ClampedArray(4) })),
       putImageData: jest.fn(),
       createImageData: jest.fn(() => ({ data: new Uint8ClampedArray(4) })),
-      setTransform: jest.fn(),
       drawImage: jest.fn(),
+      
+      // Transform operations (CRITICAL - these were missing)
+      setTransform: jest.fn(),
+      getTransform: jest.fn(() => ({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })),
+      resetTransform: jest.fn(),
+      scale: jest.fn(),          // ← This was missing, causing the error
+      rotate: jest.fn(),
+      translate: jest.fn(),
+      transform: jest.fn(),
+      
+      // State management
       save: jest.fn(),
       restore: jest.fn(),
+      
+      // Path operations
       beginPath: jest.fn(),
+      closePath: jest.fn(),
       moveTo: jest.fn(),
       lineTo: jest.fn(),
-      closePath: jest.fn(),
+      bezierCurveTo: jest.fn(),
+      quadraticCurveTo: jest.fn(),
+      arc: jest.fn(),
+      arcTo: jest.fn(),
+      ellipse: jest.fn(),
+      rect: jest.fn(),
+      
+      // Drawing styles
       stroke: jest.fn(),
       fill: jest.fn(),
+      clip: jest.fn(),
+      
+      // Properties (getters/setters)
+      fillStyle: '#000000',
+      strokeStyle: '#000000',
+      lineWidth: 1,
+      lineCap: 'butt',
+      lineJoin: 'miter',
+      miterLimit: 10,
+      lineDashOffset: 0,
+      shadowOffsetX: 0,
+      shadowOffsetY: 0,
+      shadowBlur: 0,
+      shadowColor: 'rgba(0, 0, 0, 0)',
+      globalAlpha: 1.0,
+      globalCompositeOperation: 'source-over',
+      
+      // Text operations
+      fillText: jest.fn(),
+      strokeText: jest.fn(),
+      measureText: jest.fn(() => ({ width: 100 })),
+      font: '10px sans-serif',
+      textAlign: 'start',
+      textBaseline: 'alphabetic',
+      direction: 'inherit',
+      
+      // Line dash operations
+      setLineDash: jest.fn(),
+      getLineDash: jest.fn(() => []),
+      
+      // Image smoothing
+      imageSmoothingEnabled: true,
+      imageSmoothingQuality: 'low',
+      
+      // Canvas dimensions (mock)
+      canvas: {
+        width: 800,
+        height: 600,
+        style: {},
+        getContext: jest.fn(() => null) // Recursive context creation fallback
+      }
     };
   }
   return null;
 });
 
-// 12. Silence noisy console logs in test output (optional)
+// 12. Global System Dependencies Bootstrap
+// Initialize global dependencies that SystemCoordinator and other systems need
+// This prevents "Global OptimizedCSSVariableManager not initialized" errors
+
+// Create mock global CSS manager instance (set this early, before any imports)
+const mockOptimizedCSSController = {
+  queueCSSVariableUpdate: jest.fn(),
+  flushBatch: jest.fn(),
+  setProperty: jest.fn(),
+  destroy: jest.fn(),
+  initialized: true,
+  initialize: jest.fn().mockResolvedValue(undefined),
+  // Additional methods for enhanced CSS variable management
+  batchSetVariables: jest.fn(),
+  clearBatch: jest.fn(),
+  getBatchSize: jest.fn(() => 0),
+  isReady: jest.fn(() => true),
+  flush: jest.fn(),
+  flushPendingUpdates: jest.fn(),
+  // CSS consciousness controller compatibility
+  updateCSSVariable: jest.fn(),
+  updateBatchedCSSVariables: jest.fn(),
+  queueBatchedUpdate: jest.fn()
+};
+
+// Set up global references that systems expect
+(global as any).globalOptimizedCSSController = mockOptimizedCSSController;
+
+// Mock the getter function specifically
+jest.mock('@/core/performance/OptimizedCSSVariableManager', () => ({
+  ...jest.requireActual('@/core/performance/OptimizedCSSVariableManager'),
+  getGlobalOptimizedCSSController: () => mockOptimizedCSSController,
+  setGlobalOptimizedCSSController: jest.fn(),
+  isGlobalOptimizedCSSControllerAvailable: () => true
+}));
+
+// Mock Year3000System global
+(global as any).year3000System = {
+  isInitialized: true,
+  getCachedNonVisualSystem: jest.fn(() => mockOptimizedCSSController),
+  config: { enableDebug: false, artisticMode: 'artist-vision' },
+  // Enhanced properties for system orchestration
+  cssConsciousnessController: mockOptimizedCSSController,
+  unifiedCSSConsciousnessController: mockOptimizedCSSController,
+  performanceAnalyzer: null,
+  performanceCoordinator: null,
+  performanceOrchestrator: null,
+  musicSyncService: null,
+  settingsManager: null,
+  colorHarmonyEngine: null,
+  semanticColorManager: null,
+  deviceCapabilityDetector: null,
+  // Facade coordination
+  facadeCoordinator: {
+    getVisualSystem: jest.fn(() => null),
+    getNonVisualSystem: jest.fn(() => mockOptimizedCSSController),
+    isInitialized: jest.fn(() => true)
+  },
+  // Animation and timer systems
+  timerConsolidationSystem: {
+    registerConsolidatedTimer: jest.fn(),
+    unregisterConsolidatedTimer: jest.fn()
+  },
+  // Methods that might be called
+  registerAnimationSystem: jest.fn(),
+  unregisterAnimationSystem: jest.fn(),
+  queueCSSVariableUpdate: jest.fn(),
+  updateFromMusicAnalysis: jest.fn(),
+  applyColorsToTheme: jest.fn()
+};
+
+// 13. Silence noisy console logs in test output (optional)
 const originalConsoleError = console.error.bind(console);
 console.error = (...args: any[]) => {
-  if (/(StorageManager|CSSVariableBatcher)/.test(args[0])) return;
+  if (/(StorageManager|CSSVariableBatcher|OptimizedCSSVariableManager.*not.*initialized)/.test(args[0])) return;
   originalConsoleError(...args);
 };

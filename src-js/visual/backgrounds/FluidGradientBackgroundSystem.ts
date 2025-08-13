@@ -13,14 +13,15 @@ import { unifiedEventBus, type EventData } from "@/core/events/UnifiedEventBus";
 import { SimplePerformanceCoordinator, type QualityLevel, type QualityScalingCapable, type PerformanceMetrics, type QualityCapability } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
+import type { HealthCheckResult } from "@/types/systems";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { ShaderLoader } from "@/utils/graphics/ShaderLoader";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 import type {
-  BackgroundAnimationCoordinator,
+  VisualEffectsCoordinator,
   BackgroundSystemParticipant,
-  ConsciousnessField,
-} from "../effects/BackgroundAnimationCoordinator";
+  VisualEffectState,
+} from "../effects/VisualEffectsCoordinator";
 import { WebGLGradientBackgroundSystem } from "../background/WebGLRenderer";
 
 // Enhanced shader with advanced liquid consciousness flow patterns
@@ -437,9 +438,9 @@ export class FluidGradientBackgroundSystem
   private lastMusicUpdate = 0;
 
   // Consciousness choreographer integration
-  private consciousnessChoreographer: BackgroundAnimationCoordinator | null =
+  private consciousnessChoreographer: VisualEffectsCoordinator | null =
     null;
-  private currentConsciousnessField: ConsciousnessField | null = null;
+  private currentConsciousnessField: VisualEffectState | null = null;
 
   // Make systemName publicly accessible for the interface
   public override readonly systemName: string =
@@ -805,7 +806,7 @@ export class FluidGradientBackgroundSystem
 
   public override updateAnimation(deltaTime: number): void {
     // Update base WebGL system
-    this.webglGradientSystem?.updateAnimation?.(performance.now(), deltaTime);
+    this.webglGradientSystem?.updateAnimation?.(deltaTime);
 
     // Update liquid consciousness phase
     this.liquidSettings.liquidPhase += deltaTime * 0.001;
@@ -975,21 +976,22 @@ export class FluidGradientBackgroundSystem
     }
   }
 
-  public async healthCheck(): Promise<{ ok: boolean; details: string }> {
-    const baseHealth = (await this.webglGradientSystem?.healthCheck?.()) || {
-      ok: true,
-      details: "WebGL system not initialized",
-    };
-
-    if (!baseHealth.ok) {
-      return baseHealth;
-    }
-
+  public override async healthCheck(): Promise<HealthCheckResult> {
+    const isHealthy = this.liquidSettings.enabled && this.shaderProgram !== null;
+    
     return {
-      ok: this.liquidSettings.enabled && this.shaderProgram !== null,
-      details: this.liquidSettings.enabled
-        ? "Liquid consciousness active"
-        : "Liquid consciousness disabled",
+      system: 'FluidGradientBackgroundSystem',
+      healthy: isHealthy,
+      metrics: {
+        enabled: this.liquidSettings.enabled,
+        hasShaderProgram: !!this.shaderProgram,
+        initialized: this.initialized,
+        flowIntensity: this.liquidSettings.flowIntensity
+      },
+      issues: isHealthy ? [] : [
+        ...(this.liquidSettings.enabled ? [] : ['System disabled']),
+        ...(this.shaderProgram ? [] : ['Shader program not initialized'])
+      ]
     };
   }
 
@@ -1305,7 +1307,7 @@ export class FluidGradientBackgroundSystem
     };
   }
 
-  public onConsciousnessFieldUpdate(field: ConsciousnessField): void {
+  public onConsciousnessFieldUpdate(field: VisualEffectState): void {
     if (!this.gl || !this.shaderProgram) return;
 
     try {
@@ -1318,9 +1320,9 @@ export class FluidGradientBackgroundSystem
         "FluidGradientBackgroundSystem",
         "Updated from consciousness field:",
         {
-          rhythmicPulse: field.rhythmicPulse,
-          liquidDensity: field.liquidDensity,
-          membraneFluidityIndex: field.membraneFluidityIndex,
+          rhythmicPulse: field.pulseRate,
+          liquidDensity: field.fluidIntensity,
+          membraneFluidityIndex: field.fluidIntensity,
         }
       );
     } catch (error) {
@@ -1391,12 +1393,12 @@ export class FluidGradientBackgroundSystem
   /**
    * Update liquid shader parameters based on consciousness field
    */
-  private updateLiquidFromConsciousness(field: ConsciousnessField): void {
+  private updateLiquidFromConsciousness(field: VisualEffectState): void {
     if (!this.gl || !this.shaderProgram) return;
 
     // Modulate liquid phase with rhythmic pulse
     const consciousLiquidPhase =
-      this.liquidSettings.liquidPhase + field.rhythmicPulse * 0.5;
+      this.liquidSettings.liquidPhase + field.pulseRate * 0.5;
     const liquidPhaseLocation = this.gl.getUniformLocation(
       this.shaderProgram,
       "u_liquidPhase"
@@ -1408,7 +1410,7 @@ export class FluidGradientBackgroundSystem
     // Modulate breathing intensity with consciousness breathing cycle
     const consciousBreathing =
       this.liquidSettings.breathingIntensity *
-      (0.7 + field.breathingCycle * 0.3);
+      (0.7 + field.pulseRate * 0.3);
     const breathingLocation = this.gl.getUniformLocation(
       this.shaderProgram,
       "u_breathingIntensity"
@@ -1425,7 +1427,7 @@ export class FluidGradientBackgroundSystem
     if (auroraFlowLocation) {
       this.gl.uniform1f(
         auroraFlowLocation,
-        this.liquidSettings.auroraFlow * (0.8 + field.musicalFlow.x * 0.4)
+        this.liquidSettings.auroraFlow * (0.8 + field.flowDirection.x * 0.4)
       );
     }
 
@@ -1437,8 +1439,8 @@ export class FluidGradientBackgroundSystem
     if (flowDirectionLocation) {
       this.gl.uniform2f(
         flowDirectionLocation,
-        field.musicalFlow.x,
-        field.musicalFlow.y
+        field.flowDirection.x,
+        field.flowDirection.y
       );
     }
 
@@ -1450,7 +1452,7 @@ export class FluidGradientBackgroundSystem
     if (turbulenceLocation) {
       const consciousTurbulence =
         this.liquidSettings.liquidTurbulence *
-        (0.5 + field.energyResonance * 0.5);
+        (0.5 + field.energyLevel * 0.5);
       this.gl.uniform1f(turbulenceLocation, consciousTurbulence);
     }
 
@@ -1460,7 +1462,7 @@ export class FluidGradientBackgroundSystem
       "u_consciousnessDepth"
     );
     if (depthLocation) {
-      this.gl.uniform1f(depthLocation, field.membraneFluidityIndex);
+      this.gl.uniform1f(depthLocation, field.fluidIntensity);
     }
 
     // Apply consciousness-aware CSS variables for hybrid coordination
@@ -1505,5 +1507,41 @@ export class FluidGradientBackgroundSystem
         error
       );
     }
+  }
+
+  // =========================================================================
+  // BACKGROUND SYSTEM PARTICIPANT INTERFACE
+  // =========================================================================
+
+  public onVisualStateUpdate(state: VisualEffectState): void {
+    // Update visual effects based on shared state
+    this.onConsciousnessFieldUpdate(state);
+  }
+
+  public onVisualEffectEvent(eventType: string, payload: any): void {
+    // Handle visual effect events from coordinator
+    switch (eventType) {
+      case "visual:rhythm-shift":
+        if (payload.intensity) {
+          this.liquidSettings.liquidTurbulence = Math.min(1, payload.intensity * 0.8);
+        }
+        break;
+      case "visual:color-shift":
+        this.forceRepaint("color-shift");
+        break;
+      case "visual:energy-surge":
+        if (payload.intensity > 0.5) {
+          this.liquidSettings.particleDensity = Math.min(1, payload.intensity);
+        }
+        break;
+    }
+  }
+
+  public getVisualContribution(): Partial<VisualEffectState> {
+    return {
+      fluidIntensity: this.liquidSettings.liquidTurbulence,
+      effectDepth: this.liquidSettings.particleDensity,
+      systemHarmony: this.liquidSettings.surfaceTension
+    };
   }
 }

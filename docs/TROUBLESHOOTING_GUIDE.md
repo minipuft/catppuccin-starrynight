@@ -1,20 +1,82 @@
 # Troubleshooting Guide
 
-> **"In the Year 3000, every challenge becomes an opportunity for consciousness to evolve—debugging is not just fixing code, it's healing the digital organism and restoring harmony to the living interface."**
+> **"In the Year 3000, every challenge becomes an opportunity for coordination to evolve—debugging is not just fixing code, it's healing the digital organism and restoring harmony between coordinated systems."**
 
 ## Overview
 
-This comprehensive troubleshooting guide addresses common issues in the Catppuccin StarryNight theme architecture. The Year 3000 System's sophisticated consciousness-aware architecture requires specialized debugging approaches that consider both technical and organic aspects of the system.
+This comprehensive troubleshooting guide addresses common issues in the Catppuccin StarryNight theme architecture. The Year 3000 System's sophisticated Visual Effects Coordination architecture requires specialized debugging approaches that consider both technical coordination and organic harmony aspects of the system.
 
 ### Troubleshooting Philosophy
 
-1. **Organic Debugging** - Understanding issues as consciousness imbalances rather than mere errors
-2. **System-Wide Analysis** - Examining issues across the entire facade pattern architecture
-3. **Performance-Conscious Solutions** - Fixing issues while maintaining performance targets
+1. **Coordination-Aware Debugging** - Understanding issues as coordination imbalances rather than mere errors
+2. **System-Wide Analysis** - Examining issues across the entire facade pattern and coordination architecture
+3. **Performance-Conscious Solutions** - Fixing issues while maintaining performance targets and visual state harmony
 4. **Multi-Agent Awareness** - Considering agent coordination when diagnosing problems
-5. **Graceful Recovery** - Implementing self-healing mechanisms for robust operation
+5. **Graceful Recovery** - Implementing self-healing mechanisms for robust coordination
 
 ## Common Issues and Solutions
+
+### Visual Effects Coordination Issues
+
+#### Issue: VisualEffectsCoordinator not initializing
+**Symptoms:**
+- Background systems not receiving coordinated state updates
+- Console error: "VisualEffectsCoordinator initialization failed"
+- Visual effects appear disconnected or uncoordinated
+
+**Diagnosis:**
+```typescript
+// Check coordinator status
+console.log('Coordinator instance:', VisualEffectsCoordinator.getInstance());
+console.log('Registered participants:', coordinator.getParticipantCount());
+
+// Verify participant registration
+const participants = coordinator.getRegisteredParticipants();
+console.log('Active participants:', participants.map(p => p.systemName));
+```
+
+**Solutions:**
+1. **Check Singleton Initialization**
+   ```typescript
+   // Ensure coordinator is initialized before system registration
+   const coordinator = VisualEffectsCoordinator.getInstance();
+   await coordinator.initialize();
+   
+   // Then register participants
+   coordinator.registerVisualParticipant(backgroundSystem);
+   ```
+
+2. **Verify Interface Implementation**
+   ```typescript
+   // Ensure systems properly implement BackgroundSystemParticipant
+   class MyBackgroundSystem implements BackgroundSystemParticipant {
+     public systemName = "MyBackgroundSystem";
+     onVisualStateUpdate(state: VisualEffectState): void { /* required */ }
+     onVisualEffectEvent(eventType: string, payload: any): void { /* required */ }
+     getVisualContribution(): Partial<VisualEffectState> { /* required */ }
+   }
+   ```
+
+#### Issue: Visual state not updating across systems
+**Symptoms:**
+- Individual background systems work but don't coordinate
+- Music changes don't affect all visual systems uniformly
+- Performance metrics show high coordination latency
+
+**Solutions:**
+1. **Check State Evolution Loop**
+   ```typescript
+   // Verify state evolution is running
+   const metrics = coordinator.getPerformanceMetrics();
+   console.log('State updates per second:', metrics.stateUpdatesPerSecond);
+   console.log('Last state evolution:', metrics.lastStateEvolution);
+   ```
+
+2. **Debug Participant Contributions**
+   ```typescript
+   // Check if participants are contributing back to state
+   coordinator.debugParticipantContributions();
+   ```
 
 ### System Initialization Problems
 

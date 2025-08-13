@@ -748,7 +748,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
 
     // Update consciousness variables using coordination
     const consciousnessAccentVariables = {
-      "--organic-holographic-rgb": accentRgb,
+      "--sn-holographic-rgb": accentRgb,
       "--holographic-scanline-rgb": accentRgb,
       "--consciousness-intensity": `calc(0.5 + var(--musical-sync-intensity) * ${this.integrationConfig.energyResponseMultiplier})`,
     };
@@ -951,7 +951,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
     );
   }
 
-  public async healthCheck(): Promise<any> {
+  public override async healthCheck(): Promise<any> {
     const isDynamicEnabled = this.checkDynamicAccentEnabled();
     const hasRecentUpdate =
       Date.now() - this.dynamicColorState.lastUpdateTime < 30000; // 30s

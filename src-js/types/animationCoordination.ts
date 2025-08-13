@@ -10,21 +10,28 @@
 
 // Import base types for extension and re-export
 import type { 
-  ConsciousnessField,
+  VisualEffectState,
   BackgroundSystemParticipant,
-  ChoreographyEventType,
-  OrganicTransitionConfig,
   Vector2D
-} from '@/visual/effects/BackgroundAnimationCoordinator';
+} from '@/visual/effects/VisualEffectsCoordinator';
+
+// Define choreography event types locally since they may not exist yet
+export type ChoreographyEventType = 'rhythm-shift' | 'intensity-peak' | 'genre-transition' | 'emotional-shift';
+export type OrganicTransitionConfig = {
+  duration: number;
+  easing: 'smooth' | 'harmonic' | 'exponential' | 'cubic';
+  intensity: number;
+};
 
 // Re-export core types for convenience
 export type {
-  ConsciousnessField,
+  VisualEffectState,
   BackgroundSystemParticipant,
-  ChoreographyEventType,
-  OrganicTransitionConfig,
   Vector2D
 };
+
+// Alias for backward compatibility
+export type ConsciousnessField = VisualEffectState;
 
 // ===================================================================
 // CHOREOGRAPHY EVENT PAYLOADS
@@ -123,7 +130,7 @@ export interface PerformanceAdaptEventPayload {
  * Complete event payload type map for type-safe event handling
  */
 export interface ChoreographyEventPayloadMap {
-  'consciousness:field-updated': import('@/visual/effects/BackgroundAnimationCoordinator').ConsciousnessField;
+  'consciousness:field-updated': VisualEffectState;
   'choreography:rhythm-shift': RhythmShiftEventPayload;
   'choreography:emotional-shift': EmotionalShiftEventPayload;
   'choreography:energy-surge': EnergySurgeEventPayload;
@@ -162,11 +169,7 @@ export interface EnhancedBackgroundSystemParticipant extends BackgroundSystemPar
     energyAbsorption: number;
   };
   
-  getVisualContribution?(): {
-    luminosityContribution: number;
-    chromaticInfluence: number;
-    depthContribution: number;
-  };
+  getVisualContribution(): Partial<VisualEffectState>;
   
   getOrganicContribution?(): {
     breathingInfluence: number;
@@ -382,7 +385,7 @@ export interface ChoreographyPerformanceMetrics {
  */
 export interface LegacyConsciousnessFieldSnapshot {
   timestamp: number;
-  field: import('@/visual/effects/BackgroundAnimationCoordinator').ConsciousnessField;
+  field: VisualEffectState;
   participants: string[];
   activeEvents: string[];
   performanceMetrics: Partial<ChoreographyPerformanceMetrics>;
@@ -497,7 +500,7 @@ export interface AnimationFieldAnalysis {
  */
 export interface AnimationFieldSnapshot {
   timestamp: number;
-  field: import('@/visual/effects/BackgroundAnimationCoordinator').ConsciousnessField;
+  field: VisualEffectState;
   participants: string[];
   activeEvents: string[];
   performanceMetrics: Partial<ChoreographyPerformanceMetrics>;

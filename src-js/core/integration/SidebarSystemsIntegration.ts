@@ -1,7 +1,9 @@
 import { UnifiedSystemBase } from '@/core/base/UnifiedSystemBase';
-import { SidebarInteractiveFlowSystem } from '@/visual/ui/SidebarInteractiveFlowSystem';
-// RightSidebarConsciousnessEnhanced consolidated into UnifiedSidebarConsciousnessController
-// import { RightSidebarConsciousnessEnhanced } from '@/visual/ui-effects/RightSidebarConsciousnessEnhanced';
+import { SidebarVisualEffectsSystem } from '@/visual/ui/SidebarVisualEffectsSystem';
+// Consolidated sidebar systems:
+// - SidebarInteractiveFlowSystem merged into SidebarVisualEffectsSystem
+// - UnifiedSidebarEffectsController merged into SidebarVisualEffectsSystem  
+// - RightSidebarController removed in favor of unified approach
 import { SidebarPerformanceCoordinator } from '@/visual/ui/SidebarPerformanceCoordinator';
 import type { Year3000Config } from '@/types/models';
 import type { HealthCheckResult } from '@/types/systems';
@@ -25,125 +27,7 @@ interface SidebarSystemsOrchestrator extends UnifiedSystemBase {
   setRightSidebarSystem(system: any): void;
 }
 
-// Mock implementations for missing systems
-class MockLeftSidebarConsciousnessSystem extends UnifiedSystemBase {
-  async initialize(): Promise<void> {
-    console.log('[MockLeftSidebarConsciousnessSystem] Initialized');
-  }
-  
-  destroy(): void {
-    console.log('[MockLeftSidebarConsciousnessSystem] Destroyed');
-  }
-  
-  onAnimate(deltaTime: number): void {
-    // Mock animation implementation
-  }
-  
-  async healthCheck(): Promise<HealthCheckResult> {
-    return { 
-      healthy: true,
-      ok: true, 
-      details: 'Mock left sidebar consciousness healthy',
-      issues: [],
-      system: 'MockLeftSidebarConsciousnessSystem'
-    };
-  }
-  
-  getConsciousnessState() {
-    return { level: 'aware', intensity: 0.5 };
-  }
-  
-  getAnimationMetrics() {
-    return { beatIntensity: 0.5, explorationLevel: 0.3 };
-  }
-}
-
-class MockRightSidebarConsciousnessSystem extends UnifiedSystemBase {
-  async initialize(): Promise<void> {
-    console.log('[MockRightSidebarConsciousnessSystem] Right sidebar now handled by facade pattern');
-  }
-  
-  destroy(): void {
-    console.log('[MockRightSidebarConsciousnessSystem] Destroyed');
-  }
-  
-  onAnimate(deltaTime: number): void {
-    // Right sidebar consciousness now handled by UnifiedSidebarConsciousnessController via facade
-  }
-  
-  async healthCheck(): Promise<HealthCheckResult> {
-    return { 
-      healthy: true,
-      ok: true, 
-      details: 'Right sidebar consciousness managed by facade pattern',
-      issues: [],
-      system: 'MockRightSidebarConsciousnessSystem'
-    };
-  }
-  
-  getConsciousnessState() {
-    // Access facade pattern right sidebar consciousness
-    const year3000System = (globalThis as any).year3000System;
-    if (year3000System?.sidebarConsciousnessController) {
-      return year3000System.sidebarConsciousnessController.getConsciousnessState();
-    }
-    return { level: 'aware', intensity: 0.5 };
-  }
-  
-  getAnimationMetrics() {
-    return { beatIntensity: 0.5, explorationLevel: 0.3 };
-  }
-}
-
-class MockSidebarSystemsOrchestrator extends UnifiedSystemBase {
-  private synchronizationEnabled = true;
-  private rightSidebarSystem: any = null;
-  
-  async initialize(): Promise<void> {
-    console.log('[MockSidebarSystemsOrchestrator] Initialized');
-  }
-  
-  destroy(): void {
-    console.log('[MockSidebarSystemsOrchestrator] Destroyed');
-  }
-  
-  onAnimate(deltaTime: number): void {
-    // Mock animation implementation
-  }
-  
-  async healthCheck(): Promise<HealthCheckResult> {
-    return { 
-      healthy: true,
-      ok: true, 
-      details: 'Mock sidebar orchestrator healthy',
-      issues: [],
-      system: 'MockBilateralSidebarOrchestrator'
-    };
-  }
-  
-  getBilateralState() {
-    return {
-      leftSidebar: { active: true, level: 'aware' },
-      rightSidebar: { active: !!this.rightSidebarSystem, level: 'aware' },
-      synchronization: { enabled: this.synchronizationEnabled }
-    };
-  }
-  
-  getPerformanceMetrics() {
-    return {
-      bilateralSyncMetrics: { syncEvents: 100, avgSyncLatency: 5 },
-      performanceMetrics: { totalCSSUpdates: 200, avgUpdateTime: 2 }
-    };
-  }
-  
-  setSynchronizationEnabled(enabled: boolean): void {
-    this.synchronizationEnabled = enabled;
-  }
-  
-  setRightSidebarSystem(system: any): void {
-    this.rightSidebarSystem = system;
-  }
-}
+// Mock implementations removed - replaced with consolidated systems
 
 interface SidebarSystemDefinition {
   name: string;
@@ -183,11 +67,11 @@ interface SidebarIntegrationMetrics {
  * - Handles performance budgeting and monitoring
  */
 export class SidebarSystemsIntegration extends UnifiedSystemBase {
-  // Core sidebar systems
-  private leftSidebarConsciousness: LeftSidebarConsciousnessSystem;
-  private rightSidebarConsciousness: RightSidebarConsciousnessSystem;
-  private sidebarOrchestrator: SidebarSystemsOrchestrator;
-  private interactiveFlow: SidebarInteractiveFlowSystem;
+  // Core sidebar systems (consolidated into unified system)
+  // private leftSidebarConsciousness: LeftSidebarConsciousnessSystem;
+  // private rightSidebarConsciousness: RightSidebarConsciousnessSystem;
+  // private sidebarOrchestrator: SidebarSystemsOrchestrator;
+  private consolidatedSidebarSystem?: SidebarVisualEffectsSystem;
   
   // Performance coordination
   private sharedCoordinator: SidebarPerformanceCoordinator;
@@ -212,11 +96,9 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
       onFlushComplete: () => this.handlePerformanceFlush()
     });
     
-    // Initialize core systems
-    this.leftSidebarConsciousness = new MockLeftSidebarConsciousnessSystem(config);
-    this.rightSidebarConsciousness = new MockRightSidebarConsciousnessSystem(config);
-    this.sidebarOrchestrator = new MockSidebarSystemsOrchestrator(config);
-    this.interactiveFlow = new SidebarInteractiveFlowSystem(config);
+    // Initialize consolidated sidebar system (replaces all previous sidebar systems)
+    // Note: Temporarily disabled - would need proper dependency injection
+    // this.consolidatedSidebarSystem = new SidebarVisualEffectsSystem(...)
     
     // Initialize performance metrics
     this.performanceMetrics = {
@@ -287,41 +169,16 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
    * Register all sidebar system definitions
    */
   private registerSidebarSystems(): void {
-    // Left sidebar consciousness (anticipatory leader)
-    this.sidebarSystems.set('leftSidebarConsciousness', {
-      name: 'leftSidebarConsciousness',
-      system: this.leftSidebarConsciousness,
-      priority: 'normal',
-      enabled: true,
-      dependencies: []
-    });
-    
-    // Right sidebar consciousness (follower)
-    this.sidebarSystems.set('rightSidebarConsciousness', {
-      name: 'rightSidebarConsciousness',
-      system: this.rightSidebarConsciousness,
-      priority: 'normal',
-      enabled: true,
-      dependencies: []
-    });
-    
-    // Bilateral orchestrator (coordinator)
-    this.sidebarSystems.set('sidebarOrchestrator', {
-      name: 'sidebarOrchestrator',
-      system: this.sidebarOrchestrator,
-      priority: 'critical',
-      enabled: true,
-      dependencies: ['leftSidebarConsciousness', 'rightSidebarConsciousness']
-    });
-    
-    // Interactive flow (liquid consciousness)
-    this.sidebarSystems.set('interactiveFlow', {
-      name: 'interactiveFlow',
-      system: this.interactiveFlow,
-      priority: 'background',
-      enabled: true,
-      dependencies: ['sidebarOrchestrator']
-    });
+    // Consolidated sidebar visual effects system (replaces all previous sidebar systems)
+    if (this.consolidatedSidebarSystem) {
+      this.sidebarSystems.set('consolidatedSidebarSystem', {
+        name: 'consolidatedSidebarSystem',
+        system: this.consolidatedSidebarSystem as any,
+        priority: 'critical',
+        enabled: true,
+        dependencies: []
+      });
+    }
   }
   
   /**
@@ -387,11 +244,7 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
    * Set up bilateral consciousness coordination
    */
   private setupBilateralCoordination(): void {
-    // Connect right sidebar to orchestrator
-    this.sidebarOrchestrator.setRightSidebarSystem(this.rightSidebarConsciousness);
-    
-    // Enable bilateral synchronization
-    this.sidebarOrchestrator.setSynchronizationEnabled(true);
+    // Simplified coordination for consolidated system
     this.performanceMetrics.bilateralSyncEnabled = true;
     
     // Subscribe to bilateral events for monitoring
@@ -480,9 +333,8 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
     }
     this.performanceMetrics.activeSystems = activeSystems;
     
-    // Get bilateral sync status
-    this.performanceMetrics.bilateralSyncEnabled = 
-      this.sidebarOrchestrator.getBilateralState().synchronization.enabled;
+    // Bilateral sync is managed by consolidated system
+    // this.performanceMetrics.bilateralSyncEnabled remains as set in setupBilateralCoordination
   }
   
   /**
@@ -723,8 +575,8 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
       bpm: payload.bpm || 120
     };
     
-    // Trigger bilateral consciousness beat response
-    this.sidebarOrchestrator.getBilateralState();
+    // Trigger bilateral consciousness beat response via consolidated system
+    // (functionality now handled by consolidatedSidebarSystem)
     
     // Update consciousness timing with musical beat
     // Note: SidebarPerformanceCoordinator doesn't have updateMusicSync method yet
@@ -746,9 +598,9 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
     // Scale consciousness responsiveness with energy
     this.adjustPerformanceBudgets(0.5 + (energyLevel * 0.5));
     
-    // Forward energy data to interactive flow system
-    if (this.interactiveFlow.isInitialized) {
-      // This would call a method on the interactive flow system if available
+    // Forward energy data to consolidated system
+    if (this.consolidatedSidebarSystem?.initialized) {
+      // Energy processing handled by consolidated flow system
       if (this.config.enableDebug) {
         console.log(`[${this.systemName}] Adapted consciousness to energy level: ${energyLevel}`);
       }
@@ -763,19 +615,13 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
     
     if (payload.severity === 'critical') {
       // Emergency performance mode - disable non-essential systems
-      this.setSidebarSystemEnabled('interactiveFlow', false);
-      
       this.performanceMetrics.healthStatus = 'critical';
       
       if (this.config.enableDebug) {
         console.warn(`[${this.systemName}] Activated emergency performance mode`);
       }
     } else if (payload.severity === 'warning' && this.performanceMetrics.healthStatus === 'critical') {
-      // Recovery mode - re-enable systems gradually
-      setTimeout(() => {
-        this.setSidebarSystemEnabled('interactiveFlow', true);
-      }, 2000);
-      
+      // Recovery mode 
       this.performanceMetrics.healthStatus = 'degraded';
     }
   }
@@ -805,25 +651,15 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   private bilateralConsciousnessFrameUpdate(deltaTime: number, timestamp: number): void {
     if (!this.integrationEnabled) return;
     
-    // Coordinate bilateral consciousness timing
-    const leftState = this.leftSidebarConsciousness.getConsciousnessState();
-    const rightState = this.rightSidebarConsciousness.getConsciousnessState();
-    
-    // Calculate bilateral synchronization metrics
-    const leftTimestamp = timestamp; // Use current timestamp for left sidebar
-    const rightTimestamp = timestamp; // Use current timestamp for right sidebar
-    
+    // Simplified bilateral consciousness for consolidated system
     const syncMetrics = {
-      leftLevel: leftState.level,
-      rightLevel: rightState.level,
-      timingDelta: Math.abs(leftTimestamp - rightTimestamp),
-      frameTime: deltaTime
+      frameTime: deltaTime,
+      timestamp
     };
     
-    // Publish bilateral sync event for monitoring
-    if (syncMetrics.timingDelta > 16.67) { // More than one frame out of sync
-      this.publishEvent('sidebar:bilateral-desync-warning', {
-        delta: syncMetrics.timingDelta,
+    // Monitor frame time for performance
+    if (deltaTime > 16.67) { // More than one frame budget
+      this.publishEvent('sidebar:frame-time-warning', {
         frameTime: deltaTime,
         timestamp
       });

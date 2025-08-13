@@ -5,16 +5,21 @@
  * with the existing Year3000 System architecture.
  */
 
-import { OrganicBeatSyncConsciousness } from '@/visual/music/MusicSyncVisualEffects';
+import { MusicBeatSynchronizer } from '@/visual/music/MusicSyncVisualEffects';
 // Using stub implementations from colorStubs
 import type { BreathingRhythmEngine, SymbioticListeningCore } from '@/types/colorStubs';
 import { Year3000System } from '@/core/lifecycle/year3000System';
 import { YEAR3000_CONFIG } from '@/config/globalConfig';
 import * as Utils from '@/utils/core/Year3000Utilities';
 
+// Mock NowPlayingDomWatcher to prevent DOM-related errors in tests
+jest.mock('@/utils/dom/NowPlayingDomWatcher', () => ({
+  startNowPlayingWatcher: jest.fn(() => jest.fn()) // Return a cleanup function
+}));
+
 describe('Visual Effects Integration', () => {
   let year3000System: Year3000System;
-  let visualEffectsSystem: OrganicBeatSyncConsciousness;
+  let visualEffectsSystem: MusicBeatSynchronizer;
 
   beforeEach(() => {
     // Initialize Year3000System
@@ -23,8 +28,20 @@ describe('Visual Effects Integration', () => {
     // Mock DOM environment
     document.body.innerHTML = '<div class="Root__main-view"></div>';
     
+    // Enhance Year3000System with facade coordinator for visual system registration
+    year3000System.facadeCoordinator = {
+      getVisualSystem: jest.fn((systemKey: string) => {
+        if (systemKey === 'OrganicBeatSync') {
+          return { initialized: true, healthCheck: jest.fn().mockResolvedValue({ ok: true }) };
+        }
+        return null;
+      }),
+      getNonVisualSystem: jest.fn(() => null),
+      isInitialized: jest.fn(() => true)
+    } as any;
+    
     // Create visual effects system instance
-    visualEffectsSystem = new OrganicBeatSyncConsciousness(YEAR3000_CONFIG);
+    visualEffectsSystem = new MusicBeatSynchronizer(YEAR3000_CONFIG);
   });
 
   afterEach(() => {
@@ -54,20 +71,24 @@ describe('Visual Effects Integration', () => {
   });
 
   describe('Visual Effects Components', () => {
-    it('should initialize cellular beat response', () => {
-      // OrganicBeatSyncConsciousness uses internal organic elements, not exposed as public properties
+    it('should initialize music beat synchronization', () => {
+      // MusicBeatSynchronizer provides music sync state and metrics
       expect(visualEffectsSystem).toBeDefined();
-      expect(visualEffectsSystem.getOrganicState).toBeDefined();
+      expect(visualEffectsSystem.getMusicSyncState).toBeDefined();
     });
 
-    it('should initialize breathing rhythm sync', () => {
-      // Breathing rhythm is internal to organic consciousness system
-      expect(visualEffectsSystem.getOrganicState().breathingPhase).toBeDefined();
+    it('should initialize music sync state tracking', () => {
+      // Music sync state provides intensity and scale information
+      const syncState = visualEffectsSystem.getMusicSyncState();
+      expect(syncState).toBeDefined();
+      expect(syncState.musicIntensity).toBeDefined();
+      expect(syncState.scaleMultiplier).toBeDefined();
     });
 
-    it('should initialize emotional beat mapping', () => {
-      // Emotional mapping is internal to organic consciousness system
-      expect(visualEffectsSystem.getOrganicState().emotionalTemperature).toBeDefined();
+    it('should initialize performance metrics tracking', () => {
+      // Music sync metrics track performance and responsiveness
+      const metrics = visualEffectsSystem.getMusicSyncMetrics();
+      expect(metrics).toBeDefined();
     });
   });
 
@@ -161,16 +182,17 @@ describe('Visual Effects Integration', () => {
   });
 
   describe('Configuration Updates', () => {
-    it('should handle visual effects configuration updates', async () => {
+    it('should handle music sync configuration updates', async () => {
       await visualEffectsSystem.initialize();
       
       const newConfig = {
-        cellularResponseSensitivity: 0.8,
-        breathingRhythmIntensity: 0.6,
-        emotionalColorSensitivity: 0.7
+        responseSensitivity: 0.8,
+        animationIntensity: 0.6,
+        transitionFluidityEnabled: true,
+        visualParticlesEnabled: false
       };
       
-      expect(() => visualEffectsSystem.updateOrganicConfig(newConfig)).not.toThrow();
+      expect(() => visualEffectsSystem.updateSyncConfig(newConfig)).not.toThrow();
     });
   });
 
@@ -197,9 +219,9 @@ describe('Visual Effects Integration', () => {
         performanceAnalyzer: null
       };
       
-      const faultyConsciousness = new OrganicBeatSyncConsciousness(YEAR3000_CONFIG);
+      const faultySystem = new MusicBeatSynchronizer(YEAR3000_CONFIG);
       
-      await expect(faultyConsciousness.initialize()).resolves.not.toThrow();
+      await expect(faultySystem.initialize()).resolves.not.toThrow();
     });
   });
 });

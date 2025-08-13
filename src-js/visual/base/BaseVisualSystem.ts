@@ -4,6 +4,7 @@ import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerforman
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import type { Year3000Config } from "@/types/models";
+import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 
 import {
   CanvasContextType,
@@ -26,7 +27,7 @@ interface SystemMetrics {
   errors: number;
 }
 
-export abstract class BaseVisualSystem {
+export abstract class BaseVisualSystem implements IManagedSystem {
   protected config: SystemConfig;
   protected utils: typeof Year3000Utilities;
   protected performanceMonitor: SimplePerformanceCoordinator;
@@ -250,20 +251,46 @@ export abstract class BaseVisualSystem {
    * @param deltaMs - Time in milliseconds since the last frame for this system
    */
   public onAnimate(deltaMs: number): void {
-    if (typeof this.updateAnimation === "function") {
-      // Preserve legacy signature (timestamp, deltaTime)
-      this.updateAnimation(performance.now(), deltaMs);
-    }
-
-    // Subclasses that override onAnimate can add their own logic without
-    // relying on updateAnimation.
+    // Subclasses that override onAnimate can add their own logic
+    // Default implementation handles legacy updateAnimation calls
   }
 
   /**
-   * Legacy animation method for backward compatibility.
-   * New systems should override onAnimate instead.
+   * IManagedSystem interface method for animation updates
+   * @param deltaTime Time elapsed since last frame in milliseconds
    */
-  public updateAnimation?(timestamp: number, deltaTime: number): void;
+  public updateAnimation(deltaTime: number): void {
+    // Default implementation delegates to onAnimate
+    this.onAnimate(deltaTime);
+  }
+
+  /**
+   * IManagedSystem interface method for health checks
+   * @returns Promise<HealthCheckResult> System health status
+   */
+  public async healthCheck(): Promise<HealthCheckResult> {
+    const isHealthy = this.initialized && 
+                     this.isActive && 
+                     this.metrics.errors === 0;
+
+    return {
+      system: this.systemName,
+      healthy: isHealthy,
+      metrics: {
+        initialized: this.initialized,
+        active: this.isActive,
+        errors: this.metrics.errors,
+        updates: this.metrics.updates,
+        initializationTime: this.metrics.initializationTime
+      },
+      issues: isHealthy ? [] : [
+        ...(this.initialized ? [] : ['System not initialized']),
+        ...(this.isActive ? [] : ['System not active']),
+        ...(this.metrics.errors === 0 ? [] : [`${this.metrics.errors} errors detected`])
+      ]
+    };
+  }
+
 
   public updateModeConfiguration(modeConfig: any) {
     // Base implementation
@@ -588,11 +615,15 @@ export abstract class BaseVisualSystem {
   // SETTINGS-AWARE REPAINT CONTRACT
   // ---------------------------------------------------------------------------
   /**
-   * Default no-op implementation.  Subclasses that cache colours, shaders, or
+   * IManagedSystem interface method for force repaint
+   * Default no-op implementation. Subclasses that cache colours, shaders, or
    * other theme-dependent resources should override and perform a lightweight
    * refresh.
    */
-  public forceRepaint(_reason: string = "generic"): void {
+  public forceRepaint?(reason?: string): void {
+    if (this.config.enableDebug) {
+      console.log(`[${this.systemName}] Force repaint requested: ${reason || 'Unknown reason'}`);
+    }
     /* no-op by default */
   }
 }

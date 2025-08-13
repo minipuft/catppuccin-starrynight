@@ -421,10 +421,10 @@ patchReactRequire();
     };
   }
 
-  // 3b. 🫧 Initialize Right Sidebar Consciousness System (Phase 2)
+  // 3b. 🫧 Initialize Consolidated Sidebar System (All Sidebar Functionality United)
   try {
-    const { RightSidebarConsciousnessSystem } = await import(
-      "./visual/ui/RightSidebarVisualEffects"
+    const { SidebarVisualEffectsSystem } = await import(
+      "./visual/ui/SidebarVisualEffectsSystem"
     );
     const { SidebarPerformanceCoordinator } = await import(
       "./visual/ui/SidebarPerformanceCoordinator"
@@ -442,25 +442,22 @@ patchReactRequire();
         },
       });
 
-      // Setup DOM observation for the coordinator
-      coordinator.setupDOMObservation();
-
-      const rsSystem = new RightSidebarConsciousnessSystem(
+      // Initialize the consolidated sidebar visual effects system
+      const sidebarSystem = new SidebarVisualEffectsSystem(
         YEAR3000_CONFIG,
         Year3000Utilities,
         year3000System.performanceAnalyzer,
         year3000System.musicSyncService as any,
         year3000System.settingsManager as any,
-        year3000System,
-        coordinator
+        year3000System
       );
-      await rsSystem.initialize();
-      (year3000System as any).rightSidebarConsciousnessSystem = rsSystem;
-      (year3000System as any).rightSidebarCoordinator = coordinator;
+      await sidebarSystem.initialize();
+      (year3000System as any).sidebarVisualEffectsSystem = sidebarSystem;
+      (year3000System as any).sidebarCoordinator = coordinator;
     }
   } catch (err) {
     console.error(
-      "[StarryNight] Failed to initialize RightSidebarConsciousnessSystem",
+      "[StarryNight] Failed to initialize Consolidated Sidebar System",
       err
     );
   }

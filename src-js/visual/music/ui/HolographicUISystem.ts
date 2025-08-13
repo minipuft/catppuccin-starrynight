@@ -617,10 +617,10 @@ export class HolographicUISystem
     element.style.boxShadow = `
       0 0 ${
         glowIntensity * 20
-      }px rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${glowIntensity}),
+      }px rgba(var(--spice-rgb-holographic-glow, var(--sn-holographic-rgb, 100, 255, 200)), ${glowIntensity}),
       inset 0 0 ${
         glowIntensity * 10
-      }px rgba(var(--spice-rgb-holographic-accent, var(--organic-holographic-rgb, 100, 255, 200)), ${
+      }px rgba(var(--spice-rgb-holographic-accent, var(--sn-holographic-rgb, 100, 255, 200)), ${
       glowIntensity * 0.5
     })
     `;
@@ -631,19 +631,19 @@ export class HolographicUISystem
     const transparency = this.holographicState.transparency * intensity;
 
     element.style.background = `
-      rgba(var(--spice-rgb-holographic-primary, var(--organic-holographic-rgb, 100, 255, 200)), ${
+      rgba(var(--spice-rgb-holographic-primary, var(--sn-holographic-rgb, 100, 255, 200)), ${
         transparency * 0.1
       }),
       linear-gradient(45deg,
         transparent 0%,
-        rgba(var(--spice-rgb-holographic-accent, var(--organic-holographic-rgb, 100, 255, 200)), ${
+        rgba(var(--spice-rgb-holographic-accent, var(--sn-holographic-rgb, 100, 255, 200)), ${
           transparency * 0.05
         }) 50%,
         transparent 100%)
     `;
     // Reduce backdrop blur to prevent excessive visual interference
     element.style.backdropFilter = `blur(${Math.min(intensity * 2, 3)}px)`;
-    element.style.border = `1px solid rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${
+    element.style.border = `1px solid rgba(var(--spice-rgb-holographic-glow, var(--sn-holographic-rgb, 100, 255, 200)), ${
       transparency * 0.6
     })`;
   }
@@ -685,13 +685,13 @@ export class HolographicUISystem
     const shimmerIntensity = (1.0 - energyStability) * intensity;
     element.style.background = `
       linear-gradient(90deg,
-        rgba(var(--organic-neon-glow-rgb, 0, 255, 255), ${
+        rgba(var(--sn-neon-glow-rgb, 0, 255, 255), ${
           shimmerIntensity * 0.3
         }) 0%,
-        rgba(var(--organic-neon-glow-rgb, 0, 255, 255), ${
+        rgba(var(--sn-neon-glow-rgb, 0, 255, 255), ${
           shimmerIntensity * 0.1
         }) 50%,
-        rgba(var(--organic-neon-glow-rgb, 0, 255, 255), ${
+        rgba(var(--sn-neon-glow-rgb, 0, 255, 255), ${
           shimmerIntensity * 0.3
         }) 100%)
     `;
@@ -730,10 +730,10 @@ export class HolographicUISystem
     element.style.boxShadow = `
       0 0 ${
         glowIntensity * 30
-      }px rgba(var(--organic-accent-rgb, 203, 166, 247), ${glowIntensity}),
+      }px rgba(var(--sn-accent-rgb, 203, 166, 247), ${glowIntensity}),
       inset 0 0 ${
         glowIntensity * 15
-      }px rgba(var(--organic-accent-rgb, 203, 166, 247), ${glowIntensity * 0.3})
+      }px rgba(var(--sn-accent-rgb, 203, 166, 247), ${glowIntensity * 0.3})
     `;
 
     // Consciousness-responsive transparency
@@ -792,10 +792,10 @@ export class HolographicUISystem
     const barHeight = Math.sin(visualPhase) * visualIntensity * 20;
     element.style.background = `
       linear-gradient(0deg,
-        rgba(var(--organic-primary-rgb, 205, 214, 244), ${
+        rgba(var(--sn-primary-rgb, 205, 214, 244), ${
           visualIntensity * 0.8
         }) 0%,
-        rgba(var(--organic-primary-rgb, 205, 214, 244), ${
+        rgba(var(--sn-primary-rgb, 205, 214, 244), ${
           visualIntensity * 0.4
         }) ${50 + barHeight}%,
         transparent ${50 + barHeight}%)
@@ -819,10 +819,10 @@ export class HolographicUISystem
         0deg,
         transparent 0px,
         transparent ${scanlineFrequency - 1}px,
-        rgba(var(--spice-rgb-holographic-accent, var(--organic-holographic-rgb, 100, 255, 200)), ${
+        rgba(var(--spice-rgb-holographic-accent, var(--sn-holographic-rgb, 100, 255, 200)), ${
           scanlineIntensity * 0.1
         }) ${scanlineFrequency}px,
-        rgba(var(--spice-rgb-holographic-accent, var(--organic-holographic-rgb, 100, 255, 200)), ${
+        rgba(var(--spice-rgb-holographic-accent, var(--sn-holographic-rgb, 100, 255, 200)), ${
           scanlineIntensity * 0.1
         }) ${scanlineFrequency}px
       )
@@ -1201,7 +1201,7 @@ export class HolographicUISystem
       finalDepth > 0 ? shadowIntensity * 5 : -shadowIntensity * 3;
 
     const existingShadow = element.style.boxShadow || "";
-    const volumetricShadow = `0 ${shadowOffset}px ${shadowBlur}px rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${
+    const volumetricShadow = `0 ${shadowOffset}px ${shadowBlur}px rgba(var(--spice-rgb-holographic-glow, var(--sn-holographic-rgb, 100, 255, 200)), ${
       shadowIntensity * 0.3
     })`;
 
@@ -2227,7 +2227,7 @@ export class HolographicUISystem
           );
 
           if (oklabResult.enhancedHex) {
-            holographicColorVariables["--organic-holographic-rgb"] = this.hexToRgb(oklabResult.enhancedHex);
+            holographicColorVariables["--sn-holographic-rgb"] = this.hexToRgb(oklabResult.enhancedHex);
             holographicColorVariables["--sn-holographic-primary"] = oklabResult.enhancedHex;
           }
         }
@@ -2608,14 +2608,14 @@ export class HolographicUISystem
       }
 
       // Fallback to spice variables with organic variable as final fallback
-      return `rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${intensity})`;
+      return `rgba(var(--spice-rgb-holographic-glow, var(--sn-holographic-rgb, 100, 255, 200)), ${intensity})`;
     } catch (error) {
       Y3KDebug?.debug?.warn(
         "HolographicUISystem",
         "Failed to get OKLAB enhanced glow color:",
         error
       );
-      return `rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${intensity})`;
+      return `rgba(var(--spice-rgb-holographic-glow, var(--sn-holographic-rgb, 100, 255, 200)), ${intensity})`;
     }
   }
 
@@ -2651,13 +2651,13 @@ export class HolographicUISystem
 
       // Fallback to spice variables with organic variable as final fallback
       return {
-        background: `rgba(var(--spice-rgb-holographic-primary, var(--organic-holographic-rgb, 100, 255, 200)), ${
+        background: `rgba(var(--spice-rgb-holographic-primary, var(--sn-holographic-rgb, 100, 255, 200)), ${
           transparency * 0.1
         })`,
-        gradient: `rgba(var(--spice-rgb-holographic-accent, var(--organic-holographic-rgb, 100, 255, 200)), ${
+        gradient: `rgba(var(--spice-rgb-holographic-accent, var(--sn-holographic-rgb, 100, 255, 200)), ${
           transparency * 0.05
         })`,
-        border: `rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${
+        border: `rgba(var(--spice-rgb-holographic-glow, var(--sn-holographic-rgb, 100, 255, 200)), ${
           transparency * 0.6
         })`,
       };
@@ -2668,13 +2668,13 @@ export class HolographicUISystem
         error
       );
       return {
-        background: `rgba(var(--spice-rgb-holographic-primary, var(--organic-holographic-rgb, 100, 255, 200)), ${
+        background: `rgba(var(--spice-rgb-holographic-primary, var(--sn-holographic-rgb, 100, 255, 200)), ${
           transparency * 0.1
         })`,
-        gradient: `rgba(var(--spice-rgb-holographic-accent, var(--organic-holographic-rgb, 100, 255, 200)), ${
+        gradient: `rgba(var(--spice-rgb-holographic-accent, var(--sn-holographic-rgb, 100, 255, 200)), ${
           transparency * 0.05
         })`,
-        border: `rgba(var(--spice-rgb-holographic-glow, var(--organic-holographic-rgb, 100, 255, 200)), ${
+        border: `rgba(var(--spice-rgb-holographic-glow, var(--sn-holographic-rgb, 100, 255, 200)), ${
           transparency * 0.6
         })`,
       };
@@ -2718,8 +2718,8 @@ export class HolographicUISystem
 
       // Fallback
       return {
-        outer: `rgba(var(--organic-accent-rgb, 203, 166, 247), ${intensity})`,
-        inner: `rgba(var(--organic-accent-rgb, 203, 166, 247), ${
+        outer: `rgba(var(--sn-accent-rgb, 203, 166, 247), ${intensity})`,
+        inner: `rgba(var(--sn-accent-rgb, 203, 166, 247), ${
           intensity * 0.3
         })`,
       };
@@ -2730,8 +2730,8 @@ export class HolographicUISystem
         error
       );
       return {
-        outer: `rgba(var(--organic-accent-rgb, 203, 166, 247), ${intensity})`,
-        inner: `rgba(var(--organic-accent-rgb, 203, 166, 247), ${
+        outer: `rgba(var(--sn-accent-rgb, 203, 166, 247), ${intensity})`,
+        inner: `rgba(var(--sn-accent-rgb, 203, 166, 247), ${
           intensity * 0.3
         })`,
       };
@@ -2774,14 +2774,14 @@ export class HolographicUISystem
         return `rgba(${rgb}, ${intensity})`;
       }
 
-      return `rgba(var(--spice-rgb-holographic-primary, var(--organic-holographic-rgb, 100, 255, 200)), ${intensity})`;
+      return `rgba(var(--spice-rgb-holographic-primary, var(--sn-holographic-rgb, 100, 255, 200)), ${intensity})`;
     } catch (error) {
       Y3KDebug?.debug?.warn(
         "HolographicUISystem",
         "Failed to get OKLAB enhanced data stream color:",
         error
       );
-      return `rgba(var(--spice-rgb-holographic-primary, var(--organic-holographic-rgb, 100, 255, 200)), ${intensity})`;
+      return `rgba(var(--spice-rgb-holographic-primary, var(--sn-holographic-rgb, 100, 255, 200)), ${intensity})`;
     }
   }
 

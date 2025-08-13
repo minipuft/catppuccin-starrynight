@@ -67,8 +67,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with th
 #### 3. Visual & Audio Integration Layer
 - **`MusicSyncService.ts`** - Spicetify API integration with beat detection
 - **`ColorHarmonyEngine.ts`** - OKLAB color science processing
-- **`WebGLGradientBackgroundSystem.ts`** - Hardware-accelerated visuals
+- **`VisualEffectsCoordinator.ts`** - Unified visual state coordination and orchestration
+- **`WebGLRenderer.ts`** - Hardware-accelerated visuals (WebGL)
 - **`DepthLayeredGradientSystem.ts`** - Multi-layer visual effects
+- **`FluidGradientBackgroundSystem.ts`** - Fluid gradient background processing
 
 #### 4. Performance Optimization Layer
 - **`PerformanceAnalyzer.ts`** - Real-time monitoring and quality scaling
@@ -86,6 +88,18 @@ interface IManagedSystem {
   healthCheck(): Promise<HealthCheckResult>;
   destroy(): void;
   forceRepaint?(reason?: string): void;
+}
+```
+
+### Background System Coordination
+Background visual systems implement `BackgroundSystemParticipant` for coordination:
+
+```typescript
+interface BackgroundSystemParticipant extends IManagedSystem {
+  systemName: string;
+  getVisualContribution?(): Partial<VisualEffectState>;
+  onVisualStateUpdate(state: VisualEffectState): void;
+  onVisualEffectEvent(eventType: VisualEventType, payload: any): void;
 }
 ```
 
@@ -205,6 +219,7 @@ Before code completion, verify:
 ### Key Documentation
 - [Master Architecture Overview](./docs/MASTER_ARCHITECTURE_OVERVIEW.md) - Complete system architecture
 - [API Reference](./docs/API_REFERENCE.md) - Interfaces and examples
+- [Visual Effects Coordination](./docs/VISUAL_EFFECTS_COORDINATION.md) - VisualEffectsCoordinator system guide
 - [Performance Guidelines](./docs/PERFORMANCE_OPTIMIZATION_GUIDELINES.md) - Optimization strategies
 - [Troubleshooting Guide](./docs/TROUBLESHOOTING_GUIDE.md) - Issue resolution
 

@@ -8,7 +8,7 @@ This comprehensive API reference documents all public interfaces, classes, and m
 
 ### API Design Philosophy
 
-1. **Consciousness-First** - Every interface considers user and system consciousness
+1. **Visual Effects Coordination** - Unified state management through VisualEffectsCoordinator and VisualEffectState
 2. **Performance-Aware** - All methods respect performance budgets and adaptive quality
 3. **Type-Safe** - Strict TypeScript with zero `any` types allowed
 4. **Facade-Integrated** - Unified access through facade pattern architecture
@@ -521,37 +521,158 @@ const healthReport = await facade.performHealthCheck();
 console.log('Visual systems ready:', healthReport.allHealthy);
 ```
 
-## Organic Consciousness API
+## Visual Effects Coordination API
 
-### OrganicConsciousnessState
+### VisualEffectState
 
-Interface representing the current consciousness state of the living system.
+Interface representing the shared visual state coordinated across all background systems.
 
-**Location**: `src-js/types/organicConsciousness.ts`
+**Location**: `src-js/visual/effects/VisualEffectsCoordinator.ts`
 
 ```typescript
-interface OrganicConsciousnessState {
-  organicIntensity: number;        // 0-1 current consciousness level
-  cellularGrowth: number;          // 1.0+ growth scale factor
-  breathingPhase: number;          // 0-2π breathing rhythm phase
-  emotionalTemperature: number;    // 1000K-20000K color temperature
-  membraneFluidityLevel: number;   // 0-1 fluidity state
-  lastBeatTime: number;           // Timestamp of last beat event
-  currentBPM: number;             // Current BPM for rhythm sync
+interface VisualEffectState {
+  // === MUSIC INTEGRATION ===
+  musicIntensity: number;        // 0-1 beat intensity from music analysis
+  flowDirection: Vector2D;       // Flow direction derived from music characteristics
+  energyLevel: number;           // 0-1 overall music energy level
+  colorTemperature: number;      // Color temperature (1000K-20000K) from music emotion
+  tempoModulation: number;       // 0-2 tempo-driven scaling factor
+  harmonicComplexity: number;    // 0-1 musical complexity for system sophistication
+
+  // === VISUAL PARAMETERS ===
+  fluidIntensity: number;        // 0-2 fluid dynamics intensity
+  depthPerception: number;       // 0-1 3D space illusion strength
+  luminosity: number;            // 0-2 hardware acceleration intensity
+  colorHarmony: number;          // 0-1 color harmony synchronization
+  visualCoherence: number;       // 0-1 how unified the visual systems appear
+
+  // === ANIMATION PARAMETERS ===
+  pulseRate: number;             // 0.5-4.0 seconds - synchronized pulse rhythm
+  transitionFluidity: number;    // 0-1 transition smoothness between systems
+  scalingFactor: number;         // 0.1-2.0 animation scaling factor
+  effectDepth: number;           // 0-1 depth of effect integration
+  systemHarmony: number;         // 0-1 how well systems coordinate together
+
+  // === PERFORMANCE AWARENESS ===
+  deviceCapabilities: DeviceCapabilities;
+  performanceMode: PerformanceMode;
+  adaptiveQuality: number;       // 0-1 current quality level
+  thermalState: number;          // 0-1 thermal throttling level
+  batteryConservation: number;   // 0-1 battery optimization level
+
+  // === TEMPORAL TRACKING ===
+  timestamp: number;             // When this state was created
+  evolutionPhase: number;        // 0-1 how the visual state has evolved
+  continuityIndex: number;       // 0-1 temporal continuity with previous state
 }
 ```
 
 **Example Usage**:
 ```typescript
-const consciousnessState: OrganicConsciousnessState = {
-  organicIntensity: 0.8,
-  cellularGrowth: 1.2,
-  breathingPhase: Math.PI / 2,
-  emotionalTemperature: 6500,
-  membraneFluidityLevel: 0.6,
-  lastBeatTime: performance.now(),
-  currentBPM: 128
+const visualState: VisualEffectState = {
+  musicIntensity: 0.8,
+  flowDirection: { x: 1.0, y: 0.5 },
+  energyLevel: 0.9,
+  colorTemperature: 6500,
+  fluidIntensity: 1.2,
+  pulseRate: 1.5,
+  adaptiveQuality: 0.8,
+  timestamp: performance.now(),
+  // ... other properties
 };
+```
+
+### BackgroundSystemParticipant
+
+Interface that background systems must implement to participate in visual effects coordination.
+
+**Location**: `src-js/visual/effects/VisualEffectsCoordinator.ts`
+
+```typescript
+interface BackgroundSystemParticipant {
+  systemName: string;
+  onVisualStateUpdate(state: VisualEffectState): void;
+  onVisualEffectEvent(eventType: string, payload: any): void;
+  getVisualContribution(): Partial<VisualEffectState>;
+}
+```
+
+**Example Implementation**:
+```typescript
+class MyBackgroundSystem implements BackgroundSystemParticipant {
+  public systemName = "MyBackgroundSystem";
+  
+  onVisualStateUpdate(state: VisualEffectState): void {
+    // Update system based on shared visual state
+    this.updateFlowIntensity(state.fluidIntensity);
+    this.syncWithMusic(state.musicIntensity);
+    this.adjustForPerformance(state.adaptiveQuality);
+  }
+  
+  onVisualEffectEvent(eventType: string, payload: any): void {
+    switch (eventType) {
+      case "visual:rhythm-shift":
+        this.handleRhythmChange(payload);
+        break;
+      case "visual:color-shift":
+        this.updateColorScheme(payload);
+        break;
+    }
+  }
+  
+  getVisualContribution(): Partial<VisualEffectState> {
+    return {
+      fluidIntensity: this.getCurrentFluidLevel(),
+      effectDepth: this.getDepthContribution(),
+      visualCoherence: this.isSystemStable() ? 1.0 : 0.5
+    };
+  }
+}
+```
+
+### VisualEffectsCoordinator
+
+Singleton coordinator managing visual effect state evolution and participant coordination.
+
+**Location**: `src-js/visual/effects/VisualEffectsCoordinator.ts`
+
+```typescript
+class VisualEffectsCoordinator implements IManagedSystem {
+  private currentVisualState: VisualEffectState | null = null;
+  private registeredParticipants: Map<string, BackgroundSystemParticipant>;
+  
+  // Core lifecycle methods
+  public async initialize(): Promise<void>;
+  public updateAnimation(deltaTime: number): void;
+  public destroy(): void;
+  
+  // Participant management
+  public registerVisualParticipant(participant: BackgroundSystemParticipant): void;
+  public unregisterVisualParticipant(systemName: string): void;
+  
+  // State management
+  public getCurrentVisualState(): VisualEffectState | null;
+  public forceStateUpdate(): void;
+  
+  // Performance monitoring
+  public getPerformanceMetrics(): CoordinationMetrics;
+}
+```
+
+**Example Usage**:
+```typescript
+// Get singleton instance
+const coordinator = VisualEffectsCoordinator.getInstance();
+await coordinator.initialize();
+
+// Register a background system
+const backgroundSystem = new MyBackgroundSystem();
+coordinator.registerVisualParticipant(backgroundSystem);
+
+// Monitor coordination
+const metrics = coordinator.getPerformanceMetrics();
+console.log(`State updates: ${metrics.stateUpdates}`);
+console.log(`Coordination events: ${metrics.coordinationEvents}`);
 ```
 
 ### Consciousness Event Interfaces
@@ -1322,6 +1443,7 @@ class MyVisualSystem extends BaseVisualSystem {
 ## Related Documentation
 
 - [Master Architecture Overview](./MASTER_ARCHITECTURE_OVERVIEW.md) - Complete system architecture
+- [Visual Effects Coordination](./VISUAL_EFFECTS_COORDINATION.md) - Complete coordination architecture guide
 - [Visual Systems Reference](./VISUAL_SYSTEMS_REFERENCE.md) - Visual system capabilities
 - [Performance Architecture Guide](./PERFORMANCE_ARCHITECTURE_GUIDE.md) - Performance optimization
 - [Development Workflow Guide](./DEVELOPMENT_WORKFLOW_GUIDE.md) - Development processes

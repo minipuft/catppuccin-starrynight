@@ -10,8 +10,7 @@
 //
 // ████████████████████████████████████████████████████████████████████████████████
 
-import type { IManagedSystem } from "../../../core/interfaces/IManagedSystem";
-import type { HealthCheckResult } from "../../../types/HealthCheck";
+import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 
 // AudioFeatures and AudioData interfaces (from MusicSyncService)
 export interface AudioFeatures {

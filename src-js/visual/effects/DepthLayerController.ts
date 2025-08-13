@@ -11,7 +11,7 @@
 import { YEAR3000_CONFIG } from "@/config/globalConfig";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { HealthCheckResult } from "@/types/HealthCheck";
+import type { HealthCheckResult } from "@/types/systems";
 import * as Utils from "@/utils/core/Year3000Utilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 
@@ -855,7 +855,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
       "--awareness-level": this.userState.focusDepth.toString(),
       "--musical-sync-intensity": this.musicalState.energy.toString(),
       "--musical-sync-strength": this.musicalState.musicSyncStrength.toString(),
-      "--emotional-temperature": this.musicalState.emotionalTemperature.toString(),
+      "--sn-color-temperature": this.musicalState.emotionalTemperature.toString(),
       "--reading-mode-active": this.userState.readingModeActive ? "1" : "0",
       "--user-interaction-detected": 
         this.userState.isScrolling || this.userState.isHovering ? "1" : "0",
@@ -868,7 +868,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
       "--temporal-flow-direction-x": (Math.sin(Date.now() * 0.0001) * 0.5 + 0.5).toString(),
       "--temporal-flow-direction-y": (Math.cos(Date.now() * 0.0001) * 0.5 + 0.5).toString(),
       "--memory-intensity": this.musicalState.musicalMemoryPatterns.toString(),
-      "--membrane-fluidity-index": this.calculateMembraneFluidityIndex().toString(),
+      "--sn-fluidity-index": this.calculateMembraneFluidityIndex().toString(),
       "--genre-consciousness-shift": this.calculateGenreConsciousnessShift().toString(),
     };
 
@@ -1042,7 +1042,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
     };
   }
 
-  public async healthCheck(): Promise<HealthCheckResult> {
+  public override async healthCheck(): Promise<HealthCheckResult> {
     const metrics = this.getConsciousnessMetrics();
     const isHealthy = metrics.contentAreas > 0 && metrics.chromeAreas > 0;
 

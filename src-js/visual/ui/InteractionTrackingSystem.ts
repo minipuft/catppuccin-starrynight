@@ -53,7 +53,7 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     if (!this.initialized) return;
 
     // Use the established updateAnimation pathway to avoid duplicating logic.
-    this.updateAnimation(performance.now(), deltaMs);
+    this.updateAnimation(deltaMs);
   }
   private year3000System: Year3000System | null;
   private nexusState: NexusState;
@@ -349,8 +349,9 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     }
   }
 
-  public override updateAnimation(timestamp: number, deltaTime: number) {
+  public override updateAnimation(deltaTime: number) {
     if (!this.initialized) return;
+    const timestamp = performance.now();
     this._frameSkipCounter++;
     if (this._frameSkipCounter < this._maxFrameSkip) {
       return;
@@ -380,7 +381,7 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
 
   private _startFallbackAnimationLoops() {
     const loop = () => {
-      this.updateAnimation(performance.now(), 16.67);
+      this.updateAnimation(16.67);
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);

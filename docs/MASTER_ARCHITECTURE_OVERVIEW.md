@@ -5,7 +5,7 @@
 
 ## 🌟 Introduction
 
-Catppuccin StarryNight is not just a Spicetify theme—it's a sophisticated **consciousness-aware visual application framework** that creates living interfaces that experience music alongside users. This document provides a comprehensive overview of the entire system architecture, from the foundational patterns to the advanced consciousness systems.
+Catppuccin StarryNight is not just a Spicetify theme—it's a sophisticated **visual effects application framework** that creates dynamic, music-responsive interfaces. This document provides a comprehensive overview of the entire system architecture, from the foundational patterns to the advanced visual coordination systems.
 
 ---
 
@@ -15,11 +15,11 @@ Catppuccin StarryNight is not just a Spicetify theme—it's a sophisticated **co
 > *"In the Year 3000, interfaces are not built—they are grown. Every pixel breathes with cellular life, every interaction morphs like liquid consciousness, and every visual element dances to the emotional temperature of the moment."*
 
 ### Core Principles
-1. **🧬 Organic Consciousness** - Biological-inspired systems that grow and breathe with music
+1. **🎭 Visual Effects Coordination** - Unified state management for background visual systems
 2. **⚡ Performance-First** - 60fps animations with intelligent degradation
 3. **🔄 Facade Coordination** - Clean separation of concerns through advanced facade patterns
 4. **🎨 OKLAB Color Science** - Perceptually uniform color processing for natural transitions
-5. **🐙 Multi-Agent Coordination** - Multiple AI agents working simultaneously with central coordination
+5. **🎵 Music Integration** - Real-time music analysis driving visual harmonization
 
 ---
 
@@ -44,10 +44,10 @@ Catppuccin StarryNight is not just a Spicetify theme—it's a sophisticated **co
 ### Layer 2: System Facades
 ```
 ┌──── VisualSystemFacade ─────┐  ┌─── NonVisualSystemFacade ────┐
-│ • Particle Systems          │  │ • Performance Analyzers      │
-│ • Organic Consciousness     │  │ • Unified CSS Controllers    │
-│ • Beat Sync Systems         │  │ • Settings Managers          │
-│ • Interactive Effects       │  │ • Music Sync Services        │
+│ • Background Systems        │  │ • Performance Analyzers      │
+│ • Visual Effects Coordinator│  │ • Unified CSS Controllers    │
+│ • Particle Systems          │  │ • Settings Managers          │
+│ • Color Processing          │  │ • Music Sync Services        │
 │ • UI Enhancement Systems    │  │ • Device Capability Detection│
 └─────────────────────────────┘  └───────────────────────────────┘
 ```
@@ -96,11 +96,16 @@ graph TD
     P --> Q[DeviceCapabilityDetection]
 ```
 
-### Organic Consciousness Flow
+### Visual Effects Coordination Flow
 ```
-🎵 Music Input → 🧠 Emotional Analysis → 🌡️ Temperature Mapping → 🎨 OKLAB Processing
-     ↓                    ↓                      ↓                    ↓
-🔊 Beat Detection → 💓 Breathing Rhythm → 🌱 Cellular Growth → ✨ Visual Expression
+🎵 Music Analysis → 🎭 VisualEffectsCoordinator → 📊 VisualEffectState → 🌟 Background Systems
+     ↓                        ↓                          ↓                    ↓
+🎨 Color Harmony → 🔄 State Evolution → ⚡ Performance Aware → ✨ Synchronized Effects
+
+VisualEffectState Properties:
+• musicIntensity, energyLevel, colorTemperature
+• fluidIntensity, depthPerception, luminosity
+• pulseRate, transitionFluidity, effectDepth
 ```
 
 ---

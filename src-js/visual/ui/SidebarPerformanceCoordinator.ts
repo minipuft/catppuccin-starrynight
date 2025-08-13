@@ -151,10 +151,10 @@ export class SidebarPerformanceCoordinator {
   private applyCriticalUpdate(property: string, value: string): void {
     try {
       // Apply critical updates using coordination (high performance path)
-      this.cssController.setVariable(
-        "SidebarPerformanceCoordinator",
+      this.cssController.queueCSSVariableUpdate(
         property,
         value,
+        null, // element (not needed for global variables)
         "critical", // Critical priority for performance-critical sidebar updates
         "sidebar-critical-update"
       );

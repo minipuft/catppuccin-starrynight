@@ -2,19 +2,19 @@
 
 > **Purpose:** give both **humans** and **AI models** a concise map of the theme's architecture, files, and core ideas. Feed this file first — it links to every deeper doc.
 
-> **ℹ️ WebGL status**: The **WebGL Flow Gradient System** (v1.2.0) is **✅ production-ready** and enabled by default.
-> The theme uses **WebGL 2.0** with automatic CSS fallbacks for optimal performance and compatibility.
+> **ℹ️ Architecture status**: The **Visual Effects Coordination System** is **✅ production-ready** and enabled by default.
+> The theme uses coordinated background systems with WebGL enhancement and automatic CSS fallbacks for optimal performance and compatibility.
 
 ---
 
 ## 1 What is StarryNight?
 
-Catppuccin StarryNight is a **music-reactive, performance-aware, year-3000-aesthetic theme** for Spotify (via Spicetify). It blends a dynamic colour pipeline, beat-synchronised visuals, and progressive enhancement to turn the client into an immersive, low-jank canvas.
+Catppuccin StarryNight is a **music-reactive, performance-aware, visually coordinated theme** for Spotify (via Spicetify). It blends a dynamic colour pipeline, beat-synchronised visuals, and progressive enhancement through a unified Visual Effects Coordination system to turn the client into an immersive, low-jank canvas.
 
 Key pillars:
 
 1. **Dynamic Palette** — RGB variables evolve with album art & Catppuccin flavour.
-2. **BeatSync Visuals** — UI blooms, oscillates, refracts to BPM & energy.
+2. **Visual Effects Coordination** — Background systems coordinate through shared state for unified experiences.
 3. **Performance Core** — single rAF loop + CSS-variable batching maintain 60 FPS.
 4. **Graceful Degradation** — reduced-motion, low-tier hardware, and degraded mode all supported.
 
@@ -25,14 +25,12 @@ Key pillars:
 | Path                           | Contents (high-level)                                        |
 | ------------------------------ | ------------------------------------------------------------ |
 | `docs/core_systems/`           | Performance / scheduling / settings infrastructure           |
-| `docs/effects/`                | Stand-alone visual effects (nebula, aberration, sheen, etc.) |
-| `docs/BeatSync/`               | Music analysis & beat-driven systems                         |
 | `docs/DragAndDrop/`            | Advanced drag-and-drop UX stack                              |
-| `docs/theme_system/`           | Colour harmony & theming pipeline                            |
+| `docs/CI_CD/`                  | CI/CD pipeline and architecture documentation                |
+| `docs/architecture/`           | Architecture examples, migration guides, performance        |
+| `docs/development/`            | AI framework, directory structure, project rules            |
 | `docs/spotify/DOM_TARGETTING/` | Canonical Spotify selector references                        |
-| `docs/visual/`                 | Deep dives into visual managers & systems                    |
-| `docs/experiences/`            | Concept papers & future UX ideas                             |
-| Other root docs                | CHANGELOG, VISUAL_SYSTEMS_ARCHITECTURE, etc.                 |
+| Other root docs                | API_REFERENCE, VISUAL_SYSTEMS_REFERENCE, VISUAL_EFFECTS_COORDINATION, etc. |
 
 ---
 
@@ -62,7 +60,7 @@ Key pillars:
 - `Data_Glyph_System.md` — adaptive glyph dots on tracks/cards.
 - `DIMENSIONAL_NEXUS_SYSTEM.md` — navigation-field warp & meditation states.
 - `Predictive_Behavior_Systems.md` — anticipatory glows & behavioural prediction.
-- `webgl-gradient-integration.md` — **✅** WebGL flow gradient with wave stack & skew transforms.
+- `VISUAL_EFFECTS_COORDINATION.md` — **✅** Visual Effects Coordination Architecture with unified state management.
 
 </details>
 
@@ -107,9 +105,9 @@ Key pillars:
 
 | You are…                | Start here                                                    |
 | ----------------------- | ------------------------------------------------------------- |
-| **New Contributor**     | `VISUAL_SYSTEMS_ARCHITECTURE.md` then dive into a sub-folder  |
-| **Performance Auditor** | `PERFORMANCE_ANALYZER.md` + `MASTER_ANIMATION_COORDINATOR.md` |
-| **Design Theorist**     | `../year3000.txt` (root) + `docs/experiences/` papers         |
+| **New Contributor**     | `VISUAL_SYSTEMS_REFERENCE.md` then `VISUAL_EFFECTS_COORDINATION.md`  |
+| **Performance Auditor** | `PERFORMANCE_OPTIMIZATION_GUIDELINES.md` + `PERFORMANCE_ARCHITECTURE_GUIDE.md` |
+| **Design Theorist**     | `MASTER_ARCHITECTURE_OVERVIEW.md` + `ORGANIC_CONSCIOUSNESS_GUIDE.md`         |
 | **AI / LLM**            | This file → follow folder map as needed                       |
 
 ---
@@ -124,4 +122,4 @@ Individual docs declare a badge in their header.
 
 ---
 
-_Last updated: **July 2025** — WebGL Flow Gradient System v1.2.0_
+_Last updated: **August 2025** — Visual Effects Coordination System v1.0.0_

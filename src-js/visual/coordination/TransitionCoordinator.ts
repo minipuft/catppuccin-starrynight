@@ -26,6 +26,7 @@ import { WebGLGradientBackgroundSystem } from "@/visual/background/WebGLRenderer
 import type {
   BackendCapabilities,
   HealthCheckResult,
+  IManagedSystem,
   MusicMetrics,
   PerformanceConstraints,
   RGBStop,
@@ -68,7 +69,9 @@ export interface GradientState {
   timestamp: number;
 }
 
-export class GradientTransitionOrchestrator {
+export class TransitionCoordinator implements IManagedSystem {
+  public readonly systemName = "TransitionCoordinator";
+  public initialized = false;
   private cssConsciousnessController: UnifiedCSSVariableManager;
   private deviceDetector: DeviceCapabilityDetector;
   private performanceAnalyzer: SimplePerformanceCoordinator;
@@ -223,8 +226,10 @@ export class GradientTransitionOrchestrator {
     // Update CSS variables to reflect current state
     this.updateCSSTransitionState();
 
+    this.initialized = true;
+
     Y3KDebug?.debug?.log(
-      "GradientTransitionOrchestrator",
+      "TransitionCoordinator",
       `Initialized with backend: ${this.targetBackend}`
     );
   }
@@ -1121,6 +1126,105 @@ export class GradientTransitionOrchestrator {
     };
   }
 
+  /**
+   * Update animation - required by IManagedSystem interface
+   * Updates transition animations and performance monitoring
+   */
+  public updateAnimation(deltaTime: number): void {
+    if (!this.initialized) return;
+
+    // Update any ongoing transition animations
+    if (this.transitionInProgress) {
+      this.updateTransitionAnimation(deltaTime);
+    }
+
+    // Check for performance-based backend switches
+    // Performance monitoring handled elsewhere
+  }
+
+  /**
+   * Health check - required by IManagedSystem interface
+   * Reports system health and performance status
+   */
+  public async healthCheck(): Promise<HealthCheckResult> {
+    try {
+      const isHealthy = this.initialized && !this.transitionInProgress;
+      const issues: string[] = [];
+
+      // Check backend health
+      if (this.currentBackend !== this.targetBackend) {
+        issues.push(`Backend transition in progress: ${this.currentBackend} → ${this.targetBackend}`);
+      }
+
+      // Check WebGL system health if applicable
+      if (this.currentBackend !== "css" && this.webglBackgroundSystem) {
+        try {
+          const webglHealth = await this.webglBackgroundSystem.healthCheck();
+          if (!webglHealth.ok) {
+            issues.push("WebGL backend unhealthy");
+          }
+        } catch (e) {
+          issues.push("WebGL health check failed");
+        }
+      }
+
+      // Check performance status
+      try {
+        const medianFPS = this.performanceAnalyzer.getMedianFPS();
+        if (medianFPS && medianFPS < 30) { // <30fps threshold
+          issues.push(`Performance degraded: ${medianFPS.toFixed(1)} FPS`);
+        }
+      } catch (e) {
+        // Performance analyzer might not have getMetrics method
+        issues.push("Performance metrics unavailable");
+      }
+
+      return {
+        healthy: isHealthy && issues.length === 0,
+        ok: isHealthy,
+        details: `TransitionCoordinator: ${this.currentBackend} backend active, ` +
+                `${this.webglReady ? 'WebGL ready' : 'CSS only'}, ` +
+                `${issues.length === 0 ? 'all systems nominal' : issues.length + ' issues'}`,
+        issues: issues,
+        system: this.systemName,
+      };
+    } catch (error) {
+      return {
+        healthy: false,
+        ok: false,
+        details: "TransitionCoordinator health check failed",
+        issues: [error instanceof Error ? error.message : "Unknown error"],
+        system: this.systemName,
+      };
+    }
+  }
+
+  /**
+   * Force repaint - optional IManagedSystem method
+   * Forces a visual refresh of the current backend
+   */
+  public forceRepaint(reason?: string): void {
+    if (!this.initialized) return;
+
+    Y3KDebug?.debug?.log("TransitionCoordinator", `Force repaint: ${reason || "manual trigger"}`);
+
+    // Force repaint on current backend
+    if (this.currentBackend !== "css" && this.webglBackgroundSystem?.forceRepaint) {
+      this.webglBackgroundSystem.forceRepaint(reason);
+    }
+
+    // Update CSS variables to trigger CSS-based repaints
+    this.updateCSSTransitionState();
+  }
+
+  /**
+   * Update transition animation progress
+   */
+  private updateTransitionAnimation(deltaTime: number): void {
+    // Implementation for smooth transition animations
+    // This would handle crossfade timing, progressive transitions, etc.
+  }
+
   public destroy(): void {
     // Stop monitoring
     if (this.performanceCheckInterval) {
@@ -1172,7 +1276,9 @@ export class GradientTransitionOrchestrator {
       "0"
     );
 
-    Y3KDebug?.debug?.log("GradientTransitionOrchestrator", "Destroyed");
+    this.initialized = false;
+
+    Y3KDebug?.debug?.log("TransitionCoordinator", "Destroyed");
   }
 
   // ========================================================================

@@ -18,13 +18,13 @@ interface FocusManagerConfig {
 }
 
 /**
- * FocusManager subsystem for reliable --focus-visible CSS variable emission.
+ * FocusController subsystem for reliable --focus-visible CSS variable emission.
  * Tracks keyboard focus and pointer hover states with throttled writes for performance.
  * Integrates with Year3000System's UnifiedCSSVariableManager for optimal batching.
  */
-export class FocusManager implements IManagedSystem {
+export class FocusController implements IManagedSystem {
   public initialized: boolean = false;
-  public readonly systemName = "FocusManager";
+  public readonly systemName = "FocusController";
 
   private config: FocusManagerConfig;
   private utils: typeof Year3000Utilities;

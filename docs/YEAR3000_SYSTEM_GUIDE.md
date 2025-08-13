@@ -5,7 +5,7 @@
 
 ## 🎯 Overview
 
-The **Year3000System** is the central orchestrator of the entire Catppuccin StarryNight theme. It represents the pinnacle of the "Year 3000" architectural philosophy—a future-thinking approach where interfaces are grown, not built, and every system operates with consciousness-aware principles.
+The **Year3000System** is the central orchestrator of the entire Catppuccin StarryNight theme. It represents the pinnacle of the "Year 3000" architectural philosophy—a future-thinking approach where interfaces are grown, not built, and every system operates through unified Visual Effects Coordination principles.
 
 **File Location**: `src-js/core/lifecycle/year3000System.ts`
 
@@ -20,7 +20,7 @@ The **Year3000System** is the central orchestrator of the entire Catppuccin Star
     ↓
 🎨 VisualSystemFacade + 🔧 NonVisualSystemFacade
     ↓
-🎵 Individual Systems (Organic Consciousness, Performance, Audio, etc.)
+🎵 Individual Systems (Visual Effects Coordination, Performance, Audio, etc.)
 ```
 
 The Year3000System sits at the apex of the architecture, managing the entire lifecycle of the theme while delegating specific concerns to specialized facades through the SystemCoordinator.
@@ -50,8 +50,8 @@ The Year3000System sits at the apex of the architecture, managing the entire lif
 ### 4. Music Integration
 - **Spicetify API Integration**: Handles Player, Platform, and Config APIs
 - **Color Extraction**: Coordinates album art analysis and color harmony
-- **Beat Synchronization**: Manages music-driven visual effects
-- **Emotional Mapping**: Translates music emotion to visual consciousness
+- **Beat Synchronization**: Manages music-driven visual effects through coordination
+- **Visual State Management**: Translates music analysis to coordinated visual state
 
 ---
 
@@ -130,8 +130,8 @@ async initializeAllSystems(): Promise<void> {
     this.performanceGuardActive = true;
   }
   
-  // 3. Enhanced Animation System Registration
-  await this._registerEnhancedAnimationSystems();
+  // 3. Visual Effects Coordination Registration
+  await this._registerVisualEffectsCoordination();
 }
 ```
 

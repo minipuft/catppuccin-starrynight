@@ -1,22 +1,17 @@
 /**
- * BackgroundAnimationCoordinator - Year 3000 Organic Coordination System
+ * VisualEffectsCoordinator - Background Visual Effects Coordination System
  *
- * Creates a shared "consciousness field" that allows background systems to dance together
- * organically, like musicians in a jazz ensemble responding to the same rhythm.
- *
- * Core Philosophy:
- * - "Interfaces are not built—they are grown"
- * - "Every pixel breathes, every element grows, every interaction ripples through a living digital organism"
- * - Choreography over Orchestration: Systems coordinate through shared awareness, not commands
+ * Coordinates visual effects across background systems, synchronizing animations
+ * and effects based on music analysis and device performance characteristics.
  *
  * Architecture:
- * - Creates ConsciousnessField - shared awareness space for background systems
- * - Broadcasts choreography events through GlobalEventBus for organic coordination
- * - Enables emergent behavior through biological-inspired state transitions
- * - Integrates music consciousness, aesthetic harmony, and performance awareness
+ * - Creates VisualEffectState - shared state for background visual systems
+ * - Broadcasts visual effect events through GlobalEventBus for coordination
+ * - Provides smooth transitions and performance-aware effect scaling
+ * - Integrates music analysis, color harmony, and performance monitoring
  *
- * @architecture Phase 2.2 Background Consciousness Choreography
- * @performance Target: Enables organic coordination while reducing 60-80KB bundle
+ * @architecture Phase 2.2 Background Visual Effects Coordination
+ * @performance Target: Efficient coordination while maintaining <1MB bundle
  */
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
@@ -32,9 +27,10 @@ import {
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
+import type { ChoreographyEventType, OrganicTransitionConfig } from "@/types/animationCoordination";
 
 // ===================================================================
-// CONSCIOUSNESS FIELD INTERFACES
+// VISUAL EFFECT STATE INTERFACES
 // ===================================================================
 
 /**
@@ -46,33 +42,33 @@ export interface Vector2D {
 }
 
 /**
- * ConsciousnessField - Shared awareness space that background systems tune into
+ * VisualEffectState - Shared state that background visual systems use for coordination
  *
- * This represents the "musical DNA" that flows through all systems, allowing them
- * to respond organically while maintaining beautiful coordination.
+ * Contains music analysis data, visual parameters, and performance metrics that
+ * allow visual systems to coordinate their effects smoothly.
  */
-export interface ConsciousnessField {
-  // === MUSICAL CONSCIOUSNESS ===
-  rhythmicPulse: number; // 0-1 beat intensity from music analysis
-  musicalFlow: Vector2D; // Flow direction derived from music characteristics
-  energyResonance: number; // 0-1 overall music energy level
-  emotionalTemperature: number; // Color temperature (1000K-20000K) from music emotion
+export interface VisualEffectState {
+  // === MUSIC INTEGRATION ===
+  musicIntensity: number; // 0-1 beat intensity from music analysis
+  flowDirection: Vector2D; // Flow direction derived from music characteristics
+  energyLevel: number; // 0-1 overall music energy level
+  colorTemperature: number; // Color temperature (1000K-20000K) from music emotion
   tempoModulation: number; // 0-2 tempo-driven scaling factor
   harmonicComplexity: number; // 0-1 musical complexity for system sophistication
 
-  // === VISUAL CONSCIOUSNESS ===
-  liquidDensity: number; // 0-2 fluid dynamics intensity
+  // === VISUAL PARAMETERS ===
+  fluidIntensity: number; // 0-2 fluid dynamics intensity
   depthPerception: number; // 0-1 3D space illusion strength
-  webglLuminosity: number; // 0-2 hardware acceleration intensity
-  chromaticResonance: number; // 0-1 color harmony synchronization
+  luminosity: number; // 0-2 hardware acceleration intensity
+  colorHarmony: number; // 0-1 color harmony synchronization
   visualCoherence: number; // 0-1 how unified the visual systems appear
 
-  // === ORGANIC TRANSITIONS ===
-  breathingCycle: number; // 0.5-4.0 seconds - synchronized breathing rhythm
-  membraneFluidityIndex: number; // 0-1 boundary fluidity between systems
-  cellularGrowthRate: number; // 0.1-2.0 organic scaling factor
-  consciousnessDepth: number; // 0-1 depth of consciousness integration
-  symbioticResonance: number; // 0-1 how well systems resonate together
+  // === ANIMATION PARAMETERS ===
+  pulseRate: number; // 0.5-4.0 seconds - synchronized pulse rhythm
+  transitionFluidity: number; // 0-1 transition smoothness between systems
+  scalingFactor: number; // 0.1-2.0 animation scaling factor
+  effectDepth: number; // 0-1 depth of effect integration
+  systemHarmony: number; // 0-1 how well systems coordinate together
 
   // === PERFORMANCE AWARENESS ===
   deviceCapabilities: DeviceCapabilities;
@@ -81,9 +77,9 @@ export interface ConsciousnessField {
   thermalState: number; // 0-1 thermal throttling level
   batteryConservation: number; // 0-1 battery optimization level
 
-  // === TEMPORAL CONSCIOUSNESS ===
-  timestamp: number; // When this field was created
-  evolutionPhase: number; // 0-1 how the consciousness has evolved
+  // === TEMPORAL TRACKING ===
+  timestamp: number; // When this state was created
+  evolutionPhase: number; // 0-1 how the visual state has evolved
   continuityIndex: number; // 0-1 temporal continuity with previous state
 }
 
@@ -92,86 +88,84 @@ export interface ConsciousnessField {
  */
 export interface BackgroundSystemParticipant {
   systemName: string;
-  onConsciousnessFieldUpdate(field: ConsciousnessField): void;
-  onChoreographyEvent(eventType: string, payload: any): void;
-  getConsciousnessContribution(): Partial<ConsciousnessField>;
+  onVisualStateUpdate(state: VisualEffectState): void;
+  onVisualEffectEvent(eventType: string, payload: any): void;
+  getVisualContribution(): Partial<VisualEffectState>;
 }
 
 /**
- * Choreography event types for organic coordination
+ * Visual effect event types for coordination
  */
-export type ChoreographyEventType =
-  | "consciousness:field-updated"
-  | "choreography:rhythm-shift"
-  | "choreography:emotional-shift"
-  | "choreography:energy-surge"
-  | "consciousness:breathing-cycle"
-  | "consciousness:membrane-fluid"
-  | "consciousness:cellular-growth"
-  | "consciousness:performance-adapt";
+export type VisualEffectEventType =
+  | "visual:state-updated"
+  | "visual:rhythm-shift"
+  | "visual:color-shift"
+  | "visual:energy-surge"
+  | "visual:pulse-cycle"
+  | "visual:transition-fluid"
+  | "visual:scaling-change"
+  | "visual:performance-adapt";
 
 /**
- * Organic transition configuration
+ * Smooth transition configuration
  */
-export interface OrganicTransitionConfig {
+export interface SmoothTransitionConfig {
   enabled: boolean;
   transitionDuration: number; // milliseconds
-  easingFunction: "biological" | "harmonic" | "cellular" | "liquid";
+  easingFunction: "smooth" | "harmonic" | "exponential" | "cubic";
   intensityFactor: number; // 0-2 transition intensity
   coherenceThreshold: number; // 0-1 minimum coherence for transitions
 }
 
 // ===================================================================
-// BACKGROUND CONSCIOUSNESS CHOREOGRAPHER
+// VISUAL EFFECTS COORDINATOR
 // ===================================================================
 
 /**
- * BackgroundAnimationCoordinator - Creates organic coordination through consciousness fields
+ * VisualEffectsCoordinator - Coordinates background visual effects through shared state
  *
- * This system establishes a shared consciousness field that background systems can tune into,
- * allowing them to coordinate organically like a jazz ensemble rather than being mechanically controlled.
+ * This system establishes shared visual effect state that background systems use for coordination,
+ * allowing them to synchronize effects smoothly based on music analysis and performance metrics.
  */
-export class BackgroundAnimationCoordinator implements IManagedSystem {
-  private static instance: BackgroundAnimationCoordinator | null = null;
+export class VisualEffectsCoordinator implements IManagedSystem {
+  private static instance: VisualEffectsCoordinator | null = null;
   public initialized: boolean = false;
 
   // Core dependencies
   private config: Year3000Config;
   private eventBus: typeof unifiedEventBus;
-  private cssConsciousnessController: OptimizedCSSVariableManager | null =
-    null;
+  private cssController: OptimizedCSSVariableManager | null = null;
   private performanceCoordinator: UnifiedPerformanceCoordinator | null = null;
   private musicSyncService: MusicSyncService | null = null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
   private emotionalGradientMapper: EmotionalGradientMapper | null = null;
 
-  // Consciousness field management
-  private currentConsciousnessField: ConsciousnessField | null = null;
-  private previousConsciousnessField: ConsciousnessField | null = null;
+  // Visual effect state management
+  private currentVisualState: VisualEffectState | null = null;
+  private previousVisualState: VisualEffectState | null = null;
   private fieldUpdateTimer: NodeJS.Timeout | null = null;
   private lastFieldUpdate: number = 0;
 
   // System participants
   private registeredParticipants: Map<string, BackgroundSystemParticipant> =
     new Map();
-  private participantContributions: Map<string, Partial<ConsciousnessField>> =
-    new Map();
+  private participantContributions: Map<string, Partial<VisualEffectState>> = new Map();
 
-  // Organic transition management
-  private transitionConfig: OrganicTransitionConfig = {
+  // Smooth transition management
+  private transitionConfig: SmoothTransitionConfig = {
     enabled: true,
     transitionDuration: 1000,
-    easingFunction: "biological",
+    easingFunction: "smooth",
     intensityFactor: 1.0,
     coherenceThreshold: 0.3,
   };
 
   // Performance and monitoring
   private isActive: boolean = false;
-  private updateInterval: number = 16; // 60fps consciousness updates
+  private updateInterval: number = 16; // 60fps visual state updates
   private performanceMetrics = {
-    fieldUpdates: 0,
-    choreographyEvents: 0,
+    stateUpdates: 0,
+    coordinationEvents: 0,
     animationTransitions: 0,
     lastUpdate: 0,
     averageUpdateTime: 0,
@@ -179,30 +173,30 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
 
   constructor(
     config: Year3000Config,
-    cssConsciousnessController?: OptimizedCSSVariableManager,
+    cssController?: OptimizedCSSVariableManager,
     performanceCoordinator?: UnifiedPerformanceCoordinator,
     musicSyncService?: MusicSyncService,
     colorHarmonyEngine?: ColorHarmonyEngine
   ) {
     this.config = config;
     this.eventBus = unifiedEventBus;
-    this.cssConsciousnessController = cssConsciousnessController || null;
+    this.cssController = cssController || null;
     this.performanceCoordinator = performanceCoordinator || null;
     this.musicSyncService = musicSyncService || null;
     this.colorHarmonyEngine = colorHarmonyEngine || null;
 
     // Initialize emotional gradient mapper if we have the required dependencies
-    if (this.cssConsciousnessController && this.musicSyncService) {
+    if (this.cssController && this.musicSyncService) {
       this.emotionalGradientMapper = new EmotionalGradientMapper(
-        this.cssConsciousnessController,
+        this.cssController,
         this.musicSyncService
       );
     }
 
     if (this.config.enableDebug) {
       Y3KDebug?.debug?.log(
-        "BackgroundAnimationCoordinator",
-        "Consciousness choreographer created"
+        "VisualEffectsCoordinator",
+        "Visual effects coordinator created"
       );
     }
   }
@@ -212,27 +206,27 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
    */
   public static getInstance(
     config?: Year3000Config,
-    cssConsciousnessController?: OptimizedCSSVariableManager,
+    cssController?: OptimizedCSSVariableManager,
     performanceCoordinator?: UnifiedPerformanceCoordinator,
     musicSyncService?: MusicSyncService,
     colorHarmonyEngine?: ColorHarmonyEngine
-  ): BackgroundAnimationCoordinator {
-    if (!BackgroundAnimationCoordinator.instance) {
+  ): VisualEffectsCoordinator {
+    if (!VisualEffectsCoordinator.instance) {
       if (!config) {
         throw new Error(
-          "BackgroundAnimationCoordinator requires configuration for first initialization"
+          "VisualEffectsCoordinator requires configuration for first initialization"
         );
       }
-      BackgroundAnimationCoordinator.instance =
-        new BackgroundAnimationCoordinator(
+      VisualEffectsCoordinator.instance =
+        new VisualEffectsCoordinator(
           config,
-          cssConsciousnessController,
+          cssController,
           performanceCoordinator,
           musicSyncService,
           colorHarmonyEngine
         );
     }
-    return BackgroundAnimationCoordinator.instance;
+    return VisualEffectsCoordinator.instance;
   }
 
   // ===================================================================
@@ -249,7 +243,7 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
       }
 
       // Create initial consciousness field
-      this.currentConsciousnessField = this.createInitialConsciousnessField();
+      this.currentVisualState = this.createInitialVisualState();
 
       // Start consciousness field updates
       this.startConsciousnessFieldUpdates();
@@ -286,8 +280,8 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
 
   public async healthCheck(): Promise<HealthCheckResult> {
     const participantCount = this.registeredParticipants.size;
-    const fieldAge = this.currentConsciousnessField
-      ? performance.now() - this.currentConsciousnessField.timestamp
+    const fieldAge = this.currentVisualState
+      ? performance.now() - this.currentVisualState.timestamp
       : 0;
     const isHealthy = this.isActive && fieldAge < 1000 && participantCount > 0;
 
@@ -302,8 +296,8 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
         isActive: this.isActive,
         participantCount,
         fieldAge,
-        fieldUpdates: this.performanceMetrics.fieldUpdates,
-        choreographyEvents: this.performanceMetrics.choreographyEvents,
+        stateUpdates: this.performanceMetrics.stateUpdates,
+        coordinationEvents: this.performanceMetrics.coordinationEvents,
         animationTransitions: this.performanceMetrics.animationTransitions,
         averageUpdateTime: this.performanceMetrics.averageUpdateTime,
       },
@@ -331,14 +325,14 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
     this.participantContributions.clear();
 
     // Reset state
-    this.currentConsciousnessField = null;
-    this.previousConsciousnessField = null;
+    this.currentVisualState = null;
+    this.previousVisualState = null;
     this.isActive = false;
     this.initialized = false;
 
     // Reset singleton
-    if (BackgroundAnimationCoordinator.instance === this) {
-      BackgroundAnimationCoordinator.instance = null;
+    if (VisualEffectsCoordinator.instance === this) {
+      VisualEffectsCoordinator.instance = null;
     }
 
     if (this.config.enableDebug) {
@@ -350,13 +344,13 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
   }
 
   // ===================================================================
-  // CONSCIOUSNESS FIELD MANAGEMENT
+  // VISUAL EFFECT STATE MANAGEMENT
   // ===================================================================
 
   /**
-   * Create initial consciousness field with default organic values
+   * Create initial visual effect state with default values
    */
-  private createInitialConsciousnessField(): ConsciousnessField {
+  private createInitialVisualState(): VisualEffectState {
     const deviceCapabilities =
       this.performanceCoordinator?.getDeviceCapabilities() || {
         performanceTier: "medium" as const,
@@ -383,36 +377,36 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
       };
 
     return {
-      // Musical consciousness - neutral starting values
-      rhythmicPulse: 0.5,
-      musicalFlow: { x: 0, y: 0 },
-      energyResonance: 0.5,
-      emotionalTemperature: 6500, // Neutral white
+      // === MUSIC INTEGRATION ===
+      musicIntensity: 0.5,
+      flowDirection: { x: 0, y: 0 },
+      energyLevel: 0.5,
+      colorTemperature: 6500, // Neutral white
       tempoModulation: 1.0,
       harmonicComplexity: 0.5,
 
-      // Visual consciousness - balanced starting values
-      liquidDensity: 1.0,
+      // === VISUAL PARAMETERS ===
+      fluidIntensity: 1.0,
       depthPerception: 0.7,
-      webglLuminosity: deviceCapabilities.gpuAcceleration ? 1.2 : 0.8,
-      chromaticResonance: 0.6,
+      luminosity: deviceCapabilities.gpuAcceleration ? 1.2 : 0.8,
+      colorHarmony: 0.6,
       visualCoherence: 0.8,
 
-      // Organic transitions - gentle breathing rhythm
-      breathingCycle: 2.0, // 2 second breathing cycle
-      membraneFluidityIndex: 0.5,
-      cellularGrowthRate: 1.0,
-      consciousnessDepth: 0.6,
-      symbioticResonance: 0.7,
+      // === ANIMATION PARAMETERS ===
+      pulseRate: 2.0, // 2 second pulse cycle
+      transitionFluidity: 0.5,
+      scalingFactor: 1.0,
+      effectDepth: 0.6,
+      systemHarmony: 0.7,
 
-      // Performance awareness
+      // === PERFORMANCE AWARENESS ===
       deviceCapabilities,
       performanceMode,
       adaptiveQuality: performanceMode.qualityLevel,
       thermalState: 0.0, // Cool
       batteryConservation: 0.0, // Not conserving
 
-      // Temporal consciousness
+      // === TEMPORAL TRACKING ===
       timestamp: performance.now(),
       evolutionPhase: 0.0,
       continuityIndex: 1.0, // Perfect continuity at start
@@ -425,27 +419,27 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
   private updateConsciousnessField(): void {
     const startTime = performance.now();
 
-    if (!this.currentConsciousnessField) {
-      this.currentConsciousnessField = this.createInitialConsciousnessField();
+    if (!this.currentVisualState) {
+      this.currentVisualState = this.createInitialVisualState();
       return;
     }
 
     // Store previous field for continuity
-    this.previousConsciousnessField = { ...this.currentConsciousnessField };
+    this.previousVisualState = { ...this.currentVisualState };
 
-    // Create new field based on current state + participant contributions + music analysis
-    const newField = this.evolveConsciousnessField(
-      this.currentConsciousnessField
+    // Create new state based on current state + participant contributions + music analysis
+    const newState = this.evolveVisualState(
+      this.currentVisualState
     );
 
-    // Apply organic transitions if enabled
+    // Apply smooth transitions if enabled
     if (this.transitionConfig.enabled) {
-      this.currentConsciousnessField = this.applyOrganicTransition(
-        this.currentConsciousnessField,
-        newField
+      this.currentVisualState = this.applySmoothTransition(
+        this.currentVisualState,
+        newState
       );
     } else {
-      this.currentConsciousnessField = newField;
+      this.currentVisualState = newState;
     }
 
     // Broadcast consciousness field update
@@ -453,75 +447,75 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
 
     // Update performance metrics
     const updateTime = performance.now() - startTime;
-    this.performanceMetrics.fieldUpdates++;
+    this.performanceMetrics.stateUpdates++;
     this.performanceMetrics.averageUpdateTime =
       (this.performanceMetrics.averageUpdateTime + updateTime) / 2;
 
     if (
       this.config.enableDebug &&
-      this.performanceMetrics.fieldUpdates % 60 === 0
+      this.performanceMetrics.stateUpdates % 60 === 0
     ) {
       Y3KDebug?.debug?.log(
         "BackgroundAnimationCoordinator",
         `Consciousness field evolved - Update #${
-          this.performanceMetrics.fieldUpdates
+          this.performanceMetrics.stateUpdates
         }, avg time: ${this.performanceMetrics.averageUpdateTime.toFixed(2)}ms`
       );
     }
   }
 
   /**
-   * Evolve consciousness field based on music, participants, and organic growth
+   * Evolve visual effect state based on music, participants, and performance
    */
-  private evolveConsciousnessField(
-    currentField: ConsciousnessField
-  ): ConsciousnessField {
-    // Start with current field
-    const evolvedField: ConsciousnessField = { ...currentField };
+  private evolveVisualState(
+    currentState: VisualEffectState
+  ): VisualEffectState {
+    // Start with current state
+    const evolvedState: VisualEffectState = { ...currentState };
 
-    // Update temporal consciousness
-    evolvedField.timestamp = performance.now();
-    evolvedField.evolutionPhase = Math.min(
+    // Update temporal tracking
+    evolvedState.timestamp = performance.now();
+    evolvedState.evolutionPhase = Math.min(
       1.0,
-      evolvedField.evolutionPhase + 0.001
+      evolvedState.evolutionPhase + 0.001
     ); // Slow evolution
 
-    // Update from music consciousness if available
-    this.updateFromMusicConsciousness(evolvedField);
+    // Update from music analysis if available
+    this.updateFromMusicAnalysis(evolvedState);
 
     // Integrate participant contributions
-    this.integrateParticipantContributions(evolvedField);
+    this.integrateParticipantContributions(evolvedState);
 
-    // Apply organic growth patterns
-    this.applyOrganicGrowthPatterns(evolvedField);
+    // Apply animation transitions
+    this.applyAnimationTransitions(evolvedState);
 
     // Update performance awareness
-    this.updatePerformanceAwareness(evolvedField);
+    this.updatePerformanceAwareness(evolvedState);
 
-    // Calculate continuity with previous field
-    if (this.previousConsciousnessField) {
-      evolvedField.continuityIndex = this.calculateContinuityIndex(
-        this.previousConsciousnessField,
-        evolvedField
+    // Calculate continuity with previous state
+    if (this.previousVisualState) {
+      evolvedState.continuityIndex = this.calculateContinuityIndex(
+        this.previousVisualState,
+        evolvedState
       );
     }
 
-    return evolvedField;
+    return evolvedState;
   }
 
   /**
-   * Update consciousness field from music analysis
+   * Update visual state from music analysis
    */
-  private updateFromMusicConsciousness(field: ConsciousnessField): void {
+  private updateFromMusicAnalysis(state: VisualEffectState): void {
     // Update from emotional gradient mapper if available
     if (this.emotionalGradientMapper) {
       const emotionalProfile =
         this.emotionalGradientMapper.getCurrentEmotionalProfile();
       if (emotionalProfile) {
-        field.rhythmicPulse = emotionalProfile.energy;
-        field.energyResonance = emotionalProfile.arousal;
-        field.emotionalTemperature = 3000 + emotionalProfile.valence * 10000; // 3000K-13000K
-        field.harmonicComplexity = emotionalProfile.complexity;
+        state.pulseRate = emotionalProfile.energy;
+        state.energyLevel = emotionalProfile.arousal;
+        state.colorTemperature = 3000 + emotionalProfile.valence * 10000; // 3000K-13000K
+        state.harmonicComplexity = emotionalProfile.complexity;
 
         // Update musical flow based on mood
         const moodFlowMap: { [key: string]: Vector2D } = {
@@ -533,11 +527,11 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
           contemplative: { x: 0, y: 0.3 },
         };
 
-        field.musicalFlow = moodFlowMap[emotionalProfile.mood] || {
+        state.flowDirection = moodFlowMap[emotionalProfile.mood] || {
           x: 0,
           y: 0,
         };
-        field.tempoModulation = 0.5 + emotionalProfile.energy * 1.5;
+        state.tempoModulation = 0.5 + emotionalProfile.energy * 1.5;
       }
     }
 
@@ -551,12 +545,12 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
   /**
    * Integrate contributions from registered participants
    */
-  private integrateParticipantContributions(field: ConsciousnessField): void {
+  private integrateParticipantContributions(state: VisualEffectState): void {
     if (this.participantContributions.size === 0) return;
 
     // Collect contributions and apply weighted average
     let totalWeight = 0;
-    const contributions: Partial<ConsciousnessField>[] = [];
+    const contributions: Partial<VisualEffectState>[] = [];
 
     for (const [participantId, contribution] of this.participantContributions) {
       contributions.push(contribution);
@@ -566,24 +560,24 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
     if (totalWeight > 0) {
       // Apply participant contributions with organic blending
       for (const contribution of contributions) {
-        if (contribution.liquidDensity !== undefined) {
-          field.liquidDensity = this.organicBlend(
-            field.liquidDensity,
-            contribution.liquidDensity,
+        if (contribution.fluidIntensity !== undefined) {
+          state.fluidIntensity = this.organicBlend(
+            state.fluidIntensity,
+            contribution.fluidIntensity,
             0.1
           );
         }
         if (contribution.depthPerception !== undefined) {
-          field.depthPerception = this.organicBlend(
-            field.depthPerception,
+          state.depthPerception = this.organicBlend(
+            state.depthPerception,
             contribution.depthPerception,
             0.1
           );
         }
-        if (contribution.webglLuminosity !== undefined) {
-          field.webglLuminosity = this.organicBlend(
-            field.webglLuminosity,
-            contribution.webglLuminosity,
+        if (contribution.luminosity !== undefined) {
+          state.luminosity = this.organicBlend(
+            state.luminosity,
+            contribution.luminosity,
             0.1
           );
         }
@@ -593,52 +587,52 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
   }
 
   /**
-   * Apply organic growth patterns to consciousness field
+   * Apply animation transitions to visual effect state
    */
-  private applyOrganicGrowthPatterns(field: ConsciousnessField): void {
+  private applyAnimationTransitions(state: VisualEffectState): void {
     const time = performance.now() / 1000; // Convert to seconds
 
-    // Apply breathing cycle modulation
-    const breathingPhase = (time % field.breathingCycle) / field.breathingCycle;
-    const breathingInfluence = Math.sin(breathingPhase * Math.PI * 2) * 0.1;
+    // Apply pulse cycle modulation
+    const pulsePhase = (time % state.pulseRate) / state.pulseRate;
+    const pulseInfluence = Math.sin(pulsePhase * Math.PI * 2) * 0.1;
 
-    field.cellularGrowthRate += breathingInfluence;
-    field.membraneFluidityIndex = Math.max(
+    state.scalingFactor += pulseInfluence;
+    state.transitionFluidity = Math.max(
       0,
-      Math.min(1, field.membraneFluidityIndex + breathingInfluence * 0.5)
+      Math.min(1, state.transitionFluidity + pulseInfluence * 0.5)
     );
 
-    // Apply organic evolution
-    field.consciousnessDepth = Math.max(
+    // Apply animation evolution
+    state.effectDepth = Math.max(
       0,
-      Math.min(1, field.consciousnessDepth + field.evolutionPhase * 0.001)
+      Math.min(1, state.effectDepth + state.evolutionPhase * 0.001)
     );
 
-    // Update symbiotic resonance based on system harmony
-    field.symbioticResonance = Math.max(
+    // Update system harmony based on visual coherence
+    state.systemHarmony = Math.max(
       0,
-      Math.min(1, (field.visualCoherence + field.continuityIndex) / 2)
+      Math.min(1, (state.visualCoherence + state.continuityIndex) / 2)
     );
   }
 
   /**
-   * Update performance awareness in consciousness field
+   * Update performance awareness in visual effect state
    */
-  private updatePerformanceAwareness(field: ConsciousnessField): void {
+  private updatePerformanceAwareness(state: VisualEffectState): void {
     if (this.performanceCoordinator) {
       // Update device capabilities and performance mode
-      field.deviceCapabilities =
+      state.deviceCapabilities =
         this.performanceCoordinator.getDeviceCapabilities();
-      field.performanceMode =
+      state.performanceMode =
         this.performanceCoordinator.getCurrentPerformanceMode();
-      field.adaptiveQuality = field.performanceMode.qualityLevel;
+      state.adaptiveQuality = state.performanceMode.qualityLevel;
 
       // Update thermal and battery state
       const thermalState = this.performanceCoordinator.getThermalState();
       const batteryState = this.performanceCoordinator.getBatteryState();
 
-      field.thermalState = thermalState.throttleLevel || 0;
-      field.batteryConservation =
+      state.thermalState = thermalState.throttleLevel || 0;
+      state.batteryConservation =
         batteryState && !batteryState.charging
           ? (1 - batteryState.level) * 0.5
           : 0;
@@ -646,19 +640,19 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
   }
 
   /**
-   * Calculate continuity index between consciousness fields
+   * Calculate continuity index between visual effect states
    */
   private calculateContinuityIndex(
-    previous: ConsciousnessField,
-    current: ConsciousnessField
+    previous: VisualEffectState,
+    current: VisualEffectState
   ): number {
-    // Calculate how similar the new field is to the previous one
+    // Calculate how similar the new state is to the previous one
     const metrics = [
-      Math.abs(previous.rhythmicPulse - current.rhythmicPulse),
-      Math.abs(previous.energyResonance - current.energyResonance),
-      Math.abs(previous.liquidDensity - current.liquidDensity),
+      Math.abs(previous.pulseRate - current.pulseRate),
+      Math.abs(previous.energyLevel - current.energyLevel),
+      Math.abs(previous.fluidIntensity - current.fluidIntensity),
       Math.abs(previous.depthPerception - current.depthPerception),
-      Math.abs(previous.webglLuminosity - current.webglLuminosity),
+      Math.abs(previous.luminosity - current.luminosity),
     ];
 
     const averageDifference =
@@ -667,100 +661,100 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
   }
 
   /**
-   * Apply organic transition between consciousness fields
+   * Apply smooth transition between visual effect states
    */
-  private applyOrganicTransition(
-    current: ConsciousnessField,
-    target: ConsciousnessField
-  ): ConsciousnessField {
+  private applySmoothTransition(
+    current: VisualEffectState,
+    target: VisualEffectState
+  ): VisualEffectState {
     // Determine transition speed based on continuity and coherence
-    const transitionSpeed = this.calculateOrganicTransitionSpeed(
+    const transitionSpeed = this.calculateSmoothTransitionSpeed(
       current,
       target
     );
 
-    // Apply biological easing function
-    const easedProgress = this.applyBiologicalEasing(transitionSpeed);
+    // Apply smooth easing function
+    const easedProgress = this.applySmoothEasing(transitionSpeed);
 
-    // Blend fields organically
-    return this.blendConsciousnessFields(current, target, easedProgress);
+    // Blend states smoothly
+    return this.blendVisualStates(current, target, easedProgress);
   }
 
   /**
-   * Calculate organic transition speed based on field characteristics
+   * Calculate smooth transition speed based on state characteristics
    */
-  private calculateOrganicTransitionSpeed(
-    current: ConsciousnessField,
-    target: ConsciousnessField
+  private calculateSmoothTransitionSpeed(
+    current: VisualEffectState,
+    target: VisualEffectState
   ): number {
     const baseBeat = 1.0 / 60.0; // 60fps base rate
-    const breathingModulation =
+    const pulseModulation =
       1.0 +
       Math.sin(
-        (performance.now() / 1000 / current.breathingCycle) * Math.PI * 2
+        (performance.now() / 1000 / current.pulseRate) * Math.PI * 2
       ) *
         0.2;
-    const energyModulation = 0.5 + current.energyResonance * 1.5;
+    const energyModulation = 0.5 + current.energyLevel * 1.5;
 
     return (
       baseBeat *
-      breathingModulation *
+      pulseModulation *
       energyModulation *
       this.transitionConfig.intensityFactor
     );
   }
 
   /**
-   * Apply biological easing function for organic transitions
+   * Apply smooth easing function for visual transitions
    */
-  private applyBiologicalEasing(progress: number): number {
+  private applySmoothEasing(progress: number): number {
     switch (this.transitionConfig.easingFunction) {
-      case "biological":
-        // Sigmoid curve mimicking biological growth
-        return 1 / (1 + Math.exp(-10 * (progress - 0.5)));
+      case "smooth":
+        // Smooth cubic bezier transition
+        return progress * progress * (3 - 2 * progress);
       case "harmonic":
         // Sine wave for harmonic transitions
         return (Math.sin((progress - 0.5) * Math.PI) + 1) / 2;
-      case "cellular":
+      case "exponential":
         // Exponential growth curve
         return progress * progress;
-      case "liquid":
-        // Cubic bezier for liquid-like motion
-        return progress * progress * (3 - 2 * progress);
+      case "cubic":
+        // Cubic easing
+        return progress * progress * progress;
       default:
         return progress;
     }
   }
 
   /**
-   * Blend two consciousness fields organically
+   * Blend two visual effect states smoothly
    */
-  private blendConsciousnessFields(
-    current: ConsciousnessField,
-    target: ConsciousnessField,
+  private blendVisualStates(
+    current: VisualEffectState,
+    target: VisualEffectState,
     progress: number
-  ): ConsciousnessField {
-    const blended: ConsciousnessField = { ...current };
+  ): VisualEffectState {
+    const blended: VisualEffectState = { ...current };
 
     // Blend numeric values
-    blended.rhythmicPulse = this.organicBlend(
-      current.rhythmicPulse,
-      target.rhythmicPulse,
+    blended.pulseRate = this.organicBlend(
+      current.pulseRate,
+      target.pulseRate,
       progress
     );
-    blended.energyResonance = this.organicBlend(
-      current.energyResonance,
-      target.energyResonance,
+    blended.energyLevel = this.organicBlend(
+      current.energyLevel,
+      target.energyLevel,
       progress
     );
-    blended.emotionalTemperature = this.organicBlend(
-      current.emotionalTemperature,
-      target.emotionalTemperature,
+    blended.colorTemperature = this.organicBlend(
+      current.colorTemperature,
+      target.colorTemperature,
       progress
     );
-    blended.liquidDensity = this.organicBlend(
-      current.liquidDensity,
-      target.liquidDensity,
+    blended.fluidIntensity = this.organicBlend(
+      current.fluidIntensity,
+      target.fluidIntensity,
       progress
     );
     blended.depthPerception = this.organicBlend(
@@ -768,14 +762,14 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
       target.depthPerception,
       progress
     );
-    blended.webglLuminosity = this.organicBlend(
-      current.webglLuminosity,
-      target.webglLuminosity,
+    blended.luminosity = this.organicBlend(
+      current.luminosity,
+      target.luminosity,
       progress
     );
-    blended.chromaticResonance = this.organicBlend(
-      current.chromaticResonance,
-      target.chromaticResonance,
+    blended.colorHarmony = this.organicBlend(
+      current.colorHarmony,
+      target.colorHarmony,
       progress
     );
     blended.visualCoherence = this.organicBlend(
@@ -783,29 +777,25 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
       target.visualCoherence,
       progress
     );
-    blended.breathingCycle = this.organicBlend(
-      current.breathingCycle,
-      target.breathingCycle,
+    // Keep pulseRate blending (already done above)
+    blended.transitionFluidity = this.organicBlend(
+      current.transitionFluidity,
+      target.transitionFluidity,
       progress
     );
-    blended.membraneFluidityIndex = this.organicBlend(
-      current.membraneFluidityIndex,
-      target.membraneFluidityIndex,
+    blended.scalingFactor = this.organicBlend(
+      current.scalingFactor,
+      target.scalingFactor,
       progress
     );
-    blended.cellularGrowthRate = this.organicBlend(
-      current.cellularGrowthRate,
-      target.cellularGrowthRate,
+    blended.effectDepth = this.organicBlend(
+      current.effectDepth,
+      target.effectDepth,
       progress
     );
-    blended.consciousnessDepth = this.organicBlend(
-      current.consciousnessDepth,
-      target.consciousnessDepth,
-      progress
-    );
-    blended.symbioticResonance = this.organicBlend(
-      current.symbioticResonance,
-      target.symbioticResonance,
+    blended.systemHarmony = this.organicBlend(
+      current.systemHarmony,
+      target.systemHarmony,
       progress
     );
     blended.tempoModulation = this.organicBlend(
@@ -825,15 +815,15 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
     );
 
     // Blend vectors
-    blended.musicalFlow = {
+    blended.flowDirection = {
       x: this.organicBlend(
-        current.musicalFlow.x,
-        target.musicalFlow.x,
+        current.flowDirection.x,
+        target.flowDirection.x,
         progress
       ),
       y: this.organicBlend(
-        current.musicalFlow.y,
-        target.musicalFlow.y,
+        current.flowDirection.y,
+        target.flowDirection.y,
         progress
       ),
     };
@@ -869,7 +859,7 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
     this.registeredParticipants.set(participant.systemName, participant);
 
     // Get initial contribution from participant
-    const contribution = participant.getConsciousnessContribution();
+    const contribution = participant.getVisualContribution();
     this.participantContributions.set(participant.systemName, contribution);
 
     if (this.config.enableDebug) {
@@ -900,7 +890,7 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
    */
   public updateParticipantContribution(
     systemName: string,
-    contribution: Partial<ConsciousnessField>
+    contribution: Partial<VisualEffectState>
   ): void {
     if (this.registeredParticipants.has(systemName)) {
       this.participantContributions.set(systemName, contribution);
@@ -915,18 +905,24 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
    * Choreograph consciousness field update - broadcast to all participants
    */
   private choreographConsciousnessUpdate(): void {
-    if (!this.currentConsciousnessField) return;
+    if (!this.currentVisualState) return;
 
     // Broadcast consciousness field update
     this.eventBus.emit(
       "consciousness:field-updated",
-      this.currentConsciousnessField
+      {
+        rhythmicPulse: this.currentVisualState.pulseRate,
+        musicalFlow: this.currentVisualState.flowDirection,
+        energyResonance: this.currentVisualState.energyLevel,
+        depthPerception: this.currentVisualState.depthPerception,
+        breathingCycle: this.currentVisualState.pulseRate
+      }
     );
 
     // Notify registered participants directly
     for (const participant of this.registeredParticipants.values()) {
       try {
-        participant.onConsciousnessFieldUpdate(this.currentConsciousnessField);
+        participant.onVisualStateUpdate(this.currentVisualState);
       } catch (error) {
         Y3KDebug?.debug?.error(
           "BackgroundAnimationCoordinator",
@@ -936,7 +932,7 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
       }
     }
 
-    this.performanceMetrics.choreographyEvents++;
+    this.performanceMetrics.coordinationEvents++;
   }
 
   /**
@@ -955,7 +951,7 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
     // Notify participants
     for (const participant of this.registeredParticipants.values()) {
       try {
-        participant.onChoreographyEvent(eventType, payload);
+        participant.onVisualEffectEvent(eventType, payload);
       } catch (error) {
         Y3KDebug?.debug?.error(
           "BackgroundAnimationCoordinator",
@@ -965,7 +961,7 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
       }
     }
 
-    this.performanceMetrics.choreographyEvents++;
+    this.performanceMetrics.coordinationEvents++;
 
     if (this.config.enableDebug) {
       Y3KDebug?.debug?.log(
@@ -1010,14 +1006,14 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
     // Subscribe to music sync events
     if (this.musicSyncService) {
       this.eventBus.subscribe("music:track-changed", (payload) => {
-        this.choreographEvent("choreography:rhythm-shift", {
+        this.choreographEvent("rhythm-shift", {
           newTrack: payload,
           transitionType: "organic",
         });
       }, "BackgroundAnimationCoordinator");
 
       this.eventBus.subscribe("emotion:analyzed", (payload: any) => {
-        this.choreographEvent("choreography:energy-surge", {
+        this.choreographEvent("intensity-peak", {
           intensity: payload?.energy || 0.5,
           affectedSystems: ["all"],
           surgeType: "full-spectrum",
@@ -1030,7 +1026,7 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
     // Subscribe to performance events
     if (this.performanceCoordinator) {
       this.eventBus.subscribe("performance:tier-changed", (payload: any) => {
-        this.choreographEvent("consciousness:performance-adapt", {
+        this.choreographEvent("genre-transition", {
           newMode: payload || {
             name: "auto",
             qualityLevel: 0.8,
@@ -1067,12 +1063,14 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
    */
   private mapChoreographyEventToUnified(eventType: ChoreographyEventType): { eventName: string; payload: any } | null {
     switch (eventType) {
-      case "choreography:rhythm-shift":
+      case "rhythm-shift":
         return { eventName: "consciousness:coordination", payload: { source: "choreographer", type: "rhythm-shift" } };
-      case "choreography:energy-surge":
+      case "intensity-peak":
         return { eventName: "consciousness:intensity-changed", payload: { intensity: 0.8, userEngagement: 0.6, timestamp: Date.now() } };
-      case "consciousness:performance-adapt":
-        return { eventName: "consciousness:coordination", payload: { source: "choreographer", type: "performance-adapt" } };
+      case "genre-transition":
+        return { eventName: "consciousness:coordination", payload: { source: "choreographer", type: "genre-transition" } };
+      case "emotional-shift":
+        return { eventName: "consciousness:coordination", payload: { source: "choreographer", type: "emotional-shift" } };
       default:
         return { eventName: "consciousness:coordination", payload: { source: "choreographer", type: eventType } };
     }
@@ -1098,8 +1096,8 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
     } else if (key.includes("breathing-cycle")) {
       // This would update the breathing cycle if the user has control over it
       const newCycle = Math.max(0.5, Math.min(4.0, parseFloat(value) || 2.0));
-      if (this.currentConsciousnessField) {
-        this.currentConsciousnessField.breathingCycle = newCycle;
+      if (this.currentVisualState) {
+        this.currentVisualState.pulseRate = newCycle;
       }
     }
 
@@ -1118,9 +1116,9 @@ export class BackgroundAnimationCoordinator implements IManagedSystem {
   /**
    * Get current consciousness field (read-only copy)
    */
-  public getCurrentConsciousnessField(): ConsciousnessField | null {
-    return this.currentConsciousnessField
-      ? { ...this.currentConsciousnessField }
+  public getCurrentConsciousnessField(): VisualEffectState | null {
+    return this.currentVisualState
+      ? { ...this.currentVisualState }
       : null;
   }
 

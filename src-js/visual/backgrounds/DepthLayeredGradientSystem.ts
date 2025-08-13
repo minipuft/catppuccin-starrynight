@@ -18,16 +18,17 @@ import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/
 import { unifiedEventBus, type EventData } from "@/core/events/UnifiedEventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
+import type { HealthCheckResult } from "@/types/systems";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 import type {
-  BackgroundAnimationCoordinator,
+  VisualEffectsCoordinator,
   BackgroundSystemParticipant,
-  ConsciousnessField,
-} from "../effects/BackgroundAnimationCoordinator";
+  VisualEffectState,
+} from "../effects/VisualEffectsCoordinator";
 
 interface DepthLayer {
   id: string;
@@ -127,9 +128,9 @@ export class DepthLayeredGradientSystem
   private eventSubscriptionIds: string[] = [];
 
   // Consciousness choreographer integration
-  private consciousnessChoreographer: BackgroundAnimationCoordinator | null =
+  private consciousnessChoreographer: VisualEffectsCoordinator | null =
     null;
-  private currentConsciousnessField: ConsciousnessField | null = null;
+  private currentConsciousnessField: VisualEffectState | null = null;
 
   // LERP smoothing half-life values (in seconds) for framerate-independent animations
   private lerpHalfLifeValues = {
@@ -1336,17 +1337,26 @@ export class DepthLayeredGradientSystem
     }
   }
 
-  public async healthCheck(): Promise<{ ok: boolean; details: string }> {
+  public override async healthCheck(): Promise<HealthCheckResult> {
     const isHealthy =
       this.depthSettings.enabled &&
       this.depthLayers.size > 0 &&
       this.backgroundContainer !== null;
 
     return {
-      ok: isHealthy,
-      details: isHealthy
-        ? `Depth system active with ${this.depthLayers.size} layers`
-        : "Depth system inactive",
+      system: 'DepthLayeredGradientSystem',
+      healthy: isHealthy,
+      metrics: {
+        enabled: this.depthSettings.enabled,
+        layerCount: this.depthLayers.size,
+        hasContainer: !!this.backgroundContainer,
+        layerSettings: this.depthSettings.layerCount
+      },
+      issues: isHealthy ? [] : [
+        ...(this.depthSettings.enabled ? [] : ['System disabled']),
+        ...(this.depthLayers.size > 0 ? [] : ['No active layers']),
+        ...(this.backgroundContainer ? [] : ['Missing container element'])
+      ]
     };
   }
 
@@ -1596,7 +1606,7 @@ export class DepthLayeredGradientSystem
     };
   }
 
-  public onConsciousnessFieldUpdate(field: ConsciousnessField): void {
+  public onConsciousnessFieldUpdate(field: VisualEffectState): void {
     try {
       this.currentConsciousnessField = field;
 
@@ -1607,9 +1617,9 @@ export class DepthLayeredGradientSystem
         "DepthLayeredGradientSystem",
         "Updated from consciousness field:",
         {
-          rhythmicPulse: field.rhythmicPulse,
+          rhythmicPulse: field.pulseRate,
           depthPerception: field.depthPerception,
-          breathingCycle: field.breathingCycle,
+          breathingCycle: field.pulseRate,
         }
       );
     } catch (error) {
@@ -1680,10 +1690,10 @@ export class DepthLayeredGradientSystem
   /**
    * Update depth layers based on consciousness field
    */
-  private updateDepthFromConsciousness(field: ConsciousnessField): void {
+  private updateDepthFromConsciousness(field: VisualEffectState): void {
     // Modulate parallax strength with rhythmic pulse
     const consciousParallax =
-      this.depthSettings.parallaxStrength * (0.7 + field.rhythmicPulse * 0.6);
+      this.depthSettings.parallaxStrength * (0.7 + field.pulseRate * 0.6);
 
     // Update layer properties based on consciousness
     for (const [layerId, layer] of this.depthLayers.entries()) {
@@ -1692,16 +1702,16 @@ export class DepthLayeredGradientSystem
       // Modulate opacity with musical flow
       const baseOpacity =
         layer.opacityRange[0] +
-        (layer.opacityRange[1] - layer.opacityRange[0]) * field.musicalFlow.x;
+        (layer.opacityRange[1] - layer.opacityRange[0]) * field.flowDirection.x;
       const consciousOpacity =
         baseOpacity * (0.8 + field.depthPerception * 0.4);
 
       // Modulate scale with breathing cycle
       const breathingScale =
-        1.0 + Math.sin(field.breathingCycle * Math.PI * 2) * 0.05;
+        1.0 + Math.sin(field.pulseRate * Math.PI * 2) * 0.05;
       const baseScale =
         layer.scaleRange[0] +
-        (layer.scaleRange[1] - layer.scaleRange[0]) * field.energyResonance;
+        (layer.scaleRange[1] - layer.scaleRange[0]) * field.energyLevel;
       const consciousScale = baseScale * breathingScale;
 
       // Apply transformations
@@ -1805,5 +1815,41 @@ export class DepthLayeredGradientSystem
         );
       }
     });
+  }
+
+  // =========================================================================
+  // BACKGROUND SYSTEM PARTICIPANT INTERFACE
+  // =========================================================================
+
+  public onVisualStateUpdate(state: VisualEffectState): void {
+    // Update visual effects based on shared state
+    this.onConsciousnessFieldUpdate(state);
+  }
+
+  public onVisualEffectEvent(eventType: string, payload: any): void {
+    // Handle visual effect events from coordinator
+    switch (eventType) {
+      case "visual:rhythm-shift":
+        if (payload.intensity) {
+          this.depthSettings.parallaxStrength = Math.min(10, payload.intensity * 5);
+        }
+        break;
+      case "visual:color-shift":
+        this.forceRepaint?.("color-shift");
+        break;
+      case "visual:energy-surge":
+        if (payload.intensity > 0.6) {
+          this.depthSettings.depthFogIntensity = Math.min(1, payload.intensity);
+        }
+        break;
+    }
+  }
+
+  public getVisualContribution(): Partial<VisualEffectState> {
+    return {
+      depthPerception: this.depthSettings.parallaxStrength / 10,
+      effectDepth: this.depthSettings.depthFogIntensity,
+      visualCoherence: this.depthSettings.maxDepth / 100
+    };
   }
 }

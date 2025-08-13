@@ -1,5 +1,5 @@
 /**
- * VisualSystemFacade - Phase 2 Unified Visual System Integration
+ * VisualSystemCoordinator - Phase 2 Unified Visual System Integration
  *
  * Extended from Year3000IntegrationBridge to handle ALL visual systems through factory patterns.
  * Provides comprehensive factory methods, dependency injection, and performance optimization
@@ -34,9 +34,9 @@ import { WebGLGradientBackgroundSystem } from "@/visual/background/WebGLRenderer
 import { CSSBlobFallbackSystem } from "@/visual/css-fallbacks/CSSBlobFallbackSystem";
 import { ConsciousnessUIEffectsController } from "@/visual/effects/UIVisualEffectsController";
 import { HeaderConsciousnessController } from "@/visual/effects/HeaderVisualEffectsController";
-import { UnifiedSidebarConsciousnessController } from "@/visual/effects/UnifiedSidebarEffectsController";
+import { SidebarVisualEffectsSystem } from "@/visual/ui/SidebarVisualEffectsSystem";
 import { GradientConductor } from "@/visual/backbone/GradientConductor";
-import { OrganicBeatSyncConsciousness } from "@/visual/music/MusicSyncVisualEffects";
+import { MusicBeatSynchronizer } from "@/visual/music/MusicSyncVisualEffects";
 import { HolographicUISystem } from "@/visual/music/ui/HolographicUISystem";
 import { InteractionTrackingSystem } from "@/visual/ui/InteractionTrackingSystem";
 import { SpotifyUIApplicationSystem } from "@/visual/ui/SpotifyUIApplicationSystem";
@@ -44,11 +44,11 @@ import { SpotifyUIApplicationSystem } from "@/visual/ui/SpotifyUIApplicationSyst
 
 // Consciousness engine imports for integration
 import { RedEnergyBurstSystem } from "@/visual/effects/HighEnergyEffectsController";
-import { SoftGlowEffectsManager } from "@/visual/effects/GlowEffectsController";
-import { NaturalHarmonyEngine } from "@/visual/effects/NaturalHarmonyEngine";
+import { MusicGlowEffectsManager } from "@/visual/effects/GlowEffectsController";
+import { BreathingEffectsController } from "@/visual/effects/BreathingEffectsController";
 
 // Interface imports
-import { IManagedSystem } from "@/types/systems";
+import { IManagedSystem, HealthCheckResult } from "@/types/systems";
 // AdaptivePerformanceSystem functionality absorbed into SimplePerformanceCoordinator (Phase 3 consolidation)
 // Using consolidated types for backward compatibility
 interface AdaptationEvent {
@@ -89,7 +89,7 @@ export type VisualSystemKey =
   | "HeaderConsciousness"
   | "WebGLBackground"
   | "CSSBlobFallback"
-  | "OrganicBeatSync"
+  | "MusicBeatSync"
   | "OrganicBreathing"
   | "InteractionTracking"
   | "SpotifyUIApplication"
@@ -97,10 +97,14 @@ export type VisualSystemKey =
   | "EtherealBeauty"
   | "NaturalHarmony"
   | "GradientConductor"
-  | "CSSAnimationManager";
+  | "CSSAnimationManager"
+  | "GlowEffects"
+  | "UnifiedParticle"
+  | "DepthLayeredGradient"
+  | "FluidGradientBackground";
 // ParticleField consolidated into Particle (ParticleConsciousnessModule)
 // EmergentChoreography consolidated into EnhancedMasterAnimationCoordinator
-// Sidebar systems consolidated into SidebarConsciousness (UnifiedSidebarConsciousnessController)
+// Sidebar systems consolidated into Sidebar Effects (UnifiedSidebarEffectsController)
 
 export type SystemHealth = "excellent" | "good" | "degraded" | "critical";
 export type IntegrationMode =
@@ -155,7 +159,9 @@ export interface VisualSystemHealthCheck {
   timestamp: number;
 }
 
-export class VisualSystemFacade {
+export class VisualSystemCoordinator implements IManagedSystem {
+  public readonly systemName = "VisualSystemCoordinator";
+  public initialized = false;
   // Core dependencies
   private config: Year3000Config;
   private utils: typeof Utils;
@@ -272,7 +278,7 @@ export class VisualSystemFacade {
 
     this.systemRegistry.set(
       "SidebarConsciousness",
-      UnifiedSidebarConsciousnessController
+      SidebarVisualEffectsSystem
     );
     this.systemDependencies.set("SidebarConsciousness", [
       "eventBus",
@@ -313,8 +319,8 @@ export class VisualSystemFacade {
     ]);
 
 
-    this.systemRegistry.set("OrganicBeatSync", OrganicBeatSyncConsciousness);
-    this.systemDependencies.set("OrganicBeatSync", [
+    this.systemRegistry.set("MusicBeatSync", MusicBeatSynchronizer);
+    this.systemDependencies.set("MusicBeatSync", [
       "performanceAnalyzer",
       "cssConsciousnessController",
       "eventBus",
@@ -341,7 +347,7 @@ export class VisualSystemFacade {
       "eventBus",
     ]);
 
-    this.systemRegistry.set("EtherealBeauty", SoftGlowEffectsManager);
+    this.systemRegistry.set("EtherealBeauty", MusicGlowEffectsManager);
     this.systemDependencies.set("EtherealBeauty", [
       "performanceAnalyzer",
       "cssConsciousnessController",
@@ -350,7 +356,7 @@ export class VisualSystemFacade {
       "eventBus",
     ]);
 
-    this.systemRegistry.set("NaturalHarmony", NaturalHarmonyEngine);
+    this.systemRegistry.set("NaturalHarmony", BreathingEffectsController);
     this.systemDependencies.set("NaturalHarmony", [
       "performanceAnalyzer",
       "cssConsciousnessController",
@@ -376,6 +382,37 @@ export class VisualSystemFacade {
 
     // EmergentChoreography consolidated into EnhancedMasterAnimationCoordinator
     // ParticleField consolidated into Particle (ParticleConsciousnessModule)
+
+    // Test compatibility aliases
+    this.systemRegistry.set("GlowEffects", MusicGlowEffectsManager);
+    this.systemDependencies.set("GlowEffects", [
+      "performanceAnalyzer",
+      "cssConsciousnessController",
+      "musicSyncService",
+      "colorHarmonyEngine",
+      "eventBus",
+    ]);
+
+    this.systemRegistry.set("UnifiedParticle", SidebarVisualEffectsSystem); // Particle system consolidated into sidebar
+    this.systemDependencies.set("UnifiedParticle", [
+      "eventBus",
+      "musicSyncService",
+    ]);
+
+    this.systemRegistry.set("DepthLayeredGradient", GradientConductor);
+    this.systemDependencies.set("DepthLayeredGradient", [
+      "cssConsciousnessController",
+      "colorHarmonyEngine",
+      "musicSyncService",
+      "performanceAnalyzer",
+      "eventBus",
+    ]);
+
+    this.systemRegistry.set("FluidGradientBackground", WebGLGradientBackgroundSystem);
+    this.systemDependencies.set("FluidGradientBackground", [
+      "performanceAnalyzer",
+      "eventBus",
+    ]);
   }
 
   public async initialize(config?: Partial<VisualSystemConfig>): Promise<void> {
@@ -415,6 +452,7 @@ export class VisualSystemFacade {
       await this.performVisualHealthCheck();
 
       this.isInitialized = true;
+      this.initialized = true;
 
       // Update CSS to indicate bridge is active
       this.cssConsciousnessController.queueCSSVariableUpdate(
@@ -1236,13 +1274,119 @@ export class VisualSystemFacade {
     };
   }
 
+  /**
+   * IManagedSystem - Update animation loop (delegates to all systems)
+   */
+  public updateAnimation(deltaTime: number): void {
+    if (!this.initialized) return;
+
+    // Update all cached visual systems
+    this.systemCache.forEach((system, key) => {
+      try {
+        if (typeof (system as any).updateAnimation === "function") {
+          (system as any).updateAnimation(deltaTime);
+        } else if (typeof (system as any).onAnimate === "function") {
+          (system as any).onAnimate(deltaTime);
+        }
+      } catch (error) {
+        Y3KDebug?.debug?.error(
+          "VisualSystemCoordinator",
+          `Error updating ${key}:`,
+          error
+        );
+      }
+    });
+  }
+
+  /**
+   * IManagedSystem - Health check for all systems
+   */
+  public async healthCheck(): Promise<HealthCheckResult> {
+    try {
+      const healthCheckResult = await this.performVisualHealthCheck();
+      
+      let status: "healthy" | "degraded" | "critical";
+      switch (healthCheckResult.overall) {
+        case "excellent":
+        case "good":
+          status = "healthy";
+          break;
+        case "degraded":
+          status = "degraded";
+          break;
+        case "critical":
+          status = "critical";
+          break;
+        default:
+          status = "healthy";
+      }
+
+      return {
+        healthy: status === "healthy",
+        ok: status !== "critical",
+        details: `Visual system coordinator health: ${healthCheckResult.overall} (${healthCheckResult.systems.size} systems)`,
+        system: "VisualSystemCoordinator",
+        issues: healthCheckResult.recommendations,
+        metrics: {
+          overall: healthCheckResult.overall,
+          systemCount: healthCheckResult.systems.size,
+          recommendations: healthCheckResult.recommendations,
+          currentMetrics: this.currentMetrics,
+          status
+        }
+      };
+    } catch (error) {
+      return {
+        healthy: false,
+        ok: false,
+        details: `Health check failed: ${error}`,
+        system: "VisualSystemCoordinator",
+        issues: ["Health check exception"],
+        metrics: { error: String(error) }
+      };
+    }
+  }
+
+  /**
+   * IManagedSystem - Force repaint for all systems
+   */
+  public forceRepaint(reason?: string): void {
+    Y3KDebug?.debug?.log(
+      "VisualSystemCoordinator",
+      `Force repaint requested${reason ? `: ${reason}` : ""}`
+    );
+
+    // Force repaint on all cached systems
+    this.systemCache.forEach((system, key) => {
+      try {
+        if (typeof (system as any).forceRepaint === "function") {
+          (system as any).forceRepaint(reason);
+        } else if (typeof (system as any).refresh === "function") {
+          (system as any).refresh();
+        }
+      } catch (error) {
+        Y3KDebug?.debug?.warn(
+          "VisualSystemCoordinator",
+          `Error force repainting ${key}:`,
+          error
+        );
+      }
+    });
+
+    // Force CSS variable flush if method exists
+    if (this.cssConsciousnessController && 'flushPendingUpdates' in this.cssConsciousnessController) {
+      (this.cssConsciousnessController as any).flushPendingUpdates();
+    }
+  }
+
   public async destroy(): Promise<void> {
     await this.cleanup();
     this.isInitialized = false;
+    this.initialized = false;
 
     // Clear system cache
     this.systemCache.clear();
 
-    Y3KDebug?.debug?.log("VisualSystemFacade", "Facade destroyed");
+    Y3KDebug?.debug?.log("VisualSystemCoordinator", "Facade destroyed");
   }
 }

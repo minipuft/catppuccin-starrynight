@@ -1,5 +1,5 @@
 /**
- * Color Orchestrator - Strategy Pattern Invoker Implementation
+ * Color Coordinator - Strategy Pattern Invoker Implementation
  *
  * Coordinates event-driven color processing using Strategy pattern.
  * Eliminates circular dependencies by acting as mediator between
@@ -25,6 +25,7 @@ import type {
   IColorStrategyRegistry,
   StrategySelectionCriteria,
 } from "@/types/colorStrategy";
+import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import {
   OKLABColorProcessor,
@@ -192,7 +193,9 @@ export class ColorStrategyRegistry implements IColorStrategyRegistry {
  * Orchestrates multiple background color processing strategies with intelligent
  * selection logic, OKLAB coordination, and performance optimization.
  */
-export class ColorOrchestrator implements IColorOrchestrator {
+export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
+  public readonly systemName = "ColorCoordinator";
+  public initialized = false;
   private registry: ColorStrategyRegistry;
   private selectionCriteria: StrategySelectionCriteria;
   private isInitialized = false;
@@ -309,6 +312,7 @@ export class ColorOrchestrator implements IColorOrchestrator {
       await this.registerDefaultStrategies();
 
       this.isInitialized = true;
+      this.initialized = true;
 
       Y3KDebug?.debug?.log(
         "ColorOrchestrator",
@@ -1384,6 +1388,172 @@ export class ColorOrchestrator implements IColorOrchestrator {
   /**
    * Cleanup resources
    */
+  /**
+   * IManagedSystem - Update animation loop (delegates to OKLAB processor if needed)
+   */
+  public updateAnimation(deltaTime: number): void {
+    if (!this.initialized) return;
+
+    // Color coordination doesn't typically need animation updates,
+    // but we can update performance metrics and process queue if needed
+    try {
+      // Process any queued color contexts if not currently processing
+      if (!this.isProcessing && this.processingQueue.length > 0) {
+        // Process queue asynchronously without blocking animation loop
+        this.processQueue().catch(error => {
+          Y3KDebug?.debug?.error(
+            "ColorCoordinator",
+            "Queue processing error in animation loop:",
+            error
+          );
+        });
+      }
+
+      // Update memory usage metrics
+      const memoryInfo = (performance as any).memory;
+      if (memoryInfo) {
+        this.orchestrationMetrics.memoryUsage = memoryInfo.usedJSHeapSize / (1024 * 1024);
+      }
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "ColorCoordinator",
+        "Animation update error:",
+        error
+      );
+    }
+  }
+
+  /**
+   * IManagedSystem - Health check for color coordination system
+   */
+  public async healthCheck(): Promise<HealthCheckResult> {
+    try {
+      const metrics = this.getOrchestrationMetrics();
+      const strategyStatus = this.registry.getStatus();
+      
+      let status: "healthy" | "degraded" | "critical" = "healthy";
+      const issues: string[] = [];
+
+      // Check initialization status
+      if (!this.isInitialized) {
+        status = "critical";
+        issues.push("System not initialized");
+      }
+
+      // Check strategy registry
+      if (strategyStatus.strategyCount === 0) {
+        status = "critical";
+        issues.push("No color processing strategies registered");
+      }
+
+      // Check processing queue health
+      if (this.processingQueue.length >= this.MAX_QUEUE_SIZE * 0.8) {
+        status = status === "critical" ? "critical" : "degraded";
+        issues.push(`Processing queue near capacity: ${this.processingQueue.length}/${this.MAX_QUEUE_SIZE}`);
+      }
+
+      // Check failure rate
+      const totalProcessed = metrics.strategiesSucceeded + metrics.strategiesFailed;
+      if (totalProcessed > 0) {
+        const failureRate = metrics.strategiesFailed / totalProcessed;
+        if (failureRate > 0.5) {
+          status = "critical";
+          issues.push(`High failure rate: ${(failureRate * 100).toFixed(1)}%`);
+        } else if (failureRate > 0.2) {
+          status = status === "critical" ? "critical" : "degraded";
+          issues.push(`Moderate failure rate: ${(failureRate * 100).toFixed(1)}%`);
+        }
+      }
+
+      // Check memory usage
+      if (metrics.memoryUsage > 100) {
+        status = status === "critical" ? "critical" : "degraded";
+        issues.push(`High memory usage: ${metrics.memoryUsage.toFixed(1)}MB`);
+      }
+
+      const message = issues.length === 0 
+        ? `Color coordination system healthy (${strategyStatus.strategyCount} strategies)`
+        : `Color coordination issues: ${issues.join(", ")}`;
+
+      return {
+        healthy: status === "healthy",
+        ok: status !== "critical",
+        details: `${message} - Status: ${status}`,
+        system: "ColorCoordinator",
+        issues,
+        metrics: {
+          initialized: this.isInitialized,
+          strategies: strategyStatus,
+          orchestrationMetrics: metrics,
+          queueSize: this.processingQueue.length,
+          isProcessing: this.isProcessing,
+          oklabEnabled: this.oklabCoordinationEnabled,
+          status
+        }
+      };
+    } catch (error) {
+      return {
+        healthy: false,
+        ok: false,
+        details: `Health check failed: ${error}`,
+        system: "ColorCoordinator",
+        issues: ["Health check exception"],
+        metrics: { error: String(error) }
+      };
+    }
+  }
+
+  /**
+   * IManagedSystem - Force repaint/refresh of color coordination
+   */
+  public forceRepaint(reason?: string): void {
+    Y3KDebug?.debug?.log(
+      "ColorCoordinator",
+      `Force repaint requested${reason ? `: ${reason}` : ""}`
+    );
+
+    try {
+      // Clear result cache to force fresh processing
+      this.clearCache();
+
+      // Clear processed contexts to allow reprocessing
+      this.processedContexts.clear();
+
+      // Force reload user preferences
+      this.loadUserPreferences();
+
+      // Update device capabilities
+      this.updateDeviceCapabilities();
+
+      // Process any pending contexts immediately
+      if (this.processingQueue.length > 0 && !this.isProcessing) {
+        this.processQueue().catch(error => {
+          Y3KDebug?.debug?.error(
+            "ColorCoordinator",
+            "Force repaint queue processing error:",
+            error
+          );
+        });
+      }
+
+      Y3KDebug?.debug?.log(
+        "ColorCoordinator",
+        "Force repaint completed",
+        {
+          cacheCleared: true,
+          contextsCleared: this.processedContexts.size === 0,
+          queueSize: this.processingQueue.length
+        }
+      );
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "ColorCoordinator",
+        "Force repaint error:",
+        error
+      );
+    }
+  }
+
   async destroy(): Promise<void> {
     // Unsubscribe from events
     // Phase 3: Updated to use UnifiedEventBus for proper facade coordination
@@ -1394,6 +1564,7 @@ export class ColorOrchestrator implements IColorOrchestrator {
     this.processingQueue = [];
     this.isProcessing = false;
     this.isInitialized = false;
+    this.initialized = false;
 
     // Phase 4: Clear recursion prevention cache
     this.processedContexts.clear();
@@ -1415,4 +1586,4 @@ export class ColorOrchestrator implements IColorOrchestrator {
 /**
  * Global singleton instance for color orchestration
  */
-export const globalColorOrchestrator = new ColorOrchestrator();
+export const globalColorOrchestrator = new ColorCoordinator();

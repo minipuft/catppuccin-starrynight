@@ -510,7 +510,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
   ): Promise<void> {
     const consciousnessVariables: Record<string, string> = {
       // Holographic consciousness variables
-      "--organic-holographic-rgb": accentRgb,
+      "--sn-holographic-rgb": accentRgb,
       "--holographic-scanline-rgb": accentRgb,
 
       // Depth consciousness variables

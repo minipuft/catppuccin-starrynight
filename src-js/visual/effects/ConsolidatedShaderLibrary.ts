@@ -1,11 +1,11 @@
 /**
- * Consolidated Shader Library for Background Consciousness Systems
+ * Consolidated Shader Library for Advanced Visual Effects
  * 
  * Shared shader components, utilities, and constants used across WebGL-based
- * consciousness systems, eliminating shader code duplication.
+ * visual effects systems, eliminating shader code duplication.
  * 
  * @architecture Phase 2.2C Shader Consolidation
- * @philosophy Organic shader consciousness through shared components
+ * @design Advanced shader components for visual effects
  */
 
 // ===================================================================
@@ -13,20 +13,20 @@
 // ===================================================================
 
 /**
- * Standard vertex shader used by all WebGL consciousness systems
+ * Standard vertex shader used by all WebGL visual effects systems
  */
-export const STANDARD_CONSCIOUSNESS_VERTEX_SHADER = `#version 300 es
+export const STANDARD_VISUAL_EFFECTS_VERTEX_SHADER = `#version 300 es
 in vec2 a_position;
 void main() {
   gl_Position = vec4(a_position, 0.0, 1.0);
 }`;
 
 /**
- * Shared noise functions used across consciousness shaders
+ * Shared noise functions used across visual effects shaders
  * Eliminates duplicate noise implementations
  */
 export const SHARED_NOISE_FUNCTIONS = `
-// Shared simplex noise implementation for consciousness effects
+// Shared simplex noise implementation for visual effects
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -905,11 +905,11 @@ export class ShaderTemplate {
  */
 export class ShaderLogicPatterns {
   /**
-   * Enhanced consciousness-driven flow calculation with Year 3000 patterns
+   * Enhanced music-driven flow calculation with advanced patterns
    */
-  public static consciousnessFlowLogic(): string {
+  public static musicFlowLogic(): string {
     return `
-  // Calculate enhanced consciousness-driven flow
+  // Calculate enhanced music-driven flow
   vec2 flowDirection = calculateMusicalFlow(vec2(1.0, 0.5), u_musicalFlow, 0.5);
   float flowStrength = rhythmicPulseModulation(0.5, u_rhythmicPulse, 0.3);
   
@@ -927,11 +927,11 @@ export class ShaderLogicPatterns {
   }
 
   /**
-   * Enhanced noise-based texture sampling with advanced consciousness patterns
+   * Enhanced noise-based texture sampling with advanced audio patterns
    */
-  public static consciousnessNoiseSampling(): string {
+  public static audioNoiseSampling(): string {
     return `
-  // Generate enhanced consciousness-modulated noise
+  // Generate enhanced audio-modulated noise
   vec2 noiseUV = uv + flowDirection * u_time * 0.03;
   
   // Multi-layered consciousness noise patterns
@@ -997,17 +997,17 @@ export class ShaderLogicPatterns {
 /**
  * Reusable shader fragments for different consciousness effects
  */
-export class ConsciousnessShaderFragments {
+export class AdvancedShaderLibrary {
   /**
-   * WebGL gradient consciousness fragment
+   * WebGL gradient shader fragment
    * Optimized version of WebGL gradient shader logic
    */
   public static webglGradientFragment(): string {
     return `
-  ${ShaderLogicPatterns.consciousnessFlowLogic()}
+  ${ShaderLogicPatterns.musicFlowLogic()}
   
   // WebGL-specific gradient sampling
-  ${ShaderLogicPatterns.consciousnessNoiseSampling()}
+  ${ShaderLogicPatterns.audioNoiseSampling()}
   
   // Sample gradient texture
   vec4 color = texture(u_gradientTex, vec2(t, 0.5));
@@ -1020,12 +1020,12 @@ export class ConsciousnessShaderFragments {
   }
 
   /**
-   * Liquid consciousness fragment
-   * Core liquid effects with consciousness integration
+   * Liquid effects shader fragment
+   * Core liquid effects with audio-visual integration
    */
-  public static liquidConsciousnessFragment(): string {
+  public static liquidEffectsFragment(): string {
     return `
-  ${ShaderLogicPatterns.consciousnessFlowLogic()}
+  ${ShaderLogicPatterns.musicFlowLogic()}
   
   // Liquid-specific turbulence and phase
   float liquidPhase = u_liquidPhase + u_rhythmicPulse * 0.5;
@@ -1053,7 +1053,7 @@ export class ConsciousnessShaderFragments {
    */
   public static corridorBubbleFragment(): string {
     return `
-  ${ShaderLogicPatterns.consciousnessFlowLogic()}
+  ${ShaderLogicPatterns.musicFlowLogic()}
   
   // Calculate corridor bubble mask
   float corridorMask = bubbleCorridors(uv, u_time, u_corridorIntensity * u_corridorBubbleScale);
@@ -1084,7 +1084,7 @@ export class ConsciousnessShaderFragments {
    */
   public static dungeonCorridorFragment(): string {
     return `
-  ${ShaderLogicPatterns.consciousnessFlowLogic()}
+  ${ShaderLogicPatterns.musicFlowLogic()}
   
   // Calculate dungeon corridor tunnel mask
   float corridorMask = dungeonCorridorTunnels(uv, u_time, u_corridorIntensity * u_corridorBubbleScale);
@@ -1119,7 +1119,7 @@ export class ConsciousnessShaderFragments {
    */
   public static advancedConsciousnessFieldFragment(): string {
     return `
-  ${ShaderLogicPatterns.consciousnessFlowLogic()}
+  ${ShaderLogicPatterns.musicFlowLogic()}
   
   // Calculate multi-dimensional consciousness field
   float consciousnessField = consciousnessFieldIntensity(uv, u_time, u_musicEnergy);
@@ -1128,7 +1128,7 @@ export class ConsciousnessShaderFragments {
   vec2 temporalUV = uv + temporalFlowDirection(uv, u_time, u_temporalFlowDirection);
   
   // Enhanced consciousness noise sampling with memory patterns
-  ${ShaderLogicPatterns.consciousnessNoiseSampling()}
+  ${ShaderLogicPatterns.audioNoiseSampling()}
   
   // Sample gradient with consciousness field modulation
   vec4 color = texture(u_gradientTex, vec2(t * consciousnessField, 0.5));
@@ -1156,7 +1156,7 @@ export class ConsciousnessShaderFragments {
    */
   public static membraneConsciousnessDynamicsFragment(): string {
     return `
-  ${ShaderLogicPatterns.consciousnessFlowLogic()}
+  ${ShaderLogicPatterns.musicFlowLogic()}
   
   // Calculate membrane consciousness position with flow
   vec2 membraneUV = uv;
@@ -1284,7 +1284,7 @@ export const CONSCIOUSNESS_SHADER_LIBRARY = {
   Template: ShaderTemplate,
   
   // Shared components
-  VERTEX_SHADER: STANDARD_CONSCIOUSNESS_VERTEX_SHADER,
+  VERTEX_SHADER: STANDARD_VISUAL_EFFECTS_VERTEX_SHADER,
   NOISE_FUNCTIONS: SHARED_NOISE_FUNCTIONS,
   CONSCIOUSNESS_FUNCTIONS: CONSCIOUSNESS_MODULATION_FUNCTIONS,
   CORRIDOR_FUNCTIONS: CORRIDOR_SDF_FUNCTIONS,
@@ -1293,8 +1293,8 @@ export const CONSCIOUSNESS_SHADER_LIBRARY = {
   // Logic patterns
   LogicPatterns: ShaderLogicPatterns,
   
-  // Enhanced consciousness fragments
-  Fragments: ConsciousnessShaderFragments,
+  // Enhanced visual effects fragments
+  Fragments: AdvancedShaderLibrary,
   
   // Optimization utilities
   Optimization: ShaderOptimizationUtils,

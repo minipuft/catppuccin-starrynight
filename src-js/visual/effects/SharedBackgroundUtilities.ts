@@ -13,10 +13,10 @@ import { getGlobalOptimizedCSSController, OptimizedCSSVariableManager } from "@/
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import { ShaderLoader } from "@/utils/graphics/ShaderLoader";
 import type {
-  BackgroundAnimationCoordinator,
+  VisualEffectsCoordinator as BackgroundAnimationCoordinator,
   BackgroundSystemParticipant,
-  ConsciousnessField,
-} from "./BackgroundAnimationCoordinator";
+  VisualEffectState as ConsciousnessField,
+} from "./VisualEffectsCoordinator";
 
 // ===================================================================
 // SHARED CONSCIOUSNESS REGISTRATION UTILITIES
@@ -467,9 +467,9 @@ export abstract class BaseBackgroundSystem
         this.systemName,
         "Updated from consciousness field:",
         {
-          rhythmicPulse: field.rhythmicPulse,
-          energyResonance: field.energyResonance,
-          breathingCycle: field.breathingCycle,
+          rhythmicPulse: field.pulseRate,
+          energyResonance: field.energyLevel,
+          breathingCycle: field.pulseRate,
         }
       );
     } catch (error) {
@@ -565,4 +565,12 @@ export abstract class BaseBackgroundSystem
       this.systemName
     );
   }
+
+  // =========================================================================
+  // BACKGROUND SYSTEM PARTICIPANT INTERFACE (ABSTRACT)
+  // =========================================================================
+
+  public abstract onVisualStateUpdate(state: ConsciousnessField): void;
+  public abstract onVisualEffectEvent(eventType: string, payload: any): void;
+  public abstract getVisualContribution(): Partial<ConsciousnessField>;
 }

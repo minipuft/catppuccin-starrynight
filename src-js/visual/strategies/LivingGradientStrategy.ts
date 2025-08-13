@@ -1278,7 +1278,7 @@ export class LivingGradientStrategy
   /**
    * Health check to include both strategy and visual system status
    */
-  public async healthCheck(): Promise<any> {
+  public override async healthCheck(): Promise<any> {
     const strategyHealth = await this.getStrategyHealthCheck();
     // Don't call super.healthCheck() as BaseVisualSystem doesn't have it
     // Instead use our own consolidated health check

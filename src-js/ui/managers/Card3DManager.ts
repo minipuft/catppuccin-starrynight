@@ -30,8 +30,8 @@ interface Card3DConfig {
 }
 
 interface Card3DEffectState {
-  currentEmotion: string;
-  emotionalIntensity: number;
+  currentMusicMood: string;
+  musicIntensity: number;
   beatPhase: number;
   lastBeatTime: number;
   effectIntensityLevel: number;
@@ -60,19 +60,19 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
 
   private boundHandleSettingsChange: (event: Event) => void;
   
-  // Year 3000 consciousness integration
+  // Year 3000 music integration
   private musicSyncService: MusicSyncService | null = null;
-  private emotionalMapper: EmotionalTemperatureMapper;
+  private musicTemperatureMapper: EmotionalTemperatureMapper;
   private oklabProcessor: OKLABColorProcessor;
   private effectState: Card3DEffectState;
-  private cinematicPreset: EnhancementPreset;
+  private effectPreset: EnhancementPreset;
   
   // Quality scaling state
   private currentQualityLevel: QualityLevel | null = null;
   private qualityCapabilities: QualityCapability[] = [];
   
-  // Cross-system consciousness coordination
-  private consciousnessCoordinationCallbacks: Set<(state: Card3DEffectState) => void> = new Set();
+  // Cross-system effect coordination
+  private effectCoordinationCallbacks: Set<(state: Card3DEffectState) => void> = new Set();
 
   public constructor(
     performanceMonitor: SimplePerformanceCoordinator,
@@ -87,7 +87,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
       glowOpacity: 0.8,
       selector:
         ".main-card-card, .main-grid-grid > *, .main-shelf-shelf > * > *",
-      // Year 3000 consciousness enhancements
+      // Year 3000 music enhancement parameters
       depthMultiplier: 1.5,
       musicResponseStrength: 0.8,
       beatSyncIntensity: 0.6,
@@ -98,15 +98,15 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
     this.utils = utils;
     this.cards = document.querySelectorAll(this.config.selector);
 
-    // Initialize Year 3000 consciousness systems
-    this.emotionalMapper = new EmotionalTemperatureMapper(true);
+    // Initialize Year 3000 music analysis systems
+    this.musicTemperatureMapper = new EmotionalTemperatureMapper(true);
     this.oklabProcessor = new OKLABColorProcessor(true);
-    this.cinematicPreset = OKLABColorProcessor.getPreset('VIBRANT');
+    this.effectPreset = OKLABColorProcessor.getPreset('VIBRANT');
     
-    // Initialize consciousness state
+    // Initialize music effect state
     this.effectState = {
-      currentEmotion: 'neutral',
-      emotionalIntensity: 0.5,
+      currentMusicMood: 'neutral',
+      musicIntensity: 0.5,
       beatPhase: 0,
       lastBeatTime: 0,
       effectIntensityLevel: 0,
@@ -152,10 +152,10 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
 
     await this.applyEventListeners();
     
-    // Initialize Year 3000 consciousness integrations
-    await this.initializeConsciousnessIntegration();
+    // Initialize Year 3000 music integrations
+    await this.initializeMusicIntegration();
     
-    // Initialize cross-system consciousness coordination
+    // Initialize cross-system effect coordination
     this.initializeCrossSystemCoordination();
 
     // Listen for live settings changes
@@ -265,19 +265,19 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
       card.appendChild(glowElement);
     }
 
-    // Use consciousness-aware OKLAB-processed dynamic accent colors
-    const { dynamicAccentRgb, emotionalIntensity, beatPhase, effectIntensityLevel } = this.effectState;
+    // Use music-aware OKLAB-processed dynamic accent colors
+    const { dynamicAccentRgb, musicIntensity, beatPhase, effectIntensityLevel } = this.effectState;
     
-    // Calculate consciousness-enhanced opacity
+    // Calculate music-enhanced opacity
     const baseOpacity = this.config.glowOpacity;
-    const emotionalModulation = 1 + (emotionalIntensity - 0.5) * this.config.musicResponseStrength;
+    const musicModulation = 1 + (musicIntensity - 0.5) * this.config.musicResponseStrength;
     const beatModulation = 1 + Math.sin(beatPhase) * this.config.beatSyncIntensity * 0.3;
-    const cinematicModulation = 1 + effectIntensityLevel * this.config.effectIntensityMultiplier * 0.4;
+    const effectModulation = 1 + effectIntensityLevel * this.config.effectIntensityMultiplier * 0.4;
     
-    const consciousnessOpacity = baseOpacity * emotionalModulation * beatModulation * cinematicModulation;
-    const finalOpacity = Math.max(0.1, Math.min(1.0, consciousnessOpacity));
+    const enhancedOpacity = baseOpacity * musicModulation * beatModulation * effectModulation;
+    const finalOpacity = Math.max(0.1, Math.min(1.0, enhancedOpacity));
     
-    // Create organic, breathing glow radius
+    // Create animated glow radius
     const baseRadius = 40;
     const breathingRadius = baseRadius + Math.sin(beatPhase * 0.5) * 8 * this.config.beatSyncIntensity;
     
@@ -325,13 +325,13 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   }
 
   // ===================================================================
-  // Year 3000 Consciousness Integration Methods
+  // Year 3000 Music Integration Methods
   // ===================================================================
 
   /**
-   * Initialize consciousness integration with music sync and emotional systems
+   * Initialize music integration with sync and mood analysis systems
    */
-  private async initializeConsciousnessIntegration(): Promise<void> {
+  private async initializeMusicIntegration(): Promise<void> {
     try {
       // Subscribe to unified color events
       unifiedEventBus.subscribe('colors:extracted', (event) => {
@@ -342,21 +342,21 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
         this.onColorsHarmonized(event);
       }, 'Card3DManager');
 
-      // Subscribe to music and consciousness events
+      // Subscribe to music and effect events
       unifiedEventBus.subscribe('music:beat', (event) => {
         this.onMusicBeat(event);
       }, 'Card3DManager');
 
       unifiedEventBus.subscribe('consciousness:dramatic-moment', (event) => {
-        this.onCinematicDramaEvent(event);
+        this.onIntensityEvent(event);
       }, 'Card3DManager');
 
       // Get initial dynamic accent color
       this.updateDynamicAccentColor();
 
-      console.log('[Card3DManager] ✅ Year 3000 consciousness integration initialized');
+      console.log('[Card3DManager] ✅ Year 3000 music integration initialized');
     } catch (error) {
-      console.error('[Card3DManager] Failed to initialize consciousness integration:', error);
+      console.error('[Card3DManager] Failed to initialize music integration:', error);
     }
   }
 
@@ -367,9 +367,9 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
     const { rawColors, musicData } = event;
     
     if (musicData) {
-      // Process emotional state
-      const emotionalResult = this.emotionalMapper.mapMusicToEmotionalTemperature(musicData);
-      this.updateEmotionalState(emotionalResult);
+      // Process music mood state
+      const musicResult = this.musicTemperatureMapper.mapMusicToEmotionalTemperature(musicData);
+      this.updateMusicState(musicResult);
     }
   }
 
@@ -381,12 +381,12 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
     
     // Update dynamic accent with OKLAB-processed colors
     if (processedColors.VIBRANT) {
-      const oklabResult = this.oklabProcessor.processColor(processedColors.VIBRANT, this.cinematicPreset);
+      const oklabResult = this.oklabProcessor.processColor(processedColors.VIBRANT, this.effectPreset);
       this.effectState.dynamicAccentHex = oklabResult.enhancedHex;
       this.effectState.dynamicAccentRgb = `${oklabResult.enhancedRgb.r},${oklabResult.enhancedRgb.g},${oklabResult.enhancedRgb.b}`;
     }
 
-    // Update consciousness level based on coordination metrics
+    // Update effect intensity based on coordination metrics
     if (coordinationMetrics?.overallIntensityLevel !== undefined) {
       this.effectState.overallIntensityLevel = coordinationMetrics.overallIntensityLevel;
     }
@@ -398,7 +398,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   private onMusicBeat(event: any): void {
     const { beat, intensity, timestamp } = event;
     
-    // Update beat phase for organic animations
+    // Update beat phase for animated effects
     this.effectState.beatPhase += Math.PI * 2 * this.config.beatSyncIntensity;
     this.effectState.lastBeatTime = timestamp || Date.now();
     
@@ -409,38 +409,38 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   }
 
   /**
-   * Handle cinematic drama events for intense 3D effects
+   * Handle intensity events for enhanced 3D effects
    */
-  private onCinematicDramaEvent(event: any): void {
+  private onIntensityEvent(event: any): void {
     const { intensity, type } = event;
     
     this.effectState.effectIntensityLevel = intensity;
     
-    // Apply dramatic 3D effects for intense moments
+    // Apply enhanced 3D effects for intense moments
     if (intensity > 0.8) {
-      this.applyDramaticDepthDistortion(intensity);
+      this.applyEnhancedDepthDistortion(intensity);
     }
   }
 
   /**
-   * Update emotional state from music analysis
+   * Update music state from audio analysis
    */
-  private updateEmotionalState(emotionalResult: EmotionalTemperatureResult): void {
-    this.effectState.currentEmotion = emotionalResult.primaryEmotion;
-    this.effectState.emotionalIntensity = emotionalResult.intensity;
+  private updateMusicState(musicResult: EmotionalTemperatureResult): void {
+    this.effectState.currentMusicMood = musicResult.primaryEmotion;
+    this.effectState.musicIntensity = musicResult.intensity;
     
-    // Adjust cinematic preset based on emotion
-    switch (emotionalResult.primaryEmotion) {
+    // Adjust effect preset based on music mood
+    switch (musicResult.primaryEmotion) {
       case 'energetic':
       case 'aggressive':
-        this.cinematicPreset = OKLABColorProcessor.getPreset('COSMIC');
+        this.effectPreset = OKLABColorProcessor.getPreset('COSMIC');
         break;
       case 'calm':
       case 'ambient':
-        this.cinematicPreset = OKLABColorProcessor.getPreset('SUBTLE');
+        this.effectPreset = OKLABColorProcessor.getPreset('SUBTLE');
         break;
       default:
-        this.cinematicPreset = OKLABColorProcessor.getPreset('VIBRANT');
+        this.effectPreset = OKLABColorProcessor.getPreset('VIBRANT');
     }
   }
 
@@ -469,19 +469,19 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   }
 
   /**
-   * Apply dramatic depth distortion for cinematic moments
+   * Apply enhanced depth distortion for intense moments
    */
-  private applyDramaticDepthDistortion(intensity: number): void {
-    const dramaticPerspective = this.config.perspective * (1 + intensity * this.config.effectIntensityMultiplier);
-    const dramaticRotation = this.config.maxRotation * (1 + intensity * 0.8);
+  private applyEnhancedDepthDistortion(intensity: number): void {
+    const enhancedPerspective = this.config.perspective * (1 + intensity * this.config.effectIntensityMultiplier);
+    const enhancedRotation = this.config.maxRotation * (1 + intensity * 0.8);
     
     this.cards.forEach(card => {
       if (card instanceof HTMLElement) {
-        const dramaticTransform = `perspective(${dramaticPerspective}px) rotateX(${dramaticRotation * 0.3}deg) rotateY(${dramaticRotation * 0.2}deg)`;
-        card.style.transform = dramaticTransform;
+        const enhancedTransform = `perspective(${enhancedPerspective}px) rotateX(${enhancedRotation * 0.3}deg) rotateY(${enhancedRotation * 0.2}deg)`;
+        card.style.transform = enhancedTransform;
         card.style.transition = 'transform 800ms ease-out';
         
-        // Reset after dramatic moment
+        // Reset after intense moment
         setTimeout(() => {
           card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
           card.style.transition = 'transform 1200ms ease-in-out';
@@ -516,16 +516,16 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   }
 
   /**
-   * Set music sync service for consciousness integration
+   * Set music sync service for music integration
    */
   public setMusicSyncService(musicSyncService: MusicSyncService): void {
     this.musicSyncService = musicSyncService;
   }
 
   /**
-   * Get current consciousness state for debugging
+   * Get current effect state for debugging
    */
-  public getConsciousnessState(): Card3DEffectState {
+  public getEffectState(): Card3DEffectState {
     return { ...this.effectState };
   }
 
@@ -592,15 +592,15 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   public getPerformanceImpact(): PerformanceMetrics {
     const cardCount = this.cards.length;
     const baseImpact = cardCount * 0.1; // Base impact per card
-    const consciousnessImpact = this.config.depthMultiplier * 0.2;
-    const emotionalImpact = this.config.musicResponseStrength * 0.15;
-    const cinematicImpact = this.config.effectIntensityMultiplier * 0.1;
+    const depthImpact = this.config.depthMultiplier * 0.2;
+    const musicImpact = this.config.musicResponseStrength * 0.15;
+    const effectImpact = this.config.effectIntensityMultiplier * 0.1;
     
     return {
       fps: 60,
-      frameTime: baseImpact + consciousnessImpact + emotionalImpact + cinematicImpact,
+      frameTime: baseImpact + depthImpact + musicImpact + effectImpact,
       memoryUsage: cardCount * 0.05, // Minimal memory impact
-      cpuUsage: (baseImpact + consciousnessImpact) * 100,
+      cpuUsage: (baseImpact + depthImpact) * 100,
     };
   }
 
@@ -610,7 +610,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   public reduceQuality(amount: number): void {
     if (!this.currentQualityLevel) return;
     
-    // Reduce consciousness modulation factors
+    // Reduce effect modulation factors
     this.config.depthMultiplier = Math.max(0.5, this.config.depthMultiplier - amount);
     this.config.musicResponseStrength = Math.max(0.1, this.config.musicResponseStrength - amount);
     this.config.beatSyncIntensity = Math.max(0.1, this.config.beatSyncIntensity - amount);
@@ -625,7 +625,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   public increaseQuality(amount: number): void {
     if (!this.currentQualityLevel) return;
     
-    // Increase consciousness modulation factors
+    // Increase effect modulation factors
     this.config.depthMultiplier = Math.min(2.0, this.config.depthMultiplier + amount);
     this.config.musicResponseStrength = Math.min(1.5, this.config.musicResponseStrength + amount);
     this.config.beatSyncIntensity = Math.min(1.0, this.config.beatSyncIntensity + amount);
@@ -646,7 +646,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
           qualityLevel: 'medium'
         },
         {
-          name: 'Consciousness Glow',
+          name: 'Music-Reactive Glow',
           enabled: true,
           qualityLevel: 'low'
         },
@@ -656,12 +656,12 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
           qualityLevel: 'low'
         },
         {
-          name: 'Dramatic Distortion',
+          name: 'Intensity Distortion',
           enabled: true,
           qualityLevel: 'medium'
         },
         {
-          name: 'Emotional Modulation',
+          name: 'Music Modulation',
           enabled: true,
           qualityLevel: 'low'
         }
@@ -682,7 +682,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
       if (this.effectState.dynamicAccentHex) {
         const oklabResult = this.oklabProcessor.processColor(
           this.effectState.dynamicAccentHex, 
-          this.cinematicPreset
+          this.effectPreset
         );
         this.effectState.dynamicAccentHex = oklabResult.enhancedHex;
         this.effectState.dynamicAccentRgb = `${oklabResult.enhancedRgb.r},${oklabResult.enhancedRgb.g},${oklabResult.enhancedRgb.b}`;
@@ -695,31 +695,31 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   }
 
   // ===================================================================
-  // Cross-System Consciousness Coordination
+  // Cross-System Effect Coordination
   // ===================================================================
 
   /**
-   * Register for consciousness coordination updates
+   * Register for effect coordination updates
    */
-  public onConsciousnessCoordination(callback: (state: Card3DEffectState) => void): () => void {
-    this.consciousnessCoordinationCallbacks.add(callback);
+  public onEffectCoordination(callback: (state: Card3DEffectState) => void): () => void {
+    this.effectCoordinationCallbacks.add(callback);
     
     // Return unsubscribe function
     return () => {
-      this.consciousnessCoordinationCallbacks.delete(callback);
+      this.effectCoordinationCallbacks.delete(callback);
     };
   }
 
   /**
-   * Synchronize consciousness state with other systems
+   * Synchronize effect state with other systems
    */
-  public synchronizeConsciousnessState(sharedState: Partial<Card3DEffectState>): void {
-    // Update our consciousness state with shared values
-    if (sharedState.currentEmotion) {
-      this.effectState.currentEmotion = sharedState.currentEmotion;
+  public synchronizeEffectState(sharedState: Partial<Card3DEffectState>): void {
+    // Update our effect state with shared values
+    if (sharedState.currentMusicMood) {
+      this.effectState.currentMusicMood = sharedState.currentMusicMood;
     }
-    if (sharedState.emotionalIntensity !== undefined) {
-      this.effectState.emotionalIntensity = sharedState.emotionalIntensity;
+    if (sharedState.musicIntensity !== undefined) {
+      this.effectState.musicIntensity = sharedState.musicIntensity;
     }
     if (sharedState.beatPhase !== undefined) {
       this.effectState.beatPhase = sharedState.beatPhase;
@@ -738,32 +738,32 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
     }
     
     // Notify other systems of our updated state
-    this.broadcastConsciousnessState();
+    this.broadcastEffectState();
   }
 
   /**
-   * Broadcast consciousness state to coordinated systems
+   * Broadcast effect state to coordinated systems
    */
-  private broadcastConsciousnessState(): void {
-    this.consciousnessCoordinationCallbacks.forEach(callback => {
+  private broadcastEffectState(): void {
+    this.effectCoordinationCallbacks.forEach(callback => {
       try {
         callback(this.effectState);
       } catch (error) {
-        console.error('[Card3DManager] Error in consciousness coordination callback:', error);
+        console.error('[Card3DManager] Error in effect coordination callback:', error);
       }
     });
   }
 
   /**
-   * Enhanced emotional state update with coordination
+   * Enhanced music state update with coordination
    */
-  private updateEmotionalStateWithCoordination(emotionalResult: EmotionalTemperatureResult): void {
-    this.updateEmotionalState(emotionalResult);
+  private updateMusicStateWithCoordination(musicResult: EmotionalTemperatureResult): void {
+    this.updateMusicState(musicResult);
     
     // Broadcast updated state to coordinated systems
-    this.broadcastConsciousnessState();
+    this.broadcastEffectState();
     
-    // Emit unified consciousness coordination event
+    // Emit unified effect coordination event
     unifiedEventBus.emit('consciousness:coordination', {
       source: 'Card3DManager',
       state: this.effectState,
@@ -778,7 +778,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
     this.onMusicBeat(event);
     
     // Broadcast synchronized beat state
-    this.broadcastConsciousnessState();
+    this.broadcastEffectState();
     
     // Emit beat coordination event for synchronized effects
     unifiedEventBus.emit('consciousness:beat-sync', {
@@ -790,15 +790,15 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   }
 
   /**
-   * Enhanced dramatic event with coordination
+   * Enhanced intensity event with coordination
    */
-  private onCinematicDramaEventWithCoordination(event: any): void {
-    this.onCinematicDramaEvent(event);
+  private onIntensityEventWithCoordination(event: any): void {
+    this.onIntensityEvent(event);
     
-    // Broadcast synchronized dramatic state
-    this.broadcastConsciousnessState();
+    // Broadcast synchronized intensity state
+    this.broadcastEffectState();
     
-    // Emit dramatic coordination event for unified effects
+    // Emit intensity coordination event for unified effects
     unifiedEventBus.emit('consciousness:dramatic-sync', {
       source: 'Card3DManager',
       dramaticLevel: this.effectState.effectIntensityLevel,
@@ -808,14 +808,14 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   }
 
   /**
-   * Initialize cross-system consciousness coordination
+   * Initialize cross-system effect coordination
    */
   private initializeCrossSystemCoordination(): void {
     try {
       // Subscribe to coordination events from other systems
       unifiedEventBus.subscribe('consciousness:coordination', (event) => {
         if (event.source !== 'Card3DManager') {
-          this.synchronizeConsciousnessState(event.state);
+          this.synchronizeEffectState(event.state);
         }
       }, 'Card3DManager');
 
@@ -829,12 +829,12 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
 
       unifiedEventBus.subscribe('consciousness:dramatic-sync', (event) => {
         if (event.source !== 'Card3DManager') {
-          // Synchronize dramatic level with other systems
+          // Synchronize intensity level with other systems
           this.effectState.effectIntensityLevel = event.dramaticLevel;
         }
       }, 'Card3DManager');
 
-      console.log('[Card3DManager] ✅ Cross-system consciousness coordination initialized');
+      console.log('[Card3DManager] ✅ Cross-system effect coordination initialized');
     } catch (error) {
       console.error('[Card3DManager] Failed to initialize cross-system coordination:', error);
     }

@@ -1,11 +1,11 @@
 /**
- * Constellation Patterns - Stardust algorithms and celestial arrangements
+ * Constellation Renderer - Stardust algorithms and celestial arrangements
  * Creates organic star formations that align with Year 3000 System vision
  */
 
 import type { ConstellationPattern, CoordinatePoint } from './types';
 
-export class ConstellationPatterns {
+export class ConstellationRenderer {
   private static readonly GOLDEN_RATIO = 1.618033988749;
   private static readonly PHI = (1 + Math.sqrt(5)) / 2;
 

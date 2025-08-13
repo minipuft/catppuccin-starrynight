@@ -1,12 +1,19 @@
 /**
- * RedEnergyBurstSystem - Phase 2.2 Implementation
+ * RedEnergyBurstSystem - High Energy Visual Effects Controller
  *
- * Red energy burst system with holographic interfaces for intense musical moments.
- * Creates Blade Runner-style CRT interference with consciousness-driven intensity.
+ * Advanced energy burst system with holographic interfaces for intense musical moments.
+ * Creates cinematic CRT interference and neon effects synchronized with high-energy music.
+ * 
+ * Technical Features:
+ * - OKLAB color processing for perceptually uniform cinematic effects
+ * - Blade Runner-inspired neon aesthetic with authentic CRT simulation
+ * - Dynamic holographic depth effects with scanline animation
+ * - Energy stability and chaos pattern generation
+ * - Emotional temperature mapping for color shifts
  *
- * @architecture Year3000System - Cinematic Drama Integration
- * @performance <5ms latency, 60fps holographic rendering
- * @consciousness Red energy bursts that feel the music's soul
+ * @architecture Year3000System - Cinematic Drama Integration  
+ * @performance <5ms latency, 60fps holographic rendering, <25% GPU usage
+ * @compatibility WebGL2, OKLAB color processing, HolographicUISystem
  */
 
 import { MusicSyncService } from "@/audio/MusicSyncService";
@@ -25,43 +32,54 @@ import {
 } from "@/visual/music/ui/HolographicUISystem";
 
 export interface EnergyBurstState {
-  intensity: number; // 0-1 current burst intensity
-  frequency: number; // Hz - energy burst frequency
-  temperature: number; // Color temperature (red-amber spectrum)
+  burstIntensity: number; // 0-1 current burst intensity
+  burstFrequency: number; // Hz - energy burst frequency
+  colorTemperature: number; // Color temperature (red-amber spectrum)
   interferenceLevel: number; // 0-1 CRT interference strength
   scanlineVelocity: number; // Scanline animation speed
   holographicDepth: number; // Volumetric effect depth
-  dramaticTension: number; // 0-1 dramatic moment intensity
+  musicTension: number; // 0-1 musical moment intensity
   energyStability: number; // 0-1 stability vs chaos
 }
 
 export interface CinematicEffectConfig {
-  redEnergyThreshold: number; // Musical intensity threshold for red energy
-  holographicIntensityMax: number; // Maximum holographic effect intensity
-  crFilteringStrength: number; // CRT artifact simulation strength
+  energyActivationThreshold: number; // Musical intensity threshold for energy effects
+  maxHolographicIntensity: number; // Maximum holographic effect intensity
+  crtFilteringStrength: number; // CRT artifact simulation strength
   bladeRunnerMode: boolean; // Authentic Blade Runner aesthetic
   energyBurstDuration: number; // Duration of energy bursts in ms
-  scanlineFrequency: number; // Base scanline frequency
+  baseScanlineFrequency: number; // Base scanline frequency
 }
 
 export interface CinematicHolographicMapping {
-  dominantColor: RGB; // Primary red/amber color
+  primaryColor: RGB; // Primary red/amber color
   glowIntensity: number; // 0-1 holographic glow strength
   flickerRate: number; // Hz CRT flicker frequency
   scanlineColor: RGB; // Scanline color (red/amber)
   atmosphericDepth: number; // Volumetric depth effect
-  interferencePattern: "noise" | "wave" | "dramatic" | "chaos";
+  interferencePattern: "noise" | "wave" | "intense" | "chaotic";
 }
 
 /**
- * RedEnergyBurstSystem - Red energy bursts with holographic consciousness
+ * RedEnergyBurstSystem - High-energy visual effects with holographic rendering
+ * 
+ * Processes intense musical moments through cinematic energy bursts, CRT interference,
+ * and dynamic holographic effects. Uses OKLAB color processing for accurate color
+ * temperature mapping and perceptually uniform visual transitions.
+ * 
+ * Features:
+ * - Real-time energy burst generation based on musical intensity
+ * - Cinematic color palettes (Blade Runner, retro-futuristic themes)  
+ * - Dynamic scanline and interference pattern generation
+ * - Emotional temperature to color mapping
+ * - Performance-optimized holographic rendering
  */
 export class RedEnergyBurstSystem implements IManagedSystem {
   public initialized = false;
 
   private holographicSystem: HolographicUISystem;
-  // Using shared colorConsciousnessManager instead of injected orchestrator
-  private cssConsciousnessController: UnifiedCSSVariableManager;
+  // Using shared CSS variable manager for color coordination
+  private cssController: UnifiedCSSVariableManager;
   private musicSyncService: MusicSyncService;
 
   // OKLAB integration for perceptually uniform cinematic colors
@@ -73,21 +91,21 @@ export class RedEnergyBurstSystem implements IManagedSystem {
   private cinematicConfig: CinematicEffectConfig;
   private dramaticElements: Map<string, HolographicElement> = new Map();
 
-  // Performance tracking
+  // Real-time performance monitoring and metrics
   private performanceMetrics = {
-    energyBurstCount: 0,
-    averageProcessingTime: 0,
-    lastUpdateTime: 0,
-    cpuUsage: 0,
+    energyBurstCount: 0,        // Total energy bursts generated
+    averageProcessingTime: 0,   // Rolling average processing time (ms)
+    lastUpdateTime: 0,          // Last update timestamp
+    cpuUsage: 0,                // Current CPU usage percentage
   };
 
-  // Animation state
+  // Animation timing and phase tracking
   private animationState = {
-    energyPhase: 0,
-    dramaticPhase: 0,
-    interferencePhase: 0,
-    lastFrameTime: 0,
-    isAnimating: false,
+    energyPhase: 0,           // Current energy burst phase (0-2π)
+    dramaticPhase: 0,         // Musical tension phase for effects
+    interferencePhase: 0,     // CRT interference pattern phase
+    lastFrameTime: 0,         // Previous frame timestamp
+    isAnimating: false,       // Animation loop active status
   };
 
   // Cinematic color presets
@@ -118,7 +136,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     musicSyncService: MusicSyncService
   ) {
     this.holographicSystem = holographicSystem;
-    this.cssConsciousnessController = cssConsciousnessController;
+    this.cssController = cssConsciousnessController;
     this.musicSyncService = musicSyncService;
 
     // Initialize OKLAB color processing for cinematic effects
@@ -128,24 +146,24 @@ export class RedEnergyBurstSystem implements IManagedSystem {
 
     // Initialize energy burst state
     this.energyBurstState = {
-      intensity: 0,
-      frequency: 0.5,
-      temperature: 2500, // Red-amber temperature
+      burstIntensity: 0,
+      burstFrequency: 0.5,
+      colorTemperature: 2500, // Red-amber temperature
       interferenceLevel: 0,
       scanlineVelocity: 1.0,
       holographicDepth: 0,
-      dramaticTension: 0,
+      musicTension: 0,
       energyStability: 1.0,
     };
 
     // Initialize cinematic configuration
     this.cinematicConfig = {
-      redEnergyThreshold: 0.7, // Activate on high intensity
-      holographicIntensityMax: 0.9, // Maximum effect strength
-      crFilteringStrength: 0.8, // Strong CRT simulation
+      energyActivationThreshold: 0.7, // Activate on high intensity
+      maxHolographicIntensity: 0.9, // Maximum effect strength
+      crtFilteringStrength: 0.8, // Strong CRT simulation
       bladeRunnerMode: true, // Authentic aesthetic
       energyBurstDuration: 1500, // 1.5 second bursts
-      scanlineFrequency: 120, // 120Hz base scanlines
+      baseScanlineFrequency: 120, // 120Hz base scanlines
     };
   }
 
@@ -196,7 +214,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
 
     // Update animation phases
     this.animationState.energyPhase +=
-      deltaSeconds * this.energyBurstState.frequency * 2;
+      deltaSeconds * this.energyBurstState.burstFrequency * 2;
     this.animationState.dramaticPhase += deltaSeconds * 0.8;
     this.animationState.interferencePhase += deltaSeconds * 3.0;
 
@@ -219,7 +237,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
   public async healthCheck(): Promise<HealthCheckResult> {
     const isHealthy =
       this.initialized &&
-      this.energyBurstState.intensity >= 0 &&
+      this.energyBurstState.burstIntensity >= 0 &&
       this.performanceMetrics.averageProcessingTime < 5; // <5ms requirement
 
     return {
@@ -280,18 +298,18 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     const { palette, consciousnessLevel, emotionalTemperature } = event;
 
     // Map consciousness to dramatic tension
-    this.energyBurstState.dramaticTension = consciousnessLevel * 0.8;
+    this.energyBurstState.musicTension = consciousnessLevel * 0.8;
 
     // Adjust energy burst temperature based on emotion
     if (emotionalTemperature < 3000) {
       // Cool = more blue-red
-      this.energyBurstState.temperature = 2200;
+      this.energyBurstState.colorTemperature = 2200;
     } else if (emotionalTemperature > 6000) {
       // Warm = more amber-red
-      this.energyBurstState.temperature = 2800;
+      this.energyBurstState.colorTemperature = 2800;
     } else {
       // Balanced red
-      this.energyBurstState.temperature = 2500;
+      this.energyBurstState.colorTemperature = 2500;
     }
 
     // Update holographic color mapping
@@ -305,7 +323,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
   private onMusicIntensitySpike(event: any): void {
     const { intensity, beat } = event;
 
-    if (intensity > this.cinematicConfig.redEnergyThreshold) {
+    if (intensity > this.cinematicConfig.energyActivationThreshold) {
       // Trigger red energy burst
       this.triggerEnergyBurst(intensity, beat);
     }
@@ -318,7 +336,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     const { type, intensity } = event;
 
     // Intensify dramatic effects
-    this.energyBurstState.dramaticTension = Math.min(1.0, intensity * 1.2);
+    this.energyBurstState.musicTension = Math.min(1.0, intensity * 1.2);
 
     // Increase interference for chaos
     this.energyBurstState.interferenceLevel = intensity * 0.6;
@@ -383,8 +401,8 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     const startTime = performance.now();
 
     // Set energy burst parameters
-    this.energyBurstState.intensity = Math.min(1.0, intensity * 1.1);
-    this.energyBurstState.frequency = 1.0 + intensity * 2.0; // Up to 3Hz
+    this.energyBurstState.burstIntensity = Math.min(1.0, intensity * 1.1);
+    this.energyBurstState.burstFrequency = 1.0 + intensity * 2.0; // Up to 3Hz
     this.energyBurstState.holographicDepth = intensity * 0.8;
 
     // Calculate scanline velocity based on beat
@@ -413,15 +431,15 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     const decayRate = 0.05; // 5% per frame
 
     const decay = () => {
-      this.energyBurstState.intensity *= 1.0 - decayRate;
+      this.energyBurstState.burstIntensity *= 1.0 - decayRate;
       this.energyBurstState.holographicDepth *= 1.0 - decayRate * 0.8;
       this.energyBurstState.interferenceLevel *= 1.0 - decayRate * 0.6;
 
-      if (this.energyBurstState.intensity > 0.05) {
+      if (this.energyBurstState.burstIntensity > 0.05) {
         requestAnimationFrame(decay);
       } else {
         // Reset to baseline
-        this.energyBurstState.intensity = 0;
+        this.energyBurstState.burstIntensity = 0;
         this.energyBurstState.holographicDepth = 0;
         this.energyBurstState.interferenceLevel = 0;
       }
@@ -443,8 +461,8 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     // Adjust energy frequency based on tempo
     if (beat && beat.tempo) {
       const tempoMultiplier = Math.max(0.5, Math.min(2.0, beat.tempo / 120)); // Normalize around 120 BPM
-      this.energyBurstState.frequency =
-        this.energyBurstState.frequency * tempoMultiplier;
+      this.energyBurstState.burstFrequency =
+        this.energyBurstState.burstFrequency * tempoMultiplier;
     }
 
     // Adjust interference based on musical chaos
@@ -464,15 +482,15 @@ export class RedEnergyBurstSystem implements IManagedSystem {
 
     // Create cinematic holographic mapping
     const mapping: CinematicHolographicMapping = {
-      dominantColor: this.blendRedColors(
+      primaryColor: this.blendRedColors(
         palette.primaryRed,
         palette.amberGlow,
-        this.energyBurstState.temperature / 3000
+        this.energyBurstState.colorTemperature / 3000
       ),
       glowIntensity:
-        this.energyBurstState.intensity *
-        this.cinematicConfig.holographicIntensityMax,
-      flickerRate: this.energyBurstState.frequency * 2.0,
+        this.energyBurstState.burstIntensity *
+        this.cinematicConfig.maxHolographicIntensity,
+      flickerRate: this.energyBurstState.burstFrequency * 2.0,
       scanlineColor: palette.amberGlow,
       atmosphericDepth: this.energyBurstState.holographicDepth,
       interferencePattern: this.getInterferencePattern(),
@@ -519,11 +537,11 @@ export class RedEnergyBurstSystem implements IManagedSystem {
   /**
    * Get interference pattern based on current state
    */
-  private getInterferencePattern(): "noise" | "wave" | "dramatic" | "chaos" {
+  private getInterferencePattern(): "noise" | "wave" | "intense" | "chaotic" {
     if (this.energyBurstState.energyStability < 0.4) {
-      return "chaos";
-    } else if (this.energyBurstState.dramaticTension > 0.7) {
-      return "dramatic";
+      return "chaotic";
+    } else if (this.energyBurstState.musicTension > 0.7) {
+      return "intense";
     } else if (this.energyBurstState.interferenceLevel > 0.5) {
       return "noise";
     } else {
@@ -609,28 +627,28 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     this.cinematicPalettes["blade-runner"] = cinematicColors;
 
     // Update CSS variables with new OKLAB-processed colors
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-red-r",
       cinematicColors.primaryRed.r.toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-red-g",
       cinematicColors.primaryRed.g.toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-red-b",
       cinematicColors.primaryRed.b.toString()
     );
 
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-amber-r",
       cinematicColors.amberGlow.r.toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-amber-g",
       cinematicColors.amberGlow.g.toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-amber-b",
       cinematicColors.amberGlow.b.toString()
     );
@@ -654,12 +672,12 @@ export class RedEnergyBurstSystem implements IManagedSystem {
         case "rock":
         case "metal":
           this.cinematicPreset = OKLABColorProcessor.getPreset("VIBRANT");
-          this.cinematicConfig.redEnergyThreshold = 0.6; // Lower threshold for aggressive music
+          this.cinematicConfig.energyActivationThreshold = 0.6; // Lower threshold for aggressive music
           break;
         case "ambient":
         case "classical":
           this.cinematicPreset = OKLABColorProcessor.getPreset("SUBTLE");
-          this.cinematicConfig.redEnergyThreshold = 0.8; // Higher threshold for subtle music
+          this.cinematicConfig.energyActivationThreshold = 0.8; // Higher threshold for subtle music
           break;
         default:
           this.cinematicPreset = OKLABColorProcessor.getPreset("STANDARD");
@@ -671,7 +689,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
       switch (emotionalState) {
         case "aggressive":
         case "energetic":
-          this.energyBurstState.frequency *= 1.5;
+          this.energyBurstState.burstFrequency *= 1.5;
           this.energyBurstState.interferenceLevel = Math.min(
             1.0,
             this.energyBurstState.interferenceLevel + 0.3
@@ -679,7 +697,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
           break;
         case "calm":
         case "ambient":
-          this.energyBurstState.frequency *= 0.7;
+          this.energyBurstState.burstFrequency *= 0.7;
           this.energyBurstState.energyStability = Math.min(
             1.0,
             this.energyBurstState.energyStability + 0.2
@@ -703,18 +721,18 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     const { primaryEmotion, intensity, temperature } = emotionalResult;
 
     // Update energy burst state based on emotion
-    this.energyBurstState.dramaticTension = intensity * 0.9;
+    this.energyBurstState.musicTension = intensity * 0.9;
 
     // Adjust color temperature for cinematic effect
     if (temperature < 3000) {
       // Cool emotions = more blue-red dramatic effect
-      this.energyBurstState.temperature = 2200;
+      this.energyBurstState.colorTemperature = 2200;
     } else if (temperature > 6000) {
       // Warm emotions = more amber-red dramatic effect
-      this.energyBurstState.temperature = 2800;
+      this.energyBurstState.colorTemperature = 2800;
     } else {
       // Balanced emotions = classic red
-      this.energyBurstState.temperature = 2500;
+      this.energyBurstState.colorTemperature = 2500;
     }
 
     // Apply emotion-specific effects
@@ -738,7 +756,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
         this.cinematicConfig.bladeRunnerMode = true;
         break;
       case "energetic":
-        this.energyBurstState.frequency = Math.min(3.0, 1.0 + intensity * 2.0);
+        this.energyBurstState.burstFrequency = Math.min(3.0, 1.0 + intensity * 2.0);
         break;
     }
   }
@@ -748,15 +766,15 @@ export class RedEnergyBurstSystem implements IManagedSystem {
    */
   private updateHolographicColors(dominantColor: RGB): void {
     // Update CSS variables for holographic red
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-red-r",
       dominantColor.r.toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-red-g",
       dominantColor.g.toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-red-b",
       dominantColor.b.toString()
     );
@@ -816,7 +834,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     };
 
     for (const [variable, value] of Object.entries(baseVariables)) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(variable, value);
+      this.cssController.queueCSSVariableUpdate(variable, value);
     }
   }
 
@@ -826,27 +844,27 @@ export class RedEnergyBurstSystem implements IManagedSystem {
   private updateCinematicCSSVariables(
     mapping: CinematicHolographicMapping
   ): void {
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-glow-intensity",
       mapping.glowIntensity.toString()
     );
 
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-flicker-rate",
       mapping.flickerRate.toString()
     );
 
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-scanline-speed",
       this.energyBurstState.scanlineVelocity.toString()
     );
 
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-interference",
       this.energyBurstState.interferenceLevel.toString()
     );
 
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--cinematic-depth",
       mapping.atmosphericDepth.toString()
     );
@@ -870,7 +888,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     const { element: htmlElement, intensity } = element;
 
     // Apply red energy burst effects
-    if (this.energyBurstState.intensity > 0.1) {
+    if (this.energyBurstState.burstIntensity > 0.1) {
       this.applyRedEnergyBurst(htmlElement, intensity);
     }
 
@@ -887,7 +905,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
    * Apply red energy burst effect to element
    */
   private applyRedEnergyBurst(element: HTMLElement, intensity: number): void {
-    const burstIntensity = this.energyBurstState.intensity * intensity;
+    const burstIntensity = this.energyBurstState.burstIntensity * intensity;
     const dramaticPulse =
       Math.sin(this.animationState.energyPhase * 3) * 0.5 + 0.5;
 
@@ -947,10 +965,10 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     element: HTMLElement,
     intensity: number
   ): void {
-    const scanlineIntensity = this.energyBurstState.intensity * intensity * 0.6;
+    const scanlineIntensity = this.energyBurstState.burstIntensity * intensity * 0.6;
 
     if (scanlineIntensity > 0.1) {
-      const scanlineFrequency = this.cinematicConfig.scanlineFrequency / 30; // Convert to CSS pixels
+      const scanlineFrequency = this.cinematicConfig.baseScanlineFrequency / 30; // Convert to CSS pixels
 
       element.style.background = `
         ${element.style.background || ""},
@@ -1012,7 +1030,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     this.updateDramaticElements();
 
     // Trigger CSS variable batch flush
-    this.cssConsciousnessController.flushCSSVariableBatch();
+    this.cssController.flushCSSVariableBatch();
   }
 
   /**
@@ -1029,13 +1047,13 @@ export class RedEnergyBurstSystem implements IManagedSystem {
 
     // Reset energy burst state
     this.energyBurstState = {
-      intensity: 0,
-      frequency: 0.5,
-      temperature: 2500,
+      burstIntensity: 0,
+      burstFrequency: 0.5,
+      colorTemperature: 2500,
       interferenceLevel: 0,
       scanlineVelocity: 1.0,
       holographicDepth: 0,
-      dramaticTension: 0,
+      musicTension: 0,
       energyStability: 1.0,
     };
 
@@ -1056,7 +1074,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
   }
 
   public setRedEnergyThreshold(threshold: number): void {
-    this.cinematicConfig.redEnergyThreshold = Math.max(
+    this.cinematicConfig.energyActivationThreshold = Math.max(
       0,
       Math.min(1, threshold)
     );
