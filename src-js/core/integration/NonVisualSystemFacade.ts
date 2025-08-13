@@ -1,23 +1,47 @@
 /**
- * NonVisualSystemFacade - Phase 3 Non-Visual Systems Facade
+ * NonVisualSystemFacade - Infrastructure Systems Factory & Management Layer
  *
- * Extended facade for handling ALL non-visual systems through factory patterns.
- * Provides comprehensive factory methods, dependency injection, and performance optimization
- * for all non-visual systems in the Year3000 architecture.
+ * Layer 3 of the three-layer facade architecture - handles ALL infrastructure and non-visual systems.
+ * Provides comprehensive factory methods, dependency injection, and lifecycle management
+ * for core services that support the music-synchronized visual effects.
+ *
+ * ═══ LAYER 3 RESPONSIBILITIES ═══
+ * 
+ * INFRASTRUCTURE SYSTEM FACTORY:
+ * • Creates and manages core systems (CSS variables, performance monitoring, settings)
+ * • Provides dependency injection for infrastructure services
+ * • Handles service lifecycle and configuration management
+ *
+ * PERFORMANCE & HEALTH MONITORING:
+ * • Monitors infrastructure system health and performance metrics
+ * • Provides systematic diagnostics for core service failures
+ * • Manages performance budgets and resource optimization
+ *
+ * CONFIGURATION & SETTINGS:
+ * • Manages user settings and theme configuration
+ * • Provides color processing and harmony engine coordination
+ * • Handles music sync service integration and audio analysis
+ *
+ * ═══ DIAGNOSTIC VALUE ═══
+ * Infrastructure-specific troubleshooting capabilities:
+ * - "Settings not saving" → Check SettingsManager health and storage adapters
+ * - "Colors not updating" → Check CSS variable batching and injection systems
+ * - "Performance issues" → Check performance monitoring and device detection
+ * - "Music not syncing" → Check MusicSyncService and audio API integration
  *
  * Key Features:
- * - Factory pattern for all non-visual systems
- * - Automatic dependency injection
- * - Performance monitoring integration
- * - System lifecycle management
- * - Error handling and recovery
- * - Loose coupling through facade pattern
+ * - Factory pattern for all infrastructure systems with dependency injection
+ * - Performance monitoring integration with health diagnostics
+ * - System lifecycle management with error recovery
+ * - Configuration management for theme settings and user preferences
+ * - Resource optimization and performance budgeting
+ * - Loose coupling through facade pattern for maintainability
  *
  * Integrates with:
- * - VisualSystemFacade (for visual systems)
- * - Year3000System (main system orchestrator)
- * - Performance monitoring systems
- * - Settings and configuration systems
+ * - VisualSystemCoordinator (provides infrastructure for visual systems)
+ * - Year3000System (main system coordinator)
+ * - Performance monitoring systems (device detection, resource management)
+ * - Settings and configuration systems (user preferences, theme config)
  */
 
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -429,7 +453,7 @@ export class NonVisualSystemFacade {
     // Note: Uses globalColorOrchestrator singleton, handled as special case in createSystem
     this.systemDependencies.set("ColorOrchestrator", []);
 
-    // 🔧 PHASE 3: UnifiedColorProcessingEngine - Consolidates all color orchestrators
+    // 🔧 PHASE 3: UnifiedColorProcessingEngine - Consolidates all color coordinators
     this.systemRegistry.set(
       "UnifiedColorProcessingEngine",
       UnifiedColorProcessingEngine
@@ -587,7 +611,7 @@ export class NonVisualSystemFacade {
             break;
           case "SimplePerformanceCoordinator":
             this.simplePerformanceCoordinator = system;
-            // Also set as performance orchestrator for backward compatibility
+            // Also set as performance coordinator for backward compatibility
             this.performanceOrchestrator = system;
             break;
           

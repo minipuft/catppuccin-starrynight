@@ -55,3 +55,4 @@ tmp/
 /context-memory
 tsconfig.tsbuildinfo
 /.github
+/context-memory

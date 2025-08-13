@@ -3,7 +3,7 @@ declare const Spicetify: any;
 // Phase 4: Facade imports for unified system access
 import { SystemCoordinator } from "@/core/integration/SystemCoordinator";
 
-// Color orchestration imports for Strategy pattern
+// Color coordination imports for Strategy pattern
 import { globalColorStateManager } from "@/core/css/ColorStateManager";
 import { globalColorOrchestrator } from "@/visual/coordination/ColorCoordinator";
 
@@ -102,7 +102,7 @@ export class Year3000System {
       ) || null
     );
   }
-  public get cssConsciousnessController() {
+  public get cssVariableController() {
     return (
       this.facadeCoordinator?.getCachedNonVisualSystem(
         "OptimizedCSSVariableManager"
@@ -142,7 +142,7 @@ export class Year3000System {
   
   // Legacy compatibility getters
   public get unifiedCSSManager() {
-    return this.cssConsciousnessController || null;
+    return this.cssVariableController || null;
   }
   /** @deprecated Use simplePerformanceCoordinator instead - legacy complex performance system */
   public get performanceCoordinator() {
@@ -176,7 +176,7 @@ export class Year3000System {
     );
   }
   public get performanceCSSIntegration() {
-    return this.cssConsciousnessController || null;
+    return this.cssVariableController || null;
   }
   public get performanceOrchestrator() {
     return (
@@ -247,9 +247,9 @@ export class Year3000System {
     return unified ? (unified as any) : null;
   }
 
-  public get colorConsciousnessState() {
-    // 🔧 PHASE 4: Delegate to unified consciousness coordinator
-    return this.unifiedConsciousnessCoordinator || null;
+  public get colorEffectsState() {
+    // 🔧 PHASE 4: Delegate to unified visual effects coordinator
+    return this.visualEffectsCoordinator || null;
   }
 
   public get musicSyncService() {
@@ -287,8 +287,8 @@ export class Year3000System {
     );
   }
 
-  // 🔧 PHASE 4: Unified Consciousness Coordination
-  public get unifiedConsciousnessCoordinator() {
+  // 🔧 PHASE 4: Unified Visual Effects Coordination
+  public get visualEffectsCoordinator() {
     return (
       this.facadeCoordinator?.getCachedNonVisualSystem(
         "VisualEffectsCoordinator"
@@ -296,12 +296,12 @@ export class Year3000System {
     );
   }
 
-  // 🔧 PHASE 4: Backward compatibility delegation for consolidated consciousness systems
-  public get colorConsciousnessManager() {
-    return this.unifiedConsciousnessCoordinator || null;
+  // 🔧 PHASE 4: Backward compatibility delegation for consolidated visual effects systems
+  public get colorEffectsManager() {
+    return this.visualEffectsCoordinator || null;
   }
   public get dynamicCatppuccinBridge() {
-    return this._dynamicCatppuccinBridge || this.unifiedConsciousnessCoordinator || null;
+    return this._dynamicCatppuccinBridge || this.visualEffectsCoordinator || null;
   }
 
   public set dynamicCatppuccinBridge(bridge: any) {
@@ -309,24 +309,24 @@ export class Year3000System {
   }
 
   // Visual Systems
-  public get particleConsciousnessModule() {
+  public get particleVisualEffectsModule() {
     return this.facadeCoordinator?.getVisualSystem("Particle") || null;
   }
-  public get sidebarConsciousnessController() {
+  public get sidebarVisualEffectsController() {
     return (
-      this.facadeCoordinator?.getVisualSystem("SidebarConsciousness") || null
+      this.facadeCoordinator?.getVisualSystem("SidebarVisualEffects") || null
     );
   }
 
-  public get uiEffectsConsciousnessController() {
+  public get uiVisualEffectsController() {
     return (
-      this.facadeCoordinator?.getVisualSystem("UIEffectsConsciousness") || null
+      this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null
     );
   }
 
-  public get headerConsciousnessController() {
+  public get headerVisualEffectsController() {
     return (
-      this.facadeCoordinator?.getVisualSystem("HeaderConsciousness") || null
+      this.facadeCoordinator?.getVisualSystem("HeaderVisualEffects") || null
     );
   }
 
@@ -335,30 +335,30 @@ export class Year3000System {
     return this.facadeCoordinator?.getVisualSystem("Particle") || null;
   }
 
-  // UI Effects systems now consolidated into ConsciousnessUIEffectsController
+  // UI Effects systems now consolidated into UIVisualEffectsController
   public get iridescentShimmerEffectsSystem() {
     return (
-      this.facadeCoordinator?.getVisualSystem("UIEffectsConsciousness") || null
+      this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null
     );
   }
   public get interactionTrackingSystem() {
     return (
-      this.facadeCoordinator?.getVisualSystem("UIEffectsConsciousness") || null
+      this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null
     );
   }
   public get whiteLayerDiagnosticSystem() {
     return (
-      this.facadeCoordinator?.getVisualSystem("UIEffectsConsciousness") || null
+      this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null
     );
   }
   public get audioVisualController() {
     return (
-      this.facadeCoordinator?.getVisualSystem("UIEffectsConsciousness") || null
+      this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null
     );
   }
   public get prismaticScrollSheenSystem() {
     return (
-      this.facadeCoordinator?.getVisualSystem("UIEffectsConsciousness") || null
+      this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null
     );
   }
   public get beatSyncVisualSystem() {
@@ -367,7 +367,7 @@ export class Year3000System {
   public get webGLGradientBackgroundSystem() {
     return this.facadeCoordinator?.getVisualSystem("WebGLBackground") || null;
   }
-  // Legacy compatibility - particleFieldSystem consolidated into particleConsciousnessModule
+  // Legacy compatibility - particleFieldSystem consolidated into particleVisualEffectsModule
   public get particleFieldSystem() {
     return this.facadeCoordinator?.getVisualSystem("Particle") || null;
   }
@@ -382,7 +382,7 @@ export class Year3000System {
   }
 
   // Music Beat Synchronization System
-  public get organicBeatSyncConsciousness() {
+  public get musicBeatSyncVisualEffects() {
     return (
       this.facadeCoordinator?.getVisualSystem("MusicBeatSync") ||
       this.beatSyncVisualSystem
@@ -582,7 +582,7 @@ export class Year3000System {
         enableCrossFacadeCommunication: true,
         enableUnifiedPerformanceMonitoring: true,
         enableResourceOptimization: true,
-        orchestration: {
+        coordination: {
           enforceSequentialInitialization: true,
           dependencyValidation: true,
           enableInitializationGates: true,
@@ -667,10 +667,10 @@ export class Year3000System {
           );
 
           // Initialize with performance analyzer and CSS variable batcher
-          if (this.performanceAnalyzer && this.cssConsciousnessController) {
+          if (this.performanceAnalyzer && this.cssVariableController) {
             this.unifiedCSSManager.initialize(
               this.performanceAnalyzer,
-              this.cssConsciousnessController
+              this.cssVariableController
             );
           }
         },
@@ -809,7 +809,7 @@ export class Year3000System {
           this.glassmorphismManager = new GlassmorphismManager(
             this.YEAR3000_CONFIG,
             this.utils,
-            this.cssConsciousnessController,
+            this.cssVariableController,
             this.performanceAnalyzer,
             this.settingsManager
           );
@@ -1062,11 +1062,11 @@ export class Year3000System {
       const eventDrivenSystems = [
         "MusicSyncService",
         "ColorHarmonyEngine",
-        "GenreGradientEvolution", // 🎵 Genre-specific visual consciousness
+        "GenreGradientEvolution", // 🎵 Genre-specific visual effects
         "MusicEmotionAnalyzer", // 🎭 Emotional intelligence for music analysis
       ];
 
-      // Group 4: UI systems that depend on CSS consciousness
+      // Group 4: UI systems that depend on CSS variable management
       const uiSystems = [
         "GlassmorphismManager", // 🌊 Essential glassmorphism effects
         "Card3DManager", // 🎴 Essential 3D card transformations
@@ -1202,11 +1202,11 @@ export class Year3000System {
 
       // Parallel initialization of visual systems (performance optimization)
       const essentialVisualSystems = [
-        "Particle", // ParticleField consolidated into Particle (ParticleConsciousnessModule)
+        "Particle", // ParticleField consolidated into Particle (ParticleVisualEffectsModule)
         "WebGLBackground", // 🌌 Enable WebGL gradient backgrounds
         "SpotifyUIApplication", // 🎨 Core UI color application
         "OrganicBeatSync",
-        "HeaderConsciousness", // 🎭 Music-responsive header consciousness animations
+        "HeaderVisualEffects", // 🎭 Music-responsive header visual effects animations
         "InteractionTracking",
         // EmergentChoreography integrated into EnhancedMasterAnimationCoordinator
       ];
@@ -1593,7 +1593,7 @@ export class Year3000System {
 
       if (this.YEAR3000_CONFIG.enableDebug) {
         console.log(
-          "🔧 [Year3000System] Sidebar systems integration initialized with bilateral consciousness"
+          "🔧 [Year3000System] Sidebar systems integration initialized with bilateral visual effects coordination"
         );
       }
     } catch (error) {
@@ -1833,19 +1833,19 @@ export class Year3000System {
       ? `url('https://github.com/catppuccin/spicetify/blob/main/catppuccin/assets/${colorScheme}/equalizer-animated-${accent}.gif?raw=true')`
       : `url('${colorScheme}/equalizer-animated-${accent}.gif')`;
 
-    this.cssConsciousnessController?.queueCSSVariableUpdate(
+    this.cssVariableController?.queueCSSVariableUpdate(
       "--spice-text",
       `var(--spice-${accent})`
     );
-    this.cssConsciousnessController?.queueCSSVariableUpdate(
+    this.cssVariableController?.queueCSSVariableUpdate(
       "--spice-button-active",
       `var(--spice-${accent})`
     );
-    this.cssConsciousnessController?.queueCSSVariableUpdate(
+    this.cssVariableController?.queueCSSVariableUpdate(
       "--spice-equalizer",
       equalizerUrl
     );
-    this.cssConsciousnessController?.flushCSSVariableBatch();
+    this.cssVariableController?.flushCSSVariableBatch();
     console.log(
       `🎨 [Year3000System] _applyCatppuccinAccent: Flushed CSS variables for accent color.`
     );
@@ -2227,10 +2227,10 @@ export class Year3000System {
 
       // Apply via CSS consciousness controller if available
       if (
-        this.cssConsciousnessController &&
-        typeof this.cssConsciousnessController.batchSetVariables === "function"
+        this.cssVariableController &&
+        typeof this.cssVariableController.batchSetVariables === "function"
       ) {
-        this.cssConsciousnessController.batchSetVariables(
+        this.cssVariableController.batchSetVariables(
           "Year3000System-ColorHarmonized",
           cssVariables,
           "high",
@@ -2245,7 +2245,7 @@ export class Year3000System {
         console.log("🔧 [Year3000System] Applied musical harmony variables via CSS coordination:", {
           totalVariables: Object.keys(cssVariables).length,
           accentColor: accentHex,
-          cssControllerUsed: !!this.cssConsciousnessController,
+          cssControllerUsed: !!this.cssVariableController,
           spicetifyDelegation: "ColorStateManager + DynamicCatppuccinBridge handle --spice-* variables"
         });
       }
@@ -2320,9 +2320,9 @@ export class Year3000System {
         "normal",
         "Year3000System"
       );
-    } else if (this.cssConsciousnessController) {
+    } else if (this.cssVariableController) {
       // Fallback to CSS variable batcher
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         property,
         value,
         element || undefined
@@ -2376,20 +2376,20 @@ export class Year3000System {
   }
 
   public updateHarmonicBaseColor(hexColor: string): void {
-    if (this.colorHarmonyEngine && this.cssConsciousnessController) {
+    if (this.colorHarmonyEngine && this.cssVariableController) {
       const rgb = this.utils.hexToRgb(hexColor);
       if (rgb) {
         const variations =
           this.colorHarmonyEngine.generateHarmonicVariations(rgb);
-        this.cssConsciousnessController.queueCSSVariableUpdate(
+        this.cssVariableController.queueCSSVariableUpdate(
           "--sn-harmonic-base-dark-vibrant",
           variations.darkVibrantHex
         );
-        this.cssConsciousnessController.queueCSSVariableUpdate(
+        this.cssVariableController.queueCSSVariableUpdate(
           "--sn-harmonic-base-light-vibrant",
           variations.lightVibrantHex
         );
-        this.cssConsciousnessController.flushCSSVariableBatch();
+        this.cssVariableController.flushCSSVariableBatch();
       }
     }
   }
@@ -2678,7 +2678,7 @@ export class Year3000System {
       },
       {
         name: "ParticleConsciousnessModule",
-        system: this.particleConsciousnessModule,
+        system: this.particleVisualEffectsModule,
         priority: "background",
       },
       {
@@ -2774,7 +2774,7 @@ export class Year3000System {
       },
       {
         name: "ParticleConsciousnessModule",
-        system: this.particleConsciousnessModule,
+        system: this.particleVisualEffectsModule,
         priority: "background" as const,
         type: "animation" as const,
       },
@@ -3369,7 +3369,7 @@ export class Year3000System {
 
     try {
       // Flush global batched CSS variables first
-      this.cssConsciousnessController?.flushCSSVariableBatch?.();
+      this.cssVariableController?.flushCSSVariableBatch?.();
 
       // Force-flush NowPlayingCoordinator to avoid frame skew
       // NowPlayingCoordinator removed – its flush is handled via UnifiedCSSVariableManager

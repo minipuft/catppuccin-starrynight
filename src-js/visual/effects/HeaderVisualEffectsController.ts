@@ -1,11 +1,11 @@
 /**
- * HeaderConsciousnessController - Year 3000 Header Animation System
+ * HeaderVisualEffectsController - Music-Responsive Header Animation System
  *
- * Connects header consciousness animations to the music system for
- * dynamic, music-responsive header effects that flow with the musical consciousness.
+ * Connects header visual effects to the music system for
+ * dynamic, music-responsive header animations that synchronize with audio analysis.
  *
- * Philosophy: "Headers become windows to the musical soul - breathing, pulsing,
- * and harmonizing with the cosmic energy of sound."
+ * Technical Focus: Real-time header visual effects synchronized with music beat detection,
+ * energy analysis, and harmonic color coordination for enhanced user experience.
  */
 
 import { UnifiedSystemBase } from "@/core/base/UnifiedSystemBase";
@@ -15,13 +15,13 @@ import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
 
-interface HeaderConsciousnessState {
+interface HeaderEffectsState {
   // Music synchronization
   energy: number; // 0-1, current music energy
   valence: number; // 0-1, musical mood/emotion
   tempo: number; // BPM
   harmonyHue: number; // Hue rotation for musical harmony
-  intensity: number; // Overall header consciousness intensity
+  intensity: number; // Overall header effects intensity
 
   // Animation state
   lastUpdateTime: number;
@@ -33,9 +33,9 @@ interface HeaderConsciousnessState {
   lastFrameTime: number;
 }
 
-export class HeaderConsciousnessController extends UnifiedSystemBase {
+export class HeaderVisualEffectsController extends UnifiedSystemBase {
   private cssController!: OptimizedCSSVariableManager;
-  private consciousnessState: HeaderConsciousnessState = {
+  private effectsState: HeaderEffectsState = {
     energy: 0.5,
     valence: 0.5,
     tempo: 120,
@@ -98,7 +98,7 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
    * Check if CSS values have changed significantly
    */
   private hasSignificantCSSChange(): boolean {
-    const state = this.consciousnessState;
+    const state = this.effectsState;
     const depthMultiplier = 1 + state.energy * 0.5;
 
     const currentValues = {
@@ -124,7 +124,7 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
    * Update previous CSS values for change detection
    */
   private updatePreviousCSSValues(): void {
-    const state = this.consciousnessState;
+    const state = this.effectsState;
     const depthMultiplier = 1 + state.energy * 0.5;
 
     this.previousCSSValues.energy = state.energy;
@@ -140,7 +140,7 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
   private batchApplyCSSUpdates(
     updates: Array<[string, string]>, 
     priority: "low" | "normal" | "high" | "critical" = "normal",
-    source: string = "header-consciousness"
+    source: string = "header-effects"
   ): void {
     const variables: Record<string, string> = {};
     for (const [property, value] of updates) {
@@ -148,7 +148,7 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
     }
     
     this.cssController.batchSetVariables(
-      "HeaderConsciousnessController",
+      "HeaderVisualEffectsController",
       variables,
       priority,
       source
@@ -156,12 +156,12 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
   }
 
   /**
-   * Schedule consciousness variable update with change detection
+   * Schedule effects variable update with change detection
    */
-  private scheduleConsciousnessUpdate(): void {
+  private scheduleEffectsUpdate(): void {
     this.debouncedEventHandler("cssUpdate", () => {
       if (this.hasSignificantCSSChange()) {
-        this.updateHeaderConsciousnessVariables();
+        this.updateHeaderEffectsVariables();
         this.updatePreviousCSSValues();
       }
     });
@@ -174,10 +174,10 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
     try {
       // Initialize CSS coordination first - use globalThis to access Year3000System
       const year3000System = (globalThis as any).year3000System;
-      this.cssController = year3000System?.cssConsciousnessController || getGlobalOptimizedCSSController();
+      this.cssController = year3000System?.cssVariableController || getGlobalOptimizedCSSController();
 
       // Check for reduced motion preference
-      this.consciousnessState.preferredMotion = !window.matchMedia(
+      this.effectsState.preferredMotion = !window.matchMedia(
         "(prefers-reduced-motion: reduce)"
       ).matches;
 
@@ -188,10 +188,10 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
       this.setupColorHarmonyListeners();
 
       // Initialize CSS variables
-      this.updateHeaderConsciousnessVariables();
+      this.updateHeaderEffectsVariables();
 
       // Start animation loop if motion is enabled
-      if (this.consciousnessState.preferredMotion) {
+      if (this.effectsState.preferredMotion) {
         this.startAnimationLoop();
       }
 
@@ -199,12 +199,12 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
       this.setupPerformanceMonitoring();
 
       Y3KDebug?.debug?.log(
-        "HeaderConsciousnessController",
-        "Header consciousness initialization complete"
+        "HeaderVisualEffectsController",
+        "Header visual effects initialization complete"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "HeaderConsciousnessController",
+        "HeaderVisualEffectsController",
         "Initialization failed:",
         error
       );
@@ -218,43 +218,43 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
       (data) => {
         this.debouncedEventHandler("musicEnergy", () => {
           if (typeof data.energy === "number") {
-            this.consciousnessState.energy = Math.max(
+            this.effectsState.energy = Math.max(
               0,
               Math.min(1, data.energy)
             );
-            this.scheduleConsciousnessUpdate();
+            this.scheduleEffectsUpdate();
           }
           if (typeof data.tempo === "number") {
-            this.consciousnessState.tempo = Math.max(
+            this.effectsState.tempo = Math.max(
               60,
               Math.min(200, data.tempo)
             );
             this.updateAnimationSpeed();
           }
           if (typeof data.valence === "number") {
-            this.consciousnessState.valence = Math.max(
+            this.effectsState.valence = Math.max(
               0,
               Math.min(1, data.valence)
             );
-            this.scheduleConsciousnessUpdate();
+            this.scheduleEffectsUpdate();
           }
         });
       },
-      "HeaderConsciousnessController"
+      "HeaderVisualEffectsController"
     );
 
-    // Listen for consciousness beat sync events (debounced)
+    // Listen for music beat sync events (debounced)
     unifiedEventBus.subscribe(
-      "consciousness:beat-sync",
+      "music:beat",
       (data) => {
         this.debouncedEventHandler("beatSync", () => {
-          if (this.consciousnessState.animationActive) {
-            const intensity = data.beatPhase || 0.8;
+          if (this.effectsState.animationActive) {
+            const intensity = data.intensity || 0.8;
             this.onBeatDetected(intensity);
           }
         });
       },
-      "HeaderConsciousnessController"
+      "HeaderVisualEffectsController"
     );
 
     // Listen for music energy changes - alternative event (debounced)
@@ -263,15 +263,15 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
       (data) => {
         this.debouncedEventHandler("musicEnergy", () => {
           if (typeof data.energy === "number") {
-            this.consciousnessState.energy = Math.max(
+            this.effectsState.energy = Math.max(
               0,
               Math.min(1, data.energy)
             );
-            this.scheduleConsciousnessUpdate();
+            this.scheduleEffectsUpdate();
           }
         });
       },
-      "HeaderConsciousnessController"
+      "HeaderVisualEffectsController"
     );
   }
 
@@ -288,7 +288,7 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
           }
         });
       },
-      "HeaderConsciousnessController"
+      "HeaderVisualEffectsController"
     );
 
     // Listen for album color extractions (debounced)
@@ -299,17 +299,17 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
           // Calculate hue from RGB values if musicData available
           if (data.musicData && typeof data.musicData.energy === "number") {
             const hue = data.musicData.energy * 360; // Map energy to hue
-            this.consciousnessState.harmonyHue = hue;
-            this.scheduleConsciousnessUpdate();
+            this.effectsState.harmonyHue = hue;
+            this.scheduleEffectsUpdate();
           }
         });
       },
-      "HeaderConsciousnessController"
+      "HeaderVisualEffectsController"
     );
   }
 
   private updateHarmonyHue(harmonicMode: string): void {
-    // Map harmonic modes to hue rotations for header consciousness
+    // Map harmonic modes to hue rotations for header effects
     const harmonyHueMap: Record<string, number> = {
       monochromatic: 0,
       complementary: 180,
@@ -320,20 +320,20 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
     };
 
     const baseHue = harmonyHueMap[harmonicMode] || 0;
-    this.consciousnessState.harmonyHue = baseHue;
-    this.scheduleConsciousnessUpdate();
+    this.effectsState.harmonyHue = baseHue;
+    this.scheduleEffectsUpdate();
   }
 
   private onBeatDetected(intensity: number): void {
     // Create temporary energy boost for beat-synchronized effects
     const beatEnergy = Math.min(
       1,
-      this.consciousnessState.energy + intensity * 0.3
+      this.effectsState.energy + intensity * 0.3
     );
 
     // Apply beat effect through batched CSS update with high priority for musical sync
     this.batchApplyCSSUpdates([
-      ["--header-consciousness-energy", beatEnergy.toString()],
+      ["--header-effects-energy", beatEnergy.toString()],
     ], "high", "beat-sync");
 
     // Schedule reset after beat effect duration using frame-based timing
@@ -342,8 +342,8 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
       if (performance.now() >= resetTime && this.initialized) {
         this.batchApplyCSSUpdates([
           [
-            "--header-consciousness-energy",
-            this.consciousnessState.energy.toString(),
+            "--header-effects-energy",
+            this.effectsState.energy.toString(),
           ],
         ], "normal", "beat-reset");
       } else if (this.initialized) {
@@ -355,22 +355,22 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
 
   private updateAnimationSpeed(): void {
     // Adjust animation speed based on tempo
-    const tempoMultiplier = this.consciousnessState.tempo / 120; // 120 BPM as baseline
+    const tempoMultiplier = this.effectsState.tempo / 120; // 120 BPM as baseline
     const baseSpeed = 8; // 8 seconds baseline
     const newSpeed = baseSpeed / tempoMultiplier;
 
     this.batchApplyCSSUpdates([
       [
-        "--header-consciousness-flow-speed",
+        "--header-effects-flow-speed",
         `${Math.max(2, Math.min(16, newSpeed))}s`,
       ],
     ], "high", "tempo-sync");
   }
 
-  private updateHeaderConsciousnessVariables(): void {
+  private updateHeaderEffectsVariables(): void {
     if (!this.initialized) return;
 
-    const state = this.consciousnessState;
+    const state = this.effectsState;
 
     // Calculate dynamic intensity based on valence and energy
     const dynamicIntensity =
@@ -381,18 +381,18 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
 
     // Batch all CSS updates to minimize DOM layout thrashing
     this.batchApplyCSSUpdates([
-      ["--header-consciousness-energy", state.energy.toString()],
-      ["--header-consciousness-harmony", `${state.harmonyHue}deg`],
-      ["--header-soul-intensity", dynamicIntensity.toString()],
-      ["--header-consciousness-depth", depthMultiplier.toString()],
-    ], "normal", "consciousness-update");
+      ["--header-effects-energy", state.energy.toString()],
+      ["--header-effects-harmony", `${state.harmonyHue}deg`],
+      ["--header-effects-intensity", dynamicIntensity.toString()],
+      ["--header-effects-depth", depthMultiplier.toString()],
+    ], "normal", "effects-update");
 
-    this.consciousnessState.lastUpdateTime = Date.now();
+    this.effectsState.lastUpdateTime = Date.now();
   }
 
   private startAnimationLoop(): void {
     const animate = (currentTime: number) => {
-      if (!this.initialized || !this.consciousnessState.animationActive) return;
+      if (!this.initialized || !this.effectsState.animationActive) return;
 
       // Throttle to target framerate
       if (currentTime - this.lastCSSUpdateTime < this.frameThrottleMs) {
@@ -401,15 +401,15 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
       }
 
       // Calculate frame rate
-      const deltaTime = currentTime - this.consciousnessState.lastFrameTime;
-      this.consciousnessState.frameRate = 1000 / deltaTime;
-      this.consciousnessState.lastFrameTime = currentTime;
+      const deltaTime = currentTime - this.effectsState.lastFrameTime;
+      this.effectsState.frameRate = 1000 / deltaTime;
+      this.effectsState.lastFrameTime = currentTime;
 
       // Update variables only if values have changed significantly
-      if (currentTime - this.consciousnessState.lastUpdateTime > 100) {
+      if (currentTime - this.effectsState.lastUpdateTime > 100) {
         // 10fps for variable updates
         if (this.hasSignificantCSSChange()) {
-          this.updateHeaderConsciousnessVariables();
+          this.updateHeaderEffectsVariables();
           this.updatePreviousCSSValues();
         }
       }
@@ -429,9 +429,9 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
       if (!this.initialized) return;
 
       // If frame rate drops below threshold, reduce update frequency
-      if (this.consciousnessState.frameRate < 30) {
+      if (this.effectsState.frameRate < 30) {
         Y3KDebug?.debug?.warn(
-          "HeaderConsciousnessController",
+          "HeaderVisualEffectsController",
           "Performance degradation detected, reducing update frequency"
         );
         // Could implement performance reduction logic here
@@ -439,9 +439,9 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
 
       // Update performance-related CSS variables using coordination
       this.cssController.setVariable(
-        "HeaderConsciousnessController",
-        "--header-consciousness-performance",
-        this.consciousnessState.frameRate > 50 ? "1" : "0.5",
+        "HeaderVisualEffectsController",
+        "--header-effects-performance",
+        this.effectsState.frameRate > 50 ? "1" : "0.5",
         "low", // Low priority for performance monitoring updates
         "performance-monitor"
       );
@@ -449,58 +449,58 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
   }
 
   /**
-   * Manually update header consciousness intensity
+   * Manually update header effects intensity
    */
-  public setConsciousnessIntensity(intensity: number): void {
-    this.consciousnessState.intensity = Math.max(0, Math.min(1, intensity));
-    this.updateHeaderConsciousnessVariables();
+  public setEffectsIntensity(intensity: number): void {
+    this.effectsState.intensity = Math.max(0, Math.min(1, intensity));
+    this.updateHeaderEffectsVariables();
   }
 
   /**
-   * Enable or disable header consciousness animations
+   * Enable or disable header effects animations
    */
   public setAnimationActive(active: boolean): void {
-    this.consciousnessState.animationActive = active;
+    this.effectsState.animationActive = active;
 
     if (!active && this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = 0;
-    } else if (active && this.consciousnessState.preferredMotion) {
+    } else if (active && this.effectsState.preferredMotion) {
       this.startAnimationLoop();
     }
   }
 
   /**
-   * Get current consciousness state for debugging
+   * Get current effects state for debugging
    */
-  public getConsciousnessState(): HeaderConsciousnessState {
-    return { ...this.consciousnessState };
+  public getEffectsState(): HeaderEffectsState {
+    return { ...this.effectsState };
   }
 
   public override async healthCheck(): Promise<HealthCheckResult> {
     const isHealthy =
       this.initialized &&
-      this.consciousnessState.frameRate > 20 &&
-      Date.now() - this.consciousnessState.lastUpdateTime < 5000;
+      this.effectsState.frameRate > 20 &&
+      Date.now() - this.effectsState.lastUpdateTime < 5000;
 
     return {
       healthy: isHealthy,
       issues: isHealthy
         ? []
         : [
-            this.consciousnessState.frameRate <= 20
+            this.effectsState.frameRate <= 20
               ? "Low frame rate detected"
               : "",
-            Date.now() - this.consciousnessState.lastUpdateTime >= 5000
+            Date.now() - this.effectsState.lastUpdateTime >= 5000
               ? "No recent updates"
               : "",
           ].filter((issue) => issue),
       metrics: {
-        frameRate: this.consciousnessState.frameRate,
-        energy: this.consciousnessState.energy,
-        intensity: this.consciousnessState.intensity,
-        animationActive: this.consciousnessState.animationActive,
-        lastUpdate: this.consciousnessState.lastUpdateTime,
+        frameRate: this.effectsState.frameRate,
+        energy: this.effectsState.energy,
+        intensity: this.effectsState.intensity,
+        animationActive: this.effectsState.animationActive,
+        lastUpdate: this.effectsState.lastUpdateTime,
       },
     };
   }
@@ -521,11 +521,11 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
     }
 
     // Unsubscribe from events
-    unifiedEventBus.unsubscribeAll("HeaderConsciousnessController");
+    unifiedEventBus.unsubscribeAll("HeaderVisualEffectsController");
 
     Y3KDebug?.debug?.log(
-      "HeaderConsciousnessController",
-      "Header consciousness system cleaned up"
+      "HeaderVisualEffectsController",
+      "Header visual effects system cleaned up"
     );
   }
 
@@ -540,9 +540,9 @@ export class HeaderConsciousnessController extends UnifiedSystemBase {
 
   public onAnimate(deltaTime: number): void {
     // Animation handled through CSS and event system
-    // Update consciousness state if needed
-    if (this.consciousnessState.animationActive) {
-      this.updateHeaderConsciousnessVariables();
+    // Update effects state if needed
+    if (this.effectsState.animationActive) {
+      this.updateHeaderEffectsVariables();
     }
   }
 }

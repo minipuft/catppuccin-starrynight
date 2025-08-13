@@ -333,7 +333,21 @@ const createWebGLMock = () => {
     uniform3f: jest.fn(),
     uniform4f: jest.fn(),
     uniform1i: jest.fn(),
+    uniform2i: jest.fn(),
+    uniform3i: jest.fn(),
+    uniform4i: jest.fn(),
     uniformMatrix4fv: jest.fn(),
+    // Vector uniform operations (missing methods causing failures)
+    uniform1fv: jest.fn(),
+    uniform2fv: jest.fn(),
+    uniform3fv: jest.fn(),
+    uniform4fv: jest.fn(),
+    uniform1iv: jest.fn(),
+    uniform2iv: jest.fn(),
+    uniform3iv: jest.fn(),
+    uniform4iv: jest.fn(),
+    uniformMatrix2fv: jest.fn(),
+    uniformMatrix3fv: jest.fn(),
     
     // Drawing operations
     drawArrays: jest.fn(),

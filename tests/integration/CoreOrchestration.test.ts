@@ -24,16 +24,16 @@ describe('Core Orchestration Integration', () => {
       getCachedNonVisualSystem: jest.fn(() => null),
       config: YEAR3000_CONFIG,
       // Additional properties that might be accessed during orchestration
-      performanceAnalyzer: null,
-      unifiedCSSConsciousnessController: null,
-      performanceCoordinator: null,
-      performanceOrchestrator: null,
-      musicSyncService: null,
-      settingsManager: null,
-      colorHarmonyEngine: null,
-      semanticColorManager: null,
-      deviceCapabilityDetector: null,
-      cssConsciousnessController: null,
+      performanceAnalyzer: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
+      unifiedCSSConsciousnessController: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
+      performanceCoordinator: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
+      performanceOrchestrator: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
+      musicSyncService: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
+      settingsManager: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
+      colorHarmonyEngine: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
+      semanticColorManager: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
+      deviceCapabilityDetector: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
+      cssConsciousnessController: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
       // Methods that might be called
       registerAnimationSystem: jest.fn(),
       unregisterAnimationSystem: jest.fn(),
@@ -44,9 +44,9 @@ describe('Core Orchestration Integration', () => {
         registerConsolidatedTimer: jest.fn(),
         unregisterConsolidatedTimer: jest.fn()
       },
-      // Facade-related properties
-      beatSyncVisualSystem: null,
-      organicBeatSyncConsciousness: null
+      // Facade-related properties with proper objects
+      beatSyncVisualSystem: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
+      organicBeatSyncConsciousness: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() }
     };
     systemCoordinator = new SystemCoordinator(YEAR3000_CONFIG, Utils, mockYear3000System);
   });

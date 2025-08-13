@@ -573,8 +573,8 @@ patchReactRequire();
     const { CDFVariableBridge } = await import(
       "./core/performance/CDFVariableBridge"
     );
-    if (year3000System.cssConsciousnessController) {
-      new CDFVariableBridge(year3000System.cssConsciousnessController);
+    if (year3000System.cssVariableController) {
+      new CDFVariableBridge(year3000System.cssVariableController);
     }
   } catch (err) {
     console.error("[StarryNight] Failed to initialize CDFVariableBridge", err);

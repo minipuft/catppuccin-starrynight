@@ -83,7 +83,7 @@ export class AudioVisualController {
     this.year3000System = y3k;
 
     // Initialize CSS controller - prefer shared instances from Year3000System
-    this.cssController = cssController ?? y3k?.cssConsciousnessController ?? getGlobalOptimizedCSSController();
+    this.cssController = cssController ?? y3k?.cssVariableController ?? getGlobalOptimizedCSSController();
 
     this.perf = perf ? perf : y3k?.performanceAnalyzer ?? null;
 

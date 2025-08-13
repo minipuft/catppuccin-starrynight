@@ -43,12 +43,33 @@ describe('Visual Effects Integration', () => {
       <canvas id="particle-canvas" width="800" height="600"></canvas>
     `;
 
-    // Initialize visual effects systems
+    // Initialize visual effects systems with proper CSS controller injection
     particleSystem = new ParticleConsciousnessModule(YEAR3000_CONFIG, Utils);
     glowController = new MusicGlowEffectsManager(YEAR3000_CONFIG, Utils);
     gradientSystem = new DepthLayeredGradientSystem(YEAR3000_CONFIG, Utils);
     fluidBackground = new FluidGradientBackgroundSystem(YEAR3000_CONFIG, Utils);
     musicSync = new MusicBeatSynchronizer(YEAR3000_CONFIG);
+    
+    // Inject CSS consciousness controller into systems that need it
+    const mockCSSController = {
+      queueCSSVariableUpdate: jest.fn(),
+      batchSetVariables: jest.fn(),
+      flushBatch: jest.fn(),
+      setProperty: jest.fn(),
+      destroy: jest.fn(),
+      initialized: true
+    };
+    
+    // Inject the CSS controller into systems
+    if (glowController) {
+      (glowController as any).cssConsciousnessController = mockCSSController;
+    }
+    if (fluidBackground) {
+      (fluidBackground as any).cssController = mockCSSController;
+    }
+    if (gradientSystem) {
+      (gradientSystem as any).cssController = mockCSSController;
+    }
   });
 
   afterEach(() => {

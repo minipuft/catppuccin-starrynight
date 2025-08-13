@@ -1,22 +1,46 @@
 /**
- * SystemCoordinator - Phase 3 Integration Coordinator
+ * SystemCoordinator - Main System Integration Coordinator
  *
  * Coordinates interaction between VisualSystemCoordinator and NonVisualSystemFacade
  * to provide unified system management with shared dependencies and cross-facade communication.
  *
+ * ═══ THREE-LAYER ARCHITECTURE VALUE ═══
+ * 
+ * LAYER 1 (SystemCoordinator):
+ * • Manages initialization phases (core → services → visual → integration)  
+ * • Aggregates health metrics from both facades for systematic troubleshooting
+ * • Coordinates shared dependencies (CSS, performance, music sync services)
+ * • Provides unified error recovery across visual and non-visual systems
+ *
+ * LAYER 2 (VisualSystemCoordinator):
+ * • Factory for visual systems (particles, backgrounds, effects)
+ * • Music-aware quality adaptation and performance scaling
+ * • Visual-specific dependency injection and event coordination
+ *
+ * LAYER 3 (NonVisualSystemFacade):
+ * • Factory for infrastructure systems (CSS, performance, settings)
+ * • Infrastructure health monitoring and configuration management
+ * • Core service coordination and dependency resolution
+ *
+ * ═══ DIAGNOSTIC VALUE ═══
+ * Each layer enables systematic issue isolation:
+ * - Layer 1 problems: "Systems won't start" → Check initialization phases
+ * - Layer 2 problems: "Visual effects broken" → Check music sync/visual systems  
+ * - Layer 3 problems: "Settings not saving" → Check infrastructure systems
+ *
  * Key Features:
  * - Shared dependency management between facades
- * - Cross-facade event coordination
- * - Unified performance monitoring
- * - Coordinated health monitoring
+ * - Cross-facade event coordination for music-visual synchronization
+ * - Multi-granular performance monitoring (system, facade, overall)
+ * - Coordinated health monitoring with layer-specific diagnostics
  * - Resource optimization across facades
- * - Error coordination and recovery
+ * - Systematic error coordination and recovery
  *
- * Architecture:
+ * Technical Architecture:
  * - Manages both visual and non-visual system facades
- * - Provides unified interface for year3000System
- * - Optimizes shared resources (PerformanceAnalyzer, UnifiedCSSVariableManager)
- * - Coordinates system lifecycle across facades
+ * - Provides unified interface for Year3000System
+ * - Optimizes shared resources (PerformanceCoordinator, CSSVariableManager)
+ * - Coordinates system lifecycle across facades with dependency resolution
  */
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
@@ -55,7 +79,7 @@ export type CoordinationMode =
   | "independent"
   | "performance-optimized";
 
-// New orchestration types for enhanced coordination
+// System coordination types for enhanced management
 export type InitializationPhase =
   | "core"
   | "services"
@@ -70,7 +94,7 @@ export type SystemState =
   | "failed"
   | "destroyed";
 
-export interface OrchestrationConfig {
+export interface CoordinationConfig {
   enforceSequentialInitialization: boolean;
   dependencyValidation: boolean;
   enableInitializationGates: boolean;
@@ -84,7 +108,7 @@ export interface FacadeCoordinationConfig {
   enableCrossFacadeCommunication: boolean;
   enableUnifiedPerformanceMonitoring: boolean;
   enableResourceOptimization: boolean;
-  orchestration: OrchestrationConfig;
+  coordination: CoordinationConfig;
   performanceThresholds: {
     maxTotalMemoryMB: number;
     maxTotalInitTime: number;
@@ -130,7 +154,7 @@ export interface FacadeHealthCheck {
   };
   sharedResources: {
     simplePerformanceCoordinator: { ok: boolean; details: string };
-    cssConsciousnessController: { ok: boolean; details: string };
+    cssVariableController: { ok: boolean; details: string };
     musicSyncService: { ok: boolean; details: string };
     semanticColorManager?: { ok: boolean; details: string };
     // Legacy systems (will be removed after migration)
@@ -220,7 +244,7 @@ export class SystemCoordinator {
       enableCrossFacadeCommunication: true,
       enableUnifiedPerformanceMonitoring: true,
       enableResourceOptimization: true,
-      orchestration: {
+      coordination: {
         enforceSequentialInitialization: true,
         dependencyValidation: true,
         enableInitializationGates: true,
@@ -239,8 +263,8 @@ export class SystemCoordinator {
       },
     };
 
-    // Initialize orchestration system dependencies and phases
-    this.setupOrchestrationPhases();
+    // Initialize coordination system dependencies and phases
+    this.setupCoordinationPhases();
 
     this.currentMetrics = this.createInitialMetrics();
 
@@ -262,13 +286,13 @@ export class SystemCoordinator {
       this.coordinationConfig = { ...this.coordinationConfig, ...config };
 
       if (
-        this.coordinationConfig.orchestration.enforceSequentialInitialization
+        this.coordinationConfig.coordination.enforceSequentialInitialization
       ) {
         Y3KDebug?.debug?.log(
           "SystemCoordinator",
-          "Starting orchestrated initialization"
+          "Starting coordinated initialization"
         );
-        await this.executeOrchestredInitialization();
+        await this.executeCoordinatedInitialization();
       } else {
         Y3KDebug?.debug?.log(
           "SystemCoordinator",
@@ -287,8 +311,8 @@ export class SystemCoordinator {
         "System coordination fully initialized",
         {
           mode: this.coordinationConfig.mode,
-          orchestrationEnabled:
-            this.coordinationConfig.orchestration
+          coordinationEnabled:
+            this.coordinationConfig.coordination
               .enforceSequentialInitialization,
           currentPhase: this.currentPhase,
           visualSystems: this.currentMetrics.visualSystems,
@@ -374,7 +398,7 @@ export class SystemCoordinator {
       );
       await this.sharedSimplePerformanceCoordinator.initialize();
 
-      // Initialize shared CSS consciousness controller with simplified performance features
+      // Initialize shared CSS variable controller with simplified performance features
       try {
         // Use the new simplified performance coordinator for CSS controller
         // SimplePerformanceCoordinator provides necessary interface methods
@@ -567,7 +591,7 @@ export class SystemCoordinator {
     }
 
     if (this.sharedUnifiedCSSVariableManager) {
-      (this.nonVisualFacade as any).cssConsciousnessController =
+      (this.nonVisualFacade as any).cssVariableController =
         this.sharedUnifiedCSSVariableManager;
     }
 
@@ -791,7 +815,7 @@ export class SystemCoordinator {
           ok: true,
           details: "Simple performance coordinator operational",
         },
-        cssConsciousnessController: {
+        cssVariableController: {
           ok: true,
           details: "CSS variable batcher operational",
         },
@@ -869,18 +893,18 @@ export class SystemCoordinator {
       }
     }
 
-    // Check shared CSS consciousness controller
+    // Check shared CSS variable controller
     if (this.sharedUnifiedCSSVariableManager) {
       try {
         const cssHealth =
           await this.sharedUnifiedCSSVariableManager.healthCheck();
-        healthCheck.sharedResources.cssConsciousnessController.ok =
+        healthCheck.sharedResources.cssVariableController.ok =
           cssHealth.healthy || cssHealth.ok || false;
-        healthCheck.sharedResources.cssConsciousnessController.details =
-          cssHealth.details || "CSS consciousness controller operational";
+        healthCheck.sharedResources.cssVariableController.details =
+          cssHealth.details || "CSS variable controller operational";
       } catch (error) {
-        healthCheck.sharedResources.cssConsciousnessController.ok = false;
-        healthCheck.sharedResources.cssConsciousnessController.details = `CSS consciousness controller error: ${error}`;
+        healthCheck.sharedResources.cssVariableController.ok = false;
+        healthCheck.sharedResources.cssVariableController.details = `CSS variable controller error: ${error}`;
       }
     }
 
@@ -924,7 +948,7 @@ export class SystemCoordinator {
       healthCheck.facades.visual.ok && healthCheck.facades.nonVisual.ok;
     const resourcesHealthy =
       healthCheck.sharedResources.simplePerformanceCoordinator.ok &&
-      healthCheck.sharedResources.cssConsciousnessController.ok &&
+      healthCheck.sharedResources.cssVariableController.ok &&
       healthCheck.sharedResources.musicSyncService.ok &&
       healthCheck.sharedResources.semanticColorManager?.ok !== false &&
       healthCheck.sharedResources.performanceAnalyzer?.ok !== false;
@@ -1045,8 +1069,8 @@ export class SystemCoordinator {
   // Orchestration Methods - Enhanced Coordination Logic
   // ============================================================================
 
-  private setupOrchestrationPhases(): void {
-    // Define system dependencies for proper orchestration
+  private setupCoordinationPhases(): void {
+    // Define system dependencies for proper coordination
     this.systemDependencies.set("MusicSyncService", []);
     this.systemDependencies.set("ColorHarmonyEngine", [
       "MusicSyncService",
@@ -1086,7 +1110,7 @@ export class SystemCoordinator {
 
     Y3KDebug?.debug?.log(
       "SystemCoordinator",
-      "Orchestration phases configured",
+      "Coordination phases configured",
       {
         phases: Array.from(this.initializationOrder.keys()),
         totalSystems: this.systemStates.size,
@@ -1095,7 +1119,7 @@ export class SystemCoordinator {
     );
   }
 
-  private async executeOrchestredInitialization(): Promise<void> {
+  private async executeCoordinatedInitialization(): Promise<void> {
     const phases: InitializationPhase[] = [
       "core",
       "services",
@@ -1233,7 +1257,7 @@ export class SystemCoordinator {
 
   private async waitForSystemReady(systemName: string): Promise<void> {
     const timeout =
-      this.coordinationConfig.orchestration.systemReadinessTimeout;
+      this.coordinationConfig.coordination.systemReadinessTimeout;
     const startTime = Date.now();
 
     while (Date.now() - startTime < timeout) {
@@ -1289,14 +1313,14 @@ export class SystemCoordinator {
     }
 
     try {
-      // Initialize device capability detector for orchestrated initialization
+      // Initialize device capability detector for coordinated initialization
       this.sharedDeviceCapabilityDetector = new DeviceCapabilityDetector({
         enableDebug: this.config.enableDebug || false,
         runStressTests: false
       });
       await this.sharedDeviceCapabilityDetector.initialize();
 
-      // Initialize performance budget manager for orchestrated initialization
+      // Initialize performance budget manager for coordinated initialization
       this.sharedPerformanceBudgetManager = new PerformanceBudgetManager({
         budgets: {
           animationFrame: 16,
@@ -1457,7 +1481,7 @@ export class SystemCoordinator {
       this.config,
       this.utils,
       this, // year3000System
-      this.sharedUnifiedCSSVariableManager!, // cssConsciousnessController
+      this.sharedUnifiedCSSVariableManager!, // cssVariableController
       this.sharedSimplePerformanceCoordinator as any,
       this.sharedMusicSyncService!,
       this.sharedSettingsManager!,
@@ -1496,7 +1520,7 @@ export class SystemCoordinator {
     await this.performHealthCheck();
   }
 
-  // Public orchestration API
+  // Public coordination API
   public getCurrentPhase(): InitializationPhase {
     return this.currentPhase;
   }
@@ -1510,7 +1534,7 @@ export class SystemCoordinator {
   }
 
   public isOrchestrationEnabled(): boolean {
-    return this.coordinationConfig.orchestration
+    return this.coordinationConfig.coordination
       .enforceSequentialInitialization;
   }
 
@@ -2148,7 +2172,7 @@ export class SystemCoordinator {
       "GradientTransitionOrchestrator",
       "GradientConductor",
       "SemanticColorManager",
-      // UI Managers with consciousness integration
+      // UI Managers with system integration
       "Card3DManager",
       "GlassmorphismManager",
     ];

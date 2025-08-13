@@ -1,18 +1,42 @@
 /**
- * VisualSystemCoordinator - Phase 2 Unified Visual System Integration
+ * VisualSystemCoordinator - Visual Effects Factory & Coordination Layer
  *
- * Extended from Year3000IntegrationBridge to handle ALL visual systems through factory patterns.
+ * Layer 2 of the three-layer facade architecture - handles ALL visual systems through factory patterns.
  * Provides comprehensive factory methods, dependency injection, and performance optimization
- * for all visual systems in the Year3000 architecture.
+ * for music-synchronized visual effects in the Spicetify theme.
+ *
+ * ═══ LAYER 2 RESPONSIBILITIES ═══
+ * 
+ * VISUAL SYSTEM FACTORY:
+ * • Creates and manages visual effects (particles, backgrounds, gradients, glow effects)
+ * • Provides cached system instances with proper dependency injection
+ * • Handles visual system lifecycle (initialize, update, destroy)
+ *
+ * MUSIC-VISUAL COORDINATION:
+ * • Synchronizes visual effects with music beat detection and energy analysis
+ * • Provides music-aware quality adaptation based on performance constraints
+ * • Coordinates cross-visual-system communication for unified effects
+ *
+ * PERFORMANCE OPTIMIZATION:
+ * • Monitors visual system performance and adapts quality dynamically
+ * • Manages WebGL vs CSS fallback strategies based on device capabilities
+ * • Implements adaptive scaling to maintain 60fps target
+ *
+ * ═══ DIAGNOSTIC VALUE ═══
+ * Visual-specific troubleshooting capabilities:
+ * - "Particles not showing" → Check particle system factory and WebGL capabilities
+ * - "Effects lag during music" → Check music sync integration and performance scaling
+ * - "Background gradients broken" → Check gradient system health and CSS injection
+ * - "Colors not changing" → Check ColorHarmonyEngine integration and CSS variables
  *
  * Key Features:
- * - Factory pattern for all visual systems
- * - Automatic dependency injection
- * - Performance monitoring integration
- * - Event coordination and propagation
- * - Adaptive quality control
- * - Health monitoring and auto-recovery
- * - Loose coupling through facade pattern
+ * - Factory pattern for all visual systems with dependency injection
+ * - Music synchronization with beat detection and energy-based adaptation
+ * - Performance monitoring integration with quality scaling
+ * - Event coordination and propagation across visual effects
+ * - Adaptive quality control based on device capabilities
+ * - Health monitoring and auto-recovery for visual systems
+ * - Loose coupling through facade pattern for maintainability
  */
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
@@ -33,7 +57,7 @@ import * as Utils from "@/utils/core/Year3000Utilities";
 import { WebGLGradientBackgroundSystem } from "@/visual/background/WebGLRenderer";
 import { CSSBlobFallbackSystem } from "@/visual/css-fallbacks/CSSBlobFallbackSystem";
 import { ConsciousnessUIEffectsController } from "@/visual/effects/UIVisualEffectsController";
-import { HeaderConsciousnessController } from "@/visual/effects/HeaderVisualEffectsController";
+import { HeaderVisualEffectsController } from "@/visual/effects/HeaderVisualEffectsController";
 import { SidebarVisualEffectsSystem } from "@/visual/ui/SidebarVisualEffectsSystem";
 import { GradientConductor } from "@/visual/backbone/GradientConductor";
 import { MusicBeatSynchronizer } from "@/visual/music/MusicSyncVisualEffects";
@@ -84,9 +108,9 @@ interface QualitySettings {
 // Type definitions
 export type VisualSystemKey =
   | "Particle"
-  | "SidebarConsciousness"
-  | "UIEffectsConsciousness"
-  | "HeaderConsciousness"
+  | "SidebarVisualEffects"
+  | "UIVisualEffects"
+  | "HeaderVisualEffects"
   | "WebGLBackground"
   | "CSSBlobFallback"
   | "MusicBeatSync"
@@ -168,7 +192,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
   private year3000System: any; // Reference to main system
 
   // Injected dependencies
-  private cssConsciousnessController: OptimizedCSSVariableManager;
+  private cssVariableController: OptimizedCSSVariableManager;
   private performanceAnalyzer: SimplePerformanceCoordinator;
   private musicSyncService: MusicSyncService;
   private settingsManager: SettingsManager;
@@ -214,7 +238,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     config: Year3000Config,
     utils: typeof Utils,
     year3000System: any,
-    cssConsciousnessController: OptimizedCSSVariableManager,
+    cssVariableController: OptimizedCSSVariableManager,
     performanceAnalyzer: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService,
     settingsManager: SettingsManager,
@@ -225,7 +249,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     this.config = config;
     this.utils = utils;
     this.year3000System = year3000System;
-    this.cssConsciousnessController = cssConsciousnessController;
+    this.cssVariableController = cssVariableController;
     this.performanceAnalyzer = performanceAnalyzer;
     this.musicSyncService = musicSyncService;
     this.settingsManager = settingsManager;
@@ -277,29 +301,29 @@ export class VisualSystemCoordinator implements IManagedSystem {
     // this.systemDependencies.set('Particle', ['performanceAnalyzer', 'cssConsciousnessController', 'eventBus', 'musicSyncService', 'colorHarmonyEngine']); // Disabled - converted to CSS-only
 
     this.systemRegistry.set(
-      "SidebarConsciousness",
+      "SidebarVisualEffects",
       SidebarVisualEffectsSystem
     );
-    this.systemDependencies.set("SidebarConsciousness", [
+    this.systemDependencies.set("SidebarVisualEffects", [
       "eventBus",
       "musicSyncService",
     ]);
 
     this.systemRegistry.set(
-      "UIEffectsConsciousness",
+      "UIVisualEffects",
       ConsciousnessUIEffectsController
     );
-    this.systemDependencies.set("UIEffectsConsciousness", [
+    this.systemDependencies.set("UIVisualEffects", [
       "eventBus",
       "musicSyncService",
-      "cssConsciousnessController",
+      "cssVariableController",
     ]);
 
     this.systemRegistry.set(
-      "HeaderConsciousness",
-      HeaderConsciousnessController
+      "HeaderVisualEffects",
+      HeaderVisualEffectsController
     );
-    this.systemDependencies.set("HeaderConsciousness", [
+    this.systemDependencies.set("HeaderVisualEffects", [
       "eventBus",
       "musicSyncService",
       "colorHarmonyEngine",
@@ -322,7 +346,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     this.systemRegistry.set("MusicBeatSync", MusicBeatSynchronizer);
     this.systemDependencies.set("MusicBeatSync", [
       "performanceAnalyzer",
-      "cssConsciousnessController",
+      "cssVariableController",
       "eventBus",
       "musicSyncService",
       "colorHarmonyEngine",
@@ -331,7 +355,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     this.systemRegistry.set("InteractionTracking", InteractionTrackingSystem);
     this.systemDependencies.set("InteractionTracking", [
       "performanceAnalyzer",
-      "cssConsciousnessController",
+      "cssVariableController",
     ]);
 
     this.systemRegistry.set("SpotifyUIApplication", SpotifyUIApplicationSystem);
@@ -341,7 +365,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     this.systemRegistry.set("CinematicDrama", RedEnergyBurstSystem);
     this.systemDependencies.set("CinematicDrama", [
       "performanceAnalyzer",
-      "cssConsciousnessController",
+      "cssVariableController",
       "musicSyncService",
       "colorHarmonyEngine",
       "eventBus",
@@ -350,7 +374,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     this.systemRegistry.set("EtherealBeauty", MusicGlowEffectsManager);
     this.systemDependencies.set("EtherealBeauty", [
       "performanceAnalyzer",
-      "cssConsciousnessController",
+      "cssVariableController",
       "musicSyncService",
       "colorHarmonyEngine",
       "eventBus",
@@ -359,7 +383,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     this.systemRegistry.set("NaturalHarmony", BreathingEffectsController);
     this.systemDependencies.set("NaturalHarmony", [
       "performanceAnalyzer",
-      "cssConsciousnessController",
+      "cssVariableController",
       "musicSyncService",
       "colorHarmonyEngine",
       "eventBus",
@@ -367,7 +391,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
 
     this.systemRegistry.set("GradientConductor", GradientConductor);
     this.systemDependencies.set("GradientConductor", [
-      "cssConsciousnessController",
+      "cssVariableController",
       "colorHarmonyEngine",
       "musicSyncService",
       "performanceAnalyzer",
@@ -376,7 +400,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
 
     this.systemRegistry.set("CSSAnimationManager", CSSAnimationManager);
     this.systemDependencies.set("CSSAnimationManager", [
-      "cssConsciousnessController",
+      "cssVariableController",
       "animationCoordinator",
     ]);
 
@@ -387,7 +411,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     this.systemRegistry.set("GlowEffects", MusicGlowEffectsManager);
     this.systemDependencies.set("GlowEffects", [
       "performanceAnalyzer",
-      "cssConsciousnessController",
+      "cssVariableController",
       "musicSyncService",
       "colorHarmonyEngine",
       "eventBus",
@@ -401,7 +425,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
 
     this.systemRegistry.set("DepthLayeredGradient", GradientConductor);
     this.systemDependencies.set("DepthLayeredGradient", [
-      "cssConsciousnessController",
+      "cssVariableController",
       "colorHarmonyEngine",
       "musicSyncService",
       "performanceAnalyzer",
@@ -455,11 +479,11 @@ export class VisualSystemCoordinator implements IManagedSystem {
       this.initialized = true;
 
       // Update CSS to indicate bridge is active
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-visual-bridge-active",
         "1"
       );
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-visual-bridge-mode",
         this.bridgeConfig.mode
       );
@@ -537,7 +561,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     if (key === "GradientConductor") {
       const system = new SystemClass(
         this.eventBus,
-        this.cssConsciousnessController,
+        this.cssVariableController,
         this.colorHarmonyEngine,
         this.musicSyncService,
         this.performanceAnalyzer,
@@ -551,23 +575,23 @@ export class VisualSystemCoordinator implements IManagedSystem {
     if (key === "CSSAnimationManager") {
       const system = new SystemClass(
         this.config,
-        this.cssConsciousnessController,
+        this.cssVariableController,
         this.animationCoordinator
       ) as T;
       this.injectDependencies(system, key);
       return system;
     }
 
-    // Special handling for consciousness engines with holographic UI integration
+    // Special handling for visual effects systems with holographic UI integration
     if (
       key === "CinematicDrama" ||
       key === "EtherealBeauty" ||
       key === "NaturalHarmony"
     ) {
-      // Create biological consciousness manager for holographic UI system
+      // Create visual effects manager for holographic UI system
       const biologicalManager = new VisualEffectsManager();
       
-      // Create holographic UI system for consciousness engines
+      // Create holographic UI system for visual effects integration
       const holographicSystem = new HolographicUISystem(
         biologicalManager,
         this.settingsManager,
@@ -576,7 +600,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
       
       const system = new SystemClass(
         holographicSystem,
-        this.cssConsciousnessController,
+        this.cssVariableController,
         this.musicSyncService
       ) as T;
       this.injectDependencies(system, key);
@@ -615,11 +639,11 @@ export class VisualSystemCoordinator implements IManagedSystem {
 
     // Inject CSS variable batcher
     if (
-      dependencies.includes("cssConsciousnessController") &&
+      dependencies.includes("cssVariableController") &&
       (system as any).setOptimizedCSSVariableManager
     ) {
       (system as any).setOptimizedCSSVariableManager(
-        this.cssConsciousnessController
+        this.cssVariableController
       );
     }
 
@@ -667,8 +691,8 @@ export class VisualSystemCoordinator implements IManagedSystem {
   ): void {
     // Set up shared utilities directly on the system (before _baseInitialize)
     // This ensures the system has access to CSS variable management
-    if (this.cssConsciousnessController) {
-      system.cssConsciousnessController = this.cssConsciousnessController;
+    if (this.cssVariableController) {
+      system.cssVariableController = this.cssVariableController;
     }
 
     if (this.performanceAnalyzer) {
@@ -778,11 +802,11 @@ export class VisualSystemCoordinator implements IManagedSystem {
     }
 
     // Update CSS variables
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssVariableController.queueCSSVariableUpdate(
       "--sn-adaptive-quality",
       (event.newSettings!.gradientComplexity || 0).toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssVariableController.queueCSSVariableUpdate(
       "--sn-adaptive-fps",
       (event.newSettings!.animationFPS || 60).toString()
     );
@@ -902,7 +926,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
             qualityScalingManager.registerSystem(key, qualityScalingSystem);
             Y3KDebug?.debug?.log(
               "VisualSystemFacade",
-              `Registered ${key} for quality scaling and performance orchestration`
+              `Registered ${key} for quality scaling and performance coordination`
             );
           }
         } catch (error) {
@@ -914,7 +938,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
         }
       }
 
-      // Initialize consciousness-aware quality adaptation
+      // Initialize music-aware quality adaptation
       await this.initializeConsciousnessAwareAdaptation(qualityScalingManager);
     } catch (error) {
       Y3KDebug?.debug?.error(
@@ -926,7 +950,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
   }
 
   /**
-   * Initialize consciousness-aware quality adaptation with music sync integration
+   * Initialize music-aware quality adaptation with music sync integration
    */
   private async initializeConsciousnessAwareAdaptation(
     qualityScalingManager: any
@@ -938,35 +962,35 @@ export class VisualSystemCoordinator implements IManagedSystem {
       if (!musicSyncService) {
         Y3KDebug?.debug?.warn(
           "VisualSystemFacade",
-          "MusicSyncService not available for consciousness-aware adaptation"
+          "MusicSyncService not available for music-aware adaptation"
         );
         return;
       }
 
-      // Setup consciousness adaptation interval
+      // Setup music-aware adaptation interval
       const adaptationInterval = setInterval(() => {
         try {
-          // Get current consciousness metrics
-          const consciousnessIntensity =
+          // Get current music intensity metrics
+          const musicIntensity =
             musicSyncService.getOverallIntensity?.() || 0.5;
           const musicEnergy = musicSyncService.getBeatStrength?.() || 0.5;
 
-          // Apply consciousness-aware quality adaptation
-          qualityScalingManager.adaptToConsciousnessState(
-            consciousnessIntensity,
+          // Apply music-aware quality adaptation
+          qualityScalingManager.adaptToMusicIntensity(
+            musicIntensity,
             musicEnergy
           );
         } catch (error) {
           Y3KDebug?.debug?.error(
             "VisualSystemFacade",
-            "Error in consciousness-aware adaptation:",
+            "Error in music-aware adaptation:",
             error
           );
         }
       }, 2000); // Run every 2 seconds
 
       // Store interval for cleanup
-      (this as any)._consciousnessAdaptationInterval = adaptationInterval;
+      (this as any)._musicAdaptationInterval = adaptationInterval;
 
       Y3KDebug?.debug?.log(
         "VisualSystemFacade",
@@ -975,7 +999,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     } catch (error) {
       Y3KDebug?.debug?.error(
         "VisualSystemFacade",
-        "Failed to initialize consciousness-aware adaptation:",
+        "Failed to initialize music-aware adaptation:",
         error
       );
     }
@@ -1058,7 +1082,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     this.lastHealthCheck = healthCheck;
 
     // Update CSS health indicator
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssVariableController.queueCSSVariableUpdate(
       "--sn-visual-health",
       healthCheck.overall
     );
@@ -1193,10 +1217,10 @@ export class VisualSystemCoordinator implements IManagedSystem {
       this.metricsUpdateInterval = null;
     }
 
-    // Clean up consciousness adaptation interval
-    if ((this as any)._consciousnessAdaptationInterval) {
-      clearInterval((this as any)._consciousnessAdaptationInterval);
-      (this as any)._consciousnessAdaptationInterval = null;
+    // Clean up music adaptation interval
+    if ((this as any)._musicAdaptationInterval) {
+      clearInterval((this as any)._musicAdaptationInterval);
+      (this as any)._musicAdaptationInterval = null;
     }
 
     // Remove event listeners
@@ -1216,7 +1240,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     // }
 
     // Reset CSS state
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssVariableController.queueCSSVariableUpdate(
       "--sn-visual-bridge-active",
       "0"
     );
@@ -1374,8 +1398,8 @@ export class VisualSystemCoordinator implements IManagedSystem {
     });
 
     // Force CSS variable flush if method exists
-    if (this.cssConsciousnessController && 'flushPendingUpdates' in this.cssConsciousnessController) {
-      (this.cssConsciousnessController as any).flushPendingUpdates();
+    if (this.cssVariableController && 'flushPendingUpdates' in this.cssVariableController) {
+      (this.cssVariableController as any).flushPendingUpdates();
     }
   }
 
