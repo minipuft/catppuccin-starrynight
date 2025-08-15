@@ -1,11 +1,11 @@
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import type { PerformanceProfile, Year3000Config } from "@/types/models";
+import type { PerformanceProfile, AdvancedSystemConfig } from "@/types/models";
 import { HARMONIC_MODES } from "@/config/globalConfig";
-import { Year3000System } from "@/core/lifecycle/year3000System";
+import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { sample as sampleNoise } from "@/utils/graphics/NoiseField";
-import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 
 // Type definitions
@@ -152,8 +152,8 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
   private readonly INTENSITY_LERP = 0.15;
 
   constructor(
-    config: Year3000Config,
-    utils: typeof Year3000Utilities,
+    config: AdvancedSystemConfig,
+    utils: typeof ThemeUtilities,
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService,
     settingsManager: SettingsManager,
@@ -284,7 +284,7 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
 
   private _createOverlayContainer() {
     this.overlayContainer = document.createElement("div");
-    this.overlayContainer.id = "sidebar-consciousness-overlay";
+    this.overlayContainer.id = "sidebar-visual-effects-overlay";
     this.overlayContainer.style.position = "absolute";
     this.overlayContainer.style.pointerEvents = "none";
     this.overlayContainer.style.zIndex = "1000";
@@ -853,7 +853,7 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
   }
 
   /**
-   * Handle proximity exit for liquid consciousness
+   * Handle proximity exit for liquid visual effects
    */
   private handleProximityExit(element: HTMLElement): void {
     this.userInteractionState.proximityElements = 

@@ -6,7 +6,7 @@
 
 ## 🌟 Overview
 
-The **Visual Effects Coordination Architecture** represents a major architectural evolution from consciousness-based systems to a modern, performance-focused approach. The `VisualEffectsCoordinator` serves as the central hub that manages shared visual state and coordinates background systems through the `VisualEffectState` interface.
+The **Visual Effects Coordination Architecture** represents a major architectural evolution from legacy metaphorical systems to a modern, performance-focused approach. The `VisualEffectsCoordinator` serves as the central hub that manages shared visual state and coordinates background systems through the `VisualEffectState` interface.
 
 ---
 
@@ -172,10 +172,10 @@ private updateFromMusicAnalysis(state: VisualEffectState): void {
 ### Supported Music Moods
 - **euphoric**: `{ x: 1, y: 1 }` - Upward, forward flow
 - **aggressive**: `{ x: -1, y: 1 }` - Backward, upward flow
-- **peaceful**: `{ x: 0, y: -0.5 }` - Gentle downward flow
+- **peaceful**: `{ x: 0, y: -0.5 }` - Smooth downward flow
 - **melancholic**: `{ x: -0.5, y: -1 }` - Backward, downward flow
 - **mysterious**: `{ x: 0.7, y: 0 }` - Forward, neutral flow
-- **contemplative**: `{ x: 0, y: 0.3 }` - Gentle upward flow
+- **contemplative**: `{ x: 0, y: 0.3 }` - Smooth upward flow
 
 ---
 
@@ -296,7 +296,7 @@ When debug mode is enabled, the coordinator provides detailed logging:
 
 ```typescript
 // Enable debug logging
-YEAR3000_CONFIG.enableDebug = true;
+ADVANCED_SYSTEM_CONFIG.enableDebug = true;
 
 // Access performance metrics
 const coordinator = VisualEffectsCoordinator.getInstance();
@@ -308,12 +308,12 @@ console.log('Coordination Performance:', metrics);
 
 ## 🚀 Migration Guide
 
-### From Consciousness-Based Systems
-Systems previously using consciousness interfaces should migrate to the new architecture:
+### From Legacy Systems
+Systems previously using legacy metaphorical interfaces should migrate to the new architecture:
 
-**Before** (Consciousness-based):
+**Before** (Legacy-based):
 ```typescript
-onConsciousnessFieldUpdate(field: ConsciousnessField): void {
+onLegacyFieldUpdate(field: LegacyField): void {
   this.updateFromField(field.rhythmicPulse, field.musicalFlow);
 }
 ```
@@ -326,7 +326,7 @@ onVisualStateUpdate(state: VisualEffectState): void {
 ```
 
 ### Property Mapping Reference
-| Old ConsciousnessField | New VisualEffectState |
+| Old LegacyField | New VisualEffectState |
 |------------------------|----------------------|
 | `rhythmicPulse` | `musicIntensity` |
 | `musicalFlow` | `flowDirection` |
@@ -334,7 +334,7 @@ onVisualStateUpdate(state: VisualEffectState): void {
 | `emotionalTemperature` | `colorTemperature` |
 | `liquidDensity` | `fluidIntensity` |
 | `webglLuminosity` | `luminosity` |
-| `breathingCycle` | `pulseRate` |
+| `smoothCycle` | `pulseRate` |
 
 ---
 
@@ -353,7 +353,7 @@ onVisualStateUpdate(state: VisualEffectState): void {
 4. **Error Resilience**: Wrap coordinator calls in try-catch blocks
 
 ### Debugging Tips
-1. **Enable Debug Mode**: Set `YEAR3000_CONFIG.enableDebug = true`
+1. **Enable Debug Mode**: Set `ADVANCED_SYSTEM_CONFIG.enableDebug = true`
 2. **Monitor Metrics**: Regularly check `getPerformanceMetrics()`
 3. **State Inspection**: Log state changes in `onVisualStateUpdate()`
 4. **Contribution Analysis**: Verify contributions are being applied

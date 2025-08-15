@@ -80,11 +80,11 @@ describe('Orchestration Validation Tests', () => {
   describe('1. Core Orchestration Components', () => {
     test('should create SystemCoordinator with orchestration configuration', async () => {
       const { SystemCoordinator } = await import('@/core/integration/SystemCoordinator');
-      const { YEAR3000_CONFIG } = await import('@/config/globalConfig');
+      const { ADVANCED_SYSTEM_CONFIG } = await import('@/config/globalConfig');
 
       expect(() => {
         new SystemCoordinator(
-          YEAR3000_CONFIG,
+          ADVANCED_SYSTEM_CONFIG,
           {} as any,
           {
             orchestration: {
@@ -101,10 +101,10 @@ describe('Orchestration Validation Tests', () => {
 
     test('should have orchestration phases defined', async () => {
       const { SystemCoordinator } = await import('@/core/integration/SystemCoordinator');
-      const { YEAR3000_CONFIG } = await import('@/config/globalConfig');
+      const { ADVANCED_SYSTEM_CONFIG } = await import('@/config/globalConfig');
 
       const coordinator = new SystemCoordinator(
-        YEAR3000_CONFIG,
+        ADVANCED_SYSTEM_CONFIG,
         {} as any,
         {
           orchestration: {
@@ -129,10 +129,10 @@ describe('Orchestration Validation Tests', () => {
 
     test('should provide shared service access methods', async () => {
       const { SystemCoordinator } = await import('@/core/integration/SystemCoordinator');
-      const { YEAR3000_CONFIG } = await import('@/config/globalConfig');
+      const { ADVANCED_SYSTEM_CONFIG } = await import('@/config/globalConfig');
 
       const coordinator = new SystemCoordinator(
-        YEAR3000_CONFIG,
+        ADVANCED_SYSTEM_CONFIG,
         {} as any,
         {
           orchestration: {
@@ -275,10 +275,10 @@ describe('Orchestration Validation Tests', () => {
   describe('4. Dependency Chain Validation', () => {
     test('should define system dependencies correctly', async () => {
       const { SystemCoordinator } = await import('@/core/integration/SystemCoordinator');
-      const { YEAR3000_CONFIG } = await import('@/config/globalConfig');
+      const { ADVANCED_SYSTEM_CONFIG } = await import('@/config/globalConfig');
 
       const coordinator = new SystemCoordinator(
-        YEAR3000_CONFIG,
+        ADVANCED_SYSTEM_CONFIG,
         {} as any,
         {
           orchestration: {
@@ -337,10 +337,10 @@ describe('Orchestration Validation Tests', () => {
   describe('5. System Status and Health', () => {
     test('should provide system status information', async () => {
       const { SystemCoordinator } = await import('@/core/integration/SystemCoordinator');
-      const { YEAR3000_CONFIG } = await import('@/config/globalConfig');
+      const { ADVANCED_SYSTEM_CONFIG } = await import('@/config/globalConfig');
 
       const coordinator = new SystemCoordinator(
-        YEAR3000_CONFIG,
+        ADVANCED_SYSTEM_CONFIG,
         {} as any,
         {
           orchestration: {
@@ -364,10 +364,10 @@ describe('Orchestration Validation Tests', () => {
 
     test('should provide orchestration configuration', async () => {
       const { SystemCoordinator } = await import('@/core/integration/SystemCoordinator');
-      const { YEAR3000_CONFIG } = await import('@/config/globalConfig');
+      const { ADVANCED_SYSTEM_CONFIG } = await import('@/config/globalConfig');
 
       const coordinator = new SystemCoordinator(
-        YEAR3000_CONFIG,
+        ADVANCED_SYSTEM_CONFIG,
         {} as any,
         {
           orchestration: {
@@ -393,10 +393,10 @@ describe('Orchestration Validation Tests', () => {
   describe('6. Color Dependency Coordination', () => {
     test('should provide color dependency management', async () => {
       const { SystemCoordinator } = await import('@/core/integration/SystemCoordinator');
-      const { YEAR3000_CONFIG } = await import('@/config/globalConfig');
+      const { ADVANCED_SYSTEM_CONFIG } = await import('@/config/globalConfig');
 
       const coordinator = new SystemCoordinator(
-        YEAR3000_CONFIG,
+        ADVANCED_SYSTEM_CONFIG,
         {} as any,
         {
           orchestration: {
@@ -418,10 +418,10 @@ describe('Orchestration Validation Tests', () => {
 
     test('should track color dependent systems', async () => {
       const { SystemCoordinator } = await import('@/core/integration/SystemCoordinator');
-      const { YEAR3000_CONFIG } = await import('@/config/globalConfig');
+      const { ADVANCED_SYSTEM_CONFIG } = await import('@/config/globalConfig');
 
       const coordinator = new SystemCoordinator(
-        YEAR3000_CONFIG,
+        ADVANCED_SYSTEM_CONFIG,
         {} as any,
         {
           orchestration: {

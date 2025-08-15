@@ -65,14 +65,14 @@ export interface GradientState {
   emotionalProfile: any;
   genreInfo: any;
   musicMetrics: any;
-  consciousnessLevel: number;
+  visualEffectsLevel: number;
   timestamp: number;
 }
 
 export class TransitionCoordinator implements IManagedSystem {
   public readonly systemName = "TransitionCoordinator";
   public initialized = false;
-  private cssConsciousnessController: UnifiedCSSVariableManager;
+  private cssController: UnifiedCSSVariableManager;
   private deviceDetector: DeviceCapabilityDetector;
   private performanceAnalyzer: SimplePerformanceCoordinator;
   private musicSyncService: MusicSyncService | null = null;
@@ -141,13 +141,13 @@ export class TransitionCoordinator implements IManagedSystem {
   };
 
   constructor(
-    cssConsciousnessController: UnifiedCSSVariableManager,
+    cssController: UnifiedCSSVariableManager,
     performanceAnalyzer: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
     settingsManager: SettingsManager | null = null,
     colorHarmonyEngine: ColorHarmonyEngine | null = null
   ) {
-    this.cssConsciousnessController = cssConsciousnessController;
+    this.cssController = cssController;
     this.performanceAnalyzer = performanceAnalyzer;
     this.musicSyncService = musicSyncService;
     this.settingsManager = settingsManager;
@@ -189,7 +189,7 @@ export class TransitionCoordinator implements IManagedSystem {
         this.webglReady = this.webglBackgroundSystem.initialized;
 
         // Update CSS variable to indicate WebGL readiness
-        this.cssConsciousnessController.setProperty(
+        this.cssController.setProperty(
           "--sn.bg.webgl.ready",
           this.webglReady ? "1" : "0"
         );
@@ -206,7 +206,7 @@ export class TransitionCoordinator implements IManagedSystem {
           error
         );
         this.webglReady = false;
-        this.cssConsciousnessController.setProperty("--sn.bg.webgl.ready", "0");
+        this.cssController.setProperty("--sn.bg.webgl.ready", "0");
       }
     }
 
@@ -404,9 +404,9 @@ export class TransitionCoordinator implements IManagedSystem {
 
   private async initializeCSSBackend(): Promise<void> {
     // CSS backend is always available through DepthLayeredGradientSystem
-    this.cssConsciousnessController.setProperty("--sn-gradient-backend", "css");
-    this.cssConsciousnessController.setProperty("--sn-webgl-ready", "0");
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty("--sn-gradient-backend", "css");
+    this.cssController.setProperty("--sn-webgl-ready", "0");
+    this.cssController.setProperty(
       "--sn-gradient-transition-active",
       "0"
     );
@@ -422,12 +422,12 @@ export class TransitionCoordinator implements IManagedSystem {
       throw new Error("WebGL system not ready");
     }
 
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn-gradient-backend",
       "webgl"
     );
-    this.cssConsciousnessController.setProperty("--sn-webgl-ready", "1");
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty("--sn-webgl-ready", "1");
+    this.cssController.setProperty(
       "--sn-gradient-transition-active",
       "0"
     );
@@ -447,22 +447,22 @@ export class TransitionCoordinator implements IManagedSystem {
 
     if (this.webglReady) {
       try {
-        this.cssConsciousnessController.setProperty(
+        this.cssController.setProperty(
           "--sn-gradient-backend",
           "hybrid"
         );
-        this.cssConsciousnessController.setProperty("--sn-webgl-ready", "1");
+        this.cssController.setProperty("--sn-webgl-ready", "1");
       } catch (error) {
         Y3KDebug?.debug?.warn(
           "GradientTransitionOrchestrator",
           "WebGL failed in hybrid mode, using CSS only:",
           error
         );
-        this.cssConsciousnessController.setProperty(
+        this.cssController.setProperty(
           "--sn-gradient-backend",
           "css"
         );
-        this.cssConsciousnessController.setProperty("--sn-webgl-ready", "0");
+        this.cssController.setProperty("--sn-webgl-ready", "0");
       }
     }
 
@@ -491,15 +491,15 @@ export class TransitionCoordinator implements IManagedSystem {
 
     try {
       // Update CSS to indicate transition in progress
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn-gradient-transition-active",
         "1"
       );
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn-gradient-transition-duration",
         `${transitionConfig.duration}ms`
       );
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn-gradient-transition-easing",
         transitionConfig.easing
       );
@@ -541,7 +541,7 @@ export class TransitionCoordinator implements IManagedSystem {
       }
     } finally {
       this.transitionInProgress = false;
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn-gradient-transition-active",
         "0"
       );
@@ -579,7 +579,7 @@ export class TransitionCoordinator implements IManagedSystem {
     await this.initializeBackend(targetBackend);
 
     // Crossfade by adjusting opacity
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn-gradient-crossfade-opacity",
       "0"
     );
@@ -587,7 +587,7 @@ export class TransitionCoordinator implements IManagedSystem {
     // Trigger crossfade
     requestAnimationFrame(() => {
       tempElement.style.opacity = "1";
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn-gradient-crossfade-opacity",
         "1"
       );
@@ -612,7 +612,7 @@ export class TransitionCoordinator implements IManagedSystem {
       const progress = i / steps;
 
       // Update transition progress
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn-gradient-transition-progress",
         progress.toString()
       );
@@ -659,7 +659,7 @@ export class TransitionCoordinator implements IManagedSystem {
       }
     }
 
-    // Capture other state from DepthLayeredGradientSystem (via CSS consciousness controller)
+    // Capture other state from DepthLayeredGradientSystem (via CSS visual effects controller)
     // TODO: Implement state capture from DepthLayeredGradientSystem
     // For now, use default values since FluxConsciousnessLayers has been removed
 
@@ -671,7 +671,7 @@ export class TransitionCoordinator implements IManagedSystem {
         confidence: 0,
       },
       musicMetrics: null,
-      consciousnessLevel: 0.7,
+      visualEffectsLevel: 0.7,
       timestamp: performance.now(),
     };
   }
@@ -698,7 +698,7 @@ export class TransitionCoordinator implements IManagedSystem {
     // Update CSS variables for state continuity
     if (state.colors.length > 0) {
       state.colors.forEach((color, index) => {
-        this.cssConsciousnessController.setProperty(
+        this.cssController.setProperty(
           `--sn-transition-color-${index}`,
           `${color.r}, ${color.g}, ${color.b}`
         );
@@ -919,14 +919,14 @@ export class TransitionCoordinator implements IManagedSystem {
     const { settingKey, newValue } = data;
 
     if (settingKey === "sn-gradient-backend") {
-      this.userPreferences.preferredBackend = newValue;
+      this.userPreferences.preferredBackend = newValue as "auto" | GradientBackend;
       this.adaptToUserPreferences();
       Y3KDebug?.debug?.log(
         "GradientTransitionOrchestrator",
         `Backend preference changed to: ${newValue}`
       );
     } else if (settingKey === "sn-gradient-quality") {
-      this.userPreferences.qualityLevel = newValue;
+      this.userPreferences.qualityLevel = newValue as QualityLevel;
       this.adaptToUserPreferences();
       Y3KDebug?.debug?.log(
         "GradientTransitionOrchestrator",
@@ -946,7 +946,7 @@ export class TransitionCoordinator implements IManagedSystem {
         genre: data.coordinationMetrics?.detectedGenre,
         processingMode: data.processingMode,
       },
-      consciousnessLevel: data.coordinationMetrics?.musicInfluenceStrength || 0,
+      visualEffectsLevel: data.coordinationMetrics?.musicInfluenceStrength || 0,
       timestamp: data.processingTime,
     };
 
@@ -1076,15 +1076,15 @@ export class TransitionCoordinator implements IManagedSystem {
   }
 
   private updateCSSTransitionState(): void {
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn-current-backend",
       this.currentBackend
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn-webgl-enabled",
       this.currentBackend === "webgl" ? "1" : "0"
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn-hybrid-mode",
       this.currentBackend === "hybrid" ? "1" : "0"
     );
@@ -1269,9 +1269,9 @@ export class TransitionCoordinator implements IManagedSystem {
     }
 
     // Reset CSS state
-    this.cssConsciousnessController.setProperty("--sn-gradient-backend", "css");
-    this.cssConsciousnessController.setProperty("--sn-webgl-ready", "0");
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty("--sn-gradient-backend", "css");
+    this.cssController.setProperty("--sn-webgl-ready", "0");
+    this.cssController.setProperty(
       "--sn-gradient-transition-active",
       "0"
     );
@@ -1362,23 +1362,23 @@ export class TransitionCoordinator implements IManagedSystem {
     try {
       // Update CSS variables that the WebGL system reads
       if (metrics.beatIntensity !== undefined) {
-        this.cssConsciousnessController.setProperty(
+        this.cssController.setProperty(
           "--sn.music.beat.pulse.intensity",
           metrics.beatIntensity.toString()
         );
       }
 
       if (metrics.rhythmPhase !== undefined) {
-        this.cssConsciousnessController.setProperty(
+        this.cssController.setProperty(
           "--sn.music.rhythm.phase",
           `${metrics.rhythmPhase}deg`
         );
       }
 
-      if (metrics.breathingScale !== undefined) {
-        this.cssConsciousnessController.setProperty(
-          "--sn.music.breathing.scale",
-          metrics.breathingScale.toString()
+      if (metrics.pulsingScale !== undefined) {
+        this.cssController.setProperty(
+          "--sn.music.pulsing.scale",
+          metrics.pulsingScale.toString()
         );
       }
 
@@ -1414,7 +1414,7 @@ export class TransitionCoordinator implements IManagedSystem {
     try {
       if (enabled) {
         // Enable WebGL rendering
-        this.cssConsciousnessController.setProperty("--sn.bg.webgl.enabled", "1");
+        this.cssController.setProperty("--sn.bg.webgl.enabled", "1");
 
         // Start WebGL animation if not already running
         if (!this.webglBackgroundSystem["animationId"]) {
@@ -1427,7 +1427,7 @@ export class TransitionCoordinator implements IManagedSystem {
         );
       } else {
         // Disable WebGL rendering
-        this.cssConsciousnessController.setProperty("--sn.bg.webgl.enabled", "0");
+        this.cssController.setProperty("--sn.bg.webgl.enabled", "0");
 
         // Stop WebGL animation
         if (this.webglBackgroundSystem["animationId"]) {

@@ -8,9 +8,9 @@
 import { MusicBeatSynchronizer } from '@/visual/music/MusicSyncVisualEffects';
 // Using stub implementations from colorStubs
 import type { BreathingRhythmEngine, SymbioticListeningCore } from '@/types/colorStubs';
-import { Year3000System } from '@/core/lifecycle/year3000System';
-import { YEAR3000_CONFIG } from '@/config/globalConfig';
-import * as Utils from '@/utils/core/Year3000Utilities';
+import { AdvancedThemeSystem } from '@/core/lifecycle/AdvancedThemeSystem';
+import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
+import * as Utils from '@/utils/core/ThemeUtilities';
 
 // Mock NowPlayingDomWatcher to prevent DOM-related errors in tests
 jest.mock('@/utils/dom/NowPlayingDomWatcher', () => ({
@@ -18,18 +18,18 @@ jest.mock('@/utils/dom/NowPlayingDomWatcher', () => ({
 }));
 
 describe('Visual Effects Integration', () => {
-  let year3000System: Year3000System;
+  let advancedThemeSystem: AdvancedThemeSystem;
   let visualEffectsSystem: MusicBeatSynchronizer;
 
   beforeEach(() => {
-    // Initialize Year3000System
-    year3000System = new Year3000System(YEAR3000_CONFIG);
+    // Initialize AdvancedThemeSystem
+    advancedThemeSystem = new AdvancedThemeSystem(ADVANCED_SYSTEM_CONFIG);
     
     // Mock DOM environment
     document.body.innerHTML = '<div class="Root__main-view"></div>';
     
-    // Enhance Year3000System with facade coordinator for visual system registration
-    year3000System.facadeCoordinator = {
+    // Enhance AdvancedThemeSystem with facade coordinator for visual system registration
+    advancedThemeSystem.facadeCoordinator = {
       getVisualSystem: jest.fn((systemKey: string) => {
         if (systemKey === 'OrganicBeatSync') {
           return { initialized: true, healthCheck: jest.fn().mockResolvedValue({ ok: true }) };
@@ -41,7 +41,7 @@ describe('Visual Effects Integration', () => {
     } as any;
     
     // Create visual effects system instance
-    visualEffectsSystem = new MusicBeatSynchronizer(YEAR3000_CONFIG);
+    visualEffectsSystem = new MusicBeatSynchronizer(ADVANCED_SYSTEM_CONFIG);
   });
 
   afterEach(() => {
@@ -53,13 +53,13 @@ describe('Visual Effects Integration', () => {
   });
 
   describe('System Integration', () => {
-    it('should integrate with Year3000System facade', () => {
-      expect(year3000System.organicBeatSyncConsciousness).toBeDefined();
-      expect(year3000System.beatSyncVisualSystem).toBe(year3000System.organicBeatSyncConsciousness);
+    it('should integrate with AdvancedThemeSystem facade', () => {
+      expect(advancedThemeSystem.organicBeatSyncConsciousness).toBeDefined();
+      expect(advancedThemeSystem.beatSyncVisualSystem).toBe(advancedThemeSystem.organicBeatSyncConsciousness);
     });
 
     it('should register with VisualSystemFacade', () => {
-      const visualFacade = year3000System.facadeCoordinator?.getVisualSystem('OrganicBeatSync');
+      const visualFacade = advancedThemeSystem.facadeCoordinator?.getVisualSystem('OrganicBeatSync');
       expect(visualFacade).toBeDefined();
     });
 
@@ -215,11 +215,11 @@ describe('Visual Effects Integration', () => {
     it('should handle initialization failures gracefully', async () => {
       // Mock a failing dependency
       const mockSystem = {
-        ...year3000System,
+        ...advancedThemeSystem,
         performanceAnalyzer: null
       };
       
-      const faultySystem = new MusicBeatSynchronizer(YEAR3000_CONFIG);
+      const faultySystem = new MusicBeatSynchronizer(ADVANCED_SYSTEM_CONFIG);
       
       await expect(faultySystem.initialize()).resolves.not.toThrow();
     });

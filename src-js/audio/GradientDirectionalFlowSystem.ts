@@ -11,11 +11,11 @@
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
 import { BaseVisualSystem } from "../visual/base/BaseVisualSystem";
 
@@ -105,7 +105,7 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
   private genreFlowPatterns: GenreFlowPatterns;
   private spectralFlowMapping: SpectralFlowMapping;
 
-  private cssConsciousnessController: OptimizedCSSVariableManager | null;
+  private cssVariableController: OptimizedCSSVariableManager | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
 
   private lastBeatTime = 0;
@@ -121,8 +121,8 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
   private updateThrottleInterval = 1000 / 30; // 30 FPS for smooth flow
 
   constructor(
-    config: Year3000Config = YEAR3000_CONFIG,
-    utils: typeof import("@/utils/core/Year3000Utilities"),
+    config: Year3000Config = ADVANCED_SYSTEM_CONFIG,
+    utils: typeof import("@/utils/core/ThemeUtilities"),
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
     settingsManager: any = null
@@ -133,13 +133,13 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     // Initialize CSS Consciousness Controller if available
     const cssController = OptimizedCSSVariableManager.getGlobalInstance();
     if (cssController) {
-      this.cssConsciousnessController = cssController;
+      this.cssVariableController = cssController;
     } else {
       Y3KDebug?.debug?.warn(
         "GradientDirectionalFlowSystem",
-        "OptimizedCSSVariableManager not available, CSS consciousness disabled"
+        "OptimizedCSSVariableManager not available, CSS integration disabled"
       );
-      this.cssConsciousnessController = null;
+      this.cssVariableController = null;
     }
 
     // Initialize flow settings
@@ -504,7 +504,7 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     
     // Create radial sampling points around the center
     const currentTime = performance.now() / 1000;
-    const rotationPhase = currentTime * 0.1; // Slow rotation for organic movement
+    const rotationPhase = currentTime * 0.1; // Slow rotation for smooth movement
     
     // Calculate base angle from center outward (then invert for inward flow)
     const baseAngle = rotationPhase + (linearFlow.x * Math.PI * 2);
@@ -543,19 +543,19 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     
     // ===== UPDATE INWARD VECTOR CSS VARIABLES =====
     // Provide true inward-pointing vectors for shader coordination
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+    if (this.cssVariableController) {
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-inward-vector-x",
         normalizedInwardX.toFixed(3)
       );
       
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-inward-vector-y", 
         normalizedInwardY.toFixed(3)
       );
       
       // Provide radial distance for corridor depth calculation
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-radial-distance",
         distanceFromCenter.toFixed(3)
       );
@@ -605,24 +605,24 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     this.lastFlowUpdate = currentTime;
 
     // Update flow direction CSS variables (if controller is available)
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+    if (this.cssVariableController) {
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-flow-direction-x",
         this.currentFlowVector.x.toFixed(3)
       );
 
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-flow-direction-y",
         this.currentFlowVector.y.toFixed(3)
       );
 
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-flow-intensity",
         this.currentFlowVector.intensity.toFixed(3)
       );
 
       // Update flow strength for WebGL systems
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-flow-strength",
         (this.currentFlowVector.intensity * 0.8).toFixed(3)
       );
@@ -632,41 +632,41 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
         this.currentFlowVector.y,
         this.currentFlowVector.x
       );
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-flow-angle",
         `${((flowAngle * 180) / Math.PI).toFixed(1)}deg`
       );
 
       // Update corridor-specific flow variables
       if (this.flowSettings.corridorFlowEnabled) {
-        this.cssConsciousnessController.queueCSSVariableUpdate(
+        this.cssVariableController.queueCSSVariableUpdate(
           "--sn-corridor-flow-angle",
           this.currentRadialFlow.angle.toFixed(3)
         );
 
-        this.cssConsciousnessController.queueCSSVariableUpdate(
+        this.cssVariableController.queueCSSVariableUpdate(
           "--sn-corridor-flow-radius",
           this.currentRadialFlow.radius.toFixed(3)
         );
 
-        this.cssConsciousnessController.queueCSSVariableUpdate(
+        this.cssVariableController.queueCSSVariableUpdate(
           "--sn-corridor-inward-flow",
           this.currentRadialFlow.inwardFlow.toFixed(3)
         );
 
-        this.cssConsciousnessController.queueCSSVariableUpdate(
+        this.cssVariableController.queueCSSVariableUpdate(
           "--sn-corridor-flow-intensity",
           this.currentRadialFlow.intensity.toFixed(3)
         );
 
         // Enable corridor flow for WebGL coordination
-        this.cssConsciousnessController.queueCSSVariableUpdate(
+        this.cssVariableController.queueCSSVariableUpdate(
           "--sn-corridor-flow-enabled",
           "1"
         );
       } else {
         // Disable corridor flow
-        this.cssConsciousnessController.queueCSSVariableUpdate(
+        this.cssVariableController.queueCSSVariableUpdate(
           "--sn-corridor-flow-enabled",
           "0"
         );
@@ -722,13 +722,13 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     const animatedY = baseY + Math.cos(animationPhase) * 0.05;
 
     // Update CSS variables with animation (if controller is available)
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+    if (this.cssVariableController) {
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-flow-animated-x",
         animatedX.toFixed(3)
       );
 
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-flow-animated-y",
         animatedY.toFixed(3)
       );
@@ -840,8 +840,8 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     this.flowSettings.corridorFlowEnabled = enabled;
     
     // Update CSS variable for coordination with WebGL system
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+    if (this.cssVariableController) {
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-corridor-flow-enabled", 
         enabled ? "1" : "0"
       );

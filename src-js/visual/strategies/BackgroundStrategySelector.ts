@@ -2,10 +2,10 @@
  * BackgroundStrategySelector - Intelligent Strategy Selection for Background Systems
  *
  * Implements sophisticated strategy selection logic that considers device capabilities,
- * user preferences, music context, and consciousness levels to optimize background
+ * user preferences, music context, and visual effects levels to optimize background
  * processing strategies for the best performance and visual experience.
  *
- * Philosophy: "The right strategy at the right time - consciousness-aware selection
+ * Philosophy: "The right strategy at the right time - visual-effects-aware selection
  * that adapts to the user's device, preferences, and musical journey."
  */
 
@@ -39,8 +39,8 @@ interface BackgroundStrategySelectionCriteria
     webglForceEnabled: boolean;
     visualGuideMode: string;
     depthLayersEnabled: boolean;
-    consciousnessLevel: number;
-    breathingAnimationEnabled: boolean;
+    visualEffectsLevel: number;
+    pulsingAnimationEnabled: boolean;
   };
   musicContext?: {
     energy: number;
@@ -128,7 +128,7 @@ export class BackgroundStrategySelector {
 
     this.strategyMetadata.set("depth-layered", {
       name: "depth-layered",
-      priority: 7, // Medium-high priority - consciousness enhancement
+      priority: 7, // Medium-high priority - visual effects enhancement
       estimatedProcessingTime: 15,
       memoryImpact: 5,
       qualityScore: 9,
@@ -171,7 +171,7 @@ export class BackgroundStrategySelector {
             webglEnabled: settingsContext.webglEnabled,
             webglForceEnabled: settingsContext.webglForceEnabled,
             gradientIntensity: settingsContext.gradientIntensity,
-            consciousnessLevel: settingsContext.consciousnessLevel,
+            visualEffectsLevel: settingsContext.visualEffectsLevel,
           },
         }
       );
@@ -351,12 +351,12 @@ export class BackgroundStrategySelector {
       strategyName: "depth-layered",
       shouldInclude:
         criteria.settingsContext.depthLayersEnabled &&
-        criteria.settingsContext.consciousnessLevel > 0.4 &&
+        criteria.settingsContext.visualEffectsLevel > 0.4 &&
         criteria.deviceContext.performanceLevel !== "low" &&
         depthScore > 0.5,
-      reason: `Depth consciousness (score: ${depthScore.toFixed(
+      reason: `Depth visual effects (score: ${depthScore.toFixed(
         2
-      )}, consciousness: ${criteria.settingsContext.consciousnessLevel})`,
+      )}, visual-effects: ${criteria.settingsContext.visualEffectsLevel})`,
       score: depthScore,
     });
 
@@ -399,11 +399,11 @@ export class BackgroundStrategySelector {
   ): number {
     let score = 0.9; // High base score - foundation layer
 
-    // Breathing animation boost
-    if (criteria.settingsContext.breathingAnimationEnabled) score += 0.1;
+    // Pulsing animation boost
+    if (criteria.settingsContext.pulsingAnimationEnabled) score += 0.1;
 
-    // Consciousness level boost
-    score += criteria.settingsContext.consciousnessLevel * 0.2;
+    // Visual effects level boost
+    score += criteria.settingsContext.visualEffectsLevel * 0.2;
 
     // Music context boost
     if (criteria.musicContext?.valence !== undefined) {
@@ -460,8 +460,8 @@ export class BackgroundStrategySelector {
     if (criteria.deviceContext.memoryCapacity > 4000) score += 0.1; // 4GB+
     if (criteria.deviceContext.memoryCapacity > 8000) score += 0.1; // 8GB+
 
-    // High consciousness level boost
-    if (criteria.settingsContext.consciousnessLevel > 0.7) score += 0.1;
+    // High visual effects level boost
+    if (criteria.settingsContext.visualEffectsLevel > 0.7) score += 0.1;
 
     // High-energy music boost
     if (criteria.musicContext?.energy && criteria.musicContext.energy > 0.8) {
@@ -494,8 +494,8 @@ export class BackgroundStrategySelector {
     // Prefer degraded WebGL over solid colors
     score += 0.3; // Significant preference over non-WebGL fallbacks
 
-    // Consciousness level consideration (reduced impact)
-    if (criteria.settingsContext.consciousnessLevel > 0.5) score += 0.1;
+    // Visual effects level consideration (reduced impact)
+    if (criteria.settingsContext.visualEffectsLevel > 0.5) score += 0.1;
 
     // Music responsiveness (basic support)
     if (criteria.musicContext?.energy && criteria.musicContext.energy > 0.6) {
@@ -524,8 +524,8 @@ export class BackgroundStrategySelector {
 
     score = 0.5; // Base score
 
-    // Consciousness level is critical
-    score += criteria.settingsContext.consciousnessLevel * 0.4;
+    // Visual effects level is critical
+    score += criteria.settingsContext.visualEffectsLevel * 0.4;
 
     // Performance level consideration
     switch (criteria.deviceContext.performanceLevel) {
@@ -596,8 +596,8 @@ export class BackgroundStrategySelector {
         webglForceEnabled: settings.get("sn-webgl-enabled"), // Use same setting
         visualGuideMode: settings.get("sn-artistic-mode") as string, // Use artistic mode as visual guide
         depthLayersEnabled: settings.get("sn-gradient-intensity") !== "disabled",
-        consciousnessLevel: 0.8, // Fixed value for consciousness level
-        breathingAnimationEnabled: true, // Always enabled
+        visualEffectsLevel: 0.8, // Fixed value for visual effects level
+        pulsingAnimationEnabled: true, // Always enabled
       };
     } catch (error) {
       Y3KDebug?.debug?.warn(
@@ -614,8 +614,8 @@ export class BackgroundStrategySelector {
         webglForceEnabled: false,
         visualGuideMode: "cosmic",
         depthLayersEnabled: true,
-        consciousnessLevel: 0.8,
-        breathingAnimationEnabled: true,
+        visualEffectsLevel: 0.8,
+        pulsingAnimationEnabled: true,
       };
     }
   }

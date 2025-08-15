@@ -1,11 +1,11 @@
 // ████████████████████████████████████████████████████████████████████████████████
-// 🌌 COSMIC CONSCIOUSNESS BACKGROUND - Reality Bleeding System
+// 🌌 DYNAMIC BACKGROUND SYSTEM - Visual Effects Layer
 // FLUX YEAR 3000 VISUAL TRANSCENDENCE MODULE
 // "Reality doesn't have backgrounds. Reality IS the background."
 // ████████████████████████████████████████████████████████████████████████████████
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🌊 LIQUID CONSCIOUSNESS FLOW VARIABLES
+// 🌊 DYNAMIC VISUAL FLOW VARIABLES
 // ═══════════════════════════════════════════════════════════════════════════════
 
 :root {
@@ -37,10 +37,10 @@
   --liquid-crystal-viscosity: 0.4;
   --liquid-crystal-surface-tension: 0.8;
   
-  // === HARMONIZED CONSCIOUSNESS BREATHING ===
-  --consciousness-breath-depth: 1.02; // More subtle baseline
-  --consciousness-breath-rhythm: var(--cosmic-meditation-sync); // 15s - matches meditation
-  --consciousness-pulse-intensity: calc(
+  // === HARMONIZED VISUAL EFFECTS ANIMATION ===
+  --visual-effects-animation-depth: 1.02; // More subtle baseline
+  --visual-effects-animation-rhythm: var(--cosmic-meditation-sync); // 15s - matches meditation
+  --visual-effects-pulse-intensity: calc(
     0.7 + 
     max(0, var(--sn-beat-pulse-intensity, 0) - 0.3) * 0.3 + 
     max(0, var(--sn-music-energy, 0) - 0.6) * 0.4
@@ -48,10 +48,10 @@
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎆 AURORA CONSCIOUSNESS KEYFRAMES
+// 🎆 AURORA VISUAL EFFECTS KEYFRAMES
 // ═══════════════════════════════════════════════════════════════════════════════
 
-@keyframes aurora-consciousness-flow {
+@keyframes aurora-visual-effects-flow {
   0% {
     transform: translateX(-100px) translateY(0px) scale(1);
     filter: hue-rotate(0deg) brightness(1) saturate(1.2);
@@ -120,13 +120,13 @@
   }
 }
 
-@keyframes consciousness-breathing {
+@keyframes visual-effects-animation {
   0%, 100% {
     transform: scale(1) rotateZ(0deg);
     filter: brightness(1) saturate(1.2);
   }
   50% {
-    transform: scale(var(--consciousness-breath-depth)) rotateZ(2deg);
+    transform: scale(var(--visual-effects-animation-depth)) rotateZ(2deg);
     filter: brightness(1.1) saturate(1.4);
   }
 }
@@ -164,7 +164,7 @@ body {
   position: relative;
   overflow: hidden;
   
-  // Base cosmic consciousness layer
+  // Base dynamic background layer
   &::before {
     content: "";
     position: fixed;
@@ -175,9 +175,9 @@ body {
     z-index: -1000;
     pointer-events: none;
     
-    // Multi-layered aurora consciousness
+    // Multi-layered aurora visual effects
     background: 
-      // Layer 1: Primary consciousness flow
+      // Layer 1: Primary visual effects flow
       radial-gradient(
         ellipse 100% 60% at 20% 30%, 
         rgba(var(--sn-gradient-primary-rgb), var(--aurora-layer-1-intensity)) 0%,
@@ -205,8 +205,8 @@ body {
     background-size: 300% 300%, 250% 400%, 400% 200%, 100% 100%;
     
     animation: 
-      aurora-consciousness-flow var(--cosmic-flow-speed-1) ease-in-out infinite,
-      consciousness-breathing var(--consciousness-breath-rhythm) ease-in-out infinite;
+      aurora-visual-effects-flow var(--cosmic-flow-speed-1) ease-in-out infinite,
+      visual-effects-animation var(--visual-effects-animation-rhythm) ease-in-out infinite;
   }
   
   // Liquid crystal morphing overlay
@@ -253,12 +253,12 @@ body {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🌠 NEBULA PARTICLE CONSCIOUSNESS FIELD
+// 🌠 NEBULA PARTICLE VISUAL EFFECTS FIELD
 // ═══════════════════════════════════════════════════════════════════════════════
 
 .Root {
   // Nebula particle field generator
-  .nebula-consciousness-field {
+  .nebula-visual-effects-field {
     position: fixed;
     top: 0;
     left: 0;
@@ -267,7 +267,7 @@ body {
     z-index: -998;
     pointer-events: none;
     
-    // Generate consciousness particles using CSS gradients
+    // Generate visual effects particles using CSS gradients
     &::before,
     &::after {
       content: "";
@@ -309,7 +309,7 @@ body {
 }
 
 // Auto-inject nebula field
-.Root:not(:has(.nebula-consciousness-field))::before {
+.Root:not(:has(.nebula-visual-effects-field))::before {
   content: "";
   position: fixed;
   top: 0;
@@ -332,13 +332,13 @@ body {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎵 MUSIC-RESPONSIVE CONSCIOUSNESS AMPLIFICATION
+// 🎵 MUSIC-RESPONSIVE VISUAL EFFECTS AMPLIFICATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Beat-synchronized consciousness intensification
+// Beat-synchronized visual effects intensification
 .Root[style*="--sn-beat-pulse-intensity"] {
   &::before {
-    animation-duration: calc(var(--cosmic-flow-speed-1) / var(--consciousness-pulse-intensity));
+    animation-duration: calc(var(--cosmic-flow-speed-1) / var(--visual-effects-pulse-intensity));
     filter: brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.2)) 
             saturate(calc(1.2 + var(--sn-beat-pulse-intensity, 0) * 0.3));
   }
@@ -350,7 +350,7 @@ body {
   }
 }
 
-// Genre-responsive consciousness adaptation
+// Genre-responsive visual effects adaptation
 .Root[style*="--sn-dynamic-genre-hue-shift"] {
   &::before {
     filter: hue-rotate(var(--sn-dynamic-genre-hue-shift, 0deg)) 
@@ -360,7 +360,7 @@ body {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🌈 ACCESSIBILITY & PERFORMANCE CONSCIOUSNESS
+// 🌈 ACCESSIBILITY & PERFORMANCE OPTIMIZATION
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @media (prefers-reduced-motion: reduce) {
@@ -374,7 +374,7 @@ body {
   :root {
     --cosmic-flow-speed-1: 45s;
     --cosmic-flow-speed-2: 60s;
-    --consciousness-breath-rhythm: 20s;
+    --visual-effects-animation-rhythm: 20s;
     --aurora-layer-1-intensity: 0.08;
     --aurora-layer-2-intensity: 0.05;
     --aurora-layer-3-intensity: 0.03;
@@ -401,4 +401,34 @@ body {
     --aurora-layer-2-intensity: 0.20;
     --aurora-layer-3-intensity: 0.15;
   }
+}
+
+// =============================================================================
+// LEGACY COMPATIBILITY MAPPINGS - Phase 6.3 Layer A Modernization
+// =============================================================================
+
+:root {
+  // === Legacy Consciousness → Visual Effects Mappings ===
+  --consciousness-breath-depth: var(--visual-effects-animation-depth);
+  --consciousness-breath-rhythm: var(--visual-effects-animation-rhythm);
+  --consciousness-pulse-intensity: var(--visual-effects-pulse-intensity);
+}
+
+// Legacy keyframe support
+@keyframes aurora-consciousness-flow {
+  0% { transform: translateX(-100px) translateY(0px) scale(1); filter: hue-rotate(0deg) brightness(1) saturate(1.2); }
+  25% { transform: translateX(50px) translateY(-80px) scale(1.1); filter: hue-rotate(15deg) brightness(1.2) saturate(1.4); }
+  50% { transform: translateX(120px) translateY(40px) scale(0.95); filter: hue-rotate(30deg) brightness(0.9) saturate(1.1); }
+  75% { transform: translateX(-20px) translateY(100px) scale(1.05); filter: hue-rotate(45deg) brightness(1.1) saturate(1.3); }
+  100% { transform: translateX(-100px) translateY(0px) scale(1); filter: hue-rotate(60deg) brightness(1) saturate(1.2); }
+}
+
+@keyframes consciousness-breathing {
+  0%, 100% { transform: scale(1) rotateZ(0deg); filter: brightness(1) saturate(1.2); }
+  50% { transform: scale(var(--consciousness-breath-depth)) rotateZ(2deg); filter: brightness(1.1) saturate(1.4); }
+}
+
+// Legacy class mappings
+.nebula-consciousness-field {
+  @extend .nebula-visual-effects-field !optional;
 }

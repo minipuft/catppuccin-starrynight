@@ -5,18 +5,18 @@ import { SidebarVisualEffectsSystem } from '@/visual/ui/SidebarVisualEffectsSyst
 // - UnifiedSidebarEffectsController merged into SidebarVisualEffectsSystem  
 // - RightSidebarController removed in favor of unified approach
 import { SidebarPerformanceCoordinator } from '@/visual/ui/SidebarPerformanceCoordinator';
-import type { Year3000Config } from '@/types/models';
+import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 import type { HealthCheckResult } from '@/types/systems';
-import { YEAR3000_CONFIG } from '@/config/globalConfig';
+import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 
 // Temporary interfaces for systems that couldn't be created due to build issues
-interface LeftSidebarConsciousnessSystem extends UnifiedSystemBase {
-  getConsciousnessState(): any;
+interface LeftSidebarVisualSystem extends UnifiedSystemBase {
+  getVisualState(): any;
   getAnimationMetrics(): any;
 }
 
-interface RightSidebarConsciousnessSystem extends UnifiedSystemBase {
-  getConsciousnessState(): any;
+interface RightSidebarVisualSystem extends UnifiedSystemBase {
+  getVisualState(): any;
   getAnimationMetrics(): any;
 }
 
@@ -51,11 +51,11 @@ interface SidebarIntegrationMetrics {
  * 
  * Central integration point for all sidebar systems with the Year3000System.
  * This module manages the lifecycle, coordination, and performance monitoring
- * of the bilateral consciousness sidebar architecture.
+ * of the bilateral visual-effects sidebar architecture.
  * 
  * Key Features:
  * - Unified system registration and lifecycle management
- * - Bilateral consciousness coordination
+ * - Bilateral visual-effects coordination
  * - Performance monitoring and optimization
  * - Graceful degradation and error recovery
  * - Integration with existing Year3000System patterns
@@ -86,7 +86,7 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   // Animation frame tracking
   private lastFrameTime = 0;
   
-  constructor(config: Year3000Config = YEAR3000_CONFIG) {
+  constructor(config: Year3000Config = ADVANCED_SYSTEM_CONFIG) {
     super(config);
     
     // Initialize shared performance coordinator
@@ -133,7 +133,7 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
       // Initialize systems in dependency order
       await this.initializeSystemsInOrder();
       
-      // Set up bilateral consciousness coordination
+      // Set up bilateral visual-effects coordination
       this.setupBilateralCoordination();
       
       // Phase 3: Connect to EventBus for system-wide communication
@@ -241,7 +241,7 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   }
   
   /**
-   * Set up bilateral consciousness coordination
+   * Set up bilateral visual-effects coordination
    */
   private setupBilateralCoordination(): void {
     // Simplified coordination for consolidated system
@@ -252,8 +252,8 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
       this.handleBilateralSync(payload);
     });
     
-    this.subscribeToEvent('sidebar:consciousness-level-changed', (payload: any) => {
-      this.handleConsciousnessChange(payload);
+    this.subscribeToEvent('sidebar:visual-level-changed', (payload: any) => {
+      this.handleVisualLevelChange(payload);
     });
   }
   
@@ -268,35 +268,35 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   }
   
   /**
-   * Handle consciousness level changes
+   * Handle visual level changes
    */
-  private handleConsciousnessChange(payload: any): void {
-    // Adapt system performance based on consciousness level
-    const consciousnessLevels = {
+  private handleVisualLevelChange(payload: any): void {
+    // Adapt system performance based on visual intensity level
+    const visualIntensityLevels = {
       dormant: 0.5,
       aware: 0.7,
       focused: 0.9,
-      transcendent: 1.0
+      advanced: 1.0
     };
     
-    const performanceLevel = consciousnessLevels[payload.newLevel as keyof typeof consciousnessLevels] || 0.7;
+    const performanceLevel = visualIntensityLevels[payload.newLevel as keyof typeof visualIntensityLevels] || 0.7;
     
-    // Adjust performance budgets based on consciousness
+    // Adjust performance budgets based on visual intensity
     this.adjustPerformanceBudgets(performanceLevel);
   }
   
   /**
-   * Adjust performance budgets based on consciousness level
+   * Adjust performance budgets based on visual intensity level
    */
   private adjustPerformanceBudgets(level: number): void {
-    // Scale performance budgets with consciousness level
+    // Scale performance budgets with visual intensity level
     const baseBudget = 16;
     const adjustedBudget = Math.floor(baseBudget * level);
     
     // Apply to all sidebar systems
     // Note: This would use the actual setSubsystemBudget when available
     if (this.config.enableDebug) {
-      console.log(`[${this.systemName}] Adjusted performance budget to ${adjustedBudget} based on consciousness level`);
+      console.log(`[${this.systemName}] Adjusted performance budget to ${adjustedBudget} based on visual intensity level`);
     }
   }
   
@@ -492,7 +492,7 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
    * Phase 3: Connect to EventBus for system-wide communication
    */
   private connectToEventBus(): void {
-    // Set up event bus connections for bilateral consciousness coordination
+    // Set up event bus connections for bilateral visual-effects coordination
     this.subscribeToEvent('music:beat', (payload: any) => {
       this.handleMusicBeat(payload);
     });
@@ -544,13 +544,13 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
       // Register with EnhancedMasterAnimationCoordinator if available
       const animationCoordinator = year3000System.enhancedMasterAnimationCoordinator;
       if (animationCoordinator) {
-        // Register bilateral consciousness coordination callback
+        // Register bilateral visual-effects coordination callback
         animationCoordinator.registerFrameCallback(
           (deltaTime: number, timestamp: number) => {
-            this.bilateralConsciousnessFrameUpdate(deltaTime, timestamp);
+            this.bilateralVisualEffectsFrameUpdate(deltaTime, timestamp);
           },
           'critical',
-          'sidebar-bilateral-consciousness'
+          'sidebar-bilateral-visual-effects'
         );
         
         if (this.config.enableDebug) {
@@ -563,22 +563,22 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   }
   
   /**
-   * Handle music beat events for consciousness synchronization
+   * Handle music beat events for visual-effects synchronization
    */
   private handleMusicBeat(payload: any): void {
     if (!this.integrationEnabled) return;
     
-    // Forward beat event to consciousness systems
+    // Forward beat event to visual-effects systems
     const beatData = {
       intensity: payload.intensity || 0.5,
       timestamp: payload.timestamp || Date.now(),
       bpm: payload.bpm || 120
     };
     
-    // Trigger bilateral consciousness beat response via consolidated system
+    // Trigger bilateral visual-effects beat response via consolidated system
     // (functionality now handled by consolidatedSidebarSystem)
     
-    // Update consciousness timing with musical beat
+    // Update visual-effects timing with musical beat
     // Note: SidebarPerformanceCoordinator doesn't have updateMusicSync method yet
     // This would be implemented when the method is available
     if (this.config.enableDebug) {
@@ -587,22 +587,22 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   }
   
   /**
-   * Handle music energy changes for adaptive consciousness
+   * Handle music energy changes for adaptive visual effects
    */
   private handleMusicEnergy(payload: any): void {
     if (!this.integrationEnabled) return;
     
-    // Adapt consciousness intensity based on music energy
+    // Adapt visual effects intensity based on music energy
     const energyLevel = payload.energy || 0.5;
     
-    // Scale consciousness responsiveness with energy
+    // Scale visual effects responsiveness with energy
     this.adjustPerformanceBudgets(0.5 + (energyLevel * 0.5));
     
     // Forward energy data to consolidated system
     if (this.consolidatedSidebarSystem?.initialized) {
       // Energy processing handled by consolidated flow system
       if (this.config.enableDebug) {
-        console.log(`[${this.systemName}] Adapted consciousness to energy level: ${energyLevel}`);
+        console.log(`[${this.systemName}] Adapted visual effects to energy level: ${energyLevel}`);
       }
     }
   }
@@ -627,31 +627,31 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   }
   
   /**
-   * Handle user navigation events for predictive consciousness
+   * Handle user navigation events for predictive visual effects
    */
   private handleUserNavigation(payload: any): void {
     if (!this.integrationEnabled) return;
     
-    // Forward navigation context to consciousness systems for predictive behavior
+    // Forward navigation context to visual-effects systems for predictive behavior
     const navigationContext = {
       action: payload.action || 'navigate',
       target: payload.target || 'unknown',
       timestamp: payload.timestamp || Date.now()
     };
     
-    // This would trigger predictive consciousness adaptation
+    // This would trigger predictive visual effects adaptation
     if (this.config.enableDebug) {
       console.log(`[${this.systemName}] Processing navigation context:`, navigationContext);
     }
   }
   
   /**
-   * Bilateral consciousness frame update callback
+   * Bilateral visual-effects frame update callback
    */
-  private bilateralConsciousnessFrameUpdate(deltaTime: number, timestamp: number): void {
+  private bilateralVisualEffectsFrameUpdate(deltaTime: number, timestamp: number): void {
     if (!this.integrationEnabled) return;
     
-    // Simplified bilateral consciousness for consolidated system
+    // Simplified bilateral visual-effects for consolidated system
     const syncMetrics = {
       frameTime: deltaTime,
       timestamp

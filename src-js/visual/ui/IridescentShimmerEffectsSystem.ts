@@ -9,7 +9,7 @@
  * - Performance-aware with configurable intensity
  */
 
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type {
@@ -20,7 +20,7 @@ import type {
 } from "@/core/performance/SimplePerformanceCoordinator";
 import type { HealthCheckResult } from "@/types/systems";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 
@@ -120,8 +120,8 @@ export class IridescentShimmerEffectsSystem
   private qualityAdjustments: { [key: string]: number } = {};
 
   constructor(
-    config: Year3000Config = YEAR3000_CONFIG,
-    utils: typeof import("@/utils/core/Year3000Utilities"),
+    config: AdvancedSystemConfig | Year3000Config = ADVANCED_SYSTEM_CONFIG,
+    utils: typeof import("@/utils/core/ThemeUtilities"),
     performanceMonitor: SimplePerformanceCoordinator,
     settingsManager: SettingsManager | null = null
   ) {

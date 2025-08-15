@@ -1,4 +1,4 @@
-import { getCanonicalAccent } from "@/utils/core/Year3000Utilities";
+import { getCanonicalAccent } from "@/utils/core/ThemeUtilities";
 
 /**
  * Ensures the canonical accent variables remain in sync. If either the HEX or

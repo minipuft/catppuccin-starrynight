@@ -9,7 +9,7 @@
  */
 
 import type { HealthCheckResult } from "@/types/systems";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { CanvasResult, CanvasContextType } from "@/utils/graphics/VisualCanvasFactory";
 
 // =============================================================================
@@ -22,7 +22,7 @@ export interface SystemLifecycleService {
    */
   initializeSystem(
     systemName: string,
-    config: Year3000Config,
+    config: AdvancedSystemConfig | Year3000Config,
     initFn: () => Promise<void>
   ): Promise<void>;
   

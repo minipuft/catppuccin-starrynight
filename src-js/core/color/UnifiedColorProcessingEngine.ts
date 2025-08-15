@@ -4,7 +4,7 @@
  * Consolidates ColorEventOrchestrator, ColorOrchestrator, EnhancedColorOrchestrator,
  * and ColorHarmonyEngine processing logic into a single, efficient system.
  *
- * Philosophy: "One unified consciousness stream for all color processing -
+ * Philosophy: "One unified visualEffects stream for all color processing -
  * from album art extraction to OKLAB harmony to visual application,
  * a seamless flow of chromatic awareness through the Year 3000 System."
  *
@@ -449,7 +449,7 @@ export class UnifiedColorProcessingEngine
     };
 
     const oklabResult =
-      await this.musicalOKLABCoordinator.coordinateMusicalColors(
+      await this.musicalOKLABCoordinator.processMusicalColors(
         musicalContext
       );
     this.metrics.oklabCoordinations++;
@@ -505,8 +505,8 @@ export class UnifiedColorProcessingEngine
           webglForceEnabled: false, // Default to false in unified engine
           visualGuideMode: "enhanced",
           depthLayersEnabled: true,
-          consciousnessLevel: 0.8,
-          breathingAnimationEnabled: true,
+          visualEffectsLevel: 0.8,
+          pulsingAnimationEnabled: true,
         },
         deviceContext: {
           supportsWebGL: capabilities?.gpu?.supportsWebGL || true,

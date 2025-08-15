@@ -56,7 +56,7 @@
    🏗️ CONSCIOUSNESS DEPTH SYSTEM - Base Architecture
    ═══════════════════════════════════════════════════════════════════════════════ */
 
-.consciousness-depth-system {
+.audio-depth-system {
   position: relative;
   
   /* Content Sanctuary - Protected Area for Text & Interactions */
@@ -100,7 +100,7 @@
   }
   
   /* Consciousness Chrome - Enhanced UI Areas */
-  .consciousness-chrome {
+  .audio-chrome {
     position: absolute;
     top: 0;
     left: 0;
@@ -131,7 +131,7 @@
   }
   
   /* Background Consciousness - Deep Atmospheric Layer */
-  .consciousness-background {
+  .audio-background {
     position: absolute;
     top: 0;
     left: 0;
@@ -213,7 +213,7 @@
 .main-view-container__scroll-node,
 [data-testid*="tracklist"],
 [data-testid*="playlist"] {
-  @extend .content-sanctuary;
+  @extend .content-sanctuary !optional;
   
   /* Enhanced text protection */
   --holographic-intensity: calc(var(--holographic-intensity, 0.5) * 0.1);
@@ -261,7 +261,7 @@
     pointer-events: none;
     
     /* Enhanced chrome consciousness */
-    @extend .consciousness-chrome;
+    @extend .audio-chrome !optional;
     
     /* Stronger atmospheric effects for chrome */
     background: 
@@ -313,7 +313,7 @@
   --reading-mode-active: 1;
   --consciousness-intensity: calc(var(--consciousness-intensity) * 0.1);
   
-  .consciousness-chrome {
+  .audio-chrome {
     opacity: 0.02;
     animation: none;
   }
@@ -325,14 +325,14 @@
 
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
-  .consciousness-depth-system {
+  .audio-depth-system {
     * {
       animation: none !important;
       transition: none !important;
     }
   }
   
-  .consciousness-chrome {
+  .audio-chrome {
     opacity: calc(var(--consciousness-intensity) * 0.3);
   }
 }
@@ -357,7 +357,7 @@
     --consciousness-breath-rate: calc(var(--consciousness-breath-rate) * 2);
   }
   
-  .consciousness-background {
+  .audio-background {
     display: none; /* Remove heavy background effects on mobile */
   }
 }
@@ -369,12 +369,12 @@
 
 /* Integration with existing holographic system */
 .main-view-container {
-  @extend .consciousness-depth-system;
+  @extend .audio-depth-system !optional;
   
   /* Override previous problematic effects with consciousness system */
   &::before {
     /* Replace old enhancement lens with content-aware consciousness */
-    @extend .consciousness-chrome;
+    @extend .audio-chrome !optional;
     
     /* Content-aware positioning - avoid text overlap */
     clip-path: polygon(
@@ -394,5 +394,5 @@
 /* Ensure all content areas are protected */
 .main-view-container__scroll-node,
 .main-view-container__scroll-node-child {
-  @extend .content-sanctuary;
+  @extend .content-sanctuary !optional;
 }

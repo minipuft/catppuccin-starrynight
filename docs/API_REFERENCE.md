@@ -1,10 +1,10 @@
 # API Reference
 
-> **"In the Year 3000, every interface becomes a portal to consciousness—each method a pathway to transcendent user experience, each parameter a note in the symphony of living code."**
+> **"With advanced systems, every interface becomes a portal to visual excellence—each method a pathway to transcendent user experience, each parameter a note in the symphony of dynamic visual effects."**
 
 ## Overview
 
-This comprehensive API reference documents all public interfaces, classes, and methods in the Catppuccin StarryNight theme architecture. The API is designed around the **Year 3000 System philosophy** where interfaces are grown, not built, and each component contributes to a unified consciousness-aware experience.
+This comprehensive API reference documents all public interfaces, classes, and methods in the Catppuccin StarryNight theme architecture. The API is designed around the **Advanced System philosophy** where interfaces are systematically enhanced, and each component contributes to a unified visual-aware experience.
 
 ### API Design Philosophy
 
@@ -12,13 +12,13 @@ This comprehensive API reference documents all public interfaces, classes, and m
 2. **Performance-Aware** - All methods respect performance budgets and adaptive quality
 3. **Type-Safe** - Strict TypeScript with zero `any` types allowed
 4. **Facade-Integrated** - Unified access through facade pattern architecture
-5. **Organic Evolution** - APIs evolve naturally through biological-inspired patterns
+5. **Dynamic Evolution** - APIs evolve naturally through performance-optimized patterns
 
 ## Core Architecture Interfaces
 
 ### IManagedSystem
 
-The foundational interface implemented by all systems in the Year 3000 architecture.
+The foundational interface implemented by all systems in the Advanced architecture.
 
 **Location**: `src-js/core/interfaces/IManagedSystem.ts`
 
@@ -50,7 +50,7 @@ console.log(system.initialized); // true
 
 ##### `updateAnimation(deltaTime: number): void`
 
-Periodic update tick for animations and consciousness evolution.
+Periodic update tick for animations and visual effects evolution.
 
 **Parameters**:
 - `deltaTime` (number): Time in milliseconds since last frame
@@ -126,27 +126,27 @@ interface HealthCheckResult {
 **Example Response**:
 ```typescript
 {
-  system: "FlowingLiquidConsciousnessSystem",
+  system: "FlowingLiquidVisualSystem",
   healthy: true,
   details: "System operational, performance optimal",
   metrics: {
     frameRate: 60,
     memoryUsage: 12.5,
-    consciousnessLevel: 0.8
+    visualLevel: 0.8
   }
 }
 ```
 
 ## Configuration Interfaces
 
-### Year3000Config
+### AdvancedSystemConfig
 
 Main configuration object for the entire Year 3000 System.
 
 **Location**: `src-js/types/models.ts`
 
 ```typescript
-interface Year3000Config {
+interface AdvancedSystemConfig {
   // Core Settings
   enableDebug: boolean;
   enableContextualIntelligence: boolean;
@@ -174,7 +174,7 @@ interface Year3000Config {
   harmonicEvolution: boolean;
   
   // Methods
-  init(): Year3000Config;
+  init(): AdvancedSystemConfig;
   getCurrentModeProfile(): ArtisticModeProfile;
   getCurrentMultipliers(): MultiplierProfile;
   getCurrentFeatures(): FeatureProfile;
@@ -191,7 +191,7 @@ interface Year3000Config {
 
 #### Key Methods
 
-##### `init(): Year3000Config`
+##### `init(): AdvancedSystemConfig`
 
 Initializes the configuration system.
 
@@ -199,7 +199,7 @@ Initializes the configuration system.
 
 **Example**:
 ```typescript
-const config = YEAR3000_CONFIG.init();
+const config = ADVANCED_SYSTEM_CONFIG.init();
 console.log(config.isFullyInitialized()); // true
 ```
 
@@ -233,7 +233,7 @@ config.setupForProduction();
 
 ### ArtisticModeProfile
 
-Configuration profile for different artistic consciousness levels.
+Configuration profile for different artistic visual levels.
 
 ```typescript
 interface ArtisticModeProfile {
@@ -303,7 +303,7 @@ visualSystem.setPalette(colorStops, 500); // 500ms transition
 
 ##### `setMusicMetrics(metrics: MusicMetrics): void`
 
-Updates music synchronization data for audio-visual consciousness.
+Updates music synchronization data for audio-visual integration.
 
 **Parameters**:
 - `metrics`: Music analysis data including BPM, energy, valence
@@ -316,7 +316,7 @@ const musicData = {
   valence: 0.6,
   beatIntensity: 0.9,
   rhythmPhase: 180,
-  breathingScale: 1.1
+  pulsingScale: 1.1
 };
 visualSystem.setMusicMetrics(musicData);
 ```
@@ -341,8 +341,8 @@ Abstract base class providing common functionality for visual systems.
 
 ```typescript
 abstract class BaseVisualSystem {
-  protected config: Year3000Config;
-  protected utils: typeof Year3000Utilities;
+  protected config: AdvancedSystemConfig;
+  protected utils: typeof ThemeUtilities;
   protected performanceMonitor: PerformanceAnalyzer;
   protected musicSyncService: MusicSyncService | null;
   protected settingsManager: SettingsManager | null;
@@ -351,8 +351,8 @@ abstract class BaseVisualSystem {
   public isActive: boolean;
   
   constructor(
-    config: Year3000Config,
-    utils: typeof Year3000Utilities,
+    config: AdvancedSystemConfig,
+    utils: typeof ThemeUtilities,
     performanceMonitor: PerformanceAnalyzer,
     musicSyncService: MusicSyncService | null,
     settingsManager: SettingsManager | null
@@ -380,23 +380,23 @@ abstract class BaseVisualSystem {
 
 ##### `_createOptimizedKineticCanvas(id, zIndex, blendMode, kineticMode): Promise<CanvasResult>`
 
-Creates performance-optimized canvas with consciousness-aware settings.
+Creates performance-optimized canvas with visual-aware settings.
 
 **Parameters**:
 - `id`: Unique canvas identifier
 - `zIndex`: CSS z-index for layering
 - `blendMode`: CSS blend mode (`multiply`, `screen`, `overlay`, etc.)
-- `kineticMode`: Consciousness mode (`breathe`, `pulse`, `flow`)
+- `kineticMode`: Visual mode (`pulse`, `flow`, `smooth`)
 
 **Returns**: Promise resolving to canvas result with context and element
 
 **Example**:
 ```typescript
 const canvasResult = await this._createOptimizedKineticCanvas(
-  'consciousness-layer',
+  'visual-layer',
   10,
   'multiply',
-  'breathe'
+  'pulse'
 );
 console.log('Canvas ready:', canvasResult.success);
 ```
@@ -455,7 +455,7 @@ Distributes events across all registered systems.
 **Example**:
 ```typescript
 coordinator.propagateEvent({
-  type: 'consciousness-shift',
+  type: 'visual-effects-shift',
   payload: { level: 0.8, intensity: 'high' },
   timestamp: performance.now(),
   source: 'MusicSyncService'
@@ -503,7 +503,7 @@ const particles = facade.getVisualSystem<LightweightParticleSystem>('Particle');
 await particles?.initialize();
 
 // Create flowing liquid system
-const flowing = facade.getVisualSystem<FlowingLiquidConsciousnessSystem>('FlowingLiquid');
+const flowing = facade.getVisualSystem<FlowingLiquidDynamicSystem>('FlowingLiquid');
 await flowing?.initialize();
 ```
 
@@ -675,14 +675,14 @@ console.log(`State updates: ${metrics.stateUpdates}`);
 console.log(`Coordination events: ${metrics.coordinationEvents}`);
 ```
 
-### Consciousness Event Interfaces
+### VisualEffects Event Interfaces
 
-#### BeatConsciousnessEvent
+#### BeatVisualEffectsEvent
 
-Beat consciousness event for rhythmic synchronization.
+Beat visual-effects event for rhythmic synchronization.
 
 ```typescript
-interface BeatConsciousnessEvent {
+interface BeatVisualEffectsEvent {
   intensity: number;      // 0-1 beat strength
   bpm?: number;          // Current BPM
   energy?: number;       // 0-1 music energy
@@ -693,22 +693,22 @@ interface BeatConsciousnessEvent {
 
 **Example**:
 ```typescript
-const beatEvent: BeatConsciousnessEvent = {
+const beatEvent: BeatVisualEffectsEvent = {
   intensity: 0.9,
   bpm: 128,
   energy: 0.8,
   timestamp: performance.now()
 };
 
-organicSystem.handleBeatConsciousness(beatEvent);
+dynamicSystem.handleBeatVisualEffects(beatEvent);
 ```
 
-#### EmotionalConsciousnessEvent
+#### EmotionalVisualEffectsEvent
 
-Emotional consciousness event for mood-based visual adaptation.
+Emotional visual-effects event for mood-based visual adaptation.
 
 ```typescript
-interface EmotionalConsciousnessEvent {
+interface EmotionalVisualEffectsEvent {
   emotion: string;        // Detected emotion
   valence: number;        // 0-1 pleasantness
   energy: number;         // 0-1 intensity
@@ -720,7 +720,7 @@ interface EmotionalConsciousnessEvent {
 
 **Example**:
 ```typescript
-const emotionalEvent: EmotionalConsciousnessEvent = {
+const emotionalEvent: EmotionalVisualEffectsEvent = {
   emotion: 'energetic',
   valence: 0.8,
   energy: 0.9,
@@ -729,7 +729,7 @@ const emotionalEvent: EmotionalConsciousnessEvent = {
   timestamp: performance.now()
 };
 
-organicSystem.handleEmotionalConsciousness(emotionalEvent);
+dynamicSystem.handleEmotionalVisualEffects(emotionalEvent);
 ```
 
 ## Audio Integration API
@@ -742,7 +742,7 @@ Service providing real-time music analysis and beat detection.
 
 ```typescript
 class MusicSyncService {
-  constructor(config: Year3000Config);
+  constructor(config: AdvancedSystemConfig);
   
   async initialize(): Promise<void>;
   subscribe(system: any, systemName: string): void;
@@ -796,7 +796,7 @@ Engine providing OKLAB color science and perceptually uniform color processing.
 
 ```typescript
 class ColorHarmonyEngine {
-  constructor(config: Year3000Config);
+  constructor(config: AdvancedSystemConfig);
   
   async initialize(): Promise<void>;
   blendColors(rgb1: RGBColor, rgb2: RGBColor, ratio?: number): RGBColor;
@@ -861,7 +861,7 @@ System providing comprehensive performance monitoring and adaptive quality manag
 
 ```typescript
 class PerformanceAnalyzer {
-  constructor(config: Year3000Config);
+  constructor(config: AdvancedSystemConfig);
   
   async initialize(): Promise<void>;
   startTiming(label: string): number;
@@ -960,15 +960,15 @@ console.log(`WebGL2 support: ${detector.supportsWebGL2()}`);
 console.log(`Max texture size: ${detector.getMaxTextureSize()}`);
 ```
 
-### OptimizedUnifiedCSSConsciousnessController
+### UnifiedCSSVariableManager
 
 **Phase 2.6 Consolidation**: Unified CSS variable management system that consolidates three overlapping systems into one optimized controller with priority queues, adaptive throttling, and global instance management.
 
-**Location**: `src-js/core/performance/OptimizedUnifiedCSSConsciousnessController.ts`
+**Location**: `src-js/core/css/UnifiedCSSVariableManager.ts`
 
 ```typescript
-class OptimizedUnifiedCSSConsciousnessController {
-  constructor(config: Year3000Config, performanceAnalyzer: PerformanceAnalyzer);
+class UnifiedCSSVariableManager {
+  constructor(config: AdvancedSystemConfig, performanceAnalyzer: PerformanceAnalyzer);
   
   // Core CSS Variable Management
   queueCSSVariableUpdate(
@@ -1007,12 +1007,12 @@ class OptimizedUnifiedCSSConsciousnessController {
   getPerformanceMetrics(): CSSPerformanceMetrics;
   
   // Global Instance Management
-  static getGlobalInstance(): OptimizedUnifiedCSSConsciousnessController;
+  static getGlobalInstance(): UnifiedCSSVariableManager;
 }
 
 // Global instance functions
-export function getGlobalOptimizedCSSController(): OptimizedUnifiedCSSConsciousnessController;
-export function setGlobalOptimizedCSSController(instance: OptimizedUnifiedCSSConsciousnessController): void;
+export function getGlobalOptimizedCSSController(): UnifiedCSSVariableManager;
+export function setGlobalOptimizedCSSController(instance: UnifiedCSSVariableManager): void;
 ```
 
 #### Priority System
@@ -1127,14 +1127,14 @@ systemCoordinator.propagateEvent(visualEvent);
 
 ## Utility APIs
 
-### Year3000Utilities
+### ThemeUtilities
 
 Collection of utility functions for the Year 3000 System.
 
-**Location**: `src-js/utils/core/Year3000Utilities.ts`
+**Location**: `src-js/utils/core/ThemeUtilities.ts`
 
 ```typescript
-export namespace Year3000Utilities {
+export namespace ThemeUtilities {
   // Color Utilities
   export function rgbToOklab(r: number, g: number, b: number): OKLABColor;
   export function oklabToRgb(L: number, a: number, b: number): RGBColor;
@@ -1172,22 +1172,22 @@ export namespace Year3000Utilities {
 
 **Example Usage**:
 ```typescript
-import * as Year3000Utilities from '@/utils/core/Year3000Utilities';
+import * as ThemeUtilities from '@/utils/core/ThemeUtilities';
 
 // Color conversion
-const oklab = Year3000Utilities.rgbToOklab(255, 100, 150);
-const rgb = Year3000Utilities.oklabToRgb(oklab.L, oklab.a, oklab.b);
+const oklab = ThemeUtilities.rgbToOklab(255, 100, 150);
+const rgb = ThemeUtilities.oklabToRgb(oklab.L, oklab.a, oklab.b);
 
 // Performance optimization
-const throttledUpdate = Year3000Utilities.throttle(updateVisualization, 16);
+const throttledUpdate = ThemeUtilities.throttle(updateVisualization, 16);
 
 // Animation easing
-const progress = Year3000Utilities.easeInOutCubic(0.5);
-const interpolated = Year3000Utilities.lerp(0, 100, progress);
+const progress = ThemeUtilities.easeInOutCubic(0.5);
+const interpolated = ThemeUtilities.lerp(0, 100, progress);
 
 // DOM optimization
-const element = Year3000Utilities.createOptimizedElement('div', 'consciousness-layer');
-Year3000Utilities.setOptimizedStyles(element, {
+const element = ThemeUtilities.createOptimizedElement('div', 'visual-effects-layer');
+ThemeUtilities.setOptimizedStyles(element, {
   'will-change': 'transform',
   'contain': 'layout style paint'
 });
@@ -1200,13 +1200,13 @@ Year3000Utilities.setOptimizedStyles(element, {
 Global debug object exposed when debug mode is enabled.
 
 ```typescript
-// Available when YEAR3000_CONFIG.enableDebug = true
+// Available when ADVANCED_SYSTEM_CONFIG.enableDebug = true
 declare global {
   var Y3K: {
     systems: Map<string, IManagedSystem>;
     performance: PerformanceAnalyzer;
     coordinator: SystemCoordinator;
-    config: Year3000Config;
+    config: AdvancedSystemConfig;
     
     // Debug Methods
     getSystemHealth(): Promise<SystemHealthReport>;
@@ -1287,9 +1287,9 @@ interface LegacyBeatSyncCompat {
 }
 
 // Migration helper
-interface OrganicConsciousnessMigration {
-  convertLegacyBeatSync(legacy: LegacyBeatSyncCompat): OrganicConsciousnessState;
-  convertLegacyConfig(legacy: any): OrganicConsciousnessConfig;
+interface DynamicVisualEffectsMigration {
+  convertLegacyBeatSync(legacy: LegacyBeatSyncCompat): DynamicVisualEffectsState;
+  convertLegacyConfig(legacy: any): DynamicVisualEffectsConfig;
   migrateLegacyEventHandlers(legacy: any): void;
 }
 ```
@@ -1304,8 +1304,8 @@ const legacy: LegacyBeatSyncCompat = {
   visualIntensity: 0.7
 };
 
-const organicState = migration.convertLegacyBeatSync(legacy);
-console.log('Migrated to organic consciousness:', organicState);
+const dynamicState = migration.convertLegacyBeatSync(legacy);
+console.log('Migrated to dynamic visual-effects:', dynamicState);
 ```
 
 ## Type Definitions Summary
@@ -1350,7 +1350,7 @@ interface CanvasResult {
 
 ```typescript
 // 1. Initialize configuration
-const config = YEAR3000_CONFIG.init();
+const config = ADVANCED_SYSTEM_CONFIG.init();
 config.setupForProduction();
 
 // 2. Create system coordinator with dependencies
@@ -1366,7 +1366,7 @@ await coordinator.initialize();
 
 // 4. Create and initialize visual systems
 const particleSystem = coordinator.createVisualSystem<LightweightParticleSystem>('Particle');
-const flowingSystem = coordinator.createVisualSystem<FlowingLiquidConsciousnessSystem>('FlowingLiquid');
+const flowingSystem = coordinator.createVisualSystem<FlowingLiquidDynamicSystem>('FlowingLiquid');
 
 await Promise.all([
   particleSystem?.initialize(),
@@ -1394,7 +1394,7 @@ class MyVisualSystem extends BaseVisualSystem {
   async initialize(): Promise<void> {
     await super.initialize();
     
-    // Create optimized canvas with consciousness awareness
+    // Create optimized canvas with visual-effects awareness
     const canvasResult = await this._createOptimizedKineticCanvas(
       'my-system-canvas',
       10,
@@ -1414,8 +1414,8 @@ class MyVisualSystem extends BaseVisualSystem {
     const timingId = this.performanceMonitor.startTiming('update_animation');
     
     try {
-      // Consciousness-aware animation updates
-      this.updateWithConsciousness(deltaTime);
+      // VisualEffects-aware animation updates
+      this.updateWithVisualEffects(deltaTime);
     } finally {
       this.performanceMonitor.endTiming(timingId);
     }
@@ -1431,7 +1431,7 @@ class MyVisualSystem extends BaseVisualSystem {
       metrics: {
         fps: metrics.fps,
         memory: metrics.memoryUsageMB,
-        consciousnessLevel: this.getCurrentConsciousnessLevel()
+        visual-effectsLevel: this.getCurrentVisualEffectsLevel()
       }
     };
   }
@@ -1451,4 +1451,4 @@ class MyVisualSystem extends BaseVisualSystem {
 
 ---
 
-*Part of the Year 3000 System - where every API becomes a gateway to transcendent user experience and consciousness-aware interface development.*
+*Part of the Advanced System - where every API becomes a gateway to transcendent user experience and visual-effects-aware interface development.*

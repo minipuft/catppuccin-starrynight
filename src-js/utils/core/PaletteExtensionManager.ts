@@ -1,5 +1,5 @@
-import type { Year3000Config } from "@/types/models";
-import * as Year3000Utilities from "./Year3000Utilities";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
+import * as ThemeUtilities from "./ThemeUtilities";
 
 // TODO: Phase 3 - Types for extensible palette system
 interface CustomPalette {
@@ -38,13 +38,13 @@ const GENRE_PALETTE_HINTS = {
 };
 
 export class PaletteExtensionManager {
-  private config: Year3000Config;
-  private utils: typeof Year3000Utilities;
+  private config: AdvancedSystemConfig | Year3000Config;
+  private utils: typeof ThemeUtilities;
   private paletteCache: PaletteCache = {};
   private cacheTTL: number = 300000; // 5 minutes
   private maxCacheSize: number = 50;
 
-  constructor(config: Year3000Config, utils: typeof Year3000Utilities) {
+  constructor(config: AdvancedSystemConfig | Year3000Config, utils: typeof ThemeUtilities) {
     this.config = config;
     this.utils = utils;
   }

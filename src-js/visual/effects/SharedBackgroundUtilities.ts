@@ -1,12 +1,12 @@
 /**
- * Shared Background Consciousness Utilities
+ * Shared Background Visual Utilities
  *
  * Shared utilities and base classes for background systems implementing
- * consciousness choreography patterns, eliminating code duplication across
+ * visual coordination patterns, eliminating code duplication across
  * WebGL, Liquid, and Depth background systems.
  *
  * @architecture Phase 2.2C Optimization & Consolidation
- * @philosophy Organic consciousness coordination through shared infrastructure
+ * @philosophy Smooth visual coordination through shared infrastructure
  */
 
 import { getGlobalOptimizedCSSController, OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
@@ -15,23 +15,23 @@ import { ShaderLoader } from "@/utils/graphics/ShaderLoader";
 import type {
   VisualEffectsCoordinator as BackgroundAnimationCoordinator,
   BackgroundSystemParticipant,
-  VisualEffectState as ConsciousnessField,
+  VisualEffectState as VisualField,
 } from "./VisualEffectsCoordinator";
 
 // ===================================================================
-// SHARED CONSCIOUSNESS REGISTRATION UTILITIES
+// SHARED VISUAL REGISTRATION UTILITIES
 // ===================================================================
 
 /**
- * Standard consciousness choreographer registration pattern
+ * Standard visual coordinator registration pattern
  * Eliminates duplicate registration code across all background systems
  */
 export class BackgroundSystemRegistry {
   /**
-   * Register a background system as a consciousness participant
+   * Register a background system as a visual participant
    * Standard pattern used by WebGL, Liquid, and Depth systems
    */
-  public static registerWithConsciousnessChoreographer(
+  public static registerWithVisualCoordinator(
     participant: BackgroundSystemParticipant,
     choreographer: BackgroundAnimationCoordinator | null,
     systemName: string
@@ -39,22 +39,22 @@ export class BackgroundSystemRegistry {
     if (!choreographer) {
       Y3KDebug?.debug?.log(
         systemName,
-        "Consciousness choreographer not available, skipping registration"
+        "Visual coordinator not available, skipping registration"
       );
       return false;
     }
 
     try {
-      choreographer.registerConsciousnessParticipant(participant);
+      choreographer.registerVisualEffectsParticipant(participant);
       Y3KDebug?.debug?.log(
         systemName,
-        "Successfully registered with consciousness choreographer"
+        "Successfully registered with visual coordinator"
       );
       return true;
     } catch (error) {
       Y3KDebug?.debug?.error(
         systemName,
-        "Failed to register with consciousness choreographer:",
+        "Failed to register with visual coordinator:",
         error
       );
       return false;
@@ -62,25 +62,25 @@ export class BackgroundSystemRegistry {
   }
 
   /**
-   * Unregister from consciousness choreographer during cleanup
+   * Unregister from visual coordinator during cleanup
    * Standard cleanup pattern for all background systems
    */
-  public static unregisterFromConsciousnessChoreographer(
+  public static unregisterFromVisualCoordinator(
     choreographer: BackgroundAnimationCoordinator | null,
     systemName: string
   ): void {
     if (!choreographer) return;
 
     try {
-      choreographer.unregisterConsciousnessParticipant(systemName);
+      choreographer.unregisterVisualEffectsParticipant(systemName);
       Y3KDebug?.debug?.log(
         systemName,
-        "Unregistered from consciousness choreographer"
+        "Unregistered from visual coordinator"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
         systemName,
-        "Error unregistering from consciousness choreographer:",
+        "Error unregistering from visual coordinator:",
         error
       );
     }
@@ -135,13 +135,13 @@ export class ShaderResourceManager {
 
       Y3KDebug?.debug?.log(
         systemName,
-        "Successfully compiled consciousness shaders"
+        "Successfully compiled visual shaders"
       );
       return shaderProgram;
     } catch (error) {
       Y3KDebug?.debug?.error(
         systemName,
-        "Failed to compile consciousness shaders:",
+        "Failed to compile visual shaders:",
         error
       );
       return null;
@@ -211,18 +211,18 @@ export class ShaderResourceManager {
 }
 
 // ===================================================================
-// SHARED CSS CONSCIOUSNESS INTEGRATION
+// SHARED CSS VISUAL INTEGRATION
 // ===================================================================
 
 /**
- * Consolidated CSS consciousness variable updates
+ * Consolidated CSS visual variable updates
  * Eliminates duplicate CSS variable update patterns
  */
 export class CSSVariableIntegrator {
   private static cssController: OptimizedCSSVariableManager | null = null;
 
   /**
-   * Get or cache the CSS consciousness controller instance
+   * Get or cache the CSS controller instance
    */
   private static getCSSController(): OptimizedCSSVariableManager | null {
     if (!this.cssController) {
@@ -232,10 +232,10 @@ export class CSSVariableIntegrator {
   }
 
   /**
-   * Update CSS variable with consciousness awareness
+   * Update CSS variable with visual awareness
    * Standard pattern for hybrid WebGL/CSS coordination
    */
-  public static updateConsciousnessVariable(
+  public static updateVisualVariable(
     variableName: string,
     value: string | number
   ): void {
@@ -246,10 +246,10 @@ export class CSSVariableIntegrator {
   }
 
   /**
-   * Batch update multiple consciousness CSS variables
+   * Batch update multiple visual CSS variables
    * Optimized for systems updating multiple variables simultaneously
    */
-  public static updateConsciousnessVariablesBatch(variables: {
+  public static updateVisualVariablesBatch(variables: {
     [key: string]: string | number;
   }): void {
     const cssController = this.getCSSController();
@@ -262,12 +262,12 @@ export class CSSVariableIntegrator {
 }
 
 // ===================================================================
-// SHARED CONSCIOUSNESS FIELD RESPONSE PATTERNS
+// SHARED VISUAL FIELD RESPONSE PATTERNS
 // ===================================================================
 
 /**
- * Standard consciousness field response utilities
- * Common patterns for responding to consciousness field updates
+ * Standard visual field response utilities
+ * Common patterns for responding to visual field updates
  */
 export class BackgroundEventResponder {
   /**
@@ -283,21 +283,21 @@ export class BackgroundEventResponder {
   }
 
   /**
-   * Standard breathing cycle modulation
-   * Organic breathing pattern used across systems
+   * Standard pulsing cycle modulation
+   * Smooth pulsing pattern used across systems
    */
-  public static calculateBreathingModulation(
+  public static calculatePulsingModulation(
     baseValue: number,
-    breathingCycle: number,
+    pulsingCycle: number,
     amplitude: number = 0.1
   ): number {
-    const breathingPhase = Math.sin(breathingCycle * Math.PI * 2);
-    return baseValue * (1.0 + breathingPhase * amplitude);
+    const pulsingPhase = Math.sin(pulsingCycle * Math.PI * 2);
+    return baseValue * (1.0 + pulsingPhase * amplitude);
   }
 
   /**
    * Musical flow direction response
-   * Standard flow direction calculation from consciousness field
+   * Standard flow direction calculation from visual field
    */
   public static calculateFlowResponse(
     musicalFlow: { x: number; y: number },
@@ -364,22 +364,22 @@ export class ChoreographyEventResponder {
   }
 
   /**
-   * Standard breathing cycle synchronization
-   * Common pattern for organic breathing effects
+   * Standard pulsing cycle synchronization
+   * Common pattern for smooth pulsing effects
    */
-  public static handleBreathingCycle(
+  public static handlePulsingCycle(
     baseValue: number,
-    breathingPhase: number,
+    pulsingPhase: number,
     amplitude: number = 0.3
   ): number {
-    return baseValue + Math.sin(breathingPhase * Math.PI * 2) * amplitude;
+    return baseValue + Math.sin(pulsingPhase * Math.PI * 2) * amplitude;
   }
 
   /**
-   * Standard membrane fluidity response
+   * Standard surface fluidity response
    * Common pattern for boundary fluidity effects
    */
-  public static handleMembraneFluid(
+  public static handleSurfaceFluid(
     targetProperty: number,
     fluidityIndex: number
   ): number {
@@ -435,7 +435,7 @@ export class MusicSyncUtilities {
 }
 
 // ===================================================================
-// BASE CONSCIOUSNESS PARTICIPANT CLASS
+// BASE VISUAL PARTICIPANT CLASS
 // ===================================================================
 
 /**
@@ -445,37 +445,36 @@ export class MusicSyncUtilities {
 export abstract class BaseBackgroundSystem
   implements BackgroundSystemParticipant
 {
-  protected consciousnessChoreographer: BackgroundAnimationCoordinator | null =
+  protected visualCoordinator: BackgroundAnimationCoordinator | null =
     null;
-  protected currentConsciousnessField: ConsciousnessField | null = null;
+  protected currentVisualField: VisualField | null = null;
 
   // Abstract properties that must be implemented by subclasses
   public abstract readonly systemName: string;
   public abstract get systemPriority(): "low" | "normal" | "high" | "critical";
 
   // Abstract methods that must be implemented by subclasses
-  public abstract getConsciousnessContribution(): any;
-  protected abstract updateFromConsciousness(field: ConsciousnessField): void;
+  protected abstract updateFromVisual(field: VisualField): void;
 
-  // Shared implementation of consciousness field updates
-  public onConsciousnessFieldUpdate(field: ConsciousnessField): void {
+  // Shared implementation of visual field updates
+  public onVisualFieldUpdate(field: VisualField): void {
     try {
-      this.currentConsciousnessField = field;
-      this.updateFromConsciousness(field);
+      this.currentVisualField = field;
+      this.updateFromVisual(field);
 
       Y3KDebug?.debug?.log(
         this.systemName,
-        "Updated from consciousness field:",
+        "Updated from visual field:",
         {
           rhythmicPulse: field.pulseRate,
           energyResonance: field.energyLevel,
-          breathingCycle: field.pulseRate,
+          pulsingCycle: field.pulseRate,
         }
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
         this.systemName,
-        "Error updating from consciousness field:",
+        "Error updating from visual field:",
         error
       );
     }
@@ -491,11 +490,11 @@ export abstract class BaseBackgroundSystem
         case "choreography:energy-surge":
           this.handleEnergySurge(payload);
           break;
-        case "consciousness:breathing-cycle":
-          this.handleBreathingCycle(payload);
+        case "visual:pulsing-cycle":
+          this.handlePulsingCycle(payload);
           break;
-        case "consciousness:membrane-fluid":
-          this.handleMembraneFluid(payload);
+        case "visual:surface-fluid":
+          this.handleSurfaceFluid(payload);
           break;
         default:
           // Allow subclasses to handle additional events
@@ -503,9 +502,9 @@ export abstract class BaseBackgroundSystem
           break;
       }
 
-      // Reapply consciousness field if available
-      if (this.currentConsciousnessField) {
-        this.updateFromConsciousness(this.currentConsciousnessField);
+      // Reapply visual field if available
+      if (this.currentVisualField) {
+        this.updateFromVisual(this.currentVisualField);
       }
 
       Y3KDebug?.debug?.log(
@@ -531,12 +530,12 @@ export abstract class BaseBackgroundSystem
     // Override in subclasses for specific energy surge handling
   }
 
-  protected handleBreathingCycle(payload: any): void {
-    // Override in subclasses for specific breathing cycle handling
+  protected handlePulsingCycle(payload: any): void {
+    // Override in subclasses for specific pulsing cycle handling
   }
 
-  protected handleMembraneFluid(payload: any): void {
-    // Override in subclasses for specific membrane fluid handling
+  protected handleSurfaceFluid(payload: any): void {
+    // Override in subclasses for specific surface fluid handling
   }
 
   // Allow subclasses to handle custom events
@@ -551,8 +550,8 @@ export abstract class BaseBackgroundSystem
   protected registerWithChoreographer(
     choreographer: BackgroundAnimationCoordinator | null
   ): void {
-    this.consciousnessChoreographer = choreographer;
-    BackgroundSystemRegistry.registerWithConsciousnessChoreographer(
+    this.visualCoordinator = choreographer;
+    BackgroundSystemRegistry.registerWithVisualCoordinator(
       this,
       choreographer,
       this.systemName
@@ -560,8 +559,8 @@ export abstract class BaseBackgroundSystem
   }
 
   protected unregisterFromChoreographer(): void {
-    BackgroundSystemRegistry.unregisterFromConsciousnessChoreographer(
-      this.consciousnessChoreographer,
+    BackgroundSystemRegistry.unregisterFromVisualCoordinator(
+      this.visualCoordinator,
       this.systemName
     );
   }
@@ -570,7 +569,7 @@ export abstract class BaseBackgroundSystem
   // BACKGROUND SYSTEM PARTICIPANT INTERFACE (ABSTRACT)
   // =========================================================================
 
-  public abstract onVisualStateUpdate(state: ConsciousnessField): void;
+  public abstract onVisualStateUpdate(state: VisualField): void;
   public abstract onVisualEffectEvent(eventType: string, payload: any): void;
-  public abstract getVisualContribution(): Partial<ConsciousnessField>;
+  public abstract getVisualContribution(): Partial<VisualField>;
 }

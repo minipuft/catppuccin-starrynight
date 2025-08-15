@@ -533,8 +533,8 @@ jest.mock('@/core/performance/OptimizedCSSVariableManager', () => ({
   isGlobalOptimizedCSSControllerAvailable: () => true
 }));
 
-// Mock Year3000System global
-(global as any).year3000System = {
+// Mock AdvancedThemeSystem global
+(global as any).advancedThemeSystem = {
   isInitialized: true,
   getCachedNonVisualSystem: jest.fn(() => mockOptimizedCSSController),
   config: { enableDebug: false, artisticMode: 'artist-vision' },

@@ -1,17 +1,17 @@
 /**
  * GenreGradientEvolution - Musical Genre to Visual Style Evolution
- * Part of the Year 3000 Flux Consciousness System
+ * Part of the Year 3000 Flux Visual Effects System
  *
  * Creates distinct gradient visual styles for different music genres:
  * - Electronic: Synthetic, digital patterns with sharp edges
  * - Rock: Bold, high-energy gradients with strong contrast
  * - Classical: Elegant, sophisticated gradients with smooth transitions
- * - Jazz: Complex, improvisational gradients with organic movement
+ * - Jazz: Complex, improvisational gradients with smooth movement
  * - Hip-Hop: Urban, rhythmic gradients with geometric patterns
  * - Ambient: Atmospheric, ethereal gradients with slow evolution
  * - Pop: Bright, accessible gradients with catchy visual hooks
  * - Metal: Intense, dark gradients with aggressive patterns
- * - Folk: Natural, organic gradients with earthy tones
+ * - Folk: Natural, smooth gradients with earthy tones
  * - Funk: Groovy, rhythmic gradients with syncopated patterns
  */
 
@@ -59,8 +59,10 @@ export interface GenreCharacteristics {
   grooveWeight: number; // 0-1 groove/pocket feeling
   tempoVariability: number; // 0-1 tempo fluctuation tolerance
 
-  // Harmonic structure
-  harmonicComplexity: number; // 0-1 chord/harmony complexity
+  // Musical structure
+  musicalComplexity: number; // 0-1 chord/harmony complexity
+  /** @deprecated Use musicalComplexity instead */
+  harmonicComplexity?: number; // Legacy compatibility
   dissonanceTolerance: number; // 0-1 acceptance of dissonance
   modalInfluence: number; // 0-1 use of non-major/minor modes
   microtonal: number; // 0-1 use of non-12-tone scales
@@ -72,7 +74,7 @@ export interface GenreCharacteristics {
   artificialProcessing: number; // 0-1 electronic/synthetic processing
 
   // Cultural/aesthetic markers
-  organicness: number; // 0-1 natural vs synthetic feel
+  smoothness: number; // 0-1 natural vs synthetic feel
   accessibility: number; // 0-1 mainstream appeal/complexity
   experimentalFactor: number; // 0-1 avant-garde/experimental nature
   emotionalRange: number; // 0-1 emotional expression breadth
@@ -87,7 +89,7 @@ export interface GenreVisualStyle {
 
   // Pattern characteristics
   gradientComplexity: number; // 0-1 number of gradient layers
-  shapeGeometry: "organic" | "geometric" | "abstract" | "hybrid";
+  shapeGeometry: "smooth" | "geometric" | "abstract" | "hybrid";
   edgeSharpness: number; // 0-1 soft to sharp gradient edges
   symmetryLevel: number; // 0-1 symmetrical to asymmetrical
 
@@ -95,7 +97,7 @@ export interface GenreVisualStyle {
   animationStyle: "smooth" | "rhythmic" | "chaotic" | "minimal";
   pulseBehavior: "steady" | "syncopated" | "irregular" | "subtle";
   flowDirection: "radial" | "linear" | "spiral" | "random";
-  transitionCharacter: "fluid" | "sharp" | "organic" | "mechanical";
+  transitionCharacter: "fluid" | "sharp" | "smooth" | "mechanical";
 
   // Layer interaction
   layerBlending: "harmonious" | "contrasting" | "complementary" | "clashing";
@@ -111,7 +113,7 @@ export interface GenreVisualStyle {
 }
 
 export class GenreGradientEvolution {
-  private cssConsciousnessController: OptimizedCSSVariableManager;
+  private cssVariableController: OptimizedCSSVariableManager;
   private musicSyncService: MusicSyncService | null = null;
   private emotionalGradientMapper: EmotionalGradientMapper | null = null;
   private settingsManager: SettingsManager | null = null;
@@ -143,7 +145,8 @@ export class GenreGradientEvolution {
       syncopation: 0.4,
       grooveWeight: 0.7,
       tempoVariability: 0.3,
-      harmonicComplexity: 0.5,
+      musicalComplexity: 0.5,
+      harmonicComplexity: 0.5, // Legacy compatibility
       dissonanceTolerance: 0.6,
       modalInfluence: 0.4,
       microtonal: 0.2,
@@ -151,7 +154,7 @@ export class GenreGradientEvolution {
       saturation: 0.6,
       stereoWidth: 0.8,
       artificialProcessing: 0.9,
-      organicness: 0.2,
+      smoothness: 0.2,
       accessibility: 0.6,
       experimentalFactor: 0.7,
       emotionalRange: 0.6,
@@ -165,7 +168,8 @@ export class GenreGradientEvolution {
       syncopation: 0.3,
       grooveWeight: 0.8,
       tempoVariability: 0.4,
-      harmonicComplexity: 0.6,
+      musicalComplexity: 0.6,
+      harmonicComplexity: 0.6, // Legacy compatibility
       dissonanceTolerance: 0.5,
       modalInfluence: 0.3,
       microtonal: 0.1,
@@ -173,7 +177,7 @@ export class GenreGradientEvolution {
       saturation: 0.7,
       stereoWidth: 0.7,
       artificialProcessing: 0.4,
-      organicness: 0.6,
+      smoothness: 0.6,
       accessibility: 0.8,
       experimentalFactor: 0.4,
       emotionalRange: 0.8,
@@ -187,7 +191,8 @@ export class GenreGradientEvolution {
       syncopation: 0.2,
       grooveWeight: 0.4,
       tempoVariability: 0.7,
-      harmonicComplexity: 0.9,
+      musicalComplexity: 0.9,
+      harmonicComplexity: 0.9, // Legacy compatibility
       dissonanceTolerance: 0.4,
       modalInfluence: 0.6,
       microtonal: 0.3,
@@ -195,7 +200,7 @@ export class GenreGradientEvolution {
       saturation: 0.2,
       stereoWidth: 0.8,
       artificialProcessing: 0.1,
-      organicness: 0.9,
+      smoothness: 0.9,
       accessibility: 0.4,
       experimentalFactor: 0.6,
       emotionalRange: 0.9,
@@ -209,7 +214,8 @@ export class GenreGradientEvolution {
       syncopation: 0.8,
       grooveWeight: 0.9,
       tempoVariability: 0.6,
-      harmonicComplexity: 0.9,
+      musicalComplexity: 0.9,
+      harmonicComplexity: 0.9, // Legacy compatibility
       dissonanceTolerance: 0.7,
       modalInfluence: 0.8,
       microtonal: 0.4,
@@ -217,7 +223,7 @@ export class GenreGradientEvolution {
       saturation: 0.3,
       stereoWidth: 0.7,
       artificialProcessing: 0.2,
-      organicness: 0.8,
+      smoothness: 0.8,
       accessibility: 0.5,
       experimentalFactor: 0.8,
       emotionalRange: 0.8,
@@ -231,7 +237,8 @@ export class GenreGradientEvolution {
       syncopation: 0.6,
       grooveWeight: 0.9,
       tempoVariability: 0.3,
-      harmonicComplexity: 0.4,
+      musicalComplexity: 0.4,
+      harmonicComplexity: 0.4, // Legacy compatibility
       dissonanceTolerance: 0.5,
       modalInfluence: 0.3,
       microtonal: 0.1,
@@ -239,7 +246,7 @@ export class GenreGradientEvolution {
       saturation: 0.6,
       stereoWidth: 0.6,
       artificialProcessing: 0.7,
-      organicness: 0.4,
+      smoothness: 0.4,
       accessibility: 0.8,
       experimentalFactor: 0.5,
       emotionalRange: 0.7,
@@ -253,7 +260,8 @@ export class GenreGradientEvolution {
       syncopation: 0.1,
       grooveWeight: 0.2,
       tempoVariability: 0.8,
-      harmonicComplexity: 0.6,
+      musicalComplexity: 0.6,
+      harmonicComplexity: 0.6, // Legacy compatibility
       dissonanceTolerance: 0.6,
       modalInfluence: 0.7,
       microtonal: 0.5,
@@ -261,7 +269,7 @@ export class GenreGradientEvolution {
       saturation: 0.4,
       stereoWidth: 0.9,
       artificialProcessing: 0.6,
-      organicness: 0.7,
+      smoothness: 0.7,
       accessibility: 0.3,
       experimentalFactor: 0.8,
       emotionalRange: 0.6,
@@ -275,7 +283,8 @@ export class GenreGradientEvolution {
       syncopation: 0.3,
       grooveWeight: 0.7,
       tempoVariability: 0.2,
-      harmonicComplexity: 0.5,
+      musicalComplexity: 0.5,
+      harmonicComplexity: 0.5, // Legacy compatibility
       dissonanceTolerance: 0.3,
       modalInfluence: 0.2,
       microtonal: 0.1,
@@ -283,7 +292,7 @@ export class GenreGradientEvolution {
       saturation: 0.5,
       stereoWidth: 0.6,
       artificialProcessing: 0.5,
-      organicness: 0.5,
+      smoothness: 0.5,
       accessibility: 0.9,
       experimentalFactor: 0.2,
       emotionalRange: 0.7,
@@ -297,7 +306,8 @@ export class GenreGradientEvolution {
       syncopation: 0.4,
       grooveWeight: 0.8,
       tempoVariability: 0.3,
-      harmonicComplexity: 0.6,
+      musicalComplexity: 0.6,
+      harmonicComplexity: 0.6, // Legacy compatibility
       dissonanceTolerance: 0.8,
       modalInfluence: 0.5,
       microtonal: 0.2,
@@ -305,7 +315,7 @@ export class GenreGradientEvolution {
       saturation: 0.9,
       stereoWidth: 0.7,
       artificialProcessing: 0.6,
-      organicness: 0.4,
+      smoothness: 0.4,
       accessibility: 0.6,
       experimentalFactor: 0.5,
       emotionalRange: 0.8,
@@ -319,7 +329,8 @@ export class GenreGradientEvolution {
       syncopation: 0.2,
       grooveWeight: 0.6,
       tempoVariability: 0.5,
-      harmonicComplexity: 0.5,
+      musicalComplexity: 0.5,
+      harmonicComplexity: 0.5, // Legacy compatibility
       dissonanceTolerance: 0.3,
       modalInfluence: 0.6,
       microtonal: 0.2,
@@ -327,7 +338,7 @@ export class GenreGradientEvolution {
       saturation: 0.2,
       stereoWidth: 0.5,
       artificialProcessing: 0.1,
-      organicness: 0.9,
+      smoothness: 0.9,
       accessibility: 0.7,
       experimentalFactor: 0.3,
       emotionalRange: 0.7,
@@ -341,7 +352,8 @@ export class GenreGradientEvolution {
       syncopation: 0.9,
       grooveWeight: 1.0,
       tempoVariability: 0.4,
-      harmonicComplexity: 0.6,
+      musicalComplexity: 0.6,
+      harmonicComplexity: 0.6, // Legacy compatibility
       dissonanceTolerance: 0.5,
       modalInfluence: 0.4,
       microtonal: 0.2,
@@ -349,7 +361,7 @@ export class GenreGradientEvolution {
       saturation: 0.5,
       stereoWidth: 0.6,
       artificialProcessing: 0.3,
-      organicness: 0.7,
+      smoothness: 0.7,
       accessibility: 0.7,
       experimentalFactor: 0.4,
       emotionalRange: 0.6,
@@ -363,7 +375,8 @@ export class GenreGradientEvolution {
       syncopation: 0.4,
       grooveWeight: 0.6,
       tempoVariability: 0.5,
-      harmonicComplexity: 0.6,
+      musicalComplexity: 0.6,
+      harmonicComplexity: 0.6, // Legacy compatibility
       dissonanceTolerance: 0.5,
       modalInfluence: 0.5,
       microtonal: 0.3,
@@ -371,7 +384,7 @@ export class GenreGradientEvolution {
       saturation: 0.4,
       stereoWidth: 0.7,
       artificialProcessing: 0.3,
-      organicness: 0.7,
+      smoothness: 0.7,
       accessibility: 0.6,
       experimentalFactor: 0.6,
       emotionalRange: 0.7,
@@ -385,7 +398,8 @@ export class GenreGradientEvolution {
       syncopation: 0.7,
       grooveWeight: 0.8,
       tempoVariability: 0.3,
-      harmonicComplexity: 0.4,
+      musicalComplexity: 0.4,
+      harmonicComplexity: 0.4, // Legacy compatibility
       dissonanceTolerance: 0.3,
       modalInfluence: 0.4,
       microtonal: 0.2,
@@ -393,7 +407,7 @@ export class GenreGradientEvolution {
       saturation: 0.4,
       stereoWidth: 0.6,
       artificialProcessing: 0.3,
-      organicness: 0.6,
+      smoothness: 0.6,
       accessibility: 0.7,
       experimentalFactor: 0.3,
       emotionalRange: 0.6,
@@ -407,7 +421,8 @@ export class GenreGradientEvolution {
       syncopation: 0.4,
       grooveWeight: 0.8,
       tempoVariability: 0.6,
-      harmonicComplexity: 0.6,
+      musicalComplexity: 0.6,
+      harmonicComplexity: 0.6, // Legacy compatibility
       dissonanceTolerance: 0.4,
       modalInfluence: 0.7,
       microtonal: 0.3,
@@ -415,7 +430,7 @@ export class GenreGradientEvolution {
       saturation: 0.5,
       stereoWidth: 0.5,
       artificialProcessing: 0.2,
-      organicness: 0.8,
+      smoothness: 0.8,
       accessibility: 0.7,
       experimentalFactor: 0.4,
       emotionalRange: 0.8,
@@ -429,7 +444,8 @@ export class GenreGradientEvolution {
       syncopation: 0.3,
       grooveWeight: 0.6,
       tempoVariability: 0.4,
-      harmonicComplexity: 0.4,
+      musicalComplexity: 0.4,
+      harmonicComplexity: 0.4, // Legacy compatibility
       dissonanceTolerance: 0.2,
       modalInfluence: 0.3,
       microtonal: 0.1,
@@ -437,7 +453,7 @@ export class GenreGradientEvolution {
       saturation: 0.3,
       stereoWidth: 0.6,
       artificialProcessing: 0.2,
-      organicness: 0.8,
+      smoothness: 0.8,
       accessibility: 0.8,
       experimentalFactor: 0.2,
       emotionalRange: 0.7,
@@ -451,7 +467,8 @@ export class GenreGradientEvolution {
       syncopation: 0.3,
       grooveWeight: 0.8,
       tempoVariability: 0.2,
-      harmonicComplexity: 0.4,
+      musicalComplexity: 0.4,
+      harmonicComplexity: 0.4, // Legacy compatibility
       dissonanceTolerance: 0.6,
       modalInfluence: 0.3,
       microtonal: 0.3,
@@ -459,7 +476,7 @@ export class GenreGradientEvolution {
       saturation: 0.7,
       stereoWidth: 0.8,
       artificialProcessing: 1.0,
-      organicness: 0.1,
+      smoothness: 0.1,
       accessibility: 0.5,
       experimentalFactor: 0.6,
       emotionalRange: 0.5,
@@ -473,7 +490,8 @@ export class GenreGradientEvolution {
       syncopation: 0.4,
       grooveWeight: 0.9,
       tempoVariability: 0.2,
-      harmonicComplexity: 0.5,
+      musicalComplexity: 0.5,
+      harmonicComplexity: 0.5, // Legacy compatibility
       dissonanceTolerance: 0.4,
       modalInfluence: 0.3,
       microtonal: 0.2,
@@ -481,7 +499,7 @@ export class GenreGradientEvolution {
       saturation: 0.6,
       stereoWidth: 0.7,
       artificialProcessing: 0.8,
-      organicness: 0.3,
+      smoothness: 0.3,
       accessibility: 0.8,
       experimentalFactor: 0.4,
       emotionalRange: 0.6,
@@ -495,7 +513,8 @@ export class GenreGradientEvolution {
       syncopation: 0.2,
       grooveWeight: 0.7,
       tempoVariability: 0.3,
-      harmonicComplexity: 0.6,
+      musicalComplexity: 0.6,
+      harmonicComplexity: 0.6, // Legacy compatibility
       dissonanceTolerance: 0.5,
       modalInfluence: 0.4,
       microtonal: 0.3,
@@ -503,7 +522,7 @@ export class GenreGradientEvolution {
       saturation: 0.5,
       stereoWidth: 0.9,
       artificialProcessing: 0.8,
-      organicness: 0.2,
+      smoothness: 0.2,
       accessibility: 0.6,
       experimentalFactor: 0.5,
       emotionalRange: 0.8,
@@ -517,7 +536,8 @@ export class GenreGradientEvolution {
       syncopation: 0.6,
       grooveWeight: 0.8,
       tempoVariability: 0.4,
-      harmonicComplexity: 0.4,
+      musicalComplexity: 0.4,
+      harmonicComplexity: 0.4, // Legacy compatibility
       dissonanceTolerance: 0.8,
       modalInfluence: 0.3,
       microtonal: 0.4,
@@ -525,7 +545,7 @@ export class GenreGradientEvolution {
       saturation: 0.8,
       stereoWidth: 0.8,
       artificialProcessing: 0.9,
-      organicness: 0.1,
+      smoothness: 0.1,
       accessibility: 0.4,
       experimentalFactor: 0.7,
       emotionalRange: 0.6,
@@ -539,7 +559,8 @@ export class GenreGradientEvolution {
       syncopation: 0.5,
       grooveWeight: 0.5,
       tempoVariability: 0.5,
-      harmonicComplexity: 0.5,
+      musicalComplexity: 0.5,
+      harmonicComplexity: 0.5, // Legacy compatibility
       dissonanceTolerance: 0.5,
       modalInfluence: 0.5,
       microtonal: 0.5,
@@ -547,7 +568,7 @@ export class GenreGradientEvolution {
       saturation: 0.5,
       stereoWidth: 0.5,
       artificialProcessing: 0.5,
-      organicness: 0.5,
+      smoothness: 0.5,
       accessibility: 0.5,
       experimentalFactor: 0.5,
       emotionalRange: 0.5,
@@ -606,7 +627,7 @@ export class GenreGradientEvolution {
       brightnessProfile: [1.0, 0.5],
       contrastLevel: 0.6,
       gradientComplexity: 0.9,
-      shapeGeometry: "organic",
+      shapeGeometry: "smooth",
       edgeSharpness: 0.3,
       symmetryLevel: 0.8,
       animationStyle: "smooth",
@@ -634,7 +655,7 @@ export class GenreGradientEvolution {
       animationStyle: "chaotic",
       pulseBehavior: "syncopated",
       flowDirection: "random",
-      transitionCharacter: "organic",
+      transitionCharacter: "smooth",
       layerBlending: "complementary",
       depthIllusion: 0.8,
       particleInfluence: 0.7,
@@ -672,7 +693,7 @@ export class GenreGradientEvolution {
       brightnessProfile: [0.8, 0.4],
       contrastLevel: 0.3,
       gradientComplexity: 0.9,
-      shapeGeometry: "organic",
+      shapeGeometry: "smooth",
       edgeSharpness: 0.2,
       symmetryLevel: 0.4,
       animationStyle: "minimal",
@@ -738,13 +759,13 @@ export class GenreGradientEvolution {
       brightnessProfile: [0.9, 0.3],
       contrastLevel: 0.5,
       gradientComplexity: 0.5,
-      shapeGeometry: "organic",
+      shapeGeometry: "smooth",
       edgeSharpness: 0.3,
       symmetryLevel: 0.5,
       animationStyle: "smooth",
       pulseBehavior: "subtle",
       flowDirection: "spiral",
-      transitionCharacter: "organic",
+      transitionCharacter: "smooth",
       layerBlending: "harmonious",
       depthIllusion: 0.6,
       particleInfluence: 0.3,
@@ -766,7 +787,7 @@ export class GenreGradientEvolution {
       animationStyle: "rhythmic",
       pulseBehavior: "syncopated",
       flowDirection: "random",
-      transitionCharacter: "organic",
+      transitionCharacter: "smooth",
       layerBlending: "complementary",
       depthIllusion: 0.7,
       particleInfluence: 0.8,
@@ -804,7 +825,7 @@ export class GenreGradientEvolution {
       brightnessProfile: [1.0, 0.3],
       contrastLevel: 0.6,
       gradientComplexity: 0.5,
-      shapeGeometry: "organic",
+      shapeGeometry: "smooth",
       edgeSharpness: 0.4,
       symmetryLevel: 0.6,
       animationStyle: "rhythmic",
@@ -826,7 +847,7 @@ export class GenreGradientEvolution {
       brightnessProfile: [0.8, 0.4],
       contrastLevel: 0.6,
       gradientComplexity: 0.6,
-      shapeGeometry: "organic",
+      shapeGeometry: "smooth",
       edgeSharpness: 0.4,
       symmetryLevel: 0.4,
       animationStyle: "smooth",
@@ -848,13 +869,13 @@ export class GenreGradientEvolution {
       brightnessProfile: [1.0, 0.3],
       contrastLevel: 0.5,
       gradientComplexity: 0.5,
-      shapeGeometry: "organic",
+      shapeGeometry: "smooth",
       edgeSharpness: 0.3,
       symmetryLevel: 0.6,
       animationStyle: "smooth",
       pulseBehavior: "steady",
       flowDirection: "radial",
-      transitionCharacter: "organic",
+      transitionCharacter: "smooth",
       layerBlending: "harmonious",
       depthIllusion: 0.5,
       particleInfluence: 0.3,
@@ -977,12 +998,12 @@ export class GenreGradientEvolution {
   };
 
   constructor(
-    cssConsciousnessController: OptimizedCSSVariableManager,
+    cssVariableController: OptimizedCSSVariableManager,
     musicSyncService: MusicSyncService | null = null,
     emotionalGradientMapper: EmotionalGradientMapper | null = null,
     settingsManager: SettingsManager | null = null
   ) {
-    this.cssConsciousnessController = cssConsciousnessController;
+    this.cssVariableController = cssVariableController;
     this.musicSyncService = musicSyncService;
     this.emotionalGradientMapper = emotionalGradientMapper;
     this.settingsManager = settingsManager;
@@ -1150,10 +1171,10 @@ export class GenreGradientEvolution {
       (genreProfile.grooveWeight * 0.7 + (1 - genreProfile.syncopation) * 0.3)
     );
 
-    // Acousticness similarity - maps to organicness vs artificial processing
+    // Acousticness similarity - maps to smoothness vs artificial processing
     const acousticnessSimilarity = 1 - Math.abs(
       (musicData.acousticness || 0.5) - 
-      (genreProfile.organicness * 0.8 + (1 - genreProfile.artificialProcessing) * 0.2)
+      (genreProfile.smoothness * 0.8 + (1 - genreProfile.artificialProcessing) * 0.2)
     );
 
     // Tempo similarity - estimate genre tempo preference from characteristics
@@ -1169,7 +1190,7 @@ export class GenreGradientEvolution {
     // Instrumentalness similarity - maps to experimental factor and complexity
     const instrumentalnessSimilarity = 1 - Math.abs(
       (musicData.instrumentalness || 0.5) - 
-      (genreProfile.experimentalFactor * 0.6 + genreProfile.harmonicComplexity * 0.4)
+      (genreProfile.experimentalFactor * 0.6 + (genreProfile.musicalComplexity || genreProfile.harmonicComplexity || 0.5) * 0.4)
     );
 
     // Weighted average similarity score
@@ -1283,11 +1304,11 @@ export class GenreGradientEvolution {
       ? (emotionalProfile.valence - 0.5) * hueRange * 0.3
       : 0;
 
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-base-hue",
       `${baseHue + emotionalHueShift}deg`
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-hue-range",
       `${hueRange}deg`
     );
@@ -1300,33 +1321,33 @@ export class GenreGradientEvolution {
       ? emotionalProfile.energy * 0.2
       : 0;
 
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-saturation-base",
       (style.saturationProfile[0] + emotionalSatBoost).toString()
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-saturation-variation",
       style.saturationProfile[1].toString()
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-brightness-base",
       (style.brightnessProfile[0] + emotionalBrightBoost).toString()
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-brightness-variation",
       style.brightnessProfile[1].toString()
     );
 
     // Apply contrast and geometry
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-contrast-level",
       style.contrastLevel.toString()
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-edge-sharpness",
       style.edgeSharpness.toString()
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-gradient-complexity",
       style.gradientComplexity.toString()
     );
@@ -1335,50 +1356,50 @@ export class GenreGradientEvolution {
     const emotionalSpeedMod = emotionalProfile
       ? 0.5 + emotionalProfile.energy
       : 1;
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-animation-speed",
       emotionalSpeedMod.toString()
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-pulse-intensity",
       style.depthIllusion.toString()
     );
 
     // Apply layer interaction
     const layerHarmony = this.mapLayerBlending(style.layerBlending);
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-layer-harmony",
       layerHarmony.toString()
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-depth-illusion",
       style.depthIllusion.toString()
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-particle-influence",
       style.particleInfluence.toString()
     );
 
     // Apply temporal behavior
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-memory-influence",
       style.memoryInfluence.toString()
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-adaptation-speed",
       style.adaptationSpeed.toString()
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-stability-preference",
       style.stabilityPreference.toString()
     );
 
     // Update genre identity
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-current-genre",
       this.currentGenre
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssVariableController.setProperty(
       "--sn-genre-confidence",
       this.genreConfidence.toString()
     );
@@ -1416,21 +1437,21 @@ export class GenreGradientEvolution {
 
       // Set genre-specific gradient angle based on style characteristics
       const genreAngle = this.calculateGenreAngle(style);
-      this.cssConsciousnessController.setProperty(
+      this.cssVariableController.setProperty(
         "--sn-bg-gradient-angle",
         `${genreAngle}deg`
       );
 
       // Set genre-specific opacity based on style characteristics
       const genreOpacity = this.calculateGenreOpacity(style, emotionalProfile);
-      this.cssConsciousnessController.setProperty(
+      this.cssVariableController.setProperty(
         "--sn-bg-gradient-opacity",
         genreOpacity.toString()
       );
 
       // Set genre-specific blur based on edge sharpness
       const genreBlur = Math.max(60, 120 * (1 - style.edgeSharpness));
-      this.cssConsciousnessController.setProperty(
+      this.cssVariableController.setProperty(
         "--sn-bg-gradient-blur",
         `${genreBlur}px`
       );
@@ -1443,15 +1464,15 @@ export class GenreGradientEvolution {
         ? emotionalProfile.energy * 0.2
         : 0;
 
-      this.cssConsciousnessController.setProperty(
+      this.cssVariableController.setProperty(
         "--sn-bg-gradient-saturation",
         (style.saturationProfile[0] + emotionalSatBoost).toString()
       );
-      this.cssConsciousnessController.setProperty(
+      this.cssVariableController.setProperty(
         "--sn-bg-gradient-brightness",
         (style.brightnessProfile[0] + emotionalBrightBoost).toString()
       );
-      this.cssConsciousnessController.setProperty(
+      this.cssVariableController.setProperty(
         "--sn-bg-gradient-contrast",
         style.contrastLevel.toString()
       );
@@ -1477,7 +1498,7 @@ export class GenreGradientEvolution {
       ambient: 180, // Ethereal downward flow
       pop: 315, // Catchy diagonal up-right
       metal: 225, // Aggressive diagonal down
-      folk: 60, // Natural organic angle
+      folk: 60, // Natural smooth angle
       funk: 30, // Groovy slight angle
       indie: 150, // Alternative angle
       reggae: 210, // Laid-back flow

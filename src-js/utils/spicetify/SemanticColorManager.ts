@@ -8,7 +8,7 @@
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { IManagedSystem, HealthCheckResult } from "@/types/systems";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 
 declare const Spicetify: any;
 
@@ -111,7 +111,7 @@ export class SemanticColorManager implements IManagedSystem {
         timestamp: Date.now(),
         metadata: {
           mappings: SemanticColorManager.SEMANTIC_MAPPINGS.length,
-          spicetifyAvailable: this.isSpicetifyAvailable()
+          spicetifyAvailable: this.isSpicetifyAvailable() ? 1 : 0
         }
       });
       
@@ -420,14 +420,14 @@ export class SemanticColorManager implements IManagedSystem {
         '--spice-rgb-mantle': this.hexToRgb(this.generateMantleColor(colorDistribution.base)),
       };
 
-      // Neural consciousness variables (MEDIUM PRIORITY from analysis)
-      const neuralSpicetifyUpdates = {
-        '--spice-blue': colorDistribution.neuralPrimary,
-        '--spice-rgb-blue': rgbDistribution.neuralPrimary,
-        '--spice-mauve': colorDistribution.neuralSecondary,
-        '--spice-rgb-mauve': rgbDistribution.neuralSecondary,
-        '--spice-teal': colorDistribution.neuralTertiary,
-        '--spice-rgb-teal': rgbDistribution.neuralTertiary,
+      // Visual harmony color variables (MEDIUM PRIORITY from analysis)
+      const visualHarmonyColorUpdates = {
+        '--spice-blue': colorDistribution.harmonyPrimary,
+        '--spice-rgb-blue': rgbDistribution.harmonyPrimary,
+        '--spice-mauve': colorDistribution.harmonySecondary,
+        '--spice-rgb-mauve': rgbDistribution.harmonySecondary,
+        '--spice-teal': colorDistribution.harmonyTertiary,
+        '--spice-rgb-teal': rgbDistribution.harmonyTertiary,
         
         // ZONE SYSTEM: Context-aware color variables for different UI zones
         '--spice-flamingo': this.generateZoneColor(colorDistribution.primary, 'flamingo'), // Zone home secondary
@@ -438,24 +438,24 @@ export class SemanticColorManager implements IManagedSystem {
         '--spice-rgb-peach': this.hexToRgb(this.generateZoneColor(colorDistribution.surface2, 'peach')),
         '--spice-rosewater': this.generateZoneColor(colorDistribution.surface1, 'rosewater'), // Zone artist/home secondary
         '--spice-rgb-rosewater': this.hexToRgb(this.generateZoneColor(colorDistribution.surface1, 'rosewater')),
-        '--spice-sapphire': this.generateZoneColor(colorDistribution.neuralPrimary, 'sapphire'), // Zone search secondary
-        '--spice-rgb-sapphire': this.hexToRgb(this.generateZoneColor(colorDistribution.neuralPrimary, 'sapphire')),
+        '--spice-sapphire': this.generateZoneColor(colorDistribution.harmonyPrimary, 'sapphire'), // Zone search secondary
+        '--spice-rgb-sapphire': this.hexToRgb(this.generateZoneColor(colorDistribution.harmonyPrimary, 'sapphire')),
       };
 
       // MISSING CATPPUCCIN PALETTE: Additional colors used in theme
       const paletteSpicetifyUpdates = {
         '--spice-pink': this.generatePaletteColor(colorDistribution.primary, 'pink'),
         '--spice-rgb-pink': this.hexToRgb(this.generatePaletteColor(colorDistribution.primary, 'pink')),
-        '--spice-sky': this.generatePaletteColor(colorDistribution.neuralPrimary, 'sky'),
-        '--spice-rgb-sky': this.hexToRgb(this.generatePaletteColor(colorDistribution.neuralPrimary, 'sky')),
+        '--spice-sky': this.generatePaletteColor(colorDistribution.harmonyPrimary, 'sky'),
+        '--spice-rgb-sky': this.hexToRgb(this.generatePaletteColor(colorDistribution.harmonyPrimary, 'sky')),
         '--spice-red': this.generatePaletteColor(colorDistribution.highlight, 'red'), // Used for errors
         '--spice-rgb-red': this.hexToRgb(this.generatePaletteColor(colorDistribution.highlight, 'red')),
         '--spice-maroon': this.generatePaletteColor(colorDistribution.shadow, 'maroon'),
         '--spice-rgb-maroon': this.hexToRgb(this.generatePaletteColor(colorDistribution.shadow, 'maroon')),
         '--spice-yellow': this.generatePaletteColor(colorDistribution.surface2, 'yellow'), // Used for warnings
         '--spice-rgb-yellow': this.hexToRgb(this.generatePaletteColor(colorDistribution.surface2, 'yellow')),
-        '--spice-green': this.generatePaletteColor(colorDistribution.neuralTertiary, 'green'), // Used for success
-        '--spice-rgb-green': this.hexToRgb(this.generatePaletteColor(colorDistribution.neuralTertiary, 'green')),
+        '--spice-green': this.generatePaletteColor(colorDistribution.harmonyTertiary, 'green'), // Used for success
+        '--spice-rgb-green': this.hexToRgb(this.generatePaletteColor(colorDistribution.harmonyTertiary, 'green')),
         '--spice-misc': colorDistribution.surface1, // Neutral grey from palette
         '--spice-rgb-misc': rgbDistribution.surface1,
       };
@@ -463,17 +463,17 @@ export class SemanticColorManager implements IManagedSystem {
       // 🎨 PHASE 3: Visual Effect System Variables (NEW)
       // Generate effect-specific colors for visual systems currently using hardcoded values
       const effectsSpicetifyUpdates = {
-        // Shimmer effect colors (neural consciousness colors for harmonious shimmer)
-        '--spice-shimmer-primary': colorDistribution.neuralPrimary,
-        '--spice-rgb-shimmer-primary': rgbDistribution.neuralPrimary,
-        '--spice-shimmer-secondary': colorDistribution.neuralSecondary,
-        '--spice-rgb-shimmer-secondary': rgbDistribution.neuralSecondary,
-        '--spice-shimmer-tertiary': colorDistribution.neuralTertiary,
-        '--spice-rgb-shimmer-tertiary': rgbDistribution.neuralTertiary,
+        // Shimmer effect colors (harmony color variations for harmonious shimmer)
+        '--spice-shimmer-primary': colorDistribution.harmonyPrimary,
+        '--spice-rgb-shimmer-primary': rgbDistribution.harmonyPrimary,
+        '--spice-shimmer-secondary': colorDistribution.harmonySecondary,
+        '--spice-rgb-shimmer-secondary': rgbDistribution.harmonySecondary,
+        '--spice-shimmer-tertiary': colorDistribution.harmonyTertiary,
+        '--spice-rgb-shimmer-tertiary': rgbDistribution.harmonyTertiary,
         '--spice-shimmer-quaternary': colorDistribution.primary,
         '--spice-rgb-shimmer-quaternary': rgbDistribution.primary,
         
-        // Particle consciousness colors
+        // Particle effect colors
         '--spice-particle-glow': colorDistribution.highlight,
         '--spice-rgb-particle-glow': rgbDistribution.highlight,
         '--spice-particle-core': colorDistribution.primary,
@@ -489,11 +489,11 @@ export class SemanticColorManager implements IManagedSystem {
         '--spice-cinematic-yellow': this.generateCinematicYellow(colorDistribution.highlight),
         '--spice-rgb-cinematic-yellow': this.hexToRgb(this.generateCinematicYellow(colorDistribution.highlight)),
         
-        // Holographic UI colors (ethereal variants)
+        // Holographic UI colors (luminous variants)
         '--spice-holographic-primary': this.generateHolographicPrimary(colorDistribution.primary),
         '--spice-rgb-holographic-primary': this.hexToRgb(this.generateHolographicPrimary(colorDistribution.primary)),
-        '--spice-holographic-accent': this.generateHolographicAccent(colorDistribution.neuralPrimary),
-        '--spice-rgb-holographic-accent': this.hexToRgb(this.generateHolographicAccent(colorDistribution.neuralPrimary)),
+        '--spice-holographic-accent': this.generateHolographicAccent(colorDistribution.harmonyPrimary),
+        '--spice-rgb-holographic-accent': this.hexToRgb(this.generateHolographicAccent(colorDistribution.harmonyPrimary)),
         '--spice-holographic-glow': this.generateHolographicGlow(colorDistribution.highlight),
         '--spice-rgb-holographic-glow': this.hexToRgb(this.generateHolographicGlow(colorDistribution.highlight)),
       };
@@ -503,7 +503,7 @@ export class SemanticColorManager implements IManagedSystem {
         ...coreSpicetifyUpdates,
         ...criticalSpicetifyUpdates,
         ...coreLayoutSpicetifyUpdates,
-        ...neuralSpicetifyUpdates,
+        ...visualHarmonyColorUpdates,
         ...paletteSpicetifyUpdates,
         ...effectsSpicetifyUpdates,
       };
@@ -543,7 +543,7 @@ export class SemanticColorManager implements IManagedSystem {
         '--sn-color-extracted-secondary-rgb': rgbDistribution.surface1,
         '--sn-color-harmony-complementary-rgb': rgbDistribution.shadow,
         '--sn-color-harmony-analogous-rgb': rgbDistribution.highlight,
-        '--sn-color-harmony-triadic-rgb': rgbDistribution.neuralPrimary,
+        '--sn-color-harmony-triadic-rgb': rgbDistribution.harmonyPrimary,
       };
 
       this.cssController.batchSetVariables(
@@ -583,7 +583,7 @@ export class SemanticColorManager implements IManagedSystem {
           shadowColor: colorDistribution.shadow,
           highlightColor: colorDistribution.highlight,
           surfaceProgression: [colorDistribution.base, colorDistribution.surface0, colorDistribution.surface1, colorDistribution.surface2],
-          neuralColors: [colorDistribution.neuralPrimary, colorDistribution.neuralSecondary, colorDistribution.neuralTertiary],
+          harmonyColors: [colorDistribution.harmonyPrimary, colorDistribution.harmonySecondary, colorDistribution.harmonyTertiary],
           effectColors: {
             shimmerColors: 4, // primary, secondary, tertiary, quaternary
             particleColors: 3, // glow, core, trail
@@ -607,7 +607,7 @@ export class SemanticColorManager implements IManagedSystem {
 
   /**
    * Generate intelligent color distribution for comprehensive Spicetify variable coverage
-   * Uses OKLAB-inspired color science for perceptually uniform depth progression and neural networks
+   * Uses OKLAB-inspired color science for perceptually uniform depth progression and harmony color variations
    */
   private generateIntelligentColorDistribution(
     primaryColor: string,
@@ -622,9 +622,9 @@ export class SemanticColorManager implements IManagedSystem {
     base: string;
     shadow: string;
     highlight: string;
-    neuralPrimary: string;
-    neuralSecondary: string;
-    neuralTertiary: string;
+    harmonyPrimary: string;
+    harmonySecondary: string;
+    harmonyTertiary: string;
   } {
     // Use provided colors or generate intelligent fallbacks
     const primary = primaryColor;
@@ -639,11 +639,11 @@ export class SemanticColorManager implements IManagedSystem {
     const surface1 = accent; // Use accent for surface1 (existing logic)
     const surface2 = this.generateLighterVariant(accent, 0.15); // Elevated surface
 
-    // Generate neural consciousness colors using hue rotation
-    // Create harmonious but distinct colors for consciousness systems
-    const neuralPrimary = this.generateHueRotatedColor(primaryColor, 120); // Blue-ish shift
-    const neuralSecondary = this.generateHueRotatedColor(primaryColor, -60); // Mauve-ish shift  
-    const neuralTertiary = this.generateHueRotatedColor(primaryColor, 180); // Teal-ish shift
+    // Generate harmony color variations using hue rotation
+    // Create harmonious but distinct colors for visual systems
+    const harmonyPrimary = this.generateHueRotatedColor(primaryColor, 120); // Blue-ish shift
+    const harmonySecondary = this.generateHueRotatedColor(primaryColor, -60); // Mauve-ish shift  
+    const harmonyTertiary = this.generateHueRotatedColor(primaryColor, 180); // Teal-ish shift
 
     return {
       primary,
@@ -653,9 +653,9 @@ export class SemanticColorManager implements IManagedSystem {
       base,
       shadow,
       highlight,
-      neuralPrimary,
-      neuralSecondary,
-      neuralTertiary,
+      harmonyPrimary,
+      harmonySecondary,
+      harmonyTertiary,
     };
   }
 
@@ -713,7 +713,7 @@ export class SemanticColorManager implements IManagedSystem {
   }
 
   /**
-   * Generate a hue-rotated variant of a color for neural consciousness systems
+   * Generate a hue-rotated variant of a color for visual harmony systems
    */
   private generateHueRotatedColor(hexColor: string, hueDegrees: number): string {
     try {
@@ -918,24 +918,24 @@ export class SemanticColorManager implements IManagedSystem {
   }
 
   /**
-   * Generate holographic primary color with ethereal characteristics
-   * Creates iridescent, otherworldly color based on album primary
+   * Generate holographic primary color with luminous characteristics
+   * Creates iridescent, enhanced color based on album primary
    */
   private generateHolographicPrimary(baseColor: string): string {
     try {
       const rgb = this.hexToRgbObject(baseColor);
       if (!rgb) return '#8A2BE2'; // Fallback to violet
 
-      // Create ethereal holographic color with prismatic characteristics
+      // Create luminous holographic color with prismatic characteristics
       // Boost saturation and add prismatic shimmer
       const hsl = this.rgbToHsl(rgb.r, rgb.g, rgb.b);
       
       // Increase saturation for holographic effect
       const enhancedSaturation = Math.min(1, hsl.s + 0.3);
-      // Adjust lightness for ethereal glow
-      const etherealLightness = Math.min(0.8, Math.max(0.4, hsl.l + 0.1));
+      // Adjust lightness for luminous glow
+      const luminousLightness = Math.min(0.8, Math.max(0.4, hsl.l + 0.1));
 
-      const enhancedRgb = this.hslToRgb(hsl.h, enhancedSaturation, etherealLightness);
+      const enhancedRgb = this.hslToRgb(hsl.h, enhancedSaturation, luminousLightness);
       return this.rgbToHex(enhancedRgb.r, enhancedRgb.g, enhancedRgb.b);
     } catch (error) {
       console.warn('[SemanticColorManager] Failed to generate holographic primary:', error);
@@ -947,10 +947,10 @@ export class SemanticColorManager implements IManagedSystem {
    * Generate holographic accent color with prismatic shift
    * Creates complementary holographic color for accent effects
    */
-  private generateHolographicAccent(neuralColor: string): string {
+  private generateHolographicAccent(harmonyColor: string): string {
     try {
       // Apply prismatic hue shift for holographic spectrum effect
-      return this.generateHueRotatedColor(neuralColor, 45);
+      return this.generateHueRotatedColor(harmonyColor, 45);
     } catch (error) {
       console.warn('[SemanticColorManager] Failed to generate holographic accent:', error);
       return '#FF00FF';
@@ -958,7 +958,7 @@ export class SemanticColorManager implements IManagedSystem {
   }
 
   /**
-   * Generate holographic glow color for ethereal lighting effects
+   * Generate holographic glow color for luminous lighting effects
    * Creates soft, luminous glow based on highlight color
    */
   private generateHolographicGlow(highlightColor: string): string {
@@ -981,7 +981,7 @@ export class SemanticColorManager implements IManagedSystem {
 
   /**
    * Generate high contrast text color based on background color
-   * Creates optimal text readability for consciousness-aware design
+   * Creates optimal text readability for context-aware design
    */
   private generateTextColor(baseColor: string): string {
     try {
@@ -1125,7 +1125,7 @@ export class SemanticColorManager implements IManagedSystem {
   }
 
   /**
-   * Generate zone-specific colors with consciousness-aware hue shifts
+   * Generate zone-specific colors with context-aware hue shifts
    * Creates contextual color variations for different UI zones (home, playlist, artist, search)
    */
   private generateZoneColor(baseColor: string, zoneType: 'flamingo' | 'lavender' | 'peach' | 'rosewater' | 'sapphire'): string {
@@ -1136,7 +1136,7 @@ export class SemanticColorManager implements IManagedSystem {
         return baseColor;
       }
       
-      // Zone-specific RGB adjustments for consciousness-aware contextual coloring
+      // Zone-specific RGB adjustments for context-aware contextual coloring
       const zoneAdjustments = {
         flamingo: { rAdjust: 20, gAdjust: -10, bAdjust: -5 }, // Warm pink for home comfort
         lavender: { rAdjust: 10, gAdjust: -5, bAdjust: 15 }, // Cool purple for focus/playlist
@@ -1166,7 +1166,7 @@ export class SemanticColorManager implements IManagedSystem {
   }
 
   /**
-   * Generate palette-specific colors with consciousness-aware variations
+   * Generate palette-specific colors with context-aware variations
    * Creates color variations for Catppuccin palette colors (pink, sky, red, maroon, yellow, green)
    */
   private generatePaletteColor(baseColor: string, paletteType: 'pink' | 'sky' | 'red' | 'maroon' | 'yellow' | 'green'): string {
@@ -1177,7 +1177,7 @@ export class SemanticColorManager implements IManagedSystem {
         return baseColor;
       }
       
-      // Palette-specific RGB adjustments for consciousness-aware color mapping
+      // Palette-specific RGB adjustments for context-aware color mapping
       const paletteAdjustments = {
         pink: { rAdjust: 30, gAdjust: -20, bAdjust: -10 }, // Soft pink for decorative elements
         sky: { rAdjust: -30, gAdjust: 10, bAdjust: 30 }, // Bright sky blue for information
@@ -1189,7 +1189,7 @@ export class SemanticColorManager implements IManagedSystem {
       
       const config = paletteAdjustments[paletteType];
       
-      // Apply palette-specific RGB adjustments with consciousness-aware boundaries
+      // Apply palette-specific RGB adjustments with context-aware boundaries
       const adjustedR = Math.max(0, Math.min(255, rgb.r + config.rAdjust));
       const adjustedG = Math.max(0, Math.min(255, rgb.g + config.gAdjust));
       const adjustedB = Math.max(0, Math.min(255, rgb.b + config.bAdjust));
@@ -1257,7 +1257,7 @@ export class SemanticColorManager implements IManagedSystem {
       metrics: {
         initialized: this.initialized,
         spicetifyAvailable: this.isSpicetifyAvailable(),
-        cssConsciousnessAvailable: !!this.cssController,
+        cssControllerAvailable: !!this.cssController,
         lastColorUpdate: this.lastColorUpdate,
         colorUpdateCount: this.colorUpdateCount,
         eventSubscriptions: this.eventSubscriptionIds.length,

@@ -1,52 +1,52 @@
 // =============================================================================
-// YEAR 3000 NEXUS CARDS SYSTEM - Holographic Interactive Elements
-// PHASE 2 ENHANCEMENT: Neural Constellation Discovery Integration
-// Advanced card interactions with energy bloom, organic morphing, and contextual intelligence
-// Now enhanced with 3D constellation node capabilities
+// STARRYNIGHT ENHANCED CARDS SYSTEM - Dynamic Interactive Elements
+// PHASE 2 ENHANCEMENT: Visual Effects System Integration
+// Advanced card interactions with visual effects, smooth transitions, and dynamic intelligence
+// Now enhanced with 3D visual node capabilities
 // =============================================================================
 
 @use "../core/_mixins" as *;
 @use "./_sn_card_base";
 @use "./_sn_visual_accents" as *;
 @use "../core/_kinetic-animations" as *;
-@use "../visual/music-sync/color/perceptual-blending" as *;
+// Note: perceptual-blending archived in Phase 10 Week 4 (orphaned file)
 
-// Year 3000 Nexus Cards System Variables
+// StarryNight Enhanced Cards System Variables
 :root {
-  // === Holographic Foundation ===
-  --card-holographic-depth: 16px;
-  --card-energy-field-radius: 20px;
-  --card-nexus-connection-strength: 0.8;
-  --card-bloom-expansion: 1.08;
-  --card-morphing-fluidity: var(--sn-anim-easing-emergence);
+  // === Visual Effects Foundation ===
+  --card-visual-depth: 16px;
+  --card-effect-field-radius: 20px;
+  --card-connection-strength: 0.8;
+  --card-expansion-factor: 1.08;
+  --card-smooth-fluidity: var(--sn-anim-easing-emergence);
 
-  // === Organic Dimension System ===
-  --card-organic-corners: 16px;
+  // === Dynamic Dimension System ===
+  --card-dynamic-corners: 16px;
   --card-depth-near: translateZ(12px);
   --card-depth-mid: translateZ(6px);
   --card-depth-far: translateZ(0px);
   --card-perspective-field: 1200px;
 
-  // === Energy Interaction Variables ===
-  --card-energy-pulse-rate: 3s;
-  --card-bloom-threshold: 0.25s;
-  --card-energy-dissipation: 0.8s;
+  // === Visual Effect Interaction Variables ===
+  --card-effect-pulse-rate: 3s;
+  --card-effect-threshold: 0.25s;
+  --card-effect-dissipation: 0.8s;
   --card-harmonic-resonance: 1;
 
-  // === Adaptive Bloom 2.0 – Year 3000 Cosmic Sync ==========================
+  // === Adaptive Visual Effects 2.0 – StarryNight System ==================
   // Base alpha kept very light; value tuned for HDR displays.
-  --card-bloom-base-alpha: 0.015;
+  --card-effect-base-alpha: 0.015;
 
   // Dynamic scale factors
-  --card-bloom-beat-factor: var(--sn-nebula-beat-intensity, 0); // set by NebulaController
-  --card-bloom-context-factor: var(--motion-intelligence-level);
+  --card-effect-beat-factor: var(--sn-visual-beat-intensity, 0); // set by VisualEffectsController
+  --card-effect-context-factor: var(--motion-intelligence-level);
 
-  // Final bloom alpha – capped to 0.12 for accessibility.
-  --card-bloom-alpha: clamp(
+  // Final effect alpha – capped to 0.12 for accessibility.
+  --card-effect-alpha: clamp(
     0.015,
     calc(
-      (var(--card-bloom-base-alpha) * var(--card-bloom-context-factor)) +
-      (var(--card-bloom-beat-factor) * 0.05)
+      (var(--card-effect-base-alpha) * var(--card-effect-context-factor)) +
+      (var(--card-effect-beat-factor) * 0.05)
     ),
     0.12
   );
@@ -55,49 +55,48 @@
   --motion-intelligence-level: 1; // Adaptive to user context
   --focus-mode-dampening: 0.25; // Reduces motion in focus contexts
   --discovery-mode-amplification: 1.4; // Enhances in exploration
-  --music-energy-modulation: 1; // Responds to music dynamics
+  --music-effect-modulation: 1; // Responds to music dynamics
 
   // === Advanced Color Harmony ===
-  --card-energy-primary: rgba(
+  --card-color-primary: rgba(
     var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
     0.8
   );
-  --card-energy-secondary: rgba(
+  --card-color-secondary: rgba(
     var(--sn-accent-rgb, var(--spice-rgb-surface0, 186,187,241)),
     0.6
   );
-  --card-energy-accent: rgba(
+  --card-color-accent: rgba(
     var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
     0.7
   );
-  --card-energy-ambient: rgba(
+  --card-color-ambient: rgba(
     var(--spice-rgb-surface0, 65,69,89),
     0.4
   );
 
-  // === YEAR 3000 BEATSYNC CONSCIOUSNESS INTEGRATION ===
-  // Cards pulse and breathe with the rhythm of the cosmos
+  // === STARRYNIGHT BEATSYNC VISUAL EFFECTS INTEGRATION ===
+  // Cards pulse and animate with the rhythm of the music
   --card-beat-pulse-multiplier: 1; // Amplifier for beat responses
-  --card-rhythm-breathing: var(
-    --sn-breathing-scale,
+  --card-rhythm-animation: var(
+    --sn-music-breathing-scale,
     1
-  ); // Sync with breathing scale
+  ); // Sync with rhythm scale
   --card-beat-intensity: var(
     --sn-beat-pulse-intensity,
     0
   ); // Direct beat connection
-  --card-rhythm-phase: var(--sn-rhythm-phase, 0); // Harmonic oscillation
+  --card-rhythm-phase: var(--sn-rhythm-phase, 0); // Rhythm oscillation
 
-  // TODO: Extend existing holographic card system with 3D constellation positioning
-  // === PHASE 2: CONSTELLATION INTEGRATION ===
-  // Cards can exist as constellation nodes while preserving existing functionality
-  --card-constellation-mode: 0; // 0 = normal, 1 = constellation node
-  --card-constellation-depth: var(--constellation-z-mid, translateZ(60px));
-  --card-constellation-connection: var(--constellation-connection-strength, 0.7);
+  // TODO: Extend existing visual effects card system with 3D visual positioning
+  // === PHASE 2: VISUAL EFFECTS INTEGRATION ===
+  // Cards can exist as visual nodes while preserving existing functionality
+  --card-visual-mode: 0; // 0 = normal, 1 = visual node
+  --card-visual-connection: var(--visual-connection-strength, 0.7);
 
   // === Intelligent Motion Calculation - ENHANCED WITH RHYTHM ===
   --calculated-lift: calc(
-    var(--card-holographic-depth) * var(--motion-intelligence-level) *
+    var(--card-visual-depth) * var(--motion-intelligence-level) *
       var(--card-harmonic-resonance) *
       (
         1 +
@@ -110,7 +109,7 @@
       (var(--card-beat-intensity) * var(--card-beat-pulse-multiplier) * 0.02)
   );
   --calculated-transition: calc(
-    var(--card-energy-dissipation) / var(--motion-intelligence-level)
+    var(--card-effect-dissipation) / var(--motion-intelligence-level)
   );
 
   // === Lightweight Enhancement Foundation ===
@@ -120,23 +119,12 @@
   --card-transition-speed: 0.3s;
 
   // === Search-Compatible Color System ===
-  --card-color-primary: rgba(
-    var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
-    0.08
-  );
-  --card-color-secondary: rgba(
-    var(--sn-accent-rgb, var(--spice-rgb-surface0, 186,187,241)),
-    0.06
-  );
-  --card-color-accent: rgba(
-    var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
-    0.07
-  );
+  // (Color definitions use existing primary/secondary/accent from above)
   --card-shadow-base: rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.12);
 }
 
 // =============================================================================
-// CONTEXTUAL INTELLIGENCE ZONES - Year 3000 Adaptive Interface System
+// CONTEXTUAL INTELLIGENCE ZONES - StarryNight Adaptive Interface System
 // =============================================================================
 
 // Discovery Mode: Full expressiveness for exploration and browsing
@@ -146,13 +134,13 @@
 [data-context="discovery"] {
   --motion-intelligence-level: var(--discovery-mode-amplification);
   --card-harmonic-resonance: 1.2;
-  --card-energy-pulse-rate: calc(var(--card-energy-pulse-rate) * 0.7);
+  --card-effect-pulse-rate: calc(var(--card-effect-pulse-rate) * 0.7);
 }
 
-// Nexus Mode: Navigation contexts with balanced interaction
+// Navigation Mode: Navigation contexts with balanced interaction
 .Root__nav-bar,
 .main-yourLibrary-yourLibrary,
-[data-context="nexus"] {
+[data-context="navigation"] {
   --motion-intelligence-level: 0.8;
   --card-harmonic-resonance: 0.9;
 }
@@ -160,13 +148,13 @@
 // Music Response Mode: Cards react to playing state
 .Root__now-playing-bar:has(.main-trackList-playingIcon),
 [data-context="playing"] {
-  --music-energy-modulation: 1.3;
-  --card-energy-pulse-rate: calc(var(--card-energy-pulse-rate) * 0.6);
+  --music-effect-modulation: 1.3;
+  --card-effect-pulse-rate: calc(var(--card-effect-pulse-rate) * 0.6);
   --card-harmonic-resonance: calc(var(--card-harmonic-resonance) * 1.2);
 }
 
 // =============================================================================
-// YEAR 3000 NEXUS CARDS - Holographic Interactive Elements
+// STARRYNIGHT ENHANCED CARDS - Dynamic Interactive Elements
 // =============================================================================
 
 .main-card-card {
@@ -177,38 +165,43 @@
   // Attach lightweight, beat-aware glow
   @include harmonic-aura;
   
-  // Add perceptual blending for enhanced consciousness
-  @extend .oklab-perceptual-gradient;
+  // Add perceptual blending for enhanced visual effects
+  // OKLAB perceptual gradient (inline CSS)
+  background: linear-gradient(135deg, 
+    rgba(var(--visual-effects-oklab-primary-rgb), 0.6) 0%,
+    rgba(var(--visual-effects-oklab-accent-rgb), 0.4) 100%);
   
-  // Enhanced consciousness blending for special contexts
-  &[data-consciousness-enhanced] {
-    @extend .oklab-consciousness-blend;
+  // Enhanced visual blending for special contexts
+  &[data-visual-enhanced] {
+    // OKLAB visual blending (inline CSS)
+    background-blend-mode: multiply;
+    mix-blend-mode: screen;
   }
 
-  // === YEAR 3000 RHYTHMIC FOUNDATION ===
-  // Kinetic Verb: OSCILLATE - Cards breathe with the music
-  transform: scale(var(--card-rhythm-breathing))
+  // === STARRYNIGHT RHYTHMIC FOUNDATION ===
+  // Kinetic Verb: ANIMATE - Cards move with the music
+  transform: scale(var(--card-rhythm-animation))
     rotateY(calc(var(--card-rhythm-phase) * 0.5deg))
     rotateX(calc(var(--card-rhythm-phase) * 0.3deg));
   
-  // Breathing removed - focusing on key music elements instead
+  // Animation removed - focusing on key music elements instead
 
-  // TODO: Add constellation node styling that builds on existing card holographics
-  // === PHASE 2: CONSTELLATION NODE ENHANCEMENT ===
-  // Cards in constellation mode get enhanced 3D presence
-  .main-gridContainer-gridContainer:has([data-testid*="constellation"]) &,
+  // TODO: Add visual node styling that builds on existing card visual effects
+  // === PHASE 2: VISUAL NODE ENHANCEMENT ===
+  // Cards in visual mode get enhanced 3D presence
+  .main-gridContainer-gridContainer:has([data-testid*="visual"]) &,
   .main-view-container:has([data-testid*="artist"]) & {
-    --card-constellation-mode: 1;
+    --card-visual-mode: 1;
 
-    // Enhanced 3D positioning for constellation nodes
-    transform: scale(var(--card-rhythm-breathing))
-      var(--card-constellation-depth)
+    // Enhanced 3D positioning for visual nodes
+    transform: scale(var(--card-rhythm-animation))
+      var(--card-visual-depth)
       rotateY(calc(var(--card-rhythm-phase) * 0.5deg + 2deg))
       rotateX(calc(var(--card-rhythm-phase) * 0.3deg + 1deg));
   }
 
-  // === Holographic Foundation - ENHANCED WITH RHYTHM ===
-  border-radius: var(--card-organic-corners);
+  // === Visual Effects Foundation - ENHANCED WITH RHYTHM ===
+  border-radius: var(--card-dynamic-corners);
   background: linear-gradient(
     calc(135deg + (var(--card-rhythm-phase) * 2deg)),
     // Kinetic Verb: HARMONIZE
@@ -234,7 +227,7 @@
   border: 1px solid
     rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.15);
 
-  // Softened organic shadow to reduce visual bloom while preserving beat dynamics
+  // Softened dynamic shadow to reduce visual effects while preserving beat dynamics
   box-shadow: 0 4px calc(16px + (6px * var(--card-beat-intensity)))
       rgba(
         var(--sn-accent-rgb, var(--spice-rgb-accent)),
@@ -251,9 +244,9 @@
         calc(0.07 + (var(--card-beat-intensity) * 0.04))
       );
 
-  // === Energy Field Base State ===
+  // === Visual Effect Base State ===
   transition: transform var(--calculated-transition)
-      var(--card-morphing-fluidity),
+      var(--card-smooth-fluidity),
     box-shadow var(--calculated-transition) ease,
     background var(--calculated-transition) ease,
     border-color var(--calculated-transition) ease,
@@ -263,14 +256,14 @@
   @include performance-optimized;
   will-change: transform, box-shadow, background, border-color;
 
-  // === Organic Energy Field (Invisible Base Layer) ===
+  // === Dynamic Visual Effect Field (Invisible Base Layer) ===
   &::before {
     content: "";
     position: absolute;
-    top: calc(-1 * var(--card-energy-field-radius));
-    left: calc(-1 * var(--card-energy-field-radius));
-    right: calc(-1 * var(--card-energy-field-radius));
-    bottom: calc(-1 * var(--card-energy-field-radius));
+    top: calc(-1 * var(--card-effect-field-radius));
+    left: calc(-1 * var(--card-effect-field-radius));
+    right: calc(-1 * var(--card-effect-field-radius));
+    bottom: calc(-1 * var(--card-effect-field-radius));
     z-index: -2;
 
     background: radial-gradient(
@@ -278,25 +271,25 @@
       rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0) 0%,
       rgba(
         var(--sn-accent-rgb, var(--spice-rgb-accent)),
-        var(--card-bloom-alpha)
+        var(--card-effect-alpha)
       ) 40%,
       transparent 70%
     );
 
-    border-radius: calc(var(--card-organic-corners) * 2);
+    border-radius: calc(var(--card-dynamic-corners) * 2);
     opacity: 0;
     transform: scale(0.95);
-    transition: all var(--calculated-transition) var(--card-morphing-fluidity);
+    transition: all var(--calculated-transition) var(--card-smooth-fluidity);
   }
 
-  // === Holographic Interaction State - YEAR 3000 ENHANCED ===
+  // === Visual Effects Interaction State - STARRYNIGHT ENHANCED ===
   &:hover {
-    // Kinetic Verb: BLOOM - Contextual lift calculation with rhythm
+    // Kinetic Verb: EXPAND - Contextual lift calculation with rhythm
     transform: var(--card-depth-near) scale(var(--calculated-scale))
       rotateY(calc(var(--card-rhythm-phase) * 1deg))
       rotateX(calc(var(--card-rhythm-phase) * 0.5deg));
 
-    // Enhanced holographic background
+    // Enhanced visual effects background
     background: linear-gradient(
       135deg,
       rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.12) 0%,
@@ -312,19 +305,19 @@
       0.4
     );
 
-    // Sophisticated shadow with energy bloom
+    // Sophisticated shadow with visual effects
     box-shadow: 0 var(--calculated-lift) calc(var(--calculated-lift) * 2)
         rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.15),
       0 calc(var(--calculated-lift) * 2) calc(var(--calculated-lift) * 4)
         rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2),
-      0 0 calc(var(--card-energy-field-radius) * 2)
+      0 0 calc(var(--card-effect-field-radius) * 2)
         rgba(
           var(--sn-accent-rgb, var(--spice-rgb-accent)),
-          var(--card-bloom-alpha)
+          var(--card-effect-alpha)
         ),
       inset 0 1px 0 rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2);
 
-    // Activate energy field
+    // Activate visual effect field
     &::before {
       opacity: 1;
       transform: scale(1);
@@ -334,10 +327,10 @@
       -o-transform: scale(1);
     }
 
-    // Temporal Echo
+    // Visual Trail
     &::after {
       content: "";
-      @extend .sn-temporal-echo;
+      @extend .sn-visual-trail !optional;
       --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.18);
     }
   }
@@ -346,7 +339,7 @@
   &:focus-visible {
     outline: none;
 
-    // Nexus connection ring
+    // Visual connection ring
     &::after {
       content: "";
       position: absolute;
@@ -354,16 +347,16 @@
       left: -3px;
       right: -3px;
       bottom: -3px;
-      border: 2px solid var(--card-energy-primary);
-      border-radius: calc(var(--card-organic-corners) + 3px);
+      border: 2px solid var(--card-color-primary);
+      border-radius: calc(var(--card-dynamic-corners) + 3px);
       box-shadow: 0 0 12px
         rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4);
-      animation: nexus-focus-pulse var(--card-energy-pulse-rate) ease-in-out
+      animation: visual-focus-pulse var(--card-effect-pulse-rate) ease-in-out
         infinite;
     }
   }
 
-  // === Active State with Organic Response ===
+  // === Active State with Dynamic Response ===
   &:active {
     transform: var(--card-depth-mid) scale(calc(var(--calculated-scale) * 0.98));
     transition: transform 0.1s ease;
@@ -373,22 +366,22 @@
 
     &::after {
       content: "";
-      @extend .sn-temporal-echo;
+      @extend .sn-visual-trail !optional;
       --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.24);
     }
   }
 }
 
 // =============================================================================
-// ENHANCED CARD HEADER - Album Art Energy Source
+// ENHANCED CARD HEADER - Album Art Visual Effect Source
 // =============================================================================
 
 .main-card-header {
   position: relative;
-  border-radius: var(--card-organic-corners) var(--card-organic-corners) 0 0;
+  border-radius: var(--card-dynamic-corners) var(--card-dynamic-corners) 0 0;
   transform: var(--card-depth-mid);
 
-  // === Energy Source Ring (Around Album Art) ===
+  // === Visual Effect Source Ring (Around Album Art) ===
   &::before {
     content: "";
     position: absolute;
@@ -407,9 +400,9 @@
       rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4) 360deg
     );
 
-    border-radius: calc(var(--card-organic-corners) + 4px);
+    border-radius: calc(var(--card-dynamic-corners) + 4px);
     opacity: 0;
-    animation: energy-source-rotation calc(var(--card-energy-pulse-rate) * 2)
+    animation: visual-source-rotation calc(var(--card-effect-pulse-rate) * 2)
       linear infinite;
     transition: opacity var(--calculated-transition) ease;
   }
@@ -417,12 +410,12 @@
   // === Enhanced Image with Contextual Scaling ===
   .main-image-image,
   .main-cardImage-image {
-    // Standard breathing for album art - key music element (1.0x strength)
-    animation: organic-element-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
-    --breathing-context-multiplier: var(--organic-breathing-standard, 1.0);
+    // Standard animation for album art - key music element (1.0x strength)
+    animation: dynamic-element-animation var(--dynamic-animation-cycle, 1s) ease-in-out infinite;
+    --animation-context-multiplier: var(--dynamic-animation-standard, 1.0);
     
     transition: transform var(--calculated-transition)
-        var(--card-morphing-fluidity),
+        var(--card-smooth-fluidity),
       filter var(--calculated-transition) ease;
     filter: contrast(1) saturate(1);
 
@@ -432,7 +425,7 @@
     }
   }
 
-  // Show energy ring on card hover
+  // Show visual effect ring on card hover
   .main-card-card:hover & {
     &::before {
       opacity: 1;
@@ -475,7 +468,7 @@
 }
 
 // =============================================================================
-// ADVANCED GRID SYSTEM - Organic Flow Layout
+// ADVANCED GRID SYSTEM - Dynamic Flow Layout
 // =============================================================================
 
 .main-gridContainer-gridContainer {
@@ -520,10 +513,10 @@
 }
 
 // =============================================================================
-// INTERACTIVE ELEMENTS - Energy Bloom System
+// INTERACTIVE ELEMENTS - Visual Effect System
 // =============================================================================
 
-// Enhanced play button with Nexus energy
+// Enhanced play button with visual effects
 .main-card-PlayButtonContainer,
 .main-playButton-PlayButton {
   position: absolute;
@@ -533,7 +526,7 @@
   height: 48px;
   border-radius: 50%;
 
-  // Enhanced visual design with dynamic energy
+  // Enhanced visual design with dynamic effects
   background: radial-gradient(
     circle,
     rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.95) 0%,
@@ -554,9 +547,9 @@
   transform: translateY(calc(8px * var(--motion-intelligence-level, 1)))
     scale(calc(0.8 + 0.2 * var(--motion-intelligence-level, 1)));
 
-  transition: all var(--calculated-transition) var(--card-morphing-fluidity);
+  transition: all var(--calculated-transition) var(--card-smooth-fluidity);
 
-  // === Energy Bloom Effect ===
+  // === Visual Effect Animation ===
   &::before {
     content: "";
     position: absolute;
@@ -571,7 +564,7 @@
     );
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    transition: all 600ms var(--card-morphing-fluidity);
+    transition: all 600ms var(--card-smooth-fluidity);
     z-index: -1;
     opacity: 0;
   }
@@ -581,11 +574,11 @@
     opacity: 1;
     transform: translateY(0) scale(1);
     transition-delay: calc(
-      var(--card-bloom-threshold) / var(--motion-intelligence-level, 1)
+      var(--card-effect-threshold) / var(--motion-intelligence-level, 1)
     );
   }
 
-  // === Enhanced Button Hover with Energy Bloom ===
+  // === Enhanced Button Hover with Visual Effects ===
   &:hover {
     transform: scale(calc(1 + 0.08 * var(--motion-intelligence-level, 1)));
     background: radial-gradient(
@@ -600,7 +593,7 @@
       0 0 16px
         rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.2);
 
-    // Activate energy bloom
+    // Activate visual effect
     &::before {
       width: 60px;
       height: 60px;
@@ -608,7 +601,7 @@
     }
   }
 
-  // === Active State with Organic Response ===
+  // === Active State with Dynamic Response ===
   &:active {
     transform: scale(calc(0.95 + 0.05 * var(--motion-intelligence-level, 1)));
     transition: transform 0.1s ease;
@@ -616,10 +609,10 @@
 }
 
 // =============================================================================
-// ADVANCED ANIMATIONS - Organic Energy System
+// ADVANCED ANIMATIONS - Dynamic Visual Effect System
 // =============================================================================
 
-@keyframes nexus-focus-pulse {
+@keyframes visual-focus-pulse {
   0%,
   100% {
     box-shadow: 0 0 12px
@@ -633,7 +626,7 @@
   }
 }
 
-@keyframes energy-source-rotation {
+@keyframes visual-source-rotation {
   0% {
     transform: rotate(0deg);
   }
@@ -650,7 +643,7 @@
 @media (prefers-reduced-motion: reduce) {
   :root {
     --motion-intelligence-level: 0.1;
-    --card-energy-pulse-rate: 0.01ms;
+    --card-effect-pulse-rate: 0.01ms;
   }
 
   .main-card-card,
@@ -673,7 +666,7 @@
 @media (max-width: 768px) {
   :root {
     --motion-intelligence-level: 0.6;
-    --card-energy-pulse-rate: calc(var(--card-energy-pulse-rate) * 1.5);
+    --card-effect-pulse-rate: calc(var(--card-effect-pulse-rate) * 1.5);
   }
 
   // Always show play buttons on mobile
@@ -701,7 +694,7 @@
 @media (prefers-reduced-data: reduce) {
   :root {
     --motion-intelligence-level: 0.3;
-    --card-energy-pulse-rate: calc(var(--card-energy-pulse-rate) * 3);
+    --card-effect-pulse-rate: calc(var(--card-effect-pulse-rate) * 3);
   }
 
   .main-card-card {
@@ -763,10 +756,10 @@ body:not(:has(.main-searchPage-content)) {
       box-shadow: 0 8px 24px var(--card-shadow-base),
         0 4px 16px rgba(var(--spice-rgb-accent), 0.1);
 
-      // Temporal Echo
+      // Visual Trail
       &::after {
         content: "";
-        @extend .sn-temporal-echo;
+        @extend .sn-visual-trail !optional;
         --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.18);
       }
     }
@@ -784,7 +777,7 @@ body:not(:has(.main-searchPage-content)) {
 
       &::after {
         content: "";
-        @extend .sn-temporal-echo;
+        @extend .sn-visual-trail !optional;
         --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.24);
       }
     }
@@ -801,9 +794,9 @@ body:not(:has(.main-searchPage-content)) {
     // === Enhanced Image ===
     .main-image-image,
     .main-cardImage-image {
-      // Standard breathing for album art - key music element (1.0x strength)
-      animation: organic-element-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
-      --breathing-context-multiplier: var(--organic-breathing-standard, 1.0);
+      // Standard animation for album art - key music element (1.0x strength)
+      animation: dynamic-element-animation var(--dynamic-animation-cycle, 1s) ease-in-out infinite;
+      --animation-context-multiplier: var(--dynamic-animation-standard, 1.0);
       
       transition: filter var(--card-transition-speed) ease;
       filter: contrast(1) saturate(1);
@@ -853,4 +846,99 @@ body:not(:has(.main-searchPage-content)) {
     --card-transition-speed: 0.2s;
     --card-shadow-intensity: 0.08;
   }
+}
+
+// =============================================================================
+// LEGACY COMPATIBILITY MAPPINGS - Phase 6.2 Layer D Modernization
+// =============================================================================
+
+:root {
+  // === Legacy Component Variable Mappings ===
+  
+  // Holographic/Visual Effects Mappings
+  --card-holographic-depth: var(--card-visual-depth);
+  
+  // Energy/Effect Field Mappings
+  --card-energy-field-radius: var(--card-effect-field-radius);
+  --card-energy-pulse-rate: var(--card-effect-pulse-rate);
+  --card-energy-dissipation: var(--card-effect-dissipation);
+  --card-energy-primary: var(--card-color-primary);
+  --card-energy-secondary: var(--card-color-secondary);
+  --card-energy-accent: var(--card-color-accent);
+  --card-energy-ambient: var(--card-color-ambient);
+  
+  // Bloom/Effect Alpha Mappings
+  --card-bloom-base-alpha: var(--card-effect-base-alpha);
+  --card-bloom-beat-factor: var(--card-effect-beat-factor);
+  --card-bloom-context-factor: var(--card-effect-context-factor);
+  --card-bloom-alpha: var(--card-effect-alpha);
+  --card-bloom-threshold: var(--card-effect-threshold);
+  
+  // Nexus/Connection Mappings
+  --card-nexus-connection-strength: var(--card-connection-strength);
+  
+  // Organic/Dynamic Mappings
+  --card-organic-corners: var(--card-dynamic-corners);
+  
+  // Morphing/Smooth Mappings
+  --card-morphing-fluidity: var(--card-smooth-fluidity);
+  
+  // Constellation/Visual Mode Mappings
+  --card-constellation-mode: var(--card-visual-mode);
+  --card-constellation-depth: var(--card-visual-depth);
+  --card-constellation-connection: var(--card-visual-connection);
+  
+  // Music Energy/Effect Mappings
+  --music-energy-modulation: var(--music-effect-modulation);
+  
+  // Expansion/Bloom Mappings
+  --card-bloom-expansion: var(--card-expansion-factor);
+  
+  // Breathing/Animation Mappings (preserve original names for music sync)
+  --card-rhythm-breathing: var(--card-rhythm-animation);
+  --organic-breathing-cycle: var(--dynamic-animation-cycle);
+  --organic-breathing-standard: var(--dynamic-animation-standard);
+  --breathing-context-multiplier: var(--animation-context-multiplier);
+}
+
+// === Legacy Class Mappings ===
+
+// Legacy consciousness blend support
+[data-consciousness-enhanced] {
+  @extend [data-visual-enhanced] !optional;
+}
+
+// Legacy SCSS extend support
+.oklab-consciousness-blend {
+  @extend .oklab-visual-blend !optional;
+}
+
+// Legacy temporal echo support
+.sn-temporal-echo {
+  @extend .sn-visual-trail !optional;
+}
+
+// === Legacy Animation Mappings ===
+
+// Support legacy breathing animations (redirect to modern keyframes)
+@keyframes organic-element-breathing {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+// Support legacy keyframe names (redirect to modern animations)
+@keyframes nexus-focus-pulse {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.6);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes energy-source-rotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

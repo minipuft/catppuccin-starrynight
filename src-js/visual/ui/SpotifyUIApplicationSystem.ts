@@ -5,7 +5,7 @@
  * This system discovers DOM elements and applies the existing --sn-* variables systematically.
  */
 
-import type { Year3000System } from "../../core/lifecycle/year3000System";
+import type { Year3000System } from "../../core/lifecycle/AdvancedThemeSystem";
 import type { HealthCheckResult, IManagedSystem } from "../../types/systems";
 
 // Event-driven integration imports

@@ -5,8 +5,8 @@
  * processing strategies. Provides a centralized registry for strategy
  * management with performance monitoring and health checking.
  *
- * Philosophy: "A conscious library of transformation algorithms - each strategy
- * a unique expression of color consciousness, waiting to be awakened."
+ * Philosophy: "A technical library of transformation algorithms - each strategy
+ * a unique expression of color visual-effects, waiting to be awakened."
  */
 
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -341,7 +341,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
         category = "foundation";
         priority = 8;
         memoryImpact = "low";
-        tags.push("gradient", "breathing", "foundation", "css");
+        tags.push("gradient", "pulsing", "foundation", "css");
         break;
 
       case "webgl-gradient":
@@ -360,7 +360,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
           "depth",
           "layers",
           "parallax",
-          "consciousness",
+          "visual-effects",
           "cosmic",
           "cinematic"
         );

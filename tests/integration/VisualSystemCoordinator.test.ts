@@ -10,8 +10,8 @@
 
 import { VisualSystemCoordinator } from '@/visual/coordination/VisualSystemCoordinator';
 import { SystemCoordinator } from '@/core/integration/SystemCoordinator';
-import { YEAR3000_CONFIG } from '@/config/globalConfig';
-import * as Utils from '@/utils/core/Year3000Utilities';
+import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
+import * as Utils from '@/utils/core/ThemeUtilities';
 
 describe('Visual System Coordinator Integration', () => {
   let visualCoordinator: VisualSystemCoordinator;
@@ -27,11 +27,11 @@ describe('Visual System Coordinator Integration', () => {
       </div>
     `;
 
-    // Mock year3000System for SystemCoordinator
-    const mockYear3000System = {
+    // Mock advancedThemeSystem for SystemCoordinator
+    const mockAdvancedThemeSystem = {
       isInitialized: false,
       getCachedNonVisualSystem: jest.fn(() => null),
-      config: YEAR3000_CONFIG
+      config: ADVANCED_SYSTEM_CONFIG
     };
 
     // Mock dependencies for VisualSystemCoordinator
@@ -74,11 +74,11 @@ describe('Visual System Coordinator Integration', () => {
     };
 
     // Initialize coordinators with proper dependencies
-    systemCoordinator = new SystemCoordinator(YEAR3000_CONFIG, Utils, mockYear3000System);
+    systemCoordinator = new SystemCoordinator(ADVANCED_SYSTEM_CONFIG, Utils, mockAdvancedThemeSystem);
     visualCoordinator = new VisualSystemCoordinator(
-      YEAR3000_CONFIG, 
+      ADVANCED_SYSTEM_CONFIG, 
       Utils, 
-      mockYear3000System,
+      mockAdvancedThemeSystem,
       mockCSSController,
       mockPerformanceAnalyzer,
       mockMusicSyncService,

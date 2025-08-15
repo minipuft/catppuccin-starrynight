@@ -2,12 +2,12 @@ import { CSSAnimationManager } from './CSSAnimationManager';
 import { EnhancedMasterAnimationCoordinator } from './EnhancedMasterAnimationCoordinator';
 import { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
 import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
-import type { Year3000Config } from '@/types/models';
+import type { Year3000Config, AdvancedSystemConfig } from '@/types/models';
 
 /**
  * CSSAnimationIntegration - Phase 2 CSS Animation Integration
  * 
- * Provides a unified interface for integrating CSS animations with the Year3000System:
+ * Provides a unified interface for integrating CSS animations with the AdvancedThemeSystem:
  * - Manages CSSAnimationManager lifecycle
  * - Coordinates between CSS animations and TypeScript systems
  * - Provides convenient methods for triggering animations
@@ -22,7 +22,7 @@ export class CSSAnimationIntegration {
   private config: Year3000Config;
   private cssAnimationManager: CSSAnimationManager | null = null;
   private animationCoordinator: EnhancedMasterAnimationCoordinator | null = null;
-  private cssConsciousnessController: UnifiedCSSVariableManager | null = null;
+  private cssVisualEffectsController: UnifiedCSSVariableManager | null = null;
   private eventBus: typeof unifiedEventBus;
   
   private initialized = false;
@@ -53,18 +53,18 @@ export class CSSAnimationIntegration {
    * Initialize the CSS animation integration
    */
   public initialize(
-    cssConsciousnessController: UnifiedCSSVariableManager,
+    cssVisualEffectsController: UnifiedCSSVariableManager,
     animationCoordinator: EnhancedMasterAnimationCoordinator
   ): void {
     if (this.initialized) return;
     
-    this.cssConsciousnessController = cssConsciousnessController;
+    this.cssVisualEffectsController = cssVisualEffectsController;
     this.animationCoordinator = animationCoordinator;
     
     // Create CSS animation manager
     this.cssAnimationManager = new CSSAnimationManager(
       this.config,
-      this.cssConsciousnessController,
+      this.cssVisualEffectsController,
       this.animationCoordinator
     );
     
@@ -85,7 +85,7 @@ export class CSSAnimationIntegration {
     if (!this.cssAnimationManager) return;
     
     // Update bloom intensity
-    this.cssConsciousnessController?.updateMusicVariables({
+    this.cssVisualEffectsController?.updateMusicVariables({
       'beat.pulse.intensity': intensity,
     });
     
@@ -108,7 +108,7 @@ export class CSSAnimationIntegration {
     const duration = options?.duration || 1200;
     
     // Update ripple variables
-    this.cssConsciousnessController?.updateMusicVariables({
+    this.cssVisualEffectsController?.updateMusicVariables({
       'spectrum.phase': intensity * 30,
     });
     
@@ -127,7 +127,7 @@ export class CSSAnimationIntegration {
     this.cssAnimationManager.enableBeatSync(enabled);
     
     // Update CSS variables
-    this.cssConsciousnessController?.updateUtilityVariables({
+    this.cssVisualEffectsController?.updateUtilityVariables({
       'feature.music.sync.enabled': enabled,
     });
   }
@@ -141,7 +141,7 @@ export class CSSAnimationIntegration {
     this.cssAnimationManager.setAnimationIntensity(intensity);
     
     // Update performance variables
-    this.cssConsciousnessController?.updatePerformanceVariables({
+    this.cssVisualEffectsController?.updatePerformanceVariables({
       'quality.level': intensity,
     });
   }
@@ -155,20 +155,20 @@ export class CSSAnimationIntegration {
     this.cssAnimationManager.onPerformanceModeChange(mode);
     
     // Update performance variables
-    this.cssConsciousnessController?.updatePerformanceVariables({
+    this.cssVisualEffectsController?.updatePerformanceVariables({
       'mode': mode,
     });
   }
   
   /**
-   * Trigger harmonize animation for breathing/flow effects
+   * Trigger harmonize animation for pulsing/flow effects
    */
   public triggerHarmonize(elements: NodeListOf<Element> | Element[], tempo: number = 120): void {
     if (!this.cssAnimationManager) return;
     
     // Update tempo-based variables
     const tempoMultiplier = tempo / 120;
-    this.cssConsciousnessController?.updateMusicVariables({
+    this.cssVisualEffectsController?.updateMusicVariables({
       'tempo.bpm': tempo,
     });
     
@@ -185,7 +185,7 @@ export class CSSAnimationIntegration {
     if (!this.cssAnimationManager) return;
     
     // Update refract variables
-    this.cssConsciousnessController?.updateColorVariables({
+    this.cssVisualEffectsController?.updateColorVariables({
       'shift.hue': intensity * 15,
     });
     
@@ -198,20 +198,27 @@ export class CSSAnimationIntegration {
   /**
    * Trigger temporal echo animation
    */
-  public triggerTemporalEcho(elements: NodeListOf<Element> | Element[], energy: number = 1): void {
+  public triggerTimeBasedEcho(elements: NodeListOf<Element> | Element[], energy: number = 1): void {
     if (!this.cssAnimationManager) return;
     
     // Update echo variables
-    this.cssConsciousnessController?.updateMusicVariables({
+    this.cssVisualEffectsController?.updateMusicVariables({
       'energy.level': energy,
     });
     
     // Trigger animation
-    this.cssAnimationManager.triggerKineticAnimation(elements, 'temporalEcho', {
+    this.cssAnimationManager.triggerKineticAnimation(elements, 'timeBasedEcho', {
       duration: 800 * energy,
     });
   }
   
+  /**
+   * @deprecated Use triggerTimeBasedEcho instead
+   */
+  public triggerTemporalEcho(elements: NodeListOf<Element> | Element[], energy: number = 1): void {
+    return this.triggerTimeBasedEcho(elements, energy);
+  }
+
   /**
    * Trigger gravity animation for attention flow
    */
@@ -219,7 +226,7 @@ export class CSSAnimationIntegration {
     if (!this.cssAnimationManager) return;
     
     // Update gravity variables
-    this.cssConsciousnessController?.updateConsciousnessVariables({
+    this.cssVisualEffectsController?.updateVisualEffectsVariables({
       'hover.pull': `${Math.abs(mouseX - 0.5) * 20}px`,
       'focus.pull': `${Math.abs(mouseY - 0.5) * 20}px`,
     });
@@ -334,13 +341,13 @@ export class CSSAnimationIntegration {
       }
     }, 'CSSAnimationIntegration');
     
-    // Listen for consciousness field changes
-    this.eventBus.subscribe('emotion:analyzed', (payload: any) => {
+    // Listen for visual effects field changes
+    this.eventBus.subscribe('music:emotion-analyzed', (payload: any) => {
       if (payload.emotion && payload.emotion.intensity > 0.5) {
-        // Trigger temporal echo on consciousness changes
-        const consciousnessElements = document.querySelectorAll('.sn-consciousness-responsive');
-        if (consciousnessElements.length > 0) {
-          this.triggerTemporalEcho(consciousnessElements, payload.emotion.intensity);
+        // Trigger time-based echo on visual effects changes
+        const visualEffectsElements = document.querySelectorAll('.sn-visual-effects-responsive');
+        if (visualEffectsElements.length > 0) {
+          this.triggerTimeBasedEcho(visualEffectsElements, payload.emotion.intensity);
         }
       }
     }, 'CSSAnimationIntegration');

@@ -9,11 +9,11 @@ import type {
   FrameContext,
   IVisualSystem,
 } from "@/core/animation/EnhancedMasterAnimationCoordinator";
-import type { Year3000System } from "@/core/lifecycle/year3000System";
+import type { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
 import type { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { SettingsManager } from "@/ui/managers/SettingsManager";
-import type * as Utils from "@/utils/core/Year3000Utilities";
+import type * as Utils from "@/utils/core/ThemeUtilities";
 
 export interface ColorZone {
   id: string;
@@ -48,7 +48,7 @@ export interface ColorFieldCoordination {
 export class ColorFieldManager implements IVisualSystem {
   public readonly systemName = "ColorFieldManager";
 
-  private config: Year3000Config;
+  private config: AdvancedSystemConfig | Year3000Config;
   private utils: typeof Utils;
   private performanceAnalyzer: SimplePerformanceCoordinator;
   private musicSyncService: MusicSyncService | null;
@@ -74,7 +74,7 @@ export class ColorFieldManager implements IVisualSystem {
   };
 
   constructor(
-    config: Year3000Config,
+    config: AdvancedSystemConfig | Year3000Config,
     utils: typeof Utils,
     performanceAnalyzer: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null,

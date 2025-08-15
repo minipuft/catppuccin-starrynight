@@ -1,5 +1,5 @@
 /* ████████████████████████████████████████████████████████████████████████████████*/
-/* DIMENSIONAL NEXUS SIDEBAR - Phase 5: Holographic Data Glyphs & Biometric Feedback*/
+/* SYSTEM NEXUS SIDEBAR - Phase 5: Dynamic Data Glyphs & Biometric Feedback*/
 /* ████████████████████████████████████████████████████████████████████████████████*/
 
 @use "../components/_sn_glyph_variables.scss" as *;
@@ -17,8 +17,8 @@
   ); /* Default color*/
 
   /* Variables for Biometric Feedback States (Phase 5)*/
-  --sn-sidebar-meditation-desaturation: 0; /* 0 to 1 (0 = normal, 1 = fully desaturated gray)*/
-  --sn-sidebar-meditation-slowdown: 1; /* Animation speed multiplier (1 = normal, <1 = slower)*/
+  --sn-sidebar-calm-mode-desaturation: 0; /* 0 to 1 (0 = normal, 1 = fully desaturated gray)*/
+  --sn-sidebar-calm-mode-slowdown: 1; /* Animation speed multiplier (1 = normal, <1 = slower)*/
   --sn-item-energy-absorption-scale: 1; /* Scale effect for item absorbing energy*/
 }
 
@@ -79,16 +79,16 @@
   }
 }
 
-/* Sidebar Digital Meditation State*/
+/* Sidebar Digital Calm State*/
 div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
-  /* Apply desaturation and slowdown when --sn-sidebar-meditation-desaturation > 0*/
+  /* Apply desaturation and slowdown when --sn-sidebar-calm-mode-desaturation > 0*/
   /* This requires careful application to not break other filter effects.*/
   /* We might need to adjust how filters are composed in the ::before/::after layers.*/
   /* For now, a simple approach targeting the main layers' filter property:*/
-  &.sn-digital-meditation {
+  &.sn-digital-calm-mode {
     /* This class will be added by JS*/
-    .sn-consciousness-layer, /* Target the pseudo-elements if they have distinct classes*/
-    .sn-neural-flow-layer,
+    .sn-dynamic-state-layer, /* Target the pseudo-elements if they have distinct classes*/
+    .sn-network-flow-layer,
     .sn-quantum-foam-layer,
     &::before, /* If layers are directly on ::before*/
     &::after {
@@ -97,22 +97,22 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
         saturate(
           calc(
             var(--sn-gradient-saturation) *
-              (1 - var(--sn-sidebar-meditation-desaturation))
+              (1 - var(--sn-sidebar-calm-mode-desaturation))
           )
         )
         brightness(var(--sn-gradient-brightness))
         contrast(var(--sn-gradient-contrast));
       animation-duration: calc(
         var(--original-animation-duration, 20s) /
-          var(--sn-sidebar-meditation-slowdown)
+          var(--sn-sidebar-calm-mode-slowdown)
       );
       /* Need to ensure other animation properties also respect this slowdown if not using a single duration property.*/
     }
     /* Reduce animation speed for specific animations*/
     /* This is tricky without a global animation speed control on the parent.*/
     /* Individual animation-duration properties would need to be targeted or vars used.*/
-    /* For example, if --sn-neural-flow-speed is used by an animation:*/
-    /* --sn-neural-flow-speed: calc(var(--original-neural-flow-speed, 20s) / var(--sn-sidebar-meditation-slowdown));*/
+    /* For example, if --sn-network-flow-speed is used by an animation:*/
+    /* --sn-network-flow-speed: calc(var(--original-network-flow-speed, 20s) / var(--sn-sidebar-calm-mode-slowdown));*/
   }
 }
 

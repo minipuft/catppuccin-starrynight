@@ -500,7 +500,7 @@ describe('Event Bus Unification Integration Tests', () => {
         'colors-harmonized',
         'music-sync:beat',
         'music-sync:energy-changed',
-        'year3000SystemSettingsChanged'
+        'advancedThemeSystemSettingsChanged'
       ];
 
       for (const eventType of eventTypes) {
@@ -532,7 +532,7 @@ describe('Event Bus Unification Integration Tests', () => {
       });
 
       // Monitor legacy DOM events (should not be used)
-      const legacyTypes = ['colors-extracted', 'music-sync:beat', 'year3000SystemSettingsChanged'];
+      const legacyTypes = ['colors-extracted', 'music-sync:beat', 'advancedThemeSystemSettingsChanged'];
       legacyTypes.forEach(eventType => {
         document.addEventListener(eventType, () => {
           legacyEventCount++;
@@ -542,7 +542,7 @@ describe('Event Bus Unification Integration Tests', () => {
       // Emit events through migration manager
       testMigrationManager.emitLegacyEvent('colors-extracted', { colors: {} });
       testMigrationManager.emitLegacyEvent('music-sync:beat', { bpm: 120 });
-      testMigrationManager.emitLegacyEvent('year3000SystemSettingsChanged', { setting: 'test' });
+      testMigrationManager.emitLegacyEvent('advancedThemeSystemSettingsChanged', { setting: 'test' });
 
       await new Promise(resolve => setTimeout(resolve, 20));
 

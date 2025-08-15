@@ -3,13 +3,13 @@
  *
  * Transforms the DynamicCatppuccinBridge into a proper IColorProcessor strategy
  * for the unified ColorOrchestrator architecture. Handles Spicetify variable
- * updates and consciousness extensions through the Color Extension Facade pattern.
+ * updates and visual-effects extensions through the Color Extension Facade pattern.
  *
  * Philosophy: "Unified color processing through intelligent strategy coordination,
  * eliminating duplicate event handling while preserving dynamic accent functionality."
  */
 
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { getGlobalOptimizedCSSController, OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type {
@@ -23,7 +23,7 @@ import {
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
 import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 
 interface DynamicColorState {
   currentAccentHex: string;
@@ -38,7 +38,7 @@ interface DynamicColorState {
 interface CatppuccinIntegrationConfig {
   accentUpdateEnabled: boolean;
   baseTransformationEnabled: boolean;
-  consciousnessIntegrationEnabled: boolean;
+  visualEffectsIntegrationEnabled: boolean;
   oklabEnhancementEnabled: boolean;
   smoothTransitionDuration: number; // ms
   energyResponseMultiplier: number; // 0-2
@@ -49,14 +49,14 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
   private cssController: OptimizedCSSVariableManager | null;
   private oklabProcessor: OKLABColorProcessor;
   private utils = Utils;
-  private config = YEAR3000_CONFIG;
+  private config = ADVANCED_SYSTEM_CONFIG;
 
   private dynamicColorState: DynamicColorState = this.getInitialColorState();
 
   private integrationConfig: CatppuccinIntegrationConfig = {
     accentUpdateEnabled: true,
     baseTransformationEnabled: true,
-    consciousnessIntegrationEnabled: true,
+    visualEffectsIntegrationEnabled: true,
     oklabEnhancementEnabled: true,
     smoothTransitionDuration: 800, // 0.8s smooth transitions
     energyResponseMultiplier: 1.2,
@@ -196,7 +196,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
       // Handle music energy if available
       if (context.musicData?.energy !== undefined) {
         this.dynamicColorState.musicEnergy = context.musicData.energy;
-        await this.updateConsciousnessWithMusicEnergy(context.musicData.energy);
+        await this.updateVisualEffectsWithMusicEnergy(context.musicData.energy);
       }
 
       const processingTime = performance.now() - startTime;
@@ -359,7 +359,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
 
   /**
    * Apply colors using Color Extension Facade pattern with coordinated updates
-   * Updates both core Spicetify variables AND consciousness extensions with OKLAB enhancement
+   * Updates both core Spicetify variables AND visual-effects extensions with OKLAB enhancement
    */
   private async applyColorFacade(
     accentHex: string,
@@ -436,14 +436,14 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
       await this.updateLivingBaseBackground(primaryColor);
     }
 
-    // 🔮 CONSCIOUSNESS INTEGRATION
-    if (this.integrationConfig.consciousnessIntegrationEnabled) {
-      await this.updateConsciousnessWithAccent(accentHex, rgbString);
+    // 🔮 VISUAL EFFECTS INTEGRATION
+    if (this.integrationConfig.visualEffectsIntegrationEnabled) {
+      await this.updateVisualEffectsWithAccent(accentHex, rgbString);
     }
 
     Y3KDebug?.debug?.log(
       "DynamicCatppuccinStrategy",
-      `Applied coordinated color facade - Spicetify: ${accentHex}, Consciousness extensions updated`,
+      `Applied coordinated color facade - Spicetify: ${accentHex}, Visual-effects extensions updated`,
       {
         oklabProcessing: !!oklabResult,
         variableCount: Object.keys(variablesToUpdate).length,
@@ -453,7 +453,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
 
   /**
    * Update living base background using coordinated variable updates
-   * Preserves Spicetify base while adding consciousness layers
+   * Preserves Spicetify base while adding visual-effects layers
    */
   private async updateLivingBaseBackground(primaryHex: string): Promise<void> {
     const primaryRgb = this.utils.hexToRgb(primaryHex);
@@ -463,7 +463,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
     const primaryRgbString = `${primaryRgb.r},${primaryRgb.g},${primaryRgb.b}`;
 
     // Create living gradient that ENHANCES Spicetify base (doesn't replace)
-    const consciousnessGradient = `
+    const visualEffectsGradient = `
       linear-gradient(135deg,
         var(--spice-base) 0%,
         rgba(${primaryRgbString}, 0.08) 30%,
@@ -472,19 +472,19 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
       var(--spice-base)
     `;
 
-    // 🌊 COORDINATED CONSCIOUSNESS EXTENSIONS
+    // 🌊 COORDINATED VISUAL-EFFECTS EXTENSIONS
     const livingBaseVariables: Record<string, string> = {
       // Dynamic secondary colors
       "--sn-dynamic-secondary-hex": primaryHex,
       "--sn-dynamic-secondary-rgb": primaryRgbString,
 
-      // Extracted color system for consciousness effects
+      // Extracted color system for visual-effects
       "--sn-color-extracted-secondary-rgb": primaryRgbString,
       "--sn-color-harmony-complementary-rgb": primaryRgbString,
 
       // Living gradient enhancements
-      "--living-base-gradient": consciousnessGradient,
-      "--consciousness-base-gradient": consciousnessGradient,
+      "--living-base-gradient": visualEffectsGradient,
+      "--visual-effects-base-gradient": visualEffectsGradient,
     };
 
     if (this.cssController) {
@@ -502,42 +502,42 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
   }
 
   /**
-   * Update consciousness system with new accent awareness using coordinated updates
+   * Update visual-effects system with new accent awareness using coordinated updates
    */
-  private async updateConsciousnessWithAccent(
+  private async updateVisualEffectsWithAccent(
     accentHex: string,
     accentRgb: string
   ): Promise<void> {
-    const consciousnessVariables: Record<string, string> = {
-      // Holographic consciousness variables
+    const visualEffectsVariables: Record<string, string> = {
+      // Holographic visual-effects variables
       "--sn-holographic-rgb": accentRgb,
       "--holographic-scanline-rgb": accentRgb,
 
-      // Depth consciousness variables
-      "--consciousness-intensity": `calc(0.5 + var(--musical-sync-intensity) * ${this.integrationConfig.energyResponseMultiplier})`,
+      // Depth visual-effects variables
+      "--visual-effects-intensity": `calc(0.5 + var(--musical-sync-intensity) * ${this.integrationConfig.energyResponseMultiplier})`,
     };
 
     if (this.cssController) {
       this.cssController.updateVariables(
-        consciousnessVariables,
+        visualEffectsVariables,
         "normal",
-        "consciousness-accent-integration"
+        "visual-effects-accent-integration"
       );
     }
   }
 
   /**
-   * Update consciousness with music energy using coordinated updates
+   * Update visual-effects with music energy using coordinated updates
    */
-  private async updateConsciousnessWithMusicEnergy(
+  private async updateVisualEffectsWithMusicEnergy(
     energy: number
   ): Promise<void> {
     const adjustedEnergy =
       energy * this.integrationConfig.energyResponseMultiplier;
 
-    // Update consciousness intensity based on energy
+    // Update visual-effects intensity based on energy
     const baseIntensity = 0.5;
-    const consciousnessIntensity = Math.max(
+    const visualEffectsIntensity = Math.max(
       0.1,
       Math.min(1.0, baseIntensity + adjustedEnergy * 0.3)
     );
@@ -545,19 +545,19 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
     const musicEnergyVariables: Record<string, string> = {
       "--musical-sync-intensity": adjustedEnergy.toString(),
       "--holographic-music-flicker-intensity": adjustedEnergy.toString(),
-      "--consciousness-intensity": consciousnessIntensity.toString(),
+      "--visual-effects-intensity": visualEffectsIntensity.toString(),
     };
 
     if (this.cssController) {
       this.cssController.updateVariables(
         musicEnergyVariables,
         "high",
-        "consciousness-music-energy"
+        "visual-effects-music-energy"
       );
 
-      // Also update consciousness intensity using the simplified coordination method
-      this.cssController.updateConsciousnessIntensity(
-        parseFloat(consciousnessIntensity.toString()),
+      // Also update visual-effects intensity using the simplified coordination method
+      this.cssController.updateVisualEffectsIntensity(
+        parseFloat(visualEffectsIntensity.toString()),
         "DynamicCatppuccinStrategy",
         adjustedEnergy
       );
@@ -616,8 +616,8 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
         musicEnergy: this.dynamicColorState.musicEnergy,
         oklabProcessing: this.integrationConfig.oklabEnhancementEnabled,
         oklabPreset: this.integrationConfig.oklabPreset,
-        consciousnessIntegration:
-          this.integrationConfig.consciousnessIntegrationEnabled,
+        visualEffectsIntegration:
+          this.integrationConfig.visualEffectsIntegrationEnabled,
       },
     };
   }

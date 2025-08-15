@@ -10,7 +10,7 @@
 
 import { UnifiedCSSVariableManager } from '../css/UnifiedCSSVariableManager';
 import { UnifiedPerformanceCoordinator } from './UnifiedPerformanceCoordinator';
-import type { Year3000Config } from '@/types/models';
+import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 import { SimplePerformanceCoordinator } from './SimplePerformanceCoordinator';
 import { PerformanceBudgetManager } from './PerformanceBudgetManager';
 

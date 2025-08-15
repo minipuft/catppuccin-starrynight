@@ -1,6 +1,6 @@
 # Background Systems Architecture Guide
 
-> **"In the Year 3000, backgrounds are not static canvases but living, breathing entities that form the conscious foundation of all visual experiences. Each layer breathes with music, flows with emotion, and adapts through unified visual effects coordination."**
+> **"With advanced systems, backgrounds are not static canvases but responsive, smooth entities that form the dynamic foundation of all visual experiences. Each layer responds with music, flows with emotion, and adapts through unified visual effects coordination."**
 
 ## Overview
 
@@ -13,7 +13,7 @@ The Catppuccin StarryNight theme implements a sophisticated **multi-layered back
 ```
 Progressive Enhancement Stack (Bottom to Top) - All coordinated through VisualEffectsCoordinator
 ├── CSS Foundation Layer (Universal Compatibility)
-│   ├── CSSBlobFallbackSystem (organic blobs, implements BackgroundSystemParticipant)
+│   ├── CSSBlobFallbackSystem (dynamic blobs, implements BackgroundSystemParticipant)
 │   ├── Static Catppuccin gradients (browser fallback)
 │   └── CSS animations (reduced-motion aware)
 ├── WebGL Enhancement Layer (High Performance)
@@ -23,7 +23,7 @@ Progressive Enhancement Stack (Bottom to Top) - All coordinated through VisualEf
 ├── Background Visual Systems (Coordinated Experience)
 │   ├── FluidGradientBackgroundSystem (implements BackgroundSystemParticipant)
 │   ├── DepthLayeredGradientSystem (implements BackgroundSystemParticipant)
-│   └── ParticleConsciousnessModule (particle effects coordination)
+│   └── ParticleEffectsModule (particle effects coordination)
 └── Coordination Layer (Unified Management)
     ├── VisualEffectsCoordinator (central state manager)
     ├── BackgroundSystemParticipant interface
@@ -110,24 +110,24 @@ class WebGLRenderer implements BackgroundSystemParticipant {
 }
 ```
 
-### 2. CSSBlobFallbackSystem (Organic CSS Fallback)
+### 2. CSSBlobFallbackSystem (Dynamic CSS Fallback)
 
-**Purpose**: Beautiful organic blob animations using pure CSS with visual effects coordination
+**Purpose**: Beautiful dynamic blob animations using pure CSS with visual effects coordination
 
 **Location**: `src-js/visual/css-fallbacks/CSSBlobFallbackSystem.ts`
 
 #### Architecture Features
 - **Auto-Detection**: Automatically activates when WebGL is unavailable
-- **Organic Blobs**: 6 individual blob elements with unique animations and positioning
+- **Dynamic Blobs**: 6 individual blob elements with unique animations and positioning
 - **Music Responsive**: Beat detection, energy changes, and genre-aware styling
 - **OKLAB Integration**: Perceptually uniform color processing
 - **Performance Aware**: Adapts quality based on device capabilities
-- **Year 3000 Vision**: Maintains organic consciousness experience without WebGL
+- **Year 3000 Vision**: Maintains dynamic visual-effects experience without WebGL
 
 #### CSS Blob Animation Architecture
 ```scss
 .sn-css-blob-container {
-  // Container for 6 organic blob elements
+  // Container for 6 dynamic blob elements
   position: fixed;
   top: 0;
   left: 0;
@@ -137,7 +137,7 @@ class WebGLRenderer implements BackgroundSystemParticipant {
   z-index: -1;
   
   .sn-css-blob {
-    // Individual blob styling with organic animations
+    // Individual blob styling with dynamic animations
     position: absolute;
     border-radius: 50%;
     background: radial-gradient(circle, 
@@ -196,7 +196,7 @@ class DepthLayeredGradientSystem implements BackgroundSystemParticipant {
 
 ### 4. FluidGradientBackgroundSystem (Fluid Dynamics Coordination)
 
-**Purpose**: Organic, fluid gradient animations with visual effects coordination
+**Purpose**: Dynamic, fluid gradient animations with visual effects coordination
 
 **Location**: `src-js/visual/backgrounds/FluidGradientBackgroundSystem.ts`
 
@@ -225,30 +225,30 @@ class FluidGradientBackgroundSystem implements BackgroundSystemParticipant {
 
 ### 5. Legacy WebGL System (Advanced Features)
 
-**Purpose**: Advanced WebGL features with consciousness integration
+**Purpose**: Advanced WebGL features with visual-effects integration
 
 **Location**: `src-js/visual/backgrounds/WebGLGradientBackgroundSystem.ts` (Legacy)
 
-#### Consciousness Shader Architecture
+#### VisualEffects Shader Architecture
 ```glsl
-// Shared consciousness shader library integration
-uniform float u_consciousnessIntensity;    // 0-1 consciousness field strength
+// Shared visual-effects shader library integration
+uniform float u_visual-effectsIntensity;    // 0-1 visual-effects field strength
 uniform vec2 u_musicalFlow;                // Musical flow direction vector
-uniform float u_breathingCycle;            // Breathing rhythm synchronization
+uniform float u_pulsingCycle;            // Pulsing rhythm synchronization
 uniform float u_emotionalTemperature;      // Music emotion temperature
 
-// Organic flow calculation
+// Dynamic flow calculation
 vec2 calculateConsciousFlow(vec2 uv, float time) {
   // Musical flow influence
-  vec2 musicalInfluence = u_musicalFlow * sin(time * 0.5) * u_consciousnessIntensity;
+  vec2 musicalInfluence = u_musicalFlow * sin(time * 0.5) * u_visual-effectsIntensity;
   
-  // Breathing cycle modulation
-  float breathingModulation = sin(time * u_breathingCycle) * 0.1;
+  // Pulsing cycle modulation
+  float pulsingModulation = sin(time * u_pulsingCycle) * 0.1;
   
   // Emotional temperature affects flow intensity
   float emotionalMultiplier = 0.5 + (u_emotionalTemperature * 0.5);
   
-  return musicalInfluence * emotionalMultiplier * (1.0 + breathingModulation);
+  return musicalInfluence * emotionalMultiplier * (1.0 + pulsingModulation);
 }
 ```
 
@@ -295,25 +295,25 @@ interface WebGLQualityLevels {
 - **Frame Rate**: 30-60fps (adaptive based on device)
 - **Fallback**: Automatic CSS fallback on WebGL unavailability
 
-### 3. ParticleConsciousnessModule (Unified Particle System)
+### 3. ParticleEffectsModule (Unified Particle System)
 
-**Purpose**: Consolidated particle system with consciousness integration
+**Purpose**: Consolidated particle system with visual-effects integration
 
-**Location**: `src-js/visual/consciousness/ParticleConsciousnessModule.ts`
+**Location**: `src-js/visual/visual-effects/ParticleEffectsModule.ts`
 
 #### Unified Architecture
 - **Lightweight Mode**: Basic particle rendering (50-200 particles)
 - **Field Mode**: Advanced physics simulation (200-1000 particles)
-- **Consciousness Response**: Particle behavior responds to music and consciousness
+- **VisualEffects Response**: Particle behavior responds to music and visual-effects
 - **Device Adaptation**: Automatic quality scaling based on performance
 
 #### Particle Behaviors
 ```typescript
-interface ParticleConsciousnessConfig {
-  // Consciousness-driven behaviors
+interface ParticleVisualEffectsConfig {
+  // VisualEffects-driven behaviors
   musicalReactivity: number;        // 0-2, how much particles respond to music
-  consciousnessFlow: boolean;       // Whether particles follow consciousness field
-  breathingSync: boolean;           // Sync particle size/opacity with breathing
+  visual-effectsFlow: boolean;       // Whether particles follow visual-effects field
+  pulsingSync: boolean;           // Sync particle size/opacity with pulsing
   emotionalColor: boolean;          // Use emotional temperature for particle colors
   
   // Performance settings
@@ -323,32 +323,32 @@ interface ParticleConsciousnessConfig {
 }
 ```
 
-### 4. FlowingLiquidConsciousnessSystem (Organic Animations)
+### 4. FlowingLiquidDynamicSystem (Dynamic Animations)
 
-**Purpose**: Biological-inspired liquid consciousness animations
+**Purpose**: Biological-inspired liquid visual-effects animations
 
-**Location**: `src-js/visual/backgrounds/FlowingLiquidConsciousnessSystem.ts`
+**Location**: `src-js/visual/backgrounds/FlowingLiquidDynamicSystem.ts`
 
-#### Organic Features
-- **Cellular Membrane Effects**: Organic boundary animations
-- **Breathing Synchronization**: 4-second breathing cycles
+#### Dynamic Features
+- **Cellular Membrane Effects**: Dynamic boundary animations
+- **Pulsing Synchronization**: 4-second pulsing cycles
 - **Symbiotic Listening**: Evolution based on musical characteristics
 - **Emotional Temperature**: Visual temperature mapping from music analysis
 
 #### Biological Animation Patterns
 ```typescript
-interface OrganicAnimationConfig {
-  // Breathing patterns
-  breathingCycle: number;           // 4000ms default cycle
-  breathingIntensity: number;       // 0-1 breathing depth
+interface DynamicAnimationConfig {
+  // Pulsing patterns
+  pulsingCycle: number;           // 4000ms default cycle
+  pulsingIntensity: number;       // 0-1 pulsing depth
   
   // Liquid flow characteristics  
   viscosity: number;                // 0-1 fluid thickness
   surface_tension: number;          // 0-1 edge definition
   flow_velocity: number;            // Base flow speed
   
-  // Consciousness integration
-  consciousness_reactivity: number;  // Response to consciousness field
+  // VisualEffects integration
+  visual-effects_reactivity: number;  // Response to visual-effects field
   musical_sensitivity: number;      // Response to music changes
   emotional_temperature_mapping: boolean; // Color temperature from music
 }
@@ -392,15 +392,15 @@ class VisualEffectsCoordinator {
 ```
 
 #### Migration from Legacy Systems
-Systems previously using **BackgroundConsciousnessChoreographer** migrate to **VisualEffectsCoordinator**:
+Systems previously using **BackgroundEffectsCoordinator** migrate to **VisualEffectsCoordinator**:
 
 ```typescript
-// Old consciousness-based approach
-interface ConsciousnessField {
+// Old visual-effects-based approach
+interface VisualEffectsField {
   rhythmicPulse: number;
   musicalFlow: { x: number; y: number };
   emotionalTemperature: number;
-  breathingCycle: number;
+  pulsingCycle: number;
 }
 
 // New visual effects coordination
@@ -408,7 +408,7 @@ interface VisualEffectState {
   musicIntensity: number;        // replaces rhythmicPulse
   flowDirection: Vector2D;       // replaces musicalFlow
   colorTemperature: number;      // replaces emotionalTemperature
-  pulseRate: number;             // replaces breathingCycle
+  pulseRate: number;             // replaces pulsingCycle
   // ... additional coordinated properties
 }
 ```
@@ -494,9 +494,9 @@ interface QualityScalingCapable {
 --sn-gradient-flow-scale: number;      // Scale transformation
 --sn-flow-strength: 0-1;              // Flow intensity (from music)
 
-// Consciousness integration
---sn-consciousness-intensity: 0-1;     // Current consciousness field strength
---sn-breathing-phase: 0-1;            // Breathing cycle position
+// VisualEffects integration
+--sn-visual-effects-intensity: 0-1;     // Current visual-effects field strength
+--sn-pulsing-phase: 0-1;            // Pulsing cycle position
 --sn-musical-energy: 0-1;             // Current musical energy level
 ```
 
@@ -524,23 +524,23 @@ When both CSS and WebGL systems are active, they coordinate through CSS variable
 
 ### Debug Information Access
 
-When `YEAR3000_CONFIG.enableDebug = true`, background systems expose comprehensive debugging:
+When `ADVANCED_SYSTEM_CONFIG.enableDebug = true`, background systems expose comprehensive debugging:
 
 ```typescript
 // Global debug object access
 Y3K.backgroundSystems = {
   css: CSSBlobFallbackSystem,
   webgl: WebGLGradientBackgroundSystem,
-  particles: ParticleConsciousnessModule,
-  consciousness: BackgroundConsciousnessChoreographer
+  particles: ParticleEffectsModule,
+  visual-effects: BackgroundEffectsCoordinator
 };
 
 // Performance metrics
 Y3K.backgroundSystems.webgl.getMetrics();
 // { fps: 58, memoryUsage: 25.6, renderTime: 16.2, qualityLevel: 'high' }
 
-// Consciousness field data
-Y3K.backgroundSystems.consciousness.getCurrentField();
+// VisualEffects field data
+Y3K.backgroundSystems.visual-effects.getCurrentField();
 // { rhythmicPulse: 0.8, musicalFlow: {x: 0.2, y: -0.1}, ... }
 ```
 

@@ -27,6 +27,16 @@
       var(--sn-header-primary-rgb, var(--spice-rgb-accent)),
       calc(var(--sn-header-intensity, 0.2) * 0.5)
     );
-  transition: background 800ms var(--sn-anim-easing-organic),
-    border-bottom 800ms var(--sn-anim-easing-organic);
+  transition: background 800ms var(--sn-anim-easing-smooth),
+    border-bottom 800ms var(--sn-anim-easing-smooth);
+}
+
+/* ==============================================
+// Legacy Compatibility Aliases
+// ==============================================
+// Ensures backward compatibility during transition */
+
+/* CSS Variable aliases for organic → smooth */
+:root {
+  --sn-anim-easing-organic: var(--sn-anim-easing-smooth, cubic-bezier(0.4, 0.0, 0.2, 1));
 }

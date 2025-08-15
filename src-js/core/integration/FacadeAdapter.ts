@@ -11,14 +11,14 @@
 import { globalStrategyBasedFactory } from "@/core/creation/StrategyBasedFactory";
 import type { NonVisualSystemKey } from "@/core/integration/NonVisualSystemFacade";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type {
   IFacadeAdapter,
   IStrategyBasedFactory,
   SystemCreationContext,
   SystemCreationResult,
 } from "@/types/systemCreationStrategy";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 
 // ============================================================================
 // Facade Adapter Implementation
@@ -99,7 +99,7 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
     systemKey: NonVisualSystemKey,
     SystemClass: new (...args: any[]) => T,
     context: {
-      config: Year3000Config;
+      config: AdvancedSystemConfig | Year3000Config;
       utils: typeof Utils;
       dependencies: {
         performanceAnalyzer?: any;
@@ -206,7 +206,7 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
     systemKey: NonVisualSystemKey,
     SystemClass: new (...args: any[]) => T,
     context: {
-      config: Year3000Config;
+      config: AdvancedSystemConfig | Year3000Config;
       utils: typeof Utils;
       dependencies: {
         performanceAnalyzer?: any;
@@ -299,8 +299,8 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
       case "MusicSyncService":
         // MusicSyncService uses object dependencies pattern
         return new SystemClass({
-          YEAR3000_CONFIG: context.config,
-          Year3000Utilities: context.utils,
+          ADVANCED_SYSTEM_CONFIG: context.config,
+          ThemeUtilities: context.utils,
           settingsManager: context.dependencies.settingsManager,
           year3000System: context.year3000System,
           // NOTE: colorHarmonyEngine deliberately omitted - using event-driven pattern

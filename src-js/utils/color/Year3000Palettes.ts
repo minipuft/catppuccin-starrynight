@@ -3,7 +3,7 @@
  * 
  * Cinematic gradient color palettes extracted from Year 3000 visual guides.
  * Maintains identical interface to CatppuccinPalettes.ts for seamless switching.
- * Features organic liquid flow aesthetics with high contrast dramatic gradients.
+ * Features smooth liquid flow aesthetics with high contrast dramatic gradients.
  * 
  * @architecture PaletteSystemManager integration
  * @performance Static color definitions for optimal lookup performance

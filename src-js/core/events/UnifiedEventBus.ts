@@ -4,12 +4,12 @@
  * Replaces the fragmented event system with a unified, efficient event pipeline
  * that eliminates duplication, provides type safety, and ensures proper cleanup.
  *
- * Philosophy: "One river carries all consciousness - a unified flow that connects
- * every system in perfect harmony, eliminating chaos and bringing order to the
- * digital organism."
+ * Architecture: Unified event coordination for all theme systems with type safety,
+ * performance optimization, and proper resource management.
  */
 
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { VisualEffectsState } from "@/types/colorStubs";
 
 // ============================================================================
 // Event Type Definitions with Unified Naming Convention
@@ -83,8 +83,8 @@ export interface UnifiedEventMap {
     timestamp: number;
   };
 
-  // Emotion Analysis Events (Year 3000 Consciousness Flow)
-  "emotion:analyzed": {
+  // Music Analysis Events
+  "music:emotion-analyzed": {
     emotion: {
       primary: string;
       secondary: string[];
@@ -107,35 +107,35 @@ export interface UnifiedEventMap {
         instrumentalness: number;
         liveness: number;
         speechiness: number;
-        organicFlow: number;
+        smoothFlow: number;
         cinematicDepth: number;
-        consciousnessResonance: number;
+        visualEffectsResonance: number;
       };
     };
     colorTemperature: number;
-    consciousnessLevel: number;
-    organicFlow: number;
+    visualEffectsLevel: number;
+    smoothFlow: number;
     cinematicDepth: number;
     timestamp: number;
   };
 
-  "emotionalColorContext:updated": {
+  "music:emotional-context-updated": {
     primaryEmotion: string;
     emotionIntensity: number;
     colorTemperature: number;
     valence: number;
     arousal: number;
     dominance: number;
-    organicFlow: number;
+    smoothFlow: number;
     cinematicDepth: number;
-    consciousnessResonance: number;
+    visualEffectsResonance: number;
   };
 
   // Settings Events
   "settings:changed": {
     settingKey: string;
-    oldValue: any;
-    newValue: any;
+    oldValue: string | number | boolean;
+    newValue: string | number | boolean;
     timestamp: number;
   };
 
@@ -145,7 +145,7 @@ export interface UnifiedEventMap {
     timestamp: number;
   };
 
-  "settings:consciousness-level-changed": {
+  "settings:visual-effects-level-changed": {
     oldLevel: number;
     newLevel: number;
     timestamp: number;
@@ -172,22 +172,22 @@ export interface UnifiedEventMap {
     timestamp: number;
   };
 
-  // Consciousness Events
-  "consciousness:field-updated": {
+  // Visual Effects Events
+  "visual-effects:field-updated": {
     rhythmicPulse: number;
     musicalFlow: { x: number; y: number };
     energyResonance: number;
     depthPerception: number;
-    breathingCycle: number;
+    pulsingCycle: number;
   };
 
-  "consciousness:choreography": {
+  "visual-effects:choreography": {
     eventType: string;
-    payload: any;
+    payload: VisualEffectsState;
     participants: string[];
   };
 
-  "consciousness:intensity-changed": {
+  "visual-effects:intensity-changed": {
     intensity: number;
     userEngagement: number;
     timestamp: number;
@@ -195,27 +195,27 @@ export interface UnifiedEventMap {
     musicEnergy?: number;
   };
 
-  "consciousness:dramatic-moment": {
+  "music:dramatic-peak-detected": {
     intensity: number;
     type?: string;
     timestamp: number;
   };
 
-  // Cross-system consciousness coordination events
-  "consciousness:coordination": {
+  // Cross-system visual effects coordination events
+  "visual-effects:coordination": {
     source: string;
-    state: any;
+    state: VisualEffectsState;
     timestamp: number;
   };
 
-  "consciousness:beat-sync": {
+  "music:beat-sync": {
     source: string;
     beatPhase: number;
     lastBeatTime: number;
     timestamp: number;
   };
 
-  "consciousness:dramatic-sync": {
+  "music:dramatic-sync": {
     source: string;
     dramaticLevel: number;
     type?: string;
@@ -234,9 +234,9 @@ export interface UnifiedEventMap {
     timestamp: number;
   };
 
-  "consciousness-ui:initialized": {
+  "visual-effects-ui:initialized": {
     registeredSystems: number;
-    adaptationState: any;
+    adaptationState: VisualEffectsState;
     timestamp: number;
   };
 
@@ -252,9 +252,16 @@ export interface UnifiedEventMap {
     type: "click" | "hover" | "focus" | "scroll" | "keyboard";
     element: string;
     timestamp: number;
-    metadata?: any;
+    metadata?: Record<string, string | number>;
   };
 
+  "user:calm-mode-detected": {
+    confidence: number;
+    duration: number;
+    timestamp: number;
+  };
+
+  /** @deprecated Use user:calm-mode-detected instead */
   "user:meditation-detected": {
     confidence: number;
     duration: number;
@@ -265,7 +272,7 @@ export interface UnifiedEventMap {
   "system:initialized": {
     systemName: string;
     timestamp: number;
-    metadata?: any;
+    metadata?: Record<string, string | number>;
   };
 
   "system:destroyed": {
@@ -281,26 +288,45 @@ export interface UnifiedEventMap {
     timestamp: number;
   };
 
-  // 🔧 PHASE 1: Consciousness Events (ColorConsciousnessState migration)
-  "consciousness:updated": {
+  // Visual Effects State Events (modernized technical terminology)
+  "visual-effects:state-updated": {
     type: string;
     payload: {
-      palette: any[];
-      consciousnessLevel: number;
+      palette: string[];
+      visualEffectsLevel: number;
       emotionalTemperature: number;
-      multidimensionalAwareness: number;
-      transcendenceLevel: number;
+      spatialAwareness: number;
+      intensityLevel: number;
       volumetricDepth: number;
       dataStreamIntensity: number;
-      temporalMemoryDepth: number;
-      cosmicResonance: number;
+      timeBasedMemoryDepth: number;
+      enhancedResonance: number;
       paletteGeneration: number;
-      temporalPatternCount: number;
-      fullConsciousnessState: any;
+      timeBasedPatternCount: number;
+      fullDynamicState: VisualEffectsState;
+      
+      // Legacy compatibility aliases
+      /** @deprecated Use spatialAwareness instead */
+      multidimensionalAwareness?: number;
+      /** @deprecated Use intensityLevel instead */
+      transcendenceLevel?: number;
+      /** @deprecated Use timeBasedMemoryDepth instead */
+      temporalMemoryDepth?: number;
+      /** @deprecated Use enhancedResonance instead */
+      cosmicResonance?: number;
+      /** @deprecated Use timeBasedPatternCount instead */
+      temporalPatternCount?: number;
+      /** @deprecated Use fullDynamicState instead */
+      fullConsciousnessState?: VisualEffectsState;
     };
   };
 
-  "consciousness:holographic-stream": {
+  "visual-effects:layered-stream": {
+    type: string;
+  };
+
+  /** @deprecated Use visual-effects:layered-stream instead */
+  "visual-effects:holographic-stream": {
     type: string;
     payload: {
       intensity: number;
@@ -309,19 +335,37 @@ export interface UnifiedEventMap {
     };
   };
 
-  "consciousness:temporal-pattern": {
+  "visual-effects:temporal-pattern": {
     type: string;
     payload: {
-      patterns: any[];
+      patterns: Array<{
+        patternId: string;
+        frequency: number;
+        strength: number;
+        musicalCorrelation: number;
+        visualEffectsSignature?: number;
+        transitionSignature?: number;
+      }>;
       memoryDepth: number;
     };
   };
 
-  "consciousness:transcendence-high": {
+  "visual-effects:intensity-high": {
     type: string;
     payload: {
       level: number;
+      enhancedAlignment: number;
+    };
+  };
+
+  /** @deprecated Use visual-effects:intensity-high instead */
+  "visual-effects:transcendence-high": {
+    type: string;
+    payload: {
+      level: number;
+      /** @deprecated Use enhancedAlignment instead */
       cosmicAlignment: number;
+      enhancedAlignment?: number;
     };
   };
 
@@ -368,10 +412,10 @@ export type EventHandler<T extends EventName> = (
 // Subscription Management
 // ============================================================================
 
-interface EventSubscription {
+interface EventSubscription<T extends EventName = EventName> {
   id: string;
-  eventName: EventName;
-  handler: EventHandler<any>;
+  eventName: T;
+  handler: EventHandler<T>;
   subscriberName: string;
   once: boolean;
   createdAt: number;
@@ -396,7 +440,7 @@ export class UnifiedEventBus {
   private static instance: UnifiedEventBus | null = null;
 
   // Event subscriptions registry
-  private subscriptions = new Map<EventName, Map<string, EventSubscription>>();
+  private subscriptions = new Map<EventName, Map<string, EventSubscription<any>>>();
 
   // Event metrics and monitoring
   private eventMetrics: EventMetrics = {
@@ -411,7 +455,7 @@ export class UnifiedEventBus {
   // Performance monitoring
   private eventQueue: Array<{
     eventName: EventName;
-    data: any;
+    data: EventData<EventName>;
     timestamp: number;
   }> = [];
   private processingQueue = false;
@@ -454,7 +498,7 @@ export class UnifiedEventBus {
       this.subscriptions.set(eventName, new Map());
     }
 
-    const subscription: EventSubscription = {
+    const subscription: EventSubscription<T> = {
       id: subscriptionId,
       eventName,
       handler,

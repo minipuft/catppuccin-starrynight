@@ -3,9 +3,9 @@ import { getGlobalOptimizedCSSController, OptimizedCSSVariableManager } from '@/
 import { unifiedEventBus, type EventName, type EventData } from '@/core/events/UnifiedEventBus';
 import { EnhancedMasterAnimationCoordinator } from '@/core/animation/EnhancedMasterAnimationCoordinator';
 import { UnifiedPerformanceCoordinator } from '@/core/performance/UnifiedPerformanceCoordinator';
-import { YEAR3000_CONFIG } from '@/config/globalConfig';
+import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import type { HealthCheckResult } from '@/types/systems';
-import type { Year3000Config } from '@/types/models';
+import type { AdvancedSystemConfig } from '@/types/models';
 
 /**
  * UnifiedSystemBase - Single base class for all Year 3000 systems
@@ -25,7 +25,7 @@ export abstract class UnifiedSystemBase {
   public initialized: boolean = false;
   protected destroyed: boolean = false;
   protected systemName: string;
-  protected config: Year3000Config;
+  protected config: AdvancedSystemConfig;
   
   // Shared utility instances (lazy-loaded singletons)
   protected performanceAnalyzer!: SimplePerformanceCoordinator;
@@ -45,7 +45,7 @@ export abstract class UnifiedSystemBase {
   private lastFPSCalculation: number = 0;
   private currentFPS: number = 60;
   
-  constructor(config: Year3000Config = YEAR3000_CONFIG) {
+  constructor(config: AdvancedSystemConfig = ADVANCED_SYSTEM_CONFIG) {
     this.config = config;
     this.systemName = this.constructor.name;
     
@@ -461,7 +461,7 @@ export abstract class UnifiedSystemBase {
   /**
    * Get system configuration
    */
-  get systemConfig(): Year3000Config {
+  get systemConfig(): AdvancedSystemConfig {
     return this.config;
   }
   

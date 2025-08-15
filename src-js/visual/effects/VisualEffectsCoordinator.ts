@@ -25,9 +25,57 @@ import {
   type PerformanceMode,
 } from "@/core/performance/UnifiedPerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
-import type { ChoreographyEventType, OrganicTransitionConfig } from "@/types/animationCoordination";
+import type { ChoreographyEventType, DynamicTransitionConfig } from "@/types/animationCoordination";
+
+// ===================================================================
+// CSS VARIABLE NAMING STANDARDS
+// ===================================================================
+
+/**
+ * Standard CSS variable prefixes for visual effects
+ * 
+ * @example
+ * ```typescript
+ * // Use these constants for consistent naming
+ * const visualEffectVars = {
+ *   [CSS_VAR_PREFIXES.VISUAL_EFFECTS + 'intensity']: '0.8',
+ *   [CSS_VAR_PREFIXES.VISUAL_STATE + 'energy']: '0.6'
+ * };
+ * ```
+ */
+export const CSS_VAR_PREFIXES = {
+  /** Main visual effects variables: --sn-visual-effects-* */
+  VISUAL_EFFECTS: '--sn-visual-effects-',
+  /** Visual state variables: --sn-visual-state-* */
+  VISUAL_STATE: '--sn-visual-state-',
+  /** Visual coordination variables: --sn-visual-coordination-* */
+  VISUAL_COORDINATION: '--sn-visual-coordination-',
+  /** Visual performance variables: --sn-visual-performance-* */
+  VISUAL_PERFORMANCE: '--sn-visual-performance-',
+} as const;
+
+/**
+ * Standard visual effects CSS variable names
+ */
+export const VISUAL_EFFECT_CSS_VARS = {
+  // Core visual effect state
+  ENERGY_LEVEL: CSS_VAR_PREFIXES.VISUAL_STATE + 'energy-level',
+  FLOW_DIRECTION_X: CSS_VAR_PREFIXES.VISUAL_STATE + 'flow-direction-x',
+  FLOW_DIRECTION_Y: CSS_VAR_PREFIXES.VISUAL_STATE + 'flow-direction-y',
+  COLOR_TEMPERATURE: CSS_VAR_PREFIXES.VISUAL_STATE + 'color-temperature',
+  
+  // Performance and coordination
+  ADAPTIVE_QUALITY: CSS_VAR_PREFIXES.VISUAL_PERFORMANCE + 'adaptive-quality',
+  PARTICIPANT_COUNT: CSS_VAR_PREFIXES.VISUAL_COORDINATION + 'participant-count',
+  UPDATE_RATE: CSS_VAR_PREFIXES.VISUAL_PERFORMANCE + 'update-rate',
+  
+  // Animation parameters
+  PULSE_RATE: CSS_VAR_PREFIXES.VISUAL_EFFECTS + 'pulse-rate',
+  TRANSITION_FLUIDITY: CSS_VAR_PREFIXES.VISUAL_EFFECTS + 'transition-fluidity',
+  SYSTEM_HARMONY: CSS_VAR_PREFIXES.VISUAL_EFFECTS + 'system-harmony',
+} as const;
 
 // ===================================================================
 // VISUAL EFFECT STATE INTERFACES
@@ -46,6 +94,28 @@ export interface Vector2D {
  *
  * Contains music analysis data, visual parameters, and performance metrics that
  * allow visual systems to coordinate their effects smoothly.
+ * 
+ * @example
+ * ```typescript
+ * // Access visual state for coordination
+ * const state = coordinator.getCurrentVisualEffectsState();
+ * if (state) {
+ *   // Use music data
+ *   const beatStrength = state.musicIntensity; // 0-1
+ *   const flowX = state.flowDirection.x; // -1 to 1
+ *   const warmth = state.colorTemperature; // 1000K-20000K
+ *   
+ *   // Use performance data
+ *   const quality = state.adaptiveQuality; // 0-1
+ *   const isLowEnd = state.deviceCapabilities.performanceTier === 'low';
+ *   
+ *   // Apply to your visual system
+ *   this.updateVisualIntensity(beatStrength * quality);
+ * }
+ * ```
+ * 
+ * @see {@link BackgroundSystemParticipant} for implementing systems that use this state
+ * @see {@link VisualEffectsCoordinator.registerVisualEffectsParticipant} for registration
  */
 export interface VisualEffectState {
   // === MUSIC INTEGRATION ===
@@ -84,17 +154,46 @@ export interface VisualEffectState {
 }
 
 /**
- * Background system participant interface
+ * Background system participant interface with enhanced type safety
+ * 
+ * @example
+ * ```typescript
+ * class MyVisualSystem implements BackgroundSystemParticipant {
+ *   systemName = 'my-visual-system';
+ *   
+ *   onVisualStateUpdate(state: VisualEffectState): void {
+ *     // Handle visual state updates with full type safety
+ *     this.updateEffects(state.energyLevel, state.colorTemperature);
+ *   }
+ *   
+ *   onVisualEffectEvent(eventType: VisualEffectEventType, payload: VisualEffectEventPayload): void {
+ *     // Type-safe event handling
+ *   }
+ *   
+ *   getVisualContribution(): Partial<VisualEffectState> {
+ *     return { fluidIntensity: 0.8, depthPerception: 0.6 };
+ *   }
+ * }
+ * ```
  */
 export interface BackgroundSystemParticipant {
   systemName: string;
   onVisualStateUpdate(state: VisualEffectState): void;
-  onVisualEffectEvent(eventType: string, payload: any): void;
+  onVisualEffectEvent(eventType: VisualEffectEventType, payload: VisualEffectEventPayload): void;
   getVisualContribution(): Partial<VisualEffectState>;
 }
 
 /**
  * Visual effect event types for coordination
+ * 
+ * @example
+ * ```typescript
+ * // Type-safe event handling
+ * coordinator.choreographEvent('visual:energy-surge', {
+ *   intensity: 0.8,
+ *   duration: 1000
+ * });
+ * ```
  */
 export type VisualEffectEventType =
   | "visual:state-updated"
@@ -104,18 +203,74 @@ export type VisualEffectEventType =
   | "visual:pulse-cycle"
   | "visual:transition-fluid"
   | "visual:scaling-change"
-  | "visual:performance-adapt";
+  | "visual:performance-adapt"
+  | "visual:coordination";
 
 /**
- * Smooth transition configuration
+ * Participant registration result with detailed information
  */
-export interface SmoothTransitionConfig {
-  enabled: boolean;
-  transitionDuration: number; // milliseconds
-  easingFunction: "smooth" | "harmonic" | "exponential" | "cubic";
-  intensityFactor: number; // 0-2 transition intensity
-  coherenceThreshold: number; // 0-1 minimum coherence for transitions
+export interface ParticipantRegistrationResult {
+  success: boolean;
+  participantName: string;
+  contributionReceived: boolean;
+  errorMessage?: string;
 }
+
+/**
+ * Visual state update result with performance metrics
+ */
+export interface VisualStateUpdateResult {
+  success: boolean;
+  participantsNotified: number;
+  updateDuration: number;
+  continuityIndex: number;
+  errorCount: number;
+}
+
+/**
+ * Type-safe payload for visual effect events
+ */
+export interface VisualEffectEventPayload {
+  intensity?: number;
+  duration?: number;
+  affectedSystems?: string[];
+  transitionType?: 'smooth' | 'harmonic' | 'exponential' | 'cubic';
+  reason?: 'automatic' | 'user-action' | 'music-sync' | 'performance';
+  metadata?: Record<string, unknown>;
+  
+  // Legacy event payload properties for backwards compatibility
+  newTrack?: any;
+  surgeType?: string;
+  newMode?: any;
+  adaptationType?: string;
+  falloffCurve?: string;
+  originalEventType?: string;
+}
+
+/**
+ * Dynamic transition configuration for visual effect state changes
+ * 
+ * Controls how visual effects transition between different states to maintain
+ * smooth, natural-feeling animations without jarring changes.
+ */
+export interface VisualDynamicTransitionConfig {
+  /** Enable/disable dynamic transitions between visual states */
+  enabled: boolean;
+  /** Duration of transitions in milliseconds (100-5000ms recommended) */
+  transitionDuration: number;
+  /** Easing function type - 'smooth' for general use, 'harmonic' for music sync */
+  easingFunction: "smooth" | "harmonic" | "exponential" | "cubic";
+  /** Transition intensity multiplier (0.1-2.0, where 1.0 is normal) */
+  intensityFactor: number;
+  /** Minimum coherence required to trigger transition (0-1, lower = more transitions) */
+  coherenceThreshold: number;
+}
+
+/**
+ * @deprecated Use VisualDynamicTransitionConfig instead  
+ * @since v1.0.0
+ */
+export type SmoothTransitionConfig = VisualDynamicTransitionConfig;
 
 // ===================================================================
 // VISUAL EFFECTS COORDINATOR
@@ -126,13 +281,75 @@ export interface SmoothTransitionConfig {
  *
  * This system establishes shared visual effect state that background systems use for coordination,
  * allowing them to synchronize effects smoothly based on music analysis and performance metrics.
+ * 
+ * **Architecture Pattern:** Singleton with participant registration
+ * **Performance:** 60fps updates with adaptive quality scaling
+ * **Integration:** Unified event bus communication and CSS variable management
+ * 
+ * @example
+ * ```typescript
+ * // Initialize coordinator
+ * const coordinator = VisualEffectsCoordinator.getInstance(config, cssController);
+ * await coordinator.initialize();
+ * 
+ * // Register a visual system
+ * class MyVisualSystem implements BackgroundSystemParticipant {
+ *   systemName = 'my-background-effects';
+ *   
+ *   onVisualStateUpdate(state: VisualEffectState): void {
+ *     // Respond to coordinated visual state
+ *     this.setBrightness(state.energyLevel);
+ *     this.setFlowDirection(state.flowDirection);
+ *   }
+ *   
+ *   onVisualEffectEvent(eventType: VisualEffectEventType, payload: VisualEffectEventPayload): void {
+ *     if (eventType === 'visual:energy-surge') {
+ *       this.triggerEnergyEffect(payload.intensity || 0.5);
+ *     }
+ *   }
+ *   
+ *   getVisualContribution(): Partial<VisualEffectState> {
+ *     return { fluidIntensity: this.getCurrentFluidLevel() };
+ *   }
+ * }
+ * 
+ * const result = coordinator.registerVisualEffectsParticipant(new MyVisualSystem());
+ * if (result.success) {
+ *   console.log('Visual system registered successfully');
+ * }
+ * ```
+ * 
+ * @example
+ * ```typescript
+ * // Advanced usage - custom events and performance monitoring
+ * coordinator.choreographEvent('visual:energy-surge', {
+ *   intensity: 0.9,
+ *   duration: 2000,
+ *   affectedSystems: ['gradient-system', 'particle-system'],
+ *   reason: 'music-sync'
+ * });
+ * 
+ * // Monitor performance
+ * const metrics = coordinator.getPerformanceMetrics();
+ * console.log(`State updates: ${metrics.stateUpdates}, avg time: ${metrics.averageUpdateTime}ms`);
+ * 
+ * // Health check
+ * const health = await coordinator.healthCheck();
+ * if (!health.healthy) {
+ *   console.warn('Visual effects coordination issues detected');
+ * }
+ * ```
+ * 
+ * @see {@link BackgroundSystemParticipant} for participant interface
+ * @see {@link VisualEffectState} for shared state structure
+ * @see {@link VISUAL_EFFECT_CSS_VARS} for standardized CSS variable names
  */
 export class VisualEffectsCoordinator implements IManagedSystem {
   private static instance: VisualEffectsCoordinator | null = null;
   public initialized: boolean = false;
 
   // Core dependencies
-  private config: Year3000Config;
+  private config: AdvancedSystemConfig | Year3000Config;
   private eventBus: typeof unifiedEventBus;
   private cssController: OptimizedCSSVariableManager | null = null;
   private performanceCoordinator: UnifiedPerformanceCoordinator | null = null;
@@ -151,8 +368,8 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     new Map();
   private participantContributions: Map<string, Partial<VisualEffectState>> = new Map();
 
-  // Smooth transition management
-  private transitionConfig: SmoothTransitionConfig = {
+  // Dynamic transition management
+  private transitionConfig: VisualDynamicTransitionConfig = {
     enabled: true,
     transitionDuration: 1000,
     easingFunction: "smooth",
@@ -172,7 +389,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   };
 
   constructor(
-    config: Year3000Config,
+    config: AdvancedSystemConfig | Year3000Config,
     cssController?: OptimizedCSSVariableManager,
     performanceCoordinator?: UnifiedPerformanceCoordinator,
     musicSyncService?: MusicSyncService,
@@ -242,11 +459,11 @@ export class VisualEffectsCoordinator implements IManagedSystem {
         await this.emotionalGradientMapper.initialize();
       }
 
-      // Create initial consciousness field
+      // Create initial visual effects state
       this.currentVisualState = this.createInitialVisualState();
 
-      // Start consciousness field updates
-      this.startConsciousnessFieldUpdates();
+      // Start visual effects updates
+      this.startVisualEffectsUpdates();
 
       // Subscribe to relevant events
       this.subscribeToEvents();
@@ -256,13 +473,13 @@ export class VisualEffectsCoordinator implements IManagedSystem {
 
       if (this.config.enableDebug) {
         Y3KDebug?.debug?.log(
-          "BackgroundAnimationCoordinator",
-          "Consciousness choreographer initialized"
+          "VisualEffectsCoordinator",
+          "Visual effects coordinator initialized"
         );
       }
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "BackgroundAnimationCoordinator",
+        "VisualEffectsCoordinator",
         "Failed to initialize:",
         error
       );
@@ -274,7 +491,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     // Update performance metrics
     this.performanceMetrics.lastUpdate = performance.now();
 
-    // Consciousness field updates are handled by timer for organic rhythm
+    // Visual state updates are handled by timer for smooth transitions
     // This keeps the system lightweight in animation loops
   }
 
@@ -286,12 +503,12 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     const isHealthy = this.isActive && fieldAge < 1000 && participantCount > 0;
 
     return {
-      system: "BackgroundAnimationCoordinator",
+      system: "VisualEffectsCoordinator",
       healthy: isHealthy,
       ok: isHealthy,
       details: isHealthy
-        ? "Consciousness choreography active"
-        : "Consciousness field inactive or stale",
+        ? "Visual effects coordination active"
+        : "Visual effects state inactive or stale",
       metrics: {
         isActive: this.isActive,
         participantCount,
@@ -305,7 +522,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   public destroy(): void {
-    // Stop consciousness field updates
+    // Stop visual effects updates
     if (this.fieldUpdateTimer) {
       clearTimeout(this.fieldUpdateTimer);
       this.fieldUpdateTimer = null;
@@ -337,8 +554,8 @@ export class VisualEffectsCoordinator implements IManagedSystem {
 
     if (this.config.enableDebug) {
       Y3KDebug?.debug?.log(
-        "BackgroundAnimationCoordinator",
-        "Consciousness choreographer destroyed"
+        "VisualEffectsCoordinator",
+        "Visual effects coordinator destroyed"
       );
     }
   }
@@ -414,9 +631,9 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   /**
-   * Update consciousness field with organic evolution
+   * Update visual effects state with smooth evolution
    */
-  private updateConsciousnessField(): void {
+  private updateVisualEffectsState(): void {
     const startTime = performance.now();
 
     if (!this.currentVisualState) {
@@ -432,9 +649,9 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       this.currentVisualState
     );
 
-    // Apply smooth transitions if enabled
+    // Apply dynamic transitions if enabled
     if (this.transitionConfig.enabled) {
-      this.currentVisualState = this.applySmoothTransition(
+      this.currentVisualState = this.applyDynamicTransition(
         this.currentVisualState,
         newState
       );
@@ -442,8 +659,21 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       this.currentVisualState = newState;
     }
 
-    // Broadcast consciousness field update
-    this.choreographConsciousnessUpdate();
+    // Apply standardized CSS variables (fire and forget)
+    this.applyStandardizedVisualVariables().catch(error => {
+      Y3KDebug?.debug?.error("VisualEffectsCoordinator", "Failed to apply CSS variables:", error);
+    });
+
+    // Broadcast visual effects state update
+    const updateResult = this.choreographVisualEffectsUpdate();
+    
+    // Log coordination errors if any occurred
+    if (!updateResult.success && this.config.enableDebug) {
+      Y3KDebug?.debug?.warn(
+        "VisualEffectsCoordinator",
+        `Visual effects update had ${updateResult.errorCount} errors, notified ${updateResult.participantsNotified} participants`
+      );
+    }
 
     // Update performance metrics
     const updateTime = performance.now() - startTime;
@@ -456,8 +686,8 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       this.performanceMetrics.stateUpdates % 60 === 0
     ) {
       Y3KDebug?.debug?.log(
-        "BackgroundAnimationCoordinator",
-        `Consciousness field evolved - Update #${
+        "VisualEffectsCoordinator",
+        `Visual effects state evolved - Update #${
           this.performanceMetrics.stateUpdates
         }, avg time: ${this.performanceMetrics.averageUpdateTime.toFixed(2)}ms`
       );
@@ -558,24 +788,24 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     }
 
     if (totalWeight > 0) {
-      // Apply participant contributions with organic blending
+      // Apply participant contributions with dynamic blending
       for (const contribution of contributions) {
         if (contribution.fluidIntensity !== undefined) {
-          state.fluidIntensity = this.organicBlend(
+          state.fluidIntensity = this.dynamicBlend(
             state.fluidIntensity,
             contribution.fluidIntensity,
             0.1
           );
         }
         if (contribution.depthPerception !== undefined) {
-          state.depthPerception = this.organicBlend(
+          state.depthPerception = this.dynamicBlend(
             state.depthPerception,
             contribution.depthPerception,
             0.1
           );
         }
         if (contribution.luminosity !== undefined) {
-          state.luminosity = this.organicBlend(
+          state.luminosity = this.dynamicBlend(
             state.luminosity,
             contribution.luminosity,
             0.1
@@ -661,29 +891,40 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   /**
-   * Apply smooth transition between visual effect states
+   * Apply dynamic transition between visual effect states
+   */
+  private applyDynamicTransition(
+    current: VisualEffectState,
+    target: VisualEffectState
+  ): VisualEffectState {
+    // Determine transition speed based on continuity and coherence
+    const transitionSpeed = this.calculateDynamicTransitionSpeed(
+      current,
+      target
+    );
+
+    // Apply dynamic easing function
+    const easedProgress = this.applyDynamicEasing(transitionSpeed);
+
+    // Blend states dynamically
+    return this.blendVisualStates(current, target, easedProgress);
+  }
+
+  /**
+   * @deprecated Use applyDynamicTransition instead
+   * @since v1.0.0
    */
   private applySmoothTransition(
     current: VisualEffectState,
     target: VisualEffectState
   ): VisualEffectState {
-    // Determine transition speed based on continuity and coherence
-    const transitionSpeed = this.calculateSmoothTransitionSpeed(
-      current,
-      target
-    );
-
-    // Apply smooth easing function
-    const easedProgress = this.applySmoothEasing(transitionSpeed);
-
-    // Blend states smoothly
-    return this.blendVisualStates(current, target, easedProgress);
+    return this.applyDynamicTransition(current, target);
   }
 
   /**
-   * Calculate smooth transition speed based on state characteristics
+   * Calculate dynamic transition speed based on state characteristics
    */
-  private calculateSmoothTransitionSpeed(
+  private calculateDynamicTransitionSpeed(
     current: VisualEffectState,
     target: VisualEffectState
   ): number {
@@ -705,12 +946,23 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   /**
-   * Apply smooth easing function for visual transitions
+   * @deprecated Use calculateDynamicTransitionSpeed instead
+   * @since v1.0.0
    */
-  private applySmoothEasing(progress: number): number {
+  private calculateSmoothTransitionSpeed(
+    current: VisualEffectState,
+    target: VisualEffectState
+  ): number {
+    return this.calculateDynamicTransitionSpeed(current, target);
+  }
+
+  /**
+   * Apply dynamic easing function for visual transitions
+   */
+  private applyDynamicEasing(progress: number): number {
     switch (this.transitionConfig.easingFunction) {
       case "smooth":
-        // Smooth cubic bezier transition
+        // Dynamic cubic bezier transition
         return progress * progress * (3 - 2 * progress);
       case "harmonic":
         // Sine wave for harmonic transitions
@@ -727,7 +979,15 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   /**
-   * Blend two visual effect states smoothly
+   * @deprecated Use applyDynamicEasing instead
+   * @since v1.0.0
+   */
+  private applySmoothEasing(progress: number): number {
+    return this.applyDynamicEasing(progress);
+  }
+
+  /**
+   * Blend two visual effect states dynamically
    */
   private blendVisualStates(
     current: VisualEffectState,
@@ -737,78 +997,78 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     const blended: VisualEffectState = { ...current };
 
     // Blend numeric values
-    blended.pulseRate = this.organicBlend(
+    blended.pulseRate = this.dynamicBlend(
       current.pulseRate,
       target.pulseRate,
       progress
     );
-    blended.energyLevel = this.organicBlend(
+    blended.energyLevel = this.dynamicBlend(
       current.energyLevel,
       target.energyLevel,
       progress
     );
-    blended.colorTemperature = this.organicBlend(
+    blended.colorTemperature = this.dynamicBlend(
       current.colorTemperature,
       target.colorTemperature,
       progress
     );
-    blended.fluidIntensity = this.organicBlend(
+    blended.fluidIntensity = this.dynamicBlend(
       current.fluidIntensity,
       target.fluidIntensity,
       progress
     );
-    blended.depthPerception = this.organicBlend(
+    blended.depthPerception = this.dynamicBlend(
       current.depthPerception,
       target.depthPerception,
       progress
     );
-    blended.luminosity = this.organicBlend(
+    blended.luminosity = this.dynamicBlend(
       current.luminosity,
       target.luminosity,
       progress
     );
-    blended.colorHarmony = this.organicBlend(
+    blended.colorHarmony = this.dynamicBlend(
       current.colorHarmony,
       target.colorHarmony,
       progress
     );
-    blended.visualCoherence = this.organicBlend(
+    blended.visualCoherence = this.dynamicBlend(
       current.visualCoherence,
       target.visualCoherence,
       progress
     );
     // Keep pulseRate blending (already done above)
-    blended.transitionFluidity = this.organicBlend(
+    blended.transitionFluidity = this.dynamicBlend(
       current.transitionFluidity,
       target.transitionFluidity,
       progress
     );
-    blended.scalingFactor = this.organicBlend(
+    blended.scalingFactor = this.dynamicBlend(
       current.scalingFactor,
       target.scalingFactor,
       progress
     );
-    blended.effectDepth = this.organicBlend(
+    blended.effectDepth = this.dynamicBlend(
       current.effectDepth,
       target.effectDepth,
       progress
     );
-    blended.systemHarmony = this.organicBlend(
+    blended.systemHarmony = this.dynamicBlend(
       current.systemHarmony,
       target.systemHarmony,
       progress
     );
-    blended.tempoModulation = this.organicBlend(
+    blended.tempoModulation = this.dynamicBlend(
       current.tempoModulation,
       target.tempoModulation,
       progress
     );
-    blended.harmonicComplexity = this.organicBlend(
+    blended.harmonicComplexity = this.dynamicBlend(
       current.harmonicComplexity,
       target.harmonicComplexity,
       progress
     );
-    blended.adaptiveQuality = this.organicBlend(
+    blended.adaptiveQuality = this.dynamicBlend(
       current.adaptiveQuality,
       target.adaptiveQuality,
       progress
@@ -816,12 +1076,12 @@ export class VisualEffectsCoordinator implements IManagedSystem {
 
     // Blend vectors
     blended.flowDirection = {
-      x: this.organicBlend(
+      x: this.dynamicBlend(
         current.flowDirection.x,
         target.flowDirection.x,
         progress
       ),
-      y: this.organicBlend(
+      y: this.dynamicBlend(
         current.flowDirection.y,
         target.flowDirection.y,
         progress
@@ -836,9 +1096,9 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   /**
-   * Organic blend function for smooth value transitions
+   * Dynamic blend function for seamless value transitions
    */
-  private organicBlend(
+  private dynamicBlend(
     current: number,
     target: number,
     progress: number
@@ -846,47 +1106,112 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     return current + (target - current) * progress;
   }
 
+  /**
+   * @deprecated Use dynamicBlend instead
+   * @since v1.0.0
+   */
+  private smoothBlend(
+    current: number,
+    target: number,
+    progress: number
+  ): number {
+    return this.dynamicBlend(current, target, progress);
+  }
+
   // ===================================================================
   // PARTICIPANT MANAGEMENT
   // ===================================================================
 
   /**
-   * Register a background system as a consciousness participant
+   * Register a background system as a visual effects participant
+   * 
+   * @param participant - The background system to register
+   * @returns Registration result with success status and details
+   * 
+   * @example
+   * ```typescript
+   * const result = coordinator.registerVisualEffectsParticipant(mySystem);
+   * if (result.success) {
+   *   console.log(`${result.participantName} registered successfully`);
+   * }
+   * ```
    */
-  public registerConsciousnessParticipant(
+  public registerVisualEffectsParticipant(
     participant: BackgroundSystemParticipant
-  ): void {
-    this.registeredParticipants.set(participant.systemName, participant);
+  ): ParticipantRegistrationResult {
+    try {
+      // Check for duplicate registration
+      if (this.registeredParticipants.has(participant.systemName)) {
+        return {
+          success: false,
+          participantName: participant.systemName,
+          contributionReceived: false,
+          errorMessage: `Participant '${participant.systemName}' is already registered`
+        };
+      }
 
-    // Get initial contribution from participant
-    const contribution = participant.getVisualContribution();
-    this.participantContributions.set(participant.systemName, contribution);
+      this.registeredParticipants.set(participant.systemName, participant);
 
-    if (this.config.enableDebug) {
-      Y3KDebug?.debug?.log(
-        "BackgroundAnimationCoordinator",
-        `Registered participant: ${participant.systemName}`
+      // Get initial contribution from participant with error handling
+      let contributionReceived = false;
+      try {
+        const contribution = participant.getVisualContribution();
+        this.participantContributions.set(participant.systemName, contribution);
+        contributionReceived = true;
+      } catch (contributionError) {
+        Y3KDebug?.debug?.warn(
+          "VisualEffectsCoordinator",
+          `Failed to get initial contribution from ${participant.systemName}:`,
+          contributionError
+        );
+      }
+
+      if (this.config.enableDebug) {
+        Y3KDebug?.debug?.log(
+          "VisualEffectsCoordinator",
+          `Registered participant: ${participant.systemName}`
+        );
+      }
+
+      return {
+        success: true,
+        participantName: participant.systemName,
+        contributionReceived
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown registration error';
+      Y3KDebug?.debug?.error(
+        "VisualEffectsCoordinator",
+        `Failed to register participant ${participant.systemName}:`,
+        error
       );
+      
+      return {
+        success: false,
+        participantName: participant.systemName,
+        contributionReceived: false,
+        errorMessage
+      };
     }
   }
 
   /**
-   * Unregister a consciousness participant
+   * Unregister a visual effects participant
    */
-  public unregisterConsciousnessParticipant(systemName: string): void {
+  public unregisterVisualEffectsParticipant(systemName: string): void {
     this.registeredParticipants.delete(systemName);
     this.participantContributions.delete(systemName);
 
     if (this.config.enableDebug) {
       Y3KDebug?.debug?.log(
-        "BackgroundAnimationCoordinator",
+        "VisualEffectsCoordinator",
         `Unregistered participant: ${systemName}`
       );
     }
   }
 
   /**
-   * Update participant contribution to consciousness field
+   * Update participant contribution to visual effects state
    */
   public updateParticipantContribution(
     systemName: string,
@@ -902,59 +1227,117 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   // ===================================================================
 
   /**
-   * Choreograph consciousness field update - broadcast to all participants
+   * Choreograph visual effects state update - broadcast to all participants
+   * 
+   * @returns Update result with performance metrics and error information
    */
-  private choreographConsciousnessUpdate(): void {
-    if (!this.currentVisualState) return;
+  private choreographVisualEffectsUpdate(): VisualStateUpdateResult {
+    const updateStartTime = performance.now();
+    let participantsNotified = 0;
+    let errorCount = 0;
 
-    // Broadcast consciousness field update
-    this.eventBus.emit(
-      "consciousness:field-updated",
-      {
-        rhythmicPulse: this.currentVisualState.pulseRate,
-        musicalFlow: this.currentVisualState.flowDirection,
-        energyResonance: this.currentVisualState.energyLevel,
-        depthPerception: this.currentVisualState.depthPerception,
-        breathingCycle: this.currentVisualState.pulseRate
-      }
-    );
+    if (!this.currentVisualState) {
+      return {
+        success: false,
+        participantsNotified: 0,
+        updateDuration: 0,
+        continuityIndex: 0,
+        errorCount: 1
+      };
+    }
 
-    // Notify registered participants directly
+    // Broadcast visual effects state update
+    try {
+      this.eventBus.emit(
+        "visual-effects:field-updated",
+        {
+          rhythmicPulse: this.currentVisualState.pulseRate,
+          musicalFlow: this.currentVisualState.flowDirection,
+          energyResonance: this.currentVisualState.energyLevel,
+          depthPerception: this.currentVisualState.depthPerception,
+          pulsingCycle: this.currentVisualState.pulseRate
+        }
+      );
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "VisualEffectsCoordinator",
+        "Error broadcasting visual effects state update:",
+        error
+      );
+      errorCount++;
+    }
+
+    // Notify registered participants directly with error tracking
     for (const participant of this.registeredParticipants.values()) {
       try {
         participant.onVisualStateUpdate(this.currentVisualState);
+        participantsNotified++;
       } catch (error) {
         Y3KDebug?.debug?.error(
-          "BackgroundAnimationCoordinator",
+          "VisualEffectsCoordinator",
           `Error updating participant ${participant.systemName}:`,
           error
         );
+        errorCount++;
       }
     }
 
     this.performanceMetrics.coordinationEvents++;
+    const updateDuration = performance.now() - updateStartTime;
+
+    return {
+      success: errorCount === 0,
+      participantsNotified,
+      updateDuration,
+      continuityIndex: this.currentVisualState.continuityIndex,
+      errorCount
+    };
   }
 
   /**
-   * Choreograph specific event type
+   * Choreograph specific event type with enhanced type safety
+   * 
+   * @param eventType - The type of visual effect event to choreograph
+   * @param payload - Type-safe event payload
+   * 
+   * @example
+   * ```typescript
+   * coordinator.choreographEvent('visual:energy-surge', {
+   *   intensity: 0.8,
+   *   duration: 1000,
+   *   affectedSystems: ['gradient-system', 'particle-system']
+   * });
+   * ```
    */
   public choreographEvent(
-    eventType: ChoreographyEventType,
-    payload: any
+    eventType: string,
+    payload: VisualEffectEventPayload
   ): void {
-    // Map to valid unified event names
-    const mappedEvent = this.mapChoreographyEventToUnified(eventType);
-    if (mappedEvent) {
-      (this.eventBus as any).emit(mappedEvent.eventName, mappedEvent.payload);
+    // Map to valid unified event names (for backwards compatibility with ChoreographyEventType)
+    if (eventType && typeof eventType === 'string') {
+      try {
+        const mappedEvent = this.mapChoreographyEventToUnified(eventType as any);
+        if (mappedEvent) {
+          (this.eventBus as any).emit(mappedEvent.eventName, mappedEvent.payload);
+        }
+      } catch (error) {
+        // Fallback for non-choreography events
+        (this.eventBus as any).emit(`visual-effects:${eventType}`, payload);
+      }
     }
 
     // Notify participants
     for (const participant of this.registeredParticipants.values()) {
       try {
-        participant.onVisualEffectEvent(eventType, payload);
+        if (eventType.startsWith('visual:')) {
+          participant.onVisualEffectEvent(eventType as VisualEffectEventType, payload);
+        } else {
+          // Handle as legacy choreography event
+          participant.onVisualEffectEvent('visual:coordination' as VisualEffectEventType, { ...payload, originalEventType: eventType });
+        }
       } catch (error) {
         Y3KDebug?.debug?.error(
-          "BackgroundAnimationCoordinator",
+          "VisualEffectsCoordinator",
           `Error sending choreography event to ${participant.systemName}:`,
           error
         );
@@ -965,7 +1348,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
 
     if (this.config.enableDebug) {
       Y3KDebug?.debug?.log(
-        "BackgroundAnimationCoordinator",
+        "VisualEffectsCoordinator",
         `Choreographed event: ${eventType}`,
         payload
       );
@@ -973,18 +1356,18 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   // ===================================================================
-  // CONSCIOUSNESS FIELD LIFECYCLE
+  // VISUAL EFFECTS STATE LIFECYCLE
   // ===================================================================
 
   /**
-   * Start consciousness field updates
+   * Start visual effects state updates
    */
-  private startConsciousnessFieldUpdates(): void {
+  private startVisualEffectsUpdates(): void {
     if (this.fieldUpdateTimer) return;
 
     const updateLoop = () => {
       if (this.isActive) {
-        this.updateConsciousnessField();
+        this.updateVisualEffectsState();
         this.fieldUpdateTimer = setTimeout(updateLoop, this.updateInterval);
       }
     };
@@ -993,8 +1376,8 @@ export class VisualEffectsCoordinator implements IManagedSystem {
 
     if (this.config.enableDebug) {
       Y3KDebug?.debug?.log(
-        "BackgroundAnimationCoordinator",
-        `Started consciousness field updates (${this.updateInterval}ms interval)`
+        "VisualEffectsCoordinator",
+        `Started visual effects state updates (${this.updateInterval}ms interval)`
       );
     }
   }
@@ -1008,19 +1391,19 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       this.eventBus.subscribe("music:track-changed", (payload) => {
         this.choreographEvent("rhythm-shift", {
           newTrack: payload,
-          transitionType: "organic",
+          transitionType: "smooth",
         });
-      }, "BackgroundAnimationCoordinator");
+      }, "VisualEffectsCoordinator");
 
-      this.eventBus.subscribe("emotion:analyzed", (payload: any) => {
+      this.eventBus.subscribe("music:emotion-analyzed", (payload: any) => {
         this.choreographEvent("intensity-peak", {
           intensity: payload?.energy || 0.5,
           affectedSystems: ["all"],
           surgeType: "full-spectrum",
           duration: 1000,
-          falloffCurve: "organic",
+          falloffCurve: "smooth",
         });
-      }, "BackgroundAnimationCoordinator");
+      }, "VisualEffectsCoordinator");
     }
 
     // Subscribe to performance events
@@ -1033,22 +1416,22 @@ export class VisualEffectsCoordinator implements IManagedSystem {
             frameRate: 60,
             optimizationLevel: 0.5,
           },
-          adaptationType: "organic",
+          adaptationType: "smooth",
           reason: "automatic",
           affectedSystems: ["all"],
         });
-      }, "BackgroundAnimationCoordinator");
+      }, "VisualEffectsCoordinator");
     }
 
     // Subscribe to settings changes
     this.eventBus.subscribe("settings:visual-guide-changed", (payload: any) => {
       if (
-        payload?.key?.includes("consciousness") ||
+        payload?.key?.includes("visual-effects") ||
         payload?.key?.includes("choreography")
       ) {
-        this.updateOrganicTransitionConfig(payload);
+        this.updateDynamicTransitionConfig(payload);
       }
-    }, "BackgroundAnimationCoordinator");
+    }, "VisualEffectsCoordinator");
   }
 
   /**
@@ -1064,23 +1447,23 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   private mapChoreographyEventToUnified(eventType: ChoreographyEventType): { eventName: string; payload: any } | null {
     switch (eventType) {
       case "rhythm-shift":
-        return { eventName: "consciousness:coordination", payload: { source: "choreographer", type: "rhythm-shift" } };
+        return { eventName: "visual-effects:coordination", payload: { source: "choreographer", type: "rhythm-shift" } };
       case "intensity-peak":
-        return { eventName: "consciousness:intensity-changed", payload: { intensity: 0.8, userEngagement: 0.6, timestamp: Date.now() } };
+        return { eventName: "visual-effects:intensity-changed", payload: { intensity: 0.8, userEngagement: 0.6, timestamp: Date.now() } };
       case "genre-transition":
-        return { eventName: "consciousness:coordination", payload: { source: "choreographer", type: "genre-transition" } };
+        return { eventName: "visual-effects:coordination", payload: { source: "choreographer", type: "genre-transition" } };
       case "emotional-shift":
-        return { eventName: "consciousness:coordination", payload: { source: "choreographer", type: "emotional-shift" } };
+        return { eventName: "visual-effects:coordination", payload: { source: "choreographer", type: "emotional-shift" } };
       default:
-        return { eventName: "consciousness:coordination", payload: { source: "choreographer", type: eventType } };
+        return { eventName: "visual-effects:coordination", payload: { source: "choreographer", type: eventType } };
     }
   }
 
   /**
-   * Update organic transition configuration
+   * Update dynamic transition configuration
    */
-  private updateOrganicTransitionConfig(settingsPayload: any): void {
-    // Handle settings that affect organic transitions
+  private updateDynamicTransitionConfig(settingsPayload: any): void {
+    // Handle settings that affect dynamic transitions
     const { key, value } = settingsPayload;
 
     if (key.includes("transition-intensity")) {
@@ -1093,8 +1476,8 @@ export class VisualEffectsCoordinator implements IManagedSystem {
         100,
         Math.min(5000, parseInt(value) || 1000)
       );
-    } else if (key.includes("breathing-cycle")) {
-      // This would update the breathing cycle if the user has control over it
+    } else if (key.includes("animation-cycle")) {
+      // This would update the animation cycle if the user has control over it
       const newCycle = Math.max(0.5, Math.min(4.0, parseFloat(value) || 2.0));
       if (this.currentVisualState) {
         this.currentVisualState.pulseRate = newCycle;
@@ -1103,8 +1486,67 @@ export class VisualEffectsCoordinator implements IManagedSystem {
 
     if (this.config.enableDebug) {
       Y3KDebug?.debug?.log(
-        "BackgroundAnimationCoordinator",
-        `Updated organic transition config: ${key} = ${value}`
+        "VisualEffectsCoordinator",
+        `Updated dynamic transition config: ${key} = ${value}`
+      );
+    }
+  }
+
+  /**
+   * @deprecated Use updateDynamicTransitionConfig instead
+   * @since v1.0.0
+   */
+  private updateSmoothTransitionConfig(settingsPayload: any): void {
+    return this.updateDynamicTransitionConfig(settingsPayload);
+  }
+
+  /**
+   * Apply standardized visual effects CSS variables to DOM
+   * 
+   * @param targetElement - Element to apply variables to (defaults to document.documentElement)
+   * 
+   * @example
+   * ```typescript
+   * coordinator.applyStandardizedVisualVariables();
+   * // Sets standardized --sn-visual-* CSS variables on :root
+   * ```
+   */
+  public async applyStandardizedVisualVariables(targetElement?: HTMLElement): Promise<void> {
+    if (!this.currentVisualState) return;
+
+    const element = targetElement || document.documentElement;
+    const state = this.currentVisualState;
+
+    // Apply standardized CSS variables using the naming constants
+    const standardizedVars: Record<string, string> = {
+      [VISUAL_EFFECT_CSS_VARS.ENERGY_LEVEL]: state.energyLevel.toFixed(3),
+      [VISUAL_EFFECT_CSS_VARS.FLOW_DIRECTION_X]: state.flowDirection.x.toFixed(3),
+      [VISUAL_EFFECT_CSS_VARS.FLOW_DIRECTION_Y]: state.flowDirection.y.toFixed(3),
+      [VISUAL_EFFECT_CSS_VARS.COLOR_TEMPERATURE]: state.colorTemperature.toString(),
+      [VISUAL_EFFECT_CSS_VARS.ADAPTIVE_QUALITY]: state.adaptiveQuality.toFixed(3),
+      [VISUAL_EFFECT_CSS_VARS.PARTICIPANT_COUNT]: this.registeredParticipants.size.toString(),
+      [VISUAL_EFFECT_CSS_VARS.UPDATE_RATE]: (1000 / this.updateInterval).toString(),
+      [VISUAL_EFFECT_CSS_VARS.PULSE_RATE]: state.pulseRate.toFixed(3),
+      [VISUAL_EFFECT_CSS_VARS.TRANSITION_FLUIDITY]: state.transitionFluidity.toFixed(3),
+      [VISUAL_EFFECT_CSS_VARS.SYSTEM_HARMONY]: state.systemHarmony.toFixed(3),
+    };
+
+    // Apply variables efficiently
+    if (this.cssController) {
+      for (const [varName, value] of Object.entries(standardizedVars)) {
+        await this.cssController.setVariable("VisualEffectsCoordinator", varName, value, "normal", "standardized-vars");
+      }
+    } else {
+      // Fallback to direct DOM manipulation
+      for (const [varName, value] of Object.entries(standardizedVars)) {
+        element.style.setProperty(varName, value);
+      }
+    }
+
+    if (this.config.enableDebug) {
+      Y3KDebug?.debug?.log(
+        "VisualEffectsCoordinator",
+        `Applied ${Object.keys(standardizedVars).length} standardized visual effect CSS variables`
       );
     }
   }
@@ -1114,9 +1556,9 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   // ===================================================================
 
   /**
-   * Get current consciousness field (read-only copy)
+   * Get current visual effects state (read-only copy)
    */
-  public getCurrentConsciousnessField(): VisualEffectState | null {
+  public getCurrentVisualEffectsState(): VisualEffectState | null {
     return this.currentVisualState
       ? { ...this.currentVisualState }
       : null;
@@ -1130,27 +1572,37 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   /**
-   * Update organic transition configuration
+   * Update dynamic transition configuration
    */
-  public updateOrganicTransitionConfiguration(
-    config: Partial<OrganicTransitionConfig>
+  public updateDynamicTransitionConfiguration(
+    config: Partial<VisualDynamicTransitionConfig>
   ): void {
     this.transitionConfig = { ...this.transitionConfig, ...config };
 
     if (this.config.enableDebug) {
       Y3KDebug?.debug?.log(
-        "BackgroundAnimationCoordinator",
-        "Updated organic transition configuration:",
+        "VisualEffectsCoordinator",
+        "Updated dynamic transition configuration:",
         config
       );
     }
   }
 
   /**
-   * Force consciousness field update (for debugging/testing)
+   * @deprecated Use updateDynamicTransitionConfiguration instead
+   * @since v1.0.0
    */
-  public forceConsciousnessFieldUpdate(): void {
-    this.updateConsciousnessField();
+  public updateSmoothTransitionConfiguration(
+    config: Partial<VisualDynamicTransitionConfig>
+  ): void {
+    return this.updateDynamicTransitionConfiguration(config);
+  }
+
+  /**
+   * Force visual effects state update (for debugging/testing)
+   */
+  public forceVisualEffectsStateUpdate(): void {
+    this.updateVisualEffectsState();
   }
 
   /**
@@ -1158,5 +1610,53 @@ export class VisualEffectsCoordinator implements IManagedSystem {
    */
   public getPerformanceMetrics() {
     return { ...this.performanceMetrics };
+  }
+
+  // ===================================================================
+  // BACKWARD COMPATIBILITY ALIASES
+  // ===================================================================
+
+  // ===================================================================
+  // BACKWARD COMPATIBILITY ALIASES
+  // ===================================================================
+
+  /** @deprecated Use registerVisualEffectsParticipant instead */
+  public registerConsciousnessParticipant(participant: BackgroundSystemParticipant): ParticipantRegistrationResult {
+    return this.registerVisualEffectsParticipant(participant);
+  }
+
+  /** @deprecated Use unregisterVisualEffectsParticipant instead */
+  public unregisterConsciousnessParticipant(systemName: string): void {
+    this.unregisterVisualEffectsParticipant(systemName);
+  }
+
+  /** @deprecated Use getCurrentVisualEffectsState instead */
+  public getCurrentConsciousnessField(): VisualEffectState | null {
+    return this.getCurrentVisualEffectsState();
+  }
+
+  /** @deprecated Use forceVisualEffectsStateUpdate instead */
+  public forceConsciousnessFieldUpdate(): void {
+    this.forceVisualEffectsStateUpdate();
+  }
+
+  /** @deprecated Use registerVisualEffectsParticipant instead */
+  public registerBackgroundSystemParticipant(participant: BackgroundSystemParticipant): ParticipantRegistrationResult {
+    return this.registerVisualEffectsParticipant(participant);
+  }
+
+  /** @deprecated Use unregisterVisualEffectsParticipant instead */  
+  public unregisterBackgroundSystemParticipant(systemName: string): void {
+    this.unregisterVisualEffectsParticipant(systemName);
+  }
+
+  /** @deprecated Use getCurrentVisualEffectsState instead */
+  public getCurrentBackgroundState(): VisualEffectState | null {
+    return this.getCurrentVisualEffectsState();
+  }
+
+  /** @deprecated Use choreographEvent instead */
+  public choreographBackgroundEvent(eventType: string, payload: VisualEffectEventPayload): void {
+    return this.choreographEvent(eventType, payload);
   }
 }

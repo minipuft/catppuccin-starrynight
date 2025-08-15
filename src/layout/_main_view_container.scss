@@ -8,10 +8,10 @@
   isolation: isolate; // Ensure pseudo-elements are behind content
   
   // =========================================================================
-  // ORGANIC BREATHING PSEUDO-ELEMENTS (Performance Optimized)
+  // DYNAMIC ANIMATION PSEUDO-ELEMENTS (Performance Optimized)
   // =========================================================================
   
-  // Replace 3x cellular membrane DOM elements with CSS pseudo-elements
+  // Replace 3x visual layer DOM elements with CSS pseudo-elements
   &::before {
     content: '';
     position: fixed;
@@ -22,13 +22,13 @@
     pointer-events: none;
     z-index: 990;
     
-    // Cellular membrane gradient (layer 1)
+    // Visual layer gradient (layer 1)
     background: radial-gradient(circle at 50% 50%, 
-      rgba(var(--spice-rgb-accent, 168, 173, 200), calc(var(--organic-fog-opacity, 0.02) * 4)) 0%, 
+      rgba(var(--spice-rgb-accent, 168, 173, 200), calc(var(--dynamic-fog-opacity, 0.02) * 4)) 0%, 
       transparent 70%);
     
-    // Apply organic membrane breathing animation - DISABLED: Caused global app bouncing
-    // animation: organic-membrane-breathing var(--organic-breathing-cycle, 2000ms) ease-in-out infinite;
+    // Apply dynamic layer animation - DISABLED: Caused global app bouncing
+    // animation: dynamic-layer-animation var(--dynamic-animation-cycle, 2000ms) ease-in-out infinite;
     
     // Performance optimizations
     will-change: opacity, transform, filter;
@@ -36,12 +36,12 @@
     
     // Quality scaling for low-end devices
     @media (update: slow) {
-      // animation-duration: calc(var(--organic-breathing-cycle, 2000ms) * 2); // DISABLED: No longer needed
+      // animation-duration: calc(var(--dynamic-animation-cycle, 2000ms) * 2); // DISABLED: No longer needed
       will-change: auto;
     }
   }
   
-  // Second cellular membrane layer
+  // Second visual layer
   &::after {
     content: '';
     position: fixed;
@@ -54,12 +54,12 @@
     
     // Cellular membrane gradient (layer 2) - offset position
     background: radial-gradient(circle at 70% 65%, 
-      rgba(var(--spice-rgb-accent, 168, 173, 200), calc(var(--organic-fog-opacity, 0.02) * 3)) 0%, 
+      rgba(var(--spice-rgb-accent, 168, 173, 200), calc(var(--dynamic-fog-opacity, 0.02) * 3)) 0%, 
       transparent 70%);
     
-    // Apply organic atmospheric pulse animation
-    // animation: organic-atmospheric-pulse var(--organic-breathing-cycle, 2000ms) ease-in-out infinite; // DISABLED: Caused global app bouncing
-    // animation-delay: calc(var(--organic-breathing-cycle, 2000ms) * 0.33);
+    // Apply dynamic atmospheric pulse animation
+    // animation: dynamic-atmospheric-pulse var(--dynamic-animation-cycle, 2000ms) ease-in-out infinite; // DISABLED: Caused global app bouncing
+    // animation-delay: calc(var(--dynamic-animation-cycle, 2000ms) * 0.33);
     
     // Performance optimizations
     will-change: opacity, transform;
@@ -67,7 +67,7 @@
     
     // Quality scaling for low-end devices
     @media (update: slow) {
-      // animation-duration: calc(var(--organic-breathing-cycle, 2000ms) * 2); // DISABLED: No longer needed
+      // animation-duration: calc(var(--dynamic-animation-cycle, 2000ms) * 2); // DISABLED: No longer needed
       will-change: auto;
     }
   }
@@ -89,35 +89,35 @@
   &::before {
     content: '';
     position: absolute;
-    top: calc(var(--organic-breathing-phase, 0) * 10% + 10%);
-    right: calc(var(--organic-breathing-phase, 0) * 15% + 10%);
-    width: calc(60px + var(--organic-growth-scale, 1) * 60px);
-    height: calc(60px + var(--organic-growth-scale, 1) * 60px);
+    top: calc(var(--dynamic-breathing-phase, 0) * 10% + 10%);
+    right: calc(var(--dynamic-breathing-phase, 0) * 15% + 10%);
+    width: calc(60px + var(--dynamic-growth-scale, 1) * 60px);
+    height: calc(60px + var(--dynamic-growth-scale, 1) * 60px);
     border-radius: 50%;
     
     background: linear-gradient(45deg, 
-      rgba(var(--spice-rgb-accent, 168, 173, 200), calc(var(--organic-shimmer-opacity, 0.05) * 2)) 0%, 
-      rgba(var(--spice-rgb-accent, 168, 173, 200), var(--organic-shimmer-opacity, 0.05)) 100%);
+      rgba(var(--spice-rgb-accent, 168, 173, 200), calc(var(--dynamic-shimmer-opacity, 0.05) * 2)) 0%, 
+      rgba(var(--spice-rgb-accent, 168, 173, 200), var(--dynamic-shimmer-opacity, 0.05)) 100%);
     
     pointer-events: none;
     z-index: 1;
     
-    // Apply organic element breathing animation - DISABLED: Caused global app bouncing
-    // animation: organic-element-breathing var(--organic-breathing-cycle, 2000ms) ease-in-out infinite;
-    // animation-delay: calc(var(--organic-breathing-phase, 0) * 200ms);
+    // Apply dynamic element breathing animation - DISABLED: Caused global app bouncing
+    // animation: dynamic-element-breathing var(--dynamic-animation-cycle, 2000ms) ease-in-out infinite;
+    // animation-delay: calc(var(--dynamic-breathing-phase, 0) * 200ms);
     
     // Performance optimizations
     will-change: transform, opacity, filter;
     contain: layout style paint;
     
-    // Only show on cards that have consciousness enabled
+    // Only show on cards that have visual effects enabled
     opacity: 0;
     transform: scale(0.5);
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
   }
   
-  // Activate breathing organism when organic consciousness is enabled
-  &.organic-consciousness-enabled::before {
+  // Activate dynamic animations when visual effects are enabled
+  &.dynamic-visual-effects-enabled::before {
     opacity: 1;
     transform: scale(1);
   }
@@ -126,35 +126,66 @@
   &::after {
     content: '';
     position: absolute;
-    bottom: calc(var(--organic-breathing-phase, 0) * 5% + 5%);
-    left: calc(var(--organic-breathing-phase, 0) * 10% + 5%);
-    width: calc(2px + var(--organic-growth-scale, 1) * 2px);
-    height: calc(2px + var(--organic-growth-scale, 1) * 2px);
+    bottom: calc(var(--dynamic-breathing-phase, 0) * 5% + 5%);
+    left: calc(var(--dynamic-breathing-phase, 0) * 10% + 5%);
+    width: calc(2px + var(--dynamic-growth-scale, 1) * 2px);
+    height: calc(2px + var(--dynamic-growth-scale, 1) * 2px);
     border-radius: 50%;
     
     background: rgba(var(--spice-rgb-accent, 168, 173, 200), 
-      calc(var(--organic-glow-opacity, 0.1) * 6));
+      calc(var(--dynamic-glow-opacity, 0.1) * 6));
     
     pointer-events: none;
     z-index: 2;
     
-    // Apply organic consciousness field animation
-    // animation: organic-consciousness-field calc(var(--organic-breathing-cycle, 2000ms) * 2) ease-in-out infinite; // DISABLED: Caused global app bouncing
-    // animation-delay: calc(var(--organic-breathing-phase, 0) * 100ms);
+    // Apply dynamic visual effects field animation
+    // animation: dynamic-visual-effects-field calc(var(--dynamic-animation-cycle, 2000ms) * 2) ease-in-out infinite; // DISABLED: Caused global app bouncing
+    // animation-delay: calc(var(--dynamic-breathing-phase, 0) * 100ms);
     
     // Performance optimizations
     will-change: opacity, background-position;
     contain: layout style paint;
     
-    // Only show on cards that have consciousness enabled
+    // Only show on cards that have visual effects enabled
     opacity: 0;
     transform: scale(0);
     transition: opacity 0.8s ease-out, transform 0.8s ease-out;
   }
   
-  // Activate atmospheric particle when organic consciousness is enabled
-  &.organic-consciousness-enabled::after {
+  // Activate atmospheric particle when visual effects are enabled
+  &.dynamic-visual-effects-enabled::after {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+// ==============================================
+// Legacy Compatibility Aliases
+// ==============================================
+// Ensures backward compatibility during transition
+
+// Class aliases for consciousness → visual effects
+.main-view-container__scroll-node.dynamic-consciousness-enabled::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.main-view-container__scroll-node.dynamic-consciousness-enabled::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+// Keyframe aliases for legacy animation names
+@keyframes organic-membrane-breathing {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.95; transform: scale(1.01); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes dynamic-consciousness-field {
+  0% { opacity: 1; transform: translateX(0) translateY(0); }
+  25% { opacity: 0.98; transform: translateX(1px) translateY(-0.5px); }
+  50% { opacity: 0.96; transform: translateX(-0.5px) translateY(1px); }
+  75% { opacity: 0.98; transform: translateX(-1px) translateY(-0.5px); }
+  100% { opacity: 1; transform: translateX(0) translateY(0); }
 }

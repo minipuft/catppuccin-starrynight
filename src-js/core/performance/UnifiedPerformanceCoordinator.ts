@@ -1,7 +1,7 @@
 import { SimplePerformanceCoordinator } from '@/core/performance/SimplePerformanceCoordinator';
 import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
-import { YEAR3000_CONFIG } from '@/config/globalConfig';
-import type { Year3000Config } from '@/types/models';
+import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
+import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 
 // Enhanced interfaces from PerformanceOptimizationManager integration
 export interface DeviceCapabilities {
@@ -108,7 +108,7 @@ interface IPerformanceMonitor {
 export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
   private static instance: UnifiedPerformanceCoordinator | null = null;
   
-  private config: Year3000Config;
+  private config: AdvancedSystemConfig | Year3000Config;
   private performanceAnalyzer: SimplePerformanceCoordinator;
   private eventBus: typeof unifiedEventBus;
   
@@ -203,7 +203,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     },
   };
   
-  constructor(config: Year3000Config, performanceAnalyzer: SimplePerformanceCoordinator) {
+  constructor(config: AdvancedSystemConfig | Year3000Config, performanceAnalyzer: SimplePerformanceCoordinator) {
     this.config = config;
     this.performanceAnalyzer = performanceAnalyzer;
     this.eventBus = unifiedEventBus;

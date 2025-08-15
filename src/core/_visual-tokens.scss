@@ -37,7 +37,7 @@
   // Beat synchronization and rhythm responsiveness
   --sn-gradient-beat-intensity: var(--sn-music-beat-pulse-intensity, 0); // 0-1 beat pulse strength
   --sn-gradient-rhythm-phase: var(--sn-music-rhythm-phase, 0); // Continuous rhythm phase
-  --sn-gradient-breathing-scale: var(--sn-music-breathing-scale, 1); // Breathing rhythm 0.95-1.05
+  --sn-gradient-animation-scale: var(--sn-music-animation-scale, 1); // Animation rhythm 0.95-1.05
 
   // Musical background harmony integration
   --sn-bg-musical-primary-rgb: var(--sn-musical-harmony-primary-rgb);

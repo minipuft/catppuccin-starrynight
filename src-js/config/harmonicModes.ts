@@ -1,11 +1,11 @@
-import type { HarmonicMode, HarmonicModes } from "@/types/models";
+import type { ColorHarmonyMode, ColorHarmonyModes, HarmonicMode, HarmonicModes } from "@/types/models";
 
 /**
  * Color harmony configurations for musical synchronization
  * Defines how colors relate to each other in gradient flows
  */
 
-export const HARMONIC_MODES: HarmonicModes = {
+export const COLOR_HARMONY_MODES: ColorHarmonyModes = {
   "analogous-flow": {
     rule: "analogous",
     angle: 30,
@@ -21,17 +21,17 @@ export const HARMONIC_MODES: HarmonicModes = {
     angle: 180,
     description: "Electric contrast gradients with opposing forces",
   },
-  "tetradic-cosmic-cross": {
+  "tetradic-advanced-cross": {
     rule: "tetradic",
     angle: 90, 
     description: "Complex four-color gradient matrix",
   },
-  "split-complementary-aurora": {
+  "split-complementary-spectrum": {
     rule: "split-complementary",
     angle: 150,
-    description: "Aurora-like gradient flows with polar contrasts", 
+    description: "Spectrum-like gradient flows with polar contrasts", 
   },
-  "monochromatic-meditation": {
+  "monochromatic-calm": {
     rule: "monochromatic",
     angle: 0,
     description: "Intense single-hue gradient depth",
@@ -39,10 +39,10 @@ export const HARMONIC_MODES: HarmonicModes = {
 };
 
 /**
- * Default harmonic settings
+ * Default color harmony settings
  */
-export const HARMONIC_DEFAULTS = {
-  mode: "analogous-flow" as keyof typeof HARMONIC_MODES,
+export const COLOR_HARMONY_DEFAULTS = {
+  mode: "analogous-flow" as keyof typeof COLOR_HARMONY_MODES,
   baseColor: null,
   intensity: 0.85,
   evolution: true,
@@ -123,30 +123,30 @@ export const ENHANCED_BPM_CONFIG = {
 } as const;
 
 /**
- * Get harmonic mode configuration by key
+ * Get color harmony mode configuration by key
  */
-export function getHarmonicMode(key: string): HarmonicMode | null {
-  return HARMONIC_MODES[key as keyof typeof HARMONIC_MODES] || null;
+export function getColorHarmonyMode(key: string): ColorHarmonyMode | null {
+  return COLOR_HARMONY_MODES[key as keyof typeof COLOR_HARMONY_MODES] || null;
 }
 
 /**
- * Get all available harmonic mode keys
+ * Get all available color harmony mode keys
  */
-export function getHarmonicModeKeys(): string[] {
-  return Object.keys(HARMONIC_MODES);
+export function getColorHarmonyModeKeys(): string[] {
+  return Object.keys(COLOR_HARMONY_MODES);
 }
 
 /**
- * Validate harmonic mode key
+ * Validate color harmony mode key
  */
-export function isValidHarmonicMode(key: string | number): key is keyof typeof HARMONIC_MODES {
-  return key in HARMONIC_MODES;
+export function isValidColorHarmonyMode(key: string | number): key is keyof typeof COLOR_HARMONY_MODES {
+  return key in COLOR_HARMONY_MODES;
 }
 
 /**
- * Calculate color angle based on harmonic rule and base color
+ * Calculate color angle based on color harmony rule and base color
  */
-export function calculateHarmonicAngle(mode: HarmonicMode, baseHue: number): number[] {
+export function calculateColorHarmonyAngle(mode: ColorHarmonyMode, baseHue: number): number[] {
   switch (mode.rule) {
     case "analogous":
       return [baseHue, baseHue + mode.angle, baseHue - mode.angle];
@@ -178,4 +178,58 @@ export function getEnergyColorMultiplier(energy: number, valence: number): numbe
                        MUSIC_VISUAL_SYNC.valenceScaling.happy;
                        
   return energyFactor * valenceFactor;
+}
+
+// =========================================================================
+// BACKWARD COMPATIBILITY ALIASES
+// =========================================================================
+
+/**
+ * @deprecated Use COLOR_HARMONY_MODES instead
+ * @since v1.0.0
+ */
+export const HARMONIC_MODES: HarmonicModes = {
+  ...COLOR_HARMONY_MODES,
+  // Legacy key mappings
+  "tetradic-cosmic-cross": COLOR_HARMONY_MODES["tetradic-advanced-cross"]!,
+  "split-complementary-aurora": COLOR_HARMONY_MODES["split-complementary-spectrum"]!,
+  "monochromatic-meditation": COLOR_HARMONY_MODES["monochromatic-calm"]!,
+};
+
+/**
+ * @deprecated Use COLOR_HARMONY_DEFAULTS instead
+ * @since v1.0.0
+ */
+export const HARMONIC_DEFAULTS = COLOR_HARMONY_DEFAULTS;
+
+/**
+ * @deprecated Use getColorHarmonyMode instead
+ * @since v1.0.0
+ */
+export function getHarmonicMode(key: string): HarmonicMode | null {
+  return getColorHarmonyMode(key);
+}
+
+/**
+ * @deprecated Use getColorHarmonyModeKeys instead
+ * @since v1.0.0
+ */
+export function getHarmonicModeKeys(): string[] {
+  return getColorHarmonyModeKeys();
+}
+
+/**
+ * @deprecated Use isValidColorHarmonyMode instead
+ * @since v1.0.0
+ */
+export function isValidHarmonicMode(key: string | number): key is keyof typeof HARMONIC_MODES {
+  return isValidColorHarmonyMode(key);
+}
+
+/**
+ * @deprecated Use calculateColorHarmonyAngle instead
+ * @since v1.0.0
+ */
+export function calculateHarmonicAngle(mode: HarmonicMode, baseHue: number): number[] {
+  return calculateColorHarmonyAngle(mode, baseHue);
 }

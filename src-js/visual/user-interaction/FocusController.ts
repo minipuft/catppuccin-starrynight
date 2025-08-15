@@ -1,6 +1,6 @@
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
-import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 
 interface FocusState {
@@ -27,7 +27,7 @@ export class FocusController implements IManagedSystem {
   public readonly systemName = "FocusController";
 
   private config: FocusManagerConfig;
-  private utils: typeof Year3000Utilities;
+  private utils: typeof ThemeUtilities;
   private focusState: FocusState;
   private year3000System: any | null = null;
   private cssController!: OptimizedCSSVariableManager;
@@ -43,8 +43,8 @@ export class FocusController implements IManagedSystem {
   private debouncedUpdate: (() => void) | null = null;
 
   constructor(
-    config: Year3000Config,
-    utils: typeof Year3000Utilities,
+    config: AdvancedSystemConfig | Year3000Config,
+    utils: typeof ThemeUtilities,
     year3000System: any | null = null
   ) {
     this.config = {

@@ -9,7 +9,7 @@
  * with intelligent fallback to CSS and device-aware optimization."
  */
 
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -24,7 +24,7 @@ import {
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
 import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 import {
   createGradientTexture,
   DEFAULT_VERTEX_SHADER,
@@ -258,7 +258,7 @@ interface WebGLFlowSettings {
 
 export class WebGLGradientStrategy implements IColorProcessor {
   private utils = Utils;
-  private config = YEAR3000_CONFIG;
+  private config = ADVANCED_SYSTEM_CONFIG;
   private deviceDetector: DeviceCapabilityDetector;
   private cssController: OptimizedCSSVariableManager;
   private oklabProcessor: OKLABColorProcessor;
@@ -333,7 +333,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
     this.cssController = cssController || getGlobalOptimizedCSSController();
     this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
 
-    // Get CSS consciousness controller
+    // Get CSS visual effects controller
     this.cssController = getGlobalOptimizedCSSController();
 
     // Check for reduced motion preference
@@ -675,7 +675,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
 
     this.webglState.webglReady = true;
 
-    // Announce WebGL readiness to CSS consciousness system
+    // Announce WebGL readiness to CSS visual effects system
     try {
       const cssController = getGlobalOptimizedCSSController();
       cssController.setPerformanceTokens({
@@ -687,7 +687,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
       
       Y3KDebug?.debug?.log(
         "WebGLGradientStrategy",
-        "🎨 WebGL readiness announced to CSS consciousness system - CSS Variables Set",
+        "🎨 WebGL readiness announced to CSS visual effects system - CSS Variables Set",
         {
           webglReady: true,
           activeBackend: "webgl-strategy",
@@ -1461,7 +1461,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
     cssError: any
   ): Promise<ColorResult> {
     try {
-      // Apply solid color using CSS consciousness controller
+      // Apply solid color using CSS visual effects controller
       await this.cssController?.queueUpdate(
         "--sn-accent-color",
         primaryColor,

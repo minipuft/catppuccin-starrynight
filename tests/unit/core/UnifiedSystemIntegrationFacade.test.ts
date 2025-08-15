@@ -4,8 +4,8 @@
  */
 
 import { NonVisualSystemFacade, NonVisualSystemKey, NonVisualSystemConfig } from '@/core/integration/NonVisualSystemFacade';
-import { YEAR3000_CONFIG } from '@/config/globalConfig';
-import * as Utils from '@/utils/core/Year3000Utilities';
+import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
+import * as Utils from '@/utils/core/ThemeUtilities';
 
 // Mock all non-visual system imports
 jest.mock('@/core/animation/EnhancedMasterAnimationCoordinator');
@@ -47,23 +47,23 @@ Object.defineProperty(window, 'performance', {
 
 describe('NonVisualSystemFacade', () => {
   let facade: NonVisualSystemFacade;
-  let mockYear3000System: any;
+  let mockAdvancedThemeSystem: any;
 
   beforeEach(() => {
     // Reset mocks
     jest.clearAllMocks();
     
-    // Create mock year3000System
-    mockYear3000System = {
+    // Create mock advancedThemeSystem
+    mockAdvancedThemeSystem = {
       isInitialized: true,
-      config: YEAR3000_CONFIG
+      config: ADVANCED_SYSTEM_CONFIG
     };
 
     // Create facade instance
     facade = new NonVisualSystemFacade(
-      YEAR3000_CONFIG,
+      ADVANCED_SYSTEM_CONFIG,
       Utils,
-      mockYear3000System
+      mockAdvancedThemeSystem
     );
   });
 
@@ -285,9 +285,9 @@ describe('NonVisualSystemFacade', () => {
       
       // Create new facade with high init time
       const slowFacade = new NonVisualSystemFacade(
-        YEAR3000_CONFIG,
+        ADVANCED_SYSTEM_CONFIG,
         Utils,
-        mockYear3000System
+        mockAdvancedThemeSystem
       );
       
       await slowFacade.initialize();

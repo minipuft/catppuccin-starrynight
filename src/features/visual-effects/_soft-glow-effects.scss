@@ -291,8 +291,8 @@
 /* Main View Container - Ethereal Background */
 .main-view-container {
   &[data-ethereal-mode="active"] {
-    @extend .ethereal-flowing-gradients;
-    @extend .ethereal-dreamy-translucency;
+    @extend .ethereal-flowing-gradients !optional;
+    @extend .ethereal-dreamy-translucency !optional;
     
     background-blend-mode: soft-light;
     
@@ -305,8 +305,8 @@
 /* Now Playing Bar - Gentle Emotional Glow */
 .Root__now-playing-bar {
   &[data-ethereal-mode="active"] {
-    @extend .ethereal-gentle-glow;
-    @extend .ethereal-emotional-breathing;
+    @extend .ethereal-gentle-glow !optional;
+    @extend .ethereal-emotional-breathing !optional;
     
     background: linear-gradient(
       90deg,
@@ -324,7 +324,7 @@
 .cover-art,
 .main-trackInfo-container img {
   &[data-ethereal-mode="active"] {
-    @extend .ethereal-mystical-shimmer;
+    @extend .ethereal-mystical-shimmer !optional;
     
     border: 2px solid rgba(var(--ethereal-mystical-rgb), calc(var(--soft-glow-effects-level) * 0.6));
     border-radius: 8px;
@@ -338,7 +338,7 @@
 /* Player Controls - Soft Ethereal Interactions */
 .player-controls {
   &[data-ethereal-mode="active"] {
-    @extend .ethereal-soft-particles;
+    @extend .ethereal-soft-particles !optional;
     
     .control-button {
       position: relative;
@@ -376,7 +376,7 @@
 /* Track Information - Flowing Text */
 .main-trackInfo-container {
   &[data-ethereal-mode="active"] {
-    @extend .ethereal-flowing-gradients;
+    @extend .ethereal-flowing-gradients !optional;
     
     .track-title,
     .artist-name {
@@ -393,8 +393,8 @@
 /* Navigation Sidebar - Mystical Presence */
 .Root__nav-bar {
   &[data-ethereal-mode="active"] {
-    @extend .ethereal-mystical-shimmer;
-    @extend .ethereal-dreamy-translucency;
+    @extend .ethereal-mystical-shimmer !optional;
+    @extend .ethereal-dreamy-translucency !optional;
     
     border-right: 1px solid rgba(var(--ethereal-mystical-rgb), calc(var(--soft-glow-effects-level) * 0.4));
     
@@ -429,7 +429,7 @@
 /* Progress Bar - Flowing Energy */
 .progress-bar {
   &[data-ethereal-mode="active"] {
-    @extend .ethereal-flowing-gradients;
+    @extend .ethereal-flowing-gradients !optional;
     
     background: rgba(var(--ethereal-dreamy-rgb), 0.3);
     border-radius: 10px;

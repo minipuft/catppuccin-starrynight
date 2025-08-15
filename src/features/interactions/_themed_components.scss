@@ -1,23 +1,23 @@
 // ████████████████████████████████████████████████████████████████████████████████
-// ████████ YEAR 3000 CONSCIOUS ELEGANCE (PERFORMANCE OPTIMIZED) ████████████████
+// ████████ YEAR 3000 DYNAMIC INTERFACE (PERFORMANCE OPTIMIZED) ████████████████
 // ████████████████████████████████████████████████████████████████████████████████
-// "Technology with a soul - consciousness that breathes with the music."
-// - Ethereal beauty meets intelligent purpose AND performance
+// "Technology with animation - visual effects that sync with the music."
+// - Visual beauty meets intelligent purpose AND performance
 
 @use "../../core/_mixins" as *;
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🌌 YEAR 3000 CONSCIOUS ELEGANCE FOUNDATION (OPTIMIZED)
-// Technology that feels alive and emotionally responsive without performance cost
+// 🌌 YEAR 3000 DYNAMIC INTERFACE FOUNDATION (OPTIMIZED)
+// Technology that feels responsive and visually engaging without performance cost
 // ═══════════════════════════════════════════════════════════════════════════════
 
 :root {
-  // === PERFORMANCE-CONSCIOUS CONTROL ===
-  --conscious-elegance-intensity: calc(
-    var(--reality-breach-intensity, 1) * 0.6
-  ); // Balanced soul
-  --conscious-breath-rate: 8s; // Slow, mindful breathing rhythm
-  --conscious-emotion-depth: 0.4; // Emotional response intensity
+  // === PERFORMANCE-AWARE CONTROL ===
+  --dynamic-interface-intensity: calc(
+    var(--visual-effects-breach-intensity, 1) * 0.6
+  ); // Balanced animation
+  --dynamic-animation-rate: 8s; // Slow, smooth animation rhythm
+  --dynamic-response-depth: 0.4; // Visual response intensity
 
   // === OPTIMIZED ETHEREAL ENERGY ===
   --ethereal-glow-base: calc(
@@ -31,20 +31,20 @@
   --cosmic-blur-poetry: 8px; // Reduced blur for better performance
   --cosmic-depth-layers: 60px; // Reduced 3D depth for performance
 
-  // === EFFICIENT COLOR CONSCIOUSNESS ===
-  --soul-primary: rgba(
+  // === EFFICIENT COLOR INTERFACE ===
+  --interface-primary: rgba(
     var(--sn-accent-rgb, var(--spice-rgb-accent)),
     var(--ethereal-glow-base)
   );
-  --soul-secondary: rgba(
+  --interface-secondary: rgba(
     var(--sn-accent-rgb, var(--spice-rgb-surface0)),
     calc(var(--ethereal-glow-base) * 0.9)
   );
-  --soul-accent: rgba(
+  --interface-accent: rgba(
     var(--sn-accent-rgb, var(--spice-rgb-accent)),
     calc(var(--ethereal-glow-base) * 1.1)
   );
-  --soul-whisper: rgba(
+  --interface-subtle: rgba(
     var(--sn-accent-rgb, var(--spice-rgb-accent)),
     calc(var(--ethereal-glow-base) * 0.3)
   );
@@ -57,7 +57,7 @@
 // High Performance Mode (Desktop, powerful devices)
 @media (min-width: 1200px) and (min-resolution: 1.5dppx) {
   :root {
-    --conscious-elegance-intensity: 0.8;
+    --dynamic-interface-intensity: 0.8;
     --cosmic-blur-poetry: 12px;
     --cosmic-depth-layers: 80px;
   }
@@ -66,7 +66,7 @@
 // Balanced Mode (Standard devices)
 @media (min-width: 768px) and (max-width: 1199px) {
   :root {
-    --conscious-elegance-intensity: 0.6;
+    --dynamic-interface-intensity: 0.6;
     --cosmic-blur-poetry: 8px;
     --cosmic-depth-layers: 60px;
   }
@@ -75,25 +75,25 @@
 // Performance Mode (Mobile, low-end devices)
 @media (max-width: 767px) {
   :root {
-    --conscious-elegance-intensity: 0.3;
+    --dynamic-interface-intensity: 0.3;
     --cosmic-blur-poetry: 4px;
     --cosmic-depth-layers: 30px;
-    --conscious-breath-rate: 16s; // Slower animations
+    --dynamic-animation-rate: 16s; // Slower animations
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🌊 OPTIMIZED CONSCIOUS ENERGY FIELD
-// Beautiful, alive backgrounds that perform well
+// 🌊 OPTIMIZED DYNAMIC INTERFACE FIELD
+// Beautiful, responsive backgrounds that perform well
 // ═══════════════════════════════════════════════════════════════════════════════
 
-@mixin conscious-energy-field($intensity: 1) {
+@mixin dynamic-interface-field($intensity: 1) {
   position: relative;
 
   // GPU optimization hint
   will-change: transform, opacity;
 
-  // Optimized conscious presence - simplified gradients
+  // Optimized visual effects presence - simplified gradients
   &::before {
     content: "";
     position: absolute;
@@ -106,8 +106,8 @@
     // SIMPLIFIED: Single gradient instead of multiple for performance
     background: radial-gradient(
       ellipse 250% 120% at 40% 60%,
-      var(--soul-primary) 0%,
-      var(--soul-secondary) 40%,
+      var(--interface-primary) 0%,
+      var(--interface-secondary) 40%,
       transparent 70%
     );
 
@@ -115,7 +115,7 @@
     filter: blur(var(--cosmic-blur-poetry)) saturate(var(--cosmic-saturation));
 
     // OPTIMIZED: Single animation instead of multiple
-    animation: conscious-breathing var(--conscious-breath-rate) ease-in-out
+    animation: dynamic-animation var(--dynamic-animation-rate) ease-in-out
       infinite;
 
     opacity: 0;
@@ -123,9 +123,9 @@
     transition: opacity 0.6s ease, transform 0.6s ease;
   }
 
-  // Activate consciousness on meaningful interaction
+  // Activate visual effects on meaningful interaction
   &:hover::before {
-    opacity: calc(var(--conscious-elegance-intensity) * #{$intensity});
+    opacity: calc(var(--dynamic-interface-intensity) * #{$intensity});
     transform: scale(1.04);
   }
 }
@@ -135,7 +135,7 @@
 // Delicate light play that's performance-conscious
 // ═══════════════════════════════════════════════════════════════════════════════
 
-@mixin ethereal-shimmer-soul {
+@mixin ethereal-shimmer-interface {
   position: relative;
 
   // Only on high-performance devices to avoid lag
@@ -152,7 +152,7 @@
       // SIMPLIFIED: Single particle pattern instead of multiple
       background-image: radial-gradient(
         circle 1px at 25% 25%,
-        var(--soul-accent) 1px,
+        var(--interface-accent) 1px,
         transparent 1px
       );
       background-size: 60px 60px;
@@ -170,19 +170,19 @@
     }
 
     &:hover::after {
-      opacity: calc(var(--conscious-elegance-intensity) * 0.5);
+      opacity: calc(var(--dynamic-interface-intensity) * 0.5);
     }
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎭 PERFORMANCE-OPTIMIZED CARDS WITH SOUL
+// 🎭 PERFORMANCE-OPTIMIZED DYNAMIC CARDS
 // Beautiful interface elements that don't lag
 // ═══════════════════════════════════════════════════════════════════════════════
 
 .main-card-card {
-  @include conscious-energy-field(0.8);
-  @include ethereal-shimmer-soul;
+  @include dynamic-interface-field(0.8);
+  @include ethereal-shimmer-interface;
 
   position: relative;
   border-radius: 12px 16px 14px 18px;
@@ -192,7 +192,7 @@
   // GPU optimization
   will-change: transform, box-shadow;
 
-  // Optimized hover consciousness
+  // Optimized hover visual effects
   &:hover {
     transform: translateY(-3px) scale(1.02);
 
@@ -200,7 +200,7 @@
     box-shadow: 0 8px 32px
       rgba(
         var(--sn-accent-rgb, var(--spice-rgb-accent)),
-        calc(var(--conscious-elegance-intensity) * 0.3)
+        calc(var(--dynamic-interface-intensity) * 0.3)
       );
 
     filter: saturate(var(--cosmic-saturation));
@@ -215,8 +215,8 @@
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎵 OPTIMIZED TRACK LISTS WITH SOUL
-// Musical consciousness that performs smoothly
+// 🎵 OPTIMIZED TRACK LISTS WITH DYNAMICS
+// Musical visual effects that perform smoothly
 // ═══════════════════════════════════════════════════════════════════════════════
 
 .main-trackList-trackListRow {
@@ -227,7 +227,7 @@
 
   &:hover {
     // SIMPLIFIED: Single gradient background
-    background: var(--soul-primary);
+    background: var(--interface-primary);
     transform: translateX(4px);
 
     // Optional shadow only on high-performance devices
@@ -235,7 +235,7 @@
       box-shadow: -2px 0 8px
         rgba(
           var(--sn-accent-rgb, var(--spice-rgb-accent)),
-          calc(var(--conscious-elegance-intensity) * 0.1)
+          calc(var(--dynamic-interface-intensity) * 0.1)
         );
     }
   }
@@ -250,12 +250,12 @@
       top: 25%;
       bottom: 25%;
       width: 2px;
-      background: var(--soul-accent);
+      background: var(--interface-accent);
       border-radius: 1px;
 
       // SIMPLIFIED: No animation on mobile for performance
       @media (min-width: 768px) {
-        animation: conscious-pulse-simple var(--conscious-breath-rate)
+        animation: dynamic-pulse-simple var(--dynamic-animation-rate)
           ease-in-out infinite;
       }
     }
@@ -263,8 +263,8 @@
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 📱 OPTIMIZED SIDEBAR CONSCIOUSNESS
-// Efficient navigation soul
+// 📱 OPTIMIZED SIDEBAR INTERFACE
+// Efficient navigation visual effects
 // ═══════════════════════════════════════════════════════════════════════════════
 
 .main-yourLibrary-yourLibrary {
@@ -276,13 +276,13 @@
       border-radius: 6px;
 
       &:hover {
-        background: var(--soul-primary);
+        background: var(--interface-primary);
         transform: translateX(3px);
       }
 
       &[aria-selected="true"] {
-        background: var(--soul-accent);
-        border-left: 2px solid var(--soul-primary);
+        background: var(--interface-accent);
+        border-left: 2px solid var(--interface-primary);
       }
     }
   }
@@ -293,7 +293,7 @@
 // Beautiful movements that don't cause lag
 // ═══════════════════════════════════════════════════════════════════════════════
 
-@keyframes conscious-breathing {
+@keyframes dynamic-animation {
   0%,
   100% {
     transform: scale(1.02);
@@ -305,7 +305,7 @@
   }
 }
 
-@keyframes conscious-breathing-simple {
+@keyframes dynamic-animation-simple {
   0%,
   100% {
     opacity: 0.2;
@@ -315,7 +315,7 @@
   }
 }
 
-@keyframes conscious-pulse-simple {
+@keyframes dynamic-pulse-simple {
   0%,
   100% {
     opacity: 0.6;
@@ -339,13 +339,13 @@
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // ♿ ACCESSIBILITY & PERFORMANCE OPTIMIZATION
-// Soul that works for everyone on every device
+// Visual effects that work for everyone on every device
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --conscious-elegance-intensity: 0.2; // Minimal soul, maximum accessibility
-    --conscious-breath-rate: 30s; // Very slow breathing
+    --dynamic-interface-intensity: 0.2; // Minimal effects, maximum accessibility
+    --dynamic-animation-rate: 30s; // Very slow animation
   }
 
   * {
@@ -356,7 +356,7 @@
 // Battery/Performance mode detection
 @media (prefers-reduced-data: reduce) {
   :root {
-    --conscious-elegance-intensity: 0.1;
+    --dynamic-interface-intensity: 0.1;
     --cosmic-blur-poetry: 2px;
   }
 
@@ -375,4 +375,46 @@
       var(--quantum-field-opacity, 0.25) * 1.5
     ); // Increase visibility
   }
+}
+
+// =============================================================================
+// LEGACY COMPATIBILITY MAPPINGS - Phase 6.3 Layer B Modernization
+// =============================================================================
+
+:root {
+  // === Legacy Conscious → Dynamic Mappings ===
+  --conscious-elegance-intensity: var(--dynamic-interface-intensity);
+  --conscious-breath-rate: var(--dynamic-animation-rate);
+  --conscious-emotion-depth: var(--dynamic-response-depth);
+  
+  // === Legacy Soul → Interface Color Mappings ===
+  --soul-primary: var(--interface-primary);
+  --soul-secondary: var(--interface-secondary);
+  --soul-accent: var(--interface-accent);
+  --soul-whisper: var(--interface-subtle);
+}
+
+// Legacy mixin support
+@mixin conscious-energy-field($intensity: 1) {
+  @include dynamic-interface-field($intensity);
+}
+
+@mixin ethereal-shimmer-soul {
+  @include ethereal-shimmer-interface;
+}
+
+// Legacy keyframe support
+@keyframes conscious-breathing {
+  0%, 100% { transform: scale(1.02); opacity: 0.7; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+
+@keyframes conscious-breathing-simple {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes conscious-pulse-simple {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }

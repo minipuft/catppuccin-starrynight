@@ -6,11 +6,11 @@
  * superior color harmony across all strategy implementations.
  *
  * Philosophy: "Perceptual color processing creates natural, harmonious color
- * transitions that respect human visual perception and enhance aesthetic consciousness."
+ * transitions that respect human visual perception and enhance aesthetic visual-effects."
  */
 
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 
 export interface OKLABColor {
   L: number; // Lightness (0-1)
@@ -86,7 +86,7 @@ export class OKLABColorProcessor {
     COSMIC: {
       name: "Cosmic Enhancement",
       description:
-        "Maximum enhancement for Year 3000 consciousness experiences",
+        "Maximum enhancement for Year 3000 visual-effects experiences",
       lightnessBoost: 1.2,
       chromaBoost: 1.35,
       shadowReduction: 0.2,

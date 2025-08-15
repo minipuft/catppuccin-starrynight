@@ -284,7 +284,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
         // shared configuration object.
         (
           globalThis as any
-        ).year3000System?.YEAR3000_CONFIG?.safeSetArtisticMode?.(mode);
+        ).year3000System?.ADVANCED_SYSTEM_CONFIG?.safeSetArtisticMode?.(mode);
       },
     }
   );

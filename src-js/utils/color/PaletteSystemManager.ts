@@ -9,7 +9,7 @@
  * @performance Static palette lookup with minimal overhead
  */
 
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import type { 
   CatppuccinColor, 
   CatppuccinColorName, 
@@ -64,7 +64,7 @@ export class PaletteSystemManager {
    * Get the currently active palette system from configuration
    */
   getCurrentPaletteSystem(): PaletteSystem {
-    return YEAR3000_CONFIG.paletteSystem || 'catppuccin';
+    return ADVANCED_SYSTEM_CONFIG.paletteSystem || 'catppuccin';
   }
   
   /**
@@ -198,7 +198,7 @@ export class PaletteSystemManager {
   }
   
   /**
-   * Get organic flow colors (Year 3000 specific, fallback for Catppuccin)
+   * Get smooth flow colors (Year 3000 specific, fallback for Catppuccin)
    */
   getAnimatedFlowColors(flavor?: UnifiedFlavor): {
     primary: UnifiedColor;
@@ -212,7 +212,7 @@ export class PaletteSystemManager {
     if (system === 'year3000') {
       return Year3000Utils.getAnimatedFlowColors(activeFlavor as Year3000Flavor);
     } else {
-      // Fallback: use Catppuccin colors for organic flow
+      // Fallback: use Catppuccin colors for smooth flow
       const palette = CATPPUCCIN_PALETTES[activeFlavor as CatppuccinFlavor];
       return {
         primary: palette.mauve,

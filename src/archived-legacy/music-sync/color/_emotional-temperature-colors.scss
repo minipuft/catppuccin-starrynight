@@ -1,0 +1,576 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// EMOTIONAL TEMPERATURE COLORS - Dynamic Color Temperature System
+// ████████████████████████████████████████████████████████████████████████████████
+
+// === EMOTIONAL COLOR TEMPERATURE FOUNDATION ===
+// Dynamic color system that maps music emotions to color temperatures (1000K-20000K)
+// and generates cinematic palettes that evolve with the user's musical journey
+
+:root {
+  // === EMOTION-SPECIFIC COLOR TEMPERATURES ===
+  // Each emotion maps to a specific color temperature range
+  // Enhanced with OKLAB processing for perceptually uniform color transitions
+  
+  // Calm/Meditative States (2700K-4000K - Warm, soothing) - OKLAB Enhanced
+  --visual-effects-emotion-calm-temp: 3200;
+  --visual-effects-emotion-calm-primary: var(--sn-emotion-calm-oklab-primary-rgb);
+  --visual-effects-emotion-calm-accent: var(--sn-emotion-calm-oklab-accent-rgb);
+  --visual-effects-emotion-calm-atmosphere: var(--sn-emotion-calm-oklab-atmosphere-rgb);
+  --visual-effects-emotion-calm-luminance: var(--sn-emotion-calm-oklab-luminance);
+  --visual-effects-emotion-calm-chroma: var(--sn-emotion-calm-oklab-chroma);
+  --visual-effects-emotion-calm-hue: var(--sn-emotion-calm-oklab-hue);
+  
+  // Melancholy States (2200K-3500K - Deep, introspective) - OKLAB Enhanced
+  --visual-effects-emotion-melancholy-temp: 2800;
+  --visual-effects-emotion-melancholy-primary: var(--sn-emotion-melancholy-oklab-primary-rgb);
+  --visual-effects-emotion-melancholy-accent: var(--sn-emotion-melancholy-oklab-accent-rgb);
+  --visual-effects-emotion-melancholy-atmosphere: var(--sn-emotion-melancholy-oklab-atmosphere-rgb);
+  --visual-effects-emotion-melancholy-luminance: var(--sn-emotion-melancholy-oklab-luminance);
+  --visual-effects-emotion-melancholy-chroma: var(--sn-emotion-melancholy-oklab-chroma);
+  --visual-effects-emotion-melancholy-hue: var(--sn-emotion-melancholy-oklab-hue);
+  
+  // Energetic States (5500K-7500K - Bright, vibrant) - OKLAB Enhanced
+  --visual-effects-emotion-energetic-temp: 6500;
+  --visual-effects-emotion-energetic-primary: var(--sn-emotion-energetic-oklab-primary-rgb);
+  --visual-effects-emotion-energetic-accent: var(--sn-emotion-energetic-oklab-accent-rgb);
+  --visual-effects-emotion-energetic-atmosphere: var(--sn-emotion-energetic-oklab-atmosphere-rgb);
+  --visual-effects-emotion-energetic-luminance: var(--sn-emotion-energetic-oklab-luminance);
+  --visual-effects-emotion-energetic-chroma: var(--sn-emotion-energetic-oklab-chroma);
+  --visual-effects-emotion-energetic-hue: var(--sn-emotion-energetic-oklab-hue);
+  
+  // Aggressive States (8000K-12000K - Cool, intense) - OKLAB Enhanced
+  --visual-effects-emotion-aggressive-temp: 10000;
+  --visual-effects-emotion-aggressive-primary: var(--sn-emotion-aggressive-oklab-primary-rgb);
+  --visual-effects-emotion-aggressive-accent: var(--sn-emotion-aggressive-oklab-accent-rgb);
+  --visual-effects-emotion-aggressive-atmosphere: var(--sn-emotion-aggressive-oklab-atmosphere-rgb);
+  --visual-effects-emotion-aggressive-luminance: var(--sn-emotion-aggressive-oklab-luminance);
+  --visual-effects-emotion-aggressive-chroma: var(--sn-emotion-aggressive-oklab-chroma);
+  --visual-effects-emotion-aggressive-hue: var(--sn-emotion-aggressive-oklab-hue);
+  
+  // Happy States (4500K-6500K - Balanced, joyful) - OKLAB Enhanced
+  --visual-effects-emotion-happy-temp: 5500;
+  --visual-effects-emotion-happy-primary: var(--sn-emotion-happy-oklab-primary-rgb);
+  --visual-effects-emotion-happy-accent: var(--sn-emotion-happy-oklab-accent-rgb);
+  --visual-effects-emotion-happy-atmosphere: var(--sn-emotion-happy-oklab-atmosphere-rgb);
+  --visual-effects-emotion-happy-luminance: var(--sn-emotion-happy-oklab-luminance);
+  --visual-effects-emotion-happy-chroma: var(--sn-emotion-happy-oklab-chroma);
+  --visual-effects-emotion-happy-hue: var(--sn-emotion-happy-oklab-hue);
+  
+  // Romantic States (2500K-3500K - Soft, intimate) - OKLAB Enhanced
+  --visual-effects-emotion-romantic-temp: 3000;
+  --visual-effects-emotion-romantic-primary: var(--sn-emotion-romantic-oklab-primary-rgb);
+  --visual-effects-emotion-romantic-accent: var(--sn-emotion-romantic-oklab-accent-rgb);
+  --visual-effects-emotion-romantic-atmosphere: var(--sn-emotion-romantic-oklab-atmosphere-rgb);
+  --visual-effects-emotion-romantic-luminance: var(--sn-emotion-romantic-oklab-luminance);
+  --visual-effects-emotion-romantic-chroma: var(--sn-emotion-romantic-oklab-chroma);
+  --visual-effects-emotion-romantic-hue: var(--sn-emotion-romantic-oklab-hue);
+  
+  // Mysterious States (1800K-2800K - Deep, enigmatic) - OKLAB Enhanced
+  --visual-effects-emotion-mysterious-temp: 2300;
+  --visual-effects-emotion-mysterious-primary: var(--sn-emotion-mysterious-oklab-primary-rgb);
+  --visual-effects-emotion-mysterious-accent: var(--sn-emotion-mysterious-oklab-accent-rgb);
+  --visual-effects-emotion-mysterious-atmosphere: var(--sn-emotion-mysterious-oklab-atmosphere-rgb);
+  --visual-effects-emotion-mysterious-luminance: var(--sn-emotion-mysterious-oklab-luminance);
+  --visual-effects-emotion-mysterious-chroma: var(--sn-emotion-mysterious-oklab-chroma);
+  --visual-effects-emotion-mysterious-hue: var(--sn-emotion-mysterious-oklab-hue);
+  
+  // Epic States (7000K-15000K - Grand, cinematic) - OKLAB Enhanced
+  --visual-effects-emotion-epic-temp: 11000;
+  --visual-effects-emotion-epic-primary: var(--sn-emotion-epic-oklab-primary-rgb);
+  --visual-effects-emotion-epic-accent: var(--sn-emotion-epic-oklab-accent-rgb);
+  --visual-effects-emotion-epic-atmosphere: var(--sn-emotion-epic-oklab-atmosphere-rgb);
+  --visual-effects-emotion-epic-luminance: var(--sn-emotion-epic-oklab-luminance);
+  --visual-effects-emotion-epic-chroma: var(--sn-emotion-epic-oklab-chroma);
+  --visual-effects-emotion-epic-hue: var(--sn-emotion-epic-oklab-hue);
+  
+  // Ambient States (3000K-5000K - Atmospheric, floating) - OKLAB Enhanced
+  --visual-effects-emotion-ambient-temp: 4000;
+  --visual-effects-emotion-ambient-primary: var(--sn-emotion-ambient-oklab-primary-rgb);
+  --visual-effects-emotion-ambient-accent: var(--sn-emotion-ambient-oklab-accent-rgb);
+  --visual-effects-emotion-ambient-atmosphere: var(--sn-emotion-ambient-oklab-atmosphere-rgb);
+  --visual-effects-emotion-ambient-luminance: var(--sn-emotion-ambient-oklab-luminance);
+  --visual-effects-emotion-ambient-chroma: var(--sn-emotion-ambient-oklab-chroma);
+  --visual-effects-emotion-ambient-hue: var(--sn-emotion-ambient-oklab-hue);
+  
+  // === MUSICAL OKLAB COORDINATION VARIABLES ===
+  // Dynamic variables updated by MusicalOKLABCoordinator for real-time responsiveness
+  --visual-effects-musical-emotion: var(--sn-musical-oklab-emotion);
+  --visual-effects-musical-genre: var(--sn-musical-oklab-genre);
+  --visual-effects-musical-intensity: var(--sn-musical-oklab-intensity);
+  --visual-effects-musical-preset: var(--sn-musical-oklab-preset-name);
+  
+  // Dynamic emotional color selection based on current music
+  --visual-effects-emotion-current-primary: var(--sn-musical-oklab-primary-rgb);
+  --visual-effects-emotion-current-accent: var(--sn-musical-oklab-accent-rgb);
+  --visual-effects-emotion-current-highlight: var(--sn-musical-oklab-highlight-rgb);
+  --visual-effects-emotion-current-shadow: var(--sn-musical-oklab-shadow-rgb);
+}
+
+// === EMOTIONAL TEMPERATURE MIXINS ===
+
+// Apply emotional temperature to element with OKLAB enhancement
+@mixin emotional-temperature($emotion: 'ambient', $intensity: 1.0) {
+  // Get emotion-specific OKLAB-enhanced color temperature
+  $temp-var: --visual-effects-emotion-#{$emotion}-temp;
+  $primary-var: --visual-effects-emotion-#{$emotion}-primary;
+  $accent-var: --visual-effects-emotion-#{$emotion}-accent;
+  $atmosphere-var: --visual-effects-emotion-#{$emotion}-atmosphere;
+  $luminance-var: --visual-effects-emotion-#{$emotion}-luminance;
+  $chroma-var: --visual-effects-emotion-#{$emotion}-chroma;
+  $hue-var: --visual-effects-emotion-#{$emotion}-hue;
+  
+  // Apply OKLAB-enhanced temperature-based coloring
+  color: rgb(var(#{$primary-var}));
+  
+  // OKLAB-based perceptual enhancements
+  filter: 
+    saturate(calc(1.0 + #{$intensity} * var(#{$chroma-var}) * 0.5))
+    brightness(calc(var(#{$luminance-var}) + #{$intensity} * 0.1))
+    hue-rotate(calc(#{$intensity} * var(--visual-effects-warmth, 0.8) * var(#{$hue-var}) * 0.02deg));
+  
+  // OKLAB-enhanced perceptually uniform text shadow
+  text-shadow: 
+    0 0 calc(#{$intensity} * var(#{$chroma-var}) * 8px) rgba(var(#{$accent-var}), calc(#{$intensity} * var(#{$chroma-var}) * 0.4)),
+    0 0 calc(#{$intensity} * var(#{$luminance-var}) * 12px) rgba(var(#{$atmosphere-var}), calc(#{$intensity} * var(#{$luminance-var}) * 0.15));
+  
+  // Musical OKLAB coordination integration
+  --emotional-oklab-luminance: var(#{$luminance-var});
+  --emotional-oklab-chroma: var(#{$chroma-var});
+  --emotional-oklab-hue: var(#{$hue-var});
+  --emotional-musical-intensity: calc(#{$intensity} * var(--visual-effects-musical-intensity, 0.5));
+  
+  // Perceptually uniform transitions in OKLAB space
+  transition: 
+    color var(--visual-effects-transition-medium, 0.5s) var(--visual-effects-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1)),
+    filter var(--visual-effects-transition-medium, 0.5s) var(--visual-effects-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1)),
+    text-shadow var(--visual-effects-transition-medium, 0.5s) var(--visual-effects-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+// Cinematic color grading for backgrounds with OKLAB enhancement
+@mixin cinematic-color-grading($emotion: 'ambient', $intensity: 1.0) {
+  $primary-var: --visual-effects-emotion-#{$emotion}-primary;
+  $accent-var: --visual-effects-emotion-#{$emotion}-accent;
+  $atmosphere-var: --visual-effects-emotion-#{$emotion}-atmosphere;
+  $luminance-var: --visual-effects-emotion-#{$emotion}-luminance;
+  $chroma-var: --visual-effects-emotion-#{$emotion}-chroma;
+  $hue-var: --visual-effects-emotion-#{$emotion}-hue;
+  
+  // OKLAB-enhanced cinematic background gradient with perceptual uniformity
+  background: 
+    radial-gradient(
+      ellipse at center,
+      rgba(var(#{$primary-var}), calc(#{$intensity} * var(#{$luminance-var}) * 0.08)) 0%,
+      rgba(var(#{$accent-var}), calc(#{$intensity} * var(#{$chroma-var}) * 0.12)) 40%,
+      rgba(var(#{$atmosphere-var}), calc(#{$intensity} * var(#{$luminance-var}) * 0.04)) 80%,
+      transparent 100%
+    );
+  
+  // OKLAB-enhanced cinematic color grading with perceptual contrast
+  filter: 
+    contrast(calc(1.0 + #{$intensity} * var(--visual-effects-cinematic-contrast, 1) * var(#{$chroma-var}) * 0.5))
+    saturate(calc(1.0 + #{$intensity} * var(#{$chroma-var}) * 0.8))
+    brightness(calc(var(#{$luminance-var}) + #{$intensity} * 0.05))
+    hue-rotate(calc(#{$intensity} * var(#{$hue-var}) * 0.01deg));
+  
+  // Musical OKLAB coordination for cinematic effects
+  --cinematic-oklab-luminance: var(#{$luminance-var});
+  --cinematic-oklab-chroma: var(#{$chroma-var});
+  --cinematic-oklab-hue: var(#{$hue-var});
+  --cinematic-musical-intensity: calc(#{$intensity} * var(--visual-effects-musical-intensity, 0.5));
+  
+  // Performance optimization with OKLAB awareness
+  will-change: background, filter;
+  contain: layout style paint;
+}
+
+// Dynamic color evolution for elements
+@mixin color-evolution($emotion: 'ambient', $evolution-speed: 1.0) {
+  $primary-var: --organic-emotion-#{$emotion}-primary;
+  $accent-var: --organic-emotion-#{$emotion}-accent;
+  
+  // Color evolution animation
+  animation: emotional-color-evolution calc(3s / #{$evolution-speed}) ease-in-out infinite;
+  
+  // Custom color evolution properties
+  --evolution-primary: var(#{$primary-var});
+  --evolution-accent: var(#{$accent-var});
+  --evolution-speed: #{$evolution-speed};
+  
+  // Performance optimization
+  will-change: color, background-color, border-color;
+}
+
+// === EMOTIONAL COLOR CLASSES ===
+
+// Calm emotional state
+.visual-effects-emotion-calm {
+  @include emotional-temperature('calm', var(--visual-effects-emotional-intensity, 1.0));
+  
+  // Calm-specific enhancements
+  // animation: visual-effects-calm-breathing calc(var(--visual-effects-breathing-cycle, 1s) * 1.2) ease-in-out infinite;
+  
+  // Calm color variations
+  &.visual-effects-calm-soft {
+    filter: 
+      saturate(0.8)
+      brightness(1.1)
+      blur(0.5px);
+  }
+  
+  &.visual-effects-calm-deep {
+    filter: 
+      saturate(1.2)
+      brightness(0.9)
+      hue-rotate(-5deg);
+  }
+}
+
+// Energetic emotional state
+.visual-effects-emotion-energetic {
+  @include emotional-temperature('energetic', var(--visual-effects-emotional-intensity, 1.0));
+  
+  // Energetic-specific enhancements
+  // animation: visual-effects-energetic-pulse calc(var(--visual-effects-breathing-cycle, 1s) * 0.8) cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  
+  // Energetic color variations
+  &.visual-effects-energetic-burst {
+    filter: 
+      saturate(1.5)
+      brightness(1.2)
+      hue-rotate(10deg);
+    
+    animation-duration: calc(var(--visual-effects-breathing-cycle, 1s) * 0.5);
+  }
+}
+
+// Melancholy emotional state
+.visual-effects-emotion-melancholy {
+  @include emotional-temperature('melancholy', var(--visual-effects-emotional-intensity, 1.0));
+  
+  // Melancholy-specific enhancements
+  // animation: visual-effects-melancholy-drift calc(var(--visual-effects-breathing-cycle, 1s) * 1.5) ease-in-out infinite;
+  
+  // Melancholy color variations
+  &.visual-effects-melancholy-deep {
+    filter: 
+      saturate(0.6)
+      brightness(0.8)
+      hue-rotate(-10deg)
+      sepia(0.2);
+  }
+}
+
+// Happy emotional state
+.visual-effects-emotion-happy {
+  @include emotional-temperature('happy', var(--visual-effects-emotional-intensity, 1.0));
+  
+  // Happy-specific enhancements
+  // animation: visual-effects-happy-bounce calc(var(--visual-effects-breathing-cycle, 1s) * 0.9) cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+  
+  // Happy color variations
+  &.visual-effects-happy-vibrant {
+    filter: 
+      saturate(1.4)
+      brightness(1.15)
+      hue-rotate(15deg);
+  }
+}
+
+// Mysterious emotional state
+.visual-effects-emotion-mysterious {
+  @include emotional-temperature('mysterious', var(--visual-effects-emotional-intensity, 1.0));
+  
+  // Mysterious-specific enhancements
+  // animation: visual-effects-mysterious-shimmer calc(var(--visual-effects-breathing-cycle, 1s) * 2) ease-in-out infinite;
+  
+  // Mysterious color variations
+  &.visual-effects-mysterious-deep {
+    filter: 
+      saturate(1.1)
+      brightness(0.7)
+      hue-rotate(-20deg)
+      contrast(1.3);
+  }
+}
+
+// Epic emotional state
+.visual-effects-emotion-epic {
+  @include emotional-temperature('epic', var(--visual-effects-emotional-intensity, 1.0));
+  
+  // Epic-specific enhancements
+  // animation: visual-effects-epic-grandeur calc(var(--visual-effects-breathing-cycle, 1s) * 0.6) cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+  
+  // Epic color variations
+  &.visual-effects-epic-cinematic {
+    filter: 
+      saturate(1.6)
+      brightness(1.3)
+      hue-rotate(25deg)
+      contrast(1.4);
+    
+    // Enhanced cinematic glow
+    box-shadow: 
+      0 0 20px rgba(var(--visual-effects-emotion-epic-accent), 0.3),
+      inset 0 0 15px rgba(var(--visual-effects-emotion-epic-primary), 0.1);
+  }
+}
+
+// === EMOTIONAL COLOR ANIMATIONS ===
+
+// Calm breathing animation
+@keyframes visual-effects-calm-breathing {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.1))
+      brightness(1.0);
+  }
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.15))
+      brightness(1.05);
+  }
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.1))
+      brightness(1.0);
+  }
+}
+
+// Energetic pulsing animation
+@keyframes visual-effects-energetic-pulse {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.2))
+      brightness(1.0)
+      hue-rotate(0deg);
+  }
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.35))
+      brightness(1.15)
+      hue-rotate(5deg);
+  }
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.2))
+      brightness(1.0)
+      hue-rotate(0deg);
+  }
+}
+
+// Melancholy drifting animation
+@keyframes visual-effects-melancholy-drift {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.05))
+      brightness(0.95)
+      hue-rotate(-5deg);
+  }
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.1))
+      brightness(1.0)
+      hue-rotate(0deg);
+  }
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.05))
+      brightness(0.95)
+      hue-rotate(-5deg);
+  }
+}
+
+// Happy bouncing animation
+@keyframes visual-effects-happy-bounce {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.15))
+      brightness(1.05)
+      hue-rotate(0deg);
+    transform: scale(1.0);
+  }
+  25% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.25))
+      brightness(1.1)
+      hue-rotate(8deg);
+    transform: scale(1.02);
+  }
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.3))
+      brightness(1.15)
+      hue-rotate(15deg);
+    transform: scale(1.03);
+  }
+  75% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.25))
+      brightness(1.1)
+      hue-rotate(8deg);
+    transform: scale(1.02);
+  }
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.15))
+      brightness(1.05)
+      hue-rotate(0deg);
+    transform: scale(1.0);
+  }
+}
+
+// Mysterious shimmering animation
+@keyframes visual-effects-mysterious-shimmer {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.1))
+      brightness(0.8)
+      hue-rotate(-15deg);
+  }
+  33% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.2))
+      brightness(0.9)
+      hue-rotate(-10deg);
+  }
+  66% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.15))
+      brightness(0.85)
+      hue-rotate(-20deg);
+  }
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.1))
+      brightness(0.8)
+      hue-rotate(-15deg);
+  }
+}
+
+// Epic grandeur animation
+@keyframes visual-effects-epic-grandeur {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.3))
+      brightness(1.1)
+      hue-rotate(0deg)
+      contrast(1.2);
+    transform: scale(1.0);
+  }
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.5))
+      brightness(1.25)
+      hue-rotate(20deg)
+      contrast(1.4);
+    transform: scale(1.05);
+  }
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.3))
+      brightness(1.1)
+      hue-rotate(0deg)
+      contrast(1.2);
+    transform: scale(1.0);
+  }
+}
+
+// Color evolution animation
+@keyframes emotional-color-evolution {
+  0% {
+    color: rgb(var(--evolution-primary));
+  }
+  50% {
+    color: rgb(var(--evolution-accent));
+  }
+  100% {
+    color: rgb(var(--evolution-primary));
+  }
+}
+
+// === ACCESSIBILITY AND PERFORMANCE ===
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .visual-effects-emotion-calm,
+  .visual-effects-emotion-energetic,
+  .visual-effects-emotion-melancholy,
+  .visual-effects-emotion-happy,
+  .visual-effects-emotion-mysterious,
+  .visual-effects-emotion-epic {
+    animation: none !important;
+    transition-duration: 0.1s !important;
+  }
+}
+
+// High contrast support
+@media (prefers-contrast: high) {
+  .visual-effects-emotion-calm,
+  .visual-effects-emotion-energetic,
+  .visual-effects-emotion-melancholy,
+  .visual-effects-emotion-happy,
+  .visual-effects-emotion-mysterious,
+  .visual-effects-emotion-epic {
+    filter: 
+      saturate(2.0) !important
+      contrast(2.0) !important
+      brightness(1.2) !important;
+  }
+}
+
+// === LEGACY COMPATIBILITY CLASSES ===
+// These provide backward compatibility during the transition
+
+// Legacy emotional states
+.organic-emotion-calm {
+  @extend .visual-effects-emotion-calm !optional;
+}
+
+.organic-emotion-energetic {
+  @extend .visual-effects-emotion-energetic !optional;
+}
+
+.organic-emotion-melancholy {
+  @extend .visual-effects-emotion-melancholy !optional;
+}
+
+.organic-emotion-happy {
+  @extend .visual-effects-emotion-happy !optional;
+}
+
+.organic-emotion-mysterious {
+  @extend .visual-effects-emotion-mysterious !optional;
+}
+
+.organic-emotion-epic {
+  @extend .visual-effects-emotion-epic !optional;
+}
+
+// Legacy emotional variations
+.organic-calm-soft {
+  @extend .visual-effects-calm-soft !optional;
+}
+
+.organic-calm-deep {
+  @extend .visual-effects-calm-deep !optional;
+}
+
+.organic-energetic-burst {
+  @extend .visual-effects-energetic-burst !optional;
+}
+
+.organic-melancholy-deep {
+  @extend .visual-effects-melancholy-deep !optional;
+}
+
+.organic-happy-vibrant {
+  @extend .visual-effects-happy-vibrant !optional;
+}
+
+.organic-mysterious-deep {
+  @extend .visual-effects-mysterious-deep !optional;
+}
+
+.organic-epic-cinematic {
+  @extend .visual-effects-epic-cinematic !optional;
+}

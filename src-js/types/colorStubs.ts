@@ -1,5 +1,5 @@
 /**
- * Minimal stub types for organic consciousness color systems
+ * Minimal stub types for visual effects color systems
  * These replace the removed redundant color modules
  */
 
@@ -23,6 +23,115 @@ export interface ColorValue {
   rgb: RGB;
   oklab: OKLAB;
   colorSpace: 'rgb' | 'oklab';
+}
+
+// =========================================================================
+// AUDIO ANALYSIS INTERFACES
+// =========================================================================
+
+/**
+ * Audio analysis data structure for music processing
+ * @since v3.0.0 - Replaces generic 'any' audio data
+ */
+export interface AudioAnalysisData {
+  /** Audio feature data from Spicetify */
+  features?: {
+    energy?: number;
+    valence?: number;
+    danceability?: number;
+    acousticness?: number;
+    instrumentalness?: number;
+    speechiness?: number;
+    tempo?: number;
+  };
+  
+  /** Raw audio buffer data */
+  audioBuffer?: {
+    samples: Float32Array;
+    sampleRate: number;
+    channels: number;
+    duration: number;
+  };
+  
+  /** Frequency analysis data */
+  frequencyData?: {
+    lowFreq: number;    // 0-250 Hz
+    midFreq: number;    // 250-4000 Hz  
+    highFreq: number;   // 4000+ Hz
+    amplitude: number;  // Overall amplitude
+  };
+  
+  /** Beat detection data */
+  beatData?: {
+    detected: boolean;
+    intensity: number;
+    confidence: number;
+    tempo: number;
+  };
+}
+
+/**
+ * Music metrics for synchronized visual effects
+ * @since v3.0.0 - Replaces generic music data
+ */
+export interface MusicMetrics {
+  /** Current energy level (0-1) */
+  energy: number;
+  
+  /** Emotional valence (0-1, sad to happy) */
+  valence: number;
+  
+  /** Beats per minute */
+  bpm: number;
+  
+  /** Beat intensity for current frame (0-1) */
+  beatIntensity: number;
+  
+  /** Rhythm phase in degrees (0-360) */
+  rhythmPhase: number;
+  
+  /** Breathing scale factor (0.8-1.2) */
+  pulsingScale: number;
+}
+
+/**
+ * Visual effects state update structure
+ * @since v3.0.0 - Replaces generic effects data
+ */
+export interface VisualEffectsState {
+  /** Visual intensity level (0-1) */
+  intensity: number;
+  
+  /** Color temperature in Kelvin */
+  colorTemperature: number;
+  
+  /** Animation scale factor */
+  animationScale: number;
+  
+  /** Current dominant emotion */
+  dominantEmotion: string;
+  
+  /** Resonance strength (0-1) */
+  resonance: number;
+  
+  // Legacy compatibility properties (non-optional for backward compatibility)
+  /** @deprecated Use resonance instead */
+  symbioticResonance: number;
+  
+  /** @deprecated Use animationScale instead */
+  surfaceFluidityIndex: number;
+  
+  /** @deprecated Use intensity instead */
+  animationScaleRate: number;
+  
+  /** @deprecated Use colorTemperature instead */
+  emotionalTemperature: number;
+  
+  /** @deprecated Use animationScale instead */
+  pulsingCycle: number;
+  
+  /** @deprecated Use intensity instead */
+  cinematicIntensity: number;
 }
 
 // =========================================================================
@@ -73,12 +182,12 @@ export interface BreathingRhythmEngine {
 }
 
 export interface SymbioticListeningCore {
-  processAudioData(data: any): void;
+  processAudioData(data: AudioAnalysisData): void;
   getEmotionalState(): MusicEmotion;
   initialize?(): void;
   updateSymbioticResonance?(resonance: number): void;
-  calculateResonance?(musicData: any): number;
-  updateSymbioticEffects?(effects: any): void;
+  calculateResonance?(musicData: AudioAnalysisData): number;
+  updateSymbioticEffects?(effects: VisualEffectsState): void;
 }
 
 // =========================================================================
@@ -110,21 +219,27 @@ export class CinematicPaletteGenerator {
 }
 
 export class VisualEffectsManager {
-  private breathingEngine: BreathingRhythmEngine;
+  private pulsingEngine: any; // PulsingRhythmEngine stub
   private symbioticCore: SymbioticListeningCore;
   
   constructor() {
-    this.breathingEngine = new StubBreathingEngine();
+    this.pulsingEngine = {} as any; // Stub implementation
     this.symbioticCore = new StubSymbioticCore();
   }
   
-  public getConsciousnessState(): any {
+  public getConsciousnessState(): VisualEffectsState {
     return {
-      cellularGrowthRate: 1.0,
-      breathingCycle: 2.0,
-      emotionalTemperature: 6000,
-      membraneFluidityIndex: 0.5,
+      intensity: 0.5,
+      colorTemperature: 6000,
+      animationScale: 1.0,
+      dominantEmotion: 'neutral',
+      resonance: 0.5,
+      // Legacy compatibility values
       symbioticResonance: 0.5,
+      surfaceFluidityIndex: 0.5,
+      animationScaleRate: 1.0,
+      emotionalTemperature: 6000,
+      pulsingCycle: 2.0,
       cinematicIntensity: 0.5
     };
   }
@@ -141,14 +256,14 @@ class StubBreathingEngine implements BreathingRhythmEngine {
 }
 
 class StubSymbioticCore implements SymbioticListeningCore {
-  processAudioData(data: any): void { /* stub */ }
+  processAudioData(data: AudioAnalysisData): void { /* stub */ }
   getEmotionalState(): MusicEmotion { 
     return { intensity: 0.5, valence: 0.5, arousal: 0.5, energy: 0.5 };
   }
   initialize?(): void { /* stub */ }
   updateSymbioticResonance?(resonance: number): void { /* stub */ }
-  calculateResonance?(musicData: any): number { return 0.5; }
-  updateSymbioticEffects?(effects: any): void { /* stub */ }
+  calculateResonance?(musicData: AudioAnalysisData): number { return 0.5; }
+  updateSymbioticEffects?(effects: VisualEffectsState): void { /* stub */ }
 }
 
 

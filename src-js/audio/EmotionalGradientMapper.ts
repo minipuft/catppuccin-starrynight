@@ -1,6 +1,6 @@
 /**
  * EmotionalGradientMapper - Musical Emotion to Visual Gradient Translation
- * Part of the Year 3000 Flux Consciousness System
+ * Part of the Year 3000 Flux Visual Effects System
  *
  * Maps musical emotional content to gradient behaviors:
  * - Valence (sad ↔ happy) affects color warmth and brightness
@@ -880,7 +880,7 @@ export class EmotionalGradientMapper {
   ): void {
     // Remove existing emotional temperature classes from body
     const existingClasses = Array.from(document.body.classList).filter((cls) =>
-      cls.startsWith("organic-emotion-")
+      cls.startsWith("smooth-emotion-")
     );
     document.body.classList.remove(...existingClasses);
 
@@ -890,7 +890,7 @@ export class EmotionalGradientMapper {
     // Apply secondary emotion blend class if present
     if (emotionalTemperature.secondaryEmotion) {
       document.body.classList.add(
-        `organic-emotion-blend-${emotionalTemperature.secondaryEmotion}`
+        `smooth-emotion-blend-${emotionalTemperature.secondaryEmotion}`
       );
     }
 
@@ -982,7 +982,7 @@ export class EmotionalGradientMapper {
       // Force the primary emotion to the requested state
       overrideTemperature.primaryEmotion = emotionalState;
       overrideTemperature.intensity = intensity;
-      overrideTemperature.cssClass = `organic-emotion-${emotionalState}`;
+      overrideTemperature.cssClass = `smooth-emotion-${emotionalState}`;
 
       this.currentEmotionalTemperature = overrideTemperature;
       this.applyEmotionalTemperatureToDocument(overrideTemperature);
@@ -1034,7 +1034,7 @@ export class EmotionalGradientMapper {
     // Clean up emotional temperature classes from document
     if (this.currentEmotionalTemperature) {
       const existingClasses = Array.from(document.body.classList).filter(
-        (cls) => cls.startsWith("organic-emotion-")
+        (cls) => cls.startsWith("smooth-emotion-")
       );
       document.body.classList.remove(...existingClasses);
     }

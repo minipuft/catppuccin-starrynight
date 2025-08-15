@@ -7,13 +7,13 @@
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { unifiedEventBus, type EventData } from "@/core/events/UnifiedEventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator, type QualityLevel, type QualityScalingCapable, type PerformanceMetrics, type QualityCapability } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import {
@@ -28,14 +28,14 @@ import type {
   VisualEffectState,
 } from "../effects/VisualEffectsCoordinator";
 
-// Import shared consciousness utilities
+// Import shared visualEffects utilities
 import {
-  CONSCIOUSNESS_SHADER_LIBRARY,
+  VISUAL_EFFECTS_SHADER_LIBRARY,
   ShaderTemplate,
 } from "../effects/ConsolidatedShaderLibrary";
 
-// WebGL-specific shader using shared consciousness library
-const webglConsciousnessShader =
+// WebGL-specific shader using shared visualEffects library
+const webglVisualEffectsShader =
   ShaderTemplate.buildFragmentShader({
     additionalUniforms: `
 // WebGL-specific uniforms
@@ -90,10 +90,10 @@ float calculateBlur(vec2 uv) {
 }`,
 
     mainShaderLogic:
-      CONSCIOUSNESS_SHADER_LIBRARY.Fragments.webglGradientFragment(),
+      VISUAL_EFFECTS_SHADER_LIBRARY.Fragments.webglGradientFragment(),
   });
 
-// Corridor bubble shader with enhanced consciousness integration
+// Corridor bubble shader with enhanced visualEffects integration
 const corridorBubbleShader =
   ShaderTemplate.buildFragmentShader({
     additionalUniforms: `
@@ -105,7 +105,7 @@ uniform float u_noiseScale;`,
     includeCorridorFunctions: true,
 
     mainShaderLogic:
-      CONSCIOUSNESS_SHADER_LIBRARY.Fragments.corridorBubbleFragment(),
+      VISUAL_EFFECTS_SHADER_LIBRARY.Fragments.corridorBubbleFragment(),
   });
 
 interface FlowGradientSettings {
@@ -127,7 +127,7 @@ interface FlowGradientSettings {
   corridorBubbleScale: number;
 }
 
-// Using shared consciousness shader management - no need for duplicate uniform interface
+// Using shared visualEffects shader management - no need for duplicate uniform interface
 
 export class WebGLGradientBackgroundSystem
   extends BaseVisualSystem
@@ -171,16 +171,16 @@ export class WebGLGradientBackgroundSystem
   private frameThrottleInterval = 1000 / 45; // 45 FPS target
 
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
-  private cssConsciousnessController: OptimizedCSSVariableManager | null =
+  private cssVisualEffectsController: OptimizedCSSVariableManager | null =
     null;
   private cssController!: OptimizedCSSVariableManager;
   private eventSubscriptionIds: string[] = [];
   private prefersReducedMotion = false;
 
-  // Consciousness choreographer integration
-  private consciousnessChoreographer: VisualEffectsCoordinator | null =
+  // VisualEffects choreographer integration
+  private visualEffectsChoreographer: VisualEffectsCoordinator | null =
     null;
-  private currentConsciousnessField: VisualEffectState | null = null;
+  private currentVisualEffectsField: VisualEffectState | null = null;
 
   private webglReady = false;
 
@@ -229,8 +229,8 @@ export class WebGLGradientBackgroundSystem
   }
 
   constructor(
-    config: Year3000Config = YEAR3000_CONFIG,
-    utils: typeof import("@/utils/core/Year3000Utilities"),
+    config: Year3000Config = ADVANCED_SYSTEM_CONFIG,
+    utils: typeof import("@/utils/core/ThemeUtilities"),
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
     settingsManager: SettingsManager | null = null,
@@ -241,9 +241,9 @@ export class WebGLGradientBackgroundSystem
     // Get ColorHarmonyEngine from year3000System if available
     this.colorHarmonyEngine = year3000System?.colorHarmonyEngine || null;
 
-    // Get consciousness choreographer from year3000System if available
-    this.consciousnessChoreographer =
-      year3000System?.backgroundConsciousnessChoreographer || null;
+    // Get visualEffects choreographer from year3000System if available
+    this.visualEffectsChoreographer =
+      year3000System?.backgroundVisualEffectsChoreographer || null;
 
     // Check for reduced motion preference
     this.prefersReducedMotion = window.matchMedia(
@@ -258,7 +258,7 @@ export class WebGLGradientBackgroundSystem
 
     // Initialize CSS coordination first - use globalThis to access Year3000System
     const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System?.cssConsciousnessController || getGlobalOptimizedCSSController();
+    this.cssController = year3000System?.cssVisualEffectsController || getGlobalOptimizedCSSController();
 
     // Check WebGL2 capability
     this.isWebGLAvailable = this.checkWebGL2Support();
@@ -339,7 +339,7 @@ export class WebGLGradientBackgroundSystem
     try {
       await this.initializeWebGL();
       this.subscribeToEvents();
-      this.registerWithConsciousnessChoreographer();
+      this.registerWithVisualEffectsChoreographer();
       this.startAnimation();
 
       // WebGL initialised; enable hybrid coordination for dynamic and living feel using coordination
@@ -793,8 +793,8 @@ export class WebGLGradientBackgroundSystem
     const fragmentShaderVariants = [
       { 
         name: "full", 
-        shader: webglConsciousnessShader,
-        description: "Full consciousness shader with all features"
+        shader: webglVisualEffectsShader,
+        description: "Full visualEffects shader with all features"
       },
       { 
         name: "simplified", 
@@ -975,40 +975,40 @@ export class WebGLGradientBackgroundSystem
     }
   }
 
-  private updateConsciousnessUniforms(uniforms: { [key: string]: WebGLUniformLocation | null }, time: number): void {
+  private updateVisualEffectsUniforms(uniforms: { [key: string]: WebGLUniformLocation | null }, time: number): void {
     if (!this.gl) return;
 
-    // Get consciousness field values from the choreographer or defaults
-    const consciousnessField = this.currentConsciousnessField;
+    // Get visualEffects field values from the choreographer or defaults
+    const visualEffectsField = this.currentVisualEffectsField;
     
-    // Rhythmic pulse from consciousness
-    const rhythmicPulse = consciousnessField?.pulseRate ?? 0.5;
+    // Rhythmic pulse from visualEffects
+    const rhythmicPulse = visualEffectsField?.pulseRate ?? 0.5;
     if (uniforms.u_rhythmicPulse) {
       this.gl.uniform1f(uniforms.u_rhythmicPulse, rhythmicPulse);
     }
 
     // Musical flow direction
-    const musicalFlow = consciousnessField?.flowDirection ?? { x: 0.0, y: 0.0 };
+    const musicalFlow = visualEffectsField?.flowDirection ?? { x: 0.0, y: 0.0 };
     if (uniforms.u_musicalFlow && musicalFlow) {
       this.gl.uniform2f(uniforms.u_musicalFlow, musicalFlow.x ?? 0.0, musicalFlow.y ?? 0.0);
     }
 
-    // Energy resonance for consciousness modulation
-    const energyResonance = consciousnessField?.energyLevel ?? 0.5;
+    // Energy resonance for visualEffects modulation
+    const energyResonance = visualEffectsField?.energyLevel ?? 0.5;
     if (uniforms.u_energyResonance) {
       this.gl.uniform1f(uniforms.u_energyResonance, energyResonance);
     }
 
-    // Breathing cycle for organic consciousness
-    const breathingCycle = Math.sin(time * 0.05) * 0.5 + 0.5;
-    if (uniforms.u_breathingCycle) {
-      this.gl.uniform1f(uniforms.u_breathingCycle, breathingCycle);
+    // Breathing cycle for smooth visualEffects
+    const pulsingCycle = Math.sin(time * 0.05) * 0.5 + 0.5;
+    if (uniforms.u_pulsingCycle) {
+      this.gl.uniform1f(uniforms.u_pulsingCycle, pulsingCycle);
     }
 
-    // Membrane fluidity for organic effects
-    const membraneFluidityIndex = consciousnessField?.fluidIntensity ?? 0.3;
-    if (uniforms.u_membraneFluidityIndex) {
-      this.gl.uniform1f(uniforms.u_membraneFluidityIndex, membraneFluidityIndex);
+    // Surface fluidity for smooth effects
+    const surfaceFluidityIndex = visualEffectsField?.fluidIntensity ?? 0.3;
+    if (uniforms.u_surfaceFluidityIndex) {
+      this.gl.uniform1f(uniforms.u_surfaceFluidityIndex, surfaceFluidityIndex);
     }
 
     // Music sync uniforms from MusicSyncService if available
@@ -2327,8 +2327,8 @@ export class WebGLGradientBackgroundSystem
       }
 
       // ===== CORRIDOR BUBBLE UNIFORMS =====
-      // Set consciousness uniforms for enhanced corridor bubble effects
-      this.updateConsciousnessUniforms(currentUniforms, time);
+      // Set visualEffects uniforms for enhanced corridor bubble effects
+      this.updateVisualEffectsUniforms(currentUniforms, time);
 
     }
 
@@ -2377,7 +2377,7 @@ export class WebGLGradientBackgroundSystem
     );
 
     // Update CSS variables for fallback gradient animation
-    if (this.cssConsciousnessController) {
+    if (this.cssVisualEffectsController) {
       this.startCSSFallbackAnimation();
     }
 
@@ -2388,14 +2388,14 @@ export class WebGLGradientBackgroundSystem
   }
 
   private startCSSFallbackAnimation(): void {
-    if (!this.cssConsciousnessController) return;
+    if (!this.cssVisualEffectsController) return;
 
     // Animate CSS variables to simulate flow using coordination
     const animateCSS = () => {
       if (!this.isActive) return;
 
       const time = performance.now() / 1000;
-      const flowX = Math.sin(time * 0.04) * 20 + Math.sin(time * 0.07) * 8; // More organic movement
+      const flowX = Math.sin(time * 0.04) * 20 + Math.sin(time * 0.07) * 8; // More smooth movement
       const flowY = Math.cos(time * 0.05) * 20 + Math.cos(time * 0.09) * 6;
       const scale = 1.15 + Math.sin(time * 0.03) * 0.2; // Enhanced base scale with more variation
 
@@ -2448,20 +2448,20 @@ export class WebGLGradientBackgroundSystem
   public override _performSystemSpecificCleanup(): void {
     super._performSystemSpecificCleanup();
 
-    // Unregister from consciousness choreographer
-    if (this.consciousnessChoreographer) {
+    // Unregister from visualEffects choreographer
+    if (this.visualEffectsChoreographer) {
       try {
-        this.consciousnessChoreographer.unregisterConsciousnessParticipant(
+        this.visualEffectsChoreographer.unregisterVisualEffectsParticipant(
           "WebGLGradientBackgroundSystem"
         );
         Y3KDebug?.debug?.log(
           "WebGLGradientBackgroundSystem",
-          "Unregistered from consciousness choreographer"
+          "Unregistered from visualEffects choreographer"
         );
       } catch (error) {
         Y3KDebug?.debug?.error(
           "WebGLGradientBackgroundSystem",
-          "Error unregistering from consciousness choreographer:",
+          "Error unregistering from visualEffects choreographer:",
           error
         );
       }
@@ -2729,27 +2729,27 @@ export class WebGLGradientBackgroundSystem
   // ===================================================================
 
   /**
-   * Register this WebGL system as a consciousness participant
+   * Register this WebGL system as a visualEffects participant
    */
-  private registerWithConsciousnessChoreographer(): void {
-    if (!this.consciousnessChoreographer) {
+  private registerWithVisualEffectsChoreographer(): void {
+    if (!this.visualEffectsChoreographer) {
       Y3KDebug?.debug?.log(
         "WebGLGradientBackgroundSystem",
-        "Consciousness choreographer not available, skipping registration"
+        "VisualEffects choreographer not available, skipping registration"
       );
       return;
     }
 
     try {
-      this.consciousnessChoreographer.registerConsciousnessParticipant(this);
+      this.visualEffectsChoreographer.registerVisualEffectsParticipant(this);
       Y3KDebug?.debug?.log(
         "WebGLGradientBackgroundSystem",
-        "Successfully registered with consciousness choreographer"
+        "Successfully registered with visualEffects choreographer"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
         "WebGLGradientBackgroundSystem",
-        "Failed to register with consciousness choreographer:",
+        "Failed to register with visualEffects choreographer:",
         error
       );
     }
@@ -2761,7 +2761,7 @@ export class WebGLGradientBackgroundSystem
 
   // SystemName and systemPriority already declared above
 
-  public getConsciousnessContribution(): any {
+  public getVisualEffectsContribution(): any {
     return {
       webglLuminosity: this.settings.flowStrength || 0.5,
       shaderComplexity: this.isWebGLAvailable ? 0.8 : 0,
@@ -2771,18 +2771,18 @@ export class WebGLGradientBackgroundSystem
     };
   }
 
-  public onConsciousnessFieldUpdate(field: VisualEffectState): void {
+  public onVisualEffectsFieldUpdate(field: VisualEffectState): void {
     if (!this.isWebGLAvailable || !this.webglReady) return;
 
     try {
-      this.currentConsciousnessField = field;
+      this.currentVisualEffectsField = field;
 
-      // Update shader uniforms based on consciousness field
-      this.updateShaderFromConsciousness(field);
+      // Update shader uniforms based on visualEffects field
+      this.updateShaderFromVisualEffects(field);
 
       Y3KDebug?.debug?.log(
         "WebGLGradientBackgroundSystem",
-        "Updated from consciousness field:",
+        "Updated from visualEffects field:",
         {
           rhythmicPulse: field.pulseRate,
           webglLuminosity: field.luminosity,
@@ -2792,7 +2792,7 @@ export class WebGLGradientBackgroundSystem
     } catch (error) {
       Y3KDebug?.debug?.error(
         "WebGLGradientBackgroundSystem",
-        "Error updating from consciousness field:",
+        "Error updating from visualEffects field:",
         error
       );
     }
@@ -2821,15 +2821,15 @@ export class WebGLGradientBackgroundSystem
           );
           break;
 
-        case "consciousness:breathing-cycle":
-          // Synchronize with breathing patterns using coordination
-          const breathingPhase = payload.phase || 0;
+        case "visualEffects:pulsing-cycle":
+          // Synchronize with pulsing patterns using coordination
+          const pulsingPhase = payload.phase || 0;
           this.cssController.setVariable(
             "WebGLGradientBackgroundSystem",
-            "--sn-webgl-breathing-sync",
-            breathingPhase.toString(),
-            "normal", // Normal priority for breathing sync
-            "consciousness-breathing-cycle"
+            "--sn-webgl-pulsing-sync",
+            pulsingPhase.toString(),
+            "normal", // Normal priority for pulsing sync
+            "visualEffects-pulsing-cycle"
           );
           break;
       }
@@ -2849,9 +2849,9 @@ export class WebGLGradientBackgroundSystem
   }
 
   /**
-   * Update WebGL shader parameters based on consciousness field
+   * Update WebGL shader parameters based on visualEffects field
    */
-  private updateShaderFromConsciousness(field: VisualEffectState): void {
+  private updateShaderFromVisualEffects(field: VisualEffectState): void {
     if (!this.gl || !this.shaderProgram) return;
 
     // Modulate flow strength with rhythmic pulse
@@ -2876,8 +2876,8 @@ export class WebGLGradientBackgroundSystem
       this.gl.uniform1f(noiseScaleLocation, consciousNoiseScale);
     }
 
-    // Update wave parameters with breathing cycle
-    const breathingModulation =
+    // Update wave parameters with pulsing cycle
+    const pulsingModulation =
       Math.sin(Date.now() * 0.001 * field.pulseRate) * 0.1;
     const waveYLocation = this.gl.getUniformLocation(
       this.shaderProgram,
@@ -2885,24 +2885,24 @@ export class WebGLGradientBackgroundSystem
     );
     if (waveYLocation) {
       const modulatedWaveY = [
-        this.settings.waveY[0] + breathingModulation,
-        this.settings.waveY[1] - breathingModulation,
+        this.settings.waveY[0] + pulsingModulation,
+        this.settings.waveY[1] - pulsingModulation,
       ];
       this.gl.uniform1fv(waveYLocation, modulatedWaveY);
     }
 
-    // Apply consciousness-aware CSS variables for hybrid coordination using coordination
-    const consciousnessWebglVariables = {
-      "--sn-webgl-consciousness-flow": consciousFlowStrength.toString(),
-      "--sn-webgl-consciousness-noise": consciousNoiseScale.toString(),
-      "--sn-webgl-breathing-phase": breathingModulation.toString(),
+    // Apply visualEffects-aware CSS variables for hybrid coordination using coordination
+    const visualEffectsWebglVariables = {
+      "--sn-webgl-visualEffects-flow": consciousFlowStrength.toString(),
+      "--sn-webgl-visualEffects-noise": consciousNoiseScale.toString(),
+      "--sn-webgl-pulsing-phase": pulsingModulation.toString(),
     };
 
     this.cssController.batchSetVariables(
       "WebGLGradientBackgroundSystem",
-      consciousnessWebglVariables,
-      "normal", // Normal priority for consciousness coordination
-      "consciousness-shader-update"
+      visualEffectsWebglVariables,
+      "normal", // Normal priority for visualEffects coordination
+      "visualEffects-shader-update"
     );
   }
 
@@ -3482,7 +3482,7 @@ export class WebGLGradientBackgroundSystem
 
   public onVisualStateUpdate(state: VisualEffectState): void {
     // Update visual effects based on shared state
-    this.onConsciousnessFieldUpdate(state);
+    this.onVisualEffectsFieldUpdate(state);
   }
 
   public onVisualEffectEvent(eventType: string, payload: any): void {

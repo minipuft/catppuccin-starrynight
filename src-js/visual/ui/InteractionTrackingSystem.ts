@@ -1,10 +1,10 @@
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import type { Year3000Config } from "@/types/models";
-import { Year3000System } from "@/core/lifecycle/year3000System";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
+import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 
@@ -80,8 +80,8 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
   private cssController!: OptimizedCSSVariableManager;
 
   constructor(
-    config: Year3000Config,
-    utils: typeof Year3000Utilities,
+    config: AdvancedSystemConfig | Year3000Config,
+    utils: typeof ThemeUtilities,
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService,
     settingsManager: SettingsManager,

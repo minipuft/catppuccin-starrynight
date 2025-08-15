@@ -1,6 +1,6 @@
 /**
  * Constellation Renderer - Stardust algorithms and celestial arrangements
- * Creates organic star formations that align with Year 3000 System vision
+ * Creates smooth star formations that align with Year 3000 System vision
  */
 
 import type { ConstellationPattern, CoordinatePoint } from './types';
@@ -121,7 +121,7 @@ export class ConstellationRenderer {
   }
 
   /**
-   * Generate random organic constellation pattern
+   * Generate random smooth constellation pattern
    */
   private static generateRandomPattern(
     centerX: number,
@@ -134,28 +134,28 @@ export class ConstellationRenderer {
     const connections: Array<[number, number]> = [];
     const luminosity: number[] = [];
 
-    // Generate star positions using organic algorithms
+    // Generate star positions using smooth algorithms
     for (let i = 0; i < starCount; i++) {
       const angle = (i / starCount) * Math.PI * 2;
       const distance = radius * (0.3 + Math.random() * 0.7);
       
-      // Add organic variation
-      const organicX = Math.sin(angle * 3) * radius * 0.2;
-      const organicY = Math.cos(angle * 2) * radius * 0.15;
+      // Add smooth variation
+      const smoothX = Math.sin(angle * 3) * radius * 0.2;
+      const smoothY = Math.cos(angle * 2) * radius * 0.15;
       
       points.push({
-        x: centerX + Math.cos(angle) * distance + organicX,
-        y: centerY + Math.sin(angle) * distance + organicY
+        x: centerX + Math.cos(angle) * distance + smoothX,
+        y: centerY + Math.sin(angle) * distance + smoothY
       });
 
       luminosity.push(0.5 + Math.random() * 0.5);
     }
 
     // Generate connections using proximity and aesthetic rules
-    connections.push(...this.generateOrganicConnections(points, radius));
+    connections.push(...this.generateSmoothConnections(points, radius));
 
     return {
-      name: 'organic',
+      name: 'smooth',
       points,
       connections,
       luminosity,
@@ -191,7 +191,7 @@ export class ConstellationRenderer {
         const spiralX = centerX + Math.cos(angle) * distance;
         const spiralY = centerY + Math.sin(angle) * distance;
         
-        // Add noise for organic feel
+        // Add noise for smooth feel
         const noise = this.perlinNoise(spiralX * 0.01, spiralY * 0.01, 0) * 20;
         
         points.push({
@@ -249,7 +249,7 @@ export class ConstellationRenderer {
     }
 
     // Connect nearby stars
-    connections.push(...this.generateOrganicConnections(points, radius * 0.3));
+    connections.push(...this.generateSmoothConnections(points, radius * 0.3));
 
     return {
       name: 'cluster',
@@ -261,9 +261,9 @@ export class ConstellationRenderer {
   }
 
   /**
-   * Generate organic connections between stars
+   * Generate smooth connections between stars
    */
-  private static generateOrganicConnections(
+  private static generateSmoothConnections(
     points: CoordinatePoint[],
     maxDistance: number
   ): Array<[number, number]> {
@@ -363,7 +363,7 @@ export class ConstellationRenderer {
       tetradic: 'crown'
     };
     
-    const patternType = patterns[harmonicMode] || 'organic';
+    const patternType = patterns[harmonicMode] || 'smooth';
     return this.generatePattern(patternType, centerX, centerY, radius, {
       ...musicContext,
       harmonicMode
@@ -458,7 +458,7 @@ export class ConstellationRenderer {
   }
 
   private static perlinNoise(x: number, y: number, z: number): number {
-    // Simplified noise function for organic variation
+    // Simplified noise function for smooth variation
     const hash = (n: number) => {
       n = Math.sin(n * 12.9898) * 43758.5453;
       return n - Math.floor(n);
@@ -485,7 +485,7 @@ export class ConstellationRenderer {
       spiral: 4,
       cluster: 5,
       fibonacci: 3,
-      organic: 2
+      smooth: 2
     };
     
     return complexityMap[patternType] || 2;

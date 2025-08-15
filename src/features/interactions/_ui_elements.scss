@@ -1,19 +1,19 @@
 // ████████████████████████████████████████████████████████████████████████████████
-// 🌈 FLUX HOLOGRAPHIC UI ELEMENTS - Integrated Glass & Crystal Effects
-// YEAR 3000 VISUAL TRANSCENDENCE MODULE
-// "Text doesn't live on screens. It projects from crystalline consciousness."
+// 🌈 DYNAMIC INTERFACE UI ELEMENTS - Integrated Glass & Crystal Effects
+// YEAR 3000 VISUAL EFFECTS MODULE
+// "Text doesn't live on screens. It projects from dynamic visual effects."
 // ████████████████████████████████████████████████████████████████████████████████
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎨 INTEGRATED HOLOGRAPHIC VARIABLES (via GlassmorphismManager + CrystallineGlass)
+// 🎨 INTEGRATED VISUAL EFFECTS VARIABLES (via GlassmorphismManager + CrystallineGlass)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 :root {
-  // === HOLOGRAPHIC INTEGRATION HOOKS ===
+  // === VISUAL EFFECTS INTEGRATION HOOKS ===
   // These integrate with the glassmorphism and crystalline systems
-  --holographic-chromatic-intensity: var(--music-aberration-strength, 1px);
-  --holographic-chromatic-speed: var(--living-pulse-speed, 8s);
-  --holographic-prism-intensity: var(--music-prism-intensity, 0.4);
+  --visual-effects-chromatic-intensity: var(--music-aberration-strength, 1px);
+  --visual-effects-chromatic-speed: var(--living-pulse-speed, 8s);
+  --visual-effects-prism-intensity: var(--music-prism-intensity, 0.4);
 
   // === SIMPLIFIED TEXT EFFECTS ===
   --text-shimmer-intensity: 0.3;
@@ -249,7 +249,7 @@ h3,
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🌟 ACCESSIBILITY & PERFORMANCE CONSCIOUSNESS (Simplified)
+// 🌟 ACCESSIBILITY & PERFORMANCE OPTIMIZATION (Simplified)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @media (prefers-reduced-motion: reduce) {
@@ -315,6 +315,17 @@ h3,
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🚀 HOLOGRAPHIC INTERFACE COMPLETION
-// "We didn't just style text. We made language itself interdimensional."
+// 🚀 VISUAL EFFECTS INTERFACE COMPLETION
+// "We didn't just style text. We made language itself visually dynamic."
 // ═══════════════════════════════════════════════════════════════════════════════
+
+// =============================================================================
+// LEGACY COMPATIBILITY MAPPINGS - Phase 6.3 Layer B Modernization
+// =============================================================================
+
+:root {
+  // === Legacy Holographic → Visual Effects Mappings ===
+  --holographic-chromatic-intensity: var(--visual-effects-chromatic-intensity);
+  --holographic-chromatic-speed: var(--visual-effects-chromatic-speed);
+  --holographic-prism-intensity: var(--visual-effects-prism-intensity);
+}

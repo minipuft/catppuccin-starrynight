@@ -196,9 +196,9 @@
   --sn-ui-nav-neural-primary-rgb: 139, 233, 253;
   --sn-ui-nav-neural-secondary-rgb: 250, 179, 135;
   
-  // Sidebar Consciousness
-  --sn-ui-sidebar-consciousness-opacity: 0.8;
-  --sn-ui-sidebar-consciousness-deep-rgb: 17, 17, 27;
+  // Sidebar Visual Effects
+  --sn-ui-sidebar-visual-effects-opacity: 0.8;
+  --sn-ui-sidebar-visual-effects-deep-rgb: 17, 17, 27;
   --sn-ui-sidebar-magnetic-hover-pull: 1.2;
   --sn-ui-sidebar-magnetic-focus-pull: 1.5;
   
@@ -499,10 +499,10 @@
   --sn-color-temporal-present-rgb: var(--sn-color-accent-rgb);
   --sn-color-temporal-future-rgb: var(--sn-cosmic-accent-rgb);
   
-  // === CONSCIOUSNESS FIELD COLORS ===
-  --sn-color-consciousness-deep-rgb: var(--sn-cosmic-base-rgb);
-  --sn-color-consciousness-surface-rgb: var(--sn-cosmic-surface-rgb);
-  --sn-color-consciousness-glow-rgb: var(--sn-color-accent-rgb);
+  // === VISUAL EFFECTS FIELD COLORS ===
+  --sn-color-visual-effects-deep-rgb: var(--sn-cosmic-base-rgb);
+  --sn-color-visual-effects-surface-rgb: var(--sn-cosmic-surface-rgb);
+  --sn-color-visual-effects-glow-rgb: var(--sn-color-accent-rgb);
   
   // -------------------------------------------------------------------------
   // Layout System (--sn-layout-*)
@@ -532,55 +532,55 @@
   --sn-layout-radius-full: 9999px;
   
   // -------------------------------------------------------------------------
-  // Consciousness Field System (--sn-consciousness-*) - Magnetic Depth
+  // Visual Effects Field System (--sn-visual-effects-*) - Magnetic Depth
   // -------------------------------------------------------------------------
   
   // 3D Perspective & Depth
-  --sn-consciousness-depth-field: 800px; // Comfortable 3D perspective for readability
-  --sn-consciousness-depth-approach: 20px;
-  --sn-consciousness-depth-recede: -10px;
-  --sn-consciousness-depth-neutral: 0px;
+  --sn-visual-effects-depth-field: 800px; // Comfortable 3D perspective for readability
+  --sn-visual-effects-depth-approach: 20px;
+  --sn-visual-effects-depth-recede: -10px;
+  --sn-visual-effects-depth-neutral: 0px;
   
   // Magnetic Interaction Forces
-  --sn-consciousness-magnetic-hover-pull: 12px;
-  --sn-consciousness-magnetic-focus-pull: 18px;
-  --sn-consciousness-magnetic-interest-pull: 8px;
-  --sn-consciousness-magnetic-transition-speed: 0.6s;
+  --sn-visual-effects-magnetic-hover-pull: 12px;
+  --sn-visual-effects-magnetic-focus-pull: 18px;
+  --sn-visual-effects-magnetic-interest-pull: 8px;
+  --sn-visual-effects-magnetic-transition-speed: 0.6s;
   
   // Depth Hierarchy (translateZ values)
-  --sn-consciousness-depth-priority-high: translateZ(8px);
-  --sn-consciousness-depth-priority-medium: translateZ(4px);
-  --sn-consciousness-depth-priority-low: translateZ(0px);
-  --sn-consciousness-depth-priority-receded: translateZ(-6px);
+  --sn-visual-effects-depth-priority-high: translateZ(8px);
+  --sn-visual-effects-depth-priority-medium: translateZ(4px);
+  --sn-visual-effects-depth-priority-low: translateZ(0px);
+  --sn-visual-effects-depth-priority-receded: translateZ(-6px);
   
   // Readability & Accessibility
-  --sn-consciousness-magnetic-max-rotation: 2deg;
-  --sn-consciousness-text-clarity: 1;
-  --sn-consciousness-contrast-boost: 1.05;
+  --sn-visual-effects-magnetic-max-rotation: 2deg;
+  --sn-visual-effects-text-clarity: 1;
+  --sn-visual-effects-contrast-boost: 1.05;
   
   // Field Dynamics
-  --sn-consciousness-field-intensity: 0.4;
-  --sn-consciousness-breathing-rate: 12s;
-  --sn-consciousness-response-sensitivity: 0.8;
+  --sn-visual-effects-field-intensity: 0.4;
+  --sn-visual-effects-animation-rate: 12s;
+  --sn-visual-effects-response-sensitivity: 0.8;
   
   // Performance & Mobile
-  --sn-consciousness-performance-mode: 1;
-  --sn-consciousness-accessibility-scale: 1;
-  --sn-consciousness-mobile-reduction: 0.6;
+  --sn-visual-effects-performance-mode: 1;
+  --sn-visual-effects-accessibility-scale: 1;
+  --sn-visual-effects-mobile-reduction: 0.6;
   
-  // Enhanced Organic Consciousness Patterns (Year 3000 System Extensions)
-  // Keep only genuinely new cellular/membrane concepts - remove duplicates
-  --sn-consciousness-membrane-elasticity: 0.7; // Membrane deformation intensity (0-1)
-  --sn-consciousness-cellular-growth: 0.8; // Cellular growth patterns (0-1)
-  --sn-consciousness-osmosis-rate: 0.5; // Cross-system consciousness flow (0-1)
-  --sn-consciousness-mitosis-frequency: 0.3; // Cellular division rate (0-1)
-  --sn-consciousness-viscosity: 0.4; // Consciousness flow resistance (0-1)
-  --sn-consciousness-surface-tension: 0.6; // Membrane surface tension (0-1)
-  --sn-consciousness-membrane-permeability: 0.6; // Consciousness permeability (0-1)
+  // Enhanced Visual Effects Patterns (Year 3000 System Extensions)
+  // Advanced animation and rendering concepts for sophisticated effects
+  --sn-visual-effects-membrane-elasticity: 0.7; // Visual membrane deformation intensity (0-1)
+  --sn-visual-effects-animation-scale: 0.8; // Animation scaling patterns (0-1)
+  --sn-visual-effects-flow-rate: 0.5; // Cross-system visual flow (0-1)
+  --sn-visual-effects-subdivision-frequency: 0.3; // Visual subdivision rate (0-1)
+  --sn-visual-effects-flow-viscosity: 0.4; // Visual flow resistance (0-1)
+  --sn-visual-effects-surface-tension: 0.6; // Visual surface tension (0-1)
+  --sn-visual-effects-permeability: 0.6; // Visual effect permeability (0-1)
   
-  // Organic modifier flags (extend existing systems without duplicating)
-  --sn-consciousness-organic-mode: 1; // Enable organic behavior in existing systems
-  --sn-consciousness-cellular-mode: 1; // Enable cellular patterns in existing systems
+  // Visual effects modifier flags (extend existing systems without duplicating)
+  --sn-visual-effects-advanced-mode: 1; // Enable advanced behavior in existing systems
+  --sn-visual-effects-subdivision-mode: 1; // Enable subdivision patterns in existing systems
   
   // -------------------------------------------------------------------------
   // Serendipity Discovery System (--sn-serendipity-*)
@@ -625,12 +625,12 @@
     --sn-bg-particle-density: 0;
     --sn-perf-quality-particles: 0;
     
-    // Reduce consciousness field motion
-    --sn-consciousness-magnetic-hover-pull: 4px;
-    --sn-consciousness-magnetic-focus-pull: 6px;
-    --sn-consciousness-magnetic-transition-speed: 1.2s;
-    --sn-consciousness-breathing-rate: 30s;
-    --sn-consciousness-field-intensity: 0.2;
+    // Reduce visual effects field motion
+    --sn-visual-effects-magnetic-hover-pull: 4px;
+    --sn-visual-effects-magnetic-focus-pull: 6px;
+    --sn-visual-effects-magnetic-transition-speed: 1.2s;
+    --sn-visual-effects-animation-rate: 30s;
+    --sn-visual-effects-field-intensity: 0.2;
   }
 }
 
@@ -640,7 +640,7 @@
     --sn-ui-glass-opacity: 0.3;
     --sn-text-glow-intensity: 0;
     --sn-bg-gradient-contrast: 1.5;
-    --sn-color-consciousness-surface-rgb: 45, 45, 69;
+    --sn-color-visual-effects-surface-rgb: 45, 45, 69;
   }
 }
 
@@ -692,36 +692,36 @@
   --sn-glass-beat-opacity: var(--sn-ui-glass-beat-opacity);
   --card-energy-level: var(--sn-ui-card-energy-level);
   
-  // Consciousness Field System (Phase 4 migration)
-  --magnetic-depth-field: var(--sn-consciousness-depth-field);
-  --magnetic-approach-distance: var(--sn-consciousness-depth-approach);
-  --magnetic-recede-distance: var(--sn-consciousness-depth-recede);
-  --magnetic-neutral-position: var(--sn-consciousness-depth-neutral);
-  --magnetic-hover-pull: var(--sn-consciousness-magnetic-hover-pull);
-  --magnetic-focus-pull: var(--sn-consciousness-magnetic-focus-pull);
-  --magnetic-interest-pull: var(--sn-consciousness-magnetic-interest-pull);
-  --magnetic-transition-speed: var(--sn-consciousness-magnetic-transition-speed);
-  --consciousness-field-intensity: var(--sn-consciousness-field-intensity);
-  --consciousness-breathing-rate: var(--sn-consciousness-breathing-rate);
-  --consciousness-response-sensitivity: var(--sn-consciousness-response-sensitivity);
+  // Visual Effects Field System (Phase 4 migration)
+  --magnetic-depth-field: var(--sn-visual-effects-depth-field);
+  --magnetic-approach-distance: var(--sn-visual-effects-depth-approach);
+  --magnetic-recede-distance: var(--sn-visual-effects-depth-recede);
+  --magnetic-neutral-position: var(--sn-visual-effects-depth-neutral);
+  --magnetic-hover-pull: var(--sn-visual-effects-magnetic-hover-pull);
+  --magnetic-focus-pull: var(--sn-visual-effects-magnetic-focus-pull);
+  --magnetic-interest-pull: var(--sn-visual-effects-magnetic-interest-pull);
+  --magnetic-transition-speed: var(--sn-visual-effects-magnetic-transition-speed);
+  --visual-effects-field-intensity: var(--sn-visual-effects-field-intensity);
+  --visual-effects-animation-rate: var(--sn-visual-effects-animation-rate);
+  --visual-effects-response-sensitivity: var(--sn-visual-effects-response-sensitivity);
   
-  // Enhanced Organic Consciousness Aliases (Year 3000 System)
-  // Keep only aliases for genuinely new cellular/membrane concepts
-  --consciousness-membrane-elasticity: var(--sn-consciousness-membrane-elasticity);
-  --consciousness-cellular-growth: var(--sn-consciousness-cellular-growth);
-  --consciousness-osmosis-rate: var(--sn-consciousness-osmosis-rate);
-  --consciousness-mitosis-frequency: var(--sn-consciousness-mitosis-frequency);
-  --consciousness-viscosity: var(--sn-consciousness-viscosity);
-  --consciousness-surface-tension: var(--sn-consciousness-surface-tension);
-  --consciousness-membrane-permeability: var(--sn-consciousness-membrane-permeability);
-  --consciousness-organic-mode: var(--sn-consciousness-organic-mode);
-  --consciousness-cellular-mode: var(--sn-consciousness-cellular-mode);
+  // Enhanced Visual Effects Aliases (Year 3000 System)
+  // Keep only aliases for advanced visual rendering concepts
+  --visual-effects-membrane-elasticity: var(--sn-visual-effects-membrane-elasticity);
+  --visual-effects-animation-scale: var(--sn-visual-effects-animation-scale);
+  --visual-effects-flow-rate: var(--sn-visual-effects-flow-rate);
+  --visual-effects-subdivision-frequency: var(--sn-visual-effects-subdivision-frequency);
+  --visual-effects-flow-viscosity: var(--sn-visual-effects-flow-viscosity);
+  --visual-effects-surface-tension: var(--sn-visual-effects-surface-tension);
+  --visual-effects-permeability: var(--sn-visual-effects-permeability);
+  --visual-effects-advanced-mode: var(--sn-visual-effects-advanced-mode);
+  --visual-effects-subdivision-mode: var(--sn-visual-effects-subdivision-mode);
   
   // Depth Priority System
-  --depth-priority-high: var(--sn-consciousness-depth-priority-high);
-  --depth-priority-medium: var(--sn-consciousness-depth-priority-medium);
-  --depth-priority-low: var(--sn-consciousness-depth-priority-low);
-  --depth-priority-receded: var(--sn-consciousness-depth-priority-receded);
+  --depth-priority-high: var(--sn-visual-effects-depth-priority-high);
+  --depth-priority-medium: var(--sn-visual-effects-depth-priority-medium);
+  --depth-priority-low: var(--sn-visual-effects-depth-priority-low);
+  --depth-priority-receded: var(--sn-visual-effects-depth-priority-receded);
   
   // Glyph System (Phase 4 migration)
   --sn-glyph-intensity: var(--sn-glyph-intensity);
@@ -736,18 +736,18 @@
   --serendipity-start-z: var(--sn-serendipity-start-z);
   --serendipity-end-z: var(--sn-serendipity-end-z);
   
-  // Enhanced OKLAB Consciousness Integration (For CSS Blob System & Visual Effects)
-  --consciousness-oklab-primary-rgb: var(--sn-musical-oklab-primary-rgb);
-  --consciousness-oklab-accent-rgb: var(--sn-musical-oklab-accent-rgb);
-  --consciousness-oklab-highlight-rgb: var(--sn-musical-oklab-highlight-rgb);
-  --consciousness-oklab-shadow-rgb: var(--sn-musical-oklab-shadow-rgb);
-  --consciousness-oklab-luminance: var(--sn-color-oklab-accent-luminance);
-  --consciousness-oklab-chroma: 0.15; // Default chroma for consciousness effects
-  --consciousness-oklab-hue: 280; // Default consciousness hue (purple-like)
+  // Enhanced OKLAB Visual Effects Integration (For CSS Blob System & Visual Effects)
+  --visual-effects-oklab-primary-rgb: var(--sn-musical-oklab-primary-rgb);
+  --visual-effects-oklab-accent-rgb: var(--sn-musical-oklab-accent-rgb);
+  --visual-effects-oklab-highlight-rgb: var(--sn-musical-oklab-highlight-rgb);
+  --visual-effects-oklab-shadow-rgb: var(--sn-musical-oklab-shadow-rgb);
+  --visual-effects-oklab-luminance: var(--sn-color-oklab-accent-luminance);
+  --visual-effects-oklab-chroma: 0.15; // Default chroma for visual effects
+  --visual-effects-oklab-hue: 280; // Default visual effects hue (purple-like)
   
-  // Consciousness CSS Fallback Coordination
-  --consciousness-css-fallback: 1.0; // CSS fallback system enabled
-  --consciousness-webgl-coordination: 0; // WebGL coordination level
+  // Visual Effects CSS Fallback Coordination
+  --visual-effects-css-fallback: 1.0; // CSS fallback system enabled
+  --visual-effects-webgl-coordination: 0; // WebGL coordination level
 }
 
 // =============================================================================
@@ -821,18 +821,18 @@ html[style*="--sn-brightness-mode: \"dark\""] {
 
 @media (max-width: 768px) {
   :root {
-    // Mobile consciousness field optimization
-    --sn-consciousness-depth-field: 600px;
-    --sn-consciousness-magnetic-hover-pull: calc(12px * var(--sn-consciousness-mobile-reduction));
-    --sn-consciousness-magnetic-focus-pull: calc(18px * var(--sn-consciousness-mobile-reduction));
-    --sn-consciousness-field-intensity: calc(0.4 * var(--sn-consciousness-mobile-reduction));
+    // Mobile visual effects field optimization
+    --sn-visual-effects-depth-field: 600px;
+    --sn-visual-effects-magnetic-hover-pull: calc(12px * var(--sn-visual-effects-mobile-reduction));
+    --sn-visual-effects-magnetic-focus-pull: calc(18px * var(--sn-visual-effects-mobile-reduction));
+    --sn-visual-effects-field-intensity: calc(0.4 * var(--sn-visual-effects-mobile-reduction));
   }
 }
 
 @media (prefers-contrast: high) {
   :root {
-    // Enhanced consciousness field contrast
-    --sn-consciousness-contrast-boost: 1.15;
-    --sn-consciousness-field-intensity: 0.6;
+    // Enhanced visual effects field contrast
+    --sn-visual-effects-contrast-boost: 1.15;
+    --sn-visual-effects-field-intensity: 0.6;
   }
 }

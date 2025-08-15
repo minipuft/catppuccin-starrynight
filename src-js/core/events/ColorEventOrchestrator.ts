@@ -5,7 +5,7 @@
  * eliminating duplication and providing a single, efficient pipeline for all
  * color-related events throughout the theme.
  *
- * Philosophy: "One river of color consciousness flowing through all systems -
+ * Philosophy: "One river of color visual-effects flowing through all systems -
  * from extraction to harmony to application, a seamless stream of chromatic awareness."
  */
 
@@ -15,7 +15,7 @@ import type { ColorContext, ColorResult } from "@/types/colorStrategy";
 import { settings } from "@/config";
 import {
   MusicalOKLABCoordinator,
-  type CoordinationOptions,
+  type ProcessingOptions,
   type MusicalColorContext,
 } from "@/utils/color/MusicalOKLABCoordinator";
 import { BackgroundStrategyRegistry } from "@/visual/strategies/BackgroundStrategyRegistry";
@@ -395,8 +395,8 @@ export class ColorEventOrchestrator {
         "sn-gradient-intensity",
         "sn-webgl-enabled",
         "sn-depth-enabled",
-        "sn-consciousness-level",
-        "sn-breathing-enabled",
+        "sn-visual-effects-level",
+        "sn-pulsing-enabled",
       ];
 
       if (colorAffectingSettings.includes(data.settingKey)) {
@@ -770,8 +770,8 @@ export class ColorEventOrchestrator {
         harmonicMode: colorContext.harmonicMode || "cosmic",
       };
 
-      // Get coordination options from settings
-      const coordinationOptions: CoordinationOptions = {
+      // Get processing options from settings
+      const processingOptions: ProcessingOptions = {
         // preferGenreOverEmotion is omitted (not available in current settings schema)
         intensityMultiplier: settings.get("sn-gradient-intensity") === "intense" ? 1.5 : 
                            settings.get("sn-gradient-intensity") === "balanced" ? 1.0 : 0.5,
@@ -781,9 +781,9 @@ export class ColorEventOrchestrator {
 
       // Process through musical OKLAB coordinator
       const musicalResult =
-        await this.musicalOKLABCoordinator.coordinateMusicalColors(
+        await this.musicalOKLABCoordinator.processMusicalColors(
           musicalContext,
-          coordinationOptions
+          processingOptions
         );
 
       // Convert to standard ColorResult for existing systems
@@ -811,7 +811,7 @@ export class ColorEventOrchestrator {
           detectedGenre: musicalResult.detectedGenre,
           emotionalState: musicalResult.emotionalResult.primaryEmotion,
           oklabPreset: musicalResult.oklabPreset.name,
-          coordinationStrategy: musicalResult.coordinationStrategy,
+          coordinationStrategy: musicalResult.processingStrategy, // Legacy compatibility
           musicInfluenceStrength: musicalResult.musicInfluenceStrength,
         },
       });
@@ -825,7 +825,7 @@ export class ColorEventOrchestrator {
         {
           genre: musicalResult.detectedGenre,
           emotion: musicalResult.emotionalResult.primaryEmotion,
-          strategy: musicalResult.coordinationStrategy,
+          strategy: musicalResult.processingStrategy,
           preset: musicalResult.oklabPreset.name,
           processingTime: musicalResult.processingTime,
           musicInfluence: musicalResult.musicInfluenceStrength,
@@ -914,7 +914,7 @@ export class ColorEventOrchestrator {
    * Clear musical OKLAB coordination cache
    */
   public clearMusicalOKLABCache(): void {
-    this.musicalOKLABCoordinator.clearCache();
+    this.musicalOKLABCoordinator.clearProcessingCache();
     Y3KDebug?.debug?.log(
       "ColorEventOrchestrator",
       "Musical OKLAB coordination cache cleared"
@@ -938,7 +938,7 @@ export class ColorEventOrchestrator {
     this.colorOrchestrator.destroy();
     this.strategyRegistry.destroy();
     this.strategySelector.destroy();
-    this.musicalOKLABCoordinator.clearCache();
+    this.musicalOKLABCoordinator.clearProcessingCache();
 
     // Clear state
     this.processingState.processingQueue = [];

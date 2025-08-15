@@ -2,12 +2,12 @@
 import type { SimplePerformanceCoordinator, QualityCapability, QualityLevel, QualityScalingCapable, PerformanceMetrics } from "@/core/performance/SimplePerformanceCoordinator";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import type { SettingsManager } from "@/ui/managers/SettingsManager";
-import type * as Utils from "@/utils/core/Year3000Utilities";
+import type * as Utils from "@/utils/core/ThemeUtilities";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { EmotionalTemperatureMapper, type EmotionalTemperatureResult } from "@/utils/color/EmotionalTemperatureMapper";
 import { OKLABColorProcessor, type EnhancementPreset } from "@/utils/color/OKLABColorProcessor";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import type { BeatData, MusicEmotion } from "@/types/colorStubs";
+import type { BeatData, MusicEmotion, VisualEffectsState } from "@/types/colorStubs";
 // NOTE: QualityLevel types imported from simplified performance system
 
 // ===================================================================
@@ -279,12 +279,12 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
     
     // Create animated glow radius
     const baseRadius = 40;
-    const breathingRadius = baseRadius + Math.sin(beatPhase * 0.5) * 8 * this.config.beatSyncIntensity;
+    const animationRadius = baseRadius + Math.sin(beatPhase * 0.5) * 8 * this.config.beatSyncIntensity;
     
     glowElement.style.background = `radial-gradient(circle at ${x}px ${y}px, 
       rgba(${dynamicAccentRgb}, ${finalOpacity}) 0%, 
       rgba(${dynamicAccentRgb}, ${finalOpacity * 0.6}) 20%, 
-      transparent ${breathingRadius}%)`;
+      transparent ${animationRadius}%)`;
   }
 
   private removeGlow(card: HTMLElement): void {
@@ -347,7 +347,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
         this.onMusicBeat(event);
       }, 'Card3DManager');
 
-      unifiedEventBus.subscribe('consciousness:dramatic-moment', (event) => {
+      unifiedEventBus.subscribe('music:dramatic-peak-detected', (event) => {
         this.onIntensityEvent(event);
       }, 'Card3DManager');
 
@@ -764,9 +764,9 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
     this.broadcastEffectState();
     
     // Emit unified effect coordination event
-    unifiedEventBus.emit('consciousness:coordination', {
+    unifiedEventBus.emit('visual-effects:coordination', {
       source: 'Card3DManager',
-      state: this.effectState,
+      state: this.convertToVisualEffectsState(this.effectState),
       timestamp: Date.now()
     });
   }
@@ -781,7 +781,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
     this.broadcastEffectState();
     
     // Emit beat coordination event for synchronized effects
-    unifiedEventBus.emit('consciousness:beat-sync', {
+    unifiedEventBus.emit('music:beat-sync', {
       source: 'Card3DManager',
       beatPhase: this.effectState.beatPhase,
       lastBeatTime: this.effectState.lastBeatTime,
@@ -799,7 +799,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
     this.broadcastEffectState();
     
     // Emit intensity coordination event for unified effects
-    unifiedEventBus.emit('consciousness:dramatic-sync', {
+    unifiedEventBus.emit('music:dramatic-sync', {
       source: 'Card3DManager',
       dramaticLevel: this.effectState.effectIntensityLevel,
       type: event.type,
@@ -813,13 +813,13 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   private initializeCrossSystemCoordination(): void {
     try {
       // Subscribe to coordination events from other systems
-      unifiedEventBus.subscribe('consciousness:coordination', (event) => {
+      unifiedEventBus.subscribe('visual-effects:coordination', (event) => {
         if (event.source !== 'Card3DManager') {
-          this.synchronizeEffectState(event.state);
+          this.synchronizeEffectState(this.convertFromVisualEffectsState(event.state));
         }
       }, 'Card3DManager');
 
-      unifiedEventBus.subscribe('consciousness:beat-sync', (event) => {
+      unifiedEventBus.subscribe('music:beat-sync', (event) => {
         if (event.source !== 'Card3DManager') {
           // Synchronize beat phase with other systems
           this.effectState.beatPhase = event.beatPhase;
@@ -827,7 +827,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
         }
       }, 'Card3DManager');
 
-      unifiedEventBus.subscribe('consciousness:dramatic-sync', (event) => {
+      unifiedEventBus.subscribe('music:dramatic-sync', (event) => {
         if (event.source !== 'Card3DManager') {
           // Synchronize intensity level with other systems
           this.effectState.effectIntensityLevel = event.dramaticLevel;
@@ -838,5 +838,37 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
     } catch (error) {
       console.error('[Card3DManager] Failed to initialize cross-system coordination:', error);
     }
+  }
+
+  /**
+   * Convert Card3DEffectState to VisualEffectsState for event system compatibility
+   */
+  private convertToVisualEffectsState(state: Card3DEffectState): VisualEffectsState {
+    return {
+      intensity: state.effectIntensityLevel,
+      colorTemperature: 6500, // Default value
+      animationScale: state.musicIntensity,
+      dominantEmotion: state.currentMusicMood,
+      resonance: state.musicIntensity,
+      // Legacy compatibility properties
+      symbioticResonance: state.musicIntensity,
+      surfaceFluidityIndex: state.musicIntensity,
+      animationScaleRate: state.effectIntensityLevel,
+      emotionalTemperature: 6500,
+      pulsingCycle: state.beatPhase,
+      cinematicIntensity: state.effectIntensityLevel
+    };
+  }
+
+  /**
+   * Convert VisualEffectsState to Card3DEffectState for internal compatibility
+   */
+  private convertFromVisualEffectsState(state: VisualEffectsState): Partial<Card3DEffectState> {
+    return {
+      currentMusicMood: state.dominantEmotion,
+      musicIntensity: state.intensity,
+      effectIntensityLevel: state.intensity,
+      overallIntensityLevel: state.intensity
+    };
   }
 }

@@ -8,8 +8,8 @@
  */
 
 import { SystemCoordinator } from '@/core/integration/SystemCoordinator';
-import { YEAR3000_CONFIG } from '@/config/globalConfig';
-import * as Utils from '@/utils/core/Year3000Utilities';
+import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
+import * as Utils from '@/utils/core/ThemeUtilities';
 
 describe('Core Orchestration Integration', () => {
   let systemCoordinator: SystemCoordinator;
@@ -18,11 +18,11 @@ describe('Core Orchestration Integration', () => {
     // Setup DOM environment
     document.body.innerHTML = '<div class="Root__main-view"></div>';
     
-    // Initialize core systems with mock year3000System
-    const mockYear3000System = {
+    // Initialize core systems with mock advancedThemeSystem
+    const mockAdvancedThemeSystem = {
       isInitialized: false,
       getCachedNonVisualSystem: jest.fn(() => null),
-      config: YEAR3000_CONFIG,
+      config: ADVANCED_SYSTEM_CONFIG,
       // Additional properties that might be accessed during orchestration
       performanceAnalyzer: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
       unifiedCSSConsciousnessController: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
@@ -48,7 +48,7 @@ describe('Core Orchestration Integration', () => {
       beatSyncVisualSystem: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() },
       organicBeatSyncConsciousness: { isInitialized: false, initialize: jest.fn(), destroy: jest.fn() }
     };
-    systemCoordinator = new SystemCoordinator(YEAR3000_CONFIG, Utils, mockYear3000System);
+    systemCoordinator = new SystemCoordinator(ADVANCED_SYSTEM_CONFIG, Utils, mockAdvancedThemeSystem);
   });
 
   afterEach(() => {

@@ -13,7 +13,7 @@ import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVari
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 
 interface PerformanceMetrics {
   fps: number;
@@ -85,7 +85,7 @@ export class GradientPerformanceOptimizer {
   > = new Map();
 
   constructor(
-    config: Year3000Config,
+    config: AdvancedSystemConfig | Year3000Config,
     performanceAnalyzer: SimplePerformanceCoordinator
   ) {
     this.performanceAnalyzer = performanceAnalyzer;

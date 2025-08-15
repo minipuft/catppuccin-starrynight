@@ -1,7 +1,7 @@
 import type { ArtisticMode, ArtisticModeProfile, ArtisticModeProfiles } from "@/types/models";
 
 /**
- * Year 3000 Artistic Mode Profiles
+ * Advanced System Artistic Mode Profiles
  * Complete system definitions for visual intensity and behavior presets
  */
 
@@ -18,23 +18,30 @@ export const ARTISTIC_MODE_PROFILES: ArtisticModeProfiles = {
       contrast: 1.05,          // Slight contrast improvement for definition
       musicEnergyBoost: 0.4,
       
-      // Year 3000 Kinetic Parameters
+      // Animation Parameters
+      animationIntensity: 0.3,
+      timeBasedEffectFactor: 0.2,
+      interactionStrength: 0.2,
+      advancedAnimations: false,
+      visualIntensityBase: 0.9,
+      
+      // Legacy compatibility
       kineticIntensity: 0.3,
-      temporalPlayFactor: 0.2,
+      timeBasedPlayFactor: 0.2,
       aestheticGravityStrength: 0.2,
       emergentChoreography: false,
-      visualIntensityBase: 0.9,
     },
     
     features: {
       rippleEffects: false,
-      temporalEcho: false,
+      timeBasedEcho: false,
       particleStreams: false,
       predictiveHighlights: true,  // Subtle only
       glassEffects: true,          // Minimal
       beatSync: false,
       colorHarmony: false,
-      aestheticGravity: false,     // Disabled for professional environments
+      userInteractions: false,     // Disabled for professional environments
+      aestheticGravity: false,     // Legacy compatibility
     },
     
     performance: {
@@ -57,23 +64,30 @@ export const ARTISTIC_MODE_PROFILES: ArtisticModeProfiles = {
       contrast: 1.3,             // Higher contrast for dramatic effects
       musicEnergyBoost: 1.2,
       
-      // Year 3000 Kinetic Parameters
+      // Animation Parameters
+      animationIntensity: 0.8,
+      timeBasedEffectFactor: 0.7,
+      interactionStrength: 0.6,
+      advancedAnimations: true,
+      visualIntensityBase: 1.2,
+      
+      // Legacy compatibility
       kineticIntensity: 0.8,
-      temporalPlayFactor: 0.7,
+      timeBasedPlayFactor: 0.7,
       aestheticGravityStrength: 0.6,
       emergentChoreography: true,
-      visualIntensityBase: 1.2,
     },
     
     features: {
       rippleEffects: true,         // Moderate intensity
-      temporalEcho: true,          // Subtle trails
+      timeBasedEcho: true,          // Subtle trails
       particleStreams: true,       // Music-responsive
       predictiveHighlights: true,
       glassEffects: true,
       beatSync: true,              // Musical harmony
       colorHarmony: true,          // Respectful blending
-      aestheticGravity: true,      // Balanced gravitational effects
+      userInteractions: true,      // Balanced interaction effects
+      aestheticGravity: true,      // Legacy compatibility
     },
     
     performance: {
@@ -84,8 +98,8 @@ export const ARTISTIC_MODE_PROFILES: ArtisticModeProfiles = {
     },
   },
 
-  "cosmic-maximum": {
-    displayName: "Cosmic Maximum",
+  "advanced-maximum": {
+    displayName: "Advanced Maximum",
     description: "Ultra-intense cinematic gradients with maximum color saturation and fluid dynamics", 
     philosophy: "Maximum gradient intensity through electric color combinations that create immersive visual landscapes",
     
@@ -96,23 +110,30 @@ export const ARTISTIC_MODE_PROFILES: ArtisticModeProfiles = {
       contrast: 1.5,             // Maximum contrast for dramatic depth
       musicEnergyBoost: 2.5,
       
-      // Year 3000 Kinetic Parameters
+      // Animation Parameters
+      animationIntensity: 2.0,
+      timeBasedEffectFactor: 3.0,
+      interactionStrength: 2.0,
+      advancedAnimations: true,
+      visualIntensityBase: 1.8,
+      
+      // Legacy compatibility
       kineticIntensity: 2.0,
-      temporalPlayFactor: 3.0,
+      timeBasedPlayFactor: 3.0,
       aestheticGravityStrength: 2.0,
       emergentChoreography: true,
-      visualIntensityBase: 1.8,
     },
     
     features: {
       rippleEffects: true,         // Full intensity
-      temporalEcho: true,          // Visible trails
+      timeBasedEcho: true,          // Visible trails
       particleStreams: true,       // Attention flow
       predictiveHighlights: true,  // Advanced prediction
       glassEffects: true,          // Intense
       beatSync: true,              // Full synchronization
       colorHarmony: true,          // Dynamic evolution
-      aestheticGravity: true,      // Visual magnetism
+      userInteractions: true,      // Visual magnetism
+      aestheticGravity: true,      // Legacy compatibility
     },
     
     performance: {
@@ -222,7 +243,20 @@ export function getArtisticColorTemperature(mode: ArtisticMode): number {
   switch (mode) {
     case "corporate-safe": return 0.1;   // Slightly warmer
     case "artist-vision": return 0.0;    // Neutral
-    case "cosmic-maximum": return -0.15; // Cooler/more dramatic
+    case "advanced-maximum":
+    case "cosmic-maximum": return -0.15; // Cooler/more dramatic (legacy compatibility)
     default: return 0.0;
   }
 }
+
+// =========================================================================
+// BACKWARD COMPATIBILITY
+// =========================================================================
+
+// Add cosmic-maximum as an alias to advanced-maximum for backward compatibility
+ARTISTIC_MODE_PROFILES["cosmic-maximum"] = {
+  ...ARTISTIC_MODE_PROFILES["advanced-maximum"],
+  displayName: "Cosmic Maximum", // Keep original display name for UI
+  description: "Ultra-intense cinematic gradients with maximum color saturation and fluid dynamics",
+  philosophy: "Maximum gradient intensity through electric color combinations that create immersive visual landscapes",
+} as ArtisticModeProfile;

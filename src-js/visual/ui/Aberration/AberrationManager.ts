@@ -8,7 +8,7 @@
  * =============================================================================
  */
 
-import { Year3000System } from "@/core/lifecycle/year3000System";
+import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { AberrationCanvas } from "./AberrationCanvas";
 import { AberrationVisualSystem } from "./AberrationVisualSystem";

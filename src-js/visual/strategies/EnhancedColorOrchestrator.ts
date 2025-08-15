@@ -4,7 +4,7 @@
  * Coordinates color processing through registered strategies with the unified event system.
  * Provides a bridge between the OKLAB integration and existing visual strategy systems.
  *
- * Philosophy: "Orchestrating color consciousness through strategic coordination -
+ * Philosophy: "Orchestrating color visualEffects through strategic coordination -
  * unifying musical OKLAB processing with visual strategy execution."
  */
 

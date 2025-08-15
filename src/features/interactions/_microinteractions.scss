@@ -1,7 +1,7 @@
 // ████████████████████████████████████████████████████████████████████████████████
-// YEAR 3000 MICROINTERACTIONS - Rhythmic Consciousness in Every Touch
-// Kinetic Verbs: RIPPLE, BLOOM, REFRACT, HARMONIZE
-// Every interaction pulses with the heartbeat of the universe
+// YEAR 3000 MICROINTERACTIONS - Rhythmic Visual Effects in Every Touch
+// Action Verbs: RIPPLE, BLOOM, REFRACT, HARMONIZE
+// Every interaction pulses with the rhythm of the music
 // ████████████████████████████████████████████████████████████████████████████████
 
 @use "../../core/_mixins" as *;
@@ -48,12 +48,12 @@
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// YEAR 3000 ENHANCED CARD MICROINTERACTIONS - Cosmic Touch Symphony
+// YEAR 3000 ENHANCED CARD MICROINTERACTIONS - Dynamic Touch Symphony
 // ══════════════════════════════════════════════════════════════════════════════
 
-// Enhanced main-card-card with YEAR 3000 rhythmic consciousness
+// Enhanced main-card-card with YEAR 3000 rhythmic visual effects
 .main-card-card {
-  // Kinetic Verb: OSCILLATE - Base breathing with rhythm
+  // Action Verb: OSCILLATE - Base animation with rhythm
   transform: scale(var(--micro-breathing-scale));
   transition: transform var(--micro-medium) var(--sn-easing-explorer, ease-out);
   
@@ -67,7 +67,7 @@
   // Enhanced hover glow with rhythmic intensity
   @include gradient-glow(var(--sn-color-accent-hex), var(--feedback-subtle));
 
-  // Add cosmic filter effects
+  // Add dynamic filter effects
   filter: hue-rotate(var(--micro-hue-shift))
     saturate(calc(1 + (var(--micro-beat-intensity) * 0.1)))
     brightness(calc(1 + (var(--micro-beat-intensity) * 0.05)));
@@ -84,7 +84,7 @@
       );
   }
 
-  // Enhanced play button interaction with cosmic consciousness
+  // Enhanced play button interaction with dynamic visual effects
   .main-card-PlayButtonContainer,
   .main-playButton-PlayButton {
     @include interaction-feedback(
@@ -96,7 +96,7 @@
     --ripple-color: var(--spice-accent);
     --ripple-intensity: var(--feedback-prominent);
 
-    // Cosmic glow pulse
+    // Dynamic glow pulse
     box-shadow: 0 0 calc(var(--micro-glow-radius) * 0.8)
       rgba(
         var(--spice-rgb-accent),
@@ -182,7 +182,7 @@
 // YEAR 3000 CONTROL BUTTON COSMIC ENHANCEMENT - The Hearts of Interaction
 // ══════════════════════════════════════════════════════════════════════════════
 
-// Enhanced shuffle and transport buttons with YEAR 3000 consciousness
+// Enhanced shuffle and transport buttons with YEAR 3000 visual effects
 .main-shuffleButton-button,
 .main-skipForwardButton-button,
 .main-skipBackButton-button {
@@ -197,7 +197,7 @@
     rgba(var(--spice-rgb-accent), var(--feedback-moderate))
   );
 
-  // Cosmic filter enhancement
+  // Dynamic filter enhancement
   filter: hue-rotate(var(--micro-hue-shift))
     brightness(calc(1 + (var(--micro-beat-intensity) * 0.08)));
   transition: all var(--micro-fast) var(--sn-easing-explorer, ease-out);
@@ -209,11 +209,11 @@
       rgba(var(--spice-rgb-accent), var(--feedback-moderate));
   }
 
-  // Enhanced active state for shuffle button with rhythm consciousness
+  // Enhanced active state for shuffle button with rhythm visual effects
   &.main-shuffleButton-active {
     --ripple-color: var(--spice-accent);
 
-    // Kinetic Verb: REFRACT - Rhythmic glow for active state
+    // Action Verb: REFRACT - Rhythmic glow for active state
     box-shadow: 0 0 calc(var(--micro-glow-radius) * 1.2)
       rgba(
         var(--spice-rgb-accent),
@@ -224,9 +224,9 @@
   }
 }
 
-// Enhanced main play button - THE COSMIC HEART 💫
+// Enhanced main play button - THE DYNAMIC CORE 💫
 .main-playButton-PlayButton.main-playButton-primary {
-  // Kinetic Verb: BLOOM - Maximum love for the most important button
+  // Action Verb: BLOOM - Maximum visual effects for the most important button
   transform: scale(
     calc(
       var(--micro-breathing-scale) * (1 + (var(--micro-beat-intensity) * 0.05))
@@ -241,7 +241,7 @@
     rgba(var(--spice-rgb-accent), var(--feedback-prominent))
   );
 
-  // Cosmic pulse enhancement
+  // Dynamic pulse enhancement
   filter: hue-rotate(var(--micro-hue-shift))
     brightness(calc(1 + (var(--micro-beat-intensity) * 0.12)))
     saturate(calc(1.1 + (var(--micro-beat-intensity) * 0.2)));
@@ -399,3 +399,11 @@
     --feedback-prominent: 0.6;
   }
 }
+
+// =============================================================================
+// LEGACY COMPATIBILITY MAPPINGS - Phase 6.3 Layer B Modernization
+// =============================================================================
+
+// Note: This file primarily uses technical terms (ripple, bloom, etc.) 
+// which are already appropriate. Most terminology was modernized in place
+// with minimal legacy mapping needed.

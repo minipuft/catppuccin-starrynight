@@ -1,11 +1,11 @@
 /**
- * Consciousness Choreography Type Definitions
+ * Animation Coordination Type Definitions
  * 
- * Type definitions for the Background Consciousness Choreographer system,
- * including event types, interfaces, and choreography patterns.
+ * Type definitions for the Background Animation Coordinator system,
+ * including event types, interfaces, and coordination patterns.
  * 
- * @architecture Phase 2.2 Background Consciousness Choreography
- * @philosophy Organic coordination through shared consciousness fields
+ * @architecture Phase 2.2 Background Animation Coordination
+ * @philosophy Technical coordination through shared visual effect state
  */
 
 // Import base types for extension and re-export
@@ -17,11 +17,12 @@ import type {
 
 // Define choreography event types locally since they may not exist yet
 export type ChoreographyEventType = 'rhythm-shift' | 'intensity-peak' | 'genre-transition' | 'emotional-shift';
-export type OrganicTransitionConfig = {
+export type DynamicTransitionConfig = {
   duration: number;
   easing: 'smooth' | 'harmonic' | 'exponential' | 'cubic';
   intensity: number;
 };
+
 
 // Re-export core types for convenience
 export type {
@@ -30,8 +31,8 @@ export type {
   Vector2D
 };
 
-// Alias for backward compatibility
-export type ConsciousnessField = VisualEffectState;
+// Modern API - use VisualEffectState directly
+// Legacy alias moved to backwards compatibility section below
 
 // ===================================================================
 // CHOREOGRAPHY EVENT PAYLOADS
@@ -46,7 +47,7 @@ export interface RhythmShiftEventPayload {
     timeSignature: number;
     intensity: number;
   };
-  transitionType: 'organic' | 'immediate' | 'fadeOut' | 'breathe';
+  transitionType: 'smooth' | 'immediate' | 'fadeOut' | 'pulsing';
   duration?: number; // Transition duration in ms
 }
 
@@ -70,23 +71,23 @@ export interface EnergySurgeEventPayload {
   affectedSystems: string[] | 'all';
   surgeType: 'beat' | 'bass' | 'treble' | 'harmonic' | 'full-spectrum';
   duration: number; // How long the surge lasts in ms
-  falloffCurve: 'linear' | 'exponential' | 'organic' | 'harmonic';
+  falloffCurve: 'linear' | 'exponential' | 'smooth' | 'harmonic';
 }
 
 /**
- * Breathing cycle event payload
+ * Animation cycle event payload
  */
-export interface BreathingCycleEventPayload {
-  phase: number; // 0-1 current phase in breathing cycle
-  intensity: number; // 0-1 breathing intensity
+export interface AnimationCycleEventPayload {
+  phase: number; // 0-1 current phase in animation cycle
+  intensity: number; // 0-1 animation intensity
   cycleLength: number; // Total cycle length in seconds
-  breathingPattern: 'regular' | 'deep' | 'excited' | 'meditative' | 'synchronized';
+  animationPattern: 'regular' | 'deep' | 'excited' | 'calm' | 'synchronized';
 }
 
 /**
- * Membrane fluid event payload
+ * Surface fluid event payload
  */
-export interface MembraneFluidEventPayload {
+export interface FluidMotionEventPayload {
   fluidityIndex: number; // 0-1 how fluid the boundaries are
   affectedBoundaries: string[]; // Which system boundaries are affected
   fluidType: 'liquid' | 'gaseous' | 'plasma' | 'crystalline';
@@ -94,13 +95,13 @@ export interface MembraneFluidEventPayload {
 }
 
 /**
- * Cellular growth event payload  
+ * Scale change event payload  
  */
-export interface CellularGrowthEventPayload {
-  growthRate: number; // 0.1-2.0 cellular growth multiplier
+export interface ScaleChangeEventPayload {
+  growthRate: number; // 0.1-2.0 scale change multiplier
   targetSystems: string[] | 'all';
-  growthPattern: 'uniform' | 'organic' | 'fractal' | 'spiral' | 'radial';
-  nutrients: { // Growth factors
+  scalePattern: 'uniform' | 'smooth' | 'fractal' | 'spiral' | 'radial';
+  scalingFactors: { // Scale factors
     energy: number;
     harmony: number;
     complexity: number;
@@ -117,7 +118,7 @@ export interface PerformanceAdaptEventPayload {
     frameRate: number;
     optimizationLevel: number;
   };
-  adaptationType: 'organic' | 'immediate' | 'gradual';
+  adaptationType: 'smooth' | 'immediate' | 'gradual';
   reason: 'thermal' | 'battery' | 'performance' | 'user' | 'automatic';
   affectedSystems: string[];
 }
@@ -130,14 +131,14 @@ export interface PerformanceAdaptEventPayload {
  * Complete event payload type map for type-safe event handling
  */
 export interface ChoreographyEventPayloadMap {
-  'consciousness:field-updated': VisualEffectState;
+  'visual-effects:state-updated': VisualEffectState;
   'choreography:rhythm-shift': RhythmShiftEventPayload;
   'choreography:emotional-shift': EmotionalShiftEventPayload;
   'choreography:energy-surge': EnergySurgeEventPayload;
-  'consciousness:breathing-cycle': BreathingCycleEventPayload;
-  'consciousness:membrane-fluid': MembraneFluidEventPayload;
-  'consciousness:cellular-growth': CellularGrowthEventPayload;
-  'consciousness:performance-adapt': PerformanceAdaptEventPayload;
+  'visual-effects:animation-cycle': AnimationCycleEventPayload;
+  'visual-effects:fluid-motion': FluidMotionEventPayload;
+  'visual-effects:scale-change': ScaleChangeEventPayload;
+  'visual-effects:performance-adapt': PerformanceAdaptEventPayload;
 }
 
 // ===================================================================
@@ -149,7 +150,7 @@ export interface ChoreographyEventPayloadMap {
  */
 export interface EnhancedBackgroundSystemParticipant extends BackgroundSystemParticipant {
   // Choreography response capabilities
-  supportsOrganicTransitions: boolean;
+  supportsSmoothTransitions: boolean;
   supportedChoreographyEvents: (keyof ChoreographyEventPayloadMap)[];
   participantPriority: 'low' | 'normal' | 'high' | 'critical';
   
@@ -157,9 +158,9 @@ export interface EnhancedBackgroundSystemParticipant extends BackgroundSystemPar
   onRhythmShift?(payload: RhythmShiftEventPayload): void;
   onEmotionalShift?(payload: EmotionalShiftEventPayload): void;
   onEnergySurge?(payload: EnergySurgeEventPayload): void;
-  onBreathingCycle?(payload: BreathingCycleEventPayload): void;
-  onMembraneFluid?(payload: MembraneFluidEventPayload): void;
-  onCellularGrowth?(payload: CellularGrowthEventPayload): void;
+  onAnimationCycle?(payload: AnimationCycleEventPayload): void;
+  onFluidMotion?(payload: FluidMotionEventPayload): void;
+  onScaleChange?(payload: ScaleChangeEventPayload): void;
   onPerformanceAdapt?(payload: PerformanceAdaptEventPayload): void;
   
   // Contribution methods
@@ -171,10 +172,10 @@ export interface EnhancedBackgroundSystemParticipant extends BackgroundSystemPar
   
   getVisualContribution(): Partial<VisualEffectState>;
   
-  getOrganicContribution?(): {
-    breathingInfluence: number;
-    membraneContribution: number;
-    growthContribution: number;
+  getSmoothContribution?(): {
+    pulsingInfluence: number;
+    surfaceContribution: number;
+    scaleContribution: number;
   };
 }
 
@@ -182,62 +183,17 @@ export interface EnhancedBackgroundSystemParticipant extends BackgroundSystemPar
 // CONSCIOUSNESS FIELD EXTENSIONS
 // ===================================================================
 
-/**
- * @deprecated - Moved to backwards compatibility section
- * Extended consciousness field with system-specific sections
- */
-export interface LegacyExtendedConsciousnessField {
-  // Includes all ConsciousnessField properties
-  // System-specific consciousness sections
-  webglConsciousness: {
-    shaderComplexity: number;
-    textureResolution: number;
-    renderingPipeline: 'forward' | 'deferred' | 'hybrid';
-    gpuUtilization: number;
-  };
-  
-  liquidConsciousness: {
-    fluidDynamics: number;
-    turbulenceLevel: number;
-    viscosityIndex: number;
-    flowPatterns: string[];
-  };
-  
-  depthConsciousness: {
-    layerCount: number;
-    parallaxStrength: number;
-    fogDensity: number;
-    infinityPerception: number;
-  };
-  
-  // Inter-system consciousness
-  systemHarmony: {
-    webglLiquidResonance: number;
-    liquidDepthCoherence: number;
-    depthWebglAlignment: number;
-  };
-}
 
 // ===================================================================
 // ORGANIC TRANSITION PATTERNS
 // ===================================================================
 
-/**
- * Organic transition pattern definitions
- */
-export interface OrganicTransitionPattern {
-  name: string;
-  description: string;
-  easingFunction: (t: number) => number;
-  duration: number; // Base duration in ms
-  intensityModifier: number; // How much the pattern responds to intensity
-  biologicalInspiration: string; // What biological process this mimics
-}
+// Legacy interface removed - use AnimationTransitionPattern instead
 
 /**
- * Predefined organic transition patterns
+ * Predefined animation transition patterns
  */
-export const ORGANIC_TRANSITION_PATTERNS: { [key: string]: OrganicTransitionPattern } = {
+export const ANIMATION_TRANSITION_PATTERNS: { [key: string]: AnimationTransitionPattern } = {
   heartbeat: {
     name: 'heartbeat',
     description: 'Cardiac rhythm-inspired pulsing transitions',
@@ -248,38 +204,38 @@ export const ORGANIC_TRANSITION_PATTERNS: { [key: string]: OrganicTransitionPatt
     },
     duration: 800,
     intensityModifier: 1.2,
-    biologicalInspiration: 'Cardiac rhythm and blood flow patterns'
+    visualInspiration: 'Cardiac rhythm and blood flow patterns'
   },
   
-  breathing: {
-    name: 'breathing',
-    description: 'Respiratory cycle-inspired smooth transitions',
+  pulsing: {
+    name: 'pulsing',
+    description: 'Rhythmic cycle-inspired smooth transitions',
     easingFunction: (t: number) => {
-      // Sine wave with longer exhale (like natural breathing)
+      // Sine wave with longer exhale (like natural pulsing)
       const phase = t * Math.PI;
       return t < 0.4 ? Math.sin(phase / 0.4) : Math.sin((phase - 0.4 * Math.PI) / 0.6) * 0.7;
     },
     duration: 3000,
     intensityModifier: 0.8,
-    biologicalInspiration: 'Diaphragmatic breathing and oxygen exchange'
+    visualInspiration: 'Rhythmic pulsing and smooth oscillation'
   },
   
-  cellDivision: {
-    name: 'cellDivision', 
-    description: 'Mitotic cell division-inspired growth transitions',
+  animationScale: {
+    name: 'animationScale', 
+    description: 'Progressive scaling-inspired growth transitions',
     easingFunction: (t: number) => {
-      // S-curve with acceleration phases like cell division
-      if (t < 0.3) return t * t / 0.09; // Slow start (G1 phase)
-      if (t < 0.7) return 0.1 + (t - 0.3) * 2.25; // Rapid growth (S phase)  
-      return 0.1 + 0.9 + (t - 0.7) * 0.3 / 0.3; // Slow finish (G2 phase)
+      // S-curve with acceleration phases like animation scaling
+      if (t < 0.3) return t * t / 0.09; // Slow start (setup phase)
+      if (t < 0.7) return 0.1 + (t - 0.3) * 2.25; // Rapid growth (scaling phase)  
+      return 0.1 + 0.9 + (t - 0.7) * 0.3 / 0.3; // Slow finish (completion phase)
     },
     duration: 2000,
     intensityModifier: 1.5,
-    biologicalInspiration: 'Cellular mitosis and organic growth patterns'
+    visualInspiration: 'Progressive scaling and smooth growth patterns'
   },
   
-  neuralFiring: {
-    name: 'neuralFiring',
+  visualHarmonyFiring: {
+    name: 'visualHarmonyFiring',
     description: 'Neural action potential-inspired rapid transitions',
     easingFunction: (t: number) => {
       // Sharp spike followed by gradual recovery like neuron firing
@@ -289,12 +245,12 @@ export const ORGANIC_TRANSITION_PATTERNS: { [key: string]: OrganicTransitionPatt
     },
     duration: 400,
     intensityModifier: 2.0,
-    biologicalInspiration: 'Neural action potentials and synaptic transmission'
+    visualInspiration: 'Visual harmony transitions and effect coordination'
   },
   
   plantGrowth: {
     name: 'plantGrowth',
-    description: 'Phototropic plant growth-inspired organic transitions',
+    description: 'Phototropic plant growth-inspired smooth transitions',
     easingFunction: (t: number) => {
       // Exponential growth curve with periodic growth spurts
       const baseGrowth = 1 - Math.exp(-t * 3);
@@ -303,7 +259,7 @@ export const ORGANIC_TRANSITION_PATTERNS: { [key: string]: OrganicTransitionPatt
     },
     duration: 4000,
     intensityModifier: 0.6,
-    biologicalInspiration: 'Phototropism and circadian growth rhythms'
+    visualInspiration: 'Phototropism and circadian growth rhythms'
   }
 };
 
@@ -311,35 +267,13 @@ export const ORGANIC_TRANSITION_PATTERNS: { [key: string]: OrganicTransitionPatt
 // CONSCIOUSNESS FIELD ANALYSIS
 // ===================================================================
 
-/**
- * @deprecated - Moved to backwards compatibility section
- * Consciousness field analyzer utilities
- */
-export interface LegacyConsciousnessFieldAnalysis {
-  overallCoherence: number; // 0-1 how coherent the field is
-  energyDistribution: {
-    musical: number;
-    visual: number; 
-    organic: number;
-    performance: number;
-  };
-  dominantCharacteristics: string[]; // Which aspects are most prominent
-  stabilityIndex: number; // 0-1 how stable the field is over time
-  evolutionTrend: 'growing' | 'stabilizing' | 'declining' | 'oscillating';
-  harmonicResonances: { [systemName: string]: number }; // How well each system resonates
-  organicHealth: {
-    breathingRhythm: 'healthy' | 'shallow' | 'irregular' | 'synchronized';
-    membraneIntegrity: 'intact' | 'permeable' | 'dissolved' | 'crystallized';
-    cellularVitality: 'thriving' | 'stable' | 'declining' | 'dormant';
-  };
-}
 
 // ===================================================================
 // CHOREOGRAPHY PERFORMANCE METRICS
 // ===================================================================
 
 /**
- * Performance metrics for consciousness choreography
+ * Performance metrics for animation coordination
  */
 export interface ChoreographyPerformanceMetrics {
   // Field update metrics
@@ -371,7 +305,7 @@ export interface ChoreographyPerformanceMetrics {
   // Quality metrics
   visualHarmony: number; // 0-1 visual coherence across systems
   musicalSynchronization: number; // 0-1 how well systems sync to music
-  organicRealism: number; // 0-1 how organic the behavior feels
+  smoothRealism: number; // 0-1 how smooth the behavior feels
   userPerceptionScore: number; // 0-1 estimated user satisfaction
 }
 
@@ -379,18 +313,6 @@ export interface ChoreographyPerformanceMetrics {
 // HELPER TYPES
 // ===================================================================
 
-/**
- * @deprecated - Moved to backwards compatibility section
- * Consciousness field snapshot for debugging/analysis
- */
-export interface LegacyConsciousnessFieldSnapshot {
-  timestamp: number;
-  field: VisualEffectState;
-  participants: string[];
-  activeEvents: string[];
-  performanceMetrics: Partial<ChoreographyPerformanceMetrics>;
-  analysis: Partial<ConsciousnessFieldAnalysis>;
-}
 
 /**
  * Choreography configuration for different modes
@@ -399,9 +321,9 @@ export interface ChoreographyModeConfig {
   mode: 'performance' | 'quality' | 'battery' | 'accessibility' | 'custom';
   fieldUpdateInterval: number; // ms between field updates
   transitionIntensity: number; // 0-2 transition intensity multiplier
-  organicComplexity: number; // 0-1 how complex organic behaviors are
+  smoothComplexity: number; // 0-1 how complex smooth behaviors are
   eventProcessingPriority: 'immediate' | 'batched' | 'deferred';
-  enabledTransitionPatterns: string[]; // Which organic patterns are enabled
+  enabledTransitionPatterns: string[]; // Which animation patterns are enabled
   performanceThresholds: {
     maxCpuUsage: number;
     maxMemoryUsage: number;
@@ -511,36 +433,15 @@ export interface AnimationFieldSnapshot {
 // BACKWARDS COMPATIBILITY ALIASES (DEPRECATED)
 // =========================================================================
 
-/**
- * @deprecated Use AnimationTransitionPattern instead
- * @since v1.0.0
- * 
- * Maintains backwards compatibility by mapping old property names to new ones
- */
-export interface OrganicTransitionPattern {
-  name: string;
-  description: string;
-  easingFunction: (t: number) => number;
-  duration: number;
-  intensityModifier: number;
-  /** @deprecated Use visualInspiration instead */
-  biologicalInspiration: string;
-}
 
 /**
- * @deprecated Use ExtendedAnimationField instead
- * @since v1.0.0
+ * Modern visual coordination field type
+ * @since v3.0.0
  */
-export type ExtendedConsciousnessField = LegacyExtendedConsciousnessField;
+export type VisualCoordinationField = VisualEffectState;
 
-/**
- * @deprecated Use AnimationFieldAnalysis instead
- * @since v1.0.0
- */
-export type ConsciousnessFieldAnalysis = LegacyConsciousnessFieldAnalysis;
+// Duplicate interface removed - using the first AnimationTransitionPattern definition
 
-/**
- * @deprecated Use AnimationFieldSnapshot instead
- * @since v1.0.0
- */
-export type ConsciousnessFieldSnapshot = LegacyConsciousnessFieldSnapshot;
+
+
+

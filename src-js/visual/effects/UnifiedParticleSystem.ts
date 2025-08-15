@@ -1,38 +1,38 @@
 /**
- * ParticleConsciousnessModule - Unified Particle System with Consciousness Integration
+ * UnifiedParticleSystem - Consolidated Particle System with Visual Effects Integration
  *
  * Consolidates LightweightParticleSystem and ParticleFieldSystem into a single
- * consciousness-aware particle system that dances organically with the musical flow.
+ * visual-effects-aware particle system that responds smoothly to musical dynamics.
  *
  * Core Philosophy:
- * - "Every particle breathes with the consciousness field"
+ * - "Every particle pulses with the visual effects state"
  * - "Unified rendering eliminates duplicate canvas management and lifecycle logic"
- * - "Organic choreography creates emergent beauty through shared awareness"
+ * - "Smooth coordination creates enhanced beauty through shared visual state"
  *
  * Architecture:
  * - Unified particle management with adaptive rendering modes
- * - Full BackgroundSystemParticipant integration with consciousness field
+ * - Full BackgroundSystemParticipant integration with visual effects state
  * - Shared canvas management eliminating duplicate code
  * - Performance-aware particle density and quality adaptation
  *
- * @architecture Phase 2.3 Particle Consciousness Integration
+ * @architecture Phase 2.3 Particle Visual Effects Integration
  * @target Bundle reduction: 30-40KB through consolidation
  */
 
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
-import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 
-// Import consciousness integration
+// Import visual effects integration
 import type {
   VisualEffectsCoordinator as BackgroundAnimationCoordinator,
   BackgroundSystemParticipant,
-  VisualEffectState as ConsciousnessField,
+  VisualEffectState,
 } from "./VisualEffectsCoordinator";
 import {
   ChoreographyEventResponder,
@@ -47,7 +47,7 @@ import {
 /**
  * Particle rendering modes supporting both legacy system behaviors
  */
-export type ParticleMode = "lightweight" | "field" | "hybrid" | "consciousness";
+export type ParticleMode = "lightweight" | "field" | "hybrid" | "visual-effects";
 
 /**
  * Unified particle interface supporting both lightweight and field particle types
@@ -92,10 +92,10 @@ export interface UnifiedParticle {
     speedY: number;
   };
 
-  // Consciousness integration
-  consciousnessResonance: number; // 0-1 how strongly this particle resonates with consciousness field
-  organicGrowthPhase: number; // Phase offset for organic growth patterns
-  breathingPhase: number; // Phase offset for breathing synchronization
+  // Visual effects integration
+  visualEffectsResonance: number; // 0-1 how strongly this particle resonates with visual effects state
+  scalingAnimationPhase: number; // Phase offset for scaling animation patterns
+  animationPhase: number; // Phase offset for animation synchronization
   flowResonance: number; // How much this particle follows musical flow
 }
 
@@ -112,14 +112,14 @@ export interface ParticlePerformanceConfig {
 }
 
 /**
- * Consciousness-driven particle behavior configuration
+ * Visual-effects-driven particle behavior configuration
  */
-export interface ParticleConsciousnessConfig {
-  enableOrganicFlow: boolean;
-  enableBreathingSynchronization: boolean;
+export interface ParticleVisualConfig {
+  enableSmoothFlow: boolean;
+  enablePulsingSynchronization: boolean;
   enableHarmonicResonance: boolean;
-  enableCellularGrowth: boolean;
-  consciousnessStrength: number; // 0-1 how much consciousness affects particles
+  enableAnimationScaling: boolean;
+  visualEffectsStrength: number; // 0-1 how much visual effects affects particles
   animationTransitionSpeed: number; // Speed of animation transitions
 }
 
@@ -252,13 +252,13 @@ class SharedCanvasManager {
 }
 
 // ===================================================================
-// CONSCIOUSNESS-AWARE PARTICLE RENDERER
+// VISUAL-EFFECTS-AWARE PARTICLE RENDERER
 // ===================================================================
 
 /**
- * Unified particle renderer with consciousness-driven adaptive rendering
+ * Unified particle renderer with visual-effects-driven adaptive rendering
  */
-class ConsciousnessParticleRenderer {
+class VisualParticleRenderer {
   private canvasManager: SharedCanvasManager;
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -270,11 +270,11 @@ class ConsciousnessParticleRenderer {
   }
 
   /**
-   * Render particles with consciousness-aware adaptive rendering
+   * Render particles with visual-effects-aware adaptive rendering
    */
   public render(
     particles: UnifiedParticle[],
-    consciousnessField: ConsciousnessField | null,
+    visualEffectsField: VisualEffectState | null,
     performanceConfig: ParticlePerformanceConfig
   ): void {
     if (!this.ctx || !this.canvas) return;
@@ -286,39 +286,39 @@ class ConsciousnessParticleRenderer {
     const activeParticles = particles.filter((p) => p.active);
     if (activeParticles.length === 0) return;
 
-    // Apply consciousness-driven global effects
-    this.applyConsciousnessGlobalEffects(consciousnessField);
+    // Apply visual-effects-driven global effects
+    this.applyVisualGlobalEffects(visualEffectsField);
 
     // Render particles based on performance config
     switch (performanceConfig.renderQuality) {
       case "high":
-        this.renderHighQuality(activeParticles, consciousnessField);
+        this.renderHighQuality(activeParticles, visualEffectsField);
         break;
       case "medium":
-        this.renderMediumQuality(activeParticles, consciousnessField);
+        this.renderMediumQuality(activeParticles, visualEffectsField);
         break;
       case "low":
-        this.renderLowQuality(activeParticles, consciousnessField);
+        this.renderLowQuality(activeParticles, visualEffectsField);
         break;
     }
   }
 
   /**
-   * Apply global consciousness-driven effects to the canvas
+   * Apply global visual-effects-driven effects to the canvas
    */
-  private applyConsciousnessGlobalEffects(
-    field: ConsciousnessField | null
+  private applyVisualGlobalEffects(
+    field: VisualEffectState | null
   ): void {
     if (!field || !this.ctx) return;
 
-    // Apply consciousness-driven global alpha modulation
-    const breathingAlpha =
-      BackgroundEventResponder.calculateBreathingModulation(
+    // Apply visual-effects-driven global alpha modulation
+    const animationAlpha =
+      BackgroundEventResponder.calculatePulsingModulation(
         0.9,
         field.pulseRate,
         0.1
       );
-    this.ctx.globalAlpha = breathingAlpha;
+    this.ctx.globalAlpha = animationAlpha;
 
     // Apply subtle global transformation based on musical flow
     if (field.flowDirection.x !== 0 || field.flowDirection.y !== 0) {
@@ -331,7 +331,7 @@ class ConsciousnessParticleRenderer {
    */
   private renderHighQuality(
     particles: UnifiedParticle[],
-    field: ConsciousnessField | null
+    field: VisualEffectState | null
   ): void {
     if (!this.ctx) return;
 
@@ -341,24 +341,24 @@ class ConsciousnessParticleRenderer {
       // Position
       this.ctx.translate(particle.x, particle.y);
 
-      // Rotation with consciousness resonance
+      // Rotation with visual effects resonance
       if (particle.currentRotation !== 0) {
-        const consciousRotation = field
+        const visualRotation = field
           ? particle.currentRotation +
-            field.pulseRate * particle.consciousnessResonance * Math.PI
+            field.pulseRate * particle.visualEffectsResonance * Math.PI
           : particle.currentRotation;
-        this.ctx.rotate(consciousRotation);
+        this.ctx.rotate(visualRotation);
       }
 
-      // Consciousness-modulated opacity
-      const consciousOpacity = field
+      // Visual-effects-modulated opacity
+      const visualOpacity = field
         ? BackgroundEventResponder.calculateRhythmicResponse(
             particle.currentOpacity,
             field.pulseRate,
             particle.flowResonance
           )
         : particle.currentOpacity;
-      this.ctx.globalAlpha = consciousOpacity;
+      this.ctx.globalAlpha = visualOpacity;
 
       // Render based on particle mode
       this.renderParticleByMode(particle, field, "high");
@@ -372,7 +372,7 @@ class ConsciousnessParticleRenderer {
    */
   private renderMediumQuality(
     particles: UnifiedParticle[],
-    field: ConsciousnessField | null
+    field: VisualEffectState | null
   ): void {
     if (!this.ctx) return;
 
@@ -446,7 +446,7 @@ class ConsciousnessParticleRenderer {
    */
   private renderLowQuality(
     particles: UnifiedParticle[],
-    field: ConsciousnessField | null
+    field: VisualEffectState | null
   ): void {
     if (!this.ctx) return;
 
@@ -471,7 +471,7 @@ class ConsciousnessParticleRenderer {
    */
   private renderParticleByMode(
     particle: UnifiedParticle,
-    field: ConsciousnessField | null,
+    field: VisualEffectState | null,
     quality: "high" | "medium" | "low"
   ): void {
     if (!this.ctx) return;
@@ -486,8 +486,8 @@ class ConsciousnessParticleRenderer {
       case "hybrid":
         this.renderHybridParticle(particle, field, quality);
         break;
-      case "consciousness":
-        this.renderConsciousnessParticle(particle, field, quality);
+      case "visual-effects":
+        this.renderVisualEffectsParticle(particle, field, quality);
         break;
     }
   }
@@ -497,7 +497,7 @@ class ConsciousnessParticleRenderer {
    */
   private renderLightweightParticle(
     particle: UnifiedParticle,
-    field: ConsciousnessField | null,
+    field: VisualEffectState | null,
     quality: "high" | "medium" | "low"
   ): void {
     if (!this.ctx || !particle.lightweightProps) return;
@@ -533,12 +533,12 @@ class ConsciousnessParticleRenderer {
    */
   private renderFieldParticle(
     particle: UnifiedParticle,
-    field: ConsciousnessField | null,
+    field: VisualEffectState | null,
     quality: "high" | "medium" | "low"
   ): void {
     if (!this.ctx || !particle.fieldProps) return;
 
-    // Pulse effect based on consciousness field
+    // Pulse effect based on visual effects state
     const pulseSize = field
       ? particle.currentSize * (1 + field.pulseRate * 0.3)
       : particle.currentSize;
@@ -564,7 +564,7 @@ class ConsciousnessParticleRenderer {
    */
   private renderHybridParticle(
     particle: UnifiedParticle,
-    field: ConsciousnessField | null,
+    field: VisualEffectState | null,
     quality: "high" | "medium" | "low"
   ): void {
     // Hybrid rendering combines lightweight color with field pulsing
@@ -604,24 +604,24 @@ class ConsciousnessParticleRenderer {
   }
 
   /**
-   * Render consciousness-enhanced particle (new organic mode)
+   * Render visual-effects-enhanced particle (new smooth mode)
    */
-  private renderConsciousnessParticle(
+  private renderVisualEffectsParticle(
     particle: UnifiedParticle,
-    field: ConsciousnessField | null,
+    field: VisualEffectState | null,
     quality: "high" | "medium" | "low"
   ): void {
     if (!this.ctx || !field) {
-      // Fallback to hybrid rendering if no consciousness field
+      // Fallback to hybrid rendering if no visual effects state
       this.renderHybridParticle(particle, field, quality);
       return;
     }
 
-    // Organic size modulation
-    const organicSize =
-      BackgroundEventResponder.calculateBreathingModulation(
+    // Smooth size modulation
+    const smoothSize =
+      BackgroundEventResponder.calculatePulsingModulation(
         particle.currentSize,
-        particle.breathingPhase,
+        particle.animationPhase,
         0.2
       );
 
@@ -632,14 +632,14 @@ class ConsciousnessParticleRenderer {
     const colorTemp = 0.5 + flowIntensity * 0.5;
 
     if (quality === "high") {
-      // Organic gradient with consciousness colors
+      // Smooth gradient with visual effects colors
       const gradient = this.ctx.createRadialGradient(
         0,
         0,
         0,
         0,
         0,
-        organicSize
+        smoothSize
       );
       gradient.addColorStop(0, `hsl(${200 + colorTemp * 60}, 70%, 70%)`);
       gradient.addColorStop(0.5, `hsl(${200 + colorTemp * 60}, 50%, 50%)`);
@@ -651,7 +651,7 @@ class ConsciousnessParticleRenderer {
     }
 
     this.ctx.beginPath();
-    this.ctx.arc(0, 0, organicSize, 0, Math.PI * 2);
+    this.ctx.arc(0, 0, smoothSize, 0, Math.PI * 2);
     this.ctx.fill();
   }
 
@@ -664,19 +664,19 @@ class ConsciousnessParticleRenderer {
 }
 
 // ===================================================================
-// MAIN PARTICLE CONSCIOUSNESS MODULE
+// MAIN PARTICLE VISUAL EFFECTS MODULE
 // ===================================================================
 
 /**
- * Unified Particle Consciousness Module
+ * Unified Particle System Module
  * Consolidates LightweightParticleSystem and ParticleFieldSystem
  */
-export class ParticleConsciousnessModule
+export class UnifiedParticleSystem
   extends BaseVisualSystem
   implements BackgroundSystemParticipant
 {
   // Required BackgroundSystemParticipant implementation
-  public override readonly systemName: string = "ParticleConsciousnessModule";
+  public override readonly systemName: string = "UnifiedParticleSystem";
   public get systemPriority(): "low" | "normal" | "high" | "critical" {
     return "normal"; // Particles are normal priority for visual enhancement
   }
@@ -687,16 +687,16 @@ export class ParticleConsciousnessModule
 
   // Rendering and canvas management
   private canvasManager: SharedCanvasManager;
-  private renderer: ConsciousnessParticleRenderer;
+  private renderer: VisualParticleRenderer;
 
   // Configuration
   private performanceConfig: ParticlePerformanceConfig;
-  private consciousnessConfig: ParticleConsciousnessConfig;
+  private visualEffectsConfig: ParticleVisualConfig;
 
-  // Consciousness integration
-  private consciousnessChoreographer: BackgroundAnimationCoordinator | null =
+  // Visual effects integration
+  private visualEffectsCoordinator: BackgroundAnimationCoordinator | null =
     null;
-  private currentConsciousnessField: ConsciousnessField | null = null;
+  private currentVisualEffectsState: VisualEffectState | null = null;
 
   // Music synchronization
   private musicSyncBound: ((event: Event) => void) | null = null;
@@ -709,8 +709,8 @@ export class ParticleConsciousnessModule
   private averageFrameTime = 16.67; // Target 60fps
 
   constructor(
-    config: Year3000Config,
-    utils: typeof Year3000Utilities,
+    config: AdvancedSystemConfig | Year3000Config,
+    utils: typeof ThemeUtilities,
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
     settingsManager: SettingsManager | null = null,
@@ -718,28 +718,28 @@ export class ParticleConsciousnessModule
   ) {
     super(config, utils, performanceMonitor, musicSyncService, settingsManager);
 
-    // Get consciousness choreographer from year3000System if available
-    this.consciousnessChoreographer =
-      year3000System?.backgroundConsciousnessChoreographer || null;
+    // Get visual effects coordinator from year3000System if available
+    this.visualEffectsCoordinator =
+      year3000System?.backgroundVisualCoordinator || null;
 
     // Initialize shared canvas manager
     this.canvasManager = new SharedCanvasManager();
 
     // Initialize renderer
-    this.renderer = new ConsciousnessParticleRenderer(
+    this.renderer = new VisualParticleRenderer(
       this.canvasManager,
-      "sn-particle-consciousness-canvas"
+      "sn-particle-visual-effects-canvas"
     );
 
     // Initialize configurations
     this.performanceConfig = this.createPerformanceConfig();
-    this.consciousnessConfig = this.createConsciousnessConfig();
+    this.visualEffectsConfig = this.createVisualConfig();
 
     // Bind event handlers
     this.musicSyncBound = this.handleMusicSync.bind(this);
 
     Y3KDebug?.debug?.log(
-      "ParticleConsciousnessModule",
+      "UnifiedParticleSystem",
       "Unified particle system initialized"
     );
   }
@@ -754,17 +754,17 @@ export class ParticleConsciousnessModule
       // Subscribe to music sync events
       this.subscribeToMusicSync();
 
-      // Register with consciousness choreographer
-      this.registerWithConsciousnessChoreographer();
+      // Register with visual effects coordinator
+      this.registerWithVisualCoordinator();
 
       Y3KDebug?.debug?.log(
-        "ParticleConsciousnessModule",
-        "Particle consciousness system initialized successfully"
+        "UnifiedParticleSystem",
+        "Particle visual effects system initialized successfully"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "ParticleConsciousnessModule",
-        "Failed to initialize particle consciousness system:",
+        "UnifiedParticleSystem",
+        "Failed to initialize particle visual effects system:",
         error
       );
     }
@@ -774,9 +774,9 @@ export class ParticleConsciousnessModule
    * Create performance configuration based on device capabilities
    */
   private createPerformanceConfig(): ParticlePerformanceConfig {
-    // Get device capabilities from consciousness choreographer if available, otherwise use fallback
+    // Get device capabilities from visual effects coordinator if available, otherwise use fallback
     const capabilities =
-      this.consciousnessChoreographer?.getCurrentConsciousnessField()
+      this.visualEffectsCoordinator?.getCurrentVisualEffectsState()
         ?.deviceCapabilities || {
         memoryGB: 4,
         cpuCores: 4,
@@ -818,15 +818,15 @@ export class ParticleConsciousnessModule
   }
 
   /**
-   * Create consciousness configuration
+   * Create visual effects configuration
    */
-  private createConsciousnessConfig(): ParticleConsciousnessConfig {
+  private createVisualConfig(): ParticleVisualConfig {
     return {
-      enableOrganicFlow: true,
-      enableBreathingSynchronization: true,
+      enableSmoothFlow: true,
+      enablePulsingSynchronization: true,
       enableHarmonicResonance: true,
-      enableCellularGrowth: true,
-      consciousnessStrength: 0.7,
+      enableAnimationScaling: true,
+      visualEffectsStrength: 0.7,
       animationTransitionSpeed: 1.0,
     };
   }
@@ -845,7 +845,7 @@ export class ParticleConsciousnessModule
     }
 
     Y3KDebug?.debug?.log(
-      "ParticleConsciousnessModule",
+      "UnifiedParticleSystem",
       `Initialized particle pool with ${totalParticles} particles`
     );
   }
@@ -870,9 +870,9 @@ export class ParticleConsciousnessModule
       currentRotation: 0,
       targetRotation: 0,
       mode: "hybrid",
-      consciousnessResonance: Math.random(),
-      organicGrowthPhase: Math.random() * Math.PI * 2,
-      breathingPhase: Math.random() * Math.PI * 2,
+      visualEffectsResonance: Math.random(),
+      scalingAnimationPhase: Math.random() * Math.PI * 2,
+      animationPhase: Math.random() * Math.PI * 2,
       flowResonance: Math.random() * 0.5 + 0.25,
     };
   }
@@ -895,7 +895,7 @@ export class ParticleConsciousnessModule
   }
 
   /**
-   * Handle music sync events with consciousness awareness
+   * Handle music sync events with visualEffects awareness
    */
   private handleMusicSync(event: Event): void {
     const currentTime = performance.now();
@@ -949,7 +949,7 @@ export class ParticleConsciousnessModule
       if (particle.active) {
         // Apply beat pulse to target size
         const pulseMultiplier =
-          1 + intensity * particle.consciousnessResonance * 0.5;
+          1 + intensity * particle.visualEffectsResonance * 0.5;
         particle.targetSize = Math.min(
           particle.targetSize * pulseMultiplier,
           20
@@ -995,34 +995,34 @@ export class ParticleConsciousnessModule
         // Update color based on valence
         particle.color = `hsl(${colorTemp}, 70%, 70%)`;
 
-        // Valence affects organic growth patterns
-        particle.organicGrowthPhase += valence * 0.1;
+        // Valence affects scaling animation patterns
+        particle.scalingAnimationPhase += valence * 0.1;
       }
     });
   }
 
   /**
-   * Register with consciousness choreographer
+   * Register with visual effects coordinator
    */
-  private registerWithConsciousnessChoreographer(): void {
-    if (!this.consciousnessChoreographer) {
+  private registerWithVisualCoordinator(): void {
+    if (!this.visualEffectsCoordinator) {
       Y3KDebug?.debug?.log(
-        "ParticleConsciousnessModule",
-        "Consciousness choreographer not available, skipping registration"
+        "UnifiedParticleSystem",
+        "Visual effects coordinator not available, skipping registration"
       );
       return;
     }
 
     try {
-      this.consciousnessChoreographer.registerConsciousnessParticipant(this);
+      this.visualEffectsCoordinator.registerVisualEffectsParticipant(this);
       Y3KDebug?.debug?.log(
-        "ParticleConsciousnessModule",
-        "Successfully registered with consciousness choreographer"
+        "UnifiedParticleSystem",
+        "Successfully registered with visual effects coordinator"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "ParticleConsciousnessModule",
-        "Failed to register with consciousness choreographer:",
+        "UnifiedParticleSystem",
+        "Failed to register with visual effects coordinator:",
         error
       );
     }
@@ -1058,8 +1058,8 @@ export class ParticleConsciousnessModule
       case "hybrid":
         this.initializeHybridParticle(particle, intensity);
         break;
-      case "consciousness":
-        this.initializeConsciousnessParticle(particle, intensity);
+      case "visual-effects":
+        this.initializeVisualEffectsParticle(particle, intensity);
         break;
     }
 
@@ -1153,26 +1153,26 @@ export class ParticleConsciousnessModule
   }
 
   /**
-   * Initialize consciousness-enhanced particle
+   * Initialize visual-effects-enhanced particle
    */
-  private initializeConsciousnessParticle(
+  private initializeVisualEffectsParticle(
     particle: UnifiedParticle,
     intensity: number
   ): void {
     // Start with hybrid base
     this.initializeHybridParticle(particle, intensity);
 
-    // Enhanced consciousness properties
-    particle.consciousnessResonance = 0.7 + Math.random() * 0.3;
+    // Enhanced visual effects properties
+    particle.visualEffectsResonance = 0.7 + Math.random() * 0.3;
     particle.flowResonance = 0.6 + Math.random() * 0.4;
 
-    // Organic color variations
+    // Smooth color variations
     const hue = 180 + Math.random() * 120; // Blue to purple range
     particle.color = `hsl(${hue}, 60%, 65%)`;
 
-    // Enhanced organic growth phase
-    particle.organicGrowthPhase = Math.random() * Math.PI * 2;
-    particle.breathingPhase = Math.random() * Math.PI * 2 + Math.PI; // Offset from other particles
+    // Enhanced scaling animation phase
+    particle.scalingAnimationPhase = Math.random() * Math.PI * 2;
+    particle.animationPhase = Math.random() * Math.PI * 2 + Math.PI; // Offset from other particles
   }
 
   public override updateAnimation(deltaTime: number): void {
@@ -1182,7 +1182,7 @@ export class ParticleConsciousnessModule
     // Update particle lifecycle and physics
     this.updateParticles(deltaTime);
 
-    // Render particles with consciousness awareness
+    // Render particles with visual effects awareness
     this.renderParticles();
 
     // Clean up inactive particles
@@ -1207,13 +1207,13 @@ export class ParticleConsciousnessModule
       ) {
         this.performanceConfig.renderQuality = "medium";
         Y3KDebug?.debug?.log(
-          "ParticleConsciousnessModule",
+          "UnifiedParticleSystem",
           "Reduced render quality due to performance"
         );
       } else if (this.averageFrameTime > 25) {
         this.performanceConfig.renderQuality = "low";
         Y3KDebug?.debug?.log(
-          "ParticleConsciousnessModule",
+          "UnifiedParticleSystem",
           "Switched to low quality rendering"
         );
       } else if (
@@ -1247,8 +1247,8 @@ export class ParticleConsciousnessModule
       particle.x += particle.vx * dt * 0.016; // Normalize to 60fps
       particle.y += particle.vy * dt * 0.016;
 
-      // Apply consciousness field influence
-      this.applyConsciousnessInfluence(particle, dt);
+      // Apply visual effects state influence
+      this.applyVisualEffectsInfluence(particle, dt);
 
       // Smooth transitions towards targets
       this.updateParticleTransitions(particle, dt);
@@ -1259,54 +1259,54 @@ export class ParticleConsciousnessModule
   }
 
   /**
-   * Apply consciousness field influence to particle
+   * Apply visual effects state influence to particle
    */
-  private applyConsciousnessInfluence(
+  private applyVisualEffectsInfluence(
     particle: UnifiedParticle,
     deltaTime: number
   ): void {
     if (
-      !this.currentConsciousnessField ||
-      !this.consciousnessConfig.enableOrganicFlow
+      !this.currentVisualEffectsState ||
+      !this.visualEffectsConfig.enableSmoothFlow
     )
       return;
 
-    const field = this.currentConsciousnessField;
-    const strength = this.consciousnessConfig.consciousnessStrength;
+    const state = this.currentVisualEffectsState;
+    const strength = this.visualEffectsConfig.visualEffectsStrength;
 
     // Apply musical flow influence
-    if (this.consciousnessConfig.enableOrganicFlow) {
+    if (this.visualEffectsConfig.enableSmoothFlow) {
       const flowInfluence = particle.flowResonance * strength;
-      particle.vx += field.flowDirection.x * flowInfluence * 0.01;
-      particle.vy += field.flowDirection.y * flowInfluence * 0.01;
+      particle.vx += state.flowDirection.x * flowInfluence * 0.01;
+      particle.vy += state.flowDirection.y * flowInfluence * 0.01;
     }
 
-    // Apply breathing synchronization
-    if (this.consciousnessConfig.enableBreathingSynchronization) {
-      const breathingInfluence =
-        BackgroundEventResponder.calculateBreathingModulation(
+    // Apply pulsing synchronization
+    if (this.visualEffectsConfig.enablePulsingSynchronization) {
+      const animationInfluence =
+        BackgroundEventResponder.calculatePulsingModulation(
           1.0,
-          field.pulseRate + particle.breathingPhase,
+          state.pulseRate + particle.animationPhase,
           0.1
         );
-      particle.targetSize *= breathingInfluence;
+      particle.targetSize *= animationInfluence;
     }
 
-    // Apply cellular growth
-    if (this.consciousnessConfig.enableCellularGrowth) {
-      const growthPhase =
-        particle.organicGrowthPhase + field.energyLevel;
-      const growthInfluence = Math.sin(growthPhase) * 0.05 + 1.0;
-      particle.targetSize *= growthInfluence;
-      particle.organicGrowthPhase = growthPhase;
+    // Apply animation scaling
+    if (this.visualEffectsConfig.enableAnimationScaling) {
+      const scalingPhase =
+        particle.scalingAnimationPhase + state.energyLevel;
+      const scalingInfluence = Math.sin(scalingPhase) * 0.05 + 1.0;
+      particle.targetSize *= scalingInfluence;
+      particle.scalingAnimationPhase = scalingPhase;
     }
 
     // Apply rhythmic pulse
     const rhythmicInfluence =
       BackgroundEventResponder.calculateRhythmicResponse(
         1.0,
-        field.pulseRate,
-        particle.consciousnessResonance
+        state.pulseRate,
+        particle.visualEffectsResonance
       );
     particle.targetOpacity *= rhythmicInfluence;
   }
@@ -1319,7 +1319,7 @@ export class ParticleConsciousnessModule
     deltaTime: number
   ): void {
     const transitionSpeed =
-      this.consciousnessConfig.animationTransitionSpeed * 0.002;
+      this.visualEffectsConfig.animationTransitionSpeed * 0.002;
     const dt = deltaTime * transitionSpeed;
 
     // Smooth size transitions
@@ -1362,12 +1362,12 @@ export class ParticleConsciousnessModule
   }
 
   /**
-   * Render all particles with consciousness awareness
+   * Render all particles with visual effects awareness
    */
   private renderParticles(): void {
     this.renderer.render(
       this.activeParticles,
-      this.currentConsciousnessField,
+      this.currentVisualEffectsState,
       this.performanceConfig
     );
   }
@@ -1383,12 +1383,12 @@ export class ParticleConsciousnessModule
   // BACKGROUND SYSTEM PARTICIPANT INTERFACE IMPLEMENTATION
   // ===================================================================
 
-  public getConsciousnessContribution(): any {
+  public getVisualContribution(): any {
     return {
       particleDensity:
         this.activeParticles.length / this.performanceConfig.maxParticles,
       energyContribution: this.averageParticleEnergy(),
-      organicFlowContribution: this.calculateOrganicFlowContribution(),
+      smoothFlowContribution: this.calculateSmoothFlowContribution(),
       renderingLoad:
         this.performanceConfig.renderQuality === "high"
           ? 1.0
@@ -1398,91 +1398,91 @@ export class ParticleConsciousnessModule
     };
   }
 
-  public onConsciousnessFieldUpdate(field: ConsciousnessField): void {
+  public onVisualStateUpdate(state: VisualEffectState): void {
     try {
-      this.currentConsciousnessField = field;
+      this.currentVisualEffectsState = state;
 
-      // Update particle behaviors based on consciousness field
-      this.adaptToConsciousnessField(field);
+      // Update particle behaviors based on visual effects state
+      this.adaptToVisualEffectsState(state);
 
       Y3KDebug?.debug?.log(
-        "ParticleConsciousnessModule",
-        "Updated from consciousness field:",
+        "UnifiedParticleSystem",
+        "Updated from visual effects state:",
         {
-          rhythmicPulse: field.pulseRate,
+          rhythmicPulse: state.pulseRate,
           particleCount: this.activeParticles.length,
           renderQuality: this.performanceConfig.renderQuality,
         }
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "ParticleConsciousnessModule",
-        "Error updating from consciousness field:",
+        "UnifiedParticleSystem",
+        "Error updating from visual effects state:",
         error
       );
     }
   }
 
-  public onChoreographyEvent(eventType: string, payload: any): void {
+  public onVisualEffectEvent(eventType: string, payload: any): void {
     try {
       switch (eventType) {
-        case "choreography:rhythm-shift":
+        case "coordination:rhythm-shift":
           this.handleRhythmShift(payload);
           break;
 
-        case "choreography:energy-surge":
+        case "coordination:energy-surge":
           this.handleEnergySurge(payload);
           break;
 
-        case "consciousness:breathing-cycle":
-          this.handleBreathingCycle(payload);
+        case "visual-effects:pulsing-cycle":
+          this.handlePulsingCycle(payload);
           break;
 
-        case "consciousness:cellular-growth":
-          this.handleCellularGrowth(payload);
+        case "visual-effects:animation-scaling":
+          this.handleAnimationScaling(payload);
           break;
 
-        case "consciousness:performance-adapt":
+        case "visual-effects:performance-adapt":
           this.handlePerformanceAdapt(payload);
           break;
       }
 
       Y3KDebug?.debug?.log(
-        "ParticleConsciousnessModule",
-        `Handled choreography event: ${eventType}`,
+        "UnifiedParticleSystem",
+        `Handled visual effect event: ${eventType}`,
         payload
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "ParticleConsciousnessModule",
-        `Error handling choreography event ${eventType}:`,
+        "UnifiedParticleSystem",
+        `Error handling visual effect event ${eventType}:`,
         error
       );
     }
   }
 
   /**
-   * Adapt particle system to consciousness field changes
+   * Adapt particle system to visual effects state changes
    */
-  private adaptToConsciousnessField(field: ConsciousnessField): void {
+  private adaptToVisualEffectsState(state: VisualEffectState): void {
     // Adapt particle density based on energy resonance
     const targetParticleCount = Math.floor(
-      this.performanceConfig.maxParticles * (0.3 + field.energyLevel * 0.7)
+      this.performanceConfig.maxParticles * (0.3 + state.energyLevel * 0.7)
     );
 
     // Spawn more particles if needed
     while (this.activeParticles.length < targetParticleCount) {
-      const mode = field.fluidIntensity > 0.7 ? "consciousness" : "hybrid";
-      this.spawnParticle(mode, field.pulseRate);
+      const mode = state.fluidIntensity > 0.7 ? "visual-effects" : "hybrid";
+      this.spawnParticle(mode, state.pulseRate);
     }
 
-    // Update existing particles with field influence
+    // Update existing particles with state influence
     this.activeParticles.forEach((particle) => {
       if (particle.active) {
-        // Update consciousness resonance based on field
-        particle.consciousnessResonance = Math.min(
+        // Update visual effects resonance based on state
+        particle.visualEffectsResonance = Math.min(
           1.0,
-          particle.consciousnessResonance + field.energyLevel * 0.1
+          particle.visualEffectsResonance + state.energyLevel * 0.1
         );
       }
     });
@@ -1521,7 +1521,7 @@ export class ParticleConsciousnessModule
     // Spawn additional particles during energy surges
     const surgeParticleCount = Math.floor(surgeIntensity * 10);
     for (let i = 0; i < surgeParticleCount; i++) {
-      this.spawnParticle("consciousness", surgeIntensity);
+      this.spawnParticle("visual-effects", surgeIntensity);
     }
 
     // Enhance existing particle effects
@@ -1540,42 +1540,42 @@ export class ParticleConsciousnessModule
   }
 
   /**
-   * Handle breathing cycle events
+   * Handle pulsing cycle events
    */
-  private handleBreathingCycle(payload: any): void {
-    const breathingPhase = payload.phase || 0;
-    const breathingIntensity = payload.intensity || 0.5;
+  private handlePulsingCycle(payload: any): void {
+    const pulsingPhase = payload.phase || 0;
+    const pulsingIntensity = payload.intensity || 0.5;
 
-    // Synchronize all particles with breathing cycle
+    // Synchronize all particles with pulsing cycle
     this.activeParticles.forEach((particle) => {
       if (particle.active) {
-        particle.breathingPhase =
-          breathingPhase + particle.consciousnessResonance * Math.PI;
-        const breathingEffect = ChoreographyEventResponder.handleBreathingCycle(
+        particle.animationPhase =
+          pulsingPhase + particle.visualEffectsResonance * Math.PI;
+        const pulsingEffect = ChoreographyEventResponder.handlePulsingCycle(
           1.0,
-          breathingPhase,
-          breathingIntensity
+          pulsingPhase,
+          pulsingIntensity
         );
-        particle.targetSize *= breathingEffect;
+        particle.targetSize *= pulsingEffect;
       }
     });
   }
 
   /**
-   * Handle cellular growth events
+   * Handle animation scaling events
    */
-  private handleCellularGrowth(payload: any): void {
-    const growthRate = payload.growthRate || 1.0;
+  private handleAnimationScaling(payload: any): void {
+    const scalingRate = payload.scalingRate || 1.0;
 
-    // Apply cellular growth to particle organic growth phases
+    // Apply animation scaling to particle scaling animation phases
     this.activeParticles.forEach((particle) => {
       if (particle.active) {
-        particle.organicGrowthPhase += growthRate * 0.1;
+        particle.scalingAnimationPhase += scalingRate * 0.1;
 
-        // Organic growth affects size and opacity
-        const growthInfluence =
-          Math.sin(particle.organicGrowthPhase) * 0.2 + 1.0;
-        particle.targetSize *= growthInfluence;
+        // Animation scaling affects size and opacity
+        const scalingInfluence =
+          Math.sin(particle.scalingAnimationPhase) * 0.2 + 1.0;
+        particle.targetSize *= scalingInfluence;
       }
     });
   }
@@ -1606,7 +1606,7 @@ export class ParticleConsciousnessModule
     this.performanceConfig.frameRateTarget = newMode.frameRate || 60;
 
     Y3KDebug?.debug?.log(
-      "ParticleConsciousnessModule",
+      "UnifiedParticleSystem",
       `Adapted to performance mode: ${newMode.name}`,
       {
         quality: this.performanceConfig.renderQuality,
@@ -1620,7 +1620,7 @@ export class ParticleConsciousnessModule
   // ===================================================================
 
   /**
-   * Calculate average particle energy for consciousness contribution
+   * Calculate average particle energy for visual effects contribution
    */
   private averageParticleEnergy(): number {
     if (this.activeParticles.length === 0) return 0;
@@ -1630,7 +1630,7 @@ export class ParticleConsciousnessModule
         sum +
         particle.currentSize *
           particle.currentOpacity *
-          particle.consciousnessResonance
+          particle.visualEffectsResonance
       );
     }, 0);
 
@@ -1638,9 +1638,9 @@ export class ParticleConsciousnessModule
   }
 
   /**
-   * Calculate organic flow contribution for consciousness field
+   * Calculate smooth flow contribution for visual effects state
    */
-  private calculateOrganicFlowContribution(): { x: number; y: number } {
+  private calculateSmoothFlowContribution(): { x: number; y: number } {
     if (this.activeParticles.length === 0) return { x: 0, y: 0 };
 
     const flowVector = this.activeParticles.reduce(
@@ -1678,27 +1678,27 @@ export class ParticleConsciousnessModule
         `Particles: ${activeCount}/${this.performanceConfig.maxParticles}, ` +
         `Pool: ${poolCount}, Quality: ${renderQuality}, ` +
         `Avg Frame: ${avgFrameTime.toFixed(1)}ms`,
-      system: "ParticleConsciousnessModule",
+      system: "UnifiedParticleSystem",
     };
   }
 
   public override _performSystemSpecificCleanup(): void {
     super._performSystemSpecificCleanup();
 
-    // Unregister from consciousness choreographer
-    if (this.consciousnessChoreographer) {
+    // Unregister from visual effects coordinator
+    if (this.visualEffectsCoordinator) {
       try {
-        this.consciousnessChoreographer.unregisterConsciousnessParticipant(
-          "ParticleConsciousnessModule"
+        this.visualEffectsCoordinator.unregisterVisualEffectsParticipant(
+          "UnifiedParticleSystem"
         );
         Y3KDebug?.debug?.log(
-          "ParticleConsciousnessModule",
-          "Unregistered from consciousness choreographer"
+          "UnifiedParticleSystem",
+          "Unregistered from visual effects coordinator"
         );
       } catch (error) {
         Y3KDebug?.debug?.error(
-          "ParticleConsciousnessModule",
-          "Error unregistering from consciousness choreographer:",
+          "UnifiedParticleSystem",
+          "Error unregistering from visual effects coordinator:",
           error
         );
       }
@@ -1727,7 +1727,7 @@ export class ParticleConsciousnessModule
     this.canvasManager.cleanup();
 
     Y3KDebug?.debug?.log(
-      "ParticleConsciousnessModule",
+      "UnifiedParticleSystem",
       "System cleanup completed"
     );
   }
@@ -1748,7 +1748,7 @@ export class ParticleConsciousnessModule
     // Map to new API
     const mode: ParticleMode =
       energy > 0.7
-        ? "consciousness"
+        ? "visual-effects"
         : intensity > 0.6
         ? "hybrid"
         : "lightweight";
@@ -1784,34 +1784,20 @@ export class ParticleConsciousnessModule
     total: number;
     renderQuality: string;
     avgFrameTime: number;
-    consciousnessIntegration: boolean;
+    visualEffectsIntegration: boolean;
   } {
     return {
       active: this.activeParticles.length,
       total: this.performanceConfig.maxParticles,
       renderQuality: this.performanceConfig.renderQuality,
       avgFrameTime: this.averageFrameTime,
-      consciousnessIntegration: this.currentConsciousnessField !== null,
+      visualEffectsIntegration: this.currentVisualEffectsState !== null,
     };
   }
 
   // =========================================================================
-  // BACKGROUND SYSTEM PARTICIPANT INTERFACE
+  // BACKGROUND SYSTEM PARTICIPANT INTERFACE COMPATIBILITY
   // =========================================================================
 
-  public onVisualStateUpdate(state: ConsciousnessField): void {
-    this.onConsciousnessFieldUpdate(state);
-  }
-
-  public onVisualEffectEvent(eventType: string, payload: any): void {
-    this.onChoreographyEvent(eventType, payload);
-  }
-
-  public getVisualContribution(): Partial<ConsciousnessField> {
-    return {
-      fluidIntensity: this.activeParticles.length / this.performanceConfig.maxParticles,
-      energyLevel: 0.5,
-      visualCoherence: this.averageFrameTime < 16.67 ? 1.0 : 0.5
-    };
-  }
+  // Note: Main interface methods are implemented above, these are for compatibility
 }

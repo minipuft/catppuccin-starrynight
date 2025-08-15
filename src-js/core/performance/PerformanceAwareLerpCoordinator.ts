@@ -12,7 +12,7 @@
  * - Device-capability aware LERP parameter adjustment
  */
 
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 // QualityScalingManager and AdaptivePerformanceSystem functionality consolidated into SimplePerformanceCoordinator (Phase 3)
@@ -206,7 +206,7 @@ export class PerformanceAwareLerpCoordinator implements IManagedSystem {
     this.currentLerpParams = this.qualityTierConfigs.get("medium")!;
     this.performanceMetrics = this.createDefaultMetrics();
 
-    if (YEAR3000_CONFIG.enableDebug) {
+    if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
       Y3KDebug?.debug?.log(
         "PerformanceAwareLerpCoordinator",
         "Performance-aware LERP coordinator initialized"
@@ -237,7 +237,7 @@ export class PerformanceAwareLerpCoordinator implements IManagedSystem {
       //   availableTiers: Array.from(this.qualityTierConfigs.keys()),
       // });
 
-      if (YEAR3000_CONFIG.enableDebug) {
+      if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
         Y3KDebug?.debug?.log(
           "PerformanceAwareLerpCoordinator",
           "Performance-aware LERP coordination fully initialized"
@@ -302,7 +302,7 @@ export class PerformanceAwareLerpCoordinator implements IManagedSystem {
 
     this.initialized = false;
 
-    if (YEAR3000_CONFIG.enableDebug) {
+    if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
       Y3KDebug?.debug?.log(
         "PerformanceAwareLerpCoordinator",
         "Performance-aware LERP coordinator destroyed"
@@ -396,7 +396,7 @@ export class PerformanceAwareLerpCoordinator implements IManagedSystem {
   public setSimplePerformanceCoordinator(orchestrator: any): void {
     this.performanceOrchestrator = orchestrator;
 
-    if (YEAR3000_CONFIG.enableDebug) {
+    if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
       Y3KDebug?.debug?.log(
         "PerformanceAwareLerpCoordinator",
         "Integrated with consolidated SimplePerformanceCoordinator"
@@ -440,7 +440,7 @@ export class PerformanceAwareLerpCoordinator implements IManagedSystem {
         this.updatePerformanceState(performanceContext);
       }
     } catch (error) {
-      if (YEAR3000_CONFIG.enableDebug) {
+      if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
         Y3KDebug?.debug?.warn(
           "PerformanceAwareLerpCoordinator",
           "Failed to sync with orchestrator:",
@@ -464,7 +464,7 @@ export class PerformanceAwareLerpCoordinator implements IManagedSystem {
     // Immediately adapt LERP parameters to new performance state
     this.adaptLerpParameters();
 
-    if (YEAR3000_CONFIG.enableDebug) {
+    if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
       Y3KDebug?.debug?.log(
         "PerformanceAwareLerpCoordinator",
         "Performance state updated",
@@ -634,7 +634,7 @@ export class PerformanceAwareLerpCoordinator implements IManagedSystem {
     this.performanceMetrics.qualityReductions++;
     this.lastQualityAdjustment = performance.now();
 
-    if (YEAR3000_CONFIG.enableDebug) {
+    if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
       Y3KDebug?.debug?.warn(
         "PerformanceAwareLerpCoordinator",
         "Reduced LERP quality for performance",
@@ -688,7 +688,7 @@ export class PerformanceAwareLerpCoordinator implements IManagedSystem {
     this.performanceMetrics.performanceRecoveries++;
     this.lastQualityAdjustment = performance.now();
 
-    if (YEAR3000_CONFIG.enableDebug) {
+    if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
       Y3KDebug?.debug?.log(
         "PerformanceAwareLerpCoordinator",
         "Increased LERP quality",
@@ -908,7 +908,7 @@ export class PerformanceAwareLerpCoordinator implements IManagedSystem {
     this.currentPerformanceContext.thermalState = "hot";
     this.adaptLerpParameters();
 
-    if (YEAR3000_CONFIG.enableDebug) {
+    if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
       Y3KDebug?.debug?.warn(
         "PerformanceAwareLerpCoordinator",
         "Thermal warning - adapting LERP performance"

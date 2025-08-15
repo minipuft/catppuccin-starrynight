@@ -8,7 +8,7 @@
  * @performance Optimized for typical usage patterns
  */
 
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import { createOptimizedCanvas, detectRenderingCapabilities, type CanvasResult, type CanvasContextType } from "@/utils/graphics/VisualCanvasFactory";
 import type {
@@ -35,7 +35,7 @@ export class DefaultSystemLifecycleService implements SystemLifecycleService {
 
   async initializeSystem(
     systemName: string,
-    config: Year3000Config,
+    config: AdvancedSystemConfig | Year3000Config,
     initFn: () => Promise<void>
   ): Promise<void> {
     const existing = this.systems.get(systemName);

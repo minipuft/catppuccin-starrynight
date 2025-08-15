@@ -1,38 +1,38 @@
 /* ████████████████████████████████████████████████████████████████████████████████*/
-/* SIDEBAR CONSCIOUSNESS FLOWS MODULE*/
-/* Year 3000 Bilateral Consciousness & Liquid Awareness Styling*/
+/* SIDEBAR ANIMATION FLOWS MODULE*/
+/* Year 3000 Bilateral Visual Effects & Smooth Animation Styling*/
 /* ████████████████████████████████████████████████████████████████████████████████*/
 /**/
-/* This module contains all styles for the bilateral consciousness flow system.*/
+/* This module contains all styles for the bilateral visual effects flow system.*/
 /* It provides dynamic visual effects that respond to:*/
-/* - Bilateral consciousness states (anticipatory, reflective, synchronized)*/
-/* - Liquid consciousness flow direction and intensity*/
+/* - Bilateral visual states (anticipatory, reflective, synchronized)*/
+/* - Smooth animation flow direction and intensity*/
 /* - Music energy levels and harmonic resonance*/
 /* - Real-time spatial navigation depth*/
 /**/
 /* Enhanced for Year 3000 vision with:*/
 /* - Emergent systems choreography*/
-/* - Consciousness-aware interfaces*/
+/* - Visual-effects-aware interfaces*/
 /* - Temporal flow states*/
 /* - Aesthetic gravity fields*/
 /**/
 /* Dependencies:*/
 /* - Enhanced CSS variables from SidebarSystemsIntegration*/
 /* - UnifiedCSSVariableManager batching system*/
-/* - Bilateral consciousness timing coordination*/
+/* - Bilateral visual effects timing coordination*/
 /**/
 /* ████████████████████████████████████████████████████████████████████████████████*/
 @use "../core/_mixins" as *;
 
 :root {
-  /* === BILATERAL CONSCIOUSNESS CORE VARIABLES ===*/
-  --sidebar-consciousness-state: "aware"; /* "dormant" | "aware" | "focused" | "transcendent" */
+  /* === BILATERAL VISUAL EFFECTS CORE VARIABLES ===*/
+  --sidebar-visual-effects-state: "active"; /* "dormant" | "active" | "focused" | "enhanced" */
   --sidebar-music-intensity: 0.5; /* 0-1 real-time music energy */
   --sidebar-spatial-depth: 0; /* 0-4 current dimensional layer */
   --sidebar-flow-direction: 0deg; /* 0-360deg directional flow based on audio */
   
-  /* === LIQUID CONSCIOUSNESS FLOW VARIABLES ===*/
-  --sidebar-flow-viscosity: 0.7; /* 0-1 liquid consciousness parameter */
+  /* === SMOOTH ANIMATION FLOW VARIABLES ===*/
+  --sidebar-flow-fluidity: 0.7; /* 0-1 smooth animation parameter */
   --sidebar-flow-velocity: 100; /* pixels per second flow speed */
   --sidebar-flow-intensity: 0.5; /* 0-1 overall flow strength */
   --sidebar-flow-turbulence: 0.1; /* 0-1 natural flow variation */
@@ -42,15 +42,15 @@
   --sidebar-right-timing-offset: 150ms; /* Reflective timing */
   --sidebar-bilateral-sync-rate: 1000ms; /* Synchronization frequency */
   
-  /* === CONSCIOUSNESS FLOW GRADIENTS ===*/
-  --sidebar-consciousness-gradient-primary: linear-gradient(
+  /* === VISUAL EFFECTS FLOW GRADIENTS ===*/
+  --sidebar-visual-effects-gradient-primary: linear-gradient(
     var(--sidebar-flow-direction, 0deg),
     rgba(var(--spice-rgb-accent, 203, 214, 244), var(--sidebar-flow-intensity, 0.5)) 0%,
     rgba(var(--spice-rgb-accent, 203, 214, 244), calc(var(--sidebar-flow-intensity, 0.5) * 0.3)) 50%,
     transparent 100%
   );
   
-  --sidebar-consciousness-gradient-secondary: radial-gradient(
+  --sidebar-visual-effects-gradient-secondary: radial-gradient(
     ellipse at var(--sidebar-spatial-depth, 0%) 50%,
     rgba(var(--spice-rgb-player, 24, 24, 37), var(--sidebar-music-intensity, 0.5)) 0%,
     rgba(var(--spice-rgb-player, 24, 24, 37), calc(var(--sidebar-music-intensity, 0.5) * 0.6)) 40%,
@@ -64,11 +64,11 @@
   --sidebar-depth-layer-3: translateZ(-150px) scale(0.85); /* Background items */
   --sidebar-depth-layer-4: translateZ(-200px) scale(0.8); /* Deep background */
   
-  /* === CONSCIOUSNESS STATE MULTIPLIERS ===*/
-  --consciousness-dormant-multiplier: 0.3;
-  --consciousness-aware-multiplier: 0.7;
-  --consciousness-focused-multiplier: 0.9;
-  --consciousness-transcendent-multiplier: 1.0;
+  /* === VISUAL EFFECTS STATE MULTIPLIERS ===*/
+  --visual-effects-dormant-multiplier: 0.3;
+  --visual-effects-active-multiplier: 0.7;
+  --visual-effects-focused-multiplier: 0.9;
+  --visual-effects-enhanced-multiplier: 1.0;
   
   /* === PERFORMANCE-AWARE VARIABLES ===*/
   --sidebar-animation-quality: 1; /* 0-1 quality scaling based on performance */
@@ -77,21 +77,21 @@
 }
 
 /* ============================================================================ */
-/* BILATERAL CONSCIOUSNESS STATES */
+/* BILATERAL VISUAL EFFECTS STATES */
 /* ============================================================================ */
 
-/* Base bilateral consciousness container */
-.bilateral-consciousness-container {
+/* Base bilateral visual effects container */
+.bilateral-visual-effects-container {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
   contain: layout style paint;
   
-  /* Consciousness flow background */
+  /* Visual effects flow background */
   background: 
-    var(--sidebar-consciousness-gradient-primary),
-    var(--sidebar-consciousness-gradient-secondary);
+    var(--sidebar-visual-effects-gradient-primary),
+    var(--sidebar-visual-effects-gradient-secondary);
   background-attachment: fixed;
   background-size: 
     200% 100%,
@@ -103,16 +103,16 @@
     opacity var(--sidebar-bilateral-sync-rate, 1000ms) ease-out;
   
   /* Flow direction animation */
-  animation: consciousness-flow-cycle 
+  animation: visual-effects-flow-cycle 
     calc(60s / max(var(--sidebar-flow-velocity, 100), 10)) 
     infinite linear;
 }
 
-/* Left sidebar anticipatory consciousness */
-.bilateral-consciousness-container.sidebar-left {
+/* Left sidebar anticipatory visual effects */
+.bilateral-visual-effects-container.sidebar-left {
   animation-delay: var(--sidebar-left-timing-offset, -150ms);
   
-  .consciousness-flow {
+  .visual-effects-flow {
     transform-origin: left center;
     animation: anticipatory-flow 
       calc(2s + var(--sidebar-music-intensity, 0.5) * 1s) 
@@ -120,11 +120,11 @@
   }
 }
 
-/* Right sidebar reflective consciousness */
-.bilateral-consciousness-container.sidebar-right {
+/* Right sidebar reflective visual effects */
+.bilateral-visual-effects-container.sidebar-right {
   animation-delay: var(--sidebar-right-timing-offset, 150ms);
   
-  .consciousness-flow {
+  .visual-effects-flow {
     transform-origin: right center;
     animation: reflective-flow 
       calc(2s + var(--sidebar-music-intensity, 0.5) * 1s) 
@@ -133,31 +133,31 @@
 }
 
 /* ============================================================================ */
-/* CONSCIOUSNESS STATE VARIATIONS */
+/* VISUAL EFFECTS STATE VARIATIONS */
 /* ============================================================================ */
 
 /* Dormant state - minimal activity */
-.bilateral-consciousness-container[data-consciousness-state="dormant"] {
-  --sidebar-flow-intensity: calc(0.2 * var(--consciousness-dormant-multiplier, 0.3));
-  --sidebar-flow-velocity: calc(50 * var(--consciousness-dormant-multiplier, 0.3));
+.bilateral-visual-effects-container[data-visual-effects-state="dormant"] {
+  --sidebar-flow-intensity: calc(0.2 * var(--visual-effects-dormant-multiplier, 0.3));
+  --sidebar-flow-velocity: calc(50 * var(--visual-effects-dormant-multiplier, 0.3));
   
   filter: grayscale(0.7) brightness(0.6);
   opacity: 0.4;
 }
 
-/* Aware state - normal activity */
-.bilateral-consciousness-container[data-consciousness-state="aware"] {
-  --sidebar-flow-intensity: calc(0.5 * var(--consciousness-aware-multiplier, 0.7));
-  --sidebar-flow-velocity: calc(100 * var(--consciousness-aware-multiplier, 0.7));
+/* Active state - normal activity */
+.bilateral-visual-effects-container[data-visual-effects-state="active"] {
+  --sidebar-flow-intensity: calc(0.5 * var(--visual-effects-active-multiplier, 0.7));
+  --sidebar-flow-velocity: calc(100 * var(--visual-effects-active-multiplier, 0.7));
   
   filter: none;
   opacity: 0.8;
 }
 
 /* Focused state - enhanced activity */
-.bilateral-consciousness-container[data-consciousness-state="focused"] {
-  --sidebar-flow-intensity: calc(0.8 * var(--consciousness-focused-multiplier, 0.9));
-  --sidebar-flow-velocity: calc(150 * var(--consciousness-focused-multiplier, 0.9));
+.bilateral-visual-effects-container[data-visual-effects-state="focused"] {
+  --sidebar-flow-intensity: calc(0.8 * var(--visual-effects-focused-multiplier, 0.9));
+  --sidebar-flow-velocity: calc(150 * var(--visual-effects-focused-multiplier, 0.9));
   
   filter: contrast(1.1) brightness(1.1);
   opacity: 1.0;
@@ -166,25 +166,25 @@
   box-shadow: inset 0 0 20px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.2);
 }
 
-/* Transcendent state - maximum activity */
-.bilateral-consciousness-container[data-consciousness-state="transcendent"] {
-  --sidebar-flow-intensity: calc(1.0 * var(--consciousness-transcendent-multiplier, 1.0));
-  --sidebar-flow-velocity: calc(200 * var(--consciousness-transcendent-multiplier, 1.0));
+/* Enhanced state - maximum activity */
+.bilateral-visual-effects-container[data-visual-effects-state="enhanced"] {
+  --sidebar-flow-intensity: calc(1.0 * var(--visual-effects-enhanced-multiplier, 1.0));
+  --sidebar-flow-velocity: calc(200 * var(--visual-effects-enhanced-multiplier, 1.0));
   
   filter: contrast(1.2) brightness(1.2) saturate(1.3);
   opacity: 1.0;
   
-  /* Transcendent aura effect */
+  /* Enhanced aura effect */
   box-shadow: 
     inset 0 0 30px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.4),
     0 0 50px rgba(var(--spice-rgb-accent, 203, 214, 244), 0.2);
 }
 
 /* ============================================================================ */
-/* LIQUID CONSCIOUSNESS FLOW EFFECTS */
+/* SMOOTH VISUAL EFFECTS FLOW EFFECTS */
 /* ============================================================================ */
 
-.consciousness-flow {
+.visual-effects-flow {
   position: absolute;
   top: 0;
   left: 0;
@@ -193,8 +193,9 @@
   pointer-events: none;
   z-index: -1;
   
-  /* Liquid viscosity effect */
-  filter: blur(calc(2px * (1 - var(--sidebar-flow-viscosity, 0.7))));
+  /* Smooth fluidity effect */
+  filter: blur(calc(2px * (1 - var(--sidebar-flow-fluidity, 0.7))));
+
   
   /* Flow field background */
   background: 
@@ -206,7 +207,7 @@
     );
   
   /* Turbulence variation */
-  animation: liquid-turbulence 
+  animation: smooth-turbulence 
     calc(10s / max(var(--sidebar-flow-turbulence, 0.1), 0.01)) 
     infinite ease-in-out;
 }
@@ -237,7 +238,7 @@
 /* MUSIC-RESPONSIVE FLOW ANIMATIONS */
 /* ============================================================================ */
 
-@keyframes consciousness-flow-cycle {
+@keyframes visual-effects-flow-cycle {
   0% {
     background-position: 0% 0%, 0% 0%;
     transform: rotate(var(--sidebar-flow-direction, 0deg));
@@ -286,21 +287,21 @@
   }
 }
 
-@keyframes liquid-turbulence {
+@keyframes smooth-turbulence {
   0%, 100% {
-    filter: blur(calc(2px * (1 - var(--sidebar-flow-viscosity, 0.7)))) 
+    filter: blur(calc(2px * (1 - var(--sidebar-flow-fluidity, 0.7)))) 
            hue-rotate(0deg);
   }
   25% {
-    filter: blur(calc(1px * (1 - var(--sidebar-flow-viscosity, 0.7)))) 
+    filter: blur(calc(1px * (1 - var(--sidebar-flow-fluidity, 0.7)))) 
            hue-rotate(5deg);
   }
   50% {
-    filter: blur(calc(3px * (1 - var(--sidebar-flow-viscosity, 0.7)))) 
+    filter: blur(calc(3px * (1 - var(--sidebar-flow-fluidity, 0.7)))) 
            hue-rotate(-3deg);
   }
   75% {
-    filter: blur(calc(1.5px * (1 - var(--sidebar-flow-viscosity, 0.7)))) 
+    filter: blur(calc(1.5px * (1 - var(--sidebar-flow-fluidity, 0.7)))) 
            hue-rotate(8deg);
   }
 }
@@ -311,23 +312,23 @@
 
 /* Reduced motion preference support */
 @media (prefers-reduced-motion: reduce) {
-  .bilateral-consciousness-container,
-  .consciousness-flow,
+  .bilateral-visual-effects-container,
+  .visual-effects-flow,
   .sidebar-spatial-layer {
     animation: none !important;
     transition: opacity 0.3s ease-out !important;
   }
   
-  .consciousness-flow {
+  .visual-effects-flow {
     filter: none !important;
   }
 }
 
 /* Performance mode optimizations */
-.bilateral-consciousness-container[data-optimization-mode="performance"] {
+.bilateral-visual-effects-container[data-optimization-mode="performance"] {
   --sidebar-animation-quality: 0.5;
   
-  .consciousness-flow {
+  .visual-effects-flow {
     filter: none;
     animation: none;
   }
@@ -338,12 +339,12 @@
 }
 
 /* High-end quality mode */
-.bilateral-consciousness-container[data-optimization-mode="quality"] {
+.bilateral-visual-effects-container[data-optimization-mode="quality"] {
   --sidebar-animation-quality: 1;
   
-  .consciousness-flow {
+  .visual-effects-flow {
     background-size: 400% 400%;
-    filter: blur(calc(2px * (1 - var(--sidebar-flow-viscosity, 0.7)))) 
+    filter: blur(calc(2px * (1 - var(--sidebar-flow-fluidity, 0.7)))) 
            contrast(1.1);
   }
 }
@@ -354,12 +355,12 @@
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-  .bilateral-consciousness-container {
+  .bilateral-visual-effects-container {
     --sidebar-flow-intensity: 0.8;
     filter: contrast(1.5);
   }
   
-  .consciousness-flow {
+  .visual-effects-flow {
     opacity: 0.9;
   }
 }
@@ -367,7 +368,7 @@
 /* Dark mode enhancements */
 @media (prefers-color-scheme: dark) {
   :root {
-    --sidebar-consciousness-gradient-primary: linear-gradient(
+    --sidebar-visual-effects-gradient-primary: linear-gradient(
       var(--sidebar-flow-direction, 0deg),
       rgba(var(--spice-rgb-accent, 203, 214, 244), calc(var(--sidebar-flow-intensity, 0.5) * 0.7)) 0%,
       rgba(var(--spice-rgb-accent, 203, 214, 244), calc(var(--sidebar-flow-intensity, 0.5) * 0.2)) 50%,
@@ -378,8 +379,8 @@
 
 /* Print styles */
 @media print {
-  .bilateral-consciousness-container,
-  .consciousness-flow {
+  .bilateral-visual-effects-container,
+  .visual-effects-flow {
     display: none !important;
   }
 }

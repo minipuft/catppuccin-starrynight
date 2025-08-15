@@ -1,11 +1,11 @@
 /**
- * BreathingEffectsController - Smooth Breathing Animation System
+ * AnimationEffectsController - Smooth Animation System
  * 
- * Provides gentle breathing animations for visual enhancement during calm musical moments.
- * Creates natural breathing effects synchronized with music tempo and intensity for meditative experience.
+ * Provides gentle animations for visual enhancement during calm musical moments.
+ * Creates natural animation effects synchronized with music tempo and intensity for meditative experience.
  * 
  * Technical Features:
- * - Natural breathing rhythms synchronized with music tempo (0.2-0.8Hz)
+ * - Natural animation rhythms synchronized with music tempo (0.2-0.8Hz)
  * - Seasonal color palette transitions (spring, summer, autumn, winter)
  * - Service-aware architecture with optional dependency injection
  * - WCAG-compliant with reduced motion support
@@ -25,15 +25,15 @@ import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import type { ServiceContainer, IServiceAwareSystem } from "@/core/services/SystemServices";
 
 /**
- * Current state of the breathing effects system
+ * Current state of the animation effects system
  */
-export interface BreathingEffectState {
-  /** Current breathing intensity level (0-1, inactive to fully active) */
-  breathingIntensity: number;
-  /** Breathing frequency in Hz (0.2-0.8Hz, slow to normal breathing rate) */
-  breathingFrequency: number;
-  /** Breathing depth amplitude (0-1, shallow to deep breathing) */
-  breathingDepth: number;
+export interface AnimationEffectState {
+  /** Current animation intensity level (0-1, inactive to fully active) */
+  animationIntensity: number;
+  /** Breathing frequency in Hz (0.2-0.8Hz, slow to normal animation rate) */
+  animationFrequency: number;
+  /** Breathing depth amplitude (0-1, shallow to deep animation) */
+  animationDepth: number;
   /** Grounding effect intensity (0-1, represents connection/stability) */
   grounding: number;
   /** Warm color intensity (0-1, cool to warm color temperature) */
@@ -47,25 +47,25 @@ export interface BreathingEffectState {
 }
 
 /**
- * Configuration settings for breathing effects behavior
+ * Configuration settings for animation effects behavior
  */
 export interface BreathingEffectConfig {
-  /** Musical intensity threshold for breathing activation (0-1) */
+  /** Musical intensity threshold for animation activation (0-1) */
   calmThreshold: number;
-  /** Maximum breathing depth amplitude (0-1) */
+  /** Maximum animation depth amplitude (0-1) */
   maxBreathingDepth: number;
-  /** Valid breathing frequency range in Hz [min, max] */
+  /** Valid animation frequency range in Hz [min, max] */
   frequencyRange: [number, number];
   /** Color effect strength multiplier (0-1) */
   colorStrength: number;
   /** Duration of smooth transitions in milliseconds */
   transitionDuration: number;
-  /** Speed multiplier for breathing cycles (0.1-2.0) */
+  /** Speed multiplier for animation cycles (0.1-2.0) */
   cycleSpeed: number;
 }
 
 /**
- * Color mapping for breathing effects across different seasons/moods
+ * Color mapping for animation effects across different seasons/moods
  */
 export interface BreathingColorMapping {
   /** Primary warm color tone (reds, oranges, yellows) */
@@ -83,9 +83,9 @@ export interface BreathingColorMapping {
 }
 
 /**
- * BreathingEffectsController - Smooth breathing animations for visual enhancement
+ * AnimationEffectsController - Smooth animation animations for visual enhancement
  * 
- * Implements calm breathing effects that synchronize with low-intensity music for meditative
+ * Implements calm animation effects that synchronize with low-intensity music for meditative
  * visual experience. Features seasonal color transitions and service-aware architecture.
  * 
  * Architecture:
@@ -94,7 +94,7 @@ export interface BreathingColorMapping {
  * - Direct UnifiedEventBus integration with service fallback
  * - Seasonal palette system with smooth transitions
  */
-export class BreathingEffectsController implements IManagedSystem, IServiceAwareSystem {
+export class AnimationEffectsController implements IManagedSystem, IServiceAwareSystem {
   public initialized = false;
   
   private holographicSystem: HolographicUISystem;
@@ -105,7 +105,7 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
   // Service composition support
   private services?: ServiceContainer;
   
-  private breathingState: BreathingEffectState;
+  private effectState: AnimationEffectState;
   private harmonyConfig: BreathingEffectConfig;
   private naturalElements: Map<string, HTMLElement> = new Map();
   
@@ -114,12 +114,12 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
     peacefulMomentCount: 0,
     averageProcessingTime: 0,
     lastUpdateTime: 0,
-    breathingCycleCount: 0
+    animationCycleCount: 0
   };
   
-  // Animation state
-  private animationState = {
-    breathingPhase: 0,           // Main breathing cycle phase
+  // Animation phase state
+  private animationPhases = {
+    animationPhase: 0,           // Main animation cycle phase
     seasonalPhase: 0,            // Seasonal transition phase
     variationPhase: 0,           // Animation variation phase
     harmonyPhase: 0,             // Natural harmony phase
@@ -168,11 +168,11 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
     this.cssController = cssController;
     this.musicSyncService = musicSyncService;
     
-    // Initialize breathing effect state
-    this.breathingState = {
-      breathingIntensity: 0,
-      breathingFrequency: 0.4,      // Natural resting frequency (0.4Hz = 24 breaths/min)
-      breathingDepth: 0.8,          // Deep, natural breathing
+    // Initialize animation effect state
+    this.effectState = {
+      animationIntensity: 0,
+      animationFrequency: 0.4,      // Natural resting frequency (0.4Hz = 24 breaths/min)
+      animationDepth: 0.8,          // Deep, natural animation
       grounding: 0,
       warmth: 0.7,                  // Warm, grounded feeling
       ambientLevel: 0,
@@ -180,14 +180,14 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
       harmonyLevel: 0
     };
     
-    // Initialize breathing effect configuration
+    // Initialize animation effect configuration
     this.harmonyConfig = {
       calmThreshold: 0.3,           // Activate on low intensity (peaceful music)
-      maxBreathingDepth: 0.9,       // Deep natural breathing
+      maxBreathingDepth: 0.9,       // Deep natural animation
       frequencyRange: [0.2, 0.8],   // 0.2Hz (12 bpm) to 0.8Hz (48 bpm)
       colorStrength: 0.6,           // Moderate color influence
       transitionDuration: 3000,     // 3-second transitions
-      cycleSpeed: 0.1               // Slow breathing cycles
+      cycleSpeed: 0.1               // Slow animation cycles
     };
   }
   
@@ -208,10 +208,10 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
   }
 
   /**
-   * Initialize the breathing effects system
+   * Initialize the animation effects system
    * 
-   * Sets up event subscriptions, breathing elements detection, CSS variables,
-   * and starts the animation loop for breathing effects.
+   * Sets up event subscriptions, animation elements detection, CSS variables,
+   * and starts the animation loop for animation effects.
    * 
    * @returns Promise<void> Resolves when initialization completes
    * @throws Error if system fails to initialize
@@ -221,35 +221,35 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
     if (this.initialized) return;
     
     try {
-      console.log('[BreathingEffectsController] Initializing breathing effects...');
+      console.log('[AnimationEffectsController] Initializing animation effects...');
       
       // Register for color coordination events
       this.subscribeToColorEvents();
       
-      // Initialize breathing effect elements
+      // Initialize animation effect elements
       await this.initializeBreathingElements();
       
-      // Setup CSS variables for breathing effects
+      // Setup CSS variables for animation effects
       this.setupBreathingCSSVariables();
       
-      // Start breathing animation loop
+      // Start animation animation loop
       this.startBreathingAnimation();
       
       this.initialized = true;
       
-      console.log('[BreathingEffectsController] 🌿 Breathing effects system ready');
+      console.log('[AnimationEffectsController] 🌿 Breathing effects system ready');
       
     } catch (error) {
-      console.error('[BreathingEffectsController] Failed to initialize:', error);
+      console.error('[AnimationEffectsController] Failed to initialize:', error);
       throw error;
     }
   }
 
   /**
-   * Update breathing effects for current animation frame
+   * Update animation effects for current animation frame
    * 
-   * Processes breathing animation phases, updates visual state from music analysis,
-   * and applies breathing effects to DOM elements.
+   * Processes animation animation phases, updates visual state from music analysis,
+   * and applies animation effects to DOM elements.
    * 
    * @param deltaTime - Time elapsed since last frame in milliseconds  
    * @public IManagedSystem animation interface
@@ -259,19 +259,19 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
     
     const deltaSeconds = deltaTime / 1000;
     
-    // Update animation phases (natural, organic timing)
-    this.animationState.breathingPhase += deltaSeconds * this.breathingState.breathingFrequency * 2 * Math.PI;
-    this.animationState.seasonalPhase += deltaSeconds * this.harmonyConfig.cycleSpeed;
-    this.animationState.variationPhase += deltaSeconds * 0.4; // Slow animation variation
-    this.animationState.harmonyPhase += deltaSeconds * 0.6; // Natural harmony phase
+    // Update animation phases (natural, smooth timing)
+    this.animationPhases.animationPhase += deltaSeconds * this.effectState.animationFrequency * 2 * Math.PI;
+    this.animationPhases.seasonalPhase += deltaSeconds * this.harmonyConfig.cycleSpeed;
+    this.animationPhases.variationPhase += deltaSeconds * 0.4; // Slow animation variation
+    this.animationPhases.harmonyPhase += deltaSeconds * 0.6; // Natural harmony phase
     
     // Update natural state from music
     this.updateNaturalFromMusic();
     
-    // Update breathing visual effects
+    // Update animation visual effects
     this.updateBreathingVisuals();
     
-    // Update breathing elements
+    // Update animation elements
     this.updateBreathingElements();
     
     // Update performance metrics
@@ -279,17 +279,17 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
   }
 
   /**
-   * Perform system health check for breathing effects
+   * Perform system health check for animation effects
    * 
-   * Validates initialization status, breathing intensity levels, and performance metrics
-   * to ensure the breathing effects system is operating within acceptable parameters.
+   * Validates initialization status, animation intensity levels, and performance metrics
+   * to ensure the animation effects system is operating within acceptable parameters.
    * 
    * @returns Promise<HealthCheckResult> System health status and metrics
    * @public IManagedSystem monitoring interface
    */
   public async healthCheck(): Promise<HealthCheckResult> {
     const isHealthy = this.initialized && 
-                     this.breathingState.breathingIntensity >= 0 &&
+                     this.effectState.animationIntensity >= 0 &&
                      this.performanceMetrics.averageProcessingTime < 10; // Gentle 10ms requirement
     
     return {
@@ -299,7 +299,7 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
         peacefulMomentCount: this.performanceMetrics.peacefulMomentCount,
         processingTime: this.performanceMetrics.averageProcessingTime,
         naturalElementCount: this.naturalElements.size,
-        breathingCycleCount: this.performanceMetrics.breathingCycleCount
+        animationCycleCount: this.performanceMetrics.animationCycleCount
       },
       issues: isHealthy ? [] : ['Performance degradation detected']
     };
@@ -311,25 +311,25 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
   private subscribeToColorEvents(): void {
     // Use service-based event subscription when available
     if (this.services?.events) {
-      this.services.events.subscribe('BreathingEffectsController', 
-        'emotionalColorContext:updated', 
+      this.services.events.subscribe('AnimationEffectsController', 
+        'music:emotional-context-updated', 
         this.onColorUpdate.bind(this)
       );
-      this.services.events.subscribe('BreathingEffectsController', 
-        'emotion:analyzed', 
+      this.services.events.subscribe('AnimationEffectsController', 
+        'music:emotion-analyzed', 
         this.onPeacefulMoment.bind(this)
       );
-      this.services.events.subscribe('BreathingEffectsController', 
+      this.services.events.subscribe('AnimationEffectsController', 
         'settings:visual-guide-changed', 
         this.onVisualTransition.bind(this)
       );
     } else {
       // Fallback to direct event bus usage
-      unifiedEventBus.subscribe('emotionalColorContext:updated', (event) => {
+      unifiedEventBus.subscribe('music:emotional-context-updated', (event) => {
         this.onColorUpdate(event);
       });
       
-      unifiedEventBus.subscribe('emotion:analyzed', (event) => {
+      unifiedEventBus.subscribe('music:emotion-analyzed', (event) => {
         this.onPeacefulMoment(event);
       });
       
@@ -345,21 +345,21 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
   private onColorUpdate(event: any): void {
     const { palette, effectsLevel, emotionalTemperature } = event;
     
-    // Map effects level to breathing harmony
-    this.breathingState.harmonyLevel = effectsLevel * 0.8;
+    // Map effects level to animation harmony
+    this.effectState.harmonyLevel = effectsLevel * 0.8;
     
     // Adjust natural effects based on emotional temperature
     if (emotionalTemperature < 5000) {
       // Cool temperatures = winter/peaceful
-      this.breathingState.grounding = effectsLevel * 0.6;
-      this.breathingState.ambientLevel = effectsLevel * 0.4;
+      this.effectState.grounding = effectsLevel * 0.6;
+      this.effectState.ambientLevel = effectsLevel * 0.4;
     } else {
       // Warm temperatures = summer/active
-      this.breathingState.warmth = effectsLevel * 0.8;
-      this.breathingState.colorShift = effectsLevel * 0.5;
+      this.effectState.warmth = effectsLevel * 0.8;
+      this.effectState.colorShift = effectsLevel * 0.5;
     }
     
-    // Update breathing color mapping
+    // Update animation color mapping
     const naturalColors = this.generateBreathingColors(palette, emotionalTemperature);
     this.updateNaturalColors(naturalColors);
   }
@@ -370,7 +370,7 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
   private onPeacefulMoment(event: any): void {
     const { type, intensity, serenity } = event;
     
-    // Trigger natural harmony breathing
+    // Trigger natural harmony animation
     this.triggerNaturalBreathing(intensity, serenity);
   }
 
@@ -382,28 +382,28 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
     
     // Create seasonal visual transition
     this.createSeasonalTransition(fromSeason, toSeason, duration);
-    this.performanceMetrics.breathingCycleCount++;
+    this.performanceMetrics.animationCycleCount++;
   }
 
   /**
-   * Trigger natural harmony breathing effect
+   * Trigger natural harmony animation effect
    */
   private triggerNaturalBreathing(intensity: number, serenity: number): void {
     // Use service-based performance tracking when available
     const performTrackedOperation = this.services?.performance ? 
-      (name: string, operation: () => void) => this.services!.performance!.trackOperation('BreathingEffectsController', name, operation) :
+      (name: string, operation: () => void) => this.services!.performance!.trackOperation('AnimationEffectsController', name, operation) :
       (name: string, operation: () => void) => operation();
 
     performTrackedOperation('triggerNaturalBreathing', () => {
-      // Set natural breathing parameters for peaceful moment
-      this.breathingState.breathingIntensity = serenity;
-      this.breathingState.grounding = serenity * 0.7;
-      this.breathingState.ambientLevel = serenity * 0.6;
-      this.breathingState.warmth = 0.6 + (serenity * 0.3);
+      // Set natural animation parameters for peaceful moment
+      this.effectState.animationIntensity = serenity;
+      this.effectState.grounding = serenity * 0.7;
+      this.effectState.ambientLevel = serenity * 0.6;
+      this.effectState.warmth = 0.6 + (serenity * 0.3);
       
-      // Adjust breathing frequency based on musical serenity
+      // Adjust animation frequency based on musical serenity
       const naturalFreq = this.harmonyConfig.frequencyRange;
-      this.breathingState.breathingFrequency = naturalFreq[0] + (serenity * (naturalFreq[1] - naturalFreq[0]));
+      this.effectState.animationFrequency = naturalFreq[0] + (serenity * (naturalFreq[1] - naturalFreq[0]));
       
       // Schedule gentle decay
       setTimeout(() => {
@@ -413,28 +413,28 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
       // Update local performance metrics
       this.performanceMetrics.peacefulMomentCount++;
       
-      console.log(`[BreathingEffectsController] 🌿 Breathing effects activated! Serenity: ${serenity.toFixed(2)}, Frequency: ${this.breathingState.breathingFrequency.toFixed(2)}Hz`);
+      console.log(`[AnimationEffectsController] 🌿 Breathing effects activated! Serenity: ${serenity.toFixed(2)}, Frequency: ${this.effectState.animationFrequency.toFixed(2)}Hz`);
     });
   }
 
   /**
-   * Gentle decay of natural breathing over time
+   * Gentle decay of natural animation over time
    */
   private gentleDecayNaturalBreathing(): void {
     const decayRate = 0.015; // Very gentle 1.5% per frame
     
     const decay = () => {
-      this.breathingState.breathingIntensity *= (1.0 - decayRate);
-      this.breathingState.grounding *= (1.0 - decayRate * 0.8);
-      this.breathingState.ambientLevel *= (1.0 - decayRate * 0.6);
+      this.effectState.animationIntensity *= (1.0 - decayRate);
+      this.effectState.grounding *= (1.0 - decayRate * 0.8);
+      this.effectState.ambientLevel *= (1.0 - decayRate * 0.6);
       
-      if (this.breathingState.breathingIntensity > 0.05) {
+      if (this.effectState.animationIntensity > 0.05) {
         requestAnimationFrame(decay);
       } else {
         // Reset to natural baseline
-        this.breathingState.breathingIntensity = 0;
-        this.breathingState.grounding = 0;
-        this.breathingState.ambientLevel = 0;
+        this.effectState.animationIntensity = 0;
+        this.effectState.grounding = 0;
+        this.effectState.ambientLevel = 0;
       }
     };
     
@@ -453,21 +453,21 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
     // Only respond to peaceful, low-intensity music
     if (emotion && intensity < this.harmonyConfig.calmThreshold) {
       // Adjust ambient atmosphere based on musical serenity
-      this.breathingState.ambientLevel = Math.max(
-        this.breathingState.ambientLevel,
+      this.effectState.ambientLevel = Math.max(
+        this.effectState.ambientLevel,
         (1 - intensity) * 0.6  // Higher atmosphere for lower intensity
       );
       
-      // Adjust breathing frequency based on tempo (slower for peaceful music)
+      // Adjust animation frequency based on tempo (slower for peaceful music)
       if (beat && beat.tempo) {
         const tempoMultiplier = Math.max(0.5, Math.min(1.2, 60 / beat.tempo)); // Normalize around 60 BPM
-        this.breathingState.breathingFrequency = 0.4 * tempoMultiplier;
+        this.effectState.animationFrequency = 0.4 * tempoMultiplier;
       }
     }
   }
 
   /**
-   * Update breathing visual effects
+   * Update animation visual effects
    */
   private updateBreathingVisuals(): void {
     const currentSeason = this.getCurrentSeason();
@@ -478,13 +478,13 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
       warmTone: this.blendBreathingColors(
         palette.earthyWarm,
         palette.sunsetGlow,
-        this.breathingState.warmth
+        this.effectState.warmth
       ),
       coolTone: palette.forestGreen,
       accentBlue: palette.skyBlue,
       highlightGlow: palette.sunsetGlow,
       neutralGray: palette.stoneGray,
-      transparency: 0.85 + (this.breathingState.breathingIntensity * 0.15)
+      transparency: 0.85 + (this.effectState.animationIntensity * 0.15)
     };
     
     // Update CSS variables through batcher
@@ -495,7 +495,7 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
    * Get current season based on seasonal phase
    */
   private getCurrentSeason(): keyof typeof this.naturalPalettes {
-    const seasonPhase = this.animationState.seasonalPhase % (2 * Math.PI);
+    const seasonPhase = this.animationPhases.seasonalPhase % (2 * Math.PI);
     const normalizedPhase = seasonPhase / (2 * Math.PI);
     
     if (normalizedPhase < 0.25) return 'spring-awakening';
@@ -505,7 +505,7 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
   }
 
   /**
-   * Blend natural colors for breathing effects
+   * Blend natural colors for animation effects
    */
   private blendBreathingColors(natural: RGB, warm: RGB, blendFactor: number): RGB {
     const factor = Math.max(0, Math.min(1, blendFactor));
@@ -538,7 +538,7 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
       accentBlue: selectedPalette.skyBlue,
       highlightGlow: selectedPalette.sunsetGlow,
       neutralGray: selectedPalette.stoneGray,
-      transparency: this.breathingState.harmonyLevel
+      transparency: this.effectState.harmonyLevel
     };
   }
 
@@ -549,45 +549,45 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
     // Use service-based CSS updates for better batching when available
     if (this.services?.cssVariables) {
       this.services.cssVariables.queueBatchUpdate({
-        '--sn-breathing-warm-r': mapping.warmTone.r.toString(),
-        '--sn-breathing-warm-g': mapping.warmTone.g.toString(),
-        '--sn-breathing-warm-b': mapping.warmTone.b.toString(),
-        '--sn-breathing-cool-r': mapping.coolTone.r.toString(),
-        '--sn-breathing-cool-g': mapping.coolTone.g.toString(),
-        '--sn-breathing-cool-b': mapping.coolTone.b.toString()
+        '--sn-animation-warm-r': mapping.warmTone.r.toString(),
+        '--sn-animation-warm-g': mapping.warmTone.g.toString(),
+        '--sn-animation-warm-b': mapping.warmTone.b.toString(),
+        '--sn-animation-cool-r': mapping.coolTone.r.toString(),
+        '--sn-animation-cool-g': mapping.coolTone.g.toString(),
+        '--sn-animation-cool-b': mapping.coolTone.b.toString()
       });
     } else {
       // Fallback to existing CSS controller
       this.cssController.queueCSSVariableUpdate(
-        '--sn-breathing-warm-r',
+        '--sn-animation-warm-r',
         mapping.warmTone.r.toString()
       );
       this.cssController.queueCSSVariableUpdate(
-        '--sn-breathing-warm-g',
+        '--sn-animation-warm-g',
         mapping.warmTone.g.toString()
       );
       this.cssController.queueCSSVariableUpdate(
-        '--sn-breathing-warm-b',
+        '--sn-animation-warm-b',
         mapping.warmTone.b.toString()
       );
       
       this.cssController.queueCSSVariableUpdate(
-        '--sn-breathing-cool-r',
+        '--sn-animation-cool-r',
         mapping.coolTone.r.toString()
       );
       this.cssController.queueCSSVariableUpdate(
-        '--sn-breathing-cool-g',
+        '--sn-animation-cool-g',
         mapping.coolTone.g.toString()
       );
       this.cssController.queueCSSVariableUpdate(
-        '--sn-breathing-cool-b',
+        '--sn-animation-cool-b',
         mapping.coolTone.b.toString()
       );
     }
   }
 
   /**
-   * Initialize breathing effect elements
+   * Initialize animation effect elements
    */
   private async initializeBreathingElements(): Promise<void> {
     const naturalSelectors = [
@@ -609,24 +609,24 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
   }
 
   /**
-   * Setup CSS variables for breathing effects
+   * Setup CSS variables for animation effects
    */
   private setupBreathingCSSVariables(): void {
     const baseVariables = {
-      '--sn-breathing-earthy-r': '166',
-      '--sn-breathing-earthy-g': '227',
-      '--sn-breathing-earthy-b': '161',
-      '--sn-breathing-forest-r': '64',
-      '--sn-breathing-forest-g': '160',
-      '--sn-breathing-forest-b': '43',
-      '--sn-breathing-sky-r': '137',
-      '--sn-breathing-sky-g': '220',
-      '--sn-breathing-sky-b': '235',
-      '--sn-breathing-serenity-level': '0',
-      '--sn-breathing-breathing-frequency': '0.4',
-      '--sn-breathing-earth-connection': '0',
-      '--sn-breathing-breathing-depth': '0.8',
-      '--sn-breathing-seasonal-shift': '0'
+      '--sn-animation-earthy-r': '166',
+      '--sn-animation-earthy-g': '227',
+      '--sn-animation-earthy-b': '161',
+      '--sn-animation-forest-r': '64',
+      '--sn-animation-forest-g': '160',
+      '--sn-animation-forest-b': '43',
+      '--sn-animation-sky-r': '137',
+      '--sn-animation-sky-g': '220',
+      '--sn-animation-sky-b': '235',
+      '--sn-animation-serenity-level': '0',
+      '--sn-animation-animation-frequency': '0.4',
+      '--sn-animation-earth-connection': '0',
+      '--sn-animation-animation-depth': '0.8',
+      '--sn-animation-seasonal-shift': '0'
     };
     
     // Use service-based batch update when available
@@ -644,16 +644,16 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
    * Update natural CSS variables
    */
   private updateNaturalCSSVariables(mapping: BreathingColorMapping): void {
-    // Update breathing phase for CSS animations
-    const breathingValue = Math.sin(this.animationState.breathingPhase) * this.breathingState.breathingDepth;
+    // Update animation phase for CSS animations
+    const animationValue = Math.sin(this.animationPhases.animationPhase) * this.effectState.animationDepth;
     
     const cssUpdates = {
-      '--sn-breathing-breathing-intensity': this.breathingState.breathingIntensity.toString(),
-      '--sn-breathing-breathing-frequency': this.breathingState.breathingFrequency.toString(),
-      '--sn-breathing-grounding': this.breathingState.grounding.toString(),
-      '--sn-breathing-breathing-depth': this.breathingState.breathingDepth.toString(),
-      '--sn-breathing-color-shift': this.breathingState.colorShift.toString(),
-      '--sn-breathing-breathing-phase': breathingValue.toString()
+      '--sn-animation-animation-intensity': this.effectState.animationIntensity.toString(),
+      '--sn-animation-animation-frequency': this.effectState.animationFrequency.toString(),
+      '--sn-animation-grounding': this.effectState.grounding.toString(),
+      '--sn-animation-animation-depth': this.effectState.animationDepth.toString(),
+      '--sn-animation-color-shift': this.effectState.colorShift.toString(),
+      '--sn-animation-animation-phase': animationValue.toString()
     };
     
     // Use service-based batch update when available
@@ -680,43 +680,43 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
    * Update single natural element
    */
   private updateNaturalElement(element: HTMLElement): void {
-    // Apply natural breathing when breathing intensity is active
-    if (this.breathingState.breathingIntensity > 0.1) {
+    // Apply natural animation when animation intensity is active
+    if (this.effectState.animationIntensity > 0.1) {
       this.applyNaturalBreathing(element);
     }
     
     // Apply grounding effects
-    if (this.breathingState.grounding > 0.1) {
+    if (this.effectState.grounding > 0.1) {
       this.applyEarthConnection(element);
     }
     
     // Apply ambient atmosphere
-    if (this.breathingState.ambientLevel > 0.1) {
+    if (this.effectState.ambientLevel > 0.1) {
       this.applyForestAtmosphere(element);
     }
   }
 
   /**
-   * Apply natural breathing effect to element
+   * Apply natural animation effect to element
    */
   private applyNaturalBreathing(element: HTMLElement): void {
-    const breathingIntensity = this.breathingState.breathingIntensity;
-    const breathingPhase = Math.sin(this.animationState.breathingPhase);
+    const animationIntensity = this.effectState.animationIntensity;
+    const animationPhase = Math.sin(this.animationPhases.animationPhase);
     
-    // Natural breathing scale (very subtle)
-    const breathingScale = 1.0 + (breathingPhase * breathingIntensity * 0.02); // Max 2% scale
+    // Natural animation scale (very subtle)
+    const animationScale = 1.0 + (animationPhase * animationIntensity * 0.02); // Max 2% scale
     
-    // Natural breathing opacity
-    const breathingOpacity = 0.9 + (breathingPhase * breathingIntensity * 0.1);
+    // Natural animation opacity
+    const animationOpacity = 0.9 + (animationPhase * animationIntensity * 0.1);
     
-    element.style.transform = `scale(${breathingScale})`;
-    element.style.opacity = breathingOpacity.toString();
+    element.style.transform = `scale(${animationScale})`;
+    element.style.opacity = animationOpacity.toString();
     
-    // Natural breathing glow
-    const glowIntensity = breathingIntensity * (breathingPhase * 0.5 + 0.5) * 0.3;
+    // Natural animation glow
+    const glowIntensity = animationIntensity * (animationPhase * 0.5 + 0.5) * 0.3;
     element.style.boxShadow = `
-      0 0 ${glowIntensity * 20}px rgba(var(--sn-breathing-earthy-r), var(--sn-breathing-earthy-g), var(--sn-breathing-earthy-b), ${glowIntensity * 0.5}),
-      inset 0 0 ${glowIntensity * 10}px rgba(var(--sn-breathing-forest-r), var(--sn-breathing-forest-g), var(--sn-breathing-forest-b), ${glowIntensity * 0.3})
+      0 0 ${glowIntensity * 20}px rgba(var(--sn-animation-earthy-r), var(--sn-animation-earthy-g), var(--sn-animation-earthy-b), ${glowIntensity * 0.5}),
+      inset 0 0 ${glowIntensity * 10}px rgba(var(--sn-animation-forest-r), var(--sn-animation-forest-g), var(--sn-animation-forest-b), ${glowIntensity * 0.3})
     `;
   }
 
@@ -724,17 +724,17 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
    * Apply earth connection effect
    */
   private applyEarthConnection(element: HTMLElement): void {
-    const connectionIntensity = this.breathingState.grounding;
+    const connectionIntensity = this.effectState.grounding;
     
     // Earthy border
-    element.style.border = `1px solid rgba(var(--sn-breathing-earthy-r), var(--sn-breathing-earthy-g), var(--sn-breathing-earthy-b), ${connectionIntensity * 0.4})`;
+    element.style.border = `1px solid rgba(var(--sn-animation-earthy-r), var(--sn-animation-earthy-g), var(--sn-animation-earthy-b), ${connectionIntensity * 0.4})`;
     
     // Earth-grounded background
     element.style.background = `
       ${element.style.background || ''},
       linear-gradient(180deg,
-        rgba(var(--sn-breathing-earthy-r), var(--sn-breathing-earthy-g), var(--sn-breathing-earthy-b), ${connectionIntensity * 0.05}) 0%,
-        rgba(var(--sn-breathing-forest-r), var(--sn-breathing-forest-g), var(--sn-breathing-forest-b), ${connectionIntensity * 0.08}) 100%
+        rgba(var(--sn-animation-earthy-r), var(--sn-animation-earthy-g), var(--sn-animation-earthy-b), ${connectionIntensity * 0.05}) 0%,
+        rgba(var(--sn-animation-forest-r), var(--sn-animation-forest-g), var(--sn-animation-forest-b), ${connectionIntensity * 0.08}) 100%
       )
     `;
   }
@@ -743,16 +743,16 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
    * Apply forest atmosphere effect
    */
   private applyForestAtmosphere(element: HTMLElement): void {
-    const atmosphereIntensity = this.breathingState.ambientLevel;
-    const variationPhase = this.animationState.variationPhase;
+    const atmosphereIntensity = this.effectState.ambientLevel;
+    const variationPhase = this.animationPhases.variationPhase;
     
-    // Subtle breathing movement
-    const breathingOffset = Math.sin(variationPhase * 0.8) * atmosphereIntensity * 1;
-    element.style.transform += ` translateY(${breathingOffset}px)`;
+    // Subtle animation movement
+    const animationOffset = Math.sin(variationPhase * 0.8) * atmosphereIntensity * 1;
+    element.style.transform += ` translateY(${animationOffset}px)`;
     
     // Breathing color tint
-    const breathingHue = Math.sin(variationPhase * 0.5) * atmosphereIntensity * 5;
-    element.style.filter = `hue-rotate(${breathingHue}deg) saturate(${1 + atmosphereIntensity * 0.2})`;
+    const animationHue = Math.sin(variationPhase * 0.5) * atmosphereIntensity * 5;
+    element.style.filter = `hue-rotate(${animationHue}deg) saturate(${1 + atmosphereIntensity * 0.2})`;
   }
 
   /**
@@ -770,7 +770,7 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
       
       // Interpolate seasonal colors and states
       // This would interpolate between seasonal palettes
-      this.breathingState.colorShift = eased;
+      this.effectState.colorShift = eased;
       
       if (progress < 1) {
         requestAnimationFrame(transition);
@@ -781,19 +781,19 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
   }
 
   /**
-   * Start breathing animation loop
+   * Start animation animation loop
    */
   private startBreathingAnimation(): void {
-    this.animationState.isAnimating = true;
-    this.animationState.lastFrameTime = performance.now();
+    this.animationPhases.isAnimating = true;
+    this.animationPhases.lastFrameTime = performance.now();
     
     const animate = (currentTime: number) => {
-      if (!this.animationState.isAnimating) return;
+      if (!this.animationPhases.isAnimating) return;
       
-      const deltaTime = currentTime - this.animationState.lastFrameTime;
-      this.animationState.lastFrameTime = currentTime;
+      const deltaTime = currentTime - this.animationPhases.lastFrameTime;
+      this.animationPhases.lastFrameTime = currentTime;
       
-      // Update natural breathing animation
+      // Update natural animation animation
       this.updateAnimation(deltaTime);
       
       // Continue animation loop
@@ -815,9 +815,9 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
    * Force repaint for immediate visual updates
    */
   public forceRepaint(reason?: string): void {
-    console.log(`[BreathingEffectsController] Force repaint triggered: ${reason || 'Unknown'}`);
+    console.log(`[AnimationEffectsController] Force repaint triggered: ${reason || 'Unknown'}`);
     
-    // Force update of all breathing elements
+    // Force update of all animation elements
     this.updateBreathingElements();
     
     // Flush CSS updates using service when available
@@ -833,24 +833,24 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
    * Cleanup and destroy the engine
    */
   public destroy(): void {
-    console.log('[BreathingEffectsController] Shutting down breathing effects system...');
+    console.log('[AnimationEffectsController] Shutting down animation effects system...');
     
     // Clean up service subscriptions
     if (this.services?.events) {
-      this.services.events.cleanupSystem('BreathingEffectsController');
+      this.services.events.cleanupSystem('AnimationEffectsController');
     }
     
     // Stop animation
-    this.animationState.isAnimating = false;
+    this.animationPhases.isAnimating = false;
     
     // Clear natural elements
     this.naturalElements.clear();
     
-    // Reset breathing state
-    this.breathingState = {
-      breathingIntensity: 0,
-      breathingFrequency: 0.4,
-      breathingDepth: 0.8,
+    // Reset animation state
+    this.effectState = {
+      animationIntensity: 0,
+      animationFrequency: 0.4,
+      animationDepth: 0.8,
       grounding: 0,
       warmth: 0.7,
       ambientLevel: 0,
@@ -862,11 +862,11 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
   }
 
   // Public API methods
-  public getBreathingState(): BreathingEffectState {
-    return { ...this.breathingState };
+  public getBreathingState(): AnimationEffectState {
+    return { ...this.effectState };
   }
 
-  public getBreathingConfig(): BreathingEffectConfig {
+  public getAnimationConfig(): BreathingEffectConfig {
     return { ...this.harmonyConfig };
   }
 
@@ -882,7 +882,7 @@ export class BreathingEffectsController implements IManagedSystem, IServiceAware
   }
 
   public setBreathingDepth(depth: number): void {
-    this.breathingState.breathingDepth = Math.max(0, Math.min(1, depth));
+    this.effectState.animationDepth = Math.max(0, Math.min(1, depth));
   }
 
   public setColorStrength(strength: number): void {

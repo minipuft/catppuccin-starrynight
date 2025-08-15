@@ -2,39 +2,41 @@
  * Musical LERP Orchestrator - Year 3000 System
  * 
  * Central intelligence for calculating music-aware LERP parameters that create
- * organic consciousness breathing and flowing with musical characteristics.
+ * smooth visual effects that adapt and flow with musical characteristics.
  * 
- * @philosophy "Interfaces are not built—they are grown, and they breathe with music"
- * @architecture Musical Consciousness replacing static smoothing
+ * @philosophy "Interfaces are not built—they are grown, and they adapt with music"
+ * @architecture Musical Visual Effects replacing static smoothing
  * @performance Sub-millisecond calculations, 60fps target maintenance
  */
 
 import type { MusicSyncService } from "@/audio/MusicSyncService";
 import type { PerformanceContext, PerformanceAwareLerpParams } from "@/core/performance/PerformanceAwareLerpCoordinator";
 
-// Musical context interface for consciousness calculations
+// Musical context interface for visual effects calculations
 export interface MusicalContext {
   tempo: number;                    // BPM (60-200+)
   energy: number;                   // 0-1 intensity level
   valence: number;                  // 0-1 emotional positivity
   danceability: number;             // 0-1 rhythmic flow quality
-  emotionalTemperature: number;     // 1000K-20000K consciousness temperature
+  emotionalTemperature: number;     // 1000K-20000K visual effects temperature
   beatPhase: 'attack' | 'sustain' | 'decay' | 'rest';
   beatConfidence: number;           // 0-1 beat detection confidence
   beatInterval: number;             // Milliseconds between beats
   timeSinceLastBeat: number;        // Milliseconds since last beat
 }
 
-// Animation type profiles for different consciousness aspects
-export type AnimationType = 'pulse' | 'flow' | 'emotional' | 'organic' | 'crystalline';
+// Animation type profiles for different visual effects aspects
+export type AnimationType = 'pulse' | 'flow' | 'emotional' | 'smooth' | 'precise';
+/** @deprecated Use 'precise' instead */
+export type LegacyAnimationType = 'crystalline';
 
-// LERP calculation result with musical consciousness
+// LERP calculation result with musical visual effects
 export interface MusicalLerpResult {
   halfLife: number;                 // Calculated half-life in seconds
   attackMultiplier: number;         // Attack phase speed modifier
   decayMultiplier: number;          // Decay phase speed modifier
   fluidityFactor: number;           // Organic fluidity level
-  consciousnessLevel: number;       // Overall consciousness awareness
+  visualEffectsLevel: number;       // Overall visual effects awareness
   performanceOptimized: boolean;    // Whether performance optimizations were applied
   debugInfo?: {
     tempoFactor: number;
@@ -48,7 +50,8 @@ export interface MusicalLerpResult {
 }
 
 /**
- * Musical LERP Orchestrator - Consciousness-aware smoothing calculation engine
+ * Musical LERP Coordinator - Performance-aware smoothing calculation engine  
+ * @deprecated Use PerformanceAwareLerpCoordinator class name instead of MusicalLerpOrchestrator
  */
 export class MusicalLerpOrchestrator {
   // Base half-life values for different animation types
@@ -56,8 +59,10 @@ export class MusicalLerpOrchestrator {
     pulse: 0.08,        // Beat-synchronized effects
     flow: 0.15,         // Continuous movement (parallax, gradients)
     emotional: 0.25,    // Color and emotional transitions
-    organic: 0.12,      // Particle and breathing effects
-    crystalline: 0.06   // Precise, geometric animations
+    smooth: 0.12,      // Particle and pulsing effects
+    precise: 0.06,     // Precise, geometric animations
+    /** @deprecated Use precise instead */
+    crystalline: 0.06   // Legacy: Precise, geometric animations
   };
 
   // Beat phase timing configuration (as percentage of beat interval)
@@ -68,7 +73,7 @@ export class MusicalLerpOrchestrator {
     rest: { start: 0.85, end: 1.0, baseMultiplier: 0.8 }      // 85-100% of beat
   };
 
-  // Musical modulation ranges for consciousness calculation
+  // Musical modulation ranges for visual-effects calculation
   private modulationConfig = {
     tempo: {
       reference: 120,     // Reference BPM (120)
@@ -84,7 +89,7 @@ export class MusicalLerpOrchestrator {
     danceability: {
       fluidityMin: 0.5,   // Minimum fluidity factor
       fluidityMax: 1.0,   // Maximum fluidity factor
-      organicThreshold: 0.6 // Threshold for organic behavior
+      fluidThreshold: 0.6 // Threshold for smooth behavior
     },
     temperature: {
       neutral: 4000,      // Neutral temperature (4000K)
@@ -101,7 +106,7 @@ export class MusicalLerpOrchestrator {
   }
 
   /**
-   * Calculate music-aware LERP parameters for consciousness smoothing
+   * Calculate music-aware LERP parameters for visual effects smoothing
    */
   public calculateMusicalLerp(
     musicContext: MusicalContext,
@@ -117,7 +122,7 @@ export class MusicalLerpOrchestrator {
   }
 
   /**
-   * Calculate performance-aware musical LERP parameters for consciousness smoothing
+   * Calculate performance-aware musical LERP parameters for visual effects smoothing
    */
   public calculateMusicalLerpWithPerformance(
     musicContext: MusicalContext,
@@ -172,7 +177,7 @@ export class MusicalLerpOrchestrator {
         danceabilityFactor = 0.8 + (musicContext.danceability * 0.4); // Simplified danceability
       }
     } else {
-      // Full musical consciousness calculations (original behavior)
+      // Full musical visual effects calculations (original behavior)
       tempoFactor = this.calculateTempoFactor(musicContext.tempo);
       energyFactor = this.calculateEnergyFactor(musicContext.energy);
       danceabilityFactor = this.calculateDanceabilityFactor(musicContext.danceability);
@@ -216,18 +221,18 @@ export class MusicalLerpOrchestrator {
       decayMultiplier = this.calculateDecayMultiplier(musicContext.energy, musicContext.valence);
     }
 
-    // Calculate fluidity factor for organic movement
+    // Calculate fluidity factor for smooth movement
     const fluidityFactor = this.calculateFluidityFactor(musicContext.danceability, musicContext.emotionalTemperature);
 
-    // Calculate overall consciousness level
-    const consciousnessLevel = this.calculateConsciousnessLevel(musicContext);
+    // Calculate overall visual-effects level
+    const visualEffectsLevel = this.calculateVisualEffectsLevel(musicContext);
 
     const result: MusicalLerpResult = {
       halfLife: Math.max(0.01, Math.min(2.0, finalHalfLife)), // Clamp to reasonable bounds
       attackMultiplier,
       decayMultiplier,
       fluidityFactor,
-      consciousnessLevel,
+      visualEffectsLevel,
       performanceOptimized
     };
 
@@ -279,8 +284,8 @@ export class MusicalLerpOrchestrator {
   }
 
   /**
-   * Calculate danceability influence on organic fluidity
-   * High danceability = organic fluid transitions, low = structured
+   * Calculate danceability influence on smooth fluidity
+   * High danceability = smooth fluid transitions, low = structured
    */
   private calculateDanceabilityFactor(danceability: number): number {
     const { fluidityMin, fluidityMax } = this.modulationConfig.danceability;
@@ -289,7 +294,7 @@ export class MusicalLerpOrchestrator {
 
   /**
    * Calculate emotional temperature influence on movement style
-   * Warm temperatures = flowing, cool temperatures = crystalline precise
+   * Warm temperatures = flowing, cool temperatures = precise structured
    */
   private calculateTemperatureFactor(emotionalTemperature: number): number {
     const { neutral, range, warmthInfluence } = this.modulationConfig.temperature;
@@ -298,7 +303,7 @@ export class MusicalLerpOrchestrator {
   }
 
   /**
-   * Calculate beat phase influence for rhythmic consciousness
+   * Calculate beat phase influence for rhythmic visual-effects
    * Different smoothing based on beat timing phases
    */
   private calculateBeatPhaseFactor(
@@ -353,10 +358,10 @@ export class MusicalLerpOrchestrator {
   }
 
   /**
-   * Calculate fluidity factor for organic movement quality
+   * Calculate fluidity factor for smooth movement quality
    */
   private calculateFluidityFactor(danceability: number, emotionalTemperature: number): number {
-    const { fluidityMin, fluidityMax, organicThreshold } = this.modulationConfig.danceability;
+    const { fluidityMin, fluidityMax, fluidThreshold } = this.modulationConfig.danceability;
     const { neutral, range } = this.modulationConfig.temperature;
     
     // Base fluidity from danceability
@@ -370,12 +375,12 @@ export class MusicalLerpOrchestrator {
   }
 
   /**
-   * Calculate overall consciousness level for system-wide awareness
+   * Calculate overall visual-effects level for system-wide awareness
    */
-  private calculateConsciousnessLevel(musicContext: MusicalContext): number {
+  private calculateVisualEffectsLevel(musicContext: MusicalContext): number {
     const { energy, valence, danceability, beatConfidence } = musicContext;
     
-    // Combine factors for overall consciousness awareness
+    // Combine factors for overall visual effects awareness
     const energyContribution = energy * 0.3;
     const valenceContribution = valence * 0.2;
     const danceabilityContribution = danceability * 0.25;
@@ -446,4 +451,6 @@ export class MusicalLerpOrchestrator {
 }
 
 // Singleton instance for global access
-export const musicalLerpOrchestrator = new MusicalLerpOrchestrator(false);
+export const musicalLerpCoordinator = new MusicalLerpOrchestrator(false);
+/** @deprecated Use musicalLerpCoordinator instead */
+export const musicalLerpOrchestrator = musicalLerpCoordinator;

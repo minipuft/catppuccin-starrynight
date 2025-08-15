@@ -2,11 +2,11 @@
 // MUSIC EMOTION ANALYZER - Dynamic Color Pipeline
 // ████████████████████████████████████████████████████████████████████████████████
 //
-// Analyzes Spotify audio features to extract emotional content for organic consciousness
+// Analyzes Spotify audio features to extract emotional content for smooth visual-effects
 // color temperature mapping and dynamic palette generation.
 //
 // Integration: MusicSyncService → MusicEmotionAnalyzer → DynamicColorPipeline
-// Philosophy: Transform musical data into consciousness-aware emotional states
+// Philosophy: Transform musical data into visual-effects-aware emotional states
 //
 // ████████████████████████████████████████████████████████████████████████████████
 
@@ -75,8 +75,8 @@ export type EmotionType =
   | "excitement"
   | "nostalgia"
   | "transcendence"
-  | "consciousness"
-  | "organic-flow";
+  | "visual-effects"
+  | "smooth-flow";
 
 export interface MusicalCharacteristics {
   // Core musical features
@@ -93,10 +93,10 @@ export interface MusicalCharacteristics {
   liveness: number; // 0-1 live performance likelihood
   speechiness: number; // 0-1 spoken word content
 
-  // Consciousness-specific metrics
-  organicFlow: number; // 0-1 organic vs mechanical feeling
+  // Visual-effects-specific metrics
+  smoothFlow: number; // 0-1 smooth vs mechanical feeling
   cinematicDepth: number; // 0-1 cinematic atmosphere potential
-  consciousnessResonance: number; // 0-1 consciousness awakening potential
+  visualEffectsResonance: number; // 0-1 visual-effects awakening potential
 }
 
 export interface EmotionAnalysisConfig {
@@ -108,9 +108,9 @@ export interface EmotionAnalysisConfig {
   smoothingFactor: number; // 0-1 how much to smooth emotion changes
   memoryDecay: number; // 0-1 how quickly to forget previous emotions
 
-  // Consciousness integration
-  consciousnessAwareness: boolean; // Enable consciousness-specific analysis
-  organicFlowDetection: boolean; // Enable organic flow analysis
+  // Visual-effects integration
+  visualEffectsAwareness: boolean; // Enable visual-effects-specific analysis
+  smoothFlowDetection: boolean; // Enable smooth flow analysis
   cinematicAnalysis: boolean; // Enable cinematic depth analysis
 
   // Performance settings
@@ -132,7 +132,7 @@ export class MusicEmotionAnalyzer implements IManagedSystem {
   private valenceEnergyMapper: ValenceEnergyMapper;
   private audioFeatureAnalyzer: AudioFeatureAnalyzer;
   private temperatureCalculator: TemperatureCalculator;
-  private consciousnessDetector: ConsciousnessDetector;
+  private visualEffectsDetector: VisualEffectsDetector;
 
   // Subscribers for emotion updates
   private emotionSubscribers = new Set<(emotion: EmotionalState) => void>();
@@ -143,8 +143,8 @@ export class MusicEmotionAnalyzer implements IManagedSystem {
       confidenceThreshold: 0.6,
       smoothingFactor: 0.3,
       memoryDecay: 0.1,
-      consciousnessAwareness: true,
-      organicFlowDetection: true,
+      visualEffectsAwareness: true,
+      smoothFlowDetection: true,
       cinematicAnalysis: true,
       analysisInterval: 500, // 2Hz analysis rate
       cacheSize: 100,
@@ -154,7 +154,7 @@ export class MusicEmotionAnalyzer implements IManagedSystem {
     this.valenceEnergyMapper = new ValenceEnergyMapper();
     this.audioFeatureAnalyzer = new AudioFeatureAnalyzer();
     this.temperatureCalculator = new TemperatureCalculator();
-    this.consciousnessDetector = new ConsciousnessDetector();
+    this.visualEffectsDetector = new VisualEffectsDetector();
   }
 
   // ===== SYSTEM LIFECYCLE =====
@@ -168,13 +168,13 @@ export class MusicEmotionAnalyzer implements IManagedSystem {
       await this.audioFeatureAnalyzer.initialize();
       await this.temperatureCalculator.initialize();
 
-      if (this.config.consciousnessAwareness) {
-        await this.consciousnessDetector.initialize();
+      if (this.config.visualEffectsAwareness) {
+        await this.visualEffectsDetector.initialize();
       }
 
       this.initialized = true;
       console.log(
-        "🎵 MusicEmotionAnalyzer initialized with consciousness awareness"
+        "🎵 MusicEmotionAnalyzer initialized with visual effects awareness"
       );
     } catch (error) {
       console.error("❌ Failed to initialize MusicEmotionAnalyzer:", error);
@@ -338,10 +338,10 @@ export class MusicEmotionAnalyzer implements IManagedSystem {
       musicalCharacteristics
     );
 
-    // Detect consciousness-specific characteristics
-    let consciousnessMetrics: any = {};
-    if (this.config.consciousnessAwareness) {
-      consciousnessMetrics = await this.consciousnessDetector.analyze(
+    // Detect visual-effects-specific characteristics
+    let visualEffectsMetrics: any = {};
+    if (this.config.visualEffectsAwareness) {
+      visualEffectsMetrics = await this.visualEffectsDetector.analyze(
         audioFeatures,
         musicalCharacteristics,
         audioData
@@ -371,14 +371,14 @@ export class MusicEmotionAnalyzer implements IManagedSystem {
       ),
       musicalCharacteristics: {
         ...musicalCharacteristics,
-        organicFlow:
-          consciousnessMetrics.organicFlow ??
-          musicalCharacteristics.organicFlow,
+        smoothFlow:
+          visualEffectsMetrics.smoothFlow ??
+          musicalCharacteristics.smoothFlow,
         cinematicDepth:
-          consciousnessMetrics.cinematicDepth ??
+          visualEffectsMetrics.cinematicDepth ??
           musicalCharacteristics.cinematicDepth,
-        consciousnessResonance:
-          consciousnessMetrics.consciousnessResonance ?? 0.5,
+        visualEffectsResonance:
+          visualEffectsMetrics.visualEffectsResonance ?? 0.5,
       },
     };
 
@@ -571,7 +571,7 @@ class ValenceEnergyMapper {
       // Neutral zone: transition emotions
       if (characteristics.instrumentalness > 0.8) {
         primary = "transcendence";
-        secondary = ["transcendence", "consciousness"];
+        secondary = ["transcendence", "visual-effects"];
       } else {
         primary = "nostalgia";
         secondary = ["nostalgia"];
@@ -580,13 +580,13 @@ class ValenceEnergyMapper {
       confidence = 0.6; // Lower confidence for neutral emotions
     }
 
-    // Special cases for consciousness and organic flow
-    if (characteristics.organicFlow > 0.8) {
-      secondary.push("organic-flow");
+    // Special cases for visual effects and smooth flow
+    if (characteristics.smoothFlow > 0.8) {
+      secondary.push("smooth-flow");
     }
 
-    if (characteristics.consciousnessResonance > 0.7) {
-      secondary.push("consciousness");
+    if (characteristics.visualEffectsResonance > 0.7) {
+      secondary.push("visual-effects");
     }
 
     return { primary, secondary, intensity, confidence };
@@ -611,19 +611,19 @@ class AudioFeatureAnalyzer {
       liveness: audioFeatures.liveness,
       speechiness: audioFeatures.speechiness,
 
-      // Calculate consciousness-specific metrics
-      organicFlow: this.calculateOrganicFlow(audioFeatures),
+      // Calculate visual-effects-specific metrics
+      smoothFlow: this.calculateSmoothFlow(audioFeatures),
       cinematicDepth: this.calculateCinematicDepth(audioFeatures),
-      consciousnessResonance:
-        this.calculateConsciousnessResonance(audioFeatures),
+      visualEffectsResonance:
+        this.calculateVisualEffectsResonance(audioFeatures),
     };
   }
 
-  private calculateOrganicFlow(features: AudioFeatures): number {
-    // Organic flow is higher for acoustic, lower tempo, flowing music
+  private calculateSmoothFlow(features: AudioFeatures): number {
+    // Smooth flow is higher for acoustic, lower tempo, flowing music
     const acousticWeight = features.acousticness * 0.4;
-    const tempoWeight = (1 - Math.min(features.tempo / 140, 1)) * 0.3; // Slower = more organic
-    const energyWeight = (1 - features.energy) * 0.2; // Lower energy = more organic
+    const tempoWeight = (1 - Math.min(features.tempo / 140, 1)) * 0.3; // Slower = more smooth
+    const energyWeight = (1 - features.energy) * 0.2; // Lower energy = more smooth
     const danceWeight = features.danceability * 0.1; // Some rhythm helps flow
 
     return Math.min(
@@ -645,8 +645,8 @@ class AudioFeatureAnalyzer {
     );
   }
 
-  private calculateConsciousnessResonance(features: AudioFeatures): number {
-    // Consciousness resonance for transcendent, awareness-expanding music
+  private calculateVisualEffectsResonance(features: AudioFeatures): number {
+    // Visual effects resonance for advanced, awareness-expanding music
     const valenceBalance = 1 - Math.abs(features.valence - 0.5) * 2; // Balanced valence
     const energyBalance = 1 - Math.abs(features.energy - 0.4) * 2; // Slightly lower energy
     const instrumentalWeight = features.instrumentalness * 0.3;
@@ -696,11 +696,11 @@ class TemperatureCalculator {
         baseTemperature = 2500; // Warm, golden hour
         break;
       case "transcendence":
-      case "consciousness":
+      case "visual-effects":
         baseTemperature = 6500; // Neutral, balanced
         break;
-      case "organic-flow":
-        baseTemperature = 4000; // Natural, organic warmth
+      case "smooth-flow":
+        baseTemperature = 4000; // Natural, smooth warmth
         break;
       default:
         baseTemperature = 6500; // Daylight neutral
@@ -724,7 +724,7 @@ class TemperatureCalculator {
   }
 }
 
-class ConsciousnessDetector {
+class VisualEffectsDetector {
   async initialize(): Promise<void> {
     // Initialization if needed
   }
@@ -734,23 +734,23 @@ class ConsciousnessDetector {
     characteristics: MusicalCharacteristics,
     audioData?: AudioData
   ): Promise<{
-    organicFlow: number;
+    smoothFlow: number;
     cinematicDepth: number;
-    consciousnessResonance: number;
+    visualEffectsResonance: number;
   }> {
-    // Enhanced consciousness detection using audio data if available
-    let organicFlow = characteristics.organicFlow;
+    // Enhanced visual effects detection using audio data if available
+    let smoothFlow = characteristics.smoothFlow;
     let cinematicDepth = characteristics.cinematicDepth;
-    let consciousnessResonance = characteristics.consciousnessResonance;
+    let visualEffectsResonance = characteristics.visualEffectsResonance;
 
     // If we have audio data, analyze waveform patterns
     if (audioData?.waveform) {
       const waveformAnalysis = this.analyzeWaveformPatterns(audioData.waveform);
 
-      // Enhance organic flow based on waveform smoothness
-      organicFlow = Math.min(
+      // Enhance smooth flow based on waveform smoothness
+      smoothFlow = Math.min(
         1,
-        organicFlow + waveformAnalysis.smoothness * 0.2
+        smoothFlow + waveformAnalysis.smoothness * 0.2
       );
 
       // Enhance cinematic depth based on dynamic range
@@ -759,17 +759,17 @@ class ConsciousnessDetector {
         cinematicDepth + waveformAnalysis.dynamicRange * 0.3
       );
 
-      // Enhance consciousness resonance based on harmonic complexity
-      consciousnessResonance = Math.min(
+      // Enhance visual effects resonance based on harmonic complexity
+      visualEffectsResonance = Math.min(
         1,
-        consciousnessResonance + waveformAnalysis.harmonicComplexity * 0.2
+        visualEffectsResonance + waveformAnalysis.harmonicComplexity * 0.2
       );
     }
 
     return {
-      organicFlow,
+      smoothFlow,
       cinematicDepth,
-      consciousnessResonance,
+      visualEffectsResonance,
     };
   }
 
@@ -778,7 +778,7 @@ class ConsciousnessDetector {
     dynamicRange: number;
     harmonicComplexity: number;
   } {
-    // Simple waveform analysis for consciousness characteristics
+    // Simple waveform analysis for visual effects characteristics
     let smoothness = 0;
     let dynamicRange = 0;
     let harmonicComplexity = 0;

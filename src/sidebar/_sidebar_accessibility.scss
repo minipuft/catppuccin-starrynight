@@ -645,7 +645,7 @@
     /* Screen reader accessible text */
     &::after {
       content: attr(aria-valuenow) '% complete';
-      @extend .sidebar-sr-only;
+      @extend .sidebar-sr-only !optional;
     }
   }
 }

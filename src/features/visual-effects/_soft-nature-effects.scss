@@ -1,11 +1,11 @@
 /**
- * Natural Harmony Engine CSS - Phase 2.4
+ * Dynamic Harmony Engine CSS - Phase 2.4
  * 
  * Gentle color breathing for peaceful content.
- * Creates organic, earth-connected breathing rhythms that sync with natural frequencies.
+ * Creates natural, earth-connected breathing rhythms that sync with natural frequencies.
  * 
- * @performance 60fps organic breathing with nature-inspired timing
- * @consciousness Natural rhythms that breathe with musical serenity
+ * @performance 60fps dynamic breathing with nature-inspired timing
+ * @visualization Dynamic rhythms that breathe with musical serenity
  */
 
 /* === Natural Harmony CSS Variables === */
@@ -35,7 +35,7 @@
   --natural-breathing-phase: 0;         /* -1 to 1 breathing cycle value */
   --natural-seasonal-shift: 0;          /* 0-1 seasonal color transitions */
   --natural-forest-atmosphere: 0;       /* 0-1 forest-like ambiance */
-  --natural-organic-transparency: 0.85; /* Overall natural transparency */
+  --natural-visual-transparency: 0.85; /* Overall natural transparency */
   
   /* Calculated Composite Values */
   --natural-earthy-rgb: var(--natural-earthy-r), var(--natural-earthy-g), var(--natural-earthy-b);
@@ -49,21 +49,21 @@
 @keyframes natural-breathing-cycle {
   0% { 
     transform: scale(1);
-    opacity: calc(var(--natural-organic-transparency) - var(--natural-breathing-depth) * 0.05);
+    opacity: calc(var(--natural-visual-transparency) - var(--natural-breathing-depth) * 0.05);
     box-shadow: 
       0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.3)),
       inset 0 0 calc(var(--natural-serenity-level) * 8px) rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.2));
   }
   50% { 
     transform: scale(calc(1 + var(--natural-breathing-depth) * 0.02));
-    opacity: calc(var(--natural-organic-transparency) + var(--natural-breathing-depth) * 0.05);
+    opacity: calc(var(--natural-visual-transparency) + var(--natural-breathing-depth) * 0.05);
     box-shadow: 
       0 0 calc(var(--natural-serenity-level) * 25px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.4)),
       inset 0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.3));
   }
   100% { 
     transform: scale(1);
-    opacity: calc(var(--natural-organic-transparency) - var(--natural-breathing-depth) * 0.05);
+    opacity: calc(var(--natural-visual-transparency) - var(--natural-breathing-depth) * 0.05);
     box-shadow: 
       0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.3)),
       inset 0 0 calc(var(--natural-serenity-level) * 8px) rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.2));
@@ -140,7 +140,7 @@
   }
 }
 
-@keyframes natural-organic-flow {
+@keyframes natural-visual-flow {
   0% { 
     background-position: 0% 50%;
     background-size: 200% 200%;
@@ -173,10 +173,10 @@
   }
 }
 
-/* === Natural Harmony Base Classes === */
+/* === Dynamic Harmony Base Classes === */
 
-/* Natural Breathing Effect */
-.natural-breathing {
+/* Dynamic Breathing Effect */
+.dynamic-breathing {
   position: relative;
   
   animation: natural-breathing-cycle calc(1s / max(var(--natural-breathing-frequency), 0.1)) ease-in-out infinite;
@@ -203,7 +203,7 @@
 }
 
 /* Forest Atmosphere Effect */
-.natural-forest-atmosphere {
+.dynamic-forest-atmosphere {
   position: relative;
   
   animation: natural-forest-sway 8s ease-in-out infinite;
@@ -225,12 +225,12 @@
     pointer-events: none;
     opacity: var(--natural-forest-atmosphere);
     
-    animation: natural-organic-flow 12s ease-in-out infinite;
+    animation: natural-visual-flow 12s ease-in-out infinite;
   }
 }
 
 /* Earth Connection Effect */
-.natural-earth-connection {
+.dynamic-earth-connection {
   position: relative;
   border: 1px solid rgba(var(--natural-earthy-rgb), calc(var(--natural-earth-connection) * 0.4));
   
@@ -244,7 +244,7 @@
 }
 
 /* Seasonal Shift Effect */
-.natural-seasonal-shift {
+.dynamic-seasonal-shift {
   position: relative;
   
   animation: natural-seasonal-shift 60s linear infinite;
@@ -255,8 +255,8 @@
     brightness(calc(1 + var(--natural-seasonal-shift) * 0.1));
 }
 
-/* Organic Flow Background */
-.natural-organic-flow {
+/* Dynamic Flow Background */
+.dynamic-visual-flow {
   position: relative;
   overflow: hidden;
   
@@ -278,12 +278,12 @@
     pointer-events: none;
     border-radius: inherit;
     
-    animation: natural-organic-flow 20s ease-in-out infinite;
+    animation: natural-visual-flow 20s ease-in-out infinite;
   }
 }
 
-/* Natural Serenity Glow */
-.natural-serenity-glow {
+/* Dynamic Serenity Glow */
+.dynamic-serenity-glow {
   filter: drop-shadow(0 0 calc(var(--natural-serenity-level) * 12px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.5)));
   
   animation: natural-serenity-glow calc(3s / max(var(--natural-breathing-frequency), 0.1)) ease-in-out infinite;
@@ -294,8 +294,8 @@
 /* Main View Container - Natural Background Flow */
 .main-view-container {
   &[data-natural-mode="active"] {
-    @extend .natural-organic-flow;
-    @extend .natural-seasonal-shift;
+    @extend .dynamic-visual-flow !optional;
+    @extend .dynamic-seasonal-shift !optional;
     
     background-blend-mode: multiply;
     
@@ -308,8 +308,8 @@
 /* Now Playing Bar - Natural Breathing */
 .Root__now-playing-bar {
   &[data-natural-mode="active"] {
-    @extend .natural-breathing;
-    @extend .natural-earth-connection;
+    @extend .dynamic-breathing !optional;
+    @extend .dynamic-earth-connection !optional;
     
     background: linear-gradient(
       90deg,
@@ -327,8 +327,8 @@
 .cover-art,
 .main-trackInfo-container img {
   &[data-natural-mode="active"] {
-    @extend .natural-serenity-glow;
-    @extend .natural-seasonal-shift;
+    @extend .dynamic-serenity-glow !optional;
+    @extend .dynamic-seasonal-shift !optional;
     
     border: 2px solid rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.5));
     border-radius: 8px;
@@ -342,8 +342,8 @@
 /* Progress Bar - Natural Flow */
 .progress-bar {
   &[data-natural-mode="active"] {
-    @extend .natural-organic-flow;
-    @extend .natural-breathing;
+    @extend .dynamic-visual-flow !optional;
+    @extend .dynamic-breathing !optional;
     
     background: rgba(var(--natural-stone-rgb), 0.3);
     border-radius: 8px;
@@ -359,7 +359,7 @@
       border-radius: 8px;
       box-shadow: 0 0 8px rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.5));
       
-      animation: natural-organic-flow 15s ease-in-out infinite;
+      animation: natural-visual-flow 15s ease-in-out infinite;
     }
   }
 }
@@ -367,8 +367,8 @@
 /* Navigation Sidebar - Forest Atmosphere */
 .Root__nav-bar {
   &[data-natural-mode="active"] {
-    @extend .natural-forest-atmosphere;
-    @extend .natural-earth-connection;
+    @extend .dynamic-forest-atmosphere !optional;
+    @extend .dynamic-earth-connection !optional;
     
     border-right: 1px solid rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.4));
     
@@ -403,7 +403,7 @@
 /* Player Controls - Natural Harmony */
 .player-controls {
   &[data-natural-mode="active"] {
-    @extend .natural-breathing;
+    @extend .dynamic-breathing !optional;
     
     .control-button {
       position: relative;
@@ -442,7 +442,7 @@
 /* Track Information - Natural Text Flow */
 .main-trackInfo-container {
   &[data-natural-mode="active"] {
-    @extend .natural-organic-flow;
+    @extend .dynamic-visual-flow !optional;
     
     .track-title,
     .artist-name {
@@ -459,8 +459,8 @@
 /* Volume Controls - Natural Breathing */
 .volume-bar {
   &[data-natural-mode="active"] {
-    @extend .natural-breathing;
-    @extend .natural-earth-connection;
+    @extend .dynamic-breathing !optional;
+    @extend .dynamic-earth-connection !optional;
     
     .volume-bar-fill {
       background: linear-gradient(
@@ -478,12 +478,12 @@
 
 /* Reduce effects for accessibility */
 @media (prefers-reduced-motion: reduce) {
-  .natural-breathing,
-  .natural-forest-atmosphere,
-  .natural-earth-connection,
-  .natural-seasonal-shift,
-  .natural-organic-flow,
-  .natural-serenity-glow {
+  .dynamic-breathing,
+  .dynamic-forest-atmosphere,
+  .dynamic-earth-connection,
+  .dynamic-seasonal-shift,
+  .dynamic-visual-flow,
+  .dynamic-serenity-glow {
     animation: none !important;
     
     &::before,
@@ -499,11 +499,11 @@
     --natural-quality-multiplier: 1.2;
   }
   
-  .natural-breathing::before {
+  .dynamic-breathing::before {
     filter: blur(calc(var(--natural-serenity-level) * 1px));
   }
   
-  .natural-organic-flow::before {
+  .dynamic-visual-flow::before {
     background-size: 300% 300%;
   }
 }
@@ -514,8 +514,8 @@
     --natural-quality-multiplier: 0.7;
   }
   
-  .natural-breathing,
-  .natural-forest-atmosphere {
+  .dynamic-breathing,
+  .dynamic-forest-atmosphere {
     &::before,
     &::after {
       opacity: calc(var(--natural-serenity-level) * 0.7);
@@ -541,9 +541,9 @@
 
 /* Debug mode - shows natural effect boundaries */
 [data-debug="natural"] {
-  .natural-breathing,
-  .natural-forest-atmosphere,
-  .natural-earth-connection {
+  .dynamic-breathing,
+  .dynamic-forest-atmosphere,
+  .dynamic-earth-connection {
     outline: 1px dashed rgba(var(--natural-earthy-rgb), 0.5) !important;
     
     &::before,
@@ -551,4 +551,94 @@
       outline: 1px dotted rgba(var(--natural-forest-rgb), 0.3) !important;
     }
   }
+}
+
+// =============================================================================
+// LEGACY COMPATIBILITY MAPPINGS - Phase 6.3 Layer C Modernization
+// =============================================================================
+
+// === Legacy Class Support ===
+// natural-* → dynamic-* class mappings for backward compatibility
+
+.natural-breathing {
+  @extend .dynamic-breathing !optional;
+}
+
+.natural-forest-atmosphere {
+  @extend .dynamic-forest-atmosphere !optional;
+}
+
+.natural-earth-connection {
+  @extend .dynamic-earth-connection !optional;
+}
+
+.natural-seasonal-shift {
+  @extend .dynamic-seasonal-shift !optional;
+}
+
+.natural-visual-flow {
+  @extend .dynamic-visual-flow !optional;
+}
+
+.natural-serenity-glow {
+  @extend .dynamic-serenity-glow !optional;
+}
+
+// Legacy organic → visual class alias
+.natural-organic-flow {
+  @extend .dynamic-visual-flow !optional;
+}
+
+// === Legacy Keyframe Support ===
+// Duplicate keyframes with original names for compatibility
+
+@keyframes natural-breathing-cycle {
+  0% { 
+    transform: scale(1);
+    opacity: calc(var(--natural-visual-transparency) - var(--natural-breathing-depth) * 0.05);
+    box-shadow: 
+      0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.3)),
+      inset 0 0 calc(var(--natural-serenity-level) * 8px) rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.2));
+  }
+  50% { 
+    transform: scale(calc(1 + var(--natural-breathing-depth) * 0.02));
+    opacity: calc(var(--natural-visual-transparency) + var(--natural-breathing-depth) * 0.05);
+    box-shadow: 
+      0 0 calc(var(--natural-serenity-level) * 25px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.4)),
+      inset 0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.3));
+  }
+  100% { 
+    transform: scale(1);
+    opacity: calc(var(--natural-visual-transparency) - var(--natural-breathing-depth) * 0.05);
+    box-shadow: 
+      0 0 calc(var(--natural-serenity-level) * 15px) rgba(var(--natural-earthy-rgb), calc(var(--natural-serenity-level) * 0.3)),
+      inset 0 0 calc(var(--natural-serenity-level) * 8px) rgba(var(--natural-forest-rgb), calc(var(--natural-serenity-level) * 0.2));
+  }
+}
+
+@keyframes natural-forest-sway {
+  0% { 
+    transform: translateY(0) rotateZ(0deg);
+    filter: hue-rotate(0deg) saturate(1);
+  }
+  33% { 
+    transform: translateY(calc(var(--natural-forest-atmosphere) * -1px)) rotateZ(calc(var(--natural-forest-atmosphere) * 0.5deg));
+    filter: hue-rotate(calc(var(--natural-forest-atmosphere) * 3deg)) saturate(calc(1 + var(--natural-forest-atmosphere) * 0.15));
+  }
+  66% { 
+    transform: translateY(calc(var(--natural-forest-atmosphere) * 0.5px)) rotateZ(calc(var(--natural-forest-atmosphere) * -0.3deg));
+    filter: hue-rotate(calc(var(--natural-forest-atmosphere) * -2deg)) saturate(calc(1 + var(--natural-forest-atmosphere) * 0.1));
+  }
+  100% { 
+    transform: translateY(0) rotateZ(0deg);
+    filter: hue-rotate(0deg) saturate(1);
+  }
+}
+
+@keyframes natural-organic-flow {
+  0% { transform: scale(1) rotate(0deg); filter: saturate(1); }
+  25% { transform: scale(1.01) rotate(1deg); filter: saturate(1.1); }
+  50% { transform: scale(0.99) rotate(-0.5deg); filter: saturate(0.95); }
+  75% { transform: scale(1.02) rotate(0.8deg); filter: saturate(1.05); }
+  100% { transform: scale(1) rotate(0deg); filter: saturate(1); }
 }

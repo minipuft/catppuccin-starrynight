@@ -8,17 +8,17 @@
   // 🌡️ Enhanced breathing effect with emotional temperature integration
   transform: scale(
     calc(
-      var(--sn-breathing-scale, 1) * 
-      (1 + var(--organic-emotional-intensity, 0.5) * 0.05)
+      var(--sn-music-breathing-scale, 1) * 
+      (1 + var(--sn-audio-emotional-intensity, 0.5) * 0.05)
     )
   );
   transition: transform 
-    calc(var(--organic-breathing-cycle, 4s) * 0.1) 
-    var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+    calc(var(--sn-audio-breathing-cycle, 4s) * 0.1) 
+    var(--sn-anim-easing-organic, cubic-bezier(0.4, 0, 0.2, 1));
   
   // Apply emotional temperature breathing animation when available
-  &:where(.organic-emotion-calm, .organic-emotion-energetic, .organic-emotion-melancholy) {
-    animation: organic-beat-sync-breathing var(--organic-breathing-cycle, 4s) ease-in-out infinite;
+  &:where(.emotion-calm, .emotion-energetic, .emotion-melancholy) {
+    animation: beat-sync-breathing var(--sn-audio-breathing-cycle, 4s) ease-in-out infinite;
   }
 
   // 🌡️ Enhanced heart icon with emotional temperature response
@@ -27,18 +27,18 @@
     transform: scale(
       calc(
         1 + 
-        (var(--sn-beat-pulse-intensity, 0) * 0.15) +
-        (var(--organic-emotional-intensity, 0.5) * 0.08)
+        (var(--sn-music-beat-pulse-intensity, 0) * 0.15) +
+        (var(--sn-audio-emotional-intensity, 0.5) * 0.08)
       )
     );
     
     // Enhanced breathing for emotional connection (1.5x strength)
-    animation: organic-element-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
-    --breathing-context-multiplier: var(--organic-breathing-enhanced, 1.5);
+    animation: audio-element-breathing var(--sn-audio-breathing-cycle, 1s) ease-in-out infinite;
+    --breathing-context-multiplier: var(--sn-audio-breathing-enhanced, 1.5);
     
     transition: transform 
       140ms 
-      var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+      var(--sn-anim-easing-organic, cubic-bezier(0.4, 0, 0.2, 1));
 
     // 🌡️ Emotional temperature-aware glow
     filter: 
@@ -46,37 +46,37 @@
         0 0 
         calc(
           6px * 
-          var(--sn-beat-pulse-intensity, 0) * 
-          var(--organic-emotional-intensity, 0.5)
+          var(--sn-music-beat-pulse-intensity, 0) * 
+          var(--sn-audio-emotional-intensity, 0.5)
         )
         rgba(
-          var(--organic-emotion-romantic-accent, var(--spice-rgb-red, 243, 139, 168)),
-          calc(0.6 * var(--sn-beat-pulse-intensity, 0) * var(--organic-emotional-intensity, 0.5))
+          var(--sn-emotion-romantic-accent, var(--spice-rgb-red, 243, 139, 168)),
+          calc(0.6 * var(--sn-music-beat-pulse-intensity, 0) * var(--sn-audio-emotional-intensity, 0.5))
         )
       )
-      saturate(var(--organic-emotional-saturation, 1))
-      brightness(var(--organic-temperature-brightness, 1));
+      saturate(var(--sn-audio-emotional-saturation, 1))
+      brightness(var(--sn-audio-temperature-brightness, 1));
     
     // Apply emotional temperature class-specific enhancements
-    &:where(.organic-emotion-romantic, .organic-emotion-happy) {
+    &:where(.emotion-romantic, .emotion-happy) {
       filter: 
         drop-shadow(
           0 0 
-          calc(8px * var(--sn-beat-pulse-intensity, 0))
-          rgba(var(--organic-emotion-romantic-accent), 0.8)
+          calc(8px * var(--sn-music-beat-pulse-intensity, 0))
+          rgba(var(--sn-emotion-romantic-accent), 0.8)
         )
         saturate(1.2)
         brightness(1.1);
       
-      animation: organic-romantic-heart-pulse var(--organic-breathing-cycle, 3s) ease-in-out infinite;
+      animation: romantic-heart-pulse var(--sn-audio-breathing-cycle, 3s) ease-in-out infinite;
     }
     
-    &:where(.organic-emotion-energetic, .organic-emotion-aggressive) {
-      animation: organic-energetic-heart-pulse calc(var(--organic-breathing-cycle, 2s) * 0.8) ease-in-out infinite;
+    &:where(.emotion-energetic, .emotion-aggressive) {
+      animation: energetic-heart-pulse calc(var(--sn-audio-breathing-cycle, 2s) * 0.8) ease-in-out infinite;
     }
     
-    &:where(.organic-emotion-calm, .organic-emotion-ambient) {
-      animation: organic-calm-heart-pulse calc(var(--organic-breathing-cycle, 6s) * 1.2) ease-in-out infinite;
+    &:where(.emotion-calm, .emotion-ambient) {
+      animation: calm-heart-pulse calc(var(--sn-audio-breathing-cycle, 6s) * 1.2) ease-in-out infinite;
     }
   }
   
@@ -84,142 +84,142 @@
   .main-trackInfo-container,
   .main-trackInfo-name {
     // Standard breathing for active musical element (1.0x strength)
-    animation: organic-element-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
-    --breathing-context-multiplier: var(--organic-breathing-standard, 1.0);
+    animation: audio-element-breathing var(--sn-audio-breathing-cycle, 1s) ease-in-out infinite;
+    --breathing-context-multiplier: var(--sn-audio-breathing-standard, 1.0);
   }
 }
 
 // 🌡️ EMOTIONAL TEMPERATURE BEAT SYNC ANIMATIONS
 
-// Organic beat sync breathing animation
-@keyframes organic-beat-sync-breathing {
+// Natural beat sync breathing animation
+@keyframes beat-sync-breathing {
   0%, 100% {
     transform: scale(
       calc(
-        var(--sn-breathing-scale, 1) * 
-        (1 + var(--organic-emotional-intensity, 0.5) * 0.03)
+        var(--sn-music-breathing-scale, 1) * 
+        (1 + var(--sn-audio-emotional-intensity, 0.5) * 0.03)
       )
     );
     filter: 
-      saturate(var(--organic-emotional-saturation, 1))
-      brightness(var(--organic-temperature-brightness, 1));
+      saturate(var(--sn-audio-emotional-saturation, 1))
+      brightness(var(--sn-audio-temperature-brightness, 1));
   }
   50% {
     transform: scale(
       calc(
-        var(--sn-breathing-scale, 1) * 
-        (1 + var(--organic-emotional-intensity, 0.5) * 0.08)
+        var(--sn-music-breathing-scale, 1) * 
+        (1 + var(--sn-audio-emotional-intensity, 0.5) * 0.08)
       )
     );
     filter: 
-      saturate(calc(var(--organic-emotional-saturation, 1) * 1.1))
-      brightness(calc(var(--organic-temperature-brightness, 1) * 1.05));
+      saturate(calc(var(--sn-audio-emotional-saturation, 1) * 1.1))
+      brightness(calc(var(--sn-audio-temperature-brightness, 1) * 1.05));
   }
 }
 
 // Romantic heart pulse animation
-@keyframes organic-romantic-heart-pulse {
+@keyframes romantic-heart-pulse {
   0%, 100% {
     transform: scale(
       calc(
         1 + 
-        (var(--sn-beat-pulse-intensity, 0) * 0.15) +
-        (var(--organic-emotional-intensity, 0.7) * 0.05)
+        (var(--sn-music-beat-pulse-intensity, 0) * 0.15) +
+        (var(--natural-emotional-intensity, 0.7) * 0.05)
       )
     );
     filter: 
       drop-shadow(
         0 0 6px 
-        rgba(var(--organic-emotion-romantic-accent), 0.6)
+        rgba(var(--sn-emotion-romantic-accent), 0.6)
       )
-      hue-rotate(var(--organic-temperature-hue-shift, 0deg));
+      hue-rotate(var(--sn-audio-temperature-hue-shift, 0deg));
   }
   50% {
     transform: scale(
       calc(
         1 + 
-        (var(--sn-beat-pulse-intensity, 0) * 0.20) +
-        (var(--organic-emotional-intensity, 0.7) * 0.10)
+        (var(--sn-music-beat-pulse-intensity, 0) * 0.20) +
+        (var(--natural-emotional-intensity, 0.7) * 0.10)
       )
     );
     filter: 
       drop-shadow(
         0 0 10px 
-        rgba(var(--organic-emotion-romantic-accent), 0.8)
+        rgba(var(--sn-emotion-romantic-accent), 0.8)
       )
-      hue-rotate(var(--organic-temperature-hue-shift, 0deg))
+      hue-rotate(var(--sn-audio-temperature-hue-shift, 0deg))
       saturate(1.2);
   }
 }
 
 // Energetic heart pulse animation
-@keyframes organic-energetic-heart-pulse {
+@keyframes energetic-heart-pulse {
   0%, 100% {
     transform: scale(
       calc(
         1 + 
-        (var(--sn-beat-pulse-intensity, 0) * 0.12) +
-        (var(--organic-emotional-intensity, 1.0) * 0.06)
+        (var(--sn-music-beat-pulse-intensity, 0) * 0.12) +
+        (var(--natural-emotional-intensity, 1.0) * 0.06)
       )
     );
     filter: 
       drop-shadow(
         0 0 4px 
-        rgba(var(--organic-emotion-energetic-accent), 0.7)
+        rgba(var(--sn-emotion-energetic-accent), 0.7)
       )
-      hue-rotate(var(--organic-temperature-hue-shift, 0deg));
+      hue-rotate(var(--sn-audio-temperature-hue-shift, 0deg));
   }
   60% {
     transform: scale(
       calc(
         1 + 
-        (var(--sn-beat-pulse-intensity, 0) * 0.20) +
-        (var(--organic-emotional-intensity, 1.0) * 0.12)
+        (var(--sn-music-beat-pulse-intensity, 0) * 0.20) +
+        (var(--natural-emotional-intensity, 1.0) * 0.12)
       )
     );
     filter: 
       drop-shadow(
         0 0 12px 
-        rgba(var(--organic-emotion-energetic-accent), 1.0)
+        rgba(var(--sn-emotion-energetic-accent), 1.0)
       )
-      hue-rotate(calc(var(--organic-temperature-hue-shift, 0deg) + 10deg))
+      hue-rotate(calc(var(--sn-audio-temperature-hue-shift, 0deg) + 10deg))
       saturate(1.4)
       brightness(1.15);
   }
 }
 
 // Calm heart pulse animation
-@keyframes organic-calm-heart-pulse {
+@keyframes calm-heart-pulse {
   0%, 100% {
     transform: scale(
       calc(
         1 + 
-        (var(--sn-beat-pulse-intensity, 0) * 0.08) +
-        (var(--organic-emotional-intensity, 0.6) * 0.04)
+        (var(--sn-music-beat-pulse-intensity, 0) * 0.08) +
+        (var(--natural-emotional-intensity, 0.6) * 0.04)
       )
     );
     filter: 
       drop-shadow(
         0 0 3px 
-        rgba(var(--organic-emotion-calm-accent), 0.5)
+        rgba(var(--sn-emotion-calm-accent), 0.5)
       )
-      hue-rotate(var(--organic-temperature-hue-shift, 0deg))
+      hue-rotate(var(--sn-audio-temperature-hue-shift, 0deg))
       blur(0.5px);
   }
   50% {
     transform: scale(
       calc(
         1 + 
-        (var(--sn-beat-pulse-intensity, 0) * 0.12) +
-        (var(--organic-emotional-intensity, 0.6) * 0.06)
+        (var(--sn-music-beat-pulse-intensity, 0) * 0.12) +
+        (var(--natural-emotional-intensity, 0.6) * 0.06)
       )
     );
     filter: 
       drop-shadow(
         0 0 6px 
-        rgba(var(--organic-emotion-calm-accent), 0.7)
+        rgba(var(--sn-emotion-calm-accent), 0.7)
       )
-      hue-rotate(var(--organic-temperature-hue-shift, 0deg))
+      hue-rotate(var(--sn-audio-temperature-hue-shift, 0deg))
       blur(0.3px)
       saturate(1.1)
       brightness(1.05);
@@ -229,43 +229,43 @@
 // 🌡️ Enhanced cards with emotional temperature beat sync (performance optimized)
 .main-card-card {
   // Only apply emotional temperature beat sync on hover for performance
-  &:hover:where(.organic-emotion-energetic, .organic-emotion-happy, .organic-emotion-epic) {
-    animation: organic-card-energetic-pulse 
-      calc(var(--organic-breathing-cycle, 2s) * 0.8) 
+  &:hover:where(.emotion-energetic, .emotion-happy, .emotion-epic) {
+    animation: card-energetic-pulse 
+      calc(var(--sn-audio-breathing-cycle, 2s) * 0.8) 
       ease-in-out infinite;
   }
   
-  &:hover:where(.organic-emotion-calm, .organic-emotion-ambient, .organic-emotion-romantic) {
-    animation: organic-card-calm-pulse 
-      calc(var(--organic-breathing-cycle, 5s) * 1.2) 
+  &:hover:where(.emotion-calm, .emotion-ambient, .emotion-romantic) {
+    animation: card-calm-pulse 
+      calc(var(--sn-audio-breathing-cycle, 5s) * 1.2) 
       ease-in-out infinite;
   }
   
   transition: transform 
     200ms 
-    var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+    var(--natural-ease-visual, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 // Card pulse animations
-@keyframes organic-card-energetic-pulse {
+@keyframes card-energetic-pulse {
   0%, 100% {
     transform: translateY(-2px) 
-      scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.015)));
+      scale(calc(1 + (var(--sn-music-beat-pulse-intensity, 0) * 0.015)));
   }
   50% {
     transform: translateY(-4px) 
-      scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.025)));
+      scale(calc(1 + (var(--sn-music-beat-pulse-intensity, 0) * 0.025)));
   }
 }
 
-@keyframes organic-card-calm-pulse {
+@keyframes card-calm-pulse {
   0%, 100% {
     transform: translateY(-1px) 
-      scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.010)));
+      scale(calc(1 + (var(--sn-music-beat-pulse-intensity, 0) * 0.010)));
   }
   50% {
     transform: translateY(-2px) 
-      scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.015)));
+      scale(calc(1 + (var(--sn-music-beat-pulse-intensity, 0) * 0.015)));
   }
 }
 
@@ -282,7 +282,7 @@
   
   // Keep basic beat pulse but remove emotional temperature enhancements
   .main-addButton-button.control-button-heart {
-    transform: scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.05))) !important;
+    transform: scale(calc(1 + (var(--sn-music-beat-pulse-intensity, 0) * 0.05))) !important;
     filter: none !important;
   }
 }
@@ -293,8 +293,8 @@
     filter: 
       drop-shadow(
         0 0 
-        calc(8px * var(--sn-beat-pulse-intensity, 0))
-        rgba(var(--organic-emotion-romantic-accent), 1.0)
+        calc(8px * var(--sn-music-beat-pulse-intensity, 0))
+        rgba(var(--sn-emotion-romantic-accent), 1.0)
       )
       saturate(2.0) !important
       contrast(2.0) !important
@@ -315,7 +315,7 @@
     filter: 
       drop-shadow(
         0 0 
-        calc(4px * var(--sn-beat-pulse-intensity, 0))
+        calc(4px * var(--sn-music-beat-pulse-intensity, 0))
         rgba(var(--spice-rgb-red, 243, 139, 168), 0.4)
       ) !important;
   }

@@ -107,7 +107,7 @@ Key pillars:
 | ----------------------- | ------------------------------------------------------------- |
 | **New Contributor**     | `VISUAL_SYSTEMS_REFERENCE.md` then `VISUAL_EFFECTS_COORDINATION.md`  |
 | **Performance Auditor** | `PERFORMANCE_OPTIMIZATION_GUIDELINES.md` + `PERFORMANCE_ARCHITECTURE_GUIDE.md` |
-| **Design Theorist**     | `MASTER_ARCHITECTURE_OVERVIEW.md` + `ORGANIC_CONSCIOUSNESS_GUIDE.md`         |
+| **Design Theorist**     | `MASTER_ARCHITECTURE_OVERVIEW.md` + `DYNAMIC_VISUAL_EFFECTS_GUIDE.md`         |
 | **AI / LLM**            | This file → follow folder map as needed                       |
 
 ---

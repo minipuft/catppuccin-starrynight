@@ -1,5 +1,5 @@
 // ████████████████████████████████████████████████████████████████████████████████
-// YEAR 3000 PERFORMANCE OPTIMIZATION - GPU Acceleration & Efficiency
+// ADVANCED PERFORMANCE OPTIMIZATION - GPU Acceleration & Efficiency
 // ████████████████████████████████████████████████████████████████████████████████
 
 // GPU Acceleration Hints for High-Performance Elements
@@ -22,7 +22,7 @@
   // Timing curves are now referenced via the shared easing tokens which other
   // SCSS modules already consume (see _sn_root_variables.scss & _sn_gradient.scss)
   // These remain as fallbacks so nothing breaks if the variables are unset.
-  --sn-transition-timing-default: var(--sn-easing-explorer, var(--sn-anim-easing-organic));
+  --sn-transition-timing-default: var(--sn-easing-explorer, var(--sn-anim-easing-dynamic));
 
   // Composite transition helpers (duration + timing) for convenience.  These
   // map 1-to-1 with the previous public tokens so no downstream refactor is
@@ -34,7 +34,7 @@
   // Legacy specialized easings kept for semantics – consider consolidating into
   // _sn_root_variables.scss in a later housekeeping pass.
   --sn-ease-bounce: var(--sn-anim-easing-bounce-gentle);
-  --sn-ease-smooth: var(--sn-anim-easing-organic);
+  --sn-ease-smooth: var(--sn-anim-easing-dynamic);
   --sn-ease-sharp: var(--sn-anim-easing-custom-1);
 }
 
@@ -43,7 +43,7 @@
 .main-trackList-trackListRow,
 .main-actionBar-ActionBarRow,
 .main-nowPlayingBar-nowPlayingBar {
-  @extend .sn-gpu-accelerated;
+  @extend .sn-gpu-accelerated !optional;
 }
 
 // Reduce motion for users who prefer it

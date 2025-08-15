@@ -16,7 +16,7 @@ export type VariableGroup =
   | 'animation'
   | 'layout'
   | 'performance'
-  | 'consciousness'
+  | 'visual-effects'
   | 'utility';
 
 export type VariablePriority = 'critical' | 'high' | 'normal' | 'low';
@@ -100,15 +100,15 @@ export const UNIFIED_VARIABLE_GROUPS: Record<VariableGroup, VariableGroupDefinit
         type: 'number',
         description: 'Treble frequency energy (0-1)'
       },
-      'breathing.scale': {
-        name: '--sn-music-breathing-scale',
+      'animation.scale': {
+        name: '--sn-music-animation-scale',
         defaultValue: '1',
         type: 'number',
         description: 'Breathing scale factor (0.95-1.05)',
         critical: true
       },
-      'breathing.rate': {
-        name: '--sn-music-breathing-rate',
+      'animation.rate': {
+        name: '--sn-music-animation-rate',
         defaultValue: '4s',
         type: 'time',
         description: 'Breathing animation duration'
@@ -400,8 +400,8 @@ export const UNIFIED_VARIABLE_GROUPS: Record<VariableGroup, VariableGroupDefinit
         type: 'time',
         description: 'Slow animation duration'
       },
-      'duration.breathing': {
-        name: '--sn-anim-duration-breathing',
+      'duration.animation': {
+        name: '--sn-anim-duration-animation',
         defaultValue: '4s',
         type: 'time',
         description: 'Breathing animation duration'
@@ -641,88 +641,197 @@ export const UNIFIED_VARIABLE_GROUPS: Record<VariableGroup, VariableGroupDefinit
     }
   },
 
-  consciousness: {
-    name: 'consciousness',
+  'visual-effects': {
+    name: 'visual-effects',
     priority: 'normal',
     description: 'Consciousness fields and magnetic depth',
     variables: {
       'depth.field': {
-        name: '--sn-consciousness-depth-field',
+        name: '--sn-visual-effects-depth-field',
         defaultValue: '800px',
         type: 'length',
         description: '3D perspective depth field'
       },
       'depth.near': {
-        name: '--sn-consciousness-depth-near',
+        name: '--sn-visual-effects-depth-near',
         defaultValue: '12px',
         type: 'length',
         description: 'Near depth distance'
       },
       'depth.far': {
-        name: '--sn-consciousness-depth-far',
+        name: '--sn-visual-effects-depth-far',
         defaultValue: '-10px',
         type: 'length',
         description: 'Far depth distance'
       },
       'depth.neutral': {
-        name: '--sn-consciousness-depth-neutral',
+        name: '--sn-visual-effects-depth-neutral',
         defaultValue: '0px',
         type: 'length',
         description: 'Neutral depth position'
       },
       'field.intensity': {
-        name: '--sn-consciousness-field-intensity',
+        name: '--sn-visual-effects-field-intensity',
         defaultValue: '0.4',
         type: 'number',
         description: 'Consciousness field intensity (0-1)'
       },
-      'field.breathing.rate': {
-        name: '--sn-consciousness-field-breathing-rate',
+      'field.animation.rate': {
+        name: '--sn-visual-effects-field-animation-rate',
         defaultValue: '12s',
         type: 'time',
-        description: 'Consciousness field breathing rate'
+        description: 'Consciousness field animation rate'
       },
       'field.sensitivity': {
-        name: '--sn-consciousness-field-sensitivity',
+        name: '--sn-visual-effects-field-sensitivity',
         defaultValue: '0.8',
         type: 'number',
         description: 'Field response sensitivity (0-1)'
       },
       'bilateral.left.lead': {
-        name: '--sn-consciousness-bilateral-left-lead',
+        name: '--sn-visual-effects-bilateral-left-lead',
         defaultValue: '-150ms',
         type: 'time',
         description: 'Left sidebar lead time'
       },
       'bilateral.right.delay': {
-        name: '--sn-consciousness-bilateral-right-delay',
+        name: '--sn-visual-effects-bilateral-right-delay',
         defaultValue: '150ms',
         type: 'time',
         description: 'Right sidebar delay'
       },
       'bilateral.sync': {
-        name: '--sn-consciousness-bilateral-sync',
+        name: '--sn-visual-effects-bilateral-sync',
         defaultValue: '1',
         type: 'boolean',
         description: 'Bilateral sync enabled (0/1)'
       },
       'hover.pull': {
-        name: '--sn-consciousness-hover-pull',
+        name: '--sn-visual-effects-hover-pull',
         defaultValue: '12px',
         type: 'length',
         description: 'Hover pull distance'
       },
       'focus.pull': {
-        name: '--sn-consciousness-focus-pull',
+        name: '--sn-visual-effects-focus-pull',
         defaultValue: '18px',
         type: 'length',
         description: 'Focus pull distance'
       },
       'transition.speed': {
-        name: '--sn-consciousness-transition-speed',
+        name: '--sn-visual-effects-transition-speed',
         defaultValue: '0.6s',
         type: 'time',
         description: 'Consciousness transition speed'
+      },
+      'system.active': {
+        name: '--sn-visual-effects-system-active',
+        defaultValue: '1',
+        type: 'boolean',
+        description: 'Visual effects system active state (0/1)',
+        critical: true
+      },
+      'level': {
+        name: '--sn-visual-effects-level',
+        defaultValue: '0.7',
+        type: 'number',
+        description: 'Overall visual effects level (0-1)'
+      },
+      'awareness.level': {
+        name: '--sn-visual-effects-awareness-level',
+        defaultValue: '0.5',
+        type: 'number',
+        description: 'User awareness level (0-1)'
+      },
+      'music.sync.strength': {
+        name: '--sn-visual-effects-music-sync-strength',
+        defaultValue: '0.7',
+        type: 'number',
+        description: 'Music synchronization strength (0-1)'
+      },
+      'interaction.mode': {
+        name: '--sn-visual-effects-interaction-mode',
+        defaultValue: '0',
+        type: 'number',
+        description: 'Current interaction mode (0-4)'
+      },
+      'focus.depth': {
+        name: '--sn-visual-effects-focus-depth',
+        defaultValue: '0.3',
+        type: 'number',
+        description: 'User focus depth (0-1)'
+      },
+      'content.engagement': {
+        name: '--sn-visual-effects-content-engagement',
+        defaultValue: '0.5',
+        type: 'number',
+        description: 'Content engagement level (0-1)'
+      },
+      'scroll.velocity': {
+        name: '--sn-visual-effects-scroll-velocity',
+        defaultValue: '0',
+        type: 'number',
+        description: 'Normalized scroll velocity (0-1)'
+      },
+      'dwell.time.factor': {
+        name: '--sn-visual-effects-dwell-time-factor',
+        defaultValue: '0',
+        type: 'number',
+        description: 'Dwell time factor (0-1)'
+      },
+      'interaction.pattern': {
+        name: '--sn-visual-effects-interaction-pattern',
+        defaultValue: '1',
+        type: 'number',
+        description: 'Interaction pattern type (0-3)'
+      },
+      'temporal.flow.direction.x': {
+        name: '--sn-visual-effects-temporal-flow-direction-x',
+        defaultValue: '0.5',
+        type: 'number',
+        description: 'Temporal flow X direction (0-1)'
+      },
+      'temporal.flow.direction.y': {
+        name: '--sn-visual-effects-temporal-flow-direction-y',
+        defaultValue: '0.5',
+        type: 'number',
+        description: 'Temporal flow Y direction (0-1)'
+      },
+      'memory.intensity': {
+        name: '--sn-visual-effects-memory-intensity',
+        defaultValue: '0.4',
+        type: 'number',
+        description: 'Memory pattern intensity (0-1)'
+      },
+      'fluidity.index': {
+        name: '--sn-visual-effects-fluidity-index',
+        defaultValue: '0.5',
+        type: 'number',
+        description: 'Membrane fluidity index (0-1)'
+      },
+      'genre.shift': {
+        name: '--sn-visual-effects-genre-shift',
+        defaultValue: '0.5',
+        type: 'number',
+        description: 'Genre-based visual effects shift (0-1)'
+      },
+      'user.interaction.detected': {
+        name: '--sn-visual-effects-user-interaction-detected',
+        defaultValue: '0',
+        type: 'boolean',
+        description: 'User interaction detected (0/1)'
+      },
+      'content.protection.level': {
+        name: '--sn-visual-effects-content-protection-level',
+        defaultValue: '0.95',
+        type: 'number',
+        description: 'Content protection level (0-1)'
+      },
+      'chrome.enhancement.level': {
+        name: '--sn-visual-effects-chrome-enhancement-level',
+        defaultValue: '2.0',
+        type: 'number',
+        description: 'Chrome enhancement level'
       }
     }
   },
@@ -786,8 +895,8 @@ export const UNIFIED_VARIABLE_GROUPS: Record<VariableGroup, VariableGroupDefinit
         type: 'boolean',
         description: 'WebGL features enabled (0/1)'
       },
-      'feature.consciousness.enabled': {
-        name: '--sn-feature-consciousness-enabled',
+      'feature.visual-effects.enabled': {
+        name: '--sn-feature-visual-effects-enabled',
         defaultValue: '1',
         type: 'boolean',
         description: 'Consciousness features enabled (0/1)'
@@ -803,6 +912,12 @@ export const UNIFIED_VARIABLE_GROUPS: Record<VariableGroup, VariableGroupDefinit
         defaultValue: '1',
         type: 'boolean',
         description: 'Animations enabled (0/1)'
+      },
+      'feature.reading.mode.active': {
+        name: '--sn-feature-reading-mode-active',
+        defaultValue: '0',
+        type: 'boolean',
+        description: 'Reading mode active (0/1)'
       }
     }
   }
@@ -817,7 +932,7 @@ export const LEGACY_VARIABLE_MAPPINGS: Record<string, string> = {
   '--sn-beat-pulse-intensity': '--sn-music-beat-pulse-intensity',
   '--sn-rhythm-phase': '--sn-music-rhythm-phase',
   '--sn-spectrum-phase': '--sn-music-spectrum-phase',
-  '--sn-breathing-scale': '--sn-music-breathing-scale',
+  '--sn-animation-scale': '--sn-music-animation-scale',
   '--sn-feed-bloom-intensity': '--sn-music-beat-pulse-intensity',
   
   // Color legacy mappings
@@ -833,18 +948,42 @@ export const LEGACY_VARIABLE_MAPPINGS: Record<string, string> = {
   '--sn-gradient-transition': '--sn-bg-transition-duration',
   
   // Consciousness legacy mappings
-  '--magnetic-depth-field': '--sn-consciousness-depth-field',
-  '--magnetic-hover-pull': '--sn-consciousness-hover-pull',
-  '--magnetic-focus-pull': '--sn-consciousness-focus-pull',
-  '--magnetic-transition-speed': '--sn-consciousness-transition-speed',
-  '--consciousness-field-intensity': '--sn-consciousness-field-intensity',
-  '--consciousness-breathing-rate': '--sn-consciousness-field-breathing-rate',
+  '--magnetic-depth-field': '--sn-visual-effects-depth-field',
+  '--magnetic-hover-pull': '--sn-visual-effects-hover-pull',
+  '--magnetic-focus-pull': '--sn-visual-effects-focus-pull',
+  '--magnetic-transition-speed': '--sn-visual-effects-transition-speed',
+  '--visual-effects-field-intensity': '--sn-visual-effects-field-intensity',
+  '--visual-effects-animation-rate': '--sn-visual-effects-field-animation-rate',
   
   // Animation legacy mappings
   '--sn-transition-timing-default': '--sn-anim-easing-standard',
   '--sn-transition-duration-fast': '--sn-anim-duration-fast',
   '--sn-transition-duration-normal': '--sn-anim-duration-normal',
-  '--sn-transition-duration-slow': '--sn-anim-duration-slow'
+  '--sn-transition-duration-slow': '--sn-anim-duration-slow',
+  
+  // Visual effects legacy mappings (DepthLayerController compatibility)
+  '--visualEffects-system-active': '--sn-visual-effects-system-active',
+  '--visualEffects-intensity': '--sn-visual-effects-field-intensity',
+  '--visualEffects-level': '--sn-visual-effects-level',
+  '--awareness-level': '--sn-visual-effects-awareness-level',
+  '--musical-sync-intensity': '--sn-music-energy-level',
+  '--musical-sync-strength': '--sn-visual-effects-music-sync-strength',
+  '--reading-mode-active': '--sn-feature-reading-mode-active',
+  '--user-interaction-detected': '--sn-visual-effects-user-interaction-detected',
+  '--current-interaction-mode': '--sn-visual-effects-interaction-mode',
+  '--focus-depth': '--sn-visual-effects-focus-depth',
+  '--content-engagement': '--sn-visual-effects-content-engagement',
+  '--scroll-velocity': '--sn-visual-effects-scroll-velocity',
+  '--dwell-time-factor': '--sn-visual-effects-dwell-time-factor',
+  '--interaction-pattern': '--sn-visual-effects-interaction-pattern',
+  '--temporal-flow-direction-x': '--sn-visual-effects-temporal-flow-direction-x',
+  '--temporal-flow-direction-y': '--sn-visual-effects-temporal-flow-direction-y',
+  '--memory-intensity': '--sn-visual-effects-memory-intensity',
+  '--genre-visualEffects-shift': '--sn-visual-effects-genre-shift',
+  '--sn-fluidity-index': '--sn-visual-effects-fluidity-index',
+  '--visualEffects-breath-rate': '--sn-visual-effects-field-animation-rate',
+  '--content-protection-level': '--sn-visual-effects-content-protection-level',
+  '--chrome-enhancement-level': '--sn-visual-effects-chrome-enhancement-level'
 };
 
 /**

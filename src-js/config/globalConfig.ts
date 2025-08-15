@@ -2,21 +2,25 @@ import type {
   ArtisticMode,
   ArtisticModeProfile,
   ArtisticModeProfiles,
+  ColorHarmonyModes,
   HarmonicModes,
-  Year3000Config,
+  AdvancedSystemConfig,
 } from "@/types/models";
 import { settings } from "@/config";
 
 // Import modular configuration directly to avoid circular imports
-import { HARMONIC_MODES as MODULAR_HARMONIC_MODES, MUSIC_VISUAL_SYNC, ENHANCED_BPM_CONFIG } from "./harmonicModes";
+import { COLOR_HARMONY_MODES as MODULAR_COLOR_HARMONY_MODES, HARMONIC_MODES as MODULAR_HARMONIC_MODES, MUSIC_VISUAL_SYNC, ENHANCED_BPM_CONFIG } from "./harmonicModes";
 import { ARTISTIC_MODE_PROFILES as MODULAR_ARTISTIC_PROFILES } from "./artisticProfiles";
 import { PERFORMANCE_PROFILES, DEFAULT_LOGGING_CONFIG } from "./performanceProfiles";
+
+// Modern exports
+export const COLOR_HARMONY_MODES: ColorHarmonyModes = MODULAR_COLOR_HARMONY_MODES;
 
 // Re-export for backward compatibility
 export const HARMONIC_MODES: HarmonicModes = MODULAR_HARMONIC_MODES;
 export const ARTISTIC_MODE_PROFILES: ArtisticModeProfiles = MODULAR_ARTISTIC_PROFILES;
 
-export const YEAR3000_CONFIG: Year3000Config = {
+export const ADVANCED_SYSTEM_CONFIG: AdvancedSystemConfig = {
   enableDebug: true,
   enableContextualIntelligence: true,
   paletteSystem: 'catppuccin', // Default to maintain compatibility
@@ -28,20 +32,20 @@ export const YEAR3000_CONFIG: Year3000Config = {
   healthCheckInterval: 10000,
   visual: {
     lightweightParticleSystem: { mode: "artist-vision" },
-    dimensionalNexusSystem: { mode: "artist-vision" },
+    spatialNexusSystem: { mode: "artist-vision" },
     dataGlyphSystem: { mode: "artist-vision" },
     beatSyncVisualSystem: { mode: "artist-vision" },
     behavioralPredictionEngine: { mode: "artist-vision" },
     predictiveMaterializationSystem: { mode: "artist-vision" },
-    sidebarConsciousnessSystem: { mode: "artist-vision" },
+    sidebarVisualStateSystem: { mode: "artist-vision" },
   },
   enableColorExtraction: true,
   enableMusicAnalysis: true,
-  enableCosmicSync: true, // NEW: Music-driven visual intensity
+  enableAdvancedSync: true, // NEW: Music-driven visual intensity
   musicModulationIntensity: 0.4, // Increased for dynamic gradient responsiveness
 
   // Active artistic mode for UX / visual presets
-  artisticMode: "artist-vision", // "corporate-safe" | "artist-vision" | "cosmic-maximum"
+  artisticMode: "artist-vision", // "corporate-safe" | "artist-vision" | "advanced-maximum"
 
   // Context-bound method references for external calling
   boundGetCurrentMultipliers: null,
@@ -66,13 +70,13 @@ export const YEAR3000_CONFIG: Year3000Config = {
     if (needsPreferenceLoad) {
       if (this.enableDebug) {
         console.log(
-          `🎨 [YEAR3000_CONFIG] Loading preferences (current: artistic=${this.artisticMode}, palette=${this.paletteSystem})`
+          `🎨 [ADVANCED_SYSTEM_CONFIG] Loading preferences (current: artistic=${this.artisticMode}, palette=${this.paletteSystem})`
         );
       }
       this.loadArtisticPreference();
     } else if (this.enableDebug) {
       console.log(
-        `🎨 [YEAR3000_CONFIG] Skipping preference load (current: artistic=${this.artisticMode}, palette=${this.paletteSystem})`
+        `🎨 [ADVANCED_SYSTEM_CONFIG] Skipping preference load (current: artistic=${this.artisticMode}, palette=${this.paletteSystem})`
       );
     }
 
@@ -80,7 +84,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
     if (this._pendingArtisticMode && this.isFullyInitialized()) {
       if (this.enableDebug) {
         console.log(
-          `🎨 [YEAR3000_CONFIG] Applying pending artistic mode: ${this._pendingArtisticMode}`
+          `🎨 [ADVANCED_SYSTEM_CONFIG] Applying pending artistic mode: ${this._pendingArtisticMode}`
         );
       }
       this.setArtisticMode(this._pendingArtisticMode);
@@ -89,17 +93,17 @@ export const YEAR3000_CONFIG: Year3000Config = {
 
     if (this.enableDebug) {
       console.log(
-        "🔧 [YEAR3000_CONFIG] Initialized with context-bound methods"
+        "🔧 [ADVANCED_SYSTEM_CONFIG] Initialized with context-bound methods"
       );
     }
 
     return this; // Allow chaining
   },
 
-  currentHarmonicMode: "analogous-flow",
-  harmonicBaseColor: null,
-  harmonicIntensity: 0.85, // Enhanced for cinematic gradient harmonies
-  harmonicEvolution: true,
+  currentColorHarmonyMode: "analogous-flow",
+  colorHarmonyBaseColor: null,
+  colorHarmonyIntensity: 0.85, // Enhanced for cinematic gradient harmonies
+  colorHarmonyEvolution: true,
 
   // Music sync configuration imported from modular harmonic modes
   musicVisualSync: {
@@ -121,7 +125,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
       // Defensive check for method existence
       if (typeof this.getCurrentModeProfile !== "function") {
         console.warn(
-          "[YEAR3000_CONFIG] getCurrentModeProfile method not available, using fallback multipliers"
+          "[ADVANCED_SYSTEM_CONFIG] getCurrentModeProfile method not available, using fallback multipliers"
         );
         return this["artisticMultipliers"] as any; // Fallback to legacy multipliers
       }
@@ -131,14 +135,14 @@ export const YEAR3000_CONFIG: Year3000Config = {
       // Defensive check for profile structure
       if (!currentProfile || !currentProfile.multipliers) {
         console.warn(
-          "[YEAR3000_CONFIG] Invalid profile or missing multipliers, using fallback"
+          "[ADVANCED_SYSTEM_CONFIG] Invalid profile or missing multipliers, using fallback"
         );
         return this["artisticMultipliers"] as any;
       }
 
       return currentProfile.multipliers;
     } catch (error) {
-      console.error("[YEAR3000_CONFIG] Error in getCurrentMultipliers:", error);
+      console.error("[ADVANCED_SYSTEM_CONFIG] Error in getCurrentMultipliers:", error);
       return this["artisticMultipliers"] as any; // Safe fallback
     }
   },
@@ -149,7 +153,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
       // Defensive check for method existence
       if (typeof this.getCurrentModeProfile !== "function") {
         console.warn(
-          "[YEAR3000_CONFIG] getCurrentModeProfile method not available, using fallback features"
+          "[ADVANCED_SYSTEM_CONFIG] getCurrentModeProfile method not available, using fallback features"
         );
         return {
           enableAdvancedEffects: true,
@@ -164,7 +168,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
       // Defensive check for profile structure
       if (!currentProfile || !currentProfile.features) {
         console.warn(
-          "[YEAR3000_CONFIG] Invalid profile or missing features, using fallback"
+          "[ADVANCED_SYSTEM_CONFIG] Invalid profile or missing features, using fallback"
         );
         return {
           enableAdvancedEffects: true,
@@ -176,7 +180,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
 
       return currentProfile.features;
     } catch (error) {
-      console.error("[YEAR3000_CONFIG] Error in getCurrentFeatures:", error);
+      console.error("[ADVANCED_SYSTEM_CONFIG] Error in getCurrentFeatures:", error);
       return {
         enableAdvancedEffects: true,
         enableHarmony: true,
@@ -192,7 +196,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
       // Defensive check for method existence
       if (typeof this.getCurrentModeProfile !== "function") {
         console.warn(
-          "[YEAR3000_CONFIG] getCurrentModeProfile method not available, using fallback performance settings"
+          "[ADVANCED_SYSTEM_CONFIG] getCurrentModeProfile method not available, using fallback performance settings"
         );
         return {
           maxParticles: 20,
@@ -207,7 +211,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
       // Defensive check for profile structure
       if (!currentProfile || !currentProfile.performance) {
         console.warn(
-          "[YEAR3000_CONFIG] Invalid profile or missing performance settings, using fallback"
+          "[ADVANCED_SYSTEM_CONFIG] Invalid profile or missing performance settings, using fallback"
         );
         return {
           maxParticles: 20,
@@ -220,7 +224,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
       return currentProfile.performance;
     } catch (error) {
       console.error(
-        "[YEAR3000_CONFIG] Error in getCurrentPerformanceSettings:",
+        "[ADVANCED_SYSTEM_CONFIG] Error in getCurrentPerformanceSettings:",
         error
       );
       return {
@@ -232,7 +236,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
     }
   },
 
-  // Check if YEAR3000_CONFIG is fully initialized with all required methods
+  // Check if ADVANCED_SYSTEM_CONFIG is fully initialized with all required methods
   isFullyInitialized() {
     const requiredMethods = [
       "setArtisticMode",
@@ -250,7 +254,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
   safeSetArtisticMode(mode) {
     if (!this.isFullyInitialized()) {
       console.warn(
-        "[YEAR3000_CONFIG] Not fully initialized, deferring artistic mode change"
+        "[ADVANCED_SYSTEM_CONFIG] Not fully initialized, deferring artistic mode change"
       );
       // Store for later application
       this._pendingArtisticMode = mode;
@@ -268,10 +272,10 @@ export const YEAR3000_CONFIG: Year3000Config = {
 
       if (this.enableDebug) {
         console.log(
-          `🎨 [YEAR3000_CONFIG] Artistic mode changed: ${previousMode} → ${mode}`
+          `🎨 [ADVANCED_SYSTEM_CONFIG] Artistic mode changed: ${previousMode} → ${mode}`
         );
         console.log(
-          `🎨 [YEAR3000_CONFIG] New profile:`,
+          `🎨 [ADVANCED_SYSTEM_CONFIG] New profile:`,
           this.getCurrentModeProfile()
         );
       }
@@ -302,7 +306,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
       return true;
     }
     console.warn(
-      `[YEAR3000_CONFIG] Invalid artistic mode: ${mode}. Valid modes:`,
+      `[ADVANCED_SYSTEM_CONFIG] Invalid artistic mode: ${mode}. Valid modes:`,
       validModes
     );
     return false;
@@ -318,12 +322,12 @@ export const YEAR3000_CONFIG: Year3000Config = {
     if (validLevels.includes(level)) {
       this.logging.level = level;
       if (level !== "off") {
-        console.log(`🔧 [YEAR3000_CONFIG] Logging level set to: ${level}`);
+        console.log(`🔧 [ADVANCED_SYSTEM_CONFIG] Logging level set to: ${level}`);
       }
       return true;
     }
     console.warn(
-      `[YEAR3000_CONFIG] Invalid logging level: ${level}. Valid levels:`,
+      `[ADVANCED_SYSTEM_CONFIG] Invalid logging level: ${level}. Valid levels:`,
       validLevels
     );
     return false;
@@ -332,27 +336,27 @@ export const YEAR3000_CONFIG: Year3000Config = {
   // Disable performance warnings (useful for production or when performance is acceptable)
   disablePerformanceWarnings() {
     this.logging.performance.enableFrameBudgetWarnings = false;
-    console.log("🔧 [YEAR3000_CONFIG] Performance warnings disabled");
+    console.log("🔧 [ADVANCED_SYSTEM_CONFIG] Performance warnings disabled");
   },
 
   // Enable performance warnings
   enablePerformanceWarnings() {
     this.logging.performance.enableFrameBudgetWarnings = true;
-    console.log("🔧 [YEAR3000_CONFIG] Performance warnings enabled");
+    console.log("🔧 [ADVANCED_SYSTEM_CONFIG] Performance warnings enabled");
   },
 
   // Set performance warning throttle interval (ms)
-  setPerformanceWarningThrottle(intervalMs) {
+  setPerformanceWarningThrottle(intervalMs: number) {
     if (typeof intervalMs === "number" && intervalMs >= 0) {
       this.logging.performance.throttleInterval = intervalMs;
       this.logging.performance.throttleWarnings = intervalMs > 0;
       console.log(
-        `🔧 [YEAR3000_CONFIG] Performance warning throttle set to: ${intervalMs}ms`
+        `🔧 [ADVANCED_SYSTEM_CONFIG] Performance warning throttle set to: ${intervalMs}ms`
       );
       return true;
     }
     console.warn(
-      "[YEAR3000_CONFIG] Invalid throttle interval. Must be a non-negative number."
+      "[ADVANCED_SYSTEM_CONFIG] Invalid throttle interval. Must be a non-negative number."
     );
     return false;
   },
@@ -362,7 +366,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
     this.setLoggingLevel("warn");
     this.disablePerformanceWarnings();
     this.logging.performance.enableAdaptiveDegradation = true;
-    console.log("🔧 [YEAR3000_CONFIG] Configured for production environment");
+    console.log("🔧 [ADVANCED_SYSTEM_CONFIG] Configured for production environment");
   },
 
   setupForDevelopment() {
@@ -370,7 +374,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
     this.enablePerformanceWarnings();
     this.setPerformanceWarningThrottle(2000); // 2 second throttle
     this.logging.performance.enableAdaptiveDegradation = true;
-    console.log("🔧 [YEAR3000_CONFIG] Configured for development environment");
+    console.log("🔧 [ADVANCED_SYSTEM_CONFIG] Configured for development environment");
   },
 
   setupForDebugging() {
@@ -378,7 +382,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
     this.enablePerformanceWarnings();
     this.setPerformanceWarningThrottle(500); // 0.5 second throttle for detailed debugging
     this.logging.performance.enableAdaptiveDegradation = false; // Don't degrade during debugging
-    console.log("🔧 [YEAR3000_CONFIG] Configured for debugging environment");
+    console.log("🔧 [ADVANCED_SYSTEM_CONFIG] Configured for debugging environment");
   },
 
   // Validate configuration health and functionality
@@ -393,9 +397,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
       dynamicChecks: {} as { [key: string]: any },
     };
 
-    const configKeys = Object.keys(this).filter(
-      (k) => typeof k === "string"
-    ) as (keyof Year3000Config)[];
+    const configKeys = Object.keys(this) as (keyof AdvancedSystemConfig)[];
 
     // Check for function properties being bound
     const functionProperties = configKeys.filter(
@@ -438,7 +440,7 @@ export const YEAR3000_CONFIG: Year3000Config = {
     }
 
     if (this.enableDebug) {
-      console.log("[YEAR3000_CONFIG] Health Check Report:", healthReport);
+      console.log("[ADVANCED_SYSTEM_CONFIG] Health Check Report:", healthReport);
     }
 
     return healthReport;
@@ -454,12 +456,12 @@ export const YEAR3000_CONFIG: Year3000Config = {
       if (saved && validModes.includes(String(saved)) && this.artisticMode !== saved) {
         this.artisticMode = String(saved) as ArtisticMode;
         if (this.enableDebug) {
-          console.log(`🎨 [YEAR3000_CONFIG] Updated artistic mode from storage: ${saved}`);
+          console.log(`🎨 [ADVANCED_SYSTEM_CONFIG] Updated artistic mode from storage: ${saved}`);
         }
       } else if (!saved && this.artisticMode !== "artist-vision") {
         this.artisticMode = "artist-vision"; // Default
         if (this.enableDebug) {
-          console.log(`🎨 [YEAR3000_CONFIG] Reset artistic mode to default: artist-vision`);
+          console.log(`🎨 [ADVANCED_SYSTEM_CONFIG] Reset artistic mode to default: artist-vision`);
         }
       }
 
@@ -471,26 +473,26 @@ export const YEAR3000_CONFIG: Year3000Config = {
       if (savedPalette && validPaletteSystems.includes(String(savedPalette)) && this.paletteSystem !== savedPalette) {
         this.paletteSystem = String(savedPalette) as any;
         if (this.enableDebug) {
-          console.log(`🎨 [YEAR3000_CONFIG] Updated palette system from storage: ${savedPalette}`);
+          console.log(`🎨 [ADVANCED_SYSTEM_CONFIG] Updated palette system from storage: ${savedPalette}`);
         }
       } else if (!savedPalette && this.paletteSystem !== 'catppuccin') {
         this.paletteSystem = 'catppuccin'; // Default for compatibility
         if (this.enableDebug) {
-          console.log(`🎨 [YEAR3000_CONFIG] Reset palette system to default: catppuccin`);
+          console.log(`🎨 [ADVANCED_SYSTEM_CONFIG] Reset palette system to default: catppuccin`);
         }
       }
 
       if (this.enableDebug) {
         console.log(
-          `🎨 [YEAR3000_CONFIG] Current artistic preference: ${this.artisticMode}`
+          `🎨 [ADVANCED_SYSTEM_CONFIG] Current artistic preference: ${this.artisticMode}`
         );
         console.log(
-          `🎨 [YEAR3000_CONFIG] Current palette system: ${this.paletteSystem}`
+          `🎨 [ADVANCED_SYSTEM_CONFIG] Current palette system: ${this.paletteSystem}`
         );
       }
     } catch (error) {
       if (this.enableDebug) {
-        console.warn(`🎨 [YEAR3000_CONFIG] Failed to load preferences:`, error);
+        console.warn(`🎨 [ADVANCED_SYSTEM_CONFIG] Failed to load preferences:`, error);
       }
       // Use fallback defaults
       this.artisticMode = "artist-vision";
@@ -499,7 +501,13 @@ export const YEAR3000_CONFIG: Year3000Config = {
   },
 };
 
-// Initialize YEAR3000_CONFIG with bound methods immediately for external usage
-if (typeof YEAR3000_CONFIG.init === "function") {
-  YEAR3000_CONFIG.init();
+// =========================================================================
+// BACKWARD COMPATIBILITY ALIASES - REMOVED
+// =========================================================================
+
+// ADVANCED_SYSTEM_CONFIG has been removed. Use ADVANCED_SYSTEM_CONFIG instead.
+
+// Initialize configuration with bound methods immediately for external usage
+if (typeof ADVANCED_SYSTEM_CONFIG.init === "function") {
+  ADVANCED_SYSTEM_CONFIG.init();
 }

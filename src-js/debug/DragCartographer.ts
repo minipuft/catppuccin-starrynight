@@ -7,7 +7,7 @@
 // can later augment them with richer previews and quick-add menus.
 //
 // ⚠️  This file is **development / debug-only**. It is conditionally imported
-//     from `theme.entry.ts` when `YEAR3000_CONFIG.enableDebug === true`.
+//     from `theme.entry.ts` when `ADVANCED_SYSTEM_CONFIG.enableDebug === true`.
 //     No production bundles should include this code.
 //
 // Export `enableDragCartography()` to activate. The function is idempotent and

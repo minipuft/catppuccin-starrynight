@@ -9,7 +9,7 @@
  * =============================================================================
  */
 
-import { Year3000System } from "@/core/lifecycle/year3000System";
+import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 
 /** Thin wrapper that owns the canvas and GL program.  */

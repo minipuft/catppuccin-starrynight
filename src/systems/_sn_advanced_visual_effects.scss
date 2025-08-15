@@ -1,12 +1,12 @@
 /* ████████████████████████████████████████████████████████████████████████████████*/
-/* QUANTUM SIDEBAR CONSCIOUSNESS FIELD - Dynamic Harmonic & Energy Responsive UI*/
+/* ADVANCED SIDEBAR VISUAL EFFECTS - Dynamic Harmonic & Energy Responsive UI*/
 /* ████████████████████████████████████████████████████████████████████████████████*/
 
 :root {
-  /* Base variables for Quantum Sidebar. These can be adjusted.*/
+  /* Base variables for Advanced Sidebar. These can be adjusted.*/
   --sn-sidebar-base-bg-opacity: 0.1;
 
-  /* Default temporal shift, JS will update this with --sn-sidebar-temporal-shift*/
+  /* Default time-based shift, JS will update this with --sn-sidebar-temporal-shift*/
 }
 
 .Root__nav-bar {
@@ -15,9 +15,9 @@
     box-shadow 0.7s var(--sn-easing-explorer),
     filter 0.7s var(--sn-easing-explorer);
 
-  /* --- Harmonic Mode Styling ---*/
-  /* Define a mixin for common harmonic mode background properties*/
-  @mixin harmonic-background($primary-rgb, $secondary-rgb, $accent-rgb) {
+  /* --- Color Harmony Mode Styling ---*/
+  /* Define a mixin for common color harmony mode background properties*/
+  @mixin color-harmony-background($primary-rgb, $secondary-rgb, $accent-rgb) {
     background: linear-gradient(
       170deg,
       rgba(
@@ -54,17 +54,17 @@
         );
   }
 
-  /* Apply backgrounds per harmonic mode (JS adds these classes)*/
-  &.sn-harmonic-analogous-flow {
-    @include harmonic-background(
+  /* Apply backgrounds per color harmony mode (JS adds these classes)*/
+  &.sn-color-harmony-analogous-flow {
+    @include color-harmony-background(
       var(--sn-accent-rgb, "202,158,230"),
       var(--sn-accent-rgb, "186,187,241"),
       var(--sn-accent-rgb, "140,170,238")
     );
   }
-  &.sn-harmonic-triadic-trinity {
-    /* Example: Use Primary, Accent, and a shifted Primary for Triadic feel*/
-    @include harmonic-background(
+  &.sn-color-harmony-triadic-scheme {
+    /* Example: Use Primary, Accent, and a shifted Primary for Triadic relationship*/
+    @include color-harmony-background(
       var(--sn-accent-rgb, "203,166,247"),
       /* Mauve as P1*/
       var(--sn-accent-rgb, "148,226,213"),
@@ -73,9 +73,9 @@
         /* Pink as P3 (derived from secondary)*/
     );
   }
-  &.sn-harmonic-complementary-yin-yang {
+  &.sn-color-harmony-complementary-contrast {
     /* Primary and Accent (often complementary)*/
-    @include harmonic-background(
+    @include color-harmony-background(
       var(--sn-accent-rgb, "239,159,118"),
       /* Peach as P1*/
       var(--sn-accent-rgb, "137,180,250"),
@@ -83,26 +83,26 @@
       var(--spice-rgb-surface1, "69,71,90") /* Neutral darker for depth*/
     );
   }
-  /* Add more .sn-harmonic-* classes as needed for other modes from HARMONIC_MODES*/
-  &.sn-harmonic-tetradic-cosmic-cross {
+  /* Add more .sn-color-harmony-* classes as needed for other modes from COLOR_HARMONY_MODES*/
+  &.sn-color-harmony-tetradic-cross {
     /* Example*/
-    @include harmonic-background(
+    @include color-harmony-background(
       var(--spice-rgb-green),
       var(--spice-rgb-red),
       var(--spice-rgb-yellow)
     );
   }
-  &.sn-harmonic-split-complementary-aurora {
+  &.sn-color-harmony-split-complementary-spectrum {
     /* Example*/
-    @include harmonic-background(
+    @include color-harmony-background(
       var(--spice-rgb-peach),
       var(--spice-rgb-sky),
       var(--spice-rgb-teal)
     );
   }
-  &.sn-harmonic-monochromatic-meditation {
+  &.sn-color-harmony-monochromatic-calm {
     /* Example*/
-    @include harmonic-background(
+    @include color-harmony-background(
       var(--sn-accent-rgb),
       var(--sn-accent-rgb),
       var(--sn-accent-rgb)

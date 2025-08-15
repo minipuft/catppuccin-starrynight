@@ -2,12 +2,12 @@
  * CSS Blob Fallback System - Year 3000 Vision
  * 
  * Creates DOM elements for CSS-only blob effects when WebGL is not available
- * Integrates with existing consciousness systems and provides beautiful fallback experience
+ * Integrates with existing visual systems and provides beautiful fallback experience
  */
 
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
 
 export interface CSSBlobSettings {
@@ -16,13 +16,13 @@ export interface CSSBlobSettings {
   musicResponsive: boolean;
   performanceMode: boolean;
   debugMode: boolean;
-  // Organic pattern enhancements
-  organicFlow: boolean;
-  membraneElasticity: number; // 0-1 membrane elasticity factor
+  // Smooth pattern enhancements
+  smoothFlow: boolean;
+  surfaceElasticity: number; // 0-1 surface elasticity factor
   musicSync: boolean;
-  emotionalTemperature: number; // 0-1 emotional temperature influence
-  cellularGrowth: boolean;
-  organicBreathing: boolean;
+  colorTemperature: number; // 0-1 color temperature influence
+  animationScale: boolean;
+  smoothPulsing: boolean;
   fluidDynamics: boolean;
 }
 
@@ -39,19 +39,19 @@ export class CSSBlobFallbackSystem extends BaseVisualSystem {
     musicResponsive: true,
     performanceMode: false,
     debugMode: false,
-    // Enhanced organic pattern defaults
-    organicFlow: true,
-    membraneElasticity: 0.7,
+    // Enhanced smooth pattern defaults
+    smoothFlow: true,
+    surfaceElasticity: 0.7,
     musicSync: true,
-    emotionalTemperature: 0.5,
-    cellularGrowth: true,
-    organicBreathing: true,
+    colorTemperature: 0.5,
+    animationScale: true,
+    smoothPulsing: true,
     fluidDynamics: true,
   };
 
   constructor(
-    config: Year3000Config = YEAR3000_CONFIG,
-    utils: typeof import("@/utils/core/Year3000Utilities"),
+    config: AdvancedSystemConfig | Year3000Config = ADVANCED_SYSTEM_CONFIG,
+    utils: typeof import("@/utils/core/ThemeUtilities"),
     performanceMonitor: any,
     musicSyncService: any = null,
     settingsManager: any = null
@@ -257,17 +257,17 @@ export class CSSBlobFallbackSystem extends BaseVisualSystem {
       document.documentElement.style.setProperty("--css-blob-filter-quality", "0");
     }
 
-    // Update existing consciousness variables with settings values
-    document.documentElement.style.setProperty("--sn-consciousness-organic-mode", this.settings.organicFlow ? "1" : "0");
-    document.documentElement.style.setProperty("--sn-consciousness-membrane-elasticity", this.settings.membraneElasticity.toString());
-    document.documentElement.style.setProperty("--sn-consciousness-musical-emotion", this.settings.emotionalTemperature.toString());
-    document.documentElement.style.setProperty("--sn-consciousness-cellular-growth", this.settings.cellularGrowth ? "1" : "0");
-    document.documentElement.style.setProperty("--sn-consciousness-breathing-intensity", this.settings.organicBreathing ? "1" : "0");
-    document.documentElement.style.setProperty("--sn-consciousness-viscosity", this.settings.fluidDynamics ? "0.4" : "0");
+    // Update existing visual variables with settings values
+    document.documentElement.style.setProperty("--sn-visual-smooth-mode", this.settings.smoothFlow ? "1" : "0");
+    document.documentElement.style.setProperty("--sn-visual-surface-elasticity", this.settings.surfaceElasticity.toString());
+    document.documentElement.style.setProperty("--sn-visual-color-temperature", this.settings.colorTemperature.toString());
+    document.documentElement.style.setProperty("--sn-visual-animation-scale", this.settings.animationScale ? "1" : "0");
+    document.documentElement.style.setProperty("--sn-visual-pulsing-intensity", this.settings.smoothPulsing ? "1" : "0");
+    document.documentElement.style.setProperty("--sn-visual-viscosity", this.settings.fluidDynamics ? "0.4" : "0");
 
-    // Coordinate with consciousness systems - use existing variables
-    document.documentElement.style.setProperty("--sn-consciousness-css-fallback", "1.0");
-    document.documentElement.style.setProperty("--sn-consciousness-webgl-coordination", "0");
+    // Coordinate with visual systems - use existing variables
+    document.documentElement.style.setProperty("--sn-visual-css-fallback", "1.0");
+    document.documentElement.style.setProperty("--sn-visual-webgl-coordination", "0");
   }
 
   private subscribeToEvents(): void {
@@ -323,10 +323,10 @@ export class CSSBlobFallbackSystem extends BaseVisualSystem {
     // Adjust animation speeds based on energy
     const speedMultiplier = 0.8 + energy * 0.4; // 0.8 to 1.2
     const movementSpeed = Math.round(8000 / speedMultiplier);
-    const breathingSpeed = Math.round(4000 / speedMultiplier);
+    const pulsingSpeed = Math.round(4000 / speedMultiplier);
 
     document.documentElement.style.setProperty("--css-blob-movement-speed", `${movementSpeed}ms`);
-    document.documentElement.style.setProperty("--css-blob-breathing-speed", `${breathingSpeed}ms`);
+    document.documentElement.style.setProperty("--css-blob-pulsing-speed", `${pulsingSpeed}ms`);
   }
 
   private handleGenreChange = (event: Event): void => {
@@ -449,41 +449,41 @@ export class CSSBlobFallbackSystem extends BaseVisualSystem {
   }
 
   /**
-   * Enhanced organic pattern control methods - using existing consciousness variables
+   * Enhanced smooth pattern control methods - using existing visual variables
    */
-  public setOrganicFlow(enabled: boolean): void {
-    this.settings.organicFlow = enabled;
-    document.documentElement.style.setProperty("--sn-consciousness-organic-mode", enabled ? "1" : "0");
+  public setSmoothFlow(enabled: boolean): void {
+    this.settings.smoothFlow = enabled;
+    document.documentElement.style.setProperty("--sn-visual-smooth-mode", enabled ? "1" : "0");
   }
 
-  public setMembraneElasticity(elasticity: number): void {
-    this.settings.membraneElasticity = Math.max(0, Math.min(1, elasticity));
-    document.documentElement.style.setProperty("--sn-consciousness-membrane-elasticity", this.settings.membraneElasticity.toString());
+  public setSurfaceElasticity(elasticity: number): void {
+    this.settings.surfaceElasticity = Math.max(0, Math.min(1, elasticity));
+    document.documentElement.style.setProperty("--sn-visual-surface-elasticity", this.settings.surfaceElasticity.toString());
   }
 
-  public setConsciousnessSync(enabled: boolean): void {
+  public setVisualSync(enabled: boolean): void {
     this.settings.musicSync = enabled;
-    // Consciousness sync is inherent to the system - no separate variable needed
+    // Visual sync is inherent to the system - no separate variable needed
   }
 
-  public setEmotionalTemperature(temperature: number): void {
-    this.settings.emotionalTemperature = Math.max(0, Math.min(1, temperature));
-    document.documentElement.style.setProperty("--sn-consciousness-musical-emotion", this.settings.emotionalTemperature.toString());
+  public setColorTemperature(temperature: number): void {
+    this.settings.colorTemperature = Math.max(0, Math.min(1, temperature));
+    document.documentElement.style.setProperty("--sn-visual-color-temperature", this.settings.colorTemperature.toString());
   }
 
-  public setCellularGrowth(enabled: boolean): void {
-    this.settings.cellularGrowth = enabled;
-    document.documentElement.style.setProperty("--sn-consciousness-cellular-growth", enabled ? "1" : "0");
+  public setAnimationScale(enabled: boolean): void {
+    this.settings.animationScale = enabled;
+    document.documentElement.style.setProperty("--sn-visual-animation-scale", enabled ? "1" : "0");
   }
 
-  public setOrganicBreathing(enabled: boolean): void {
-    this.settings.organicBreathing = enabled;
-    document.documentElement.style.setProperty("--sn-consciousness-breathing-intensity", enabled ? "1" : "0");
+  public setSmoothPulsing(enabled: boolean): void {
+    this.settings.smoothPulsing = enabled;
+    document.documentElement.style.setProperty("--sn-visual-pulsing-intensity", enabled ? "1" : "0");
   }
 
   public setFluidDynamics(enabled: boolean): void {
     this.settings.fluidDynamics = enabled;
-    document.documentElement.style.setProperty("--sn-consciousness-viscosity", enabled ? "0.4" : "0");
+    document.documentElement.style.setProperty("--sn-visual-viscosity", enabled ? "0.4" : "0");
   }
 
   /**

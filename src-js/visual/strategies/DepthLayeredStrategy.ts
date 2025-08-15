@@ -5,11 +5,11 @@
  * for the unified ColorOrchestrator architecture. Handles infinite space illusion
  * through depth-layered gradients with parallax effects and music synchronization.
  *
- * Philosophy: "Create infinite depth through consciousness layers—each gradient becomes
+ * Philosophy: "Create infinite depth through visual effects layers—each gradient becomes
  * a dimensional portal extending the interface into limitless cosmic space."
  */
 
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { getGlobalOptimizedCSSController, OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -19,7 +19,7 @@ import type {
   IColorProcessor,
 } from "@/types/colorStrategy";
 import { settings } from "@/config";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 
 interface DepthLayer {
   id: string;
@@ -72,7 +72,7 @@ interface DepthPerformanceMetrics {
 
 export class DepthLayeredStrategy implements IColorProcessor {
   private utils = Utils;
-  private config = YEAR3000_CONFIG;
+  private config = ADVANCED_SYSTEM_CONFIG;
   private deviceDetector: DeviceCapabilityDetector;
   private cssController: OptimizedCSSVariableManager | null = null;
 
@@ -156,7 +156,7 @@ export class DepthLayeredStrategy implements IColorProcessor {
   constructor() {
     this.deviceDetector = new DeviceCapabilityDetector();
 
-    // Get CSS consciousness controller
+    // Get CSS visual effects controller
     this.cssController = getGlobalOptimizedCSSController();
 
     // Load settings and adapt to device capabilities
@@ -776,10 +776,10 @@ export class DepthLayeredStrategy implements IColorProcessor {
       // Update animation phase
       layer.animationPhase += layer.rotationSpeed * deltaTime * 0.001;
 
-      // Apply subtle depth breathing
-      const breathingFactor = Math.sin(layer.animationPhase) * 0.05;
+      // Apply subtle depth pulsing
+      const pulsingFactor = Math.sin(layer.animationPhase) * 0.05;
       const currentOpacity = parseFloat(layer.element.style.opacity);
-      const newOpacity = currentOpacity + breathingFactor;
+      const newOpacity = currentOpacity + pulsingFactor;
 
       layer.element.style.opacity = Math.max(
         0,

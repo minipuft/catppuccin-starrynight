@@ -1,0 +1,239 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// MIXIN COMPATIBILITY LAYER
+// Provides backward compatibility aliases for renamed mixins
+// ████████████████████████████████████████████████████████████████████████████████
+
+// === CONSCIOUSNESS → GLASSMORPHISM MIGRATION ===
+// Old metaphorical crystal mixins mapped to glassmorphism effects
+@mixin glassmorphism-crystal {
+  @include glassmorphism-effect;
+}
+
+@mixin prismatic-edge-lighting {
+  @include glassmorphism-edge-lighting;
+}
+
+// === NEURAL → AUDIO VISUALIZATION MIGRATION ===
+// Old metaphorical network mixins mapped to audio visualization
+@mixin neural-pathway-network {
+  @include audio-visualization-grid;
+}
+
+@mixin neural-synapse-connection($strength: 1) {
+  @include audio-sync-connection($strength);
+}
+
+// === HOLOGRAPHIC → LAYERED DEPTH MIGRATION ===
+// Old metaphorical depth mixins mapped to layered depth effects
+@mixin holographic-depth($level: 1) {
+  @include layered-depth-effect($level);
+}
+
+@mixin holographic-projection($distance: 20px) {
+  @include layered-projection($distance);
+}
+
+// === ORGANIC → DYNAMIC MIGRATION ===
+// Old metaphorical motion mixins mapped to dynamic motion
+@mixin liquid-content-shape {
+  @include dynamic-content-shape;
+}
+
+@mixin energy-field-content {
+  @include dynamic-field-content;
+}
+
+@mixin fractal-recursive-content($level: 1) {
+  @include dynamic-recursive-content($level);
+}
+
+// === NEW TECHNICAL MIXINS ===
+// These are the new, properly named mixins that replace the metaphorical ones
+
+@mixin glassmorphism-effect {
+  backdrop-filter: blur(var(--glassmorphism-edge-sharpness, 8px));
+  background: rgba(255, 255, 255, var(--glassmorphism-opacity, 0.1));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--dynamic-corners, 16px);
+}
+
+@mixin glassmorphism-edge-lighting {
+  box-shadow: 
+    0 8px 32px rgba(31, 38, 135, 0.37),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+@mixin audio-visualization-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: var(--audio-sync-delay, 100ms);
+  transition: all var(--music-sync-flow-speed, 12s) var(--dynamic-ease-motion);
+}
+
+@mixin audio-sync-connection($strength: 1) {
+  opacity: calc(var(--audio-visualization-strength, 0.8) * #{$strength});
+  transform: scale(calc(1 + var(--music-sync-intensity, 0.8) * #{$strength} * 0.1));
+}
+
+@mixin layered-depth-effect($level: 1) {
+  z-index: calc(100 + #{$level});
+  transform: translateZ(calc(#{$level} * var(--layered-projection-distance, 30px)));
+  filter: blur(calc((#{$level} - 1) * 1px));
+}
+
+@mixin layered-projection($distance: 20px) {
+  transform: translateZ(#{$distance});
+  box-shadow: 0 0 #{$distance} rgba(0, 0, 0, 0.1);
+}
+
+@mixin dynamic-content-shape {
+  border-radius: var(--dynamic-corners, 16px);
+  clip-path: polygon(0% 0%, 100% 0%, 100% 95%, 5% 100%, 0% 100%);
+  transition: clip-path var(--music-sync-flow-speed, 12s) var(--dynamic-ease-motion);
+}
+
+@mixin dynamic-field-content {
+  background: linear-gradient(
+    135deg,
+    var(--music-sync-oklab-primary-rgb),
+    var(--music-sync-oklab-accent-rgb)
+  );
+  animation: dynamic-pulse var(--music-sync-breath-duration, 4000ms) infinite alternate;
+}
+
+@mixin dynamic-recursive-content($level: 1) {
+  $opacity: calc(1 / #{$level});
+  opacity: #{$opacity};
+  transform: scale(calc(1 - #{$level} * 0.1));
+}
+
+@keyframes dynamic-pulse {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.02); }
+}
+
+// === CONSCIOUSNESS → AUDIO VISUAL MIGRATION ===
+// Old metaphorical mixins mapped to audio visual effects
+@mixin visual-effects-field-background {
+  @include audio-visual-field-background;
+}
+
+
+@mixin organic-glow-effect($color: 'primary', $intensity: 1.0) {
+  @include dynamic-glow-effect($color, $intensity);
+}
+
+@mixin organic-interaction-states {
+  @include dynamic-interaction-states;
+}
+
+
+@mixin text-visual-effects($intensity: var(--text-gradient-intensity)) {
+  @include text-audio-visualization($intensity);
+}
+
+@mixin glyph-visual-effects($color: inherit, $intensity: 1.0, $timing: 0ms) {
+  @include glyph-audio-visualization($color, $intensity, $timing);
+}
+
+// === NEW TECHNICAL MIXINS ===
+// Audio visual effects
+@mixin audio-visual-field-background {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--music-sync-oklab-primary-rgb, 205, 214, 244), var(--audio-visualization-opacity, 0.15)) 0%,
+    rgba(var(--music-sync-oklab-accent-rgb, 203, 166, 247), var(--audio-visualization-opacity, 0.1)) 50%,
+    rgba(var(--music-sync-oklab-secondary-rgb, 116, 199, 236), var(--audio-visualization-opacity, 0.05)) 100%
+  );
+  backdrop-filter: blur(var(--audio-visualization-blur, 4px));
+  transition: all var(--music-sync-flow-speed, 12s) var(--dynamic-ease-motion);
+}
+
+@mixin dynamic-visual-base {
+  position: relative;
+  transition: all var(--music-sync-flow-speed, 12s) var(--dynamic-ease-motion);
+  will-change: transform, opacity, filter;
+  contain: layout style paint;
+}
+
+@mixin dynamic-glow-effect($color: 'primary', $intensity: 1.0) {
+  $rgb-var: --music-sync-oklab-#{$color}-rgb;
+  @if $color == 'accent' {
+    $rgb-var: --music-sync-oklab-accent-rgb;
+  } @else if $color == 'neon' {
+    $rgb-var: --music-sync-oklab-secondary-rgb;
+  }
+  
+  box-shadow: 
+    0 0 calc(var(--dynamic-glow-radius, 8px) * #{$intensity}) rgba(var(#{$rgb-var}, 203, 166, 247), calc(var(--dynamic-glow-opacity, 0.3) * #{$intensity})),
+    0 0 calc(var(--dynamic-glow-radius, 8px) * #{$intensity} * 2) rgba(var(#{$rgb-var}, 203, 166, 247), calc(var(--dynamic-glow-opacity, 0.3) * #{$intensity} * 0.5));
+  filter: brightness(calc(1 + #{$intensity} * 0.1));
+}
+
+@mixin dynamic-interaction-states {
+  &:hover {
+    @include dynamic-glow-effect('accent', var(--dynamic-hover-intensity, 1.2));
+    transform: translateY(calc(-1 * var(--dynamic-hover-lift, 2px)));
+  }
+  
+  &:active, &:focus {
+    @include dynamic-glow-effect('neon', var(--dynamic-click-intensity, 1.5));
+    transform: scale(0.98);
+  }
+  
+  &:focus-visible {
+    @include dynamic-glow-effect('primary', var(--dynamic-focus-intensity, 1.0));
+    outline: 2px solid rgba(var(--music-sync-oklab-accent-rgb, 203, 166, 247), 0.6);
+    outline-offset: 2px;
+  }
+}
+
+@mixin dynamic-text-effects($level: 'medium') {
+  @if $level == 'high' {
+    --text-audio-multiplier: 1.5;
+  } @else if $level == 'medium' {
+    --text-audio-multiplier: 1.0;
+  } @else {
+    --text-audio-multiplier: 0.5;
+  }
+  
+  text-shadow: 
+    0 0 calc(var(--dynamic-glow-radius, 8px) * 0.5 * var(--text-audio-multiplier)) rgba(var(--music-sync-oklab-primary-rgb, 205, 214, 244), calc(var(--dynamic-glow-opacity, 0.3) * var(--text-audio-multiplier))),
+    0 0 calc(var(--dynamic-glow-radius, 8px) * 1 * var(--text-audio-multiplier)) rgba(var(--music-sync-oklab-secondary-rgb, 116, 199, 236), calc(var(--dynamic-glow-opacity, 0.3) * var(--text-audio-multiplier) * 0.5));
+  
+  color: rgb(
+    calc(var(--spice-text-r, 205) + var(--music-sync-oklab-primary-r, 0) * var(--music-sync-emotional-saturation, 1.0) * 0.1 * var(--text-audio-multiplier)),
+    calc(var(--spice-text-g, 214) + var(--music-sync-oklab-primary-g, 0) * var(--music-sync-emotional-saturation, 1.0) * 0.1 * var(--text-audio-multiplier)),
+    calc(var(--spice-text-b, 244) + var(--music-sync-oklab-primary-b, 0) * var(--music-sync-emotional-saturation, 1.0) * 0.1 * var(--text-audio-multiplier))
+  );
+}
+
+@mixin text-audio-visualization($intensity: var(--text-gradient-intensity)) {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--music-sync-oklab-primary-rgb, 205, 214, 244), #{$intensity}) 0%,
+    rgba(var(--music-sync-oklab-accent-rgb, 203, 166, 247), calc(#{$intensity} * 0.8)) 50%,
+    rgba(var(--music-sync-oklab-secondary-rgb, 116, 199, 236), calc(#{$intensity} * 0.6)) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all var(--music-sync-flow-speed, 12s) var(--dynamic-ease-motion);
+}
+
+@mixin glyph-audio-visualization($color: inherit, $intensity: 1.0, $timing: 0ms) {
+  color: #{$color};
+  filter: brightness(calc(1 + var(--music-sync-intensity, 0.8) * #{$intensity} * 0.2));
+  animation: glyph-audio-pulse calc(var(--music-sync-breath-duration, 4000ms) + #{$timing}) infinite ease-in-out;
+}
+
+@keyframes glyph-audio-pulse {
+  0%, 100% { 
+    opacity: 0.8; 
+    transform: scale(1); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(calc(1 + var(--music-sync-intensity, 0.8) * 0.05)); 
+  }
+}

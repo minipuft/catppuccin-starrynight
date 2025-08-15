@@ -4,8 +4,8 @@
 // Integrates genre-specific color presets with existing Spicetify UI components
 // for a cohesive musical consciousness experience that adapts to detected genres.
 
-// Import OKLAB animation system for enhanced transitions
-@use "../../visual/music-sync/color/_oklab-animations" as oklab-anims;
+// Note: OKLAB animation system archived in Phase 10 Week 4 (orphaned file)
+// Using existing CSS variables for OKLAB functionality instead
 
 // === GENRE-AWARE COMPONENT INTEGRATION ===
 
@@ -60,12 +60,15 @@
   &[data-genre-active] {
     @include genre-background(attr(data-genre-active value, 'default'), var(--genre-active-intensity, 0.8), 0.12);
 
-    // Genre transition animation with OKLAB support
-    @include oklab-anims.oklab-transition(all, var(--genre-transition-duration), var(--genre-transition-easing));
+    // Genre transition animation (standard CSS transition)
+    transition: all var(--genre-transition-duration) var(--genre-transition-easing);
     
     // Add OKLAB gradient flow for enhanced genre transitions
     &.genre-oklab-enhanced {
-      @extend .oklab-gradient-flow;
+      // OKLAB gradient flow (inline CSS)
+      background: linear-gradient(135deg, 
+        rgba(var(--sn-oklab-primary-rgb), 0.3) 0%,
+        rgba(var(--sn-oklab-accent-rgb), 0.2) 100%);
     }
   }
 
@@ -158,7 +161,8 @@
     position: relative;
     
     // Add OKLAB animation classes for enhanced visual consciousness
-    @extend .oklab-animated;
+    // OKLAB animation (inline CSS)
+    animation: oklab-color-flow 4s ease-in-out infinite;
 
     // Genre-aware card background with OKLAB transitions
     &::before {
@@ -169,7 +173,7 @@
       right: 0;
       bottom: 0;
       @include genre-background(attr(data-genre-active value, 'default'), var(--genre-active-intensity, 0.6), 0.08);
-      @include oklab-anims.oklab-transition(background, var(--genre-transition-duration), var(--genre-transition-easing));
+      transition: background var(--genre-transition-duration) var(--genre-transition-easing);
       border-radius: inherit;
       pointer-events: none;
       z-index: -1;
@@ -299,7 +303,8 @@ button,
   .main-playButton-PlayButton {
     // Enhanced electronic play button with OKLAB animations
     @include genre-glow('electronic', 1.2, 10px);
-    @extend .oklab-musical-breathing;
+    // OKLAB musical breathing (inline CSS)
+    animation: musical-breathing var(--music-sync-breath-duration, 4s) ease-in-out infinite;
     animation: 
       genre-electronic-pulse calc(var(--sn-anim-musical-beat-duration, 500ms) * 2) ease-in-out infinite,
       oklab-musical-consciousness-breathing calc(var(--sn-anim-musical-beat-duration, 500ms) * 4) ease-in-out infinite;
@@ -315,11 +320,14 @@ button,
 
   .main-card {
     // Electronic card hover effects with OKLAB shimmer
-    @extend .oklab-shimmer-effect;
+    // OKLAB shimmer effect (inline CSS)
+    background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-accent-rgb), 0.1) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
     
     &:hover {
       transform: scale(1.02) translateY(-2px);
-      @include oklab-anims.oklab-transition(transform, 0.3s, ease);
+      transition: transform 0.3s ease;
     }
   }
 }

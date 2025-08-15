@@ -1,4 +1,4 @@
-import year3000System from "@/core/lifecycle/year3000System";
+import { AdvancedThemeSystem } from "@/core/lifecycle/AdvancedThemeSystem";
 
 // Create a simplified mock CSS Variable Batcher for testing
 class MockCSSVariableBatcher {
@@ -31,19 +31,20 @@ describe("Color pipeline emits only canonical token when legacy disabled", () =>
   it("queues only --sn-accent-* variables", () => {
     // Arrange
     const batcher = new MockCSSVariableBatcher();
-    year3000System.cssVariableBatcher = batcher as any;
+    const advancedThemeSystem = new AdvancedThemeSystem();
+    advancedThemeSystem.cssVariableBatcher = batcher as any;
 
     // Clear any pre-existing vars on root
     document.documentElement.style.cssText = "";
 
     // Act – apply simple colour map
-    year3000System.applyColorsToTheme({ VIBRANT: "#336699" });
+    advancedThemeSystem.applyColorsToTheme({ VIBRANT: "#336699" });
 
     // Flush batch immediately
     batcher.flushCSSVariableBatch();
 
     const style = document.documentElement.style;
-    // Updated to match actual variables set by Year3000System
+    // Updated to match actual variables set by AdvancedThemeSystem
     const accentHex = style.getPropertyValue("--sn-processed-vibrant-hex").trim();
     const accentRgb = style.getPropertyValue("--sn-processed-vibrant-rgb").trim();
 

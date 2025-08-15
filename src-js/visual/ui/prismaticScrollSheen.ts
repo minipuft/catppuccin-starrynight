@@ -9,7 +9,7 @@
 // ---------------------------------------------------------------------------
 
 import type { FrameContext, IVisualSystem } from "@/core/animation/EnhancedMasterAnimationCoordinator";
-import year3000System from "@/core/lifecycle/year3000System";
+import year3000System from "@/core/lifecycle/AdvancedThemeSystem";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController
 } from "@/core/performance/OptimizedCSSVariableManager";
 

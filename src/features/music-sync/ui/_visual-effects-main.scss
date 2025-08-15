@@ -1,0 +1,847 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// VISUAL EFFECTS MAIN - Audio-Reactive Interface Foundation
+// ████████████████████████████████████████████████████████████████████████████████
+//
+// This module provides the SCSS foundation for the visual effects system,
+// creating a dynamic interface that responds, scales, and synchronizes with music.
+//
+// Core Philosophy: Performance-first audio-visual synchronization with OKLAB color science
+// Visual Language: Cyberpunk neon aesthetics + fluid gradient systems  
+// Color System: Dynamic temperature mapping with warm-to-cool spectrum (1000K-20000K)
+//
+// ████████████████████████████████████████████████████████████████████████████████
+
+// === CORE FOUNDATION ===
+// Note: visual-effects-variables and music-reactive-effects archived in Phase 10 Week 4 (orphaned files)
+// Using existing CSS variables and mixins for visual effects functionality
+
+// === COMPATIBILITY MIXINS ===
+// Temporary backward compatibility during Phase 6 transition
+
+// Core visual effects mixin
+@mixin visual-effects-base {
+  position: relative;
+  contain: layout style paint;
+  will-change: transform, opacity, filter;
+  transform: translateZ(0);
+}
+
+// Visual effects interaction states
+@mixin visual-effects-interaction-states {
+  transition: all var(--visual-effects-transition-medium, 0.5s) ease-out;
+  
+  &:hover {
+    filter: brightness(1.1);
+  }
+  
+  &:active {
+    filter: brightness(0.9);
+  }
+}
+
+// Visual effects text enhancement
+@mixin visual-effects-text-enhancement($intensity: 'medium') {
+  @if $intensity == 'high' {
+    filter: saturate(1.3) brightness(1.1);
+  } @else if $intensity == 'medium' {
+    filter: saturate(1.2) brightness(1.05);
+  } @else if $intensity == 'low' {
+    filter: saturate(1.1) brightness(1.02);
+  }
+}
+
+// Cinematic color grading mixin
+@mixin cinematic-color-grading($mode: 'ambient', $intensity: 0.8) {
+  @if $mode == 'ambient' {
+    filter: 
+      saturate(calc(1.0 + #{$intensity} * 0.3))
+      brightness(calc(1.0 + #{$intensity} * 0.15))
+      contrast(calc(1.0 + #{$intensity} * 0.1));
+  }
+}
+
+// === NEW VISUAL EFFECTS CLASSES ===
+// Modern visual effects system classes
+
+.visual-effects-container {
+  @include visual-effects-base;
+  
+  // Visual effects enhancement
+  filter: saturate(1.0) brightness(1.0);
+  transition: all var(--visual-effects-transition-medium, 0.5s) ease-out;
+}
+
+.visual-effects-enabled {
+  @extend .visual-effects-container !optional;
+}
+
+.visual-effects-audio-resonance {
+  filter: 
+    saturate(calc(1.0 + var(--visual-effects-audio-resonance, 0.7) * 0.2))
+    brightness(calc(1.0 + var(--visual-effects-audio-resonance, 0.7) * 0.1));
+}
+
+.visual-effects-beat-sync {
+  transition: filter 0.1s ease-out;
+}
+
+.visual-effects-audio-responsive {
+  @extend .visual-effects-audio-resonance !optional;
+}
+
+.visual-effects-neon-theme {
+  filter: saturate(1.3) brightness(1.1);
+}
+
+.visual-effects-volumetric-fog {
+  backdrop-filter: blur(2px);
+}
+
+.visual-effects-holographic-display {
+  mix-blend-mode: overlay;
+}
+
+.visual-effects-luminescent-tech {
+  filter: saturate(1.2) brightness(1.05);
+}
+
+.visual-effects-crystalline-glassmorphism {
+  backdrop-filter: blur(1px) saturate(1.2);
+}
+
+.dynamic-environmental-effects {
+  filter: saturate(1.1) brightness(1.02);
+}
+
+// === LEGACY COMPATIBILITY CLASSES ===
+// These provide backward compatibility during the transition
+
+.organic-consciousness-base {
+  @include visual-effects-base;
+}
+
+.organic-consciousness-container {
+  @extend .visual-effects-container !optional;
+}
+
+.organic-consciousness-enabled {
+  @extend .visual-effects-enabled !optional;
+}
+
+.organic-symbiotic-resonance {
+  @extend .visual-effects-audio-resonance !optional;
+}
+
+.organic-beat-sync {
+  @extend .visual-effects-beat-sync !optional;
+}
+
+.organic-emotional-empathy {
+  @extend .visual-effects-audio-responsive !optional;
+}
+
+.organic-blade-runner-neon {
+  @extend .visual-effects-neon-theme !optional;
+}
+
+.organic-volumetric-fog {
+  @extend .visual-effects-volumetric-fog !optional;
+}
+
+.organic-holographic-display {
+  @extend .visual-effects-holographic-display !optional;
+}
+
+.organic-bioluminescent-tech {
+  @extend .visual-effects-luminescent-tech !optional;
+}
+
+.organic-crystalline-consciousness {
+  @extend .visual-effects-crystalline-glassmorphism !optional;
+}
+
+.dynamic-environmental-consciousness {
+  @extend .dynamic-environmental-effects !optional;
+}
+
+// === COLOR SYSTEM ===
+// Note: Color system files archived in Phase 10 Week 4 (orphaned files)
+// - emotional-temperature-colors, genre-specific-presets, oklab-animations, perceptual-blending
+// Using existing CSS variables for color functionality
+
+// === CINEMATIC EFFECTS ===
+// Note: Cinematic effect files archived in Phase 10 Week 4 (orphaned files)
+// - neon-glow-theme, dramatic_visual_theme
+// Using existing CSS variables for cinematic effects
+
+// === ATMOSPHERIC SYSTEMS ===
+// Note: Atmospheric system files archived in Phase 10 Week 4 (orphaned files)
+// - ambient-background-effects
+// Using existing CSS variables for atmospheric effects
+
+// === GLOBAL VISUAL EFFECTS SYSTEM STYLES ===
+
+// Initialize visual effects system on the root element
+:root {
+  // Enable visual effects system
+  --visual-effects-enabled: 1;
+  
+  // Visual effects system initialization flag
+  --visual-effects-system-loaded: 1;
+  
+  // Dynamic visual effects state (updated by VisualEffectsCoordinator)
+  --visual-effects-active: 1;
+  --visual-effects-intensity: 0.7; // 0-1 effects intensity
+  --visual-effects-mode: 'balanced'; // 'balanced', 'cinematic', 'atmospheric'
+  
+  // Performance visual effects settings
+  --visual-effects-performance-mode: 'optimal'; // 'minimal', 'balanced', 'optimal', 'maximum'
+  --animation-quality: 1.0; // 0-1 animation quality level
+  --visual-effects-quality: 1.0; // 0-1 visual effects quality
+  
+  // Debug and development flags
+  --visual-effects-debug-mode: 0; // Set to 1 to enable debug visualization
+  --visual-effects-development-mode: 0; // Set to 1 for development helpers
+  
+  // Apply visual effects to main application containers
+  .Root {
+    // Core visual effects properties
+    @extend .visual-effects-container !optional;
+    
+    // Global visual effects foundation
+    
+    // Global visual effects field
+    &::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      
+      // Global visual effects background
+      background: radial-gradient(
+        ellipse at center,
+        rgba(var(--visual-effects-primary-rgb, 205, 214, 244), calc(var(--visual-effects-fog-opacity, 0.02) * var(--visual-effects-intensity, 0.7) * 2)) 0%,
+        rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-fog-opacity, 0.02) * var(--visual-effects-intensity, 0.7) * 1)) 50%,
+        transparent 80%
+      );
+      
+      // Removed: Global dynamic animation
+      
+      // Performance optimization
+      pointer-events: none;
+      z-index: calc(var(--visual-effects-depth-atmosphere, 0) - 10);
+      will-change: transform, opacity;
+      contain: strict;
+      mix-blend-mode: overlay;
+    }
+    
+    // Visual effects mode variations
+    &[data-visual-effects-mode="cinematic"] {
+      // Enhanced cinematic visual effects
+      @include cinematic-color-grading('ambient', var(--visual-effects-cinematic-intensity, 0.8));
+      
+      // Apply cyberpunk aesthetics
+      @extend .visual-effects-neon-theme !optional;
+      @extend .visual-effects-volumetric-fog !optional;
+      
+      // Cinematic visual effects
+      
+      // Removed: transform animation
+    }
+    
+    &[data-visual-effects-mode="atmospheric"] {
+      // Enhanced atmospheric visual effects
+      // Dynamic atmospheric particles (inline CSS)
+      position: relative;
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image: radial-gradient(circle at 20% 30%, rgba(var(--sn-accent-rgb), 0.1) 2px, transparent 2px);
+        background-size: 40px 40px;
+        animation: particle-float 8s ease-in-out infinite;
+      }
+      // Dynamic volumetric lighting (inline CSS)
+      background: radial-gradient(ellipse at center, 
+        rgba(var(--sn-accent-rgb), 0.2) 0%,
+        rgba(var(--sn-accent-rgb), 0.05) 60%,
+        transparent 100%);
+      filter: blur(2px);
+      @extend .dynamic-environmental-effects !optional;
+      
+      // Atmospheric enhancement
+      filter: 
+        saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.3))
+        brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.15));
+    }
+    
+    &[data-visual-effects-mode="dynamic-tech"] {
+      // Enhanced dynamic technology visual effects
+      @extend .visual-effects-holographic-display !optional;
+      @extend .visual-effects-luminescent-tech !optional;
+      @extend .visual-effects-crystalline-glassmorphism !optional;
+      
+      // Dynamic-tech enhancement
+      backdrop-filter: blur(1px) saturate(1.2);
+    }
+  }
+  
+  // Spicetify-specific visual effects integration
+  .Root__main-view {
+    // Apply visual effects to main view
+    @extend .visual-effects-container !optional;
+    
+    // Main view specific visual effects
+    &.visual-effects-enabled {
+      // Enhanced main view visual effects
+      position: relative;
+      
+      // Main view atmospheric enhancement
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        
+        // Main view visual effects field
+        background: linear-gradient(
+          135deg,
+          rgba(var(--visual-effects-primary-rgb, 205, 214, 244), calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 0%,
+          rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 1)) 50%,
+          rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-shimmer-opacity, 0.05) * 1.5)) 100%
+        );
+        
+        // Removed: Main view dynamic animation
+        
+        pointer-events: none;
+        z-index: calc(var(--visual-effects-depth-atmosphere, 0) - 5);
+        mix-blend-mode: overlay;
+      }
+    }
+  }
+
+  // Player bar visual effects integration
+  .Root__nav-bar,
+  .Root__now-playing-bar,
+  .player-controls {
+    // Apply visual enhancement to player elements
+    &.visual-effects-enabled {
+      position: relative;
+      
+      // Player visual effects enhancement
+      &::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid rgba(var(--visual-effects-neon-glow-rgb, 116, 199, 236), calc(var(--visual-effects-border-opacity, 0.3) * 1.2));
+        border-radius: inherit;
+        background: rgba(var(--visual-effects-primary-rgb, 205, 214, 244), var(--visual-effects-fog-opacity, 0.02));
+        pointer-events: none;
+        z-index: var(--visual-effects-depth-mid, 2);
+      }
+      
+      // Player visual effects enhancement
+      filter: 
+        saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.3))
+        brightness(calc(1.0 + var(--visual-effects-audio-resonance, 0.7) * 0.2));
+      
+      // Player audio-visual resonance
+      @extend .visual-effects-audio-resonance !optional;
+      @extend .visual-effects-beat-sync !optional;
+    }
+  }
+
+  // Sidebar visual effects integration
+  .Root__nav-bar {
+    // Apply visual effects to sidebar
+    &.visual-effects-enabled {
+      // Sidebar atmospheric enhancement
+      // Dynamic atmospheric fog (inline CSS)
+      &[data-fog-type="light"] {
+        background: linear-gradient(45deg, 
+          rgba(var(--sn-base-rgb), 0.9) 0%,
+          rgba(var(--sn-accent-rgb), 0.1) 50%,
+          rgba(var(--sn-base-rgb), 0.9) 100%);
+        backdrop-filter: blur(10px);
+      }
+      
+      // Sidebar visual effects field
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        
+        // Sidebar visual effects gradient
+        background: linear-gradient(
+          180deg,
+          rgba(var(--visual-effects-atmosphere-rgb, 88, 91, 112), calc(var(--visual-effects-fog-opacity, 0.02) * 3)) 0%,
+          rgba(var(--visual-effects-primary-rgb, 205, 214, 244), calc(var(--visual-effects-fog-opacity, 0.02) * 2)) 50%,
+          rgba(var(--visual-effects-atmosphere-rgb, 88, 91, 112), calc(var(--visual-effects-fog-opacity, 0.02) * 3)) 100%
+        );
+        
+        pointer-events: none;
+        z-index: calc(var(--visual-effects-depth-atmosphere, 0) - 3);
+        mix-blend-mode: multiply;
+      }
+    }
+  }
+  
+  // Card and item visual effects integration
+  .card,
+  .main-card,
+  .artist-card,
+  .playlist-card,
+  .playlist-playlist,
+  .artist-artist,
+  .album-album,
+  .track-row {
+    // Apply visual effects to cards
+    &.visual-effects-enabled {
+      // Card visual effects base
+      @extend .visual-effects-container !optional;
+      
+      // Removed: dynamic animation extension (animations controlled by component)
+      
+      // Card visual effects enhancement  
+      &::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid rgba(var(--visual-effects-primary-rgb, 205, 214, 244), var(--visual-effects-border-opacity, 0.3));
+        border-radius: inherit;
+        background: rgba(var(--visual-effects-primary-rgb, 205, 214, 244), var(--visual-effects-fog-opacity, 0.02));
+        pointer-events: none;
+        z-index: var(--visual-effects-depth-mid, 2);
+        transition: all var(--visual-effects-transition-medium, 0.5s) ease-out;
+      }
+      
+      // Card interaction enhancements
+      &:hover {
+        // Enhanced hover visual effects
+        &::before {
+          transform: scale(1.05);
+          border-color: rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-border-opacity, 0.3) * 1.2));
+        }
+        
+        // Card hover visual effects
+        filter: 
+          saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.4))
+          brightness(calc(1.0 + var(--visual-effects-hover-intensity, 0.3) * 0.2));
+      }
+      
+      &:active {
+        // Click visual effects pulse
+        &::before {
+          transform: scale(0.95);
+          border-color: rgba(var(--visual-effects-neon-glow-rgb, 116, 199, 236), calc(var(--visual-effects-border-opacity, 0.3) * 1.5));
+        }
+      }
+    }
+    
+    // Removed: Dynamic synchronization
+  }
+
+  // Button visual effects integration
+  button,
+  .button,
+  .Button {
+    // Apply visual effects to buttons
+    &.visual-effects-enabled {
+      // Button visual effects base
+      @extend .visual-effects-container !optional;
+      
+      // Button interaction states
+      &:hover {
+        filter: brightness(1.1);
+      }
+      
+      &:active {
+        filter: brightness(0.9);
+      }
+      
+      // Button text visual effects
+      filter: saturate(1.2) brightness(1.05);
+      
+      // Button visual effects enhancement
+      &::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-border-opacity, 0.3) * 1.5));
+        border-radius: inherit;
+        background: rgba(var(--visual-effects-primary-rgb, 205, 214, 244), var(--visual-effects-fog-opacity, 0.02));
+        pointer-events: none;
+        z-index: var(--visual-effects-depth-mid, 2);
+        transition: all var(--visual-effects-transition-medium, 0.5s) ease-out;
+      }
+      
+      // Button audio-responsive enhancement
+      @extend .visual-effects-audio-responsive !optional;
+    }
+  }
+  
+  // Text visual effects integration
+  h1, h2, h3, h4, h5, h6,
+  .main-type-heading {
+    // Apply text visual effects to headings
+    &.visual-effects-enabled {
+      filter: saturate(1.3) brightness(1.1);
+    }
+  }
+
+  p, span, div,
+  .main-type-body,
+  .main-type-bass {
+    // Apply text visual effects to body text
+    &.visual-effects-enabled {
+      filter: saturate(1.2) brightness(1.05);
+    }
+  }
+
+  .text-small,
+  .description {
+    // Apply text visual effects to small text
+    &.visual-effects-enabled {
+      filter: saturate(1.1) brightness(1.02);
+    }
+  }
+}
+
+// === CONSCIOUSNESS MODE ADAPTATIONS ===
+
+// Performance mode adaptations
+:root[data-organic-performance-mode="minimal"] {
+  // Minimal performance mode - disable complex effects
+  .organic-consciousness-container {
+    animation: none !important;
+    filter: none !important;
+    
+    &::before {
+      display: none !important;
+    }
+  }
+  
+  // Disable atmospheric effects in minimal mode
+  .dynamic-atmospheric-particles,
+  .dynamic-volumetric-lighting,
+  .dynamic-atmospheric-fog {
+    &::before,
+    &::after {
+      display: none !important;
+    }
+  }
+}
+
+:root[data-organic-performance-mode="balanced"] {
+  // Balanced performance mode - remove animations
+  .organic-consciousness-container {
+    animation: none !important;
+  }
+  
+  // Reduce atmospheric density in balanced mode
+  .dynamic-atmospheric-particles {
+    &::before {
+      opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.3) !important;
+    }
+    
+    &::after {
+      opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.2) !important;
+    }
+  }
+}
+
+:root[data-visual-effects-performance-mode="maximum"] {
+  // Maximum performance mode - enhance all effects
+  .visual-effects-container {
+    // Enhanced maximum visual effects
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.5)) !important
+      brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.3)) !important;
+    
+    // Maximum visual effects field enhancement
+    &::before {
+      opacity: calc(var(--visual-effects-fog-opacity, 0.02) * 5) !important;
+    }
+  }
+  
+  // Enhanced atmospheric effects in maximum mode
+  .dynamic-atmospheric-particles {
+    // Dynamic atmospheric particles with dense density (inline CSS)
+    &[data-particle-density="dense"] {
+      position: relative;
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image: radial-gradient(circle at 20% 30%, rgba(var(--sn-accent-rgb), 0.15) 1px, transparent 1px);
+        background-size: 20px 20px;
+        animation: particle-float 6s ease-in-out infinite;
+      }
+    }
+  }
+  
+  .dynamic-volumetric-lighting {
+    // Dynamic volumetric lighting with dramatic intensity (inline CSS)
+    &[data-light-intensity="dramatic"] {
+      background: radial-gradient(ellipse at center, 
+        rgba(var(--sn-accent-rgb), 0.4) 0%,
+        rgba(var(--sn-accent-rgb), 0.1) 60%,
+        transparent 100%);
+      filter: blur(3px);
+      mix-blend-mode: screen;
+    }
+  }
+}
+
+// === VISUAL EFFECTS SYSTEM KEYFRAMES ===
+
+// Global visual effects field animation
+@keyframes visual-effects-global-field {
+  0% {
+    opacity: calc(var(--visual-effects-fog-opacity, 0.02) * var(--visual-effects-intensity, 0.7) * 2);
+    background-size: 100% 100%;
+  }
+  
+  50% {
+    opacity: calc(var(--visual-effects-fog-opacity, 0.02) * var(--visual-effects-intensity, 0.7) * 3);
+    background-size: 105% 105%;
+  }
+  
+  100% {
+    opacity: calc(var(--visual-effects-fog-opacity, 0.02) * var(--visual-effects-intensity, 0.7) * 2);
+    background-size: 100% 100%;
+  }
+}
+
+// Main view visual effects animation
+@keyframes visual-effects-main-view {
+  0% {
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 2);
+    background-position: 0% 0%;
+  }
+  
+  33% {
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 3);
+    background-position: 50% 50%;
+  }
+  
+  66% {
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 2.5);
+    background-position: 100% 100%;
+  }
+  
+  100% {
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 2);
+    background-position: 0% 0%;
+  }
+}
+
+// === ACCESSIBILITY SUPPORT ===
+
+// Comprehensive reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .visual-effects-container,
+  .Root__main-view,
+  .Root__nav-bar,
+  .player-controls,
+  .card,
+  button {
+    animation: none !important;
+    transition-duration: 0.1s !important;
+    
+    &::before,
+    &::after {
+      animation: none !important;
+      transition-duration: 0.1s !important;
+    }
+  }
+  
+  // Disable complex visual effects for accessibility
+  .visual-effects-container {
+    filter: none !important;
+    
+    &::before {
+      opacity: 0.05 !important;
+    }
+  }
+  
+  :root {
+    // Removed: animation cycle variable
+    --visual-effects-growth-intensity: 0;
+    --visual-effects-border-thickness: 1px;
+    
+    .Root::before,
+    // Removed: dynamic-animation-enabled class
+    [class*="visual-effects-"] {
+      animation: none !important;
+      transition-duration: 0.1s !important;
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .visual-effects-container {
+    filter: 
+      contrast(2.0) !important
+      saturate(1.5) !important;
+  }
+  
+  
+  // Enhanced text visibility
+  h1, h2, h3, h4, h5, h6,
+  p, span, div {
+    &.visual-effects-enabled {
+      text-shadow: 
+        0 0 2px rgba(255, 255, 255, 0.8) !important,
+        0 0 4px rgba(var(--visual-effects-primary-rgb, 205, 214, 244), 0.6) !important;
+    }
+  }
+  
+  :root {
+    // Enhanced visibility for high contrast
+    --visual-effects-border-thickness: 3px;
+    --visual-effects-emotional-saturation: 1.5;
+    --visual-effects-cinematic-contrast: 1.8;
+    
+    // Stronger visual effects
+    .visual-effects-enabled {
+      filter: 
+        contrast(var(--visual-effects-cinematic-contrast, 1.8))
+        saturate(var(--visual-effects-emotional-saturation, 1.5)) !important;
+    }
+  }
+}
+
+// Performance optimization layer
+@layer visual-effects.performance {
+  // GPU acceleration for visual effects elements
+  .visual-effects-enabled {
+    // Hardware acceleration
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    
+    // Optimized painting
+    will-change: transform, opacity, filter;
+    contain: layout style paint;
+  }
+  
+  // Reduce visual effects on low-power devices
+  @media (prefers-reduced-motion: reduce), (update: slow) {
+    .visual-effects-enabled {
+      // Minimal visual effects for performance
+      filter: none !important;
+      animation: none !important;
+      transition-duration: 0.1s !important;
+    }
+  }
+}
+
+// === DEBUG MODE VISUALIZATION ===
+
+// Debug mode for entire visual effects system
+:root.visual-effects-debug {
+  // Global debug indicators
+  &::before {
+    content: '✨ VISUAL EFFECTS SYSTEM ACTIVE';
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    font-size: 12px;
+    color: lime;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 5px 10px;
+    border-radius: 4px;
+    z-index: 99999;
+    pointer-events: none;
+    border: 1px solid lime;
+  }
+  
+  // Debug visual effects intensity indicator
+  &::after {
+    content: '🎵 Visual Effects Intensity: ' attr(data-visual-effects-intensity, '0.7');
+    position: fixed;
+    top: 50px;
+    left: 10px;
+    font-size: 11px;
+    color: cyan;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 4px 8px;
+    border-radius: 3px;
+    z-index: 99998;
+    pointer-events: none;
+    border: 1px solid cyan;
+  }
+  
+  // Debug performance indicator
+  .visual-effects-container {
+    outline: 3px dashed lime !important;
+    outline-offset: 2px;
+    
+    &::after {
+      content: '🚀 Performance: ' attr(data-visual-effects-performance-mode, 'optimal');
+      position: fixed;
+      top: 90px;
+      left: 10px;
+      font-size: 11px;
+      color: rgb(var(--sn-musical-harmony-analogous-warm-rgb));
+      background: rgba(var(--spice-rgb-base), 0.9);
+      padding: 4px 8px;
+      border-radius: 3px;
+      z-index: 99997;
+      pointer-events: none;
+      border: 1px solid rgb(var(--sn-musical-harmony-analogous-warm-rgb));
+    }
+  }
+  
+  
+  .visual-effects-enabled {
+    position: relative;
+    
+    &::after {
+      content: '✨ VFX';
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      font-size: 10px;
+      color: rgb(var(--sn-musical-harmony-complementary-rgb));
+      pointer-events: none;
+      z-index: 9999;
+      background: rgba(var(--spice-rgb-base), 0.9);
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+  }
+}
+
+// Debug mode for visual effects development
+@layer visual-effects.debug {
+  :root.visual-effects-debug {
+    // Debug system integration
+    @extend :root, .visual-effects-debug;
+  }
+}
+
+// === VISUAL EFFECTS SYSTEM READY ===
+// Mark system as fully loaded and ready
+:root {
+  --visual-effects-main-loaded: 1;
+  --visual-effects-system-ready: 1;
+}

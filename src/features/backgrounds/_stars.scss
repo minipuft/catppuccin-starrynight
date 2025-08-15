@@ -1,6 +1,6 @@
 // =============================================================================
-// YEAR 3000 ENERGY PARTICLE NETWORK - Advanced Stellar Animation System
-// Organic energy flows that respond to music and connect to the Nexus Orb
+// YEAR 3000 DYNAMIC PARTICLE NETWORK - Advanced Stellar Animation System
+// Dynamic animation flows that respond to music and connect to the interface
 // =============================================================================
 
 @use "../../core/_mixins" as *;
@@ -12,11 +12,11 @@
   --particle-base-speed: 8s;
   --particle-energy-intensity: 0.8;
   --particle-connection-strength: 0.6;
-  --particle-nexus-influence: 1;
+  --particle-interface-influence: 1;
 
-  // === Organic Flow Variables ===
+  // === Dynamic Flow Variables ===
   --particle-flow-variance: 15deg;
-  --particle-organic-curve: var(--sn-easing-organic, var(--sn-anim-easing-organic));
+  --particle-dynamic-curve: var(--sn-easing-smooth, var(--sn-anim-easing-smooth));
   --particle-life-cycle: 12s;
   --particle-emergence-delay: 3s;
 
@@ -47,7 +47,7 @@
 }
 
 // =============================================================================
-// ADVANCED KEYFRAME SYSTEM: Organic Energy Flows
+// ADVANCED KEYFRAME SYSTEM: Dynamic Animation Flows
 // =============================================================================
 
 // Primary Energy Stream - Organic diagonal flow
@@ -116,8 +116,8 @@
   }
 }
 
-// Energy Pulse - Radiating from Nexus influence points
-@keyframes energy-pulse-nexus {
+// Animation Pulse - Radiating from interface influence points
+@keyframes animation-pulse-interface {
   0% {
     transform: translate(-50%, -50%) scale(0);
     opacity: 0;
@@ -126,28 +126,28 @@
   20% {
     transform: translate(-50%, -50%) scale(1);
     opacity: calc(
-      var(--particle-energy-intensity) * var(--particle-nexus-influence)
+      var(--particle-energy-intensity) * var(--particle-interface-influence)
     );
   }
 
   40% {
     transform: translate(-50%, -50%) scale(1.2);
     opacity: calc(
-      var(--particle-energy-intensity) * var(--particle-nexus-influence) * 0.8
+      var(--particle-energy-intensity) * var(--particle-interface-influence) * 0.8
     );
   }
 
   60% {
     transform: translate(-50%, -50%) scale(0.9);
     opacity: calc(
-      var(--particle-energy-intensity) * var(--particle-nexus-influence) * 0.6
+      var(--particle-energy-intensity) * var(--particle-interface-influence) * 0.6
     );
   }
 
   80% {
     transform: translate(-50%, -50%) scale(0.5);
     opacity: calc(
-      var(--particle-energy-intensity) * var(--particle-nexus-influence) * 0.3
+      var(--particle-energy-intensity) * var(--particle-interface-influence) * 0.3
     );
   }
 
@@ -205,8 +205,8 @@
   }
 }
 
-// Energy Twinkle - Organic pulsing for ambient particles
-@keyframes energy-twinkle-organic {
+// Animation Twinkle - Dynamic pulsing for ambient particles
+@keyframes animation-twinkle-dynamic {
   0%,
   100% {
     opacity: calc(var(--particle-energy-intensity) * 0.6);
@@ -267,10 +267,10 @@
     @include performance-optimized;
     transform-style: preserve-3d;
 
-    // Base energy pulse
+    // Base animation pulse
     animation: energy-stream-primary
       calc(var(--particle-base-speed) * var(--particle-music-modulation))
-      var(--particle-organic-curve) infinite;
+      var(--particle-dynamic-curve) infinite;
 
     // === Enhanced Energy Trail System ===
     &::before {
@@ -326,7 +326,7 @@
       top: 15%;
       left: -10%;
       animation: energy-stream-primary calc(var(--particle-base-speed) * 1.2)
-        var(--particle-organic-curve) infinite;
+        var(--particle-dynamic-curve) infinite;
       animation-delay: 0s;
 
       background: radial-gradient(
@@ -342,7 +342,7 @@
       top: 25%;
       left: -15%;
       animation: energy-whisper-secondary calc(var(--particle-base-speed) * 0.8)
-        var(--particle-organic-curve) infinite;
+        var(--particle-dynamic-curve) infinite;
       animation-delay: calc(var(--particle-emergence-delay) * 1);
 
       background: radial-gradient(
@@ -358,7 +358,7 @@
       top: 65%;
       left: -5%;
       animation: energy-stream-primary calc(var(--particle-base-speed) * 1.5)
-        var(--particle-organic-curve) infinite;
+        var(--particle-dynamic-curve) infinite;
       animation-delay: calc(var(--particle-emergence-delay) * 2);
 
       background: radial-gradient(
@@ -369,13 +369,13 @@
       );
     }
 
-    // Nexus Influence Particles
+    // Interface Influence Particles
     &:nth-child(4) {
       --particle-cluster-size: 2.5;
       top: 85%;
       left: -20%;
-      animation: energy-pulse-nexus calc(var(--particle-base-speed) * 1.1)
-        var(--particle-organic-curve) infinite;
+      animation: animation-pulse-interface calc(var(--particle-base-speed) * 1.1)
+        var(--particle-dynamic-curve) infinite;
       animation-delay: calc(var(--particle-emergence-delay) * 0.5);
 
       background: radial-gradient(
@@ -391,7 +391,7 @@
       top: 45%;
       left: -8%;
       animation: energy-cluster-formation calc(var(--particle-base-speed) * 0.9)
-        var(--particle-organic-curve) infinite;
+        var(--particle-dynamic-curve) infinite;
       animation-delay: calc(var(--particle-emergence-delay) * 1.8);
 
       background: radial-gradient(
@@ -407,7 +407,7 @@
       --particle-cluster-size: 1.5;
       top: 35%;
       left: 25%;
-      animation: energy-twinkle-organic calc(var(--particle-life-cycle))
+      animation: animation-twinkle-dynamic calc(var(--particle-life-cycle))
         ease-in-out infinite;
       animation-delay: calc(var(--particle-emergence-delay) * 0.3);
 
@@ -422,7 +422,7 @@
       --particle-cluster-size: 2;
       top: 75%;
       left: 60%;
-      animation: energy-twinkle-organic calc(var(--particle-life-cycle) * 1.3)
+      animation: animation-twinkle-dynamic calc(var(--particle-life-cycle) * 1.3)
         ease-in-out infinite;
       animation-delay: calc(var(--particle-emergence-delay) * 2.2);
 
@@ -437,7 +437,7 @@
       --particle-cluster-size: 1.8;
       top: 55%;
       left: 80%;
-      animation: energy-twinkle-organic calc(var(--particle-life-cycle) * 0.7)
+      animation: animation-twinkle-dynamic calc(var(--particle-life-cycle) * 0.7)
         ease-in-out infinite;
       animation-delay: calc(var(--particle-emergence-delay) * 1.5);
 
@@ -478,7 +478,7 @@
     var(--particle-energy-intensity) * var(--particle-discovery-amplification)
   );
   --particle-network-density: 5;
-  --particle-nexus-influence: 1.3;
+  --particle-interface-influence: 1.3;
 }
 
 // Music Response Mode: Particles react to playing state
@@ -486,7 +486,7 @@
 [data-context="playing"] {
   --particle-music-modulation: 0.7; // Faster, more energetic
   --particle-energy-intensity: calc(var(--particle-energy-intensity) * 1.2);
-  --particle-nexus-influence: 1.5;
+  --particle-interface-influence: 1.5;
 
   .sn-stars-container .star {
     animation-duration: calc(var(--particle-base-speed) * 0.6) !important;
@@ -518,16 +518,16 @@
   --particle-energy-intensity: 1.2;
   --particle-base-speed: calc(var(--particle-base-speed) * 0.7);
   --particle-cluster-size: 5;
-  --particle-nexus-influence: 1.8;
+  --particle-interface-influence: 1.8;
 }
 
-// Nexus Mode: Particles cluster around UI elements
-.nexus-active {
-  --particle-nexus-influence: 2;
+// Interface Mode: Particles cluster around UI elements
+.interface-active {
+  --particle-interface-influence: 2;
   --particle-cluster-cohesion: 1.2;
 
   .sn-stars-container .star:nth-child(even) {
-    animation-name: energy-pulse-nexus;
+    animation-name: animation-pulse-interface;
   }
 }
 
@@ -561,7 +561,7 @@
 @media (prefers-reduced-motion: reduce) {
   .sn-stars-container {
     .star {
-      animation: energy-twinkle-organic calc(var(--particle-life-cycle) * 2)
+      animation: animation-twinkle-dynamic calc(var(--particle-life-cycle) * 2)
         ease-in-out infinite !important;
 
       &::before,
@@ -618,4 +618,38 @@
     transform: scale(1.05);
     opacity: 0.9;
   }
+}
+
+// =============================================================================
+// LEGACY COMPATIBILITY MAPPINGS - Phase 6.3 Layer A Modernization
+// =============================================================================
+
+:root {
+  // === Legacy Nexus → Interface Mappings ===
+  --particle-nexus-influence: var(--particle-interface-influence);
+  
+  // === Legacy Organic → Dynamic Mappings ===
+  --particle-organic-curve: var(--particle-dynamic-curve);
+}
+
+// Legacy keyframe support
+@keyframes energy-pulse-nexus {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  20% { transform: translate(-50%, -50%) scale(1); opacity: calc(var(--particle-energy-intensity) * var(--particle-nexus-influence)); }
+  40% { transform: translate(-50%, -50%) scale(1.2); opacity: calc(var(--particle-energy-intensity) * var(--particle-nexus-influence) * 0.8); }
+  60% { transform: translate(-50%, -50%) scale(0.9); opacity: calc(var(--particle-energy-intensity) * var(--particle-nexus-influence) * 0.6); }
+  80% { transform: translate(-50%, -50%) scale(0.5); opacity: calc(var(--particle-energy-intensity) * var(--particle-nexus-influence) * 0.3); }
+  100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+}
+
+@keyframes energy-twinkle-organic {
+  0%, 100% { opacity: calc(var(--particle-energy-intensity) * 0.6); transform: scale(1); }
+  25% { opacity: calc(var(--particle-energy-intensity) * 0.9); transform: scale(1.1); }
+  50% { opacity: calc(var(--particle-energy-intensity) * 0.4); transform: scale(0.8); }
+  75% { opacity: calc(var(--particle-energy-intensity) * 0.8); transform: scale(1.05); }
+}
+
+// Legacy class mappings
+.nexus-active {
+  @extend .interface-active !optional;
 }

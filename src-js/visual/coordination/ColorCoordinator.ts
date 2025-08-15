@@ -12,7 +12,7 @@
  * - Mediator Pattern: Coordinates strategy selection and execution
  */
 
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
@@ -32,7 +32,7 @@ import {
   type EnhancementPreset,
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 import { BackgroundStrategySelector } from "@/visual/strategies/BackgroundStrategySelector";
 
 // ============================================================================
@@ -64,7 +64,7 @@ interface ColorResultMergeOptions {
   priorityWeighting: boolean;
   conflictResolution: "override" | "merge" | "average";
   preserveMetadata: boolean;
-  consciousnessBlending: boolean;
+  visualEffectsBlending: boolean;
   oklabCoordination: boolean;
 }
 
@@ -254,7 +254,7 @@ export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
                                null;
     this.deviceDetector = new DeviceCapabilityDetector();
     this.strategySelector = new BackgroundStrategySelector();
-    this.oklabProcessor = new OKLABColorProcessor(YEAR3000_CONFIG.enableDebug);
+    this.oklabProcessor = new OKLABColorProcessor(ADVANCED_SYSTEM_CONFIG.enableDebug);
 
     // Enhanced default selection criteria with device awareness
     this.selectionCriteria = {
@@ -679,7 +679,7 @@ export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
       priorityWeighting: true,
       conflictResolution: "merge",
       preserveMetadata: true,
-      consciousnessBlending: true,
+      visualEffectsBlending: true,
       oklabCoordination: this.oklabCoordinationEnabled,
     };
 
@@ -749,9 +749,9 @@ export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
       }
     }
 
-    // Apply consciousness blending if enabled
-    if (options.consciousnessBlending) {
-      this.applyConsciousnessBlending(mergedResult, sortedResults);
+    // Apply visual effects blending if enabled
+    if (options.visualEffectsBlending) {
+      this.applyVisualEffectsBlending(mergedResult, sortedResults);
     }
 
     // Apply OKLAB coordination if enabled
@@ -763,13 +763,13 @@ export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
   }
 
   /**
-   * Apply consciousness-aware blending to merged results
+   * Apply visual-effects-aware blending to merged results
    */
-  private applyConsciousnessBlending(
+  private applyVisualEffectsBlending(
     mergedResult: ColorResult,
     strategyResults: StrategyProcessingResult[]
   ): void {
-    // Calculate consciousness-weighted average for accent colors
+    // Calculate visual-effects-weighted average for accent colors
     let totalWeight = 0;
     let weightedR = 0,
       weightedG = 0,
@@ -798,8 +798,8 @@ export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
       mergedResult.accentHex = this.rgbToHex(avgR, avgG, avgB);
       mergedResult.accentRgb = `${avgR},${avgG},${avgB}`;
 
-      // Add consciousness blending metadata
-      mergedResult.metadata.consciousnessBlending = {
+      // Add visual effects blending metadata
+      mergedResult.metadata.visualEffectsBlending = {
         strategyCount: strategyResults.length,
         totalWeight,
         blendedAccent: mergedResult.accentHex,
@@ -1102,10 +1102,10 @@ export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
           this.settingsManager.get("sn-visual-guide-mode" as any) ?? "cosmic",
         depthLayersEnabled:
           this.settingsManager.get("sn-depth-enabled" as any) ?? true,
-        consciousnessLevel:
-          this.settingsManager.get("sn-consciousness-level" as any) ?? 0.8,
-        breathingAnimationEnabled:
-          this.settingsManager.get("sn-breathing-enabled" as any) ?? true,
+        visualEffectsLevel:
+          this.settingsManager.get("sn-visual-effects-level" as any) ?? 0.8,
+        pulsingAnimationEnabled:
+          this.settingsManager.get("sn-pulsing-enabled" as any) ?? true,
       },
       musicContext: context.musicData,
       deviceContext: {
@@ -1245,7 +1245,7 @@ export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
         harmonicMode:
           this.settingsManager.get("sn-visual-guide-mode" as any) ?? "cosmic",
         intensity:
-          this.settingsManager.get("sn-consciousness-level" as any) ?? 0.8,
+          this.settingsManager.get("sn-visual-effects-level" as any) ?? 0.8,
         enableAdvancedBlending:
           this.settingsManager.get("sn-advanced-blending" as any) ?? true,
       };

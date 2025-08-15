@@ -1,58 +1,58 @@
 /**
  * Visual Effects Type Definitions
  * 
- * Type definitions for the Year 3000 Visual Effects System.
- * Replaces mechanical BeatSync types with modern visual effect patterns.
+ * Type definitions for the Advanced Visual Effects System.
+ * Technical interfaces for music-synchronized visual effects.
  */
 
 // =========================================================================
-// CORE ORGANIC CONSCIOUSNESS TYPES
+// CORE VISUAL EFFECTS TYPES
 // =========================================================================
 
 /**
- * Organic consciousness state representing the living system's current condition
+ * Visual effects state representing the system's current visual condition
  */
-export interface OrganicConsciousnessState {
-  /** Current organic intensity level (0-1) */
-  organicIntensity: number;
+export interface VisualEffectsState {
+  /** Current visual intensity level (0-1) */
+  visualIntensity: number;
   
-  /** Cellular growth scale factor (1.0 = normal, >1.0 = growth) */
-  cellularGrowth: number;
+  /** Animation scale factor (1.0 = normal, >1.0 = enhanced) */
+  animationScale: number;
   
-  /** Breathing phase in radians (0 to 2π) */
-  breathingPhase: number;
+  /** Animation phase in radians (0 to 2π) */
+  animationPhase: number;
   
-  /** Emotional temperature in Kelvin (1000K-20000K) */
-  emotionalTemperature: number;
+  /** Color temperature in Kelvin (1000K-20000K) */
+  colorTemperature: number;
   
-  /** Membrane fluidity level (0-1) */
-  membraneFluidityLevel: number;
+  /** Animation fluidity level (0-1) */
+  animationFluidityLevel: number;
   
-  /** Timestamp of last beat consciousness event */
+  /** Timestamp of last beat effect event */
   lastBeatTime: number;
   
-  /** Current BPM for breathing rhythm synchronization */
+  /** Current BPM for rhythm synchronization */
   currentBPM: number;
 }
 
 /**
- * Configuration for organic consciousness behavior
+ * Configuration for visual effects behavior
  */
-export interface OrganicConsciousnessConfig {
-  /** Sensitivity to cellular response (0-1) */
-  cellularResponseSensitivity: number;
+export interface VisualEffectsConfig {
+  /** Sensitivity to animation response (0-1) */
+  animationResponseSensitivity: number;
   
-  /** Intensity of breathing rhythm effects (0-1) */
-  breathingRhythmIntensity: number;
+  /** Intensity of rhythm effects (0-1) */
+  rhythmIntensity: number;
   
-  /** Range for emotional temperature mapping */
-  emotionalTemperatureRange: {
+  /** Range for color temperature mapping */
+  colorTemperatureRange: {
     min: number; // Minimum temperature in Kelvin
     max: number; // Maximum temperature in Kelvin
   };
   
-  /** Whether membrane fluidity effects are enabled */
-  membraneFluidityEnabled: boolean;
+  /** Whether advanced animation effects are enabled */
+  enableAdvancedEffects: boolean;
   
   /** Whether atmospheric particles are enabled */
   atmosphericParticlesEnabled: boolean;
@@ -62,20 +62,20 @@ export interface OrganicConsciousnessConfig {
 }
 
 /**
- * Performance metrics for organic consciousness
+ * Performance metrics for visual effects
  */
-export interface OrganicConsciousnessMetrics {
-  /** Total number of organic consciousness updates */
-  organicUpdates: number;
+export interface VisualEffectsMetrics {
+  /** Total number of visual effects updates */
+  visualUpdates: number;
   
-  /** Number of cellular growth events */
-  cellularGrowthEvents: number;
+  /** Number of animation scale events */
+  animationScaleEvents: number;
   
-  /** Number of breathing cycles completed */
-  breathingCycles: number;
+  /** Number of animation cycles completed */
+  animationCycles: number;
   
-  /** Number of emotional temperature shifts */
-  emotionalShifts: number;
+  /** Number of color temperature shifts */
+  colorTemperatureShifts: number;
   
   /** Average frame time in milliseconds */
   averageFrameTime: number;
@@ -85,25 +85,24 @@ export interface OrganicConsciousnessMetrics {
 }
 
 // =========================================================================
-// CELLULAR CONSCIOUSNESS TYPES
+// RHYTHMIC ANIMATION TYPES
 // =========================================================================
 
-
 /**
- * Breathing organism representing rhythmic consciousness
+ * Rhythmic element representing music-synchronized animation
  */
-export interface BreathingOrganism {
-  /** Unique identifier for the organism */
+export interface RhythmicElement {
+  /** Unique identifier for the element */
   id: string;
   
-  /** DOM element representing the organism */
+  /** DOM element representing the animated element */
   element: HTMLElement;
   
-  /** Current breathing phase offset */
+  /** Current animation phase offset */
   phaseOffset: number;
   
-  /** Current breathing intensity (0-1) */
-  breathingIntensity: number;
+  /** Current animation intensity (0-1) */
+  animationIntensity: number;
   
   /** Position on screen */
   position: {
@@ -111,8 +110,8 @@ export interface BreathingOrganism {
     y: number;
   };
   
-  /** Whether the organism is actively breathing */
-  isBreathing: boolean;
+  /** Whether the element is actively animating */
+  isAnimating: boolean;
 }
 
 /**
@@ -148,12 +147,12 @@ export interface AtmosphericParticle {
 }
 
 // =========================================================================
-// CONSCIOUSNESS EVENT TYPES
+// LEGACY EVENT TYPES (DEPRECATED)
 // =========================================================================
 
 /**
  * @deprecated - Moved to backwards compatibility section
- * Beat consciousness event payload
+ * Beat visual effects event payload (deprecated)
  */
 export interface LegacyBeatConsciousnessEvent {
   /** Beat intensity (0-1) */
@@ -169,12 +168,12 @@ export interface LegacyBeatConsciousnessEvent {
   timestamp?: number;
   
   /** Additional beat data */
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
  * @deprecated - Moved to backwards compatibility section
- * Energy consciousness event payload
+ * Energy visual effects event payload (deprecated)
  */
 export interface LegacyEnergyConsciousnessEvent {
   /** Energy level (0-1) */
@@ -192,7 +191,7 @@ export interface LegacyEnergyConsciousnessEvent {
 
 /**
  * @deprecated - Moved to backwards compatibility section
- * Emotional consciousness event payload
+ * Emotional visual effects event payload (deprecated)
  */
 export interface LegacyEmotionalConsciousnessEvent {
   /** Detected emotion type */
@@ -216,7 +215,7 @@ export interface LegacyEmotionalConsciousnessEvent {
 
 /**
  * @deprecated - Moved to backwards compatibility section
- * Tempo consciousness event payload
+ * Tempo visual effects event payload (deprecated)
  */
 export interface LegacyTempoConsciousnessEvent {
   /** Base BPM */
@@ -233,11 +232,11 @@ export interface LegacyTempoConsciousnessEvent {
 }
 
 // =========================================================================
-// CINEMATIC CONSCIOUSNESS TYPES
+// CINEMATIC EFFECTS TYPES
 // =========================================================================
 
 /**
- * Color temperature mapping for emotional consciousness
+ * Color temperature mapping for emotional visual effects
  */
 export interface EmotionalColorTemperature {
   /** Temperature in Kelvin (1000K-20000K) */
@@ -272,23 +271,23 @@ export interface CinematicEffectConfig {
     /** Neon reflection intensity (0-1) */
     neonReflections: number;
     
-    /** Holographic overlay intensity (0-1) */
-    holographicOverlay: number;
+    /** Layered overlay intensity (0-1) */
+    layeredOverlay: number;
     
     /** Urban decay effect intensity (0-1) */
     urbanDecay: number;
   };
   
-  /** Star Wars organic-tech effects */
+  /** Star Wars smooth-tech effects */
   starWarsEffects: {
     /** Lens flare intensity (0-1) */
     lensFlare: number;
     
-    /** Material consciousness intensity (0-1) */
-    materialConsciousness: number;
+    /** Material effects intensity (0-1) */
+    materialEffects: number;
     
-    /** Organic curve intensity (0-1) */
-    organicCurves: number;
+    /** Smooth curve intensity (0-1) */
+    smoothCurves: number;
     
     /** Energy field intensity (0-1) */
     energyFields: number;
@@ -300,9 +299,9 @@ export interface CinematicEffectConfig {
 // =========================================================================
 
 /**
- * Organic consciousness system configuration
+ * Visual effects system configuration
  */
-export interface OrganicConsciousnessSystemConfig {
+export interface VisualEffectsSystemConfig {
   /** System identifier */
   systemId: string;
   
@@ -312,8 +311,8 @@ export interface OrganicConsciousnessSystemConfig {
   /** Whether the system is enabled */
   enabled: boolean;
   
-  /** Organic consciousness configuration */
-  organicConfig: OrganicConsciousnessConfig;
+  /** Visual effects configuration */
+  visualConfig: VisualEffectsConfig;
   
   /** Performance targets */
   performanceTargets: {
@@ -341,26 +340,26 @@ export interface OrganicConsciousnessSystemConfig {
 }
 
 /**
- * Integration with Year 3000 System
+ * Integration with Advanced System Architecture
  */
-export interface Year3000OrganicIntegration {
+export interface AdvancedVisualIntegration {
   /** Whether integration is active */
   isActive: boolean;
   
   /** Integration version */
   version: string;
   
-  /** Registered organic consciousness systems */
-  registeredSystems: Map<string, OrganicConsciousnessSystemConfig>;
+  /** Registered visual effects systems */
+  registeredSystems: Map<string, VisualEffectsSystemConfig>;
   
   /** Shared event bus reference */
-  eventBus: any;
+  eventBus: unknown;
   
   /** Shared performance analyzer reference */
-  performanceAnalyzer: any;
+  performanceAnalyzer: unknown;
   
   /** Shared CSS variable manager reference */
-  cssVariableManager: any;
+  cssVariableManager: unknown;
 }
 
 // =========================================================================
@@ -369,7 +368,7 @@ export interface Year3000OrganicIntegration {
 
 /**
  * Legacy beat sync compatibility interface
- * @deprecated Use OrganicConsciousnessState instead
+ * @deprecated Use VisualEffectsState instead
  */
 export interface LegacyBeatSyncCompat {
   /** Legacy beat intensity */
@@ -388,92 +387,20 @@ export interface LegacyBeatSyncCompat {
 /**
  * Migration helper for converting legacy types
  */
-export interface OrganicConsciousnessMigration {
-  /** Convert legacy beat sync to organic consciousness */
-  convertLegacyBeatSync(legacy: LegacyBeatSyncCompat): OrganicConsciousnessState;
+export interface VisualEffectsMigration {
+  /** Convert legacy beat sync to visual effects */
+  convertLegacyBeatSync(legacy: LegacyBeatSyncCompat): VisualEffectsState;
   
-  /** Convert legacy configuration to organic config */
-  convertLegacyConfig(legacy: any): OrganicConsciousnessConfig;
+  /** Convert legacy configuration to visual config */
+  convertLegacyConfig(legacy: unknown): VisualEffectsConfig;
   
   /** Migrate legacy event handlers */
-  migrateLegacyEventHandlers(legacy: any): void;
+  migrateLegacyEventHandlers(legacy: unknown): void;
 }
 
 // =========================================================================
-// MODERN TYPE DEFINITIONS (RECOMMENDED)
+// MODERN EVENT DEFINITIONS (RECOMMENDED)
 // =========================================================================
-
-/**
- * Visual effects state representing the system's current condition
- * @since v3.0.0 - Replaces OrganicConsciousnessState
- */
-export interface VisualEffectsState {
-  /** Current visual intensity level (0-1) */
-  visualIntensity: number;
-  
-  /** Animation scale factor (1.0 = normal, >1.0 = scaled) */
-  animationScale: number;
-  
-  /** Animation phase in radians (0 to 2π) */
-  animationPhase: number;
-  
-  /** Color temperature in Kelvin (1000K-20000K) */
-  colorTemperature: number;
-  
-  /** Animation fluidity level (0-1) */
-  animationFluidityLevel: number;
-  
-  /** Timestamp of last beat event */
-  lastBeatTime: number;
-  
-  /** Current BPM for rhythm synchronization */
-  currentBPM: number;
-}
-
-/**
- * Configuration for visual effects behavior
- * @since v3.0.0 - Replaces OrganicConsciousnessConfig
- */
-export interface VisualEffectsConfig {
-  /** Sensitivity to animation response (0-1) */
-  animationResponseSensitivity: number;
-  
-  /** Intensity of rhythm effects (0-1) */
-  rhythmIntensity: number;
-  
-  /** Range for color temperature mapping */
-  colorTemperatureRange: {
-    min: number; // Minimum temperature in Kelvin
-    max: number; // Maximum temperature in Kelvin
-  };
-  
-  /** Speed of animation transitions (0.1-5.0) */
-  animationTransitionSpeed: number;
-  
-  /** Enable advanced visual effects */
-  enableAdvancedEffects: boolean;
-}
-
-/**
- * Metrics for visual effects performance
- * @since v3.0.0 - Replaces OrganicConsciousnessMetrics
- */
-export interface VisualEffectsMetrics {
-  /** Total animation cycles processed */
-  animationCycles: number;
-  
-  /** Current effects per second */
-  effectsPerSecond: number;
-  
-  /** Average response time in milliseconds */
-  averageResponseTime: number;
-  
-  /** Memory usage for effects (in MB) */
-  effectsMemoryUsage: number;
-  
-  /** Last performance check timestamp */
-  lastPerformanceCheck: number;
-}
 
 /**
  * Beat event for visual effects
@@ -569,21 +496,21 @@ export interface TempoEffectEvent {
  * 
  * Maintains backwards compatibility by mapping old property names to new ones
  */
-export interface OrganicConsciousnessState {
+export interface DynamicVisualEffectsState {
   /** @deprecated Use visualIntensity instead */
-  organicIntensity: number;
+  smoothIntensity: number;
   
   /** @deprecated Use animationScale instead */
-  cellularGrowth: number;
+  animationScaleGrowth: number;
   
   /** @deprecated Use animationPhase instead */
-  breathingPhase: number;
+  pulsingPhase: number;
   
   /** @deprecated Use colorTemperature instead */
   emotionalTemperature: number;
   
   /** @deprecated Use animationFluidityLevel instead */
-  membraneFluidityLevel: number;
+  surfaceFluidityLevel: number;
   
   lastBeatTime: number;
   currentBPM: number;
@@ -593,12 +520,12 @@ export interface OrganicConsciousnessState {
  * @deprecated Use VisualEffectsConfig instead
  * @since v1.0.0
  */
-export interface OrganicConsciousnessConfig {
+export interface DynamicVisualEffectsConfig {
   /** @deprecated Use animationResponseSensitivity instead */
-  cellularResponseSensitivity: number;
+  animationScaleResponseSensitivity: number;
   
   /** @deprecated Use rhythmIntensity instead */
-  breathingRhythmIntensity: number;
+  pulsingRhythmIntensity: number;
   
   /** @deprecated Use colorTemperatureRange instead */
   emotionalTemperatureRange: {
@@ -607,7 +534,7 @@ export interface OrganicConsciousnessConfig {
   };
   
   /** @deprecated Use animationTransitionSpeed instead */
-  organicTransitionSpeed: number;
+  smoothTransitionSpeed: number;
   
   /** @deprecated Use enableAdvancedEffects instead */
   enableCellularGrowth: boolean;
@@ -617,17 +544,17 @@ export interface OrganicConsciousnessConfig {
  * @deprecated Use VisualEffectsMetrics instead
  * @since v1.0.0
  */
-export interface OrganicConsciousnessMetrics {
+export interface DynamicVisualEffectsMetrics {
   /** @deprecated Use animationCycles instead */
-  breathingCycles: number;
+  pulsingCycles: number;
   
   /** @deprecated Use effectsPerSecond instead */
-  cellularResponsesPerSecond: number;
+  animationScaleResponsesPerSecond: number;
   
   averageResponseTime: number;
   
   /** @deprecated Use effectsMemoryUsage instead */
-  organicMemoryUsage: number;
+  smoothMemoryUsage: number;
   
   lastPerformanceCheck: number;
 }
@@ -656,3 +583,53 @@ export type EmotionalConsciousnessEvent = LegacyEmotionalConsciousnessEvent;
  * @since v1.0.0
  */
 export type TempoConsciousnessEvent = LegacyTempoConsciousnessEvent;
+
+// =========================================================================
+// INTERFACE COMPATIBILITY ALIASES
+// =========================================================================
+
+/**
+ * @deprecated Use DynamicVisualEffectsState instead
+ * @since v1.0.0
+ */
+export type SmoothVisualEffectsState = DynamicVisualEffectsState;
+
+/**
+ * @deprecated Use DynamicVisualEffectsState instead
+ * @since v1.0.0
+ */
+export type OrganicConsciousnessState = DynamicVisualEffectsState;
+
+/**
+ * @deprecated Use DynamicVisualEffectsConfig instead  
+ * @since v1.0.0
+ */
+export type SmoothVisualEffectsConfig = DynamicVisualEffectsConfig;
+
+/**
+ * @deprecated Use DynamicVisualEffectsConfig instead  
+ * @since v1.0.0
+ */
+export type OrganicConsciousnessConfig = DynamicVisualEffectsConfig;
+
+/**
+ * @deprecated Use DynamicVisualEffectsMetrics instead
+ * @since v1.0.0
+ */
+export type SmoothVisualEffectsMetrics = DynamicVisualEffectsMetrics;
+
+/**
+ * @deprecated Use DynamicVisualEffectsMetrics instead
+ * @since v1.0.0
+ */
+export type OrganicConsciousnessMetrics = DynamicVisualEffectsMetrics;
+
+// =========================================================================
+// LEGACY YEAR 3000 COMPATIBILITY ALIASES
+// =========================================================================
+
+/**
+ * @deprecated Use AdvancedVisualIntegration instead
+ * @since v1.0.0
+ */
+export type Year3000VisualIntegration = AdvancedVisualIntegration;

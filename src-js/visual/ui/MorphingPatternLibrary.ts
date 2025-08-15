@@ -466,7 +466,7 @@ export class MorphingPatternLibrary {
   ): void {
     const { color = 'rgba(var(--sn-accent-rgb), 0.25)', size = 60, speed = 0.8 } = options;
     
-    // Create organic blooming pattern for positive valence
+    // Create smooth blooming pattern for positive valence
     const bloomPhase = Math.sin(time * speed * 0.001) * 0.5 + 0.5;
     const petalCount = 6;
     
@@ -594,7 +594,7 @@ export class MorphingPatternLibrary {
       context.save();
       context.translate(x, y);
       
-      // Apply time-based rotation for organic feel
+      // Apply time-based rotation for smooth feel
       const rotation = (time * speed * 0.0005) % (Math.PI * 2);
       context.rotate(rotation);
       

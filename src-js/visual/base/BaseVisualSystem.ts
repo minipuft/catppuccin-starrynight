@@ -1,9 +1,9 @@
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 
 import {
@@ -12,7 +12,7 @@ import {
   createOptimizedCanvas,
   detectRenderingCapabilities,
 } from "@/utils/graphics/VisualCanvasFactory";
-import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { selectPerformanceProfile } from "@/utils/animation/visualPerformance";
 
 // Extend the config type locally to include the missing property
@@ -29,7 +29,7 @@ interface SystemMetrics {
 
 export abstract class BaseVisualSystem implements IManagedSystem {
   protected config: SystemConfig;
-  protected utils: typeof Year3000Utilities;
+  protected utils: typeof ThemeUtilities;
   protected performanceMonitor: SimplePerformanceCoordinator;
   protected musicSyncService: MusicSyncService | null;
   protected settingsManager: SettingsManager | null;
@@ -51,8 +51,8 @@ export abstract class BaseVisualSystem implements IManagedSystem {
   protected activeCanvasResults: Map<string, CanvasResult> = new Map();
 
   constructor(
-    config: SystemConfig = YEAR3000_CONFIG,
-    utils: typeof Year3000Utilities = Year3000Utilities,
+    config: SystemConfig = ADVANCED_SYSTEM_CONFIG,
+    utils: typeof ThemeUtilities = ThemeUtilities,
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null,
     settingsManager: SettingsManager | null

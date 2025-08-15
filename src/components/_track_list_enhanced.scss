@@ -98,7 +98,7 @@
         /* Echo element*/
         &::after {
           content: "";
-          @extend .sn-temporal-echo;
+          @extend .sn-temporal-echo !optional;
         }
 
         /* Add subtle side border*/
@@ -140,7 +140,7 @@
         @include hue-shift();
         &::after {
           content: "";
-          @extend .sn-temporal-echo;
+          @extend .sn-temporal-echo !optional;
         }
 
         /* Highlight track number when row is active*/

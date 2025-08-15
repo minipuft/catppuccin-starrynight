@@ -2,23 +2,23 @@
  * DynamicCatppuccinBridge - Phase 2.1 Dynamic Color Integration
  *
  * Bridges ColorHarmonyEngine extracted colors to Catppuccin dynamic accent system
- * enabling real-time sync between album art extraction and consciousness effects.
+ * enabling real-time sync between album art extraction and visual effects.
  *
- * Philosophy: "Living color systems that breathe with musical consciousness while
+ * Philosophy: "Living color systems that pulse with musical awareness while
  * preserving Catppuccin's aesthetic harmony and ensuring dynamic accent functionality."
  */
 
 import type { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import {
   OptimizedCSSVariableManager,
   getGlobalOptimizedCSSController,
 } from "@/core/performance/OptimizedCSSVariableManager";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
-import type { DepthConsciousnessController } from "./DepthLayerController";
+import type { DepthVisualEffectsController } from "./DepthLayerController";
 
 interface AlbumColors {
   VIBRANT?: string;
@@ -44,14 +44,14 @@ interface DynamicColorState {
 interface CatppuccinIntegrationConfig {
   accentUpdateEnabled: boolean;
   baseTransformationEnabled: boolean;
-  consciousnessIntegrationEnabled: boolean;
+  visualIntegrationEnabled: boolean;
   smoothTransitionDuration: number; // ms
   energyResponseMultiplier: number; // 0-2
 }
 
 export class DynamicCatppuccinBridge extends BaseVisualSystem {
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
-  private depthConsciousnessController: DepthConsciousnessController | null =
+  private depthVisualController: DepthVisualEffectsController | null =
     null;
 
   private dynamicColorState: DynamicColorState = {
@@ -67,7 +67,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
   private integrationConfig: CatppuccinIntegrationConfig = {
     accentUpdateEnabled: true,
     baseTransformationEnabled: true,
-    consciousnessIntegrationEnabled: true,
+    visualIntegrationEnabled: true,
     smoothTransitionDuration: 800, // 0.8s smooth transitions
     energyResponseMultiplier: 1.2,
   };
@@ -82,7 +82,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
   private cssController!: OptimizedCSSVariableManager;
 
   constructor(
-    config = YEAR3000_CONFIG,
+    config = ADVANCED_SYSTEM_CONFIG,
     utils = Utils,
     performanceMonitor: any = null,
     musicSyncService: any = null,
@@ -98,7 +98,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
       // Initialize CSS coordination - use globalThis to access Year3000System
       const year3000System = (globalThis as any).year3000System;
       this.cssController =
-        year3000System?.cssConsciousnessController ||
+        year3000System?.cssController ||
         getGlobalOptimizedCSSController();
 
       // Always setup event listeners and settings monitoring
@@ -528,9 +528,9 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
     if (musicState.energy !== undefined) {
       this.dynamicColorState.musicEnergy = musicState.energy;
 
-      // Update consciousness intensity based on music energy
-      if (this.integrationConfig.consciousnessIntegrationEnabled) {
-        this.updateConsciousnessWithMusicEnergy(musicState.energy);
+      // Update visual intensity based on music energy
+      if (this.integrationConfig.visualIntegrationEnabled) {
+        this.updateVisualWithMusicEnergy(musicState.energy);
       }
     }
   }
@@ -656,7 +656,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
 
   /**
    * Apply dynamic accent using Color Extension Facade
-   * Updates both core Spicetify variables AND consciousness extensions
+   * Updates both core Spicetify variables AND visualEffects extensions
    */
   private applyDynamicAccent(accentHex: string): void {
     // 🎨 CRITICAL: Log accent color being applied
@@ -708,9 +708,9 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
       "dynamic-accent-application"
     );
 
-    // 🔮 CONSCIOUSNESS INTEGRATION
-    if (this.integrationConfig.consciousnessIntegrationEnabled) {
-      this.updateConsciousnessWithAccent(accentHex, rgbString);
+    // 🔮 VISUAL INTEGRATION
+    if (this.integrationConfig.visualIntegrationEnabled) {
+      this.updateVisualWithAccent(accentHex, rgbString);
     }
 
     if (this.config.enableDebug) {
@@ -738,42 +738,42 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
   }
 
   /**
-   * Update consciousness system with new accent awareness
+   * Update visual system with new accent awareness
    */
-  private updateConsciousnessWithAccent(
+  private updateVisualWithAccent(
     accentHex: string,
     accentRgb: string
   ): void {
     const root = document.documentElement;
 
-    // Update consciousness variables using coordination
-    const consciousnessAccentVariables = {
+    // Update visual variables using coordination
+    const visualAccentVariables = {
       "--sn-holographic-rgb": accentRgb,
       "--holographic-scanline-rgb": accentRgb,
-      "--consciousness-intensity": `calc(0.5 + var(--musical-sync-intensity) * ${this.integrationConfig.energyResponseMultiplier})`,
+      "--visual-intensity": `calc(0.5 + var(--musical-sync-intensity) * ${this.integrationConfig.energyResponseMultiplier}),`,
     };
 
     this.cssController.batchSetVariables(
       "DynamicCatppuccinBridge",
-      consciousnessAccentVariables,
-      "high", // High priority for consciousness accent integration
-      "consciousness-accent-update"
+      visualAccentVariables,
+      "high", // High priority for visual accent integration
+      "visual-accent-update"
     );
 
-    // Notify depth consciousness controller if available
-    if (this.depthConsciousnessController) {
-      // Update consciousness system via public interface
+    // Notify depth visual controller if available
+    if (this.depthVisualController) {
+      // Update visual system via public interface
       Y3KDebug?.debug?.log(
         "DynamicCatppuccinBridge",
-        "Notifying depth consciousness of accent change"
+        "Notifying depth visual controller of accent change"
       );
     }
   }
 
   /**
-   * Update consciousness with music energy
+   * Update visual system with music energy
    */
-  private updateConsciousnessWithMusicEnergy(energy: number): void {
+  private updateVisualWithMusicEnergy(energy: number): void {
     const root = document.documentElement;
     const adjustedEnergy =
       energy * this.integrationConfig.energyResponseMultiplier;
@@ -791,25 +791,25 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
       "musical-energy-update"
     );
 
-    // Update consciousness intensity based on energy using coordination
+    // Update visual intensity based on energy using coordination
     const baseIntensity = 0.5;
-    const consciousnessIntensity = Math.max(
+    const visualIntensity = Math.max(
       0.1,
       Math.min(1.0, baseIntensity + adjustedEnergy * 0.3)
     );
 
     this.cssController.setVariable(
       "DynamicCatppuccinBridge",
-      "--consciousness-intensity",
-      consciousnessIntensity.toString(),
-      "high", // High priority for consciousness intensity - affects awareness levels
-      "consciousness-intensity-update"
+      "--visual-intensity",
+      visualIntensity.toString(),
+      "high", // High priority for visual intensity - affects visual levels
+      "visual-intensity-update"
     );
   }
 
   /**
    * Update living base background using Color Extension Facade
-   * Preserves Spicetify base while adding consciousness layers
+   * Preserves Spicetify base while adding visual layers
    */
   private updateLivingBaseBackground(primaryHex: string): void {
     const root = document.documentElement;
@@ -835,7 +835,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
     );
 
     // Create living gradient that ENHANCES Spicetify base (doesn't replace)
-    const consciousnessGradient = `
+    const visualGradient = `
       linear-gradient(135deg,
         var(--spice-base) 0%,
         rgba(${primaryRgbString}, 0.08) 30%,
@@ -846,8 +846,8 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
 
     // Update living base gradient variables using coordination
     const livingGradientVariables = {
-      "--living-base-gradient": consciousnessGradient,
-      "--consciousness-base-gradient": consciousnessGradient,
+      "--living-base-gradient": visualGradient,
+      "--visual-base-gradient": visualGradient,
     };
 
     this.cssController.batchSetVariables(
@@ -866,7 +866,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
   }
 
   /**
-   * Link with other consciousness systems
+   * Link with other visual systems
    */
   public linkWithColorHarmonyEngine(engine: ColorHarmonyEngine): void {
     this.colorHarmonyEngine = engine;
@@ -876,10 +876,10 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
     );
   }
 
-  public linkWithDepthConsciousness(
-    controller: DepthConsciousnessController
+  public linkWithDepthVisual(
+    controller: DepthVisualEffectsController
   ): void {
-    this.depthConsciousnessController = controller;
+    this.depthVisualController = controller;
     Y3KDebug?.debug?.log(
       "DynamicCatppuccinBridge",
       "Linked with DepthLayerController"
@@ -909,8 +909,8 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
         base: computedStyle.getPropertyValue("--spice-base").trim(),
       },
 
-      // Consciousness Extensions
-      consciousnessVars: {
+      // Visual Extensions
+      visualVars: {
         gradientPrimary: computedStyle
           .getPropertyValue("--sn-bg-gradient-primary-rgb")
           .trim(),
@@ -932,8 +932,8 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
       config: {
         dynamicAccentEnabled: this.checkDynamicAccentEnabled(),
         accentUpdateEnabled: this.integrationConfig.accentUpdateEnabled,
-        consciousnessEnabled:
-          this.integrationConfig.consciousnessIntegrationEnabled,
+        visualEnabled:
+          this.integrationConfig.visualIntegrationEnabled,
         isActive: this.isActive,
       },
     };

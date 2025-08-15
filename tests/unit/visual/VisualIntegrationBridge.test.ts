@@ -9,8 +9,8 @@ import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerforman
 import { MusicSyncService } from '@/audio/MusicSyncService';
 import { SettingsManager } from '@/ui/managers/SettingsManager';
 import { ColorHarmonyEngine } from '@/audio/ColorHarmonyEngine';
-import { YEAR3000_CONFIG } from '@/config/globalConfig';
-import * as Utils from '@/utils/core/Year3000Utilities';
+import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
+import * as Utils from '@/utils/core/ThemeUtilities';
 import { IManagedSystem } from '@/types/systems';
 
 // Mock dependencies
@@ -59,7 +59,7 @@ describe('VisualSystemCoordinator', () => {
   let mockMusicSyncService: jest.Mocked<MusicSyncService>;
   let mockSettingsManager: jest.Mocked<SettingsManager>;
   let mockColorHarmonyEngine: jest.Mocked<ColorHarmonyEngine>;
-  let mockYear3000System: any;
+  let mockAdvancedThemeSystem: any;
 
   beforeEach(() => {
     // Reset mocks
@@ -107,16 +107,16 @@ describe('VisualSystemCoordinator', () => {
       destroy: jest.fn()
     } as any;
     
-    mockYear3000System = {
+    mockAdvancedThemeSystem = {
       isInitialized: true,
-      config: YEAR3000_CONFIG
+      config: ADVANCED_SYSTEM_CONFIG
     };
 
     // Create bridge instance
     bridge = new VisualSystemCoordinator(
-      YEAR3000_CONFIG,
+      ADVANCED_SYSTEM_CONFIG,
       Utils,
-      mockYear3000System,
+      mockAdvancedThemeSystem,
       mockCSSVariableBatcher,
       mockPerformanceAnalyzer,
       mockMusicSyncService,
@@ -228,9 +228,9 @@ describe('VisualSystemCoordinator', () => {
       const mockEventBus = { subscribe: jest.fn(), emit: jest.fn() };
       
       const bridgeWithEventBus = new VisualSystemCoordinator(
-        YEAR3000_CONFIG,
+        ADVANCED_SYSTEM_CONFIG,
         Utils,
-        mockYear3000System,
+        mockAdvancedThemeSystem,
         mockCSSVariableBatcher,
         mockPerformanceAnalyzer,
         mockMusicSyncService,
@@ -499,7 +499,7 @@ describe('VisualSystemCoordinator', () => {
     });
 
     it('should handle settings changes', async () => {
-      const settingsEvent = new CustomEvent('year3000SystemSettingsChanged', {
+      const settingsEvent = new CustomEvent('advancedThemeSystemSettingsChanged', {
         detail: { key: 'sn-visual-quality', value: 'high' }
       });
 

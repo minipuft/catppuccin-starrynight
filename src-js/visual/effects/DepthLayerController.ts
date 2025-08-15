@@ -1,18 +1,18 @@
 /**
- * DepthConsciousnessController - Year 3000 Organic Intelligence
+ * DepthVisualEffectsController - Year 3000 Smooth Intelligence
  *
- * Manages content-aware consciousness effects that adapt to user behavior,
+ * Manages content-aware visualEffects effects that adapt to user behavior,
  * musical energy, and interface context for optimal readability and beauty.
  *
- * Philosophy: "Consciousness that enhances human experience through intelligent,
+ * Philosophy: "VisualEffects that enhances human experience through intelligent,
  * beautiful interfaces that adapt to serve the user's current need."
  */
 
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { HealthCheckResult } from "@/types/systems";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 
 interface ContentArea {
@@ -20,23 +20,23 @@ interface ContentArea {
   type: "text" | "interactive" | "visual" | "chrome" | "media" | "navigation";
   protectionLevel: number; // 0-1
   lastInteraction: number;
-  consciousnessLevel: number; // 0-1 current consciousness adaptation level
+  visualEffectsLevel: number; // 0-1 current visualEffects adaptation level
   readingIntensity: number; // 0-1 detected reading engagement
   contextualImportance: number; // 0-1 importance in current context
   adaptiveProtection: number; // 0-1 dynamic protection based on behavior
 }
 
-interface MusicalConsciousnessState {
+interface MusicalVisualEffectsState {
   energy: number; // 0-1
   valence: number; // 0-1
   instrumental: boolean;
   tempo: number;
   genre?: string;
   
-  // Enhanced musical consciousness
+  // Enhanced musical visualEffects
   emotionalTemperature: number; // 0-1 warm to cool emotional range
   musicSyncStrength: number; // 0-1 how strongly visual effects should sync with music
-  genreConsciousnessProfile: {
+  genreVisualEffectsProfile: {
     ambientLevel: number; // 0-1
     energyResponse: number; // 0-1
     visualComplexity: number; // 0-1
@@ -60,7 +60,7 @@ interface UserInteractionState {
   contentEngagement: number; // 0-1 estimated content engagement level
 }
 
-export class DepthConsciousnessController extends BaseVisualSystem {
+export class DepthVisualEffectsController extends BaseVisualSystem {
   private cssController!: OptimizedCSSVariableManager;
   private contentAreas: Map<Element, ContentArea> = new Map();
   private chromeAreas: Set<Element> = new Set();
@@ -80,16 +80,16 @@ export class DepthConsciousnessController extends BaseVisualSystem {
     contentEngagement: 0.5,
   };
 
-  private musicalState: MusicalConsciousnessState = {
+  private musicalState: MusicalVisualEffectsState = {
     energy: 0.5,
     valence: 0.5,
     instrumental: false,
     tempo: 120,
     
-    // Enhanced musical consciousness defaults
+    // Enhanced musical visualEffects defaults
     emotionalTemperature: 0.5,
     musicSyncStrength: 0.7,
-    genreConsciousnessProfile: {
+    genreVisualEffectsProfile: {
       ambientLevel: 0.5,
       energyResponse: 0.6,
       visualComplexity: 0.5,
@@ -99,18 +99,18 @@ export class DepthConsciousnessController extends BaseVisualSystem {
 
   private readingModeTimer: number = 0;
   private interactionTimer: number = 0;
-  private consciousnessUpdateInterval: number = 0;
+  private visualEffectsUpdateInterval: number = 0;
 
-  // Performance optimization and consciousness timing
+  // Performance optimization and visualEffects timing
   private lastUpdate = 0;
-  private updateThreshold = 100; // Max 10fps for consciousness updates
-  private consciousnessIntensity = 0.7; // Overall consciousness system intensity
+  private updateThreshold = 100; // Max 10fps for visualEffects updates
+  private visualEffectsIntensity = 0.7; // Overall visualEffects system intensity
   private adaptiveProtectionMap: Map<Element, number> = new Map(); // Dynamic protection levels
   private scrollVelocityHistory: number[] = []; // Track scroll patterns
   private dwellTimeTracker: Map<Element, number> = new Map(); // Track time spent in areas
 
   constructor(
-    config = YEAR3000_CONFIG,
+    config = ADVANCED_SYSTEM_CONFIG,
     utils = Utils,
     performanceMonitor: any = null,
     musicSyncService: any = null,
@@ -125,21 +125,21 @@ export class DepthConsciousnessController extends BaseVisualSystem {
     try {
       // Initialize CSS coordination first - use globalThis to access Year3000System
       const year3000System = (globalThis as any).year3000System;
-      this.cssController = year3000System?.cssConsciousnessController || getGlobalOptimizedCSSController();
+      this.cssController = year3000System?.cssVisualEffectsController || getGlobalOptimizedCSSController();
 
       this.detectContentAndChromeAreas();
       this.setupInteractionListeners();
-      this.initializeConsciousnessVariables();
-      this.startConsciousnessUpdate();
+      this.initializeVisualEffectsVariables();
+      this.startVisualEffectsUpdate();
 
       Y3KDebug?.debug?.log(
-        "DepthConsciousnessController",
-        "Consciousness system awakened"
+        "DepthVisualEffectsController",
+        "VisualEffects system awakened"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "DepthConsciousnessController",
-        "Failed to initialize consciousness:",
+        "DepthVisualEffectsController",
+        "Failed to initialize visualEffects:",
         error
       );
     }
@@ -201,7 +201,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
       ]
     };
 
-    // UI chrome areas that can handle enhanced consciousness effects
+    // UI chrome areas that can handle enhanced visualEffects effects
     const chromeSelectors = [
       ".Root__nav-bar",
       ".Root__top-bar",
@@ -224,7 +224,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
             type: type as ContentArea["type"],
             protectionLevel: this.calculateAdvancedProtectionLevel(element, type as ContentArea["type"]),
             lastInteraction: 0,
-            consciousnessLevel: this.calculateConsciousnessLevel(element),
+            visualEffectsLevel: this.calculateVisualEffectsLevel(element),
             readingIntensity: 0,
             contextualImportance: this.calculateContextualImportance(element),
             adaptiveProtection: this.calculateProtectionLevel(element),
@@ -235,9 +235,9 @@ export class DepthConsciousnessController extends BaseVisualSystem {
           element.classList.add(`content-${type}`);
 
           // Add enhanced content-aware data attributes
-          element.setAttribute("data-consciousness-protected", "true");
+          element.setAttribute("data-visualEffects-protected", "true");
           element.setAttribute("data-content-type", contentArea.type);
-          element.setAttribute("data-consciousness-level", contentArea.consciousnessLevel.toString());
+          element.setAttribute("data-visualEffects-level", contentArea.visualEffectsLevel.toString());
           element.setAttribute("data-contextual-importance", contentArea.contextualImportance.toString());
 
           // Initialize adaptive protection tracking
@@ -252,15 +252,15 @@ export class DepthConsciousnessController extends BaseVisualSystem {
       document.querySelectorAll(selector).forEach((element) => {
         this.chromeAreas.add(element);
         element.classList.add("ui-chrome-area");
-        element.setAttribute("data-consciousness-enhanced", "true");
+        element.setAttribute("data-visualEffects-enhanced", "true");
       });
     });
 
-    // Analyze content distribution for consciousness optimization
+    // Analyze content distribution for visualEffects optimization
     const contentStats = this.analyzeContentDistribution();
     
     Y3KDebug?.debug?.log(
-      "DepthConsciousnessController",
+      "DepthVisualEffectsController",
       `Enhanced detection: ${this.contentAreas.size} content areas, ${this.chromeAreas.size} chrome areas`,
       contentStats
     );
@@ -324,7 +324,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
   }
 
   /**
-   * Advanced protection level calculation with consciousness awareness
+   * Advanced protection level calculation with visualEffects awareness
    */
   private calculateAdvancedProtectionLevel(element: Element, type: ContentArea["type"]): number {
     const baseProtection = this.calculateProtectionLevel(element);
@@ -355,27 +355,27 @@ export class DepthConsciousnessController extends BaseVisualSystem {
   }
 
   /**
-   * Calculate consciousness level - how much consciousness effects should be applied
+   * Calculate visualEffects level - how much visualEffects effects should be applied
    */
-  private calculateConsciousnessLevel(element: Element): number {
+  private calculateVisualEffectsLevel(element: Element): number {
     const rect = element.getBoundingClientRect();
     const elementArea = rect.width * rect.height;
     const viewportArea = window.innerWidth * window.innerHeight;
     const elementVisibilityRatio = elementArea / viewportArea;
     
-    // Larger elements get more consciousness attention
-    let consciousnessLevel = Math.min(elementVisibilityRatio * 2, 0.8);
+    // Larger elements get more visualEffects attention
+    let visualEffectsLevel = Math.min(elementVisibilityRatio * 2, 0.8);
     
     // Adjust based on element type
     if (element.matches('.Root__main-view, .main-view-container')) {
-      consciousnessLevel += 0.3; // Main content areas get more consciousness
+      visualEffectsLevel += 0.3; // Main content areas get more visualEffects
     }
     
     if (element.matches('.main-nowPlayingBar-container')) {
-      consciousnessLevel += 0.4; // Now playing bar is consciousness-focal
+      visualEffectsLevel += 0.4; // Now playing bar is visualEffects-focal
     }
     
-    return Math.min(consciousnessLevel, 1.0);
+    return Math.min(visualEffectsLevel, 1.0);
   }
 
   /**
@@ -408,7 +408,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
   }
 
   /**
-   * Analyze content distribution for consciousness optimization
+   * Analyze content distribution for visualEffects optimization
    */
   private analyzeContentDistribution(): object {
     const stats = {
@@ -446,7 +446,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
   }
 
   /**
-   * Analyze scrolling behavior patterns for consciousness adaptation
+   * Analyze scrolling behavior patterns for visualEffects adaptation
    */
   private analyzeScrollingBehavior(): void {
     if (this.scrollVelocityHistory.length < 3) return;
@@ -470,21 +470,21 @@ export class DepthConsciousnessController extends BaseVisualSystem {
       this.userState.interactionPattern = "casual";
     }
     
-    // Adjust consciousness intensity based on engagement
+    // Adjust visualEffects intensity based on engagement
     if (this.userState.contentEngagement > 0.7) {
-      this.consciousnessIntensity = Math.min(this.consciousnessIntensity + 0.05, 0.9);
+      this.visualEffectsIntensity = Math.min(this.visualEffectsIntensity + 0.05, 0.9);
     } else if (this.userState.contentEngagement < 0.3) {
-      this.consciousnessIntensity = Math.max(this.consciousnessIntensity - 0.1, 0.3);
+      this.visualEffectsIntensity = Math.max(this.visualEffectsIntensity - 0.1, 0.3);
     }
   }
 
   /**
-   * Calculate interaction modifier for consciousness intensity
+   * Calculate interaction modifier for visualEffects intensity
    */
   private calculateInteractionModifier(): number {
     let modifier = 0;
     
-    // Reading mode significantly reduces consciousness effects
+    // Reading mode significantly reduces visualEffects effects
     if (this.userState.readingModeActive) {
       modifier -= 0.6;
     }
@@ -506,7 +506,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
       modifier -= 0.2;
     }
     
-    // High focus depth allows more consciousness effects
+    // High focus depth allows more visualEffects effects
     if (this.userState.focusDepth > 0.7 && !this.userState.readingModeActive) {
       modifier += 0.2;
     }
@@ -520,17 +520,17 @@ export class DepthConsciousnessController extends BaseVisualSystem {
   private calculateContextualModifier(): number {
     let modifier = 0;
     
-    // Enhance consciousness in music-focused areas
+    // Enhance visualEffects in music-focused areas
     if (this.userState.interactionTarget?.matches('.main-nowPlayingBar, .main-nowPlayingWidget')) {
       modifier += 0.3;
     }
     
-    // Reduce consciousness in text-heavy areas unless user is exploring
+    // Reduce visualEffects in text-heavy areas unless user is exploring
     if (this.userState.interactionTarget?.matches('.main-trackList, .main-entityHeader-subtitle')) {
       modifier -= this.userState.currentMode === "exploring" ? 0.1 : 0.3;
     }
     
-    // Ambient mode allows more consciousness effects
+    // Ambient mode allows more visualEffects effects
     if (this.userState.currentMode === "ambient") {
       modifier += 0.4;
     }
@@ -560,39 +560,39 @@ export class DepthConsciousnessController extends BaseVisualSystem {
   }
 
   /**
-   * Calculate membrane fluidity index based on user behavior and music
+   * Calculate surface fluidity index based on user behavior and music
    */
-  private calculateMembraneFluidityIndex(): number {
+  private calculateSurfaceFluidityIndex(): number {
     let fluidity = 0.5; // Base fluidity
     
-    // Musical energy affects membrane fluidity
+    // Musical energy affects surface fluidity
     fluidity += this.musicalState.energy * 0.3;
     
-    // User engagement affects membrane responsiveness
+    // User engagement affects surface responsiveness
     fluidity += this.userState.contentEngagement * 0.2;
     
-    // Emotional temperature affects membrane dynamics
+    // Emotional temperature affects surface dynamics
     fluidity += this.musicalState.emotionalTemperature * 0.2;
     
-    // Interaction pattern affects membrane behavior
+    // Interaction pattern affects surface behavior
     if (this.userState.interactionPattern === "contemplative") {
-      fluidity -= 0.2; // More stable membranes for focused states
+      fluidity -= 0.2; // More stable surfaces for focused states
     } else if (this.userState.interactionPattern === "rapid") {
-      fluidity += 0.3; // More fluid membranes for active browsing
+      fluidity += 0.3; // More fluid surfaces for active browsing
     }
     
     return Math.max(0.1, Math.min(1.0, fluidity));
   }
 
   /**
-   * Calculate genre-specific consciousness shifts
+   * Calculate genre-specific visualEffects shifts
    */
-  private calculateGenreConsciousnessShift(): number {
+  private calculateGenreVisualEffectsShift(): number {
     if (!this.musicalState.genre) return 0.5;
     
-    // Genre-specific consciousness adjustments
+    // Genre-specific visualEffects adjustments
     const genreShifts: Record<string, number> = {
-      "ambient": 0.8,     // High consciousness for ambient music
+      "ambient": 0.8,     // High visualEffects for ambient music
       "electronic": 0.7, // Moderate-high for electronic
       "classical": 0.6,  // Moderate for classical
       "jazz": 0.5,       // Balanced for jazz
@@ -612,7 +612,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
   }
 
   /**
-   * Enhanced interaction listeners with advanced consciousness awareness
+   * Enhanced interaction listeners with advanced visualEffects awareness
    */
   private setupInteractionListeners(): void {
     // Enhanced scroll detection with velocity tracking
@@ -719,7 +719,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
       });
     });
 
-    // Enhanced reading mode detection with consciousness adaptation
+    // Enhanced reading mode detection with visualEffects adaptation
     document.addEventListener("mousemove", () => {
       clearTimeout(this.readingModeTimer);
       this.userState.readingModeActive = false;
@@ -774,7 +774,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
     
     resetAmbientTimer();
 
-    // Musical consciousness sync
+    // Musical visualEffects sync
     document.addEventListener("music-state-change", (event: Event) => {
       const customEvent = event as CustomEvent;
       if (customEvent.detail) {
@@ -782,101 +782,101 @@ export class DepthConsciousnessController extends BaseVisualSystem {
       }
     });
 
-    // Beat detection for consciousness pulsing
+    // Beat detection for visualEffects pulsing
     document.addEventListener("beat-detected", () => {
       this.handleBeatPulse();
     });
   }
 
   /**
-   * Initialize CSS consciousness variables
+   * Initialize CSS visualEffects variables
    */
-  private initializeConsciousnessVariables(): void {
-    // Set initial consciousness state using coordination
+  private initializeVisualEffectsVariables(): void {
+    // Set initial visualEffects state using coordination
     const initialVariables = {
-      "--consciousness-system-active": "1",
-      "--content-protection-level": "0.95",
-      "--chrome-enhancement-level": "2.0",
-      "--consciousness-breath-rate": "4s",
-      "--musical-sync-intensity": "0.5",
-      "--reading-mode-active": "0",
-      "--user-interaction-detected": "0",
+      "--sn-visual-effects-system-active": "1",
+      "--sn-visual-effects-content-protection-level": "0.95",
+      "--sn-visual-effects-chrome-enhancement-level": "2.0",
+      "--sn-visual-effects-field-animation-rate": "4s",
+      "--sn-music-energy-level": "0.5",
+      "--sn-feature-reading-mode-active": "0",
+      "--sn-visual-effects-user-interaction-detected": "0",
     };
 
     this.cssController.batchSetVariables(
-      "DepthConsciousnessController",
+      "DepthVisualEffectsController",
       initialVariables,
       "normal",
-      "consciousness-initialization"
+      "visualEffects-initialization"
     );
   }
 
   /**
-   * Start consciousness update loop
+   * Start visualEffects update loop
    */
-  private startConsciousnessUpdate(): void {
-    const updateConsciousness = () => {
+  private startVisualEffectsUpdate(): void {
+    const updateVisualEffects = () => {
       if (!this.isActive) return;
 
       const now = performance.now();
       if (now - this.lastUpdate >= this.updateThreshold) {
-        this.updateConsciousnessState();
+        this.updateVisualEffectsState();
         this.lastUpdate = now;
       }
 
-      requestAnimationFrame(updateConsciousness);
+      requestAnimationFrame(updateVisualEffects);
     };
 
-    updateConsciousness();
+    updateVisualEffects();
   }
 
   /**
-   * Enhanced consciousness state update with advanced awareness patterns
+   * Enhanced visualEffects state update with advanced awareness patterns
    */
-  private updateConsciousnessState(): void {
+  private updateVisualEffectsState(): void {
     const root = document.documentElement;
 
-    // Advanced consciousness intensity calculation
-    const baseIntensity = this.consciousnessIntensity;
+    // Advanced visualEffects intensity calculation
+    const baseIntensity = this.visualEffectsIntensity;
     const musicalModifier = this.musicalState.energy * this.musicalState.musicSyncStrength * 0.3;
     const interactionModifier = this.calculateInteractionModifier();
     const contextualModifier = this.calculateContextualModifier();
     const emotionalModifier = this.musicalState.emotionalTemperature * 0.2;
     
-    const finalConsciousnessIntensity = Math.max(
+    const finalVisualEffectsIntensity = Math.max(
       0.05,
       Math.min(1.0, baseIntensity + musicalModifier + interactionModifier + contextualModifier + emotionalModifier)
     );
 
     // Update enhanced CSS variables using coordination
-    const consciousnessVariables = {
-      "--consciousness-intensity": finalConsciousnessIntensity.toString(),
-      "--consciousness-level": this.consciousnessIntensity.toString(),
-      "--awareness-level": this.userState.focusDepth.toString(),
-      "--musical-sync-intensity": this.musicalState.energy.toString(),
-      "--musical-sync-strength": this.musicalState.musicSyncStrength.toString(),
-      "--sn-color-temperature": this.musicalState.emotionalTemperature.toString(),
-      "--reading-mode-active": this.userState.readingModeActive ? "1" : "0",
-      "--user-interaction-detected": 
+    const visualEffectsVariables = {
+      "--sn-visual-effects-field-intensity": finalVisualEffectsIntensity.toString(),
+      "--sn-visual-effects-level": this.visualEffectsIntensity.toString(),
+      "--sn-visual-effects-awareness-level": this.userState.focusDepth.toString(),
+      "--sn-music-energy-level": this.musicalState.energy.toString(),
+      "--sn-visual-effects-music-sync-strength": this.musicalState.musicSyncStrength.toString(),
+      "--sn-color-shift-temperature": this.musicalState.emotionalTemperature.toString(),
+      "--sn-feature-reading-mode-active": this.userState.readingModeActive ? "1" : "0",
+      "--sn-visual-effects-user-interaction-detected": 
         this.userState.isScrolling || this.userState.isHovering ? "1" : "0",
-      "--current-interaction-mode": this.getModeNumericValue(this.userState.currentMode).toString(),
-      "--focus-depth": this.userState.focusDepth.toString(),
-      "--content-engagement": this.userState.contentEngagement.toString(),
-      "--scroll-velocity": Math.min(this.userState.scrollVelocity / 2000, 1.0).toString(),
-      "--dwell-time-factor": Math.min(this.userState.dwellTime / 5000, 1.0).toString(),
-      "--interaction-pattern": this.getPatternNumericValue(this.userState.interactionPattern).toString(),
-      "--temporal-flow-direction-x": (Math.sin(Date.now() * 0.0001) * 0.5 + 0.5).toString(),
-      "--temporal-flow-direction-y": (Math.cos(Date.now() * 0.0001) * 0.5 + 0.5).toString(),
-      "--memory-intensity": this.musicalState.musicalMemoryPatterns.toString(),
-      "--sn-fluidity-index": this.calculateMembraneFluidityIndex().toString(),
-      "--genre-consciousness-shift": this.calculateGenreConsciousnessShift().toString(),
+      "--sn-visual-effects-interaction-mode": this.getModeNumericValue(this.userState.currentMode).toString(),
+      "--sn-visual-effects-focus-depth": this.userState.focusDepth.toString(),
+      "--sn-visual-effects-content-engagement": this.userState.contentEngagement.toString(),
+      "--sn-visual-effects-scroll-velocity": Math.min(this.userState.scrollVelocity / 2000, 1.0).toString(),
+      "--sn-visual-effects-dwell-time-factor": Math.min(this.userState.dwellTime / 5000, 1.0).toString(),
+      "--sn-visual-effects-interaction-pattern": this.getPatternNumericValue(this.userState.interactionPattern).toString(),
+      "--sn-visual-effects-temporal-flow-direction-x": (Math.sin(Date.now() * 0.0001) * 0.5 + 0.5).toString(),
+      "--sn-visual-effects-temporal-flow-direction-y": (Math.cos(Date.now() * 0.0001) * 0.5 + 0.5).toString(),
+      "--sn-visual-effects-memory-intensity": this.musicalState.musicalMemoryPatterns.toString(),
+      "--sn-visual-effects-fluidity-index": this.calculateSurfaceFluidityIndex().toString(),
+      "--sn-visual-effects-genre-shift": this.calculateGenreVisualEffectsShift().toString(),
     };
 
     this.cssController.batchSetVariables(
-      "DepthConsciousnessController",
-      consciousnessVariables,
+      "DepthVisualEffectsController",
+      visualEffectsVariables,
       "normal",
-      "consciousness-state-update"
+      "visualEffects-state-update"
     );
 
     // Update music energy class (CSS classes need direct manipulation)
@@ -902,17 +902,17 @@ export class DepthConsciousnessController extends BaseVisualSystem {
    * Update user interaction state
    */
   private updateUserInteractionState(): void {
-    // Immediate update for responsive consciousness
-    this.updateConsciousnessState();
+    // Immediate update for responsive visualEffects
+    this.updateVisualEffectsState();
   }
 
   /**
-   * Sync consciousness with musical state
+   * Sync visualEffects with musical state
    */
-  private syncWithMusic(musicState: Partial<MusicalConsciousnessState>): void {
+  private syncWithMusic(musicState: Partial<MusicalVisualEffectsState>): void {
     Object.assign(this.musicalState, musicState);
 
-    // Adjust consciousness breath rate based on tempo
+    // Adjust visualEffects breath rate based on tempo
     if (musicState.tempo) {
       const breathRate = Math.max(
         2,
@@ -920,40 +920,40 @@ export class DepthConsciousnessController extends BaseVisualSystem {
       );
       
       this.cssController.setVariable(
-        "DepthConsciousnessController",
-        "--consciousness-breath-rate",
+        "DepthVisualEffectsController",
+        "--sn-visual-effects-field-animation-rate",
         `${breathRate}s`,
         "high", // High priority for musical sync
         "musical-tempo-sync"
       );
     }
 
-    // Immediate consciousness update
-    this.updateConsciousnessState();
+    // Immediate visualEffects update
+    this.updateVisualEffectsState();
 
     Y3KDebug?.debug?.log(
-      "DepthConsciousnessController",
-      `Musical consciousness sync: energy=${musicState.energy}, tempo=${musicState.tempo}`
+      "DepthVisualEffectsController",
+      `Musical visualEffects sync: energy=${musicState.energy}, tempo=${musicState.tempo}`
     );
   }
 
   /**
-   * Handle beat pulse for consciousness effects
+   * Handle beat pulse for visualEffects effects
    */
   private handleBeatPulse(): void {
     if (this.userState.readingModeActive) return; // No pulses during reading
 
-    // Brief consciousness pulse on beat
+    // Brief visualEffects pulse on beat
     const root = document.documentElement;
     const currentIntensity = parseFloat(
-      root.style.getPropertyValue("--consciousness-intensity") || "0.5"
+      root.style.getPropertyValue("--sn-visual-effects-field-intensity") || "0.5"
     );
     const pulseIntensity = Math.min(1, currentIntensity + 0.1);
 
     // Use high priority for beat pulse (time-critical for musical sync)
     this.cssController.setVariable(
-      "DepthConsciousnessController",
-      "--consciousness-intensity",
+      "DepthVisualEffectsController",
+      "--sn-visual-effects-field-intensity",
       pulseIntensity.toString(),
       "high",
       "beat-pulse"
@@ -962,7 +962,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
     // Return to normal after brief pulse
     setTimeout(() => {
       if (this.isActive) {
-        this.updateConsciousnessState();
+        this.updateVisualEffectsState();
       }
     }, 100);
   }
@@ -978,7 +978,7 @@ export class DepthConsciousnessController extends BaseVisualSystem {
       type: this.determineContentType(element),
       protectionLevel: this.calculateProtectionLevel(element),
       lastInteraction: 0,
-      consciousnessLevel: 0.5, // Initial consciousness adaptation level
+      visualEffectsLevel: 0.5, // Initial visualEffects adaptation level
       readingIntensity: 0, // No reading detected initially
       contextualImportance: this.calculateProtectionLevel(element), // Use protection level as initial importance
       adaptiveProtection: 0.5, // Start with moderate adaptive protection
@@ -986,11 +986,11 @@ export class DepthConsciousnessController extends BaseVisualSystem {
 
     this.contentAreas.set(element, contentArea);
     element.classList.add("content-sanctuary");
-    element.setAttribute("data-consciousness-protected", "true");
+    element.setAttribute("data-visualEffects-protected", "true");
     element.setAttribute("data-content-type", contentArea.type);
 
     Y3KDebug?.debug?.log(
-      "DepthConsciousnessController",
+      "DepthVisualEffectsController",
       `Protected new content element: ${element.tagName}.${element.className}`
     );
   }
@@ -1003,10 +1003,10 @@ export class DepthConsciousnessController extends BaseVisualSystem {
 
     this.chromeAreas.add(element);
     element.classList.add("ui-chrome-area");
-    element.setAttribute("data-consciousness-enhanced", "true");
+    element.setAttribute("data-visualEffects-enhanced", "true");
 
     Y3KDebug?.debug?.log(
-      "DepthConsciousnessController",
+      "DepthVisualEffectsController",
       `Enhanced new chrome element: ${element.tagName}.${element.className}`
     );
   }
@@ -1019,21 +1019,21 @@ export class DepthConsciousnessController extends BaseVisualSystem {
     this.updateUserInteractionState();
 
     Y3KDebug?.debug?.log(
-      "DepthConsciousnessController",
+      "DepthVisualEffectsController",
       `Reading mode ${active ? "activated" : "deactivated"}`
     );
   }
 
   /**
-   * Get consciousness metrics for monitoring
+   * Get visualEffects metrics for monitoring
    */
-  public getConsciousnessMetrics() {
+  public getVisualEffectsMetrics() {
     return {
       contentAreas: this.contentAreas.size,
       chromeAreas: this.chromeAreas.size,
-      consciousnessIntensity: parseFloat(
+      visualEffectsIntensity: parseFloat(
         document.documentElement.style.getPropertyValue(
-          "--consciousness-intensity"
+          "--sn-visual-effects-field-intensity"
         ) || "0.5"
       ),
       readingModeActive: this.userState.readingModeActive,
@@ -1043,16 +1043,16 @@ export class DepthConsciousnessController extends BaseVisualSystem {
   }
 
   public override async healthCheck(): Promise<HealthCheckResult> {
-    const metrics = this.getConsciousnessMetrics();
+    const metrics = this.getVisualEffectsMetrics();
     const isHealthy = metrics.contentAreas > 0 && metrics.chromeAreas > 0;
 
     return {
       healthy: isHealthy,
       issues: isHealthy
         ? []
-        : ["Consciousness system not properly initialized"],
+        : ["VisualEffects system not properly initialized"],
       metrics: {
-        consciousnessLevel: metrics.contentAreas > 0 ? 1 : 0,
+        visualEffectsLevel: metrics.contentAreas > 0 ? 1 : 0,
         protectedAreas: metrics.contentAreas,
         enhancedAreas: metrics.chromeAreas,
         musicalEnergy: metrics.musicalEnergy,
@@ -1067,32 +1067,32 @@ export class DepthConsciousnessController extends BaseVisualSystem {
     clearTimeout(this.readingModeTimer);
     clearTimeout(this.interactionTimer);
 
-    // Remove consciousness classes and attributes
+    // Remove visualEffects classes and attributes
     this.contentAreas.forEach((_, element) => {
       element.classList.remove("content-sanctuary");
-      element.removeAttribute("data-consciousness-protected");
+      element.removeAttribute("data-visualEffects-protected");
       element.removeAttribute("data-content-type");
     });
 
     this.chromeAreas.forEach((element) => {
       element.classList.remove("ui-chrome-area");
-      element.removeAttribute("data-consciousness-enhanced");
+      element.removeAttribute("data-visualEffects-enhanced");
     });
 
     // Reset CSS variables using coordination
     const resetVariables = {
-      "--consciousness-system-active": "",
-      "--consciousness-intensity": "",
-      "--reading-mode-active": "",
-      "--user-interaction-detected": "",
-      "--consciousness-breath-rate": "",
-      "--musical-sync-intensity": "",
-      "--content-protection-level": "",
-      "--chrome-enhancement-level": "",
+      "--sn-visual-effects-system-active": "",
+      "--sn-visual-effects-field-intensity": "",
+      "--sn-feature-reading-mode-active": "",
+      "--sn-visual-effects-user-interaction-detected": "",
+      "--sn-visual-effects-field-animation-rate": "",
+      "--sn-music-energy-level": "",
+      "--sn-visual-effects-content-protection-level": "",
+      "--sn-visual-effects-chrome-enhancement-level": "",
     };
 
     this.cssController.batchSetVariables(
-      "DepthConsciousnessController",
+      "DepthVisualEffectsController",
       resetVariables,
       "critical", // Critical priority for cleanup
       "system-cleanup"
@@ -1105,8 +1105,8 @@ export class DepthConsciousnessController extends BaseVisualSystem {
     root.removeAttribute("data-reading-mode");
 
     Y3KDebug?.debug?.log(
-      "DepthConsciousnessController",
-      "Consciousness system deactivated"
+      "DepthVisualEffectsController",
+      "VisualEffects system deactivated"
     );
   }
 }

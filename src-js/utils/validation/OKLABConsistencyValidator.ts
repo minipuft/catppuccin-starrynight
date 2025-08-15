@@ -5,7 +5,7 @@
  * OKLAB for perceptual uniformity and consistency. Helps identify any remaining
  * legacy RGB processing that should be updated.
  *
- * Philosophy: "Every color that touches consciousness must pass through the
+ * Philosophy: "Every color that touches visual-effects must pass through the
  * perceptual lens of OKLAB - ensuring visual harmony that respects human
  * perception and transcends mere technical color representation."
  */
@@ -187,7 +187,7 @@ export class OKLABConsistencyValidator {
         timestamp: Date.now(),
       };
 
-      const result = await coordinator.coordinateMusicalColors(testContext);
+      const result = await coordinator.processMusicalColors(testContext);
 
       if (result.enhancedColors && result.oklabPreset && result.detectedGenre) {
         this.validationResults.summary.passedChecks++;

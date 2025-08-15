@@ -5,12 +5,12 @@
 
 import {
   ARTISTIC_MODE_PROFILES,
-  YEAR3000_CONFIG as Config,
+  ADVANCED_SYSTEM_CONFIG as Config,
   HARMONIC_MODES as Modes,
 } from "@/config/globalConfig";
 import type { HarmonicMode } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 import { settings, type TypedSettings } from "@/config";
 
 declare const Spicetify: any;

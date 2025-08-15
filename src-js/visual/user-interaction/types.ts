@@ -1,5 +1,5 @@
 /**
- * Shared types for the organic ripple system aligned with Year 3000 vision
+ * Shared types for the smooth ripple system aligned with Year 3000 vision
  */
 
 export type RippleType = 'click' | 'beat' | 'selection';
@@ -55,7 +55,7 @@ export interface RippleVariantConfig {
   shapeComplexity: number; // 1-10 scale
   particleCount: number;
   trailLength: number;
-  organicness: number; // 0-1 scale, how organic vs geometric
+  smoothness: number; // 0-1 scale, how smooth vs geometric
   animationStyle: 'smooth' | 'bounce' | 'elastic' | 'wave';
   renderMethod: 'css' | 'svg' | 'canvas';
 }

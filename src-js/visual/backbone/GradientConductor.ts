@@ -15,7 +15,7 @@ import { MusicSyncService } from "@/audio/MusicSyncService";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import {
   BackendCapabilities,
   HealthCheckResult,
@@ -25,6 +25,10 @@ import {
   RGBStop,
   VisualBackplane,
 } from "@/types/systems";
+import type { VisualRenderer } from "@/types/visualRenderer";
+import type { PerformanceAware } from "@/types/performanceAware";
+import type { AccessibilitySupport } from "@/types/accessibilitySupport";
+import type { MusicSynchronized } from "@/types/musicSynchronized";
 
 export interface GradientConductorConfig {
   enabledBackends: ("css" | "webgl")[];
@@ -84,7 +88,7 @@ export class GradientConductor implements IManagedSystem {
   public initialized: boolean = false;
 
   private eventBus: typeof unifiedEventBus;
-  private cssConsciousnessController: UnifiedCSSVariableManager;
+  private cssController: UnifiedCSSVariableManager;
   private colorHarmonyEngine: ColorHarmonyEngine;
   private musicSyncService: MusicSyncService;
   private performanceAnalyzer: SimplePerformanceCoordinator;
@@ -103,18 +107,18 @@ export class GradientConductor implements IManagedSystem {
   private frameCount: number = 0;
   private performanceCheckInterval: number | null = null;
 
-  // Removed: Dimensional Breathing State (breathing animations completely removed)
+  // Removed: Dimensional Pulsing State (pulsing animations completely removed)
 
   constructor(
     eventBus: typeof unifiedEventBus,
-    cssConsciousnessController: UnifiedCSSVariableManager,
+    cssController: UnifiedCSSVariableManager,
     colorHarmonyEngine: ColorHarmonyEngine,
     musicSyncService: MusicSyncService,
     performanceAnalyzer: SimplePerformanceCoordinator,
     config: Partial<GradientConductorConfig> = {}
   ) {
     this.eventBus = eventBus || unifiedEventBus;
-    this.cssConsciousnessController = cssConsciousnessController;
+    this.cssController = cssController;
     this.colorHarmonyEngine = colorHarmonyEngine;
     this.musicSyncService = musicSyncService;
     this.performanceAnalyzer = performanceAnalyzer;
@@ -434,13 +438,13 @@ export class GradientConductor implements IManagedSystem {
     }
   }
 
-  // Removed: updateDimensionalBreathing method (breathing animations completely removed)
+  // Removed: updateDimensionalPulsing method (pulsing animations completely removed)
 
-  // Removed: applyDimensionalBreathingToCSS method (breathing animations completely removed)
+  // Removed: applyDimensionalPulsingToCSS method (pulsing animations completely removed)
 
-  // Removed: onBeatDetected method (breathing animations completely removed)
+  // Removed: onBeatDetected method (pulsing animations completely removed)
 
-  // Removed: onEnergyChanged method (breathing animations completely removed)
+  // Removed: onEnergyChanged method (pulsing animations completely removed)
 
   /**
    * Clean up resources and event listeners
@@ -504,7 +508,7 @@ export class GradientConductor implements IManagedSystem {
         bpm: data.tempo,
         beatIntensity: data.energy,
         rhythmPhase: 0,
-        breathingScale: 1 + data.energy * 0.2,
+        pulsingScale: 1 + data.energy * 0.2,
       };
       this.setMusicMetrics(metrics);
     }, 'GradientConductor');
@@ -517,7 +521,7 @@ export class GradientConductor implements IManagedSystem {
         bpm: data.bpm,
         beatIntensity: data.intensity,
         rhythmPhase: (Date.now() / 16.67) % 360, // Rough phase calculation
-        breathingScale: 1 + data.intensity * 0.1,
+        pulsingScale: 1 + data.intensity * 0.1,
       };
       this.setMusicMetrics(metrics);
     }, 'GradientConductor');
@@ -550,13 +554,13 @@ export class GradientConductor implements IManagedSystem {
       }
     }, 'GradientConductor');
 
-    // Listen for emotion analysis updates (Year 3000 consciousness flow)
-    this.eventBus.subscribe("emotion:analyzed", (emotionData) => {
+    // Listen for emotion analysis updates (Year 3000 visual flow)
+    this.eventBus.subscribe("music:emotion-analyzed", (emotionData) => {
       this.handleEmotionUpdate(emotionData);
     }, 'GradientConductor');
 
     // Listen for emotional color context updates
-    this.eventBus.subscribe("emotionalColorContext:updated", (context) => {
+    this.eventBus.subscribe("music:emotional-context-updated", (context) => {
       this.handleEmotionalColorContext(context);
     }, 'GradientConductor');
   }
@@ -566,63 +570,63 @@ export class GradientConductor implements IManagedSystem {
     const criticalVariables = [
       "--sn.music.beat.pulse.intensity",
       "--sn.music.rhythm.phase",
-      "--sn.music.breathing.scale",
+      "--sn.music.pulsing.scale",
       "--sn.bg.webgl.ready",
       "--sn.bg.active-backend",
-      // Year 3000 consciousness variables (emotion-aware)
+      // Year 3000 visual variables (emotion-aware)
       "--sn-emotion-primary",
       "--sn-emotion-intensity",
       "--sn-color-temperature",
-      "--sn-consciousness-level",
-      "--sn-organic-flow",
+      "--sn-visual-effects-level",
+      "--sn-smooth-flow",
       "--sn-cinematic-depth",
     ];
 
     // Add critical variables to UnifiedCSSVariableManager fast-path
     criticalVariables.forEach((variable) => {
-      this.cssConsciousnessController.addCriticalVariable(variable);
+      this.cssController.addCriticalVariable(variable);
     });
   }
 
   /**
    * Handle emotion analysis updates from ColorHarmonyEngine
-   * Part of the Year 3000 consciousness-aware flow
+   * Part of the Year 3000 visual-aware flow
    */
   private handleEmotionUpdate(emotionData: any): void {
     try {
-      const { emotion, colorTemperature, consciousnessLevel, organicFlow, cinematicDepth } = emotionData;
+      const { emotion, colorTemperature, visualLevel, smoothFlow, cinematicDepth } = emotionData;
 
       // Update CSS variables for emotion-aware styling
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn-emotion-primary",
         emotion.primary || "neutral"
       );
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn-emotion-intensity",
         (emotion.intensity || 0.5).toString()
       );
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn-emotion-confidence",
         (emotion.confidence || 0.5).toString()
       );
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn-color-temperature",
         (colorTemperature || 6500).toString()
       );
-      this.cssConsciousnessController.setProperty(
-        "--sn-consciousness-level",
-        (consciousnessLevel || 0.5).toString()
+      this.cssController.setProperty(
+        "--sn-visual-effects-level",
+        (visualLevel || 0.5).toString()
       );
-      this.cssConsciousnessController.setProperty(
-        "--sn-organic-flow",
-        (organicFlow || 0.5).toString()
+      this.cssController.setProperty(
+        "--sn-smooth-flow",
+        (smoothFlow || 0.5).toString()
       );
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn-cinematic-depth",
         (cinematicDepth || 0.5).toString()
       );
 
-      // Pass emotion data to all registered backends for consciousness-aware rendering
+      // Pass emotion data to all registered backends for visual-aware rendering
       for (const registration of this.registeredBackends.values()) {
         if (registration.backend.setEmotionalState) {
           registration.backend.setEmotionalState(emotion);
@@ -638,7 +642,7 @@ export class GradientConductor implements IManagedSystem {
 
   /**
    * Handle emotional color context updates
-   * Triggers consciousness-aware color processing across all backends
+   * Triggers visual-aware color processing across all backends
    */
   private handleEmotionalColorContext(context: any): void {
     try {
@@ -649,30 +653,30 @@ export class GradientConductor implements IManagedSystem {
         valence, 
         arousal, 
         dominance,
-        organicFlow,
+        smoothFlow,
         cinematicDepth,
-        consciousnessResonance 
+        visualResonance 
       } = context;
 
-      // Update advanced consciousness CSS variables
-      this.cssConsciousnessController.setProperty(
+      // Update advanced visual CSS variables
+      this.cssController.setProperty(
         "--sn-emotion-valence",
         (valence || 0.5).toString()
       );
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn-emotion-arousal",
         (arousal || 0.5).toString()
       );
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn-emotion-dominance",
         (dominance || 0.5).toString()
       );
-      this.cssConsciousnessController.setProperty(
-        "--sn-consciousness-resonance",
-        (consciousnessResonance || 0.5).toString()
+      this.cssController.setProperty(
+        "--sn-visual-resonance",
+        (visualResonance || 0.5).toString()
       );
 
-      // Pass emotional context to backends for advanced consciousness processing
+      // Pass emotional context to backends for advanced visual processing
       for (const registration of this.registeredBackends.values()) {
         if (registration.backend.setEmotionalContext) {
           registration.backend.setEmotionalContext(context);
@@ -694,25 +698,25 @@ export class GradientConductor implements IManagedSystem {
     const secondary = stops[Math.floor(stops.length / 2)]!;
     const accent = stops[stops.length - 1]!;
 
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn.bg.gradient.primary.rgb",
       `${primary.r}, ${primary.g}, ${primary.b}`
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn.bg.gradient.secondary.rgb",
       `${secondary.r}, ${secondary.g}, ${secondary.b}`
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn.bg.gradient.accent.rgb",
       `${accent.r}, ${accent.g}, ${accent.b}`
     );
 
     // Update color system variables
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn.color.accent.rgb",
       `${accent.r}, ${accent.g}, ${accent.b}`
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn.color.accent.hex",
       `#${Math.round(accent.r).toString(16).padStart(2, "0")}${Math.round(
         accent.g
@@ -725,36 +729,36 @@ export class GradientConductor implements IManagedSystem {
   private updateCSSMusicVariables(metrics: MusicMetrics): void {
     // Critical real-time variables (fast-path)
     if (metrics.beatIntensity !== undefined) {
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn.music.beat.pulse.intensity",
         metrics.beatIntensity.toString()
       );
     }
 
     if (metrics.rhythmPhase !== undefined) {
-      this.cssConsciousnessController.setProperty(
+      this.cssController.setProperty(
         "--sn.music.rhythm.phase",
         `${metrics.rhythmPhase}deg`
       );
     }
 
-    if (metrics.breathingScale !== undefined) {
-      this.cssConsciousnessController.setProperty(
-        "--sn.music.breathing.scale",
-        metrics.breathingScale.toString()
+    if (metrics.pulsingScale !== undefined) {
+      this.cssController.setProperty(
+        "--sn.music.pulsing.scale",
+        metrics.pulsingScale.toString()
       );
     }
 
     // Non-critical variables (batched)
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn.music.energy.level",
       metrics.energy.toString()
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn.music.valence",
       metrics.valence.toString()
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn.music.tempo.bpm",
       metrics.bpm.toString()
     );
@@ -762,11 +766,11 @@ export class GradientConductor implements IManagedSystem {
 
   private updateGlobalStatus(): void {
     // Update backend status variables
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn.bg.webgl.ready",
       this.registeredBackends.has("webgl") ? "1" : "0"
     );
-    this.cssConsciousnessController.setProperty(
+    this.cssController.setProperty(
       "--sn.bg.active-backend",
       this.activeBackend?.backendId || "none"
     );
@@ -811,9 +815,9 @@ export class GradientConductor implements IManagedSystem {
         systemName: `GradientConductor-${optimal.backendId}`,
         timestamp: Date.now(),
         metadata: {
-          previousBackend: this.activeBackend?.backendId,
+          previousBackend: this.activeBackend?.backendId || 'none',
           newBackend: optimal.backendId,
-          capabilities: optimal.capabilities,
+          capabilities: optimal.capabilities.webgl ? 'webgl' : 'css',
         }
       });
     }

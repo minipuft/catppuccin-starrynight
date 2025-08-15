@@ -13,12 +13,12 @@
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { GradientDirectionalFlowSystem } from "@/audio/GradientDirectionalFlowSystem";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { GradientPerformanceOptimizer } from "@/core/performance/GradientPerformanceOptimizer";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { DepthLayeredGradientSystem } from "../backgrounds/DepthLayeredGradientSystem";
@@ -27,7 +27,7 @@ import { BaseVisualSystem } from "../base/BaseVisualSystem";
 import { IridescentShimmerEffectsSystem } from "../ui/IridescentShimmerEffectsSystem";
 
 interface RealityBleedingState {
-  liquidConsciousness: boolean;
+  liquidVisualEffects: boolean;
   directionalFlow: boolean;
   shimmerEffects: boolean;
   depthLayers: boolean;
@@ -35,7 +35,7 @@ interface RealityBleedingState {
 }
 
 interface SystemHealth {
-  liquidConsciousness: HealthCheckResult;
+  liquidVisualEffects: HealthCheckResult;
   directionalFlow: HealthCheckResult;
   shimmerEffects: HealthCheckResult;
   depthLayers: HealthCheckResult;
@@ -65,7 +65,7 @@ interface RealityBleedingMetrics {
 export class GradientEffectsCoordinator extends BaseVisualSystem implements IManagedSystem {
   public override readonly systemName = "GradientEffectsCoordinator";
   public override initialized = false;
-  private liquidConsciousnessSystem: FluidGradientBackgroundSystem | null =
+  private liquidVisualEffectsSystem: FluidGradientBackgroundSystem | null =
     null;
   private directionalFlowSystem: GradientDirectionalFlowSystem | null = null;
   private shimmerEffectsSystem: IridescentShimmerEffectsSystem | null = null;
@@ -73,7 +73,7 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
   private performanceOptimizer: GradientPerformanceOptimizer | null =
     null;
 
-  private cssConsciousnessController: OptimizedCSSVariableManager | null;
+  private cssVariableManager: OptimizedCSSVariableManager | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
   private realityBleedingState: RealityBleedingState;
   private systemHealth: SystemHealth;
@@ -88,8 +88,8 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
   private boundColorHarmonyHandler: ((event: Event) => void) | null = null;
 
   constructor(
-    config: Year3000Config = YEAR3000_CONFIG,
-    utils: typeof import("@/utils/core/Year3000Utilities"),
+    config: AdvancedSystemConfig | Year3000Config = ADVANCED_SYSTEM_CONFIG,
+    utils: typeof import("@/utils/core/ThemeUtilities"),
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
     settingsManager: SettingsManager | null = null,
@@ -98,12 +98,12 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
     super(config, utils, performanceMonitor, musicSyncService, settingsManager);
 
     this.colorHarmonyEngine = year3000System?.colorHarmonyEngine || null;
-    // CSS Consciousness Controller will be injected by VisualSystemFacade
-    this.cssConsciousnessController = null;
+    // CSS Variable Manager will be injected by VisualSystemFacade
+    this.cssVariableManager = null;
 
     // Initialize state
     this.realityBleedingState = {
-      liquidConsciousness: true,
+      liquidVisualEffects: true,
       directionalFlow: true,
       shimmerEffects: true,
       depthLayers: true,
@@ -112,7 +112,7 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
 
     // Initialize health tracking
     this.systemHealth = {
-      liquidConsciousness: { system: 'FluidGradientBackgroundSystem', healthy: false, issues: ['Not initialized'] },
+      liquidVisualEffects: { system: 'FluidGradientBackgroundSystem', healthy: false, issues: ['Not initialized'] },
       directionalFlow: { system: 'GradientDirectionalFlowSystem', healthy: false, issues: ['Not initialized'] },
       shimmerEffects: { system: 'IridescentShimmerEffectsSystem', healthy: false, issues: ['Not initialized'] },
       depthLayers: { system: 'DepthLayeredGradientSystem', healthy: false, issues: ['Not initialized'] },
@@ -140,13 +140,23 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
   }
 
   /**
-   * Dependency injection setter for CSS Consciousness Controller
+   * Dependency injection setter for CSS Variable Manager
    * Called by VisualSystemFacade during system initialization
+   */
+  public setCSSVariableManager(
+    cssController: OptimizedCSSVariableManager
+  ): void {
+    this.cssVariableManager = cssController;
+  }
+
+  /**
+   * @deprecated Use setCSSVariableManager() instead
+   * Backwards compatibility method for Phase 3 → Phase 4 migration
    */
   public setOptimizedCSSVariableManager(
     cssController: OptimizedCSSVariableManager
   ): void {
-    this.cssConsciousnessController = cssController;
+    this.setCSSVariableManager(cssController);
   }
 
   public override async _performSystemSpecificInitialization(): Promise<void> {
@@ -157,7 +167,7 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
       await this.initializePerformanceOptimizer();
 
       // Initialize core systems
-      await this.initializeLiquidConsciousness();
+      await this.initializeLiquidVisualEffects();
       await this.initializeDirectionalFlow();
       await this.initializeShimmerEffects();
       await this.initializeDepthLayers();
@@ -223,11 +233,11 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
     }
   }
 
-  private async initializeLiquidConsciousness(): Promise<void> {
-    if (!this.realityBleedingState.liquidConsciousness) return;
+  private async initializeLiquidVisualEffects(): Promise<void> {
+    if (!this.realityBleedingState.liquidVisualEffects) return;
 
     try {
-      this.liquidConsciousnessSystem = new FluidGradientBackgroundSystem(
+      this.liquidVisualEffectsSystem = new FluidGradientBackgroundSystem(
         this.config,
         this.utils,
         this.performanceMonitor,
@@ -236,16 +246,16 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
         { colorHarmonyEngine: this.colorHarmonyEngine }
       );
 
-      await this.liquidConsciousnessSystem.initialize();
-      this.systemHealth.liquidConsciousness =
-        await this.liquidConsciousnessSystem.healthCheck();
+      await this.liquidVisualEffectsSystem.initialize();
+      this.systemHealth.liquidVisualEffects =
+        await this.liquidVisualEffectsSystem.healthCheck();
     } catch (error) {
       Y3KDebug?.debug?.error(
         "RealityBleedingGradientOrchestrator",
-        "Failed to initialize liquid consciousness:",
+        "Failed to initialize liquid visual effects:",
         error
       );
-      this.systemHealth.liquidConsciousness = {
+      this.systemHealth.liquidVisualEffects = {
         system: 'FluidGradientBackgroundSystem',
         healthy: false,
         issues: [`Error: ${error}`]
@@ -323,10 +333,10 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
         { colorHarmonyEngine: this.colorHarmonyEngine }
       );
 
-      // Inject CSS consciousness controller
-      if (this.cssConsciousnessController) {
+      // Inject CSS variable manager
+      if (this.cssVariableManager) {
         this.depthLayeredSystem.setOptimizedCSSVariableManager(
-          this.cssConsciousnessController
+          this.cssVariableManager
         );
       }
 
@@ -344,26 +354,26 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
   }
 
   private setupSystemInteractions(): void {
-    // Connect directional flow to liquid consciousness
-    if (this.directionalFlowSystem && this.liquidConsciousnessSystem) {
+    // Connect directional flow to liquid visual effects
+    if (this.directionalFlowSystem && this.liquidVisualEffectsSystem) {
       document.addEventListener("gradient-flow:direction-changed", (event) => {
         const customEvent = event as CustomEvent;
         const { flowDirection, intensity } = customEvent.detail;
 
-        this.liquidConsciousnessSystem?.setFlowDirection(
+        this.liquidVisualEffectsSystem?.setFlowDirection(
           flowDirection.x,
           flowDirection.y
         );
-        this.liquidConsciousnessSystem?.setBreathingIntensity(intensity);
+        this.liquidVisualEffectsSystem?.setAnimationIntensity(intensity);
       });
     }
 
     // Connect performance optimizer to all systems
     if (this.performanceOptimizer) {
       this.performanceOptimizer.registerOptimizationCallback(
-        "liquid-consciousness",
+        "liquid-visual-effects",
         (quality) => {
-          this.liquidConsciousnessSystem?.setBreathingIntensity(
+          this.liquidVisualEffectsSystem?.setAnimationIntensity(
             quality.animationSpeed
           );
         }
@@ -454,7 +464,7 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
 
   private coordinateEnergyChange(energy: number): void {
     // Coordinate energy changes across all systems
-    this.liquidConsciousnessSystem?.setBreathingIntensity(0.5 + energy * 0.5);
+    this.liquidVisualEffectsSystem?.setAnimationIntensity(0.5 + energy * 0.5);
     this.depthLayeredSystem?.setParallaxStrength(0.3 + energy * 0.5);
 
     // Update shimmer intensity based on energy
@@ -467,8 +477,8 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
 
   private applyQualitySettings(qualitySettings: any): void {
     // Apply quality settings to all systems
-    if (this.liquidConsciousnessSystem) {
-      this.liquidConsciousnessSystem.setBreathingIntensity(
+    if (this.liquidVisualEffectsSystem) {
+      this.liquidVisualEffectsSystem.setAnimationIntensity(
         qualitySettings.animationSpeed
       );
     }
@@ -485,7 +495,7 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
   }
 
   private forceRepaintAllSystems(): void {
-    this.liquidConsciousnessSystem?.forceRepaint?.("color-harmony-change");
+    this.liquidVisualEffectsSystem?.forceRepaint?.("color-harmony-change");
     this.depthLayeredSystem?.forceRepaint?.("color-harmony-change");
   }
 
@@ -503,9 +513,9 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
 
   private async updateSystemHealth(): Promise<void> {
     try {
-      if (this.liquidConsciousnessSystem) {
-        this.systemHealth.liquidConsciousness =
-          await this.liquidConsciousnessSystem.healthCheck();
+      if (this.liquidVisualEffectsSystem) {
+        this.systemHealth.liquidVisualEffects =
+          await this.liquidVisualEffectsSystem.healthCheck();
       }
 
       if (this.directionalFlowSystem) {
@@ -573,13 +583,13 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
   }
 
   private updatePerformanceVariables(): void {
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+    if (this.cssVariableManager) {
+      this.cssVariableManager.queueCSSVariableUpdate(
         "--sn-reality-bleeding-performance-score",
         this.metrics.performanceScore.toString()
       );
 
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableManager.queueCSSVariableUpdate(
         "--sn-reality-bleeding-quality",
         this.metrics.effectsQuality
       );
@@ -587,23 +597,23 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
   }
 
   private updateMetricsVariables(): void {
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+    if (this.cssVariableManager) {
+      this.cssVariableManager.queueCSSVariableUpdate(
         "--sn-reality-bleeding-systems-active",
         this.metrics.totalSystemsActive.toString()
       );
 
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableManager.queueCSSVariableUpdate(
         "--sn-reality-bleeding-memory-usage",
         this.metrics.memoryUsage.toFixed(1)
       );
 
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableManager.queueCSSVariableUpdate(
         "--sn-reality-bleeding-render-time",
         this.metrics.renderTime.toFixed(1)
       );
 
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableManager.queueCSSVariableUpdate(
         "--sn-reality-bleeding-music-sync",
         this.metrics.musicSyncStrength.toFixed(2)
       );
@@ -612,7 +622,7 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
 
   public override updateAnimation(deltaTime: number): void {
     // Update all active systems
-    this.liquidConsciousnessSystem?.updateAnimation(deltaTime);
+    this.liquidVisualEffectsSystem?.updateAnimation(deltaTime);
     this.directionalFlowSystem?.updateAnimation(deltaTime);
     this.shimmerEffectsSystem?.updateAnimation(deltaTime);
     this.depthLayeredSystem?.updateAnimation(deltaTime);
@@ -713,14 +723,14 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
     }
 
     // Cleanup systems
-    this.liquidConsciousnessSystem?.destroy();
+    this.liquidVisualEffectsSystem?.destroy();
     this.directionalFlowSystem?.destroy();
     this.shimmerEffectsSystem?.destroy();
     this.depthLayeredSystem?.destroy();
     this.performanceOptimizer?.destroy();
 
     // Clear references
-    this.liquidConsciousnessSystem = null;
+    this.liquidVisualEffectsSystem = null;
     this.directionalFlowSystem = null;
     this.shimmerEffectsSystem = null;
     this.depthLayeredSystem = null;
@@ -740,12 +750,12 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
     this.realityBleedingState[system] = enabled;
 
     switch (system) {
-      case "liquidConsciousness":
-        if (enabled && !this.liquidConsciousnessSystem) {
-          this.initializeLiquidConsciousness();
-        } else if (!enabled && this.liquidConsciousnessSystem) {
-          this.liquidConsciousnessSystem.destroy();
-          this.liquidConsciousnessSystem = null;
+      case "liquidVisualEffects":
+        if (enabled && !this.liquidVisualEffectsSystem) {
+          this.initializeLiquidVisualEffects();
+        } else if (!enabled && this.liquidVisualEffectsSystem) {
+          this.liquidVisualEffectsSystem.destroy();
+          this.liquidVisualEffectsSystem = null;
         }
         break;
 

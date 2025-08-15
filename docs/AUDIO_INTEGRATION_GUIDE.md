@@ -378,7 +378,7 @@ private cinematicEffects = {
   atmosphericFog: 0,            // Environmental atmosphere
   neonReflections: 0,           // Neon light reflections
   lensFlare: 0,                 // Lens flare effects
-  materialConsciousness: 0,     // Living material effects
+  materialEffects: 0,           // Living material effects
 };
 
 // Update cinematic effects based on music analysis

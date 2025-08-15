@@ -11,11 +11,11 @@
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
 import { BaseVisualSystem } from "../visual/base/BaseVisualSystem";
 
@@ -99,8 +99,8 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
   private updateThrottleInterval = 1000 / 30; // 30 FPS for smooth updates
 
   constructor(
-    config: Year3000Config = YEAR3000_CONFIG,
-    utils: typeof import("@/utils/core/Year3000Utilities"),
+    config: Year3000Config = ADVANCED_SYSTEM_CONFIG,
+    utils: typeof import("@/utils/core/ThemeUtilities"),
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
     settingsManager: any = null

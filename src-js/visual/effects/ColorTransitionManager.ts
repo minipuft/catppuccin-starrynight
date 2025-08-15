@@ -418,18 +418,18 @@ export class ColorTransitionManager {
     
     // 🔧 PHASE 1: Visual data stream update via UnifiedEventBus
     if (this.transitionState.flowIntensity > 0.5) {
-      unifiedEventBus.emit('consciousness:field-updated', {
+      unifiedEventBus.emit('visual-effects:field-updated', {
         rhythmicPulse: this.transitionState.flowIntensity,
         musicalFlow: { x: this.transitionState.flowIntensity, y: 0 },
         energyResonance: this.transitionState.patternComplexity,
         depthPerception: this.transitionState.stabilityLevel,
-        breathingCycle: this.transitionState.flowIntensity
+        pulsingCycle: this.transitionState.flowIntensity
       });
     }
     
     // 🔧 PHASE 1: Temporal pattern recognition via UnifiedEventBus
     if (this.transitionState.paletteEvolution.temporalPatterns.length > 3) {
-      unifiedEventBus.emit('consciousness:temporal-pattern', {
+      unifiedEventBus.emit('visual-effects:temporal-pattern', {
         type: 'temporalPatternDetected',
         payload: {
           patterns: this.transitionState.paletteEvolution.temporalPatterns,
@@ -440,7 +440,7 @@ export class ColorTransitionManager {
     
     // 🔧 PHASE 1: High transition level changes via UnifiedEventBus
     if (this.transitionState.transitionIntensity > 0.8) {
-      unifiedEventBus.emit('consciousness:transcendence-high', {
+      unifiedEventBus.emit('visual-effects:transcendence-high', {
         type: 'transitionIntensityHigh',
         payload: {
           level: this.transitionState.transitionIntensity,

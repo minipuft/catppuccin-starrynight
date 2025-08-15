@@ -11,7 +11,7 @@
  * @consolidation Replaces 3000+ lines of scattered debug code with 400 lines
  */
 
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import type { HealthCheckResult } from "@/types/systems";
 
 // =========================================================================
@@ -69,12 +69,12 @@ export class UnifiedDebugManager {
 
   private constructor(config: Partial<DebugConfig> = {}) {
     this.config = {
-      enableConsoleReporting: YEAR3000_CONFIG.enableDebug,
+      enableConsoleReporting: ADVANCED_SYSTEM_CONFIG.enableDebug,
       reportingInterval: 30000, // 30 seconds
       enablePerformanceTracking: true,
       enableSystemHealthMonitoring: true,
       maxHistoryEntries: 50,
-      verboseLogging: YEAR3000_CONFIG.enableDebug,
+      verboseLogging: ADVANCED_SYSTEM_CONFIG.enableDebug,
       ...config,
     };
 
@@ -669,7 +669,7 @@ export class UnifiedDebugManager {
 export const Y3KDebug = {
   debug: {
     log: (component: string, message: string, ...args: any[]) => {
-      if (YEAR3000_CONFIG?.enableDebug) {
+      if (ADVANCED_SYSTEM_CONFIG?.enableDebug) {
         console.log(`[${component}] ${message}`, ...args);
       }
     },

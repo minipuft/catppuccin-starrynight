@@ -1,5 +1,5 @@
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
-import type { Year3000Config } from "@/types/models";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { 
   OKLABColorProcessor, 
   type EnhancementPreset 
@@ -212,14 +212,15 @@ const GENRE_PROFILES: Record<string, GenreProfile> = {
 };
 
 interface GenreProfileManagerDependencies {
-  YEAR3000_CONFIG?: Year3000Config;
+  ADVANCED_SYSTEM_CONFIG?: Year3000Config;
+  YEAR3000_CONFIG?: Year3000Config; // Legacy compatibility
 }
 
 export class GenreProfileManager {
-  private config: Year3000Config;
+  private config: AdvancedSystemConfig | Year3000Config;
 
   constructor(dependencies: GenreProfileManagerDependencies = {}) {
-    this.config = dependencies.YEAR3000_CONFIG || YEAR3000_CONFIG;
+    this.config = dependencies.ADVANCED_SYSTEM_CONFIG || dependencies.YEAR3000_CONFIG || ADVANCED_SYSTEM_CONFIG;
 
     if (this.config.enableDebug) {
       console.log("🧬 [GenreProfileManager] Initialized");

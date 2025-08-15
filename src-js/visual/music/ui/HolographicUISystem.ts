@@ -59,16 +59,16 @@ export interface HolographicElement {
   isActive: boolean;
   lastUpdate: number;
   animation: Animation | null;
-  consciousnessLevel: number; // 0-1 consciousness influence
-  organicIntegration: boolean; // Whether element has organic integration
+  visualEffectsLevel: number; // 0-1 visual effects influence
+  smoothIntegration: boolean; // Whether element has smooth integration
 }
 
 export type HolographicType =
   | "translucent_panel"
   | "data_stream"
   | "energy_barrier"
-  | "consciousness_interface"
-  | "organic_hologram"
+  | "visual_effects_interface"
+  | "dynamic_hologram"
   | "musical_visualization"
   | "scanline_overlay"
   | "chromatic_ghost";
@@ -78,7 +78,7 @@ export interface ScanlineEffect {
   opacity: number; // Scanline opacity
   animation: boolean; // Whether scanlines animate
   speed: number; // Animation speed
-  organic: boolean; // Whether scanlines follow organic patterns
+  dynamic: boolean; // Whether scanlines follow dynamic patterns
 }
 
 export interface ChromaticAberration {
@@ -94,8 +94,8 @@ export interface DataStream {
   characters: string[]; // Characters for data stream
   speed: number; // Stream speed
   density: number; // Character density
-  organic: boolean; // Whether stream follows organic patterns
-  consciousness: boolean; // Whether stream reflects consciousness
+  dynamic: boolean; // Whether stream follows dynamic patterns
+  musicSync: boolean; // Whether stream reflects music synchronization
   musicalSync: boolean; // Whether stream syncs with music
 }
 
@@ -103,8 +103,8 @@ export interface InterferencePattern {
   frequency: number; // Interference frequency
   amplitude: number; // Interference amplitude
   phase: number; // Current phase
-  organic: boolean; // Whether interference follows organic patterns
-  type: "wave" | "noise" | "grid" | "organic";
+  dynamic: boolean; // Whether interference follows dynamic patterns
+  type: "wave" | "noise" | "grid" | "dynamic";
 }
 
 /**
@@ -114,7 +114,7 @@ export interface InterferencePattern {
  * - Transform regular UI elements into holographic projections
  * - Add scanlines, chromatic aberration, and interference patterns
  * - Create data streams and energy barriers
- * - Sync with music and consciousness for dynamic effects
+ * - Sync with music and visual effects for dynamic effects
  * - Maintain Star Wars and Blade Runner holographic aesthetics
  */
 export class HolographicUISystem
@@ -152,7 +152,7 @@ export class HolographicUISystem
     chromaticPhase: 0,
     dataStreamPhase: 0,
     interferencePhase: 0,
-    organicPhase: 0,
+    dynamicPhase: 0,
     isAnimating: false,
   };
 
@@ -178,7 +178,7 @@ export class HolographicUISystem
       energyStability: 0.6,
       projectionDistance: 0.6,
     },
-    "organic-consciousness": {
+    "dynamic-visualEffects": {
       flickerIntensity: 0.3,
       transparency: 0.9,
       chromatic: 0.2,
@@ -229,7 +229,7 @@ export class HolographicUISystem
       qualityLevel: "low",
     },
     {
-      name: "organic-integration",
+      name: "dynamic-integration",
       enabled: true,
       qualityLevel: "high",
     },
@@ -269,7 +269,7 @@ export class HolographicUISystem
       opacity: 0.1,
       animation: true,
       speed: 0.5,
-      organic: false,
+      dynamic: false,
     };
 
     this.chromaticAberration = {
@@ -314,8 +314,8 @@ export class HolographicUISystem
       ],
       speed: 0.5,
       density: 0.3,
-      organic: false,
-      consciousness: true,
+      dynamic: false,
+      musicSync: true,
       musicalSync: true,
     };
 
@@ -323,7 +323,7 @@ export class HolographicUISystem
       frequency: 0.1,
       amplitude: 0.05,
       phase: 0,
-      organic: false,
+      dynamic: false,
       type: "wave",
     };
   }
@@ -436,17 +436,17 @@ export class HolographicUISystem
     );
 
     // Update data stream flow based on tempo
-    const consciousnessState = this.manager.getConsciousnessState();
-    const targetDataFlow = 0.3 + consciousnessState.symbioticResonance * 0.7;
+    const visualEffectsState = this.manager.getConsciousnessState();
+    const targetDataFlow = 0.3 + visualEffectsState.symbioticResonance * 0.7;
     this.holographicState.dataStreamFlow = this.smoothTransition(
       this.holographicState.dataStreamFlow,
       targetDataFlow,
       0.04
     );
 
-    // Update interference based on consciousness
+    // Update interference based on visualEffects
     const targetInterference =
-      0.1 + consciousnessState.membraneFluidityIndex * 0.3;
+      0.1 + visualEffectsState.surfaceFluidityIndex * 0.3;
     this.holographicState.interferenceLevel = this.smoothTransition(
       this.holographicState.interferenceLevel,
       targetInterference,
@@ -475,7 +475,7 @@ export class HolographicUISystem
       this.holographicState.scanlineIntensity * 0.15;
     this.scanlineEffect.speed =
       0.3 + this.holographicState.dataStreamFlow * 0.7;
-    this.scanlineEffect.organic = this.holographicState.energyStability > 0.7;
+    this.scanlineEffect.dynamic = this.holographicState.energyStability > 0.7;
 
     // Update chromatic aberration
     this.chromaticAberration.intensity = this.holographicState.chromatic;
@@ -485,19 +485,19 @@ export class HolographicUISystem
     // Update data stream
     this.dataStream.speed = 0.2 + this.holographicState.dataStreamFlow * 0.8;
     this.dataStream.density = 0.2 + this.holographicState.dataStreamFlow * 0.6;
-    this.dataStream.organic = this.holographicState.energyStability > 0.6;
+    this.dataStream.dynamic = this.holographicState.energyStability > 0.6;
 
     // Update interference pattern
     this.interferencePattern.frequency =
       0.05 + this.holographicState.interferenceLevel * 0.15;
     this.interferencePattern.amplitude =
       this.holographicState.interferenceLevel * 0.1;
-    this.interferencePattern.organic =
+    this.interferencePattern.dynamic =
       this.holographicState.energyStability > 0.5;
 
     // Update type based on emotion
     if (emotion.type === "ambient") {
-      this.interferencePattern.type = "organic";
+      this.interferencePattern.type = "dynamic";
     } else if (emotion.intensity > 0.7) {
       this.interferencePattern.type = "noise";
     } else {
@@ -526,8 +526,8 @@ export class HolographicUISystem
       element,
       holographicType,
       intensity,
-      consciousnessLevel,
-      organicIntegration,
+      visualEffectsLevel,
+      smoothIntegration,
     } = holographicElement;
 
     try {
@@ -545,15 +545,15 @@ export class HolographicUISystem
         case "energy_barrier":
           this.applyEnergyBarrier(element, intensity);
           break;
-        case "consciousness_interface":
-          this.applyConsciousnessInterface(
+        case "visual_effects_interface":
+          this.applyVisualEffectsInterface(
             element,
             intensity,
-            consciousnessLevel
+            visualEffectsLevel
           );
           break;
-        case "organic_hologram":
-          this.applyOrganicHologram(element, intensity, organicIntegration);
+        case "dynamic_hologram":
+          this.applyDynamicHologram(element, intensity, smoothIntegration);
           break;
         case "musical_visualization":
           this.applyMusicalVisualization(element, intensity);
@@ -566,13 +566,13 @@ export class HolographicUISystem
           break;
       }
 
-      // Apply consciousness and organic modifiers
-      if (consciousnessLevel > 0.5) {
-        this.applyConsciousnessModifiers(element, consciousnessLevel);
+      // Apply visualEffects and dynamic modifiers
+      if (visualEffectsLevel > 0.5) {
+        this.applyVisualEffectsModifiers(element, visualEffectsLevel);
       }
 
-      if (organicIntegration) {
-        this.applyOrganicModifiers(element, intensity);
+      if (smoothIntegration) {
+        this.applyDynamicModifiers(element, intensity);
       }
 
       holographicElement.lastUpdate = performance.now();
@@ -715,15 +715,15 @@ export class HolographicUISystem
     }
   }
 
-  // Apply consciousness interface effect
-  private applyConsciousnessInterface(
+  // Apply visualEffects interface effect
+  private applyVisualEffectsInterface(
     element: HTMLElement,
     intensity: number,
-    consciousnessLevel: number
+    visualEffectsLevel: number
   ): void {
-    const consciousnessState = this.manager.getConsciousnessState();
+    const visualEffectsState = this.manager.getConsciousnessState();
     const resonance =
-      consciousnessState.symbioticResonance * consciousnessLevel;
+      visualEffectsState.symbioticResonance * visualEffectsLevel;
 
     // Consciousness-responsive glow
     const glowIntensity = resonance * intensity * 0.5;
@@ -737,43 +737,43 @@ export class HolographicUISystem
     `;
 
     // Consciousness-responsive transparency
-    const consciousnessTransparency = 0.7 + resonance * 0.3;
-    element.style.opacity = consciousnessTransparency.toString();
+    const visualEffectsTransparency = 0.7 + resonance * 0.3;
+    element.style.opacity = visualEffectsTransparency.toString();
 
     // Consciousness pulsing
     if (resonance > 0.6) {
-      const pulsePhase = this.animationState.organicPhase * 2;
+      const pulsePhase = this.animationState.dynamicPhase * 2;
       const pulseIntensity = 1.0 + Math.sin(pulsePhase) * resonance * 0.2;
       element.style.transform = `scale(${pulseIntensity})`;
     }
   }
 
-  // Apply organic hologram effect
-  private applyOrganicHologram(
+  // Apply dynamic hologram effect
+  private applyDynamicHologram(
     element: HTMLElement,
     intensity: number,
-    organicIntegration: boolean
+    dynamicIntegration: boolean
   ): void {
-    if (!organicIntegration) return;
+    if (!dynamicIntegration) return;
 
-    const organicPhase = this.animationState.organicPhase;
-    const organicIntensity = this.holographicState.energyStability * intensity;
+    const dynamicPhase = this.animationState.dynamicPhase;
+    const dynamicIntensity = this.holographicState.energyStability * intensity;
 
-    // Organic morphing
-    const morphX = Math.sin(organicPhase * 1.5) * organicIntensity * 2;
-    const morphY = Math.cos(organicPhase * 2.0) * organicIntensity * 1.5;
+    // Dynamic morphing
+    const morphX = Math.sin(dynamicPhase * 1.5) * dynamicIntensity * 2;
+    const morphY = Math.cos(dynamicPhase * 2.0) * dynamicIntensity * 1.5;
     element.style.transform = `translate(${morphX}px, ${morphY}px)`;
 
-    // Organic color shifting
-    const colorPhase = organicPhase * 0.5;
-    const hueShift = Math.sin(colorPhase) * organicIntensity * 30;
+    // Dynamic color shifting
+    const colorPhase = dynamicPhase * 0.5;
+    const hueShift = Math.sin(colorPhase) * dynamicIntensity * 30;
     element.style.filter = `hue-rotate(${hueShift}deg)`;
 
-    // Organic breathing
-    const breathingPhase = organicPhase * 0.8;
-    const breathingScale =
-      1.0 + Math.sin(breathingPhase) * organicIntensity * 0.05;
-    element.style.transform += ` scale(${breathingScale})`;
+    // Dynamic pulsing
+    const pulsingPhase = dynamicPhase * 0.8;
+    const pulsingScale =
+      1.0 + Math.sin(pulsingPhase) * dynamicIntensity * 0.05;
+    element.style.transform += ` scale(${pulsingScale})`;
   }
 
   // Apply musical visualization effect
@@ -781,8 +781,8 @@ export class HolographicUISystem
     element: HTMLElement,
     intensity: number
   ): void {
-    const consciousnessState = this.manager.getConsciousnessState();
-    const musicalIntensity = consciousnessState.symbioticResonance * intensity;
+    const visualEffectsState = this.manager.getConsciousnessState();
+    const musicalIntensity = visualEffectsState.symbioticResonance * intensity;
 
     // Musical responsiveness
     const visualPhase = this.animationState.dataStreamPhase * 3;
@@ -870,14 +870,14 @@ export class HolographicUISystem
     element.style.transform = `translate(${offsetAnimation}px, 0)`;
   }
 
-  // Apply consciousness modifiers
-  private applyConsciousnessModifiers(
+  // Apply visualEffects modifiers
+  private applyVisualEffectsModifiers(
     element: HTMLElement,
-    consciousnessLevel: number
+    visualEffectsLevel: number
   ): void {
-    const consciousnessState = this.manager.getConsciousnessState();
+    const visualEffectsState = this.manager.getConsciousnessState();
     const resonance =
-      consciousnessState.symbioticResonance * consciousnessLevel;
+      visualEffectsState.symbioticResonance * visualEffectsLevel;
 
     // Consciousness-based brightness
     const brightness = 1.0 + resonance * 0.3;
@@ -890,28 +890,28 @@ export class HolographicUISystem
       (element.style.filter || "") + ` saturate(${saturation})`;
   }
 
-  // Apply organic modifiers
-  private applyOrganicModifiers(element: HTMLElement, intensity: number): void {
-    const organicPhase = this.animationState.organicPhase;
-    const organicIntensity = this.holographicState.energyStability * intensity;
+  // Apply dynamic modifiers
+  private applyDynamicModifiers(element: HTMLElement, intensity: number): void {
+    const dynamicPhase = this.animationState.dynamicPhase;
+    const dynamicIntensity = this.holographicState.energyStability * intensity;
 
-    // Organic blur breathing - consolidate with existing filters to prevent stacking
-    const blurPhase = organicPhase * 1.2;
-    const organicBlurAmount = Math.sin(blurPhase) * organicIntensity * 2;
+    // Dynamic blur pulsing - consolidate with existing filters to prevent stacking
+    const blurPhase = dynamicPhase * 1.2;
+    const dynamicBlurAmount = Math.sin(blurPhase) * dynamicIntensity * 2;
 
     // Parse existing filter to avoid blur stacking
     const currentFilter = element.style.filter || "";
     const hasExistingBlur = currentFilter.includes("blur(");
 
-    if (!hasExistingBlur && organicBlurAmount > 0) {
+    if (!hasExistingBlur && dynamicBlurAmount > 0) {
       element.style.filter =
-        currentFilter + ` blur(${Math.max(0, organicBlurAmount)}px)`;
+        currentFilter + ` blur(${Math.max(0, dynamicBlurAmount)}px)`;
     }
 
-    // Organic opacity pulsing
-    const opacityPhase = organicPhase * 0.7;
+    // Dynamic opacity pulsing
+    const opacityPhase = dynamicPhase * 0.7;
     const opacityModifier =
-      1.0 + Math.sin(opacityPhase) * organicIntensity * 0.2;
+      1.0 + Math.sin(opacityPhase) * dynamicIntensity * 0.2;
     const currentOpacity = parseFloat(element.style.opacity) || 1.0;
     element.style.opacity = Math.max(
       0.1,
@@ -970,10 +970,10 @@ export class HolographicUISystem
     const elementSelectors = [
       { selector: ".main-view-container", type: "translucent_panel" },
       { selector: ".Root__nav-bar", type: "data_stream" },
-      { selector: ".Root__now-playing-bar", type: "consciousness_interface" },
+      { selector: ".Root__now-playing-bar", type: "visualEffects_interface" },
       {
         selector: ".main-view-container__scroll-node",
-        type: "organic_hologram",
+        type: "dynamic_hologram",
       },
       { selector: ".root-now-playing-view", type: "energy_barrier" },
       {
@@ -997,8 +997,8 @@ export class HolographicUISystem
           isActive: true,
           lastUpdate: 0,
           animation: null,
-          consciousnessLevel: 0.8,
-          organicIntegration: true,
+          visualEffectsLevel: 0.8,
+          smoothIntegration: true,
         };
 
         this.holographicElements.set(holographicElement.id, holographicElement);
@@ -1020,7 +1020,7 @@ export class HolographicUISystem
     this.animationState.dataStreamPhase += deltaSeconds * this.dataStream.speed;
     this.animationState.interferencePhase +=
       deltaSeconds * this.interferencePattern.frequency;
-    this.animationState.organicPhase += deltaSeconds * 0.5;
+    this.animationState.dynamicPhase += deltaSeconds * 0.5;
 
     // Note: Scanline effects now handled via CSS classes on individual elements
 
@@ -1120,7 +1120,7 @@ export class HolographicUISystem
   }
 
   /**
-   * Enable volumetric depth effects for 3D holographic consciousness
+   * Enable volumetric depth effects for 3D holographic visualEffects
    */
   public enableVolumetricDepth(depthLevel: number = 0.8): void {
     const perspectiveDepth = 800 + depthLevel * 1200; // 800px-2000px range
@@ -1146,13 +1146,13 @@ export class HolographicUISystem
   }
 
   /**
-   * Update volumetric layers for 3D consciousness depth
+   * Update volumetric layers for 3D visualEffects depth
    */
   public updateVolumetricLayers(
-    consciousnessLevel: number,
+    visualEffectsLevel: number,
     emotionalTemperature: number
   ): void {
-    const depthIntensity = consciousnessLevel * 0.8;
+    const depthIntensity = visualEffectsLevel * 0.8;
     const temperatureDepth = (emotionalTemperature - 4000) / 4000; // Normalize 4000K-8000K to 0-1
 
     for (const [id, holographicElement] of this.holographicElements) {
@@ -1174,12 +1174,12 @@ export class HolographicUISystem
     intensity: number,
     temperatureDepth: number = 0.5
   ): void {
-    // Calculate depth offset based on consciousness and temperature
+    // Calculate depth offset based on visualEffects and temperature
     const baseDepth = depthLevel * 100; // -100px to +100px range
     const temperatureOffset = temperatureDepth * 50; // Additional depth based on emotional temperature
     const finalDepth = baseDepth + temperatureOffset;
 
-    // Apply 3D transform with consciousness-driven depth
+    // Apply 3D transform with visualEffects-driven depth
     const currentTransform = element.style.transform || "";
     const volumetricTransform = `translateZ(${finalDepth}px)`;
 
@@ -1266,56 +1266,56 @@ export class HolographicUISystem
    * Data is now integrated into element-native effects for better text clarity
    */
 
-  // Canvas-based consciousness data stream methods removed - now handled via CSS-only implementations
+  // Canvas-based visualEffects data stream methods removed - now handled via CSS-only implementations
 
   /**
-   * Organic consciousness atmospheric effects system
-   * Phase 4.2c: Advanced Atmospheric Enhancement - flowing, seamless, organic
-   * Now updates CSS variables for element-native consciousness effects
+   * Dynamic atmospheric effects system
+   * Phase 4.2c: Advanced Atmospheric Enhancement - flowing, seamless, dynamic
+   * Now updates CSS variables for element-native visual effects
    */
   public updateConsciousnessScanlines(
-    consciousnessLevel: number,
+    visualEffectsLevel: number,
     emotionalTemperature: number,
     musicalIntensity: number
   ): void {
-    // Update CSS variables for element-native consciousness effects
-    const consciousnessDensity = Math.max(0.2, consciousnessLevel * 1.5);
+    // Update CSS variables for element-native visualEffects effects
+    const visualEffectsDensity = Math.max(0.2, visualEffectsLevel * 1.5);
     const temperatureFrequency =
       this.mapTemperatureToFrequency(emotionalTemperature);
     const musicalPulse =
       Math.sin(performance.now() * 0.005 * musicalIntensity) * 0.3 + 0.7;
 
-    // Update CSS variables using coordination for consciousness effects
-    const consciousnessScanlineVariables = {
-      "--consciousness-scanline-density": consciousnessDensity.toString(),
-      "--consciousness-scanline-frequency": `${temperatureFrequency}px`,
-      "--consciousness-scanline-opacity": (consciousnessLevel * 0.15).toString(),
+    // Update CSS variables using coordination for visualEffects effects
+    const visualEffectsScanlineVariables = {
+      "--visualEffects-scanline-density": visualEffectsDensity.toString(),
+      "--visualEffects-scanline-frequency": `${temperatureFrequency}px`,
+      "--visualEffects-scanline-opacity": (visualEffectsLevel * 0.15).toString(),
       "--musical-scanline-pulse": musicalPulse.toString(),
       "--temperature-scanline-color-shift": `${((emotionalTemperature - 5000) / 3000) * 30}deg`
     };
 
     this.cssController.batchSetVariables(
       "HolographicUISystem",
-      consciousnessScanlineVariables,
-      "high", // High priority for consciousness scanline effects
-      "consciousness-scanline-update"
+      visualEffectsScanlineVariables,
+      "high", // High priority for visualEffects scanline effects
+      "visualEffects-scanline-update"
     );
   }
 
   /**
-   * Update enhanced aberration system CSS variables based on consciousness and musical data
+   * Update enhanced aberration system CSS variables based on visualEffects and musical data
    * Phase 4.2g: Enhanced CSS-Only Aberration Integration
    */
   public updateAberrationEffects(
-    consciousnessLevel: number,
+    visualEffectsLevel: number,
     emotionalTemperature: number,
     musicalIntensity: number,
     beatDetected: boolean = false
   ): void {
     const root = document.documentElement;
 
-    // Base aberration intensity controlled by consciousness level
-    const baseIntensity = Math.min(1, consciousnessLevel * 1.2);
+    // Base aberration intensity controlled by visualEffects level
+    const baseIntensity = Math.min(1, visualEffectsLevel * 1.2);
 
     // Musical synchronization affects color separation and pulse
     const musicalSync = Math.min(1, musicalIntensity * 1.5);
@@ -1335,9 +1335,9 @@ export class HolographicUISystem
       Math.sin(performance.now() * 0.003 * musicalIntensity) * 0.4 + 0.6;
     const beatBoost = beatDetected ? 1.5 : 1.0;
 
-    // Wave frequency affected by consciousness and music
+    // Wave frequency affected by visualEffects and music
     const waveFrequency =
-      1000 + consciousnessLevel * 2000 + musicalIntensity * 1000; // 1-4s range
+      1000 + visualEffectsLevel * 2000 + musicalIntensity * 1000; // 1-4s range
 
     // Update aberration CSS variables using coordination
     const aberrationEffectVariables = {
@@ -1345,7 +1345,7 @@ export class HolographicUISystem
       "--aberration-color-separation": `${colorSeparation}px`,
       "--aberration-musical-sync": musicalSync.toString(),
       "--aberration-emotional-temperature": `${emotionalTemperature}K`,
-      "--aberration-consciousness-level": consciousnessLevel.toString(),
+      "--aberration-visualEffects-level": visualEffectsLevel.toString(),
       "--aberration-red-shift": `${redShift}px`,
       "--aberration-green-shift": `${greenShift}px`,
       "--aberration-blue-shift": `${blueShift}px`,
@@ -1393,16 +1393,16 @@ export class HolographicUISystem
    * Update CSS variables for scanline system integration
    */
   private updateScanlineCSSVariables(
-    consciousnessLevel: number,
+    visualEffectsLevel: number,
     emotionalTemperature: number,
     musicalIntensity: number
   ): void {
-    // Base scanline consciousness variables
+    // Base scanline visualEffects variables
     const scanlineCoreVariables = {
-      "--consciousness-scanline-density": consciousnessLevel.toString(),
-      "--consciousness-scanline-frequency": `${this.scanlineEffect.frequency}px`,
-      "--consciousness-scanline-opacity": this.scanlineEffect.opacity.toString(),
-      "--consciousness-scanline-speed": `${this.scanlineEffect.speed}s`,
+      "--visualEffects-scanline-density": visualEffectsLevel.toString(),
+      "--visualEffects-scanline-frequency": `${this.scanlineEffect.frequency}px`,
+      "--visualEffects-scanline-opacity": this.scanlineEffect.opacity.toString(),
+      "--visualEffects-scanline-speed": `${this.scanlineEffect.speed}s`,
       "--temperature-scanline-color-shift": `${((emotionalTemperature - 5000) / 2000) * 30}deg`,
       "--musical-scanline-pulse": musicalIntensity.toString()
     };
@@ -1410,22 +1410,22 @@ export class HolographicUISystem
     this.cssController.batchSetVariables(
       "HolographicUISystem",
       scanlineCoreVariables,
-      "high", // High priority for scanline consciousness effects
-      "scanline-consciousness-update"
+      "high", // High priority for scanline visualEffects effects
+      "scanline-visualEffects-update"
     );
 
-    // Advanced consciousness scanline effects based on consciousness level
+    // Advanced visualEffects scanline effects based on visualEffects level
     const advancedScanlineVariables = {
-      "--consciousness-scanline-interference": consciousnessLevel > 0.7 ? "visible" : "none",
-      "--consciousness-scanline-complexity": consciousnessLevel > 0.7 
-        ? Math.min(1, (consciousnessLevel - 0.7) * 3.33).toString()
+      "--visualEffects-scanline-interference": visualEffectsLevel > 0.7 ? "visible" : "none",
+      "--visualEffects-scanline-complexity": visualEffectsLevel > 0.7 
+        ? Math.min(1, (visualEffectsLevel - 0.7) * 3.33).toString()
         : "0"
     };
 
     this.cssController.batchSetVariables(
       "HolographicUISystem",
       advancedScanlineVariables,
-      "high", // High priority for advanced consciousness scanline effects
+      "high", // High priority for advanced visualEffects scanline effects
       "scanline-complexity-update"
     );
   }
@@ -1809,7 +1809,7 @@ export class HolographicUISystem
         case "interference-patterns":
           capability.enabled = this.holographicState.interferenceLevel > 0.1;
           break;
-        case "organic-integration":
+        case "dynamic-integration":
           capability.enabled = level !== "low";
           break;
       }
@@ -1819,7 +1819,7 @@ export class HolographicUISystem
   private getPresetForLevel(level: string): HolographicState {
     switch (level) {
       case "low":
-        return this.holographicPresets["organic-consciousness"];
+        return this.holographicPresets["dynamic-visualEffects"];
       case "medium":
         return this.holographicPresets["star-wars"];
       case "high":
@@ -1887,7 +1887,7 @@ export class HolographicUISystem
   }
 
   /**
-   * Setup OKLAB event subscriptions for holographic consciousness
+   * Setup OKLAB event subscriptions for holographic visualEffects
    */
   private setupOKLABEventSubscriptions(): void {
     try {
@@ -2055,7 +2055,7 @@ export class HolographicUISystem
 
       // Update enhanced aberration effects with musical data
       if (emotionalResult && musicInfluenceStrength !== undefined) {
-        const consciousnessLevel =
+        const visualEffectsLevel =
           this.holographicState.flickerIntensity || 0.5; // Use current holographic state
         const emotionalTemperature =
           emotionalResult.emotionalTemperature || 6000;
@@ -2063,7 +2063,7 @@ export class HolographicUISystem
         const beatDetected = emotionalResult.beatDetected || false;
 
         this.updateAberrationEffects(
-          consciousnessLevel,
+          visualEffectsLevel,
           emotionalTemperature,
           musicalIntensity,
           beatDetected
@@ -2117,10 +2117,10 @@ export class HolographicUISystem
       }
 
       // Update aberration effects with emotional temperature data
-      const consciousnessLevel = this.holographicState.flickerIntensity || 0.5;
+      const visualEffectsLevel = this.holographicState.flickerIntensity || 0.5;
       const musicalIntensity = this.lastMusicalContext?.influence || 0.5;
       this.updateAberrationEffects(
-        consciousnessLevel,
+        visualEffectsLevel,
         emotionalTemperature,
         musicalIntensity,
         false
@@ -2312,7 +2312,7 @@ export class HolographicUISystem
         this.cssController.batchSetVariables(
           "HolographicUISystem",
           emotionalHolographicVariables,
-          "critical", // Critical priority for emotional holographic colors - affects consciousness perception
+          "critical", // Critical priority for emotional holographic colors - affects visualEffects perception
           "emotional-oklab-holographic-update"
         );
 
@@ -2401,7 +2401,7 @@ export class HolographicUISystem
           this.holographicState.transparency = 0.9;
           this.holographicState.energyStability = 0.8;
           this.holographicState.flickerIntensity = 0.2;
-          this.scanlineEffect.organic = true;
+          this.scanlineEffect.dynamic = true;
           break;
 
         case "rock":
@@ -2417,7 +2417,7 @@ export class HolographicUISystem
           this.holographicState.transparency = 0.95;
           this.holographicState.dataStreamFlow = 0.3;
           this.holographicState.energyStability = 0.9;
-          this.scanlineEffect.organic = true;
+          this.scanlineEffect.dynamic = true;
           this.scanlineEffect.speed = 0.2;
           break;
 
@@ -2425,8 +2425,8 @@ export class HolographicUISystem
         case "blues":
           this.holographicState.flickerIntensity = 0.4;
           this.holographicState.energyStability = 0.6;
-          this.interferencePattern.type = "organic";
-          this.scanlineEffect.organic = true;
+          this.interferencePattern.type = "dynamic";
+          this.scanlineEffect.dynamic = true;
           break;
 
         default:
@@ -2506,7 +2506,7 @@ export class HolographicUISystem
         this.holographicState.dataStreamFlow = 1.0;
         this.holographicState.interferenceLevel = 0.6;
       } else if (genre === "classical" && emotion === "calm") {
-        this.setHolographicPreset("organic-consciousness");
+        this.setHolographicPreset("dynamic-visualEffects");
         this.holographicState.transparency = 0.95;
         this.holographicState.energyStability = 0.9;
       } else if (genre === "rock" && emotion === "aggressive") {
@@ -2607,7 +2607,7 @@ export class HolographicUISystem
         return `rgba(${rgb}, ${intensity})`;
       }
 
-      // Fallback to spice variables with organic variable as final fallback
+      // Fallback to spice variables with dynamic variable as final fallback
       return `rgba(var(--spice-rgb-holographic-glow, var(--sn-holographic-rgb, 100, 255, 200)), ${intensity})`;
     } catch (error) {
       Y3KDebug?.debug?.warn(
@@ -2649,7 +2649,7 @@ export class HolographicUISystem
         };
       }
 
-      // Fallback to spice variables with organic variable as final fallback
+      // Fallback to spice variables with dynamic variable as final fallback
       return {
         background: `rgba(var(--spice-rgb-holographic-primary, var(--sn-holographic-rgb, 100, 255, 200)), ${
           transparency * 0.1
@@ -2682,21 +2682,21 @@ export class HolographicUISystem
   }
 
   /**
-   * Get OKLAB consciousness-responsive glow colors
+   * Get OKLAB visualEffects-responsive glow colors
    */
   private getOKLABConsciousnessGlow(
     intensity: number,
     resonance: number
   ): { outer: string; inner: string } {
     try {
-      // Get consciousness accent color or fallback
+      // Get visualEffects accent color or fallback
       const accentColor =
         getComputedStyle(document.documentElement)
           .getPropertyValue("--sn-accent-hex")
           ?.trim() || "#cba6f7";
 
-      // Process through OKLAB with consciousness enhancement
-      const consciousnessPreset: EnhancementPreset = {
+      // Process through OKLAB with visualEffects enhancement
+      const visualEffectsPreset: EnhancementPreset = {
         ...this.holographicPreset,
         chromaBoost: this.holographicPreset.chromaBoost * (1 + resonance * 0.5),
         lightnessBoost:
@@ -2705,7 +2705,7 @@ export class HolographicUISystem
 
       const oklabResult = this.oklabProcessor.processColor(
         accentColor,
-        consciousnessPreset
+        visualEffectsPreset
       );
 
       if (oklabResult.enhancedHex) {
@@ -2726,7 +2726,7 @@ export class HolographicUISystem
     } catch (error) {
       Y3KDebug?.debug?.warn(
         "HolographicUISystem",
-        "Failed to get OKLAB consciousness glow:",
+        "Failed to get OKLAB visualEffects glow:",
         error
       );
       return {

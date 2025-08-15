@@ -1,0 +1,822 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// DRAMATIC VISUAL THEME - Cinematic Technology Integration
+// ████████████████████████████████████████████████████████████████████████████████
+
+// === DYNAMIC-TECH FUSION FOUNDATION ===
+// Inspired by cyberpunk blend of fluid and technological elements:
+// • Holographic displays with dynamic flow
+// • Luminescent technology interfaces  
+// • Crystalline structures with glassmorphism properties
+// • Energy fields that feel both futuristic and atmospheric
+
+// Holographic display system
+.visual-effects-holographic-display {
+  // Core holographic properties
+  position: relative;
+  contain: layout style paint;
+  
+  // Holographic base enhancement
+  background: linear-gradient(
+    135deg,
+    rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 0%,
+    rgba(var(--visual-effects-primary-rgb, 205, 214, 244), calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 50%,
+    rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 100%
+  );
+  
+  // Holographic filter effects
+  filter: 
+    saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.3))
+    brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.15))
+    hue-rotate(calc(var(--visual-effects-audio-resonance, 0.7) * 10deg));
+  
+  // Holographic animation
+  // animation: visual-effects-holographic-pulse var(--visual-effects-animation-cycle, 1s) ease-in-out infinite;
+  
+  // Performance optimization
+  will-change: filter, background;
+  transform: translateZ(0);
+  backdrop-filter: blur(1px);
+  
+  // Holographic scanlines
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    // Scanline pattern
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+    
+    // Scanline animation
+    // animation: visual-effects-holographic-scanlines 2s linear infinite;
+    
+    // Performance optimization
+    pointer-events: none;
+    z-index: var(--visual-effects-depth-near, 1);
+    will-change: opacity, background-position;
+    contain: strict;
+    mix-blend-mode: screen;
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.3);
+  }
+  
+  // Holographic shimmer effect
+  &::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    
+    // Shimmer gradient
+    background: linear-gradient(
+      45deg,
+      transparent 0%,
+      rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 4)) 25%,
+      rgba(255, 255, 255, calc(var(--visual-effects-shimmer-opacity, 0.05) * 6)) 50%,
+      rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 4)) 75%,
+      transparent 100%
+    );
+    
+    // Shimmer animation
+    // animation: visual-effects-holographic-shimmer calc(var(--visual-effects-animation-cycle, 1s) * 3) ease-in-out infinite;
+    
+    pointer-events: none;
+    z-index: var(--visual-effects-depth-far, 3);
+    will-change: transform, opacity;
+    contain: strict;
+    border-radius: inherit;
+  }
+  
+  // Holographic quality levels
+  &[data-holo-quality="low"] {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.1))
+      brightness(0.9)
+      blur(0.5px);
+    
+    &::before {
+      opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.1);
+    }
+  }
+  
+  &[data-holo-quality="medium"] {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.2))
+      brightness(1.0);
+  }
+  
+  &[data-holo-quality="high"] {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.4))
+      brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.2))
+      hue-rotate(calc(var(--visual-effects-audio-resonance, 0.7) * 15deg));
+    
+    &::before {
+      opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.5);
+    }
+    
+    // Enhanced outer glow for high quality
+    box-shadow: 
+      0 0 10px rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-glow-opacity, 0.1) * 2)),
+      0 0 20px rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-glow-opacity, 0.1) * 1));
+  }
+}
+
+// Luminescent technology system
+.visual-effects-luminescent-tech {
+  // Core luminescent properties
+  position: relative;
+  
+  // Dynamic luminescent enhancement
+  filter: 
+    saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.5))
+    brightness(calc(1.0 + var(--visual-effects-audio-resonance, 0.7) * 0.3));
+  
+  // Luminescent base glow
+  background: radial-gradient(
+    ellipse at center,
+    rgba(var(--visual-effects-neon-glow-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 4)) 0%,
+    rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 40%,
+    rgba(var(--visual-effects-primary-rgb, 205, 214, 244), calc(var(--visual-effects-shimmer-opacity, 0.05) * 1)) 70%,
+    transparent 90%
+  );
+  
+  // Luminescent pulse
+  // animation: visual-effects-luminescent-pulse var(--visual-effects-animation-cycle, 1s) ease-in-out infinite;
+  
+  // Performance optimization
+  will-change: filter, background;
+  transform: translateZ(0);
+  
+  // Dynamic circuit pattern overlay
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    // Dynamic circuit pattern
+    background: 
+      radial-gradient(circle at 25% 25%, rgba(var(--visual-effects-neon-glow-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 1px, transparent 2px),
+      radial-gradient(circle at 75% 25%, rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 1px, transparent 2px),
+      radial-gradient(circle at 25% 75%, rgba(var(--visual-effects-primary-rgb, 205, 214, 244), calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 1px, transparent 2px),
+      radial-gradient(circle at 75% 75%, rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 1px, transparent 2px),
+      // Connecting lines
+      linear-gradient(45deg, transparent 0%, rgba(var(--visual-effects-neon-glow-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 1)) 48%, transparent 52%),
+      linear-gradient(-45deg, transparent 0%, rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-shimmer-opacity, 0.05) * 1)) 48%, transparent 52%);
+    
+    background-size: 60px 60px, 60px 60px, 60px 60px, 60px 60px, 120px 120px, 120px 120px;
+    
+    // Dynamic circuit energy flow
+    // animation: visual-effects-circuit-flow calc(var(--visual-effects-animation-cycle, 1s) * 2) linear infinite;
+    
+    // Performance optimization
+    pointer-events: none;
+    z-index: var(--visual-effects-depth-mid, 2);
+    will-change: background-position, opacity;
+    contain: strict;
+    mix-blend-mode: screen;
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.6);
+  }
+  
+  // Energy pulse nodes
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    // Energy node pattern
+    background: 
+      radial-gradient(circle at 33% 33%, rgba(var(--visual-effects-neon-glow-rgb, 116, 199, 236), calc(var(--visual-effects-glow-opacity, 0.1) * 3)) 2px, transparent 4px),
+      radial-gradient(circle at 66% 66%, rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-glow-opacity, 0.1) * 3)) 2px, transparent 4px);
+    
+    background-size: 90px 90px, 90px 90px;
+    
+    // Energy node pulsing
+    // animation: visual-effects-energy-nodes calc(var(--visual-effects-animation-cycle, 1s) * 1.5) ease-in-out infinite;
+    
+    pointer-events: none;
+    z-index: var(--visual-effects-depth-far, 3);
+    will-change: opacity, transform;
+    contain: strict;
+  }
+  
+  // Luminescent intensity levels
+  &[data-luminescent-intensity="dormant"] {
+    --luminescent-multiplier: 0.2;
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.1))
+      brightness(0.7);
+  }
+  
+  &[data-luminescent-intensity="active"] {
+    --luminescent-multiplier: 0.8;
+  }
+  
+  &[data-luminescent-intensity="energized"] {
+    --luminescent-multiplier: 1.5;
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.7))
+      brightness(calc(1.0 + var(--visual-effects-audio-resonance, 0.7) * 0.5))
+      hue-rotate(calc(var(--luminescent-multiplier, 1.5) * 20deg));
+  }
+}
+
+// Crystalline glassmorphism system
+.visual-effects-crystalline-glassmorphism {
+  // Core crystalline properties
+  position: relative;
+  
+  // Crystalline enhancement
+  background: linear-gradient(
+    60deg,
+    rgba(var(--visual-effects-primary-rgb, 205, 214, 244), calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 0%,
+    rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 4)) 33%,
+    rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 66%,
+    rgba(var(--visual-effects-primary-rgb, 205, 214, 244), calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 100%
+  );
+  
+  // Crystalline filtering
+  filter: 
+    saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.4))
+    brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.2))
+    hue-rotate(calc(var(--visual-effects-audio-resonance, 0.7) * 15deg));
+  
+  // Crystalline facet reflections
+  backdrop-filter: 
+    blur(0.5px) 
+    saturate(1.3);
+  
+  // Crystalline pulse
+  // animation: visual-effects-crystalline-pulse var(--visual-effects-animation-cycle, 1s) ease-in-out infinite;
+  
+  // Performance optimization
+  will-change: filter, background, backdrop-filter;
+  transform: translateZ(0);
+  
+  // Crystal facet overlay
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    // Faceted crystal pattern
+    background: 
+      linear-gradient(30deg, transparent 40%, rgba(255, 255, 255, calc(var(--visual-effects-shimmer-opacity, 0.05) * 4)) 50%, transparent 60%),
+      linear-gradient(60deg, transparent 40%, rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 50%, transparent 60%),
+      linear-gradient(90deg, transparent 40%, rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 50%, transparent 60%),
+      linear-gradient(120deg, transparent 40%, rgba(255, 255, 255, calc(var(--visual-effects-shimmer-opacity, 0.05) * 4)) 50%, transparent 60%);
+    
+    background-size: 40px 40px, 60px 60px, 80px 80px, 50px 50px;
+    
+    // Crystal facet animation
+    // animation: visual-effects-crystal-facets calc(var(--visual-effects-animation-cycle, 1s) * 4) linear infinite;
+    
+    // Performance optimization
+    pointer-events: none;
+    z-index: var(--visual-effects-depth-mid, 2);
+    will-change: background-position;
+    contain: strict;
+    mix-blend-mode: overlay;
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.4);
+  }
+  
+  // Crystal energy resonance
+  &::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    
+    // Energy resonance field
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-glow-opacity, 0.1) * 2)) 0%,
+      rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-glow-opacity, 0.1) * 1.5)) 40%,
+      transparent 70%
+    );
+    
+    // Resonance pulsing
+    // animation: visual-effects-crystal-resonance calc(var(--visual-effects-animation-cycle, 1s) * 1.5) ease-in-out infinite;
+    
+    pointer-events: none;
+    z-index: var(--visual-effects-depth-atmosphere, 0);
+    will-change: opacity, transform;
+    contain: strict;
+    border-radius: inherit;
+  }
+  
+  // Crystal scale states
+  &[data-crystal-scale="emerging"] {
+    --crystal-multiplier: 0.3;
+    transform: scale(0.95);
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.1))
+      brightness(0.8);
+  }
+  
+  &[data-crystal-scale="mature"] {
+    --crystal-multiplier: 1.0;
+  }
+  
+  &[data-crystal-scale="enhanced"] {
+    --crystal-multiplier: 1.8;
+    transform: scale(1.05);
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.6))
+      brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.3))
+      hue-rotate(calc(var(--crystal-multiplier, 1.8) * 25deg));
+    
+    // Enhanced glow
+    box-shadow: 
+      0 0 15px rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-glow-opacity, 0.1) * 3)),
+      0 0 30px rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-glow-opacity, 0.1) * 2)),
+      inset 0 0 10px rgba(255, 255, 255, calc(var(--visual-effects-shimmer-opacity, 0.05) * 6));
+  }
+}
+
+// Energy field system
+.visual-effects-energy-field {
+  // Core energy field properties
+  position: relative;
+  
+  // Energy field base
+  background: radial-gradient(
+    ellipse at center,
+    rgba(var(--visual-effects-neon-glow-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 5)) 0%,
+    rgba(var(--visual-effects-primary-rgb, 205, 214, 244), calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 30%,
+    rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 60%,
+    transparent 90%
+  );
+  
+  // Energy field enhancement
+  filter: 
+    saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.6))
+    brightness(calc(1.0 + var(--visual-effects-audio-resonance, 0.7) * 0.4));
+  
+  // Energy field pulsing
+  // animation: visual-effects-energy-field-pulse var(--visual-effects-animation-cycle, 1s) ease-in-out infinite;
+  
+  // Performance optimization
+  will-change: filter, background, transform;
+  transform: translateZ(0);
+  
+  // Energy field fluctuations
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    
+    // Energy fluctuation pattern
+    background: 
+      radial-gradient(circle at 30% 20%, rgba(var(--visual-effects-neon-glow-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 0%, transparent 30%),
+      radial-gradient(circle at 70% 80%, rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 0%, transparent 30%),
+      radial-gradient(circle at 20% 70%, rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 0%, transparent 30%),
+      radial-gradient(circle at 80% 30%, rgba(var(--visual-effects-primary-rgb, 205, 214, 244), calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 0%, transparent 30%);
+    
+    // Energy fluctuation animation
+    // animation: visual-effects-energy-fluctuations calc(var(--visual-effects-animation-cycle, 1s) * 3) ease-in-out infinite;
+    
+    pointer-events: none;
+    z-index: var(--visual-effects-depth-mid, 2);
+    will-change: opacity, transform;
+    contain: strict;
+    mix-blend-mode: screen;
+  }
+  
+  // Energy field types
+  &[data-field-type="protective"] {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(var(--visual-effects-primary-rgb, 205, 214, 244), calc(var(--visual-effects-shimmer-opacity, 0.05) * 4)) 0%,
+      rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 50%,
+      transparent 80%
+    );
+  }
+  
+  &[data-field-type="intense"] {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(var(--visual-effects-neon-glow-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 6)) 0%,
+      rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-shimmer-opacity, 0.05) * 4)) 40%,
+      transparent 70%
+    );
+    
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.8))
+      brightness(calc(1.0 + var(--visual-effects-audio-resonance, 0.7) * 0.6))
+      hue-rotate(15deg);
+  }
+  
+  &[data-field-type="atmospheric"] {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(var(--visual-effects-accent-rgb, 203, 166, 247), calc(var(--visual-effects-shimmer-opacity, 0.05) * 5)) 0%,
+      rgba(var(--visual-effects-primary-rgb, 205, 214, 244), calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 40%,
+      transparent 80%
+    );
+    
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.5))
+      brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.3))
+      hue-rotate(-10deg);
+  }
+}
+
+// === DRAMATIC VISUAL KEYFRAMES ===
+
+// Holographic pulse animation
+@keyframes visual-effects-holographic-pulse {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.3))
+      brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.15));
+    background-size: 100% 100%;
+  }
+  
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.4))
+      brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.2))
+      hue-rotate(calc(var(--visual-effects-audio-resonance, 0.7) * 15deg));
+    background-size: 105% 105%;
+  }
+  
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.3))
+      brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.15));
+    background-size: 100% 100%;
+  }
+}
+
+// Holographic scanlines animation
+@keyframes visual-effects-holographic-scanlines {
+  0% {
+    background-position: 0px 0px;
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.3);
+  }
+  
+  50% {
+    background-position: 0px 2px;
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.5);
+  }
+  
+  100% {
+    background-position: 0px 4px;
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.3);
+  }
+}
+
+// Holographic shimmer animation
+@keyframes visual-effects-holographic-shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+    opacity: 0;
+  }
+  
+  50% {
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 6);
+  }
+  
+  100% {
+    transform: translateX(200%) skewX(-15deg);
+    opacity: 0;
+  }
+}
+
+// Luminescent pulse animation
+@keyframes visual-effects-luminescent-pulse {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.5))
+      brightness(calc(1.0 + var(--visual-effects-audio-resonance, 0.7) * 0.3));
+    background-size: 100% 100%;
+  }
+  
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.7))
+      brightness(calc(1.0 + var(--visual-effects-audio-resonance, 0.7) * 0.5))
+      hue-rotate(calc(var(--luminescent-multiplier, 1) * 10deg));
+    background-size: 102% 102%;
+  }
+  
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.5))
+      brightness(calc(1.0 + var(--visual-effects-audio-resonance, 0.7) * 0.3));
+    background-size: 100% 100%;
+  }
+}
+
+// Circuit flow animation
+@keyframes visual-effects-circuit-flow {
+  0% {
+    background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px;
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.6);
+  }
+  
+  50% {
+    background-position: 30px 30px, 30px 30px, 30px 30px, 30px 30px, 60px 60px, 60px 60px;
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.8);
+  }
+  
+  100% {
+    background-position: 60px 60px, 60px 60px, 60px 60px, 60px 60px, 120px 120px, 120px 120px;
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.6);
+  }
+}
+
+// Energy nodes animation
+@keyframes visual-effects-energy-nodes {
+  0% {
+    opacity: calc(var(--visual-effects-glow-opacity, 0.1) * 3);
+    transform: scale(1.0);
+  }
+  
+  50% {
+    opacity: calc(var(--visual-effects-glow-opacity, 0.1) * 5);
+    transform: scale(1.1);
+  }
+  
+  100% {
+    opacity: calc(var(--visual-effects-glow-opacity, 0.1) * 3);
+    transform: scale(1.0);
+  }
+}
+
+// Crystalline pulse animation
+@keyframes visual-effects-crystalline-pulse {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.4))
+      brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.2));
+    backdrop-filter: blur(0.5px) saturate(1.3);
+  }
+  
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.6))
+      brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.3))
+      hue-rotate(calc(var(--crystal-multiplier, 1) * 20deg));
+    backdrop-filter: blur(0.3px) saturate(1.5);
+  }
+  
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.4))
+      brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.2));
+    backdrop-filter: blur(0.5px) saturate(1.3);
+  }
+}
+
+// Crystal facets animation
+@keyframes visual-effects-crystal-facets {
+  0% {
+    background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px;
+  }
+  
+  25% {
+    background-position: 10px 10px, 15px 15px, 20px 20px, 12px 12px;
+  }
+  
+  50% {
+    background-position: 20px 20px, 30px 30px, 40px 40px, 25px 25px;
+  }
+  
+  75% {
+    background-position: 30px 30px, 45px 45px, 60px 60px, 37px 37px;
+  }
+  
+  100% {
+    background-position: 40px 40px, 60px 60px, 80px 80px, 50px 50px;
+  }
+}
+
+// Crystal resonance animation
+@keyframes visual-effects-crystal-resonance {
+  0% {
+    opacity: calc(var(--visual-effects-glow-opacity, 0.1) * 2);
+    transform: scale(1.0);
+  }
+  
+  50% {
+    opacity: calc(var(--visual-effects-glow-opacity, 0.1) * 3);
+    transform: scale(1.03);
+  }
+  
+  100% {
+    opacity: calc(var(--visual-effects-glow-opacity, 0.1) * 2);
+    transform: scale(1.0);
+  }
+}
+
+// Energy field pulse animation
+@keyframes visual-effects-energy-field-pulse {
+  0% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.6))
+      brightness(calc(1.0 + var(--visual-effects-audio-resonance, 0.7) * 0.4));
+    transform: scale(1.0);
+  }
+  
+  50% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.8))
+      brightness(calc(1.0 + var(--visual-effects-audio-resonance, 0.7) * 0.6))
+      hue-rotate(calc(var(--visual-effects-audio-resonance, 0.7) * 12deg));
+    transform: scale(1.02);
+  }
+  
+  100% {
+    filter: 
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.6))
+      brightness(calc(1.0 + var(--visual-effects-audio-resonance, 0.7) * 0.4));
+    transform: scale(1.0);
+  }
+}
+
+// Energy fluctuations animation
+@keyframes visual-effects-energy-fluctuations {
+  0% {
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 3);
+    transform: scale(1.0) rotate(0deg);
+  }
+  
+  33% {
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 5);
+    transform: scale(1.1) rotate(120deg);
+  }
+  
+  66% {
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 4);
+    transform: scale(0.9) rotate(240deg);
+  }
+  
+  100% {
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 3);
+    transform: scale(1.0) rotate(360deg);
+  }
+}
+
+// === ACCESSIBILITY AND PERFORMANCE ===
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .visual-effects-holographic-display,
+  .visual-effects-luminescent-tech,
+  .visual-effects-crystalline-glassmorphism,
+  .visual-effects-energy-field {
+    animation: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    
+    &::before,
+    &::after {
+      animation: none !important;
+      opacity: 0.1 !important;
+    }
+  }
+}
+
+// High contrast support
+@media (prefers-contrast: high) {
+  .visual-effects-holographic-display {
+    filter: 
+      contrast(2.0) !important
+      saturate(2.0) !important;
+    
+    &::before {
+      opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.8) !important;
+    }
+  }
+  
+  .visual-effects-crystalline-glassmorphism {
+    filter: 
+      contrast(2.5) !important
+      saturate(1.8) !important
+      brightness(1.3) !important;
+  }
+}
+
+// Debug mode for dramatic visual effects
+:root.visual-effects-debug {
+  .visual-effects-holographic-display {
+    outline: 2px dashed rgba(var(--sn-musical-harmony-primary-rgb), 0.8) !important;
+    
+    &::after {
+      content: '📺 HOLO';
+      position: absolute;
+      top: -35px;
+      left: 0;
+      font-size: 10px;
+      color: rgb(var(--sn-musical-harmony-primary-rgb));
+      background: rgba(var(--spice-rgb-base), 0.9);
+      padding: 2px 4px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  }
+  
+  .visual-effects-luminescent-tech {
+    outline: 2px dashed rgba(var(--sn-musical-harmony-secondary-rgb), 0.8) !important;
+    
+    &::after {
+      content: '✨ LUMINESCENT';
+      position: absolute;
+      top: -35px;
+      right: 0;
+      font-size: 10px;
+      color: rgb(var(--sn-musical-harmony-secondary-rgb));
+      background: rgba(var(--spice-rgb-base), 0.9);
+      padding: 2px 4px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  }
+  
+  .visual-effects-crystalline-glassmorphism {
+    outline: 2px dashed rgba(var(--sn-musical-harmony-tertiary-rgb), 0.8) !important;
+    
+    &::after {
+      content: '💎 CRYSTAL';
+      position: absolute;
+      bottom: -35px;
+      left: 0;
+      font-size: 10px;
+      color: rgb(var(--sn-musical-harmony-tertiary-rgb));
+      background: rgba(var(--spice-rgb-base), 0.9);
+      padding: 2px 4px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  }
+  
+  .visual-effects-energy-field {
+    outline: 2px dashed rgba(var(--sn-musical-harmony-quaternary-rgb), 0.8) !important;
+    
+    &::after {
+      content: '⚡ ENERGY';
+      position: absolute;
+      bottom: -35px;
+      right: 0;
+      font-size: 10px;
+      color: rgb(var(--sn-musical-harmony-quaternary-rgb));
+      background: rgba(var(--spice-rgb-base), 0.9);
+      padding: 2px 4px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  }
+}
+
+// === LEGACY COMPATIBILITY ALIASES ===
+// These provide backward compatibility during the modernization transition
+
+.organic-holographic-display {
+  @extend .visual-effects-holographic-display !optional;
+}
+
+.organic-bioluminescent-tech {
+  @extend .visual-effects-luminescent-tech !optional;
+}
+
+.organic-crystalline-consciousness {
+  @extend .visual-effects-crystalline-glassmorphism !optional;
+}
+
+.organic-energy-field {
+  @extend .visual-effects-energy-field !optional;
+}
+
+// Legacy debug mode alias
+:root.organic-debug {
+  @extend :root, .visual-effects-debug;
+}

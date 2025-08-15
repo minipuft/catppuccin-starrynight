@@ -9,14 +9,14 @@
  * @compatibility Maintains all existing base class APIs
  */
 
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 
 import type {
   ServiceContainer,
@@ -40,7 +40,7 @@ export abstract class ServiceSystemBase implements IManagedSystem, IServiceAware
   
   // Legacy compatibility properties
   protected systemName: string;
-  protected config: Year3000Config;
+  protected config: AdvancedSystemConfig | Year3000Config;
   protected destroyed: boolean = false;
   
   // Service container
@@ -64,7 +64,7 @@ export abstract class ServiceSystemBase implements IManagedSystem, IServiceAware
   private _legacyCSSController: any = null;
   private _legacyEventBus: any = null;
 
-  constructor(config: Year3000Config = YEAR3000_CONFIG) {
+  constructor(config: AdvancedSystemConfig | Year3000Config = ADVANCED_SYSTEM_CONFIG) {
     this.config = config;
     this.systemName = this.constructor.name;
     this.services = DefaultServiceFactory.getServices();
@@ -310,14 +310,14 @@ export abstract class ServiceVisualSystemBase extends ServiceSystemBase {
   protected canvasCapabilities: any = null;
   
   // Additional visual system properties
-  protected utils: typeof Year3000Utilities = Year3000Utilities;
+  protected utils: typeof ThemeUtilities = ThemeUtilities;
   protected musicSyncService: MusicSyncService | null = null;
   protected settingsManager: SettingsManager | null = null;
   protected isActive: boolean = false;
   
   constructor(
-    config: Year3000Config = YEAR3000_CONFIG,
-    utils: typeof Year3000Utilities = Year3000Utilities,
+    config: AdvancedSystemConfig | Year3000Config = ADVANCED_SYSTEM_CONFIG,
+    utils: typeof ThemeUtilities = ThemeUtilities,
     performanceMonitor?: SimplePerformanceCoordinator,
     musicSyncService?: MusicSyncService | null,
     settingsManager?: SettingsManager | null

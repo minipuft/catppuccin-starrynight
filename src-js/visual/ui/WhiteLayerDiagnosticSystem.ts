@@ -52,7 +52,7 @@ export class WhiteLayerDiagnosticSystem {
     } else {
       Y3KDebug?.debug?.warn(
         "WhiteLayerDiagnosticSystem",
-        "UnifiedCSSVariableManager not available, CSS consciousness disabled"
+        "UnifiedCSSVariableManager not available, CSS visual-effects disabled"
       );
       this.cssConsciousnessController = null;
     }

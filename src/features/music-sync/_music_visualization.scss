@@ -1,16 +1,16 @@
 // ████████████████████████████████████████████████████████████████████████████████
-// FLUX MUSIC VISUALIZATION - Modern CSS-Native Music Consciousness Effects
+// FLUX MUSIC VISUALIZATION - Modern CSS-Native Music Visual Effects
 // ████████████████████████████████████████████████████████████████████████████████
 
 // 🎵 FLUX MUSIC VISUALIZATION SYSTEM
-// Modern CSS-native approach replacing DOM manipulation with consciousness-aware effects
-// Integrates with Year 3000 consciousness field and emotional temperature system
+// Modern CSS-native approach replacing DOM manipulation with visual-aware effects
+// Integrates with Year 3000 visual effects field and emotional temperature system
 
 // ===================================================================
-// CONSCIOUSNESS PULSE VISUALIZATION
+// VISUAL EFFECTS PULSE VISUALIZATION
 // ===================================================================
 
-// Main consciousness pulse effect - replaces manually created DOM element
+// Main visual effects pulse effect - replaces manually created DOM element
 .Root__main-view::before {
   content: '';
   position: fixed;
@@ -28,18 +28,18 @@
   pointer-events: none;
   will-change: transform, opacity;
   
-  // Consciousness pulse scaling
-  transform: translate(-50%, -50%) scale(var(--sn-flux-consciousness-pulse, 0));
-  opacity: calc(var(--sn-flux-consciousness-pulse, 0) * 0.8);
+  // Visual effects pulse scaling
+  transform: translate(-50%, -50%) scale(var(--sn-flux-visual-effects-pulse, 0));
+  opacity: calc(var(--sn-flux-visual-effects-pulse, 0) * 0.8);
   
   // Smooth transitions
   transition: 
-    transform 0.1s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1)),
-    opacity 0.1s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+    transform 0.1s var(--sn-anim-easing-organic, cubic-bezier(0.4, 0, 0.2, 1)),
+    opacity 0.1s var(--sn-anim-easing-organic, cubic-bezier(0.4, 0, 0.2, 1));
   
   // Beat pulse animation when active
   &:where(.sn-flux-beat-active) {
-    animation: flux-consciousness-beat-pulse 0.5s ease-out;
+    animation: flux-visual-effects-beat-pulse 0.5s ease-out;
   }
 }
 
@@ -87,7 +87,7 @@
   
   // Show/hide based on spectral visualization setting
   opacity: var(--sn-flux-spectral-enabled, 1);
-  transition: opacity 0.3s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+  transition: opacity 0.3s var(--sn-anim-easing-organic, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 // ===================================================================
@@ -116,8 +116,8 @@
   
   // Smooth flow animation
   transition: 
-    transform 0.2s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1)),
-    opacity 0.2s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+    transform 0.2s var(--sn-anim-easing-organic, cubic-bezier(0.4, 0, 0.2, 1)),
+    opacity 0.2s var(--sn-anim-easing-organic, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 // ===================================================================
@@ -152,24 +152,24 @@
   
   // Smooth harmonic transitions
   transition: 
-    transform 0.2s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1)),
-    opacity 0.2s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+    transform 0.2s var(--sn-anim-easing-organic, cubic-bezier(0.4, 0, 0.2, 1)),
+    opacity 0.2s var(--sn-anim-easing-organic, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 // ===================================================================
 // BEAT PULSE ANIMATIONS
 // ===================================================================
 
-// Consciousness pulse beat animation
-@keyframes flux-consciousness-beat-pulse {
+// Visual effects pulse beat animation
+@keyframes flux-visual-effects-beat-pulse {
   0% {
-    transform: translate(-50%, -50%) scale(var(--sn-flux-consciousness-pulse, 0));
+    transform: translate(-50%, -50%) scale(var(--sn-flux-visual-effects-pulse, 0));
   }
   50% {
-    transform: translate(-50%, -50%) scale(calc(var(--sn-flux-consciousness-pulse, 0) * 1.5));
+    transform: translate(-50%, -50%) scale(calc(var(--sn-flux-visual-effects-pulse, 0) * 1.5));
   }
   100% {
-    transform: translate(-50%, -50%) scale(var(--sn-flux-consciousness-pulse, 0));
+    transform: translate(-50%, -50%) scale(var(--sn-flux-visual-effects-pulse, 0));
   }
 }
 
@@ -190,32 +190,32 @@
 }
 
 // ===================================================================
-// CONSCIOUSNESS MODE VARIATIONS
+// VISUAL EFFECTS MODE VARIATIONS
 // ===================================================================
 
-// Dormant consciousness mode - minimal effects
-.sn-consciousness-dormant {
+// Dormant visual mode - minimal effects
+.sn-visual-mode-dormant {
   .Root__main-view::before,
   .main-view-container::after,
   .Root__top-container::before,
   .Root__top-container::after {
-    opacity: calc(var(--sn-flux-consciousness-pulse, 0) * 0.3);
+    opacity: calc(var(--sn-flux-visual-effects-pulse, 0) * 0.3);
     filter: blur(1px);
   }
 }
 
-// Aware consciousness mode - normal effects (default)
-.sn-consciousness-aware {
+// Aware visual mode - normal effects (default)
+.sn-visual-mode-aware {
   .Root__main-view::before,
   .main-view-container::after, 
   .Root__top-container::before,
   .Root__top-container::after {
-    opacity: calc(var(--sn-flux-consciousness-pulse, 0) * 0.7);
+    opacity: calc(var(--sn-flux-visual-effects-pulse, 0) * 0.7);
   }
 }
 
-// Transcendent consciousness mode - enhanced effects
-.sn-consciousness-transcendent {
+// Enhanced visual mode - enhanced effects
+.sn-visual-mode-enhanced {
   .Root__main-view::before {
     background: radial-gradient(circle,
       rgba(var(--sn-gradient-primary-rgb), 0.15) 0%,
@@ -260,10 +260,10 @@
   }
 }
 
-// Organic temporal flow - natural easing (default)
-.sn-temporal-organic {
+// Natural temporal flow - natural easing (default)
+.sn-temporal-natural {
   .Root__top-container::before {
-    transition: transform 0.2s var(--organic-ease-consciousness, cubic-bezier(0.4, 0, 0.2, 1));
+    transition: transform 0.2s var(--sn-anim-easing-organic, cubic-bezier(0.4, 0, 0.2, 1));
   }
 }
 
@@ -298,8 +298,8 @@
   }
 }
 
-// Psychedelic harmonic sensitivity - enhanced response
-.sn-harmonic-psychedelic {
+// Dynamic harmonic sensitivity - enhanced response
+.sn-harmonic-dynamic {
   .Root__top-container::after {
     transform: 
       scale(calc(0.3 + var(--sn-flux-harmonic-resonance, 0) * 0.8))
@@ -328,7 +328,7 @@
   
   // Keep basic visualization but reduce intensity
   .Root__main-view::before {
-    transform: translate(-50%, -50%) scale(calc(var(--sn-flux-consciousness-pulse, 0) * 0.5)) !important;
+    transform: translate(-50%, -50%) scale(calc(var(--sn-flux-visual-effects-pulse, 0) * 0.5)) !important;
   }
   
   .Root__top-container::after {
@@ -398,7 +398,7 @@
 
 :root {
   // Flux music visualization variables with fallback values
-  --sn-flux-consciousness-pulse: 0;
+  --sn-flux-visual-effects-pulse: 0;
   --sn-flux-temporal-flow-progress: 0;
   --sn-flux-harmonic-rotation: 0deg;
   --sn-flux-harmonic-resonance: 0;

@@ -63,24 +63,24 @@ float snoise(vec2 v) {
 }`;
 
 /**
- * Enhanced consciousness modulation functions
- * Advanced consciousness-based parameter calculations with Year 3000 effects
+ * Enhanced visualEffects modulation functions
+ * Advanced visualEffects-based parameter calculations with Year 3000 effects
  */
-export const CONSCIOUSNESS_MODULATION_FUNCTIONS = `
-// Enhanced consciousness-aware breathing effect with multi-phase patterns
-float consciousnessBreathing(float time, float phase, float intensity) {
+export const VISUAL_EFFECTS_MODULATION_FUNCTIONS = `
+// Enhanced visualEffects-aware animation effect with multi-phase patterns
+float visualEffectsPulsing(float time, float phase, float intensity) {
   return sin(time * 0.05 + phase) * intensity;
 }
 
-// Deep consciousness breathing with emotional resonance
-float deepConsciousnessBreathing(float time, float phase, float emotionalIntensity) {
+// Deep visualEffects animation with emotional resonance
+float deepVisualEffectsPulsing(float time, float phase, float emotionalIntensity) {
   float primaryBreath = sin(time * 0.04 + phase) * 0.6;
   float secondaryBreath = sin(time * 0.07 + phase * 1.3) * 0.3;
   float emotionalBreath = sin(time * 0.02 + phase * 0.7) * 0.2;
   return (primaryBreath + secondaryBreath + emotionalBreath) * emotionalIntensity;
 }
 
-// Rhythmic pulse modulation from consciousness field
+// Rhythmic pulse modulation from visualEffects field
 float rhythmicPulseModulation(float baseValue, float rhythmicPulse, float intensity) {
   return baseValue * (1.0 + rhythmicPulse * intensity);
 }
@@ -95,41 +95,41 @@ float energyResonanceModulation(float baseValue, float energyResonance, float mi
   return baseValue * (minMult + energyResonance * (maxMult - minMult));
 }
 
-// Membrane fluidity effect
-float membraneFluidityEffect(float value, float fluidityIndex) {
+// Surface fluidity effect
+float surfaceFluidityEffect(float value, float fluidityIndex) {
   return mix(value, value * 1.2, fluidityIndex);
 }
 
-// === ADVANCED CONSCIOUSNESS FIELD PATTERNS ===
+// === ADVANCED VISUAL_EFFECTS FIELD PATTERNS ===
 
-// Multi-dimensional consciousness field intensity calculation
-float consciousnessFieldIntensity(vec2 position, float time, float musicEnergy) {
-  // Primary consciousness wave
+// Multi-dimensional visualEffects field intensity calculation
+float visualEffectsFieldIntensity(vec2 position, float time, float musicEnergy) {
+  // Primary visualEffects wave
   float primaryField = snoise(position * 2.0 + time * 0.1) * 0.6;
   
   // Secondary awareness resonance
   float secondaryField = snoise(position * 4.0 + time * 0.05) * 0.3;
   
-  // Musical consciousness enhancement
+  // Musical visualEffects enhancement
   float musicalField = snoise(position * 6.0 + time * 0.15) * 0.2;
   
-  // Combine consciousness layers
+  // Combine visualEffects layers
   float combinedField = primaryField + secondaryField + (musicalField * musicEnergy);
   return clamp(combinedField * 0.5 + 0.5, 0.0, 1.0);
 }
 
 // Multi-dimensional awareness patterns for color modulation
-vec3 awarenessResonance(vec3 baseColor, float consciousnessLevel, float musicIntensity) {
-  // Consciousness-aware color temperature shift
-  float temperatureShift = consciousnessLevel * 0.3;
+vec3 awarenessResonance(vec3 baseColor, float visualEffectsLevel, float musicIntensity) {
+  // VisualEffects-aware color temperature shift
+  float temperatureShift = visualEffectsLevel * 0.3;
   vec3 warmShift = vec3(1.0 + temperatureShift, 1.0 + temperatureShift * 0.5, 1.0);
   vec3 coolShift = vec3(1.0, 1.0 + temperatureShift * 0.3, 1.0 + temperatureShift);
   
   // Musical intensity affects color saturation
   float saturationBoost = 1.0 + musicIntensity * 0.4;
   
-  // Apply consciousness-aware color modulation
-  vec3 temperatureColor = mix(coolShift, warmShift, consciousnessLevel);
+  // Apply visualEffects-aware color modulation
+  vec3 temperatureColor = mix(coolShift, warmShift, visualEffectsLevel);
   return baseColor * temperatureColor * saturationBoost;
 }
 
@@ -141,8 +141,8 @@ vec2 temporalFlowDirection(vec2 position, float time, vec2 musicFlow) {
     cos(time * 0.06 + position.y * 2.5)
   ) * 0.02;
   
-  // Secondary consciousness flow
-  vec2 consciousnessFlow = vec2(
+  // Secondary visualEffects flow
+  vec2 visualEffectsFlow = vec2(
     sin(time * 0.05 + position.y * 4.0),
     cos(time * 0.04 + position.x * 3.5)
   ) * 0.015;
@@ -150,26 +150,26 @@ vec2 temporalFlowDirection(vec2 position, float time, vec2 musicFlow) {
   // Musical synchronization flow
   vec2 musicalSync = musicFlow * 0.01;
   
-  return primaryFlow + consciousnessFlow + musicalSync;
+  return primaryFlow + visualEffectsFlow + musicalSync;
 }
 
-// Membrane consciousness dynamics for organic boundaries
-float membraneConsciousnessFlow(vec2 position, float fluidityIndex, float awarenessLevel) {
-  // Base membrane oscillation
-  float membraneBase = sin(position.x * 8.0 + position.y * 6.0) * 0.1;
+// Surface visualEffects dynamics for smooth boundaries
+float surfaceVisualEffectsFlow(vec2 position, float fluidityIndex, float awarenessLevel) {
+  // Base surface oscillation
+  float surfaceBase = sin(position.x * 8.0 + position.y * 6.0) * 0.1;
   
-  // Consciousness-driven membrane flexibility
-  float consciousnessFlex = awarenessLevel * fluidityIndex * 0.2;
+  // VisualEffects-driven surface flexibility
+  float visualEffectsFlex = awarenessLevel * fluidityIndex * 0.2;
   
-  // Organic membrane breathing
-  float membraneBreath = sin(position.x * 3.0 + position.y * 4.0) * 0.05;
+  // Smooth surface animation
+  float surfaceBreath = sin(position.x * 3.0 + position.y * 4.0) * 0.05;
   
-  return membraneBase + consciousnessFlex + membraneBreath;
+  return surfaceBase + visualEffectsFlex + surfaceBreath;
 }
 
-// Advanced consciousness breathing patterns
-float consciousnessMemoryBreathing(float time, float phase, float memoryIntensity) {
-  // Primary consciousness rhythm
+// Advanced visualEffects animation patterns
+float visualEffectsMemoryPulsing(float time, float phase, float memoryIntensity) {
+  // Primary visualEffects rhythm
   float primaryRhythm = sin(time * 0.03 + phase) * 0.5;
   
   // Memory echo patterns
@@ -212,42 +212,42 @@ float smin(float a, float b, float k) {
   return mix(b, a, h) - k * h * (1.0 - h);
 }
 
-// Enhanced multiple bubble corridors with organic consciousness-aware animations
+// Enhanced multiple bubble corridors with smooth visualEffects-aware animations
 float bubbleCorridors(vec2 uv, float time, float intensity) {
   // ===== ENHANCED PRIMARY BUBBLE APERTURES =====
   // Create 6 main circular apertures arranged in a ring with dynamic bubble count
   float baseBubbleCount = 6.0;
   float dynamicBubbleCount = baseBubbleCount + floor(intensity * 2.0); // 6-8 bubbles based on intensity
-  float ringRadius = 0.28 + sin(time * 0.15) * 0.08; // Breathing ring radius (0.20-0.36)
+  float ringRadius = 0.28 + sin(time * 0.15) * 0.08; // Pulsing ring radius (0.20-0.36)
   
   float minBubbleDistance = 2.0; // Track closest bubble distance
   
-  // Calculate distance to each bubble position with enhanced organic movement
+  // Calculate distance to each bubble position with enhanced smooth movement
   for(float i = 0.0; i < dynamicBubbleCount; i += 1.0) {
-    // Enhanced organic rotation with breathing rhythm
+    // Enhanced smooth rotation with animation rhythm
     float bubbleAngle = (i / dynamicBubbleCount) * 2.0 * 3.14159 + time * 0.08;
     
-    // Add organic spiral motion for consciousness effect
+    // Add smooth spiral motion for visualEffects effect
     float spiralOffset = sin(time * 0.25 + i * 0.6) * 0.15;
     float dynamicRingRadius = ringRadius + spiralOffset;
     
-    // Bubble center position with enhanced organic movement
+    // Bubble center position with enhanced smooth movement
     vec2 bubbleCenter = vec2(0.5) + vec2(
       cos(bubbleAngle) * dynamicRingRadius,
       sin(bubbleAngle) * dynamicRingRadius
     );
     
-    // Enhanced breathing/pulsing animation with multi-frequency modulation
-    float breathingPhase = sin(time * 0.6 + i * 0.8) * 0.04;
-    float organicPhase = sin(time * 0.35 + i * 1.2) * 0.03;
-    float consciousnessPhase = sin(time * 0.18 + i * 0.5) * 0.025;
+    // Enhanced animation/pulsing animation with multi-frequency modulation
+    float animationPhase = sin(time * 0.6 + i * 0.8) * 0.04;
+    float smoothPhase = sin(time * 0.35 + i * 1.2) * 0.03;
+    float visualEffectsPhase = sin(time * 0.18 + i * 0.5) * 0.025;
     
-    vec2 organicMovement = vec2(
-      sin(time * 0.3 + i * 0.7) * (breathingPhase + organicPhase),
-      cos(time * 0.4 + i * 0.9) * (breathingPhase + consciousnessPhase)
+    vec2 smoothMovement = vec2(
+      sin(time * 0.3 + i * 0.7) * (animationPhase + smoothPhase),
+      cos(time * 0.4 + i * 0.9) * (animationPhase + visualEffectsPhase)
     );
     
-    vec2 animatedCenter = bubbleCenter + organicMovement;
+    vec2 animatedCenter = bubbleCenter + smoothMovement;
     
     // Calculate distance from current pixel to this bubble center
     float distanceToBubble = length(uv - animatedCenter);
@@ -258,26 +258,26 @@ float bubbleCorridors(vec2 uv, float time, float intensity) {
   // Enhanced bubble size with multi-wave expansion patterns
   float baseBubbleSize = 0.08 * intensity;
   float primaryPulse = sin(time * 1.5) * 0.35;
-  float organicPulse = sin(time * 0.8) * 0.25;
-  float consciousnessPulse = sin(time * 2.2) * 0.15;
+  float smoothPulse = sin(time * 0.8) * 0.25;
+  float visualEffectsPulse = sin(time * 2.2) * 0.15;
   
-  float expandedBubbleSize = baseBubbleSize * (1.0 + primaryPulse + organicPulse + consciousnessPulse);
+  float expandedBubbleSize = baseBubbleSize * (1.0 + primaryPulse + smoothPulse + visualEffectsPulse);
   
   // Create clean circular apertures with enhanced soft edges
   float primaryBubbleMask = 1.0 - smoothstep(expandedBubbleSize * 0.6, expandedBubbleSize * 1.1, minBubbleDistance);
   
   // ===== ENHANCED SECONDARY BUBBLE LAYER =====
-  // Add smaller secondary bubbles with organic movement
+  // Add smaller secondary bubbles with smooth movement
   float secondaryBubbleCount = 4.0 + floor(intensity * 1.0); // 4-5 secondary bubbles
   float baseSecondaryRadius = 0.15;
   float secondaryRingRadius = baseSecondaryRadius * (1.0 + sin(time * 0.12) * 0.3);
   float minSecondaryDistance = 2.0;
   
   for(float i = 0.0; i < secondaryBubbleCount; i += 1.0) {
-    // Counter-rotating secondary bubbles with organic offset
+    // Counter-rotating secondary bubbles with smooth offset
     float secondaryAngle = (i / secondaryBubbleCount) * 2.0 * 3.14159 - time * 0.15 + 1.57;
     
-    // Add organic wobble to secondary bubble positions
+    // Add smooth wobble to secondary bubble positions
     float wobbleX = sin(time * 0.45 + i * 1.1) * 0.02;
     float wobbleY = cos(time * 0.55 + i * 0.8) * 0.02;
     
@@ -299,32 +299,32 @@ float bubbleCorridors(vec2 uv, float time, float intensity) {
   float centerDistance = length(uv - vec2(0.5));
   float centerPrimaryPulse = sin(time * 2.0) * 0.4;
   float centerSecondaryPulse = sin(time * 3.5) * 0.2;
-  float centerBreathingPulse = sin(time * 0.6) * 0.3;
+  float centerPulsingPulse = sin(time * 0.6) * 0.3;
   
-  float centerBubbleSize = 0.06 * intensity * (1.0 + centerPrimaryPulse + centerSecondaryPulse + centerBreathingPulse);
+  float centerBubbleSize = 0.06 * intensity * (1.0 + centerPrimaryPulse + centerSecondaryPulse + centerPulsingPulse);
   float centerBubbleMask = 1.0 - smoothstep(centerBubbleSize * 0.4, centerBubbleSize * 0.9, centerDistance);
   
   // ===== ENHANCED COMBINATION AND BLENDING =====
-  // Use smooth maximum for organic blending instead of hard max
+  // Use smooth maximum for smooth blending instead of hard max
   float corridorMask = primaryBubbleMask;
   corridorMask = max(corridorMask, secondaryBubbleMask * 0.9);
   corridorMask = max(corridorMask, centerBubbleMask * 1.1); // Center bubble slightly stronger
   
-  // Enhanced radial falloff with organic variation
+  // Enhanced radial falloff with smooth variation
   vec2 center = uv - vec2(0.5);
   float radialDistance = length(center);
-  float organicVariation = sin(time * 0.3 + radialDistance * 8.0) * 0.05;
-  float radialFalloff = 1.0 - smoothstep(0.0, 0.65 + organicVariation, radialDistance);
+  float smoothVariation = sin(time * 0.3 + radialDistance * 8.0) * 0.05;
+  float radialFalloff = 1.0 - smoothstep(0.0, 0.65 + smoothVariation, radialDistance);
   corridorMask *= radialFalloff;
   
-  // Enhanced organic breathing pattern with consciousness harmonics
-  float primaryBreathing = sin(time * 0.4) * 0.15;
-  float secondaryBreathing = sin(time * 0.25) * 0.08;
-  float consciousnessBreathing = sin(time * 0.6) * 0.05;
-  float breathingCycle = 0.85 + primaryBreathing + secondaryBreathing + consciousnessBreathing;
-  corridorMask *= breathingCycle;
+  // Enhanced smooth animation pattern with visualEffects harmonics
+  float primaryPulsing = sin(time * 0.4) * 0.15;
+  float secondaryPulsing = sin(time * 0.25) * 0.08;
+  float visualEffectsPulsing = sin(time * 0.6) * 0.05;
+  float animationCycle = 0.85 + primaryPulsing + secondaryPulsing + visualEffectsPulsing;
+  corridorMask *= animationCycle;
   
-  // Add subtle noise variation for organic consciousness texture
+  // Add subtle noise variation for smooth visualEffects texture
   float noisePattern = sin(radialDistance * 12.0 + time * 0.5) * cos(radialDistance * 8.0 - time * 0.3) * 0.03;
   corridorMask += noisePattern * intensity * 0.5;
   
@@ -419,7 +419,7 @@ vec3 calculateTunnelLighting(vec2 uv, float tunnelMask, vec2 normal, float depth
   float distanceFromCenter = length(uv - vec2(0.5));
   float endLightFalloff = 1.0 / (1.0 + distanceFromCenter * 4.0); // Inverse square falloff
   
-  // Music-responsive light intensity with breathing effect
+  // Music-responsive light intensity with animation effect
   float lightPulse = sin(time * 2.0) * 0.3 + 0.7;
   float endLightIntensity = intensity * lightPulse * endLightFalloff;
   
@@ -455,7 +455,7 @@ float dungeonCorridorTunnels(vec2 uv, float time, float intensity) {
   for(float i = 0.0; i < corridorCount; i += 1.0) {
     float corridorAngle = (i / corridorCount) * 2.0 * 3.14159 + time * 0.05;
     
-    // Corridor center position with slight offset for organic feel
+    // Corridor center position with slight offset for smooth feel
     vec2 corridorOffset = vec2(
       cos(corridorAngle) * 0.25,
       sin(corridorAngle) * 0.25
@@ -511,14 +511,14 @@ float dungeonCorridorTunnels(vec2 uv, float time, float intensity) {
   float radialFalloff = 1.0 - smoothstep(0.2, 0.8, radialDistance);
   
   // ===== ORGANIC BREATHING PATTERN =====
-  float breathingCycle = 0.9 + sin(time * 0.4) * 0.1;
+  float animationCycle = 0.9 + sin(time * 0.4) * 0.1;
   
-  return clamp(combinedMask * radialFalloff * breathingCycle, 0.0, 1.0);
+  return clamp(combinedMask * radialFalloff * animationCycle, 0.0, 1.0);
 }
 
 // Enhanced corridor gradient reveal with advanced dual-layer blending
 vec4 corridorGradientReveal(vec2 uv, sampler2D gradientTex, float corridorMask, float time, float intensity) {
-  // ===== ENHANCED BASE LAYER: Musical flow with consciousness awareness =====
+  // ===== ENHANCED BASE LAYER: Musical flow with visualEffects awareness =====
   vec2 baseFlowUV = uv;
   vec2 flowDirection = normalize(vec2(1.0, 0.0));
   
@@ -527,12 +527,12 @@ vec4 corridorGradientReveal(vec2 uv, sampler2D gradientTex, float corridorMask, 
     flowDirection = normalize(u_musicalFlow.xy + vec2(0.001, 0.0));
   #endif
   
-  // Multi-layered flow animation with consciousness patterns
+  // Multi-layered flow animation with visualEffects patterns
   float primaryFlow = sin(time * 0.1) * 0.02;
-  float organicFlow = sin(time * 0.07) * 0.015;
-  float consciousnessFlow = sin(time * 0.13) * 0.008;
+  float smoothFlow = sin(time * 0.07) * 0.015;
+  float visualEffectsFlow = sin(time * 0.13) * 0.008;
   
-  baseFlowUV += flowDirection * (primaryFlow + organicFlow + consciousnessFlow);
+  baseFlowUV += flowDirection * (primaryFlow + smoothFlow + visualEffectsFlow);
   vec4 baseGradient = texture(gradientTex, vec2(baseFlowUV.x, 0.5));
   
   // Enhanced base layer with depth awareness
@@ -547,21 +547,21 @@ vec4 corridorGradientReveal(vec2 uv, sampler2D gradientTex, float corridorMask, 
   // Advanced inward flow with multi-phase animation
   float primaryInwardPhase = time * 0.15 + radius * 6.0;
   float secondaryInwardPhase = time * 0.08 + radius * 4.5;
-  float consciousnessInwardPhase = time * 0.22 + radius * 8.0;
+  float visualEffectsInwardPhase = time * 0.22 + radius * 8.0;
   
   // Multi-layered inward flow combining multiple patterns
   float primaryInwardFlow = radius - (sin(primaryInwardPhase) * 0.1);
   float secondaryInwardFlow = radius - (cos(secondaryInwardPhase) * 0.06);
-  float consciousnessInwardFlow = radius - (sin(consciousnessInwardPhase) * 0.04);
+  float visualEffectsInwardFlow = radius - (sin(visualEffectsInwardPhase) * 0.04);
   
   float combinedInwardFlow = mix(
     mix(primaryInwardFlow, secondaryInwardFlow, 0.3),
-    consciousnessInwardFlow, 0.2
+    visualEffectsInwardFlow, 0.2
   );
   
   // Enhanced gradient sampling with dual-layer coordination
   vec2 corridorFlowUV = vec2(
-    fract(angle / (2.0 * 3.14159) + time * 0.02), // Slow rotation for organic feel
+    fract(angle / (2.0 * 3.14159) + time * 0.02), // Slow rotation for smooth feel
     clamp(combinedInwardFlow, 0.0, 1.0)
   );
   vec4 corridorGradient = texture(gradientTex, corridorFlowUV);
@@ -569,33 +569,33 @@ vec4 corridorGradientReveal(vec2 uv, sampler2D gradientTex, float corridorMask, 
   // ===== ADVANCED DEPTH AND PERSPECTIVE =====
   float depth = calculatePerspectiveDepth(uv, time, intensity);
   
-  // Enhanced tunnel brightness with organic variation
-  float organicBrightnessVariation = sin(angle * 3.0 + time * 0.3) * 0.1;
-  float tunnelBrightness = 1.0 + depth * 0.9 + organicBrightnessVariation;
+  // Enhanced tunnel brightness with smooth variation
+  float smoothBrightnessVariation = sin(angle * 3.0 + time * 0.3) * 0.1;
+  float tunnelBrightness = 1.0 + depth * 0.9 + smoothBrightnessVariation;
   corridorGradient.rgb *= tunnelBrightness;
   
-  // Advanced color shift with consciousness-aware color temperature
+  // Advanced color shift with visualEffects-aware color temperature
   vec3 warmShift = vec3(1.15, 1.05, 0.85); // Warm center
   vec3 coolShift = vec3(0.9, 1.0, 1.1);    // Cool edges
   vec3 colorTemperature = mix(coolShift, warmShift, depth);
   corridorGradient.rgb = mix(corridorGradient.rgb, corridorGradient.rgb * colorTemperature, depth * 0.4);
   
   // ===== ENHANCED DUAL-LAYER BLENDING =====
-  // Multi-stage aperture masking for organic blending
+  // Multi-stage aperture masking for smooth blending
   float softApertureMask = smoothstep(0.2, 0.8, corridorMask);
   float sharpApertureMask = smoothstep(0.4, 0.6, corridorMask);
-  float organicApertureMask = mix(softApertureMask, sharpApertureMask, 0.6);
+  float smoothApertureMask = mix(softApertureMask, sharpApertureMask, 0.6);
   
-  // Enhanced blending with consciousness-aware mixing
-  float consciousnessBlendFactor = 0.7 + sin(time * 0.4 + radius * 4.0) * 0.2;
-  float dynamicIntensity = intensity * consciousnessBlendFactor;
+  // Enhanced blending with visualEffects-aware mixing
+  float visualEffectsBlendFactor = 0.7 + sin(time * 0.4 + radius * 4.0) * 0.2;
+  float dynamicIntensity = intensity * visualEffectsBlendFactor;
   
   // Primary blend: base and corridor layers
-  vec4 primaryBlend = mix(baseGradient, corridorGradient, organicApertureMask * dynamicIntensity);
+  vec4 primaryBlend = mix(baseGradient, corridorGradient, smoothApertureMask * dynamicIntensity);
   
   // ===== ADVANCED APERTURE EFFECTS =====
-  // Enhanced rim lighting with organic variation 
-  float rimLightBase = corridorMask * (1.0 - organicApertureMask);
+  // Enhanced rim lighting with smooth variation 
+  float rimLightBase = corridorMask * (1.0 - smoothApertureMask);
   float rimLightVariation = sin(angle * 4.0 + time * 0.5) * 0.3 + 0.7;
   float enhancedRimLight = rimLightBase * rimLightVariation * 0.6;
   
@@ -603,12 +603,12 @@ vec4 corridorGradientReveal(vec2 uv, sampler2D gradientTex, float corridorMask, 
   float apertureGlow = softApertureMask * (1.0 - sharpApertureMask) * 0.4;
   vec3 glowColor = corridorGradient.rgb * 1.2;
   
-  // ===== CONSCIOUSNESS-AWARE COLOR HARMONIZATION =====
-  // Harmonize colors between layers for organic consciousness effect
+  // ===== VISUAL_EFFECTS-AWARE COLOR HARMONIZATION =====
+  // Harmonize colors between layers for smooth visualEffects effect
   vec3 harmonizedColor = mix(
     primaryBlend.rgb,
     (primaryBlend.rgb + corridorGradient.rgb) * 0.5,
-    organicApertureMask * 0.3
+    smoothApertureMask * 0.3
   );
   
   // Final composition with enhanced rim and glow effects
@@ -616,9 +616,9 @@ vec4 corridorGradientReveal(vec2 uv, sampler2D gradientTex, float corridorMask, 
   finalColor.rgb += vec3(enhancedRimLight) * dynamicIntensity;
   finalColor.rgb += glowColor * apertureGlow * dynamicIntensity;
   
-  // Organic breathing effect for consciousness integration
-  float breathingCycle = 0.95 + sin(time * 0.3) * 0.05;
-  finalColor.rgb *= breathingCycle;
+  // Smooth animation effect for visualEffects integration
+  float animationCycle = 0.95 + sin(time * 0.3) * 0.05;
+  finalColor.rgb *= animationCycle;
   
   return finalColor;
 }
@@ -712,35 +712,35 @@ vec4 dungeonCorridorGradientReveal(vec2 uv, sampler2D gradientTex, float corrido
 }`;
 
 /**
- * Common uniform declarations for consciousness systems
+ * Common uniform declarations for visualEffects systems
  */
-export const STANDARD_CONSCIOUSNESS_UNIFORMS = `
+export const STANDARD_VISUAL_EFFECTS_UNIFORMS = `
 // Time and resolution (universal)
 uniform float u_time;
 uniform vec2 u_resolution;
 
-// Enhanced consciousness field uniforms
+// Enhanced visualEffects field uniforms
 uniform float u_rhythmicPulse;
 uniform vec2 u_musicalFlow;
 uniform float u_energyResonance;
-uniform float u_breathingCycle;
-uniform float u_membraneFluidityIndex;
+uniform float u_animationCycle;
+uniform float u_surfaceFluidityIndex;
 
-// Advanced consciousness control uniforms
-uniform float u_consciousnessLevel;        // 0-1 current consciousness intensity
+// Advanced visualEffects control uniforms
+uniform float u_visualEffectsLevel;        // 0-1 current visualEffects intensity
 uniform float u_awarenessLevel;           // 0-1 current awareness depth
 uniform float u_emotionalIntensity;       // 0-1 emotional resonance strength
-uniform float u_memoryIntensity;          // 0-1 consciousness memory patterns
+uniform float u_memoryIntensity;          // 0-1 visualEffects memory patterns
 uniform vec2 u_temporalFlowDirection;     // Year 3000 temporal stream direction
-uniform float u_consciousnessTemperature; // Color temperature shift from consciousness
+uniform float u_visualEffectsTemperature; // Color temperature shift from visualEffects
 
 // Enhanced music sync uniforms
 uniform float u_musicEnergy;
 uniform float u_musicValence;
 uniform float u_beatIntensity;
 uniform float u_bassResponse;
-uniform float u_musicalConsciousnessSync; // Music-consciousness synchronization level
-uniform float u_genreConsciousnessShift;  // Genre-specific consciousness adjustments
+uniform float u_musicalVisualEffectsSync; // Music-visualEffects synchronization level
+uniform float u_genreVisualEffectsShift;  // Genre-specific visualEffects adjustments
 
 // Corridor-specific uniforms
 uniform float u_corridorIntensity;
@@ -760,7 +760,7 @@ uniform vec3 u_wallColor;`;
 // ===================================================================
 
 /**
- * Shader template builder for consciousness systems
+ * Shader template builder for visualEffects systems
  * Eliminates duplicate shader construction patterns
  */
 export class ShaderTemplate {
@@ -773,7 +773,7 @@ export class ShaderTemplate {
     additionalFunctions?: string;
     mainShaderLogic: string;
     includeNoiseFunctions?: boolean;
-    includeConsciousnessFunctions?: boolean;
+    includeVisualEffectsFunctions?: boolean;
     includeCorridorFunctions?: boolean;
   }): string {
     const {
@@ -782,14 +782,14 @@ export class ShaderTemplate {
       additionalFunctions = '',
       mainShaderLogic,
       includeNoiseFunctions = true,
-      includeConsciousnessFunctions = true,
+      includeVisualEffectsFunctions = true,
       includeCorridorFunctions = false
     } = options;
 
     let shader = `#version 300 es\n${precision}\n\n`;
     
-    // Add standard consciousness uniforms
-    shader += STANDARD_CONSCIOUSNESS_UNIFORMS + '\n\n';
+    // Add standard visualEffects uniforms
+    shader += STANDARD_VISUAL_EFFECTS_UNIFORMS + '\n\n';
     
     // Add additional uniforms if provided
     if (additionalUniforms) {
@@ -804,9 +804,9 @@ export class ShaderTemplate {
       shader += SHARED_NOISE_FUNCTIONS + '\n\n';
     }
     
-    // Add consciousness modulation functions if requested
-    if (includeConsciousnessFunctions) {
-      shader += CONSCIOUSNESS_MODULATION_FUNCTIONS + '\n\n';
+    // Add visualEffects modulation functions if requested
+    if (includeVisualEffectsFunctions) {
+      shader += VISUAL_EFFECTS_MODULATION_FUNCTIONS + '\n\n';
     }
     
     // Add corridor SDF functions if requested
@@ -829,16 +829,16 @@ export class ShaderTemplate {
   }
 
   /**
-   * Generate enhanced standard uniform names list for consciousness systems
+   * Generate enhanced standard uniform names list for visualEffects systems
    */
   public static getStandardUniformNames(): string[] {
     return [
       'u_time', 'u_resolution', 'u_rhythmicPulse', 'u_musicalFlow',
-      'u_energyResonance', 'u_breathingCycle', 'u_membraneFluidityIndex',
-      'u_consciousnessLevel', 'u_awarenessLevel', 'u_emotionalIntensity', 'u_memoryIntensity',
-      'u_temporalFlowDirection', 'u_consciousnessTemperature',
+      'u_energyResonance', 'u_animationCycle', 'u_surfaceFluidityIndex',
+      'u_visualEffectsLevel', 'u_awarenessLevel', 'u_emotionalIntensity', 'u_memoryIntensity',
+      'u_temporalFlowDirection', 'u_visualEffectsTemperature',
       'u_musicEnergy', 'u_musicValence', 'u_beatIntensity', 'u_bassResponse',
-      'u_musicalConsciousnessSync', 'u_genreConsciousnessShift'
+      'u_musicalVisualEffectsSync', 'u_genreVisualEffectsShift'
     ];
   }
 
@@ -861,8 +861,8 @@ export class ShaderTemplate {
     return [
       ...this.getStandardUniformNames(),
       'u_gradientTex', 'u_flowStrength', 'u_noiseScale', 'u_liquidPhase',
-      'u_breathingIntensity', 'u_auroraFlow', 'u_flowDirection',
-      'u_liquidTurbulence', 'u_consciousnessDepth', 'u_waveY',
+      'u_animationIntensity', 'u_auroraFlow', 'u_flowDirection',
+      'u_liquidTurbulence', 'u_visualEffectsDepth', 'u_waveY',
       'u_waveHeight', 'u_waveOffset', 'u_blurExp', 'u_blurMax'
     ];
   }
@@ -873,9 +873,9 @@ export class ShaderTemplate {
    */
   public static getCorridorUniformNames(): string[] {
     return [
-      // Standard consciousness uniforms
+      // Standard visualEffects uniforms
       'u_time', 'u_resolution', 'u_gradientTex',
-      'u_rhythmicPulse', 'u_musicalFlow', 'u_energyResonance', 'u_breathingCycle', 'u_membraneFluidityIndex',
+      'u_rhythmicPulse', 'u_musicalFlow', 'u_energyResonance', 'u_animationCycle', 'u_surfaceFluidityIndex',
       'u_musicEnergy', 'u_musicValence', 'u_beatIntensity', 'u_bassResponse',
       // Corridor-specific uniforms
       'u_corridorIntensity', 'u_corridorFlowStrength', 'u_corridorDepthEffect', 'u_corridorBubbleScale'
@@ -901,7 +901,7 @@ export class ShaderTemplate {
 // ===================================================================
 
 /**
- * Common shader logic patterns used across consciousness systems
+ * Common shader logic patterns used across visualEffects systems
  */
 export class ShaderLogicPatterns {
   /**
@@ -917,12 +917,12 @@ export class ShaderLogicPatterns {
   vec2 temporalFlow = temporalFlowDirection(uv, u_time, u_temporalFlowDirection);
   flowDirection += temporalFlow;
   
-  // Apply enhanced breathing modulation with emotional resonance
-  float breathingMod = deepConsciousnessBreathing(u_time, 0.0, u_emotionalIntensity);
-  flowStrength *= (1.0 + breathingMod);
+  // Apply enhanced animation modulation with emotional resonance
+  float animationMod = deepVisualEffectsPulsing(u_time, 0.0, u_emotionalIntensity);
+  flowStrength *= (1.0 + animationMod);
   
-  // Apply consciousness field intensity
-  float fieldIntensity = consciousnessFieldIntensity(uv, u_time, u_musicEnergy);
+  // Apply visualEffects field intensity
+  float fieldIntensity = visualEffectsFieldIntensity(uv, u_time, u_musicEnergy);
   flowStrength *= (0.5 + fieldIntensity * 0.5);`;
   }
 
@@ -934,37 +934,37 @@ export class ShaderLogicPatterns {
   // Generate enhanced audio-modulated noise
   vec2 noiseUV = uv + flowDirection * u_time * 0.03;
   
-  // Multi-layered consciousness noise patterns
+  // Multi-layered visualEffects noise patterns
   float noise1 = snoise(noiseUV * 2.0);
   float noise2 = snoise(noiseUV * 4.0) * 0.5;
   float memoryNoise = snoise(noiseUV * 1.5 + u_time * 0.01) * u_memoryIntensity * 0.3;
   
-  // Apply consciousness field modulation
-  float consciousnessModulation = consciousnessFieldIntensity(noiseUV, u_time, u_musicEnergy);
+  // Apply visualEffects field modulation
+  float visualEffectsModulation = visualEffectsFieldIntensity(noiseUV, u_time, u_musicEnergy);
   
-  // Combine noise with enhanced consciousness influence
+  // Combine noise with enhanced visualEffects influence
   float t = (noise1 + noise2 + memoryNoise) * energyResonanceModulation(1.0, u_energyResonance, 0.5, 1.5);
-  t *= consciousnessModulation;
+  t *= visualEffectsModulation;
   t = clamp(t * 0.5 + 0.5, 0.0, 1.0);`;
   }
 
   /**
-   * Enhanced consciousness-aware vignette with membrane dynamics
+   * Enhanced visualEffects-aware vignette with surface dynamics
    */
-  public static consciousnessVignette(): string {
+  public static visualEffectsVignette(): string {
     return `
-  // Apply enhanced consciousness-aware vignette
+  // Apply enhanced visualEffects-aware vignette
   vec2 center = uv - 0.5;
-  float breathing = deepConsciousnessBreathing(u_time, u_breathingCycle, u_emotionalIntensity);
+  float animation = deepVisualEffectsPulsing(u_time, u_animationCycle, u_emotionalIntensity);
   
-  // Add membrane consciousness flow for organic boundaries
-  float membraneFlow = membraneConsciousnessFlow(uv, u_membraneFluidityIndex, u_awarenessLevel);
+  // Add surface visualEffects flow for smooth boundaries
+  float surfaceFlow = surfaceVisualEffectsFlow(uv, u_surfaceFluidityIndex, u_awarenessLevel);
   
-  // Calculate consciousness-aware vignette with membrane dynamics
-  float vignette = (0.9 + breathing + membraneFlow) - dot(center, center) * 0.3;
+  // Calculate visualEffects-aware vignette with surface dynamics
+  float vignette = (0.9 + animation + surfaceFlow) - dot(center, center) * 0.3;
   
   // Apply awareness resonance to color
-  color.rgb = awarenessResonance(color.rgb, u_consciousnessLevel, u_musicEnergy);
+  color.rgb = awarenessResonance(color.rgb, u_visualEffectsLevel, u_musicEnergy);
   color.rgb *= vignette;`;
   }
 
@@ -991,11 +991,11 @@ export class ShaderLogicPatterns {
 }
 
 // ===================================================================
-// CONSCIOUSNESS-SPECIFIC SHADER FRAGMENTS
+// VISUAL_EFFECTS-SPECIFIC SHADER FRAGMENTS
 // ===================================================================
 
 /**
- * Reusable shader fragments for different consciousness effects
+ * Reusable shader fragments for different visualEffects effects
  */
 export class AdvancedShaderLibrary {
   /**
@@ -1012,8 +1012,8 @@ export class AdvancedShaderLibrary {
   // Sample gradient texture
   vec4 color = texture(u_gradientTex, vec2(t, 0.5));
   
-  // Apply consciousness effects
-  ${ShaderLogicPatterns.consciousnessVignette()}
+  // Apply visualEffects effects
+  ${ShaderLogicPatterns.visualEffectsVignette()}
   ${ShaderLogicPatterns.musicResponsiveAlpha()}
   
   fragColor = color;`;
@@ -1032,7 +1032,7 @@ export class AdvancedShaderLibrary {
   vec2 turbulenceUV = uv * u_liquidTurbulence;
   float turbulence = snoise(turbulenceUV + u_time * 0.01);
   
-  // Liquid consciousness noise
+  // Liquid visualEffects noise
   vec2 liquidUV = uv + flowDirection * u_time * 0.03;
   liquidUV += vec2(sin(u_time * 0.04 + liquidPhase), cos(u_time * 0.03 + liquidPhase)) * 0.02;
   float liquidNoise = snoise(liquidUV * 2.0 + turbulence * 0.1);
@@ -1040,7 +1040,7 @@ export class AdvancedShaderLibrary {
   float t = clamp(liquidNoise * 0.5 + 0.5, 0.0, 1.0);
   vec4 color = texture(u_gradientTex, vec2(t, 0.5));
   
-  ${ShaderLogicPatterns.consciousnessVignette()}
+  ${ShaderLogicPatterns.visualEffectsVignette()}
   ${ShaderLogicPatterns.auroraShimmerEffect()}
   ${ShaderLogicPatterns.musicResponsiveAlpha()}
   
@@ -1048,7 +1048,7 @@ export class AdvancedShaderLibrary {
   }
 
   /**
-   * Corridor bubble consciousness fragment
+   * Corridor bubble visualEffects fragment
    * Inward-flowing corridor effect with bubble apertures
    */
   public static corridorBubbleFragment(): string {
@@ -1064,8 +1064,8 @@ export class AdvancedShaderLibrary {
   // Generate corridor gradient reveal effect
   vec4 color = corridorGradientReveal(uv, u_gradientTex, corridorMask, u_time, u_corridorIntensity);
   
-  // Apply consciousness effects
-  ${ShaderLogicPatterns.consciousnessVignette()}
+  // Apply visualEffects effects
+  ${ShaderLogicPatterns.visualEffectsVignette()}
   
   // Enhanced music responsiveness for corridor effects
   float corridorMusicAlpha = 0.85 + u_beatIntensity * 0.15 + u_bassResponse * 0.05;
@@ -1079,7 +1079,7 @@ export class AdvancedShaderLibrary {
   }
 
   /**
-   * Dungeon corridor consciousness fragment
+   * Dungeon corridor visualEffects fragment
    * Advanced tunnel corridors with realistic lighting and magical light sources  
    */
   public static dungeonCorridorFragment(): string {
@@ -1095,8 +1095,8 @@ export class AdvancedShaderLibrary {
   // Generate advanced dungeon corridor gradient reveal effect with realistic lighting
   vec4 color = dungeonCorridorGradientReveal(uv, u_gradientTex, corridorMask, u_time, u_corridorIntensity);
   
-  // Apply consciousness effects for organic integration
-  ${ShaderLogicPatterns.consciousnessVignette()}
+  // Apply visualEffects effects for smooth integration
+  ${ShaderLogicPatterns.visualEffectsVignette()}
   
   // Enhanced music responsiveness for dungeon atmosphere
   float dungeonMusicAlpha = 0.9 + u_beatIntensity * 0.1 + u_bassResponse * 0.05;
@@ -1114,83 +1114,83 @@ export class AdvancedShaderLibrary {
   }
 
   /**
-   * Advanced consciousness field fragment
-   * Multi-dimensional consciousness patterns with Year 3000 temporal effects
+   * Advanced visualEffects field fragment
+   * Multi-dimensional visualEffects patterns with Year 3000 temporal effects
    */
-  public static advancedConsciousnessFieldFragment(): string {
+  public static advancedVisualEffectsFieldFragment(): string {
     return `
   ${ShaderLogicPatterns.musicFlowLogic()}
   
-  // Calculate multi-dimensional consciousness field
-  float consciousnessField = consciousnessFieldIntensity(uv, u_time, u_musicEnergy);
+  // Calculate multi-dimensional visualEffects field
+  float visualEffectsField = visualEffectsFieldIntensity(uv, u_time, u_musicEnergy);
   
   // Apply temporal flow effects for Year 3000 streaming
   vec2 temporalUV = uv + temporalFlowDirection(uv, u_time, u_temporalFlowDirection);
   
-  // Enhanced consciousness noise sampling with memory patterns
+  // Enhanced visualEffects noise sampling with memory patterns
   ${ShaderLogicPatterns.audioNoiseSampling()}
   
-  // Sample gradient with consciousness field modulation
-  vec4 color = texture(u_gradientTex, vec2(t * consciousnessField, 0.5));
+  // Sample gradient with visualEffects field modulation
+  vec4 color = texture(u_gradientTex, vec2(t * visualEffectsField, 0.5));
   
-  // Apply awareness resonance for consciousness-aware color
-  color.rgb = awarenessResonance(color.rgb, u_consciousnessLevel, u_musicEnergy);
+  // Apply awareness resonance for visualEffects-aware color
+  color.rgb = awarenessResonance(color.rgb, u_visualEffectsLevel, u_musicEnergy);
   
-  // Enhanced membrane consciousness effects
-  float membraneEffect = membraneConsciousnessFlow(temporalUV, u_membraneFluidityIndex, u_awarenessLevel);
-  color.rgb *= (1.0 + membraneEffect * 0.3);
+  // Enhanced surface visualEffects effects
+  float surfaceEffect = surfaceVisualEffectsFlow(temporalUV, u_surfaceFluidityIndex, u_awarenessLevel);
+  color.rgb *= (1.0 + surfaceEffect * 0.3);
   
-  // Apply consciousness memory breathing
-  float memoryBreathing = consciousnessMemoryBreathing(u_time, u_breathingCycle, u_memoryIntensity);
-  color.a *= (0.8 + memoryBreathing * 0.2 + u_beatIntensity * 0.1);
+  // Apply visualEffects memory animation
+  float memoryPulsing = visualEffectsMemoryPulsing(u_time, u_animationCycle, u_memoryIntensity);
+  color.a *= (0.8 + memoryPulsing * 0.2 + u_beatIntensity * 0.1);
   
-  // Enhanced consciousness vignette
-  ${ShaderLogicPatterns.consciousnessVignette()}
+  // Enhanced visualEffects vignette
+  ${ShaderLogicPatterns.visualEffectsVignette()}
   
   fragColor = color;`;
   }
 
   /**
-   * Membrane consciousness dynamics fragment
-   * Organic boundary system with consciousness-aware membrane behavior
+   * Surface visualEffects dynamics fragment
+   * Smooth boundary system with visualEffects-aware surface behavior
    */
-  public static membraneConsciousnessDynamicsFragment(): string {
+  public static surfaceVisualEffectsDynamicsFragment(): string {
     return `
   ${ShaderLogicPatterns.musicFlowLogic()}
   
-  // Calculate membrane consciousness position with flow
-  vec2 membraneUV = uv;
-  membraneUV += temporalFlowDirection(uv, u_time, u_temporalFlowDirection);
+  // Calculate surface visualEffects position with flow
+  vec2 surfaceUV = uv;
+  surfaceUV += temporalFlowDirection(uv, u_time, u_temporalFlowDirection);
   
-  // Apply membrane consciousness flow for organic boundaries
-  float membraneFlow = membraneConsciousnessFlow(membraneUV, u_membraneFluidityIndex, u_awarenessLevel);
-  membraneUV += vec2(membraneFlow * 0.02);
+  // Apply surface visualEffects flow for smooth boundaries
+  float surfaceFlow = surfaceVisualEffectsFlow(surfaceUV, u_surfaceFluidityIndex, u_awarenessLevel);
+  surfaceUV += vec2(surfaceFlow * 0.02);
   
-  // Enhanced noise sampling with membrane distortion
-  vec2 noiseUV = membraneUV + flowDirection * u_time * 0.03;
-  float membraneNoise = snoise(noiseUV * 3.0 + membraneFlow);
-  float consciousnessNoise = snoise(noiseUV * 1.5) * u_consciousnessLevel;
+  // Enhanced noise sampling with surface distortion
+  vec2 noiseUV = surfaceUV + flowDirection * u_time * 0.03;
+  float surfaceNoise = snoise(noiseUV * 3.0 + surfaceFlow);
+  float visualEffectsNoise = snoise(noiseUV * 1.5) * u_visualEffectsLevel;
   
-  // Combine membrane and consciousness noise
-  float t = (membraneNoise * 0.6 + consciousnessNoise * 0.4) * 0.5 + 0.5;
+  // Combine surface and visualEffects noise
+  float t = (surfaceNoise * 0.6 + visualEffectsNoise * 0.4) * 0.5 + 0.5;
   t = clamp(t, 0.0, 1.0);
   
-  // Sample gradient with membrane consciousness modulation
+  // Sample gradient with surface visualEffects modulation
   vec4 color = texture(u_gradientTex, vec2(t, 0.5));
   
-  // Apply consciousness field influence to membrane
-  float fieldInfluence = consciousnessFieldIntensity(membraneUV, u_time, u_musicEnergy);
+  // Apply visualEffects field influence to surface
+  float fieldInfluence = visualEffectsFieldIntensity(surfaceUV, u_time, u_musicEnergy);
   color.rgb = awarenessResonance(color.rgb, fieldInfluence, u_musicEnergy);
   
-  // Enhanced membrane breathing with emotional resonance
-  float membraneBreathing = deepConsciousnessBreathing(u_time, u_breathingCycle, u_emotionalIntensity);
-  color.rgb *= (0.9 + membraneBreathing * 0.2 + membraneFlow * 0.1);
+  // Enhanced surface animation with emotional resonance
+  float surfacePulsing = deepVisualEffectsPulsing(u_time, u_animationCycle, u_emotionalIntensity);
+  color.rgb *= (0.9 + surfacePulsing * 0.2 + surfaceFlow * 0.1);
   
-  // Musical consciousness synchronization
-  color.a *= (0.85 + u_musicalConsciousnessSync * 0.15 + u_beatIntensity * 0.1);
+  // Musical visualEffects synchronization
+  color.a *= (0.85 + u_musicalVisualEffectsSync * 0.15 + u_beatIntensity * 0.1);
   
-  // Apply enhanced vignette with membrane dynamics
-  ${ShaderLogicPatterns.consciousnessVignette()}
+  // Apply enhanced vignette with surface dynamics
+  ${ShaderLogicPatterns.visualEffectsVignette()}
   
   fragColor = color;`;
   }
@@ -1223,7 +1223,7 @@ export class ShaderOptimizationUtils {
           .replace(/\* 0\.0[1-9]/g, '* 0.02'); // Reduce animation frequencies
         
       case 'low':
-        // Minimal effects, basic consciousness response
+        // Minimal effects, basic visualEffects response
         return baseShaderLogic
           .replace(/snoise\(.*?\) \* 0\.[0-9]+/g, '0.5') // Replace noise with constants
           .replace(/sin\(.*?\) \* 0\.[0-9]+/g, '0.0'); // Remove sine calculations
@@ -1254,10 +1254,10 @@ export class ShaderOptimizationUtils {
   public static generateFallbackShader(): string {
     return ShaderTemplate.buildFragmentShader({
       includeNoiseFunctions: false,
-      includeConsciousnessFunctions: false,
+      includeVisualEffectsFunctions: false,
       additionalUniforms: 'uniform sampler2D u_gradientTex;',
       mainShaderLogic: `
-  // Minimal fallback consciousness shader
+  // Minimal fallback visualEffects shader
   float t = uv.x + sin(u_time * 0.5 + u_rhythmicPulse) * 0.1;
   t = clamp(t, 0.0, 1.0);
   
@@ -1274,21 +1274,21 @@ export class ShaderOptimizationUtils {
 // ===================================================================
 
 /**
- * Complete shader library export for consciousness systems
+ * Complete shader library export for visualEffects systems
  */
 /**
- * Enhanced shader library with advanced consciousness patterns
+ * Enhanced shader library with advanced visualEffects patterns
  */
-export const CONSCIOUSNESS_SHADER_LIBRARY = {
+export const VISUAL_EFFECTS_SHADER_LIBRARY = {
   // Templates and builders
   Template: ShaderTemplate,
   
   // Shared components
   VERTEX_SHADER: STANDARD_VISUAL_EFFECTS_VERTEX_SHADER,
   NOISE_FUNCTIONS: SHARED_NOISE_FUNCTIONS,
-  CONSCIOUSNESS_FUNCTIONS: CONSCIOUSNESS_MODULATION_FUNCTIONS,
+  VISUAL_EFFECTS_FUNCTIONS: VISUAL_EFFECTS_MODULATION_FUNCTIONS,
   CORRIDOR_FUNCTIONS: CORRIDOR_SDF_FUNCTIONS,
-  STANDARD_UNIFORMS: STANDARD_CONSCIOUSNESS_UNIFORMS,
+  STANDARD_UNIFORMS: STANDARD_VISUAL_EFFECTS_UNIFORMS,
   
   // Logic patterns
   LogicPatterns: ShaderLogicPatterns,
@@ -1299,23 +1299,23 @@ export const CONSCIOUSNESS_SHADER_LIBRARY = {
   // Optimization utilities
   Optimization: ShaderOptimizationUtils,
   
-  // Advanced consciousness effects
+  // Advanced visualEffects effects
   AdvancedEffects: {
-    CONSCIOUSNESS_FIELD_PATTERNS: [
-      'consciousnessFieldIntensity',
+    VISUAL_EFFECTS_FIELD_PATTERNS: [
+      'visualEffectsFieldIntensity',
       'awarenessResonance', 
       'temporalFlowDirection',
-      'membraneConsciousnessFlow',
-      'consciousnessMemoryBreathing'
+      'surfaceVisualEffectsFlow',
+      'visualEffectsMemoryPulsing'
     ],
     YEAR_3000_PATTERNS: [
       'temporalFlowDirection',
-      'consciousnessMemoryBreathing',
-      'deepConsciousnessBreathing'
+      'visualEffectsMemoryPulsing',
+      'deepVisualEffectsPulsing'
     ],
     MEMBRANE_DYNAMICS: [
-      'membraneConsciousnessFlow',
-      'membraneFluidityEffect'
+      'surfaceVisualEffectsFlow',
+      'surfaceFluidityEffect'
     ]
   }
 };

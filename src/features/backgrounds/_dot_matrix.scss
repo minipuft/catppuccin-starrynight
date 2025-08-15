@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
-// ⭐ YEAR 3000 STELLAR CONSTELLATION MODE (Mode 2)
+// ⭐ YEAR 3000 STELLAR NAVIGATION MODE (Mode 2)
 // Subtle grid-spacing oscillation + gentle card drift driven by beat sync.
-// Activated when <body> (or parent) carries data-layout="constellation".
+// Activated when <body> (or parent) carries data-layout="navigation".
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @use "../../core/_mixins" as *;
@@ -9,19 +9,19 @@
 // ─── Tunable Variables ─────────────────────────────────────────────────────────
 :root {
   // Base gap size for the feed grid
-  --stellar-gap-base: 24px;
+  --interface-gap-base: 24px;
   // How much the gap can expand/contract with beat intensity (keep subtle)
-  --stellar-gap-range: 6px;
+  --interface-gap-range: 6px;
   // Maximum per-card drift distance (px)
-  --stellar-drift-range: 2px;
+  --interface-drift-range: 2px;
 }
 
-// ─── Constellation Grid Behaviour ─────────────────────────────────────────────
-// Only when constellation mode is enabled
-[data-layout="constellation"] {
+// ─── Navigation Grid Behaviour ─────────────────────────────────────────────
+// Only when navigation mode is enabled
+[data-layout="navigation"] {
   // Main grid container breathing with music
   .main-gridContainer-gridContainer {
-    //Gaposcillateswithbeatintensity→elegant"breathing"gap: calc(      var(--stellar-gap-base) +      (var(--stellar-gap-range) * var(--sn-beat-pulse-intensity, 0))    );
+    //Gaposcillateswithbeatintensity→elegant"breathing"gap: calc(      var(--interface-gap-base) +      (var(--interface-gap-range) * var(--sn-beat-pulse-intensity, 0))    );
     transition: gap 400ms var(--sn-easing-explorer, ease-out);
     //Slightoverallscaleusingexistingbreathingvariabletransform: scale(var(--sn-breathing-scale, 1));
     transform-origin: center;
@@ -35,8 +35,8 @@
   .main-gridContainer-gridContainer .main-card-card {
     // Vertical drift ties to rhythm phase; horizontal ties to intensity
     transform: translate3d(
-        calc(var(--stellar-drift-range) * (var(--sn-beat-pulse-intensity, 0) - 0.5)),
-        calc(var(--stellar-drift-range) * (var(--sn-rhythm-phase, 0) * 0.002)),
+        calc(var(--interface-drift-range) * (var(--sn-beat-pulse-intensity, 0) - 0.5)),
+        calc(var(--interface-drift-range) * (var(--sn-rhythm-phase, 0) * 0.002)),
         0
       )
       scale(var(--sn-breathing-scale, 1));
@@ -52,9 +52,9 @@
 
 // ─── Accessibility Overrides ──────────────────────────────────────────────────
 @media (prefers-reduced-motion: reduce) {
-  [data-layout="constellation"] {
+  [data-layout="navigation"] {
     .main-gridContainer-gridContainer {
-      gap: var(--stellar-gap-base);
+      gap: var(--interface-gap-base);
       transform: none;
       transition: none;
     }
@@ -64,4 +64,20 @@
       transition: none !important;
     }
   }
+}
+
+// =============================================================================
+// LEGACY COMPATIBILITY MAPPINGS - Phase 6.3 Layer A Modernization
+// =============================================================================
+
+:root {
+  // === Legacy Stellar → Interface Mappings ===
+  --stellar-gap-base: var(--interface-gap-base);
+  --stellar-gap-range: var(--interface-gap-range);
+  --stellar-drift-range: var(--interface-drift-range);
+}
+
+// Legacy layout attribute support
+[data-layout="constellation"] {
+  @extend [data-layout="navigation"] !optional;
 }

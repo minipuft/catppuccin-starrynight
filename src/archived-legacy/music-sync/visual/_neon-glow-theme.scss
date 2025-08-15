@@ -10,19 +10,19 @@
 // • Rain-soaked reflective surfaces
 
 // Blade Runner neon glow system
-.organic-blade-runner-neon {
+.visual-effects-blade-runner-neon {
   // Core neon properties
   position: relative;
   contain: layout style paint;
   
   // Blade Runner color palette enhancement
   filter: 
-    contrast(calc(1.2 + var(--organic-cinematic-contrast, 1) * 0.3))
-    saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.4))
-    hue-rotate(calc(var(--organic-emotional-temperature, 6500) / 100 - 65deg));
+    contrast(calc(1.2 + var(--visual-effects-cinematic-contrast, 1) * 0.3))
+    saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.4))
+    hue-rotate(calc(var(--visual-effects-emotional-temperature, 6500) / 100 - 65deg));
   
   // Neon breathing effect
-  // animation: organic-blade-runner-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+  // animation: visual-effects-blade-runner-breathing var(--visual-effects-breathing-cycle, 1s) ease-in-out infinite;
   
   // Performance optimization
   will-change: filter, box-shadow;
@@ -40,18 +40,18 @@
     // Electric blue base glow
     background: radial-gradient(
       ellipse at center,
-      rgba(0, 255, 255, calc(var(--organic-shimmer-opacity, 0.05) * 2)) 0%,
-      rgba(0, 191, 255, calc(var(--organic-shimmer-opacity, 0.05) * 1.5)) 30%,
-      rgba(30, 144, 255, calc(var(--organic-shimmer-opacity, 0.05) * 1)) 60%,
+      rgba(0, 255, 255, calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 0%,
+      rgba(0, 191, 255, calc(var(--visual-effects-shimmer-opacity, 0.05) * 1.5)) 30%,
+      rgba(30, 144, 255, calc(var(--visual-effects-shimmer-opacity, 0.05) * 1)) 60%,
       transparent 80%
     );
     
     // Neon flicker animation
-    // animation: organic-neon-flicker calc(var(--organic-breathing-cycle, 1s) * 0.3) ease-in-out infinite;
+    // animation: visual-effects-neon-flicker calc(var(--visual-effects-breathing-cycle, 1s) * 0.3) ease-in-out infinite;
     
     // Performance optimization
     pointer-events: none;
-    z-index: var(--organic-depth-atmosphere, 0);
+    z-index: var(--visual-effects-depth-atmosphere, 0);
     will-change: opacity;
     contain: strict;
     border-radius: inherit;
@@ -61,8 +61,8 @@
   &[data-neon-intensity="low"] {
     --neon-multiplier: 0.4;
     filter: 
-      contrast(calc(1.1 + var(--organic-cinematic-contrast, 1) * 0.1))
-      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.2));
+      contrast(calc(1.1 + var(--visual-effects-cinematic-contrast, 1) * 0.1))
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.2));
   }
   
   &[data-neon-intensity="medium"] {
@@ -72,18 +72,18 @@
   &[data-neon-intensity="high"] {
     --neon-multiplier: 1.5;
     filter: 
-      contrast(calc(1.4 + var(--organic-cinematic-contrast, 1) * 0.5))
-      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.6))
+      contrast(calc(1.4 + var(--visual-effects-cinematic-contrast, 1) * 0.5))
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.6))
       brightness(calc(1.0 + var(--neon-multiplier, 1.5) * 0.2));
     
     // Enhanced high-intensity glow
     &::before {
       background: radial-gradient(
         ellipse at center,
-        rgba(0, 255, 255, calc(var(--organic-shimmer-opacity, 0.05) * 4)) 0%,
-        rgba(0, 191, 255, calc(var(--organic-shimmer-opacity, 0.05) * 3)) 20%,
-        rgba(30, 144, 255, calc(var(--organic-shimmer-opacity, 0.05) * 2)) 40%,
-        rgba(65, 105, 225, calc(var(--organic-shimmer-opacity, 0.05) * 1)) 70%,
+        rgba(0, 255, 255, calc(var(--visual-effects-shimmer-opacity, 0.05) * 4)) 0%,
+        rgba(0, 191, 255, calc(var(--visual-effects-shimmer-opacity, 0.05) * 3)) 20%,
+        rgba(30, 144, 255, calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 40%,
+        rgba(65, 105, 225, calc(var(--visual-effects-shimmer-opacity, 0.05) * 1)) 70%,
         transparent 90%
       );
     }
@@ -99,27 +99,27 @@
       
       background: radial-gradient(
         circle at center,
-        rgba(0, 255, 255, calc(var(--organic-shimmer-opacity, 0.05) * 2)) 0%,
+        rgba(0, 255, 255, calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 0%,
         transparent 60%
       );
       
       pointer-events: none;
-      z-index: calc(var(--organic-depth-atmosphere, 0) - 1);
+      z-index: calc(var(--visual-effects-depth-atmosphere, 0) - 1);
       border-radius: inherit;
-      // animation: organic-neon-outer-glow calc(var(--organic-breathing-cycle, 1s) * 0.7) ease-in-out infinite;
+      // animation: visual-effects-neon-outer-glow calc(var(--visual-effects-breathing-cycle, 1s) * 0.7) ease-in-out infinite;
     }
   }
 }
 
 // Noir shadow system
-.organic-noir-shadows {
+.visual-effects-noir-shadows {
   // Core noir properties
   position: relative;
   
   // High contrast noir enhancement
   filter: 
-    contrast(calc(1.5 + var(--organic-cinematic-contrast, 1) * 0.3))
-    brightness(calc(0.8 + var(--organic-warmth, 0.8) * 0.2));
+    contrast(calc(1.5 + var(--visual-effects-cinematic-contrast, 1) * 0.3))
+    brightness(calc(0.8 + var(--visual-effects-warmth, 0.8) * 0.2));
   
   // Noir shadow overlay
   &::before {
@@ -133,18 +133,18 @@
     // Gradient noir shadows
     background: linear-gradient(
       135deg,
-      rgba(0, 0, 0, calc(var(--organic-fog-opacity, 0.02) * 15)) 0%,
+      rgba(0, 0, 0, calc(var(--visual-effects-fog-opacity, 0.02) * 15)) 0%,
       transparent 30%,
       transparent 70%,
-      rgba(0, 0, 0, calc(var(--organic-fog-opacity, 0.02) * 10)) 100%
+      rgba(0, 0, 0, calc(var(--visual-effects-fog-opacity, 0.02) * 10)) 100%
     );
     
     // Noir breathing
-    // animation: organic-noir-shadow-breathing var(--organic-breathing-cycle, 1s) ease-in-out infinite;
+    // animation: visual-effects-noir-shadow-breathing var(--visual-effects-breathing-cycle, 1s) ease-in-out infinite;
     
     // Performance optimization
     pointer-events: none;
-    z-index: var(--organic-depth-near, 1);
+    z-index: var(--visual-effects-depth-near, 1);
     will-change: opacity;
     contain: strict;
   }
@@ -164,32 +164,32 @@
         0deg,
         transparent 0px,
         transparent 8px,
-        rgba(0, 0, 0, calc(var(--organic-fog-opacity, 0.02) * 8)) 9px,
-        rgba(0, 0, 0, calc(var(--organic-fog-opacity, 0.02) * 8)) 10px,
+        rgba(0, 0, 0, calc(var(--visual-effects-fog-opacity, 0.02) * 8)) 9px,
+        rgba(0, 0, 0, calc(var(--visual-effects-fog-opacity, 0.02) * 8)) 10px,
         transparent 11px,
         transparent 19px
       );
       
       // Subtle animation
-      // animation: organic-venetian-drift 3s linear infinite;
-      opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.3);
+      // animation: visual-effects-venetian-drift 3s linear infinite;
+      opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.3);
       
       pointer-events: none;
-      z-index: var(--organic-depth-near, 1);
+      z-index: var(--visual-effects-depth-near, 1);
       mix-blend-mode: multiply;
     }
   }
 }
 
 // Rain-soaked reflection system
-.organic-rain-reflections {
+.visual-effects-rain-reflections {
   // Core reflection properties
   position: relative;
   
   // Wet surface enhancement
   filter: 
-    saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.3))
-    brightness(calc(1.0 + var(--organic-warmth, 0.8) * 0.1));
+    saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.3))
+    brightness(calc(1.0 + var(--visual-effects-warmth, 0.8) * 0.1));
   
   // Rain droplet overlay
   &::before {
@@ -210,14 +210,14 @@
     background-size: 50px 50px, 30px 30px, 70px 70px, 40px 40px;
     
     // Rain animation
-    // animation: organic-rain-movement 4s linear infinite;
+    // animation: visual-effects-rain-movement 4s linear infinite;
     
     // Performance optimization
     pointer-events: none;
-    z-index: var(--organic-depth-far, 3);
+    z-index: var(--visual-effects-depth-far, 3);
     will-change: background-position;
     contain: strict;
-    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.4);
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.4);
   }
   
   // Reflection shimmer
@@ -233,22 +233,22 @@
     background: linear-gradient(
       180deg,
       transparent 0%,
-      rgba(var(--organic-holographic-rgb, 116, 199, 236), calc(var(--organic-shimmer-opacity, 0.05) * 2)) 50%,
+      rgba(var(--visual-effects-holographic-rgb, 116, 199, 236), calc(var(--visual-effects-shimmer-opacity, 0.05) * 2)) 50%,
       transparent 100%
     );
     
     // Reflection movement
-    // animation: organic-reflection-shimmer calc(var(--organic-breathing-cycle, 1s) * 2) ease-in-out infinite;
+    // animation: visual-effects-reflection-shimmer calc(var(--visual-effects-breathing-cycle, 1s) * 2) ease-in-out infinite;
     
     pointer-events: none;
-    z-index: var(--organic-depth-mid, 2);
+    z-index: var(--visual-effects-depth-mid, 2);
     will-change: opacity, transform;
     contain: strict;
   }
 }
 
 // Volumetric fog system
-.organic-volumetric-fog {
+.visual-effects-volumetric-fog {
   // Core fog properties
   position: relative;
   
@@ -264,18 +264,18 @@
     // Volumetric fog gradient
     background: radial-gradient(
       ellipse at center,
-      rgba(var(--organic-atmospheric-rgb, 88, 91, 112), calc(var(--organic-fog-opacity, 0.02) * 8)) 0%,
-      rgba(var(--organic-atmosphere-rgb, 88, 91, 112), calc(var(--organic-fog-opacity, 0.02) * 5)) 40%,
-      rgba(var(--organic-atmospheric-rgb, 88, 91, 112), calc(var(--organic-fog-opacity, 0.02) * 2)) 70%,
+      rgba(var(--visual-effects-atmospheric-rgb, 88, 91, 112), calc(var(--visual-effects-fog-opacity, 0.02) * 8)) 0%,
+      rgba(var(--visual-effects-atmosphere-rgb, 88, 91, 112), calc(var(--visual-effects-fog-opacity, 0.02) * 5)) 40%,
+      rgba(var(--visual-effects-atmospheric-rgb, 88, 91, 112), calc(var(--visual-effects-fog-opacity, 0.02) * 2)) 70%,
       transparent 90%
     );
     
     // Fog movement
-    // animation: organic-fog-drift calc(var(--organic-breathing-cycle, 1s) * 3) ease-in-out infinite;
+    // animation: visual-effects-fog-drift calc(var(--visual-effects-breathing-cycle, 1s) * 3) ease-in-out infinite;
     
     // Performance optimization
     pointer-events: none;
-    z-index: var(--organic-depth-atmosphere, 0);
+    z-index: var(--visual-effects-depth-atmosphere, 0);
     will-change: opacity, transform;
     contain: strict;
   }
@@ -283,19 +283,19 @@
   // Fog density levels
   &[data-fog-density="light"] {
     &::before {
-      opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.3);
+      opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.3);
     }
   }
   
   &[data-fog-density="medium"] {
     &::before {
-      opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.6);
+      opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.6);
     }
   }
   
   &[data-fog-density="heavy"] {
     &::before {
-      opacity: var(--organic-cinematic-intensity, 0.8);
+      opacity: var(--visual-effects-cinematic-intensity, 0.8);
     }
     
     // Additional fog layer for heavy density
@@ -309,13 +309,13 @@
       
       background: radial-gradient(
         circle at center,
-        rgba(var(--organic-atmospheric-rgb, 88, 91, 112), calc(var(--organic-fog-opacity, 0.02) * 4)) 0%,
+        rgba(var(--visual-effects-atmospheric-rgb, 88, 91, 112), calc(var(--visual-effects-fog-opacity, 0.02) * 4)) 0%,
         transparent 80%
       );
       
-      // animation: organic-fog-drift calc(var(--organic-breathing-cycle, 1s) * 2) ease-in-out infinite reverse;
+      // animation: visual-effects-fog-drift calc(var(--visual-effects-breathing-cycle, 1s) * 2) ease-in-out infinite reverse;
       pointer-events: none;
-      z-index: calc(var(--organic-depth-atmosphere, 0) + 1);
+      z-index: calc(var(--visual-effects-depth-atmosphere, 0) + 1);
     }
   }
 }
@@ -323,29 +323,29 @@
 // === BLADE RUNNER KEYFRAMES ===
 
 // Blade Runner breathing animation
-@keyframes organic-blade-runner-breathing {
+@keyframes visual-effects-blade-runner-breathing {
   0% {
     filter: 
-      contrast(calc(1.2 + var(--organic-cinematic-contrast, 1) * 0.3))
-      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.4));
+      contrast(calc(1.2 + var(--visual-effects-cinematic-contrast, 1) * 0.3))
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.4));
   }
   
   50% {
     filter: 
-      contrast(calc(1.3 + var(--organic-cinematic-contrast, 1) * 0.4))
-      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.5))
+      contrast(calc(1.3 + var(--visual-effects-cinematic-contrast, 1) * 0.4))
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.5))
       brightness(calc(1.0 + var(--neon-multiplier, 1) * 0.1));
   }
   
   100% {
     filter: 
-      contrast(calc(1.2 + var(--organic-cinematic-contrast, 1) * 0.3))
-      saturate(calc(1.0 + var(--organic-emotional-saturation, 1) * 0.4));
+      contrast(calc(1.2 + var(--visual-effects-cinematic-contrast, 1) * 0.3))
+      saturate(calc(1.0 + var(--visual-effects-emotional-saturation, 1) * 0.4));
   }
 }
 
 // Neon flicker animation
-@keyframes organic-neon-flicker {
+@keyframes visual-effects-neon-flicker {
   0% { opacity: 1.0; }
   2% { opacity: 0.8; }
   4% { opacity: 1.0; }
@@ -359,40 +359,40 @@
 }
 
 // Neon outer glow animation
-@keyframes organic-neon-outer-glow {
+@keyframes visual-effects-neon-outer-glow {
   0% {
-    opacity: calc(var(--organic-shimmer-opacity, 0.05) * 2);
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 2);
     transform: scale(1.0);
   }
   
   50% {
-    opacity: calc(var(--organic-shimmer-opacity, 0.05) * 3);
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 3);
     transform: scale(1.05);
   }
   
   100% {
-    opacity: calc(var(--organic-shimmer-opacity, 0.05) * 2);
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 2);
     transform: scale(1.0);
   }
 }
 
 // Noir shadow breathing
-@keyframes organic-noir-shadow-breathing {
+@keyframes visual-effects-noir-shadow-breathing {
   0% {
-    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.7);
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.7);
   }
   
   50% {
-    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.9);
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.9);
   }
   
   100% {
-    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.7);
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.7);
   }
 }
 
 // Venetian blind drift
-@keyframes organic-venetian-drift {
+@keyframes visual-effects-venetian-drift {
   0% {
     background-position: 0px 0px;
   }
@@ -403,7 +403,7 @@
 }
 
 // Rain movement animation
-@keyframes organic-rain-movement {
+@keyframes visual-effects-rain-movement {
   0% {
     background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px;
   }
@@ -414,47 +414,47 @@
 }
 
 // Reflection shimmer animation
-@keyframes organic-reflection-shimmer {
+@keyframes visual-effects-reflection-shimmer {
   0% {
-    opacity: calc(var(--organic-shimmer-opacity, 0.05) * 2);
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 2);
     transform: translateY(0%);
   }
   
   50% {
-    opacity: calc(var(--organic-shimmer-opacity, 0.05) * 4);
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 4);
     transform: translateY(-10%);
   }
   
   100% {
-    opacity: calc(var(--organic-shimmer-opacity, 0.05) * 2);
+    opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 2);
     transform: translateY(0%);
   }
 }
 
 // Fog drift animation
-@keyframes organic-fog-drift {
+@keyframes visual-effects-fog-drift {
   0% {
-    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.6);
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.6);
     transform: translateX(0%) translateY(0%) scale(1.0);
   }
   
   25% {
-    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.8);
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.8);
     transform: translateX(2%) translateY(-1%) scale(1.02);
   }
   
   50% {
-    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 1.0);
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 1.0);
     transform: translateX(0%) translateY(-2%) scale(1.05);
   }
   
   75% {
-    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.8);
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.8);
     transform: translateX(-2%) translateY(-1%) scale(1.02);
   }
   
   100% {
-    opacity: calc(var(--organic-cinematic-intensity, 0.8) * 0.6);
+    opacity: calc(var(--visual-effects-cinematic-intensity, 0.8) * 0.6);
     transform: translateX(0%) translateY(0%) scale(1.0);
   }
 }
@@ -463,10 +463,10 @@
 
 // Reduced motion support
 @media (prefers-reduced-motion: reduce) {
-  .organic-blade-runner-neon,
-  .organic-noir-shadows,
-  .organic-rain-reflections,
-  .organic-volumetric-fog {
+  .visual-effects-blade-runner-neon,
+  .visual-effects-noir-shadows,
+  .visual-effects-rain-reflections,
+  .visual-effects-volumetric-fog {
     animation: none !important;
     
     &::before,
@@ -478,17 +478,17 @@
 
 // High contrast support
 @media (prefers-contrast: high) {
-  .organic-blade-runner-neon {
+  .visual-effects-blade-runner-neon {
     filter: 
       contrast(2.0) !important
       saturate(1.5) !important;
     
     &::before {
-      opacity: calc(var(--organic-shimmer-opacity, 0.05) * 6) !important;
+      opacity: calc(var(--visual-effects-shimmer-opacity, 0.05) * 6) !important;
     }
   }
   
-  .organic-noir-shadows {
+  .visual-effects-noir-shadows {
     filter: 
       contrast(2.5) !important
       brightness(0.6) !important;
@@ -496,8 +496,8 @@
 }
 
 // Debug mode for Blade Runner aesthetics
-:root.organic-debug {
-  .organic-blade-runner-neon {
+:root.visual-effects-debug {
+  .visual-effects-blade-runner-neon {
     outline: 2px dashed rgba(var(--sn-musical-harmony-analogous-cool-rgb), 0.8) !important;
     
     &::after {
@@ -515,7 +515,7 @@
     }
   }
   
-  .organic-volumetric-fog {
+  .visual-effects-volumetric-fog {
     outline: 1px dashed rgba(var(--sn-musical-harmony-tertiary-rgb), 0.8) !important;
     
     &::after {
@@ -532,4 +532,27 @@
       z-index: 9999;
     }
   }
+}
+
+// === LEGACY COMPATIBILITY CLASSES ===
+// These provide backward compatibility during the transition
+
+// Legacy Blade Runner neon effects
+.organic-blade-runner-neon {
+  @extend .visual-effects-blade-runner-neon !optional;
+}
+
+// Legacy noir shadow effects
+.organic-noir-shadows {
+  @extend .visual-effects-noir-shadows !optional;
+}
+
+// Legacy rain reflection effects
+.organic-rain-reflections {
+  @extend .visual-effects-rain-reflections !optional;
+}
+
+// Legacy volumetric fog effects
+.organic-volumetric-fog {
+  @extend .visual-effects-volumetric-fog !optional;
 }

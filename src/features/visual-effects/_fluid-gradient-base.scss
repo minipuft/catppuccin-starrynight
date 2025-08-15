@@ -1,28 +1,28 @@
 /**
- * Liquid Consciousness Base Styles
+ * Liquid Visual Effects Base Styles
  * 
- * Core CSS variables and foundational styles for liquid consciousness effects
- * - Consciousness-inspired variable system
+ * Core CSS variables and foundational styles for liquid visual effects effects
+ * - Visual effects-inspired variable system
  * - Liquid physics simulation via CSS
  * - Oil-on-water aesthetic foundation
  * - Performance-optimized animations
  */
 
 // =============================================================================
-// LIQUID CONSCIOUSNESS VARIABLES
+// LIQUID VISUAL EFFECTS VARIABLES
 // =============================================================================
 
 :root {
-  // Consciousness state variables - use existing consciousness system
-  --consciousness-coherence: var(--sn-consciousness-awareness-resonance, 0.7); // 0-1 consciousness coherence level
-  --consciousness-phase: var(--sn-consciousness-flow-direction, 0); // 0-1 wave phase (0-2π normalized)
-  --consciousness-amplitude: var(--sn-consciousness-depth-intensity, 0.5); // 0-1 wave amplitude
-  --consciousness-frequency: var(--sn-consciousness-breathing-frequency, 0.1); // Wave frequency
-  --consciousness-superposition: var(--sn-consciousness-organic-mode, 1); // Organic state
-  --consciousness-entanglement: var(--sn-consciousness-osmosis-rate, 0); // Consciousness flow strength
-  --consciousness-wave-real: var(--sn-consciousness-membrane-elasticity, 1); // Real part of consciousness wave
-  --consciousness-wave-imaginary: var(--sn-consciousness-viscosity, 0); // Imaginary part of consciousness wave
-  --consciousness-probability: var(--sn-consciousness-cellular-mode, 1); // Consciousness probability
+  // Visual effects state variables - use existing visual effects system
+  --visual-effects-coherence: var(--sn-visual-effects-awareness-resonance, 0.7); // 0-1 visual effects coherence level
+  --visual-effects-phase: var(--sn-visual-effects-flow-direction, 0); // 0-1 wave phase (0-2π normalized)
+  --visual-effects-amplitude: var(--sn-visual-effects-depth-intensity, 0.5); // 0-1 wave amplitude
+  --visual-effects-frequency: var(--sn-visual-effects-breathing-frequency, 0.1); // Wave frequency
+  --visual-effects-superposition: var(--sn-visual-effects-flow-mode, 1); // Flow state
+  --visual-effects-entanglement: var(--sn-visual-effects-osmosis-rate, 0); // Visual effects flow strength
+  --visual-effects-wave-real: var(--sn-visual-effects-membrane-elasticity, 1); // Real part of visual effects wave
+  --visual-effects-wave-imaginary: var(--sn-visual-effects-viscosity, 0); // Imaginary part of visual effects wave
+  --visual-effects-probability: var(--sn-visual-effects-cellular-mode, 1); // Visual effects probability
 
   // Liquid physics variables
   --fluid-gradients-opacity: 0.3; // Base opacity
@@ -46,7 +46,7 @@
 }
 
 // =============================================================================
-// LIQUID CONSCIOUSNESS FOUNDATION
+// LIQUID VISUAL EFFECTS FOUNDATION
 // =============================================================================
 
 .fluid-gradients-container {
@@ -97,29 +97,29 @@
   width: 100%;
   height: 100%;
   
-  // Dynamic conic gradient with consciousness phase
+  // Dynamic conic gradient with visual effects phase
   background: conic-gradient(
-    from calc(var(--consciousness-phase, 0) * 360deg),
-    hsla(calc(var(--consciousness-phase, 0) * 360 + 0), 70%, 60%, calc(var(--oil-slick-intensity, 0.8) * 0.12)) 0%,
-    hsla(calc(var(--consciousness-phase, 0) * 360 + 51), 80%, 65%, calc(var(--oil-slick-intensity, 0.8) * 0.14)) 14.28%,
-    hsla(calc(var(--consciousness-phase, 0) * 360 + 102), 75%, 70%, calc(var(--oil-slick-intensity, 0.8) * 0.13)) 28.57%,
-    hsla(calc(var(--consciousness-phase, 0) * 360 + 153), 85%, 55%, calc(var(--oil-slick-intensity, 0.8) * 0.15)) 42.86%,
-    hsla(calc(var(--consciousness-phase, 0) * 360 + 204), 80%, 62%, calc(var(--oil-slick-intensity, 0.8) * 0.14)) 57.14%,
-    hsla(calc(var(--consciousness-phase, 0) * 360 + 255), 75%, 58%, calc(var(--oil-slick-intensity, 0.8) * 0.13)) 71.43%,
-    hsla(calc(var(--consciousness-phase, 0) * 360 + 306), 70%, 64%, calc(var(--oil-slick-intensity, 0.8) * 0.12)) 85.71%,
-    hsla(calc(var(--consciousness-phase, 0) * 360 + 357), 70%, 60%, calc(var(--oil-slick-intensity, 0.8) * 0.11)) 100%
+    from calc(var(--visual-effects-phase, 0) * 360deg),
+    hsla(calc(var(--visual-effects-phase, 0) * 360 + 0), 70%, 60%, calc(var(--oil-slick-intensity, 0.8) * 0.12)) 0%,
+    hsla(calc(var(--visual-effects-phase, 0) * 360 + 51), 80%, 65%, calc(var(--oil-slick-intensity, 0.8) * 0.14)) 14.28%,
+    hsla(calc(var(--visual-effects-phase, 0) * 360 + 102), 75%, 70%, calc(var(--oil-slick-intensity, 0.8) * 0.13)) 28.57%,
+    hsla(calc(var(--visual-effects-phase, 0) * 360 + 153), 85%, 55%, calc(var(--oil-slick-intensity, 0.8) * 0.15)) 42.86%,
+    hsla(calc(var(--visual-effects-phase, 0) * 360 + 204), 80%, 62%, calc(var(--oil-slick-intensity, 0.8) * 0.14)) 57.14%,
+    hsla(calc(var(--visual-effects-phase, 0) * 360 + 255), 75%, 58%, calc(var(--oil-slick-intensity, 0.8) * 0.13)) 71.43%,
+    hsla(calc(var(--visual-effects-phase, 0) * 360 + 306), 70%, 64%, calc(var(--oil-slick-intensity, 0.8) * 0.12)) 85.71%,
+    hsla(calc(var(--visual-effects-phase, 0) * 360 + 357), 70%, 60%, calc(var(--oil-slick-intensity, 0.8) * 0.11)) 100%
   );
   
   // Backdrop filter for oil-on-water effect
   backdrop-filter: 
     blur(calc(var(--fluid-gradients-blur, 4) * 1px)) 
     saturate(calc(var(--fluid-gradients-saturation, 1.5)))
-    hue-rotate(calc(var(--consciousness-phase, 0) * 60deg));
+    hue-rotate(calc(var(--visual-effects-phase, 0) * 60deg));
   
-  // Transform based on consciousness state
+  // Transform based on visual effects state
   transform: 
-    scale(calc(1 + var(--consciousness-amplitude, 0.5) * 0.02))
-    rotate(calc(var(--consciousness-phase, 0) * 1deg));
+    scale(calc(1 + var(--visual-effects-amplitude, 0.5) * 0.02))
+    rotate(calc(var(--visual-effects-phase, 0) * 1deg));
   
   // Oil slick animation
   animation: liquid-oil-slick 
@@ -141,17 +141,17 @@
   // Surface tension highlight
   background: radial-gradient(
     ellipse at center,
-    rgba(255, 255, 255, calc(var(--fluid-gradients-tension, 0.1) * var(--consciousness-coherence, 0.7))) 0%,
-    rgba(255, 255, 255, calc(var(--fluid-gradients-tension, 0.1) * var(--consciousness-coherence, 0.7) * 0.7)) 25%,
-    rgba(255, 255, 255, calc(var(--fluid-gradients-tension, 0.1) * var(--consciousness-coherence, 0.7) * 0.4)) 50%,
-    rgba(255, 255, 255, calc(var(--fluid-gradients-tension, 0.1) * var(--consciousness-coherence, 0.7) * 0.2)) 75%,
+    rgba(255, 255, 255, calc(var(--fluid-gradients-tension, 0.1) * var(--visual-effects-coherence, 0.7))) 0%,
+    rgba(255, 255, 255, calc(var(--fluid-gradients-tension, 0.1) * var(--visual-effects-coherence, 0.7) * 0.7)) 25%,
+    rgba(255, 255, 255, calc(var(--fluid-gradients-tension, 0.1) * var(--visual-effects-coherence, 0.7) * 0.4)) 50%,
+    rgba(255, 255, 255, calc(var(--fluid-gradients-tension, 0.1) * var(--visual-effects-coherence, 0.7) * 0.2)) 75%,
     transparent 100%
   );
   
-  // Transform based on consciousness amplitude
+  // Transform based on visual effects amplitude
   transform: 
-    scale(calc(1 + var(--consciousness-amplitude, 0.5) * 0.05))
-    rotate(calc(var(--consciousness-phase, 0) * 2deg));
+    scale(calc(1 + var(--visual-effects-amplitude, 0.5) * 0.05))
+    rotate(calc(var(--visual-effects-phase, 0) * 2deg));
   
   // Blend mode for realistic surface tension
   mix-blend-mode: soft-light;
@@ -176,18 +176,18 @@
   // Interference pattern using repeating gradients
   background: 
     repeating-linear-gradient(
-      calc(var(--consciousness-phase, 0) * 90deg),
+      calc(var(--visual-effects-phase, 0) * 90deg),
       transparent 0%,
-      rgba(255, 255, 255, calc(var(--fluid-gradients-interference, 0.05) * var(--consciousness-coherence, 0.7))) 1%,
-      rgba(255, 255, 255, calc(var(--fluid-gradients-interference, 0.05) * var(--consciousness-coherence, 0.7) * 0.5)) 2%,
+      rgba(255, 255, 255, calc(var(--fluid-gradients-interference, 0.05) * var(--visual-effects-coherence, 0.7))) 1%,
+      rgba(255, 255, 255, calc(var(--fluid-gradients-interference, 0.05) * var(--visual-effects-coherence, 0.7) * 0.5)) 2%,
       transparent 3%,
       transparent 4%
     ),
     repeating-linear-gradient(
-      calc(var(--consciousness-phase, 0) * 90deg + 45deg),
+      calc(var(--visual-effects-phase, 0) * 90deg + 45deg),
       transparent 0%,
-      rgba(255, 255, 255, calc(var(--fluid-gradients-interference, 0.05) * var(--consciousness-coherence, 0.7) * 0.7)) 1.5%,
-      rgba(255, 255, 255, calc(var(--fluid-gradients-interference, 0.05) * var(--consciousness-coherence, 0.7) * 0.3)) 3%,
+      rgba(255, 255, 255, calc(var(--fluid-gradients-interference, 0.05) * var(--visual-effects-coherence, 0.7) * 0.7)) 1.5%,
+      rgba(255, 255, 255, calc(var(--fluid-gradients-interference, 0.05) * var(--visual-effects-coherence, 0.7) * 0.3)) 3%,
       transparent 4.5%,
       transparent 6%
     );
@@ -195,8 +195,8 @@
   // Blend mode for interference effect
   mix-blend-mode: overlay;
   
-  // Opacity based on consciousness coherence
-  opacity: var(--consciousness-coherence, 0.7);
+  // Opacity based on visual effects coherence
+  opacity: var(--visual-effects-coherence, 0.7);
   
   // Interference animation
   animation: liquid-interference 
@@ -219,21 +219,21 @@
   background: 
     linear-gradient(
       90deg,
-      rgba(255, 0, 0, calc(var(--fluid-gradients-chromatic, 0.08) * var(--consciousness-probability, 1))) 0%,
-      rgba(255, 0, 0, calc(var(--fluid-gradients-chromatic, 0.08) * var(--consciousness-probability, 1) * 0.7)) 10%,
+      rgba(255, 0, 0, calc(var(--fluid-gradients-chromatic, 0.08) * var(--visual-effects-probability, 1))) 0%,
+      rgba(255, 0, 0, calc(var(--fluid-gradients-chromatic, 0.08) * var(--visual-effects-probability, 1) * 0.7)) 10%,
       transparent 20%,
       transparent 80%,
-      rgba(0, 0, 255, calc(var(--fluid-gradients-chromatic, 0.08) * var(--consciousness-probability, 1) * 0.7)) 90%,
-      rgba(0, 0, 255, calc(var(--fluid-gradients-chromatic, 0.08) * var(--consciousness-probability, 1))) 100%
+      rgba(0, 0, 255, calc(var(--fluid-gradients-chromatic, 0.08) * var(--visual-effects-probability, 1) * 0.7)) 90%,
+      rgba(0, 0, 255, calc(var(--fluid-gradients-chromatic, 0.08) * var(--visual-effects-probability, 1))) 100%
     );
   
   // Blend mode for chromatic aberration
   mix-blend-mode: multiply;
   
-  // Transform based on consciousness wave function
+  // Transform based on visual effects wave function
   transform: 
-    translateX(calc(var(--consciousness-wave-real, 0) * 1px)) 
-    translateY(calc(var(--consciousness-wave-imaginary, 0) * 0.5px));
+    translateX(calc(var(--visual-effects-wave-real, 0) * 1px)) 
+    translateY(calc(var(--visual-effects-wave-imaginary, 0) * 0.5px));
   
   // Chromatic aberration animation
   animation: liquid-chromatic-aberration 
@@ -246,7 +246,7 @@
 }
 
 // =============================================================================
-// LIQUID CONSCIOUSNESS ANIMATIONS
+// LIQUID VISUAL EFFECTS ANIMATIONS
 // =============================================================================
 
 @keyframes liquid-oil-slick {
@@ -316,27 +316,27 @@
 @keyframes liquid-interference {
   0% { 
     background-position: 0% 0%, 0% 0%;
-    opacity: var(--consciousness-coherence, 0.7);
+    opacity: var(--visual-effects-coherence, 0.7);
   }
   
   25% { 
     background-position: 25% 25%, -25% -25%;
-    opacity: calc(var(--consciousness-coherence, 0.7) * 0.8);
+    opacity: calc(var(--visual-effects-coherence, 0.7) * 0.8);
   }
   
   50% { 
     background-position: 50% 50%, -50% -50%;
-    opacity: calc(var(--consciousness-coherence, 0.7) * 0.9);
+    opacity: calc(var(--visual-effects-coherence, 0.7) * 0.9);
   }
   
   75% { 
     background-position: 75% 75%, -75% -75%;
-    opacity: calc(var(--consciousness-coherence, 0.7) * 0.8);
+    opacity: calc(var(--visual-effects-coherence, 0.7) * 0.8);
   }
   
   100% { 
     background-position: 100% 100%, -100% -100%;
-    opacity: var(--consciousness-coherence, 0.7);
+    opacity: var(--visual-effects-coherence, 0.7);
   }
 }
 
@@ -348,22 +348,22 @@
   
   25% { 
     transform: 
-      translateX(calc(var(--consciousness-wave-real, 0) * 0.8px)) 
-      translateY(calc(var(--consciousness-wave-imaginary, 0) * -0.4px));
+      translateX(calc(var(--visual-effects-wave-real, 0) * 0.8px)) 
+      translateY(calc(var(--visual-effects-wave-imaginary, 0) * -0.4px));
     opacity: calc(var(--fluid-gradients-chromatic, 0.08) * 12);
   }
   
   50% { 
     transform: 
-      translateX(calc(var(--consciousness-wave-real, 0) * -0.8px)) 
-      translateY(calc(var(--consciousness-wave-imaginary, 0) * 0.4px));
+      translateX(calc(var(--visual-effects-wave-real, 0) * -0.8px)) 
+      translateY(calc(var(--visual-effects-wave-imaginary, 0) * 0.4px));
     opacity: calc(var(--fluid-gradients-chromatic, 0.08) * 8);
   }
   
   75% { 
     transform: 
-      translateX(calc(var(--consciousness-wave-real, 0) * 0.4px)) 
-      translateY(calc(var(--consciousness-wave-imaginary, 0) * -0.8px));
+      translateX(calc(var(--visual-effects-wave-real, 0) * 0.4px)) 
+      translateY(calc(var(--visual-effects-wave-imaginary, 0) * -0.8px));
     opacity: calc(var(--fluid-gradients-chromatic, 0.08) * 11);
   }
 }
@@ -380,7 +380,7 @@
   .liquid-chromatic-aberration {
     animation: none !important;
     
-    // Provide static liquid consciousness effect
+    // Provide static liquid visual effects effect
     opacity: calc(var(--fluid-gradients-opacity, 0.3) * 0.5);
     
     // Remove transforms for reduced motion
@@ -468,4 +468,19 @@
   .fluid-gradients-layer {
     display: none !important;
   }
+}
+
+// ==============================================
+// Legacy Compatibility Aliases
+// ==============================================
+// Ensures backward compatibility during transition
+
+// CSS variable aliases for legacy consciousness references
+:root {
+  --consciousness-phase: var(--visual-effects-phase);
+  --consciousness-amplitude: var(--visual-effects-amplitude);
+  --consciousness-coherence: var(--visual-effects-coherence);
+  --consciousness-probability: var(--visual-effects-probability);
+  --consciousness-wave-real: var(--visual-effects-wave-real);
+  --consciousness-wave-imaginary: var(--visual-effects-wave-imaginary);
 }

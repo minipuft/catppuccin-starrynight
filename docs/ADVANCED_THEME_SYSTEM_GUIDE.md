@@ -1,20 +1,20 @@
-# 🌌 Year 3000 System Guide
+# 🌌 Advanced Theme System Guide
 **Central Orchestrator Deep Dive**
 
 ---
 
 ## 🎯 Overview
 
-The **Year3000System** is the central orchestrator of the entire Catppuccin StarryNight theme. It represents the pinnacle of the "Year 3000" architectural philosophy—a future-thinking approach where interfaces are grown, not built, and every system operates through unified Visual Effects Coordination principles.
+The **AdvancedThemeSystem** is the central orchestrator of the entire Catppuccin StarryNight theme. It represents the pinnacle of advanced architectural philosophy—a future-thinking approach where interfaces are systematically constructed through unified Visual Effects Coordination principles.
 
-**File Location**: `src-js/core/lifecycle/year3000System.ts`
+**File Location**: `src-js/core/lifecycle/AdvancedThemeSystem.ts`
 
 ---
 
 ## 🏗️ Architectural Position
 
 ```
-🌌 Year3000System (Central Orchestrator)
+🌌 AdvancedThemeSystem (Central Orchestrator)
     ↓
 🧠 SystemCoordinator (Facade Coordination Hub)
     ↓
@@ -23,7 +23,7 @@ The **Year3000System** is the central orchestrator of the entire Catppuccin Star
 🎵 Individual Systems (Visual Effects Coordination, Performance, Audio, etc.)
 ```
 
-The Year3000System sits at the apex of the architecture, managing the entire lifecycle of the theme while delegating specific concerns to specialized facades through the SystemCoordinator.
+The AdvancedThemeSystem sits at the apex of the architecture, managing the entire lifecycle of the theme while delegating specific concerns to specialized facades through the SystemCoordinator.
 
 ---
 
@@ -38,8 +38,8 @@ The Year3000System sits at the apex of the architecture, managing the entire lif
 ### 2. Configuration Management
 - **Deep Configuration Cloning**: Maintains configuration state consistency
 - **Live Settings Updates**: Responds to real-time configuration changes
-- **Artistic Mode Management**: Handles visual quality and performance profiles
-- **Harmonic Evolution**: Manages color harmony and evolution settings
+- **Quality Profile Management**: Handles visual quality and performance profiles
+- **Dynamic Evolution**: Manages color harmony and evolution settings
 
 ### 3. Performance Orchestration
 - **Progressive Loading**: Supports degraded mode for environments with limited APIs
@@ -76,9 +76,9 @@ public get lightweightParticleSystem() {
 
 #### Configuration and Utils
 ```typescript
-public YEAR3000_CONFIG: Year3000Config;  // System configuration
-public utils: typeof Utils;              // Utility functions
-public initialized: boolean;             // Initialization state
+public ADVANCED_SYSTEM_CONFIG: AdvancedSystemConfig;  // System configuration
+public utils: typeof Utils;                           // Utility functions
+public initialized: boolean;                          // Initialization state
 ```
 
 #### API Integration
@@ -89,7 +89,7 @@ private _songChangeHandler: (() => Promise<void>) | null = null;  // Music event
 
 #### Performance Monitoring
 ```typescript
-public allowHarmonicEvolution: boolean = true;      // Harmonic evolution permission
+public allowDynamicEvolution: boolean = true;       // Dynamic evolution permission
 public performanceGuardActive: boolean = false;     // Performance monitoring state
 ```
 
@@ -99,14 +99,14 @@ public performanceGuardActive: boolean = false;     // Performance monitoring st
 
 ### Phase 4: Facade Coordination Pattern
 
-The Year3000System has evolved through multiple phases, currently implementing **Phase 4: Facade Coordination**. This represents a sophisticated architectural pattern where all system access goes through facade coordinators.
+The AdvancedThemeSystem has evolved through multiple phases, currently implementing **Phase 4: Facade Coordination**. This represents a sophisticated architectural pattern where all system access goes through facade coordinators.
 
 #### Initialization Flow
 ```typescript
 async initializeAllSystems(): Promise<void> {
   // 1. Initialize Facade Coordination System
   this.facadeCoordinator = new SystemCoordinator(
-    this.YEAR3000_CONFIG,
+    this.ADVANCED_SYSTEM_CONFIG,
     this.utils,
     this
   );
@@ -166,7 +166,7 @@ All system access now goes through the facade coordinator instead of direct prop
 ```typescript
 // Modern facade access
 public get beatSyncVisualSystem() {
-  return this.facadeCoordinator?.getVisualSystem('OrganicBeatSync') || null;
+  return this.facadeCoordinator?.getVisualSystem('DynamicBeatSync') || null;
 }
 
 public get lightweightParticleSystem() {
@@ -301,7 +301,7 @@ public queueCSSVariableUpdate(
 ): void {
   if (this.unifiedCSSManager) {
     // Use unified CSS manager for optimal performance
-    this.unifiedCSSManager.queueUpdate(property, value, "normal", "Year3000System");
+    this.unifiedCSSManager.queueUpdate(property, value, "normal", "AdvancedThemeSystem");
   } else if (this.cssVariableBatcher) {
     // Fallback to CSS variable batcher
     this.cssVariableBatcher.queueCSSVariableUpdate(property, value, element || undefined);
@@ -319,7 +319,7 @@ public queueCSSVariableUpdate(
 
 ### Animation System Registration
 
-The Year3000System coordinates all animation systems through the **EnhancedMasterAnimationCoordinator**:
+The AdvancedThemeSystem coordinates all animation systems through the **EnhancedMasterAnimationCoordinator**:
 
 ```typescript
 private async _registerEnhancedAnimationSystems(): Promise<void> {
@@ -327,7 +327,7 @@ private async _registerEnhancedAnimationSystems(): Promise<void> {
   
   const visualSystems = [
     { name: "BeatSyncVisualSystem", system: this.beatSyncVisualSystem, priority: "critical" },
-    { name: "EmergentChoreographyEngine", system: this.emergentChoreographyEngine, priority: "critical" },
+    { name: "DynamicChoreographyEngine", system: this.dynamicChoreographyEngine, priority: "critical" },
     { name: "LightweightParticleSystem", system: this.lightweightParticleSystem, priority: "background" },
     { name: "InteractionTrackingSystem", system: this.interactionTrackingSystem, priority: "background" }
   ];
@@ -375,7 +375,7 @@ public registerAnimationSystem(
 
 ### Deep Configuration Handling
 ```typescript
-private _deepCloneConfig(config: Year3000Config): Year3000Config {
+private _deepCloneConfig(config: AdvancedSystemConfig): AdvancedSystemConfig {
   // Phase 4: Preserve object reference to avoid state divergence
   // All systems share the same configuration object for consistency
   return config;
@@ -385,7 +385,7 @@ public updateConfiguration(key: string, value: any): void {
   const keyPath = key.split(".").filter(Boolean);
   if (!keyPath.length) return;
   
-  let current: any = this.YEAR3000_CONFIG;
+  let current: any = this.ADVANCED_SYSTEM_CONFIG;
   const finalKey = keyPath.pop();
   
   // Navigate to the target property
@@ -412,16 +412,16 @@ private _handleExternalSettingsChange(event: Event): void {
   if (!key) return;
   
   switch (key) {
-    case 'artisticMode':
-      if (typeof this.YEAR3000_CONFIG.safeSetArtisticMode === "function") {
-        this.YEAR3000_CONFIG.safeSetArtisticMode(value);
+    case 'qualityMode':
+      if (typeof this.ADVANCED_SYSTEM_CONFIG.safeSetQualityMode === "function") {
+        this.ADVANCED_SYSTEM_CONFIG.safeSetQualityMode(value);
       }
       break;
       
-    case 'harmonicIntensity':
+    case 'dynamicIntensity':
       const intensity = parseFloat(value);
       if (!Number.isNaN(intensity)) {
-        this.YEAR3000_CONFIG.harmonicIntensity = intensity;
+        this.ADVANCED_SYSTEM_CONFIG.dynamicIntensity = intensity;
         if (this.colorHarmonyEngine) {
           this.colorHarmonyEngine.setIntensity?.(intensity);
           this.updateColorsFromCurrentTrack?.();
@@ -429,10 +429,10 @@ private _handleExternalSettingsChange(event: Event): void {
       }
       break;
       
-    case 'harmonicEvolution':
+    case 'dynamicEvolution':
       const enabled = value === "true" || value === true;
-      this.allowHarmonicEvolution = enabled;
-      this.YEAR3000_CONFIG.harmonicEvolution = enabled;
+      this.allowDynamicEvolution = enabled;
+      this.ADVANCED_SYSTEM_CONFIG.dynamicEvolution = enabled;
       break;
   }
   
@@ -463,8 +463,8 @@ public async destroyAllSystems(): Promise<void> {
   }
   
   // Clean up event listeners
-  document.removeEventListener("year3000SystemSettingsChanged", this._boundExternalSettingsHandler);
-  document.removeEventListener("year3000ArtisticModeChanged", this._boundArtisticModeHandler);
+  document.removeEventListener("advancedThemeSystemSettingsChanged", this._boundExternalSettingsHandler);
+  document.removeEventListener("advancedThemeQualityModeChanged", this._boundQualityModeHandler);
   document.removeEventListener("visibilitychange", this._boundVisibilityChangeHandler);
   
   // Remove Spicetify event listeners
@@ -508,16 +508,16 @@ public async upgradeToFullMode(): Promise<void> {
 }
 ```
 
-### Harmonic Evolution
+### Dynamic Evolution
 ```typescript
-public evolveHarmonicSignature(
+public evolveDynamicSignature(
   selectedModeKey: string,
   baseSourceHex: string
 ): { derivedDarkVibrantHex: string; derivedLightVibrantHex: string } | null {
   if (this.colorHarmonyEngine) {
     const rgb = this.utils.hexToRgb(baseSourceHex);
     if (rgb) {
-      const variations = this.colorHarmonyEngine.generateHarmonicVariations(rgb);
+      const variations = this.colorHarmonyEngine.generateDynamicVariations(rgb);
       return {
         derivedDarkVibrantHex: variations.darkVibrantHex,
         derivedLightVibrantHex: variations.lightVibrantHex,
@@ -540,8 +540,8 @@ private _handleVisibilityChange(): void {
     // Force-flush performance coordinators
     // Prevents frame skew when tab regains focus
   } catch (e) {
-    if (this.YEAR3000_CONFIG?.enableDebug) {
-      console.warn("[Year3000System] VisibilityChange flush error", e);
+    if (this.ADVANCED_SYSTEM_CONFIG?.enableDebug) {
+      console.warn("[AdvancedThemeSystem] VisibilityChange flush error", e);
     }
   }
 }
@@ -554,8 +554,8 @@ private _handleVisibilityChange(): void {
 ### Event System Integration
 ```typescript
 // Global event listeners for system coordination
-document.addEventListener("year3000SystemSettingsChanged", this._boundExternalSettingsHandler);
-document.addEventListener("year3000ArtisticModeChanged", this._boundArtisticModeHandler);
+document.addEventListener("advancedThemeSystemSettingsChanged", this._boundExternalSettingsHandler);
+document.addEventListener("advancedThemeQualityModeChanged", this._boundQualityModeHandler);
 document.addEventListener("visibilitychange", this._boundVisibilityChangeHandler);
 ```
 
@@ -564,17 +564,17 @@ document.addEventListener("visibilitychange", this._boundVisibilityChangeHandler
 // Force-refresh CSS variables when Now Playing UI changes
 this._disposeNowPlayingWatcher = startNowPlayingWatcher(() => {
   this.queueCSSVariableUpdate("--sn-force-refresh", Date.now().toString());
-}, this.YEAR3000_CONFIG.enableDebug);
+}, this.ADVANCED_SYSTEM_CONFIG.enableDebug);
 ```
 
 ### Global Exposure
 ```typescript
 // Make system available globally for debugging and external access
-const year3000System = new Year3000System();
+const advancedThemeSystem = new AdvancedThemeSystem();
 if (typeof window !== "undefined") {
-  (window as any).year3000System = year3000System;
+  (window as any).advancedThemeSystem = advancedThemeSystem;
 }
-export default year3000System;
+export default advancedThemeSystem;
 ```
 
 ---
@@ -584,35 +584,35 @@ export default year3000System;
 ### Basic System Access
 ```typescript
 // Access visual systems
-const particleSystem = year3000System.lightweightParticleSystem;
-const beatSync = year3000System.beatSyncVisualSystem;
+const particleSystem = advancedThemeSystem.lightweightParticleSystem;
+const beatSync = advancedThemeSystem.beatSyncVisualSystem;
 
 // Access core services
-const musicSync = year3000System.musicSyncService;
-const settings = year3000System.settingsManager;
+const musicSync = advancedThemeSystem.musicSyncService;
+const settings = advancedThemeSystem.settingsManager;
 
 // Access performance systems
-const analyzer = year3000System.performanceAnalyzer;
-const batcher = year3000System.cssVariableBatcher;
+const analyzer = advancedThemeSystem.performanceAnalyzer;
+const batcher = advancedThemeSystem.cssVariableBatcher;
 ```
 
 ### Configuration Updates
 ```typescript
 // Update system configuration
-year3000System.updateConfiguration("harmonicIntensity", 0.8);
-year3000System.updateConfiguration("performance.enableGPUAcceleration", true);
+advancedThemeSystem.updateConfiguration("dynamicIntensity", 0.8);
+advancedThemeSystem.updateConfiguration("performance.enableGPUAcceleration", true);
 
 // Trigger color updates
-await year3000System.updateColorsFromCurrentTrack();
+await advancedThemeSystem.updateColorsFromCurrentTrack();
 
-// Apply harmonic evolution
-const evolution = year3000System.evolveHarmonicSignature("cinematic", "#ff6b6b");
+// Apply dynamic evolution
+const evolution = advancedThemeSystem.evolveDynamicSignature("cinematic", "#ff6b6b");
 ```
 
 ### Animation Registration
 ```typescript
 // Register custom animation system
-const success = year3000System.registerAnimationSystem(
+const success = advancedThemeSystem.registerAnimationSystem(
   "CustomEffectSystem",
   customSystem,
   "normal",
@@ -620,7 +620,7 @@ const success = year3000System.registerAnimationSystem(
 );
 
 // Unregister when no longer needed
-year3000System.unregisterAnimationSystem("CustomEffectSystem");
+advancedThemeSystem.unregisterAnimationSystem("CustomEffectSystem");
 ```
 
 ---
@@ -635,7 +635,7 @@ year3000System.unregisterAnimationSystem("CustomEffectSystem");
 5. **Use event-driven patterns** - Avoid polling and tight loops
 
 ### Configuration Management
-1. **Use updateConfiguration()** - Never modify YEAR3000_CONFIG directly
+1. **Use updateConfiguration()** - Never modify ADVANCED_SYSTEM_CONFIG directly
 2. **Listen for changes** - Subscribe to configuration change events
 3. **Validate inputs** - Ensure configuration values are valid
 4. **Provide defaults** - Always have fallback values
@@ -651,20 +651,20 @@ year3000System.unregisterAnimationSystem("CustomEffectSystem");
 ## 🔮 Future Evolution
 
 ### Planned Enhancements
-- **Advanced Consciousness Integration** - Deeper organic consciousness systems
+- **Advanced Visual Integration** - Deeper dynamic visual effects systems
 - **Machine Learning Integration** - Predictive behavior and adaptation
 - **Cross-Platform Support** - Beyond Spicetify integration
 - **Enhanced Performance** - GPU acceleration and WebGL integration
 
 ### Architectural Roadmap
-- **Phase 5** - Advanced consciousness systems with WebGL integration
+- **Phase 5** - Advanced visual effects systems with WebGL integration
 - **Phase 6** - Machine learning and predictive behavior
 - **Phase 7** - Cross-platform and multi-environment support
-- **Phase 8** - Community features and shared consciousness
+- **Phase 8** - Community features and shared visual coordination
 
 ---
 
-**Last Updated**: 2025-07-19  
+**Last Updated**: 2025-08-15  
 **System Version**: Phase 4 (Facade Coordination)  
 **API Compatibility**: Spicetify 2.x  
 **Performance Target**: 60fps, <50MB memory, <10% CPU

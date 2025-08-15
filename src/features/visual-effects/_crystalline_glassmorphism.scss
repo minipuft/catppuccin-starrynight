@@ -1,11 +1,11 @@
 // ████████████████████████████████████████████████████████████████████████████████
 // 💎 FLUX CRYSTALLINE GLASSMORPHISM - Floating Crystal Reality
-// YEAR 3000 VISUAL TRANSCENDENCE MODULE  
+// YEAR 3000 VISUAL ENHANCEMENT MODULE  
 // "Interface elements don't sit on surfaces. They float in crystalline space."
 // ████████████████████████████████████████████████████████████████████████████████
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 💠 CRYSTAL CONSCIOUSNESS VARIABLES
+// 💠 CRYSTAL VISUAL EFFECTS VARIABLES
 // ═══════════════════════════════════════════════════════════════════════════════
 
 :root {
@@ -40,7 +40,7 @@
   --crystal-shadow-distance: 30px;
   --crystal-weightlessness: 0.98;
   
-  // === FROSTED CONSCIOUSNESS ===
+  // === FROSTED VISUAL EFFECTS ===
   --frost-density: var(--glass-blur, 20px);
   --frost-texture-scale: 200%;
   --frost-edge-clarity: 8px;
@@ -63,7 +63,7 @@
 // ✨ CRYSTAL FLOATING ANIMATIONS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-@keyframes crystal-holographic-pulse {
+@keyframes crystal-layered-pulse {
   0%, 100% {
     filter: brightness(1) drop-shadow(0 var(--crystal-shadow-distance) 40px rgba(var(--sn-accent-rgb), 0.15)) hue-rotate(0deg);
     opacity: var(--crystal-opacity-base, 0.8);
@@ -120,7 +120,7 @@
   }
 }
 
-@keyframes living-pulse-consciousness {
+@keyframes living-pulse-visual-effects {
   0%, 100% {
     transform: scale(1) rotateZ(0deg);
     opacity: var(--living-pulse-opacity);
@@ -144,7 +144,7 @@
   }
 }
 
-@keyframes iridescent-consciousness {
+@keyframes iridescent-visual-effects {
   0% {
     background-position: 0% 50%;
     filter: hue-rotate(0deg);
@@ -171,7 +171,7 @@
 // 💎 CORE CRYSTAL MIXIN
 // ═══════════════════════════════════════════════════════════════════════════════
 
-@mixin crystalline-consciousness {
+@mixin crystalline-layered-effects {
   position: relative;
   backdrop-filter: 
     blur(var(--frost-density)) 
@@ -204,9 +204,9 @@
   
   // Floating animation with integrated pulse effects
   animation: 
-    crystal-holographic-pulse var(--crystal-float-rhythm) ease-in-out infinite,
-    iridescent-consciousness var(--iridescence-flow-speed) linear infinite,
-    living-pulse-consciousness var(--living-pulse-speed) ease-in-out infinite;
+    crystal-layered-pulse var(--crystal-float-rhythm) ease-in-out infinite,
+    iridescent-visual-effects var(--iridescence-flow-speed) linear infinite,
+    living-pulse-visual-effects var(--living-pulse-speed) ease-in-out infinite;
   
   // Prismatic edge lighting
   box-shadow: 
@@ -318,7 +318,7 @@
     z-index: -1;
     animation: 
       prismatic-rainbow-flow var(--iridescence-flow-speed) linear infinite,
-      living-pulse-consciousness var(--music-pulse-speed) ease-in-out infinite;
+      living-pulse-visual-effects var(--music-pulse-speed) ease-in-out infinite;
     filter: blur(1px);
   }
 }
@@ -329,7 +329,7 @@
 
 // === CARDS BECOME FLOATING CRYSTALS ===
 .main-card-card {
-  @include crystalline-consciousness;
+  @include crystalline-layered-effects;
   @include prismatic-edge-lighting;
   
   border-radius: 12px;
@@ -368,7 +368,7 @@
 
 // === TRACK LIST BECOMES CRYSTAL STREAMS ===
 .main-trackList-trackListRow {
-  @include crystalline-consciousness;
+  @include crystalline-layered-effects;
   
   border-radius: 8px;
   margin: 2px 0;
@@ -389,10 +389,10 @@
     
     border: 2px solid rgba(var(--sn-accent-rgb), 0.4);
     
-    // Pulsing consciousness for active track
+    // Pulsing visual-effects for active track
     animation: 
-      crystal-holographic-pulse var(--crystal-float-rhythm) ease-in-out infinite,
-      iridescent-consciousness var(--iridescence-flow-speed) linear infinite,
+      crystal-layered-pulse var(--crystal-float-rhythm) ease-in-out infinite,
+      iridescent-visual-effects var(--iridescence-flow-speed) linear infinite,
       prismatic-rainbow-flow calc(var(--iridescence-flow-speed) * 0.8) linear infinite;
   }
 }
@@ -400,7 +400,7 @@
 // === SIDEBAR BECOMES CRYSTAL NAVIGATION ===
 .main-yourLibrary-yourLibrary,
 .main-navBar-navBar {
-  @include crystalline-consciousness;
+  @include crystalline-layered-effects;
   
   border-radius: 0;
   --crystal-float-height: 5px;
@@ -408,7 +408,7 @@
   
   .main-navBar-navBarLink,
   .spicetify-playlist-list li {
-    @include crystalline-consciousness;
+    @include crystalline-layered-effects;
     
     border-radius: 6px;
     margin: 1px 0;
@@ -426,7 +426,7 @@
 
 // === PLAYBACK CONTROLS BECOME CRYSTAL INTERFACE ===
 .main-nowPlayingBar-nowPlayingBar {
-  @include crystalline-consciousness;
+  @include crystalline-layered-effects;
   
   border-radius: 0;
   border-top: 2px solid rgba(var(--sn-accent-rgb), 0.3);
@@ -436,7 +436,7 @@
   .main-skipBackButton-button,
   .main-skipForwardButton-button,
   .main-shuffleButton-button {
-    @include crystalline-consciousness;
+    @include crystalline-layered-effects;
     
     border-radius: 50%;
     --crystal-float-height: 4px;
@@ -447,7 +447,7 @@
     }
   }
   
-  // Main play button gets enhanced crystal consciousness
+  // Main play button gets enhanced crystal visual-effects
   .main-playButton-PlayButton {
     --crystal-float-height: 8px;
     --prism-intensity: 0.7;
@@ -462,7 +462,7 @@
 input[type="text"],
 input[type="search"],
 .x-filterBox-filterInput {
-  @include crystalline-consciousness;
+  @include crystalline-layered-effects;
   
   border-radius: 25px;
   --crystal-float-height: 2px;
@@ -479,7 +479,7 @@ input[type="search"],
 
 // === CONTEXT MENUS BECOME CRYSTAL PORTALS ===
 .main-contextMenu-menu {
-  @include crystalline-consciousness;
+  @include crystalline-layered-effects;
   @include prismatic-edge-lighting;
   
   border-radius: 12px;
@@ -487,7 +487,7 @@ input[type="search"],
   --prism-intensity: 0.3;
   
   .main-contextMenu-menuItemButton {
-    @include crystalline-consciousness;
+    @include crystalline-layered-effects;
     
     border-radius: 6px;
     --crystal-float-height: 2px;
@@ -569,3 +569,11 @@ input[type="search"],
     border-color: rgba(var(--sn-accent-rgb), 0.6);
   }
 }
+
+// =============================================================================
+// LEGACY COMPATIBILITY MAPPINGS - Phase 6.3 Layer C Modernization
+// =============================================================================
+
+// This file already uses appropriate technical terminology (crystal, prismatic, 
+// iridescent, facet) and requires minimal legacy support. Only a few comment
+// references to metaphorical concepts need compatibility.

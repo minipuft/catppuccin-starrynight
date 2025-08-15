@@ -12,7 +12,7 @@ import { UnifiedSystemBase } from "@/core/base/UnifiedSystemBase";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
 
 interface HeaderEffectsState {
@@ -72,7 +72,7 @@ export class HeaderVisualEffectsController extends UnifiedSystemBase {
   };
   private cssChangeThreshold = 0.01;
 
-  constructor(config: Year3000Config) {
+  constructor(config: AdvancedSystemConfig | Year3000Config) {
     super(config);
   }
 

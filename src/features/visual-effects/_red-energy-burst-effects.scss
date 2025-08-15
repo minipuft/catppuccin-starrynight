@@ -269,8 +269,11 @@
 /* Now Playing Bar - Energy Barrier */
 .Root__now-playing-bar {
   &[data-cinematic-mode="active"] {
-    @extend .cinematic-energy-burst;
-    @extend .cinematic-atmospheric-depth;
+    @extend .cinematic-energy-burst !optional;
+    // Cinematic atmospheric depth (inline CSS)
+    position: relative;
+    filter: blur(0.5px);
+    backdrop-filter: brightness(1.1) contrast(1.05);
     
     background: linear-gradient(
       90deg,
@@ -289,8 +292,8 @@
 /* Main View Container - Cinematic Overlay */
 .main-view-container {
   &[data-cinematic-mode="active"] {
-    @extend .cinematic-crt-interference;
-    @extend .red-energy-burst-effectstic-scanlines;
+    @extend .cinematic-crt-interference !optional;
+    @extend .red-energy-burst-effectstic-scanlines !optional;
     
     &::before {
       opacity: calc(var(--cinematic-interference) * 0.8);
@@ -301,8 +304,8 @@
 /* Navigation Bar - Red Data Stream */
 .Root__nav-bar {
   &[data-cinematic-mode="active"] {
-    @extend .cinematic-red-data-stream;
-    @extend .cinematic-crt-interference;
+    @extend .cinematic-red-data-stream !optional;
+    @extend .cinematic-crt-interference !optional;
     
     border-right: 1px solid rgba(var(--cinematic-red-rgb), calc(var(--cinematic-glow-intensity) * 0.6));
     box-shadow: 
@@ -314,7 +317,7 @@
 /* Player Controls - Dramatic Interface */
 .player-controls {
   &[data-cinematic-mode="active"] {
-    @extend .cinematic-energy-burst;
+    @extend .cinematic-energy-burst !optional;
     
     .control-button {
       position: relative;
@@ -373,7 +376,7 @@
         cinematic-crt-flicker 0.3s linear infinite;
     }
     
-    @extend .cinematic-crt-interference;
+    @extend .cinematic-crt-interference !optional;
   }
 }
 

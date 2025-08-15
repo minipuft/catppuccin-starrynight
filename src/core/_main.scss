@@ -1,119 +1,122 @@
 // ████████████████████████████████████████████████████████████████████████████████
-// YEAR 3000 REALITY BREACH ENHANCEMENT - Revolutionary Visual Experience
+// CATPPUCCIN STARRYNIGHT - Optimized Architecture (Phase 3)
+// Consolidated SCSS module system with performance optimization
 // ████████████████████████████████████████████████████████████████████████████████
 
-// === CORE MODULES ===
-// 🎯 CONSOLIDATED TOKEN SYSTEM (Phase 2: Variable Consolidation)
+// === LAYER 1: FOUNDATION (Load Order Critical) ===
+// Design tokens must load first - all other modules depend on these
 @use "_design-tokens" as *; // Consolidated design system (root, unified, base variables)
-@use "_motion-tokens" as *;  // Consolidated motion system (animation, beat sync, layered effects)
+@use "_motion-tokens" as *;  // Consolidated motion system (animation, beat sync, layered effects)  
 @use "_visual-tokens" as *;  // Consolidated visual system (gradient, visual effects)
 
-// Utility modules
+// === LAYER 2: UTILITIES (Mixin Dependencies) ===
+// Utility mixins and functions - loaded after tokens, before implementations
 @use "_mixins" as *;
-@use "_performance_mixins" as *; // 🚀 PHASE 3 PERFORMANCE OPTIMIZATION MIXINS
+@use "_performance_mixins" as *; // Performance optimization mixins
 @use "_sn_typography" as *;
 @use "_kinetic-animations" as *;
-@use "_sn_legacy_support" as *;
-@use "_sn_architecture_documentation" as *;
 @use "_dom_selectors" as *; // Centralized DOM selector mixins
 
-// Legacy compatibility (deprecated - will be removed after validation)
+// === LAYER 3: COMPATIBILITY (Backward Compatibility) ===
+// Compatibility layers for renamed variables and mixins
+@use "_variable-compatibility" as *; // CSS variable compatibility aliases
+@use "_mixin-compatibility" as *; // Backward compatibility for renamed mixins
 @use "_variables" as *; // Legacy variables for backward compatibility
+@use "_sn_legacy_support" as *;
+@use "_sn_architecture_documentation" as *;
 
-// === LAYOUT MODULES ===
+// === LAYER 4: STRUCTURAL (Layout & Components) ===
+// Layout modules - structural positioning and containers
 @use "../layout/_main_view_container" as *;
-@use "../layout/_entity_header_enhanced" as *;
-@use "../layout/_top_bar_enhanced" as *;
-@use "../layout/_action_bar_enhanced" as *;
-@use "../layout/_sn_sidebar_navigation" as *;
 @use "../layout/_navbar" as *;
 @use "../layout/_top_bar" as *;
-@use "../layout/_right_sidebar" as *;
+@use "../layout/_top_bar_enhanced" as *;
+@use "../layout/_action_bar_enhanced" as *;
 @use "../layout/_sn_header_actionBar" as *;
+@use "../layout/_sn_sidebar_navigation" as *;
+@use "../layout/_right_sidebar" as *;
+@use "../layout/_entity_header_enhanced" as *;
 @use "../layout/_artist_header_effects" as *;
 @use "../layout/_sn_scroll_node_backgrounds" as *;
 
-// === COMPONENT MODULES ===
-@use "../components/_track_list_enhanced" as *;
-@use "../components/_sn_card_base" as *;
-@use "../components/_sn_enhanced_cards" as *;
+// Component modules - reusable UI components
+@use "../components/_sn_glyph_variables" as *; // Load glyph variables first
+@use "../components/_sn_card_base" as *; // Base card styles first
+@use "../components/_sn_enhanced_cards" as *; // Enhanced cards depend on base
 @use "../components/_sn_card_non_search" as *;
-@use "../components/_sn_loading" as *;
+@use "../components/_sn_visual_accents" as *; // Visual accents for components
+@use "../components/_track_list_enhanced" as *;
 @use "../components/_now_playing" as *;
-@use "../components/_sn_glyph_variables" as *; // Glyph system variables
-@use "../components/_sn_visual_accents" as *; // Visual accent effects
+@use "../components/_sn_loading" as *;
 
-// === FEATURE MODULES ===
+// === LAYER 5: FEATURES (Advanced Functionality) ===
+// Load features in dependency order for optimal performance
 
-// Animation & Motion
-@use "../features/animations/_3d_transforms" as *;
-@use "../features/animations/_field_matrix" as *;
-@use "../features/animations/_scrolling_effects" as *;
-@use "../features/animations/_shape_transitions" as *;
-
-// Background & Visual Layers
-@use "../features/backgrounds/_ambient_effects" as *;
-@use "../features/backgrounds/_connected_dots" as *;
-@use "../features/backgrounds/_cosmic_effects" as *;
-@use "../features/backgrounds/_depth_layers" as *; // Content-aware depth consciousness
-@use "../features/backgrounds/_3d_depth_layers" as *; // 3D layer system
-@use "../features/backgrounds/_dot_matrix" as *;
-@use "../features/backgrounds/_particle_field" as *;
-@use "../features/backgrounds/_stars" as *;
-
-// Visual Effects & Styling
-@use "../features/visual-effects/_advanced_layer" as *;
-@use "../features/visual-effects/_beat_sync_glassmorphism" as *;
-@use "../features/visual-effects/_crystalline_glassmorphism" as *;
-@use "../features/visual-effects/_css_blob_fallback" as *;
-@use "../features/visual-effects/_living_gradients" as *;
-@use "../features/visual-effects/_translucent_overlays" as *;
-
-// Music Integration
-@use "../features/music-sync/_beat_synchronization" as *;
-@use "../features/music-sync/_genre_aware_ui" as *;
-@use "../features/music-sync/_music_visualization" as *;
-
-// UI Components & Interaction
-@use "../features/interactions/_animated_icons" as *;
-@use "../features/interactions/_css_interactions" as *;
-@use "../features/interactions/_microinteractions" as *;
-@use "../features/interactions/_themed_components" as *;
-@use "../features/interactions/_ui_elements" as *;
-
-// System & Architecture
+// Core system features first - other features depend on these
+@use "../features/system/_z_index_management" as *; // Z-index management first
 @use "../features/system/_context_zones" as *;
 @use "../features/system/_visual_hierarchy" as *;
-@use "../features/system/_z_index_management" as *;
 
-// === SYSTEMS MODULES ===
-@use "../systems/_sn_behavioral_prediction" as *;
+// Background layers - provide foundation for visual effects
+@use "../features/backgrounds/_depth_layers" as *; // Base depth system
+@use "../features/backgrounds/_3d_depth_layers" as *; // 3D layer system
+@use "../features/backgrounds/_ambient_effects" as *;
+@use "../features/backgrounds/_cosmic_effects" as *; // Dynamic background effects
+@use "../features/backgrounds/_stars" as *;
+@use "../features/backgrounds/_particle_field" as *;
+@use "../features/backgrounds/_connected_dots" as *;
+@use "../features/backgrounds/_dot_matrix" as *;
+
+// Music synchronization - core functionality for visual effects
+@use "../features/music-sync/_beat_synchronization" as *;
+@use "../features/music-sync/_music_visualization" as *;
+@use "../features/music-sync/_genre_aware_ui" as *;
+@use "../features/music-sync/ui/visual-effects-main" as *;
+
+// Visual effects - depend on backgrounds and music sync
+@use "../features/visual-effects/_fluid-gradient-base" as *; // Base gradients first
+@use "../features/visual-effects/_living_gradients" as *; // Dynamic gradient effects
+@use "../features/visual-effects/_crystalline_glassmorphism" as *;
+@use "../features/visual-effects/_beat_sync_glassmorphism" as *;
+@use "../features/visual-effects/_translucent_overlays" as *;
+@use "../features/visual-effects/_advanced_layer" as *;
+@use "../features/visual-effects/_css_blob_fallback" as *;
+
+// Animations - enhance visual effects
+@use "../features/animations/_3d_transforms" as *;
+@use "../features/animations/_shape_transitions" as *;
+@use "../features/animations/_scrolling_effects" as *;
+@use "../features/animations/_field_matrix" as *;
+
+// Interactions - topmost layer
+@use "../features/interactions/_themed_components" as *;
+@use "../features/interactions/_ui_elements" as *;
+@use "../features/interactions/_css_interactions" as *;
+@use "../features/interactions/_microinteractions" as *;
+@use "../features/interactions/_animated_icons" as *;
+
+// === LAYER 6: SPECIALIZED SYSTEMS ===
+// High-level behavioral and optimization systems
 @use "../systems/_sn_performance_optimization" as *;
-@use "../systems/_sn_advanced_visual_effects" as *;
 @use "../systems/_sn_data_glyphs" as *;
+@use "../systems/_sn_advanced_visual_effects" as *;
+@use "../systems/_sn_behavioral_prediction" as *;
 
-// === VISUAL CONSCIOUSNESS MODULES ===
-@use "../visual/music-sync/visual-effects-main" as *;
+// === LAYER 7: INTERFACE SPECIFIC ===
+// Search and sidebar-specific functionality
+@use "../search/_sn_search_future" as *; // Lightweight search styling
+@use "../sidebar/_sidebar_interactive" as *; // Sidebar-specific interactions
 
-// === UI EFFECTS MODULES ===
-// Context menu implementation removed
-
-// === SEARCH MODULES ===
-@use "../search/_sn_search_future" as *; // Lightweight Year3000 search styling
-
-// === LEGACY SIDEBAR MODULES ===
-@use "../sidebar/_sidebar_background_effects" as *;
-@use "../sidebar/_sidebar_interactive" as *;
-
-// Sidebar Dimensional Nexus enhancement module (post-interactive)
-@use "../sidebar/_sidebar_layered_effects" as *;
-
-// ARCHITECTURAL LAYERS:
-// 1. CORE MODULES      - Foundation utilities and variables
-// 2. LAYOUT MODULES    - Structural styling and positioning
-// 3. COMPONENT MODULES - Individual component styling
-// 4. FEATURE MODULES   - Advanced interactive features
-// 5. SYSTEM MODULES    - Complex behavioral systems
+// ████████████████████████████████████████████████████████████████████████████████
+// OPTIMIZED ARCHITECTURAL LAYERS (Load Order):
+// 1. FOUNDATION    - Design tokens, variables (critical dependencies)
+// 2. UTILITIES     - Mixins, functions, typography (tool dependencies)  
+// 3. COMPATIBILITY - Backward compatibility layers (legacy support)
+// 4. STRUCTURAL    - Layout and component architecture (UI foundation)
+// 5. FEATURES      - Advanced functionality (visual effects, interactions)
+// 6. SYSTEMS       - High-level behavioral systems (performance, analytics)
+// 7. INTERFACE     - Specialized interface modules (search, sidebar)
 //
-// For detailed documentation, see: src/core/_sn_architecture_documentation.scss
+// Performance Targets: <1MB bundle, <30ms compilation, 60fps runtime
+// Documentation: src/core/_sn_architecture_documentation.scss
 // ████████████████████████████████████████████████████████████████████████████████

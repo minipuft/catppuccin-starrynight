@@ -2,17 +2,17 @@
  * FluidGradientBackgroundSystem - Reality Bleeding Gradients System
  * Part of the Year 3000 System visual pipeline
  *
- * Transforms gradients into flowing liquid consciousness - breathing, pulsing aurora
+ * Transforms gradients into flowing liquid visuals - animated, pulsing aurora
  * that responds to music with directional flow patterns.
  */
 
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { unifiedEventBus, type EventData } from "@/core/events/UnifiedEventBus";
 import { SimplePerformanceCoordinator, type QualityLevel, type QualityScalingCapable, type PerformanceMetrics, type QualityCapability } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { ShaderLoader } from "@/utils/graphics/ShaderLoader";
@@ -24,8 +24,8 @@ import type {
 } from "../effects/VisualEffectsCoordinator";
 import { WebGLGradientBackgroundSystem } from "../background/WebGLRenderer";
 
-// Enhanced shader with advanced liquid consciousness flow patterns
-const liquidConsciousnessShader = `#version 300 es
+// Enhanced shader with advanced liquid visual effects flow patterns
+const liquidVisualEffectsShader = `#version 300 es
 precision mediump float;
 
 uniform float u_time;
@@ -34,13 +34,13 @@ uniform vec2 u_resolution;
 uniform float u_flowStrength;
 uniform float u_noiseScale;
 
-// Enhanced liquid consciousness uniforms
+// Enhanced liquid visual effects uniforms
 uniform float u_liquidPhase;
-uniform float u_breathingIntensity;
+uniform float u_animationIntensity;
 uniform float u_auroraFlow;
 uniform vec2 u_flowDirection;
 uniform float u_liquidTurbulence;
-uniform float u_consciousnessDepth;
+uniform float u_visualEffectsDepth;
 
 // Advanced liquid physics uniforms
 uniform float u_surfaceTension;
@@ -48,9 +48,9 @@ uniform float u_viscosity;
 uniform float u_liquidGravity;
 uniform float u_particleDensity;
 uniform float u_fluidDynamics;
-uniform float u_membraneElasticity;
+uniform float u_surfaceElasticity;
 uniform vec2 u_liquidVelocity;
-uniform float u_consciousnessTemperature;
+uniform float u_visualEffectsTemperature;
 
 // Music sync uniforms
 uniform float u_musicEnergy;
@@ -60,9 +60,9 @@ uniform float u_bassResponse;
 uniform float u_genreInfluence;
 uniform float u_emotionalTemperature;
 
-// Multi-layer consciousness uniforms
-uniform float u_consciousnessLevel;
-uniform float u_awarenessLevel;
+// Multi-layer visual effects uniforms
+uniform float u_visualEffectsLevel;
+uniform float u_activityLevel;
 uniform float u_memoryIntensity;
 uniform float u_temporalFlowStrength;
 
@@ -75,7 +75,7 @@ uniform float u_blurMax;
 
 out vec4 fragColor;
 
-// Improved simplex noise with liquid consciousness modifications
+// Improved simplex noise with liquid visualEffects modifications
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -120,7 +120,7 @@ float calculateSurfaceTension(vec2 uv, float baseValue) {
 }
 
 vec2 calculateViscosityFlow(vec2 uv, vec2 baseFlow, float timeOffset) {
-  // Viscosity affects flow resistance and creates more organic movement
+  // Viscosity affects flow resistance and creates more dynamic movement
   float viscosityResistance = 1.0 - u_viscosity * 0.8;
   vec2 viscousFlow = baseFlow * viscosityResistance;
   
@@ -138,8 +138,8 @@ float simulateGravityEffect(vec2 uv, float baseIntensity) {
   return baseIntensity + settlingPattern;
 }
 
-// Enhanced liquid consciousness noise with advanced physics
-float liquidConsciousnessNoise(vec2 uv, float timeOffset) {
+// Enhanced liquid visual effects noise with advanced physics
+float liquidVisualEffectsNoise(vec2 uv, float timeOffset) {
   vec2 flowUV = uv;
   float adjustedTime = u_time + timeOffset;
 
@@ -155,11 +155,11 @@ float liquidConsciousnessNoise(vec2 uv, float timeOffset) {
   // Add liquid velocity for momentum
   viscousFlow += u_liquidVelocity * 0.5;
 
-  // Enhanced breathing effect with consciousness depth
-  float breathingPhase = sin(adjustedTime * 0.05 + u_liquidPhase) * u_breathingIntensity;
-  float consciousnessWave = sin(adjustedTime * 0.02 + u_consciousnessDepth) * 0.3;
+  // Enhanced animation effect with visualEffects depth
+  float animationPhase = sin(adjustedTime * 0.05 + u_liquidPhase) * u_animationIntensity;
+  float visualEffectsWave = sin(adjustedTime * 0.02 + u_visualEffectsDepth) * 0.3;
   
-  // Consciousness memory patterns
+  // VisualEffects memory patterns
   float memoryPattern = sin(adjustedTime * 0.008 + u_memoryIntensity * 5.0) * 0.15;
   
   // Temporal flow effects
@@ -168,8 +168,8 @@ float liquidConsciousnessNoise(vec2 uv, float timeOffset) {
   // Aurora flow patterns with enhanced physics
   flowUV += viscousFlow * adjustedTime * 0.03 * u_auroraFlow;
   flowUV += vec2(
-    sin(adjustedTime * 0.04 + uv.y * 6.28) * (breathingPhase + memoryPattern),
-    cos(adjustedTime * 0.03 + uv.x * 6.28) * (breathingPhase + temporalDistortion)
+    sin(adjustedTime * 0.04 + uv.y * 6.28) * (animationPhase + memoryPattern),
+    cos(adjustedTime * 0.03 + uv.x * 6.28) * (animationPhase + temporalDistortion)
   ) * 0.02;
 
   // Enhanced turbulence with particle density
@@ -181,10 +181,10 @@ float liquidConsciousnessNoise(vec2 uv, float timeOffset) {
   // Fluid dynamics creates more complex flow patterns
   float fluidDynamicsEffect = snoise(flowUV * 3.0 + adjustedTime * 0.005) * u_fluidDynamics;
 
-  // Multi-octave liquid noise with consciousness layers
-  float noise1 = snoise(flowUV * u_noiseScale + turbulence1 * 0.1) * u_consciousnessLevel;
-  float noise2 = snoise(flowUV * u_noiseScale * 2.0 + turbulence2 * 0.05) * u_awarenessLevel;
-  float noise3 = snoise(flowUV * u_noiseScale * 0.5 + consciousnessWave) * (1.0 - u_consciousnessLevel * 0.3);
+  // Multi-octave liquid noise with visualEffects layers
+  float noise1 = snoise(flowUV * u_noiseScale + turbulence1 * 0.1) * u_visualEffectsLevel;
+  float noise2 = snoise(flowUV * u_noiseScale * 2.0 + turbulence2 * 0.05) * u_activityLevel;
+  float noise3 = snoise(flowUV * u_noiseScale * 0.5 + visualEffectsWave) * (1.0 - u_visualEffectsLevel * 0.3);
   float memoryNoise = snoise(flowUV * u_noiseScale * 1.5 + memoryPattern) * u_memoryIntensity * 0.3;
 
   // Apply surface tension effects
@@ -193,7 +193,7 @@ float liquidConsciousnessNoise(vec2 uv, float timeOffset) {
   // Apply gravity settling
   float gravityEffect = simulateGravityEffect(uv, 1.0);
 
-  // Blend with enhanced music and consciousness responsiveness
+  // Blend with enhanced music and visualEffects responsiveness
   float baseNoise = (noise1 * 0.4 + noise2 * 0.3 + noise3 * 0.2 + memoryNoise * 0.1) * surfaceTensionEffect * gravityEffect;
   baseNoise += fluidDynamicsEffect * 0.1;
   
@@ -206,26 +206,26 @@ float liquidConsciousnessNoise(vec2 uv, float timeOffset) {
   return clamp((baseNoise + musicModulation) * temperatureEffect * 0.5 + 0.5, 0.0, 1.0);
 }
 
-// Advanced liquid wave physics with membrane elasticity
+// Advanced liquid wave physics with surface elasticity
 float liquidWaveAlpha(vec2 uv, int waveIndex) {
   float y = uv.y;
   float waveCenter = u_waveY[waveIndex];
   float waveHeight = u_waveHeight[waveIndex];
 
-  // Enhanced breathing modulation with consciousness memory
-  float breathingMod = sin(u_time * 0.1 + float(waveIndex) * 2.0) * u_breathingIntensity * 0.2;
-  float consciousnessBreathing = sin(u_time * 0.06 + u_consciousnessLevel * 3.0) * 0.15;
+  // Enhanced animation modulation with visualEffects memory
+  float animationMod = sin(u_time * 0.1 + float(waveIndex) * 2.0) * u_animationIntensity * 0.2;
+  float visualEffectsBreathing = sin(u_time * 0.06 + u_visualEffectsLevel * 3.0) * 0.15;
   float memoryBreathing = sin(u_time * 0.04 + u_memoryIntensity * 2.0) * 0.1;
   
-  float totalBreathing = breathingMod + consciousnessBreathing + memoryBreathing;
+  float totalBreathing = animationMod + visualEffectsBreathing + memoryBreathing;
   float adjustedWaveHeight = waveHeight * (1.0 + totalBreathing);
 
-  // Enhanced liquid distortion with membrane elasticity
-  float membraneElastic = snoise(vec2(uv.x * 6.0 + u_time * 0.3, uv.y * 4.0)) * u_membraneElasticity * 0.08;
+  // Enhanced liquid distortion with surface elasticity
+  float surfaceElastic = snoise(vec2(uv.x * 6.0 + u_time * 0.3, uv.y * 4.0)) * u_surfaceElasticity * 0.08;
   float liquidDistortion = snoise(vec2(uv.x * 8.0, u_time * 0.5)) * 0.05 * u_liquidTurbulence;
   float fluidDeformation = sin(uv.x * 10.0 + u_time * 0.7) * u_fluidDynamics * 0.03;
   
-  float totalDistortion = liquidDistortion + membraneElastic + fluidDeformation;
+  float totalDistortion = liquidDistortion + surfaceElastic + fluidDeformation;
   float adjustedWaveCenter = waveCenter + totalDistortion;
 
   // Surface tension creates natural wave boundaries
@@ -233,12 +233,12 @@ float liquidWaveAlpha(vec2 uv, int waveIndex) {
   float tensionSmoothness = mix(0.3, 0.7, u_surfaceTension);
   float alpha = 1.0 - smoothstep(0.0, adjustedWaveHeight * tensionSmoothness, distance);
 
-  // Enhanced shimmer with consciousness and emotional temperature
+  // Enhanced shimmer with visualEffects and emotional temperature
   float baseShimmer = sin(u_time * 2.0 + uv.x * 20.0) * 0.1 + 0.9;
-  float consciousnessShimmer = sin(u_time * 1.5 + uv.y * 15.0 + u_consciousnessLevel * 5.0) * 0.05 + 0.975;
+  float visualEffectsShimmer = sin(u_time * 1.5 + uv.y * 15.0 + u_visualEffectsLevel * 5.0) * 0.05 + 0.975;
   float temperatureShimmer = mix(0.95, 1.05, u_emotionalTemperature);
   
-  alpha *= baseShimmer * consciousnessShimmer * temperatureShimmer;
+  alpha *= baseShimmer * visualEffectsShimmer * temperatureShimmer;
 
   // Viscosity affects wave edge softness
   alpha = mix(alpha, smoothstep(0.2, 0.8, alpha), u_viscosity);
@@ -246,13 +246,13 @@ float liquidWaveAlpha(vec2 uv, int waveIndex) {
   return clamp(alpha, 0.0, 1.0);
 }
 
-// Dynamic blur with consciousness depth
+// Dynamic blur with visualEffects depth
 float liquidBlur(vec2 uv) {
   vec2 center = vec2(0.5, 0.5);
   float distance = length(uv - center);
 
-  // Consciousness depth affects blur
-  float depthModulation = sin(u_time * 0.08 + u_consciousnessDepth) * 0.2 + 0.8;
+  // VisualEffects depth affects blur
+  float depthModulation = sin(u_time * 0.08 + u_visualEffectsDepth) * 0.2 + 0.8;
   float adjustedBlurExp = u_blurExp * depthModulation;
 
   float blur = pow(distance, adjustedBlurExp);
@@ -264,10 +264,10 @@ float liquidBlur(vec2 uv) {
 void main() {
   vec2 uv = gl_FragCoord.xy / u_resolution.xy;
 
-  // Generate enhanced liquid consciousness noise fields with physics
-  float liquidNoise1 = liquidConsciousnessNoise(uv, u_waveOffset[0]);
-  float liquidNoise2 = liquidConsciousnessNoise(uv, u_waveOffset[1]);
-  float liquidNoise3 = liquidConsciousnessNoise(uv, u_waveOffset[2]);
+  // Generate enhanced liquid visualEffects noise fields with physics
+  float liquidNoise1 = liquidVisualEffectsNoise(uv, u_waveOffset[0]);
+  float liquidNoise2 = liquidVisualEffectsNoise(uv, u_waveOffset[1]);
+  float liquidNoise3 = liquidVisualEffectsNoise(uv, u_waveOffset[2]);
 
   // Calculate advanced liquid wave alphas with physics simulation
   float alpha1 = liquidWaveAlpha(uv, 0);
@@ -283,43 +283,43 @@ void main() {
     alpha3 = (alpha3 / totalAlpha) * particleWeight;
   }
 
-  // Blend liquid consciousness noise fields with physics
+  // Blend liquid visualEffects noise fields with physics
   float t = liquidNoise1 * alpha1 + liquidNoise2 * alpha2 + liquidNoise3 * alpha3;
   
-  // Apply consciousness temperature modulation
-  t = mix(t * 0.8, t * 1.2, u_consciousnessTemperature);
+  // Apply visualEffects temperature modulation
+  t = mix(t * 0.8, t * 1.2, u_visualEffectsTemperature);
   t = clamp(t, 0.0, 1.0);
 
-  // Sample gradient texture with enhanced consciousness modulation
+  // Sample gradient texture with enhanced visualEffects modulation
   vec4 color = texture(u_gradientTex, vec2(t, 0.5));
 
-  // Apply dynamic blur with consciousness awareness
+  // Apply dynamic blur with visualEffects awareness
   float blurAmount = liquidBlur(uv);
-  float consciousnessBlur = mix(blurAmount, blurAmount * 0.5, u_consciousnessLevel);
+  float visualEffectsBlur = mix(blurAmount, blurAmount * 0.5, u_visualEffectsLevel);
 
-  // Enhanced vignette with consciousness memory patterns
+  // Enhanced vignette with visualEffects memory patterns
   vec2 center = uv - 0.5;
-  float breathingVignette = sin(u_time * 0.06 + u_liquidPhase) * 0.1 + 0.9;
-  float consciousnessVignette = sin(u_time * 0.04 + u_consciousnessLevel * 3.0) * 0.05 + 0.975;
+  float animationVignette = sin(u_time * 0.06 + u_liquidPhase) * 0.1 + 0.9;
+  float visualEffectsVignette = sin(u_time * 0.04 + u_visualEffectsLevel * 3.0) * 0.05 + 0.975;
   float memoryVignette = sin(u_time * 0.03 + u_memoryIntensity * 2.0) * 0.03 + 0.985;
   
-  float combinedVignette = breathingVignette * consciousnessVignette * memoryVignette;
-  float vignette = combinedVignette - dot(center, center) * (0.3 + consciousnessBlur * 0.2);
+  float combinedVignette = animationVignette * visualEffectsVignette * memoryVignette;
+  float vignette = combinedVignette - dot(center, center) * (0.3 + visualEffectsBlur * 0.2);
   color.rgb *= vignette;
 
-  // Enhanced shimmer overlay with consciousness patterns
+  // Enhanced shimmer overlay with visualEffects patterns
   float shimmerPhase = u_time * 3.0 + uv.x * 15.0 + uv.y * 10.0;
   float baseShimmer = sin(shimmerPhase) * 0.03 + 0.97;
-  float awarenessShimmer = sin(u_time * 2.5 + uv.x * 12.0 + u_awarenessLevel * 8.0) * 0.02 + 0.98;
+  float awarenessShimmer = sin(u_time * 2.5 + uv.x * 12.0 + u_activityLevel * 8.0) * 0.02 + 0.98;
   float temporalShimmer = sin(u_time * 1.8 + u_temporalFlowStrength * 6.0) * 0.015 + 0.985;
   
   color.rgb *= baseShimmer * awarenessShimmer * temporalShimmer;
 
-  // Enhanced music-responsive alpha with consciousness integration
+  // Enhanced music-responsive alpha with visualEffects integration
   float musicAlpha = 0.8 + u_beatIntensity * 0.2 + u_bassResponse * 0.1 + u_genreInfluence * 0.05;
-  float consciousnessAlpha = 0.9 + u_consciousnessLevel * 0.1 - u_awarenessLevel * 0.05;
+  float visualEffectsAlpha = 0.9 + u_visualEffectsLevel * 0.1 - u_activityLevel * 0.05;
   
-  color.a *= musicAlpha * consciousnessAlpha * (1.0 - consciousnessBlur * 0.3);
+  color.a *= musicAlpha * visualEffectsAlpha * (1.0 - visualEffectsBlur * 0.3);
 
   // Apply emotional temperature to final color
   color.rgb = mix(
@@ -331,32 +331,32 @@ void main() {
   fragColor = color;
 }`;
 
-interface LiquidConsciousnessSettings {
+interface LiquidVisualEffectsSettings {
   enabled: boolean;
   liquidPhase: number;
-  breathingIntensity: number;
+  animationIntensity: number;
   auroraFlow: number;
   flowDirection: [number, number];
   liquidTurbulence: number;
-  consciousnessDepth: number;
+  visualEffectsDepth: number;
 
   // Enhanced liquid physics properties
   surfaceTension: number;      // 0-1 surface tension strength
   viscosity: number;           // 0-1 liquid viscosity
   liquidGravity: number;       // 0-1 gravitational effect
   particleDensity: number;     // 0-1 particle concentration
-  fluidDynamics: number;       // 0-1 complex fluid behavior
-  membraneElasticity: number;  // 0-1 membrane flexibility
+  smoothDynamics: number;       // 0-1 complex smooth behavior
+  surfaceElasticity: number;   // 0-1 surface flexibility
   liquidVelocity: [number, number]; // liquid momentum vector
-  consciousnessTemperature: number; // 0-1 consciousness heat
+  visualEffectsTemperature: number; // 0-1 visualEffects heat
 
-  // Enhanced consciousness properties  
-  consciousnessLevel: number;   // 0-1 consciousness intensity
+  // Enhanced visualEffects properties  
+  visualEffectsLevel: number;   // 0-1 visualEffects intensity
   awarenessLevel: number;       // 0-1 awareness depth
-  memoryIntensity: number;      // 0-1 consciousness memory strength
+  memoryIntensity: number;      // 0-1 visualEffects memory strength
   temporalFlowStrength: number; // 0-1 temporal distortion
   
-  // Enhanced musical consciousness
+  // Enhanced musical visualEffects
   genreInfluence: number;       // 0-1 genre-specific adaptations
   emotionalTemperature: number; // 0-1 warm/cool emotional range
 
@@ -367,7 +367,7 @@ interface LiquidConsciousnessSettings {
   animationSpeed: number;
 }
 
-interface LiquidConsciousnessUniforms {
+interface LiquidVisualEffectsUniforms {
   // Base uniforms from WebGL system
   u_time: WebGLUniformLocation | null;
   u_gradientTex: WebGLUniformLocation | null;
@@ -375,23 +375,23 @@ interface LiquidConsciousnessUniforms {
   u_flowStrength: WebGLUniformLocation | null;
   u_noiseScale: WebGLUniformLocation | null;
 
-  // Enhanced liquid consciousness uniforms
+  // Enhanced liquid visualEffects uniforms
   u_liquidPhase: WebGLUniformLocation | null;
-  u_breathingIntensity: WebGLUniformLocation | null;
+  u_animationIntensity: WebGLUniformLocation | null;
   u_auroraFlow: WebGLUniformLocation | null;
   u_flowDirection: WebGLUniformLocation | null;
   u_liquidTurbulence: WebGLUniformLocation | null;
-  u_consciousnessDepth: WebGLUniformLocation | null;
+  u_visualEffectsDepth: WebGLUniformLocation | null;
 
   // Advanced liquid physics uniforms
   u_surfaceTension: WebGLUniformLocation | null;
   u_viscosity: WebGLUniformLocation | null;
   u_liquidGravity: WebGLUniformLocation | null;
   u_particleDensity: WebGLUniformLocation | null;
-  u_fluidDynamics: WebGLUniformLocation | null;
-  u_membraneElasticity: WebGLUniformLocation | null;
+  u_smoothDynamics: WebGLUniformLocation | null;
+  u_surfaceElasticity: WebGLUniformLocation | null;
   u_liquidVelocity: WebGLUniformLocation | null;
-  u_consciousnessTemperature: WebGLUniformLocation | null;
+  u_visualEffectsTemperature: WebGLUniformLocation | null;
 
   // Enhanced music sync uniforms
   u_musicEnergy: WebGLUniformLocation | null;
@@ -401,9 +401,9 @@ interface LiquidConsciousnessUniforms {
   u_genreInfluence: WebGLUniformLocation | null;
   u_emotionalTemperature: WebGLUniformLocation | null;
 
-  // Multi-layer consciousness uniforms
-  u_consciousnessLevel: WebGLUniformLocation | null;
-  u_awarenessLevel: WebGLUniformLocation | null;
+  // Multi-layer visualEffects uniforms
+  u_visualEffectsLevel: WebGLUniformLocation | null;
+  u_activityLevel: WebGLUniformLocation | null;
   u_memoryIntensity: WebGLUniformLocation | null;
   u_temporalFlowStrength: WebGLUniformLocation | null;
 
@@ -416,10 +416,10 @@ interface LiquidConsciousnessUniforms {
 }
 
 /**
- * FluidGradientBackgroundSystem extends WebGL gradients with liquid consciousness
+ * FluidGradientBackgroundSystem extends WebGL gradients with liquid visualEffects
  * - Breathing, pulsing aurora effects
  * - Music-responsive directional flow
- * - Liquid turbulence and consciousness depth
+ * - Liquid turbulence and visualEffects depth
  * - Performance-optimized with CSS fallback
  */
 export class FluidGradientBackgroundSystem
@@ -427,8 +427,8 @@ export class FluidGradientBackgroundSystem
   implements BackgroundSystemParticipant, QualityScalingCapable
 {
   private webglGradientSystem: WebGLGradientBackgroundSystem;
-  private liquidUniforms: LiquidConsciousnessUniforms;
-  private liquidSettings: LiquidConsciousnessSettings;
+  private liquidUniforms: LiquidVisualEffectsUniforms;
+  private liquidSettings: LiquidVisualEffectsSettings;
   private shaderProgram: WebGLProgram | null = null;
   private gl: WebGL2RenderingContext | null = null;
 
@@ -437,18 +437,18 @@ export class FluidGradientBackgroundSystem
   private animationPhase = 0;
   private lastMusicUpdate = 0;
 
-  // Consciousness choreographer integration
-  private consciousnessChoreographer: VisualEffectsCoordinator | null =
+  // VisualEffects choreographer integration
+  private visualEffectsChoreographer: VisualEffectsCoordinator | null =
     null;
-  private currentConsciousnessField: VisualEffectState | null = null;
+  private currentVisualEffectsField: VisualEffectState | null = null;
 
   // Make systemName publicly accessible for the interface
   public override readonly systemName: string =
     "FluidGradientBackgroundSystem";
 
   constructor(
-    config: Year3000Config = YEAR3000_CONFIG,
-    utils: typeof import("@/utils/core/Year3000Utilities"),
+    config: AdvancedSystemConfig | Year3000Config = ADVANCED_SYSTEM_CONFIG,
+    utils: typeof import("@/utils/core/ThemeUtilities"),
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
     settingsManager: SettingsManager | null = null,
@@ -466,37 +466,37 @@ export class FluidGradientBackgroundSystem
       year3000System
     );
 
-    // Get consciousness choreographer from year3000System if available
-    this.consciousnessChoreographer =
-      year3000System?.backgroundConsciousnessChoreographer || null;
+    // Get visualEffects choreographer from year3000System if available
+    this.visualEffectsChoreographer =
+      year3000System?.backgroundVisualEffectsChoreographer || null;
 
-    // Initialize enhanced liquid consciousness settings
+    // Initialize enhanced liquid visualEffects settings
     this.liquidSettings = {
       enabled: true,
       liquidPhase: 0,
-      breathingIntensity: 0.8,
+      animationIntensity: 0.8,
       auroraFlow: 0.6,
       flowDirection: [1.0, 0.5],
       liquidTurbulence: 1.2,
-      consciousnessDepth: 0.7,
+      visualEffectsDepth: 0.7,
 
       // Enhanced liquid physics properties
       surfaceTension: 0.6,           // Moderate surface tension for natural boundaries
       viscosity: 0.4,                // Medium viscosity for smooth flow
       liquidGravity: 0.3,            // Light gravitational settling
       particleDensity: 0.5,          // Balanced particle concentration
-      fluidDynamics: 0.7,            // Rich fluid behavior patterns
-      membraneElasticity: 0.5,       // Flexible membrane boundaries
+      smoothDynamics: 0.7,            // Rich smooth behavior patterns
+      surfaceElasticity: 0.5,        // Flexible surface boundaries
       liquidVelocity: [0.0, 0.0],    // Initial velocity state
-      consciousnessTemperature: 0.5,  // Neutral consciousness temperature
+      visualEffectsTemperature: 0.5,  // Neutral visualEffects temperature
 
-      // Enhanced consciousness properties  
-      consciousnessLevel: 0.7,       // High consciousness integration
+      // Enhanced visualEffects properties  
+      visualEffectsLevel: 0.7,       // High visualEffects integration
       awarenessLevel: 0.6,           // Good awareness depth
-      memoryIntensity: 0.4,          // Moderate consciousness memory
+      memoryIntensity: 0.4,          // Moderate visualEffects memory
       temporalFlowStrength: 0.5,     // Balanced temporal effects
       
-      // Enhanced musical consciousness
+      // Enhanced musical visualEffects
       genreInfluence: 0.3,           // Moderate genre-specific adaptations
       emotionalTemperature: 0.5,     // Neutral emotional temperature
 
@@ -515,27 +515,27 @@ export class FluidGradientBackgroundSystem
       u_flowStrength: null,
       u_noiseScale: null,
       u_liquidPhase: null,
-      u_breathingIntensity: null,
+      u_animationIntensity: null,
       u_auroraFlow: null,
       u_flowDirection: null,
       u_liquidTurbulence: null,
-      u_consciousnessDepth: null,
+      u_visualEffectsDepth: null,
       u_surfaceTension: null,
       u_viscosity: null,
       u_liquidGravity: null,
       u_particleDensity: null,
-      u_fluidDynamics: null,
-      u_membraneElasticity: null,
+      u_smoothDynamics: null,
+      u_surfaceElasticity: null,
       u_liquidVelocity: null,
-      u_consciousnessTemperature: null,
+      u_visualEffectsTemperature: null,
       u_musicEnergy: null,
       u_musicValence: null,
       u_beatIntensity: null,
       u_bassResponse: null,
       u_genreInfluence: null,
       u_emotionalTemperature: null,
-      u_consciousnessLevel: null,
-      u_awarenessLevel: null,
+      u_visualEffectsLevel: null,
+      u_activityLevel: null,
       u_memoryIntensity: null,
       u_temporalFlowStrength: null,
       u_waveY: null,
@@ -566,26 +566,26 @@ export class FluidGradientBackgroundSystem
     }
 
     try {
-      // Compile liquid consciousness shader
+      // Compile liquid visualEffects shader
       await this.compileLiquidShader();
 
-      // Setup liquid consciousness uniforms
+      // Setup liquid visualEffects uniforms
       this.setupLiquidUniforms();
 
       // Subscribe to unified events
       this.subscribeToUnifiedEvents();
 
-      // Register with consciousness choreographer
-      this.registerWithConsciousnessChoreographer();
+      // Register with visualEffects choreographer
+      this.registerWithVisualEffectsChoreographer();
 
       Y3KDebug?.debug?.log(
         "FluidGradientBackgroundSystem",
-        "Liquid consciousness system initialized"
+        "Liquid visualEffects system initialized"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
         "FluidGradientBackgroundSystem",
-        "Failed to initialize liquid consciousness:",
+        "Failed to initialize liquid visualEffects:",
         error
       );
       // Fallback to base WebGL system
@@ -607,11 +607,11 @@ export class FluidGradientBackgroundSystem
 
     const fragmentShader = ShaderLoader.loadFragment(
       this.gl,
-      liquidConsciousnessShader
+      liquidVisualEffectsShader
     );
 
     if (!vertexShader || !fragmentShader) {
-      throw new Error("Failed to compile liquid consciousness shaders");
+      throw new Error("Failed to compile liquid visualEffects shaders");
     }
 
     this.shaderProgram = ShaderLoader.createProgram(
@@ -621,7 +621,7 @@ export class FluidGradientBackgroundSystem
     );
 
     if (!this.shaderProgram) {
-      throw new Error("Failed to create liquid consciousness shader program");
+      throw new Error("Failed to create liquid visualEffects shader program");
     }
   }
 
@@ -636,11 +636,11 @@ export class FluidGradientBackgroundSystem
       "u_flowStrength",
       "u_noiseScale",
       "u_liquidPhase",
-      "u_breathingIntensity",
+      "u_animationIntensity",
       "u_auroraFlow",
       "u_flowDirection",
       "u_liquidTurbulence",
-      "u_consciousnessDepth",
+      "u_visualEffectsDepth",
       "u_musicEnergy",
       "u_musicValence",
       "u_beatIntensity",
@@ -655,10 +655,10 @@ export class FluidGradientBackgroundSystem
       "u_viscosity",
       "u_liquidGravity",
       "u_particleDensity",
-      "u_membraneElasticity",
-      "u_fluidDynamics",
-      "u_consciousnessLevel",
-      "u_consciousnessTemperature",
+      "u_surfaceElasticity",
+      "u_smoothDynamics",
+      "u_visualEffectsLevel",
+      "u_visualEffectsTemperature",
       "u_memoryIntensity",
       "u_emotionalTemperature",
       "u_genreInfluence",
@@ -736,7 +736,7 @@ export class FluidGradientBackgroundSystem
   }
 
   private handleMusicEnergy(data: EventData<"music:energy">): void {
-    this.liquidSettings.breathingIntensity = 0.5 + data.energy * 0.5;
+    this.liquidSettings.animationIntensity = 0.5 + data.energy * 0.5;
     this.liquidSettings.auroraFlow = 0.4 + data.valence * 0.6;
 
     Y3KDebug?.debug?.log(
@@ -751,16 +751,16 @@ export class FluidGradientBackgroundSystem
   }
 
   private handleMusicStateChange(data: EventData<"music:state-changed">): void {
-    // Adjust liquid consciousness based on playback state
+    // Adjust liquid visualEffects based on playback state
     if (data.isPlaying) {
-      this.liquidSettings.consciousnessDepth = Math.max(
+      this.liquidSettings.visualEffectsDepth = Math.max(
         0.7,
-        this.liquidSettings.consciousnessDepth
+        this.liquidSettings.visualEffectsDepth
       );
     } else {
-      this.liquidSettings.consciousnessDepth = Math.min(
+      this.liquidSettings.visualEffectsDepth = Math.min(
         0.3,
-        this.liquidSettings.consciousnessDepth
+        this.liquidSettings.visualEffectsDepth
       );
     }
 
@@ -776,7 +776,7 @@ export class FluidGradientBackgroundSystem
   }
 
   private handleColorHarmonized(data: EventData<"colors:harmonized">): void {
-    // Coordinate liquid consciousness with color processing
+    // Coordinate liquid visualEffects with color processing
     // Adjust turbulence based on processing complexity
     const strategyCount = data.strategies.length;
     this.liquidSettings.liquidTurbulence = Math.max(
@@ -808,12 +808,12 @@ export class FluidGradientBackgroundSystem
     // Update base WebGL system
     this.webglGradientSystem?.updateAnimation?.(deltaTime);
 
-    // Update liquid consciousness phase
+    // Update liquid visualEffects phase
     this.liquidSettings.liquidPhase += deltaTime * 0.001;
-    this.liquidSettings.consciousnessDepth =
+    this.liquidSettings.visualEffectsDepth =
       0.5 + Math.sin(this.liquidSettings.liquidPhase * 0.5) * 0.3;
 
-    // Update liquid consciousness uniforms if shader is active
+    // Update liquid visualEffects uniforms if shader is active
     if (this.gl && this.shaderProgram) {
       this.updateLiquidUniforms();
     }
@@ -824,7 +824,7 @@ export class FluidGradientBackgroundSystem
 
     this.gl.useProgram(this.shaderProgram);
 
-    // Update liquid consciousness uniforms
+    // Update liquid visualEffects uniforms
     if (this.liquidUniforms.u_liquidPhase) {
       this.gl.uniform1f(
         this.liquidUniforms.u_liquidPhase,
@@ -832,10 +832,10 @@ export class FluidGradientBackgroundSystem
       );
     }
 
-    if (this.liquidUniforms.u_breathingIntensity) {
+    if (this.liquidUniforms.u_animationIntensity) {
       this.gl.uniform1f(
-        this.liquidUniforms.u_breathingIntensity,
-        this.liquidSettings.breathingIntensity
+        this.liquidUniforms.u_animationIntensity,
+        this.liquidSettings.animationIntensity
       );
     }
 
@@ -860,10 +860,10 @@ export class FluidGradientBackgroundSystem
       );
     }
 
-    if (this.liquidUniforms.u_consciousnessDepth) {
+    if (this.liquidUniforms.u_visualEffectsDepth) {
       this.gl.uniform1f(
-        this.liquidUniforms.u_consciousnessDepth,
-        this.liquidSettings.consciousnessDepth
+        this.liquidUniforms.u_visualEffectsDepth,
+        this.liquidSettings.visualEffectsDepth
       );
     }
 
@@ -896,31 +896,31 @@ export class FluidGradientBackgroundSystem
       );
     }
 
-    if (this.liquidUniforms.u_membraneElasticity) {
+    if (this.liquidUniforms.u_surfaceElasticity) {
       this.gl.uniform1f(
-        this.liquidUniforms.u_membraneElasticity,
-        this.liquidSettings.membraneElasticity
+        this.liquidUniforms.u_surfaceElasticity,
+        this.liquidSettings.surfaceElasticity
       );
     }
 
-    if (this.liquidUniforms.u_fluidDynamics) {
+    if (this.liquidUniforms.u_smoothDynamics) {
       this.gl.uniform1f(
-        this.liquidUniforms.u_fluidDynamics,
-        this.liquidSettings.fluidDynamics
+        this.liquidUniforms.u_smoothDynamics,
+        this.liquidSettings.smoothDynamics
       );
     }
 
-    if (this.liquidUniforms.u_consciousnessLevel) {
+    if (this.liquidUniforms.u_visualEffectsLevel) {
       this.gl.uniform1f(
-        this.liquidUniforms.u_consciousnessLevel,
-        this.liquidSettings.consciousnessLevel
+        this.liquidUniforms.u_visualEffectsLevel,
+        this.liquidSettings.visualEffectsLevel
       );
     }
 
-    if (this.liquidUniforms.u_consciousnessTemperature) {
+    if (this.liquidUniforms.u_visualEffectsTemperature) {
       this.gl.uniform1f(
-        this.liquidUniforms.u_consciousnessTemperature,
-        this.liquidSettings.consciousnessTemperature
+        this.liquidUniforms.u_visualEffectsTemperature,
+        this.liquidSettings.visualEffectsTemperature
       );
     }
 
@@ -996,7 +996,7 @@ export class FluidGradientBackgroundSystem
   }
 
   public override forceRepaint(
-    reason: string = "liquid-consciousness-update"
+    reason: string = "liquid-visualEffects-update"
   ): void {
     this.webglGradientSystem.forceRepaint(reason);
   }
@@ -1013,7 +1013,7 @@ export class FluidGradientBackgroundSystem
   }
 
   public setQualityLevel(level: QualityLevel): void {
-    // Update liquid consciousness quality settings based on performance level
+    // Update liquid visualEffects quality settings based on performance level
     switch (level) {
       case "low":
         this.liquidSettings.flowIntensity = 0.5;
@@ -1045,7 +1045,7 @@ export class FluidGradientBackgroundSystem
     // Apply settings to WebGL system
     this.webglGradientSystem.setQualityLevel(level);
 
-    if (YEAR3000_CONFIG.enableDebug) {
+    if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
       Y3KDebug?.debug?.log(
         "FluidGradientBackgroundSystem",
         `Quality level set to: ${level}`,
@@ -1057,7 +1057,7 @@ export class FluidGradientBackgroundSystem
   public getPerformanceImpact(): PerformanceMetrics {
     const baseMetrics = this.webglGradientSystem.getPerformanceImpact();
 
-    // Add liquid consciousness overhead
+    // Add liquid visualEffects overhead
     return {
       fps: baseMetrics.fps,
       frameTime: baseMetrics.frameTime + 1.2, // Additional render complexity
@@ -1067,7 +1067,7 @@ export class FluidGradientBackgroundSystem
   }
 
   public reduceQuality(amount: number): void {
-    // Reduce liquid consciousness quality proportionally
+    // Reduce liquid visualEffects quality proportionally
     this.liquidSettings.flowIntensity = Math.max(
       0.1,
       this.liquidSettings.flowIntensity - amount * 0.3
@@ -1090,7 +1090,7 @@ export class FluidGradientBackgroundSystem
   }
 
   public increaseQuality(amount: number): void {
-    // Increase liquid consciousness quality proportionally
+    // Increase liquid visualEffects quality proportionally
     this.liquidSettings.flowIntensity = Math.min(
       1.0,
       this.liquidSettings.flowIntensity + amount * 0.2
@@ -1140,20 +1140,20 @@ export class FluidGradientBackgroundSystem
   public override _performSystemSpecificCleanup(): void {
     super._performSystemSpecificCleanup();
 
-    // Unregister from consciousness choreographer
-    if (this.consciousnessChoreographer) {
+    // Unregister from visualEffects choreographer
+    if (this.visualEffectsChoreographer) {
       try {
-        this.consciousnessChoreographer.unregisterConsciousnessParticipant(
+        this.visualEffectsChoreographer.unregisterVisualEffectsParticipant(
           "FluidGradientBackgroundSystem"
         );
         Y3KDebug?.debug?.log(
           "FluidGradientBackgroundSystem",
-          "Unregistered from consciousness choreographer"
+          "Unregistered from visualEffects choreographer"
         );
       } catch (error) {
         Y3KDebug?.debug?.error(
           "FluidGradientBackgroundSystem",
-          "Error unregistering from consciousness choreographer:",
+          "Error unregistering from visualEffects choreographer:",
           error
         );
       }
@@ -1170,7 +1170,7 @@ export class FluidGradientBackgroundSystem
       "Unified event subscriptions cleaned up"
     );
 
-    // Clean up liquid consciousness shader
+    // Clean up liquid visualEffects shader
     if (this.gl && this.shaderProgram) {
       this.gl.deleteProgram(this.shaderProgram);
       this.shaderProgram = null;
@@ -1180,13 +1180,13 @@ export class FluidGradientBackgroundSystem
     this.webglGradientSystem.destroy();
   }
 
-  // Public API for liquid consciousness control
+  // Public API for liquid visualEffects control
   public setLiquidPhase(phase: number): void {
     this.liquidSettings.liquidPhase = phase;
   }
 
-  public setBreathingIntensity(intensity: number): void {
-    this.liquidSettings.breathingIntensity = Math.max(
+  public setAnimationIntensity(intensity: number): void {
+    this.liquidSettings.animationIntensity = Math.max(
       0,
       Math.min(1, intensity)
     );
@@ -1204,8 +1204,8 @@ export class FluidGradientBackgroundSystem
     this.liquidSettings.liquidTurbulence = Math.max(0, Math.min(2, turbulence));
   }
 
-  public setConsciousnessDepth(depth: number): void {
-    this.liquidSettings.consciousnessDepth = Math.max(0, Math.min(1, depth));
+  public setVisualEffectsDepth(depth: number): void {
+    this.liquidSettings.visualEffectsDepth = Math.max(0, Math.min(1, depth));
   }
 
   // Advanced liquid physics control methods
@@ -1225,20 +1225,20 @@ export class FluidGradientBackgroundSystem
     this.liquidSettings.particleDensity = Math.max(0, Math.min(2, density));
   }
 
-  public setMembraneElasticity(elasticity: number): void {
-    this.liquidSettings.membraneElasticity = Math.max(0, Math.min(1, elasticity));
+  public setSurfaceElasticity(elasticity: number): void {
+    this.liquidSettings.surfaceElasticity = Math.max(0, Math.min(1, elasticity));
   }
 
-  public setFluidDynamics(dynamics: number): void {
-    this.liquidSettings.fluidDynamics = Math.max(0, Math.min(1, dynamics));
+  public setSmoothDynamics(dynamics: number): void {
+    this.liquidSettings.smoothDynamics = Math.max(0, Math.min(1, dynamics));
   }
 
-  public setConsciousnessLevel(level: number): void {
-    this.liquidSettings.consciousnessLevel = Math.max(0, Math.min(1, level));
+  public setVisualEffectsLevel(level: number): void {
+    this.liquidSettings.visualEffectsLevel = Math.max(0, Math.min(1, level));
   }
 
-  public setConsciousnessTemperature(temperature: number): void {
-    this.liquidSettings.consciousnessTemperature = Math.max(0, Math.min(1, temperature));
+  public setVisualEffectsTemperature(temperature: number): void {
+    this.liquidSettings.visualEffectsTemperature = Math.max(0, Math.min(1, temperature));
   }
 
   public setMemoryIntensity(intensity: number): void {
@@ -1253,7 +1253,7 @@ export class FluidGradientBackgroundSystem
     this.liquidSettings.genreInfluence = Math.max(0, Math.min(1, influence));
   }
 
-  public getLiquidSettings(): LiquidConsciousnessSettings {
+  public getLiquidSettings(): LiquidVisualEffectsSettings {
     return { ...this.liquidSettings };
   }
 
@@ -1262,27 +1262,27 @@ export class FluidGradientBackgroundSystem
   // ===================================================================
 
   /**
-   * Register this liquid system as a consciousness participant
+   * Register this liquid system as a visualEffects participant
    */
-  private registerWithConsciousnessChoreographer(): void {
-    if (!this.consciousnessChoreographer) {
+  private registerWithVisualEffectsChoreographer(): void {
+    if (!this.visualEffectsChoreographer) {
       Y3KDebug?.debug?.log(
         "FluidGradientBackgroundSystem",
-        "Consciousness choreographer not available, skipping registration"
+        "VisualEffects choreographer not available, skipping registration"
       );
       return;
     }
 
     try {
-      this.consciousnessChoreographer.registerConsciousnessParticipant(this);
+      this.visualEffectsChoreographer.registerVisualEffectsParticipant(this);
       Y3KDebug?.debug?.log(
         "FluidGradientBackgroundSystem",
-        "Successfully registered with consciousness choreographer"
+        "Successfully registered with visualEffects choreographer"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
         "FluidGradientBackgroundSystem",
-        "Failed to register with consciousness choreographer:",
+        "Failed to register with visualEffects choreographer:",
         error
       );
     }
@@ -1293,42 +1293,42 @@ export class FluidGradientBackgroundSystem
   // ===================================================================
 
   public get systemPriority(): "low" | "normal" | "high" | "critical" {
-    return "high"; // Liquid consciousness is high priority for organic effects
+    return "high"; // Liquid visualEffects is high priority for dynamic effects
   }
 
-  public getConsciousnessContribution(): any {
+  public getVisualEffectsContribution(): any {
     return {
       liquidDensity: this.liquidSettings.liquidTurbulence || 0.5,
-      fluidDynamics: this.liquidSettings.auroraFlow || 0.6,
-      membraneFluidityIndex: this.liquidSettings.breathingIntensity || 0.8,
+      smoothDynamics: this.liquidSettings.auroraFlow || 0.6,
+      surfaceFluidityIndex: this.liquidSettings.animationIntensity || 0.8,
       turbulenceLevel: this.liquidSettings.liquidTurbulence || 0.5,
       viscosityIndex: 1.0,
-      flowPatterns: ["aurora", "liquid", "consciousness"],
+      flowPatterns: ["aurora", "liquid", "visualEffects"],
     };
   }
 
-  public onConsciousnessFieldUpdate(field: VisualEffectState): void {
+  public onVisualEffectsFieldUpdate(field: VisualEffectState): void {
     if (!this.gl || !this.shaderProgram) return;
 
     try {
-      this.currentConsciousnessField = field;
+      this.currentVisualEffectsField = field;
 
-      // Update liquid shader parameters based on consciousness field
-      this.updateLiquidFromConsciousness(field);
+      // Update liquid shader parameters based on visualEffects field
+      this.updateLiquidFromVisualEffects(field);
 
       Y3KDebug?.debug?.log(
         "FluidGradientBackgroundSystem",
-        "Updated from consciousness field:",
+        "Updated from visualEffects field:",
         {
           rhythmicPulse: field.pulseRate,
           liquidDensity: field.fluidIntensity,
-          membraneFluidityIndex: field.fluidIntensity,
+          surfaceFluidityIndex: field.fluidIntensity,
         }
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
         "FluidGradientBackgroundSystem",
-        "Error updating from consciousness field:",
+        "Error updating from visualEffects field:",
         error
       );
     }
@@ -1357,23 +1357,23 @@ export class FluidGradientBackgroundSystem
           );
           break;
 
-        case "consciousness:breathing-cycle":
-          // Synchronize liquid breathing with consciousness breathing
-          const breathingPhase = payload.phase || 0;
-          this.liquidSettings.breathingIntensity =
-            0.5 + Math.sin(breathingPhase * Math.PI * 2) * 0.3;
+        case "visualEffects:animation-cycle":
+          // Synchronize liquid animation with visualEffects animation
+          const animationPhase = payload.phase || 0;
+          this.liquidSettings.animationIntensity =
+            0.5 + Math.sin(animationPhase * Math.PI * 2) * 0.3;
           break;
 
-        case "consciousness:membrane-fluid":
-          // Adjust membrane fluidity
+        case "visualEffects:surface-fluid":
+          // Adjust surface fluidity
           const fluidityIndex = payload.fluidityIndex || 0.5;
-          this.liquidSettings.consciousnessDepth = fluidityIndex;
+          this.liquidSettings.visualEffectsDepth = fluidityIndex;
           break;
       }
 
       // Apply changes to shader
-      if (this.currentConsciousnessField) {
-        this.updateLiquidFromConsciousness(this.currentConsciousnessField);
+      if (this.currentVisualEffectsField) {
+        this.updateLiquidFromVisualEffects(this.currentVisualEffectsField);
       }
 
       Y3KDebug?.debug?.log(
@@ -1391,9 +1391,9 @@ export class FluidGradientBackgroundSystem
   }
 
   /**
-   * Update liquid shader parameters based on consciousness field
+   * Update liquid shader parameters based on visualEffects field
    */
-  private updateLiquidFromConsciousness(field: VisualEffectState): void {
+  private updateLiquidFromVisualEffects(field: VisualEffectState): void {
     if (!this.gl || !this.shaderProgram) return;
 
     // Modulate liquid phase with rhythmic pulse
@@ -1407,16 +1407,16 @@ export class FluidGradientBackgroundSystem
       this.gl.uniform1f(liquidPhaseLocation, consciousLiquidPhase);
     }
 
-    // Modulate breathing intensity with consciousness breathing cycle
-    const consciousBreathing =
-      this.liquidSettings.breathingIntensity *
+    // Modulate animation intensity with visualEffects animation cycle
+    const smoothAnimation =
+      this.liquidSettings.animationIntensity *
       (0.7 + field.pulseRate * 0.3);
-    const breathingLocation = this.gl.getUniformLocation(
+    const animationLocation = this.gl.getUniformLocation(
       this.shaderProgram,
-      "u_breathingIntensity"
+      "u_animationIntensity"
     );
-    if (breathingLocation) {
-      this.gl.uniform1f(breathingLocation, consciousBreathing);
+    if (animationLocation) {
+      this.gl.uniform1f(animationLocation, smoothAnimation);
     }
 
     // Update aurora flow with musical flow direction
@@ -1456,47 +1456,47 @@ export class FluidGradientBackgroundSystem
       this.gl.uniform1f(turbulenceLocation, consciousTurbulence);
     }
 
-    // Update consciousness depth with membrane fluidity
+    // Update visualEffects depth with surface fluidity
     const depthLocation = this.gl.getUniformLocation(
       this.shaderProgram,
-      "u_consciousnessDepth"
+      "u_visualEffectsDepth"
     );
     if (depthLocation) {
       this.gl.uniform1f(depthLocation, field.fluidIntensity);
     }
 
-    // Apply consciousness-aware CSS variables for hybrid coordination
-    // Use existing consciousness variables instead of creating liquid-specific ones
+    // Apply visualEffects-aware CSS variables for hybrid coordination
+    // Use existing visualEffects variables instead of creating liquid-specific ones
     try {
       const cssController = getGlobalOptimizedCSSController();
       cssController.queueCSSVariableUpdate(
-        "--sn-consciousness-flow-direction",
+        "--sn-visualEffects-flow-direction",
         consciousLiquidPhase.toString()
       );
       cssController.queueCSSVariableUpdate(
-        "--sn-consciousness-breathing-intensity",
-        consciousBreathing.toString()
+        "--sn-visualEffects-animation-intensity",
+        smoothAnimation.toString()
       );
       cssController.queueCSSVariableUpdate(
-        "--sn-consciousness-aurora-flow",
+        "--sn-visualEffects-aurora-flow",
         this.liquidSettings.auroraFlow.toString()
       );
       cssController.queueCSSVariableUpdate(
-        "--sn-consciousness-viscosity",
+        "--sn-visualEffects-viscosity",
         this.liquidSettings.liquidTurbulence.toString()
       );
       
-      // Update physics-related consciousness variables
+      // Update physics-related visualEffects variables
       cssController.queueCSSVariableUpdate(
-        "--sn-consciousness-surface-tension",
+        "--sn-visualEffects-surface-tension",
         this.liquidSettings.surfaceTension.toString()
       );
       cssController.queueCSSVariableUpdate(
-        "--sn-consciousness-membrane-elasticity", 
-        this.liquidSettings.membraneElasticity.toString()
+        "--sn-visualEffects-surface-elasticity", 
+        this.liquidSettings.surfaceElasticity.toString()
       );
       cssController.queueCSSVariableUpdate(
-        "--sn-consciousness-cellular-growth",
+        "--sn-visualEffects-animation-scale",
         this.liquidSettings.particleDensity.toString()
       );
     } catch (error) {
@@ -1515,7 +1515,7 @@ export class FluidGradientBackgroundSystem
 
   public onVisualStateUpdate(state: VisualEffectState): void {
     // Update visual effects based on shared state
-    this.onConsciousnessFieldUpdate(state);
+    this.onVisualEffectsFieldUpdate(state);
   }
 
   public onVisualEffectEvent(eventType: string, payload: any): void {
@@ -1543,5 +1543,14 @@ export class FluidGradientBackgroundSystem
       effectDepth: this.liquidSettings.particleDensity,
       systemHarmony: this.liquidSettings.surfaceTension
     };
+  }
+
+  // ===================================================================
+  // BACKWARD COMPATIBILITY ALIASES
+  // ===================================================================
+
+  /** @deprecated Use onVisualEffectsFieldUpdate */
+  public onConsciousnessFieldUpdate(field: VisualEffectState): void {
+    return this.onVisualEffectsFieldUpdate(field);
   }
 }

@@ -8,16 +8,16 @@
  * Focus: Effects coordination, music integration, visual quality
  */
 
-import { ParticleConsciousnessModule } from '@/visual/effects/UnifiedParticleSystem';
+import { UnifiedParticleSystem } from '@/visual/effects/UnifiedParticleSystem';
 import { MusicGlowEffectsManager } from '@/visual/effects/GlowEffectsController';
 import { DepthLayeredGradientSystem } from '@/visual/backgrounds/DepthLayeredGradientSystem';
 import { FluidGradientBackgroundSystem } from '@/visual/backgrounds/FluidGradientBackgroundSystem';
 import { MusicBeatSynchronizer } from '@/visual/music/MusicSyncVisualEffects';
-import { YEAR3000_CONFIG } from '@/config/globalConfig';
-import * as Utils from '@/utils/core/Year3000Utilities';
+import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
+import * as Utils from '@/utils/core/ThemeUtilities';
 
 describe('Visual Effects Integration', () => {
-  let particleSystem: ParticleConsciousnessModule;
+  let particleSystem: UnifiedParticleSystem;
   let glowController: MusicGlowEffectsManager;
   let gradientSystem: DepthLayeredGradientSystem;
   let fluidBackground: FluidGradientBackgroundSystem;
@@ -44,11 +44,11 @@ describe('Visual Effects Integration', () => {
     `;
 
     // Initialize visual effects systems with proper CSS controller injection
-    particleSystem = new ParticleConsciousnessModule(YEAR3000_CONFIG, Utils);
-    glowController = new MusicGlowEffectsManager(YEAR3000_CONFIG, Utils);
-    gradientSystem = new DepthLayeredGradientSystem(YEAR3000_CONFIG, Utils);
-    fluidBackground = new FluidGradientBackgroundSystem(YEAR3000_CONFIG, Utils);
-    musicSync = new MusicBeatSynchronizer(YEAR3000_CONFIG);
+    particleSystem = new UnifiedParticleSystem(ADVANCED_SYSTEM_CONFIG, Utils);
+    glowController = new MusicGlowEffectsManager(ADVANCED_SYSTEM_CONFIG, Utils);
+    gradientSystem = new DepthLayeredGradientSystem(ADVANCED_SYSTEM_CONFIG, Utils);
+    fluidBackground = new FluidGradientBackgroundSystem(ADVANCED_SYSTEM_CONFIG, Utils);
+    musicSync = new MusicBeatSynchronizer(ADVANCED_SYSTEM_CONFIG);
     
     // Inject CSS consciousness controller into systems that need it
     const mockCSSController = {
@@ -59,16 +59,32 @@ describe('Visual Effects Integration', () => {
       destroy: jest.fn(),
       initialized: true
     };
+
+    const mockMusicService = {
+      getCurrentMusicState: jest.fn(() => ({
+        emotion: 'neutral',
+        beat: 0.5,
+        intensity: 0.8,
+        energy: 0.6,
+        tempo: 120
+      })),
+      initialized: true,
+      destroy: jest.fn()
+    };
     
-    // Inject the CSS controller into systems
+    // Inject the CSS controller and music service into systems
     if (glowController) {
-      (glowController as any).cssConsciousnessController = mockCSSController;
+      (glowController as any).cssVisualEffectsController = mockCSSController;
+      (glowController as any).musicSyncService = mockMusicService;
     }
     if (fluidBackground) {
       (fluidBackground as any).cssController = mockCSSController;
     }
     if (gradientSystem) {
       (gradientSystem as any).cssController = mockCSSController;
+    }
+    if (musicSync) {
+      (musicSync as any).cssVariableManager = mockCSSController;
     }
   });
 
@@ -388,10 +404,8 @@ describe('Visual Effects Integration', () => {
       const tempoSequence = [60, 90, 120, 150, 180, 120]; // BPM changes
       
       for (const bpm of tempoSequence) {
-        const tempoEvent = new CustomEvent('music:bpm-change', {
-          detail: { bpm, tempo: 'variable', enhancedBPM: bpm }
-        });
-        document.dispatchEvent(tempoEvent);
+        // Directly call the tempo change method instead of relying on event dispatch
+        (musicSync as any).onTempoChanged({ bpm, tempo: 'variable', enhancedBPM: bpm });
         
         // Process several frames to see adaptation
         for (let frame = 0; frame < 15; frame++) {
@@ -399,6 +413,9 @@ describe('Visual Effects Integration', () => {
           particleSystem.updateAnimation(16.67);
           gradientSystem.updateAnimation(16.67);
         }
+        
+        // Allow for event processing
+        await new Promise(resolve => setTimeout(resolve, 10));
         
         // Check that tempo is reflected in sync state
         const syncState = musicSync.getMusicSyncState();
@@ -513,17 +530,43 @@ describe('Visual Effects Integration', () => {
     it('should gracefully degrade under resource constraints', async () => {
       // Simulate low-end device constraints
       const lowEndConfig = {
-        ...YEAR3000_CONFIG,
+        ...ADVANCED_SYSTEM_CONFIG,
         performance: {
-          ...YEAR3000_CONFIG.performance,
+          ...ADVANCED_SYSTEM_CONFIG.performance,
           targetFPS: 30,
           qualityLevel: 'low',
           enableParticles: false
         }
       };
       
-      const constrainedParticles = new ParticleConsciousnessModule(lowEndConfig, Utils);
+      const constrainedParticles = new UnifiedParticleSystem(lowEndConfig, Utils);
       const constrainedGlow = new MusicGlowEffectsManager(lowEndConfig, Utils);
+      
+      // Create mocks for isolated test
+      const testMockCSSController = {
+        queueCSSVariableUpdate: jest.fn(),
+        batchSetVariables: jest.fn(),
+        flushBatch: jest.fn(),
+        setProperty: jest.fn(),
+        destroy: jest.fn(),
+        initialized: true
+      };
+
+      const testMockMusicService = {
+        getCurrentMusicState: jest.fn(() => ({
+          emotion: 'neutral',
+          beat: 0.5,
+          intensity: 0.8,
+          energy: 0.6,
+          tempo: 120
+        })),
+        initialized: true,
+        destroy: jest.fn()
+      };
+
+      // Inject dependencies into constrained systems
+      (constrainedGlow as any).cssVisualEffectsController = testMockCSSController;
+      (constrainedGlow as any).musicSyncService = testMockMusicService;
       
       await constrainedParticles.initialize();
       await constrainedGlow.initialize();

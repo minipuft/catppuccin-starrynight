@@ -1,24 +1,30 @@
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { Year3000System } from "@/core/lifecycle/year3000System";
+import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
 import type { ColorContext } from "@/types/colorStrategy";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 import { SpicetifyCompat } from "@/utils/platform/SpicetifyCompat";
 import { settings } from "@/config";
 import { GenreProfileManager } from "./GenreProfileManager";
 import { 
   OKLABColorProcessor, 
-  type EnhancementPreset, 
-  type OKLABProcessingResult 
+  type EnhancementPreset 
 } from "@/utils/color/OKLABColorProcessor";
 import { 
-  EmotionalTemperatureMapper, 
-  type EmotionalTemperatureResult 
+  EmotionalTemperatureMapper 
 } from "@/utils/color/EmotionalTemperatureMapper";
 
 // Interfaces
+interface GenreProfile {
+  intensityMultiplier?: number;
+  precisionBoost?: number;
+  smoothingFactor?: number;
+  adaptiveVariation?: boolean;
+  [key: string]: unknown;
+}
+
 interface MusicSyncConfig {
   enableDebug: boolean;
   enableBeatSynchronization: boolean;
@@ -51,7 +57,7 @@ interface MusicSyncConfig {
     debounceRapidChanges: number;
   };
   genreProfiles: {
-    [key: string]: any;
+    [key: string]: GenreProfile;
   };
   musicVisualSync: {
     enhancedBPM: {
@@ -96,11 +102,84 @@ interface BeatSyncState {
   isActive: boolean;
 }
 
+// Spicetify audio analysis structures
+interface SpicetifyAudioBeat {
+  start: number;
+  duration: number;
+  confidence: number;
+}
+
+interface SpicetifyAudioBar {
+  start: number;
+  duration: number;
+  confidence: number;
+}
+
+interface SpicetifyAudioSection {
+  start: number;
+  duration: number;
+  confidence: number;
+  loudness: number;
+  tempo: number;
+  tempo_confidence: number;
+  key: number;
+  key_confidence: number;
+  mode: number;
+  mode_confidence: number;
+  time_signature: number;
+  time_signature_confidence: number;
+}
+
+interface SpicetifyAudioSegment {
+  start: number;
+  duration: number;
+  confidence: number;
+  loudness_start: number;
+  loudness_max_time: number;
+  loudness_max: number;
+  loudness_end: number;
+  pitches: number[];
+  timbre: number[];
+}
+
+interface SpicetifyAudioTatum {
+  start: number;
+  duration: number;
+  confidence: number;
+}
+
+interface ProcessedMusicData {
+  enhancedBPM: number;
+  genre: string;
+  mood?: string;
+  energy: number;
+  valence: number;
+  adaptedColorTemp?: number;
+  rhythmicIntensity?: number;
+  [key: string]: unknown;
+}
+
+interface UserPreferences {
+  enableMusicSync: boolean;
+  audioAnalysisQuality: string;
+  [key: string]: unknown;
+}
+
+interface MusicSyncDependencies {
+  ADVANCED_SYSTEM_CONFIG?: Year3000Config;
+  YEAR3000_CONFIG?: Year3000Config; // Legacy compatibility
+  ThemeUtilities?: typeof Utils;
+  settingsManager?: SettingsManager | undefined;
+  year3000System?: Year3000System;
+  genreProfileManager?: any;
+  [key: string]: unknown;
+}
+
 interface VisualSystemSubscriber {
   initialized: boolean;
   updateFromMusicAnalysis(
-    processedData: any,
-    rawFeatures: any,
+    processedData: ProcessedMusicData | null,
+    rawFeatures: AudioData | null,
     trackUri: string | null
   ): void;
 }
@@ -118,11 +197,11 @@ interface AudioData {
   speechiness: number;
   liveness: number;
   mode: number;
-  beats?: any[];
-  bars?: any[];
-  sections?: any[];
-  segments?: any[];
-  tatums?: any[];
+  beats?: SpicetifyAudioBeat[];
+  bars?: SpicetifyAudioBar[];
+  sections?: SpicetifyAudioSection[];
+  segments?: SpicetifyAudioSegment[];
+  tatums?: SpicetifyAudioTatum[];
 }
 
 interface AudioFeatures {
@@ -221,10 +300,10 @@ const MUSIC_SYNC_CONFIG: MusicSyncConfig = {
 };
 
 export class MusicSyncService {
-  private config: Year3000Config;
+  private config: AdvancedSystemConfig | Year3000Config;
   private utils: typeof Utils;
-  private settingsManager?: SettingsManager;
-  private year3000System?: Year3000System;
+  private settingsManager?: SettingsManager | null;
+  private year3000System?: Year3000System | null;
   private genreProfileManager: GenreProfileManager;
   
   // OKLAB integration for perceptually uniform color processing
@@ -233,9 +312,9 @@ export class MusicSyncService {
 
   private isInitialized: boolean = false;
   private currentTrack: any = null;
-  private audioData: any = null;
+  private audioData: AudioData | null = null;
   private currentTrackUri: string | null = null;
-  private latestProcessedData: any = null;
+  private latestProcessedData: ProcessedMusicData | null = null;
 
   // High-precision beat scheduling
   private beatSchedulerTimer: NodeJS.Timeout | null = null;
@@ -243,7 +322,7 @@ export class MusicSyncService {
   // Phase 1: Song Change Debouncing
   private songChangeDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private nextBeatIndex: number = 0;
-  private currentSongBeats: any[] = [];
+  private currentSongBeats: SpicetifyAudioBeat[] = [];
   private songStartTimestamp: number = 0;
 
   private metrics: MusicSyncMetrics = {
@@ -257,7 +336,7 @@ export class MusicSyncService {
     updates: 0,
   };
 
-  private unifiedCache: Map<string, CacheEntry<any>> = new Map();
+  private unifiedCache: Map<string, CacheEntry<AudioData | ProcessedMusicData | unknown>> = new Map();
   private cacheTTL: number;
 
   private subscribers: Map<string, VisualSystemSubscriber> = new Map();
@@ -270,7 +349,7 @@ export class MusicSyncService {
     isActive: false,
   };
 
-  private userPreferences: any;
+  private userPreferences: UserPreferences;
   private performanceInterval: NodeJS.Timeout | null = null;
   private cacheCleanupInterval: NodeJS.Timeout | null = null;
 
@@ -291,15 +370,15 @@ export class MusicSyncService {
   /** Current unit beat direction vector (updated each beat). */
   private currentBeatVector: { x: number; y: number } = { x: 0, y: 0 };
 
-  constructor(dependencies: any = {}) {
-    this.config = dependencies.YEAR3000_CONFIG || YEAR3000_CONFIG;
-    this.utils = dependencies.Year3000Utilities || Utils;
-    this.settingsManager = dependencies.settingsManager;
-    this.year3000System = dependencies.year3000System;
+  constructor(dependencies: MusicSyncDependencies = {}) {
+    this.config = dependencies.ADVANCED_SYSTEM_CONFIG || dependencies.YEAR3000_CONFIG || ADVANCED_SYSTEM_CONFIG;
+    this.utils = dependencies.ThemeUtilities || Utils;
+    this.settingsManager = dependencies.settingsManager || null;
+    this.year3000System = dependencies.year3000System || null;
 
     this.genreProfileManager =
       dependencies.genreProfileManager ||
-      new GenreProfileManager({ YEAR3000_CONFIG: this.config });
+      new GenreProfileManager({ ADVANCED_SYSTEM_CONFIG: this.config });
 
     // Initialize OKLAB integration for perceptually uniform color processing
     this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
@@ -408,8 +487,8 @@ export class MusicSyncService {
   }
 
   public notifySubscribers(
-    processedData: any,
-    rawFeatures: any,
+    processedData: ProcessedMusicData | null,
+    rawFeatures: AudioData | null,
     trackUri: string | null
   ): void {
     if (!this.isInitialized) {
@@ -615,8 +694,9 @@ export class MusicSyncService {
 
   public async calculateEnhancedBPM(
     audioData: AudioData,
-    options: any = {}
+    options: Record<string, unknown> = {}
   ): Promise<number> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const startTime = performance.now();
 
     try {
@@ -652,6 +732,7 @@ export class MusicSyncService {
       const profile = this.genreProfileManager.getProfileForTrack(
         audioFeatures || undefined
       );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const detectedGenre = this.genreProfileManager.detectGenre(
         audioFeatures || undefined
       );
@@ -1444,7 +1525,8 @@ export class MusicSyncService {
         rawColors: finalColors,
         trackUri,
         timestamp: Date.now(),
-        harmonicMode: this.config.currentHarmonicMode || "catppuccin",
+        colorHarmonyMode: this.config.currentColorHarmonyMode || "catppuccin",
+        harmonicMode: this.config.currentColorHarmonyMode || "catppuccin", // Legacy compatibility
         musicData: audioFeatures
           ? {
               energy: audioFeatures.energy,
@@ -1595,7 +1677,7 @@ export class MusicSyncService {
     }, 60000); // Monitor every minute
   }
 
-  private loadUserPreferences(): any {
+  private loadUserPreferences(): UserPreferences {
     try {
       // Use individual settings from the typed system instead of a single JSON blob
       return {
@@ -1743,6 +1825,9 @@ export class MusicSyncService {
     }
 
     const nextBeat = this.currentSongBeats[this.nextBeatIndex];
+    if (!nextBeat) {
+      return; // No more beats available
+    }
     const timeSinceSongStart = Date.now() - this.songStartTimestamp;
     const delay = nextBeat.start * 1000 - timeSinceSongStart;
 
@@ -1904,7 +1989,7 @@ export class MusicSyncService {
   }
 
   /**
-   * Get current music state for consciousness systems
+   * Get current music state for visual effects systems
    */
   public getCurrentMusicState(): {
     emotion: any;
@@ -1919,11 +2004,11 @@ export class MusicSyncService {
       emotion: this.latestProcessedData.emotion || null,
       beat: {
         tempo: this.latestProcessedData.bpm || this.audioData.tempo || 120,
-        energy: this.latestProcessedData.energy || this.audioData.energy || 0.5,
+        energy: (this.latestProcessedData.energy as number) || this.audioData.energy || 0.5,
         timestamp: Date.now(),
       },
       intensity:
-        this.latestProcessedData.intensity || this.audioData.energy || 0.5,
+        (this.latestProcessedData.intensity as number) || this.audioData.energy || 0.5,
     };
   }
 

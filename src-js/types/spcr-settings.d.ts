@@ -5,14 +5,14 @@ declare module "spcr-settings" {
   interface ISettingsFieldBase {
     type: string;
     description?: string;
-    defaultValue?: any;
+    defaultValue?: unknown;
   }
 
   interface ISettingsFieldButton extends ISettingsFieldBase {
     type: "button";
     value: string;
     events?: {
-      onClick?: (e?: any) => void;
+      onClick?: (e?: Event) => void;
     };
   }
 
@@ -21,7 +21,7 @@ declare module "spcr-settings" {
     defaultValue: string;
     inputType?: string;
     events?: {
-      onChange?: (e?: any) => void;
+      onChange?: (e?: Event) => void;
     };
   }
 
@@ -29,8 +29,8 @@ declare module "spcr-settings" {
     type: "toggle";
     defaultValue: boolean;
     events?: {
-      onChange?: (e?: any) => void;
-      onClick?: (e?: any) => void;
+      onChange?: (e?: Event) => void;
+      onClick?: (e?: Event) => void;
     };
   }
 
@@ -40,13 +40,13 @@ declare module "spcr-settings" {
     options: string[];
     events?: {
       onSelect?: () => void;
-      onChange?: (e?: any) => void;
+      onChange?: (e?: Event) => void;
     };
   }
 
   interface ISettingsFieldHidden extends ISettingsFieldBase {
     type: "hidden";
-    defaultValue: any;
+    defaultValue: unknown;
   }
 
   type ISettingsField =
@@ -106,10 +106,10 @@ declare module "spcr-settings" {
       events?: ISettingsFieldDropdown["events"]
     ): void;
 
-    addHidden(nameId: string, defaultValue: any): void;
+    addHidden(nameId: string, defaultValue: unknown): void;
 
     // Value access methods
-    getFieldValue(nameId: string): any;
-    setFieldValue(nameId: string, newValue: any): void;
+    getFieldValue(nameId: string): unknown;
+    setFieldValue(nameId: string, newValue: unknown): void;
   }
 }

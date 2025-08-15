@@ -1,17 +1,17 @@
 /**
  * MusicalOKLABCoordinator - Unified Music-to-OKLAB Color Processing Pipeline
  *
- * Orchestrates the complete flow from music analysis through emotional mapping
+ * Processes the complete flow from music analysis through emotional mapping
  * to OKLAB color processing, providing a unified, perceptually consistent
  * color experience that responds intelligently to musical content.
  *
- * Philosophy: "Music becomes color through the lens of consciousness -
- * every note, every beat, every emotion translated into perceptually perfect
- * visual harmony through the unified language of OKLAB color science."
+ * Technical Approach: Music becomes color through systematic audio-visual processing -
+ * every note, every beat, every emotion transformed into perceptually accurate
+ * visual harmony through OKLAB color science implementation.
  */
 
 import { GenreProfileManager } from "@/audio/GenreProfileManager";
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { ColorResult } from "@/types/colorStrategy";
 import {
@@ -51,7 +51,7 @@ export interface MusicalOKLABResult {
   // Processing metadata
   processingTime: number;
   musicInfluenceStrength: number;
-  coordinationStrategy:
+  processingStrategy:
     | "genre-primary"
     | "emotion-primary"
     | "balanced"
@@ -61,12 +61,13 @@ export interface MusicalOKLABResult {
   cssVariables: Record<string, string>;
 }
 
-export interface CoordinationOptions {
+export interface ProcessingOptions {
   preferGenreOverEmotion?: boolean;
   intensityMultiplier?: number;
   enableAdvancedBlending?: boolean;
   enableDebugLogging?: boolean;
 }
+
 
 export class MusicalOKLABCoordinator {
   private oklabProcessor: OKLABColorProcessor;
@@ -78,13 +79,13 @@ export class MusicalOKLABCoordinator {
   private cacheMaxSize = 20;
   private cacheTimeoutMs = 300000; // 5 minutes
 
-  constructor(enableDebug: boolean = YEAR3000_CONFIG.enableDebug) {
+  constructor(enableDebug: boolean = ADVANCED_SYSTEM_CONFIG.enableDebug) {
     this.enableDebug = enableDebug;
 
     // Initialize integrated processors
     this.oklabProcessor = new OKLABColorProcessor(enableDebug);
     this.emotionalMapper = new EmotionalTemperatureMapper(enableDebug);
-    this.genreManager = new GenreProfileManager({ YEAR3000_CONFIG });
+    this.genreManager = new GenreProfileManager({ ADVANCED_SYSTEM_CONFIG });
 
     if (this.enableDebug) {
       Y3KDebug?.debug?.log(
@@ -95,11 +96,11 @@ export class MusicalOKLABCoordinator {
   }
 
   /**
-   * Main coordination method - processes musical context through complete OKLAB pipeline
+   * Main processing method - transforms musical context through complete OKLAB pipeline
    */
-  public async coordinateMusicalColors(
+  public async processMusicalColors(
     context: MusicalColorContext,
-    options: CoordinationOptions = {}
+    options: ProcessingOptions = {}
   ): Promise<MusicalOKLABResult> {
     const startTime = performance.now();
 
@@ -110,7 +111,7 @@ export class MusicalOKLABCoordinator {
       if (this.enableDebug) {
         Y3KDebug?.debug?.log(
           "MusicalOKLABCoordinator",
-          "Using cached coordination result",
+          "Using cached processing result",
           { cacheKey }
         );
       }
@@ -118,8 +119,8 @@ export class MusicalOKLABCoordinator {
     }
 
     try {
-      // Step 1: Analyze music and determine coordination strategy
-      const coordinationStrategy = this.determineCoordinationStrategy(
+      // Step 1: Analyze music and determine processing strategy
+      const processingStrategy = this.determineProcessingStrategy(
         context,
         options
       );
@@ -127,7 +128,7 @@ export class MusicalOKLABCoordinator {
       // Step 2: Get optimal OKLAB preset through genre and emotional analysis
       const oklabPreset = await this.getOptimalOKLABPreset(
         context,
-        coordinationStrategy,
+        processingStrategy,
         options
       );
 
@@ -184,7 +185,7 @@ export class MusicalOKLABCoordinator {
         genreCharacteristics,
         processingTime,
         musicInfluenceStrength,
-        coordinationStrategy,
+        processingStrategy,
         cssVariables,
       };
 
@@ -194,11 +195,11 @@ export class MusicalOKLABCoordinator {
       if (this.enableDebug) {
         Y3KDebug?.debug?.log(
           "MusicalOKLABCoordinator",
-          "Musical OKLAB coordination completed",
+          "Musical OKLAB processing completed",
           {
             genre: detectedGenre,
             emotion: emotionalResult.primaryEmotion,
-            strategy: coordinationStrategy,
+            strategy: processingStrategy,
             preset: oklabPreset.name,
             processingTime,
             colorCount: Object.keys(colorProcessingResult).length,
@@ -211,7 +212,7 @@ export class MusicalOKLABCoordinator {
       if (this.enableDebug) {
         Y3KDebug?.debug?.error(
           "MusicalOKLABCoordinator",
-          "Musical coordination failed:",
+          "Musical processing failed:",
           error
         );
       }
@@ -221,12 +222,13 @@ export class MusicalOKLABCoordinator {
     }
   }
 
+
   /**
-   * Determine the optimal coordination strategy based on musical context
+   * Determine the optimal processing strategy based on musical context
    */
-  private determineCoordinationStrategy(
+  private determineProcessingStrategy(
     context: MusicalColorContext,
-    options: CoordinationOptions
+    options: ProcessingOptions
   ): "genre-primary" | "emotion-primary" | "balanced" | "fallback" {
     const { musicData } = context;
 
@@ -251,12 +253,12 @@ export class MusicalOKLABCoordinator {
     const valenceExtremity = Math.abs(musicData.valence - 0.5) * 2; // 0-1 scale
     const emotionalExtremity = (energyExtremity + valenceExtremity) / 2;
 
-    // If music has strong emotional characteristics, prefer emotion-based coordination
+    // If music has strong emotional characteristics, prefer emotion-based processing
     if (emotionalExtremity > 0.6) {
       return "emotion-primary";
     }
 
-    // If we have a clear genre detection, prefer genre-based coordination
+    // If we have a clear genre detection, prefer genre-based processing
     const detectedGenre = this.genreManager.detectGenre(musicData);
     if (detectedGenre !== "default") {
       return "genre-primary";
@@ -266,13 +268,14 @@ export class MusicalOKLABCoordinator {
     return "balanced";
   }
 
+
   /**
    * Get optimal OKLAB preset considering both genre and emotional context
    */
   private async getOptimalOKLABPreset(
     context: MusicalColorContext,
     strategy: string,
-    options: CoordinationOptions
+    options: ProcessingOptions
   ): Promise<EnhancementPreset> {
     const { musicData } = context;
 
@@ -296,7 +299,7 @@ export class MusicalOKLABCoordinator {
             this.genreManager.getOKLABPresetForTrack(musicData);
           const emotionalResult2 =
             this.emotionalMapper.mapMusicToEmotionalTemperature(musicData);
-          preset = this.blendPresets(
+          preset = this.processBlendedPresets(
             genrePreset,
             emotionalResult2.oklabPreset,
             options.intensityMultiplier || 1.0
@@ -321,9 +324,9 @@ export class MusicalOKLABCoordinator {
   }
 
   /**
-   * Blend two OKLAB presets for balanced coordination strategy
+   * Process two OKLAB presets for balanced processing strategy
    */
-  private blendPresets(
+  private processBlendedPresets(
     genrePreset: EnhancementPreset,
     emotionalPreset: EnhancementPreset,
     intensityMultiplier: number
@@ -381,7 +384,7 @@ export class MusicalOKLABCoordinator {
   }
 
   /**
-   * Calculate music influence strength for coordination
+   * Calculate music influence strength for processing
    */
   private calculateMusicInfluenceStrength(
     musicData: MusicAnalysisData,
@@ -453,8 +456,8 @@ export class MusicalOKLABCoordinator {
     variables["--sn-oklab-chroma-boost"] = preset.chromaBoost.toString();
     variables["--sn-oklab-lightness-boost"] = preset.lightnessBoost.toString();
 
-    // Coordination metadata
-    variables["--sn-musical-oklab-coordination"] = "enabled";
+    // Processing metadata
+    variables["--sn-musical-oklab-processing"] = "enabled";
     variables["--sn-color-processing-mode"] = "unified-musical-oklab";
 
     return variables;
@@ -521,7 +524,7 @@ export class MusicalOKLABCoordinator {
         intensity: 0.5,
         temperature: 3500,
         blendRatio: 1.0,
-        cssClass: "organic-emotion-calm",
+        cssClass: "smooth-emotion-calm",
         cssVariables: {},
         oklabPreset: fallbackPreset,
       } as EmotionalTemperatureResult,
@@ -532,9 +535,9 @@ export class MusicalOKLABCoordinator {
       },
       processingTime,
       musicInfluenceStrength: 0.5,
-      coordinationStrategy: "fallback",
+      processingStrategy: "fallback",
       cssVariables: {
-        "--sn-musical-oklab-coordination": "fallback",
+        "--sn-musical-oklab-processing": "fallback",
         "--sn-oklab-preset-name": "STANDARD",
       },
     };
@@ -577,41 +580,41 @@ export class MusicalOKLABCoordinator {
       accentHex: musicalResult.accentHex,
       accentRgb: musicalResult.accentRgb,
       metadata: {
-        strategy: "musical-oklab-coordinator",
+        strategy: "musical-oklab-processor",
         processingTime: musicalResult.processingTime,
         detectedGenre: musicalResult.detectedGenre,
         emotionalState: musicalResult.emotionalResult.primaryEmotion,
         oklabPreset: musicalResult.oklabPreset.name,
-        coordinationStrategy: musicalResult.coordinationStrategy,
+        processingStrategy: musicalResult.processingStrategy,
         musicInfluenceStrength: musicalResult.musicInfluenceStrength,
       },
       context: {
         rawColors: context.rawColors,
         trackUri: context.trackUri,
         timestamp: context.timestamp,
-        harmonicMode: context.harmonicMode || "musical-oklab",
+        harmonicMode: context.harmonicMode || "musical-oklab-processing",
         musicData: context.musicData,
       },
     };
   }
 
   /**
-   * Clear coordination cache
+   * Clear processing cache
    */
-  public clearCache(): void {
+  public clearProcessingCache(): void {
     this.coordinationCache.clear();
     if (this.enableDebug) {
       Y3KDebug?.debug?.log(
         "MusicalOKLABCoordinator",
-        "Coordination cache cleared"
+        "Processing cache cleared"
       );
     }
   }
 
   /**
-   * Get coordination metrics for monitoring
+   * Get processing metrics for monitoring
    */
-  public getCoordinationMetrics(): any {
+  public getProcessingMetrics(): any {
     return {
       cacheSize: this.coordinationCache.size,
       maxCacheSize: this.cacheMaxSize,

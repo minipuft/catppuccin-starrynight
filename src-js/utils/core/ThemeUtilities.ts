@@ -1,4 +1,4 @@
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 
 // Type definition for RGB color
 interface RgbColor {
@@ -129,7 +129,7 @@ export function sanitizeColorMap(input: {
   [key: string]: string | undefined | null;
 }): { [key: string]: string } {
   // 🎨 CRITICAL: Enhanced logging for color sanitization
-  console.log("🎨 [Year3000Utilities] sanitizeColorMap input:", {
+  console.log("🎨 [ThemeUtilities] sanitizeColorMap input:", {
     input,
     inputKeys: input ? Object.keys(input) : [],
     inputEntries: input ? Object.entries(input) : []
@@ -140,7 +140,7 @@ export function sanitizeColorMap(input: {
   const sanitized: { [key: string]: string } = {};
 
   if (!input || typeof input !== "object") {
-    console.warn("🎨 [Year3000Utilities] sanitizeColorMap: Invalid input type");
+    console.warn("🎨 [ThemeUtilities] sanitizeColorMap: Invalid input type");
     return sanitized;
   }
 
@@ -149,19 +149,19 @@ export function sanitizeColorMap(input: {
   Object.entries(input).forEach(([key, value]) => {
     if (typeof value !== "string") {
       droppedEntries.push([key, value]);
-      console.warn(`🎨 [Year3000Utilities] Dropped non-string color: ${key} = ${value} (type: ${typeof value})`);
+      console.warn(`🎨 [ThemeUtilities] Dropped non-string color: ${key} = ${value} (type: ${typeof value})`);
       return;
     }
     const trimmed = value.trim();
     // Discard obviously invalid placeholders returned by upstream extractors
     if (!trimmed || trimmed === "undefined") {
       droppedEntries.push([key, value]);
-      console.warn(`🎨 [Year3000Utilities] Dropped empty/undefined color: ${key} = "${value}"`);
+      console.warn(`🎨 [ThemeUtilities] Dropped empty/undefined color: ${key} = "${value}"`);
       return;
     }
     if (!validHex.test(trimmed)) {
       droppedEntries.push([key, value]);
-      console.warn(`🎨 [Year3000Utilities] Dropped invalid hex color: ${key} = "${value}"`);
+      console.warn(`🎨 [ThemeUtilities] Dropped invalid hex color: ${key} = "${value}"`);
       return;
     }
 
@@ -171,7 +171,7 @@ export function sanitizeColorMap(input: {
   });
 
   // 🎨 CRITICAL: Log sanitization results
-  console.log("🎨 [Year3000Utilities] sanitizeColorMap output:", {
+  console.log("🎨 [ThemeUtilities] sanitizeColorMap output:", {
     sanitized,
     sanitizedKeys: Object.keys(sanitized),
     sanitizedEntries: Object.entries(sanitized),
@@ -180,7 +180,7 @@ export function sanitizeColorMap(input: {
   });
 
   if (
-    YEAR3000_CONFIG?.enableDebug &&
+    ADVANCED_SYSTEM_CONFIG?.enableDebug &&
     Object.keys(input).length !== Object.keys(sanitized).length
   ) {
     console.warn(
@@ -307,7 +307,7 @@ export function lerpSmooth(
 ): number {
   const EPSILON = 0.00001;
   if (halfLife <= EPSILON || deltaTime <= 0) {
-    if (YEAR3000_CONFIG?.enableDebug) {
+    if (ADVANCED_SYSTEM_CONFIG?.enableDebug) {
       if (halfLife <= EPSILON) {
         // console.warn(
         //   "[StarryNight lerpSmooth] halfLife is near zero or negative. Snapping to target. halfLife:",
@@ -323,19 +323,19 @@ export function lerpSmooth(
 }
 
 /**
- * Musical Consciousness LERP Smoothing - Year 3000 Enhanced Smoothing
+ * Musical Visual Effects LERP Smoothing - Year 3000 Enhanced Smoothing
  * 
  * Enhanced LERP function that adapts to musical characteristics, creating
- * organic consciousness that breathes and flows with music rather than using
+ * smooth visual effects that adapt and flow with music rather than using
  * static smoothing values.
  * 
  * @param current Current value to smooth from
  * @param target Target value to smooth towards  
  * @param deltaTime Time elapsed since last frame (seconds)
- * @param musicContext Musical characteristics for consciousness calculation
+ * @param musicContext Musical characteristics for visual effects calculation
  * @param animationType Type of animation for appropriate smoothing profile
  * @param baseHalfLife Optional override for base half-life value
- * @returns Smoothed value with musical consciousness
+ * @returns Smoothed value with musical visual effects
  */
 export function lerpSmoothMusical(
   current: number,
@@ -355,22 +355,22 @@ export function lerpSmoothMusical(
     baseHalfLife
   );
   
-  // Apply musical consciousness to smoothing
+  // Apply musical visual effects to smoothing
   return lerpSmooth(current, target, deltaTime, musicalParams.halfLife);
 }
 
 /**
- * Performance-aware Musical LERP with full consciousness and performance optimization
+ * Performance-aware Musical LERP with full visual effects and performance optimization
  * Integrates with PerformanceAwareLerpCoordinator for device-aware smoothing
  * 
  * @param current Current value to smooth from
  * @param target Target value to smooth towards  
  * @param deltaTime Time elapsed since last frame (seconds)
- * @param musicContext Musical characteristics for consciousness calculation
+ * @param musicContext Musical characteristics for visual effects calculation
  * @param performanceCoordinator Performance coordinator for optimization
  * @param animationType Type of animation for appropriate smoothing profile
  * @param baseHalfLife Optional override for base half-life value
- * @returns Performance-optimized smoothed value with musical consciousness
+ * @returns Performance-optimized smoothed value with musical visual effects
  */
 export function lerpSmoothMusicalPerformance(
   current: number,
@@ -399,7 +399,7 @@ export function lerpSmoothMusicalPerformance(
 
 /**
  * Simplified Musical LERP for cases where full musical context isn't available
- * Uses basic tempo and energy information for consciousness calculation
+ * Uses basic tempo and energy information for visual effects calculation
  * 
  * @param current Current value to smooth from
  * @param target Target value to smooth towards
@@ -407,7 +407,7 @@ export function lerpSmoothMusicalPerformance(
  * @param tempo BPM of current music (60-200+)
  * @param energy Energy level of music (0-1)
  * @param baseHalfLife Base half-life for calculation
- * @returns Smoothed value with basic musical awareness
+ * @returns Smoothed value with basic musical integration
  */
 export function lerpSmoothSimpleMusical(
   current: number,
@@ -589,7 +589,7 @@ export function processOklabColor(
     valence = 0.5,
     artisticMode = "artist-vision",
   } = context;
-  const multipliers = YEAR3000_CONFIG.getCurrentMultipliers();
+  const multipliers = ADVANCED_SYSTEM_CONFIG.getCurrentMultipliers();
 
   let adjusted_L = L * (1 + (valence - 0.5) * 0.1);
   let adjusted_C =

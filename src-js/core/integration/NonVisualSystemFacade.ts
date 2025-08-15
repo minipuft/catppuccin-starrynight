@@ -45,8 +45,8 @@
  */
 
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
+import * as Utils from "@/utils/core/ThemeUtilities";
 
 // Performance System imports
 import { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
@@ -77,7 +77,7 @@ import { SettingsManager } from "@/ui/managers/SettingsManager";
 
 // Consciousness Systems imports
 import { GenreGradientEvolution } from "@/audio/GenreGradientEvolution";
-import { VisualEffectsCoordinator } from "@/core/consciousness/VisualEffectsCoordinator";
+import { VisualEffectsCoordinator } from "@/visual/effects/VisualEffectsCoordinator";
 import { MusicEmotionAnalyzer } from "@/visual/music/integration/MusicEmotionAnalyzer";
 
 // Color Strategy imports
@@ -202,12 +202,12 @@ export interface NonVisualSystemHealthCheck {
 
 export class NonVisualSystemFacade {
   // Core dependencies
-  private config: Year3000Config;
+  private config: AdvancedSystemConfig | Year3000Config;
   private utils: typeof Utils;
   private year3000System: any; // Reference to main system
 
   // Core shared dependencies (will be injected from main system)
-  private cssConsciousnessController: OptimizedCSSVariableManager | null =
+  private cssVariableManager: OptimizedCSSVariableManager | null =
     null;
   private musicSyncService: MusicSyncService | null = null;
   private settingsManager: SettingsManager | null = null;
@@ -254,7 +254,7 @@ export class NonVisualSystemFacade {
   private facadeAdapter = globalFacadeAdapter;
 
   constructor(
-    config: Year3000Config,
+    config: AdvancedSystemConfig | Year3000Config,
     utils: typeof Utils,
     year3000System: any
   ) {
@@ -266,7 +266,7 @@ export class NonVisualSystemFacade {
     if (year3000System && typeof year3000System === 'object' && 'performanceAnalyzer' in year3000System) {
       // Extract shared dependencies from SystemCoordinator
       this.performanceAnalyzer = year3000System.performanceAnalyzer || null;
-      this.cssConsciousnessController = year3000System.unifiedCSSConsciousnessController || null;
+      this.cssVariableManager = year3000System.unifiedCSSConsciousnessController || null;
       this.performanceCoordinator = year3000System.unifiedPerformanceCoordinator || null;
       this.performanceOrchestrator = year3000System.performanceOrchestrator || null;
       this.musicSyncService = year3000System.musicSyncService || null;
@@ -277,7 +277,7 @@ export class NonVisualSystemFacade {
         "Shared dependencies injected from SystemCoordinator",
         {
           performanceAnalyzer: !!this.performanceAnalyzer,
-          cssConsciousnessController: !!this.cssConsciousnessController,
+          cssVariableManager: !!this.cssVariableManager,
           performanceOrchestrator: !!this.performanceOrchestrator,
           musicSyncService: !!this.musicSyncService,
           settingsManager: !!this.settingsManager,
@@ -326,7 +326,7 @@ export class NonVisualSystemFacade {
     );
     this.systemDependencies.set("EnhancedMasterAnimationCoordinator", [
       "performanceAnalyzer",
-      "cssConsciousnessController",
+      "cssVariableManager",
     ]);
 
     this.systemRegistry.set(
@@ -466,7 +466,7 @@ export class NonVisualSystemFacade {
     // Consciousness Systems
     this.systemRegistry.set("GenreGradientEvolution", GenreGradientEvolution);
     this.systemDependencies.set("GenreGradientEvolution", [
-      "cssConsciousnessController",
+      "cssVariableManager",
       "musicSyncService",
       "settingsManager",
     ]);
@@ -489,7 +489,7 @@ export class NonVisualSystemFacade {
     // UI Managers
     this.systemRegistry.set("GlassmorphismManager", GlassmorphismManager);
     this.systemDependencies.set("GlassmorphismManager", [
-      "cssConsciousnessController",
+      "cssVariableManager",
       "performanceAnalyzer",
       "settingsManager",
     ]);
@@ -506,7 +506,7 @@ export class NonVisualSystemFacade {
       SidebarSystemsIntegration
     );
     this.systemDependencies.set("SidebarSystemsIntegration", [
-      "cssConsciousnessController",
+      "cssVariableManager",
     ]);
   }
 
@@ -625,7 +625,7 @@ export class NonVisualSystemFacade {
           
           // Shared systems
           case "OptimizedCSSVariableManager":
-            this.cssConsciousnessController = system;
+            this.cssVariableManager = system;
             break;
           case "SettingsManager":
             this.settingsManager = system;
@@ -695,9 +695,9 @@ export class NonVisualSystemFacade {
     }
 
     // Shared systems
-    if ((key === "OptimizedCSSVariableManager" || key === "UnifiedCSSVariableManager") && this.cssConsciousnessController) {
-      this.systemCache.set(key, this.cssConsciousnessController);
-      return this.cssConsciousnessController as T;
+    if ((key === "OptimizedCSSVariableManager" || key === "UnifiedCSSVariableManager") && this.cssVariableManager) {
+      this.systemCache.set(key, this.cssVariableManager);
+      return this.cssVariableManager as T;
     }
 
     if (key === "MusicSyncService" && this.musicSyncService) {
@@ -774,13 +774,13 @@ export class NonVisualSystemFacade {
       return this.performanceAnalyzer as T;
     }
 
-    if ((key === "OptimizedCSSVariableManager" || key === "UnifiedCSSVariableManager") && this.cssConsciousnessController) {
-      this.systemCache.set(key, this.cssConsciousnessController);
+    if ((key === "OptimizedCSSVariableManager" || key === "UnifiedCSSVariableManager") && this.cssVariableManager) {
+      this.systemCache.set(key, this.cssVariableManager);
       Y3KDebug?.debug?.log(
         "NonVisualSystemFacade",
         `Using shared OptimizedCSSVariableManager instance from SystemCoordinator (requested as ${key})`
       );
-      return this.cssConsciousnessController as T;
+      return this.cssVariableManager as T;
     }
 
     if (key === "SimplePerformanceCoordinator" && this.performanceOrchestrator) {
@@ -886,7 +886,7 @@ export class NonVisualSystemFacade {
           settingsManager: this.settingsManager,
           musicSyncService: this.musicSyncService,
           year3000System: this.year3000System,
-          cssConsciousnessController: this.cssConsciousnessController,
+          cssVariableManager: this.cssVariableManager,
           performanceCoordinator: this.performanceCoordinator,
           performanceOrchestrator: this.performanceOrchestrator,
           // New simplified performance system dependencies
@@ -1004,13 +1004,22 @@ export class NonVisualSystemFacade {
       system.setPerformanceAnalyzer(this.performanceAnalyzer);
     }
 
-    // Inject CSS variable batcher
+    // Inject CSS variable manager
+    if (
+      dependencies.includes("cssVariableManager") &&
+      this.cssVariableManager &&
+      system.setCSSVariableManager
+    ) {
+      system.setCSSVariableManager(this.cssVariableManager);
+    }
+
+    // Backwards compatibility - inject CSS variable manager via old method name
     if (
       dependencies.includes("cssConsciousnessController") &&
-      this.cssConsciousnessController &&
+      this.cssVariableManager &&
       system.setCSSConsciousnessController
     ) {
-      system.setCSSConsciousnessController(this.cssConsciousnessController);
+      system.setCSSConsciousnessController(this.cssVariableManager);
     }
 
     // Inject music sync service
@@ -1313,7 +1322,7 @@ export class NonVisualSystemFacade {
     }
 
     // Clear references
-    this.cssConsciousnessController = null;
+    this.cssVariableManager = null;
     this.performanceAnalyzer = null;
     this.performanceOrchestrator = null;
     this.musicSyncService = null;

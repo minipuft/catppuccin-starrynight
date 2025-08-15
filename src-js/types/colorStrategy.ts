@@ -23,7 +23,10 @@ export interface ColorContext {
   /** Processing timestamp */
   timestamp: number;
   
-  /** Current harmonic mode setting */
+  /** Current color harmony mode setting */
+  colorHarmonyMode?: string;
+  
+  /** @deprecated Use colorHarmonyMode instead */
   harmonicMode?: string;
   
   /** Music analysis data for context-aware processing */

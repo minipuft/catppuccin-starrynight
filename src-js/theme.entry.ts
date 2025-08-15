@@ -1,7 +1,7 @@
-import { YEAR3000_CONFIG } from "./config/globalConfig";
-import { Year3000System } from "./core/lifecycle/year3000System";
+import { ADVANCED_SYSTEM_CONFIG } from "./config/globalConfig";
+import { Year3000System, AdvancedThemeSystem } from "./core/lifecycle/AdvancedThemeSystem";
 import { Y3KDebug } from "./debug/UnifiedDebugManager";
-import * as Year3000Utilities from "./utils/core/Year3000Utilities";
+import * as ThemeUtilities from "./utils/core/ThemeUtilities";
 import { waitForSpicetifyReady } from "./utils/platform/spicetifyReady";
 import { initializeAberrationManager } from "./visual/ui/Aberration/AberrationManager"; // Re-enabled for hybrid CSS+WebGL approach
 import { initializeAudioVisualController } from "./visual/ui/AudioVisualController";
@@ -310,7 +310,7 @@ patchReactRequire();
 
   const ENABLE_GLOBAL_DEBUGGING = true;
   if (ENABLE_GLOBAL_DEBUGGING) {
-    YEAR3000_CONFIG.enableDebug = true;
+    ADVANCED_SYSTEM_CONFIG.enableDebug = true;
     // Activate Drag Cartography mapping in debug mode (Phase 1)
     import("./debug/DragCartographer").then((m) => {
       m.enableDragCartography?.();
@@ -319,7 +319,7 @@ patchReactRequire();
   }
 
   // 1. Instantiate the main system. It will handle its own internal dependencies.
-  const year3000System = new Year3000System(YEAR3000_CONFIG);
+  const year3000System = new Year3000System(ADVANCED_SYSTEM_CONFIG);
 
   // 2. Initialize the system using progressive loading approach
   try {
@@ -406,7 +406,7 @@ patchReactRequire();
   }
 
   // 4. Expose for debugging
-  if (YEAR3000_CONFIG.enableDebug) {
+  if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
     (window as any).Y3K = {
       system: year3000System,
       // Expose internal modules for easier debugging
@@ -433,7 +433,7 @@ patchReactRequire();
     if (year3000System.performanceAnalyzer) {
       // Initialize the coordinator first
       const coordinator = SidebarPerformanceCoordinator.getInstance({
-        enableDebug: YEAR3000_CONFIG.enableDebug,
+        enableDebug: ADVANCED_SYSTEM_CONFIG.enableDebug,
         performanceAnalyzer: year3000System.performanceAnalyzer,
         onFlushComplete: () => {
           year3000System.performanceAnalyzer?.emitTrace?.(
@@ -444,8 +444,8 @@ patchReactRequire();
 
       // Initialize the consolidated sidebar visual effects system
       const sidebarSystem = new SidebarVisualEffectsSystem(
-        YEAR3000_CONFIG,
-        Year3000Utilities,
+        ADVANCED_SYSTEM_CONFIG,
+        ThemeUtilities,
         year3000System.performanceAnalyzer,
         year3000System.musicSyncService as any,
         year3000System.settingsManager as any,
@@ -464,13 +464,13 @@ patchReactRequire();
 
   // 3c. 🌊 Initialize Depth Consciousness Controller (Phase 4.2e)
   try {
-    const { DepthConsciousnessController } = await import(
+    const { DepthVisualEffectsController } = await import(
       "./visual/effects/DepthLayerController"
     );
 
-    const depthConsciousness = new DepthConsciousnessController(
-      YEAR3000_CONFIG,
-      Year3000Utilities,
+    const depthConsciousness = new DepthVisualEffectsController(
+      ADVANCED_SYSTEM_CONFIG,
+      ThemeUtilities,
       year3000System.performanceAnalyzer,
       year3000System.musicSyncService as any,
       year3000System.settingsManager as any
@@ -481,7 +481,7 @@ patchReactRequire();
     console.log("🌊 [StarryNight] Depth Consciousness Controller awakened");
   } catch (err) {
     console.error(
-      "[StarryNight] Failed to initialize DepthConsciousnessController",
+      "[StarryNight] Failed to initialize DepthVisualEffectsController",
       err
     );
   }
@@ -493,22 +493,22 @@ patchReactRequire();
     );
 
     const dynamicBridge = new DynamicCatppuccinBridge(
-      YEAR3000_CONFIG,
-      Year3000Utilities,
+      ADVANCED_SYSTEM_CONFIG,
+      ThemeUtilities,
       year3000System.performanceAnalyzer,
       year3000System.musicSyncService as any,
       year3000System.settingsManager as any
     );
     await dynamicBridge.initialize();
 
-    // Link with other consciousness systems
+    // Link with other visual-effects systems
     if (year3000System.colorHarmonyEngine) {
       dynamicBridge.linkWithColorHarmonyEngine(
         year3000System.colorHarmonyEngine
       );
     }
     if ((year3000System as any).depthConsciousnessController) {
-      dynamicBridge.linkWithDepthConsciousness(
+      dynamicBridge.linkWithDepthVisual(
         (year3000System as any).depthConsciousnessController
       );
     }
@@ -530,15 +530,15 @@ patchReactRequire();
     );
 
     const livingGradientSystem = new LivingGradientStrategy(
-      YEAR3000_CONFIG,
-      Year3000Utilities,
+      ADVANCED_SYSTEM_CONFIG,
+      ThemeUtilities,
       year3000System.performanceAnalyzer,
       year3000System.musicSyncService as any,
       year3000System.settingsManager as any
     );
     await livingGradientSystem.initialize();
 
-    // Link with other consciousness systems
+    // Link with other visual-effects systems
     if ((year3000System as any).dynamicCatppuccinBridge) {
       // The living gradient system will listen to events from the dynamic bridge
       console.log(
@@ -546,7 +546,7 @@ patchReactRequire();
       );
     }
     if ((year3000System as any).depthConsciousnessController) {
-      // The living gradient system coordinates with depth consciousness
+      // The living gradient system coordinates with depth visual-effects
       console.log(
         "🌊 [StarryNight] Consolidated Living Gradient System linked with Depth Consciousness"
       );

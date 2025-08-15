@@ -1,8 +1,8 @@
 import { UnifiedPerformanceCoordinator } from '@/core/performance/UnifiedPerformanceCoordinator';
 import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
-import { YEAR3000_CONFIG } from '@/config/globalConfig';
+import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import { temporalMemoryService } from "@/audio/TemporalMemoryService";
-import type { Year3000Config, MultiplierProfile } from '@/types/models';
+import type { AdvancedSystemConfig, Year3000Config, MultiplierProfile } from '@/types/models';
 import type { PersonalAestheticSignature } from "@/types/signature";
 import type { CSSAnimationManager } from './CSSAnimationManager';
 
@@ -83,12 +83,12 @@ interface ConsolidatedMetrics {
  * 
  * @architecture Phase 4 of system consolidation
  * @performance Target: 5-10% animation performance improvement
- * @emergent Integrates emergent choreography engine functionality
+ * @adaptive Integrates adaptive choreography engine functionality
  */
 export class EnhancedMasterAnimationCoordinator {
   private static instance: EnhancedMasterAnimationCoordinator | null = null;
   
-  private config: Year3000Config;
+  private config: AdvancedSystemConfig | Year3000Config;
   private eventBus: typeof unifiedEventBus;
   private performanceCoordinator: UnifiedPerformanceCoordinator | null = null;
   private cssAnimationManager: CSSAnimationManager | null = null;
@@ -138,41 +138,41 @@ export class EnhancedMasterAnimationCoordinator {
   private readonly MAX_HISTORY_SIZE = 60; // 1 second at 60fps
   
   // ===================================================================
-  // CSS-FIRST BREATHING COORDINATION - YEAR 3000 PERFORMANCE REVOLUTION
+  // CSS-FIRST PULSING COORDINATION - YEAR 3000 PERFORMANCE REVOLUTION
   // ===================================================================
   
   /**
-   * Coordinate consciousness breathing with CSSAnimationManager
-   * Integrates beat events with CSS-first breathing for 90%+ JavaScript overhead elimination
+   * Coordinate visual effects pulsing with CSSAnimationManager
+   * Integrates beat events with CSS-first pulsing for 90%+ JavaScript overhead elimination
    */
-  private coordinateConsciousnessBreathing(payload: any): void {
+  private coordinateVisualEffectsPulsing(payload: any): void {
     if (!this.cssAnimationManager) return;
     
     const energyLevel = payload.energy || payload.intensity || 0.5;
     const tempo = payload.bpm || this.currentBpm || 120;
     
-    // Only trigger breathing updates if significant change occurred
+    // Only trigger pulsing updates if significant change occurred
     // This prevents excessive updates and maintains performance
     const energyDelta = Math.abs(energyLevel - this.currentIntensity);
     if (energyDelta < 0.1 && Math.abs(tempo - this.currentBpm) < 5) {
       return; // Skip minor fluctuations
     }
     
-    // Get consciousness elements for breathing coordination
-    const consciousnessElements = document.querySelectorAll(
-      '.Root__main-view::before, .Root__main-view, [data-consciousness-breathing]'
+    // Get visual effects elements for pulsing coordination
+    const visualEffectsElements = document.querySelectorAll(
+      '.Root__main-view::before, .Root__main-view, [data-visual-effects-pulsing]'
     );
     
-    if (consciousnessElements.length > 0) {
-      // Coordinate breathing through CSSAnimationManager
+    if (visualEffectsElements.length > 0) {
+      // Coordinate pulsing through CSSAnimationManager
       this.cssAnimationManager.triggerConsciousnessBreathing(
-        consciousnessElements,
+        visualEffectsElements,
         energyLevel,
         tempo
       );
       
       if (this.config.enableDebug) {
-        console.log(`[EnhancedMasterAnimationCoordinator] Consciousness breathing coordinated - Energy: ${energyLevel.toFixed(2)}, Tempo: ${tempo} BPM`);
+        console.log(`[EnhancedMasterAnimationCoordinator] Visual effects pulsing coordinated - Energy: ${energyLevel.toFixed(2)}, Tempo: ${tempo} BPM`);
       }
     }
     
@@ -193,7 +193,7 @@ export class EnhancedMasterAnimationCoordinator {
   private currentIntensity: number = 0.5;
   private emergentEventSubscriptions: string[] = [];
   
-  constructor(config: Year3000Config, performanceCoordinator?: UnifiedPerformanceCoordinator, cssAnimationManager?: CSSAnimationManager) {
+  constructor(config: AdvancedSystemConfig | Year3000Config, performanceCoordinator?: UnifiedPerformanceCoordinator, cssAnimationManager?: CSSAnimationManager) {
     this.config = config;
     this.eventBus = unifiedEventBus;
     this.performanceCoordinator = performanceCoordinator || null;
@@ -203,20 +203,20 @@ export class EnhancedMasterAnimationCoordinator {
     this.startTime = performance.now();
     this.lastTimestamp = this.startTime;
     
-    // Initialize emergent choreography state
+    // Initialize adaptive choreography state
     this.currentMultipliers = this.config.cosmicMultipliers; // Start with defaults
     
     // Subscribe to performance events
     this.subscribeToEvents();
     
-    // Initialize emergent choreography (from EmergentChoreographyEngine)
+    // Initialize adaptive choreography (from EmergentChoreographyEngine)
     this.initializeEmergentChoreography();
     
     // Set up performance-aware frame budget
     this.updateFrameBudget();
     
     if (this.config.enableDebug) {
-      console.log('[EnhancedMasterAnimationCoordinator] Initialized with unified animation coordination and emergent choreography');
+      console.log('[EnhancedMasterAnimationCoordinator] Initialized with unified animation coordination and adaptive choreography');
     }
   }
   
@@ -234,13 +234,13 @@ export class EnhancedMasterAnimationCoordinator {
   }
   
   /**
-   * Register CSSAnimationManager for breathing coordination
+   * Register CSSAnimationManager for pulsing coordination
    */
   public registerCSSAnimationManager(cssAnimationManager: CSSAnimationManager): void {
     this.cssAnimationManager = cssAnimationManager;
     
     if (this.config.enableDebug) {
-      console.log('[EnhancedMasterAnimationCoordinator] CSSAnimationManager registered for breathing coordination');
+      console.log('[EnhancedMasterAnimationCoordinator] CSSAnimationManager registered for pulsing coordination');
     }
   }
 
@@ -563,7 +563,7 @@ export class EnhancedMasterAnimationCoordinator {
   }
   
   /**
-   * Get current multipliers for emergent choreography
+   * Get current multipliers for adaptive choreography
    */
   public getCurrentMultipliers(): MultiplierProfile {
     return this.currentMultipliers;
@@ -582,7 +582,7 @@ export class EnhancedMasterAnimationCoordinator {
   public destroy(): void {
     this.stopMasterAnimationLoop();
     
-    // Clean up emergent choreography
+    // Clean up adaptive choreography
     this.destroyEmergentChoreography();
     
     // Destroy all visual systems
@@ -654,7 +654,7 @@ export class EnhancedMasterAnimationCoordinator {
       }
     }
     
-    // Process emergent choreography only if we have budget remaining
+    // Process adaptive choreography only if we have budget remaining
     const midFrameTime = performance.now() - frameStartTime;
     if (midFrameTime < FRAME_BUDGET * 0.8) { // Reserve 20% for cleanup
       this.processEmergentTick(deltaTime);
@@ -925,12 +925,12 @@ export class EnhancedMasterAnimationCoordinator {
    * Subscribe to performance events
    */
   private subscribeToEvents(): void {
-    // Subscribe to beat events for frame context and breathing coordination
+    // Subscribe to beat events for frame context and pulsing coordination
     this.eventBus.subscribe('music:beat', (payload: { bpm: number; intensity: number; timestamp: number; confidence: number }) => {
       this.frameContext.beatIntensity = payload.intensity || 0;
       
-      // Coordinate consciousness breathing with CSSAnimationManager
-      this.coordinateConsciousnessBreathing(payload);
+      // Coordinate visual effects pulsing with CSSAnimationManager
+      this.coordinateVisualEffectsPulsing(payload);
     }, 'EnhancedMasterAnimationCoordinator');
     
     // Subscribe to performance events
@@ -952,7 +952,7 @@ export class EnhancedMasterAnimationCoordinator {
   // =========================================================================
   
   /**
-   * Initialize emergent choreography functionality
+   * Initialize adaptive choreography functionality
    */
   private async initializeEmergentChoreography(): Promise<void> {
     try {
@@ -970,12 +970,12 @@ export class EnhancedMasterAnimationCoordinator {
         console.log('[EnhancedMasterAnimationCoordinator] Emergent choreography initialized');
       }
     } catch (error) {
-      console.error('[EnhancedMasterAnimationCoordinator] Failed to initialize emergent choreography:', error);
+      console.error('[EnhancedMasterAnimationCoordinator] Failed to initialize adaptive choreography:', error);
     }
   }
   
   /**
-   * Register emergent choreography event listeners
+   * Register adaptive choreography event listeners
    */
   private registerEmergentEventListeners(): void {
     const beatFrameSub = this.eventBus.subscribe("music:beat", (payload: { bpm: number; intensity: number; timestamp: number; confidence: number }) =>
@@ -1007,15 +1007,15 @@ export class EnhancedMasterAnimationCoordinator {
   }
   
   /**
-   * Handle beat frame events for emergent adaptation
+   * Handle beat frame events for adaptive adaptation
    */
   private handleBeatFrame(payload: any): void {
     if (!this.signature) return;
     // TODO: Process beat data and update signature in Phase 3
     this.signature.lastModified = Date.now();
     
-    // Coordinate consciousness breathing with emergent choreography
-    this.coordinateConsciousnessBreathing({
+    // Coordinate visual effects pulsing with adaptive choreography
+    this.coordinateVisualEffectsPulsing({
       intensity: payload.intensity || this.currentIntensity,
       energy: payload.energy || this.currentIntensity,
       bpm: this.currentBpm,
@@ -1023,7 +1023,7 @@ export class EnhancedMasterAnimationCoordinator {
   }
 
   /**
-   * Handle harmony frame events for emergent adaptation
+   * Handle harmony frame events for adaptive adaptation
    */
   private handleHarmonyFrame(payload: any): void {
     if (!this.signature) return;
@@ -1106,15 +1106,15 @@ export class EnhancedMasterAnimationCoordinator {
       visualIntensityBase,
     };
 
-    // TODO: Add emergent events to UnifiedEventBus when needed
+    // TODO: Add adaptive events to UnifiedEventBus when needed
     // this.eventBus.emit(
-    //   "emergent/multipliersUpdated",
+    //   "adaptive/multipliersUpdated",
     //   this.currentMultipliers
     // );
   }
   
   /**
-   * Process emergent choreography tick within animation loop
+   * Process adaptive choreography tick within animation loop
    */
   private processEmergentTick(deltaMs: number): void {
     if (!this.signature) return;
@@ -1140,14 +1140,14 @@ export class EnhancedMasterAnimationCoordinator {
     const emergentPayload = {
       timestamp: performance.now(),
       deltaMs,
-      // ...other emergent data to be calculated in later phases
+      // ...other adaptive data to be calculated in later phases
     };
-    // TODO: Add emergent events to UnifiedEventBus when needed
-    // this.eventBus.emit("emergent/frame", emergentPayload);
+    // TODO: Add adaptive events to UnifiedEventBus when needed
+    // this.eventBus.emit("adaptive/frame", emergentPayload);
   }
   
   /**
-   * Clean up emergent choreography resources
+   * Clean up adaptive choreography resources
    */
   private destroyEmergentChoreography(): void {
     // Save signature one last time on destroy

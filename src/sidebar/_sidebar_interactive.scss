@@ -1,19 +1,19 @@
 /* ████████████████████████████████████████████████████████████████████████████████*/
-/* SIDEBAR DIMENSIONAL NEXUS MODULE*/
-/* Advanced Dimensional Effects, Meditation Modes & Quantum Consciousness Field*/
+/* SIDEBAR INTERACTIVE SYSTEM MODULE*/
+/* Advanced Interactive Effects, Meditation Modes & Visual Effects Field*/
 /* ████████████████████████████████████████████████████████████████████████████████*/
 /**/
 /* This module contains advanced sidebar effects that complement the base*/
-/* SidebarConsciousnessSystem, including:*/
+/* SidebarVisualEffectsSystem, including:*/
 /* - Digital meditation states and biometric feedback*/
 /* - Atmospheric effects (hue shifting, saturation control, vibration)*/
 /* - Quantum entanglement and dimensional rifts*/
-/* - Advanced quantum consciousness field effects*/
+/* - Advanced visual effects field coordination*/
 /* - Enhanced navigation items with temporal echoes*/
 /* - Complex animation systems for advanced interactions*/
 /**/
 /* Dependencies:*/
-/* - Base sidebar consciousness system (_sidebar_consciousness.scss)*/
+/* - Base sidebar visual effects system (_sidebar_visual_effects.scss)*/
 /* - Year 3000 gradient variables (--sn-gradient-*-rgb)*/
 /* - Spicetify theme variables (--spice-rgb-*)*/
 /**/
@@ -38,7 +38,7 @@
 /* === PREDICTIVE MATERIALIZATION ===*/
 /* Duplicate variable declarations removed—canonical versions live in _sidebar_background_effects.scss*/
 
-/* === QUANTUM CONSCIOUSNESS FIELD ===*/
+/* === VISUAL EFFECTS FIELD ===*/
 /* Duplicate variable declarations removed—canonical versions live in _sidebar_background_effects.scss*/
 
 /* === YEAR 3000 DYNAMIC ACCENT ===*/
@@ -71,7 +71,7 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
     transition: opacity var(--sn-nav-item-transition-duration) ease,
       background-color var(--sn-nav-item-transition-duration) ease,
       transform var(--sn-nav-item-transition-duration)
-        var(--sn-anim-easing-organic),
+        var(--sn-anim-easing-dynamic),
       box-shadow var(--sn-nav-item-transition-duration) ease;
 
     /* Quantum glow effect via pseudo-element*/
@@ -159,7 +159,7 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
   /* For now, a simple approach targeting the main layers' filter property:*/
   &.sn-digital-meditation {
     /* This class will be added by JS*/
-    .sn-consciousness-layer, /* Target the pseudo-elements if they have distinct classes*/
+    .sn-visual-effects-layer, /* Target the pseudo-elements if they have distinct classes*/
     .sn-neural-flow-layer,
     .sn-quantum-foam-layer,
     &::before, /* If layers are directly on ::before*/
@@ -296,7 +296,7 @@ nav[aria-label="Main"] ul li a {
 }
 
 /* ████████████████████████████████████████████████████████████████████████████████*/
-/* QUANTUM CONSCIOUSNESS FIELD & HARMONIC MODES*/
+/* VISUAL EFFECTS FIELD & HARMONIC MODES*/
 /* ████████████████████████████████████████████████████████████████████████████████*/
 
 .Root__nav-bar {

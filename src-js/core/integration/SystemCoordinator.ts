@@ -38,7 +38,7 @@
  *
  * Technical Architecture:
  * - Manages both visual and non-visual system facades
- * - Provides unified interface for Year3000System
+ * - Provides unified interface for AdvancedSystem
  * - Optimizes shared resources (PerformanceCoordinator, CSSVariableManager)
  * - Coordinates system lifecycle across facades with dependency resolution
  */
@@ -59,9 +59,9 @@ import { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 import { SemanticColorManager } from "@/utils/spicetify/SemanticColorManager";
 import {
   VisualSystemCoordinator,
@@ -71,7 +71,7 @@ import {
 // Consciousness engine imports for integration
 import { RedEnergyBurstSystem } from "@/visual/effects/HighEnergyEffectsController";
 import { MusicGlowEffectsManager } from "@/visual/effects/GlowEffectsController";
-import { BreathingEffectsController } from "@/visual/effects/BreathingEffectsController";
+import { AnimationEffectsController } from "@/visual/effects/BreathingEffectsController";
 
 export type SystemType = "visual" | "non-visual";
 export type CoordinationMode =
@@ -416,8 +416,8 @@ export class SystemCoordinator {
                 '--sn-rs-glow-alpha', 
                 '--sn-rs-beat-intensity', 
                 '--sn-rs-hue-shift',
-                '--sn-cosmic-base-hex',
-                '--sn-cosmic-accent-hex'
+                '--sn-enhanced-base-hex',
+                '--sn-enhanced-accent-hex'
               ],
               high: [
                 '--sn-gradient-primary', 
@@ -1375,8 +1375,8 @@ export class SystemCoordinator {
               '--sn-rs-glow-alpha', 
               '--sn-rs-beat-intensity', 
               '--sn-rs-hue-shift',
-              '--sn-cosmic-base-hex',
-              '--sn-cosmic-accent-hex'
+              '--sn-enhanced-base-hex',
+              '--sn-enhanced-accent-hex'
             ],
             high: [
               '--sn-gradient-primary', 
@@ -1419,10 +1419,10 @@ export class SystemCoordinator {
 
   private async initializeMusicSyncService(): Promise<void> {
     this.sharedMusicSyncService = new MusicSyncService({
-      YEAR3000_CONFIG: this.config,
-      Year3000Utilities: this.utils,
+      ADVANCED_SYSTEM_CONFIG: this.config,
+      ThemeUtilities: this.utils,
       performanceMonitor: this.sharedSimplePerformanceCoordinator as any,
-      settingsManager: this.sharedSettingsManager,
+      settingsManager: this.sharedSettingsManager || undefined,
       year3000System: this.year3000System,
     });
     await this.sharedMusicSyncService.initialize();
@@ -1471,7 +1471,7 @@ export class SystemCoordinator {
     );
 
     // Note: SemanticColorManager integration will be handled through dependency injection
-    // in ColorHarmonyEngine's constructor or through the Year3000System bridge
+    // in ColorHarmonyEngine's constructor or through the AdvancedSystem bridge
 
     await this.sharedColorHarmonyEngine.initialize();
   }
@@ -1678,9 +1678,9 @@ export class SystemCoordinator {
   } {
     return {
       initialized: this.isInitialized,
-      visualSystems: this.visualBridge?.getSystemStatus().systemsActive || 0,
+      visualSystems: this.visualBridge?.getSystemStatus()?.systemsActive || 0,
       nonVisualSystems:
-        this.nonVisualFacade?.getSystemStatus().systemsActive || 0,
+        this.nonVisualFacade?.getSystemStatus()?.systemsActive || 0,
       healthy:
         this.currentMetrics.overallHealth === "excellent" ||
         this.currentMetrics.overallHealth === "good",

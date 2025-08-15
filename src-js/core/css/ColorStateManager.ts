@@ -113,8 +113,8 @@ export class ColorStateManager implements IManagedSystem {
     unifiedEventBus.subscribe('colors:harmonized', this.handleProcessedColors.bind(this), 'ColorStateManager');
     unifiedEventBus.subscribe('colors:extracted', this.handleExtractedColors.bind(this), 'ColorStateManager');
     
-    // 🔧 PHASE 2: Subscribe to consciousness and music events for dynamic CSS
-    unifiedEventBus.subscribe('consciousness:updated', this.handleConsciousnessUpdate.bind(this), 'ColorStateManager');
+    // 🔧 PHASE 2: Subscribe to visual-effects and music events for dynamic CSS
+    unifiedEventBus.subscribe('visual-effects:state-updated', this.handleVisualEffectsUpdate.bind(this), 'ColorStateManager');
     unifiedEventBus.subscribe('music:energy', this.handleMusicEnergyUpdate.bind(this), 'ColorStateManager');
     
     // 🔧 PHASE 2: Subscribe to CSS variable events from other systems
@@ -593,15 +593,15 @@ export class ColorStateManager implements IManagedSystem {
   }
 
   /**
-   * 🔧 PHASE 2: Handle consciousness updates and apply consciousness CSS variables
+   * 🔧 PHASE 2: Handle visual-effects updates and apply visual-effects CSS variables
    */
-  private async handleConsciousnessUpdate(event: any): Promise<void> {
+  private async handleVisualEffectsUpdate(event: any): Promise<void> {
     const { payload } = event;
     
     if (!payload) return;
     
-    const consciousnessVariables: Record<string, string> = {
-      '--sn-consciousness-level': (payload.consciousnessLevel || 0).toFixed(3),
+    const visualEffectsVariables: Record<string, string> = {
+      '--sn-visual-effects-level': (payload.visualEffectsLevel || 0).toFixed(3),
       '--sn-emotional-temperature': (payload.emotionalTemperature || 6500).toString(),
       '--sn-transcendence-level': (payload.transcendenceLevel || 0).toFixed(3),
       '--sn-volumetric-depth': (payload.volumetricDepth || 0).toFixed(3),
@@ -609,8 +609,8 @@ export class ColorStateManager implements IManagedSystem {
       '--sn-cosmic-resonance': (payload.cosmicResonance || 0).toFixed(3)
     };
     
-    // Apply consciousness variables with normal priority
-    Object.entries(consciousnessVariables).forEach(([property, value]) => {
+    // Apply visual-effects variables with normal priority
+    Object.entries(visualEffectsVariables).forEach(([property, value]) => {
       this.queueCSSVariableUpdate(property, value, 'normal');
     });
   }
@@ -655,7 +655,7 @@ export class ColorStateManager implements IManagedSystem {
       // Harmony and animation variables are high priority for smooth effects
       if (property.includes('harmony') || property.includes('glow') || property.includes('pulse')) {
         priority = 'high';
-      } else if (property.includes('debug') || property.includes('breathing')) {
+      } else if (property.includes('debug') || property.includes('animation')) {
         priority = 'low';
       }
       

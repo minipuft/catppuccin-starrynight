@@ -3,7 +3,7 @@
 // - UnifiedCSSVariableManager: Priority-based transactions and variable groups
 // - UnifiedCSSVariableManager: Device-aware performance optimization
 //
-// The unified controller provides consciousness-driven CSS updates that
+// The unified controller provides visual-effects-driven CSS updates that
 // adapt to music, aesthetics, performance constraints, and device capabilities.
 
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
@@ -12,19 +12,19 @@ import {
   type DeviceCapabilities,
   type PerformanceMode,
 } from "@/core/performance/UnifiedPerformanceCoordinator";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 
 // ===================================================================
 // INTERFACES AND TYPES
 // ===================================================================
 
-export interface ConsciousnessState {
+export interface VisualEffectsState {
   musicState?: {
     intensity: number;
     bpm: number;
     rhythmPhase: number;
-    breathingScale: number;
+    animationScale: number;
     energy: number;
     valence: number;
   };
@@ -43,18 +43,18 @@ export interface ConsciousnessState {
   "focus.pull"?: string;
   "transition.speed"?: string;
   "field.intensity"?: number;
-  "field.breathing.rate"?: string;
+  "field.animation.rate"?: string;
   "field.sensitivity"?: number;
   "bilateral.sync"?: boolean;
   // Breathing coordination for CSS-first Year 3000 system
-  "breathing.type"?: string;
-  "breathing.duration"?: string;
-  "breathing.intensity"?: number;
-  "breathing.energy"?: number;
-  "breathing.sync"?: number;
+  "animation.type"?: string;
+  "animation.duration"?: string;
+  "animation.intensity"?: number;
+  "animation.energy"?: number;
+  "animation.sync"?: number;
 }
 
-export interface CSSConsciousnessConfig {
+export interface CSSVisualEffectsConfig {
   // Batching configuration (from UnifiedCSSVariableManager)
   batchIntervalMs: number;
   maxBatchSize: number;
@@ -71,10 +71,10 @@ export interface CSSConsciousnessConfig {
   debugPerformanceClasses: boolean;
 
   // Consciousness configuration (new)
-  enableConsciousnessIntegration: boolean;
-  consciousnessUpdateInterval: number;
-  enableMusicConsciousness: boolean;
-  enableAestheticConsciousness: boolean;
+  enableVisualEffectsIntegration: boolean;
+  visualEffectsUpdateInterval: number;
+  enableMusicVisualEffects: boolean;
+  enableAestheticVisualEffects: boolean;
 }
 
 interface PendingUpdate {
@@ -103,7 +103,7 @@ interface PerformanceMetrics {
   overBudgetBatches: number;
   conflictResolutions: number;
   transactionCount: number;
-  consciousnessUpdates: number;
+  visualEffectsUpdates: number;
 }
 
 // ===================================================================
@@ -113,13 +113,13 @@ interface PerformanceMetrics {
 const CRITICAL_NOW_PLAYING_VARS = new Set<string>([
   // Legacy variables (Phase 1 migration)
   "--sn-beat-pulse-intensity",
-  "--sn-breathing-scale",
+  "--sn-animation-scale",
   "--sn-accent-hex",
   "--sn-accent-rgb",
 
   // New namespaced variables (Phase 2+)
   "--sn.music.beat.pulse.intensity",
-  "--sn.music.breathing.scale",
+  "--sn.music.animation.scale",
   "--sn.music.rhythm.phase",
   "--sn.music.spectrum.phase",
   "--sn.color.accent.hex",
@@ -140,7 +140,7 @@ const CRITICAL_NOW_PLAYING_VARS = new Set<string>([
  * - UnifiedCSSVariableManager: Priority-based variable management
  * - UnifiedCSSVariableManager: Device-aware performance optimization
  *
- * Adds consciousness-driven CSS updates that respond to:
+ * Adds visual-effects-driven CSS updates that respond to:
  * - Music and rhythm analysis
  * - Aesthetic harmony calculations
  * - Performance and device constraints
@@ -153,8 +153,8 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   public initialized: boolean = false;
 
   // Core dependencies
-  private config: Year3000Config;
-  private cssConfig: CSSConsciousnessConfig;
+  private config: AdvancedSystemConfig | Year3000Config;
+  private cssConfig: CSSVisualEffectsConfig;
   private performanceCoordinator: UnifiedPerformanceCoordinator;
   private eventBus: typeof unifiedEventBus;
 
@@ -178,9 +178,9 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   private appliedClasses: Set<string> = new Set();
 
   // === CONSCIOUSNESS LAYER (new integration) ===
-  private consciousnessState: ConsciousnessState | null = null;
-  private consciousnessUpdateTimer: NodeJS.Timeout | null = null;
-  private lastConsciousnessUpdate = 0;
+  private visualEffectsState: VisualEffectsState | null = null;
+  private visualEffectsUpdateTimer: NodeJS.Timeout | null = null;
+  private lastVisualEffectsUpdate = 0;
 
   // Performance tracking
   private performanceMetrics: PerformanceMetrics = {
@@ -192,7 +192,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     overBudgetBatches: 0,
     conflictResolutions: 0,
     transactionCount: 0,
-    consciousnessUpdates: 0,
+    visualEffectsUpdates: 0,
   };
 
   // Native setProperty reference for fast-path writes
@@ -208,7 +208,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   };
 
   constructor(
-    config: Year3000Config,
+    config: AdvancedSystemConfig | Year3000Config,
     performanceCoordinator: UnifiedPerformanceCoordinator
   ) {
     this.config = config;
@@ -232,10 +232,10 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
       debugPerformanceClasses: config.enableDebug,
 
       // Consciousness configuration
-      enableConsciousnessIntegration: true,
-      consciousnessUpdateInterval: 16, // 60fps
-      enableMusicConsciousness: true,
-      enableAestheticConsciousness: true,
+      enableVisualEffectsIntegration: true,
+      visualEffectsUpdateInterval: 16, // 60fps
+      enableMusicVisualEffects: true,
+      enableAestheticVisualEffects: true,
     };
 
     // Get initial device capabilities and performance mode
@@ -248,7 +248,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
 
     if (this.config.enableDebug) {
       console.log(
-        "🌌 [UnifiedCSSVariableManager] Created with consciousness-driven CSS management"
+        "🌌 [UnifiedCSSVariableManager] Created with visual-effects-driven CSS management"
       );
     }
   }
@@ -269,9 +269,9 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     // Apply initial optimizations
     this.applyInitialOptimizations();
 
-    // Start consciousness integration if enabled
-    if (this.cssConfig.enableConsciousnessIntegration) {
-      this.startConsciousnessIntegration();
+    // Start visual-effects integration if enabled
+    if (this.cssConfig.enableVisualEffectsIntegration) {
+      this.startVisualEffectsIntegration();
     }
 
     // Enable global hijack if configured
@@ -304,13 +304,13 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
       healthy: isHealthy,
       ok: isHealthy,
       details: isHealthy
-        ? "CSS consciousness controller operating normally"
+        ? "CSS visual-effects controller operating normally"
         : "High queue size or pending transactions",
       metrics: {
         queueSize,
         pendingTransactions,
         performanceMetrics: this.performanceMetrics,
-        consciousnessActive: this.consciousnessState !== null,
+        visualEffectsActive: this.visualEffectsState !== null,
         deviceTier: this.currentDeviceCapabilities?.performanceTier,
         performanceMode: this.currentPerformanceMode?.name,
       },
@@ -318,10 +318,10 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   }
 
   public destroy(): void {
-    // Stop consciousness integration
-    if (this.consciousnessUpdateTimer) {
-      clearTimeout(this.consciousnessUpdateTimer);
-      this.consciousnessUpdateTimer = null;
+    // Stop visual-effects integration
+    if (this.visualEffectsUpdateTimer) {
+      clearTimeout(this.visualEffectsUpdateTimer);
+      this.visualEffectsUpdateTimer = null;
     }
 
     // Clear all timers
@@ -372,7 +372,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   // ===================================================================
 
   /**
-   * Queue a CSS variable update with priority and consciousness awareness
+   * Queue a CSS variable update with priority and visual-effects awareness
    */
   public queueCSSVariableUpdate(
     property: string,
@@ -479,62 +479,62 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   }
 
   /**
-   * Update consciousness-driven CSS variables
+   * Update visual-effects-driven CSS variables
    */
-  public updateConsciousnessVariables(
-    consciousnessState: ConsciousnessState
+  public updateVisualEffectsVariables(
+    visualEffectsState: VisualEffectsState
   ): void {
-    if (!this.cssConfig.enableConsciousnessIntegration) return;
+    if (!this.cssConfig.enableVisualEffectsIntegration) return;
 
-    this.consciousnessState = consciousnessState;
-    this.performanceMetrics.consciousnessUpdates++;
+    this.visualEffectsState = visualEffectsState;
+    this.performanceMetrics.visualEffectsUpdates++;
 
     const variables: Record<string, string> = {};
 
     // Music-driven variables
     if (
-      consciousnessState.musicState &&
-      this.cssConfig.enableMusicConsciousness
+      visualEffectsState.musicState &&
+      this.cssConfig.enableMusicVisualEffects
     ) {
       variables["--sn.music.beat.pulse.intensity"] =
-        consciousnessState.musicState.intensity.toString();
+        visualEffectsState.musicState.intensity.toString();
       variables["--sn.music.tempo.bpm"] =
-        consciousnessState.musicState.bpm.toString();
+        visualEffectsState.musicState.bpm.toString();
       variables[
         "--sn.music.rhythm.phase"
-      ] = `${consciousnessState.musicState.rhythmPhase}deg`;
-      variables["--sn.music.breathing.scale"] =
-        consciousnessState.musicState.breathingScale.toString();
+      ] = `${visualEffectsState.musicState.rhythmPhase}deg`;
+      variables["--sn.music.animation.scale"] =
+        visualEffectsState.musicState.animationScale.toString();
       variables["--sn.music.energy.level"] =
-        consciousnessState.musicState.energy.toString();
+        visualEffectsState.musicState.energy.toString();
       variables["--sn.music.valence"] =
-        consciousnessState.musicState.valence.toString();
+        visualEffectsState.musicState.valence.toString();
     }
 
-    // Aesthetic consciousness variables
+    // Aesthetic visual-effects variables
     if (
-      consciousnessState.aestheticState &&
-      this.cssConfig.enableAestheticConsciousness
+      visualEffectsState.aestheticState &&
+      this.cssConfig.enableAestheticVisualEffects
     ) {
       variables["--sn.aesthetic.harmony.level"] =
-        consciousnessState.aestheticState.harmonyLevel.toString();
+        visualEffectsState.aestheticState.harmonyLevel.toString();
       variables["--sn.aesthetic.evolution.factor"] =
-        consciousnessState.aestheticState.evolutionFactor.toString();
+        visualEffectsState.aestheticState.evolutionFactor.toString();
       variables["--sn.color.temperature"] =
-        consciousnessState.aestheticState.colorTemperature.toString();
+        visualEffectsState.aestheticState.colorTemperature.toString();
     }
 
-    // Performance consciousness variables
-    if (consciousnessState.performanceState) {
+    // Performance visual-effects variables
+    if (visualEffectsState.performanceState) {
       variables["--sn.performance.mode"] =
-        consciousnessState.performanceState.mode;
+        visualEffectsState.performanceState.mode;
       variables["--sn.device.tier"] =
-        consciousnessState.performanceState.deviceTier;
+        visualEffectsState.performanceState.deviceTier;
       variables["--sn.performance.optimization.level"] =
-        consciousnessState.performanceState.optimizationLevel.toString();
+        visualEffectsState.performanceState.optimizationLevel.toString();
     }
 
-    this.updateVariables(variables, "high", "consciousness-system");
+    this.updateVariables(variables, "high", "visual-effects-system");
 
     if (this.config.enableDebug) {
       console.log(
@@ -776,7 +776,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   public setMusicMetrics(metrics: {
     beatIntensity?: number;
     rhythmPhase?: number;
-    breathingScale?: number;
+    animationScale?: number;
     spectrumPhase?: number;
     energy?: number;
     valence?: number;
@@ -791,9 +791,9 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     if (metrics.rhythmPhase !== undefined) {
       variables["--sn.music.rhythm.phase"] = `${metrics.rhythmPhase}deg`;
     }
-    if (metrics.breathingScale !== undefined) {
-      variables["--sn.music.breathing.scale"] =
-        metrics.breathingScale.toString();
+    if (metrics.animationScale !== undefined) {
+      variables["--sn.music.animation.scale"] =
+        metrics.animationScale.toString();
     }
     if (metrics.spectrumPhase !== undefined) {
       variables["--sn.music.spectrum.phase"] = `${metrics.spectrumPhase}deg`;
@@ -988,8 +988,8 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
       overBudgetBatches: this.performanceMetrics.overBudgetBatches,
       conflictResolutions: this.performanceMetrics.conflictResolutions,
       transactionCount: this.performanceMetrics.transactionCount,
-      consciousnessUpdates: this.performanceMetrics.consciousnessUpdates,
-      consciousnessActive: this.consciousnessState !== null,
+      visualEffectsUpdates: this.performanceMetrics.visualEffectsUpdates,
+      visualEffectsActive: this.visualEffectsState !== null,
       deviceTier: this.currentDeviceCapabilities?.performanceTier,
       performanceMode: this.currentPerformanceMode?.name,
     };
@@ -1102,33 +1102,33 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     }
   }
 
-  private startConsciousnessIntegration(): void {
-    if (this.consciousnessUpdateTimer) return;
+  private startVisualEffectsIntegration(): void {
+    if (this.visualEffectsUpdateTimer) return;
 
-    const updateConsciousness = () => {
+    const updateVisualEffects = () => {
       const now = performance.now();
       if (
-        now - this.lastConsciousnessUpdate >=
-        this.cssConfig.consciousnessUpdateInterval
+        now - this.lastVisualEffectsUpdate >=
+        this.cssConfig.visualEffectsUpdateInterval
       ) {
-        this.lastConsciousnessUpdate = now;
+        this.lastVisualEffectsUpdate = now;
 
-        // Update consciousness state based on current conditions
+        // Update visual-effects state based on current conditions
         // This would integrate with music analysis, aesthetic calculations, etc.
-        // For now, we maintain the existing consciousness state
-        if (this.consciousnessState) {
-          this.updateConsciousnessVariables(this.consciousnessState);
+        // For now, we maintain the existing visual-effects state
+        if (this.visualEffectsState) {
+          this.updateVisualEffectsVariables(this.visualEffectsState);
         }
       }
 
       // Schedule next update
-      this.consciousnessUpdateTimer = setTimeout(
-        updateConsciousness,
-        this.cssConfig.consciousnessUpdateInterval
+      this.visualEffectsUpdateTimer = setTimeout(
+        updateVisualEffects,
+        this.cssConfig.visualEffectsUpdateInterval
       );
     };
 
-    updateConsciousness();
+    updateVisualEffects();
   }
 
   private shouldReplaceUpdate(
@@ -1320,8 +1320,8 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     "beat.phase"?: number;
     "spectrum.phase"?: number;
     "spectrum.energy"?: number;
-    "breathing.scale"?: number;
-    "breathing.sync"?: number;
+    "animation.scale"?: number;
+    "animation.sync"?: number;
     "rhythm.phase"?: number;
     "rhythm.intensity"?: number;
     "tempo.bpm"?: number;
@@ -1375,7 +1375,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     "duration.fast"?: string;
     "duration.normal"?: string;
     "duration.slow"?: string;
-    "duration.breathing"?: string;
+    "duration.animation"?: string;
     "motion.reduced"?: boolean;
     "motion.scale"?: number;
     "frame.budget"?: string;
@@ -1445,7 +1445,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     "a11y.motion.reduced"?: boolean;
     "a11y.text.size.scale"?: number;
     "feature.webgl.enabled"?: boolean;
-    "feature.consciousness.enabled"?: boolean;
+    "feature.visual-effects.enabled"?: boolean;
     "feature.music.sync.enabled"?: boolean;
     "feature.animations.enabled"?: boolean;
   }): void {
@@ -1550,7 +1550,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   /**
    * Update configuration (from CSSVariableBatcher compatibility)
    */
-  public updateConfig(newConfig: Partial<CSSConsciousnessConfig>): void {
+  public updateConfig(newConfig: Partial<CSSVisualEffectsConfig>): void {
     this.cssConfig = { ...this.cssConfig, ...newConfig };
 
     if (this.config.enableDebug) {
@@ -1612,10 +1612,10 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   // ===================================================================
 
   /**
-   * Update consciousness intensity with simplified coordination through UnifiedEventBus
+   * Update visual-effects intensity with simplified coordination through UnifiedEventBus
    * Replaces the complex ConsciousnessIntensityCoordinator pattern with a simple subscription-based approach
    */
-  public updateConsciousnessIntensity(
+  public updateVisualEffectsIntensity(
     intensity: number,
     sourceStrategy: string,
     musicEnergy?: number
@@ -1625,16 +1625,16 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
 
     // Set the variable immediately
     this.queueCSSVariableUpdate(
-      "--consciousness-intensity",
+      "--visual-effects-intensity",
       clampedIntensity.toString(),
       null,
       "high",
-      `consciousness-${sourceStrategy}`
+      `visual-effects-${sourceStrategy}`
     );
 
     // Emit event for other systems to coordinate
     if (this.eventBus) {
-      this.eventBus.emitSync("consciousness:intensity-changed", {
+      this.eventBus.emitSync("visual-effects:intensity-changed", {
         intensity: clampedIntensity,
         userEngagement: 0.5, // Default engagement level
         timestamp: Date.now(),
@@ -1692,9 +1692,9 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   }
 
   /**
-   * Subscribe to consciousness intensity changes from other strategies
+   * Subscribe to visual-effects intensity changes from other strategies
    */
-  public subscribeToConsciousnessChanges(
+  public subscribeToVisualEffectsChanges(
     callback: (data: {
       intensity: number;
       userEngagement: number;
@@ -1705,13 +1705,13 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   ): () => void {
     if (!this.eventBus) {
       console.warn(
-        "[UnifiedCSSVariableManager] No UnifiedEventBus available for consciousness subscriptions"
+        "[UnifiedCSSVariableManager] No UnifiedEventBus available for visual-effects subscriptions"
       );
       return () => {};
     }
 
     const subscriptionId = this.eventBus.subscribe(
-      "consciousness:intensity-changed",
+      "visual-effects:intensity-changed",
       callback,
       "UnifiedCSSVariableManager"
     );

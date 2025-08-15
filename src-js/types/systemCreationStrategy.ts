@@ -8,10 +8,10 @@
  * that properly handle dependency injection at creation time.
  */
 
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type { SettingsManager } from "@/ui/managers/SettingsManager";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 
 // ============================================================================
 // Core Creation Strategy Interfaces
@@ -25,7 +25,7 @@ export interface SystemCreationContext {
   systemKey: string;
   
   /** Year 3000 configuration */
-  config: Year3000Config;
+  config: AdvancedSystemConfig | Year3000Config;
   
   /** Utility functions */
   utils: typeof Utils;
@@ -34,15 +34,15 @@ export interface SystemCreationContext {
   dependencies: {
     performanceAnalyzer?: SimplePerformanceCoordinator;
     settingsManager?: SettingsManager;
-    musicSyncService?: any;
-    year3000System?: any;
-    cssConsciousnessController?: any;
-    performanceCoordinator?: any;
+    musicSyncService?: unknown;
+    year3000System?: unknown;
+    cssConsciousnessController?: unknown;
+    performanceCoordinator?: unknown;
     // New simplified performance system dependencies
-    simplePerformanceCoordinator?: any;
-    enhancedDeviceTierDetector?: any;
-    webglSystemsIntegration?: any;
-    deviceCapabilityDetector?: any;
+    simplePerformanceCoordinator?: unknown;
+    enhancedDeviceTierDetector?: unknown;
+    webglSystemsIntegration?: unknown;
+    deviceCapabilityDetector?: unknown;
   };
   
   /** Creation preferences */
@@ -82,7 +82,7 @@ export interface SystemCreationContext {
 /**
  * Result of system creation
  */
-export interface SystemCreationResult<T = any> {
+export interface SystemCreationResult<T = unknown> {
   /** Created system instance */
   system: T;
   
@@ -142,8 +142,8 @@ export interface ISystemCreationStrategy {
   /**
    * Create system instance using this strategy
    */
-  createSystem<T = any>(
-    SystemClass: new(...args: any[]) => T,
+  createSystem<T = unknown>(
+    SystemClass: new(...args: unknown[]) => T,
     context: SystemCreationContext
   ): Promise<SystemCreationResult<T>>;
   
@@ -239,7 +239,7 @@ export interface IStandardConstructorStrategy extends ISystemCreationStrategy {
   /**
    * Define constructor parameter mapping
    */
-  getConstructorParameters(context: SystemCreationContext): any[];
+  getConstructorParameters(context: SystemCreationContext): unknown[];
 }
 
 /**
@@ -249,7 +249,7 @@ export interface IEventDrivenCreationStrategy extends ISystemCreationStrategy {
   /**
    * Setup event subscriptions during creation
    */
-  setupEventSubscriptions(system: any, context: SystemCreationContext): void;
+  setupEventSubscriptions(system: unknown, context: SystemCreationContext): void;
   
   /**
    * Get events that system will subscribe to
@@ -264,15 +264,15 @@ export interface IBuilderCreationStrategy extends ISystemCreationStrategy {
   /**
    * Create system using builder pattern
    */
-  createWithBuilder<T = any>(
-    SystemClass: new(...args: any[]) => T,
+  createWithBuilder<T = unknown>(
+    SystemClass: new(...args: unknown[]) => T,
     context: SystemCreationContext
   ): Promise<SystemCreationResult<T>>;
   
   /**
    * Configure builder based on context
    */
-  configureBuilder(builder: any, context: SystemCreationContext): void;
+  configureBuilder(builder: unknown, context: SystemCreationContext): void;
 }
 
 /**
@@ -282,8 +282,8 @@ export interface ISingletonCreationStrategy extends ISystemCreationStrategy {
   /**
    * Get or create singleton instance
    */
-  getInstance<T = any>(
-    SystemClass: new(...args: any[]) => T,
+  getInstance<T = unknown>(
+    SystemClass: new(...args: unknown[]) => T,
     context: SystemCreationContext
   ): Promise<SystemCreationResult<T>>;
   
@@ -355,9 +355,9 @@ export interface IStrategyBasedFactory {
   /**
    * Create system using best available strategy
    */
-  createSystem<T = any>(
+  createSystem<T = unknown>(
     systemKey: string,
-    SystemClass: new(...args: any[]) => T,
+    SystemClass: new(...args: unknown[]) => T,
     context: SystemCreationContext
   ): Promise<SystemCreationResult<T>>;
   

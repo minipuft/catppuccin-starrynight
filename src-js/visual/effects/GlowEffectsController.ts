@@ -16,7 +16,7 @@ import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
-import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 
 export interface GlowEffectState {
   glowIntensity: number;         // 0-1 current glow intensity
@@ -59,28 +59,43 @@ export class MusicGlowEffectsManager implements IManagedSystem {
   public initialized = false;
   
   private holographicSystem: HolographicUISystem;
-  // Using shared colorConsciousnessManager instead of injected orchestrator
-  private cssConsciousnessController: UnifiedCSSVariableManager;
+  // Using shared colorVisualEffectsManager instead of injected orchestrator
+  private cssVisualEffectsController: UnifiedCSSVariableManager;
   private musicSyncService: MusicSyncService;
   
   private glowState: GlowEffectState;
   private glowConfig: GlowEffectConfig;
-  private etherealElements: Map<string, HTMLElement> = new Map();
+  private subtleElements: Map<string, HTMLElement> = new Map();
+  // Legacy compatibility
+  private get etherealElements() { return this.subtleElements; }
   
   // Performance tracking
   private performanceMetrics = {
-    emotionalMomentCount: 0,
+    responsiveMomentCount: 0,
     averageProcessingTime: 0,
     lastUpdateTime: 0,
-    gentleTransitionCount: 0
+    smoothTransitionCount: 0,
+    // Legacy compatibility
+    get emotionalMomentCount() { return this.responsiveMomentCount; },
+    set emotionalMomentCount(value: number) { this.responsiveMomentCount = value; },
+    get gentleTransitionCount() { return this.smoothTransitionCount; },
+    set gentleTransitionCount(value: number) { this.smoothTransitionCount = value; }
   };
   
   // Animation state
   private animationState = {
-    mysticalPhase: 0,
-    dreamyPhase: 0,
+    ambientPhase: 0,
+    smoothPhase: 0,
     flowingPhase: 0,
-    emotionalPulsePhase: 0,
+    // Legacy compatibility
+    get mysticalPhase() { return this.ambientPhase; },
+    set mysticalPhase(value: number) { this.ambientPhase = value; },
+    get dreamyPhase() { return this.smoothPhase; },
+    set dreamyPhase(value: number) { this.smoothPhase = value; },
+    responsivePulsePhase: 0,
+    // Legacy compatibility continued
+    get emotionalPulsePhase() { return this.responsivePulsePhase; },
+    set emotionalPulsePhase(value: number) { this.responsivePulsePhase = value; },
     lastFrameTime: 0,
     isAnimating: false
   };
@@ -92,38 +107,41 @@ export class MusicGlowEffectsManager implements IManagedSystem {
     shimmerEffect: 0.20        // Quick shimmer response
   };
   
-  // Ethereal color palettes
-  private etherealPalettes = {
-    'dreamy-pastels': {
+  // Subtle color palettes
+  private subtlePalettes = {
+    'smooth-pastels': {
       primaryGlow: { r: 203, g: 166, b: 247 },      // Catppuccin mauve (soft)
-      shimmerColor: { r: 148, g: 226, b: 213 },     // Catppuccin teal (mystical)
+      shimmerColor: { r: 148, g: 226, b: 213 },     // Catppuccin teal (ambient)
       mistBackground: { r: 245, g: 224, b: 220 },       // Catppuccin rosewater
       coreColor: { r: 249, g: 226, b: 175 },   // Catppuccin yellow (warm)
       accentColor: { r: 180, g: 190, b: 254 } // Catppuccin lavender
     },
-    'mystical-moonlight': {
+    'ambient-moonlight': {
       primaryGlow: { r: 137, g: 180, b: 250 },      // Catppuccin blue (soft)
-      shimmerColor: { r: 166, g: 227, b: 161 },     // Catppuccin green (mystical)
+      shimmerColor: { r: 166, g: 227, b: 161 },     // Catppuccin green (ambient)
       mistBackground: { r: 205, g: 214, b: 244 },       // Catppuccin text (muted)
       coreColor: { r: 243, g: 139, b: 168 },   // Catppuccin pink (warm)
       accentColor: { r: 137, g: 220, b: 235 } // Catppuccin sky
     },
-    'gentle-aurora': {
+    'smooth-aurora': {
       primaryGlow: { r: 166, g: 227, b: 161 },      // Catppuccin green (soft)
-      shimmerColor: { r: 137, g: 220, b: 235 },     // Catppuccin sky (mystical)
+      shimmerColor: { r: 137, g: 220, b: 235 },     // Catppuccin sky (ambient)
       mistBackground: { r: 186, g: 194, b: 222 },       // Catppuccin subtext1
       coreColor: { r: 250, g: 179, b: 135 },   // Catppuccin peach (warm)
       accentColor: { r: 203, g: 166, b: 247 } // Catppuccin mauve
     }
   };
+  
+  // Legacy compatibility
+  private get etherealPalettes() { return this.subtlePalettes; }
 
   constructor(
     holographicSystem: HolographicUISystem,
-    cssConsciousnessController: UnifiedCSSVariableManager,
+    cssVisualEffectsController: UnifiedCSSVariableManager,
     musicSyncService: MusicSyncService
   ) {
     this.holographicSystem = holographicSystem;
-    this.cssConsciousnessController = cssConsciousnessController;
+    this.cssVisualEffectsController = cssVisualEffectsController;
     this.musicSyncService = musicSyncService;
     
     // Initialize glow state with LERP target values
@@ -161,15 +179,15 @@ export class MusicGlowEffectsManager implements IManagedSystem {
     if (this.initialized) return;
     
     try {
-      console.log('[SoftGlowEffectsManager] Awakening ethereal beauty consciousness...');
+      console.log('[SoftGlowEffectsManager] Initializing subtle visual effects...');
       
-      // Register for ColorConsciousnessOrchestrator events
-      this.subscribeToEmotionalConsciousness();
+      // Register for ColorVisualEffectsOrchestrator events
+      this.subscribeToEmotionalVisualEffects();
       
-      // Initialize ethereal UI elements
+      // Initialize subtle UI elements
       await this.initializeGlowElements();
       
-      // Setup CSS variables for ethereal effects
+      // Setup CSS variables for subtle effects
       this.setupGlowCSSVariables();
       
       // Start gentle animation loop
@@ -177,7 +195,7 @@ export class MusicGlowEffectsManager implements IManagedSystem {
       
       this.initialized = true;
       
-      console.log('[SoftGlowEffectsManager] ✨ Ready for mystical emotional moments');
+      console.log('[SoftGlowEffectsManager] ✨ Ready for ambient responsive moments');
       
     } catch (error) {
       console.error('[SoftGlowEffectsManager] Failed to initialize:', error);
@@ -194,21 +212,21 @@ export class MusicGlowEffectsManager implements IManagedSystem {
     const deltaSeconds = deltaTime / 1000;
     
     // Update animation phases (slow, flowing)
-    this.animationState.mysticalPhase += deltaSeconds * 0.5;
-    this.animationState.dreamyPhase += deltaSeconds * 0.3;
+    this.animationState.ambientPhase += deltaSeconds * 0.5;
+    this.animationState.smoothPhase += deltaSeconds * 0.3;
     this.animationState.flowingPhase += deltaSeconds * this.glowConfig.gradientSpeed;
-    this.animationState.emotionalPulsePhase += deltaSeconds * 0.8;
+    this.animationState.responsivePulsePhase += deltaSeconds * 0.8;
     
-    // Update ethereal state from music
-    this.updateEtherealFromMusic();
+    // Update subtle state from music
+    this.updateSubtleFromMusic();
     
     // Apply LERP smoothing for framerate-independent animation
-    this.updateEtherealStateWithLERP(deltaSeconds);
+    this.updateSubtleStateWithLERP(deltaSeconds);
     
-    // Update mystical effects
-    this.updateMysticalEffects();
+    // Update ambient effects
+    this.updateAmbientEffects();
     
-    // Update ethereal elements
+    // Update subtle elements
     this.updateGlowElements();
     
     // Update performance metrics
@@ -237,14 +255,14 @@ export class MusicGlowEffectsManager implements IManagedSystem {
   }
 
   /**
-   * Subscribe to emotional consciousness events
+   * Subscribe to emotional visual effects events
    */
-  private subscribeToEmotionalConsciousness(): void {
-    unifiedEventBus.subscribe('emotionalColorContext:updated', (event) => {
-      this.onColorConsciousnessUpdate(event);
+  private subscribeToEmotionalVisualEffects(): void {
+    unifiedEventBus.subscribe('music:emotional-context-updated', (event) => {
+      this.onColorVisualEffectsUpdate(event);
     });
     
-    unifiedEventBus.subscribe('emotion:analyzed', (event) => {
+    unifiedEventBus.subscribe('music:emotion-analyzed', (event) => {
       this.onEmotionalMoment(event);
     });
     
@@ -254,21 +272,21 @@ export class MusicGlowEffectsManager implements IManagedSystem {
   }
 
   /**
-   * Handle color consciousness updates
+   * Handle color visual effects updates
    */
-  private onColorConsciousnessUpdate(event: any): void {
-    const { palette, consciousnessLevel, emotionalTemperature } = event;
+  private onColorVisualEffectsUpdate(event: any): void {
+    const { palette, visualEffectsLevel, emotionalTemperature } = event;
     
-    // Map consciousness to glow beauty
-    this.glowState.musicResponse = consciousnessLevel * 0.9;
+    // Map visual effects to glow beauty
+    this.glowState.musicResponse = visualEffectsLevel * 0.9;
     
     // Adjust ethereal temperature for soft, warm colors
     if (emotionalTemperature > 5000) {
       // Warm temperatures enhance glow beauty
-      this.glowState.effectLevel = Math.min(0.8, consciousnessLevel * 1.2);
+      this.glowState.effectLevel = Math.min(0.8, visualEffectsLevel * 1.2);
     } else {
       // Cool temperatures create shimmer effects
-      this.glowState.shimmerEffect = consciousnessLevel * 0.7;
+      this.glowState.shimmerEffect = visualEffectsLevel * 0.7;
     }
     
     // Update glow color mapping
@@ -284,7 +302,7 @@ export class MusicGlowEffectsManager implements IManagedSystem {
     
     // Only activate for positive emotional moments
     if (valence > this.glowConfig.musicThreshold) {
-      this.triggerEtherealBeauty(intensity, valence);
+      this.triggerSubtleEffect(intensity, valence);
     }
   }
 
@@ -300,9 +318,9 @@ export class MusicGlowEffectsManager implements IManagedSystem {
   }
 
   /**
-   * Trigger ethereal beauty effect
+   * Trigger subtle effect
    */
-  private triggerEtherealBeauty(intensity: number, valence: number): void {
+  private triggerSubtleEffect(intensity: number, valence: number): void {
     const startTime = performance.now();
     
     // Set non-LERP glow parameters for emotional moment
@@ -330,26 +348,26 @@ export class MusicGlowEffectsManager implements IManagedSystem {
   }
 
   /**
-   * Update ethereal state with LERP smoothing towards target values
+   * Update subtle state with LERP smoothing towards target values
    * This replaces the old frame-rate dependent decay system
    */
-  private updateEtherealStateWithLERP(deltaTimeSeconds: number): void {
+  private updateSubtleStateWithLERP(deltaTimeSeconds: number): void {
     // LERP current values towards targets for framerate-independent animation
-    this.glowState.glowIntensity = Year3000Utilities.lerpSmooth(
+    this.glowState.glowIntensity = ThemeUtilities.lerpSmooth(
       this.glowState.glowIntensity,
       this.glowState.targetGlowIntensity,
       deltaTimeSeconds,
       this.lerpHalfLifeValues.glowIntensity
     );
     
-    this.glowState.effectLevel = Year3000Utilities.lerpSmooth(
+    this.glowState.effectLevel = ThemeUtilities.lerpSmooth(
       this.glowState.effectLevel,
       this.glowState.targetEffectLevel,
       deltaTimeSeconds,
       this.lerpHalfLifeValues.effectLevel
     );
     
-    this.glowState.shimmerEffect = Year3000Utilities.lerpSmooth(
+    this.glowState.shimmerEffect = ThemeUtilities.lerpSmooth(
       this.glowState.shimmerEffect,
       this.glowState.targetShimmerEffect,
       deltaTimeSeconds,
@@ -359,21 +377,21 @@ export class MusicGlowEffectsManager implements IManagedSystem {
     // Auto-decay targets when not actively being updated by music
     // This creates natural decay without frame-rate dependency
     const autoDecayHalfLife = 1.5; // Half-life of 1.5 seconds for target decay
-    this.glowState.targetGlowIntensity = Year3000Utilities.lerpSmooth(
+    this.glowState.targetGlowIntensity = ThemeUtilities.lerpSmooth(
       this.glowState.targetGlowIntensity,
       0, // Decay towards zero
       deltaTimeSeconds,
       autoDecayHalfLife
     );
     
-    this.glowState.targetEffectLevel = Year3000Utilities.lerpSmooth(
+    this.glowState.targetEffectLevel = ThemeUtilities.lerpSmooth(
       this.glowState.targetEffectLevel,
       0, // Decay towards zero
       deltaTimeSeconds,
       autoDecayHalfLife * 1.2 // Slower decay for beauty
     );
     
-    this.glowState.targetShimmerEffect = Year3000Utilities.lerpSmooth(
+    this.glowState.targetShimmerEffect = ThemeUtilities.lerpSmooth(
       this.glowState.targetShimmerEffect,
       0, // Decay towards zero
       deltaTimeSeconds,
@@ -382,9 +400,9 @@ export class MusicGlowEffectsManager implements IManagedSystem {
   }
 
   /**
-   * Update ethereal state from current music
+   * Update subtle state from current music
    */
-  private updateEtherealFromMusic(): void {
+  private updateSubtleFromMusic(): void {
     const musicState = this.musicSyncService.getCurrentMusicState();
     if (!musicState) return;
     
@@ -407,10 +425,10 @@ export class MusicGlowEffectsManager implements IManagedSystem {
   }
 
   /**
-   * Update mystical effects
+   * Update ambient effects
    */
-  private updateMysticalEffects(): void {
-    const palette = this.etherealPalettes['dreamy-pastels']; // Default ethereal palette
+  private updateAmbientEffects(): void {
+    const palette = this.etherealPalettes['smooth-pastels']; // Default ethereal palette
     
     // Create ethereal color mapping
     const mapping: GlowColorMapping = {
@@ -444,16 +462,16 @@ export class MusicGlowEffectsManager implements IManagedSystem {
   }
 
   /**
-   * Generate ethereal colors from consciousness palette
+   * Generate ethereal colors from visual effects palette
    */
   private generateGlowColors(palette: any[], emotionalTemperature: number): GlowColorMapping {
     // Select appropriate ethereal palette based on temperature
-    let selectedPalette = this.etherealPalettes['dreamy-pastels'];
+    let selectedPalette = this.etherealPalettes['smooth-pastels'];
     
     if (emotionalTemperature < 4000) {
-      selectedPalette = this.etherealPalettes['mystical-moonlight'];
+      selectedPalette = this.etherealPalettes['ambient-moonlight'];
     } else if (emotionalTemperature > 7000) {
-      selectedPalette = this.etherealPalettes['gentle-aurora'];
+      selectedPalette = this.etherealPalettes['smooth-aurora'];
     }
     
     return {
@@ -471,29 +489,29 @@ export class MusicGlowEffectsManager implements IManagedSystem {
    */
   private updateGlowColors(mapping: GlowColorMapping): void {
     // Update ethereal color CSS variables
-    this.cssConsciousnessController.queueCSSVariableUpdate(
-      '--ethereal-soft-r',
+    this.cssVisualEffectsController.queueCSSVariableUpdate(
+      '--subtle-soft-r',
       mapping.primaryGlow.r.toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
-      '--ethereal-soft-g',
+    this.cssVisualEffectsController.queueCSSVariableUpdate(
+      '--subtle-soft-g',
       mapping.primaryGlow.g.toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
-      '--ethereal-soft-b',
+    this.cssVisualEffectsController.queueCSSVariableUpdate(
+      '--subtle-soft-b',
       mapping.primaryGlow.b.toString()
     );
     
-    this.cssConsciousnessController.queueCSSVariableUpdate(
-      '--ethereal-mystical-r',
+    this.cssVisualEffectsController.queueCSSVariableUpdate(
+      '--subtle-ambient-r',
       mapping.shimmerColor.r.toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
-      '--ethereal-mystical-g',
+    this.cssVisualEffectsController.queueCSSVariableUpdate(
+      '--subtle-ambient-g',
       mapping.shimmerColor.g.toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
-      '--ethereal-mystical-b',
+    this.cssVisualEffectsController.queueCSSVariableUpdate(
+      '--subtle-ambient-b',
       mapping.shimmerColor.b.toString()
     );
   }
@@ -525,24 +543,24 @@ export class MusicGlowEffectsManager implements IManagedSystem {
    */
   private setupGlowCSSVariables(): void {
     const baseVariables = {
-      '--ethereal-soft-r': '203',
-      '--ethereal-soft-g': '166',
-      '--ethereal-soft-b': '247',
-      '--ethereal-mystical-r': '148',
-      '--ethereal-mystical-g': '226',
-      '--ethereal-mystical-b': '213',
-      '--ethereal-dreamy-r': '245',
-      '--ethereal-dreamy-g': '224',
-      '--ethereal-dreamy-b': '220',
-      '--ethereal-beauty-level': '0',
-      '--ethereal-mystical-shimmer': '0',
-      '--ethereal-gentle-transparency': '0.9',
-      '--ethereal-flowing-phase': '0',
-      '--ethereal-emotional-pulse': '0'
+      '--subtle-soft-r': '203',
+      '--subtle-soft-g': '166',
+      '--subtle-soft-b': '247',
+      '--subtle-ambient-r': '148',
+      '--subtle-ambient-g': '226',
+      '--subtle-ambient-b': '213',
+      '--subtle-smooth-r': '245',
+      '--subtle-smooth-g': '224',
+      '--subtle-smooth-b': '220',
+      '--subtle-effect-level': '0',
+      '--subtle-ambient-shimmer': '0',
+      '--subtle-smooth-transparency': '0.9',
+      '--subtle-flowing-phase': '0',
+      '--subtle-responsive-pulse': '0'
     };
     
     for (const [variable, value] of Object.entries(baseVariables)) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(variable, value);
+      this.cssVisualEffectsController.queueCSSVariableUpdate(variable, value);
     }
   }
 
@@ -550,29 +568,29 @@ export class MusicGlowEffectsManager implements IManagedSystem {
    * Update ethereal CSS variables
    */
   private updateGlowCSSVariables(mapping: GlowColorMapping): void {
-    this.cssConsciousnessController.queueCSSVariableUpdate(
-      '--ethereal-beauty-level',
+    this.cssVisualEffectsController.queueCSSVariableUpdate(
+      '--subtle-effect-level',
       this.glowState.effectLevel.toString()
     );
     
-    this.cssConsciousnessController.queueCSSVariableUpdate(
-      '--ethereal-mystical-shimmer',
+    this.cssVisualEffectsController.queueCSSVariableUpdate(
+      '--subtle-ambient-shimmer',
       this.glowState.shimmerEffect.toString()
     );
     
-    this.cssConsciousnessController.queueCSSVariableUpdate(
-      '--ethereal-gentle-transparency',
+    this.cssVisualEffectsController.queueCSSVariableUpdate(
+      '--subtle-smooth-transparency',
       mapping.transparency.toString()
     );
     
-    this.cssConsciousnessController.queueCSSVariableUpdate(
-      '--ethereal-flowing-phase',
+    this.cssVisualEffectsController.queueCSSVariableUpdate(
+      '--subtle-flowing-phase',
       this.animationState.flowingPhase.toString()
     );
     
-    this.cssConsciousnessController.queueCSSVariableUpdate(
-      '--ethereal-emotional-pulse',
-      Math.sin(this.animationState.emotionalPulsePhase).toString()
+    this.cssVisualEffectsController.queueCSSVariableUpdate(
+      '--subtle-responsive-pulse',
+      Math.sin(this.animationState.responsivePulsePhase).toString()
     );
   }
 
@@ -589,14 +607,14 @@ export class MusicGlowEffectsManager implements IManagedSystem {
    * Update single ethereal element
    */
   private updateEtherealElement(element: HTMLElement): void {
-    // Apply ethereal beauty effects when active
+    // Apply subtle effects when active
     if (this.glowState.effectLevel > 0.1) {
-      this.applyEtherealBeauty(element);
+      this.applySubtleEffect(element);
     }
     
-    // Apply mystical shimmer effects
+    // Apply ambient shimmer effects
     if (this.glowState.shimmerEffect > 0.1) {
-      this.applyMysticalShimmer(element);
+      this.applyAmbientShimmer(element);
     }
     
     // Apply flowing gradients
@@ -604,39 +622,39 @@ export class MusicGlowEffectsManager implements IManagedSystem {
   }
 
   /**
-   * Apply ethereal beauty effect to element
+   * Apply subtle effect to element
    */
-  private applyEtherealBeauty(element: HTMLElement): void {
-    const beautyIntensity = this.glowState.effectLevel;
-    const emotionalPulse = Math.sin(this.animationState.emotionalPulsePhase) * 0.5 + 0.5;
+  private applySubtleEffect(element: HTMLElement): void {
+    const effectIntensity = this.glowState.effectLevel;
+    const responsivePulse = Math.sin(this.animationState.responsivePulsePhase) * 0.5 + 0.5;
     
-    // Soft ethereal glow
-    const glowIntensity = beautyIntensity * emotionalPulse * 0.6;
+    // Soft subtle glow
+    const glowIntensity = effectIntensity * responsivePulse * 0.6;
     element.style.boxShadow = `
-      0 0 ${glowIntensity * 30}px rgba(var(--ethereal-soft-r), var(--ethereal-soft-g), var(--ethereal-soft-b), ${glowIntensity * 0.6}),
-      inset 0 0 ${glowIntensity * 20}px rgba(var(--ethereal-mystical-r), var(--ethereal-mystical-g), var(--ethereal-mystical-b), ${glowIntensity * 0.3})
+      0 0 ${glowIntensity * 30}px rgba(var(--subtle-soft-r), var(--subtle-soft-g), var(--subtle-soft-b), ${glowIntensity * 0.6}),
+      inset 0 0 ${glowIntensity * 20}px rgba(var(--subtle-ambient-r), var(--subtle-ambient-g), var(--subtle-ambient-b), ${glowIntensity * 0.3})
     `;
     
-    // Gentle transparency
-    const transparency = 0.9 + (beautyIntensity * 0.1);
+    // Smooth transparency
+    const transparency = 0.9 + (effectIntensity * 0.1);
     element.style.opacity = transparency.toString();
   }
 
   /**
-   * Apply mystical shimmer effect
+   * Apply ambient shimmer effect
    */
-  private applyMysticalShimmer(element: HTMLElement): void {
+  private applyAmbientShimmer(element: HTMLElement): void {
     const shimmerIntensity = this.glowState.shimmerEffect;
-    const mysticalPhase = this.animationState.mysticalPhase;
+    const ambientPhase = this.animationState.ambientPhase;
     
-    // Mystical particle-like shimmer
-    const shimmerOffset = Math.sin(mysticalPhase * 2) * shimmerIntensity * 2;
-    const shimmerScale = 1.0 + (Math.cos(mysticalPhase * 1.5) * shimmerIntensity * 0.05);
+    // Ambient particle-like shimmer
+    const shimmerOffset = Math.sin(ambientPhase * 2) * shimmerIntensity * 2;
+    const shimmerScale = 1.0 + (Math.cos(ambientPhase * 1.5) * shimmerIntensity * 0.05);
     
     element.style.transform = `translate(${shimmerOffset}px, 0) scale(${shimmerScale})`;
     
     // Soft color shifting
-    const hueShift = Math.sin(mysticalPhase * 0.8) * shimmerIntensity * 15;
+    const hueShift = Math.sin(ambientPhase * 0.8) * shimmerIntensity * 15;
     element.style.filter = `hue-rotate(${hueShift}deg) saturate(${1 + shimmerIntensity * 0.3})`;
   }
 
@@ -654,9 +672,9 @@ export class MusicGlowEffectsManager implements IManagedSystem {
         ${element.style.background || ''},
         linear-gradient(
           ${gradientPosition}deg,
-          rgba(var(--ethereal-soft-r), var(--ethereal-soft-g), var(--ethereal-soft-b), ${flowIntensity * 0.1}) 0%,
-          rgba(var(--ethereal-mystical-r), var(--ethereal-mystical-g), var(--ethereal-mystical-b), ${flowIntensity * 0.15}) 50%,
-          rgba(var(--ethereal-dreamy-r), var(--ethereal-dreamy-g), var(--ethereal-dreamy-b), ${flowIntensity * 0.05}) 100%
+          rgba(var(--subtle-soft-r), var(--subtle-soft-g), var(--subtle-soft-b), ${flowIntensity * 0.1}) 0%,
+          rgba(var(--subtle-ambient-r), var(--subtle-ambient-g), var(--subtle-ambient-b), ${flowIntensity * 0.15}) 50%,
+          rgba(var(--subtle-smooth-r), var(--subtle-smooth-g), var(--subtle-smooth-b), ${flowIntensity * 0.05}) 100%
         )
       `;
     }
@@ -728,7 +746,7 @@ export class MusicGlowEffectsManager implements IManagedSystem {
     this.updateGlowElements();
     
     // Trigger CSS variable batch flush
-    this.cssConsciousnessController.flushCSSVariableBatch();
+    this.cssVisualEffectsController.flushCSSVariableBatch();
   }
 
   /**

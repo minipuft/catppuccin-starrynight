@@ -1,7 +1,7 @@
 import { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
 import { EnhancedMasterAnimationCoordinator, type IVisualSystem, type FrameContext } from './EnhancedMasterAnimationCoordinator';
 import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
-import type { Year3000Config } from '@/types/models';
+import type { Year3000Config, AdvancedSystemConfig } from '@/types/models';
 
 export interface CSSAnimationConfig {
   name: string;
@@ -20,7 +20,7 @@ export interface KineticAnimationState {
   refractActive: boolean;
   oscillateActive: boolean;
   harmonizeActive: boolean;
-  temporalEchoActive: boolean;
+  timeBasedEchoActive: boolean;
   gravityActive: boolean;
   beatSyncEnabled: boolean;
   intensityLevel: number;
@@ -43,7 +43,7 @@ export class CSSAnimationManager implements IVisualSystem {
   public readonly systemName = 'CSSAnimationManager';
   
   private config: Year3000Config;
-  private cssConsciousnessController: UnifiedCSSVariableManager;
+  private cssVariableManager: UnifiedCSSVariableManager;
   private animationCoordinator: EnhancedMasterAnimationCoordinator;
   private eventBus: typeof unifiedEventBus;
   
@@ -67,14 +67,14 @@ export class CSSAnimationManager implements IVisualSystem {
     avgBeatInterval: 500,
   };
   
-  // Consciousness breathing state for Year 3000 integration with LERP smoothing
-  private breathingState = {
+  // Visual effects animation state for Advanced Theme System integration with LERP smoothing
+  private animationState = {
     currentType: 'gentle' as 'gentle' | 'energetic' | 'meditative' | 'cosmic',
     activeElements: new Set<Element>(),
     currentAnimation: null as Animation | null,
     lastEnergyLevel: 0.5,
     lastTempoChange: 0,
-    // LERP smoothing for breathing transitions
+    // LERP smoothing for animation transitions
     targetEnergyLevel: 0.5,
     smoothedEnergyLevel: 0.5,
     targetTempo: 120,
@@ -86,9 +86,9 @@ export class CSSAnimationManager implements IVisualSystem {
   
   // Animation configuration
   private readonly ANIMATION_CONFIGS: Record<string, CSSAnimationConfig> = {
-    // Consciousness breathing animations for Year 3000 performance revolution
-    consciousnessGentleBreathing: {
-      name: 'consciousness-gentle-breathing',
+    // Visual effects animations for Advanced Theme System performance
+    visualEffectsGentleBreathing: {
+      name: 'visualEffects-gentle-animation',
       duration: 4000,
       easing: 'ease-in-out',
       iterations: 'infinite',
@@ -97,8 +97,8 @@ export class CSSAnimationManager implements IVisualSystem {
       delay: 0,
       direction: 'normal' as PlaybackDirection,
     },
-    consciousnessEnergeticBreathing: {
-      name: 'consciousness-energetic-breathing',
+    visualEffectsEnergeticBreathing: {
+      name: 'visualEffects-energetic-animation',
       duration: 2500,
       easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
       iterations: 'infinite',
@@ -107,8 +107,8 @@ export class CSSAnimationManager implements IVisualSystem {
       delay: 0,
       direction: 'normal' as PlaybackDirection,
     },
-    consciousnessMeditativeBreathing: {
-      name: 'consciousness-meditative-breathing',
+    visualEffectsMeditativeBreathing: {
+      name: 'visualEffects-meditative-animation',
       duration: 6000,
       easing: 'cubic-bezier(0.4, 0, 0.6, 1)',
       iterations: 'infinite',
@@ -117,8 +117,8 @@ export class CSSAnimationManager implements IVisualSystem {
       delay: 0,
       direction: 'normal' as PlaybackDirection,
     },
-    consciousnessCosmicBreathing: {
-      name: 'consciousness-cosmic-breathing',
+    visualEffectsCosmicBreathing: {
+      name: 'visualEffects-cosmic-animation',
       duration: 3000,
       easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
       iterations: 'infinite',
@@ -128,7 +128,7 @@ export class CSSAnimationManager implements IVisualSystem {
       direction: 'normal' as PlaybackDirection,
     },
     bloom: {
-      name: 'year3000-bloom',
+      name: 'advanced-bloom',
       duration: 1500,
       easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
       iterations: 1,
@@ -138,7 +138,7 @@ export class CSSAnimationManager implements IVisualSystem {
       direction: 'normal' as PlaybackDirection,
     },
     ripple: {
-      name: 'year3000-ripple',
+      name: 'advanced-ripple',
       duration: 1200,
       easing: 'ease-out',
       iterations: 1,
@@ -148,7 +148,7 @@ export class CSSAnimationManager implements IVisualSystem {
       direction: 'normal' as PlaybackDirection,
     },
     oscillate: {
-      name: 'year3000-oscillate',
+      name: 'advanced-oscillate',
       duration: 4000,
       easing: 'ease-in-out',
       iterations: 'infinite',
@@ -158,7 +158,7 @@ export class CSSAnimationManager implements IVisualSystem {
       direction: 'normal' as PlaybackDirection,
     },
     harmonize: {
-      name: 'year3000-harmonize-flow',
+      name: 'advanced-harmonize-flow',
       duration: 8000,
       easing: 'linear',
       iterations: 'infinite',
@@ -168,7 +168,7 @@ export class CSSAnimationManager implements IVisualSystem {
       direction: 'normal' as PlaybackDirection,
     },
     refract: {
-      name: 'year3000-refract',
+      name: 'advanced-refract',
       duration: 800,
       easing: 'ease-in-out',
       iterations: 1,
@@ -177,8 +177,8 @@ export class CSSAnimationManager implements IVisualSystem {
       delay: 0,
       direction: 'normal' as PlaybackDirection,
     },
-    temporalEcho: {
-      name: 'year3000-echo-core',
+    timeBasedEcho: {
+      name: 'advanced-echo-core',
       duration: 800,
       easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
       iterations: 1,
@@ -188,7 +188,7 @@ export class CSSAnimationManager implements IVisualSystem {
       direction: 'normal' as PlaybackDirection,
     },
     gravity: {
-      name: 'year3000-gravity-pull',
+      name: 'advanced-gravity-pull',
       duration: 1000,
       easing: 'ease-in-out',
       iterations: 'infinite',
@@ -201,11 +201,11 @@ export class CSSAnimationManager implements IVisualSystem {
   
   constructor(
     config: Year3000Config,
-    cssConsciousnessController: UnifiedCSSVariableManager,
+    cssVariableManager: UnifiedCSSVariableManager,
     animationCoordinator: EnhancedMasterAnimationCoordinator
   ) {
     this.config = config;
-    this.cssConsciousnessController = cssConsciousnessController;
+    this.cssVariableManager = cssVariableManager;
     this.animationCoordinator = animationCoordinator;
     this.eventBus = unifiedEventBus;
     
@@ -219,10 +219,10 @@ export class CSSAnimationManager implements IVisualSystem {
     this.animationCoordinator.registerVisualSystem(this, 'normal');
     
     // Initialize LERP smoothing timestamps
-    this.breathingState.lastFrameTime = performance.now();
+    this.animationState.lastFrameTime = performance.now();
     
     if (this.config.enableDebug) {
-      console.log('[CSSAnimationManager] Initialized with CSS animation coordination and LERP-smoothed breathing transitions');
+      console.log('[CSSAnimationManager] Initialized with CSS animation coordination and LERP-smoothed animation transitions');
     }
   }
   
@@ -242,7 +242,7 @@ export class CSSAnimationManager implements IVisualSystem {
       this.updateBeatSyncState(context.beatIntensity, context.timestamp);
     }
     
-    // Update LERP-smoothed breathing values for seamless transitions
+    // Update LERP-smoothed animation values for seamless transitions
     const deltaTimeSeconds = deltaMs / 1000; // Convert to seconds for LERP
     this.updateBreathingLerpValues(deltaTimeSeconds);
     
@@ -328,7 +328,7 @@ export class CSSAnimationManager implements IVisualSystem {
     }
     
     // Update CSS variables
-    this.cssConsciousnessController.updateMusicVariables({
+    this.cssVariableManager.updateMusicVariables({
       'beat.pulse.intensity': enable ? this.beatSyncState.intensity : 0,
     });
     
@@ -350,11 +350,11 @@ export class CSSAnimationManager implements IVisualSystem {
     }
     
     // Update CSS variables
-    this.cssConsciousnessController.updateAnimationVariables({
+    this.cssVariableManager.updateAnimationVariables({
       'motion.scale': clampedIntensity,
     });
     
-    this.cssConsciousnessController.updateMusicVariables({
+    this.cssVariableManager.updateMusicVariables({
       'beat.pulse.intensity': clampedIntensity,
     });
     
@@ -372,7 +372,7 @@ export class CSSAnimationManager implements IVisualSystem {
     }
     
     // Update CSS variables
-    this.cssConsciousnessController.updateAnimationVariables({
+    this.cssVariableManager.updateAnimationVariables({
       'motion.scale': 0,
     });
     
@@ -390,7 +390,7 @@ export class CSSAnimationManager implements IVisualSystem {
     }
     
     // Restore CSS variables
-    this.cssConsciousnessController.updateAnimationVariables({
+    this.cssVariableManager.updateAnimationVariables({
       'motion.scale': 1,
     });
     
@@ -400,7 +400,7 @@ export class CSSAnimationManager implements IVisualSystem {
   }
   
   /**
-   * LERP smoothing utility for framerate-independent breathing transitions
+   * LERP smoothing utility for framerate-independent animation transitions
    * Based on Rory Driscoll's frame rate independent damping using lerp
    */
   private lerpSmooth(current: number, target: number, deltaTime: number, halfLife: number): number {
@@ -412,84 +412,84 @@ export class CSSAnimationManager implements IVisualSystem {
   }
 
   /**
-   * Update LERP-smoothed breathing values for seamless transitions
+   * Update LERP-smoothed animation values for seamless transitions
    */
   private updateBreathingLerpValues(deltaTime: number): void {
     // Apply LERP smoothing to energy level changes
-    this.breathingState.smoothedEnergyLevel = this.lerpSmooth(
-      this.breathingState.smoothedEnergyLevel,
-      this.breathingState.targetEnergyLevel,
+    this.animationState.smoothedEnergyLevel = this.lerpSmooth(
+      this.animationState.smoothedEnergyLevel,
+      this.animationState.targetEnergyLevel,
       deltaTime,
-      this.breathingState.energyHalfLife
+      this.animationState.energyHalfLife
     );
 
     // Apply LERP smoothing to tempo changes
-    this.breathingState.smoothedTempo = this.lerpSmooth(
-      this.breathingState.smoothedTempo,
-      this.breathingState.targetTempo,
+    this.animationState.smoothedTempo = this.lerpSmooth(
+      this.animationState.smoothedTempo,
+      this.animationState.targetTempo,
       deltaTime,
-      this.breathingState.tempoHalfLife
+      this.animationState.tempoHalfLife
     );
   }
 
   /**
-   * Trigger consciousness breathing animation based on music energy
-   * Year 3000 CSS-first breathing performance revolution with LERP smoothing
+   * Trigger visual effects animation based on music energy
+   * Advanced Theme System CSS-first animation with LERP smoothing
    */
-  public triggerConsciousnessBreathing(
+  public triggerVisualEffectsAnimation(
     elements: NodeListOf<Element> | Element[],
     energyLevel: number = 0.5,
     tempo: number = 120
   ): void {
     // Update target values for LERP smoothing
-    this.breathingState.targetEnergyLevel = energyLevel;
-    this.breathingState.targetTempo = tempo;
+    this.animationState.targetEnergyLevel = energyLevel;
+    this.animationState.targetTempo = tempo;
     
-    // Use smoothed values for breathing type selection for natural transitions
-    const smoothedEnergy = this.breathingState.smoothedEnergyLevel;
-    const smoothedTempo = this.breathingState.smoothedTempo;
-    const breathingType = this.selectBreathingType(smoothedEnergy, smoothedTempo);
+    // Use smoothed values for animation type selection for natural transitions
+    const smoothedEnergy = this.animationState.smoothedEnergyLevel;
+    const smoothedTempo = this.animationState.smoothedTempo;
+    const animationType = this.selectBreathingType(smoothedEnergy, smoothedTempo);
     
-    // Stop current breathing animation if active
-    if (this.breathingState.currentAnimation) {
-      this.breathingState.currentAnimation.cancel();
+    // Stop current animation animation if active
+    if (this.animationState.currentAnimation) {
+      this.animationState.currentAnimation.cancel();
     }
     
-    // Clear previous breathing classes
-    this.breathingState.activeElements.forEach(element => {
+    // Clear previous animation classes
+    this.animationState.activeElements.forEach(element => {
       element.classList.remove(
-        'consciousness-gentle-breathing',
-        'consciousness-energetic-breathing', 
-        'consciousness-meditative-breathing',
-        'consciousness-cosmic-breathing'
+        'visualEffects-gentle-animation',
+        'visualEffects-energetic-animation', 
+        'visualEffects-meditative-animation',
+        'visualEffects-cosmic-animation'
       );
     });
     
-    // Update breathing state
-    this.breathingState.currentType = breathingType;
-    this.breathingState.lastEnergyLevel = smoothedEnergy;
-    this.breathingState.lastTempoChange = Date.now();
-    this.breathingState.activeElements.clear();
+    // Update animation state
+    this.animationState.currentType = animationType;
+    this.animationState.lastEnergyLevel = smoothedEnergy;
+    this.animationState.lastTempoChange = Date.now();
+    this.animationState.activeElements.clear();
     
-    // Apply new breathing animation
+    // Apply new animation animation
     Array.from(elements).forEach(element => {
-      this.breathingState.activeElements.add(element);
-      element.classList.add(`consciousness-${breathingType}-breathing`);
+      this.animationState.activeElements.add(element);
+      element.classList.add(`visualEffects-${animationType}-animation`);
     });
     
-    // Update CSS variables for breathing synchronization using smoothed values
-    this.updateBreathingVariables(breathingType, smoothedEnergy, smoothedTempo);
+    // Update CSS variables for animation synchronization using smoothed values
+    this.updateBreathingVariables(animationType, smoothedEnergy, smoothedTempo);
     
     if (this.config.enableDebug) {
-      console.log(`[CSSAnimationManager] LERP-smoothed breathing: ${breathingType} (raw: ${energyLevel.toFixed(2)}→${smoothedEnergy.toFixed(2)}, tempo: ${tempo}→${smoothedTempo.toFixed(1)})`);
+      console.log(`[CSSAnimationManager] LERP-smoothed visual effects: ${animationType} (raw: ${energyLevel.toFixed(2)}→${smoothedEnergy.toFixed(2)}, tempo: ${tempo}→${smoothedTempo.toFixed(1)})`);
     }
   }
   
   /**
-   * Select breathing type based on music energy and tempo
+   * Select animation type based on music energy and tempo
    */
   private selectBreathingType(energyLevel: number, tempo: number): 'gentle' | 'energetic' | 'meditative' | 'cosmic' {
-    // Performance-aware breathing type selection
+    // Performance-aware animation type selection
     if (this.performanceMode === 'performance' && energyLevel > 0.7) {
       // Limit to gentle/meditative in performance mode for high energy
       return energyLevel > 0.8 ? 'gentle' : 'meditative';
@@ -497,47 +497,47 @@ export class CSSAnimationManager implements IVisualSystem {
     
     // Energy-based selection with tempo influence
     if (energyLevel < 0.3) {
-      return 'meditative'; // Low energy = calm breathing
+      return 'meditative'; // Low energy = calm animation
     } else if (energyLevel > 0.7 && tempo > 140) {
-      return 'cosmic'; // High energy + fast tempo = cosmic breathing  
+      return 'cosmic'; // High energy + fast tempo = cosmic animation  
     } else if (energyLevel > 0.6) {
-      return 'energetic'; // High energy = energetic breathing
+      return 'energetic'; // High energy = energetic animation
     } else {
-      return 'gentle'; // Default = gentle breathing
+      return 'gentle'; // Default = gentle animation
     }
   }
   
   /**
-   * Update CSS variables for breathing coordination
+   * Update CSS variables for animation coordination
    */
   private updateBreathingVariables(
-    breathingType: string, 
+    animationType: string, 
     energyLevel: number, 
     tempo: number
   ): void {
-    const duration = this.calculateBreathingDuration(breathingType, tempo);
+    const duration = this.calculateBreathingDuration(animationType, tempo);
     const intensity = Math.max(0.05, Math.min(1.0, energyLevel));
     
-    // Update consciousness breathing variables
-    this.cssConsciousnessController.updateConsciousnessVariables({
-      'breathing.type': breathingType,
-      'breathing.duration': `${duration}ms`,
-      'breathing.intensity': intensity,
-      'breathing.energy': energyLevel,
+    // Update visualEffects animation variables
+    this.cssVariableManager.updateVisualEffectsVariables({
+      'animation.type': animationType,
+      'animation.duration': `${duration}ms`,
+      'animation.intensity': intensity,
+      'animation.energy': energyLevel,
     });
     
     // Update music-responsive variables
-    this.cssConsciousnessController.updateMusicVariables({
+    this.cssVariableManager.updateMusicVariables({
       'tempo.bpm': tempo,
       'energy.level': energyLevel,
-      'breathing.sync': 1, // Enable breathing synchronization
+      'animation.sync': 1, // Enable animation synchronization
     });
   }
   
   /**
-   * Calculate breathing duration based on type and tempo
+   * Calculate animation duration based on type and tempo
    */
-  private calculateBreathingDuration(breathingType: string, tempo: number): number {
+  private calculateBreathingDuration(animationType: string, tempo: number): number {
     const baseDurations = {
       gentle: 4000,
       energetic: 2500, 
@@ -545,42 +545,42 @@ export class CSSAnimationManager implements IVisualSystem {
       cosmic: 3000,
     };
     
-    const baseDuration = baseDurations[breathingType as keyof typeof baseDurations] || 4000;
+    const baseDuration = baseDurations[animationType as keyof typeof baseDurations] || 4000;
     
-    // Adjust duration based on tempo (faster tempo = faster breathing)
+    // Adjust duration based on tempo (faster tempo = faster animation)
     const tempoMultiplier = Math.max(0.5, Math.min(2.0, 120 / tempo));
     
     return Math.round(baseDuration * tempoMultiplier);
   }
   
   /**
-   * Stop consciousness breathing animations
+   * Stop visual effects animations
    */
-  public stopConsciousnessBreathing(): void {
-    if (this.breathingState.currentAnimation) {
-      this.breathingState.currentAnimation.cancel();
-      this.breathingState.currentAnimation = null;
+  public stopVisualEffectsAnimation(): void {
+    if (this.animationState.currentAnimation) {
+      this.animationState.currentAnimation.cancel();
+      this.animationState.currentAnimation = null;
     }
     
-    // Remove breathing classes from all active elements
-    this.breathingState.activeElements.forEach(element => {
+    // Remove animation classes from all active elements
+    this.animationState.activeElements.forEach(element => {
       element.classList.remove(
-        'consciousness-gentle-breathing',
-        'consciousness-energetic-breathing',
-        'consciousness-meditative-breathing', 
-        'consciousness-cosmic-breathing'
+        'visualEffects-gentle-animation',
+        'visualEffects-energetic-animation',
+        'visualEffects-meditative-animation', 
+        'visualEffects-cosmic-animation'
       );
     });
     
-    this.breathingState.activeElements.clear();
+    this.animationState.activeElements.clear();
     
     // Reset CSS variables
-    this.cssConsciousnessController.updateConsciousnessVariables({
-      'breathing.sync': 0,
+    this.cssVariableManager.updateVisualEffectsVariables({
+      'animation.sync': 0,
     });
     
     if (this.config.enableDebug) {
-      console.log('[CSSAnimationManager] Consciousness breathing stopped');
+      console.log('[CSSAnimationManager] Visual effects animation stopped');
     }
   }
 
@@ -633,7 +633,7 @@ export class CSSAnimationManager implements IVisualSystem {
       refractActive: false,
       oscillateActive: false,
       harmonizeActive: false,
-      temporalEchoActive: false,
+      timeBasedEchoActive: false,
       gravityActive: false,
       beatSyncEnabled: true,
       intensityLevel: 1,
@@ -691,24 +691,24 @@ export class CSSAnimationManager implements IVisualSystem {
     }
     
     // Update CSS variables for beat sync
-    this.cssConsciousnessController.updateMusicVariables({
+    this.cssVariableManager.updateMusicVariables({
       'beat.pulse.intensity': this.beatSyncState.intensity,
       'beat.phase': this.beatSyncState.phase,
     });
     
-    // Trigger consciousness breathing based on music energy (Year 3000 CSS-first integration)
+    // Trigger visual effects animation based on music energy (Advanced Theme System CSS-first integration)
     if (payload.energy !== undefined) {
       const energyLevel = payload.energy;
       const tempo = this.beatSyncState.tempo;
       
-      // Only update breathing if energy level changed significantly or tempo changed
-      const energyDelta = Math.abs(energyLevel - this.breathingState.lastEnergyLevel);
-      const timeSinceTempoChange = currentTime - this.breathingState.lastTempoChange;
+      // Only update animation if energy level changed significantly or tempo changed
+      const energyDelta = Math.abs(energyLevel - this.animationState.lastEnergyLevel);
+      const timeSinceTempoChange = currentTime - this.animationState.lastTempoChange;
       
       if (energyDelta > 0.15 || timeSinceTempoChange > 5000) { // 5 second tempo check interval
-        const consciousnessElements = document.querySelectorAll('.Root__main-view::before, .Root__main-view, [data-consciousness-breathing]');
-        if (consciousnessElements.length > 0) {
-          this.triggerConsciousnessBreathing(consciousnessElements, energyLevel, tempo);
+        const visualEffectsElements = document.querySelectorAll('.Root__main-view::before, .Root__main-view, [data-visualEffects-animation]');
+        if (visualEffectsElements.length > 0) {
+          this.triggerVisualEffectsAnimation(visualEffectsElements, energyLevel, tempo);
         }
       }
     }
@@ -725,11 +725,11 @@ export class CSSAnimationManager implements IVisualSystem {
     const tempoMultiplier = newTempo / 120; // Normalize to 120 BPM
     
     // Update CSS variables
-    this.cssConsciousnessController.updateMusicVariables({
+    this.cssVariableManager.updateMusicVariables({
       'tempo.bpm': newTempo,
     });
     
-    this.cssConsciousnessController.updateAnimationVariables({
+    this.cssVariableManager.updateAnimationVariables({
       'motion.scale': tempoMultiplier,
     });
     
@@ -748,7 +748,7 @@ export class CSSAnimationManager implements IVisualSystem {
     this.beatSyncState.lastBeatTime = timestamp;
     
     // Update CSS variables for beat sync
-    this.cssConsciousnessController.updateMusicVariables({
+    this.cssVariableManager.updateMusicVariables({
       'beat.pulse.intensity': intensity,
     });
   }
@@ -758,14 +758,14 @@ export class CSSAnimationManager implements IVisualSystem {
    */
   private updateAnimationVariables(context: FrameContext): void {
     // Update frame-based variables
-    this.cssConsciousnessController.updateAnimationVariables({
+    this.cssVariableManager.updateAnimationVariables({
       'frame.fps': Math.round(1000 / context.deltaMs),
       'frame.budget': `${context.frameBudget}ms`,
     });
     
-    // Update consciousness variables if available
+    // Update visualEffects variables if available
     if (context.tiltXY) {
-      this.cssConsciousnessController.updateConsciousnessVariables({
+      this.cssVariableManager.updateVisualEffectsVariables({
         'hover.pull': `${Math.abs(context.tiltXY.x) + Math.abs(context.tiltXY.y)}px`,
       });
     }
@@ -833,22 +833,22 @@ export class CSSAnimationManager implements IVisualSystem {
     const effectiveMode = qualityLevel < 0.5 ? 'performance' : 'quality';
     
     // Update CSS variables
-    this.cssConsciousnessController.updatePerformanceVariables({
+    this.cssVariableManager.updatePerformanceVariables({
       'quality.level': qualityLevel,
       'mode': effectiveMode,
     });
     
-    this.cssConsciousnessController.updateAnimationVariables({
+    this.cssVariableManager.updateAnimationVariables({
       'motion.scale': qualityLevel,
     });
     
     // Disable complex animations in low quality mode
     if (qualityLevel < 0.5) {
-      this.cssConsciousnessController.updateUtilityVariables({
+      this.cssVariableManager.updateUtilityVariables({
         'feature.animations.enabled': false,
       });
     } else {
-      this.cssConsciousnessController.updateUtilityVariables({
+      this.cssVariableManager.updateUtilityVariables({
         'feature.animations.enabled': true,
       });
     }
@@ -881,5 +881,23 @@ export class CSSAnimationManager implements IVisualSystem {
     if (this.config.enableDebug) {
       console.log(`[CSSAnimationManager] Performance - FPS: ${Math.round(1000 / metrics.avgFrameTime)}, Active: ${metrics.activeAnimations}`);
     }
+  }
+  
+  // =========================================================================
+  // BACKWARD COMPATIBILITY METHODS
+  // =========================================================================
+  
+  /**
+   * @deprecated Use triggerVisualEffectsAnimation instead
+   */
+  public triggerConsciousnessBreathing(elements: NodeListOf<Element> | Element[], energyLevel: number = 0.5, tempo: number = 120): void {
+    return this.triggerVisualEffectsAnimation(elements, energyLevel, tempo);
+  }
+  
+  /**
+   * @deprecated Use stopVisualEffectsAnimation instead
+   */  
+  public stopConsciousnessBreathing(): void {
+    return this.stopVisualEffectsAnimation();
   }
 }

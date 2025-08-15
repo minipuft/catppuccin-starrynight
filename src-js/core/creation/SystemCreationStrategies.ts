@@ -967,8 +967,8 @@ export class ObjectDependenciesStrategy extends BaseCreationStrategy {
 
       // Create dependencies object for MusicSyncService
       const dependencies = {
-        YEAR3000_CONFIG: context.config,
-        Year3000Utilities: context.utils,
+        ADVANCED_SYSTEM_CONFIG: context.config,
+        ThemeUtilities: context.utils,
         settingsManager: context.dependencies.settingsManager,
         year3000System: context.dependencies.year3000System,
         // NOTE: colorHarmonyEngine deliberately omitted - using event-driven pattern instead

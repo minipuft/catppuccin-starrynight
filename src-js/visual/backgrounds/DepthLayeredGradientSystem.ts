@@ -6,23 +6,23 @@
  * - Multi-layer gradient system with parallax scrolling
  * - CSS transforms for 3D depth perception
  * - Performance-aware layering with automatic quality scaling
- * - Extends existing 6-layer consciousness system
+ * - Extends existing 6-layer visual effects system
  */
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { EmotionalGradientMapper } from "@/audio/EmotionalGradientMapper";
 import { GenreGradientEvolution } from "@/audio/GenreGradientEvolution";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { unifiedEventBus, type EventData } from "@/core/events/UnifiedEventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type { HealthCheckResult } from "@/types/systems";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
-import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 import type {
   VisualEffectsCoordinator,
@@ -56,12 +56,12 @@ interface DepthLayer {
   targetScale: number;
 }
 
-interface MusicalConsciousnessSettings {
+interface MusicalVisualEffectsSettings {
   enabled: boolean;
-  consciousnessLevel: number; // 0-1 overall consciousness intensity
+  activityLevel: number; // 0-1 overall activity intensity
   temporalMemory: number; // 0-1 how much past colors influence current
   harmonicSensitivity: number; // 0-1 frequency response sensitivity
-  flowDynamics: number; // 0-1 organic flow pattern intensity
+  flowDynamics: number; // 0-1 smooth flow pattern intensity
   stellarDensity: number; // 0-1 stellar phenomena density
   dimensionalDepth: number; // 1-5 layer depth perception level
 }
@@ -75,7 +75,7 @@ interface DepthSettings {
   infiniteScrolling: boolean;
   qualityLevel: "low" | "medium" | "high";
   performanceMode: boolean;
-  musicalConsciousness: MusicalConsciousnessSettings;
+  musicalVisualEffects: MusicalVisualEffectsSettings;
 }
 
 interface InfiniteSpaceMetrics {
@@ -100,15 +100,15 @@ export class DepthLayeredGradientSystem
 {
   private depthSettings: DepthSettings;
   private depthLayers: Map<string, DepthLayer>;
-  private consciousnessLayers: Map<string, HTMLDivElement>;
-  private cssConsciousnessController: OptimizedCSSVariableManager | null;
+  private visualEffectsLayers: Map<string, HTMLDivElement>;
+  private cssVariableController: OptimizedCSSVariableManager | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
   private emotionalGradientMapper: EmotionalGradientMapper | null = null;
   private genreGradientEvolution: GenreGradientEvolution | null = null;
   private containerElement: HTMLElement | null = null;
   private backgroundContainer: HTMLElement | null = null;
   
-  // Musical consciousness spectral data
+  // Musical visual effects spectral data
   private spectralData = {
     bassResponse: 0,
     midResponse: 0,
@@ -127,10 +127,10 @@ export class DepthLayeredGradientSystem
   private boundResizeHandler: ((event: Event) => void) | null = null;
   private eventSubscriptionIds: string[] = [];
 
-  // Consciousness choreographer integration
-  private consciousnessChoreographer: VisualEffectsCoordinator | null =
+  // Visual effects coordinator integration
+  private visualEffectsCoordinator: VisualEffectsCoordinator | null =
     null;
-  private currentConsciousnessField: VisualEffectState | null = null;
+  private currentVisualEffectState: VisualEffectState | null = null;
 
   // LERP smoothing half-life values (in seconds) for framerate-independent animations
   private lerpHalfLifeValues = {
@@ -173,11 +173,11 @@ export class DepthLayeredGradientSystem
       animation: "multi-blob-secondary",
       duration: "280s",
     },
-    // Large organic blob formations
-    organicBubbles: {
+    // Large smooth blob formations
+    smoothBubbles: {
       gradient:
         "radial-gradient(ellipse 45% 35% at 35% 40%, rgba(203, 166, 247, 0.4) 0%, rgba(203, 166, 247, 0.1) 60%, transparent 90%), radial-gradient(ellipse 35% 45% at 70% 65%, rgba(137, 180, 250, 0.35) 0%, rgba(137, 180, 250, 0.08) 65%, transparent 95%), radial-gradient(circle 25% at 25% 75%, rgba(245, 194, 231, 0.3) 0%, transparent 80%), radial-gradient(ellipse 20% 30% at 80% 20%, rgba(250, 179, 135, 0.25) 0%, transparent 75%)",
-      animation: "organic-bubble-flow",
+      animation: "smooth-bubble-flow",
       duration: "320s",
     },
     // Nebula with enhanced blob-like structure
@@ -204,8 +204,8 @@ export class DepthLayeredGradientSystem
   };
 
   constructor(
-    config: Year3000Config = YEAR3000_CONFIG,
-    utils: typeof import("@/utils/core/Year3000Utilities"),
+    config: AdvancedSystemConfig | Year3000Config = ADVANCED_SYSTEM_CONFIG,
+    utils: typeof import("@/utils/core/ThemeUtilities"),
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
     settingsManager: SettingsManager | null = null,
@@ -215,15 +215,15 @@ export class DepthLayeredGradientSystem
 
     this.colorHarmonyEngine = year3000System?.colorHarmonyEngine || null;
 
-    // Get consciousness choreographer from year3000System if available
-    this.consciousnessChoreographer =
+    // Get visual effects coordinator from year3000System if available
+    this.visualEffectsCoordinator =
       year3000System?.backgroundConsciousnessChoreographer || null;
 
-    // CSS Consciousness Controller will be injected by VisualSystemFacade
-    this.cssConsciousnessController = null;
+    // CSS Variable Controller will be injected by VisualSystemFacade
+    this.cssVariableController = null;
     this.deviceCapabilities = new DeviceCapabilityDetector();
     this.depthLayers = new Map();
-    this.consciousnessLayers = new Map();
+    this.visualEffectsLayers = new Map();
 
     // Initialize settings
     this.depthSettings = {
@@ -235,9 +235,9 @@ export class DepthLayeredGradientSystem
       infiniteScrolling: true,
       qualityLevel: "medium",
       performanceMode: false,
-      musicalConsciousness: {
+      musicalVisualEffects: {
         enabled: true,
-        consciousnessLevel: 0.7,
+        activityLevel: 0.7,
         temporalMemory: 0.3,
         harmonicSensitivity: 0.6,
         flowDynamics: 0.4,
@@ -265,23 +265,23 @@ export class DepthLayeredGradientSystem
   }
 
   /**
-   * Dependency injection setter for CSS Consciousness Controller
+   * Dependency injection setter for CSS Variable Controller
    * Called by VisualSystemFacade during system initialization
    */
   public setOptimizedCSSVariableManager(
     cssController: OptimizedCSSVariableManager
   ): void {
-    this.cssConsciousnessController = cssController;
+    this.cssVariableController = cssController;
     
-    // Initialize musical consciousness components after CSS controller is available
-    this.initializeMusicalConsciousness();
+    // Initialize musical visual effects components after CSS controller is available
+    this.initializeMusicalVisualEffects();
   }
 
   /**
-   * Initialize musical consciousness components (async version)
+   * Initialize musical visual effects components (async version)
    */
-  private async initializeMusicalConsciousnessAsync(): Promise<void> {
-    this.initializeMusicalConsciousness();
+  private async initializeMusicalVisualEffectsAsync(): Promise<void> {
+    this.initializeMusicalVisualEffects();
     
     // Initialize the components asynchronously
     if (this.emotionalGradientMapper) {
@@ -294,13 +294,13 @@ export class DepthLayeredGradientSystem
   }
 
   /**
-   * Initialize musical consciousness components
+   * Initialize musical visual effects components
    */
-  private initializeMusicalConsciousness(): void {
-    if (!this.cssConsciousnessController) {
+  private initializeMusicalVisualEffects(): void {
+    if (!this.cssVariableController) {
       Y3KDebug?.debug?.warn(
         "DepthLayeredGradientSystem",
-        "CSS consciousness controller not available, musical consciousness disabled"
+        "CSS variable controller not available, musical visual effects disabled"
       );
       return;
     }
@@ -308,14 +308,14 @@ export class DepthLayeredGradientSystem
     try {
       // Initialize emotional gradient mapper
       this.emotionalGradientMapper = new EmotionalGradientMapper(
-        this.cssConsciousnessController,
+        this.cssVariableController,
         this.musicSyncService,
         this.settingsManager
       );
 
       // Initialize genre gradient evolution
       this.genreGradientEvolution = new GenreGradientEvolution(
-        this.cssConsciousnessController,
+        this.cssVariableController,
         this.musicSyncService,
         this.emotionalGradientMapper,
         this.settingsManager
@@ -323,12 +323,12 @@ export class DepthLayeredGradientSystem
 
       Y3KDebug?.debug?.log(
         "DepthLayeredGradientSystem",
-        "Musical consciousness components initialized"
+        "Musical visual effects components initialized"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
         "DepthLayeredGradientSystem",
-        "Failed to initialize musical consciousness:",
+        "Failed to initialize musical visual effects:",
         error
       );
       this.emotionalGradientMapper = null;
@@ -351,19 +351,19 @@ export class DepthLayeredGradientSystem
     // Initialize depth layers
     this.initializeDepthLayers();
 
-    // Initialize consciousness layers from FluxConsciousnessLayers
-    this.initializeConsciousnessLayers();
+    // Initialize visual effects layers from FluxVisualEffectsLayers
+    this.initializeVisualEffectsLayers();
 
-    // Initialize musical consciousness components if CSS controller is available
-    if (this.cssConsciousnessController) {
-      await this.initializeMusicalConsciousnessAsync();
+    // Initialize musical visual effects components if CSS controller is available
+    if (this.cssVariableController) {
+      await this.initializeMusicalVisualEffectsAsync();
     }
 
     // Setup event listeners
     this.setupEventListeners();
 
-    // Register with consciousness choreographer
-    this.registerWithConsciousnessChoreographer();
+    // Register with visual effects coordinator
+    this.registerWithVisualEffectsCoordinator();
 
     // Start animation loop
     this.startAnimationLoop();
@@ -557,7 +557,7 @@ export class DepthLayeredGradientSystem
         100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 0.7; }
       }
 
-      @keyframes organic-bubble-flow {
+      @keyframes smooth-bubble-flow {
         0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 0.75; }
         12% { transform: translate3d(0.4%, -0.3%, 0) rotate(0.15deg) scale(1.02); opacity: 0.85; }
         24% { transform: translate3d(-0.3%, 0.6%, 0) rotate(-0.25deg) scale(0.98); opacity: 0.65; }
@@ -659,10 +659,10 @@ export class DepthLayeredGradientSystem
   }
 
   /**
-   * Initialize consciousness layers from FluxConsciousnessLayers functionality
+   * Initialize visual effects layers from FluxVisualEffectsLayers functionality
    */
-  private initializeConsciousnessLayers(): void {
-    if (!this.backgroundContainer || !this.depthSettings.musicalConsciousness.enabled) {
+  private initializeVisualEffectsLayers(): void {
+    if (!this.backgroundContainer || !this.depthSettings.musicalVisualEffects.enabled) {
       return;
     }
 
@@ -672,10 +672,10 @@ export class DepthLayeredGradientSystem
     const shouldReduceQuality = this.performanceMonitor?.shouldReduceQuality?.() || false;
 
     if (currentFPS < 45 || isLowEndDevice || shouldReduceQuality) {
-      this.depthSettings.musicalConsciousness.enabled = false;
+      this.depthSettings.musicalVisualEffects.enabled = false;
       Y3KDebug?.debug?.log(
         "DepthLayeredGradientSystem",
-        `Performance mode activated - consciousness layers disabled (FPS: ${currentFPS})`
+        `Performance mode activated - visual effects layers disabled (FPS: ${currentFPS})`
       );
       return;
     }
@@ -766,13 +766,13 @@ export class DepthLayeredGradientSystem
       will-change: auto;
     `;
 
-    // Store consciousness layers
-    this.consciousnessLayers.set("harmonic", harmonicLayer);
-    this.consciousnessLayers.set("flowDynamics", flowDynamicsLayer);
-    this.consciousnessLayers.set("waveDynamics", waveDynamicsLayer);
-    this.consciousnessLayers.set("flowEffects", flowEffectsLayer);
-    this.consciousnessLayers.set("proceduralNebula", proceduralNebulaLayer);
-    this.consciousnessLayers.set("stellar", stellarLayer);
+    // Store visual effects layers
+    this.visualEffectsLayers.set("harmonic", harmonicLayer);
+    this.visualEffectsLayers.set("flowDynamics", flowDynamicsLayer);
+    this.visualEffectsLayers.set("waveDynamics", waveDynamicsLayer);
+    this.visualEffectsLayers.set("flowEffects", flowEffectsLayer);
+    this.visualEffectsLayers.set("proceduralNebula", proceduralNebulaLayer);
+    this.visualEffectsLayers.set("stellar", stellarLayer);
 
     // Insert layers in the correct order (highest z-index first)
     targetContainer.appendChild(harmonicLayer);
@@ -784,12 +784,12 @@ export class DepthLayeredGradientSystem
 
     Y3KDebug?.debug?.log(
       "DepthLayeredGradientSystem",
-      `Initialized ${this.consciousnessLayers.size} consciousness layers`
+      `Initialized ${this.visualEffectsLayers.size} visual effects layers`
     );
   }
 
   /**
-   * Find Spotify container for consciousness layers
+   * Find Spotify container for visual effects layers
    */
   private findSpotifyContainer(): HTMLElement {
     const containers = [
@@ -864,8 +864,8 @@ export class DepthLayeredGradientSystem
   private handleMusicBeat(data: EventData<"music:beat">): void {
     this.pulseDepthLayers(data.intensity);
     
-    // Handle musical consciousness beat
-    this.handleMusicalConsciousnessBeat(data.intensity);
+    // Handle musical visual effects beat
+    this.handleMusicalVisualEffectsBeat(data.intensity);
 
     Y3KDebug?.debug?.log("DepthLayeredGradientSystem", "Music beat processed", {
       bpm: data.bpm,
@@ -876,8 +876,8 @@ export class DepthLayeredGradientSystem
   private handleMusicEnergy(data: EventData<"music:energy">): void {
     this.updateDepthWithMusicEnergy(data.energy);
     
-    // Handle musical consciousness spectral data simulation
-    this.handleMusicalConsciousnessSpectralData({
+    // Handle musical visual effects spectral data simulation
+    this.handleMusicalVisualEffectsSpectralData({
       energy: data.energy,
       valence: data.valence,
     });
@@ -893,20 +893,20 @@ export class DepthLayeredGradientSystem
   }
 
   /**
-   * Handle musical consciousness beat effects (from FluxConsciousnessLayers)
+   * Handle musical visual effects beat effects (from FluxVisualEffectsLayers)
    */
-  private handleMusicalConsciousnessBeat(intensity: number): void {
-    if (!this.depthSettings.musicalConsciousness.enabled) return;
+  private handleMusicalVisualEffectsBeat(intensity: number): void {
+    if (!this.depthSettings.musicalVisualEffects.enabled) return;
     
     // Handle beat detection for flow dynamics
     this.updateFlowDynamics(intensity);
   }
 
   /**
-   * Handle musical consciousness spectral data (from FluxConsciousnessLayers)
+   * Handle musical visual effects spectral data (from FluxVisualEffectsLayers)
    */
-  private handleMusicalConsciousnessSpectralData(data: { energy: number; valence: number }): void {
-    if (!this.depthSettings.musicalConsciousness.enabled) return;
+  private handleMusicalVisualEffectsSpectralData(data: { energy: number; valence: number }): void {
+    if (!this.depthSettings.musicalVisualEffects.enabled) return;
     
     // Simulate spectral data from energy and valence
     // Map energy to different frequency ranges
@@ -1025,42 +1025,42 @@ export class DepthLayeredGradientSystem
     const deltaTimeSeconds = deltaTime / 1000; // Convert to seconds for LERP
 
     this.depthLayers.forEach((layer) => {
-      // Update animation phase for organic breathing patterns
+      // Update animation phase for smooth animation patterns
       layer.animationPhase += layer.rotationSpeed * deltaTime * 0.001;
 
-      // Calculate target values based on music and consciousness state
+      // Calculate target values based on music and visual effects state
       this.updateLayerTargetsFromMusic(layer);
 
       // Apply LERP smoothing to all properties for framerate-independent animation
-      layer.currentOffsetY = Year3000Utilities.lerpSmooth(
+      layer.currentOffsetY = ThemeUtilities.lerpSmooth(
         layer.currentOffsetY,
         layer.targetOffsetY,
         deltaTimeSeconds,
         this.lerpHalfLifeValues.parallaxOffset
       );
 
-      layer.currentOpacity = Year3000Utilities.lerpSmooth(
+      layer.currentOpacity = ThemeUtilities.lerpSmooth(
         layer.currentOpacity,
         layer.targetOpacity,
         deltaTimeSeconds,
         this.lerpHalfLifeValues.opacity
       );
 
-      layer.currentBlur = Year3000Utilities.lerpSmooth(
+      layer.currentBlur = ThemeUtilities.lerpSmooth(
         layer.currentBlur,
         layer.targetBlur,
         deltaTimeSeconds,
         this.lerpHalfLifeValues.blur
       );
 
-      layer.currentHueRotate = Year3000Utilities.lerpSmooth(
+      layer.currentHueRotate = ThemeUtilities.lerpSmooth(
         layer.currentHueRotate,
         layer.targetHueRotate,
         deltaTimeSeconds,
         this.lerpHalfLifeValues.hueRotate
       );
 
-      layer.currentScale = Year3000Utilities.lerpSmooth(
+      layer.currentScale = ThemeUtilities.lerpSmooth(
         layer.currentScale,
         layer.targetScale,
         deltaTimeSeconds,
@@ -1073,25 +1073,25 @@ export class DepthLayeredGradientSystem
   }
 
   /**
-   * Update layer target values based on music analysis and consciousness state
+   * Update layer target values based on music analysis and visual effects state
    */
   private updateLayerTargetsFromMusic(layer: DepthLayer): void {
-    // Get music state for consciousness-driven animation
+    // Get music state for visual-effects-driven animation
     const musicState = this.musicSyncService?.getCurrentMusicState();
 
     if (musicState) {
       const { intensity, beat, emotion } = musicState;
 
-      // Calculate organic breathing effect based on music
-      const breathingFactor = Math.sin(layer.animationPhase) * 0.05 * intensity;
+      // Calculate smooth animation effect based on music
+      const animationFactor = Math.sin(layer.animationPhase) * 0.05 * intensity;
       const baseOpacity =
         layer.opacityRange[0] +
         (layer.opacityRange[1] - layer.opacityRange[0]) * 0.5;
 
-      // Update target opacity with breathing
+      // Update target opacity with animation
       layer.targetOpacity = Math.max(
         0,
-        Math.min(1, baseOpacity + breathingFactor)
+        Math.min(1, baseOpacity + animationFactor)
       );
 
       // Parallax offset based on scroll and music intensity
@@ -1122,14 +1122,14 @@ export class DepthLayeredGradientSystem
       }
     } else {
       // Fallback to gentle baseline animation when no music
-      const breathingFactor = Math.sin(layer.animationPhase) * 0.02;
+      const animationFactor = Math.sin(layer.animationPhase) * 0.02;
       const baseOpacity =
         layer.opacityRange[0] +
         (layer.opacityRange[1] - layer.opacityRange[0]) * 0.5;
 
       layer.targetOpacity = Math.max(
         0,
-        Math.min(1, baseOpacity + breathingFactor)
+        Math.min(1, baseOpacity + animationFactor)
       );
       layer.targetOffsetY = this.scrollY * layer.parallaxFactor;
       layer.targetScale =
@@ -1174,13 +1174,13 @@ export class DepthLayeredGradientSystem
       performance.now() - this.lastAnimationTime;
 
     // Update CSS variables for debugging (if controller is available)
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+    if (this.cssVariableController) {
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-depth-layers-total",
         this.performanceMetrics.totalLayers.toString()
       );
 
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-depth-layers-visible",
         this.performanceMetrics.visibleLayers.toString()
       );
@@ -1188,28 +1188,28 @@ export class DepthLayeredGradientSystem
   }
 
   /**
-   * Update consciousness variables (from FluxConsciousnessLayers)
+   * Update visual effects variables (from FluxVisualEffectsLayers)
    */
-  private updateConsciousnessVariables(): void {
-    if (!this.cssConsciousnessController || !this.depthSettings.musicalConsciousness.enabled) return;
+  private updateVisualEffectsVariables(): void {
+    if (!this.cssVariableController || !this.depthSettings.musicalVisualEffects.enabled) return;
 
     // Runtime performance check - disable if performance degrades
     const currentFPS = (this.performanceMonitor as any)?.currentFPS || 60;
-    if (currentFPS < 40 && this.depthSettings.musicalConsciousness.enabled) {
-      this.depthSettings.musicalConsciousness.enabled = false;
-      this.destroyConsciousnessLayers();
+    if (currentFPS < 40 && this.depthSettings.musicalVisualEffects.enabled) {
+      this.depthSettings.musicalVisualEffects.enabled = false;
+      this.destroyVisualEffectsLayers();
       Y3KDebug?.debug?.log(
         "DepthLayeredGradientSystem",
-        `Runtime performance degradation detected - consciousness layers disabled (FPS: ${currentFPS})`
+        `Runtime performance degradation detected - visual effects layers disabled (FPS: ${currentFPS})`
       );
       return;
     }
 
-    const settings = this.depthSettings.musicalConsciousness;
+    const settings = this.depthSettings.musicalVisualEffects;
 
     // Batch all updates to reduce style recalculation
     const updates = [
-      ["--sn-gradient-consciousness-level", settings.consciousnessLevel.toString()],
+      ["--sn-gradient-activity-level", settings.activityLevel.toString()],
       ["--sn-gradient-temporal-memory", settings.temporalMemory.toString()],
       ["--sn-gradient-harmonic-resonance", settings.harmonicSensitivity.toString()],
       ["--sn-gradient-flow-dynamics", settings.flowDynamics.toString()],
@@ -1217,95 +1217,95 @@ export class DepthLayeredGradientSystem
       ["--sn-gradient-dimensional-depth", settings.dimensionalDepth.toString()],
 
       // Pre-calculate derived values to reduce CPU overhead
-      ["--sn-gradient-layer-consciousness", "1"],
+      ["--sn-gradient-layer-activity", "1"],
       ["--sn-gradient-layer-temporal", "0.8"],
       ["--sn-gradient-layer-harmonic", (settings.harmonicSensitivity * 0.6).toString()],
       ["--sn-gradient-layer-flow", (settings.flowDynamics * 0.4).toString()],
       ["--sn-gradient-layer-stellar", (settings.stellarDensity * 0.2).toString()],
 
       // Wave dynamics (reduce precision to improve performance)
-      ["--sn-gradient-wave-intensity", (Math.round(settings.consciousnessLevel * 40) / 100).toString()],
+      ["--sn-gradient-wave-intensity", (Math.round(settings.activityLevel * 40) / 100).toString()],
       ["--sn-gradient-flow-intensity", (Math.round(settings.harmonicSensitivity * 30) / 100).toString()],
       ["--sn-gradient-temporal-flow-speed", Math.max(0.5, Math.round(settings.temporalMemory * 100) / 100).toString()],
     ];
 
     // Apply updates in batch
     updates.forEach(([property, value]) => {
-      if (property && value !== undefined && this.cssConsciousnessController) {
-        this.cssConsciousnessController.queueCSSVariableUpdate(property, value);
+      if (property && value !== undefined && this.cssVariableController) {
+        this.cssVariableController.queueCSSVariableUpdate(property, value);
       }
     });
   }
 
   /**
-   * Update spectral variables (from FluxConsciousnessLayers)
+   * Update spectral variables (from FluxVisualEffectsLayers)
    */
   private updateSpectralVariables(): void {
-    if (!this.cssConsciousnessController) return;
+    if (!this.cssVariableController) return;
 
     // Update spectral analysis variables
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssVariableController.queueCSSVariableUpdate(
       "--sn-gradient-bass-response",
       this.spectralData.bassResponse.toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssVariableController.queueCSSVariableUpdate(
       "--sn-gradient-mid-response",
       this.spectralData.midResponse.toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssVariableController.queueCSSVariableUpdate(
       "--sn-gradient-treble-response",
       this.spectralData.trebleResponse.toString()
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssVariableController.queueCSSVariableUpdate(
       "--sn-gradient-vocal-presence",
       this.spectralData.vocalPresence.toString()
     );
   }
 
   /**
-   * Update flow dynamics (from FluxConsciousnessLayers)
+   * Update flow dynamics (from FluxVisualEffectsLayers)
    */
   private updateFlowDynamics(beatIntensity: number): void {
-    if (!this.cssConsciousnessController) return;
+    if (!this.cssVariableController) return;
 
-    // Flow dynamics increase with beat intensity for organic movement
+    // Flow dynamics increase with beat intensity for smooth movement
     const flowIntensity = Math.min(
-      this.depthSettings.musicalConsciousness.flowDynamics + beatIntensity * 0.3,
+      this.depthSettings.musicalVisualEffects.flowDynamics + beatIntensity * 0.3,
       1.0
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssVariableController.queueCSSVariableUpdate(
       "--sn-gradient-flow-dynamics",
       flowIntensity.toString()
     );
 
     // Gradually decay back to base level
     setTimeout(() => {
-      if (this.cssConsciousnessController) {
-        this.cssConsciousnessController.queueCSSVariableUpdate(
+      if (this.cssVariableController) {
+        this.cssVariableController.queueCSSVariableUpdate(
           "--sn-gradient-flow-dynamics",
-          this.depthSettings.musicalConsciousness.flowDynamics.toString()
+          this.depthSettings.musicalVisualEffects.flowDynamics.toString()
         );
       }
     }, 500);
   }
 
   /**
-   * Destroy consciousness layers (from FluxConsciousnessLayers)
+   * Destroy visual effects layers (from FluxVisualEffectsLayers)
    */
-  private destroyConsciousnessLayers(): void {
+  private destroyVisualEffectsLayers(): void {
     // Remove DOM elements immediately for performance
-    this.consciousnessLayers.forEach((layer, key) => {
+    this.visualEffectsLayers.forEach((layer, key) => {
       if (layer.parentNode) {
         layer.parentNode.removeChild(layer);
       }
     });
-    this.consciousnessLayers.clear();
+    this.visualEffectsLayers.clear();
 
-    // Set all consciousness variables to disabled state
-    if (this.cssConsciousnessController) {
+    // Set all visual effects variables to disabled state
+    if (this.cssVariableController) {
       const resetVariables = [
-        "--sn-gradient-consciousness-level",
-        "--sn-gradient-layer-consciousness",
+        "--sn-gradient-activity-level",
+        "--sn-gradient-layer-activity",
         "--sn-gradient-layer-temporal",
         "--sn-gradient-layer-harmonic",
         "--sn-gradient-layer-flow",
@@ -1313,26 +1313,26 @@ export class DepthLayeredGradientSystem
       ];
 
       resetVariables.forEach((variable) => {
-        this.cssConsciousnessController!.queueCSSVariableUpdate(variable, "0");
+        this.cssVariableController!.queueCSSVariableUpdate(variable, "0");
       });
     }
   }
 
   public override updateAnimation(deltaTime: number): void {
     // Animation is handled by the animation loop
-    // Update consciousness temporal phase
-    if (this.depthSettings.musicalConsciousness.enabled && this.cssConsciousnessController) {
+    // Update visual effects temporal phase
+    if (this.depthSettings.musicalVisualEffects.enabled && this.cssVariableController) {
       const currentTime = performance.now();
       const temporalPhase = (currentTime / 10000) % 1; // 10 second cycle
       
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-gradient-temporal-phase",
         temporalPhase.toString()
       );
       
-      // Update consciousness variables periodically
+      // Update visual effects variables periodically
       if (currentTime % 1000 < 16) { // Roughly every second
-        this.updateConsciousnessVariables();
+        this.updateVisualEffectsVariables();
       }
     }
   }
@@ -1363,20 +1363,20 @@ export class DepthLayeredGradientSystem
   public override _performSystemSpecificCleanup(): void {
     super._performSystemSpecificCleanup();
 
-    // Unregister from consciousness choreographer
-    if (this.consciousnessChoreographer) {
+    // Unregister from visual effects coordinator
+    if (this.visualEffectsCoordinator) {
       try {
-        this.consciousnessChoreographer.unregisterConsciousnessParticipant(
+        this.visualEffectsCoordinator.unregisterVisualEffectsParticipant(
           "DepthLayeredGradientSystem"
         );
         Y3KDebug?.debug?.log(
           "DepthLayeredGradientSystem",
-          "Unregistered from consciousness choreographer"
+          "Unregistered from visual effects coordinator"
         );
       } catch (error) {
         Y3KDebug?.debug?.error(
           "DepthLayeredGradientSystem",
-          "Error unregistering from consciousness choreographer:",
+          "Error unregistering from visual effects coordinator:",
           error
         );
       }
@@ -1412,10 +1412,10 @@ export class DepthLayeredGradientSystem
 
     this.depthLayers.clear();
 
-    // Clean up consciousness layers
-    this.destroyConsciousnessLayers();
+    // Clean up visual effects layers
+    this.destroyVisualEffectsLayers();
 
-    // Clean up musical consciousness components
+    // Clean up musical visual effects components
     if (this.emotionalGradientMapper) {
       this.emotionalGradientMapper.destroy();
       this.emotionalGradientMapper = null;
@@ -1500,41 +1500,41 @@ export class DepthLayeredGradientSystem
   }
 
   // ===================================================================
-  // MUSICAL CONSCIOUSNESS API (from FluxConsciousnessLayers)
+  // MUSICAL VISUAL EFFECTS API (from FluxVisualEffectsLayers)
   // ===================================================================
 
-  public setConsciousnessLevel(level: number): void {
-    this.depthSettings.musicalConsciousness.consciousnessLevel = Math.max(0, Math.min(1, level));
-    this.updateConsciousnessVariables();
+  public setVisualEffectsLevel(level: number): void {
+    this.depthSettings.musicalVisualEffects.activityLevel = Math.max(0, Math.min(1, level));
+    this.updateVisualEffectsVariables();
   }
 
   public setTemporalMemory(memory: number): void {
-    this.depthSettings.musicalConsciousness.temporalMemory = Math.max(0, Math.min(1, memory));
-    this.updateConsciousnessVariables();
+    this.depthSettings.musicalVisualEffects.temporalMemory = Math.max(0, Math.min(1, memory));
+    this.updateVisualEffectsVariables();
   }
 
   public setHarmonicSensitivity(sensitivity: number): void {
-    this.depthSettings.musicalConsciousness.harmonicSensitivity = Math.max(0, Math.min(1, sensitivity));
-    this.updateConsciousnessVariables();
+    this.depthSettings.musicalVisualEffects.harmonicSensitivity = Math.max(0, Math.min(1, sensitivity));
+    this.updateVisualEffectsVariables();
   }
 
   public setStellarDrift(drift: number): void {
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+    if (this.cssVariableController) {
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-gradient-stellar-drift",
         `${drift}deg`
       );
     }
   }
 
-  public getConsciousnessMetrics() {
+  public getVisualEffectsMetrics() {
     return {
-      consciousnessLevel: this.depthSettings.musicalConsciousness.consciousnessLevel,
-      temporalMemory: this.depthSettings.musicalConsciousness.temporalMemory,
-      harmonicSensitivity: this.depthSettings.musicalConsciousness.harmonicSensitivity,
-      flowDynamics: this.depthSettings.musicalConsciousness.flowDynamics,
-      stellarDensity: this.depthSettings.musicalConsciousness.stellarDensity,
-      dimensionalDepth: this.depthSettings.musicalConsciousness.dimensionalDepth,
+      activityLevel: this.depthSettings.musicalVisualEffects.activityLevel,
+      temporalMemory: this.depthSettings.musicalVisualEffects.temporalMemory,
+      harmonicSensitivity: this.depthSettings.musicalVisualEffects.harmonicSensitivity,
+      flowDynamics: this.depthSettings.musicalVisualEffects.flowDynamics,
+      stellarDensity: this.depthSettings.musicalVisualEffects.stellarDensity,
+      dimensionalDepth: this.depthSettings.musicalVisualEffects.dimensionalDepth,
       spectralData: { ...this.spectralData },
       emotionalProfile:
         this.emotionalGradientMapper?.getCurrentEmotionalProfile() || null,
@@ -1555,31 +1555,31 @@ export class DepthLayeredGradientSystem
   }
 
   // ===================================================================
-  // CONSCIOUSNESS CHOREOGRAPHER INTEGRATION
+  // VISUAL EFFECTS COORDINATOR INTEGRATION
   // ===================================================================
 
   /**
-   * Register this depth system as a consciousness participant
+   * Register this depth system as a visual effects participant
    */
-  private registerWithConsciousnessChoreographer(): void {
-    if (!this.consciousnessChoreographer) {
+  private registerWithVisualEffectsCoordinator(): void {
+    if (!this.visualEffectsCoordinator) {
       Y3KDebug?.debug?.log(
         "DepthLayeredGradientSystem",
-        "Consciousness choreographer not available, skipping registration"
+        "Visual effects coordinator not available, skipping registration"
       );
       return;
     }
 
     try {
-      this.consciousnessChoreographer.registerConsciousnessParticipant(this);
+      this.visualEffectsCoordinator.registerVisualEffectsParticipant(this);
       Y3KDebug?.debug?.log(
         "DepthLayeredGradientSystem",
-        "Successfully registered with consciousness choreographer"
+        "Successfully registered with visual effects coordinator"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
         "DepthLayeredGradientSystem",
-        "Failed to register with consciousness choreographer:",
+        "Failed to register with visual effects coordinator:",
         error
       );
     }
@@ -1590,10 +1590,10 @@ export class DepthLayeredGradientSystem
   // ===================================================================
 
   public get systemPriority(): "low" | "normal" | "high" | "critical" {
-    return "high"; // Depth perception is high priority for spatial consciousness
+    return "high"; // Depth perception is high priority for spatial visual effects
   }
 
-  public getConsciousnessContribution(): any {
+  public getVisualEffectsContribution(): any {
     return {
       depthPerception: this.depthSettings.maxDepth / 10, // Normalize to 0-1
       layerCount: this.depthLayers.size,
@@ -1606,96 +1606,41 @@ export class DepthLayeredGradientSystem
     };
   }
 
-  public onConsciousnessFieldUpdate(field: VisualEffectState): void {
+  public onVisualEffectsFieldUpdate(field: VisualEffectState): void {
     try {
-      this.currentConsciousnessField = field;
+      this.currentVisualEffectState = field;
 
-      // Update depth layers based on consciousness field
-      this.updateDepthFromConsciousness(field);
+      // Update depth layers based on visual effects field
+      this.updateDepthFromVisualEffects(field);
 
       Y3KDebug?.debug?.log(
         "DepthLayeredGradientSystem",
-        "Updated from consciousness field:",
+        "Updated from visual effects field:",
         {
           rhythmicPulse: field.pulseRate,
           depthPerception: field.depthPerception,
-          breathingCycle: field.pulseRate,
+          animationCycle: field.pulseRate,
         }
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
         "DepthLayeredGradientSystem",
-        "Error updating from consciousness field:",
+        "Error updating from visual effects field:",
         error
       );
     }
   }
 
-  public onChoreographyEvent(eventType: string, payload: any): void {
-    try {
-      switch (eventType) {
-        case "choreography:rhythm-shift":
-          // Adjust parallax speed based on rhythm changes
-          const newRhythm = payload.newRhythm?.bpm || 120;
-          const rhythmFactor = Math.max(0.5, Math.min(2.0, newRhythm / 120));
-
-          // Update all layers with new rhythm-based parallax
-          for (const layer of this.depthLayers.values()) {
-            layer.parallaxFactor = layer.parallaxFactor * rhythmFactor;
-            layer.rotationSpeed = layer.rotationSpeed * rhythmFactor;
-          }
-          break;
-
-        case "choreography:energy-surge":
-          // Intensify depth fog during energy surges
-          const surgeIntensity = payload.intensity || 1.0;
-          this.depthSettings.depthFogIntensity = Math.min(
-            1.0,
-            this.depthSettings.depthFogIntensity * (1.0 + surgeIntensity * 0.3)
-          );
-          this.updateDepthFogIntensity();
-          break;
-
-        case "consciousness:breathing-cycle":
-          // Synchronize layer scale with consciousness breathing
-          const breathingPhase = payload.phase || 0;
-          this.updateLayerScalesWithBreathing(breathingPhase);
-          break;
-
-        case "consciousness:cellular-growth":
-          // Adjust depth perception during growth phases
-          const growthRate = payload.growthRate || 1.0;
-          this.depthSettings.maxDepth = Math.max(
-            5,
-            Math.min(20, this.depthSettings.maxDepth * growthRate)
-          );
-          this.updateDepthPerception();
-          break;
-      }
-
-      Y3KDebug?.debug?.log(
-        "DepthLayeredGradientSystem",
-        `Handled choreography event: ${eventType}`,
-        payload
-      );
-    } catch (error) {
-      Y3KDebug?.debug?.error(
-        "DepthLayeredGradientSystem",
-        `Error handling choreography event ${eventType}:`,
-        error
-      );
-    }
-  }
 
   /**
-   * Update depth layers based on consciousness field
+   * Update depth layers based on visual effects field
    */
-  private updateDepthFromConsciousness(field: VisualEffectState): void {
+  private updateDepthFromVisualEffects(field: VisualEffectState): void {
     // Modulate parallax strength with rhythmic pulse
-    const consciousParallax =
+    const visualEffectsParallax =
       this.depthSettings.parallaxStrength * (0.7 + field.pulseRate * 0.6);
 
-    // Update layer properties based on consciousness
+    // Update layer properties based on visual effects
     for (const [layerId, layer] of this.depthLayers.entries()) {
       if (!layer.element) continue;
 
@@ -1703,46 +1648,46 @@ export class DepthLayeredGradientSystem
       const baseOpacity =
         layer.opacityRange[0] +
         (layer.opacityRange[1] - layer.opacityRange[0]) * field.flowDirection.x;
-      const consciousOpacity =
+      const visualEffectsOpacity =
         baseOpacity * (0.8 + field.depthPerception * 0.4);
 
-      // Modulate scale with breathing cycle
-      const breathingScale =
+      // Modulate scale with animation cycle
+      const animationScale =
         1.0 + Math.sin(field.pulseRate * Math.PI * 2) * 0.05;
       const baseScale =
         layer.scaleRange[0] +
         (layer.scaleRange[1] - layer.scaleRange[0]) * field.energyLevel;
-      const consciousScale = baseScale * breathingScale;
+      const visualEffectsScale = baseScale * animationScale;
 
       // Apply transformations
-      layer.element.style.opacity = consciousOpacity.toString();
+      layer.element.style.opacity = visualEffectsOpacity.toString();
       layer.element.style.transform = `
-        scale(${consciousScale})
-        translateZ(${layer.depth * consciousParallax}px)
+        scale(${visualEffectsScale})
+        translateZ(${layer.depth * visualEffectsParallax}px)
         rotateZ(${layer.animationPhase * layer.rotationSpeed}deg)
       `;
 
       // Update blur based on depth perception
-      const consciousBlur =
+      const visualEffectsBlur =
         layer.blurAmount * (1.0 + field.depthPerception * 0.5);
-      layer.element.style.filter = `blur(${consciousBlur}px)`;
+      layer.element.style.filter = `blur(${visualEffectsBlur}px)`;
     }
 
-    // Apply consciousness-aware CSS variables for hybrid coordination
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(
-        "--sn-depth-consciousness-parallax",
-        consciousParallax.toString()
+    // Apply visual effects-aware CSS variables for hybrid coordination
+    if (this.cssVariableController) {
+      this.cssVariableController.queueCSSVariableUpdate(
+        "--sn-depth-activity-parallax",
+        visualEffectsParallax.toString()
       );
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-depth-perception-intensity",
         field.depthPerception.toString()
       );
-      this.cssConsciousnessController.queueCSSVariableUpdate(
-        "--sn-depth-fog-consciousness",
+      this.cssVariableController.queueCSSVariableUpdate(
+        "--sn-depth-fog-intensity",
         this.depthSettings.depthFogIntensity.toString()
       );
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssVariableController.queueCSSVariableUpdate(
         "--sn-depth-spatial-awareness",
         (
           this.performanceMetrics.visibleLayers /
@@ -1753,10 +1698,10 @@ export class DepthLayeredGradientSystem
   }
 
   /**
-   * Update layer scales with breathing pattern
+   * Update layer scales with animation pattern
    */
-  private updateLayerScalesWithBreathing(breathingPhase: number): void {
-    const breathingModulation = Math.sin(breathingPhase * Math.PI * 2) * 0.03; // Subtle breathing
+  private updateLayerScalesWithAnimation(animationPhase: number): void {
+    const animationModulation = Math.sin(animationPhase * Math.PI * 2) * 0.03; // Subtle animation
 
     for (const layer of this.depthLayers.values()) {
       if (!layer.element) continue;
@@ -1764,12 +1709,12 @@ export class DepthLayeredGradientSystem
       const currentTransform = layer.element.style.transform;
       const baseScale =
         layer.scaleRange[0] + (layer.scaleRange[1] - layer.scaleRange[0]) * 0.5;
-      const breathingScale = baseScale * (1.0 + breathingModulation);
+      const animationScale = baseScale * (1.0 + animationModulation);
 
       // Update only the scale part of the transform
       layer.element.style.transform = currentTransform.replace(
         /scale\([^)]+\)/,
-        `scale(${breathingScale})`
+        `scale(${animationScale})`
       );
     }
   }
@@ -1823,21 +1768,21 @@ export class DepthLayeredGradientSystem
 
   public onVisualStateUpdate(state: VisualEffectState): void {
     // Update visual effects based on shared state
-    this.onConsciousnessFieldUpdate(state);
+    this.onVisualEffectsFieldUpdate(state);
   }
 
   public onVisualEffectEvent(eventType: string, payload: any): void {
     // Handle visual effect events from coordinator
     switch (eventType) {
-      case "visual:rhythm-shift":
+      case "visual-effects:rhythm-shift":
         if (payload.intensity) {
           this.depthSettings.parallaxStrength = Math.min(10, payload.intensity * 5);
         }
         break;
-      case "visual:color-shift":
+      case "visual-effects:color-shift":
         this.forceRepaint?.("color-shift");
         break;
-      case "visual:energy-surge":
+      case "visual-effects:energy-surge":
         if (payload.intensity > 0.6) {
           this.depthSettings.depthFogIntensity = Math.min(1, payload.intensity);
         }
@@ -1851,5 +1796,34 @@ export class DepthLayeredGradientSystem
       effectDepth: this.depthSettings.depthFogIntensity,
       visualCoherence: this.depthSettings.maxDepth / 100
     };
+  }
+
+  // ===================================================================
+  // BACKWARD COMPATIBILITY ALIASES
+  // ===================================================================
+
+  /** @deprecated Use onVisualEffectsFieldUpdate */
+  public onConsciousnessFieldUpdate(field: VisualEffectState): void {
+    return this.onVisualEffectsFieldUpdate(field);
+  }
+
+  /** @deprecated Use getVisualEffectsContribution */
+  public getConsciousnessContribution(): any {
+    return this.getVisualEffectsContribution();
+  }
+
+  /** @deprecated Use setVisualEffectsLevel */
+  public setConsciousnessLevel(level: number): void {
+    return this.setVisualEffectsLevel(level);
+  }
+
+  /** @deprecated Use getVisualEffectsMetrics */
+  public getConsciousnessMetrics() {
+    return this.getVisualEffectsMetrics();
+  }
+
+  /** @deprecated Use onVisualEffectsEvent */
+  public onChoreographyEvent(eventType: string, payload: any): void {
+    return this.onVisualEffectEvent(eventType, payload);
   }
 }

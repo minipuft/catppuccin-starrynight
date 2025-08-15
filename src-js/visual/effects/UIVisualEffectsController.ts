@@ -1,7 +1,7 @@
 /**
- * ConsciousnessUIEffectsController - Phase 2.4B UI Effects Consolidation
+ * UIEffectsController - Phase 2.4B UI Effects Consolidation
  *
- * Consolidates fragmented UI effects systems into a unified consciousness controller
+ * Consolidates fragmented UI effects systems into a unified UI effects controller
  * that eliminates 60-80% code duplication while preserving all functionality.
  *
  * Consolidates:
@@ -28,19 +28,89 @@ import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerforman
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type {
   BackgroundSystemParticipant,
-  ConsciousnessField,
+  VisualCoordinationField,
 } from "@/types/animationCoordination";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
-import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
 import { VisualEffectsCoordinator as BackgroundAnimationCoordinator, type VisualEffectState } from "@/visual/effects/VisualEffectsCoordinator";
 
+// ===================================================================
+// ENHANCED TYPE SAFETY INTERFACES
+// ===================================================================
+
+/**
+ * Configuration update result with validation details
+ */
+export interface ConfigurationUpdateResult {
+  success: boolean;
+  updatedProperties: string[];
+  validationErrors: string[];
+  previousConfig: Partial<UIEffectsConfig>;
+  newConfig: UIEffectsConfig;
+}
+
+/**
+ * Shimmer effect operation result
+ */
+export interface ShimmerOperationResult {
+  success: boolean;
+  elementsAffected: number;
+  effectType: UIEffectsConfig['shimmerType'];
+  intensity: number;
+  performanceImpact: number;
+  errorMessage?: string;
+}
+
+/**
+ * UI effects diagnostic report
+ */
+export interface UIEffectsDiagnosticReport {
+  timestamp: number;
+  systemHealth: 'excellent' | 'good' | 'degraded' | 'critical';
+  activeEffects: {
+    shimmer: boolean;
+    interaction: boolean;
+    audioVisual: boolean;
+    scroll: boolean;
+  };
+  performanceMetrics: {
+    averageFrameTime: number;
+    maxFrameTime: number;
+    memoryUsage: number;
+    cpuUsage: number;
+  };
+  issues: {
+    whiteLayerProblems: string[];
+    webglContextIssues: string[];
+    performanceWarnings: string[];
+    configurationErrors: string[];
+  };
+  recommendations: string[];
+}
+
+/**
+ * Visual contribution calculation result
+ */
+export interface VisualContributionResult {
+  contribution: Partial<VisualEffectState>;
+  confidence: number; // 0-1 how confident we are in this contribution
+  sources: string[]; // Which UI systems contributed to this calculation
+  timestamp: number;
+}
+
+// ===================================================================
+// CONSOLIDATED UI EFFECTS STATE TYPES
+// ===================================================================
+
 // Consolidated UI effects state types
-export interface UIEffectsConsciousnessState {
-  // Core consciousness levels
-  consciousnessLevel: "dormant" | "aware" | "focused" | "transcendent";
+export interface UIEffectsActivityState {
+  // Core activity levels
+  activityLevel: "dormant" | "aware" | "focused" | "enhanced";
+  /** @deprecated Use enhanced instead */
+  transcendentLevel?: "advanced";
 
   // Shimmer effects state
   shimmer: {
@@ -98,7 +168,7 @@ export interface UIEffectsConsciousnessState {
 export interface UIEffectsConfig {
   // Core settings
   enabled: boolean;
-  consciousnessThreshold: number;
+  activityThreshold: number;
 
   // Shimmer settings
   shimmerEnabled: boolean;
@@ -131,26 +201,30 @@ export interface UIEffectsConfig {
   debugMode: boolean;
 }
 
-export class ConsciousnessUIEffectsController
+export class UIEffectsController
   extends BaseVisualSystem
   implements BackgroundSystemParticipant
 {
   // BackgroundSystemParticipant implementation
   public override readonly systemName: string =
-    "ConsciousnessUIEffectsController";
+    "UIVisualEffectsController";
+  /** @deprecated Use systemName instead */
+  public readonly legacySystemName: string = "UIVisualEffectsController";
   public get systemPriority(): "low" | "normal" | "high" | "critical" {
     return "normal"; // UI effects are normal priority
   }
 
-  // Core consciousness state
-  private consciousnessState: UIEffectsConsciousnessState;
+  // Core activity state
+  private activityState: UIEffectsActivityState;
   private uiEffectsConfig: UIEffectsConfig;
 
   // Infrastructure dependencies
   private cssController!: OptimizedCSSVariableManager; // Initialized in initializeCSSConsciousness
-  private consciousnessChoreographer: BackgroundAnimationCoordinator | null =
+  private visualEffectsCoordinator: BackgroundAnimationCoordinator | null =
     null;
-  private currentConsciousnessField: ConsciousnessField | null = null;
+  private currentVisualField: VisualCoordinationField | null = null;
+  /** @deprecated Use currentVisualField instead */
+  private currentConsciousnessField: VisualCoordinationField | null = null;
 
   // Element management
   private shimmerElements: Map<string, HTMLElement> = new Map();
@@ -178,8 +252,8 @@ export class ConsciousnessUIEffectsController
   private lastDiagnosticRun: number = 0;
 
   constructor(
-    config: Year3000Config,
-    utils: typeof Year3000Utilities,
+    config: AdvancedSystemConfig,
+    utils: typeof ThemeUtilities,
     performanceAnalyzer: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService,
     settingsManager: SettingsManager
@@ -195,7 +269,7 @@ export class ConsciousnessUIEffectsController
     // Initialize default configuration
     this.uiEffectsConfig = {
       enabled: true,
-      consciousnessThreshold: 0.3,
+      activityThreshold: 0.3,
 
       // Shimmer defaults (from IridescentShimmerEffectsSystem)
       shimmerEnabled: true,
@@ -228,12 +302,12 @@ export class ConsciousnessUIEffectsController
       debugMode: config.enableDebug || false,
     };
 
-    // Initialize core consciousness state
-    this.consciousnessState = this.createInitialConsciousnessState();
+    // Initialize core activity state
+    this.activityState = this.createInitialActivityState();
 
     Y3KDebug?.debug?.log(
-      "ConsciousnessUIEffectsController",
-      "Unified UI effects consciousness controller created"
+      "UIVisualEffectsController",
+      "Unified UI effects controller created"
     );
   }
 
@@ -244,9 +318,9 @@ export class ConsciousnessUIEffectsController
     if (!this.settingsManager) {
       return 0.7; // Safe fallback if settings manager not available
     }
-    
+
     const setting = this.settingsManager.get("sn-gradient-intensity");
-    
+
     // Map string setting to numeric intensity following layered enhancement philosophy
     switch (setting) {
       case "disabled":
@@ -262,9 +336,9 @@ export class ConsciousnessUIEffectsController
     }
   }
 
-  private createInitialConsciousnessState(): UIEffectsConsciousnessState {
+  private createInitialActivityState(): UIEffectsActivityState {
     return {
-      consciousnessLevel: "dormant",
+      activityLevel: "dormant",
       shimmer: {
         intensity: 0,
         effectType: "mixed",
@@ -312,15 +386,15 @@ export class ConsciousnessUIEffectsController
   public override async initialize(): Promise<void> {
     try {
       Y3KDebug?.debug?.log(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "Starting unified UI effects initialization..."
       );
 
-      // Initialize CSS consciousness integration
-      await this.initializeCSSConsciousness();
+      // Initialize CSS visual effects integration
+      await this.initializeVisualCSS();
 
-      // Initialize consciousness choreographer integration
-      await this.initializeConsciousnessIntegration();
+      // Initialize visual effects coordinator integration
+      await this.initializeVisualCoordination();
 
       // Set up event subscriptions (consolidated from all systems)
       this.subscribeToUnifiedEvents();
@@ -356,12 +430,12 @@ export class ConsciousnessUIEffectsController
       this.initialized = true;
 
       Y3KDebug?.debug?.log(
-        "ConsciousnessUIEffectsController",
-        "Unified UI effects consciousness initialized"
+        "UIVisualEffectsController",
+        "Unified UI effects controller initialized"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "Failed to initialize:",
         error
       );
@@ -369,58 +443,76 @@ export class ConsciousnessUIEffectsController
     }
   }
 
+  private async initializeVisualCSS(): Promise<void> {
+    return this.initializeCSSConsciousness(); // Call legacy method for compatibility
+  }
+
+  /**
+   * @deprecated Use initializeVisualCSS instead
+   */
   private async initializeCSSConsciousness(): Promise<void> {
     try {
-      // Access the shared CSS consciousness controller
+      // Access the shared CSS visual effects controller
       this.cssController =
-        (globalThis as any).unifiedCSSConsciousnessController || null;
+        (globalThis as any).unifiedVisualCSSController || (globalThis as any).unifiedCSSConsciousnessController || null;
 
-      // Initialize CSS variable coordinator with the consciousness controller
+      // Initialize CSS variable coordinator with the visual effects controller
       this.cssController = getGlobalOptimizedCSSController();
 
       if (!this.cssController) {
         Y3KDebug?.debug?.warn(
-          "ConsciousnessUIEffectsController",
-          "CSS consciousness not available, using coordinator fallback"
+          "UIVisualEffectsController",
+          "CSS visual effects not available, using coordinator fallback"
         );
       } else {
         Y3KDebug?.debug?.log(
-          "ConsciousnessUIEffectsController",
-          "Connected to unified CSS consciousness"
+          "UIVisualEffectsController",
+          "Connected to unified CSS visual effects"
         );
       }
     } catch (error) {
       Y3KDebug?.debug?.warn(
-        "ConsciousnessUIEffectsController",
-        "CSS consciousness initialization failed:",
+        "UIVisualEffectsController",
+        "CSS visual effects initialization failed:",
         error
       );
     }
   }
 
+  private async initializeVisualCoordination(): Promise<void> {
+    return this.initializeConsciousnessIntegration(); // Call legacy method for compatibility
+  }
+
+  /**
+   * @deprecated Use initializeVisualCoordination instead
+   */
   private async initializeConsciousnessIntegration(): Promise<void> {
     try {
-      // Connect to consciousness choreographer if available
-      this.consciousnessChoreographer =
-        (globalThis as any).backgroundConsciousnessChoreographer || null;
+      // Connect to visual effects coordinator if available
+      this.visualEffectsCoordinator =
+        (globalThis as any).backgroundVisualCoordinator || (globalThis as any).backgroundConsciousnessChoreographer || null;
 
-      if (this.consciousnessChoreographer) {
-        // Register as consciousness participant
-        this.consciousnessChoreographer.registerConsciousnessParticipant(this);
+      if (this.visualEffectsCoordinator) {
+        // Register as visual effects participant
+        if (this.visualEffectsCoordinator.registerVisualEffectsParticipant) {
+          this.visualEffectsCoordinator.registerVisualEffectsParticipant(this);
+        } else if (this.visualEffectsCoordinator.registerConsciousnessParticipant) {
+          this.visualEffectsCoordinator.registerConsciousnessParticipant(this); // Legacy fallback
+        }
         Y3KDebug?.debug?.log(
-          "ConsciousnessUIEffectsController",
-          "Registered with consciousness choreographer"
+          "UIVisualEffectsController",
+          "Registered with visual effects coordinator"
         );
       } else {
         Y3KDebug?.debug?.log(
-          "ConsciousnessUIEffectsController",
-          "Operating without consciousness choreographer integration"
+          "UIVisualEffectsController",
+          "Operating without visual effects coordinator integration"
         );
       }
     } catch (error) {
       Y3KDebug?.debug?.warn(
-        "ConsciousnessUIEffectsController",
-        "Consciousness integration failed:",
+        "UIVisualEffectsController",
+        "Visual coordination integration failed:",
         error
       );
     }
@@ -433,7 +525,7 @@ export class ConsciousnessUIEffectsController
     const musicBeatUnsubscribe = unifiedEventBus.subscribe(
       "music:beat",
       this.handleMusicBeat.bind(this),
-      "ConsciousnessUIEffectsController"
+      "UIVisualEffectsController"
     );
     this.eventUnsubscribeFunctions.push(() =>
       unifiedEventBus.unsubscribe(musicBeatUnsubscribe)
@@ -442,7 +534,7 @@ export class ConsciousnessUIEffectsController
     const musicEnergyUnsubscribe = unifiedEventBus.subscribe(
       "music:energy",
       this.handleMusicEnergy.bind(this),
-      "ConsciousnessUIEffectsController"
+      "UIVisualEffectsController"
     );
     this.eventUnsubscribeFunctions.push(() =>
       unifiedEventBus.unsubscribe(musicEnergyUnsubscribe)
@@ -459,14 +551,14 @@ export class ConsciousnessUIEffectsController
     const settingsUnsubscribe = unifiedEventBus.subscribe(
       "settings:changed",
       this.handleSettingsChange.bind(this),
-      "ConsciousnessUIEffectsController"
+      "UIVisualEffectsController"
     );
     this.eventUnsubscribeFunctions.push(() =>
       unifiedEventBus.unsubscribe(settingsUnsubscribe)
     );
 
     Y3KDebug?.debug?.log(
-      "ConsciousnessUIEffectsController",
+      "UIVisualEffectsController",
       `Subscribed to ${this.eventUnsubscribeFunctions.length} unified events`
     );
   }
@@ -480,12 +572,12 @@ export class ConsciousnessUIEffectsController
       await this.discoverShimmerElements();
 
       Y3KDebug?.debug?.log(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         `Shimmer effects initialized with ${this.shimmerElements.size} elements`
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "Shimmer effects initialization failed:",
         error
       );
@@ -498,12 +590,12 @@ export class ConsciousnessUIEffectsController
       this.setupInteractionListeners();
 
       Y3KDebug?.debug?.log(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "Interaction tracking initialized"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "Interaction tracking initialization failed:",
         error
       );
@@ -516,12 +608,12 @@ export class ConsciousnessUIEffectsController
       this.startDiagnosticMonitoring();
 
       Y3KDebug?.debug?.log(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "Diagnostic system initialized"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "Diagnostic system initialization failed:",
         error
       );
@@ -532,12 +624,12 @@ export class ConsciousnessUIEffectsController
     try {
       // Audio-visual integration ready (events already subscribed)
       Y3KDebug?.debug?.log(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "Audio-visual effects initialized"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "Audio-visual effects initialization failed:",
         error
       );
@@ -548,12 +640,12 @@ export class ConsciousnessUIEffectsController
     try {
       // Scroll effects ready (events already subscribed)
       Y3KDebug?.debug?.log(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "Scroll effects initialized"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "Scroll effects initialization failed:",
         error
       );
@@ -595,9 +687,9 @@ export class ConsciousnessUIEffectsController
             const elementId = entry.target.getAttribute("data-shimmer-id");
             if (elementId) {
               if (entry.isIntersecting) {
-                this.consciousnessState.shimmer.activeElements.add(elementId);
+                this.activityState.shimmer.activeElements.add(elementId);
               } else {
-                this.consciousnessState.shimmer.activeElements.delete(
+                this.activityState.shimmer.activeElements.delete(
                   elementId
                 );
               }
@@ -641,7 +733,7 @@ export class ConsciousnessUIEffectsController
 
     if (this.uiEffectsConfig.debugMode && elementCount > 0) {
       Y3KDebug?.debug?.log(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         `Discovered ${elementCount} shimmer elements`
       );
     }
@@ -661,9 +753,9 @@ export class ConsciousnessUIEffectsController
       document.addEventListener(
         eventType,
         () => {
-          this.consciousnessState.interaction.isActive = true;
-          this.consciousnessState.interaction.lastInteractionTime = Date.now();
-          this.consciousnessState.interaction.digitalMeditationDetected = false;
+          this.activityState.interaction.isActive = true;
+          this.activityState.interaction.lastInteractionTime = Date.now();
+          this.activityState.interaction.digitalMeditationDetected = false;
 
           // Update nexus state
           this.updateNexusState();
@@ -692,8 +784,8 @@ export class ConsciousnessUIEffectsController
       const frameStartTime = performance.now();
 
       try {
-        // Update consciousness state
-        this.updateConsciousnessState(deltaTime);
+        // Update activity state
+        this.updateVisualActivityState(deltaTime);
 
         // Update shimmer effects
         if (this.uiEffectsConfig.shimmerEnabled) {
@@ -728,7 +820,7 @@ export class ConsciousnessUIEffectsController
         }
       } catch (error) {
         Y3KDebug?.debug?.error(
-          "ConsciousnessUIEffectsController",
+          "UIVisualEffectsController",
           "Animation loop error:",
           error
         );
@@ -740,35 +832,36 @@ export class ConsciousnessUIEffectsController
     this.animationFrameId = requestAnimationFrame(animate);
   }
 
-  private updateConsciousnessState(deltaTime: number): void {
-    const state = this.consciousnessState;
+  private updateVisualActivityState(deltaTime: number): void {
+    const state = this.activityState;
 
-    // Update overall consciousness level based on activity
+    // Update overall activity level based on interaction
     const totalActivity =
       state.shimmer.intensity * 0.2 +
       (state.interaction.isActive ? 0.3 : 0) +
       state.audioVisual.beatIntensity * 0.3 +
       state.scroll.sheenIntensity * 0.2;
 
-    // Consciousness level thresholds
+    // Visual activity level thresholds
     if (totalActivity > 0.8) {
-      state.consciousnessLevel = "transcendent";
+      state.activityLevel = "enhanced";
+      state.transcendentLevel = "advanced"; // Legacy compatibility
     } else if (totalActivity > 0.5) {
-      state.consciousnessLevel = "focused";
+      state.activityLevel = "focused";
     } else if (totalActivity > 0.2) {
-      state.consciousnessLevel = "aware";
+      state.activityLevel = "aware";
     } else {
-      state.consciousnessLevel = "dormant";
+      state.activityLevel = "dormant";
     }
   }
 
   private updateShimmerEffects(deltaTime: number): void {
-    const shimmerState = this.consciousnessState.shimmer;
+    const shimmerState = this.activityState.shimmer;
 
-    // Update shimmer intensity based on consciousness and music
+    // Update shimmer intensity based on activity and music
     const musicInfluence =
-      this.consciousnessState.audioVisual.beatIntensity * 0.3;
-    const interactionInfluence = this.consciousnessState.interaction.isActive
+      this.activityState.audioVisual.beatIntensity * 0.3;
+    const interactionInfluence = this.activityState.interaction.isActive
       ? 0.2
       : 0;
 
@@ -780,17 +873,17 @@ export class ConsciousnessUIEffectsController
     );
 
     // Apply performance adaptation
-    if (this.consciousnessState.performance.healthStatus === "degraded") {
+    if (this.activityState.performance.healthStatus === "degraded") {
       shimmerState.intensity *= 0.7;
     } else if (
-      this.consciousnessState.performance.healthStatus === "critical"
+      this.activityState.performance.healthStatus === "critical"
     ) {
       shimmerState.intensity *= 0.3;
     }
   }
 
   private updateInteractionTracking(deltaTime: number): void {
-    const interactionState = this.consciousnessState.interaction;
+    const interactionState = this.activityState.interaction;
     const now = Date.now();
 
     // Check for digital meditation (prolonged inactivity)
@@ -804,7 +897,7 @@ export class ConsciousnessUIEffectsController
         //   timestamp: now
         // });
         Y3KDebug?.debug?.log(
-          "ConsciousnessUIEffectsController",
+          "UIVisualEffectsController",
           "Digital meditation detected",
           { inactiveTime }
         );
@@ -816,7 +909,7 @@ export class ConsciousnessUIEffectsController
   }
 
   private updateNexusState(): void {
-    const state = this.consciousnessState.interaction;
+    const state = this.activityState.interaction;
     const now = Date.now();
     const timeSinceInteraction = now - state.lastInteractionTime;
 
@@ -832,21 +925,21 @@ export class ConsciousnessUIEffectsController
   }
 
   private updateAudioVisualEffects(deltaTime: number): void {
-    const audioState = this.consciousnessState.audioVisual;
+    const audioState = this.activityState.audioVisual;
 
-    // Update nebula effect intensity based on beat and consciousness
-    const consciousnessBoost =
-      this.consciousnessState.consciousnessLevel === "transcendent" ? 0.2 : 0;
+    // Update nebula effect intensity based on beat and activity
+    const activityBoost =
+      this.activityState.activityLevel === "enhanced" ? 0.2 : 0;
     audioState.nebulaEffectIntensity = Math.min(
       this.uiEffectsConfig.nebulaEffectIntensity +
         audioState.beatIntensity * 0.3 +
-        consciousnessBoost,
+        activityBoost,
       1.0
     );
   }
 
   private updateScrollEffects(deltaTime: number): void {
-    const scrollState = this.consciousnessState.scroll;
+    const scrollState = this.activityState.scroll;
 
     // Update prismatic sheen based on scroll activity
     const timeSinceScroll = Date.now() - scrollState.lastScrollTime;
@@ -863,12 +956,12 @@ export class ConsciousnessUIEffectsController
   }
 
   private applyCSSUpdates(): void {
-    const state = this.consciousnessState;
+    const state = this.activityState;
 
     // Consolidated CSS variable updates from all systems
     const updates: Record<string, string> = {
-      // Core consciousness
-      "--sn-ui-consciousness-level": state.consciousnessLevel,
+      // Core activity state
+      "--sn-ui-activity-level": state.activityLevel,
 
       // Shimmer effects
       "--sn-shimmer-intensity": state.shimmer.intensity.toFixed(3),
@@ -902,16 +995,16 @@ export class ConsciousnessUIEffectsController
 
     // Use coordination-first approach with proper batching and priority handling
     try {
-      // Batch all consciousness UI updates with normal priority
+      // Batch all UI activity updates with normal priority
       this.cssController.batchSetVariables(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         updates,
         "normal",
-        "ui-consciousness-update"
+        "ui-activity-update"
       );
     } catch (error) {
       Y3KDebug?.debug?.warn(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "CSS coordination error:",
         error
       );
@@ -921,7 +1014,7 @@ export class ConsciousnessUIEffectsController
 
 
   private updatePerformanceMetrics(frameTime: number): void {
-    const perf = this.consciousnessState.performance;
+    const perf = this.activityState.performance;
 
     // Update frame time metrics
     perf.frameTime = frameTime;
@@ -958,12 +1051,12 @@ export class ConsciousnessUIEffectsController
       // Apply quality reduction
       if (this.customPerformanceMonitor.adaptiveQualityLevel < 0.5) {
         // Disable intensive effects
-        this.consciousnessState.shimmer.performanceLevel = "minimal";
+        this.activityState.shimmer.performanceLevel = "minimal";
       }
 
       if (this.uiEffectsConfig.debugMode) {
         Y3KDebug?.debug?.warn(
-          "ConsciousnessUIEffectsController",
+          "UIVisualEffectsController",
           `Performance issue: ${frameTime.toFixed(
             2
           )}ms, reduced quality to ${this.customPerformanceMonitor.adaptiveQualityLevel.toFixed(
@@ -975,7 +1068,7 @@ export class ConsciousnessUIEffectsController
   }
 
   private runDiagnosticCheck(): void {
-    const diagnosticState = this.consciousnessState.diagnostic;
+    const diagnosticState = this.activityState.diagnostic;
     const now = Date.now();
 
     diagnosticState.lastDiagnosticTime = now;
@@ -1018,7 +1111,7 @@ export class ConsciousnessUIEffectsController
         diagnosticState.whiteLayerIssues.length;
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "Diagnostic check failed:",
         error
       );
@@ -1030,7 +1123,7 @@ export class ConsciousnessUIEffectsController
     try {
       // Use critical priority for white layer fixes - these are important for functionality
       this.cssController.batchSetVariables(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         {
           "--spice-text": "var(--spice-main)",
           "--spice-subtext": "var(--catppuccin-text)",
@@ -1041,13 +1134,13 @@ export class ConsciousnessUIEffectsController
 
       if (this.uiEffectsConfig.debugMode) {
         Y3KDebug?.debug?.log(
-          "ConsciousnessUIEffectsController",
+          "UIVisualEffectsController",
           "Applied white layer auto-fix"
         );
       }
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         "Auto-fix failed:",
         error
       );
@@ -1056,22 +1149,22 @@ export class ConsciousnessUIEffectsController
 
   // Event handlers (consolidated from all systems)
   private handleMusicBeat(event: any): void {
-    const audioState = this.consciousnessState.audioVisual;
+    const audioState = this.activityState.audioVisual;
     audioState.beatIntensity = event.intensity || 0.5;
     audioState.lastBeatTime = Date.now();
 
     // Apply beat influence to shimmer effects
     if (this.uiEffectsConfig.shimmerEnabled) {
       const beatBoost = audioState.beatIntensity * 0.2;
-      this.consciousnessState.shimmer.intensity = Math.min(
-        this.consciousnessState.shimmer.intensity + beatBoost,
+      this.activityState.shimmer.intensity = Math.min(
+        this.activityState.shimmer.intensity + beatBoost,
         1.0
       );
     }
   }
 
   private handleMusicEnergy(event: any): void {
-    const audioState = this.consciousnessState.audioVisual;
+    const audioState = this.activityState.audioVisual;
 
     if (event.energy !== undefined) {
       audioState.beatIntensity = Math.max(
@@ -1082,7 +1175,7 @@ export class ConsciousnessUIEffectsController
   }
 
   private handleGenreChange(event: any): void {
-    const audioState = this.consciousnessState.audioVisual;
+    const audioState = this.activityState.audioVisual;
     audioState.genreChangeDetected = true;
 
     // Reset detection flag after brief period
@@ -1092,8 +1185,8 @@ export class ConsciousnessUIEffectsController
   }
 
   private handleUserScroll(event: any): void {
-    const scrollState = this.consciousnessState.scroll;
-    const interactionState = this.consciousnessState.interaction;
+    const scrollState = this.activityState.scroll;
+    const interactionState = this.activityState.interaction;
 
     scrollState.lastScrollTime = Date.now();
     scrollState.scrollRatio = event.scrollRatio || 0;
@@ -1112,7 +1205,7 @@ export class ConsciousnessUIEffectsController
   }
 
   private handleUserInteraction(event: any): void {
-    const interactionState = this.consciousnessState.interaction;
+    const interactionState = this.activityState.interaction;
 
     interactionState.isActive = true;
     interactionState.lastInteractionTime = event.timestamp || Date.now();
@@ -1132,7 +1225,7 @@ export class ConsciousnessUIEffectsController
       // Update nebula effect intensity when user changes consolidated gradient setting
       this.uiEffectsConfig.nebulaEffectIntensity = this.getNebulaIntensityFromSettings();
       Y3KDebug?.debug?.log(
-        "ConsciousnessUIEffectsController",
+        "UIVisualEffectsController",
         `Updated nebula intensity to: ${this.uiEffectsConfig.nebulaEffectIntensity} from consolidated gradient setting: ${value}`
       );
     }
@@ -1154,66 +1247,85 @@ export class ConsciousnessUIEffectsController
     }
   }
 
-  // BackgroundSystemParticipant interface implementation
+  // BackgroundSystemParticipant interface implementation - defer to main implementation below
+
+  /**
+   * @deprecated Use getVisualContribution instead
+   */
   public getConsciousnessContribution(): any {
     return {
       systemName: this.systemName,
-      consciousnessLevel: this.consciousnessState.consciousnessLevel,
-      shimmerIntensity: this.consciousnessState.shimmer.intensity,
-      interactionState: this.consciousnessState.interaction.nexusState,
+      activityLevel: this.activityState.activityLevel,
+      shimmerIntensity: this.activityState.shimmer.intensity,
+      interactionState: this.activityState.interaction.nexusState,
       audioVisualIntensity:
-        this.consciousnessState.audioVisual.nebulaEffectIntensity,
-      scrollActivity: this.consciousnessState.scroll.sheenIntensity,
+        this.activityState.audioVisual.nebulaEffectIntensity,
+      scrollActivity: this.activityState.scroll.sheenIntensity,
       timestamp: Date.now(),
     };
   }
 
-  public onConsciousnessFieldUpdate(field: ConsciousnessField): void {
-    try {
-      this.currentConsciousnessField = field;
+  public onVisualFieldUpdate(field: VisualCoordinationField): void {
+    return this.onConsciousnessFieldUpdate(field); // Legacy compatibility
+  }
 
-      // Modulate UI effects based on consciousness field
+  /**
+   * @deprecated Use onVisualFieldUpdate instead
+   */
+  public onConsciousnessFieldUpdate(field: VisualCoordinationField): void {
+    try {
+      this.currentVisualField = field as any;
+      this.currentConsciousnessField = field; // Legacy compatibility
+
+      // Modulate UI effects based on visual effects state
       const fieldInfluence = field.pulseRate * 0.2; // Moderate influence
 
       // Apply to shimmer effects
-      this.consciousnessState.shimmer.intensity = Math.min(
-        this.consciousnessState.shimmer.intensity + fieldInfluence,
+      this.activityState.shimmer.intensity = Math.min(
+        this.activityState.shimmer.intensity + fieldInfluence,
         1.0
       );
 
       // Apply to audio-visual effects
-      this.consciousnessState.audioVisual.nebulaEffectIntensity = Math.min(
-        this.consciousnessState.audioVisual.nebulaEffectIntensity +
+      this.activityState.audioVisual.nebulaEffectIntensity = Math.min(
+        this.activityState.audioVisual.nebulaEffectIntensity +
           fieldInfluence * 0.3,
         1.0
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "ConsciousnessUIEffectsController",
-        "Error updating from consciousness field:",
+        "UIVisualEffectsController",
+        "Error updating from visual effects state:",
         error
       );
     }
   }
 
+  public onVisualCoordinationEvent(eventType: string, data: any): void {
+    return this.onChoreographyEvent(eventType, data); // Legacy compatibility
+  }
+
+  /**
+   * @deprecated Use onVisualCoordinationEvent instead
+   */
   public onChoreographyEvent(eventType: string, data: any): void {
-    // Handle choreography events from the consciousness choreographer
+    // Handle coordination events from the visual effects coordinator
     if (eventType === "transition:start") {
       // Boost all UI effects during transitions
-      this.consciousnessState.shimmer.intensity = Math.min(
-        this.consciousnessState.shimmer.intensity + 0.2,
+      this.activityState.shimmer.intensity = Math.min(
+        this.activityState.shimmer.intensity + 0.2,
         1.0
       );
-      this.consciousnessState.audioVisual.nebulaEffectIntensity = Math.min(
-        this.consciousnessState.audioVisual.nebulaEffectIntensity + 0.15,
+      this.activityState.audioVisual.nebulaEffectIntensity = Math.min(
+        this.activityState.audioVisual.nebulaEffectIntensity + 0.15,
         1.0
       );
     }
 
     if (this.uiEffectsConfig.debugMode) {
       Y3KDebug?.debug?.log(
-        "ConsciousnessUIEffectsController",
-        `Choreography event: ${eventType}`,
+        "UIVisualEffectsController",
+        `Visual coordination event: ${eventType}`,
         data
       );
     }
@@ -1221,7 +1333,7 @@ export class ConsciousnessUIEffectsController
 
   // Health check implementation
   public override async healthCheck(): Promise<HealthCheckResult> {
-    const state = this.consciousnessState;
+    const state = this.activityState;
     const isHealthy =
       this.initialized &&
       state.performance.healthStatus !== "critical" &&
@@ -1231,51 +1343,182 @@ export class ConsciousnessUIEffectsController
       healthy: isHealthy,
       ok: isHealthy,
       details:
-        `UI Effects Consciousness: ${state.consciousnessLevel}, ` +
+        `UI Effects Activity: ${state.activityLevel}, ` +
         `Shimmer: ${state.shimmer.activeElements.size} elements, ` +
         `Interaction: ${state.interaction.nexusState}, ` +
         `Performance: ${state.performance.healthStatus}, ` +
         `Diagnostics: ${state.diagnostic.criticalIssuesDetected} issues`,
-      system: "ConsciousnessUIEffectsController",
+      system: "UIVisualEffectsController",
     };
   }
 
   // Configuration API
-  public updateConfiguration(updates: Partial<UIEffectsConfig>): void {
-    Object.assign(this.uiEffectsConfig, updates);
+  public updateConfiguration(updates: Partial<UIEffectsConfig>): ConfigurationUpdateResult {
+    const previousConfig = { ...this.uiEffectsConfig };
+    const updatedProperties: string[] = [];
+    const validationErrors: string[] = [];
 
-    // Handle specific configuration updates
-    if (updates.shimmerEnabled !== undefined) {
-      if (
-        updates.shimmerEnabled &&
-        !this.consciousnessState.shimmer.activeElements.size
-      ) {
-        this.discoverShimmerElements();
+    try {
+      // Validate updates before applying
+      for (const [key, value] of Object.entries(updates)) {
+        if (key in this.uiEffectsConfig) {
+          updatedProperties.push(key);
+        } else {
+          validationErrors.push(`Unknown configuration property: ${key}`);
+        }
+
+        // Type-specific validation
+        if (key === 'shimmerIntensity' && typeof value === 'number' && (value < 0 || value > 1)) {
+          validationErrors.push('shimmerIntensity must be between 0 and 1');
+        }
+        if (key === 'digitalMeditationThreshold' && typeof value === 'number' && value < 1000) {
+          validationErrors.push('digitalMeditationThreshold must be at least 1000ms');
+        }
       }
-    }
 
-    if (updates.diagnosticEnabled !== undefined) {
-      if (updates.diagnosticEnabled && !this.diagnosticTimerId) {
-        this.startDiagnosticMonitoring();
-      } else if (!updates.diagnosticEnabled && this.diagnosticTimerId) {
-        clearInterval(this.diagnosticTimerId);
-        this.diagnosticTimerId = null;
+      // Apply valid updates
+      if (validationErrors.length === 0) {
+        Object.assign(this.uiEffectsConfig, updates);
+
+        // Handle specific configuration updates
+        if (updates.shimmerEnabled !== undefined) {
+          if (
+            updates.shimmerEnabled &&
+            !this.activityState.shimmer.activeElements.size
+          ) {
+            this.discoverShimmerElements();
+          }
+        }
+
+        if (updates.diagnosticEnabled !== undefined) {
+          if (updates.diagnosticEnabled && !this.diagnosticTimerId) {
+            this.startDiagnosticMonitoring();
+          } else if (!updates.diagnosticEnabled && this.diagnosticTimerId) {
+            clearInterval(this.diagnosticTimerId);
+            this.diagnosticTimerId = null;
+          }
+        }
+
+        Y3KDebug?.debug?.log(
+          "UIEffectsController",
+          "Configuration updated:",
+          updates
+        );
       }
-    }
 
-    Y3KDebug?.debug?.log(
-      "ConsciousnessUIEffectsController",
-      "Configuration updated:",
-      updates
-    );
+      return {
+        success: validationErrors.length === 0,
+        updatedProperties,
+        validationErrors,
+        previousConfig,
+        newConfig: { ...this.uiEffectsConfig }
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error during configuration update';
+      return {
+        success: false,
+        updatedProperties,
+        validationErrors: [...validationErrors, errorMessage],
+        previousConfig,
+        newConfig: previousConfig
+      };
+    }
   }
 
   public getConfiguration(): UIEffectsConfig {
     return { ...this.uiEffectsConfig };
   }
 
-  public getConsciousnessState(): UIEffectsConsciousnessState {
-    return { ...this.consciousnessState };
+  public getVisualState(): UIEffectsActivityState {
+    return this.getConsciousnessState(); // Legacy compatibility
+  }
+
+  /**
+   * @deprecated Use getVisualState instead
+   */
+  public getConsciousnessState(): UIEffectsActivityState {
+    return { ...this.activityState };
+  }
+
+  /**
+   * Generate comprehensive diagnostic report for UI effects system
+   *
+   * @returns Detailed diagnostic report with health metrics and recommendations
+   *
+   * @example
+   * ```typescript
+   * const report = uiController.generateDiagnosticReport();
+   * if (report.systemHealth === 'critical') {
+   *   console.warn('UI Effects in critical state:', report.issues);
+   *   report.recommendations.forEach(rec => console.log('Recommendation:', rec));
+   * }
+   * ```
+   */
+  public generateDiagnosticReport(): UIEffectsDiagnosticReport {
+    const now = performance.now();
+    const memoryInfo = (performance as any).memory;
+
+    // Calculate system health
+    let healthScore = 100;
+    const issues = {
+      whiteLayerProblems: [...this.activityState.diagnostic.whiteLayerIssues],
+      webglContextIssues: [] as string[],
+      performanceWarnings: [] as string[],
+      configurationErrors: [] as string[]
+    };
+    const recommendations: string[] = [];
+
+    // Check performance metrics
+    if (this.activityState.performance.avgFrameTime > 33) { // > 30fps
+      healthScore -= 20;
+      issues.performanceWarnings.push(`High frame time: ${this.activityState.performance.avgFrameTime.toFixed(1)}ms`);
+      recommendations.push('Consider reducing visual effect quality or disabling intensive effects');
+    }
+
+    // Check WebGL context
+    if (!this.activityState.diagnostic.webglContextHealthy) {
+      healthScore -= 30;
+      issues.webglContextIssues.push('WebGL context is unhealthy or lost');
+      recommendations.push('Restart visual effects or check browser WebGL support');
+    }
+
+    // Check configuration issues
+    if (!this.uiEffectsConfig.enabled) {
+      issues.configurationErrors.push('UI effects are disabled');
+      recommendations.push('Enable UI effects in settings for full experience');
+    }
+
+    // Check white layer issues
+    if (this.activityState.diagnostic.whiteLayerIssues.length > 0) {
+      healthScore -= 15 * this.activityState.diagnostic.whiteLayerIssues.length;
+      recommendations.push('Enable auto-fix for white layer issues or check CSS customizations');
+    }
+
+    // Determine overall health
+    let systemHealth: UIEffectsDiagnosticReport['systemHealth'];
+    if (healthScore >= 90) systemHealth = 'excellent';
+    else if (healthScore >= 70) systemHealth = 'good';
+    else if (healthScore >= 50) systemHealth = 'degraded';
+    else systemHealth = 'critical';
+
+    return {
+      timestamp: now,
+      systemHealth,
+      activeEffects: {
+        shimmer: this.uiEffectsConfig.shimmerEnabled && this.activityState.shimmer.intensity > 0,
+        interaction: this.uiEffectsConfig.interactionTrackingEnabled && this.activityState.interaction.isActive,
+        audioVisual: this.uiEffectsConfig.audioVisualEnabled && this.activityState.audioVisual.beatIntensity > 0,
+        scroll: this.uiEffectsConfig.scrollEffectsEnabled && this.activityState.scroll.prismaticEffectActive
+      },
+      performanceMetrics: {
+        averageFrameTime: this.activityState.performance.avgFrameTime,
+        maxFrameTime: this.activityState.performance.maxFrameTime,
+        memoryUsage: memoryInfo?.usedJSHeapSize || 0,
+        cpuUsage: this.activityState.performance.frameTime / 16.67 // Percentage of 60fps budget
+      },
+      issues,
+      recommendations
+    };
   }
 
   // Legacy compatibility methods (for migration)
@@ -1284,16 +1527,16 @@ export class ConsciousnessUIEffectsController
   }
 
   public getInteractionState() {
-    return this.consciousnessState.interaction;
+    return this.activityState.interaction;
   }
 
   public getDiagnosticState() {
-    return this.consciousnessState.diagnostic;
+    return this.activityState.diagnostic;
   }
 
   public override async destroy(): Promise<void> {
     Y3KDebug?.debug?.log(
-      "ConsciousnessUIEffectsController",
+      "UIVisualEffectsController",
       "Destroying unified UI effects controller..."
     );
 
@@ -1329,15 +1572,15 @@ export class ConsciousnessUIEffectsController
     // Clean up element references
     this.shimmerElements.clear();
 
-    // Clean up consciousness choreographer registration
-    if (this.consciousnessChoreographer) {
-      // Note: Would need unregister method on choreographer
+    // Clean up visual effects coordinator registration
+    if (this.visualEffectsCoordinator) {
+      // Note: Would need unregister method on coordinator
     }
 
     this.initialized = false;
 
     Y3KDebug?.debug?.log(
-      "ConsciousnessUIEffectsController",
+      "UIVisualEffectsController",
       "Unified UI effects controller destroyed"
     );
   }
@@ -1373,11 +1616,56 @@ export class ConsciousnessUIEffectsController
     }
   }
 
-  public getVisualContribution(): Partial<VisualEffectState> {
+  public getVisualContribution(): VisualContributionResult {
+    const sources: string[] = [];
+    let confidence = 0;
+
+    // Calculate contribution from different UI systems
+    const contribution: Partial<VisualEffectState> = {};
+
+    // Shimmer contribution
+    if (this.uiEffectsConfig.shimmerEnabled && this.activityState.shimmer.intensity > 0) {
+      contribution.visualCoherence = this.activityState.activityLevel === "enhanced" ? 1.0 : 0.7;
+      contribution.systemHarmony = this.activityState.shimmer.intensity;
+      sources.push('shimmer');
+      confidence += 0.3;
+    }
+
+    // Audio-visual contribution
+    if (this.uiEffectsConfig.audioVisualEnabled && this.activityState.audioVisual.nebulaEffectIntensity > 0) {
+      contribution.effectDepth = this.activityState.audioVisual.nebulaEffectIntensity;
+      contribution.energyLevel = this.activityState.audioVisual.beatIntensity;
+      sources.push('audioVisual');
+      confidence += 0.4;
+    }
+
+    // Interaction contribution
+    if (this.activityState.interaction.isActive) {
+      const flowMagnitude = Math.sqrt(
+        this.activityState.interaction.scrollVelocity.x ** 2 +
+        this.activityState.interaction.scrollVelocity.y ** 2
+      );
+      if (flowMagnitude > 0) {
+        contribution.flowDirection = {
+          x: this.activityState.interaction.scrollVelocity.x / 100, // Normalize
+          y: this.activityState.interaction.scrollVelocity.y / 100
+        };
+        sources.push('interaction');
+        confidence += 0.2;
+      }
+    }
+
+    // Performance-based contribution
+    if (this.activityState.performance.healthStatus !== 'critical') {
+      sources.push('performance');
+      confidence += 0.1;
+    }
+
     return {
-      visualCoherence: this.consciousnessState.consciousnessLevel === "transcendent" ? 1.0 : 0.7,
-      systemHarmony: this.consciousnessState.shimmer.intensity,
-      effectDepth: this.consciousnessState.audioVisual.nebulaEffectIntensity
+      contribution,
+      confidence: Math.min(1, confidence), // Cap at 1.0
+      sources,
+      timestamp: performance.now()
     };
   }
 
@@ -1388,24 +1676,24 @@ export class ConsciousnessUIEffectsController
   private triggerIntensityEffects(intensity: number): void {
     // Boost shimmer effects based on intensity
     if (this.uiEffectsConfig.shimmerEnabled) {
-      this.consciousnessState.shimmer.intensity = Math.min(
-        this.consciousnessState.shimmer.intensity + (intensity * 0.3),
+      this.activityState.shimmer.intensity = Math.min(
+        this.activityState.shimmer.intensity + (intensity * 0.3),
         1.0
       );
     }
 
     // Boost audio-visual effects
     if (this.uiEffectsConfig.audioVisualEnabled) {
-      this.consciousnessState.audioVisual.nebulaEffectIntensity = Math.min(
-        this.consciousnessState.audioVisual.nebulaEffectIntensity + (intensity * 0.2),
+      this.activityState.audioVisual.nebulaEffectIntensity = Math.min(
+        this.activityState.audioVisual.nebulaEffectIntensity + (intensity * 0.2),
         1.0
       );
     }
 
     // Apply intensity to scroll effects
     if (this.uiEffectsConfig.scrollEffectsEnabled) {
-      this.consciousnessState.scroll.sheenIntensity = Math.min(
-        this.consciousnessState.scroll.sheenIntensity + (intensity * 0.1),
+      this.activityState.scroll.sheenIntensity = Math.min(
+        this.activityState.scroll.sheenIntensity + (intensity * 0.1),
         1.0
       );
     }
@@ -1414,23 +1702,23 @@ export class ConsciousnessUIEffectsController
   private updateTemperatureEffects(temperature: number): void {
     // Map temperature to UI effect characteristics
     const normalizedTemp = Math.max(1000, Math.min(10000, temperature));
-    
+
     // Update shimmer effect type based on temperature
     if (this.uiEffectsConfig.shimmerEnabled) {
       if (normalizedTemp < 3000) {
-        this.consciousnessState.shimmer.effectType = "prism"; // Cool colors
+        this.activityState.shimmer.effectType = "prism"; // Cool colors
       } else if (normalizedTemp > 7000) {
-        this.consciousnessState.shimmer.effectType = "oil-slick"; // Warm colors
+        this.activityState.shimmer.effectType = "oil-slick"; // Warm colors
       } else {
-        this.consciousnessState.shimmer.effectType = "rainbow"; // Neutral
+        this.activityState.shimmer.effectType = "rainbow"; // Neutral
       }
     }
 
     // Apply temperature influence to other effects
     const tempInfluence = (normalizedTemp - 1000) / 9000; // 0-1 scale
     if (this.uiEffectsConfig.audioVisualEnabled) {
-      this.consciousnessState.audioVisual.nebulaEffectIntensity = Math.min(
-        this.consciousnessState.audioVisual.nebulaEffectIntensity + (tempInfluence * 0.1),
+      this.activityState.audioVisual.nebulaEffectIntensity = Math.min(
+        this.activityState.audioVisual.nebulaEffectIntensity + (tempInfluence * 0.1),
         1.0
       );
     }
@@ -1440,18 +1728,18 @@ export class ConsciousnessUIEffectsController
     if (!this.uiEffectsConfig.shimmerEnabled) return;
 
     // Apply immediate shimmer boost
-    this.consciousnessState.shimmer.intensity = Math.min(
-      this.consciousnessState.shimmer.intensity + (intensity * 0.4),
+    this.activityState.shimmer.intensity = Math.min(
+      this.activityState.shimmer.intensity + (intensity * 0.4),
       1.0
     );
 
     // Temporarily switch to mixed effect for variety
-    const currentType = this.consciousnessState.shimmer.effectType;
-    this.consciousnessState.shimmer.effectType = "mixed";
+    const currentType = this.activityState.shimmer.effectType;
+    this.activityState.shimmer.effectType = "mixed";
 
     // Revert effect type after brief period
     setTimeout(() => {
-      this.consciousnessState.shimmer.effectType = currentType;
+      this.activityState.shimmer.effectType = currentType;
     }, 2000);
   }
 }

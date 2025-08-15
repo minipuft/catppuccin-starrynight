@@ -146,16 +146,16 @@
 // Apply to card elements that don't interfere with existing hover states
 [data-testid="card"]:not(.sn-performance-mode .sn-beat-responsive),
 .main-card-card:not(.sn-performance-mode .sn-beat-responsive) {
-  @extend .sn-beat-responsive--subtle;
+  @extend .sn-beat-responsive--subtle !optional;
 }
 
 // Apply to now playing area elements
 .main-nowPlayingWidget-nowPlaying:not(.sn-performance-mode .sn-beat-responsive) {
-  @extend .sn-beat-responsive--custom;
+  @extend .sn-beat-responsive--custom !optional;
 }
 
 // Apply glow to accent buttons when beat is active
 .main-playButton-PlayButton:not(.sn-performance-mode .sn-beat-responsive),
 .control-button:not(.sn-performance-mode .sn-beat-responsive) {
-  @extend .sn-beat-glow;
+  @extend .sn-beat-glow !optional;
 }

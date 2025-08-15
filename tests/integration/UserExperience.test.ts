@@ -8,10 +8,10 @@
  * Focus: Theme behavior, user interactions, visual quality
  */
 
-import { Year3000System } from '@/core/lifecycle/year3000System';
+import { AdvancedThemeSystem } from '@/core/lifecycle/AdvancedThemeSystem';
 import { MusicBeatSynchronizer } from '@/visual/music/MusicSyncVisualEffects';
 import { ColorHarmonyEngine } from '@/audio/ColorHarmonyEngine';
-import { YEAR3000_CONFIG } from '@/config/globalConfig';
+import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 
 // Mock Spicetify environment
 const mockSpicetify = {
@@ -43,7 +43,7 @@ const mockSpicetify = {
 (global as any).Spicetify = mockSpicetify;
 
 describe('User Experience Integration', () => {
-  let year3000System: Year3000System;
+  let advancedThemeSystem: AdvancedThemeSystem;
   let musicSyncSystem: MusicBeatSynchronizer;
   let colorHarmonyEngine: ColorHarmonyEngine;
 
@@ -67,15 +67,15 @@ describe('User Experience Integration', () => {
     `;
 
     // Initialize systems
-    year3000System = new Year3000System(YEAR3000_CONFIG);
-    musicSyncSystem = new MusicBeatSynchronizer(YEAR3000_CONFIG);
-    colorHarmonyEngine = new ColorHarmonyEngine(YEAR3000_CONFIG);
+    advancedThemeSystem = new AdvancedThemeSystem(ADVANCED_SYSTEM_CONFIG);
+    musicSyncSystem = new MusicBeatSynchronizer(ADVANCED_SYSTEM_CONFIG);
+    colorHarmonyEngine = new ColorHarmonyEngine(ADVANCED_SYSTEM_CONFIG);
   });
 
   afterEach(() => {
     // Cleanup
-    if (year3000System && year3000System.initialized) {
-      year3000System.destroy();
+    if (advancedThemeSystem && advancedThemeSystem.initialized) {
+      advancedThemeSystem.destroy();
     }
     if (musicSyncSystem && musicSyncSystem.initialized) {
       musicSyncSystem.destroy();
@@ -88,7 +88,7 @@ describe('User Experience Integration', () => {
 
   describe('Theme Integration', () => {
     it('should integrate with Spotify UI structure', async () => {
-      await year3000System.initialize();
+      await advancedThemeSystem.initialize();
       
       // Check that theme recognizes Spotify elements
       const mainView = document.querySelector('.Root__main-view');
@@ -101,7 +101,7 @@ describe('User Experience Integration', () => {
     });
 
     it('should apply visual effects to UI elements', async () => {
-      await year3000System.initialize();
+      await advancedThemeSystem.initialize();
       await musicSyncSystem.initialize();
       
       // Simulate music beat
@@ -217,7 +217,7 @@ describe('User Experience Integration', () => {
 
   describe('Performance Impact on User Experience', () => {
     it('should maintain 60fps during visual effects', async () => {
-      await year3000System.initialize();
+      await advancedThemeSystem.initialize();
       await musicSyncSystem.initialize();
       
       const frameTime = 16.67; // 60fps target
@@ -245,7 +245,7 @@ describe('User Experience Integration', () => {
     });
 
     it('should handle memory efficiently during extended use', async () => {
-      await year3000System.initialize();
+      await advancedThemeSystem.initialize();
       
       // Simulate extended use with many events
       for (let i = 0; i < 1000; i++) {
@@ -262,7 +262,7 @@ describe('User Experience Integration', () => {
       }
       
       // System should remain healthy
-      const healthCheck = await year3000System.healthCheck();
+      const healthCheck = await advancedThemeSystem.healthCheck();
       expect(healthCheck.healthy).toBeDefined();
     });
 
@@ -310,7 +310,7 @@ describe('User Experience Integration', () => {
     });
 
     it('should handle edge cases gracefully', async () => {
-      await year3000System.initialize();
+      await advancedThemeSystem.initialize();
       
       // Test edge cases
       const edgeCases = [
@@ -333,7 +333,7 @@ describe('User Experience Integration', () => {
     });
 
     it('should maintain visual consistency across different screen sizes', async () => {
-      await year3000System.initialize();
+      await advancedThemeSystem.initialize();
       
       // Test different viewport sizes
       const viewportSizes = [
@@ -353,7 +353,7 @@ describe('User Experience Integration', () => {
         await new Promise(resolve => setTimeout(resolve, 100));
         
         // System should adapt without errors
-        const healthCheck = await year3000System.healthCheck();
+        const healthCheck = await advancedThemeSystem.healthCheck();
         expect(healthCheck.healthy).toBeDefined();
       }
     });
@@ -388,9 +388,9 @@ describe('User Experience Integration', () => {
     it('should maintain theme functionality with animations disabled', async () => {
       // Simulate disabled animations
       const customConfig = {
-        ...YEAR3000_CONFIG,
+        ...ADVANCED_SYSTEM_CONFIG,
         visualEffects: {
-          ...YEAR3000_CONFIG.visualEffects,
+          ...ADVANCED_SYSTEM_CONFIG.visualEffects,
           enableAnimations: false
         }
       };

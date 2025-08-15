@@ -2,7 +2,7 @@
 // STARRYNIGHT SIDEBAR NAVIGATION - Enhanced Navigation Styling
 // ████████████████████████████████████████████████████████████████████████████████
 // TODO: Extract sidebar navigation styling from main file
-// TODO: Include quantum consciousness field effects
+// TODO: Include visual effects field coordination
 // TODO: Include temporal echo layer styling
 // TODO: Target file: src/layout/_sn_sidebar_navigation.scss
 
@@ -29,7 +29,7 @@
     transition: opacity var(--sn-nav-item-transition-duration) ease,
       background-color var(--sn-nav-item-transition-duration) ease,
       transform var(--sn-nav-item-transition-duration)
-        var(--sn-anim-easing-organic),
+        var(--sn-anim-easing-dynamic),
       box-shadow var(--sn-nav-item-transition-duration) ease;
     text-decoration: none;
     color: var(--spice-subtext, #b3b3b3); // Default text color

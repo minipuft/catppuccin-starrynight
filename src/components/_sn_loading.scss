@@ -543,13 +543,13 @@
 .main-trackList-trackListHeaderRow
   + .main-trackList-trackListRow:empty
   + .main-trackList-trackListRow:empty {
-  @extend .loading-state;
+  @extend .loading-state !optional;
 }
 
 // Loading state for network delays
 .main-gridContainer-gridContainer[data-testid*="loading"],
 .main-entityHeader-container[data-testid*="loading"] {
-  @extend .loading-state;
+  @extend .loading-state !optional;
 }
 
 // PHASE 4.3: Accessibility Enhancements

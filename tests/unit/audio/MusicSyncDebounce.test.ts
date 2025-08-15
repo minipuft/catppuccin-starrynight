@@ -33,10 +33,10 @@ describe('MusicSyncService Debouncing', () => {
     jest.useFakeTimers();
 
     musicSyncService = new MusicSyncService({
-      YEAR3000_CONFIG: { enableDebug: false } as any,
+      ADVANCED_SYSTEM_CONFIG: { enableDebug: false } as any,
       Year3000Utilities: {} as any,
       settingsManager: null,
-      year3000System: null,
+      advancedThemeSystem: null,
     });
 
     // Spy on the internal method to count actual processing calls

@@ -1,15 +1,15 @@
 /**
  * LivingGradientStrategy - ColorOrchestrator Strategy Implementation
  *
- * Transforms static backgrounds into organic consciousness foundations through
- * the strategy pattern. Handles breathing animations, WebGL coordination, and
+ * Transforms static backgrounds into dynamic visualEffects foundations through
+ * the strategy pattern. Handles animation animations, WebGL coordination, and
  * music-responsive gradient transformations.
  *
- * Philosophy: "The foundation itself becomes conscious - breathing with music,
+ * Philosophy: "The foundation itself becomes conscious - animation with music,
  * flowing with extracted colors, creating a living substrate for all visual systems."
  */
 
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
@@ -24,7 +24,7 @@ import {
   OKLABColorProcessor,
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 
 interface LivingBaseState {
@@ -32,7 +32,7 @@ interface LivingBaseState {
   currentBaseRgb: string;
   currentPrimaryHex: string;
   currentPrimaryRgb: string;
-  consciousnessIntensity: number;
+  visualEffectsIntensity: number;
   musicEnergy: number;
   lastUpdateTime: number;
   webglIntegrationActive: boolean;
@@ -42,14 +42,14 @@ interface LivingBaseState {
 interface LivingGradientConfig {
   baseTransformationEnabled: boolean;
   webglIntegrationEnabled: boolean;
-  breathingAnimationEnabled: boolean;
-  consciousnessLayerOpacity: number; // 0-1
-  organicFlowIntensity: number; // 0-2
+  animationAnimationEnabled: boolean;
+  visualEffectsLayerOpacity: number; // 0-1
+  dynamicFlowIntensity: number; // 0-2
   musicResponsiveness: number; // 0-2
   oklabInterpolationEnabled: boolean;
   oklabPreset: string; // OKLAB enhancement preset name
   gradientSmoothness: number; // 0-1, controls gradient transition smoothness
-  animationThrottleFps: number; // Target FPS for breathing animation (default: 30)
+  animationThrottleFps: number; // Target FPS for animation animation (default: 30)
   enablePerformanceBudget: boolean; // Enable 16ms frame budget enforcement
   maxFrameTimeMs: number; // Maximum allowed frame time in milliseconds
 }
@@ -62,14 +62,14 @@ export class LivingGradientStrategy
   private oklabProcessor: OKLABColorProcessor;
   private deviceDetector: DeviceCapabilityDetector;
   protected override utils = Utils;
-  protected override config = YEAR3000_CONFIG;
+  protected override config = ADVANCED_SYSTEM_CONFIG;
 
   private livingBaseState: LivingBaseState = {
     currentBaseHex: "#1e1e2e", // Catppuccin base
     currentBaseRgb: "30,30,46",
     currentPrimaryHex: "#cba6f7", // Default mauve
     currentPrimaryRgb: "203,166,247",
-    consciousnessIntensity: 0.5,
+    visualEffectsIntensity: 0.5,
     musicEnergy: 0.5,
     lastUpdateTime: 0,
     webglIntegrationActive: false,
@@ -79,14 +79,14 @@ export class LivingGradientStrategy
   private gradientConfig: LivingGradientConfig = {
     baseTransformationEnabled: true,
     webglIntegrationEnabled: true,
-    breathingAnimationEnabled: true,
-    consciousnessLayerOpacity: 0.08, // Subtle but visible
-    organicFlowIntensity: 1.2,
+    animationAnimationEnabled: true,
+    visualEffectsLayerOpacity: 0.08, // Subtle but visible
+    dynamicFlowIntensity: 1.2,
     musicResponsiveness: 1.0,
     oklabInterpolationEnabled: true,
     oklabPreset: "STANDARD", // Use standard OKLAB enhancement for gradients
     gradientSmoothness: 0.8, // High smoothness for natural transitions
-    animationThrottleFps: 30, // 30fps for smooth breathing while conserving performance
+    animationThrottleFps: 30, // 30fps for smooth animation while conserving performance
     enablePerformanceBudget: true, // Enable frame budget enforcement
     maxFrameTimeMs: 16, // 16ms budget for 60fps main thread responsiveness
   };
@@ -101,7 +101,7 @@ export class LivingGradientStrategy
   private lastCacheCleanup: number = 0;
 
   constructor(
-    config = YEAR3000_CONFIG,
+    config = ADVANCED_SYSTEM_CONFIG,
     utils = Utils,
     performanceMonitor: any = null,
     musicSyncService: any = null,
@@ -147,7 +147,7 @@ export class LivingGradientStrategy
     await super._performSystemSpecificInitialization();
 
     try {
-      // Setup consciousness event listeners
+      // Setup visualEffects event listeners
       this.setupConsciousnessListeners();
 
       // Setup WebGL integration listeners
@@ -156,10 +156,10 @@ export class LivingGradientStrategy
       // Initialize current base state
       this.initializeBaseState();
 
-      // Initialize CSS-first breathing consciousness (Year 3000 performance revolution)
+      // Initialize CSS-first animation visualEffects (Year 3000 performance revolution)
       this.initializeConsciousnessBreathing();
 
-      // Apply initial consciousness base gradient
+      // Apply initial visualEffects base gradient
       await this.applyLivingConsciousnessBase();
 
       Y3KDebug?.debug?.log(
@@ -176,7 +176,7 @@ export class LivingGradientStrategy
   }
 
   /**
-   * Setup listeners for consciousness and dynamic color changes
+   * Setup listeners for visualEffects and dynamic color changes
    * Phase 2: Migrated from DOM events to UnifiedEventBus for proper facade coordination
    */
   private setupConsciousnessListeners(): void {
@@ -202,9 +202,9 @@ export class LivingGradientStrategy
       }
     });
 
-    // Listen for consciousness intensity changes
+    // Listen for visualEffects intensity changes
     document.addEventListener(
-      "consciousness-intensity-change",
+      "visualEffects-intensity-change",
       (event: Event) => {
         const customEvent = event as CustomEvent;
         if (
@@ -268,7 +268,7 @@ export class LivingGradientStrategy
           this.livingBaseState.currentPrimaryRgb = `${primaryRgb.r},${primaryRgb.g},${primaryRgb.b}`;
         }
 
-        // Update living consciousness base and trigger CSS-first breathing
+        // Update living visualEffects base and trigger CSS-first animation
         this.updateLivingConsciousnessBase();
         this.triggerConsciousnessBreathing();
 
@@ -289,11 +289,11 @@ export class LivingGradientStrategy
       if (musicState.energy !== undefined) {
         this.livingBaseState.musicEnergy = musicState.energy;
 
-        // Update consciousness intensity based on music energy
+        // Update visualEffects intensity based on music energy
         const baseIntensity = 0.5;
         const energyBoost =
           musicState.energy * this.gradientConfig.musicResponsiveness;
-        this.livingBaseState.consciousnessIntensity = Math.max(
+        this.livingBaseState.visualEffectsIntensity = Math.max(
           0.1,
           Math.min(1.0, baseIntensity + energyBoost * 0.3)
         );
@@ -326,11 +326,11 @@ export class LivingGradientStrategy
   }
 
   /**
-   * Update consciousness intensity
+   * Update visualEffects intensity
    */
   private updateConsciousnessIntensity(intensity: number): void {
-    this.debouncedEventHandler("consciousnessIntensity", () => {
-      this.livingBaseState.consciousnessIntensity = Math.max(
+    this.debouncedEventHandler("visualEffectsIntensity", () => {
+      this.livingBaseState.visualEffectsIntensity = Math.max(
         0,
         Math.min(1, intensity)
       );
@@ -345,7 +345,7 @@ export class LivingGradientStrategy
     musicState: 0,
     harmonizedColors: 0,
     webglState: 0,
-    consciousnessIntensity: 0,
+    visualEffectsIntensity: 0,
   };
   private eventDebounceMs = 100;
 
@@ -364,43 +364,43 @@ export class LivingGradientStrategy
   }
 
   /**
-   * Initialize CSS-first consciousness breathing (Year 3000 performance revolution)
+   * Initialize CSS-first visualEffects animation (Year 3000 performance revolution)
    */
   private initializeConsciousnessBreathing(): void {
-    if (!this.gradientConfig.breathingAnimationEnabled) return;
+    if (!this.gradientConfig.animationAnimationEnabled) return;
     if (!this.cssAnimationManager) {
       Y3KDebug?.debug?.warn(
         "LivingGradientStrategy", 
-        "CSSAnimationManager not available, falling back to basic consciousness"
+        "CSSAnimationManager not available, falling back to basic visualEffects"
       );
       return;
     }
 
-    // Trigger initial breathing animation with current music state
+    // Trigger initial animation animation with current music state
     this.triggerConsciousnessBreathing();
     
     Y3KDebug?.debug?.log(
       "LivingGradientStrategy",
-      "CSS-first consciousness breathing initialized"
+      "CSS-first visualEffects animation initialized"
     );
   }
 
   /**
-   * Trigger consciousness breathing using CSSAnimationManager (Year 3000 CSS-first)
+   * Trigger visualEffects animation using CSSAnimationManager (Year 3000 CSS-first)
    */
   private triggerConsciousnessBreathing(): void {
-    if (!this.cssAnimationManager || !this.gradientConfig.breathingAnimationEnabled) return;
+    if (!this.cssAnimationManager || !this.gradientConfig.animationAnimationEnabled) return;
 
-    // Get elements for consciousness breathing
-    const consciousnessElements = document.querySelectorAll(
-      '.Root__main-view::before, .Root__main-view, [data-consciousness-breathing]'
+    // Get elements for visualEffects animation
+    const visualEffectsElements = document.querySelectorAll(
+      '.Root__main-view::before, .Root__main-view, [data-visualEffects-animation]'
     );
     
-    if (consciousnessElements.length === 0) {
+    if (visualEffectsElements.length === 0) {
       // Fallback: apply to main view if pseudo-elements aren't accessible
       const mainView = document.querySelector('.Root__main-view') || document.body;
       if (mainView) {
-        mainView.setAttribute('data-consciousness-breathing', 'true');
+        mainView.setAttribute('data-visualEffects-animation', 'true');
         this.cssAnimationManager.triggerConsciousnessBreathing(
           [mainView],
           this.livingBaseState.musicEnergy,
@@ -409,7 +409,7 @@ export class LivingGradientStrategy
       }
     } else {
       this.cssAnimationManager.triggerConsciousnessBreathing(
-        consciousnessElements,
+        visualEffectsElements,
         this.livingBaseState.musicEnergy,
         120 // Will be updated by music events
       );
@@ -417,7 +417,7 @@ export class LivingGradientStrategy
 
     Y3KDebug?.debug?.log(
       "LivingGradientStrategy",
-      `CSS-first consciousness breathing triggered for ${consciousnessElements.length} elements`
+      `CSS-first visualEffects animation triggered for ${visualEffectsElements.length} elements`
     );
   }
 
@@ -457,7 +457,7 @@ export class LivingGradientStrategy
         this.gradientConfig.animationThrottleFps = 30;
         this.gradientConfig.maxFrameTimeMs = 16;
         this.gradientConfig.enablePerformanceBudget = true;
-        // CSS-first breathing now handled by CSSAnimationManager
+        // CSS-first animation now handled by CSSAnimationManager
         break;
 
       case "medium":
@@ -465,7 +465,7 @@ export class LivingGradientStrategy
         this.gradientConfig.animationThrottleFps = 20;
         this.gradientConfig.maxFrameTimeMs = 20;
         this.gradientConfig.enablePerformanceBudget = true;
-        // CSS-first breathing now handled by CSSAnimationManager
+        // CSS-first animation now handled by CSSAnimationManager
         break;
 
       case "low":
@@ -473,10 +473,10 @@ export class LivingGradientStrategy
         this.gradientConfig.animationThrottleFps = 15;
         this.gradientConfig.maxFrameTimeMs = 33;
         this.gradientConfig.enablePerformanceBudget = true;
-        // CSS-first breathing now handled by CSSAnimationManager
+        // CSS-first animation now handled by CSSAnimationManager
         // Reduce visual effects for low-end devices
-        this.gradientConfig.consciousnessLayerOpacity *= 0.7;
-        this.gradientConfig.organicFlowIntensity *= 0.8;
+        this.gradientConfig.visualEffectsLayerOpacity *= 0.7;
+        this.gradientConfig.dynamicFlowIntensity *= 0.8;
         // Disable expensive OKLAB processing on low-end devices
         this.gradientConfig.oklabInterpolationEnabled = false;
         break;
@@ -504,12 +504,12 @@ export class LivingGradientStrategy
         this.gradientConfig.animationThrottleFps,
         15
       );
-      // CSS-first breathing coordination now handled by CSSAnimationManager
+      // CSS-first animation coordination now handled by CSSAnimationManager
     }
 
     // Respect user preference for reduced motion
     if (capabilities.display.reducedMotion) {
-      this.gradientConfig.breathingAnimationEnabled = false;
+      this.gradientConfig.animationAnimationEnabled = false;
       Y3KDebug?.debug?.log(
         "LivingGradientStrategy",
         "Breathing animation disabled due to reduced motion preference"
@@ -518,7 +518,7 @@ export class LivingGradientStrategy
 
     Y3KDebug?.debug?.log(
       "LivingGradientStrategy",
-      `Device-aware settings applied for ${overallTier}: ${this.gradientConfig.animationThrottleFps}fps, CSS-first breathing coordination`
+      `Device-aware settings applied for ${overallTier}: ${this.gradientConfig.animationThrottleFps}fps, CSS-first animation coordination`
     );
   }
 
@@ -630,10 +630,10 @@ export class LivingGradientStrategy
         oklabGradientStops
       );
 
-      // Create and apply living consciousness gradients with OKLAB enhancement
+      // Create and apply living visualEffects gradients with OKLAB enhancement
       await this.applyLivingConsciousnessBase();
 
-      // Trigger CSS-first consciousness breathing (Year 3000 performance revolution)
+      // Trigger CSS-first visualEffects animation (Year 3000 performance revolution)
       this.triggerConsciousnessBreathing();
 
       // Update WebGL integration variables
@@ -656,7 +656,7 @@ export class LivingGradientStrategy
           strategy: this.getStrategyName(),
           processingTime,
           cacheKey: `living-gradient-${context.trackUri}`,
-          harmonicIntensity: this.gradientConfig.organicFlowIntensity,
+          harmonicIntensity: this.gradientConfig.dynamicFlowIntensity,
           oklabInterpolation: this.gradientConfig.oklabInterpolationEnabled,
           oklabPreset: this.gradientConfig.oklabPreset,
           gradientStopCount: oklabGradientStops.length,
@@ -812,11 +812,11 @@ export class LivingGradientStrategy
     if (context.musicData?.energy !== undefined) {
       this.livingBaseState.musicEnergy = context.musicData.energy;
 
-      // Adjust consciousness intensity based on music energy
-      const baseIntensity = this.gradientConfig.consciousnessLayerOpacity;
+      // Adjust visualEffects intensity based on music energy
+      const baseIntensity = this.gradientConfig.visualEffectsLayerOpacity;
       const musicMultiplier =
         1 + context.musicData.energy * this.gradientConfig.musicResponsiveness;
-      this.livingBaseState.consciousnessIntensity = Math.max(
+      this.livingBaseState.visualEffectsIntensity = Math.max(
         0.05,
         Math.min(1.0, baseIntensity * musicMultiplier)
       );
@@ -826,54 +826,54 @@ export class LivingGradientStrategy
   }
 
   /**
-   * Apply living consciousness base gradient using coordinated updates
+   * Apply living visualEffects base gradient using coordinated updates
    */
   private async applyLivingConsciousnessBase(): Promise<void> {
-    // Create organic living gradient that enhances Catppuccin base with OKLAB smoothness
-    const consciousnessGradient = this.createLivingGradient(
+    // Create dynamic living gradient that enhances Catppuccin base with OKLAB smoothness
+    const visualEffectsGradient = this.createLivingGradient(
       this.livingBaseState.oklabGradientStops
     );
 
-    // Calculate dynamic values (CSS-first breathing replaces JavaScript breathing calculations)
+    // Calculate dynamic values (CSS-first animation replaces JavaScript animation calculations)
     const currentTime = performance.now();
-    const breathingPhase = (currentTime / 4000) * Math.PI * 2; // 4-second cycle for reference
-    const breathingMultiplier =
-      1 + Math.sin(breathingPhase) * 0.2;
+    const animationPhase = (currentTime / 4000) * Math.PI * 2; // 4-second cycle for reference
+    const animationMultiplier =
+      1 + Math.sin(animationPhase) * 0.2;
     const finalOpacity =
-      this.livingBaseState.consciousnessIntensity * breathingMultiplier;
+      this.livingBaseState.visualEffectsIntensity * animationMultiplier;
 
     const flowX =
-      Math.sin(breathingPhase * 0.7) *
-      this.gradientConfig.organicFlowIntensity;
+      Math.sin(animationPhase * 0.7) *
+      this.gradientConfig.dynamicFlowIntensity;
     const flowY =
-      Math.cos(breathingPhase * 0.5) *
-      this.gradientConfig.organicFlowIntensity;
+      Math.cos(animationPhase * 0.5) *
+      this.gradientConfig.dynamicFlowIntensity;
 
     const baseDuration = 4000; // 4 seconds
     const energyMultiplier = 0.5 + this.livingBaseState.musicEnergy * 1.5; // 0.5x to 2x speed
-    const breathingDuration = baseDuration / energyMultiplier;
+    const animationDuration = baseDuration / energyMultiplier;
 
     // Build coordinated variable updates
-    const consciousnessBaseVariables: Record<string, string> = {
-      "--living-base-gradient": consciousnessGradient,
-      "--consciousness-base-gradient": consciousnessGradient,
-      "--consciousness-layer-opacity": finalOpacity.toString(),
-      "--consciousness-flow-x": `${flowX}%`,
-      "--consciousness-flow-y": `${flowY}%`,
-      "--consciousness-breathing-duration": `${breathingDuration}ms`,
+    const visualEffectsBaseVariables: Record<string, string> = {
+      "--living-base-gradient": visualEffectsGradient,
+      "--visualEffects-base-gradient": visualEffectsGradient,
+      "--visualEffects-layer-opacity": finalOpacity.toString(),
+      "--visualEffects-flow-x": `${flowX}%`,
+      "--visualEffects-flow-y": `${flowY}%`,
+      "--visualEffects-animation-duration": `${animationDuration}ms`,
     };
 
-    // Apply all consciousness variables in a coordinated batch
+    // Apply all visualEffects variables in a coordinated batch
     await this.cssController.batchSetVariables(
       "LivingGradientStrategy",
-      consciousnessBaseVariables,
-      "high", // High priority for consciousness animations
-      "living-consciousness-base"
+      visualEffectsBaseVariables,
+      "high", // High priority for visualEffects animations
+      "living-visualEffects-base"
     );
 
     Y3KDebug?.debug?.log(
       "LivingGradientStrategy",
-      "Applied coordinated living consciousness base gradient"
+      "Applied coordinated living visualEffects base gradient"
     );
   }
 
@@ -884,13 +884,13 @@ export class LivingGradientStrategy
     primaryRgb: string,
     baseRgb: string,
     oklabGradientStops: OKLABProcessingResult[],
-    breathingPhase: number
+    animationPhase: number
   ): string {
     const stopKey = oklabGradientStops
       .map((stop, index) => `${stop.enhancedHex}-${index}`)
       .join("|");
     return `${primaryRgb}-${baseRgb}-${stopKey}-${Math.floor(
-      breathingPhase * 10
+      animationPhase * 10
     )}`;
   }
 
@@ -926,14 +926,14 @@ export class LivingGradientStrategy
     const baseRgb = this.livingBaseState.currentBaseRgb;
 
     // Check cache first for performance optimization
-    // Use current time-based breathing phase for cache key consistency  
+    // Use current time-based animation phase for cache key consistency  
     const currentTime = performance.now();
-    const breathingPhase = (currentTime / 4000) * Math.PI * 2; // 4-second cycle
+    const animationPhase = (currentTime / 4000) * Math.PI * 2; // 4-second cycle
     const cacheKey = this.createGradientCacheKey(
       primaryRgb,
       baseRgb,
       oklabGradientStops,
-      breathingPhase
+      animationPhase
     );
 
     const cachedGradient = this.gradientCache.get(cacheKey);
@@ -975,13 +975,13 @@ export class LivingGradientStrategy
           const percentage = (index / (oklabGradientStops.length - 1)) * 100;
           const rgb = `${stop.enhancedRgb.r},${stop.enhancedRgb.g},${stop.enhancedRgb.b}`;
           const opacity = 0.6 * (1 - index / oklabGradientStops.length) + 0.1; // Fade from 0.6 to 0.1
-          return `rgba(${rgb}, calc(var(--consciousness-layer-opacity) * ${opacity})) ${percentage}%`;
+          return `rgba(${rgb}, calc(var(--visualEffects-layer-opacity) * ${opacity})) ${percentage}%`;
         })
         .join(", ");
 
       return `
         radial-gradient(
-          ellipse at calc(50% + var(--consciousness-flow-x)) calc(50% + var(--consciousness-flow-y)),
+          ellipse at calc(50% + var(--visualEffects-flow-x)) calc(50% + var(--visualEffects-flow-y)),
           ${gradientStops}
         ),
         linear-gradient(
@@ -992,7 +992,7 @@ export class LivingGradientStrategy
         oklabGradientStops[0]?.enhancedRgb.g || primaryRgb.split(",")[1]
       },${
         oklabGradientStops[0]?.enhancedRgb.b || primaryRgb.split(",")[2]
-      }, calc(var(--consciousness-layer-opacity) * 0.4)) 0%,
+      }, calc(var(--visualEffects-layer-opacity) * 0.4)) 0%,
           var(--spice-base) 50%,
           rgba(${
             oklabGradientStops[oklabGradientStops.length - 1]?.enhancedRgb.r ||
@@ -1003,7 +1003,7 @@ export class LivingGradientStrategy
       },${
         oklabGradientStops[oklabGradientStops.length - 1]?.enhancedRgb.b ||
         primaryRgb.split(",")[2]
-      }, calc(var(--consciousness-layer-opacity) * 0.2)) 100%
+      }, calc(var(--visualEffects-layer-opacity) * 0.2)) 100%
         ),
         var(--spice-base)
       `;
@@ -1012,40 +1012,40 @@ export class LivingGradientStrategy
     // Fallback to standard gradient for backward compatibility
     return `
       radial-gradient(
-        ellipse at calc(50% + var(--consciousness-flow-x)) calc(50% + var(--consciousness-flow-y)),
-        rgba(${primaryRgb}, calc(var(--consciousness-layer-opacity) * 0.6)) 0%,
-        rgba(${primaryRgb}, calc(var(--consciousness-layer-opacity) * 0.3)) 30%,
-        rgba(${baseRgb}, calc(var(--consciousness-layer-opacity) * 0.1)) 60%,
+        ellipse at calc(50% + var(--visualEffects-flow-x)) calc(50% + var(--visualEffects-flow-y)),
+        rgba(${primaryRgb}, calc(var(--visualEffects-layer-opacity) * 0.6)) 0%,
+        rgba(${primaryRgb}, calc(var(--visualEffects-layer-opacity) * 0.3)) 30%,
+        rgba(${baseRgb}, calc(var(--visualEffects-layer-opacity) * 0.1)) 60%,
         var(--spice-base) 100%
       ),
       linear-gradient(
         135deg,
-        rgba(${primaryRgb}, calc(var(--consciousness-layer-opacity) * 0.4)) 0%,
+        rgba(${primaryRgb}, calc(var(--visualEffects-layer-opacity) * 0.4)) 0%,
         var(--spice-base) 50%,
-        rgba(${primaryRgb}, calc(var(--consciousness-layer-opacity) * 0.2)) 100%
+        rgba(${primaryRgb}, calc(var(--visualEffects-layer-opacity) * 0.2)) 100%
       ),
       var(--spice-base)
     `;
   }
 
   /**
-   * Update breathing animation (Year 3000 CSS-first approach)
+   * Update animation animation (Year 3000 CSS-first approach)
    */
   private updateBreathingAnimation(): void {
-    // Replaced with CSS-first consciousness breathing via CSSAnimationManager
+    // Replaced with CSS-first visualEffects animation via CSSAnimationManager
     this.triggerConsciousnessBreathing();
   }
 
   /**
-   * Start breathing animation (Year 3000 CSS-first approach)
+   * Start animation animation (Year 3000 CSS-first approach)
    */
   private startBreathingAnimation(): void {
-    // Year 3000 performance revolution: Replaced JavaScript RAF loop with CSS-first breathing
+    // Year 3000 performance revolution: Replaced JavaScript RAF loop with CSS-first animation
     this.triggerConsciousnessBreathing();
     
     Y3KDebug?.debug?.log(
       "LivingGradientStrategy",
-      "CSS-first consciousness breathing started - 90%+ JavaScript overhead eliminated"
+      "CSS-first visualEffects animation started - 90%+ JavaScript overhead eliminated"
     );
   }
 
@@ -1057,7 +1057,7 @@ export class LivingGradientStrategy
     // No more JavaScript debouncing needed - CSS keyframes manage their own timing
     Y3KDebug?.debug?.log(
       "LivingGradientStrategy", 
-      "Debounced CSS updates eliminated - using CSS-first breathing"
+      "Debounced CSS updates eliminated - using CSS-first animation"
     );
   }
 
@@ -1071,8 +1071,8 @@ export class LivingGradientStrategy
     const webglIntegrationVariables: Record<string, string> = {
       "--sn-bg-gradient-primary-rgb": this.livingBaseState.currentPrimaryRgb,
       "--sn-webgl-living-gradient-sync": "1",
-      "--sn-gradient-consciousness-level":
-        this.livingBaseState.consciousnessIntensity.toString(),
+      "--sn-gradient-visualEffects-level":
+        this.livingBaseState.visualEffectsIntensity.toString(),
     };
 
     // Apply WebGL coordination variables
@@ -1096,13 +1096,13 @@ export class LivingGradientStrategy
   }
 
   /**
-   * Update living consciousness base when colors change
+   * Update living visualEffects base when colors change
    */
   private updateLivingConsciousnessBase(): void {
     this.applyLivingConsciousnessBase().catch((error) => {
       Y3KDebug?.debug?.error(
         "LivingGradientStrategy",
-        "Failed to update living consciousness base:",
+        "Failed to update living visualEffects base:",
         error
       );
     });
@@ -1112,7 +1112,7 @@ export class LivingGradientStrategy
       detail: {
         baseHex: this.livingBaseState.currentBaseHex,
         primaryHex: this.livingBaseState.currentPrimaryHex,
-        consciousnessIntensity: this.livingBaseState.consciousnessIntensity,
+        visualEffectsIntensity: this.livingBaseState.visualEffectsIntensity,
         timestamp: Date.now(),
       },
     });
@@ -1124,10 +1124,10 @@ export class LivingGradientStrategy
    */
   private updateMusicResponsiveVariables(): void {
     const musicResponsiveVariables: Record<string, string> = {
-      "--consciousness-music-energy":
+      "--visualEffects-music-energy":
         this.livingBaseState.musicEnergy.toString(),
-      "--consciousness-music-intensity":
-        this.livingBaseState.consciousnessIntensity.toString(),
+      "--visualEffects-music-intensity":
+        this.livingBaseState.visualEffectsIntensity.toString(),
     };
 
     this.cssController
@@ -1147,29 +1147,29 @@ export class LivingGradientStrategy
   }
 
   /**
-   * Update consciousness variables
+   * Update visualEffects variables
    */
   private updateConsciousnessVariables(): void {
-    const consciousnessVariables: Record<string, string> = {
-      "--consciousness-intensity-global":
-        this.livingBaseState.consciousnessIntensity.toString(),
-      "--consciousness-layer-opacity": (
-        this.gradientConfig.consciousnessLayerOpacity *
-        this.livingBaseState.consciousnessIntensity
+    const visualEffectsVariables: Record<string, string> = {
+      "--visualEffects-intensity-global":
+        this.livingBaseState.visualEffectsIntensity.toString(),
+      "--visualEffects-layer-opacity": (
+        this.gradientConfig.visualEffectsLayerOpacity *
+        this.livingBaseState.visualEffectsIntensity
       ).toString(),
     };
 
     this.cssController
       .batchSetVariables(
         "LivingGradientStrategy",
-        consciousnessVariables,
+        visualEffectsVariables,
         3 as any, // medium priority
-        "consciousness-vars"
+        "visualEffects-vars"
       )
       .catch((error) => {
         Y3KDebug?.debug?.error(
           "LivingGradientStrategy",
-          "Failed to update consciousness variables:",
+          "Failed to update visualEffects variables:",
           error
         );
       });
@@ -1182,13 +1182,13 @@ export class LivingGradientStrategy
     const webglCoordinationVariables: Record<string, string> = webglEnabled
       ? {
           // Reduce CSS layer opacity to allow WebGL to dominate
-          "--consciousness-webgl-coordination": "0.7",
-          "--consciousness-css-fallback": "0.3",
+          "--visualEffects-webgl-coordination": "0.7",
+          "--visualEffects-css-fallback": "0.3",
         }
       : {
-          // Full CSS consciousness when WebGL is disabled
-          "--consciousness-webgl-coordination": "0",
-          "--consciousness-css-fallback": "1.0",
+          // Full CSS visualEffects when WebGL is disabled
+          "--visualEffects-webgl-coordination": "0",
+          "--visualEffects-css-fallback": "1.0",
         };
 
     this.cssController
@@ -1218,7 +1218,7 @@ export class LivingGradientStrategy
   private coordinateWithWebGLGradient(webglData: any): void {
     if (!this.gradientConfig.webglIntegrationEnabled) return;
 
-    // Update consciousness variables to match WebGL state
+    // Update visualEffects variables to match WebGL state
     if (webglData.flowState) {
       this.updateFlowStateFromWebGL(webglData.flowState);
     }
@@ -1235,13 +1235,13 @@ export class LivingGradientStrategy
     const flowVariables: Record<string, string> = {};
 
     if (flowState.flowX !== undefined) {
-      flowVariables["--consciousness-webgl-flow-x"] = `${flowState.flowX}%`;
+      flowVariables["--visualEffects-webgl-flow-x"] = `${flowState.flowX}%`;
     }
     if (flowState.flowY !== undefined) {
-      flowVariables["--consciousness-webgl-flow-y"] = `${flowState.flowY}%`;
+      flowVariables["--visualEffects-webgl-flow-y"] = `${flowState.flowY}%`;
     }
     if (flowState.flowScale !== undefined) {
-      flowVariables["--consciousness-webgl-scale"] =
+      flowVariables["--visualEffects-webgl-scale"] =
         flowState.flowScale.toString();
     }
 
@@ -1267,7 +1267,7 @@ export class LivingGradientStrategy
    * Update color state from WebGL system
    */
   private updateColorStateFromWebGL(colorState: any): void {
-    // Sync color variables with WebGL for unified consciousness
+    // Sync color variables with WebGL for unified visualEffects
     if (colorState.primaryColor) {
       // WebGL may have processed colors differently, sync them
       this.livingBaseState.currentPrimaryRgb = colorState.primaryColor;
@@ -1314,13 +1314,13 @@ export class LivingGradientStrategy
       metrics: {
         baseTransformationEnabled:
           this.gradientConfig.baseTransformationEnabled,
-        breathingAnimationEnabled:
-          this.gradientConfig.breathingAnimationEnabled,
+        animationAnimationEnabled:
+          this.gradientConfig.animationAnimationEnabled,
         webglIntegrationActive: this.livingBaseState.webglIntegrationActive,
-        consciousnessIntensity: this.livingBaseState.consciousnessIntensity,
+        visualEffectsIntensity: this.livingBaseState.visualEffectsIntensity,
         musicEnergy: this.livingBaseState.musicEnergy,
         hasRecentUpdate,
-        cssFirstBreathing: true, // CSS-first breathing replaces JavaScript animation
+        cssFirstBreathing: true, // CSS-first animation replaces JavaScript animation
         oklabInterpolation: this.gradientConfig.oklabInterpolationEnabled,
         oklabPreset: this.gradientConfig.oklabPreset,
         gradientSmoothness: this.gradientConfig.gradientSmoothness,
@@ -1333,7 +1333,7 @@ export class LivingGradientStrategy
    * Override destroy method to include both strategy and visual system cleanup
    */
   public override destroy(): void {
-    // Year 3000 CSS-first cleanup: Stop consciousness breathing via CSSAnimationManager
+    // Year 3000 CSS-first cleanup: Stop visualEffects animation via CSSAnimationManager
     if (this.cssAnimationManager) {
       this.cssAnimationManager.stopConsciousnessBreathing();
     }
@@ -1357,7 +1357,7 @@ export class LivingGradientStrategy
   public override _performSystemSpecificCleanup(): void {
     super._performSystemSpecificCleanup();
 
-    // CSS-first breathing cleanup (no JavaScript animation frame to cancel)
+    // CSS-first animation cleanup (no JavaScript animation frame to cancel)
     // Breathing animations are now handled entirely by CSS keyframes
 
     Y3KDebug?.debug?.log(
@@ -1389,7 +1389,7 @@ export class LivingGradientStrategy
   }
 
   /**
-   * Stop breathing animation (Year 3000 CSS-first approach)
+   * Stop animation animation (Year 3000 CSS-first approach)
    */
   public stopBreathingAnimation(): void {
     // Year 3000 performance revolution: Delegate to CSSAnimationManager
@@ -1399,7 +1399,7 @@ export class LivingGradientStrategy
 
     Y3KDebug?.debug?.log(
       "LivingGradientStrategy",
-      "CSS-first consciousness breathing stopped"
+      "CSS-first visualEffects animation stopped"
     );
   }
 }

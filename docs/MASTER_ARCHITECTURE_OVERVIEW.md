@@ -12,7 +12,7 @@ Catppuccin StarryNight is not just a Spicetify theme—it's a sophisticated **vi
 ## 🎯 Architectural Philosophy
 
 ### Year 3000 System Vision
-> *"In the Year 3000, interfaces are not built—they are grown. Every pixel breathes with cellular life, every interaction morphs like liquid consciousness, and every visual element dances to the emotional temperature of the moment."*
+> *"In the Year 3000, interfaces are not built—they are grown. Every pixel pulses with visual life, every interaction flows like smooth dynamics, and every visual element dances to the musical temperature of the moment."*
 
 ### Core Principles
 1. **🎭 Visual Effects Coordination** - Unified state management for background visual systems
@@ -28,7 +28,7 @@ Catppuccin StarryNight is not just a Spicetify theme—it's a sophisticated **vi
 ### Layer 1: Central Orchestration
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        Year3000System                           │
+│                      AdvancedThemeSystem                       │
 │                   (Central Orchestrator)                       │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │                SystemCoordinator                        │   │
@@ -55,7 +55,7 @@ Catppuccin StarryNight is not just a Spicetify theme—it's a sophisticated **vi
 ### Layer 3: Shared Dependencies
 ```
 ┌─────────────────── Shared Core Systems ──────────────────────┐
-│ PerformanceAnalyzer • OptimizedUnifiedCSSConsciousnessController │
+│ PerformanceAnalyzer • OptimizedUnifiedCSSController │
 │ SettingsManager • ColorHarmonyEngine • DeviceCapabilityDetector │
 │ MusicSyncService • TimerConsolidationSystem                    │
 └───────────────────────────────────────────────────────────────┘
@@ -67,7 +67,7 @@ Catppuccin StarryNight is not just a Spicetify theme—it's a sophisticated **vi
 │ • IManagedSystem Interface      │  │ • Modular Architecture    │
 │ • UnifiedSystemBase Pattern     │  │ • CSS Variable System     │
 │ • Factory Pattern Implementation│  │ • Catppuccin Integration  │
-│ • Dependency Injection          │  │ • Organic Consciousness   │
+│ • Dependency Injection          │  │ • Smooth Visual Effects   │
 └─────────────────────────────────┘  └───────────────────────────┘
 ```
 
@@ -78,13 +78,13 @@ Catppuccin StarryNight is not just a Spicetify theme—it's a sophisticated **vi
 ### Primary Data Flow
 ```mermaid
 graph TD
-    A[Spicetify APIs] --> B[Year3000System]
+    A[Spicetify APIs] --> B[AdvancedThemeSystem]
     B --> C[SystemCoordinator]
     C --> D[VisualSystemFacade]
     C --> E[NonVisualSystemFacade]
     
     F[Music Events] --> G[MusicSyncService]
-    G --> H[OrganicConsciousness]
+    G --> H[VisualEffectsCoordination]
     H --> I[Visual Effects]
     
     J[User Interactions] --> K[InteractionTracking]
@@ -117,7 +117,7 @@ The **Project Status** (`plans/project-status.md`) coordinates multiple AI agent
 
 #### Agent Specializations
 1. **🎨 Visual Systems** (30% brain cycles)
-   - Organic consciousness effects
+   - Visual effects processing
    - Beat synchronization
    - Color harmony processing
 
@@ -134,7 +134,7 @@ The **Project Status** (`plans/project-status.md`) coordinates multiple AI agent
 4. **🎵 Music Integration** (15% brain cycles)
    - Spicetify API integration
    - Audio analysis
-   - Emotional temperature mapping
+   - Color temperature mapping
 
 5. **🎭 Theme Customization** (10% brain cycles)
    - Catppuccin compliance
@@ -144,23 +144,23 @@ The **Project Status** (`plans/project-status.md`) coordinates multiple AI agent
 ### Coordination Protocols
 - **Real-time Status Monitoring** - Live coordination dashboard
 - **Resource Allocation** - Dynamic brain cycle distribution
-- **Cross-Tentacle Communication** - Standardized communication templates
+- **Cross-Agent Communication** - Standardized communication templates
 - **Conflict Detection** - Automatic resource conflict resolution
 - **Performance Monitoring** - <0.5% CPU overhead for coordination
 
 ---
 
-## 🎨 Organic Consciousness Architecture
+## 🎨 Visual Effects Architecture
 
-### Biological Systems
+### Visual Processing Systems
 ```
-┌─── BiologicalConsciousnessManager ───┐
-│ ┌─ CellularMembrane ─┐ ┌─ Breathing ─┐│
+┌─── VisualEffectsManager ─────────────┐
+│ ┌─ SurfaceControl ───┐ ┌─ Pulsing ───┐│
 │ │ • Growth Patterns  │ │ • Rhythm     ││
-│ │ • Membrane Fluidity│ │ • Sync       ││
-│ │ • Living Boundaries│ │ • Meditation ││
+│ │ • Surface Fluidity │ │ • Sync       ││
+│ │ • Dynamic Surfaces │ │ • Animation  ││
 │ └───────────────────┘ └─────────────┘│
-│ ┌─ EmotionalTemperature ─┐            │
+│ ┌─ ColorTemperature ─────┐            │
 │ │ • 1000K-20000K Range   │            │
 │ │ • OKLAB Processing     │            │
 │ │ • Catppuccin Harmony   │            │
@@ -168,12 +168,12 @@ The **Project Status** (`plans/project-status.md`) coordinates multiple AI agent
 └─────────────────────────────────────┘
 ```
 
-### Consciousness Principles
-- **🌱 Cellular Growth** - Interface elements expand/contract like living tissue
-- **💧 Membrane Fluidity** - Boundaries flow like liquid consciousness
-- **💓 Breathing Rhythms** - Gentle pulsing synchronized with music tempo
-- **🌡️ Emotional Temperature** - Colors shift based on music mood (1000K-20000K)
-- **🤝 Symbiotic Listening** - System experiences music *with* you, not just for you
+### Visual Design Principles
+- **🌱 Animation Scaling** - Interface elements expand/contract with musical dynamics
+- **💧 Surface Fluidity** - Boundaries flow with smooth visual transitions
+- **💓 Pulsing Rhythms** - Smooth pulsing synchronized with music tempo
+- **🌡️ Color Temperature** - Colors shift based on music mood (1000K-20000K)
+- **🤝 Musical Synchronization** - System visualizes music *with* you, creating shared experiences
 
 ---
 
@@ -196,11 +196,11 @@ targets:
 1. **DeviceCapabilityDetector** - Automatic hardware assessment
 2. **PerformanceAnalyzer** - Real-time performance monitoring
 3. **AdaptivePerformanceSystem** - Dynamic quality scaling
-4. **OptimizedUnifiedCSSConsciousnessController** - Unified CSS variable management with priority queues and adaptive throttling (Phase 2.6 Consolidation)
+4. **OptimizedUnifiedCSSVisualController** - Unified CSS variable management with priority queues and adaptive throttling (Phase 2.6 Consolidation)
 5. **TimerConsolidationSystem** - Consolidated animation timing
 
 ### Progressive Degradation
-- **High-end devices** - Full consciousness effects, WebGL backgrounds
+- **High-end devices** - Full visual effects, WebGL backgrounds
 - **Mid-range devices** - Reduced particle counts, CSS-only animations
 - **Low-end devices** - Essential effects only, static backgrounds
 - **Battery mode** - Minimal animations, aggressive optimization
@@ -214,15 +214,15 @@ targets:
 interface ColorValue {
   rgb: RGB;           // Standard RGB values
   oklab: OKLAB;       // Perceptually uniform color space
-  temperature: number; // Emotional temperature (1000K-20000K)
-  consciousness: number; // Organic consciousness level (0-1)
+  temperature: number; // Color temperature (1000K-20000K)
+  intensity: number;  // Visual intensity level (0-1)
 }
 ```
 
 ### Color Harmony Integration
 - **Catppuccin Preservation** - Maintains beloved Catppuccin aesthetics
 - **Dynamic Enhancement** - Album art colors blended with Catppuccin base
-- **Emotional Mapping** - Music emotion → color temperature → OKLAB processing
+- **Musical Mapping** - Music emotion → color temperature → OKLAB processing
 - **Perceptual Uniformity** - Smooth, natural color transitions
 
 ---
@@ -254,7 +254,7 @@ scss_architecture:
     - features/: Visual effects
     - components/: UI components
     - layout/: Layout systems
-    - visual/organic-consciousness/: Organic systems
+    - visual/visual-effects/: Visual effects systems
 ```
 
 ### Testing Strategy
@@ -281,7 +281,7 @@ interface SpicetifyIntegration {
   };
   React: ComponentLibrary;
   colorExtractor: AlbumArtAnalysis;
-  // Color harmony and consciousness
+  // Color harmony and visual effects
 }
 ```
 
@@ -298,12 +298,12 @@ interface SpicetifyIntegration {
 ```
 src-js/
 ├── core/                    # Core system architecture
-│   ├── lifecycle/           # Year3000System orchestration
+│   ├── lifecycle/           # AdvancedThemeSystem orchestration
 │   ├── integration/         # Facade patterns and coordination
 │   ├── performance/         # Performance optimization systems
 │   └── interfaces/          # System interfaces and contracts
 ├── visual/                  # Visual system implementations
-│   ├── organic-consciousness/  # Biological-inspired systems
+│   ├── effects/             # Visual effects coordination systems
 │   ├── backgrounds/         # Background visual effects
 │   └── ui-effects/          # UI enhancement systems
 ├── audio/                   # Music integration and analysis
@@ -312,7 +312,7 @@ src-js/
 
 src/                         # SCSS styling architecture
 ├── core/                    # Foundational styling systems
-├── visual/organic-consciousness/  # Organic consciousness styles
+├── visual/visual-effects/   # Visual effects styles
 ├── features/                # Visual effect implementations
 └── components/              # UI component styles
 ```
@@ -373,14 +373,14 @@ Event-driven communication through **EventBus** and cross-facade coordination.
 ## 🔮 Future Evolution
 
 ### Planned Enhancements
-- **WebGL Consciousness** - Advanced GPU-accelerated visual effects
-- **Machine Learning Integration** - Predictive behavior and adaptive consciousness
+- **WebGL Visual Effects** - Advanced GPU-accelerated visual processing
+- **Machine Learning Integration** - Predictive behavior and adaptive visual systems
 - **Extended OKLAB Processing** - Advanced color science features
 - **Cross-Platform Support** - Beyond Spotify integration
-- **Community Consciousness** - Shared visual experiences
+- **Community Visual Sharing** - Shared visual experiences
 
 ### Architectural Roadmap
-- **Phase 5** - Advanced consciousness systems
+- **Phase 5** - Advanced visual systems
 - **Phase 6** - Machine learning integration
 - **Phase 7** - Extended platform support
 - **Phase 8** - Community features
@@ -391,7 +391,7 @@ Event-driven communication through **EventBus** and cross-facade coordination.
 
 - **[Year 3000 System Guide](./YEAR3000_SYSTEM_GUIDE.md)** - Central orchestrator details
 - **[Facade Pattern Documentation](./FACADE_PATTERN_GUIDE.md)** - Facade architecture deep-dive
-- **[Organic Consciousness Guide](./ORGANIC_CONSCIOUSNESS_GUIDE.md)** - Biological systems overview
+- **[Visual Effects Guide](./VISUAL_EFFECTS_GUIDE.md)** - Visual systems overview
 - **[Performance Architecture](./PERFORMANCE_ARCHITECTURE.md)** - Optimization systems
 - **[Multi-Agent Workbench](./MULTI_AGENT_WORKBENCH.md)** - Tentacle coordination
 - **[Development Workflow](./DEVELOPMENT_WORKFLOW.md)** - Developer guide
@@ -399,10 +399,12 @@ Event-driven communication through **EventBus** and cross-facade coordination.
 
 ---
 
-**Last Updated**: 2025-08-04  
-**Architecture Version**: 4.1 (Phase 2.6 CSS Consolidation Complete)  
-**Documentation Status**: Master Overview Complete - CSS Systems Unified  
-**Next Review**: Phase 5 Implementation  
+**Last Updated**: 2025-08-13  
+**Architecture Version**: 5.0 (Phase 5 Documentation Modernization Complete)  
+**Documentation Status**: Master Overview Modernized - Visual Effects Terminology  
+**Next Review**: Performance Validation  
 
 ### Recent Updates
-- **Phase 2.6 CSS Consolidation** ✅ Complete - Unified three CSS variable systems into OptimizedUnifiedCSSConsciousnessController
+- **Phase 5 Documentation** ✅ Complete - Updated all terminology from metaphorical to technical language
+- **Interface Modernization** ✅ Complete - VisualEffectsCoordinator terminology standardized
+- **CSS Integration** ✅ Complete - All CSS variables aligned with modern terminology

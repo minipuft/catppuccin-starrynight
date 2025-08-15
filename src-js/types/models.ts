@@ -1,11 +1,11 @@
 // ===================================================================
-// 🎯 YEAR 3000 SHARED TYPE DEFINITIONS
+// 🎯 ADVANCED SYSTEM SHARED TYPE DEFINITIONS
 // ===================================================================
-// Centralized type definitions for the Year 3000 system.
+// Centralized type definitions for the Advanced system architecture.
 // All shared interfaces and types used across multiple modules.
 
-// Represents the structure for a single harmonic rule.
-export interface HarmonicMode {
+// Represents the structure for a single color harmony rule.
+export interface ColorHarmonyMode {
   rule:
     | "analogous"
     | "triadic"
@@ -17,10 +17,22 @@ export interface HarmonicMode {
   description: string;
 }
 
-// A map of all available harmonic modes.
-export interface HarmonicModes {
-  [key: string]: HarmonicMode;
+// A map of all available color harmony modes.
+export interface ColorHarmonyModes {
+  [key: string]: ColorHarmonyMode;
 }
+
+/**
+ * @deprecated Use ColorHarmonyMode instead
+ * @since v1.0.0
+ */
+export type HarmonicMode = ColorHarmonyMode;
+
+/**
+ * @deprecated Use ColorHarmonyModes instead
+ * @since v1.0.0
+ */
+export type HarmonicModes = ColorHarmonyModes;
 
 // Defines the performance profile for an artistic mode.
 export interface PerformanceProfile {
@@ -33,16 +45,22 @@ export interface PerformanceProfile {
 // Defines the feature set for an artistic mode.
 export interface FeatureProfile {
   rippleEffects: boolean;
-  temporalEcho: boolean;
+  timeBasedEcho?: boolean;
   particleStreams: boolean;
   predictiveHighlights: boolean;
   glassEffects: boolean;
   beatSync: boolean;
   colorHarmony: boolean;
-  aestheticGravity: boolean;
-  temporalPlay?: boolean; // Optional for cosmic-maximum
+  userInteractions: boolean;
+  timeBasedEffects?: boolean; // Optional for advanced-maximum
   blur?: string;
   transition?: string;
+  
+  // Legacy property aliases for backward compatibility
+  /** @deprecated Use userInteractions instead */
+  aestheticGravity?: boolean;
+  /** @deprecated Use timeBasedEffects instead */
+  timeBasedPlay?: boolean;
 }
 
 // Defines the parameter multipliers for an artistic mode.
@@ -52,11 +70,22 @@ export interface MultiplierProfile {
   brightness: number;
   contrast: number;
   musicEnergyBoost: number;
-  kineticIntensity: number;
-  temporalPlayFactor: number;
-  aestheticGravityStrength: number;
-  emergentChoreography: boolean;
+  animationIntensity: number;
+  timeBasedEffectFactor: number;
+  interactionStrength: number;
+  
+  advancedAnimations: boolean;
   visualIntensityBase: number;
+  
+  // Legacy property aliases for backward compatibility
+  /** @deprecated Use animationIntensity instead */
+  kineticIntensity?: number;
+  /** @deprecated Use timeBasedEffectFactor instead */ 
+  timeBasedPlayFactor?: number;
+  /** @deprecated Use interactionStrength instead */
+  aestheticGravityStrength?: number;
+  /** @deprecated Use advancedAnimations instead */
+  emergentChoreography?: boolean;
 }
 
 // Defines the complete profile for a single artistic mode.
@@ -78,7 +107,14 @@ export interface ArtisticModeProfiles {
 export type ArtisticMode =
   | "corporate-safe"
   | "artist-vision"
-  | "cosmic-maximum";
+  | "advanced-maximum"
+  | "cosmic-maximum"; // Legacy compatibility
+
+/**
+ * @deprecated Use advanced-maximum instead
+ * @since v1.0.0
+ */
+export type LegacyCosmicMaximum = "cosmic-maximum";
 
 // Palette system types for aesthetic switching
 export type PaletteSystem = 'catppuccin' | 'year3000';
@@ -94,8 +130,8 @@ export type IntensityLevel = "disabled" | "minimal" | "balanced" | "intense";
 export type QualityLevel = "auto" | "low" | "high";
 export type WebGLQuality = "low" | "medium" | "high";
 
-// The main configuration object for the Year 3000 system.
-export interface Year3000Config {
+// The main configuration object for the Advanced system architecture.
+export interface AdvancedSystemConfig {
   [key: string]: any; // Index signature for dynamic access
   enableDebug: boolean;
   enableContextualIntelligence: boolean;
@@ -117,18 +153,18 @@ export interface Year3000Config {
   };
   enableColorExtraction: boolean;
   enableMusicAnalysis: boolean;
-  enableCosmicSync: boolean;
+  enableAdvancedSync: boolean;
   musicModulationIntensity: number;
   artisticMode: ArtisticMode;
   boundGetCurrentMultipliers: (() => MultiplierProfile) | null;
   boundGetCurrentFeatures: (() => FeatureProfile) | null;
   boundGetCurrentPerformanceSettings: (() => PerformanceProfile) | null;
   _pendingArtisticMode: ArtisticMode | null;
-  init(): Year3000Config;
-  currentHarmonicMode: string;
-  harmonicBaseColor: string | null;
-  harmonicIntensity: number;
-  harmonicEvolution: boolean;
+  init(): AdvancedSystemConfig;
+  currentColorHarmonyMode: string;
+  colorHarmonyBaseColor: string | null;
+  colorHarmonyIntensity: number;
+  colorHarmonyEvolution: boolean;
   musicVisualSync: any; // Can be typed more strictly if needed
   getCurrentModeProfile(): ArtisticModeProfile;
   getCurrentMultipliers(): MultiplierProfile;
@@ -146,6 +182,26 @@ export interface Year3000Config {
   setupForProduction(): void;
   setupForDevelopment(): void;
   setupForDebugging(): void;
-  validateConfigHealth(): any; // Can be typed more strictly
+  validateConfigHealth(): any;
   loadArtisticPreference(): void;
+}
+
+/**
+ * @deprecated Use AdvancedSystemConfig instead
+ * @since v1.0.0
+ */
+export interface Year3000Config extends AdvancedSystemConfig {
+  // Legacy property aliases for backward compatibility
+  /** @deprecated Use enableAdvancedSync instead */
+  enableCosmicSync?: boolean;
+  /** @deprecated Use currentColorHarmonyMode instead */
+  currentHarmonicMode?: string;
+  /** @deprecated Use colorHarmonyBaseColor instead */
+  harmonicBaseColor?: string | null;
+  /** @deprecated Use colorHarmonyIntensity instead */
+  harmonicIntensity?: number;
+  /** @deprecated Use colorHarmonyEvolution instead */
+  harmonicEvolution?: boolean;
+  
+  init(): Year3000Config;
 }

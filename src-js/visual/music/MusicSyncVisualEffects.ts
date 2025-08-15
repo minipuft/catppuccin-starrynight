@@ -1,8 +1,8 @@
 import { UnifiedSystemBase } from '@/core/base/UnifiedSystemBase';
 // Removed: unused GlobalEventBus import
-import type { Year3000Config } from '@/types/models';
+import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 import type { HealthCheckResult } from '@/types/systems';
-import * as Year3000Utilities from '@/utils/core/Year3000Utilities';
+import * as ThemeUtilities from '@/utils/core/ThemeUtilities';
 import { musicalLerpOrchestrator, type MusicalContext } from '@/utils/core/MusicalLerpOrchestrator';
 import type { MusicSyncService } from '@/audio/MusicSyncService';
 
@@ -231,7 +231,7 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
     // Register CSS variable groups with appropriate priorities
     this.registerCSSVariableGroup('music-sync-core', 'critical');
     this.registerCSSVariableGroup('visual-scaling', 'high');
-    // Removed: Breathing rhythm CSS variable group (breathing animations completely removed)
+    // Removed: Breathing rhythm CSS variable group (pulsing animations completely removed)
     this.registerCSSVariableGroup('color-temperature', 'normal');
     this.registerCSSVariableGroup('transition-fluidity', 'normal');
     
@@ -398,7 +398,7 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
       ? this.lerpHalfLifeValues.intensityAttack  // Fast attack
       : this.lerpHalfLifeValues.intensityDecay;  // Smooth decay
       
-    this.musicIntensity = Year3000Utilities.lerpSmooth(
+    this.musicIntensity = ThemeUtilities.lerpSmooth(
       this.musicIntensity,
       this.targetMusicIntensity,
       deltaTimeSeconds,
@@ -408,7 +408,7 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
     // Auto-decay target when no recent beats (natural decay)
     const timeSinceLastBeat = Date.now() - this.lastBeatTime;
     if (timeSinceLastBeat > 2000) { // 2 seconds
-      this.targetMusicIntensity = Year3000Utilities.lerpSmooth(
+      this.targetMusicIntensity = ThemeUtilities.lerpSmooth(
         this.targetMusicIntensity,
         0, // Decay to zero
         deltaTimeSeconds,
@@ -424,7 +424,7 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
     const deltaTimeSeconds = deltaTime / 1000;
     
     // Smooth scale multiplier towards target
-    this.scaleMultiplier = Year3000Utilities.lerpSmooth(
+    this.scaleMultiplier = ThemeUtilities.lerpSmooth(
       this.scaleMultiplier,
       this.targetScaleMultiplier,
       deltaTimeSeconds,
@@ -432,7 +432,7 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
     );
     
     // Auto-decay target scale multiplier to baseline over time
-    this.targetScaleMultiplier = Year3000Utilities.lerpSmooth(
+    this.targetScaleMultiplier = ThemeUtilities.lerpSmooth(
       this.targetScaleMultiplier,
       1.0, // Baseline scale
       deltaTimeSeconds,
@@ -448,7 +448,7 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
     const deltaTimeSeconds = deltaTime / 1000;
     
     // Smooth color temperature towards target
-    this.colorTemperature = Year3000Utilities.lerpSmooth(
+    this.colorTemperature = ThemeUtilities.lerpSmooth(
       this.colorTemperature,
       this.targetColorTemperature,
       deltaTimeSeconds,
@@ -457,7 +457,7 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
     
     // Auto-decay target temperature toward neutral over time
     const neutral = 4000;
-    this.targetColorTemperature = Year3000Utilities.lerpSmooth(
+    this.targetColorTemperature = ThemeUtilities.lerpSmooth(
       this.targetColorTemperature,
       neutral,
       deltaTimeSeconds,
@@ -474,7 +474,7 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
     const deltaTimeSeconds = deltaTime / 1000;
     
     // Smooth transition fluidity towards target
-    this.transitionFluidityLevel = Year3000Utilities.lerpSmooth(
+    this.transitionFluidityLevel = ThemeUtilities.lerpSmooth(
       this.transitionFluidityLevel,
       this.targetTransitionFluidityLevel,
       deltaTimeSeconds,

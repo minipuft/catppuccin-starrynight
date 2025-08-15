@@ -18,7 +18,7 @@ import type {
   ColorResult,
   IColorProcessor,
 } from "@/types/colorStrategy";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import {
@@ -33,7 +33,7 @@ import {
 } from "@/utils/color/OKLABColorProcessor";
 import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
 import { PaletteExtensionManager } from "@/utils/core/PaletteExtensionManager";
-import * as Year3000Utilities from "@/utils/core/Year3000Utilities";
+import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { SemanticColorManager } from "@/utils/spicetify/SemanticColorManager";
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
 import { globalColorOrchestrator } from "@/visual/coordination/ColorCoordinator";
@@ -47,7 +47,7 @@ import {
 
 // Type definitions for color structures
 type RGBColor = { r: number; g: number; b: number };
-type HSLColor = { h: number; s: number; l: number };
+// HSLColor type removed - not currently used in this system
 type HarmoniousAccent = {
   name: string;
   hex: string;
@@ -68,6 +68,19 @@ type CatppuccinFlavors = {
 
 type CatppuccinFlavor = keyof CatppuccinFlavors;
 
+// Color validation interfaces
+interface ColorRequirements {
+  minContrast: number;
+  minHarmony: number;
+}
+
+interface ColorRecommendation {
+  type: 'contrast' | 'harmony' | 'vibrancy' | 'accessibility';
+  suggestion: string;
+  color?: RGBColor;
+  value?: number;
+}
+
 type ValidationResult = {
   isValid: boolean;
   contrastRatio: number;
@@ -75,10 +88,45 @@ type ValidationResult = {
   meetsContrast: boolean;
   isHarmonious: boolean;
   artisticMode: string;
-  adjustedRequirements: any;
-  recommendations: any[];
+  adjustedRequirements: ColorRequirements;
+  recommendations: ColorRecommendation[];
   error?: string;
 };
+
+// Musical memory interfaces
+interface TrackData {
+  trackUri: string;
+  energy: number;
+  valence: number;
+  tempo: number;
+  danceability: number;
+  acousticness: number;
+  instrumentalness: number;
+  liveness: number;
+  speechiness: number;
+  [key: string]: unknown;
+}
+
+interface MusicalMemory {
+  recentTracks: TrackData[];
+  userColorPreferences: Map<string, string>;
+  energyHistory: number[];
+  maxMemorySize: number;
+}
+
+// Vibrancy configuration interface
+interface VibrancyConfig {
+  defaultBlendRatio: number;
+  minimumSaturation: number;
+  maximumDesaturation: number;
+  contrastBoostIntensity: number;
+  artisticSaturationBoost: number;
+  enhancedLuminanceBoost: number;
+  energyResponsiveness: number;
+  harmonyTolerance: number;
+  getBlendRatio: (artisticMode: string) => number;
+  [key: string]: unknown;
+}
 
 // =============================================================================
 // YEAR 3000 COLOR HARMONY ENGINE - Enhanced Vibrancy Edition
@@ -107,16 +155,11 @@ export class ColorHarmonyEngine
     performance: number[];
   };
 
-  private musicalMemory: {
-    recentTracks: any[];
-    userColorPreferences: Map<any, any>;
-    energyHistory: any[];
-    maxMemorySize: number;
-  };
+  private musicalMemory: MusicalMemory;
 
   private kineticState: {
     currentPulse: number;
-    breathingPhase: number;
+    animationPhase: number;
     lastBeatTime: number;
     visualMomentum: number;
     // TODO: Phase 2 - Extended properties for music-aware dynamics
@@ -127,10 +170,10 @@ export class ColorHarmonyEngine
   };
 
   private catppuccinPalettes: CatppuccinFlavors;
-  private vibrancyConfig: any;
+  private vibrancyConfig: VibrancyConfig;
   private paletteExtensionManager: PaletteExtensionManager;
   private semanticColorManager: SemanticColorManager;
-  private emergentEngine: EnhancedMasterAnimationCoordinator | null = null;
+  private animationEngine: EnhancedMasterAnimationCoordinator | null = null;
   private emotionalTemperatureMapper: EmotionalTemperatureMapper;
   private oklabProcessor: OKLABColorProcessor;
   private musicEmotionAnalyzer: MusicEmotionAnalyzer;
@@ -145,7 +188,7 @@ export class ColorHarmonyEngine
     lastProcessingTime: number;
   };
 
-  // Musical emotion state for consciousness-aware color processing
+  // Musical emotion state for audio-responsive color processing
   private emotionalState: {
     currentEmotion: EmotionalState | null;
     emotionHistory: EmotionalState[];
@@ -166,7 +209,7 @@ export class ColorHarmonyEngine
     genreInfluenceIntensity: number; // 0-1 how much genre affects visual aesthetics
   };
 
-  // User-specified harmonic intensity (0-1). Multiplies defaultBlendRatio.
+  // User-specified color harmony intensity (0-1). Multiplies defaultBlendRatio.
   private userIntensity: number = 0.7;
   private evolutionEnabled: boolean = true;
   private _boundSettingsChangeHandler: (e: Event) => void;
@@ -182,13 +225,13 @@ export class ColorHarmonyEngine
 
   constructor(
     config?: Year3000Config,
-    utils?: typeof Year3000Utilities,
+    utils?: typeof ThemeUtilities,
     performanceMonitor?: SimplePerformanceCoordinator,
     settingsManager?: SettingsManager
   ) {
     super(
       config,
-      utils || Year3000Utilities,
+      utils || ThemeUtilities,
       performanceMonitor!,
       null, // No direct music service dependency
       settingsManager || null
@@ -210,17 +253,19 @@ export class ColorHarmonyEngine
     this.currentTheme = this.detectCurrentTheme();
 
     // ------------------------------------------------------------------
-    // Sync initial harmonic intensity from shared config so that user
+    // Sync initial color harmony intensity from shared config so that user
     // preferences are respected as soon as the engine is instantiated.
     // ------------------------------------------------------------------
+    // Check for extended config with color harmony intensity
+    const extendedConfig = config as Year3000Config & { colorHarmonyIntensity?: number };
     if (
-      config &&
-      typeof (config as any).harmonicIntensity === "number" &&
-      Number.isFinite((config as any).harmonicIntensity)
+      extendedConfig &&
+      typeof extendedConfig.colorHarmonyIntensity === "number" &&
+      Number.isFinite(extendedConfig.colorHarmonyIntensity)
     ) {
       const clamped = Math.max(
         0,
-        Math.min(1, (config as any).harmonicIntensity)
+        Math.min(1, extendedConfig.colorHarmonyIntensity)
       );
       this.userIntensity = clamped;
     }
@@ -243,7 +288,7 @@ export class ColorHarmonyEngine
     // 🌊 Kinetic State for Visual Transformations
     this.kineticState = {
       currentPulse: 0,
-      breathingPhase: 0,
+      animationPhase: 0,
       lastBeatTime: 0,
       visualMomentum: 0,
     };
@@ -358,7 +403,7 @@ export class ColorHarmonyEngine
 
       // 🎨 Cinematic Gradient Enhancement Factors
       artisticSaturationBoost: 1.35, // Strong saturation for vibrant gradient aesthetics
-      cosmicLuminanceBoost: 1.25, // Enhanced luminance for gradient depth
+      enhancedLuminanceBoost: 1.25, // Enhanced luminance for gradient depth
       energyResponsiveness: 0.8, // High energy responsiveness for dynamic gradients
 
       // 🌟 Cinematic Gradient Blending Based on Artistic Mode
@@ -366,7 +411,8 @@ export class ColorHarmonyEngine
         const ratios: { [key: string]: number } = {
           "corporate-safe": 0.6, // Moderate: 60% extracted for professional gradients
           "artist-vision": 0.75, // Cinematic: 75% extracted for balanced drama
-          "cosmic-maximum": 0.85, // Maximum: 85% extracted for full intensity!
+          "advanced-maximum": 0.85, // Maximum: 85% extracted for full intensity!
+          "cosmic-maximum": 0.85, // Legacy alias - Maximum: 85% extracted for full intensity!
         };
         return ratios[artisticMode] || this.defaultBlendRatio;
       },
@@ -379,7 +425,10 @@ export class ColorHarmonyEngine
     }
 
     // Sync evolution flag from config
-    if (config && typeof (config as any).harmonicEvolution === "boolean") {
+    if (config && typeof (config as any).colorHarmonyEvolution === "boolean") {
+      this.evolutionEnabled = (config as any).colorHarmonyEvolution;
+    } else if (config && typeof (config as any).harmonicEvolution === "boolean") {
+      // Legacy compatibility
       this.evolutionEnabled = (config as any).harmonicEvolution;
     }
 
@@ -391,19 +440,19 @@ export class ColorHarmonyEngine
     // Initialize OKLAB processor for advanced color science
     this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
 
-    // Initialize music emotion analyzer for consciousness-aware color processing
+    // Initialize music emotion analyzer for audio-responsive color processing
     this.musicEmotionAnalyzer = new MusicEmotionAnalyzer({
       emotionSensitivity: 0.7,
       confidenceThreshold: 0.6,
-      consciousnessAwareness: true,
-      organicFlowDetection: true,
+      visualEffectsAwareness: true,
+      smoothFlowDetection: true,
       cinematicAnalysis: true,
       analysisInterval: 500, // 2Hz analysis rate
     });
 
     // Initialize GenreGradientEvolution for aesthetic intelligence
     this.genreGradientEvolution = new GenreGradientEvolution(
-      undefined as any, // cssConsciousnessController will be set during initialize()
+      undefined as any, // cssVisualEffectsController will be set during initialize()
       null, // musicSyncService will be injected if available
       null, // emotionalGradientMapper will be injected if available
       this.settingsManager
@@ -418,7 +467,7 @@ export class ColorHarmonyEngine
       lastProcessingTime: 0,
     };
 
-    // Initialize emotional state for consciousness-aware processing
+    // Initialize emotional state for audio-responsive processing
     this.emotionalState = {
       currentEmotion: null,
       emotionHistory: [],
@@ -525,13 +574,14 @@ export class ColorHarmonyEngine
   }
 
   // 🔧 PHASE 2: Emit harmony state instead of applying CSS directly
-  private _updateCSSVariables(deltaMs: number): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private _updateCSSVariables(_deltaMs: number): void {
     // Prepare harmony variables for ColorStateManager
     const harmonyVariables: Record<string, string> = {
       "--sn-harmony-energy": this.kineticState.visualMomentum.toFixed(3),
       "--sn-harmony-pulse": this.kineticState.currentPulse.toFixed(3),
-      "--sn-harmony-breathing-phase": (
-        Math.sin(this.kineticState.breathingPhase) * 0.5 +
+      "--sn-harmony-animation-phase": (
+        Math.sin(this.kineticState.animationPhase) * 0.5 +
         0.5
       ).toFixed(3),
     };
@@ -572,27 +622,28 @@ export class ColorHarmonyEngine
     // Decay current pulse
     this.kineticState.currentPulse *= Math.pow(0.95, deltaMs / 16.67); // Normalized to 60fps decay
 
-    // Update breathing phase
-    this.kineticState.breathingPhase += (deltaMs / 1000) * 0.5; // Slow breathing cycle
-    if (this.kineticState.breathingPhase > 2 * Math.PI) {
-      this.kineticState.breathingPhase -= 2 * Math.PI;
+    // Update animation phase
+    this.kineticState.animationPhase += (deltaMs / 1000) * 0.5; // Slow animation cycle
+    if (this.kineticState.animationPhase > 2 * Math.PI) {
+      this.kineticState.animationPhase -= 2 * Math.PI;
     }
 
-    // Emit gradient breathing events for dimensional consciousness
-    this._emitGradientBreathingEvents(deltaMs);
+    // Emit gradient animation events for dimensional audioAnalysis
+    this._emitGradientAnimationEvents(deltaMs);
   }
 
   /**
-   * Emit gradient breathing events for dimensional consciousness integration
+   * Emit gradient animation events for dimensional audioAnalysis integration
    */
-  private _emitGradientBreathingEvents(deltaMs: number): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private _emitGradientAnimationEvents(_deltaMs: number): void {
     // Calculate current energy level from various sources
     const currentEnergy = this._calculateCurrentEnergyLevel();
 
     // Check for beat detection based on audio analysis
     const beatDetected = this._detectBeatFromAudioAnalysis();
 
-    // Emit energy consciousness events
+    // Emit energy audioAnalysis events
     if (Math.random() < 0.1) {
       // Throttle to ~6Hz (10% of 60fps)
       unifiedEventBus.emit("music:energy", {
@@ -622,19 +673,19 @@ export class ColorHarmonyEngine
     valence: number;
     arousal: number;
   } {
-    // Fall back to kinetic state and breathing pattern for now
+    // Fall back to kinetic state and animation pattern for now
     // TODO: Integrate with actual music analysis data when available
-    const breathingEnergy =
-      0.5 + Math.sin(this.kineticState.breathingPhase) * 0.3;
+    const animationEnergy =
+      0.5 + Math.sin(this.kineticState.animationPhase) * 0.3;
     return {
-      energy: Math.max(0.2, breathingEnergy),
+      energy: Math.max(0.2, animationEnergy),
       valence: 0.5 + this.kineticState.currentPulse * 0.3,
       arousal: 0.4 + this.kineticState.currentPulse * 0.4,
     };
   }
 
   /**
-   * Detect beats from current audio analysis for gradient breathing
+   * Detect beats from current audio analysis for gradient animation
    */
   private _detectBeatFromAudioAnalysis(): {
     detected: boolean;
@@ -657,9 +708,9 @@ export class ColorHarmonyEngine
       };
     }
 
-    // Check for natural breathing beats (every 2 seconds roughly)
-    const breathingBeat = Math.sin(this.kineticState.breathingPhase) > 0.8;
-    if (breathingBeat) {
+    // Check for natural animation beats (every 2 seconds roughly)
+    const animationBeat = Math.sin(this.kineticState.animationPhase) > 0.8;
+    if (animationBeat) {
       return {
         detected: true,
         intensity: 0.4,
@@ -674,10 +725,10 @@ export class ColorHarmonyEngine
     await super.initialize();
 
     // Initialize SemanticColorManager with UnifiedCSSVariableManager from parent system
-    const cssConsciousnessController = this.performanceMonitor
-      ? (this.performanceMonitor as any).cssConsciousnessController
+    const cssVisualEffectsController = this.performanceMonitor
+      ? (this.performanceMonitor as any).cssVisualEffectsController
       : undefined;
-    this.semanticColorManager.initialize(cssConsciousnessController);
+    this.semanticColorManager.initialize(cssVisualEffectsController);
 
     // 🔧 CRITICAL FIX: Do NOT update semantic colors on initialization as it sets white/gray values
     // Initial semantic color setup - DISABLED to prevent color override
@@ -705,18 +756,18 @@ export class ColorHarmonyEngine
       );
     }
 
-    // Initialize music emotion analyzer for consciousness-aware color processing
+    // Initialize music emotion analyzer for audio-responsive color processing
     try {
       await this.musicEmotionAnalyzer.initialize();
 
-      // Subscribe to emotion updates for consciousness-aware color processing
+      // Subscribe to emotion updates for audioAnalysis-aware color processing
       this.musicEmotionAnalyzer.onEmotionUpdate((emotion: EmotionalState) => {
         this.handleEmotionUpdate(emotion);
       });
 
       if (this.config.enableDebug) {
         console.log(
-          "🎭 [ColorHarmonyEngine] MusicEmotionAnalyzer initialized with consciousness awareness"
+          "🎭 [ColorHarmonyEngine] MusicEmotionAnalyzer initialized with audioAnalysis awareness"
         );
       }
     } catch (error) {
@@ -755,7 +806,7 @@ export class ColorHarmonyEngine
 
   /**
    * Handle emotion updates from MusicEmotionAnalyzer
-   * Updates emotional state and triggers consciousness-aware color processing
+   * Updates emotional state and triggers audioAnalysis-aware color processing
    */
   private handleEmotionUpdate(emotion: EmotionalState): void {
     if (!this.initialized) return;
@@ -773,12 +824,12 @@ export class ColorHarmonyEngine
       }
 
       // Emit emotion event for other systems (like GradientConductor)
-      unifiedEventBus.emit("emotion:analyzed", {
+      unifiedEventBus.emit("music:emotion-analyzed", {
         emotion,
         colorTemperature: emotion.colorTemperature,
-        consciousnessLevel:
-          emotion.musicalCharacteristics.consciousnessResonance,
-        organicFlow: emotion.musicalCharacteristics.organicFlow,
+        visualEffectsLevel:
+          emotion.musicalCharacteristics.visualEffectsResonance,
+        smoothFlow: emotion.musicalCharacteristics.smoothFlow,
         cinematicDepth: emotion.musicalCharacteristics.cinematicDepth,
         timestamp: emotion.timestamp,
       });
@@ -839,14 +890,14 @@ export class ColorHarmonyEngine
         valence: emotion.valence,
         arousal: emotion.arousal,
         dominance: emotion.dominance,
-        organicFlow: emotion.musicalCharacteristics.organicFlow,
+        smoothFlow: emotion.musicalCharacteristics.smoothFlow,
         cinematicDepth: emotion.musicalCharacteristics.cinematicDepth,
-        consciousnessResonance:
-          emotion.musicalCharacteristics.consciousnessResonance,
+        visualEffectsResonance:
+          emotion.musicalCharacteristics.visualEffectsResonance,
       };
 
       // Emit emotional color context for other systems
-      unifiedEventBus.emit("emotionalColorContext:updated", emotionalContext);
+      unifiedEventBus.emit("music:emotional-context-updated", emotionalContext);
 
       if (this.config.enableDebug) {
         console.log(
@@ -989,7 +1040,7 @@ export class ColorHarmonyEngine
           strategy: "CatppuccinHarmony",
           processingTime,
           cacheKey: `catppuccin-${trackUri}-${this.currentTheme}`,
-          harmonicIntensity: this.userIntensity,
+          colorHarmonyIntensity: this.userIntensity,
         },
         context,
       };
@@ -1107,7 +1158,8 @@ export class ColorHarmonyEngine
         rawColors: data.rawColors,
         trackUri: data.trackUri,
         timestamp: data.timestamp,
-        harmonicMode: this.currentTheme,
+        colorHarmonyMode: this.currentTheme,
+        harmonicMode: this.currentTheme, // Legacy compatibility
         musicData: data.musicData,
         performanceHints: {
           preferLightweight: false,
@@ -1557,9 +1609,9 @@ export class ColorHarmonyEngine
     const harmonyScore = this.calculateHarmonyScore(color, currentPalette);
 
     const currentMode = this.config.artisticMode;
-    let adjustedRequirements = { ...requirements };
+    const adjustedRequirements = { ...requirements };
 
-    if (currentMode === "cosmic-maximum") {
+    if (currentMode === "advanced-maximum" || currentMode === "cosmic-maximum") {
       adjustedRequirements.minContrast *= 0.7;
       adjustedRequirements.minHarmony *= 0.6;
     } else if (currentMode === "artist-vision") {
@@ -1739,13 +1791,13 @@ export class ColorHarmonyEngine
 
     // Preserve previous boost behaviour
     const artisticMode = this.config?.artisticMode ?? "artist-vision";
-    const emergentMultipliers =
-      this.emergentEngine?.getCurrentMultipliers?.() || undefined;
+    const animationMultipliers =
+      this.animationEngine?.getCurrentMultipliers?.() || undefined;
 
     const shouldUseEmergent =
-      artisticMode === "cosmic-maximum" && !!emergentMultipliers;
+      (artisticMode === "advanced-maximum" || artisticMode === "cosmic-maximum") && !!animationMultipliers;
 
-    const validMultipliers: any = emergentMultipliers || {};
+    const validMultipliers: any = animationMultipliers || {};
 
     const saturationBoostFactor = shouldUseEmergent
       ? (validMultipliers.visualIntensityBase || 1) * 1.25 // Align with previous behaviour
@@ -1753,7 +1805,7 @@ export class ColorHarmonyEngine
 
     const luminanceBoostFactor = shouldUseEmergent
       ? (validMultipliers.aestheticGravityStrength || 1) * 1.15
-      : this.vibrancyConfig.cosmicLuminanceBoost;
+      : this.vibrancyConfig.enhancedLuminanceBoost;
 
     // Minimum saturation guard (uses configured threshold)
     blendedHsl.s = Math.max(
@@ -1819,14 +1871,14 @@ export class ColorHarmonyEngine
           // Add emotional class to body for SCSS integration (keep direct DOM update for classes)
           document.body.classList.remove(
             ...Array.from(document.body.classList).filter((c) =>
-              c.startsWith("organic-emotion-")
+              c.startsWith("smooth-emotion-")
             )
           );
           document.body.classList.add(emotionalTemperature.cssClass);
 
           if (emotionalTemperature.secondaryEmotion) {
             document.body.classList.add(
-              `organic-emotion-blend-${emotionalTemperature.secondaryEmotion}`
+              `smooth-emotion-blend-${emotionalTemperature.secondaryEmotion}`
             );
           }
         }
@@ -2123,11 +2175,11 @@ export class ColorHarmonyEngine
    * Enhanced with comprehensive UI component support and robust fallbacks
    */
   private applyCSSVariablesToDOM(cssVariables: Record<string, string>): void {
-    // 🔧 CRITICAL FIX: Enhanced cssConsciousnessController detection
+    // 🔧 CRITICAL FIX: Enhanced cssVisualEffectsController detection
     const year3000System = (globalThis as any).year3000System;
-    const cssConsciousnessController =
-      year3000System?.cssConsciousnessController ||
-      (this.performanceMonitor as any)?.cssConsciousnessController ||
+    const cssVisualEffectsController =
+      year3000System?.cssVisualEffectsController ||
+      (this.performanceMonitor as any)?.cssVisualEffectsController ||
       year3000System?.facadeCoordinator?.getCachedNonVisualSystem?.(
         "UnifiedCSSVariableManager"
       );
@@ -2137,12 +2189,12 @@ export class ColorHarmonyEngine
       this.enhanceCSSVariablesForUIComponents(cssVariables);
 
     if (
-      cssConsciousnessController &&
-      typeof cssConsciousnessController.batchSetVariables === "function"
+      cssVisualEffectsController &&
+      typeof cssVisualEffectsController.batchSetVariables === "function"
     ) {
       try {
         // Use batched CSS variable updates for better performance
-        cssConsciousnessController.batchSetVariables(
+        cssVisualEffectsController.batchSetVariables(
           "ColorHarmonyEngine",
           enhancedCssVariables,
           "high", // High priority for color processing
@@ -2151,13 +2203,13 @@ export class ColorHarmonyEngine
 
         if (this.config.enableDebug) {
           console.log(
-            "🔧 [ColorHarmonyEngine] Applied CSS variables via cssConsciousnessController batcher"
+            "🔧 [ColorHarmonyEngine] Applied CSS variables via cssVisualEffectsController batcher"
           );
         }
       } catch (error) {
         if (this.config.enableDebug) {
           console.warn(
-            "🔧 [ColorHarmonyEngine] cssConsciousnessController.batchSetVariables failed, using direct application:",
+            "🔧 [ColorHarmonyEngine] cssVisualEffectsController.batchSetVariables failed, using direct application:",
             error
           );
         }
@@ -2166,7 +2218,7 @@ export class ColorHarmonyEngine
     } else {
       if (this.config.enableDebug) {
         console.log(
-          "🔧 [ColorHarmonyEngine] cssConsciousnessController not available, using direct DOM application"
+          "🔧 [ColorHarmonyEngine] cssVisualEffectsController not available, using direct DOM application"
         );
       }
       this.applyVariablesDirectly(enhancedCssVariables);
@@ -2200,7 +2252,7 @@ export class ColorHarmonyEngine
           sidebarVariables: Object.keys(enhancedCssVariables).filter((k) =>
             k.includes("sidebar")
           ).length,
-          cssConsciousnessControllerUsed: !!cssConsciousnessController,
+          cssVisualEffectsControllerUsed: !!cssVisualEffectsController,
         }
       );
     }
@@ -2271,18 +2323,21 @@ export class ColorHarmonyEngine
       enhanced["--sn-main-feed-secondary-rgb"] = secondaryRgb;
     }
 
-    // 🎯 OKLAB ENHANCED VARIABLES for consciousness effects
+    // 🎯 OKLAB ENHANCED VARIABLES for audioAnalysis effects
     const oklabBrightHighlight =
       enhanced["--sn-color-oklab-bright-highlight-rgb"];
     if (oklabBrightHighlight) {
-      enhanced["--sn-consciousness-bright-accent-rgb"] = oklabBrightHighlight;
+      enhanced["--sn-audioAnalysis-bright-accent-rgb"] = oklabBrightHighlight;
+      enhanced["--sn-layered-accent-rgb"] = oklabBrightHighlight;
+      enhanced["--smooth-layered-rgb"] = oklabBrightHighlight;
+      // Legacy compatibility
       enhanced["--sn-holographic-accent-rgb"] = oklabBrightHighlight;
-      enhanced["--organic-holographic-rgb"] = oklabBrightHighlight;
+      enhanced["--smooth-holographic-rgb"] = oklabBrightHighlight;
     }
 
     const oklabDynamicShadow = enhanced["--sn-color-oklab-dynamic-shadow-rgb"];
     if (oklabDynamicShadow) {
-      enhanced["--sn-consciousness-shadow-rgb"] = oklabDynamicShadow;
+      enhanced["--sn-audioAnalysis-shadow-rgb"] = oklabDynamicShadow;
       enhanced["--sn-depth-shadow-rgb"] = oklabDynamicShadow;
     }
 
@@ -2465,16 +2520,16 @@ export class ColorHarmonyEngine
     }
 
     const artisticMode = this.config.artisticMode;
-    const baseAmplitude = artisticMode === "cosmic-maximum" ? 8 : 5; // stronger base swing in cosmic mode
+    const baseAmplitude = (artisticMode === "advanced-maximum" || artisticMode === "cosmic-maximum") ? 8 : 5; // stronger base swing in advanced mode
     let hueShift = Math.sin(beatPhase * 2 * Math.PI) * baseAmplitude;
 
     // Boost on actual beats
     if (beatOccurred) {
-      const beatBoost = artisticMode === "cosmic-maximum" ? 12 : 10;
-      hueShift += energy * beatBoost; // larger boost for cosmic mode
+      const beatBoost = (artisticMode === "advanced-maximum" || artisticMode === "cosmic-maximum") ? 12 : 10;
+      hueShift += energy * beatBoost; // larger boost for advanced mode
     }
 
-    const clampRange = artisticMode === "cosmic-maximum" ? 25 : 15;
+    const clampRange = (artisticMode === "advanced-maximum" || artisticMode === "cosmic-maximum") ? 25 : 15;
     return Math.max(-clampRange, Math.min(clampRange, hueShift)); // Clamp depending on mode
   }
 
@@ -2510,7 +2565,7 @@ export class ColorHarmonyEngine
 
     const timeSinceLastBeat = now - this.kineticState.lastBeatTime;
     const beatInterval = 60000 / (enhancedBPM || 120);
-    this.kineticState.breathingPhase =
+    this.kineticState.animationPhase =
       ((timeSinceLastBeat % beatInterval) / beatInterval) * 2 * Math.PI;
 
     this.kineticState.visualMomentum = this.utils.lerp(
@@ -2565,7 +2620,7 @@ export class ColorHarmonyEngine
 
   /**
    * Get current gradient colors optimized for WebGL texture creation
-   * Uses variable inheritance from OKLAB processed consciousness-aware colors
+   * Uses variable inheritance from OKLAB processed audioAnalysis-aware colors
    * @param stopCount Number of gradient stops to generate (default: 5)
    * @returns Array of RGB color objects or null if unavailable
    */
@@ -2586,7 +2641,7 @@ export class ColorHarmonyEngine
 
       const computedStyle = getComputedStyle(rootEl);
 
-      // Inherit from sophisticated OKLAB processed variables (consciousness-aware)
+      // Inherit from sophisticated OKLAB processed variables (audioAnalysis-aware)
       const inheritedColors = this.getInheritedGradientColors(computedStyle);
 
       if (!inheritedColors) {
@@ -2597,23 +2652,23 @@ export class ColorHarmonyEngine
         return this.generateFallbackGradient(stopCount);
       }
 
-      // Generate harmonious color variations using inherited consciousness data
+      // Generate harmonious color variations using inherited audioAnalysis data
       const gradientColors: Array<{ r: number; g: number; b: number }> = [];
 
-      // Apply consciousness state for music-responsive dynamics
+      // Apply audioAnalysis state for music-responsive dynamics
       const musicInfluence = this.kineticState.musicIntensityMultiplier || 1.0;
       const hueShift = this.kineticState.hueShift || 0;
       const valenceGravity = this.kineticState.valenceGravity || 0.5;
       const emotionalTemperature =
         this.emotionalState?.currentEmotion?.colorTemperature || 0.5;
 
-      // 🌈 CONSCIOUSNESS-AWARE GRADIENT GENERATION: Use inherited OKLAB processed colors
+      // 🌈 VISUAL-EFFECTS-AWARE GRADIENT GENERATION: Use inherited OKLAB processed colors
       const { primary, secondary, accent, emotional, tertiary } =
         inheritedColors;
 
-      // Create consciousness-aware color array for interpolation
+      // Create audioAnalysis-aware color array for interpolation
       const baseColors = [
-        primary, // Deep consciousness base
+        primary, // Deep audioAnalysis base
         secondary, // Harmonic transition
         accent, // Vibrational peak
         emotional, // Emotional resonance
@@ -2630,7 +2685,7 @@ export class ColorHarmonyEngine
         if (stopCount === 1) {
           interpolatedColor = accent; // Single color fallback
         } else {
-          // Map position to inherited color array with consciousness influence
+          // Map position to inherited color array with audioAnalysis influence
           const colorIndex = position * (baseColors.length - 1);
           const lowerIndex = Math.floor(colorIndex);
           const upperIndex = Math.min(lowerIndex + 1, baseColors.length - 1);
@@ -2659,8 +2714,8 @@ export class ColorHarmonyEngine
           }
         }
 
-        // Apply consciousness state modulation (preserves OKLAB processing)
-        let finalColor = this._applyConsciousnessModulation(interpolatedColor, {
+        // Apply audioAnalysis state modulation (preserves OKLAB processing)
+        let finalColor = this._applyVisualEffectsModulation(interpolatedColor, {
           musicInfluence,
           valenceGravity,
           hueShift,
@@ -2745,7 +2800,7 @@ export class ColorHarmonyEngine
     tertiary: RGBColor;
   } | null {
     try {
-      // Inherit from OKLAB processed variables (consciousness-aware hierarchy)
+      // Inherit from OKLAB processed variables (audioAnalysis-aware hierarchy)
       const primaryRgb =
         this.parseRGBVariable(
           computedStyle,
@@ -2792,7 +2847,7 @@ export class ColorHarmonyEngine
           computedStyle,
           "--sn-oklab-processed-bright-highlight-rgb"
         ) ||
-        this.parseRGBVariable(computedStyle, "--sn-consciousness-flow-rgb") ||
+        this.parseRGBVariable(computedStyle, "--sn-audioAnalysis-flow-rgb") ||
         this.parseRGBVariable(
           computedStyle,
           "--sn-musical-harmony-tertiary-rgb"
@@ -2887,9 +2942,9 @@ export class ColorHarmonyEngine
   }
 
   /**
-   * Apply consciousness modulation to color (preserves OKLAB processing)
+   * Apply audioAnalysis modulation to color (preserves OKLAB processing)
    */
-  private _applyConsciousnessModulation(
+  private _applyVisualEffectsModulation(
     color: RGBColor,
     modulation: {
       musicInfluence: number;
@@ -2900,10 +2955,10 @@ export class ColorHarmonyEngine
     }
   ): RGBColor {
     try {
-      // Convert to HSL for consciousness modulation
+      // Convert to HSL for audioAnalysis modulation
       const hsl = this.utils.rgbToHsl(color.r, color.g, color.b);
 
-      // Apply consciousness influences
+      // Apply audioAnalysis influences
       let { h, s, l } = hsl;
 
       // Music influence affects saturation
@@ -3011,7 +3066,7 @@ export class ColorHarmonyEngine
   }
 
   /**
-   * Analyze music and update emotional state for consciousness-aware color processing
+   * Analyze music and update emotional state for audioAnalysis-aware color processing
    * This method connects the Music → Emotion → Color flow
    */
   public async analyzeMusicEmotion(
@@ -3062,7 +3117,7 @@ export class ColorHarmonyEngine
   }
 
   /**
-   * Get emotion history for consciousness flow analysis
+   * Get emotion history for audioAnalysis flow analysis
    */
   public getEmotionHistory(limit: number = 10): EmotionalState[] {
     if (!this.emotionalState?.emotionHistory) return [];
@@ -3143,14 +3198,14 @@ export class ColorHarmonyEngine
   // PUBLIC API – User Control
   // =========================
   /**
-   * Update user-defined harmonic intensity (0–1). Values outside range are clamped.
+   * Update user-defined color harmony intensity (0–1). Values outside range are clamped.
    */
   public setIntensity(value: number): void {
     const clamped = Math.max(0, Math.min(1, value));
     this.userIntensity = clamped;
     if (this.config?.enableDebug) {
       console.log(
-        `[ColorHarmonyEngine] User harmonic intensity set to ${clamped}`
+        `[ColorHarmonyEngine] User color harmony intensity set to ${clamped}`
       );
     }
   }
@@ -3344,7 +3399,7 @@ export class ColorHarmonyEngine
   }
 
   public setEmergentEngine(engine: EnhancedMasterAnimationCoordinator): void {
-    this.emergentEngine = engine;
+    this.animationEngine = engine;
   }
 
   // ---------------------------------------------------------------------------
@@ -3514,7 +3569,7 @@ export class ColorHarmonyEngine
   /**
    * Enhance music emotion analysis with album art color psychology
    * Uses color theory and psychological associations to calibrate emotion detection
-   * Creating a multi-sensory approach to artist consciousness recognition
+   * Creating a multi-sensory approach to artist audioAnalysis recognition
    */
   private async enhanceWithAlbumArtPsychology(
     originalAnalysis: MusicAnalysisData,
@@ -3649,7 +3704,7 @@ export class ColorHarmonyEngine
 
   /**
    * Analyze album art colors for psychological and emotional indicators
-   * 🎨 PHASE 2.3: Enhanced with genre indicators and artist consciousness recognition
+   * 🎨 PHASE 2.3: Enhanced with genre indicators and artist audioAnalysis recognition
    * Based on color psychology research and artist expression patterns
    */
   private analyzeAlbumArtPsychology(albumArtColors: Record<string, string>): {
@@ -3661,16 +3716,16 @@ export class ColorHarmonyEngine
     harmony: number; // 0-1: How harmonious the color relationships are
     dominantHue: number; // 0-360: Primary hue in degrees
     emotionalIntensity: number; // 0-1: Overall emotional intensity
-    // 🎨 PHASE 2.3: New genre and artist consciousness indicators
+    // 🎨 PHASE 2.3: New genre and artist audioAnalysis indicators
     genreIndicators: {
       electronicLikelihood: number; // 0-1: Likelihood of electronic/synthetic music
-      organicLikelihood: number; // 0-1: Likelihood of organic/acoustic music
+      smoothLikelihood: number; // 0-1: Likelihood of smooth/acoustic music
       metalHardcoreLikelihood: number; // 0-1: Likelihood of metal/hardcore music
       popCommercialLikelihood: number; // 0-1: Likelihood of pop/commercial music
       jazzClassicalLikelihood: number; // 0-1: Likelihood of jazz/classical music
       folkAcousticLikelihood: number; // 0-1: Likelihood of folk/acoustic music
     };
-    artistConsciousness: {
+    artistAwareness: {
       visualSophistication: number; // 0-1: How sophisticated the visual choices are
       artisticIntention: number; // 0-1: How intentional the color choices appear
       culturalIndicators: string[]; // Array of detected cultural/regional indicators
@@ -3692,13 +3747,13 @@ export class ColorHarmonyEngine
           emotionalIntensity: 0.5,
           genreIndicators: {
             electronicLikelihood: 0.5,
-            organicLikelihood: 0.5,
+            smoothLikelihood: 0.5,
             metalHardcoreLikelihood: 0.5,
             popCommercialLikelihood: 0.5,
             jazzClassicalLikelihood: 0.5,
             folkAcousticLikelihood: 0.5,
           },
-          artistConsciousness: {
+          artistAwareness: {
             visualSophistication: 0.5,
             artisticIntention: 0.5,
             culturalIndicators: [],
@@ -3767,8 +3822,8 @@ export class ColorHarmonyEngine
         emotionalIntensity,
       });
 
-      // 🎨 PHASE 2.3: Analyze artist consciousness from color choices
-      const artistConsciousness = this._analyzeArtistConsciousness(colors, {
+      // 🎨 PHASE 2.3: Analyze artist audioAnalysis from color choices
+      const artistAwareness = this._analyzeArtistAwareness(colors, {
         avgSaturation,
         avgBrightness,
         harmony,
@@ -3786,7 +3841,7 @@ export class ColorHarmonyEngine
         dominantHue,
         emotionalIntensity,
         genreIndicators,
-        artistConsciousness,
+        artistAwareness,
       };
     } catch (error) {
       console.warn(
@@ -3804,13 +3859,13 @@ export class ColorHarmonyEngine
         emotionalIntensity: 0.5,
         genreIndicators: {
           electronicLikelihood: 0.5,
-          organicLikelihood: 0.5,
+          smoothLikelihood: 0.5,
           metalHardcoreLikelihood: 0.5,
           popCommercialLikelihood: 0.5,
           jazzClassicalLikelihood: 0.5,
           folkAcousticLikelihood: 0.5,
         },
-        artistConsciousness: {
+        artistAwareness: {
           visualSophistication: 0.5,
           artisticIntention: 0.5,
           culturalIndicators: [],
@@ -3843,7 +3898,7 @@ export class ColorHarmonyEngine
         const diff = Math.abs(hue1 - hue2);
         const minDiff = Math.min(diff, 360 - diff);
 
-        // Check if this difference is close to a harmonic relationship
+        // Check if this difference is close to a color harmony relationship
         for (const harmonic of harmonyTypes) {
           if (Math.abs(minDiff - harmonic) <= 15) {
             harmonyScore += 1;
@@ -4161,16 +4216,16 @@ export class ColorHarmonyEngine
         }
       }
 
-      // Add consciousness layer variables for integration with other systems
+      // Add audioAnalysis layer variables for integration with other systems
       if (result.processedColors.EMOTIONAL_BLEND) {
-        cssVariables["--sn-consciousness-emotional-color"] =
+        cssVariables["--sn-audioAnalysis-emotional-color"] =
           result.processedColors.EMOTIONAL_BLEND;
-        const emotionalRgb = Year3000Utilities.hexToRgb(
+        const emotionalRgb = ThemeUtilities.hexToRgb(
           result.processedColors.EMOTIONAL_BLEND
         );
         if (emotionalRgb) {
           cssVariables[
-            "--sn-consciousness-emotional-rgb"
+            "--sn-audioAnalysis-emotional-rgb"
           ] = `${emotionalRgb.r},${emotionalRgb.g},${emotionalRgb.b}`;
         }
       }
@@ -4291,7 +4346,7 @@ export class ColorHarmonyEngine
       let harmonyScore = 0.5; // Default neutral score
 
       if (primaryColor && this.isValidHex(primaryColor)) {
-        const primaryRgb = Year3000Utilities.hexToRgb(primaryColor);
+        const primaryRgb = ThemeUtilities.hexToRgb(primaryColor);
         if (primaryRgb) {
           // Calculate color vibrancy as a quality metric
           const vibrancy = this.calculateColorVibrancy(primaryRgb);
@@ -4358,7 +4413,7 @@ export class ColorHarmonyEngine
    */
   private generateComplementaryColor(hexColor: string): string {
     try {
-      const rgb = Year3000Utilities.hexToRgb(hexColor);
+      const rgb = ThemeUtilities.hexToRgb(hexColor);
       if (!rgb) return hexColor;
 
       // Convert to HSL for hue manipulation
@@ -4370,7 +4425,7 @@ export class ColorHarmonyEngine
       // Convert back to RGB
       const complementRgb = this.hslToRgb(complementHue, hsl.s, hsl.l);
 
-      return Year3000Utilities.rgbToHex(
+      return ThemeUtilities.rgbToHex(
         complementRgb.r,
         complementRgb.g,
         complementRgb.b
@@ -4651,13 +4706,13 @@ export class ColorHarmonyEngine
     }
 
     // Adjust vibrant threshold based on genre complexity
-    if (characteristics.harmonicComplexity > 0.7) {
+    if (characteristics.musicalComplexity > 0.7) {
       // Complex genres (jazz, classical) - lower threshold for more vibrancy
       genreAdjustedPreset.vibrantThreshold = Math.max(
         0.05,
         basePreset.vibrantThreshold - 0.05 * genreInfluence
       );
-    } else if (characteristics.harmonicComplexity < 0.3) {
+    } else if (characteristics.musicalComplexity < 0.3) {
       // Simple genres (pop, house) - higher threshold for cleaner colors
       genreAdjustedPreset.vibrantThreshold = Math.min(
         0.2,
@@ -4668,9 +4723,9 @@ export class ColorHarmonyEngine
     // Adjust lightness based on emotional range and energy
     if (
       characteristics.emotionalRange > 0.7 &&
-      characteristics.organicness > 0.6
+      characteristics.smoothness > 0.6
     ) {
-      // Emotionally rich organic genres (folk, blues) - natural lightness
+      // Emotionally rich smooth genres (folk, blues) - natural lightness
       genreAdjustedPreset.lightnessBoost = Math.max(
         0.9,
         basePreset.lightnessBoost - 0.1 * genreInfluence
@@ -4690,7 +4745,7 @@ export class ColorHarmonyEngine
         0.1,
         basePreset.shadowReduction - 0.1 * genreInfluence
       );
-    } else if (characteristics.organicness > 0.6) {
+    } else if (characteristics.smoothness > 0.6) {
       // Organic genres (folk, acoustic) - softer shadows
       genreAdjustedPreset.shadowReduction = Math.min(
         0.5,
@@ -4828,7 +4883,7 @@ export class ColorHarmonyEngine
       const isMonochromatic = hueSpread < 30;
       const isPolychromatic = hueSpread > 120;
 
-      const expectedComplexity = genreCharacteristics.harmonicComplexity || 0.5;
+      const expectedComplexity = genreCharacteristics.musicalComplexity || genreCharacteristics.harmonicComplexity || 0.5;
       if (expectedComplexity > 0.7 && isPolychromatic) {
         harmonyScore *= 1.1; // Complex genre with diverse colors
         explanationParts.push("diverse album colors match complex genre");
@@ -5130,7 +5185,7 @@ export class ColorHarmonyEngine
    */
   private _analyzeGenreIndicatorsFromColors(colorPsychology: any): {
     electronicLikelihood: number;
-    organicLikelihood: number;
+    smoothLikelihood: number;
     metalHardcoreLikelihood: number;
     popCommercialLikelihood: number;
     jazzClassicalLikelihood: number;
@@ -5157,7 +5212,7 @@ export class ColorHarmonyEngine
     );
 
     // Organic/Acoustic: Natural colors, earth tones, moderate saturation
-    const organicLikelihood = Math.min(
+    const smoothLikelihood = Math.min(
       1.0,
       (warmth > coolness ? warmth : 0) * 0.3 +
         (saturation >= 0.3 && saturation <= 0.7 ? 0.3 : 0) +
@@ -5205,7 +5260,7 @@ export class ColorHarmonyEngine
 
     return {
       electronicLikelihood,
-      organicLikelihood,
+      smoothLikelihood,
       metalHardcoreLikelihood,
       popCommercialLikelihood,
       jazzClassicalLikelihood,
@@ -5214,9 +5269,9 @@ export class ColorHarmonyEngine
   }
 
   /**
-   * 🎨 PHASE 2.3: Analyze artist consciousness through color sophistication and intention
+   * 🎨 PHASE 2.3: Analyze artist audioAnalysis through color sophistication and intention
    */
-  private _analyzeArtistConsciousness(
+  private _analyzeArtistAwareness(
     colors: string[],
     metrics: any
   ): {

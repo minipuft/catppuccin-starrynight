@@ -1,15 +1,15 @@
 /**
- * VisualEffectsCoordinator - Phase 4 Consciousness System Consolidation
+ * VisualEffectsCoordinator - Phase 4 Visual Effects System Consolidation
  *
- * Consolidates ColorConsciousnessState and DynamicCatppuccinBridge functionality
- * into a single, unified consciousness coordinator that maintains all original
+ * Consolidates ColorVisualEffectsState and DynamicCatppuccinBridge functionality
+ * into a single, unified visual effects coordinator that maintains all original
  * functionality while providing 60%+ code reduction through intelligent integration.
  *
- * Philosophy: "Unity in consciousness - one central coordinator managing the complete
- * spectrum of color consciousness, from transcendent awareness to dynamic Catppuccin
+ * Philosophy: "Unity in visual effects - one central coordinator managing the complete
+ * spectrum of color effects, from advanced visuals to dynamic Catppuccin
  * integration, through the unified flow of the Year 3000 System."
  *
- * @consolidates ColorConsciousnessState (520 lines) - Transcendent consciousness system
+ * @consolidates ColorVisualEffectsState (520 lines) - Enhanced visual effects system
  * @consolidates DynamicCatppuccinBridge (725 lines) - Dynamic accent bridge system
  *
  * @architecture Single responsibility, unified events, performance-optimized
@@ -18,56 +18,56 @@
 
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { RGB } from "@/types/colorStubs";
+import type { RGB, ColorValue } from "@/types/colorStubs";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 
 // ============================================================================
-// Unified Consciousness Types
+// Unified Visual Effects Types
 // ============================================================================
 
-export interface ColorConsciousnessState {
-  // === CORE CONSCIOUSNESS ===
-  consciousnessResonance: number; // 0-1 consciousness level
-  multidimensionalAwareness: number; // 0-1 awareness across dimensions
-  transcendenceLevel: number; // 0-1 transcendence beyond reality
+export interface ColorVisualEffectsState {
+  // === CORE VISUAL EFFECTS ===
+  visualEffectsResonance: number; // 0-1 visual effects level
+  layeredEffects: number; // 0-1 effects across layers
+  enhancementLevel: number; // 0-1 enhancement beyond standard effects
 
-  // === EMOTIONAL CONSCIOUSNESS ===
+  // === EMOTIONAL VISUAL EFFECTS ===
   dominantEmotionalTemperature: number; // Color temperature (1000K-10000K)
   emotionalDepth: number; // 0-1 emotional depth layers
   emotionalComplexity: number; // 0-1 emotional complexity index
 
-  // === VISUAL CONSCIOUSNESS ===
+  // === VISUAL EFFECTS CORE ===
   totalIntensity: number; // 0-1 overall intensity
   activeLayerCount: number; // Number of active color layers
   volumetricDepth: number; // 0-1 volumetric atmosphere depth
   cinematicPerspective: number; // 0-1 cinematic depth perspective
 
-  // === HOLOGRAPHIC CONSCIOUSNESS ===
+  // === HOLOGRAPHIC EFFECTS ===
   holographicInfluence: number; // 0-1 holographic effect influence
   dataStreamIntensity: number; // 0-1 Matrix-style data stream flow
   interferencePatterns: number; // 0-1 holographic interference
   projectionStability: number; // 0-1 holographic projection stability
 
-  // === TEMPORAL CONSCIOUSNESS ===
+  // === TEMPORAL EFFECTS ===
   temporalMemoryDepth: number; // 0-1 temporal memory integration
-  consciousnessEvolution: number; // 0-1 consciousness evolution rate
+  visualEffectsEvolution: number; // 0-1 visual effects evolution rate
   futureProjection: number; // 0-1 future state projection
 
-  // === PALETTE CONSCIOUSNESS ===
+  // === PALETTE EFFECTS ===
   catppuccinPreservationLevel: number; // 0-1 Catppuccin color preservation
-  currentPalette: TranscendentColorValue[]; // Current consciousness palette
+  currentPalette: EnhancedColorValue[]; // Current visual effects palette
   paletteEvolution: PaletteEvolutionState; // Palette evolution tracking
 
-  // === ATMOSPHERIC CONSCIOUSNESS ===
+  // === ATMOSPHERIC EFFECTS ===
   atmosphericDensity: number; // 0-1 atmospheric particle density
-  cosmicResonance: number; // 0-1 cosmic frequency alignment
-  quantumFluctuation: number; // 0-1 quantum color fluctuations
+  harmonicResonance: number; // 0-1 harmonic frequency alignment
+  dynamicFluctuation: number; // 0-1 dynamic color fluctuations
 
   // === SYSTEM STATE ===
   lastBlendTime: number; // Last color blend timestamp
-  consciousnessFrameRate: number; // Current consciousness update rate
-  systemHealthConsciousness: number; // 0-1 system consciousness health
+  visualEffectsFrameRate: number; // Current visual effects update rate
+  systemHealthVisualEffects: number; // 0-1 system visual effects health
 }
 
 export interface DynamicColorState {
@@ -80,14 +80,24 @@ export interface DynamicColorState {
   transitionInProgress: boolean;
 }
 
-export interface TranscendentColorValue {
+export interface EnhancedColorValue {
+  rgb: RGB;
+  oklab?: { L: number; a: number; b: number };
+  xyz?: { x: number; y: number; z: number };
+  emotionalTemperature: number;
+  resonanceStrength: number;
+  adaptationRate: number;
+}
+
+// Legacy compatibility
+export interface TranscendentColorValue extends EnhancedColorValue {
   rgb: RGB;
   oklab?: { L: number; a: number; b: number };
   xyz?: { x: number; y: number; z: number };
   hsl?: { h: number; s: number; l: number };
 
-  // === CONSCIOUSNESS PROPERTIES ===
-  consciousnessLevel: number;
+  // === VISUAL EFFECTS PROPERTIES ===
+  visualEffectsLevel: number;
   emotionalResonance: number;
   transcendenceIndex: number;
 
@@ -99,11 +109,11 @@ export interface TranscendentColorValue {
   // === ATMOSPHERIC PROPERTIES ===
   volumetricPresence: number;
   holographicReflectance: number;
-  cosmicFrequency: number;
+  harmonicFrequency: number;
 
   // === METADATA ===
-  colorSpace: "rgb" | "oklab" | "xyz" | "hsl" | "consciousness";
-  generationMethod: "harmony" | "consciousness" | "temporal" | "cosmic";
+  colorSpace: "rgb" | "oklab" | "xyz" | "hsl" | "visual-effects";
+  generationMethod: "harmony" | "visual-effects" | "temporal" | "harmonic";
   timestamp: number;
 }
 
@@ -114,29 +124,29 @@ export interface PaletteEvolutionState {
   adaptationRate: number;
 
   // === TEMPORAL MEMORY ===
-  previousGenerations: TranscendentColorValue[][];
-  futureProjections: TranscendentColorValue[][];
+  previousGenerations: EnhancedColorValue[][];
+  futureProjections: EnhancedColorValue[][];
   temporalPatterns: TemporalColorPattern[];
 
-  // === CONSCIOUSNESS TRACKING ===
-  consciousnessGrowth: number;
-  transcendenceProgress: number;
-  cosmicAlignment: number;
+  // === VISUAL EFFECTS TRACKING ===
+  visualEffectsGrowth: number;
+  enhancementProgress: number;
+  harmonicAlignment: number;
 }
 
 export interface TemporalColorPattern {
   patternId: string;
   frequency: number;
   strength: number;
-  colorSequence: TranscendentColorValue[];
+  colorSequence: EnhancedColorValue[];
   musicalCorrelation: number;
-  consciousnessSignature: number;
+  visualEffectsSignature: number;
 }
 
 export interface CatppuccinIntegrationConfig {
   accentUpdateEnabled: boolean;
   baseTransformationEnabled: boolean;
-  consciousnessIntegrationEnabled: boolean;
+  visualEffectsIntegrationEnabled: boolean;
   smoothTransitionDuration: number; // ms
   energyResponseMultiplier: number; // 0-2
 }
@@ -160,7 +170,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   public initialized = false;
 
   // === CORE STATE MANAGEMENT ===
-  private consciousnessState: ColorConsciousnessState;
+  private visualEffectsState: ColorVisualEffectsState;
   private dynamicColorState: DynamicColorState;
   private integrationConfig: CatppuccinIntegrationConfig;
 
@@ -178,11 +188,11 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     this.utils = utils;
     this.settingsManager = settingsManager;
 
-    // Initialize consciousness state (from ColorConsciousnessState)
-    this.consciousnessState = {
-      consciousnessResonance: 0.7,
-      multidimensionalAwareness: 0.8,
-      transcendenceLevel: 0.6,
+    // Initialize visual-effects state (from ColorVisualEffectsState)
+    this.visualEffectsState = {
+      visualEffectsResonance: 0.7,
+      layeredEffects: 0.8,
+      enhancementLevel: 0.6,
       dominantEmotionalTemperature: 6500,
       emotionalDepth: 0.7,
       emotionalComplexity: 0.5,
@@ -195,7 +205,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       interferencePatterns: 0.1,
       projectionStability: 0.9,
       temporalMemoryDepth: 0.5,
-      consciousnessEvolution: 0.0,
+      visualEffectsEvolution: 0.0,
       futureProjection: 0.2,
       catppuccinPreservationLevel: 0.8,
       currentPalette: [],
@@ -207,21 +217,21 @@ export class VisualEffectsCoordinator implements IManagedSystem {
         previousGenerations: [],
         futureProjections: [],
         temporalPatterns: [],
-        consciousnessGrowth: 0.0,
-        transcendenceProgress: 0.0,
-        cosmicAlignment: 0.5,
+        visualEffectsGrowth: 0.0,
+        enhancementProgress: 0.0,
+        harmonicAlignment: 0.5,
       },
       atmosphericDensity: 0.3,
-      cosmicResonance: 0.5,
-      quantumFluctuation: 0.2,
+      harmonicResonance: 0.5,
+      dynamicFluctuation: 0.2,
       lastBlendTime: Date.now(),
-      consciousnessFrameRate: 60.0,
-      systemHealthConsciousness: 1.0,
+      visualEffectsFrameRate: 60.0,
+      systemHealthVisualEffects: 1.0,
     };
 
     // Initialize dynamic color state (from DynamicCatppuccinBridge)
     this.dynamicColorState = {
-      currentAccentHex: "#4b19a1", // Default StarryNight cosmic purple
+      currentAccentHex: "#4b19a1", // Default StarryNight harmonic purple
       currentAccentRgb: "75,25,161",
       baseBackgroundHex: "#0d1117", // Default StarryNight deep space black
       baseBackgroundRgb: "13,17,23",
@@ -234,7 +244,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     this.integrationConfig = {
       accentUpdateEnabled: true,
       baseTransformationEnabled: true,
-      consciousnessIntegrationEnabled: true,
+      visualEffectsIntegrationEnabled: true,
       smoothTransitionDuration: 800, // 0.8s smooth transitions
       energyResponseMultiplier: 1.2,
     };
@@ -261,9 +271,9 @@ export class VisualEffectsCoordinator implements IManagedSystem {
 
       Y3KDebug?.debug?.log(
         "VisualEffectsCoordinator",
-        "🎨 Unified consciousness coordinator initialized successfully",
+        "🎨 Unified visual-effects coordinator initialized successfully",
         {
-          consciousnessLevel: this.consciousnessState.consciousnessResonance,
+          visualEffectsLevel: this.visualEffectsState.visualEffectsResonance,
           dynamicAccentEnabled: isDynamicEnabled,
           accentHex: this.dynamicColorState.currentAccentHex,
         }
@@ -292,10 +302,10 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       issues.push("Dynamic color transition appears stuck");
     }
 
-    if (this.consciousnessState.systemHealthConsciousness < 0.5) {
+    if (this.visualEffectsState.systemHealthVisualEffects < 0.5) {
       issues.push(
-        `Low consciousness health: ${(
-          this.consciousnessState.systemHealthConsciousness * 100
+        `Low visual-effects health: ${(
+          this.visualEffectsState.systemHealthVisualEffects * 100
         ).toFixed(1)}%`
       );
     }
@@ -303,7 +313,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     return {
       healthy: issues.length === 0,
       ok: issues.length === 0,
-      details: `Unified consciousness coordination - consciousness level: ${this.consciousnessState.consciousnessResonance.toFixed(
+      details: `Unified visual effects coordination - visual-effects level: ${this.visualEffectsState.visualEffectsResonance.toFixed(
         2
       )}, dynamic accent: ${this.integrationConfig.accentUpdateEnabled}`,
       issues,
@@ -312,17 +322,17 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   public updateAnimation(deltaTime: number): void {
-    // Update consciousness frame rate
-    this.consciousnessState.consciousnessFrameRate = 1000 / deltaTime;
+    // Update visual-effects frame rate
+    this.visualEffectsState.visualEffectsFrameRate = 1000 / deltaTime;
 
-    // Update consciousness evolution based on time
-    this.consciousnessState.consciousnessEvolution += deltaTime * 0.0001;
-    if (this.consciousnessState.consciousnessEvolution > 1.0) {
-      this.consciousnessState.consciousnessEvolution = 0.0;
+    // Update visual-effects evolution based on time
+    this.visualEffectsState.visualEffectsEvolution += deltaTime * 0.0001;
+    if (this.visualEffectsState.visualEffectsEvolution > 1.0) {
+      this.visualEffectsState.visualEffectsEvolution = 0.0;
     }
 
-    // Update quantum fluctuations for dynamic effects
-    this.consciousnessState.quantumFluctuation =
+    // Update dynamic fluctuations for dynamic effects
+    this.visualEffectsState.dynamicFluctuation =
       0.2 + Math.sin(Date.now() * 0.002) * 0.1;
   }
 
@@ -343,7 +353,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
 
     Y3KDebug?.debug?.log(
       "VisualEffectsCoordinator",
-      "Unified consciousness coordinator destroyed"
+      "Unified visual-effects coordinator destroyed"
     );
   }
 
@@ -352,10 +362,10 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   // ============================================================================
 
   /**
-   * Setup unified event subscriptions for both consciousness systems
+   * Setup unified event subscriptions for both visual-effects systems
    */
   private setupUnifiedEventSubscriptions(): void {
-    // 🔧 PHASE 4: Primary consciousness event handling (from ColorConsciousnessState)
+    // 🔧 PHASE 4: Primary visual-effects event handling (from ColorVisualEffectsState)
     unifiedEventBus.subscribe(
       "colors:harmonized",
       (data) => {
@@ -389,7 +399,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       "VisualEffectsCoordinator"
     );
 
-    // Settings changes that affect consciousness processing
+    // Settings changes that affect visual-effects processing
     unifiedEventBus.subscribe(
       "settings:changed",
       (data) => {
@@ -398,7 +408,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       "VisualEffectsCoordinator"
     );
 
-    // Music state changes for consciousness coordination
+    // Music state changes for visual effects coordination
     if (typeof document !== "undefined") {
       document.addEventListener("music-state-change", (event: Event) => {
         const customEvent = event as CustomEvent;
@@ -415,7 +425,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   /**
-   * 🔧 PHASE 4: Handle unified color events (ColorConsciousnessState logic)
+   * 🔧 PHASE 4: Handle unified color events (ColorVisualEffectsState logic)
    */
   private handleUnifiedColorUpdate(data: any): void {
     const { processedColors, accentHex, accentRgb, coordinationMetrics } = data;
@@ -424,10 +434,10 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     const musicEmotion = coordinationMetrics?.emotionalState || "neutral";
     const beatData = coordinationMetrics?.musicInfluenceStrength || 0.5;
 
-    // Update consciousness state based on musical input
+    // Update visual-effects state based on musical input
     this.updateConsciousnessFromMusic(musicEmotion, beatData);
 
-    // Convert processed colors to consciousness format
+    // Convert processed colors to visual-effects format
     this.updatePaletteFromUnifiedColors(processedColors, accentHex, accentRgb);
 
     // Handle dynamic accent updates if enabled
@@ -439,8 +449,8 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       this.scheduleSmoothAccentTransition(accentHex);
     }
 
-    // Publish consciousness update for dependent systems
-    this.publishConsciousnessUpdate();
+    // Publish visual-effects update for dependent systems
+    this.publishVisualEffectsUpdate();
   }
 
   /**
@@ -543,24 +553,24 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   /**
-   * Handle music state changes for unified consciousness coordination
+   * Handle music state changes for unified visual effects coordination
    */
   private handleMusicStateChange(musicState: any): void {
     if (musicState.energy !== undefined) {
       this.dynamicColorState.musicEnergy = musicState.energy;
 
-      // Update consciousness intensity based on music energy
-      if (this.integrationConfig.consciousnessIntegrationEnabled) {
+      // Update visual-effects intensity based on music energy
+      if (this.integrationConfig.visualEffectsIntegrationEnabled) {
         this.updateConsciousnessWithMusicEnergy(musicState.energy);
       }
     }
   }
 
   /**
-   * Handle settings changes for unified consciousness
+   * Handle settings changes for unified visual-effects
    */
   private handleSettingsChange(data: any): void {
-    // Clear consciousness cache when settings change that affect consciousness processing
+    // Clear visual-effects cache when settings change that affect visual-effects processing
     if (
       [
         "catppuccin-flavor",
@@ -568,8 +578,8 @@ export class VisualEffectsCoordinator implements IManagedSystem {
         "sn-dynamic-color-intensity",
       ].includes(data.settingKey)
     ) {
-      // Reset consciousness evolution on settings change
-      this.consciousnessState.consciousnessEvolution = 0.0;
+      // Reset visual-effects evolution on settings change
+      this.visualEffectsState.visualEffectsEvolution = 0.0;
       Y3KDebug?.debug?.log(
         "VisualEffectsCoordinator",
         "Consciousness state reset due to settings change:",
@@ -590,39 +600,39 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   // ============================================================================
-  // Consciousness Processing (ColorConsciousnessState logic)
+  // Consciousness Processing (ColorVisualEffectsState logic)
   // ============================================================================
 
   /**
-   * Update consciousness parameters from musical input
+   * Update visual-effects parameters from musical input
    */
   private updateConsciousnessFromMusic(musicEmotion: any, beatData: any): void {
     if (musicEmotion) {
-      // Core consciousness mapping
-      this.consciousnessState.consciousnessResonance =
+      // Core visual-effects mapping
+      this.visualEffectsState.visualEffectsResonance =
         (musicEmotion.valence + musicEmotion.intensity) * 0.5;
 
-      this.consciousnessState.dominantEmotionalTemperature =
+      this.visualEffectsState.dominantEmotionalTemperature =
         4000 + musicEmotion.valence * 4000; // 4000K-8000K range
 
-      this.consciousnessState.totalIntensity = musicEmotion.intensity || 0.5;
+      this.visualEffectsState.totalIntensity = musicEmotion.intensity || 0.5;
 
-      // Enhanced transcendent capabilities
-      this.consciousnessState.multidimensionalAwareness = Math.min(
+      // Enhanced advanced capabilities
+      this.visualEffectsState.layeredEffects = Math.min(
         1.0,
         (musicEmotion.valence + musicEmotion.arousal) * 0.6
       );
 
-      this.consciousnessState.emotionalDepth =
+      this.visualEffectsState.emotionalDepth =
         Math.abs(musicEmotion.valence - 0.5) * 2;
 
-      this.consciousnessState.dataStreamIntensity =
+      this.visualEffectsState.dataStreamIntensity =
         musicEmotion.intensity * 0.7;
     }
 
     if (beatData) {
       // Holographic influence from beat data
-      this.consciousnessState.holographicInfluence = Math.min(
+      this.visualEffectsState.holographicInfluence = Math.min(
         0.8,
         beatData.strength * 0.6
       );
@@ -632,7 +642,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
         this.updateTemporalMemory(beatData);
       }
 
-      this.consciousnessState.volumetricDepth = Math.min(
+      this.visualEffectsState.volumetricDepth = Math.min(
         1.0,
         beatData.strength * 0.8
       );
@@ -640,7 +650,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   /**
-   * Convert unified processed colors to consciousness format
+   * Convert unified processed colors to visual-effects format
    */
   private updatePaletteFromUnifiedColors(
     processedColors: Record<string, string>,
@@ -664,47 +674,47 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   /**
-   * Convert color harmony palette to consciousness format
+   * Convert color harmony palette to visual-effects format
    */
   private updatePaletteFromHarmony(palette: any[]): void {
     // Store previous generation for temporal memory
-    if (this.consciousnessState.currentPalette.length > 0) {
-      this.consciousnessState.paletteEvolution.previousGenerations.push([
-        ...this.consciousnessState.currentPalette,
+    if (this.visualEffectsState.currentPalette.length > 0) {
+      this.visualEffectsState.paletteEvolution.previousGenerations.push([
+        ...this.visualEffectsState.currentPalette,
       ]);
 
       // Keep only last 5 generations for performance
       if (
-        this.consciousnessState.paletteEvolution.previousGenerations.length > 5
+        this.visualEffectsState.paletteEvolution.previousGenerations.length > 5
       ) {
-        this.consciousnessState.paletteEvolution.previousGenerations.shift();
+        this.visualEffectsState.paletteEvolution.previousGenerations.shift();
       }
     }
 
-    // Convert to transcendent color values
-    this.consciousnessState.currentPalette = palette.map(
+    // Convert to advanced color values
+    this.visualEffectsState.currentPalette = palette.map(
       (color: any, index: number) => ({
         rgb: color.rgb || { r: color.r || 0, g: color.g || 0, b: color.b || 0 },
         oklab: color.oklab,
         hsl: color.hsl,
         xyz: color.xyz,
 
-        // Consciousness properties
-        consciousnessLevel: this.consciousnessState.consciousnessResonance,
-        emotionalResonance: this.consciousnessState.emotionalDepth,
-        transcendenceIndex: this.consciousnessState.transcendenceLevel,
+        // Enhanced color properties
+        emotionalTemperature: this.visualEffectsState.dominantEmotionalTemperature || 6000,
+        resonanceStrength: this.visualEffectsState.visualEffectsResonance,
+        adaptationRate: this.visualEffectsState.emotionalDepth,
 
         // Temporal properties
         temporalStability: Math.max(0.1, 1.0 - index * 0.1),
         evolutionRate:
-          this.consciousnessState.paletteEvolution.evolutionVelocity,
-        memoryImprint: this.consciousnessState.temporalMemoryDepth,
+          this.visualEffectsState.paletteEvolution.evolutionVelocity,
+        memoryImprint: this.visualEffectsState.temporalMemoryDepth,
 
         // Atmospheric properties
         volumetricPresence:
-          this.consciousnessState.volumetricDepth * (1.0 - index * 0.15),
-        holographicReflectance: this.consciousnessState.holographicInfluence,
-        cosmicFrequency: 432 + index * 111,
+          this.visualEffectsState.volumetricDepth * (1.0 - index * 0.15),
+        holographicReflectance: this.visualEffectsState.holographicInfluence,
+        harmonicFrequency: 432 + index * 111,
 
         // Metadata
         colorSpace: color.oklab ? "oklab" : ("rgb" as const),
@@ -714,10 +724,10 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     );
 
     // Update evolution state
-    this.consciousnessState.activeLayerCount = palette.length;
-    this.consciousnessState.lastBlendTime = Date.now();
-    this.consciousnessState.paletteEvolution.currentGeneration++;
-    this.consciousnessState.paletteEvolution.totalEvolutions++;
+    this.visualEffectsState.activeLayerCount = palette.length;
+    this.visualEffectsState.lastBlendTime = Date.now();
+    this.visualEffectsState.paletteEvolution.currentGeneration++;
+    this.visualEffectsState.paletteEvolution.totalEvolutions++;
   }
 
   /**
@@ -731,89 +741,88 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       patternId: `pattern-${currentTime}`,
       frequency: beatData.tempo || 120,
       strength: beatData.strength,
-      colorSequence: [...this.consciousnessState.currentPalette],
+      colorSequence: [...this.visualEffectsState.currentPalette],
       musicalCorrelation: beatData.strength,
-      consciousnessSignature: this.consciousnessState.consciousnessResonance,
+      visualEffectsSignature: this.visualEffectsState.visualEffectsResonance,
     };
 
     // Store pattern for recognition
-    this.consciousnessState.paletteEvolution.temporalPatterns.push(pattern);
+    this.visualEffectsState.paletteEvolution.temporalPatterns.push(pattern);
 
     // Keep only recent patterns
-    if (this.consciousnessState.paletteEvolution.temporalPatterns.length > 10) {
-      this.consciousnessState.paletteEvolution.temporalPatterns.shift();
+    if (this.visualEffectsState.paletteEvolution.temporalPatterns.length > 10) {
+      this.visualEffectsState.paletteEvolution.temporalPatterns.shift();
     }
 
     // Update temporal memory depth
-    this.consciousnessState.temporalMemoryDepth = Math.min(
+    this.visualEffectsState.temporalMemoryDepth = Math.min(
       1.0,
-      this.consciousnessState.temporalMemoryDepth + 0.1
+      this.visualEffectsState.temporalMemoryDepth + 0.1
     );
   }
 
   /**
-   * Publish consciousness update for dependent systems
+   * Publish visual effects update for dependent systems
    */
-  private publishConsciousnessUpdate(): void {
-    // 🔧 PHASE 4: Use UnifiedEventBus for consciousness updates
-    unifiedEventBus.emit("consciousness:updated", {
+  private publishVisualEffectsUpdate(): void {
+    // 🔧 PHASE 4: Use UnifiedEventBus for visual-effects updates
+    unifiedEventBus.emit("visual-effects:state-updated", {
       type: "colorConsciousnessUpdate",
       payload: {
         // Core Data (preserved for compatibility)
-        palette: this.consciousnessState.currentPalette,
-        consciousnessLevel: this.consciousnessState.consciousnessResonance,
+        palette: this.visualEffectsState.currentPalette,
+        visualEffectsLevel: this.visualEffectsState.visualEffectsResonance,
         emotionalTemperature:
-          this.consciousnessState.dominantEmotionalTemperature,
+          this.visualEffectsState.dominantEmotionalTemperature,
 
-        // Enhanced Transcendent Data
-        multidimensionalAwareness:
-          this.consciousnessState.multidimensionalAwareness,
-        transcendenceLevel: this.consciousnessState.transcendenceLevel,
-        volumetricDepth: this.consciousnessState.volumetricDepth,
-        dataStreamIntensity: this.consciousnessState.dataStreamIntensity,
-        temporalMemoryDepth: this.consciousnessState.temporalMemoryDepth,
-        cosmicResonance: this.consciousnessState.cosmicResonance,
+        // Enhanced Layered Data
+        layeredEffects:
+          this.visualEffectsState.layeredEffects,
+        enhancementLevel: this.visualEffectsState.enhancementLevel,
+        volumetricDepth: this.visualEffectsState.volumetricDepth,
+        dataStreamIntensity: this.visualEffectsState.dataStreamIntensity,
+        temporalMemoryDepth: this.visualEffectsState.temporalMemoryDepth,
+        harmonicResonance: this.visualEffectsState.harmonicResonance,
 
         // Evolution State
         paletteGeneration:
-          this.consciousnessState.paletteEvolution.currentGeneration,
+          this.visualEffectsState.paletteEvolution.currentGeneration,
         temporalPatternCount:
-          this.consciousnessState.paletteEvolution.temporalPatterns.length,
+          this.visualEffectsState.paletteEvolution.temporalPatterns.length,
 
         // Full State (for advanced consumers including dynamic color integration)
-        fullConsciousnessState: this.consciousnessState,
+        fullConsciousnessState: this.visualEffectsState,
       } as any,
     });
 
-    // Specialized events for transcendent systems
-    if (this.consciousnessState.dataStreamIntensity > 0.5) {
-      unifiedEventBus.emit("consciousness:holographic-stream", {
+    // Specialized events for advanced systems
+    if (this.visualEffectsState.dataStreamIntensity > 0.5) {
+      unifiedEventBus.emit("visual-effects:holographic-stream", {
         type: "holographicStreamUpdate",
         payload: {
-          intensity: this.consciousnessState.dataStreamIntensity,
-          interferencePatterns: this.consciousnessState.interferencePatterns,
-          projectionStability: this.consciousnessState.projectionStability,
+          intensity: this.visualEffectsState.dataStreamIntensity,
+          interferencePatterns: this.visualEffectsState.interferencePatterns,
+          projectionStability: this.visualEffectsState.projectionStability,
         },
       });
     }
 
-    if (this.consciousnessState.paletteEvolution.temporalPatterns.length > 3) {
-      unifiedEventBus.emit("consciousness:temporal-pattern", {
+    if (this.visualEffectsState.paletteEvolution.temporalPatterns.length > 3) {
+      unifiedEventBus.emit("visual-effects:temporal-pattern", {
         type: "temporalPatternDetected",
         payload: {
-          patterns: this.consciousnessState.paletteEvolution.temporalPatterns,
-          memoryDepth: this.consciousnessState.temporalMemoryDepth,
+          patterns: this.visualEffectsState.paletteEvolution.temporalPatterns,
+          memoryDepth: this.visualEffectsState.temporalMemoryDepth,
         },
       });
     }
 
-    if (this.consciousnessState.transcendenceLevel > 0.8) {
-      unifiedEventBus.emit("consciousness:transcendence-high", {
+    if (this.visualEffectsState.enhancementLevel > 0.8) {
+      unifiedEventBus.emit("visual-effects:transcendence-high", {
         type: "transcendenceLevelHigh",
         payload: {
-          level: this.consciousnessState.transcendenceLevel,
-          cosmicAlignment:
-            this.consciousnessState.paletteEvolution.cosmicAlignment,
+          level: this.visualEffectsState.enhancementLevel,
+          cosmicAlignment: this.visualEffectsState.paletteEvolution.harmonicAlignment,
         },
       });
     }
@@ -899,7 +908,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   /**
-   * Apply dynamic accent using unified consciousness coordination
+   * Apply dynamic accent using unified visual effects coordination
    */
   private applyDynamicAccent(accentHex: string): void {
     if (typeof document === "undefined") return;
@@ -930,15 +939,15 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     root.style.setProperty("--sn-color-extracted-dominant-rgb", rgbString);
 
     // Consciousness integration
-    if (this.integrationConfig.consciousnessIntegrationEnabled) {
-      this.updateConsciousnessWithAccent(accentHex, rgbString);
+    if (this.integrationConfig.visualEffectsIntegrationEnabled) {
+      this.updateVisualEffectsWithAccent(accentHex, rgbString);
     }
   }
 
   /**
-   * Update consciousness system with new accent awareness
+   * Update visual effects system with new accent integration
    */
-  private updateConsciousnessWithAccent(
+  private updateVisualEffectsWithAccent(
     accentHex: string,
     accentRgb: string
   ): void {
@@ -946,19 +955,19 @@ export class VisualEffectsCoordinator implements IManagedSystem {
 
     const root = document.documentElement;
 
-    // Update holographic consciousness variables
-    root.style.setProperty("--organic-holographic-rgb", accentRgb);
+    // Update holographic visual effects variables
+    root.style.setProperty("--smooth-holographic-rgb", accentRgb);
     root.style.setProperty("--holographic-scanline-rgb", accentRgb);
 
-    // Update depth consciousness variables
+    // Update depth visual effects variables
     root.style.setProperty(
-      "--consciousness-intensity",
+      "--visual-effects-intensity",
       `calc(0.5 + var(--musical-sync-intensity) * ${this.integrationConfig.energyResponseMultiplier})`
     );
   }
 
   /**
-   * Update consciousness with music energy
+   * Update visual-effects with music energy
    */
   private updateConsciousnessWithMusicEnergy(energy: number): void {
     if (typeof document === "undefined") return;
@@ -976,15 +985,15 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       adjustedEnergy.toString()
     );
 
-    // Update consciousness intensity based on energy
+    // Update visual-effects intensity based on energy
     const baseIntensity = 0.5;
-    const consciousnessIntensity = Math.max(
+    const visualEffectsIntensity = Math.max(
       0.1,
       Math.min(1.0, baseIntensity + adjustedEnergy * 0.3)
     );
     root.style.setProperty(
-      "--consciousness-intensity",
-      consciousnessIntensity.toString()
+      "--visual-effects-intensity",
+      visualEffectsIntensity.toString()
     );
   }
 
@@ -1075,7 +1084,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
 
     const currentAccent =
       computedStyle.getPropertyValue("--sn-dynamic-accent-hex").trim() ||
-      computedStyle.getPropertyValue("--sn-cosmic-accent-hex").trim() ||
+      computedStyle.getPropertyValue("--sn-harmonic-accent-hex").trim() ||
       computedStyle.getPropertyValue("--spice-accent").trim();
 
     if (currentAccent) {
@@ -1119,44 +1128,48 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   // ============================================================================
 
   /**
-   * Get current consciousness state (ColorConsciousnessState compatibility)
+   * Get current visual-effects state (ColorVisualEffectsState compatibility)
    */
-  public getConsciousnessState(): ColorConsciousnessState {
-    return { ...this.consciousnessState };
+  public getConsciousnessState(): ColorVisualEffectsState {
+    return { ...this.visualEffectsState };
   }
 
   /**
-   * Set consciousness parameters manually (ColorConsciousnessState compatibility)
+   * Set visual-effects parameters manually (ColorVisualEffectsState compatibility)
    */
   public setConsciousness(level: number, temperature: number = 6500): void {
-    this.consciousnessState.consciousnessResonance = Math.max(
+    this.visualEffectsState.visualEffectsResonance = Math.max(
       0,
       Math.min(1, level)
     );
-    this.consciousnessState.dominantEmotionalTemperature = Math.max(
+    this.visualEffectsState.dominantEmotionalTemperature = Math.max(
       1000,
       Math.min(10000, temperature)
     );
 
-    // Update transcendent parameters based on consciousness level
-    this.consciousnessState.transcendenceLevel = Math.min(1.0, level * 1.2);
-    this.consciousnessState.multidimensionalAwareness = level * 0.9;
+    // Update advanced parameters based on visual-effects level
+    this.visualEffectsState.enhancementLevel = Math.min(1.0, level * 1.2);
+    this.visualEffectsState.layeredEffects = level * 0.9;
 
-    this.publishConsciousnessUpdate();
+    this.publishVisualEffectsUpdate();
   }
 
   /**
-   * Get transcendent color palette (ColorConsciousnessState compatibility)
+   * Get advanced color palette (ColorVisualEffectsState compatibility)
    */
-  public getTranscendentPalette(): TranscendentColorValue[] {
-    return [...this.consciousnessState.currentPalette];
+  public getAdvancedPalette(): ColorValue[] {
+    return this.visualEffectsState.currentPalette.map(enhancedColor => ({
+      rgb: enhancedColor.rgb,
+      oklab: enhancedColor.oklab || { L: 0.5, a: 0, b: 0 },
+      colorSpace: 'rgb' as const
+    } as ColorValue));
   }
 
   /**
-   * Get temporal patterns (ColorConsciousnessState compatibility)
+   * Get temporal patterns (ColorVisualEffectsState compatibility)
    */
   public getTemporalPatterns(): TemporalColorPattern[] {
-    return [...this.consciousnessState.paletteEvolution.temporalPatterns];
+    return [...this.visualEffectsState.paletteEvolution.temporalPatterns];
   }
 
   /**
@@ -1179,27 +1192,27 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   /**
-   * Set transcendence level manually (ColorConsciousnessState compatibility)
+   * Set transcendence level manually (ColorVisualEffectsState compatibility)
    */
   public setTranscendence(level: number): void {
-    this.consciousnessState.transcendenceLevel = Math.max(
+    this.visualEffectsState.enhancementLevel = Math.max(
       0,
       Math.min(1, level)
     );
-    this.consciousnessState.cosmicResonance = level * 0.8;
-    this.consciousnessState.paletteEvolution.transcendenceProgress = level;
-    this.publishConsciousnessUpdate();
+    this.visualEffectsState.harmonicResonance = level * 0.8;
+    this.visualEffectsState.paletteEvolution.enhancementProgress = level;
+    this.publishVisualEffectsUpdate();
   }
 
   /**
-   * Set data stream intensity (ColorConsciousnessState compatibility)
+   * Set data stream intensity (ColorVisualEffectsState compatibility)
    */
   public setDataStreamIntensity(intensity: number): void {
-    this.consciousnessState.dataStreamIntensity = Math.max(
+    this.visualEffectsState.dataStreamIntensity = Math.max(
       0,
       Math.min(1, intensity)
     );
-    this.publishConsciousnessUpdate();
+    this.publishVisualEffectsUpdate();
   }
 }
 

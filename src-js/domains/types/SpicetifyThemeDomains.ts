@@ -152,7 +152,7 @@ export interface ThemeAppearance extends ThemeService {
 
 export interface VisualEffectConfig {
   webglEnabled: boolean;
-  consciousnessLevel: number;
+  visualEffectsLevel: number;
   visualIntensity: number;
   effectQuality: 'low' | 'medium' | 'high';
   enabledEffects: string[];
@@ -178,7 +178,7 @@ export interface VisualEffects extends ThemeService {
   webglGradientSystem: any; // WebGLGradientBackgroundSystem
   flowingLiquidSystem: any; // FluidGradientBackgroundSystem
   depthLayeredSystem: any; // DepthLayeredGradientSystem
-  consciousnessChoreographer: any; // BackgroundAnimationCoordinator
+  visualEffectsChoreographer: any; // BackgroundAnimationCoordinator
   backgroundStrategySelector: any; // BackgroundStrategySelector
   
   // Service-specific coordination methods

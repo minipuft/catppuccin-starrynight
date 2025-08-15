@@ -1,12 +1,12 @@
 /**
  * CSS-Only Blob Fallback System - Year 3000 Vision
  * 
- * Provides beautiful organic blob effects that work without WebGL
- * Integrates with existing living gradient base system and consciousness architecture
+ * Provides beautiful fluid blob effects that work without WebGL
+ * Integrates with existing living gradient base system and visual effects architecture
  * 
  * Features:
- * - Multi-layer blob positioning with organic movement
- * - Music-responsive breathing and color transitions
+ * - Multi-layer blob positioning with fluid movement
+ * - Music-responsive animation and color transitions
  * - OKLAB color science integration
  * - Performance-optimized CSS animations
  * - Automatic WebGL-CSS coordination
@@ -43,23 +43,23 @@
   /* Performance and quality */
   --css-blob-quality: 1; /* 0 = minimal, 1 = full quality */
   --css-blob-filter-quality: 1; /* Filter effects quality */
-  --css-blob-blur-amount: 20px; /* Organic edge blur */
+  --css-blob-blur-amount: 20px; /* Fluid edge blur */
   
-  /* Enhanced organic pattern variables - use existing consciousness system */
-  --css-blob-organic-flow: var(--consciousness-organic-mode); /* Use existing organic mode */
-  --css-blob-membrane-elasticity: var(--consciousness-membrane-elasticity); /* Use new membrane concept */
-  --css-blob-consciousness-sync: 1; /* Sync with consciousness systems */
-  --css-blob-emotional-temperature: var(--consciousness-musical-emotion); /* Use existing musical emotion */
-  --css-blob-cellular-growth: var(--consciousness-cellular-growth); /* Use new cellular concept */
-  --css-blob-organic-breathing: var(--consciousness-breathing-intensity); /* Use existing breathing */
+  /* Enhanced fluid pattern variables - use existing visual effects system */
+  --css-blob-fluid-flow: var(--visual-effects-flow-mode); /* Use existing flow mode */
+  --css-blob-membrane-elasticity: var(--visual-effects-membrane-elasticity); /* Use new membrane concept */
+  --css-blob-visual-effects-sync: 1; /* Sync with visual effects systems */
+  --css-blob-emotional-temperature: var(--visual-effects-musical-emotion); /* Use existing musical emotion */
+  --css-blob-cellular-growth: var(--visual-effects-cellular-growth); /* Use new cellular concept */
+  --css-blob-fluid-breathing: var(--visual-effects-breathing-intensity); /* Use existing breathing */
   --css-blob-fluid-dynamics: 1; /* Advanced fluid dynamics */
   
-  /* Organic consciousness physics - map to existing and new concepts */
-  --css-blob-membrane-tension: var(--consciousness-surface-tension); /* Use new surface tension concept */
-  --css-blob-cellular-mitosis: var(--consciousness-mitosis-frequency); /* Use new mitosis concept */
-  --css-blob-consciousness-osmosis: var(--consciousness-osmosis-rate); /* Use new osmosis concept */
-  --css-blob-organic-viscosity: var(--consciousness-viscosity); /* Use new viscosity concept */
-  --css-blob-emotional-conductivity: var(--consciousness-field-intensity); /* Use existing field intensity */
+  /* Fluid visual effects physics - map to existing and new concepts */
+  --css-blob-membrane-tension: var(--visual-effects-surface-tension); /* Use new surface tension concept */
+  --css-blob-cellular-mitosis: var(--visual-effects-mitosis-frequency); /* Use new mitosis concept */
+  --css-blob-visual-effects-osmosis: var(--visual-effects-osmosis-rate); /* Use new osmosis concept */
+  --css-blob-fluid-viscosity: var(--visual-effects-viscosity); /* Use new viscosity concept */
+  --css-blob-emotional-conductivity: var(--visual-effects-field-intensity); /* Use existing field intensity */
 }
 
 /* ============================================================================ */
@@ -73,17 +73,17 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: -10; /* Behind WebGL and consciousness layers */
+  z-index: -10; /* Behind WebGL and visual effects layers */
   pointer-events: none;
   overflow: hidden;
   contain: layout style paint;
   
   /* Show only when WebGL is not available or as requested */
-  opacity: calc(var(--css-blob-enabled) * var(--consciousness-css-fallback, 1));
-  transition: opacity 800ms var(--sn-anim-easing-organic, ease-out);
+  opacity: calc(var(--css-blob-enabled) * var(--visual-effects-css-fallback, 1));
+  transition: opacity 800ms var(--sn-anim-easing-smooth, ease-out);
 }
 
-/* Individual blob elements - Enhanced with organic consciousness patterns */
+/* Individual blob elements - Enhanced with fluid visual effects patterns */
 .sn-css-blob {
   position: absolute;
   width: var(--css-blob-size-base);
@@ -92,48 +92,48 @@
   will-change: transform, opacity, filter, border-radius;
   contain: layout style;
   
-  /* Organic membrane shape - deforms based on consciousness */
+  /* Fluid membrane shape - deforms based on visual effects */
   border-radius: 
-    calc(50% + var(--css-blob-membrane-elasticity) * var(--consciousness-oklab-chroma) * 10%)
-    calc(50% - var(--css-blob-membrane-elasticity) * var(--consciousness-oklab-luminance) * 8%)
-    calc(50% + var(--css-blob-membrane-elasticity) * var(--consciousness-oklab-hue) * 0.05%)
+    calc(50% + var(--css-blob-membrane-elasticity) * var(--visual-effects-oklab-chroma) * 10%)
+    calc(50% - var(--css-blob-membrane-elasticity) * var(--visual-effects-oklab-luminance) * 8%)
+    calc(50% + var(--css-blob-membrane-elasticity) * var(--visual-effects-oklab-hue) * 0.05%)
     calc(50% - var(--css-blob-membrane-elasticity) * var(--css-blob-emotional-temperature) * 12%);
   
-  /* Enhanced organic blob gradient with cellular consciousness */
+  /* Enhanced fluid blob gradient with cellular visual effects */
   background: 
     /* Core cellular nucleus */
     radial-gradient(
-      ellipse 25% 30% at calc(30% + var(--css-blob-consciousness-osmosis) * 20%) calc(40% + var(--css-blob-emotional-temperature) * 10%),
-      rgba(var(--consciousness-oklab-primary-rgb), calc(var(--css-blob-opacity) * var(--consciousness-oklab-luminance) * (1 + var(--css-blob-cellular-growth) * 0.3))) 0%,
-      rgba(var(--consciousness-oklab-accent-rgb), calc(var(--css-blob-opacity) * 0.7 * var(--consciousness-oklab-chroma))) 35%,
+      ellipse 25% 30% at calc(30% + var(--css-blob-visual-effects-osmosis) * 20%) calc(40% + var(--css-blob-emotional-temperature) * 10%),
+      rgba(var(--visual-effects-oklab-primary-rgb), calc(var(--css-blob-opacity) * var(--visual-effects-oklab-luminance) * (1 + var(--css-blob-cellular-growth) * 0.3))) 0%,
+      rgba(var(--visual-effects-oklab-accent-rgb), calc(var(--css-blob-opacity) * 0.7 * var(--visual-effects-oklab-chroma))) 35%,
       transparent 70%
     ),
     /* Cellular membrane layer */
     radial-gradient(
       ellipse calc(40% + var(--css-blob-membrane-tension) * 10%) calc(50% - var(--css-blob-membrane-tension) * 5%) at 50% 50%,
-      rgba(var(--consciousness-oklab-highlight-rgb), calc(var(--css-blob-opacity) * 0.4 * var(--consciousness-oklab-luminance) * var(--css-blob-cellular-mitosis))) 0%,
-      rgba(var(--consciousness-oklab-shadow-rgb), calc(var(--css-blob-opacity) * 0.2)) 60%,
+      rgba(var(--visual-effects-oklab-highlight-rgb), calc(var(--css-blob-opacity) * 0.4 * var(--visual-effects-oklab-luminance) * var(--css-blob-cellular-mitosis))) 0%,
+      rgba(var(--visual-effects-oklab-shadow-rgb), calc(var(--css-blob-opacity) * 0.2)) 60%,
       transparent 90%
     ),
-    /* Outer consciousness field */
+    /* Outer visual effects field */
     radial-gradient(
       circle calc(60% + var(--css-blob-emotional-conductivity) * 20%) at 50% 50%,
-      rgba(var(--consciousness-oklab-accent-rgb), calc(var(--css-blob-opacity) * 0.1 * var(--css-blob-consciousness-sync))) 0%,
+      rgba(var(--visual-effects-oklab-accent-rgb), calc(var(--css-blob-opacity) * 0.1 * var(--css-blob-visual-effects-sync))) 0%,
       transparent 100%
     );
   
-  /* Enhanced organic visual effects with consciousness responsiveness */
+  /* Enhanced fluid visual effects with system responsiveness */
   filter: 
-    blur(calc(var(--css-blob-blur-amount) * var(--css-blob-filter-quality) * (1 + var(--css-blob-organic-flow) * var(--css-blob-organic-viscosity) * 0.2)))
-    saturate(calc(var(--css-blob-saturation) * (1 + var(--consciousness-oklab-chroma) * var(--css-blob-emotional-conductivity) * 0.3)))
-    brightness(calc(1.0 + var(--consciousness-oklab-luminance) * var(--css-blob-consciousness-sync) * 0.15))
-    hue-rotate(calc(var(--css-blob-color-shift) + var(--consciousness-oklab-hue) * var(--css-blob-emotional-temperature) * 0.02deg))
+    blur(calc(var(--css-blob-blur-amount) * var(--css-blob-filter-quality) * (1 + var(--css-blob-fluid-flow) * var(--css-blob-fluid-viscosity) * 0.2)))
+    saturate(calc(var(--css-blob-saturation) * (1 + var(--visual-effects-oklab-chroma) * var(--css-blob-emotional-conductivity) * 0.3)))
+    brightness(calc(1.0 + var(--visual-effects-oklab-luminance) * var(--css-blob-visual-effects-sync) * 0.15))
+    hue-rotate(calc(var(--css-blob-color-shift) + var(--visual-effects-oklab-hue) * var(--css-blob-emotional-temperature) * 0.02deg))
     contrast(calc(1.0 + var(--css-blob-membrane-tension) * 0.1));
   
   /* Organic membrane blending */
   mix-blend-mode: var(--css-blob-blend-mode);
   
-  /* Performance optimizations with organic transforms */
+  /* Performance optimizations with fluid transforms */
   transform: translateZ(0) 
     scale(calc(1 + var(--css-blob-cellular-growth) * var(--css-blob-emotional-temperature) * 0.05));
   backface-visibility: hidden;
@@ -152,13 +152,13 @@
   
   background: radial-gradient(
     ellipse 60% 40% at 25% 30%,
-    rgba(var(--consciousness-oklab-primary-rgb), calc(var(--css-blob-opacity) * 0.9 * var(--consciousness-oklab-luminance))) 0%,
-    rgba(var(--consciousness-oklab-accent-rgb), calc(var(--css-blob-opacity) * 0.6 * var(--consciousness-oklab-chroma))) 40%,
+    rgba(var(--visual-effects-oklab-primary-rgb), calc(var(--css-blob-opacity) * 0.9 * var(--visual-effects-oklab-luminance))) 0%,
+    rgba(var(--visual-effects-oklab-accent-rgb), calc(var(--css-blob-opacity) * 0.6 * var(--visual-effects-oklab-chroma))) 40%,
     transparent 80%
   );
   
   animation: 
-    css-blob-organic-movement-1 var(--css-blob-movement-speed) ease-in-out infinite,
+    css-blob-fluid-movement-1 var(--css-blob-movement-speed) ease-in-out infinite,
     css-blob-breathing-1 var(--css-blob-breathing-speed) ease-in-out infinite;
 }
 
@@ -171,13 +171,13 @@
   
   background: radial-gradient(
     ellipse 40% 60% at 75% 70%,
-    rgba(var(--consciousness-oklab-accent-rgb), calc(var(--css-blob-opacity) * 0.8 * var(--consciousness-oklab-chroma))) 0%,
-    rgba(var(--consciousness-oklab-highlight-rgb), calc(var(--css-blob-opacity) * 0.5 * var(--consciousness-oklab-luminance))) 50%,
+    rgba(var(--visual-effects-oklab-accent-rgb), calc(var(--css-blob-opacity) * 0.8 * var(--visual-effects-oklab-chroma))) 0%,
+    rgba(var(--visual-effects-oklab-highlight-rgb), calc(var(--css-blob-opacity) * 0.5 * var(--visual-effects-oklab-luminance))) 50%,
     transparent 85%
   );
   
   animation: 
-    css-blob-organic-movement-2 calc(var(--css-blob-movement-speed) * 1.2) ease-in-out infinite,
+    css-blob-fluid-movement-2 calc(var(--css-blob-movement-speed) * 1.2) ease-in-out infinite,
     css-blob-breathing-2 calc(var(--css-blob-breathing-speed) * 0.8) ease-in-out infinite;
 }
 
@@ -190,13 +190,13 @@
   
   background: radial-gradient(
     circle 30% at 50% 50%,
-    rgba(var(--consciousness-oklab-highlight-rgb), calc(var(--css-blob-opacity) * 0.7 * var(--consciousness-oklab-luminance))) 0%,
-    rgba(var(--consciousness-oklab-shadow-rgb), calc(var(--css-blob-opacity) * 0.3)) 70%,
+    rgba(var(--visual-effects-oklab-highlight-rgb), calc(var(--css-blob-opacity) * 0.7 * var(--visual-effects-oklab-luminance))) 0%,
+    rgba(var(--visual-effects-oklab-shadow-rgb), calc(var(--css-blob-opacity) * 0.3)) 70%,
     transparent 100%
   );
   
   animation: 
-    css-blob-organic-movement-3 calc(var(--css-blob-movement-speed) * 0.9) ease-in-out infinite,
+    css-blob-fluid-movement-3 calc(var(--css-blob-movement-speed) * 0.9) ease-in-out infinite,
     css-blob-breathing-3 calc(var(--css-blob-breathing-speed) * 1.1) ease-in-out infinite;
 }
 
@@ -209,13 +209,13 @@
   
   background: radial-gradient(
     ellipse 50% 35% at 40% 25%,
-    rgba(var(--consciousness-oklab-shadow-rgb), calc(var(--css-blob-opacity) * 0.8)) 0%,
-    rgba(var(--consciousness-oklab-primary-rgb), calc(var(--css-blob-opacity) * 0.4 * var(--consciousness-oklab-luminance))) 45%,
+    rgba(var(--visual-effects-oklab-shadow-rgb), calc(var(--css-blob-opacity) * 0.8)) 0%,
+    rgba(var(--visual-effects-oklab-primary-rgb), calc(var(--css-blob-opacity) * 0.4 * var(--visual-effects-oklab-luminance))) 45%,
     transparent 90%
   );
   
   animation: 
-    css-blob-organic-movement-4 calc(var(--css-blob-movement-speed) * 1.3) ease-in-out infinite,
+    css-blob-fluid-movement-4 calc(var(--css-blob-movement-speed) * 1.3) ease-in-out infinite,
     css-blob-breathing-4 calc(var(--css-blob-breathing-speed) * 0.9) ease-in-out infinite;
 }
 
@@ -228,13 +228,13 @@
   
   background: radial-gradient(
     ellipse 35% 50% at 65% 75%,
-    rgba(var(--consciousness-oklab-accent-rgb), calc(var(--css-blob-opacity) * 0.7 * var(--consciousness-oklab-chroma))) 0%,
-    rgba(var(--consciousness-oklab-shadow-rgb), calc(var(--css-blob-opacity) * 0.4)) 60%,
+    rgba(var(--visual-effects-oklab-accent-rgb), calc(var(--css-blob-opacity) * 0.7 * var(--visual-effects-oklab-chroma))) 0%,
+    rgba(var(--visual-effects-oklab-shadow-rgb), calc(var(--css-blob-opacity) * 0.4)) 60%,
     transparent 85%
   );
   
   animation: 
-    css-blob-organic-movement-5 calc(var(--css-blob-movement-speed) * 0.8) ease-in-out infinite,
+    css-blob-fluid-movement-5 calc(var(--css-blob-movement-speed) * 0.8) ease-in-out infinite,
     css-blob-breathing-5 calc(var(--css-blob-breathing-speed) * 1.2) ease-in-out infinite;
 }
 
@@ -247,13 +247,13 @@
   
   background: radial-gradient(
     ellipse 25% at 20% 80%,
-    rgba(var(--consciousness-oklab-highlight-rgb), calc(var(--css-blob-opacity) * 0.6 * var(--consciousness-oklab-luminance))) 0%,
-    rgba(var(--consciousness-oklab-primary-rgb), calc(var(--css-blob-opacity) * 0.3 * var(--consciousness-oklab-chroma))) 80%,
+    rgba(var(--visual-effects-oklab-highlight-rgb), calc(var(--css-blob-opacity) * 0.6 * var(--visual-effects-oklab-luminance))) 0%,
+    rgba(var(--visual-effects-oklab-primary-rgb), calc(var(--css-blob-opacity) * 0.3 * var(--visual-effects-oklab-chroma))) 80%,
     transparent 100%
   );
   
   animation: 
-    css-blob-organic-movement-6 calc(var(--css-blob-movement-speed) * 1.1) ease-in-out infinite,
+    css-blob-fluid-movement-6 calc(var(--css-blob-movement-speed) * 1.1) ease-in-out infinite,
     css-blob-breathing-6 calc(var(--css-blob-breathing-speed) * 0.7) ease-in-out infinite;
 }
 
@@ -261,7 +261,7 @@
 /* ORGANIC MOVEMENT ANIMATIONS */
 /* ============================================================================ */
 
-@keyframes css-blob-organic-movement-1 {
+@keyframes css-blob-fluid-movement-1 {
   0% { 
     transform: translateZ(0) translate(0%, 0%) rotate(0deg) scale(1);
   }
@@ -279,7 +279,7 @@
   }
 }
 
-@keyframes css-blob-organic-movement-2 {
+@keyframes css-blob-fluid-movement-2 {
   0% { 
     transform: translateZ(0) translate(0%, 0%) rotate(0deg) scale(1);
   }
@@ -294,7 +294,7 @@
   }
 }
 
-@keyframes css-blob-organic-movement-3 {
+@keyframes css-blob-fluid-movement-3 {
   0% { 
     transform: translateZ(0) translate(0%, 0%) rotate(0deg) scale(1);
   }
@@ -315,7 +315,7 @@
   }
 }
 
-@keyframes css-blob-organic-movement-4 {
+@keyframes css-blob-fluid-movement-4 {
   0% { 
     transform: translateZ(0) translate(0%, 0%) rotate(0deg) scale(1);
   }
@@ -330,7 +330,7 @@
   }
 }
 
-@keyframes css-blob-organic-movement-5 {
+@keyframes css-blob-fluid-movement-5 {
   0% { 
     transform: translateZ(0) translate(0%, 0%) rotate(0deg) scale(1);
   }
@@ -345,7 +345,7 @@
   }
 }
 
-@keyframes css-blob-organic-movement-6 {
+@keyframes css-blob-fluid-movement-6 {
   0% { 
     transform: translateZ(0) translate(0%, 0%) rotate(0deg) scale(1);
   }
@@ -361,7 +361,7 @@
 /* ENHANCED ORGANIC CONSCIOUSNESS ANIMATIONS */
 /* ============================================================================ */
 
-/* Cellular mitosis animation - organic division patterns */
+/* Cellular mitosis animation - fluid division patterns */
 @keyframes css-blob-cellular-mitosis {
   0% {
     border-radius: 50%;
@@ -386,7 +386,7 @@
 }
 
 /* Consciousness osmosis - energy flow between blobs */
-@keyframes css-blob-consciousness-osmosis {
+@keyframes css-blob-visual-effects-osmosis {
   0% {
     opacity: calc(var(--css-blob-opacity) * 1.0);
     filter: brightness(1.0) contrast(1.0);
@@ -479,21 +479,21 @@
 
 @keyframes css-blob-breathing-1 {
   0% { 
-    opacity: calc(var(--css-blob-opacity) * 0.9 * var(--consciousness-oklab-luminance));
+    opacity: calc(var(--css-blob-opacity) * 0.9 * var(--visual-effects-oklab-luminance));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 1.0))
       saturate(calc(var(--css-blob-saturation) * 1.0))
       brightness(1.0);
   }
   50% { 
-    opacity: calc(var(--css-blob-opacity) * 1.1 * var(--consciousness-oklab-luminance));
+    opacity: calc(var(--css-blob-opacity) * 1.1 * var(--visual-effects-oklab-luminance));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 0.8))
       saturate(calc(var(--css-blob-saturation) * 1.15))
       brightness(1.05);
   }
   100% { 
-    opacity: calc(var(--css-blob-opacity) * 0.9 * var(--consciousness-oklab-luminance));
+    opacity: calc(var(--css-blob-opacity) * 0.9 * var(--visual-effects-oklab-luminance));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 1.0))
       saturate(calc(var(--css-blob-saturation) * 1.0))
@@ -503,21 +503,21 @@
 
 @keyframes css-blob-breathing-2 {
   0% { 
-    opacity: calc(var(--css-blob-opacity) * 0.8 * var(--consciousness-oklab-chroma));
+    opacity: calc(var(--css-blob-opacity) * 0.8 * var(--visual-effects-oklab-chroma));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 1.1))
       saturate(calc(var(--css-blob-saturation) * 0.95))
       brightness(0.98);
   }
   50% { 
-    opacity: calc(var(--css-blob-opacity) * 1.2 * var(--consciousness-oklab-chroma));
+    opacity: calc(var(--css-blob-opacity) * 1.2 * var(--visual-effects-oklab-chroma));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 0.7))
       saturate(calc(var(--css-blob-saturation) * 1.2))
       brightness(1.08);
   }
   100% { 
-    opacity: calc(var(--css-blob-opacity) * 0.8 * var(--consciousness-oklab-chroma));
+    opacity: calc(var(--css-blob-opacity) * 0.8 * var(--visual-effects-oklab-chroma));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 1.1))
       saturate(calc(var(--css-blob-saturation) * 0.95))
@@ -527,21 +527,21 @@
 
 @keyframes css-blob-breathing-3 {
   0% { 
-    opacity: calc(var(--css-blob-opacity) * 0.7 * var(--consciousness-oklab-luminance));
+    opacity: calc(var(--css-blob-opacity) * 0.7 * var(--visual-effects-oklab-luminance));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 1.2))
       saturate(calc(var(--css-blob-saturation) * 0.9))
       brightness(0.96);
   }
   50% { 
-    opacity: calc(var(--css-blob-opacity) * 1.3 * var(--consciousness-oklab-luminance));
+    opacity: calc(var(--css-blob-opacity) * 1.3 * var(--visual-effects-oklab-luminance));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 0.6))
       saturate(calc(var(--css-blob-saturation) * 1.25))
       brightness(1.12);
   }
   100% { 
-    opacity: calc(var(--css-blob-opacity) * 0.7 * var(--consciousness-oklab-luminance));
+    opacity: calc(var(--css-blob-opacity) * 0.7 * var(--visual-effects-oklab-luminance));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 1.2))
       saturate(calc(var(--css-blob-saturation) * 0.9))
@@ -575,21 +575,21 @@
 
 @keyframes css-blob-breathing-5 {
   0% { 
-    opacity: calc(var(--css-blob-opacity) * 0.7 * var(--consciousness-oklab-chroma));
+    opacity: calc(var(--css-blob-opacity) * 0.7 * var(--visual-effects-oklab-chroma));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 1.15))
       saturate(calc(var(--css-blob-saturation) * 0.92))
       brightness(0.97);
   }
   50% { 
-    opacity: calc(var(--css-blob-opacity) * 1.25 * var(--consciousness-oklab-chroma));
+    opacity: calc(var(--css-blob-opacity) * 1.25 * var(--visual-effects-oklab-chroma));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 0.65))
       saturate(calc(var(--css-blob-saturation) * 1.22))
       brightness(1.09);
   }
   100% { 
-    opacity: calc(var(--css-blob-opacity) * 0.7 * var(--consciousness-oklab-chroma));
+    opacity: calc(var(--css-blob-opacity) * 0.7 * var(--visual-effects-oklab-chroma));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 1.15))
       saturate(calc(var(--css-blob-saturation) * 0.92))
@@ -599,21 +599,21 @@
 
 @keyframes css-blob-breathing-6 {
   0% { 
-    opacity: calc(var(--css-blob-opacity) * 0.6 * var(--consciousness-oklab-luminance));
+    opacity: calc(var(--css-blob-opacity) * 0.6 * var(--visual-effects-oklab-luminance));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 1.3))
       saturate(calc(var(--css-blob-saturation) * 0.85))
       brightness(0.94);
   }
   50% { 
-    opacity: calc(var(--css-blob-opacity) * 1.4 * var(--consciousness-oklab-luminance));
+    opacity: calc(var(--css-blob-opacity) * 1.4 * var(--visual-effects-oklab-luminance));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 0.5))
       saturate(calc(var(--css-blob-saturation) * 1.3))
       brightness(1.15);
   }
   100% { 
-    opacity: calc(var(--css-blob-opacity) * 0.6 * var(--consciousness-oklab-luminance));
+    opacity: calc(var(--css-blob-opacity) * 0.6 * var(--visual-effects-oklab-luminance));
     filter: 
       blur(calc(var(--css-blob-blur-amount) * 1.3))
       saturate(calc(var(--css-blob-saturation) * 0.85))
@@ -636,7 +636,7 @@
 }
 
 /* High energy music response */
-html[style*="--consciousness-music-energy: 1"] .sn-css-blob {
+html[style*="--visual-effects-music-energy: 1"] .sn-css-blob {
   --css-blob-movement-speed: 6000ms;
   --css-blob-breathing-speed: 3000ms;
   --css-blob-opacity: calc(var(--css-blob-energy-opacity) * 1.2);
@@ -645,7 +645,7 @@ html[style*="--consciousness-music-energy: 1"] .sn-css-blob {
 }
 
 /* Low energy music response */
-html[style*="--consciousness-music-energy: 0"] .sn-css-blob {
+html[style*="--visual-effects-music-energy: 0"] .sn-css-blob {
   --css-blob-movement-speed: 12000ms;
   --css-blob-breathing-speed: 8000ms;
   --css-blob-opacity: calc(var(--css-blob-energy-opacity) * 0.8);
@@ -680,8 +680,8 @@ html[style*="--consciousness-music-energy: 0"] .sn-css-blob {
 html[style*="--sn-webgl-enabled: 1"] .sn-css-blob-container {
   opacity: calc(
     var(--css-blob-enabled) * 
-    var(--consciousness-css-fallback, 1) * 
-    (1 - var(--consciousness-webgl-coordination, 0) * 0.8)
+    var(--visual-effects-css-fallback, 1) * 
+    (1 - var(--visual-effects-webgl-coordination, 0) * 0.8)
   );
   
   .sn-css-blob {
@@ -696,8 +696,8 @@ html[style*="--sn-webgl-enabled: 1"] .sn-css-blob-container {
 /* WebGL transition coordination */
 .sn-css-blob-container {
   transition: 
-    opacity 800ms var(--sn-anim-easing-organic, ease-out),
-    transform 600ms var(--sn-anim-easing-organic, ease-out);
+    opacity 800ms var(--sn-anim-easing-smooth, ease-out),
+    transform 600ms var(--sn-anim-easing-smooth, ease-out);
 }
 
 /* ============================================================================ */
@@ -747,14 +747,14 @@ html[style*="--sn-webgl-enabled: 1"] .sn-css-blob-container {
 /* ORGANIC CONSCIOUSNESS INTEGRATION */
 /* ============================================================================ */
 
-/* Enhanced organic consciousness animations - applied when organic flow is enabled */
+/* Enhanced fluid visual effects animations - applied when fluid flow is enabled */
 .sn-css-blob {
-  /* Base organic consciousness animations */
+  /* Base fluid visual effects animations */
   animation: 
-    css-blob-organic-movement-1 var(--css-blob-movement-speed) ease-in-out infinite,
+    css-blob-fluid-movement-1 var(--css-blob-movement-speed) ease-in-out infinite,
     css-blob-breathing-1 var(--css-blob-breathing-speed) ease-in-out infinite,
     css-blob-cellular-mitosis calc(var(--css-blob-movement-speed) * 1.8 * var(--css-blob-cellular-growth)) ease-in-out infinite,
-    css-blob-consciousness-osmosis calc(var(--css-blob-breathing-speed) * 1.2 * var(--css-blob-consciousness-sync)) ease-in-out infinite,
+    css-blob-visual-effects-osmosis calc(var(--css-blob-breathing-speed) * 1.2 * var(--css-blob-visual-effects-sync)) ease-in-out infinite,
     css-blob-membrane-deformation calc(var(--css-blob-movement-speed) * 0.7 * var(--css-blob-membrane-elasticity)) ease-in-out infinite,
     css-blob-emotional-temperature calc(var(--css-blob-breathing-speed) * 2.5 * var(--css-blob-emotional-temperature)) ease-in-out infinite;
     
@@ -768,7 +768,7 @@ html[style*="--sn-webgl-enabled: 1"] .sn-css-blob-container {
     calc(var(--css-blob-breathing-speed) * 0.4);
 }
 
-/* Individual blob organic variations */
+/* Individual blob fluid variations */
 .sn-css-blob:nth-child(2) {
   animation-delay: 
     calc(var(--css-blob-movement-speed) * 0.15),
@@ -819,16 +819,16 @@ html[style*="--sn-webgl-enabled: 1"] .sn-css-blob-container {
     calc(var(--css-blob-breathing-speed) * 1.15);
 }
 
-/* Disable organic animations when organic flow is disabled */
-.sn-css-blob-container[style*="--css-blob-organic-flow: 0"] .sn-css-blob {
+/* Disable fluid animations when fluid flow is disabled */
+.sn-css-blob-container[style*="--css-blob-fluid-flow: 0"] .sn-css-blob {
   animation: 
-    css-blob-organic-movement-1 var(--css-blob-movement-speed) ease-in-out infinite,
+    css-blob-fluid-movement-1 var(--css-blob-movement-speed) ease-in-out infinite,
     css-blob-breathing-1 var(--css-blob-breathing-speed) ease-in-out infinite !important;
 }
 
-/* High consciousness sync intensity */
-.sn-css-blob-container[style*="--css-blob-consciousness-sync: 1"] .sn-css-blob {
-  /* Enhanced consciousness osmosis with faster flow */
+/* High visual effects sync intensity */
+.sn-css-blob-container[style*="--css-blob-visual-effects-sync: 1"] .sn-css-blob {
+  /* Enhanced visual effects osmosis with faster flow */
   animation-duration: 
     var(--css-blob-movement-speed),
     var(--css-blob-breathing-speed),
@@ -876,5 +876,34 @@ html[style*="--sn-webgl-enabled: 1"] .sn-css-blob-container {
 
 /* Debug mode - show blob boundaries */
 html[data-debug="true"] .sn-css-blob {
-  outline: 1px dashed rgba(var(--consciousness-oklab-primary-rgb), 0.3);
+  outline: 1px dashed rgba(var(--visual-effects-oklab-primary-rgb), 0.3);
+}
+
+// ==============================================
+// Legacy Compatibility Aliases
+// ==============================================
+// Ensures backward compatibility during transition
+
+// Keyframe aliases for legacy animation names
+@keyframes css-blob-consciousness-osmosis {
+  0% { transform: translateX(0) translateY(0) scale(1); }
+  25% { transform: translateX(5px) translateY(-3px) scale(1.02); }
+  50% { transform: translateX(-3px) translateY(4px) scale(0.98); }
+  75% { transform: translateX(-4px) translateY(-2px) scale(1.01); }
+  100% { transform: translateX(0) translateY(0) scale(1); }
+}
+
+@keyframes css-blob-organic-movement-1 {
+  0% { transform: translateX(0%) translateY(0%) rotate(0deg); }
+  25% { transform: translateX(2%) translateY(-1.5%) rotate(90deg); }
+  50% { transform: translateX(-1%) translateY(2%) rotate(180deg); }
+  75% { transform: translateX(-2%) translateY(-1%) rotate(270deg); }
+  100% { transform: translateX(0%) translateY(0%) rotate(360deg); }
+}
+
+@keyframes css-blob-organic-movement-2 {
+  0% { transform: translateX(0%) translateY(0%) rotate(0deg) scale(1); }
+  33% { transform: translateX(-1.5%) translateY(1.5%) rotate(120deg) scale(1.05); }
+  66% { transform: translateX(1%) translateY(-2%) rotate(240deg) scale(0.95); }
+  100% { transform: translateX(0%) translateY(0%) rotate(360deg) scale(1); }
 }

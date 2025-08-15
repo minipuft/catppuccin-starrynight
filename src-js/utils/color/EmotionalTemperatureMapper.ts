@@ -75,7 +75,7 @@ const EMOTIONAL_TEMPERATURE_MAP: Record<EmotionalState, {
       valence: [0.4, 0.8],
       intensity: 0.6
     },
-    cssClass: 'organic-emotion-calm',
+    cssClass: 'smooth-emotion-calm',
     description: 'Warm, soothing, meditative states',
     oklabBaseColor: '#89b4fa', // Catppuccin blue - calming base
     oklabPreset: 'SUBTLE',
@@ -93,7 +93,7 @@ const EMOTIONAL_TEMPERATURE_MAP: Record<EmotionalState, {
       valence: [0.0, 0.4],
       intensity: 0.8
     },
-    cssClass: 'organic-emotion-melancholy',
+    cssClass: 'smooth-emotion-melancholy',
     description: 'Deep, introspective, amber-golden tones',
     oklabBaseColor: '#f9e2af', // Catppuccin yellow - warm melancholic base
     oklabPreset: 'STANDARD',
@@ -111,7 +111,7 @@ const EMOTIONAL_TEMPERATURE_MAP: Record<EmotionalState, {
       valence: [0.5, 1.0],
       intensity: 1.0
     },
-    cssClass: 'organic-emotion-energetic',
+    cssClass: 'smooth-emotion-energetic',
     description: 'Bright, vibrant, high-energy states',
     oklabBaseColor: '#a6e3a1', // Catppuccin green - vibrant energetic base
     oklabPreset: 'VIBRANT',
@@ -129,7 +129,7 @@ const EMOTIONAL_TEMPERATURE_MAP: Record<EmotionalState, {
       valence: [0.0, 0.6],
       intensity: 1.2
     },
-    cssClass: 'organic-emotion-aggressive',
+    cssClass: 'smooth-emotion-aggressive',
     description: 'Cool, intense, high-energy negative valence',
     oklabBaseColor: '#f38ba8', // Catppuccin red - intense aggressive base
     oklabPreset: 'COSMIC',
@@ -147,7 +147,7 @@ const EMOTIONAL_TEMPERATURE_MAP: Record<EmotionalState, {
       valence: [0.6, 1.0],
       intensity: 0.9
     },
-    cssClass: 'organic-emotion-happy',
+    cssClass: 'smooth-emotion-happy',
     description: 'Balanced, joyful, warm-white tones',
     oklabBaseColor: '#fab387', // Catppuccin peach - warm happy base
     oklabPreset: 'STANDARD',
@@ -165,7 +165,7 @@ const EMOTIONAL_TEMPERATURE_MAP: Record<EmotionalState, {
       valence: [0.5, 0.9],
       intensity: 0.7
     },
-    cssClass: 'organic-emotion-romantic',
+    cssClass: 'smooth-emotion-romantic',
     description: 'Soft, intimate, warm tones with pink accent',
     oklabBaseColor: '#f5c2e7', // Catppuccin pink - romantic base
     oklabPreset: 'SUBTLE',
@@ -183,7 +183,7 @@ const EMOTIONAL_TEMPERATURE_MAP: Record<EmotionalState, {
       valence: [0.1, 0.5],
       intensity: 0.9
     },
-    cssClass: 'organic-emotion-mysterious',
+    cssClass: 'smooth-emotion-mysterious',
     description: 'Deep, enigmatic, low temperature with purple accent',
     oklabBaseColor: '#cba6f7', // Catppuccin mauve - mysterious base
     oklabPreset: 'VIBRANT',
@@ -201,7 +201,7 @@ const EMOTIONAL_TEMPERATURE_MAP: Record<EmotionalState, {
       valence: [0.3, 0.8],
       intensity: 1.3
     },
-    cssClass: 'organic-emotion-epic',
+    cssClass: 'smooth-emotion-epic',
     description: 'Grand, cinematic, high contrast blue-gold',
     oklabBaseColor: '#74c7ec', // Catppuccin sapphire - epic base
     oklabPreset: 'COSMIC',
@@ -219,7 +219,7 @@ const EMOTIONAL_TEMPERATURE_MAP: Record<EmotionalState, {
       valence: [0.3, 0.7],
       intensity: 0.5
     },
-    cssClass: 'organic-emotion-ambient',
+    cssClass: 'smooth-emotion-ambient',
     description: 'Atmospheric, floating, neutral temperature',
     oklabBaseColor: '#94e2d5', // Catppuccin teal - ambient base
     oklabPreset: 'SUBTLE',
@@ -501,25 +501,25 @@ export class EmotionalTemperatureMapper {
     const cssVars: Record<string, string> = {};
 
     // Core emotional temperature variables
-    cssVars['--organic-current-emotion'] = primary;
-    cssVars['--organic-emotional-intensity'] = intensity.toString();
-    cssVars['--organic-current-temperature'] = temperature.toString();
+    cssVars['--smooth-current-emotion'] = primary;
+    cssVars['--smooth-emotional-intensity'] = intensity.toString();
+    cssVars['--smooth-current-temperature'] = temperature.toString();
     
     // Dynamic emotional state variables
-    cssVars['--organic-emotion-primary'] = primary;
+    cssVars['--smooth-emotion-primary'] = primary;
     if (secondary) {
-      cssVars['--organic-emotion-secondary'] = secondary;
-      cssVars['--organic-emotion-blend-ratio'] = blendRatio.toString();
+      cssVars['--smooth-emotion-secondary'] = secondary;
+      cssVars['--smooth-emotion-blend-ratio'] = blendRatio.toString();
     }
 
     // Intensity-based variables for mixins
-    cssVars['--organic-emotional-saturation'] = Math.max(0.5, intensity).toString();
-    cssVars['--organic-cinematic-contrast'] = Math.max(0.8, intensity * 1.2).toString();
-    cssVars['--organic-warmth'] = this.calculateWarmth(temperature).toString();
+    cssVars['--smooth-emotional-saturation'] = Math.max(0.5, intensity).toString();
+    cssVars['--smooth-cinematic-contrast'] = Math.max(0.8, intensity * 1.2).toString();
+    cssVars['--smooth-warmth'] = this.calculateWarmth(temperature).toString();
 
-    // Breathing and animation variables
-    const breathingSpeed = this.calculateBreathingSpeed(primary, intensity);
-    cssVars['--organic-breathing-cycle'] = `${breathingSpeed}s`;
+    // Pulsing and animation variables
+    const pulsingSpeed = this.calculatePulsingSpeed(primary, intensity);
+    cssVars['--smooth-pulsing-cycle'] = `${pulsingSpeed}s`;
     
     // Temperature-based filter adjustments
     const temperatureFilters = this.calculateTemperatureFilters(temperature, intensity);
@@ -528,26 +528,26 @@ export class EmotionalTemperatureMapper {
     // OKLAB enhanced variables for perceptual color processing
     if (oklabResult && perceptualColorHex) {
       // Core OKLAB color variables
-      cssVars['--organic-emotion-oklab-hex'] = perceptualColorHex;
-      cssVars['--organic-emotion-oklab-rgb'] = `${oklabResult.enhancedRgb.r},${oklabResult.enhancedRgb.g},${oklabResult.enhancedRgb.b}`;
+      cssVars['--smooth-emotion-oklab-hex'] = perceptualColorHex;
+      cssVars['--smooth-emotion-oklab-rgb'] = `${oklabResult.enhancedRgb.r},${oklabResult.enhancedRgb.g},${oklabResult.enhancedRgb.b}`;
       
       // OKLAB space coordinates for advanced effects
-      cssVars['--organic-emotion-oklab-l'] = oklabResult.oklabEnhanced.L.toFixed(3);
-      cssVars['--organic-emotion-oklab-a'] = oklabResult.oklabEnhanced.a.toFixed(3);
-      cssVars['--organic-emotion-oklab-b'] = oklabResult.oklabEnhanced.b.toFixed(3);
+      cssVars['--smooth-emotion-oklab-l'] = oklabResult.oklabEnhanced.L.toFixed(3);
+      cssVars['--smooth-emotion-oklab-a'] = oklabResult.oklabEnhanced.a.toFixed(3);
+      cssVars['--smooth-emotion-oklab-b'] = oklabResult.oklabEnhanced.b.toFixed(3);
       
       // OKLCH representation for hue-based animations
-      cssVars['--organic-emotion-oklch-l'] = oklabResult.oklchEnhanced.L.toFixed(3);
-      cssVars['--organic-emotion-oklch-c'] = oklabResult.oklchEnhanced.C.toFixed(3);
-      cssVars['--organic-emotion-oklch-h'] = oklabResult.oklchEnhanced.H.toFixed(1);
+      cssVars['--smooth-emotion-oklch-l'] = oklabResult.oklchEnhanced.L.toFixed(3);
+      cssVars['--smooth-emotion-oklch-c'] = oklabResult.oklchEnhanced.C.toFixed(3);
+      cssVars['--smooth-emotion-oklch-h'] = oklabResult.oklchEnhanced.H.toFixed(1);
       
       // Shadow color for depth effects
-      cssVars['--organic-emotion-oklab-shadow-hex'] = oklabResult.shadowHex;
-      cssVars['--organic-emotion-oklab-shadow-rgb'] = `${oklabResult.shadowRgb.r},${oklabResult.shadowRgb.g},${oklabResult.shadowRgb.b}`;
+      cssVars['--smooth-emotion-oklab-shadow-hex'] = oklabResult.shadowHex;
+      cssVars['--smooth-emotion-oklab-shadow-rgb'] = `${oklabResult.shadowRgb.r},${oklabResult.shadowRgb.g},${oklabResult.shadowRgb.b}`;
       
       // Replace legacy temperature-based color with OKLAB-enhanced color
-      cssVars['--organic-perceptual-emotion-color'] = perceptualColorHex;
-      cssVars['--organic-perceptual-emotion-rgb'] = `${oklabResult.enhancedRgb.r},${oklabResult.enhancedRgb.g},${oklabResult.enhancedRgb.b}`;
+      cssVars['--smooth-perceptual-emotion-color'] = perceptualColorHex;
+      cssVars['--smooth-perceptual-emotion-rgb'] = `${oklabResult.enhancedRgb.r},${oklabResult.enhancedRgb.g},${oklabResult.enhancedRgb.b}`;
       
       if (this.enableDebug) {
         console.log('🎨 [EmotionalTemperatureMapper] Generated OKLAB CSS variables:', {
@@ -580,9 +580,9 @@ export class EmotionalTemperatureMapper {
   }
 
   /**
-   * Calculate breathing animation speed based on emotion and intensity
+   * Calculate pulsing animation speed based on emotion and intensity
    */
-  private calculateBreathingSpeed(emotion: EmotionalState, intensity: number): number {
+  private calculatePulsingSpeed(emotion: EmotionalState, intensity: number): number {
     const baseSpeed: Record<EmotionalState, number> = {
       calm: 6.0,
       melancholy: 8.0,
@@ -596,7 +596,7 @@ export class EmotionalTemperatureMapper {
     };
 
     const base = baseSpeed[emotion];
-    // Higher intensity = faster breathing
+    // Higher intensity = faster pulsing
     const intensityFactor = Math.max(0.5, Math.min(2.0, 2.0 - intensity));
     return base * intensityFactor;
   }
@@ -609,15 +609,15 @@ export class EmotionalTemperatureMapper {
 
     // Hue rotation based on temperature
     const hueRotation = this.mapTemperatureToHue(temperature);
-    filters['--organic-temperature-hue-shift'] = `${hueRotation}deg`;
+    filters['--smooth-temperature-hue-shift'] = `${hueRotation}deg`;
 
     // Saturation based on temperature and intensity
     const saturation = Math.max(0.8, Math.min(1.5, 1.0 + (intensity - 0.5) * 0.4));
-    filters['--organic-temperature-saturation'] = saturation.toString();
+    filters['--smooth-temperature-saturation'] = saturation.toString();
 
     // Brightness based on temperature
     const brightness = this.mapTemperatureToBrightness(temperature);
-    filters['--organic-temperature-brightness'] = brightness.toString();
+    filters['--smooth-temperature-brightness'] = brightness.toString();
 
     return filters;
   }
@@ -656,7 +656,7 @@ export class EmotionalTemperatureMapper {
   ): void {
     // Remove existing emotion classes
     const existingClasses = Array.from(element.classList).filter(cls => 
-      cls.startsWith('organic-emotion-')
+      cls.startsWith('smooth-emotion-')
     );
     element.classList.remove(...existingClasses);
 
@@ -665,7 +665,7 @@ export class EmotionalTemperatureMapper {
 
     // Apply secondary emotion modifier if present
     if (result.secondaryEmotion) {
-      element.classList.add(`organic-emotion-blend-${result.secondaryEmotion}`);
+      element.classList.add(`smooth-emotion-blend-${result.secondaryEmotion}`);
     }
 
     // Apply CSS variables

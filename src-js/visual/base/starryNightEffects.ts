@@ -1,5 +1,5 @@
 import { SettingsManager } from "@/ui/managers/SettingsManager";
-import { YEAR3000_CONFIG } from "@/config/globalConfig";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 
 type EffectIntensity = "disabled" | "minimal" | "balanced" | "intense";
 
@@ -53,7 +53,7 @@ function applyStarryNightSettings(
   // Legacy parameter kept for backwards compatibility
   _legacyStarDensity?: EffectIntensity
 ): void {
-  if (YEAR3000_CONFIG.enableDebug) {
+  if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
     console.log("[StarryNightEffects] Applying consolidated effect settings:", {
       effectIntensity,
     });

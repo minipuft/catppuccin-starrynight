@@ -47,16 +47,16 @@ import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVari
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import type { Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { VisualEffectsManager } from "@/types/colorStubs";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
-import * as Utils from "@/utils/core/Year3000Utilities";
+import * as Utils from "@/utils/core/ThemeUtilities";
 
 // Visual System imports
 // import "@/visual/effects/ParticleConsciousnessModule"; // Disabled - converted to CSS-only
 import { WebGLGradientBackgroundSystem } from "@/visual/background/WebGLRenderer";
 import { CSSBlobFallbackSystem } from "@/visual/css-fallbacks/CSSBlobFallbackSystem";
-import { ConsciousnessUIEffectsController } from "@/visual/effects/UIVisualEffectsController";
+import { UIEffectsController } from "@/visual/effects/UIVisualEffectsController";
 import { HeaderVisualEffectsController } from "@/visual/effects/HeaderVisualEffectsController";
 import { SidebarVisualEffectsSystem } from "@/visual/ui/SidebarVisualEffectsSystem";
 import { GradientConductor } from "@/visual/backbone/GradientConductor";
@@ -69,7 +69,7 @@ import { SpotifyUIApplicationSystem } from "@/visual/ui/SpotifyUIApplicationSyst
 // Consciousness engine imports for integration
 import { RedEnergyBurstSystem } from "@/visual/effects/HighEnergyEffectsController";
 import { MusicGlowEffectsManager } from "@/visual/effects/GlowEffectsController";
-import { BreathingEffectsController } from "@/visual/effects/BreathingEffectsController";
+import { AnimationEffectsController } from "@/visual/effects/BreathingEffectsController";
 
 // Interface imports
 import { IManagedSystem, HealthCheckResult } from "@/types/systems";
@@ -187,7 +187,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
   public readonly systemName = "VisualSystemCoordinator";
   public initialized = false;
   // Core dependencies
-  private config: Year3000Config;
+  private config: AdvancedSystemConfig | Year3000Config;
   private utils: typeof Utils;
   private year3000System: any; // Reference to main system
 
@@ -225,6 +225,9 @@ export class VisualSystemCoordinator implements IManagedSystem {
   private healthCheckInterval: number | null = null;
   private metricsUpdateInterval: number | null = null;
 
+  // Performance tracking
+  private fpsHistory: number[] = [];
+
   // Event callbacks
   private onSystemAdaptation: ((metrics: VisualSystemMetrics) => void) | null =
     null;
@@ -235,7 +238,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     | null = null;
 
   constructor(
-    config: Year3000Config,
+    config: AdvancedSystemConfig | Year3000Config,
     utils: typeof Utils,
     year3000System: any,
     cssVariableController: OptimizedCSSVariableManager,
@@ -311,7 +314,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
 
     this.systemRegistry.set(
       "UIVisualEffects",
-      ConsciousnessUIEffectsController
+      UIEffectsController
     );
     this.systemDependencies.set("UIVisualEffects", [
       "eventBus",
@@ -380,7 +383,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
       "eventBus",
     ]);
 
-    this.systemRegistry.set("NaturalHarmony", BreathingEffectsController);
+    this.systemRegistry.set("NaturalHarmony", AnimationEffectsController);
     this.systemDependencies.set("NaturalHarmony", [
       "performanceAnalyzer",
       "cssVariableController",
@@ -1091,34 +1094,6 @@ export class VisualSystemCoordinator implements IManagedSystem {
   }
 
   // Utility methods
-  private createInitialMetrics(): VisualSystemMetrics {
-    return {
-      currentFPS: 0,
-      averageFPS: 0,
-      frameTime: 0,
-      memoryUsageMB: 0,
-      systemHealth: "good",
-      activeVisualSystems: [],
-      currentQuality: {
-        gradientComplexity: 0.6,
-        particleDensity: 0.6,
-        shaderPrecision: "medium",
-        textureResolution: 1.0,
-        animationFPS: 60,
-        transitionQuality: "smooth",
-        motionBlur: false,
-        bloomEnabled: true,
-        shadowQuality: "medium",
-        antiAliasing: "fxaa",
-        postProcessing: true,
-      },
-      adaptiveScaling: true,
-      performanceMonitoring: true,
-      eventCoordination: true,
-      lastEventTime: 0,
-      eventCount: 0,
-    };
-  }
 
   private async applyConfiguration(): Promise<void> {
     // AdaptivePerformanceSystem functionality absorbed into SimplePerformanceCoordinator (Phase 3 consolidation)
@@ -1154,31 +1129,211 @@ export class VisualSystemCoordinator implements IManagedSystem {
     }
   }
 
+  /**
+   * Create initial metrics with enhanced performance monitoring
+   */
+  private createInitialMetrics(): VisualSystemMetrics {
+    return {
+      currentFPS: 60,
+      averageFPS: 60,
+      frameTime: 16.67,
+      memoryUsageMB: 0,
+      systemHealth: "excellent",
+      activeVisualSystems: [],
+      currentQuality: {
+        level: "medium",
+        gradientComplexity: 0.7,
+        particleDensity: 100,
+        animationFPS: 60,
+        postProcessing: true,
+        bloomEnabled: true,
+        antiAliasing: "fxaa",
+        shadowQuality: "medium",
+        shaderPrecision: "medium",
+      },
+      adaptiveScaling: true,
+      performanceMonitoring: true,
+      eventCoordination: true,
+      lastEventTime: 0,
+      eventCount: 0,
+    };
+  }
+
+  /**
+   * Enhanced metrics update with comprehensive performance monitoring
+   */
   private updateMetrics(): void {
-    // Update performance metrics
-    this.currentMetrics.currentFPS =
-      this.performanceAnalyzer.getMedianFPS() || 0;
+    const startTime = performance.now();
+
+    // Update FPS metrics with rolling average
+    const currentFPS = this.performanceAnalyzer.getMedianFPS() || 0;
+    this.currentMetrics.currentFPS = currentFPS;
+    
+    // Calculate rolling average FPS (last 10 readings)
+    if (!this.fpsHistory) {
+      this.fpsHistory = [];
+    }
+    this.fpsHistory.push(currentFPS);
+    if (this.fpsHistory.length > 10) {
+      this.fpsHistory.shift();
+    }
+    this.currentMetrics.averageFPS = this.fpsHistory.reduce((a, b) => a + b, 0) / this.fpsHistory.length;
+
+    // Update frame time
     this.currentMetrics.frameTime =
       this.currentMetrics.currentFPS > 0
         ? 1000 / this.currentMetrics.currentFPS
         : 1000;
 
-    // Update memory usage
+    // Update memory usage with more detailed tracking
     const memoryInfo = (performance as any).memory;
     if (memoryInfo) {
       this.currentMetrics.memoryUsageMB =
         memoryInfo.usedJSHeapSize / (1024 * 1024);
     }
 
-    // Update system health
-    if (this.currentMetrics.currentFPS < 20) {
-      this.currentMetrics.systemHealth = "critical";
-    } else if (this.currentMetrics.currentFPS < 30) {
-      this.currentMetrics.systemHealth = "degraded";
-    } else if (this.currentMetrics.currentFPS > 55) {
-      this.currentMetrics.systemHealth = "excellent";
-    } else {
-      this.currentMetrics.systemHealth = "good";
+    // Update active visual systems count
+    this.currentMetrics.activeVisualSystems = Array.from(this.systemCache.keys()).filter(key => {
+      const system = this.systemCache.get(key);
+      return system && system.initialized;
+    });
+
+    // Enhanced system health determination
+    this.currentMetrics.systemHealth = this.calculateSystemHealth();
+
+    // Trigger adaptive quality adjustments if needed
+    if (this.bridgeConfig.enableAdaptiveQuality) {
+      this.checkAdaptiveQualityTriggers();
+    }
+
+    // Track update performance
+    const updateTime = performance.now() - startTime;
+    if (updateTime > 5) { // More than 5ms for metrics update is concerning
+      Y3KDebug?.debug?.warn(
+        "VisualSystemCoordinator",
+        `Metrics update took ${updateTime.toFixed(2)}ms - performance concern`
+      );
+    }
+
+    // Notify listeners if system adaptation callback is set
+    if (this.onSystemAdaptation) {
+      this.onSystemAdaptation(this.currentMetrics);
+    }
+  }
+
+  /**
+   * Calculate comprehensive system health based on multiple factors
+   */
+  private calculateSystemHealth(): SystemHealth {
+    const { currentFPS, averageFPS, memoryUsageMB } = this.currentMetrics;
+    let healthScore = 100;
+
+    // FPS-based health scoring
+    if (currentFPS < 20) healthScore -= 40;
+    else if (currentFPS < 30) healthScore -= 25;
+    else if (currentFPS < 45) healthScore -= 10;
+
+    // Average FPS stability
+    if (Math.abs(currentFPS - averageFPS) > 10) healthScore -= 15; // High variance
+
+    // Memory usage impact
+    if (memoryUsageMB > this.bridgeConfig.performanceThresholds.maxMemoryMB) {
+      healthScore -= 20;
+    } else if (memoryUsageMB > this.bridgeConfig.performanceThresholds.maxMemoryMB * 0.8) {
+      healthScore -= 10;
+    }
+
+    // Active systems load
+    if (this.currentMetrics.activeVisualSystems.length > 8) {
+      healthScore -= 10; // Too many active systems
+    }
+
+    // Determine health category
+    if (healthScore >= 90) return "excellent";
+    if (healthScore >= 70) return "good";
+    if (healthScore >= 50) return "degraded";
+    return "critical";
+  }
+
+  /**
+   * Check if adaptive quality adjustments should be triggered
+   */
+  private checkAdaptiveQualityTriggers(): void {
+    const { systemHealth, currentFPS, memoryUsageMB } = this.currentMetrics;
+    
+    // Performance degradation triggers
+    if (systemHealth === "critical" || currentFPS < this.bridgeConfig.performanceThresholds.minFPS) {
+      this.triggerQualityReduction();
+    }
+    
+    // Performance improvement opportunities
+    else if (systemHealth === "excellent" && currentFPS > 58 && memoryUsageMB < this.bridgeConfig.performanceThresholds.maxMemoryMB * 0.5) {
+      this.triggerQualityImprovement();
+    }
+  }
+
+  /**
+   * Trigger quality reduction for better performance
+   */
+  private triggerQualityReduction(): void {
+    if (this.currentMetrics.currentQuality.level === "minimal") return;
+
+    const newLevel = this.currentMetrics.currentQuality.level === "high" ? "medium" : "minimal";
+    this.updateQualitySettings(newLevel);
+    
+    Y3KDebug?.debug?.log(
+      "VisualSystemCoordinator",
+      `Adaptive quality reduced to ${newLevel} due to performance constraints`
+    );
+  }
+
+  /**
+   * Trigger quality improvement when performance allows
+   */
+  private triggerQualityImprovement(): void {
+    if (this.currentMetrics.currentQuality.level === "high") return;
+
+    const newLevel = this.currentMetrics.currentQuality.level === "minimal" ? "medium" : "high";
+    this.updateQualitySettings(newLevel);
+    
+    Y3KDebug?.debug?.log(
+      "VisualSystemCoordinator",
+      `Adaptive quality improved to ${newLevel} due to excellent performance`
+    );
+  }
+
+  /**
+   * Update quality settings across all visual systems
+   */
+  private updateQualitySettings(level: QualitySettings['level']): void {
+    const qualityMap = {
+      minimal: { gradientComplexity: 0.3, particleDensity: 25, animationFPS: 30, postProcessing: false, bloomEnabled: false, antiAliasing: "none" as const, shadowQuality: "off" as const },
+      low: { gradientComplexity: 0.4, particleDensity: 40, animationFPS: 45, postProcessing: false, bloomEnabled: false, antiAliasing: "fxaa" as const, shadowQuality: "medium" as const },
+      medium: { gradientComplexity: 0.6, particleDensity: 60, animationFPS: 60, postProcessing: true, bloomEnabled: true, antiAliasing: "fxaa" as const, shadowQuality: "medium" as const },
+      high: { gradientComplexity: 1.0, particleDensity: 100, animationFPS: 60, postProcessing: true, bloomEnabled: true, antiAliasing: "msaa4x" as const, shadowQuality: "high" as const },
+      ultra: { gradientComplexity: 1.2, particleDensity: 150, animationFPS: 60, postProcessing: true, bloomEnabled: true, antiAliasing: "msaa4x" as const, shadowQuality: "high" as const }
+    } as const;
+
+    if (level && qualityMap[level]) {
+      this.currentMetrics.currentQuality = {
+        level,
+        ...qualityMap[level]
+      };
+    }
+
+    // Apply quality settings to all active systems
+    for (const [key, system] of this.systemCache.entries()) {
+      if (system && system.initialized && typeof system.updateQuality === 'function') {
+        try {
+          system.updateQuality(this.currentMetrics.currentQuality);
+        } catch (error) {
+          Y3KDebug?.debug?.error(
+            "VisualSystemCoordinator",
+            `Failed to update quality for ${key}:`,
+            error
+          );
+        }
+      }
     }
   }
 
