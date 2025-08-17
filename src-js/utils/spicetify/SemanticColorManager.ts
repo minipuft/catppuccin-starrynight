@@ -3,14 +3,22 @@
  * Provides a bridge between Spicetify's semantic color system and our theming architecture
  */
 
-// Import spicetify types via triple-slash directive
-/// <reference path="../../../types/spicetify.d.ts" />
+// Import theme-specific Spicetify type extensions
+/// <reference path="../../types/spicetify-extensions.d.ts" />
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+
+// Runtime utilities for safe Spicetify access
+function safeGetSpicetify(): typeof Spicetify | null {
+  return (typeof window !== 'undefined' && window.Spicetify) ? window.Spicetify : null;
+}
+
+function isSpicetifyPlatformAvailable(): boolean {
+  const spicetify = safeGetSpicetify();
+  return !!(spicetify?.Platform);
+}
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import * as Utils from "@/utils/core/ThemeUtilities";
-
-declare const Spicetify: any;
 
 export interface SemanticColorConfig {
   enableDebug?: boolean;
@@ -211,8 +219,9 @@ export class SemanticColorManager implements IManagedSystem {
 
     try {
       // Try to get color from Spicetify's semantic color system
-      if (this.isSpicetifyAvailable() && Spicetify.Platform?.getSemanticColors) {
-        const semanticColors = await Spicetify.Platform.getSemanticColors();
+      const spicetify = safeGetSpicetify();
+      if (this.isSpicetifyAvailable() && spicetify?.Platform?.getSemanticColors) {
+        const semanticColors = await spicetify.Platform.getSemanticColors();
         color = semanticColors[semanticColor];
         
         // 🎨 CRITICAL: Log what Spicetify returns
@@ -317,9 +326,7 @@ export class SemanticColorManager implements IManagedSystem {
   }
 
   private isSpicetifyAvailable(): boolean {
-    return typeof Spicetify !== 'undefined' && 
-           Spicetify.Platform && 
-           typeof Spicetify.Platform.getSemanticColors === 'function';
+    return isSpicetifyPlatformAvailable();
   }
 
   public flushUpdates(): void {

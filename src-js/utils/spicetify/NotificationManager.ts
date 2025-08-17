@@ -3,11 +3,14 @@
  * Provides enhanced notification system with semantic colors and variants
  */
 
-// Import spicetify types via triple-slash directive
-/// <reference path="../../../types/spicetify.d.ts" />
+// Import theme-specific Spicetify type extensions
+/// <reference path="../../types/spicetify-extensions.d.ts" />
 import { SemanticColorManager } from "./SemanticColorManager";
 
-declare const Spicetify: any;
+// Runtime utilities for safe Spicetify access
+function safeGetSpicetify(): typeof Spicetify | null {
+  return (typeof window !== 'undefined' && window.Spicetify) ? window.Spicetify : null;
+}
 
 export interface NotificationConfig {
   enableDebug?: boolean;
@@ -109,8 +112,14 @@ export class NotificationManager {
       const processedOptions = await this.processNotificationOptions(options);
       const enhancedMessage = await this.enhanceMessage(message, processedOptions);
 
-      // Use Spicetify's notification system
-      Spicetify.UI.showNotification(enhancedMessage, processedOptions.type === 'error', processedOptions.timeout);
+      // Use Spicetify's notification system with safe access
+      const spicetify = safeGetSpicetify();
+      if (spicetify?.UI?.showNotification) {
+        spicetify.UI.showNotification(enhancedMessage, processedOptions.type === 'error', processedOptions.timeout);
+      } else {
+        // Fallback to console if Spicetify unavailable
+        console.log(`[Notification] ${enhancedMessage}`);
+      }
 
       if (this.config.enableDebug) {
         console.log(`[NotificationManager] Shown: ${message}`, processedOptions);

@@ -9,6 +9,8 @@
  * @architecture Separated from theme code for maintainability
  */
 
+import type { SpicetifyAudioFeatures, SpicetifyAudioAnalysis, SpicetifyAudioData } from './systems';
+
 // =============================================================================
 // SPICETIFY CORE TYPES
 // =============================================================================
@@ -68,8 +70,8 @@ declare namespace Spicetify {
 
   // Platform APIs
   interface Platform {
-    getAudioData(uri: string): Promise<any>;
-    getAudioFeatures(uris: string[]): Promise<any>;
+    getAudioData(uri: string): Promise<SpicetifyAudioAnalysis>;
+    getAudioFeatures(uris: string[]): Promise<SpicetifyAudioFeatures[]>;
     History: {
       push(path: string): void;
       goBack(): void;
@@ -114,22 +116,7 @@ declare namespace Spicetify {
   }>;
 
   // Audio data function  
-  function getAudioData(uri: string): Promise<{
-    tempo: number;
-    energy: number;
-    valence: number;
-    danceability: number;
-    acousticness: number;
-    instrumentalness: number;
-    liveness: number;
-    speechiness: number;
-    loudness: number;
-    key: number;
-    mode: number;
-    time_signature: number;
-    duration_ms: number;
-    [key: string]: unknown;
-  }>;
+  function getAudioData(uri: string): Promise<SpicetifyAudioFeatures>;
 }
 
 // =============================================================================

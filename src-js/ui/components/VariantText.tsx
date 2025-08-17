@@ -4,8 +4,8 @@
  */
 
 import React, { useEffect, useRef } from "react";
-// Import spicetify types via triple-slash directive
-/// <reference path="../../../types/spicetify.d.ts" />
+// Import theme-specific Spicetify type extensions
+/// <reference path="../../types/spicetify-extensions.d.ts" />
 import { VariantResolver } from "@/utils/spicetify/VariantResolver";
 
 // Create a singleton instance for performance

@@ -1,3 +1,5 @@
+import type { SpicetifyAudioFeatures } from '../src-js/types/systems';
+
 declare namespace Spicetify {
   type Icon =
     | "album"
@@ -601,7 +603,7 @@ declare namespace Spicetify {
    * @param uri is optional. Leave it blank to get current track
    * or specify another track uri.
    */
-  function getAudioData(uri?: string): Promise<any>;
+  function getAudioData(uri?: string): Promise<SpicetifyAudioFeatures>;
   /**
    * Set of APIs method to register, deregister hotkeys/shortcuts
    */

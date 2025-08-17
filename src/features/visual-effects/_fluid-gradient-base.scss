@@ -13,36 +13,16 @@
 // =============================================================================
 
 :root {
-  // Visual effects state variables - use existing visual effects system
-  --visual-effects-coherence: var(--sn-visual-effects-awareness-resonance, 0.7); // 0-1 visual effects coherence level
-  --visual-effects-phase: var(--sn-visual-effects-flow-direction, 0); // 0-1 wave phase (0-2π normalized)
-  --visual-effects-amplitude: var(--sn-visual-effects-depth-intensity, 0.5); // 0-1 wave amplitude
-  --visual-effects-frequency: var(--sn-visual-effects-breathing-frequency, 0.1); // Wave frequency
-  --visual-effects-superposition: var(--sn-visual-effects-flow-mode, 1); // Flow state
-  --visual-effects-entanglement: var(--sn-visual-effects-osmosis-rate, 0); // Visual effects flow strength
-  --visual-effects-wave-real: var(--sn-visual-effects-membrane-elasticity, 1); // Real part of visual effects wave
-  --visual-effects-wave-imaginary: var(--sn-visual-effects-viscosity, 0); // Imaginary part of visual effects wave
-  --visual-effects-probability: var(--sn-visual-effects-cellular-mode, 1); // Visual effects probability
+  // Fluid effects using design system variables
+  --fluid-gradients-opacity: var(--sn-ui-glass-opacity, 0.1); 
+  --fluid-gradients-blur: var(--sn-ui-glass-blur, 20px);
+  --fluid-gradients-saturation: var(--sn-bg-gradient-saturation, 1.1);
+  --fluid-gradients-duration: var(--sn-anim-transition-cosmic, 1200ms);
 
-  // Liquid physics variables
-  --fluid-gradients-opacity: 0.3; // Base opacity
-  --fluid-gradients-blur: 4; // Blur amount in pixels
-  --fluid-gradients-saturation: 1.5; // Saturation boost
-  --fluid-gradients-tension: 0.1; // Surface tension effect
-  --fluid-gradients-interference: 0.05; // Interference pattern strength
-  --fluid-gradients-chromatic: 0.08; // Chromatic aberration amount
-  --fluid-gradients-duration: 12; // Animation duration in seconds
-
-  // Oil-on-water effect variables
-  --oil-slick-intensity: 0.8; // Oil slick effect intensity
-  --oil-slick-refraction: 1.33; // Refraction index
-  --oil-slick-viscosity: 1.2; // Liquid viscosity
-  --oil-slick-hue-shift: 0; // Hue rotation amount
-
-  // Performance variables
-  --fluid-gradients-quality: 1; // Quality multiplier (0-1)
-  --fluid-gradients-frame-rate: 60; // Target frame rate
-  --fluid-gradients-complexity: 1; // Effect complexity (0-1)
+  // Simplified fluid effects - remove quantum physics terminology
+  --fluid-phase: var(--sn-music-rhythm-phase, 0deg);
+  --fluid-amplitude: var(--sn-music-breathing-scale, 1.0);
+  --fluid-intensity: var(--sn-music-energy-level, 0.5);
 }
 
 // =============================================================================
@@ -97,29 +77,26 @@
   width: 100%;
   height: 100%;
   
-  // Dynamic conic gradient with visual effects phase
+  // Dynamic conic gradient using design system
   background: conic-gradient(
-    from calc(var(--visual-effects-phase, 0) * 360deg),
-    hsla(calc(var(--visual-effects-phase, 0) * 360 + 0), 70%, 60%, calc(var(--oil-slick-intensity, 0.8) * 0.12)) 0%,
-    hsla(calc(var(--visual-effects-phase, 0) * 360 + 51), 80%, 65%, calc(var(--oil-slick-intensity, 0.8) * 0.14)) 14.28%,
-    hsla(calc(var(--visual-effects-phase, 0) * 360 + 102), 75%, 70%, calc(var(--oil-slick-intensity, 0.8) * 0.13)) 28.57%,
-    hsla(calc(var(--visual-effects-phase, 0) * 360 + 153), 85%, 55%, calc(var(--oil-slick-intensity, 0.8) * 0.15)) 42.86%,
-    hsla(calc(var(--visual-effects-phase, 0) * 360 + 204), 80%, 62%, calc(var(--oil-slick-intensity, 0.8) * 0.14)) 57.14%,
-    hsla(calc(var(--visual-effects-phase, 0) * 360 + 255), 75%, 58%, calc(var(--oil-slick-intensity, 0.8) * 0.13)) 71.43%,
-    hsla(calc(var(--visual-effects-phase, 0) * 360 + 306), 70%, 64%, calc(var(--oil-slick-intensity, 0.8) * 0.12)) 85.71%,
-    hsla(calc(var(--visual-effects-phase, 0) * 360 + 357), 70%, 60%, calc(var(--oil-slick-intensity, 0.8) * 0.11)) 100%
+    from var(--fluid-phase),
+    rgba(var(--sn-musical-oklab-primary-rgb), calc(var(--fluid-intensity) * 0.12)) 0%,
+    rgba(var(--sn-musical-oklab-accent-rgb), calc(var(--fluid-intensity) * 0.14)) 25%,
+    rgba(var(--sn-musical-oklab-highlight-rgb), calc(var(--fluid-intensity) * 0.13)) 50%,
+    rgba(var(--sn-musical-oklab-shadow-rgb), calc(var(--fluid-intensity) * 0.15)) 75%,
+    rgba(var(--sn-musical-oklab-primary-rgb), calc(var(--fluid-intensity) * 0.11)) 100%
   );
   
-  // Backdrop filter for oil-on-water effect
+  // Backdrop filter using design system
   backdrop-filter: 
-    blur(calc(var(--fluid-gradients-blur, 4) * 1px)) 
-    saturate(calc(var(--fluid-gradients-saturation, 1.5)))
-    hue-rotate(calc(var(--visual-effects-phase, 0) * 60deg));
+    blur(var(--fluid-gradients-blur)) 
+    saturate(var(--fluid-gradients-saturation))
+    hue-rotate(calc(var(--fluid-phase) * 0.5));
   
-  // Transform based on visual effects state
+  // Transform based on design system variables
   transform: 
-    scale(calc(1 + var(--visual-effects-amplitude, 0.5) * 0.02))
-    rotate(calc(var(--visual-effects-phase, 0) * 1deg));
+    scale(calc(1 + var(--fluid-amplitude) * 0.02))
+    rotate(calc(var(--fluid-phase) * 0.8));
   
   // Oil slick animation
   animation: liquid-oil-slick 
@@ -470,17 +447,10 @@
   }
 }
 
-// ==============================================
-// Legacy Compatibility Aliases
-// ==============================================
-// Ensures backward compatibility during transition
+/* ============================================================================ */
+/* STREAMLINED LEGACY COMPATIBILITY - Phase 4 Optimization */
+/* Uses centralized legacy system from core/_mixins.scss */
+/* ============================================================================ */
 
-// CSS variable aliases for legacy consciousness references
-:root {
-  --consciousness-phase: var(--visual-effects-phase);
-  --consciousness-amplitude: var(--visual-effects-amplitude);
-  --consciousness-coherence: var(--visual-effects-coherence);
-  --consciousness-probability: var(--visual-effects-probability);
-  --consciousness-wave-real: var(--visual-effects-wave-real);
-  --consciousness-wave-imaginary: var(--visual-effects-wave-imaginary);
-}
+// Legacy compatibility now handled by centralized consciousness-bridge mixin
+// Applied in core systems to reduce duplication

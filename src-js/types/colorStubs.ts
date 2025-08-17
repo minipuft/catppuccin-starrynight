@@ -181,6 +181,16 @@ export interface BreathingRhythmEngine {
   synchronizeWithBeat?(beatData: BeatData): void;
 }
 
+export interface PulsingRhythmEngine {
+  updatePulsing(intensity: number): void;
+  getPulsingPhase(): number;
+  initialize?(): void;
+  updatePulsingCycle?(cycle: number): void;
+  calculatePulsingCycle?(bpm: number): number;
+  adjustPulsingRhythm?(intensity: number): void;
+  synchronizeWithBeat?(beatData: BeatData): void;
+}
+
 export interface SymbioticListeningCore {
   processAudioData(data: AudioAnalysisData): void;
   getEmotionalState(): MusicEmotion;
@@ -219,11 +229,11 @@ export class CinematicPaletteGenerator {
 }
 
 export class VisualEffectsManager {
-  private pulsingEngine: any; // PulsingRhythmEngine stub
+  private pulsingEngine: PulsingRhythmEngine;
   private symbioticCore: SymbioticListeningCore;
   
   constructor() {
-    this.pulsingEngine = {} as any; // Stub implementation
+    this.pulsingEngine = new StubPulsingEngine();
     this.symbioticCore = new StubSymbioticCore();
   }
   
@@ -252,6 +262,16 @@ class StubBreathingEngine implements BreathingRhythmEngine {
   updateBreathingCycle?(cycle: number): void { /* stub */ }
   calculateBreathingCycle?(bpm: number): number { return 2.0; }
   adjustRhythm?(intensity: number): void { /* stub */ }
+  synchronizeWithBeat?(beatData: BeatData): void { /* stub */ }
+}
+
+class StubPulsingEngine implements PulsingRhythmEngine {
+  updatePulsing(intensity: number): void { /* stub */ }
+  getPulsingPhase(): number { return 0.5; }
+  initialize?(): void { /* stub */ }
+  updatePulsingCycle?(cycle: number): void { /* stub */ }
+  calculatePulsingCycle?(bpm: number): number { return 2.0; }
+  adjustPulsingRhythm?(intensity: number): void { /* stub */ }
   synchronizeWithBeat?(beatData: BeatData): void { /* stub */ }
 }
 

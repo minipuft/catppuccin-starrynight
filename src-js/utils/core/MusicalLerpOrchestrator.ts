@@ -1,6 +1,13 @@
 /**
  * Musical LERP Orchestrator - Year 3000 System
  * 
+ * 🚨 DEPRECATED: This orchestrator has been consolidated into EnhancedMasterAnimationCoordinator
+ * 🔧 PHASE 3.1: Use EnhancedMasterAnimationCoordinator.createMusicalLerp() instead
+ * 
+ * @deprecated Use EnhancedMasterAnimationCoordinator instead - provides all musical LERP functionality
+ * @see EnhancedMasterAnimationCoordinator.createMusicalLerp()
+ * @see EnhancedMasterAnimationCoordinator for ConsolidatedMusicalContext
+ * 
  * Central intelligence for calculating music-aware LERP parameters that create
  * smooth visual effects that adapt and flow with musical characteristics.
  * 

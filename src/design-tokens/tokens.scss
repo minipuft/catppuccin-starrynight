@@ -602,6 +602,40 @@
   --sn-glyph-base-size: 6px;
   --sn-glyph-color-rgb: 140, 170, 238;
   --sn-glyph-rotation: 0deg;
+  
+  // -------------------------------------------------------------------------
+  // Visual Effects Theme RGB Colors - Unified System
+  // -------------------------------------------------------------------------
+  
+  // === YEAR3000 VISUAL THEME SYSTEM ===
+  // Cyberpunk aesthetic themes mapped to Catppuccin palette for design consistency
+  // Visual Guide: Ethereal (soft glow), Natural (organic), Cinematic (dramatic energy)
+  
+  // Ethereal theme colors (soft glow effects) - Mapped to Catppuccin
+  --sn-theme-ethereal-soft-rgb: var(--spice-rgb-mauve);      // Soft primary glow
+  --sn-theme-ethereal-mystical-rgb: var(--spice-rgb-teal);   // Mystical glow accent
+  --sn-theme-ethereal-dreamy-rgb: var(--spice-rgb-rosewater); // Dreamy mist overlay
+  --sn-theme-ethereal-emotional-rgb: var(--spice-rgb-yellow); // Emotional heart pulse
+  --sn-theme-ethereal-highlight-rgb: var(--spice-rgb-lavender); // Ethereal highlight
+  
+  // Natural theme colors (organic nature effects) - Mapped to Catppuccin
+  --sn-theme-natural-earthy-rgb: var(--spice-rgb-green);     // Spring earthy base
+  --sn-theme-natural-forest-rgb: var(--spice-rgb-green);     // Deep forest (same as earthy for consistency)
+  --sn-theme-natural-sky-rgb: var(--spice-rgb-sky);          // Natural sky blue
+  --sn-theme-natural-sunset-rgb: var(--spice-rgb-peach);     // Sunset glow warmth
+  --sn-theme-natural-stone-rgb: var(--spice-rgb-overlay0);   // Stone gray base
+  
+  // Cinematic theme colors (dramatic energy burst effects) - Mapped to Catppuccin
+  --sn-theme-cinematic-red-rgb: var(--spice-rgb-red);        // Cinematic energy burst
+  --sn-theme-cinematic-amber-rgb: var(--spice-rgb-peach);    // Amber glow (warm accent)
+  --sn-theme-cinematic-blue-rgb: var(--spice-rgb-blue);      // Cool energy accent
+  --sn-theme-cinematic-cyan-rgb: var(--spice-rgb-teal);      // Cyan effects highlight
+  
+  // Unified breathing animation durations
+  --sn-anim-breathing-gentle: 4000ms;     // Calm, meditative breathing
+  --sn-anim-breathing-energetic: 2000ms;  // Active, dynamic breathing
+  --sn-anim-breathing-cosmic: 6000ms;     // Deep, cosmic breathing
+  --sn-anim-breathing-effects: var(--sn-anim-transition-cosmic, 1200ms); // Effects breathing
 }
 
 // =============================================================================

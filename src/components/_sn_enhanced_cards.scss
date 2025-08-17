@@ -901,32 +901,28 @@ body:not(:has(.main-searchPage-content)) {
   --breathing-context-multiplier: var(--animation-context-multiplier);
 }
 
-// === Legacy Class Mappings ===
+// === STREAMLINED LEGACY COMPATIBILITY - Phase 4 Optimization ===
 
-// Legacy consciousness blend support
+// Consolidated legacy class mappings using central extend bridge
 [data-consciousness-enhanced] {
-  @extend [data-visual-enhanced] !optional;
+  @include extend-bridge('[data-visual-enhanced]');
 }
 
-// Legacy SCSS extend support
 .oklab-consciousness-blend {
-  @extend .oklab-visual-blend !optional;
+  @include extend-bridge('.oklab-visual-blend');
 }
 
-// Legacy temporal echo support
 .sn-temporal-echo {
-  @extend .sn-visual-trail !optional;
+  @include extend-bridge('.sn-visual-trail');
 }
 
-// === Legacy Animation Mappings ===
+// === Legacy Animation Bridge ===
 
-// Support legacy breathing animations (redirect to modern keyframes)
+// Unified legacy breathing animation using central system
 @keyframes organic-element-breathing {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+  50% { transform: scale(var(--sn-music-breathing-scale, 1.02)); }
 }
-
-// Support legacy keyframe names (redirect to modern animations)
 @keyframes nexus-focus-pulse {
   0%, 100% {
     box-shadow: 0 0 12px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4);

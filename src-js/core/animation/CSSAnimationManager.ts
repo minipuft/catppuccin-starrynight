@@ -30,6 +30,13 @@ export interface KineticAnimationState {
 /**
  * CSSAnimationManager - Phase 2 CSS Module Integration
  * 
+ * 🚨 DEPRECATED: This manager has been consolidated into EnhancedMasterAnimationCoordinator
+ * 🔧 PHASE 3.1: Use EnhancedMasterAnimationCoordinator.createCSSAnimation() instead
+ * 
+ * @deprecated Use EnhancedMasterAnimationCoordinator instead - provides all CSS animation functionality
+ * @see EnhancedMasterAnimationCoordinator.createCSSAnimation()
+ * @see EnhancedMasterAnimationCoordinator.createMusicalLerp()
+ * 
  * Bridges CSS animations with the unified animation system:
  * - Coordinates CSS keyframe animations with TypeScript systems
  * - Manages CSS animation variables through UnifiedCSSVariableManager

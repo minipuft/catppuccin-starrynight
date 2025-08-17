@@ -3,12 +3,14 @@
  * Handles graceful fallbacks during migration from incorrect to correct APIs
  */
 
+import type { SpicetifyAudioFeatures } from '@/types/systems';
+
 export class SpicetifyCompat {
   /**
    * Get audio data with fallback handling
    * Uses correct Spicetify.getAudioData() API with fallback to legacy patterns
    */
-  static async getAudioData(): Promise<any> {
+  static async getAudioData(): Promise<SpicetifyAudioFeatures | null> {
     try {
       // Use the correct API (not Spicetify.Player.getAudioData which doesn't exist)
       if (typeof Spicetify !== "undefined" && Spicetify.getAudioData) {
@@ -36,7 +38,7 @@ export class SpicetifyCompat {
   static async getAudioDataWithRetry(
     retryDelay = 200,
     maxRetries = 10
-  ): Promise<any> {
+  ): Promise<SpicetifyAudioFeatures | null> {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const audioData = await this.getAudioData();

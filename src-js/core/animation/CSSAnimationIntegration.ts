@@ -7,6 +7,13 @@ import type { Year3000Config, AdvancedSystemConfig } from '@/types/models';
 /**
  * CSSAnimationIntegration - Phase 2 CSS Animation Integration
  * 
+ * 🚨 DEPRECATED: This integration has been consolidated into EnhancedMasterAnimationCoordinator
+ * 🔧 PHASE 3.1: Use EnhancedMasterAnimationCoordinator.getInstance() instead
+ * 
+ * @deprecated Use EnhancedMasterAnimationCoordinator instead - provides unified CSS animation integration
+ * @see EnhancedMasterAnimationCoordinator.getInstance()
+ * @see EnhancedMasterAnimationCoordinator.createCSSAnimation()
+ * 
  * Provides a unified interface for integrating CSS animations with the AdvancedThemeSystem:
  * - Manages CSSAnimationManager lifecycle
  * - Coordinates between CSS animations and TypeScript systems

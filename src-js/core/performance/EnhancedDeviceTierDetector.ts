@@ -1,13 +1,18 @@
 /**
- * Enhanced Device Tier Detector
+ * Enhanced Device Tier Detector - Backward Compatibility Layer
  * 
- * Focuses on giving most modern devices the full experience.
- * Only very budget/old devices get restrictions.
+ * This file now provides backward compatibility while delegating all
+ * functionality to the enhanced DeviceCapabilityDetector.
+ * 
+ * Phase 1.2 Consolidation: All enhanced tier detection features have been merged
+ * into DeviceCapabilityDetector for reduced code duplication.
  */
 
+import { DeviceCapabilityDetector, type TierDetectionResult } from './DeviceCapabilityDetector';
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { PerformanceTier } from "./SimpleTierBasedPerformanceSystem";
 
+// Re-export types for backward compatibility
 export interface DeviceCapabilities {
   memory: number; // GB
   cores: number;
@@ -23,52 +28,40 @@ export interface DeviceCapabilities {
   };
 }
 
-export interface TierDetectionResult {
-  tier: PerformanceTier;
-  confidence: number; // 0-1
-  reasoning: string[];
-  capabilities: DeviceCapabilities;
-}
+export { TierDetectionResult };
 
+/**
+ * Enhanced Device Tier Detector - Backward Compatibility Wrapper
+ * 
+ * All functionality now delegated to DeviceCapabilityDetector.
+ * This class exists purely for backward compatibility during migration.
+ */
 export class EnhancedDeviceTierDetector {
   /**
    * Detect device performance tier with focus on giving most users full experience
+   * @deprecated Use DeviceCapabilityDetector.detectTier() instead
    */
   public static detectTier(): TierDetectionResult {
-    const capabilities = this._analyzeDeviceCapabilities();
-    const reasoning: string[] = [];
-    
-    let tier: PerformanceTier = 'medium'; // Default to full experience
-    let confidence = 0.8; // Default confidence
-    
-    // High Tier Detection: True high-end devices only
-    if (this._isHighTierDevice(capabilities, reasoning)) {
-      tier = 'high';
-      confidence = 0.9;
+    if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+      console.warn(
+        '⚠️  [EnhancedDeviceTierDetector] This class is deprecated. ' +
+        'Use DeviceCapabilityDetector.detectTier() instead. ' +
+        'This compatibility layer will be removed in a future version.'
+      );
     }
-    // Low Tier Detection: Only very budget/old devices
-    else if (this._isLowTierDevice(capabilities, reasoning)) {
-      tier = 'low';
-      confidence = 0.85;
-    }
-    // Medium Tier: Most modern devices (default)
-    else {
-      reasoning.push('Standard modern device - full experience enabled');
-      reasoning.push(`${capabilities.memory}GB RAM, ${capabilities.cores} cores, WebGL2: ${capabilities.webgl2}`);
-    }
+
+    // Delegate to enhanced DeviceCapabilityDetector
+    const result = DeviceCapabilityDetector.detectTier();
     
-    const result: TierDetectionResult = {
-      tier,
-      confidence,
-      reasoning,
-      capabilities
-    };
-    
-    Y3KDebug?.debug?.log("EnhancedDeviceTierDetector", "Tier detection complete", result);
+    Y3KDebug?.debug?.log("EnhancedDeviceTierDetector", "Compatibility layer - delegating to DeviceCapabilityDetector", result);
     
     return result;
   }
 
+  /**
+   * Legacy method compatibility - _analyzeDeviceCapabilities
+   * @deprecated Use DeviceCapabilityDetector.detectTier() instead
+   */
   private static _analyzeDeviceCapabilities(): DeviceCapabilities {
     const memory = (navigator as any).deviceMemory || this._estimateMemory();
     const cores = navigator.hardwareConcurrency || this._estimateCores();
@@ -93,107 +86,18 @@ export class EnhancedDeviceTierDetector {
     };
   }
 
-  private static _isHighTierDevice(capabilities: DeviceCapabilities, reasoning: string[]): boolean {
-    const { memory, cores, webgl2, hardwareInfo } = capabilities;
-    
-    // Primary high-end criteria
-    const hasHighEndSpecs = memory >= 8 && cores >= 6 && webgl2;
-    
-    if (!hasHighEndSpecs) {
-      return false;
-    }
-    
-    // Additional high-end indicators
-    const indicators = [];
-    
-    if (memory >= 16) indicators.push('16+GB RAM');
-    if (cores >= 8) indicators.push('8+ CPU cores');
-    if (hardwareInfo.hasPerformanceIndicators) indicators.push('Performance GPU detected');
-    if (hardwareInfo.isHighEnd) indicators.push('High-end hardware signatures');
-    
-    // Need at least 2 high-end indicators beyond base specs
-    if (indicators.length >= 2) {
-      reasoning.push('High-end device detected');
-      reasoning.push(`Specs: ${memory}GB RAM, ${cores} cores, WebGL2: ${webgl2}`);
-      reasoning.push(`Indicators: ${indicators.join(', ')}`);
-      return true;
-    }
-    
-    // Gaming/workstation detection
-    if (this._isGamingOrWorkstation(capabilities)) {
-      reasoning.push('Gaming/workstation device detected');
-      reasoning.push(`High-performance device indicators found`);
-      return true;
-    }
-    
-    return false;
-  }
-
-  private static _isLowTierDevice(capabilities: DeviceCapabilities, reasoning: string[]): boolean {
-    const { memory, cores, webgl2, hardwareInfo } = capabilities;
-    
-    // Very restrictive low-tier criteria - only truly limited devices
-    const reasons = [];
-    
-    // Memory restrictions (very low memory only)
-    if (memory < 4) {
-      reasons.push(`Low memory: ${memory}GB`);
-    }
-    
-    // CPU restrictions (very few cores only)
-    if (cores < 4) {
-      reasons.push(`Few CPU cores: ${cores}`);
-    }
-    
-    // WebGL restrictions (no WebGL2 support)
-    if (!webgl2) {
-      reasons.push('No WebGL2 support');
-    }
-    
-    // Old device detection
-    if (hardwareInfo.isOldDevice) {
-      reasons.push('Legacy device detected');
-    }
-    
-    // Mobile with very limited specs
-    if (hardwareInfo.isMobile && memory <= 4 && cores <= 4) {
-      reasons.push('Resource-constrained mobile device');
-    }
-    
-    // Need multiple limiting factors for low tier
-    if (reasons.length >= 2) {
-      reasoning.push('Budget/legacy device detected - enabling performance optimizations');
-      reasoning.push(...reasons);
-      return true;
-    }
-    
-    return false;
-  }
-
+  // Legacy helper methods for backward compatibility
   private static _estimateMemory(): number {
-    // Conservative memory estimation for devices without deviceMemory API
     const ua = navigator.userAgent.toLowerCase();
-    
-    if (ua.includes('mobile') || ua.includes('android')) {
-      return 4; // Most mobile devices have at least 4GB now
-    }
-    
-    if (ua.includes('ipad') || ua.includes('tablet')) {
-      return 6; // iPads typically have good specs
-    }
-    
-    return 8; // Desktop default - most desktops have 8GB+
+    if (ua.includes('mobile') || ua.includes('android')) return 4;
+    if (ua.includes('ipad') || ua.includes('tablet')) return 6;
+    return 8;
   }
 
   private static _estimateCores(): number {
-    // Conservative core estimation
     const ua = navigator.userAgent.toLowerCase();
-    
-    if (ua.includes('mobile')) {
-      return 4; // Most modern mobile devices have 4+ cores
-    }
-    
-    return 4; // Safe desktop default
+    if (ua.includes('mobile')) return 4;
+    return 4;
   }
 
   private static _checkWebGLSupport(): boolean {
@@ -222,8 +126,6 @@ export class EnhancedDeviceTierDetector {
 
   private static _detectHighEndHardware(memory: number, cores: number, userAgent: string): boolean {
     const ua = userAgent.toLowerCase();
-    
-    // Hardware indicators
     const indicators = [
       ua.includes('gaming'),
       ua.includes('nvidia'),
@@ -233,14 +135,12 @@ export class EnhancedDeviceTierDetector {
       memory >= 16,
       cores >= 8
     ];
-    
     return indicators.filter(Boolean).length >= 2;
   }
 
   private static _isMobileDevice(userAgent: string, platform: string): boolean {
     const ua = userAgent.toLowerCase();
     const p = platform.toLowerCase();
-    
     return (
       ua.includes('mobile') ||
       ua.includes('android') ||
@@ -253,65 +153,64 @@ export class EnhancedDeviceTierDetector {
 
   private static _isOldDevice(userAgent: string): boolean {
     const ua = userAgent.toLowerCase();
-    
-    // Old browser versions that indicate legacy hardware
     const oldBrowsers = [
       /chrome\/[1-6]\d\./, // Chrome < 70
       /firefox\/[1-5]\d\./, // Firefox < 60
       /safari\/[1-9]\./, // Very old Safari
       /msie|trident/, // Internet Explorer
     ];
-    
     return oldBrowsers.some(pattern => pattern.test(ua));
   }
 
   private static _hasPerformanceIndicators(userAgent: string): boolean {
     const ua = userAgent.toLowerCase();
-    
-    // GPU/Performance indicators in user agent
     const indicators = [
-      'nvidia',
-      'amd',
-      'geforce',
-      'radeon',
-      'quadro',
-      'gaming',
-      'performance'
+      'nvidia', 'amd', 'geforce', 'radeon', 'quadro', 'gaming', 'performance'
     ];
-    
     return indicators.some(indicator => ua.includes(indicator));
   }
 
-  private static _isGamingOrWorkstation(capabilities: DeviceCapabilities): boolean {
-    const { userAgent, memory, cores } = capabilities;
-    const ua = userAgent.toLowerCase();
-    
-    // Gaming device indicators
-    const gamingIndicators = [
-      ua.includes('gaming'),
-      ua.includes('rog'), // ASUS ROG
-      ua.includes('msi'),
-      ua.includes('alienware'),
-      ua.includes('predator'), // Acer Predator
-      memory >= 16 && cores >= 8
-    ];
-    
-    return gamingIndicators.some(Boolean);
-  }
-
   /**
-   * Get a human-readable description of the device capabilities
+   * Get device description string for debugging and logging
+   * @deprecated Use DeviceCapabilityDetector.getDeviceInfo() instead
    */
   public static getDeviceDescription(capabilities: DeviceCapabilities): string {
-    const { memory, cores, webgl2, hardwareInfo } = capabilities;
+    if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+      console.warn(
+        '⚠️  [EnhancedDeviceTierDetector] getDeviceDescription is deprecated. ' +
+        'Use DeviceCapabilityDetector.getDeviceInfo() instead.'
+      );
+    }
+
+    const { memory, cores, platform, hardwareInfo } = capabilities;
+    const deviceType = hardwareInfo.isMobile ? 'Mobile' : 'Desktop';
+    const qualifiers = [];
     
-    let description = `${memory}GB RAM, ${cores} CPU cores`;
+    if (hardwareInfo.isHighEnd) qualifiers.push('High-End');
+    if (hardwareInfo.isOldDevice) qualifiers.push('Legacy');
     
-    if (webgl2) description += ', WebGL2';
-    if (hardwareInfo.isHighEnd) description += ', High-end hardware';
-    if (hardwareInfo.isMobile) description += ', Mobile device';
-    if (hardwareInfo.hasPerformanceIndicators) description += ', Performance GPU';
-    
-    return description;
+    return `${deviceType} Device (${memory}GB RAM, ${cores} cores, ${platform})${qualifiers.length ? ` [${qualifiers.join(', ')}]` : ''}`;
   }
+}
+
+// ===================================================================
+// MIGRATION HELPERS
+// ===================================================================
+
+/**
+ * Migration helper: Create TierDetectionResult using DeviceCapabilityDetector
+ */
+export function createTierDetectionFromCapabilities(): TierDetectionResult {
+  return DeviceCapabilityDetector.detectTier();
+}
+
+/**
+ * Deprecation warning for direct usage
+ */
+if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+  console.warn(
+    '⚠️  [EnhancedDeviceTierDetector] This class is deprecated. ' +
+    'Use DeviceCapabilityDetector.detectTier() instead. ' +
+    'This compatibility layer will be removed in a future version.'
+  );
 }

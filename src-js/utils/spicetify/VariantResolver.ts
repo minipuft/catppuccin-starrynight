@@ -3,11 +3,9 @@
  * Integrates with Year 3000 System's theming architecture for consistent typography
  */
 
-// Import spicetify types via triple-slash directive
-/// <reference path="../../../types/spicetify.d.ts" />
+// Import theme-specific Spicetify type extensions
+/// <reference path="../../types/spicetify-extensions.d.ts" />
 import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
-
-declare const Spicetify: any;
 
 export interface VariantConfig {
   enableDebug?: boolean;

@@ -45,7 +45,7 @@ import { BackgroundStrategyRegistry } from "@/visual/strategies/BackgroundStrate
 import { BackgroundStrategySelector } from "@/visual/strategies/BackgroundStrategySelector";
 
 // ============================================================================
-// Unified Processing Interfaces
+// Unified Processing Interfaces (Enhanced with ColorCoordinator features)
 // ============================================================================
 
 interface ProcessingState {
@@ -56,6 +56,36 @@ interface ProcessingState {
   lastProcessingTime: number;
   processingQueue: ColorContext[];
   queueSize: number;
+}
+
+// Enhanced interfaces from ColorCoordinator consolidation
+interface StrategyProcessingResult {
+  strategy: IColorProcessor;
+  result: ColorResult;
+  processingTime: number;
+  success: boolean;
+  error?: string;
+  oklabData?: OKLABProcessingResult[];
+}
+
+interface OrchestrationMetrics {
+  totalProcessingTime: number;
+  strategiesProcessed: number;
+  strategiesSucceeded: number;
+  strategiesFailed: number;
+  cacheHits: number;
+  averageStrategyTime: number;
+  memoryUsage: number;
+  oklabCoordinations: number;
+  oklabProcessingTime: number;
+}
+
+interface ColorResultMergeOptions {
+  priorityWeighting: boolean;
+  conflictResolution: "override" | "merge" | "average";
+  preserveMetadata: boolean;
+  visualEffectsBlending: boolean;
+  oklabCoordination: boolean;
 }
 
 interface ProcessingMetrics {
@@ -132,6 +162,30 @@ export class UnifiedColorProcessingEngine
     strategySelections: 0,
     cacheHits: 0,
   };
+
+  // Enhanced orchestration metrics from ColorCoordinator
+  private orchestrationMetrics: OrchestrationMetrics = {
+    totalProcessingTime: 0,
+    strategiesProcessed: 0,
+    strategiesSucceeded: 0,
+    strategiesFailed: 0,
+    cacheHits: 0,
+    averageStrategyTime: 0,
+    memoryUsage: 0,
+    oklabCoordinations: 0,
+    oklabProcessingTime: 0,
+  };
+
+  // Advanced processing features from ColorCoordinator
+  private oklabCoordinationEnabled: boolean = true;
+  private multiStrategyProcessingEnabled: boolean = true;
+  private resultCache = new Map<string, ColorResult>();
+  private cacheMaxSize = 50;
+  private cacheTimeoutMs = 300000; // 5 minutes
+
+  // Context deduplication (from ColorCoordinator)
+  private processedContexts: Map<string, number> = new Map(); // trackUri -> timestamp
+  private readonly CONTEXT_CACHE_TTL = 2000; // 2 seconds
 
   // === PERFORMANCE OPTIMIZATION ===
   private processingTimeout: number | null = null;
@@ -283,8 +337,8 @@ export class UnifiedColorProcessingEngine
   // ============================================================================
 
   /**
-   * 🔧 PHASE 3: Main color processing entry point
-   * Consolidates processing logic from all three orchestrators
+   * 🔧 PHASE 2.1: Main color processing entry point
+   * Consolidates processing logic from all orchestrators with multi-strategy support
    */
   public async processColors(context: ColorContext): Promise<ColorResult> {
     const startTime = performance.now();
@@ -295,25 +349,40 @@ export class UnifiedColorProcessingEngine
       const cached = this.getCachedResult(cacheKey);
       if (cached) {
         this.metrics.cacheHits++;
+        this.orchestrationMetrics.cacheHits++;
         return cached;
       }
 
-      // Strategy selection (from orchestrators)
-      const strategy = await this.selectOptimalStrategy(context);
-      this.metrics.strategySelections++;
+      // Check context deduplication
+      if (this.isDuplicateContext(context)) {
+        Y3KDebug?.debug?.log(
+          "UnifiedColorProcessingEngine", 
+          "Skipping duplicate context within TTL"
+        );
+        return this.getLastProcessedResult() || this.createFallbackResult(context, new Error("No previous result"));
+      }
 
-      // Color processing with OKLAB coordination (from ColorHarmonyEngine)
-      const result = await this.processWithOKLAB(context, strategy);
+      // Multi-strategy processing or single strategy
+      let result: ColorResult;
+      if (this.multiStrategyProcessingEnabled) {
+        result = await this.processMultipleStrategies(context);
+      } else {
+        // Single strategy processing (original logic)
+        const strategy = await this.selectOptimalStrategy(context);
+        this.metrics.strategySelections++;
+        result = await this.processWithOKLAB(context, strategy);
+      }
 
       // Performance tracking
       const processingTime = performance.now() - startTime;
       this.updateMetrics(processingTime, true);
+      this.updateOrchestrationMetrics(processingTime, true);
 
       // Create unified result
       const unifiedResult: UnifiedProcessingResult = {
         ...result,
         processingTime,
-        strategy,
+        strategy: result.metadata?.strategy ? { getStrategyName: () => result.metadata.strategy } as IColorProcessor : await this.selectOptimalStrategy(context),
         success: true,
         timestamp: Date.now(),
         coordinationMetrics: {
@@ -322,20 +391,24 @@ export class UnifiedColorProcessingEngine
             ? this.classifyEmotionalState(context.musicData.energy)
             : "neutral",
           oklabPreset: this.determineOKLABPreset(context),
-          coordinationStrategy: strategy.getStrategyName(),
+          coordinationStrategy: result.metadata?.strategy || "unified",
           musicInfluenceStrength: context.musicData?.energy || 0.5,
         },
       };
 
       // Cache result for performance
       this.cacheResult(cacheKey, unifiedResult);
+      this.cacheContext(context);
+      
+      // Store last processed result for duplicate handling
+      this.processingState.lastProcessedResult = unifiedResult;
 
       // Emit unified event for ColorStateManager (single responsibility)
       unifiedEventBus.emit("colors:harmonized" as any, {
         processedColors: result.processedColors,
         accentHex: result.accentHex || "#cba6f7",
         accentRgb: result.accentRgb || "203,166,247",
-        strategies: [strategy.getStrategyName()],
+        strategies: [unifiedResult.coordinationMetrics.coordinationStrategy],
         coordinationMetrics: unifiedResult.coordinationMetrics,
         oklabData: unifiedResult.oklabData,
         processingTime,
@@ -346,6 +419,7 @@ export class UnifiedColorProcessingEngine
     } catch (error) {
       const processingTime = performance.now() - startTime;
       this.updateMetrics(processingTime, false);
+      this.updateOrchestrationMetrics(processingTime, false);
 
       Y3KDebug?.debug?.error(
         "UnifiedColorProcessingEngine",
@@ -356,6 +430,248 @@ export class UnifiedColorProcessingEngine
       // Return fallback result
       return this.createFallbackResult(context, error as Error);
     }
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Multi-strategy parallel processing from ColorCoordinator
+   * Processes multiple strategies and intelligently merges results
+   */
+  private async processMultipleStrategies(context: ColorContext): Promise<ColorResult> {
+    const startTime = performance.now();
+    
+    try {
+      // Get multiple strategies for parallel processing
+      const strategies = await this.selectMultipleStrategies(context);
+      
+      if (strategies.length === 0) {
+        throw new Error("No strategies available for processing");
+      }
+
+      // Process strategies in parallel
+      const strategyPromises = strategies.map(async (strategy): Promise<StrategyProcessingResult> => {
+        const strategyStartTime = performance.now();
+        
+        try {
+          const result = await strategy.processColors(context);
+          const processingTime = performance.now() - strategyStartTime;
+          
+          return {
+            strategy,
+            result,
+            processingTime,
+            success: true,
+            oklabData: result.metadata?.oklabData
+          };
+        } catch (error) {
+          const processingTime = performance.now() - strategyStartTime;
+          
+          Y3KDebug?.debug?.warn(
+            "UnifiedColorProcessingEngine",
+            `Strategy ${strategy.getStrategyName()} failed:`,
+            error
+          );
+          
+          return {
+            strategy,
+            result: this.createFallbackResult(context, error as Error),
+            processingTime,
+            success: false,
+            error: (error as Error).message
+          };
+        }
+      });
+
+      const strategyResults = await Promise.all(strategyPromises);
+      
+      // Update orchestration metrics
+      this.orchestrationMetrics.strategiesProcessed += strategyResults.length;
+      this.orchestrationMetrics.strategiesSucceeded += strategyResults.filter(r => r.success).length;
+      this.orchestrationMetrics.strategiesFailed += strategyResults.filter(r => !r.success).length;
+      this.orchestrationMetrics.totalProcessingTime += performance.now() - startTime;
+      this.orchestrationMetrics.averageStrategyTime = strategyResults.reduce((sum, r) => sum + r.processingTime, 0) / strategyResults.length;
+
+      // Coordinate OKLAB processing across strategies if enabled
+      let mergedResult: ColorResult;
+      if (this.oklabCoordinationEnabled && strategyResults.some(r => r.success)) {
+        mergedResult = await this.coordinateOKLABProcessing(context, strategyResults);
+        this.orchestrationMetrics.oklabCoordinations++;
+      } else {
+        // Fallback to intelligent result merging
+        mergedResult = this.mergeStrategyResults(strategyResults, context);
+      }
+
+      return mergedResult;
+      
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "UnifiedColorProcessingEngine", 
+        "Multi-strategy processing failed:",
+        error
+      );
+      
+      // Fallback to single strategy
+      const fallbackStrategy = await this.selectOptimalStrategy(context);
+      return await this.processWithOKLAB(context, fallbackStrategy);
+    }
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Advanced OKLAB coordination from ColorCoordinator
+   * Coordinates OKLAB processing across multiple strategy results
+   */
+  private async coordinateOKLABProcessing(
+    context: ColorContext, 
+    strategyResults: StrategyProcessingResult[]
+  ): Promise<ColorResult> {
+    const oklabStartTime = performance.now();
+    
+    try {
+      // Filter successful results for OKLAB processing
+      const successfulResults = strategyResults.filter(r => r.success);
+      
+      if (successfulResults.length === 0) {
+        throw new Error("No successful strategy results for OKLAB coordination");
+      }
+
+      // Extract colors from all successful strategies
+      const allColors: Record<string, string[]> = {};
+      successfulResults.forEach(result => {
+        Object.entries(result.result.processedColors).forEach(([key, value]) => {
+          if (!allColors[key]) allColors[key] = [];
+          allColors[key].push(value);
+        });
+      });
+
+      // Process through OKLAB coordinator with aggregated colors
+      const musicalContext: MusicalColorContext = {
+        rawColors: context.rawColors,
+        musicData: context.musicData as any,
+        trackUri: context.trackUri,
+        timestamp: context.timestamp,
+      };
+
+      const oklabResult = await this.musicalOKLABCoordinator.processMusicalColors(musicalContext);
+      
+      // Merge OKLAB-coordinated colors with strategy results
+      const coordinatedColors = this.blendOKLABWithStrategies(allColors, oklabResult);
+      
+      // Select the best result as base and enhance with coordinated colors
+      const primaryResult = this.selectPrimaryResult(successfulResults);
+      
+      const coordinated: ColorResult = {
+        ...primaryResult.result,
+        processedColors: coordinatedColors,
+        metadata: {
+          ...primaryResult.result.metadata,
+          oklabCoordination: oklabResult,
+          coordinationStrategy: "multi-strategy-oklab",
+          strategiesUsed: successfulResults.map(r => r.strategy.getStrategyName()),
+          oklabProcessingTime: performance.now() - oklabStartTime
+        }
+      };
+
+      this.orchestrationMetrics.oklabProcessingTime += performance.now() - oklabStartTime;
+      
+      return coordinated;
+      
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "UnifiedColorProcessingEngine",
+        "OKLAB coordination failed, falling back to merge:",
+        error
+      );
+      
+      // Fallback to regular merging
+      return this.mergeStrategyResults(strategyResults, context);
+    }
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Intelligent result merging from ColorCoordinator
+   * Merges multiple strategy results with conflict resolution
+   */
+  private mergeStrategyResults(
+    strategyResults: StrategyProcessingResult[], 
+    context: ColorContext,
+    options: ColorResultMergeOptions = {
+      priorityWeighting: true,
+      conflictResolution: "merge",
+      preserveMetadata: true,
+      visualEffectsBlending: true,
+      oklabCoordination: false
+    }
+  ): ColorResult {
+    const successfulResults = strategyResults.filter(r => r.success);
+    
+    if (successfulResults.length === 0) {
+      return this.createFallbackResult(context, new Error("No successful strategies"));
+    }
+
+    if (successfulResults.length === 1) {
+      const singleResult = successfulResults[0];
+      if (!singleResult) {
+        return this.createFallbackResult(context, new Error("Single result is undefined"));
+      }
+      return singleResult.result;
+    }
+
+    // Priority-based result selection
+    const prioritizedResults = options.priorityWeighting 
+      ? this.prioritizeResults(successfulResults)
+      : successfulResults;
+
+    if (prioritizedResults.length === 0) {
+      return this.createFallbackResult(context, new Error("No prioritized results"));
+    }
+
+    const primaryResult = prioritizedResults[0];
+    if (!primaryResult) {
+      return this.createFallbackResult(context, new Error("Primary result is undefined"));
+    }
+
+    const mergedColors: Record<string, string> = { ...primaryResult.result.processedColors };
+
+    // Merge colors from all results based on conflict resolution strategy
+    prioritizedResults.slice(1).forEach(strategyResult => {
+      Object.entries(strategyResult.result.processedColors).forEach(([key, value]) => {
+        if (mergedColors[key]) {
+          // Handle conflicts
+          switch (options.conflictResolution) {
+            case "override":
+              // Keep existing (primary result priority)
+              break;
+            case "merge":
+              // Create blended key
+              mergedColors[`${key}-${strategyResult.strategy.getStrategyName()}`] = value;
+              break;
+            case "average":
+              // Implement color averaging if both are valid hex colors
+              if (this.isValidHexColor(mergedColors[key]) && this.isValidHexColor(value)) {
+                mergedColors[key] = this.averageColors(mergedColors[key], value);
+              }
+              break;
+          }
+        } else {
+          mergedColors[key] = value;
+        }
+      });
+    });
+
+    // Merge metadata if requested
+    const mergedMetadata = options.preserveMetadata 
+      ? this.mergeMetadata(prioritizedResults.map(r => r.result.metadata))
+      : primaryResult.result.metadata;
+
+    return {
+      ...primaryResult.result,
+      processedColors: mergedColors,
+      metadata: {
+        ...mergedMetadata,
+        mergeStrategy: options.conflictResolution,
+        strategiesUsed: successfulResults.map(r => r.strategy.getStrategyName()),
+        mergeTimestamp: Date.now()
+      }
+    };
   }
 
   /**
@@ -637,6 +953,17 @@ export class UnifiedColorProcessingEngine
 
   private cacheResult(key: string, result: UnifiedProcessingResult): void {
     this.processingCache.set(key, { ...result, timestamp: Date.now() });
+    
+    // Also cache in the enhanced resultCache with TTL management
+    this.resultCache.set(key, result);
+    
+    // Enforce cache size limits
+    if (this.resultCache.size > this.cacheMaxSize) {
+      // Remove oldest entries
+      const entries = Array.from(this.resultCache.entries());
+      const toRemove = entries.slice(0, entries.length - this.cacheMaxSize);
+      toRemove.forEach(([cacheKey]) => this.resultCache.delete(cacheKey));
+    }
   }
 
   private cleanupCache(): void {
@@ -666,6 +993,263 @@ export class UnifiedColorProcessingEngine
     }
 
     this.metrics.lastProcessingTime = Date.now();
+  }
+
+  // ============================================================================
+  // Multi-Strategy Processing Support Methods
+  // ============================================================================
+
+  /**
+   * 🔧 PHASE 2.1: Select multiple strategies for parallel processing
+   */
+  private async selectMultipleStrategies(context: ColorContext): Promise<IColorProcessor[]> {
+    try {
+      const capabilities = this.deviceCapabilityDetector.getCapabilities();
+      
+      // Build criteria for strategy selection
+      const criteria = this.buildSelectionCriteria(capabilities);
+      
+      // Get multiple strategies from selector
+      const strategies = this.strategySelector.selectStrategies(context, criteria);
+      
+      // Return up to 3 strategies for parallel processing (performance balance)
+      return strategies?.slice(0, 3) || [];
+      
+    } catch (error) {
+      Y3KDebug?.debug?.warn(
+        "UnifiedColorProcessingEngine",
+        "Multi-strategy selection failed, using single strategy:",
+        error
+      );
+      
+      // Fallback to single strategy
+      const singleStrategy = await this.selectOptimalStrategy(context);
+      return [singleStrategy];
+    }
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Context deduplication checking
+   */
+  private isDuplicateContext(context: ColorContext): boolean {
+    if (!context.trackUri) return false;
+    
+    const lastProcessed = this.processedContexts.get(context.trackUri);
+    if (!lastProcessed) return false;
+    
+    const timeSinceProcessed = Date.now() - lastProcessed;
+    return timeSinceProcessed < this.CONTEXT_CACHE_TTL;
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Cache context for deduplication
+   */
+  private cacheContext(context: ColorContext): void {
+    if (context.trackUri) {
+      this.processedContexts.set(context.trackUri, Date.now());
+      
+      // Clean up old entries
+      if (this.processedContexts.size > 100) {
+        const cutoff = Date.now() - this.CONTEXT_CACHE_TTL * 2;
+        for (const [uri, timestamp] of this.processedContexts.entries()) {
+          if (timestamp < cutoff) {
+            this.processedContexts.delete(uri);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Get last processed result for duplicate handling
+   */
+  private getLastProcessedResult(): ColorResult | null {
+    return this.processingState.lastProcessedResult;
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Update orchestration metrics
+   */
+  private updateOrchestrationMetrics(processingTime: number, success: boolean): void {
+    this.orchestrationMetrics.totalProcessingTime += processingTime;
+    
+    if (success) {
+      // Success metrics already updated in specific methods
+    } else {
+      this.orchestrationMetrics.strategiesFailed++;
+    }
+    
+    // Update memory usage estimation
+    this.orchestrationMetrics.memoryUsage = Math.round(
+      (this.resultCache.size * 1024 + this.processedContexts.size * 256) / 1024 // KB estimate
+    );
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Blend OKLAB results with strategy colors
+   */
+  private blendOKLABWithStrategies(
+    strategyColors: Record<string, string[]>, 
+    oklabResult: MusicalOKLABResult
+  ): Record<string, string> {
+    const blended: Record<string, string> = {};
+    
+    // Start with OKLAB enhanced colors as base
+    if (oklabResult.enhancedColors) {
+      Object.entries(oklabResult.enhancedColors).forEach(([key, value]) => {
+        blended[`oklab-${key}`] = value;
+      });
+    }
+    
+    // Blend in strategy colors
+    Object.entries(strategyColors).forEach(([key, colors]) => {
+      if (colors.length === 1 && colors[0]) {
+        blended[key] = colors[0];
+      } else if (colors.length > 1 && colors[0]) {
+        // Average multiple colors or use first as primary
+        blended[key] = colors[0]; // Primary strategy color
+        colors.slice(1).forEach((color, index) => {
+          if (color) {
+            blended[`${key}-variant-${index + 1}`] = color;
+          }
+        });
+      }
+    });
+    
+    return blended;
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Select primary result from strategy results
+   */
+  private selectPrimaryResult(results: StrategyProcessingResult[]): StrategyProcessingResult {
+    if (results.length === 0) {
+      throw new Error("Cannot select primary result from empty results array");
+    }
+    
+    // Prioritize by processing time and success
+    const sorted = results.sort((a, b) => {
+      if (a.success && !b.success) return -1;
+      if (!a.success && b.success) return 1;
+      return a.processingTime - b.processingTime; // Faster processing time preferred
+    });
+    
+    const primary = sorted[0];
+    if (!primary) {
+      throw new Error("Primary result is undefined after sorting");
+    }
+    
+    return primary;
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Prioritize strategy results for merging
+   */
+  private prioritizeResults(results: StrategyProcessingResult[]): StrategyProcessingResult[] {
+    if (results.length === 0) return [];
+    
+    return results.sort((a, b) => {
+      // Success first
+      if (a.success && !b.success) return -1;
+      if (!a.success && b.success) return 1;
+      
+      // Then by processing time (faster is better)
+      if (a.success && b.success) {
+        return a.processingTime - b.processingTime;
+      }
+      
+      return 0;
+    });
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Merge metadata from multiple results
+   */
+  private mergeMetadata(metadataArray: any[]): any {
+    if (metadataArray.length === 0) return {};
+    if (metadataArray.length === 1) return metadataArray[0] || {};
+    
+    const merged = { ...metadataArray[0] };
+    
+    // Collect strategies from all metadata
+    const allStrategies: string[] = [];
+    metadataArray.forEach(meta => {
+      if (meta?.strategy) allStrategies.push(meta.strategy);
+      if (meta?.strategiesUsed) allStrategies.push(...meta.strategiesUsed);
+    });
+    
+    merged.strategiesUsed = [...new Set(allStrategies)]; // Deduplicate
+    merged.mergeTimestamp = Date.now();
+    
+    return merged;
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Check if string is valid hex color
+   */
+  private isValidHexColor(color: string): boolean {
+    return /^#[0-9A-F]{6}$/i.test(color);
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Average two hex colors
+   */
+  private averageColors(color1: string, color2: string): string {
+    try {
+      // Simple RGB averaging for hex colors
+      const r1 = parseInt(color1.substring(1, 3), 16);
+      const g1 = parseInt(color1.substring(3, 5), 16);
+      const b1 = parseInt(color1.substring(5, 7), 16);
+      
+      const r2 = parseInt(color2.substring(1, 3), 16);
+      const g2 = parseInt(color2.substring(3, 5), 16);
+      const b2 = parseInt(color2.substring(5, 7), 16);
+      
+      const r = Math.round((r1 + r2) / 2);
+      const g = Math.round((g1 + g2) / 2);
+      const b = Math.round((b1 + b2) / 2);
+      
+      return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    } catch (error) {
+      // Fallback to first color if averaging fails
+      return color1;
+    }
+  }
+
+  /**
+   * 🔧 PHASE 2.1: Build selection criteria for strategies
+   */
+  private buildSelectionCriteria(capabilities: any) {
+    return {
+      performance: "medium" as const,
+      quality: "enhanced" as const,
+      deviceCapabilities: {
+        hasWebGL: capabilities?.gpu?.supportsWebGL || true,
+        memoryMB: capabilities?.memory?.total || 4096,
+        isMobile: false,
+      },
+      userPreferences: {
+        harmonicMode: "cosmic",
+        intensity: 0.8,
+        enableAdvancedBlending: true,
+      },
+      settingsContext: {
+        dynamicAccentEnabled: true,
+        gradientIntensity: "medium",
+        webglEnabled: capabilities?.gpu?.supportsWebGL || true,
+        webglForceEnabled: false,
+        visualGuideMode: "enhanced",
+        depthLayersEnabled: true,
+        visualEffectsLevel: 0.8,
+        pulsingAnimationEnabled: true,
+      },
+      deviceContext: {
+        supportsWebGL: capabilities?.gpu?.supportsWebGL || true,
+        performanceLevel: "medium" as const,
+        memoryCapacity: capabilities?.memory?.total || 4096,
+        isMobile: false,
+      },
+    };
   }
 
   // ============================================================================

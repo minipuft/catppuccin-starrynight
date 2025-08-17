@@ -12,6 +12,27 @@
 
 import type { IManagedSystem, BackendCapabilities, RGBStop } from './systems';
 
+// =========================================================================
+// WEBGL UNIFORM TYPES
+// =========================================================================
+
+/**
+ * Type-safe WebGL uniform values for shader programs
+ */
+export type WebGLUniformValue = 
+  | number 
+  | Float32Array 
+  | Int32Array 
+  | boolean 
+  | number[] 
+  | [number, number] 
+  | [number, number, number] 
+  | [number, number, number, number];
+
+// =========================================================================
+// CORE INTERFACES
+// =========================================================================
+
 /**
  * Core visual rendering interface for all visual backend systems
  * 
@@ -99,7 +120,7 @@ export interface ShaderRenderer extends VisualRenderer {
   loadShaders?(
     vertexShader: string, 
     fragmentShader: string, 
-    uniforms?: Record<string, any>
+    uniforms?: Record<string, WebGLUniformValue>
   ): Promise<void>;
   
   /**
@@ -107,7 +128,7 @@ export interface ShaderRenderer extends VisualRenderer {
    * 
    * @param uniforms - Uniform variables to update
    */
-  setUniforms?(uniforms: Record<string, any>): void;
+  setUniforms?(uniforms: Record<string, WebGLUniformValue>): void;
   
   /**
    * Hot-reload shaders during development

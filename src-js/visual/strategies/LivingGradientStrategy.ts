@@ -1130,20 +1130,20 @@ export class LivingGradientStrategy
         this.livingBaseState.visualEffectsIntensity.toString(),
     };
 
-    this.cssController
-      .batchSetVariables(
+    try {
+      this.cssController.batchSetVariables(
         "LivingGradientStrategy",
         musicResponsiveVariables,
         3 as any, // medium priority
         "music-responsive"
-      )
-      .catch((error) => {
-        Y3KDebug?.debug?.error(
-          "LivingGradientStrategy",
-          "Failed to update music responsive variables:",
-          error
-        );
-      });
+      );
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "LivingGradientStrategy",
+        "Failed to update music responsive variables:",
+        error
+      );
+    }
   }
 
   /**
@@ -1159,20 +1159,20 @@ export class LivingGradientStrategy
       ).toString(),
     };
 
-    this.cssController
-      .batchSetVariables(
+    try {
+      this.cssController.batchSetVariables(
         "LivingGradientStrategy",
         visualEffectsVariables,
         3 as any, // medium priority
         "visualEffects-vars"
-      )
-      .catch((error) => {
-        Y3KDebug?.debug?.error(
-          "LivingGradientStrategy",
-          "Failed to update visualEffects variables:",
-          error
-        );
-      });
+      );
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "LivingGradientStrategy",
+        "Failed to update visualEffects variables:",
+        error
+      );
+    }
   }
 
   /**
@@ -1191,20 +1191,20 @@ export class LivingGradientStrategy
           "--visualEffects-css-fallback": "1.0",
         };
 
-    this.cssController
-      .batchSetVariables(
+    try {
+      this.cssController.batchSetVariables(
         "LivingGradientStrategy",
         webglCoordinationVariables,
         "high",
         "webgl-coordination"
-      )
-      .catch((error) => {
-        Y3KDebug?.debug?.error(
-          "LivingGradientStrategy",
-          "Failed to coordinate with WebGL system:",
-          error
-        );
-      });
+      );
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "LivingGradientStrategy",
+        "Failed to coordinate with WebGL system:",
+        error
+      );
+    }
 
     Y3KDebug?.debug?.log(
       "LivingGradientStrategy",
@@ -1246,20 +1246,20 @@ export class LivingGradientStrategy
     }
 
     if (Object.keys(flowVariables).length > 0) {
-      this.cssController
-        .batchSetVariables(
+      try {
+        this.cssController.batchSetVariables(
           "LivingGradientStrategy",
           flowVariables,
           3 as any, // medium priority
           "webgl-flow"
-        )
-        .catch((error) => {
-          Y3KDebug?.debug?.error(
-            "LivingGradientStrategy",
-            "Failed to update WebGL flow state:",
-            error
-          );
-        });
+        );
+      } catch (error) {
+        Y3KDebug?.debug?.error(
+          "LivingGradientStrategy",
+          "Failed to update WebGL flow state:",
+          error
+        );
+      }
     }
   }
 

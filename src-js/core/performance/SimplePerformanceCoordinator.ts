@@ -1,15 +1,18 @@
 /**
- * Simple Performance Coordinator
+ * Simple Performance Coordinator - Backward Compatibility Layer
  * 
- * Replaces all complex performance monitoring systems with a simple
- * tier-based coordinator that integrates with UnifiedWebGLController.
+ * This file now provides backward compatibility while delegating all
+ * functionality to the enhanced UnifiedPerformanceCoordinator.
+ * 
+ * Phase 1.2 Consolidation: All performance coordination features have been merged
+ * into UnifiedPerformanceCoordinator for reduced code duplication.
  */
 
-import { SimpleTierBasedPerformanceSystem } from "./SimpleTierBasedPerformanceSystem";
-import { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
-import { EnhancedDeviceTierDetector } from "./EnhancedDeviceTierDetector";
+import { UnifiedPerformanceCoordinator } from "./UnifiedPerformanceCoordinator";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
+import type { Year3000Config } from "@/types/models";
 
 // =============================================================================
 // TYPE EXPORTS - Legacy Compatibility Types
@@ -34,48 +37,56 @@ export interface QualityScalingCapable {
   adjustQuality(level: QualityLevel): void;
 }
 
+// Re-export types for backward compatibility
+export type { DeviceCapabilities, ThermalState, BatteryState, PerformanceMode } from './UnifiedPerformanceCoordinator';
+
 /**
- * Simple Performance Coordinator
+ * Simple Performance Coordinator - Backward Compatibility Wrapper
  * 
- * This replaces the complex ContinuousQualityManager, SimplePerformanceCoordinator,
- * and other complex monitoring systems with a simple tier-based approach.
+ * All functionality now delegated to UnifiedPerformanceCoordinator.
+ * This class exists purely for backward compatibility during migration.
  */
 export class SimplePerformanceCoordinator implements IManagedSystem {
   public initialized = false;
   
-  private performanceSystem: SimpleTierBasedPerformanceSystem;
-  private webglIntegration: WebGLSystemsIntegration;
-  private enhancedDeviceTierDetector: EnhancedDeviceTierDetector;
+  private unifiedCoordinator: UnifiedPerformanceCoordinator;
+  private config: Year3000Config;
 
   constructor(
-    enhancedDeviceTierDetector: EnhancedDeviceTierDetector,
-    webglIntegration: WebGLSystemsIntegration
+    enhancedDeviceTierDetector?: any, // Deprecated parameter for compatibility
+    webglIntegration?: any // Deprecated parameter for compatibility
   ) {
-    this.enhancedDeviceTierDetector = enhancedDeviceTierDetector;
-    this.webglIntegration = webglIntegration;
-    this.performanceSystem = new SimpleTierBasedPerformanceSystem(enhancedDeviceTierDetector);
+    if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+      console.warn(
+        '⚠️  [SimplePerformanceCoordinator] This class is deprecated. ' +
+        'Use UnifiedPerformanceCoordinator.getInstance() instead. ' +
+        'This compatibility layer will be removed in a future version.'
+      );
+    }
+
+    // Use global config for unified coordinator
+    this.config = ADVANCED_SYSTEM_CONFIG as Year3000Config;
     
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "Created simple performance coordination");
+    // Get or create unified coordinator instance
+    // We'll create a simple mock coordinator if the real one doesn't exist
+    try {
+      this.unifiedCoordinator = UnifiedPerformanceCoordinator.getInstance(this.config, this);
+    } catch {
+      // Create with self-reference for compatibility
+      this.unifiedCoordinator = new UnifiedPerformanceCoordinator(this.config, this);
+    }
+    
+    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "Compatibility layer - delegating to UnifiedPerformanceCoordinator");
   }
 
   public async initialize(): Promise<void> {
     if (this.initialized) return;
     
-    // Initialize the tier-based performance system
-    await this.performanceSystem.initialize();
-    
-    // Register WebGL integration with performance system
-    this.performanceSystem.registerWebGLIntegration(this.webglIntegration);
-    
+    // Delegate initialization to unified coordinator
+    // Note: UnifiedPerformanceCoordinator initializes itself in constructor
     this.initialized = true;
     
-    const tierResult = this.performanceSystem.getTierDetectionResult();
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "Coordination established", {
-      deviceTier: this.performanceSystem.getDeviceTier(),
-      deviceDescription: this.performanceSystem.getDeviceDescription(),
-      confidence: tierResult?.confidence,
-      webglState: this.webglIntegration?.getWebGLState() || 'disabled'
-    });
+    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "Compatibility layer initialized - delegating to UnifiedPerformanceCoordinator");
   }
 
   public async healthCheck(): Promise<HealthCheckResult> {
@@ -87,83 +98,68 @@ export class SimplePerformanceCoordinator implements IManagedSystem {
       };
     }
     
-    // Check performance system health
-    const performanceHealth = await this.performanceSystem.healthCheck();
-    const webglHealth = this.webglIntegration 
-      ? await this.webglIntegration.healthCheck()
-      : { healthy: false, details: "WebGL integration not available" };
-    
-    const issues: string[] = [];
-    
-    if (!performanceHealth.healthy) {
-      issues.push(`Performance: ${performanceHealth.details}`);
-    }
-    
-    if (!webglHealth.healthy) {
-      issues.push(`WebGL: ${webglHealth.details}`);
-    }
+    // Delegate to unified coordinator but adapt the response
+    const unifiedHealth = this.unifiedCoordinator.getSystemHealth();
     
     return {
-      healthy: issues.length === 0,
-      details: issues.length > 0 
-        ? `Issues: ${issues.join(', ')}`
-        : `Coordinating ${this.performanceSystem.getDeviceTier()} tier performance with ${this.webglIntegration?.getWebGLState() || 'disabled'} WebGL`,
-      issues,
+      healthy: unifiedHealth.overall === 'healthy',
+      details: unifiedHealth.overall === 'healthy' 
+        ? `Performance monitoring active (${unifiedHealth.totalSubsystems} subsystems)`
+        : `Performance issues detected: ${unifiedHealth.recommendations.join(', ')}`,
       system: "SimplePerformanceCoordinator"
     };
   }
 
   public destroy(): void {
-    // Destroy performance system
-    this.performanceSystem.destroy();
-    
+    // Note: We don't destroy the unified coordinator as it may be used by other systems
     this.initialized = false;
     
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "Coordination destroyed");
+    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "Compatibility layer destroyed");
   }
 
   public updateAnimation(deltaTime: number): void {
-    // Forward to performance system (but it doesn't need animation updates)
-    this.performanceSystem.updateAnimation(deltaTime);
+    // Unified coordinator doesn't need animation updates, but we maintain interface
+    // The sophisticated monitoring in unified coordinator handles this internally
   }
 
   // =============================================================================
-  // PUBLIC API - Simplified Performance Management
+  // PUBLIC API - Delegated to UnifiedPerformanceCoordinator
   // =============================================================================
 
   /**
    * Get the performance system for direct access
+   * @deprecated Use UnifiedPerformanceCoordinator directly instead
    */
-  public getPerformanceSystem(): SimpleTierBasedPerformanceSystem {
-    return this.performanceSystem;
+  public getPerformanceSystem(): any {
+    return this.unifiedCoordinator;
   }
 
   /**
    * Get current device performance tier
    */
   public getDeviceTier(): 'low' | 'medium' | 'high' {
-    return this.performanceSystem.getDeviceTier();
+    return this.unifiedCoordinator.getDeviceTier();
   }
 
   /**
    * Get device description for debugging
    */
   public getDeviceDescription(): string {
-    return this.performanceSystem.getDeviceDescription();
+    return this.unifiedCoordinator.getDeviceDescription();
   }
 
   /**
    * Check if energy boost is currently active
    */
   public hasEnergyBoost(): boolean {
-    return this.performanceSystem.hasEnergyBoost();
+    return this.unifiedCoordinator.hasEnergyBoost();
   }
 
   /**
    * Get current effective performance settings
    */
   public getCurrentSettings(): any {
-    return this.performanceSystem.getEffectiveSettings();
+    return this.unifiedCoordinator.getCurrentSettings();
   }
 
   /**
@@ -174,19 +170,7 @@ export class SimplePerformanceCoordinator implements IManagedSystem {
     quality: 'low' | 'medium' | 'high';
     enabled: boolean;
   } {
-    if (!this.webglIntegration) {
-      return {
-        state: 'disabled',
-        quality: 'low',
-        enabled: false
-      };
-    }
-    
-    return {
-      state: this.webglIntegration.getWebGLState(),
-      quality: this.webglIntegration.getQuality(),
-      enabled: this.webglIntegration.isWebGLActive()
-    };
+    return this.unifiedCoordinator.getWebGLStatus();
   }
 
   /**
@@ -201,17 +185,7 @@ export class SimplePerformanceCoordinator implements IManagedSystem {
     energyBoost: boolean;
     settings: any;
   } {
-    const tierResult = this.performanceSystem.getTierDetectionResult();
-    
-    return {
-      deviceTier: this.getDeviceTier(),
-      deviceDescription: this.getDeviceDescription(),
-      confidence: tierResult?.confidence || 0,
-      reasoning: tierResult?.reasoning || [],
-      webglStatus: this.getWebGLStatus(),
-      energyBoost: this.hasEnergyBoost(),
-      settings: this.getCurrentSettings()
-    };
+    return this.unifiedCoordinator.getPerformanceSummary();
   }
 
   // =============================================================================
@@ -222,83 +196,77 @@ export class SimplePerformanceCoordinator implements IManagedSystem {
    * Start monitoring (required by Year3000System interface)
    */
   public startMonitoring(): void {
-    // In the simple tier-based system, monitoring is handled automatically
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "Monitoring started (tier-based system)");
+    this.unifiedCoordinator.startMonitoring();
+    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "Monitoring started (delegated to UnifiedPerformanceCoordinator)");
   }
 
   // =============================================================================
-  // ESSENTIAL LEGACY API METHODS (Still actively used)
+  // ESSENTIAL LEGACY API METHODS (Delegated to UnifiedPerformanceCoordinator)
   // =============================================================================
 
   public emitTrace(event: string, data?: any): void {
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", `${event}`, data);
+    return this.unifiedCoordinator.emitTrace(event, data);
   }
 
   public recordMetric(name: string, value: number): void {
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", `Metric ${name}: ${value}`);
+    return this.unifiedCoordinator.recordMetric(name, value);
   }
 
   public getMedianFPS(): number {
-    const tier = this.getDeviceTier();
-    switch (tier) {
-      case 'high': return 60;
-      case 'medium': return 50;
-      case 'low': return 30;
-      default: return 30;
-    }
+    return this.unifiedCoordinator.getMedianFPS();
   }
 
   public calculateHealthScore(): number {
-    const tier = this.getDeviceTier();
-    switch (tier) {
-      case 'high': return 0.95;
-      case 'medium': return 0.75;
-      case 'low': return 0.50;
-      default: return 0.50;
-    }
+    return this.unifiedCoordinator.calculateHealthScore();
   }
 
   public shouldReduceQuality(): boolean {
-    return this.getDeviceTier() === 'low';
+    return this.unifiedCoordinator.shouldReduceQuality();
   }
 
   public timeOperation<T>(name: string, operation: () => T): T {
-    const start = performance.now();
-    const result = operation();
-    const duration = performance.now() - start;
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", `Operation ${name}: ${duration.toFixed(2)}ms`);
-    return result;
+    return this.unifiedCoordinator.timeOperation(name, operation);
   }
 
   public async timeOperationAsync<T>(name: string, operation: () => Promise<T>): Promise<T> {
-    const start = performance.now();
-    const result = await operation();
-    const duration = performance.now() - start;
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", `Async operation ${name}: ${duration.toFixed(2)}ms`);
-    return result;
+    return this.unifiedCoordinator.timeOperationAsync(name, operation);
   }
 
   public getAverageTime(name: string): number {
-    const tier = this.getDeviceTier();
-    switch (tier) {
-      case 'high': return 5;
-      case 'medium': return 15;
-      case 'low': return 30;
-      default: return 15;
-    }
+    return this.unifiedCoordinator.getAverageTime(name);
   }
 
   public updateBudget(name: string, value: number): void {
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", `Budget update ignored: ${name}=${value} (tier-based system)`);
+    return this.unifiedCoordinator.updateBudget(name, value);
   }
 
   public startTiming(name: string): string {
-    const timingId = `${name}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", `Timing started: ${name} (${timingId})`);
-    return timingId;
+    return this.unifiedCoordinator.startTiming(name);
   }
 
   public endTiming(timingId: string, context?: any): void {
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", `Timing ended: ${timingId}`, context);
+    return this.unifiedCoordinator.endTiming(timingId, context);
   }
+}
+
+// ===================================================================
+// MIGRATION HELPERS
+// ===================================================================
+
+/**
+ * Migration helper: Create SimplePerformanceCoordinator using UnifiedPerformanceCoordinator
+ */
+export function createSimplePerformanceCoordinator(): SimplePerformanceCoordinator {
+  return new SimplePerformanceCoordinator();
+}
+
+/**
+ * Deprecation warning for direct usage
+ */
+if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+  console.warn(
+    '⚠️  [SimplePerformanceCoordinator] This class is deprecated. ' +
+    'Use UnifiedPerformanceCoordinator.getInstance() instead. ' +
+    'This compatibility layer will be removed in a future version.'
+  );
 }

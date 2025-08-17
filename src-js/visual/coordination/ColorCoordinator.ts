@@ -1,5 +1,8 @@
 /**
- * Color Coordinator - Strategy Pattern Invoker Implementation
+ * Color Coordinator - Strategy Pattern Invoker Implementation (Legacy Wrapper)
+ *
+ * 🔧 PHASE 2.1: This is now a backward compatibility wrapper that delegates
+ * to UnifiedColorProcessingEngine while maintaining the same public API.
  *
  * Coordinates event-driven color processing using Strategy pattern.
  * Eliminates circular dependencies by acting as mediator between
@@ -10,9 +13,11 @@
  * - Observer Pattern: Event-driven coordination via UnifiedEventBus
  * - Adapter Pattern: Clean interface between systems
  * - Mediator Pattern: Coordinates strategy selection and execution
+ * - Delegation Pattern: Delegates to UnifiedColorProcessingEngine for processing
  */
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
+import { UnifiedColorProcessingEngine, globalUnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
@@ -203,6 +208,9 @@ export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
   private isProcessing = false;
   private currentStrategy: string | null = null;
 
+  // 🔧 PHASE 2.1: Delegation to UnifiedColorProcessingEngine
+  private unifiedEngine: UnifiedColorProcessingEngine;
+
   // Enhanced multi-strategy coordination
   private strategySelector: BackgroundStrategySelector;
   private performanceAnalyzer: SimplePerformanceCoordinator | null;
@@ -256,6 +264,9 @@ export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
     this.strategySelector = new BackgroundStrategySelector();
     this.oklabProcessor = new OKLABColorProcessor(ADVANCED_SYSTEM_CONFIG.enableDebug);
 
+    // 🔧 PHASE 2.1: Initialize UnifiedColorProcessingEngine for delegation
+    this.unifiedEngine = globalUnifiedColorProcessingEngine;
+
     // Enhanced default selection criteria with device awareness
     this.selectionCriteria = {
       performance: "medium",
@@ -283,6 +294,7 @@ export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
 
   /**
    * Initialize enhanced orchestrator with event bus and strategy registry
+   * 🔧 PHASE 2.1: Now delegates to UnifiedColorProcessingEngine for enhanced initialization
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) {
@@ -291,6 +303,9 @@ export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
     }
 
     try {
+      // 🔧 PHASE 2.1: Initialize UnifiedColorProcessingEngine first
+      await this.unifiedEngine.initialize();
+
       // Subscribe to color extraction events via UnifiedEventBus
       // Phase 3: Fixed event name mismatch - MusicSyncService emits "colors:extracted" not "colors/extracted"
       unifiedEventBus.subscribe(
@@ -346,15 +361,37 @@ export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
 
   /**
    * Enhanced color extraction processing with multi-strategy coordination
+   * 🔧 PHASE 2.1: Now delegates to UnifiedColorProcessingEngine for enhanced processing
    * Phase 4: Added recursion prevention, queue overflow protection, and caching
    */
   async handleColorExtraction(context: ColorContext): Promise<void> {
+    // 🔧 PHASE 2.1: Delegate to UnifiedColorProcessingEngine for enhanced multi-strategy processing
+    try {
+      await this.unifiedEngine.handleColorExtraction(context);
+      Y3KDebug?.debug?.log(
+        "ColorCoordinator",
+        "✅ Delegated color extraction to UnifiedColorProcessingEngine",
+        {
+          trackUri: context.trackUri || "unknown",
+          colorCount: Object.keys(context.rawColors).length,
+        }
+      );
+      return;
+    } catch (error) {
+      Y3KDebug?.debug?.warn(
+        "ColorCoordinator",
+        "UnifiedColorProcessingEngine delegation failed, falling back to legacy processing:",
+        error
+      );
+      // Fall back to original processing
+    }
+
     const now = Date.now();
     const contextKey = context.trackUri || "unknown";
 
     Y3KDebug?.debug?.log(
       "ColorOrchestrator",
-      "🎵 Color Extraction Event Received - WebGL Gradient Entry Point",
+      "🎵 Color Extraction Event Received - WebGL Gradient Entry Point (Legacy)",
       {
         trackUri: contextKey,
         rawColors: context.rawColors,

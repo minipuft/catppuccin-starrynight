@@ -1716,20 +1716,20 @@ export class WebGLGradientStrategy implements IColorProcessor {
       "--sn-gradient-crossfade-opacity": "0",
     };
 
-    this.cssController
-      .batchSetVariables(
+    try {
+      this.cssController.batchSetVariables(
         "WebGLGradientStrategy",
         resetVariables,
         "critical", // Critical priority for cleanup
         "strategy-destroy-cleanup"
-      )
-      .catch((error) => {
-        Y3KDebug?.debug?.error(
-          "WebGLGradientStrategy",
-          "Error during destroy cleanup:",
-          error
-        );
-      });
+      );
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "WebGLGradientStrategy",
+        "Error during destroy cleanup:",
+        error
+      );
+    }
 
     Y3KDebug?.debug?.log(
       "WebGLGradientStrategy",

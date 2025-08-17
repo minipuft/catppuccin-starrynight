@@ -1,6 +1,12 @@
 /**
  * GradientTransitionOrchestrator - Seamless WebGL ↔ CSS Transition System
-
+ * 
+ * 🚨 DEPRECATED: This coordinator has been consolidated into VisualEffectsCoordinator
+ * 🔧 PHASE 2.2: Use VisualEffectsCoordinator.coordinateBackendTransition() instead
+ * 
+ * @deprecated Use VisualEffectsCoordinator instead - provides all transition coordination
+ * @see VisualEffectsCoordinator.coordinateBackendTransition()
+ * @see VisualEffectsCoordinator.getConsolidatedHealthCheck()
  *
  * Orchestrates intelligent transitions between CSS gradients and WebGL-powered visuals
  * based on hardware capabilities, performance metrics, and user preferences.

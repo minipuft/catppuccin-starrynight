@@ -6,6 +6,7 @@ import type {
   HarmonicModes,
   AdvancedSystemConfig,
 } from "@/types/models";
+import type { SystemMetrics } from "@/types/systems";
 import { settings } from "@/config";
 
 // Import modular configuration directly to avoid circular imports
@@ -387,14 +388,18 @@ export const ADVANCED_SYSTEM_CONFIG: AdvancedSystemConfig = {
 
   // Validate configuration health and functionality
   validateConfigHealth() {
+    const detailedIssues: {
+      key: string;
+      severity: "critical" | "warning";
+      message: string;
+    }[] = [];
+    
     const healthReport = {
-      overallStatus: "healthy",
-      issues: [] as {
-        key: string;
-        severity: "critical" | "warning";
-        message: string;
-      }[],
-      dynamicChecks: {} as { [key: string]: any },
+      healthy: true,
+      system: "AdvancedSystemConfig",
+      details: "Configuration health validation",
+      issues: [] as string[],
+      metrics: {} as SystemMetrics,
     };
 
     const configKeys = Object.keys(this) as (keyof AdvancedSystemConfig)[];
@@ -406,7 +411,7 @@ export const ADVANCED_SYSTEM_CONFIG: AdvancedSystemConfig = {
 
     for (const key of functionProperties) {
       if (!this.hasOwnProperty(key)) {
-        healthReport.issues.push({
+        detailedIssues.push({
           key: String(key),
           severity: "warning",
           message: `Method ${key} is not an own property, may indicate prototype chain issues.`,
@@ -417,26 +422,29 @@ export const ADVANCED_SYSTEM_CONFIG: AdvancedSystemConfig = {
     // Dynamic checks for artistic mode properties
     const checkProfile = (mode: string) => {
       if (!ARTISTIC_MODE_PROFILES[mode]) {
-        healthReport.issues.push({
+        detailedIssues.push({
           key: `artisticMode:${mode}`,
           severity: "critical",
           message: `Artistic mode profile for '${mode}' is missing.`,
         });
         return;
       }
-      (healthReport.dynamicChecks as any)[`${mode}Profile`] = "ok";
+      (healthReport.metrics as any)[`${mode}Profile`] = "ok";
     };
 
     checkProfile(this.artisticMode);
     checkProfile("artist-vision");
     checkProfile("corporate-safe");
 
-    if (healthReport.issues.length > 0) {
-      healthReport.overallStatus = healthReport.issues.some(
-        (i) => i.severity === "critical"
-      )
-        ? "critical"
-        : "unhealthy";
+    // Convert detailed issues to string array and update health status
+    if (detailedIssues.length > 0) {
+      healthReport.healthy = false;
+      healthReport.issues = detailedIssues.map(issue => 
+        `[${issue.severity.toUpperCase()}] ${issue.key}: ${issue.message}`
+      );
+      healthReport.details = detailedIssues.some((i) => i.severity === "critical")
+        ? "Critical configuration issues detected"
+        : "Configuration issues detected";
     }
 
     if (this.enableDebug) {

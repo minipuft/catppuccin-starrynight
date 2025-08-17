@@ -4,6 +4,8 @@
 // Centralized type definitions for the Advanced system architecture.
 // All shared interfaces and types used across multiple modules.
 
+import type { HealthCheckResult } from './systems';
+
 // Represents the structure for a single color harmony rule.
 export interface ColorHarmonyMode {
   rule:
@@ -130,6 +132,110 @@ export type IntensityLevel = "disabled" | "minimal" | "balanced" | "intense";
 export type QualityLevel = "auto" | "low" | "high";
 export type WebGLQuality = "low" | "medium" | "high";
 
+// =============================================================================
+// MUSIC SYNCHRONIZATION CONFIGURATION - PHASE 2.5.2
+// =============================================================================
+
+/**
+ * Configuration interface for music-visual synchronization
+ * Replaces unknown type in AdvancedSystemConfig.musicVisualSync
+ * 
+ * @phase 2.5.2 Music Sync Configuration Type Safety
+ */
+export interface MusicSyncConfiguration {
+  /** Energy scaling factors for visual intensity modulation */
+  energyScaling: {
+    /** Low energy scaling (0.0-0.3 energy range) */
+    low: number;
+    /** Medium energy scaling (0.3-0.7 energy range) */
+    medium: number;
+    /** High energy scaling (0.7-1.0 energy range) */
+    high: number;
+  };
+  
+  /** Valence scaling factors for emotional color responses */
+  valenceScaling: {
+    /** Sad/negative valence scaling (0.0-0.3 valence range) */
+    sad: number;
+    /** Neutral valence scaling (0.3-0.7 valence range) */
+    neutral: number;
+    /** Happy/positive valence scaling (0.7-1.0 valence range) */
+    happy: number;
+  };
+  
+  /** Danceability-based visual effects configuration */
+  danceabilityEffects: {
+    /** Enable danceability-driven visual effects */
+    enable: boolean;
+    /** Animation speed multiplier based on danceability */
+    animationSpeedMultiplier: number;
+    /** Blur variation intensity for dance effects */
+    blurVariation: number;
+  };
+  
+  /** Enhanced BPM detection and processing configuration */
+  enhancedBPM: {
+    /** Enable enhanced BPM calculation features */
+    enable: boolean;
+    /** Use smart calculation algorithms */
+    useSmartCalculation: boolean;
+    /** Use realistic tempo data processing */
+    useRealisticData: boolean;
+    
+    /** Danceability estimation based on tempo ranges */
+    danceabilityEstimation: {
+      /** High dance tempo range and value */
+      highDance: { min: number; max: number; value: number };
+      /** Medium dance tempo range and value */
+      mediumDance: { min: number; max: number; value: number };
+      /** Low-medium dance tempo range and value */
+      lowMediumDance: { min: number; max: number; value: number };
+      /** Low dance default value */
+      lowDance: { value: number };
+    };
+    
+    /** Energy estimation from tempo and loudness */
+    energyEstimation: {
+      /** Weight of tempo in energy calculation */
+      tempoWeight: number;
+      /** Weight of loudness in energy calculation */
+      loudnessWeight: number;
+      /** Valid tempo range for energy estimation */
+      tempoRange: { min: number; max: number };
+      /** Valid loudness range for energy estimation */
+      loudnessRange: { min: number; max: number };
+    };
+    
+    /** Danceability thresholds for BPM processing */
+    danceabilityThresholds: {
+      /** High danceability threshold */
+      high: number;
+      /** Low danceability threshold */
+      low: number;
+    };
+    
+    /** Energy multiplier range for BPM calculations */
+    energyMultiplierRange: {
+      /** Minimum energy multiplier */
+      min: number;
+      /** Maximum energy multiplier */
+      max: number;
+    };
+    
+    /** Fallback values for missing audio data */
+    fallbacks: {
+      /** Default tempo in BPM */
+      tempo: number;
+      /** Default loudness in dB */
+      loudness: number;
+      /** Default key (0-11) */
+      key: number;
+      /** Default time signature */
+      timeSignature: number;
+    };
+  };
+}
+
 // The main configuration object for the Advanced system architecture.
 export interface AdvancedSystemConfig {
   [key: string]: any; // Index signature for dynamic access
@@ -165,7 +271,7 @@ export interface AdvancedSystemConfig {
   colorHarmonyBaseColor: string | null;
   colorHarmonyIntensity: number;
   colorHarmonyEvolution: boolean;
-  musicVisualSync: any; // Can be typed more strictly if needed
+  musicVisualSync: MusicSyncConfiguration;
   getCurrentModeProfile(): ArtisticModeProfile;
   getCurrentMultipliers(): MultiplierProfile;
   getCurrentFeatures(): FeatureProfile;
@@ -182,7 +288,7 @@ export interface AdvancedSystemConfig {
   setupForProduction(): void;
   setupForDevelopment(): void;
   setupForDebugging(): void;
-  validateConfigHealth(): any;
+  validateConfigHealth(): HealthCheckResult;
   loadArtisticPreference(): void;
 }
 

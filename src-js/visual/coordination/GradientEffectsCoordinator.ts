@@ -1,5 +1,13 @@
 /**
  * GradientEffectsCoordinator - Master System Integration
+ * 
+ * 🚨 DEPRECATED: This coordinator has been consolidated into VisualEffectsCoordinator
+ * 🔧 PHASE 2.2: Use VisualEffectsCoordinator.orchestrateGradientEffects() instead
+ * 
+ * @deprecated Use VisualEffectsCoordinator instead - provides all gradient orchestration
+ * @see VisualEffectsCoordinator.orchestrateGradientEffects()
+ * @see VisualEffectsCoordinator.coordinateBackendTransition()
+ *
  * Part of the Year 3000 System visual pipeline
  *
  * Orchestrates all Reality Bleeding Gradients components:
@@ -656,7 +664,7 @@ export class GradientEffectsCoordinator extends BaseVisualSystem implements IMan
         system: "GradientEffectsCoordinator",
         issues: status !== "healthy" ? [`${totalSystems - healthySystems} systems degraded/failed`] : [],
         metrics: {
-          systemHealth: this.systemHealth,
+          systemHealth: this.systemHealth as unknown as string,
           gradientMetrics: this.metrics,
           realityBleedingState: this.realityBleedingState,
           healthPercentage,

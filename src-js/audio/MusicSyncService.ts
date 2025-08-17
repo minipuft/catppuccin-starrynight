@@ -3,6 +3,17 @@ import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
 import type { ColorContext } from "@/types/colorStrategy";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
+import type { SpicetifyAudioFeatures, SpicetifyPlayerData } from "@/types/systems";
+
+// Runtime utilities for safe Spicetify access
+function safeGetSpicetify(): typeof Spicetify | null {
+  return (typeof window !== 'undefined' && window.Spicetify) ? window.Spicetify : null;
+}
+
+function isCosmosAsyncAvailable(): boolean {
+  const spicetify = safeGetSpicetify();
+  return !!(spicetify?.CosmosAsync);
+}
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import * as Utils from "@/utils/core/ThemeUtilities";
 import { SpicetifyCompat } from "@/utils/platform/SpicetifyCompat";
@@ -336,7 +347,7 @@ export class MusicSyncService {
     updates: 0,
   };
 
-  private unifiedCache: Map<string, CacheEntry<AudioData | ProcessedMusicData | unknown>> = new Map();
+  private unifiedCache: Map<string, CacheEntry<any>> = new Map();
   private cacheTTL: number;
 
   private subscribers: Map<string, VisualSystemSubscriber> = new Map();
@@ -530,7 +541,8 @@ export class MusicSyncService {
       maxRetries = MUSIC_SYNC_CONFIG.performance.maxRetries,
     } = options;
 
-    const currentTrackUri = Spicetify.Player.data?.item?.uri;
+    const spicetify = safeGetSpicetify();
+    const currentTrackUri = (spicetify?.Player?.data?.item as SpicetifyPlayerData)?.uri;
     if (!currentTrackUri) {
       if (this.config.enableDebug) {
         console.warn(
@@ -560,7 +572,10 @@ export class MusicSyncService {
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
-        const audioData = (await SpicetifyCompat.getAudioData()) as AudioData;
+        const spicetifyAudioData = await SpicetifyCompat.getAudioData();
+        if (!spicetifyAudioData) continue;
+        
+        const audioData = this.convertSpicetifyToAudioData(spicetifyAudioData);
 
         if (this.isValidAudioData(audioData)) {
           this.setInCache(cacheKey, { audioData });
@@ -617,7 +632,8 @@ export class MusicSyncService {
 
   public async getAudioFeatures(): Promise<AudioFeatures | null> {
     try {
-      const currentTrack = Spicetify.Player.data?.item;
+      const spicetify = safeGetSpicetify();
+      const currentTrack = spicetify?.Player?.data?.item as SpicetifyPlayerData;
       if (!currentTrack?.uri) return null;
 
       const trackId = currentTrack.uri.split(":")[2] || "fallback";
@@ -638,7 +654,13 @@ export class MusicSyncService {
 
       this.metrics.cacheMisses++;
 
-      const response = await Spicetify.CosmosAsync.get(
+      // Safe CosmosAsync access with type checking
+      const spicetifyForCosmos = safeGetSpicetify();
+      if (!isCosmosAsyncAvailable() || !spicetifyForCosmos?.CosmosAsync) {
+        throw new Error("CosmosAsync not available");
+      }
+      
+      const response = await spicetifyForCosmos.CosmosAsync.get(
         `https://api.spotify.com/v1/audio-features/${trackId}`
       );
 
@@ -747,7 +769,8 @@ export class MusicSyncService {
       });
 
       // Use current track URI for cache key instead of tempo
-      const currentTrack = Spicetify.Player.data?.item || Spicetify.Player.data;
+      const spicetify = safeGetSpicetify();
+      const currentTrack = (spicetify?.Player?.data?.item || spicetify?.Player?.data) as SpicetifyPlayerData;
       const uriParts = currentTrack?.uri?.split(":") ?? [];
       const trackId =
         uriParts.length > 2 && uriParts[2] ? uriParts[2] : "fallback";
@@ -1318,7 +1341,8 @@ export class MusicSyncService {
    * changed (used after live settings updates so gradients repaint instantly).
    */
   public async processSongUpdate(force: boolean = false): Promise<void> {
-    const trackUri = Spicetify.Player?.data?.item?.uri;
+    const spicetify = safeGetSpicetify();
+    const trackUri = (spicetify?.Player?.data?.item as SpicetifyPlayerData)?.uri;
 
     if (!trackUri) return;
 
@@ -1385,8 +1409,9 @@ export class MusicSyncService {
     try {
       // New track detected – clear any stale cache entries for it
       this.invalidateTrackCaches(trackUri);
+      const spicetify = safeGetSpicetify();
       const trackDuration =
-        Spicetify.Player.data?.item?.duration?.milliseconds || 0;
+        (spicetify?.Player?.data?.item as SpicetifyPlayerData)?.duration || 0;
 
       // Phase 1 – instant colour update + provisional BPM from audio-features
       // Use Promise.allSettled for graceful degradation - continue with partial success
@@ -1888,6 +1913,28 @@ export class MusicSyncService {
       // Optional arrays left undefined – beat grid will arrive later
     } as AudioData;
   }
+  
+  /**
+   * Convert SpicetifyAudioFeatures to internal AudioData format
+   * Handles property name mapping and provides fallback values
+   */
+  private convertSpicetifyToAudioData(spicetifyData: SpicetifyAudioFeatures): AudioData {
+    return {
+      tempo: spicetifyData.tempo,
+      energy: spicetifyData.energy,
+      valence: spicetifyData.valence,
+      loudness: spicetifyData.loudness,
+      key: spicetifyData.key,
+      time_signature: spicetifyData.time_signature || spicetifyData.timeSignature,
+      danceability: spicetifyData.danceability,
+      acousticness: spicetifyData.acousticness,
+      instrumentalness: spicetifyData.instrumentalness,
+      speechiness: spicetifyData.speechiness,
+      liveness: spicetifyData.liveness,
+      mode: spicetifyData.mode,
+      // Optional arrays can be undefined for now
+    };
+  }
 
   /**
    * 🔧 IMPROVED: Robust color extraction with retry logic and fallbacks
@@ -1915,7 +1962,11 @@ export class MusicSyncService {
         // 🎨 CRITICAL: Log before Spicetify call
         console.log(`🎨 [MusicSyncService] Calling Spicetify.colorExtractor (attempt ${attempt})...`);
         
-        const colors = await Spicetify.colorExtractor(trackUri);
+        const spicetify = safeGetSpicetify();
+        if (!spicetify?.colorExtractor) {
+          throw new Error("colorExtractor not available");
+        }
+        const colors = await spicetify.colorExtractor(trackUri);
 
         // 🎨 CRITICAL: Log raw extraction result
         console.log(

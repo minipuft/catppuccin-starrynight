@@ -5,7 +5,7 @@
 
 // === LAYER 1: FOUNDATION (Load Order Critical) ===
 // Design tokens must load first - all other modules depend on these
-@use "_design-tokens" as *; // Consolidated design system (root, unified, base variables)
+@use "../design-tokens/tokens" as *; // Authoritative unified design token system
 @use "_motion-tokens" as *;  // Consolidated motion system (animation, beat sync, layered effects)  
 @use "_visual-tokens" as *;  // Consolidated visual system (gradient, visual effects)
 

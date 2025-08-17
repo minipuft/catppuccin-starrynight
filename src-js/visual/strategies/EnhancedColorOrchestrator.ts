@@ -1,5 +1,9 @@
 /**
  * EnhancedColorOrchestrator - Lightweight Color Processing Coordinator
+ * 
+ * 🔧 PHASE 2.1: DEPRECATION NOTICE - This lightweight coordinator will be replaced
+ * by UnifiedColorProcessingEngine in Phase 2.2 for better performance and features.
+ * Current usage in ColorEventOrchestrator will be migrated to use UnifiedColorProcessingEngine.
  *
  * Coordinates color processing through registered strategies with the unified event system.
  * Provides a bridge between the OKLAB integration and existing visual strategy systems.

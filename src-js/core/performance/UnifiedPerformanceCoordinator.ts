@@ -1039,4 +1039,323 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
   public getCurrentPerformanceMode(): PerformanceMode {
     return { ...this.currentPerformanceMode };
   }
+
+  // ===============================================================================
+  // LEGACY API METHODS (from SimplePerformanceCoordinator consolidation)
+  // ===============================================================================
+
+  /**
+   * Emit trace event (legacy API compatibility)
+   */
+  public emitTrace(event: string, data?: any): void {
+    if (this.config.enableDebug) {
+      console.log(`[UnifiedPerformanceCoordinator] Trace: ${event}`, data);
+    }
+    
+    // TODO: Add performance events to UnifiedEventBus when needed
+    // this.eventBus.emit('performance:trace', { event, data, timestamp: Date.now() });
+  }
+
+  /**
+   * Record metric (legacy API compatibility)
+   */
+  public recordMetric(name: string, value: number): void {
+    // Track as subsystem metric if it follows subsystem pattern
+    const subsystemMatch = name.match(/^subsystem_(.+)_(.+)$/);
+    if (subsystemMatch && subsystemMatch.length >= 3) {
+      const subsystemName = subsystemMatch[1] || 'unknown';
+      const metricType = subsystemMatch[2] || 'unknown';
+      const existing = this.subsystemMetrics.get(subsystemName) || {
+        name: subsystemName,
+        frameTime: 0,
+        memoryUsage: 0,
+        cpuUsage: 0,
+        fps: 60,
+        lastUpdate: performance.now(),
+        status: 'healthy' as const,
+        issues: [],
+      };
+
+      // Update the specific metric
+      switch (metricType) {
+        case 'frame_time':
+          existing.frameTime = value;
+          break;
+        case 'memory':
+          existing.memoryUsage = value;
+          break;
+        case 'fps':
+          existing.fps = value;
+          break;
+        case 'cpu':
+          existing.cpuUsage = value;
+          break;
+      }
+
+      this.trackSubsystem(subsystemName, existing);
+    }
+
+    if (this.config.enableDebug) {
+      console.log(`[UnifiedPerformanceCoordinator] Metric: ${name}=${value}`);
+    }
+  }
+
+  /**
+   * Get median FPS (legacy API compatibility)
+   */
+  public getMedianFPS(): number {
+    // Calculate from subsystem metrics
+    const fpsValues = Array.from(this.subsystemMetrics.values()).map(m => m.fps);
+    if (fpsValues.length > 0) {
+      fpsValues.sort((a, b) => a - b);
+      const mid = Math.floor(fpsValues.length / 2);
+      return fpsValues.length % 2 === 0 
+        ? ((fpsValues[mid - 1] || 0) + (fpsValues[mid] || 0)) / 2 
+        : (fpsValues[mid] || 0);
+    }
+
+    // Fallback based on device tier
+    const tier = this.deviceCapabilities.performanceTier;
+    switch (tier) {
+      case 'premium': return 60;
+      case 'high': return 60;
+      case 'medium': return 50;
+      case 'low': return 30;
+      default: return 30;
+    }
+  }
+
+  /**
+   * Calculate health score (legacy API compatibility)
+   */
+  public calculateHealthScore(): number {
+    const healthReport = this.getSystemHealth();
+    return healthReport.performanceScore / 100; // Convert 0-100 to 0-1
+  }
+
+  /**
+   * Check if quality should be reduced (legacy API compatibility)
+   */
+  public shouldReduceQuality(): boolean {
+    const tier = this.deviceCapabilities.performanceTier;
+    const thermalState = this.thermalState.temperature;
+    const healthScore = this.calculateHealthScore();
+    
+    return tier === 'low' || thermalState === 'hot' || thermalState === 'critical' || healthScore < 0.5;
+  }
+
+  /**
+   * Time operation (legacy API compatibility)
+   */
+  public timeOperation<T>(name: string, operation: () => T): T {
+    const start = performance.now();
+    const result = operation();
+    const duration = performance.now() - start;
+    
+    this.recordMetric(`operation_${name}_duration`, duration);
+    
+    if (this.config.enableDebug) {
+      console.log(`[UnifiedPerformanceCoordinator] Operation ${name}: ${duration.toFixed(2)}ms`);
+    }
+    
+    return result;
+  }
+
+  /**
+   * Time async operation (legacy API compatibility)
+   */
+  public async timeOperationAsync<T>(name: string, operation: () => Promise<T>): Promise<T> {
+    const start = performance.now();
+    const result = await operation();
+    const duration = performance.now() - start;
+    
+    this.recordMetric(`async_operation_${name}_duration`, duration);
+    
+    if (this.config.enableDebug) {
+      console.log(`[UnifiedPerformanceCoordinator] Async operation ${name}: ${duration.toFixed(2)}ms`);
+    }
+    
+    return result;
+  }
+
+  /**
+   * Get average time for operation (legacy API compatibility)
+   */
+  public getAverageTime(name: string): number {
+    // Estimate based on device tier for legacy compatibility
+    const tier = this.deviceCapabilities.performanceTier;
+    switch (tier) {
+      case 'premium': return 3;
+      case 'high': return 5;
+      case 'medium': return 15;
+      case 'low': return 30;
+      default: return 15;
+    }
+  }
+
+  /**
+   * Update budget (legacy API compatibility)
+   */
+  public updateBudget(name: string, value: number): void {
+    if (this.config.enableDebug) {
+      console.log(`[UnifiedPerformanceCoordinator] Budget update ignored: ${name}=${value} (using adaptive optimization instead)`);
+    }
+  }
+
+  /**
+   * Start timing (legacy API compatibility)
+   */
+  public startTiming(name: string): string {
+    const timingId = `${name}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    if (this.config.enableDebug) {
+      console.log(`[UnifiedPerformanceCoordinator] Timing started: ${name} (${timingId})`);
+    }
+    
+    return timingId;
+  }
+
+  /**
+   * End timing (legacy API compatibility)
+   */
+  public endTiming(timingId: string, context?: any): void {
+    if (this.config.enableDebug) {
+      console.log(`[UnifiedPerformanceCoordinator] Timing ended: ${timingId}`, context);
+    }
+  }
+
+  // ===============================================================================
+  // WEBGL INTEGRATION (from SimplePerformanceCoordinator consolidation)
+  // ===============================================================================
+
+  /**
+   * Get WebGL status (legacy API compatibility)
+   */
+  public getWebGLStatus(): {
+    state: 'disabled' | 'css-fallback' | 'webgl-active';
+    quality: 'low' | 'medium' | 'high';
+    enabled: boolean;
+  } {
+    const webglSupported = this.deviceCapabilities.supportsWebGL;
+    const performanceTier = this.deviceCapabilities.performanceTier;
+    
+    if (!webglSupported) {
+      return {
+        state: 'disabled',
+        quality: 'low',
+        enabled: false,
+      };
+    }
+
+    // Determine quality based on performance tier and thermal state
+    let quality: 'low' | 'medium' | 'high' = 'medium';
+    if (performanceTier === 'premium' || performanceTier === 'high') {
+      quality = this.thermalState.temperature === 'normal' ? 'high' : 'medium';
+    } else if (performanceTier === 'low' || this.thermalState.temperature === 'critical') {
+      quality = 'low';
+    }
+
+    return {
+      state: 'webgl-active',
+      quality,
+      enabled: true,
+    };
+  }
+
+  /**
+   * Get performance summary (legacy API compatibility)
+   */
+  public getPerformanceSummary(): {
+    deviceTier: 'low' | 'medium' | 'high';
+    deviceDescription: string;
+    confidence: number;
+    reasoning: string[];
+    webglStatus: ReturnType<UnifiedPerformanceCoordinator['getWebGLStatus']>;
+    energyBoost: boolean;
+    settings: any;
+  } {
+    const webglStatus = this.getWebGLStatus();
+    const healthReport = this.getSystemHealth();
+    
+    // Map premium tier to high for legacy compatibility
+    const deviceTier = this.deviceCapabilities.performanceTier === 'premium' 
+      ? 'high' 
+      : this.deviceCapabilities.performanceTier as 'low' | 'medium' | 'high';
+
+    // Generate device description
+    const deviceDescription = `${this.deviceCapabilities.memoryGB}GB RAM, ${this.deviceCapabilities.cpuCores} cores, ${
+      this.deviceCapabilities.supportsWebGL ? 'WebGL' : 'No WebGL'
+    }${this.deviceCapabilities.isMobile ? ', Mobile' : ''}`;
+
+    // Calculate confidence based on health score
+    const confidence = healthReport.performanceScore / 100;
+
+    // Generate reasoning based on device capabilities and current state
+    const reasoning: string[] = [];
+    reasoning.push(`Device tier: ${deviceTier} (${this.deviceCapabilities.performanceTier})`);
+    reasoning.push(`Memory: ${this.deviceCapabilities.memoryGB}GB`);
+    reasoning.push(`CPU cores: ${this.deviceCapabilities.cpuCores}`);
+    if (this.deviceCapabilities.supportsWebGL) {
+      reasoning.push(`WebGL supported (${this.deviceCapabilities.maxTextureSize}px max texture)`);
+    }
+    if (this.thermalState.temperature !== 'normal') {
+      reasoning.push(`Thermal state: ${this.thermalState.temperature}`);
+    }
+
+    // Energy boost detection based on thermal and battery state
+    const energyBoost = this.currentPerformanceMode.name === 'performance' && 
+                       this.thermalState.temperature === 'normal' &&
+                       (this.batteryState?.charging || (this.batteryState?.level || 0) > 0.5 || !this.batteryState);
+
+    return {
+      deviceTier,
+      deviceDescription,
+      confidence,
+      reasoning,
+      webglStatus,
+      energyBoost,
+      settings: this.currentPerformanceMode,
+    };
+  }
+
+  /**
+   * Get device tier (legacy API compatibility)
+   */
+  public getDeviceTier(): 'low' | 'medium' | 'high' {
+    // Map premium to high for legacy compatibility
+    return this.deviceCapabilities.performanceTier === 'premium' 
+      ? 'high' 
+      : this.deviceCapabilities.performanceTier as 'low' | 'medium' | 'high';
+  }
+
+  /**
+   * Get device description (legacy API compatibility)
+   */
+  public getDeviceDescription(): string {
+    return `${this.deviceCapabilities.memoryGB}GB RAM, ${this.deviceCapabilities.cpuCores} cores, ${
+      this.deviceCapabilities.supportsWebGL ? 'WebGL' : 'No WebGL'
+    }${this.deviceCapabilities.isMobile ? ', Mobile' : ''}`;
+  }
+
+  /**
+   * Check if energy boost is active (legacy API compatibility)
+   */
+  public hasEnergyBoost(): boolean {
+    return this.currentPerformanceMode.name === 'performance' && 
+           this.thermalState.temperature === 'normal' &&
+           (this.batteryState?.charging || (this.batteryState?.level || 0) > 0.5 || !this.batteryState);
+  }
+
+  /**
+   * Get current effective settings (legacy API compatibility)
+   */
+  public getCurrentSettings(): any {
+    return {
+      performanceMode: this.currentPerformanceMode,
+      deviceCapabilities: this.deviceCapabilities,
+      thermalState: this.thermalState,
+      batteryState: this.batteryState,
+      webglStatus: this.getWebGLStatus(),
+    };
+  }
 }

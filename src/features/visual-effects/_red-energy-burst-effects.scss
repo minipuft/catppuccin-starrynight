@@ -8,36 +8,25 @@
  * @consciousness Red energy that breathes with musical soul
  */
 
-/* === Cinematic Drama CSS Variables === */
+/* === Cinematic Drama CSS Variables - Centralized === */
 :root {
-  /* Red Energy Burst Colors */
-  --cinematic-red-r: 255;
-  --cinematic-red-g: 50;
-  --cinematic-red-b: 50;
-  --cinematic-amber-r: 255;
-  --cinematic-amber-g: 140;
-  --cinematic-amber-b: 0;
-  --cinematic-blue-r: 0;
-  --cinematic-blue-g: 100;
-  --cinematic-blue-b: 200;
-  --cinematic-cyan-r: 0;
-  --cinematic-cyan-g: 255;
-  --cinematic-cyan-b: 255;
-  
-  /* Dynamic Intensity Variables */
+  /* Dynamic Intensity Variables - Theme-specific behavior */
   --cinematic-glow-intensity: 0;         /* 0-1 holographic glow strength */
   --cinematic-flicker-rate: 0.5;         /* Hz CRT flicker frequency */
   --cinematic-scanline-speed: 1.0;       /* Scanline animation velocity */
   --cinematic-interference: 0;           /* 0-1 CRT interference level */
   --cinematic-depth: 0;                  /* 0-1 atmospheric depth */
-  --red-energy-burst-effectstic-tension: 0;       /* 0-1 dramatic moment intensity */
+  --cinematic-tension: 0;                /* 0-1 dramatic moment intensity */
   --cinematic-energy-stability: 1.0;     /* 0-1 chaos vs stability */
   
-  /* Calculated Composite Values */
-  --cinematic-red-rgb: var(--cinematic-red-r), var(--cinematic-red-g), var(--cinematic-red-b);
-  --cinematic-amber-rgb: var(--cinematic-amber-r), var(--cinematic-amber-g), var(--cinematic-amber-b);
-  --cinematic-blue-rgb: var(--cinematic-blue-r), var(--cinematic-blue-g), var(--cinematic-blue-b);
-  --cinematic-cyan-rgb: var(--cinematic-cyan-r), var(--cinematic-cyan-g), var(--cinematic-cyan-b);
+  /* Centralized RGB Color References - From design-tokens/tokens.scss */
+  --cinematic-red-rgb: var(--sn-theme-cinematic-red-rgb);
+  --cinematic-amber-rgb: var(--sn-theme-cinematic-amber-rgb);
+  --cinematic-blue-rgb: var(--sn-theme-cinematic-blue-rgb);
+  --cinematic-cyan-rgb: var(--sn-theme-cinematic-cyan-rgb);
+  
+  /* Unified breathing duration */
+  --cinematic-breathing-duration: var(--sn-anim-breathing-energetic);
 }
 
 /* === Red Energy Burst Keyframes === */

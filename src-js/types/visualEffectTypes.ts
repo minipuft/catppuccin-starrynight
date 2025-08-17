@@ -5,6 +5,10 @@
  * Technical interfaces for music-synchronized visual effects.
  */
 
+import type { UnifiedEventBus } from '@/core/events/UnifiedEventBus';
+import type { SimplePerformanceCoordinator } from '@/core/performance/SimplePerformanceCoordinator';
+import type { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
+
 // =========================================================================
 // CORE VISUAL EFFECTS TYPES
 // =========================================================================
@@ -353,13 +357,13 @@ export interface AdvancedVisualIntegration {
   registeredSystems: Map<string, VisualEffectsSystemConfig>;
   
   /** Shared event bus reference */
-  eventBus: unknown;
+  eventBus: UnifiedEventBus;
   
   /** Shared performance analyzer reference */
-  performanceAnalyzer: unknown;
+  performanceAnalyzer: SimplePerformanceCoordinator;
   
   /** Shared CSS variable manager reference */
-  cssVariableManager: unknown;
+  cssVariableManager: UnifiedCSSVariableManager;
 }
 
 // =========================================================================

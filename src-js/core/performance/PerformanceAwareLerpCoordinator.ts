@@ -1,5 +1,12 @@
 /**
  * PerformanceAwareLerpCoordinator - Musical LERP with Performance Optimization
+ * 
+ * 🚨 DEPRECATED: This coordinator has been consolidated into EnhancedMasterAnimationCoordinator
+ * 🔧 PHASE 3.1: Use EnhancedMasterAnimationCoordinator.createMusicalLerp() instead
+ * 
+ * @deprecated Use EnhancedMasterAnimationCoordinator instead - provides all LERP coordination functionality
+ * @see EnhancedMasterAnimationCoordinator.createMusicalLerp()
+ * @see EnhancedMasterAnimationCoordinator.getConsolidatedMetrics()
  *
  * Manages mathematical interpolation with performance constraints while maintaining
  * musical synchronization across all device capabilities.

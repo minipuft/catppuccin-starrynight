@@ -1,5 +1,12 @@
 /**
  * VisualSystemCoordinator - Visual Effects Factory & Coordination Layer
+ * 
+ * 🚨 DEPRECATED: This coordinator has been consolidated into VisualEffectsCoordinator
+ * 🔧 PHASE 2.2: Use VisualEffectsCoordinator.createVisualSystem() instead
+ * 
+ * @deprecated Use VisualEffectsCoordinator instead - provides all factory functionality
+ * @see VisualEffectsCoordinator.createVisualSystem()
+ * @see VisualEffectsCoordinator.orchestrateGradientEffects()
  *
  * Layer 2 of the three-layer facade architecture - handles ALL visual systems through factory patterns.
  * Provides comprehensive factory methods, dependency injection, and performance optimization

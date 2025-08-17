@@ -27,6 +27,360 @@
   @include contain-optimized;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌊 UNIFIED BREATHING ANIMATION SYSTEM (Phase 2)
+// Consolidated breathing animations with design system integration
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Base breathing animation mixin with performance optimization
+@mixin breathing-animation-base($duration-var: --sn-anim-transition-cosmic, $easing-var: --sn-anim-easing-organic) {
+  @include performance-optimized;
+  animation-duration: var(#{$duration-var}, 4000ms);
+  animation-timing-function: var(#{$easing-var}, ease-in-out);
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+  
+  // Accessibility support
+  @media (prefers-reduced-motion: reduce) {
+    animation: none !important;
+    transform: translateZ(0) scale(1) !important;
+    opacity: var(--sn-ui-glass-opacity, 1) !important;
+    filter: none !important;
+  }
+}
+
+// Unified breathing animation mixin - generates keyframes and applies animation
+@mixin breathing-animation(
+  $variant: 'gentle',
+  $duration-var: --sn-anim-transition-cosmic,
+  $easing-var: --sn-anim-easing-organic,
+  $intensity-scale: 1.0
+) {
+  @include breathing-animation-base($duration-var, $easing-var);
+  
+  @if $variant == 'gentle' {
+    animation-name: breathing-gentle;
+    // Gentle breathing keyframes - subtle effects for content areas
+    @keyframes breathing-gentle {
+      0%, 100% {
+        transform: translateZ(0) scale(1);
+        opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 0.95 * #{$intensity-scale});
+        filter: 
+          brightness(var(--sn-bg-gradient-brightness, 1.0)) 
+          saturate(var(--sn-bg-gradient-saturation, 1.1)) 
+          contrast(var(--sn-bg-gradient-contrast, 1.0));
+      }
+      50% {
+        transform: translateZ(0) scale(calc(1 + var(--sn-music-breathing-scale, 0.02) * 0.75 * #{$intensity-scale}));
+        opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 1.05 * #{$intensity-scale});
+        filter: 
+          brightness(calc(var(--sn-bg-gradient-brightness, 1.0) * (1 + 0.03 * #{$intensity-scale}))) 
+          saturate(calc(var(--sn-bg-gradient-saturation, 1.1) * (1 + 0.08 * #{$intensity-scale}))) 
+          contrast(calc(var(--sn-bg-gradient-contrast, 1.0) * (1 + 0.02 * #{$intensity-scale})));
+      }
+    }
+  } @else if $variant == 'energetic' {
+    animation-name: breathing-energetic;
+    animation-duration: calc(var(#{$duration-var}, 4000ms) * 0.6);
+    // Energetic breathing keyframes - enhanced effects for high energy
+    @keyframes breathing-energetic {
+      0%, 100% {
+        transform: translateZ(0) scale(1);
+        opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 0.9 * #{$intensity-scale});
+        filter: 
+          brightness(var(--sn-bg-gradient-brightness, 1.0)) 
+          saturate(var(--sn-bg-gradient-saturation, 1.1)) 
+          contrast(var(--sn-bg-gradient-contrast, 1.0));
+      }
+      50% {
+        transform: translateZ(0) scale(calc(1 + var(--sn-music-breathing-scale, 0.05) * #{$intensity-scale}));
+        opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 1.15 * #{$intensity-scale});
+        filter: 
+          brightness(calc(var(--sn-bg-gradient-brightness, 1.0) * (1 + 0.08 * #{$intensity-scale}))) 
+          saturate(calc(var(--sn-bg-gradient-saturation, 1.1) * (1 + 0.25 * #{$intensity-scale}))) 
+          contrast(calc(var(--sn-bg-gradient-contrast, 1.0) * (1 + 0.08 * #{$intensity-scale})));
+      }
+    }
+  } @else if $variant == 'meditative' {
+    animation-name: breathing-meditative;
+    animation-duration: calc(var(#{$duration-var}, 4000ms) * 1.5);
+    // Meditative breathing keyframes - minimal effects for calm music
+    @keyframes breathing-meditative {
+      0%, 100% {
+        transform: translateZ(0) scale(1);
+        opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 0.85 * #{$intensity-scale});
+      }
+      50% {
+        transform: translateZ(0) scale(calc(1 + var(--sn-music-breathing-scale, 0.02) * 0.4 * #{$intensity-scale}));
+        opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 0.95 * #{$intensity-scale});
+      }
+    }
+  } @else if $variant == 'cosmic' {
+    animation-name: breathing-cosmic;
+    animation-duration: calc(var(#{$duration-var}, 4000ms) * 0.75);
+    // Cosmic breathing keyframes - maximum effects for dramatic moments
+    @keyframes breathing-cosmic {
+      0%, 100% {
+        transform: translateZ(0) scale(1);
+        opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 0.88 * #{$intensity-scale});
+        filter: 
+          brightness(var(--sn-bg-gradient-brightness, 1.0))
+          saturate(var(--sn-bg-gradient-saturation, 1.1))
+          contrast(var(--sn-bg-gradient-contrast, 1.0));
+      }
+      50% {
+        transform: translateZ(0) scale(calc(1 + var(--sn-music-breathing-scale, 0.02) * 4 * #{$intensity-scale}));
+        opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 1.25 * #{$intensity-scale});
+        filter: 
+          brightness(calc(var(--sn-bg-gradient-brightness, 1.0) * (1 + 0.12 * #{$intensity-scale})))
+          saturate(calc(var(--sn-bg-gradient-saturation, 1.1) * (1 + 0.4 * #{$intensity-scale})))
+          contrast(calc(var(--sn-bg-gradient-contrast, 1.0) * (1 + 0.1 * #{$intensity-scale})))
+          hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) * 0.08 * #{$intensity-scale}));
+      }
+    }
+  } @else if $variant == 'depth' {
+    animation-name: breathing-depth;
+    // Depth breathing keyframes - backdrop-filter based for depth layers
+    @keyframes breathing-depth {
+      0%, 100% {
+        transform: scale(1);
+        opacity: calc(var(--depth-effects-intensity, 0.5) * 0.6 * #{$intensity-scale});
+        backdrop-filter: 
+          contrast(calc(1 + var(--depth-effects-intensity, 0.5) * 0.02 * #{$intensity-scale}))
+          saturate(calc(1 + var(--depth-effects-intensity, 0.5) * 0.03 * #{$intensity-scale}));
+      }
+      50% {
+        transform: scale(calc(1 + var(--depth-effects-intensity, 0.5) * 0.02 * #{$intensity-scale}));
+        opacity: calc(var(--depth-effects-intensity, 0.5) * 0.8 * #{$intensity-scale});
+        backdrop-filter: 
+          contrast(calc(1 + var(--depth-effects-intensity, 0.5) * 0.05 * #{$intensity-scale}))
+          saturate(calc(1 + var(--depth-effects-intensity, 0.5) * 0.08 * #{$intensity-scale}));
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 💎 UNIFIED CRYSTALLINE GLASSMORPHISM SYSTEM (Phase 3)
+// Enhanced glassmorphism with crystalline effects and prismatic lighting
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Prismatic edge lighting mixin for crystalline effects
+@mixin prismatic-edge-lighting($intensity: 0.4, $speed: 8s) {
+  position: relative;
+  
+  &::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(
+      45deg,
+      rgba(255, 0, 0, #{$intensity}) 0%,
+      rgba(255, 255, 0, #{$intensity}) 16.66%,
+      rgba(0, 255, 0, #{$intensity}) 33.33%,
+      rgba(0, 255, 255, #{$intensity}) 50%,
+      rgba(0, 0, 255, #{$intensity}) 66.66%,
+      rgba(255, 0, 255, #{$intensity}) 83.33%,
+      rgba(255, 0, 0, #{$intensity}) 100%
+    );
+    border-radius: inherit;
+    z-index: -1;
+    animation: prismatic-rainbow-flow #{$speed} linear infinite;
+    filter: blur(1px);
+  }
+  
+  @keyframes prismatic-rainbow-flow {
+    0% { filter: hue-rotate(0deg) blur(1px); }
+    25% { filter: hue-rotate(90deg) blur(1px); }
+    50% { filter: hue-rotate(180deg) blur(1px); }
+    75% { filter: hue-rotate(270deg) blur(1px); }
+    100% { filter: hue-rotate(360deg) blur(1px); }
+  }
+}
+
+// Enhanced glassmorphism with crystalline effects
+@mixin glassmorphism-crystalline(
+  $blur: 20px, 
+  $opacity: 0.08, 
+  $saturation: 1.2,
+  $intensity: 0.6,
+  $float-height: 15px,
+  $animation-speed: 4s
+) {
+  @include performance-optimized;
+  position: relative;
+  
+  // Enhanced backdrop filter with crystalline properties
+  backdrop-filter: 
+    blur(#{$blur}) 
+    brightness(calc(var(--sn-bg-gradient-brightness, 1.0) * 1.1)) 
+    contrast(1.1) 
+    saturate(#{$saturation});
+  -webkit-backdrop-filter: 
+    blur(#{$blur}) 
+    brightness(calc(var(--sn-bg-gradient-brightness, 1.0) * 1.1)) 
+    contrast(1.1) 
+    saturate(#{$saturation});
+    
+  // Crystal-like border
+  border: 1px solid rgba(var(--sn-musical-oklab-accent-rgb), 0.2);
+  
+  // Layered crystalline background
+  background: 
+    // Primary crystal surface using design system
+    linear-gradient(
+      135deg,
+      rgba(var(--sn-musical-oklab-primary-rgb), #{$opacity}) 0%,
+      rgba(var(--sn-musical-oklab-accent-rgb), calc(#{$opacity} * 1.5)) 50%,
+      rgba(var(--sn-musical-oklab-secondary-rgb), calc(#{$opacity} * 0.75)) 100%
+    ),
+    // Iridescent overlay
+    linear-gradient(
+      45deg,
+      transparent 0%,
+      rgba(var(--sn-musical-oklab-highlight-rgb), calc(#{$opacity} * 0.375)) 25%,
+      rgba(var(--sn-musical-oklab-accent-rgb), calc(#{$opacity} * 0.625)) 50%,
+      rgba(var(--sn-musical-oklab-highlight-rgb), calc(#{$opacity} * 0.375)) 75%,
+      transparent 100%
+    );
+  
+  background-size: 100% 100%, 300% 300%;
+  
+  // Crystalline box shadow with design system colors
+  box-shadow: 
+    inset 0 1px 0 rgba(var(--sn-musical-oklab-highlight-rgb), 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+    0 calc(#{$float-height} * 2) 60px rgba(var(--sn-musical-oklab-accent-rgb), calc(#{$intensity} * 0.25)),
+    0 0 20px rgba(var(--sn-musical-oklab-accent-rgb), calc(#{$intensity} * 0.17));
+  
+  // Crystalline animations
+  animation: 
+    crystalline-pulse #{$animation-speed} ease-in-out infinite,
+    crystalline-iridescence calc(#{$animation-speed} * 2) linear infinite;
+  
+  // Crystal facet reflections
+  &::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    height: 40%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.02) 50%,
+      transparent 100%
+    );
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  // Crystal internal refraction
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(
+        ellipse at 30% 20%,
+        rgba(var(--sn-musical-oklab-accent-rgb), calc(#{$opacity} * 0.75)) 0%,
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse at 70% 80%,
+        rgba(var(--sn-musical-oklab-primary-rgb), calc(#{$opacity} * 0.5)) 0%,
+        transparent 50%
+      );
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    animation: crystalline-shimmer calc(#{$animation-speed} * 1.5) ease-in-out infinite;
+  }
+  
+  // Enhanced hover state
+  &:hover {
+    transform: translateY(calc(-#{$float-height})) scale(1.02);
+    backdrop-filter: 
+      blur(calc(#{$blur} + 5px)) 
+      brightness(calc(var(--sn-bg-gradient-brightness, 1.0) * 1.2)) 
+      contrast(1.2) 
+      saturate(1.4);
+    
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+      0 calc(#{$float-height} * 3) 80px rgba(var(--sn-musical-oklab-accent-rgb), calc(#{$intensity} * 0.42)),
+      0 0 40px rgba(var(--sn-musical-oklab-accent-rgb), calc(#{$intensity} * 0.33)),
+      0 0 60px rgba(var(--sn-musical-oklab-accent-rgb), calc(#{$intensity} * 0.17));
+    
+    &::before {
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0.06) 50%,
+        transparent 100%
+      );
+    }
+    
+    &::after {
+      animation-duration: calc(#{$animation-speed} * 0.8);
+    }
+  }
+  
+  // Fallback for unsupported browsers
+  @supports not (backdrop-filter: blur(1px)) {
+    background: rgba(var(--spice-rgb-surface0), calc(#{$opacity} * 3));
+    border: 1px solid rgba(var(--spice-rgb-surface1), 0.3);
+  }
+}
+
+// Crystalline keyframe animations
+@keyframes crystalline-pulse {
+  0%, 100% {
+    filter: brightness(1) saturate(1.2);
+    opacity: 0.8;
+  }
+  25% {
+    filter: brightness(1.05) saturate(1.3);
+    opacity: 0.9;
+  }
+  50% {
+    filter: brightness(1.1) saturate(1.4);
+    opacity: 1.0;
+  }
+  75% {
+    filter: brightness(1.05) saturate(1.3);
+    opacity: 0.9;
+  }
+}
+
+@keyframes crystalline-iridescence {
+  0% { background-position: 0% 50%, 0% 50%; }
+  25% { background-position: 100% 0%, 100% 0%; }
+  50% { background-position: 50% 100%, 50% 100%; }
+  75% { background-position: 0% 50%, 0% 50%; }
+  100% { background-position: 0% 50%, 0% 50%; }
+}
+
+@keyframes crystalline-shimmer {
+  0%, 100% {
+    background-position: -200% center, 200% center;
+    opacity: 0.6;
+  }
+  50% {
+    background-position: 200% center, -200% center;
+    opacity: 1;
+  }
+}
+
 // PHASE 1: Glassmorphism Foundation Mixins
 // =============================================================================
 
@@ -723,3 +1077,33 @@
 
 // Forward centralised DOM selector helpers so any module that `@use`s
 // `_mixins.scss` automatically gains access.
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CENTRALIZED LEGACY COMPATIBILITY SYSTEM - Phase 4 Optimization
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Universal legacy consciousness terminology bridge
+@mixin consciousness-bridge {
+  // CSS variable bridges for consciousness → visual-effects terminology
+  --consciousness-phase: var(--fluid-phase);
+  --consciousness-amplitude: var(--fluid-amplitude);
+  --consciousness-intensity: var(--visual-effects-intensity);
+  --consciousness-breathing-duration: var(--visual-effects-breathing-duration);
+}
+
+// Legacy animation bridge for consciousness breathing classes
+@mixin legacy-consciousness-breathing($variant: 'gentle') {
+  @include breathing-animation($variant, --visual-effects-breathing-duration);
+}
+
+// Consolidated legacy class bridge system
+@mixin legacy-class-bridge($old-class, $new-class) {
+  .#{$old-class} {
+    @extend .#{$new-class} !optional;
+  }
+}
+
+// Performance-optimized extend bridge (reduces CSS output)
+@mixin extend-bridge($target-class) {
+  @extend #{$target-class} !optional;
+}

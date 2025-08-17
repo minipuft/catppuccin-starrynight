@@ -12,6 +12,11 @@
 
 import { Y3KDebug } from "./UnifiedDebugManager";
 
+// Runtime utility for safe Spicetify access
+function isSpicetifyAvailable(): boolean {
+  return typeof window !== 'undefined' && !!window.Spicetify;
+}
+
 export interface WebGLCapabilities {
   webgl2: boolean;
   webgl1: boolean;
@@ -49,7 +54,7 @@ export class WebGLDebugCore {
 
   private detectSpicetifyEnvironment(): void {
     this.isSpicetifyEnvironment = !!(
-      window.Spicetify ||
+      isSpicetifyAvailable() ||
       document.querySelector(".Root__main-view") ||
       document.querySelector('[data-testid="topbar"]') ||
       navigator.userAgent.includes("Spotify")

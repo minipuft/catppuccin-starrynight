@@ -11,6 +11,12 @@
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type { SettingsManager } from "@/ui/managers/SettingsManager";
+import type { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import type { MusicSyncService } from "@/audio/MusicSyncService";
+import type { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
+import type { EnhancedDeviceTierDetector } from "@/core/performance/EnhancedDeviceTierDetector";
+import type { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
+import type { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
 import * as Utils from "@/utils/core/ThemeUtilities";
 
 // ============================================================================
@@ -34,15 +40,15 @@ export interface SystemCreationContext {
   dependencies: {
     performanceAnalyzer?: SimplePerformanceCoordinator;
     settingsManager?: SettingsManager;
-    musicSyncService?: unknown;
-    year3000System?: unknown;
-    cssConsciousnessController?: unknown;
-    performanceCoordinator?: unknown;
+    musicSyncService?: MusicSyncService;
+    year3000System?: Year3000System;
+    cssConsciousnessController?: UnifiedCSSVariableManager;
+    performanceCoordinator?: SimplePerformanceCoordinator;
     // New simplified performance system dependencies
-    simplePerformanceCoordinator?: unknown;
-    enhancedDeviceTierDetector?: unknown;
-    webglSystemsIntegration?: unknown;
-    deviceCapabilityDetector?: unknown;
+    simplePerformanceCoordinator?: SimplePerformanceCoordinator;
+    enhancedDeviceTierDetector?: EnhancedDeviceTierDetector;
+    webglSystemsIntegration?: WebGLSystemsIntegration;
+    deviceCapabilityDetector?: DeviceCapabilityDetector;
   };
   
   /** Creation preferences */

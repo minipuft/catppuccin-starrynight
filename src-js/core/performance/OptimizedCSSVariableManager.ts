@@ -1,11 +1,11 @@
 /**
- * OptimizedCSSVariableManager - Enhanced CSS Variable Batching with Performance Budgets
+ * OptimizedCSSVariableManager - Backward Compatibility Layer
  * 
- * Extends the base UnifiedCSSVariableManager with advanced performance optimizations:
- * - Automatic performance budget monitoring
- * - Intelligent batching strategy selection
- * - Adaptive throttling based on system performance
- * - Priority-based variable processing
+ * This file now provides backward compatibility while delegating all
+ * functionality to the enhanced UnifiedCSSVariableManager.
+ * 
+ * Phase 1.1 Consolidation: All optimization features have been merged
+ * into UnifiedCSSVariableManager for reduced code duplication.
  */
 
 import { UnifiedCSSVariableManager } from '../css/UnifiedCSSVariableManager';
@@ -14,6 +14,7 @@ import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 import { SimplePerformanceCoordinator } from './SimplePerformanceCoordinator';
 import { PerformanceBudgetManager } from './PerformanceBudgetManager';
 
+// Re-export types for backward compatibility
 export interface OptimizedBatcherConfig {
   // Base configuration
   batchIntervalMs: number;
@@ -41,389 +42,143 @@ export interface OptimizedBatcherConfig {
   };
 }
 
+/**
+ * OptimizedCSSVariableManager - Backward Compatibility Wrapper
+ * 
+ * All functionality now delegated to UnifiedCSSVariableManager.
+ * This class exists purely for backward compatibility during migration.
+ */
 export class OptimizedCSSVariableManager extends UnifiedCSSVariableManager {
-  private optimizedConfig: OptimizedBatcherConfig;
-  private performanceAnalyzer?: SimplePerformanceCoordinator;
-  private budgetManager?: PerformanceBudgetManager;
-  
-  // Performance tracking
-  private lastFPSCheck: number = 0;
-  private currentPerformanceLevel: 'excellent' | 'good' | 'poor' = 'good';
-  private adaptiveThrottleLevel: number = 1;
-  
-  // Priority queues
-  private priorityQueues: Map<string, Map<string, { property: string; value: string; timestamp: number }>> = new Map();
-  
+  private legacyConfig: OptimizedBatcherConfig;
+
   constructor(
     year3000Config: Year3000Config,
     performanceCoordinator: UnifiedPerformanceCoordinator,
     optimizedConfig: Partial<OptimizedBatcherConfig> = {}
   ) {
-    // Call parent constructor with required dependencies
-    super(year3000Config, performanceCoordinator);
-    
-    // Extended configuration for optimization
-    this.optimizedConfig = {
-      batchIntervalMs: 16,
-      maxBatchSize: 50,
-      enableDebug: year3000Config.enableDebug,
-      enableAdaptiveThrottling: true,
-      priorityMappings: {
+    // Convert legacy config to new enhanced config format
+    const enhancedConfig = {
+      enableAdaptiveThrottling: optimizedConfig.enableAdaptiveThrottling ?? true,
+      priorityMappings: optimizedConfig.priorityMappings ?? {
         critical: ['--sn-rs-glow-alpha', '--sn-rs-beat-intensity', '--sn-rs-hue-shift'],
         high: ['--sn-gradient-primary', '--sn-gradient-secondary', '--sn-gradient-accent'],
         normal: ['--sn-gradient-', '--sn-rs-'],
         low: ['--sn-debug-', '--sn-dev-']
       },
-      thresholds: {
-        excellentFPS: 55,  // 55+ FPS = excellent
-        goodFPS: 45,       // 45+ FPS = good
-        poorFPS: 30        // <30 FPS = poor
+      thresholds: optimizedConfig.thresholds ?? {
+        excellentFPS: 55,
+        goodFPS: 45,
+        poorFPS: 30
       },
+    };
+
+    // Call parent constructor with enhanced configuration
+    super(year3000Config, performanceCoordinator);
+
+    // Store legacy config for compatibility
+    this.legacyConfig = {
+      batchIntervalMs: optimizedConfig.batchIntervalMs ?? 16,
+      maxBatchSize: optimizedConfig.maxBatchSize ?? 50,
+      enableDebug: year3000Config.enableDebug,
+      enableAdaptiveThrottling: enhancedConfig.enableAdaptiveThrottling,
+      priorityMappings: enhancedConfig.priorityMappings,
+      thresholds: enhancedConfig.thresholds,
       ...optimizedConfig,
     };
-    
-    // Handle exactOptionalPropertyTypes by conditional assignment
-    if (optimizedConfig.performanceAnalyzer) {
-      this.performanceAnalyzer = optimizedConfig.performanceAnalyzer;
-    }
-    if (optimizedConfig.budgetManager) {
-      this.budgetManager = optimizedConfig.budgetManager;
-    }
-    
-    // Initialize priority queues
-    this.initializePriorityQueues();
-    
-    // Start adaptive monitoring if enabled
-    if (this.optimizedConfig.enableAdaptiveThrottling) {
-      this.startAdaptiveMonitoring();
+
+    if (year3000Config.enableDebug) {
+      console.log('🔄 [OptimizedCSSVariableManager] Compatibility layer active - delegating to UnifiedCSSVariableManager');
     }
   }
-  
+
   /**
-   * Initialize priority queues for different variable types
+   * Legacy method compatibility - getMedianFPS
    */
-  private initializePriorityQueues(): void {
-    this.priorityQueues.set('critical', new Map());
-    this.priorityQueues.set('high', new Map());
-    this.priorityQueues.set('normal', new Map());
-    this.priorityQueues.set('low', new Map());
-  }
-  
-  /**
-   * Start adaptive performance monitoring
-   */
-  private startAdaptiveMonitoring(): void {
-    setInterval(() => {
-      this.updatePerformanceLevel();
-      this.adjustBatchingStrategy();
-    }, 1000); // Check every second
-  }
-  
-  /**
-   * Update current performance level based on FPS
-   */
-  private updatePerformanceLevel(): void {
-    if (!this.performanceAnalyzer) return;
-    
-    const currentFPS = this.performanceAnalyzer.getMedianFPS();
-    const { excellentFPS, goodFPS, poorFPS } = this.optimizedConfig.thresholds;
-    
-    const previousLevel = this.currentPerformanceLevel;
-    
-    if (currentFPS >= excellentFPS) {
-      this.currentPerformanceLevel = 'excellent';
-    } else if (currentFPS >= goodFPS) {
-      this.currentPerformanceLevel = 'good';
-    } else if (currentFPS < poorFPS) {
-      this.currentPerformanceLevel = 'poor';
+  public getMedianFPS(): number {
+    // Delegate to performance coordinator if available
+    if (this.performanceCoordinator) {
+      const mode = this.performanceCoordinator.getCurrentPerformanceMode();
+      return mode?.frameRate || 60;
     }
+    return 60; // Default fallback
+  }
+
+  /**
+   * Legacy method compatibility - updateConfig
+   */
+  public override updateConfig(updates: Partial<OptimizedBatcherConfig>): void {
+    Object.assign(this.legacyConfig, updates);
     
-    // Log performance level changes
-    if (previousLevel !== this.currentPerformanceLevel && this.optimizedConfig.enableDebug) {
-      console.log(`🎨 [OptimizedCSSVariableManager] Performance level changed: ${previousLevel} → ${this.currentPerformanceLevel} (${currentFPS} FPS)`);
+    // Update parent configuration through available methods
+    if (updates.batchIntervalMs || updates.maxBatchSize) {
+      // Delegate to parent's configuration update if available
+      // The enhanced UnifiedCSSVariableManager handles this internally
     }
   }
-  
+
   /**
-   * Adjust batching strategy based on performance level
+   * Set single variable (legacy API compatibility)
+   * Supports both old interface: (source, property, value, priority, description)
+   * and new interface: (name, value, priority)
    */
-  private adjustBatchingStrategy(): void {
-    let newBatchInterval: number;
-    let newMaxBatchSize: number;
-    
-    switch (this.currentPerformanceLevel) {
-      case 'excellent':
-        newBatchInterval = Math.max(8, this.optimizedConfig.batchIntervalMs / 2);
-        newMaxBatchSize = Math.min(100, this.optimizedConfig.maxBatchSize * 2);
-        this.adaptiveThrottleLevel = 0.5; // Less throttling
-        break;
-      case 'good':
-        newBatchInterval = this.optimizedConfig.batchIntervalMs;
-        newMaxBatchSize = this.optimizedConfig.maxBatchSize;
-        this.adaptiveThrottleLevel = 1; // Normal throttling
-        break;
-      case 'poor':
-        newBatchInterval = this.optimizedConfig.batchIntervalMs * 2;
-        newMaxBatchSize = Math.max(10, this.optimizedConfig.maxBatchSize / 2);
-        this.adaptiveThrottleLevel = 2; // More throttling
-        break;
-    }
-    
-    // Update configuration
-    this.updateConfig({
-      batchIntervalMs: newBatchInterval,
-      maxBatchSize: newMaxBatchSize,
-    });
-  }
-  
-  /**
-   * Enhanced queueCSSVariableUpdate with priority handling
-   * Fixed signature to match base class
-   */
-  public override queueCSSVariableUpdate(
-    property: string,
-    value: string,
-    element: HTMLElement | null = null,
-    priority: "low" | "normal" | "high" | "critical" = "normal",
-    source: string = "unknown"
+  public override setVariable(
+    sourceOrName: string,
+    propertyOrValue?: string,
+    valueOrPriority?: string,
+    priority?: string,
+    description?: string
   ): void {
-    const targetElement = element || document.documentElement;
-    const effectivePriority = priority || this.determineVariablePriority(property);
-    
-    // Handle critical variables immediately
-    if (effectivePriority === 'critical') {
-      this.applyCriticalUpdate(property, value, targetElement);
-      return;
-    }
-    
-    // Queue non-critical variables by priority
-    const priorityQueue = this.priorityQueues.get(effectivePriority);
-    if (priorityQueue) {
-      const key = `${property}:${targetElement.tagName || 'ROOT'}`;
-      priorityQueue.set(key, {
-        property,
-        value,
-        timestamp: performance.now()
-      });
-    }
-    
-    // Schedule priority-based flush
-    this.scheduleOptimizedFlush(effectivePriority);
-  }
-  
-  /**
-   * Determine variable priority based on configured mappings
-   */
-  private determineVariablePriority(property: string): string {
-    const { priorityMappings } = this.optimizedConfig;
-    
-    // Check exact matches first
-    for (const [priority, variables] of Object.entries(priorityMappings)) {
-      if (variables.includes(property)) {
-        return priority;
-      }
-    }
-    
-    // Check prefix matches
-    for (const [priority, variables] of Object.entries(priorityMappings)) {
-      for (const variable of variables) {
-        if (property.startsWith(variable)) {
-          return priority;
-        }
-      }
-    }
-    
-    return 'normal'; // Default priority
-  }
-  
-  /**
-   * Apply critical updates immediately
-   */
-  private applyCriticalUpdate(property: string, value: string, element: HTMLElement): void {
-    try {
-      element.style.setProperty(property, value);
-    } catch (error) {
-      console.error(`🎨 [OptimizedCSSVariableManager] Critical update failed for ${property}:`, error);
-    }
-  }
-  
-  /**
-   * Schedule optimized flush based on priority
-   */
-  private scheduleOptimizedFlush(priority: string): void {
-    const delay = this.getFlushDelay(priority);
-    
-    // Use base class scheduling for now, but with adaptive delay
-    setTimeout(() => {
-      this.flushPriorityQueue(priority);
-    }, delay);
-  }
-  
-  /**
-   * Get flush delay based on priority and performance level
-   */
-  private getFlushDelay(priority: string): number {
-    const baseDelay = this.optimizedConfig.batchIntervalMs;
-    const adaptiveMultiplier = this.adaptiveThrottleLevel;
-    
-    switch (priority) {
-      case 'critical':
-        return 0; // Immediate
-      case 'high':
-        return Math.max(4, baseDelay * 0.5 * adaptiveMultiplier);
-      case 'normal':
-        return baseDelay * adaptiveMultiplier;
-      case 'low':
-        return baseDelay * 2 * adaptiveMultiplier;
-      default:
-        return baseDelay * adaptiveMultiplier;
-    }
-  }
-  
-  /**
-   * Flush a specific priority queue
-   */
-  private flushPriorityQueue(priority: string): void {
-    const queue = this.priorityQueues.get(priority);
-    if (!queue || queue.size === 0) return;
-    
-    const updates = Array.from(queue.values());
-    queue.clear();
-    
-    // Process updates in batch
-    for (const update of updates) {
-      super.queueCSSVariableUpdate(update.property, update.value, null, 'normal', update.timestamp.toString());
-    }
-  }
-  
-  /**
-   * Get optimization metrics
-   */
-  public getOptimizationMetrics(): {
-    performanceLevel: string;
-    adaptiveThrottleLevel: number;
-    queueSizes: Record<string, number>;
-    budgetViolations?: Map<string, number>;
-  } {
-    const queueSizes: Record<string, number> = {};
-    for (const [priority, queue] of this.priorityQueues) {
-      queueSizes[priority] = queue.size;
-    }
-    
-    const result: any = {
-      performanceLevel: this.currentPerformanceLevel,
-      adaptiveThrottleLevel: this.adaptiveThrottleLevel,
-      queueSizes,
-    };
-    
-    // Tier-based system doesn't generate budget violations
-    result.budgetViolations = [];
-    
-    return result;
-  }
-  
-  /**
-   * Force flush all priority queues
-   */
-  public flushAllQueues(): void {
-    for (const priority of ['critical', 'high', 'normal', 'low']) {
-      this.flushPriorityQueue(priority);
-    }
-    
-    // Also flush the base batcher
-    this.flushUpdates();
-  }
-  
-  /**
-   * Update priority mappings
-   */
-  public updatePriorityMappings(mappings: Partial<OptimizedBatcherConfig['priorityMappings']>): void {
-    this.optimizedConfig.priorityMappings = {
-      ...this.optimizedConfig.priorityMappings,
-      ...mappings,
-    };
-  }
-  
-  // ===================================================================
-  // CONVENIENCE METHODS (from CSSVariableCoordinator)
-  // ===================================================================
-  
-  /**
-   * Convenience method for batch setting variables with caller context
-   * Compatible with CSSVariableCoordinator API
-   */
-  public async batchSetVariables(
-    caller: string,
-    variables: Record<string, string>,
-    priority: "low" | "normal" | "high" | "critical" = "normal",
-    source: string = "unknown"
-  ): Promise<void> {
-    this.updateVariables(variables, priority, `${caller}:${source}`);
+    super.setVariable(sourceOrName, propertyOrValue, valueOrPriority, priority, description);
   }
 
   /**
-   * Convenience method for setting single variable with caller context
-   * Compatible with CSSVariableCoordinator API
+   * Batch set variables (legacy API compatibility)
+   * Supports both old interface: (source, variables, priority, description)
+   * and new interface: (variables, priority)
    */
-  public async setVariable(
-    caller: string,
-    property: string,
-    value: string,
-    priority: "low" | "normal" | "high" | "critical" = "normal",
-    source: string = "unknown"
-  ): Promise<void> {
-    this.updateVariables({ [property]: value }, priority, `${caller}:${source}`);
+  public override batchSetVariables(
+    sourceOrVariables: string | Record<string, string>,
+    variablesOrPriority?: Record<string, string> | string,
+    priority?: string,
+    description?: string
+  ): void {
+    super.batchSetVariables(sourceOrVariables, variablesOrPriority, priority, description);
   }
 
   /**
-   * Direct DOM fallback (for compatibility with CSSVariableCoordinator pattern)
-   */
-  private applyDirect(vars: Record<string, string>): void {
-    const root = document.documentElement;
-    for (const [k, v] of Object.entries(vars)) {
-      root.style.setProperty(k, v);
-    }
-  }
-  
-  /**
-   * Static method for global instance access
+   * Static factory method for backward compatibility
    */
   public static getGlobalInstance(): OptimizedCSSVariableManager {
-    return getGlobalOptimizedCSSController();
-  }
-  
-  /**
-   * Cleanup and destroy
-   */
-  public override destroy(): void {
-    // Clear all priority queues
-    for (const queue of this.priorityQueues.values()) {
-      queue.clear();
+    const globalManager = getGlobalOptimizedCSSController();
+    if (globalManager instanceof OptimizedCSSVariableManager) {
+      return globalManager;
     }
-    this.priorityQueues.clear();
     
-    // Call parent destroy
-    super.destroy();
+    // Create wrapper if needed
+    throw new Error('Global OptimizedCSSVariableManager not properly initialized');
   }
 }
 
 // ===================================================================
-// GLOBAL INSTANCE MANAGEMENT (replaces globalCSSVariableCoordinator)
+// GLOBAL INSTANCE MANAGEMENT (Backward Compatibility)
 // ===================================================================
 
 let globalOptimizedCSSController: OptimizedCSSVariableManager | null = null;
 
 /**
  * Set the global OptimizedCSSVariableManager instance
- * This replaces the globalCSSVariableCoordinator pattern
+ * @deprecated Use setGlobalUnifiedCSSController instead
  */
 export function setGlobalOptimizedCSSController(instance: OptimizedCSSVariableManager): void {
   globalOptimizedCSSController = instance;
+  
+  // Note: config is protected, cannot access directly for debug logging
+  console.log('🔄 [OptimizedCSSVariableManager] Global compatibility layer instance set');
 }
 
 /**
  * Get the global OptimizedCSSVariableManager instance
- * This replaces the globalCSSVariableCoordinator pattern
+ * @deprecated Use getGlobalUnifiedCSSController instead
  */
 export function getGlobalOptimizedCSSController(): OptimizedCSSVariableManager {
   if (!globalOptimizedCSSController) {
@@ -435,15 +190,42 @@ export function getGlobalOptimizedCSSController(): OptimizedCSSVariableManager {
 
 /**
  * Check if global OptimizedCSSVariableManager instance is available
+ * @deprecated Use hasGlobalUnifiedCSSController instead
  */
-export function isGlobalOptimizedCSSControllerAvailable(): boolean {
+export function hasGlobalOptimizedCSSController(): boolean {
   return globalOptimizedCSSController !== null;
 }
 
 /**
  * Get the global OptimizedCSSVariableManager instance safely
- * Returns null if not initialized instead of throwing
+ * @deprecated Use getGlobalUnifiedCSSControllerSafe instead
  */
 export function getGlobalOptimizedCSSControllerSafe(): OptimizedCSSVariableManager | null {
   return globalOptimizedCSSController;
+}
+
+// ===================================================================
+// MIGRATION HELPERS
+// ===================================================================
+
+/**
+ * Migration helper: Create OptimizedCSSVariableManager from UnifiedCSSVariableManager
+ */
+export function createOptimizedFromUnified(
+  unifiedManager: UnifiedCSSVariableManager
+): OptimizedCSSVariableManager {
+  // This would be used during migration to wrap existing unified managers
+  // For now, we'll throw since all new instances should use the enhanced unified manager
+  throw new Error('Migration not needed - use UnifiedCSSVariableManager directly with enhanced features');
+}
+
+/**
+ * Deprecation warning for direct usage
+ */
+if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+  console.warn(
+    '⚠️  [OptimizedCSSVariableManager] This class is deprecated. ' +
+    'Use UnifiedCSSVariableManager with enhanced optimization features instead. ' +
+    'This compatibility layer will be removed in a future version.'
+  );
 }

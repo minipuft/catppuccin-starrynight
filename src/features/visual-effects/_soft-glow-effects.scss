@@ -8,26 +8,9 @@
  * @consciousness Gentle beauty that breathes with musical soul
  */
 
-/* === Ethereal Beauty CSS Variables === */
+/* === Ethereal Beauty CSS Variables - Centralized === */
 :root {
-  /* Ethereal Color Palette - Soft Catppuccin */
-  --ethereal-soft-r: 203;           /* Mauve (soft primary) */
-  --ethereal-soft-g: 166;
-  --ethereal-soft-b: 247;
-  --ethereal-mystical-r: 148;       /* Teal (mystical glow) */
-  --ethereal-mystical-g: 226;
-  --ethereal-mystical-b: 213;
-  --ethereal-dreamy-r: 245;         /* Rosewater (dreamy mist) */
-  --ethereal-dreamy-g: 224;
-  --ethereal-dreamy-b: 220;
-  --ethereal-emotional-r: 249;     /* Yellow (emotional heart) */
-  --ethereal-emotional-g: 226;
-  --ethereal-emotional-b: 175;
-  --ethereal-highlight-r: 180;     /* Lavender (ethereal highlight) */
-  --ethereal-highlight-g: 190;
-  --ethereal-highlight-b: 254;
-  
-  /* Dynamic Ethereal Variables */
+  /* Dynamic Ethereal Variables - Theme-specific behavior */
   --soft-glow-effects-level: 0;           /* 0-1 ethereal beauty strength */
   --ethereal-mystical-shimmer: 0;       /* 0-1 mystical particle flow */
   --ethereal-gentle-transparency: 0.9;  /* 0-1 dreamy transparency level */
@@ -35,12 +18,15 @@
   --ethereal-emotional-pulse: 0;        /* -1 to 1 emotional pulse wave */
   --ethereal-softness-factor: 1.0;      /* 0-1 overall softness multiplier */
   
-  /* Calculated Composite Values */
-  --ethereal-soft-rgb: var(--ethereal-soft-r), var(--ethereal-soft-g), var(--ethereal-soft-b);
-  --ethereal-mystical-rgb: var(--ethereal-mystical-r), var(--ethereal-mystical-g), var(--ethereal-mystical-b);
-  --ethereal-dreamy-rgb: var(--ethereal-dreamy-r), var(--ethereal-dreamy-g), var(--ethereal-dreamy-b);
-  --ethereal-emotional-rgb: var(--ethereal-emotional-r), var(--ethereal-emotional-g), var(--ethereal-emotional-b);
-  --ethereal-highlight-rgb: var(--ethereal-highlight-r), var(--ethereal-highlight-g), var(--ethereal-highlight-b);
+  /* Centralized RGB Color References - From design-tokens/tokens.scss */
+  --ethereal-soft-rgb: var(--sn-theme-ethereal-soft-rgb);
+  --ethereal-mystical-rgb: var(--sn-theme-ethereal-mystical-rgb);
+  --ethereal-dreamy-rgb: var(--sn-theme-ethereal-dreamy-rgb);
+  --ethereal-emotional-rgb: var(--sn-theme-ethereal-emotional-rgb);
+  --ethereal-highlight-rgb: var(--sn-theme-ethereal-highlight-rgb);
+  
+  /* Unified breathing duration */
+  --ethereal-breathing-duration: var(--sn-anim-breathing-gentle);
 }
 
 /* === Ethereal Beauty Keyframes === */

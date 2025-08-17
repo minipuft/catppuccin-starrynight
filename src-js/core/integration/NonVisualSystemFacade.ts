@@ -449,11 +449,7 @@ export class NonVisualSystemFacade {
     this.systemRegistry.set("MusicSyncService", MusicSyncService);
     this.systemDependencies.set("MusicSyncService", []);
 
-    // ColorOrchestrator - Strategy pattern coordinator (singleton)
-    // Note: Uses globalColorOrchestrator singleton, handled as special case in createSystem
-    this.systemDependencies.set("ColorOrchestrator", []);
-
-    // 🔧 PHASE 3: UnifiedColorProcessingEngine - Consolidates all color coordinators
+    // 🔧 PHASE 2.1: UnifiedColorProcessingEngine - Enhanced consolidated color processor (PREFERRED)
     this.systemRegistry.set(
       "UnifiedColorProcessingEngine",
       UnifiedColorProcessingEngine
@@ -462,6 +458,11 @@ export class NonVisualSystemFacade {
       "settingsManager",
       "performanceAnalyzer",
     ]);
+
+    // ColorOrchestrator - Legacy strategy pattern coordinator (now delegates to UnifiedColorProcessingEngine)
+    // Note: Uses globalColorOrchestrator singleton, handled as special case in createSystem
+    // 🔧 PHASE 2.1: Now delegates to UnifiedColorProcessingEngine for enhanced processing
+    this.systemDependencies.set("ColorOrchestrator", []);
 
     // Consciousness Systems
     this.systemRegistry.set("GenreGradientEvolution", GenreGradientEvolution);
