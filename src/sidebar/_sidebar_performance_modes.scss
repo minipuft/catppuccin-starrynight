@@ -22,6 +22,7 @@
 /**/
 /* ████████████████████████████████████████████████████████████████████████████████*/
 @use "../core/_mixins" as *;
+@use "../core/_performance_mixins" as *;
 
 :root {
   /* === PERFORMANCE MONITORING VARIABLES (Updated by TypeScript) ===*/

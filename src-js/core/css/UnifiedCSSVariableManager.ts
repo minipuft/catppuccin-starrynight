@@ -9,6 +9,7 @@
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import {
   UnifiedPerformanceCoordinator,
+  PerformanceAnalyzer,
   type DeviceCapabilities,
   type PerformanceMode,
 } from "@/core/performance/UnifiedPerformanceCoordinator";
@@ -170,7 +171,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   // Core dependencies
   protected config: AdvancedSystemConfig | Year3000Config;
   private cssConfig: CSSVisualEffectsConfig;
-  protected performanceCoordinator: UnifiedPerformanceCoordinator;
+  protected performanceCoordinator: PerformanceAnalyzer;
   private eventBus: typeof unifiedEventBus;
 
   // === BATCHING LAYER (from UnifiedCSSVariableManager) ===
@@ -237,7 +238,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
 
   constructor(
     config: AdvancedSystemConfig | Year3000Config,
-    performanceCoordinator: UnifiedPerformanceCoordinator
+    performanceCoordinator: PerformanceAnalyzer
   ) {
     this.config = config;
     this.performanceCoordinator = performanceCoordinator;

@@ -166,7 +166,7 @@ try {
 
     # Configure extension for progressive loading
     Write-Host "🔌 Configuring extension..." -ForegroundColor Blue
-    $extensionPath = "catppuccin-starrynight/Extensions/catppuccin-starrynight.js"
+    $extensionPath = "catppuccin-starrynight.js"
 
     # Check current extensions config
     $currentExtensions = spicetify config extensions 2>$null

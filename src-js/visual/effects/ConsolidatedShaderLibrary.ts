@@ -883,15 +883,15 @@ export class ShaderTemplate {
   }
 
   /**
-   * Get dungeon corridor-specific uniform names for advanced tunnel effects
-   * @returns Array of uniform names used in dungeon corridor shaders
+   * Get tunnel visualization-specific uniform names for advanced tunnel effects
+   * @returns Array of uniform names used in tunnel visualization shaders
    */
-  public static getDungeonCorridorUniformNames(): string[] {
+  public static getTunnelVisualizationUniformNames(): string[] {
     return [
-      // Include all corridor uniforms
+      // Include all tunnel uniforms
       ...this.getCorridorUniformNames(),
-      // Dungeon-specific uniforms
-      'u_dungeonEnabled', 'u_tunnelWidth', 'u_lightingIntensity', 'u_atmosphericHaze', 'u_wallColor'
+      // Tunnel visualization-specific uniforms
+      'u_tunnelEnabled', 'u_tunnelWidth', 'u_lightingIntensity', 'u_atmosphericHaze', 'u_wallColor'
     ];
   }
 }

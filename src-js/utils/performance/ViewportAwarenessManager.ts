@@ -1,5 +1,5 @@
 /**
- * ViewportAwarenessManager - Intelligent viewport detection and visibility optimization
+ * ViewportController - Intelligent viewport detection and visibility optimization
  * 
  * Provides efficient viewport awareness for Year 3000 System components to avoid
  * unnecessary updates when elements are not visible. Uses Intersection Observer
@@ -29,8 +29,8 @@ export type VisibilityChangeCallback = (state: VisibilityState) => void;
 /**
  * Manages viewport awareness for performance optimization
  */
-export class ViewportAwarenessManager {
-  private static instance: ViewportAwarenessManager;
+export class ViewportController {
+  private static instance: ViewportController;
   private observers = new Map<string, IntersectionObserver>();
   private trackedElements = new Map<Element, {
     callback: VisibilityChangeCallback;
@@ -43,15 +43,15 @@ export class ViewportAwarenessManager {
     this.isSupported = typeof IntersectionObserver !== 'undefined';
     
     if (!this.isSupported) {
-      console.warn('[ViewportAwarenessManager] IntersectionObserver not supported, falling back to always-visible behavior');
+      console.warn('[ViewportController] IntersectionObserver not supported, falling back to always-visible behavior');
     }
   }
 
-  public static getInstance(): ViewportAwarenessManager {
-    if (!ViewportAwarenessManager.instance) {
-      ViewportAwarenessManager.instance = new ViewportAwarenessManager();
+  public static getInstance(): ViewportController {
+    if (!ViewportController.instance) {
+      ViewportController.instance = new ViewportController();
     }
-    return ViewportAwarenessManager.instance;
+    return ViewportController.instance;
   }
 
   /**
@@ -167,7 +167,7 @@ export class ViewportAwarenessManager {
     }
 
     if (!element) {
-      console.warn('[ViewportAwarenessManager] Could not find Spotify main container, using document.body');
+      console.warn('[ViewportController] Could not find Spotify main container, using document.body');
       element = document.body;
     }
 
@@ -223,7 +223,7 @@ export class ViewportAwarenessManager {
         try {
           tracked.callback(tracked.state);
         } catch (error) {
-          console.error('[ViewportAwarenessManager] Error in visibility callback:', error);
+          console.error('[ViewportController] Error in visibility callback:', error);
         }
       }
     }
@@ -235,4 +235,7 @@ export class ViewportAwarenessManager {
 }
 
 // Export singleton instance
-export const ViewportManager = ViewportAwarenessManager.getInstance();
+export const ViewportManager = ViewportController.getInstance();
+
+// Backward compatibility alias
+export const ViewportAwarenessManager = ViewportController;

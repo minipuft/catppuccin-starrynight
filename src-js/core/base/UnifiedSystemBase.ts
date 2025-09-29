@@ -2,7 +2,7 @@ import { SimplePerformanceCoordinator } from '@/core/performance/SimplePerforman
 import { getGlobalOptimizedCSSController, OptimizedCSSVariableManager } from '@/core/performance/OptimizedCSSVariableManager';
 import { unifiedEventBus, type EventName, type EventData } from '@/core/events/UnifiedEventBus';
 import { EnhancedMasterAnimationCoordinator } from '@/core/animation/EnhancedMasterAnimationCoordinator';
-import { UnifiedPerformanceCoordinator } from '@/core/performance/UnifiedPerformanceCoordinator';
+import { UnifiedPerformanceCoordinator, PerformanceAnalyzer } from '@/core/performance/UnifiedPerformanceCoordinator';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import type { HealthCheckResult } from '@/types/systems';
 import type { AdvancedSystemConfig } from '@/types/models';
@@ -29,11 +29,14 @@ export abstract class UnifiedSystemBase {
   
   // Shared utility instances (lazy-loaded singletons)
   protected performanceAnalyzer!: SimplePerformanceCoordinator;
-  protected cssConsciousnessController!: OptimizedCSSVariableManager | null;
+  protected cssController!: OptimizedCSSVariableManager | null;
+  // Backward compatibility alias
+  protected get cssConsciousnessController() { return this.cssController; }
+  protected set cssConsciousnessController(value: OptimizedCSSVariableManager | null) { this.cssController = value; }
   protected eventBus!: typeof unifiedEventBus;
   protected animationCoordinator!: EnhancedMasterAnimationCoordinator;
   protected unifiedCSSManager!: OptimizedCSSVariableManager | null;
-  protected performanceCoordinator!: UnifiedPerformanceCoordinator;
+  protected performanceCoordinator!: PerformanceAnalyzer;
   
   // Event management
   private eventUnsubscribers: (() => void)[] = [];
@@ -109,7 +112,7 @@ export abstract class UnifiedSystemBase {
         this.performanceAnalyzer = globalSystem.performanceAnalyzer || 
                                    globalSystem.facadeCoordinator?.getCachedNonVisualSystem?.('SimplePerformanceCoordinator') ||
                                    globalSystem.facadeCoordinator?.getCachedNonVisualSystem?.('PerformanceAnalyzer');
-        this.cssConsciousnessController = globalSystem.cssConsciousnessController || getGlobalOptimizedCSSController();
+        this.cssController = globalSystem.cssController || globalSystem.cssConsciousnessController || getGlobalOptimizedCSSController();
         this.eventBus = unifiedEventBus; // Use the unified event bus singleton
         this.performanceCoordinator = globalSystem.performanceCoordinator || (this.performanceAnalyzer ? UnifiedPerformanceCoordinator.getInstance(this.config, this.performanceAnalyzer) : null);
         this.animationCoordinator = globalSystem.enhancedMasterAnimationCoordinator || (this.performanceCoordinator ? EnhancedMasterAnimationCoordinator.getInstance(this.config, this.performanceCoordinator) : null);
@@ -117,7 +120,7 @@ export abstract class UnifiedSystemBase {
       } else {
         // Performance analyzer will be injected through factory pattern
         // Note: performanceAnalyzer will be set by dependency injection
-        this.cssConsciousnessController = getGlobalOptimizedCSSController();
+        this.cssController = getGlobalOptimizedCSSController();
         this.eventBus = unifiedEventBus; // Use the unified event bus singleton
         this.performanceCoordinator = UnifiedPerformanceCoordinator.getInstance(this.config, this.performanceAnalyzer);
         this.animationCoordinator = EnhancedMasterAnimationCoordinator.getInstance(this.config, this.performanceCoordinator);
@@ -125,9 +128,9 @@ export abstract class UnifiedSystemBase {
       }
       
       // Initialize unified CSS manager with performance analyzer
-      if (this.unifiedCSSManager && this.performanceAnalyzer && this.cssConsciousnessController) {
+      if (this.unifiedCSSManager && this.performanceAnalyzer && this.cssController) {
         // UnifiedCSSVariableManager doesn't have an initialize method that takes these arguments
-        // this.unifiedCSSManager.initialize(this.performanceAnalyzer, this.cssConsciousnessController);
+        // this.unifiedCSSManager.initialize(this.performanceAnalyzer, this.cssController);
       }
       
       // Register with performance monitoring (if available)
@@ -234,8 +237,8 @@ export abstract class UnifiedSystemBase {
   ): void {
     if (this.unifiedCSSManager) {
       this.unifiedCSSManager.queueUpdate(property, value, priority, this.systemName);
-    } else if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(property, value);
+    } else if (this.cssController) {
+      this.cssController.queueCSSVariableUpdate(property, value);
     } else {
       console.warn(`[${this.systemName}] CSS variable management not initialized`);
     }
@@ -250,9 +253,9 @@ export abstract class UnifiedSystemBase {
   ): void {
     if (this.unifiedCSSManager) {
       this.unifiedCSSManager.queueTransaction(updates, priority, this.systemName);
-    } else if (this.cssConsciousnessController) {
+    } else if (this.cssController) {
       Object.entries(updates).forEach(([property, value]) => {
-        this.cssConsciousnessController!.queueCSSVariableUpdate(property, value);
+        this.cssController!.queueCSSVariableUpdate(property, value);
       });
     } else {
       console.warn(`[${this.systemName}] CSS variable management not initialized`);

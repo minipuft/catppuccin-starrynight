@@ -71,7 +71,7 @@ import {
 // Consciousness engine imports for integration
 import { RedEnergyBurstSystem } from "@/visual/effects/HighEnergyEffectsController";
 import { MusicGlowEffectsManager } from "@/visual/effects/GlowEffectsController";
-import { AnimationEffectsController } from "@/visual/effects/BreathingEffectsController";
+import { AnimationEffectsController } from "@/visual/effects/AnimationEffectsController";
 
 export type SystemType = "visual" | "non-visual";
 export type CoordinationMode =
@@ -485,7 +485,7 @@ export class SystemCoordinator {
     Y3KDebug?.debug?.log("SystemCoordinator", "Initializing facades");
 
     try {
-      // Get EnhancedMasterAnimationCoordinator from NonVisualSystemFacade for CSSAnimationManager integration
+      // Get EnhancedMasterAnimationCoordinator from NonVisualSystemFacade for animation integration
       const animationCoordinator = this.nonVisualFacade?.getCachedSystem("EnhancedMasterAnimationCoordinator") || null;
 
       // Initialize Visual System Facade

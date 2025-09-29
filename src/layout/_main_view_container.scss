@@ -2,6 +2,8 @@
 // YEAR 3000 MAIN VIEW CONTAINER - Enhanced Visual Experience
 // ████████████████████████████████████████████████████████████████████████████████
 
+@use "../core/_performance_mixins" as *;
+
 // === YEAR 3000: Main View Container Styling ===
 .main-view-container__scroll-node {
   position: relative; // Needed for pseudo-elements
@@ -31,8 +33,7 @@
     // animation: dynamic-layer-animation var(--dynamic-animation-cycle, 2000ms) ease-in-out infinite;
     
     // Performance optimizations
-    will-change: opacity, transform, filter;
-    contain: layout style paint;
+    @include performance-hardware-acceleration;
     
     // Quality scaling for low-end devices
     @media (update: slow) {
@@ -62,8 +63,7 @@
     // animation-delay: calc(var(--dynamic-animation-cycle, 2000ms) * 0.33);
     
     // Performance optimizations
-    will-change: opacity, transform;
-    contain: layout style paint;
+    @include performance-hardware-acceleration;
     
     // Quality scaling for low-end devices
     @media (update: slow) {
@@ -107,8 +107,7 @@
     // animation-delay: calc(var(--dynamic-breathing-phase, 0) * 200ms);
     
     // Performance optimizations
-    will-change: transform, opacity, filter;
-    contain: layout style paint;
+    @include performance-hardware-acceleration;
     
     // Only show on cards that have visual effects enabled
     opacity: 0;
@@ -143,8 +142,7 @@
     // animation-delay: calc(var(--dynamic-breathing-phase, 0) * 100ms);
     
     // Performance optimizations
-    will-change: opacity, background-position;
-    contain: layout style paint;
+    @include performance-hardware-acceleration;
     
     // Only show on cards that have visual effects enabled
     opacity: 0;

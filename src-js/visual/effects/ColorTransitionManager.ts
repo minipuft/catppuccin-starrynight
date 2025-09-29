@@ -133,7 +133,7 @@ export interface CinematicDepthLayer {
  * Enhanced Color Transition Manager
  * Preserves existing integration while adding transition capabilities
  */
-export class ColorTransitionManager {
+export class ColorTransitionController {
   private transitionState: ColorTransitionState = {
     // === Existing Core State (preserved) ===
     colorHarmony: 0.7,
@@ -179,7 +179,7 @@ export class ColorTransitionManager {
     // 🔧 PHASE 1: Migrate to UnifiedEventBus for color transition integration
     unifiedEventBus.subscribe('colors:harmonized', (data) => {
       this.handleUnifiedColorUpdate(data);
-    }, 'ColorTransitionManager');
+    }, 'ColorTransitionController');
     
     // Legacy bridge: Keep GlobalEventBus temporarily during transition
     // TODO: Remove after Phase 1 validation complete
@@ -516,4 +516,7 @@ export class ColorTransitionManager {
 }
 
 // Export singleton instance
-export const colorTransitionManager = new ColorTransitionManager();
+export const colorTransitionManager = new ColorTransitionController();
+
+// Backward compatibility alias
+export const ColorTransitionManager = ColorTransitionController;

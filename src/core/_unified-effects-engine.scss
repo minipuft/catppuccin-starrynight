@@ -1,0 +1,340 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// UNIFIED EFFECTS ENGINE - Formula-Based Visual System
+// Phase 1: Consolidation of overlapping effect systems
+// ████████████████████████████████████████████████████████████████████████████████
+//
+// This module provides a unified, formula-based approach to visual effects,
+// replacing the stacked effect systems that cause performance overhead.
+//
+// Philosophy: Single intensity parameter drives all effects through formulas
+// Benefits:
+//   - No effect stacking conflicts
+//   - Linear intensity control (0.0 → 1.0)
+//   - Performance-optimized by design
+//   - Easy music synchronization
+//
+// ████████████████████████████████████████████████████████████████████████████████
+
+@use "mixins" as *;
+@use "performance_mixins" as *;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UNIFIED EFFECT VARIABLES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // === MASTER INTENSITY CONTROLLERS ===
+  // These are the only variables that should be modified by TypeScript
+  --sn-unified-effect-intensity: 0.5;        // Master effect strength (0-1)
+  --sn-unified-music-energy: 0.5;            // Real-time audio energy (0-1)
+  --sn-unified-performance-quality: 1.0;     // Device capability multiplier (0-1)
+
+  // === DERIVED FORMULAS (READ-ONLY) ===
+  // These are computed from master controllers - do not modify directly
+  --sn-unified-blur-amount: calc(
+    var(--sn-unified-effect-intensity) *
+    var(--sn-unified-performance-quality) *
+    20px
+  );
+
+  --sn-unified-scale-delta: calc(
+    var(--sn-unified-effect-intensity) *
+    0.02
+  );
+
+  --sn-unified-opacity-base: 0.8;
+  --sn-unified-opacity-range: calc(
+    0.2 * var(--sn-unified-music-energy)
+  );
+
+  --sn-unified-saturation-boost: calc(
+    var(--sn-unified-effect-intensity) * 0.3
+  );
+
+  --sn-unified-brightness-delta: calc(
+    var(--sn-unified-effect-intensity) * 0.1
+  );
+
+  --sn-unified-glow-radius: calc(
+    var(--sn-unified-effect-intensity) *
+    var(--sn-unified-music-energy) *
+    20px
+  );
+
+  // === VARIANT MULTIPLIERS ===
+  // Different effect styles modify base formulas
+  --sn-variant-gentle-scale: 0.5;      // Gentle: 50% of base intensity
+  --sn-variant-energetic-scale: 1.5;   // Energetic: 150% of base
+  --sn-variant-crystalline-scale: 1.2; // Crystalline: 120% of base
+  --sn-variant-fluid-scale: 0.8;       // Fluid: 80% of base
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UNIFIED GLASSMORPHISM SYSTEM
+// Replaces: glassmorphism(), glassmorphism-dynamic(), glassmorphism-crystalline()
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin unified-glassmorphism($intensity: 0.5, $variant: 'standard') {
+  // Performance optimization baseline
+  @include performance-optimized;
+
+  // Variant scaling
+  $variant-scale: 1;
+  @if $variant == 'gentle' {
+    $variant-scale: var(--sn-variant-gentle-scale, 0.5);
+  } @else if $variant == 'energetic' {
+    $variant-scale: var(--sn-variant-energetic-scale, 1.5);
+  } @else if $variant == 'crystalline' {
+    $variant-scale: var(--sn-variant-crystalline-scale, 1.2);
+  } @else if $variant == 'fluid' {
+    $variant-scale: var(--sn-variant-fluid-scale, 0.8);
+  }
+
+  // Effective intensity with variant scaling
+  $effective-intensity: calc(#{$intensity} * #{$variant-scale});
+
+  // Single consolidated backdrop-filter (no stacking)
+  backdrop-filter:
+    blur(calc(#{$effective-intensity} * var(--sn-unified-blur-amount)))
+    saturate(calc(1 + #{$effective-intensity} * var(--sn-unified-saturation-boost)))
+    brightness(calc(1 + #{$effective-intensity} * var(--sn-unified-brightness-delta)));
+
+  -webkit-backdrop-filter:
+    blur(calc(#{$effective-intensity} * var(--sn-unified-blur-amount)))
+    saturate(calc(1 + #{$effective-intensity} * var(--sn-unified-saturation-boost)))
+    brightness(calc(1 + #{$effective-intensity} * var(--sn-unified-brightness-delta)));
+
+  // Background with design system colors
+  background: rgba(
+    var(--sn-musical-oklab-primary-rgb, var(--spice-rgb-surface0)),
+    calc(0.08 * #{$effective-intensity})
+  );
+
+  // Border with accent color
+  border: 1px solid rgba(
+    var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)),
+    calc(0.2 * #{$effective-intensity})
+  );
+
+  // Smooth transitions
+  transition:
+    backdrop-filter 400ms ease-out,
+    background 400ms ease-out,
+    border-color 400ms ease-out;
+
+  // Fallback for unsupported browsers
+  @supports not (backdrop-filter: blur(1px)) {
+    background: rgba(
+      var(--spice-rgb-surface0),
+      calc(0.2 * #{$effective-intensity})
+    );
+    border: 1px solid rgba(var(--spice-rgb-surface1), 0.3);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UNIFIED BREATHING ANIMATION
+// Replaces: breathing-animation(), natural-breathing-cycle, crystalline-pulse, etc.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin unified-breathing($intensity: 0.5, $variant: 'standard', $duration: 4s) {
+  // Performance optimization
+  @include performance-optimized;
+
+  // Variant scaling
+  $variant-scale: 1;
+  @if $variant == 'gentle' {
+    $variant-scale: var(--sn-variant-gentle-scale, 0.5);
+  } @else if $variant == 'energetic' {
+    $variant-scale: var(--sn-variant-energetic-scale, 1.5);
+  } @else if $variant == 'crystalline' {
+    $variant-scale: var(--sn-variant-crystalline-scale, 1.2);
+  }
+
+  // Effective intensity
+  $effective-intensity: calc(#{$intensity} * #{$variant-scale});
+
+  // Set CSS variables for keyframe consumption
+  --breath-scale-min: 1;
+  --breath-scale-max: calc(1 + #{$effective-intensity} * var(--sn-unified-scale-delta));
+  --breath-opacity-min: calc(var(--sn-unified-opacity-base) - #{$effective-intensity} * 0.05);
+  --breath-opacity-max: calc(var(--sn-unified-opacity-base) + #{$effective-intensity} * var(--sn-unified-opacity-range));
+  --breath-filter-min: brightness(1);
+  --breath-filter-max: brightness(calc(1 + #{$effective-intensity} * var(--sn-unified-brightness-delta)));
+
+  // Apply unified breathing animation
+  animation: unified-breathing-keyframes $duration ease-in-out infinite;
+
+  // Respect reduced motion
+  @media (prefers-reduced-motion: reduce) {
+    animation: none !important;
+    transform: scale(1) translateZ(0) !important;
+    opacity: var(--sn-unified-opacity-base) !important;
+  }
+}
+
+// Unified breathing keyframes (single implementation)
+@keyframes unified-breathing-keyframes {
+  0%, 100% {
+    transform: scale(var(--breath-scale-min)) translateZ(0);
+    opacity: var(--breath-opacity-min);
+    filter: var(--breath-filter-min);
+  }
+  50% {
+    transform: scale(var(--breath-scale-max)) translateZ(0);
+    opacity: var(--breath-opacity-max);
+    filter: var(--breath-filter-max) saturate(calc(1 + var(--sn-unified-saturation-boost)));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UNIFIED VISUAL EFFECT (Master Mixin)
+// Combines glassmorphism + breathing + performance in single application
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin unified-visual-effect(
+  $intensity: 0.5,
+  $variant: 'standard',
+  $breathing: false,
+  $breathing-duration: 4s
+) {
+  // Apply glassmorphism base
+  @include unified-glassmorphism($intensity, $variant);
+
+  // Optionally add breathing
+  @if $breathing {
+    @include unified-breathing($intensity, $variant, $breathing-duration);
+  }
+
+  // Add subtle glow effect
+  box-shadow:
+    0 0 calc($intensity * var(--sn-unified-glow-radius))
+    rgba(
+      var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)),
+      calc($intensity * 0.3)
+    );
+
+  // Device-aware optimizations
+  @include device-tier-optimization(
+    // Low-tier: minimal effects
+    (backdrop-filter: none, box-shadow: none),
+    // Medium-tier: reduced effects
+    (backdrop-filter: blur(calc($intensity * 10px))),
+    // High-tier: full effects
+    null,
+    // Premium-tier: enhanced effects
+    null
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MIGRATION HELPERS (Legacy Compatibility)
+// These allow gradual migration without breaking existing code
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Legacy glassmorphism wrapper
+@mixin glassmorphism-unified($blur: 20px, $opacity: 0.1, $saturation: 1.2) {
+  // Convert legacy parameters to intensity
+  $intensity: calc($opacity * 10); // 0.1 opacity → 1.0 intensity
+  @include unified-glassmorphism($intensity, 'standard');
+}
+
+// Legacy breathing wrapper
+@mixin breathing-unified($variant: 'gentle', $duration: 4s) {
+  $intensity: 0.5;
+  @if $variant == 'energetic' {
+    $intensity: 0.8;
+  } @else if $variant == 'meditative' {
+    $intensity: 0.3;
+  } @else if $variant == 'cosmic' {
+    $intensity: 1.0;
+  }
+
+  @include unified-breathing($intensity, $variant, $duration);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UTILITY CLASSES (Optional convenience classes)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.unified-effect-gentle {
+  @include unified-visual-effect($intensity: 0.3, $variant: 'gentle', $breathing: true);
+}
+
+.unified-effect-standard {
+  @include unified-visual-effect($intensity: 0.5, $variant: 'standard', $breathing: true);
+}
+
+.unified-effect-energetic {
+  @include unified-visual-effect($intensity: 0.8, $variant: 'energetic', $breathing: true);
+}
+
+.unified-effect-crystalline {
+  @include unified-visual-effect($intensity: 0.6, $variant: 'crystalline', $breathing: false);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TYPESCRIPT INTEGRATION HELPERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// CSS classes that TypeScript can toggle for effect intensity
+.unified-intensity-minimal { --sn-unified-effect-intensity: 0.2; }
+.unified-intensity-low { --sn-unified-effect-intensity: 0.4; }
+.unified-intensity-medium { --sn-unified-effect-intensity: 0.6; }
+.unified-intensity-high { --sn-unified-effect-intensity: 0.8; }
+.unified-intensity-maximum { --sn-unified-effect-intensity: 1.0; }
+
+// Music energy classes
+.unified-energy-calm { --sn-unified-music-energy: 0.2; }
+.unified-energy-moderate { --sn-unified-music-energy: 0.5; }
+.unified-energy-high { --sn-unified-music-energy: 0.8; }
+.unified-energy-peak { --sn-unified-music-energy: 1.0; }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DOCUMENTATION & USAGE EXAMPLES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/*
+USAGE EXAMPLES:
+
+1. Simple glassmorphism with breathing:
+   @include unified-visual-effect($intensity: 0.5, $breathing: true);
+
+2. Crystalline effect without breathing:
+   @include unified-visual-effect($intensity: 0.6, $variant: 'crystalline');
+
+3. Energetic breathing only:
+   @include unified-breathing($intensity: 0.8, $variant: 'energetic', $duration: 3s);
+
+4. Custom intensity control:
+   .my-element {
+     @include unified-visual-effect($intensity: 0.7, $variant: 'gentle');
+
+     &:hover {
+       --sn-unified-effect-intensity: 0.9; // Increase on hover
+     }
+   }
+
+5. Music-reactive effect (TypeScript controlled):
+   // In TypeScript:
+   // element.style.setProperty('--sn-unified-music-energy', audioLevel);
+
+   .music-reactive {
+     @include unified-visual-effect($intensity: var(--sn-unified-music-energy));
+   }
+
+MIGRATION FROM LEGACY MIXINS:
+
+Old:
+  @include glassmorphism(20px, 0.1, 1.2);
+  @include breathing-animation('gentle');
+
+New:
+  @include unified-visual-effect($intensity: 0.5, $breathing: true);
+
+Benefits:
+  - Single backdrop-filter application (no stacking)
+  - Single animation (no conflicts)
+  - Performance-optimized by default
+  - Music sync through single intensity variable
+*/

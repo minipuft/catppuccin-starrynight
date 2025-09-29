@@ -3,7 +3,7 @@ import { UnifiedSystemBase } from '@/core/base/UnifiedSystemBase';
 import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 import type { HealthCheckResult } from '@/types/systems';
 import * as ThemeUtilities from '@/utils/core/ThemeUtilities';
-import { musicalLerpOrchestrator, type MusicalContext } from '@/utils/core/MusicalLerpOrchestrator';
+import { EnhancedMasterAnimationCoordinator, type ConsolidatedMusicalContext } from '@/core/animation/EnhancedMasterAnimationCoordinator';
 import type { MusicSyncService } from '@/audio/MusicSyncService';
 
 /**
@@ -60,7 +60,7 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
   
   // External service integration for music analysis
   private musicSyncService: MusicSyncService | null = null;  // Spicetify audio analysis service
-  private currentMusicalContext: MusicalContext | null = null; // Current musical analysis context
+  private currentMusicalContext: ConsolidatedMusicalContext | null = null; // Current musical analysis context
   private lastBeatPhaseUpdate: number = 0;                    // Last context update timestamp
   
   // Real-time performance monitoring
@@ -604,10 +604,30 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
     }
     
     this.lastBeatPhaseUpdate = now;
-    this.currentMusicalContext = musicalLerpOrchestrator.createMusicalContext(
-      this.musicSyncService,
-      this.lastBeatTime
-    );
+    // Create musical context using MusicSyncService API
+    const musicState = this.musicSyncService.getCurrentMusicState();
+    const processedData = this.musicSyncService.getLatestProcessedData();
+
+    this.currentMusicalContext = {
+      tempo: musicState?.beat?.tempo || processedData?.enhancedBPM || 120,
+      energy: musicState?.beat?.energy || processedData?.energy || 0.5,
+      valence: processedData?.valence || 0.5,
+      danceability: processedData?.danceability || 0.5,
+      emotionalTemperature: processedData?.adaptedColorTemp || 4000,
+      beatPhase: 'sustain' as const, // Default beat phase
+      beatConfidence: 0.5, // Default confidence
+      beatInterval: musicState?.beat?.tempo ? (60000 / musicState.beat.tempo) : 500,
+      timeSinceLastBeat: now - this.lastBeatTime,
+      // Missing ConsolidatedMusicalContext properties - add with defaults
+      energyLevel: musicState?.beat?.energy || processedData?.energy || 0.5,
+      harmonicContent: processedData?.harmonicContent || 0.5,
+      rhythmicStability: processedData?.rhythmicStability || 0.8,
+      harmonicComplexity: processedData?.harmonicComplexity || 0.5,
+      rhythmicDensity: processedData?.rhythmicDensity || 0.5,
+      spectralCentroid: processedData?.spectralCentroid || 2000,
+      bpm: musicState?.beat?.tempo || processedData?.enhancedBPM || 120,
+      beat: Math.floor(now / (musicState?.beat?.tempo ? (60000 / musicState.beat.tempo) : 500))
+    };
     
     if (this.config.enableDebug && this.currentMusicalContext) {
       const ctx = this.currentMusicalContext;

@@ -36,6 +36,7 @@ import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDet
 import { GradientPerformanceOptimizer } from "@/core/performance/GradientPerformanceOptimizer";
 import {
   UnifiedPerformanceCoordinator,
+  PerformanceAnalyzer,
   type DeviceCapabilities,
   type PerformanceMode,
 } from "@/core/performance/UnifiedPerformanceCoordinator";
@@ -466,7 +467,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   private config: AdvancedSystemConfig | Year3000Config;
   private eventBus: typeof unifiedEventBus;
   private cssController: OptimizedCSSVariableManager | null = null;
-  private performanceCoordinator: UnifiedPerformanceCoordinator | null = null;
+  private performanceCoordinator: PerformanceAnalyzer | null = null;
   private musicSyncService: MusicSyncService | null = null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
   private emotionalGradientMapper: EmotionalGradientMapper | null = null;
@@ -555,7 +556,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   constructor(
     config: AdvancedSystemConfig | Year3000Config,
     cssController?: OptimizedCSSVariableManager,
-    performanceCoordinator?: UnifiedPerformanceCoordinator,
+    performanceCoordinator?: PerformanceAnalyzer,
     musicSyncService?: MusicSyncService,
     colorHarmonyEngine?: ColorHarmonyEngine
   ) {
@@ -593,7 +594,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   public static getInstance(
     config?: Year3000Config,
     cssController?: OptimizedCSSVariableManager,
-    performanceCoordinator?: UnifiedPerformanceCoordinator,
+    performanceCoordinator?: PerformanceAnalyzer,
     musicSyncService?: MusicSyncService,
     colorHarmonyEngine?: ColorHarmonyEngine
   ): VisualEffectsCoordinator {

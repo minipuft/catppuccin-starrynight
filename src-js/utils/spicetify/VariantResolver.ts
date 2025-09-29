@@ -37,7 +37,7 @@ export interface VariantContext {
 
 export class VariantResolver {
   private config: VariantConfig;
-  private cssConsciousnessController: OptimizedCSSVariableManager | null = null;
+  private cssController: OptimizedCSSVariableManager | null = null;
   private variantCache: Map<string, VariantMapping> = new Map();
   private initialized: boolean = false;
 
@@ -256,8 +256,8 @@ export class VariantResolver {
     };
   }
 
-  public initialize(cssConsciousnessController?: OptimizedCSSVariableManager): void {
-    this.cssConsciousnessController = cssConsciousnessController || null;
+  public initialize(cssController?: OptimizedCSSVariableManager): void {
+    this.cssController = cssController || null;
     this.initialized = true;
     
     // Generate CSS variables for all variants
@@ -266,7 +266,7 @@ export class VariantResolver {
     if (this.config.enableDebug) {
       console.log("📝 [VariantResolver] Initialized with", {
         variants: VariantResolver.VARIANT_MAPPINGS.length,
-        batcherAvailable: !!this.cssConsciousnessController,
+        batcherAvailable: !!this.cssController,
         config: this.config
       });
     }
@@ -351,16 +351,16 @@ export class VariantResolver {
   }
 
   private setCSSVariable(property: string, value: string): void {
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(property, value);
+    if (this.cssController) {
+      this.cssController.queueCSSVariableUpdate(property, value);
     } else {
       document.documentElement.style.setProperty(property, value);
     }
   }
 
   public flushUpdates(): void {
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.flushCSSVariableBatch();
+    if (this.cssController) {
+      this.cssController.flushCSSVariableBatch();
     }
   }
 
@@ -379,7 +379,7 @@ export class VariantResolver {
 
   public destroy(): void {
     this.variantCache.clear();
-    this.cssConsciousnessController = null;
+    this.cssController = null;
     this.initialized = false;
   }
 }

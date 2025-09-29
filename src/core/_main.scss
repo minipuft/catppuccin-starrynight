@@ -13,6 +13,7 @@
 // Utility mixins and functions - loaded after tokens, before implementations
 @use "_mixins" as *;
 @use "_performance_mixins" as *; // Performance optimization mixins
+@use "_unified-effects-engine" as *; // Phase 1: Unified formula-based effects system
 @use "_sn_typography" as *;
 @use "_kinetic-animations" as *;
 @use "_dom_selectors" as *; // Centralized DOM selector mixins
@@ -80,10 +81,9 @@
 @use "../features/visual-effects/_beat_sync_glassmorphism" as *;
 @use "../features/visual-effects/_translucent_overlays" as *;
 @use "../features/visual-effects/_advanced_layer" as *;
-@use "../features/visual-effects/_css_blob_fallback" as *;
 
 // Animations - enhance visual effects
-@use "../features/animations/_3d_transforms" as *;
+// 3D transforms removed - simple hover effects integrated into _sn_enhanced_cards.scss
 @use "../features/animations/_shape_transitions" as *;
 @use "../features/animations/_scrolling_effects" as *;
 @use "../features/animations/_field_matrix" as *;

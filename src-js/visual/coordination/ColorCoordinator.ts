@@ -1,10 +1,10 @@
 /**
- * Color Coordinator - Strategy Pattern Invoker Implementation (Legacy Wrapper)
+ * Color Manager - High-Level Color System Management
  *
  * 🔧 PHASE 2.1: This is now a backward compatibility wrapper that delegates
  * to UnifiedColorProcessingEngine while maintaining the same public API.
  *
- * Coordinates event-driven color processing using Strategy pattern.
+ * Manages event-driven color processing using Strategy pattern.
  * Eliminates circular dependencies by acting as mediator between
  * color extraction and color processing systems.
  *
@@ -193,13 +193,13 @@ export class ColorStrategyRegistry implements IColorStrategyRegistry {
 // ============================================================================
 
 /**
- * Enhanced Color Orchestrator with Multi-Strategy Coordination
+ * Enhanced Color Manager with Multi-Strategy Coordination
  *
- * Orchestrates multiple background color processing strategies with intelligent
+ * Manages multiple background color processing strategies with intelligent
  * selection logic, OKLAB coordination, and performance optimization.
  */
-export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
-  public readonly systemName = "ColorCoordinator";
+export class ColorManager implements IColorOrchestrator, IManagedSystem {
+  public readonly systemName = "ColorManager";
   public initialized = false;
   private registry: ColorStrategyRegistry;
   private selectionCriteria: StrategySelectionCriteria;
@@ -1621,6 +1621,23 @@ export class ColorCoordinator implements IColorOrchestrator, IManagedSystem {
 // ============================================================================
 
 /**
- * Global singleton instance for color orchestration
+ * Global singleton instance for color management
  */
-export const globalColorOrchestrator = new ColorCoordinator();
+export const globalColorManager = new ColorManager();
+
+// =============================================================================
+// BACKWARD COMPATIBILITY EXPORTS
+// =============================================================================
+
+/**
+ * @deprecated Use ColorManager instead
+ * Backward compatibility alias for ColorCoordinator
+ */
+export const ColorCoordinator = ColorManager;
+export type ColorCoordinator = ColorManager;
+
+/**
+ * @deprecated Use globalColorManager instead
+ * Backward compatibility export for globalColorOrchestrator
+ */
+export const globalColorOrchestrator = globalColorManager;

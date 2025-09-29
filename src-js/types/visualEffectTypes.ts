@@ -158,7 +158,7 @@ export interface AtmosphericParticle {
  * @deprecated - Moved to backwards compatibility section
  * Beat visual effects event payload (deprecated)
  */
-export interface LegacyBeatConsciousnessEvent {
+export interface LegacyBeatStateEvent {
   /** Beat intensity (0-1) */
   intensity: number;
   
@@ -179,7 +179,7 @@ export interface LegacyBeatConsciousnessEvent {
  * @deprecated - Moved to backwards compatibility section
  * Energy visual effects event payload (deprecated)
  */
-export interface LegacyEnergyConsciousnessEvent {
+export interface LegacyEnergyStateEvent {
   /** Energy level (0-1) */
   energy: number;
   
@@ -197,7 +197,7 @@ export interface LegacyEnergyConsciousnessEvent {
  * @deprecated - Moved to backwards compatibility section
  * Emotional visual effects event payload (deprecated)
  */
-export interface LegacyEmotionalConsciousnessEvent {
+export interface LegacyEmotionalStateEvent {
   /** Detected emotion type */
   emotion: string;
   
@@ -221,7 +221,7 @@ export interface LegacyEmotionalConsciousnessEvent {
  * @deprecated - Moved to backwards compatibility section
  * Tempo visual effects event payload (deprecated)
  */
-export interface LegacyTempoConsciousnessEvent {
+export interface LegacyTempoStateEvent {
   /** Base BPM */
   bpm: number;
   
@@ -568,25 +568,25 @@ export interface DynamicVisualEffectsMetrics {
  * @deprecated Use BeatEffectEvent instead
  * @since v1.0.0
  */
-export type BeatConsciousnessEvent = LegacyBeatConsciousnessEvent;
+export type BeatStateEvent = LegacyBeatStateEvent;
 
 /**
  * @deprecated Use EnergyEffectEvent instead
  * @since v1.0.0
  */
-export type EnergyConsciousnessEvent = LegacyEnergyConsciousnessEvent;
+export type EnergyStateEvent = LegacyEnergyStateEvent;
 
 /**
  * @deprecated Use EmotionalEffectEvent instead
  * @since v1.0.0
  */
-export type EmotionalConsciousnessEvent = LegacyEmotionalConsciousnessEvent;
+export type EmotionalStateEvent = LegacyEmotionalStateEvent;
 
 /**
  * @deprecated Use TempoEffectEvent instead
  * @since v1.0.0
  */
-export type TempoConsciousnessEvent = LegacyTempoConsciousnessEvent;
+export type TempoStateEvent = LegacyTempoStateEvent;
 
 // =========================================================================
 // INTERFACE COMPATIBILITY ALIASES
@@ -598,11 +598,6 @@ export type TempoConsciousnessEvent = LegacyTempoConsciousnessEvent;
  */
 export type SmoothVisualEffectsState = DynamicVisualEffectsState;
 
-/**
- * @deprecated Use DynamicVisualEffectsState instead
- * @since v1.0.0
- */
-export type OrganicConsciousnessState = DynamicVisualEffectsState;
 
 /**
  * @deprecated Use DynamicVisualEffectsConfig instead  
@@ -610,11 +605,6 @@ export type OrganicConsciousnessState = DynamicVisualEffectsState;
  */
 export type SmoothVisualEffectsConfig = DynamicVisualEffectsConfig;
 
-/**
- * @deprecated Use DynamicVisualEffectsConfig instead  
- * @since v1.0.0
- */
-export type OrganicConsciousnessConfig = DynamicVisualEffectsConfig;
 
 /**
  * @deprecated Use DynamicVisualEffectsMetrics instead
@@ -622,11 +612,6 @@ export type OrganicConsciousnessConfig = DynamicVisualEffectsConfig;
  */
 export type SmoothVisualEffectsMetrics = DynamicVisualEffectsMetrics;
 
-/**
- * @deprecated Use DynamicVisualEffectsMetrics instead
- * @since v1.0.0
- */
-export type OrganicConsciousnessMetrics = DynamicVisualEffectsMetrics;
 
 // =========================================================================
 // LEGACY YEAR 3000 COMPATIBILITY ALIASES

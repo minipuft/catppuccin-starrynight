@@ -42,6 +42,8 @@ export interface SystemCreationContext {
     settingsManager?: SettingsManager;
     musicSyncService?: MusicSyncService;
     year3000System?: Year3000System;
+    cssController?: UnifiedCSSVariableManager;
+    // Backward compatibility alias
     cssConsciousnessController?: UnifiedCSSVariableManager;
     performanceCoordinator?: SimplePerformanceCoordinator;
     // New simplified performance system dependencies

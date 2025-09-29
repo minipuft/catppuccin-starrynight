@@ -5,6 +5,7 @@
 // - Visual beauty meets intelligent purpose AND performance
 
 @use "../../core/_mixins" as *;
+@use "../../core/performance_mixins" as *;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🌌 YEAR 3000 DYNAMIC INTERFACE FOUNDATION (OPTIMIZED)
@@ -91,7 +92,7 @@
   position: relative;
 
   // GPU optimization hint
-  will-change: transform, opacity;
+  @include performance-hardware-acceleration;
 
   // Optimized visual effects presence - simplified gradients
   &::before {
@@ -190,7 +191,7 @@
     box-shadow 0.3s ease, filter 0.3s ease;
 
   // GPU optimization
-  will-change: transform, box-shadow;
+  @include performance-hardware-acceleration;
 
   // Optimized hover visual effects
   &:hover {

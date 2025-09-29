@@ -173,17 +173,17 @@ export interface BrightnessConfig {
 
 export const BRIGHTNESS_CONFIGS: Record<'bright' | 'balanced' | 'dark', BrightnessConfig> = {
   bright: {
-    baseColorTarget: 0.25, // Lighter base colors
+    baseColorTarget: 0.25, // Brighter interface colors
     surfaceColorTarget: 0.35,
     textContrastMin: 4.5
   },
   balanced: {
-    baseColorTarget: 0.15, // Standard base colors  
+    baseColorTarget: 0.15, // Standard interface colors
     surfaceColorTarget: 0.25,
     textContrastMin: 4.5
   },
   dark: {
-    baseColorTarget: 0.08, // Darker base colors
+    baseColorTarget: 0.08, // Darker interface colors (deeper, less bright)
     surfaceColorTarget: 0.15,
     textContrastMin: 3.0 // Slightly lower contrast for dark mode comfort
   }
@@ -199,14 +199,14 @@ export function getBrightnessAdjustedBaseColor(
   const palette = CATPPUCCIN_PALETTES[flavor];
   const config = BRIGHTNESS_CONFIGS[brightnessMode];
   
-  // For bright mode, use surface colors; for dark mode, use deeper colors
+  // Fixed logic: bright=lighter colors, dark=darker colors, regardless of flavor
   switch (brightnessMode) {
     case 'bright':
-      return flavor === 'latte' ? palette.surface1 : palette.surface0;
+      return flavor === 'latte' ? palette.surface2 : palette.surface1; // Lighter colors
     case 'balanced':
-      return flavor === 'latte' ? palette.base : palette.surface0;
+      return flavor === 'latte' ? palette.surface0 : palette.base; // Standard colors
     case 'dark':
-      return flavor === 'latte' ? palette.mantle : palette.base;
+      return flavor === 'latte' ? palette.mantle : palette.mantle; // Darker colors for all flavors
     default:
       return palette.base;
   }
@@ -223,11 +223,11 @@ export function getBrightnessAdjustedSurfaceColor(
   
   switch (brightnessMode) {
     case 'bright':
-      return flavor === 'latte' ? palette.surface2 : palette.surface1;
+      return flavor === 'latte' ? palette.surface2 : palette.surface2; // Lighter surface colors
     case 'balanced':
-      return flavor === 'latte' ? palette.surface0 : palette.surface1;
+      return flavor === 'latte' ? palette.surface1 : palette.surface1; // Standard surface colors
     case 'dark':
-      return flavor === 'latte' ? palette.surface0 : palette.surface0;
+      return flavor === 'latte' ? palette.surface0 : palette.surface0; // Darker surface colors
     default:
       return palette.surface1;
   }

@@ -1,5 +1,5 @@
 /**
- * MusicalOKLABCoordinator - Unified Music-to-OKLAB Color Processing Pipeline
+ * MusicalOKLABProcessor - Unified Music-to-OKLAB Color Processing Pipeline
  *
  * Processes the complete flow from music analysis through emotional mapping
  * to OKLAB color processing, providing a unified, perceptually consistent
@@ -69,7 +69,7 @@ export interface ProcessingOptions {
 }
 
 
-export class MusicalOKLABCoordinator {
+export class MusicalOKLABProcessor {
   private oklabProcessor: OKLABColorProcessor;
   private emotionalMapper: EmotionalTemperatureMapper;
   private genreManager: GenreProfileManager;
@@ -89,7 +89,7 @@ export class MusicalOKLABCoordinator {
 
     if (this.enableDebug) {
       Y3KDebug?.debug?.log(
-        "MusicalOKLABCoordinator",
+        "MusicalOKLABProcessor",
         "Unified music-to-OKLAB coordinator initialized"
       );
     }
@@ -110,7 +110,7 @@ export class MusicalOKLABCoordinator {
     if (cachedResult) {
       if (this.enableDebug) {
         Y3KDebug?.debug?.log(
-          "MusicalOKLABCoordinator",
+          "MusicalOKLABProcessor",
           "Using cached processing result",
           { cacheKey }
         );
@@ -194,7 +194,7 @@ export class MusicalOKLABCoordinator {
 
       if (this.enableDebug) {
         Y3KDebug?.debug?.log(
-          "MusicalOKLABCoordinator",
+          "MusicalOKLABProcessor",
           "Musical OKLAB processing completed",
           {
             genre: detectedGenre,
@@ -211,7 +211,7 @@ export class MusicalOKLABCoordinator {
     } catch (error) {
       if (this.enableDebug) {
         Y3KDebug?.debug?.error(
-          "MusicalOKLABCoordinator",
+          "MusicalOKLABProcessor",
           "Musical processing failed:",
           error
         );
@@ -314,7 +314,7 @@ export class MusicalOKLABCoordinator {
     } catch (error) {
       if (this.enableDebug) {
         Y3KDebug?.debug?.warn(
-          "MusicalOKLABCoordinator",
+          "MusicalOKLABProcessor",
           "Failed to get optimal preset, using STANDARD:",
           error
         );
@@ -372,7 +372,7 @@ export class MusicalOKLABCoordinator {
       } catch (error) {
         if (this.enableDebug) {
           Y3KDebug?.debug?.warn(
-            "MusicalOKLABCoordinator",
+            "MusicalOKLABProcessor",
             `Failed to process color ${key}:`,
             error
           );
@@ -605,7 +605,7 @@ export class MusicalOKLABCoordinator {
     this.coordinationCache.clear();
     if (this.enableDebug) {
       Y3KDebug?.debug?.log(
-        "MusicalOKLABCoordinator",
+        "MusicalOKLABProcessor",
         "Processing cache cleared"
       );
     }
@@ -623,3 +623,6 @@ export class MusicalOKLABCoordinator {
     };
   }
 }
+
+// Backward compatibility alias
+export const MusicalOKLABCoordinator = MusicalOKLABProcessor;

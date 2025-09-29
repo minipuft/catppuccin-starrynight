@@ -52,7 +52,7 @@ import * as Utils from "@/utils/core/ThemeUtilities";
 import { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
 import { TimerConsolidationSystem } from "@/core/performance/TimerConsolidationSystem";
-import { PerformanceAwareLerpCoordinator } from "@/core/performance/PerformanceAwareLerpCoordinator";
+// PerformanceAwareLerpCoordinator consolidated into EnhancedMasterAnimationCoordinator
 
 // New simplified performance system imports (replacing complex monitoring)
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
@@ -62,7 +62,7 @@ import { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
 
 // Legacy performance imports (deprecated, for backward compatibility)
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { UnifiedPerformanceCoordinator } from "@/core/performance/UnifiedPerformanceCoordinator";
+import { PerformanceAnalyzer } from "@/core/performance/UnifiedPerformanceCoordinator";
 import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
 // CSS systems consolidated into OptimizedCSSVariableManager:
 // - OptimizedCSSVariableManager (batching layer)
@@ -81,8 +81,7 @@ import { VisualEffectsCoordinator } from "@/visual/effects/VisualEffectsCoordina
 import { MusicEmotionAnalyzer } from "@/visual/music/integration/MusicEmotionAnalyzer";
 
 // Color Strategy imports
-import { UnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
-import { globalColorOrchestrator } from "@/visual/coordination/ColorCoordinator";
+import { UnifiedColorProcessingEngine, globalUnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
 
 // UI Managers imports
 import { Card3DManager } from "@/ui/managers/Card3DManager";
@@ -104,7 +103,7 @@ export type NonVisualSystemKey =
   | "TimerConsolidationSystem"
   | "OptimizedCSSVariableManager"
   | "UnifiedCSSVariableManager" // Alias for OptimizedCSSVariableManager
-  | "PerformanceAwareLerpCoordinator"
+  // PerformanceAwareLerpCoordinator consolidated into EnhancedMasterAnimationCoordinator
   
   // New simplified performance systems (replacing complex monitoring)
   | "SimplePerformanceCoordinator"
@@ -113,10 +112,9 @@ export type NonVisualSystemKey =
   | "WebGLSystemsIntegration"
   
   // Legacy performance systems (deprecated, for backward compatibility)
-  | "UnifiedPerformanceCoordinator"
-  | "DeviceCapabilityDetector"
+  | "UnifiedPerformanceCoordinator" // Backward compatibility alias for PerformanceAnalyzer
   | "PerformanceAnalyzer"
-  | "SimplePerformanceCoordinator"
+  | "DeviceCapabilityDetector"
   | "PerformanceBudgetManager"
 
   // Core Services
@@ -219,7 +217,7 @@ export class NonVisualSystemFacade {
   
   // Legacy performance system dependencies (deprecated, for backward compatibility)
   private performanceAnalyzer: SimplePerformanceCoordinator | null = null;
-  private performanceCoordinator: UnifiedPerformanceCoordinator | null = null;
+  private performanceCoordinator: PerformanceAnalyzer | null = null;
   private performanceOrchestrator: SimplePerformanceCoordinator | null = null;
   // private colorHarmonyEngine: ColorHarmonyEngine | null = null; // Unused for now
   // private systemHealthMonitor: SystemHealthMonitor | null = null; // Unused for now
@@ -355,10 +353,10 @@ export class NonVisualSystemFacade {
     ]);
 
     this.systemRegistry.set(
-      "UnifiedPerformanceCoordinator",
-      UnifiedPerformanceCoordinator
+      "PerformanceAnalyzer",
+      PerformanceAnalyzer
     );
-    this.systemDependencies.set("UnifiedPerformanceCoordinator", []);
+    this.systemDependencies.set("PerformanceAnalyzer", []);
 
     this.systemRegistry.set(
       "DeviceCapabilityDetector",
@@ -402,13 +400,8 @@ export class NonVisualSystemFacade {
     // this.systemRegistry.set('QualityScalingManager', QualityScalingManager);
     // this.systemDependencies.set('QualityScalingManager', ['performanceAnalyzer', 'deviceCapabilityDetector']);
 
-    this.systemRegistry.set(
-      "PerformanceAwareLerpCoordinator",
-      PerformanceAwareLerpCoordinator
-    );
-    this.systemDependencies.set("PerformanceAwareLerpCoordinator", [
-      "performanceOrchestrator",
-    ]);
+    // PerformanceAwareLerpCoordinator consolidated into EnhancedMasterAnimationCoordinator
+    // Use EnhancedMasterAnimationCoordinator for musical LERP functionality
 
     // New simplified performance systems (replacing complex monitoring)
     this.systemRegistry.set("SimplePerformanceCoordinator", SimplePerformanceCoordinator);
@@ -460,7 +453,7 @@ export class NonVisualSystemFacade {
     ]);
 
     // ColorOrchestrator - Legacy strategy pattern coordinator (now delegates to UnifiedColorProcessingEngine)
-    // Note: Uses globalColorOrchestrator singleton, handled as special case in createSystem
+    // Note: Uses globalUnifiedColorProcessingEngine singleton, handled as special case in createSystem
     // 🔧 PHASE 2.1: Now delegates to UnifiedColorProcessingEngine for enhanced processing
     this.systemDependencies.set("ColorOrchestrator", []);
 
@@ -576,7 +569,7 @@ export class NonVisualSystemFacade {
       
       // Legacy performance systems (for backward compatibility)
       "PerformanceAnalyzer",
-      "UnifiedPerformanceCoordinator",
+      "PerformanceAnalyzer",
       "SimplePerformanceCoordinator",
       
       // Shared systems
@@ -620,7 +613,7 @@ export class NonVisualSystemFacade {
           case "PerformanceAnalyzer":
             this.performanceAnalyzer = system;
             break;
-          case "UnifiedPerformanceCoordinator":
+          case "PerformanceAnalyzer":
             this.performanceCoordinator = system;
             break;
           
@@ -854,8 +847,8 @@ export class NonVisualSystemFacade {
       }
 
       if (key === "ColorOrchestrator") {
-        // ColorOrchestrator is a singleton - use globalColorOrchestrator
-        const system = globalColorOrchestrator as T;
+        // ColorOrchestrator is a singleton - use globalUnifiedColorProcessingEngine
+        const system = globalUnifiedColorProcessingEngine as T;
 
         // Inject additional dependencies
         this.injectDependencies(system, key);

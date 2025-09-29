@@ -37,9 +37,7 @@
       (1 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.5)
   );
   --sn-glass-rhythm-hue: calc(var(--sn-rhythm-phase, 0) * var(--sn-glass-pulse-enabled) * 20deg);
-  --sn-glass-breathing-scale: calc(
-    1 + (var(--sn-breathing-scale, 1) - 1) * var(--sn-glass-pulse-enabled)
-  );
+  // Removed --sn-glass-breathing-scale to eliminate bubble-like pulsing effects
 
   // === COSMIC GLASS ENHANCEMENT ===
   --sn-glass-cosmic-blur: calc(var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 3px);
@@ -122,12 +120,11 @@
   filter: hue-rotate(var(--sn-glass-rhythm-hue))
     saturate(var(--sn-glass-saturation)) brightness(var(--sn-glass-brightness));
 
-  // BREATHING scale effect
-  transform: scale(var(--sn-glass-breathing-scale));
+  // NO BREATHING scale - removed to eliminate bubble effects
 
   // Enhanced visual-effects transitions
   transition: var(--color-transition), filter 0.4s ease-out,
-    transform 0.2s ease-out, box-shadow 0.3s ease-out;
+    box-shadow 0.3s ease-out;
 
   // HARMONIZE atmosphere overlay
   &::after {
@@ -221,8 +218,7 @@
     filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.2))
       saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
 
-    // BREATHING scale effect
-    transform: scale(var(--sn-glass-breathing-scale));
+    // NO BREATHING scale - removed to eliminate bubble effects
 
     // Enhanced transitions
     transition: all 0.3s ease-out, transform 0.2s ease-out, filter 0.4s ease-out;
@@ -251,8 +247,7 @@
         saturate(calc(1.1 + var(--sn-beat-pulse-intensity, 0) * 0.2))
         brightness(calc(1.05 + var(--sn-beat-pulse-intensity, 0) * 0.1));
 
-      // Slight BLOOM scale enhancement
-      transform: scale(calc(var(--sn-glass-breathing-scale) * 1.02));
+      // NO scale enhancement on hover - removed to eliminate bubble effects
     }
   }
 }
@@ -262,15 +257,14 @@
   background: var(--enhanced-background) !important;
   border-left: 1px solid var(--enhanced-border);
 
-  // BREATHING scale effect
-  transform: scale(var(--sn-glass-breathing-scale));
+  // NO BREATHING scale - removed to eliminate bubble effects
 
   // REFRACT subtle color shifts
   filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.2))
     saturate(var(--sn-glass-saturation));
 
   // Enhanced transitions
-  transition: var(--color-transition), transform 0.2s ease-out,
+  transition: var(--color-transition),
     filter 0.4s ease-out;
 }
 

@@ -462,23 +462,25 @@ patchReactRequire();
     );
   }
 
-  // 3c. 🌊 Initialize Depth Consciousness Controller (Phase 4.2e)
+  // 3c. 🌊 Initialize Depth Visual Effects Controller (Phase 4.2e)
   try {
     const { DepthVisualEffectsController } = await import(
       "./visual/effects/DepthLayerController"
     );
 
-    const depthConsciousness = new DepthVisualEffectsController(
+    const depthController = new DepthVisualEffectsController(
       ADVANCED_SYSTEM_CONFIG,
       ThemeUtilities,
       year3000System.performanceAnalyzer,
       year3000System.musicSyncService as any,
       year3000System.settingsManager as any
     );
-    await depthConsciousness.initialize();
-    (year3000System as any).depthConsciousnessController = depthConsciousness;
+    await depthController.initialize();
+    (year3000System as any).depthController = depthController;
+    // Backward compatibility alias
+    (year3000System as any).depthConsciousnessController = depthController;
 
-    console.log("🌊 [StarryNight] Depth Consciousness Controller awakened");
+    console.log("🌊 [StarryNight] Depth Visual Effects Controller initialized");
   } catch (err) {
     console.error(
       "[StarryNight] Failed to initialize DepthVisualEffectsController",
@@ -507,9 +509,9 @@ patchReactRequire();
         year3000System.colorHarmonyEngine
       );
     }
-    if ((year3000System as any).depthConsciousnessController) {
+    if ((year3000System as any).depthController) {
       dynamicBridge.linkWithDepthVisual(
-        (year3000System as any).depthConsciousnessController
+        (year3000System as any).depthController
       );
     }
 
@@ -523,45 +525,45 @@ patchReactRequire();
     );
   }
 
-  // 3e. 🌊 Initialize Consolidated Living Gradient Strategy System (Phase 2.2 - Consolidated)
+  // 3e. 🌊 Initialize Dynamic Gradient Strategy System (Phase 2.2 - Consolidated)
   try {
-    const { LivingGradientStrategy } = await import(
-      "./visual/strategies/LivingGradientStrategy"
+    const { DynamicGradientStrategy } = await import(
+      "./visual/strategies/DynamicGradientStrategy"
     );
 
-    const livingGradientSystem = new LivingGradientStrategy(
+    const dynamicGradientSystem = new DynamicGradientStrategy(
       ADVANCED_SYSTEM_CONFIG,
       ThemeUtilities,
       year3000System.performanceAnalyzer,
       year3000System.musicSyncService as any,
       year3000System.settingsManager as any
     );
-    await livingGradientSystem.initialize();
+    await dynamicGradientSystem.initialize();
 
     // Link with other visual-effects systems
     if ((year3000System as any).dynamicCatppuccinBridge) {
       // The living gradient system will listen to events from the dynamic bridge
       console.log(
-        "🌊 [StarryNight] Consolidated Living Gradient System linked with Dynamic Catppuccin Bridge"
+        "🌊 [StarryNight] Consolidated Dynamic Gradient System linked with Dynamic Catppuccin Bridge"
       );
     }
-    if ((year3000System as any).depthConsciousnessController) {
+    if ((year3000System as any).depthController) {
       // The living gradient system coordinates with depth visual-effects
       console.log(
-        "🌊 [StarryNight] Consolidated Living Gradient System linked with Depth Consciousness"
+        "🌊 [StarryNight] Consolidated Dynamic Gradient System linked with Depth Controller"
       );
     }
 
     // Store as both visual system and color strategy for unified access
-    (year3000System as any).livingGradientSystem = livingGradientSystem;
-    (year3000System as any).livingGradientStrategy = livingGradientSystem; // Alias for color strategy access
+    (year3000System as any).dynamicGradientSystem = dynamicGradientSystem;
+    (year3000System as any).livingGradientStrategy = dynamicGradientSystem; // Alias for color strategy access
 
     console.log(
-      "🌊 [StarryNight] Consolidated Living Gradient Strategy System awakened - unified color processing and visual system lifecycle with performance optimizations"
+      "🌊 [StarryNight] Consolidated Dynamic Gradient Strategy System awakened - unified color processing and visual system lifecycle with performance optimizations"
     );
   } catch (err) {
     console.error(
-      "[StarryNight] Failed to initialize Consolidated Living Gradient Strategy System",
+      "[StarryNight] Failed to initialize Consolidated Dynamic Gradient Strategy System",
       err
     );
   }

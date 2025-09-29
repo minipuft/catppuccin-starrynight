@@ -65,6 +65,21 @@
   --organic-temperature-hue-shift: var(--audio-temperature-hue-shift, 0deg);
   --organic-breathing-cycle: var(--audio-breathing-cycle, 8s);
   --organic-transition-medium: var(--dynamic-transition-medium, 0.5s);
+
+  // === PHASE 3: INTENSITY CONSOLIDATION ===
+  // Map intensity variables to unified controller (Phase 2 modules already use these)
+  --fluid-intensity: var(--sn-unified-effect-intensity, 0.5);
+  --crystal-pulse-intensity: var(--sn-unified-effect-intensity, 0.6);
+  --natural-serenity-level: var(--sn-unified-effect-intensity, 0.6);
+  --visual-effects-coherence: var(--sn-unified-effect-intensity, 0.7);
+
+  // === PHASE 3: RHYTHM/PHASE CONSOLIDATION ===
+  // Map rhythm and phase variables to unified controller
+  --music-harmonic-resonance: var(--sn-music-rhythm-phase, 0deg);
+
+  // === PHASE 3: ENERGY/AMPLITUDE CONSOLIDATION ===
+  // Map energy and amplitude variables to unified music energy
+  --music-energy-boost: var(--sn-unified-music-energy, 1.0);
   
   // === ORGANIC OPACITY → LAYER OPACITY MIGRATION ===
   // Old metaphorical opacity variables mapped to layer-specific opacity

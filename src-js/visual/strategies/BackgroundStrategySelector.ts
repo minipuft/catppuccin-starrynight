@@ -21,7 +21,7 @@ import { settings } from "@/config";
 // Import strategy implementations
 import { DepthLayeredStrategy } from "./DepthLayeredStrategy";
 import { DynamicCatppuccinStrategy } from "../color/ThemeColorController";
-import { LivingGradientStrategy } from "./LivingGradientStrategy";
+import { DynamicGradientStrategy } from "./DynamicGradientStrategy";
 import { WebGLGradientStrategy } from "./WebGLGradientStrategy";
 
 interface BackgroundStrategySelectionCriteria
@@ -303,7 +303,7 @@ export class BackgroundStrategySelector {
     });
 
     // Living Gradient Strategy Analysis
-    const livingScore = this.scoreLivingGradientStrategy(criteria);
+    const livingScore = this.scoreDynamicGradientStrategy(criteria);
     decisions.push({
       strategyName: "living-gradient",
       shouldInclude: livingScore > 0.3, // Almost always include as foundation
@@ -394,7 +394,7 @@ export class BackgroundStrategySelector {
   /**
    * Score Living Gradient Strategy compatibility
    */
-  private scoreLivingGradientStrategy(
+  private scoreDynamicGradientStrategy(
     criteria: BackgroundStrategySelectionCriteria
   ): number {
     let score = 0.9; // High base score - foundation layer
@@ -639,7 +639,7 @@ export class BackgroundStrategySelector {
           break;
 
         case "living-gradient":
-          strategy = new LivingGradientStrategy();
+          strategy = new DynamicGradientStrategy();
           break;
 
         case "webgl-gradient":

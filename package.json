@@ -19,7 +19,7 @@
     "build:js:dev": "npm run typecheck && esbuild src-js/theme.entry.ts --bundle --outfile=theme.js --format=iife --target=es2020 --external:react --external:react-dom --loader:.fs=text --keep-names --sourcemap",
     "build:js:prod": "npm run typecheck && esbuild src-js/theme.entry.ts --bundle --outfile=theme.js --format=iife --target=es2020 --external:react --external:react-dom --loader:.fs=text --minify",
     "build:css:dev": "sass app.scss user.css --style=expanded --quiet",
-    "build:css:prod": "sass app.scss user.css --style=compressed --quiet && postcss user.css --replace --config config/postcss/default.config.js",
+    "build:css:prod": "NODE_ENV=production sass app.scss user.css --style=compressed --quiet && postcss user.css --replace",
     "build:fast": "npm run build:css:prod && esbuild src-js/theme.entry.ts --bundle --outfile=theme.js --format=iife --target=es2020 --external:react --external:react-dom --loader:.fs=text --minify",
     "build:ci": "npm run build",
     "typecheck": "tsc --noEmit",

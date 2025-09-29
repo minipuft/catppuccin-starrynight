@@ -2,6 +2,8 @@
 // FLUX MUSIC VISUALIZATION - Modern CSS-Native Music Visual Effects
 // ████████████████████████████████████████████████████████████████████████████████
 
+@use "../../core/performance_mixins" as *;
+
 // 🎵 FLUX MUSIC VISUALIZATION SYSTEM
 // Modern CSS-native approach replacing DOM manipulation with visual-aware effects
 // Integrates with Year 3000 visual effects field and emotional temperature system
@@ -26,8 +28,8 @@
     transparent 100%);
   z-index: -12;
   pointer-events: none;
-  will-change: transform, opacity;
-  
+  @include performance-hardware-acceleration;
+
   // Visual effects pulse scaling
   transform: translate(-50%, -50%) scale(var(--sn-flux-visual-effects-pulse, 0));
   opacity: calc(var(--sn-flux-visual-effects-pulse, 0) * 0.8);
@@ -107,8 +109,8 @@
     rgba(var(--sn-gradient-accent-rgb), 0.4) 100%);
   z-index: -10;
   pointer-events: none;
-  will-change: transform, opacity;
-  
+  @include performance-hardware-acceleration;
+
   // Temporal flow progress
   transform: scaleX(var(--sn-flux-temporal-flow-progress, 0));
   transform-origin: left;
@@ -142,8 +144,8 @@
   border-radius: 50%;
   z-index: -11;
   pointer-events: none;
-  will-change: transform, opacity;
-  
+  @include performance-hardware-acceleration;
+
   // Harmonic resonance effects
   transform: 
     scale(calc(0.5 + var(--sn-flux-harmonic-resonance, 0) * 0.5))

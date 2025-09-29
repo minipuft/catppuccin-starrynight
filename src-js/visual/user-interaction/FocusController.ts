@@ -76,7 +76,7 @@ export class FocusController implements IManagedSystem {
     try {
       // Initialize CSS coordination - use globalThis to access Year3000System
       const year3000System = (globalThis as any).year3000System;
-      this.cssController = year3000System?.cssConsciousnessController || this.year3000System?.cssConsciousnessController || getGlobalOptimizedCSSController();
+      this.cssController = year3000System?.cssController || this.year3000System?.cssController || getGlobalOptimizedCSSController();
 
       this.setupEventListeners();
       this.initialized = true;

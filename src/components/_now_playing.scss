@@ -36,8 +36,8 @@
 
       &:hover {
         color: var(--spice-text);
-        // Kinetic Verb: BLOOM - Enhanced hover with rhythm
-        transform: scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.05)));
+        // Kinetic Verb: BLOOM - Enhanced hover with rhythm (scale removed)
+        transform: translateZ(0);
         filter: drop-shadow(
           0 0 calc(4px * var(--sn-beat-pulse-intensity, 0))
             rgba(
@@ -50,8 +50,8 @@
       // Active Shuffle State - Rhythmic consciousness
       &.main-shuffleButton-active {
         color: var(--spice-text);
-        // Kinetic Verb: OSCILLATE - Active state breathes with music
-        transform: scale(var(--sn-breathing-scale, 1));
+        // Kinetic Verb: OSCILLATE - Active state breathes with music (scale removed)
+        transform: translateZ(0);
         text-shadow: 0 0 calc(4px * var(--sn-beat-pulse-intensity, 0))
           rgba(
             var(--sn-accent-rgb),
@@ -67,14 +67,14 @@
       position: relative;
       transition: all 0.2s var(--sn-anim-easing-bounce-smooth);
 
-      // Kinetic Verb: BLOOM - The most important button gets maximum love
-      transform: scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.10)));
+      // Kinetic Verb: BLOOM - The most important button gets maximum love (scale removed)
+      transform: translateZ(0);
 
-      // Cosmic glow around play button
+      // Cosmic glow around play button (static size, no expansion)
       &::before {
         content: "";
         position: absolute;
-        inset: -8px;
+        inset: -10px;
         border-radius: 50%;
         background: radial-gradient(
           circle,
@@ -86,12 +86,11 @@
           transparent 70%
         );
         z-index: -1;
-        transition: all 0.3s ease-out;
+        transition: opacity 0.3s ease-out, background 0.3s ease-out;
       }
 
-      // Enhanced hover state
+      // Enhanced hover state (brighter, no size change)
       &:hover::before {
-        inset: -12px;
         background: radial-gradient(
           circle,
           rgba(
@@ -137,8 +136,8 @@
           rgba(var(--sn-accent-rgb), 0.8) 100%
         )
       );
-      // Kinetic Verb: BLOOM
-      transform: scale(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.04)));
+      // Kinetic Verb: BLOOM (scale removed)
+      transform: translateZ(0);
       box-shadow: 0 0 calc(6px * var(--sn-beat-pulse-intensity, 0))
         rgba(
           var(--sn-accent-rgb),
@@ -157,18 +156,13 @@
       color: var(--spice-subtext) !important;
       transition: all 0.3s var(--sn-easing-explorer, ease-out);
 
-      // Kinetic Verb: OSCILLATE - All controls breathe gently
-      transform: scale(var(--sn-breathing-scale, 1));
+      // Kinetic Verb: OSCILLATE - All controls breathe gently (scale removed)
+      transform: translateZ(0);
 
       &:hover {
         color: var(--spice-text) !important;
-        // Kinetic Verb: RIPPLE - Enhanced hover
-        transform: scale(
-          calc(
-            var(--sn-breathing-scale, 1) +
-              (var(--sn-beat-pulse-intensity, 0) * 0.05)
-          )
-        );
+        // Kinetic Verb: RIPPLE - Enhanced hover (scale removed)
+        transform: translateZ(0);
         text-shadow: 0 0 calc(3px * var(--sn-beat-pulse-intensity, 0))
           rgba(
             var(--sn-accent-rgb),
@@ -185,10 +179,8 @@
     .main-addButton-active:focus,
     .main-addButton-active:hover {
       color: var(--spice-red);
-      // Kinetic Verb: BLOOM - Love pulses stronger!
-      transform: scale(
-        calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.12))
-      ); // Calmer love pulse
+      // Kinetic Verb: BLOOM - Love pulses with glow (scale removed)
+      transform: translateZ(0);
       filter: drop-shadow(
         0 0 calc(6px * var(--sn-beat-pulse-intensity, 0))
           rgba(var(--spice-rgb-red, 243, 139, 168), calc(0.7 * var(--sn-beat-pulse-intensity, 0)))

@@ -67,12 +67,11 @@ $fractal-iteration-depth-sass: 5;
 
 @keyframes particle-drift {
   0% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
+    transform: translate3d(0, 0, 0);
     opacity: 0.1;
   }
   25% {
-    transform: translate3d(var(--drift-x), var(--drift-y), var(--drift-z))
-      rotate(90deg);
+    transform: translate3d(var(--drift-x), var(--drift-y), var(--drift-z));
     opacity: 0.8;
   }
   50% {
@@ -80,8 +79,7 @@ $fractal-iteration-depth-sass: 5;
         calc(var(--drift-x) * 0.5),
         calc(var(--drift-y) * -0.3),
         calc(var(--drift-z) * 1.2)
-      )
-      rotate(180deg);
+      );
     opacity: 0.6;
   }
   75% {
@@ -89,12 +87,11 @@ $fractal-iteration-depth-sass: 5;
         calc(var(--drift-x) * -0.8),
         calc(var(--drift-y) * 0.9),
         calc(var(--drift-z) * 0.4)
-      )
-      rotate(270deg);
+      );
     opacity: 0.9;
   }
   100% {
-    transform: translate3d(0, 0, 0) rotate(360deg);
+    transform: translate3d(0, 0, 0);
     opacity: 0.1;
   }
 }
@@ -119,23 +116,23 @@ $fractal-iteration-depth-sass: 5;
 @keyframes liquid-morph {
   0% {
     border-radius: 20% 80% 50% 30% / 40% 60% 70% 20%;
-    transform: rotate(0deg) scale(1);
+    transform: scale(1);
   }
   25% {
     border-radius: 70% 30% 20% 80% / 60% 20% 80% 40%;
-    transform: rotate(90deg) scale(1.05);
+    transform: scale(1.05);
   }
   50% {
     border-radius: 40% 60% 80% 20% / 30% 70% 20% 80%;
-    transform: rotate(180deg) scale(0.95);
+    transform: scale(0.95);
   }
   75% {
     border-radius: 80% 20% 60% 40% / 70% 30% 40% 60%;
-    transform: rotate(270deg) scale(1.1);
+    transform: scale(1.1);
   }
   100% {
     border-radius: 20% 80% 50% 30% / 40% 60% 70% 20%;
-    transform: rotate(360deg) scale(1);
+    transform: scale(1);
   }
 }
 

@@ -2,13 +2,12 @@
 // ADVANCED PERFORMANCE OPTIMIZATION - GPU Acceleration & Efficiency
 // ████████████████████████████████████████████████████████████████████████████████
 
+@use "../core/performance_mixins" as *;
+
 // GPU Acceleration Hints for High-Performance Elements
 .sn-gpu-accelerated {
-  // Force GPU layer creation for smooth animations
-  transform: translateZ(0);
-  will-change: transform, opacity, filter;
-  backface-visibility: hidden;
-  perspective: 1000px;
+  @include performance-hardware-acceleration;
+  perspective: 1000px; // Additional 3D context for nested transforms
 }
 
 // Performance-optimized transitions

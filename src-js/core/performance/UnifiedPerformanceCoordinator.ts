@@ -1,7 +1,18 @@
-import { SimplePerformanceCoordinator } from '@/core/performance/SimplePerformanceCoordinator';
+// Removed circular dependency - SimplePerformanceCoordinator now delegates to this class
 import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
+
+// Performance analyzer interface to break circular dependency
+export interface IPerformanceAnalyzer {
+  initialized: boolean;
+  initialize(): Promise<void>;
+  updateAnimation(deltaTime: number): void;
+  healthCheck(): Promise<any>;
+  destroy(): void;
+  recordMetric?(metric: string, value: number): void;
+  getMedianFPS?(): number;
+}
 
 // Enhanced interfaces from PerformanceOptimizationManager integration
 export interface DeviceCapabilities {
@@ -94,7 +105,7 @@ interface IPerformanceMonitor {
 }
 
 /**
- * UnifiedPerformanceCoordinator - Phase 3 System Consolidation
+ * PerformanceAnalyzer - Phase 3 System Consolidation
  * 
  * Consolidates all performance monitoring into a single unified interface:
  * - Centralizes performance tracking for all subsystems
@@ -105,11 +116,11 @@ interface IPerformanceMonitor {
  * @architecture Phase 3 of system consolidation
  * @performance Target: 20% reduction in performance monitoring overhead
  */
-export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
-  private static instance: UnifiedPerformanceCoordinator | null = null;
+export class PerformanceAnalyzer implements IPerformanceMonitor {
+  private static instance: PerformanceAnalyzer | null = null;
   
   private config: AdvancedSystemConfig | Year3000Config;
-  private performanceAnalyzer: SimplePerformanceCoordinator;
+  private performanceAnalyzer: IPerformanceAnalyzer | null = null;
   private eventBus: typeof unifiedEventBus;
   
   // Subsystem tracking
@@ -203,9 +214,9 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     },
   };
   
-  constructor(config: AdvancedSystemConfig | Year3000Config, performanceAnalyzer: SimplePerformanceCoordinator) {
+  constructor(config: AdvancedSystemConfig | Year3000Config, performanceAnalyzer?: IPerformanceAnalyzer) {
     this.config = config;
-    this.performanceAnalyzer = performanceAnalyzer;
+    this.performanceAnalyzer = performanceAnalyzer || null;
     this.eventBus = unifiedEventBus;
     
     // Initialize enhanced capabilities from PerformanceOptimizationManager
@@ -224,21 +235,21 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     this.subscribeToEvents();
     
     if (this.config.enableDebug) {
-      console.log('[UnifiedPerformanceCoordinator] Initialized with enhanced device capabilities, thermal monitoring, and battery optimization');
+      console.log('[PerformanceAnalyzer] Initialized with enhanced device capabilities, thermal monitoring, and battery optimization');
     }
   }
   
   /**
    * Get or create singleton instance
    */
-  public static getInstance(config?: Year3000Config, performanceAnalyzer?: SimplePerformanceCoordinator): UnifiedPerformanceCoordinator {
-    if (!UnifiedPerformanceCoordinator.instance) {
+  public static getInstance(config?: Year3000Config, performanceAnalyzer?: IPerformanceAnalyzer): PerformanceAnalyzer {
+    if (!PerformanceAnalyzer.instance) {
       if (!config || !performanceAnalyzer) {
-        throw new Error('UnifiedPerformanceCoordinator requires config and performanceAnalyzer for first initialization');
+        throw new Error('PerformanceAnalyzer requires config and performanceAnalyzer for first initialization');
       }
-      UnifiedPerformanceCoordinator.instance = new UnifiedPerformanceCoordinator(config, performanceAnalyzer);
+      PerformanceAnalyzer.instance = new PerformanceAnalyzer(config, performanceAnalyzer);
     }
-    return UnifiedPerformanceCoordinator.instance;
+    return PerformanceAnalyzer.instance;
   }
   
   /**
@@ -277,9 +288,9 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     
     // Record with performance analyzer
     if (this.performanceAnalyzer) {
-      this.performanceAnalyzer.recordMetric(`subsystem_${name}_frame_time`, updatedMetrics.frameTime);
-      this.performanceAnalyzer.recordMetric(`subsystem_${name}_memory`, updatedMetrics.memoryUsage);
-      this.performanceAnalyzer.recordMetric(`subsystem_${name}_fps`, updatedMetrics.fps);
+      this.performanceAnalyzer.recordMetric?.(`subsystem_${name}_frame_time`, updatedMetrics.frameTime);
+      this.performanceAnalyzer.recordMetric?.(`subsystem_${name}_memory`, updatedMetrics.memoryUsage);
+      this.performanceAnalyzer.recordMetric?.(`subsystem_${name}_fps`, updatedMetrics.fps);
     }
     
     // Trigger optimization if needed
@@ -288,7 +299,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     }
     
     if (this.config.enableDebug && updatedMetrics.status !== 'healthy') {
-      console.warn(`[UnifiedPerformanceCoordinator] Subsystem ${name} status: ${updatedMetrics.status}`, updatedMetrics);
+      console.warn(`[PerformanceAnalyzer] Subsystem ${name} status: ${updatedMetrics.status}`, updatedMetrics);
     }
   }
   
@@ -368,7 +379,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     }
     
     if (this.config.enableDebug) {
-      console.log('[UnifiedPerformanceCoordinator] Monitoring started');
+      console.log('[PerformanceAnalyzer] Monitoring started');
     }
   }
 
@@ -386,7 +397,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     }, 2000); // Check every 2 seconds
     
     if (this.config.enableDebug) {
-      console.log('[UnifiedPerformanceCoordinator] Adaptive optimization enabled');
+      console.log('[PerformanceAnalyzer] Adaptive optimization enabled');
     }
     
     // TODO: Add performance events to UnifiedEventBus when needed
@@ -410,7 +421,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     }
     
     if (this.config.enableDebug) {
-      console.log('[UnifiedPerformanceCoordinator] Adaptive optimization disabled');
+      console.log('[PerformanceAnalyzer] Adaptive optimization disabled');
     }
     
     // TODO: Add performance events to UnifiedEventBus when needed
@@ -426,7 +437,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     this.optimizationStrategies.set(strategy.name, strategy);
     
     if (this.config.enableDebug) {
-      console.log(`[UnifiedPerformanceCoordinator] Registered optimization strategy: ${strategy.name}`);
+      console.log(`[PerformanceAnalyzer] Registered optimization strategy: ${strategy.name}`);
     }
   }
   
@@ -456,7 +467,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
           strategy.action(subsystemMetrics);
           
           if (this.config.enableDebug) {
-            console.log(`[UnifiedPerformanceCoordinator] Applied optimization strategy: ${strategy.name} for ${issue.subsystem}`);
+            console.log(`[PerformanceAnalyzer] Applied optimization strategy: ${strategy.name} for ${issue.subsystem}`);
           }
           
           // Emit optimization event
@@ -469,7 +480,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
           
           break; // Only apply one strategy per issue
         } catch (error) {
-          console.error(`[UnifiedPerformanceCoordinator] Error applying optimization strategy ${strategy.name}:`, error);
+          console.error(`[PerformanceAnalyzer] Error applying optimization strategy ${strategy.name}:`, error);
         }
       }
     }
@@ -508,12 +519,12 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     this.activeIssues.clear();
     this.issueHistory = [];
     
-    if (UnifiedPerformanceCoordinator.instance === this) {
-      UnifiedPerformanceCoordinator.instance = null;
+    if (PerformanceAnalyzer.instance === this) {
+      PerformanceAnalyzer.instance = null;
     }
     
     if (this.config.enableDebug) {
-      console.log('[UnifiedPerformanceCoordinator] Destroyed');
+      console.log('[PerformanceAnalyzer] Destroyed');
     }
   }
   
@@ -873,7 +884,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     };
     
     if (this.config.enableDebug) {
-      console.log('[UnifiedPerformanceCoordinator] Device capabilities detected:', this.deviceCapabilities);
+      console.log('[PerformanceAnalyzer] Device capabilities detected:', this.deviceCapabilities);
     }
   }
   
@@ -926,12 +937,12 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
         });
         
         if (this.config.enableDebug) {
-          console.log('[UnifiedPerformanceCoordinator] Battery monitoring initialized');
+          console.log('[PerformanceAnalyzer] Battery monitoring initialized');
         }
       }
     } catch (error) {
       if (this.config.enableDebug) {
-        console.log('[UnifiedPerformanceCoordinator] Battery API not available');
+        console.log('[PerformanceAnalyzer] Battery API not available');
       }
     }
   }
@@ -940,7 +951,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
    * Update thermal state based on performance metrics
    */
   private updateThermalState(): void {
-    const currentFPS = this.performanceAnalyzer.getMedianFPS() || 60;
+    const currentFPS = this.performanceAnalyzer?.getMedianFPS?.() || 60;
     const memory = (performance as any).memory;
     const memoryUsage = memory ? memory.usedJSHeapSize / memory.jsHeapSizeLimit : 0;
     
@@ -1008,7 +1019,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     // });
     
     if (this.config.enableDebug) {
-      console.log(`[UnifiedPerformanceCoordinator] Performance mode changed to: ${modeName}`);
+      console.log(`[PerformanceAnalyzer] Performance mode changed to: ${modeName}`);
     }
   }
   
@@ -1049,7 +1060,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
    */
   public emitTrace(event: string, data?: any): void {
     if (this.config.enableDebug) {
-      console.log(`[UnifiedPerformanceCoordinator] Trace: ${event}`, data);
+      console.log(`[PerformanceAnalyzer] Trace: ${event}`, data);
     }
     
     // TODO: Add performance events to UnifiedEventBus when needed
@@ -1096,7 +1107,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     }
 
     if (this.config.enableDebug) {
-      console.log(`[UnifiedPerformanceCoordinator] Metric: ${name}=${value}`);
+      console.log(`[PerformanceAnalyzer] Metric: ${name}=${value}`);
     }
   }
 
@@ -1155,7 +1166,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     this.recordMetric(`operation_${name}_duration`, duration);
     
     if (this.config.enableDebug) {
-      console.log(`[UnifiedPerformanceCoordinator] Operation ${name}: ${duration.toFixed(2)}ms`);
+      console.log(`[PerformanceAnalyzer] Operation ${name}: ${duration.toFixed(2)}ms`);
     }
     
     return result;
@@ -1172,7 +1183,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     this.recordMetric(`async_operation_${name}_duration`, duration);
     
     if (this.config.enableDebug) {
-      console.log(`[UnifiedPerformanceCoordinator] Async operation ${name}: ${duration.toFixed(2)}ms`);
+      console.log(`[PerformanceAnalyzer] Async operation ${name}: ${duration.toFixed(2)}ms`);
     }
     
     return result;
@@ -1198,7 +1209,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
    */
   public updateBudget(name: string, value: number): void {
     if (this.config.enableDebug) {
-      console.log(`[UnifiedPerformanceCoordinator] Budget update ignored: ${name}=${value} (using adaptive optimization instead)`);
+      console.log(`[PerformanceAnalyzer] Budget update ignored: ${name}=${value} (using adaptive optimization instead)`);
     }
   }
 
@@ -1209,7 +1220,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     const timingId = `${name}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
     if (this.config.enableDebug) {
-      console.log(`[UnifiedPerformanceCoordinator] Timing started: ${name} (${timingId})`);
+      console.log(`[PerformanceAnalyzer] Timing started: ${name} (${timingId})`);
     }
     
     return timingId;
@@ -1220,7 +1231,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
    */
   public endTiming(timingId: string, context?: any): void {
     if (this.config.enableDebug) {
-      console.log(`[UnifiedPerformanceCoordinator] Timing ended: ${timingId}`, context);
+      console.log(`[PerformanceAnalyzer] Timing ended: ${timingId}`, context);
     }
   }
 
@@ -1270,7 +1281,7 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     deviceDescription: string;
     confidence: number;
     reasoning: string[];
-    webglStatus: ReturnType<UnifiedPerformanceCoordinator['getWebGLStatus']>;
+    webglStatus: ReturnType<PerformanceAnalyzer['getWebGLStatus']>;
     energyBoost: boolean;
     settings: any;
   } {
@@ -1359,3 +1370,6 @@ export class UnifiedPerformanceCoordinator implements IPerformanceMonitor {
     };
   }
 }
+
+// Backward compatibility alias
+export const UnifiedPerformanceCoordinator = PerformanceAnalyzer;

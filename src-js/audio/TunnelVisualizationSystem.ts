@@ -1,12 +1,12 @@
 /**
- * DungeonCorridorSystem - Music-Responsive Dungeon Corridor Management
+ * TunnelVisualizationSystem - Music-Responsive Tunnel Visualization
  * Part of the Year 3000 System audio-visual pipeline
  *
- * Manages realistic dungeon corridor effects with dynamic lighting
+ * Manages dynamic tunnel visual effects with music-responsive lighting
  * - Music-responsive tunnel dimensions and lighting intensity
- * - Realistic lighting calculations (shadows, edge highlights, end illumination)
+ * - Advanced lighting calculations (shadows, edge highlights, depth illumination)
  * - Integration with ColorHarmonyEngine for color temperature effects
- * - Performance-optimized corridor rendering with device-aware scaling
+ * - Performance-optimized tunnel rendering with device-aware scaling
  */
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
@@ -19,15 +19,15 @@ import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
 import { BaseVisualSystem } from "../visual/base/BaseVisualSystem";
 
-// Interfaces for dungeon corridor system
-interface DungeonCorridorSettings {
+// Interfaces for tunnel visualization system
+interface TunnelVisualizationSettings {
   enabled: boolean;
-  dungeonEnabled: boolean;
-  
-  // Corridor geometry
+  tunnelEnabled: boolean;
+
+  // Tunnel geometry
   tunnelWidth: number;
   tunnelDepth: number;
-  corridorCount: number;
+  tunnelSegmentCount: number;
   perspectiveFactor: number;
   
   // Lighting system
@@ -40,7 +40,7 @@ interface DungeonCorridorSettings {
   // Color and atmosphere
   wallColor: [number, number, number];
   lightTemperatureRange: [number, number]; // Cold to warm
-  magicalShimmerStrength: number;
+  surfaceShimmerStrength: number;
   
   // Music responsiveness
   musicResponseStrength: number;
@@ -61,7 +61,7 @@ interface CorridorLightingState {
   endLightIntensity: number;
   colorTemperature: number; // 0-1 from cold to warm
   atmosphericHaze: number;
-  magicalShimmer: number;
+  surfaceShimmer: number;
   timestamp: number;
 }
 
@@ -75,16 +75,16 @@ interface MusicAnalysisData {
 }
 
 /**
- * DungeonCorridorSystem manages music-responsive dungeon corridor effects
+ * TunnelVisualizationSystem manages music-responsive tunnel visualization effects
  * - Real-time lighting calculations based on music analysis
  * - Dynamic tunnel geometry responsive to music energy and bass
  * - Color temperature shifts based on musical mood (valence)
  * - Performance-optimized rendering with quality scaling
  */
-export class DungeonCorridorSystem extends BaseVisualSystem {
-  private dungeonSettings: DungeonCorridorSettings;
+export class TunnelVisualizationSystem extends BaseVisualSystem {
+  private tunnelSettings: TunnelVisualizationSettings;
   private currentLightingState: CorridorLightingState;
-  private cssConsciousnessController: OptimizedCSSVariableManager | null;
+  private cssController: OptimizedCSSVariableManager | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
 
   private lastBeatTime = 0;
@@ -110,24 +110,24 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
     // Initialize CSS Consciousness Controller
     const cssController = OptimizedCSSVariableManager.getGlobalInstance();
     if (cssController) {
-      this.cssConsciousnessController = cssController;
+      this.cssController = cssController;
     } else {
       Y3KDebug?.debug?.warn(
-        "DungeonCorridorSystem",
+        "TunnelVisualizationSystem",
         "OptimizedCSSVariableManager not available"
       );
-      this.cssConsciousnessController = null;
+      this.cssController = null;
     }
 
-    // Initialize dungeon corridor settings
-    this.dungeonSettings = {
+    // Initialize tunnel visualization settings
+    this.tunnelSettings = {
       enabled: true,
-      dungeonEnabled: true,
+      tunnelEnabled: true,
       
       // Corridor geometry
       tunnelWidth: 0.15,
       tunnelDepth: 0.4,
-      corridorCount: 4,
+      tunnelSegmentCount: 4,
       perspectiveFactor: 2.0,
       
       // Lighting system
@@ -140,7 +140,7 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
       // Color and atmosphere
       wallColor: [0.1, 0.12, 0.15], // Dark stone
       lightTemperatureRange: [0.3, 0.9], // Cool blue to warm orange
-      magicalShimmerStrength: 0.05,
+      surfaceShimmerStrength: 0.05,
       
       // Music responsiveness
       musicResponseStrength: 0.8,
@@ -157,12 +157,12 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
 
     // Initialize lighting state
     this.currentLightingState = {
-      ambientShadow: this.dungeonSettings.ambientShadowLevel,
-      edgeHighlight: this.dungeonSettings.edgeHighlightStrength,
-      endLightIntensity: this.dungeonSettings.endLightIntensity,
+      ambientShadow: this.tunnelSettings.ambientShadowLevel,
+      edgeHighlight: this.tunnelSettings.edgeHighlightStrength,
+      endLightIntensity: this.tunnelSettings.endLightIntensity,
       colorTemperature: 0.5,
-      atmosphericHaze: this.dungeonSettings.atmosphericHaze,
-      magicalShimmer: this.dungeonSettings.magicalShimmerStrength,
+      atmosphericHaze: this.tunnelSettings.atmosphericHaze,
+      surfaceShimmer: this.tunnelSettings.surfaceShimmerStrength,
       timestamp: performance.now(),
     };
 
@@ -181,11 +181,11 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
     await super._performSystemSpecificInitialization();
 
     this.subscribeToMusicEvents();
-    this.startDungeonUpdates();
+    this.startTunnelUpdates();
 
     Y3KDebug?.debug?.log(
-      "DungeonCorridorSystem",
-      "Dungeon corridor system initialized"
+      "TunnelVisualizationSystem",
+      "Tunnel tunnel system initialized"
     );
   }
 
@@ -223,7 +223,7 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
     this.updateBeatLighting(intensity, bpm, confidence);
 
     Y3KDebug?.debug?.log(
-      "DungeonCorridorSystem",
+      "TunnelVisualizationSystem",
       `Beat lighting pulse: intensity ${intensity.toFixed(2)}, bpm ${bpm}`
     );
   }
@@ -255,21 +255,21 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
       this.currentMusicAnalysis.spectralCentroid = spectralData.harmonicContent || 0.5;
     }
 
-    // Update corridor width based on bass response
+    // Update tunnel width based on bass response
     this.updateCorridorGeometry(spectralData.bassEnergy || 0.5);
   }
 
   private updateBeatLighting(intensity: number, bpm: number, confidence: number): void {
-    const beatPulse = intensity * this.dungeonSettings.beatLightPulse * confidence;
+    const beatPulse = intensity * this.tunnelSettings.beatLightPulse * confidence;
 
     // Update end light intensity with pulse
     const newLightingState = { ...this.currentLightingState };
     newLightingState.endLightIntensity = 
-      this.dungeonSettings.endLightIntensity * (1.0 + beatPulse);
+      this.tunnelSettings.endLightIntensity * (1.0 + beatPulse);
 
     // Update edge highlights with beat response
     newLightingState.edgeHighlight = 
-      this.dungeonSettings.edgeHighlightStrength * (1.0 + beatPulse * 0.5);
+      this.tunnelSettings.edgeHighlightStrength * (1.0 + beatPulse * 0.5);
 
     // Add to smoothing buffer and update
     this.updateLightingState(newLightingState);
@@ -279,31 +279,31 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
     const newLightingState = { ...this.currentLightingState };
 
     // Energy affects overall lighting intensity
-    const energyModifier = energy * this.dungeonSettings.musicResponseStrength;
+    const energyModifier = energy * this.tunnelSettings.musicResponseStrength;
     newLightingState.endLightIntensity = 
-      this.dungeonSettings.lightingIntensity * (0.5 + energyModifier);
+      this.tunnelSettings.lightingIntensity * (0.5 + energyModifier);
 
     // Valence affects color temperature (happy = warm, sad = cool)
-    const temperatureRange = this.dungeonSettings.lightTemperatureRange;
+    const temperatureRange = this.tunnelSettings.lightTemperatureRange;
     newLightingState.colorTemperature = 
-      temperatureRange[0] + (valence * this.dungeonSettings.valenceTemperatureShift * 
+      temperatureRange[0] + (valence * this.tunnelSettings.valenceTemperatureShift * 
       (temperatureRange[1] - temperatureRange[0]));
 
     // Energy affects magical shimmer
-    newLightingState.magicalShimmer = 
-      this.dungeonSettings.magicalShimmerStrength * (0.8 + energy * 0.4);
+    newLightingState.surfaceShimmer = 
+      this.tunnelSettings.surfaceShimmerStrength * (0.8 + energy * 0.4);
 
     this.updateLightingState(newLightingState);
   }
 
   private updateCorridorGeometry(bassResponse: number): void {
     // Bass response affects tunnel width
-    const bassMod = bassResponse * this.dungeonSettings.bassWidthModulation;
-    const newTunnelWidth = this.dungeonSettings.tunnelWidth * (1.0 + bassMod);
+    const bassMod = bassResponse * this.tunnelSettings.bassWidthModulation;
+    const newTunnelWidth = this.tunnelSettings.tunnelWidth * (1.0 + bassMod);
 
     // Update CSS variables for geometry
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+    if (this.cssController) {
+      this.cssController.queueCSSVariableUpdate(
         "--sn-tunnel-width",
         newTunnelWidth.toFixed(3)
       );
@@ -341,7 +341,7 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
       smoothed.endLightIntensity = smoothed.endLightIntensity * smoothingFactor + current.endLightIntensity * (1 - smoothingFactor);
       smoothed.colorTemperature = smoothed.colorTemperature * smoothingFactor + current.colorTemperature * (1 - smoothingFactor);
       smoothed.atmosphericHaze = smoothed.atmosphericHaze * smoothingFactor + current.atmosphericHaze * (1 - smoothingFactor);
-      smoothed.magicalShimmer = smoothed.magicalShimmer * smoothingFactor + current.magicalShimmer * (1 - smoothingFactor);
+      smoothed.surfaceShimmer = smoothed.surfaceShimmer * smoothingFactor + current.surfaceShimmer * (1 - smoothingFactor);
     }
 
     smoothed.timestamp = performance.now();
@@ -355,92 +355,92 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
     if (currentTime - this.lastLightingUpdate < this.updateThrottleInterval) return;
     this.lastLightingUpdate = currentTime;
 
-    if (!this.cssConsciousnessController) return;
+    if (!this.cssController) return;
 
     const lighting = this.currentLightingState;
 
-    // Dungeon corridor control variables
-    this.cssConsciousnessController.queueCSSVariableUpdate(
-      "--sn-dungeon-enabled",
-      this.dungeonSettings.dungeonEnabled ? "1" : "0"
+    // Tunnel tunnel control variables
+    this.cssController.queueCSSVariableUpdate(
+      "--sn-tunnel-enabled",
+      this.tunnelSettings.tunnelEnabled ? "1" : "0"
     );
 
     // Lighting variables
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--sn-lighting-intensity",
       lighting.endLightIntensity.toFixed(3)
     );
 
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--sn-atmospheric-haze",
       lighting.atmosphericHaze.toFixed(3)
     );
 
     // Wall color
-    const [r, g, b] = this.dungeonSettings.wallColor;
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    const [r, g, b] = this.tunnelSettings.wallColor;
+    this.cssController.queueCSSVariableUpdate(
       "--sn-wall-color-r",
       r.toFixed(3)
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--sn-wall-color-g",
       g.toFixed(3)
     );
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--sn-wall-color-b",
       b.toFixed(3)
     );
 
     // Color temperature for lighting
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--sn-light-temperature",
       lighting.colorTemperature.toFixed(3)
     );
 
     // Tunnel geometry
-    this.cssConsciousnessController.queueCSSVariableUpdate(
+    this.cssController.queueCSSVariableUpdate(
       "--sn-tunnel-depth",
-      this.dungeonSettings.tunnelDepth.toFixed(3)
+      this.tunnelSettings.tunnelDepth.toFixed(3)
     );
 
-    this.cssConsciousnessController.queueCSSVariableUpdate(
-      "--sn-corridor-count",
-      this.dungeonSettings.corridorCount.toString()
+    this.cssController.queueCSSVariableUpdate(
+      "--sn-tunnel-count",
+      this.tunnelSettings.tunnelSegmentCount.toString()
     );
   }
 
-  private startDungeonUpdates(): void {
-    const updateDungeon = () => {
-      if (!this.isActive || !this.dungeonSettings.enabled) return;
+  private startTunnelUpdates(): void {
+    const updateTunnel = () => {
+      if (!this.isActive || !this.tunnelSettings.enabled) return;
 
       // Update magical shimmer animation
       const currentTime = performance.now();
       const shimmerPhase = (currentTime / 1000) * 0.5;
-      const animatedShimmer = this.currentLightingState.magicalShimmer * 
+      const animatedShimmer = this.currentLightingState.surfaceShimmer * 
         (0.9 + Math.sin(shimmerPhase) * 0.1);
 
-      if (this.cssConsciousnessController) {
-        this.cssConsciousnessController.queueCSSVariableUpdate(
+      if (this.cssController) {
+        this.cssController.queueCSSVariableUpdate(
           "--sn-magical-shimmer",
           animatedShimmer.toFixed(3)
         );
       }
 
       // Continue updates
-      setTimeout(updateDungeon, this.updateThrottleInterval);
+      setTimeout(updateTunnel, this.updateThrottleInterval);
     };
 
-    updateDungeon();
+    updateTunnel();
   }
 
   public override updateAnimation(deltaTime: number): void {
-    // Update dungeon corridor animations
-    if (this.dungeonSettings.enabled) {
-      this.updateDungeonAnimation(deltaTime);
+    // Update tunnel tunnel animations
+    if (this.tunnelSettings.enabled) {
+      this.updateTunnelAnimation(deltaTime);
     }
   }
 
-  private updateDungeonAnimation(deltaTime: number): void {
+  private updateTunnelAnimation(deltaTime: number): void {
     // Animate atmospheric effects
     const currentTime = performance.now();
     const atmosphericPhase = (currentTime / 1000) * 0.1;
@@ -449,8 +449,8 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
     const animatedHaze = this.currentLightingState.atmosphericHaze * 
       (0.95 + Math.sin(atmosphericPhase) * 0.05);
 
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+    if (this.cssController) {
+      this.cssController.queueCSSVariableUpdate(
         "--sn-animated-haze",
         animatedHaze.toFixed(3)
       );
@@ -459,21 +459,21 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
 
   public override async healthCheck(): Promise<HealthCheckResult> {
     const isHealthy =
-      this.dungeonSettings.enabled &&
+      this.tunnelSettings.enabled &&
       this.currentLightingState.timestamp > 0 &&
       this.musicSyncService !== null;
 
     return {
-      system: 'DungeonCorridorSystem',
+      system: 'TunnelVisualizationSystem',
       healthy: isHealthy,
       metrics: {
-        enabled: this.dungeonSettings.enabled,
+        enabled: this.tunnelSettings.enabled,
         lastUpdateTime: this.currentLightingState.timestamp,
         musicSyncConnected: !!this.musicSyncService,
         endLightIntensity: this.currentLightingState.endLightIntensity
       },
       issues: isHealthy ? [] : [
-        ...(this.dungeonSettings.enabled ? [] : ['System disabled']),
+        ...(this.tunnelSettings.enabled ? [] : ['System disabled']),
         ...(this.currentLightingState.timestamp > 0 ? [] : ['No updates received']),
         ...(this.musicSyncService ? [] : ['Music sync disconnected'])
       ]
@@ -513,33 +513,33 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
   // ========================================================================
 
   /**
-   * Enable or disable dungeon corridor effects
+   * Enable or disable tunnel tunnel effects
    */
-  public setDungeonEnabled(enabled: boolean): void {
-    this.dungeonSettings.dungeonEnabled = enabled;
+  public setTunnelEnabled(enabled: boolean): void {
+    this.tunnelSettings.tunnelEnabled = enabled;
     
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(
-        "--sn-dungeon-enabled",
+    if (this.cssController) {
+      this.cssController.queueCSSVariableUpdate(
+        "--sn-tunnel-enabled",
         enabled ? "1" : "0"
       );
     }
 
     Y3KDebug?.debug?.log(
-      "DungeonCorridorSystem",
-      `Dungeon corridors ${enabled ? 'enabled' : 'disabled'}`
+      "TunnelVisualizationSystem",
+      `Tunnel tunnels ${enabled ? 'enabled' : 'disabled'}`
     );
   }
 
   /**
-   * Update dungeon corridor settings
+   * Update tunnel tunnel settings
    */
-  public updateDungeonSettings(settings: Partial<DungeonCorridorSettings>): void {
-    Object.assign(this.dungeonSettings, settings);
+  public updateTunnelSettings(settings: Partial<TunnelVisualizationSettings>): void {
+    Object.assign(this.tunnelSettings, settings);
     
     Y3KDebug?.debug?.log(
-      "DungeonCorridorSystem",
-      "Dungeon settings updated", settings
+      "TunnelVisualizationSystem",
+      "Tunnel settings updated", settings
     );
   }
 
@@ -551,39 +551,39 @@ export class DungeonCorridorSystem extends BaseVisualSystem {
   }
 
   /**
-   * Get dungeon corridor settings
+   * Get tunnel tunnel settings
    */
-  public getDungeonSettings(): DungeonCorridorSettings {
-    return { ...this.dungeonSettings };
+  public getTunnelSettings(): TunnelVisualizationSettings {
+    return { ...this.tunnelSettings };
   }
 
   /**
    * Set lighting quality level for performance optimization
    */
   public setQualityLevel(level: 'low' | 'medium' | 'high'): void {
-    this.dungeonSettings.qualityLevel = level;
+    this.tunnelSettings.qualityLevel = level;
     
     // Adjust settings based on quality
     switch (level) {
       case 'low':
-        this.dungeonSettings.enableAtmosphericEffects = false;
-        this.dungeonSettings.enableComplexLighting = false;
-        this.dungeonSettings.corridorCount = 2;
+        this.tunnelSettings.enableAtmosphericEffects = false;
+        this.tunnelSettings.enableComplexLighting = false;
+        this.tunnelSettings.tunnelSegmentCount = 2;
         break;
       case 'medium':
-        this.dungeonSettings.enableAtmosphericEffects = true;
-        this.dungeonSettings.enableComplexLighting = false;
-        this.dungeonSettings.corridorCount = 3;
+        this.tunnelSettings.enableAtmosphericEffects = true;
+        this.tunnelSettings.enableComplexLighting = false;
+        this.tunnelSettings.tunnelSegmentCount = 3;
         break;
       case 'high':
-        this.dungeonSettings.enableAtmosphericEffects = true;
-        this.dungeonSettings.enableComplexLighting = true;
-        this.dungeonSettings.corridorCount = 4;
+        this.tunnelSettings.enableAtmosphericEffects = true;
+        this.tunnelSettings.enableComplexLighting = true;
+        this.tunnelSettings.tunnelSegmentCount = 4;
         break;
     }
 
     Y3KDebug?.debug?.log(
-      "DungeonCorridorSystem",
+      "TunnelVisualizationSystem",
       `Quality level set to ${level}`
     );
   }

@@ -1,4 +1,5 @@
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
+import { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 
 // Type definition for RGB color
 interface RgbColor {
@@ -341,15 +342,15 @@ export function lerpSmoothMusical(
   current: number,
   target: number,
   deltaTime: number,
-  musicContext: import("./MusicalLerpOrchestrator").MusicalContext,
-  animationType: import("./MusicalLerpOrchestrator").AnimationType = 'flow',
+  musicContext: import("@/core/animation/EnhancedMasterAnimationCoordinator").MusicalContext,
+  animationType: import("@/core/animation/EnhancedMasterAnimationCoordinator").AnimationType = 'flow',
   baseHalfLife?: number
 ): number {
-  // Import orchestrator dynamically to avoid circular dependencies
-  const { musicalLerpOrchestrator } = require("./MusicalLerpOrchestrator");
+  // Use consolidated EnhancedMasterAnimationCoordinator functionality
+  // Musical LERP functionality has been consolidated
   
-  // Calculate music-aware LERP parameters
-  const musicalParams = musicalLerpOrchestrator.calculateMusicalLerp(
+  // Calculate music-aware LERP parameters using consolidated functionality
+  const musicalParams = EnhancedMasterAnimationCoordinator.calculateMusicalLerp(
     musicContext,
     animationType,
     baseHalfLife
@@ -376,9 +377,9 @@ export function lerpSmoothMusicalPerformance(
   current: number,
   target: number,
   deltaTime: number,
-  musicContext: import("./MusicalLerpOrchestrator").MusicalContext,
-  performanceCoordinator: any, // PerformanceAwareLerpCoordinator
-  animationType: import("./MusicalLerpOrchestrator").AnimationType = 'flow',
+  musicContext: import("@/core/animation/EnhancedMasterAnimationCoordinator").MusicalContext,
+  performanceCoordinator: any, // EnhancedMasterAnimationCoordinator
+  animationType: import("@/core/animation/EnhancedMasterAnimationCoordinator").AnimationType = 'flow',
   baseHalfLife?: number
 ): number {
   if (!performanceCoordinator?.calculatePerformanceAwareMusicalLerp) {

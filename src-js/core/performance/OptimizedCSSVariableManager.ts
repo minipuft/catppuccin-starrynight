@@ -9,7 +9,7 @@
  */
 
 import { UnifiedCSSVariableManager } from '../css/UnifiedCSSVariableManager';
-import { UnifiedPerformanceCoordinator } from './UnifiedPerformanceCoordinator';
+import { UnifiedPerformanceCoordinator, PerformanceAnalyzer } from './UnifiedPerformanceCoordinator';
 import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 import { SimplePerformanceCoordinator } from './SimplePerformanceCoordinator';
 import { PerformanceBudgetManager } from './PerformanceBudgetManager';
@@ -53,7 +53,7 @@ export class OptimizedCSSVariableManager extends UnifiedCSSVariableManager {
 
   constructor(
     year3000Config: Year3000Config,
-    performanceCoordinator: UnifiedPerformanceCoordinator,
+    performanceCoordinator: PerformanceAnalyzer,
     optimizedConfig: Partial<OptimizedBatcherConfig> = {}
   ) {
     // Convert legacy config to new enhanced config format

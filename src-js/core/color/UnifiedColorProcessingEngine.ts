@@ -33,7 +33,7 @@ import type {
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 import {
-  MusicalOKLABCoordinator,
+  MusicalOKLABProcessor,
   type MusicalColorContext,
   type MusicalOKLABResult,
 } from "@/utils/color/MusicalOKLABCoordinator";
@@ -137,7 +137,7 @@ export class UnifiedColorProcessingEngine
 
   // === COLOR PROCESSING ===
   private oklabProcessor: OKLABColorProcessor;
-  private musicalOKLABCoordinator: MusicalOKLABCoordinator;
+  private musicalOKLABProcessor: MusicalOKLABProcessor;
 
   // === STATE MANAGEMENT ===
   private processingState: ProcessingState = {
@@ -209,7 +209,7 @@ export class UnifiedColorProcessingEngine
 
     // Initialize color processing systems
     this.oklabProcessor = new OKLABColorProcessor();
-    this.musicalOKLABCoordinator = new MusicalOKLABCoordinator(true);
+    this.musicalOKLABProcessor = new MusicalOKLABProcessor(true);
   }
 
   public async initialize(): Promise<void> {
@@ -406,8 +406,8 @@ export class UnifiedColorProcessingEngine
       // Emit unified event for ColorStateManager (single responsibility)
       unifiedEventBus.emit("colors:harmonized" as any, {
         processedColors: result.processedColors,
-        accentHex: result.accentHex || "#cba6f7",
-        accentRgb: result.accentRgb || "203,166,247",
+        accentHex: result.accentHex || "var(--sn-brightness-adjusted-accent-hex, #cba6f7)",
+        accentRgb: result.accentRgb || "var(--sn-brightness-adjusted-accent-rgb, 203, 166, 247)",
         strategies: [unifiedResult.coordinationMetrics.coordinationStrategy],
         coordinationMetrics: unifiedResult.coordinationMetrics,
         oklabData: unifiedResult.oklabData,
@@ -550,7 +550,7 @@ export class UnifiedColorProcessingEngine
         timestamp: context.timestamp,
       };
 
-      const oklabResult = await this.musicalOKLABCoordinator.processMusicalColors(musicalContext);
+      const oklabResult = await this.musicalOKLABProcessor.processMusicalColors(musicalContext);
       
       // Merge OKLAB-coordinated colors with strategy results
       const coordinatedColors = this.blendOKLABWithStrategies(allColors, oklabResult);
@@ -765,7 +765,7 @@ export class UnifiedColorProcessingEngine
     };
 
     const oklabResult =
-      await this.musicalOKLABCoordinator.processMusicalColors(
+      await this.musicalOKLABProcessor.processMusicalColors(
         musicalContext
       );
     this.metrics.oklabCoordinations++;
@@ -855,8 +855,8 @@ export class UnifiedColorProcessingEngine
       getEstimatedProcessingTime: (ctx: ColorContext) => 50, // 50ms estimate
       processColors: async (ctx: ColorContext) => ({
         processedColors: ctx.rawColors,
-        accentHex: "#cba6f7",
-        accentRgb: "203,166,247",
+        accentHex: "var(--sn-brightness-adjusted-accent-hex, #cba6f7)",
+        accentRgb: "var(--sn-brightness-adjusted-accent-rgb, 203, 166, 247)",
         context: ctx,
         metadata: {
           strategy: "fallback",
@@ -1294,10 +1294,10 @@ export class UnifiedColorProcessingEngine
   ): ColorResult {
     return {
       processedColors: {
-        fallback: "#cba6f7", // Default Catppuccin mauve
+        fallback: "var(--sn-brightness-adjusted-accent-hex, #cba6f7)", // Brightness-adjusted default
       },
-      accentHex: "#cba6f7",
-      accentRgb: "203,166,247",
+      accentHex: "var(--sn-brightness-adjusted-accent-hex, #cba6f7)",
+      accentRgb: "var(--sn-brightness-adjusted-accent-rgb, 203, 166, 247)",
       context: context, // Required by ColorResult interface
       metadata: {
         strategy: "fallback",

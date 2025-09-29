@@ -5,6 +5,7 @@
 
 @use "./_sn_card_base";
 @use "../core/_mixins" as *;
+@use "../core/_performance_mixins" as *;
 
 // =============================================================================
 // COSMIC FOUNDATION VARIABLES
@@ -55,11 +56,11 @@
 
 @keyframes stellar-breathing {
   0%, 100% {
-    transform: scale(calc(0.98 + var(--sn-card-breathing-scale) * 0.02));
+    transform: translateZ(0);
     filter: brightness(0.95);
   }
   50% {
-    transform: scale(calc(1.0 + var(--sn-card-breathing-scale) * 0.04));
+    transform: translateZ(0);
     filter: brightness(1.05);
   }
 }
@@ -99,9 +100,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card {
   position: relative;
   border-radius: var(--sn-card-stellar-radius);
   isolation: isolate;
-  // Remove layout containment (see Chrome lazy-load issue)
-  contain: style paint;
-  will-change: transform, box-shadow, border-color;
+  @include performance-hardware-acceleration;
 
   // === Gravitational Field Shadows ===
   --sn-card-gravitational-field-idle:
@@ -192,7 +191,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card {
 
     box-shadow: var(--sn-card-gravitational-field-active);
     border-color: rgba(var(--sn-card-harmonic-primary-rgb), 0.4);
-    transform: translateY(-2px) scale(1.02);
+    transform: translateY(-2px);
 
     animation:
       stellar-breathing calc(var(--sn-card-stellar-breath-duration) * 0.7) ease-in-out infinite,
@@ -211,7 +210,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card {
 
     box-shadow: var(--sn-card-gravitational-field-emergence);
     border-color: rgba(var(--sn-card-harmonic-complementary-rgb), 0.8);
-    transform: translateY(-6px) scale(1.06);
+    transform: translateY(-6px);
 
     animation:
       stellar-breathing calc(var(--sn-card-stellar-breath-duration) * 0.6) ease-in-out infinite,

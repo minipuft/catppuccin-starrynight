@@ -38,7 +38,7 @@ interface DiagnosticResult {
  * - Implements prevention strategies
  */
 export class WhiteLayerDiagnosticSystem {
-  private cssConsciousnessController: OptimizedCSSVariableManager | null;
+  private cssController: OptimizedCSSVariableManager | null;
   private diagnostics: WhiteLayerDiagnostics;
   private diagnosticResults: DiagnosticResult[];
   private monitoringInterval: number | null = null;
@@ -48,13 +48,13 @@ export class WhiteLayerDiagnosticSystem {
     // Initialize CSS Consciousness Controller if available
     const cssController = getGlobalOptimizedCSSController();
     if (cssController) {
-      this.cssConsciousnessController = cssController;
+      this.cssController = cssController;
     } else {
       Y3KDebug?.debug?.warn(
         "WhiteLayerDiagnosticSystem",
         "UnifiedCSSVariableManager not available, CSS visual-effects disabled"
       );
-      this.cssConsciousnessController = null;
+      this.cssController = null;
     }
 
     // Initialize diagnostics
@@ -345,23 +345,23 @@ export class WhiteLayerDiagnosticSystem {
     const totalIssues = this.diagnosticResults.length;
 
     // Update CSS variables (if controller is available)
-    if (this.cssConsciousnessController) {
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+    if (this.cssController) {
+      this.cssController.queueCSSVariableUpdate(
         "--sn-white-layer-critical-issues",
         criticalIssues.toString()
       );
 
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssController.queueCSSVariableUpdate(
         "--sn-white-layer-high-issues",
         highIssues.toString()
       );
 
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssController.queueCSSVariableUpdate(
         "--sn-white-layer-total-issues",
         totalIssues.toString()
       );
 
-      this.cssConsciousnessController.queueCSSVariableUpdate(
+      this.cssController.queueCSSVariableUpdate(
         "--sn-white-layer-status",
         criticalIssues > 0 ? "critical" : highIssues > 0 ? "warning" : "ok"
       );

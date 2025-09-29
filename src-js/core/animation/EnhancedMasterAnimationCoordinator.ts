@@ -1,15 +1,47 @@
-import { UnifiedPerformanceCoordinator } from '@/core/performance/UnifiedPerformanceCoordinator';
+import { PerformanceAnalyzer } from '@/core/performance/UnifiedPerformanceCoordinator';
 import { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
 import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import { temporalMemoryService } from "@/audio/TemporalMemoryService";
 import type { AdvancedSystemConfig, Year3000Config, MultiplierProfile } from '@/types/models';
 import type { PersonalAestheticSignature } from "@/types/signature";
-import type { CSSAnimationManager } from './CSSAnimationManager';
+// CSSAnimationManager consolidated into this class
+
+/**
+ * Internal CSS Animation Manager interface (consolidated from removed CSSAnimationManager)
+ */
+interface CSSAnimationManagerInterface {
+  triggerConsciousnessBreathing?(payload?: any): void;
+  [key: string]: any;
+}
 
 // 🔧 PHASE 3.1: Consolidated Animation System Imports
-import type { MusicalContext, AnimationType } from '@/utils/core/MusicalLerpOrchestrator';
-import type { PerformanceContext } from '@/core/performance/PerformanceAwareLerpCoordinator';
+// Types consolidated from MusicalLerpOrchestrator and PerformanceAwareLerpCoordinator
+export type AnimationType = 'flow' | 'pulse' | 'smooth' | 'sharp';
+
+export interface MusicalContext {
+  tempo: number;
+  energy: number;
+  valence: number;
+  danceability: number;
+  emotionalTemperature: number;
+  beatPhase: 'attack' | 'decay' | 'sustain' | 'release';
+  beatConfidence: number;
+  beatInterval: number;
+  timeSinceLastBeat: number;
+}
+
+export interface PerformanceContext {
+  currentFPS: number;
+  targetFPS: number;
+  frameTimeMs: number;
+  frameBudgetMs: number;
+  qualityLevel: "minimal" | "low" | "medium" | "high" | "ultra";
+  qualityScore: number;
+  deviceTier: "minimal" | "low" | "medium" | "high" | "ultra";
+  thermalState: "nominal" | "warm" | "hot" | "critical";
+  powerLevel: "high" | "balanced" | "battery-saver";
+}
 
 export interface AnimationSystem {
   onAnimate(deltaMs: number): void;
@@ -157,7 +189,7 @@ export interface EnhancedAnimationRegistration extends AnimationRegistration {
  * - Merges AnimationConductor and VisualFrameCoordinator functionality
  * - Integrates EmergentChoreographyEngine music-driven adaptation logic
  * - Provides unified animation registration and frame callback management
- * - Integrates with UnifiedPerformanceCoordinator for performance-aware coordination
+ * - Integrates with PerformanceAnalyzer for performance-aware coordination
  * - Eliminates redundant RAF loops throughout the system
  * - Handles music-driven multiplier calculations and adaptive coefficients
  * 
@@ -177,8 +209,8 @@ export class EnhancedMasterAnimationCoordinator {
   
   private config: AdvancedSystemConfig | Year3000Config;
   private eventBus: typeof unifiedEventBus;
-  private performanceCoordinator: UnifiedPerformanceCoordinator | null = null;
-  private cssAnimationManager: CSSAnimationManager | null = null;
+  private performanceCoordinator: PerformanceAnalyzer | null = null;
+  private cssAnimationManager: CSSAnimationManagerInterface | null = null;
   
   // Animation management
   private animations: Map<string, AnimationRegistration> = new Map();
@@ -318,8 +350,8 @@ export class EnhancedMasterAnimationCoordinator {
     );
     
     if (visualEffectsElements.length > 0) {
-      // Coordinate pulsing through CSSAnimationManager
-      this.cssAnimationManager.triggerConsciousnessBreathing(
+      // Coordinate pulsing through internal CSS animation methods
+      this.triggerConsciousnessBreathing(
         visualEffectsElements,
         energyLevel,
         tempo
@@ -347,7 +379,7 @@ export class EnhancedMasterAnimationCoordinator {
   private currentIntensity: number = 0.5;
   private emergentEventSubscriptions: string[] = [];
   
-  constructor(config: AdvancedSystemConfig | Year3000Config, performanceCoordinator?: UnifiedPerformanceCoordinator, cssAnimationManager?: CSSAnimationManager, cssVariableManager?: UnifiedCSSVariableManager) {
+  constructor(config: AdvancedSystemConfig | Year3000Config, performanceCoordinator?: PerformanceAnalyzer, cssAnimationManager?: CSSAnimationManagerInterface, cssVariableManager?: UnifiedCSSVariableManager) {
     this.config = config;
     this.eventBus = unifiedEventBus;
     this.performanceCoordinator = performanceCoordinator || null;
@@ -381,7 +413,7 @@ export class EnhancedMasterAnimationCoordinator {
   /**
    * Get or create singleton instance
    */
-  public static getInstance(config?: Year3000Config, performanceCoordinator?: UnifiedPerformanceCoordinator, cssAnimationManager?: CSSAnimationManager): EnhancedMasterAnimationCoordinator {
+  public static getInstance(config?: Year3000Config, performanceCoordinator?: PerformanceAnalyzer, cssAnimationManager?: CSSAnimationManagerInterface): EnhancedMasterAnimationCoordinator {
     if (!EnhancedMasterAnimationCoordinator.instance) {
       if (!config) {
         throw new Error('EnhancedMasterAnimationCoordinator requires config for first initialization');
@@ -394,7 +426,7 @@ export class EnhancedMasterAnimationCoordinator {
   /**
    * Register CSSAnimationManager for pulsing coordination
    */
-  public registerCSSAnimationManager(cssAnimationManager: CSSAnimationManager): void {
+  public registerCSSAnimationManager(cssAnimationManager: CSSAnimationManagerInterface): void {
     this.cssAnimationManager = cssAnimationManager;
     
     if (this.config.enableDebug) {
@@ -1375,6 +1407,42 @@ export class EnhancedMasterAnimationCoordinator {
   }
 
   /**
+   * Static musical LERP calculation (from MusicalLerpOrchestrator consolidation)
+   */
+  public static calculateMusicalLerp(
+    musicContext: MusicalContext,
+    animationType: AnimationType = 'flow',
+    baseHalfLife?: number
+  ): { halfLife: number; intensity: number; easing: (t: number) => number } {
+    // Musical parameters based on context
+    const tempoFactor = Math.max(0.3, Math.min(2.0, musicContext.tempo / 120));
+    const energyFactor = Math.max(0.1, Math.min(1.0, musicContext.energy));
+
+    // Base half-life calculation
+    const calculatedHalfLife = baseHalfLife || (16.67 * (2.0 - energyFactor) * (1.0 / tempoFactor));
+
+    // Animation type modifiers
+    const typeModifiers = {
+      'flow': { intensityMod: 0.7, easingPower: 1.2 },
+      'pulse': { intensityMod: 1.3, easingPower: 2.0 },
+      'smooth': { intensityMod: 0.5, easingPower: 0.8 },
+      'sharp': { intensityMod: 1.1, easingPower: 3.0 }
+    };
+
+    const modifier = typeModifiers[animationType] || typeModifiers.flow;
+    const intensity = energyFactor * modifier.intensityMod;
+
+    // Easing function based on animation type
+    const easing = (t: number) => Math.pow(t, modifier.easingPower);
+
+    return {
+      halfLife: calculatedHalfLife,
+      intensity,
+      easing
+    };
+  }
+
+  /**
    * CSS Animation Management (from CSSAnimationManager consolidation)
    */
   public createCSSAnimation(
@@ -1632,15 +1700,125 @@ export class EnhancedMasterAnimationCoordinator {
     // Stop all CSS animations
     this.activeCSSAnimations.forEach(animation => animation.cancel());
     this.activeCSSAnimations.clear();
-    
+
     // Clear LERP operations
     this.lerpOperations.clear();
-    
+
     // Clear CSS animation states
     this.cssAnimationStates.clear();
-    
+
     if (this.config.enableDebug) {
       console.log('[EnhancedMasterAnimationCoordinator] Consolidated systems destroyed');
     }
+  }
+
+  // ===================================================================
+  // CSS ANIMATION MANAGER IMPLEMENTATION (replaces external CSSAnimationManager)
+  // ===================================================================
+
+  /**
+   * Trigger consciousness breathing animation (legacy CSSAnimationManager API)
+   * This method provides compatibility with systems expecting CSSAnimationManager
+   */
+  public triggerConsciousnessBreathing(
+    elements: NodeListOf<Element> | Element[] | Element,
+    energyLevel: number = 0.5,
+    tempo: number = 120
+  ): void {
+    if (!elements) return;
+
+    const elementsArray = Array.isArray(elements)
+      ? elements
+      : elements instanceof NodeList
+        ? Array.from(elements)
+        : [elements];
+
+    elementsArray.forEach(element => {
+      if (element instanceof Element) {
+        // Apply CSS animation through CSS variables for performance
+        if (this.cssVariableManager) {
+          this.cssVariableManager.batchSetVariables({
+            '--sn-consciousness-energy': energyLevel.toString(),
+            '--sn-consciousness-tempo': tempo.toString(),
+            '--sn-consciousness-duration': `${Math.max(1000, 4000 / Math.max(0.5, energyLevel))}ms`,
+            '--sn-consciousness-active': '1',
+          });
+        }
+
+        // Apply CSS class for consciousness breathing animation
+        element.classList.add('sn-consciousness-breathing');
+
+        // Auto-remove animation class after duration
+        const duration = Math.max(1000, 4000 / Math.max(0.5, energyLevel));
+        setTimeout(() => {
+          element.classList.remove('sn-consciousness-breathing');
+        }, duration);
+      }
+    });
+
+    if (this.config.enableDebug) {
+      console.log(`[EnhancedMasterAnimationCoordinator] Triggered consciousness breathing - Energy: ${energyLevel.toFixed(2)}, Tempo: ${tempo} BPM`);
+    }
+  }
+
+  /**
+   * Stop consciousness breathing animation (legacy CSSAnimationManager API)
+   */
+  public stopConsciousnessBreathing(): void {
+    // Remove consciousness breathing from all elements
+    const elementsWithBreathing = document.querySelectorAll('.sn-consciousness-breathing');
+    elementsWithBreathing.forEach(element => {
+      element.classList.remove('sn-consciousness-breathing');
+    });
+
+    // Reset CSS variables
+    if (this.cssVariableManager) {
+      this.cssVariableManager.batchSetVariables({
+        '--sn-consciousness-active': '0',
+        '--sn-consciousness-energy': '0',
+        '--sn-consciousness-tempo': '120',
+      });
+    }
+
+    if (this.config.enableDebug) {
+      console.log('[EnhancedMasterAnimationCoordinator] Stopped consciousness breathing');
+    }
+  }
+
+  /**
+   * Trigger ripple effect animation
+   */
+  public triggerRipple(element: Element, intensity: number = 0.5): void {
+    if (!element || !(element instanceof Element)) return;
+
+    // Apply ripple effect through CSS variables
+    if (this.cssVariableManager) {
+      this.cssVariableManager.batchSetVariables({
+        '--sn-ripple-intensity': intensity.toString(),
+        '--sn-ripple-active': '1',
+      });
+    }
+
+    element.classList.add('sn-ripple-effect');
+
+    // Auto-remove after animation
+    setTimeout(() => {
+      element.classList.remove('sn-ripple-effect');
+      if (this.cssVariableManager) {
+        this.cssVariableManager.setVariable('--sn-ripple-active', '0');
+      }
+    }, 1000);
+  }
+
+  /**
+   * Get CSS Animation Manager interface for compatibility
+   * This allows the EnhancedMasterAnimationCoordinator to act as its own CSSAnimationManager
+   */
+  public getCSSAnimationManagerInterface(): CSSAnimationManagerInterface {
+    return {
+      triggerConsciousnessBreathing: this.triggerConsciousnessBreathing.bind(this),
+      stopConsciousnessBreathing: this.stopConsciousnessBreathing.bind(this),
+      triggerRipple: this.triggerRipple.bind(this),
+    };
   }
 }

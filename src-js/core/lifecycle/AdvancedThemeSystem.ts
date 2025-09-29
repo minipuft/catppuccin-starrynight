@@ -5,7 +5,7 @@ import { SystemCoordinator } from "@/core/integration/SystemCoordinator";
 
 // Color coordination imports for Strategy pattern
 import { globalColorStateManager } from "@/core/css/ColorStateManager";
-import { globalColorOrchestrator } from "@/visual/coordination/ColorCoordinator";
+import { globalUnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
 
 // Event-driven integration imports
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
@@ -1183,7 +1183,7 @@ export class AdvancedThemeSystem {
 
       // Initialize ColorOrchestrator for Strategy pattern coordination
       try {
-        await globalColorOrchestrator.initialize();
+        await globalUnifiedColorProcessingEngine.initialize();
         if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
           console.log(
             "🎨 [Year3000System] ColorOrchestrator initialized for strategy pattern coordination"

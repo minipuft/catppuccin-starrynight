@@ -254,8 +254,9 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
         case "year3000System":
           params.push(context.dependencies.year3000System);
           break;
-        case "cssConsciousnessController":
-          params.push(context.dependencies.cssConsciousnessController);
+        case "cssController":
+        case "cssConsciousnessController": // Backward compatibility
+          params.push(context.dependencies.cssController || context.dependencies.cssConsciousnessController);
           break;
         case "performanceCoordinator":
           params.push(context.dependencies.performanceCoordinator);
@@ -410,13 +411,13 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
       },
     });
 
-    // GlassmorphismManager - requires cssConsciousnessController, simplePerformanceCoordinator, and settingsManager
+    // GlassmorphismManager - requires cssController, simplePerformanceCoordinator, and settingsManager
     this.registerSystemConfig({
       systemKey: "GlassmorphismManager",
       requiredDependencies: [
         "config",
         "utils",
-        "cssConsciousnessController",
+        "cssController",
         "simplePerformanceCoordinator",
         "settingsManager",
       ],
@@ -425,14 +426,14 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
         parameterNames: [
           "config",
           "utils",
-          "cssConsciousnessController",
+          "cssController",
           "simplePerformanceCoordinator",
           "settingsManager",
         ],
         dependencyMapping: {
           config: "config",
           utils: "utils",
-          cssConsciousnessController: "cssConsciousnessController",
+          cssController: "cssController",
           simplePerformanceCoordinator: "simplePerformanceCoordinator",
           settingsManager: "settingsManager",
         },
@@ -486,15 +487,15 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
       },
     });
 
-    // SidebarSystemsIntegration - requires cssConsciousnessController
+    // SidebarSystemsIntegration - requires cssController
     this.registerSystemConfig({
       systemKey: "SidebarSystemsIntegration",
-      requiredDependencies: ["cssConsciousnessController"],
+      requiredDependencies: ["cssController"],
       optionalDependencies: [],
       constructorMapping: {
-        parameterNames: ["cssConsciousnessController"],
+        parameterNames: ["cssController"],
         dependencyMapping: {
-          cssConsciousnessController: "cssConsciousnessController",
+          cssController: "cssController",
         },
       },
       creationPreferences: {

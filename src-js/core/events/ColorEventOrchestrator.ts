@@ -1,7 +1,7 @@
 /**
- * ColorEventOrchestrator - Unified Color Processing Event Pipeline
+ * ColorEventManager - Unified Color Processing Event Pipeline
  *
- * Orchestrates the complete color processing flow using the unified event system,
+ * Manages the complete color processing flow using the unified event system,
  * eliminating duplication and providing a single, efficient pipeline for all
  * color-related events throughout the theme.
  *
@@ -14,13 +14,13 @@ import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { ColorContext, ColorResult } from "@/types/colorStrategy";
 import { settings } from "@/config";
 import {
-  MusicalOKLABCoordinator,
+  MusicalOKLABProcessor,
   type ProcessingOptions,
   type MusicalColorContext,
 } from "@/utils/color/MusicalOKLABCoordinator";
 import { BackgroundStrategyRegistry } from "@/visual/strategies/BackgroundStrategyRegistry";
 import { BackgroundStrategySelector } from "@/visual/strategies/BackgroundStrategySelector";
-import { EnhancedColorOrchestrator } from "@/visual/strategies/EnhancedColorOrchestrator";
+import { ColorHarmonyProcessor } from "@/visual/strategies/EnhancedColorOrchestrator";
 import { EventData, unifiedEventBus } from "./UnifiedEventBus";
 
 interface ColorProcessingMetrics {
@@ -42,17 +42,17 @@ interface ColorProcessingState {
   processingQueue: ColorContext[];
 }
 
-export class ColorEventOrchestrator {
-  private static instance: ColorEventOrchestrator | null = null;
+export class ColorEventManager {
+  private static instance: ColorEventManager | null = null;
 
   // Core processing components
-  private colorOrchestrator: EnhancedColorOrchestrator;
+  private colorOrchestrator: ColorHarmonyProcessor;
   private strategySelector: BackgroundStrategySelector;
   private strategyRegistry: BackgroundStrategyRegistry;
   private performanceAnalyzer: SimplePerformanceCoordinator;
 
   // Unified OKLAB coordination
-  private musicalOKLABCoordinator: MusicalOKLABCoordinator;
+  private musicalOKLABCoordinator: MusicalOKLABProcessor;
 
   // Processing state and metrics
   private processingState: ColorProcessingState = {
@@ -92,12 +92,12 @@ export class ColorEventOrchestrator {
     
     this.strategyRegistry = new BackgroundStrategyRegistry();
     this.strategySelector = new BackgroundStrategySelector();
-    this.colorOrchestrator = new EnhancedColorOrchestrator(
+    this.colorOrchestrator = new ColorHarmonyProcessor(
       this.performanceAnalyzer
     );
 
     // Initialize unified OKLAB coordination
-    this.musicalOKLABCoordinator = new MusicalOKLABCoordinator(true);
+    this.musicalOKLABCoordinator = new MusicalOKLABProcessor(true);
 
     // Initialize color orchestrator
     this.initializeColorOrchestrator();
@@ -117,11 +117,11 @@ export class ColorEventOrchestrator {
   /**
    * Get singleton instance
    */
-  public static getInstance(): ColorEventOrchestrator {
-    if (!ColorEventOrchestrator.instance) {
-      ColorEventOrchestrator.instance = new ColorEventOrchestrator();
+  public static getInstance(): ColorEventManager {
+    if (!ColorEventManager.instance) {
+      ColorEventManager.instance = new ColorEventManager();
     }
-    return ColorEventOrchestrator.instance;
+    return ColorEventManager.instance;
   }
 
   /**
@@ -157,10 +157,10 @@ export class ColorEventOrchestrator {
         }
       );
 
-      import("@/visual/strategies/LivingGradientStrategy").then(
-        ({ LivingGradientStrategy }) => {
+      import("@/visual/strategies/DynamicGradientStrategy").then(
+        ({ DynamicGradientStrategy }) => {
           this.strategyRegistry.register(
-            new LivingGradientStrategy()
+            new DynamicGradientStrategy()
           );
         }
       );
@@ -524,9 +524,9 @@ export class ColorEventOrchestrator {
   ): Promise<void> {
     try {
       const fallbackColors = {
-        primary: "#cba6f7", // Catppuccin mauve
+        primary: "var(--sn-brightness-adjusted-accent-hex, #cba6f7)", // Brightness-adjusted primary
         secondary: "#f5c2e7", // Catppuccin pink
-        accent: "#cba6f7",
+        accent: "var(--sn-brightness-adjusted-accent-hex, #cba6f7)", // Brightness-adjusted accent
         base: "#1e1e2e",
       };
 
@@ -534,7 +534,7 @@ export class ColorEventOrchestrator {
       unifiedEventBus.emitSync("colors:applied", {
         cssVariables: fallbackColors,
         accentHex: fallbackColors.accent,
-        accentRgb: "203,166,247",
+        accentRgb: "var(--sn-brightness-adjusted-accent-rgb, 203, 166, 247)",
         appliedAt: Date.now(),
       });
 
@@ -859,11 +859,11 @@ export class ColorEventOrchestrator {
         root.style.setProperty(cssVar, value || "");
       });
 
-      // Apply accent colors
-      root.style.setProperty("--sn-accent-hex", result.accentHex || "#cba6f7");
+      // Apply accent colors with brightness-adjusted fallbacks
+      root.style.setProperty("--sn-accent-hex", result.accentHex || "var(--sn-brightness-adjusted-accent-hex, #cba6f7)");
       root.style.setProperty(
         "--sn-accent-rgb",
-        result.accentRgb || "203,166,247"
+        result.accentRgb || "var(--sn-brightness-adjusted-accent-rgb, 203, 166, 247)"
       );
 
       // Apply enhanced metadata
@@ -906,7 +906,7 @@ export class ColorEventOrchestrator {
   /**
    * Get musical OKLAB coordinator for external access
    */
-  public getMusicalOKLABCoordinator(): MusicalOKLABCoordinator {
+  public getMusicalOKLABProcessor(): MusicalOKLABProcessor {
     return this.musicalOKLABCoordinator;
   }
 
@@ -948,9 +948,13 @@ export class ColorEventOrchestrator {
       "Color event orchestrator destroyed"
     );
 
-    ColorEventOrchestrator.instance = null;
+    ColorEventManager.instance = null;
   }
 }
 
 // Export singleton instance
-export const colorEventOrchestrator = ColorEventOrchestrator.getInstance();
+export const colorEventManager = ColorEventManager.getInstance();
+
+// Backward compatibility exports
+export const colorEventOrchestrator = colorEventManager;
+export const ColorEventOrchestrator = ColorEventManager;

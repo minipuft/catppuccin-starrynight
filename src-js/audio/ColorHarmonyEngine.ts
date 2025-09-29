@@ -36,7 +36,7 @@ import { PaletteExtensionManager } from "@/utils/core/PaletteExtensionManager";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { SemanticColorManager } from "@/utils/spicetify/SemanticColorManager";
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
-import { globalColorOrchestrator } from "@/visual/coordination/ColorCoordinator";
+import { globalUnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
 import {
   MusicEmotionAnalyzer,
   type AudioData,
@@ -741,18 +741,11 @@ export class ColorHarmonyEngine
       "ColorHarmonyEngine"
     );
 
-    // Register with ColorOrchestrator for strategy pattern coordination
-    try {
-      globalColorOrchestrator.registerStrategy(this);
-      if (this.config.enableDebug) {
-        console.log(
-          "🎨 [ColorHarmonyEngine] Registered with ColorOrchestrator as strategy processor."
-        );
-      }
-    } catch (error) {
-      console.warn(
-        "🎨 [ColorHarmonyEngine] Failed to register with ColorOrchestrator:",
-        error
+    // ColorHarmonyEngine operates as independent OKLAB color processor
+    // Direct integration with UnifiedColorProcessingEngine through event system
+    if (this.config.enableDebug) {
+      console.log(
+        "🎨 [ColorHarmonyEngine] Initialized as independent OKLAB color processor."
       );
     }
 
@@ -4017,9 +4010,12 @@ export class ColorHarmonyEngine
               continue;
             }
 
+            // Apply brightness mode multipliers before OKLAB processing
+            const adjustedColorHex = this.applyBrightnessModeMultipliers(colorHex);
+
             // Process through OKLAB with genre-adjusted aesthetics
             const oklabResult = this.oklabProcessor.processColor(
-              colorHex,
+              adjustedColorHex,
               genreAdjustedPreset
             );
             processedColors[colorKey] = oklabResult.enhancedHex;
@@ -4146,6 +4142,87 @@ export class ColorHarmonyEngine
     }
 
     return processedColors;
+  }
+
+  /**
+   * Apply progressive resistance to color intensity to prevent oversaturation
+   * Uses asymptotic approach - harder to increase as limits are approached
+   */
+  private applyProgressiveResistance(
+    currentValue: number,
+    multiplier: number,
+    upperBound: number,
+    lowerBound: number = 0
+  ): number {
+    // Normalize current value to 0-1 range relative to bounds
+    const normalizedValue = (currentValue - lowerBound) / (upperBound - lowerBound);
+
+    if (multiplier >= 1.0) {
+      // Applying increase - use asymptotic resistance near upper bound
+      const resistance = Math.pow(normalizedValue, 2);
+      const effectiveMultiplier = 1 + (multiplier - 1) * (1 - resistance);
+      const result = currentValue * effectiveMultiplier;
+      return Math.max(lowerBound, Math.min(result, upperBound));
+    } else {
+      // Applying decrease - use asymptotic resistance near lower bound
+      const resistance = Math.pow(1 - normalizedValue, 2);
+      const effectiveMultiplier = 1 - (1 - multiplier) * (1 - resistance);
+      const result = currentValue * effectiveMultiplier;
+      return Math.max(lowerBound, Math.min(result, upperBound));
+    }
+  }
+
+  /**
+   * Apply brightness mode multipliers from CSS variables to color processing
+   * This ensures user brightness/saturation settings override base Catppuccin colors
+   * Now includes progressive resistance to prevent oversaturation
+   */
+  private applyBrightnessModeMultipliers(colorHex: string): string {
+    try {
+      // Get current brightness mode multipliers from CSS
+      const computedStyle = getComputedStyle(document.documentElement);
+      const saturationMultiplier = parseFloat(computedStyle.getPropertyValue('--sn-bg-gradient-saturation')) || 1.0;
+      const brightnessMultiplier = parseFloat(computedStyle.getPropertyValue('--sn-bg-gradient-brightness')) || 1.0;
+      const contrastMultiplier = parseFloat(computedStyle.getPropertyValue('--sn-bg-gradient-contrast')) || 1.0;
+
+      // If all multipliers are default (1.0), no adjustment needed
+      if (saturationMultiplier === 1.0 && brightnessMultiplier === 1.0 && contrastMultiplier === 1.0) {
+        return colorHex;
+      }
+
+      // Convert hex to HSL for easier manipulation
+      const rgb = this.utils.hexToRgb(colorHex);
+      if (!rgb) return colorHex;
+
+      const hsl = this.utils.rgbToHsl(rgb.r, rgb.g, rgb.b);
+      if (!hsl) return colorHex;
+
+      // Apply brightness mode multipliers with progressive resistance
+      // Upper bounds: 85% saturation, 75% lightness | Lower bounds: 0% saturation, 15% lightness
+      const adjustedHsl = {
+        h: hsl.h, // Keep hue unchanged
+        s: this.applyProgressiveResistance(hsl.s, saturationMultiplier, 85, 0), // Clamped saturation
+        l: this.applyProgressiveResistance(hsl.l, brightnessMultiplier, 75, 15) // Clamped lightness
+      };
+
+      // Convert back to RGB and then hex
+      const adjustedRgb = this.utils.hslToRgb(adjustedHsl.h, adjustedHsl.s, adjustedHsl.l);
+      const adjustedHex = adjustedRgb ? this.utils.rgbToHex(adjustedRgb.r, adjustedRgb.g, adjustedRgb.b) : colorHex;
+
+      if (this.config?.enableDebug) {
+        console.log(`🎨 [ColorHarmonyEngine] Applied brightness mode multipliers:`, {
+          original: colorHex,
+          adjusted: adjustedHex,
+          multipliers: { saturation: saturationMultiplier, brightness: brightnessMultiplier, contrast: contrastMultiplier },
+          hslChange: { from: hsl, to: adjustedHsl }
+        });
+      }
+
+      return adjustedHex;
+    } catch (error) {
+      console.warn('[ColorHarmonyEngine] Failed to apply brightness mode multipliers:', error);
+      return colorHex; // Return original color on error
+    }
   }
 
   /**

@@ -34,7 +34,7 @@ interface HeaderEffectsState {
 }
 
 export class HeaderVisualEffectsController extends UnifiedSystemBase {
-  private cssController!: OptimizedCSSVariableManager;
+  protected override cssController!: OptimizedCSSVariableManager;
   private effectsState: HeaderEffectsState = {
     energy: 0.5,
     valence: 0.5,

@@ -410,7 +410,7 @@ export class MusicGlowEffectsManager implements IManagedSystem {
     
     // Only respond to positive, emotional music
     if (emotion && emotion.valence > 0.5) {
-      // Adjust mystical shimmer based on musical beauty
+      // Adjust ambient shimmer based on musical beauty
       this.glowState.shimmerEffect = Math.max(
         this.glowState.shimmerEffect,
         emotion.valence * intensity * 0.5
@@ -451,13 +451,13 @@ export class MusicGlowEffectsManager implements IManagedSystem {
   /**
    * Blend soft colors for ethereal effects
    */
-  private blendSoftColors(soft: RGB, mystical: RGB, blendFactor: number): RGB {
+  private blendSoftColors(soft: RGB, ambient: RGB, blendFactor: number): RGB {
     const factor = Math.max(0, Math.min(1, blendFactor));
     
     return {
-      r: Math.round(soft.r * (1 - factor) + mystical.r * factor),
-      g: Math.round(soft.g * (1 - factor) + mystical.g * factor),
-      b: Math.round(soft.b * (1 - factor) + mystical.b * factor)
+      r: Math.round(soft.r * (1 - factor) + ambient.r * factor),
+      g: Math.round(soft.g * (1 - factor) + ambient.g * factor),
+      b: Math.round(soft.b * (1 - factor) + ambient.b * factor)
     };
   }
 

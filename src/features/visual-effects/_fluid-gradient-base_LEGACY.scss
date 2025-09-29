@@ -1,0 +1,456 @@
+/**
+ * Liquid Visual Effects Base Styles
+ * 
+ * Core CSS variables and foundational styles for liquid visual effects effects
+ * - Visual effects-inspired variable system
+ * - Liquid physics simulation via CSS
+ * - Oil-on-water aesthetic foundation
+ * - Performance-optimized animations
+ */
+
+// =============================================================================
+// LIQUID VISUAL EFFECTS VARIABLES
+// =============================================================================
+
+:root {
+  // Fluid effects using design system variables
+  --fluid-gradients-opacity: var(--sn-ui-glass-opacity, 0.1); 
+  --fluid-gradients-blur: var(--sn-ui-glass-blur, 20px);
+  --fluid-gradients-saturation: var(--sn-bg-gradient-saturation, 1.1);
+  --fluid-gradients-duration: var(--sn-anim-transition-cosmic, 1200ms);
+
+  // Simplified fluid effects - remove quantum physics terminology
+  --fluid-phase: var(--sn-music-rhythm-phase, 0deg);
+  --fluid-amplitude: var(--sn-music-breathing-scale, 1.0);
+  --fluid-intensity: var(--sn-music-energy-level, 0.5);
+}
+
+// =============================================================================
+// LIQUID VISUAL EFFECTS FOUNDATION
+// =============================================================================
+
+.fluid-gradients-container {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  contain: layout style paint;
+  
+  // Ensure proper layering
+  z-index: 0;
+  
+  // Optimize for animations
+  will-change: transform, opacity, filter;
+  
+  // Smooth transitions
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fluid-gradients-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  
+  // Blending and opacity
+  mix-blend-mode: overlay;
+  opacity: var(--fluid-gradients-opacity, 0.3);
+  
+  // Performance optimizations
+  contain: layout style paint;
+  will-change: opacity, transform, filter;
+  
+  // Smooth transitions
+  transition: opacity 300ms ease-out;
+}
+
+// =============================================================================
+// OIL-ON-WATER EFFECTS
+// =============================================================================
+
+.liquid-oil-slick {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  // Dynamic conic gradient using design system
+  background: conic-gradient(
+    from var(--fluid-phase),
+    rgba(var(--sn-musical-oklab-primary-rgb), calc(var(--fluid-intensity) * 0.12)) 0%,
+    rgba(var(--sn-musical-oklab-accent-rgb), calc(var(--fluid-intensity) * 0.14)) 25%,
+    rgba(var(--sn-musical-oklab-highlight-rgb), calc(var(--fluid-intensity) * 0.13)) 50%,
+    rgba(var(--sn-musical-oklab-shadow-rgb), calc(var(--fluid-intensity) * 0.15)) 75%,
+    rgba(var(--sn-musical-oklab-primary-rgb), calc(var(--fluid-intensity) * 0.11)) 100%
+  );
+  
+  // Backdrop filter using design system
+  backdrop-filter: 
+    blur(var(--fluid-gradients-blur)) 
+    saturate(var(--fluid-gradients-saturation))
+    hue-rotate(calc(var(--fluid-phase) * 0.5));
+  
+  // Transform based on design system variables
+  transform: 
+    scale(calc(1 + var(--fluid-amplitude) * 0.02))
+    rotate(calc(var(--fluid-phase) * 0.8));
+  
+  // Oil slick animation
+  animation: liquid-oil-slick 
+    calc(var(--fluid-gradients-duration, 12) * 1s) 
+    ease-in-out infinite;
+  
+  // Performance optimizations
+  contain: layout style paint;
+  will-change: transform, filter, background;
+}
+
+.liquid-surface-tension {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  // Surface tension highlight
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, calc(var(--fluid-gradients-tension, 0.1) * var(--visual-effects-coherence, 0.7))) 0%,
+    rgba(255, 255, 255, calc(var(--fluid-gradients-tension, 0.1) * var(--visual-effects-coherence, 0.7) * 0.7)) 25%,
+    rgba(255, 255, 255, calc(var(--fluid-gradients-tension, 0.1) * var(--visual-effects-coherence, 0.7) * 0.4)) 50%,
+    rgba(255, 255, 255, calc(var(--fluid-gradients-tension, 0.1) * var(--visual-effects-coherence, 0.7) * 0.2)) 75%,
+    transparent 100%
+  );
+  
+  // Transform based on visual effects amplitude
+  transform: 
+    scale(calc(1 + var(--visual-effects-amplitude, 0.5) * 0.05))
+    rotate(calc(var(--visual-effects-phase, 0) * 2deg));
+  
+  // Blend mode for realistic surface tension
+  mix-blend-mode: soft-light;
+  
+  // Surface tension animation
+  animation: liquid-surface-tension 
+    calc(var(--fluid-gradients-duration, 8) * 1s) 
+    ease-in-out infinite;
+  
+  // Performance optimizations
+  contain: layout style paint;
+  will-change: transform, opacity;
+}
+
+.liquid-interference-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  // Interference pattern using repeating gradients
+  background: 
+    repeating-linear-gradient(
+      calc(var(--visual-effects-phase, 0) * 90deg),
+      transparent 0%,
+      rgba(255, 255, 255, calc(var(--fluid-gradients-interference, 0.05) * var(--visual-effects-coherence, 0.7))) 1%,
+      rgba(255, 255, 255, calc(var(--fluid-gradients-interference, 0.05) * var(--visual-effects-coherence, 0.7) * 0.5)) 2%,
+      transparent 3%,
+      transparent 4%
+    ),
+    repeating-linear-gradient(
+      calc(var(--visual-effects-phase, 0) * 90deg + 45deg),
+      transparent 0%,
+      rgba(255, 255, 255, calc(var(--fluid-gradients-interference, 0.05) * var(--visual-effects-coherence, 0.7) * 0.7)) 1.5%,
+      rgba(255, 255, 255, calc(var(--fluid-gradients-interference, 0.05) * var(--visual-effects-coherence, 0.7) * 0.3)) 3%,
+      transparent 4.5%,
+      transparent 6%
+    );
+  
+  // Blend mode for interference effect
+  mix-blend-mode: overlay;
+  
+  // Opacity based on visual effects coherence
+  opacity: var(--visual-effects-coherence, 0.7);
+  
+  // Interference animation
+  animation: liquid-interference 
+    calc(var(--fluid-gradients-duration, 10) * 1s) 
+    linear infinite;
+  
+  // Performance optimizations
+  contain: layout style paint;
+  will-change: background-position, opacity;
+}
+
+.liquid-chromatic-aberration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  // Chromatic aberration gradient
+  background: 
+    linear-gradient(
+      90deg,
+      rgba(255, 0, 0, calc(var(--fluid-gradients-chromatic, 0.08) * var(--visual-effects-probability, 1))) 0%,
+      rgba(255, 0, 0, calc(var(--fluid-gradients-chromatic, 0.08) * var(--visual-effects-probability, 1) * 0.7)) 10%,
+      transparent 20%,
+      transparent 80%,
+      rgba(0, 0, 255, calc(var(--fluid-gradients-chromatic, 0.08) * var(--visual-effects-probability, 1) * 0.7)) 90%,
+      rgba(0, 0, 255, calc(var(--fluid-gradients-chromatic, 0.08) * var(--visual-effects-probability, 1))) 100%
+    );
+  
+  // Blend mode for chromatic aberration
+  mix-blend-mode: multiply;
+  
+  // Transform based on visual effects wave function
+  transform: 
+    translateX(calc(var(--visual-effects-wave-real, 0) * 1px)) 
+    translateY(calc(var(--visual-effects-wave-imaginary, 0) * 0.5px));
+  
+  // Chromatic aberration animation
+  animation: liquid-chromatic-aberration 
+    calc(var(--fluid-gradients-duration, 6) * 1s) 
+    ease-in-out infinite;
+  
+  // Performance optimizations
+  contain: layout style paint;
+  will-change: transform, opacity;
+}
+
+// =============================================================================
+// LIQUID VISUAL EFFECTS ANIMATIONS
+// =============================================================================
+
+@keyframes liquid-oil-slick {
+  0% {
+    backdrop-filter:
+      blur(calc(var(--fluid-gradients-blur, 4) * 0.5px))
+      saturate(calc(var(--fluid-gradients-saturation, 1.5) * 0.8))
+      hue-rotate(0deg);
+    transform: scale(1);
+    opacity: 0.9;
+  }
+
+  25% {
+    backdrop-filter:
+      blur(calc(var(--fluid-gradients-blur, 4) * 1.5px))
+      saturate(calc(var(--fluid-gradients-saturation, 1.5) * 1.3))
+      hue-rotate(90deg);
+    transform: scale(1.015);
+    opacity: 0.7;
+  }
+
+  50% {
+    backdrop-filter:
+      blur(calc(var(--fluid-gradients-blur, 4) * 1.8px))
+      saturate(calc(var(--fluid-gradients-saturation, 1.5) * 1.1))
+      hue-rotate(180deg);
+    transform: scale(0.985);
+    opacity: 0.8;
+  }
+
+  75% {
+    backdrop-filter:
+      blur(calc(var(--fluid-gradients-blur, 4) * 1.0px))
+      saturate(calc(var(--fluid-gradients-saturation, 1.5) * 0.9))
+      hue-rotate(270deg);
+    transform: scale(1.005);
+    opacity: 0.6;
+  }
+
+  100% {
+    backdrop-filter:
+      blur(calc(var(--fluid-gradients-blur, 4) * 0.5px))
+      saturate(calc(var(--fluid-gradients-saturation, 1.5) * 0.8))
+      hue-rotate(360deg);
+    transform: scale(1);
+    opacity: 0.9;
+  }
+}
+
+@keyframes liquid-surface-tension {
+  0%, 100% {
+    transform: scale(1);
+    opacity: calc(var(--fluid-gradients-tension, 0.1) * 8);
+  }
+
+  33% {
+    transform: scale(1.02);
+    opacity: calc(var(--fluid-gradients-tension, 0.1) * 6);
+  }
+
+  66% {
+    transform: scale(0.98);
+    opacity: calc(var(--fluid-gradients-tension, 0.1) * 7);
+  }
+}
+
+@keyframes liquid-interference {
+  0% { 
+    background-position: 0% 0%, 0% 0%;
+    opacity: var(--visual-effects-coherence, 0.7);
+  }
+  
+  25% { 
+    background-position: 25% 25%, -25% -25%;
+    opacity: calc(var(--visual-effects-coherence, 0.7) * 0.8);
+  }
+  
+  50% { 
+    background-position: 50% 50%, -50% -50%;
+    opacity: calc(var(--visual-effects-coherence, 0.7) * 0.9);
+  }
+  
+  75% { 
+    background-position: 75% 75%, -75% -75%;
+    opacity: calc(var(--visual-effects-coherence, 0.7) * 0.8);
+  }
+  
+  100% { 
+    background-position: 100% 100%, -100% -100%;
+    opacity: var(--visual-effects-coherence, 0.7);
+  }
+}
+
+@keyframes liquid-chromatic-aberration {
+  0%, 100% { 
+    transform: translateX(0) translateY(0);
+    opacity: calc(var(--fluid-gradients-chromatic, 0.08) * 10);
+  }
+  
+  25% { 
+    transform: 
+      translateX(calc(var(--visual-effects-wave-real, 0) * 0.8px)) 
+      translateY(calc(var(--visual-effects-wave-imaginary, 0) * -0.4px));
+    opacity: calc(var(--fluid-gradients-chromatic, 0.08) * 12);
+  }
+  
+  50% { 
+    transform: 
+      translateX(calc(var(--visual-effects-wave-real, 0) * -0.8px)) 
+      translateY(calc(var(--visual-effects-wave-imaginary, 0) * 0.4px));
+    opacity: calc(var(--fluid-gradients-chromatic, 0.08) * 8);
+  }
+  
+  75% { 
+    transform: 
+      translateX(calc(var(--visual-effects-wave-real, 0) * 0.4px)) 
+      translateY(calc(var(--visual-effects-wave-imaginary, 0) * -0.8px));
+    opacity: calc(var(--fluid-gradients-chromatic, 0.08) * 11);
+  }
+}
+
+// =============================================================================
+// ACCESSIBILITY AND PERFORMANCE
+// =============================================================================
+
+// Respect reduced motion preferences
+@media (prefers-reduced-motion: reduce) {
+  .liquid-oil-slick,
+  .liquid-surface-tension,
+  .liquid-interference-pattern,
+  .liquid-chromatic-aberration {
+    animation: none !important;
+    
+    // Provide static liquid visual effects effect
+    opacity: calc(var(--fluid-gradients-opacity, 0.3) * 0.5);
+    
+    // Remove transforms for reduced motion
+    transform: none !important;
+    
+    // Simplify effects
+    backdrop-filter: blur(2px) saturate(1.2) !important;
+    filter: none !important;
+  }
+  
+  .fluid-gradients-layer {
+    // Reduce opacity for reduced motion
+    opacity: calc(var(--fluid-gradients-opacity, 0.3) * 0.3);
+  }
+}
+
+// High contrast mode adjustments
+@media (prefers-contrast: high) {
+  .fluid-gradients-layer {
+    opacity: calc(var(--fluid-gradients-opacity, 0.3) * 0.5);
+  }
+  
+  .liquid-oil-slick,
+  .liquid-surface-tension,
+  .liquid-interference-pattern,
+  .liquid-chromatic-aberration {
+    opacity: 0.7;
+  }
+}
+
+// Performance optimizations for low-end devices
+@media (max-width: 768px) and (max-height: 1024px) {
+  .fluid-gradients-layer {
+    // Reduce complexity on mobile
+    opacity: calc(var(--fluid-gradients-opacity, 0.3) * 0.7);
+  }
+  
+  .liquid-oil-slick {
+    // Simplify backdrop filter on mobile
+    backdrop-filter: blur(2px) saturate(1.3);
+  }
+  
+  .liquid-interference-pattern {
+    // Disable interference pattern on mobile for performance
+    display: none;
+  }
+  
+  .liquid-chromatic-aberration {
+    // Simplify chromatic aberration on mobile
+    opacity: 0.5;
+  }
+}
+
+// =============================================================================
+// UTILITY CLASSES
+// =============================================================================
+
+.fluid-gradients-minimal {
+  .fluid-gradients-layer {
+    opacity: calc(var(--fluid-gradients-opacity, 0.3) * 0.4);
+  }
+  
+  .liquid-interference-pattern {
+    display: none;
+  }
+  
+  .liquid-chromatic-aberration {
+    opacity: 0.3;
+  }
+}
+
+.fluid-gradients-intense {
+  .fluid-gradients-layer {
+    opacity: calc(var(--fluid-gradients-opacity, 0.3) * 1.5);
+  }
+  
+  .liquid-oil-slick {
+    backdrop-filter: 
+      blur(calc(var(--fluid-gradients-blur, 4) * 1.5px)) 
+      saturate(calc(var(--fluid-gradients-saturation, 1.5) * 1.3));
+  }
+}
+
+.fluid-gradients-disabled {
+  .fluid-gradients-layer {
+    display: none !important;
+  }
+}
+
+/* ============================================================================ */
+/* STREAMLINED LEGACY COMPATIBILITY - Phase 4 Optimization */
+/* Uses centralized legacy system from core/_mixins.scss */
+/* ============================================================================ */
+
+// Legacy compatibility now handled by centralized consciousness-bridge mixin
+// Applied in core systems to reduce duplication

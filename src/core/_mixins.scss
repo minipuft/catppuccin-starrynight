@@ -60,78 +60,78 @@
   
   @if $variant == 'gentle' {
     animation-name: breathing-gentle;
-    // Gentle breathing keyframes - subtle effects for content areas
+    // Gentle breathing keyframes - subtle effects for content areas (NO SCALING)
     @keyframes breathing-gentle {
       0%, 100% {
-        transform: translateZ(0) scale(1);
+        transform: translateZ(0);
         opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 0.95 * #{$intensity-scale});
-        filter: 
-          brightness(var(--sn-bg-gradient-brightness, 1.0)) 
-          saturate(var(--sn-bg-gradient-saturation, 1.1)) 
+        filter:
+          brightness(var(--sn-bg-gradient-brightness, 1.0))
+          saturate(var(--sn-bg-gradient-saturation, 1.1))
           contrast(var(--sn-bg-gradient-contrast, 1.0));
       }
       50% {
-        transform: translateZ(0) scale(calc(1 + var(--sn-music-breathing-scale, 0.02) * 0.75 * #{$intensity-scale}));
+        transform: translateZ(0);
         opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 1.05 * #{$intensity-scale});
-        filter: 
-          brightness(calc(var(--sn-bg-gradient-brightness, 1.0) * (1 + 0.03 * #{$intensity-scale}))) 
-          saturate(calc(var(--sn-bg-gradient-saturation, 1.1) * (1 + 0.08 * #{$intensity-scale}))) 
+        filter:
+          brightness(calc(var(--sn-bg-gradient-brightness, 1.0) * (1 + 0.03 * #{$intensity-scale})))
+          saturate(calc(var(--sn-bg-gradient-saturation, 1.1) * (1 + 0.08 * #{$intensity-scale})))
           contrast(calc(var(--sn-bg-gradient-contrast, 1.0) * (1 + 0.02 * #{$intensity-scale})));
       }
     }
   } @else if $variant == 'energetic' {
     animation-name: breathing-energetic;
     animation-duration: calc(var(#{$duration-var}, 4000ms) * 0.6);
-    // Energetic breathing keyframes - enhanced effects for high energy
+    // Energetic breathing keyframes - enhanced effects for high energy (NO SCALING)
     @keyframes breathing-energetic {
       0%, 100% {
-        transform: translateZ(0) scale(1);
+        transform: translateZ(0);
         opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 0.9 * #{$intensity-scale});
-        filter: 
-          brightness(var(--sn-bg-gradient-brightness, 1.0)) 
-          saturate(var(--sn-bg-gradient-saturation, 1.1)) 
+        filter:
+          brightness(var(--sn-bg-gradient-brightness, 1.0))
+          saturate(var(--sn-bg-gradient-saturation, 1.1))
           contrast(var(--sn-bg-gradient-contrast, 1.0));
       }
       50% {
-        transform: translateZ(0) scale(calc(1 + var(--sn-music-breathing-scale, 0.05) * #{$intensity-scale}));
+        transform: translateZ(0);
         opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 1.15 * #{$intensity-scale});
-        filter: 
-          brightness(calc(var(--sn-bg-gradient-brightness, 1.0) * (1 + 0.08 * #{$intensity-scale}))) 
-          saturate(calc(var(--sn-bg-gradient-saturation, 1.1) * (1 + 0.25 * #{$intensity-scale}))) 
+        filter:
+          brightness(calc(var(--sn-bg-gradient-brightness, 1.0) * (1 + 0.08 * #{$intensity-scale})))
+          saturate(calc(var(--sn-bg-gradient-saturation, 1.1) * (1 + 0.25 * #{$intensity-scale})))
           contrast(calc(var(--sn-bg-gradient-contrast, 1.0) * (1 + 0.08 * #{$intensity-scale})));
       }
     }
   } @else if $variant == 'meditative' {
     animation-name: breathing-meditative;
     animation-duration: calc(var(#{$duration-var}, 4000ms) * 1.5);
-    // Meditative breathing keyframes - minimal effects for calm music
+    // Meditative breathing keyframes - minimal effects for calm music (NO SCALING)
     @keyframes breathing-meditative {
       0%, 100% {
-        transform: translateZ(0) scale(1);
+        transform: translateZ(0);
         opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 0.85 * #{$intensity-scale});
       }
       50% {
-        transform: translateZ(0) scale(calc(1 + var(--sn-music-breathing-scale, 0.02) * 0.4 * #{$intensity-scale}));
+        transform: translateZ(0);
         opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 0.95 * #{$intensity-scale});
       }
     }
   } @else if $variant == 'cosmic' {
     animation-name: breathing-cosmic;
     animation-duration: calc(var(#{$duration-var}, 4000ms) * 0.75);
-    // Cosmic breathing keyframes - maximum effects for dramatic moments
+    // Cosmic breathing keyframes - maximum effects for dramatic moments (NO SCALING)
     @keyframes breathing-cosmic {
       0%, 100% {
-        transform: translateZ(0) scale(1);
+        transform: translateZ(0);
         opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 0.88 * #{$intensity-scale});
-        filter: 
+        filter:
           brightness(var(--sn-bg-gradient-brightness, 1.0))
           saturate(var(--sn-bg-gradient-saturation, 1.1))
           contrast(var(--sn-bg-gradient-contrast, 1.0));
       }
       50% {
-        transform: translateZ(0) scale(calc(1 + var(--sn-music-breathing-scale, 0.02) * 4 * #{$intensity-scale}));
+        transform: translateZ(0);
         opacity: calc(var(--sn-ui-glass-opacity, 0.1) * 1.25 * #{$intensity-scale});
-        filter: 
+        filter:
           brightness(calc(var(--sn-bg-gradient-brightness, 1.0) * (1 + 0.12 * #{$intensity-scale})))
           saturate(calc(var(--sn-bg-gradient-saturation, 1.1) * (1 + 0.4 * #{$intensity-scale})))
           contrast(calc(var(--sn-bg-gradient-contrast, 1.0) * (1 + 0.1 * #{$intensity-scale})))
@@ -143,16 +143,16 @@
     // Depth breathing keyframes - backdrop-filter based for depth layers
     @keyframes breathing-depth {
       0%, 100% {
-        transform: scale(1);
+        transform: translateZ(0);
         opacity: calc(var(--depth-effects-intensity, 0.5) * 0.6 * #{$intensity-scale});
-        backdrop-filter: 
+        backdrop-filter:
           contrast(calc(1 + var(--depth-effects-intensity, 0.5) * 0.02 * #{$intensity-scale}))
           saturate(calc(1 + var(--depth-effects-intensity, 0.5) * 0.03 * #{$intensity-scale}));
       }
       50% {
-        transform: scale(calc(1 + var(--depth-effects-intensity, 0.5) * 0.02 * #{$intensity-scale}));
+        transform: translateZ(0);
         opacity: calc(var(--depth-effects-intensity, 0.5) * 0.8 * #{$intensity-scale});
-        backdrop-filter: 
+        backdrop-filter:
           contrast(calc(1 + var(--depth-effects-intensity, 0.5) * 0.05 * #{$intensity-scale}))
           saturate(calc(1 + var(--depth-effects-intensity, 0.5) * 0.08 * #{$intensity-scale}));
       }

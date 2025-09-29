@@ -163,14 +163,14 @@ body,
   }
 }
 
-/* Unified breathing animation using design system */
+/* Unified breathing animation using design system - NO SCALING */
 @keyframes visual-effects-breathing {
   0%, 100% {
-    transform: translateZ(0) scale(1);
+    transform: translateZ(0);
     opacity: calc(var(--visual-effects-layer-opacity) * 0.9);
   }
   50% {
-    transform: translateZ(0) scale(var(--sn-music-breathing-scale, 1.02));
+    transform: translateZ(0);
     opacity: calc(var(--visual-effects-layer-opacity) * 1.1);
   }
 }

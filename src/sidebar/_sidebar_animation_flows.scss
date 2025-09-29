@@ -23,6 +23,7 @@
 /**/
 /* ████████████████████████████████████████████████████████████████████████████████*/
 @use "../core/_mixins" as *;
+@use "../core/_performance_mixins" as *;
 
 :root {
   /* === BILATERAL VISUAL EFFECTS CORE VARIABLES ===*/
@@ -86,7 +87,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  contain: layout style paint;
+  @include performance-hardware-acceleration;
   
   /* Visual effects flow background */
   background: 

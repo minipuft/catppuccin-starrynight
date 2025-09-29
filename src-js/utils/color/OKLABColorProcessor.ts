@@ -87,8 +87,8 @@ export class OKLABColorProcessor {
       name: "Cosmic Enhancement",
       description:
         "Maximum enhancement for Year 3000 visual-effects experiences",
-      lightnessBoost: 1.2,
-      chromaBoost: 1.35,
+      lightnessBoost: 1.1, // Reduced from 1.2
+      chromaBoost: 1.2,    // Reduced from 1.35
       shadowReduction: 0.2,
       vibrantThreshold: 0.15,
     },

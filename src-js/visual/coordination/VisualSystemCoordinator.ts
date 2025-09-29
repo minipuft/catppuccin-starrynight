@@ -48,7 +48,7 @@
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { CSSAnimationManager } from "@/core/animation/CSSAnimationManager";
+// CSSAnimationManager consolidated into EnhancedMasterAnimationCoordinator
 import { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
@@ -62,7 +62,6 @@ import * as Utils from "@/utils/core/ThemeUtilities";
 // Visual System imports
 // import "@/visual/effects/ParticleConsciousnessModule"; // Disabled - converted to CSS-only
 import { WebGLGradientBackgroundSystem } from "@/visual/background/WebGLRenderer";
-import { CSSBlobFallbackSystem } from "@/visual/css-fallbacks/CSSBlobFallbackSystem";
 import { UIEffectsController } from "@/visual/effects/UIVisualEffectsController";
 import { HeaderVisualEffectsController } from "@/visual/effects/HeaderVisualEffectsController";
 import { SidebarVisualEffectsSystem } from "@/visual/ui/SidebarVisualEffectsSystem";
@@ -76,7 +75,7 @@ import { SpotifyUIApplicationSystem } from "@/visual/ui/SpotifyUIApplicationSyst
 // Consciousness engine imports for integration
 import { RedEnergyBurstSystem } from "@/visual/effects/HighEnergyEffectsController";
 import { MusicGlowEffectsManager } from "@/visual/effects/GlowEffectsController";
-import { AnimationEffectsController } from "@/visual/effects/BreathingEffectsController";
+import { AnimationEffectsController } from "@/visual/effects/AnimationEffectsController";
 
 // Interface imports
 import { IManagedSystem, HealthCheckResult } from "@/types/systems";
@@ -119,7 +118,6 @@ export type VisualSystemKey =
   | "UIVisualEffects"
   | "HeaderVisualEffects"
   | "WebGLBackground"
-  | "CSSBlobFallback"
   | "MusicBeatSync"
   | "OrganicBreathing"
   | "InteractionTracking"
@@ -128,7 +126,7 @@ export type VisualSystemKey =
   | "EtherealBeauty"
   | "NaturalHarmony"
   | "GradientConductor"
-  | "CSSAnimationManager"
+  // CSSAnimationManager consolidated into EnhancedMasterAnimationCoordinator
   | "GlowEffects"
   | "UnifiedParticle"
   | "DepthLayeredGradient"
@@ -345,14 +343,6 @@ export class VisualSystemCoordinator implements IManagedSystem {
       "eventBus",
     ]);
 
-    this.systemRegistry.set("CSSBlobFallback", CSSBlobFallbackSystem);
-    this.systemDependencies.set("CSSBlobFallback", [
-      "performanceAnalyzer",
-      "musicSyncService",
-      "settingsManager",
-    ]);
-
-
     this.systemRegistry.set("MusicBeatSync", MusicBeatSynchronizer);
     this.systemDependencies.set("MusicBeatSync", [
       "performanceAnalyzer",
@@ -408,11 +398,8 @@ export class VisualSystemCoordinator implements IManagedSystem {
       "eventBus",
     ]);
 
-    this.systemRegistry.set("CSSAnimationManager", CSSAnimationManager);
-    this.systemDependencies.set("CSSAnimationManager", [
-      "cssVariableController",
-      "animationCoordinator",
-    ]);
+    // CSSAnimationManager consolidated into EnhancedMasterAnimationCoordinator
+    // Use EnhancedMasterAnimationCoordinator for animation management
 
     // EmergentChoreography consolidated into EnhancedMasterAnimationCoordinator
     // ParticleField consolidated into Particle (ParticleConsciousnessModule)
@@ -581,16 +568,8 @@ export class VisualSystemCoordinator implements IManagedSystem {
       return system;
     }
 
-    // Special handling for CSSAnimationManager with direct dependency injection
-    if (key === "CSSAnimationManager") {
-      const system = new SystemClass(
-        this.config,
-        this.cssVariableController,
-        this.animationCoordinator
-      ) as T;
-      this.injectDependencies(system, key);
-      return system;
-    }
+    // CSSAnimationManager was consolidated into EnhancedMasterAnimationCoordinator
+    // EnhancedMasterAnimationCoordinator is not a visual system, so removed from this factory
 
     // Special handling for visual effects systems with holographic UI integration
     if (
@@ -679,7 +658,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
       (system as any).setMusicSyncService(this.musicSyncService);
     }
 
-    // Inject animation coordinator (for CSSAnimationManager)
+    // Inject animation coordinator (for EnhancedMasterAnimationCoordinator)
     if (
       dependencies.includes("animationCoordinator") &&
       this.animationCoordinator &&

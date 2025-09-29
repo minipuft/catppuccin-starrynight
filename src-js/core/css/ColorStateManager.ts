@@ -103,7 +103,7 @@ export class ColorStateManager implements IManagedSystem {
 
     // Initialize CSS controller - use globalThis to access Year3000System
     const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System?.cssConsciousnessController || 
+    this.cssController = year3000System?.cssController ||
                         getGlobalOptimizedCSSController();
 
     // Listen for settings changes
@@ -186,7 +186,7 @@ export class ColorStateManager implements IManagedSystem {
       const defaultFlavor = paletteSystemManager.getCurrentDefaultFlavor();
       return {
         paletteSystemFlavor: defaultFlavor,
-        brightnessMode: 'dark', // Updated to use corrected default
+        brightnessMode: 'balanced', // Balanced default provides natural color experience
         accentColor: 'mauve' as UnifiedColorName,
         preserveAlbumArt: true,
         enableTransitions: true
@@ -290,7 +290,11 @@ export class ColorStateManager implements IManagedSystem {
       '--sn-bg-gradient-primary-rgb': state.accentColor.rgb,
       '--sn-bg-gradient-secondary-rgb': state.surfaceColor.rgb,
       '--sn-bg-gradient-accent-rgb': state.accentColor.rgb,
-      
+
+      // === HIGH PRIORITY: Brightness mode application ===
+      '--sn-brightness-mode': `"${state.effectiveConfig.brightnessMode}"`,
+      '--sn-brightness-data-attr': state.effectiveConfig.brightnessMode,
+
       // === LOW PRIORITY: Meta information for debugging ===
       '--sn-color-state-flavor': `"${state.effectiveConfig.paletteSystemFlavor}"`,
       '--sn-color-state-brightness': `"${state.effectiveConfig.brightnessMode}"`,
@@ -314,7 +318,7 @@ export class ColorStateManager implements IManagedSystem {
   private async applyColorVariablesWithPriorities(cssUpdates: Record<string, string>): Promise<void> {
     // Group variables by priority for optimized coordination
     const criticalVars = ['--sn-cosmic-base-hex', '--sn-cosmic-accent-hex', '--spice-accent', '--spice-base'];
-    const highPriorityVars = ['--sn-color-', '--sn-dynamic-accent-'];
+    const highPriorityVars = ['--sn-color-', '--sn-dynamic-accent-', '--sn-brightness-mode', '--sn-brightness-data-attr'];
     
     const criticalUpdates: Record<string, string> = {};
     const highPriorityUpdates: Record<string, string> = {};
@@ -445,7 +449,10 @@ export class ColorStateManager implements IManagedSystem {
         
         // Apply to CSS variables
         await this.applyColorStateToCSSVariables(newState);
-        
+
+        // Apply brightness mode overrides to ensure they take precedence over base colors
+        await this.applyBrightnessModeOverrides(newState.effectiveConfig.brightnessMode);
+
         // Update state
         this.currentState = newState;
         this.updateCount++;
@@ -478,6 +485,81 @@ export class ColorStateManager implements IManagedSystem {
     } finally {
       this.isUpdating = false;
     }
+  }
+
+  /**
+   * Apply brightness mode specific CSS variables that take precedence over base colors
+   */
+  private async applyBrightnessModeOverrides(brightnessMode: 'bright' | 'balanced' | 'dark'): Promise<void> {
+    // Get brightness-adjusted accent color using default accent for current brightness mode
+    const config = this.getCurrentConfig();
+    const defaultAccent = getDefaultAccentColor(config.paletteSystemFlavor);
+
+    // Apply brightness adjustment to the accent color by modifying RGB values
+    let adjustedAccentColor = defaultAccent;
+
+    // For accent colors, we adjust saturation/brightness similarly to CSS multipliers
+    if (brightnessMode === 'dark') {
+      // Dark mode: reduce brightness/saturation for less bright colors
+      const rgbValues = defaultAccent.rgb.split(', ').map(Number);
+      if (rgbValues.length === 3 && rgbValues.every(val => !isNaN(val) && val !== undefined)) {
+        const r = rgbValues[0]!;
+        const g = rgbValues[1]!;
+        const b = rgbValues[2]!;
+        const darkR = Math.floor(r * 0.85);
+        const darkG = Math.floor(g * 0.85);
+        const darkB = Math.floor(b * 0.85);
+        adjustedAccentColor = {
+          ...defaultAccent,
+          rgb: `${darkR}, ${darkG}, ${darkB}`,
+          hex: `#${darkR.toString(16).padStart(2, '0')}${darkG.toString(16).padStart(2, '0')}${darkB.toString(16).padStart(2, '0')}`
+        };
+      }
+    } else if (brightnessMode === 'bright') {
+      // Bright mode: increase vibrancy but not raw brightness
+      const rgbValues = defaultAccent.rgb.split(', ').map(Number);
+      if (rgbValues.length === 3 && rgbValues.every(val => !isNaN(val) && val !== undefined)) {
+        const r = rgbValues[0]!;
+        const g = rgbValues[1]!;
+        const b = rgbValues[2]!;
+        const brightR = Math.min(255, Math.floor(r * 1.1));
+        const brightG = Math.min(255, Math.floor(g * 1.1));
+        const brightB = Math.min(255, Math.floor(b * 1.1));
+        adjustedAccentColor = {
+          ...defaultAccent,
+          rgb: `${brightR}, ${brightG}, ${brightB}`,
+          hex: `#${brightR.toString(16).padStart(2, '0')}${brightG.toString(16).padStart(2, '0')}${brightB.toString(16).padStart(2, '0')}`
+        };
+      }
+    }
+    // balanced mode uses default accent as-is
+
+    // These CSS variables ensure the brightness mode affects all visual processing
+    const brightnessOverrides = {
+      // Core brightness mode state (highest priority)
+      '--sn-brightness-mode': `"${brightnessMode}"`,
+      '--sn-brightness-data-attr': brightnessMode,
+
+      // Brightness-adjusted accent color (critical for proper color hierarchy)
+      '--sn-brightness-adjusted-accent-hex': adjustedAccentColor.hex,
+      '--sn-brightness-adjusted-accent-rgb': adjustedAccentColor.rgb,
+
+      // CSS gradient adjustments based on brightness mode
+      '--sn-bg-gradient-saturation': `var(--sn-brightness-${brightnessMode}-saturation)`,
+      '--sn-bg-gradient-brightness': `var(--sn-brightness-${brightnessMode}-brightness)`,
+      '--sn-bg-gradient-contrast': `var(--sn-brightness-${brightnessMode}-contrast)`,
+      '--sn-bg-gradient-opacity': `var(--sn-brightness-${brightnessMode}-opacity)`,
+    };
+
+    // Apply brightness overrides with critical priority to ensure they take precedence
+    this.cssController.batchSetVariables(
+      "ColorStateManager",
+      brightnessOverrides,
+      "critical",
+      "brightness-mode-overrides"
+    );
+
+    console.log(`🎨 [ColorStateManager] Applied brightness mode overrides: ${brightnessMode}`);
   }
 
   /**

@@ -105,8 +105,8 @@ export class EmotionalGradientMapper {
     {
       euphoric: {
         hueShift: 15, // Warm yellows/oranges
-        saturationMultiplier: 1.4, // Vibrant colors
-        brightnessMultiplier: 1.3, // Bright
+        saturationMultiplier: 1.3, // Vibrant colors (reduced from 1.4)
+        brightnessMultiplier: 1.2, // Bright (reduced from 1.3)
         contrastMultiplier: 1.2, // High contrast
         animationSpeed: 1.5, // Fast animations
         pulseIntensity: 0.8, // Strong pulse
@@ -127,7 +127,7 @@ export class EmotionalGradientMapper {
       },
       melancholic: {
         hueShift: -30, // Cool blues/purples
-        saturationMultiplier: 0.7, // Desaturated
+        saturationMultiplier: 0.8, // Desaturated (increased from 0.7)
         brightnessMultiplier: 0.8, // Darker
         contrastMultiplier: 0.9, // Lower contrast
         animationSpeed: 0.6, // Slow animations
@@ -138,7 +138,7 @@ export class EmotionalGradientMapper {
       },
       aggressive: {
         hueShift: -15, // Reds/magentas
-        saturationMultiplier: 1.6, // Very saturated
+        saturationMultiplier: 1.3, // Very saturated (reduced from 1.6)
         brightnessMultiplier: 1.2, // Bright
         contrastMultiplier: 1.5, // High contrast
         animationSpeed: 2.0, // Very fast
@@ -150,7 +150,7 @@ export class EmotionalGradientMapper {
       mysterious: {
         hueShift: -45, // Deep purples/blues
         saturationMultiplier: 0.9, // Slightly desaturated
-        brightnessMultiplier: 0.7, // Dark
+        brightnessMultiplier: 0.8, // Dark (increased from 0.7)
         contrastMultiplier: 1.3, // High contrast
         animationSpeed: 0.7, // Medium-slow
         pulseIntensity: 0.6, // Moderate pulse
@@ -182,7 +182,7 @@ export class EmotionalGradientMapper {
       },
       ambient: {
         hueShift: 10, // Subtle shifts
-        saturationMultiplier: 0.6, // Very desaturated
+        saturationMultiplier: 0.8, // Very desaturated (increased from 0.6)
         brightnessMultiplier: 0.9, // Soft
         contrastMultiplier: 0.8, // Low contrast
         animationSpeed: 0.3, // Very slow
@@ -193,7 +193,7 @@ export class EmotionalGradientMapper {
       },
       chaotic: {
         hueShift: 0, // Full spectrum chaos
-        saturationMultiplier: 1.5, // High saturation
+        saturationMultiplier: 1.3, // High saturation (reduced from 1.5)
         brightnessMultiplier: 1.2, // Bright
         contrastMultiplier: 1.6, // Very high contrast
         animationSpeed: 2.5, // Chaotic speed
@@ -216,7 +216,7 @@ export class EmotionalGradientMapper {
       heroic: {
         hueShift: 20, // Warm, golden tones
         saturationMultiplier: 1.2, // Rich colors
-        brightnessMultiplier: 1.25, // Bright and bold
+        brightnessMultiplier: 1.2, // Bright and bold (reduced from 1.25)
         contrastMultiplier: 1.3, // Strong contrast
         animationSpeed: 1.3, // Bold movement
         pulseIntensity: 0.7, // Strong pulse

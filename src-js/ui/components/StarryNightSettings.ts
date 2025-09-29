@@ -11,7 +11,7 @@ import { applyStarryNightSettings } from "@/visual/base/starryNightEffects";
 function getCSSController(): OptimizedCSSVariableManager {
   const year3000System = (globalThis as any).year3000System;
   return (
-    year3000System?.cssConsciousnessController ||
+    year3000System?.cssController ||
     getGlobalOptimizedCSSController()
   );
 }
@@ -137,7 +137,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
 
   // --- Brightness mode drop-down ------------------------------------------
   const brightnessOptions = ["bright", "balanced", "dark"] as const;
-  const currentBrightness = settingsManager.get("sn-brightness-mode") || "dark";
+  const currentBrightness = settingsManager.get("sn-brightness-mode") || "balanced";
 
   (section as any).addDropDown(
     "sn-brightness-mode",
@@ -415,7 +415,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
   console.log("✨ [StarryNight] spcr-settings panel initialised");
 
   // Initialize brightness mode on load using coordination
-  const initialBrightness = settingsManager.get("sn-brightness-mode") || "dark";
+  const initialBrightness = settingsManager.get("sn-brightness-mode") || "balanced";
 
   const cssController = getCSSController();
   const initialBrightnessVariables = {

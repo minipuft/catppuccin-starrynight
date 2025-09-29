@@ -1,14 +1,14 @@
 /**
- * EnhancedColorOrchestrator - Lightweight Color Processing Coordinator
+ * ColorHarmonyProcessor - Lightweight Color Processing Coordinator
  * 
  * 🔧 PHASE 2.1: DEPRECATION NOTICE - This lightweight coordinator will be replaced
  * by UnifiedColorProcessingEngine in Phase 2.2 for better performance and features.
- * Current usage in ColorEventOrchestrator will be migrated to use UnifiedColorProcessingEngine.
+ * Current usage in ColorEventManager will be migrated to use UnifiedColorProcessingEngine.
  *
- * Coordinates color processing through registered strategies with the unified event system.
+ * Processes color harmony through registered strategies with the unified event system.
  * Provides a bridge between the OKLAB integration and existing visual strategy systems.
  *
- * Philosophy: "Orchestrating color visualEffects through strategic coordination -
+ * Philosophy: "Processing color harmony through strategic coordination -
  * unifying musical OKLAB processing with visual strategy execution."
  */
 
@@ -30,7 +30,7 @@ interface OrchestratorStatus {
   queueSize: number;
 }
 
-export class EnhancedColorOrchestrator implements IColorOrchestrator {
+export class ColorHarmonyProcessor implements IColorOrchestrator {
   private performanceAnalyzer: SimplePerformanceCoordinator | null;
   private strategyRegistry: BackgroundStrategyRegistry;
   private strategySelector: BackgroundStrategySelector;
@@ -251,3 +251,6 @@ export class EnhancedColorOrchestrator implements IColorOrchestrator {
     );
   }
 }
+
+// Backward compatibility export
+export const EnhancedColorOrchestrator = ColorHarmonyProcessor;

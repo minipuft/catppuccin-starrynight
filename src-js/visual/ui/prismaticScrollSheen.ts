@@ -33,7 +33,7 @@ export class PrismaticScrollSheenSystem implements IVisualSystem {
   constructor(private cyclePx = DEFAULT_CYCLE_PX) {
     // Initialize CSS coordination - use globalThis to access Year3000System
     const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System?.cssConsciousnessController || getGlobalOptimizedCSSController();
+    this.cssController = year3000System?.cssController || getGlobalOptimizedCSSController();
 
     // Expose cycle length so SCSS authors can reference it using coordination
     this.cssController.setVariable(

@@ -28,8 +28,8 @@ interface CoordinatorConfig {
   onFlushComplete?: () => void;
 }
 
-export class SidebarPerformanceCoordinator {
-  private static instance: SidebarPerformanceCoordinator | null = null;
+export class SidebarPerformanceManager {
+  private static instance: SidebarPerformanceManager | null = null;
 
   private pendingUpdates: Map<string, PendingUpdate> = new Map();
   private isFlushScheduled: boolean = false;
@@ -91,7 +91,7 @@ export class SidebarPerformanceCoordinator {
 
     if (this.config.enableDebug) {
       console.log(
-        "🌌 [SidebarPerformanceCoordinator] Initialized with RAF-based batching"
+        "🌌 [SidebarPerformanceManager] Initialized with RAF-based batching"
       );
     }
   }
@@ -101,12 +101,12 @@ export class SidebarPerformanceCoordinator {
    */
   public static getInstance(
     config?: CoordinatorConfig
-  ): SidebarPerformanceCoordinator {
-    if (!SidebarPerformanceCoordinator.instance) {
-      SidebarPerformanceCoordinator.instance =
-        new SidebarPerformanceCoordinator(config);
+  ): SidebarPerformanceManager {
+    if (!SidebarPerformanceManager.instance) {
+      SidebarPerformanceManager.instance =
+        new SidebarPerformanceManager(config);
     }
-    return SidebarPerformanceCoordinator.instance;
+    return SidebarPerformanceManager.instance;
   }
 
   /**
@@ -144,7 +144,7 @@ export class SidebarPerformanceCoordinator {
 
       if (this.config.enableDebug && this.pendingUpdates.size === 1) {
         console.log(
-          `🌌 [SidebarPerformanceCoordinator] Queuing first update (fallback): ${property}`
+          `🌌 [SidebarPerformanceManager] Queuing first update (fallback): ${property}`
         );
       }
 
@@ -167,7 +167,7 @@ export class SidebarPerformanceCoordinator {
       );
     } catch (error) {
       console.error(
-        `🌌 [SidebarPerformanceCoordinator] Failed to apply critical ${property}:`,
+        `🌌 [SidebarPerformanceManager] Failed to apply critical ${property}:`,
         error
       );
     }
@@ -223,14 +223,14 @@ export class SidebarPerformanceCoordinator {
 
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [SidebarPerformanceCoordinator] Flushing ${updateCount} updates atomically`
+        `🌌 [SidebarPerformanceManager] Flushing ${updateCount} updates atomically`
       );
     }
 
     // Performance guard - if too many updates, batch them differently
     if (updateCount > (this.config.maxBatchSize || 50)) {
       console.warn(
-        `🌌 [SidebarPerformanceCoordinator] Large batch detected (${updateCount} updates), may impact performance`
+        `🌌 [SidebarPerformanceManager] Large batch detected (${updateCount} updates), may impact performance`
       );
     }
 
@@ -251,7 +251,7 @@ export class SidebarPerformanceCoordinator {
 
           if (this.config.enableDebug) {
             console.log(
-              `🌌 [SidebarPerformanceCoordinator] Mapped ${update.property} → ${harmonicVar} = ${update.value}`
+              `🌌 [SidebarPerformanceManager] Mapped ${update.property} → ${harmonicVar} = ${update.value}`
             );
           }
         }
@@ -268,7 +268,7 @@ export class SidebarPerformanceCoordinator {
       // Apply global harmonic variables using coordination (targeting document root)
       if (Object.keys(globalHarmonicVariables).length > 0) {
         this.cssController.batchSetVariables(
-          "SidebarPerformanceCoordinator",
+          "SidebarPerformanceManager",
           globalHarmonicVariables,
           "high", // High priority for harmonic variable mapping
           "harmonic-variable-mapping"
@@ -276,7 +276,7 @@ export class SidebarPerformanceCoordinator {
       }
     } catch (error) {
       console.error(
-        `🌌 [SidebarPerformanceCoordinator] Failed to apply batched updates:`,
+        `🌌 [SidebarPerformanceManager] Failed to apply batched updates:`,
         error
       );
     }
@@ -292,7 +292,7 @@ export class SidebarPerformanceCoordinator {
         this.config.onFlushComplete();
       } catch (error) {
         console.error(
-          "🌌 [SidebarPerformanceCoordinator] Error in flush completion callback:",
+          "🌌 [SidebarPerformanceManager] Error in flush completion callback:",
           error
         );
       }
@@ -307,7 +307,7 @@ export class SidebarPerformanceCoordinator {
 
     if (this.performanceAnalyzer) {
       this.performanceAnalyzer.emitTrace?.(
-        `[SidebarPerformanceCoordinator] Flushed ${updateCount} updates in ${flushTime.toFixed(
+        `[SidebarPerformanceManager] Flushed ${updateCount} updates in ${flushTime.toFixed(
           2
         )}ms`
       );
@@ -318,7 +318,7 @@ export class SidebarPerformanceCoordinator {
       this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0;
     if (avgFlushTime > 3) {
       console.warn(
-        `🌌 [SidebarPerformanceCoordinator] Performance threshold exceeded: average ${avgFlushTime.toFixed(
+        `🌌 [SidebarPerformanceManager] Performance threshold exceeded: average ${avgFlushTime.toFixed(
           2
         )}ms per flush (target: <3ms)`
       );
@@ -326,7 +326,7 @@ export class SidebarPerformanceCoordinator {
 
     if (this.config.enableDebug && flushTime > 4) {
       console.warn(
-        `🌌 [SidebarPerformanceCoordinator] Slow flush detected: ${flushTime.toFixed(
+        `🌌 [SidebarPerformanceManager] Slow flush detected: ${flushTime.toFixed(
           2
         )}ms for ${updateCount} updates`
       );
@@ -343,7 +343,7 @@ export class SidebarPerformanceCoordinator {
     }
 
     this.musicChangeUnsubscribe = () => {
-      unifiedEventBus.unsubscribeAll("SidebarPerformanceCoordinator");
+      unifiedEventBus.unsubscribeAll("SidebarPerformanceManager");
     };
 
     unifiedEventBus.subscribe(
@@ -356,12 +356,12 @@ export class SidebarPerformanceCoordinator {
           reason: "music:track-changed event",
         });
       },
-      "SidebarPerformanceCoordinator"
+      "SidebarPerformanceManager"
     );
 
     if (this.config.enableDebug) {
       console.log(
-        "🌌 [SidebarPerformanceCoordinator] Event-driven music coordination active"
+        "🌌 [SidebarPerformanceManager] Event-driven music coordination active"
       );
     }
   }
@@ -381,7 +381,7 @@ export class SidebarPerformanceCoordinator {
 
       if (this.config.enableDebug) {
         console.log(
-          "🌌 [SidebarPerformanceCoordinator] Music change coordinated via event",
+          "🌌 [SidebarPerformanceManager] Music change coordinated via event",
           {
             source: eventData.source,
             reason: eventData.reason,
@@ -410,7 +410,7 @@ export class SidebarPerformanceCoordinator {
     if (!this.sidebarElement) {
       if (this.config.enableDebug) {
         console.warn(
-          "🌌 [SidebarPerformanceCoordinator] Sidebar not found, deferring DOM observation"
+          "🌌 [SidebarPerformanceManager] Sidebar not found, deferring DOM observation"
         );
       }
 
@@ -454,7 +454,7 @@ export class SidebarPerformanceCoordinator {
 
         if (this.config.enableDebug) {
           console.log(
-            "🌌 [SidebarPerformanceCoordinator] Relevant DOM change detected - visibility/structure only",
+            "🌌 [SidebarPerformanceManager] Relevant DOM change detected - visibility/structure only",
             {
               mutationCount: relevantMutations.length,
               types: relevantMutations.map((m) => m.type),
@@ -481,7 +481,7 @@ export class SidebarPerformanceCoordinator {
 
     if (this.config.enableDebug) {
       console.log(
-        "🌌 [SidebarPerformanceCoordinator] DOM observation active on sidebar"
+        "🌌 [SidebarPerformanceManager] DOM observation active on sidebar"
       );
     }
   }
@@ -646,7 +646,7 @@ export class SidebarPerformanceCoordinator {
 
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [SidebarPerformanceCoordinator] Visibility changed: ${
+        `🌌 [SidebarPerformanceManager] Visibility changed: ${
           isVisible ? "visible" : "hidden"
         }`
       );
@@ -669,7 +669,7 @@ export class SidebarPerformanceCoordinator {
 
     if (this.config.enableDebug) {
       console.log(
-        "🌌 [SidebarPerformanceCoordinator] Triggering temporal echo effect"
+        "🌌 [SidebarPerformanceManager] Triggering temporal echo effect"
       );
     }
 
@@ -758,15 +758,15 @@ export class SidebarPerformanceCoordinator {
     this.isFlushScheduled = false;
     this.sidebarElement = null;
 
-    if (SidebarPerformanceCoordinator.instance === this) {
-      SidebarPerformanceCoordinator.instance = null;
+    if (SidebarPerformanceManager.instance === this) {
+      SidebarPerformanceManager.instance = null;
     }
 
     if (this.config.enableDebug) {
       const avgFlushTime =
         this.flushCount > 0 ? this.totalFlushTime / this.flushCount : 0;
       console.log(
-        `🌌 [SidebarPerformanceCoordinator] Destroyed. Performance: ${
+        `🌌 [SidebarPerformanceManager] Destroyed. Performance: ${
           this.flushCount
         } flushes, ${avgFlushTime.toFixed(2)}ms avg`
       );
@@ -777,8 +777,18 @@ export class SidebarPerformanceCoordinator {
 /**
  * Global helper function for easy access
  */
+export function getSidebarPerformanceManager(
+  config?: CoordinatorConfig
+): SidebarPerformanceManager {
+  return SidebarPerformanceManager.getInstance(config);
+}
+
+// Backward compatibility alias
 export function getSidebarPerformanceCoordinator(
   config?: CoordinatorConfig
-): SidebarPerformanceCoordinator {
-  return SidebarPerformanceCoordinator.getInstance(config);
+): SidebarPerformanceManager {
+  return SidebarPerformanceManager.getInstance(config);
 }
+
+// Backward compatibility alias for the class
+export const SidebarPerformanceCoordinator = SidebarPerformanceManager;

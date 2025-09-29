@@ -17,7 +17,19 @@
 
 :root {
   // -------------------------------------------------------------------------
-  // Background System (--sn-bg-*) 
+  // Animation Stability System (--sn-rotation-*)
+  // -------------------------------------------------------------------------
+
+  // Global rotation control system - prevents UI shake and tilt
+  --sn-rotation-disable: 0; /* Set to 1 to disable all rotations for stable UI */
+  --sn-rotation-multiplier: calc(1 - var(--sn-rotation-disable, 0)); /* Multiplier for rotation values */
+
+  // Animation intensity controls
+  --sn-animation-intensity: 1; /* 0 = minimal, 1 = full effects */
+  --sn-animation-reduce: 0; /* Set to 1 to reduce all animations */
+
+  // -------------------------------------------------------------------------
+  // Background System (--sn-bg-*)
   // -------------------------------------------------------------------------
   
   // WebGL/WebGPU Status
@@ -869,4 +881,53 @@ html[style*="--sn-brightness-mode: \"dark\""] {
     --sn-visual-effects-contrast-boost: 1.15;
     --sn-visual-effects-field-intensity: 0.6;
   }
+}
+
+// =============================================================================
+// MOTION ACCESSIBILITY & STABILITY CONTROLS
+// =============================================================================
+
+/* Comprehensive reduced motion support - disables all problematic animations */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    // Disable all rotations for stable UI
+    --sn-rotation-disable: 1 !important;
+    --sn-rotation-multiplier: 0 !important;
+
+    // Reduce animation intensity
+    --sn-animation-intensity: 0.3 !important;
+    --sn-animation-reduce: 1 !important;
+
+    // Disable complex visual effects
+    --sn-visual-effects-field-intensity: 0.1 !important;
+  }
+
+  // Disable problematic animations entirely
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Utility classes for manual motion control */
+.sn-no-rotation,
+.sn-stable-ui {
+  --sn-rotation-disable: 1 !important;
+  --sn-rotation-multiplier: 0 !important;
+}
+
+.sn-minimal-animation {
+  --sn-animation-intensity: 0.2 !important;
+  --sn-animation-reduce: 1 !important;
+}
+
+.sn-full-effects {
+  --sn-rotation-disable: 0 !important;
+  --sn-rotation-multiplier: 1 !important;
+  --sn-animation-intensity: 1 !important;
+  --sn-animation-reduce: 0 !important;
 }

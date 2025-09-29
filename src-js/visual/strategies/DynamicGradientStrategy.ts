@@ -1,12 +1,12 @@
 /**
- * LivingGradientStrategy - ColorOrchestrator Strategy Implementation
+ * DynamicGradientStrategy - ColorOrchestrator Strategy Implementation
  *
- * Transforms static backgrounds into dynamic visualEffects foundations through
- * the strategy pattern. Handles animation animations, WebGL coordination, and
+ * Transforms static backgrounds into dynamic visual foundations through
+ * the strategy pattern. Handles responsive animations, WebGL coordination, and
  * music-responsive gradient transformations.
  *
- * Philosophy: "The foundation itself becomes conscious - animation with music,
- * flowing with extracted colors, creating a living substrate for all visual systems."
+ * Provides dynamic gradient processing with music synchronization,
+ * color extraction integration, and performance-optimized visual effects.
  */
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
@@ -27,7 +27,7 @@ import {
 import * as Utils from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 
-interface LivingBaseState {
+interface DynamicGradientState {
   currentBaseHex: string;
   currentBaseRgb: string;
   currentPrimaryHex: string;
@@ -39,10 +39,10 @@ interface LivingBaseState {
   oklabGradientStops: OKLABProcessingResult[];
 }
 
-interface LivingGradientConfig {
+interface DynamicGradientConfig {
   baseTransformationEnabled: boolean;
   webglIntegrationEnabled: boolean;
-  animationAnimationEnabled: boolean;
+  responsiveAnimationEnabled: boolean;
   visualEffectsLayerOpacity: number; // 0-1
   dynamicFlowIntensity: number; // 0-2
   musicResponsiveness: number; // 0-2
@@ -54,7 +54,7 @@ interface LivingGradientConfig {
   maxFrameTimeMs: number; // Maximum allowed frame time in milliseconds
 }
 
-export class LivingGradientStrategy
+export class DynamicGradientStrategy
   extends BaseVisualSystem
   implements IColorProcessor
 {
@@ -64,11 +64,11 @@ export class LivingGradientStrategy
   protected override utils = Utils;
   protected override config = ADVANCED_SYSTEM_CONFIG;
 
-  private livingBaseState: LivingBaseState = {
+  private livingBaseState: DynamicGradientState = {
     currentBaseHex: "#1e1e2e", // Catppuccin base
     currentBaseRgb: "30,30,46",
-    currentPrimaryHex: "#cba6f7", // Default mauve
-    currentPrimaryRgb: "203,166,247",
+    currentPrimaryHex: "var(--sn-brightness-adjusted-accent-hex, #cba6f7)", // Brightness-adjusted default
+    currentPrimaryRgb: "var(--sn-brightness-adjusted-accent-rgb, 203, 166, 247)", // Brightness-adjusted default
     visualEffectsIntensity: 0.5,
     musicEnergy: 0.5,
     lastUpdateTime: 0,
@@ -76,10 +76,10 @@ export class LivingGradientStrategy
     oklabGradientStops: [],
   };
 
-  private gradientConfig: LivingGradientConfig = {
+  private gradientConfig: DynamicGradientConfig = {
     baseTransformationEnabled: true,
     webglIntegrationEnabled: true,
-    animationAnimationEnabled: true,
+    responsiveAnimationEnabled: true,
     visualEffectsLayerOpacity: 0.08, // Subtle but visible
     dynamicFlowIntensity: 1.2,
     musicResponsiveness: 1.0,
@@ -92,7 +92,7 @@ export class LivingGradientStrategy
   };
 
   // CSS Animation Manager integration for Year 3000 performance revolution  
-  private cssAnimationManager: any = null; // Will be injected
+  private cssAnimationManager: any = null; // Will be injected (EnhancedMasterAnimationCoordinator or interface)
 
   // OKLAB calculation caching
   private oklabCache = new Map<string, OKLABProcessingResult[]>();
@@ -128,14 +128,14 @@ export class LivingGradientStrategy
     // Apply device-aware performance settings (async - non-blocking)
     this.applyDeviceAwareSettings().catch((error) => {
       Y3KDebug?.debug?.warn(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         "Failed to apply device-aware settings:",
         error
       );
     });
 
     Y3KDebug?.debug?.log(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       "Living gradient strategy initialized with OKLAB interpolation and device-aware performance"
     );
   }
@@ -163,12 +163,12 @@ export class LivingGradientStrategy
       await this.applyLivingConsciousnessBase();
 
       Y3KDebug?.debug?.log(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         "Living gradient system awakened with visual system lifecycle"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         "Failed to initialize living gradient system:",
         error
       );
@@ -217,7 +217,7 @@ export class LivingGradientStrategy
     );
 
     Y3KDebug?.debug?.log(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       "Consciousness listeners established"
     );
   }
@@ -243,7 +243,7 @@ export class LivingGradientStrategy
     });
 
     Y3KDebug?.debug?.log(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       "WebGL integration listeners established"
     );
   }
@@ -273,7 +273,7 @@ export class LivingGradientStrategy
         this.triggerConsciousnessBreathing();
 
         Y3KDebug?.debug?.log(
-          "LivingGradientStrategy",
+          "DynamicGradientStrategy",
           "Living base updated with harmonized colors:",
           primaryColor
         );
@@ -316,7 +316,7 @@ export class LivingGradientStrategy
         this.coordinateWithWebGLSystem(webglState.enabled);
 
         Y3KDebug?.debug?.log(
-          "LivingGradientStrategy",
+          "DynamicGradientStrategy",
           `WebGL integration ${
             webglState.enabled ? "activated" : "deactivated"
           }`
@@ -367,10 +367,10 @@ export class LivingGradientStrategy
    * Initialize CSS-first visualEffects animation (Year 3000 performance revolution)
    */
   private initializeConsciousnessBreathing(): void {
-    if (!this.gradientConfig.animationAnimationEnabled) return;
+    if (!this.gradientConfig.responsiveAnimationEnabled) return;
     if (!this.cssAnimationManager) {
       Y3KDebug?.debug?.warn(
-        "LivingGradientStrategy", 
+        "DynamicGradientStrategy", 
         "CSSAnimationManager not available, falling back to basic visualEffects"
       );
       return;
@@ -380,7 +380,7 @@ export class LivingGradientStrategy
     this.triggerConsciousnessBreathing();
     
     Y3KDebug?.debug?.log(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       "CSS-first visualEffects animation initialized"
     );
   }
@@ -389,7 +389,7 @@ export class LivingGradientStrategy
    * Trigger visualEffects animation using CSSAnimationManager (Year 3000 CSS-first)
    */
   private triggerConsciousnessBreathing(): void {
-    if (!this.cssAnimationManager || !this.gradientConfig.animationAnimationEnabled) return;
+    if (!this.cssAnimationManager || !this.gradientConfig.responsiveAnimationEnabled) return;
 
     // Get elements for visualEffects animation
     const visualEffectsElements = document.querySelectorAll(
@@ -416,7 +416,7 @@ export class LivingGradientStrategy
     }
 
     Y3KDebug?.debug?.log(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       `CSS-first visualEffects animation triggered for ${visualEffectsElements.length} elements`
     );
   }
@@ -431,7 +431,7 @@ export class LivingGradientStrategy
         await this.deviceDetector.initialize();
       } catch (error) {
         Y3KDebug?.debug?.warn(
-          "LivingGradientStrategy",
+          "DynamicGradientStrategy",
           "Device detection failed, using default settings:",
           error
         );
@@ -442,7 +442,7 @@ export class LivingGradientStrategy
     const capabilities = this.deviceDetector.getCapabilities();
     if (!capabilities) {
       Y3KDebug?.debug?.warn(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         "No device capabilities available, using default settings"
       );
       return;
@@ -509,15 +509,15 @@ export class LivingGradientStrategy
 
     // Respect user preference for reduced motion
     if (capabilities.display.reducedMotion) {
-      this.gradientConfig.animationAnimationEnabled = false;
+      this.gradientConfig.responsiveAnimationEnabled = false;
       Y3KDebug?.debug?.log(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         "Breathing animation disabled due to reduced motion preference"
       );
     }
 
     Y3KDebug?.debug?.log(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       `Device-aware settings applied for ${overallTier}: ${this.gradientConfig.animationThrottleFps}fps, CSS-first animation coordination`
     );
   }
@@ -609,7 +609,7 @@ export class LivingGradientStrategy
         }
 
         Y3KDebug?.debug?.log(
-          "LivingGradientStrategy",
+          "DynamicGradientStrategy",
           "OKLAB gradient processing applied:",
           {
             originalPrimary: primaryColor,
@@ -623,7 +623,7 @@ export class LivingGradientStrategy
       }
 
       // Update living base state with processed colors
-      await this.updateLivingBaseState(
+      await this.updateDynamicGradientState(
         processedPrimary,
         processedSecondary,
         context,
@@ -666,7 +666,7 @@ export class LivingGradientStrategy
       };
 
       Y3KDebug?.debug?.log(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         "Living gradient processing completed",
         {
           originalPrimary: primaryColor,
@@ -685,7 +685,7 @@ export class LivingGradientStrategy
       const processingTime = performance.now() - startTime;
 
       Y3KDebug?.debug?.error(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         "Living gradient processing failed:",
         error
       );
@@ -741,7 +741,7 @@ export class LivingGradientStrategy
 
     this.livingBaseState.lastUpdateTime = Date.now();
 
-    Y3KDebug?.debug?.log("LivingGradientStrategy", "Base state initialized:", {
+    Y3KDebug?.debug?.log("DynamicGradientStrategy", "Base state initialized:", {
       base: this.livingBaseState.currentBaseHex,
       primary: this.livingBaseState.currentPrimaryHex,
     });
@@ -793,7 +793,7 @@ export class LivingGradientStrategy
   /**
    * Update living base state with new colors and context including OKLAB data
    */
-  private async updateLivingBaseState(
+  private async updateDynamicGradientState(
     primaryColor: string,
     secondaryColor: string | null,
     context: ColorContext,
@@ -865,14 +865,14 @@ export class LivingGradientStrategy
 
     // Apply all visualEffects variables in a coordinated batch
     await this.cssController.batchSetVariables(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       visualEffectsBaseVariables,
       "high", // High priority for visualEffects animations
       "living-visualEffects-base"
     );
 
     Y3KDebug?.debug?.log(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       "Applied coordinated living visualEffects base gradient"
     );
   }
@@ -912,7 +912,7 @@ export class LivingGradientStrategy
     // Note: OKLAB cache is managed by the ColorOrchestrator/SettingsManager
 
     if (this.config.enableDebug) {
-      Y3KDebug?.debug?.log("LivingGradientStrategy", "Cache cleanup completed");
+      Y3KDebug?.debug?.log("DynamicGradientStrategy", "Cache cleanup completed");
     }
   }
 
@@ -1044,7 +1044,7 @@ export class LivingGradientStrategy
     this.triggerConsciousnessBreathing();
     
     Y3KDebug?.debug?.log(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       "CSS-first visualEffects animation started - 90%+ JavaScript overhead eliminated"
     );
   }
@@ -1056,7 +1056,7 @@ export class LivingGradientStrategy
     // Year 3000 performance revolution: CSS animations handle timing automatically
     // No more JavaScript debouncing needed - CSS keyframes manage their own timing
     Y3KDebug?.debug?.log(
-      "LivingGradientStrategy", 
+      "DynamicGradientStrategy", 
       "Debounced CSS updates eliminated - using CSS-first animation"
     );
   }
@@ -1077,7 +1077,7 @@ export class LivingGradientStrategy
 
     // Apply WebGL coordination variables
     await this.cssController.batchSetVariables(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       webglIntegrationVariables,
       "high", // High priority for WebGL coordination
       "webgl-living-gradient-integration"
@@ -1085,13 +1085,13 @@ export class LivingGradientStrategy
 
     this.livingBaseState.webglIntegrationActive = true;
 
-    Y3KDebug?.debug?.log("LivingGradientStrategy", "WebGL integration updated");
+    Y3KDebug?.debug?.log("DynamicGradientStrategy", "WebGL integration updated");
   }
 
   /**
    * Get current living base state for debugging
    */
-  public getLivingBaseState(): LivingBaseState {
+  public getDynamicGradientState(): DynamicGradientState {
     return { ...this.livingBaseState };
   }
 
@@ -1101,7 +1101,7 @@ export class LivingGradientStrategy
   private updateLivingConsciousnessBase(): void {
     this.applyLivingConsciousnessBase().catch((error) => {
       Y3KDebug?.debug?.error(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         "Failed to update living visualEffects base:",
         error
       );
@@ -1132,14 +1132,14 @@ export class LivingGradientStrategy
 
     try {
       this.cssController.batchSetVariables(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         musicResponsiveVariables,
         3 as any, // medium priority
         "music-responsive"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         "Failed to update music responsive variables:",
         error
       );
@@ -1161,14 +1161,14 @@ export class LivingGradientStrategy
 
     try {
       this.cssController.batchSetVariables(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         visualEffectsVariables,
         3 as any, // medium priority
         "visualEffects-vars"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         "Failed to update visualEffects variables:",
         error
       );
@@ -1193,21 +1193,21 @@ export class LivingGradientStrategy
 
     try {
       this.cssController.batchSetVariables(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         webglCoordinationVariables,
         "high",
         "webgl-coordination"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "LivingGradientStrategy",
+        "DynamicGradientStrategy",
         "Failed to coordinate with WebGL system:",
         error
       );
     }
 
     Y3KDebug?.debug?.log(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       `WebGL coordination ${webglEnabled ? "enabled" : "disabled"}`
     );
   }
@@ -1248,14 +1248,14 @@ export class LivingGradientStrategy
     if (Object.keys(flowVariables).length > 0) {
       try {
         this.cssController.batchSetVariables(
-          "LivingGradientStrategy",
+          "DynamicGradientStrategy",
           flowVariables,
           3 as any, // medium priority
           "webgl-flow"
         );
       } catch (error) {
         Y3KDebug?.debug?.error(
-          "LivingGradientStrategy",
+          "DynamicGradientStrategy",
           "Failed to update WebGL flow state:",
           error
         );
@@ -1314,8 +1314,8 @@ export class LivingGradientStrategy
       metrics: {
         baseTransformationEnabled:
           this.gradientConfig.baseTransformationEnabled,
-        animationAnimationEnabled:
-          this.gradientConfig.animationAnimationEnabled,
+        responsiveAnimationEnabled:
+          this.gradientConfig.responsiveAnimationEnabled,
         webglIntegrationActive: this.livingBaseState.webglIntegrationActive,
         visualEffectsIntensity: this.livingBaseState.visualEffectsIntensity,
         musicEnergy: this.livingBaseState.musicEnergy,
@@ -1346,7 +1346,7 @@ export class LivingGradientStrategy
     super.destroy();
 
     Y3KDebug?.debug?.log(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       "Consolidated living gradient system destroyed with complete cleanup"
     );
   }
@@ -1361,7 +1361,7 @@ export class LivingGradientStrategy
     // Breathing animations are now handled entirely by CSS keyframes
 
     Y3KDebug?.debug?.log(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       "Living gradient system cleaned up"
     );
   }
@@ -1369,7 +1369,7 @@ export class LivingGradientStrategy
   /**
    * Update configuration
    */
-  public updateConfig(newConfig: Partial<LivingGradientConfig>): void {
+  public updateConfig(newConfig: Partial<DynamicGradientConfig>): void {
     this.gradientConfig = { ...this.gradientConfig, ...newConfig };
 
     // Update OKLAB processor debug setting if configuration changed
@@ -1380,7 +1380,7 @@ export class LivingGradientStrategy
       this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
     }
 
-    Y3KDebug?.debug?.log("LivingGradientStrategy", "Configuration updated:", {
+    Y3KDebug?.debug?.log("DynamicGradientStrategy", "Configuration updated:", {
       ...newConfig,
       oklabInterpolation: this.gradientConfig.oklabInterpolationEnabled,
       oklabPreset: this.gradientConfig.oklabPreset,
@@ -1398,7 +1398,7 @@ export class LivingGradientStrategy
     }
 
     Y3KDebug?.debug?.log(
-      "LivingGradientStrategy",
+      "DynamicGradientStrategy",
       "CSS-first visualEffects animation stopped"
     );
   }

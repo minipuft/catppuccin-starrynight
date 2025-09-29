@@ -20,7 +20,7 @@ let visualSystem: AberrationVisualSystem | null = null;
 // Helper to get CSS coordinator for coordination
 function getCSSController(y3k: Year3000System | null): OptimizedCSSVariableManager {
   const year3000System = y3k || (globalThis as any).year3000System;
-  return year3000System?.cssConsciousnessController || getGlobalOptimizedCSSController();
+  return year3000System?.cssController || getGlobalOptimizedCSSController();
 }
 
 // Helper to read current user preference without circular dep

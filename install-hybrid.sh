@@ -239,7 +239,7 @@ $SPICETIFY_CMD config color_scheme "$COLOR_SCHEME"
 
 # Configure extension
 echo "🔌 Configuring extension..."
-EXTENSION_PATH="catppuccin-starrynight/Extensions/catppuccin-starrynight.js"
+EXTENSION_PATH="catppuccin-starrynight.js"
 
 # Get current extensions
 current_extensions=$($SPICETIFY_CMD config extensions 2>/dev/null || echo "")

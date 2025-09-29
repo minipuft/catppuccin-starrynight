@@ -163,6 +163,14 @@
 // HARDWARE ACCELERATION OPTIMIZATION
 // ============================================================================
 
+// Standard hardware acceleration for all elements requiring GPU optimization
+@mixin performance-hardware-acceleration {
+  will-change: transform, opacity, filter;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: layout style paint;
+}
+
 // Conditional hardware acceleration
 @mixin hardware-acceleration-adaptive {
   // Only apply hardware acceleration on capable devices
@@ -170,7 +178,7 @@
   .device-tier-premium & {
     @include hardware-accelerated;
   }
-  
+
   // Simplified transforms for lower-end devices
   .device-tier-low &,
   .device-tier-medium & {
@@ -362,5 +370,58 @@
     --sn-performance-quality-level: var(--sn-performance-auto-quality, 0.8);
     --sn-performance-animation-quality: var(--sn-performance-auto-animation, 0.8);
     --sn-performance-effect-quality: var(--sn-performance-auto-effect, 0.8);
+  }
+}
+
+// ============================================================================
+// ANIMATION CONTAINMENT & ISOLATION MIXINS
+// ============================================================================
+
+/* Mixin to contain animations to prevent UI shake propagation */
+@mixin animation-containment($strict: false) {
+  // CSS Containment for animation isolation
+  contain: layout style paint;
+
+  @if $strict {
+    // Strict mode - complete isolation
+    contain: size layout style paint;
+    isolation: isolate;
+  }
+
+  // Performance optimizations
+  will-change: transform;
+  transform: translateZ(0); // Create compositing layer
+}
+
+/* Mixin for stable UI elements (no rotation/shake) */
+@mixin stable-ui-element() {
+  // Disable rotation multipliers
+  --sn-rotation-multiplier: 0 !important;
+
+  // Containment for stability
+  @include animation-containment($strict: true);
+
+  // Override any problematic transforms
+  > * {
+    will-change: auto;
+  }
+}
+
+/* Mixin for background effects that should not affect UI stability */
+@mixin background-effect-isolation() {
+  // Prevent layout shifts
+  contain: layout style paint;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+
+  // Respect motion preferences
+  @media (prefers-reduced-motion: reduce) {
+    opacity: 0.1;
+    animation: none !important;
   }
 }

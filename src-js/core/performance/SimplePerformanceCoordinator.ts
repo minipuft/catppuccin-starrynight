@@ -1,14 +1,14 @@
 /**
- * Simple Performance Coordinator - Backward Compatibility Layer
- * 
- * This file now provides backward compatibility while delegating all
- * functionality to the enhanced UnifiedPerformanceCoordinator.
- * 
- * Phase 1.2 Consolidation: All performance coordination features have been merged
- * into UnifiedPerformanceCoordinator for reduced code duplication.
+ * Performance Manager - High-Level Performance System Management
+ *
+ * Provides high-level performance management functionality with backward
+ * compatibility. This manager delegates to PerformanceAnalyzer
+ * for detailed performance monitoring and analysis.
+ *
+ * Architecture: Manager (high-level) → Coordinator (cross-system) → Controller (direct control)
  */
 
-import { UnifiedPerformanceCoordinator } from "./UnifiedPerformanceCoordinator";
+import { PerformanceAnalyzer } from "./UnifiedPerformanceCoordinator";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
@@ -41,15 +41,15 @@ export interface QualityScalingCapable {
 export type { DeviceCapabilities, ThermalState, BatteryState, PerformanceMode } from './UnifiedPerformanceCoordinator';
 
 /**
- * Simple Performance Coordinator - Backward Compatibility Wrapper
- * 
- * All functionality now delegated to UnifiedPerformanceCoordinator.
- * This class exists purely for backward compatibility during migration.
+ * Performance Manager - High-Level Performance Management
+ *
+ * Provides high-level performance management with delegated functionality.
+ * Main entry point for performance system management across the application.
  */
-export class SimplePerformanceCoordinator implements IManagedSystem {
+export class PerformanceManager implements IManagedSystem {
   public initialized = false;
   
-  private unifiedCoordinator: UnifiedPerformanceCoordinator;
+  private unifiedCoordinator: PerformanceAnalyzer;
   private config: Year3000Config;
 
   constructor(
@@ -58,9 +58,9 @@ export class SimplePerformanceCoordinator implements IManagedSystem {
   ) {
     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
       console.warn(
-        '⚠️  [SimplePerformanceCoordinator] This class is deprecated. ' +
-        'Use UnifiedPerformanceCoordinator.getInstance() instead. ' +
-        'This compatibility layer will be removed in a future version.'
+        '⚠️  [PerformanceManager] Direct instantiation is deprecated. ' +
+        'Use PerformanceManager.getInstance() instead. ' +
+        'This ensures proper system-wide performance management.'
       );
     }
 
@@ -70,23 +70,23 @@ export class SimplePerformanceCoordinator implements IManagedSystem {
     // Get or create unified coordinator instance
     // We'll create a simple mock coordinator if the real one doesn't exist
     try {
-      this.unifiedCoordinator = UnifiedPerformanceCoordinator.getInstance(this.config, this);
+      this.unifiedCoordinator = PerformanceAnalyzer.getInstance(this.config, this);
     } catch {
       // Create with self-reference for compatibility
-      this.unifiedCoordinator = new UnifiedPerformanceCoordinator(this.config, this);
+      this.unifiedCoordinator = new PerformanceAnalyzer(this.config, this);
     }
     
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "Compatibility layer - delegating to UnifiedPerformanceCoordinator");
+    Y3KDebug?.debug?.log("PerformanceManager", "High-level performance management - delegating to PerformanceAnalyzer");
   }
 
   public async initialize(): Promise<void> {
     if (this.initialized) return;
     
     // Delegate initialization to unified coordinator
-    // Note: UnifiedPerformanceCoordinator initializes itself in constructor
+    // Note: PerformanceAnalyzer initializes itself in constructor
     this.initialized = true;
     
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "Compatibility layer initialized - delegating to UnifiedPerformanceCoordinator");
+    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "Compatibility layer initialized - delegating to PerformanceAnalyzer");
   }
 
   public async healthCheck(): Promise<HealthCheckResult> {
@@ -123,12 +123,12 @@ export class SimplePerformanceCoordinator implements IManagedSystem {
   }
 
   // =============================================================================
-  // PUBLIC API - Delegated to UnifiedPerformanceCoordinator
+  // PUBLIC API - Delegated to PerformanceAnalyzer
   // =============================================================================
 
   /**
    * Get the performance system for direct access
-   * @deprecated Use UnifiedPerformanceCoordinator directly instead
+   * @deprecated Use PerformanceAnalyzer directly instead
    */
   public getPerformanceSystem(): any {
     return this.unifiedCoordinator;
@@ -181,7 +181,7 @@ export class SimplePerformanceCoordinator implements IManagedSystem {
     deviceDescription: string;
     confidence: number;
     reasoning: string[];
-    webglStatus: ReturnType<SimplePerformanceCoordinator['getWebGLStatus']>;
+    webglStatus: ReturnType<PerformanceManager['getWebGLStatus']>;
     energyBoost: boolean;
     settings: any;
   } {
@@ -197,11 +197,11 @@ export class SimplePerformanceCoordinator implements IManagedSystem {
    */
   public startMonitoring(): void {
     this.unifiedCoordinator.startMonitoring();
-    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "Monitoring started (delegated to UnifiedPerformanceCoordinator)");
+    Y3KDebug?.debug?.log("PerformanceManager", "Monitoring started (delegated to PerformanceAnalyzer)");
   }
 
   // =============================================================================
-  // ESSENTIAL LEGACY API METHODS (Delegated to UnifiedPerformanceCoordinator)
+  // ESSENTIAL LEGACY API METHODS (Delegated to PerformanceAnalyzer)
   // =============================================================================
 
   public emitTrace(event: string, data?: any): void {
@@ -253,20 +253,39 @@ export class SimplePerformanceCoordinator implements IManagedSystem {
 // MIGRATION HELPERS
 // ===================================================================
 
+// =============================================================================
+// BACKWARD COMPATIBILITY EXPORTS
+// =============================================================================
+
 /**
- * Migration helper: Create SimplePerformanceCoordinator using UnifiedPerformanceCoordinator
+ * @deprecated Use PerformanceManager instead
+ * Backward compatibility alias for SimplePerformanceCoordinator
  */
-export function createSimplePerformanceCoordinator(): SimplePerformanceCoordinator {
-  return new SimplePerformanceCoordinator();
+export const SimplePerformanceCoordinator = PerformanceManager;
+export type SimplePerformanceCoordinator = PerformanceManager;
+
+/**
+ * Migration helper: Create PerformanceManager instance
+ */
+export function createPerformanceManager(): PerformanceManager {
+  return new PerformanceManager();
 }
 
 /**
- * Deprecation warning for direct usage
+ * @deprecated Use createPerformanceManager instead
+ * Backward compatibility helper
+ */
+export function createSimplePerformanceCoordinator(): PerformanceManager {
+  return new PerformanceManager();
+}
+
+/**
+ * Deprecation warning for module usage
  */
 if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
   console.warn(
-    '⚠️  [SimplePerformanceCoordinator] This class is deprecated. ' +
-    'Use UnifiedPerformanceCoordinator.getInstance() instead. ' +
-    'This compatibility layer will be removed in a future version.'
+    '⚠️  [SimplePerformanceCoordinator] This module is deprecated. ' +
+    'Use PerformanceManager from this same module instead. ' +
+    'The SimplePerformanceCoordinator alias will be removed in a future version.'
   );
 }

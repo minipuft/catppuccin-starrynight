@@ -16,7 +16,7 @@
     --sn-beat-pulse-intensity,
     0
   ); // Direct beat connection
-  --micro-breathing-scale: var(--sn-breathing-scale, 1); // Breathing rhythm
+  --micro-breathing-scale: 1; // Scale removed to eliminate bubble effects
   --micro-rhythm-phase: var(--sn-rhythm-phase, 0); // Harmonic oscillation
 
   // === Enhanced Microinteraction Variables (BeatSync Enabled) ===
@@ -53,8 +53,8 @@
 
 // Enhanced main-card-card with YEAR 3000 rhythmic visual effects
 .main-card-card {
-  // Action Verb: OSCILLATE - Base animation with rhythm
-  transform: scale(var(--micro-breathing-scale));
+  // Action Verb: OSCILLATE - Base animation with rhythm (scale removed)
+  transform: translateZ(0);
   transition: transform var(--micro-medium) var(--sn-easing-explorer, ease-out);
   
   // Breathing removed - too many elements, creates visual chaos
@@ -72,11 +72,9 @@
     saturate(calc(1 + (var(--micro-beat-intensity) * 0.1)))
     brightness(calc(1 + (var(--micro-beat-intensity) * 0.05)));
 
-  // Kinetic Verb: BLOOM - Enhanced hover with rhythm
+  // Kinetic Verb: BLOOM - Enhanced hover with rhythm (scale removed)
   &:hover {
-    transform: scale(
-      calc(var(--micro-breathing-scale) * var(--micro-scale-enhancement))
-    );
+    transform: translateZ(0);
     box-shadow: 0 0 var(--micro-glow-radius)
       rgba(
         var(--sn-accent-rgb, var(--spice-rgb-accent)),
@@ -186,8 +184,8 @@
 .main-shuffleButton-button,
 .main-skipForwardButton-button,
 .main-skipBackButton-button {
-  // Kinetic Verb: OSCILLATE - Base breathing
-  transform: scale(var(--micro-breathing-scale));
+  // Kinetic Verb: OSCILLATE - Base breathing (scale removed)
+  transform: translateZ(0);
 
   @include interaction-feedback(
     calc(1.05 + (var(--micro-beat-intensity) * 0.03)),
@@ -202,9 +200,9 @@
     brightness(calc(1 + (var(--micro-beat-intensity) * 0.08)));
   transition: all var(--micro-fast) var(--sn-easing-explorer, ease-out);
 
-  // Kinetic Verb: BLOOM - Enhanced hover
+  // Kinetic Verb: BLOOM - Enhanced hover (scale removed)
   &:hover {
-    transform: scale(calc(var(--micro-breathing-scale) * 1.08));
+    transform: translateZ(0);
     box-shadow: 0 0 var(--micro-glow-radius)
       rgba(var(--spice-rgb-accent), var(--feedback-moderate));
   }
@@ -254,7 +252,7 @@
         var(--spice-rgb-accent),
         calc(0.5 + (var(--micro-beat-intensity) * 0.3))
       );
-    transform: scale(calc(var(--micro-breathing-scale) * 1.12));
+    transform: translateZ(0);
   }
 }
 

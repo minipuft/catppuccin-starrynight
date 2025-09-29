@@ -4,7 +4,7 @@ import { SidebarVisualEffectsSystem } from '@/visual/ui/SidebarVisualEffectsSyst
 // - SidebarInteractiveFlowSystem merged into SidebarVisualEffectsSystem
 // - UnifiedSidebarEffectsController merged into SidebarVisualEffectsSystem  
 // - RightSidebarController removed in favor of unified approach
-import { SidebarPerformanceCoordinator } from '@/visual/ui/SidebarPerformanceCoordinator';
+import { SidebarPerformanceManager } from '@/visual/ui/SidebarPerformanceCoordinator';
 import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 import type { HealthCheckResult } from '@/types/systems';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
@@ -74,7 +74,7 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   private consolidatedSidebarSystem?: SidebarVisualEffectsSystem;
   
   // Performance coordination
-  private sharedCoordinator: SidebarPerformanceCoordinator;
+  private sharedCoordinator: SidebarPerformanceManager;
   
   // System registry
   private sidebarSystems: Map<string, SidebarSystemDefinition> = new Map();
@@ -90,7 +90,7 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
     super(config);
     
     // Initialize shared performance coordinator
-    this.sharedCoordinator = SidebarPerformanceCoordinator.getInstance({
+    this.sharedCoordinator = SidebarPerformanceManager.getInstance({
       enableDebug: config.enableDebug,
       performanceAnalyzer: this.performanceAnalyzer,
       onFlushComplete: () => this.handlePerformanceFlush()
@@ -579,7 +579,7 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
     // (functionality now handled by consolidatedSidebarSystem)
     
     // Update visual-effects timing with musical beat
-    // Note: SidebarPerformanceCoordinator doesn't have updateMusicSync method yet
+    // Note: SidebarPerformanceManager doesn't have updateMusicSync method yet
     // This would be implemented when the method is available
     if (this.config.enableDebug) {
       console.log(`[${this.systemName}] Processed music beat:`, beatData);

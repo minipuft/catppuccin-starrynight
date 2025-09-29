@@ -11,6 +11,8 @@
 //
 // ████████████████████████████████████████████████████████████████████████████████
 
+@use "../../../core/performance_mixins" as *;
+
 // === CORE FOUNDATION ===
 // Note: visual-effects-variables and music-reactive-effects archived in Phase 10 Week 4 (orphaned files)
 // Using existing CSS variables and mixins for visual effects functionality
@@ -21,9 +23,7 @@
 // Core visual effects mixin
 @mixin visual-effects-base {
   position: relative;
-  contain: layout style paint;
-  will-change: transform, opacity, filter;
-  transform: translateZ(0);
+  @include performance-hardware-acceleration;
 }
 
 // Visual effects interaction states
@@ -232,7 +232,7 @@
       // Performance optimization
       pointer-events: none;
       z-index: calc(var(--visual-effects-depth-atmosphere, 0) - 10);
-      will-change: transform, opacity;
+      @include performance-hardware-acceleration;
       contain: strict;
       mix-blend-mode: overlay;
     }
@@ -734,13 +734,9 @@
   // GPU acceleration for visual effects elements
   .visual-effects-enabled {
     // Hardware acceleration
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    perspective: 1000px;
-    
     // Optimized painting
-    will-change: transform, opacity, filter;
-    contain: layout style paint;
+    @include performance-hardware-acceleration;
+    perspective: 1000px;
   }
   
   // Reduce visual effects on low-power devices
