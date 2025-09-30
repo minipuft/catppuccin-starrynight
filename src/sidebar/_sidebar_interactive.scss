@@ -23,24 +23,6 @@
   /* === RHYTHMIC BREATHING & PHASE CALCULATIONS ===*/
   /* 0.97 to 1.02, controlled by BeatSyncVisualSystem*/
   /* 0 to 2π, math phase for rhythm calculations*/
-
-  /* === BILATERAL SPATIAL DEPTH SYSTEM (Phase 4.5 Integration) ===*/
-  /* Bilateral timing coordination - anticipatory/reflective states*/
-  --sidebar-left-timing-offset: -150ms; /* Anticipatory timing (left appears first)*/
-  --sidebar-right-timing-offset: 150ms; /* Reflective timing (right follows)*/
-  --sidebar-bilateral-sync-rate: 1000ms; /* Synchronization frequency*/
-
-  /* Spatial depth layers - 3D consciousness*/
-  --sidebar-depth-layer-0: translateZ(0px) scale(1); /* Surface layer*/
-  --sidebar-depth-layer-1: translateZ(-50px) scale(0.95); /* Navigation items*/
-  --sidebar-depth-layer-2: translateZ(-100px) scale(0.9); /* Context items*/
-  --sidebar-depth-layer-3: translateZ(-150px) scale(0.85); /* Background items*/
-  --sidebar-depth-layer-4: translateZ(-200px) scale(0.8); /* Deep background*/
-
-  /* Music-synchronized flow direction*/
-  --sidebar-flow-direction: 0deg; /* 0-360deg directional flow based on audio*/
-  --sidebar-music-intensity: 0.5; /* 0-1 real-time music energy*/
-  --sidebar-spatial-depth: 0; /* 0-4 current dimensional layer*/
 }
 
 /* === DIGITAL MEDITATION & BIOMETRIC FEEDBACK ===*/
