@@ -10,7 +10,8 @@
 // === ROOT-LEVEL UTILITIES (non-duplicated) ===
 @forward "src/core/variables";
 
-@forward "src/scss/quick_add_radial";
+// Standalone utilities (not part of main architecture)
+@forward "src/utilities/quick_add_radial";
 
 :root {
   // Spicetify doesn't fully support light-sets yet, so we have to manually set the colors for the light theme
