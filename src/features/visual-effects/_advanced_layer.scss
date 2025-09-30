@@ -541,8 +541,8 @@ $fractal-iteration-depth-sass: 5;
 // === LIQUID MORPHING CONTENT CARDS ===
 .main-card-card {
   @include liquid-content-shape;
-  @include neural-pathway-network;
-  @include holographic-depth(2);
+  @include audio-visualization-grid;
+  @include layered-depth-effect(2);
   @include energy-field-content;
   @include fractal-recursive-content(1);
 
@@ -576,17 +576,17 @@ $fractal-iteration-depth-sass: 5;
   }
 
   &:nth-child(3n) {
-    @include holographic-depth(3);
+    @include layered-depth-effect(3);
     --fractal-zoom-level: 1.1;
   }
 
   &:nth-child(4n) {
-    @include holographic-depth(4);
+    @include layered-depth-effect(4);
     --neural-dendrite-length: 200px;
   }
 
   &:hover {
-    @include holographic-depth(1);
+    @include layered-depth-effect(1);
     --liquid-flow-speed: 1.5s;
     --energy-field-intensity: 2;
     --neural-connection-opacity: 0.6;
@@ -604,7 +604,7 @@ $fractal-iteration-depth-sass: 5;
 
 // === HOLOGRAPHIC ARTIST CIRCLES ===
 .main-card-card[data-testid*="artist"] {
-  @include holographic-depth(3);
+  @include layered-depth-effect(3);
   @include energy-field-content;
 
   border-radius: 50% !important;
@@ -647,7 +647,7 @@ $fractal-iteration-depth-sass: 5;
 
 // === NEURAL NETWORK SEARCH RESULTS ===
 .main-trackList-trackListRow {
-  @include neural-pathway-network;
+  @include audio-visualization-grid;
   @include liquid-content-shape;
 
   position: relative;
@@ -665,7 +665,7 @@ $fractal-iteration-depth-sass: 5;
     infinite;
 
   &:hover {
-    @include holographic-depth(2);
+    @include layered-depth-effect(2);
 
     background: linear-gradient(
       90deg,
@@ -689,7 +689,7 @@ $fractal-iteration-depth-sass: 5;
   &.main-trackList-selected,
   &:has(.main-trackList-playingIcon) {
     @include fractal-recursive-content(2);
-    @include holographic-depth(1);
+    @include layered-depth-effect(1);
 
     background: radial-gradient(
       ellipse at left,
@@ -711,7 +711,7 @@ $fractal-iteration-depth-sass: 5;
 
 // === FRACTAL SIDEBAR CONSCIOUSNESS ===
 .main-yourLibrary-yourLibrary {
-  @include holographic-depth(5);
+  @include layered-depth-effect(5);
 
   position: relative;
 
@@ -744,7 +744,7 @@ $fractal-iteration-depth-sass: 5;
 
   .spicetify-playlist-list li {
     @include liquid-content-shape;
-    @include neural-pathway-network;
+    @include audio-visualization-grid;
     @include energy-field-content;
 
     margin: 4px 0;
@@ -759,7 +759,7 @@ $fractal-iteration-depth-sass: 5;
     }
 
     &:hover {
-      @include holographic-depth(3);
+      @include layered-depth-effect(3);
       --energy-field-intensity: 1.5;
       --neural-connection-opacity: 0.4;
 
@@ -770,7 +770,7 @@ $fractal-iteration-depth-sass: 5;
     &[aria-selected="true"],
     &.main-rootlist-rootlistItemActive {
       @include fractal-recursive-content(1);
-      @include holographic-depth(1);
+      @include layered-depth-effect(1);
 
       background: linear-gradient(
         90deg,

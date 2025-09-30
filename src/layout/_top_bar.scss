@@ -27,7 +27,6 @@
   --sn-topbar-cosmic-opacity: calc(
     0.1 + var(--sn-beat-pulse-intensity, 0) * 0.15
   );
-  --sn-topbar-breathing-scale: var(--sn-breathing-scale, 1);
 
   // === SEARCH CONSCIOUSNESS VARIABLES ===
   --sn-search-ripple-intensity: calc(var(--sn-beat-pulse-intensity, 0) * 0.6);
@@ -98,12 +97,9 @@
     saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.2))
     brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
 
-  // BREATHING scale effect (subtle)
-  transform: scale(var(--sn-topbar-breathing-scale));
-
   // Smooth consciousness transitions
   transition: all 0.8s var(--sn-anim-easing-organic),
-    filter 0.3s ease-out, transform 0.2s ease-out;
+    filter 0.3s ease-out;
 
   // Cosmic atmosphere enhancement layer
   &::before {
@@ -145,10 +141,6 @@
         0.2
       ) 100%
     ) !important;
-
-    // BREATHING effect
-    transform: scale(var(--sn-topbar-breathing-scale));
-    transition: transform 0.4s ease-out;
   }
 }
 
@@ -191,9 +183,6 @@
 
     // Text consciousness
     color: var(--spice-subtext, #bac2de) !important;
-
-    // BLOOM scale with beats
-    transform: scale(var(--sn-search-focus-bloom));
     transition: all 0.3s var(--sn-anim-easing-organic);
 
     // Enhanced placeholder consciousness
@@ -207,8 +196,6 @@
 
     // Enhanced focus state
     &:focus {
-      // Intensified BLOOM on focus
-      transform: scale(calc(var(--sn-search-focus-bloom) * 1.02));
       border-color: rgba(var(--sn-accent-rgb, "202,158,230"), 0.8);
 
       box-shadow: 0 0 calc(12px + var(--sn-search-ripple-intensity) * 16px)
@@ -244,7 +231,6 @@
 
     &:hover {
       color: rgba(var(--sn-accent-rgb, 140,170,238), 1);
-      transform: scale(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
     }
   }
 }
@@ -264,9 +250,6 @@
     // HARMONIZE background colors with rhythm
     background: var(--sn-button-harmony-color) !important;
     color: var(--spice-subtext, #bac2de) !important;
-
-    // BLOOM scale effect during beats
-    transform: scale(var(--sn-button-bloom-scale));
 
     // Cosmic border enhancement
     border: 1px solid
@@ -321,8 +304,7 @@
           );
 
       // Enhanced BLOOM transform
-      transform: scale(calc(var(--sn-button-bloom-scale) * 1.05))
-        translateY(-1px);
+      transform: translateY(-1px);
 
       // Shimmer effect on hover
       &::before {
@@ -332,7 +314,6 @@
 
     // Active state consciousness
     &:active {
-      transform: scale(calc(var(--sn-button-bloom-scale) * 0.95));
       box-shadow: inset 0 2px 4px
         rgba(var(--sn-accent-rgb, "202,158,230"), 0.3);
     }
@@ -362,8 +343,6 @@
       calc(60% + var(--sn-beat-pulse-intensity, 0) * 20%)
     ) !important;
 
-    // BREATHING scale effect
-    transform: scale(var(--sn-topbar-breathing-scale));
     transition: all 0.4s ease-out;
   }
 }

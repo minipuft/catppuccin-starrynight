@@ -439,12 +439,11 @@ html[data-debug="true"] {
 /* Uses centralized legacy system from core/_mixins.scss */
 /* ============================================================================ */
 
-/* Apply universal consciousness terminology bridge */
-:root {
-  @include consciousness-bridge;
-}
+/* NOTE: Consciousness CSS variables are defined globally in core/_variable-compatibility.scss */
 
 /* Essential consciousness → visual-effects class bridge using central system */
+/* NOTE: All breathing classes now use opacity/filter effects only - no scale transforms */
+/* This preserves Year 3000 music-reactive design without UI shaking */
 .consciousness-gentle-breathing {
   @include legacy-consciousness-breathing('gentle');
 }

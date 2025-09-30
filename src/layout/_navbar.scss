@@ -22,8 +22,7 @@
                 var(--sn-accent-rgb, var(--spice-rgb-accent)),
                 calc(0.15 + (var(--sn-beat-pulse-intensity, 0) * 0.1))
               );
-              transform: scale(var(--sn-breathing-scale, 1));
-              transition: transform 0.2s ease-out;
+              transition: background-color 0.2s ease-out;
             }
 
             // Kinetic Verb: BLOOM - Hover enhancement with beat sync
@@ -71,8 +70,7 @@
         rgba(var(--sn-accent-rgb, var(--spice-rgb-main)), 0.8) 0%,
         rgba(var(--sn-accent-rgb, var(--spice-rgb-main)), 0.6) 100%
       );
-      transform: scale(var(--sn-breathing-scale, 1));
-      transition: background 0.3s ease-out, transform 0.3s ease-out;
+      transition: background 0.3s ease-out;
     }
 
     // Your collection, marketplace and lyrics app buttons - YEAR 3000 ENHANCED
@@ -97,10 +95,9 @@
     // Your collection svg - Rhythmic icon enhancement
     .Svg-img-24-icon.collection-icon {
       color: var(--spice-text);
-      transition: filter 0.3s ease-out, transform 0.2s ease-out;
+      transition: filter 0.3s ease-out;
 
-      // Kinetic Verb: OSCILLATE - Icon breathes with rhythm
-      transform: scale(var(--sn-breathing-scale, 1));
+      // Kinetic Verb: OSCILLATE - Icon breathes with rhythm (glow only, no scaling)
       filter: drop-shadow(
         0 0 calc(4px * var(--sn-beat-pulse-intensity, 0))
           rgba(

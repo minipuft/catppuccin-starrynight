@@ -24,7 +24,7 @@
 // === LAYER 3: COMPATIBILITY (Backward Compatibility) ===
 // Compatibility layers for renamed variables and mixins
 @use "_variable-compatibility" as *; // CSS variable compatibility aliases
-@use "_mixin-compatibility" as *; // Backward compatibility for renamed mixins
+// REMOVED: _mixin-compatibility (metaphorical mixin aliases migrated to technical names)
 @use "_variables" as *; // Legacy variables for backward compatibility
 @use "_sn_legacy_support" as *;
 @use "_sn_architecture_documentation" as *;

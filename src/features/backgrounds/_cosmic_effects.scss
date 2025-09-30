@@ -424,8 +424,8 @@ body {
 }
 
 @keyframes consciousness-breathing {
-  0%, 100% { transform: scale(1) rotateZ(0deg); filter: brightness(1) saturate(1.2); }
-  50% { transform: scale(var(--consciousness-breath-depth)) rotateZ(2deg); filter: brightness(1.1) saturate(1.4); }
+  0%, 100% { transform: rotateZ(0deg); filter: brightness(1) saturate(1.2); }
+  50% { transform: rotateZ(2deg); filter: brightness(1.1) saturate(1.4); }
 }
 
 // Legacy class mappings

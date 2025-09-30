@@ -2,10 +2,30 @@
 // CSS VARIABLE COMPATIBILITY LAYER
 // Provides backward compatibility aliases for renamed variables
 // ████████████████████████████████████████████████████████████████████████████████
+//
+// IMPORTANT: SCALE TRANSFORM DEPRECATION (Option C Implementation)
+// ════════════════════════════════════════════════════════════════════════════════
+// The --sn-breathing-scale variable and consciousness breathing system have been
+// modified to eliminate all scale() transforms that caused UI shaking.
+//
+// Changes implemented:
+// - All scale() transforms removed from navbar, top bar, and other UI components
+// - Consciousness breathing keyframes now only affect opacity and filter properties
+// - The --sn-breathing-scale variable is preserved for backward compatibility but
+//   should no longer be used in transform: scale() declarations
+//
+// Migration guidance:
+// - Replace transform: scale(var(--sn-breathing-scale)) with opacity/filter effects
+// - Use consciousness variables for color, saturation, and glow effects only
+// - For scale effects, use explicit hover/focus states instead of breathing variables
+//
+// This ensures Year 3000 music-reactive design (colors, glows) without movement.
+// ════════════════════════════════════════════════════════════════════════════════
 
 :root {
   // === CONSCIOUSNESS → MUSIC-SYNC MIGRATION ===
   // Old metaphorical variables mapped to new music-sync equivalents
+  // NOTE: consciousness-breathing variables now affect opacity/filters only, not scale
   --consciousness-breathing-duration: var(--music-sync-breath-duration, 4000ms);
   --consciousness-oklab-primary-rgb: var(--music-sync-oklab-primary-rgb);
   --consciousness-oklab-accent-rgb: var(--music-sync-oklab-accent-rgb);

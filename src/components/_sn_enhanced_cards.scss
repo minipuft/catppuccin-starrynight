@@ -177,10 +177,8 @@
   }
 
   // === STARRYNIGHT RHYTHMIC FOUNDATION ===
-  // Kinetic Verb: ANIMATE - Cards move with the music (scale removed)
-  transform: translateZ(0)
-    rotateY(calc(var(--card-rhythm-phase) * 0.5deg))
-    rotateX(calc(var(--card-rhythm-phase) * 0.3deg));
+  // Kinetic Verb: HARMONIZE - Cards respond to music through color/glow (rotation removed for stability)
+  transform: translateZ(0);
   
   // Animation removed - focusing on key music elements instead
 
@@ -191,11 +189,8 @@
   .main-view-container:has([data-testid*="artist"]) & {
     --card-visual-mode: 1;
 
-    // Enhanced 3D positioning for visual nodes (scale removed)
-    transform: translateZ(0)
-      var(--card-visual-depth)
-      rotateY(calc(var(--card-rhythm-phase) * 0.5deg + 2deg))
-      rotateX(calc(var(--card-rhythm-phase) * 0.3deg + 1deg));
+    // Enhanced depth for visual nodes (rotation removed for stability)
+    transform: translateZ(0) var(--card-visual-depth);
   }
 
   // === Visual Effects Foundation - ENHANCED WITH RHYTHM ===
@@ -283,9 +278,7 @@
   &:hover {
     // Kinetic Verb: EXPAND - Contextual lift calculation with rhythm + 3D depth
     transform: var(--card-depth-near)
-      translateZ(12px)
-      rotateY(calc(var(--card-rhythm-phase) * 1deg))
-      rotateX(calc(var(--card-rhythm-phase) * 0.5deg));
+      translateZ(12px);
 
     // Enhanced visual effects background
     background: linear-gradient(

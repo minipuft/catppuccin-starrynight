@@ -47,21 +47,19 @@
     // background-color: rgba(var(--spice-rgb-main), 0.1) !important;
   }
 
-  // Continuous breathing effect based on rhythm
-  transform: scale(var(--sn-breathing-scale, 1));
-  transition: transform var(--sn-transition-fast); // Smooth transition for breathing
+  // Kinetic Verb: HARMONIZE - Stable positioning with beat-responsive glows
+  transform: translateZ(0);
+  transition: box-shadow var(--sn-transition-fast);
 
-  // Pulse effect on beat detection - YEAR 3000 ENHANCED
+  // Pulse effect on beat detection - YEAR 3000 ENHANCED (glow only, no scale)
   .main-playButton-PlayButton,
   .main-shuffleButton-button,
   .main-button-button {
-    // Kinetic Verb: BLOOM - More pronounced pulse for stronger connection
-    transform: scale(
-      calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.12))
-    ); // Enhanced pulse: max 12% size increase - sell the effect!
-    transition: transform 120ms var(--sn-anim-easing-bounce-medium); // Snappier, bouncier pulse
+    // Kinetic Verb: BLOOM - Beat-responsive glow (scale removed for stability)
+    transform: translateZ(0);
+    transition: box-shadow 120ms var(--sn-anim-easing-bounce-medium);
 
-    // Additional enhancement: subtle glow pulse
+    // Beat-responsive glow - Year 3000 design philosophy preserved
     box-shadow: 0 0 calc(8px * var(--sn-beat-pulse-intensity, 0))
       rgba(
         var(--sn-accent-rgb, var(--spice-rgb-accent)),
@@ -69,7 +67,7 @@
       );
   }
 
-  // Optional: Background pulse for the entire action bar (can be intense)
+  // Optional: Background pulse for the entire action bar - Year 3000 ambient glow
   &::after {
     content: "";
     position: absolute;
@@ -77,13 +75,13 @@
     right: 10%; // End inset from edges
     top: 50%;
     height: 4px; // Fixed height for the bar
-    transform: translateY(-50%) scaleX(var(--sn-beat-pulse-intensity, 0)); // Pulse width with beat, centered
+    transform: translateY(-50%); // Centered, stable positioning
     background: rgba(
       var(--sn-accent-rgb, var(--spice-rgb-accent)),
-      0.7
-    ); // Solid color for the bar, using a dynamic theme color
+      calc(0.7 * var(--sn-beat-pulse-intensity, 0))
+    ); // Opacity pulses with beat intensity
     border-radius: 2px; // Rounded edges for the bar
-    transition: transform 120ms var(--sn-anim-easing-bounce-medium); // Snappy pulse
+    transition: opacity 120ms var(--sn-anim-easing-bounce-medium); // Snappy opacity pulse
     z-index: -1; // Behind the buttons
   }
 }

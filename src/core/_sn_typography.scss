@@ -74,20 +74,17 @@
   // ColorHarmonyEngine based on beat pulse.
   @include text-glow(--sn-gradient-accent-rgb);
 
-  // BeatSync enhancements
+  // BeatSync enhancements - Year 3000 color harmonization
   & {
-    // BLOOM text glow during beats
-    // Remove custom glow; now handled by text-glow mixin above
+    // Kinetic Verb: HARMONIZE - Stable text with music-reactive colors
+    transform: translateZ(0);
 
-    // BREATHING scale effect
-    transform: scale(var(--sn-text-breathing-scale));
-
-    // HARMONIZE filter effects
+    // HARMONIZE filter effects - color shifts with music
     filter: hue-rotate(calc(var(--sn-text-rhythm-hue) * $intensity))
       saturate(var(--sn-text-harmonic-saturation))
       brightness(var(--sn-text-energy-brightness));
 
-    // OSCILLATE letter spacing
+    // OSCILLATE letter spacing - subtle rhythm tracking
     letter-spacing: calc(normal + var(--sn-text-rhythm-spacing) * $intensity);
 
     // Enhanced transitions
@@ -111,9 +108,8 @@
       )
       hue-rotate(calc(var(--sn-text-rhythm-hue) * 0.5));
 
-    // BLOOM transform enhancement
-    transform: translateY(-0.5px)
-      scale(calc(var(--sn-text-breathing-scale) * 1.02));
+    // Kinetic Verb: LIFT - Subtle elevation (scale removed for stability)
+    transform: translateY(-0.5px);
 
     // Enhanced cosmic glow on hover
     text-shadow: 0 0 calc(var(--sn-text-beat-glow) * 1.5)
@@ -155,7 +151,7 @@
     );
     border-radius: 4px;
     opacity: var(--sn-beat-pulse-intensity, 0);
-    transform: scale(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+    transform: translateZ(0); // Stable positioning, glow via opacity
     transition: all 0.3s ease-out;
     pointer-events: none;
     z-index: -1;
@@ -317,8 +313,8 @@
   .main-card-cardMetadata {
     color: var(--spice-subtext);
 
-    // Subtle consciousness for metadata
-    transform: scale(var(--sn-text-breathing-scale));
+    // Subtle consciousness for metadata - color harmonization only
+    transform: translateZ(0);
     filter: hue-rotate(calc(var(--sn-text-rhythm-hue) * 0.2));
     transition: all var(--text-transition);
 
@@ -416,12 +412,11 @@
 @keyframes nowPlayingBreathing {
   0%,
   100% {
-    transform: scale(var(--sn-text-breathing-scale)) translateX(0);
+    transform: translateX(0); // Subtle horizontal drift (scale removed)
     filter: hue-rotate(var(--sn-text-rhythm-hue));
   }
   50% {
-    transform: scale(calc(var(--sn-text-breathing-scale) * 1.01))
-      translateX(1px);
+    transform: translateX(1px); // Gentle movement with music
     filter: hue-rotate(calc(var(--sn-text-rhythm-hue) * 1.2));
   }
 }

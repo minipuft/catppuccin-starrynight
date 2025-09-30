@@ -590,6 +590,21 @@
   }
 }
 
+// Improved layered depth effect with dynamic calculation (replaces holographic-depth)
+@mixin layered-depth-effect($level: 1) {
+  z-index: calc(100 + #{$level});
+  transform: translateZ(calc(#{$level} * var(--layered-projection-distance, 30px)));
+  filter: blur(calc((#{$level} - 1) * 1px));
+}
+
+// Audio visualization grid layout (replaces neural-pathway-network)
+@mixin audio-visualization-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: var(--audio-sync-delay, 100ms);
+  transition: all var(--music-sync-flow-speed, 12s) var(--dynamic-ease-motion);
+}
+
 // Card morphing states (for different card layouts)
 @mixin card-morph-state($state: "default") {
   @if $state == "expanded" {
@@ -1019,11 +1034,9 @@
 
 @keyframes consciousness-breathing {
   0%, 100% {
-    transform: scale(1);
     opacity: var(--consciousness-field-intensity, 0.4);
   }
   50% {
-    transform: scale(1.02);
     opacity: calc(var(--consciousness-field-intensity, 0.4) * 1.2);
   }
 }
