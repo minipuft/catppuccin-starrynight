@@ -20,17 +20,20 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 :root {
-  // === UNIFIED FLUID INTENSITY ===
-  --fluid-base-intensity: 0.5;             // Fluid effect strength (0-1)
-  --fluid-animation-duration: 12s;         // Base animation duration
+  // === MIGRATED TO CENTRALIZED SYSTEM (Phase 6.4.2) ===
+  // Base variables now defined in src/core/_unified-effects-engine.scss
+  // Using centralized --sn-gradient-* variables for consistency
 
-  // === LEGACY COMPATIBILITY ALIASES ===
-  // Map old variables to unified system
+  // Local aliases for backward compatibility (deprecated - will be removed Phase 6.5)
+  --fluid-base-intensity: var(--sn-gradient-base-intensity, 0.5);
+  --fluid-animation-duration: var(--sn-gradient-flow-duration, 12s);
+
+  // Music sync aliases (good - keep these)
   --fluid-phase: var(--sn-music-rhythm-phase, 0deg);
   --fluid-amplitude: var(--sn-music-breathing-scale, 1.0);
   --fluid-intensity: var(--sn-unified-effect-intensity, 0.5);
 
-  // === FLUID APPEARANCE ===
+  // Design token aliases (good - keep these)
   --fluid-gradients-opacity: var(--sn-ui-glass-opacity, 0.1);
   --fluid-gradients-blur: var(--sn-ui-glass-blur, 20px);
   --fluid-gradients-saturation: var(--sn-bg-gradient-saturation, 1.1);

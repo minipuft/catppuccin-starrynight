@@ -1,35 +1,39 @@
 // ████████████████████████████████████████████████████████████████████████████████
-// 🌌 FLUX PARTICLE CONSCIOUSNESS FIELD - Living Star Neural Network
-// YEAR 3000 VISUAL TRANSCENDENCE MODULE
-// "Consciousness exists as particles in space. We make them visible."
+// 🌌 FLUX PARTICLE FIELD - Music-Reactive Star System
+// YEAR 3000 VISUAL EFFECTS MODULE
+// Dynamic particle field with music synchronization and ambient flow
 // ████████████████████████████████████████████████████████████████████████████████
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ✨ CONSCIOUSNESS PARTICLE VARIABLES
+// ✨ PARTICLE FIELD VARIABLES
 // ═══════════════════════════════════════════════════════════════════════════════
 
 :root {
-  // === HARMONIZED WITH MEDITATION RHYTHM ===
-  --particle-meditation-sync: 15s; // Matches liquid morphing meditation rhythm
-  --particle-consciousness-density: 0.4; // More peaceful baseline
+  // === MIGRATED TO CENTRALIZED SYSTEM (Phase 6.4.3) ===
+  // Core particle variables now in src/core/_unified-effects-engine.scss
+  // Using centralized --sn-particle-* and --sn-star-* variables
+
+  // Local aliases for backward compatibility (deprecated - will be removed Phase 6.5)
+  --particle-meditation-sync: var(--sn-particle-base-speed, 15s);
+  --particle-field-density: var(--sn-particle-field-density, 0.4);
   --particle-life-cycle-speed: var(--particle-meditation-sync);
-  --particle-neural-connection-range: 100px; // Slightly smaller for subtlety
+  --particle-neural-connection-range: var(--sn-particle-connection-range, 100px);
   --particle-cosmic-scale: 1;
-  --particle-reality-phase: calc(var(--sn-rhythm-phase, 0) * 60deg); // Gentler rotation
-  
-  // === MEDITATIVE STAR FIELD ===
-  --star-field-depth: 4; // Simplified
-  --star-brightness-variance: 0.3; // More consistent, peaceful
-  --star-size-range: 2px; // Smaller, subtler
-  --star-twinkle-frequency: 8s; // Much slower, meditative
-  --star-parallax-intensity: 0.15; // Gentler movement
-  
-  // === CALMER NEURAL NETWORK ===
-  --neural-synaptic-firing-speed: 6s; // Much slower baseline
-  --neural-connection-opacity: 0.1; // More subtle
-  --neural-pulse-propagation: 2s; // Slower pulse
-  --neural-dendrite-growth: 3s; // Gentler growth
-  --neural-network-complexity: 2; // Simplified
+  --particle-reality-phase: calc(var(--sn-rhythm-phase, 0) * 60deg);
+
+  // Star field aliases (map to centralized system)
+  --star-field-depth: var(--sn-star-depth-layers, 4);
+  --star-brightness-variance: var(--sn-star-brightness-variance, 0.3);
+  --star-size-range: var(--sn-star-max-size, 2px);
+  --star-twinkle-frequency: var(--sn-star-twinkle-speed, 8s);
+  --star-parallax-intensity: var(--sn-star-parallax-intensity, 0.15);
+
+  // Neural network aliases (map to centralized particle system)
+  --neural-synaptic-firing-speed: var(--sn-particle-connect-speed, 6s);
+  --neural-connection-opacity: var(--sn-particle-connection-opacity, 0.1);
+  --neural-pulse-propagation: var(--sn-particle-pulse-speed, 2s);
+  --neural-dendrite-growth: var(--sn-particle-growth-speed, 3s);
+  --neural-network-complexity: var(--sn-particle-connection-complexity, 2)
   
   // === MUSICAL AWAKENING THRESHOLDS (Harmonized) ===
   --particle-awakening-threshold: 0.3; // Matches other systems
@@ -49,24 +53,24 @@
     var(--music-particle-awakening-gate) * 0.4 + 
     var(--music-particle-transcendence-gate) * 0.5
   );
-  --music-consciousness-flow: calc(
+  --music-flow-multiplier: calc(
     1 + 
     var(--music-particle-awakening-gate) * 0.5 + 
     var(--music-particle-transcendence-gate) * 1
   );
   
-  // === CONSCIOUSNESS BREATHING (Harmonized with Meditation) ===
-  --consciousness-field-breath: var(--particle-meditation-sync); // 15s to match meditation rhythm
-  --consciousness-depth-shift: calc(var(--music-particle-awakening-gate) * 15px + var(--music-particle-transcendence-gate) * 10px);
-  --consciousness-color-shift: calc(var(--sn-dynamic-genre-hue-shift, 0deg) * 0.1); // Much gentler
+  // === PARTICLE ANIMATION VARIABLES (Harmonized with Meditation) ===
+  --particle-animation-duration: var(--particle-meditation-sync); // 15s to match meditation rhythm
+  --particle-depth-shift: calc(var(--music-particle-awakening-gate) * 15px + var(--music-particle-transcendence-gate) * 10px);
+  --particle-color-shift: calc(var(--sn-dynamic-genre-hue-shift, 0deg) * 0.1); // Much gentler
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🌟 PARTICLE CONSCIOUSNESS KEYFRAMES - PERFORMANCE OPTIMIZED
+// 🌟 PARTICLE FIELD KEYFRAMES - PERFORMANCE OPTIMIZED
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// CONSOLIDATED ANIMATION - Combines drift, twinkle, and breathing into single keyframe
-@keyframes consciousness-field-consolidated {
+// CONSOLIDATED FLOW ANIMATION - Combines drift, twinkle, and breathing into single keyframe
+@keyframes particle-field-flow {
   0%, 100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
     opacity: 0.4;
@@ -89,8 +93,8 @@
   }
 }
 
-// CONSOLIDATED AWAKENING ANIMATION - Combines multiple effects for musical response
-@keyframes consciousness-field-awakening {
+// MUSICAL RESPONSE ANIMATION - Combines multiple effects for beat synchronization
+@keyframes particle-field-musical {
   0% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
     opacity: 0.6;
@@ -118,8 +122,8 @@
   }
 }
 
-// CONSOLIDATED SECONDARY LAYER ANIMATION - Combines flow and twinkle effects
-@keyframes consciousness-field-secondary {
+// AMBIENT SECONDARY LAYER ANIMATION - Combines flow and twinkle effects
+@keyframes particle-field-ambient {
   0%, 100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(0.9);
     opacity: 0.4;
@@ -190,7 +194,7 @@
   }
 }
 
-@keyframes star-twinkle-consciousness {
+@keyframes star-twinkle-pulse {
   0%, 100% {
     opacity: 0.4;
     transform: scale(1);
@@ -247,14 +251,14 @@
   }
 }
 
-@keyframes consciousness-field-pulse {
+@keyframes particle-field-pulse {
   0%, 100% {
-    filter: hue-rotate(var(--consciousness-color-shift)) brightness(1);
-    opacity: var(--particle-consciousness-density);
+    filter: hue-rotate(var(--particle-color-shift)) brightness(1);
+    opacity: var(--particle-field-density);
   }
   50% {
-    filter: hue-rotate(calc(var(--consciousness-color-shift) + 10deg)) brightness(1.1);
-    opacity: calc(var(--particle-consciousness-density) * 1.2);
+    filter: hue-rotate(calc(var(--particle-color-shift) + 10deg)) brightness(1.1);
+    opacity: calc(var(--particle-field-density) * 1.2);
   }
 }
 
@@ -323,14 +327,14 @@
       radial-gradient(4px circle at 60% 10%, rgba(var(--sn-gradient-secondary-rgb), 0.5) 0%, transparent 50%);
     
     // PERFORMANCE OPTIMIZED: Consolidated single animation instead of 3 concurrent ones
-    animation: consciousness-field-consolidated var(--particle-life-cycle-speed) ease-in-out infinite;
+    animation: particle-field-flow var(--particle-life-cycle-speed) ease-in-out infinite;
     
     // Gentle baseline filtering
     filter: brightness(var(--music-particle-resonance)) hue-rotate(var(--particle-reality-phase));
     
     // PERFORMANCE OPTIMIZED: Musical awakening uses consolidated animation
     .Root[style*="--sn-beat-pulse-intensity"] & {
-      animation: consciousness-field-awakening calc(var(--particle-life-cycle-speed) / max(var(--music-particle-resonance), 0.3)) ease-in-out infinite;
+      animation: particle-field-musical calc(var(--particle-life-cycle-speed) / max(var(--music-particle-resonance), 0.3)) ease-in-out infinite;
     }
   }
   
@@ -367,7 +371,7 @@
       radial-gradient(1px circle at 52% 8%, rgba(var(--sn-gradient-secondary-rgb), 0.3) 0%, transparent 50%);
     
     // PERFORMANCE OPTIMIZED: Single animation for secondary layer
-    animation: consciousness-field-secondary calc(var(--particle-life-cycle-speed) * 1.4) ease-in-out infinite;
+    animation: particle-field-ambient calc(var(--particle-life-cycle-speed) * 1.4) ease-in-out infinite;
     
     // Slightly different music response for layering effect
     filter: brightness(calc(var(--music-particle-resonance) * 0.9)) hue-rotate(calc(var(--particle-reality-phase) * -0.3));
@@ -551,8 +555,8 @@
         transparent 100%
       );
     
-    animation: consciousness-field-pulse calc(var(--consciousness-field-breath) * 0.8) ease-in-out infinite;
-    filter: brightness(var(--music-consciousness-flow));
+    animation: particle-field-pulse calc(var(--particle-animation-duration) * 0.8) ease-in-out infinite;
+    filter: brightness(var(--music-flow-multiplier));
   }
 }
 
@@ -569,7 +573,7 @@
       radial-gradient(1px circle at 85% 15%, rgba(var(--sn-gradient-secondary-rgb), 0.6) 0%, transparent 50%);
     
     // PERFORMANCE OPTIMIZED: Single animation for artist cards
-    animation: consciousness-field-consolidated calc(var(--particle-life-cycle-speed) * 0.7) ease-in-out infinite;
+    animation: particle-field-flow calc(var(--particle-life-cycle-speed) * 0.7) ease-in-out infinite;
   }
 }
 
@@ -590,9 +594,9 @@
     --star-twinkle-frequency: 8s;
     --neural-synaptic-firing-speed: 6s;
     --neural-pulse-propagation: 3s;
-    --consciousness-field-breath: 15s;
+    --particle-animation-duration: 15s;
     --neural-connection-opacity: 0.1;
-    --particle-consciousness-density: 0.4;
+    --particle-field-density: 0.4;
   }
   
   // Disable neural connections for reduced motion
@@ -608,11 +612,11 @@
 
 @media (max-width: 768px) {
   :root {
-    --particle-consciousness-density: 0.6;
+    --particle-field-density: 0.6;
     --particle-neural-connection-range: 80px;
     --star-size-range: 2px;
     --neural-connection-opacity: 0.15;
-    --consciousness-field-breath: 6s;
+    --particle-animation-duration: 6s;
   }
   
   // Simplified neural network for mobile
@@ -632,7 +636,7 @@
 @media (prefers-contrast: high) {
   :root {
     --neural-connection-opacity: 0.4;
-    --particle-consciousness-density: 1;
+    --particle-field-density: 1;
   }
   
   .main-card-card,
@@ -660,7 +664,7 @@
 // Performance optimization for lower-end devices
 @media (max-resolution: 1.5dppx) {
   :root {
-    --particle-consciousness-density: 0.5;
+    --particle-field-density: 0.5;
     --neural-network-complexity: 2;
   }
   

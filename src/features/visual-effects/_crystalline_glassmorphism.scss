@@ -20,15 +20,17 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 :root {
-  // === UNIFIED INTENSITY CONTROL ===
-  // These replace 20+ separate variables with formula-driven system
-  --crystal-base-intensity: 0.6;              // Base crystalline effect strength
-  --crystal-music-multiplier: 1.0;            // Music reactivity (0-2)
-  --crystal-float-height: 15px;               // Floating animation height
-  --crystal-float-rhythm: 4s;                 // Breathing rhythm duration
+  // === MIGRATED TO CENTRALIZED SYSTEM (Phase 6.4.1) ===
+  // Base variables now defined in src/core/_unified-effects-engine.scss
+  // Using centralized --sn-glass-* variables for consistency
 
-  // === LEGACY COMPATIBILITY ALIASES ===
-  // Old variables mapped to unified system
+  // Local aliases for backward compatibility (deprecated - will be removed Phase 6.5)
+  --crystal-base-intensity: var(--sn-glass-base-intensity, 0.6);
+  --crystal-music-multiplier: var(--sn-glass-music-multiplier, 1.0);
+  --crystal-float-height: var(--sn-glass-float-height, 15px);
+  --crystal-float-rhythm: var(--sn-glass-float-rhythm, 4s);
+
+  // Unified system integration (good - keep)
   --crystal-pulse-intensity: var(--sn-unified-effect-intensity, 0.6);
   --prism-intensity: calc(var(--sn-unified-music-energy, 0.5) * 0.8);
   --iridescence-flow-speed: var(--crystal-float-rhythm, 4s);
