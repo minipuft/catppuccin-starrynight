@@ -1,0 +1,272 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// 🌊 FLUID MORPHING ANIMATIONS - Year3000 Organic Visual Effects
+// Phase 7.4: Extracted from _shape_transitions.scss (selective integration)
+// ████████████████████████████████████████████████████████████████████████████████
+//
+// Philosophy: Organic, breathing interfaces that respond to music
+// Extracted: Core fluid morphing animations without legacy metaphorical variables
+// Performance: Optimized for 60fps, respects reduced-motion preferences
+//
+// ████████████████████████████████████████████████████████████████████████████████
+
+@use "../../core/mixins" as *;
+@use "../../core/performance_mixins" as *;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌊 FLUID MORPHING KEYFRAMES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Gentle resting state - subtle organic breathing
+@keyframes fluid-breathing {
+  0%, 100% {
+    border-radius: 48% 52% 53% 47% / 51% 49% 52% 48%;
+    transform: rotate(0deg) scale(1) skewX(0deg);
+  }
+  25% {
+    border-radius: 52% 48% 47% 53% / 49% 51% 48% 52%;
+    transform: rotate(1deg) scale(1.005) skewX(0.5deg);
+  }
+  50% {
+    border-radius: 47% 53% 52% 48% / 52% 48% 51% 49%;
+    transform: rotate(0deg) scale(1.01) skewX(0deg);
+  }
+  75% {
+    border-radius: 53% 47% 48% 52% / 48% 52% 49% 51%;
+    transform: rotate(-1deg) scale(1.005) skewX(-0.5deg);
+  }
+}
+
+// Musical activation - more dramatic organic response
+@keyframes fluid-awakening {
+  0%, 100% {
+    border-radius: 48% 52% 53% 47% / 51% 49% 52% 48%;
+    transform: rotate(0deg) scale(1) skewX(0deg);
+  }
+  25% {
+    border-radius: 60% 40% 45% 55% / 42% 58% 48% 52%;
+    transform: rotate(-3deg) scale(1.02) skewX(-1deg);
+  }
+  50% {
+    border-radius: 43% 57% 48% 52% / 55% 45% 53% 47%;
+    transform: rotate(2deg) scale(1.04) skewX(0.5deg);
+  }
+  75% {
+    border-radius: 53% 47% 48% 52% / 48% 52% 49% 51%;
+    transform: rotate(-1deg) scale(1.005) skewX(-0.5deg);
+  }
+}
+
+// Metallic surface coalescence - liquid mercury effect
+@keyframes metallic-coalescence {
+  0% {
+    transform: scale(1) translateX(0);
+    border-radius: 50%;
+    opacity: 1;
+  }
+  30% {
+    transform: scale(1.2) translateX(5px);
+    border-radius: 60% 40% 50% 50%;
+    opacity: 0.8;
+  }
+  60% {
+    transform: scale(0.8) translateX(-3px);
+    border-radius: 40% 60% 45% 55%;
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1) translateX(0);
+    border-radius: 50%;
+    opacity: 1;
+  }
+}
+
+// Holographic shimmer - light-based dynamic refraction
+@keyframes holographic-shimmer {
+  0%, 100% {
+    border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+    filter: brightness(1) saturate(1.2) hue-rotate(var(--sn-rhythm-phase, 0deg));
+  }
+  25% {
+    border-radius: 60% 40% 70% 30% / 40% 80% 20% 60%;
+    filter: brightness(1.1) saturate(1.3) hue-rotate(calc(var(--sn-rhythm-phase, 0deg) + 30deg));
+  }
+  50% {
+    border-radius: 30% 70% 40% 60% / 80% 20% 60% 40%;
+    filter: brightness(1.2) saturate(1.4) hue-rotate(calc(var(--sn-rhythm-phase, 0deg) + 60deg));
+  }
+  75% {
+    border-radius: 70% 30% 60% 40% / 20% 80% 40% 60%;
+    filter: brightness(1.1) saturate(1.3) hue-rotate(calc(var(--sn-rhythm-phase, 0deg) + 90deg));
+  }
+}
+
+// Ripple propagation - interaction feedback
+@keyframes fluid-ripple {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0;
+    border-radius: 50%;
+  }
+  50% {
+    transform: scale(2) rotate(180deg);
+    opacity: 1;
+    border-radius: 40% 60% 30% 70%;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🧬 FLUID MORPHING MIXINS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin fluid-morphing($intensity: 0.5) {
+  position: relative;
+  overflow: visible;
+
+  // Gentle organic border-radius
+  border-radius: 48% 52% 53% 47% / 51% 49% 52% 48%;
+
+  // Subtle gradient background
+  background:
+    radial-gradient(
+      ellipse 90% 70% at 35% 45%,
+      rgba(var(--sn-gradient-primary-rgb), calc(#{$intensity} * 0.04)) 0%,
+      transparent 80%
+    ),
+    radial-gradient(
+      ellipse 70% 85% at 65% 55%,
+      rgba(var(--sn-gradient-accent-rgb), calc(#{$intensity} * 0.03)) 0%,
+      transparent 70%
+    );
+
+  background-size: 250% 180%, 220% 250%;
+
+  // Performance-optimized animation
+  @include performance-hardware-acceleration;
+  animation: fluid-breathing 15s ease-in-out infinite;
+
+  // Smooth state transitions
+  transition:
+    border-radius 2.5s var(--sn-anim-easing-standard),
+    background 3s ease-out;
+
+  // Musical activation override
+  .Root[style*="--sn-beat-pulse-intensity"] & {
+    animation: fluid-awakening calc(15s * (2 - var(--sn-beat-pulse-intensity, 0))) ease-in-out infinite;
+
+    background:
+      radial-gradient(
+        ellipse 95% 75% at 30% 40%,
+        rgba(var(--sn-gradient-primary-rgb), calc(#{$intensity} * (0.04 + var(--sn-beat-pulse-intensity, 0) * 0.06))) 0%,
+        transparent 75%
+      ),
+      radial-gradient(
+        ellipse 75% 90% at 70% 60%,
+        rgba(var(--sn-gradient-accent-rgb), calc(#{$intensity} * (0.03 + var(--sn-beat-pulse-intensity, 0) * 0.05))) 0%,
+        transparent 65%
+      );
+  }
+}
+
+@mixin metallic-surface {
+  position: relative;
+  border-radius: 50%;
+
+  // Metallic gradient
+  background:
+    radial-gradient(
+      ellipse 100% 80% at 50% 30%,
+      rgba(var(--sn-gradient-primary-rgb), 0.12) 0%,
+      rgba(var(--sn-gradient-accent-rgb), 0.08) 40%,
+      transparent 80%
+    );
+
+  @include performance-hardware-acceleration;
+  animation: metallic-coalescence 2s ease-in-out infinite;
+
+  // Surface reflection highlight
+  &::before {
+    content: "";
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    width: 30%;
+    height: 30%;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.8) 0%,
+      rgba(255, 255, 255, 0.4) 40%,
+      transparent 70%
+    );
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+    animation: metallic-coalescence calc(2s * 0.7) ease-in-out infinite reverse;
+  }
+}
+
+@mixin fluid-ripple-feedback {
+  position: relative;
+  overflow: visible;
+
+  // Ripple effect on interaction
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(
+      circle,
+      rgba(var(--sn-gradient-primary-rgb), 0.3) 0%,
+      rgba(var(--sn-gradient-accent-rgb), 0.2) 30%,
+      transparent 100%
+    );
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0;
+    transition: all 0.3s ease-out;
+  }
+
+  &:hover,
+  &:focus,
+  &[aria-selected="true"] {
+    &::before {
+      width: 200%;
+      height: 200%;
+      opacity: 1;
+      animation: fluid-ripple 8s ease-out infinite;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌟 ACCESSIBILITY & PERFORMANCE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --fluid-animation-speed: 20s;
+  }
+
+  // Disable complex morphing, keep gentle breathing only
+  * {
+    animation-duration: var(--fluid-animation-speed) !important;
+    animation-timing-function: linear !important;
+  }
+}
+
+@media (max-width: 768px) {
+  // Simplified morphing for mobile
+  @keyframes fluid-breathing {
+    0%, 100% { border-radius: 12px; transform: none; }
+    50% { border-radius: 16px; transform: scale(1.01); }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// 🌊 FLUID MORPHING COMPLETION
+// Extracted core organic animations for Year3000 theme integration
+// ════════════════════════════════════════════════════════════════════════════════
