@@ -34,6 +34,8 @@ interface DepthLayer {
   animationPhase: number;
   enabled: boolean;
   gradientColors: string[];
+  cachedOpacity: number;
+  cachedTransform: string;
 }
 
 interface DepthLayeredState {
@@ -88,6 +90,9 @@ export class DepthLayeredStrategy implements IColorProcessor {
     isInitialized: false,
     stylesInjected: false,
   };
+
+  // Track animation time for coordinator-driven updates
+  private animationElapsedTime: number = 0;
 
   private depthSettings: DepthSettings = {
     enabled: true,
@@ -639,11 +644,12 @@ export class DepthLayeredStrategy implements IColorProcessor {
         i
       );
 
-      // Set layer styles
+      // Set layer styles - use CSS variables for dynamic properties
+      // PERFORMANCE FIX: Properties controlled by CSS variables can be updated efficiently
       layerElement.style.cssText = `
         background: ${gradient};
-        transform: translate3d(0, 0, ${-depth}px) scale(${scale});
-        opacity: ${opacity};
+        transform: var(--sn-depth-layer-${i}-transform, translate3d(0, 0, ${-depth}px) scale(${scale}));
+        opacity: var(--sn-depth-layer-${i}-opacity, ${opacity});
         filter: blur(${blur}px);
         animation: ${template.animation} ${
         template.duration
@@ -665,6 +671,8 @@ export class DepthLayeredStrategy implements IColorProcessor {
         animationPhase: (i * Math.PI) / 4,
         enabled: true,
         gradientColors: depthColors.slice(i, i + 4),
+        cachedOpacity: opacity,
+        cachedTransform: `translate3d(0, 0, ${-depth}px) scale(${scale})`,
       };
 
       // Store layer
@@ -737,39 +745,18 @@ export class DepthLayeredStrategy implements IColorProcessor {
 
   /**
    * Start depth animation loop
+   * MIGRATION NOTE: This method now no-ops. Animation is driven by EnhancedMasterAnimationCoordinator
+   * via updateAnimation() method, which will be called automatically by SystemCoordinator.
    */
   private startDepthAnimation(): void {
-    this.depthState.lastAnimationTime = performance.now();
-
-    const animate = () => {
-      if (!this.depthState.isInitialized) return;
-
-      const currentTime = performance.now();
-      const deltaTime = currentTime - this.depthState.lastAnimationTime;
-
-      // Throttle to 30 FPS for depth layers
-      if (deltaTime < 33) {
-        this.depthState.animationFrameId = requestAnimationFrame(animate);
-        return;
-      }
-
-      this.depthState.lastAnimationTime = currentTime;
-
-      // Update depth animations
-      this.updateDepthAnimations(deltaTime);
-
-      // Update performance metrics
-      this.updatePerformanceMetrics();
-
-      // Continue animation
-      this.depthState.animationFrameId = requestAnimationFrame(animate);
-    };
-
-    this.depthState.animationFrameId = requestAnimationFrame(animate);
+    // Animation is now handled by updateAnimation() called by coordinator
+    // No standalone RAF loop needed
+    Y3KDebug?.debug?.log("DepthLayeredStrategy", "Animation loop delegated to EnhancedMasterAnimationCoordinator");
   }
 
   /**
    * Update depth animations
+   * PERFORMANCE FIX: Use CSS variables instead of direct style manipulation
    */
   private updateDepthAnimations(deltaTime: number): void {
     this.depthState.depthLayers.forEach((layer) => {
@@ -778,18 +765,25 @@ export class DepthLayeredStrategy implements IColorProcessor {
 
       // Apply subtle depth pulsing
       const pulsingFactor = Math.sin(layer.animationPhase) * 0.05;
-      const currentOpacity = parseFloat(layer.element.style.opacity);
-      const newOpacity = currentOpacity + pulsingFactor;
+      const newOpacity = Math.max(0, Math.min(1, layer.cachedOpacity + pulsingFactor));
 
-      layer.element.style.opacity = Math.max(
-        0,
-        Math.min(1, newOpacity)
-      ).toString();
+      // Update cached value
+      layer.cachedOpacity = newOpacity;
+
+      // Queue CSS variable update instead of direct DOM manipulation
+      if (this.cssController) {
+        const depthIndex = layer.id.replace('depth-layer-', '');
+        this.cssController.queueCSSVariableUpdate(
+          `--sn-depth-layer-${depthIndex}-opacity`,
+          newOpacity.toString()
+        );
+      }
     });
   }
 
   /**
    * Update depth with music energy
+   * PERFORMANCE FIX: Use CSS variables instead of direct style manipulation
    */
   private updateDepthWithMusicEnergy(energy: number): void {
     const energyModulation =
@@ -798,13 +792,22 @@ export class DepthLayeredStrategy implements IColorProcessor {
     this.depthState.depthLayers.forEach((layer) => {
       const baseOpacity = layer.opacityRange[0];
       const maxOpacity = layer.opacityRange[1];
-      const newOpacity =
-        baseOpacity + energyModulation * (maxOpacity - baseOpacity);
-
-      layer.element.style.opacity = Math.max(
+      const newOpacity = Math.max(
         0,
-        Math.min(1, newOpacity)
-      ).toString();
+        Math.min(1, baseOpacity + energyModulation * (maxOpacity - baseOpacity))
+      );
+
+      // Update cached value
+      layer.cachedOpacity = newOpacity;
+
+      // Queue CSS variable update instead of direct DOM manipulation
+      if (this.cssController) {
+        const depthIndex = layer.id.replace('depth-layer-', '');
+        this.cssController.queueCSSVariableUpdate(
+          `--sn-depth-layer-${depthIndex}-opacity`,
+          newOpacity.toString()
+        );
+      }
     });
   }
 
@@ -831,50 +834,94 @@ export class DepthLayeredStrategy implements IColorProcessor {
 
   /**
    * Update parallax effects
+   * PERFORMANCE FIX: Use CSS variables instead of direct style manipulation
    */
   private updateParallaxEffects(): void {
     this.depthState.depthLayers.forEach((layer) => {
       const parallaxY = this.depthState.scrollY * layer.parallaxFactor;
       const parallaxX = this.depthState.scrollX * layer.parallaxFactor * 0.5;
 
-      // Update transform
-      const currentTransform = layer.element.style.transform;
-      const newTransform = currentTransform.replace(
-        /translate3d\([^)]*\)/,
-        `translate3d(${parallaxX}px, ${parallaxY}px, ${-layer.depth}px)`
-      );
+      // Extract scale from cached transform
+      const scaleMatch = layer.cachedTransform.match(/scale\(([^)]+)\)/);
+      const scale = scaleMatch ? scaleMatch[1] : '1';
 
-      layer.element.style.transform = newTransform;
+      // Build new transform
+      const newTransform = `translate3d(${parallaxX}px, ${parallaxY}px, ${-layer.depth}px) scale(${scale})`;
+
+      // Update cached value
+      layer.cachedTransform = newTransform;
+
+      // Queue CSS variable update instead of direct DOM manipulation
+      if (this.cssController) {
+        const depthIndex = layer.id.replace('depth-layer-', '');
+        this.cssController.queueCSSVariableUpdate(
+          `--sn-depth-layer-${depthIndex}-transform`,
+          newTransform
+        );
+      }
     });
   }
 
   /**
    * Update layer dimensions
+   * PERFORMANCE FIX: Use CSS variables instead of direct style manipulation
    */
   private updateLayerDimensions(): void {
     this.depthState.depthLayers.forEach((layer) => {
       const depthFactor = layer.depth / this.depthSettings.maxDepth;
       const scale = 1 + depthFactor * 0.2;
 
-      // Update scale in transform
-      const currentTransform = layer.element.style.transform;
-      const newTransform = currentTransform.replace(
-        /scale\([^)]*\)/,
-        `scale(${scale})`
-      );
+      // Extract translate3d from cached transform
+      const translateMatch = layer.cachedTransform.match(/translate3d\([^)]+\)/);
+      const translate = translateMatch ? translateMatch[0] : `translate3d(0, 0, ${-layer.depth}px)`;
 
-      layer.element.style.transform = newTransform;
+      // Build new transform
+      const newTransform = `${translate} scale(${scale})`;
+
+      // Update cached value
+      layer.cachedTransform = newTransform;
+
+      // Queue CSS variable update instead of direct DOM manipulation
+      if (this.cssController) {
+        const depthIndex = layer.id.replace('depth-layer-', '');
+        this.cssController.queueCSSVariableUpdate(
+          `--sn-depth-layer-${depthIndex}-transform`,
+          newTransform
+        );
+      }
     });
   }
 
   /**
+   * updateAnimation() - Called by EnhancedMasterAnimationCoordinator at 60fps
+   * Handles depth layer animations that were previously in standalone RAF loop
+   */
+  public updateAnimation(deltaTime: number): void {
+    if (!this.depthState.isInitialized) return;
+
+    // Throttle to 30 FPS for depth layers (performance optimization)
+    this.animationElapsedTime += deltaTime;
+    if (this.animationElapsedTime < 33) return;
+
+    // Update depth animations
+    this.updateDepthAnimations(this.animationElapsedTime);
+
+    // Update performance metrics
+    this.updatePerformanceMetrics();
+
+    // Reset elapsed time
+    this.animationElapsedTime = 0;
+  }
+
+  /**
    * Update performance metrics
+   * PERFORMANCE FIX: Use cached opacity values instead of reading from DOM
    */
   private updatePerformanceMetrics(): void {
     this.performanceMetrics.totalLayers = this.depthState.depthLayers.size;
     this.performanceMetrics.visibleLayers = Array.from(
       this.depthState.depthLayers.values()
-    ).filter((layer) => parseFloat(layer.element.style.opacity) > 0.01).length;
+    ).filter((layer) => layer.cachedOpacity > 0.01).length;
 
     this.performanceMetrics.averageDepth =
       Array.from(this.depthState.depthLayers.values()).reduce(
@@ -883,8 +930,7 @@ export class DepthLayeredStrategy implements IColorProcessor {
       ) / this.depthState.depthLayers.size;
 
     this.performanceMetrics.parallaxRange = this.depthSettings.parallaxStrength;
-    this.performanceMetrics.renderTime =
-      performance.now() - this.depthState.lastAnimationTime;
+    this.performanceMetrics.renderTime = this.animationElapsedTime;
 
     // Update CSS variables for debugging
     if (this.cssController) {
