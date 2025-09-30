@@ -164,18 +164,18 @@
   }
 }
 
-/* Apply fixes globally */
+/* Apply fixes globally - classes are used by TypeScript WhiteLayerDiagnosticSystem */
 body {
-  @include sn-chromatic-aberration-fix;
-  @include sn-screen-blend-fix;
-  @include sn-backdrop-filter-fix;
-  @include sn-webgl-context-fix;
-  @include sn-floating-crystal-fix;
-  @include sn-z-index-fix;
-  
+  @extend .sn-chromatic-aberration-fix;
+  @extend .sn-screen-blend-fix;
+  @extend .sn-backdrop-filter-fix;
+  @extend .sn-webgl-context-fix;
+  @extend .sn-floating-crystal-fix;
+  @extend .sn-z-index-fix;
+
   /* Apply emergency fixes if white layers are detected */
   &.sn-white-layer-emergency {
-    @include sn-emergency-white-fix;
+    @extend .sn-emergency-white-fix;
   }
 }
 
