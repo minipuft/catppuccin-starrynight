@@ -8,7 +8,7 @@
 @forward "src/core/_main";
 
 // === ROOT-LEVEL UTILITIES (non-duplicated) ===
-@forward "src/core/variables";
+// REMOVED: src/core/variables (Phase 6.1 - dead code, no functionality)
 
 // Standalone utilities (not part of main architecture)
 @forward "src/utilities/quick_add_radial";

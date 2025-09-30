@@ -67,6 +67,55 @@
   --sn-variant-energetic-scale: 1.5;   // Energetic: 150% of base
   --sn-variant-crystalline-scale: 1.2; // Crystalline: 120% of base
   --sn-variant-fluid-scale: 0.8;       // Fluid: 80% of base
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // FEATURE SYSTEM VARIABLES (Phase 6.3 - Centralized)
+  // Consolidates scattered definitions from individual feature files
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // === GLASSMORPHISM SYSTEM ===
+  // Controls glass-like blur and transparency effects
+  --sn-glass-base-intensity: 0.6;              // Base glass effect strength (0-1)
+  --sn-glass-music-multiplier: 1.0;            // Music reactivity multiplier (0-2)
+  --sn-glass-float-height: 15px;               // Floating animation height
+  --sn-glass-float-rhythm: 4s;                 // Breathing rhythm duration
+
+  // === GRADIENT SYSTEM ===
+  // Controls flowing gradient animations
+  --sn-gradient-base-intensity: 0.5;           // Gradient strength (0-1)
+  --sn-gradient-flow-duration: 12s;            // Flow animation speed
+
+  // === PARTICLE FIELD SYSTEM ===
+  // Controls star field and particle connection effects
+  --sn-particle-base-speed: 15s;               // Meditation sync rhythm
+  --sn-particle-field-density: 0.4;            // Particle count multiplier (0-1)
+  --sn-particle-connection-range: 100px;       // Connection distance threshold
+  --sn-particle-connect-speed: 6s;             // Connection animation speed
+  --sn-particle-connection-opacity: 0.1;       // Connection line opacity (0-1)
+  --sn-particle-pulse-speed: 2s;               // Pulse propagation duration
+  --sn-particle-growth-speed: 3s;              // Growth animation duration
+  --sn-particle-connection-complexity: 2;      // Max connections per particle
+
+  // Star field sub-system
+  --sn-star-depth-layers: 4;                   // Number of parallax layers
+  --sn-star-brightness-variance: 0.3;          // Brightness randomization (0-1)
+  --sn-star-max-size: 2px;                     // Maximum star size
+  --sn-star-twinkle-speed: 8s;                 // Twinkle frequency
+  --sn-star-parallax-intensity: 0.15;          // Parallax strength (0-1)
+
+  // === SHAPE TRANSFORMATION SYSTEM ===
+  // Controls 3D depth and shape transitions
+  --sn-shape-corner-radius: 16px;              // Default border radius
+  --sn-shape-depth-near: translateZ(12px);     // 3D depth near plane
+  --sn-shape-depth-mid: translateZ(6px);       // 3D depth mid plane
+  --sn-shape-depth-far: translateZ(0px);       // 3D depth far plane
+  --sn-shape-transition-medium: 0.5s;          // Standard transition duration
+
+  // === LAYERED EFFECTS SYSTEM ===
+  // Controls depth layering and atmospheric effects
+  --sn-layered-depth-count: 3;                 // Number of depth layers
+  --sn-layered-projection-distance: 30px;      // Layer separation distance
+  --sn-layered-glow-intensity: 0.8;            // Glow effect strength (0-1)
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
