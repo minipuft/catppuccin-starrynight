@@ -353,11 +353,3 @@
 /* ============================================================================ */
 /* LEGACY COMPATIBILITY - Consolidated */
 /* ============================================================================ */
-
-:root {
-  // Legacy aliases for consciousness terminology
-  --consciousness-intensity: var(--depth-effects-intensity);
-  --consciousness-breath-rate: var(--depth-animation-duration);
-  --consciousness-scanline-opacity: var(--depth-scanline-opacity);
-  --consciousness-scanline-density: var(--depth-scanline-opacity);
-}

@@ -286,7 +286,7 @@
     ),
     // Tertiary nebula streams
     linear-gradient(
-      calc(135deg + var(--consciousness-flow-state, 0deg)),
+      calc(135deg + var(--visual-flow-angle, 0deg)),
       rgba(var(--sn-gradient-secondary-rgb), calc($opacity * 0.6)) 0%,
       rgba(var(--sn-gradient-primary-rgb), calc($opacity * 0.4)) 30%,
       transparent 70%,
@@ -511,7 +511,7 @@
 
 // Genre-responsive cosmic evolution
 .Root[style*="--sn-dynamic-genre-hue-shift"] {
-  --consciousness-flow-state: calc(var(--sn-dynamic-genre-hue-shift, 0deg) + var(--sn-rhythm-phase, 0) * 180deg);
+  --visual-flow-angle: calc(var(--sn-dynamic-genre-hue-shift, 0deg) + var(--sn-rhythm-phase, 0) * 180deg);
   
   &::before {
     filter: 

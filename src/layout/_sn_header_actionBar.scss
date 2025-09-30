@@ -424,14 +424,10 @@ body:not(:has(.main-searchPage-content)) {
   --header-soul-secondary: var(--header-interface-secondary);
   --header-soul-accent: var(--header-interface-accent);
   --header-soul-whisper: var(--header-interface-glow);
-  --header-consciousness-flow-speed: var(--header-visual-effects-flow-speed);
-  --header-consciousness-energy: var(--header-visual-effects-energy);
-  --header-consciousness-harmony: var(--header-visual-effects-harmony);
-  --header-consciousness-depth: var(--header-visual-effects-depth);
 }
 
 /* Keyframe aliases for legacy animation names */
-@keyframes header-cosmic-consciousness {
+@keyframes header-cosmic-pulse {
   0%, 100% {
     filter: blur(var(--header-cosmic-blur))
       saturate(calc(var(--cosmic-saturation, 1.4) * (0.9 + var(--header-visual-effects-energy) * 0.1)))
@@ -466,7 +462,7 @@ body:not(:has(.main-searchPage-content)) {
   }
 }
 
-@keyframes header-entity-consciousness {
+@keyframes header-entity-pulse {
   0%, 100% {
     filter: blur(var(--header-cosmic-blur))
       saturate(calc(var(--cosmic-saturation, 1.4) * (0.8 + var(--header-visual-effects-energy) * 0.1)))

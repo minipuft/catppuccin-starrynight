@@ -9,8 +9,8 @@
 @use "../core/_performance_mixins" as *;
 @use "./_sn_card_base";
 @use "./_sn_visual_accents" as *;
-@use "../core/_kinetic-animations" as *;
 // Note: perceptual-blending archived in Phase 10 Week 4 (orphaned file)
+// Note: _kinetic-animations removed - animations integrated into _sn_advanced_visual_effects.scss
 
 // StarryNight Enhanced Cards System Variables
 :root {
@@ -900,7 +900,7 @@ body:not(:has(.main-searchPage-content)) {
   @include extend-bridge('[data-visual-enhanced]');
 }
 
-.oklab-consciousness-blend {
+.oklab-color-blend {
   @include extend-bridge('.oklab-visual-blend');
 }
 

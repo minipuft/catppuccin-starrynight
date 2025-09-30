@@ -1007,39 +1007,7 @@
   }
 }
 
-// Cosmic consciousness field backdrop – subtle radial aura breathing
-@mixin consciousness-field-background {
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -30px;
-    z-index: -1;
-    pointer-events: none;
-
-    background: radial-gradient(
-      ellipse 600% 200% at 50% 50%,
-      rgba(var(--sn-gradient-primary-rgb, var(--spice-rgb-accent)),
-        calc(var(--consciousness-field-intensity, 0.4) * 0.3)) 0%,
-      transparent 40%
-    );
-
-    filter: blur(20px);
-    opacity: var(--consciousness-field-intensity, 0.4);
-    animation: consciousness-breathing var(--consciousness-breathing-rate, 12s)
-      ease-in-out infinite;
-  }
-}
-
 // === Magnetic Depth Utility Animations =====================
-
-@keyframes consciousness-breathing {
-  0%, 100% {
-    opacity: var(--consciousness-field-intensity, 0.4);
-  }
-  50% {
-    opacity: calc(var(--consciousness-field-intensity, 0.4) * 1.2);
-  }
-}
 
 @keyframes magnetic-invitation-pulse {
   0%, 100% {
@@ -1092,22 +1060,8 @@
 // `_mixins.scss` automatically gains access.
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// CENTRALIZED LEGACY COMPATIBILITY SYSTEM - Phase 4 Optimization
+// LEGACY COMPATIBILITY SYSTEM
 // ═══════════════════════════════════════════════════════════════════════════════
-
-// Universal legacy consciousness terminology bridge
-@mixin consciousness-bridge {
-  // CSS variable bridges for consciousness → visual-effects terminology
-  --consciousness-phase: var(--fluid-phase);
-  --consciousness-amplitude: var(--fluid-amplitude);
-  --consciousness-intensity: var(--visual-effects-intensity);
-  --consciousness-breathing-duration: var(--visual-effects-breathing-duration);
-}
-
-// Legacy animation bridge for consciousness breathing classes
-@mixin legacy-consciousness-breathing($variant: 'gentle') {
-  @include breathing-animation($variant, --visual-effects-breathing-duration);
-}
 
 // Consolidated legacy class bridge system
 @mixin legacy-class-bridge($old-class, $new-class) {

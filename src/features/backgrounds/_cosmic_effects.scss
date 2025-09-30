@@ -409,13 +409,13 @@ body {
 
 :root {
   // === Legacy Consciousness → Visual Effects Mappings ===
-  --consciousness-breath-depth: var(--visual-effects-animation-depth);
-  --consciousness-breath-rhythm: var(--visual-effects-animation-rhythm);
-  --consciousness-pulse-intensity: var(--visual-effects-pulse-intensity);
+  --cosmic-breath-depth: var(--visual-effects-animation-depth);
+  --cosmic-breath-rhythm: var(--visual-effects-animation-rhythm);
+  --cosmic-pulse-intensity: var(--visual-effects-pulse-intensity);
 }
 
 // Legacy keyframe support
-@keyframes aurora-consciousness-flow {
+@keyframes aurora-ambient-flow {
   0% { transform: translateX(-100px) translateY(0px) scale(1); filter: hue-rotate(0deg) brightness(1) saturate(1.2); }
   25% { transform: translateX(50px) translateY(-80px) scale(1.1); filter: hue-rotate(15deg) brightness(1.2) saturate(1.4); }
   50% { transform: translateX(120px) translateY(40px) scale(0.95); filter: hue-rotate(30deg) brightness(0.9) saturate(1.1); }
@@ -423,12 +423,12 @@ body {
   100% { transform: translateX(-100px) translateY(0px) scale(1); filter: hue-rotate(60deg) brightness(1) saturate(1.2); }
 }
 
-@keyframes consciousness-breathing {
+@keyframes cosmic-breathing {
   0%, 100% { transform: rotateZ(0deg); filter: brightness(1) saturate(1.2); }
   50% { transform: rotateZ(2deg); filter: brightness(1.1) saturate(1.4); }
 }
 
 // Legacy class mappings
-.nebula-consciousness-field {
+.nebula-ambient-field {
   @extend .nebula-visual-effects-field !optional;
 }

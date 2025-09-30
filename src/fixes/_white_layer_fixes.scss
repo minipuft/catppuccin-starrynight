@@ -126,7 +126,7 @@
   }
   
   /* Ensure consciousness layers don't conflict */
-  .sn-consciousness-layer {
+  .sn-ambient-layer {
     z-index: -10 !important;
   }
   
@@ -135,7 +135,7 @@
   }
   
   /* Fix cosmic consciousness background layers */
-  .sn-cosmic-consciousness-layer {
+  .sn-cosmic-ambient-layer {
     z-index: -1000 !important;
   }
   

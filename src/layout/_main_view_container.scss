@@ -163,12 +163,12 @@
 // Ensures backward compatibility during transition
 
 // Class aliases for consciousness → visual effects
-.main-view-container__scroll-node.dynamic-consciousness-enabled::before {
+.main-view-container__scroll-node.dynamic-particle-enabled::before {
   opacity: 1;
   transform: scale(1);
 }
 
-.main-view-container__scroll-node.dynamic-consciousness-enabled::after {
+.main-view-container__scroll-node.dynamic-particle-enabled::after {
   opacity: 1;
   transform: scale(1);
 }
@@ -180,7 +180,7 @@
   100% { opacity: 1; transform: scale(1); }
 }
 
-@keyframes dynamic-consciousness-field {
+@keyframes dynamic-ambient-field {
   0% { opacity: 1; transform: translateX(0) translateY(0); }
   25% { opacity: 0.98; transform: translateX(1px) translateY(-0.5px); }
   50% { opacity: 0.96; transform: translateX(-0.5px) translateY(1px); }

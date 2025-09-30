@@ -47,7 +47,7 @@
   // === TEMPORAL SHIFT VARIABLES ===
   --sn-topbar-temporal-phase: var(--sn-rhythm-phase, 0);
   --sn-topbar-energy-absorption: var(--sn-beat-pulse-intensity, 0);
-  --sn-topbar-consciousness-flow: calc(var(--sn-rhythm-phase, 0) * 180deg);
+  --sn-topbar-rhythm-angle: calc(var(--sn-rhythm-phase, 0) * 180deg);
 }
 
 // ████████████████████████████████████████████████████████████████████████████████
@@ -63,7 +63,7 @@
   background:
     // Layer 1: OSCILLATE rhythm gradient
     linear-gradient(
-      calc(90deg + var(--sn-topbar-consciousness-flow)),
+      calc(90deg + var(--sn-topbar-rhythm-angle)),
             rgba(
         var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
         var(--sn-topbar-cosmic-opacity)
@@ -362,7 +362,7 @@
   }
 }
 
-@keyframes consciousnessBreathing {
+@keyframes topbar-breathing {
   0%,
   100% {
     transform: scale(1) rotate(0deg);

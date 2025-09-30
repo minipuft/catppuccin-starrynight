@@ -23,19 +23,13 @@
 // ════════════════════════════════════════════════════════════════════════════════
 
 :root {
-  // === CONSCIOUSNESS → MUSIC-SYNC MIGRATION ===
-  // Old metaphorical variables mapped to new music-sync equivalents
-  // NOTE: consciousness-breathing variables now affect opacity/filters only, not scale
-  --consciousness-breathing-duration: var(--music-sync-breath-duration, 4000ms);
-  --consciousness-oklab-primary-rgb: var(--music-sync-oklab-primary-rgb);
-  --consciousness-oklab-accent-rgb: var(--music-sync-oklab-accent-rgb);
-  --consciousness-musical-intensity: var(--music-sync-intensity, 0.8);
-  --consciousness-rhythm-phase: var(--music-sync-rhythm-phase, 0);
-  --consciousness-flow-speed: var(--music-sync-flow-speed, 12s);
+  // === CONSCIOUSNESS VARIABLES REMOVED ===
+  // The consciousness terminology has been removed and replaced with direct usage
+  // of functional variables (music-sync, audio-visualization, dynamic effects).
+  // See Phase 2C of consciousness system removal for migration details.
   
   // === ORGANIC → DYNAMIC MIGRATION ===
   // Old metaphorical variables mapped to new dynamic equivalents
-  --organic-ease-consciousness: var(--dynamic-ease-motion, cubic-bezier(0.4, 0, 0.2, 1));
   --organic-corners: var(--dynamic-corners, 16px);
   --organic-depth-near: var(--dynamic-depth-near, translateZ(12px));
   --organic-depth-mid: var(--dynamic-depth-mid, translateZ(6px));
@@ -51,7 +45,6 @@
   
   // === CRYSTAL → GLASSMORPHISM MIGRATION ===
   // Old metaphorical crystal variables mapped to glassmorphism
-  --crystal-consciousness-opacity: var(--glassmorphism-opacity, 0.8);
   --crystal-edge-sharpness: var(--glassmorphism-edge-sharpness, 8px);
   --crystal-surface-roughness: var(--glassmorphism-surface-roughness, 0.3);
   --crystal-internal-refraction: var(--glassmorphism-internal-refraction, 15px);
@@ -109,10 +102,8 @@
   --organic-membrane-opacity: var(--glassmorphism-border-opacity, 0.3);
   --organic-cinematic-intensity: var(--audio-cinematic-intensity, 0.8);
   
-  // === CONSCIOUSNESS DEPTH → LAYERED DEPTH MIGRATION ===
-  // Old metaphorical depth variables mapped to layered depth system
-  --consciousness-intensity: var(--audio-visualization-intensity, 0.7);
-  --consciousness-depth-offset: var(--layered-depth-offset, 12px);
+  // === ORGANIC DEPTH → AMBIENT DEPTH MIGRATION ===
+  // Old metaphorical depth variables mapped to ambient depth system
   --organic-depth-atmosphere: var(--ambient-depth-atmosphere, 0);
 }
 

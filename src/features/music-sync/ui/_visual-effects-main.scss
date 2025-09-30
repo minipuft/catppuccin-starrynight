@@ -113,57 +113,6 @@
   filter: saturate(1.1) brightness(1.02);
 }
 
-// === LEGACY COMPATIBILITY CLASSES ===
-// These provide backward compatibility during the transition
-
-.organic-consciousness-base {
-  @include visual-effects-base;
-}
-
-.organic-consciousness-container {
-  @extend .visual-effects-container !optional;
-}
-
-.organic-consciousness-enabled {
-  @extend .visual-effects-enabled !optional;
-}
-
-.organic-symbiotic-resonance {
-  @extend .visual-effects-audio-resonance !optional;
-}
-
-.organic-beat-sync {
-  @extend .visual-effects-beat-sync !optional;
-}
-
-.organic-emotional-empathy {
-  @extend .visual-effects-audio-responsive !optional;
-}
-
-.organic-blade-runner-neon {
-  @extend .visual-effects-neon-theme !optional;
-}
-
-.organic-volumetric-fog {
-  @extend .visual-effects-volumetric-fog !optional;
-}
-
-.organic-holographic-display {
-  @extend .visual-effects-holographic-display !optional;
-}
-
-.organic-bioluminescent-tech {
-  @extend .visual-effects-luminescent-tech !optional;
-}
-
-.organic-crystalline-consciousness {
-  @extend .visual-effects-crystalline-glassmorphism !optional;
-}
-
-.dynamic-environmental-consciousness {
-  @extend .dynamic-environmental-effects !optional;
-}
-
 // === COLOR SYSTEM ===
 // Note: Color system files archived in Phase 10 Week 4 (orphaned files)
 // - emotional-temperature-colors, genre-specific-presets, oklab-animations, perceptual-blending
@@ -528,10 +477,10 @@
 // Performance mode adaptations
 :root[data-organic-performance-mode="minimal"] {
   // Minimal performance mode - disable complex effects
-  .organic-consciousness-container {
+  .visual-effects-container {
     animation: none !important;
     filter: none !important;
-    
+
     &::before {
       display: none !important;
     }
@@ -550,7 +499,7 @@
 
 :root[data-organic-performance-mode="balanced"] {
   // Balanced performance mode - remove animations
-  .organic-consciousness-container {
+  .visual-effects-container {
     animation: none !important;
   }
   

@@ -1,0 +1,14 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// 🎭 MOTION TOKENS - Compatibility Shim (Phase 6+)
+// Consolidated into design-tokens/tokens.scss
+// ████████████████████████████████████████████████████████████████████████████████
+//
+// This file now forwards all motion, animation, and musical timing tokens from
+// the unified design-tokens/tokens.scss system. All 388 lines of motion-specific
+// variables have been consolidated into the authoritative token source.
+//
+// Maintained for backward compatibility during migration.
+// Original content archived in _motion-tokens.scss.backup
+// ████████████████████████████████████████████████████████████████████████████████
+
+@forward "tokens";

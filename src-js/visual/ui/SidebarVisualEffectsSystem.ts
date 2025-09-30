@@ -426,22 +426,39 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
     this.visualEffectsAnimationFrame = requestAnimationFrame(animate);
   }
 
+  /**
+   * Mapping from HARMONIC_MODES keys to SCSS class names in _sn_advanced_visual_effects.scss
+   * This ensures TypeScript applies the correct CSS classes that match the SCSS selectors
+   */
+  private readonly HARMONIC_MODE_TO_CSS_CLASS: Record<string, string> = {
+    "analogous-flow": "sn-color-harmony-analogous-flow",
+    "triadic-trinity": "sn-color-harmony-triadic-scheme",
+    "complementary-yin-yang": "sn-color-harmony-complementary-contrast",
+    "tetradic-advanced-cross": "sn-color-harmony-tetradic-cross",
+    "tetradic-cosmic-cross": "sn-color-harmony-tetradic-cross",
+    "split-complementary-spectrum": "sn-color-harmony-split-complementary-spectrum",
+    "split-complementary-aurora": "sn-color-harmony-split-complementary-spectrum",
+    "monochromatic-calm": "sn-color-harmony-monochromatic-calm",
+    "monochromatic-meditation": "sn-color-harmony-monochromatic-calm",
+  };
+
   public updateHarmonicModeDisplay(newModeKey: string) {
     this.currentHarmonicModeKey = newModeKey;
     if (this.rootNavBar) {
-      // Remove any existing harmonic mode classes to prevent conflicts.
+      // Remove any existing color harmony mode classes to prevent conflicts
       const classList = this.rootNavBar.classList;
       classList.forEach((className) => {
-        if (className.startsWith("sn-harmonic-")) {
+        if (className.startsWith("sn-color-harmony-")) {
           classList.remove(className);
         }
       });
 
-      // Add the new class based on the mode key.
-      // This will activate the corresponding styles in the SCSS.
+      // Add the new class based on the mode key mapping to SCSS class names
+      // This activates the corresponding styles in _sn_advanced_visual_effects.scss
       const mode = HARMONIC_MODES[newModeKey];
-      if (mode) {
-        this.rootNavBar.classList.add(`sn-harmonic-${newModeKey}`);
+      const cssClassName = this.HARMONIC_MODE_TO_CSS_CLASS[newModeKey];
+      if (mode && cssClassName) {
+        this.rootNavBar.classList.add(cssClassName);
       }
     }
   }

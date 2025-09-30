@@ -298,232 +298,11 @@ nav[aria-label="Main"] ul li a {
 }
 
 /* ████████████████████████████████████████████████████████████████████████████████*/
-/* VISUAL EFFECTS FIELD & HARMONIC MODES*/
+/* TEMPORAL ECHO LAYER STYLING (from _sn_advanced_visual_effects.scss)*/
 /* ████████████████████████████████████████████████████████████████████████████████*/
+/* Note: Color harmony and music energy classes moved to consolidated section below */
 
 .Root__nav-bar {
-  /* Base transition for all dynamic effects*/
-  transition: background-color 0.7s var(--sn-easing-explorer),
-    box-shadow 0.7s var(--sn-easing-explorer),
-    filter 0.7s var(--sn-easing-explorer);
-
-  /* Apply backgrounds per harmonic mode (JS adds these classes)*/
-  &.sn-harmonic-analogous-flow {
-    background: linear-gradient(
-      170deg,
-      rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-accent)),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.7 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        0%,
-      rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-surface0)),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.5 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        40%,
-      rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-accent)),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.8 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        100%
-    );
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.15 *
-              var(--sn-sidebar-harmonic-intensity-multiplier))),
-      inset 0 0 30px 5px
-        rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-surface0)),
-          calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier))
-        );
-  }
-
-  &.sn-harmonic-triadic-trinity {
-    background: linear-gradient(
-      170deg,
-      rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-accent)),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.7 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        0%,
-      rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-accent)),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.5 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        40%,
-      rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-surface0)),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.8 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        100%
-    );
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.15 *
-              var(--sn-sidebar-harmonic-intensity-multiplier))),
-      inset 0 0 30px 5px
-        rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-accent)),
-          calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier))
-        );
-  }
-
-  &.sn-harmonic-complementary-yin-yang {
-    background: linear-gradient(
-      170deg,
-      rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-accent)),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.7 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        0%,
-      rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-accent)),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.5 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        40%,
-      rgba(
-          var(--spice-rgb-surface1, 69, 71, 90),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.8 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        100%
-    );
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.15 *
-              var(--sn-sidebar-harmonic-intensity-multiplier))),
-      inset 0 0 30px 5px
-        rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-accent)),
-          calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier))
-        );
-  }
-
-  &.sn-harmonic-tetradic-cosmic-cross {
-    background: linear-gradient(
-      170deg,
-      rgba(
-          var(--spice-rgb-green, 166, 227, 161),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.7 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        0%,
-      rgba(
-          var(--spice-rgb-red, 243, 139, 168),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.5 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        40%,
-      rgba(
-          var(--spice-rgb-yellow, 249, 226, 175),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.8 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        100%
-    );
-  }
-
-  &.sn-harmonic-split-complementary-aurora {
-    background: linear-gradient(
-      170deg,
-      rgba(
-          var(--spice-rgb-peach, 239, 159, 118),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.7 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        0%,
-      rgba(
-          var(--spice-rgb-sky, 137, 220, 235),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.5 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        40%,
-      rgba(
-          var(--spice-rgb-teal, 129, 200, 190),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.8 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        100%
-    );
-  }
-
-  &.sn-harmonic-monochromatic-meditation {
-    background: linear-gradient(
-      170deg,
-      rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-accent)),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.7 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        0%,
-      rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-accent)),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.5 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        40%,
-      rgba(
-          var(--sn-accent-rgb, var(--spice-rgb-accent)),
-          calc(
-            var(--sn-sidebar-base-bg-opacity) * 0.8 *
-              var(--sn-sidebar-harmonic-intensity-multiplier)
-          )
-        )
-        100%
-    ); /* More intense for monochromatic*/
-  }
-
-  /* --- Music Energy Styling ---*/
-  /* (JS adds these classes: sn-music-low-energy, sn-music-mid-energy, sn-music-high-energy)*/
-  &.sn-music-low-energy {
-    filter: saturate(0.85) brightness(0.95);
-    animation: sn-sidebar-pulse-slow 8s infinite ease-in-out alternate;
-  }
-  &.sn-music-mid-energy {
-    filter: saturate(1) brightness(1);
-    animation: sn-sidebar-pulse-mid 5s infinite ease-in-out alternate;
-  }
-  &.sn-music-high-energy {
-    filter: saturate(1.15) brightness(1.05);
-    animation: sn-sidebar-pulse-fast 3s infinite ease-in-out alternate;
-  }
-
   /* --- Temporal Echo Layer Styling ---*/
   /* This uses the --sn-sidebar-temporal-shift variable set by JS*/
   /* Applied to a pseudo-element if existing ones are not sufficient, or integrated into existing ones.*/
@@ -762,39 +541,243 @@ nav[aria-label="Main"] ul li a {
   }
 }
 
-/* Subtle pulsing animation for the sidebar background based on energy*/
-@keyframes sn-sidebar-pulse-slow {
-  0%,
-  100% {
-    box-shadow: inset 0 0 70px -25px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.1 *
-            var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/* CONSOLIDATED ADVANCED VISUAL EFFECTS (from _sn_advanced_visual_effects.scss)*/
+/* Dynamic Harmonic & Energy Responsive UI*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
+
+:root {
+  /* Base variables for Advanced Sidebar. These can be adjusted.*/
+  --sn-sidebar-base-bg-opacity: 0.1;
+
+  /* Default time-based shift, JS will update this with --sn-sidebar-temporal-shift*/
+}
+
+.Root__nav-bar {
+  /* Base transition for all dynamic effects*/
+  transition: background-color 0.7s var(--sn-easing-explorer),
+    box-shadow 0.7s var(--sn-easing-explorer),
+    filter 0.7s var(--sn-easing-explorer);
+
+  /* --- Color Harmony Mode Styling ---*/
+  /* Define a mixin for common color harmony mode background properties*/
+  @mixin color-harmony-background($primary-rgb, $secondary-rgb, $accent-rgb) {
+    background: linear-gradient(
+      170deg,
+      rgba(
+          $primary-rgb,
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.7 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        0%,
+      rgba(
+          $secondary-rgb,
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.5 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        40%,
+      rgba(
+          $accent-rgb,
+          calc(
+            var(--sn-sidebar-base-bg-opacity) * 0.8 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)
+          )
+        )
+        100%
+    );
+    box-shadow: inset 0 0 80px -20px rgba($primary-rgb, calc(0.15 *
+              var(--sn-sidebar-harmonic-intensity-multiplier))),
+      inset 0 0 30px 5px
+        rgba(
+          $secondary-rgb,
+          calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier))
+        );
   }
-  50% {
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb, var(--spice-rgb-surface0)), calc(0.15 *
-            var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
+
+  /* Apply backgrounds per color harmony mode (JS adds these classes)*/
+  &.sn-color-harmony-analogous-flow {
+    @include color-harmony-background(
+      var(--sn-accent-rgb, "202,158,230"),
+      var(--sn-accent-rgb, "186,187,241"),
+      var(--sn-accent-rgb, "140,170,238")
+    );
+  }
+  &.sn-color-harmony-triadic-scheme {
+    /* Example: Use Primary, Accent, and a shifted Primary for Triadic relationship*/
+    @include color-harmony-background(
+      var(--sn-accent-rgb, "203,166,247"),
+      /* Mauve as P1*/
+      var(--sn-accent-rgb, "148,226,213"),
+      /* Teal as P2 (derived from accent)*/
+      var(--sn-accent-rgb, "245,194,231")
+        /* Pink as P3 (derived from secondary)*/
+    );
+  }
+  &.sn-color-harmony-complementary-contrast {
+    /* Primary and Accent (often complementary)*/
+    @include color-harmony-background(
+      var(--sn-accent-rgb, "239,159,118"),
+      /* Peach as P1*/
+      var(--sn-accent-rgb, "137,180,250"),
+      /* Blue as P2 (complement)*/
+      var(--spice-rgb-surface1, "69,71,90") /* Neutral darker for depth*/
+    );
+  }
+  /* Add more .sn-color-harmony-* classes as needed for other modes from COLOR_HARMONY_MODES*/
+  &.sn-color-harmony-tetradic-cross {
+    /* Example*/
+    @include color-harmony-background(
+      var(--spice-rgb-green),
+      var(--spice-rgb-red),
+      var(--spice-rgb-yellow)
+    );
+  }
+  &.sn-color-harmony-split-complementary-spectrum {
+    /* Example*/
+    @include color-harmony-background(
+      var(--spice-rgb-peach),
+      var(--spice-rgb-sky),
+      var(--spice-rgb-teal)
+    );
+  }
+  &.sn-color-harmony-monochromatic-calm {
+    /* Example*/
+    @include color-harmony-background(
+      var(--sn-accent-rgb),
+      var(--sn-accent-rgb),
+      var(--sn-accent-rgb)
+    );
+    --sn-sidebar-base-bg-opacity: 0.2; /* More intense for monochromatic*/
+  }
+
+  /* --- Music Energy Styling ---*/
+  /* (JS adds these classes: sn-music-low-energy, sn-music-mid-energy, sn-music-high-energy)*/
+  &.sn-music-low-energy {
+    filter: saturate(0.85) brightness(0.95);
+    animation: sn-sidebar-pulse-slow 8s infinite ease-in-out alternate;
+  }
+  &.sn-music-mid-energy {
+    filter: saturate(1) brightness(1);
+    animation: sn-sidebar-pulse-mid 5s infinite ease-in-out alternate;
+  }
+  &.sn-music-high-energy {
+    filter: saturate(1.15) brightness(1.05);
+    animation: sn-sidebar-pulse-fast 3s infinite ease-in-out alternate;
+  }
+
+  /* Subtle pulsing animation for the sidebar background based on energy*/
+  @keyframes sn-sidebar-pulse-slow {
+    0%,
+    100% {
+      box-shadow: inset 0 0 70px -25px rgba(var(--sn-accent-rgb), calc(0.1 *
+              var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
+    }
+    50% {
+      box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb), calc(0.15 *
+              var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
+    }
+  }
+  @keyframes sn-sidebar-pulse-mid {
+    0%,
+    100% {
+      box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb), calc(0.2 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)));
+    }
+    50% {
+      box-shadow: inset 0 0 90px -15px rgba(var(--sn-accent-rgb), calc(0.25 *
+              var(--sn-sidebar-harmonic-intensity-multiplier)));
+    }
+  }
+  @keyframes sn-sidebar-pulse-fast {
+    0%,
+    100% {
+      box-shadow: inset 0 0 90px -15px rgba(var(--sn-accent-rgb), calc(0.3 *
+              var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
+    }
+    50% {
+      box-shadow: inset 0 0 100px -10px rgba(var(--sn-accent-rgb), calc(0.35 *
+              var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
+    }
   }
 }
-@keyframes sn-sidebar-pulse-mid {
-  0%,
-  100% {
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.2 *
-            var(--sn-sidebar-harmonic-intensity-multiplier)));
+
+/* ████████████████████████████████████████████████████████████████████████████████*/
+/* TEMPORAL ECHO ANIMATIONS - Sidebar Interaction Effects*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
+
+@keyframes year3000-echo-core {
+  0% {
+    opacity: 0.32;
+    transform:
+      translate(
+        var(--sn-echo-offset-x, 0px),
+        var(--sn-echo-offset-y, 0px)
+      )
+      skew(var(--sn-echo-skew, 0deg))
+      scale(calc(0.8 * var(--sn-echo-radius-multiplier, 1)));
+    filter: blur(1px) hue-rotate(var(--sn-echo-hue-shift, 0deg));
   }
-  50% {
-    box-shadow: inset 0 0 90px -15px rgba(var(--sn-accent-rgb, var(--spice-rgb-surface0)), calc(0.25 *
-            var(--sn-sidebar-harmonic-intensity-multiplier)));
+  100% {
+    opacity: 0;
+    transform:
+      translate(
+        var(--sn-echo-offset-x, 0px),
+        var(--sn-echo-offset-y, 0px)
+      )
+      skew(var(--sn-echo-skew, 0deg))
+      scale(calc(1.4 * var(--sn-echo-radius-multiplier, 1)));
+    filter: blur(4px) hue-rotate(var(--sn-echo-hue-shift, 0deg));
   }
 }
-@keyframes sn-sidebar-pulse-fast {
-  0%,
-  100% {
-    box-shadow: inset 0 0 90px -15px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.3 *
-            var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
+
+.sn-temporal-echo {
+  --sn-echo-hue-shift: var(--sn-echo-hue-shift, 0deg);
+  --sn-echo-radius-multiplier: var(--sn-echo-radius-multiplier, 1);
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  border-radius: inherit;
+  transform-origin: center;
+  z-index: 0;
+  animation: year3000-echo-core 800ms var(--sn-echo-decay-curve, var(--sn-easing-emergence, var(--sn-anim-easing-organic))) forwards;
+}
+
+.sn-temporal-echo::before,
+.sn-temporal-echo::after {
+  content: none;
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes year3000-future-preview {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+    filter: blur(2px);
   }
   50% {
-    box-shadow: inset 0 0 100px -10px rgba(var(--sn-accent-rgb, var(--spice-rgb-surface0)), calc(0.35 *
-            var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
+    opacity: calc(var(--sn-kinetic-intensity, 1) * 0.2);
+    transform: scale(1);
+    filter: blur(1px);
   }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+    filter: blur(0px);
+  }
+}
+
+.sn-future-preview {
+  animation: year3000-future-preview 2000ms ease-in-out;
+  -webkit-animation: year3000-future-preview 2000ms ease-in-out;
 }
 
 /* === Digital Meditation Support (Phase 5) ===*/

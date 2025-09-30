@@ -59,4 +59,28 @@
   .shootingstar {
     display: none !important;
   }
+
+  // Disable kinetic animations (from _kinetic-animations.scss)
+  .sn-bloom-active,
+  .sn-refract-active,
+  .sn-oscillate-active,
+  .sn-harmonize-fundamental,
+  .sn-harmonize-sub,
+  .sn-harmonize-flow,
+  .sn-temporal-echo,
+  .sn-gravity-active,
+  .sn-future-preview,
+  .year3000-kinetic-canvas {
+    animation: none !important;
+  }
+
+  // Provide static fallback styles for kinetic effects
+  .sn-bloom-active {
+    transform: scale(1.02);
+    filter: drop-shadow(0 0 4px rgba(var(--sn-bloom-glow-color, 140,170,238), 0.3));
+  }
+
+  .sn-refract-active {
+    filter: brightness(1.05);
+  }
 }

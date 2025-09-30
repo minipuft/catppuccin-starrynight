@@ -439,29 +439,27 @@ html[data-debug="true"] {
 /* Uses centralized legacy system from core/_mixins.scss */
 /* ============================================================================ */
 
-/* NOTE: Consciousness CSS variables are defined globally in core/_variable-compatibility.scss */
-
-/* Essential consciousness → visual-effects class bridge using central system */
-/* NOTE: All breathing classes now use opacity/filter effects only - no scale transforms */
+/* Breathing animation utility classes */
+/* NOTE: All breathing classes use opacity/filter effects only - no scale transforms */
 /* This preserves Year 3000 music-reactive design without UI shaking */
-.consciousness-gentle-breathing {
-  @include legacy-consciousness-breathing('gentle');
+.breathing-gentle {
+  @include breathing-animation('gentle', --visual-effects-breathing-duration);
 }
 
-.consciousness-energetic-breathing {
-  @include legacy-consciousness-breathing('energetic');
+.breathing-energetic {
+  @include breathing-animation('energetic', --visual-effects-breathing-duration);
 }
 
-.consciousness-meditative-breathing {
-  @include legacy-consciousness-breathing('meditative');
+.breathing-meditative {
+  @include breathing-animation('meditative', --visual-effects-breathing-duration);
 }
 
-.consciousness-cosmic-breathing {
-  @include legacy-consciousness-breathing('cosmic');
+.breathing-cosmic {
+  @include breathing-animation('cosmic', --visual-effects-breathing-duration);
 }
 
-.legacy-visual-effects-base-breathing {
-  @include legacy-consciousness-breathing('gentle');
+.breathing-base {
+  @include breathing-animation('gentle', --visual-effects-breathing-duration);
 }
 
 /* Legacy flow animation bridge */

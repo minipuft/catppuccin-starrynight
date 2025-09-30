@@ -1787,11 +1787,14 @@ export class EnhancedMasterAnimationCoordinator {
 
   /**
    * Trigger ripple effect animation
+   * @deprecated CSS class .sn-ripple-effect does not exist in SCSS.
+   * This method is currently non-functional and not used anywhere in the codebase.
+   * TODO: Either implement the CSS class or remove this method entirely.
    */
   public triggerRipple(element: Element, intensity: number = 0.5): void {
     if (!element || !(element instanceof Element)) return;
 
-    // Apply ripple effect through CSS variables
+    // NOTE: CSS class .sn-ripple-effect does not exist - this code has no effect
     if (this.cssVariableManager) {
       this.cssVariableManager.batchSetVariables({
         '--sn-ripple-intensity': intensity.toString(),
@@ -1801,7 +1804,6 @@ export class EnhancedMasterAnimationCoordinator {
 
     element.classList.add('sn-ripple-effect');
 
-    // Auto-remove after animation
     setTimeout(() => {
       element.classList.remove('sn-ripple-effect');
       if (this.cssVariableManager) {

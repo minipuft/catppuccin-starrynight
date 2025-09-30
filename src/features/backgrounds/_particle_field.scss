@@ -28,12 +28,12 @@
   --star-twinkle-frequency: var(--sn-star-twinkle-speed, 8s);
   --star-parallax-intensity: var(--sn-star-parallax-intensity, 0.15);
 
-  // Neural network aliases (map to centralized particle system)
-  --neural-synaptic-firing-speed: var(--sn-particle-connect-speed, 6s);
-  --neural-connection-opacity: var(--sn-particle-connection-opacity, 0.1);
-  --neural-pulse-propagation: var(--sn-particle-pulse-speed, 2s);
-  --neural-dendrite-growth: var(--sn-particle-growth-speed, 3s);
-  --neural-network-complexity: var(--sn-particle-connection-complexity, 2)
+  // Particle animation timing (canonical tokens)
+  --neural-synaptic-firing-speed: var(--sn-bg-particle-animation-speed, 8s);
+  --neural-connection-opacity: var(--sn-bg-particle-network-opacity, 0.4);
+  --neural-pulse-propagation: var(--sn-bg-particle-pulse-speed, 12s);
+  --neural-dendrite-growth: var(--sn-anim-duration-slow, 0.8s);
+  --neural-network-complexity: 2
   
   // === MUSICAL AWAKENING THRESHOLDS (Harmonized) ===
   --particle-awakening-threshold: 0.3; // Matches other systems
