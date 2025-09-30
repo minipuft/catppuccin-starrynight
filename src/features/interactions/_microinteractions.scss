@@ -5,6 +5,7 @@
 // ████████████████████████████████████████████████████████████████████████████████
 
 @use "../../core/_mixins" as *;
+@use "../animations/fluid_morphing" as *; // Phase 8: Year3000 fluid ripple feedback
 
 // ══════════════════════════════════════════════════════════════════════════════
 // YEAR 3000 BEATSYNC MICROINTERACTION VARIABLES
@@ -534,9 +535,37 @@
 }
 
 // =============================================================================
+// PHASE 8: YEAR3000 FLUID RIPPLE FEEDBACK INTEGRATION
+// Organic interaction feedback with fluid propagation
+// =============================================================================
+
+// Track rows get fluid ripple feedback on hover/focus
+.main-trackList-trackListRow {
+  @include fluid-ripple-feedback;
+}
+
+// Navigation links get subtle fluid ripple feedback
+.main-navBar-navBarLink {
+  @include fluid-ripple-feedback;
+}
+
+// Play buttons get prominent fluid ripple feedback
+.main-playButton-PlayButton,
+.main-playPauseButton-button,
+.main-card-PlayButtonContainer button {
+  @include fluid-ripple-feedback;
+}
+
+// Sidebar interactive elements
+.main-yourLibrary-entryPoints button,
+.main-createPlaylistButton-button {
+  @include fluid-ripple-feedback;
+}
+
+// =============================================================================
 // LEGACY COMPATIBILITY MAPPINGS - Phase 6.3 Layer B Modernization
 // =============================================================================
 
-// Note: This file primarily uses technical terms (ripple, bloom, etc.) 
+// Note: This file primarily uses technical terms (ripple, bloom, etc.)
 // which are already appropriate. Most terminology was modernized in place
 // with minimal legacy mapping needed.

@@ -9,6 +9,7 @@
 @use "../core/_performance_mixins" as *;
 @use "./_sn_card_base";
 @use "./_sn_visual_accents" as *;
+@use "../features/animations/fluid_morphing" as *; // Phase 8: Year3000 organic effects
 // Note: perceptual-blending archived in Phase 10 Week 4 (orphaned file)
 // Note: _kinetic-animations removed - animations integrated into _sn_advanced_visual_effects.scss
 
@@ -361,6 +362,22 @@
       @extend .sn-visual-trail !optional;
       --sn-kinetic-intensity: calc(var(--motion-intelligence-level,1) * 0.24);
     }
+  }
+}
+
+// =============================================================================
+// PHASE 8: YEAR3000 FLUID MORPHING INTEGRATION
+// Organic breathing animations that respond to music
+// =============================================================================
+
+.main-card-card {
+  // Apply subtle fluid morphing for organic Year3000 aesthetic
+  // Lower intensity (0.2) to complement existing visual effects
+  @include fluid-morphing(0.2);
+
+  // Artist cards get enhanced fluid morphing
+  &[data-testid*="artist"] {
+    @include fluid-morphing(0.3);
   }
 }
 
