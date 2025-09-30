@@ -21,19 +21,8 @@
 
 :root {
   // === MIGRATED TO CENTRALIZED SYSTEM (Phase 6.4.1) ===
-  // Base variables now defined in src/core/_unified-effects-engine.scss
-  // Using centralized --sn-glass-* variables for consistency
-
-  // Local aliases for backward compatibility (deprecated - will be removed Phase 6.5)
-  --crystal-base-intensity: var(--sn-glass-base-intensity, 0.6);
-  --crystal-music-multiplier: var(--sn-glass-music-multiplier, 1.0);
-  --crystal-float-height: var(--sn-glass-float-height, 15px);
-  --crystal-float-rhythm: var(--sn-glass-float-rhythm, 4s);
-
-  // Unified system integration (good - keep)
-  --crystal-pulse-intensity: var(--sn-unified-effect-intensity, 0.6);
-  --prism-intensity: calc(var(--sn-unified-music-energy, 0.5) * 0.8);
-  --iridescence-flow-speed: var(--crystal-float-rhythm, 4s);
+  // All crystal-* variables replaced with canonical --sn-* tokens (Phase 7.5)
+  // Using centralized design token system for consistency
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -44,10 +33,10 @@
 @mixin crystalline-card-effect {
   // Single unified effect application (replaces 3 separate mixins)
   @include unified-visual-effect(
-    $intensity: var(--crystal-base-intensity, 0.6),
+    $intensity: var(--sn-ui-glass-pulse-enabled, 0.6),
     $variant: 'crystalline',
     $breathing: true,
-    $breathing-duration: var(--crystal-float-rhythm, 4s)
+    $breathing-duration: var(--sn-anim-breathing-cosmic, 4s)
   );
 
   // Crystalline-specific enhancements
@@ -56,10 +45,10 @@
 
   // Floating shadow (enhanced by music)
   box-shadow:
-    0 calc(var(--crystal-float-height, 15px) * 0.5) 40px
+    0 calc(var(--sn-ui-glass-float-distance, 15px) * 0.5) 40px
     rgba(
       var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)),
-      calc(var(--crystal-base-intensity, 0.6) * var(--crystal-music-multiplier, 1) * 0.15)
+      calc(var(--sn-ui-glass-pulse-enabled, 0.6) * var(--sn-music-intensity-boost, 1) * 0.15)
     );
 
   // Smooth transitions
@@ -71,7 +60,7 @@
   &:hover {
     // Increase intensity on hover
     --sn-unified-effect-intensity: 0.8;
-    transform: translateY(calc(-1 * var(--crystal-float-height, 15px) * 0.3));
+    transform: translateY(calc(-1 * var(--sn-ui-glass-float-distance, 15px) * 0.3));
   }
 }
 
@@ -85,11 +74,11 @@
 
   // Staggered animation delays for depth
   &:nth-child(2n) {
-    animation-delay: calc(var(--crystal-float-rhythm, 4s) * -0.3);
+    animation-delay: calc(var(--sn-anim-breathing-cosmic, 4s) * -0.3);
   }
 
   &:nth-child(3n) {
-    animation-delay: calc(var(--crystal-float-rhythm, 4s) * -0.6);
+    animation-delay: calc(var(--sn-anim-breathing-cosmic, 4s) * -0.6);
   }
 
   // Artist cards: circular crystalline effect
@@ -132,7 +121,7 @@
     border: 2px solid rgba(var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)), 0.4);
 
     // Music-reactive intensity
-    --crystal-music-multiplier: calc(1 + var(--sn-unified-music-energy, 0.5));
+    --sn-music-intensity-boost: calc(1 + var(--sn-unified-music-energy, 0.5));
   }
 }
 
@@ -209,7 +198,7 @@
     );
 
     // Music-reactive
-    --crystal-music-multiplier: calc(1 + var(--sn-unified-music-energy, 0.5) * 0.5);
+    --sn-music-intensity-boost: calc(1 + var(--sn-unified-music-energy, 0.5) * 0.5);
   }
 }
 
@@ -269,7 +258,7 @@ input[type="search"],
   .main-playButton-PlayButton {
     // Music energy directly modulates intensity
     --sn-unified-music-energy: var(--sn-beat-pulse-intensity, 0.5);
-    --crystal-music-multiplier: calc(1 + var(--sn-beat-pulse-intensity, 0.5));
+    --sn-music-intensity-boost: calc(1 + var(--sn-beat-pulse-intensity, 0.5));
   }
 }
 
@@ -292,8 +281,8 @@ input[type="search"],
 // Mobile optimization
 @media (max-width: 768px) {
   :root {
-    --crystal-base-intensity: 0.4;              // Reduce intensity on mobile
-    --crystal-float-height: 8px;                // Smaller float height
+    --sn-ui-glass-pulse-enabled: 0.4;           // Reduce intensity on mobile
+    --sn-ui-glass-float-distance: 8px;          // Smaller float height
     --sn-unified-blur-amount: 15px;             // Less blur
   }
 
@@ -305,7 +294,7 @@ input[type="search"],
 // High contrast mode
 @media (prefers-contrast: high) {
   :root {
-    --crystal-base-intensity: 0.8;              // Increase intensity
+    --sn-ui-glass-pulse-enabled: 0.8;           // Increase intensity
     --sn-unified-brightness-delta: 0.15;        // Brighter effects
   }
 

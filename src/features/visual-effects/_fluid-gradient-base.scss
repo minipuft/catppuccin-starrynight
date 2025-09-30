@@ -21,23 +21,8 @@
 
 :root {
   // === MIGRATED TO CENTRALIZED SYSTEM (Phase 6.4.2) ===
-  // Base variables now defined in src/core/_unified-effects-engine.scss
-  // Using centralized --sn-gradient-* variables for consistency
-
-  // Local aliases for backward compatibility (deprecated - will be removed Phase 6.5)
-  --fluid-base-intensity: var(--sn-gradient-base-intensity, 0.5);
-  --fluid-animation-duration: var(--sn-gradient-flow-duration, 12s);
-
-  // Music sync aliases (good - keep these)
-  --fluid-phase: var(--sn-music-rhythm-phase, 0deg);
-  --fluid-amplitude: var(--sn-music-breathing-scale, 1.0);
-  --fluid-intensity: var(--sn-unified-effect-intensity, 0.5);
-
-  // Design token aliases (good - keep these)
-  --fluid-gradients-opacity: var(--sn-ui-glass-opacity, 0.1);
-  --fluid-gradients-blur: var(--sn-ui-glass-blur, 20px);
-  --fluid-gradients-saturation: var(--sn-bg-gradient-saturation, 1.1);
-  --fluid-gradients-duration: var(--sn-anim-transition-cosmic, 1200ms);
+  // All fluid-* variables replaced with canonical --sn-* tokens (Phase 7.5)
+  // Using centralized design token system for consistency
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -50,18 +35,18 @@
     $intensity: $intensity,
     $variant: 'energetic',
     $breathing: true,
-    $breathing-duration: var(--fluid-animation-duration, 12s)
+    $breathing-duration: var(--sn-anim-breathing-cosmic, 12s)
   );
 
   // Oil slick specific backdrop-filter (single application)
   backdrop-filter:
-    blur(calc(#{$intensity} * var(--fluid-gradients-blur, 20px)))
-    saturate(calc(1 + #{$intensity} * var(--fluid-gradients-saturation, 0.3)))
-    hue-rotate(calc(var(--fluid-phase, 0deg) * 0.5));
+    blur(calc(#{$intensity} * var(--sn-bg-gradient-blur, 20px)))
+    saturate(calc(1 + #{$intensity} * var(--sn-bg-gradient-saturation, 0.3)))
+    hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) * 0.5));
 
   // Conic gradient for oil-slick appearance
   background: conic-gradient(
-    from var(--fluid-phase),
+    from var(--sn-music-rhythm-phase),
     rgba(var(--sn-musical-oklab-primary-rgb), calc(#{$intensity} * 0.12)) 0%,
     rgba(var(--sn-musical-oklab-accent-rgb), calc(#{$intensity} * 0.14)) 25%,
     rgba(var(--sn-musical-oklab-highlight-rgb), calc(#{$intensity} * 0.13)) 50%,
@@ -98,14 +83,14 @@
 
   background:
     repeating-linear-gradient(
-      calc(var(--fluid-phase, 0deg) * 0.9),
+      calc(var(--sn-music-rhythm-phase, 0deg) * 0.9),
       transparent 0%,
       rgba(255, 255, 255, calc(#{$intensity} * 0.05)) 1%,
       rgba(255, 255, 255, calc(#{$intensity} * 0.025)) 2%,
       transparent 3%
     ),
     repeating-linear-gradient(
-      calc(var(--fluid-phase, 0deg) * 0.9 + 45deg),
+      calc(var(--sn-music-rhythm-phase, 0deg) * 0.9 + 45deg),
       transparent 0%,
       rgba(255, 255, 255, calc(#{$intensity} * 0.035)) 1.5%,
       rgba(255, 255, 255, calc(#{$intensity} * 0.015)) 3%,
@@ -144,7 +129,7 @@
   @include performance-hardware-acceleration;
 
   mix-blend-mode: overlay;
-  opacity: var(--fluid-gradients-opacity, 0.3);
+  opacity: var(--sn-bg-gradient-opacity, 0.3);
   transition: opacity 300ms ease-out;
 }
 
@@ -159,14 +144,14 @@
   width: 100%;
   height: 100%;
 
-  @include liquid-oil-slick-effect(var(--fluid-base-intensity, 0.5));
+  @include liquid-oil-slick-effect(var(--sn-ui-glass-pulse-enabled, 0.5));
 
   // Performance optimization
   @include performance-hardware-acceleration;
 
   transform:
-    scale(calc(1 + var(--fluid-amplitude, 1) * 0.02))
-    rotate(calc(var(--fluid-phase, 0deg) * 0.8));
+    scale(calc(1 + var(--sn-music-intensity-boost, 1) * 0.02))
+    rotate(calc(var(--sn-music-rhythm-phase, 0deg) * 0.8));
 }
 
 .liquid-surface-tension {
@@ -183,7 +168,7 @@
 
   transform:
     scale(calc(1 + var(--sn-unified-effect-intensity, 0.5) * 0.05))
-    rotate(calc(var(--fluid-phase, 0deg) * 2deg));
+    rotate(calc(var(--sn-music-rhythm-phase, 0deg) * 2deg));
 }
 
 .liquid-interference-pattern {
@@ -222,12 +207,12 @@
   background:
     linear-gradient(
       90deg,
-      rgba(255, 0, 0, calc(var(--fluid-base-intensity, 0.5) * 0.08)) 0%,
-      rgba(255, 0, 0, calc(var(--fluid-base-intensity, 0.5) * 0.056)) 10%,
+      rgba(255, 0, 0, calc(var(--sn-ui-glass-pulse-enabled, 0.5) * 0.08)) 0%,
+      rgba(255, 0, 0, calc(var(--sn-ui-glass-pulse-enabled, 0.5) * 0.056)) 10%,
       transparent 20%,
       transparent 80%,
-      rgba(0, 0, 255, calc(var(--fluid-base-intensity, 0.5) * 0.056)) 90%,
-      rgba(0, 0, 255, calc(var(--fluid-base-intensity, 0.5) * 0.08)) 100%
+      rgba(0, 0, 255, calc(var(--sn-ui-glass-pulse-enabled, 0.5) * 0.056)) 90%,
+      rgba(0, 0, 255, calc(var(--sn-ui-glass-pulse-enabled, 0.5) * 0.08)) 100%
     );
 
   mix-blend-mode: multiply;
@@ -248,7 +233,7 @@
   .liquid-chromatic-aberration {
     // Music energy modulates fluid intensity
     --sn-unified-music-energy: var(--sn-beat-pulse-intensity, 0.5);
-    --fluid-base-intensity: calc(0.5 + var(--sn-beat-pulse-intensity, 0) * 0.4);
+    --sn-ui-glass-pulse-enabled: calc(0.5 + var(--sn-beat-pulse-intensity, 0) * 0.4);
   }
 }
 
@@ -261,8 +246,8 @@
 
 @media (max-width: 768px) {
   :root {
-    --fluid-base-intensity: 0.3;           // Reduce intensity on mobile
-    --fluid-gradients-blur: 10px;          // Less blur
+    --sn-ui-glass-pulse-enabled: 0.3;      // Reduce intensity on mobile
+    --sn-bg-gradient-blur: 10px;           // Less blur
   }
 
   .liquid-interference-pattern {
@@ -276,7 +261,7 @@
 
 @media (prefers-contrast: high) {
   .fluid-gradients-layer {
-    opacity: calc(var(--fluid-gradients-opacity, 0.3) * 0.5);
+    opacity: calc(var(--sn-bg-gradient-opacity, 0.3) * 0.5);
   }
 
   .liquid-oil-slick,
@@ -293,7 +278,7 @@
 
 .fluid-gradients-minimal {
   .fluid-gradients-layer {
-    opacity: calc(var(--fluid-gradients-opacity, 0.3) * 0.4);
+    opacity: calc(var(--sn-bg-gradient-opacity, 0.3) * 0.4);
   }
 
   .liquid-interference-pattern {
@@ -307,7 +292,7 @@
 
 .fluid-gradients-intense {
   .fluid-gradients-layer {
-    opacity: calc(var(--fluid-gradients-opacity, 0.3) * 1.5);
+    opacity: calc(var(--sn-bg-gradient-opacity, 0.3) * 1.5);
   }
 
   .liquid-oil-slick {

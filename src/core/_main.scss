@@ -1,18 +1,18 @@
 // ████████████████████████████████████████████████████████████████████████████████
-// CATPPUCCIN STARRYNIGHT - Optimized Architecture (Phase 6+)
+// CATPPUCCIN STARRYNIGHT - Optimized Architecture (Phase 7.7)
 // Consolidated SCSS module system with strategic consolidation complete
 // Phase 1-3: 587 lines eliminated, 875KB optimized CSS
 // Phase 4: 273KB source cleanup (legacy files + archived code removed)
 // Phase 4.5: 153KB cleanup + focused integration (880KB final CSS, beat-responsive + white layer fixes)
 // Phase 5: Removed non-functional typography (36KB/740 lines, broken music sync + unstable selectors)
 // Phase 6+: Design token consolidation (858 lines eliminated, single authoritative token source)
+// Phase 7.5-7.6: Compatibility cleanup (44 usages migrated, 164 lines eliminated)
+// Phase 7.7: Orphaned effect files + token shims removed (1,369 lines, 50KB eliminated)
 // ████████████████████████████████████████████████████████████████████████████████
 
 // === LAYER 1: FOUNDATION (Load Order Critical) ===
 // Single authoritative design token source - all modules depend on these
 @use "../design-tokens/tokens" as *; // Unified design token system (932 lines, all tokens)
-@use "../design-tokens/motion-tokens" as *;  // Compatibility shim → forwards to tokens.scss
-@use "../design-tokens/visual-tokens" as *;  // Compatibility shim → forwards to tokens.scss
 
 // === LAYER 2: UTILITIES (Mixin Dependencies) ===
 // Utility mixins and functions - loaded after tokens, before implementations
@@ -24,7 +24,7 @@
 
 // === LAYER 3: COMPATIBILITY (Backward Compatibility) ===
 // Compatibility layers for renamed variables and mixins
-@use "_variable-compatibility" as *; // CSS variable compatibility aliases
+// REMOVED: _variable-compatibility (Phase 7.6 - all 6 variables unused, 59 lines eliminated)
 // REMOVED: _mixin-compatibility (metaphorical mixin aliases migrated to technical names)
 // REMOVED: _variables (Phase 6.1 - dead code, 16 lines, no functionality)
 @use "_sn_legacy_support" as *;
@@ -117,7 +117,7 @@
 // 1. FOUNDATION    - Single authoritative design token source (tokens.scss)
 //                    Motion/visual tokens now forward to unified source
 // 2. UTILITIES     - Mixins, functions, DOM selectors (tool dependencies)
-// 3. COMPATIBILITY - Backward compatibility layers (legacy support)
+// 3. COMPATIBILITY - Backward compatibility layers (legacy support only)
 // 4. STRUCTURAL    - Layout and component architecture (UI foundation)
 // 5. FEATURES      - Advanced functionality (visual effects, interactions)
 // 6. SYSTEMS       - High-level behavioral systems (performance, analytics)
@@ -125,4 +125,5 @@
 //
 // Performance Targets: <1MB bundle, <30ms compilation, 60fps runtime
 // Phase 6+ Consolidation: 858 lines eliminated, single token source
+// Phase 7.5-7.6: 164 lines compatibility cleanup, zero unused variables
 // ████████████████████████████████████████████████████████████████████████████████

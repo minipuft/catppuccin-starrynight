@@ -13,7 +13,7 @@
   // Core particle variables now in src/core/_unified-effects-engine.scss
   // Using centralized --sn-particle-* and --sn-star-* variables
 
-  // Local aliases for backward compatibility (deprecated - will be removed Phase 6.5)
+  // Local computed variables and aliases (active - provide music-reactive functionality)
   --particle-meditation-sync: var(--sn-particle-base-speed, 15s);
   --particle-field-density: var(--sn-particle-field-density, 0.4);
   --particle-life-cycle-speed: var(--particle-meditation-sync);

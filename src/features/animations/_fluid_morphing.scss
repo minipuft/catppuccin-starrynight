@@ -247,13 +247,9 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @media (prefers-reduced-motion: reduce) {
-  :root {
-    --fluid-animation-speed: 20s;
-  }
-
   // Disable complex morphing, keep gentle breathing only
   * {
-    animation-duration: var(--fluid-animation-speed) !important;
+    animation-duration: var(--sn-anim-duration-slow, 0.8s) !important;
     animation-timing-function: linear !important;
   }
 }
