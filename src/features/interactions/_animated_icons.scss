@@ -5,7 +5,6 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @use "../../core/_mixins" as *;
-@use "../system/_z_index_management" as *;
 
 .sn-crystalline-overlay {
   position: fixed;

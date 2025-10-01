@@ -1,0 +1,45 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 Z-INDEX MANAGEMENT - StarryNight Effects Layer Control
+// ████████████████████████████████████████████████████████████████████████████████
+
+:root {
+  // --- Atmospheric & Background Layers ---
+  --z-starfield: -10;
+  --z-crystals: -9;
+  --z-atmospheric-glow: -5;
+
+  // --- Interactive Content Layers ---
+  --z-content-base: 1;
+  --z-content-hover: 2;
+  --z-content-focus: 3;
+
+  // --- Sidebar & Navigation Layers ---
+  --z-right-sidebar-glow: 5; // Below modals but above main content
+  --z-right-sidebar-content: 6;
+
+  // --- Foreground Effect Layers ---
+  --z-ui-overlays: 100; // e.g., Pop-ups, menus
+}
+
+// Ensure main view has a stacking context
+.Root__main-view {
+  position: relative;
+  z-index: 0;
+}
+
+.sn-stars-container {
+  z-index: 1 !important; // Ensure it's above main backgrounds but below particles and UI
+}
+
+.shootingstar {
+  z-index: 2 !important; // Above stars, below particles and UI
+  position: fixed; // Ensure positioning context for z-index if not already set globally
+}
+
+// Particle canvas (#sn-particle-canvas) is set to z-index: 3 via JavaScript.
+// Ensure main content containers are appropriately z-indexed if they need to be above particles,
+// or below the main background effects.
+// For example, if .Root__main-view .main-view-container__scroll-node itself should be at the very bottom:
+// .Root__main-view .main-view-container__scroll-node {
+//   z-index: 0; // Or an appropriate base level like -3 if pseudo-elements are -2 and -1
+// }

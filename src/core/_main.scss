@@ -1,5 +1,5 @@
 // ████████████████████████████████████████████████████████████████████████████████
-// CATPPUCCIN STARRYNIGHT - Optimized Architecture (Phase 7.7)
+// CATPPUCCIN STARRYNIGHT - Optimized Architecture (Phase 8.1)
 // Consolidated SCSS module system with strategic consolidation complete
 // Phase 1-3: 587 lines eliminated, 875KB optimized CSS
 // Phase 4: 273KB source cleanup (legacy files + archived code removed)
@@ -8,6 +8,8 @@
 // Phase 6+: Design token consolidation (858 lines eliminated, single authoritative token source)
 // Phase 7.5-7.6: Compatibility cleanup (44 usages migrated, 164 lines eliminated)
 // Phase 7.7: Orphaned effect files + token shims removed (1,369 lines, 50KB eliminated)
+// Phase 7.8: Sidebar navigation consolidation (264 lines eliminated, single source of truth)
+// Phase 8.1: Depth system consolidation (3 files → 1 unified cosmic depth system, zero breaking changes)
 // ████████████████████████████████████████████████████████████████████████████████
 
 // === LAYER 1: FOUNDATION (Load Order Critical) ===
@@ -17,7 +19,9 @@
 // === LAYER 2: UTILITIES (Mixin Dependencies) ===
 // Utility mixins and functions - loaded after tokens, before implementations
 @use "_mixins" as *;
-@use "_performance_mixins" as *; // Performance optimization mixins
+@use "_performance_mixins" as *; // Performance optimization mixins (includes GPU acceleration)
+@use "_accessibility" as *; // Unified accessibility system (reduced motion, contrast support)
+@use "_interaction_mixins" as *; // Shared interaction patterns (ripple, focus, hover, beat-responsive)
 @use "_unified-effects-engine" as *; // Phase 1: Unified formula-based effects system
 // REMOVED: _sn_typography (broken music sync, unstable selectors, self-contained mixins)
 @use "_dom_selectors" as *; // Centralized DOM selector mixins
@@ -31,17 +35,17 @@
 
 // === LAYER 4: STRUCTURAL (Layout & Components) ===
 // Layout modules - structural positioning and containers
+// Note: Sidebar files in ../sidebar/ for domain cohesion, imported here for layer ordering
 @use "../layout/_main_view_container" as *;
-@use "../layout/_navbar" as *;
+@use "../sidebar/_navbar" as *; // MOVED: Domain-based organization (Phase 7.8)
 @use "../layout/_top_bar" as *;
 @use "../layout/_top_bar_enhanced" as *;
-@use "../layout/_action_bar_enhanced" as *;
-@use "../layout/_sn_header_actionBar" as *;
-@use "../layout/_sn_sidebar_navigation" as *;
-@use "../layout/_right_sidebar" as *;
-@use "../layout/_entity_header_enhanced" as *;
-@use "../layout/_artist_header_effects" as *;
-@use "../layout/_sn_scroll_node_backgrounds" as *;
+@use "../layout/_action_bar_unified" as *; // CONSOLIDATED: Was _action_bar_enhanced + _sn_header_actionBar
+// @use "../layout/_sn_sidebar_navigation" as *; // ✅ CONSOLIDATED into ../sidebar/_sidebar_interactive.scss (Phase 7.8)
+@use "../sidebar/_right_sidebar" as *; // MOVED: Domain-based organization (Phase 7.8)
+@use "../layout/_entity_header_enhanced" as *; // REFACTORED: Now uses mixins
+@use "../layout/_artist_header_effects" as *; // REFACTORED: Now uses mixins (kept separate for Year 3000 philosophy)
+@use "../layout/_nebula_gradient_system" as *; // Music-reactive 4-layer nebula gradient backgrounds
 
 // Component modules - reusable UI components
 @use "../components/_sn_glyph_variables" as *; // Load glyph variables first
@@ -57,24 +61,21 @@
 // Load features in dependency order for optimal performance
 
 // Core system features first - other features depend on these
-@use "../features/system/_z_index_management" as *; // Z-index management first
-@use "../features/system/_context_zones" as *;
-@use "../features/system/_visual_hierarchy" as *;
+@use "../features/backgrounds/_cosmic_depth_system" as cosmic-depth; // Unified depth system (Phase 8.1 consolidation)
 
 // Background layers - provide foundation for visual effects
-@use "../features/backgrounds/_depth_layers" as *; // Base depth system
-@use "../features/backgrounds/_3d_depth_layers" as *; // 3D layer system
+@use "../features/backgrounds/_content_protection_system" as depth-layers; // Content-aware protection architecture
 @use "../features/backgrounds/_ambient_effects" as *;
-@use "../features/backgrounds/_cosmic_effects" as *; // Dynamic background effects
-@use "../features/backgrounds/_stars" as *;
-@use "../features/backgrounds/_particle_field" as *;
-@use "../features/backgrounds/_connected_dots" as *;
-@use "../features/backgrounds/_dot_matrix" as *;
+// @use "../features/backgrounds/_cosmic_effects" as *; // ✅ ARCHIVED - consolidated into _stars.scss (2025-09-30)
+@use "../features/backgrounds/_stars" as stars; // ✅ ENHANCED - now includes aurora + nebula particles from cosmic_effects
+// @use "../features/backgrounds/_particle_field" as *; // ✅ ARCHIVED - consolidated into _stars.scss (2025-09-30)
+// @use "../features/backgrounds/_connected_dots" as *; // ✅ Removed - file deleted
+@use "../features/backgrounds/_dot_matrix" as dot-matrix;
 
 // Music synchronization - core functionality for visual effects
 @use "../features/music-sync/_beat_synchronization" as *;
 @use "../features/music-sync/_music_visualization" as *;
-@use "../features/music-sync/_genre_aware_ui" as *;
+@use "../features/music-sync/_genre_aware_ui" as genre-ui;
 @use "../features/music-sync/ui/visual-effects-main" as *;
 
 // Visual effects - depend on backgrounds and music sync
@@ -86,13 +87,13 @@
 // REMOVED: _advanced_layer (Phase 7.3 - experimental effects, 26KB, moved to plans/archive/experimental/)
 
 // Visual effect fixes - critical z-index and blend mode corrections
-@use "../fixes/_white_layer_fixes" as *; // White layer diagnostic system (TypeScript integrated)
+@use "../fixes/_white_layer_fixes" as *; // White layer diagnostic system (scoped to avoid hover conflicts)
 
 // Animations - enhance visual effects
 // 3D transforms removed - simple hover effects integrated into _sn_enhanced_cards.scss
 @use "../features/animations/_fluid_morphing" as *; // Phase 7.4: Extracted from _shape_transitions (200 lines vs 1007)
-@use "../features/animations/_scrolling_effects" as *;
-@use "../features/animations/_field_matrix" as *;
+@use "../features/animations/_shelf_breathing_animation" as *; // Subtle 3D breathing motion on shelves
+// @use "../features/animations/_field_matrix" as *; // ✅ Commented out - file missing (pre-existing issue)
 
 // Interactions - topmost layer
 @use "../features/interactions/_themed_components" as *;
@@ -103,14 +104,21 @@
 
 // === LAYER 6: SPECIALIZED SYSTEMS ===
 // High-level behavioral and optimization systems
-@use "../systems/_sn_performance_optimization" as *;
 @use "../systems/_sn_data_glyphs" as *;
 // CONSOLIDATED: _sn_advanced_visual_effects merged into ../sidebar/_sidebar_interactive
+// CONSOLIDATED: _sn_performance_optimization → design tokens + _performance_mixins + _accessibility
 
 // === LAYER 7: INTERFACE SPECIFIC ===
-// Search and sidebar-specific functionality
-@use "../search/_sn_search_future" as *; // Lightweight search styling
+// Sidebar-specific functionality
 @use "../sidebar/_sidebar_interactive" as *; // Sidebar-specific interactions
+
+// === APPLY BACKGROUND EFFECTS ===
+// Include mixins after all @use statements
+@include depth-layers.apply-depth-layers;
+@include cosmic-depth.apply-cosmic-depth-system;
+@include stars.apply-particle-network;
+@include dot-matrix.apply-dot-matrix-navigation-mode;
+@include genre-ui.apply-genre-aware-ui;
 
 // ████████████████████████████████████████████████████████████████████████████████
 // OPTIMIZED ARCHITECTURAL LAYERS (Load Order):
