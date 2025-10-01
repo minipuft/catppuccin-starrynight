@@ -11,152 +11,157 @@
 
 /* Fix chromatic aberration white texture issues */
 .sn-chromatic-aberration-fix {
-  /* Override screen blend mode with safer overlay */
-  canvas[style*="mix-blend-mode: screen"] {
-    mix-blend-mode: overlay !important;
-    opacity: 0.6 !important;
+  /* Override screen blend mode with safer overlay - only for canvas backgrounds */
+  canvas[style*="mix-blend-mode: screen"]:not(.sn-shimmer-layer):not(.sn-fluid-gradients) {
+    mix-blend-mode: overlay;
+    opacity: 0.6;
   }
-  
-  /* Ensure transparent backgrounds instead of white */
-  canvas[style*="mix-blend-mode"] {
-    background: transparent !important;
+
+  /* Ensure transparent backgrounds instead of white - only canvas elements */
+  canvas[style*="mix-blend-mode"]:not(.sn-shimmer-layer) {
+    background: transparent;
   }
 }
 
 /* Fix screen blend mode white bleeding */
 .sn-screen-blend-fix {
-  /* Limit screen blend mode usage */
-  [style*="mix-blend-mode: screen"] {
+  /* Limit screen blend mode usage - only for background layers, not UI */
+  [style*="mix-blend-mode: screen"]:not(.main-card-card):not(.main-trackList-trackListRow) {
     &:not(:first-of-type) {
-      mix-blend-mode: overlay !important;
-      opacity: 0.8 !important;
+      mix-blend-mode: overlay;
+      opacity: 0.8;
     }
   }
-  
-  /* Reduce intensity of screen blend modes */
-  [style*="mix-blend-mode: screen"] {
-    opacity: 0.7 !important;
+
+  /* Reduce intensity of screen blend modes - canvas/background only */
+  canvas[style*="mix-blend-mode: screen"],
+  .sn-depth-background-container [style*="mix-blend-mode: screen"] {
+    opacity: 0.7;
   }
 }
 
 /* Fix backdrop filter white fallbacks */
 .sn-backdrop-filter-fix {
-  /* Provide transparent fallbacks for backdrop-filter */
+  /* Provide transparent fallbacks for backdrop-filter - background layers only */
   @supports not (backdrop-filter: blur(1px)) {
-    [style*="backdrop-filter"] {
-      background: rgba(0, 0, 0, 0.1) !important;
-      backdrop-filter: none !important;
+    .sn-depth-background-container [style*="backdrop-filter"],
+    canvas[style*="backdrop-filter"] {
+      background: rgba(0, 0, 0, 0.1);
+      backdrop-filter: none;
     }
   }
-  
-  /* Ensure backdrop filters don't create white layers */
-  [style*="backdrop-filter"] {
-    background: transparent !important;
-    
-    &::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.05);
-      z-index: -1;
+
+  /* Ensure backdrop filters don't create white layers - scoped to backgrounds */
+  .sn-depth-background-container [style*="backdrop-filter"],
+  .sn-cosmic-ambient-layer [style*="backdrop-filter"] {
+    &:not(.main-card-card):not(.main-button-primary) {
+      background: transparent;
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.05);
+        z-index: -1;
+      }
     }
   }
 }
 
 /* Fix WebGL context failure white renders */
 .sn-webgl-context-fix {
-  /* Hide WebGL canvases that might render white on failure */
-  canvas {
-    &[style*="mix-blend-mode"] {
-      /* Ensure transparent background for WebGL canvases */
-      background: transparent !important;
-      
-      /* Hide canvas if WebGL context is lost */
-      &:not([data-webgl-ready="true"]) {
-        opacity: 0 !important;
-      }
+  /* Hide WebGL canvases that might render white on failure - background only */
+  canvas[style*="mix-blend-mode"]:not(.sn-shimmer-layer) {
+    /* Ensure transparent background for WebGL canvases */
+    background: transparent;
+
+    /* Hide canvas if WebGL context is lost */
+    &:not([data-webgl-ready="true"]) {
+      opacity: 0;
     }
   }
 }
 
 /* Fix floating crystal white backgrounds */
 .sn-floating-crystal-fix {
-  /* Override white gradients in floating crystals */
-  .floating-crystal {
+  /* Override white gradients in floating crystals - background layer only */
+  .sn-depth-background-container .floating-crystal {
     background: radial-gradient(
       ellipse at center,
       rgba(203, 166, 247, 0.1) 0%,
       rgba(203, 166, 247, 0) 70%
-    ) !important;
+    );
   }
 }
 
 /* Fix white layer z-index conflicts */
 .sn-z-index-fix {
-  /* Ensure gradient layers have proper z-index hierarchy */
+  /* Ensure gradient layers have proper z-index hierarchy - background systems only */
   .sn-webgl-gradient,
   .sn-css-gradient {
-    z-index: -10 !important;
+    z-index: -10;
   }
-  
+
   .sn-depth-background-container {
-    z-index: -20 !important;
+    z-index: -20;
   }
-  
+
   .sn-shimmer-layer {
-    z-index: 1 !important;
+    z-index: 1;
   }
-  
+
   /* Ensure aberration canvas stays below other effects but above deep backgrounds */
-  canvas[style*="mix-blend-mode"] {
-    z-index: -5 !important;
+  canvas[style*="mix-blend-mode"]:not(.sn-interactive) {
+    z-index: -5;
   }
-  
+
   /* Fix Reality Bleeding Gradients system z-index hierarchy */
   .sn-fluid-gradients-layer {
-    z-index: -8 !important;
+    z-index: -8;
   }
-  
+
   .sn-flow-gradient-layer {
-    z-index: -7 !important;
+    z-index: -7;
   }
-  
+
   .sn-iridescent-shimmer-layer {
-    z-index: -6 !important;
+    z-index: -6;
   }
-  
+
   /* Ensure consciousness layers don't conflict */
   .sn-ambient-layer {
-    z-index: -10 !important;
+    z-index: -10;
   }
-  
+
   .sn-temporal-layer {
-    z-index: -9 !important;
+    z-index: -9;
   }
-  
+
   /* Fix cosmic consciousness background layers */
   .sn-cosmic-ambient-layer {
-    z-index: -1000 !important;
+    z-index: -1000;
   }
-  
+
   /* Ensure floating crystals don't interfere with gradients */
   .floating-crystal {
-    z-index: -15 !important;
+    z-index: -15;
   }
 }
 
 /* Emergency white layer suppression */
 .sn-emergency-white-fix {
-  /* Hide any elements that might be causing white layer issues */
-  *[style*="background: white"],
-  *[style*="background-color: white"],
-  *[style*="background-color: #fff"],
-  *[style*="background-color: #ffffff"] {
+  /* Hide background elements that might be causing white layer issues - exclude UI */
+  .sn-depth-background-container *[style*="background: white"],
+  .sn-depth-background-container *[style*="background-color: white"],
+  .sn-depth-background-container *[style*="background-color: #fff"],
+  .sn-depth-background-container *[style*="background-color: #ffffff"],
+  canvas[style*="background: white"]:not(.sn-interactive) {
     background: transparent !important;
   }
-  
-  /* Ensure mix-blend-mode effects don't cause white bleeding */
-  *[style*="mix-blend-mode"] {
+
+  /* Ensure mix-blend-mode effects don't cause white bleeding - background only */
+  .sn-depth-background-container *[style*="mix-blend-mode"],
+  canvas[style*="mix-blend-mode"]:not(.sn-interactive) {
     &:not(.sn-shimmer-layer):not(.sn-fluid-gradients) {
       mix-blend-mode: overlay !important;
       opacity: 0.6 !important;

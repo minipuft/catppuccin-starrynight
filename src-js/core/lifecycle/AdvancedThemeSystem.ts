@@ -272,13 +272,8 @@ export class AdvancedThemeSystem {
   }
 
   // Consciousness Systems
-  public get genreGradientEvolution() {
-    return (
-      this.facadeCoordinator?.getCachedNonVisualSystem(
-        "GenreGradientEvolution"
-      ) || null
-    );
-  }
+  // GenreGradientEvolution removed - functionality consolidated into GenreProfileManager
+  // Access genre functionality via ColorHarmonyEngine or DepthLayeredGradientSystem
   public get musicEmotionAnalyzer() {
     return (
       this.facadeCoordinator?.getCachedNonVisualSystem(
@@ -1066,8 +1061,7 @@ export class AdvancedThemeSystem {
       // Group 3: Event-driven systems (can initialize in parallel after dependencies)
       const eventDrivenSystems = [
         "MusicSyncService",
-        "ColorHarmonyEngine",
-        "GenreGradientEvolution", // 🎵 Genre-specific visual effects
+        "ColorHarmonyEngine", // 🎵 Now includes GenreProfileManager integration
         "MusicEmotionAnalyzer", // 🎭 Emotional intelligence for music analysis
       ];
 
@@ -1309,9 +1303,9 @@ export class AdvancedThemeSystem {
         }
 
         // Test 2: Validate Strategy Pattern Systems (Phase 2 fix)
-        const strategyPatternSystems = ["ColorHarmonyEngine", "GenreGradientEvolution", "MusicEmotionAnalyzer"];
+        const strategyPatternSystems = ["ColorHarmonyEngine", "MusicEmotionAnalyzer"];
         let strategySystemsFound = 0;
-        
+
         for (const systemKey of strategyPatternSystems) {
           try {
             const system = await this.facadeCoordinator.getNonVisualSystem(systemKey as any);

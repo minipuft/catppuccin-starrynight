@@ -5,12 +5,9 @@
 /**/
 /* This module contains advanced sidebar effects that complement the base*/
 /* SidebarVisualEffectsSystem, including:*/
-/* - Digital meditation states and biometric feedback*/
 /* - Atmospheric effects (hue shifting, saturation control, vibration)*/
-/* - Quantum entanglement and dimensional rifts*/
 /* - Advanced visual effects field coordination*/
-/* - Enhanced navigation items with temporal echoes*/
-/* - Complex animation systems for advanced interactions*/
+/**/
 /**/
 /* Dependencies:*/
 /* - Base sidebar visual effects system (_sidebar_visual_effects.scss)*/
@@ -19,44 +16,9 @@
 /**/
 /* ████████████████████████████████████████████████████████████████████████████████*/
 
-:root {
-  /* === RHYTHMIC BREATHING & PHASE CALCULATIONS ===*/
-  /* 0.97 to 1.02, controlled by BeatSyncVisualSystem*/
-  /* 0 to 2π, math phase for rhythm calculations*/
-}
+@use "../core/_mixins" as *;
 
-/* === DIGITAL MEDITATION & BIOMETRIC FEEDBACK ===*/
-/* Duplicate variable declarations removed—canonical versions live in _sidebar_background_effects.scss*/
-
-/* === ATMOSPHERIC EFFECTS ===*/
-/* Duplicate variable declarations removed—canonical versions live in _sidebar_background_effects.scss*/
-
-/* === QUANTUM ENTANGLEMENT ===*/
-/* Duplicate variable declarations removed—canonical versions live in _sidebar_background_effects.scss*/
-
-/* === DIMENSIONAL RIFT VARIABLES ===*/
-/* Duplicate variable declarations removed—canonical versions live in _sidebar_background_effects.scss*/
-
-/* === PREDICTIVE MATERIALIZATION ===*/
-/* Duplicate variable declarations removed—canonical versions live in _sidebar_background_effects.scss*/
-
-/* === VISUAL EFFECTS FIELD ===*/
-/* Duplicate variable declarations removed—canonical versions live in _sidebar_background_effects.scss*/
-
-/* === YEAR 3000 DYNAMIC ACCENT ===*/
-/* Duplicate variable declarations removed—canonical versions live in _sidebar_background_effects.scss*/
-
-/* === NAVIGATION ENTANGLEMENT ===*/
-/* Duplicate variable declarations removed—canonical versions live in _sidebar_background_effects.scss*/
-
-/* === DATA GLYPH ENHANCEMENTS ===*/
-/* Duplicate variable declarations removed—canonical versions live in _sidebar_background_effects.scss*/
-
-/* ████████████████████████████████████████████████████████████████████████████████*/
-/* DIMENSIONAL NEXUS SIDEBAR - Phase 3: Quantum Entanglement of Navigation Elements*/
-/* ████████████████████████████████████████████████████████████████████████████████*/
-
-div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
+@include left-sidebar-root {
   nav[aria-label="Main"] a,
   .main-yourLibraryX-header a, /* Links in library header*/
   div[data-testid="left-sidebar-footer"] a, /* Links in sidebar footer*/
@@ -154,7 +116,7 @@ div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
 /* ████████████████████████████████████████████████████████████████████████████████*/
 
 /* Sidebar Digital Meditation State*/
-div[data-testid="Desktop_LeftSidebar_Id"].Root__nav-bar {
+@include left-sidebar-root {
   /* Apply desaturation and slowdown when --sn-sidebar-meditation-desaturation > 0*/
   /* This requires careful application to not break other filter effects.*/
   /* We might need to adjust how filters are composed in the ::before/::after layers.*/
@@ -215,7 +177,7 @@ nav[aria-label="Main"] ul li a {
 /* ATMOSPHERIC EFFECTS & QUANTUM ENTANGLEMENT*/
 /* ████████████████████████████████████████████████████████████████████████████████*/
 
-.Root__nav-bar {
+@include left-sidebar-root {
   /* Or whichever element holds the main sidebar background layers*/
   /* Apply atmospheric hue shift and saturation to the whole sidebar or specific layers*/
   /* This example applies it to the main sidebar container. Be careful with specificity.*/
@@ -302,7 +264,7 @@ nav[aria-label="Main"] ul li a {
 /* ████████████████████████████████████████████████████████████████████████████████*/
 /* Note: Color harmony and music energy classes moved to consolidated section below */
 
-.Root__nav-bar {
+@include left-sidebar-root {
   /* --- Temporal Echo Layer Styling ---*/
   /* This uses the --sn-sidebar-temporal-shift variable set by JS*/
   /* Applied to a pseudo-element if existing ones are not sufficient, or integrated into existing ones.*/
@@ -331,7 +293,7 @@ nav[aria-label="Main"] ul li a {
 /* ENHANCED NAVIGATION ITEMS WITH DIMENSIONAL EFFECTS*/
 /* ████████████████████████████████████████████████████████████████████████████████*/
 
-.Root__nav-bar {
+@include left-sidebar-root {
   /* Target general navigation links. Adapt selectors as needed.*/
   .main-navBar-navBarLink,
   .main-yourLibraryX-navLinkContainer a, /* For library items in grid/list view*/
@@ -446,35 +408,6 @@ nav[aria-label="Main"] ul li a {
 } /* Closes the .Root__nav-bar block for navigation item enhancements*/
 
 /* ████████████████████████████████████████████████████████████████████████████████*/
-/* DATA GLYPH SYSTEM - TEMPORAL ECHOES & RESONANCE*/
-/* ████████████████████████████████████████████████████████████████████████████████*/
-
-.sn-data-glyph {
-  position: relative; /* For pseudo-element positioning if used for echo*/
-  /* Base styles... (opacity, size, color already handled by JS on the element or its CSS vars)*/
-
-  /* Resonance: Enhance existing properties or add new ones*/
-  /* Example: Adding a subtle glow based on resonance intensity*/
-  /* The base glyph color and opacity are set via --sn-glyph-color-rgb and --sn-glyph-opacity*/
-  /* Resonance can add to this, e.g. making the base color slightly more intense or adding a distinct glow.*/
-  box-shadow: 0 0 calc(2px + var(--sn-glyph-resonance-intensity, 0) * 15px)
-    rgba(
-      var(--sn-glyph-color-rgb, var(--spice-rgb-accent)),
-      calc(0.1 + var(--sn-glyph-resonance-intensity, 0) * 0.5)
-    );
-  transition: box-shadow 0.4s ease-in-out; /* Smooth resonance changes*/
-
-  /* Temporal Echo (achieved via JS setting --sn-nav-item-echo-opacity/scale on the glyph element)*/
-  /* Or using a pseudo-element if the glyph itself needs to remain unchanged during echo*/
-  &.sn-nav-item-echoing {
-    /* The following assumes JS sets these vars directly on the .sn-data-glyph or its wrapper*/
-    /* when echo is active, and SCSS primarily defines the animation behavior.*/
-    /* An alternative is to use a ::after pseudo-element for the echo.*/
-    animation: sn-temporal-echo-animation 0.75s ease-out forwards;
-  }
-}
-
-/* ████████████████████████████████████████████████████████████████████████████████*/
 /* ADVANCED ANIMATIONS & KEYFRAMES*/
 /* ████████████████████████████████████████████████████████████████████████████████*/
 
@@ -525,26 +458,7 @@ nav[aria-label="Main"] ul li a {
   }
 }
 
-/* Temporal Echo Animation*/
-@keyframes sn-temporal-echo-animation {
-  0% {
-    opacity: var(--sn-nav-item-echo-opacity, 0.3); /* Start opacity (set by JS)*/
-    transform: scale(
-      var(--sn-nav-item-echo-scale, 1.15)
-    ); /* Start scale (set by JS)*/
-    filter: brightness(1.2);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.4);
-    filter: brightness(1.5);
-  }
-}
-
-/* ████████████████████████████████████████████████████████████████████████████████*/
-/* CONSOLIDATED ADVANCED VISUAL EFFECTS (from _sn_advanced_visual_effects.scss)*/
 /* Dynamic Harmonic & Energy Responsive UI*/
-/* ████████████████████████████████████████████████████████████████████████████████*/
 
 :root {
   /* Base variables for Advanced Sidebar. These can be adjusted.*/
@@ -553,15 +467,9 @@ nav[aria-label="Main"] ul li a {
   /* Default time-based shift, JS will update this with --sn-sidebar-temporal-shift*/
 }
 
-.Root__nav-bar {
-  /* Base transition for all dynamic effects*/
-  transition: background-color 0.7s var(--sn-easing-explorer),
-    box-shadow 0.7s var(--sn-easing-explorer),
-    filter 0.7s var(--sn-easing-explorer);
-
-  /* --- Color Harmony Mode Styling ---*/
-  /* Define a mixin for common color harmony mode background properties*/
-  @mixin color-harmony-background($primary-rgb, $secondary-rgb, $accent-rgb) {
+/* --- Color Harmony Mode Styling ---*/
+/* Define a mixin for common color harmony mode background properties*/
+@mixin color-harmony-background($primary-rgb, $secondary-rgb, $accent-rgb) {
     background: linear-gradient(
       170deg,
       rgba(
@@ -596,7 +504,13 @@ nav[aria-label="Main"] ul li a {
           $secondary-rgb,
           calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier))
         );
-  }
+}
+
+@include left-sidebar-root {
+  /* Base transition for all dynamic effects*/
+  transition: background-color 0.7s var(--sn-easing-explorer),
+    box-shadow 0.7s var(--sn-easing-explorer),
+    filter 0.7s var(--sn-easing-explorer);
 
   /* Apply backgrounds per color harmony mode (JS adds these classes)*/
   &.sn-color-harmony-analogous-flow {
@@ -705,9 +619,7 @@ nav[aria-label="Main"] ul li a {
   }
 }
 
-/* ████████████████████████████████████████████████████████████████████████████████*/
 /* TEMPORAL ECHO ANIMATIONS - Sidebar Interaction Effects*/
-/* ████████████████████████████████████████████████████████████████████████████████*/
 
 @keyframes year3000-echo-core {
   0% {

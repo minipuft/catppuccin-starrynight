@@ -662,6 +662,47 @@ export class SystemCoordinator {
     }
     this.currentMetrics.activeSystems++;
 
+    // ✅ ANIMATION LOOP CONSOLIDATION: Register visual systems with EnhancedMasterAnimationCoordinator
+    if (type === "visual" && system && typeof system.updateAnimation === "function") {
+      const animationCoordinator = this.nonVisualFacade?.getCachedSystem("EnhancedMasterAnimationCoordinator");
+
+      if (animationCoordinator) {
+        // Determine priority based on system type
+        let priority: 'critical' | 'normal' | 'background' = 'normal';
+
+        if (key === "WebGLGradientBackground" || key.includes("WebGL")) {
+          priority = 'critical'; // Background rendering is critical
+        } else if (key.includes("Interaction") || key.includes("Tracking")) {
+          priority = 'background'; // Tracking systems are background priority
+        }
+
+        // Register system with coordinator
+        try {
+          animationCoordinator.registerAnimation(
+            key,
+            system,
+            priority
+          );
+
+          Y3KDebug?.debug?.log(
+            "SystemCoordinator",
+            `Registered ${key} with EnhancedMasterAnimationCoordinator (priority: ${priority})`
+          );
+        } catch (error) {
+          Y3KDebug?.debug?.warn(
+            "SystemCoordinator",
+            `Failed to register ${key} with animation coordinator:`,
+            error
+          );
+        }
+      } else {
+        Y3KDebug?.debug?.warn(
+          "SystemCoordinator",
+          `Animation coordinator not available for ${key} registration`
+        );
+      }
+    }
+
     // Emit system created event
     if (this.onSystemCreated) {
       this.onSystemCreated(type, key, system);

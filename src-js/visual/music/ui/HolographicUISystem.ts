@@ -353,8 +353,9 @@ export class HolographicUISystem
       // Setup user interaction tracking for content-aware effects
       this.setupUserInteractionTracking();
 
-      // Start holographic animation
-      this.startHolographicAnimation();
+      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by EnhancedMasterAnimationCoordinator
+      // The coordinator will call updateAnimation(deltaTime) automatically
+      // Registration happens in SystemCoordinator during system initialization
 
       this.initialized = true;
       this.isInitialized = true;
@@ -590,77 +591,64 @@ export class HolographicUISystem
     const flicker = this.holographicState.flickerIntensity * intensity;
     const chromatic = this.holographicState.chromatic * intensity;
 
-    // Base transparency
-    element.style.opacity = transparency.toString();
-
-    // Holographic flicker
+    // Base transparency with flicker
+    let finalOpacity = transparency;
     if (flicker > 0.3) {
       const flickerAmount =
         Math.sin(this.animationState.flickerPhase * 10) * flicker * 0.3;
-      element.style.opacity = Math.max(
-        0.1,
-        transparency + flickerAmount
-      ).toString();
+      finalOpacity = Math.max(0.1, transparency + flickerAmount);
     }
 
-    // Chromatic aberration
-    if (chromatic > 0.2) {
-      const chromaticOffset = chromatic * 2;
-      element.style.filter = `
-        drop-shadow(${chromaticOffset}px 0 0 rgba(255, 0, 0, 0.5))
-        drop-shadow(-${chromaticOffset}px 0 0 rgba(0, 255, 255, 0.5))
-      `;
-    }
+    // Chromatic aberration - store offset values without using filter
+    const chromaticOffset = chromatic > 0.2 ? chromatic * 2 : 0;
+    const chromaticRedOpacity = chromatic > 0.2 ? 0.5 : 0;
+    const chromaticCyanOpacity = chromatic > 0.2 ? 0.5 : 0;
 
     // Holographic glow
     const glowIntensity = intensity * 0.3;
-    element.style.boxShadow = `
-      0 0 ${
-        glowIntensity * 20
-      }px rgba(var(--spice-rgb-holographic-glow, var(--sn-holographic-rgb, 100, 255, 200)), ${glowIntensity}),
-      inset 0 0 ${
-        glowIntensity * 10
-      }px rgba(var(--spice-rgb-holographic-accent, var(--sn-holographic-rgb, 100, 255, 200)), ${
-      glowIntensity * 0.5
-    })
-    `;
+    const glowSpread = glowIntensity * 20;
+    const glowOpacity = glowIntensity;
+    const insetGlowSpread = glowIntensity * 10;
+    const insetGlowOpacity = glowIntensity * 0.5;
+
+    // Batch CSS variable updates
+    this.cssController.queueCSSVariableUpdate('--holo-base-opacity', finalOpacity.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-chromatic-offset', `${chromaticOffset}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-chromatic-red-opacity', chromaticRedOpacity.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-chromatic-cyan-opacity', chromaticCyanOpacity.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-glow-spread', `${glowSpread}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-glow-opacity', glowOpacity.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-inset-glow-spread', `${insetGlowSpread}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-inset-glow-opacity', insetGlowOpacity.toString());
   }
 
   // Apply translucent panel effect
   private applyTranslucentPanel(element: HTMLElement, intensity: number): void {
     const transparency = this.holographicState.transparency * intensity;
 
-    element.style.background = `
-      rgba(var(--spice-rgb-holographic-primary, var(--sn-holographic-rgb, 100, 255, 200)), ${
-        transparency * 0.1
-      }),
-      linear-gradient(45deg,
-        transparent 0%,
-        rgba(var(--spice-rgb-holographic-accent, var(--sn-holographic-rgb, 100, 255, 200)), ${
-          transparency * 0.05
-        }) 50%,
-        transparent 100%)
-    `;
-    // Reduce backdrop blur to prevent excessive visual interference
-    element.style.backdropFilter = `blur(${Math.min(intensity * 2, 3)}px)`;
-    element.style.border = `1px solid rgba(var(--spice-rgb-holographic-glow, var(--sn-holographic-rgb, 100, 255, 200)), ${
-      transparency * 0.6
-    })`;
+    // Calculate opacity values for background layers
+    const bgPrimaryOpacity = transparency * 0.1;
+    const bgAccentOpacity = transparency * 0.05;
+    const borderOpacity = transparency * 0.6;
+    const blurAmount = Math.min(intensity * 2, 3);
+
+    // Batch CSS variable updates
+    this.cssController.queueCSSVariableUpdate('--holo-panel-bg-primary-opacity', bgPrimaryOpacity.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-panel-bg-accent-opacity', bgAccentOpacity.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-panel-border-opacity', borderOpacity.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-panel-blur', `${blurAmount}px`);
   }
 
   // Apply data stream effect
   private applyDataStream(element: HTMLElement, intensity: number): void {
     const streamSpeed = this.dataStream.speed * intensity;
     const streamDensity = this.dataStream.density * intensity;
+    const animationDuration = 2 / streamSpeed;
 
-    // Create scrolling data stream background
-    const streamGradient = this.generateDataStreamGradient(
-      streamSpeed,
-      streamDensity
-    );
-    element.style.background = streamGradient;
-    element.style.backgroundSize = "100% 20px";
-    element.style.animation = `dataStream ${2 / streamSpeed}s linear infinite`;
+    // Store data stream parameters in CSS variables
+    this.cssController.queueCSSVariableUpdate('--holo-stream-speed', streamSpeed.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-stream-density', streamDensity.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-stream-duration', `${animationDuration}s`);
 
     // Add CSS animation if not exists
     if (!document.getElementById("dataStreamAnimation")) {
@@ -683,22 +671,14 @@ export class HolographicUISystem
 
     // Energy barrier shimmer
     const shimmerIntensity = (1.0 - energyStability) * intensity;
-    element.style.background = `
-      linear-gradient(90deg,
-        rgba(var(--sn-neon-glow-rgb, 0, 255, 255), ${
-          shimmerIntensity * 0.3
-        }) 0%,
-        rgba(var(--sn-neon-glow-rgb, 0, 255, 255), ${
-          shimmerIntensity * 0.1
-        }) 50%,
-        rgba(var(--sn-neon-glow-rgb, 0, 255, 255), ${
-          shimmerIntensity * 0.3
-        }) 100%)
-    `;
-    element.style.backgroundSize = "200% 100%";
-    element.style.animation = `energyBarrier ${
-      1 / shimmerIntensity
-    }s ease-in-out infinite`;
+    const shimmerOpacityHigh = shimmerIntensity * 0.3;
+    const shimmerOpacityLow = shimmerIntensity * 0.1;
+    const animationDuration = 1 / shimmerIntensity;
+
+    // Store energy barrier parameters in CSS variables
+    this.cssController.queueCSSVariableUpdate('--holo-energy-shimmer-high', shimmerOpacityHigh.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-energy-shimmer-low', shimmerOpacityLow.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-energy-duration', `${animationDuration}s`);
 
     // Add CSS animation if not exists
     if (!document.getElementById("energyBarrierAnimation")) {
@@ -727,25 +707,26 @@ export class HolographicUISystem
 
     // Consciousness-responsive glow
     const glowIntensity = resonance * intensity * 0.5;
-    element.style.boxShadow = `
-      0 0 ${
-        glowIntensity * 30
-      }px rgba(var(--sn-accent-rgb, 203, 166, 247), ${glowIntensity}),
-      inset 0 0 ${
-        glowIntensity * 15
-      }px rgba(var(--sn-accent-rgb, 203, 166, 247), ${glowIntensity * 0.3})
-    `;
+    const glowSpread = glowIntensity * 30;
+    const glowOpacity = glowIntensity;
+    const insetGlowSpread = glowIntensity * 15;
+    const insetGlowOpacity = glowIntensity * 0.3;
 
     // Consciousness-responsive transparency
     const visualEffectsTransparency = 0.7 + resonance * 0.3;
-    element.style.opacity = visualEffectsTransparency.toString();
 
     // Consciousness pulsing
-    if (resonance > 0.6) {
-      const pulsePhase = this.animationState.dynamicPhase * 2;
-      const pulseIntensity = 1.0 + Math.sin(pulsePhase) * resonance * 0.2;
-      element.style.transform = `scale(${pulseIntensity})`;
-    }
+    const pulseIntensity = resonance > 0.6
+      ? 1.0 + Math.sin(this.animationState.dynamicPhase * 2) * resonance * 0.2
+      : 1.0;
+
+    // Batch CSS variable updates
+    this.cssController.queueCSSVariableUpdate('--holo-consciousness-glow-spread', `${glowSpread}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-consciousness-glow-opacity', glowOpacity.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-consciousness-inset-spread', `${insetGlowSpread}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-consciousness-inset-opacity', insetGlowOpacity.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-consciousness-opacity', visualEffectsTransparency.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-consciousness-pulse-scale', pulseIntensity.toString());
   }
 
   // Apply dynamic hologram effect
@@ -762,18 +743,21 @@ export class HolographicUISystem
     // Dynamic morphing
     const morphX = Math.sin(dynamicPhase * 1.5) * dynamicIntensity * 2;
     const morphY = Math.cos(dynamicPhase * 2.0) * dynamicIntensity * 1.5;
-    element.style.transform = `translate(${morphX}px, ${morphY}px)`;
 
-    // Dynamic color shifting
+    // Dynamic color shifting - store hue value without using filter
     const colorPhase = dynamicPhase * 0.5;
     const hueShift = Math.sin(colorPhase) * dynamicIntensity * 30;
-    element.style.filter = `hue-rotate(${hueShift}deg)`;
 
     // Dynamic pulsing
     const pulsingPhase = dynamicPhase * 0.8;
     const pulsingScale =
       1.0 + Math.sin(pulsingPhase) * dynamicIntensity * 0.05;
-    element.style.transform += ` scale(${pulsingScale})`;
+
+    // Batch CSS variable updates
+    this.cssController.queueCSSVariableUpdate('--holo-dynamic-translate-x', `${morphX}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-dynamic-translate-y', `${morphY}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-dynamic-hue-shift', hueShift.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-dynamic-scale', pulsingScale.toString());
   }
 
   // Apply musical visualization effect
@@ -790,21 +774,19 @@ export class HolographicUISystem
 
     // Musical bars visualization
     const barHeight = Math.sin(visualPhase) * visualIntensity * 20;
-    element.style.background = `
-      linear-gradient(0deg,
-        rgba(var(--sn-primary-rgb, 205, 214, 244), ${
-          visualIntensity * 0.8
-        }) 0%,
-        rgba(var(--sn-primary-rgb, 205, 214, 244), ${
-          visualIntensity * 0.4
-        }) ${50 + barHeight}%,
-        transparent ${50 + barHeight}%)
-    `;
+    const bgTopOpacity = visualIntensity * 0.8;
+    const bgMidOpacity = visualIntensity * 0.4;
+    const barPosition = 50 + barHeight;
 
     // Musical pulsing
     const pulseIntensity =
       1.0 + Math.sin(visualPhase * 2) * musicalIntensity * 0.1;
-    element.style.transform = `scaleY(${pulseIntensity})`;
+
+    // Store musical visualization parameters in CSS variables
+    this.cssController.queueCSSVariableUpdate('--holo-musical-bg-top-opacity', bgTopOpacity.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-musical-bg-mid-opacity', bgMidOpacity.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-musical-bar-position', `${barPosition}%`);
+    this.cssController.queueCSSVariableUpdate('--holo-musical-pulse-scale', pulseIntensity.toString());
   }
 
   // Apply scanline overlay effect
@@ -812,27 +794,16 @@ export class HolographicUISystem
     const scanlineIntensity =
       this.holographicState.scanlineIntensity * intensity;
     const scanlineFrequency = this.scanlineEffect.frequency;
+    const scanlineOpacity = scanlineIntensity * 0.1;
 
-    // Scanline pattern
-    element.style.background = `
-      repeating-linear-gradient(
-        0deg,
-        transparent 0px,
-        transparent ${scanlineFrequency - 1}px,
-        rgba(var(--spice-rgb-holographic-accent, var(--sn-holographic-rgb, 100, 255, 200)), ${
-          scanlineIntensity * 0.1
-        }) ${scanlineFrequency}px,
-        rgba(var(--spice-rgb-holographic-accent, var(--sn-holographic-rgb, 100, 255, 200)), ${
-          scanlineIntensity * 0.1
-        }) ${scanlineFrequency}px
-      )
-    `;
+    // Store scanline parameters in CSS variables
+    this.cssController.queueCSSVariableUpdate('--holo-scanline-frequency', `${scanlineFrequency}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-scanline-opacity', scanlineOpacity.toString());
 
     // Animated scanlines
     if (this.scanlineEffect.animation) {
-      element.style.animation = `scanlines ${
-        1 / this.scanlineEffect.speed
-      }s linear infinite`;
+      const animationDuration = 1 / this.scanlineEffect.speed;
+      this.cssController.queueCSSVariableUpdate('--holo-scanline-duration', `${animationDuration}s`);
     }
 
     // Add CSS animation if not exists
@@ -853,21 +824,22 @@ export class HolographicUISystem
   private applyChromaticGhost(element: HTMLElement, intensity: number): void {
     const chromaticIntensity = this.holographicState.chromatic * intensity;
 
-    // Multiple chromatic ghosts
+    // Multiple chromatic ghosts - store offset values without using filter
     const redOffset = chromaticIntensity * 3;
     const greenOffset = chromaticIntensity * 1.5;
     const blueOffset = chromaticIntensity * 2;
-
-    element.style.filter = `
-      drop-shadow(${redOffset}px 0 0 rgba(255, 0, 0, 0.4))
-      drop-shadow(-${greenOffset}px 0 0 rgba(0, 255, 0, 0.4))
-      drop-shadow(0 ${blueOffset}px 0 rgba(0, 0, 255, 0.4))
-    `;
+    const shadowOpacity = 0.4;
 
     // Chromatic animation
     const chromaticPhase = this.animationState.chromaticPhase;
     const offsetAnimation = Math.sin(chromaticPhase * 5) * chromaticIntensity;
-    element.style.transform = `translate(${offsetAnimation}px, 0)`;
+
+    // Batch CSS variable updates
+    this.cssController.queueCSSVariableUpdate('--holo-chromatic-red-offset', `${redOffset}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-chromatic-green-offset', `-${greenOffset}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-chromatic-blue-offset-y', `${blueOffset}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-chromatic-shadow-opacity', shadowOpacity.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-chromatic-translate', `${offsetAnimation}px`);
   }
 
   // Apply visualEffects modifiers
@@ -879,15 +851,13 @@ export class HolographicUISystem
     const resonance =
       visualEffectsState.symbioticResonance * visualEffectsLevel;
 
-    // Consciousness-based brightness
+    // Consciousness-based brightness and saturation - store without using filters
     const brightness = 1.0 + resonance * 0.3;
-    element.style.filter =
-      (element.style.filter || "") + ` brightness(${brightness})`;
-
-    // Consciousness-based saturation
     const saturation = 1.0 + resonance * 0.5;
-    element.style.filter =
-      (element.style.filter || "") + ` saturate(${saturation})`;
+
+    // Batch CSS variable updates
+    this.cssController.queueCSSVariableUpdate('--holo-consciousness-brightness', brightness.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-consciousness-saturation', saturation.toString());
   }
 
   // Apply dynamic modifiers
@@ -895,28 +865,18 @@ export class HolographicUISystem
     const dynamicPhase = this.animationState.dynamicPhase;
     const dynamicIntensity = this.holographicState.energyStability * intensity;
 
-    // Dynamic blur pulsing - consolidate with existing filters to prevent stacking
+    // Dynamic blur pulsing - store without using filter
     const blurPhase = dynamicPhase * 1.2;
-    const dynamicBlurAmount = Math.sin(blurPhase) * dynamicIntensity * 2;
-
-    // Parse existing filter to avoid blur stacking
-    const currentFilter = element.style.filter || "";
-    const hasExistingBlur = currentFilter.includes("blur(");
-
-    if (!hasExistingBlur && dynamicBlurAmount > 0) {
-      element.style.filter =
-        currentFilter + ` blur(${Math.max(0, dynamicBlurAmount)}px)`;
-    }
+    const dynamicBlurAmount = Math.max(0, Math.sin(blurPhase) * dynamicIntensity * 2);
 
     // Dynamic opacity pulsing
     const opacityPhase = dynamicPhase * 0.7;
     const opacityModifier =
       1.0 + Math.sin(opacityPhase) * dynamicIntensity * 0.2;
-    const currentOpacity = parseFloat(element.style.opacity) || 1.0;
-    element.style.opacity = Math.max(
-      0.1,
-      Math.min(1.0, currentOpacity * opacityModifier)
-    ).toString();
+
+    // Batch CSS variable updates
+    this.cssController.queueCSSVariableUpdate('--holo-dynamic-blur', `${dynamicBlurAmount}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-dynamic-opacity-modifier', opacityModifier.toString());
   }
 
   // Generate data stream gradient
@@ -1034,26 +994,21 @@ export class HolographicUISystem
 
   // Data stream canvas method removed - now implemented via CSS-only per-element effects
 
-  // Start holographic animation
-  private startHolographicAnimation(): void {
-    this.animationState.isAnimating = true;
-    this.animationState.lastFrameTime = performance.now();
-
-    const animate = (currentTime: number) => {
-      if (!this.animationState.isAnimating) return;
-
-      const deltaTime = currentTime - this.animationState.lastFrameTime;
-      this.animationState.lastFrameTime = currentTime;
-
-      // Update holographic animation
-      this.updateHolographicAnimation(deltaTime);
-
-      // Continue animation loop
-      requestAnimationFrame(animate);
-    };
-
-    requestAnimationFrame(animate);
-  }
+  /**
+   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   *
+   * Previous implementation: startHolographicAnimation() with independent RAF loop
+   * New implementation: updateAnimation() called by coordinator
+   *
+   * Benefits:
+   * - Single RAF loop for all systems (not 5-8 independent loops)
+   * - Shared deltaTime calculation (eliminates redundant performance.now() calls)
+   * - Coordinated frame budget management
+   * - Priority-based execution order
+   *
+   * Migration: Lines 998-1016 removed, registration added to SystemCoordinator
+   * Note: updateHolographicAnimation() is now called from updateAnimation(deltaTime)
+   */
 
   // Utility methods
   private smoothTransition(
@@ -1091,14 +1046,13 @@ export class HolographicUISystem
     this.isEnabled = enabled;
 
     if (!enabled) {
-      // Clear all holographic effects
-      for (const [id, element] of this.holographicElements) {
-        element.element.style.opacity = "1";
-        element.element.style.filter = "";
-        element.element.style.background = "";
-        element.element.style.boxShadow = "";
-        element.element.style.transform = "";
-      }
+      // Clear all holographic effects by resetting CSS variables
+      this.cssController.queueCSSVariableUpdate('--holo-base-opacity', '1');
+      this.cssController.queueCSSVariableUpdate('--holo-chromatic-offset', '0px');
+      this.cssController.queueCSSVariableUpdate('--holo-glow-spread', '0px');
+      this.cssController.queueCSSVariableUpdate('--holo-dynamic-translate-x', '0px');
+      this.cssController.queueCSSVariableUpdate('--holo-dynamic-translate-y', '0px');
+      this.cssController.queueCSSVariableUpdate('--holo-dynamic-scale', '1');
     }
   }
 
@@ -1179,37 +1133,18 @@ export class HolographicUISystem
     const temperatureOffset = temperatureDepth * 50; // Additional depth based on emotional temperature
     const finalDepth = baseDepth + temperatureOffset;
 
-    // Apply 3D transform with visualEffects-driven depth
-    const currentTransform = element.style.transform || "";
-    const volumetricTransform = `translateZ(${finalDepth}px)`;
-
-    // Preserve existing transforms and add volumetric depth
-    if (currentTransform.includes("translateZ")) {
-      element.style.transform = currentTransform.replace(
-        /translateZ\([^)]*\)/,
-        volumetricTransform
-      );
-    } else {
-      element.style.transform =
-        `${currentTransform} ${volumetricTransform}`.trim();
-    }
-
     // Add volumetric shadow effects based on depth
     const shadowIntensity = (Math.abs(finalDepth) / 100) * intensity;
     const shadowBlur = shadowIntensity * 30;
     const shadowOffset =
       finalDepth > 0 ? shadowIntensity * 5 : -shadowIntensity * 3;
+    const shadowOpacity = shadowIntensity * 0.3;
 
-    const existingShadow = element.style.boxShadow || "";
-    const volumetricShadow = `0 ${shadowOffset}px ${shadowBlur}px rgba(var(--spice-rgb-holographic-glow, var(--sn-holographic-rgb, 100, 255, 200)), ${
-      shadowIntensity * 0.3
-    })`;
-
-    if (existingShadow) {
-      element.style.boxShadow = `${existingShadow}, ${volumetricShadow}`;
-    } else {
-      element.style.boxShadow = volumetricShadow;
-    }
+    // Batch CSS variable updates for volumetric effects
+    this.cssController.queueCSSVariableUpdate('--holo-volumetric-depth', `${finalDepth}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-volumetric-shadow-blur', `${shadowBlur}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-volumetric-shadow-offset', `${shadowOffset}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-volumetric-shadow-opacity', shadowOpacity.toString());
 
     // Add volumetric atmosphere for depth perception
     this.applyVolumetricAtmosphere(element, depthLevel, intensity);
@@ -1227,38 +1162,16 @@ export class HolographicUISystem
     const atmosphereIntensity = depthLevel * intensity;
     const blurAmount = Math.max(0, (depthLevel - 0.5) * 4); // Blur distant elements
     const brightnessAdjust = 1 + (depthLevel - 0.5) * 0.3; // Brighten near elements
+    const saturateAdjust = 1 + atmosphereIntensity * 0.2;
 
-    // Apply atmospheric filters - avoid blur stacking
-    const currentFilter = element.style.filter || "";
-    const hasExistingBlur = currentFilter.includes("blur(");
+    // Calculate depth-based opacity for atmospheric perspective
+    const atmosphericOpacityModifier = Math.max(0.3, 1.0 - (1 - depthLevel) * 0.3);
 
-    const atmosphericFilters = [
-      // Only add blur if no existing blur effect
-      blurAmount > 0 && !hasExistingBlur ? `blur(${blurAmount}px)` : "",
-      `brightness(${brightnessAdjust})`,
-      `saturate(${1 + atmosphereIntensity * 0.2})`,
-    ]
-      .filter((f) => f)
-      .join(" ");
-
-    // Merge with existing filters, avoiding duplicate effects
-    const hasBrightness = currentFilter.includes("brightness");
-    const hasSaturate = currentFilter.includes("saturate");
-
-    if (currentFilter && !hasBrightness && !hasSaturate) {
-      element.style.filter = `${currentFilter} ${atmosphericFilters}`;
-    } else if (!currentFilter) {
-      element.style.filter = atmosphericFilters;
-    }
-    // Skip if filters already exist to prevent stacking
-
-    // Add depth-based opacity scaling for atmospheric perspective
-    const baseOpacity = parseFloat(element.style.opacity || "1");
-    const atmosphericOpacity = Math.max(
-      0.3,
-      baseOpacity - (1 - depthLevel) * 0.3
-    );
-    element.style.opacity = atmosphericOpacity.toString();
+    // Batch CSS variable updates for atmospheric effects
+    this.cssController.queueCSSVariableUpdate('--holo-atmosphere-blur', `${blurAmount}px`);
+    this.cssController.queueCSSVariableUpdate('--holo-atmosphere-brightness', brightnessAdjust.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-atmosphere-saturate', saturateAdjust.toString());
+    this.cssController.queueCSSVariableUpdate('--holo-atmosphere-opacity-modifier', atmosphericOpacityModifier.toString());
   }
 
   /**
@@ -1568,23 +1481,25 @@ export class HolographicUISystem
   public destroy(): void {
     console.log("[HolographicUISystem] Destroying holographic UI system...");
 
-    // Stop animation
-    this.animationState.isAnimating = false;
+    // ✅ RAF LOOP CONSOLIDATION: No need to stop animation loop (coordinator handles this)
+    // System unregistration happens in SystemCoordinator destroy()
 
     // Clear holographic elements
     for (const [id, element] of this.holographicElements) {
-      // Restore original styles
-      element.element.style.opacity = "1";
-      element.element.style.filter = "";
-      element.element.style.background = "";
-      element.element.style.boxShadow = "";
-      element.element.style.transform = "";
-
       // Cancel animations
       if (element.animation) {
         element.animation.cancel();
       }
     }
+
+    // Reset all holographic CSS variables
+    this.cssController.queueCSSVariableUpdate('--holo-base-opacity', '1');
+    this.cssController.queueCSSVariableUpdate('--holo-chromatic-offset', '0px');
+    this.cssController.queueCSSVariableUpdate('--holo-glow-spread', '0px');
+    this.cssController.queueCSSVariableUpdate('--holo-dynamic-translate-x', '0px');
+    this.cssController.queueCSSVariableUpdate('--holo-dynamic-translate-y', '0px');
+    this.cssController.queueCSSVariableUpdate('--holo-dynamic-scale', '1');
+
     this.holographicElements.clear();
 
     // Remove interface container

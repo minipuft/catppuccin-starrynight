@@ -8,13 +8,73 @@
 @use "../core/_mixins" as *;
 @use "../core/_performance_mixins" as *;
 @use "./_sn_card_base";
-@use "./_sn_visual_accents" as *;
 @use "../features/animations/fluid_morphing" as *; // Phase 8: Year3000 organic effects
 // Note: perceptual-blending archived in Phase 10 Week 4 (orphaned file)
 // Note: _kinetic-animations removed - animations integrated into _sn_advanced_visual_effects.scss
 
+// ============================================================================
+// HARMONIC AURA — Year 3000 Subtle Bloom System (Phase 3)
+// ----------------------------------------------------------------------------
+// Consolidated from _sn_visual_accents.scss (Phase 8.3)
+// Provides light, beat-aware glow that replaces heavy drop-shadows.
+// Designed to harmonize with dynamic variables injected by JS visual systems.
+// ----------------------------------------------------------------------------
+
+@mixin harmonic-aura {
+  position: relative;
+
+  // Prevent duplicate auras when mixin is included multiple times
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+
+    filter: drop-shadow(
+      0 0 calc(
+          var(--sn-harmonic-aura-blur-base) +
+            var(--sn-harmonic-aura-blur-dynamic)
+        )
+        rgba(
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
+          calc(
+            var(--sn-harmonic-aura-alpha-base) +
+              var(--sn-harmonic-aura-alpha-dynamic)
+          )
+        )
+    );
+    transition: filter 400ms ease-out;
+    z-index: -1;
+  }
+
+  &:hover::after {
+    // Slightly stronger on hover but still subtle
+    filter: drop-shadow(
+      0 0 calc(
+          (var(--sn-harmonic-aura-blur-base) * 1.4) +
+            var(--sn-harmonic-aura-blur-dynamic)
+        )
+        rgba(
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
+          calc(
+            (var(--sn-harmonic-aura-alpha-base) * 1.4) +
+              var(--sn-harmonic-aura-alpha-dynamic)
+          )
+        )
+    );
+  }
+}
+
 // StarryNight Enhanced Cards System Variables
 :root {
+  // === Harmonic Aura Variables (Phase 3 - Consolidated from _sn_visual_accents) ===
+  --sn-harmonic-aura-alpha-base: 0.04;
+  --sn-harmonic-aura-alpha-dynamic: calc(var(--card-beat-intensity, 0) * 0.12);
+  --sn-harmonic-aura-blur-base: 10px;
+  --sn-harmonic-aura-blur-dynamic: calc(var(--card-beat-intensity, 0) * 6px);
+
+
   // === Visual Effects Foundation ===
   --card-visual-depth: 16px;
   --card-effect-field-radius: 20px;

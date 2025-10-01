@@ -3,12 +3,12 @@ import {
   HARMONIC_INTENSITY_KEY,
 } from "@/config/settingKeys";
 // EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
-import {
-  GenreGradientEvolution,
-  type GenreCharacteristics,
-  type GenreVisualStyle,
-  type MusicGenre,
-} from "@/audio/GenreGradientEvolution";
+import { GenreProfileManager } from "@/audio/GenreProfileManager";
+import type {
+  GenreCharacteristics,
+  GenreVisualStyle,
+  GenreType as MusicGenre,
+} from "@/types/genre";
 import type { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
@@ -177,7 +177,7 @@ export class ColorHarmonyEngine
   private emotionalTemperatureMapper: EmotionalTemperatureMapper;
   private oklabProcessor: OKLABColorProcessor;
   private musicEmotionAnalyzer: MusicEmotionAnalyzer;
-  private genreGradientEvolution: GenreGradientEvolution;
+  private genreProfileManager: GenreProfileManager;
 
   // Enhanced OKLAB processing state
   private oklabState: {
@@ -451,13 +451,8 @@ export class ColorHarmonyEngine
       analysisInterval: 500, // 2Hz analysis rate
     });
 
-    // Initialize GenreGradientEvolution for aesthetic intelligence
-    this.genreGradientEvolution = new GenreGradientEvolution(
-      undefined as any, // cssVisualEffectsController will be set during initialize()
-      null, // musicSyncService will be injected if available
-      null, // emotionalGradientMapper will be injected if available
-      this.settingsManager
-    );
+    // Initialize GenreProfileManager for genre detection and characteristics
+    this.genreProfileManager = new GenreProfileManager();
 
     // Initialize OKLAB processing state
     this.oklabState = {
@@ -772,19 +767,10 @@ export class ColorHarmonyEngine
       );
     }
 
-    // Initialize GenreGradientEvolution for aesthetic intelligence
-    try {
-      await this.genreGradientEvolution.initialize();
-
-      if (this.config.enableDebug) {
-        console.log(
-          "🎶 [ColorHarmonyEngine] GenreGradientEvolution initialized with aesthetic intelligence"
-        );
-      }
-    } catch (error) {
-      console.warn(
-        "🎶 [ColorHarmonyEngine] Failed to initialize GenreGradientEvolution:",
-        error
+    // GenreProfileManager is stateless and doesn't need initialization
+    if (this.config.enableDebug) {
+      console.log(
+        "🎶 [ColorHarmonyEngine] GenreProfileManager ready for genre detection"
       );
     }
 
@@ -4804,13 +4790,13 @@ export class ColorHarmonyEngine
     visualStyle: GenreVisualStyle;
   } | null> {
     try {
-      if (!this.genreGradientEvolution) {
+      if (!this.genreProfileManager) {
         return null;
       }
 
-      // Get current genre from GenreGradientEvolution
-      const currentGenre = this.genreGradientEvolution.getCurrentGenre();
-      const genreConfidence = this.genreGradientEvolution.getGenreConfidence();
+      // Get current genre from GenreProfileManager
+      const currentGenre = this.genreProfileManager.getCurrentGenre();
+      const genreConfidence = this.genreProfileManager.getGenreConfidence();
 
       // Only proceed if we have decent confidence
       if (genreConfidence < 0.3) {
@@ -4819,9 +4805,9 @@ export class ColorHarmonyEngine
 
       // Get genre characteristics and visual style
       const genreCharacteristics =
-        this.genreGradientEvolution.getGenreCharacteristics(currentGenre);
+        this.genreProfileManager.getCharacteristics(currentGenre);
       const genreVisualStyle =
-        this.genreGradientEvolution.getGenreVisualStyle(currentGenre);
+        this.genreProfileManager.getVisualStyle(currentGenre);
 
       // 🎨 PHASE 2.1: Album Color Enhancement - Use album colors to validate and enhance genre detection
       let albumGenreHarmonyScore = 1.0; // Default confidence multiplier
@@ -4832,7 +4818,7 @@ export class ColorHarmonyEngine
           // Analyze album color harmony with detected genre
           const albumColorAnalysis = this._analyzeAlbumGenreHarmony(
             albumArtColors,
-            currentGenre,
+            currentGenre as MusicGenre,
             genreCharacteristics
           );
           albumGenreHarmonyScore = albumColorAnalysis.harmonyScore;
@@ -4863,13 +4849,13 @@ export class ColorHarmonyEngine
       }
 
       // Update our internal genre state with album-validated confidence
-      this.genreState.currentGenre = currentGenre;
+      this.genreState.currentGenre = currentGenre as MusicGenre;
       this.genreState.genreConfidence = genreValidatedByAlbumColors; // Use album-enhanced confidence
       this.genreState.lastGenreUpdate = Date.now();
 
       // Add to genre history with album-enhanced confidence
       this.genreState.genreHistory.unshift({
-        genre: currentGenre,
+        genre: currentGenre as MusicGenre,
         confidence: genreValidatedByAlbumColors, // Use album-enhanced confidence
         timestamp: Date.now(),
       });
@@ -4891,7 +4877,7 @@ export class ColorHarmonyEngine
       }
 
       return {
-        genre: currentGenre,
+        genre: currentGenre as MusicGenre,
         confidence: genreValidatedByAlbumColors, // Return album-enhanced confidence
         characteristics: genreCharacteristics,
         visualStyle: genreVisualStyle,

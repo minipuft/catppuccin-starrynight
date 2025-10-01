@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
-// 💎 YEAR 3000 FLOATING CRYSTALS - Phase 4 Implementation
+// 💎 YEAR 3000 ATMOSPHERIC CRYSTALS - Phase 8.3 Implementation
 // Renders large, translucent SVG crystals and a starfield background to add
-// atmospheric depth based on the mood-board.
+// atmospheric depth to the interface.
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @use "../../core/_mixins" as *;
@@ -20,19 +20,17 @@
     content: "";
     position: absolute;
     inset: 0;
-    // TODO[Crystals]: Replace with a proper starfield image/animation
     background: radial-gradient(ellipse at center, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1) 0%, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0) 70%);
     opacity: 0.5;
     z-index: var(--z-starfield, -10);
   }
 }
 
-.sn-crystal {
+.sn-atmospheric-crystal {
   position: absolute;
   opacity: 0.3;
   transform-style: preserve-3d;
   z-index: var(--z-crystals, -9);
-  // Animation will be added here
   animation: float 30s ease-in-out infinite alternate;
 
   // Individual crystal styling
@@ -41,7 +39,7 @@
     top: 5vh;
     left: -5vw;
     animation-duration: 45s;
-    background: url("../assets/icons/crystal_a.svg") no-repeat center center / contain;
+    background: url("../../assets/icons/crystal_a.svg") no-repeat center center / contain;
   }
 
   &--b {
@@ -49,7 +47,7 @@
     bottom: -10vh;
     right: -8vw;
     animation-duration: 60s;
-    background: url("../assets/icons/crystal_b.svg") no-repeat center center / contain;
+    background: url("../../assets/icons/crystal_b.svg") no-repeat center center / contain;
   }
 
   &--c {
@@ -58,7 +56,7 @@
     right: 10vw;
     animation-duration: 35s;
     animation-delay: -10s;
-    background: url("../assets/icons/crystal_c.svg") no-repeat center center / contain;
+    background: url("../../assets/icons/crystal_c.svg") no-repeat center center / contain;
   }
 }
 
@@ -69,13 +67,13 @@
 
 // --- Media Queries ---
 @media (prefers-color-scheme: dark) {
-  .sn-crystal {
+  .sn-atmospheric-crystal {
     filter: hue-rotate(180deg) brightness(0.8);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sn-crystal {
+  .sn-atmospheric-crystal {
     animation: none;
     // Set a static position
     transform: translateZ(-40px);

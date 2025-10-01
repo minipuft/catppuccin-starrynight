@@ -72,11 +72,12 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
     energyResponseMultiplier: 1.2,
   };
 
-  // Transition management
+  // Transition management - now handled by coordinator updateAnimation() loop
   private transitionTimer: number = 0;
   private lastTransitionStartTime: number = 0;
   private transitionFromAccent: string = "";
   private transitionToAccent: string = "";
+  private transitionElapsedTime: number = 0;
 
   // CSS coordination system
   private cssController!: OptimizedCSSVariableManager;
@@ -585,53 +586,13 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
 
   /**
    * Animate smooth accent color transitions
+   * MIGRATION NOTE: This method previously used standalone RAF loop.
+   * Now transitions are driven by EnhancedMasterAnimationCoordinator via updateAnimation().
+   * The coordinator will call updateAnimation(deltaTime) which handles all transition logic.
    */
   private animateAccentTransition(): void {
-    const animate = () => {
-      if (!this.dynamicColorState.transitionInProgress) return;
-
-      const elapsed = Date.now() - this.lastTransitionStartTime;
-      const progress = Math.min(
-        elapsed / this.integrationConfig.smoothTransitionDuration,
-        1
-      );
-
-      // Smooth easing function
-      const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease-out cubic
-
-      // Interpolate colors
-      const currentColor = this.interpolateColors(
-        this.transitionFromAccent,
-        this.transitionToAccent,
-        easeProgress
-      );
-
-      if (currentColor) {
-        this.applyDynamicAccent(currentColor);
-      }
-
-      if (progress >= 1) {
-        // Transition complete
-        this.dynamicColorState.transitionInProgress = false;
-        this.dynamicColorState.currentAccentHex = this.transitionToAccent;
-        this.dynamicColorState.lastUpdateTime = Date.now();
-
-        const rgb = this.utils.hexToRgb(this.transitionToAccent);
-        if (rgb) {
-          this.dynamicColorState.currentAccentRgb = `${rgb.r},${rgb.g},${rgb.b}`;
-        }
-
-        Y3KDebug?.debug?.log(
-          "DynamicCatppuccinBridge",
-          `Accent transition complete: ${this.transitionToAccent}`
-        );
-      } else {
-        // Continue animation
-        requestAnimationFrame(animate);
-      }
-    };
-
-    requestAnimationFrame(animate);
+    // Transition is now handled by updateAnimation() method called by coordinator
+    // This method only initializes the transition state
   }
 
   /**
@@ -884,6 +845,54 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
       "DynamicCatppuccinBridge",
       "Linked with DepthLayerController"
     );
+  }
+
+  /**
+   * updateAnimation() - Called by EnhancedMasterAnimationCoordinator at 60fps
+   * Handles color transition animations that were previously in standalone RAF loop
+   */
+  public override updateAnimation(deltaTime: number): void {
+    if (!this.dynamicColorState.transitionInProgress) return;
+
+    // Accumulate elapsed time
+    this.transitionElapsedTime += deltaTime;
+
+    const progress = Math.min(
+      this.transitionElapsedTime / this.integrationConfig.smoothTransitionDuration,
+      1
+    );
+
+    // Smooth easing function
+    const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease-out cubic
+
+    // Interpolate colors
+    const currentColor = this.interpolateColors(
+      this.transitionFromAccent,
+      this.transitionToAccent,
+      easeProgress
+    );
+
+    if (currentColor) {
+      this.applyDynamicAccent(currentColor);
+    }
+
+    if (progress >= 1) {
+      // Transition complete
+      this.dynamicColorState.transitionInProgress = false;
+      this.dynamicColorState.currentAccentHex = this.transitionToAccent;
+      this.dynamicColorState.lastUpdateTime = Date.now();
+      this.transitionElapsedTime = 0;
+
+      const rgb = this.utils.hexToRgb(this.transitionToAccent);
+      if (rgb) {
+        this.dynamicColorState.currentAccentRgb = `${rgb.r},${rgb.g},${rgb.b}`;
+      }
+
+      Y3KDebug?.debug?.log(
+        "DynamicCatppuccinBridge",
+        `Accent transition complete: ${this.transitionToAccent}`
+      );
+    }
   }
 
   /**

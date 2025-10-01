@@ -7,180 +7,24 @@
 @use "../../core/_mixins" as *;
 @use "../animations/fluid_morphing" as *; // Phase 8: Year3000 fluid ripple feedback
 
+// Note: Core interaction variables, keyframes, and utility classes moved to:
+// - src/core/_interaction_mixins.scss (imported via _main.scss Layer 2)
+// This eliminates ~200 lines of duplication across interaction files
+
 // ══════════════════════════════════════════════════════════════════════════════
-// YEAR 3000 BEATSYNC MICROINTERACTION VARIABLES
+// MICROINTERACTION-SPECIFIC VARIABLES
 // ══════════════════════════════════════════════════════════════════════════════
 
 :root {
-  // === RHYTHMIC FOUNDATION VARIABLES ===
-  --micro-beat-intensity: var(
-    --sn-beat-pulse-intensity,
-    0
-  ); // Direct beat connection
+  // === LOCAL MICROINTERACTION VARIABLES ===
+  // (Shared variables now in _interaction_mixins.scss)
+  --micro-beat-intensity: var(--sn-beat-pulse-intensity, 0); // Local alias for beat intensity
   --micro-breathing-scale: 1; // Scale removed to eliminate bubble effects
-  --micro-rhythm-phase: var(--sn-rhythm-phase, 0); // Harmonic oscillation
 
-  // === Enhanced Microinteraction Variables (BeatSync Enabled) ===
-  --ripple-color: var(--sn-color-accent-hex);
-  --ripple-duration: calc(
-    var(--sn-gradient-transition) * (1 - (var(--micro-beat-intensity) * 0.3))
-  ); // Faster on beats
-  --ripple-intensity: calc(
-    0.3 + (var(--micro-beat-intensity) * 0.4)
-  ); // More intense on beats
-  --interaction-feedback-delay: calc(
-    0.1s * (1 - (var(--micro-beat-intensity) * 0.5))
-  ); // Quicker response
-
-  // === Rhythmic Timing Variables ===
-  --micro-fast: calc(0.15s * (1 - (var(--micro-beat-intensity) * 0.3)));
-  --micro-medium: calc(0.3s * (1 - (var(--micro-beat-intensity) * 0.2)));
-  --micro-slow: calc(0.6s * (1 - (var(--micro-beat-intensity) * 0.1)));
-
-  // === Beat-Responsive Feedback Intensity ===
-  --feedback-subtle: calc(0.1 + (var(--micro-beat-intensity) * 0.05));
-  --feedback-moderate: calc(0.2 + (var(--micro-beat-intensity) * 0.1));
-  --feedback-prominent: calc(0.3 + (var(--micro-beat-intensity) * 0.2));
-
-  // === Cosmic Enhancement Variables ===
+  // === Cosmic Enhancement Variables (microinteraction-specific) ===
   --micro-glow-radius: calc(8px + (12px * var(--micro-beat-intensity)));
   --micro-scale-enhancement: calc(1 + (var(--micro-beat-intensity) * 0.02));
-  --micro-hue-shift: calc(var(--micro-rhythm-phase) * 1deg);
-
-  // === Beat-Responsive Class Control (Phase 4.5) ===
-  --sn-beat-pulse: 0; // 0-1 beat pulse trigger
-  --sn-kinetic-energy: 0; // 0-1 music energy level
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// BEAT-RESPONSIVE ANIMATION KEYFRAMES (Phase 4.5 Integration)
-// Zero-CPU-cost animations using animation-play-state
-// ══════════════════════════════════════════════════════════════════════════════
-
-// Beat-responsive scale animation keyframes
-@keyframes sn-beat-scale {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  35% {
-    transform: scale(1.03);
-    opacity: 0.98;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-// Alternative subtle pulse for less prominent elements
-@keyframes sn-beat-pulse-subtle {
-  0% {
-    opacity: 1;
-    filter: brightness(1);
-  }
-  50% {
-    opacity: 0.95;
-    filter: brightness(1.05);
-  }
-  100% {
-    opacity: 1;
-    filter: brightness(1);
-  }
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// BEAT-RESPONSIVE UTILITY CLASSES (Phase 4.5 Integration)
-// Apply to elements for zero-CPU-cost beat synchronization
-// ══════════════════════════════════════════════════════════════════════════════
-
-/**
- * Primary beat-responsive class
- * Elements with this class will pulse with detected beats
- * Performance: Zero CPU cost when paused, animation-play-state controls activation
- */
-.sn-beat-responsive {
-  --_sn-pulse-intensity: var(--sn-beat-pulse, 0);
-
-  animation: sn-beat-scale 300ms var(--sn-anim-easing-standard) forwards;
-  animation-play-state: var(--_sn-pulse-intensity, paused);
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-    transform: none !important;
-  }
-}
-
-/**
- * Subtle variant for secondary elements
- */
-.sn-beat-responsive--subtle {
-  --_sn-pulse-intensity: var(--sn-beat-pulse, 0);
-
-  animation: sn-beat-pulse-subtle 250ms var(--sn-anim-easing-standard) forwards;
-  animation-play-state: var(--_sn-pulse-intensity, paused);
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-    filter: none !important;
-  }
-}
-
-/**
- * Custom implementation using CSS variables
- * For elements needing precise control via --sn-kinetic-energy
- */
-.sn-beat-responsive--custom {
-  transform: scale(calc(1 + var(--sn-kinetic-energy, 0) * 0.03));
-  opacity: calc(1 - var(--sn-kinetic-energy, 0) * 0.02);
-
-  transition:
-    transform 100ms var(--sn-anim-easing-standard),
-    opacity 100ms var(--sn-anim-easing-standard);
-
-  @media (prefers-reduced-motion: reduce) {
-    transform: scale(1) !important;
-    opacity: 1 !important;
-    transition: none;
-  }
-}
-
-/**
- * Beat-responsive glow effect for accent elements
- */
-.sn-beat-glow {
-  --_sn-glow-intensity: calc(var(--sn-kinetic-energy, 0) * 0.3);
-
-  box-shadow:
-    0 0 calc(var(--_sn-glow-intensity) * 20px)
-    rgba(var(--sn-accent-rgb, 140, 170, 238), var(--_sn-glow-intensity));
-
-  transition: box-shadow 150ms var(--sn-anim-easing-standard);
-
-  @media (prefers-reduced-motion: reduce) {
-    box-shadow: none !important;
-    transition: none;
-  }
-}
-
-/**
- * Performance mode: Disable all beat effects during high CPU usage
- * Add this class programmatically when performance degrades
- */
-.sn-performance-mode {
-  .sn-beat-responsive,
-  .sn-beat-responsive--subtle,
-  .sn-beat-responsive--custom {
-    animation: none !important;
-    transform: scale(1) !important;
-    opacity: 1 !important;
-    transition: none !important;
-  }
-
-  .sn-beat-glow {
-    box-shadow: none !important;
-    transition: none !important;
-  }
+  --micro-hue-shift: calc(var(--sn-rhythm-phase, 0) * 1deg);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

@@ -44,15 +44,13 @@ tmp/
 *.map
 
 # AI Files
-#/.claude
+/.claude
 /.cursor
-# /plans
+/plans/archive
 /scripts
-**/logs/
+logs/
 **/tsconfig.tsbuildinfo
 /.worktrees/
 /logs
-# /context-memory
 tsconfig.tsbuildinfo
 # /.github
-# /context-memory

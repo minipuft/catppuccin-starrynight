@@ -27,60 +27,33 @@ module.exports = (ctx) => {
       // PRODUCTION ONLY: Optimization plugins
       // ═══════════════════════════════════════════════════════════════════════════
 
-      // Merge adjacent rules with same selectors (built into postcss-merge-rules)
-      isProd && require('postcss-merge-rules')(),
+      // Merge adjacent rules - DISABLED to preserve feature-specific attribute selectors
+      // (postcss-merge-rules was collapsing [data-layout="navigation"] with [data-context="navigation"])
+      // isProd && require('postcss-merge-rules')(),
 
       // Discard duplicate declarations
       isProd && require('postcss-discard-duplicates')(),
 
       // Advanced CSS minification and optimization
+      // Using 'lite' preset to prevent aggressive selector removal
       isProd && require('cssnano')({
-        preset: ['default', {
-          // Discard all comments except those starting with !
+        preset: ['lite', {
+          // Discard all comments
           discardComments: {
-            removeAll: true,
-            removeAllButFirst: false
+            removeAll: true
           },
 
           // Optimize calculations
           calc: {
             // Preserve CSS variables in calc()
-            preserve: true,
-            precision: 5
+            preserve: true
           },
 
-          // Color optimization
-          colormin: true,
-          convertValues: {
-            // Preserve precision for animations
-            precision: 3
-          },
-
-          // Merge longhand properties into shorthand
-          mergeLonghand: true,
-          mergeRules: true,
-
-          // Whitespace optimization
-          normalizeWhitespace: true,
-
-          // Transform optimization
-          reduceTransforms: true,
-
-          // CRITICAL: Preserve CSS variables and custom identifiers
-          // Do NOT minimize these as they're controlled by TypeScript
+          // CRITICAL: Preserve all CSS variables (controlled by TypeScript)
           cssDeclarationSorter: false,
-          reduceIdents: false,
-          discardUnused: false,
-          zindex: false, // Preserve z-index values (managed by design system)
 
-          // Preserve SVG precision for visual effects
-          svgo: {
-            precision: 3,
-            plugins: [
-              { name: 'removeViewBox', active: false },
-              { name: 'cleanupIDs', active: false }
-            ]
-          }
+          // Whitespace optimization only
+          normalizeWhitespace: true,
         }]
       }),
 

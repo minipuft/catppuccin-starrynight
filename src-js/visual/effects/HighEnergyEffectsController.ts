@@ -214,8 +214,9 @@ export class RedEnergyBurstSystem implements IManagedSystem {
       // Setup CSS variables for cinematic effects
       this.setupCinematicCSSVariables();
 
-      // Start animation loop
-      this.startCinematicAnimation();
+      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by EnhancedMasterAnimationCoordinator
+      // The coordinator will call updateAnimation(deltaTime) automatically
+      // Registration happens in SystemCoordinator during system initialization
 
       this.initialized = true;
 
@@ -241,6 +242,21 @@ export class RedEnergyBurstSystem implements IManagedSystem {
       deltaSeconds * this.energyBurstState.burstFrequency * 2;
     this.animationState.dramaticPhase += deltaSeconds * 0.8;
     this.animationState.interferencePhase += deltaSeconds * 3.0;
+
+    // Decay energy burst (previously in standalone RAF loop)
+    if (this.energyBurstState.burstIntensity > 0.05) {
+      const decayRate = 0.05; // 5% per frame
+      this.energyBurstState.burstIntensity *= 1.0 - decayRate;
+      this.energyBurstState.layeredDepth *= 1.0 - decayRate * 0.8;
+      this.energyBurstState.holographicDepth = this.energyBurstState.layeredDepth; // Legacy sync
+      this.energyBurstState.interferenceLevel *= 1.0 - decayRate * 0.6;
+    } else if (this.energyBurstState.burstIntensity > 0) {
+      // Reset to baseline when decay complete
+      this.energyBurstState.burstIntensity = 0;
+      this.energyBurstState.layeredDepth = 0;
+      this.energyBurstState.holographicDepth = 0; // Legacy compatibility
+      this.energyBurstState.interferenceLevel = 0;
+    }
 
     // Update energy burst intensity based on music
     this.updateEnergyBurstFromMusic();
@@ -451,28 +467,13 @@ export class RedEnergyBurstSystem implements IManagedSystem {
 
   /**
    * Decay energy burst over time
+   * MIGRATION NOTE: This now relies on updateAnimation() being called by coordinator.
+   * Decay is handled frame-by-frame in updateAnimation() instead of standalone RAF loop.
    */
   private decayEnergyBurst(): void {
-    const decayRate = 0.05; // 5% per frame
-
-    const decay = () => {
-      this.energyBurstState.burstIntensity *= 1.0 - decayRate;
-      this.energyBurstState.layeredDepth *= 1.0 - decayRate * 0.8;
-      this.energyBurstState.holographicDepth = this.energyBurstState.layeredDepth; // Legacy sync
-      this.energyBurstState.interferenceLevel *= 1.0 - decayRate * 0.6;
-
-      if (this.energyBurstState.burstIntensity > 0.05) {
-        requestAnimationFrame(decay);
-      } else {
-        // Reset to baseline
-        this.energyBurstState.burstIntensity = 0;
-        this.energyBurstState.layeredDepth = 0;
-        this.energyBurstState.holographicDepth = 0; // Legacy compatibility
-        this.energyBurstState.interferenceLevel = 0;
-      }
-    };
-
-    requestAnimationFrame(decay);
+    // Decay is now handled by updateAnimation() called every frame by coordinator
+    // This method just marks that decay should start happening
+    // The actual decay logic runs in updateAnimation()
   }
 
   /**
@@ -980,6 +981,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
 
   /**
    * Apply red energy burst effect to element
+   * PERFORMANCE FIX: Use CSS variables instead of direct DOM manipulation
    */
   private applyRedEnergyBurst(element: HTMLElement, intensity: number): void {
     const burstIntensity = this.energyBurstState.burstIntensity * intensity;
@@ -988,25 +990,28 @@ export class RedEnergyBurstSystem implements IManagedSystem {
 
     // Red energy glow
     const glowIntensity = burstIntensity * dramaticPulse * 0.8;
-    element.style.boxShadow = `
-      0 0 ${
-        glowIntensity * 40
-      }px rgba(var(--cinematic-red-r), var(--cinematic-red-g), var(--cinematic-red-b), ${glowIntensity}),
-      inset 0 0 ${
-        glowIntensity * 20
-      }px rgba(var(--cinematic-amber-r), var(--cinematic-amber-g), var(--cinematic-amber-b), ${
-      glowIntensity * 0.5
-    })
-    `;
+    const glowSpread = glowIntensity * 40;
+    const insetSpread = glowIntensity * 20;
+    const insetOpacity = glowIntensity * 0.5;
+
+    // Use CSS variables for batched updates
+    this.cssController.queueCSSVariableUpdate('--energy-glow-spread', `${glowSpread}px`);
+    this.cssController.queueCSSVariableUpdate('--energy-glow-opacity', glowIntensity.toString());
+    this.cssController.queueCSSVariableUpdate('--energy-inset-spread', `${insetSpread}px`);
+    this.cssController.queueCSSVariableUpdate('--energy-inset-opacity', insetOpacity.toString());
 
     // Energy burst border
     if (burstIntensity > 0.3) {
-      element.style.border = `1px solid rgba(var(--cinematic-red-r), var(--cinematic-red-g), var(--cinematic-red-b), ${burstIntensity})`;
+      this.cssController.queueCSSVariableUpdate('--energy-border-opacity', burstIntensity.toString());
+    } else {
+      this.cssController.queueCSSVariableUpdate('--energy-border-opacity', '0');
     }
   }
 
   /**
    * Apply CRT interference effect
+   * PERFORMANCE FIX: Use CSS variables instead of direct DOM manipulation
+   * CRITICAL: Removed CSS filter (drop-shadow) - use pre-computed effects instead
    */
   private applyCRTInterference(element: HTMLElement, intensity: number): void {
     const interferenceIntensity =
@@ -1017,26 +1022,29 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     const chromaticOffset = interferenceIntensity * 3;
     const redOffset = Math.sin(interferencePhase * 2) * chromaticOffset;
     const blueOffset = Math.cos(interferencePhase * 2.5) * chromaticOffset;
+    const redOpacity = interferenceIntensity * 0.6;
+    const blueOpacity = interferenceIntensity * 0.4;
 
-    element.style.filter = `
-      drop-shadow(${redOffset}px 0 0 rgba(var(--spice-rgb-cinematic-red, 255, 0, 0), ${
-      interferenceIntensity * 0.6
-    }))
-      drop-shadow(${blueOffset}px 0 0 rgba(var(--spice-rgb-cinematic-cyan, 0, 255, 255), ${
-      interferenceIntensity * 0.4
-    }))
-    `;
+    // REMOVED: CSS filter (drop-shadow) - causes GPU pipeline overhead
+    // Store values for potential pre-computed shadow effects
+    this.cssController.queueCSSVariableUpdate('--crt-red-offset', `${redOffset}px`);
+    this.cssController.queueCSSVariableUpdate('--crt-blue-offset', `${blueOffset}px`);
+    this.cssController.queueCSSVariableUpdate('--crt-red-opacity', redOpacity.toString());
+    this.cssController.queueCSSVariableUpdate('--crt-blue-opacity', blueOpacity.toString());
 
     // CRT noise distortion
     if (interferenceIntensity > 0.5) {
       const noiseOffset =
         Math.sin(interferencePhase * 10) * interferenceIntensity * 2;
-      element.style.transform = `translateX(${noiseOffset}px)`;
+      this.cssController.queueCSSVariableUpdate('--crt-noise-offset', `${noiseOffset}px`);
+    } else {
+      this.cssController.queueCSSVariableUpdate('--crt-noise-offset', '0px');
     }
   }
 
   /**
    * Apply cinematic scanlines
+   * PERFORMANCE FIX: Use CSS variables instead of direct background manipulation
    */
   private applyCinematicScanlines(
     element: HTMLElement,
@@ -1046,70 +1054,44 @@ export class RedEnergyBurstSystem implements IManagedSystem {
 
     if (scanlineIntensity > 0.1) {
       const scanlineFrequency = this.cinematicConfig.baseScanlineFrequency / 30; // Convert to CSS pixels
+      const scanlineOpacity = scanlineIntensity * 0.15;
 
-      element.style.background = `
-        ${element.style.background || ""},
-        repeating-linear-gradient(
-          0deg,
-          transparent 0px,
-          transparent ${scanlineFrequency - 1}px,
-          rgba(var(--cinematic-amber-r), var(--cinematic-amber-g), var(--cinematic-amber-b), ${
-            scanlineIntensity * 0.15
-          }) ${scanlineFrequency}px
-        )
-      `;
+      // Use CSS variables for scanline parameters - CSS gradient applied via stylesheet
+      this.cssController.queueCSSVariableUpdate('--scanline-frequency', `${scanlineFrequency}px`);
+      this.cssController.queueCSSVariableUpdate('--scanline-opacity', scanlineOpacity.toString());
+      this.cssController.queueCSSVariableUpdate('--scanline-active', '1');
+    } else {
+      this.cssController.queueCSSVariableUpdate('--scanline-active', '0');
     }
   }
   
   /**
    * @deprecated Use applyCinematicScanlines instead
    * Apply dramatic scanlines
+   * PERFORMANCE FIX: Use CSS variables instead of direct background manipulation
    */
   private applyDramaticScanlines(
     element: HTMLElement,
     intensity: number
   ): void {
-    const scanlineIntensity = this.energyBurstState.burstIntensity * intensity * 0.6;
-
-    if (scanlineIntensity > 0.1) {
-      const scanlineFrequency = this.cinematicConfig.baseScanlineFrequency / 30; // Convert to CSS pixels
-
-      element.style.background = `
-        ${element.style.background || ""},
-        repeating-linear-gradient(
-          0deg,
-          transparent 0px,
-          transparent ${scanlineFrequency - 1}px,
-          rgba(var(--cinematic-amber-r), var(--cinematic-amber-g), var(--cinematic-amber-b), ${
-            scanlineIntensity * 0.15
-          }) ${scanlineFrequency}px
-        )
-      `;
-    }
+    // Deprecated method - delegate to applyCinematicScanlines
+    this.applyCinematicScanlines(element, intensity);
   }
 
   /**
-   * Start cinematic animation loop
+   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   *
+   * Previous implementation: startCinematicAnimation() with independent RAF loop
+   * New implementation: updateAnimation() called by coordinator
+   *
+   * Benefits:
+   * - Single RAF loop for all systems (not 5-8 independent loops)
+   * - Shared deltaTime calculation (eliminates redundant performance.now() calls)
+   * - Coordinated frame budget management
+   * - Priority-based execution order
+   *
+   * Migration: Lines 1084-1102 removed, registration added to SystemCoordinator
    */
-  private startCinematicAnimation(): void {
-    this.animationState.isAnimating = true;
-    this.animationState.lastFrameTime = performance.now();
-
-    const animate = (currentTime: number) => {
-      if (!this.animationState.isAnimating) return;
-
-      const deltaTime = currentTime - this.animationState.lastFrameTime;
-      this.animationState.lastFrameTime = currentTime;
-
-      // Update cinematic animation
-      this.updateAnimation(deltaTime);
-
-      // Continue animation loop
-      requestAnimationFrame(animate);
-    };
-
-    requestAnimationFrame(animate);
-  }
 
   /**
    * Update performance metrics
@@ -1143,8 +1125,8 @@ export class RedEnergyBurstSystem implements IManagedSystem {
   public destroy(): void {
     console.log("[RedEnergyBurstSystem] Destroying cinematic drama engine...");
 
-    // Stop animation
-    this.animationState.isAnimating = false;
+    // ✅ RAF LOOP CONSOLIDATION: No need to stop animation loop (coordinator handles this)
+    // System unregistration happens in SystemCoordinator destroy()
 
     // Clear cinematic elements
     this.cinematicElements.clear();

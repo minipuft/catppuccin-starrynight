@@ -76,7 +76,6 @@ import UnifiedDebugManager from "@/debug/UnifiedDebugManager";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
 
 // Consciousness Systems imports
-import { GenreGradientEvolution } from "@/audio/GenreGradientEvolution";
 import { VisualEffectsCoordinator } from "@/visual/effects/VisualEffectsCoordinator";
 import { MusicEmotionAnalyzer } from "@/visual/music/integration/MusicEmotionAnalyzer";
 
@@ -86,6 +85,7 @@ import { UnifiedColorProcessingEngine, globalUnifiedColorProcessingEngine } from
 // UI Managers imports
 import { Card3DManager } from "@/ui/managers/Card3DManager";
 import { GlassmorphismManager } from "@/ui/managers/GlassmorphismManager";
+import { GenreUIBridge } from "@/visual/ui/GenreUIBridge";
 
 // Integration Systems imports
 import { SidebarSystemsIntegration } from "@/core/integration/SidebarSystemsIntegration";
@@ -126,18 +126,18 @@ export type NonVisualSystemKey =
   | "UnifiedColorProcessingEngine"
 
   // Consciousness Systems
-  | "GenreGradientEvolution"
   | "MusicEmotionAnalyzer"
   | "VisualEffectsCoordinator"
 
   // UI Managers
   | "GlassmorphismManager"
   | "Card3DManager"
+  | "GenreUIBridge"
 
   // Integration Systems
   | "SidebarSystemsIntegration"
   | "CSSVariableBatcher"
-  | "SystemHealthMonitor" 
+  | "SystemHealthMonitor"
   | "UnifiedSystemIntegration";
 
 export type SystemHealth = "excellent" | "good" | "degraded" | "critical";
@@ -458,12 +458,7 @@ export class NonVisualSystemFacade {
     this.systemDependencies.set("ColorOrchestrator", []);
 
     // Consciousness Systems
-    this.systemRegistry.set("GenreGradientEvolution", GenreGradientEvolution);
-    this.systemDependencies.set("GenreGradientEvolution", [
-      "cssVariableManager",
-      "musicSyncService",
-      "settingsManager",
-    ]);
+    // GenreGradientEvolution removed - functionality consolidated into GenreProfileManager
 
     this.systemRegistry.set("MusicEmotionAnalyzer", MusicEmotionAnalyzer);
     this.systemDependencies.set("MusicEmotionAnalyzer", [
@@ -492,6 +487,12 @@ export class NonVisualSystemFacade {
     this.systemDependencies.set("Card3DManager", [
       "performanceAnalyzer",
       "settingsManager",
+    ]);
+
+    this.systemRegistry.set("GenreUIBridge", GenreUIBridge);
+    this.systemDependencies.set("GenreUIBridge", [
+      "GenreProfileManager",
+      "MusicSyncService",
     ]);
 
     // Integration Systems

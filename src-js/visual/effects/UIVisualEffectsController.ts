@@ -232,7 +232,7 @@ export class UIEffectsController
   private intersectionObserver: IntersectionObserver | null = null;
 
   // Animation and timing
-  private animationFrameId: number | null = null;
+  // ✅ RAF LOOP CONSOLIDATION: Removed animationFrameId (coordinator manages animation)
   private lastFrameTime: number = 0;
   private frameTimeHistory: number[] = [];
 
@@ -424,8 +424,8 @@ export class UIEffectsController
         await this.initializeScrollEffects();
       }
 
-      // Start unified animation loop
-      this.startUnifiedAnimationLoop();
+      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by coordinator
+      // updateAnimation(deltaTime) will be called automatically
 
       this.initialized = true;
 
@@ -772,64 +772,67 @@ export class UIEffectsController
     }, this.uiEffectsConfig.diagnosticInterval);
   }
 
-  private startUnifiedAnimationLoop(): void {
-    // Consolidated animation loop from all systems
-    const animate = (currentTime: number) => {
-      if (!this.initialized) return;
+  /**
+   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   * Old method removed: startUnifiedAnimationLoop()
+   * Replacement: updateAnimation(deltaTime) called by coordinator
+   */
 
-      const deltaTime = currentTime - this.lastFrameTime;
-      this.lastFrameTime = currentTime;
+  /**
+   * ✅ RAF LOOP CONSOLIDATION: Animation update method called by coordinator
+   * Consolidates all UI effects updates in single coordinated frame
+   */
+  public override updateAnimation(deltaTime: number): void {
+    if (!this.initialized) return;
 
-      // Performance monitoring
-      const frameStartTime = performance.now();
+    const currentTime = performance.now();
+    this.lastFrameTime = currentTime;
 
-      try {
-        // Update activity state
-        this.updateVisualActivityState(deltaTime);
+    // Performance monitoring
+    const frameStartTime = currentTime;
 
-        // Update shimmer effects
-        if (this.uiEffectsConfig.shimmerEnabled) {
-          this.updateShimmerEffects(deltaTime);
-        }
+    try {
+      // Update activity state
+      this.updateVisualActivityState(deltaTime);
 
-        // Update interaction tracking
-        if (this.uiEffectsConfig.interactionTrackingEnabled) {
-          this.updateInteractionTracking(deltaTime);
-        }
-
-        // Update audio-visual effects
-        if (this.uiEffectsConfig.audioVisualEnabled) {
-          this.updateAudioVisualEffects(deltaTime);
-        }
-
-        // Update scroll effects
-        if (this.uiEffectsConfig.scrollEffectsEnabled) {
-          this.updateScrollEffects(deltaTime);
-        }
-
-        // Apply CSS variable updates
-        this.applyCSSUpdates();
-
-        // Performance tracking
-        const frameTime = performance.now() - frameStartTime;
-        this.updatePerformanceMetrics(frameTime);
-
-        // Check performance budget
-        if (frameTime > this.uiEffectsConfig.maxFrameTime) {
-          this.handlePerformanceIssue(frameTime);
-        }
-      } catch (error) {
-        Y3KDebug?.debug?.error(
-          "UIVisualEffectsController",
-          "Animation loop error:",
-          error
-        );
+      // Update shimmer effects
+      if (this.uiEffectsConfig.shimmerEnabled) {
+        this.updateShimmerEffects(deltaTime);
       }
 
-      this.animationFrameId = requestAnimationFrame(animate);
-    };
+      // Update interaction tracking
+      if (this.uiEffectsConfig.interactionTrackingEnabled) {
+        this.updateInteractionTracking(deltaTime);
+      }
 
-    this.animationFrameId = requestAnimationFrame(animate);
+      // Update audio-visual effects
+      if (this.uiEffectsConfig.audioVisualEnabled) {
+        this.updateAudioVisualEffects(deltaTime);
+      }
+
+      // Update scroll effects
+      if (this.uiEffectsConfig.scrollEffectsEnabled) {
+        this.updateScrollEffects(deltaTime);
+      }
+
+      // Apply CSS variable updates
+      this.applyCSSUpdates();
+
+      // Performance tracking
+      const frameTime = performance.now() - frameStartTime;
+      this.updatePerformanceMetrics(frameTime);
+
+      // Check performance budget
+      if (frameTime > this.uiEffectsConfig.maxFrameTime) {
+        this.handlePerformanceIssue(frameTime);
+      }
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "UIVisualEffectsController",
+        "Animation loop error:",
+        error
+      );
+    }
   }
 
   private updateVisualActivityState(deltaTime: number): void {
@@ -1540,11 +1543,7 @@ export class UIEffectsController
       "Destroying unified UI effects controller..."
     );
 
-    // Stop animation loop
-    if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = null;
-    }
+    // ✅ RAF LOOP CONSOLIDATION: No need to stop animation - coordinator handles this
 
     // Stop diagnostic monitoring
     if (this.diagnosticTimerId) {

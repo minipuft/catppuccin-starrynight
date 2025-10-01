@@ -1,5 +1,5 @@
 // ████████████████████████████████████████████████████████████████████████████████
-// CATPPUCCIN STARRYNIGHT - Optimized Architecture (Phase 8.1)
+// CATPPUCCIN STARRYNIGHT - Optimized Architecture (Phase 8.4)
 // Consolidated SCSS module system with strategic consolidation complete
 // Phase 1-3: 587 lines eliminated, 875KB optimized CSS
 // Phase 4: 273KB source cleanup (legacy files + archived code removed)
@@ -10,6 +10,9 @@
 // Phase 7.7: Orphaned effect files + token shims removed (1,369 lines, 50KB eliminated)
 // Phase 7.8: Sidebar navigation consolidation (264 lines eliminated, single source of truth)
 // Phase 8.1: Depth system consolidation (3 files → 1 unified cosmic depth system, zero breaking changes)
+// Phase 8.2: Visual effects unification (2 files → 1, 1405→1050 lines, TypeScript-aligned CSS variables)
+// Phase 8.3: Atmospheric depth effects (activated crystals, archived glyphs + glyph variables, 227 lines eliminated)
+// Phase 8.4: Card visual accents consolidation (_sn_visual_accents → _sn_enhanced_cards, single source of truth)
 // ████████████████████████████████████████████████████████████████████████████████
 
 // === LAYER 1: FOUNDATION (Load Order Critical) ===
@@ -48,11 +51,11 @@
 @use "../layout/_nebula_gradient_system" as *; // Music-reactive 4-layer nebula gradient backgrounds
 
 // Component modules - reusable UI components
-@use "../components/_sn_glyph_variables" as *; // Load glyph variables first
 @use "../components/_sn_card_base" as *; // Base card styles first
-@use "../components/_sn_enhanced_cards" as *; // Enhanced cards depend on base
+@use "../components/_sn_enhanced_cards" as *; // Enhanced cards depend on base (includes harmonic-aura from Phase 8.4)
 @use "../components/_sn_card_non_search" as *;
-@use "../components/_sn_visual_accents" as *; // Visual accents for components
+// ARCHIVED (Phase 8.3): _sn_glyph_variables → plans/archive/phase-5-incomplete/ (unused mixin, dead code)
+// CONSOLIDATED (Phase 8.4): _sn_visual_accents → _sn_enhanced_cards.scss (single source of truth)
 @use "../components/_track_list_enhanced" as *;
 @use "../components/_now_playing" as *;
 @use "../components/_sn_loading" as *;
@@ -65,18 +68,19 @@
 
 // Background layers - provide foundation for visual effects
 @use "../features/backgrounds/_content_protection_system" as depth-layers; // Content-aware protection architecture
-@use "../features/backgrounds/_ambient_effects" as *;
-// @use "../features/backgrounds/_cosmic_effects" as *; // ✅ ARCHIVED - consolidated into _stars.scss (2025-09-30)
-@use "../features/backgrounds/_stars" as stars; // ✅ ENHANCED - now includes aurora + nebula particles from cosmic_effects
-// @use "../features/backgrounds/_particle_field" as *; // ✅ ARCHIVED - consolidated into _stars.scss (2025-09-30)
+// @use "../features/backgrounds/_ambient_effects" as *; // ✅ ARCHIVED - consolidated into unified-visual-effects (Phase 8.2, 2025-09-30)
+// @use "../features/backgrounds/_cosmic_effects" as *; // ✅ ARCHIVED - consolidated into _particle_animation_system.scss (2025-09-30)
+@use "../features/backgrounds/_particle_animation_system" as particles; // ✅ ENHANCED - now includes aurora + nebula particles from cosmic_effects
+// @use "../features/backgrounds/_particle_field" as *; // ✅ ARCHIVED - consolidated into _particle_animation_system.scss (2025-09-30)
 // @use "../features/backgrounds/_connected_dots" as *; // ✅ Removed - file deleted
-@use "../features/backgrounds/_dot_matrix" as dot-matrix;
+@use "../features/backgrounds/_grid_navigation_mode" as grid-nav;
 
 // Music synchronization - core functionality for visual effects
 @use "../features/music-sync/_beat_synchronization" as *;
 @use "../features/music-sync/_music_visualization" as *;
 @use "../features/music-sync/_genre_aware_ui" as genre-ui;
-@use "../features/music-sync/ui/visual-effects-main" as *;
+// @use "../features/music-sync/ui/visual-effects-main" as *; // ✅ ARCHIVED - consolidated into audio-reactive-atmospherics (Phase 8.2, 2025-09-30)
+@use "../features/music-sync/ui/audio-reactive-atmospherics" as *; // Phase 8.2: Audio-reactive atmospherics (filter + animation, TypeScript-aligned)
 
 // Visual effects - depend on backgrounds and music sync
 @use "../features/visual-effects/_fluid-gradient-base" as *; // Base gradients first
@@ -96,15 +100,17 @@
 // @use "../features/animations/_field_matrix" as *; // ✅ Commented out - file missing (pre-existing issue)
 
 // Interactions - topmost layer
-@use "../features/interactions/_themed_components" as *;
-@use "../features/interactions/_ui_elements" as *;
+@use "../features/interactions/_dynamic_interface" as *;
+@use "../features/interactions/_text_visual_effects" as *;
 @use "../features/interactions/_css_interactions" as *;
 @use "../features/interactions/_microinteractions" as *;
-@use "../features/interactions/_animated_icons" as *;
+
+// Atmospheric effects - Year 3000 depth
+@use "../features/backgrounds/_atmospheric_crystals" as *;
 
 // === LAYER 6: SPECIALIZED SYSTEMS ===
 // High-level behavioral and optimization systems
-@use "../systems/_sn_data_glyphs" as *;
+// ARCHIVED: _sn_data_glyphs → plans/archive/phase-5-incomplete/ (Phase 8.3 - no TS implementation, duplicate meditation code)
 // CONSOLIDATED: _sn_advanced_visual_effects merged into ../sidebar/_sidebar_interactive
 // CONSOLIDATED: _sn_performance_optimization → design tokens + _performance_mixins + _accessibility
 
@@ -116,8 +122,8 @@
 // Include mixins after all @use statements
 @include depth-layers.apply-depth-layers;
 @include cosmic-depth.apply-cosmic-depth-system;
-@include stars.apply-particle-network;
-@include dot-matrix.apply-dot-matrix-navigation-mode;
+@include particles.apply-particle-network;
+@include grid-nav.apply-dot-matrix-navigation-mode;
 @include genre-ui.apply-genre-aware-ui;
 
 // ████████████████████████████████████████████████████████████████████████████████

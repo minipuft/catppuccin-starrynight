@@ -9,10 +9,8 @@
 
 // === GENRE-AWARE COMPONENT INTEGRATION ===
 
-// Placeholder mixin for genre background (to be implemented)
-// Placeholder mixins for genre features (to be implemented)
+// Genre-aware background mixin - applies gradient based on genre characteristics
 @mixin genre-background($genre, $intensity, $opacity) {
-  // TODO: Implement genre-specific background patterns
   position: relative;
 
   &::before {
@@ -22,36 +20,184 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--spice-accent);
+
+    // Use genre-specific hue range and saturation from CSS variables
+    // GenreUIBridge sets these: --genre-primary-hue-min/max, --genre-saturation-base, etc.
+    background: linear-gradient(
+      135deg,
+      hsl(
+        var(--genre-primary-hue-min, 240),
+        calc(var(--genre-saturation-base, 50%) * #{$intensity}),
+        calc(var(--genre-brightness-base, 50%) * 1.2)
+      ) 0%,
+      hsl(
+        var(--genre-primary-hue-max, 280),
+        calc(var(--genre-saturation-base, 50%) * #{$intensity} * 0.8),
+        calc(var(--genre-brightness-base, 50%) * 0.9)
+      ) 100%
+    );
+
     opacity: #{$opacity};
     pointer-events: none;
     z-index: -1;
+
+    // Apply genre-specific animation style
+    transition: background 0.6s ease-in-out, opacity 0.4s ease-in-out;
+
+    // Add subtle animation based on genre pulse behavior
+    @media (prefers-reduced-motion: no-preference) {
+      animation: genre-background-pulse
+        calc(4s / var(--genre-gradient-complexity, 1))
+        ease-in-out
+        infinite;
+    }
   }
 }
 
+@keyframes genre-background-pulse {
+  0%, 100% {
+    filter: brightness(1.0) saturate(1.0);
+  }
+  50% {
+    filter: brightness(1.05) saturate(1.1);
+  }
+}
+
+// Genre-aware color preset - applies genre-specific color harmonization
 @mixin genre-color-preset($genre, $intensity) {
-  // TODO: Implement genre-specific color presets
-  color: var(--spice-text);
+  // Use genre hue range to tint text colors
+  color: hsl(
+    calc((var(--genre-primary-hue-min, 240) + var(--genre-primary-hue-max, 280)) / 2),
+    calc(var(--genre-saturation-base, 50%) * #{$intensity}),
+    calc(var(--genre-brightness-base, 50%) * 1.8)
+  );
+
+  // Apply subtle text shadow for depth based on genre contrast
+  text-shadow:
+    0 0 calc(8px * #{$intensity})
+      hsla(
+        var(--genre-primary-hue-min, 240),
+        calc(var(--genre-saturation-base, 50%) * 1.2),
+        calc(var(--genre-brightness-base, 50%) * 0.6),
+        calc(0.3 * #{$intensity})
+      );
+
+  transition: color 0.4s ease-in-out, text-shadow 0.4s ease-in-out;
 }
 
+// Genre-aware visualization - applies filter effects based on genre characteristics
 @mixin genre-visualization($genre, $intensity) {
-  // TODO: Implement genre-specific visualizations
-  opacity: 1;
+  // Apply genre-specific visual filters
+  filter:
+    saturate(calc(1 + (var(--genre-saturation-variation, 0.2) * #{$intensity})))
+    brightness(calc(1 + (var(--genre-brightness-variation, 0.1) * #{$intensity} * 0.15)))
+    contrast(calc(1 + (var(--genre-contrast-level, 1.0) - 1) * #{$intensity} * 0.3));
+
+  // Add subtle backdrop blur for depth perception
+  backdrop-filter: blur(calc(2px * #{$intensity} * var(--genre-gradient-complexity, 1)));
+
+  opacity: calc(0.85 + (0.15 * #{$intensity}));
+  transition: filter 0.5s ease-in-out, opacity 0.3s ease-in-out;
+
+  // Accessibility support
+  @media (prefers-reduced-motion: reduce) {
+    filter: none;
+    backdrop-filter: none;
+    opacity: 1;
+  }
 }
 
+// Genre-aware adaptive spacing - adjusts spacing based on genre energy and complexity
 @mixin genre-adaptive-spacing($genre, $base-spacing) {
-  // TODO: Implement genre-specific spacing
-  margin: #{$base-spacing};
+  // Adjust spacing based on genre gradient complexity and energy
+  // High energy/complex genres (electronic, rock) get tighter spacing
+  // Calm genres (classical, ambient) get more breathing room
+  $spacing-multiplier: calc(1 + ((1 - var(--genre-gradient-complexity, 1)) * 0.3));
+
+  margin: calc(#{$base-spacing} * #{$spacing-multiplier});
+  padding: calc(#{$base-spacing} * 0.5 * #{$spacing-multiplier});
+
+  // Adjust gap for grid/flex containers
+  gap: calc(#{$base-spacing} * 0.75 * #{$spacing-multiplier});
+
+  transition: margin 0.4s ease-in-out, padding 0.4s ease-in-out, gap 0.4s ease-in-out;
 }
 
+// Genre-aware effect - applies dynamic visual effects based on genre animation style
 @mixin genre-effect($genre, $intensity) {
-  // TODO: Implement genre-specific effects
-  filter: none;
+  // Apply genre-specific filter effects based on CSS variable settings
+  filter:
+    hue-rotate(calc((var(--genre-primary-hue-min, 240) - 240) * #{$intensity} * 0.3))
+    saturate(calc(1 + (var(--genre-saturation-variation, 0.2) * #{$intensity} * 0.5)))
+    brightness(calc(1 + (var(--genre-brightness-variation, 0.1) * #{$intensity} * 0.2)));
+
+  // Apply transform based on genre animation style
+  // Energetic genres get subtle scale variations, calm genres stay static
+  @media (prefers-reduced-motion: no-preference) {
+    transform: scale(calc(1 + (var(--genre-gradient-complexity, 1) - 1) * 0.02 * #{$intensity}));
+  }
+
+  transition: filter 0.5s ease-in-out, transform 0.3s ease-in-out;
+
+  // Accessibility support
+  @media (prefers-reduced-motion: reduce) {
+    filter: none;
+    transform: none;
+  }
 }
 
+// Genre-aware glow effect - creates genre-specific box shadows and glows
 @mixin genre-glow($genre, $intensity, $radius) {
-  // TODO: Implement genre-specific glow effects
-  box-shadow: none;
+  // Create multi-layered glow using genre hue and saturation
+  box-shadow:
+    // Inner glow (subtle)
+    inset 0 0 calc(#{$radius} * 0.5)
+      hsla(
+        var(--genre-primary-hue-min, 240),
+        calc(var(--genre-saturation-base, 50%) * 1.2),
+        calc(var(--genre-brightness-base, 50%) * 1.5),
+        calc(0.15 * #{$intensity})
+      ),
+    // Outer glow (main)
+    0 0 calc(#{$radius} * 1)
+      hsla(
+        var(--genre-primary-hue-min, 240),
+        calc(var(--genre-saturation-base, 50%) * 1.3),
+        calc(var(--genre-brightness-base, 50%) * 1.2),
+        calc(0.4 * #{$intensity})
+      ),
+    // Extended glow (diffuse)
+    0 0 calc(#{$radius} * 2)
+      hsla(
+        var(--genre-primary-hue-max, 280),
+        calc(var(--genre-saturation-base, 50%) * 1.1),
+        calc(var(--genre-brightness-base, 50%) * 0.9),
+        calc(0.2 * #{$intensity})
+      );
+
+  transition: box-shadow 0.4s ease-in-out;
+
+  // Add subtle pulse animation for high-energy genres
+  @media (prefers-reduced-motion: no-preference) {
+    animation: genre-glow-pulse
+      calc(2s / var(--genre-gradient-complexity, 1))
+      ease-in-out
+      infinite;
+  }
+
+  // Accessibility support
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes genre-glow-pulse {
+  0%, 100% {
+    filter: brightness(1.0);
+  }
+  50% {
+    filter: brightness(1.1);
+  }
 }
 
 // Main application containers with genre awareness
@@ -62,11 +208,11 @@
 
     // Genre transition animation (standard CSS transition)
     transition: all var(--genre-transition-duration) var(--genre-transition-easing);
-    
+
     // Add OKLAB gradient flow for enhanced genre transitions
     &.genre-oklab-enhanced {
       // OKLAB gradient flow (inline CSS)
-      background: linear-gradient(135deg, 
+      background: linear-gradient(135deg,
         rgba(var(--sn-oklab-primary-rgb), 0.3) 0%,
         rgba(var(--sn-oklab-accent-rgb), 0.2) 100%);
     }
@@ -100,7 +246,7 @@
 .Root__now-playing-bar,
 .player-controls {
   // Breathing removed from general controls - targeting specific elements instead
-  
+
   // Apply genre-specific styling to player controls
   &[data-genre-active] {
     @include genre-color-preset(attr(data-genre-active value, 'default'), var(--genre-active-intensity, 0.7));
@@ -115,7 +261,7 @@
   .control-button,
   .player-controls__buttons button {
     // Breathing removed from general buttons - targeting specific elements instead
-    
+
     &[data-genre-active] {
       @include genre-color-preset(attr(data-genre-active value, 'default'), 0.6);
 
@@ -159,7 +305,7 @@
   // Apply genre styling to cards
   &[data-genre-active] {
     position: relative;
-    
+
     // Add OKLAB animation classes for enhanced visual consciousness
     // OKLAB animation (inline CSS)
     animation: oklab-color-flow 4s ease-in-out infinite;
@@ -297,15 +443,17 @@ button,
 
 // === GENRE-SPECIFIC UI COMPONENT STYLES ===
 
-// Electronic genre UI enhancements
-[data-genre-active="electronic"] {
+// Main mixin to apply all genre-aware UI styles
+@mixin apply-genre-aware-ui {
+  // Electronic genre UI enhancements
+  [data-genre-active="electronic"] {
   // Electronic-specific UI components
   .main-playButton-PlayButton {
     // Enhanced electronic play button with OKLAB animations
     @include genre-glow('electronic', 1.2, 10px);
     // OKLAB musical breathing (inline CSS)
     animation: musical-breathing var(--music-sync-breath-duration, 4s) ease-in-out infinite;
-    animation: 
+    animation:
       genre-electronic-pulse calc(var(--sn-anim-musical-beat-duration, 500ms) * 2) ease-in-out infinite,
       oklab-musical-consciousness-breathing calc(var(--sn-anim-musical-beat-duration, 500ms) * 4) ease-in-out infinite;
   }
@@ -324,7 +472,7 @@ button,
     background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-accent-rgb), 0.1) 50%, transparent 100%);
     background-size: 200% 100%;
     animation: shimmer 2s linear infinite;
-    
+
     &:hover {
       transform: scale(1.02) translateY(-2px);
       transition: transform 0.3s ease;
@@ -513,39 +661,40 @@ button,
   }
 }
 
-// === ACCESSIBILITY SUPPORT ===
+  // === ACCESSIBILITY SUPPORT ===
 
-// Reduced motion support for genre effects
-@media (prefers-reduced-motion: reduce) {
-  [data-genre-active] {
-    // Disable all genre animations
-    animation: none !important;
-    transition-duration: 0.1s !important;
+  // Reduced motion support for genre effects
+  @media (prefers-reduced-motion: reduce) {
+    [data-genre-active] {
+      // Disable all genre animations
+      animation: none !important;
+      transition-duration: 0.1s !important;
 
-    .main-playButton-PlayButton,
-    .main-card,
-    .main-trackList-trackListRow {
+      .main-playButton-PlayButton,
+      .main-card,
+      .main-trackList-trackListRow {
+        animation: none !important;
+        transition-duration: 0.1s !important;
+      }
+    }
+
+    .genre-detection-indicator {
       animation: none !important;
       transition-duration: 0.1s !important;
     }
   }
 
-  .genre-detection-indicator {
-    animation: none !important;
-    transition-duration: 0.1s !important;
-  }
-}
+  // High contrast support for genre effects
+  @media (prefers-contrast: high) {
+    [data-genre-active] {
+      // Enhanced contrast for genre elements
+      filter: contrast(1.5) saturate(1.3) !important;
 
-// High contrast support for genre effects
-@media (prefers-contrast: high) {
-  [data-genre-active] {
-    // Enhanced contrast for genre elements
-    filter: contrast(1.5) saturate(1.3) !important;
-
-    .main-playButton-PlayButton {
-      box-shadow:
-        0 0 4px rgba(255, 255, 255, 0.8) !important,
-        0 0 8px rgba(var(--genre-current-primary-rgb), 0.9) !important;
+      .main-playButton-PlayButton {
+        box-shadow:
+          0 0 4px rgba(255, 255, 255, 0.8),
+          0 0 8px rgba(var(--genre-current-primary-rgb), 0.9) !important;
+      }
     }
   }
 }

@@ -1,0 +1,367 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// YEAR 3000 ACTION BAR UNIFIED - Music-Responsive Playback Controls
+// Consolidated from _action_bar_enhanced.scss + _sn_header_actionBar.scss
+// ████████████████████████████████████████████████████████████████████████████████
+
+@use "../core/_mixins" as *;
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   🌟 YEAR 3000 HEADER VISUAL EFFECTS VARIABLES
+   Technology that synchronizes with the music's dynamic response
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  // === DYNAMIC VISUAL CONTROL ===
+  --header-musical-response: 0.6; // How much the header responds to musical energy
+
+  // === ETHEREAL HEADER DYNAMICS ===
+  --header-transition: calc(var(--choreography-harmony-sync, 0.8s) * 0.7)
+    var(--sn-anim-easing-organic); // Smooth, alive motion
+  --header-cosmic-depth: calc(
+    var(--cosmic-depth-layers, 80px) * 0.4
+  ); // Subtle 3D presence
+  --header-cosmic-blur: calc(
+    var(--cosmic-blur-poetry, 12px) * 0.8
+  ); // Dreamlike softness
+
+  // === MUSICAL COLOR INTERFACE (Connected to Dynamic Elegance) ===
+  --header-interface-glow: rgba(
+    var(--sn-accent-rgb, var(--spice-rgb-accent)),
+    calc(var(--ethereal-glow-base, 0.2) * 0.4)
+  );
+
+  // === DEFAULT INTERFACE TOKENS – ensure graceful fallback before JS initializes ===
+  --header-interface-intensity: 0.8; // 0 → off, 1 → full
+  --header-interface-animation-rate: 8s;
+  --header-interface-primary: var(--sn-color-accent-hex, var(--spice-accent));
+  --header-interface-secondary: var(
+    --sn-color-accent-hex,
+    var(--spice-subtext)
+  );
+  --header-interface-accent: var(--sn-color-accent-hex, var(--spice-accent));
+
+  // === YEAR 3000 VISUAL EFFECTS VARIABLES ===
+  --header-visual-effects-flow-speed: calc(
+    var(--header-interface-animation-rate) * 0.8
+  );
+  --header-visual-effects-energy: 0.5; // Updated by MusicSyncService
+  --header-visual-effects-harmony: 0deg; // Hue rotation based on musical harmony
+  --header-visual-effects-depth: 1; // Z-depth visual effects multiplier
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   🚫 SEARCH EXCLUSION GUARD - Header Visual Effects DISABLED in Search
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+// Only apply visual effects OUTSIDE of search pages
+body:not(:has(.main-searchPage-content)) {
+  /* ═══════════════════════════════════════════════════════════════════════════════
+     🎯 ACTION BAR VISUAL EFFECTS - Music-Responsive Background
+     ═══════════════════════════════════════════════════════════════════════════════ */
+
+  @include action-bar-background {
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    right: -16px;
+    bottom: -16px;
+    z-index: -1;
+    pointer-events: none;
+
+    // Dynamic visual effects inspired by Year 3000 design
+    background:
+      // Primary interface energy
+      radial-gradient(
+        ellipse 400% 120% at 25% 50%,
+        var(--header-interface-primary) 0%,
+        transparent 45%
+      ),
+      // Secondary harmonic flow
+      radial-gradient(
+        ellipse 300% 100% at 75% 50%,
+        var(--header-interface-secondary) 0%,
+        transparent 40%
+      ),
+      // Accent energy shimmer
+      linear-gradient(
+        90deg,
+        var(--header-interface-accent) 0%,
+        transparent 25%,
+        var(--header-interface-glow) 60%,
+        transparent 100%
+      );
+
+    border-radius: 20px 28px 24px 32px; // Organic, flowing shape
+    filter: blur(var(--header-cosmic-blur))
+      saturate(calc(var(--cosmic-saturation, 1.4) * 0.9))
+      brightness(calc(1 + 0.08 * var(--header-interface-intensity)));
+
+    // Year 3000 Visual Effects - Internal energy flow synchronized with music
+    animation: header-dynamic-visual-effects
+      var(--header-visual-effects-flow-speed) ease-in-out infinite;
+
+    opacity: calc(var(--header-interface-intensity) * 0.6);
+    transition: all var(--header-transition);
+
+    // Enhanced interaction visual effects
+    &:hover {
+      opacity: calc(var(--header-interface-intensity) * 0.9);
+      filter: blur(calc(var(--header-cosmic-blur) * 1.1))
+        saturate(calc(var(--cosmic-saturation, 1.4) * 1.1))
+        brightness(calc(1 + 0.15 * var(--header-interface-intensity)));
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════════
+     🎯 ACTION BAR ROW - Harmonic Oscillation & Beat Sync
+     ═══════════════════════════════════════════════════════════════════════════════ */
+
+  @include action-bar-row {
+    background: linear-gradient(
+      calc(135deg + (var(--sn-rhythm-phase, 0) * 5deg)),
+      rgba(
+          var(--sn-header-primary-rgb, var(--spice-rgb-accent)),
+          calc(var(--sn-header-intensity, 0.2) * 0.85)
+        )
+        0%,
+      rgba(
+          var(--sn-header-secondary-rgb, var(--spice-rgb-surface0)),
+          calc(var(--sn-header-intensity, 0.2) * 0.75)
+        )
+        50%,
+      rgba(
+          var(--sn-header-accent-rgb, var(--spice-rgb-surface1)),
+          calc(var(--sn-header-intensity, 0.2) * 0.65)
+        )
+        100%
+    ) !important;
+
+    backdrop-filter: blur(15px)
+      saturate(calc(1.15 + (var(--sn-breathing-scale, 1) - 1) * 0.3));
+    transition: background 800ms var(--sn-anim-easing-organic);
+
+    // Subtle hue breathing with rhythm
+    filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 2deg))
+      brightness(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.1)));
+
+    // Ensure content within the action bar is visually distinct
+    position: relative;
+    z-index: 1;
+
+    // Stable positioning with beat-responsive glows
+    transform: translateZ(0);
+    transition: box-shadow var(--sn-transition-fast);
+
+    // Optional: Background pulse for the entire action bar - Year 3000 ambient glow
+    &::after {
+      content: "";
+      position: absolute;
+      left: 10%; // Start inset from edges
+      right: 10%; // End inset from edges
+      top: 50%;
+      height: 4px; // Fixed height for the bar
+      transform: translateY(-50%); // Centered, stable positioning
+      background: rgba(
+        var(--sn-accent-rgb, var(--spice-rgb-accent)),
+        calc(0.7 * var(--sn-beat-pulse-intensity, 0))
+      ); // Opacity pulses with beat intensity
+      border-radius: 2px; // Rounded edges for the bar
+      transition: opacity 120ms var(--sn-anim-easing-bounce-medium); // Snappy opacity pulse
+      z-index: -1; // Behind the buttons
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════════
+     🎮 PLAYBACK CONTROL BUTTONS - Beat-Responsive Glow
+     ═══════════════════════════════════════════════════════════════════════════════ */
+
+  @include action-bar-controls {
+    position: relative;
+    z-index: 2;
+    transition: all var(--header-transition);
+
+    // Gentle enhancement that supports content
+    &:hover {
+      filter: brightness(calc(1 + 0.05 * var(--header-interface-intensity)))
+        saturate(calc(1 + 0.1 * var(--header-interface-intensity)));
+    }
+  }
+
+  @include playback-buttons {
+    // Beat-responsive glow (scale removed for stability)
+    transform: translateZ(0);
+    transition: box-shadow 120ms var(--sn-anim-easing-bounce-medium);
+
+    // Example: add subtle shadow to buttons for better contrast
+    text-shadow: 0 0 5px rgba(var(--spice-rgb-shadow), 0.3);
+
+    // Beat-responsive glow - Year 3000 design philosophy preserved
+    box-shadow: 0 0 calc(8px * var(--sn-beat-pulse-intensity, 0))
+      rgba(
+        var(--sn-accent-rgb, var(--spice-rgb-accent)),
+        calc(0.4 * var(--sn-beat-pulse-intensity, 0))
+      );
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   🚫 SEARCH AREAS - Complete Respect Mode
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.main-searchPage-content {
+  @include action-bar-background {
+    opacity: 0.05 !important; // Minimal presence in search
+  }
+
+  @include action-bar-row {
+    animation-duration: 30s !important; // Much slower if any
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   🎬 VISUAL EFFECTS ANIMATIONS - Movements that feel dynamic and musically connected
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@keyframes header-dynamic-visual-effects {
+  0%,
+  100% {
+    filter: blur(var(--header-cosmic-blur))
+      saturate(
+        calc(
+          var(--cosmic-saturation, 1.4) *
+            (0.9 + var(--header-visual-effects-energy) * 0.1)
+        )
+      )
+      brightness(
+        calc(
+          1 + 0.08 * var(--header-interface-intensity) +
+            var(--header-visual-effects-energy) * 0.05
+        )
+      )
+      hue-rotate(calc(var(--header-visual-effects-harmony) + 0deg))
+      contrast(calc(1 + var(--header-visual-effects-energy) * 0.05));
+    opacity: calc(
+      var(--header-interface-intensity) *
+        (0.6 + var(--header-visual-effects-energy) * 0.1)
+    );
+  }
+  25% {
+    filter: blur(
+        calc(
+          var(--header-cosmic-blur) *
+            (1.1 - var(--header-visual-effects-energy) * 0.05)
+        )
+      )
+      saturate(
+        calc(
+          var(--cosmic-saturation, 1.4) *
+            (1.1 + var(--header-visual-effects-energy) * 0.2)
+        )
+      )
+      brightness(
+        calc(
+          1 + 0.12 * var(--header-interface-intensity) +
+            var(--header-visual-effects-energy) * 0.08
+        )
+      )
+      hue-rotate(calc(var(--header-visual-effects-harmony) + 8deg))
+      contrast(calc(1.05 + var(--header-visual-effects-energy) * 0.1));
+    opacity: calc(
+      var(--header-interface-intensity) *
+        (0.75 + var(--header-visual-effects-energy) * 0.15)
+    );
+  }
+  50% {
+    filter: blur(
+        calc(
+          var(--header-cosmic-blur) *
+            (0.9 + var(--header-visual-effects-energy) * 0.1)
+        )
+      )
+      saturate(
+        calc(
+          var(--cosmic-saturation, 1.4) *
+            (1.0 + var(--header-visual-effects-energy) * 0.3)
+        )
+      )
+      brightness(
+        calc(
+          1 + 0.15 * var(--header-interface-intensity) +
+            var(--header-visual-effects-energy) * 0.12
+        )
+      )
+      hue-rotate(calc(var(--header-visual-effects-harmony) + 15deg))
+      contrast(calc(1.08 + var(--header-visual-effects-energy) * 0.15));
+    opacity: calc(
+      var(--header-interface-intensity) *
+        (0.8 + var(--header-visual-effects-energy) * 0.2)
+    );
+  }
+  75% {
+    filter: blur(
+        calc(
+          var(--header-cosmic-blur) *
+            (1.05 - var(--header-visual-effects-energy) * 0.03)
+        )
+      )
+      saturate(
+        calc(
+          var(--cosmic-saturation, 1.4) *
+            (0.95 + var(--header-visual-effects-energy) * 0.15)
+        )
+      )
+      brightness(
+        calc(
+          1 + 0.10 * var(--header-interface-intensity) +
+            var(--header-visual-effects-energy) * 0.06
+        )
+      )
+      hue-rotate(calc(var(--header-visual-effects-harmony) + -5deg))
+      contrast(calc(1.03 + var(--header-visual-effects-energy) * 0.08));
+    opacity: calc(
+      var(--header-interface-intensity) *
+        (0.7 + var(--header-visual-effects-energy) * 0.12)
+    );
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ♿ ACCESSIBILITY & PERFORMANCE WITH VISUAL EFFECTS
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --header-interface-animation-rate: 30s;
+  }
+
+  * {
+    animation-duration: 30s !important; // Slow, calm motion
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --header-cosmic-blur: 6px;
+    --header-cosmic-depth: 30px;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --header-interface-intensity: 1.0; // More visible for accessibility
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   🔄 LEGACY COMPATIBILITY ALIASES
+   Ensures backward compatibility during transition
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --header-soul-intensity: var(--header-interface-intensity);
+  --header-soul-breath-rate: var(--header-interface-animation-rate);
+  --header-soul-primary: var(--header-interface-primary);
+  --header-soul-secondary: var(--header-interface-secondary);
+  --header-soul-accent: var(--header-interface-accent);
+  --header-soul-whisper: var(--header-interface-glow);
+}

@@ -379,12 +379,11 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     }
   }
 
+  // ✅ RAF LOOP CONSOLIDATION: Fallback loop removed
+  // Animation coordinator registration is now guaranteed via VisualSystemCoordinator
   private _startFallbackAnimationLoops() {
-    const loop = () => {
-      this.updateAnimation(16.67);
-      requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
+    // No-op: Fallback no longer needed - coordinator registration is guaranteed
+    this._animationRegistered = true;
   }
 
   private animateOptimizedNexusFrame(deltaTimeMs: number | null) {

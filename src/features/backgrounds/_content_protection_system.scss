@@ -10,6 +10,11 @@
 @use "../../core/mixins" as *;
 
 /* ═══════════════════════════════════════════════════════════════════════════════
+   🏗️ DEPTH LAYER SYSTEM - Base Architecture
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@mixin apply-depth-layers {
+/* ═══════════════════════════════════════════════════════════════════════════════
    🌊 DEPTH LAYER VARIABLES - Foundation Architecture
    ═══════════════════════════════════════════════════════════════════════════════ */
 
@@ -17,32 +22,28 @@
   /* Depth layer system using design tokens */
   --depth-foreground-clarity: 1.0;
   --depth-background-blur: var(--sn-ui-glass-blur, 20px);
-  
+
   /* Content protection system */
   --content-protection-level: 0.95;
   --chrome-enhancement-level: 2.0;
   --reading-mode-active: 0;
-  
+
   /* Animation timing using design system */
   --depth-animation-duration: var(--sn-anim-transition-cosmic, 1200ms);
   --musical-sync-intensity: var(--sn-music-energy-level, 0.5);
-  
+
   /* Layer management */
   --content-layer-index: var(--sn-layout-z-ui, 10);
   --chrome-layer-index: var(--sn-layout-z-content, 0);
   --background-layer-index: var(--sn-layout-z-background, -11);
-  
+
   /* Unified intensity using design system */
   --depth-effects-intensity: calc(
-    var(--sn-bg-gradient-opacity, 0.8) * 
+    var(--sn-bg-gradient-opacity, 0.8) *
     var(--sn-perf-quality-blur, 1.0) *
     (1 - var(--reading-mode-active) * 0.9)
   );
 }
-
-/* ═══════════════════════════════════════════════════════════════════════════════
-   🏗️ DEPTH LAYER SYSTEM - Base Architecture
-   ═══════════════════════════════════════════════════════════════════════════════ */
 
 .audio-depth-system {
   position: relative;
@@ -348,6 +349,8 @@
 .main-view-container__scroll-node,
 .main-view-container__scroll-node-child {
   @extend .content-sanctuary !optional;
+}
+
 }
 
 /* ============================================================================ */

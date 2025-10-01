@@ -48,7 +48,7 @@ export class HeaderVisualEffectsController extends UnifiedSystemBase {
     lastFrameTime: 0,
   };
 
-  private animationFrameId: number = 0;
+  // ✅ RAF LOOP CONSOLIDATION: Removed animationFrameId (coordinator manages animation)
   private updateInterval: number = 0;
 
   // Performance optimization
@@ -192,7 +192,8 @@ export class HeaderVisualEffectsController extends UnifiedSystemBase {
 
       // Start animation loop if motion is enabled
       if (this.effectsState.preferredMotion) {
-        this.startAnimationLoop();
+        // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by coordinator
+        // updateAnimation(deltaTime) will be called automatically
       }
 
       // Setup performance monitoring
@@ -390,37 +391,41 @@ export class HeaderVisualEffectsController extends UnifiedSystemBase {
     this.effectsState.lastUpdateTime = Date.now();
   }
 
-  private startAnimationLoop(): void {
-    const animate = (currentTime: number) => {
-      if (!this.initialized || !this.effectsState.animationActive) return;
+  /**
+   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   * Old method removed: startAnimationLoop()
+   * Replacement: updateAnimation(deltaTime) called by coordinator
+   */
 
-      // Throttle to target framerate
-      if (currentTime - this.lastCSSUpdateTime < this.frameThrottleMs) {
-        this.animationFrameId = requestAnimationFrame(animate);
-        return;
+  /**
+   * ✅ RAF LOOP CONSOLIDATION: Animation update method called by coordinator
+   * Replaces internal RAF loop with coordinator-managed updates
+   */
+  public override updateAnimation(deltaTime: number): void {
+    if (!this.initialized || !this.effectsState.animationActive) return;
+    if (!this.effectsState.preferredMotion) return;
+
+    const currentTime = performance.now();
+
+    // Throttle to target framerate
+    if (currentTime - this.lastCSSUpdateTime < this.frameThrottleMs) {
+      return;
+    }
+
+    // Calculate frame rate
+    this.effectsState.frameRate = 1000 / deltaTime;
+    this.effectsState.lastFrameTime = currentTime;
+
+    // Update variables only if values have changed significantly
+    if (currentTime - this.effectsState.lastUpdateTime > 100) {
+      // 10fps for variable updates
+      if (this.hasSignificantCSSChange()) {
+        this.updateHeaderEffectsVariables();
+        this.updatePreviousCSSValues();
       }
+    }
 
-      // Calculate frame rate
-      const deltaTime = currentTime - this.effectsState.lastFrameTime;
-      this.effectsState.frameRate = 1000 / deltaTime;
-      this.effectsState.lastFrameTime = currentTime;
-
-      // Update variables only if values have changed significantly
-      if (currentTime - this.effectsState.lastUpdateTime > 100) {
-        // 10fps for variable updates
-        if (this.hasSignificantCSSChange()) {
-          this.updateHeaderEffectsVariables();
-          this.updatePreviousCSSValues();
-        }
-      }
-
-      this.lastCSSUpdateTime = currentTime;
-
-      // Continue animation loop
-      this.animationFrameId = requestAnimationFrame(animate);
-    };
-
-    this.animationFrameId = requestAnimationFrame(animate);
+    this.lastCSSUpdateTime = currentTime;
   }
 
   private setupPerformanceMonitoring(): void {
@@ -461,13 +466,8 @@ export class HeaderVisualEffectsController extends UnifiedSystemBase {
    */
   public setAnimationActive(active: boolean): void {
     this.effectsState.animationActive = active;
-
-    if (!active && this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = 0;
-    } else if (active && this.effectsState.preferredMotion) {
-      this.startAnimationLoop();
-    }
+    // ✅ RAF LOOP CONSOLIDATION: Coordinator manages animation lifecycle
+    // Animation automatically controlled via effectsState.animationActive flag
   }
 
   /**
@@ -508,11 +508,7 @@ export class HeaderVisualEffectsController extends UnifiedSystemBase {
   public override _performSystemSpecificCleanup(): void {
     super._performSystemSpecificCleanup();
 
-    // Stop animation loop
-    if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = 0;
-    }
+    // ✅ RAF LOOP CONSOLIDATION: No need to stop animation - coordinator handles this
 
     // Clear update interval
     if (this.updateInterval) {

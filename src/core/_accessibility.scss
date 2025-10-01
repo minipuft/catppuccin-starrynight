@@ -1,0 +1,103 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// UNIFIED ACCESSIBILITY SYSTEM - Centralized a11y Support
+// ████████████████████████████████████████████████████████████████████████████████
+//
+// Consolidates accessibility support from:
+// - _sn_performance_optimization.scss (prefers-reduced-motion)
+// - _performance_mixins.scss (motion-safe, contrast-safe mixins)
+// - Scattered implementations across 33+ files
+//
+// Provides single source of truth for:
+// - Motion reduction preferences
+// - Contrast preferences
+// - Reduced motion fallbacks
+// - Static visual alternatives
+
+@use "_mixins" as *;
+
+// ============================================================================
+// REDUCED MOTION SUPPORT
+// ============================================================================
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  // Disable complex visual effects for performance
+  .sn-stars-container,
+  .shootingstar {
+    display: none !important;
+  }
+
+  // Disable kinetic animations (from _kinetic-animations.scss)
+  .sn-bloom-active,
+  .sn-refract-active,
+  .sn-oscillate-active,
+  .sn-harmonize-fundamental,
+  .sn-harmonize-sub,
+  .sn-harmonize-flow,
+  .sn-temporal-echo,
+  .sn-gravity-active,
+  .sn-future-preview,
+  .year3000-kinetic-canvas {
+    animation: none !important;
+  }
+
+  // Provide static fallback styles for kinetic effects
+  .sn-bloom-active {
+    transform: scale(1.02);
+    filter: drop-shadow(0 0 4px rgba(var(--sn-bloom-glow-color, 140,170,238), 0.3));
+  }
+
+  .sn-refract-active {
+    filter: brightness(1.05);
+  }
+}
+
+// ============================================================================
+// ACCESSIBILITY MIXINS
+// ============================================================================
+
+// Motion-safe animations that respect user preferences
+@mixin motion-safe-animation($animation, $reduced-motion-alternative: none) {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: #{$animation};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: #{$reduced-motion-alternative};
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  }
+}
+
+// Contrast-aware effects
+@mixin contrast-safe-effect($high-contrast-alternative: none) {
+  // Normal effects for standard contrast
+  @media (prefers-contrast: no-preference) {
+    filter: var(--effect-filter, none);
+    backdrop-filter: var(--effect-backdrop-filter, none);
+    box-shadow: var(--effect-shadow, none);
+  }
+
+  // Simplified effects for high contrast
+  @media (prefers-contrast: high) {
+    filter: #{$high-contrast-alternative};
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+}
+
+// Motion-safe transition helper
+@mixin motion-safe-transition($property: all, $duration: 300ms, $timing: ease-out) {
+  @media (prefers-reduced-motion: no-preference) {
+    transition: #{$property} #{$duration} #{$timing};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: #{$property} 0.01ms #{$timing};
+  }
+}

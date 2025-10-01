@@ -14,9 +14,12 @@ function injectStarContainer(): HTMLElement {
   const starContainer = document.createElement("div");
   starContainer.className = "sn-stars-container";
 
-  for (let i = 1; i <= 5; i++) {
+  // Create 10 star particles (8 energy + 2 nebula from consolidated system)
+  // Matches enhanced _stars.scss particle definitions (nth-child 1-10)
+  for (let i = 1; i <= 10; i++) {
     const star = document.createElement("div");
     star.className = "star";
+    // Optional twinkle enhancement for variety
     if (Math.random() > 0.7) star.classList.add("twinkle");
     starContainer.appendChild(star);
   }

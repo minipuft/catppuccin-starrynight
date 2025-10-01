@@ -1,0 +1,414 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// INTERACTION MIXINS - Shared interaction patterns for Year3000 theme
+// Consolidates duplicate mixins from src/features/interactions/*.scss
+// ████████████████████████████████████████████████████████████████████████████████
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SHARED CSS VARIABLES (Beat-Responsive & Interaction Timing)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // === Beat Synchronization Variables ===
+  --sn-beat-pulse: 0; // 0-1 beat pulse trigger
+  --sn-kinetic-energy: 0; // 0-1 music energy level
+  --sn-beat-pulse-intensity: 0; // 0-1 beat intensity from MusicSyncService
+  --sn-rhythm-phase: 0; // Harmonic oscillation phase
+
+  // === Interaction Timing Variables ===
+  --micro-fast: calc(0.15s * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.3)));
+  --micro-medium: calc(0.3s * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.2)));
+  --micro-slow: calc(0.6s * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.1)));
+
+  // === Ripple Effect Variables ===
+  --ripple-color: var(--sn-color-accent-hex);
+  --ripple-duration: calc(
+    var(--sn-gradient-transition, 0.8s) * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.3))
+  );
+  --ripple-intensity: calc(0.3 + (var(--sn-beat-pulse-intensity, 0) * 0.4));
+  --ripple-max-scale: 3;
+  --ripple-opacity: 0.3;
+
+  // === Focus & Hover Variables ===
+  --focus-glow-intensity: 0.4;
+  --focus-flow-duration: 300ms;
+  --focus-ring-thickness: 2px;
+  --focus-ring-color: rgba(var(--sn-gradient-accent-rgb), var(--focus-glow-intensity));
+  --hover-lift-distance: 2px;
+  --hover-glow-intensity: 0.2;
+  --hover-transition-speed: 200ms;
+  --hover-scale-factor: 1.02;
+
+  // === Beat-Responsive Feedback Intensity ===
+  --feedback-subtle: calc(0.1 + (var(--sn-beat-pulse-intensity, 0) * 0.05));
+  --feedback-moderate: calc(0.2 + (var(--sn-beat-pulse-intensity, 0) * 0.1));
+  --feedback-prominent: calc(0.3 + (var(--sn-beat-pulse-intensity, 0) * 0.2));
+
+  // === Musical Interaction Sync ===
+  --interaction-beat-sync: calc(var(--sn-beat-pulse-intensity, 0) * 0.5);
+  --interaction-energy-boost: calc(var(--sn-music-energy, 0) * 0.3);
+  --interaction-feedback-delay: calc(
+    0.1s * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.5))
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SHARED ANIMATION KEYFRAMES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Beat-responsive scale animation
+@keyframes sn-beat-scale {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  35% {
+    transform: scale(1.03);
+    opacity: 0.98;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Subtle pulse for less prominent elements
+@keyframes sn-beat-pulse-subtle {
+  0% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.95;
+    filter: brightness(1.05);
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+// Musical interaction boost animation
+@keyframes musical-interaction-boost {
+  0%, 100% {
+    filter: brightness(1) saturate(1);
+  }
+  50% {
+    filter: brightness(calc(1 + var(--interaction-energy-boost)))
+            saturate(calc(1 + var(--interaction-beat-sync)));
+  }
+}
+
+// CSS interaction ripple effect
+@keyframes css-interaction-ripple {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+// Focus flow pulse animation
+@keyframes focus-flow-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 var(--focus-ring-thickness) var(--focus-ring-color),
+      0 0 10px var(--focus-ring-color);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 0 calc(var(--focus-ring-thickness) * 1.5) var(--focus-ring-color),
+      0 0 20px var(--focus-ring-color);
+    transform: scale(1.01);
+  }
+}
+
+// Gentle text shimmer animation
+@keyframes gentle-text-shimmer {
+  0%, 100% {
+    opacity: var(--text-shimmer-intensity, 0.3);
+    text-shadow: 0 0 5px rgba(var(--sn-gradient-accent-rgb), 0.2);
+  }
+  50% {
+    opacity: calc(var(--text-shimmer-intensity, 0.3) * 1.4);
+    text-shadow: 0 0 8px rgba(var(--sn-gradient-accent-rgb), 0.4);
+  }
+}
+
+// Simple gradient flow animation
+@keyframes simple-gradient-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TEXT EFFECT MIXINS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin lightweight-text-shimmer($intensity: normal) {
+  color: rgba(var(--sn-gradient-primary-rgb), 0.95);
+
+  @if $intensity == subtle {
+    --local-shimmer-strength: 0.15;
+  } @else if $intensity == intense {
+    --local-shimmer-strength: 0.5;
+  } @else {
+    --local-shimmer-strength: var(--music-text-intensity, 0.3);
+  }
+
+  // Simple text glow that responds to music
+  text-shadow: 0 0 calc(var(--local-shimmer-strength) * 10px) rgba(var(--sn-gradient-accent-rgb), var(--music-glow-strength, 0.2));
+
+  // Lightweight shimmer animation
+  animation: gentle-text-shimmer var(--text-shimmer-speed, 8s) ease-in-out infinite;
+
+  // Smooth state transitions
+  transition: text-shadow 0.3s ease-out, opacity 0.2s ease-out;
+}
+
+@mixin simple-gradient-text($flow-speed: normal) {
+  @if $flow-speed == slow {
+    --local-gradient-speed: calc(var(--text-shimmer-speed, 8s) * 1.5);
+  } @else if $flow-speed == fast {
+    --local-gradient-speed: calc(var(--text-shimmer-speed, 8s) * 0.7);
+  } @else {
+    --local-gradient-speed: var(--text-shimmer-speed, 8s);
+  }
+
+  // Simple three-color gradient
+  background: linear-gradient(
+    45deg,
+    rgba(var(--sn-gradient-primary-rgb), 1) 0%,
+    rgba(var(--sn-gradient-accent-rgb), 1) 50%,
+    rgba(var(--sn-gradient-secondary-rgb), 1) 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+
+  // Simple gradient flow animation
+  animation: simple-gradient-flow var(--local-gradient-speed) linear infinite;
+
+  // Smooth transitions
+  transition: background-size 0.3s ease-out;
+}
+
+@mixin simple-glow-effect {
+  // Simple glow on hover (replaces complex portal effects)
+  transition:
+    box-shadow 0.3s ease-out,
+    transform 0.2s ease-out;
+
+  &:hover,
+  &:focus,
+  &[aria-selected="true"] {
+    box-shadow:
+      0 0 15px rgba(var(--sn-gradient-accent-rgb), 0.3),
+      0 0 30px rgba(var(--sn-gradient-accent-rgb), 0.1);
+    transform: scale(1.02);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CSS INTERACTION MIXINS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@mixin css-interaction-ripple($intensity: normal) {
+  position: relative;
+  overflow: hidden;
+
+  @if $intensity == subtle {
+    --local-ripple-opacity: 0.15;
+    --local-ripple-scale: 2;
+  } @else if $intensity == strong {
+    --local-ripple-opacity: 0.5;
+    --local-ripple-scale: 4;
+  } @else {
+    --local-ripple-opacity: var(--ripple-opacity);
+    --local-ripple-scale: var(--ripple-max-scale);
+  }
+
+  // Create ripple effect on click using CSS pseudo-elements
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      var(--ripple-color) 0%,
+      rgba(var(--sn-gradient-accent-rgb), 0) 70%
+    );
+    transform: translate(-50%, -50%) scale(0);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &:active::after {
+    width: 100%;
+    height: 100%;
+    animation: css-interaction-ripple var(--ripple-duration) ease-out;
+  }
+}
+
+@mixin css-focus-flow($intensity: normal) {
+  transition:
+    box-shadow var(--focus-flow-duration) ease-out,
+    transform var(--focus-flow-duration) ease-out,
+    filter var(--focus-flow-duration) ease-out;
+
+  @if $intensity == subtle {
+    --local-focus-glow: 0.2;
+  } @else if $intensity == strong {
+    --local-focus-glow: 0.6;
+  } @else {
+    --local-focus-glow: var(--focus-glow-intensity);
+  }
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    animation: focus-flow-pulse 2s ease-in-out infinite;
+    z-index: 10;
+  }
+
+  &:focus:not(:focus-visible) {
+    animation: none;
+    box-shadow:
+      0 0 0 var(--focus-ring-thickness) var(--focus-ring-color),
+      0 0 10px var(--focus-ring-color);
+  }
+}
+
+@mixin css-hover-lift($intensity: normal) {
+  transition:
+    transform var(--hover-transition-speed) ease-out,
+    box-shadow var(--hover-transition-speed) ease-out,
+    filter var(--hover-transition-speed) ease-out;
+
+  @if $intensity == subtle {
+    --local-lift-distance: 1px;
+    --local-hover-scale: 1.005;
+    --local-hover-glow: 0.1;
+  } @else if $intensity == strong {
+    --local-lift-distance: 4px;
+    --local-hover-scale: 1.05;
+    --local-hover-glow: 0.4;
+  } @else {
+    --local-lift-distance: var(--hover-lift-distance);
+    --local-hover-scale: var(--hover-scale-factor);
+    --local-hover-glow: var(--hover-glow-intensity);
+  }
+
+  &:hover {
+    transform:
+      translateY(calc(-1 * var(--local-lift-distance)))
+      scale(var(--local-hover-scale));
+    box-shadow:
+      0 calc(var(--local-lift-distance) * 2)
+      calc(var(--local-lift-distance) * 8)
+      rgba(var(--sn-gradient-accent-rgb), var(--local-hover-glow));
+    filter: brightness(1.05) saturate(1.1);
+  }
+}
+
+@mixin css-musical-interaction() {
+  // Sync interaction effects with music when available
+  animation: musical-interaction-boost
+    calc(var(--living-pulse-speed, 4s) / max(var(--sn-beat-pulse-intensity, 0.5), 0.5))
+    ease-in-out infinite;
+
+  // Enhanced effects during musical peaks
+  &:hover,
+  &:focus {
+    animation-duration: calc(var(--living-pulse-speed, 4s) * 0.7);
+    filter: brightness(calc(1.05 + var(--interaction-energy-boost)))
+            saturate(calc(1.1 + var(--interaction-beat-sync)));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// BEAT-RESPONSIVE UTILITY CLASSES
+// Apply to elements for zero-CPU-cost beat synchronization
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.sn-beat-responsive {
+  --_sn-pulse-intensity: var(--sn-beat-pulse, 0);
+
+  animation: sn-beat-scale 300ms var(--sn-anim-easing-standard) forwards;
+  animation-play-state: var(--_sn-pulse-intensity, paused);
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    transform: none !important;
+  }
+}
+
+.sn-beat-responsive--subtle {
+  --_sn-pulse-intensity: var(--sn-beat-pulse, 0);
+
+  animation: sn-beat-pulse-subtle 250ms var(--sn-anim-easing-standard) forwards;
+  animation-play-state: var(--_sn-pulse-intensity, paused);
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    filter: none !important;
+  }
+}
+
+.sn-beat-responsive--custom {
+  transform: scale(calc(1 + var(--sn-kinetic-energy, 0) * 0.03));
+  opacity: calc(1 - var(--sn-kinetic-energy, 0) * 0.02);
+
+  transition:
+    transform 100ms var(--sn-anim-easing-standard),
+    opacity 100ms var(--sn-anim-easing-standard);
+
+  @media (prefers-reduced-motion: reduce) {
+    transform: scale(1) !important;
+    opacity: 1 !important;
+    transition: none;
+  }
+}
+
+.sn-beat-glow {
+  --_sn-glow-intensity: calc(var(--sn-kinetic-energy, 0) * 0.3);
+
+  box-shadow:
+    0 0 calc(var(--_sn-glow-intensity) * 20px)
+    rgba(var(--sn-accent-rgb, 140, 170, 238), var(--_sn-glow-intensity));
+
+  transition: box-shadow 150ms var(--sn-anim-easing-standard);
+
+  @media (prefers-reduced-motion: reduce) {
+    box-shadow: none !important;
+    transition: none;
+  }
+}
+
+// Performance mode: Disable all beat effects during high CPU usage
+.sn-performance-mode {
+  .sn-beat-responsive,
+  .sn-beat-responsive--subtle,
+  .sn-beat-responsive--custom {
+    animation: none !important;
+    transform: scale(1) !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  .sn-beat-glow {
+    box-shadow: none !important;
+    transition: none !important;
+  }
+}

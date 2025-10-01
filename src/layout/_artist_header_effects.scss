@@ -49,16 +49,11 @@
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 🎯 ARTIST PAGE DETECTION (Spotify-Compatible Selectors)
+// 🎯 ARTIST PAGE DETECTION (Using Centralized Mixins)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Target artist pages using Spotify's data attributes and class structure
-// Defensive CSS with multiple fallback selectors for resilience
-.main-view-container:has([data-testid*="artist"]),
-.main-view-container:has(.main-entityHeader-container[data-testid*="artist"]),
-.main-view-container:has(.main-entityHeader-title:contains("Artist")),
-.main-view-container[data-testid*="artist"],
-body:has(.main-entityHeader-container) .main-view-container {
+// Target artist pages using centralized mixin for resilience
+@include artist-page-container {
 
   // === ARTIST AURA FIELD ACTIVATION ===
   position: relative;
@@ -120,18 +115,16 @@ body:has(.main-entityHeader-container) .main-view-container {
   }
 
   // === ENHANCED HEADER INTEGRATION ===
-  .main-entityHeader-container {
-    // Strengthen existing header effects when aura is active
+  // Strengthen existing header effects when aura is active using mixin
+  @include entity-header-root {
     position: relative;
     z-index: 2; // Above aura field
 
-    // TODO: Add artist-specific theming hooks using [data-testid*="artist"] selectors
-    &[data-testid*="artist"] {
-      --header-soul-intensity: calc(var(--artist-aura-intensity) * 1.2);
-      --header-soul-primary: var(--artist-aura-signature-primary);
-      --header-soul-secondary: var(--artist-aura-signature-secondary);
-      --header-soul-accent: var(--artist-aura-signature-accent);
-    }
+    // Artist-specific theming enhancements
+    --header-soul-intensity: calc(var(--artist-aura-intensity) * 1.2);
+    --header-soul-primary: var(--artist-aura-signature-primary);
+    --header-soul-secondary: var(--artist-aura-signature-secondary);
+    --header-soul-accent: var(--artist-aura-signature-accent);
   }
 
   // === CONTENT AREA AURA INFLUENCE ===

@@ -1,0 +1,215 @@
+//  DYNAMIC INTERFACE UI ELEMENTS - Integrated Glass & Crystal Effects
+
+@use "../../core/_interaction_mixins" as *; // Access text effect mixins
+
+// Note: Text effect mixins, variables, and keyframes consolidated to:
+// - src/core/_interaction_mixins.scss
+
+//  UI ELEMENT SPECIFIC VARIABLES
+
+:root {
+  // === VISUAL EFFECTS INTEGRATION HOOKS ===
+  // These integrate with the glassmorphism and crystalline systems
+  --visual-effects-chromatic-intensity: var(--music-aberration-strength, 1px);
+  --visual-effects-chromatic-speed: var(--living-pulse-speed, 8s);
+  --visual-effects-prism-intensity: var(--music-prism-intensity, 0.4);
+
+  // === SIMPLIFIED TEXT EFFECTS (UI-specific overrides) ===
+  --text-shimmer-intensity: 0.3;
+  --text-shimmer-speed: var(--living-pulse-speed, 8s);
+  --text-glow-strength: 0.2;
+
+  // === MUSICAL RESPONSIVENESS (UI-specific) ===
+  --music-text-intensity: calc(
+    var(--text-shimmer-intensity) +
+    var(--sn-beat-pulse-intensity, 0) * 0.3
+  );
+  --music-glow-strength: calc(
+    var(--text-glow-strength) +
+    var(--sn-music-energy, 0) * 0.4
+  );
+}
+
+//  APPLICATION TO SPOTIFY UI ELEMENTS
+
+// === MAIN HEADINGS AND TITLES ===
+h1,
+h2,
+h3,
+.main-entityHeader-title,
+.main-trackList-trackListHeaderRow th,
+.main-cardHeader-text {
+  @include lightweight-text-shimmer(subtle);
+}
+
+// === SPECIAL EMPHASIS ELEMENTS ===
+.main-nowPlayingBar-trackInfo strong,
+.main-trackInfo-name,
+.main-cardHeader-cardHeaderTitle,
+.main-entityHeader-subtitle {
+  @include simple-gradient-text(slow);
+  @include simple-glow-effect;
+}
+
+// === NAVIGATION AND MENU ITEMS ===
+.main-navBar-navBarLink,
+.main-rootlist-rootlistItemLink,
+.main-contextMenu-menuItemButton,
+.spicetify-playlist-list li a {
+  @include lightweight-text-shimmer(subtle);
+
+  // Enhanced effects on active/selected states only
+  &[aria-selected="true"],
+  &.main-rootlist-rootlistItemActive {
+    @include simple-gradient-text(fast);
+  }
+
+  // Simple glow on hover
+  &:hover {
+    @include simple-glow-effect;
+  }
+}
+
+// === TRACK NAMES AND ARTIST NAMES ===
+.main-trackList-trackName,
+.main-trackList-rowTitle a,
+.main-card-cardMetadata-title,
+.main-cardHeader-link {
+  @include lightweight-text-shimmer(subtle);
+
+  // Currently playing track gets gradient treatment
+  .main-trackList-selected &,
+  .main-trackList-trackListRow:has(.main-trackList-playingIcon) & {
+    @include simple-gradient-text(normal);
+    @include simple-glow-effect;
+  }
+}
+
+// === BUTTONS AND INTERACTIVE ELEMENTS ===
+.main-playButton-PlayButton,
+.main-skipBackButton-button,
+.main-skipForwardButton-button,
+.main-shuffleButton-button,
+.main-repeatButton-button {
+  @include lightweight-text-shimmer(intense);
+  @include simple-glow-effect;
+
+  // Special treatment for main play button
+  &.main-playButton-PlayButton {
+    @include simple-gradient-text(fast);
+  }
+}
+
+// === SEARCH RESULTS ===
+.main-search-searchCategory h2,
+.main-shelf-header h2 {
+  @include simple-gradient-text(slow);
+  @include simple-glow-effect;
+}
+
+// === TIME DISPLAYS AND NUMERIC VALUES ===
+.main-trackList-duration,
+.main-playbackBarRemainingTime-container,
+.main-playbackBarDisplay-bar {
+  @include lightweight-text-shimmer(subtle);
+
+  // Enhanced effects during active playback
+  .main-nowPlayingBar-nowPlayingBar:hover & {
+    @include simple-gradient-text(fast);
+  }
+}
+
+//  SIMPLIFIED MUSIC-RESPONSIVE ENHANCEMENT (Integrated with Other Systems)
+
+// Note: Main music responsiveness now handled by:
+// - GlassmorphismManager for aberration effects
+// - BeatSyncVisualSystem for pulse coordination
+// - CrystallineGlass for prismatic effects
+
+// Simple beat-responsive text glow enhancement
+.Root[style*="--sn-beat-pulse-intensity"] {
+  h1, h2, h3,
+  .main-entityHeader-title,
+  .main-trackList-trackName,
+  .main-cardHeader-text {
+    // Text shimmer speed scales with beat intensity
+    animation-duration: calc(var(--text-shimmer-speed) / max(var(--sn-beat-pulse-intensity, 0.3), 0.3));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  ACCESSIBILITY & PERFORMANCE OPTIMIZATION (Simplified)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --text-shimmer-speed: 20s;
+    --text-shimmer-intensity: 0.1;
+  }
+
+  // Disable all animations for motion sensitivity
+  h1, h2, h3,
+  .main-entityHeader-title,
+  .main-trackList-trackName,
+  .main-cardHeader-text,
+  .main-navBar-navBarLink {
+    animation: none !important;
+  }
+
+  // Static gradient text only
+  .main-nowPlayingBar-trackInfo strong,
+  .main-cardHeader-cardHeaderTitle {
+    background: linear-gradient(
+      45deg,
+      rgba(var(--sn-gradient-primary-rgb), 1) 0%,
+      rgba(var(--sn-gradient-accent-rgb), 1) 50%,
+      rgba(var(--sn-gradient-secondary-rgb), 1) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --text-shimmer-intensity: 0.2;
+    --text-glow-strength: 0.1;
+  }
+
+  // Reduced effects for mobile performance
+  .main-trackList-trackName,
+  .main-cardHeader-text {
+    animation-duration: calc(var(--text-shimmer-speed) * 2) !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --text-shimmer-intensity: 0.8;
+    --text-glow-strength: 0.6;
+  }
+
+  // Enhanced visibility for high contrast
+  h1, h2, h3,
+  .main-entityHeader-title,
+  .main-trackList-trackName {
+    text-shadow:
+      2px 0 rgba(255, 255, 255, 0.8),
+      -2px 0 rgba(0, 0, 0, 0.8),
+      0 2px rgba(255, 255, 255, 0.6),
+      0 -2px rgba(0, 0, 0, 0.6);
+  }
+}
+
+// VISUAL EFFECTS INTERFACE COMPLETION
+
+// LEGACY COMPATIBILITY MAPPINGS
+
+:root {
+  // === Legacy Holographic → Visual Effects Mappings ===
+  --holographic-chromatic-intensity: var(--visual-effects-chromatic-intensity);
+  --holographic-chromatic-speed: var(--visual-effects-chromatic-speed);
+  --holographic-prism-intensity: var(--visual-effects-prism-intensity);
+}

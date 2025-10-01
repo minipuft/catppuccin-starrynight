@@ -171,6 +171,12 @@
   contain: layout style paint;
 }
 
+// GPU Acceleration Class - Apply to critical UI elements
+.sn-gpu-accelerated {
+  @include performance-hardware-acceleration;
+  perspective: 1000px; // Additional 3D context for nested transforms
+}
+
 // Conditional hardware acceleration
 @mixin hardware-acceleration-adaptive {
   // Only apply hardware acceleration on capable devices
@@ -419,9 +425,13 @@
   pointer-events: none;
   z-index: -1;
 
-  // Respect motion preferences
-  @media (prefers-reduced-motion: reduce) {
-    opacity: 0.1;
-    animation: none !important;
-  }
+  // Respect motion preferences - delegated to _accessibility.scss
+}
+
+// Apply GPU acceleration to critical UI elements
+.main-card-card,
+.main-trackList-trackListRow,
+.main-actionBar-ActionBarRow,
+.main-nowPlayingBar-nowPlayingBar {
+  @extend .sn-gpu-accelerated !optional;
 }

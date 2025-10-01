@@ -58,5 +58,108 @@
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// ENTITY HEADERS & CONTENT PAGES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Entity Header (Album/Playlist/Artist page headers)
+// Usage: @include entity-header-root { … }
+@mixin entity-header-root {
+  .main-entityHeader-container,
+  [data-testid*="entity-header"],
+  [class*="entityHeader"] {
+    @content;
+  }
+}
+
+// Entity Header Title
+// Usage: @include entity-header-title { … }
+@mixin entity-header-title {
+  .main-entityHeader-title,
+  [class*="entityHeader-title"] {
+    @content;
+  }
+}
+
+// Entity Header Image Container
+// Usage: @include entity-header-image { … }
+@mixin entity-header-image {
+  .main-entityHeader-imageContainer,
+  .main-entityHeader-image,
+  [class*="entityHeader-image"] {
+    @content;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ARTIST-SPECIFIC SELECTORS (Year 3000 Enhanced Detection)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Artist Page Container (Main view when viewing an artist)
+// Usage: @include artist-page-container { … }
+@mixin artist-page-container {
+  .main-view-container:has([data-testid*="artist"]),
+  .main-view-container:has([aria-label*="Artist"]),
+  [data-testid*="artist-page"],
+  body:has(.main-entityHeader-container) .main-view-container {
+    @content;
+  }
+}
+
+// Artist Entity Header (Nested - combines artist detection + header)
+// Usage: @include artist-entity-header { … }
+@mixin artist-entity-header {
+  .main-entityHeader-container[data-testid*="artist"],
+  .main-view-container:has([data-testid*="artist"]) .main-entityHeader-container,
+  [data-testid*="artist"] .main-entityHeader-container {
+    @content;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ACTION BAR & PLAYBACK CONTROLS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Action Bar Background (Visual effects layer)
+// Usage: @include action-bar-background { … }
+@mixin action-bar-background {
+  .main-actionBarBackground-background,
+  [class*="actionBarBackground"],
+  .main-actionBar-ActionBarRow::before {
+    @content;
+  }
+}
+
+// Action Bar Row (Main container)
+// Usage: @include action-bar-row { … }
+@mixin action-bar-row {
+  .main-actionBar-ActionBarRow,
+  [class*="actionBar-ActionBarRow"],
+  [data-testid*="action-bar"] {
+    @content;
+  }
+}
+
+// Action Bar Controls (Inner control elements)
+// Usage: @include action-bar-controls { … }
+@mixin action-bar-controls {
+  .main-actionBar-ActionBar,
+  [class*="actionBar-ActionBar"]:not([class*="Row"]) {
+    @content;
+  }
+}
+
+// Playback Control Buttons (Play, Pause, Shuffle, etc.)
+// Usage: @include playback-buttons { … }
+@mixin playback-buttons {
+  .main-playButton-PlayButton,
+  .main-shuffleButton-button,
+  .main-button-button,
+  [data-testid*="play-button"],
+  [data-testid*="control-button"] {
+    @content;
+  }
+}
+
 // Add additional selector helpers below as needed, following the same
 // pattern: prefer attribute selectors first, fall back to legacy class names.

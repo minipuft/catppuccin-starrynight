@@ -44,6 +44,13 @@
   --particle-focus-dampening: 0.3; // Reduces in focus contexts
   --particle-discovery-amplification: 1.4; // Enhances in discovery
   --particle-music-modulation: 1; // Responds to music energy
+
+  // === Aurora Background Layer (Extracted from _cosmic_effects.scss) ===
+  --aurora-layer-1-intensity: 0.08; // Subtle base layer
+  --aurora-layer-2-intensity: 0.05; // More meditative
+  --aurora-layer-3-intensity: 0.03; // Very gentle
+  --aurora-flow-speed: calc(var(--particle-base-speed) * 3.2); // 25.6s - harmonized rhythm
+  --aurora-shimmer-speed: calc(var(--particle-base-speed) * 1.5); // 12s - subtle animation
 }
 
 // =============================================================================
@@ -229,11 +236,90 @@
   }
 }
 
+// Aurora Background Flow - Gentle shifting aurora effect (from _cosmic_effects.scss)
+@keyframes aurora-background-flow {
+  0% {
+    background-position: 0% 50%, 100% 50%, 50% 0%;
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  25% {
+    background-position: 50% 100%, 0% 0%, 100% 50%;
+    filter: hue-rotate(8deg) brightness(1.05);
+  }
+  50% {
+    background-position: 100% 50%, 50% 100%, 0% 100%;
+    filter: hue-rotate(15deg) brightness(0.98);
+  }
+  75% {
+    background-position: 50% 0%, 100% 50%, 50% 50%;
+    filter: hue-rotate(23deg) brightness(1.02);
+  }
+  100% {
+    background-position: 0% 50%, 100% 50%, 50% 0%;
+    filter: hue-rotate(30deg) brightness(1);
+  }
+}
+
+// Nebula Particle Drift - Slow drifting nebula particles (from _cosmic_effects.scss)
+@keyframes nebula-particle-drift {
+  0% {
+    transform: translate3d(0, 0, 0) rotateZ(0deg);
+    opacity: 0.3;
+  }
+  33% {
+    transform: translate3d(50px, -40px, 15px) rotateZ(40deg);
+    opacity: 0.5;
+  }
+  66% {
+    transform: translate3d(-30px, 50px, -10px) rotateZ(80deg);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotateZ(120deg);
+    opacity: 0.3;
+  }
+}
+
 // =============================================================================
 // YEAR 3000 ENERGY PARTICLE NETWORK CONTAINER
 // =============================================================================
 
-.sn-stars-container {
+@mixin apply-particle-network {
+  // Aurora background layer (z-index: -6, deepest layer)
+  .Root::before {
+    content: "";
+    position: fixed;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 120%;
+    z-index: -6;
+    pointer-events: none;
+
+    // Subtle aurora gradients
+    background:
+      radial-gradient(
+        ellipse 100% 60% at 20% 30%,
+        rgba(var(--sn-gradient-primary-rgb), var(--aurora-layer-1-intensity)) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 80% 90% at 80% 60%,
+        rgba(var(--sn-gradient-secondary-rgb), var(--aurora-layer-2-intensity)) 0%,
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 120% 50% at 50% 90%,
+        rgba(var(--sn-gradient-accent-rgb), var(--aurora-layer-3-intensity)) 0%,
+        transparent 80%
+      );
+
+    background-size: 300% 300%, 250% 400%, 400% 200%;
+    animation: aurora-background-flow var(--aurora-flow-speed) ease-in-out infinite;
+    filter: blur(60px);
+  }
+
+  .sn-stars-container {
   position: fixed;
   top: 0;
   left: 0;
@@ -447,6 +533,41 @@
         transparent 85%
       );
     }
+
+    // === NEBULA PARTICLES (from _cosmic_effects.scss) ===
+    // Slow drifting particles that add depth and cosmic atmosphere
+
+    &:nth-child(9) {
+      --particle-cluster-size: 2.5;
+      top: 20%;
+      left: 40%;
+      animation: nebula-particle-drift calc(var(--particle-base-speed) * 7.5)
+        linear infinite;
+      animation-delay: 0s;
+      opacity: 0.4;
+
+      background: radial-gradient(
+        circle,
+        var(--particle-secondary-energy) 0%,
+        transparent 70%
+      );
+    }
+
+    &:nth-child(10) {
+      --particle-cluster-size: 3;
+      top: 70%;
+      left: 15%;
+      animation: nebula-particle-drift calc(var(--particle-base-speed) * 9)
+        linear infinite reverse;
+      animation-delay: calc(var(--particle-emergence-delay) * 2);
+      opacity: 0.3;
+
+      background: radial-gradient(
+        circle,
+        var(--particle-accent-energy) 0%,
+        transparent 65%
+      );
+    }
   }
 }
 
@@ -490,6 +611,38 @@
 
   .sn-stars-container .star {
     animation-duration: calc(var(--particle-base-speed) * 0.6) !important;
+  }
+}
+
+// Beat-synchronized particle intensification (consolidated from _particle_field.scss & _cosmic_effects.scss)
+.Root[style*="--sn-beat-pulse-intensity"] {
+  // Aurora layer responds to beat
+  .Root::before {
+    animation-duration: calc(var(--aurora-flow-speed) / max(var(--sn-beat-pulse-intensity, 1), 0.7));
+    filter: blur(60px)
+            brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.15))
+            saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.2));
+  }
+
+  // Particles pulse with beat
+  .sn-stars-container .star {
+    animation-duration: calc(var(--particle-base-speed) * 0.8 / max(var(--sn-beat-pulse-intensity, 1), 0.5)) !important;
+    filter: brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.3))
+            saturate(calc(1.2 + var(--sn-beat-pulse-intensity, 0) * 0.4));
+  }
+}
+
+// Genre-responsive particle evolution (from _cosmic_effects.scss)
+.Root[style*="--sn-dynamic-genre-hue-shift"] {
+  .Root::before {
+    filter: blur(60px)
+            hue-rotate(var(--sn-dynamic-genre-hue-shift, 0deg))
+            brightness(calc(1 + var(--sn-music-energy, 0) * 0.1));
+  }
+
+  .sn-stars-container .star {
+    filter: hue-rotate(calc(var(--sn-dynamic-genre-hue-shift, 0deg) * 0.3))
+            saturate(calc(1.2 + var(--sn-music-valence, 0) * 0.3));
   }
 }
 
@@ -649,7 +802,8 @@
   75% { opacity: calc(var(--particle-energy-intensity) * 0.8); transform: scale(1.05); }
 }
 
-// Legacy class mappings
-.nexus-active {
-  @extend .interface-active !optional;
+  // Legacy class mappings
+  .nexus-active {
+    @extend .interface-active !optional;
+  }
 }

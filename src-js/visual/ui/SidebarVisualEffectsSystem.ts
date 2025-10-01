@@ -102,7 +102,7 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
   private resizeObserver: ResizeObserver | null = null;
   private visualEffectsElement: HTMLElement | null = null;
   private harmonicModeIndicator: HTMLElement | null = null;
-  public visualEffectsAnimationFrame: number | null = null;
+  // ✅ RAF LOOP CONSOLIDATION: Removed visualEffectsAnimationFrame (coordinator manages animation)
   private currentHarmonicModeClass: string;
   private currentEnergyClass: string;
   private currentHarmonicModeKey: string;
@@ -331,9 +331,13 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
     }
   }
 
+  /**
+   * ✅ RAF LOOP CONSOLIDATION: Fallback removed - now always uses coordinator
+   * VisualSystemCoordinator.registerAnimationSystems() handles registration automatically
+   */
   private _startFallbackVisualEffectsLoop() {
-    this.isUsingMasterAnimation = false;
-    this.startVisualEffectsLoop();
+    // No-op: Fallback no longer needed - coordinator registration is guaranteed
+    this.isUsingMasterAnimation = true;
   }
 
   public override updateAnimation(deltaTime: number) {
@@ -416,15 +420,18 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
     }
   }
 
-  private startVisualEffectsLoop() {
-    if (this.visualEffectsAnimationFrame)
-      cancelAnimationFrame(this.visualEffectsAnimationFrame);
-    const animate = (timestamp: number) => {
-      this.updateAnimation(16.67);
-      this.visualEffectsAnimationFrame = requestAnimationFrame(animate);
-    };
-    this.visualEffectsAnimationFrame = requestAnimationFrame(animate);
-  }
+  /**
+   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   *
+   * Benefits:
+   * - Single RAF loop for all systems
+   * - Shared deltaTime calculation
+   * - Priority-based execution order
+   * - Automatic registration via VisualSystemCoordinator
+   *
+   * Old method removed: startVisualEffectsLoop()
+   * Replacement: updateAnimation(deltaTime) called by coordinator
+   */
 
   /**
    * Mapping from HARMONIC_MODES keys to SCSS class names in _sn_advanced_visual_effects.scss
@@ -529,10 +536,8 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
   }
 
   public override destroy() {
-    if (this.visualEffectsAnimationFrame) {
-      cancelAnimationFrame(this.visualEffectsAnimationFrame);
-    }
-    
+    // ✅ RAF LOOP CONSOLIDATION: No need to cancel animation frame - coordinator handles this
+
     // Clean up all pending echo timers
     if (this.year3000System?.timerConsolidationSystem) {
       for (let i = 0; i < this.echoTimerCounter; i++) {

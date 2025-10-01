@@ -344,7 +344,11 @@ patchReactRequire();
       year3000System.setupMusicAnalysisAndColorExtraction();
 
       console.log("🌟 [StarryNight] Full initialization complete");
-      
+
+      // 🌌 Enable Year3000 Stellar Navigation Mode (Dot Matrix Grid Effects)
+      document.body.setAttribute('data-layout', 'navigation');
+      console.log("🌌 [StarryNight] Stellar Navigation Mode activated - grid breathing enabled");
+
       // Initialize UI controllers after Year3000System is fully initialized
       // (these require global CSS controller to be available)
       try {
@@ -488,7 +492,25 @@ patchReactRequire();
     );
   }
 
-  // 3d. 🎨 Initialize Dynamic Catppuccin Bridge (Phase 2.1)
+  // 3d. 💎 Initialize Atmospheric Crystals System (Phase 8.3)
+  try {
+    const { AtmosphericCrystalsSystem } = await import(
+      "./visual/atmospheric/AtmosphericCrystalsSystem"
+    );
+
+    const atmosphericCrystals = new AtmosphericCrystalsSystem();
+    await atmosphericCrystals.initialize();
+    (year3000System as any).atmosphericCrystals = atmosphericCrystals;
+
+    console.log("💎 [StarryNight] Atmospheric Crystals System activated - Year3000 depth rendering");
+  } catch (err) {
+    console.error(
+      "[StarryNight] Failed to initialize AtmosphericCrystalsSystem",
+      err
+    );
+  }
+
+  // 3e. 🎨 Initialize Dynamic Catppuccin Bridge (Phase 2.1)
   try {
     const { DynamicCatppuccinBridge } = await import(
       "./visual/effects/DynamicCatppuccinBridge"
@@ -525,7 +547,7 @@ patchReactRequire();
     );
   }
 
-  // 3e. 🌊 Initialize Dynamic Gradient Strategy System (Phase 2.2 - Consolidated)
+  // 3f. 🌊 Initialize Dynamic Gradient Strategy System (Phase 2.2 - Consolidated)
   try {
     const { DynamicGradientStrategy } = await import(
       "./visual/strategies/DynamicGradientStrategy"

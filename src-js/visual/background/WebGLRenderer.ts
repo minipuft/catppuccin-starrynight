@@ -165,10 +165,10 @@ export class WebGLGradientBackgroundSystem
   };
 
   private isWebGLAvailable = false;
-  private animationId: number | null = null;
+  // ✅ RAF LOOP CONSOLIDATION: Removed animationId (coordinator manages animation)
   private startTime = 0;
   private lastFrameTime = 0;
-  private frameThrottleInterval = 1000 / 45; // 45 FPS target
+  private frameThrottleInterval = 1000 / 60; // ✅ Increased to 60 FPS (coordinator target)
 
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
   private cssVisualEffectsController: OptimizedCSSVariableManager | null =
@@ -340,7 +340,8 @@ export class WebGLGradientBackgroundSystem
       await this.initializeWebGL();
       this.subscribeToEvents();
       this.registerWithVisualEffectsChoreographer();
-      this.startAnimation();
+      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by EnhancedMasterAnimationCoordinator
+      // The coordinator will call updateAnimation(deltaTime) automatically
 
       // WebGL initialised; enable hybrid coordination for dynamic and living feel using coordination
       const webglInitVariables = {
@@ -1473,11 +1474,7 @@ export class WebGLGradientBackgroundSystem
           }
           this.textureUpdatePending = false;
 
-          // Stop animation loop temporarily
-          if (this.animationId) {
-            cancelAnimationFrame(this.animationId);
-            this.animationId = null;
-          }
+          // ✅ RAF LOOP CONSOLIDATION: No need to stop animation - coordinator handles this
         } else {
           // Respect persistence mode - only fallback if not in persistent mode
           if (this.shouldPersistWebGL()) {
@@ -1590,8 +1587,7 @@ export class WebGLGradientBackgroundSystem
             this.adjustQualityForTier("medium");
           }
 
-          // Restart animation
-          this.startAnimation();
+          // ✅ RAF LOOP CONSOLIDATION: No need to restart animation - coordinator handles this
 
           this.pendingContextRestore = false;
 
@@ -2083,29 +2079,19 @@ export class WebGLGradientBackgroundSystem
     );
   }
 
-  private startAnimation(): void {
-    this.startTime = performance.now();
-    this.lastFrameTime = this.startTime;
-    this.animate();
-  }
-
-  private animate = (): void => {
-    if (!this.isActive || !this.gl || !this.canvas) return;
-
-    const currentTime = performance.now();
-    const deltaTime = currentTime - this.lastFrameTime;
-
-    // Throttle to target FPS
-    if (deltaTime < this.frameThrottleInterval) {
-      this.animationId = requestAnimationFrame(this.animate);
-      return;
-    }
-
-    this.lastFrameTime = currentTime;
-    this.render(currentTime);
-
-    this.animationId = requestAnimationFrame(this.animate);
-  };
+  /**
+   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   *
+   * Benefits:
+   * - Single RAF loop for all systems (not 5-8 independent loops)
+   * - Shared deltaTime calculation (eliminates redundant performance.now() calls)
+   * - Coordinated frame budget management
+   * - Priority-based execution order
+   * - Increased from 45 FPS to 60 FPS target (coordinator manages this)
+   *
+   * Old methods removed: startAnimation(), animate()
+   * Replacement: updateAnimation(deltaTime) called by coordinator
+   */
 
   private render(currentTime: number): void {
     if (!this.gl || !this.vao) return;
@@ -2467,11 +2453,7 @@ export class WebGLGradientBackgroundSystem
       }
     }
 
-    // Stop animation
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
-    }
+    // ✅ RAF LOOP CONSOLIDATION: No need to stop animation - coordinator handles this
 
     // Clean up texture update timers
     if (this.textureUpdateDebounceTimer) {
@@ -2593,13 +2575,13 @@ export class WebGLGradientBackgroundSystem
   }
 
   /**
-   * Gracefully stop the animation loop.  Exposed for backplane adapters.
+   * ✅ RAF LOOP CONSOLIDATION: Animation loop managed by coordinator
+   * No need to stop animation - coordinator handles this
+   * Kept for API compatibility with backplane adapters (no-op)
    */
   public stopAnimation(): void {
-    if (this.animationId !== null) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
-    }
+    // No-op: Animation loop managed by EnhancedMasterAnimationCoordinator
+    // System will automatically stop receiving updateAnimation() calls when destroyed
   }
 
   /**

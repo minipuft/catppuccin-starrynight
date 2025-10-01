@@ -865,6 +865,11 @@ export class VisualSystemCoordinator implements IManagedSystem {
       `Visual systems initialized: ${successCount}/${results.length}`
     );
 
+    // ✅ RAF LOOP CONSOLIDATION: Register animation-capable systems with master coordinator
+    if (this.animationCoordinator) {
+      this.registerAnimationSystems();
+    }
+
     // Register quality scaling capable systems with SimplePerformanceCoordinator
     await this.registerQualityScalingSystems();
   }
@@ -935,6 +940,58 @@ export class VisualSystemCoordinator implements IManagedSystem {
         "Failed to register quality scaling systems:",
         error
       );
+    }
+  }
+
+  /**
+   * ✅ RAF LOOP CONSOLIDATION: Register animation-capable systems with master coordinator
+   * Systems with updateAnimation(deltaTime) method are registered to receive frame callbacks
+   */
+  private registerAnimationSystems(): void {
+    if (!this.animationCoordinator) {
+      return;
+    }
+
+    // Define priority mapping for visual systems
+    const systemPriorities: Record<string, 'critical' | 'normal' | 'background'> = {
+      'AnimationEffectsController': 'critical',     // Core breathing/glow effects
+      'WebGLRenderer': 'critical',                  // Hardware-accelerated visuals
+      'DepthLayeredGradientSystem': 'normal',       // Background gradients
+      'GlowEffectsController': 'normal',            // Music-reactive glow
+      'HighEnergyEffectsController': 'normal',      // High-energy bursts
+      'HolographicUISystem': 'normal',              // UI effects
+      'InteractionTracking': 'background',          // User interaction tracking
+      'Year3000FluidMorphing': 'background',        // Decorative morphing
+      'ParticleSystemController': 'background',     // Particle effects
+      'MusicVisualizationController': 'normal'      // Music visualization
+    };
+
+    for (const [key, system] of this.systemCache.entries()) {
+      try {
+        // Check if system has updateAnimation method (IManagedSystem pattern)
+        if (typeof (system as any).updateAnimation === 'function') {
+          const priority = systemPriorities[key] || 'normal';
+          const registered = this.animationCoordinator.registerAnimationSystem(
+            key,
+            system as any,
+            priority,
+            60 // Target 60 FPS
+          );
+
+          if (registered) {
+            Y3KDebug?.debug?.log(
+              'VisualSystemFacade',
+              `Registered ${key} with animation coordinator (priority: ${priority})`
+            );
+          }
+        }
+      } catch (error) {
+        Y3KDebug?.debug?.error(
+          'VisualSystemFacade',
+          `Failed to register ${key} with animation coordinator:`,
+          error
+        );
+      }
     }
   }
 

@@ -11,7 +11,7 @@
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { EmotionalGradientMapper } from "@/audio/EmotionalGradientMapper";
-import { GenreGradientEvolution } from "@/audio/GenreGradientEvolution";
+import { GenreProfileManager } from "@/audio/GenreProfileManager";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
@@ -104,7 +104,7 @@ export class DepthLayeredGradientSystem
   private cssVariableController: OptimizedCSSVariableManager | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
   private emotionalGradientMapper: EmotionalGradientMapper | null = null;
-  private genreGradientEvolution: GenreGradientEvolution | null = null;
+  private genreProfileManager: GenreProfileManager | null = null;
   private containerElement: HTMLElement | null = null;
   private backgroundContainer: HTMLElement | null = null;
   
@@ -116,7 +116,7 @@ export class DepthLayeredGradientSystem
     vocalPresence: 0,
   };
 
-  private animationFrameId: number | null = null;
+  // ✅ RAF LOOP CONSOLIDATION: Removed animationFrameId (coordinator manages animation)
   private lastAnimationTime = 0;
   private scrollY = 0;
   private scrollX = 0;
@@ -287,10 +287,8 @@ export class DepthLayeredGradientSystem
     if (this.emotionalGradientMapper) {
       await this.emotionalGradientMapper.initialize();
     }
-    
-    if (this.genreGradientEvolution) {
-      await this.genreGradientEvolution.initialize();
-    }
+
+    // GenreProfileManager doesn't need initialization (stateless)
   }
 
   /**
@@ -313,13 +311,8 @@ export class DepthLayeredGradientSystem
         this.settingsManager
       );
 
-      // Initialize genre gradient evolution
-      this.genreGradientEvolution = new GenreGradientEvolution(
-        this.cssVariableController,
-        this.musicSyncService,
-        this.emotionalGradientMapper,
-        this.settingsManager
-      );
+      // Initialize genre profile manager for genre detection
+      this.genreProfileManager = new GenreProfileManager();
 
       Y3KDebug?.debug?.log(
         "DepthLayeredGradientSystem",
@@ -332,7 +325,7 @@ export class DepthLayeredGradientSystem
         error
       );
       this.emotionalGradientMapper = null;
-      this.genreGradientEvolution = null;
+      this.genreProfileManager = null;
     }
   }
 
@@ -365,8 +358,8 @@ export class DepthLayeredGradientSystem
     // Register with visual effects coordinator
     this.registerWithVisualEffectsCoordinator();
 
-    // Start animation loop
-    this.startAnimationLoop();
+    // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by EnhancedMasterAnimationCoordinator
+    // The coordinator will call updateAnimation(deltaTime) automatically
 
     Y3KDebug?.debug?.log(
       "DepthLayeredGradientSystem",
@@ -925,14 +918,13 @@ export class DepthLayeredGradientSystem
       const parallaxY = this.scrollY * layer.parallaxFactor;
       const parallaxX = this.scrollX * layer.parallaxFactor * 0.5;
 
-      // Update transform
-      const currentTransform = layer.element.style.transform;
-      const newTransform = currentTransform.replace(
-        /translate3d\([^)]*\)/,
-        `translate3d(${parallaxX}px, ${parallaxY}px, ${-layer.depth}px)`
-      );
-
-      layer.element.style.transform = newTransform;
+      // ✅ PERFORMANCE FIX: Use CSS variables instead of direct transform manipulation
+      // CSS applies transform using these variables, avoiding forced layout recalculation
+      if (this.cssVariableController) {
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-x`, `${parallaxX}px`);
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-y`, `${parallaxY}px`);
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-z`, `${-layer.depth}px`);
+      }
     });
   }
 
@@ -941,14 +933,10 @@ export class DepthLayeredGradientSystem
       const depthFactor = layer.depth / this.depthSettings.maxDepth;
       const scale = 1 + depthFactor * 0.2;
 
-      // Update scale in transform
-      const currentTransform = layer.element.style.transform;
-      const newTransform = currentTransform.replace(
-        /scale\([^)]*\)/,
-        `scale(${scale})`
-      );
-
-      layer.element.style.transform = newTransform;
+      // ✅ PERFORMANCE FIX: Use CSS variables instead of direct transform manipulation
+      if (this.cssVariableController) {
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-scale`, scale.toString());
+      }
     });
   }
 
@@ -961,7 +949,10 @@ export class DepthLayeredGradientSystem
       const newOpacity =
         baseOpacity + energyModulation * (maxOpacity - baseOpacity);
 
-      layer.element.style.opacity = newOpacity.toString();
+      // ✅ PERFORMANCE FIX: Use CSS variables instead of direct opacity manipulation
+      if (this.cssVariableController) {
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-opacity`, newOpacity.toString());
+      }
     });
   }
 
@@ -973,53 +964,35 @@ export class DepthLayeredGradientSystem
       const maxScale = layer.scaleRange[1];
       const pulseScale = baseScale + pulseStrength * (maxScale - baseScale);
 
-      // Temporarily apply pulse scale
-      const currentTransform = layer.element.style.transform;
-      const newTransform = currentTransform.replace(
-        /scale\([^)]*\)/,
-        `scale(${pulseScale})`
-      );
+      // ✅ PERFORMANCE FIX: Use CSS variables for pulse animation
+      // Apply pulse scale via CSS variable
+      if (this.cssVariableController) {
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-pulse-scale`, pulseScale.toString());
 
-      layer.element.style.transform = newTransform;
-
-      // Reset after pulse
-      setTimeout(() => {
-        const resetTransform = layer.element.style.transform.replace(
-          /scale\([^)]*\)/,
-          `scale(${baseScale})`
-        );
-        layer.element.style.transform = resetTransform;
-      }, 200);
+        // Reset after pulse using CSS variable (not direct DOM)
+        setTimeout(() => {
+          if (this.cssVariableController) {
+            this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-pulse-scale`, baseScale.toString());
+          }
+        }, 200);
+      }
     });
   }
 
-  private startAnimationLoop(): void {
-    const animate = () => {
-      if (!this.isActive) return;
-
-      const currentTime = performance.now();
-      const deltaTime = currentTime - this.lastAnimationTime;
-
-      // Throttle to 30 FPS for depth layers
-      if (deltaTime < 33) {
-        this.animationFrameId = requestAnimationFrame(animate);
-        return;
-      }
-
-      this.lastAnimationTime = currentTime;
-
-      // Update depth layer animations
-      this.updateDepthAnimations(deltaTime);
-
-      // Update performance metrics
-      this.updatePerformanceMetrics();
-
-      // Continue animation
-      this.animationFrameId = requestAnimationFrame(animate);
-    };
-
-    this.animationFrameId = requestAnimationFrame(animate);
-  }
+  /**
+   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   *
+   * Benefits:
+   * - Single RAF loop for all systems (not 5-8 independent loops)
+   * - Shared deltaTime calculation (eliminates redundant performance.now() calls)
+   * - Coordinated frame budget management
+   * - Priority-based execution order
+   * - Increased target from 30 FPS to 60 FPS (coordinator manages this)
+   *
+   * Old method removed: startAnimationLoop()
+   * Replacement: updateAnimation(deltaTime) called by coordinator
+   * Note: updateDepthAnimations() still called, now from updateAnimation()
+   */
 
   private updateDepthAnimations(deltaTime: number): void {
     const deltaTimeSeconds = deltaTime / 1000; // Convert to seconds for LERP
@@ -1143,25 +1116,29 @@ export class DepthLayeredGradientSystem
    * Apply the current smoothed properties to the layer element
    */
   private applyLayerProperties(layer: DepthLayer): void {
-    // Apply transform with smooth values
-    layer.element.style.transform =
-      `translate3d(0, ${layer.currentOffsetY}px, ${-layer.depth}px) ` +
-      `scale(${layer.currentScale})`;
+    // ✅ PERFORMANCE FIX: Use CSS variables instead of direct style manipulation
+    // This method is called every frame, so batching via CSS variables is critical
+    if (this.cssVariableController) {
+      // Transform components
+      this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-offset-y`, `${layer.currentOffsetY}px`);
+      this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-depth-z`, `${-layer.depth}px`);
+      this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-scale`, layer.currentScale.toString());
 
-    // Apply opacity
-    layer.element.style.opacity = layer.currentOpacity.toString();
+      // Opacity
+      this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-opacity`, layer.currentOpacity.toString());
 
-    // Apply filter effects
-    layer.element.style.filter =
-      `blur(${layer.currentBlur}px) ` +
-      `hue-rotate(${layer.currentHueRotate}deg)`;
+      // Filter effects
+      this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-blur`, `${layer.currentBlur}px`);
+      this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-hue`, `${layer.currentHueRotate}deg`);
+    }
   }
 
   private updatePerformanceMetrics(): void {
     this.performanceMetrics.totalLayers = this.depthLayers.size;
+    // ✅ PERFORMANCE FIX: Use cached opacity value instead of reading from DOM
     this.performanceMetrics.visibleLayers = Array.from(
       this.depthLayers.values()
-    ).filter((layer) => parseFloat(layer.element.style.opacity) > 0.01).length;
+    ).filter((layer) => layer.currentOpacity > 0.01).length;
 
     this.performanceMetrics.averageDepth =
       Array.from(this.depthLayers.values()).reduce(
@@ -1318,18 +1295,29 @@ export class DepthLayeredGradientSystem
     }
   }
 
+  /**
+   * ✅ RAF LOOP CONSOLIDATION: Now receives deltaTime from coordinator
+   * Calls updateDepthAnimations() which was previously called from internal RAF loop
+   */
   public override updateAnimation(deltaTime: number): void {
-    // Animation is handled by the animation loop
+    if (!this.isActive) return;
+
+    // Update depth layer animations (previously called from RAF loop)
+    this.updateDepthAnimations(deltaTime);
+
+    // Update performance metrics (previously called from RAF loop)
+    this.updatePerformanceMetrics();
+
     // Update visual effects temporal phase
     if (this.depthSettings.musicalVisualEffects.enabled && this.cssVariableController) {
       const currentTime = performance.now();
       const temporalPhase = (currentTime / 10000) % 1; // 10 second cycle
-      
+
       this.cssVariableController.queueCSSVariableUpdate(
         "--sn-gradient-temporal-phase",
         temporalPhase.toString()
       );
-      
+
       // Update visual effects variables periodically
       if (currentTime % 1000 < 16) { // Roughly every second
         this.updateVisualEffectsVariables();
@@ -1382,11 +1370,8 @@ export class DepthLayeredGradientSystem
       }
     }
 
-    // Stop animation loop
-    if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = null;
-    }
+    // ✅ RAF LOOP CONSOLIDATION: No need to stop animation - coordinator handles this
+    // System will automatically stop receiving updateAnimation() calls when destroyed
 
     // Remove event listeners
     if (this.boundScrollHandler) {
@@ -1421,10 +1406,8 @@ export class DepthLayeredGradientSystem
       this.emotionalGradientMapper = null;
     }
 
-    if (this.genreGradientEvolution) {
-      this.genreGradientEvolution.destroy();
-      this.genreGradientEvolution = null;
-    }
+    // GenreProfileManager doesn't need cleanup (stateless)
+    this.genreProfileManager = null;
 
     // Remove background container
     if (this.backgroundContainer && this.backgroundContainer.parentNode) {
@@ -1475,11 +1458,17 @@ export class DepthLayeredGradientSystem
   public setDepthFogIntensity(intensity: number): void {
     this.depthSettings.depthFogIntensity = Math.max(0, Math.min(1, intensity));
 
-    // Update layer opacities
+    // ✅ PERFORMANCE FIX: Use CSS variables for fog opacity updates
     this.depthLayers.forEach((layer) => {
       const depthFactor = layer.depth / this.depthSettings.maxDepth;
       const opacity = 1 - depthFactor * this.depthSettings.depthFogIntensity;
-      layer.element.style.opacity = opacity.toString();
+
+      if (this.cssVariableController) {
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-fog-opacity`, opacity.toString());
+      }
+
+      // Update cached value for performance metrics
+      layer.currentOpacity = opacity;
     });
   }
 
@@ -1540,9 +1529,9 @@ export class DepthLayeredGradientSystem
         this.emotionalGradientMapper?.getCurrentEmotionalProfile() || null,
       gradientState:
         this.emotionalGradientMapper?.getCurrentGradientState() || null,
-      currentGenre: this.genreGradientEvolution?.getCurrentGenre() || null,
-      genreConfidence: this.genreGradientEvolution?.getGenreConfidence() || 0,
-      genreHistory: this.genreGradientEvolution?.getGenreHistory() || [],
+      currentGenre: this.genreProfileManager?.getCurrentGenre() || null,
+      genreConfidence: this.genreProfileManager?.getGenreConfidence() || 0,
+      genreHistory: this.genreProfileManager?.getGenreHistory() || [],
     };
   }
 
@@ -1550,8 +1539,8 @@ export class DepthLayeredGradientSystem
     return this.emotionalGradientMapper;
   }
 
-  public getGenreGradientEvolution(): GenreGradientEvolution | null {
-    return this.genreGradientEvolution;
+  public getGenreProfileManager(): GenreProfileManager | null {
+    return this.genreProfileManager;
   }
 
   // ===================================================================
@@ -1659,18 +1648,23 @@ export class DepthLayeredGradientSystem
         (layer.scaleRange[1] - layer.scaleRange[0]) * field.energyLevel;
       const visualEffectsScale = baseScale * animationScale;
 
-      // Apply transformations
-      layer.element.style.opacity = visualEffectsOpacity.toString();
-      layer.element.style.transform = `
-        scale(${visualEffectsScale})
-        translateZ(${layer.depth * visualEffectsParallax}px)
-        rotateZ(${layer.animationPhase * layer.rotationSpeed}deg)
-      `;
+      // ✅ PERFORMANCE FIX: Use CSS variables for visual effects transformations
+      if (this.cssVariableController) {
+        // Opacity
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-effect-opacity`, visualEffectsOpacity.toString());
 
-      // Update blur based on depth perception
-      const visualEffectsBlur =
-        layer.blurAmount * (1.0 + field.depthPerception * 0.5);
-      layer.element.style.filter = `blur(${visualEffectsBlur}px)`;
+        // Transform components
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-effect-scale`, visualEffectsScale.toString());
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-effect-translate-z`, `${layer.depth * visualEffectsParallax}px`);
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-effect-rotate`, `${layer.animationPhase * layer.rotationSpeed}deg`);
+
+        // Update blur based on depth perception
+        const visualEffectsBlur = layer.blurAmount * (1.0 + field.depthPerception * 0.5);
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-effect-blur`, `${visualEffectsBlur}px`);
+      }
+
+      // Update cached opacity for performance metrics
+      layer.currentOpacity = visualEffectsOpacity;
     }
 
     // Apply visual effects-aware CSS variables for hybrid coordination
@@ -1706,16 +1700,14 @@ export class DepthLayeredGradientSystem
     for (const layer of this.depthLayers.values()) {
       if (!layer.element) continue;
 
-      const currentTransform = layer.element.style.transform;
       const baseScale =
         layer.scaleRange[0] + (layer.scaleRange[1] - layer.scaleRange[0]) * 0.5;
       const animationScale = baseScale * (1.0 + animationModulation);
 
-      // Update only the scale part of the transform
-      layer.element.style.transform = currentTransform.replace(
-        /scale\([^)]+\)/,
-        `scale(${animationScale})`
-      );
+      // ✅ PERFORMANCE FIX: Use CSS variable for animation scale updates
+      if (this.cssVariableController) {
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-anim-scale`, animationScale.toString());
+      }
     }
   }
 
@@ -1731,11 +1723,13 @@ export class DepthLayeredGradientSystem
         (layer.depth / this.depthSettings.maxDepth) *
         this.depthSettings.depthFogIntensity;
       const fogOpacity = Math.max(0, Math.min(0.8, fogIntensity));
+      const fogSpread = 50 * fogIntensity;
 
-      // Apply fog effect as box-shadow
-      layer.element.style.boxShadow = `inset 0 0 ${
-        50 * fogIntensity
-      }px rgba(30, 30, 46, ${fogOpacity})`;
+      // ✅ PERFORMANCE FIX: Use CSS variables for fog effect instead of direct boxShadow
+      if (this.cssVariableController) {
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-fog-spread`, `${fogSpread}px`);
+        this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-fog-opacity`, fogOpacity.toString());
+      }
     }
   }
 
@@ -1753,11 +1747,11 @@ export class DepthLayeredGradientSystem
       layer.depth = depthRatio * this.depthSettings.maxDepth;
 
       if (layer.element) {
-        // Update perspective transform
-        layer.element.style.transform = layer.element.style.transform.replace(
-          /translateZ\([^)]+\)/,
-          `translateZ(${layer.depth * this.depthSettings.parallaxStrength}px)`
-        );
+        // ✅ PERFORMANCE FIX: Use CSS variable for perspective transform update
+        const translateZ = layer.depth * this.depthSettings.parallaxStrength;
+        if (this.cssVariableController) {
+          this.cssVariableController.queueCSSVariableUpdate(`--layer-${layer.depth}-translate-z`, `${translateZ}px`);
+        }
       }
     });
   }
