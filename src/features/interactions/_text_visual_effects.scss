@@ -22,7 +22,7 @@
   // === MUSICAL RESPONSIVENESS (UI-specific) ===
   --music-text-intensity: calc(
     var(--text-shimmer-intensity) +
-    var(--sn-beat-pulse-intensity, 0) * 0.3
+    var(--sn-music-beat-pulse-intensity, 0) * 0.3
   );
   --music-glow-strength: calc(
     var(--text-glow-strength) +
@@ -127,13 +127,13 @@ h3,
 // - CrystallineGlass for prismatic effects
 
 // Simple beat-responsive text glow enhancement
-.Root[style*="--sn-beat-pulse-intensity"] {
+.Root[style*="--sn-music-beat-pulse-intensity"] {
   h1, h2, h3,
   .main-entityHeader-title,
   .main-trackList-trackName,
   .main-cardHeader-text {
     // Text shimmer speed scales with beat intensity
-    animation-duration: calc(var(--text-shimmer-speed) / max(var(--sn-beat-pulse-intensity, 0.3), 0.3));
+    animation-duration: calc(var(--text-shimmer-speed) / max(var(--sn-music-beat-pulse-intensity, 0.3), 0.3));
   }
 }
 
