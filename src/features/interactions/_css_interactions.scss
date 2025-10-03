@@ -15,14 +15,14 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Enhanced interaction during musical activity
-.Root[style*="--sn-beat-pulse-intensity"] {
+.Root[style*="--sn-music-beat-pulse-intensity"] {
   // Boost ripple effects during beat pulses
   :root {
-    --ripple-opacity: calc(0.3 + var(--sn-beat-pulse-intensity, 0) * 0.2);
+    --ripple-opacity: calc(0.3 + var(--sn-music-beat-pulse-intensity, 0) * 0.2);
     --focus-glow-intensity: calc(0.4 + var(--sn-music-energy, 0) * 0.3);
-    --hover-glow-intensity: calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.2);
+    --hover-glow-intensity: calc(0.2 + var(--sn-music-beat-pulse-intensity, 0) * 0.2);
   }
-  
+
   // Speed up interactions during high energy
   button,
   .main-playButton-PlayButton,
@@ -30,7 +30,7 @@
   .main-card-cardContainer,
   .main-trackList-trackListRow {
     --ripple-duration: calc(600ms / max(var(--sn-music-energy, 0.5), 0.5));
-    --hover-transition-speed: calc(200ms / max(var(--sn-beat-pulse-intensity, 0.5), 0.5));
+    --hover-transition-speed: calc(200ms / max(var(--sn-music-beat-pulse-intensity, 0.5), 0.5));
   }
 }
 
