@@ -18,13 +18,13 @@
 :root {
   // === LOCAL MICROINTERACTION VARIABLES ===
   // (Shared variables now in _interaction_mixins.scss)
-  --micro-beat-intensity: var(--sn-beat-pulse-intensity, 0); // Local alias for beat intensity
+  --micro-beat-intensity: var(--sn-music-beat-pulse-intensity, 0); // Local alias for beat intensity
   --micro-breathing-scale: 1; // Scale removed to eliminate bubble effects
 
   // === Cosmic Enhancement Variables (microinteraction-specific) ===
   --micro-glow-radius: calc(8px + (12px * var(--micro-beat-intensity)));
   --micro-scale-enhancement: calc(1 + (var(--micro-beat-intensity) * 0.02));
-  --micro-hue-shift: calc(var(--sn-rhythm-phase, 0) * 1deg);
+  --micro-hue-shift: calc(var(--sn-music-rhythm-phase, 0) * 1deg);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
