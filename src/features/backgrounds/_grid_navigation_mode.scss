@@ -28,7 +28,7 @@
       // Gap oscillates with beat intensity → elegant "breathing"
       gap: calc(
         var(--interface-gap-base) +
-        (var(--interface-gap-range) * var(--sn-beat-pulse-intensity, 0))
+        (var(--interface-gap-range) * var(--sn-music-beat-pulse-intensity, 0))
       );
       transition: gap 400ms var(--sn-easing-explorer, ease-out);
       transform-origin: center;
@@ -39,8 +39,8 @@
     .main-gridContainer-gridContainer .main-card-card {
       // Vertical drift ties to rhythm phase; horizontal ties to intensity
       transform: translate3d(
-          calc(var(--interface-drift-range) * (var(--sn-beat-pulse-intensity, 0) - 0.5)),
-          calc(var(--interface-drift-range) * (var(--sn-rhythm-phase, 0) * 0.002)),
+          calc(var(--interface-drift-range) * (var(--sn-music-beat-pulse-intensity, 0) - 0.5)),
+          calc(var(--interface-drift-range) * (var(--sn-music-rhythm-phase, 0) * 0.002)),
           0
         );
 
