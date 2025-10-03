@@ -6,12 +6,8 @@
 @use "../core/design_tokens" as *;
 @use "../core/interaction_mixins" as *;
 
-/* TODO[PHASE1-SOURCE-OF-TRUTH]:*/
-/* Track-list kinetic behaviour (hover, selected, playing) is defined only here.*/
-/* Down-stream modules (e.g. _sn_atmospheric.scss) should NOT duplicate these*/
-/* `@extend` statements.*/
 
-/* === YEAR 3000: Track List Container Styling ===*/
+/* Track List Container Styling*/
 .main-rootlist-wrapper {
   position: relative;
   background: transparent;

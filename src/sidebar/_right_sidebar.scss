@@ -1,8 +1,9 @@
 @use "../core/_mixins" as *;
+@use "../core/_design_tokens" as *;
 
 @include right-sidebar-root {
   // New artist side bar
-  --spice-main-elevated: rgba(var(--sn-accent-rgb), 0.05);
+  --spice-main-elevated: #{oklab-color('accent', 0.05)};
   .Button-textSubdued-sm-16-buttonTertiary-condensed-useBrowserDefaultFocusStyle {
     color: var(--spice-text) !important;
   }

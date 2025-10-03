@@ -4748,6 +4748,7 @@
             );
             const oklabEnhanced = this.enhanceOKLABColor(oklabOriginal, preset);
             const oklabShadow = this.generateShadowColor(oklabOriginal, preset);
+            const oklabHighlight = this.generateHighlightColor(oklabOriginal, preset);
             const enhancedRgb = this.utils.oklabToRgb(
               oklabEnhanced.L,
               oklabEnhanced.a,
@@ -4757,6 +4758,11 @@
               oklabShadow.L,
               oklabShadow.a,
               oklabShadow.b
+            );
+            const highlightRgb = this.utils.oklabToRgb(
+              oklabHighlight.L,
+              oklabHighlight.a,
+              oklabHighlight.b
             );
             const enhancedHex = this.utils.rgbToHex(
               enhancedRgb.r,
@@ -4768,6 +4774,11 @@
               shadowRgb.g,
               shadowRgb.b
             );
+            const highlightHex = this.utils.rgbToHex(
+              highlightRgb.r,
+              highlightRgb.g,
+              highlightRgb.b
+            );
             const oklchEnhanced = this.convertOklabToOklch(oklabEnhanced);
             const processingTime = performance.now() - startTime;
             const result = {
@@ -4777,9 +4788,12 @@
               enhancedRgb,
               shadowHex,
               shadowRgb,
+              highlightHex,
+              highlightRgb,
               oklabOriginal,
               oklabEnhanced,
               oklabShadow,
+              oklabHighlight,
               oklchEnhanced,
               processingTime
             };
@@ -4788,6 +4802,7 @@
                 input: hexColor,
                 enhanced: enhancedHex,
                 shadow: shadowHex,
+                highlight: highlightHex,
                 preset: preset.name,
                 processingTime: `${processingTime.toFixed(2)}ms`
               });
@@ -4901,6 +4916,27 @@
         }
         /**
          * Generate shadow color by reducing lightness while preserving hue
+         *
+         * Creates a perceptually darker variant of the source color using OKLAB color space
+         * manipulation. The algorithm reduces lightness (L) while maintaining hue relationship
+         * and slightly desaturating to create natural-looking shadows.
+         *
+         * Algorithm:
+         * - Lightness: Multiply by preset.shadowReduction (typically 0.4-0.6), minimum 0.02
+         * - Chroma: Reduce to 80% to prevent over-saturation in dark colors
+         * - Hue: Preserved through proportional a/b adjustment
+         *
+         * Perceptual Properties:
+         * - Shadows appear naturally darker to human vision
+         * - Color harmony maintained with source color
+         * - Prevents pure black (L >= 0.02) for better visual depth
+         *
+         * @param oklab - Source color in OKLAB color space
+         * @param preset - Enhancement preset containing shadowReduction factor
+         * @returns Shadow color in OKLAB space (darker, slightly desaturated)
+         *
+         * @see generateHighlightColor() - Companion method for highlight generation
+         * @see plans/oklab-color-architecture-consolidation.md - Phase 1 implementation
          */
         generateShadowColor(oklab, preset) {
           return {
@@ -4908,6 +4944,42 @@
             a: oklab.a * 0.8,
             // Slightly desaturate shadows
             b: oklab.b * 0.8
+          };
+        }
+        /**
+         * Generate highlight color by increasing lightness while preserving hue
+         *
+         * Creates a perceptually brighter variant of the source color using OKLAB color space
+         * manipulation. The algorithm increases lightness (L) inversely proportional to shadow
+         * reduction, maintaining perceptual symmetry between shadow and highlight.
+         *
+         * Algorithm:
+         * - Lightness: Multiply by (2.0 - shadowReduction), capped at 1.0
+         * - Chroma: Reduce to 90% to prevent over-saturation in bright colors
+         * - Hue: Preserved through proportional a/b adjustment
+         *
+         * Perceptual Properties:
+         * - Highlights appear naturally brighter to human vision
+         * - Symmetric perceptual spacing with shadow colors
+         * - Prevents pure white (L <= 1.0) for better visual depth
+         *
+         * Mathematical Relationship:
+         * - If shadowReduction = 0.5, shadow multiplier = 0.5, highlight multiplier = 1.5
+         * - Creates perceptually balanced light-dark pairs
+         *
+         * @param oklab - Source color in OKLAB color space
+         * @param preset - Enhancement preset containing shadowReduction factor (used inversely)
+         * @returns Highlight color in OKLAB space (brighter, slightly desaturated)
+         *
+         * @see generateShadowColor() - Companion method for shadow generation
+         * @see plans/oklab-color-architecture-consolidation.md - Phase 1 implementation
+         */
+        generateHighlightColor(oklab, preset) {
+          const highlightBoost = 2 - preset.shadowReduction;
+          return {
+            L: Math.min(1, oklab.L * highlightBoost),
+            a: oklab.a * 0.9,
+            b: oklab.b * 0.9
           };
         }
         /**
@@ -4936,9 +5008,12 @@
             enhancedRgb: fallbackRgb,
             shadowHex: "#000000",
             shadowRgb: { r: 0, g: 0, b: 0 },
+            highlightHex: "#FFFFFF",
+            highlightRgb: { r: 255, g: 255, b: 255 },
             oklabOriginal: fallbackOklab,
             oklabEnhanced: fallbackOklab,
             oklabShadow: { L: 0.05, a: 0, b: 0 },
+            oklabHighlight: { L: 0.95, a: 0, b: 0 },
             oklchEnhanced: this.convertOklabToOklch(fallbackOklab),
             processingTime: 0
           };
@@ -11737,7 +11812,6 @@
                 enhancedOklab.a,
                 enhancedOklab.b
               );
-              cssVars["--sn-color-oklab-bright-highlight-rgb"] = `${enhancedRgb.r},${enhancedRgb.g},${enhancedRgb.b}`;
               cssVars["--sn-color-oklab-primary-r"] = Math.round(
                 enhancedRgb.r
               ).toString();
@@ -11783,8 +11857,21 @@
                 shadowOklab.a,
                 shadowOklab.b
               );
-              cssVars["--sn-color-oklab-dynamic-shadow-rgb"] = `${shadowRgb.r},${shadowRgb.g},${shadowRgb.b}`;
               cssVars["--sn-color-oklab-base-luminance"] = shadowOklab.L.toFixed(3);
+            }
+            const shadowHex = processedColors["SHADOW"];
+            const highlightHex = processedColors["HIGHLIGHT"];
+            if (shadowHex) {
+              const shadowRgb = this.utils.hexToRgb(shadowHex);
+              if (shadowRgb) {
+                cssVars["--sn-oklab-shadow-rgb"] = `${shadowRgb.r},${shadowRgb.g},${shadowRgb.b}`;
+              }
+            }
+            if (highlightHex) {
+              const highlightRgb = this.utils.hexToRgb(highlightHex);
+              if (highlightRgb) {
+                cssVars["--sn-oklab-highlight-rgb"] = `${highlightRgb.r},${highlightRgb.g},${highlightRgb.b}`;
+              }
             }
             if (this.config.enableDebug) {
               console.log(
@@ -11807,15 +11894,6 @@
                 "\u{1F52C} [ColorHarmonyEngine] OKLAB processing failed, using fallbacks:",
                 error
               );
-            }
-            const fallbackRgb = this.utils.hexToRgb(result.accentHex);
-            if (fallbackRgb) {
-              cssVars["--sn-color-oklab-bright-highlight-rgb"] = `${fallbackRgb.r},${fallbackRgb.g},${fallbackRgb.b}`;
-              cssVars["--sn-color-oklab-dynamic-shadow-rgb"] = `${Math.round(
-                fallbackRgb.r * 0.3
-              )},${Math.round(fallbackRgb.g * 0.3)},${Math.round(
-                fallbackRgb.b * 0.3
-              )}`;
             }
           }
         }
@@ -12494,7 +12572,7 @@
             enhanced["--sn-main-feed-secondary-color"] = secondaryHex;
             enhanced["--sn-main-feed-secondary-rgb"] = secondaryRgb;
           }
-          const oklabBrightHighlight = enhanced["--sn-color-oklab-bright-highlight-rgb"];
+          const oklabBrightHighlight = enhanced["--sn-oklab-highlight-rgb"];
           if (oklabBrightHighlight) {
             enhanced["--sn-audioAnalysis-bright-accent-rgb"] = oklabBrightHighlight;
             enhanced["--sn-layered-accent-rgb"] = oklabBrightHighlight;
@@ -12502,7 +12580,7 @@
             enhanced["--sn-holographic-accent-rgb"] = oklabBrightHighlight;
             enhanced["--smooth-holographic-rgb"] = oklabBrightHighlight;
           }
-          const oklabDynamicShadow = enhanced["--sn-color-oklab-dynamic-shadow-rgb"];
+          const oklabDynamicShadow = enhanced["--sn-oklab-shadow-rgb"];
           if (oklabDynamicShadow) {
             enhanced["--sn-audioAnalysis-shadow-rgb"] = oklabDynamicShadow;
             enhanced["--sn-depth-shadow-rgb"] = oklabDynamicShadow;
@@ -12842,24 +12920,15 @@
          */
         getInheritedGradientColors(computedStyle) {
           try {
-            const primaryRgb = this.parseRGBVariable(
-              computedStyle,
-              "--sn-oklab-processed-primary-rgb"
-            ) || this.parseRGBVariable(computedStyle, "--sn-bg-gradient-primary-rgb") || this.parseRGBVariable(
+            const primaryRgb = this.parseRGBVariable(computedStyle, "--sn-bg-gradient-primary-rgb") || this.parseRGBVariable(
               computedStyle,
               "--sn-musical-harmony-primary-rgb"
             );
-            const secondaryRgb = this.parseRGBVariable(
-              computedStyle,
-              "--sn-oklab-processed-secondary-rgb"
-            ) || this.parseRGBVariable(computedStyle, "--sn-bg-gradient-secondary-rgb") || this.parseRGBVariable(
+            const secondaryRgb = this.parseRGBVariable(computedStyle, "--sn-bg-gradient-secondary-rgb") || this.parseRGBVariable(
               computedStyle,
               "--sn-musical-harmony-secondary-rgb"
             );
-            const accentRgb = this.parseRGBVariable(
-              computedStyle,
-              "--sn-oklab-processed-accent-rgb"
-            ) || this.parseRGBVariable(computedStyle, "--sn-bg-gradient-accent-rgb") || this.parseRGBVariable(computedStyle, "--sn-color-accent-rgb");
+            const accentRgb = this.parseRGBVariable(computedStyle, "--sn-bg-gradient-accent-rgb") || this.parseRGBVariable(computedStyle, "--sn-color-accent-rgb");
             const emotionalRgb = this.parseRGBVariable(
               computedStyle,
               "--sn-oklab-emotional-temperature-rgb"
@@ -12867,10 +12936,7 @@
               computedStyle,
               "--sn-emotional-temperature-warm-rgb"
             ) || accentRgb;
-            const tertiaryRgb = this.parseRGBVariable(
-              computedStyle,
-              "--sn-oklab-processed-bright-highlight-rgb"
-            ) || this.parseRGBVariable(computedStyle, "--sn-audioAnalysis-flow-rgb") || this.parseRGBVariable(
+            const tertiaryRgb = this.parseRGBVariable(computedStyle, "--sn-oklab-highlight-rgb") || this.parseRGBVariable(computedStyle, "--sn-audioAnalysis-flow-rgb") || this.parseRGBVariable(
               computedStyle,
               "--sn-musical-harmony-tertiary-rgb"
             );
@@ -13760,6 +13826,33 @@
                     error
                   );
                 }
+              }
+            }
+            const primaryColorForDerivation = processedColors.PRIMARY || processedColors.VIBRANT || processedColors.PROMINENT;
+            if (primaryColorForDerivation && this.isValidHex(primaryColorForDerivation)) {
+              try {
+                const shadowHighlightResult = this.oklabProcessor.processColor(
+                  primaryColorForDerivation,
+                  genreAdjustedPreset
+                );
+                processedColors.SHADOW = shadowHighlightResult.shadowHex;
+                processedColors.HIGHLIGHT = shadowHighlightResult.highlightHex;
+                if (this.config?.enableDebug) {
+                  console.log(
+                    "\u{1F317} [ColorHarmonyEngine] Derived shadow/highlight colors:",
+                    {
+                      primary: primaryColorForDerivation,
+                      shadow: shadowHighlightResult.shadowHex,
+                      highlight: shadowHighlightResult.highlightHex,
+                      preset: genreAdjustedPreset.name
+                    }
+                  );
+                }
+              } catch (error) {
+                console.warn(
+                  "[ColorHarmonyEngine] Shadow/highlight derivation failed:",
+                  error
+                );
               }
             }
             if (emotionalTemperature?.perceptualColorHex && processedColors.PRIMARY) {

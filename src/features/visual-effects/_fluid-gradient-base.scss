@@ -226,14 +226,14 @@
 // 🎵 MUSIC-RESPONSIVE FLUID EFFECTS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-.Root[style*="--sn-beat-pulse-intensity"] {
+.Root[style*="--sn-music-beat-pulse-intensity"] {
   .liquid-oil-slick,
   .liquid-surface-tension,
   .liquid-interference-pattern,
   .liquid-chromatic-aberration {
     // Music energy modulates fluid intensity
-    --sn-unified-music-energy: var(--sn-beat-pulse-intensity, 0.5);
-    --sn-ui-glass-pulse-enabled: calc(0.5 + var(--sn-beat-pulse-intensity, 0) * 0.4);
+    --sn-unified-music-energy: var(--sn-music-beat-pulse-intensity, 0.5);
+    --sn-ui-glass-pulse-enabled: calc(0.5 + var(--sn-music-beat-pulse-intensity, 0) * 0.4);
   }
 }
 

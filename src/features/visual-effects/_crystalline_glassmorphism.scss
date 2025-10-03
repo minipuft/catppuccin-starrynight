@@ -252,13 +252,13 @@ input[type="search"],
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Beat-synchronized crystalline pulsing (TypeScript controlled)
-.Root[style*="--sn-beat-pulse-intensity"] {
+.Root[style*="--sn-music-beat-pulse-intensity"] {
   .main-card-card,
   .main-trackList-trackListRow,
   .main-playButton-PlayButton {
     // Music energy directly modulates intensity
-    --sn-unified-music-energy: var(--sn-beat-pulse-intensity, 0.5);
-    --sn-music-intensity-boost: calc(1 + var(--sn-beat-pulse-intensity, 0.5));
+    --sn-unified-music-energy: var(--sn-music-beat-pulse-intensity, 0.5);
+    --sn-music-intensity-boost: calc(1 + var(--sn-music-beat-pulse-intensity, 0.5));
   }
 }
 

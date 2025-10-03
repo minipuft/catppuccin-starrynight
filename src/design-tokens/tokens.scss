@@ -122,6 +122,13 @@
   --sn-music-feed-bloom-intensity: 0;
   --sn-music-energy-modulation: 1.0;
 
+  // Kinetic Music Analysis (AdvancedThemeSystem integration)
+  --sn-kinetic-energy: 0;              // Processed energy level (0-1)
+  --sn-kinetic-valence: 0.5;           // Valence/mood (0-1)
+  --sn-kinetic-bpm: 120;               // Enhanced BPM
+  --sn-kinetic-beat-interval: 500ms;   // Beat interval duration
+  --sn-kinetic-animation-speed: 1.0;   // Animation speed multiplier
+
   // Musical Animation Coordination (Animation System Integration)
   --sn-anim-musical-beat-duration: calc(60s / var(--sn-music-tempo-bpm, 120)); // Beat-based animation duration
   --sn-anim-musical-measure-duration: calc(var(--sn-anim-musical-beat-duration) * 4); // Measure duration (4 beats)
@@ -145,11 +152,13 @@
   // Animation System (--sn-anim-*)
   // -------------------------------------------------------------------------
   
-  // Standard Animation Durations
-  --sn-anim-duration-fast: 0.2s; // Fast animations
-  --sn-anim-duration-normal: 0.4s; // Normal animations
-  --sn-anim-duration-slow: 0.8s; // Slow animations
-  --sn-anim-duration-animation: 4s; // Extended animation duration
+  // ⚠️ CONSOLIDATED: Animation durations now reference transition-duration tokens
+  // These provide backward compatibility while unifying duration system
+  --sn-anim-duration-fast: var(--sn-transition-fast-duration); // 150ms - Fast animations
+  --sn-anim-duration-normal: var(--sn-transition-standard-duration); // 300ms - Normal animations
+  --sn-anim-duration-slow: var(--sn-transition-slow-duration); // 500ms - Slow animations
+  --sn-anim-duration-extended: var(--sn-anim-transition-cosmic); // 1200ms - Extended animation duration
+  --sn-anim-duration-animation: 4s; // Legacy: Decorative animation duration (consider migrating)
 
   // Frame Budget & Performance Targeting
   --sn-anim-frame-budget: 16.67ms; // Target frame budget for 60fps (1000ms / 60)
@@ -180,11 +189,13 @@
   --sn-anim-easing-custom-2: cubic-bezier(0.34, 1.56, 0.64, 1);
   --sn-anim-easing-custom-3: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-  // Transition Durations (split for JavaScript lerp-update via Year3000Utilities)
-  --sn-transition-fast-duration: 150ms;
-  --sn-transition-standard-duration: 300ms;
-  --sn-transition-slow-duration: 500ms;
-  --sn-anim-transition-cosmic: 1200ms;
+  // === PRIMARY DURATION TOKENS (Source of Truth) ===
+  // All animation/transition durations should reference these
+  --sn-transition-fast-duration: 150ms; // Fast UI transitions
+  --sn-transition-standard-duration: 300ms; // Standard UI transitions
+  --sn-transition-slow-duration: 500ms; // Slow, deliberate transitions
+  --sn-transition-extended-duration: 800ms; // Extended transitions
+  --sn-anim-transition-cosmic: 1200ms; // Cosmic/atmospheric effects
 
   // Legacy transition names (backward compatibility)
   --sn-anim-transition-fast: var(--sn-transition-fast-duration);
@@ -264,6 +275,14 @@
   --sn-ui-nav-magnetic-pull: 1.0;
   --sn-ui-nav-neural-primary-rgb: 139, 233, 253;
   --sn-ui-nav-neural-secondary-rgb: 250, 179, 135;
+
+  // Echo Effects (SidebarVisualEffectsSystem integration)
+  --sn-echo-radius-multiplier: 1.0;    // Echo radius scale
+  --sn-echo-hue-shift: 0deg;           // Echo color hue shift
+  --sn-echo-offset-x: 0px;             // Echo horizontal offset
+  --sn-echo-offset-y: 0px;             // Echo vertical offset
+  --sn-echo-skew: 0deg;                // Echo skew transformation
+  --sn-echo-rotate: 0deg;              // Echo rotation angle
   
   // Sidebar Visual Effects
   --sn-ui-sidebar-visual-effects-opacity: 0.8;
@@ -373,21 +392,21 @@
   --sn-color-harmony-triadic-rgb: var(--sn-cosmic-surface-rgb);
   --sn-color-harmony-blend-intensity: 0.8;
   
-  // === OKLAB PROCESSED COLORS ===
-  --sn-color-oklab-bright-highlight-rgb: var(--sn-cosmic-accent-rgb);
-  --sn-color-oklab-dynamic-shadow-rgb: var(--sn-cosmic-base-rgb);
-  
-  // OKLAB processed individual RGB components (updated by ColorHarmonyEngine)
-  --sn-color-oklab-primary-r: 124;     // R component of processed primary
-  --sn-color-oklab-primary-g: 58;      // G component of processed primary  
-  --sn-color-oklab-primary-b: 237;     // B component of processed primary
-  --sn-color-oklab-accent-r: 124;      // R component of processed accent
-  --sn-color-oklab-accent-g: 58;       // G component of processed accent
-  --sn-color-oklab-accent-b: 237;      // B component of processed accent
-  
-  // OKLAB processed luminance values
-  --sn-color-oklab-base-luminance: 0.08;      // Base luminance (cosmic base)
-  --sn-color-oklab-accent-luminance: 0.45;    // Accent luminance (cosmic accent)
+  // === BASE OKLAB COLORS (Source of Truth) ===
+  // ⚠️ CONSOLIDATED Phase 4.2: Unified OKLAB namespace
+  // Updated by ColorHarmonyEngine - perceptually uniform color processing
+  --sn-oklab-primary-rgb: var(--sn-cosmic-accent-rgb);        // Primary OKLAB processed color
+  --sn-oklab-accent-rgb: var(--sn-cosmic-accent-rgb);         // Accent OKLAB processed color
+  --sn-oklab-highlight-rgb: var(--sn-cosmic-accent-rgb);      // Highlight OKLAB processed color
+  --sn-oklab-shadow-rgb: var(--sn-cosmic-base-rgb);           // Shadow OKLAB processed color
+  --sn-oklab-base-luminance: 0.08;                            // Base luminance (0-1)
+  --sn-oklab-accent-luminance: 0.45;                          // Accent luminance (0-1)
+
+  // Legacy aliases for backward compatibility (Phase 4.2)
+  --sn-color-oklab-bright-highlight-rgb: var(--sn-oklab-highlight-rgb);
+  --sn-color-oklab-dynamic-shadow-rgb: var(--sn-oklab-shadow-rgb);
+  --sn-color-oklab-base-luminance: var(--sn-oklab-base-luminance);
+  --sn-color-oklab-accent-luminance: var(--sn-oklab-accent-luminance);
   
   // === OKLCH COLOR SYSTEM ===
   // OKLCH (OKLab LCH) - Lightness, Chroma, Hue representation
@@ -407,11 +426,12 @@
   --sn-musical-oklab-intensity: 0.5;         // Musical influence intensity (0-1)
   
   // Musical OKLAB processed colors (updated in real-time)
-  --sn-musical-oklab-primary-rgb: var(--sn-cosmic-accent-rgb);
+  // Phase 5: Consolidated to delegate to base OKLAB tokens
+  --sn-musical-oklab-primary-rgb: var(--sn-oklab-primary-rgb);
   --sn-musical-oklab-secondary-rgb: var(--sn-cosmic-secondary-rgb);
-  --sn-musical-oklab-accent-rgb: var(--sn-cosmic-accent-rgb);
-  --sn-musical-oklab-highlight-rgb: var(--sn-cosmic-accent-rgb);
-  --sn-musical-oklab-shadow-rgb: var(--sn-cosmic-base-rgb);
+  --sn-musical-oklab-accent-rgb: var(--sn-oklab-accent-rgb);
+  --sn-musical-oklab-highlight-rgb: var(--sn-oklab-highlight-rgb);
+  --sn-musical-oklab-shadow-rgb: var(--sn-oklab-shadow-rgb);
   
   // === EMOTIONAL TEMPERATURE OKLAB VARIABLES ===
   // OKLAB-enhanced emotional color temperatures (perceptually uniform)
@@ -562,6 +582,15 @@
   --sn-genre-default-oklab-hue-shift: 5;
   --sn-genre-default-oklab-primary-rgb: var(--sn-cosmic-accent-rgb);
   --sn-genre-default-oklab-accent-rgb: var(--sn-cosmic-accent-rgb);
+
+  // === GENRE UI BRIDGE INTEGRATION ===
+  // CSS variables for genre-aware UI styling (GenreUIBridge integration)
+  --genre-primary-hue-min: 0;          // Primary hue range minimum
+  --genre-primary-hue-max: 360;        // Primary hue range maximum
+  --genre-saturation-base: 1.0;        // Base saturation level
+  --genre-saturation-variation: 0.2;   // Saturation variation amount
+  --genre-brightness-base: 1.0;        // Base brightness level
+  --genre-brightness-variation: 0.1;   // Brightness variation amount
   
   // === TEMPORAL COLOR SYSTEM ===
   --sn-color-temporal-past-rgb: var(--sn-cosmic-secondary-rgb);
@@ -750,108 +779,476 @@
 // =============================================================================
 // LEGACY COMPATIBILITY ALIASES
 // =============================================================================
+// Phase 3 Audit completed: 2025-10-03
+// Total aliases: ~70 | Active usage: ~210 occurrences | Zero usage: ~50 aliases (71%)
+//
+// DEPRECATION POLICY:
+// - All aliases will be removed in v4.0.0 (Phase 6)
+// - SCSS migration (Phase 4) required before removal
+// - See docs/LEGACY_TOKEN_MIGRATION.md for migration guide
+//
+// RISK CATEGORIZATION:
+// 🔴 UNSAFE: High usage (100+ occurrences) - Requires Phase 4 migration
+// 🟡 RISKY: Medium usage (10-50 occurrences) - Phase 4 migration recommended
+// ✅ SAFE: Zero usage - Can be removed in Phase 6 without migration
+// =============================================================================
 
 :root {
-  // Maintain backward compatibility during migration
-  // These will be deprecated in v3-0
-  
-  // Critical real-time variables (Phase 1 migration)
+  // ---------------------------------------------------------------------------
+  // MUSIC SYSTEM ALIASES
+  // Phase 1 migration complete | Status: Zero SCSS usage
+  // ---------------------------------------------------------------------------
+
+  /* @deprecated Phase 3 - Use --sn-music-beat-pulse-intensity instead
+     Usage: 0 files (TypeScript-only variable)
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --sn-beat-pulse-intensity: var(--sn-music-beat-pulse-intensity);
+
+  /* @deprecated Phase 3 - Use --sn-music-rhythm-phase instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --sn-rhythm-phase: var(--sn-music-rhythm-phase);
+
+  /* @deprecated Phase 3 - Use --sn-music-breathing-scale instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --sn-breathing-scale: var(--sn-music-breathing-scale);
+
+  // ---------------------------------------------------------------------------
+  // COLOR SYSTEM ALIASES
+  // Active usage detected | Requires Phase 4 migration
+  // ---------------------------------------------------------------------------
+
+  /* @deprecated Phase 3 - Use --sn-color-accent-hex instead
+     Usage: 1 file
+     Risk: 🟡 RISKY
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
   --sn-accent-hex: var(--sn-color-accent-hex);
+
+  /* @deprecated Phase 3 - Use --sn-color-accent-rgb instead
+     Usage: 12 occurrences across multiple files
+     Risk: 🟡 RISKY
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
   --sn-accent-rgb: var(--sn-color-accent-rgb);
   
-  // Legacy dynamic color aliases
+  /* @deprecated Phase 3 - Use --sn-dynamic-accent-hex instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --sn-dynamic-accent: var(--sn-dynamic-accent-hex);
+
+  /* @deprecated Phase 3 - Use --sn-cosmic-accent-hex instead
+     Usage: 34 occurrences (internal delegation only in tokens.scss)
+     Risk: ✅ SAFE (no external SCSS usage)
+     Removal: Phase 6 (v4.0.0) */
   --sn-cosmic-accent: var(--sn-cosmic-accent-hex);
+
+  /* @deprecated Phase 3 - Use --sn-cosmic-base-hex instead
+     Usage: Internal delegation only in tokens.scss
+     Risk: ✅ SAFE (no external SCSS usage)
+     Removal: Phase 6 (v4.0.0) */
   --sn-cosmic-base: var(--sn-cosmic-base-hex);
-  
-  // OKLAB processed color aliases (Phase 4 migration)
-  --sn-oklab-processed-bright-highlight-rgb: var(--sn-color-oklab-bright-highlight-rgb);
-  --sn-oklab-processed-dynamic-shadow-rgb: var(--sn-color-oklab-dynamic-shadow-rgb);
-  
-  // OKLAB individual RGB component aliases
-  --sn-oklab-processed-primary-rgb-r: var(--sn-color-oklab-primary-r);
-  --sn-oklab-processed-primary-rgb-g: var(--sn-color-oklab-primary-g);
-  --sn-oklab-processed-primary-rgb-b: var(--sn-color-oklab-primary-b);
-  --sn-oklab-processed-accent-rgb-r: var(--sn-color-oklab-accent-r);
-  --sn-oklab-processed-accent-rgb-g: var(--sn-color-oklab-accent-g);
-  --sn-oklab-processed-accent-rgb-b: var(--sn-color-oklab-accent-b);
-  
-  // OKLAB luminance aliases
-  --sn-oklab-processed-dynamic-base-luminance: var(--sn-color-oklab-base-luminance);
-  
-  // Background system (Phase 2 migration)
+
+  // ---------------------------------------------------------------------------
+  // OKLAB PROCESSED ALIASES
+  // Phase 5 consolidated to base OKLAB | Low usage
+  // ---------------------------------------------------------------------------
+
+  /* @deprecated Phase 3 - Use --sn-oklab-primary-rgb instead
+     Usage: 3 occurrences in 2 files
+     Risk: ✅ SAFE (Phase 5 consolidated)
+     Removal: Phase 6 (v4.0.0) */
+  --sn-oklab-processed-primary-rgb: var(--sn-oklab-primary-rgb);
+
+  /* @deprecated Phase 3 - Use --sn-oklab-accent-rgb instead
+     Usage: 3 occurrences in 2 files
+     Risk: ✅ SAFE (Phase 5 consolidated)
+     Removal: Phase 6 (v4.0.0) */
+  --sn-oklab-processed-accent-rgb: var(--sn-oklab-accent-rgb);
+
+  /* @deprecated Phase 3 - Use --sn-oklab-base-luminance instead
+     Usage: 3 occurrences in 2 files
+     Risk: ✅ SAFE (Phase 5 consolidated)
+     Removal: Phase 6 (v4.0.0) */
+  --sn-oklab-processed-dynamic-base-luminance: var(--sn-oklab-base-luminance);
+
+  // Note: --sn-oklab-processed-bright-highlight-rgb and --sn-oklab-processed-dynamic-shadow-rgb
+  // were already removed - all usages migrated to oklab-color() helper or canonical variable names
+
+  // ---------------------------------------------------------------------------
+  // BACKGROUND GRADIENT SYSTEM ALIASES
+  // Phase 2 migration | CRITICAL USAGE: 152 occurrences across 13 files
+  // ---------------------------------------------------------------------------
+
+  /* @deprecated Phase 3 - Use --sn-bg-gradient-primary-rgb instead
+     Usage: 48 occurrences across 13 files
+     Risk: 🔴 UNSAFE - CRITICAL USAGE
+     Migration: Phase 4 REQUIRED (incremental file-by-file)
+     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
   --sn-gradient-primary-rgb: var(--sn-bg-gradient-primary-rgb);
+
+  /* @deprecated Phase 3 - Use --sn-bg-gradient-secondary-rgb instead
+     Usage: 27 occurrences across 13 files
+     Risk: 🔴 UNSAFE - CRITICAL USAGE
+     Migration: Phase 4 REQUIRED
+     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
   --sn-gradient-secondary-rgb: var(--sn-bg-gradient-secondary-rgb);
+
+  /* @deprecated Phase 3 - Use --sn-bg-gradient-accent-rgb instead
+     Usage: 48 occurrences across 13 files
+     Risk: 🔴 UNSAFE - CRITICAL USAGE
+     Migration: Phase 4 REQUIRED
+     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
   --sn-gradient-accent-rgb: var(--sn-bg-gradient-accent-rgb);
+
+  /* @deprecated Phase 3 - Use --sn-bg-gradient-flow-x instead
+     Usage: Multiple files
+     Risk: 🔴 UNSAFE
+     Migration: Phase 4 REQUIRED
+     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
   --sn-gradient-flow-x: var(--sn-bg-gradient-flow-x);
+
+  /* @deprecated Phase 3 - Use --sn-bg-gradient-flow-y instead
+     Usage: Multiple files
+     Risk: 🔴 UNSAFE
+     Migration: Phase 4 REQUIRED
+     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
   --sn-gradient-flow-y: var(--sn-bg-gradient-flow-y);
+
+  /* @deprecated Phase 3 - Use --sn-bg-webgl-ready instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --sn-webgl-ready: var(--sn-bg-webgl-ready);
   
-  // UI Components (Phase 3 migration)
-  --sn-text-glow-intensity: var(--sn-text-glow-intensity);
+  // ---------------------------------------------------------------------------
+  // UI COMPONENT ALIASES
+  // Phase 3 migration | Mixed usage
+  // ---------------------------------------------------------------------------
+
+  /* @deprecated Phase 3 - Use --sn-text-glow-intensity instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
+  --text-glow-intensity: var(--sn-text-glow-intensity);
+
+  /* @deprecated Phase 3 - Use --sn-ui-glass-beat-opacity instead
+     Usage: 8 occurrences in 1 file (_beat_sync_glassmorphism.scss)
+     Risk: ✅ SAFE (single file migration)
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
   --sn-glass-beat-opacity: var(--sn-ui-glass-beat-opacity);
+
+  /* @deprecated Phase 3 - Use --sn-ui-card-energy-level instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --card-energy-level: var(--sn-ui-card-energy-level);
   
-  // Visual Effects Field System (Phase 4 migration)
+  // ---------------------------------------------------------------------------
+  // VISUAL EFFECTS FIELD SYSTEM ALIASES
+  // Phase 4 migration | Zero usage - Safe for removal
+  // ---------------------------------------------------------------------------
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-field instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-depth-field: var(--sn-visual-effects-depth-field);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-approach instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-approach-distance: var(--sn-visual-effects-depth-approach);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-recede instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-recede-distance: var(--sn-visual-effects-depth-recede);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-neutral instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-neutral-position: var(--sn-visual-effects-depth-neutral);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-magnetic-hover-pull instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-hover-pull: var(--sn-visual-effects-magnetic-hover-pull);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-magnetic-focus-pull instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-focus-pull: var(--sn-visual-effects-magnetic-focus-pull);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-magnetic-interest-pull instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-interest-pull: var(--sn-visual-effects-magnetic-interest-pull);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-magnetic-transition-speed instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-transition-speed: var(--sn-visual-effects-magnetic-transition-speed);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-field-intensity instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-field-intensity: var(--sn-visual-effects-field-intensity);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-animation-rate instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-animation-rate: var(--sn-visual-effects-animation-rate);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-response-sensitivity instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-response-sensitivity: var(--sn-visual-effects-response-sensitivity);
   
-  // Enhanced Visual Effects Aliases (Year 3000 System)
-  // Keep only aliases for advanced visual rendering concepts
+  // ---------------------------------------------------------------------------
+  // ENHANCED VISUAL EFFECTS ALIASES (Year 3000 System)
+  // Zero usage - Safe for removal
+  // ---------------------------------------------------------------------------
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-membrane-elasticity instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-membrane-elasticity: var(--sn-visual-effects-membrane-elasticity);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-animation-scale instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-animation-scale: var(--sn-visual-effects-animation-scale);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-flow-rate instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-flow-rate: var(--sn-visual-effects-flow-rate);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-subdivision-frequency instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-subdivision-frequency: var(--sn-visual-effects-subdivision-frequency);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-flow-viscosity instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-flow-viscosity: var(--sn-visual-effects-flow-viscosity);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-surface-tension instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-surface-tension: var(--sn-visual-effects-surface-tension);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-permeability instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-permeability: var(--sn-visual-effects-permeability);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-advanced-mode instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-advanced-mode: var(--sn-visual-effects-advanced-mode);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-subdivision-mode instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-subdivision-mode: var(--sn-visual-effects-subdivision-mode);
-  
-  // Depth Priority System
+
+  // ---------------------------------------------------------------------------
+  // DEPTH PRIORITY SYSTEM ALIASES
+  // Zero usage - Safe for removal
+  // ---------------------------------------------------------------------------
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-priority-high instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --depth-priority-high: var(--sn-visual-effects-depth-priority-high);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-priority-medium instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --depth-priority-medium: var(--sn-visual-effects-depth-priority-medium);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-priority-low instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --depth-priority-low: var(--sn-visual-effects-depth-priority-low);
+
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-priority-receded instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --depth-priority-receded: var(--sn-visual-effects-depth-priority-receded);
-  
-  // Glyph System (Phase 4 migration)
-  --sn-glyph-intensity: var(--sn-glyph-intensity);
-  --sn-glyph-glow: var(--sn-glyph-glow);
-  --sn-glyph-base-size: var(--sn-glyph-base-size);
-  --sn-glyph-color-rgb: var(--sn-glyph-color-rgb);
-  --sn-glyph-rotation: var(--sn-glyph-rotation);
-  
-  // Serendipity System
+
+  // ---------------------------------------------------------------------------
+  // GLYPH SYSTEM ALIASES
+  // Zero usage | Pass-through aliases for potential future glyph system
+  // ---------------------------------------------------------------------------
+
+  /* @deprecated Phase 3 - Use --sn-glyph-intensity instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Note: Pass-through alias for future glyph system
+     Removal: Phase 6 (v4.0.0) */
+  --glyph-intensity: var(--sn-glyph-intensity);
+
+  /* @deprecated Phase 3 - Use --sn-glyph-glow instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
+  --glyph-glow: var(--sn-glyph-glow);
+
+  /* @deprecated Phase 3 - Use --sn-glyph-base-size instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
+  --glyph-base-size: var(--sn-glyph-base-size);
+
+  /* @deprecated Phase 3 - Use --sn-glyph-color-rgb instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
+  --glyph-color-rgb: var(--sn-glyph-color-rgb);
+
+  /* @deprecated Phase 3 - Use --sn-glyph-rotation instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
+  --glyph-rotation: var(--sn-glyph-rotation);
+
+  // ---------------------------------------------------------------------------
+  // SERENDIPITY SYSTEM ALIASES
+  // Zero usage - Safe for removal
+  // ---------------------------------------------------------------------------
+
+  /* @deprecated Phase 3 - Use --sn-serendipity-idle-threshold instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --serendipity-idle-threshold: var(--sn-serendipity-idle-threshold);
+
+  /* @deprecated Phase 3 - Use --sn-serendipity-animation-duration instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --serendipity-animation-duration: var(--sn-serendipity-animation-duration);
+
+  /* @deprecated Phase 3 - Use --sn-serendipity-start-z instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --serendipity-start-z: var(--sn-serendipity-start-z);
+
+  /* @deprecated Phase 3 - Use --sn-serendipity-end-z instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --serendipity-end-z: var(--sn-serendipity-end-z);
   
-  // Enhanced OKLAB Visual Effects Integration (For CSS Blob System & Visual Effects)
-  --visual-effects-oklab-primary-rgb: var(--sn-musical-oklab-primary-rgb);
-  --visual-effects-oklab-accent-rgb: var(--sn-musical-oklab-accent-rgb);
-  --visual-effects-oklab-highlight-rgb: var(--sn-musical-oklab-highlight-rgb);
-  --visual-effects-oklab-shadow-rgb: var(--sn-musical-oklab-shadow-rgb);
-  --visual-effects-oklab-luminance: var(--sn-color-oklab-accent-luminance);
+  // ---------------------------------------------------------------------------
+  // VISUAL EFFECTS OKLAB INTEGRATION ALIASES
+  // Phase 5 consolidated | Medium usage across 5 files
+  // ---------------------------------------------------------------------------
+
+  /* @deprecated Phase 3 - Use --sn-oklab-primary-rgb instead
+     Usage: 5 occurrences in 5 files (_living_gradients, _translucent_overlays, etc.)
+     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
+  --visual-effects-oklab-primary-rgb: var(--sn-oklab-primary-rgb);
+
+  /* @deprecated Phase 3 - Use --sn-oklab-accent-rgb instead
+     Usage: 5 occurrences in 5 files
+     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
+  --visual-effects-oklab-accent-rgb: var(--sn-oklab-accent-rgb);
+
+  /* @deprecated Phase 3 - Use --sn-oklab-highlight-rgb instead
+     Usage: 2 occurrences
+     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
+  --visual-effects-oklab-highlight-rgb: var(--sn-oklab-highlight-rgb);
+
+  /* @deprecated Phase 3 - Use --sn-oklab-shadow-rgb instead
+     Usage: 1 occurrence
+     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
+  --visual-effects-oklab-shadow-rgb: var(--sn-oklab-shadow-rgb);
+
+  /* @deprecated Phase 3 - Use --sn-oklab-accent-luminance instead
+     Usage: 8 occurrences
+     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
+  --visual-effects-oklab-luminance: var(--sn-oklab-accent-luminance);
+
+  /* @deprecated Phase 3 - Literal value, consider using a semantic token
+     Usage: 11 occurrences
+     Risk: 🟡 RISKY
+     Note: Not a true alias, but a literal value that should be migrated to semantic token
+     Migration: Phase 4 consideration
+     Removal: Consider refactoring to --sn-oklab-default-chroma */
   --visual-effects-oklab-chroma: 0.15; // Default chroma for visual effects
+
+  /* @deprecated Phase 3 - Literal value, consider using a semantic token
+     Usage: 4 occurrences
+     Risk: 🟡 RISKY
+     Note: Not a true alias, but a literal value that should be migrated to semantic token
+     Migration: Phase 4 consideration
+     Removal: Consider refactoring to --sn-oklab-default-hue */
   --visual-effects-oklab-hue: 280; // Default visual effects hue (purple-like)
-  
-  // Visual Effects CSS Fallback Coordination
+
+  // ---------------------------------------------------------------------------
+  // VISUAL EFFECTS CSS FALLBACK COORDINATION
+  // Literal values - not legacy aliases
+  // ---------------------------------------------------------------------------
+
+  /* Note: These are configuration flags, not legacy aliases
+     Status: ACTIVE (not deprecated)
+     Purpose: CSS fallback system coordination */
   --visual-effects-css-fallback: 1.0; // CSS fallback system enabled
   --visual-effects-webgl-coordination: 0; // WebGL coordination level
 }
+
+// =============================================================================
+// END LEGACY COMPATIBILITY ALIASES
+// =============================================================================
+// Phase 3 deprecation documentation complete
+// All ~70 legacy aliases now have deprecation notices with usage data
+// Next step: Phase 4 SCSS migration for high-usage aliases
+// =============================================================================
 
 // =============================================================================
 // SPICETIFY THEME INTEGRATION

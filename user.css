@@ -117,19 +117,19 @@
 @keyframes advanced-holographic-shimmer-music {
   0%, 100% {
     border-radius: 50% 50% 50% 50%/50% 50% 50% 50%;
-    filter: brightness(1) saturate(1.2) hue-rotate(var(--sn-rhythm-phase, 0deg));
+    filter: brightness(1) saturate(1.2) hue-rotate(var(--sn-music-rhythm-phase, 0deg));
   }
   25% {
     border-radius: 60% 40% 70% 30%/40% 80% 20% 60%;
-    filter: brightness(1.1) saturate(1.3) hue-rotate(calc(var(--sn-rhythm-phase, 0deg) + 30deg));
+    filter: brightness(1.1) saturate(1.3) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 30deg));
   }
   50% {
     border-radius: 30% 70% 40% 60%/80% 20% 60% 40%;
-    filter: brightness(1.2) saturate(1.4) hue-rotate(calc(var(--sn-rhythm-phase, 0deg) + 60deg));
+    filter: brightness(1.2) saturate(1.4) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 60deg));
   }
   75% {
     border-radius: 70% 30% 60% 40%/20% 80% 40% 60%;
-    filter: brightness(1.1) saturate(1.3) hue-rotate(calc(var(--sn-rhythm-phase, 0deg) + 90deg));
+    filter: brightness(1.1) saturate(1.3) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 90deg));
   }
 }
 @keyframes advanced-cosmic-depth {
@@ -156,23 +156,23 @@
 }
 @keyframes advanced-cosmic-depth-music {
   0% {
-    filter: blur(0px) brightness(1) hue-rotate(var(--sn-rhythm-phase, 0deg));
+    filter: blur(0px) brightness(1) hue-rotate(var(--sn-music-rhythm-phase, 0deg));
     perspective: var(--cosmic-perspective, 1000px);
   }
   25% {
-    filter: blur(1px) brightness(1.2) hue-rotate(calc(var(--sn-rhythm-phase, 0deg) + 15deg));
+    filter: blur(1px) brightness(1.2) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 15deg));
     perspective: calc(var(--cosmic-perspective, 1000px) * 1.2);
   }
   50% {
-    filter: blur(0.5px) brightness(0.8) hue-rotate(calc(var(--sn-rhythm-phase, 0deg) + 30deg));
+    filter: blur(0.5px) brightness(0.8) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 30deg));
     perspective: calc(var(--cosmic-perspective, 1000px) * 0.8);
   }
   75% {
-    filter: blur(1.5px) brightness(1.1) hue-rotate(calc(var(--sn-rhythm-phase, 0deg) + 45deg));
+    filter: blur(1.5px) brightness(1.1) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 45deg));
     perspective: calc(var(--cosmic-perspective, 1000px) * 1.1);
   }
   100% {
-    filter: blur(0px) brightness(1) hue-rotate(calc(var(--sn-rhythm-phase, 0deg) + 60deg));
+    filter: blur(0px) brightness(1) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 60deg));
     perspective: var(--cosmic-perspective, 1000px);
   }
 }
@@ -278,6 +278,11 @@
   --sn-music-micro-breathing-scale: 1.0;
   --sn-music-feed-bloom-intensity: 0;
   --sn-music-energy-modulation: 1.0;
+  --sn-kinetic-energy: 0;
+  --sn-kinetic-valence: 0.5;
+  --sn-kinetic-bpm: 120;
+  --sn-kinetic-beat-interval: 500ms;
+  --sn-kinetic-animation-speed: 1.0;
   --sn-anim-musical-beat-duration: calc(60s / var(--sn-music-tempo-bpm, 120));
   --sn-anim-musical-measure-duration: calc(var(--sn-anim-musical-beat-duration) * 4);
   --sn-anim-musical-phrase-duration: calc(var(--sn-anim-musical-measure-duration) * 4);
@@ -291,9 +296,10 @@
   --sn-bg-beat-pulse-scale: calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.1);
   --sn-bg-beat-color-shift: calc(var(--sn-music-beat-color-phase, 0) * 10deg);
   --sn-bg-beat-pulse: var(--sn-bg-beat-pulse-intensity);
-  --sn-anim-duration-fast: 0.2s;
-  --sn-anim-duration-normal: 0.4s;
-  --sn-anim-duration-slow: 0.8s;
+  --sn-anim-duration-fast: var(--sn-transition-fast-duration);
+  --sn-anim-duration-normal: var(--sn-transition-standard-duration);
+  --sn-anim-duration-slow: var(--sn-transition-slow-duration);
+  --sn-anim-duration-extended: var(--sn-anim-transition-cosmic);
   --sn-anim-duration-animation: 4s;
   --sn-anim-frame-budget: 16.67ms;
   --sn-anim-frame-priority: normal;
@@ -321,6 +327,7 @@
   --sn-transition-fast-duration: 150ms;
   --sn-transition-standard-duration: 300ms;
   --sn-transition-slow-duration: 500ms;
+  --sn-transition-extended-duration: 800ms;
   --sn-anim-transition-cosmic: 1200ms;
   --sn-anim-transition-fast: var(--sn-transition-fast-duration);
   --sn-anim-transition-standard: var(--sn-transition-standard-duration);
@@ -369,6 +376,12 @@
   --sn-ui-nav-magnetic-pull: 1.0;
   --sn-ui-nav-neural-primary-rgb: 139, 233, 253;
   --sn-ui-nav-neural-secondary-rgb: 250, 179, 135;
+  --sn-echo-radius-multiplier: 1.0;
+  --sn-echo-hue-shift: 0deg;
+  --sn-echo-offset-x: 0px;
+  --sn-echo-offset-y: 0px;
+  --sn-echo-skew: 0deg;
+  --sn-echo-rotate: 0deg;
   --sn-ui-sidebar-visual-effects-opacity: 0.8;
   --sn-ui-sidebar-visual-effects-deep-rgb: 17, 17, 27;
   --sn-ui-sidebar-magnetic-hover-pull: 1.2;
@@ -433,16 +446,16 @@
   --sn-color-harmony-analogous-rgb: var(--sn-cosmic-accent-rgb);
   --sn-color-harmony-triadic-rgb: var(--sn-cosmic-surface-rgb);
   --sn-color-harmony-blend-intensity: 0.8;
-  --sn-color-oklab-bright-highlight-rgb: var(--sn-cosmic-accent-rgb);
-  --sn-color-oklab-dynamic-shadow-rgb: var(--sn-cosmic-base-rgb);
-  --sn-color-oklab-primary-r: 124;
-  --sn-color-oklab-primary-g: 58;
-  --sn-color-oklab-primary-b: 237;
-  --sn-color-oklab-accent-r: 124;
-  --sn-color-oklab-accent-g: 58;
-  --sn-color-oklab-accent-b: 237;
-  --sn-color-oklab-base-luminance: 0.08;
-  --sn-color-oklab-accent-luminance: 0.45;
+  --sn-oklab-primary-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-oklab-accent-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-oklab-highlight-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-oklab-shadow-rgb: var(--sn-cosmic-base-rgb);
+  --sn-oklab-base-luminance: 0.08;
+  --sn-oklab-accent-luminance: 0.45;
+  --sn-color-oklab-bright-highlight-rgb: var(--sn-oklab-highlight-rgb);
+  --sn-color-oklab-dynamic-shadow-rgb: var(--sn-oklab-shadow-rgb);
+  --sn-color-oklab-base-luminance: var(--sn-oklab-base-luminance);
+  --sn-color-oklab-accent-luminance: var(--sn-oklab-accent-luminance);
   --sn-color-oklch-accent-l: 0.65;
   --sn-color-oklch-accent-c: 0.15;
   --sn-color-oklch-accent-h: 295;
@@ -454,11 +467,11 @@
   --sn-musical-oklab-genre: "ambient";
   --sn-musical-oklab-emotion: "neutral";
   --sn-musical-oklab-intensity: 0.5;
-  --sn-musical-oklab-primary-rgb: var(--sn-cosmic-accent-rgb);
+  --sn-musical-oklab-primary-rgb: var(--sn-oklab-primary-rgb);
   --sn-musical-oklab-secondary-rgb: var(--sn-cosmic-secondary-rgb);
-  --sn-musical-oklab-accent-rgb: var(--sn-cosmic-accent-rgb);
-  --sn-musical-oklab-highlight-rgb: var(--sn-cosmic-accent-rgb);
-  --sn-musical-oklab-shadow-rgb: var(--sn-cosmic-base-rgb);
+  --sn-musical-oklab-accent-rgb: var(--sn-oklab-accent-rgb);
+  --sn-musical-oklab-highlight-rgb: var(--sn-oklab-highlight-rgb);
+  --sn-musical-oklab-shadow-rgb: var(--sn-oklab-shadow-rgb);
   --sn-emotion-calm-oklab-primary-rgb: 255, 248, 220;
   --sn-emotion-calm-oklab-accent-rgb: 255, 218, 185;
   --sn-emotion-calm-oklab-atmosphere-rgb: 139, 125, 96;
@@ -567,6 +580,12 @@
   --sn-genre-default-oklab-hue-shift: 5;
   --sn-genre-default-oklab-primary-rgb: var(--sn-cosmic-accent-rgb);
   --sn-genre-default-oklab-accent-rgb: var(--sn-cosmic-accent-rgb);
+  --genre-primary-hue-min: 0;
+  --genre-primary-hue-max: 360;
+  --genre-saturation-base: 1.0;
+  --genre-saturation-variation: 0.2;
+  --genre-brightness-base: 1.0;
+  --genre-brightness-variation: 0.1;
   --sn-color-temporal-past-rgb: var(--sn-cosmic-secondary-rgb);
   --sn-color-temporal-present-rgb: var(--sn-color-accent-rgb);
   --sn-color-temporal-future-rgb: var(--sn-cosmic-accent-rgb);
@@ -676,72 +695,327 @@
   }
 }
 :root {
+  /* @deprecated Phase 3 - Use --sn-music-beat-pulse-intensity instead
+     Usage: 0 files (TypeScript-only variable)
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --sn-beat-pulse-intensity: var(--sn-music-beat-pulse-intensity);
+  /* @deprecated Phase 3 - Use --sn-music-rhythm-phase instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --sn-rhythm-phase: var(--sn-music-rhythm-phase);
+  /* @deprecated Phase 3 - Use --sn-music-breathing-scale instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --sn-breathing-scale: var(--sn-music-breathing-scale);
+  /* @deprecated Phase 3 - Use --sn-color-accent-hex instead
+     Usage: 1 file
+     Risk: 🟡 RISKY
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
   --sn-accent-hex: var(--sn-color-accent-hex);
+  /* @deprecated Phase 3 - Use --sn-color-accent-rgb instead
+     Usage: 12 occurrences across multiple files
+     Risk: 🟡 RISKY
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
   --sn-accent-rgb: var(--sn-color-accent-rgb);
+  /* @deprecated Phase 3 - Use --sn-dynamic-accent-hex instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --sn-dynamic-accent: var(--sn-dynamic-accent-hex);
+  /* @deprecated Phase 3 - Use --sn-cosmic-accent-hex instead
+     Usage: 34 occurrences (internal delegation only in tokens.scss)
+     Risk: ✅ SAFE (no external SCSS usage)
+     Removal: Phase 6 (v4.0.0) */
   --sn-cosmic-accent: var(--sn-cosmic-accent-hex);
+  /* @deprecated Phase 3 - Use --sn-cosmic-base-hex instead
+     Usage: Internal delegation only in tokens.scss
+     Risk: ✅ SAFE (no external SCSS usage)
+     Removal: Phase 6 (v4.0.0) */
   --sn-cosmic-base: var(--sn-cosmic-base-hex);
-  --sn-oklab-processed-bright-highlight-rgb: var(--sn-color-oklab-bright-highlight-rgb);
-  --sn-oklab-processed-dynamic-shadow-rgb: var(--sn-color-oklab-dynamic-shadow-rgb);
-  --sn-oklab-processed-primary-rgb-r: var(--sn-color-oklab-primary-r);
-  --sn-oklab-processed-primary-rgb-g: var(--sn-color-oklab-primary-g);
-  --sn-oklab-processed-primary-rgb-b: var(--sn-color-oklab-primary-b);
-  --sn-oklab-processed-accent-rgb-r: var(--sn-color-oklab-accent-r);
-  --sn-oklab-processed-accent-rgb-g: var(--sn-color-oklab-accent-g);
-  --sn-oklab-processed-accent-rgb-b: var(--sn-color-oklab-accent-b);
-  --sn-oklab-processed-dynamic-base-luminance: var(--sn-color-oklab-base-luminance);
+  /* @deprecated Phase 3 - Use --sn-oklab-primary-rgb instead
+     Usage: 3 occurrences in 2 files
+     Risk: ✅ SAFE (Phase 5 consolidated)
+     Removal: Phase 6 (v4.0.0) */
+  --sn-oklab-processed-primary-rgb: var(--sn-oklab-primary-rgb);
+  /* @deprecated Phase 3 - Use --sn-oklab-accent-rgb instead
+     Usage: 3 occurrences in 2 files
+     Risk: ✅ SAFE (Phase 5 consolidated)
+     Removal: Phase 6 (v4.0.0) */
+  --sn-oklab-processed-accent-rgb: var(--sn-oklab-accent-rgb);
+  /* @deprecated Phase 3 - Use --sn-oklab-base-luminance instead
+     Usage: 3 occurrences in 2 files
+     Risk: ✅ SAFE (Phase 5 consolidated)
+     Removal: Phase 6 (v4.0.0) */
+  --sn-oklab-processed-dynamic-base-luminance: var(--sn-oklab-base-luminance);
+  /* @deprecated Phase 3 - Use --sn-bg-gradient-primary-rgb instead
+     Usage: 48 occurrences across 13 files
+     Risk: 🔴 UNSAFE - CRITICAL USAGE
+     Migration: Phase 4 REQUIRED (incremental file-by-file)
+     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
   --sn-gradient-primary-rgb: var(--sn-bg-gradient-primary-rgb);
+  /* @deprecated Phase 3 - Use --sn-bg-gradient-secondary-rgb instead
+     Usage: 27 occurrences across 13 files
+     Risk: 🔴 UNSAFE - CRITICAL USAGE
+     Migration: Phase 4 REQUIRED
+     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
   --sn-gradient-secondary-rgb: var(--sn-bg-gradient-secondary-rgb);
+  /* @deprecated Phase 3 - Use --sn-bg-gradient-accent-rgb instead
+     Usage: 48 occurrences across 13 files
+     Risk: 🔴 UNSAFE - CRITICAL USAGE
+     Migration: Phase 4 REQUIRED
+     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
   --sn-gradient-accent-rgb: var(--sn-bg-gradient-accent-rgb);
+  /* @deprecated Phase 3 - Use --sn-bg-gradient-flow-x instead
+     Usage: Multiple files
+     Risk: 🔴 UNSAFE
+     Migration: Phase 4 REQUIRED
+     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
   --sn-gradient-flow-x: var(--sn-bg-gradient-flow-x);
+  /* @deprecated Phase 3 - Use --sn-bg-gradient-flow-y instead
+     Usage: Multiple files
+     Risk: 🔴 UNSAFE
+     Migration: Phase 4 REQUIRED
+     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
   --sn-gradient-flow-y: var(--sn-bg-gradient-flow-y);
+  /* @deprecated Phase 3 - Use --sn-bg-webgl-ready instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --sn-webgl-ready: var(--sn-bg-webgl-ready);
-  --sn-text-glow-intensity: var(--sn-text-glow-intensity);
+  /* @deprecated Phase 3 - Use --sn-text-glow-intensity instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
+  --text-glow-intensity: var(--sn-text-glow-intensity);
+  /* @deprecated Phase 3 - Use --sn-ui-glass-beat-opacity instead
+     Usage: 8 occurrences in 1 file (_beat_sync_glassmorphism.scss)
+     Risk: ✅ SAFE (single file migration)
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
   --sn-glass-beat-opacity: var(--sn-ui-glass-beat-opacity);
+  /* @deprecated Phase 3 - Use --sn-ui-card-energy-level instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --card-energy-level: var(--sn-ui-card-energy-level);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-field instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-depth-field: var(--sn-visual-effects-depth-field);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-approach instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-approach-distance: var(--sn-visual-effects-depth-approach);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-recede instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-recede-distance: var(--sn-visual-effects-depth-recede);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-neutral instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-neutral-position: var(--sn-visual-effects-depth-neutral);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-magnetic-hover-pull instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-hover-pull: var(--sn-visual-effects-magnetic-hover-pull);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-magnetic-focus-pull instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-focus-pull: var(--sn-visual-effects-magnetic-focus-pull);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-magnetic-interest-pull instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-interest-pull: var(--sn-visual-effects-magnetic-interest-pull);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-magnetic-transition-speed instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --magnetic-transition-speed: var(--sn-visual-effects-magnetic-transition-speed);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-field-intensity instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-field-intensity: var(--sn-visual-effects-field-intensity);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-animation-rate instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-animation-rate: var(--sn-visual-effects-animation-rate);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-response-sensitivity instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-response-sensitivity: var(--sn-visual-effects-response-sensitivity);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-membrane-elasticity instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-membrane-elasticity: var(--sn-visual-effects-membrane-elasticity);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-animation-scale instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-animation-scale: var(--sn-visual-effects-animation-scale);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-flow-rate instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-flow-rate: var(--sn-visual-effects-flow-rate);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-subdivision-frequency instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-subdivision-frequency: var(--sn-visual-effects-subdivision-frequency);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-flow-viscosity instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-flow-viscosity: var(--sn-visual-effects-flow-viscosity);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-surface-tension instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-surface-tension: var(--sn-visual-effects-surface-tension);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-permeability instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-permeability: var(--sn-visual-effects-permeability);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-advanced-mode instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-advanced-mode: var(--sn-visual-effects-advanced-mode);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-subdivision-mode instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --visual-effects-subdivision-mode: var(--sn-visual-effects-subdivision-mode);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-priority-high instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --depth-priority-high: var(--sn-visual-effects-depth-priority-high);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-priority-medium instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --depth-priority-medium: var(--sn-visual-effects-depth-priority-medium);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-priority-low instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --depth-priority-low: var(--sn-visual-effects-depth-priority-low);
+  /* @deprecated Phase 3 - Use --sn-visual-effects-depth-priority-receded instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --depth-priority-receded: var(--sn-visual-effects-depth-priority-receded);
-  --sn-glyph-intensity: var(--sn-glyph-intensity);
-  --sn-glyph-glow: var(--sn-glyph-glow);
-  --sn-glyph-base-size: var(--sn-glyph-base-size);
-  --sn-glyph-color-rgb: var(--sn-glyph-color-rgb);
-  --sn-glyph-rotation: var(--sn-glyph-rotation);
+  /* @deprecated Phase 3 - Use --sn-glyph-intensity instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Note: Pass-through alias for future glyph system
+     Removal: Phase 6 (v4.0.0) */
+  --glyph-intensity: var(--sn-glyph-intensity);
+  /* @deprecated Phase 3 - Use --sn-glyph-glow instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
+  --glyph-glow: var(--sn-glyph-glow);
+  /* @deprecated Phase 3 - Use --sn-glyph-base-size instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
+  --glyph-base-size: var(--sn-glyph-base-size);
+  /* @deprecated Phase 3 - Use --sn-glyph-color-rgb instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
+  --glyph-color-rgb: var(--sn-glyph-color-rgb);
+  /* @deprecated Phase 3 - Use --sn-glyph-rotation instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
+  --glyph-rotation: var(--sn-glyph-rotation);
+  /* @deprecated Phase 3 - Use --sn-serendipity-idle-threshold instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --serendipity-idle-threshold: var(--sn-serendipity-idle-threshold);
+  /* @deprecated Phase 3 - Use --sn-serendipity-animation-duration instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --serendipity-animation-duration: var(--sn-serendipity-animation-duration);
+  /* @deprecated Phase 3 - Use --sn-serendipity-start-z instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --serendipity-start-z: var(--sn-serendipity-start-z);
+  /* @deprecated Phase 3 - Use --sn-serendipity-end-z instead
+     Usage: 0 files
+     Risk: ✅ SAFE
+     Removal: Phase 6 (v4.0.0) */
   --serendipity-end-z: var(--sn-serendipity-end-z);
-  --visual-effects-oklab-primary-rgb: var(--sn-musical-oklab-primary-rgb);
-  --visual-effects-oklab-accent-rgb: var(--sn-musical-oklab-accent-rgb);
-  --visual-effects-oklab-highlight-rgb: var(--sn-musical-oklab-highlight-rgb);
-  --visual-effects-oklab-shadow-rgb: var(--sn-musical-oklab-shadow-rgb);
-  --visual-effects-oklab-luminance: var(--sn-color-oklab-accent-luminance);
+  /* @deprecated Phase 3 - Use --sn-oklab-primary-rgb instead
+     Usage: 5 occurrences in 5 files (_living_gradients, _translucent_overlays, etc.)
+     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
+  --visual-effects-oklab-primary-rgb: var(--sn-oklab-primary-rgb);
+  /* @deprecated Phase 3 - Use --sn-oklab-accent-rgb instead
+     Usage: 5 occurrences in 5 files
+     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
+  --visual-effects-oklab-accent-rgb: var(--sn-oklab-accent-rgb);
+  /* @deprecated Phase 3 - Use --sn-oklab-highlight-rgb instead
+     Usage: 2 occurrences
+     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
+  --visual-effects-oklab-highlight-rgb: var(--sn-oklab-highlight-rgb);
+  /* @deprecated Phase 3 - Use --sn-oklab-shadow-rgb instead
+     Usage: 1 occurrence
+     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
+  --visual-effects-oklab-shadow-rgb: var(--sn-oklab-shadow-rgb);
+  /* @deprecated Phase 3 - Use --sn-oklab-accent-luminance instead
+     Usage: 8 occurrences
+     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
+     Migration: Phase 4 target
+     Removal: Phase 6 (v4.0.0) */
+  --visual-effects-oklab-luminance: var(--sn-oklab-accent-luminance);
+  /* @deprecated Phase 3 - Literal value, consider using a semantic token
+     Usage: 11 occurrences
+     Risk: 🟡 RISKY
+     Note: Not a true alias, but a literal value that should be migrated to semantic token
+     Migration: Phase 4 consideration
+     Removal: Consider refactoring to --sn-oklab-default-chroma */
   --visual-effects-oklab-chroma: 0.15;
+  /* @deprecated Phase 3 - Literal value, consider using a semantic token
+     Usage: 4 occurrences
+     Risk: 🟡 RISKY
+     Note: Not a true alias, but a literal value that should be migrated to semantic token
+     Migration: Phase 4 consideration
+     Removal: Consider refactoring to --sn-oklab-default-hue */
   --visual-effects-oklab-hue: 280;
+  /* Note: These are configuration flags, not legacy aliases
+     Status: ACTIVE (not deprecated)
+     Purpose: CSS fallback system coordination */
   --visual-effects-css-fallback: 1.0;
   --visual-effects-webgl-coordination: 0;
 }
@@ -883,16 +1157,16 @@ html[style*='--sn-brightness-mode: "dark"'] {
 :root {
   --sn-beat-pulse: 0;
   --sn-kinetic-energy: 0;
-  --sn-beat-pulse-intensity: 0;
-  --sn-rhythm-phase: 0;
-  --micro-fast: calc(0.15s * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.3)));
-  --micro-medium: calc(0.3s * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.2)));
-  --micro-slow: calc(0.6s * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.1)));
+  --sn-music-beat-pulse-intensity: 0;
+  --sn-music-rhythm-phase: 0;
+  --micro-fast: calc(0.15s * (1 - (var(--sn-music-beat-pulse-intensity, 0) * 0.3)));
+  --micro-medium: calc(0.3s * (1 - (var(--sn-music-beat-pulse-intensity, 0) * 0.2)));
+  --micro-slow: calc(0.6s * (1 - (var(--sn-music-beat-pulse-intensity, 0) * 0.1)));
   --ripple-color: var(--sn-color-accent-hex);
   --ripple-duration: calc(
-    var(--sn-gradient-transition, 0.8s) * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.3))
+    var(--sn-gradient-transition, 0.8s) * (1 - (var(--sn-music-beat-pulse-intensity, 0) * 0.3))
   );
-  --ripple-intensity: calc(0.3 + (var(--sn-beat-pulse-intensity, 0) * 0.4));
+  --ripple-intensity: calc(0.3 + (var(--sn-music-beat-pulse-intensity, 0) * 0.4));
   --ripple-max-scale: 3;
   --ripple-opacity: 0.3;
   --focus-glow-intensity: 0.4;
@@ -903,13 +1177,13 @@ html[style*='--sn-brightness-mode: "dark"'] {
   --hover-glow-intensity: 0.2;
   --hover-transition-speed: 200ms;
   --hover-scale-factor: 1.02;
-  --feedback-subtle: calc(0.1 + (var(--sn-beat-pulse-intensity, 0) * 0.05));
-  --feedback-moderate: calc(0.2 + (var(--sn-beat-pulse-intensity, 0) * 0.1));
-  --feedback-prominent: calc(0.3 + (var(--sn-beat-pulse-intensity, 0) * 0.2));
-  --interaction-beat-sync: calc(var(--sn-beat-pulse-intensity, 0) * 0.5);
+  --feedback-subtle: calc(0.1 + (var(--sn-music-beat-pulse-intensity, 0) * 0.05));
+  --feedback-moderate: calc(0.2 + (var(--sn-music-beat-pulse-intensity, 0) * 0.1));
+  --feedback-prominent: calc(0.3 + (var(--sn-music-beat-pulse-intensity, 0) * 0.2));
+  --interaction-beat-sync: calc(var(--sn-music-beat-pulse-intensity, 0) * 0.5);
   --interaction-energy-boost: calc(var(--sn-music-energy, 0) * 0.3);
   --interaction-feedback-delay: calc(
-    0.1s * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.5))
+    0.1s * (1 - (var(--sn-music-beat-pulse-intensity, 0) * 0.5))
   );
   --sn-echo-offset-x: 0px;
   --sn-echo-offset-y: 0px;
@@ -1413,7 +1687,7 @@ Benefits:
   border: 1px solid var(--spice-overlay1);
 }
 :root .Root__main-view .Button-sm-buttonSecondary-useBrowserDefaultFocusStyle:hover {
-  border-color: rgba(var(--sn-color-oklab-bright-highlight-rgb), 0.7);
+  border-color: rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.7);
 }
 
 .starrynight-settings .setting-row {
@@ -1459,14 +1733,14 @@ Benefits:
 }
 
 :root {
-  --spice-button: rgba(var(--sn-accent-rgb), 0.15);
-  --spice-button-active: rgba(var(--sn-accent-rgb), 0.25);
-  --spice-button-disabled: rgba(var(--sn-accent-rgb), 0.05);
+  --spice-button: rgba(var(--sn-accent-rgb, 128, 128, 128), 0.15);
+  --spice-button-active: rgba(var(--sn-accent-rgb, 128, 128, 128), 0.25);
+  --spice-button-disabled: rgba(var(--sn-accent-rgb, 128, 128, 128), 0.05);
   --spice-rgb-button: var(--sn-accent-rgb);
-  --sn-button-shadow: 0 1px 3px rgba(var(--sn-accent-rgb), 0.2);
-  --sn-button-highlight: inset 0 1px 0 rgba(var(--sn-accent-rgb), 0.1);
-  --sn-button-hover-shadow: 0 2px 6px rgba(var(--sn-accent-rgb), 0.3);
-  --sn-button-hover-highlight: inset 0 1px 0 rgba(var(--sn-accent-rgb), 0.2);
+  --sn-button-shadow: 0 1px 3px rgba(var(--sn-accent-rgb, 128, 128, 128), 0.2);
+  --sn-button-highlight: inset 0 1px 0 rgba(var(--sn-accent-rgb, 128, 128, 128), 0.1);
+  --sn-button-hover-shadow: 0 2px 6px rgba(var(--sn-accent-rgb, 128, 128, 128), 0.3);
+  --sn-button-hover-highlight: inset 0 1px 0 rgba(var(--sn-accent-rgb, 128, 128, 128), 0.2);
 }
 
 button,
@@ -1502,7 +1776,7 @@ button:disabled,
 select.main-dropDown-dropDown:disabled,
 .main-button-secondary:disabled,
 .main-button-primary:disabled {
-  box-shadow: 0 1px 2px rgba(var(--sn-accent-rgb), 0.1), inset 0 1px 0 rgba(var(--sn-accent-rgb), 0.05);
+  box-shadow: 0 1px 2px rgba(var(--sn-accent-rgb, 128, 128, 128), 0.1), inset 0 1px 0 rgba(var(--sn-accent-rgb, 128, 128, 128), 0.05);
   opacity: 0.6;
 }
 
@@ -1674,13 +1948,13 @@ select.main-dropDown-dropDown:disabled,
 }
 :root div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .main-rootlist-wrapper div:nth-child(2) > li > div:active::after,
 :root .Root__nav-bar .main-rootlist-wrapper div:nth-child(2) > li > div:active::after {
-  background-color: rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.15 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+  background-color: rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.15 + var(--sn-music-beat-pulse-intensity, 0) * 0.1));
   transition: background-color 0.2s ease-out;
 }
 :root div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .main-rootlist-wrapper div:nth-child(2) > li > div:hover,
 :root .Root__nav-bar .main-rootlist-wrapper div:nth-child(2) > li > div:hover {
-  transform: translateY(-1px) scale(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.02));
-  box-shadow: 0 2px calc(8px + 4px * var(--sn-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+  transform: translateY(-1px) scale(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.02));
+  box-shadow: 0 2px calc(8px + 4px * var(--sn-music-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.2 + var(--sn-music-beat-pulse-intensity, 0) * 0.1));
 }
 :root div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .main-rootlist-wrapper div:nth-child(2) > li > div p,
 :root .Root__nav-bar .main-rootlist-wrapper div:nth-child(2) > li > div p {
@@ -1690,7 +1964,7 @@ select.main-dropDown-dropDown:disabled,
 :root div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .main-rootlist-wrapper div:nth-child(2) > li > div p.TypeElement-ballad-textBrightAccent-type,
 :root .Root__nav-bar .main-rootlist-wrapper div:nth-child(2) > li > div p.TypeElement-ballad-textBrightAccent-type {
   color: var(--spice-text) !important;
-  text-shadow: 0 0 calc(4px * var(--sn-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.4 * var(--sn-beat-pulse-intensity, 0)));
+  text-shadow: 0 0 calc(4px * var(--sn-music-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.4 * var(--sn-music-beat-pulse-intensity, 0)));
 }
 :root div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .main-navBar-navBar li:hover > div,
 :root div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .main-navBar-navBar li:hover > a:not(.main-navBar-navBarLinkActive),
@@ -1698,7 +1972,7 @@ select.main-dropDown-dropDown:disabled,
 :root .Root__nav-bar .main-navBar-navBar li:hover > div,
 :root .Root__nav-bar .main-navBar-navBar li:hover > a:not(.main-navBar-navBarLinkActive),
 :root .Root__nav-bar .spicetify-playlist-list li:hover {
-  background: linear-gradient(calc(90deg + var(--sn-rhythm-phase, 0) * 3deg), rgba(var(--sn-accent-rgb, var(--spice-rgb-main)), 0.8) 0%, rgba(var(--sn-accent-rgb, var(--spice-rgb-main)), 0.6) 100%);
+  background: linear-gradient(calc(90deg + var(--sn-music-rhythm-phase, 0) * 3deg), rgba(var(--sn-accent-rgb, var(--spice-rgb-main)), 0.8) 0%, rgba(var(--sn-accent-rgb, var(--spice-rgb-main)), 0.6) 100%);
   transition: background 0.3s ease-out;
 }
 :root div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .main-navBar-navBarLink,
@@ -1709,14 +1983,14 @@ select.main-dropDown-dropDown:disabled,
 }
 :root div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .main-navBar-navBarLink:hover,
 :root .Root__nav-bar .main-navBar-navBarLink:hover {
-  transform: translateY(-1px) scale(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.03));
-  text-shadow: 0 0 calc(6px * var(--sn-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.5 * var(--sn-beat-pulse-intensity, 0)));
+  transform: translateY(-1px) scale(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.03));
+  text-shadow: 0 0 calc(6px * var(--sn-music-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.5 * var(--sn-music-beat-pulse-intensity, 0)));
 }
 :root div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .Svg-img-24-icon.collection-icon,
 :root .Root__nav-bar .Svg-img-24-icon.collection-icon {
   color: var(--spice-text);
   transition: filter 0.3s ease-out;
-  filter: drop-shadow(0 0 calc(4px * var(--sn-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.3 * var(--sn-beat-pulse-intensity, 0))));
+  filter: drop-shadow(0 0 calc(4px * var(--sn-music-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.3 * var(--sn-music-beat-pulse-intensity, 0))));
 }
 :root div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .main-createPlaylistButton-button,
 :root .Root__nav-bar .main-createPlaylistButton-button {
@@ -1725,41 +1999,41 @@ select.main-dropDown-dropDown:disabled,
 }
 :root div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .main-createPlaylistButton-button:hover,
 :root .Root__nav-bar .main-createPlaylistButton-button:hover {
-  transform: scale(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.05));
-  box-shadow: 0 0 calc(8px * var(--sn-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.4 * var(--sn-beat-pulse-intensity, 0)));
+  transform: scale(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.05));
+  box-shadow: 0 0 calc(8px * var(--sn-music-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.4 * var(--sn-music-beat-pulse-intensity, 0)));
 }
 :root div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .main-navBar-navBarLinkActive,
 :root .Root__nav-bar .main-navBar-navBarLinkActive {
   background: linear-gradient(135deg, rgba(var(--sn-accent-rgb, var(--spice-rgb-tab-active)), 0.9) 0%, rgba(var(--sn-accent-rgb, var(--spice-rgb-tab-active)), 0.7) 100%);
   border-left: 3px solid rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.8);
-  transform: scale(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.02));
-  box-shadow: inset 0 0 calc(10px * var(--sn-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.2 * var(--sn-beat-pulse-intensity, 0)));
+  transform: scale(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.02));
+  box-shadow: inset 0 0 calc(10px * var(--sn-music-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.2 * var(--sn-music-beat-pulse-intensity, 0)));
   transition: all 0.4s var(--sn-easing-explorer, ease-out);
 }
 
 :root {
   --sn-topbar-beat-glow-intensity: calc(
-    var(--sn-beat-pulse-intensity, 0) * 0.8
+    var(--sn-music-beat-pulse-intensity, 0) * 0.8
   );
-  --sn-topbar-rhythm-hue-shift: calc(var(--sn-rhythm-phase, 0) * 25deg);
+  --sn-topbar-rhythm-hue-shift: calc(var(--sn-music-rhythm-phase, 0) * 25deg);
   --sn-topbar-cosmic-opacity: calc(
-    0.1 + var(--sn-beat-pulse-intensity, 0) * 0.15
+    0.1 + var(--sn-music-beat-pulse-intensity, 0) * 0.15
   );
-  --sn-search-ripple-intensity: calc(var(--sn-beat-pulse-intensity, 0) * 0.6);
-  --sn-search-focus-bloom: calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.05);
+  --sn-search-ripple-intensity: calc(var(--sn-music-beat-pulse-intensity, 0) * 0.6);
+  --sn-search-focus-bloom: calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.05);
   --sn-search-beat-border: rgba(
     var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
-    calc(0.3 + var(--sn-beat-pulse-intensity, 0) * 0.4)
+    calc(0.3 + var(--sn-music-beat-pulse-intensity, 0) * 0.4)
   );
   --sn-button-harmony-color: rgba(
     var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
-    calc(0.1 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+    calc(0.1 + var(--sn-music-beat-pulse-intensity, 0) * 0.2)
   );
-  --sn-button-bloom-scale: calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.03);
-  --sn-button-cosmic-glow: calc(5px + var(--sn-beat-pulse-intensity, 0) * 10px);
-  --sn-topbar-temporal-phase: var(--sn-rhythm-phase, 0);
-  --sn-topbar-energy-absorption: var(--sn-beat-pulse-intensity, 0);
-  --sn-topbar-rhythm-angle: calc(var(--sn-rhythm-phase, 0) * 180deg);
+  --sn-button-bloom-scale: calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.03);
+  --sn-button-cosmic-glow: calc(5px + var(--sn-music-beat-pulse-intensity, 0) * 10px);
+  --sn-topbar-temporal-phase: var(--sn-music-rhythm-phase, 0);
+  --sn-topbar-energy-absorption: var(--sn-music-beat-pulse-intensity, 0);
+  --sn-topbar-rhythm-angle: calc(var(--sn-music-rhythm-phase, 0) * 180deg);
 }
 
 :root .Root__top-bar header,
@@ -1768,7 +2042,7 @@ select.main-dropDown-dropDown:disabled,
   overflow: hidden;
   background: linear-gradient(calc(90deg + var(--sn-topbar-rhythm-angle)), rgba(var(--sn-accent-rgb, var(--sn-accent-rgb, 202, 158, 230)), var(--sn-topbar-cosmic-opacity)) 0%, transparent 40%, transparent 60%, rgba(var(--sn-accent-rgb, var(--spice-rgb-surface0, 186, 187, 241)), calc(var(--sn-topbar-cosmic-opacity) * 0.8)) 100%), var(--spice-main, #1e1e2e) !important;
   box-shadow: 0 2px var(--sn-button-cosmic-glow) rgba(var(--sn-accent-rgb, var(--sn-accent-rgb, 202, 158, 230)), calc(var(--sn-topbar-beat-glow-intensity) * 0.3)), inset 0 1px 0 rgba(var(--sn-accent-rgb, "140,170,238"), calc(var(--sn-topbar-beat-glow-intensity) * 0.2));
-  filter: hue-rotate(var(--sn-topbar-rhythm-hue-shift)) saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.2)) brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+  filter: hue-rotate(var(--sn-topbar-rhythm-hue-shift)) saturate(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.2)) brightness(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.1));
   transition: all 0.8s var(--sn-anim-easing-organic), filter 0.3s ease-out;
 }
 :root .Root__top-bar header::before,
@@ -1778,7 +2052,7 @@ select.main-dropDown-dropDown:disabled,
   inset: 0;
   z-index: -1;
   background: radial-gradient(ellipse 150% 100% at 50% 0%, rgba(var(--sn-accent-rgb, 140, 170, 238), calc(var(--sn-topbar-energy-absorption) * 0.15)) 0%, transparent 70%);
-  animation: cosmicFlow calc(20s / max(var(--sn-beat-pulse-intensity, 0.1), 0.1)) linear infinite;
+  animation: cosmicFlow calc(20s / max(var(--sn-music-beat-pulse-intensity, 0.1), 0.1)) linear infinite;
   opacity: var(--sn-topbar-energy-absorption);
 }
 :root .Root__top-bar header .main-topBar-background,
@@ -1802,7 +2076,7 @@ select.main-dropDown-dropDown:disabled,
 }
 :root .Root__top-bar header .x-searchInput-searchInputInput::placeholder,
 :root .main-topBar-container .x-searchInput-searchInputInput::placeholder {
-  color: rgba(var(--spice-rgb-subtext, "186,194,222"), calc(0.5 + var(--sn-beat-pulse-intensity, 0) * 0.2)) !important;
+  color: rgba(var(--spice-rgb-subtext, "186,194,222"), calc(0.5 + var(--sn-music-beat-pulse-intensity, 0) * 0.2)) !important;
   transition: color 0.3s ease;
 }
 :root .Root__top-bar header .x-searchInput-searchInputInput:focus,
@@ -1813,11 +2087,11 @@ select.main-dropDown-dropDown:disabled,
 }
 :root .Root__top-bar header .x-searchInput-searchInputInput:not(:placeholder-shown),
 :root .main-topBar-container .x-searchInput-searchInputInput:not(:placeholder-shown) {
-  border-color: rgba(var(--sn-accent-rgb, 140, 170, 238), calc(0.6 + var(--sn-beat-pulse-intensity, 0) * 0.3));
+  border-color: rgba(var(--sn-accent-rgb, 140, 170, 238), calc(0.6 + var(--sn-music-beat-pulse-intensity, 0) * 0.3));
 }
 :root .Root__top-bar header .x-searchInput-searchInputClearButton,
 :root .main-topBar-container .x-searchInput-searchInputClearButton {
-  color: rgba(var(--spice-rgb-subtext, 186, 194, 222), calc(0.7 + var(--sn-beat-pulse-intensity, 0) * 0.2));
+  color: rgba(var(--spice-rgb-subtext, 186, 194, 222), calc(0.7 + var(--sn-music-beat-pulse-intensity, 0) * 0.2));
 }
 :root .Root__top-bar header .x-searchInput-searchInputClearButton:hover,
 :root .main-topBar-container .x-searchInput-searchInputClearButton:hover {
@@ -1832,7 +2106,7 @@ select.main-dropDown-dropDown:disabled,
   overflow: hidden;
   background: var(--sn-button-harmony-color) !important;
   color: var(--spice-subtext, #bac2de) !important;
-  border: 1px solid rgba(var(--sn-accent-rgb, 140, 170, 238), calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.3)) !important;
+  border: 1px solid rgba(var(--sn-accent-rgb, 140, 170, 238), calc(0.2 + var(--sn-music-beat-pulse-intensity, 0) * 0.3)) !important;
   border-radius: 8px;
   transition: all 0.3s var(--sn-anim-easing-organic);
 }
@@ -1854,7 +2128,7 @@ select.main-dropDown-dropDown:disabled,
 :root .Root__top-bar header .main-topBar-button:hover,
 :root .main-topBar-container button:not(.x-searchInput-searchInputClearButton):hover,
 :root .main-topBar-container .main-topBar-button:hover {
-  background: rgba(var(--sn-accent-rgb, "202,158,230"), calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.15)) !important;
+  background: rgba(var(--sn-accent-rgb, "202,158,230"), calc(0.2 + var(--sn-music-beat-pulse-intensity, 0) * 0.15)) !important;
   box-shadow: 0 0 var(--sn-button-cosmic-glow) rgba(var(--sn-accent-rgb, "202,158,230"), calc(var(--sn-topbar-beat-glow-intensity) * 0.5 + 0.2)), inset 0 1px 2px rgba(var(--sn-accent-rgb, 140, 170, 238), calc(var(--sn-topbar-beat-glow-intensity) * 0.3));
   transform: translateY(-1px);
 }
@@ -1879,8 +2153,8 @@ select.main-dropDown-dropDown:disabled,
 }
 :root .Root__top-bar header .Svg-img-24-icon.home-active-icon,
 :root .main-topBar-container .Svg-img-24-icon.home-active-icon {
-  filter: drop-shadow(0 0 calc(6px + var(--sn-beat-pulse-intensity, 0) * 8px) rgba(var(--sn-accent-rgb, "202,158,230"), calc(var(--sn-topbar-beat-glow-intensity) * 0.8 + 0.2)));
-  color: hsl(calc(250 + var(--sn-rhythm-phase, 0) * 15), calc(70% + var(--sn-beat-pulse-intensity, 0) * 20%), calc(60% + var(--sn-beat-pulse-intensity, 0) * 20%)) !important;
+  filter: drop-shadow(0 0 calc(6px + var(--sn-music-beat-pulse-intensity, 0) * 8px) rgba(var(--sn-accent-rgb, "202,158,230"), calc(var(--sn-topbar-beat-glow-intensity) * 0.8 + 0.2)));
+  color: hsl(calc(250 + var(--sn-music-rhythm-phase, 0) * 15), calc(70% + var(--sn-music-beat-pulse-intensity, 0) * 20%), calc(60% + var(--sn-music-beat-pulse-intensity, 0) * 20%)) !important;
   transition: all 0.4s ease-out;
 }
 
@@ -1933,7 +2207,7 @@ select.main-dropDown-dropDown:disabled,
   :root {
     --sn-topbar-cosmic-opacity: 0.08;
     --sn-button-cosmic-glow: calc(
-      3px + var(--sn-beat-pulse-intensity, 0) * 6px
+      3px + var(--sn-music-beat-pulse-intensity, 0) * 6px
     );
   }
   :root .Root__top-bar header .x-searchInput-searchInputInput,
@@ -2037,10 +2311,10 @@ body:not(:has(.main-searchPage-content)) .main-actionBar-ActionBarRow::before:ho
 body:not(:has(.main-searchPage-content)) .main-actionBar-ActionBarRow,
 body:not(:has(.main-searchPage-content)) [class*=actionBar-ActionBarRow],
 body:not(:has(.main-searchPage-content)) [data-testid*=action-bar] {
-  background: linear-gradient(calc(135deg + var(--sn-rhythm-phase, 0) * 5deg), rgba(var(--sn-header-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-header-intensity, 0.2) * 0.85)) 0%, rgba(var(--sn-header-secondary-rgb, var(--spice-rgb-surface0)), calc(var(--sn-header-intensity, 0.2) * 0.75)) 50%, rgba(var(--sn-header-accent-rgb, var(--spice-rgb-surface1)), calc(var(--sn-header-intensity, 0.2) * 0.65)) 100%) !important;
-  backdrop-filter: blur(15px) saturate(calc(1.15 + (var(--sn-breathing-scale, 1) - 1) * 0.3));
+  background: linear-gradient(calc(135deg + var(--sn-music-rhythm-phase, 0) * 5deg), rgba(var(--sn-header-primary-rgb, var(--spice-rgb-accent)), calc(var(--sn-header-intensity, 0.2) * 0.85)) 0%, rgba(var(--sn-header-secondary-rgb, var(--spice-rgb-surface0)), calc(var(--sn-header-intensity, 0.2) * 0.75)) 50%, rgba(var(--sn-header-accent-rgb, var(--spice-rgb-surface1)), calc(var(--sn-header-intensity, 0.2) * 0.65)) 100%) !important;
+  backdrop-filter: blur(15px) saturate(calc(1.15 + (var(--sn-music-breathing-scale, 1) - 1) * 0.3));
   transition: background 800ms var(--sn-anim-easing-organic);
-  filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 2deg)) brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+  filter: hue-rotate(calc(var(--sn-music-rhythm-phase, 0) * 2deg)) brightness(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.1));
   position: relative;
   z-index: 1;
   transform: translateZ(0);
@@ -2056,7 +2330,7 @@ body:not(:has(.main-searchPage-content)) [data-testid*=action-bar]::after {
   top: 50%;
   height: 4px;
   transform: translateY(-50%);
-  background: rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.7 * var(--sn-beat-pulse-intensity, 0)));
+  background: rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.7 * var(--sn-music-beat-pulse-intensity, 0)));
   border-radius: 2px;
   transition: opacity 120ms var(--sn-anim-easing-bounce-medium);
   z-index: -1;
@@ -2079,7 +2353,7 @@ body:not(:has(.main-searchPage-content)) [data-testid*=control-button] {
   transform: translateZ(0);
   transition: box-shadow 120ms var(--sn-anim-easing-bounce-medium);
   text-shadow: 0 0 5px rgba(var(--spice-rgb-shadow), 0.3);
-  box-shadow: 0 0 calc(8px * var(--sn-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.4 * var(--sn-beat-pulse-intensity, 0)));
+  box-shadow: 0 0 calc(8px * var(--sn-music-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.4 * var(--sn-music-beat-pulse-intensity, 0)));
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
@@ -2154,7 +2428,7 @@ body:not(:has(.main-searchPage-content)) [data-testid*=control-button] {
 
 div.Root__right-sidebar[data-testid=right-sidebar],
 .Root__right-sidebar {
-  --spice-main-elevated: rgba(var(--sn-accent-rgb), 0.05);
+  --spice-main-elevated: rgba(var(--sn-accent-rgb, 128, 128, 128), 0.05);
 }
 div.Root__right-sidebar[data-testid=right-sidebar] .Button-textSubdued-sm-16-buttonTertiary-condensed-useBrowserDefaultFocusStyle,
 .Root__right-sidebar .Button-textSubdued-sm-16-buttonTertiary-condensed-useBrowserDefaultFocusStyle {
@@ -2213,11 +2487,11 @@ div.Root__right-sidebar[data-testid=right-sidebar] .main-buddyFeed-activityMetad
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(45deg, transparent 30%, rgba(var(--sn-accent-rgb), 0.1) 50%, transparent 70%);
+  background: linear-gradient(45deg, transparent 30%, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.1) 50%, transparent 70%);
   backdrop-filter: blur(20px) brightness(1.2) contrast(1.1);
-  border: 1px solid rgba(var(--sn-accent-rgb), 0.3);
+  border: 1px solid rgba(var(--sn-accent-rgb, 128, 128, 128), 0.3);
   border-radius: 12px;
-  box-shadow: inset 0 1px 0 rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1), 0 0 20px rgba(var(--sn-accent-rgb), 0.2), 0 0 40px rgba(var(--sn-accent-rgb), 0.1);
+  box-shadow: inset 0 1px 0 rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.1), 0 0 20px rgba(var(--sn-accent-rgb, 128, 128, 128), 0.2), 0 0 40px rgba(var(--sn-accent-rgb, 128, 128, 128), 0.1);
   animation: holographic-pulse 3s ease-in-out infinite;
 }
 
@@ -2466,7 +2740,7 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
   overflow: hidden;
   isolation: isolate;
   background: rgba(var(--section-background-base, var(--spice-rgb-surface0, 28, 28, 30)), 0.08);
-  filter: drop-shadow(0 1px 4px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.06));
+  filter: drop-shadow(0 1px 4px rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.06));
   transition: box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
   will-change: transform, opacity, filter;
   transform: translateZ(0);
@@ -2625,10 +2899,10 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
   --card-beat-pulse-multiplier: 1;
   --card-rhythm-animation: 1;
   --card-beat-intensity: var(
-    --sn-beat-pulse-intensity,
+    --sn-music-beat-pulse-intensity,
     0
   );
-  --card-rhythm-phase: var(--sn-rhythm-phase, 0);
+  --card-rhythm-phase: var(--sn-music-rhythm-phase, 0);
   --card-visual-mode: 0;
   --card-visual-connection: var(--visual-connection-strength, 0.7);
   --calculated-lift: calc(
@@ -2651,7 +2925,7 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
   --card-color-intensity: 0.08;
   --card-shadow-intensity: 0.12;
   --card-transition-speed: 0.3s;
-  --card-shadow-base: rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.12);
+  --card-shadow-base: rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.12);
 }
 
 .main-entityHeader-container,
@@ -2688,7 +2962,7 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
   background: linear-gradient(calc(135deg + var(--card-rhythm-phase) * 2deg), rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.05 + var(--card-beat-intensity) * 0.03)) 0%, rgba(var(--sn-accent-rgb, var(--spice-rgb-surface0)), calc(0.08 + var(--card-beat-intensity) * 0.04)) 50%, rgba(var(--sn-accent-rgb, var(--spice-rgb-surface1)), calc(0.03 + var(--card-beat-intensity) * 0.02)) 100%);
   backdrop-filter: blur(20px) saturate(1.3);
   border: 1px solid rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.15);
-  box-shadow: 0 4px calc(16px + 6px * var(--card-beat-intensity)) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.05 + var(--card-beat-intensity) * 0.05)), 0 8px calc(24px + 8px * var(--card-beat-intensity)) rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), calc(0.08 + var(--card-beat-intensity) * 0.07)), inset 0 1px 0 rgba(var(--sn-oklab-processed-bright-highlight-rgb), calc(0.07 + var(--card-beat-intensity) * 0.04));
+  box-shadow: 0 4px calc(16px + 6px * var(--card-beat-intensity)) rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.05 + var(--card-beat-intensity) * 0.05)), 0 8px calc(24px + 8px * var(--card-beat-intensity)) rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), calc(0.08 + var(--card-beat-intensity) * 0.07)), inset 0 1px 0 rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), calc(0.07 + var(--card-beat-intensity) * 0.04));
   transition: transform var(--calculated-transition) var(--card-smooth-fluidity), box-shadow var(--calculated-transition) ease, background var(--calculated-transition) ease, border-color var(--calculated-transition) ease, backdrop-filter var(--calculated-transition) ease;
   will-change: transform, opacity, filter;
   transform: translateZ(0);
@@ -2735,7 +3009,7 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
   background: linear-gradient(135deg, rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.12) 0%, rgba(var(--sn-accent-rgb, var(--spice-rgb-surface0)), 0.15) 50%, rgba(var(--sn-accent-rgb, var(--spice-rgb-surface1)), 0.08) 100%);
   backdrop-filter: blur(25px) saturate(1.5) contrast(1.1);
   border-color: rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4);
-  box-shadow: 0 var(--calculated-lift) calc(var(--calculated-lift) * 2) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.15), 0 calc(var(--calculated-lift) * 2) calc(var(--calculated-lift) * 4) rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2), 0 8px 24px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2), 0 0 calc(var(--card-effect-field-radius) * 2) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), var(--card-effect-alpha)), inset 0 1px 0 rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2);
+  box-shadow: 0 var(--calculated-lift) calc(var(--calculated-lift) * 2) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.15), 0 calc(var(--calculated-lift) * 2) calc(var(--calculated-lift) * 4) rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.2), 0 8px 24px rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.2), 0 0 calc(var(--card-effect-field-radius) * 2) rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), var(--card-effect-alpha)), inset 0 1px 0 rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.2);
 }
 .main-card-card:hover::before {
   opacity: 1;
@@ -2787,9 +3061,9 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
   animation: fluid-breathing 15s ease-in-out infinite;
   transition: border-radius 2.5s var(--sn-anim-easing-standard), background 3s ease-out;
 }
-.Root[style*="--sn-beat-pulse-intensity"] .main-card-card {
-  animation: fluid-awakening calc(15s * (2 - var(--sn-beat-pulse-intensity, 0))) ease-in-out infinite;
-  background: radial-gradient(ellipse 95% 75% at 30% 40%, rgba(var(--sn-gradient-primary-rgb), calc(0.2 * (0.04 + var(--sn-beat-pulse-intensity, 0) * 0.06))) 0%, transparent 75%), radial-gradient(ellipse 75% 90% at 70% 60%, rgba(var(--sn-gradient-accent-rgb), calc(0.2 * (0.03 + var(--sn-beat-pulse-intensity, 0) * 0.05))) 0%, transparent 65%);
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-card-card {
+  animation: fluid-awakening calc(15s * (2 - var(--sn-music-beat-pulse-intensity, 0))) ease-in-out infinite;
+  background: radial-gradient(ellipse 95% 75% at 30% 40%, rgba(var(--sn-gradient-primary-rgb), calc(0.2 * (0.04 + var(--sn-music-beat-pulse-intensity, 0) * 0.06))) 0%, transparent 75%), radial-gradient(ellipse 75% 90% at 70% 60%, rgba(var(--sn-gradient-accent-rgb), calc(0.2 * (0.03 + var(--sn-music-beat-pulse-intensity, 0) * 0.05))) 0%, transparent 65%);
 }
 .main-card-card[data-testid*=artist] {
   position: relative;
@@ -2804,9 +3078,9 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
   animation: fluid-breathing 15s ease-in-out infinite;
   transition: border-radius 2.5s var(--sn-anim-easing-standard), background 3s ease-out;
 }
-.Root[style*="--sn-beat-pulse-intensity"] .main-card-card[data-testid*=artist] {
-  animation: fluid-awakening calc(15s * (2 - var(--sn-beat-pulse-intensity, 0))) ease-in-out infinite;
-  background: radial-gradient(ellipse 95% 75% at 30% 40%, rgba(var(--sn-gradient-primary-rgb), calc(0.3 * (0.04 + var(--sn-beat-pulse-intensity, 0) * 0.06))) 0%, transparent 75%), radial-gradient(ellipse 75% 90% at 70% 60%, rgba(var(--sn-gradient-accent-rgb), calc(0.3 * (0.03 + var(--sn-beat-pulse-intensity, 0) * 0.05))) 0%, transparent 65%);
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-card-card[data-testid*=artist] {
+  animation: fluid-awakening calc(15s * (2 - var(--sn-music-beat-pulse-intensity, 0))) ease-in-out infinite;
+  background: radial-gradient(ellipse 95% 75% at 30% 40%, rgba(var(--sn-gradient-primary-rgb), calc(0.3 * (0.04 + var(--sn-music-beat-pulse-intensity, 0) * 0.06))) 0%, transparent 75%), radial-gradient(ellipse 75% 90% at 70% 60%, rgba(var(--sn-gradient-accent-rgb), calc(0.3 * (0.03 + var(--sn-music-beat-pulse-intensity, 0) * 0.05))) 0%, transparent 65%);
 }
 
 .main-card-header {
@@ -2847,19 +3121,19 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
   left: 0;
   right: 0;
   padding: 16px;
-  background: linear-gradient(transparent 0%, rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.7) 40%, rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.85) 100%);
+  background: linear-gradient(transparent 0%, rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.7) 40%, rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.85) 100%);
   backdrop-filter: blur(8px);
 }
 .main-card-header .main-card-cardMetadata .main-cardHeader-text,
 .main-card-header .main-card-cardMetadata .main-type-bass {
-  text-shadow: 0 1px 3px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.8), 0 0 8px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.2);
+  text-shadow: 0 1px 3px rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.8), 0 0 8px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.2);
   color: rgba(var(--sn-musical-harmony-contrast-rgb), 0.95);
   transition: all 300ms ease;
 }
 .main-card-header .main-card-cardMetadata .main-cardHeader-text:hover,
 .main-card-header .main-card-cardMetadata .main-type-bass:hover {
   color: rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 1);
-  text-shadow: 0 1px 3px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.8), 0 0 12px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4);
+  text-shadow: 0 1px 3px rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.8), 0 0 12px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4);
 }
 
 .main-gridContainer-gridContainer {
@@ -2908,7 +3182,7 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
   height: 48px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.95) 0%, rgba(var(--sn-accent-rgb, var(--spice-rgb-surface1)), 0.85) 100%);
-  box-shadow: 0 4px 16px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.3), 0 8px 32px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2), inset 0 1px 0 rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2);
+  box-shadow: 0 4px 16px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.3), 0 8px 32px rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.2), inset 0 1px 0 rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.2);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.3);
   opacity: calc(0.2 * var(--motion-intelligence-level, 1));
@@ -2940,7 +3214,7 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
 .main-playButton-PlayButton:hover {
   transform: translateZ(0);
   background: radial-gradient(circle, rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 1) 0%, rgba(var(--sn-accent-rgb, var(--spice-rgb-surface1)), 0.95) 100%);
-  box-shadow: 0 6px 24px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4), 0 12px 48px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.3), 0 0 16px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.2);
+  box-shadow: 0 6px 24px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.4), 0 12px 48px rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.3), 0 0 16px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.2);
 }
 .main-card-PlayButtonContainer:hover::before,
 .main-playButton-PlayButton:hover::before {
@@ -3004,10 +3278,10 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
 @media (prefers-contrast: high) {
   .main-card-card {
     border-width: 2px;
-    box-shadow: 0 4px 24px rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1), 0 8px 32px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.4);
+    box-shadow: 0 4px 24px rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.1), 0 8px 32px rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.4);
   }
   .main-card-card:hover {
-    border-color: rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.8);
+    border-color: rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.8);
   }
 }
 @media (prefers-reduced-data: reduce) {
@@ -3103,17 +3377,17 @@ body:not(:has(.main-searchPage-content)) .main-card-card {
   backface-visibility: hidden;
   contain: layout style paint;
   --sn-card-shadow-idle:
-    0 2px 8px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.08),
+    0 2px 8px rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.08),
     0 4px 16px rgba(var(--sn-card-harmonic-primary-rgb), 0.04),
     inset 0 1px 0 rgba(var(--spice-rgb-surface1), 0.1);
   --sn-card-shadow-active:
-    0 8px 32px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.15),
+    0 8px 32px rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.15),
     0 16px 64px rgba(var(--sn-card-harmonic-primary-rgb), 0.1),
     0 4px 24px rgba(var(--sn-card-harmonic-analogous-1-rgb), 0.06),
     inset 0 1px 0 rgba(var(--spice-rgb-surface1), 0.2),
     inset 0 -1px 0 rgba(var(--sn-card-harmonic-primary-rgb), 0.05);
   --sn-card-shadow-emergence:
-    0 12px 48px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2),
+    0 12px 48px rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.2),
     0 24px 96px rgba(var(--sn-card-harmonic-primary-rgb), 0.15),
     0 8px 32px rgba(var(--sn-card-harmonic-complementary-rgb), 0.08),
     0 4px 16px rgba(var(--sn-card-harmonic-triadic-1-rgb), 0.06),
@@ -3334,11 +3608,7 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected=true]::af
 /* ████████████████████████████████████████████████████████████████████████████████*/
 /* YEAR 3000 TRACK LIST ENHANCED - Revolutionary Track Experience*/
 /* ████████████████████████████████████████████████████████████████████████████████*/
-/* TODO[PHASE1-SOURCE-OF-TRUTH]:*/
-/* Track-list kinetic behaviour (hover, selected, playing) is defined only here.*/
-/* Down-stream modules (e.g. _sn_atmospheric.scss) should NOT duplicate these*/
-/* `@extend` statements.*/
-/* === YEAR 3000: Track List Container Styling ===*/
+/* Track List Container Styling*/
 .main-rootlist-wrapper {
   position: relative;
   background: transparent;
@@ -3402,7 +3672,7 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
   height: 40px; /* Set fixed height (e.g., matches album art)*/
   transform: translateY(-50%); /* Adjust for vertical centering*/
   width: 3px;
-  background: linear-gradient(180deg, rgba(var(--sn-oklab-processed-primary-rgb), 0.8) 0%, rgba(var(--sn-oklab-processed-accent-rgb), 0.6) 100%);
+  background: linear-gradient(180deg, rgba(var(--sn-bg-gradient-primary-rgb, 128, 128, 128), 0.8) 0%, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.6) 100%);
   border-radius: 0 2px 2px 0;
   transition: all 200ms ease;
 }
@@ -3445,8 +3715,8 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
 :root .Root__now-playing-bar {
   backdrop-filter: blur(calc(var(--glass-blur, 6px) + var(--sn-glass-beat-boost, 0) * 5px)) saturate(var(--glass-saturation, 1.2)) brightness(var(--glass-brightness, 1.1));
   -webkit-backdrop-filter: blur(calc(var(--glass-blur, 6px) + var(--sn-glass-beat-boost, 0) * 5px)) saturate(var(--glass-saturation, 1.2)) brightness(var(--glass-brightness, 1.1));
-  background: var(--glass-background, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1));
-  border: 1px solid var(--glass-border, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2));
+  background: var(--glass-background, rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.1));
+  border: 1px solid var(--glass-border, rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.2));
   transition: backdrop-filter 400ms ease-out, -webkit-backdrop-filter 400ms ease-out, background var(--sn-gradient-transition, 0.8s ease-in-out), border var(--sn-gradient-transition, 0.8s ease-in-out);
   will-change: transform, opacity, filter;
   transform: translateZ(0);
@@ -3474,13 +3744,13 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
 :root .Root__now-playing-bar .main-shuffleButton-button:hover {
   color: var(--spice-text);
   transform: translateZ(0);
-  filter: drop-shadow(0 0 calc(4px * var(--sn-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb), calc(0.4 * var(--sn-beat-pulse-intensity, 0))));
+  filter: drop-shadow(0 0 calc(4px * var(--sn-music-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.4 * var(--sn-music-beat-pulse-intensity, 0))));
 }
 :root aside[data-testid=now-playing-bar] .main-shuffleButton-button.main-shuffleButton-active,
 :root .Root__now-playing-bar .main-shuffleButton-button.main-shuffleButton-active {
   color: var(--spice-text);
   transform: translateZ(0);
-  text-shadow: 0 0 calc(4px * var(--sn-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb), calc(0.6 * var(--sn-beat-pulse-intensity, 0)));
+  text-shadow: 0 0 calc(4px * var(--sn-music-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.6 * var(--sn-music-beat-pulse-intensity, 0)));
 }
 :root aside[data-testid=now-playing-bar] .main-playButton-PlayButton.main-playButton-primary,
 :root .Root__now-playing-bar .main-playButton-PlayButton.main-playButton-primary {
@@ -3495,18 +3765,18 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
   position: absolute;
   inset: -10px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--sn-accent-rgb), calc(0.25 * var(--sn-beat-pulse-intensity, 0))) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.25 * var(--sn-music-beat-pulse-intensity, 0))) 0%, transparent 70%);
   z-index: -1;
   transition: opacity 0.3s ease-out, background 0.3s ease-out;
 }
 :root aside[data-testid=now-playing-bar] .main-playButton-PlayButton.main-playButton-primary:hover::before,
 :root .Root__now-playing-bar .main-playButton-PlayButton.main-playButton-primary:hover::before {
-  background: radial-gradient(circle, rgba(var(--sn-accent-rgb), calc(0.35 * var(--sn-beat-pulse-intensity, 0))) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.35 * var(--sn-music-beat-pulse-intensity, 0))) 0%, transparent 70%);
 }
 :root aside[data-testid=now-playing-bar] .main-button-primary,
 :root .Root__now-playing-bar .main-button-primary {
-  background: var(--glass-button-background, linear-gradient(135deg, rgba(var(--sn-accent-rgb), 0.9) 0%, rgba(var(--sn-accent-rgb), 0.7) 100%));
-  border: 1px solid var(--glass-button-border, rgba(var(--sn-accent-rgb), 0.3));
+  background: var(--glass-button-background, linear-gradient(135deg, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.9) 0%, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.7) 100%));
+  border: 1px solid var(--glass-button-border, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.3));
   transition: all 0.3s var(--sn-easing-explorer, ease-out);
 }
 :root aside[data-testid=now-playing-bar] .main-button-primary:active,
@@ -3515,9 +3785,9 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
 :root .Root__now-playing-bar .main-button-primary:active,
 :root .Root__now-playing-bar .main-button-primary:focus,
 :root .Root__now-playing-bar .main-button-primary:hover {
-  background: var(--glass-button-background-hover, linear-gradient(135deg, rgba(var(--sn-accent-rgb), 0.95) 0%, rgba(var(--sn-accent-rgb), 0.8) 100%));
+  background: var(--glass-button-background-hover, linear-gradient(135deg, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.95) 0%, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.8) 100%));
   transform: translateZ(0);
-  box-shadow: 0 0 calc(6px * var(--sn-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb), calc(0.3 * var(--sn-beat-pulse-intensity, 0)));
+  box-shadow: 0 0 calc(6px * var(--sn-music-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.3 * var(--sn-music-beat-pulse-intensity, 0)));
 }
 :root aside[data-testid=now-playing-bar] .Button-sm-16-buttonTertiary-iconOnly-isUsingKeyboard-useBrowserDefaultFocusStyle,
 :root aside[data-testid=now-playing-bar] .control-button,
@@ -3545,7 +3815,7 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
 :root .Root__now-playing-bar .main-skipBackButton-button:hover {
   color: var(--spice-text) !important;
   transform: translateZ(0);
-  text-shadow: 0 0 calc(3px * var(--sn-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb), calc(0.4 * var(--sn-beat-pulse-intensity, 0)));
+  text-shadow: 0 0 calc(3px * var(--sn-music-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.4 * var(--sn-music-beat-pulse-intensity, 0)));
 }
 :root aside[data-testid=now-playing-bar] .control-button-heart[aria-checked=true],
 :root aside[data-testid=now-playing-bar] .main-addButton-active,
@@ -3557,7 +3827,7 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
 :root .Root__now-playing-bar .main-addButton-active:hover {
   color: var(--spice-red);
   transform: translateZ(0);
-  filter: drop-shadow(0 0 calc(6px * var(--sn-beat-pulse-intensity, 0)) rgba(var(--spice-rgb-red, 243, 139, 168), calc(0.7 * var(--sn-beat-pulse-intensity, 0))));
+  filter: drop-shadow(0 0 calc(6px * var(--sn-music-beat-pulse-intensity, 0)) rgba(var(--spice-rgb-red, 243, 139, 168), calc(0.7 * var(--sn-music-beat-pulse-intensity, 0))));
   transition: all 0.15s var(--sn-anim-easing-bounce-strong);
 }
 :root aside[data-testid=now-playing-bar] .x-progressBar-progressBarBg,
@@ -3566,8 +3836,8 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
 }
 :root aside[data-testid=now-playing-bar] .x-progressBar-progressBarBg > div > div,
 :root .Root__now-playing-bar .x-progressBar-progressBarBg > div > div {
-  background: linear-gradient(calc(90deg + var(--sn-rhythm-phase, 0) * 4deg), rgba(var(--sn-accent-rgb), 0.9) 0%, rgba(var(--sn-accent-rgb), 1) 50%, rgba(var(--sn-accent-rgb), 0.9) 100%);
-  box-shadow: 0 0 calc(4px * var(--sn-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb), calc(0.5 * var(--sn-beat-pulse-intensity, 0)));
+  background: linear-gradient(calc(90deg + var(--sn-music-rhythm-phase, 0) * 4deg), rgba(var(--sn-accent-rgb, 128, 128, 128), 0.9) 0%, rgba(var(--sn-accent-rgb, 128, 128, 128), 1) 50%, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.9) 100%);
+  box-shadow: 0 0 calc(4px * var(--sn-music-beat-pulse-intensity, 0)) rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.5 * var(--sn-music-beat-pulse-intensity, 0)));
   transition: box-shadow 0.2s ease-out;
 }
 :root aside[data-testid=now-playing-bar] .x-progressBar-progressBarBg::before,
@@ -3575,7 +3845,7 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-accent-rgb), calc(0.1 * var(--sn-beat-pulse-intensity, 0))) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.1 * var(--sn-music-beat-pulse-intensity, 0))) 50%, transparent 100%);
   z-index: -1;
   transition: all 0.3s ease-out;
 }
@@ -3588,7 +3858,7 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
 }
 .sn-glass-disabled aside[data-testid=now-playing-bar]::before,
 .sn-glass-disabled .Root__now-playing-bar::before {
-  background: rgba(var(--sn-accent-rgb), 0.8) !important;
+  background: rgba(var(--sn-accent-rgb, 128, 128, 128), 0.8) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4252,9 +4522,9 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
   --zoom-animation-speed: 15s;
   --zoom-depth-variance: 200px;
   --zoom-breathing-rhythm: 8s;
-  --music-cosmic-expansion: calc(var(--sn-beat-pulse-intensity, 0) * 0.3 + 1);
-  --music-stellar-intensity: calc(var(--sn-beat-pulse-intensity, 0) * 0.6 + 0.4);
-  --music-galactic-rotation: calc(2 - var(--sn-beat-pulse-intensity, 0));
+  --music-cosmic-expansion: calc(var(--sn-music-beat-pulse-intensity, 0) * 0.3 + 1);
+  --music-stellar-intensity: calc(var(--sn-music-beat-pulse-intensity, 0) * 0.6 + 0.4);
+  --music-galactic-rotation: calc(2 - var(--sn-music-beat-pulse-intensity, 0));
   --music-depth-perception: calc(var(--sn-music-energy, 0.5) * 1000px + 500px);
 }
 
@@ -4700,7 +4970,7 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
   height: 100px;
   margin: -50px 0 0 -50px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--sn-gradient-primary-rgb), 0.1) 0%, rgba(var(--sn-gradient-secondary-rgb), 0.05) 50%, transparent 100%);
+  background: radial-gradient(circle, rgba(var(--sn-bg-gradient-primary-rgb), 0.1) 0%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.05) 50%, transparent 100%);
   z-index: -12;
   pointer-events: none;
   will-change: transform, opacity, filter;
@@ -4725,7 +4995,7 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
   z-index: -11;
   pointer-events: none;
   will-change: opacity;
-  background: linear-gradient(to top, rgba(var(--sn-gradient-primary-rgb), var(--sn-flux-spectral-bass, 0)) 0px, transparent calc(var(--sn-flux-spectral-bass, 0) * 60px)) 0px 0px/60px 100% no-repeat, linear-gradient(to top, rgba(var(--sn-gradient-secondary-rgb), var(--sn-flux-spectral-mid, 0)) 0px, transparent calc(var(--sn-flux-spectral-mid, 0) * 60px)) 60px 0px/60px 100% no-repeat, linear-gradient(to top, rgba(var(--sn-gradient-accent-rgb), var(--sn-flux-spectral-treble, 0)) 0px, transparent calc(var(--sn-flux-spectral-treble, 0) * 60px)) 120px 0px/60px 100% no-repeat, linear-gradient(to top, rgba(var(--sn-gradient-primary-rgb), var(--sn-flux-spectral-vocal, 0)) 0px, transparent calc(var(--sn-flux-spectral-vocal, 0) * 60px)) 180px 0px/60px 100% no-repeat;
+  background: linear-gradient(to top, rgba(var(--sn-bg-gradient-primary-rgb), var(--sn-flux-spectral-bass, 0)) 0px, transparent calc(var(--sn-flux-spectral-bass, 0) * 60px)) 0px 0px/60px 100% no-repeat, linear-gradient(to top, rgba(var(--sn-bg-gradient-secondary-rgb), var(--sn-flux-spectral-mid, 0)) 0px, transparent calc(var(--sn-flux-spectral-mid, 0) * 60px)) 60px 0px/60px 100% no-repeat, linear-gradient(to top, rgba(var(--sn-bg-gradient-accent-rgb), var(--sn-flux-spectral-treble, 0)) 0px, transparent calc(var(--sn-flux-spectral-treble, 0) * 60px)) 120px 0px/60px 100% no-repeat, linear-gradient(to top, rgba(var(--sn-bg-gradient-primary-rgb), var(--sn-flux-spectral-vocal, 0)) 0px, transparent calc(var(--sn-flux-spectral-vocal, 0) * 60px)) 180px 0px/60px 100% no-repeat;
   opacity: var(--sn-flux-spectral-enabled, 1);
   transition: opacity 0.3s var(--sn-anim-easing-organic, cubic-bezier(0.4, 0, 0.2, 1));
 }
@@ -4737,7 +5007,7 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(to right, rgba(var(--sn-gradient-primary-rgb), 0.6) 0%, rgba(var(--sn-gradient-accent-rgb), 0.4) 100%);
+  background: linear-gradient(to right, rgba(var(--sn-bg-gradient-primary-rgb), 0.6) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 0.4) 100%);
   z-index: -10;
   pointer-events: none;
   will-change: transform, opacity, filter;
@@ -4757,7 +5027,7 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
   right: 20px;
   width: 100px;
   height: 100px;
-  background: conic-gradient(from 0deg, rgba(var(--sn-gradient-primary-rgb), 0.3) 0deg, rgba(var(--sn-gradient-secondary-rgb), 0.2) 120deg, rgba(var(--sn-gradient-accent-rgb), 0.1) 240deg, rgba(var(--sn-gradient-primary-rgb), 0.3) 360deg);
+  background: conic-gradient(from 0deg, rgba(var(--sn-bg-gradient-primary-rgb), 0.3) 0deg, rgba(var(--sn-bg-gradient-secondary-rgb), 0.2) 120deg, rgba(var(--sn-bg-gradient-accent-rgb), 0.1) 240deg, rgba(var(--sn-bg-gradient-primary-rgb), 0.3) 360deg);
   border-radius: 50%;
   z-index: -11;
   pointer-events: none;
@@ -4815,18 +5085,18 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
 }
 
 .sn-visual-mode-enhanced .Root__main-view::before {
-  background: radial-gradient(circle, rgba(var(--sn-gradient-primary-rgb), 0.15) 0%, rgba(var(--sn-gradient-secondary-rgb), 0.1) 30%, rgba(var(--sn-gradient-accent-rgb), 0.05) 60%, transparent 100%);
-  filter: drop-shadow(0 0 20px rgba(var(--sn-gradient-primary-rgb), 0.3)) saturate(1.2) brightness(1.1);
+  background: radial-gradient(circle, rgba(var(--sn-bg-gradient-primary-rgb), 0.15) 0%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.1) 30%, rgba(var(--sn-bg-gradient-accent-rgb), 0.05) 60%, transparent 100%);
+  filter: drop-shadow(0 0 20px rgba(var(--sn-bg-gradient-primary-rgb), 0.3)) saturate(1.2) brightness(1.1);
 }
 .sn-visual-mode-enhanced .main-view-container::after {
-  filter: drop-shadow(0 0 10px rgba(var(--sn-gradient-primary-rgb), 0.2)) saturate(1.3);
+  filter: drop-shadow(0 0 10px rgba(var(--sn-bg-gradient-primary-rgb), 0.2)) saturate(1.3);
 }
 .sn-visual-mode-enhanced .Root__top-container::before {
   height: 6px;
-  filter: drop-shadow(0 0 8px rgba(var(--sn-gradient-accent-rgb), 0.4)) brightness(1.2);
+  filter: drop-shadow(0 0 8px rgba(var(--sn-bg-gradient-accent-rgb), 0.4)) brightness(1.2);
 }
 .sn-visual-mode-enhanced .Root__top-container::after {
-  filter: drop-shadow(0 0 15px rgba(var(--sn-gradient-primary-rgb), 0.4)) saturate(1.4) brightness(1.15);
+  filter: drop-shadow(0 0 15px rgba(var(--sn-bg-gradient-primary-rgb), 0.4)) saturate(1.4) brightness(1.15);
 }
 
 .sn-temporal-linear .Root__top-container::before {
@@ -4874,13 +5144,13 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
 }
 @media (prefers-contrast: high) {
   .Root__main-view::before {
-    background: radial-gradient(circle, rgba(var(--sn-gradient-primary-rgb), 0.3) 0%, rgba(var(--sn-gradient-secondary-rgb), 0.15) 50%, transparent 100%) !important;
+    background: radial-gradient(circle, rgba(var(--sn-bg-gradient-primary-rgb), 0.3) 0%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.15) 50%, transparent 100%) !important;
   }
   .main-view-container::after {
     filter: contrast(2) saturate(1.5) !important;
   }
   .Root__top-container::before {
-    background: linear-gradient(to right, rgba(var(--sn-gradient-primary-rgb), 1) 0%, rgba(var(--sn-gradient-accent-rgb), 0.8) 100%) !important;
+    background: linear-gradient(to right, rgba(var(--sn-bg-gradient-primary-rgb), 1) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 0.8) 100%) !important;
   }
   .Root__top-container::after {
     filter: contrast(1.5) saturate(2) brightness(1.2) !important;
@@ -4895,10 +5165,10 @@ body:not([data-bloom=off]) .main-rootlist-wrapper .main-trackList-trackListRow:h
   filter: none !important;
 }
 .sn-performance-mode .Root__main-view::before {
-  background: rgba(var(--sn-gradient-primary-rgb), 0.1) !important;
+  background: rgba(var(--sn-bg-gradient-primary-rgb), 0.1) !important;
 }
 .sn-performance-mode .main-view-container::after {
-  background: linear-gradient(to top, rgba(var(--sn-gradient-primary-rgb), var(--sn-flux-spectral-bass, 0))) !important;
+  background: linear-gradient(to top, rgba(var(--sn-bg-gradient-primary-rgb), var(--sn-flux-spectral-bass, 0))) !important;
 }
 
 .sn-flux-disabled .Root__main-view::before,
@@ -5606,7 +5876,7 @@ button[data-genre-active]:active,
 }
 :root .Root[data-visual-effects-mode=atmospheric] {
   position: relative;
-  background: radial-gradient(ellipse at center, rgba(var(--sn-accent-rgb), 0.2) 0%, rgba(var(--sn-accent-rgb), 0.05) 60%, transparent 100%);
+  background: radial-gradient(ellipse at center, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.2) 0%, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.05) 60%, transparent 100%);
   filter: blur(2px);
   filter: saturate(calc(1 + var(--sn-visual-effects-emotional-saturation, 1) * 0.3)) brightness(calc(1 + var(--sn-visual-effects-warmth, 0.8) * 0.15));
 }
@@ -5617,7 +5887,7 @@ button[data-genre-active]:active,
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: radial-gradient(circle at 20% 30%, rgba(var(--sn-accent-rgb), 0.1) 2px, transparent 2px);
+  background-image: radial-gradient(circle at 20% 30%, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.1) 2px, transparent 2px);
   background-size: 40px 40px;
   animation: particle-float 8s ease-in-out infinite;
 }
@@ -5661,7 +5931,7 @@ button[data-genre-active]:active,
   z-index: var(--sn-visual-effects-depth-mid, 2);
 }
 :root .Root__nav-bar.visual-effects-enabled[data-fog-type=light] {
-  background: linear-gradient(45deg, rgba(var(--sn-base-rgb), 0.9) 0%, rgba(var(--sn-accent-rgb), 0.1) 50%, rgba(var(--sn-base-rgb), 0.9) 100%);
+  background: linear-gradient(45deg, rgba(var(--sn-base-rgb), 0.9) 0%, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.1) 50%, rgba(var(--sn-base-rgb), 0.9) 100%);
   backdrop-filter: blur(10px);
 }
 :root .Root__nav-bar.visual-effects-enabled::after {
@@ -6020,7 +6290,7 @@ body:not(:has(.main-searchPage-content)) .main-gridContainer-gridContainer[data-
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, transparent 0%, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.05) 50%, transparent 100%);
+  background: linear-gradient(135deg, transparent 0%, rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.05) 50%, transparent 100%);
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
@@ -6254,8 +6524,8 @@ body:not(:has(.main-searchPage-content)) .main-yourLibrary-yourLibrary .main-roo
 body:not(:has(.main-searchPage-content)) .main-yourLibrary-yourLibrary .main-rootlist-wrapper .spicetify-playlist-list li:hover {
   backdrop-filter: blur(12px) saturate(1.1);
   -webkit-backdrop-filter: blur(12px) saturate(1.1);
-  background: rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.08);
-  border: 1px solid rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2);
+  background: rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.08);
+  border: 1px solid rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.2);
   will-change: transform, opacity, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -6303,8 +6573,8 @@ body:not(:has(.main-searchPage-content)) .Root__now-playing-bar {
   contain: style paint;
   backdrop-filter: blur(calc(var(--glass-blur, 6px) + var(--sn-glass-beat-boost, 0) * 5px)) saturate(var(--glass-saturation, 1.2)) brightness(var(--glass-brightness, 1.1));
   -webkit-backdrop-filter: blur(calc(var(--glass-blur, 6px) + var(--sn-glass-beat-boost, 0) * 5px)) saturate(var(--glass-saturation, 1.2)) brightness(var(--glass-brightness, 1.1));
-  background: var(--glass-background, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1));
-  border: 1px solid var(--glass-border, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2));
+  background: var(--glass-background, rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.1));
+  border: 1px solid var(--glass-border, rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.2));
   transition: backdrop-filter 400ms ease-out, -webkit-backdrop-filter 400ms ease-out, background var(--sn-gradient-transition, 0.8s ease-in-out), border var(--sn-gradient-transition, 0.8s ease-in-out);
   will-change: transform, opacity, filter;
   transform: translateZ(0);
@@ -6412,12 +6682,12 @@ body:not(:has(.main-searchPage-content)) .Root__now-playing-bar .main-shuffleBut
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: radial-gradient(circle at 20% 30%, rgba(var(--sn-accent-rgb), 0.15) 1px, transparent 1px);
+  background-image: radial-gradient(circle at 20% 30%, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.15) 1px, transparent 1px);
   background-size: 20px 20px;
   animation: particle-float 6s ease-in-out infinite;
 }
 :root[data-visual-effects-performance-mode=maximum] .dynamic-volumetric-lighting[data-light-intensity=dramatic] {
-  background: radial-gradient(ellipse at center, rgba(var(--sn-accent-rgb), 0.4) 0%, rgba(var(--sn-accent-rgb), 0.1) 60%, transparent 100%);
+  background: radial-gradient(ellipse at center, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.4) 0%, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.1) 60%, transparent 100%);
   filter: blur(3px);
   mix-blend-mode: screen;
 }
@@ -6925,12 +7195,12 @@ body:not(:has(.main-searchPage-content)) .Root__now-playing-bar .main-shuffleBut
   }
 }
 
-.Root[style*="--sn-beat-pulse-intensity"] .liquid-oil-slick,
-.Root[style*="--sn-beat-pulse-intensity"] .liquid-surface-tension,
-.Root[style*="--sn-beat-pulse-intensity"] .liquid-interference-pattern,
-.Root[style*="--sn-beat-pulse-intensity"] .liquid-chromatic-aberration {
-  --sn-unified-music-energy: var(--sn-beat-pulse-intensity, 0.5);
-  --sn-ui-glass-pulse-enabled: calc(0.5 + var(--sn-beat-pulse-intensity, 0) * 0.4);
+.Root[style*="--sn-music-beat-pulse-intensity"] .liquid-oil-slick,
+.Root[style*="--sn-music-beat-pulse-intensity"] .liquid-surface-tension,
+.Root[style*="--sn-music-beat-pulse-intensity"] .liquid-interference-pattern,
+.Root[style*="--sn-music-beat-pulse-intensity"] .liquid-chromatic-aberration {
+  --sn-unified-music-energy: var(--sn-music-beat-pulse-intensity, 0.5);
+  --sn-ui-glass-pulse-enabled: calc(0.5 + var(--sn-music-beat-pulse-intensity, 0) * 0.4);
 }
 
 @media (max-width: 768px) {
@@ -8099,11 +8369,11 @@ input[type=search]:focus,
   --sn-unified-effect-intensity: 0.4;
 }
 
-.Root[style*="--sn-beat-pulse-intensity"] .main-card-card,
-.Root[style*="--sn-beat-pulse-intensity"] .main-trackList-trackListRow,
-.Root[style*="--sn-beat-pulse-intensity"] .main-playButton-PlayButton {
-  --sn-unified-music-energy: var(--sn-beat-pulse-intensity, 0.5);
-  --sn-music-intensity-boost: calc(1 + var(--sn-beat-pulse-intensity, 0.5));
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-card-card,
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-trackList-trackListRow,
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-playButton-PlayButton {
+  --sn-unified-music-energy: var(--sn-music-beat-pulse-intensity, 0.5);
+  --sn-music-intensity-boost: calc(1 + var(--sn-music-beat-pulse-intensity, 0.5));
 }
 
 .Root[style*="--sn-dynamic-genre-hue-shift"] .main-card-card,
@@ -8138,53 +8408,53 @@ input[type=search]:focus,
   --color-enhancement-opacity: 0.1;
   --sn-glass-beat-opacity: calc(
     var(--color-enhancement-opacity) *
-      (1 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.5)
+      (1 + var(--sn-music-beat-pulse-intensity, 0) * var(--sn-ui-glass-pulse-enabled) * 0.5)
   );
-  --sn-glass-rhythm-hue: calc(var(--sn-rhythm-phase, 0) * var(--sn-glass-pulse-enabled) * 20deg);
-  --sn-glass-cosmic-blur: calc(var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 3px);
-  --sn-glass-saturation: calc(1.2 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.3);
-  --sn-glass-brightness: calc(1.1 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.2);
-  --sn-glass-rhythm-shift: calc(var(--sn-rhythm-phase, 0) * var(--sn-glass-pulse-enabled) * 0.1);
-  --sn-glass-pulse-enabled: var(--glass-pulse-toggle, 1);
+  --sn-glass-rhythm-hue: calc(var(--sn-music-rhythm-phase, 0) * var(--sn-ui-glass-pulse-enabled) * 20deg);
+  --sn-glass-cosmic-blur: calc(var(--sn-music-beat-pulse-intensity, 0) * var(--sn-ui-glass-pulse-enabled) * 3px);
+  --sn-glass-saturation: calc(1.2 + var(--sn-music-beat-pulse-intensity, 0) * var(--sn-ui-glass-pulse-enabled) * 0.3);
+  --sn-glass-brightness: calc(1.1 + var(--sn-music-beat-pulse-intensity, 0) * var(--sn-ui-glass-pulse-enabled) * 0.2);
+  --sn-glass-rhythm-shift: calc(var(--sn-music-rhythm-phase, 0) * var(--sn-ui-glass-pulse-enabled) * 0.1);
+  --sn-ui-glass-pulse-enabled: var(--glass-pulse-toggle, 1);
   --sn-glass-user-base-intensity: var(--glass-user-intensity, 0.5);
   --glass-blur: calc(
     var(--sn-glass-user-base-intensity) * 20px +
-    var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 5px
+    var(--sn-glass-beat-boost, 0) * var(--sn-ui-glass-pulse-enabled) * 5px
   );
   --glass-saturation: calc(
-    1.2 + var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 0.2
+    1.2 + var(--sn-glass-beat-boost, 0) * var(--sn-ui-glass-pulse-enabled) * 0.2
   );
   --glass-brightness: calc(
-    1.1 + var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 0.15
+    1.1 + var(--sn-glass-beat-boost, 0) * var(--sn-ui-glass-pulse-enabled) * 0.15
   );
   --glass-background: rgba(
-    var(--sn-oklab-processed-bright-highlight-rgb),
+    var(--sn-oklab-highlight-rgb),
     calc(
       var(--sn-glass-user-base-intensity) * 0.1 +
-      var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 0.05
+      var(--sn-glass-beat-boost, 0) * var(--sn-ui-glass-pulse-enabled) * 0.05
     )
   );
   --glass-border: rgba(
-    var(--sn-oklab-processed-bright-highlight-rgb),
+    var(--sn-oklab-highlight-rgb),
     calc(
       var(--sn-glass-user-base-intensity) * 0.2 +
-      var(--sn-glass-beat-boost, 0) * var(--sn-glass-pulse-enabled) * 0.1
+      var(--sn-glass-beat-boost, 0) * var(--sn-ui-glass-pulse-enabled) * 0.1
     )
   );
-  --sn-glass-refract-intensity: calc(var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 15deg);
-  --sn-glass-spectrum-shift: calc(var(--sn-rhythm-phase, 0) * var(--sn-glass-pulse-enabled) * 30deg);
-  --sn-glass-energy-pulse: calc(0.8 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.4);
+  --sn-glass-refract-intensity: calc(var(--sn-music-beat-pulse-intensity, 0) * var(--sn-ui-glass-pulse-enabled) * 15deg);
+  --sn-glass-spectrum-shift: calc(var(--sn-music-rhythm-phase, 0) * var(--sn-ui-glass-pulse-enabled) * 30deg);
+  --sn-glass-energy-pulse: calc(0.8 + var(--sn-music-beat-pulse-intensity, 0) * var(--sn-ui-glass-pulse-enabled) * 0.4);
   --enhanced-background: rgba(
     var(--spice-rgb-surface0),
     var(--sn-glass-beat-opacity)
   );
   --enhanced-border: rgba(
     var(--spice-rgb-surface1),
-    calc(0.2 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.15)
+    calc(0.2 + var(--sn-music-beat-pulse-intensity, 0) * var(--sn-ui-glass-pulse-enabled) * 0.15)
   );
   --enhanced-shadow: rgba(
-    var(--sn-oklab-processed-dynamic-shadow-rgb),
-    calc(0.1 + var(--sn-beat-pulse-intensity, 0) * var(--sn-glass-pulse-enabled) * 0.2)
+    var(--sn-oklab-shadow-rgb),
+    calc(0.1 + var(--sn-music-beat-pulse-intensity, 0) * var(--sn-ui-glass-pulse-enabled) * 0.2)
   );
   --color-transition: all var(--sn-gradient-transition, 0.8s ease-in-out);
 }
@@ -8192,7 +8462,7 @@ input[type=search]:focus,
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar,
 .Root__nav-bar {
   background: var(--enhanced-background) !important;
-  box-shadow: 0 8px 32px var(--enhanced-shadow), 0 2px calc(16px + var(--sn-beat-pulse-intensity, 0) * 8px) rgba(var(--sn-accent-rgb, var(--sn-accent-rgb, 202, 158, 230)), calc(var(--sn-beat-pulse-intensity, 0) * 0.2));
+  box-shadow: 0 8px 32px var(--enhanced-shadow), 0 2px calc(16px + var(--sn-music-beat-pulse-intensity, 0) * 8px) rgba(var(--sn-accent-rgb, var(--sn-accent-rgb, 202, 158, 230)), calc(var(--sn-music-beat-pulse-intensity, 0) * 0.2));
   filter: hue-rotate(var(--sn-glass-rhythm-hue)) saturate(var(--sn-glass-saturation)) brightness(var(--sn-glass-brightness));
   transition: var(--color-transition), filter 0.4s ease-out, box-shadow 0.3s ease-out;
 }
@@ -8202,24 +8472,24 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar::after,
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(calc(135deg + var(--sn-glass-spectrum-shift)), rgba(var(--sn-accent-rgb, var(--sn-accent-rgb, 202, 158, 230)), calc(var(--sn-beat-pulse-intensity, 0) * 0.1)) 0%, transparent 40%, rgba(var(--sn-accent-rgb, var(--sn-accent-rgb, 140, 170, 238)), calc(var(--sn-beat-pulse-intensity, 0) * 0.08)) 100%);
+  background: linear-gradient(calc(135deg + var(--sn-glass-spectrum-shift)), rgba(var(--sn-accent-rgb, var(--sn-accent-rgb, 202, 158, 230)), calc(var(--sn-music-beat-pulse-intensity, 0) * 0.1)) 0%, transparent 40%, rgba(var(--sn-accent-rgb, var(--sn-accent-rgb, 140, 170, 238)), calc(var(--sn-music-beat-pulse-intensity, 0) * 0.08)) 100%);
   animation: glassVisualEffectsFlow calc(15s / max(var(--sn-glass-energy-pulse), 0.1)) linear infinite;
-  opacity: var(--sn-beat-pulse-intensity, 0);
+  opacity: var(--sn-music-beat-pulse-intensity, 0);
   transition: opacity 0.5s ease-out;
 }
 @media (max-width: 768px) {
   div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar,
   .Root__nav-bar {
     --sn-glass-beat-opacity: calc(
-      0.12 * (1 + var(--sn-beat-pulse-intensity, 0) * 0.3)
+      0.12 * (1 + var(--sn-music-beat-pulse-intensity, 0) * 0.3)
     );
   }
 }
 
 .GenericModal,
 .main-contextMenu-container {
-  box-shadow: 0 16px 64px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2), 0 8px calc(32px + var(--sn-beat-pulse-intensity, 0) * 16px) rgba(var(--sn-accent-rgb, var(--sn-accent-rgb, 202, 158, 230)), calc(var(--sn-beat-pulse-intensity, 0) * 0.15));
-  border: 1px solid rgba(var(--sn-accent-rgb, "140,170,238"), calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.2));
+  box-shadow: 0 16px 64px rgba(var(--sn-oklab-shadow-rgb, var(--sn-color-oklab-dynamic-shadow-rgb, 0, 0, 0)), 0.2), 0 8px calc(32px + var(--sn-music-beat-pulse-intensity, 0) * 16px) rgba(var(--sn-accent-rgb, var(--sn-accent-rgb, 202, 158, 230)), calc(var(--sn-music-beat-pulse-intensity, 0) * 0.15));
+  border: 1px solid rgba(var(--sn-accent-rgb, "140,170,238"), calc(0.2 + var(--sn-music-beat-pulse-intensity, 0) * 0.2));
   filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.3));
   transition: all 0.4s ease-out;
 }
@@ -8227,14 +8497,14 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar::after,
 body:not(.main-searchPage-content) .main-card-card {
   background: var(--enhanced-background);
   border: 1px solid var(--enhanced-border);
-  box-shadow: 0 4px 12px var(--enhanced-shadow), 0 2px calc(8px + var(--sn-beat-pulse-intensity, 0) * 4px) rgba(var(--sn-accent-rgb, "140,170,238"), calc(var(--sn-beat-pulse-intensity, 0) * 0.1));
-  filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.2)) saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+  box-shadow: 0 4px 12px var(--enhanced-shadow), 0 2px calc(8px + var(--sn-music-beat-pulse-intensity, 0) * 4px) rgba(var(--sn-accent-rgb, "140,170,238"), calc(var(--sn-music-beat-pulse-intensity, 0) * 0.1));
+  filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.2)) saturate(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.1));
   transition: all 0.3s ease-out, transform 0.2s ease-out, filter 0.4s ease-out;
 }
 body:not(.main-searchPage-content) .main-card-card:hover, body:not(.main-searchPage-content) .main-card-card[data-context-menu-open=true] {
-  background: var(--dynamic-card-hover-bg, rgba(var(--spice-rgb-surface1), calc(0.15 + var(--sn-beat-pulse-intensity, 0) * 0.05))) !important;
-  box-shadow: 0 8px 24px var(--enhanced-shadow), 0 4px calc(16px + var(--sn-beat-pulse-intensity, 0) * 8px) rgba(var(--sn-accent-rgb, "202,158,230"), calc(var(--sn-beat-pulse-intensity, 0) * 0.2));
-  filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.4)) saturate(calc(1.1 + var(--sn-beat-pulse-intensity, 0) * 0.2)) brightness(calc(1.05 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+  background: var(--dynamic-card-hover-bg, rgba(var(--spice-rgb-surface1), calc(0.15 + var(--sn-music-beat-pulse-intensity, 0) * 0.05))) !important;
+  box-shadow: 0 8px 24px var(--enhanced-shadow), 0 4px calc(16px + var(--sn-music-beat-pulse-intensity, 0) * 8px) rgba(var(--sn-accent-rgb, "202,158,230"), calc(var(--sn-music-beat-pulse-intensity, 0) * 0.2));
+  filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.4)) saturate(calc(1.1 + var(--sn-music-beat-pulse-intensity, 0) * 0.2)) brightness(calc(1.05 + var(--sn-music-beat-pulse-intensity, 0) * 0.1));
 }
 
 div.Root__right-sidebar[data-testid=right-sidebar],
@@ -8307,10 +8577,10 @@ div.Root__right-sidebar[data-testid=right-sidebar],
 @media (prefers-contrast: high) {
   :root {
     --sn-glass-beat-opacity: calc(
-      0.25 * (1 + var(--sn-beat-pulse-intensity, 0) * 0.3)
+      0.25 * (1 + var(--sn-music-beat-pulse-intensity, 0) * 0.3)
     );
     --enhanced-border: rgba(var(--spice-rgb-text), 0.4);
-    --sn-glass-saturation: calc(1.4 + var(--sn-beat-pulse-intensity, 0) * 0.2);
+    --sn-glass-saturation: calc(1.4 + var(--sn-music-beat-pulse-intensity, 0) * 0.2);
   }
   .Root__nav-bar,
   .main-card-card {
@@ -8320,16 +8590,16 @@ div.Root__right-sidebar[data-testid=right-sidebar],
 @media (max-width: 768px) {
   :root {
     --sn-glass-beat-opacity: calc(
-      0.08 * (1 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+      0.08 * (1 + var(--sn-music-beat-pulse-intensity, 0) * 0.2)
     );
-    --sn-glass-cosmic-blur: calc(var(--sn-beat-pulse-intensity, 0) * 2px);
+    --sn-glass-cosmic-blur: calc(var(--sn-music-beat-pulse-intensity, 0) * 2px);
     --sn-glass-refract-intensity: calc(
-      var(--sn-beat-pulse-intensity, 0) * 10deg
+      var(--sn-music-beat-pulse-intensity, 0) * 10deg
     );
   }
   .sn-glass-intense {
     --sn-glass-beat-opacity: calc(
-      0.12 * (1 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+      0.12 * (1 + var(--sn-music-beat-pulse-intensity, 0) * 0.2)
     );
   }
   .Root__nav-bar,
@@ -8339,7 +8609,7 @@ div.Root__right-sidebar[data-testid=right-sidebar],
 }
 @media (max-resolution: 1dppx) {
   :root {
-    --sn-glass-cosmic-blur: calc(var(--sn-beat-pulse-intensity, 0) * 1px);
+    --sn-glass-cosmic-blur: calc(var(--sn-music-beat-pulse-intensity, 0) * 1px);
   }
   .Root__nav-bar::after {
     display: none;
@@ -9466,7 +9736,7 @@ body:not(.sn-debug-mode) .sn-white-layer-indicator {
   --text-glow-strength: 0.2;
   --music-text-intensity: calc(
     var(--text-shimmer-intensity) +
-    var(--sn-beat-pulse-intensity, 0) * 0.3
+    var(--sn-music-beat-pulse-intensity, 0) * 0.3
   );
   --music-glow-strength: calc(
     var(--text-glow-strength) +
@@ -9850,11 +10120,11 @@ h3,
   transition: background-size 0.3s ease-out;
 }
 
-.Root[style*="--sn-beat-pulse-intensity"] h1, .Root[style*="--sn-beat-pulse-intensity"] h2, .Root[style*="--sn-beat-pulse-intensity"] h3,
-.Root[style*="--sn-beat-pulse-intensity"] .main-entityHeader-title,
-.Root[style*="--sn-beat-pulse-intensity"] .main-trackList-trackName,
-.Root[style*="--sn-beat-pulse-intensity"] .main-cardHeader-text {
-  animation-duration: calc(var(--text-shimmer-speed) / max(var(--sn-beat-pulse-intensity, 0.3), 0.3));
+.Root[style*="--sn-music-beat-pulse-intensity"] h1, .Root[style*="--sn-music-beat-pulse-intensity"] h2, .Root[style*="--sn-music-beat-pulse-intensity"] h3,
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-entityHeader-title,
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-trackList-trackName,
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-cardHeader-text {
+  animation-duration: calc(var(--text-shimmer-speed) / max(var(--sn-music-beat-pulse-intensity, 0.3), 0.3));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -9905,18 +10175,18 @@ h3,
   --holographic-prism-intensity: var(--visual-effects-prism-intensity);
 }
 
-.Root[style*="--sn-beat-pulse-intensity"] :root {
-  --ripple-opacity: calc(0.3 + var(--sn-beat-pulse-intensity, 0) * 0.2);
+.Root[style*="--sn-music-beat-pulse-intensity"] :root {
+  --ripple-opacity: calc(0.3 + var(--sn-music-beat-pulse-intensity, 0) * 0.2);
   --focus-glow-intensity: calc(0.4 + var(--sn-music-energy, 0) * 0.3);
-  --hover-glow-intensity: calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.2);
+  --hover-glow-intensity: calc(0.2 + var(--sn-music-beat-pulse-intensity, 0) * 0.2);
 }
-.Root[style*="--sn-beat-pulse-intensity"] button,
-.Root[style*="--sn-beat-pulse-intensity"] .main-playButton-PlayButton,
-.Root[style*="--sn-beat-pulse-intensity"] .main-card-card,
-.Root[style*="--sn-beat-pulse-intensity"] .main-card-cardContainer,
-.Root[style*="--sn-beat-pulse-intensity"] .main-trackList-trackListRow {
+.Root[style*="--sn-music-beat-pulse-intensity"] button,
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-playButton-PlayButton,
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-card-card,
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-card-cardContainer,
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-trackList-trackListRow {
   --ripple-duration: calc(600ms / max(var(--sn-music-energy, 0.5), 0.5));
-  --hover-transition-speed: calc(200ms / max(var(--sn-beat-pulse-intensity, 0.5), 0.5));
+  --hover-transition-speed: calc(200ms / max(var(--sn-music-beat-pulse-intensity, 0.5), 0.5));
 }
 
 .main-playButton-PlayButton,
@@ -9934,7 +10204,7 @@ h3,
   --local-lift-distance: var(--hover-lift-distance);
   --local-hover-scale: var(--hover-scale-factor);
   --local-hover-glow: var(--hover-glow-intensity);
-  animation: musical-interaction-boost calc(var(--living-pulse-speed, 4s) / max(var(--sn-beat-pulse-intensity, 0.5), 0.5)) ease-in-out infinite;
+  animation: musical-interaction-boost calc(var(--living-pulse-speed, 4s) / max(var(--sn-music-beat-pulse-intensity, 0.5), 0.5)) ease-in-out infinite;
 }
 .main-playButton-PlayButton::after,
 .main-skipBackButton-button::after,
@@ -10037,7 +10307,7 @@ h3,
   --local-lift-distance: 1px;
   --local-hover-scale: 1.005;
   --local-hover-glow: 0.1;
-  animation: musical-interaction-boost calc(var(--living-pulse-speed, 4s) / max(var(--sn-beat-pulse-intensity, 0.5), 0.5)) ease-in-out infinite;
+  animation: musical-interaction-boost calc(var(--living-pulse-speed, 4s) / max(var(--sn-music-beat-pulse-intensity, 0.5), 0.5)) ease-in-out infinite;
 }
 .main-card-card::after,
 .main-card-cardContainer::after {
@@ -10142,7 +10412,7 @@ h3,
   filter: brightness(1.05) saturate(1.1);
 }
 .main-trackList-trackListRow.main-trackList-selected, .main-trackList-trackListRow:has(.main-trackList-playingIcon) {
-  animation: musical-interaction-boost calc(var(--living-pulse-speed, 4s) / max(var(--sn-beat-pulse-intensity, 0.5), 0.5)) ease-in-out infinite;
+  animation: musical-interaction-boost calc(var(--living-pulse-speed, 4s) / max(var(--sn-music-beat-pulse-intensity, 0.5), 0.5)) ease-in-out infinite;
   transition: transform var(--hover-transition-speed) ease-out, box-shadow var(--hover-transition-speed) ease-out, filter var(--hover-transition-speed) ease-out;
   --local-lift-distance: var(--hover-lift-distance);
   --local-hover-scale: var(--hover-scale-factor);
@@ -10231,7 +10501,7 @@ h3,
 .main-contextMenu-menuItemButton.main-rootlist-rootlistItemActive,
 .spicetify-playlist-list li a[aria-selected=true],
 .spicetify-playlist-list li a.main-rootlist-rootlistItemActive {
-  animation: musical-interaction-boost calc(var(--living-pulse-speed, 4s) / max(var(--sn-beat-pulse-intensity, 0.5), 0.5)) ease-in-out infinite;
+  animation: musical-interaction-boost calc(var(--living-pulse-speed, 4s) / max(var(--sn-music-beat-pulse-intensity, 0.5), 0.5)) ease-in-out infinite;
 }
 .main-navBar-navBarLink[aria-selected=true]:hover, .main-navBar-navBarLink[aria-selected=true]:focus, .main-navBar-navBarLink.main-rootlist-rootlistItemActive:hover, .main-navBar-navBarLink.main-rootlist-rootlistItemActive:focus,
 .main-rootlist-rootlistItemLink[aria-selected=true]:hover,
@@ -10373,11 +10643,11 @@ input[type=search]:focus,
   }
 }
 :root {
-  --micro-beat-intensity: var(--sn-beat-pulse-intensity, 0);
+  --micro-beat-intensity: var(--sn-music-beat-pulse-intensity, 0);
   --micro-breathing-scale: 1;
   --micro-glow-radius: calc(8px + (12px * var(--micro-beat-intensity)));
   --micro-scale-enhancement: calc(1 + (var(--micro-beat-intensity) * 0.02));
-  --micro-hue-shift: calc(var(--sn-rhythm-phase, 0) * 1deg);
+  --micro-hue-shift: calc(var(--sn-music-rhythm-phase, 0) * 1deg);
 }
 
 .main-card-card,
@@ -11160,7 +11430,7 @@ input[type=search]:focus,
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1) 0%, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0) 70%);
+  background: radial-gradient(ellipse at center, rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.1) 0%, rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0) 70%);
   opacity: 0.5;
   z-index: var(--z-starfield, -10);
 }
@@ -11716,7 +11986,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .main-yourLibraryX-listIte
 .main-yourLibraryX-navLinkActive .Root__nav-bar .main-yourLibraryX-listItem .main-useDropTarget-base {
   /* If parent has active class*/
   background-color: rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.15);
-  box-shadow: inset 0 0 10px -5px rgba(var(--sn-accent-rgb), calc(0.3 * var(--sn-sidebar-harmonic-intensity-multiplier)));
+  box-shadow: inset 0 0 10px -5px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.3 * var(--sn-sidebar-harmonic-intensity-multiplier)));
 }
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar .sn-item-type-playlist::after,
 .Root__nav-bar .sn-item-type-playlist::after {
@@ -11786,37 +12056,37 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar,
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-color-harmony-analogous-flow,
 .Root__nav-bar.sn-color-harmony-analogous-flow {
   background: linear-gradient(170deg, rgba(var(--sn-accent-rgb, "202,158,230"), calc(var(--sn-sidebar-base-bg-opacity) * 0.7 * var(--sn-sidebar-harmonic-intensity-multiplier))) 0%, rgba(var(--sn-accent-rgb, "186,187,241"), calc(var(--sn-sidebar-base-bg-opacity) * 0.5 * var(--sn-sidebar-harmonic-intensity-multiplier))) 40%, rgba(var(--sn-accent-rgb, "140,170,238"), calc(var(--sn-sidebar-base-bg-opacity) * 0.8 * var(--sn-sidebar-harmonic-intensity-multiplier))) 100%);
-  box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier))), inset 0 0 30px 5px rgba(var(--sn-accent-rgb), calc(0.099 * var(--sn-sidebar-harmonic-intensity-multiplier)));
+  box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier))), inset 0 0 30px 5px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.099 * var(--sn-sidebar-harmonic-intensity-multiplier)));
 }
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-color-harmony-triadic-scheme,
 .Root__nav-bar.sn-color-harmony-triadic-scheme {
   /* Example: Use Primary, Accent, and a shifted Primary for Triadic relationship*/
   background: linear-gradient(170deg, rgba(var(--sn-accent-rgb, "203,166,247"), calc(var(--sn-sidebar-base-bg-opacity) * 0.7 * var(--sn-sidebar-harmonic-intensity-multiplier))) 0%, rgba(var(--sn-accent-rgb, "148,226,213"), calc(var(--sn-sidebar-base-bg-opacity) * 0.5 * var(--sn-sidebar-harmonic-intensity-multiplier))) 40%, rgba(var(--sn-accent-rgb, "245,194,231"), calc(var(--sn-sidebar-base-bg-opacity) * 0.8 * var(--sn-sidebar-harmonic-intensity-multiplier))) 100%);
-  box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier))), inset 0 0 30px 5px rgba(var(--sn-accent-rgb), calc(0.099 * var(--sn-sidebar-harmonic-intensity-multiplier)));
+  box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier))), inset 0 0 30px 5px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.099 * var(--sn-sidebar-harmonic-intensity-multiplier)));
 }
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-color-harmony-complementary-contrast,
 .Root__nav-bar.sn-color-harmony-complementary-contrast {
   /* Primary and Accent (often complementary)*/
   background: linear-gradient(170deg, rgba(var(--sn-accent-rgb, "239,159,118"), calc(var(--sn-sidebar-base-bg-opacity) * 0.7 * var(--sn-sidebar-harmonic-intensity-multiplier))) 0%, rgba(var(--sn-accent-rgb, "137,180,250"), calc(var(--sn-sidebar-base-bg-opacity) * 0.5 * var(--sn-sidebar-harmonic-intensity-multiplier))) 40%, rgba(var(--spice-rgb-surface1, "69,71,90"), calc(var(--sn-sidebar-base-bg-opacity) * 0.8 * var(--sn-sidebar-harmonic-intensity-multiplier))) 100%);
-  box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier))), inset 0 0 30px 5px rgba(var(--sn-accent-rgb), calc(0.099 * var(--sn-sidebar-harmonic-intensity-multiplier)));
+  box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier))), inset 0 0 30px 5px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.099 * var(--sn-sidebar-harmonic-intensity-multiplier)));
 }
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-color-harmony-tetradic-cross,
 .Root__nav-bar.sn-color-harmony-tetradic-cross {
   /* Example*/
   background: linear-gradient(170deg, rgba(var(--spice-rgb-green), calc(var(--sn-sidebar-base-bg-opacity) * 0.7 * var(--sn-sidebar-harmonic-intensity-multiplier))) 0%, rgba(var(--spice-rgb-red), calc(var(--sn-sidebar-base-bg-opacity) * 0.5 * var(--sn-sidebar-harmonic-intensity-multiplier))) 40%, rgba(var(--spice-rgb-yellow), calc(var(--sn-sidebar-base-bg-opacity) * 0.8 * var(--sn-sidebar-harmonic-intensity-multiplier))) 100%);
-  box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier))), inset 0 0 30px 5px rgba(var(--sn-accent-rgb), calc(0.099 * var(--sn-sidebar-harmonic-intensity-multiplier)));
+  box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier))), inset 0 0 30px 5px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.099 * var(--sn-sidebar-harmonic-intensity-multiplier)));
 }
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-color-harmony-split-complementary-spectrum,
 .Root__nav-bar.sn-color-harmony-split-complementary-spectrum {
   /* Example*/
   background: linear-gradient(170deg, rgba(var(--spice-rgb-peach), calc(var(--sn-sidebar-base-bg-opacity) * 0.7 * var(--sn-sidebar-harmonic-intensity-multiplier))) 0%, rgba(var(--spice-rgb-sky), calc(var(--sn-sidebar-base-bg-opacity) * 0.5 * var(--sn-sidebar-harmonic-intensity-multiplier))) 40%, rgba(var(--spice-rgb-teal), calc(var(--sn-sidebar-base-bg-opacity) * 0.8 * var(--sn-sidebar-harmonic-intensity-multiplier))) 100%);
-  box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier))), inset 0 0 30px 5px rgba(var(--sn-accent-rgb), calc(0.099 * var(--sn-sidebar-harmonic-intensity-multiplier)));
+  box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier))), inset 0 0 30px 5px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.099 * var(--sn-sidebar-harmonic-intensity-multiplier)));
 }
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-color-harmony-monochromatic-calm,
 .Root__nav-bar.sn-color-harmony-monochromatic-calm {
   /* Example*/
   background: linear-gradient(170deg, rgba(var(--sn-accent-rgb), calc(var(--sn-sidebar-base-bg-opacity) * 0.7 * var(--sn-sidebar-harmonic-intensity-multiplier))) 0%, rgba(var(--sn-accent-rgb), calc(var(--sn-sidebar-base-bg-opacity) * 0.5 * var(--sn-sidebar-harmonic-intensity-multiplier))) 40%, rgba(var(--sn-accent-rgb), calc(var(--sn-sidebar-base-bg-opacity) * 0.8 * var(--sn-sidebar-harmonic-intensity-multiplier))) 100%);
-  box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier))), inset 0 0 30px 5px rgba(var(--sn-accent-rgb), calc(0.099 * var(--sn-sidebar-harmonic-intensity-multiplier)));
+  box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier))), inset 0 0 30px 5px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.099 * var(--sn-sidebar-harmonic-intensity-multiplier)));
   --sn-sidebar-base-bg-opacity: 0.2; /* More intense for monochromatic*/
 }
 div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-low-energy,
@@ -11836,26 +12106,26 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
 }
 @keyframes sn-sidebar-pulse-slow {
   0%, 100% {
-    box-shadow: inset 0 0 70px -25px rgba(var(--sn-accent-rgb), calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
+    box-shadow: inset 0 0 70px -25px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
   }
   50% {
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.15 * var(--sn-sidebar-harmonic-intensity-multiplier) * 0.7));
   }
 }
 @keyframes sn-sidebar-pulse-mid {
   0%, 100% {
-    box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb), calc(0.2 * var(--sn-sidebar-harmonic-intensity-multiplier)));
+    box-shadow: inset 0 0 80px -20px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.2 * var(--sn-sidebar-harmonic-intensity-multiplier)));
   }
   50% {
-    box-shadow: inset 0 0 90px -15px rgba(var(--sn-accent-rgb), calc(0.25 * var(--sn-sidebar-harmonic-intensity-multiplier)));
+    box-shadow: inset 0 0 90px -15px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.25 * var(--sn-sidebar-harmonic-intensity-multiplier)));
   }
 }
 @keyframes sn-sidebar-pulse-fast {
   0%, 100% {
-    box-shadow: inset 0 0 90px -15px rgba(var(--sn-accent-rgb), calc(0.3 * var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
+    box-shadow: inset 0 0 90px -15px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.3 * var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
   }
   50% {
-    box-shadow: inset 0 0 100px -10px rgba(var(--sn-accent-rgb), calc(0.35 * var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
+    box-shadow: inset 0 0 100px -10px rgba(var(--sn-accent-rgb, 128, 128, 128), calc(0.35 * var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
   }
 }
 
@@ -12369,7 +12639,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   inset: 0;
   pointer-events: none;
   z-index: var(--z-depth-layer-1);
-  background: radial-gradient(ellipse at center, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.015) 0%, transparent 50%);
+  background: radial-gradient(ellipse at center, rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.015) 0%, transparent 50%);
   transform: translateZ(calc(var(--sn-depth-layer-1-z, 150px) * -1)) translateY(var(--sn-depth-layer-1-offset-y, 0px)) scale(var(--sn-depth-layer-1-scale, 1));
   filter: blur(var(--sn-depth-layer-1-blur, 4px)) hue-rotate(var(--sn-depth-layer-1-hue-rotate, 0deg));
   transition: var(--sn-depth-layer-transition);
@@ -12391,7 +12661,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   height: 500%;
   z-index: -1020;
   pointer-events: none;
-  background: radial-gradient(circle 15% at 50% 50%, rgba(var(--sn-gradient-primary-rgb), var(--galaxy-core-brightness)) 0%, rgba(var(--sn-gradient-accent-rgb), calc(var(--galaxy-core-brightness) * 0.8)) 30%, rgba(var(--sn-gradient-secondary-rgb), calc(var(--galaxy-core-brightness) * 0.6)) 60%, transparent 100%), conic-gradient(from 0deg, transparent 0deg, rgba(var(--sn-gradient-primary-rgb), 0.2) 45deg, transparent 90deg, rgba(var(--sn-gradient-accent-rgb), 0.15) 135deg, transparent 180deg, rgba(var(--sn-gradient-secondary-rgb), 0.1) 225deg, transparent 270deg, rgba(var(--sn-gradient-primary-rgb), 0.2) 315deg, transparent 360deg), conic-gradient(from 90deg, transparent 0deg, rgba(var(--sn-gradient-accent-rgb), 0.18) 45deg, transparent 90deg, rgba(var(--sn-gradient-secondary-rgb), 0.12) 135deg, transparent 180deg, rgba(var(--sn-gradient-primary-rgb), 0.08) 225deg, transparent 270deg, rgba(var(--sn-gradient-accent-rgb), 0.18) 315deg, transparent 360deg), radial-gradient(ellipse 80% 60% at 50% 50%, transparent 0%, rgba(var(--sn-gradient-primary-rgb), 0.05) 40%, rgba(var(--sn-gradient-accent-rgb), 0.08) 70%, rgba(var(--sn-gradient-secondary-rgb), var(--galaxy-outer-dimness)) 100%);
+  background: radial-gradient(circle 15% at 50% 50%, rgba(var(--sn-bg-gradient-primary-rgb), var(--galaxy-core-brightness)) 0%, rgba(var(--sn-bg-gradient-accent-rgb), calc(var(--galaxy-core-brightness) * 0.8)) 30%, rgba(var(--sn-bg-gradient-secondary-rgb), calc(var(--galaxy-core-brightness) * 0.6)) 60%, transparent 100%), conic-gradient(from 0deg, transparent 0deg, rgba(var(--sn-bg-gradient-primary-rgb), 0.2) 45deg, transparent 90deg, rgba(var(--sn-bg-gradient-accent-rgb), 0.15) 135deg, transparent 180deg, rgba(var(--sn-bg-gradient-secondary-rgb), 0.1) 225deg, transparent 270deg, rgba(var(--sn-bg-gradient-primary-rgb), 0.2) 315deg, transparent 360deg), conic-gradient(from 90deg, transparent 0deg, rgba(var(--sn-bg-gradient-accent-rgb), 0.18) 45deg, transparent 90deg, rgba(var(--sn-bg-gradient-secondary-rgb), 0.12) 135deg, transparent 180deg, rgba(var(--sn-bg-gradient-primary-rgb), 0.08) 225deg, transparent 270deg, rgba(var(--sn-bg-gradient-accent-rgb), 0.18) 315deg, transparent 360deg), radial-gradient(ellipse 80% 60% at 50% 50%, transparent 0%, rgba(var(--sn-bg-gradient-primary-rgb), 0.05) 40%, rgba(var(--sn-bg-gradient-accent-rgb), 0.08) 70%, rgba(var(--sn-bg-gradient-secondary-rgb), var(--galaxy-outer-dimness)) 100%);
   animation: galactic-holographic-rotation calc(var(--galaxy-rotation-speed) / var(--music-galactic-rotation)) linear infinite, cosmic-holographic-pulse var(--zoom-breathing-rhythm) ease-in-out infinite;
   filter: blur(8px) brightness(calc(0.7 * var(--music-cosmic-expansion)));
   z-index: var(--z-galactic-backdrop);
@@ -12405,7 +12675,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   height: 200%;
   z-index: calc(-1000 - 6);
   pointer-events: none;
-  background: radial-gradient(0.09px circle at 5% 8%, rgba(var(--sn-gradient-primary-rgb), 0.15) 0%, transparent 50%), radial-gradient(0.09px circle at 95% 92%, rgba(var(--sn-gradient-accent-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.09px circle at 25% 35%, rgba(var(--sn-gradient-secondary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.09px circle at 75% 65%, rgba(var(--sn-gradient-primary-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.09px circle at 45% 85%, rgba(var(--sn-gradient-accent-rgb), 0.15) 0%, transparent 50%), radial-gradient(0.09px circle at 85% 15%, rgba(var(--sn-gradient-secondary-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.09px circle at 15% 55%, rgba(var(--sn-gradient-primary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.09px circle at 55% 45%, rgba(var(--sn-gradient-accent-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.09px circle at 35% 75%, rgba(var(--sn-gradient-secondary-rgb), 0.15) 0%, transparent 50%), radial-gradient(0.09px circle at 75% 25%, rgba(var(--sn-gradient-primary-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.09px circle at 65% 85%, rgba(var(--sn-gradient-accent-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.09px circle at 85% 35%, rgba(var(--sn-gradient-secondary-rgb), 0.1) 0%, transparent 50%);
+  background: radial-gradient(0.09px circle at 5% 8%, rgba(var(--sn-bg-gradient-primary-rgb), 0.15) 0%, transparent 50%), radial-gradient(0.09px circle at 95% 92%, rgba(var(--sn-bg-gradient-accent-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.09px circle at 25% 35%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.09px circle at 75% 65%, rgba(var(--sn-bg-gradient-primary-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.09px circle at 45% 85%, rgba(var(--sn-bg-gradient-accent-rgb), 0.15) 0%, transparent 50%), radial-gradient(0.09px circle at 85% 15%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.09px circle at 15% 55%, rgba(var(--sn-bg-gradient-primary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.09px circle at 55% 45%, rgba(var(--sn-bg-gradient-accent-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.09px circle at 35% 75%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.15) 0%, transparent 50%), radial-gradient(0.09px circle at 75% 25%, rgba(var(--sn-bg-gradient-primary-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.09px circle at 65% 85%, rgba(var(--sn-bg-gradient-accent-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.09px circle at 85% 35%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.1) 0%, transparent 50%);
   animation: infinite-star-field-drift calc(var(--zoom-animation-speed) / 0.05) linear infinite, stellar-holographic-pulse calc(120s / 0.05) linear infinite;
   filter: blur(calc(6 * 0.5px)) brightness(calc(1 - 6 * 0.1));
   opacity: calc(1 - 6 * 0.1);
@@ -12421,7 +12691,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   height: 300%;
   z-index: calc(-1000 - 5 - 10);
   pointer-events: none;
-  background: radial-gradient(ellipse var(--nebula-scale-infinite) 80% at 30% 40%, rgba(var(--sn-gradient-primary-rgb), 0.03) 0%, rgba(var(--sn-gradient-accent-rgb), 0.021) 30%, rgba(var(--sn-gradient-secondary-rgb), 0.015) 60%, transparent 100%), radial-gradient(ellipse calc(var(--nebula-scale-infinite) * 0.7) 60% at 70% 60%, rgba(var(--sn-gradient-accent-rgb), 0.024) 0%, rgba(var(--sn-gradient-secondary-rgb), 0.018) 40%, transparent 80%), linear-gradient(calc(135deg + var(--visual-flow-angle, 0deg)), rgba(var(--sn-gradient-secondary-rgb), 0.018) 0%, rgba(var(--sn-gradient-primary-rgb), 0.012) 30%, transparent 70%, rgba(var(--sn-gradient-accent-rgb), 0.009) 100%);
+  background: radial-gradient(ellipse var(--nebula-scale-infinite) 80% at 30% 40%, rgba(var(--sn-bg-gradient-primary-rgb), 0.03) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 0.021) 30%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.015) 60%, transparent 100%), radial-gradient(ellipse calc(var(--nebula-scale-infinite) * 0.7) 60% at 70% 60%, rgba(var(--sn-bg-gradient-accent-rgb), 0.024) 0%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.018) 40%, transparent 80%), linear-gradient(calc(135deg + var(--visual-flow-angle, 0deg)), rgba(var(--sn-bg-gradient-secondary-rgb), 0.018) 0%, rgba(var(--sn-bg-gradient-primary-rgb), 0.012) 30%, transparent 70%, rgba(var(--sn-bg-gradient-accent-rgb), 0.009) 100%);
   background-size: 400% 300%, 350% 250%, 500% 200%;
   animation: nebula-holographic-flow calc(var(--nebula-flow-speed) * (1 + 5 * 0.3)) ease-in-out infinite;
   will-change: transform, opacity, filter;
@@ -12460,7 +12730,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   height: 200%;
   z-index: calc(-1000 - 4);
   pointer-events: none;
-  background: radial-gradient(0.25px circle at 8% 12%, rgba(var(--sn-gradient-primary-rgb), 0.3) 0%, transparent 50%), radial-gradient(0.25px circle at 92% 88%, rgba(var(--sn-gradient-accent-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.25px circle at 28% 38%, rgba(var(--sn-gradient-secondary-rgb), 0.4) 0%, transparent 50%), radial-gradient(0.25px circle at 72% 62%, rgba(var(--sn-gradient-primary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.25px circle at 44% 84%, rgba(var(--sn-gradient-accent-rgb), 0.3) 0%, transparent 50%), radial-gradient(0.25px circle at 84% 16%, rgba(var(--sn-gradient-secondary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.25px circle at 16% 56%, rgba(var(--sn-gradient-primary-rgb), 0.3) 0%, transparent 50%), radial-gradient(0.25px circle at 56% 44%, rgba(var(--sn-gradient-accent-rgb), 0.4) 0%, transparent 50%), radial-gradient(0.25px circle at 36% 76%, rgba(var(--sn-gradient-secondary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.25px circle at 76% 24%, rgba(var(--sn-gradient-primary-rgb), 0.3) 0%, transparent 50%);
+  background: radial-gradient(0.25px circle at 8% 12%, rgba(var(--sn-bg-gradient-primary-rgb), 0.3) 0%, transparent 50%), radial-gradient(0.25px circle at 92% 88%, rgba(var(--sn-bg-gradient-accent-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.25px circle at 28% 38%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.4) 0%, transparent 50%), radial-gradient(0.25px circle at 72% 62%, rgba(var(--sn-bg-gradient-primary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.25px circle at 44% 84%, rgba(var(--sn-bg-gradient-accent-rgb), 0.3) 0%, transparent 50%), radial-gradient(0.25px circle at 84% 16%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.25px circle at 16% 56%, rgba(var(--sn-bg-gradient-primary-rgb), 0.3) 0%, transparent 50%), radial-gradient(0.25px circle at 56% 44%, rgba(var(--sn-bg-gradient-accent-rgb), 0.4) 0%, transparent 50%), radial-gradient(0.25px circle at 36% 76%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.25px circle at 76% 24%, rgba(var(--sn-bg-gradient-primary-rgb), 0.3) 0%, transparent 50%);
   animation: infinite-star-field-drift calc(var(--zoom-animation-speed) / 0.3) linear infinite, stellar-holographic-pulse calc(120s / 0.3) linear infinite;
   filter: blur(calc(4 * 0.5px)) brightness(calc(1 - 4 * 0.1));
   opacity: calc(1 - 4 * 0.1);
@@ -12476,7 +12746,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   height: 300%;
   z-index: calc(-1000 - 3 - 10);
   pointer-events: none;
-  background: radial-gradient(ellipse var(--nebula-scale-large) 80% at 30% 40%, rgba(var(--sn-gradient-primary-rgb), 0.05) 0%, rgba(var(--sn-gradient-accent-rgb), 0.035) 30%, rgba(var(--sn-gradient-secondary-rgb), 0.025) 60%, transparent 100%), radial-gradient(ellipse calc(var(--nebula-scale-large) * 0.7) 60% at 70% 60%, rgba(var(--sn-gradient-accent-rgb), 0.04) 0%, rgba(var(--sn-gradient-secondary-rgb), 0.03) 40%, transparent 80%), linear-gradient(calc(135deg + var(--visual-flow-angle, 0deg)), rgba(var(--sn-gradient-secondary-rgb), 0.03) 0%, rgba(var(--sn-gradient-primary-rgb), 0.02) 30%, transparent 70%, rgba(var(--sn-gradient-accent-rgb), 0.015) 100%);
+  background: radial-gradient(ellipse var(--nebula-scale-large) 80% at 30% 40%, rgba(var(--sn-bg-gradient-primary-rgb), 0.05) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 0.035) 30%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.025) 60%, transparent 100%), radial-gradient(ellipse calc(var(--nebula-scale-large) * 0.7) 60% at 70% 60%, rgba(var(--sn-bg-gradient-accent-rgb), 0.04) 0%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.03) 40%, transparent 80%), linear-gradient(calc(135deg + var(--visual-flow-angle, 0deg)), rgba(var(--sn-bg-gradient-secondary-rgb), 0.03) 0%, rgba(var(--sn-bg-gradient-primary-rgb), 0.02) 30%, transparent 70%, rgba(var(--sn-bg-gradient-accent-rgb), 0.015) 100%);
   background-size: 400% 300%, 350% 250%, 500% 200%;
   animation: nebula-holographic-flow calc(var(--nebula-flow-speed) * (1 + 3 * 0.3)) ease-in-out infinite;
   will-change: transform, opacity, filter;
@@ -12515,7 +12785,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   height: 200%;
   z-index: calc(-1000 - 3);
   pointer-events: none;
-  background: radial-gradient(0.8px circle at 12% 18%, rgba(var(--sn-gradient-primary-rgb), 0.6) 0%, transparent 50%), radial-gradient(0.8px circle at 88% 82%, rgba(var(--sn-gradient-accent-rgb), 0.5) 0%, transparent 50%), radial-gradient(0.8px circle at 32% 42%, rgba(var(--sn-gradient-secondary-rgb), 0.7) 0%, transparent 50%), radial-gradient(0.8px circle at 78% 28%, rgba(var(--sn-gradient-primary-rgb), 0.4) 0%, transparent 50%), radial-gradient(0.8px circle at 48% 88%, rgba(var(--sn-gradient-accent-rgb), 0.6) 0%, transparent 50%), radial-gradient(0.8px circle at 18% 68%, rgba(var(--sn-gradient-secondary-rgb), 0.5) 0%, transparent 50%), radial-gradient(0.8px circle at 92% 52%, rgba(var(--sn-gradient-primary-rgb), 0.4) 0%, transparent 50%), radial-gradient(0.8px circle at 58% 22%, rgba(var(--sn-gradient-accent-rgb), 0.7) 0%, transparent 50%);
+  background: radial-gradient(0.8px circle at 12% 18%, rgba(var(--sn-bg-gradient-primary-rgb), 0.6) 0%, transparent 50%), radial-gradient(0.8px circle at 88% 82%, rgba(var(--sn-bg-gradient-accent-rgb), 0.5) 0%, transparent 50%), radial-gradient(0.8px circle at 32% 42%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.7) 0%, transparent 50%), radial-gradient(0.8px circle at 78% 28%, rgba(var(--sn-bg-gradient-primary-rgb), 0.4) 0%, transparent 50%), radial-gradient(0.8px circle at 48% 88%, rgba(var(--sn-bg-gradient-accent-rgb), 0.6) 0%, transparent 50%), radial-gradient(0.8px circle at 18% 68%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.5) 0%, transparent 50%), radial-gradient(0.8px circle at 92% 52%, rgba(var(--sn-bg-gradient-primary-rgb), 0.4) 0%, transparent 50%), radial-gradient(0.8px circle at 58% 22%, rgba(var(--sn-bg-gradient-accent-rgb), 0.7) 0%, transparent 50%);
   animation: infinite-star-field-drift calc(var(--zoom-animation-speed) / 0.5) linear infinite, stellar-holographic-pulse calc(120s / 0.5) linear infinite;
   filter: blur(calc(3 * 0.5px)) brightness(calc(1 - 3 * 0.1));
   opacity: calc(1 - 3 * 0.1);
@@ -12531,7 +12801,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   height: 300%;
   z-index: calc(-1000 - 2 - 10);
   pointer-events: none;
-  background: radial-gradient(ellipse var(--nebula-scale-medium) 80% at 30% 40%, rgba(var(--sn-gradient-primary-rgb), 0.08) 0%, rgba(var(--sn-gradient-accent-rgb), 0.056) 30%, rgba(var(--sn-gradient-secondary-rgb), 0.04) 60%, transparent 100%), radial-gradient(ellipse calc(var(--nebula-scale-medium) * 0.7) 60% at 70% 60%, rgba(var(--sn-gradient-accent-rgb), 0.064) 0%, rgba(var(--sn-gradient-secondary-rgb), 0.048) 40%, transparent 80%), linear-gradient(calc(135deg + var(--visual-flow-angle, 0deg)), rgba(var(--sn-gradient-secondary-rgb), 0.048) 0%, rgba(var(--sn-gradient-primary-rgb), 0.032) 30%, transparent 70%, rgba(var(--sn-gradient-accent-rgb), 0.024) 100%);
+  background: radial-gradient(ellipse var(--nebula-scale-medium) 80% at 30% 40%, rgba(var(--sn-bg-gradient-primary-rgb), 0.08) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 0.056) 30%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.04) 60%, transparent 100%), radial-gradient(ellipse calc(var(--nebula-scale-medium) * 0.7) 60% at 70% 60%, rgba(var(--sn-bg-gradient-accent-rgb), 0.064) 0%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.048) 40%, transparent 80%), linear-gradient(calc(135deg + var(--visual-flow-angle, 0deg)), rgba(var(--sn-bg-gradient-secondary-rgb), 0.048) 0%, rgba(var(--sn-bg-gradient-primary-rgb), 0.032) 30%, transparent 70%, rgba(var(--sn-bg-gradient-accent-rgb), 0.024) 100%);
   background-size: 400% 300%, 350% 250%, 500% 200%;
   animation: nebula-holographic-flow calc(var(--nebula-flow-speed) * (1 + 2 * 0.3)) ease-in-out infinite;
   will-change: transform, opacity, filter;
@@ -12570,7 +12840,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   height: 200%;
   z-index: calc(-1000 - 2);
   pointer-events: none;
-  background: radial-gradient(2px circle at 15% 25%, rgba(var(--sn-gradient-primary-rgb), 0.9) 0%, transparent 50%), radial-gradient(3px circle at 85% 15%, rgba(var(--sn-gradient-accent-rgb), 0.8) 0%, transparent 50%), radial-gradient(1px circle at 45% 75%, rgba(var(--sn-gradient-secondary-rgb), 1) 0%, transparent 50%), radial-gradient(2px circle at 75% 85%, rgba(var(--sn-gradient-primary-rgb), 0.7) 0%, transparent 50%), radial-gradient(4px circle at 25% 55%, rgba(var(--sn-gradient-accent-rgb), 0.6) 0%, transparent 50%);
+  background: radial-gradient(2px circle at 15% 25%, rgba(var(--sn-bg-gradient-primary-rgb), 0.9) 0%, transparent 50%), radial-gradient(3px circle at 85% 15%, rgba(var(--sn-bg-gradient-accent-rgb), 0.8) 0%, transparent 50%), radial-gradient(1px circle at 45% 75%, rgba(var(--sn-bg-gradient-secondary-rgb), 1) 0%, transparent 50%), radial-gradient(2px circle at 75% 85%, rgba(var(--sn-bg-gradient-primary-rgb), 0.7) 0%, transparent 50%), radial-gradient(4px circle at 25% 55%, rgba(var(--sn-bg-gradient-accent-rgb), 0.6) 0%, transparent 50%);
   animation: infinite-star-field-drift calc(var(--zoom-animation-speed) / 0.8) linear infinite, stellar-holographic-pulse calc(120s / 0.8) linear infinite;
   filter: blur(calc(2 * 0.5px)) brightness(calc(1 - 2 * 0.1));
   opacity: calc(1 - 2 * 0.1);
@@ -12590,7 +12860,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   height: 200%;
   z-index: calc(-1000 - 1);
   pointer-events: none;
-  background: radial-gradient(0.45px circle at 5% 8%, rgba(var(--sn-gradient-primary-rgb), 0.15) 0%, transparent 50%), radial-gradient(0.45px circle at 95% 92%, rgba(var(--sn-gradient-accent-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.45px circle at 25% 35%, rgba(var(--sn-gradient-secondary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.45px circle at 75% 65%, rgba(var(--sn-gradient-primary-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.45px circle at 45% 85%, rgba(var(--sn-gradient-accent-rgb), 0.15) 0%, transparent 50%), radial-gradient(0.45px circle at 85% 15%, rgba(var(--sn-gradient-secondary-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.45px circle at 15% 55%, rgba(var(--sn-gradient-primary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.45px circle at 55% 45%, rgba(var(--sn-gradient-accent-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.45px circle at 35% 75%, rgba(var(--sn-gradient-secondary-rgb), 0.15) 0%, transparent 50%), radial-gradient(0.45px circle at 75% 25%, rgba(var(--sn-gradient-primary-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.45px circle at 65% 85%, rgba(var(--sn-gradient-accent-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.45px circle at 85% 35%, rgba(var(--sn-gradient-secondary-rgb), 0.1) 0%, transparent 50%);
+  background: radial-gradient(0.45px circle at 5% 8%, rgba(var(--sn-bg-gradient-primary-rgb), 0.15) 0%, transparent 50%), radial-gradient(0.45px circle at 95% 92%, rgba(var(--sn-bg-gradient-accent-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.45px circle at 25% 35%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.45px circle at 75% 65%, rgba(var(--sn-bg-gradient-primary-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.45px circle at 45% 85%, rgba(var(--sn-bg-gradient-accent-rgb), 0.15) 0%, transparent 50%), radial-gradient(0.45px circle at 85% 15%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.45px circle at 15% 55%, rgba(var(--sn-bg-gradient-primary-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.45px circle at 55% 45%, rgba(var(--sn-bg-gradient-accent-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.45px circle at 35% 75%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.15) 0%, transparent 50%), radial-gradient(0.45px circle at 75% 25%, rgba(var(--sn-bg-gradient-primary-rgb), 0.1) 0%, transparent 50%), radial-gradient(0.45px circle at 65% 85%, rgba(var(--sn-bg-gradient-accent-rgb), 0.2) 0%, transparent 50%), radial-gradient(0.45px circle at 85% 35%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.1) 0%, transparent 50%);
   animation: infinite-star-field-drift calc(var(--zoom-animation-speed) / 1) linear infinite, stellar-holographic-pulse calc(120s / 1) linear infinite;
   filter: blur(calc(1 * 0.5px)) brightness(calc(1 - 1 * 0.1));
   opacity: calc(1 - 1 * 0.1);
@@ -12605,7 +12875,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   height: 300%;
   z-index: calc(-1000 - 1 - 10);
   pointer-events: none;
-  background: radial-gradient(ellipse var(--nebula-scale-small) 80% at 30% 40%, rgba(var(--sn-gradient-primary-rgb), 0.12) 0%, rgba(var(--sn-gradient-accent-rgb), 0.084) 30%, rgba(var(--sn-gradient-secondary-rgb), 0.06) 60%, transparent 100%), radial-gradient(ellipse calc(var(--nebula-scale-small) * 0.7) 60% at 70% 60%, rgba(var(--sn-gradient-accent-rgb), 0.096) 0%, rgba(var(--sn-gradient-secondary-rgb), 0.072) 40%, transparent 80%), linear-gradient(calc(135deg + var(--visual-flow-angle, 0deg)), rgba(var(--sn-gradient-secondary-rgb), 0.072) 0%, rgba(var(--sn-gradient-primary-rgb), 0.048) 30%, transparent 70%, rgba(var(--sn-gradient-accent-rgb), 0.036) 100%);
+  background: radial-gradient(ellipse var(--nebula-scale-small) 80% at 30% 40%, rgba(var(--sn-bg-gradient-primary-rgb), 0.12) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 0.084) 30%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.06) 60%, transparent 100%), radial-gradient(ellipse calc(var(--nebula-scale-small) * 0.7) 60% at 70% 60%, rgba(var(--sn-bg-gradient-accent-rgb), 0.096) 0%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.072) 40%, transparent 80%), linear-gradient(calc(135deg + var(--visual-flow-angle, 0deg)), rgba(var(--sn-bg-gradient-secondary-rgb), 0.072) 0%, rgba(var(--sn-bg-gradient-primary-rgb), 0.048) 30%, transparent 70%, rgba(var(--sn-bg-gradient-accent-rgb), 0.036) 100%);
   background-size: 400% 300%, 350% 250%, 500% 200%;
   animation: nebula-holographic-flow calc(var(--nebula-flow-speed) * (1 + 1 * 0.3)) ease-in-out infinite;
   will-change: transform, opacity, filter;
@@ -12648,35 +12918,35 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   height: 300%;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(ellipse 150% 100% at 50% 50%, rgba(var(--sn-gradient-primary-rgb), 0.15) 0%, rgba(var(--sn-gradient-accent-rgb), 0.1) 40%, rgba(var(--sn-gradient-secondary-rgb), 0.08) 70%, transparent 100%);
+  background: radial-gradient(ellipse 150% 100% at 50% 50%, rgba(var(--sn-bg-gradient-primary-rgb), 0.15) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 0.1) 40%, rgba(var(--sn-bg-gradient-secondary-rgb), 0.08) 70%, transparent 100%);
   animation: nebula-holographic-flow calc(var(--nebula-flow-speed) * 0.5) ease-in-out infinite, cosmic-holographic-pulse calc(var(--zoom-breathing-rhythm) * 0.8) ease-in-out infinite;
   filter: brightness(var(--music-cosmic-expansion));
 }
 
-.Root[style*="--sn-beat-pulse-intensity"] {
-  --music-cosmic-expansion: calc(var(--sn-beat-pulse-intensity, 0) * 0.4 + 1);
+.Root[style*="--sn-music-beat-pulse-intensity"] {
+  --music-cosmic-expansion: calc(var(--sn-music-beat-pulse-intensity, 0) * 0.4 + 1);
   --music-stellar-intensity: calc(
-    var(--sn-beat-pulse-intensity, 0) * 0.8 + 0.4
+    var(--sn-music-beat-pulse-intensity, 0) * 0.8 + 0.4
   );
   --music-galactic-rotation: calc(
-    2 - var(--sn-beat-pulse-intensity, 0) * 1.5
+    2 - var(--sn-music-beat-pulse-intensity, 0) * 1.5
   );
 }
-.Root[style*="--sn-beat-pulse-intensity"]::before, .Root[style*="--sn-beat-pulse-intensity"]::after {
+.Root[style*="--sn-music-beat-pulse-intensity"]::before, .Root[style*="--sn-music-beat-pulse-intensity"]::after {
   animation-duration: calc(var(--galaxy-rotation-speed) / var(--music-galactic-rotation)), calc(var(--zoom-animation-speed) / max(var(--music-stellar-intensity), 0.3));
 }
-.Root[style*="--sn-beat-pulse-intensity"] .main-view-container::before, .Root[style*="--sn-beat-pulse-intensity"] .main-view-container::after,
-.Root[style*="--sn-beat-pulse-intensity"] .main-topBar-container::before,
-.Root[style*="--sn-beat-pulse-intensity"] .main-topBar-container::after,
-.Root[style*="--sn-beat-pulse-intensity"] .main-navBar-navBar::before,
-.Root[style*="--sn-beat-pulse-intensity"] .main-navBar-navBar::after {
-  filter: brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.3)) saturate(calc(1.2 + var(--sn-beat-pulse-intensity, 0) * 0.4));
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-view-container::before, .Root[style*="--sn-music-beat-pulse-intensity"] .main-view-container::after,
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-topBar-container::before,
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-topBar-container::after,
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-navBar-navBar::before,
+.Root[style*="--sn-music-beat-pulse-intensity"] .main-navBar-navBar::after {
+  filter: brightness(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.3)) saturate(calc(1.2 + var(--sn-music-beat-pulse-intensity, 0) * 0.4));
 }
 
 .Root[style*="--sn-dynamic-genre-hue-shift"] {
   --visual-flow-angle: calc(
     var(--sn-dynamic-genre-hue-shift, 0deg) +
-      var(--sn-rhythm-phase, 0) * 180deg
+      var(--sn-music-rhythm-phase, 0) * 180deg
   );
 }
 .Root[style*="--sn-dynamic-genre-hue-shift"]::before {
@@ -12724,7 +12994,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
     transform: none !important;
   }
   .Root::before {
-    background: radial-gradient(circle 30% at 50% 50%, rgba(var(--sn-gradient-primary-rgb), 0.1) 0%, rgba(var(--sn-gradient-accent-rgb), 0.05) 50%, transparent 100%);
+    background: radial-gradient(circle 30% at 50% 50%, rgba(var(--sn-bg-gradient-primary-rgb), 0.1) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 0.05) 50%, transparent 100%);
     animation: none !important;
   }
 }
@@ -12751,7 +13021,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
     --galaxy-core-brightness: 1.2;
     --galaxy-outer-dimness: 0.4;
     --music-stellar-intensity: calc(
-      var(--sn-beat-pulse-intensity, 0) * 1 + 0.6
+      var(--sn-music-beat-pulse-intensity, 0) * 1 + 0.6
     );
   }
   .Root::before {
@@ -12771,7 +13041,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
     --cosmic-perspective: 800px;
   }
   .Root::before {
-    background: radial-gradient(circle 40% at 50% 50%, rgba(var(--sn-gradient-primary-rgb), 0.15) 0%, rgba(var(--sn-gradient-accent-rgb), 0.1) 60%, transparent 100%);
+    background: radial-gradient(circle 40% at 50% 50%, rgba(var(--sn-bg-gradient-primary-rgb), 0.15) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 0.1) 60%, transparent 100%);
     animation: none !important;
   }
   .main-view-container::after,
@@ -12988,13 +13258,13 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   animation-duration: calc(var(--particle-base-speed) * 0.6) !important;
 }
 
-.Root[style*="--sn-beat-pulse-intensity"] .Root::before {
-  animation-duration: calc(var(--aurora-flow-speed) / max(var(--sn-beat-pulse-intensity, 1), 0.7));
-  filter: blur(60px) brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.15)) saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.2));
+.Root[style*="--sn-music-beat-pulse-intensity"] .Root::before {
+  animation-duration: calc(var(--aurora-flow-speed) / max(var(--sn-music-beat-pulse-intensity, 1), 0.7));
+  filter: blur(60px) brightness(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.15)) saturate(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.2));
 }
-.Root[style*="--sn-beat-pulse-intensity"] .sn-stars-container .star {
-  animation-duration: calc(var(--particle-base-speed) * 0.8 / max(var(--sn-beat-pulse-intensity, 1), 0.5)) !important;
-  filter: brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.3)) saturate(calc(1.2 + var(--sn-beat-pulse-intensity, 0) * 0.4));
+.Root[style*="--sn-music-beat-pulse-intensity"] .sn-stars-container .star {
+  animation-duration: calc(var(--particle-base-speed) * 0.8 / max(var(--sn-music-beat-pulse-intensity, 1), 0.5)) !important;
+  filter: brightness(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.3)) saturate(calc(1.2 + var(--sn-music-beat-pulse-intensity, 0) * 0.4));
 }
 
 .Root[style*="--sn-dynamic-genre-hue-shift"] .Root::before {
@@ -13065,7 +13335,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
     --particle-energy-intensity: 1.5;
   }
   .sn-stars-container .star {
-    background: radial-gradient(circle, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.9) 0%, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.3) 70%, transparent 100%) !important;
+    background: radial-gradient(circle, rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.9) 0%, rgba(var(--sn-oklab-highlight-rgb, var(--sn-color-oklab-bright-highlight-rgb, 255, 255, 255)), 0.3) 70%, transparent 100%) !important;
   }
 }
 @media (prefers-reduced-data: reduce) {
@@ -13133,12 +13403,12 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
 }
 
 [data-layout=navigation] .main-gridContainer-gridContainer, [data-layout=constellation] .main-gridContainer-gridContainer {
-  gap: calc(var(--interface-gap-base) + var(--interface-gap-range) * var(--sn-beat-pulse-intensity, 0));
+  gap: calc(var(--interface-gap-base) + var(--interface-gap-range) * var(--sn-music-beat-pulse-intensity, 0));
   transition: gap 400ms var(--sn-easing-explorer, ease-out);
   transform-origin: center;
 }
 [data-layout=navigation] .main-gridContainer-gridContainer .main-card-card, [data-layout=constellation] .main-gridContainer-gridContainer .main-card-card {
-  transform: translate3d(calc(var(--interface-drift-range) * (var(--sn-beat-pulse-intensity, 0) - 0.5)), calc(var(--interface-drift-range) * var(--sn-rhythm-phase, 0) * 0.002), 0);
+  transform: translate3d(calc(var(--interface-drift-range) * (var(--sn-music-beat-pulse-intensity, 0) - 0.5)), calc(var(--interface-drift-range) * var(--sn-music-rhythm-phase, 0) * 0.002), 0);
   transition: transform 400ms ease-out;
 }
 [data-layout=navigation] .main-gridContainer-gridContainer .main-card-card:hover, [data-layout=constellation] .main-gridContainer-gridContainer .main-card-card:hover {
@@ -13183,7 +13453,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   transition: transform 0.2s ease;
 }
 [data-genre-active=electronic] .main-card {
-  background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-accent-rgb), 0.1) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-accent-rgb, 128, 128, 128), 0.1) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 2s linear infinite;
 }

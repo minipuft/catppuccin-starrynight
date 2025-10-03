@@ -1294,11 +1294,6 @@ export class ColorHarmonyEngine
           enhancedOklab.b
         );
 
-        // Set OKLAB processed variables that SCSS files expect
-        cssVars[
-          "--sn-color-oklab-bright-highlight-rgb"
-        ] = `${enhancedRgb.r},${enhancedRgb.g},${enhancedRgb.b}`;
-
         // Individual RGB components for SCSS processing
         cssVars["--sn-color-oklab-primary-r"] = Math.round(
           enhancedRgb.r
@@ -1353,10 +1348,46 @@ export class ColorHarmonyEngine
           shadowOklab.a,
           shadowOklab.b
         );
-        cssVars[
-          "--sn-color-oklab-dynamic-shadow-rgb"
-        ] = `${shadowRgb.r},${shadowRgb.g},${shadowRgb.b}`;
         cssVars["--sn-color-oklab-base-luminance"] = shadowOklab.L.toFixed(3);
+      }
+
+      /**
+       * OKLAB Color Architecture - Phase 3: Consolidated Variable Generation
+       *
+       * Generates CSS variables using the unified naming convention established in Phase 3.
+       * These variables are consumed by the oklab-color() SCSS helper function for consistent
+       * color token usage across the entire theme.
+       *
+       * Consolidated Variable Naming:
+       * - --sn-oklab-shadow-rgb: Dynamically derived shadow color (RGB format)
+       * - --sn-oklab-highlight-rgb: Dynamically derived highlight color (RGB format)
+       *
+       * Legacy Variables (REMOVED in Phase 3):
+       * - --sn-color-oklab-dynamic-shadow-rgb (replaced by --sn-oklab-shadow-rgb)
+       * - --sn-color-oklab-bright-highlight-rgb (replaced by --sn-oklab-highlight-rgb)
+       *
+       * Usage in SCSS:
+       * - oklab-color('shadow', 0.2) -> rgba(var(--sn-oklab-shadow-rgb), 0.2)
+       * - oklab-color('highlight', 0.8) -> rgba(var(--sn-oklab-highlight-rgb), 0.8)
+       *
+       * @see src/core/_design_tokens.scss - oklab-color() helper function
+       * @see plans/oklab-color-architecture-consolidation.md - Phase 3 consolidation details
+       */
+      const shadowHex = processedColors["SHADOW"];
+      const highlightHex = processedColors["HIGHLIGHT"];
+
+      if (shadowHex) {
+        const shadowRgb = this.utils.hexToRgb(shadowHex);
+        if (shadowRgb) {
+          cssVars["--sn-oklab-shadow-rgb"] = `${shadowRgb.r},${shadowRgb.g},${shadowRgb.b}`;
+        }
+      }
+
+      if (highlightHex) {
+        const highlightRgb = this.utils.hexToRgb(highlightHex);
+        if (highlightRgb) {
+          cssVars["--sn-oklab-highlight-rgb"] = `${highlightRgb.r},${highlightRgb.g},${highlightRgb.b}`;
+        }
       }
 
       if (this.config.enableDebug) {
@@ -1382,18 +1413,6 @@ export class ColorHarmonyEngine
         );
       }
 
-      // Fallback to primary color if OKLAB processing fails
-      const fallbackRgb = this.utils.hexToRgb(result.accentHex);
-      if (fallbackRgb) {
-        cssVars[
-          "--sn-color-oklab-bright-highlight-rgb"
-        ] = `${fallbackRgb.r},${fallbackRgb.g},${fallbackRgb.b}`;
-        cssVars["--sn-color-oklab-dynamic-shadow-rgb"] = `${Math.round(
-          fallbackRgb.r * 0.3
-        )},${Math.round(fallbackRgb.g * 0.3)},${Math.round(
-          fallbackRgb.b * 0.3
-        )}`;
-      }
     }
   }
 
@@ -2312,7 +2331,7 @@ export class ColorHarmonyEngine
 
     // 🎯 OKLAB ENHANCED VARIABLES for audioAnalysis effects
     const oklabBrightHighlight =
-      enhanced["--sn-color-oklab-bright-highlight-rgb"];
+      enhanced["--sn-oklab-highlight-rgb"];
     if (oklabBrightHighlight) {
       enhanced["--sn-audioAnalysis-bright-accent-rgb"] = oklabBrightHighlight;
       enhanced["--sn-layered-accent-rgb"] = oklabBrightHighlight;
@@ -2322,7 +2341,7 @@ export class ColorHarmonyEngine
       enhanced["--smooth-holographic-rgb"] = oklabBrightHighlight;
     }
 
-    const oklabDynamicShadow = enhanced["--sn-color-oklab-dynamic-shadow-rgb"];
+    const oklabDynamicShadow = enhanced["--sn-oklab-shadow-rgb"];
     if (oklabDynamicShadow) {
       enhanced["--sn-audioAnalysis-shadow-rgb"] = oklabDynamicShadow;
       enhanced["--sn-depth-shadow-rgb"] = oklabDynamicShadow;
@@ -2787,12 +2806,8 @@ export class ColorHarmonyEngine
     tertiary: RGBColor;
   } | null {
     try {
-      // Inherit from OKLAB processed variables (audioAnalysis-aware hierarchy)
+      // Inherit from gradient and musical harmony variables
       const primaryRgb =
-        this.parseRGBVariable(
-          computedStyle,
-          "--sn-oklab-processed-primary-rgb"
-        ) ||
         this.parseRGBVariable(computedStyle, "--sn-bg-gradient-primary-rgb") ||
         this.parseRGBVariable(
           computedStyle,
@@ -2800,10 +2815,6 @@ export class ColorHarmonyEngine
         );
 
       const secondaryRgb =
-        this.parseRGBVariable(
-          computedStyle,
-          "--sn-oklab-processed-secondary-rgb"
-        ) ||
         this.parseRGBVariable(computedStyle, "--sn-bg-gradient-secondary-rgb") ||
         this.parseRGBVariable(
           computedStyle,
@@ -2811,10 +2822,6 @@ export class ColorHarmonyEngine
         );
 
       const accentRgb =
-        this.parseRGBVariable(
-          computedStyle,
-          "--sn-oklab-processed-accent-rgb"
-        ) ||
         this.parseRGBVariable(computedStyle, "--sn-bg-gradient-accent-rgb") ||
         this.parseRGBVariable(computedStyle, "--sn-color-accent-rgb");
 
@@ -2830,10 +2837,7 @@ export class ColorHarmonyEngine
         accentRgb; // Fallback to accent
 
       const tertiaryRgb =
-        this.parseRGBVariable(
-          computedStyle,
-          "--sn-oklab-processed-bright-highlight-rgb"
-        ) ||
+        this.parseRGBVariable(computedStyle, "--sn-oklab-highlight-rgb") ||
         this.parseRGBVariable(computedStyle, "--sn-audioAnalysis-flow-rgb") ||
         this.parseRGBVariable(
           computedStyle,
@@ -4035,6 +4039,61 @@ export class ColorHarmonyEngine
             );
             // Keep original color on error
           }
+        }
+      }
+
+      /**
+       * OKLAB Color Architecture - Phase 1: Shadow/Highlight Derivation
+       *
+       * Derives perceptually uniform shadow and highlight colors from the primary album art color
+       * using OKLAB color space processing. This ensures natural-looking depth and contrast while
+       * maintaining color harmony across the entire UI.
+       *
+       * Derivation Strategy:
+       * - Shadow: Reduces lightness while preserving hue relationship (perceptually darker)
+       * - Highlight: Increases lightness while maintaining saturation (perceptually brighter)
+       * - Both processed through OKLAB space for perceptual uniformity
+       *
+       * Fallback Order:
+       * 1. PRIMARY color (preferred - from genre-adjusted processing)
+       * 2. VIBRANT color (fallback - most saturated from album art)
+       * 3. PROMINENT color (last resort - most prevalent in image)
+       *
+       * Output Variables:
+       * - processedColors.SHADOW -> --sn-oklab-shadow-rgb (CSS variable)
+       * - processedColors.HIGHLIGHT -> --sn-oklab-highlight-rgb (CSS variable)
+       *
+       * @see OKLABColorProcessor.generateShadowColor() - Shadow generation algorithm
+       * @see OKLABColorProcessor.generateHighlightColor() - Highlight generation algorithm
+       * @see plans/oklab-color-architecture-consolidation.md - Phase 1 implementation details
+       */
+      const primaryColorForDerivation = processedColors.PRIMARY || processedColors.VIBRANT || processedColors.PROMINENT;
+      if (primaryColorForDerivation && this.isValidHex(primaryColorForDerivation)) {
+        try {
+          const shadowHighlightResult = this.oklabProcessor.processColor(
+            primaryColorForDerivation,
+            genreAdjustedPreset
+          );
+
+          processedColors.SHADOW = shadowHighlightResult.shadowHex;
+          processedColors.HIGHLIGHT = shadowHighlightResult.highlightHex;
+
+          if (this.config?.enableDebug) {
+            console.log(
+              "🌗 [ColorHarmonyEngine] Derived shadow/highlight colors:",
+              {
+                primary: primaryColorForDerivation,
+                shadow: shadowHighlightResult.shadowHex,
+                highlight: shadowHighlightResult.highlightHex,
+                preset: genreAdjustedPreset.name,
+              }
+            );
+          }
+        } catch (error) {
+          console.warn(
+            "[ColorHarmonyEngine] Shadow/highlight derivation failed:",
+            error
+          );
         }
       }
 

@@ -9,7 +9,7 @@
  * @performance Enables priority-based CSS variable updates
  */
 
-export type VariableGroup = 
+export type VariableGroup =
   | 'music'
   | 'color'
   | 'background'
@@ -17,6 +17,7 @@ export type VariableGroup =
   | 'layout'
   | 'performance'
   | 'visual-effects'
+  | 'ui'
   | 'utility';
 
 export type VariablePriority = 'critical' | 'high' | 'normal' | 'low';
@@ -382,29 +383,36 @@ export const UNIFIED_VARIABLE_GROUPS: Record<VariableGroup, VariableGroupDefinit
     priority: 'normal',
     description: 'Animation coordination and effects',
     variables: {
+      // ⚠️ CONSOLIDATED: Duration tokens now reference --sn-transition-*-duration
       'duration.fast': {
         name: '--sn-anim-duration-fast',
-        defaultValue: '0.2s',
+        defaultValue: '150ms', // References --sn-transition-fast-duration
         type: 'time',
-        description: 'Fast animation duration'
+        description: 'Fast animation duration (consolidated with transition-fast)'
       },
       'duration.normal': {
         name: '--sn-anim-duration-normal',
-        defaultValue: '0.4s',
+        defaultValue: '300ms', // References --sn-transition-standard-duration
         type: 'time',
-        description: 'Normal animation duration'
+        description: 'Normal animation duration (consolidated with transition-standard)'
       },
       'duration.slow': {
         name: '--sn-anim-duration-slow',
-        defaultValue: '0.8s',
+        defaultValue: '500ms', // References --sn-transition-slow-duration
         type: 'time',
-        description: 'Slow animation duration'
+        description: 'Slow animation duration (consolidated with transition-slow)'
+      },
+      'duration.extended': {
+        name: '--sn-anim-duration-extended',
+        defaultValue: '1200ms', // References --sn-anim-transition-cosmic
+        type: 'time',
+        description: 'Extended animation duration for cosmic/atmospheric effects'
       },
       'duration.animation': {
         name: '--sn-anim-duration-animation',
         defaultValue: '4s',
         type: 'time',
-        description: 'Breathing animation duration'
+        description: 'Legacy: Decorative animation duration (consider migrating to duration.extended)'
       },
       'easing.standard': {
         name: '--sn-anim-easing-standard',
@@ -832,6 +840,116 @@ export const UNIFIED_VARIABLE_GROUPS: Record<VariableGroup, VariableGroupDefinit
         defaultValue: '2.0',
         type: 'number',
         description: 'Chrome enhancement level'
+      }
+    }
+  },
+
+  ui: {
+    name: 'ui',
+    priority: 'high',
+    description: 'UI component visual effects and interactions',
+    variables: {
+      'card.energy.level': {
+        name: '--sn-ui-card-energy-level',
+        defaultValue: '0',
+        type: 'number',
+        description: 'Card energy level (0-1)'
+      },
+      'card.rhythm.phase': {
+        name: '--sn-ui-card-rhythm-phase',
+        defaultValue: '0deg',
+        type: 'angle',
+        description: 'Card rhythm phase'
+      },
+      'card.beat.intensity': {
+        name: '--sn-ui-card-beat-intensity',
+        defaultValue: '0',
+        type: 'number',
+        description: 'Card beat intensity (0-1)'
+      },
+      'card.3d.enabled': {
+        name: '--sn-ui-card-3d-enabled',
+        defaultValue: '1',
+        type: 'boolean',
+        description: 'Card 3D effects enabled (0/1)'
+      },
+      'glass.opacity': {
+        name: '--sn-ui-glass-opacity',
+        defaultValue: '0.1',
+        type: 'number',
+        description: 'Glass effect opacity (0-1)'
+      },
+      'glass.blur': {
+        name: '--sn-ui-glass-blur',
+        defaultValue: '20px',
+        type: 'length',
+        description: 'Glass blur radius'
+      },
+      'glass.pulse.enabled': {
+        name: '--sn-ui-glass-pulse-enabled',
+        defaultValue: '1',
+        type: 'boolean',
+        description: 'Glass pulse effects enabled (0/1)'
+      },
+      'glass.beat.opacity': {
+        name: '--sn-ui-glass-beat-opacity',
+        defaultValue: '0',
+        type: 'number',
+        description: 'Glass beat-driven opacity (0-1)'
+      },
+      'nav.glow.intensity': {
+        name: '--sn-ui-nav-glow-intensity',
+        defaultValue: '0',
+        type: 'number',
+        description: 'Navigation glow intensity (0-1)'
+      },
+      'sidebar.magnetic.hover.pull': {
+        name: '--sn-ui-sidebar-magnetic-hover-pull',
+        defaultValue: '1.2',
+        type: 'number',
+        description: 'Sidebar hover pull scale'
+      },
+      'sidebar.magnetic.focus.pull': {
+        name: '--sn-ui-sidebar-magnetic-focus-pull',
+        defaultValue: '1.5',
+        type: 'number',
+        description: 'Sidebar focus pull scale'
+      },
+      'button.accent.hex': {
+        name: '--sn-ui-button-accent-hex',
+        defaultValue: '#cba6f7',
+        type: 'color',
+        description: 'Button accent color (hex)'
+      },
+      'button.accent.rgb': {
+        name: '--sn-ui-button-accent-rgb',
+        defaultValue: '203, 166, 247',
+        type: 'color',
+        description: 'Button accent color (RGB)'
+      },
+      'echo.radius.multiplier': {
+        name: '--sn-echo-radius-multiplier',
+        defaultValue: '1.0',
+        type: 'number',
+        description: 'Echo radius scale multiplier'
+      },
+      'echo.hue.shift': {
+        name: '--sn-echo-hue-shift',
+        defaultValue: '0deg',
+        type: 'angle',
+        description: 'Echo hue shift'
+      },
+      'echo.offset.x': {
+        name: '--sn-echo-offset-x',
+        defaultValue: '0px',
+        type: 'length',
+        description: 'Echo horizontal offset'
+      },
+      'echo.offset.y': {
+        name: '--sn-echo-offset-y',
+        defaultValue: '0px',
+        type: 'length',
+        description: 'Echo vertical offset'
       }
     }
   },

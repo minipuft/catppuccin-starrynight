@@ -53,11 +53,11 @@
     background: linear-gradient(
       45deg,
       transparent 30%,
-      rgba(var(--sn-accent-rgb), 0.1) 50%,
+      oklab-color('accent', 0.1) 50%,
       transparent 70%
     );
     backdrop-filter: blur(20px) brightness(1.2) contrast(1.1);
-    border: 1px solid rgba(var(--sn-accent-rgb), 0.3);
+    border: 1px solid oklab-color('accent', 0.3);
     border-radius: 12px;
     @include oklab-shadow-stack('header-base');
 

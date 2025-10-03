@@ -46,9 +46,12 @@ export interface OKLABProcessingResult {
   enhancedRgb: RGBColor;
   shadowHex: string;
   shadowRgb: RGBColor;
+  highlightHex: string;
+  highlightRgb: RGBColor;
   oklabOriginal: OKLABColor;
   oklabEnhanced: OKLABColor;
   oklabShadow: OKLABColor;
+  oklabHighlight: OKLABColor;
   oklchEnhanced: OKLCHColor;
   processingTime: number;
 }
@@ -125,8 +128,9 @@ export class OKLABColorProcessor {
       // Apply enhancement in OKLAB space
       const oklabEnhanced = this.enhanceOKLABColor(oklabOriginal, preset);
 
-      // Generate shadow variant
+      // Generate shadow and highlight variants
       const oklabShadow = this.generateShadowColor(oklabOriginal, preset);
+      const oklabHighlight = this.generateHighlightColor(oklabOriginal, preset);
 
       // Convert back to RGB
       const enhancedRgb = this.utils.oklabToRgb(
@@ -139,6 +143,11 @@ export class OKLABColorProcessor {
         oklabShadow.a,
         oklabShadow.b
       );
+      const highlightRgb = this.utils.oklabToRgb(
+        oklabHighlight.L,
+        oklabHighlight.a,
+        oklabHighlight.b
+      );
 
       // Convert to hex
       const enhancedHex = this.utils.rgbToHex(
@@ -150,6 +159,11 @@ export class OKLABColorProcessor {
         shadowRgb.r,
         shadowRgb.g,
         shadowRgb.b
+      );
+      const highlightHex = this.utils.rgbToHex(
+        highlightRgb.r,
+        highlightRgb.g,
+        highlightRgb.b
       );
 
       // Generate OKLCH representation
@@ -164,9 +178,12 @@ export class OKLABColorProcessor {
         enhancedRgb,
         shadowHex,
         shadowRgb,
+        highlightHex,
+        highlightRgb,
         oklabOriginal,
         oklabEnhanced,
         oklabShadow,
+        oklabHighlight,
         oklchEnhanced,
         processingTime,
       };
@@ -176,6 +193,7 @@ export class OKLABColorProcessor {
           input: hexColor,
           enhanced: enhancedHex,
           shadow: shadowHex,
+          highlight: highlightHex,
           preset: preset.name,
           processingTime: `${processingTime.toFixed(2)}ms`,
         });
@@ -349,6 +367,27 @@ export class OKLABColorProcessor {
 
   /**
    * Generate shadow color by reducing lightness while preserving hue
+   *
+   * Creates a perceptually darker variant of the source color using OKLAB color space
+   * manipulation. The algorithm reduces lightness (L) while maintaining hue relationship
+   * and slightly desaturating to create natural-looking shadows.
+   *
+   * Algorithm:
+   * - Lightness: Multiply by preset.shadowReduction (typically 0.4-0.6), minimum 0.02
+   * - Chroma: Reduce to 80% to prevent over-saturation in dark colors
+   * - Hue: Preserved through proportional a/b adjustment
+   *
+   * Perceptual Properties:
+   * - Shadows appear naturally darker to human vision
+   * - Color harmony maintained with source color
+   * - Prevents pure black (L >= 0.02) for better visual depth
+   *
+   * @param oklab - Source color in OKLAB color space
+   * @param preset - Enhancement preset containing shadowReduction factor
+   * @returns Shadow color in OKLAB space (darker, slightly desaturated)
+   *
+   * @see generateHighlightColor() - Companion method for highlight generation
+   * @see plans/oklab-color-architecture-consolidation.md - Phase 1 implementation
    */
   private generateShadowColor(
     oklab: OKLABColor,
@@ -358,6 +397,46 @@ export class OKLABColorProcessor {
       L: Math.max(0.02, oklab.L * preset.shadowReduction),
       a: oklab.a * 0.8, // Slightly desaturate shadows
       b: oklab.b * 0.8,
+    };
+  }
+
+  /**
+   * Generate highlight color by increasing lightness while preserving hue
+   *
+   * Creates a perceptually brighter variant of the source color using OKLAB color space
+   * manipulation. The algorithm increases lightness (L) inversely proportional to shadow
+   * reduction, maintaining perceptual symmetry between shadow and highlight.
+   *
+   * Algorithm:
+   * - Lightness: Multiply by (2.0 - shadowReduction), capped at 1.0
+   * - Chroma: Reduce to 90% to prevent over-saturation in bright colors
+   * - Hue: Preserved through proportional a/b adjustment
+   *
+   * Perceptual Properties:
+   * - Highlights appear naturally brighter to human vision
+   * - Symmetric perceptual spacing with shadow colors
+   * - Prevents pure white (L <= 1.0) for better visual depth
+   *
+   * Mathematical Relationship:
+   * - If shadowReduction = 0.5, shadow multiplier = 0.5, highlight multiplier = 1.5
+   * - Creates perceptually balanced light-dark pairs
+   *
+   * @param oklab - Source color in OKLAB color space
+   * @param preset - Enhancement preset containing shadowReduction factor (used inversely)
+   * @returns Highlight color in OKLAB space (brighter, slightly desaturated)
+   *
+   * @see generateShadowColor() - Companion method for shadow generation
+   * @see plans/oklab-color-architecture-consolidation.md - Phase 1 implementation
+   */
+  private generateHighlightColor(
+    oklab: OKLABColor,
+    preset: EnhancementPreset
+  ): OKLABColor {
+    const highlightBoost = 2.0 - preset.shadowReduction;
+    return {
+      L: Math.min(1.0, oklab.L * highlightBoost),
+      a: oklab.a * 0.9,
+      b: oklab.b * 0.9,
     };
   }
 
@@ -395,9 +474,12 @@ export class OKLABColorProcessor {
       enhancedRgb: fallbackRgb,
       shadowHex: "#000000",
       shadowRgb: { r: 0, g: 0, b: 0 },
+      highlightHex: "#FFFFFF",
+      highlightRgb: { r: 255, g: 255, b: 255 },
       oklabOriginal: fallbackOklab,
       oklabEnhanced: fallbackOklab,
       oklabShadow: { L: 0.05, a: 0, b: 0 },
+      oklabHighlight: { L: 0.95, a: 0, b: 0 },
       oklchEnhanced: this.convertOklabToOklch(fallbackOklab),
       processingTime: 0,
     };

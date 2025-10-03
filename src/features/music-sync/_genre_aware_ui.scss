@@ -7,6 +7,8 @@
 // Note: OKLAB animation system archived in Phase 10 Week 4 (orphaned file)
 // Using existing CSS variables for OKLAB functionality instead
 
+@use "../../core/_design_tokens" as *;
+
 // === GENRE-AWARE COMPONENT INTEGRATION ===
 
 // Genre-aware background mixin - applies gradient based on genre characteristics
@@ -469,7 +471,7 @@ button,
   .main-card {
     // Electronic card hover effects with OKLAB shimmer
     // OKLAB shimmer effect (inline CSS)
-    background: linear-gradient(90deg, transparent 0%, rgba(var(--sn-accent-rgb), 0.1) 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, oklab-color('accent', 0.1) 50%, transparent 100%);
     background-size: 200% 100%;
     animation: shimmer 2s linear infinite;
 

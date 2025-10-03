@@ -217,6 +217,16 @@ interface ColorValue {
   temperature: number; // Color temperature (1000K-20000K)
   intensity: number;  // Visual intensity level (0-1)
 }
+
+// Phase 1: Shadow/Highlight Processing (Added 2025-10-02)
+interface OKLABProcessingResult {
+  originalHex: string;
+  enhancedHex: string;
+  shadowHex: string;      // Perceptually darker variant
+  highlightHex: string;   // Perceptually brighter variant
+  oklabShadow: OKLABColor;
+  oklabHighlight: OKLABColor;
+}
 ```
 
 ### Color Harmony Integration
@@ -224,6 +234,125 @@ interface ColorValue {
 - **Dynamic Enhancement** - Album art colors blended with Catppuccin base
 - **Musical Mapping** - Music emotion → color temperature → OKLAB processing
 - **Perceptual Uniformity** - Smooth, natural color transitions
+
+### Consolidated OKLAB Architecture (Phases 1-4)
+
+#### Phase 1: Dynamic Shadow/Highlight Derivation
+**Implemented**: 2025-10-02
+
+Album art colors are processed to derive perceptually uniform shadow and highlight variants:
+
+```typescript
+// In ColorHarmonyEngine.blendWithAdvancedOKLAB()
+const primaryColor = processedColors.PRIMARY || processedColors.VIBRANT;
+const result = oklabProcessor.processColor(primaryColor, preset);
+
+processedColors.SHADOW = result.shadowHex;      // Perceptually darker
+processedColors.HIGHLIGHT = result.highlightHex; // Perceptually brighter
+```
+
+**Shadow Generation**:
+- Lightness (L): Reduced by `preset.shadowReduction` (typically 0.4-0.6)
+- Chroma: Reduced to 80% to prevent over-saturation
+- Hue: Preserved through proportional a/b adjustment
+
+**Highlight Generation**:
+- Lightness (L): Increased by `(2.0 - preset.shadowReduction)`
+- Chroma: Reduced to 90% to prevent over-saturation
+- Hue: Preserved through proportional a/b adjustment
+
+#### Phase 2 & 3: Unified Variable Architecture
+**Implemented**: 2025-10-02
+
+Consolidated CSS variable naming convention:
+
+| Token | CSS Variable | Source | Updates |
+|-------|--------------|--------|---------|
+| Accent | `--sn-oklab-accent-rgb` | ColorHarmonyEngine | On track change |
+| Primary | `--sn-oklab-primary-rgb` | ColorHarmonyEngine | On track change |
+| Secondary | `--sn-oklab-secondary-rgb` | ColorHarmonyEngine | On track change |
+| Shadow | `--sn-oklab-shadow-rgb` | Derived from primary | On track change |
+| Highlight | `--sn-oklab-highlight-rgb` | Derived from primary | On track change |
+
+**Legacy Variables Removed** (Phase 3):
+- `--sn-color-oklab-dynamic-shadow-rgb` → `--sn-oklab-shadow-rgb`
+- `--sn-color-oklab-bright-highlight-rgb` → `--sn-oklab-highlight-rgb`
+
+#### Phase 3.6: SCSS Helper Function
+**Implemented**: 2025-10-02
+
+Unified `oklab-color()` helper provides single point of access:
+
+```scss
+// Function definition (src/core/_design_tokens.scss)
+@function oklab-color($token, $opacity: 1) {
+  @if $token == 'accent' {
+    @return rgba(var(--sn-oklab-accent-rgb), $opacity);
+  } @else if $token == 'shadow' {
+    @return rgba(var(--sn-oklab-shadow-rgb), $opacity);
+  } @else if $token == 'highlight' {
+    @return rgba(var(--sn-oklab-highlight-rgb), $opacity);
+  }
+  // ... additional tokens
+}
+
+// Usage examples
+.card {
+  background: oklab-color('accent', 0.1);
+  box-shadow: 0 4px 8px oklab-color('shadow', 0.3);
+  border-top: 1px solid oklab-color('highlight', 0.2);
+}
+```
+
+**Migration Status** (Phase 3.6):
+- ✅ 47 rgba() calls migrated to `oklab-color()` helper
+- ✅ 9 SCSS files updated
+- ✅ 100% ColorHarmonyEngine variable adoption
+- ✅ Backward compatibility maintained
+
+#### Color Processing Pipeline
+
+```
+Album Art → Spicetify.colorExtractor() → Raw RGB Colors
+                                              ↓
+                                    Genre-Adjusted Processing
+                                              ↓
+                                    OKLAB Color Space Conversion
+                                              ↓
+                        ┌───────────────────┴────────────────────┐
+                        ↓                                        ↓
+                Shadow Derivation                      Highlight Derivation
+                (L reduced, desaturated)               (L increased, desaturated)
+                        ↓                                        ↓
+                        └───────────────────┬────────────────────┘
+                                              ↓
+                                    RGB Conversion & CSS Variables
+                                              ↓
+                                    --sn-oklab-{token}-rgb
+                                              ↓
+                                    oklab-color() Helper (SCSS)
+                                              ↓
+                                    Visual Effects & UI Components
+```
+
+#### Performance Characteristics
+- **Color Processing**: <100ms per track change
+- **CSS Variable Updates**: <16ms (60fps budget)
+- **Batch Processing**: <500ms for 10 colors
+- **Memory**: No leaks during extended sessions
+
+#### Testing & Validation (Phase 4)
+**Test Coverage**:
+- Unit Tests: `tests/unit/utils/OKLABColorProcessor.test.ts`
+- Integration Tests: `tests/unit/audio/ColorHarmonyEngine-CSSVariables.test.ts`
+- Performance Tests: `tests/performance/OKLABColorProcessing.perf.test.ts`
+
+**Validation Criteria**:
+- Perceptual uniformity (OKLAB L spacing)
+- RGB range validation (0-255)
+- CSS variable format compliance
+- Performance budget adherence
+- Memory leak detection
 
 ---
 

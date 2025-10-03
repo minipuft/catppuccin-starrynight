@@ -2,6 +2,8 @@
 // YEAR 3000 LEGACY SUPPORT - Backward Compatibility & Migration Support
 // ████████████████████████████████████████████████████████████████████████████████
 
+@use "./_design_tokens" as *;
+
 :root .Root__main-view {
   // Duration in album view
   .UyzJidwrGk3awngSGIwv {
@@ -26,7 +28,7 @@
     border: 1px solid var(--spice-overlay1);
 
     &:hover {
-      border-color: rgba(var(--sn-color-oklab-bright-highlight-rgb), 0.7);
+      border-color: oklab-color('highlight', 0.7);
     }
   }
 }
@@ -99,16 +101,16 @@
 // Enhanced Button System - Year 3000 Integration
 :root {
   // Override core Spicetify button colors with Year 3000 accent system
-  --spice-button: rgba(var(--sn-accent-rgb), 0.15);
-  --spice-button-active: rgba(var(--sn-accent-rgb), 0.25);
-  --spice-button-disabled: rgba(var(--sn-accent-rgb), 0.05);
+  --spice-button: #{oklab-color('accent', 0.15)};
+  --spice-button-active: #{oklab-color('accent', 0.25)};
+  --spice-button-disabled: #{oklab-color('accent', 0.05)};
   --spice-rgb-button: var(--sn-accent-rgb);
-  
+
   // Button shadow and highlight system
-  --sn-button-shadow: 0 1px 3px rgba(var(--sn-accent-rgb), 0.2);
-  --sn-button-highlight: inset 0 1px 0 rgba(var(--sn-accent-rgb), 0.1);
-  --sn-button-hover-shadow: 0 2px 6px rgba(var(--sn-accent-rgb), 0.3);
-  --sn-button-hover-highlight: inset 0 1px 0 rgba(var(--sn-accent-rgb), 0.2);
+  --sn-button-shadow: 0 1px 3px #{oklab-color('accent', 0.2)};
+  --sn-button-highlight: inset 0 1px 0 #{oklab-color('accent', 0.1)};
+  --sn-button-hover-shadow: 0 2px 6px #{oklab-color('accent', 0.3)};
+  --sn-button-hover-highlight: inset 0 1px 0 #{oklab-color('accent', 0.2)};
 }
 
 // Apply shadow and highlight system to all buttons
@@ -136,8 +138,8 @@ select.main-dropDown-dropDown,
   
   // Disabled state with reduced shadows
   &:disabled {
-    box-shadow: 0 1px 2px rgba(var(--sn-accent-rgb), 0.1), 
-                inset 0 1px 0 rgba(var(--sn-accent-rgb), 0.05);
+    box-shadow: 0 1px 2px oklab-color('accent', 0.1),
+                inset 0 1px 0 oklab-color('accent', 0.05);
     opacity: 0.6;
   }
 }

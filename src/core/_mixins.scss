@@ -1361,10 +1361,10 @@
 
   @if $secondary {
     box-shadow:
-      #{$shadow-type} 0 0 $blur $spread rgba(var(--sn-accent-rgb), calc(#{$base-opacity} * var(--sn-sidebar-harmonic-intensity-multiplier))),
-      #{$shadow-type} 0 0 30px 5px rgba(var(--sn-accent-rgb), calc(#{$base-opacity * 0.66} * var(--sn-sidebar-harmonic-intensity-multiplier)));
+      #{$shadow-type} 0 0 $blur $spread oklab-color('accent', calc(#{$base-opacity} * var(--sn-sidebar-harmonic-intensity-multiplier))),
+      #{$shadow-type} 0 0 30px 5px oklab-color('accent', calc(#{$base-opacity * 0.66} * var(--sn-sidebar-harmonic-intensity-multiplier)));
   } @else {
-    box-shadow: #{$shadow-type} 0 0 $blur $spread rgba(var(--sn-accent-rgb), calc(#{$base-opacity} * var(--sn-sidebar-harmonic-intensity-multiplier)));
+    box-shadow: #{$shadow-type} 0 0 $blur $spread oklab-color('accent', calc(#{$base-opacity} * var(--sn-sidebar-harmonic-intensity-multiplier)));
   }
 }
 

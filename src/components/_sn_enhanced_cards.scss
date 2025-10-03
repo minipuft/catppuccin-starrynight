@@ -284,20 +284,11 @@
 
   // Softened dynamic shadow to reduce visual effects while preserving beat dynamics
   box-shadow: 0 4px calc(16px + (6px * var(--card-beat-intensity)))
-      rgba(
-        var(--sn-accent-rgb, var(--spice-rgb-accent)),
-        calc(0.05 + (var(--card-beat-intensity) * 0.05))
-      ),
+      oklab-color('accent', calc(0.05 + (var(--card-beat-intensity) * 0.05))),
     0 8px calc(24px + (8px * var(--card-beat-intensity)))
-      rgba(
-        var(--sn-oklab-processed-dynamic-shadow-rgb),
-        calc(0.08 + (var(--card-beat-intensity) * 0.07))
-      ),
+      oklab-color('shadow', calc(0.08 + (var(--card-beat-intensity) * 0.07))),
     inset 0 1px 0
-      rgba(
-        var(--sn-oklab-processed-bright-highlight-rgb),
-        calc(0.07 + (var(--card-beat-intensity) * 0.04))
-      );
+      oklab-color('highlight', calc(0.07 + (var(--card-beat-intensity) * 0.04)));
 
   // === Visual Effect Base State ===
   transition: transform var(--calculated-transition)
