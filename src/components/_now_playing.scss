@@ -5,6 +5,7 @@
 // ████████████████████████████████████████████████████████████████████████████████
 
 @use "../core/_mixins" as *;
+@use "../core/_design_tokens" as *;
 
 :root {
   @include now-playing-bar-root {
@@ -39,11 +40,8 @@
         // Kinetic Verb: BLOOM - Enhanced hover with rhythm (scale removed)
         transform: translateZ(0);
         filter: drop-shadow(
-          0 0 calc(4px * var(--sn-beat-pulse-intensity, 0))
-            rgba(
-              var(--sn-accent-rgb),
-              calc(0.4 * var(--sn-beat-pulse-intensity, 0))
-            )
+          0 0 calc(4px * var(--sn-music-beat-pulse-intensity, 0))
+            oklab-color('accent', calc(0.4 * var(--sn-music-beat-pulse-intensity, 0)))
         );
       }
 
@@ -52,11 +50,8 @@
         color: var(--spice-text);
         // Kinetic Verb: OSCILLATE - Active state breathes with music (scale removed)
         transform: translateZ(0);
-        text-shadow: 0 0 calc(4px * var(--sn-beat-pulse-intensity, 0))
-          rgba(
-            var(--sn-accent-rgb),
-            calc(0.6 * var(--sn-beat-pulse-intensity, 0))
-          );
+        text-shadow: 0 0 calc(4px * var(--sn-music-beat-pulse-intensity, 0))
+          oklab-color('accent', calc(0.6 * var(--sn-music-beat-pulse-intensity, 0)));
       }
     }
 
@@ -78,11 +73,7 @@
         border-radius: 50%;
         background: radial-gradient(
           circle,
-          rgba(
-              var(--sn-accent-rgb),
-              calc(0.25 * var(--sn-beat-pulse-intensity, 0))
-            )
-            0%,
+          oklab-color('accent', calc(0.25 * var(--sn-music-beat-pulse-intensity, 0))) 0%,
           transparent 70%
         );
         z-index: -1;
@@ -93,11 +84,7 @@
       &:hover::before {
         background: radial-gradient(
           circle,
-          rgba(
-              var(--sn-accent-rgb),
-              calc(0.35 * var(--sn-beat-pulse-intensity, 0))
-            )
-            0%,
+          oklab-color('accent', calc(0.35 * var(--sn-music-beat-pulse-intensity, 0))) 0%,
           transparent 70%
         );
       }
@@ -110,17 +97,17 @@
         --glass-button-background,
         linear-gradient(
           135deg,
-          rgba(var(--sn-accent-rgb), 0.9) 0%,
-          rgba(var(--sn-accent-rgb), 0.7) 100%
+          oklab-color('accent', 0.9) 0%,
+          oklab-color('accent', 0.7) 100%
         )
       );
       border: 1px solid
         var(
           --glass-button-border,
-          rgba(var(--sn-accent-rgb), 0.3)
+          oklab-color('accent', 0.3)
         );
       transition: all 0.3s var(--sn-easing-explorer, ease-out);
-      
+
       // TODO: Phase 2 - Add glass-button-layer for advanced depth effects
     }
 
@@ -132,17 +119,14 @@
         --glass-button-background-hover,
         linear-gradient(
           135deg,
-          rgba(var(--sn-accent-rgb), 0.95) 0%,
-          rgba(var(--sn-accent-rgb), 0.8) 100%
+          oklab-color('accent', 0.95) 0%,
+          oklab-color('accent', 0.8) 100%
         )
       );
       // Kinetic Verb: BLOOM (scale removed)
       transform: translateZ(0);
-      box-shadow: 0 0 calc(6px * var(--sn-beat-pulse-intensity, 0))
-        rgba(
-          var(--sn-accent-rgb),
-          calc(0.3 * var(--sn-beat-pulse-intensity, 0))
-        );
+      box-shadow: 0 0 calc(6px * var(--sn-music-beat-pulse-intensity, 0))
+        oklab-color('accent', calc(0.3 * var(--sn-music-beat-pulse-intensity, 0)));
     }
 
     // ══════════════════════════════════════════════════════════════════════════════
@@ -163,11 +147,8 @@
         color: var(--spice-text) !important;
         // Kinetic Verb: RIPPLE - Enhanced hover (scale removed)
         transform: translateZ(0);
-        text-shadow: 0 0 calc(3px * var(--sn-beat-pulse-intensity, 0))
-          rgba(
-            var(--sn-accent-rgb),
-            calc(0.4 * var(--sn-beat-pulse-intensity, 0))
-          );
+        text-shadow: 0 0 calc(3px * var(--sn-music-beat-pulse-intensity, 0))
+          oklab-color('accent', calc(0.4 * var(--sn-music-beat-pulse-intensity, 0)));
       }
     }
 
@@ -182,8 +163,8 @@
       // Kinetic Verb: BLOOM - Love pulses with glow (scale removed)
       transform: translateZ(0);
       filter: drop-shadow(
-        0 0 calc(6px * var(--sn-beat-pulse-intensity, 0))
-          rgba(var(--spice-rgb-red, 243, 139, 168), calc(0.7 * var(--sn-beat-pulse-intensity, 0)))
+        0 0 calc(6px * var(--sn-music-beat-pulse-intensity, 0))
+          rgba(var(--spice-rgb-red, 243, 139, 168), calc(0.7 * var(--sn-music-beat-pulse-intensity, 0)))
       );
       transition: all 0.15s var(--sn-anim-easing-bounce-strong); // Heart beats fast!
     }
@@ -196,18 +177,15 @@
 
       > div > div {
         background: linear-gradient(
-          calc(90deg + (var(--sn-rhythm-phase, 0) * 4deg)),
+          calc(90deg + (var(--sn-music-rhythm-phase, 0) * 4deg)),
           // Kinetic Verb: HARMONIZE
-          rgba(var(--sn-accent-rgb), 0.9) 0%,
-          rgba(var(--sn-accent-rgb), 1) 50%,
-          rgba(var(--sn-accent-rgb), 0.9) 100%
+          oklab-color('accent', 0.9) 0%,
+          oklab-color('accent', 1) 50%,
+          oklab-color('accent', 0.9) 100%
         );
         // Kinetic Verb: REFRACT - Progress bar glows with energy
-        box-shadow: 0 0 calc(4px * var(--sn-beat-pulse-intensity, 0))
-          rgba(
-            var(--sn-accent-rgb),
-            calc(0.5 * var(--sn-beat-pulse-intensity, 0))
-          );
+        box-shadow: 0 0 calc(4px * var(--sn-music-beat-pulse-intensity, 0))
+          oklab-color('accent', calc(0.5 * var(--sn-music-beat-pulse-intensity, 0)));
         transition: box-shadow 0.2s ease-out;
       }
 
@@ -219,11 +197,7 @@
         background: linear-gradient(
           90deg,
           transparent 0%,
-          rgba(
-              var(--sn-accent-rgb),
-              calc(0.1 * var(--sn-beat-pulse-intensity, 0))
-            )
-            50%,
+          oklab-color('accent', calc(0.1 * var(--sn-music-beat-pulse-intensity, 0))) 50%,
           transparent 100%
         );
         z-index: -1;
@@ -244,9 +218,9 @@
     background: rgba(var(--spice-rgb-surface0), 0.9) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    
+
     &::before {
-      background: rgba(var(--sn-accent-rgb), 0.8) !important;
+      background: oklab-color('accent', 0.8) !important;
     }
   }
 }

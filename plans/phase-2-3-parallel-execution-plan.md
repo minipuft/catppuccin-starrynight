@@ -6,7 +6,7 @@
 | Phase | Status | Progress | Lead | Started | ETA |
 |-------|--------|----------|------|---------|-----|
 | Phase 1: Foundation | ✅ COMPLETE | 100% | - | 2025-10-02 | 2025-10-02 |
-| Phase 2: Token Alignment | 🔄 IN PROGRESS | 33% (5/15 files) | Claude | 2025-10-02 | Week 2-3 |
+| Phase 2: Token Alignment | 🔄 IN PROGRESS | 40% (6/15 files) | Claude | 2025-10-02 | Week 2-3 |
 | Phase 3: Selector Modernization | 🔄 IN PROGRESS | 0% | TBD | 2025-10-02 | Week 4 |
 
 **⚠️ PARALLEL EXECUTION ACTIVE**: Phase 2 and Phase 3 running simultaneously
@@ -364,12 +364,12 @@ document.querySelectorAll('.sn-card').length > 0        // Should be true
 - [x] `_mixins.scss` - Migrated all music tokens in mixin definitions (10 references updated)
 - [x] `_interaction_mixins.scss` - Updated interaction pattern mixins (12 references updated)
 
-#### Wave 2: High-Impact Components 🔄 3/5 IN PROGRESS
+#### Wave 2: High-Impact Components 🔄 4/5 IN PROGRESS
 - [x] `_beat_sync_glassmorphism.scss` - Migrated glassmorphism beat sync (4 references updated)
 - [x] `_action_bar_unified.scss` - Migrated action bar beat response (3 references updated)
 - [x] `_top_bar.scss` - Migrated top bar animations (5 references updated)
-- [ ] `_now_playing.scss` - Update now playing widget
-- [ ] `_navbar.scss` - Migrate navbar beat sync
+- [x] `_now_playing.scss` - Migrated now playing widget (1 reference updated)
+- [ ] `_navbar.scss` - Migrate navbar beat sync (CONFLICT ZONE - coordinate with Phase 3)
 
 #### Wave 3: Visual Effects ⬜ 0/3
 - [ ] `_particle_animation_system.scss` - Update particle beat sync
@@ -385,7 +385,7 @@ document.querySelectorAll('.sn-card').length > 0        // Should be true
 - [ ] `_sn_enhanced_cards.scss` - Update card beat sync
 - [ ] `_grid_navigation_mode.scss` - Migrate grid animations
 
-**Total: 5/15 files complete (33%)**
+**Total: 6/15 files complete (40%)**
 
 **Wave 1 Completed**: 2025-10-02
 - CSS build: ✅ SUCCESS
@@ -406,6 +406,11 @@ document.querySelectorAll('.sn-card').length > 0        // Should be true
   - TypeScript check: ✅ SUCCESS
 - `_top_bar.scss` complete:
   - Migrated `--sn-rhythm-phase` → `--sn-music-rhythm-phase` (5 references: 1 comment + 4 token refs)
+  - CSS build: ✅ SUCCESS
+  - TypeScript check: ✅ SUCCESS
+- `_now_playing.scss` complete:
+  - Migrated `--sn-rhythm-phase` → `--sn-music-rhythm-phase` (1 reference in progress bar gradient)
+  - Preserved all consciousness effects (BLOOM, OSCILLATE, RIPPLE, HARMONIZE)
   - CSS build: ✅ SUCCESS
   - TypeScript check: ✅ SUCCESS
 
@@ -511,8 +516,10 @@ document.querySelectorAll('.sn-card').length > 0        // Should be true
 1. ✅ Phase 2 Wave 2: Complete `_beat_sync_glassmorphism.scss` migration (DONE - 4 refs)
 2. ✅ Phase 2 Wave 2: Complete `_action_bar_unified.scss` migration (DONE - 3 refs)
 3. ✅ Phase 2 Wave 2: Complete `_top_bar.scss` migration (DONE - 5 refs)
-4. ⬜ Phase 2 Wave 2: Migrate `_now_playing.scss` (NEXT - now playing widget)
-5. ⬜ Phase 3 Wave 1: Start `_navbar.scss` modernization (if parallel lead assigned)
+4. ✅ Phase 2 Wave 2: Complete `_now_playing.scss` migration (DONE - 1 ref)
+5. ⬜ Phase 2 Wave 2: Migrate `_navbar.scss` (CONFLICT ZONE - requires coordination)
+6. ⬜ Phase 2 Wave 3: Start visual effects files (particle, cosmic depth, fluid morphing)
+7. ⬜ Phase 3 Wave 1: Start `_navbar.scss` modernization (if parallel lead assigned)
 
 ---
 
