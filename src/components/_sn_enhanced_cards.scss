@@ -143,10 +143,10 @@
   --card-beat-pulse-multiplier: 1; // Amplifier for beat responses
   --card-rhythm-animation: 1; // Scale removed to eliminate bubble effects
   --card-beat-intensity: var(
-    --sn-beat-pulse-intensity,
+    --sn-music-beat-pulse-intensity,
     0
   ); // Direct beat connection
-  --card-rhythm-phase: var(--sn-rhythm-phase, 0); // Rhythm oscillation
+  --card-rhythm-phase: var(--sn-music-rhythm-phase, 0); // Rhythm oscillation
 
   // TODO: Extend existing visual effects card system with 3D visual positioning
   // === PHASE 2: VISUAL EFFECTS INTEGRATION ===
