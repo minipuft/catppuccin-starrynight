@@ -401,6 +401,8 @@
   --sn-oklab-shadow-rgb: var(--sn-cosmic-base-rgb);           // Shadow OKLAB processed color
   --sn-oklab-base-luminance: 0.08;                            // Base luminance (0-1)
   --sn-oklab-accent-luminance: 0.45;                          // Accent luminance (0-1)
+  --sn-oklab-default-chroma: 0.15;                            // Default chroma intensity for visual effects (0-1)
+  --sn-oklab-default-hue: 280;                                // Default hue for visual effects (purple, 0-360 degrees)
 
   // Legacy aliases for backward compatibility (Phase 4.2)
   --sn-color-oklab-bright-highlight-rgb: var(--sn-oklab-highlight-rgb);
@@ -1214,21 +1216,19 @@
      Removal: Phase 6 (v4.0.0) */
   --visual-effects-oklab-luminance: var(--sn-oklab-accent-luminance);
 
-  /* @deprecated Phase 3 - Literal value, consider using a semantic token
-     Usage: 11 occurrences
-     Risk: 🟡 RISKY
-     Note: Not a true alias, but a literal value that should be migrated to semantic token
-     Migration: Phase 4 consideration
-     Removal: Consider refactoring to --sn-oklab-default-chroma */
-  --visual-effects-oklab-chroma: 0.15; // Default chroma for visual effects
+  /* @deprecated Phase 6 - Use --sn-oklab-default-chroma instead
+     Usage: 0 files (Phase 6 migration complete - was 11 occurrences in 1 file)
+     Risk: ✅ SAFE - Phase 6 migration complete
+     Migration: ✅ COMPLETE (2025-10-03)
+     Removal: Phase 6 (v4.0.0) */
+  --visual-effects-oklab-chroma: var(--sn-oklab-default-chroma);
 
-  /* @deprecated Phase 3 - Literal value, consider using a semantic token
-     Usage: 4 occurrences
-     Risk: 🟡 RISKY
-     Note: Not a true alias, but a literal value that should be migrated to semantic token
-     Migration: Phase 4 consideration
-     Removal: Consider refactoring to --sn-oklab-default-hue */
-  --visual-effects-oklab-hue: 280; // Default visual effects hue (purple-like)
+  /* @deprecated Phase 6 - Use --sn-oklab-default-hue instead
+     Usage: 0 files (Phase 6 migration complete - was 4 occurrences in 1 file)
+     Risk: ✅ SAFE - Phase 6 migration complete
+     Migration: ✅ COMPLETE (2025-10-03)
+     Removal: Phase 6 (v4.0.0) */
+  --visual-effects-oklab-hue: var(--sn-oklab-default-hue);
 
   // ---------------------------------------------------------------------------
   // VISUAL EFFECTS CSS FALLBACK COORDINATION

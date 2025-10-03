@@ -242,10 +242,10 @@ html[data-visual-effects-level="high"] {
   .Root__main-view::before {
     /* OKLAB-enhanced high visual effects intensity with perceptual uniformity */
     filter:
-      saturate(calc(1.2 + var(--visual-effects-oklab-chroma) * 0.4))
+      saturate(calc(1.2 + var(--sn-oklab-default-chroma) * 0.4))
       brightness(calc(1.1 * var(--sn-oklab-accent-luminance)))
-      contrast(calc(1.1 + var(--visual-effects-oklab-chroma) * 0.2))
-      hue-rotate(calc(var(--visual-effects-music-energy) * var(--visual-effects-oklab-hue) * 0.03deg));
+      contrast(calc(1.1 + var(--sn-oklab-default-chroma) * 0.2))
+      hue-rotate(calc(var(--sn-music-energy-level) * var(--sn-oklab-default-hue) * 0.03deg));
   }
 }
 
@@ -272,22 +272,22 @@ html[data-visual-effects-level="low"] {
 /* ============================================================================ */
 
 /* High energy music - vibrant living base */
-html[style*="--visual-effects-music-energy: 1"] {
+html[style*="--sn-music-energy-level: 1"] {
   --visual-effects-breathing-duration: var(--sn-anim-breathing-energetic); /* Faster breathing */
 
   .Root__main-view::before {
     animation-duration: 2000ms, 4000ms; /* Faster animations */
     /* OKLAB-enhanced high energy music with perceptual color processing */
     filter:
-      saturate(calc(1.0 + var(--visual-effects-music-energy) * var(--visual-effects-oklab-chroma) * 0.5))
-      brightness(calc(1.0 + var(--visual-effects-music-energy) * var(--sn-oklab-accent-luminance) * 0.3))
-      contrast(calc(1.0 + var(--visual-effects-music-energy) * var(--visual-effects-oklab-chroma) * 0.3))
-      hue-rotate(calc(var(--visual-effects-music-energy) * var(--visual-effects-oklab-hue) * 0.02deg));
+      saturate(calc(1.0 + var(--sn-music-energy-level) * var(--sn-oklab-default-chroma) * 0.5))
+      brightness(calc(1.0 + var(--sn-music-energy-level) * var(--sn-oklab-accent-luminance) * 0.3))
+      contrast(calc(1.0 + var(--sn-music-energy-level) * var(--sn-oklab-default-chroma) * 0.3))
+      hue-rotate(calc(var(--sn-music-energy-level) * var(--sn-oklab-default-hue) * 0.02deg));
   }
 }
 
 /* Low energy music - calm living base */
-html[style*="--visual-effects-music-energy: 0"] {
+html[style*="--sn-music-energy-level: 0"] {
   --visual-effects-breathing-duration: var(--sn-anim-breathing-cosmic); /* Slower breathing */
 
   .Root__main-view::before {
@@ -368,17 +368,17 @@ html[style*="--visual-effects-music-energy: 0"] {
   .Root__main-view::before {
     /* OKLAB-enhanced dramatic visual effects with perceptual uniformity */
     filter:
-      saturate(calc(1.3 + var(--visual-effects-oklab-chroma) * 0.5))
+      saturate(calc(1.3 + var(--sn-oklab-default-chroma) * 0.5))
       brightness(calc(1.2 * var(--sn-oklab-accent-luminance)))
-      contrast(calc(1.2 + var(--visual-effects-oklab-chroma) * 0.3))
-      hue-rotate(calc(var(--visual-effects-music-energy) * var(--visual-effects-oklab-hue) * 0.04deg)) !important;
+      contrast(calc(1.2 + var(--sn-oklab-default-chroma) * 0.3))
+      hue-rotate(calc(var(--sn-music-energy-level) * var(--sn-oklab-default-hue) * 0.04deg)) !important;
 
     /* Enhanced OKLAB-based background for dramatic effect */
     background:
       radial-gradient(
         ellipse at center,
         rgba(var(--sn-oklab-primary-rgb), calc(0.15 * var(--sn-oklab-accent-luminance))) 0%,
-        rgba(var(--sn-oklab-accent-rgb), calc(0.12 * var(--visual-effects-oklab-chroma))) 30%,
+        rgba(var(--sn-oklab-accent-rgb), calc(0.12 * var(--sn-oklab-default-chroma))) 30%,
         rgba(var(--sn-oklab-highlight-rgb), calc(0.08 * var(--sn-oklab-accent-luminance))) 60%,
         rgba(var(--sn-oklab-shadow-rgb), 0.03) 85%,
         var(--spice-base) 100%
@@ -403,7 +403,7 @@ html[style*="--visual-effects-music-energy: 0"] {
 /* Development mode - show OKLAB-enhanced visual effects boundaries */
 html[data-debug="true"] {
   .Root__main-view::before {
-    outline: 1px dashed rgba(var(--sn-oklab-primary-rgb), calc(0.3 * var(--visual-effects-oklab-chroma)));
+    outline: 1px dashed rgba(var(--sn-oklab-primary-rgb), calc(0.3 * var(--sn-oklab-default-chroma)));
   }
 
   .Root__main-view::after {
@@ -420,17 +420,17 @@ html[data-debug="true"] {
       /* OKLAB-based visual effects area highlighting */
       radial-gradient(
         circle at 50% 50%,
-        rgba(var(--sn-oklab-primary-rgb), calc(0.15 * var(--visual-effects-oklab-chroma))) 0%,
+        rgba(var(--sn-oklab-primary-rgb), calc(0.15 * var(--sn-oklab-default-chroma))) 0%,
         rgba(var(--sn-oklab-accent-rgb), calc(0.1 * var(--sn-oklab-accent-luminance))) 25%,
-        rgba(var(--sn-oklab-highlight-rgb), calc(0.05 * var(--visual-effects-oklab-chroma))) 50%,
+        rgba(var(--sn-oklab-highlight-rgb), calc(0.05 * var(--sn-oklab-default-chroma))) 50%,
         transparent 75%
       );
 
     /* OKLAB-enhanced debug filter */
     filter:
-      saturate(calc(1.5 + var(--visual-effects-oklab-chroma)))
+      saturate(calc(1.5 + var(--sn-oklab-default-chroma)))
       brightness(calc(1.3 * var(--sn-oklab-accent-luminance)))
-      hue-rotate(calc(var(--visual-effects-oklab-hue) * 0.05deg));
+      hue-rotate(calc(var(--sn-oklab-default-hue) * 0.05deg));
   }
 }
 
