@@ -418,8 +418,8 @@
   // Phase 3: Beat-Sync Glass Effects - Optimized transitions for smooth beat pulses
   transition: backdrop-filter 400ms ease-out,
               -webkit-backdrop-filter 400ms ease-out,
-              background var(--sn-gradient-transition, 0.8s ease-in-out),
-              border var(--sn-gradient-transition, 0.8s ease-in-out);
+              background var(--sn-bg-gradient-transition, 0.8s ease-in-out),
+              border var(--sn-bg-gradient-transition, 0.8s ease-in-out);
 
   // Include performance optimizations (these don't contain nested rules)
   @include performance-optimized;
@@ -691,7 +691,7 @@
     border-radius: inherit;
     z-index: -1;
     opacity: 0;
-    transition: opacity var(--sn-gradient-transition, 0.8s ease-in-out);
+    transition: opacity var(--sn-bg-gradient-transition, 0.8s ease-in-out);
     pointer-events: none;
   }
 
@@ -774,32 +774,32 @@
   position: relative;
 
   @if $context == "playlist" {
-    --sn-gradient-primary: var(--zone-playlist-primary);
-    --sn-gradient-secondary: var(--zone-playlist-secondary);
+    --sn-bg-gradient-primary: var(--zone-playlist-primary);
+    --sn-bg-gradient-secondary: var(--zone-playlist-secondary);
     --sn-current-intensity: var(--zone-intensity-playback);
   } @else if $context == "artist" {
-    --sn-gradient-primary: var(--zone-artist-primary);
-    --sn-gradient-secondary: var(--zone-artist-secondary);
+    --sn-bg-gradient-primary: var(--zone-artist-primary);
+    --sn-bg-gradient-secondary: var(--zone-artist-secondary);
     --sn-current-intensity: var(--zone-intensity-discovery);
   } @else if $context == "search" {
-    --sn-gradient-primary: var(--zone-search-primary);
-    --sn-gradient-secondary: var(--zone-search-secondary);
+    --sn-bg-gradient-primary: var(--zone-search-primary);
+    --sn-bg-gradient-secondary: var(--zone-search-secondary);
     --sn-current-intensity: var(--zone-intensity-focused);
   } @else if $context == "home" {
-    --sn-gradient-primary: var(--zone-home-primary);
-    --sn-gradient-secondary: var(--zone-home-secondary);
+    --sn-bg-gradient-primary: var(--zone-home-primary);
+    --sn-bg-gradient-secondary: var(--zone-home-secondary);
     --sn-current-intensity: var(--zone-intensity-relaxed);
   } @else if $context == "discovery" {
-    --sn-gradient-primary: var(--zone-artist-primary);
-    --sn-gradient-secondary: var(--zone-artist-secondary);
+    --sn-bg-gradient-primary: var(--zone-artist-primary);
+    --sn-bg-gradient-secondary: var(--zone-artist-secondary);
     --sn-current-intensity: var(--zone-intensity-discovery);
   } @else if $context == "playback" {
-    --sn-gradient-primary: var(--zone-playlist-primary);
-    --sn-gradient-secondary: var(--zone-playlist-secondary);
+    --sn-bg-gradient-primary: var(--zone-playlist-primary);
+    --sn-bg-gradient-secondary: var(--zone-playlist-secondary);
     --sn-current-intensity: var(--zone-intensity-playback);
   } @else {
-    --sn-gradient-primary: var(--spice-accent);
-    --sn-gradient-secondary: var(--spice-subtext);
+    --sn-bg-gradient-primary: var(--spice-accent);
+    --sn-bg-gradient-secondary: var(--spice-subtext);
     --sn-current-intensity: 1;
   }
 
@@ -812,7 +812,7 @@
 // Contextual ripple effect (extends gradient-ripple for context awareness)
 @mixin context-ripple($context: "default", $intensity: 1) {
   @include context-gradient-zone($context);
-  @include gradient-ripple(var(--sn-gradient-primary), $intensity);
+  @include gradient-ripple(var(--sn-bg-gradient-primary), $intensity);
 
   &::after {
     background: radial-gradient(
@@ -860,21 +860,21 @@
   $duration: calc(#{$base-duration} * #{$speed-multiplier});
 
   // Context-aware gradient colors
-  $start-color: var(--sn-gradient-secondary, var(--spice-surface0));
-  $end-color: var(--sn-gradient-accent, var(--spice-surface1));
+  $start-color: var(--sn-bg-gradient-secondary, var(--spice-surface0));
+  $end-color: var(--sn-bg-gradient-accent, var(--spice-surface1));
 
   @if $context == 'playlist' {
-    $start-color: var(--album-dominant-color, var(--sn-gradient-secondary));
-    $end-color: var(--album-accent-color, var(--sn-gradient-accent));
+    $start-color: var(--album-dominant-color, var(--sn-bg-gradient-secondary));
+    $end-color: var(--album-accent-color, var(--sn-bg-gradient-accent));
   } @else if $context == 'artist' {
-    $start-color: var(--artist-header-start, var(--sn-gradient-primary));
-    $end-color: var(--artist-header-end, var(--sn-gradient-accent));
+    $start-color: var(--artist-header-start, var(--sn-bg-gradient-primary));
+    $end-color: var(--artist-header-end, var(--sn-bg-gradient-accent));
   } @else if $context == 'search' {
     $start-color: var(--spice-surface0);
     $end-color: var(--spice-surface1);
   } @else if $context == 'home' {
-    $start-color: var(--sn-gradient-primary, var(--spice-accent));
-    $end-color: var(--spice-accent, var(--sn-gradient-primary));
+    $start-color: var(--sn-bg-gradient-primary, var(--spice-accent));
+    $end-color: var(--spice-accent, var(--sn-bg-gradient-primary));
   }
 
   // Performance optimization
@@ -916,7 +916,7 @@
     // Text-specific shimmer (replaces gentle-text-shimmer)
     --text-shimmer-intensity: calc(0.3 * #{$opacity-multiplier});
     opacity: var(--text-shimmer-intensity);
-    text-shadow: 0 0 5px rgba(var(--sn-gradient-accent-rgb), calc(0.2 * #{$opacity-multiplier}));
+    text-shadow: 0 0 5px rgba(var(--sn-bg-gradient-accent-rgb), calc(0.2 * #{$opacity-multiplier}));
     animation: unified-text-shimmer calc(#{$duration} * 1.5) ease-in-out infinite;
   }
 
@@ -1008,11 +1008,11 @@
 @keyframes unified-text-shimmer {
   0%, 100% {
     opacity: var(--text-shimmer-intensity, 0.3);
-    text-shadow: 0 0 5px rgba(var(--sn-gradient-accent-rgb), 0.2);
+    text-shadow: 0 0 5px rgba(var(--sn-bg-gradient-accent-rgb), 0.2);
   }
   50% {
     opacity: calc(var(--text-shimmer-intensity, 0.3) * 1.4);
-    text-shadow: 0 0 8px rgba(var(--sn-gradient-accent-rgb), 0.4);
+    text-shadow: 0 0 8px rgba(var(--sn-bg-gradient-accent-rgb), 0.4);
   }
 }
 
@@ -1236,15 +1236,15 @@
 // Supports angle & multi-stop maps while remaining backward-compatible.
 // Example multi-stop usage:
 //   $stops: (
-//     0%: rgba(var(--sn-gradient-primary-rgb),1),
-//     60%: rgba(var(--sn-gradient-secondary-rgb),1),
-//     100%: rgba(var(--sn-gradient-accent-rgb),1)
+//     0%: rgba(var(--sn-bg-gradient-primary-rgb),1),
+//     60%: rgba(var(--sn-bg-gradient-secondary-rgb),1),
+//     100%: rgba(var(--sn-bg-gradient-accent-rgb),1)
 //   );
 //   @include text-gradient(null, null, 90deg, $stops);
 
 @mixin text-gradient(
-  $start: var(--sn-gradient-primary),
-  $end: var(--sn-gradient-accent),
+  $start: var(--sn-bg-gradient-primary),
+  $end: var(--sn-bg-gradient-accent),
   $angle: 135deg,
   $stops: null
 ) {
@@ -1276,7 +1276,7 @@
 
 // === Year 3000 Dynamic Text Glow ==========================================
 // Creates a soft glow whose strength follows a CSS variable (0-1).
-// Example: @include text-glow(--sn-gradient-accent-rgb);
+// Example: @include text-glow(--sn-bg-gradient-accent-rgb);
 @mixin text-glow($rgbVar, $intensityVar: --sn-text-glow-intensity) {
   text-shadow: 0 0 calc(2px + 6px * var(#{$intensityVar}))
       rgba(var(#{$rgbVar}), calc(0.3 + 0.4 * var(#{$intensityVar}))),

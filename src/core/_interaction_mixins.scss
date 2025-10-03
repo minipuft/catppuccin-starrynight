@@ -24,7 +24,7 @@
   // === Ripple Effect Variables ===
   --ripple-color: var(--sn-color-accent-hex);
   --ripple-duration: calc(
-    var(--sn-gradient-transition, 0.8s) * (1 - (var(--sn-music-beat-pulse-intensity, 0) * 0.3))
+    var(--sn-bg-gradient-transition, 0.8s) * (1 - (var(--sn-music-beat-pulse-intensity, 0) * 0.3))
   );
   --ripple-intensity: calc(0.3 + (var(--sn-music-beat-pulse-intensity, 0) * 0.4));
   --ripple-max-scale: 3;
@@ -34,7 +34,7 @@
   --focus-glow-intensity: 0.4;
   --focus-flow-duration: 300ms;
   --focus-ring-thickness: 2px;
-  --focus-ring-color: rgba(var(--sn-gradient-accent-rgb), var(--focus-glow-intensity));
+  --focus-ring-color: rgba(var(--sn-bg-gradient-accent-rgb), var(--focus-glow-intensity));
   --hover-lift-distance: 2px;
   --hover-glow-intensity: 0.2;
   --hover-transition-speed: 200ms;
@@ -174,7 +174,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @mixin lightweight-text-shimmer($intensity: normal) {
-  color: rgba(var(--sn-gradient-primary-rgb), 0.95);
+  color: rgba(var(--sn-bg-gradient-primary-rgb), 0.95);
 
   @if $intensity == subtle {
     --local-shimmer-strength: 0.15;
@@ -185,7 +185,7 @@
   }
 
   // Simple text glow that responds to music
-  text-shadow: 0 0 calc(var(--local-shimmer-strength) * 10px) rgba(var(--sn-gradient-accent-rgb), var(--music-glow-strength, 0.2));
+  text-shadow: 0 0 calc(var(--local-shimmer-strength) * 10px) rgba(var(--sn-bg-gradient-accent-rgb), var(--music-glow-strength, 0.2));
 
   // Lightweight shimmer animation (Phase 8.5b: Use unified shimmer system)
   @include unified-shimmer($type: 'text', $intensity: 'subtle');
@@ -207,9 +207,9 @@
   // Simple three-color gradient
   background: linear-gradient(
     45deg,
-    rgba(var(--sn-gradient-primary-rgb), 1) 0%,
-    rgba(var(--sn-gradient-accent-rgb), 1) 50%,
-    rgba(var(--sn-gradient-secondary-rgb), 1) 100%
+    rgba(var(--sn-bg-gradient-primary-rgb), 1) 0%,
+    rgba(var(--sn-bg-gradient-accent-rgb), 1) 50%,
+    rgba(var(--sn-bg-gradient-secondary-rgb), 1) 100%
   );
   background-size: 200% 100%;
   background-clip: text;
@@ -233,8 +233,8 @@
   &:focus,
   &[aria-selected="true"] {
     box-shadow:
-      0 0 15px rgba(var(--sn-gradient-accent-rgb), 0.3),
-      0 0 30px rgba(var(--sn-gradient-accent-rgb), 0.1);
+      0 0 15px rgba(var(--sn-bg-gradient-accent-rgb), 0.3),
+      0 0 30px rgba(var(--sn-bg-gradient-accent-rgb), 0.1);
     transform: scale(1.02);
   }
 }
@@ -270,7 +270,7 @@
     background: radial-gradient(
       circle,
       var(--ripple-color) 0%,
-      rgba(var(--sn-gradient-accent-rgb), 0) 70%
+      rgba(var(--sn-bg-gradient-accent-rgb), 0) 70%
     );
     transform: translate(-50%, -50%) scale(0);
     pointer-events: none;
@@ -340,7 +340,7 @@
     box-shadow:
       0 calc(var(--local-lift-distance) * 2)
       calc(var(--local-lift-distance) * 8)
-      rgba(var(--sn-gradient-accent-rgb), var(--local-hover-glow));
+      rgba(var(--sn-bg-gradient-accent-rgb), var(--local-hover-glow));
     filter: brightness(1.05) saturate(1.1);
   }
 }
