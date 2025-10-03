@@ -616,20 +616,20 @@
 }
 
 // Beat-synchronized particle intensification (consolidated from _particle_field.scss & _cosmic_effects.scss)
-.Root[style*="--sn-beat-pulse-intensity"] {
+.Root[style*="--sn-music-beat-pulse-intensity"] {
   // Aurora layer responds to beat
   .Root::before {
-    animation-duration: calc(var(--aurora-flow-speed) / max(var(--sn-beat-pulse-intensity, 1), 0.7));
+    animation-duration: calc(var(--aurora-flow-speed) / max(var(--sn-music-beat-pulse-intensity, 1), 0.7));
     filter: blur(60px)
-            brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.15))
-            saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.2));
+            brightness(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.15))
+            saturate(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.2));
   }
 
   // Particles pulse with beat
   .sn-stars-container .star {
-    animation-duration: calc(var(--particle-base-speed) * 0.8 / max(var(--sn-beat-pulse-intensity, 1), 0.5)) !important;
-    filter: brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.3))
-            saturate(calc(1.2 + var(--sn-beat-pulse-intensity, 0) * 0.4));
+    animation-duration: calc(var(--particle-base-speed) * 0.8 / max(var(--sn-music-beat-pulse-intensity, 1), 0.5)) !important;
+    filter: brightness(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.3))
+            saturate(calc(1.2 + var(--sn-music-beat-pulse-intensity, 0) * 0.4));
   }
 }
 

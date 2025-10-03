@@ -6,7 +6,7 @@
 | Phase | Status | Progress | Lead | Started | ETA |
 |-------|--------|----------|------|---------|-----|
 | Phase 1: Foundation | ✅ COMPLETE | 100% | - | 2025-10-02 | 2025-10-02 |
-| Phase 2: Token Alignment | 🔄 IN PROGRESS | 40% (6/15 files) | Claude | 2025-10-02 | Week 2-3 |
+| Phase 2: Token Alignment | 🔄 IN PROGRESS | 47% (7/15 files) | Claude | 2025-10-02 | Week 2-3 |
 | Phase 3: Selector Modernization | 🔄 IN PROGRESS | 0% | TBD | 2025-10-02 | Week 4 |
 
 **⚠️ PARALLEL EXECUTION ACTIVE**: Phase 2 and Phase 3 running simultaneously
@@ -371,8 +371,8 @@ document.querySelectorAll('.sn-card').length > 0        // Should be true
 - [x] `_now_playing.scss` - Migrated now playing widget (1 reference updated)
 - [ ] `_navbar.scss` - Migrate navbar beat sync (CONFLICT ZONE - coordinate with Phase 3)
 
-#### Wave 3: Visual Effects ⬜ 0/3
-- [ ] `_particle_animation_system.scss` - Update particle beat sync
+#### Wave 3: Visual Effects 🔄 1/3 IN PROGRESS
+- [x] `_particle_animation_system.scss` - Migrated particle beat sync (6 references updated)
 - [ ] `_cosmic_depth_system.scss` - Migrate depth layer responses
 - [ ] `_fluid_morphing.scss` - Update morphing animations
 
@@ -385,7 +385,7 @@ document.querySelectorAll('.sn-card').length > 0        // Should be true
 - [ ] `_sn_enhanced_cards.scss` - Update card beat sync
 - [ ] `_grid_navigation_mode.scss` - Migrate grid animations
 
-**Total: 6/15 files complete (40%)**
+**Total: 7/15 files complete (47%)**
 
 **Wave 1 Completed**: 2025-10-02
 - CSS build: ✅ SUCCESS
@@ -411,6 +411,14 @@ document.querySelectorAll('.sn-card').length > 0        // Should be true
 - `_now_playing.scss` complete:
   - Migrated `--sn-rhythm-phase` → `--sn-music-rhythm-phase` (1 reference in progress bar gradient)
   - Preserved all consciousness effects (BLOOM, OSCILLATE, RIPPLE, HARMONIZE)
+  - CSS build: ✅ SUCCESS
+  - TypeScript check: ✅ SUCCESS
+
+**Wave 3 In Progress**: 2025-10-02
+- `_particle_animation_system.scss` complete:
+  - Migrated `--sn-beat-pulse-intensity` → `--sn-music-beat-pulse-intensity` (6 references)
+  - Updated selector: `.Root[style*="--sn-music-beat-pulse-intensity"]`
+  - Aurora layer and particle pulse effects preserved
   - CSS build: ✅ SUCCESS
   - TypeScript check: ✅ SUCCESS
 
@@ -517,9 +525,11 @@ document.querySelectorAll('.sn-card').length > 0        // Should be true
 2. ✅ Phase 2 Wave 2: Complete `_action_bar_unified.scss` migration (DONE - 3 refs)
 3. ✅ Phase 2 Wave 2: Complete `_top_bar.scss` migration (DONE - 5 refs)
 4. ✅ Phase 2 Wave 2: Complete `_now_playing.scss` migration (DONE - 1 ref)
-5. ⬜ Phase 2 Wave 2: Migrate `_navbar.scss` (CONFLICT ZONE - requires coordination)
-6. ⬜ Phase 2 Wave 3: Start visual effects files (particle, cosmic depth, fluid morphing)
-7. ⬜ Phase 3 Wave 1: Start `_navbar.scss` modernization (if parallel lead assigned)
+5. ✅ Phase 2 Wave 3: Complete `_particle_animation_system.scss` migration (DONE - 6 refs)
+6. ⬜ Phase 2 Wave 3: Migrate `_cosmic_depth_system.scss` (NEXT - depth layer responses)
+7. ⬜ Phase 2 Wave 3: Migrate `_fluid_morphing.scss` (morphing animations)
+8. ⬜ Phase 2 Wave 2: Migrate `_navbar.scss` (CONFLICT ZONE - defer until Phase 3 ready)
+9. ⬜ Phase 3 Wave 1: Start `_navbar.scss` modernization (if parallel lead assigned)
 
 ---
 
