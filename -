@@ -1,0 +1,9 @@
+:root {
+  --test-var: 10px;
+}
+
+.test-selector {
+  color: red;
+}
+
+/*# sourceMappingURL=-.map */

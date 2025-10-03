@@ -227,22 +227,23 @@
 }
 
 // 🌡️ Enhanced cards with emotional temperature beat sync (performance optimized)
-.main-card-card {
+.main-card-card,
+.main-card-cardContainer {
   // Only apply emotional temperature beat sync on hover for performance
   &:hover:where(.emotion-energetic, .emotion-happy, .emotion-epic) {
-    animation: card-energetic-pulse 
-      calc(var(--sn-audio-breathing-cycle, 2s) * 0.8) 
+    animation: card-energetic-pulse
+      calc(var(--sn-audio-breathing-cycle, 2s) * 0.8)
       ease-in-out infinite;
   }
-  
+
   &:hover:where(.emotion-calm, .emotion-ambient, .emotion-romantic) {
-    animation: card-calm-pulse 
-      calc(var(--sn-audio-breathing-cycle, 5s) * 1.2) 
+    animation: card-calm-pulse
+      calc(var(--sn-audio-breathing-cycle, 5s) * 1.2)
       ease-in-out infinite;
   }
-  
-  transition: transform 
-    200ms 
+
+  transition: transform
+    200ms
     var(--natural-ease-visual, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
@@ -275,7 +276,8 @@
 @media (prefers-reduced-motion: reduce) {
   .main-nowPlayingBar-nowPlayingBar,
   .main-addButton-button.control-button-heart,
-  .main-card-card {
+  .main-card-card,
+  .main-card-cardContainer {
     animation: none !important;
     transition-duration: 0.1s !important;
   }
@@ -306,7 +308,8 @@
 .sn-performance-mode {
   .main-nowPlayingBar-nowPlayingBar,
   .main-addButton-button.control-button-heart,
-  .main-card-card {
+  .main-card-card,
+  .main-card-cardContainer {
     animation: none !important;
     transition-duration: 100ms !important;
   }

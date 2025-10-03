@@ -1,6 +1,7 @@
 // StarryNight Shared Mixins
 // Common SCSS mixins used across StarryNight modules
 @forward "dom_selectors";
+@use "_design_tokens" as *;
 
 // Performance optimization mixin for hardware acceleration
 @mixin hardware-accelerated {
@@ -302,7 +303,9 @@
     border-radius: inherit;
     pointer-events: none;
     z-index: 0;
-    animation: crystalline-shimmer calc(#{$animation-speed} * 1.5) ease-in-out infinite;
+    // Phase 8.5b: Use unified shimmer system (gradient type for dual-layer movement)
+    @include unified-shimmer($type: 'gradient', $intensity: 'normal');
+    animation-duration: calc(#{$animation-speed} * 1.5);
   }
   
   // Enhanced hover state
@@ -370,16 +373,7 @@
   100% { background-position: 0% 50%, 0% 50%; }
 }
 
-@keyframes crystalline-shimmer {
-  0%, 100% {
-    background-position: -200% center, 200% center;
-    opacity: 0.6;
-  }
-  50% {
-    background-position: 200% center, -200% center;
-    opacity: 1;
-  }
-}
+// REMOVED (Phase 8.5b): crystalline-shimmer → consolidated into unified-shimmer($type: 'gradient')
 
 // PHASE 1: Glassmorphism Foundation Mixins
 // =============================================================================
@@ -389,8 +383,8 @@
   // Main glassmorphism properties first
   backdrop-filter: blur($blur) saturate($saturation);
   -webkit-backdrop-filter: blur($blur) saturate($saturation); // Safari support
-  background: rgba(var(--sn-oklab-processed-bright-highlight-rgb), $opacity);
-  border: 1px solid rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2);
+  background: oklab-color('highlight', $opacity);
+  border: 1px solid #{oklab-color('highlight', 0.2)};
 
   // Integrate with existing hardware acceleration
   @include hardware-accelerated;
@@ -414,12 +408,12 @@
     brightness(var(--glass-brightness, 1.1));
   background: var(
     --glass-background,
-    rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1)
+    #{oklab-color('highlight', 0.1)}
   );
   border: 1px solid
     var(
       --glass-border,
-      rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.2)
+      #{oklab-color('highlight', 0.2)}
     );
   // Phase 3: Beat-Sync Glass Effects - Optimized transitions for smooth beat pulses
   transition: backdrop-filter 400ms ease-out,
@@ -474,15 +468,6 @@
   backface-visibility: hidden;
 }
 
-// Enhanced hover lift effect for cards
-@mixin card-hover-lift($lift: 8px, $shadow-blur: 24px) {
-  transform: translateY(-#{$lift}) translateZ(0);
-  box-shadow: 0 #{$shadow-blur} #{$shadow-blur * 2}
-      rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.15),
-    0 #{$lift} #{$shadow-blur}
-      rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.1);
-}
-
 // Interactive element scaling
 @mixin interactive-scale($scale: 1.02) {
   transform: scale($scale) translateZ(0);
@@ -512,7 +497,7 @@
     background: linear-gradient(
       135deg,
       transparent 0%,
-      rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.05) 50%,
+      #{oklab-color('highlight', 0.05)} 50%,
       transparent 100%
     );
     opacity: 0;
@@ -556,18 +541,6 @@
   transition: transform $duration $timing, background $duration $timing,
     backdrop-filter $duration $timing, box-shadow $duration $timing,
     border-radius $duration $timing, opacity $duration $timing;
-}
-
-// Interactive 3D hover effect with mouse tracking
-@mixin interactive-3d-hover($max-rotate: 0deg, $depth: 50px) {
-  transition: all 0.3s var(--sn-transition-timing-default, var(--sn-anim-easing-organic));
-
-  &:hover {
-    transform-style: preserve-3d;
-    // Base 3D state - JavaScript will override with mouse position
-    transform: perspective(1200px)
-      translateZ($depth);
-  }
 }
 
 // Layered depth system for complex 3D scenes
@@ -644,30 +617,8 @@
   }
 }
 
-// Advanced shadow system for 3D depth
-@mixin shadow-3d($depth: 1) {
-  @if $depth == 1 {
-    box-shadow: 0
-        4px
-        8px
-        rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.1),
-      0 8px 16px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.05);
-  } @else if $depth == 2 {
-    box-shadow: 0
-        8px
-        16px
-        rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.15),
-      0 16px 32px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.1),
-      0 32px 64px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.05);
-  } @else if $depth == 3 {
-    box-shadow: 0
-        16px
-        32px
-        rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2),
-      0 32px 64px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.15),
-      0 64px 128px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.1);
-  }
-}
+// shadow-3d mixin removed - unused (0 references)
+// Migrated functionality available in oklab-shadow-stack() presets in _design_tokens.scss
 
 // PHASE 4: Advanced Gradient Intelligence Mixins
 // =============================================================================
@@ -874,30 +825,411 @@
   }
 }
 
-// Skeleton loading with gradient shimmer
-@mixin skeleton-gradient($width: 100%, $height: 20px) {
+// ████████████████████████████████████████████████████████████████████████████████
+// PHASE 8.5: UNIFIED SHIMMER SYSTEM
+// Consolidates 11 shimmer variants (118 lines) into parametric generator
+// Replaces: skeleton-shimmer, holographic-shimmer, crystalline-shimmer,
+//           particle-shimmer, gentle-text-shimmer, loading-pulse variants
+// ████████████████████████████████████████████████████████████████████████████████
+
+@mixin unified-shimmer(
+  $type: 'skeleton',           // skeleton | gradient | filter | pulse | text
+  $intensity: 'normal',        // subtle | normal | intense
+  $context: 'default',         // default | playlist | artist | search | home
+  $music-sync: false,          // Enable music-reactive intensity
+  $grain-texture: false,       // Enable Year3000 grain overlay
+  $accessibility: true         // Auto-apply reduced-motion variants
+) {
+  // Intensity scaling parameters
+  $speed-multiplier: 1.0;
+  $opacity-multiplier: 1.0;
+  $filter-strength: 1.0;
+
+  @if $intensity == 'subtle' {
+    $speed-multiplier: 1.3;
+    $opacity-multiplier: 0.7;
+    $filter-strength: 0.6;
+  } @else if $intensity == 'intense' {
+    $speed-multiplier: 0.7;
+    $opacity-multiplier: 1.3;
+    $filter-strength: 1.5;
+  }
+
+  // Base duration (adjusted by intensity)
+  $base-duration: 1.5s;
+  $duration: calc(#{$base-duration} * #{$speed-multiplier});
+
+  // Context-aware gradient colors
+  $start-color: var(--sn-gradient-secondary, var(--spice-surface0));
+  $end-color: var(--sn-gradient-accent, var(--spice-surface1));
+
+  @if $context == 'playlist' {
+    $start-color: var(--album-dominant-color, var(--sn-gradient-secondary));
+    $end-color: var(--album-accent-color, var(--sn-gradient-accent));
+  } @else if $context == 'artist' {
+    $start-color: var(--artist-header-start, var(--sn-gradient-primary));
+    $end-color: var(--artist-header-end, var(--sn-gradient-accent));
+  } @else if $context == 'search' {
+    $start-color: var(--spice-surface0);
+    $end-color: var(--spice-surface1);
+  } @else if $context == 'home' {
+    $start-color: var(--sn-gradient-primary, var(--spice-accent));
+    $end-color: var(--spice-accent, var(--sn-gradient-primary));
+  }
+
+  // Performance optimization
   @include performance-optimized;
 
+  // Type-specific implementations
+  @if $type == 'skeleton' {
+    // Gradient-based position movement (replaces skeleton-shimmer)
+    background: linear-gradient(
+      90deg,
+      #{$start-color} 0%,
+      #{$end-color} 50%,
+      #{$start-color} 100%
+    );
+    background-size: 200% 100%;
+    animation: unified-skeleton-shimmer $duration ease-in-out infinite;
+
+  } @else if $type == 'gradient' {
+    // Crystalline dual-layer movement (replaces crystalline-shimmer)
+    background:
+      linear-gradient(90deg, #{$start-color}, transparent),
+      linear-gradient(270deg, #{$end-color}, transparent);
+    background-size: 200% 100%;
+    opacity: calc(0.6 * #{$opacity-multiplier});
+    animation: unified-gradient-shimmer calc(#{$duration} * 1.3) ease-in-out infinite;
+
+  } @else if $type == 'filter' {
+    // Holographic filter effects (replaces holographic/infinite-holographic/echo shimmers)
+    animation: unified-filter-shimmer calc(#{$duration} * 2) ease-in-out infinite;
+
+  } @else if $type == 'pulse' {
+    // Opacity-based pulsing (replaces loading-pulse, particle-shimmer)
+    $opacity-start: calc(0.5 * #{$opacity-multiplier});
+    $opacity-peak: calc(0.8 * #{$opacity-multiplier});
+    opacity: $opacity-start;
+    animation: unified-pulse-shimmer $duration ease-in-out infinite;
+
+  } @else if $type == 'text' {
+    // Text-specific shimmer (replaces gentle-text-shimmer)
+    --text-shimmer-intensity: calc(0.3 * #{$opacity-multiplier});
+    opacity: var(--text-shimmer-intensity);
+    text-shadow: 0 0 5px rgba(var(--sn-gradient-accent-rgb), calc(0.2 * #{$opacity-multiplier}));
+    animation: unified-text-shimmer calc(#{$duration} * 1.5) ease-in-out infinite;
+  }
+
+  // Music synchronization (optional)
+  @if $music-sync {
+    opacity: calc((#{$opacity-multiplier} * 0.6) + (0.3 * var(--sn-current-intensity, 0.5)));
+    animation-duration: calc(#{$duration} / (1 + var(--sn-current-intensity, 0.5) * 0.5));
+
+    @if $type == 'filter' {
+      filter: hue-rotate(var(--sn-music-rhythm-phase, 0deg));
+    }
+  }
+
+  // Grain texture overlay (Year3000 feature)
+  @if $grain-texture {
+    mask-image: var(--sn-nebula-noise-url);
+    mask-size: 600% 600%;
+    @if $type == 'skeleton' or $type == 'gradient' {
+      animation: unified-skeleton-shimmer $duration ease-in-out infinite,
+                 year3000-grain-shift calc(#{$duration} * 2) linear infinite;
+    }
+  }
+
+  // Accessibility: Reduced motion
+  @if $accessibility {
+    @media (prefers-reduced-motion: reduce) {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      opacity: calc(0.5 * #{$opacity-multiplier}) !important;
+      filter: none !important;
+      transform: none !important;
+    }
+
+    // High contrast mode
+    @media (prefers-contrast: high) {
+      opacity: calc(#{$opacity-multiplier} * 1.3);
+      filter: contrast(1.2);
+    }
+  }
+}
+
+// Unified shimmer animations (generated once, used by all types)
+@keyframes unified-skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes unified-gradient-shimmer {
+  0%, 100% {
+    background-position: -200% center, 200% center;
+    opacity: 0.6;
+  }
+  50% {
+    background-position: 200% center, -200% center;
+    opacity: 1;
+  }
+}
+
+@keyframes unified-filter-shimmer {
+  0%, 100% {
+    filter: brightness(100%) saturate(100%) hue-rotate(0deg);
+  }
+  25% {
+    filter: brightness(120%) saturate(110%) hue-rotate(15deg);
+  }
+  50% {
+    filter: brightness(90%) saturate(105%) hue-rotate(30deg);
+  }
+  75% {
+    filter: brightness(110%) saturate(115%) hue-rotate(45deg);
+  }
+}
+
+@keyframes unified-pulse-shimmer {
+  0%, 100% {
+    opacity: var(--pulse-opacity-start, 0.5);
+    transform: scale(1);
+  }
+  50% {
+    opacity: var(--pulse-opacity-peak, 0.8);
+    transform: scale(var(--pulse-scale-peak, 1.05));
+  }
+}
+
+@keyframes unified-text-shimmer {
+  0%, 100% {
+    opacity: var(--text-shimmer-intensity, 0.3);
+    text-shadow: 0 0 5px rgba(var(--sn-gradient-accent-rgb), 0.2);
+  }
+  50% {
+    opacity: calc(var(--text-shimmer-intensity, 0.3) * 1.4);
+    text-shadow: 0 0 8px rgba(var(--sn-gradient-accent-rgb), 0.4);
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// PHASE 8.5B: ADVANCED SHIMMER SYSTEM (Year3000 Effects)
+// Tier 2 shimmer system for sophisticated visual effects
+// Supports: border-radius morphing, perspective breathing, complex choreography
+// Use for: cosmic depth, holographic fluidity, organic morphing, advanced particles
+// ████████████████████████████████████████████████████████████████████████████████
+
+@mixin advanced-shimmer(
+  $type: 'holographic',     // holographic | cosmic-depth | fluid-organic | particle-field
+  $intensity: 'normal',     // subtle | normal | intense
+  $music-sync: false,       // Enable music-reactive effects (--sn-music-rhythm-phase)
+  $accessibility: true      // Auto-apply reduced-motion variants
+) {
+  // Intensity scaling parameters
+  $speed-multiplier: 1.0;
+  $effect-strength: 1.0;
+
+  @if $intensity == 'subtle' {
+    $speed-multiplier: 1.4;
+    $effect-strength: 0.6;
+  } @else if $intensity == 'intense' {
+    $speed-multiplier: 0.6;
+    $effect-strength: 1.5;
+  }
+
+  // Base duration (adjusted by intensity)
+  $base-duration: 8s; // Longer for sophisticated effects
+  $duration: calc(#{$base-duration} * #{$speed-multiplier});
+
+  // Performance optimization
+  @include performance-optimized;
+
+  // Type-specific implementations
+  @if $type == 'holographic' {
+    // Border-radius morphing + music-reactive filters (fluid organic shapes)
+    @if $music-sync {
+      animation: advanced-holographic-shimmer-music $duration ease-in-out infinite;
+    } @else {
+      animation: advanced-holographic-shimmer $duration ease-in-out infinite;
+    }
+
+  } @else if $type == 'cosmic-depth' {
+    // Perspective breathing + blur + hue-rotate (3D cosmic depth)
+    @if $music-sync {
+      animation: advanced-cosmic-depth-music $duration ease-in-out infinite;
+    } @else {
+      animation: advanced-cosmic-depth $duration ease-in-out infinite;
+    }
+
+  } @else if $type == 'fluid-organic' {
+    // Complex multi-property morphing (advanced fluid effects)
+    animation: advanced-fluid-organic $duration ease-in-out infinite;
+
+  } @else if $type == 'particle-field' {
+    // Advanced scale/opacity/rotation (particle systems)
+    animation: advanced-particle-field $duration ease-in-out infinite;
+  }
+
+  // Accessibility: Reduced motion
+  @if $accessibility {
+    @media (prefers-reduced-motion: reduce) {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      filter: none !important;
+      transform: none !important;
+      border-radius: inherit !important;
+      perspective: none !important;
+    }
+
+    // High contrast mode
+    @media (prefers-contrast: high) {
+      filter: contrast(1.3) brightness(1.1);
+    }
+  }
+}
+
+// Advanced shimmer animations (Year3000 sophistication)
+
+// Holographic shimmer - border-radius morphing + filters (organic fluid shapes)
+@keyframes advanced-holographic-shimmer {
+  0%, 100% {
+    border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+    filter: brightness(1) saturate(1.2) hue-rotate(0deg);
+  }
+  25% {
+    border-radius: 60% 40% 70% 30% / 40% 80% 20% 60%;
+    filter: brightness(1.1) saturate(1.3) hue-rotate(30deg);
+  }
+  50% {
+    border-radius: 30% 70% 40% 60% / 80% 20% 60% 40%;
+    filter: brightness(1.2) saturate(1.4) hue-rotate(60deg);
+  }
+  75% {
+    border-radius: 70% 30% 60% 40% / 20% 80% 40% 60%;
+    filter: brightness(1.1) saturate(1.3) hue-rotate(90deg);
+  }
+}
+
+// Holographic shimmer with music synchronization
+@keyframes advanced-holographic-shimmer-music {
+  0%, 100% {
+    border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+    filter: brightness(1) saturate(1.2) hue-rotate(var(--sn-music-rhythm-phase, 0deg));
+  }
+  25% {
+    border-radius: 60% 40% 70% 30% / 40% 80% 20% 60%;
+    filter: brightness(1.1) saturate(1.3) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 30deg));
+  }
+  50% {
+    border-radius: 30% 70% 40% 60% / 80% 20% 60% 40%;
+    filter: brightness(1.2) saturate(1.4) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 60deg));
+  }
+  75% {
+    border-radius: 70% 30% 60% 40% / 20% 80% 40% 60%;
+    filter: brightness(1.1) saturate(1.3) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 90deg));
+  }
+}
+
+// Cosmic depth - perspective breathing + blur + hue-rotate (3D depth effects)
+@keyframes advanced-cosmic-depth {
+  0% {
+    filter: blur(0px) brightness(1) hue-rotate(0deg);
+    perspective: 1000px;
+  }
+  25% {
+    filter: blur(1px) brightness(1.2) hue-rotate(15deg);
+    perspective: 1200px;
+  }
+  50% {
+    filter: blur(0.5px) brightness(0.8) hue-rotate(30deg);
+    perspective: 800px;
+  }
+  75% {
+    filter: blur(1.5px) brightness(1.1) hue-rotate(45deg);
+    perspective: 1100px;
+  }
+  100% {
+    filter: blur(0px) brightness(1) hue-rotate(60deg);
+    perspective: 1000px;
+  }
+}
+
+// Cosmic depth with music synchronization (uses CSS variables)
+@keyframes advanced-cosmic-depth-music {
+  0% {
+    filter: blur(0px) brightness(1) hue-rotate(var(--sn-music-rhythm-phase, 0deg));
+    perspective: var(--cosmic-perspective, 1000px);
+  }
+  25% {
+    filter: blur(1px) brightness(1.2) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 15deg));
+    perspective: calc(var(--cosmic-perspective, 1000px) * 1.2);
+  }
+  50% {
+    filter: blur(0.5px) brightness(0.8) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 30deg));
+    perspective: calc(var(--cosmic-perspective, 1000px) * 0.8);
+  }
+  75% {
+    filter: blur(1.5px) brightness(1.1) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 45deg));
+    perspective: calc(var(--cosmic-perspective, 1000px) * 1.1);
+  }
+  100% {
+    filter: blur(0px) brightness(1) hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) + 60deg));
+    perspective: var(--cosmic-perspective, 1000px);
+  }
+}
+
+// Fluid organic - complex multi-property morphing
+@keyframes advanced-fluid-organic {
+  0%, 100% {
+    border-radius: 45% 55% 50% 50% / 50% 45% 55% 50%;
+    transform: rotate(0deg) scale(1);
+    filter: brightness(1) saturate(1.1);
+  }
+  33% {
+    border-radius: 55% 45% 60% 40% / 40% 60% 45% 55%;
+    transform: rotate(120deg) scale(1.05);
+    filter: brightness(1.1) saturate(1.2);
+  }
+  66% {
+    border-radius: 40% 60% 45% 55% / 55% 40% 60% 45%;
+    transform: rotate(240deg) scale(0.95);
+    filter: brightness(0.9) saturate(1.15);
+  }
+}
+
+// Particle field - advanced scale/opacity/rotation
+@keyframes advanced-particle-field {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.1) rotate(90deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(0.8) rotate(180deg);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(1.05) rotate(270deg);
+    opacity: 0.9;
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// LEGACY COMPATIBILITY: skeleton-gradient() (deprecated - use unified-shimmer)
+// Preserved for backward compatibility until all references are migrated
+// ████████████████████████████████████████████████████████████████████████████████
+@mixin skeleton-gradient($width: 100%, $height: 20px) {
   width: $width;
   height: $height;
   border-radius: 4px;
-  background: linear-gradient(
-    90deg,
-    var(--sn-gradient-secondary, var(--spice-surface0)) 0%,
-    var(--sn-gradient-accent, var(--spice-surface1)) 50%,
-    var(--sn-gradient-secondary, var(--spice-surface0)) 100%
-  );
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s ease-in-out infinite;
-
-  @keyframes skeleton-shimmer {
-    0% {
-      background-position: -200% 0;
-    }
-    100% {
-      background-position: 200% 0;
-    }
-  }
+  @include unified-shimmer($type: 'skeleton', $context: 'default');
 }
 
 // === Year 3000 Text Gradient Utility ======================================
@@ -948,63 +1280,7 @@
 @mixin text-glow($rgbVar, $intensityVar: --sn-text-glow-intensity) {
   text-shadow: 0 0 calc(2px + 6px * var(#{$intensityVar}))
       rgba(var(#{$rgbVar}), calc(0.3 + 0.4 * var(#{$intensityVar}))),
-    0 1px 2px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.1);
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🧲 MAGNETIC DEPTH SYSTEM MIXINS (Year 3000 Invitation-Focused 3D)
-// These mixins power the Magnetic Depth philosophy – subtle 3D depth that
-// invites users toward content instead of distracting rotations.
-// They are appended here so that any SCSS module that already `@use`s this
-// mixin file automatically gains access without needing additional imports.
-// ═══════════════════════════════════════════════════════════════════════════════
-
-// 3D container that establishes a perspective field and preserve-3D rendering
-@mixin magnetic-depth-container {
-  perspective: var(--magnetic-depth-field, 800px);
-  transform-style: preserve-3d;
-  position: relative;
-}
-
-// Hover invitation – gently pulls element toward the user
-@mixin magnetic-hover-invitation {
-  transition: transform var(--magnetic-transition-speed, 0.6s)
-      var(--sn-anim-easing-organic);
-
-  &:hover {
-    transform: translateZ(var(--magnetic-hover-pull, 12px))
-      scale(1.02);
-  }
-}
-
-// Focus/active invitation – stronger pull & recede siblings
-@mixin magnetic-focus-invitation {
-  &:focus-within {
-    transform: translateZ(var(--magnetic-focus-pull, 18px)) scale(1.03);
-
-    // Recede siblings slightly to increase focus prominence
-    ~ * {
-      transform: translateZ(var(--magnetic-recede-distance, -10px));
-      opacity: 0.85;
-    }
-  }
-}
-
-// Quickly assign depth layer based on relevance priority
-@mixin magnetic-depth-layer($priority: 'medium') {
-  @if $priority == 'high' {
-    transform: var(--depth-priority-high, translateZ(8px));
-    filter: brightness(var(--magnetic-contrast-boost, 1.05)) contrast(1.05);
-  } @else if $priority == 'low' {
-    transform: var(--depth-priority-low, translateZ(0px));
-    filter: brightness(0.95) contrast(0.98);
-  } @else if $priority == 'receded' {
-    transform: var(--depth-priority-receded, translateZ(-6px));
-    filter: brightness(0.9) contrast(0.95) opacity(0.8);
-  } @else {
-    transform: var(--depth-priority-medium, translateZ(4px));
-    filter: brightness(1) contrast(1);
-  }
+    0 1px 2px #{oklab-color('shadow', 0.1)};
 }
 
 // === Magnetic Depth Utility Animations =====================
@@ -1058,6 +1334,72 @@
 
 // Forward centralised DOM selector helpers so any module that `@use`s
 // `_mixins.scss` automatically gains access.
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SHADOW PATTERN CONSOLIDATION MIXINS (Phase 8.5b+)
+// Consolidates 26+ repetitive shadow patterns into parametric generators
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// Music-reactive shadow mixin for sidebar elements
+/// Creates box-shadows that respond to musical intensity via --sn-sidebar-harmonic-intensity-multiplier
+/// @param {Number} $blur - Blur radius (default: 80px)
+/// @param {Number} $spread - Spread radius, usually negative (default: -20px)
+/// @param {Number} $base-opacity - Base opacity before multiplier (default: 0.15)
+/// @param {Boolean} $inset - Whether shadow is inset (default: true)
+/// @param {Boolean} $secondary - Add secondary shadow layer (default: false)
+/// @example
+///   @include music-reactive-shadow(80px, -20px, 0.15, true, true);
+///   // Outputs: box-shadow: inset 0 0 80px -20px rgba(...), inset 0 0 30px 5px rgba(...);
+@mixin music-reactive-shadow(
+  $blur: 80px,
+  $spread: -20px,
+  $base-opacity: 0.15,
+  $inset: true,
+  $secondary: false
+) {
+  $shadow-type: if($inset, 'inset', '');
+
+  @if $secondary {
+    box-shadow:
+      #{$shadow-type} 0 0 $blur $spread rgba(var(--sn-accent-rgb), calc(#{$base-opacity} * var(--sn-sidebar-harmonic-intensity-multiplier))),
+      #{$shadow-type} 0 0 30px 5px rgba(var(--sn-accent-rgb), calc(#{$base-opacity * 0.66} * var(--sn-sidebar-harmonic-intensity-multiplier)));
+  } @else {
+    box-shadow: #{$shadow-type} 0 0 $blur $spread rgba(var(--sn-accent-rgb), calc(#{$base-opacity} * var(--sn-sidebar-harmonic-intensity-multiplier)));
+  }
+}
+
+/// Volumetric atmospheric depth shadow for layered visual effects
+/// Creates multi-layer shadow stacks for 3D depth perception
+/// @param {Number} $depth-multiplier - Multiplier for atmospheric depth calculation (default: 25px)
+/// @param {Number} $glow-multiplier - Multiplier for glow intensity (default: 1)
+/// @param {String} $stack-type - Shadow stack configuration: 'full' | 'standard' | 'enhanced' (default: 'full')
+/// @example
+///   @include volumetric-shadow(25px, 1.2, 'enhanced');
+///   // Outputs 3-layer shadow stack with enhanced multipliers for now-playing bar
+@mixin volumetric-shadow(
+  $depth-multiplier: 25px,
+  $glow-multiplier: 1,
+  $stack-type: 'full'
+) {
+  @if $stack-type == 'full' {
+    // Full 3-layer stack: outer glow + inset glow + depth shadow
+    box-shadow:
+      0 0 calc(var(--layered-atmospheric-depth) * #{$depth-multiplier}) rgba(var(--layered-effect-rgb), calc(var(--layered-glow-intensity) * #{$glow-multiplier})),
+      inset 0 0 calc(var(--layered-atmospheric-depth) * #{$depth-multiplier * 0.48}) rgba(var(--layered-effect-rgb), calc(var(--layered-glow-intensity) * #{$glow-multiplier} * 0.3)),
+      0 calc(var(--layered-depth-offset) * 0.3) calc(var(--volumetric-shadow-blur)) rgba(var(--layered-effect-rgb), calc(var(--volumetric-depth-intensity) * #{$glow-multiplier} * 0.3));
+  } @else if $stack-type == 'standard' {
+    // Standard 2-layer stack: outer glow + inset glow
+    box-shadow:
+      0 0 calc(var(--layered-atmospheric-depth) * #{$depth-multiplier * 0.8}) rgba(var(--layered-effect-rgb), calc(var(--layered-glow-intensity) * #{$glow-multiplier} * 0.6)),
+      inset 0 0 calc(var(--layered-atmospheric-depth) * #{$depth-multiplier * 0.32}) rgba(var(--layered-effect-rgb), calc(var(--layered-glow-intensity) * #{$glow-multiplier} * 0.2));
+  } @else if $stack-type == 'enhanced' {
+    // Enhanced 3-layer stack with 1.2x multipliers for prominent elements
+    box-shadow:
+      0 0 calc(var(--layered-atmospheric-depth) * #{$depth-multiplier * 1.2}) rgba(var(--layered-effect-rgb), calc(var(--layered-glow-intensity) * #{$glow-multiplier} * 1.2)),
+      inset 0 0 calc(var(--layered-atmospheric-depth) * #{$depth-multiplier * 0.48}) rgba(var(--layered-effect-rgb), calc(var(--layered-glow-intensity) * #{$glow-multiplier} * 0.3)),
+      0 calc(var(--layered-depth-offset) * 0.4) calc(var(--volumetric-shadow-blur) * 1.2) rgba(var(--layered-effect-rgb), calc(var(--volumetric-depth-intensity) * #{$glow-multiplier} * 0.4));
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // LEGACY COMPATIBILITY SYSTEM

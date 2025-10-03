@@ -141,12 +141,14 @@ export class IridescentShimmerEffectsSystem
     }
 
     // Initialize settings with enhanced oil-on-water effects
+    // Phase 2.2: Unified .sn-card selector added (applied by CardDOMWatcher)
     this.shimmerSettings = {
       enabled: true,
       intensity: "balanced",
       targetSelectors: [
         ".main-entityHeader-container",
-        ".main-card-card",
+        ".sn-card", // Unified selector (CardDOMWatcher)
+        ".main-card-card", // Legacy selector (kept for transition)
         ".main-playButton-PlayButton",
         ".main-actionBarRow-ActionBarRow",
         ".main-trackList-trackListRow",
@@ -768,15 +770,6 @@ export class IridescentShimmerEffectsSystem
     // Adjust shimmer settings based on quality level
     switch (level) {
       case "low":
-        this.shimmerSettings.enabled = false;
-        this.shimmerSettings.maxSimultaneousShimmers = 3;
-        this.shimmerSettings.animationSpeed = 0.2;
-        this.shimmerSettings.oilSlickIntensity = 0.3;
-        this.shimmerSettings.chromaticAberration = 0.5;
-        this.shimmerSettings.useGPUAcceleration = false;
-        break;
-
-      case "low":
         this.shimmerSettings.enabled = true;
         this.shimmerSettings.intensity = "minimal";
         this.shimmerSettings.maxSimultaneousShimmers = 5;
@@ -1018,6 +1011,7 @@ export class IridescentShimmerEffectsSystem
           useGPUAcceleration: false,
           interferencePattern: false,
         };
+        break;
       case "low":
         return {
           maxSimultaneousShimmers: 5,
@@ -1033,15 +1027,6 @@ export class IridescentShimmerEffectsSystem
           animationSpeed: 0.5,
           oilSlickIntensity: 0.7,
           chromaticAberration: 2.0,
-          useGPUAcceleration: true,
-          interferencePattern: true,
-        };
-      case "high":
-        return {
-          maxSimultaneousShimmers: 12,
-          animationSpeed: 0.7,
-          oilSlickIntensity: 0.9,
-          chromaticAberration: 2.5,
           useGPUAcceleration: true,
           interferencePattern: true,
         };

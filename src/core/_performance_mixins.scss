@@ -123,6 +123,8 @@
 }
 
 // Adaptive shadow optimization
+// NOTE: Currently unused (0 references) - infrastructure for performance-aware quality scaling
+// KEEP: Aligns with Year3000 adaptive quality system, may be activated when performance classes are implemented
 @mixin shadow-adaptive($base-shadow: 0 4px 20px rgba(0, 0, 0, 0.3)) {
   box-shadow: #{$base-shadow} * var(--sn-performance-shadow-quality, 1);
   

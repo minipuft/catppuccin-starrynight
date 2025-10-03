@@ -1543,16 +1543,6 @@ export class HolographicUISystem
     // Adjust holographic settings based on quality level
     switch (level) {
       case "low":
-        this.holographicState.flickerIntensity = 0.1;
-        this.holographicState.transparency = 0.9;
-        this.holographicState.chromatic = 0.1;
-        this.holographicState.scanlineIntensity = 0.2;
-        this.holographicState.dataStreamFlow = 0.2;
-        this.holographicState.interferenceLevel = 0.0;
-        this.scanlineEffect.animation = false;
-        break;
-
-      case "low":
         this.holographicState.flickerIntensity = 0.2;
         this.holographicState.transparency = 0.85;
         this.holographicState.chromatic = 0.2;

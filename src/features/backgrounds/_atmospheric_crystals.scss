@@ -5,6 +5,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @use "../../core/_mixins" as *;
+@use "../../core/_design_tokens" as *;
 
 .sn-crystalline-overlay {
   position: fixed;
@@ -20,7 +21,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at center, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1) 0%, rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0) 70%);
+    background: radial-gradient(ellipse at center, #{oklab-color('highlight', 0.1)} 0%, #{oklab-color('highlight', 0)} 70%);
     opacity: 0.5;
     z-index: var(--z-starfield, -10);
   }

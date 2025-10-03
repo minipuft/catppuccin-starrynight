@@ -176,8 +176,9 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
         ".main-playButton-PlayButton",
       ],
       cards: [
+        ".sn-card", // Phase 2.2: Unified selector (CardDOMWatcher)
         '[data-testid*="card"]',
-        ".main-card-card",
+        ".main-card-card", // Legacy selector (kept for transition)
         ".main-entityCard-container",
       ],
       headers: [

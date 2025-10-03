@@ -3,34 +3,8 @@
 /* ████████████████████████████████████████████████████████████████████████████████*/
 
 @use "../core/mixins" as *;
-
-/* === FEED BLOOM MIXIN =========================================================*/
-/* Generates a directional bloom gradient that is modulated in real-time via the*/
-/* `--sn-feed-bloom-intensity` CSS variable (updated by the BeatSync system).*/
-/* The optional $base-alpha argument allows individual call-sites to strengthen*/
-/* or soften the effect while still respecting the global intensity.*/
-
-@mixin feed-bloom($base-alpha: 0.08) {
-  background: linear-gradient(
-    90deg,
-    rgba(
-        var(--sn-oklab-processed-primary-rgb-r, 202),
-        var(--sn-oklab-processed-primary-rgb-g, 158),
-        var(--sn-oklab-processed-primary-rgb-b, 230),
-        /* Intensity is a combination of base alpha and beat-driven variable*/
-        calc(var(--sn-feed-bloom-intensity, 0) + #{$base-alpha})
-      )
-      0%,
-    rgba(
-        var(--sn-oklab-processed-primary-rgb-r, 202),
-        var(--sn-oklab-processed-primary-rgb-g, 158),
-        var(--sn-oklab-processed-primary-rgb-b, 230),
-        calc((var(--sn-feed-bloom-intensity, 0) + #{$base-alpha}) * 0.5)
-      )
-      50%,
-    transparent 100%
-  );
-}
+@use "../core/design_tokens" as *;
+@use "../core/interaction_mixins" as *;
 
 /* TODO[PHASE1-SOURCE-OF-TRUTH]:*/
 /* Track-list kinetic behaviour (hover, selected, playing) is defined only here.*/
@@ -76,14 +50,12 @@
   .main-trackList-trackListRowGrid {
     position: relative;
     z-index: 1;
-    @include magnetic-depth-container;
   }
 
   /* Individual track row styling*/
   .main-trackList-trackListRow {
     position: relative;
-    transform: translateZ(0);
-    @include magnetic-hover-invitation;
+    @include css-hover-lift(normal);
     transition: transform 300ms var(--sn-easing-explorer, var(--sn-anim-easing-organic)),
                 background 300ms var(--sn-easing-explorer, var(--sn-anim-easing-organic));
 
@@ -91,9 +63,6 @@
     body:not([data-bloom="off"]) & {
       /* Hover effect with dynamic colors*/
       &:hover {
-        transform: translateZ(12px);
-        /* Motion-aware intensity*/
-
         /* Echo element*/
         &::after {
           content: "";
@@ -112,20 +81,8 @@
           width: 3px;
           background: linear-gradient(
             180deg,
-            rgba(
-                var(--sn-oklab-processed-primary-rgb-r, 202),
-                var(--sn-oklab-processed-primary-rgb-g, 158),
-                var(--sn-oklab-processed-primary-rgb-b, 230),
-                0.8
-              )
-              0%,
-            rgba(
-                var(--sn-oklab-processed-accent-rgb-r, 140),
-                var(--sn-oklab-processed-accent-rgb-g, 170),
-                var(--sn-oklab-processed-accent-rgb-b, 238),
-                0.6
-              )
-              100%
+            #{oklab-color('primary', 0.8)} 0%,
+            #{oklab-color('accent', 0.6)} 100%
           );
           border-radius: 0 2px 2px 0;
           transition: all 200ms ease;
@@ -135,7 +92,6 @@
       /* Selected/active state – one-shot ocean ripple*/
       &[aria-selected="true"],
       &:has(.main-trackList-playingIcon) {
-        transform: translateZ(12px);
         @include hue-shift();
         &::after {
           content: "";

@@ -1,0 +1,194 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// DESIGN TOKEN ABSTRACTION SYSTEM
+// Provides reusable functions and mixins for OKLAB color tokens and shadow stacks
+// ████████████████████████████████████████████████████████████████████████████████
+//
+// PURPOSE:
+// - Single source of truth for design token usage patterns
+// - Reduces 50+ direct OKLAB token references
+// - Standardizes shadow stack definitions
+// - Improves code readability and maintainability
+//
+// USAGE EXAMPLES:
+//
+// Color Tokens (Functions):
+//   color: oklab-color('shadow', 0.2);
+//   background: oklab-color('highlight', 0.15);
+//
+// Shadow Stacks (Mixins):
+//   @include oklab-shadow-stack('card-idle');
+//   @include oklab-shadow-stack('header-base');
+//
+// ████████████████████████████████████████████████████████████████████████████████
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// OKLAB COLOR TOKEN FUNCTIONS
+// Returns rgba() color from OKLAB processed tokens
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// Returns an OKLAB-processed color with specified opacity
+/// @param {String} $token - Token name: 'shadow', 'highlight', 'accent', 'primary', 'secondary'
+/// @param {Number} $opacity - Opacity value (0-1), defaults to 1
+/// @return {Color} rgba() color value
+/// @example
+///   color: oklab-color('shadow', 0.2);
+///   // Output: rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2)
+@function oklab-color($token, $opacity: 1) {
+  @if $token == 'shadow' {
+    @return rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), $opacity);
+  } @else if $token == 'highlight' {
+    @return rgba(var(--sn-oklab-processed-bright-highlight-rgb), $opacity);
+  } @else if $token == 'accent' {
+    @return rgba(var(--sn-oklab-processed-accent-rgb), $opacity);
+  } @else if $token == 'primary' {
+    @return rgba(var(--sn-oklab-processed-primary-rgb), $opacity);
+  } @else if $token == 'secondary' {
+    @return rgba(var(--sn-oklab-processed-secondary-rgb), $opacity);
+  } @else {
+    @warn "Unknown OKLAB token: #{$token}. Valid tokens: 'shadow', 'highlight', 'accent', 'primary', 'secondary'";
+    @return rgba(0, 0, 0, $opacity); // Fallback
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SHADOW STACK PRESETS
+// Standardized shadow definitions for consistent depth across components
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// Applies a preset shadow stack with OKLAB colors
+/// @param {String} $preset - Preset name
+/// @example
+///   @include oklab-shadow-stack('card-idle');
+@mixin oklab-shadow-stack($preset: 'card-idle') {
+  @if $preset == 'card-idle' {
+    // Subtle 2-layer depth for resting cards
+    box-shadow:
+      0 2px 8px oklab-color('shadow', 0.08),
+      0 4px 16px oklab-color('shadow', 0.05);
+
+  } @else if $preset == 'card-hover' {
+    // Enhanced 3-layer depth for hovered cards
+    box-shadow:
+      0 4px 12px oklab-color('shadow', 0.12),
+      0 8px 24px oklab-color('shadow', 0.08),
+      0 12px 36px oklab-color('shadow', 0.04);
+
+  } @else if $preset == 'card-active' {
+    // Full 5-layer emergence for active/selected cards
+    box-shadow:
+      0 8px 16px oklab-color('shadow', 0.15),
+      0 16px 32px oklab-color('shadow', 0.12),
+      0 24px 48px oklab-color('shadow', 0.08),
+      0 32px 64px oklab-color('shadow', 0.04),
+      inset 0 1px 0 oklab-color('highlight', 0.15);
+
+  } @else if $preset == 'header-base' {
+    // Header depth with inset highlight
+    box-shadow:
+      inset 0 1px 0 oklab-color('highlight', 0.1),
+      0 0 20px rgba(var(--sn-accent-rgb), 0.2),
+      0 0 40px rgba(var(--sn-accent-rgb), 0.1);
+
+  } @else if $preset == 'glass-soft' {
+    // Soft glassmorphism shadow
+    box-shadow:
+      0 4px 16px oklab-color('shadow', 0.06),
+      0 8px 32px oklab-color('shadow', 0.04),
+      inset 0 1px 0 oklab-color('highlight', 0.08);
+
+  } @else if $preset == 'glass-strong' {
+    // Strong glassmorphism shadow with depth
+    box-shadow:
+      0 8px 24px oklab-color('shadow', 0.12),
+      0 16px 48px oklab-color('shadow', 0.08),
+      inset 0 1px 0 oklab-color('highlight', 0.12),
+      inset 0 -1px 0 oklab-color('shadow', 0.05);
+
+  } @else if $preset == 'track-list-hover' {
+    // Subtle shadow for track row hover states
+    box-shadow:
+      0 2px 4px oklab-color('shadow', 0.06),
+      0 4px 8px oklab-color('shadow', 0.03);
+
+  } @else if $preset == 'floating-element' {
+    // Shadow for floating UI elements (tooltips, popovers)
+    box-shadow:
+      0 8px 32px oklab-color('shadow', 0.16),
+      0 16px 64px oklab-color('shadow', 0.08),
+      0 4px 16px oklab-color('shadow', 0.04);
+
+  } @else {
+    @warn "Unknown shadow preset: #{$preset}. Valid presets: 'card-idle', 'card-hover', 'card-active', 'header-base', 'glass-soft', 'glass-strong', 'track-list-hover', 'floating-element'";
+    // Fallback to card-idle
+    box-shadow:
+      0 2px 8px oklab-color('shadow', 0.08),
+      0 4px 16px oklab-color('shadow', 0.05);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GRADIENT BUILDER (Future Enhancement)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// TODO: Implement gradient builder mixin when pattern stabilizes
+// @mixin oklab-gradient($angle, $stops) { ... }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// USAGE EXAMPLES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// EXAMPLE 1: Color Function
+// -----------------------------------------------------------------------------
+// .my-component {
+//   background: oklab-color('shadow', 0.12);
+//   border-color: oklab-color('highlight', 0.3);
+//   box-shadow: 0 4px 8px oklab-color('shadow', 0.15);
+// }
+
+// EXAMPLE 2: Shadow Stack Mixin
+// -----------------------------------------------------------------------------
+// .main-card-card {
+//   @include oklab-shadow-stack('card-idle');
+//
+//   &:hover {
+//     @include oklab-shadow-stack('card-hover');
+//   }
+//
+//   &:active, &[aria-selected="true"] {
+//     @include oklab-shadow-stack('card-active');
+//   }
+// }
+
+// EXAMPLE 3: Combined Usage
+// -----------------------------------------------------------------------------
+// .entity-header::before {
+//   background: linear-gradient(
+//     45deg,
+//     transparent 30%,
+//     oklab-color('accent', 0.1) 50%,
+//     transparent 70%
+//   );
+//   @include oklab-shadow-stack('header-base');
+// }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MIGRATION NOTES
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+// BEFORE (Direct Token Reference):
+//   rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.12)
+//   box-shadow: 0 2px 8px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.08),
+//               0 4px 16px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.05);
+//
+// AFTER (Design Token Abstraction):
+//   oklab-color('shadow', 0.12)
+//   @include oklab-shadow-stack('card-idle');
+//
+// BENEFITS:
+// - Single source of truth for shadow definitions
+// - Easier to maintain consistency across components
+// - Simpler to adjust global depth/intensity
+// - Self-documenting code with semantic preset names
+// - Type-safe token names (compile-time validation)
+//
+// ═══════════════════════════════════════════════════════════════════════════════

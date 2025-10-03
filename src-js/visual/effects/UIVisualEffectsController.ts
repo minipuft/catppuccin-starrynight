@@ -703,8 +703,10 @@ export class UIEffectsController
 
   private async discoverShimmerElements(): Promise<void> {
     // Discover shimmer target elements (from IridescentShimmerEffectsSystem)
+    // Phase 2.2: Unified .sn-card selector added (applied by CardDOMWatcher)
     const selectors = [
-      ".main-card-card",
+      ".sn-card", // Unified selector (CardDOMWatcher)
+      ".main-card-card", // Legacy selector (kept for transition)
       ".main-trackList-trackListRow",
       ".main-button-primary",
       ".main-playButton-button",

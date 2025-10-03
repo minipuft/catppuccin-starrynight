@@ -1,5 +1,5 @@
 // ████████████████████████████████████████████████████████████████████████████████
-// CATPPUCCIN STARRYNIGHT - Optimized Architecture (Phase 8.4)
+// CATPPUCCIN STARRYNIGHT - Optimized Architecture (Phase Card)
 // Consolidated SCSS module system with strategic consolidation complete
 // Phase 1-3: 587 lines eliminated, 875KB optimized CSS
 // Phase 4: 273KB source cleanup (legacy files + archived code removed)
@@ -13,6 +13,7 @@
 // Phase 8.2: Visual effects unification (2 files → 1, 1405→1050 lines, TypeScript-aligned CSS variables)
 // Phase 8.3: Atmospheric depth effects (activated crystals, archived glyphs + glyph variables, 227 lines eliminated)
 // Phase 8.4: Card visual accents consolidation (_sn_visual_accents → _sn_enhanced_cards, single source of truth)
+// Phase Card: Card system consolidation (_sn_card_non_search → _sn_enhanced_cards, 431 lines eliminated, technical naming)
 // ████████████████████████████████████████████████████████████████████████████████
 
 // === LAYER 1: FOUNDATION (Load Order Critical) ===
@@ -22,6 +23,7 @@
 // === LAYER 2: UTILITIES (Mixin Dependencies) ===
 // Utility mixins and functions - loaded after tokens, before implementations
 @use "_mixins" as *;
+@use "_design_tokens" as *; // OKLAB color abstraction and shadow stack presets (Phase: Design Token Mixin System)
 @use "_performance_mixins" as *; // Performance optimization mixins (includes GPU acceleration)
 @use "_accessibility" as *; // Unified accessibility system (reduced motion, contrast support)
 @use "_interaction_mixins" as *; // Shared interaction patterns (ripple, focus, hover, beat-responsive)
@@ -52,13 +54,14 @@
 
 // Component modules - reusable UI components
 @use "../components/_sn_card_base" as *; // Base card styles first
-@use "../components/_sn_enhanced_cards" as *; // Enhanced cards depend on base (includes harmonic-aura from Phase 8.4)
-@use "../components/_sn_card_non_search" as *;
+@use "../components/_sn_enhanced_cards" as *; // All card enhancements (Phase Card: consolidated advanced non-search system with technical naming)
+// CONSOLIDATED (Phase Card): _sn_card_non_search → _sn_enhanced_cards.scss (16 variables + 4 keyframes renamed to technical standards)
 // ARCHIVED (Phase 8.3): _sn_glyph_variables → plans/archive/phase-5-incomplete/ (unused mixin, dead code)
 // CONSOLIDATED (Phase 8.4): _sn_visual_accents → _sn_enhanced_cards.scss (single source of truth)
 @use "../components/_track_list_enhanced" as *;
 @use "../components/_now_playing" as *;
-@use "../components/_sn_loading" as *;
+// ARCHIVED (Phase 8.5): _sn_loading → plans/archive/phase-4-incomplete/ (passive 580-line module, no TypeScript integration)
+@use "../components/_sn_active_loading_states" as *; // Phase 8.5: Active loading states with LoadingStateService
 
 // === LAYER 5: FEATURES (Advanced Functionality) ===
 // Load features in dependency order for optimal performance

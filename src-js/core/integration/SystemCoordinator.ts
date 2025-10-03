@@ -68,7 +68,7 @@ import {
   VisualSystemKey,
 } from "@/visual/coordination/VisualSystemCoordinator";
 
-// Consciousness engine imports for integration
+// High-energy visual effects imports for integration
 import { RedEnergyBurstSystem } from "@/visual/effects/HighEnergyEffectsController";
 import { MusicGlowEffectsManager } from "@/visual/effects/GlowEffectsController";
 import { AnimationEffectsController } from "@/visual/effects/AnimationEffectsController";

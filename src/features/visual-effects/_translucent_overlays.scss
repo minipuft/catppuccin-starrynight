@@ -8,8 +8,10 @@
 // Note: Visual effect engine styles archived in Phase 10 Week 4 (orphaned files)
 // Using existing CSS variables and inline styles for functionality
 // - red-energy-burst-effects: Implemented via CSS variables
-// - soft-glow-effects: Implemented via backdrop-filter and glow variables  
+// - soft-glow-effects: Implemented via backdrop-filter and glow variables
 // - soft-nature-effects: Implemented via filter and warmth variables
+
+@use "../../core/_mixins" as *;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🌊 COLOR VISUAL EFFECTS INTEGRATION VARIABLES
@@ -278,20 +280,24 @@
   }
 }
 
-// Volumetric atmospheric depth
+// Phase 8.5b+: Volumetric atmospheric depth animation
+// Note: Keyframes define property values, mixin consolidation applied at usage sites
 @keyframes visual-effects-atmospheric-depth {
   0% {
-    box-shadow: 
+    // Standard stack: 20px depth multiplier, 0.2/0.1 glow multipliers
+    box-shadow:
       0 0 calc(var(--layered-atmospheric-depth) * 20px) rgba(var(--layered-effect-rgb), 0.2),
       inset 0 0 calc(var(--layered-atmospheric-depth) * 10px) rgba(var(--layered-effect-rgb), 0.1);
   }
   50% {
-    box-shadow: 
+    // Peak: 30px depth multiplier, 0.3/0.15 glow multipliers
+    box-shadow:
       0 0 calc(var(--layered-atmospheric-depth) * 30px) rgba(var(--layered-effect-rgb), 0.3),
       inset 0 0 calc(var(--layered-atmospheric-depth) * 15px) rgba(var(--layered-effect-rgb), 0.15);
   }
   100% {
-    box-shadow: 
+    // Return to standard
+    box-shadow:
       0 0 calc(var(--layered-atmospheric-depth) * 20px) rgba(var(--layered-effect-rgb), 0.2),
       inset 0 0 calc(var(--layered-atmospheric-depth) * 10px) rgba(var(--layered-effect-rgb), 0.1);
   }
@@ -596,12 +602,9 @@
   
   // Volumetric depth transform based on visual effects level
   transform: translateZ(calc(var(--layered-depth-offset) * var(--volumetric-depth-intensity)));
-  
-  // Volumetric shadow for depth perception
-  box-shadow: 
-    0 0 calc(var(--layered-atmospheric-depth) * 25px) rgba(var(--layered-effect-rgb), var(--layered-glow-intensity)),
-    inset 0 0 calc(var(--layered-atmospheric-depth) * 12px) rgba(var(--layered-effect-rgb), calc(var(--layered-glow-intensity) * 0.3)),
-    0 calc(var(--layered-depth-offset) * 0.3) calc(var(--volumetric-shadow-blur)) rgba(var(--layered-effect-rgb), calc(var(--volumetric-depth-intensity) * 0.3));
+
+  // Phase 8.5b+: Use consolidated volumetric-shadow mixin (full 3-layer stack)
+  @include volumetric-shadow($depth-multiplier: 25px, $glow-multiplier: 1, $stack-type: 'full');
   
   // Phase 4.2e: Depth Visual Enhancement Lens - Content-aware layered enhancement
   &::before {
@@ -733,12 +736,9 @@
   
   // Phase 4.2a: Volumetric depth for now playing visual effects
   transform: translateZ(calc(var(--layered-depth-offset) * var(--volumetric-depth-intensity) * 1.2));
-  
-  // Consciousness-responsive glow that pulses with music (enhanced with volumetric shadows)
-  box-shadow: 
-    0 0 calc(var(--layered-atmospheric-depth) * 25px) rgba(var(--layered-effect-rgb), var(--layered-glow-intensity)),
-    inset 0 0 calc(var(--layered-atmospheric-depth) * 12px) rgba(var(--layered-effect-rgb), calc(var(--layered-glow-intensity) * 0.3)),
-    0 calc(var(--layered-depth-offset) * 0.4) calc(var(--volumetric-shadow-blur) * 1.2) rgba(var(--layered-effect-rgb), calc(var(--volumetric-depth-intensity) * 0.4));
+
+  // Phase 8.5b+: Use consolidated volumetric-shadow mixin (enhanced 3-layer stack with 1.2x multipliers)
+  @include volumetric-shadow($depth-multiplier: 25px, $glow-multiplier: 1, $stack-type: 'enhanced');
   
   // Enhanced pulsing during visual effects peaks with volumetric breathing
   &[data-visual-effects-level="high"] {
@@ -757,10 +757,9 @@
     &:hover,
     &.main-trackList-selected {
       background: rgba(var(--layered-effect-rgb), calc(var(--layered-glow-intensity) * 0.1));
-      box-shadow: 
-        0 0 15px rgba(var(--layered-effect-rgb), calc(var(--layered-glow-intensity) * 0.3)),
-        inset 0 0 8px rgba(var(--layered-effect-rgb), calc(var(--layered-glow-intensity) * 0.1));
-      
+      // Phase 8.5b+: Use consolidated volumetric-shadow mixin (standard 2-layer stack)
+      @include volumetric-shadow($depth-multiplier: 18.75px, $glow-multiplier: 0.75, $stack-type: 'standard');
+
       // Removed: breathing effect on selected/hovered tracks
     }
   }

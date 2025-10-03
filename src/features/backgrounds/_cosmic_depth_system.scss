@@ -5,6 +5,7 @@
 // ████████████████████████████████████████████████████████████████████████████████
 
 @use "../../core/_mixins" as *;
+@use "../../core/_design_tokens" as *;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // PART 1: UNIFIED Z-INDEX MANAGEMENT
@@ -264,28 +265,9 @@
   }
 }
 
-@keyframes infinite-holographic-shimmer {
-  0% {
-    filter: blur(0px) brightness(1) hue-rotate(0deg);
-    perspective: var(--cosmic-perspective);
-  }
-  25% {
-    filter: blur(1px) brightness(1.2) hue-rotate(15deg);
-    perspective: calc(var(--cosmic-perspective) * 1.2);
-  }
-  50% {
-    filter: blur(0.5px) brightness(0.8) hue-rotate(30deg);
-    perspective: calc(var(--cosmic-perspective) * 0.8);
-  }
-  75% {
-    filter: blur(1.5px) brightness(1.1) hue-rotate(45deg);
-    perspective: calc(var(--cosmic-perspective) * 1.1);
-  }
-  100% {
-    filter: blur(0px) brightness(1) hue-rotate(60deg);
-    perspective: var(--cosmic-perspective);
-  }
-}
+// REMOVED (Phase 8.5b): infinite-holographic-shimmer → consolidated into advanced-shimmer($type: 'cosmic-depth', $music-sync: true)
+// This animation is now part of the advanced shimmer architecture in _mixins.scss
+// Preserves: perspective breathing, blur, brightness, hue-rotate (3D cosmic depth effects)
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // PART 5: MIXINS - INFINITE STAR FIELD GENERATOR
@@ -541,10 +523,10 @@
   animation:
     nebula-holographic-flow
       calc(var(--nebula-flow-speed) * (1 + #{$layer} * 0.3)) ease-in-out
-      infinite,
-    infinite-holographic-shimmer
-      calc(var(--zoom-breathing-rhythm) * (1 + #{$layer} * 0.2)) ease-in-out
       infinite;
+    // Phase 8.5b: Use advanced shimmer system for cosmic depth breathing
+    @include advanced-shimmer($type: 'cosmic-depth', $music-sync: true, $intensity: 'normal');
+    animation-duration: calc(var(--zoom-breathing-rhythm) * (1 + #{$layer} * 0.2));
 
   opacity: calc(1 - #{$layer} * 0.1);
   filter: blur(calc(#{$layer} * 2px)) brightness(calc(1 - #{$layer} * 0.05));
@@ -654,7 +636,7 @@
       z-index: var(--z-depth-layer-1);
       background: radial-gradient(
         ellipse at center,
-        rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.015) 0%,
+        #{oklab-color('highlight', 0.015)} 0%,
         transparent 50%
       );
 

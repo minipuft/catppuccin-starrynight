@@ -8,6 +8,7 @@
 ============================================================================= */
 
 @use "../core/_mixins" as *;
+@use "../core/_design_tokens" as *;
 @use "../core/_performance_mixins" as *;
 
 // Enable 3D transforms for card grid (perspective container)
@@ -27,7 +28,7 @@
   background: rgba(var(--section-background-base, var(--spice-rgb-surface0, 28, 28, 30)), 0.08);
   // Use GPU-friendly drop-shadow instead of box-shadow to avoid costly
   // blur radius calculations on the compositor thread.
-  filter: drop-shadow(0 1px 4px rgba(var(--sn-oklab-processed-dynamic-shadow-rgb, 0, 0, 0), 0.06));
+  filter: drop-shadow(0 1px 4px #{oklab-color('shadow', 0.06)});
 
   // Smooth, conservative transitions – motion layers can override timing-func/speed
   transition: box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease,

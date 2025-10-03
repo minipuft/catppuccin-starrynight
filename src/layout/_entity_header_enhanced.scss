@@ -5,6 +5,7 @@
 // ████████████████████████████████████████████████████████████████████████████████
 
 @use "../core/_mixins" as *;
+@use "../core/_design_tokens" as *;
 
 @include entity-header-root {
   position: relative;
@@ -58,10 +59,7 @@
     backdrop-filter: blur(20px) brightness(1.2) contrast(1.1);
     border: 1px solid rgba(var(--sn-accent-rgb), 0.3);
     border-radius: 12px;
-    box-shadow: inset 0 1px 0
-        rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.1),
-      0 0 20px rgba(var(--sn-accent-rgb), 0.2),
-      0 0 40px rgba(var(--sn-accent-rgb), 0.1);
+    @include oklab-shadow-stack('header-base');
 
     // Gentle holographic pulse
     animation: holographic-pulse 3s ease-in-out infinite;

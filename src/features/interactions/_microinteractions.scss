@@ -32,7 +32,8 @@
 // ══════════════════════════════════════════════════════════════════════════════
 
 // Enhanced main-card-card with YEAR 3000 rhythmic visual effects
-.main-card-card {
+.main-card-card,
+.main-card-cardContainer {
   // Action Verb: OSCILLATE - Base animation with rhythm (scale removed)
   transform: translateZ(0);
   transition: transform var(--micro-medium) var(--sn-easing-explorer, ease-out);
@@ -334,6 +335,7 @@
 
   // Simplify ripples on mobile for performance
   .main-card-card,
+  .main-card-cardContainer,
   .spicetify-playlist-list li {
     &::after {
       // Smaller ripple scale for mobile
@@ -349,6 +351,7 @@
 // Reduced motion preferences
 @media (prefers-reduced-motion: reduce) {
   .main-card-card,
+  .main-card-cardContainer,
   .spicetify-playlist-list li,
   .main-createPlaylistButton-button,
   .main-shuffleButton-button,

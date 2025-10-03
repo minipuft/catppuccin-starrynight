@@ -49,7 +49,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   private utils: typeof Utils;
   private cards: NodeListOf<HTMLElement>;
   private cardQuerySelector =
-    ".main-card-card, .main-gridContainer-gridContainer.main-gridContainer-fixedWidth";
+    ".sn-card, .main-card-card, .main-card-cardContainer, .main-gridContainer-gridContainer.main-gridContainer-fixedWidth";
   private cardEventHandlers: WeakMap<
     HTMLElement,
     {
@@ -86,7 +86,7 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
       transitionSpeed: "200ms",
       glowOpacity: 0.8,
       selector:
-        ".main-card-card, .main-grid-grid > *, .main-shelf-shelf > * > *",
+        ".main-card-card, .main-card-cardContainer, .main-grid-grid > *, .main-shelf-shelf > * > *",
       // Year 3000 music enhancement parameters
       depthMultiplier: 1.5,
       musicResponseStrength: 0.8,

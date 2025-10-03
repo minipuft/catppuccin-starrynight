@@ -231,7 +231,9 @@ nav[aria-label="Main"] ul li a {
   transform: scale(var(--sn-predictive-echo-scale, 1));
   transition: opacity 0.5s ease-out, transform 0.5s ease-out;
   /* Add a subtle shimmer or pulse if desired*/
-  animation: sn-echo-shimmer 3s infinite ease-in-out alternate;
+  // Phase 8.5b: Use unified shimmer system (filter type for brightness/saturate effects)
+  @include unified-shimmer($type: 'filter', $intensity: 'subtle');
+  animation-duration: 3s;
 }
 
 /* Styles for a dimensional rift effect (conceptual, likely a pseudo-element on a target)*/
@@ -382,7 +384,8 @@ nav[aria-label="Main"] ul li a {
         var(--sn-accent-rgb, var(--spice-rgb-accent)),
         0.15
       );
-      box-shadow: inset 0 0 10px -5px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.3);
+      // Phase 8.5b+: Use consolidated music-reactive-shadow mixin
+      @include music-reactive-shadow($blur: 10px, $spread: -5px, $base-opacity: 0.3, $inset: true, $secondary: false);
     } /* Closes &[aria-current="true"] / .main-yourLibraryX-navLinkActive &*/
   } /* Closes .main-yourLibraryX-listItem .main-useDropTarget-base*/
 
@@ -446,17 +449,7 @@ nav[aria-label="Main"] ul li a {
 }
 
 /* Predictive Echo Shimmer*/
-@keyframes sn-echo-shimmer {
-  0% {
-    filter: brightness(100%) saturate(100%);
-  }
-  50% {
-    filter: brightness(120%) saturate(110%);
-  }
-  100% {
-    filter: brightness(100%) saturate(100%);
-  }
-}
+// REMOVED (Phase 8.5b): sn-echo-shimmer → consolidated into unified-shimmer($type: 'filter')
 
 /* Dynamic Harmonic & Energy Responsive UI*/
 
@@ -497,13 +490,8 @@ nav[aria-label="Main"] ul li a {
         )
         100%
     );
-    box-shadow: inset 0 0 80px -20px rgba($primary-rgb, calc(0.15 *
-              var(--sn-sidebar-harmonic-intensity-multiplier))),
-      inset 0 0 30px 5px
-        rgba(
-          $secondary-rgb,
-          calc(0.1 * var(--sn-sidebar-harmonic-intensity-multiplier))
-        );
+    // Phase 8.5b+: Use consolidated music-reactive-shadow mixin
+    @include music-reactive-shadow($blur: 80px, $spread: -20px, $base-opacity: 0.15, $inset: true, $secondary: true);
 }
 
 @include left-sidebar-root {
@@ -617,56 +605,6 @@ nav[aria-label="Main"] ul li a {
               var(--sn-sidebar-harmonic-intensity-multiplier) * 1.2));
     }
   }
-}
-
-/* TEMPORAL ECHO ANIMATIONS - Sidebar Interaction Effects*/
-
-@keyframes year3000-echo-core {
-  0% {
-    opacity: 0.32;
-    transform:
-      translate(
-        var(--sn-echo-offset-x, 0px),
-        var(--sn-echo-offset-y, 0px)
-      )
-      skew(var(--sn-echo-skew, 0deg))
-      scale(calc(0.8 * var(--sn-echo-radius-multiplier, 1)));
-    filter: blur(1px) hue-rotate(var(--sn-echo-hue-shift, 0deg));
-  }
-  100% {
-    opacity: 0;
-    transform:
-      translate(
-        var(--sn-echo-offset-x, 0px),
-        var(--sn-echo-offset-y, 0px)
-      )
-      skew(var(--sn-echo-skew, 0deg))
-      scale(calc(1.4 * var(--sn-echo-radius-multiplier, 1)));
-    filter: blur(4px) hue-rotate(var(--sn-echo-hue-shift, 0deg));
-  }
-}
-
-.sn-temporal-echo {
-  --sn-echo-hue-shift: var(--sn-echo-hue-shift, 0deg);
-  --sn-echo-radius-multiplier: var(--sn-echo-radius-multiplier, 1);
-
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  border-radius: inherit;
-  transform-origin: center;
-  z-index: 0;
-  animation: year3000-echo-core 800ms var(--sn-echo-decay-curve, var(--sn-easing-emergence, var(--sn-anim-easing-organic))) forwards;
-}
-
-.sn-temporal-echo::before,
-.sn-temporal-echo::after {
-  content: none;
-  animation: none;
-  opacity: 0;
 }
 
 @keyframes year3000-future-preview {

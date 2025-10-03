@@ -1,0 +1,116 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// CATPPUCCIN STARRYNIGHT - Feature Control Documentation
+// Central reference for all visual modules and systems
+// ████████████████████████████████████████████████████████████████████████████████
+//
+// USAGE: To disable a module, comment out the corresponding @use statement in src/core/_main.scss
+//
+// SASS Limitation: SASS does not support @use inside @if blocks, so feature flags
+// cannot dynamically control module loading. Instead, use this file as a reference
+// for which modules can be safely disabled by commenting them out in _main.scss.
+//
+// PERFORMANCE MODES:
+// - Minimal: Comment out all "Advanced Visual Effects" modules
+// - Reduced: Comment out "Expensive Background Systems" only
+// - Full: Keep all modules enabled (default)
+//
+// ████████████████████████████████████████████████████████████████████████████████
+
+// === EXPENSIVE BACKGROUND SYSTEMS (High GPU/CPU Impact) ===
+// File: src/features/backgrounds/_cosmic_depth_system.scss
+// Impact: Medium GPU load, layered depth effects
+// Disable for: Low-end devices
+$cosmic-depth-system: true;
+
+// File: src/features/backgrounds/_particle_animation_system.scss
+// Impact: High GPU load, animated particle fields
+// Disable for: Low-end devices, performance issues
+$particle-animation-system: true;
+
+// File: src/features/backgrounds/_atmospheric_crystals.scss
+// Impact: Medium GPU load, crystalline depth effects
+// Disable for: Performance optimization
+$atmospheric-crystals: true;
+
+// File: src/features/backgrounds/_grid_navigation_mode.scss
+// Impact: Low, navigation visualization
+// Safe to keep enabled
+$grid-navigation-mode: true;
+
+// File: src/layout/_nebula_gradient_system.scss
+// Impact: Low, gradient backgrounds
+// Safe to keep enabled
+$nebula-gradient-system: true;
+
+// File: src/features/backgrounds/_content_protection_system.scss
+// Impact: Low, content layering
+// Safe to keep enabled
+$content-protection-system: true;
+
+// === ADVANCED VISUAL EFFECTS (Medium Impact) ===
+// File: src/features/animations/_fluid_morphing.scss
+// Impact: Medium, shape transition animations
+// Disable for: Performance optimization
+$fluid-morphing: true;
+
+// File: src/features/visual-effects/_crystalline_glassmorphism.scss
+// Impact: Medium, glassmorphic blur effects
+// Disable for: Performance optimization
+$crystalline-glassmorphism: true;
+
+// File: src/features/visual-effects/_beat_sync_glassmorphism.scss
+// Impact: Medium, music-reactive glassmorphism
+// Disable for: Performance optimization, no music sync needed
+$beat-sync-glassmorphism: true;
+
+// === CORE FUNCTIONALITY (Required - DO NOT DISABLE) ===
+// These modules provide essential theme functionality
+
+// File: src/components/_sn_card_base.scss
+// Impact: Low, essential card styling
+// DO NOT DISABLE
+$card-base: true;
+
+// File: src/components/_sn_enhanced_cards.scss
+// Impact: Low, card enhancements
+// Safe to keep enabled
+$enhanced-cards: true;
+
+// File: src/components/_sn_active_loading_states.scss
+// Impact: Low, loading indicators
+// Safe to keep enabled
+$active-loading-states: true;
+
+// === MUSIC SYNCHRONIZATION (Optional) ===
+// File: src/features/music-sync/_beat_synchronization.scss
+// Impact: Low CPU, audio analysis
+// Disable for: No music-reactive features needed
+$beat-synchronization: true;
+
+// File: src/features/music-sync/_music_visualization.scss
+// Impact: Medium, visual music response
+// Disable for: Performance optimization
+$music-visualization: true;
+
+// File: src/features/music-sync/_genre_aware_ui.scss
+// Impact: Low, genre-based styling
+// Safe to keep enabled
+$genre-aware-ui: true;
+
+// === QUICK PERFORMANCE PROFILES ===
+// Copy one of these profiles to quickly optimize for your device:
+//
+// MINIMAL MODE (Maximum Performance):
+// - Comment out: _cosmic_depth_system, _particle_animation_system, _atmospheric_crystals
+// - Comment out: _fluid_morphing, _crystalline_glassmorphism, _beat_sync_glassmorphism
+// - Comment out: _music_visualization
+// - Keep: All core components, basic cards, layout
+//
+// BALANCED MODE (Good Performance + Visual Appeal):
+// - Comment out: _particle_animation_system
+// - Keep: _cosmic_depth_system, _atmospheric_crystals, glassmorphism
+// - Keep: Music synchronization
+//
+// FULL MODE (Maximum Visual Effects - Default):
+// - Keep everything enabled
+// - Recommended for: Mid to high-end devices

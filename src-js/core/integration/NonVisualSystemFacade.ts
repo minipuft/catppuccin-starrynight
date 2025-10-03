@@ -74,6 +74,7 @@ import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import UnifiedDebugManager from "@/debug/UnifiedDebugManager";
 import { SettingsManager } from "@/ui/managers/SettingsManager";
+import { LoadingStateService } from "@/core/services/LoadingStateService";
 
 // Consciousness Systems imports
 import { VisualEffectsCoordinator } from "@/visual/effects/VisualEffectsCoordinator";
@@ -124,6 +125,7 @@ export type NonVisualSystemKey =
   | "MusicSyncService"
   | "ColorOrchestrator"
   | "UnifiedColorProcessingEngine"
+  | "LoadingStateService"
 
   // Consciousness Systems
   | "MusicEmotionAnalyzer"
@@ -209,7 +211,8 @@ export class NonVisualSystemFacade {
     null;
   private musicSyncService: MusicSyncService | null = null;
   private settingsManager: SettingsManager | null = null;
-  
+  private loadingStateService: LoadingStateService | null = null; // Phase 8.5: Active loading state management
+
   // New simplified performance system dependencies
   private simplePerformanceCoordinator: SimplePerformanceCoordinator | null = null;
   private webglSystemsIntegration: WebGLSystemsIntegration | null = null;
@@ -442,6 +445,10 @@ export class NonVisualSystemFacade {
     this.systemRegistry.set("MusicSyncService", MusicSyncService);
     this.systemDependencies.set("MusicSyncService", []);
 
+    // Loading State Service - Phase 8.5 active loading state management
+    this.systemRegistry.set("LoadingStateService", LoadingStateService);
+    this.systemDependencies.set("LoadingStateService", ["performanceAnalyzer", "settingsManager"]);
+
     // 🔧 PHASE 2.1: UnifiedColorProcessingEngine - Enhanced consolidated color processor (PREFERRED)
     this.systemRegistry.set(
       "UnifiedColorProcessingEngine",
@@ -578,6 +585,7 @@ export class NonVisualSystemFacade {
       "SettingsManager",
       "UnifiedDebugManager",
       "MusicSyncService",
+      "LoadingStateService", // Phase 8.5: Active loading state management (depends on performanceAnalyzer, settingsManager)
     ];
 
     for (const systemKey of coreSystemsOrder) {
@@ -613,9 +621,7 @@ export class NonVisualSystemFacade {
           // Legacy performance systems (for backward compatibility)
           case "PerformanceAnalyzer":
             this.performanceAnalyzer = system;
-            break;
-          case "PerformanceAnalyzer":
-            this.performanceCoordinator = system;
+            this.performanceCoordinator = system; // Also set coordinator for backward compatibility
             break;
           
           // Shared systems
@@ -630,6 +636,9 @@ export class NonVisualSystemFacade {
             break;
           case "MusicSyncService":
             this.musicSyncService = system;
+            break;
+          case "LoadingStateService":
+            this.loadingStateService = system;
             break;
         }
       } catch (error) {
@@ -703,6 +712,11 @@ export class NonVisualSystemFacade {
     if (key === "SettingsManager" && this.settingsManager) {
       this.systemCache.set(key, this.settingsManager);
       return this.settingsManager as T;
+    }
+
+    if (key === "LoadingStateService" && this.loadingStateService) {
+      this.systemCache.set(key, this.loadingStateService);
+      return this.loadingStateService as T;
     }
 
     return null;
@@ -803,6 +817,15 @@ export class NonVisualSystemFacade {
         "Using shared SettingsManager instance from SystemCoordinator"
       );
       return this.settingsManager as T;
+    }
+
+    if (key === "LoadingStateService" && this.loadingStateService) {
+      this.systemCache.set(key, this.loadingStateService);
+      Y3KDebug?.debug?.log(
+        "NonVisualSystemFacade",
+        "Using shared LoadingStateService instance"
+      );
+      return this.loadingStateService as T;
     }
 
     // Create new system instance using strategy-based creation

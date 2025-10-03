@@ -4,6 +4,7 @@
 // =============================================================================
 
 @use "../../core/_mixins" as *;
+@use "../../core/_design_tokens" as *;
 
 // Year 3000 Energy Particle System Variables
 :root {
@@ -734,8 +735,8 @@
     .star {
       background: radial-gradient(
         circle,
-        rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.9) 0%,
-        rgba(var(--sn-oklab-processed-bright-highlight-rgb), 0.3) 70%,
+        #{oklab-color('highlight', 0.9)} 0%,
+        #{oklab-color('highlight', 0.3)} 70%,
         transparent 100%
       ) !important;
     }
@@ -754,24 +755,10 @@
   }
 }
 
-@keyframes particle-shimmer {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  25% {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(0.8);
-    opacity: 1;
-  }
-  75% {
-    transform: scale(1.05);
-    opacity: 0.9;
-  }
-}
+// REMOVED (Phase 8.5b): particle-shimmer → unused dead code, no active references
+// Shimmer functionality now provided by unified shimmer architecture:
+// - Simple effects: @include unified-shimmer($type: 'skeleton|gradient|filter|pulse|text')
+// - Advanced effects: @include advanced-shimmer($type: 'holographic|cosmic-depth|fluid-organic|particle-field')
 
 // =============================================================================
 // LEGACY COMPATIBILITY MAPPINGS - Phase 6.3 Layer A Modernization

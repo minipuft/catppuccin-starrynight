@@ -69,7 +69,8 @@ export const MODERN_SELECTORS: { [key: string]: string } = {
   sortButton: "[data-testid='sort-button']",
 
   // Cards & Media
-  card: ".main-card-card",
+  // Phase 2.2: Unified .sn-card selector (CardDOMWatcher) + legacy
+  card: ".sn-card, .main-card-card",
   cardImage: ".main-cardImage-image",
   albumArt: ".main-trackList-albumArt",
 

@@ -1,0 +1,355 @@
+// ████████████████████████████████████████████████████████████████████████████████
+// PHASE 8.5: Active Loading State System
+// TypeScript-integrated loading UX using LoadingStateService + unified-shimmer
+// Replaces: _sn_loading.scss (passive 580-line module)
+// ████████████████████████████████████████████████████████████████████████████████
+
+@use "../core/mixins" as *;
+
+// === BASE LOADING STATE ===
+// Applied by LoadingStateService to elements with aria-busy="true"
+.loading-state {
+  position: relative;
+  pointer-events: none;
+  user-select: none;
+
+  // Default skeleton shimmer (context-aware colors applied dynamically)
+  @include unified-shimmer(
+    $type: 'skeleton',
+    $intensity: 'normal',
+    $context: 'default',
+    $music-sync: false,
+    $grain-texture: false
+  );
+
+  // Subtle fade-out during loading
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+// === CONTEXT-AWARE LOADING STYLES ===
+// LoadingStateService detects UI context and applies appropriate classes
+
+// Playlist context (album art colors)
+.loading-context-playlist {
+  @include unified-shimmer(
+    $type: 'skeleton',
+    $intensity: 'normal',
+    $context: 'playlist'
+  );
+}
+
+// Artist context (artist header gradients)
+.loading-context-artist {
+  @include unified-shimmer(
+    $type: 'skeleton',
+    $intensity: 'normal',
+    $context: 'artist'
+  );
+}
+
+// Search context (neutral colors)
+.loading-context-search {
+  @include unified-shimmer(
+    $type: 'skeleton',
+    $intensity: 'subtle',
+    $context: 'search'
+  );
+}
+
+// Home context (brand accents)
+.loading-context-home {
+  @include unified-shimmer(
+    $type: 'skeleton',
+    $intensity: 'normal',
+    $context: 'home'
+  );
+}
+
+// === INTENSITY VARIANTS ===
+// User-configurable intensity levels
+
+.loading-intensity-subtle {
+  // Override base shimmer with subtle intensity
+  animation-duration: 1.95s; // slower = more subtle
+  opacity: 0.5;
+}
+
+.loading-intensity-intense {
+  // Override with intense shimmer
+  animation-duration: 1.05s; // faster = more intense
+  opacity: 0.9;
+}
+
+// === YEAR3000 FEATURES ===
+// Optional grain texture and music synchronization
+
+.loading-grain-texture {
+  // Enable Year3000 nebula grain overlay
+  mask-image: var(--sn-nebula-noise-url);
+  mask-size: 600% 600%;
+  animation: unified-skeleton-shimmer 1.5s ease-in-out infinite,
+             year3000-grain-shift 3s linear infinite;
+}
+
+.loading-music-sync {
+  // Music-reactive shimmer intensity
+  opacity: calc(0.6 + 0.3 * var(--sn-current-intensity, 0.5));
+  animation-duration: calc(1.5s / (1 + var(--sn-current-intensity, 0.5) * 0.5));
+}
+
+// === COMPONENT-SPECIFIC LOADING STATES ===
+// Enhanced loading UX for specific Spotify components
+
+// Track list rows
+.loading-state.main-trackList-trackListRow,
+.loading-state [class*="trackList"] {
+  @include unified-shimmer($type: 'skeleton', $context: 'playlist');
+
+  .main-trackList-rowSectionVariable,
+  .main-trackList-rowTitle,
+  .main-trackList-rowSubTitle {
+    @include unified-shimmer($type: 'pulse', $intensity: 'subtle');
+  }
+}
+
+// Entity headers (playlist, artist, album)
+.loading-state.main-entityHeader-container,
+.loading-state [class*="entityHeader"] {
+  .main-entityHeader-image,
+  .main-entityHeader-headerImage {
+    @include unified-shimmer($type: 'gradient', $intensity: 'normal');
+  }
+
+  .main-entityHeader-title,
+  .main-entityHeader-subtitle {
+    @include unified-shimmer($type: 'text', $intensity: 'subtle');
+  }
+}
+
+// Cards (album, playlist, artist cards)
+// Strategy: Apply shimmer to pseudo-element overlay, not image itself
+// IMPORTANT: Spotify uses multiple card class names (.main-card-card, .main-card-cardContainer)
+.loading-state [class*="Card"],
+.loading-state .main-card-card,
+.loading-state .main-card-cardContainer {
+  // Approach A: Cards with .main-card-header wrapper (standard structure)
+  .main-card-header,
+  .main-card-imageContainer {
+    position: relative;
+    isolation: isolate; // Create stacking context for z-index
+
+    // Shimmer overlay (above image, non-interactive)
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2; // Above image (z-index: 1), below text (z-index: 3)
+      pointer-events: none; // Don't block image interactions
+      border-radius: inherit;
+
+      // Apply shimmer gradient with reduced opacity
+      background:
+        linear-gradient(90deg, var(--sn-gradient-primary, var(--spice-accent)), transparent),
+        linear-gradient(270deg, var(--spice-accent, var(--sn-gradient-primary)), transparent);
+      background-size: 200% 100%;
+
+      // Blend mode for visibility through overlay
+      mix-blend-mode: overlay; // Experiment: overlay, soft-light, screen
+      opacity: 0.3; // Reduced from 0.6 to let image show through
+
+      // Shimmer animation
+      animation: unified-gradient-shimmer 1.95s ease-in-out infinite;
+
+      // Performance optimization
+      will-change: transform, opacity;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      contain: layout style paint;
+    }
+  }
+
+  // Ensure images are positioned correctly in stacking order
+  .main-card-cardImage,
+  .main-cardImage-image,
+  .main-image-image {
+    position: relative;
+    z-index: 1; // Above background effects (z-index: -1, -2), below shimmer (z-index: 2)
+    opacity: 1 !important; // Force full image opacity
+    isolation: auto; // Don't create new stacking context
+  }
+
+  // Text shimmer (unchanged)
+  .main-cardHeader-text {
+    position: relative;
+    z-index: 3; // Above shimmer overlay
+    @include unified-shimmer($type: 'text', $intensity: 'subtle');
+  }
+
+  // Approach B: Cards without .main-card-header wrapper (fallback)
+  // Apply shimmer directly to card with height constraint
+  &:not(:has(.main-card-header)) {
+    position: relative;
+    isolation: isolate;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60%; // Cover only image area, not text
+      z-index: 2;
+      pointer-events: none;
+      border-radius: var(--card-border-radius, 12px) var(--card-border-radius, 12px) 0 0;
+
+      // Shimmer gradient
+      background:
+        linear-gradient(90deg, var(--sn-gradient-primary, var(--spice-accent)), transparent),
+        linear-gradient(270deg, var(--spice-accent, var(--sn-gradient-primary)), transparent);
+      background-size: 200% 100%;
+
+      mix-blend-mode: overlay;
+      opacity: 0.3;
+      animation: unified-gradient-shimmer 1.95s ease-in-out infinite;
+
+      // Performance optimization
+      will-change: transform, opacity;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      contain: layout style paint;
+    }
+  }
+}
+
+// Search results
+.loading-state [data-testid*="search"],
+.loading-state .main-searchSection-searchSection {
+  @include unified-shimmer($type: 'skeleton', $context: 'search', $intensity: 'subtle');
+}
+
+// Now playing (player bar)
+.loading-state [class*="nowPlaying"],
+.loading-state .main-nowPlayingWidget-nowPlaying {
+  @include unified-shimmer($type: 'pulse', $intensity: 'normal');
+}
+
+// === PROGRESSIVE CONTENT FADE-IN ===
+// Smooth transition when content finishes loading
+
+// Elements that exit loading state
+:not(.loading-state) {
+  &.main-trackList-trackListRow,
+  &.main-entityHeader-container,
+  &[class*="Card"],
+  &[class*="nowPlaying"] {
+    animation: loading-content-fadein 0.4s ease-out;
+  }
+}
+
+@keyframes loading-content-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+// === ACCESSIBILITY ===
+// Reduced motion and high contrast support (handled by unified-shimmer)
+// Additional accessibility enhancements:
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-state {
+    animation: none !important;
+    opacity: 0.5 !important;
+
+    // Static placeholder instead of animated shimmer
+    background: var(--spice-surface0) !important;
+    background-size: 100% 100% !important;
+
+    // Disable shimmer animations on pseudo-elements
+    .main-card-header::after,
+    &:not(:has(.main-card-header))::after {
+      animation: none !important;
+      opacity: 0.2 !important; // Static overlay
+    }
+  }
+
+  :not(.loading-state) {
+    animation: none !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .loading-state {
+    opacity: 0.9;
+    filter: contrast(1.2);
+    border: 1px solid var(--spice-text);
+
+    // Reduce shimmer overlay in high contrast for better image clarity
+    .main-card-header::after,
+    &:not(:has(.main-card-header))::after {
+      opacity: 0.15 !important; // Minimal overlay
+      mix-blend-mode: normal !important; // Disable blend mode for clarity
+    }
+  }
+}
+
+// === PERFORMANCE OPTIMIZATION ===
+// Battery-conscious loading on mobile
+
+@media (max-width: 768px) {
+  .loading-state {
+    // Reduce animation complexity on mobile
+    animation-duration: 2s !important; // slower = less CPU
+  }
+
+  .loading-grain-texture {
+    // Disable grain on mobile for performance
+    mask-image: none;
+    animation: unified-skeleton-shimmer 2s ease-in-out infinite;
+  }
+}
+
+// === DEBUG MODE ===
+// Visual debugging for LoadingStateService
+// Activated via: document.body.classList.add('debug-loading-states')
+
+.debug-loading-states {
+  .loading-state {
+    outline: 2px dashed var(--spice-notification-error);
+    outline-offset: 2px;
+
+    &::after {
+      content: attr(class);
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: rgba(0, 0, 0, 0.8);
+      color: var(--spice-notification-error);
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      z-index: 999999;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+  }
+}
+
+// ████████████████████████████████████████████████████████████████████████████████
+// INTEGRATION NOTES:
+// - LoadingStateService (TypeScript) detects loading indicators and applies classes
+// - Unified shimmer system (SCSS) provides parametric animation generation
+// - Context detection: playlist, artist, search, home contexts auto-detected
+// - Intensity levels: subtle, normal, intense (user-configurable)
+// - Year3000 features: grain texture, music-sync (optional)
+// - Accessibility: reduced-motion, high-contrast support (automatic)
+// - Performance: Mobile optimizations, battery-conscious animations
+// ████████████████████████████████████████████████████████████████████████████████

@@ -3,6 +3,8 @@
 // Consolidates duplicate mixins from src/features/interactions/*.scss
 // ████████████████████████████████████████████████████████████████████████████████
 
+@use "mixins" as *;
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // SHARED CSS VARIABLES (Beat-Responsive & Interaction Timing)
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -11,20 +13,20 @@
   // === Beat Synchronization Variables ===
   --sn-beat-pulse: 0; // 0-1 beat pulse trigger
   --sn-kinetic-energy: 0; // 0-1 music energy level
-  --sn-beat-pulse-intensity: 0; // 0-1 beat intensity from MusicSyncService
-  --sn-rhythm-phase: 0; // Harmonic oscillation phase
+  --sn-music-beat-pulse-intensity: 0; // 0-1 beat intensity from MusicSyncService
+  --sn-music-rhythm-phase: 0; // Harmonic oscillation phase
 
   // === Interaction Timing Variables ===
-  --micro-fast: calc(0.15s * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.3)));
-  --micro-medium: calc(0.3s * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.2)));
-  --micro-slow: calc(0.6s * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.1)));
+  --micro-fast: calc(0.15s * (1 - (var(--sn-music-beat-pulse-intensity, 0) * 0.3)));
+  --micro-medium: calc(0.3s * (1 - (var(--sn-music-beat-pulse-intensity, 0) * 0.2)));
+  --micro-slow: calc(0.6s * (1 - (var(--sn-music-beat-pulse-intensity, 0) * 0.1)));
 
   // === Ripple Effect Variables ===
   --ripple-color: var(--sn-color-accent-hex);
   --ripple-duration: calc(
-    var(--sn-gradient-transition, 0.8s) * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.3))
+    var(--sn-gradient-transition, 0.8s) * (1 - (var(--sn-music-beat-pulse-intensity, 0) * 0.3))
   );
-  --ripple-intensity: calc(0.3 + (var(--sn-beat-pulse-intensity, 0) * 0.4));
+  --ripple-intensity: calc(0.3 + (var(--sn-music-beat-pulse-intensity, 0) * 0.4));
   --ripple-max-scale: 3;
   --ripple-opacity: 0.3;
 
@@ -39,16 +41,25 @@
   --hover-scale-factor: 1.02;
 
   // === Beat-Responsive Feedback Intensity ===
-  --feedback-subtle: calc(0.1 + (var(--sn-beat-pulse-intensity, 0) * 0.05));
-  --feedback-moderate: calc(0.2 + (var(--sn-beat-pulse-intensity, 0) * 0.1));
-  --feedback-prominent: calc(0.3 + (var(--sn-beat-pulse-intensity, 0) * 0.2));
+  --feedback-subtle: calc(0.1 + (var(--sn-music-beat-pulse-intensity, 0) * 0.05));
+  --feedback-moderate: calc(0.2 + (var(--sn-music-beat-pulse-intensity, 0) * 0.1));
+  --feedback-prominent: calc(0.3 + (var(--sn-music-beat-pulse-intensity, 0) * 0.2));
 
   // === Musical Interaction Sync ===
-  --interaction-beat-sync: calc(var(--sn-beat-pulse-intensity, 0) * 0.5);
+  --interaction-beat-sync: calc(var(--sn-music-beat-pulse-intensity, 0) * 0.5);
   --interaction-energy-boost: calc(var(--sn-music-energy, 0) * 0.3);
   --interaction-feedback-delay: calc(
-    0.1s * (1 - (var(--sn-beat-pulse-intensity, 0) * 0.5))
+    0.1s * (1 - (var(--sn-music-beat-pulse-intensity, 0) * 0.5))
   );
+
+  // === Temporal Echo Variables ===
+  --sn-echo-offset-x: 0px;
+  --sn-echo-offset-y: 0px;
+  --sn-echo-skew: 0deg;
+  --sn-echo-radius-multiplier: 1;
+  --sn-echo-hue-shift: 0deg;
+  --sn-echo-decay-curve: var(--sn-easing-emergence, var(--sn-anim-easing-organic));
+  --sn-echo-duration: 800ms;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -123,16 +134,7 @@
 }
 
 // Gentle text shimmer animation
-@keyframes gentle-text-shimmer {
-  0%, 100% {
-    opacity: var(--text-shimmer-intensity, 0.3);
-    text-shadow: 0 0 5px rgba(var(--sn-gradient-accent-rgb), 0.2);
-  }
-  50% {
-    opacity: calc(var(--text-shimmer-intensity, 0.3) * 1.4);
-    text-shadow: 0 0 8px rgba(var(--sn-gradient-accent-rgb), 0.4);
-  }
-}
+// REMOVED (Phase 8.5b): gentle-text-shimmer → consolidated into unified-shimmer($type: 'text')
 
 // Simple gradient flow animation
 @keyframes simple-gradient-flow {
@@ -144,6 +146,26 @@
   }
   100% {
     background-position: 200% 50%;
+  }
+}
+
+// Temporal echo animation - ghostly afterimage trail
+@keyframes year3000-echo-core {
+  0% {
+    opacity: 0.32;
+    transform:
+      translate(var(--sn-echo-offset-x), var(--sn-echo-offset-y))
+      skew(var(--sn-echo-skew))
+      scale(calc(0.8 * var(--sn-echo-radius-multiplier)));
+    filter: blur(1px) hue-rotate(var(--sn-echo-hue-shift));
+  }
+  100% {
+    opacity: 0.2;
+    transform:
+      translate(var(--sn-echo-offset-x), var(--sn-echo-offset-y))
+      skew(var(--sn-echo-skew))
+      scale(calc(1.4 * var(--sn-echo-radius-multiplier)));
+    filter: blur(4px) hue-rotate(var(--sn-echo-hue-shift));
   }
 }
 
@@ -165,8 +187,9 @@
   // Simple text glow that responds to music
   text-shadow: 0 0 calc(var(--local-shimmer-strength) * 10px) rgba(var(--sn-gradient-accent-rgb), var(--music-glow-strength, 0.2));
 
-  // Lightweight shimmer animation
-  animation: gentle-text-shimmer var(--text-shimmer-speed, 8s) ease-in-out infinite;
+  // Lightweight shimmer animation (Phase 8.5b: Use unified shimmer system)
+  @include unified-shimmer($type: 'text', $intensity: 'subtle');
+  animation-duration: var(--text-shimmer-speed, 8s);
 
   // Smooth state transitions
   transition: text-shadow 0.3s ease-out, opacity 0.2s ease-out;
@@ -325,7 +348,7 @@
 @mixin css-musical-interaction() {
   // Sync interaction effects with music when available
   animation: musical-interaction-boost
-    calc(var(--living-pulse-speed, 4s) / max(var(--sn-beat-pulse-intensity, 0.5), 0.5))
+    calc(var(--living-pulse-speed, 4s) / max(var(--sn-music-beat-pulse-intensity, 0.5), 0.5))
     ease-in-out infinite;
 
   // Enhanced effects during musical peaks
@@ -396,6 +419,34 @@
   }
 }
 
+// Temporal echo effect - creates ghostly afterimage trail on interactions
+.sn-temporal-echo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  border-radius: inherit;
+  transform-origin: center;
+  z-index: 0;
+  animation: year3000-echo-core var(--sn-echo-duration) var(--sn-echo-decay-curve) forwards;
+
+  // Disable nested pseudo-elements to prevent conflicts
+  &::before,
+  &::after {
+    content: none;
+    animation: none;
+    opacity: 0;
+  }
+
+  // Accessibility: Disable in reduced motion
+  @media (prefers-reduced-motion: reduce) {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+}
+
 // Performance mode: Disable all beat effects during high CPU usage
 .sn-performance-mode {
   .sn-beat-responsive,
@@ -410,5 +461,10 @@
   .sn-beat-glow {
     box-shadow: none !important;
     transition: none !important;
+  }
+
+  .sn-temporal-echo {
+    animation: none !important;
+    opacity: 0 !important;
   }
 }

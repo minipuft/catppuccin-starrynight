@@ -5,6 +5,7 @@ import * as ThemeUtilities from "./utils/core/ThemeUtilities";
 import { waitForSpicetifyReady } from "./utils/platform/spicetifyReady";
 import { initializeAberrationManager } from "./visual/ui/Aberration/AberrationManager"; // Re-enabled for hybrid CSS+WebGL approach
 import { initializeAudioVisualController } from "./visual/ui/AudioVisualController";
+import { startCardDOMWatcher } from "./utils/dom/CardDOMWatcher"; // Phase 2: Card normalization
 
 // A placeholder for the settings UI function until it can be properly typed.
 declare const initializeSettingsUI: (location: any) => void;
@@ -348,6 +349,19 @@ patchReactRequire();
       // 🌌 Enable Year3000 Stellar Navigation Mode (Dot Matrix Grid Effects)
       document.body.setAttribute('data-layout', 'navigation');
       console.log("🌌 [StarryNight] Stellar Navigation Mode activated - grid breathing enabled");
+
+      // 🃏 Start CardDOMWatcher for unified card detection (Phase 2)
+      const disposeCardWatcher = startCardDOMWatcher({
+        enableDebug: ADVANCED_SYSTEM_CONFIG.enableDebug,
+        onCardDiscovered: (card) => {
+          if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
+            console.log('[CardDOMWatcher] New card discovered and normalized:', card.className);
+          }
+        }
+      });
+      // Store disposer for cleanup
+      (year3000System as any).disposeCardWatcher = disposeCardWatcher;
+      console.log("🃏 [StarryNight] CardDOMWatcher active - normalizing Spotify card variants");
 
       // Initialize UI controllers after Year3000System is fully initialized
       // (these require global CSS controller to be available)

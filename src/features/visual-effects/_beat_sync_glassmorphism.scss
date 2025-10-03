@@ -18,6 +18,7 @@
 // ████████████████████████████████████████████████████████████████████████████████
 
 @use "../../core/_mixins" as *;
+@use "../../core/_design_tokens" as *;
 
 // ████████████████████████████████████████████████████████████████████████████████
 // CORE GLASSMORPHISM VISUAL EFFECTS VARIABLES
@@ -179,7 +180,7 @@
 .main-contextMenu-container {
   // BLOOM shadow effect during beats
   box-shadow: 0 16px 64px
-      rgba(var(--sn-oklab-processed-dynamic-shadow-rgb), 0.2),
+      #{oklab-color('shadow', 0.2)},
     0 8px calc(32px + var(--sn-beat-pulse-intensity, 0) * 16px)
           rgba(
       var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
