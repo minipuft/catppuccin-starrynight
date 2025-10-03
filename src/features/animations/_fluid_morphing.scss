@@ -134,18 +134,18 @@
     background 3s ease-out;
 
   // Musical activation override
-  .Root[style*="--sn-beat-pulse-intensity"] & {
-    animation: fluid-awakening calc(15s * (2 - var(--sn-beat-pulse-intensity, 0))) ease-in-out infinite;
+  .Root[style*="--sn-music-beat-pulse-intensity"] & {
+    animation: fluid-awakening calc(15s * (2 - var(--sn-music-beat-pulse-intensity, 0))) ease-in-out infinite;
 
     background:
       radial-gradient(
         ellipse 95% 75% at 30% 40%,
-        rgba(var(--sn-gradient-primary-rgb), calc(#{$intensity} * (0.04 + var(--sn-beat-pulse-intensity, 0) * 0.06))) 0%,
+        rgba(var(--sn-gradient-primary-rgb), calc(#{$intensity} * (0.04 + var(--sn-music-beat-pulse-intensity, 0) * 0.06))) 0%,
         transparent 75%
       ),
       radial-gradient(
         ellipse 75% 90% at 70% 60%,
-        rgba(var(--sn-gradient-accent-rgb), calc(#{$intensity} * (0.03 + var(--sn-beat-pulse-intensity, 0) * 0.05))) 0%,
+        rgba(var(--sn-gradient-accent-rgb), calc(#{$intensity} * (0.03 + var(--sn-music-beat-pulse-intensity, 0) * 0.05))) 0%,
         transparent 65%
       );
   }
