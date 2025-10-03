@@ -12,7 +12,7 @@
 // - REFRACT light through cosmic filter effects
 //
 // Dependencies:
-// - BeatSyncVisualSystem variables (--sn-beat-pulse-intensity, --sn-rhythm-phase, --sn-breathing-scale)
+// - BeatSyncVisualSystem variables (--sn-music-beat-pulse-intensity, --sn-music-rhythm-phase, --sn-music-breathing-scale)
 // - Year 3000 gradient system variables (--sn-gradient-*-rgb)
 // - Base Spicetify theme variables (--spice-*)
 //
@@ -21,33 +21,33 @@
 :root {
   // === CORE CONSCIOUSNESS VARIABLES (BeatSync Integration) ===
   --sn-topbar-beat-glow-intensity: calc(
-    var(--sn-beat-pulse-intensity, 0) * 0.8
+    var(--sn-music-beat-pulse-intensity, 0) * 0.8
   );
-  --sn-topbar-rhythm-hue-shift: calc(var(--sn-rhythm-phase, 0) * 25deg);
+  --sn-topbar-rhythm-hue-shift: calc(var(--sn-music-rhythm-phase, 0) * 25deg);
   --sn-topbar-cosmic-opacity: calc(
-    0.1 + var(--sn-beat-pulse-intensity, 0) * 0.15
+    0.1 + var(--sn-music-beat-pulse-intensity, 0) * 0.15
   );
 
   // === SEARCH CONSCIOUSNESS VARIABLES ===
-  --sn-search-ripple-intensity: calc(var(--sn-beat-pulse-intensity, 0) * 0.6);
-  --sn-search-focus-bloom: calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.05);
+  --sn-search-ripple-intensity: calc(var(--sn-music-beat-pulse-intensity, 0) * 0.6);
+  --sn-search-focus-bloom: calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.05);
   --sn-search-beat-border: rgba(
     var(--sn-accent-rgb, var(--sn-accent-rgb, 140,170,238)),
-    calc(0.3 + var(--sn-beat-pulse-intensity, 0) * 0.4)
+    calc(0.3 + var(--sn-music-beat-pulse-intensity, 0) * 0.4)
   );
 
   // === BUTTON CONSCIOUSNESS VARIABLES ===
   --sn-button-harmony-color: rgba(
     var(--sn-accent-rgb, var(--sn-accent-rgb, 202,158,230)),
-    calc(0.1 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+    calc(0.1 + var(--sn-music-beat-pulse-intensity, 0) * 0.2)
   );
-  --sn-button-bloom-scale: calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.03);
-  --sn-button-cosmic-glow: calc(5px + var(--sn-beat-pulse-intensity, 0) * 10px);
+  --sn-button-bloom-scale: calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.03);
+  --sn-button-cosmic-glow: calc(5px + var(--sn-music-beat-pulse-intensity, 0) * 10px);
 
   // === TEMPORAL SHIFT VARIABLES ===
-  --sn-topbar-temporal-phase: var(--sn-rhythm-phase, 0);
-  --sn-topbar-energy-absorption: var(--sn-beat-pulse-intensity, 0);
-  --sn-topbar-rhythm-angle: calc(var(--sn-rhythm-phase, 0) * 180deg);
+  --sn-topbar-temporal-phase: var(--sn-music-rhythm-phase, 0);
+  --sn-topbar-energy-absorption: var(--sn-music-beat-pulse-intensity, 0);
+  --sn-topbar-rhythm-angle: calc(var(--sn-music-rhythm-phase, 0) * 180deg);
 }
 
 // ████████████████████████████████████████████████████████████████████████████████
@@ -94,8 +94,8 @@
 
   // REFRACT cosmic filter effects
   filter: hue-rotate(var(--sn-topbar-rhythm-hue-shift))
-    saturate(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.2))
-    brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.1));
+    saturate(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.2))
+    brightness(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.1));
 
   // Smooth consciousness transitions
   transition: all 0.8s var(--sn-anim-easing-organic),
@@ -117,7 +117,7 @@
       transparent 70%
     );
     animation: cosmicFlow
-      calc(20s / max(var(--sn-beat-pulse-intensity, 0.1), 0.1)) linear infinite;
+      calc(20s / max(var(--sn-music-beat-pulse-intensity, 0.1), 0.1)) linear infinite;
     opacity: var(--sn-topbar-energy-absorption);
   }
 
@@ -189,7 +189,7 @@
     &::placeholder {
       color: rgba(
         var(--spice-rgb-subtext, "186,194,222"),
-        calc(0.5 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+        calc(0.5 + var(--sn-music-beat-pulse-intensity, 0) * 0.2)
       ) !important;
       transition: color 0.3s ease;
     }
@@ -217,7 +217,7 @@
     &:not(:placeholder-shown) {
       border-color: rgba(
         var(--sn-accent-rgb, 140,170,238),
-        calc(0.6 + var(--sn-beat-pulse-intensity, 0) * 0.3)
+        calc(0.6 + var(--sn-music-beat-pulse-intensity, 0) * 0.3)
       );
     }
   }
@@ -226,7 +226,7 @@
   .x-searchInput-searchInputClearButton {
     color: rgba(
       var(--spice-rgb-subtext, 186,194,222),
-      calc(0.7 + var(--sn-beat-pulse-intensity, 0) * 0.2)
+      calc(0.7 + var(--sn-music-beat-pulse-intensity, 0) * 0.2)
     );
 
     &:hover {
@@ -255,7 +255,7 @@
     border: 1px solid
       rgba(
         var(--sn-accent-rgb, 140,170,238),
-        calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.3)
+        calc(0.2 + var(--sn-music-beat-pulse-intensity, 0) * 0.3)
       ) !important;
     border-radius: 8px;
 
@@ -288,7 +288,7 @@
     &:hover {
       background: rgba(
         var(--sn-accent-rgb, "202,158,230"),
-        calc(0.2 + var(--sn-beat-pulse-intensity, 0) * 0.15)
+        calc(0.2 + var(--sn-music-beat-pulse-intensity, 0) * 0.15)
       ) !important;
 
       // BLOOM glow enhancement
@@ -329,7 +329,7 @@
   .Svg-img-24-icon.home-active-icon {
     // Enhanced active state with cosmic glow
     filter: drop-shadow(
-      0 0 calc(6px + var(--sn-beat-pulse-intensity, 0) * 8px)
+      0 0 calc(6px + var(--sn-music-beat-pulse-intensity, 0) * 8px)
         rgba(
           var(--sn-accent-rgb, "202,158,230"),
           calc(var(--sn-topbar-beat-glow-intensity) * 0.8 + 0.2)
@@ -338,9 +338,9 @@
 
     // OSCILLATE color with rhythm (enhanced from original)
     color: hsl(
-      calc(250 + var(--sn-rhythm-phase, 0) * 15),
-      calc(70% + var(--sn-beat-pulse-intensity, 0) * 20%),
-      calc(60% + var(--sn-beat-pulse-intensity, 0) * 20%)
+      calc(250 + var(--sn-music-rhythm-phase, 0) * 15),
+      calc(70% + var(--sn-music-beat-pulse-intensity, 0) * 20%),
+      calc(60% + var(--sn-music-beat-pulse-intensity, 0) * 20%)
     ) !important;
 
     transition: all 0.4s ease-out;
@@ -416,7 +416,7 @@
   :root {
     --sn-topbar-cosmic-opacity: 0.08;
     --sn-button-cosmic-glow: calc(
-      3px + var(--sn-beat-pulse-intensity, 0) * 6px
+      3px + var(--sn-music-beat-pulse-intensity, 0) * 6px
     );
   }
 
