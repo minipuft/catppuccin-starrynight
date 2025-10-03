@@ -118,7 +118,7 @@ body:not(:has(.main-searchPage-content)) {
 
   @include action-bar-row {
     background: linear-gradient(
-      calc(135deg + (var(--sn-rhythm-phase, 0) * 5deg)),
+      calc(135deg + (var(--sn-music-rhythm-phase, 0) * 5deg)),
       rgba(
           var(--sn-header-primary-rgb, var(--spice-rgb-accent)),
           calc(var(--sn-header-intensity, 0.2) * 0.85)
@@ -137,12 +137,12 @@ body:not(:has(.main-searchPage-content)) {
     ) !important;
 
     backdrop-filter: blur(15px)
-      saturate(calc(1.15 + (var(--sn-breathing-scale, 1) - 1) * 0.3));
+      saturate(calc(1.15 + (var(--sn-music-breathing-scale, 1) - 1) * 0.3));
     transition: background 800ms var(--sn-anim-easing-organic);
 
     // Subtle hue breathing with rhythm
-    filter: hue-rotate(calc(var(--sn-rhythm-phase, 0) * 2deg))
-      brightness(calc(1 + (var(--sn-beat-pulse-intensity, 0) * 0.1)));
+    filter: hue-rotate(calc(var(--sn-music-rhythm-phase, 0) * 2deg))
+      brightness(calc(1 + (var(--sn-music-beat-pulse-intensity, 0) * 0.1)));
 
     // Ensure content within the action bar is visually distinct
     position: relative;
@@ -163,7 +163,7 @@ body:not(:has(.main-searchPage-content)) {
       transform: translateY(-50%); // Centered, stable positioning
       background: rgba(
         var(--sn-accent-rgb, var(--spice-rgb-accent)),
-        calc(0.7 * var(--sn-beat-pulse-intensity, 0))
+        calc(0.7 * var(--sn-music-beat-pulse-intensity, 0))
       ); // Opacity pulses with beat intensity
       border-radius: 2px; // Rounded edges for the bar
       transition: opacity 120ms var(--sn-anim-easing-bounce-medium); // Snappy opacity pulse
@@ -196,10 +196,10 @@ body:not(:has(.main-searchPage-content)) {
     text-shadow: 0 0 5px rgba(var(--spice-rgb-shadow), 0.3);
 
     // Beat-responsive glow - Year 3000 design philosophy preserved
-    box-shadow: 0 0 calc(8px * var(--sn-beat-pulse-intensity, 0))
+    box-shadow: 0 0 calc(8px * var(--sn-music-beat-pulse-intensity, 0))
       rgba(
         var(--sn-accent-rgb, var(--spice-rgb-accent)),
-        calc(0.4 * var(--sn-beat-pulse-intensity, 0))
+        calc(0.4 * var(--sn-music-beat-pulse-intensity, 0))
       );
   }
 }
