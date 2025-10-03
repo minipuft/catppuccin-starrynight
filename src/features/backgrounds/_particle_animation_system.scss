@@ -301,17 +301,17 @@
     background:
       radial-gradient(
         ellipse 100% 60% at 20% 30%,
-        rgba(var(--sn-gradient-primary-rgb), var(--aurora-layer-1-intensity)) 0%,
+        rgba(var(--sn-bg-gradient-primary-rgb), var(--aurora-layer-1-intensity)) 0%,
         transparent 70%
       ),
       radial-gradient(
         ellipse 80% 90% at 80% 60%,
-        rgba(var(--sn-gradient-secondary-rgb), var(--aurora-layer-2-intensity)) 0%,
+        rgba(var(--sn-bg-gradient-secondary-rgb), var(--aurora-layer-2-intensity)) 0%,
         transparent 60%
       ),
       radial-gradient(
         ellipse 120% 50% at 50% 90%,
-        rgba(var(--sn-gradient-accent-rgb), var(--aurora-layer-3-intensity)) 0%,
+        rgba(var(--sn-bg-gradient-accent-rgb), var(--aurora-layer-3-intensity)) 0%,
         transparent 80%
       );
 

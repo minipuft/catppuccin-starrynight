@@ -228,8 +228,8 @@
   // Add perceptual blending for enhanced visual effects
   // OKLAB perceptual gradient (inline CSS)
   background: linear-gradient(135deg, 
-    rgba(var(--visual-effects-oklab-primary-rgb), 0.6) 0%,
-    rgba(var(--visual-effects-oklab-accent-rgb), 0.4) 100%);
+    rgba(var(--sn-oklab-primary-rgb), 0.6) 0%,
+    rgba(var(--sn-oklab-accent-rgb), 0.4) 100%);
   
   // Enhanced visual blending for special contexts
   &[data-visual-enhanced] {

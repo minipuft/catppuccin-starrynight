@@ -33,7 +33,7 @@
 
   // === BEATSYNC VISUAL EFFECTS VARIABLES (New) ===
   // Phase 4: Gate beat effects behind user toggle
-  --sn-glass-beat-opacity: calc(
+  --sn-ui-glass-beat-opacity: calc(
     var(--color-enhancement-opacity) *
       (1 + var(--sn-music-beat-pulse-intensity, 0) * var(--sn-ui-glass-pulse-enabled) * 0.5)
   );
@@ -85,7 +85,7 @@
   // Background colors (adapts to existing color extraction with visual-effects)
   --enhanced-background: rgba(
     var(--spice-rgb-surface0),
-    var(--sn-glass-beat-opacity)
+    var(--sn-ui-glass-beat-opacity)
   );
   --enhanced-border: rgba(
     var(--spice-rgb-surface1),
@@ -155,7 +155,7 @@
 
   // Maintain existing responsive behavior with visual-effects
   @media (max-width: 768px) {
-    --sn-glass-beat-opacity: calc(
+    --sn-ui-glass-beat-opacity: calc(
       0.12 * (1 + var(--sn-music-beat-pulse-intensity, 0) * 0.3)
     );
   }
@@ -351,7 +351,7 @@
 // High contrast mode support (enhanced)
 @media (prefers-contrast: high) {
   :root {
-    --sn-glass-beat-opacity: calc(
+    --sn-ui-glass-beat-opacity: calc(
       0.25 * (1 + var(--sn-music-beat-pulse-intensity, 0) * 0.3)
     );
     --enhanced-border: rgba(var(--spice-rgb-text), 0.4);
@@ -368,7 +368,7 @@
 // Mobile optimizations (respects existing responsive design with visual-effects)
 @media (max-width: 768px) {
   :root {
-    --sn-glass-beat-opacity: calc(
+    --sn-ui-glass-beat-opacity: calc(
       0.08 * (1 + var(--sn-music-beat-pulse-intensity, 0) * 0.2)
     );
     --sn-glass-cosmic-blur: calc(var(--sn-music-beat-pulse-intensity, 0) * 2px);
@@ -378,7 +378,7 @@
   }
 
   .sn-glass-intense {
-    --sn-glass-beat-opacity: calc(
+    --sn-ui-glass-beat-opacity: calc(
       0.12 * (1 + var(--sn-music-beat-pulse-intensity, 0) * 0.2)
     );
   }

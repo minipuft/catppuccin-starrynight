@@ -113,12 +113,12 @@
   background:
     radial-gradient(
       ellipse 90% 70% at 35% 45%,
-      rgba(var(--sn-gradient-primary-rgb), calc(#{$intensity} * 0.04)) 0%,
+      rgba(var(--sn-bg-gradient-primary-rgb), calc(#{$intensity} * 0.04)) 0%,
       transparent 80%
     ),
     radial-gradient(
       ellipse 70% 85% at 65% 55%,
-      rgba(var(--sn-gradient-accent-rgb), calc(#{$intensity} * 0.03)) 0%,
+      rgba(var(--sn-bg-gradient-accent-rgb), calc(#{$intensity} * 0.03)) 0%,
       transparent 70%
     );
 
@@ -140,12 +140,12 @@
     background:
       radial-gradient(
         ellipse 95% 75% at 30% 40%,
-        rgba(var(--sn-gradient-primary-rgb), calc(#{$intensity} * (0.04 + var(--sn-music-beat-pulse-intensity, 0) * 0.06))) 0%,
+        rgba(var(--sn-bg-gradient-primary-rgb), calc(#{$intensity} * (0.04 + var(--sn-music-beat-pulse-intensity, 0) * 0.06))) 0%,
         transparent 75%
       ),
       radial-gradient(
         ellipse 75% 90% at 70% 60%,
-        rgba(var(--sn-gradient-accent-rgb), calc(#{$intensity} * (0.03 + var(--sn-music-beat-pulse-intensity, 0) * 0.05))) 0%,
+        rgba(var(--sn-bg-gradient-accent-rgb), calc(#{$intensity} * (0.03 + var(--sn-music-beat-pulse-intensity, 0) * 0.05))) 0%,
         transparent 65%
       );
   }
@@ -159,8 +159,8 @@
   background:
     radial-gradient(
       ellipse 100% 80% at 50% 30%,
-      rgba(var(--sn-gradient-primary-rgb), 0.12) 0%,
-      rgba(var(--sn-gradient-accent-rgb), 0.08) 40%,
+      rgba(var(--sn-bg-gradient-primary-rgb), 0.12) 0%,
+      rgba(var(--sn-bg-gradient-accent-rgb), 0.08) 40%,
       transparent 80%
     );
 
@@ -202,8 +202,8 @@
     height: 0;
     background: radial-gradient(
       circle,
-      rgba(var(--sn-gradient-primary-rgb), 0.3) 0%,
-      rgba(var(--sn-gradient-accent-rgb), 0.2) 30%,
+      rgba(var(--sn-bg-gradient-primary-rgb), 0.3) 0%,
+      rgba(var(--sn-bg-gradient-accent-rgb), 0.2) 30%,
       transparent 100%
     );
     border-radius: 50%;

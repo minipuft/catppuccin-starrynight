@@ -753,34 +753,34 @@
      Removal: Phase 6 (v4.0.0) */
   --sn-oklab-processed-dynamic-base-luminance: var(--sn-oklab-base-luminance);
   /* @deprecated Phase 3 - Use --sn-bg-gradient-primary-rgb instead
-     Usage: 48 occurrences across 13 files
-     Risk: 🔴 UNSAFE - CRITICAL USAGE
-     Migration: Phase 4 REQUIRED (incremental file-by-file)
-     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
+     Usage: 0 files (Phase 4 migration complete - was 48 occurrences across 7 files)
+     Risk: ✅ SAFE - Phase 4 migration complete
+     Migration: ✅ COMPLETE (2025-10-03)
+     Removal: Phase 6 (v4.0.0) */
   --sn-gradient-primary-rgb: var(--sn-bg-gradient-primary-rgb);
   /* @deprecated Phase 3 - Use --sn-bg-gradient-secondary-rgb instead
-     Usage: 27 occurrences across 13 files
-     Risk: 🔴 UNSAFE - CRITICAL USAGE
-     Migration: Phase 4 REQUIRED
-     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
+     Usage: 0 files (Phase 4 migration complete - was 27 occurrences across 7 files)
+     Risk: ✅ SAFE - Phase 4 migration complete
+     Migration: ✅ COMPLETE (2025-10-03)
+     Removal: Phase 6 (v4.0.0) */
   --sn-gradient-secondary-rgb: var(--sn-bg-gradient-secondary-rgb);
   /* @deprecated Phase 3 - Use --sn-bg-gradient-accent-rgb instead
-     Usage: 48 occurrences across 13 files
-     Risk: 🔴 UNSAFE - CRITICAL USAGE
-     Migration: Phase 4 REQUIRED
-     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
+     Usage: 0 files (Phase 4 migration complete - was 48 occurrences across 7 files)
+     Risk: ✅ SAFE - Phase 4 migration complete
+     Migration: ✅ COMPLETE (2025-10-03)
+     Removal: Phase 6 (v4.0.0) */
   --sn-gradient-accent-rgb: var(--sn-bg-gradient-accent-rgb);
   /* @deprecated Phase 3 - Use --sn-bg-gradient-flow-x instead
-     Usage: Multiple files
-     Risk: 🔴 UNSAFE
-     Migration: Phase 4 REQUIRED
-     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
+     Usage: 0 files (Phase 4 migration complete)
+     Risk: ✅ SAFE - Phase 4 migration complete
+     Migration: ✅ COMPLETE (2025-10-03)
+     Removal: Phase 6 (v4.0.0) */
   --sn-gradient-flow-x: var(--sn-bg-gradient-flow-x);
   /* @deprecated Phase 3 - Use --sn-bg-gradient-flow-y instead
-     Usage: Multiple files
-     Risk: 🔴 UNSAFE
-     Migration: Phase 4 REQUIRED
-     Removal: Phase 6 (v4.0.0) after Phase 4 complete */
+     Usage: 0 files (Phase 4 migration complete)
+     Risk: ✅ SAFE - Phase 4 migration complete
+     Migration: ✅ COMPLETE (2025-10-03)
+     Removal: Phase 6 (v4.0.0) */
   --sn-gradient-flow-y: var(--sn-bg-gradient-flow-y);
   /* @deprecated Phase 3 - Use --sn-bg-webgl-ready instead
      Usage: 0 files
@@ -793,9 +793,9 @@
      Removal: Phase 6 (v4.0.0) */
   --text-glow-intensity: var(--sn-text-glow-intensity);
   /* @deprecated Phase 3 - Use --sn-ui-glass-beat-opacity instead
-     Usage: 8 occurrences in 1 file (_beat_sync_glassmorphism.scss)
-     Risk: ✅ SAFE (single file migration)
-     Migration: Phase 4 target
+     Usage: 0 files (Phase 4 migration complete - was 6 occurrences in 1 file)
+     Risk: ✅ SAFE - Phase 4 migration complete
+     Migration: ✅ COMPLETE (2025-10-03)
      Removal: Phase 6 (v4.0.0) */
   --sn-glass-beat-opacity: var(--sn-ui-glass-beat-opacity);
   /* @deprecated Phase 3 - Use --sn-ui-card-energy-level instead
@@ -970,33 +970,33 @@
      Removal: Phase 6 (v4.0.0) */
   --serendipity-end-z: var(--sn-serendipity-end-z);
   /* @deprecated Phase 3 - Use --sn-oklab-primary-rgb instead
-     Usage: 5 occurrences in 5 files (_living_gradients, _translucent_overlays, etc.)
-     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
-     Migration: Phase 4 target
+     Usage: 0 files (Phase 4 migration complete - was 4 occurrences in 1 file)
+     Risk: ✅ SAFE - Phase 4 migration complete, Phase 5 consolidated
+     Migration: ✅ COMPLETE (2025-10-03)
      Removal: Phase 6 (v4.0.0) */
   --visual-effects-oklab-primary-rgb: var(--sn-oklab-primary-rgb);
   /* @deprecated Phase 3 - Use --sn-oklab-accent-rgb instead
-     Usage: 5 occurrences in 5 files
-     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
-     Migration: Phase 4 target
+     Usage: 0 files (Phase 4 migration complete - was 4 occurrences in 1 file)
+     Risk: ✅ SAFE - Phase 4 migration complete, Phase 5 consolidated
+     Migration: ✅ COMPLETE (2025-10-03)
      Removal: Phase 6 (v4.0.0) */
   --visual-effects-oklab-accent-rgb: var(--sn-oklab-accent-rgb);
   /* @deprecated Phase 3 - Use --sn-oklab-highlight-rgb instead
-     Usage: 2 occurrences
-     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
-     Migration: Phase 4 target
+     Usage: 0 files (Phase 4 migration complete - was 2 occurrences in 1 file)
+     Risk: ✅ SAFE - Phase 4 migration complete, Phase 5 consolidated
+     Migration: ✅ COMPLETE (2025-10-03)
      Removal: Phase 6 (v4.0.0) */
   --visual-effects-oklab-highlight-rgb: var(--sn-oklab-highlight-rgb);
   /* @deprecated Phase 3 - Use --sn-oklab-shadow-rgb instead
-     Usage: 1 occurrence
-     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
-     Migration: Phase 4 target
+     Usage: 0 files (Phase 4 migration complete - was 1 occurrence in 1 file)
+     Risk: ✅ SAFE - Phase 4 migration complete, Phase 5 consolidated
+     Migration: ✅ COMPLETE (2025-10-03)
      Removal: Phase 6 (v4.0.0) */
   --visual-effects-oklab-shadow-rgb: var(--sn-oklab-shadow-rgb);
   /* @deprecated Phase 3 - Use --sn-oklab-accent-luminance instead
-     Usage: 8 occurrences
-     Risk: 🟡 RISKY (Phase 5 consolidated, but SCSS still uses legacy)
-     Migration: Phase 4 target
+     Usage: 0 files (Phase 4 migration complete - was 8 occurrences in 1 file)
+     Risk: ✅ SAFE - Phase 4 migration complete, Phase 5 consolidated
+     Migration: ✅ COMPLETE (2025-10-03)
      Removal: Phase 6 (v4.0.0) */
   --visual-effects-oklab-luminance: var(--sn-oklab-accent-luminance);
   /* @deprecated Phase 3 - Literal value, consider using a semantic token
@@ -2956,7 +2956,7 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
   perspective: var(--card-perspective-field);
   transform-style: preserve-3d;
   position: relative;
-  background: linear-gradient(135deg, rgba(var(--visual-effects-oklab-primary-rgb), 0.6) 0%, rgba(var(--visual-effects-oklab-accent-rgb), 0.4) 100%);
+  background: linear-gradient(135deg, rgba(var(--sn-oklab-primary-rgb), 0.6) 0%, rgba(var(--sn-oklab-accent-rgb), 0.4) 100%);
   transform: translateZ(0);
   border-radius: var(--card-dynamic-corners);
   background: linear-gradient(calc(135deg + var(--card-rhythm-phase) * 2deg), rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), calc(0.05 + var(--card-beat-intensity) * 0.03)) 0%, rgba(var(--sn-accent-rgb, var(--spice-rgb-surface0)), calc(0.08 + var(--card-beat-intensity) * 0.04)) 50%, rgba(var(--sn-accent-rgb, var(--spice-rgb-surface1)), calc(0.03 + var(--card-beat-intensity) * 0.02)) 100%);
@@ -3052,7 +3052,7 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
   position: relative;
   overflow: visible;
   border-radius: 48% 52% 53% 47%/51% 49% 52% 48%;
-  background: radial-gradient(ellipse 90% 70% at 35% 45%, rgba(var(--sn-gradient-primary-rgb), calc(0.2 * 0.04)) 0%, transparent 80%), radial-gradient(ellipse 70% 85% at 65% 55%, rgba(var(--sn-gradient-accent-rgb), calc(0.2 * 0.03)) 0%, transparent 70%);
+  background: radial-gradient(ellipse 90% 70% at 35% 45%, rgba(var(--sn-bg-gradient-primary-rgb), calc(0.2 * 0.04)) 0%, transparent 80%), radial-gradient(ellipse 70% 85% at 65% 55%, rgba(var(--sn-bg-gradient-accent-rgb), calc(0.2 * 0.03)) 0%, transparent 70%);
   background-size: 250% 180%, 220% 250%;
   will-change: transform, opacity, filter;
   transform: translateZ(0);
@@ -3063,13 +3063,13 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
 }
 .Root[style*="--sn-music-beat-pulse-intensity"] .main-card-card {
   animation: fluid-awakening calc(15s * (2 - var(--sn-music-beat-pulse-intensity, 0))) ease-in-out infinite;
-  background: radial-gradient(ellipse 95% 75% at 30% 40%, rgba(var(--sn-gradient-primary-rgb), calc(0.2 * (0.04 + var(--sn-music-beat-pulse-intensity, 0) * 0.06))) 0%, transparent 75%), radial-gradient(ellipse 75% 90% at 70% 60%, rgba(var(--sn-gradient-accent-rgb), calc(0.2 * (0.03 + var(--sn-music-beat-pulse-intensity, 0) * 0.05))) 0%, transparent 65%);
+  background: radial-gradient(ellipse 95% 75% at 30% 40%, rgba(var(--sn-bg-gradient-primary-rgb), calc(0.2 * (0.04 + var(--sn-music-beat-pulse-intensity, 0) * 0.06))) 0%, transparent 75%), radial-gradient(ellipse 75% 90% at 70% 60%, rgba(var(--sn-bg-gradient-accent-rgb), calc(0.2 * (0.03 + var(--sn-music-beat-pulse-intensity, 0) * 0.05))) 0%, transparent 65%);
 }
 .main-card-card[data-testid*=artist] {
   position: relative;
   overflow: visible;
   border-radius: 48% 52% 53% 47%/51% 49% 52% 48%;
-  background: radial-gradient(ellipse 90% 70% at 35% 45%, rgba(var(--sn-gradient-primary-rgb), calc(0.3 * 0.04)) 0%, transparent 80%), radial-gradient(ellipse 70% 85% at 65% 55%, rgba(var(--sn-gradient-accent-rgb), calc(0.3 * 0.03)) 0%, transparent 70%);
+  background: radial-gradient(ellipse 90% 70% at 35% 45%, rgba(var(--sn-bg-gradient-primary-rgb), calc(0.3 * 0.04)) 0%, transparent 80%), radial-gradient(ellipse 70% 85% at 65% 55%, rgba(var(--sn-bg-gradient-accent-rgb), calc(0.3 * 0.03)) 0%, transparent 70%);
   background-size: 250% 180%, 220% 250%;
   will-change: transform, opacity, filter;
   transform: translateZ(0);
@@ -3080,7 +3080,7 @@ body:has(.main-entityHeader-container) .main-view-container .main-gridContainer-
 }
 .Root[style*="--sn-music-beat-pulse-intensity"] .main-card-card[data-testid*=artist] {
   animation: fluid-awakening calc(15s * (2 - var(--sn-music-beat-pulse-intensity, 0))) ease-in-out infinite;
-  background: radial-gradient(ellipse 95% 75% at 30% 40%, rgba(var(--sn-gradient-primary-rgb), calc(0.3 * (0.04 + var(--sn-music-beat-pulse-intensity, 0) * 0.06))) 0%, transparent 75%), radial-gradient(ellipse 75% 90% at 70% 60%, rgba(var(--sn-gradient-accent-rgb), calc(0.3 * (0.03 + var(--sn-music-beat-pulse-intensity, 0) * 0.05))) 0%, transparent 65%);
+  background: radial-gradient(ellipse 95% 75% at 30% 40%, rgba(var(--sn-bg-gradient-primary-rgb), calc(0.3 * (0.04 + var(--sn-music-beat-pulse-intensity, 0) * 0.06))) 0%, transparent 75%), radial-gradient(ellipse 75% 90% at 70% 60%, rgba(var(--sn-bg-gradient-accent-rgb), calc(0.3 * (0.03 + var(--sn-music-beat-pulse-intensity, 0) * 0.05))) 0%, transparent 65%);
 }
 
 .main-card-header {
@@ -7318,7 +7318,7 @@ body,
   opacity: calc(var(--visual-effects-musical-intensity, 0.8) * 0.8);
 }
 .living-gradient-perceptual-blend.musical-responsive {
-  background: linear-gradient(135deg, rgba(var(--visual-effects-oklab-primary-rgb), 0.8) 0%, rgba(var(--visual-effects-oklab-accent-rgb), 0.6) 100%);
+  background: linear-gradient(135deg, rgba(var(--sn-oklab-primary-rgb), 0.8) 0%, rgba(var(--sn-oklab-accent-rgb), 0.6) 100%);
   animation: visual-effects-oklab-breathing var(--visual-effects-breathing-duration, 4000ms) ease-in-out infinite, oklab-perceptual-gradient-flow calc(var(--visual-effects-breathing-duration, 4000ms) * 3) ease-in-out infinite;
 }
 
@@ -7546,7 +7546,7 @@ html[data-visual-effects-level=high] {
 html[style*="--visual-effects-intensity-global: 1"] .Root__main-view::before,
 html[data-visual-effects-level=high] .Root__main-view::before {
   /* OKLAB-enhanced high visual effects intensity with perceptual uniformity */
-  filter: saturate(calc(1.2 + var(--visual-effects-oklab-chroma) * 0.4)) brightness(calc(1.1 * var(--visual-effects-oklab-luminance))) contrast(calc(1.1 + var(--visual-effects-oklab-chroma) * 0.2)) hue-rotate(calc(var(--visual-effects-music-energy) * var(--visual-effects-oklab-hue) * 0.03deg));
+  filter: saturate(calc(1.2 + var(--visual-effects-oklab-chroma) * 0.4)) brightness(calc(1.1 * var(--sn-oklab-accent-luminance))) contrast(calc(1.1 + var(--visual-effects-oklab-chroma) * 0.2)) hue-rotate(calc(var(--visual-effects-music-energy) * var(--visual-effects-oklab-hue) * 0.03deg));
 }
 
 /* Medium visual effects intensity - balanced living base */
@@ -7577,7 +7577,7 @@ html[style*="--visual-effects-music-energy: 1"] {
 html[style*="--visual-effects-music-energy: 1"] .Root__main-view::before {
   animation-duration: 2000ms, 4000ms; /* Faster animations */
   /* OKLAB-enhanced high energy music with perceptual color processing */
-  filter: saturate(calc(1 + var(--visual-effects-music-energy) * var(--visual-effects-oklab-chroma) * 0.5)) brightness(calc(1 + var(--visual-effects-music-energy) * var(--visual-effects-oklab-luminance) * 0.3)) contrast(calc(1 + var(--visual-effects-music-energy) * var(--visual-effects-oklab-chroma) * 0.3)) hue-rotate(calc(var(--visual-effects-music-energy) * var(--visual-effects-oklab-hue) * 0.02deg));
+  filter: saturate(calc(1 + var(--visual-effects-music-energy) * var(--visual-effects-oklab-chroma) * 0.5)) brightness(calc(1 + var(--visual-effects-music-energy) * var(--sn-oklab-accent-luminance) * 0.3)) contrast(calc(1 + var(--visual-effects-music-energy) * var(--visual-effects-oklab-chroma) * 0.3)) hue-rotate(calc(var(--visual-effects-music-energy) * var(--visual-effects-oklab-hue) * 0.02deg));
 }
 
 /* Low energy music - calm living base */
@@ -7646,9 +7646,9 @@ html[style*="--visual-effects-music-energy: 0"] .Root__main-view::before {
 }
 .living-base-enhanced .Root__main-view::before {
   /* OKLAB-enhanced dramatic visual effects with perceptual uniformity */
-  filter: saturate(calc(1.3 + var(--visual-effects-oklab-chroma) * 0.5)) brightness(calc(1.2 * var(--visual-effects-oklab-luminance))) contrast(calc(1.2 + var(--visual-effects-oklab-chroma) * 0.3)) hue-rotate(calc(var(--visual-effects-music-energy) * var(--visual-effects-oklab-hue) * 0.04deg)) !important;
+  filter: saturate(calc(1.3 + var(--visual-effects-oklab-chroma) * 0.5)) brightness(calc(1.2 * var(--sn-oklab-accent-luminance))) contrast(calc(1.2 + var(--visual-effects-oklab-chroma) * 0.3)) hue-rotate(calc(var(--visual-effects-music-energy) * var(--visual-effects-oklab-hue) * 0.04deg)) !important;
   /* Enhanced OKLAB-based background for dramatic effect */
-  background: radial-gradient(ellipse at center, rgba(var(--visual-effects-oklab-primary-rgb), calc(0.15 * var(--visual-effects-oklab-luminance))) 0%, rgba(var(--visual-effects-oklab-accent-rgb), calc(0.12 * var(--visual-effects-oklab-chroma))) 30%, rgba(var(--visual-effects-oklab-highlight-rgb), calc(0.08 * var(--visual-effects-oklab-luminance))) 60%, rgba(var(--visual-effects-oklab-shadow-rgb), 0.03) 85%, var(--spice-base) 100%) !important;
+  background: radial-gradient(ellipse at center, rgba(var(--sn-oklab-primary-rgb), calc(0.15 * var(--sn-oklab-accent-luminance))) 0%, rgba(var(--sn-oklab-accent-rgb), calc(0.12 * var(--visual-effects-oklab-chroma))) 30%, rgba(var(--sn-oklab-highlight-rgb), calc(0.08 * var(--sn-oklab-accent-luminance))) 60%, rgba(var(--sn-oklab-shadow-rgb), 0.03) 85%, var(--spice-base) 100%) !important;
 }
 
 /* Minimal living base for content focus */
@@ -7665,17 +7665,17 @@ html[style*="--visual-effects-music-energy: 0"] .Root__main-view::before {
 /* ============================================================================ */
 /* Development mode - show OKLAB-enhanced visual effects boundaries */
 html[data-debug=true] .Root__main-view::before {
-  outline: 1px dashed rgba(var(--visual-effects-oklab-primary-rgb), calc(0.3 * var(--visual-effects-oklab-chroma)));
+  outline: 1px dashed rgba(var(--sn-oklab-primary-rgb), calc(0.3 * var(--visual-effects-oklab-chroma)));
 }
 html[data-debug=true] .Root__main-view::after {
-  outline: 1px dashed rgba(var(--visual-effects-oklab-accent-rgb), calc(0.2 * var(--visual-effects-oklab-luminance)));
+  outline: 1px dashed rgba(var(--sn-oklab-accent-rgb), calc(0.2 * var(--sn-oklab-accent-luminance)));
 }
 
 /* OKLAB-enhanced visual effects visualization for debugging */
 .visual-effects-debug .Root__main-view::before {
-  background: var(--living-base-gradient), radial-gradient(circle at 50% 50%, rgba(var(--visual-effects-oklab-primary-rgb), calc(0.15 * var(--visual-effects-oklab-chroma))) 0%, rgba(var(--visual-effects-oklab-accent-rgb), calc(0.1 * var(--visual-effects-oklab-luminance))) 25%, rgba(var(--visual-effects-oklab-highlight-rgb), calc(0.05 * var(--visual-effects-oklab-chroma))) 50%, transparent 75%);
+  background: var(--living-base-gradient), radial-gradient(circle at 50% 50%, rgba(var(--sn-oklab-primary-rgb), calc(0.15 * var(--visual-effects-oklab-chroma))) 0%, rgba(var(--sn-oklab-accent-rgb), calc(0.1 * var(--sn-oklab-accent-luminance))) 25%, rgba(var(--sn-oklab-highlight-rgb), calc(0.05 * var(--visual-effects-oklab-chroma))) 50%, transparent 75%);
   /* OKLAB-enhanced debug filter */
-  filter: saturate(calc(1.5 + var(--visual-effects-oklab-chroma))) brightness(calc(1.3 * var(--visual-effects-oklab-luminance))) hue-rotate(calc(var(--visual-effects-oklab-hue) * 0.05deg));
+  filter: saturate(calc(1.5 + var(--visual-effects-oklab-chroma))) brightness(calc(1.3 * var(--sn-oklab-accent-luminance))) hue-rotate(calc(var(--visual-effects-oklab-hue) * 0.05deg));
 }
 
 /* ============================================================================ */
@@ -8406,7 +8406,7 @@ input[type=search]:focus,
   --color-enhancement-saturation: 1.2;
   --color-enhancement-brightness: 1.1;
   --color-enhancement-opacity: 0.1;
-  --sn-glass-beat-opacity: calc(
+  --sn-ui-glass-beat-opacity: calc(
     var(--color-enhancement-opacity) *
       (1 + var(--sn-music-beat-pulse-intensity, 0) * var(--sn-ui-glass-pulse-enabled) * 0.5)
   );
@@ -8446,7 +8446,7 @@ input[type=search]:focus,
   --sn-glass-energy-pulse: calc(0.8 + var(--sn-music-beat-pulse-intensity, 0) * var(--sn-ui-glass-pulse-enabled) * 0.4);
   --enhanced-background: rgba(
     var(--spice-rgb-surface0),
-    var(--sn-glass-beat-opacity)
+    var(--sn-ui-glass-beat-opacity)
   );
   --enhanced-border: rgba(
     var(--spice-rgb-surface1),
@@ -8480,7 +8480,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar::after,
 @media (max-width: 768px) {
   div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar,
   .Root__nav-bar {
-    --sn-glass-beat-opacity: calc(
+    --sn-ui-glass-beat-opacity: calc(
       0.12 * (1 + var(--sn-music-beat-pulse-intensity, 0) * 0.3)
     );
   }
@@ -8576,7 +8576,7 @@ div.Root__right-sidebar[data-testid=right-sidebar],
 }
 @media (prefers-contrast: high) {
   :root {
-    --sn-glass-beat-opacity: calc(
+    --sn-ui-glass-beat-opacity: calc(
       0.25 * (1 + var(--sn-music-beat-pulse-intensity, 0) * 0.3)
     );
     --enhanced-border: rgba(var(--spice-rgb-text), 0.4);
@@ -8589,7 +8589,7 @@ div.Root__right-sidebar[data-testid=right-sidebar],
 }
 @media (max-width: 768px) {
   :root {
-    --sn-glass-beat-opacity: calc(
+    --sn-ui-glass-beat-opacity: calc(
       0.08 * (1 + var(--sn-music-beat-pulse-intensity, 0) * 0.2)
     );
     --sn-glass-cosmic-blur: calc(var(--sn-music-beat-pulse-intensity, 0) * 2px);
@@ -8598,7 +8598,7 @@ div.Root__right-sidebar[data-testid=right-sidebar],
     );
   }
   .sn-glass-intense {
-    --sn-glass-beat-opacity: calc(
+    --sn-ui-glass-beat-opacity: calc(
       0.12 * (1 + var(--sn-music-beat-pulse-intensity, 0) * 0.2)
     );
   }
@@ -10141,7 +10141,7 @@ h3,
   }
   .main-nowPlayingBar-trackInfo strong,
   .main-cardHeader-cardHeaderTitle {
-    background: linear-gradient(45deg, rgba(var(--sn-gradient-primary-rgb), 1) 0%, rgba(var(--sn-gradient-accent-rgb), 1) 50%, rgba(var(--sn-gradient-secondary-rgb), 1) 100%);
+    background: linear-gradient(45deg, rgba(var(--sn-bg-gradient-primary-rgb), 1) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 1) 50%, rgba(var(--sn-bg-gradient-secondary-rgb), 1) 100%);
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
@@ -10283,7 +10283,7 @@ h3,
   --local-lift-distance: 4px;
   --local-hover-scale: 1.05;
   --local-hover-glow: 0.4;
-  --ripple-color: rgba(var(--sn-gradient-primary-rgb), 0.4);
+  --ripple-color: rgba(var(--sn-bg-gradient-primary-rgb), 0.4);
 }
 .main-playButton-PlayButton.main-playButton-PlayButton:hover,
 .main-skipBackButton-button.main-playButton-PlayButton:hover,
@@ -10417,7 +10417,7 @@ h3,
   --local-lift-distance: var(--hover-lift-distance);
   --local-hover-scale: var(--hover-scale-factor);
   --local-hover-glow: var(--hover-glow-intensity);
-  --ripple-color: rgba(var(--sn-gradient-primary-rgb), 0.3);
+  --ripple-color: rgba(var(--sn-bg-gradient-primary-rgb), 0.3);
 }
 .main-trackList-trackListRow.main-trackList-selected:hover, .main-trackList-trackListRow.main-trackList-selected:focus, .main-trackList-trackListRow:has(.main-trackList-playingIcon):hover, .main-trackList-trackListRow:has(.main-trackList-playingIcon):focus {
   animation-duration: calc(var(--living-pulse-speed, 4s) * 0.7);
@@ -10562,7 +10562,7 @@ input[type=text]:focus,
 input[type=search]:focus,
 .x-filterBox-filterInput:focus,
 .main-dropDown-dropDown:focus {
-  border-color: rgba(var(--sn-gradient-accent-rgb), 0.6);
+  border-color: rgba(var(--sn-bg-gradient-accent-rgb), 0.6);
 }
 
 .main-contextMenu-menu .main-contextMenu-menuItemButton {
@@ -10615,7 +10615,7 @@ input[type=search]:focus,
   input:focus,
   button:focus {
     animation: none !important;
-    box-shadow: 0 0 0 2px rgba(var(--sn-gradient-accent-rgb), 0.6) !important;
+    box-shadow: 0 0 0 2px rgba(var(--sn-bg-gradient-accent-rgb), 0.6) !important;
   }
 }
 @media (max-width: 768px) {
@@ -11309,7 +11309,7 @@ input[type=search]:focus,
   left: 50%;
   width: 0;
   height: 0;
-  background: radial-gradient(circle, rgba(var(--sn-gradient-primary-rgb), 0.3) 0%, rgba(var(--sn-gradient-accent-rgb), 0.2) 30%, transparent 100%);
+  background: radial-gradient(circle, rgba(var(--sn-bg-gradient-primary-rgb), 0.3) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 0.2) 30%, transparent 100%);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
@@ -11335,7 +11335,7 @@ input[type=search]:focus,
   left: 50%;
   width: 0;
   height: 0;
-  background: radial-gradient(circle, rgba(var(--sn-gradient-primary-rgb), 0.3) 0%, rgba(var(--sn-gradient-accent-rgb), 0.2) 30%, transparent 100%);
+  background: radial-gradient(circle, rgba(var(--sn-bg-gradient-primary-rgb), 0.3) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 0.2) 30%, transparent 100%);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
@@ -11365,7 +11365,7 @@ input[type=search]:focus,
   left: 50%;
   width: 0;
   height: 0;
-  background: radial-gradient(circle, rgba(var(--sn-gradient-primary-rgb), 0.3) 0%, rgba(var(--sn-gradient-accent-rgb), 0.2) 30%, transparent 100%);
+  background: radial-gradient(circle, rgba(var(--sn-bg-gradient-primary-rgb), 0.3) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 0.2) 30%, transparent 100%);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
@@ -11399,7 +11399,7 @@ input[type=search]:focus,
   left: 50%;
   width: 0;
   height: 0;
-  background: radial-gradient(circle, rgba(var(--sn-gradient-primary-rgb), 0.3) 0%, rgba(var(--sn-gradient-accent-rgb), 0.2) 30%, transparent 100%);
+  background: radial-gradient(circle, rgba(var(--sn-bg-gradient-primary-rgb), 0.3) 0%, rgba(var(--sn-bg-gradient-accent-rgb), 0.2) 30%, transparent 100%);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
@@ -13067,7 +13067,7 @@ div[data-testid=Desktop_LeftSidebar_Id].Root__nav-bar.sn-music-high-energy,
   height: 120%;
   z-index: -6;
   pointer-events: none;
-  background: radial-gradient(ellipse 100% 60% at 20% 30%, rgba(var(--sn-gradient-primary-rgb), var(--aurora-layer-1-intensity)) 0%, transparent 70%), radial-gradient(ellipse 80% 90% at 80% 60%, rgba(var(--sn-gradient-secondary-rgb), var(--aurora-layer-2-intensity)) 0%, transparent 60%), radial-gradient(ellipse 120% 50% at 50% 90%, rgba(var(--sn-gradient-accent-rgb), var(--aurora-layer-3-intensity)) 0%, transparent 80%);
+  background: radial-gradient(ellipse 100% 60% at 20% 30%, rgba(var(--sn-bg-gradient-primary-rgb), var(--aurora-layer-1-intensity)) 0%, transparent 70%), radial-gradient(ellipse 80% 90% at 80% 60%, rgba(var(--sn-bg-gradient-secondary-rgb), var(--aurora-layer-2-intensity)) 0%, transparent 60%), radial-gradient(ellipse 120% 50% at 50% 90%, rgba(var(--sn-bg-gradient-accent-rgb), var(--aurora-layer-3-intensity)) 0%, transparent 80%);
   background-size: 300% 300%, 250% 400%, 400% 200%;
   animation: aurora-background-flow var(--aurora-flow-speed) ease-in-out infinite;
   filter: blur(60px);

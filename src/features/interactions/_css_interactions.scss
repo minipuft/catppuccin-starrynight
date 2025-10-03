@@ -52,7 +52,7 @@
   // Special treatment for main play button
   &.main-playButton-PlayButton {
     @include css-hover-lift(strong);
-    --ripple-color: rgba(var(--sn-gradient-primary-rgb), 0.4);
+    --ripple-color: rgba(var(--sn-bg-gradient-primary-rgb), 0.4);
   }
 }
 
@@ -81,7 +81,7 @@
   &:has(.main-trackList-playingIcon) {
     @include css-musical-interaction();
     @include css-hover-lift(normal);
-    --ripple-color: rgba(var(--sn-gradient-primary-rgb), 0.3);
+    --ripple-color: rgba(var(--sn-bg-gradient-primary-rgb), 0.3);
   }
 }
 
@@ -114,7 +114,7 @@ input[type="search"],
     box-shadow var(--focus-flow-duration) ease-out;
     
   &:focus {
-    border-color: rgba(var(--sn-gradient-accent-rgb), 0.6);
+    border-color: rgba(var(--sn-bg-gradient-accent-rgb), 0.6);
   }
 }
 
@@ -150,7 +150,7 @@ input[type="search"],
   input:focus,
   button:focus {
     animation: none !important;
-    box-shadow: 0 0 0 2px rgba(var(--sn-gradient-accent-rgb), 0.6) !important;
+    box-shadow: 0 0 0 2px rgba(var(--sn-bg-gradient-accent-rgb), 0.6) !important;
   }
 }
 

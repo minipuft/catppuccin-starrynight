@@ -161,9 +161,9 @@ h3,
   .main-cardHeader-cardHeaderTitle {
     background: linear-gradient(
       45deg,
-      rgba(var(--sn-gradient-primary-rgb), 1) 0%,
-      rgba(var(--sn-gradient-accent-rgb), 1) 50%,
-      rgba(var(--sn-gradient-secondary-rgb), 1) 100%
+      rgba(var(--sn-bg-gradient-primary-rgb), 1) 0%,
+      rgba(var(--sn-bg-gradient-accent-rgb), 1) 50%,
+      rgba(var(--sn-bg-gradient-secondary-rgb), 1) 100%
     );
     background-clip: text;
     -webkit-background-clip: text;
