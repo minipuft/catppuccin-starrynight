@@ -159,9 +159,9 @@
   --zoom-breathing-rhythm: 8s;
 
   // === Music Responsiveness ===
-  --music-cosmic-expansion: calc(var(--sn-beat-pulse-intensity, 0) * 0.3 + 1);
-  --music-stellar-intensity: calc(var(--sn-beat-pulse-intensity, 0) * 0.6 + 0.4);
-  --music-galactic-rotation: calc(2 - var(--sn-beat-pulse-intensity, 0));
+  --music-cosmic-expansion: calc(var(--sn-music-beat-pulse-intensity, 0) * 0.3 + 1);
+  --music-stellar-intensity: calc(var(--sn-music-beat-pulse-intensity, 0) * 0.6 + 0.4);
+  --music-galactic-rotation: calc(2 - var(--sn-music-beat-pulse-intensity, 0));
   --music-depth-perception: calc(var(--sn-music-energy, 0.5) * 1000px + 500px);
 }
 
@@ -746,13 +746,13 @@
   }
 
   // === MUSIC-RESPONSIVE COSMIC AMPLIFICATION ===
-  .Root[style*="--sn-beat-pulse-intensity"] {
-    --music-cosmic-expansion: calc(var(--sn-beat-pulse-intensity, 0) * 0.4 + 1);
+  .Root[style*="--sn-music-beat-pulse-intensity"] {
+    --music-cosmic-expansion: calc(var(--sn-music-beat-pulse-intensity, 0) * 0.4 + 1);
     --music-stellar-intensity: calc(
-      var(--sn-beat-pulse-intensity, 0) * 0.8 + 0.4
+      var(--sn-music-beat-pulse-intensity, 0) * 0.8 + 0.4
     );
     --music-galactic-rotation: calc(
-      2 - var(--sn-beat-pulse-intensity, 0) * 1.5
+      2 - var(--sn-music-beat-pulse-intensity, 0) * 1.5
     );
 
     &::before,
@@ -769,8 +769,8 @@
     .main-navBar-navBar {
       &::before,
       &::after {
-        filter: brightness(calc(1 + var(--sn-beat-pulse-intensity, 0) * 0.3))
-          saturate(calc(1.2 + var(--sn-beat-pulse-intensity, 0) * 0.4));
+        filter: brightness(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.3))
+          saturate(calc(1.2 + var(--sn-music-beat-pulse-intensity, 0) * 0.4));
       }
     }
   }
@@ -778,7 +778,7 @@
   .Root[style*="--sn-dynamic-genre-hue-shift"] {
     --visual-flow-angle: calc(
       var(--sn-dynamic-genre-hue-shift, 0deg) +
-        var(--sn-rhythm-phase, 0) * 180deg
+        var(--sn-music-rhythm-phase, 0) * 180deg
     );
 
     &::before {
@@ -876,7 +876,7 @@
       --galaxy-core-brightness: 1.2;
       --galaxy-outer-dimness: 0.4;
       --music-stellar-intensity: calc(
-        var(--sn-beat-pulse-intensity, 0) * 1 + 0.6
+        var(--sn-music-beat-pulse-intensity, 0) * 1 + 0.6
       );
     }
 
