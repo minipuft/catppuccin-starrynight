@@ -14,7 +14,7 @@ import type {
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+import { settings } from "@/config";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 // IManagedSystem interface (inline definition for now)
 interface IManagedSystem {
@@ -197,7 +197,7 @@ export class HolographicUISystem
   private holographicPreset: EnhancementPreset;
   private lastMusicalContext: any = null;
   private eventSubscriptionIds: string[] = [];
-  private settingsManager: SettingsManager;
+  // REMOVED: private settingsManager: SettingsManager; // Migrated to TypedSettingsManager singleton via typed settings
   private musicSyncService: MusicSyncService;
 
   // User interaction tracking for content-aware effects
@@ -238,11 +238,11 @@ export class HolographicUISystem
 
   constructor(
     manager: VisualEffectsManager,
-    settingsManager?: SettingsManager,
+    // NOTE: settingsManager parameter removed - using typed settings directly
     musicSyncService?: MusicSyncService
   ) {
     this.manager = manager;
-    this.settingsManager = settingsManager || new SettingsManager();
+    // NOTE: settingsManager assignment removed - using typed settings directly
     this.musicSyncService = musicSyncService || new MusicSyncService();
 
     // Initialize OKLAB components

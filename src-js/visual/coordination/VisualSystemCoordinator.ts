@@ -56,7 +56,7 @@ import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerforman
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { VisualEffectsManager } from "@/types/colorStubs";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+import { settings } from "@/config";
 import * as Utils from "@/utils/core/ThemeUtilities";
 
 // Visual System imports
@@ -200,7 +200,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
   private cssVariableController: OptimizedCSSVariableManager;
   private performanceAnalyzer: SimplePerformanceCoordinator;
   private musicSyncService: MusicSyncService;
-  private settingsManager: SettingsManager;
+  // REMOVED: private settingsManager: SettingsManager; // Migrated to TypedSettingsManager singleton via typed settings
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
   private eventBus: any = null; // EventBus when available
   private animationCoordinator: EnhancedMasterAnimationCoordinator | null = null;
@@ -249,7 +249,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     cssVariableController: OptimizedCSSVariableManager,
     performanceAnalyzer: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService,
-    settingsManager: SettingsManager,
+    // NOTE: settingsManager parameter removed - using typed settings directly
     colorHarmonyEngine?: ColorHarmonyEngine,
     eventBus?: any,
     animationCoordinator?: EnhancedMasterAnimationCoordinator
@@ -260,7 +260,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     this.cssVariableController = cssVariableController;
     this.performanceAnalyzer = performanceAnalyzer;
     this.musicSyncService = musicSyncService;
-    this.settingsManager = settingsManager;
+    // NOTE: settingsManager assignment removed - using typed settings directly
     this.colorHarmonyEngine = colorHarmonyEngine || null;
     this.eventBus = eventBus || null;
     this.animationCoordinator = animationCoordinator || null;
@@ -579,11 +579,10 @@ export class VisualSystemCoordinator implements IManagedSystem {
     ) {
       // Create visual effects manager for holographic UI system
       const biologicalManager = new VisualEffectsManager();
-      
-      // Create holographic UI system for visual effects integration
+
+      // Create holographic UI system for visual effects integration (settingsManager removed - using typed settings)
       const holographicSystem = new HolographicUISystem(
         biologicalManager,
-        this.settingsManager,
         this.musicSyncService
       );
       
@@ -596,13 +595,12 @@ export class VisualSystemCoordinator implements IManagedSystem {
       return system;
     }
 
-    // Standard 6-parameter constructor for legacy systems
+    // Standard 5-parameter constructor for legacy systems (settingsManager removed - using typed settings)
     const system = new SystemClass(
       this.config,
       this.utils,
       this.performanceAnalyzer,
       this.musicSyncService,
-      this.settingsManager,
       this.year3000System
     ) as T;
 
@@ -1152,7 +1150,8 @@ export class VisualSystemCoordinator implements IManagedSystem {
   }
 
   private subscribeToEvents(): void {
-    if (this.settingsManager && this.boundSettingsHandler) {
+    // NOTE: settingsManager check removed - using typed settings directly
+    if (this.boundSettingsHandler) {
       document.addEventListener(
         "year3000SystemSettingsChanged",
         this.boundSettingsHandler

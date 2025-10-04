@@ -14,6 +14,7 @@
 // Phase 8.3: Atmospheric depth effects (activated crystals, archived glyphs + glyph variables, 227 lines eliminated)
 // Phase 8.4: Card visual accents consolidation (_sn_visual_accents → _sn_enhanced_cards, single source of truth)
 // Phase Card: Card system consolidation (_sn_card_non_search → _sn_enhanced_cards, 431 lines eliminated, technical naming)
+// Phase Top Bar: Top bar consolidation (_top_bar_enhanced → _top_bar, 331 lines eliminated, glassmorphism + header variables integrated)
 // ████████████████████████████████████████████████████████████████████████████████
 
 // === LAYER 1: FOUNDATION (Load Order Critical) ===
@@ -42,9 +43,8 @@
 // Layout modules - structural positioning and containers
 // Note: Sidebar files in ../sidebar/ for domain cohesion, imported here for layer ordering
 @use "../layout/_main_view_container" as *;
-@use "../sidebar/_navbar" as *; // MOVED: Domain-based organization (Phase 7.8)
-@use "../layout/_top_bar" as *;
-@use "../layout/_top_bar_enhanced" as *;
+// CONSOLIDATED: _navbar → _sidebar_interactive using kinetic verb mixins (Phase: Navbar Consolidation, 144 lines eliminated)
+@use "../layout/_top_bar" as *; // CONSOLIDATED: Integrated glassmorphism from _top_bar_enhanced (Phase: Top Bar Consolidation)
 @use "../layout/_action_bar_unified" as *; // CONSOLIDATED: Was _action_bar_enhanced + _sn_header_actionBar
 // @use "../layout/_sn_sidebar_navigation" as *; // ✅ CONSOLIDATED into ../sidebar/_sidebar_interactive.scss (Phase 7.8)
 @use "../sidebar/_right_sidebar" as *; // MOVED: Domain-based organization (Phase 7.8)

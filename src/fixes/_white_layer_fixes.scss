@@ -26,7 +26,7 @@
 /* Fix screen blend mode white bleeding */
 .sn-screen-blend-fix {
   /* Limit screen blend mode usage - only for background layers, not UI */
-  [style*="mix-blend-mode: screen"]:not(.main-card-card):not(.main-trackList-trackListRow) {
+  [style*="mix-blend-mode: screen"]:not(.main-card-card):not(.main-card-cardContainer):not(.main-trackList-trackListRow) {
     &:not(:first-of-type) {
       mix-blend-mode: overlay;
       opacity: 0.8;
@@ -54,7 +54,7 @@
   /* Ensure backdrop filters don't create white layers - scoped to backgrounds */
   .sn-depth-background-container [style*="backdrop-filter"],
   .sn-cosmic-ambient-layer [style*="backdrop-filter"] {
-    &:not(.main-card-card):not(.main-button-primary) {
+    &:not(.main-card-card):not(.main-card-cardContainer):not(.main-button-primary) {
       background: transparent;
 
       &::before {

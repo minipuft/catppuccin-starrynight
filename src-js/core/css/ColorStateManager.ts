@@ -9,9 +9,9 @@
  * @performance Efficient CSS variable batching with change detection
  */
 
+import { settings } from '@/config';
 import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from '@/core/performance/OptimizedCSSVariableManager';
-import { SettingsManager } from '@/ui/managers/SettingsManager';
 import type { IManagedSystem, HealthCheckResult } from '@/types/systems';
 import {
   paletteSystemManager,
@@ -83,19 +83,18 @@ export interface ColorStateEvents {
 
 export class ColorStateManager implements IManagedSystem {
   public initialized = false;
-  private settingsManager: SettingsManager | null = null;
   private currentState: ColorStateResult | null = null;
   private isUpdating = false;
-  
+
   // 🔧 PHASE 2: CSS Authority Consolidation - Single Optimized Controller
   private cssController!: OptimizedCSSVariableManager;
-  
+
   // Performance tracking
   private updateCount = 0;
   private lastUpdateTime = 0;
-  
-  constructor(settingsManager?: SettingsManager) {
-    this.settingsManager = settingsManager || null;
+
+  constructor() {
+    // No settingsManager needed - using typed settings
   }
 
   public async initialize(): Promise<void> {
@@ -120,16 +119,8 @@ export class ColorStateManager implements IManagedSystem {
     // 🔧 PHASE 2: Subscribe to CSS variable events from other systems
     unifiedEventBus.subscribe('system:css-variables' as any, this.handleSystemCSSVariables.bind(this), 'ColorStateManager');
 
-    // Get settings manager if not provided
-    if (!this.settingsManager) {
-      this.settingsManager = (globalThis as any).__SN_settingsManager || 
-                             (globalThis as any).Y3K?.system?.settingsManager;
-    }
-
-    if (this.settingsManager) {
-      // Apply initial color state
-      await this.applyInitialColorState();
-    }
+    // Apply initial color state using typed settings
+    await this.applyInitialColorState();
 
     this.initialized = true;
     console.log('🎨 [ColorStateManager] Initialized successfully');
@@ -137,11 +128,7 @@ export class ColorStateManager implements IManagedSystem {
 
   public async healthCheck(): Promise<HealthCheckResult> {
     const issues: string[] = [];
-    
-    if (!this.settingsManager) {
-      issues.push('SettingsManager not available');
-    }
-    
+
     if (!this.currentState) {
       issues.push('No current color state');
     }
@@ -181,26 +168,14 @@ export class ColorStateManager implements IManagedSystem {
    * Get current color state configuration from settings
    */
   private getCurrentConfig(): ColorStateConfig {
-    if (!this.settingsManager) {
-      // Fallback to safe defaults using current palette system
-      const defaultFlavor = paletteSystemManager.getCurrentDefaultFlavor();
-      return {
-        paletteSystemFlavor: defaultFlavor,
-        brightnessMode: 'balanced', // Balanced default provides natural color experience
-        accentColor: 'mauve' as UnifiedColorName,
-        preserveAlbumArt: true,
-        enableTransitions: true
-      };
-    }
-
     // Get the current flavor from settings, or use palette system default
-    const settingsFlavor = this.settingsManager.get('catppuccin-flavor');
+    const settingsFlavor = settings.get('catppuccin-flavor');
     const currentFlavor = settingsFlavor as UnifiedFlavor || paletteSystemManager.getCurrentDefaultFlavor();
 
     return {
       paletteSystemFlavor: currentFlavor,
-      brightnessMode: this.settingsManager.get('sn-brightness-mode') as 'bright' | 'balanced' | 'dark',
-      accentColor: this.settingsManager.get('catppuccin-accentColor') as UnifiedColorName | 'dynamic',
+      brightnessMode: settings.get('sn-brightness-mode') as 'bright' | 'balanced' | 'dark',
+      accentColor: settings.get('catppuccin-accentColor') as UnifiedColorName | 'dynamic',
       preserveAlbumArt: true, // TODO: Add setting for this
       enableTransitions: true
     };

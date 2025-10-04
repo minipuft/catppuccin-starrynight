@@ -238,7 +238,7 @@ export class NonVisualSystemFacadeAdapter implements IFacadeAdapter {
       // Simple systems with no dependencies
       case "DeviceCapabilityDetector":
       case "PerformanceAnalyzer":
-      case "SettingsManager":
+      // NOTE: "SettingsManager" removed - using TypedSettingsManager singleton
       case "TimerConsolidationSystem":
         return new SystemClass() as T;
 

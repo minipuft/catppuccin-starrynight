@@ -54,8 +54,14 @@
     @return rgba(var(--sn-bg-gradient-primary-rgb, 128, 128, 128), $opacity);
   } @else if $token == 'secondary' {
     @return rgba(var(--sn-bg-gradient-secondary-rgb, 96, 96, 96), $opacity);
+  } @else if $token == 'complementary' {
+    @return rgba(var(--sn-color-harmony-complementary-rgb, 128, 128, 128), $opacity);
+  } @else if $token == 'analogous' {
+    @return rgba(var(--sn-color-harmony-analogous-rgb, 128, 128, 128), $opacity);
+  } @else if $token == 'triadic' {
+    @return rgba(var(--sn-color-harmony-triadic-rgb, 128, 128, 128), $opacity);
   } @else {
-    @warn "Unknown OKLAB token: #{$token}. Valid tokens: 'shadow', 'highlight', 'accent', 'primary', 'secondary'";
+    @warn "Unknown OKLAB token: #{$token}. Valid tokens: 'shadow', 'highlight', 'accent', 'primary', 'secondary', 'complementary', 'analogous', 'triadic'";
     @return rgba(0, 0, 0, $opacity);
   }
 }

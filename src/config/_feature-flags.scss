@@ -25,12 +25,12 @@ $cosmic-depth-system: true;
 // File: src/features/backgrounds/_particle_animation_system.scss
 // Impact: High GPU load, animated particle fields
 // Disable for: Low-end devices, performance issues
-$particle-animation-system: true;
+$particle-animation-system: false;
 
 // File: src/features/backgrounds/_atmospheric_crystals.scss
 // Impact: Medium GPU load, crystalline depth effects
 // Disable for: Performance optimization
-$atmospheric-crystals: true;
+$atmospheric-crystals: false;
 
 // File: src/features/backgrounds/_grid_navigation_mode.scss
 // Impact: Low, navigation visualization

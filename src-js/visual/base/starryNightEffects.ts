@@ -1,4 +1,4 @@
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+import { settings } from "@/config";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 
 type EffectIntensity = "disabled" | "minimal" | "balanced" | "intense";
@@ -42,9 +42,9 @@ function createShootingStar(): void {
 
 function startShootingStars(): number {
   return window.setInterval(() => {
-    // Now reads consolidated gradient intensity setting
+    // Now reads consolidated gradient intensity setting (using typed settings singleton)
     const effectSetting =
-      getSettingsManager().get("sn-gradient-intensity") ?? "balanced";
+      settings.get("sn-gradient-intensity") ?? "balanced";
     if (effectSetting !== "disabled" && Math.random() < 0.3) {
       createShootingStar();
     }
@@ -96,22 +96,7 @@ function applyStarryNightSettings(
   }
 }
 
-// Unified accessor – mirrors helper used by StarryNightSettings.ts
-function getSettingsManager(): SettingsManager {
-  const existing = (window as any).Y3K?.system?.settingsManager as
-    | SettingsManager
-    | undefined;
-  if (existing) return existing;
-
-  const cached = (globalThis as any).__SN_settingsManager as
-    | SettingsManager
-    | undefined;
-  if (cached) return cached;
-
-  const manager = new SettingsManager();
-  (globalThis as any).__SN_settingsManager = manager;
-  return manager;
-}
+// NOTE: getSettingsManager() removed - now using TypedSettingsManager singleton via typed settings
 
 export {
   applyStarryNightSettings,

@@ -1,4 +1,5 @@
 import { ADVANCED_SYSTEM_CONFIG } from "./config/globalConfig";
+import { settings } from "./config"; // TypedSettingsManager singleton
 import { Year3000System, AdvancedThemeSystem } from "./core/lifecycle/AdvancedThemeSystem";
 import { Y3KDebug } from "./debug/UnifiedDebugManager";
 import * as ThemeUtilities from "./utils/core/ThemeUtilities";
@@ -429,7 +430,7 @@ patchReactRequire();
       system: year3000System,
       // Expose internal modules for easier debugging
       music: year3000System.musicSyncService,
-      settings: year3000System.settingsManager,
+      settings: settings, // TypedSettingsManager singleton
       // Expose the superior, specialized debug tools directly
       debug: Y3KDebug.debug,
       health: year3000System.systemHealthMonitor,
@@ -466,7 +467,7 @@ patchReactRequire();
         ThemeUtilities,
         year3000System.performanceAnalyzer,
         year3000System.musicSyncService as any,
-        year3000System.settingsManager as any,
+        // NOTE: settingsManager argument removed - using TypedSettingsManager singleton
         year3000System
       );
       await sidebarSystem.initialize();
@@ -490,8 +491,8 @@ patchReactRequire();
       ADVANCED_SYSTEM_CONFIG,
       ThemeUtilities,
       year3000System.performanceAnalyzer,
-      year3000System.musicSyncService as any,
-      year3000System.settingsManager as any
+      year3000System.musicSyncService as any
+      // NOTE: settingsManager argument removed - using TypedSettingsManager singleton
     );
     await depthController.initialize();
     (year3000System as any).depthController = depthController;
@@ -534,8 +535,7 @@ patchReactRequire();
       ADVANCED_SYSTEM_CONFIG,
       ThemeUtilities,
       year3000System.performanceAnalyzer,
-      year3000System.musicSyncService as any,
-      year3000System.settingsManager as any
+      year3000System.musicSyncService as any
     );
     await dynamicBridge.initialize();
 
@@ -571,8 +571,8 @@ patchReactRequire();
       ADVANCED_SYSTEM_CONFIG,
       ThemeUtilities,
       year3000System.performanceAnalyzer,
-      year3000System.musicSyncService as any,
-      year3000System.settingsManager as any
+      year3000System.musicSyncService as any
+      // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
     );
     await dynamicGradientSystem.initialize();
 

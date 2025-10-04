@@ -10,7 +10,7 @@
 
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import type { SettingsManager } from "@/ui/managers/SettingsManager";
+// NOTE: SettingsManager import removed - file deleted in Phase 5, using TypedSettingsManager singleton
 import type { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
 import type { MusicSyncService } from "@/audio/MusicSyncService";
 import type { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
@@ -39,7 +39,8 @@ export interface SystemCreationContext {
   /** Available dependencies */
   dependencies: {
     performanceAnalyzer?: SimplePerformanceCoordinator;
-    settingsManager?: SettingsManager;
+    /** @deprecated Use TypedSettingsManager singleton via `settings` import from @/config */
+    settingsManager?: any; // Legacy type - SettingsManager deleted in Phase 5
     musicSyncService?: MusicSyncService;
     year3000System?: Year3000System;
     cssController?: UnifiedCSSVariableManager;

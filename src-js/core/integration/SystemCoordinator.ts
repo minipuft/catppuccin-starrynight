@@ -60,7 +60,7 @@ import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDet
 import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+import { settings } from "@/config";
 import * as Utils from "@/utils/core/ThemeUtilities";
 import { SemanticColorManager } from "@/utils/spicetify/SemanticColorManager";
 import {
@@ -186,7 +186,7 @@ export class SystemCoordinator {
   private sharedDeviceCapabilityDetector: DeviceCapabilityDetector | null = null;
   private sharedPerformanceBudgetManager: PerformanceBudgetManager | null = null;
   private sharedMusicSyncService: MusicSyncService | null = null;
-  private sharedSettingsManager: SettingsManager | null = null;
+  // REMOVED: private sharedSettingsManager: SettingsManager | null = null; // Migrated to TypedSettingsManager singleton via typed settings
   private sharedColorHarmonyEngine: ColorHarmonyEngine | null = null;
   private sharedSemanticColorManager: SemanticColorManager | null = null;
 
@@ -450,9 +450,8 @@ export class SystemCoordinator {
         this.sharedUnifiedCSSVariableManager = null;
       }
 
-      // Core services
-      this.sharedSettingsManager = new SettingsManager();
-      await this.sharedSettingsManager.initialize();
+      // Core services (migrated to typed settings)
+      // NOTE: SettingsManager no longer initialized - using TypedSettingsManager singleton
 
       this.sharedMusicSyncService = new MusicSyncService();
       await this.sharedMusicSyncService.initialize();
@@ -461,8 +460,7 @@ export class SystemCoordinator {
       this.sharedColorHarmonyEngine = new ColorHarmonyEngine(
         this.config,
         this.utils,
-        this.sharedSimplePerformanceCoordinator as any,
-        this.sharedSettingsManager
+        this.sharedSimplePerformanceCoordinator as any
       );
       // ColorHarmonyEngine doesn't have setMusicSyncService method
       await this.sharedColorHarmonyEngine.initialize();
@@ -488,7 +486,7 @@ export class SystemCoordinator {
       // Get EnhancedMasterAnimationCoordinator from NonVisualSystemFacade for animation integration
       const animationCoordinator = this.nonVisualFacade?.getCachedSystem("EnhancedMasterAnimationCoordinator") || null;
 
-      // Initialize Visual System Facade
+      // Initialize Visual System Facade (settingsManager removed - using typed settings)
       this.visualBridge = new VisualSystemCoordinator(
         this.config,
         this.utils,
@@ -496,7 +494,6 @@ export class SystemCoordinator {
         this.sharedUnifiedCSSVariableManager!,
         this.sharedSimplePerformanceCoordinator as any,
         this.sharedMusicSyncService!,
-        this.sharedSettingsManager!,
         this.sharedColorHarmonyEngine!,
         this.eventBus,
         animationCoordinator
@@ -600,10 +597,7 @@ export class SystemCoordinator {
         this.sharedMusicSyncService;
     }
 
-    if (this.sharedSettingsManager) {
-      (this.nonVisualFacade as any).settingsManager =
-        this.sharedSettingsManager;
-    }
+    // NOTE: SettingsManager no longer managed - using TypedSettingsManager singleton
 
     if (this.sharedColorHarmonyEngine) {
       (this.nonVisualFacade as any).colorHarmonyEngine =
@@ -1121,7 +1115,7 @@ export class SystemCoordinator {
     this.systemDependencies.set("UnifiedCSSVariableManager", [
       "PerformanceAnalyzer",
     ]);
-    this.systemDependencies.set("SettingsManager", []);
+    // NOTE: SettingsManager removed - using TypedSettingsManager singleton
     this.systemDependencies.set("SemanticColorManager", [
       "UnifiedCSSVariableManager",
     ]);
@@ -1132,7 +1126,7 @@ export class SystemCoordinator {
       "UnifiedCSSVariableManager",
     ]);
     this.initializationOrder.set("services", [
-      "SettingsManager",
+      // NOTE: SettingsManager removed - using TypedSettingsManager singleton
       "MusicSyncService",
       "SemanticColorManager",
     ]);
@@ -1258,9 +1252,7 @@ export class SystemCoordinator {
         case "UnifiedCSSVariableManager":
           await this.initializeUnifiedCSSController();
           break;
-        case "SettingsManager":
-          await this.initializeSettingsManager();
-          break;
+        // NOTE: SettingsManager case removed - using TypedSettingsManager singleton
         case "MusicSyncService":
           await this.initializeMusicSyncService();
           break;
@@ -1453,17 +1445,15 @@ export class SystemCoordinator {
     }
   }
 
-  private async initializeSettingsManager(): Promise<void> {
-    this.sharedSettingsManager = new SettingsManager();
-    await this.sharedSettingsManager.initialize();
-  }
+  // NOTE: initializeSettingsManager() removed - using TypedSettingsManager singleton
+  // All systems now use typed settings directly via: import { settings } from "@/config";
 
   private async initializeMusicSyncService(): Promise<void> {
     this.sharedMusicSyncService = new MusicSyncService({
       ADVANCED_SYSTEM_CONFIG: this.config,
       ThemeUtilities: this.utils,
       performanceMonitor: this.sharedSimplePerformanceCoordinator as any,
-      settingsManager: this.sharedSettingsManager || undefined,
+      // NOTE: settingsManager removed - using typed settings directly
       year3000System: this.year3000System,
     });
     await this.sharedMusicSyncService.initialize();
@@ -1507,8 +1497,8 @@ export class SystemCoordinator {
     this.sharedColorHarmonyEngine = new ColorHarmonyEngine(
       this.config,
       this.utils,
-      (this.sharedSimplePerformanceCoordinator as any) || undefined,
-      this.sharedSettingsManager || undefined
+      (this.sharedSimplePerformanceCoordinator as any) || undefined
+      // NOTE: settingsManager parameter removed - using typed settings directly
     );
 
     // Note: SemanticColorManager integration will be handled through dependency injection
@@ -1525,7 +1515,7 @@ export class SystemCoordinator {
       this.sharedUnifiedCSSVariableManager!, // cssVariableController
       this.sharedSimplePerformanceCoordinator as any,
       this.sharedMusicSyncService!,
-      this.sharedSettingsManager!,
+      // NOTE: settingsManager removed - using typed settings directly
       this.sharedColorHarmonyEngine || undefined, // optional
       this.eventBus // optional
     );
@@ -1542,7 +1532,7 @@ export class SystemCoordinator {
       unifiedCSSConsciousnessController:
         this.sharedUnifiedCSSVariableManager,
       musicSyncService: this.sharedMusicSyncService,
-      settingsManager: this.sharedSettingsManager,
+      // NOTE: settingsManager removed - using typed settings directly
       colorHarmonyEngine: this.sharedColorHarmonyEngine,
       performanceOrchestrator: this.sharedSimplePerformanceCoordinator,
       semanticColorManager: this.sharedSemanticColorManager,
@@ -1637,11 +1627,7 @@ export class SystemCoordinator {
       this.sharedMusicSyncService = null;
     }
 
-    if (this.sharedSettingsManager) {
-      // SettingsManager has destroy method
-      this.sharedSettingsManager.destroy();
-      this.sharedSettingsManager = null;
-    }
+    // NOTE: SettingsManager destroy removed - using TypedSettingsManager singleton (no cleanup needed)
 
     if (this.sharedUnifiedCSSVariableManager) {
       // UnifiedCSSVariableManager has destroy method
@@ -2244,9 +2230,7 @@ export class SystemCoordinator {
     return this.sharedColorHarmonyEngine || undefined;
   }
 
-  public getSharedSettingsManager(): SettingsManager | undefined {
-    return this.sharedSettingsManager || undefined;
-  }
+  // NOTE: getSharedSettingsManager() removed - use typed settings directly: import { settings } from "@/config"
 
   public getSharedSemanticColorManager(): SemanticColorManager | undefined {
     return this.sharedSemanticColorManager || undefined;

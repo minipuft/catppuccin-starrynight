@@ -1,7 +1,6 @@
 // NOTE: CARD_3D_LEVEL_KEY has been removed in settings rationalization
 import type { SimplePerformanceCoordinator, QualityCapability, QualityLevel, QualityScalingCapable, PerformanceMetrics } from "@/core/performance/SimplePerformanceCoordinator";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
-import type { SettingsManager } from "@/ui/managers/SettingsManager";
 import type * as Utils from "@/utils/core/ThemeUtilities";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { EmotionalTemperatureMapper, type EmotionalTemperatureResult } from "@/utils/color/EmotionalTemperatureMapper";
@@ -45,7 +44,6 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
   private static instance: Card3DManager;
   private config: Card3DConfig;
   private performanceMonitor: SimplePerformanceCoordinator;
-  private settingsManager: SettingsManager;
   private utils: typeof Utils;
   private cards: NodeListOf<HTMLElement>;
   private cardQuerySelector =
@@ -76,7 +74,6 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
 
   public constructor(
     performanceMonitor: SimplePerformanceCoordinator,
-    settingsManager: SettingsManager,
     utils: typeof Utils
   ) {
     this.config = {
@@ -94,7 +91,6 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
       effectIntensityMultiplier: 1.2,
     };
     this.performanceMonitor = performanceMonitor;
-    this.settingsManager = settingsManager;
     this.utils = utils;
     this.cards = document.querySelectorAll(this.config.selector);
 
@@ -121,13 +117,11 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
 
   public static getInstance(
     performanceMonitor: SimplePerformanceCoordinator,
-    settingsManager: SettingsManager,
     utils: typeof Utils
   ): Card3DManager {
     if (!Card3DManager.instance) {
       Card3DManager.instance = new Card3DManager(
         performanceMonitor,
-        settingsManager,
         utils
       );
     }
@@ -203,8 +197,8 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
 
   private get shouldEnable3DEffects(): boolean {
     const quality = this.performanceMonitor.shouldReduceQuality();
-    const setting = this.settingsManager.get("sn-enable3dCards" as any);
-    return !quality && setting !== "disabled";
+    // NOTE: 3D card setting removed - only check performance
+    return !quality;
   }
 
   private async applyEventListeners(): Promise<void> {

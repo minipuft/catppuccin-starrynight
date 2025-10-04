@@ -13,6 +13,7 @@
 
 // NOTE: NEBULA_INTENSITY_KEY has been removed in settings rationalization
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { settings } from "@/config"; // TypedSettingsManager singleton
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
@@ -94,13 +95,10 @@ export class AudioVisualController {
     const capabilityOverall =
       y3k?.deviceCapabilityDetector?.deviceCapabilities?.overall;
 
-    // Read user setting if available
-    const settings = y3k?.settingsManager;
-    if (settings) {
-      // NOTE: Nebula intensity setting has been removed - use gradient intensity instead
-      this.intensitySetting =
-        (settings.get as any)("sn-gradient-intensity") ?? "balanced";
-    }
+    // Read user setting if available (TypedSettingsManager singleton)
+    // NOTE: Nebula intensity setting has been removed - use gradient intensity instead
+    this.intensitySetting =
+      (settings.get as any)("sn-gradient-intensity") ?? "balanced";
 
     switch (this.intensitySetting) {
       case "disabled":

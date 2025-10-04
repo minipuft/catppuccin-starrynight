@@ -161,9 +161,10 @@ describe('Core Orchestration Integration', () => {
 
     it('should provide shared settings manager', async () => {
       await systemCoordinator.initialize();
-      
-      const settingsManager = systemCoordinator.getSharedSettingsManager();
-      expect(settingsManager).toBeDefined();
+
+      // NOTE: getSharedSettingsManager() removed - SettingsManager deleted in Phase 5, using TypedSettingsManager singleton
+      // const settingsManager = systemCoordinator.getSharedSettingsManager();
+      // expect(settingsManager).toBeDefined();
     });
 
     it('should provide shared color harmony engine', async () => {

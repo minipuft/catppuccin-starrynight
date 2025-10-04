@@ -3,6 +3,9 @@ declare const Spicetify: any;
 // Phase 4: Facade imports for unified system access
 import { SystemCoordinator } from "@/core/integration/SystemCoordinator";
 
+// Settings import for typed access
+import { settings } from "@/config";
+
 // Color coordination imports for Strategy pattern
 import { globalColorStateManager } from "@/core/css/ColorStateManager";
 import { globalUnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
@@ -200,12 +203,7 @@ export class AdvancedThemeSystem {
       null
     );
   }
-  public get settingsManager() {
-    return (
-      this.facadeCoordinator?.getCachedNonVisualSystem("SettingsManager") ||
-      null
-    );
-  }
+  // NOTE: settingsManager getter removed - using TypedSettingsManager singleton via settings import
   public get colorHarmonyEngine() {
     return (
       this.facadeCoordinator?.getCachedNonVisualSystem("ColorHarmonyEngine") ||
@@ -716,18 +714,7 @@ export class AdvancedThemeSystem {
           }
         },
       },
-      {
-        name: "SettingsManager",
-        init: async () => {
-          this.settingsManager = new SettingsManager();
-          if (this.systemHealthMonitor) {
-            this.systemHealthMonitor.registerSystem(
-              "SettingsManager",
-              this.settingsManager
-            );
-          }
-        },
-      },
+      // NOTE: SettingsManager removed - using typed settings singleton instead
       {
         name: "EnhancedMasterAnimationCoordinator",
         init: () => {
@@ -760,7 +747,6 @@ export class AdvancedThemeSystem {
           this.musicSyncService = new MusicSyncService({
             ADVANCED_SYSTEM_CONFIG: this.ADVANCED_SYSTEM_CONFIG,
             ThemeUtilities: this.utils,
-            settingsManager: this.settingsManager,
             year3000System: this,
           });
           await this.musicSyncService.initialize();
@@ -770,17 +756,16 @@ export class AdvancedThemeSystem {
       {
         name: "ColorHarmonyEngine",
         init: async () => {
-          if (!this.performanceAnalyzer || !this.settingsManager) {
+          if (!this.performanceAnalyzer) {
             throw new Error(
-              "SimplePerformanceCoordinator and SettingsManager are required for ColorHarmonyEngine."
+              "SimplePerformanceCoordinator is required for ColorHarmonyEngine."
             );
           }
           this.colorHarmonyEngine = new ColorHarmonyEngine(
             this.ADVANCED_SYSTEM_CONFIG,
             this.utils,
             this.performanceAnalyzer,
-            this.musicSyncService || undefined,
-            this.settingsManager
+            this.musicSyncService || undefined
           );
           await this.colorHarmonyEngine.initialize();
 
@@ -801,17 +786,16 @@ export class AdvancedThemeSystem {
       {
         name: "GlassmorphismManager",
         init: async () => {
-          if (!this.performanceAnalyzer || !this.settingsManager) {
+          if (!this.performanceAnalyzer) {
             throw new Error(
-              "SimplePerformanceCoordinator and SettingsManager are required for GlassmorphismManager."
+              "SimplePerformanceCoordinator is required for GlassmorphismManager."
             );
           }
           this.glassmorphismManager = new GlassmorphismManager(
             this.ADVANCED_SYSTEM_CONFIG,
             this.utils,
             this.cssVariableController,
-            this.performanceAnalyzer,
-            this.settingsManager
+            this.performanceAnalyzer
           );
           await this.glassmorphismManager.initialize();
           if (this.systemHealthMonitor) {
@@ -825,14 +809,13 @@ export class AdvancedThemeSystem {
       {
         name: "Card3DManager",
         init: async () => {
-          if (!this.performanceAnalyzer || !this.settingsManager) {
+          if (!this.performanceAnalyzer) {
             throw new Error(
-              "SimplePerformanceCoordinator and SettingsManager are required for Card3DManager."
+              "SimplePerformanceCoordinator is required for Card3DManager."
             );
           }
           this.card3DManager = new Card3DManager(
             this.performanceAnalyzer,
-            this.settingsManager,
             this.utils
           );
           await this.card3DManager.initialize();
@@ -1429,7 +1412,6 @@ export class AdvancedThemeSystem {
         const systemsToRegister = [
           { name: "MusicSyncService", system: this.musicSyncService },
           { name: "ColorHarmonyEngine", system: this.colorHarmonyEngine },
-          { name: "SettingsManager", system: this.settingsManager },
         ];
 
         for (const { name, system } of systemsToRegister) {
@@ -1465,11 +1447,10 @@ export class AdvancedThemeSystem {
   ): Promise<void> {
     if (
       !this.performanceAnalyzer ||
-      !this.musicSyncService ||
-      !this.settingsManager
+      !this.musicSyncService
     ) {
       console.error(
-        "[Year3000System] Cannot initialize visual systems due to missing core dependencies (SimplePerformanceCoordinator, MusicSyncService, or SettingsManager)."
+        "[Year3000System] Cannot initialize visual systems due to missing core dependencies (SimplePerformanceCoordinator, MusicSyncService)."
       );
       const visualSystems = [
         "InteractionTrackingSystem",
@@ -1669,18 +1650,11 @@ export class AdvancedThemeSystem {
   public async applyInitialSettings(
     trigger?: "flavor" | "brightness" | "accent" | "full"
   ): Promise<void> {
-    if (!this.settingsManager) {
-      console.warn(
-        "[Year3000System] SettingsManager not ready, cannot apply initial settings."
-      );
-      return;
-    }
     if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
       console.log(
         `🎨 [Year3000System] Inside applyInitialSettings. Trigger: ${
           trigger || "full"
-        }, SettingsManager valid:`,
-        !!this.settingsManager
+        }`
       );
     }
 
@@ -1721,22 +1695,22 @@ export class AdvancedThemeSystem {
           "🎨 [Year3000System] ColorStateManager not available, using legacy color application"
         );
         // Fallback to legacy accent application
-        const accent = this.settingsManager.get("catppuccin-accentColor");
+        const accent = settings.get("catppuccin-accentColor");
         if ((accent as string) !== "dynamic") {
           await this._applyCatppuccinAccent(accent);
         }
       }
 
-      const gradient = this.settingsManager.get("sn-gradient-intensity");
+      const gradient = settings.get("sn-gradient-intensity");
       // Use gradient intensity for both params since star density is consolidated
       const stars = gradient;
 
-      // NEW – harmonic settings
-      const intensityRaw = this.settingsManager.get("sn-harmonic-intensity");
-      const evolutionRaw = this.settingsManager.get("sn-harmonic-evolution");
+      // NEW – harmonic settings (TypedSettingsManager provides proper types)
+      const intensity = settings.get("sn-harmonic-intensity");
+      const evolutionEnabled = settings.get("sn-harmonic-evolution");
 
       // NEW – harmonic mode selection
-      const harmonicModeKey = this.settingsManager.get(
+      const harmonicModeKey = settings.get(
         "sn-current-harmonic-mode"
       );
       if (harmonicModeKey) {
@@ -1754,7 +1728,6 @@ export class AdvancedThemeSystem {
       );
 
       // Apply harmonic intensity once the engine is ready
-      const intensity = parseFloat(intensityRaw as string);
       if (!Number.isNaN(intensity)) {
         if (this.colorHarmonyEngine) {
           (this.colorHarmonyEngine as any).setIntensity?.(intensity);
@@ -1763,7 +1736,6 @@ export class AdvancedThemeSystem {
       }
 
       // Persist evolution flag locally
-      const evolutionEnabled = evolutionRaw === "true";
       this.allowHarmonicEvolution = evolutionEnabled;
       this.ADVANCED_SYSTEM_CONFIG.colorHarmonyEvolution = evolutionEnabled;
 
@@ -3063,47 +3035,14 @@ export class AdvancedThemeSystem {
         skipped: [],
       };
 
-      // Phase 4: SettingsManager managed by facade
-      try {
-        // this.settingsManager = new SettingsManager(); // Managed by facade
-        if (this.systemHealthMonitor) {
-          this.systemHealthMonitor.registerSystem(
-            "SettingsManager",
-            this.settingsManager
-          );
-        }
-        upgradeResults.success.push("SettingsManager");
-      } catch (error) {
-        upgradeResults.failed.push("SettingsManager");
-        console.error(
-          `[Year3000System] Failed to upgrade SettingsManager:`,
-          error
-        );
-      }
+      // Phase 4: SettingsManager managed by facade (migrated to typed settings)
+      // NOTE: SettingsManager no longer initialized - using TypedSettingsManager singleton via typed settings
 
-      // Phase 4: MusicSyncService managed by facade
-      if (this.settingsManager) {
-        try {
-          /* this.musicSyncService = new MusicSyncService({
-            ADVANCED_SYSTEM_CONFIG: this.ADVANCED_SYSTEM_CONFIG,
-            ThemeUtilities: this.utils,
-            settingsManager: this.settingsManager,
-            year3000System: this,
-          });
-          await this.musicSyncService.initialize();
-          this.musicSyncService.subscribe(this, "Year3000System");
-          upgradeResults.success.push("MusicSyncService"); */
-        } catch (error) {
-          /* upgradeResults.failed.push("MusicSyncService");
-          console.error(
-            `[Year3000System] Failed to upgrade MusicSyncService:`,
-            error
-          ); */
-        }
-      }
+      // Phase 4: MusicSyncService managed by facade (migrated to typed settings)
+      // NOTE: MusicSyncService initialization moved to earlier in lifecycle, no longer dependent on SettingsManager
 
       // Initialize remaining systems...
-      if (this.performanceAnalyzer && this.settingsManager) {
+      if (this.performanceAnalyzer) {
         // Phase 4: ColorHarmonyEngine managed by facade
         try {
           /* this.colorHarmonyEngine = new ColorHarmonyEngine(
@@ -3173,10 +3112,8 @@ export class AdvancedThemeSystem {
         );
       }
 
-      // Apply initial settings if available
-      if (this.settingsManager) {
-        await this.applyInitialSettings();
-      }
+      // Apply initial settings (now using typed settings directly)
+      await this.applyInitialSettings();
 
       if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
         console.log(
@@ -3218,7 +3155,7 @@ export class AdvancedThemeSystem {
   private _handleExternalSettingsChange(event: Event): void {
     const { key, value } = (event as CustomEvent).detail || {};
 
-    // Guard when settingsManager or subsystems are not ready yet
+    // Guard when subsystems are not ready yet
     if (!key) return;
 
     switch (key) {

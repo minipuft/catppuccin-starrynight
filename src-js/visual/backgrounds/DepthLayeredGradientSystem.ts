@@ -21,7 +21,6 @@ import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerforman
 import type { HealthCheckResult } from "@/types/systems";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 import type {
@@ -208,10 +207,9 @@ export class DepthLayeredGradientSystem
     utils: typeof import("@/utils/core/ThemeUtilities"),
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
-    settingsManager: SettingsManager | null = null,
     year3000System: any = null
   ) {
-    super(config, utils, performanceMonitor, musicSyncService, settingsManager);
+    super(config, utils, performanceMonitor, musicSyncService);
 
     this.colorHarmonyEngine = year3000System?.colorHarmonyEngine || null;
 
@@ -307,8 +305,8 @@ export class DepthLayeredGradientSystem
       // Initialize emotional gradient mapper
       this.emotionalGradientMapper = new EmotionalGradientMapper(
         this.cssVariableController,
-        this.musicSyncService,
-        this.settingsManager
+        this.musicSyncService
+        // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
       );
 
       // Initialize genre profile manager for genre detection
@@ -368,30 +366,9 @@ export class DepthLayeredGradientSystem
   }
 
   private loadSettings(): void {
-    if (!this.settingsManager) return;
-
-    try {
-      const qualitySetting = this.settingsManager.get(
-        "sn-depth-quality" as any
-      );
-      if (qualitySetting) {
-        this.depthSettings.qualityLevel = qualitySetting;
-        this.adjustQualitySettings();
-      }
-
-      const enabledSetting = this.settingsManager.get(
-        "sn-depth-enabled" as any
-      );
-      if (enabledSetting !== undefined) {
-        this.depthSettings.enabled = enabledSetting;
-      }
-    } catch (error) {
-      Y3KDebug?.debug?.warn(
-        "DepthLayeredGradientSystem",
-        "Failed to load settings:",
-        error
-      );
-    }
+    // NOTE: Depth settings (sn-depth-quality, sn-depth-enabled) removed
+    // Using default depth settings from constructor
+    // Quality level managed by performance coordinator
   }
 
   private adaptToDeviceCapabilities(): void {

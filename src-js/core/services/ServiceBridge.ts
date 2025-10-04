@@ -12,7 +12,7 @@
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+// NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -312,21 +312,21 @@ export abstract class ServiceVisualSystemBase extends ServiceSystemBase {
   // Additional visual system properties
   protected utils: typeof ThemeUtilities = ThemeUtilities;
   protected musicSyncService: MusicSyncService | null = null;
-  protected settingsManager: SettingsManager | null = null;
+  // NOTE: settingsManager field removed - using TypedSettingsManager singleton, events auto-fire
   protected isActive: boolean = false;
   
   constructor(
     config: AdvancedSystemConfig | Year3000Config = ADVANCED_SYSTEM_CONFIG,
     utils: typeof ThemeUtilities = ThemeUtilities,
     performanceMonitor?: SimplePerformanceCoordinator,
-    musicSyncService?: MusicSyncService | null,
-    settingsManager?: SettingsManager | null
+    musicSyncService?: MusicSyncService | null
+    // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
   ) {
     super(config);
-    
+
     this.utils = utils;
     this.musicSyncService = musicSyncService || null;
-    this.settingsManager = settingsManager || null;
+    // NOTE: settingsManager assignment removed - using TypedSettingsManager singleton
     
     if (performanceMonitor) {
       this._legacyPerformanceAnalyzer = performanceMonitor;
@@ -398,9 +398,9 @@ export abstract class ServiceVisualSystemBase extends ServiceSystemBase {
   
   async _performSystemSpecificInitialization(): Promise<void> {
     this.isActive = true;
-    
-    // Set up settings change listener
-    if (this.settingsManager && this.services.events) {
+
+    // Set up settings change listener (TypedSettingsManager fires events automatically)
+    if (this.services.events) {
       this.services.events.subscribeToDOM(
         this.systemName,
         document,

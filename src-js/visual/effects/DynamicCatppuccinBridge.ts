@@ -9,7 +9,12 @@
  */
 
 import type { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
+import { settings } from "@/config";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
+import {
+  calculateColorHarmonyAngle,
+  COLOR_HARMONY_MODES,
+} from "@/config/harmonicModes";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import {
   OptimizedCSSVariableManager,
@@ -86,10 +91,9 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
     config = ADVANCED_SYSTEM_CONFIG,
     utils = Utils,
     performanceMonitor: any = null,
-    musicSyncService: any = null,
-    settingsManager: any = null
+    musicSyncService: any = null
   ) {
-    super(config, utils, performanceMonitor, musicSyncService, settingsManager);
+    super(config, utils, performanceMonitor, musicSyncService);
   }
 
   public override async _performSystemSpecificInitialization(): Promise<void> {
@@ -143,9 +147,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
    */
   private checkDynamicAccentEnabled(): boolean {
     try {
-      if (!this.settingsManager) return false;
-
-      const accentSetting = this.settingsManager.get("catppuccin-accentColor");
+      const accentSetting = settings.get("catppuccin-accentColor");
       // Cast to string since 'dynamic' might be a custom value not in the type definition
       const isDynamic = String(accentSetting) === "dynamic";
 
@@ -616,6 +618,62 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
   }
 
   /**
+   * Calculate harmony colors (complementary, analogous, triadic) from base RGB
+   * Uses OKLAB color harmony system for perceptually uniform relationships
+   */
+  private calculateHarmonyColors(baseRgb: string): {
+    complementary: string;
+    analogous: string;
+    triadic: string;
+  } {
+    // Parse RGB string to individual values and validate
+    const rgbValues = baseRgb.split(",").map((v) => parseInt(v.trim(), 10));
+    const r = rgbValues[0] !== undefined && !isNaN(rgbValues[0]) ? rgbValues[0] : 128;
+    const g = rgbValues[1] !== undefined && !isNaN(rgbValues[1]) ? rgbValues[1] : 128;
+    const b = rgbValues[2] !== undefined && !isNaN(rgbValues[2]) ? rgbValues[2] : 128;
+
+    // Convert to HSL for hue manipulation
+    const hsl = Utils.rgbToHsl(r, g, b);
+    const baseHue = hsl.h;
+    const baseSat = hsl.s;
+    const baseLum = hsl.l;
+
+    // Calculate complementary color (180° hue shift)
+    const complementaryMode = COLOR_HARMONY_MODES["complementary-yin-yang"];
+    const complementaryHues = complementaryMode
+      ? calculateColorHarmonyAngle(complementaryMode, baseHue)
+      : [baseHue, (baseHue + 180) % 360];
+    const complementaryHue = complementaryHues[1] ?? (baseHue + 180) % 360;
+    const complementaryRgb = Utils.hslToRgb(
+      complementaryHue % 360,
+      baseSat,
+      baseLum
+    );
+
+    // Calculate analogous color (30° hue shift)
+    const analogousMode = COLOR_HARMONY_MODES["analogous-flow"];
+    const analogousHues = analogousMode
+      ? calculateColorHarmonyAngle(analogousMode, baseHue)
+      : [baseHue, (baseHue + 30) % 360];
+    const analogousHue = analogousHues[1] ?? (baseHue + 30) % 360;
+    const analogousRgb = Utils.hslToRgb(analogousHue % 360, baseSat, baseLum);
+
+    // Calculate triadic color (120° hue shift)
+    const triadicMode = COLOR_HARMONY_MODES["triadic-trinity"];
+    const triadicHues = triadicMode
+      ? calculateColorHarmonyAngle(triadicMode, baseHue)
+      : [baseHue, (baseHue + 120) % 360];
+    const triadicHue = triadicHues[1] ?? (baseHue + 120) % 360;
+    const triadicRgb = Utils.hslToRgb(triadicHue % 360, baseSat, baseLum);
+
+    return {
+      complementary: `${complementaryRgb.r},${complementaryRgb.g},${complementaryRgb.b}`,
+      analogous: `${analogousRgb.r},${analogousRgb.g},${analogousRgb.b}`,
+      triadic: `${triadicRgb.r},${triadicRgb.g},${triadicRgb.b}`,
+    };
+  }
+
+  /**
    * Apply dynamic accent using Color Extension Facade
    * Updates both core Spicetify variables AND visualEffects extensions
    */
@@ -640,6 +698,9 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
 
     const rgbString = `${rgb.r},${rgb.g},${rgb.b}`;
 
+    // 🎨 Calculate OKLAB harmony colors for perceptually uniform relationships
+    const harmonyColors = this.calculateHarmonyColors(rgbString);
+
     // 🎨 CRITICAL: Log all CSS variables being set
     const variablesToSet = {
       "--sn-dynamic-accent-hex": accentHex,
@@ -654,6 +715,10 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
       "--sn-color-extracted-primary-rgb": rgbString,
       "--sn-color-extracted-vibrant-rgb": rgbString,
       "--sn-color-extracted-dominant-rgb": rgbString,
+      // OKLAB Harmony System - Dynamic color relationships from album art
+      "--sn-color-harmony-complementary-rgb": harmonyColors.complementary,
+      "--sn-color-harmony-analogous-rgb": harmonyColors.analogous,
+      "--sn-color-harmony-triadic-rgb": harmonyColors.triadic,
     };
 
     console.log(

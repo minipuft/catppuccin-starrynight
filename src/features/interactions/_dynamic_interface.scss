@@ -181,7 +181,8 @@
 // Beautiful interface elements that don't lag
 // ═══════════════════════════════════════════════════════════════════════════════
 
-.main-card-card {
+.main-card-card,
+.main-card-cardContainer {
   @include dynamic-interface-field(0.8);
   @include ethereal-shimmer-interface;
 
@@ -363,7 +364,9 @@
 
   // Disable all heavy effects
   .main-card-card::before,
-  .main-card-card::after {
+  .main-card-card::after,
+  .main-card-cardContainer::before,
+  .main-card-cardContainer::after {
     display: none;
   }
 }

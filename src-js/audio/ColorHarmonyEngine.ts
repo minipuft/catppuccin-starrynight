@@ -20,7 +20,7 @@ import type {
 } from "@/types/colorStrategy";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+// NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import {
   EmotionalTemperatureMapper,
   type EmotionalTemperatureResult,
@@ -227,15 +227,15 @@ export class ColorHarmonyEngine
   constructor(
     config?: Year3000Config,
     utils?: typeof ThemeUtilities,
-    performanceMonitor?: SimplePerformanceCoordinator,
-    settingsManager?: SettingsManager
+    performanceMonitor?: SimplePerformanceCoordinator
+    // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
   ) {
     super(
       config,
       utils || ThemeUtilities,
       performanceMonitor!,
-      null, // No direct music service dependency
-      settingsManager || null
+      null // No direct music service dependency
+      // NOTE: settingsManager argument removed - using TypedSettingsManager singleton
     );
     this.systemName = "ColorHarmonyEngine";
 

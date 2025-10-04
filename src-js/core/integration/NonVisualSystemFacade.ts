@@ -73,7 +73,7 @@ import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetMa
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import UnifiedDebugManager from "@/debug/UnifiedDebugManager";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+// NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { LoadingStateService } from "@/core/services/LoadingStateService";
 
 // Consciousness Systems imports
@@ -120,7 +120,7 @@ export type NonVisualSystemKey =
 
   // Core Services
   | "UnifiedDebugManager"
-  | "SettingsManager"
+  // NOTE: "SettingsManager" removed - using TypedSettingsManager singleton
   | "ColorHarmonyEngine"
   | "MusicSyncService"
   | "ColorOrchestrator"
@@ -210,7 +210,7 @@ export class NonVisualSystemFacade {
   private cssVariableManager: OptimizedCSSVariableManager | null =
     null;
   private musicSyncService: MusicSyncService | null = null;
-  private settingsManager: SettingsManager | null = null;
+  // NOTE: settingsManager field removed - using TypedSettingsManager singleton
   private loadingStateService: LoadingStateService | null = null; // Phase 8.5: Active loading state management
 
   // New simplified performance system dependencies
@@ -271,7 +271,7 @@ export class NonVisualSystemFacade {
       this.performanceCoordinator = year3000System.unifiedPerformanceCoordinator || null;
       this.performanceOrchestrator = year3000System.performanceOrchestrator || null;
       this.musicSyncService = year3000System.musicSyncService || null;
-      this.settingsManager = year3000System.settingsManager || null;
+      // NOTE: settingsManager injection removed - using TypedSettingsManager singleton
 
       Y3KDebug?.debug?.log(
         "NonVisualSystemFacade",
@@ -281,7 +281,7 @@ export class NonVisualSystemFacade {
           cssVariableManager: !!this.cssVariableManager,
           performanceOrchestrator: !!this.performanceOrchestrator,
           musicSyncService: !!this.musicSyncService,
-          settingsManager: !!this.settingsManager,
+          // NOTE: settingsManager logging removed - using TypedSettingsManager singleton
         }
       );
     }
@@ -436,8 +436,7 @@ export class NonVisualSystemFacade {
     // Cannot register in systemRegistry due to private constructor - handled in createSystem special cases
     this.systemDependencies.set("UnifiedDebugManager", []);
 
-    this.systemRegistry.set("SettingsManager", SettingsManager);
-    this.systemDependencies.set("SettingsManager", []);
+    // NOTE: SettingsManager removed from registry - using TypedSettingsManager singleton
 
     this.systemRegistry.set("ColorHarmonyEngine", ColorHarmonyEngine);
     this.systemDependencies.set("ColorHarmonyEngine", ["musicSyncService"]);
@@ -447,7 +446,7 @@ export class NonVisualSystemFacade {
 
     // Loading State Service - Phase 8.5 active loading state management
     this.systemRegistry.set("LoadingStateService", LoadingStateService);
-    this.systemDependencies.set("LoadingStateService", ["performanceAnalyzer", "settingsManager"]);
+    this.systemDependencies.set("LoadingStateService", ["performanceAnalyzer"]); // NOTE: settingsManager dependency removed
 
     // 🔧 PHASE 2.1: UnifiedColorProcessingEngine - Enhanced consolidated color processor (PREFERRED)
     this.systemRegistry.set(
@@ -455,7 +454,7 @@ export class NonVisualSystemFacade {
       UnifiedColorProcessingEngine
     );
     this.systemDependencies.set("UnifiedColorProcessingEngine", [
-      "settingsManager",
+      // NOTE: settingsManager dependency removed - was dead code in constructor
       "performanceAnalyzer",
     ]);
 
@@ -628,9 +627,7 @@ export class NonVisualSystemFacade {
           case "OptimizedCSSVariableManager":
             this.cssVariableManager = system;
             break;
-          case "SettingsManager":
-            this.settingsManager = system;
-            break;
+          // NOTE: "SettingsManager" case removed - using TypedSettingsManager singleton
           case "UnifiedDebugManager":
             // this.systemHealthMonitor = system; // Unused for now
             break;
@@ -709,10 +706,7 @@ export class NonVisualSystemFacade {
       return this.musicSyncService as T;
     }
 
-    if (key === "SettingsManager" && this.settingsManager) {
-      this.systemCache.set(key, this.settingsManager);
-      return this.settingsManager as T;
-    }
+    // NOTE: SettingsManager cache check removed - using TypedSettingsManager singleton
 
     if (key === "LoadingStateService" && this.loadingStateService) {
       this.systemCache.set(key, this.loadingStateService);
@@ -810,14 +804,7 @@ export class NonVisualSystemFacade {
       return this.musicSyncService as T;
     }
 
-    if (key === "SettingsManager" && this.settingsManager) {
-      this.systemCache.set(key, this.settingsManager);
-      Y3KDebug?.debug?.log(
-        "NonVisualSystemFacade",
-        "Using shared SettingsManager instance from SystemCoordinator"
-      );
-      return this.settingsManager as T;
-    }
+    // NOTE: SettingsManager shared instance check removed - using TypedSettingsManager singleton
 
     if (key === "LoadingStateService" && this.loadingStateService) {
       this.systemCache.set(key, this.loadingStateService);
@@ -901,7 +888,7 @@ export class NonVisualSystemFacade {
           config: this.config,
           utils: this.utils,
           performanceAnalyzer: this.performanceAnalyzer,
-          settingsManager: this.settingsManager,
+          // NOTE: settingsManager removed - using TypedSettingsManager singleton
           musicSyncService: this.musicSyncService,
           year3000System: this.year3000System,
           cssVariableManager: this.cssVariableManager,
@@ -1049,14 +1036,7 @@ export class NonVisualSystemFacade {
       system.setMusicSyncService(this.musicSyncService);
     }
 
-    // Inject settings manager
-    if (
-      dependencies.includes("settingsManager") &&
-      this.settingsManager &&
-      system.setSettingsManager
-    ) {
-      system.setSettingsManager(this.settingsManager);
-    }
+    // NOTE: settingsManager injection removed - using TypedSettingsManager singleton
 
     // Inject year3000System reference
     if (dependencies.includes("year3000System") && system.setYear3000System) {
@@ -1344,7 +1324,7 @@ export class NonVisualSystemFacade {
     this.performanceAnalyzer = null;
     this.performanceOrchestrator = null;
     this.musicSyncService = null;
-    this.settingsManager = null;
+    // NOTE: settingsManager cleanup removed - using TypedSettingsManager singleton
     // this.colorHarmonyEngine = null; // Unused for now
     // this.systemHealthMonitor = null; // Unused for now
   }

@@ -14,7 +14,7 @@ import { SimplePerformanceCoordinator, type QualityLevel, type QualityScalingCap
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+// NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { ShaderLoader } from "@/utils/graphics/ShaderLoader";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 import type {
@@ -451,10 +451,10 @@ export class FluidGradientBackgroundSystem
     utils: typeof import("@/utils/core/ThemeUtilities"),
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
-    settingsManager: SettingsManager | null = null,
+    // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
     year3000System: any = null
   ) {
-    super(config, utils, performanceMonitor, musicSyncService, settingsManager);
+    super(config, utils, performanceMonitor, musicSyncService);
 
     // Initialize base WebGL gradient system
     this.webglGradientSystem = new WebGLGradientBackgroundSystem(
@@ -462,7 +462,6 @@ export class FluidGradientBackgroundSystem
       utils,
       performanceMonitor,
       musicSyncService,
-      settingsManager,
       year3000System
     );
 

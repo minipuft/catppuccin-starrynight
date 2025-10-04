@@ -124,10 +124,10 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     config: Year3000Config = ADVANCED_SYSTEM_CONFIG,
     utils: typeof import("@/utils/core/ThemeUtilities"),
     performanceMonitor: SimplePerformanceCoordinator,
-    musicSyncService: MusicSyncService | null = null,
-    settingsManager: any = null
+    musicSyncService: MusicSyncService | null = null
+    // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
   ) {
-    super(config, utils, performanceMonitor, musicSyncService, settingsManager);
+    super(config, utils, performanceMonitor, musicSyncService);
 
     this.colorHarmonyEngine = null; // Initialize as null, will be set later
     // Initialize CSS Consciousness Controller if available

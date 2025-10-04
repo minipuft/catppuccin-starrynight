@@ -4,7 +4,7 @@ import { GLASS_LEVEL_KEY } from "@/config/settingKeys";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { SimplePerformanceCoordinator, QualityCapability, QualityLevel, QualityScalingCapable, PerformanceMetrics } from "@/core/performance/SimplePerformanceCoordinator";
 import type { HealthCheckResult } from "@/types/systems";
-import type { SettingsManager } from "@/ui/managers/SettingsManager";
+import { settings } from "@/config";
 import { ViewportAwareSystem, type ViewportSystemOptions } from "@/visual/base/ViewportAwareSystem";
 import type { VisibilityState } from "@/utils/performance/ViewportAwarenessManager";
 import * as Utils from "@/utils/core/ThemeUtilities";
@@ -44,7 +44,6 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   private cssBatcher: OptimizedCSSVariableManager | null = null;
   private cssController!: OptimizedCSSVariableManager;
   private performanceAnalyzer: SimplePerformanceCoordinator | null = null;
-  private settingsManager: SettingsManager;
   private isSupported: boolean;
   private currentIntensity: GlassIntensity;
   private observers: MutationObserver[] = [];
@@ -68,7 +67,6 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
     utils: typeof Utils = Utils,
     cssBatcher: OptimizedCSSVariableManager | null = null,
     performanceAnalyzer: SimplePerformanceCoordinator | null = null,
-    settingsManager: SettingsManager,
     viewportOptions: ViewportSystemOptions = {}
   ) {
     // Configure viewport integration for glassmorphism effects
@@ -84,7 +82,6 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
     this.utils = utils;
     this.cssBatcher = cssBatcher;
     this.performanceAnalyzer = performanceAnalyzer;
-    this.settingsManager = settingsManager;
     this.isSupported = this.detectBackdropFilterSupport();
     this.currentIntensity = "balanced";
     
@@ -120,8 +117,8 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
     // Initialize CSS coordination - use globalThis to access Year3000System
     const year3000System = (globalThis as any).year3000System;
     this.cssController = year3000System?.cssController || getGlobalOptimizedCSSController();
-    
-    const initialIntensity = this.settingsManager.get("sn-glassmorphism-level");
+
+    const initialIntensity = settings.get("sn-glassmorphism-level");
     this.applyGlassmorphismSettings(initialIntensity);
     
     // Initialize Year 3000 music integrations

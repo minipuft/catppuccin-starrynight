@@ -12,7 +12,7 @@ import type {
 import type { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
 import type { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import type { SettingsManager } from "@/ui/managers/SettingsManager";
+// NOTE: SettingsManager import removed - was dead code, never used
 import type * as Utils from "@/utils/core/ThemeUtilities";
 
 export interface ColorZone {
@@ -52,7 +52,7 @@ export class ColorFieldManager implements IVisualSystem {
   private utils: typeof Utils;
   private performanceAnalyzer: SimplePerformanceCoordinator;
   private musicSyncService: MusicSyncService | null;
-  private settingsManager: SettingsManager;
+  // NOTE: settingsManager field removed - was dead code, never used
   private year3000System: Year3000System;
 
   public initialized: boolean = false;
@@ -78,14 +78,14 @@ export class ColorFieldManager implements IVisualSystem {
     utils: typeof Utils,
     performanceAnalyzer: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null,
-    settingsManager: SettingsManager,
+    // NOTE: settingsManager parameter removed - was dead code, never used
     year3000System: Year3000System
   ) {
     this.config = config;
     this.utils = utils;
     this.performanceAnalyzer = performanceAnalyzer;
     this.musicSyncService = musicSyncService;
-    this.settingsManager = settingsManager;
+    // NOTE: settingsManager assignment removed - was dead code, never used
     this.year3000System = year3000System;
 
     // Initialize coordination parameters

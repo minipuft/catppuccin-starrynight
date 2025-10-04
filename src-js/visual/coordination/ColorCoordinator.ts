@@ -16,6 +16,7 @@
  * - Delegation Pattern: Delegates to UnifiedColorProcessingEngine for processing
  */
 
+import { settings } from "@/config";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { UnifiedColorProcessingEngine, globalUnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
@@ -31,7 +32,6 @@ import type {
   StrategySelectionCriteria,
 } from "@/types/colorStrategy";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
 import {
   OKLABColorProcessor,
   type EnhancementPreset,
@@ -215,7 +215,6 @@ export class ColorManager implements IColorOrchestrator, IManagedSystem {
   private strategySelector: BackgroundStrategySelector;
   private performanceAnalyzer: SimplePerformanceCoordinator | null;
   private deviceDetector: DeviceCapabilityDetector;
-  private settingsManager: SettingsManager;
 
   // OKLAB coordination system
   private oklabProcessor: OKLABColorProcessor;
@@ -253,11 +252,9 @@ export class ColorManager implements IColorOrchestrator, IManagedSystem {
     this.registry = new ColorStrategyRegistry();
 
     // Initialize enhanced components
-    this.settingsManager = new SettingsManager();
-    
     // Try to get shared PerformanceAnalyzer from global system first
     const globalSystem = (globalThis as any).year3000System;
-    this.performanceAnalyzer = globalSystem?.performanceAnalyzer || 
+    this.performanceAnalyzer = globalSystem?.performanceAnalyzer ||
                                globalSystem?.facadeCoordinator?.getCachedNonVisualSystem?.('SimplePerformanceCoordinator') ||
                                null;
     this.deviceDetector = new DeviceCapabilityDetector();
@@ -1128,21 +1125,15 @@ export class ColorManager implements IColorOrchestrator, IManagedSystem {
     return {
       ...this.selectionCriteria,
       settingsContext: {
-        dynamicAccentEnabled:
-          this.settingsManager.get("sn-dynamic-accent-enabled" as any) ?? true,
-        gradientIntensity:
-          this.settingsManager.get("sn-gradient-intensity" as any) ??
-          "balanced",
-        webglEnabled:
-          this.settingsManager.get("sn-webgl-enabled" as any) ?? true,
-        visualGuideMode:
-          this.settingsManager.get("sn-visual-guide-mode" as any) ?? "cosmic",
-        depthLayersEnabled:
-          this.settingsManager.get("sn-depth-enabled" as any) ?? true,
-        visualEffectsLevel:
-          this.settingsManager.get("sn-visual-effects-level" as any) ?? 0.8,
-        pulsingAnimationEnabled:
-          this.settingsManager.get("sn-pulsing-enabled" as any) ?? true,
+        // NOTE: dynamicAccentEnabled, visualGuideMode, depthLayersEnabled, visualEffectsLevel, pulsingAnimationEnabled
+        // removed - these settings don't exist in schema. Using sensible defaults instead.
+        dynamicAccentEnabled: true, // Default enabled
+        gradientIntensity: settings.get("sn-gradient-intensity") ?? "balanced",
+        webglEnabled: settings.get("sn-webgl-enabled") ?? true,
+        visualGuideMode: "cosmic", // Default mode
+        depthLayersEnabled: true, // Default enabled
+        visualEffectsLevel: 0.8, // Default level
+        pulsingAnimationEnabled: true, // Default enabled
       },
       musicContext: context.musicData,
       deviceContext: {
@@ -1278,13 +1269,12 @@ export class ColorManager implements IColorOrchestrator, IManagedSystem {
 
   private loadUserPreferences(): void {
     try {
+      // NOTE: sn-visual-guide-mode, sn-visual-effects-level, sn-advanced-blending
+      // removed - these settings don't exist in schema. Using sensible defaults.
       this.selectionCriteria.userPreferences = {
-        harmonicMode:
-          this.settingsManager.get("sn-visual-guide-mode" as any) ?? "cosmic",
-        intensity:
-          this.settingsManager.get("sn-visual-effects-level" as any) ?? 0.8,
-        enableAdvancedBlending:
-          this.settingsManager.get("sn-advanced-blending" as any) ?? true,
+        harmonicMode: "cosmic", // Default mode
+        intensity: 0.8, // Default intensity
+        enableAdvancedBlending: true, // Default enabled
       };
     } catch (error) {
       Y3KDebug?.debug?.warn(

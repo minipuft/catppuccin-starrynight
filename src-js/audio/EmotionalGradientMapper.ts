@@ -14,7 +14,7 @@
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+// NOTE: SettingsManager import removed - was dead code, never used
 import {
   EmotionalTemperatureMapper,
   type EmotionalState,
@@ -84,7 +84,7 @@ export interface EmotionalGradientState {
 export class EmotionalGradientMapper {
   private cssController!: OptimizedCSSVariableManager;
   private musicSyncService: MusicSyncService | null = null;
-  private settingsManager: SettingsManager | null = null;
+  // NOTE: settingsManager field removed - was dead code, never used
 
   private currentEmotionalProfile: EmotionalProfile | null = null;
   private currentGradientState: EmotionalGradientState;
@@ -250,12 +250,12 @@ export class EmotionalGradientMapper {
 
   constructor(
     cssController?: OptimizedCSSVariableManager,
-    musicSyncService: MusicSyncService | null = null,
-    settingsManager: SettingsManager | null = null
+    musicSyncService: MusicSyncService | null = null
+    // NOTE: settingsManager parameter removed - was dead code, never used
   ) {
     this.cssController = cssController || getGlobalOptimizedCSSController();
     this.musicSyncService = musicSyncService;
-    this.settingsManager = settingsManager;
+    // NOTE: settingsManager assignment removed - was dead code, never used
 
     // Initialize with neutral gradient state
     this.currentGradientState = this.createNeutralGradientState();

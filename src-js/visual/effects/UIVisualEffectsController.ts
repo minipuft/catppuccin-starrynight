@@ -32,7 +32,7 @@ import type {
 } from "@/types/animationCoordination";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+import { settings } from "@/config";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
 import { VisualEffectsCoordinator as BackgroundAnimationCoordinator, type VisualEffectState } from "@/visual/effects/VisualEffectsCoordinator";
@@ -255,15 +255,13 @@ export class UIEffectsController
     config: AdvancedSystemConfig,
     utils: typeof ThemeUtilities,
     performanceAnalyzer: SimplePerformanceCoordinator,
-    musicSyncService: MusicSyncService,
-    settingsManager: SettingsManager
+    musicSyncService: MusicSyncService
   ) {
     super(
       config,
       utils,
       performanceAnalyzer,
-      musicSyncService,
-      settingsManager
+      musicSyncService
     );
 
     // Initialize default configuration
@@ -315,11 +313,7 @@ export class UIEffectsController
    * Get nebula effect intensity from user settings with layered enhancement
    */
   private getNebulaIntensityFromSettings(): number {
-    if (!this.settingsManager) {
-      return 0.7; // Safe fallback if settings manager not available
-    }
-
-    const setting = this.settingsManager.get("sn-gradient-intensity");
+    const setting = settings.get("sn-gradient-intensity");
 
     // Map string setting to numeric intensity following layered enhancement philosophy
     switch (setting) {

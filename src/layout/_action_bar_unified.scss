@@ -30,19 +30,16 @@
     calc(var(--ethereal-glow-base, 0.2) * 0.4)
   );
 
-  // === DEFAULT INTERFACE TOKENS – ensure graceful fallback before JS initializes ===
-  --header-interface-intensity: 0.8; // 0 → off, 1 → full
-  --header-interface-animation-rate: 8s;
-  --header-interface-primary: var(--sn-color-accent-hex, var(--spice-accent));
-  --header-interface-secondary: var(
-    --sn-color-accent-hex,
-    var(--spice-subtext)
-  );
-  --header-interface-accent: var(--sn-color-accent-hex, var(--spice-accent));
+  // === ACTION BAR COLOR ARCHITECTURE (Complementary Harmony Differentiation) ===
+  --sn-action-bar-intensity: 0.2; // Opacity multiplier for all colors
+  --sn-action-bar-animation-rate: 8s;
+  --sn-action-bar-primary-rgb: var(--sn-color-harmony-complementary-rgb); // Complementary to accent
+  --sn-action-bar-secondary-rgb: var(--sn-cosmic-secondary-rgb);
+  --sn-action-bar-accent-rgb: var(--sn-oklab-accent-rgb);
 
   // === YEAR 3000 VISUAL EFFECTS VARIABLES ===
   --header-visual-effects-flow-speed: calc(
-    var(--header-interface-animation-rate) * 0.8
+    var(--sn-action-bar-animation-rate) * 0.8
   );
   --header-visual-effects-energy: 0.5; // Updated by MusicSyncService
   --header-visual-effects-harmony: 0deg; // Hue rotation based on musical harmony
@@ -68,28 +65,31 @@ body:not(:has(.main-searchPage-content)) {
     z-index: -1;
     pointer-events: none;
 
-    // Dynamic visual effects inspired by Year 3000 design
+    // Override Spotify's inline background-color to enable Year 3000 gradients
+    background-color: transparent !important;
+
+    // Dynamic visual effects inspired by Year 3000 design (Complementary Harmony)
     background:
-      // Primary interface energy
+      // Primary complementary energy
       radial-gradient(
         ellipse 400% 120% at 25% 50%,
-        var(--header-interface-primary) 0%,
+        oklab-color('complementary', var(--sn-action-bar-intensity)) 0%,
         transparent 45%
       ),
-      // Secondary harmonic flow
+      // Secondary cosmic flow
       radial-gradient(
         ellipse 300% 100% at 75% 50%,
-        var(--header-interface-secondary) 0%,
+        oklab-color('secondary', calc(var(--sn-action-bar-intensity) * 0.8)) 0%,
         transparent 40%
       ),
       // Accent energy shimmer
       linear-gradient(
         90deg,
-        var(--header-interface-accent) 0%,
+        oklab-color('accent', var(--sn-action-bar-intensity)) 0%,
         transparent 25%,
-        var(--header-interface-glow) 60%,
+        oklab-color('accent', calc(var(--sn-action-bar-intensity) * 0.4)) 60%,
         transparent 100%
-      );
+      ) !important; // Force override of Spotify inline styles
 
     border-radius: 20px 28px 24px 32px; // Organic, flowing shape
     filter: blur(var(--header-cosmic-blur))

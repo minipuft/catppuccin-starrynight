@@ -15,7 +15,7 @@ import { SimplePerformanceCoordinator, type QualityLevel, type QualityScalingCap
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+import { settings } from "@/config";
 import {
   createGradientTexture,
   DEFAULT_VERTEX_SHADER,
@@ -233,10 +233,9 @@ export class WebGLGradientBackgroundSystem
     utils: typeof import("@/utils/core/ThemeUtilities"),
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
-    settingsManager: SettingsManager | null = null,
     year3000System: any = null
   ) {
-    super(config, utils, performanceMonitor, musicSyncService, settingsManager);
+    super(config, utils, performanceMonitor, musicSyncService);
 
     // Get ColorHarmonyEngine from year3000System if available
     this.colorHarmonyEngine = year3000System?.colorHarmonyEngine || null;
@@ -495,17 +494,13 @@ export class WebGLGradientBackgroundSystem
   }
 
   private loadSettings(): void {
-    if (!this.settingsManager) return;
-
     try {
-      // Load WebGL enabled/disabled state
-      const webglEnabled = this.settingsManager.get("sn-webgl-enabled" as any);
-      const webglForceEnabled = this.settingsManager.get("sn-webgl-force-enabled" as any);
-      const persistenceMode = this.settingsManager.get("sn-webgl-persistence-mode" as any);
-      const intensitySetting = this.settingsManager.get("sn-gradient-intensity");
+      // Load WebGL enabled/disabled state from typed settings
+      const webglEnabled = settings.get("sn-webgl-enabled");
+      const intensitySetting = settings.get("sn-gradient-intensity");
 
       // Apply WebGL enabled state
-      if (webglEnabled === "false" && webglForceEnabled !== "true") {
+      if (!webglEnabled) {
         this.settings.enabled = false;
         Y3KDebug?.debug?.log(
           "WebGLGradientBackgroundSystem",
@@ -514,8 +509,9 @@ export class WebGLGradientBackgroundSystem
         return;
       }
 
-      // Apply persistence mode
-      this.settings.webglPersistenceMode = (persistenceMode as any) || "adaptive";
+      // NOTE: webglForceEnabled and persistenceMode settings removed
+      // Persistence mode now defaults to "adaptive"
+      this.settings.webglPersistenceMode = "adaptive";
 
       // Apply flow gradient intensity
       if (intensitySetting === "disabled") {
@@ -523,7 +519,7 @@ export class WebGLGradientBackgroundSystem
         return;
       }
 
-      this.settings.intensity = (intensitySetting as any) || "balanced";
+      this.settings.intensity = intensitySetting || "balanced";
 
       // Map intensity to parameters
       switch (this.settings.intensity) {
@@ -559,7 +555,6 @@ export class WebGLGradientBackgroundSystem
         "Settings loaded:",
         {
           webglEnabled,
-          webglForceEnabled,
           persistenceMode: this.settings.webglPersistenceMode,
           intensity: this.settings.intensity,
           enabled: this.settings.enabled,
@@ -578,8 +573,6 @@ export class WebGLGradientBackgroundSystem
    * Handle runtime setting changes (implements ISettingsResponsiveSystem pattern)
    */
   public override applyUpdatedSettings(key: string, value: any): void {
-    if (!this.settingsManager) return;
-
     Y3KDebug?.debug?.log(
       "WebGLGradientBackgroundSystem",
       `Runtime setting changed: ${key} = ${value}`
@@ -588,11 +581,11 @@ export class WebGLGradientBackgroundSystem
     try {
       switch (key) {
         case "sn-webgl-enabled":
-          // Handle WebGL enabled/disabled at runtime
-          if (value === "false") {
+          // Handle WebGL enabled/disabled at runtime (boolean value from typed settings)
+          if (!value) {
             this.settings.enabled = false;
             this.destroy(); // Clean up WebGL resources
-          } else if (value === "true" && !this.settings.enabled) {
+          } else if (value && !this.settings.enabled) {
             this.settings.enabled = true;
             // Re-initialize if not already running
             if (!this.gl && this.canvas) {
@@ -601,26 +594,8 @@ export class WebGLGradientBackgroundSystem
           }
           break;
 
-        case "sn-webgl-force-enabled":
-          // Re-evaluate WebGL enablement with force setting
-          const webglEnabled = this.settingsManager.get("sn-webgl-enabled" as any);
-          if (webglEnabled === "false" && value !== "true") {
-            this.settings.enabled = false;
-            this.destroy();
-          }
-          break;
-
-        case "sn-webgl-persistence-mode":
-          // Update persistence mode
-          this.settings.webglPersistenceMode = value || "adaptive";
-          Y3KDebug?.debug?.log(
-            "WebGLGradientBackgroundSystem",
-            `Persistence mode changed to: ${this.settings.webglPersistenceMode}`
-          );
-          break;
-
         case "sn-gradient-intensity":
-          // Handle flow gradient intensity changes (existing logic)
+          // Handle flow gradient intensity changes (IntensityLevel from typed settings)
           if (value === "disabled") {
             this.settings.enabled = false;
           } else {

@@ -149,7 +149,7 @@ describe('Orchestration Validation Tests', () => {
       expect(typeof coordinator.getSharedMusicSyncService).toBe('function');
       expect(typeof coordinator.getSharedColorHarmonyEngine).toBe('function');
       expect(typeof coordinator.getSharedPerformanceAnalyzer).toBe('function');
-      expect(typeof coordinator.getSharedSettingsManager).toBe('function');
+      // NOTE: getSharedSettingsManager removed - SettingsManager deleted in Phase 5, using TypedSettingsManager singleton
     });
   });
 

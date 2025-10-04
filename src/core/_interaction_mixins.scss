@@ -468,3 +468,58 @@
     opacity: 0 !important;
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// KINETIC VERB MIXINS - Semantic Year 3000 Interaction Patterns
+// High-level mixins that wrap existing primitives with semantic naming
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// Kinetic Verb: RIPPLE - List items flow with energy
+/// Combines subtle lift with musical interaction
+@mixin kinetic-ripple() {
+  @include css-hover-lift('subtle');
+  @include css-musical-interaction();
+}
+
+/// Kinetic Verb: BLOOM - Hover enhancement with beat sync
+/// Combines normal lift with musical text glow
+@mixin kinetic-bloom() {
+  @include css-hover-lift('normal');
+
+  &:hover {
+    text-shadow: 0 0 calc(6px * var(--sn-music-beat-pulse-intensity, 0))
+                rgba(var(--sn-accent-rgb, 140, 170, 238), calc(0.5 * var(--sn-music-beat-pulse-intensity, 0)));
+  }
+}
+
+/// Kinetic Verb: HARMONIZE - Background gradient with rhythm
+/// Creates musical gradient that shifts with rhythm phase
+@mixin kinetic-harmonize() {
+  &:hover {
+    background: linear-gradient(
+      calc(90deg + (var(--sn-music-rhythm-phase, 0) * 3deg)),
+      rgba(var(--sn-accent-rgb, 140, 170, 238), 0.8) 0%,
+      rgba(var(--sn-accent-rgb, 140, 170, 238), 0.6) 100%
+    );
+    transition: background 0.3s ease-out;
+  }
+}
+
+/// Kinetic Verb: OSCILLATE - Icon breathes with rhythm
+/// Creates pulsing glow effect synchronized with music beats
+@mixin kinetic-oscillate() {
+  filter: drop-shadow(
+    0 0 calc(4px * var(--sn-music-beat-pulse-intensity, 0))
+    rgba(var(--sn-accent-rgb, 140, 170, 238), calc(0.3 * var(--sn-music-beat-pulse-intensity, 0)))
+  );
+  transition: filter 0.3s ease-out;
+}
+
+/// Kinetic Verb: REFRACT - Text glows with energy
+/// Combines text shimmer with musical glow effect
+@mixin kinetic-refract() {
+  @include lightweight-text-shimmer('subtle');
+
+  text-shadow: 0 0 calc(4px * var(--sn-music-beat-pulse-intensity, 0))
+              rgba(var(--sn-accent-rgb, 140, 170, 238), calc(0.4 * var(--sn-music-beat-pulse-intensity, 0)));
+}

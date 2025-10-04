@@ -14,7 +14,7 @@ function isCosmosAsyncAvailable(): boolean {
   const spicetify = safeGetSpicetify();
   return !!(spicetify?.CosmosAsync);
 }
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+// NOTE: SettingsManager import removed - was dead code, never used
 import * as Utils from "@/utils/core/ThemeUtilities";
 import { SpicetifyCompat } from "@/utils/platform/SpicetifyCompat";
 import { settings } from "@/config";
@@ -180,7 +180,7 @@ interface MusicSyncDependencies {
   ADVANCED_SYSTEM_CONFIG?: Year3000Config;
   YEAR3000_CONFIG?: Year3000Config; // Legacy compatibility
   ThemeUtilities?: typeof Utils;
-  settingsManager?: SettingsManager | undefined;
+  // NOTE: settingsManager removed - was dead code, never used
   year3000System?: Year3000System;
   genreProfileManager?: any;
   [key: string]: unknown;
@@ -313,7 +313,7 @@ const MUSIC_SYNC_CONFIG: MusicSyncConfig = {
 export class MusicSyncService {
   private config: AdvancedSystemConfig | Year3000Config;
   private utils: typeof Utils;
-  private settingsManager?: SettingsManager | null;
+  // NOTE: settingsManager field removed - was dead code, never used
   private year3000System?: Year3000System | null;
   private genreProfileManager: GenreProfileManager;
   
@@ -384,7 +384,7 @@ export class MusicSyncService {
   constructor(dependencies: MusicSyncDependencies = {}) {
     this.config = dependencies.ADVANCED_SYSTEM_CONFIG || dependencies.YEAR3000_CONFIG || ADVANCED_SYSTEM_CONFIG;
     this.utils = dependencies.ThemeUtilities || Utils;
-    this.settingsManager = dependencies.settingsManager || null;
+    // NOTE: settingsManager assignment removed - was dead code, never used
     this.year3000System = dependencies.year3000System || null;
 
     this.genreProfileManager =

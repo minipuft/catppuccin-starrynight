@@ -113,8 +113,7 @@ export class DynamicGradientStrategy
       config,
       utils,
       performanceMonitor,
-      musicSyncService,
-      null
+      musicSyncService
     );
 
     this.cssController = cssController || getGlobalOptimizedCSSController();

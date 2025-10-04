@@ -18,6 +18,7 @@
 
 @use "../core/_mixins" as *;
 @use "../core/_design_tokens" as *;
+@use "../core/_interaction_mixins" as *;
 
 @include left-sidebar-root {
   nav[aria-label="Main"] a,
@@ -293,12 +294,67 @@ nav[aria-label="Main"] ul li a {
 }
 
 /* ████████████████████████████████████████████████████████████████████████████████*/
+/* KINETIC NAVIGATION PATTERNS (Consolidated from _navbar.scss)*/
+/* Uses semantic kinetic verb mixins for consistency and maintainability*/
+/* ████████████████████████████████████████████████████████████████████████████████*/
+
+@include left-sidebar-root {
+  // Kinetic Verb: RIPPLE - List items flow with energy
+  .main-rootlist-wrapper div:nth-child(2) > li > div {
+    @include kinetic-ripple();
+
+    &:active::after {
+      background-color: oklab-color('accent', calc(0.15 + var(--sn-music-beat-pulse-intensity, 0) * 0.1));
+      transition: background-color 0.2s ease-out;
+    }
+
+    p.TypeElement-ballad-textBrightAccent-type {
+      @include kinetic-refract();
+    }
+  }
+
+  // Kinetic Verb: HARMONIZE - Navigation links with rhythm
+  .main-navBar-navBar li:hover > div,
+  .main-navBar-navBar li:hover > a:not(.main-navBar-navBarLinkActive),
+  .spicetify-playlist-list li:hover {
+    @include kinetic-harmonize();
+  }
+
+  // Kinetic Verb: BLOOM - Main navigation links
+  .main-navBar-navBarLink {
+    @include kinetic-bloom();
+  }
+
+  // Kinetic Verb: OSCILLATE - Collection icon breathes with rhythm
+  .Svg-img-24-icon.collection-icon {
+    @include kinetic-oscillate();
+  }
+
+  // Create playlist button - Strong BLOOM
+  .main-createPlaylistButton-button {
+    @include css-hover-lift('strong');
+    @include css-musical-interaction();
+  }
+
+  // Active navigation state with OKLAB shadow stack
+  .main-navBar-navBarLinkActive {
+    @include oklab-shadow-stack('card-active');
+    background: linear-gradient(135deg,
+      oklab-color('accent', 0.9) 0%,
+      oklab-color('accent', 0.7) 100%
+    );
+    border-left: 3px solid oklab-color('accent', 0.8);
+    transform: scale(calc(1 + var(--sn-music-beat-pulse-intensity, 0) * 0.02));
+    transition: all 0.4s var(--sn-easing-explorer, ease-out);
+  }
+}
+
+/* ████████████████████████████████████████████████████████████████████████████████*/
 /* ENHANCED NAVIGATION ITEMS WITH DIMENSIONAL EFFECTS*/
 /* ████████████████████████████████████████████████████████████████████████████████*/
 
 @include left-sidebar-root {
   /* Target general navigation links. Adapt selectors as needed.*/
-  .main-navBar-navBarLink,
   .main-yourLibraryX-navLinkContainer a, /* For library items in grid/list view*/
   .main-rootlist-rootlistItem a, /* For playlist items in folders*/
   .main-playlistFolder-textLink {

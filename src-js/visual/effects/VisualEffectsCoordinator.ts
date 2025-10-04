@@ -44,7 +44,7 @@ import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import type { ChoreographyEventType, DynamicTransitionConfig } from "@/types/animationCoordination";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+// NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { DepthLayeredGradientSystem } from "@/visual/backgrounds/DepthLayeredGradientSystem";
 import { FluidGradientBackgroundSystem } from "@/visual/backgrounds/FluidGradientBackgroundSystem";
 import { WebGLGradientBackgroundSystem } from "@/visual/background/WebGLRenderer";

@@ -4,7 +4,7 @@ import {
   getGlobalOptimizedCSSController,
 } from "@/core/performance/OptimizedCSSVariableManager";
 import { SettingsSection } from "@/ui/components/SettingsSection";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+import { settings } from "@/config";
 import { applyStarryNightSettings } from "@/visual/base/starryNightEffects";
 
 // Helper to get CSS controller for coordination
@@ -48,26 +48,8 @@ export async function initializeStarryNightSettings(): Promise<void> {
     "lavender",
   ];
 
-  // Retrieve the shared SettingsManager (created by Year3000System) or fall back
-  // to a local instance to guarantee the UI works even in degraded mode.
-  function getSettingsManager(): SettingsManager {
-    const existing = (window as any).Y3K?.system?.settingsManager as
-      | SettingsManager
-      | undefined;
-    if (existing) return existing;
-
-    const cached = (globalThis as any).__SN_settingsManager as
-      | SettingsManager
-      | undefined;
-    if (cached) return cached;
-
-    const manager = new SettingsManager();
-    (globalThis as any).__SN_settingsManager = manager;
-    return manager;
-  }
-
-  const settingsManager = getSettingsManager();
-  const currentAccent = settingsManager.get("catppuccin-accentColor");
+  // NOTE: Now using TypedSettingsManager singleton directly via typed settings
+  const currentAccent = settings.get("catppuccin-accentColor");
 
   (section as any).addDropDown(
     "catppuccin-accentColor", // settings key (nameId)
@@ -80,9 +62,9 @@ export async function initializeStarryNightSettings(): Promise<void> {
         try {
           const idx = e?.currentTarget?.selectedIndex ?? 0;
           const newAccent = accentOptions[idx] ?? "mauve";
-          settingsManager.set("catppuccin-accentColor", newAccent as any);
+          settings.set("catppuccin-accentColor", newAccent as any);
 
-          const grad = settingsManager.get("sn-gradient-intensity");
+          const grad = settings.get("sn-gradient-intensity");
           applyStarryNightSettings(grad as any, grad as any); // Use grad for both params since star density is consolidated
 
           // Trigger the main Year3000System to re-apply accent colors selectively
@@ -109,7 +91,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
     "intense",
   ] as const;
 
-  const currentGradient = settingsManager.get("sn-gradient-intensity");
+  const currentGradient = settings.get("sn-gradient-intensity");
 
   (section as any).addDropDown(
     "sn-gradient-intensity",
@@ -121,7 +103,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
       onChange: (e: any) => {
         const idx = e?.currentTarget?.selectedIndex ?? 0;
         const newGrad = intensityOptions[idx] ?? "balanced";
-        settingsManager.set("sn-gradient-intensity", newGrad as any);
+        settings.set("sn-gradient-intensity", newGrad as any);
 
         // Apply consolidated gradient intensity to all background effects
         applyStarryNightSettings(newGrad as any, newGrad as any);
@@ -137,7 +119,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
 
   // --- Brightness mode drop-down ------------------------------------------
   const brightnessOptions = ["bright", "balanced", "dark"] as const;
-  const currentBrightness = settingsManager.get("sn-brightness-mode") || "balanced";
+  const currentBrightness = settings.get("sn-brightness-mode") || "balanced";
 
   (section as any).addDropDown(
     "sn-brightness-mode",
@@ -149,7 +131,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
       onChange: (e: any) => {
         const idx = e?.currentTarget?.selectedIndex ?? 0;
         const newBrightness = brightnessOptions[idx] ?? "bright";
-        settingsManager.set("sn-brightness-mode", newBrightness as any);
+        settings.set("sn-brightness-mode", newBrightness as any);
 
         // Apply brightness mode via coordination
         const cssController = getCSSController();
@@ -191,7 +173,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
 
   // Catppuccin flavour
   const flavourOptions = ["latte", "frappe", "macchiato", "mocha"] as const;
-  const currentFlavor = settingsManager.get("catppuccin-flavor");
+  const currentFlavor = settings.get("catppuccin-flavor");
   (section as any).addDropDown(
     "catppuccin-flavor",
     "Catppuccin flavour (light/dark theme base)",
@@ -201,7 +183,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
     {
       onChange: (e: any) => {
         const idx = e?.currentTarget?.selectedIndex ?? 0;
-        settingsManager.set("catppuccin-flavor", flavourOptions[idx] as any);
+        settings.set("catppuccin-flavor", flavourOptions[idx] as any);
         // Trigger selective flavor update instead of full settings reload
         try {
           (globalThis as any).Y3K?.system?.applyInitialSettings?.("flavor");
@@ -218,7 +200,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
   // Palette System (Year 3000 Enhancement)
   const paletteOptions = ["catppuccin", "year3000"] as const;
   const paletteLabels = ["Catppuccin Classic", "Year 3000 Cinematic"];
-  const currentPalette = settingsManager.get("sn-palette-system");
+  const currentPalette = settings.get("sn-palette-system");
   (section as any).addDropDown(
     "sn-palette-system",
     "Palette system (color foundation vs enhancement)",
@@ -228,7 +210,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
     {
       onChange: (e: any) => {
         const idx = e?.currentTarget?.selectedIndex ?? 0;
-        settingsManager.set("sn-palette-system", paletteOptions[idx] as any);
+        settings.set("sn-palette-system", paletteOptions[idx] as any);
         // Trigger Year3000System to refresh palette coordination
         try {
           (globalThis as any).Y3K?.system?.applyInitialSettings?.("palette");
@@ -244,7 +226,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
 
   // Glassmorphism level
   const glassOptions = ["disabled", "minimal", "moderate", "intense"] as const;
-  const currentGlass = settingsManager.get("sn-glassmorphism-level");
+  const currentGlass = settings.get("sn-glassmorphism-level");
   (section as any).addDropDown(
     "sn-glassmorphism-level",
     "Glassmorphism",
@@ -254,7 +236,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
     {
       onChange: (e: any) => {
         const idx = e?.currentTarget?.selectedIndex ?? 0;
-        settingsManager.set("sn-glassmorphism-level", glassOptions[idx] as any);
+        settings.set("sn-glassmorphism-level", glassOptions[idx] as any);
       },
     }
   );
@@ -267,7 +249,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
     "artist-vision",
     "cosmic-maximum",
   ] as const;
-  const currentArtistic = settingsManager.get("sn-artistic-mode");
+  const currentArtistic = settings.get("sn-artistic-mode");
   (section as any).addDropDown(
     "sn-artistic-mode",
     "Artistic mode",
@@ -278,7 +260,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
       onChange: (e: any) => {
         const idx = e?.currentTarget?.selectedIndex ?? 0;
         const mode = artisticOptions[idx];
-        settingsManager.set("sn-artistic-mode", mode as any);
+        settings.set("sn-artistic-mode", mode as any);
         // Forward the change to the live Year3000System instance so that all
         // subsystems (including ColorHarmonyEngine) receive the update via the
         // shared configuration object.
@@ -291,7 +273,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
 
   // Harmonic mode
   const harmonicModes = Object.keys(HARMONIC_MODES) as string[];
-  const currentHarmMode = settingsManager.get("sn-current-harmonic-mode");
+  const currentHarmMode = settings.get("sn-current-harmonic-mode");
   if (harmonicModes.length) {
     (section as any).addDropDown(
       "sn-current-harmonic-mode",
@@ -303,7 +285,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
         onChange: (e: any) => {
           const idx = e?.currentTarget?.selectedIndex ?? 0;
           const modeKey = harmonicModes[idx];
-          settingsManager.set("sn-current-harmonic-mode", modeKey as any);
+          settings.set("sn-current-harmonic-mode", modeKey as any);
           (globalThis as any).Y3K?.system?.evolveHarmonicSignature?.(modeKey);
         },
       }
@@ -311,7 +293,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
   }
 
   // Harmonic intensity (number input 0-1 step 0.05)
-  const currentHarmInt = settingsManager.get("sn-harmonic-intensity") || "0.7";
+  const currentHarmInt = settings.get("sn-harmonic-intensity") || "0.7";
   (section as any).addInput(
     "sn-harmonic-intensity",
     "Harmonic intensity (music-color sync strength 0-1)",
@@ -320,14 +302,13 @@ export async function initializeStarryNightSettings(): Promise<void> {
     {
       onChange: (e: any) => {
         const val = (e.currentTarget as HTMLInputElement).value;
-        settingsManager.set("sn-harmonic-intensity", val as any);
+        settings.set("sn-harmonic-intensity", val as any);
       },
     }
   );
 
-  // Harmonic evolution toggle
-  const currentEvolution =
-    settingsManager.get("sn-harmonic-evolution") === "true";
+  // Harmonic evolution toggle (TypedSettingsManager provides boolean type)
+  const currentEvolution = settings.get("sn-harmonic-evolution");
   (section as any).addToggle(
     "sn-harmonic-evolution",
     "Allow harmonic evolution",
@@ -335,9 +316,9 @@ export async function initializeStarryNightSettings(): Promise<void> {
     {
       onClick: (e: any) => {
         const checked = (e.currentTarget as HTMLInputElement).checked;
-        settingsManager.set(
+        settings.set(
           "sn-harmonic-evolution",
-          (checked ? "true" : "false") as any
+          checked
         );
       },
     }
@@ -352,8 +333,8 @@ export async function initializeStarryNightSettings(): Promise<void> {
 
   // === Performance Controls ===============================================
   
-  // WebGL enabled toggle
-  const enableWebGL = settingsManager.get("sn-webgl-enabled") === "true";
+  // WebGL enabled toggle (TypedSettingsManager provides boolean type)
+  const enableWebGL = settings.get("sn-webgl-enabled");
   (section as any).addToggle(
     "sn-webgl-enabled",
     "WebGL effects (master toggle for all WebGL backgrounds)",
@@ -361,9 +342,9 @@ export async function initializeStarryNightSettings(): Promise<void> {
     {
       onClick: (e: any) => {
         const checked = (e.currentTarget as HTMLInputElement).checked;
-        settingsManager.set(
+        settings.set(
           "sn-webgl-enabled",
-          (checked ? "true" : "false") as any
+          checked
         );
       },
     }
@@ -371,7 +352,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
 
   // WebGL quality drop-down
   const webglQualityOptions = ["low", "medium", "high"] as const;
-  const currentWebGLQ = settingsManager.get("sn-webgl-quality") || "medium";
+  const currentWebGLQ = settings.get("sn-webgl-quality") || "medium";
   (section as any).addDropDown(
     "sn-webgl-quality",
     "WebGL quality (performance vs visual quality)",
@@ -382,14 +363,14 @@ export async function initializeStarryNightSettings(): Promise<void> {
       onChange: (e: any) => {
         const idx = e?.currentTarget?.selectedIndex ?? 1;
         const val = webglQualityOptions[idx] ?? "medium";
-        settingsManager.set("sn-webgl-quality", val as any);
+        settings.set("sn-webgl-quality", val as any);
       },
     }
   );
 
   // Animation quality drop-down
   const animQualityOptions = ["auto", "low", "high"] as const;
-  const currentAnimQ = settingsManager.get("sn-animation-quality") || "auto";
+  const currentAnimQ = settings.get("sn-animation-quality") || "auto";
   (section as any).addDropDown(
     "sn-animation-quality",
     "Animation quality (auto/low/high performance)",
@@ -400,7 +381,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
       onChange: (e: any) => {
         const idx = e?.currentTarget?.selectedIndex ?? 0;
         const val = animQualityOptions[idx] ?? "auto";
-        settingsManager.set("sn-animation-quality", val as any);
+        settings.set("sn-animation-quality", val as any);
       },
     }
   );
@@ -415,7 +396,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
   console.log("✨ [StarryNight] spcr-settings panel initialised");
 
   // Initialize brightness mode on load using coordination
-  const initialBrightness = settingsManager.get("sn-brightness-mode") || "balanced";
+  const initialBrightness = settings.get("sn-brightness-mode") || "balanced";
 
   const cssController = getCSSController();
   const initialBrightnessVariables = {

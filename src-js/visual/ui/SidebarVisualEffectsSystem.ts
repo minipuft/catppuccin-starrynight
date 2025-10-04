@@ -3,7 +3,7 @@ import { MusicSyncService } from "@/audio/MusicSyncService";
 import type { PerformanceProfile, AdvancedSystemConfig } from "@/types/models";
 import { HARMONIC_MODES } from "@/config/globalConfig";
 import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+// NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { sample as sampleNoise } from "@/utils/graphics/NoiseField";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
@@ -156,10 +156,10 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
     utils: typeof ThemeUtilities,
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService,
-    settingsManager: SettingsManager,
+    // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
     year3000System: Year3000System | null = null
   ) {
-    super(config, utils, performanceMonitor, musicSyncService, settingsManager);
+    super(config, utils, performanceMonitor, musicSyncService);
     this.year3000System = year3000System;
     this.masterAnimationRegistered = false;
     this.isUsingMasterAnimation = false;

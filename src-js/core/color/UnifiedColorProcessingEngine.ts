@@ -31,7 +31,6 @@ import type {
   StrategySelectionCriteria,
 } from "@/types/colorStrategy";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
 import {
   MusicalOKLABProcessor,
   type MusicalColorContext,
@@ -127,7 +126,7 @@ export class UnifiedColorProcessingEngine
   public initialized = false;
 
   // === CORE INFRASTRUCTURE ===
-  private settingsManager: SettingsManager;
+  // REMOVED: private settingsManager: SettingsManager; // Dead code - never used, eliminated during settings consolidation
   private performanceAnalyzer: SimplePerformanceCoordinator | null;
   private deviceCapabilityDetector: DeviceCapabilityDetector;
 
@@ -195,10 +194,10 @@ export class UnifiedColorProcessingEngine
   private readonly CACHE_TTL_MS = 30000; // 30 seconds
 
   constructor(
-    settingsManager?: SettingsManager,
+    // NOTE: settingsManager parameter removed - was dead code, never used
     performanceAnalyzer?: SimplePerformanceCoordinator
   ) {
-    this.settingsManager = settingsManager || new SettingsManager();
+    // NOTE: settingsManager assignment removed - was dead code, never used
     // Performance analyzer will be injected through factory pattern
     this.performanceAnalyzer = performanceAnalyzer || null;
     this.deviceCapabilityDetector = new DeviceCapabilityDetector();
@@ -1410,12 +1409,12 @@ export class UnifiedColorProcessingEngine
 const getSharedDependencies = () => {
   const globalSystem = (globalThis as any).year3000System;
   return {
-    settingsManager: globalSystem?.settingsManager,
-    performanceAnalyzer: globalSystem?.performanceAnalyzer || 
+    // NOTE: settingsManager removed - was dead code in UnifiedColorProcessingEngine
+    performanceAnalyzer: globalSystem?.performanceAnalyzer ||
                         globalSystem?.facadeCoordinator?.getCachedNonVisualSystem?.('PerformanceAnalyzer')
   };
 };
 
-const { settingsManager, performanceAnalyzer } = getSharedDependencies();
+const { performanceAnalyzer } = getSharedDependencies();
 export const globalUnifiedColorProcessingEngine =
-  new UnifiedColorProcessingEngine(settingsManager, performanceAnalyzer);
+  new UnifiedColorProcessingEngine(performanceAnalyzer);

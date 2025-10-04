@@ -59,12 +59,7 @@ describe('Visual System Coordinator Integration', () => {
       getMusicSyncState: jest.fn(() => ({ musicIntensity: 0.5 }))
     };
 
-    const mockSettingsManager = {
-      initialize: jest.fn().mockResolvedValue(undefined),
-      destroy: jest.fn(),
-      initialized: true,
-      getSettings: jest.fn(() => ({}))
-    };
+    // NOTE: mockSettingsManager removed - SettingsManager deleted in Phase 5, using TypedSettingsManager singleton
 
     const mockSemanticColorManager = {
       initialize: jest.fn().mockResolvedValue(undefined),
@@ -82,7 +77,7 @@ describe('Visual System Coordinator Integration', () => {
       mockCSSController,
       mockPerformanceAnalyzer,
       mockMusicSyncService,
-      mockSettingsManager,
+      // NOTE: settingsManager parameter removed - deleted in Phase 5, using TypedSettingsManager singleton
       mockSemanticColorManager
     );
   });

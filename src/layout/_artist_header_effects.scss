@@ -145,17 +145,21 @@
         var(--artist-aura-signature-primary) 0%,
         transparent 20%
       );
+      background-size: 200% 200%; // Allow gradient to shift via animation
 
       border-radius: 12px;
       opacity: calc(var(--artist-aura-intensity) * var(--aura-cascade-strength) * 0.15);
 
-      // TODO: Ensure atmospheric effects don't conflict with existing card animations
+      // Smooth transitions for atmospheric effects
       transition: opacity var(--aura-cascade-transition);
     }
 
-    // Enhanced hover states influenced by aura
+    // Enhanced hover states influenced by aura (pops lighter with flowing animation)
     &:hover::before {
-      opacity: calc(var(--artist-aura-intensity) * var(--aura-cascade-strength) * 0.25);
+      opacity: calc(var(--artist-aura-intensity) * var(--aura-cascade-strength) * 0.35); // Pop lighter
+
+      // Flowing holographic animation shifts brightness/hue/saturation
+      animation: nebula-holographic-flow 18s ease-in-out infinite;
     }
   }
 }

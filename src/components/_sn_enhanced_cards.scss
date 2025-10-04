@@ -197,6 +197,103 @@
   --card-effect-pulse-rate: calc(var(--card-effect-pulse-rate) * 0.7);
 }
 
+// =============================================================================
+// SHELF GRID ATMOSPHERIC GLOW - Year3000 Design System
+// Multi-layer flowing gradients with opacity-based transitions
+// Targets: .main-shelf-shelf .main-gridContainer-gridContainer (the actual card grid)
+// Integrates with --sn-visual-effects-* variables for cosmic atmosphere
+// =============================================================================
+
+.main-shelf-shelf .main-gridContainer-gridContainer {
+  position: relative;
+
+  // Year3000 visual effects integration (increased intensity for visibility)
+  --shelf-glow-base-opacity: calc(
+    0.5 * var(--sn-visual-effects-field-intensity, 0.4)
+  );
+  --shelf-glow-hover-opacity: calc(
+    0.8 * var(--sn-visual-effects-intensity, 0.7)
+  );
+  --shelf-glow-transition: calc(
+    var(--sn-visual-effects-transition-duration, 0.6s) * 1.3
+  );
+
+  // Subtle atmospheric base glow with multi-layer gradients
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 16px;
+
+    // Multi-layer radial gradients for nebula-holographic-flow animation
+    // Each layer shifts independently via background-position
+    background: radial-gradient(
+        circle at 0% 0%,
+        rgba(
+            var(--sn-accent-rgb),
+            calc(0.02 * var(--sn-visual-effects-field-intensity, 0.4))
+          )
+          0%,
+        transparent 60%
+      ),
+      radial-gradient(
+        circle at 100% 100%,
+        rgba(
+            var(--sn-accent-rgb),
+            calc(0.015 * var(--sn-visual-effects-field-intensity, 0.4))
+          )
+          0%,
+        transparent 60%
+      ),
+      radial-gradient(
+        circle at 50% 0%,
+        rgba(
+            var(--sn-accent-rgb),
+            calc(0.025 * var(--sn-visual-effects-field-intensity, 0.4))
+          )
+          0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        circle at 0% 50%,
+        rgba(
+            var(--sn-accent-rgb),
+            calc(0.018 * var(--sn-visual-effects-field-intensity, 0.4))
+          )
+          0%,
+        transparent 70%
+      );
+
+    background-size: 200% 200%; // Allow gradients to shift via animation
+    opacity: var(--shelf-glow-base-opacity);
+    transition: opacity var(--shelf-glow-transition) ease;
+    pointer-events: none;
+    z-index: 0; // Behind cards
+  }
+
+  // Flowing gradient glow on hover (opacity-based, Year3000 standard)
+  &:hover {
+    // No filter on container - only opacity changes on ::before
+
+    &::before {
+      opacity: var(--shelf-glow-hover-opacity);
+
+      // nebula-holographic-flow animates:
+      // - background-position (shifts 4 gradient layers)
+      // - brightness (0.9 → 1.2 cycle)
+      // - saturate (1.1 → 1.4 cycle)
+      // - hue-rotate (0deg → 360deg color shift)
+      animation: nebula-holographic-flow 18s ease-in-out infinite;
+    }
+  }
+
+  // Ensure cards are above the glow
+  > * {
+    position: relative;
+    z-index: 1; // Above glow
+  }
+}
+
 // Navigation Mode: Navigation contexts with balanced interaction
 .Root__nav-bar,
 .main-yourLibrary-yourLibrary,
@@ -215,9 +312,11 @@
 
 // =============================================================================
 // STARRYNIGHT ENHANCED CARDS - Dynamic Interactive Elements
+// Supports both legacy and current Spotify DOM structures
 // =============================================================================
 
-.main-card-card {
+.main-card-card,
+.main-card-cardContainer {
   position: relative;
   perspective: var(--card-perspective-field);
   transform-style: preserve-3d;
@@ -278,7 +377,17 @@
   );
 
   // Advanced glassmorphism with dynamic blur
-  backdrop-filter: blur(20px) saturate(1.3);
+  // Note: backdrop-filter can interfere with child image rendering in some GPU contexts
+  // Using @supports to provide fallback for better compatibility
+  @supports (backdrop-filter: blur(1px)) {
+    backdrop-filter: blur(20px) saturate(1.3);
+  }
+
+  // Fallback for browsers without backdrop-filter support
+  @supports not (backdrop-filter: blur(1px)) {
+    background: rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.15);
+  }
+
   border: 1px solid
     rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.15);
 
@@ -420,9 +529,11 @@
 // =============================================================================
 // PHASE 8: YEAR3000 FLUID MORPHING INTEGRATION
 // Organic breathing animations that respond to music
+// Supports both legacy and current Spotify DOM structures
 // =============================================================================
 
-.main-card-card {
+.main-card-card,
+.main-card-cardContainer {
   // Apply subtle fluid morphing for organic Year3000 aesthetic
   // Lower intensity (0.2) to complement existing visual effects
   @include fluid-morphing(0.2);
@@ -435,10 +546,15 @@
 
 // =============================================================================
 // ENHANCED CARD HEADER - Album Art Visual Effect Source
+// Supports both .main-card-header (legacy) and .main-card-imageContainer (current)
 // =============================================================================
 
-.main-card-header {
+.main-card-header,
+.main-card-imageContainer {
   position: relative;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  overflow: hidden;
   border-radius: var(--card-dynamic-corners) var(--card-dynamic-corners) 0 0;
   transform: var(--card-depth-mid);
 
@@ -471,6 +587,10 @@
   // === Enhanced Image with Contextual Scaling ===
   .main-image-image,
   .main-cardImage-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
     transition: transform var(--calculated-transition)
         var(--card-smooth-fluidity),
       filter var(--calculated-transition) ease;
@@ -483,7 +603,8 @@
   }
 
   // Show visual effect ring on card hover
-  .main-card-card:hover & {
+  .main-card-card:hover &,
+  .main-card-cardContainer:hover & {
     &::before {
       opacity: 1;
     }
@@ -627,7 +748,8 @@
   }
 
   // Show on parent hover with contextual animation
-  .main-card-card:hover & {
+  .main-card-card:hover &,
+  .main-card-cardContainer:hover & {
     opacity: 1;
     transform: translateY(0);
     transition-delay: calc(
@@ -851,7 +973,8 @@
 
 // === ADVANCED CARD STYLING (NON-SEARCH ONLY) ===
 
-body:not(:has(.main-searchPage-content)) .main-card-card {
+body:not(:has(.main-searchPage-content)) .main-card-card,
+body:not(:has(.main-searchPage-content)) .main-card-cardContainer {
   // Foundation
   position: relative;
   border-radius: var(--sn-card-border-radius-enhanced);
@@ -994,18 +1117,24 @@ body:not(:has(.main-searchPage-content)) .main-card-card {
 
 // Stagger animations for multiple selected cards
 body:not(:has(.main-searchPage-content)) .main-card-card.sn-card-selected:nth-child(2n),
-body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]:nth-child(2n) {
+body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]:nth-child(2n),
+body:not(:has(.main-searchPage-content)) .main-card-cardContainer.sn-card-selected:nth-child(2n),
+body:not(:has(.main-searchPage-content)) .main-card-cardContainer[aria-selected="true"]:nth-child(2n) {
   animation-delay: calc(var(--sn-card-breath-duration) * 0.33);
 }
 
 body:not(:has(.main-searchPage-content)) .main-card-card.sn-card-selected:nth-child(3n),
-body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]:nth-child(3n) {
+body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]:nth-child(3n),
+body:not(:has(.main-searchPage-content)) .main-card-cardContainer.sn-card-selected:nth-child(3n),
+body:not(:has(.main-searchPage-content)) .main-card-cardContainer[aria-selected="true"]:nth-child(3n) {
   animation-delay: calc(var(--sn-card-breath-duration) * 0.66);
 }
 
 // Enhanced particles for selected cards
 body:not(:has(.main-searchPage-content)) .main-card-card.sn-card-selected::before,
-body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::before {
+body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::before,
+body:not(:has(.main-searchPage-content)) .main-card-cardContainer.sn-card-selected::before,
+body:not(:has(.main-searchPage-content)) .main-card-cardContainer[aria-selected="true"]::before {
   width: calc(var(--sn-card-particle-size) * 1.5);
   height: calc(var(--sn-card-particle-size) * 1.5);
   opacity: 1;
@@ -1014,7 +1143,9 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::
 }
 
 body:not(:has(.main-searchPage-content)) .main-card-card.sn-card-selected::after,
-body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::after {
+body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::after,
+body:not(:has(.main-searchPage-content)) .main-card-cardContainer.sn-card-selected::after,
+body:not(:has(.main-searchPage-content)) .main-card-cardContainer[aria-selected="true"]::after {
   width: calc(var(--sn-card-particle-size) * 1.2);
   height: calc(var(--sn-card-particle-size) * 1.2);
   opacity: 0.9;
@@ -1026,7 +1157,8 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::
 
 // Reduced motion support - disable animations
 @media (prefers-reduced-motion: reduce) {
-  body:not(:has(.main-searchPage-content)) .main-card-card {
+  body:not(:has(.main-searchPage-content)) .main-card-card,
+  body:not(:has(.main-searchPage-content)) .main-card-cardContainer {
     animation-duration: 0.1s !important;
     transition-duration: 0.2s !important;
 
@@ -1039,7 +1171,8 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::
 
 // Hardware acceleration support
 @supports (will-change: transform) {
-  body:not(:has(.main-searchPage-content)) .main-card-card {
+  body:not(:has(.main-searchPage-content)) .main-card-card,
+  body:not(:has(.main-searchPage-content)) .main-card-cardContainer {
     will-change: transform, box-shadow, border-color, opacity;
 
     &::before,
@@ -1051,7 +1184,8 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::
 
 // High contrast mode support
 @media (prefers-contrast: high) {
-  body:not(:has(.main-searchPage-content)) .main-card-card {
+  body:not(:has(.main-searchPage-content)) .main-card-card,
+  body:not(:has(.main-searchPage-content)) .main-card-cardContainer {
     --sn-card-border-width: 2px;
     border-color: var(--spice-accent) !important;
 
@@ -1082,7 +1216,25 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::
 }
 
 // =============================================================================
-// SHELF 3D RENDERING FIX - Phase 8.5
+// UNIVERSAL 3D RENDERING FIX - Prevents GPU backface culling across all contexts
+// =============================================================================
+// Issue: preserve-3d with nested transforms can cause images to disappear
+// Solution: Flatten 3D rendering by default, allow specific opt-in with class
+// =============================================================================
+
+// Default: Flatten 3D rendering for all cards to prevent image disappearance
+.main-card-card,
+.main-card-cardContainer {
+  // Use flat transform-style to prevent GPU backface culling issues
+  // Cards needing 3D can opt-in with .preserve-3d-override class
+  &:not(.preserve-3d-override) {
+    transform-style: flat !important;
+    backface-visibility: visible !important;
+  }
+}
+
+// =============================================================================
+// SHELF 3D RENDERING FIX - Phase 8.5 (Retained for specificity)
 // =============================================================================
 // Issue: Nested 3D transform contexts (grid rotation + card preserve-3d +
 //        backface-visibility: hidden) cause album art to disappear in shelves
@@ -1121,6 +1273,33 @@ body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::
   transform: translateZ(0);  // Maintain GPU acceleration
   opacity: 1 !important;  // Ensure full visibility
   will-change: transform;  // Hint for GPU optimization
+}
+
+// =============================================================================
+// UNIVERSAL IMAGE VISIBILITY SAFEGUARD - Ensures images display in all contexts
+// =============================================================================
+// Prevents backdrop-filter, 3D transforms, or GPU compositing from hiding images
+.main-card-card,
+.main-card-cardContainer {
+  // Ensure all images within cards are always visible
+  img,
+  .main-image-image,
+  .main-cardImage-image,
+  .main-card-cardImage {
+    opacity: 1 !important;
+    visibility: visible !important;
+    backface-visibility: visible !important;
+    position: relative;  // Ensure proper stacking context
+    z-index: 1;  // Above any backdrop-filter effects
+  }
+
+  // Image containers must not hide content
+  .main-card-header,
+  .main-card-imageContainer,
+  .main-cardImage-imageWrapper {
+    position: relative;
+    z-index: 1;  // Above card pseudo-elements
+  }
 }
 
 // Mobile optimizations

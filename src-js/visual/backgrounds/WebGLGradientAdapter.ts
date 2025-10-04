@@ -11,6 +11,7 @@ import type { WebGLSystemInterface } from "@/core/webgl/WebGLSystemInterface";
 import type { WebGLQuality } from "@/core/webgl/UnifiedWebGLController";
 import { WebGLQualityMapper } from "@/core/webgl/WebGLSystemInterface";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { settings } from "@/config";
 
 export class WebGLGradientAdapter implements WebGLSystemInterface {
   private system: WebGLGradientBackgroundSystem;
@@ -72,15 +73,13 @@ export class WebGLGradientAdapter implements WebGLSystemInterface {
     try {
       // Map simplified settings to the existing system's settings format
       const intensityMapping = this._mapQualityToIntensity(this.quality);
-      
-      // Enable the system through the existing SettingsManager approach
-      if (this.system['settingsManager']) {
-        // Set the flow gradient intensity setting
-        this.system['settingsManager'].set('sn-gradient-intensity', intensityMapping);
-        
-        // Force WebGL enabled
-        this.system['settingsManager'].set('sn-webgl-enabled', 'true');
-      }
+
+      // Enable the system through TypedSettingsManager singleton
+      // Set the flow gradient intensity setting
+      settings.set('sn-gradient-intensity', intensityMapping as any);
+
+      // Force WebGL enabled
+      settings.set('sn-webgl-enabled', true);
       
       // If system wasn't initialized, initialize it
       if (!this.system.initialized) {
@@ -97,10 +96,8 @@ export class WebGLGradientAdapter implements WebGLSystemInterface {
 
   private _disableSystem(): void {
     try {
-      if (this.system['settingsManager']) {
-        // Disable flow gradient
-        this.system['settingsManager'].set('sn-gradient-intensity', 'disabled');
-      }
+      // Disable flow gradient using TypedSettingsManager singleton
+      settings.set('sn-gradient-intensity', 'disabled' as any);
       
       // Call the system's disable/destroy methods if available
       if (typeof (this.system as any)['disable'] === 'function') {

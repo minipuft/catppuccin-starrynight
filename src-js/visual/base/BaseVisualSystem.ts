@@ -1,7 +1,6 @@
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
@@ -32,7 +31,7 @@ export abstract class BaseVisualSystem implements IManagedSystem {
   protected utils: typeof ThemeUtilities;
   protected performanceMonitor: SimplePerformanceCoordinator;
   protected musicSyncService: MusicSyncService | null;
-  protected settingsManager: SettingsManager | null;
+  // REMOVED: protected settingsManager: SettingsManager | null; // Migrated to TypedSettingsManager singleton
   protected systemName: string;
   public initialized: boolean;
   public isActive: boolean;
@@ -54,14 +53,14 @@ export abstract class BaseVisualSystem implements IManagedSystem {
     config: SystemConfig = ADVANCED_SYSTEM_CONFIG,
     utils: typeof ThemeUtilities = ThemeUtilities,
     performanceMonitor: SimplePerformanceCoordinator,
-    musicSyncService: MusicSyncService | null,
-    settingsManager: SettingsManager | null
+    musicSyncService: MusicSyncService | null
+    // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton, events still work via compatibility layer
   ) {
     this.config = config;
     this.utils = utils;
     this.performanceMonitor = performanceMonitor;
     this.musicSyncService = musicSyncService;
-    this.settingsManager = settingsManager;
+    // NOTE: settingsManager assignment removed - using TypedSettingsManager singleton
     this.systemName = this.constructor.name;
     this.initialized = false;
     this.isActive = false;
@@ -89,35 +88,33 @@ export abstract class BaseVisualSystem implements IManagedSystem {
       console.log(`[${this.systemName}] Initializing...`);
     }
 
-    // Phase 1: Set up settings manager and performance profile listener.
-    if (this.settingsManager) {
-      document.addEventListener(
-        "year3000SystemSettingsChanged",
-        this.boundHandleSettingsChange
-      );
-      // Determine an appropriate performance profile entirely via auto-detection.
-      try {
-        const detectorInstance = (globalThis as any).year3000System
-          ?.deviceCapabilityDetector as DeviceCapabilityDetector;
+    // Phase 1: Set up performance profile listener (TypedSettingsManager event compatibility layer handles events automatically).
+    document.addEventListener(
+      "year3000SystemSettingsChanged",
+      this.boundHandleSettingsChange
+    );
+    // Determine an appropriate performance profile entirely via auto-detection.
+    try {
+      const detectorInstance = (globalThis as any).year3000System
+        ?.deviceCapabilityDetector as DeviceCapabilityDetector;
 
-        let quality: "low" | "balanced" | "high" = "balanced";
-        if (detectorInstance?.isInitialized) {
-          quality = detectorInstance.recommendPerformanceQuality();
-        }
-
-        if (this.config.enableDebug) {
-          console.log(`[${this.systemName}] Auto-selected performance quality '${quality}' based on device capability.`);
-        }
-
-        this._applyPerformanceProfile(quality);
-      } catch (e) {
-        // Fall back to a balanced profile on error.
-        this.performanceMonitor?.emitTrace?.(
-          `[${this.systemName}] Device capability detection failed; defaulting to 'balanced'.`,
-          e as any
-        );
-        this._applyPerformanceProfile("balanced");
+      let quality: "low" | "balanced" | "high" = "balanced";
+      if (detectorInstance?.isInitialized) {
+        quality = detectorInstance.recommendPerformanceQuality();
       }
+
+      if (this.config.enableDebug) {
+        console.log(`[${this.systemName}] Auto-selected performance quality '${quality}' based on device capability.`);
+      }
+
+      this._applyPerformanceProfile(quality);
+    } catch (e) {
+      // Fall back to a balanced profile on error.
+      this.performanceMonitor?.emitTrace?.(
+        `[${this.systemName}] Device capability detection failed; defaulting to 'balanced'.`,
+        e as any
+      );
+      this._applyPerformanceProfile("balanced");
     }
 
     // Phase 2: Call the system-specific initialization hook for subclasses.
@@ -196,8 +193,8 @@ export abstract class BaseVisualSystem implements IManagedSystem {
         this.musicSyncService.unsubscribe(this.systemName);
       }
 
-      // Remove event listeners.
-      if (this.settingsManager && this.boundHandleSettingsChange) {
+      // Remove event listeners (TypedSettingsManager event compatibility layer).
+      if (this.boundHandleSettingsChange) {
         document.removeEventListener(
           "year3000SystemSettingsChanged",
           this.boundHandleSettingsChange

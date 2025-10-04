@@ -7,7 +7,7 @@ import { VisualSystemCoordinator, VisualSystemKey, VisualSystemConfig } from '@/
 import { OptimizedCSSVariableManager as CSSVariableBatcher } from '@/core/performance/OptimizedCSSVariableManager';
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { MusicSyncService } from '@/audio/MusicSyncService';
-import { SettingsManager } from '@/ui/managers/SettingsManager';
+// NOTE: SettingsManager import removed - deleted in Phase 5, using TypedSettingsManager singleton
 import { ColorHarmonyEngine } from '@/audio/ColorHarmonyEngine';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import * as Utils from '@/utils/core/ThemeUtilities';
@@ -18,7 +18,7 @@ jest.mock('@/core/performance/OptimizedCSSVariableManager');
 // PerformanceAnalyzer is legacy - remove mock
 jest.mock('@/core/performance/DeviceCapabilityDetector');
 jest.mock('@/audio/MusicSyncService');
-jest.mock('@/ui/managers/SettingsManager');
+// NOTE: SettingsManager mock removed - deleted in Phase 5, using TypedSettingsManager singleton
 jest.mock('@/audio/ColorHarmonyEngine');
 jest.mock('@/core/performance/UnifiedPerformanceCoordinator');
 
@@ -57,7 +57,7 @@ describe('VisualSystemCoordinator', () => {
   let mockCSSVariableBatcher: jest.Mocked<CSSVariableBatcher>;
   let mockPerformanceAnalyzer: jest.Mocked<SimplePerformanceCoordinator>;
   let mockMusicSyncService: jest.Mocked<MusicSyncService>;
-  let mockSettingsManager: jest.Mocked<SettingsManager>;
+  // NOTE: mockSettingsManager removed - deleted in Phase 5, using TypedSettingsManager singleton
   let mockColorHarmonyEngine: jest.Mocked<ColorHarmonyEngine>;
   let mockAdvancedThemeSystem: any;
 
@@ -96,17 +96,14 @@ describe('VisualSystemCoordinator', () => {
       initialize: jest.fn(),
       destroy: jest.fn()
     } as any;
-    
-    mockSettingsManager = {
-      initialize: jest.fn(),
-      destroy: jest.fn()
-    } as any;
-    
+
+    // NOTE: mockSettingsManager initialization removed - deleted in Phase 5
+
     mockColorHarmonyEngine = {
       initialize: jest.fn(),
       destroy: jest.fn()
     } as any;
-    
+
     mockAdvancedThemeSystem = {
       isInitialized: true,
       config: ADVANCED_SYSTEM_CONFIG
@@ -120,7 +117,7 @@ describe('VisualSystemCoordinator', () => {
       mockCSSVariableBatcher,
       mockPerformanceAnalyzer,
       mockMusicSyncService,
-      mockSettingsManager,
+      // NOTE: settingsManager parameter removed - deleted in Phase 5, using TypedSettingsManager singleton
       mockColorHarmonyEngine
     );
   });
@@ -226,7 +223,7 @@ describe('VisualSystemCoordinator', () => {
 
     it('should inject event bus when available', () => {
       const mockEventBus = { subscribe: jest.fn(), emit: jest.fn() };
-      
+
       const bridgeWithEventBus = new VisualSystemCoordinator(
         ADVANCED_SYSTEM_CONFIG,
         Utils,
@@ -234,7 +231,7 @@ describe('VisualSystemCoordinator', () => {
         mockCSSVariableBatcher,
         mockPerformanceAnalyzer,
         mockMusicSyncService,
-        mockSettingsManager,
+        // NOTE: settingsManager parameter removed - deleted in Phase 5, using TypedSettingsManager singleton
         mockColorHarmonyEngine,
         mockEventBus
       );

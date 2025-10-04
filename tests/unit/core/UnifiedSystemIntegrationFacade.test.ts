@@ -16,7 +16,7 @@ jest.mock('@/core/performance/UnifiedPerformanceCoordinator');
 jest.mock('@/core/performance/DeviceCapabilityDetector');
 // PerformanceCSSIntegration doesn't exist - remove mock
 jest.mock('@/debug/UnifiedDebugManager');
-jest.mock('@/ui/managers/SettingsManager');
+// NOTE: SettingsManager mock removed - system deleted in Phase 5, using TypedSettingsManager singleton
 jest.mock('@/audio/ColorHarmonyEngine');
 jest.mock('@/audio/MusicSyncService');
 jest.mock('@/ui/managers/GlassmorphismManager');
@@ -115,10 +115,10 @@ describe('NonVisualSystemFacade', () => {
     });
 
     it('should create core service systems using factory pattern', () => {
-      const settingsManager = facade.getSystem('SettingsManager');
+      const colorHarmonyEngine = facade.getSystem('ColorHarmonyEngine'); // Replaced SettingsManager (deleted in Phase 5)
       const systemHealthMonitor = facade.getSystem('SystemHealthMonitor');
-      
-      expect(settingsManager).toBeDefined();
+
+      expect(colorHarmonyEngine).toBeDefined();
       expect(systemHealthMonitor).toBeDefined();
       expect(facade.getSystemStatus().systemsActive).toBe(2);
     });
@@ -151,9 +151,9 @@ describe('NonVisualSystemFacade', () => {
 
     it('should create different instances for different system keys', () => {
       const performanceAnalyzer = facade.getSystem('PerformanceAnalyzer');
-      const settingsManager = facade.getSystem('SettingsManager');
-      
-      expect(performanceAnalyzer).not.toBe(settingsManager);
+      const colorHarmonyEngine = facade.getSystem('ColorHarmonyEngine'); // Replaced SettingsManager (deleted in Phase 5)
+
+      expect(performanceAnalyzer).not.toBe(colorHarmonyEngine);
       expect(facade.getSystemStatus().systemsActive).toBe(2);
     });
 
@@ -231,12 +231,12 @@ describe('NonVisualSystemFacade', () => {
 
     it('should track system creation metrics', () => {
       facade.getSystem('PerformanceAnalyzer');
-      facade.getSystem('SettingsManager');
-      
+      facade.getSystem('ColorHarmonyEngine'); // Replaced SettingsManager (deleted in Phase 5)
+
       const metrics = facade.getMetrics();
       expect(metrics.initializedSystems).toBe(2);
       expect(metrics.activeSystems).toContain('PerformanceAnalyzer');
-      expect(metrics.activeSystems).toContain('SettingsManager');
+      expect(metrics.activeSystems).toContain('ColorHarmonyEngine');
     });
 
     it('should track system failures', () => {
@@ -264,8 +264,8 @@ describe('NonVisualSystemFacade', () => {
     it('should perform health check on all systems', async () => {
       // Create some systems
       facade.getSystem('PerformanceAnalyzer');
-      facade.getSystem('SettingsManager');
-      
+      facade.getSystem('ColorHarmonyEngine'); // Replaced SettingsManager (deleted in Phase 5)
+
       const healthCheck = await facade.performHealthCheck();
       
       expect(healthCheck).toBeDefined();
@@ -319,8 +319,8 @@ describe('NonVisualSystemFacade', () => {
     it('should initialize all cached systems', async () => {
       // Create some systems
       const system1 = facade.getSystem('PerformanceAnalyzer');
-      const system2 = facade.getSystem('SettingsManager');
-      
+      const system2 = facade.getSystem('ColorHarmonyEngine'); // Replaced SettingsManager (deleted in Phase 5)
+
       // Mock initialize methods
       (system1 as any).initialize = jest.fn().mockResolvedValue(undefined);
       (system2 as any).initialize = jest.fn().mockResolvedValue(undefined);
@@ -487,10 +487,10 @@ describe('NonVisualSystemFacade', () => {
 
     it('should track system metrics correctly', () => {
       facade.getSystem('PerformanceAnalyzer');
-      facade.getSystem('SettingsManager');
-      
+      facade.getSystem('ColorHarmonyEngine'); // Replaced SettingsManager (deleted in Phase 5)
+
       const metrics = facade.getMetrics();
-      
+
       expect(metrics.systemCount).toBe(16); // Total registered systems
       expect(metrics.initializedSystems).toBe(2); // Cached systems
       expect(metrics.failedSystems).toBe(0);
@@ -499,10 +499,10 @@ describe('NonVisualSystemFacade', () => {
 
     it('should update metrics over time', () => {
       const initialMetrics = facade.getMetrics();
-      
+
       facade.getSystem('PerformanceAnalyzer');
-      facade.getSystem('SettingsManager');
-      
+      facade.getSystem('ColorHarmonyEngine'); // Replaced SettingsManager (deleted in Phase 5)
+
       const updatedMetrics = facade.getMetrics();
       
       expect(updatedMetrics.initializedSystems).toBeGreaterThan(initialMetrics.initializedSystems);

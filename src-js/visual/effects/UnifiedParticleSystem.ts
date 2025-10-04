@@ -24,7 +24,7 @@ import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerforman
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+// NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 
@@ -713,10 +713,10 @@ export class UnifiedParticleSystem
     utils: typeof ThemeUtilities,
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
-    settingsManager: SettingsManager | null = null,
+    // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
     year3000System: any = null
   ) {
-    super(config, utils, performanceMonitor, musicSyncService, settingsManager);
+    super(config, utils, performanceMonitor, musicSyncService);
 
     // Get visual effects coordinator from year3000System if available
     this.visualEffectsCoordinator =

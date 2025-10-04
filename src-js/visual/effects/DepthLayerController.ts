@@ -113,10 +113,10 @@ export class DepthVisualEffectsController extends BaseVisualSystem {
     config = ADVANCED_SYSTEM_CONFIG,
     utils = Utils,
     performanceMonitor: any = null,
-    musicSyncService: any = null,
-    settingsManager: any = null
+    musicSyncService: any = null
+    // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
   ) {
-    super(config, utils, performanceMonitor, musicSyncService, settingsManager);
+    super(config, utils, performanceMonitor, musicSyncService);
   }
 
   public override async _performSystemSpecificInitialization(): Promise<void> {

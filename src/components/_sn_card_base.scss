@@ -1,8 +1,12 @@
 /* =============================================================================
    CARD BASE LAYER – shared structural styles (Phase 2)
    -----------------------------------------------------------------------------
-   Purpose: Provide a single source of truth for fundamental `.main-card-card`
-   attributes that must be consistent across Lite & Cosmic variants.
+   Purpose: Provide a single source of truth for fundamental card attributes
+   that must be consistent across all card types and variants.
+
+   Supports both legacy (.main-card-card) and current (.main-card-cardContainer)
+   Spotify DOM structures for maximum compatibility.
+
    This file MUST contain **no high-intensity motion** – keep it gentle so that
    additional layers can opt-in to heavier effects.
 ============================================================================= */
@@ -17,8 +21,10 @@
   perspective-origin: center;
 }
 
-// Base selector – keep scope broad so both search & non-search contexts inherit.
-.main-card-card {
+// Base selector – supports both legacy and current Spotify DOM structures
+// Keep scope broad so both search & non-search contexts inherit.
+.main-card-card,
+.main-card-cardContainer {
   // Layout & geometry
   position: relative;
   border-radius: var(--sn-card-stellar-radius, var(--card-border-radius, 12px));

@@ -21,7 +21,6 @@ import type {
 import type { HealthCheckResult } from "@/types/systems";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 
 interface ShimmerElement {
@@ -122,10 +121,9 @@ export class IridescentShimmerEffectsSystem
   constructor(
     config: AdvancedSystemConfig | Year3000Config = ADVANCED_SYSTEM_CONFIG,
     utils: typeof import("@/utils/core/ThemeUtilities"),
-    performanceMonitor: SimplePerformanceCoordinator,
-    settingsManager: SettingsManager | null = null
+    performanceMonitor: SimplePerformanceCoordinator
   ) {
-    super(config, utils, performanceMonitor, null, settingsManager);
+    super(config, utils, performanceMonitor, null);
 
     this.shimmerElements = new Map();
     // Initialize CSS Controller - get from Year3000System or global instance
@@ -306,30 +304,9 @@ export class IridescentShimmerEffectsSystem
   }
 
   private loadSettings(): void {
-    if (!this.settingsManager) return;
-
-    try {
-      const intensitySetting = this.settingsManager.get(
-        "sn-shimmer-intensity" as any
-      );
-      if (intensitySetting) {
-        this.shimmerSettings.intensity = intensitySetting;
-        this.applyIntensitySettings();
-      }
-
-      const enabledSetting = this.settingsManager.get(
-        "sn-shimmer-enabled" as any
-      );
-      if (enabledSetting !== undefined) {
-        this.shimmerSettings.enabled = enabledSetting;
-      }
-    } catch (error) {
-      Y3KDebug?.debug?.warn(
-        "IridescentShimmerEffectsSystem",
-        "Failed to load settings:",
-        error
-      );
-    }
+    // NOTE: Shimmer settings (sn-shimmer-intensity, sn-shimmer-enabled) removed
+    // Using default shimmer settings from constructor
+    // Future: Could integrate with global settings if shimmer controls are added
   }
 
   private applyIntensitySettings(): void {

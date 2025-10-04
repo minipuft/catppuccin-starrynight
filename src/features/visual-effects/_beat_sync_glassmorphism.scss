@@ -200,7 +200,8 @@
 }
 
 // Enhanced cards with visual-effects glass styling (NO BACKDROP FILTERS)
-.main-card-card {
+.main-card-card,
+.main-card-cardContainer {
   // IMPORTANT: Let our Year 3000 search precision module handle search cards entirely
   body:not(.main-searchPage-content) & {
     // Apply visual-effects-enhanced glass effects outside search pages
@@ -281,7 +282,8 @@
   @include right-sidebar-root {
     background: rgba(var(--spice-rgb-surface0), 0.8) !important;
   }
-  .main-card-card {
+  .main-card-card,
+  .main-card-cardContainer {
     // REMOVED ALL BACKDROP FILTERS - use solid backgrounds instead
     background: rgba(var(--spice-rgb-surface0), 0.8) !important;
   }
@@ -360,7 +362,8 @@
 
   // Enhanced borders for visual-effects elements
   .Root__nav-bar,
-  .main-card-card {
+  .main-card-card,
+  .main-card-cardContainer {
     border-width: 2px !important;
   }
 }
@@ -385,7 +388,8 @@
 
   // Simplified mobile visual-effects effects
   .Root__nav-bar,
-  .main-card-card {
+  .main-card-card,
+  .main-card-cardContainer {
     filter: hue-rotate(calc(var(--sn-glass-rhythm-hue) * 0.5));
   }
 }
@@ -416,7 +420,8 @@
 
 // Now-playing bar fallbacks moved to _now_playing.scss for integrated control
 
-.main-card-card {
+.main-card-card,
+.main-card-cardContainer {
   // Let Year 3000 search precision handle search cards
   body:not(:has(.main-searchPage-content)) & {
     background: rgba(var(--spice-rgb-surface0), 0.7) !important;

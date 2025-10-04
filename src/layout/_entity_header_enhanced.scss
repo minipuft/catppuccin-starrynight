@@ -7,29 +7,50 @@
 @use "../core/_mixins" as *;
 @use "../core/_design_tokens" as *;
 
+:root {
+  // Entity Header Color Architecture (Analogous Harmony Differentiation)
+  --sn-entity-header-primary-rgb: var(--sn-color-harmony-analogous-rgb);
+  --sn-entity-header-secondary-rgb: var(--sn-cosmic-secondary-rgb);
+  --sn-entity-header-accent-rgb: var(--sn-oklab-accent-rgb);
+  --sn-entity-header-intensity: 0.2;
+}
+
 @include entity-header-root {
   position: relative;
 
-  // Holographic gradient background for all entities
-  background: linear-gradient(
-    145deg,
-    rgba(
-        var(--sn-header-primary-rgb, var(--spice-rgb-accent)),
-        var(--sn-header-intensity, 0.2)
-      )
-      0%,
-    rgba(
-        var(--sn-header-secondary-rgb, var(--spice-rgb-surface0)),
-        calc(var(--sn-header-intensity, 0.2) * 0.7)
-      )
-      40%,
-    rgba(
-        var(--sn-header-accent-rgb, var(--spice-rgb-surface1)),
-        calc(var(--sn-header-intensity, 0.2) * 0.4)
-      )
-      100%
-  );
-  transition: background 800ms var(--sn-anim-easing-organic);
+  // Multi-layer gradient system for dynamic album art integration (Analogous Harmony)
+  background:
+    // Primary analogous energy (radial from header area)
+    radial-gradient(
+      ellipse 400% 150% at 50% 20%,
+      oklab-color('analogous', var(--sn-entity-header-intensity)) 0%,
+      transparent 45%
+    ),
+    // Secondary cosmic flow (radial from lower area)
+    radial-gradient(
+      ellipse 300% 120% at 50% 60%,
+      oklab-color('secondary', calc(var(--sn-entity-header-intensity) * 0.8)) 0%,
+      transparent 40%
+    ),
+    // Accent shimmer layer (linear gradient for depth)
+    linear-gradient(
+      145deg,
+      oklab-color('accent', var(--sn-entity-header-intensity)) 0%,
+      transparent 30%,
+      oklab-color('accent', calc(var(--sn-entity-header-intensity) * 0.4)) 70%,
+      transparent 100%
+    );
+
+  // Organic flowing shape matching action bar architecture
+  border-radius: 16px 20px 18px 22px;
+
+  // Visual effects for depth (matching action bar system)
+  filter: blur(var(--header-cosmic-blur, 12px))
+    saturate(calc(var(--cosmic-saturation, 1.4) * 0.9))
+    brightness(calc(1 + 0.08 * var(--sn-entity-header-intensity)));
+
+  transition: background 800ms var(--sn-anim-easing-organic),
+    filter 800ms var(--sn-anim-easing-organic);
 
   // Remove default Spotify backgrounds
   .main-entityHeader-backgroundColor,
@@ -44,25 +65,39 @@
     z-index: 1;
   }
 
-  // Holographic overlay effect
+  // Enhanced holographic overlay with music-reactive effects
   &::before {
     content: "";
     position: absolute;
     inset: 0;
+    z-index: 1;
+    pointer-events: none;
 
-    background: linear-gradient(
-      45deg,
-      transparent 30%,
-      oklab-color('accent', 0.1) 50%,
-      transparent 70%
-    );
-    backdrop-filter: blur(20px) brightness(1.2) contrast(1.1);
-    border: 1px solid oklab-color('accent', 0.3);
-    border-radius: 12px;
+    // Multi-layer shimmer effect
+    background:
+      // Primary accent shimmer
+      linear-gradient(
+        45deg,
+        transparent 30%,
+        oklab-color('accent', calc(0.1 + var(--sn-music-beat-pulse-intensity, 0) * 0.05)) 50%,
+        transparent 70%
+      ),
+      // Analogous harmony glow
+      radial-gradient(
+        ellipse 120% 100% at 50% 50%,
+        transparent 40%,
+        oklab-color('analogous', 0.08) 60%,
+        transparent 80%
+      );
+
+    backdrop-filter: blur(20px) brightness(calc(1.2 + var(--sn-music-beat-pulse-intensity, 0) * 0.05)) contrast(1.1);
+    border: 1px solid oklab-color('accent', calc(0.3 + var(--sn-music-beat-pulse-intensity, 0) * 0.15));
+    border-radius: 16px 20px 18px 22px; // Match parent border-radius
     @include oklab-shadow-stack('header-base');
 
-    // Gentle holographic pulse
+    // Music-reactive holographic pulse
     animation: holographic-pulse 3s ease-in-out infinite;
+    transition: backdrop-filter 300ms ease-out, border-color 300ms ease-out;
   }
 }
 

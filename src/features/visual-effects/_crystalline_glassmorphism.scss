@@ -69,7 +69,9 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // === CARDS BECOME FLOATING CRYSTALS ===
-.main-card-card {
+// Supports both legacy and current Spotify DOM structures
+.main-card-card,
+.main-card-cardContainer {
   @include crystalline-card-effect;
 
   // Staggered animation delays for depth
@@ -254,6 +256,7 @@ input[type="search"],
 // Beat-synchronized crystalline pulsing (TypeScript controlled)
 .Root[style*="--sn-music-beat-pulse-intensity"] {
   .main-card-card,
+  .main-card-cardContainer,
   .main-trackList-trackListRow,
   .main-playButton-PlayButton {
     // Music energy directly modulates intensity
@@ -265,6 +268,7 @@ input[type="search"],
 // Genre-responsive hue shifting (TypeScript controlled)
 .Root[style*="--sn-dynamic-genre-hue-shift"] {
   .main-card-card,
+  .main-card-cardContainer,
   .main-trackList-trackListRow {
     filter: hue-rotate(var(--sn-dynamic-genre-hue-shift, 0deg));
   }
@@ -286,7 +290,8 @@ input[type="search"],
     --sn-unified-blur-amount: 15px;             // Less blur
   }
 
-  .main-card-card {
+  .main-card-card,
+  .main-card-cardContainer {
     margin: 4px;
   }
 }
@@ -299,6 +304,7 @@ input[type="search"],
   }
 
   .main-card-card,
+  .main-card-cardContainer,
   .main-trackList-trackListRow {
     border-width: 2px;
     border-color: rgba(var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)), 0.6);

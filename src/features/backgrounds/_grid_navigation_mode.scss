@@ -36,7 +36,8 @@
     }
 
     // Individual card drift (very subtle, not distracting) (scale removed)
-    .main-gridContainer-gridContainer .main-card-card {
+    .main-gridContainer-gridContainer .main-card-card,
+    .main-gridContainer-gridContainer .main-card-cardContainer {
       // Vertical drift ties to rhythm phase; horizontal ties to intensity
       transform: translate3d(
           calc(var(--interface-drift-range) * (var(--sn-music-beat-pulse-intensity, 0) - 0.5)),
@@ -62,7 +63,8 @@
       transition: none;
     }
 
-    .main-card-card {
+    .main-card-card,
+    .main-card-cardContainer {
       transform: none !important;
       transition: none !important;
     }

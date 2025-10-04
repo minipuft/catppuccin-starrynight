@@ -2,7 +2,7 @@ import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
-import { SettingsManager } from "@/ui/managers/SettingsManager";
+// NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
@@ -84,10 +84,10 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     utils: typeof ThemeUtilities,
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService,
-    settingsManager: SettingsManager,
+    // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
     year3000System: Year3000System | null = null
   ) {
-    super(config, utils, performanceMonitor, musicSyncService, settingsManager);
+    super(config, utils, performanceMonitor, musicSyncService);
     this.year3000System = year3000System;
 
     this.nexusState = {
