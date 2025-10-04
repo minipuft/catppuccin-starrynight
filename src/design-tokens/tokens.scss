@@ -463,76 +463,17 @@
   // OKLAB presets optimized for different music genres (updated by GenreProfileManager)
   
   // Electronic/EDM - Vibrant, high-energy OKLAB processing
-  --sn-genre-electronic-oklab-preset: "COSMIC";
   --sn-genre-electronic-oklab-chroma-boost: 1.6;
   --sn-genre-electronic-oklab-lightness-boost: 1.2;
-  --sn-genre-electronic-oklab-hue-shift: 15;
-  --sn-genre-electronic-oklab-primary-rgb: var(--sn-emotion-energetic-oklab-primary-rgb);
-  --sn-genre-electronic-oklab-accent-rgb: var(--sn-emotion-energetic-oklab-accent-rgb);
   
   // Classical - Subtle, refined OKLAB processing
-  --sn-genre-classical-oklab-preset: "SUBTLE";
   --sn-genre-classical-oklab-chroma-boost: 1.1;
   --sn-genre-classical-oklab-lightness-boost: 1.05;
-  --sn-genre-classical-oklab-hue-shift: 5;
-  --sn-genre-classical-oklab-primary-rgb: var(--sn-emotion-romantic-oklab-primary-rgb);
-  --sn-genre-classical-oklab-accent-rgb: var(--sn-emotion-romantic-oklab-accent-rgb);
   
   // Rock/Metal - Bold, intense OKLAB processing
-  --sn-genre-rock-oklab-preset: "VIBRANT";
   --sn-genre-rock-oklab-chroma-boost: 1.4;
   --sn-genre-rock-oklab-lightness-boost: 1.1;
-  --sn-genre-rock-oklab-hue-shift: 10;
-  --sn-genre-rock-oklab-primary-rgb: var(--sn-emotion-aggressive-oklab-primary-rgb);
-  --sn-genre-rock-oklab-accent-rgb: var(--sn-emotion-aggressive-oklab-accent-rgb);
   
-  // Jazz - Sophisticated, warm OKLAB processing
-  --sn-genre-jazz-oklab-preset: "STANDARD";
-  --sn-genre-jazz-oklab-chroma-boost: 1.25;
-  --sn-genre-jazz-oklab-lightness-boost: 1.08;
-  --sn-genre-jazz-oklab-hue-shift: 8;
-  --sn-genre-jazz-oklab-primary-rgb: var(--sn-emotion-mysterious-oklab-primary-rgb);
-  --sn-genre-jazz-oklab-accent-rgb: var(--sn-emotion-mysterious-oklab-accent-rgb);
-  
-  // Hip-Hop/Rap - Dynamic, punchy OKLAB processing
-  --sn-genre-hiphop-oklab-preset: "VIBRANT";
-  --sn-genre-hiphop-oklab-chroma-boost: 1.5;
-  --sn-genre-hiphop-oklab-lightness-boost: 1.15;
-  --sn-genre-hiphop-oklab-hue-shift: 12;
-  --sn-genre-hiphop-oklab-primary-rgb: var(--sn-emotion-epic-oklab-primary-rgb);
-  --sn-genre-hiphop-oklab-accent-rgb: var(--sn-emotion-epic-oklab-accent-rgb);
-  
-  // Ambient/Drone - Atmospheric, ethereal OKLAB processing
-  --sn-genre-ambient-oklab-preset: "SUBTLE";
-  --sn-genre-ambient-oklab-chroma-boost: 1.05;
-  --sn-genre-ambient-oklab-lightness-boost: 1.02;
-  --sn-genre-ambient-oklab-hue-shift: 3;
-  --sn-genre-ambient-oklab-primary-rgb: var(--sn-emotion-ambient-oklab-primary-rgb);
-  --sn-genre-ambient-oklab-accent-rgb: var(--sn-emotion-ambient-oklab-accent-rgb);
-  
-  // Folk/Acoustic - Natural, warm OKLAB processing
-  --sn-genre-folk-oklab-preset: "STANDARD";
-  --sn-genre-folk-oklab-chroma-boost: 1.15;
-  --sn-genre-folk-oklab-lightness-boost: 1.05;
-  --sn-genre-folk-oklab-hue-shift: 5;
-  --sn-genre-folk-oklab-primary-rgb: var(--sn-emotion-calm-oklab-primary-rgb);
-  --sn-genre-folk-oklab-accent-rgb: var(--sn-emotion-calm-oklab-accent-rgb);
-  
-  // Pop - Balanced, pleasant OKLAB processing
-  --sn-genre-pop-oklab-preset: "STANDARD";
-  --sn-genre-pop-oklab-chroma-boost: 1.3;
-  --sn-genre-pop-oklab-lightness-boost: 1.1;
-  --sn-genre-pop-oklab-hue-shift: 8;
-  --sn-genre-pop-oklab-primary-rgb: var(--sn-emotion-happy-oklab-primary-rgb);
-  --sn-genre-pop-oklab-accent-rgb: var(--sn-emotion-happy-oklab-accent-rgb);
-  
-  // Default fallback genre - Balanced OKLAB processing
-  --sn-genre-default-oklab-preset: "STANDARD";
-  --sn-genre-default-oklab-chroma-boost: 1.2;
-  --sn-genre-default-oklab-lightness-boost: 1.05;
-  --sn-genre-default-oklab-hue-shift: 5;
-  --sn-genre-default-oklab-primary-rgb: var(--sn-cosmic-accent-rgb);
-  --sn-genre-default-oklab-accent-rgb: var(--sn-cosmic-accent-rgb);
 
   // === GENRE UI BRIDGE INTEGRATION ===
   // CSS variables for genre-aware UI styling (GenreUIBridge integration)
