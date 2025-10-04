@@ -142,6 +142,65 @@ For advanced tweaks, you can override CSS variables by creating a `user.css` fil
 
 See the [**Customization Guide**](docs/README.md) for more details.
 
+## 🎯 Token System
+
+StarryNight uses a carefully curated system of **277 CSS custom properties (tokens)** to power its dynamic visuals and music-reactive effects. After a comprehensive Phase 5 consolidation, the system achieved a **42.77% reduction** (from 484 original tokens) while maintaining 100% backwards compatibility.
+
+### Key Features
+
+- **🎨 Semantic Naming**: All tokens follow `--sn-{category}-{name}` pattern for clarity
+- **🎵 Music-Reactive**: Real-time token updates synchronized with beat detection and audio analysis
+- **🌈 OKLAB Color Science**: Perceptually uniform color processing for natural harmonization
+- **⚡ Performance-First**: Optimized for 60fps with minimal delegation chains
+- **♿ Accessible**: Automatic support for `prefers-reduced-motion`
+
+### Token Categories
+
+| Category | Count | Examples |
+|----------|-------|----------|
+| **Animation** | 40 | `--sn-anim-easing-organic`, `--sn-transition-fast-duration` |
+| **Color** | 35 | `--sn-color-accent-rgb`, `--sn-cosmic-base-hex` |
+| **Music Sync** | 15 | `--sn-music-beat-pulse-intensity`, `--sn-music-tempo-bpm` |
+| **Visual Effects** | 25 | `--sn-visual-effects-depth-field`, `--sn-visual-effects-magnetic-hover-pull` |
+| **UI Components** | 25 | `--sn-ui-glass-blur`, `--sn-ui-card-beat-intensity` |
+| **Layout** | 18 | `--sn-layout-space-md`, `--sn-layout-z-ui` |
+| **Background** | 10 | `--sn-bg-gradient-primary-rgb`, `--sn-bg-beat-pulse` |
+| **Other** | 109 | Performance, brightness, genre-specific |
+
+### Documentation
+
+- **[Token System Architecture](docs/token-system-architecture.md)**: Complete system overview, categories, and integration patterns
+- **[Token Governance](docs/token-governance.md)**: Standards for adding, modifying, and deprecating tokens
+- **[Token Usage Guide](docs/token-usage-guide.md)**: Developer guide with examples, recipes, and best practices
+- **[Legacy Token Migration](docs/LEGACY_TOKEN_MIGRATION.md)**: Migration guide for deprecated tokens
+
+### Quick Reference
+
+**Common Token Patterns**:
+```css
+/* Music-reactive opacity */
+.element {
+  opacity: calc(1 - var(--sn-music-beat-pulse-intensity) * 0.3);
+}
+
+/* Glassmorphism effect */
+.glass {
+  backdrop-filter: blur(var(--sn-ui-glass-blur));
+  background: rgba(var(--sn-color-accent-rgb), var(--sn-ui-glass-opacity));
+}
+
+/* Smooth transitions (automatically respects reduced motion) */
+.animated {
+  transition: transform var(--sn-transition-fast-duration) var(--sn-anim-easing-organic);
+}
+```
+
+**Validation**:
+```bash
+# Validate token system integrity
+npm run validate:tokens
+```
+
 ## 🛠️ Troubleshooting
 
 **Theme not applying correctly?**

@@ -49,6 +49,7 @@
     "build:css:advanced": "sass app.scss user.css --style=compressed --quiet && postcss user.css --replace --config config/postcss/advanced.config.js",
     "build:css:benchmark": "npm run measure-css:backup && time npm run build:css:advanced && npm run measure-css:compare",
     "validate": "npm run typecheck && npm run lint:css && npm run test",
+    "validate:tokens": "./scripts/validate-tokens.sh",
     "validate:fix": "npm run lint:js:fix && npm run validate",
     "test:comprehensive": "node scripts/run-comprehensive-tests.js",
     "test:theme": "node scripts/validate-theme-structure.js && node scripts/validate-color-schemes.js",
