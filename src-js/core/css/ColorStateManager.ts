@@ -81,12 +81,30 @@ export interface ColorStateEvents {
   };
 }
 
-export class ColorStateManager implements IManagedSystem {
+/**
+ * 🔧 PHASE 3: CSS Color Controller - Single CSS Write Authority
+ *
+ * ARCHITECTURAL ROLE: CSS Authority - OWNS all CSS variable writes for color system
+ * - Subscribes to: colors:harmonized, colors:extracted events
+ * - Manages: Color state, brightness modes, flavor coordination
+ * - OWNS: ALL CSS variable writes via OptimizedCSSVariableManager
+ * - Coordinates: SemanticColorManager for Spicetify integration
+ * - Emits: colors:applied event after CSS application
+ *
+ * SINGLE RESPONSIBILITY: CSS variable management and color state coordination
+ * - NO color processing (delegated to OKLABColorProcessor)
+ * - NO event routing (delegated to ColorEventOrchestrator)
+ * - Pure CSS write authority with state management
+ *
+ * @class CSSColorController
+ * @implements {IManagedSystem}
+ */
+export class CSSColorController implements IManagedSystem {
   public initialized = false;
   private currentState: ColorStateResult | null = null;
   private isUpdating = false;
 
-  // 🔧 PHASE 2: CSS Authority Consolidation - Single Optimized Controller
+  // 🔧 PHASE 3: CSS Authority - Single Optimized Controller
   private cssController!: OptimizedCSSVariableManager;
 
   // Performance tracking
@@ -574,29 +592,38 @@ export class ColorStateManager implements IManagedSystem {
    * This replaces individual CSS application in ColorHarmonyEngine and orchestrators
    */
   private async handleProcessedColors(event: any): Promise<void> {
-    const { processedColors, accentHex, accentRgb, strategies, coordinationMetrics } = event;
-    
-    // Apply processed colors to CSS variables through our batching system
+    const { processedColors, cssVariables, accentHex, accentRgb, strategies, coordinationMetrics, timestamp } = event;
+
+    // 🔧 PHASE 2: CSS Authority Pattern
+    // ColorStateManager is the SINGLE source of truth for ALL CSS variable writes
     const colorVariables: Record<string, string> = {};
-    
-    // Convert processed colors to CSS variables
-    Object.entries(processedColors as Record<string, string>).forEach(([key, value]) => {
-      if (value) {
-        const cssVar = key.startsWith('--') ? key : `--sn-${key.toLowerCase().replace(/_/g, '-')}`;
-        colorVariables[cssVar] = value;
-      }
-    });
-    
-    // Add primary accent colors
+
+    // 🔧 PHASE 2: Prefer pre-generated CSS variables from processor (OKLABColorProcessor)
+    if (cssVariables && typeof cssVariables === 'object') {
+      // Use complete CSS variable set from pure processor
+      Object.assign(colorVariables, cssVariables);
+    } else {
+      // Fallback: Convert processed colors to CSS variables (legacy compatibility)
+      Object.entries(processedColors as Record<string, string>).forEach(([key, value]) => {
+        if (value) {
+          const cssVar = key.startsWith('--') ? key : `--sn-${key.toLowerCase().replace(/_/g, '-')}`;
+          colorVariables[cssVar] = value;
+        }
+      });
+    }
+
+    // Ensure primary accent colors are always set (critical for Year3000 system)
     if (accentHex) {
       colorVariables['--sn-accent-hex'] = accentHex;
       colorVariables['--sn-processed-accent-hex'] = accentHex;
+      colorVariables['--sn-color-accent-hex'] = accentHex;
     }
     if (accentRgb) {
       colorVariables['--sn-accent-rgb'] = accentRgb;
       colorVariables['--sn-processed-accent-rgb'] = accentRgb;
+      colorVariables['--sn-color-accent-rgb'] = accentRgb;
     }
-    
+
     // Add coordination metrics as CSS variables for debugging
     if (coordinationMetrics) {
       if (coordinationMetrics.emotionalState) {
@@ -610,17 +637,26 @@ export class ColorStateManager implements IManagedSystem {
     // Apply all color variables with appropriate priorities
     Object.entries(colorVariables).forEach(([property, value]) => {
       let priority: 'critical' | 'high' | 'normal' | 'low' = 'normal';
-      
+
       if (property.includes('accent-hex') || property.includes('accent-rgb')) {
         priority = 'high';
       } else if (property.includes('debug') || property.includes('state') || property.includes('influence')) {
         priority = 'low';
       }
-      
+
       this.queueCSSVariableUpdate(property, value, priority);
     });
-    
-    console.log(`🎨 [ColorStateManager] Applied ${Object.keys(colorVariables).length} processed color variables`);
+
+    // 🔧 PHASE 2: Emit colors:applied event for UI components needing immediate notification
+    unifiedEventBus.emitSync('colors:applied', {
+      cssVariables: colorVariables,
+      accentHex: accentHex || colorVariables['--sn-accent-hex'],
+      accentRgb: accentRgb || colorVariables['--sn-accent-rgb'],
+      strategies: strategies || ['OKLABColorProcessor'],
+      appliedAt: timestamp || Date.now()
+    });
+
+    console.log(`🎨 [ColorStateManager] Applied ${Object.keys(colorVariables).length} processed color variables from ${strategies?.join(', ') || 'OKLABColorProcessor'}`);
   }
 
   /**
@@ -737,5 +773,34 @@ export class ColorStateManager implements IManagedSystem {
   }
 }
 
+// =============================================================================
+// BACKWARD COMPATIBILITY ALIASES
+// =============================================================================
+
+/**
+ * @deprecated Use CSSColorController instead. This alias is provided for backward compatibility.
+ * Will be removed in a future version after all imports are updated.
+ *
+ * ColorStateManager has been renamed to CSSColorController to better reflect its role
+ * as the single CSS write authority in the architecture.
+ *
+ * Migration path:
+ * ```typescript
+ * // Old (deprecated)
+ * import { ColorStateManager } from '@/core/css/ColorStateManager';
+ *
+ * // New (recommended)
+ * import { CSSColorController } from '@/core/css/ColorStateManager';
+ * // or: import { CSSColorController as ColorStateManager } from '@/core/css/ColorStateManager';
+ * ```
+ */
+export const ColorStateManager = CSSColorController;
+
+/**
+ * @deprecated Use CSSColorController type instead. This type alias is provided for backward compatibility.
+ * Will be removed in a future version after all type annotations are updated.
+ */
+export type ColorStateManager = CSSColorController;
+
 // Global instance
-export const globalColorStateManager = new ColorStateManager();
+export const globalColorStateManager = new CSSColorController();

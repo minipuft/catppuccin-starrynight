@@ -1,12 +1,19 @@
 /**
- * ColorEventManager - Unified Color Processing Event Pipeline
+ * 🔧 PHASE 4: ColorEventRouter - Pure Event Router (zero processing logic)
  *
- * Manages the complete color processing flow using the unified event system,
- * eliminating duplication and providing a single, efficient pipeline for all
- * color-related events throughout the theme.
+ * ARCHITECTURAL ROLE: Pure Event Router - NO processing logic
+ * - Coordinates color extraction requests → MusicalOKLABProcessor
+ * - Routes processor results → colors:harmonized event
+ * - Subscribes to: colors:extracted, track-changed events
+ * - Emits: colors:harmonized event (with processor-generated CSS variables)
+ * - Delegates to: MusicalOKLABProcessor (ALL color processing and CSS generation)
  *
- * Philosophy: "One river of color visual-effects flowing through all systems -
- * from extraction to harmony to application, a seamless stream of chromatic awareness."
+ * SINGLE RESPONSIBILITY: Event routing and coordination
+ * - NO color processing (delegated to MusicalOKLABProcessor)
+ * - NO CSS variable generation (delegated to MusicalOKLABProcessor)
+ * - Pure event routing with zero processing logic
+ *
+ * @class ColorEventRouter
  */
 
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
@@ -42,8 +49,8 @@ interface ColorProcessingState {
   processingQueue: ColorContext[];
 }
 
-export class ColorEventManager {
-  private static instance: ColorEventManager | null = null;
+export class ColorEventRouter {
+  private static instance: ColorEventRouter | null = null;
 
   // Core processing components
   private colorOrchestrator: ColorHarmonyProcessor;
@@ -117,11 +124,11 @@ export class ColorEventManager {
   /**
    * Get singleton instance
    */
-  public static getInstance(): ColorEventManager {
-    if (!ColorEventManager.instance) {
-      ColorEventManager.instance = new ColorEventManager();
+  public static getInstance(): ColorEventRouter {
+    if (!ColorEventRouter.instance) {
+      ColorEventRouter.instance = new ColorEventRouter();
     }
-    return ColorEventManager.instance;
+    return ColorEventRouter.instance;
   }
 
   /**
@@ -795,17 +802,20 @@ export class ColorEventManager {
       // Store the result
       this.processingState.lastHarmonizedResult = colorResult;
 
-      // Apply colors to interface
-      await this.applyColorResult(colorResult);
+      // 🔧 PHASE 4: Use processor-generated CSS variables (no duplication)
+      // MusicalOKLABCoordinator now generates ALL CSS variables including metadata
 
-      // Emit harmonized event for other systems
+      // 🔧 PHASE 3/4: Emit colors:harmonized with processor-generated CSS variables
+      // ColorStateManager (CSS Authority) subscribes to this and handles ALL DOM writes
       unifiedEventBus.emitSync("colors:harmonized", {
         processedColors: colorResult.processedColors,
+        cssVariables: musicalResult.cssVariables, // 🔧 PHASE 4: Processor-generated (no duplication)
         accentHex: colorResult.accentHex,
         accentRgb: colorResult.accentRgb,
         strategies: ["musical-oklab-coordinator"],
         processingTime: colorResult.metadata.processingTime,
         trackUri: colorContext.trackUri,
+        timestamp: Date.now(),
         processingMode: "musical-oklab-coordination",
         coordinationMetrics: {
           detectedGenre: musicalResult.detectedGenre,
@@ -843,65 +853,9 @@ export class ColorEventManager {
     }
   }
 
-  /**
-   * Apply color result to the interface with enhanced CSS variables
-   */
-  private async applyColorResult(result: ColorResult): Promise<void> {
-    try {
-      const root = document.documentElement;
-
-      // Apply all processed colors as CSS variables
-      Object.entries(result.processedColors).forEach(([key, value]) => {
-        // Convert key to CSS variable format if needed
-        const cssVar = key.startsWith("--")
-          ? key
-          : `--sn-${key.toLowerCase().replace(/_/g, "-")}`;
-        root.style.setProperty(cssVar, value || "");
-      });
-
-      // Apply accent colors with brightness-adjusted fallbacks
-      root.style.setProperty("--sn-accent-hex", result.accentHex || "var(--sn-brightness-adjusted-accent-hex, #cba6f7)");
-      root.style.setProperty(
-        "--sn-accent-rgb",
-        result.accentRgb || "var(--sn-brightness-adjusted-accent-rgb, 203, 166, 247)"
-      );
-
-      // Apply enhanced metadata
-      if (result.metadata) {
-        root.style.setProperty(
-          "--sn-color-processing-strategy",
-          result.metadata.strategy || "unknown"
-        );
-        if (result.metadata.detectedGenre) {
-          root.style.setProperty(
-            "--sn-detected-genre",
-            result.metadata.detectedGenre
-          );
-        }
-        if (result.metadata.emotionalState) {
-          root.style.setProperty(
-            "--sn-emotional-state",
-            result.metadata.emotionalState
-          );
-        }
-        if (result.metadata.oklabPreset) {
-          root.style.setProperty(
-            "--sn-active-oklab-preset",
-            result.metadata.oklabPreset
-          );
-        }
-      }
-
-      this.metrics.totalApplications++;
-      this.processingState.lastApplicationTime = Date.now();
-    } catch (error) {
-      Y3KDebug?.debug?.error(
-        "ColorEventOrchestrator",
-        "Failed to apply color result:",
-        error
-      );
-    }
-  }
+  // 🔧 PHASE 3: Removed applyColorResult() method
+  // ColorStateManager (CSS Authority) now handles ALL CSS variable writes via colors:harmonized event
+  // This eliminates race conditions and clarifies single-responsibility architecture
 
   /**
    * Get musical OKLAB coordinator for external access
@@ -948,13 +902,40 @@ export class ColorEventManager {
       "Color event orchestrator destroyed"
     );
 
-    ColorEventManager.instance = null;
+    ColorEventRouter.instance = null;
   }
 }
 
 // Export singleton instance
-export const colorEventManager = ColorEventManager.getInstance();
+export const colorEventRouter = ColorEventRouter.getInstance();
 
-// Backward compatibility exports
-export const colorEventOrchestrator = colorEventManager;
-export const ColorEventOrchestrator = ColorEventManager;
+// 🔧 PHASE 4: Backward compatibility aliases
+/**
+ * @deprecated Use colorEventRouter instead. This alias is provided for backward compatibility.
+ */
+export const colorEventManager = colorEventRouter;
+
+/**
+ * @deprecated Use colorEventRouter instead. This alias is provided for backward compatibility.
+ */
+export const colorEventOrchestrator = colorEventRouter;
+
+/**
+ * @deprecated Use ColorEventRouter instead. This alias is provided for backward compatibility.
+ */
+export const ColorEventManager = ColorEventRouter;
+
+/**
+ * @deprecated Use ColorEventRouter instead. This alias is provided for backward compatibility.
+ */
+export const ColorEventOrchestrator = ColorEventRouter;
+
+/**
+ * @deprecated Use ColorEventRouter type instead.
+ */
+export type ColorEventManager = ColorEventRouter;
+
+/**
+ * @deprecated Use ColorEventRouter type instead.
+ */
+export type ColorEventOrchestrator = ColorEventRouter;

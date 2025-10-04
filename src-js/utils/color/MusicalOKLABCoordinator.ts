@@ -155,17 +155,24 @@ export class MusicalOKLABProcessor {
       );
 
       // Step 7: Generate comprehensive CSS variables
+      // 🔧 PHASE 4: Include detected genre and processing strategy for metadata variables
       const cssVariables = this.generateUnifiedCSSVariables(
         colorProcessingResult,
         emotionalResult,
         genreCharacteristics,
-        oklabPreset
+        oklabPreset,
+        detectedGenre,
+        processingStrategy
       );
 
       // Step 8: Determine accent color from enhanced palette
       const { accentHex, accentRgb } = this.selectOptimalAccentColor(
         colorProcessingResult
       );
+
+      // 🔧 PHASE 4: Add accent colors to CSS variables
+      cssVariables["--sn-accent-hex"] = accentHex || "var(--sn-brightness-adjusted-accent-hex, #cba6f7)";
+      cssVariables["--sn-accent-rgb"] = accentRgb || "var(--sn-brightness-adjusted-accent-rgb, 203, 166, 247)";
 
       const processingTime = performance.now() - startTime;
 
@@ -410,12 +417,15 @@ export class MusicalOKLABProcessor {
 
   /**
    * Generate comprehensive CSS variables for all visual systems
+   * 🔧 PHASE 4: Enhanced to include metadata variables (detectedGenre, processingStrategy)
    */
   private generateUnifiedCSSVariables(
     oklabResults: Record<string, OKLABProcessingResult>,
     emotionalResult: EmotionalTemperatureResult,
     genreCharacteristics: any,
-    preset: EnhancementPreset
+    preset: EnhancementPreset,
+    detectedGenre: string,
+    processingStrategy: string
   ): Record<string, string> {
     const variables: Record<string, string> = {};
 
@@ -440,10 +450,13 @@ export class MusicalOKLABProcessor {
       variables[key] = value;
     });
 
+    // 🔧 PHASE 4: Metadata CSS variables (replaces ColorEventOrchestrator generation)
+    variables["--sn-color-processing-strategy"] = processingStrategy;
+    variables["--sn-detected-genre"] = detectedGenre;
+    variables["--sn-emotional-state"] = emotionalResult.primaryEmotion;
+    variables["--sn-active-oklab-preset"] = preset.name;
+
     // Genre-specific variables
-    variables["--sn-detected-genre"] = genreCharacteristics
-      ? genreCharacteristics.vibrancyLevel
-      : "standard";
     variables["--sn-color-temperature"] = genreCharacteristics
       ? genreCharacteristics.colorTemperature
       : "neutral";
