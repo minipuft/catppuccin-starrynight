@@ -216,3 +216,6 @@ export const settings = {
   export: () => getSettings().export(),
   import: (settings: Partial<TypedSettings>) => getSettings().import(settings),
 };
+
+// NOTE: legacySettings wrapper removed in Phase 6A - unused export that wrapped TypedSettingsManager legacy methods
+// For legacy key access, TypedSettingsManager still provides getLegacy(), setLegacy() methods (deprecated)

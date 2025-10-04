@@ -141,40 +141,9 @@ export function initializeAberrationManager(y3k: Year3000System | null = null) {
     subtree: true,
   });
 
-  // React to runtime setting changes
-  document.addEventListener("year3000SystemSettingsChanged", (e: any) => {
-    const { key, value } = e.detail || {};
-    if (key === "sn-enable-aberration") {
-      const enable = value === "true";
-      if (enable && !instance) {
-        attach(y3k);
-      } else if (!enable && instance) {
-        instance.destroy();
-        instance = null;
-        // Unregister and destroy visual system
-        y3k?.unregisterAnimationSystem("AberrationCanvas");
-        visualSystem?.destroy();
-        visualSystem = null;
-        console.log("[AberrationManager] AberrationCanvas detached");
-      }
-      setNebulaNoiseEnabled(enable && !!instance, y3k);
-      setCSSAberrationEnabled(enable && !!instance, y3k);
-    }
-    // Phase-3: Live strength updates via SettingsManager using coordination
-    if (key === "sn-nebula-aberration-strength") {
-      const num = parseFloat(value);
-      if (!Number.isNaN(num) && instance) {
-        instance.setStrength(num);
-      }
-      // Ensure CSS variable reflects setting using coordination
-      const cssController = getCSSController(y3k);
-      cssController.setVariable(
-        "AberrationManager",
-        "--sn-nebula-aberration-strength",
-        String(value),
-        "normal", // Normal priority for strength settings
-        "aberration-strength-update"
-      );
-    }
-  });
+  // NOTE: Runtime setting change listener removed - aberration settings (sn-enable-aberration,
+  // sn-nebula-aberration-strength) were removed during settings rationalization (Phase 5).
+  // Aberration system is now disabled by default (see isAberrationEnabled() on line 28).
+  // If aberration settings are re-added in future, use settings.onChange() pattern instead
+  // of DOM events for better type safety and performance.
 }

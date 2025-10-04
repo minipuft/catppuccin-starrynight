@@ -105,18 +105,22 @@ export class TypedSettingsManager {
     if (success) {
       // Update cache
       this.cache.set(key, value);
-      
-      // Emit change event
+
+      // Emit modern change event (TypeScript callbacks)
       const changeEvent: SettingsChangeEvent<K> = {
         settingKey: key,
         oldValue,
         newValue: value,
         timestamp: Date.now(),
       };
-      
+
       this.notifyChangeListeners(changeEvent);
+
+      // NOTE: Event Bridge removed in Phase 6B - all event listeners migrated to onChange() pattern.
+      // DOM CustomEvent "year3000SystemSettingsChanged" no longer emitted.
+      // Use onChange() callback API for settings change notifications.
     }
-    
+
     return success;
   }
   
@@ -297,25 +301,31 @@ export class TypedSettingsManager {
       imported: 0,
       failed: [] as Array<{ key: string; error: string }>,
     };
-    
+
     for (const [key, value] of Object.entries(settings)) {
       if (!isValidSettingKey(key)) {
         result.failed.push({ key, error: "Unknown setting key" });
         continue;
       }
-      
+
       if (!validateSetting(key, value)) {
         result.failed.push({ key, error: "Invalid value for setting" });
         continue;
       }
-      
+
       if (this.set(key, value)) {
         result.imported++;
       } else {
         result.failed.push({ key, error: "Failed to store setting" });
       }
     }
-    
+
     return result;
   }
+
+  // NOTE: Legacy compatibility helpers removed in Phase 7 - all code now uses modern typed API
+  // - getLegacy() / setLegacy() removed - use settings.get() / settings.set() with typed keys
+  // - getCurrentHarmonicMode() removed - use settings.get("sn-current-harmonic-mode")
+  // - getAllSettingsLegacy() removed - use settings.getAllSettings() for typed object
+  // - LEGACY_KEY_MAP removed - all keys are now typed in settingsSchema.ts
 }

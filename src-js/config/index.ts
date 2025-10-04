@@ -89,6 +89,7 @@ export {
 
 // Settings provider and storage
 export { SettingsProvider, getSettingsProvider, setSettingsProvider, getSettings, settings } from "./settingsProvider";
+// NOTE: legacySettings removed in Phase 6A - unused wrapper, use settings singleton directly
 export { SpicetifyStorageAdapter, createSpicetifyStorage } from "./storage/spicetifyStorage";
 export { BrowserStorageAdapter, createBrowserStorage } from "./storage/browserStorage";
 
