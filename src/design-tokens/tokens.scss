@@ -135,12 +135,6 @@
   --sn-anim-musical-phrase-duration: calc(var(--sn-anim-musical-measure-duration) * 4); // Phrase duration (16 beats)
   --sn-anim-musical-color-transition: var(--sn-musical-transition-duration, 800ms); // Musical color transitions
   --sn-anim-musical-color-easing: var(--sn-musical-transition-easing, cubic-bezier(0.4, 0, 0.2, 1)); // Musical easing
-  --sn-anim-musical-color-speed: var(--sn-musical-color-evolution-speed, 1.0); // Color evolution speed multiplier
-
-  // Beat-Synchronized Animation Flags
-  --sn-anim-beat-sync-enabled: 1; // Beat synchronization enabled (0=off, 1=on)
-  --sn-anim-beat-sync-intensity: var(--sn-music-beat-pulse-intensity, 0); // Beat sync intensity (0-1)
-  --sn-anim-beat-sync-phase: var(--sn-music-beat-phase, 0); // Beat sync phase (0-1 or degrees)
 
   // Beat-Synchronized Background Effects
   --sn-bg-beat-pulse-intensity: var(--sn-music-beat-color-pulse, 0); // Beat pulse intensity for backgrounds
@@ -152,13 +146,6 @@
   // Animation System (--sn-anim-*)
   // -------------------------------------------------------------------------
   
-  // ⚠️ CONSOLIDATED: Animation durations now reference transition-duration tokens
-  // These provide backward compatibility while unifying duration system
-  --sn-anim-duration-fast: var(--sn-transition-fast-duration); // 150ms - Fast animations
-  --sn-anim-duration-normal: var(--sn-transition-standard-duration); // 300ms - Normal animations
-  --sn-anim-duration-slow: var(--sn-transition-slow-duration); // 500ms - Slow animations
-  --sn-anim-duration-extended: var(--sn-anim-transition-cosmic); // 1200ms - Extended animation duration
-
   // Frame Budget & Performance Targeting
   --sn-anim-frame-budget: 16.67ms; // Target frame budget for 60fps (1000ms / 60)
   --sn-anim-frame-priority: normal; // Animation scheduling priority
@@ -166,7 +153,6 @@
 
   // Motion Controls
   --sn-anim-motion-scale: 1; // Global animation scale multiplier (0-1)
-  --sn-anim-motion-blur: 0; // Motion blur intensity (0-1)
 
   // Easing Functions
   --sn-anim-easing-emergence: cubic-bezier(0.23, 1, 0.32, 1);
@@ -202,22 +188,12 @@
   // -------------------------------------------------------------------------
   
   // GPU & Hardware
-  --sn-perf-gpu-acceleration-enabled: 1;
   --sn-perf-webgl-context-ready: 0;
   --sn-perf-webgpu-context-ready: 0;
-  
+
   // Performance Modes
-  --sn-perf-mode: "auto"; // "auto" | "high" | "medium" | "low"
   --sn-perf-fps-target: 60;
-  --sn-perf-memory-optimization: 1;
-  --sn-perf-batch-enabled: 1;
-  
-  // CDF (Cosmic Discovery Framework)
-  --sn-perf-cdf-enabled: 1;
-  --sn-perf-cdf-energy: 0.5;
-  --sn-perf-cdf-scroll-ratio: 0;
-  --sn-perf-cdf-aberration-strength: 0.1;
-  
+
   // Quality Scaling
   --sn-perf-quality-particles: 1.0;
   --sn-perf-quality-shadows: 1.0;
@@ -609,7 +585,6 @@
   --sn-theme-cinematic-cyan-rgb: var(--spice-rgb-teal);      // Cyan effects highlight
   
   // Unified breathing animation durations
-  --sn-anim-breathing-gentle: 4000ms;     // Calm, meditative breathing
   --sn-anim-breathing-energetic: 2000ms;  // Active, dynamic breathing
   --sn-anim-breathing-cosmic: 6000ms;     // Deep, cosmic breathing
   --sn-anim-breathing-effects: var(--sn-anim-transition-cosmic, 1200ms); // Effects breathing
