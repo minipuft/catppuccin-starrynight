@@ -41,9 +41,7 @@
   --sn-bg-gradient-primary-rgb: var(--sn-dynamic-accent-rgb);
   --sn-bg-gradient-secondary-rgb: var(--sn-cosmic-secondary-rgb);
   --sn-bg-gradient-accent-rgb: var(--sn-dynamic-accent-rgb);
-  --sn-bg-gradient-opacity: 0.8;
-  --sn-bg-gradient-blur: 120px;
-  
+
   // -------------------------------------------------------------------------
   // Brightness Mode System (--sn-brightness-*)
   // -------------------------------------------------------------------------
@@ -68,33 +66,6 @@
   --sn-brightness-dark-brightness: 1.0;
   --sn-brightness-dark-contrast: 1.0;
   --sn-brightness-dark-opacity: 0.15;
-  
-  // Active brightness values (set by brightness mode) - Default to dark mode for consistency
-  --sn-bg-gradient-saturation: var(--sn-brightness-dark-saturation);
-  --sn-bg-gradient-brightness: var(--sn-brightness-dark-brightness);
-  --sn-bg-gradient-contrast: var(--sn-brightness-dark-contrast);
-  
-  // Gradient Flow Animation
-  --sn-bg-gradient-flow-x: 0;
-  --sn-bg-gradient-flow-y: 0;
-  --sn-bg-gradient-flow-scale: 1.0;
-  --sn-bg-gradient-flow-speed: 1.0;
-  
-  // Nebula Layer System  
-  --sn-bg-nebula-layer-0-opacity: 0.3;
-  --sn-bg-nebula-layer-1-opacity: 0.2;
-  --sn-bg-nebula-layer-2-opacity: 0.15;
-  --sn-bg-nebula-layer-3-opacity: 0.1;
-  --sn-bg-nebula-max-blur: 40px;
-  
-  // Particle System
-  --sn-bg-particle-density: 0.6;
-  --sn-bg-particle-energy-intensity: 0;
-  --sn-bg-particle-cluster-size: 1.0;
-  --sn-bg-particle-network-opacity: 0.4;
-  --sn-bg-particle-focus-dampening: 0.8;
-  --sn-bg-particle-animation-speed: 8s; // Particle connection animation speed
-  --sn-bg-particle-pulse-speed: 12s; // Particle pulse propagation speed
   
   // -------------------------------------------------------------------------
   // Music System (--sn-music-*) - Critical Real-time Variables
@@ -328,20 +299,6 @@
   --sn-color-base-hex: var(--sn-cosmic-base-hex);
   --sn-color-base-rgb: var(--sn-cosmic-base-rgb);
   
-  // === EXTRACTED COLORS FROM ALBUM ART ===
-  // Updated by ColorHarmonyEngine during music playback
-  --sn-color-extracted-primary-rgb: var(--sn-cosmic-accent-rgb);
-  --sn-color-extracted-secondary-rgb: var(--sn-cosmic-secondary-rgb);
-  --sn-color-extracted-tertiary-rgb: var(--sn-cosmic-surface-rgb);
-  --sn-color-extracted-dominant-rgb: var(--sn-cosmic-accent-rgb);
-  --sn-color-extracted-vibrant-rgb: var(--sn-cosmic-accent-rgb);
-  
-  // === COLOR HARMONY SYSTEM ===
-  --sn-color-harmony-complementary-rgb: var(--sn-cosmic-secondary-rgb);
-  --sn-color-harmony-analogous-rgb: var(--sn-cosmic-accent-rgb);
-  --sn-color-harmony-triadic-rgb: var(--sn-cosmic-surface-rgb);
-  --sn-color-harmony-blend-intensity: 0.8;
-  
   // === BASE OKLAB COLORS (Source of Truth) ===
   // ⚠️ CONSOLIDATED Phase 4.2: Unified OKLAB namespace
   // Updated by ColorHarmonyEngine - perceptually uniform color processing
@@ -354,15 +311,6 @@
   --sn-oklab-default-chroma: 0.15;                            // Default chroma intensity for visual effects (0-1)
   --sn-oklab-default-hue: 280;                                // Default hue for visual effects (purple, 0-360 degrees)
 
-  // === OKLCH COLOR SYSTEM ===
-  // OKLCH (OKLab LCH) - Lightness, Chroma, Hue representation
-  --sn-color-oklch-accent-l: 0.65;           // Lightness (0-1)
-  --sn-color-oklch-accent-c: 0.15;           // Chroma (0-0.4 typical)
-  --sn-color-oklch-accent-h: 295;            // Hue (0-360 degrees)
-  --sn-color-oklch-primary-l: 0.65;          // Primary lightness
-  --sn-color-oklch-primary-c: 0.15;          // Primary chroma  
-  --sn-color-oklch-primary-h: 295;           // Primary hue
-  
   // === MUSICAL OKLAB COORDINATION ===
   // Variables updated by MusicalOKLABCoordinator for real-time color processing
   --sn-musical-oklab-enabled: 1;             // Musical OKLAB coordination enabled (0/1)
@@ -378,45 +326,6 @@
   --sn-musical-oklab-accent-rgb: var(--sn-oklab-accent-rgb);
   --sn-musical-oklab-highlight-rgb: var(--sn-oklab-highlight-rgb);
   --sn-musical-oklab-shadow-rgb: var(--sn-oklab-shadow-rgb);
-  
-  // === EMOTIONAL TEMPERATURE OKLAB VARIABLES ===
-  // OKLAB-enhanced emotional color temperatures (perceptually uniform)
-  
-  // Calm/Meditative (warm, soothing) - OKLAB enhanced
-  --sn-emotion-calm-oklab-primary-rgb: 255, 248, 220;
-  --sn-emotion-calm-oklab-accent-rgb: 255, 218, 185;
-  
-  // Energetic (bright, vibrant) - OKLAB enhanced
-  --sn-emotion-energetic-oklab-primary-rgb: 255, 255, 255;
-  --sn-emotion-energetic-oklab-accent-rgb: 173, 216, 230;
-  
-  // Melancholy (deep, introspective) - OKLAB enhanced
-  --sn-emotion-melancholy-oklab-primary-rgb: 255, 234, 191;
-  --sn-emotion-melancholy-oklab-accent-rgb: 204, 153, 102;
-  
-  // Happy (balanced, joyful) - OKLAB enhanced
-  --sn-emotion-happy-oklab-primary-rgb: 255, 250, 240;
-  --sn-emotion-happy-oklab-accent-rgb: 255, 228, 181;
-  
-  // Aggressive (cool, intense) - OKLAB enhanced
-  --sn-emotion-aggressive-oklab-primary-rgb: 201, 226, 255;
-  --sn-emotion-aggressive-oklab-accent-rgb: 135, 206, 235;
-  
-  // Mysterious (deep, enigmatic) - OKLAB enhanced
-  --sn-emotion-mysterious-oklab-primary-rgb: 255, 214, 170;
-  --sn-emotion-mysterious-oklab-accent-rgb: 138, 43, 226;
-  
-  // Romantic (soft, intimate) - OKLAB enhanced
-  --sn-emotion-romantic-oklab-primary-rgb: 255, 244, 229;
-  --sn-emotion-romantic-oklab-accent-rgb: 255, 192, 203;
-  
-  // Epic (grand, cinematic) - OKLAB enhanced
-  --sn-emotion-epic-oklab-primary-rgb: 191, 211, 255;
-  --sn-emotion-epic-oklab-accent-rgb: 255, 215, 0;
-  
-  // Ambient (atmospheric, floating) - OKLAB enhanced
-  --sn-emotion-ambient-oklab-primary-rgb: 255, 248, 220;
-  --sn-emotion-ambient-oklab-accent-rgb: 176, 196, 222;
   
   // === GENRE-SPECIFIC OKLAB PRESETS ===
   // OKLAB presets optimized for different music genres (updated by GenreProfileManager)
@@ -442,11 +351,6 @@
   --genre-saturation-variation: 0.2;   // Saturation variation amount
   --genre-brightness-base: 1.0;        // Base brightness level
   --genre-brightness-variation: 0.1;   // Brightness variation amount
-  
-  // === TEMPORAL COLOR SYSTEM ===
-  --sn-color-temporal-past-rgb: var(--sn-cosmic-secondary-rgb);
-  --sn-color-temporal-present-rgb: var(--sn-color-accent-rgb);
-  --sn-color-temporal-future-rgb: var(--sn-cosmic-accent-rgb);
   
   // === VISUAL EFFECTS FIELD COLORS ===
   --sn-color-visual-effects-deep-rgb: var(--sn-cosmic-base-rgb);
@@ -516,16 +420,6 @@
   --sn-visual-effects-performance-mode: 1;
   --sn-visual-effects-accessibility-scale: 1;
   --sn-visual-effects-mobile-reduction: 0.6;
-  
-  // Enhanced Visual Effects Patterns (Year 3000 System Extensions)
-  // Advanced animation and rendering concepts for sophisticated effects
-  --sn-visual-effects-membrane-elasticity: 0.7; // Visual membrane deformation intensity (0-1)
-  --sn-visual-effects-animation-scale: 0.8; // Animation scaling patterns (0-1)
-  --sn-visual-effects-flow-rate: 0.5; // Cross-system visual flow (0-1)
-  --sn-visual-effects-subdivision-frequency: 0.3; // Visual subdivision rate (0-1)
-  --sn-visual-effects-flow-viscosity: 0.4; // Visual flow resistance (0-1)
-  --sn-visual-effects-surface-tension: 0.6; // Visual surface tension (0-1)
-  --sn-visual-effects-permeability: 0.6; // Visual effect permeability (0-1)
   
   // Visual effects modifier flags (extend existing systems without duplicating)
   --sn-visual-effects-advanced-mode: 1; // Enable advanced behavior in existing systems
