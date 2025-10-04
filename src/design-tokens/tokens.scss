@@ -158,7 +158,6 @@
   --sn-anim-duration-normal: var(--sn-transition-standard-duration); // 300ms - Normal animations
   --sn-anim-duration-slow: var(--sn-transition-slow-duration); // 500ms - Slow animations
   --sn-anim-duration-extended: var(--sn-anim-transition-cosmic); // 1200ms - Extended animation duration
-  --sn-anim-duration-animation: 4s; // Legacy: Decorative animation duration (consider migrating)
 
   // Frame Budget & Performance Targeting
   --sn-anim-frame-budget: 16.67ms; // Target frame budget for 60fps (1000ms / 60)
@@ -188,6 +187,8 @@
   --sn-anim-easing-custom-1: cubic-bezier(0.4, 0, 0.6, 1);
   --sn-anim-easing-custom-2: cubic-bezier(0.34, 1.56, 0.64, 1);
   --sn-anim-easing-custom-3: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --sn-anim-easing-dynamic: cubic-bezier(0.4, 0, 0.2, 1);
+  --sn-easing-explorer: var(--sn-anim-easing-dynamic);
 
   // === PRIMARY DURATION TOKENS (Source of Truth) ===
   // All animation/transition durations should reference these
@@ -197,22 +198,12 @@
   --sn-transition-extended-duration: 800ms; // Extended transitions
   --sn-anim-transition-cosmic: 1200ms; // Cosmic/atmospheric effects
 
-  // Legacy transition names (backward compatibility)
-  --sn-anim-transition-fast: var(--sn-transition-fast-duration);
-  --sn-anim-transition-standard: var(--sn-transition-standard-duration);
-  --sn-anim-transition-slow: var(--sn-transition-slow-duration);
-
   // Composite transition helpers (duration + timing function)
-  --sn-transition-timing-default: var(--sn-easing-explorer, var(--sn-anim-easing-dynamic));
+  --sn-transition-timing-default: var(--sn-anim-easing-dynamic);
   --sn-transition-fast: var(--sn-transition-fast-duration) var(--sn-transition-timing-default);
   --sn-transition-standard: var(--sn-transition-standard-duration) var(--sn-transition-timing-default);
   --sn-transition-slow: var(--sn-transition-slow-duration) var(--sn-transition-timing-default);
 
-  // Legacy easing aliases (forward to primary tokens)
-  --sn-ease-bounce: var(--sn-anim-easing-bounce-gentle);
-  --sn-ease-smooth: var(--sn-anim-easing-dynamic);
-  --sn-ease-sharp: var(--sn-anim-easing-custom-1);
-  
   // 3D System
   --sn-anim-3d-depth-near: translateZ(10px);
   --sn-anim-3d-depth-mid: translateZ(20px);
@@ -404,12 +395,6 @@
   --sn-oklab-default-chroma: 0.15;                            // Default chroma intensity for visual effects (0-1)
   --sn-oklab-default-hue: 280;                                // Default hue for visual effects (purple, 0-360 degrees)
 
-  // Legacy aliases for backward compatibility (Phase 4.2)
-  --sn-color-oklab-bright-highlight-rgb: var(--sn-oklab-highlight-rgb);
-  --sn-color-oklab-dynamic-shadow-rgb: var(--sn-oklab-shadow-rgb);
-  --sn-color-oklab-base-luminance: var(--sn-oklab-base-luminance);
-  --sn-color-oklab-accent-luminance: var(--sn-oklab-accent-luminance);
-  
   // === OKLCH COLOR SYSTEM ===
   // OKLCH (OKLab LCH) - Lightness, Chroma, Hue representation
   --sn-color-oklch-accent-l: 0.65;           // Lightness (0-1)
@@ -441,74 +426,38 @@
   // Calm/Meditative (warm, soothing) - OKLAB enhanced
   --sn-emotion-calm-oklab-primary-rgb: 255, 248, 220;
   --sn-emotion-calm-oklab-accent-rgb: 255, 218, 185;
-  --sn-emotion-calm-oklab-atmosphere-rgb: 139, 125, 96;
-  --sn-emotion-calm-oklab-luminance: 0.92;
-  --sn-emotion-calm-oklab-chroma: 0.08;
-  --sn-emotion-calm-oklab-hue: 85;
   
   // Energetic (bright, vibrant) - OKLAB enhanced
   --sn-emotion-energetic-oklab-primary-rgb: 255, 255, 255;
   --sn-emotion-energetic-oklab-accent-rgb: 173, 216, 230;
-  --sn-emotion-energetic-oklab-atmosphere-rgb: 119, 136, 153;
-  --sn-emotion-energetic-oklab-luminance: 1.0;
-  --sn-emotion-energetic-oklab-chroma: 0.12;
-  --sn-emotion-energetic-oklab-hue: 210;
   
   // Melancholy (deep, introspective) - OKLAB enhanced
   --sn-emotion-melancholy-oklab-primary-rgb: 255, 234, 191;
   --sn-emotion-melancholy-oklab-accent-rgb: 204, 153, 102;
-  --sn-emotion-melancholy-oklab-atmosphere-rgb: 102, 87, 66;
-  --sn-emotion-melancholy-oklab-luminance: 0.88;
-  --sn-emotion-melancholy-oklab-chroma: 0.15;
-  --sn-emotion-melancholy-oklab-hue: 70;
   
   // Happy (balanced, joyful) - OKLAB enhanced
   --sn-emotion-happy-oklab-primary-rgb: 255, 250, 240;
   --sn-emotion-happy-oklab-accent-rgb: 255, 228, 181;
-  --sn-emotion-happy-oklab-atmosphere-rgb: 169, 169, 169;
-  --sn-emotion-happy-oklab-luminance: 0.95;
-  --sn-emotion-happy-oklab-chroma: 0.10;
-  --sn-emotion-happy-oklab-hue: 60;
   
   // Aggressive (cool, intense) - OKLAB enhanced
   --sn-emotion-aggressive-oklab-primary-rgb: 201, 226, 255;
   --sn-emotion-aggressive-oklab-accent-rgb: 135, 206, 235;
-  --sn-emotion-aggressive-oklab-atmosphere-rgb: 105, 105, 105;
-  --sn-emotion-aggressive-oklab-luminance: 0.85;
-  --sn-emotion-aggressive-oklab-chroma: 0.18;
-  --sn-emotion-aggressive-oklab-hue: 240;
   
   // Mysterious (deep, enigmatic) - OKLAB enhanced
   --sn-emotion-mysterious-oklab-primary-rgb: 255, 214, 170;
   --sn-emotion-mysterious-oklab-accent-rgb: 138, 43, 226;
-  --sn-emotion-mysterious-oklab-atmosphere-rgb: 75, 63, 48;
-  --sn-emotion-mysterious-oklab-luminance: 0.78;
-  --sn-emotion-mysterious-oklab-chroma: 0.25;
-  --sn-emotion-mysterious-oklab-hue: 285;
   
   // Romantic (soft, intimate) - OKLAB enhanced
   --sn-emotion-romantic-oklab-primary-rgb: 255, 244, 229;
   --sn-emotion-romantic-oklab-accent-rgb: 255, 192, 203;
-  --sn-emotion-romantic-oklab-atmosphere-rgb: 128, 108, 96;
-  --sn-emotion-romantic-oklab-luminance: 0.90;
-  --sn-emotion-romantic-oklab-chroma: 0.12;
-  --sn-emotion-romantic-oklab-hue: 15;
   
   // Epic (grand, cinematic) - OKLAB enhanced
   --sn-emotion-epic-oklab-primary-rgb: 191, 211, 255;
   --sn-emotion-epic-oklab-accent-rgb: 255, 215, 0;
-  --sn-emotion-epic-oklab-atmosphere-rgb: 112, 128, 144;
-  --sn-emotion-epic-oklab-luminance: 0.80;
-  --sn-emotion-epic-oklab-chroma: 0.22;
-  --sn-emotion-epic-oklab-hue: 50;
   
   // Ambient (atmospheric, floating) - OKLAB enhanced
   --sn-emotion-ambient-oklab-primary-rgb: 255, 248, 220;
   --sn-emotion-ambient-oklab-accent-rgb: 176, 196, 222;
-  --sn-emotion-ambient-oklab-atmosphere-rgb: 128, 128, 128;
-  --sn-emotion-ambient-oklab-luminance: 0.85;
-  --sn-emotion-ambient-oklab-chroma: 0.09;
-  --sn-emotion-ambient-oklab-hue: 220;
   
   // === GENRE-SPECIFIC OKLAB PRESETS ===
   // OKLAB presets optimized for different music genres (updated by GenreProfileManager)
@@ -754,11 +703,13 @@
     --sn-music-breathing-scale: 1.0 !important;
     --sn-anim-motion-reduced: 1;
     
-    // Use conservative transitions
-    --sn-anim-transition-fast: 0ms;
-    --sn-anim-transition-standard: 0ms;
-    --sn-anim-transition-slow: 0ms;
-    
+    // Disable all transition durations (using primary tokens)
+    --sn-transition-fast-duration: 0ms;
+    --sn-transition-standard-duration: 0ms;
+    --sn-transition-slow-duration: 0ms;
+    --sn-transition-extended-duration: 0ms;
+    --sn-anim-transition-cosmic: 0ms;
+
     // Disable particle effects
     --sn-bg-particle-density: 0;
     --sn-perf-quality-particles: 0;
