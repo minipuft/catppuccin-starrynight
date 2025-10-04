@@ -93,13 +93,6 @@
   --sn-music-feed-bloom-intensity: 0;
   --sn-music-energy-modulation: 1.0;
 
-  // Kinetic Music Analysis (AdvancedThemeSystem integration)
-  --sn-kinetic-energy: 0;              // Processed energy level (0-1)
-  --sn-kinetic-valence: 0.5;           // Valence/mood (0-1)
-  --sn-kinetic-bpm: 120;               // Enhanced BPM
-  --sn-kinetic-beat-interval: 500ms;   // Beat interval duration
-  --sn-kinetic-animation-speed: 1.0;   // Animation speed multiplier
-
   // Musical Animation Coordination (Animation System Integration)
   --sn-anim-musical-beat-duration: calc(60s / var(--sn-music-tempo-bpm, 120)); // Beat-based animation duration
   --sn-anim-musical-measure-duration: calc(var(--sn-anim-musical-beat-duration) * 4); // Measure duration (4 beats)
@@ -230,14 +223,6 @@
   --sn-text-cosmic-blur: 0px;
   --sn-text-harmonic-saturation: 1.0;
   
-  // Typography Scale  
-  --sn-text-scale-xs: 0.75rem;
-  --sn-text-scale-sm: 0.875rem;
-  --sn-text-scale-base: 1rem;
-  --sn-text-scale-lg: 1.125rem;
-  --sn-text-scale-xl: 1.25rem;
-  --sn-text-scale-2xl: 1.5rem;
-  
   // -------------------------------------------------------------------------
   // Interaction System (--sn-ix-*)
   // -------------------------------------------------------------------------
@@ -312,21 +297,13 @@
   --sn-oklab-default-hue: 280;                                // Default hue for visual effects (purple, 0-360 degrees)
 
   // === MUSICAL OKLAB COORDINATION ===
-  // Variables updated by MusicalOKLABCoordinator for real-time color processing
-  --sn-musical-oklab-enabled: 1;             // Musical OKLAB coordination enabled (0/1)
-  --sn-musical-oklab-preset-name: "STANDARD"; // Current OKLAB preset name
-  --sn-musical-oklab-genre: "ambient";       // Detected music genre
-  --sn-musical-oklab-emotion: "neutral";     // Primary detected emotion
-  --sn-musical-oklab-intensity: 0.5;         // Musical influence intensity (0-1)
-  
   // Musical OKLAB processed colors (updated in real-time)
   // Phase 5: Consolidated to delegate to base OKLAB tokens
   --sn-musical-oklab-primary-rgb: var(--sn-oklab-primary-rgb);
-  --sn-musical-oklab-secondary-rgb: var(--sn-cosmic-secondary-rgb);
   --sn-musical-oklab-accent-rgb: var(--sn-oklab-accent-rgb);
   --sn-musical-oklab-highlight-rgb: var(--sn-oklab-highlight-rgb);
   --sn-musical-oklab-shadow-rgb: var(--sn-oklab-shadow-rgb);
-  
+
   // === GENRE-SPECIFIC OKLAB PRESETS ===
   // OKLAB presets optimized for different music genres (updated by GenreProfileManager)
   
@@ -429,27 +406,6 @@
   --visual-effects-css-fallback: 1.0; // CSS fallback system enabled
   --visual-effects-webgl-coordination: 0; // WebGL coordination level
 
-  // -------------------------------------------------------------------------
-  // Serendipity Discovery System (--sn-serendipity-*)
-  // -------------------------------------------------------------------------
-  
-  // Idle State Discovery
-  --sn-serendipity-idle-threshold: 2000ms;
-  --sn-serendipity-animation-duration: 600ms;
-  --sn-serendipity-start-z: -60px;
-  --sn-serendipity-end-z: -10px;
-  
-  // -------------------------------------------------------------------------
-  // Glyph Consciousness System (--sn-glyph-*)
-  // -------------------------------------------------------------------------
-  
-  // Core Glyph Controls
-  --sn-glyph-intensity: 0; // 0.1 base intensity
-  --sn-glyph-glow: 0; // 0.1 glow factor (usually intensity * 0.8)
-  --sn-glyph-base-size: 6px;
-  --sn-glyph-color-rgb: 140, 170, 238;
-  --sn-glyph-rotation: 0deg;
-  
   // -------------------------------------------------------------------------
   // Visual Effects Theme RGB Colors - Unified System
   // -------------------------------------------------------------------------
