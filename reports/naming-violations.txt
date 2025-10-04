@@ -1,0 +1,15 @@
+Naming Convention Violations
+═══════════════════════════════════════════════════════════════
+
+1. Uppercase letters (should be lowercase):
+  ✓ No violations found
+
+2. Underscores (should use hyphens):
+  ✓ No violations found
+
+3. Very short names (< 10 characters, may lack clarity):
+  ✓ No violations found
+
+4. Very long names (> 60 characters, may be overly specific):
+  ✓ No violations found
+

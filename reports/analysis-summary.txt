@@ -1,0 +1,74 @@
+═══════════════════════════════════════════════════════════════
+Token System Analysis Summary
+═══════════════════════════════════════════════════════════════
+
+Total Tokens: 433
+Unused Tokens: 432
+Active Tokens: 1
+Usage Rate: 0%
+
+Top 10 Most Used Tokens:
+───────────────────────────────────────────────────────────────
+  --sn-visual-effects-text-clarity                     0 uses
+  --sn-visual-effects-surface-tension                  0 uses
+  --sn-visual-effects-subdivision-mode                 0 uses
+  --sn-visual-effects-subdivision-frequency            0 uses
+  --sn-visual-effects-response-sensitivity             0 uses
+  --sn-visual-effects-permeability                     0 uses
+  --sn-visual-effects-performance-mode                 0 uses
+  --sn-visual-effects-mobile-reduction                 0 uses
+  --sn-visual-effects-membrane-elasticity              0 uses
+  --sn-visual-effects-magnetic-transition-speed        0 uses
+
+Sample Unused Tokens (first 10):
+───────────────────────────────────────────────────────────────
+  --sn-anim-3d-depth-mid
+  --sn-anim-3d-depth-near
+  --sn-anim-3d-perspective
+  --sn-animation-intensity
+  --sn-animation-reduce
+  --sn-anim-beat-sync-enabled
+  --sn-anim-beat-sync-intensity
+  --sn-anim-beat-sync-phase
+  --sn-anim-breathing-cosmic
+  --sn-anim-breathing-effects
+
+═══════════════════════════════════════════════════════════════
+
+Reports generated in ./reports/:
+  • token-definitions.txt     - All token names
+  • token-usage-report.csv    - Full usage analysis
+  • unused-tokens.txt         - Zero usage tokens
+  • top-50-tokens.csv         - Most frequently used
+
+═══════════════════════════════════════════════════════════════
+Dependency Analysis Summary
+═══════════════════════════════════════════════════════════════
+
+Tokens with Dependencies: 91
+Circular Dependencies: 0
+
+Top 10 Most Referenced Tokens:
+───────────────────────────────────────────────────────────────
+  sn-cosmic-accent-rgb                                12 refs
+  sn-cosmic-secondary-rgb                              6 refs
+  sn-transition-timing-default                         3 refs
+  sn-dynamic-accent-rgb                                3 refs
+  sn-cosmic-surface-rgb                                3 refs
+  sn-cosmic-base-rgb                                   3 refs
+  sn-transition-standard-duration                      2 refs
+  sn-transition-slow-duration                          2 refs
+  sn-transition-fast-duration                          2 refs
+  sn-cosmic-accent-hex                                 2 refs
+
+═══════════════════════════════════════════════════════════════
+
+Reports generated in ./reports/:
+  • token-dependencies.txt      - Raw dependency list
+  • dependency-depth.csv        - Dependency depth analysis
+  • circular-dependencies.txt   - Circular reference check
+  • token-graph.dot            - GraphViz source (requires graphviz)
+
+To generate visual graph (if graphviz installed):
+  dot -Tsvg reports/token-graph.dot -o reports/token-graph.svg
+

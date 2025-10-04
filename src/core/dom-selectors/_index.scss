@@ -5,6 +5,28 @@
 // backward compatibility. Import it once via `_mixins.scss` (@forward) so
 // every SCSS module instantly gains access.
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// SELECTOR STABILITY GUIDELINES
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+// ✅ TIER 1 - STABLE (Preferred):
+//    - data-encore-id attributes (e.g., data-encore-id="cardTitle")
+//    - data-testid attributes (e.g., data-testid="play-button")
+//    - Least likely to change, future-proof
+//
+// ⚠️ TIER 2 - TRANSITIONAL (Use with both legacy fallbacks):
+//    - .main-* classes (e.g., .main-card-cardContainer)
+//    - Support both legacy and current during 6-month Encore migration (2025)
+//
+// ❌ TIER 3 - DANGEROUS (NEVER TARGET):
+//    - *-sc-* classes (styled-components with random hashes)
+//    - Random alphanumeric classes (e.g., .hGutJE, .cQZRed)
+//    - These change on every build and will break your theme!
+//
+// Strategy: Always prefer Tier 1 > Tier 2 fallback > Never use Tier 3
+// See: docs/spotify/DOM_TARGETTING/cards_DOM.md for complete reference
+// ═══════════════════════════════════════════════════════════════════════════════
+
 // Right Sidebar (Now Playing panel)
 // Usage: @include right-sidebar-root { … }
 @mixin right-sidebar-root {
@@ -152,11 +174,434 @@
 // Playback Control Buttons (Play, Pause, Shuffle, etc.)
 // Usage: @include playback-buttons { … }
 @mixin playback-buttons {
+  // Tier 1 - Stable attributes (preferred)
+  button[data-testid="play-button"],
+  button[data-testid="pause-button"],
+  button[data-testid="control-button-shuffle"],
+  button[data-testid*="control-button"],
+  // Tier 2 - Transitional classes (fallback)
   .main-playButton-PlayButton,
   .main-shuffleButton-button,
-  .main-button-button,
-  [data-testid*="play-button"],
-  [data-testid*="control-button"] {
+  .main-button-button {
+    @content;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STRUCTURAL CONTAINERS (Shelves & Grids)
+// ═══════════════════════════════════════════════════════════════════════════════
+// Layout containers for card collections across different contexts
+
+// Shelf Container (Home page sections)
+// Usage: @include shelf-container { … }
+// Use for: Styling shelf wrappers, background effects, spacing
+@mixin shelf-container {
+  section[data-testid="component-shelf"],  // Stable attribute (preferred)
+  .main-shelf-shelf {                       // Transitional class
+    @content;
+  }
+}
+
+// Grid Container (Universal card layout)
+// Usage: @include grid-container { … }
+// Use for: Grid-specific styles, gap control, alignment
+@mixin grid-container {
+  .main-gridContainer-gridContainer {
+    @content;
+  }
+}
+
+// Shelf Grid (Combined: shelf + grid for home page layouts)
+// Usage: @include shelf-grid { … }
+// Use for: Scoped effects within shelf contexts, performance optimization
+@mixin shelf-grid {
+  section[data-testid="component-shelf"] .main-gridContainer-gridContainer,
+  .main-shelf-shelf .main-gridContainer-gridContainer,
+  .main-gridContainer-gridContainer.main-shelf-shelfGrid {
+    @content;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CARD COMPONENTS (Encore Migration 2025)
+// ═══════════════════════════════════════════════════════════════════════════════
+// Spotify is migrating to Encore design system throughout 2025 H1-H2.
+// These mixins support both legacy and current selectors during the transition.
+// See: docs/spotify/DOM_TARGETTING/cards_DOM.md for complete documentation
+
+// Card Container - Universal (All card types: albums, artists, playlists, podcasts)
+// Usage: @include card-container-universal { … }
+// Use for: Visual effects, glassmorphism, depth layers, hover states
+@mixin card-container-universal {
+  .main-card-card,              // Legacy (pre-Encore)
+  .main-card-cardContainer {    // Current (Encore 2025)
+    @content;
+  }
+}
+
+// Card Container - Music Reactive (Album and Artist cards only)
+// Usage: @include card-container-music-reactive { … }
+// Use for: Beat synchronization, rhythm phase, audio-responsive effects
+// Note: Playlists and podcasts do NOT get music reactivity
+@mixin card-container-music-reactive {
+  .main-card-card[href*="/album/"],
+  .main-card-card[href*="/artist/"],
+  .main-card-cardContainer[href*="/album/"],
+  .main-card-cardContainer[href*="/artist/"] {
+    @content;
+  }
+}
+
+// Card Image Container (Album artwork area)
+// Usage: @include card-image-container { … }
+// Use for: Image overlays, gradients, visual effects on artwork
+@mixin card-image-container {
+  .main-card-header,            // Legacy (pre-Encore)
+  .main-card-imageContainer {   // Current (Encore 2025)
+    @content;
+  }
+}
+
+// Card Title (Stable attribute preferred)
+// Usage: @include card-title { … }
+// Use for: Title text styling, gradients, text effects
+@mixin card-title {
+  [data-encore-id="cardTitle"],  // Encore stable attribute (preferred)
+  .main-cardHeader-text {        // Legacy fallback
+    @content;
+  }
+}
+
+// Card Subtitle (Metadata: year, artist, etc.)
+// Usage: @include card-subtitle { … }
+// Use for: Subtitle text styling, secondary information
+@mixin card-subtitle {
+  [data-encore-id="cardSubtitle"], // Encore stable attribute (preferred)
+  .main-card-cardMetadata {        // Legacy fallback
+    @content;
+  }
+}
+
+// Card Play Button Overlay
+// Usage: @include card-play-button { … }
+// Use for: Play button effects, hover animations
+@mixin card-play-button {
+  button[data-testid="play-button"],  // Stable attribute (preferred)
+  .main-card-PlayButtonContainer {     // Legacy fallback
+    @content;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONTEXT-AWARE CARD SELECTORS (Year3000 Design Philosophy)
+// ═══════════════════════════════════════════════════════════════════════════════
+// Different contexts require different effect intensities for optimal UX
+
+// Cards in Home Page Shelves (Full effects)
+// Usage: @include cards-in-shelf { … }
+// Use for: Maximum visual effects, full animation suite
+// Context: Home page recommended content, personalized playlists
+@mixin cards-in-shelf {
+  section[data-testid="component-shelf"] .main-card-cardContainer,
+  .main-shelf-shelf .main-card-cardContainer,
+  section[data-testid="component-shelf"] .main-card-card,
+  .main-shelf-shelf .main-card-card {
+    @content;
+  }
+}
+
+// Cards in Search Results (Reduced effects)
+// Usage: @include cards-in-search { … }
+// Use for: Minimal effects, focus on clarity and readability
+// Context: Search results, filtering experience
+@mixin cards-in-search {
+  .main-searchPage-content .main-card-cardContainer,
+  section[data-testid*="search"] .main-card-cardContainer,
+  .main-searchPage-content .main-card-card,
+  section[data-testid*="search"] .main-card-card {
+    @content;
+  }
+}
+
+// Cards in Artist Discography (Enhanced album focus)
+// Usage: @include cards-in-artist-discography { … }
+// Use for: Enhanced visual effects for artist page albums
+// Context: Artist page discography sections
+@mixin cards-in-artist-discography {
+  [data-testid="artist-page"] .main-card-cardContainer,
+  section[data-testid*="discography"] .main-card-cardContainer,
+  [data-testid="artist-page"] .main-card-card,
+  section[data-testid*="discography"] .main-card-card {
+    @content;
+  }
+}
+
+// Cards in Library View (Compact styling)
+// Usage: @include cards-in-library { … }
+// Use for: Compact card styles, reduced spacing, minimal effects
+// Context: Your Library sidebar view
+@mixin cards-in-library {
+  .main-yourLibrary-yourLibrary .main-card-cardContainer,
+  .main-yourLibrary-yourLibrary .main-card-card {
+    @content;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GLOBAL NAVIGATION BAR (Top Bar)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Global Navigation Bar Root (Top bar with search, history, avatar)
+// Usage: @include global-nav-bar { … }
+// Use for: Styling the entire top navigation bar
+@mixin global-nav-bar {
+  div.Root__globalNav#global-nav-bar,  // Stable ID (preferred)
+  .Root__globalNav {                    // Legacy fallback
+    @content;
+  }
+}
+
+// Global Navigation Search Input
+// Usage: @include global-nav-search-input { … }
+// Use for: Search bar styling, focus states, custom icons
+@mixin global-nav-search-input {
+  input[data-top-bar-search="true"],              // Stable attribute (preferred)
+  input[role="combobox"].main-globalNav-searchInput {  // Legacy fallback
+    @content;
+  }
+}
+
+// Global Navigation History Buttons Container
+// Usage: @include global-nav-history-buttons { … }
+// Use for: Back/Forward button container styling
+@mixin global-nav-history-buttons {
+  .main-globalNav-historyButtonsContainer {
+    @content;
+  }
+}
+
+// User Avatar Button (Top-right dropdown)
+// Usage: @include user-avatar-button { … }
+// Use for: User profile dropdown button styling
+@mixin user-avatar-button {
+  button.main-userWidget-box {
+    @content;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// NOW PLAYING BAR SECTIONS (Bottom Bar Components)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Now Playing Bar Sections (Left/Center/Right containers)
+// Usage: @include now-playing-bar-section("left"|"center"|"right") { … }
+// Use for: Targeting specific sections of the now playing bar
+@mixin now-playing-bar-section($section: null) {
+  @if $section == "left" {
+    .main-nowPlayingBar-left {
+      @content;
+    }
+  } @else if $section == "center" {
+    .main-nowPlayingBar-center {
+      @content;
+    }
+  } @else if $section == "right" {
+    .main-nowPlayingBar-right {
+      @content;
+    }
+  } @else {
+    // All sections
+    .main-nowPlayingBar-left,
+    .main-nowPlayingBar-center,
+    .main-nowPlayingBar-right {
+      @content;
+    }
+  }
+}
+
+// Now Playing Widget (Current track display in bottom bar)
+// Usage: @include now-playing-widget { … }
+// Use for: Styling the current track widget container
+@mixin now-playing-widget {
+  div[data-testid="now-playing-widget"],  // Stable attribute (preferred)
+  .main-nowPlayingWidget-nowPlaying {      // Legacy fallback
+    @content;
+  }
+}
+
+// Now Playing Track Info Container
+// Usage: @include now-playing-track-info { … }
+// Use for: Track title and artist text container
+@mixin now-playing-track-info {
+  .main-trackInfo-container,
+  .main-nowPlayingWidget-trackInfo {
+    @content;
+  }
+}
+
+// Now Playing Cover Art (Small album art in bottom bar)
+// Usage: @include now-playing-cover-art { … }
+// Use for: Album artwork styling in now playing bar
+@mixin now-playing-cover-art {
+  div[data-testid="CoverSlotCollapsed_container"],  // Stable attribute (preferred)
+  .main-coverSlotCollapsed-container {               // Legacy fallback
+    @content;
+  }
+}
+
+// Like Button (Heart icon)
+// Usage: @include like-button { … }
+// Use for: Like/Unlike button styling, checked states
+@mixin like-button {
+  button.control-button-heart,                       // Stable class (preferred)
+  button.main-addButton-button.control-button-heart {  // Full selector
+    @content;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RIGHT SIDEBAR - NOW PLAYING VIEW (Expanded Player)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// NPV Panel Container (Now Playing View panel wrapper)
+// Usage: @include npv-panel { … }
+// Use for: Main container for expanded now playing view
+@mixin npv-panel {
+  div[data-testid="NPV_Panel_OpenDiv"] {  // Stable attribute
+    @content;
+  }
+}
+
+// NPV Widget (Now Playing View widget container)
+// Usage: @include npv-widget { … }
+// Use for: Inner widget wrapper in right sidebar
+@mixin npv-widget {
+  .main-nowPlayingView-nowPlayingWidget {
+    @content;
+  }
+}
+
+// NPV Grid (Two-column layout: artwork + info)
+// Usage: @include npv-grid { … }
+// Use for: Grid container styling in now playing view
+@mixin npv-grid {
+  .main-nowPlayingView-nowPlayingGrid {
+    @content;
+  }
+}
+
+// NPV Cover Art Container (Large album art in sidebar)
+// Usage: @include npv-cover-art { … }
+// Use for: Large cover art container in now playing view
+@mixin npv-cover-art {
+  .main-nowPlayingView-coverArtContainer {
+    @content;
+  }
+}
+
+// NPV Track Info (Metadata & controls column)
+// Usage: @include npv-track-info { … }
+// Use for: Track info and action buttons in sidebar
+@mixin npv-track-info {
+  .main-nowPlayingView-contextItemInfo,
+  .main-nowPlayingView-trackInfo {
+    @content;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TRACK LIST COMPONENTS (Playlist/Album Track Tables)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Track List Root Container
+// Usage: @include tracklist-root { … }
+// Use for: Main grid container for track list
+@mixin tracklist-root {
+  div[role="grid"][aria-label*="tracks"],  // Stable attribute (preferred)
+  .main-trackList-container {               // Legacy fallback
+    @content;
+  }
+}
+
+// Track List Header Row
+// Usage: @include tracklist-header { … }
+// Use for: Column headers (# Title Album Date Duration)
+@mixin tracklist-header {
+  div.main-trackList-trackListHeaderRow[role="row"],  // Stable structure
+  div[data-testid="track-list-header"] {               // Stable attribute
+    @content;
+  }
+}
+
+// Track List Row (Individual track)
+// Usage: @include tracklist-row { … }
+// Use for: Individual track row styling, hover states
+@mixin tracklist-row {
+  div.main-trackList-trackListRow[role="row"] {
+    @content;
+  }
+}
+
+// Track List Album Art (Small square thumbnail)
+// Usage: @include tracklist-album-art { … }
+// Use for: Album artwork in track list
+@mixin tracklist-album-art {
+  img.main-trackList-albumArt,
+  img.main-trackList-rowImage {
+    @content;
+  }
+}
+
+// Track List Title (Track name link)
+// Usage: @include tracklist-title { … }
+// Use for: Track title text styling
+@mixin tracklist-title {
+  a.main-trackList-rowTitle,
+  div.main-trackList-rowTitle {
+    @content;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// YOUR LIBRARY (Left Sidebar Library Section)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Your Library Container (Main library scrollable area)
+// Usage: @include your-library-container { … }
+// Use for: Library container background, scrollbar styling
+@mixin your-library-container {
+  .main-yourLibraryX-libraryContainer,
+  .main-yourLibrary-libraryContainer {
+    @content;
+  }
+}
+
+// Your Library Entry Points (Quick access buttons)
+// Usage: @include your-library-entry-points { … }
+// Use for: Playlists/Artists/Albums filter buttons
+@mixin your-library-entry-points {
+  .main-yourLibraryX-entryPoints,
+  .main-yourLibrary-entryPoints {
+    @content;
+  }
+}
+
+// Your Library List Item (Individual playlist/album/artist)
+// Usage: @include your-library-list-item { … }
+// Use for: Library item styling, hover states
+@mixin your-library-list-item {
+  .main-yourLibraryX-listItem,
+  .main-yourLibrary-listItem {
+    @content;
+  }
+}
+
+// Your Library Header (Library section header)
+// Usage: @include your-library-header { … }
+// Use for: Library header styling, search/filter controls
+@mixin your-library-header {
+  .main-yourLibraryX-header,
+  .main-yourLibrary-header {
     @content;
   }
 }

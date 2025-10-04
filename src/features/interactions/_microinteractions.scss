@@ -31,13 +31,13 @@
 // YEAR 3000 ENHANCED CARD MICROINTERACTIONS - Dynamic Touch Symphony
 // ══════════════════════════════════════════════════════════════════════════════
 
-// Enhanced main-card-card with YEAR 3000 rhythmic visual effects
-.main-card-card,
-.main-card-cardContainer {
+// Enhanced cards with YEAR 3000 rhythmic visual effects
+// Uses centralized mixin for card containers (supports both legacy and Encore structures)
+@include card-container-universal {
   // Action Verb: OSCILLATE - Base animation with rhythm (scale removed)
   transform: translateZ(0);
   transition: transform var(--micro-medium) var(--sn-easing-explorer, ease-out);
-  
+
   // Breathing removed - too many elements, creates visual chaos
 
   // Apply gradient ripple with beat sync
@@ -334,8 +334,18 @@
   }
 
   // Simplify ripples on mobile for performance
-  .main-card-card,
-  .main-card-cardContainer,
+  // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+  @include card-container-universal {
+    &::after {
+      // Smaller ripple scale for mobile
+      transform: translate(-50%, -50%) scale(0);
+    }
+
+    &:active::after {
+      transform: translate(-50%, -50%) scale(15); // Reduced from 20
+    }
+  }
+
   .spicetify-playlist-list li {
     &::after {
       // Smaller ripple scale for mobile
@@ -350,8 +360,22 @@
 
 // Reduced motion preferences
 @media (prefers-reduced-motion: reduce) {
-  .main-card-card,
-  .main-card-cardContainer,
+  // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+  @include card-container-universal {
+    // Keep only opacity transitions (moved above nested rules)
+    transition: opacity var(--micro-medium) ease,
+      background-color var(--micro-medium) ease;
+
+    // Disable ripple animations
+    &::after {
+      display: none;
+    }
+
+    &:hover {
+      transform: none;
+    }
+  }
+
   .spicetify-playlist-list li,
   .main-createPlaylistButton-button,
   .main-shuffleButton-button,
@@ -387,7 +411,7 @@
 // =============================================================================
 
 // Track rows get fluid ripple feedback on hover/focus
-.main-trackList-trackListRow {
+@include tracklist-row {
   @include fluid-ripple-feedback;
 }
 

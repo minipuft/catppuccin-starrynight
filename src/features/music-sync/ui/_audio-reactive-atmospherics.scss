@@ -738,8 +738,8 @@ body:not(:has(.main-searchPage-content)) {
       @include staggered-reveal(8);
     }
 
-    .main-card-card,
-    .main-card-cardContainer {
+    // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+    @include card-container-universal {
       @include atmospheric-item(var(--sn-visual-effects-stagger-delay));
     }
 
@@ -750,8 +750,8 @@ body:not(:has(.main-searchPage-content)) {
       --sn-visual-effects-float-range: calc(8px * (1 + var(--sn-visual-effects-aura-influence) * 0.3));
       --sn-visual-effects-animation-duration: var(--sn-visual-effects-aura-breathing);
 
-      .main-card-card,
-      .main-card-cardContainer {
+      // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+      @include card-container-universal {
         filter: brightness(calc(1 + 0.02 * var(--sn-visual-effects-aura-influence)))
           saturate(calc(1 + 0.1 * var(--sn-visual-effects-aura-influence)));
       }
@@ -764,8 +764,8 @@ body:not(:has(.main-searchPage-content)) {
       perspective: var(--navigation-depth-field, 1200px);
       transform-style: preserve-3d;
 
-      .main-card-card,
-      .main-card-cardContainer {
+      // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+      @include card-container-universal {
         animation: floating var(--navigation-animation-sync, 8s) ease-in-out infinite,
                    navigation-orbital-drift calc(var(--navigation-orbit-speed) * 2) linear infinite;
 
@@ -784,8 +784,8 @@ body:not(:has(.main-searchPage-content)) {
     &[data-testid*="grid"] {
       @include atmospheric-grid;
 
-      .main-card-card,
-      .main-card-cardContainer {
+      // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+      @include card-container-universal {
         @include atmospheric-item;
         @include card-state-base;
 
@@ -801,8 +801,8 @@ body:not(:has(.main-searchPage-content)) {
   }
 
   // === CARDS WITH EMOTIONAL TEMPERATURE ANIMATIONS ===
-  .main-card-card,
-  .main-card-cardContainer {
+  // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+  @include card-container-universal {
     animation: floating-emotional-temperature var(--sn-visual-effects-breathing-cycle, 8s)
       var(--dynamic-ease-motion, cubic-bezier(0.4, 0, 0.2, 1)) infinite;
     transition: transform var(--sn-visual-effects-transition-duration);
@@ -840,8 +840,8 @@ body:not(:has(.main-searchPage-content)) {
   }
 
   .main-gridContainer-gridContainer {
-    .main-card-card,
-    .main-card-cardContainer {
+    // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+    @include card-container-universal {
       opacity: 0;
       transform: translateY(20px);
       animation: stagger-fade-in 0.8s ease-out forwards;
@@ -1148,16 +1148,25 @@ body:not(:has(.main-searchPage-content)) {
     --sn-visual-effects-grid-scale: 1.01;
   }
 
-  .main-card-card,
-  .main-card-cardContainer,
+  // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+  @include card-container-universal {
+    &:hover {
+      transform: none;
+    }
+  }
+
   .main-trackList-trackListRow {
     &:hover {
       transform: none;
     }
   }
 
-  .main-card-card,
-  .main-card-cardContainer,
+  // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+  @include card-container-universal {
+    backdrop-filter: none;
+    background: rgba(var(--spice-rgb-surface0), 0.8) !important;
+  }
+
   .main-trackList-trackListRow,
   .main-navBar-navBarLink {
     backdrop-filter: none;
@@ -1168,8 +1177,20 @@ body:not(:has(.main-searchPage-content)) {
 // === HIGH PERFORMANCE MODE FOR LOW-END DEVICES ===
 
 @media (prefers-reduced-motion: reduce) and (max-width: 768px) {
-  .main-card-card,
-  .main-card-cardContainer,
+  // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+  @include card-container-universal {
+    backdrop-filter: none !important;
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+
+    &:hover {
+      backdrop-filter: none !important;
+      transform: none !important;
+      filter: brightness(1.05);
+    }
+  }
+
   .main-trackList-trackListRow,
   .main-navBar-navBarLink {
     backdrop-filter: none !important;

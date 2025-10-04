@@ -30,7 +30,7 @@
 @use "_interaction_mixins" as *; // Shared interaction patterns (ripple, focus, hover, beat-responsive)
 @use "_unified-effects-engine" as *; // Phase 1: Unified formula-based effects system
 // REMOVED: _sn_typography (broken music sync, unstable selectors, self-contained mixins)
-@use "_dom_selectors" as *; // Centralized DOM selector mixins
+@use "dom-selectors" as *; // Centralized DOM selector mixins (loads dom-selectors/_index.scss)
 
 // === LAYER 3: COMPATIBILITY (Backward Compatibility) ===
 // Compatibility layers for renamed variables and mixins

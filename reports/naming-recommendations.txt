@@ -1,0 +1,23 @@
+═══════════════════════════════════════════════════════════════
+Naming Convention Recommendations
+═══════════════════════════════════════════════════════════════
+
+Standards:
+  ✓ Use lowercase letters only
+  ✓ Use hyphens (-) as separators, not underscores (_)
+  ✓ Follow pattern: --sn-{category}-{purpose}-{variant}
+  ✓ Be descriptive but concise (15-40 characters ideal)
+
+Common Categories:
+  • anim-       Animation/transition properties
+  • color-      Color values and harmonies
+  • bg-         Background-related properties
+  • music-      Music synchronization properties
+  • visual-     Visual effects properties
+  • oklab-      OKLAB color space properties
+  • perf-       Performance settings
+  • transition- Transition composite properties
+
+✓ No critical naming violations found
+  • Good: Consistent lowercase and hyphen usage
+

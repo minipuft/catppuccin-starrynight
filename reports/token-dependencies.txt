@@ -1,0 +1,91 @@
+--sn-bg-gradient-primary-rgb: var(--sn-dynamic-accent-rgb);
+--sn-bg-gradient-secondary-rgb: var(--sn-cosmic-secondary-rgb);
+--sn-bg-gradient-accent-rgb: var(--sn-dynamic-accent-rgb);
+--sn-bg-gradient-saturation: var(--sn-brightness-dark-saturation);
+--sn-bg-gradient-brightness: var(--sn-brightness-dark-brightness);
+--sn-bg-gradient-contrast: var(--sn-brightness-dark-contrast);
+--sn-anim-musical-color-transition: var(--sn-musical-transition-duration, 800ms); // Musical color transitions
+--sn-anim-musical-color-easing: var(--sn-musical-transition-easing, cubic-bezier(0.4, 0, 0.2, 1)); // Musical easing
+--sn-anim-musical-color-speed: var(--sn-musical-color-evolution-speed, 1.0); // Color evolution speed multiplier
+--sn-anim-beat-sync-intensity: var(--sn-music-beat-pulse-intensity, 0); // Beat sync intensity (0-1)
+--sn-anim-beat-sync-phase: var(--sn-music-beat-phase, 0); // Beat sync phase (0-1 or degrees)
+--sn-bg-beat-pulse-intensity: var(--sn-music-beat-color-pulse, 0); // Beat pulse intensity for backgrounds
+--sn-bg-beat-pulse: var(--sn-bg-beat-pulse-intensity); // Alias for compatibility
+--sn-anim-duration-fast: var(--sn-transition-fast-duration); // 150ms - Fast animations
+--sn-anim-duration-normal: var(--sn-transition-standard-duration); // 300ms - Normal animations
+--sn-anim-duration-slow: var(--sn-transition-slow-duration); // 500ms - Slow animations
+--sn-anim-duration-extended: var(--sn-anim-transition-cosmic); // 1200ms - Extended animation duration
+--sn-easing-explorer: var(--sn-anim-easing-dynamic);
+--sn-transition-timing-default: var(--sn-anim-easing-dynamic);
+--sn-transition-fast: var(--sn-transition-fast-duration) var(--sn-transition-timing-default);
+--sn-transition-standard: var(--sn-transition-standard-duration) var(--sn-transition-timing-default);
+--sn-transition-slow: var(--sn-transition-slow-duration) var(--sn-transition-timing-default);
+--sn-ui-button-accent-hex: var(--sn-accent-hex);
+--sn-ui-button-accent-rgb: var(--sn-accent-rgb);
+--sn-ix-ripple-color-rgb: var(--sn-bg-gradient-accent-rgb);
+--sn-dynamic-accent-hex: var(--sn-cosmic-accent-hex);
+--sn-dynamic-accent-rgb: var(--sn-cosmic-accent-rgb);
+--sn-dynamic-primary-hex: var(--sn-cosmic-accent-hex);
+--sn-dynamic-primary-rgb: var(--sn-cosmic-accent-rgb);
+--sn-dynamic-secondary-hex: var(--sn-cosmic-secondary-hex);
+--sn-dynamic-secondary-rgb: var(--sn-cosmic-secondary-rgb);
+--sn-color-accent-hex: var(--sn-dynamic-accent-hex);
+--sn-color-accent-rgb: var(--sn-dynamic-accent-rgb);
+--sn-color-primary-hex: var(--sn-dynamic-primary-hex);
+--sn-color-primary-rgb: var(--sn-dynamic-primary-rgb);
+--sn-color-base-hex: var(--sn-cosmic-base-hex);
+--sn-color-base-rgb: var(--sn-cosmic-base-rgb);
+--sn-color-extracted-primary-rgb: var(--sn-cosmic-accent-rgb);
+--sn-color-extracted-secondary-rgb: var(--sn-cosmic-secondary-rgb);
+--sn-color-extracted-tertiary-rgb: var(--sn-cosmic-surface-rgb);
+--sn-color-extracted-dominant-rgb: var(--sn-cosmic-accent-rgb);
+--sn-color-extracted-vibrant-rgb: var(--sn-cosmic-accent-rgb);
+--sn-color-harmony-complementary-rgb: var(--sn-cosmic-secondary-rgb);
+--sn-color-harmony-analogous-rgb: var(--sn-cosmic-accent-rgb);
+--sn-color-harmony-triadic-rgb: var(--sn-cosmic-surface-rgb);
+--sn-oklab-primary-rgb: var(--sn-cosmic-accent-rgb);        // Primary OKLAB processed color
+--sn-oklab-accent-rgb: var(--sn-cosmic-accent-rgb);         // Accent OKLAB processed color
+--sn-oklab-highlight-rgb: var(--sn-cosmic-accent-rgb);      // Highlight OKLAB processed color
+--sn-oklab-shadow-rgb: var(--sn-cosmic-base-rgb);           // Shadow OKLAB processed color
+--sn-musical-oklab-primary-rgb: var(--sn-oklab-primary-rgb);
+--sn-musical-oklab-secondary-rgb: var(--sn-cosmic-secondary-rgb);
+--sn-musical-oklab-accent-rgb: var(--sn-oklab-accent-rgb);
+--sn-musical-oklab-highlight-rgb: var(--sn-oklab-highlight-rgb);
+--sn-musical-oklab-shadow-rgb: var(--sn-oklab-shadow-rgb);
+--sn-genre-electronic-oklab-primary-rgb: var(--sn-emotion-energetic-oklab-primary-rgb);
+--sn-genre-electronic-oklab-accent-rgb: var(--sn-emotion-energetic-oklab-accent-rgb);
+--sn-genre-classical-oklab-primary-rgb: var(--sn-emotion-romantic-oklab-primary-rgb);
+--sn-genre-classical-oklab-accent-rgb: var(--sn-emotion-romantic-oklab-accent-rgb);
+--sn-genre-rock-oklab-primary-rgb: var(--sn-emotion-aggressive-oklab-primary-rgb);
+--sn-genre-rock-oklab-accent-rgb: var(--sn-emotion-aggressive-oklab-accent-rgb);
+--sn-genre-jazz-oklab-primary-rgb: var(--sn-emotion-mysterious-oklab-primary-rgb);
+--sn-genre-jazz-oklab-accent-rgb: var(--sn-emotion-mysterious-oklab-accent-rgb);
+--sn-genre-hiphop-oklab-primary-rgb: var(--sn-emotion-epic-oklab-primary-rgb);
+--sn-genre-hiphop-oklab-accent-rgb: var(--sn-emotion-epic-oklab-accent-rgb);
+--sn-genre-ambient-oklab-primary-rgb: var(--sn-emotion-ambient-oklab-primary-rgb);
+--sn-genre-ambient-oklab-accent-rgb: var(--sn-emotion-ambient-oklab-accent-rgb);
+--sn-genre-folk-oklab-primary-rgb: var(--sn-emotion-calm-oklab-primary-rgb);
+--sn-genre-folk-oklab-accent-rgb: var(--sn-emotion-calm-oklab-accent-rgb);
+--sn-genre-pop-oklab-primary-rgb: var(--sn-emotion-happy-oklab-primary-rgb);
+--sn-genre-pop-oklab-accent-rgb: var(--sn-emotion-happy-oklab-accent-rgb);
+--sn-genre-default-oklab-primary-rgb: var(--sn-cosmic-accent-rgb);
+--sn-genre-default-oklab-accent-rgb: var(--sn-cosmic-accent-rgb);
+--sn-color-temporal-past-rgb: var(--sn-cosmic-secondary-rgb);
+--sn-color-temporal-present-rgb: var(--sn-color-accent-rgb);
+--sn-color-temporal-future-rgb: var(--sn-cosmic-accent-rgb);
+--sn-color-visual-effects-deep-rgb: var(--sn-cosmic-base-rgb);
+--sn-color-visual-effects-surface-rgb: var(--sn-cosmic-surface-rgb);
+--sn-color-visual-effects-glow-rgb: var(--sn-color-accent-rgb);
+--sn-anim-breathing-effects: var(--sn-anim-transition-cosmic, 1200ms); // Effects breathing
+--sn-bg-gradient-saturation: var(--sn-brightness-bright-saturation);
+--sn-bg-gradient-brightness: var(--sn-brightness-bright-brightness);
+--sn-bg-gradient-contrast: var(--sn-brightness-bright-contrast);
+--sn-bg-gradient-opacity: var(--sn-brightness-bright-opacity);
+--sn-bg-gradient-saturation: var(--sn-brightness-balanced-saturation);
+--sn-bg-gradient-brightness: var(--sn-brightness-balanced-brightness);
+--sn-bg-gradient-contrast: var(--sn-brightness-balanced-contrast);
+--sn-bg-gradient-opacity: var(--sn-brightness-balanced-opacity);
+--sn-bg-gradient-saturation: var(--sn-brightness-dark-saturation);
+--sn-bg-gradient-brightness: var(--sn-brightness-dark-brightness);
+--sn-bg-gradient-contrast: var(--sn-brightness-dark-contrast);
+--sn-bg-gradient-opacity: var(--sn-brightness-dark-opacity);

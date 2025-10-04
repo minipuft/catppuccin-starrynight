@@ -2,6 +2,8 @@
 // YEAR 3000 BEAT SYNC ENHANCED - Advanced Rhythm Synchronization
 // ████████████████████████████████████████████████████████████████████████████████
 
+@use "../../core/dom-selectors" as *;
+
 // 🌡️ EMOTIONAL TEMPERATURE ENHANCED BEAT SYNC
 // Now Playing Bar with Emotional Temperature Breathing
 .main-nowPlayingBar-nowPlayingBar {
@@ -17,7 +19,7 @@
     var(--sn-anim-easing-organic, cubic-bezier(0.4, 0, 0.2, 1));
   
   // Apply emotional temperature breathing animation when available
-  &:where(.emotion-calm, .emotion-energetic, .emotion-melancholy) {
+  &:where(.smooth-emotion-calm, .smooth-emotion-energetic, .smooth-emotion-melancholy) {
     animation: beat-sync-breathing var(--sn-audio-breathing-cycle, 4s) ease-in-out infinite;
   }
 
@@ -58,24 +60,24 @@
       brightness(var(--sn-audio-temperature-brightness, 1));
     
     // Apply emotional temperature class-specific enhancements
-    &:where(.emotion-romantic, .emotion-happy) {
-      filter: 
+    &:where(.smooth-emotion-romantic, .smooth-emotion-happy) {
+      filter:
         drop-shadow(
-          0 0 
+          0 0
           calc(8px * var(--sn-music-beat-pulse-intensity, 0))
           rgba(var(--sn-emotion-romantic-accent), 0.8)
         )
         saturate(1.2)
         brightness(1.1);
-      
+
       animation: romantic-heart-pulse var(--sn-audio-breathing-cycle, 3s) ease-in-out infinite;
     }
-    
-    &:where(.emotion-energetic, .emotion-aggressive) {
+
+    &:where(.smooth-emotion-energetic, .smooth-emotion-aggressive) {
       animation: energetic-heart-pulse calc(var(--sn-audio-breathing-cycle, 2s) * 0.8) ease-in-out infinite;
     }
-    
-    &:where(.emotion-calm, .emotion-ambient) {
+
+    &:where(.smooth-emotion-calm, .smooth-emotion-ambient) {
       animation: calm-heart-pulse calc(var(--sn-audio-breathing-cycle, 6s) * 1.2) ease-in-out infinite;
     }
   }
@@ -227,16 +229,15 @@
 }
 
 // 🌡️ Enhanced cards with emotional temperature beat sync (performance optimized)
-.main-card-card,
-.main-card-cardContainer {
+@include card-container-universal {
   // Only apply emotional temperature beat sync on hover for performance
-  &:hover:where(.emotion-energetic, .emotion-happy, .emotion-epic) {
+  &:hover:where(.smooth-emotion-energetic, .smooth-emotion-happy, .smooth-emotion-epic) {
     animation: card-energetic-pulse
       calc(var(--sn-audio-breathing-cycle, 2s) * 0.8)
       ease-in-out infinite;
   }
 
-  &:hover:where(.emotion-calm, .emotion-ambient, .emotion-romantic) {
+  &:hover:where(.smooth-emotion-calm, .smooth-emotion-ambient, .smooth-emotion-romantic) {
     animation: card-calm-pulse
       calc(var(--sn-audio-breathing-cycle, 5s) * 1.2)
       ease-in-out infinite;
@@ -275,9 +276,12 @@
 // Reduced motion support - disable emotional temperature animations
 @media (prefers-reduced-motion: reduce) {
   .main-nowPlayingBar-nowPlayingBar,
-  .main-addButton-button.control-button-heart,
-  .main-card-card,
-  .main-card-cardContainer {
+  .main-addButton-button.control-button-heart {
+    animation: none !important;
+    transition-duration: 0.1s !important;
+  }
+
+  @include card-container-universal {
     animation: none !important;
     transition-duration: 0.1s !important;
   }
@@ -307,9 +311,12 @@
 // Performance mode - simplified emotional temperature effects
 .sn-performance-mode {
   .main-nowPlayingBar-nowPlayingBar,
-  .main-addButton-button.control-button-heart,
-  .main-card-card,
-  .main-card-cardContainer {
+  .main-addButton-button.control-button-heart {
+    animation: none !important;
+    transition-duration: 100ms !important;
+  }
+
+  @include card-container-universal {
     animation: none !important;
     transition-duration: 100ms !important;
   }

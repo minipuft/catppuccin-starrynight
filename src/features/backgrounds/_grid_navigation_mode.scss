@@ -36,20 +36,22 @@
     }
 
     // Individual card drift (very subtle, not distracting) (scale removed)
-    .main-gridContainer-gridContainer .main-card-card,
-    .main-gridContainer-gridContainer .main-card-cardContainer {
-      // Vertical drift ties to rhythm phase; horizontal ties to intensity
-      transform: translate3d(
-          calc(var(--interface-drift-range) * (var(--sn-music-beat-pulse-intensity, 0) - 0.5)),
-          calc(var(--interface-drift-range) * (var(--sn-music-rhythm-phase, 0) * 0.002)),
-          0
-        );
+    // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+    .main-gridContainer-gridContainer {
+      @include card-container-universal {
+        // Vertical drift ties to rhythm phase; horizontal ties to intensity
+        transform: translate3d(
+            calc(var(--interface-drift-range) * (var(--sn-music-beat-pulse-intensity, 0) - 0.5)),
+            calc(var(--interface-drift-range) * (var(--sn-music-rhythm-phase, 0) * 0.002)),
+            0
+          );
 
-      transition: transform 400ms ease-out;
+        transition: transform 400ms ease-out;
 
-      // On hover: pull slightly forward (magnetic invitation) (scale removed)
-      &:hover {
-        transform: translate3d(0, 0, 0);
+        // On hover: pull slightly forward (magnetic invitation) (scale removed)
+        &:hover {
+          transform: translate3d(0, 0, 0);
+        }
       }
     }
   }
@@ -63,8 +65,8 @@
       transition: none;
     }
 
-    .main-card-card,
-    .main-card-cardContainer {
+    // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+    @include card-container-universal {
       transform: none !important;
       transition: none !important;
     }

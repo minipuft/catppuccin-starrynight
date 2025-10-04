@@ -11,9 +11,7 @@
 // Context: Target grid containers inside artist/discography shelves that were
 // previously animated with `temporal-evolution-cycle`.
 
-.main-view-container:has(.main-shelf-shelf) .main-gridContainer-gridContainer,
-.main-shelf-shelf .main-gridContainer-gridContainer {
-
+@include shelf-grid {
   // Introduce subtle breathing parallax
   animation: year3000-stream-breathe var(--temporal-evolution-speed, 90s)
       ease-in-out infinite alternate;
@@ -32,8 +30,7 @@
 
 // Accessibility – turn off on prefers-reduced-motion
 @media (prefers-reduced-motion: reduce) {
-  .main-view-container:has(.main-shelf-shelf) .main-gridContainer-gridContainer,
-  .main-shelf-shelf .main-gridContainer-gridContainer {
+  @include shelf-grid {
     animation: none !important;
     transform: none !important;
   }

@@ -1,0 +1,65 @@
+═══════════════════════════════════════════════════════════════
+Definitive Token Usage Analysis Summary
+═══════════════════════════════════════════════════════════════
+
+Total Tokens Defined:      433
+Tokens Used via var():     94
+Tokens with Zero Usage:    336
+
+Actual Usage Rate:         21%
+
+Usage Distribution:
+───────────────────────────────────────────────────────────────
+  Core (50+ uses):           3 tokens ( 0%)
+  Standard (10-49 uses):     4 tokens ( 0%)
+  Specialized (1-9 uses):   87 tokens (20%)
+  Unused (0 uses):         336 tokens (77%)
+
+Top 30 Most Used Tokens (var() references):
+───────────────────────────────────────────────────────────────
+  --sn-bg-gradient-accent-rgb                         106 uses
+  --sn-anim-easing-standard                           104 uses
+  --sn-bg-gradient-primary-rgb                         71 uses
+  --sn-visual-effects-stagger-delay                    55 uses
+  --sn-unified-brightness-delta                        45 uses
+  --sn-bg-gradient-secondary-rgb                       44 uses
+  --sn-unified-opacity-base                            39 uses
+  --sn-sidebar-harmonic-intensity-multiplier           37 uses
+  --sn-unified-saturation-boost                        33 uses
+  --sn-unified-blur-amount                             32 uses
+  --sn-accent-rgb                                      19 uses
+  --sn-sidebar-base-bg-opacity                         18 uses
+  --sn-visual-effects-hover-lift                       17 uses
+  --sn-visual-effects-emotional-intensity              16 uses
+  --sn-unified-glow-radius                             16 uses
+  --sn-ui-glass-pulse-enabled                          16 uses
+  --sn-anim-easing-organic                             15 uses
+  --sn-unified-scale-delta                             13 uses
+  --sn-unified-opacity-range                           13 uses
+  --sn-visual-effects-float-range                      12 uses
+  --sn-cosmic-accent-rgb                               12 uses
+  --sn-card-harmonic-primary-rgb                       12 uses
+  --sn-oklab-default-chroma                            11 uses
+  --sn-glass-rhythm-hue                                11 uses
+  --sn-oklab-accent-rgb                                 9 uses
+  --sn-nav-item-glow-color-rgb                          9 uses
+  --sn-cosmic-secondary-rgb                             9 uses
+  --sn-visual-effects-transition-duration               8 uses
+  --sn-oklab-primary-rgb                                8 uses
+  --sn-oklab-accent-luminance                           8 uses
+
+═══════════════════════════════════════════════════════════════
+
+Key Findings:
+  • 3 critical tokens heavily used across theme
+  • 336 tokens defined but never referenced
+  • Potential cleanup opportunity: 336 tokens
+
+Reports generated in ./reports/:
+  • definitive-usage-report.csv - Complete usage analysis
+  • var-usage-counts.txt        - var() reference counts
+  • zero-var-usage-tokens.txt   - Unused tokens
+  • core-tokens.csv             - Heavily used (50+)
+  • standard-tokens.csv         - Commonly used (10-49)
+  • specialized-tokens.csv      - Specific use (1-9)
+

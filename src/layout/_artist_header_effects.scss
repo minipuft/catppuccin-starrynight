@@ -128,9 +128,9 @@
   }
 
   // === CONTENT AREA AURA INFLUENCE ===
-  .main-content,
-  .main-shelf-shelf,
-  .main-gridContainer-gridContainer {
+  // Note: Shelf and grid containers now have dedicated atmospheric glow system
+  // Artist Aura focuses on main content area to avoid visual conflicts
+  .main-content {
     position: relative;
 
     // Subtle aura influence on content areas

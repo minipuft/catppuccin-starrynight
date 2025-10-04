@@ -5,6 +5,7 @@
 // ████████████████████████████████████████████████████████████████████████████████
 
 @use "../../core/_interaction_mixins" as *; // Access CSS interaction mixins
+@use "../../core/dom-selectors" as *; // Access DOM selector mixins
 
 // Note: Core interaction mixins, variables, and keyframes consolidated to:
 // - src/core/_interaction_mixins.scss
@@ -26,9 +27,12 @@
   // Speed up interactions during high energy
   button,
   .main-playButton-PlayButton,
-  .main-card-card,
-  .main-card-cardContainer,
   .main-trackList-trackListRow {
+    --ripple-duration: calc(600ms / max(var(--sn-music-energy, 0.5), 0.5));
+    --hover-transition-speed: calc(200ms / max(var(--sn-music-beat-pulse-intensity, 0.5), 0.5));
+  }
+
+  @include card-container-universal {
     --ripple-duration: calc(600ms / max(var(--sn-music-energy, 0.5), 0.5));
     --hover-transition-speed: calc(200ms / max(var(--sn-music-beat-pulse-intensity, 0.5), 0.5));
   }
@@ -57,8 +61,7 @@
 }
 
 // === CARDS AND CONTENT CONTAINERS ===
-.main-card-card,
-.main-card-cardContainer {
+@include card-container-universal {
   @include css-interaction-ripple(subtle);
   @include css-focus-flow(normal);
   @include css-hover-lift(subtle);
@@ -162,9 +165,11 @@ input[type="search"],
   }
   
   // Reduce effects for mobile performance
-  .main-card-card,
-  .main-card-cardContainer,
   .main-trackList-trackListRow {
+    --hover-transition-speed: 300ms;
+  }
+
+  @include card-container-universal {
     --hover-transition-speed: 300ms;
   }
 }

@@ -1,0 +1,42 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// GLOBAL NAVIGATION BAR - SECONDARY CONTROLS
+// ═══════════════════════════════════════════════════════════════════════════════
+// Specialized mixins for global navigation bar secondary controls
+// Primary controls are in _dom_selectors.scss
+// See: docs/spotify/DOM_TARGETTING/navbar_DOM.md
+
+// Global Navigation Links (Custom navigation buttons)
+// Usage: @include global-nav-links { … }
+// Use for: Styling custom navigation link buttons
+@mixin global-nav-links {
+  button.main-globalNav-navLink {
+    @content;
+  }
+}
+
+// Global Navigation Search Section Container
+// Usage: @include global-nav-search-section { … }
+// Use for: Search section wrapper styling, layout control
+@mixin global-nav-search-section {
+  div.main-globalNav-searchSection {
+    @content;
+  }
+}
+
+// What's New Button (Notification bell)
+// Usage: @include whats-new-button { … }
+// Use for: What's New button styling, badge indicators
+@mixin whats-new-button {
+  button[aria-label="What's New"] {
+    @content;
+  }
+}
+
+// Friend Activity Button (Buddy feed toggle)
+// Usage: @include friend-activity-button { … }
+// Use for: Friend activity sidebar toggle button
+@mixin friend-activity-button {
+  button[data-restore-focus-key="buddy_feed"] {
+    @content;
+  }
+}

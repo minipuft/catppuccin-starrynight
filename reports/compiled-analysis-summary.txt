@@ -1,0 +1,20 @@
+═══════════════════════════════════════════════════════════════
+Compiled CSS Analysis Summary
+═══════════════════════════════════════════════════════════════
+
+Total Tokens Defined: 433
+Tokens in Compiled CSS: 0
+Truly Unused: 305
+
+Compiled Usage Rate: 0%
+
+Top 20 Tokens in Compiled CSS:
+───────────────────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════════
+
+Reports generated in ./reports/:
+  • compiled-usage-report.csv    - Full usage in compiled CSS
+  • compiled-active-tokens.csv   - Tokens actively used
+  • truly-unused-tokens.txt      - Genuinely unused tokens
+

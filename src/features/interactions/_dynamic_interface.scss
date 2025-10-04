@@ -181,8 +181,8 @@
 // Beautiful interface elements that don't lag
 // ═══════════════════════════════════════════════════════════════════════════════
 
-.main-card-card,
-.main-card-cardContainer {
+// Uses centralized mixin for card containers (supports both legacy and Encore structures)
+@include card-container-universal {
   @include dynamic-interface-field(0.8);
   @include ethereal-shimmer-interface;
 
@@ -221,7 +221,7 @@
 // Musical visual effects that perform smoothly
 // ═══════════════════════════════════════════════════════════════════════════════
 
-.main-trackList-trackListRow {
+@include tracklist-row {
   position: relative;
   border-radius: 8px;
   transition: background-color 0.2s ease, transform 0.2s ease,
@@ -363,11 +363,12 @@
   }
 
   // Disable all heavy effects
-  .main-card-card::before,
-  .main-card-card::after,
-  .main-card-cardContainer::before,
-  .main-card-cardContainer::after {
-    display: none;
+  // Uses centralized mixin for card containers (supports both legacy and Encore structures)
+  @include card-container-universal {
+    &::before,
+    &::after {
+      display: none;
+    }
   }
 }
 

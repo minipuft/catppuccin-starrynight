@@ -431,7 +431,11 @@
 }
 
 // Apply GPU acceleration to critical UI elements
-.main-card-card,
+// Uses centralized mixin for card containers (supports both legacy and Encore structures)
+@include card-container-universal {
+  @extend .sn-gpu-accelerated !optional;
+}
+
 .main-trackList-trackListRow,
 .main-actionBar-ActionBarRow,
 .main-nowPlayingBar-nowPlayingBar {

@@ -1,0 +1,55 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// NOW PLAYING VIEW (NPV) - SECTIONS & VISUAL ENHANCEMENTS
+// ═══════════════════════════════════════════════════════════════════════════════
+// Specialized mixins for right sidebar Now Playing View sections
+// Primary NPV controls are in _dom_selectors.scss
+// See: docs/spotify/DOM_TARGETTING/rightSidebar_DOM.md
+
+// NPV Visual Enhancement (Animated/video overlay)
+// Usage: @include npv-visual-enhancement { … }
+// Use for: Track visual enhancement (canvas/video) styling
+@mixin npv-visual-enhancement {
+  div[data-testid="track-visual-enhancement"],
+  div[aria-hidden="false"][data-testid*="visual"] {
+    @content;
+  }
+}
+
+// NPV Sections (Generic section container)
+// Usage: @include npv-sections { … }
+// Use for: All section containers (About Artist, Credits, Queue)
+@mixin npv-sections {
+  div.main-nowPlayingView-section {
+    @content;
+  }
+}
+
+// NPV About Artist Section
+// Usage: @include npv-about-artist { … }
+// Use for: About the artist section styling
+@mixin npv-about-artist {
+  div.main-nowPlayingView-section:has(.main-nowPlayingView-sectionHeaderText:is(:contains("About the artist"))),
+  div.main-nowPlayingView-aboutArtist {
+    @content;
+  }
+}
+
+// NPV Credits Section
+// Usage: @include npv-credits { … }
+// Use for: Song credits section styling
+@mixin npv-credits {
+  div.main-nowPlayingView-section.main-nowPlayingView-credits,
+  div.main-nowPlayingView-credits {
+    @content;
+  }
+}
+
+// NPV Queue Section
+// Usage: @include npv-queue { … }
+// Use for: Queue section styling in NPV
+@mixin npv-queue {
+  div.main-nowPlayingView-section.main-nowPlayingView-queue,
+  div.main-nowPlayingView-queue {
+    @content;
+  }
+}

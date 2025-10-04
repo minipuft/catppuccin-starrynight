@@ -20,7 +20,7 @@
 // File: src/features/backgrounds/_cosmic_depth_system.scss
 // Impact: Medium GPU load, layered depth effects
 // Disable for: Low-end devices
-$cosmic-depth-system: true;
+$cosmic-depth-system: false;
 
 // File: src/features/backgrounds/_particle_animation_system.scss
 // Impact: High GPU load, animated particle fields

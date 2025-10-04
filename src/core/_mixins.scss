@@ -1,6 +1,11 @@
 // StarryNight Shared Mixins
 // Common SCSS mixins used across StarryNight modules
-@forward "dom_selectors";
+@forward "dom-selectors/index";
+@forward "dom-selectors/global-nav";
+@forward "dom-selectors/now-playing";
+@forward "dom-selectors/npv";
+@forward "dom-selectors/tracklist";
+@forward "dom-selectors/library";
 @use "_design_tokens" as *;
 
 // Performance optimization mixin for hardware acceleration

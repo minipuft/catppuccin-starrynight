@@ -1,0 +1,31 @@
+═══════════════════════════════════════════════════════════════
+Token Category Distribution (by prefix)
+═══════════════════════════════════════════════════════════════
+
+  genre                            54 tokens
+  emotion                          54 tokens
+  anim                             50 tokens
+  bg                               45 tokens
+  visual                           42 tokens
+  color                            28 tokens
+  ui                               27 tokens
+  music                            17 tokens
+  layout                           17 tokens
+  perf                             15 tokens
+  theme                            14 tokens
+  text                             13 tokens
+  brightness                       13 tokens
+  transition                       12 tokens
+  ix                               12 tokens
+  musical                          10 tokens
+  cosmic                           10 tokens
+  rotation                          8 tokens
+  oklab                             8 tokens
+  animation                         8 tokens
+  echo                              6 tokens
+  dynamic                           6 tokens
+  kinetic                           5 tokens
+  glyph                             5 tokens
+  serendipity                       4 tokens
+  easing                            1 tokens
+

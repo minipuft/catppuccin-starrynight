@@ -1,0 +1,50 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// YOUR LIBRARY - ADVANCED SELECTORS
+// ═══════════════════════════════════════════════════════════════════════════════
+// Specialized mixins for Your Library advanced features
+// Primary library controls are in _dom_selectors.scss
+// See: docs/spotify/DOM_TARGETTING/mainView_DOM.md
+
+// Your Library Filter Area (Filter pills container)
+// Usage: @include your-library-filter-area { … }
+// Use for: Filter pill container styling (Playlists/Artists/Albums pills)
+@mixin your-library-filter-area {
+  .main-yourLibraryX-filterArea,
+  .main-yourLibrary-filterArea,
+  div.search-searchCategory-categoryGrid {
+    @content;
+  }
+}
+
+// Your Library Search (Library search input)
+// Usage: @include your-library-search { … }
+// Use for: Library search input field styling
+@mixin your-library-search {
+  input[placeholder*="library" i],
+  input[placeholder*="Search" i]:has(~ .main-yourLibraryX-libraryContainer),
+  .main-yourLibraryX-searchInput {
+    @content;
+  }
+}
+
+// Library Drop Target (Drag & drop target zones)
+// Usage: @include library-drop-target { … }
+// Use for: Drag and drop target styling for organizing items
+@mixin library-drop-target {
+  .main-useDropTarget-base,
+  .main-useDropTarget-playlist,
+  .main-useDropTarget-album,
+  .main-useDropTarget-artist {
+    @content;
+  }
+}
+
+// Left Sidebar Footer (Settings, Create Playlist buttons)
+// Usage: @include left-sidebar-footer { … }
+// Use for: Bottom sidebar action buttons styling
+@mixin left-sidebar-footer {
+  div[data-testid="left-sidebar-footer"],
+  .LayoutResizer__resize-bar + div {
+    @content;
+  }
+}

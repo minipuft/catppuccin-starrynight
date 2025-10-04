@@ -408,12 +408,6 @@ export const UNIFIED_VARIABLE_GROUPS: Record<VariableGroup, VariableGroupDefinit
         type: 'time',
         description: 'Extended animation duration for cosmic/atmospheric effects'
       },
-      'duration.animation': {
-        name: '--sn-anim-duration-animation',
-        defaultValue: '4s',
-        type: 'time',
-        description: 'Legacy: Decorative animation duration (consider migrating to duration.extended)'
-      },
       'easing.standard': {
         name: '--sn-anim-easing-standard',
         defaultValue: 'cubic-bezier(0.4, 0, 0.2, 1)',

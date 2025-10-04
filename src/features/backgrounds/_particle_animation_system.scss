@@ -594,7 +594,8 @@
 
 // Discovery Mode: Enhanced particle activity for exploration
 .main-entityHeader-container,
-.main-shelf-shelf,
+section[data-testid="component-shelf"],  // Stable attribute (preferred)
+.main-shelf-shelf,                       // Transitional class
 [data-context="discovery"] {
   --particle-energy-intensity: calc(
     var(--particle-energy-intensity) * var(--particle-discovery-amplification)

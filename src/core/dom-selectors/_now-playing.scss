@@ -1,0 +1,55 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// NOW PLAYING BAR - EXTENDED CONTROLS
+// ═══════════════════════════════════════════════════════════════════════════════
+// Specialized mixins for now playing bar extended controls
+// Primary controls are in _dom_selectors.scss
+// See: docs/spotify/DOM_TARGETTING/nowPlaying_DOM.md
+
+// Now Playing Progress Bar
+// Usage: @include now-playing-progress-bar { … }
+// Use for: Progress bar styling, seek interactions
+@mixin now-playing-progress-bar {
+  .main-nowPlayingBar-progressBar,
+  div.main-playbackBarRemainingTime-container {
+    @content;
+  }
+}
+
+// Volume Control (Slider)
+// Usage: @include volume-control { … }
+// Use for: Volume slider styling, mute button
+@mixin volume-control {
+  [data-testid="volume-bar"],
+  div.main-nowPlayingBar-volumeSlider {
+    @content;
+  }
+}
+
+// Lyrics Button (Right section toggle)
+// Usage: @include lyrics-button { … }
+// Use for: Lyrics toggle button styling
+@mixin lyrics-button {
+  [data-testid="lyrics-button"],
+  button[aria-label*="Lyrics"] {
+    @content;
+  }
+}
+
+// Queue Button (Right section toggle)
+// Usage: @include queue-button { … }
+// Use for: Queue toggle button styling
+@mixin queue-button {
+  [data-testid="queue-button"],
+  button[aria-label*="Queue"] {
+    @content;
+  }
+}
+
+// Stars Overlay (Theme-specific visual element)
+// Usage: @include stars-overlay { … }
+// Use for: Custom star animation overlay in now playing
+@mixin stars-overlay {
+  span.stars-now-playing#stars-now-playing {
+    @content;
+  }
+}

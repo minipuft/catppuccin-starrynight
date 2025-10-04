@@ -14,6 +14,7 @@
 
 @use "../../core/unified-effects-engine" as *;
 @use "../../core/performance_mixins" as *;
+@use "../../core/dom-selectors" as *;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 💠 CRYSTAL VISUAL EFFECTS VARIABLES (Simplified)
@@ -70,8 +71,7 @@
 
 // === CARDS BECOME FLOATING CRYSTALS ===
 // Supports both legacy and current Spotify DOM structures
-.main-card-card,
-.main-card-cardContainer {
+@include card-container-universal {
   @include crystalline-card-effect;
 
   // Staggered animation delays for depth
@@ -255,8 +255,12 @@ input[type="search"],
 
 // Beat-synchronized crystalline pulsing (TypeScript controlled)
 .Root[style*="--sn-music-beat-pulse-intensity"] {
-  .main-card-card,
-  .main-card-cardContainer,
+  @include card-container-universal {
+    // Music energy directly modulates intensity
+    --sn-unified-music-energy: var(--sn-music-beat-pulse-intensity, 0.5);
+    --sn-music-intensity-boost: calc(1 + var(--sn-music-beat-pulse-intensity, 0.5));
+  }
+
   .main-trackList-trackListRow,
   .main-playButton-PlayButton {
     // Music energy directly modulates intensity
@@ -267,8 +271,10 @@ input[type="search"],
 
 // Genre-responsive hue shifting (TypeScript controlled)
 .Root[style*="--sn-dynamic-genre-hue-shift"] {
-  .main-card-card,
-  .main-card-cardContainer,
+  @include card-container-universal {
+    filter: hue-rotate(var(--sn-dynamic-genre-hue-shift, 0deg));
+  }
+
   .main-trackList-trackListRow {
     filter: hue-rotate(var(--sn-dynamic-genre-hue-shift, 0deg));
   }
@@ -290,8 +296,7 @@ input[type="search"],
     --sn-unified-blur-amount: 15px;             // Less blur
   }
 
-  .main-card-card,
-  .main-card-cardContainer {
+  @include card-container-universal {
     margin: 4px;
   }
 }
@@ -303,8 +308,11 @@ input[type="search"],
     --sn-unified-brightness-delta: 0.15;        // Brighter effects
   }
 
-  .main-card-card,
-  .main-card-cardContainer,
+  @include card-container-universal {
+    border-width: 2px;
+    border-color: rgba(var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)), 0.6);
+  }
+
   .main-trackList-trackListRow {
     border-width: 2px;
     border-color: rgba(var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)), 0.6);

@@ -1,0 +1,56 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// TRACK LIST - CELL-LEVEL SELECTORS
+// ═══════════════════════════════════════════════════════════════════════════════
+// Specialized mixins for track list cell-level targeting
+// Primary track list controls are in _dom_selectors.scss
+// See: docs/spotify/DOM_TARGETTING/mainView_DOM.md
+
+// Track List Play Cell (Track number/play button column)
+// Usage: @include tracklist-play-cell { … }
+// Use for: First column styling (# or play button)
+@mixin tracklist-play-cell {
+  div[role="gridcell"][aria-colindex="1"],
+  div.main-trackList-rowSectionIndex {
+    @content;
+  }
+}
+
+// Track List Info Cell (Title & artist column)
+// Usage: @include tracklist-info-cell { … }
+// Use for: Second column styling (album art, title, artist)
+@mixin tracklist-info-cell {
+  div[role="gridcell"][aria-colindex="2"],
+  div.main-trackList-rowMainContent {
+    @content;
+  }
+}
+
+// Track List Album Cell (Album name column)
+// Usage: @include tracklist-album-cell { … }
+// Use for: Third column styling (album link)
+@mixin tracklist-album-cell {
+  div[role="gridcell"][aria-colindex="3"],
+  div.main-trackList-rowSectionVariable:has(a[href*="/album/"]) {
+    @content;
+  }
+}
+
+// Track List Duration Cell (Duration & actions column)
+// Usage: @include tracklist-duration-cell { … }
+// Use for: Last column styling (duration, add button, menu)
+@mixin tracklist-duration-cell {
+  div[role="gridcell"][aria-colindex="5"],
+  div.main-trackList-rowSectionEnd {
+    @content;
+  }
+}
+
+// Track List Column Header (Individual column headers)
+// Usage: @include tracklist-column-header { … }
+// Use for: Column header styling (# Title Album Date Duration)
+@mixin tracklist-column-header {
+  button.main-tracklist-column,
+  div[role="columnheader"] {
+    @content;
+  }
+}

@@ -38,7 +38,8 @@ h2,
 h3,
 .main-entityHeader-title,
 .main-trackList-trackListHeaderRow th,
-.main-cardHeader-text {
+.main-cardHeader-text,
+[data-encore-id="cardTitle"] {
   @include lightweight-text-shimmer(subtle);
 }
 
@@ -74,7 +75,8 @@ h3,
 .main-trackList-trackName,
 .main-trackList-rowTitle a,
 .main-card-cardMetadata-title,
-.main-cardHeader-link {
+.main-cardHeader-link,
+[data-encore-id="cardSubtitle"] {
   @include lightweight-text-shimmer(subtle);
 
   // Currently playing track gets gradient treatment
@@ -131,7 +133,8 @@ h3,
   h1, h2, h3,
   .main-entityHeader-title,
   .main-trackList-trackName,
-  .main-cardHeader-text {
+  .main-cardHeader-text,
+  [data-encore-id="cardTitle"] {
     // Text shimmer speed scales with beat intensity
     animation-duration: calc(var(--text-shimmer-speed) / max(var(--sn-music-beat-pulse-intensity, 0.3), 0.3));
   }
@@ -152,6 +155,7 @@ h3,
   .main-entityHeader-title,
   .main-trackList-trackName,
   .main-cardHeader-text,
+  [data-encore-id="cardTitle"],
   .main-navBar-navBarLink {
     animation: none !important;
   }
@@ -180,7 +184,8 @@ h3,
 
   // Reduced effects for mobile performance
   .main-trackList-trackName,
-  .main-cardHeader-text {
+  .main-cardHeader-text,
+  [data-encore-id="cardTitle"] {
     animation-duration: calc(var(--text-shimmer-speed) * 2) !important;
   }
 }

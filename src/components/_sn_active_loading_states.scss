@@ -129,24 +129,24 @@
 
 // Cards (album, playlist, artist cards)
 // Strategy: Apply shimmer to pseudo-element overlay, not image itself
-// IMPORTANT: Spotify uses multiple card class names (.main-card-card, .main-card-cardContainer)
+// Uses centralized mixin for both legacy and Encore card structures
 .loading-state [class*="Card"],
-.loading-state .main-card-card,
-.loading-state .main-card-cardContainer {
-  // Approach A: Cards with .main-card-header wrapper (standard structure)
-  .main-card-header,
-  .main-card-imageContainer {
-    position: relative;
-    isolation: isolate; // Create stacking context for z-index
+.loading-state {
+  @include card-container-universal {
+    // Approach A: Cards with .main-card-header wrapper (standard structure)
+    .main-card-header,
+    .main-card-imageContainer {
+      position: relative;
+      isolation: isolate; // Create stacking context for z-index
 
-    // Shimmer overlay (above image, non-interactive)
-    &::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 2; // Above image (z-index: 1), below text (z-index: 3)
-      pointer-events: none; // Don't block image interactions
-      border-radius: inherit;
+      // Shimmer overlay (above image, non-interactive)
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 2; // Above image (z-index: 1), below text (z-index: 3)
+        pointer-events: none; // Don't block image interactions
+        border-radius: inherit;
 
       // Apply shimmer gradient with reduced opacity
       background:
@@ -167,7 +167,7 @@
       backface-visibility: hidden;
       contain: layout style paint;
     }
-  }
+  } // Close .main-card-header/.main-card-imageContainer block
 
   // Ensure images are positioned correctly in stacking order
   .main-card-cardImage,
@@ -219,7 +219,8 @@
       backface-visibility: hidden;
       contain: layout style paint;
     }
-  }
+  } // Close Approach B (&:not(:has(.main-card-header)))
+  } // Close @include card-container-universal
 }
 
 // Search results
@@ -343,7 +344,7 @@
   }
 }
 
-// ████████████████████████████████████████████████████████████████████████████████
+// ==============================================================================
 // INTEGRATION NOTES:
 // - LoadingStateService (TypeScript) detects loading indicators and applies classes
 // - Unified shimmer system (SCSS) provides parametric animation generation
@@ -352,4 +353,4 @@
 // - Year3000 features: grain texture, music-sync (optional)
 // - Accessibility: reduced-motion, high-contrast support (automatic)
 // - Performance: Mobile optimizations, battery-conscious animations
-// ████████████████████████████████████████████████████████████████████████████████
+// ==============================================================================

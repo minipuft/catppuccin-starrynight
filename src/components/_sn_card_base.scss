@@ -21,10 +21,9 @@
   perspective-origin: center;
 }
 
-// Base selector – supports both legacy and current Spotify DOM structures
+// Base selector – uses centralized mixin for both legacy and current Spotify DOM structures
 // Keep scope broad so both search & non-search contexts inherit.
-.main-card-card,
-.main-card-cardContainer {
+@include card-container-universal {
   // Layout & geometry
   position: relative;
   border-radius: var(--sn-card-stellar-radius, var(--card-border-radius, 12px));

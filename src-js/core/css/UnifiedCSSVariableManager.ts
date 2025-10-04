@@ -1389,7 +1389,6 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     "duration.fast"?: string;
     "duration.normal"?: string;
     "duration.slow"?: string;
-    "duration.animation"?: string;
     "motion.reduced"?: boolean;
     "motion.scale"?: number;
     "frame.budget"?: string;

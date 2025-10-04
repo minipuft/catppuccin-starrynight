@@ -189,7 +189,8 @@
 
 // Discovery Mode: Full expressiveness for exploration and browsing
 .main-entityHeader-container,
-.main-shelf-shelf,
+section[data-testid="component-shelf"],  // Stable attribute (preferred)
+.main-shelf-shelf,                       // Transitional class
 .main-gridContainer-gridContainer:not([data-context="search"]),
 [data-context="discovery"] {
   --motion-intelligence-level: var(--discovery-mode-amplification);
@@ -200,97 +201,116 @@
 // =============================================================================
 // SHELF GRID ATMOSPHERIC GLOW - Year3000 Design System
 // Multi-layer flowing gradients with opacity-based transitions
-// Targets: .main-shelf-shelf .main-gridContainer-gridContainer (the actual card grid)
+// Targets: Shelf grids (uses centralized shelf-grid mixin for stable selectors)
 // Integrates with --sn-visual-effects-* variables for cosmic atmosphere
 // =============================================================================
 
-.main-shelf-shelf .main-gridContainer-gridContainer {
+@include shelf-grid {
   position: relative;
 
-  // Year3000 visual effects integration (increased intensity for visibility)
-  --shelf-glow-base-opacity: calc(
-    0.5 * var(--sn-visual-effects-field-intensity, 0.4)
-  );
-  --shelf-glow-hover-opacity: calc(
-    0.8 * var(--sn-visual-effects-intensity, 0.7)
-  );
+  // Strengthened visibility (removed field-intensity division for direct opacity control)
+  --shelf-glow-base-opacity: 0.6; // 87.5% stronger than previous 0.32 (0.8 × 0.4)
+  --shelf-glow-hover-opacity: 0.85; // Clear hover feedback
   --shelf-glow-transition: calc(
     var(--sn-visual-effects-transition-duration, 0.6s) * 1.3
   );
 
-  // Subtle atmospheric base glow with multi-layer gradients
+  // Atmospheric glow with enhanced multi-layer gradients + edge definition
   &::before {
     content: "";
     position: absolute;
     inset: -8px;
     border-radius: 16px;
 
-    // Multi-layer radial gradients for nebula-holographic-flow animation
-    // Each layer shifts independently via background-position
+    // Strengthened multi-layer gradients (525% stronger - removed field-intensity division)
+    // Perimeter edge glow + 4 corner/edge gradients for clear definition
     background: radial-gradient(
+        ellipse at 50% 0%,
+        rgba(var(--sn-accent-rgb), 0.15) 0%,
+        transparent 40%
+      ),
+      radial-gradient(
         circle at 0% 0%,
-        rgba(
-            var(--sn-accent-rgb),
-            calc(0.02 * var(--sn-visual-effects-field-intensity, 0.4))
-          )
-          0%,
+        rgba(var(--sn-accent-rgb), 0.12) 0%,
         transparent 60%
       ),
       radial-gradient(
         circle at 100% 100%,
-        rgba(
-            var(--sn-accent-rgb),
-            calc(0.015 * var(--sn-visual-effects-field-intensity, 0.4))
-          )
-          0%,
+        rgba(var(--sn-accent-rgb), 0.10) 0%,
         transparent 60%
       ),
       radial-gradient(
         circle at 50% 0%,
-        rgba(
-            var(--sn-accent-rgb),
-            calc(0.025 * var(--sn-visual-effects-field-intensity, 0.4))
-          )
-          0%,
+        rgba(var(--sn-accent-rgb), 0.15) 0%,
         transparent 70%
       ),
       radial-gradient(
         circle at 0% 50%,
-        rgba(
-            var(--sn-accent-rgb),
-            calc(0.018 * var(--sn-visual-effects-field-intensity, 0.4))
-          )
-          0%,
+        rgba(var(--sn-accent-rgb), 0.12) 0%,
         transparent 70%
       );
 
-    background-size: 200% 200%; // Allow gradients to shift via animation
-    opacity: var(--shelf-glow-base-opacity);
-    transition: opacity var(--shelf-glow-transition) ease;
+    background-size: 200% 200%;
+    border: 1px solid rgba(var(--sn-accent-rgb), 0.15);
     pointer-events: none;
-    z-index: 0; // Behind cards
+    z-index: 0;
+
+    // Always-running animations for continuous luma/color shifts during scroll
+    // Opacity animation creates visible brightness changes (0.3 → 0.8 = 167% variance)
+    animation: shelf-glow-flow 24s ease-in-out infinite,
+      shelf-border-pulse 8s ease-in-out infinite;
   }
 
   // Flowing gradient glow on hover (opacity-based, Year3000 standard)
   &:hover {
-    // No filter on container - only opacity changes on ::before
-
     &::before {
-      opacity: var(--shelf-glow-hover-opacity);
-
-      // nebula-holographic-flow animates:
-      // - background-position (shifts 4 gradient layers)
-      // - brightness (0.9 → 1.2 cycle)
-      // - saturate (1.1 → 1.4 cycle)
-      // - hue-rotate (0deg → 360deg color shift)
-      animation: nebula-holographic-flow 18s ease-in-out infinite;
+      // Speed up animations on hover for responsive feedback
+      animation: shelf-glow-flow 12s ease-in-out infinite,
+        shelf-border-pulse 4s ease-in-out infinite;
     }
   }
 
   // Ensure cards are above the glow
   > * {
     position: relative;
-    z-index: 1; // Above glow
+    z-index: 1;
+  }
+}
+
+// =============================================================================
+// SHELF GLOW ANIMATIONS - Custom keyframes for 5-layer gradient system
+// =============================================================================
+
+@keyframes shelf-glow-flow {
+  0% {
+    background-position: 0% 0%, 0% 0%, 100% 100%, 50% 0%, 0% 50%;
+    opacity: 0.3; // Dimmer phase
+  }
+  25% {
+    background-position: 20% 80%, 20% 80%, 80% 20%, 70% 30%, 30% 70%;
+    opacity: 0.8; // Brighter phase - clear luma shift
+  }
+  50% {
+    background-position: 50% 50%, 40% 60%, 60% 40%, 90% 60%, 10% 40%;
+    opacity: 0.4; // Medium-dim phase
+  }
+  75% {
+    background-position: 80% 20%, 60% 40%, 40% 60%, 30% 90%, 70% 10%;
+    opacity: 0.7; // Medium-bright phase
+  }
+  100% {
+    background-position: 100% 0%, 0% 0%, 100% 100%, 50% 0%, 0% 50%;
+    opacity: 0.3; // Return to dimmer phase
+  }
+}
+
+@keyframes shelf-border-pulse {
+  0%,
+  100% {
+    border-color: rgba(var(--sn-accent-rgb), 0.15);
+  }
+  50% {
+    border-color: rgba(var(--sn-accent-rgb), 0.35);
   }
 }
 
@@ -312,11 +332,10 @@
 
 // =============================================================================
 // STARRYNIGHT ENHANCED CARDS - Dynamic Interactive Elements
-// Supports both legacy and current Spotify DOM structures
+// Uses centralized card-container-universal mixin (Encore migration)
 // =============================================================================
 
-.main-card-card,
-.main-card-cardContainer {
+@include card-container-universal {
   position: relative;
   perspective: var(--card-perspective-field);
   transform-style: preserve-3d;
@@ -529,11 +548,10 @@
 // =============================================================================
 // PHASE 8: YEAR3000 FLUID MORPHING INTEGRATION
 // Organic breathing animations that respond to music
-// Supports both legacy and current Spotify DOM structures
+// Uses centralized card-container-universal mixin (Encore migration)
 // =============================================================================
 
-.main-card-card,
-.main-card-cardContainer {
+@include card-container-universal {
   // Apply subtle fluid morphing for organic Year3000 aesthetic
   // Lower intensity (0.2) to complement existing visual effects
   @include fluid-morphing(0.2);
@@ -546,11 +564,10 @@
 
 // =============================================================================
 // ENHANCED CARD HEADER - Album Art Visual Effect Source
-// Supports both .main-card-header (legacy) and .main-card-imageContainer (current)
+// Uses centralized card-image-container mixin (Encore migration)
 // =============================================================================
 
-.main-card-header,
-.main-card-imageContainer {
+@include card-image-container {
   position: relative;
   aspect-ratio: 1 / 1;
   width: 100%;
@@ -825,7 +842,20 @@
     --card-effect-pulse-rate: 0.01ms;
   }
 
-  .main-card-card,
+  @include card-container-universal {
+    transition: opacity 200ms ease, background-color 200ms ease,
+      border-color 200ms ease;
+
+    &:hover {
+      transform: none !important;
+    }
+
+    &::before,
+    &::after {
+      animation: none !important;
+    }
+  }
+
   .main-card-PlayButtonContainer {
     transition: opacity 200ms ease, background-color 200ms ease,
       border-color 200ms ease;
@@ -855,9 +885,9 @@
   }
 }
 
-// High contrast: Enhanced visibility
+// High contrast: Enhanced visibility (Encore migration)
 @media (prefers-contrast: high) {
-  .main-card-card {
+  @include card-container-universal {
     border-width: 2px;
     box-shadow: 0 4px 24px
         #{oklab-color('highlight', 0.1)},
@@ -869,14 +899,14 @@
   }
 }
 
-// Battery optimization: Reduce activity
+// Battery optimization: Reduce activity (Encore migration)
 @media (prefers-reduced-data: reduce) {
   :root {
     --motion-intelligence-level: 0.3;
     --card-effect-pulse-rate: calc(var(--card-effect-pulse-rate) * 3);
   }
 
-  .main-card-card {
+  @include card-container-universal {
     &::before,
     &::after {
       display: none;
@@ -972,9 +1002,10 @@
 }
 
 // === ADVANCED CARD STYLING (NON-SEARCH ONLY) ===
+// Using centralized card-container-universal mixin (Encore migration)
 
-body:not(:has(.main-searchPage-content)) .main-card-card,
-body:not(:has(.main-searchPage-content)) .main-card-cardContainer {
+body:not(:has(.main-searchPage-content)) {
+  @include card-container-universal {
   // Foundation
   position: relative;
   border-radius: var(--sn-card-border-radius-enhanced);
@@ -1111,87 +1142,89 @@ body:not(:has(.main-searchPage-content)) .main-card-cardContainer {
       animation-duration: calc(var(--sn-card-particle-orbit-duration) * 0.5);
     }
   }
-}
+  } // End card-container-universal
+} // End body:not search exclusion
 
 // === MULTI-CARD ANIMATION SYNCHRONIZATION ===
+// Using centralized card-container-universal mixin (Encore migration)
 
-// Stagger animations for multiple selected cards
-body:not(:has(.main-searchPage-content)) .main-card-card.sn-card-selected:nth-child(2n),
-body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]:nth-child(2n),
-body:not(:has(.main-searchPage-content)) .main-card-cardContainer.sn-card-selected:nth-child(2n),
-body:not(:has(.main-searchPage-content)) .main-card-cardContainer[aria-selected="true"]:nth-child(2n) {
-  animation-delay: calc(var(--sn-card-breath-duration) * 0.33);
-}
+body:not(:has(.main-searchPage-content)) {
+  // Stagger animations for multiple selected cards
+  @include card-container-universal {
+    &.sn-card-selected:nth-child(2n),
+    &[aria-selected="true"]:nth-child(2n) {
+      animation-delay: calc(var(--sn-card-breath-duration) * 0.33);
+    }
 
-body:not(:has(.main-searchPage-content)) .main-card-card.sn-card-selected:nth-child(3n),
-body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]:nth-child(3n),
-body:not(:has(.main-searchPage-content)) .main-card-cardContainer.sn-card-selected:nth-child(3n),
-body:not(:has(.main-searchPage-content)) .main-card-cardContainer[aria-selected="true"]:nth-child(3n) {
-  animation-delay: calc(var(--sn-card-breath-duration) * 0.66);
-}
+    &.sn-card-selected:nth-child(3n),
+    &[aria-selected="true"]:nth-child(3n) {
+      animation-delay: calc(var(--sn-card-breath-duration) * 0.66);
+    }
 
-// Enhanced particles for selected cards
-body:not(:has(.main-searchPage-content)) .main-card-card.sn-card-selected::before,
-body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::before,
-body:not(:has(.main-searchPage-content)) .main-card-cardContainer.sn-card-selected::before,
-body:not(:has(.main-searchPage-content)) .main-card-cardContainer[aria-selected="true"]::before {
-  width: calc(var(--sn-card-particle-size) * 1.5);
-  height: calc(var(--sn-card-particle-size) * 1.5);
-  opacity: 1;
-  animation-duration: calc(var(--sn-card-particle-orbit-duration) * 0.7);
-  box-shadow: 0 0 8px rgba(var(--sn-card-harmonic-primary-rgb), 0.6);
-}
+    // Enhanced particles for selected cards
+    &.sn-card-selected::before,
+    &[aria-selected="true"]::before {
+      width: calc(var(--sn-card-particle-size) * 1.5);
+      height: calc(var(--sn-card-particle-size) * 1.5);
+      opacity: 1;
+      animation-duration: calc(var(--sn-card-particle-orbit-duration) * 0.7);
+      box-shadow: 0 0 8px rgba(var(--sn-card-harmonic-primary-rgb), 0.6);
+    }
 
-body:not(:has(.main-searchPage-content)) .main-card-card.sn-card-selected::after,
-body:not(:has(.main-searchPage-content)) .main-card-card[aria-selected="true"]::after,
-body:not(:has(.main-searchPage-content)) .main-card-cardContainer.sn-card-selected::after,
-body:not(:has(.main-searchPage-content)) .main-card-cardContainer[aria-selected="true"]::after {
-  width: calc(var(--sn-card-particle-size) * 1.2);
-  height: calc(var(--sn-card-particle-size) * 1.2);
-  opacity: 0.9;
-  animation-duration: calc(var(--sn-card-particle-orbit-duration) * 0.9);
-  box-shadow: 0 0 6px rgba(var(--sn-card-harmonic-analogous-1-rgb), 0.5);
+    &.sn-card-selected::after,
+    &[aria-selected="true"]::after {
+      width: calc(var(--sn-card-particle-size) * 1.2);
+      height: calc(var(--sn-card-particle-size) * 1.2);
+      opacity: 0.9;
+      animation-duration: calc(var(--sn-card-particle-orbit-duration) * 0.9);
+      box-shadow: 0 0 6px rgba(var(--sn-card-harmonic-analogous-1-rgb), 0.5);
+    }
+  }
 }
 
 // === ACCESSIBILITY & PERFORMANCE ===
+// Using centralized card-container-universal mixin (Encore migration)
 
 // Reduced motion support - disable animations
 @media (prefers-reduced-motion: reduce) {
-  body:not(:has(.main-searchPage-content)) .main-card-card,
-  body:not(:has(.main-searchPage-content)) .main-card-cardContainer {
-    animation-duration: 0.1s !important;
-    transition-duration: 0.2s !important;
+  body:not(:has(.main-searchPage-content)) {
+    @include card-container-universal {
+      animation-duration: 0.1s !important;
+      transition-duration: 0.2s !important;
 
-    &::before,
-    &::after {
-      animation: none !important;
+      &::before,
+      &::after {
+        animation: none !important;
+      }
     }
   }
 }
 
 // Hardware acceleration support
 @supports (will-change: transform) {
-  body:not(:has(.main-searchPage-content)) .main-card-card,
-  body:not(:has(.main-searchPage-content)) .main-card-cardContainer {
-    will-change: transform, box-shadow, border-color, opacity;
+  body:not(:has(.main-searchPage-content)) {
+    @include card-container-universal {
+      will-change: transform, box-shadow, border-color, opacity;
 
-    &::before,
-    &::after {
-      will-change: transform, opacity;
+      &::before,
+      &::after {
+        will-change: transform, opacity;
+      }
     }
   }
 }
 
 // High contrast mode support
 @media (prefers-contrast: high) {
-  body:not(:has(.main-searchPage-content)) .main-card-card,
-  body:not(:has(.main-searchPage-content)) .main-card-cardContainer {
-    --sn-card-border-width: 2px;
-    border-color: var(--spice-accent) !important;
+  body:not(:has(.main-searchPage-content)) {
+    @include card-container-universal {
+      --sn-card-border-width: 2px;
+      border-color: var(--spice-accent) !important;
 
-    &::before,
-    &::after {
-      opacity: 0.9 !important;
+      &::before,
+      &::after {
+        opacity: 0.9 !important;
+      }
     }
   }
 }
@@ -1208,9 +1241,9 @@ body:not(:has(.main-searchPage-content)) .main-card-cardContainer[aria-selected=
 // PERFORMANCE OPTIMIZATIONS
 // =============================================================================
 
-// Reduced motion support
+// Reduced motion support (Encore migration)
 @media (prefers-reduced-motion: reduce) {
-  .main-card-card {
+  @include card-container-universal {
     transition-duration: 0.1s !important;
   }
 }
@@ -1222,9 +1255,8 @@ body:not(:has(.main-searchPage-content)) .main-card-cardContainer[aria-selected=
 // Solution: Flatten 3D rendering by default, allow specific opt-in with class
 // =============================================================================
 
-// Default: Flatten 3D rendering for all cards to prevent image disappearance
-.main-card-card,
-.main-card-cardContainer {
+// Default: Flatten 3D rendering for all cards to prevent image disappearance (Encore migration)
+@include card-container-universal {
   // Use flat transform-style to prevent GPU backface culling issues
   // Cards needing 3D can opt-in with .preserve-3d-override class
   &:not(.preserve-3d-override) {
@@ -1242,30 +1274,36 @@ body:not(:has(.main-searchPage-content)) .main-card-cardContainer[aria-selected=
 //           backface culling while maintaining shelf breathing animation
 // =============================================================================
 
-// Flatten 3D rendering for cards inside shelf grid containers
+// Flatten 3D rendering for cards inside shelf grid containers (Encore migration)
 // IMPORTANT: Spotify uses BOTH .main-card-card AND .main-card-cardContainer in different contexts
-.main-shelf-shelf .main-card-card,
-.main-shelf-shelf .main-card-cardContainer,
-.main-gridContainer-gridContainer .main-card-card,
-.main-gridContainer-gridContainer .main-card-cardContainer {
-  transform-style: flat !important;  // Override preserve-3d inheritance
-  backface-visibility: visible !important;  // Prevent GPU culling
-  perspective: none;  // Remove 3D perspective from cards
+section[data-testid="component-shelf"],  // Stable attribute (preferred)
+.main-shelf-shelf,                       // Transitional class
+.main-gridContainer-gridContainer {
+  @include card-container-universal {
+    transform-style: flat !important;  // Override preserve-3d inheritance
+    backface-visibility: visible !important;  // Prevent GPU culling
+    perspective: none;  // Remove 3D perspective from cards
+  }
 }
 
 // Remove header 3D depth offset in shelf contexts (prevents transform stacking)
 // IMPORTANT: Also target .main-card-imageContainer used by shelf cards
-.main-shelf-shelf .main-card-header,
-.main-shelf-shelf .main-card-imageContainer,
+section[data-testid="component-shelf"] .main-card-header,         // Stable attribute (preferred)
+section[data-testid="component-shelf"] .main-card-imageContainer, // Stable attribute (preferred)
+.main-shelf-shelf .main-card-header,                              // Transitional class
+.main-shelf-shelf .main-card-imageContainer,                      // Transitional class
 .main-gridContainer-gridContainer .main-card-header,
 .main-gridContainer-gridContainer .main-card-imageContainer {
   transform: none !important;  // Remove translateZ(6px) that causes culling
 }
 
 // Force image visibility in shelf cards (ensure album art displays)
-.main-shelf-shelf .main-cardImage-image,
-.main-shelf-shelf .main-image-image,
-.main-shelf-shelf .main-card-cardImage,
+section[data-testid="component-shelf"] .main-cardImage-image,  // Stable attribute (preferred)
+section[data-testid="component-shelf"] .main-image-image,      // Stable attribute (preferred)
+section[data-testid="component-shelf"] .main-card-cardImage,   // Stable attribute (preferred)
+.main-shelf-shelf .main-cardImage-image,                       // Transitional class
+.main-shelf-shelf .main-image-image,                           // Transitional class
+.main-shelf-shelf .main-card-cardImage,                        // Transitional class
 .main-gridContainer-gridContainer .main-cardImage-image,
 .main-gridContainer-gridContainer .main-image-image,
 .main-gridContainer-gridContainer .main-card-cardImage {
@@ -1276,11 +1314,10 @@ body:not(:has(.main-searchPage-content)) .main-card-cardContainer[aria-selected=
 }
 
 // =============================================================================
-// UNIVERSAL IMAGE VISIBILITY SAFEGUARD - Ensures images display in all contexts
+// UNIVERSAL IMAGE VISIBILITY SAFEGUARD - Ensures images display in all contexts (Encore migration)
 // =============================================================================
 // Prevents backdrop-filter, 3D transforms, or GPU compositing from hiding images
-.main-card-card,
-.main-card-cardContainer {
+@include card-container-universal {
   // Ensure all images within cards are always visible
   img,
   .main-image-image,
