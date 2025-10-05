@@ -9,7 +9,7 @@
  */
 
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import { VisualEffectsState } from "@/types/colorStubs";
+import { VisualEffectsState } from "@/types/colorTypes";
 
 // ============================================================================
 // Event Type Definitions with Unified Naming Convention

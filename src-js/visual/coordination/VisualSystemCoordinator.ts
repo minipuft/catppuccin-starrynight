@@ -48,14 +48,14 @@
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-// CSSAnimationManager consolidated into EnhancedMasterAnimationCoordinator
-import { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
-import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+// CSSAnimationManager consolidated into AnimationFrameCoordinator
+import { AnimationFrameCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
+import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import { VisualEffectsManager } from "@/types/colorStubs";
+import { VisualEffectsManager } from "@/types/colorTypes";
 import { settings } from "@/config";
 import * as Utils from "@/utils/core/ThemeUtilities";
 
@@ -197,13 +197,13 @@ export class VisualSystemCoordinator implements IManagedSystem {
   private year3000System: any; // Reference to main system
 
   // Injected dependencies
-  private cssVariableController: UnifiedCSSVariableManager;
+  private cssVariableController: CSSVariableWriter;
   private performanceAnalyzer: SimplePerformanceCoordinator;
   private musicSyncService: MusicSyncService;
   // REMOVED: private settingsManager: SettingsManager; // Migrated to TypedSettingsManager singleton via typed settings
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
   private eventBus: any = null; // EventBus when available
-  private animationCoordinator: EnhancedMasterAnimationCoordinator | null = null;
+  private animationCoordinator: AnimationFrameCoordinator | null = null;
 
   // Performance and monitoring
   private deviceDetector: DeviceCapabilityDetector;
@@ -246,13 +246,13 @@ export class VisualSystemCoordinator implements IManagedSystem {
     config: AdvancedSystemConfig | Year3000Config,
     utils: typeof Utils,
     year3000System: any,
-    cssVariableController: UnifiedCSSVariableManager,
+    cssVariableController: CSSVariableWriter,
     performanceAnalyzer: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService,
     // NOTE: settingsManager parameter removed - using typed settings directly
     colorHarmonyEngine?: ColorHarmonyEngine,
     eventBus?: any,
-    animationCoordinator?: EnhancedMasterAnimationCoordinator
+    animationCoordinator?: AnimationFrameCoordinator
   ) {
     this.config = config;
     this.utils = utils;

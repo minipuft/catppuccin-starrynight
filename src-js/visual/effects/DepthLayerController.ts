@@ -9,7 +9,7 @@
  */
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { HealthCheckResult } from "@/types/systems";
 import * as Utils from "@/utils/core/ThemeUtilities";
@@ -61,7 +61,7 @@ interface UserInteractionState {
 }
 
 export class DepthVisualEffectsController extends BaseVisualSystem {
-  private cssController!: UnifiedCSSVariableManager;
+  private cssController!: CSSVariableWriter;
   private contentAreas: Map<Element, ContentArea> = new Map();
   private chromeAreas: Set<Element> = new Set();
   private userState: UserInteractionState = {
@@ -125,7 +125,7 @@ export class DepthVisualEffectsController extends BaseVisualSystem {
     try {
       // Initialize CSS coordination first - use globalThis to access Year3000System
       const year3000System = (globalThis as any).year3000System;
-      this.cssController = year3000System?.cssVisualEffectsController || getGlobalUnifiedCSSManager();
+      this.cssController = year3000System?.cssVisualEffectsController || getGlobalCSSVariableWriter();
 
       this.detectContentAndChromeAreas();
       this.setupInteractionListeners();

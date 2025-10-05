@@ -16,10 +16,10 @@
  */
 
 import { HolographicUISystem } from "@/visual/music/ui/HolographicUISystem";
-import { colorTransitionManager } from "@/visual/effects/ColorTransitionManager";
-import type { RGB, MusicEmotion, BeatData, CinematicPalette } from "@/types/colorStubs";
+import { colorTransitionManager } from "@/visual/effects/MusicColorTransitionState";
+import type { RGB, MusicEmotion, BeatData, CinematicPalette } from "@/types/colorTypes";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import type { ServiceContainer, IServiceAwareSystem } from "@/core/services/SystemServices";
@@ -99,7 +99,7 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
   
   private holographicSystem: HolographicUISystem;
   // Using shared CSS controller for color coordination
-  private cssController: UnifiedCSSVariableManager;
+  private cssController: CSSVariableWriter;
   private musicSyncService: MusicSyncService;
   
   // Service composition support
@@ -159,7 +159,7 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
 
   constructor(
     holographicSystem: HolographicUISystem,
-    cssController: UnifiedCSSVariableManager,
+    cssController: CSSVariableWriter,
     musicSyncService: MusicSyncService
   ) {
     this.holographicSystem = holographicSystem;

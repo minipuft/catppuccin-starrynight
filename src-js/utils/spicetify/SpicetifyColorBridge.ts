@@ -8,7 +8,7 @@
  * ARCHITECTURE ROLE:
  * - OWNS: --spice-* CSS variable namespace (Spicetify compatibility layer)
  * - GENERATES: 70+ Spicetify-specific variables with advanced color science
- * - COORDINATES: With ColorStateManager (--sn-* namespace) via UnifiedCSSVariableManager
+ * - COORDINATES: With ColorStateManager (--sn-* namespace) via CSSVariableWriter
  * - INTEGRATES: ColorHarmonyEngine OKLAB output → Spicetify CSS variables
  *
  * CORE FUNCTIONALITY:
@@ -27,7 +27,7 @@
  *    - Applies 96 total variables per album change
  *
  * 3. CSS Variable Application Authority
- *    - Uses UnifiedCSSVariableManager with priority-based batching
+ *    - Uses CSSVariableWriter with priority-based batching
  *    - Critical priority for album color coordination
  *    - High priority for semantic color system
  *    - Emits colors:applied event after application
@@ -37,7 +37,7 @@
  * ColorHarmonyEngine (OKLAB Processing)
  *    ↓ updateWithAlbumColors(oklabColors)
  * SpicetifyColorBridge (96 Spicetify variables)
- *    ↓ batchSetVariables() via UnifiedCSSVariableManager
+ *    ↓ batchSetVariables() via CSSVariableWriter
  *    ↓ emits colors:applied event
  * DOM (CSS Variables: --spice-*)
  * ```
@@ -57,13 +57,13 @@
  *
  * @see ColorHarmonyEngine - Calls updateWithAlbumColors() with OKLAB-processed colors
  * @see ColorStateManager - Coordinates --sn-* namespace variables
- * @see UnifiedCSSVariableManager - Shared CSS variable application authority
+ * @see CSSVariableWriter - Shared CSS variable application authority
  * @see docs/architecture/adr/ADR-001-rename-semantic-color-manager.md
  */
 
 // Import theme-specific Spicetify type extensions
 /// <reference path="../../types/spicetify-extensions.d.ts" />
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import * as ColorGen from "@/utils/color/SpicetifyColorGenerators";
 
 // Runtime utilities for safe Spicetify access
@@ -106,7 +106,7 @@ export interface SemanticColorMapping {
  */
 export class SpicetifyColorBridge implements IManagedSystem {
   private config: SpicetifyColorBridgeConfig;
-  private cssController!: UnifiedCSSVariableManager;
+  private cssController!: CSSVariableWriter;
   private colorCache: Map<Spicetify.SemanticColor, string> = new Map();
   private lastCacheUpdate: number = 0;
   
@@ -166,14 +166,14 @@ export class SpicetifyColorBridge implements IManagedSystem {
     };
   }
 
-  public async initialize(cssController?: UnifiedCSSVariableManager): Promise<void> {
+  public async initialize(cssController?: CSSVariableWriter): Promise<void> {
     if (this.initialized) {
       console.warn("[SpicetifyColorBridge] Already initialized, skipping");
       return;
     }
 
     try {
-      this.cssController = cssController || getGlobalUnifiedCSSManager();
+      this.cssController = cssController || getGlobalCSSVariableWriter();
       
       // Subscribe to UnifiedEventBus events for system integration
       this.setupEventSubscriptions();

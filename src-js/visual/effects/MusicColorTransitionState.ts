@@ -9,7 +9,7 @@
  */
 
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import type { RGB } from "@/types/colorStubs";
+import type { RGB } from "@/types/colorTypes";
 
 export interface ColorTransitionState {
   // === CORE COLOR STATE ===

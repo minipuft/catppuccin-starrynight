@@ -17,9 +17,9 @@ import {
 } from "@/config/harmonicModes";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import {
-  UnifiedCSSVariableManager,
-  getGlobalUnifiedCSSManager,
-} from "@/core/css/UnifiedCSSVariableManager";
+  CSSVariableWriter,
+  getGlobalCSSVariableWriter,
+} from "@/core/css/CSSVariableWriter";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import * as Utils from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
@@ -85,7 +85,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
   private transitionElapsedTime: number = 0;
 
   // CSS coordination system
-  private cssController!: UnifiedCSSVariableManager;
+  private cssController!: CSSVariableWriter;
 
   constructor(
     config = ADVANCED_SYSTEM_CONFIG,
@@ -104,7 +104,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
       const year3000System = (globalThis as any).year3000System;
       this.cssController =
         year3000System?.cssController ||
-        getGlobalUnifiedCSSManager();
+        getGlobalCSSVariableWriter();
 
       // Always setup event listeners and settings monitoring
       this.setupColorExtractionListeners();
@@ -209,23 +209,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
       "DynamicCatppuccinBridge"
     );
 
-    // Keep legacy DOM event listeners for backward compatibility
-    document.addEventListener("colors-extracted", (event: Event) => {
-      const customEvent = event as CustomEvent;
-      if (customEvent.detail && customEvent.detail.extractedColors) {
-        this.handleExtractedColors(customEvent.detail.extractedColors);
-      }
-    });
-
-    // Listen for harmonized color events
-    document.addEventListener("colors-harmonized", (event: Event) => {
-      const customEvent = event as CustomEvent;
-      if (customEvent.detail && customEvent.detail.harmonizedColors) {
-        this.handleHarmonizedColors(customEvent.detail.harmonizedColors);
-      }
-    });
-
-    // Listen for music state changes
+    // Listen for music state changes (not yet in UnifiedEventBus)
     document.addEventListener("music-state-change", (event: Event) => {
       const customEvent = event as CustomEvent;
       if (customEvent.detail) {
@@ -233,7 +217,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
       }
     });
 
-    // 🔧 CRITICAL ENHANCEMENT: Listen for spice color update requests from other systems
+    // Listen for spice color update requests from other systems (not yet in UnifiedEventBus)
     document.addEventListener("spice-colors/update-request", (event: Event) => {
       const customEvent = event as CustomEvent;
       if (customEvent.detail && this.integrationConfig.accentUpdateEnabled) {
@@ -243,7 +227,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
 
     Y3KDebug?.debug?.log(
       "DynamicCatppuccinBridge",
-      "Enhanced color extraction and coordination listeners setup complete (UnifiedEventBus + DOM)"
+      "Color extraction and coordination listeners setup complete via UnifiedEventBus"
     );
   }
 

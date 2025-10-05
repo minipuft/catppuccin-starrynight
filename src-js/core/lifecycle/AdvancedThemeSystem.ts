@@ -108,7 +108,7 @@ export class AdvancedThemeSystem {
   public get cssVariableController() {
     return (
       this.facadeCoordinator?.getCachedNonVisualSystem(
-        "UnifiedCSSVariableManager"
+        "CSSVariableWriter"
       ) || null
     );
   }
@@ -658,9 +658,9 @@ export class AdvancedThemeSystem {
       // NOTE: PerformanceAnalyzer is now handled by facade coordinator using SimplePerformanceCoordinator
       // The old complex PerformanceAnalyzer has been replaced with a tier-based system
       {
-        name: "UnifiedCSSVariableManager",
+        name: "CSSVariableWriter",
         init: () => {
-          this.unifiedCSSManager = UnifiedCSSVariableManager.getInstance(
+          this.unifiedCSSManager = CSSVariableWriter.getInstance(
             this.ADVANCED_SYSTEM_CONFIG
           );
 
@@ -696,11 +696,11 @@ export class AdvancedThemeSystem {
       },
       // PerformanceOptimizationManager consolidated into UnifiedPerformanceCoordinator
       {
-        name: "UnifiedCSSVariableManager",
+        name: "CSSVariableWriter",
         init: () => {
           if (this.unifiedCSSManager && this.unifiedPerformanceCoordinator) {
             this.performanceCSSIntegration =
-              UnifiedCSSVariableManager.getInstance(
+              CSSVariableWriter.getInstance(
                 this.ADVANCED_SYSTEM_CONFIG,
                 this.unifiedCSSManager,
                 this.unifiedPerformanceCoordinator
@@ -708,7 +708,7 @@ export class AdvancedThemeSystem {
 
             if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
               console.log(
-                "[Year3000System] UnifiedCSSVariableManager initialized with CSS performance coordination"
+                "[Year3000System] CSSVariableWriter initialized with CSS performance coordination"
               );
             }
           }
@@ -963,7 +963,7 @@ export class AdvancedThemeSystem {
       // Initialize only essential systems that don't require Spicetify APIs
       const essentialSystems = [
         "SimplePerformanceCoordinator",
-        "UnifiedCSSVariableManager",
+        "CSSVariableWriter",
         "UnifiedDebugManager",
         "DeviceCapabilityDetector",
         "TimerConsolidationSystem",
@@ -1039,7 +1039,7 @@ export class AdvancedThemeSystem {
 
       // Group 2: Systems that depend on foundation systems
       const dependentSystems = [
-        "UnifiedCSSVariableManager", // Depends on SimplePerformanceCoordinator
+        "CSSVariableWriter", // Depends on SimplePerformanceCoordinator
         "UnifiedPerformanceCoordinator", // Depends on SimplePerformanceCoordinator
       ];
 
@@ -1269,7 +1269,7 @@ export class AdvancedThemeSystem {
       if (this.facadeCoordinator) {
         try {
           const cssController = await this.facadeCoordinator.getNonVisualSystem(
-            "UnifiedCSSVariableManager" as any
+            "CSSVariableWriter" as any
           );
 
           if (cssController) {
@@ -2268,7 +2268,7 @@ export class AdvancedThemeSystem {
   // 🆕 PUBLIC WRAPPER – UNIFIED CSS VARIABLE BATCH API
   // =============================================
   /**
-   * Queue a CSS variable update through the shared UnifiedCSSVariableManager. Falls
+   * Queue a CSS variable update through the shared CSSVariableWriter. Falls
    * back to an immediate style mutation when the batcher is unavailable
    * (degraded mode or very early boot).
    *
@@ -3307,7 +3307,7 @@ export class AdvancedThemeSystem {
       this.cssVariableController?.flushCSSVariableBatch?.();
 
       // Force-flush NowPlayingCoordinator to avoid frame skew
-      // NowPlayingCoordinator removed – its flush is handled via UnifiedCSSVariableManager
+      // NowPlayingCoordinator removed – its flush is handled via CSSVariableWriter
 
       // Force-flush SidebarPerformanceCoordinator if present
       try {

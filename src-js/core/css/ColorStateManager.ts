@@ -11,7 +11,7 @@
 
 import { settings } from '@/config';
 import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from '@/core/css/UnifiedCSSVariableManager';
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from '@/core/css/CSSVariableWriter';
 import type { IManagedSystem, HealthCheckResult } from '@/types/systems';
 import {
   paletteSystemManager,
@@ -87,7 +87,7 @@ export interface ColorStateEvents {
  * ARCHITECTURAL ROLE: CSS Authority - OWNS all CSS variable writes for color system
  * - Subscribes to: colors:harmonized, colors:extracted events
  * - Manages: Color state, brightness modes, flavor coordination
- * - OWNS: ALL CSS variable writes via UnifiedCSSVariableManager
+ * - OWNS: ALL CSS variable writes via CSSVariableWriter
  * - Coordinates: SpicetifyColorBridge for Spicetify integration
  * - Emits: colors:applied event after CSS application
  *
@@ -105,7 +105,7 @@ export class CSSColorController implements IManagedSystem {
   private isUpdating = false;
 
   // 🔧 PHASE 3: CSS Authority - Single Unified Controller
-  private cssController!: UnifiedCSSVariableManager;
+  private cssController!: CSSVariableWriter;
 
   // Performance tracking
   private updateCount = 0;
@@ -121,7 +121,7 @@ export class CSSColorController implements IManagedSystem {
     // Initialize CSS controller - use globalThis to access Year3000System
     const year3000System = (globalThis as any).year3000System;
     this.cssController = year3000System?.cssController ||
-                        getGlobalUnifiedCSSManager();
+                        getGlobalCSSVariableWriter();
 
     // Listen for settings changes
     unifiedEventBus.subscribe('settings:changed', this.handleSettingsChange.bind(this), 'ColorStateManager');
@@ -296,17 +296,17 @@ export class CSSColorController implements IManagedSystem {
       '--sn-color-state-timestamp': state.timestamp.toString()
     };
 
-    // Apply CSS variables through UnifiedCSSVariableManager with intelligent priority grouping
+    // Apply CSS variables through CSSVariableWriter with intelligent priority grouping
     await this.applyColorVariablesWithPriorities(cssUpdates);
 
     const endTime = performance.now();
     const updateDuration = endTime - startTime;
 
-    console.log(`🎨 [ColorStateManager] Applied ${Object.keys(cssUpdates).length} CSS variables in ${updateDuration.toFixed(2)}ms (via UnifiedCSSVariableManager)`);
+    console.log(`🎨 [ColorStateManager] Applied ${Object.keys(cssUpdates).length} CSS variables in ${updateDuration.toFixed(2)}ms (via CSSVariableWriter)`);
   }
 
   /**
-   * Apply color variables through UnifiedCSSVariableManager with intelligent priority grouping
+   * Apply color variables through CSSVariableWriter with intelligent priority grouping
    */
   private async applyColorVariablesWithPriorities(cssUpdates: Record<string, string>): Promise<void> {
     // Group variables by priority for optimized coordination
@@ -331,7 +331,7 @@ export class CSSColorController implements IManagedSystem {
       }
     });
 
-    // Apply updates in separate batches by priority using UnifiedCSSVariableManager
+    // Apply updates in separate batches by priority using CSSVariableWriter
     if (Object.keys(criticalUpdates).length > 0) {
       this.cssController.batchSetVariables(
         "ColorStateManager",
@@ -388,7 +388,7 @@ export class CSSColorController implements IManagedSystem {
     );
   }
 
-  // All CSS variable updates now handled directly through UnifiedCSSVariableManager
+  // All CSS variable updates now handled directly through CSSVariableWriter
 
   /**
    * Verify that critical CSS variables were actually applied to the DOM

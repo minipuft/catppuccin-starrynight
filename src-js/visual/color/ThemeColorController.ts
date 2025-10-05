@@ -10,7 +10,7 @@
  */
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { getGlobalUnifiedCSSManager, UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { getGlobalCSSVariableWriter, CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type {
   ColorContext,
@@ -46,7 +46,7 @@ interface CatppuccinIntegrationConfig {
 }
 
 export class DynamicCatppuccinStrategy implements IColorProcessor {
-  private cssController: UnifiedCSSVariableManager | null;
+  private cssController: CSSVariableWriter | null;
   private oklabProcessor: OKLABColorProcessor;
   private utils = Utils;
   private config = ADVANCED_SYSTEM_CONFIG;
@@ -102,10 +102,10 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
   }
 
   constructor(
-    cssController?: UnifiedCSSVariableManager
+    cssController?: CSSVariableWriter
   ) {
     this.cssController =
-      cssController || getGlobalUnifiedCSSManager();
+      cssController || getGlobalCSSVariableWriter();
     this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
 
     // Initialize current state from existing variables

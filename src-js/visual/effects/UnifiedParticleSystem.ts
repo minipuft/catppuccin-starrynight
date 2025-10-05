@@ -20,6 +20,7 @@
  */
 
 import { MusicSyncService } from "@/audio/MusicSyncService";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
@@ -698,8 +699,9 @@ export class UnifiedParticleSystem
     null;
   private currentVisualEffectsState: VisualEffectState | null = null;
 
-  // Music synchronization
-  private musicSyncBound: ((event: Event) => void) | null = null;
+  // Music synchronization - UnifiedEventBus subscriptions
+  private beatSubscriptionId: string | null = null;
+  private energySubscriptionId: string | null = null;
   private lastMusicUpdate = 0;
   private animationPhase = 0;
 
@@ -735,8 +737,6 @@ export class UnifiedParticleSystem
     this.performanceConfig = this.createPerformanceConfig();
     this.visualEffectsConfig = this.createVisualConfig();
 
-    // Bind event handlers
-    this.musicSyncBound = this.handleMusicSync.bind(this);
 
     Y3KDebug?.debug?.log(
       "UnifiedParticleSystem",
@@ -878,49 +878,27 @@ export class UnifiedParticleSystem
   }
 
   /**
-   * Subscribe to music sync events
+   * Subscribe to unified music events
    */
   private subscribeToMusicSync(): void {
-    if (this.musicSyncBound) {
-      document.addEventListener("music-sync:beat", this.musicSyncBound);
-      document.addEventListener(
-        "music-sync:energy-changed",
-        this.musicSyncBound
-      );
-      document.addEventListener(
-        "music-sync:valence-changed",
-        this.musicSyncBound
-      );
-    }
+    this.beatSubscriptionId = unifiedEventBus.subscribe(
+      'music:beat',
+      (data) => this.handleBeatEvent(data.intensity),
+      'UnifiedParticleSystem'
+    );
+
+    this.energySubscriptionId = unifiedEventBus.subscribe(
+      'music:energy',
+      (data) => this.handleEnergyChange(data.energy),
+      'UnifiedParticleSystem'
+    );
+
+    Y3KDebug?.debug?.log(
+      'UnifiedParticleSystem',
+      'Subscribed to unified music events'
+    );
   }
 
-  /**
-   * Handle music sync events with visualEffects awareness
-   */
-  private handleMusicSync(event: Event): void {
-    const currentTime = performance.now();
-
-    // Throttle music updates to 30fps for performance
-    if (!MusicSyncUtilities.shouldUpdateMusic(this.lastMusicUpdate, 33)) return;
-    this.lastMusicUpdate = currentTime;
-
-    const customEvent = event as CustomEvent;
-    const { type, detail } = customEvent;
-
-    switch (type) {
-      case "music-sync:beat":
-        this.handleBeatEvent(detail.intensity || 0.5);
-        break;
-
-      case "music-sync:energy-changed":
-        this.handleEnergyChange(detail.energy || 0);
-        break;
-
-      case "music-sync:valence-changed":
-        this.handleValenceChange(detail.valence || 0);
-        break;
-    }
-  }
 
   /**
    * Handle beat events - spawn particles and trigger effects
@@ -1704,19 +1682,21 @@ export class UnifiedParticleSystem
       }
     }
 
-    // Clean up music sync event listeners
-    if (this.musicSyncBound) {
-      document.removeEventListener("music-sync:beat", this.musicSyncBound);
-      document.removeEventListener(
-        "music-sync:energy-changed",
-        this.musicSyncBound
-      );
-      document.removeEventListener(
-        "music-sync:valence-changed",
-        this.musicSyncBound
-      );
-      this.musicSyncBound = null;
+    // Unsubscribe from unified music events
+    if (this.beatSubscriptionId) {
+      unifiedEventBus.unsubscribe(this.beatSubscriptionId);
+      this.beatSubscriptionId = null;
     }
+
+    if (this.energySubscriptionId) {
+      unifiedEventBus.unsubscribe(this.energySubscriptionId);
+      this.energySubscriptionId = null;
+    }
+
+    Y3KDebug?.debug?.log(
+      'UnifiedParticleSystem',
+      'Unsubscribed from unified music events'
+    );
 
     // Clean up particles
     this.activeParticles = [];

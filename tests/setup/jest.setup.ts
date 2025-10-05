@@ -525,12 +525,12 @@ const mockOptimizedCSSController = {
 // Set up global references that systems expect
 (global as any).globalOptimizedCSSController = mockOptimizedCSSController;
 
-// Mock the getter function specifically (Phase 6.1: migrated to UnifiedCSSVariableManager)
-jest.mock('@/core/css/UnifiedCSSVariableManager', () => ({
-  ...jest.requireActual('@/core/css/UnifiedCSSVariableManager'),
-  getGlobalUnifiedCSSManager: () => mockOptimizedCSSController,
-  setGlobalUnifiedCSSManager: jest.fn(),
-  getGlobalUnifiedCSSManagerSafe: () => mockOptimizedCSSController
+// Mock the getter function specifically (Phase 6.1: migrated to CSSVariableWriter)
+jest.mock('@/core/css/CSSVariableWriter', () => ({
+  ...jest.requireActual('@/core/css/CSSVariableWriter'),
+  getGlobalCSSVariableWriter: () => mockOptimizedCSSController,
+  setGlobalCSSVariableWriter: jest.fn(),
+  getGlobalCSSVariableWriterSafe: () => mockOptimizedCSSController
 }));
 
 // Mock AdvancedThemeSystem global

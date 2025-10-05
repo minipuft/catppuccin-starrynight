@@ -8,7 +8,7 @@
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { unifiedEventBus, type EventData } from "@/core/events/UnifiedEventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator, type QualityLevel, type QualityScalingCapable, type PerformanceMetrics, type QualityCapability } from "@/core/performance/SimplePerformanceCoordinator";
@@ -171,9 +171,9 @@ export class WebGLGradientBackgroundSystem
   private frameThrottleInterval = 1000 / 60; // ✅ Increased to 60 FPS (coordinator target)
 
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
-  private cssVisualEffectsController: UnifiedCSSVariableManager | null =
+  private cssVisualEffectsController: CSSVariableWriter | null =
     null;
-  private cssController!: UnifiedCSSVariableManager;
+  private cssController!: CSSVariableWriter;
   private eventSubscriptionIds: string[] = [];
   private prefersReducedMotion = false;
 
@@ -257,7 +257,7 @@ export class WebGLGradientBackgroundSystem
 
     // Initialize CSS coordination first - use globalThis to access Year3000System
     const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System?.cssVisualEffectsController || getGlobalUnifiedCSSManager();
+    this.cssController = year3000System?.cssVisualEffectsController || getGlobalCSSVariableWriter();
 
     // Check WebGL2 capability
     this.isWebGLAvailable = this.checkWebGL2Support();

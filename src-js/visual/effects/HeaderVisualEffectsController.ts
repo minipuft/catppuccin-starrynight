@@ -9,7 +9,7 @@
  */
 
 import { UnifiedSystemBase } from "@/core/base/UnifiedSystemBase";
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
@@ -34,7 +34,7 @@ interface HeaderEffectsState {
 }
 
 export class HeaderVisualEffectsController extends UnifiedSystemBase {
-  protected override cssController!: UnifiedCSSVariableManager;
+  protected override cssController!: CSSVariableWriter;
   private effectsState: HeaderEffectsState = {
     energy: 0.5,
     valence: 0.5,
@@ -174,7 +174,7 @@ export class HeaderVisualEffectsController extends UnifiedSystemBase {
     try {
       // Initialize CSS coordination first - use globalThis to access Year3000System
       const year3000System = (globalThis as any).year3000System;
-      this.cssController = year3000System?.cssVariableController || getGlobalUnifiedCSSManager();
+      this.cssController = year3000System?.cssVariableController || getGlobalCSSVariableWriter();
 
       // Check for reduced motion preference
       this.effectsState.preferredMotion = !window.matchMedia(

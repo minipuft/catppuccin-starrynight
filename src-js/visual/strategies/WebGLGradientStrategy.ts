@@ -10,7 +10,7 @@
  */
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type {
@@ -260,7 +260,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
   private utils = Utils;
   private config = ADVANCED_SYSTEM_CONFIG;
   private deviceDetector: DeviceCapabilityDetector;
-  private cssController: UnifiedCSSVariableManager;
+  private cssController: CSSVariableWriter;
   private oklabProcessor: OKLABColorProcessor;
 
   private webglState: WebGLGradientState = {
@@ -327,14 +327,14 @@ export class WebGLGradientStrategy implements IColorProcessor {
   private prefersReducedMotion = false;
 
   constructor(
-    cssController?: UnifiedCSSVariableManager
+    cssController?: CSSVariableWriter
   ) {
     this.deviceDetector = new DeviceCapabilityDetector();
-    this.cssController = cssController || getGlobalUnifiedCSSManager();
+    this.cssController = cssController || getGlobalCSSVariableWriter();
     this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
 
     // Get CSS visual effects controller
-    this.cssController = getGlobalUnifiedCSSManager();
+    this.cssController = getGlobalCSSVariableWriter();
 
     // Check for reduced motion preference
     this.prefersReducedMotion = window.matchMedia(
@@ -677,7 +677,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
 
     // Announce WebGL readiness to CSS visual effects system
     try {
-      const cssController = getGlobalUnifiedCSSManager();
+      const cssController = getGlobalCSSVariableWriter();
       cssController.setPerformanceTokens({
         webglReady: true,
         activeBackend: "webgl-strategy",

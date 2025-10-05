@@ -6,7 +6,7 @@
  */
 
 import { SimplePerformanceCoordinator } from './SimplePerformanceCoordinator';
-import { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
+import { CSSVariableWriter } from '@/core/css/CSSVariableWriter';
 
 export interface PerformanceBudgetConfig {
   // System-wide budgets (in milliseconds)
@@ -34,7 +34,7 @@ export class PerformanceBudgetManager {
   
   private config: PerformanceBudgetConfig;
   private performanceAnalyzer: SimplePerformanceCoordinator;
-  private cssVariableManager: UnifiedCSSVariableManager | null = null;
+  private cssVariableManager: CSSVariableWriter | null = null;
   
   // Optimization state
   private optimizationLevel: 'none' | 'conservative' | 'aggressive' = 'none';
@@ -84,7 +84,7 @@ export class PerformanceBudgetManager {
   /**
    * Register CSS Variable Batcher for optimization
    */
-  public registerUnifiedCSSVariableManager(batcher: UnifiedCSSVariableManager): void {
+  public registerCSSVariableWriter(batcher: CSSVariableWriter): void {
     this.cssVariableManager = batcher;
   }
   

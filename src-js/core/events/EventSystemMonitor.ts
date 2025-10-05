@@ -1,14 +1,14 @@
 /**
- * UnifiedEventDiagnostics - Event System Health Monitoring & Debugging
+ * EventSystemMonitor - Event System Health Monitoring & Performance Analysis
  *
- * Provides comprehensive diagnostics for the unified event system, including
- * real-time monitoring, performance analysis, and debugging tools for the
- * event-driven architecture.
+ * Monitors the unified event system in real-time, providing comprehensive
+ * diagnostics, performance metrics, health checks, and debugging tools for
+ * the event-driven architecture.
  *
  */
 
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import { colorEventOrchestrator } from "./ColorEventOrchestrator";
+import { colorEventOrchestrator } from "./ColorEventRouter";
 import { EventName, unifiedEventBus } from "./UnifiedEventBus";
 
 interface EventFlowMetrics {
@@ -56,8 +56,8 @@ interface EventTrace {
   errors?: string[];
 }
 
-export class UnifiedEventDiagnostics {
-  private static instance: UnifiedEventDiagnostics | null = null;
+export class EventSystemMonitor {
+  private static instance: EventSystemMonitor | null = null;
 
   // Monitoring data
   private eventMetrics = new Map<EventName, EventFlowMetrics>();
@@ -86,19 +86,19 @@ export class UnifiedEventDiagnostics {
   private constructor() {
     this.setupEventInterceptors();
     Y3KDebug?.debug?.log(
-      "UnifiedEventDiagnostics",
-      "Event diagnostics initialized"
+      "EventSystemMonitor",
+      "Event system monitoring initialized"
     );
   }
 
   /**
    * Get singleton instance
    */
-  public static getInstance(): UnifiedEventDiagnostics {
-    if (!UnifiedEventDiagnostics.instance) {
-      UnifiedEventDiagnostics.instance = new UnifiedEventDiagnostics();
+  public static getInstance(): EventSystemMonitor {
+    if (!EventSystemMonitor.instance) {
+      EventSystemMonitor.instance = new EventSystemMonitor();
     }
-    return UnifiedEventDiagnostics.instance;
+    return EventSystemMonitor.instance;
   }
 
   /**
@@ -119,7 +119,7 @@ export class UnifiedEventDiagnostics {
       this.performHealthChecks();
     }, 5000); // Every 5 seconds
 
-    Y3KDebug?.debug?.log("UnifiedEventDiagnostics", "Event monitoring started");
+    Y3KDebug?.debug?.log("EventSystemMonitor", "Event monitoring started");
   }
 
   /**
@@ -140,7 +140,7 @@ export class UnifiedEventDiagnostics {
       this.healthCheckInterval = null;
     }
 
-    Y3KDebug?.debug?.log("UnifiedEventDiagnostics", "Event monitoring stopped");
+    Y3KDebug?.debug?.log("EventSystemMonitor", "Event monitoring stopped");
   }
 
   /**
@@ -225,7 +225,7 @@ export class UnifiedEventDiagnostics {
       this.calculateSystemLoad(busMetrics, colorMetrics);
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "UnifiedEventDiagnostics",
+        "EventSystemMonitor",
         "Error collecting metrics:",
         error
       );
@@ -249,7 +249,7 @@ export class UnifiedEventDiagnostics {
       this.analyzeSystemHealth();
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "UnifiedEventDiagnostics",
+        "EventSystemMonitor",
         "Error performing health checks:",
         error
       );
@@ -460,7 +460,7 @@ export class UnifiedEventDiagnostics {
         const line = lines[i];
         if (
           line &&
-          !line.includes("UnifiedEventDiagnostics") &&
+          !line.includes("EventSystemMonitor") &&
           !line.includes("UnifiedEventBus")
         ) {
           const match = line.match(/at\s+(.+?)\s+/);
@@ -740,13 +740,13 @@ export class UnifiedEventDiagnostics {
     this.eventTraces = [];
 
     Y3KDebug?.debug?.log(
-      "UnifiedEventDiagnostics",
-      "Event diagnostics destroyed"
+      "EventSystemMonitor",
+      "Event system monitoring destroyed"
     );
 
-    UnifiedEventDiagnostics.instance = null;
+    EventSystemMonitor.instance = null;
   }
 }
 
 // Export singleton instance
-export const unifiedEventDiagnostics = UnifiedEventDiagnostics.getInstance();
+export const eventSystemMonitor = EventSystemMonitor.getInstance();

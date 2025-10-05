@@ -5,7 +5,7 @@
 
 // Import theme-specific Spicetify type extensions
 /// <reference path="../../types/spicetify-extensions.d.ts" />
-import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 
 export interface VariantConfig {
   enableDebug?: boolean;
@@ -37,7 +37,7 @@ export interface VariantContext {
 
 export class VariantResolver {
   private config: VariantConfig;
-  private cssController: UnifiedCSSVariableManager | null = null;
+  private cssController: CSSVariableWriter | null = null;
   private variantCache: Map<string, VariantMapping> = new Map();
   private initialized: boolean = false;
 
@@ -256,7 +256,7 @@ export class VariantResolver {
     };
   }
 
-  public initialize(cssController?: UnifiedCSSVariableManager): void {
+  public initialize(cssController?: CSSVariableWriter): void {
     this.cssController = cssController || null;
     this.initialized = true;
     

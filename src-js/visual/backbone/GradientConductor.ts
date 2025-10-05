@@ -6,14 +6,14 @@
  * and provides a single source of truth for gradient management.
  *
  * @architecture Year3000System
- * @performance Optimized for 60fps with UnifiedCSSVariableManager integration
+ * @performance Optimized for 60fps with CSSVariableWriter integration
  * @accessibility Full support for prefers-reduced-motion and quality scaling
  */
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import {
@@ -88,7 +88,7 @@ export class GradientConductor implements IManagedSystem {
   public initialized: boolean = false;
 
   private eventBus: typeof unifiedEventBus;
-  private cssController: UnifiedCSSVariableManager;
+  private cssController: CSSVariableWriter;
   private colorHarmonyEngine: ColorHarmonyEngine;
   private musicSyncService: MusicSyncService;
   private performanceAnalyzer: SimplePerformanceCoordinator;
@@ -111,7 +111,7 @@ export class GradientConductor implements IManagedSystem {
 
   constructor(
     eventBus: typeof unifiedEventBus,
-    cssController: UnifiedCSSVariableManager,
+    cssController: CSSVariableWriter,
     colorHarmonyEngine: ColorHarmonyEngine,
     musicSyncService: MusicSyncService,
     performanceAnalyzer: SimplePerformanceCoordinator,
@@ -582,7 +582,7 @@ export class GradientConductor implements IManagedSystem {
       "--sn-cinematic-depth",
     ];
 
-    // Add critical variables to UnifiedCSSVariableManager fast-path
+    // Add critical variables to CSSVariableWriter fast-path
     criticalVariables.forEach((variable) => {
       this.cssController.addCriticalVariable(variable);
     });

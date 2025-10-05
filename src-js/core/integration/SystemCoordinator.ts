@@ -45,7 +45,7 @@
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { UnifiedCSSVariableManager, setGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, setGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import {
   NonVisualSystemFacade,
   NonVisualSystemKey,
@@ -170,21 +170,19 @@ export class SystemCoordinator {
   private utils: typeof Utils;
   private year3000System: any;
 
-  // Facade instances
-  private visualBridge: VisualSystemCoordinator | null = null;
-  private nonVisualFacade: NonVisualSystemFacade | null = null;
+  // Facade instances (renamed for clarity)
+  private visualSystemCoordinator: VisualSystemCoordinator | null = null;
+  private infrastructureSystemFacade: NonVisualSystemFacade | null = null;
 
   // Shared dependencies (centrally managed)
-  private sharedUnifiedCSSVariableManager: UnifiedCSSVariableManager | null =
+  private sharedCSSVariableWriter: CSSVariableWriter | null =
     null;
-  // New simplified performance system
-  private sharedSimplePerformanceCoordinator: SimplePerformanceCoordinator | null = null;
+  // Performance system (simplified tier-based coordination)
+  private performanceCoordinator: SimplePerformanceCoordinator | null = null;
   private sharedWebGLSystemsIntegration: WebGLSystemsIntegration | null = null;
   private sharedEnhancedDeviceTierDetector: EnhancedDeviceTierDetector | null = null;
-  // Legacy systems (deprecated, maintained for compatibility during migration)
-  // REMOVED: private sharedPerformanceAnalyzer: SimplePerformanceCoordinator | null = null; // Replaced with SimplePerformanceCoordinator
-  private sharedDeviceCapabilityDetector: DeviceCapabilityDetector | null = null;
-  private sharedPerformanceBudgetManager: PerformanceBudgetManager | null = null;
+  // Device detection (for WebGL capabilities only)
+  private deviceDetector: DeviceCapabilityDetector | null = null;
   private sharedMusicSyncService: MusicSyncService | null = null;
   // REMOVED: private sharedSettingsManager: SettingsManager | null = null; // Migrated to TypedSettingsManager singleton via typed settings
   private sharedColorHarmonyEngine: ColorHarmonyEngine | null = null;
@@ -342,84 +340,52 @@ export class SystemCoordinator {
     // Initialize shared dependencies in correct order
     try {
       // New simplified performance system initialization
-      
+
       // Initialize device capability detector for WebGL integration
-      this.sharedDeviceCapabilityDetector = new DeviceCapabilityDetector({
-        enableDebug: true, // Enable debug for troubleshooting
-        spicetifyContext: true
-      });
-      await this.sharedDeviceCapabilityDetector.initialize();
-      
-      // Initialize enhanced device tier detector for simplified performance system
-      this.sharedEnhancedDeviceTierDetector = new EnhancedDeviceTierDetector();
-      
-      // Initialize WebGL systems integration with proper DeviceCapabilityDetector
-      this.sharedWebGLSystemsIntegration = new WebGLSystemsIntegration(
-        this.sharedDeviceCapabilityDetector
-      );
-      await this.sharedWebGLSystemsIntegration.initialize();
-      
-      // SimplePerformanceCoordinator will be initialized later in initializePerformanceAnalyzer()
-
-      // Legacy system initialization removed - migrated to SimplePerformanceCoordinator
-      // Use SimplePerformanceCoordinator instead of complex PerformanceAnalyzer
-      // this.sharedSimplePerformanceCoordinator = new PerformanceAnalyzer(); // REMOVED: 1,252 lines of complex monitoring
-
-      // Initialize legacy device capability detector
-      this.sharedDeviceCapabilityDetector = new DeviceCapabilityDetector({
+      this.deviceDetector = new DeviceCapabilityDetector({
         enableDebug: this.config.enableDebug || false,
         runStressTests: false
       });
-      await this.sharedDeviceCapabilityDetector.initialize();
+      await this.deviceDetector.initialize();
 
-      // Initialize performance budget manager
-      this.sharedPerformanceBudgetManager = new PerformanceBudgetManager({
-        budgets: {
-          animationFrame: 16,
-          cssVariableUpdate: 2,
-          domObservation: 1,
-          audioAnalysis: 5,
-          visualEffects: 8,
-          userInteraction: 100
-        },
-        autoOptimize: {
-          enabled: true,
-          violationThreshold: 3,
-          recoveryThreshold: 0.8
-        },
-        enableDebug: this.config.enableDebug || false
-      }, this.sharedSimplePerformanceCoordinator as any);
-      // PerformanceBudgetManager doesn't have initialize method
+      // Initialize enhanced device tier detector for simplified performance system
+      this.sharedEnhancedDeviceTierDetector = new EnhancedDeviceTierDetector();
+
+      // Initialize WebGL systems integration with proper DeviceCapabilityDetector
+      this.sharedWebGLSystemsIntegration = new WebGLSystemsIntegration(
+        this.deviceDetector
+      );
+      await this.sharedWebGLSystemsIntegration.initialize();
 
       // Initialize SimplePerformanceCoordinator with correct parameters
-      this.sharedSimplePerformanceCoordinator = new SimplePerformanceCoordinator(
+      this.performanceCoordinator = new SimplePerformanceCoordinator(
         this.sharedEnhancedDeviceTierDetector,
         this.sharedWebGLSystemsIntegration
       );
-      await this.sharedSimplePerformanceCoordinator.initialize();
+      await this.performanceCoordinator.initialize();
 
       // Initialize shared CSS variable controller with simplified performance features
       try {
         // Use the new simplified performance coordinator for CSS controller
         // SimplePerformanceCoordinator provides necessary interface methods
-        const performanceCoordinatorCompat = this.sharedSimplePerformanceCoordinator as any;
+        const performanceCoordinatorCompat = this.performanceCoordinator as any;
         
-        this.sharedUnifiedCSSVariableManager = new UnifiedCSSVariableManager(
+        this.sharedCSSVariableWriter = new CSSVariableWriter(
           this.config,
           performanceCoordinatorCompat
         );
 
         // Set global instance for systems that need global access
-        setGlobalUnifiedCSSManager(this.sharedUnifiedCSSVariableManager);
+        setGlobalCSSVariableWriter(this.sharedCSSVariableWriter);
         
-        await this.sharedUnifiedCSSVariableManager.initialize();
+        await this.sharedCSSVariableWriter.initialize();
       } catch (error) {
         Y3KDebug?.debug?.warn(
           "SystemCoordinator",
-          "Failed to initialize UnifiedCSSVariableManager:",
+          "Failed to initialize CSSVariableWriter:",
           error
         );
-        this.sharedUnifiedCSSVariableManager = null;
+        this.sharedCSSVariableWriter = null;
       }
 
       // Core services (migrated to typed settings)
@@ -450,22 +416,23 @@ export class SystemCoordinator {
 
     try {
       // Get EnhancedMasterAnimationCoordinator from NonVisualSystemFacade for animation integration
-      const animationCoordinator = this.nonVisualFacade?.getCachedSystem("EnhancedMasterAnimationCoordinator") || null;
+      // Phase 3.2: Use getSystem({ cacheOnly: true }) instead of getCachedSystem()
+      const animationCoordinator = (await this.infrastructureSystemFacade?.getSystem("EnhancedMasterAnimationCoordinator", { cacheOnly: true })) || null;
 
       // Initialize Visual System Facade (settingsManager removed - using typed settings)
-      this.visualBridge = new VisualSystemCoordinator(
+      this.visualSystemCoordinator = new VisualSystemCoordinator(
         this.config,
         this.utils,
         this.year3000System,
-        this.sharedUnifiedCSSVariableManager!,
-        this.sharedSimplePerformanceCoordinator as any,
+        this.sharedCSSVariableWriter!,
+        this.performanceCoordinator as any,
         this.sharedMusicSyncService!,
         this.sharedColorHarmonyEngine!,
         this.eventBus,
         animationCoordinator
       );
 
-      await this.visualBridge.initialize({
+      await this.visualSystemCoordinator.initialize({
         mode:
           this.coordinationConfig.mode === "performance-optimized"
             ? "performance-first"
@@ -477,18 +444,18 @@ export class SystemCoordinator {
       });
 
       // Set up visual bridge callbacks
-      this.visualBridge.setOnSystemCreated((key, system) => {
+      this.visualSystemCoordinator.setOnSystemCreated((key, system) => {
         this.handleSystemCreated("visual", key, system);
       });
 
       // Initialize Non-Visual System Facade
-      this.nonVisualFacade = new NonVisualSystemFacade(
+      this.infrastructureSystemFacade = new NonVisualSystemFacade(
         this.config,
         this.utils,
         this.year3000System
       );
 
-      await this.nonVisualFacade.initialize({
+      await this.infrastructureSystemFacade.initialize({
         mode:
           this.coordinationConfig.mode === "performance-optimized"
             ? "performance-first"
@@ -500,7 +467,7 @@ export class SystemCoordinator {
       });
 
       // Set up non-visual facade callbacks
-      this.nonVisualFacade.setOnSystemCreated((key, system) => {
+      this.infrastructureSystemFacade.setOnSystemCreated((key, system) => {
         this.handleSystemCreated("non-visual", key, system);
       });
 
@@ -524,7 +491,7 @@ export class SystemCoordinator {
   private injectSharedDependencies(): void {
     if (
       !this.coordinationConfig.enableSharedDependencies ||
-      !this.nonVisualFacade
+      !this.infrastructureSystemFacade
     )
       return;
 
@@ -532,51 +499,51 @@ export class SystemCoordinator {
     // This ensures both facades use the same instances
     
     // New simplified performance system injection
-    if (this.sharedSimplePerformanceCoordinator) {
-      (this.nonVisualFacade as any).simplePerformanceCoordinator =
-        this.sharedSimplePerformanceCoordinator;
+    if (this.performanceCoordinator) {
+      (this.infrastructureSystemFacade as any).simplePerformanceCoordinator =
+        this.performanceCoordinator;
     }
 
     if (this.sharedWebGLSystemsIntegration) {
-      (this.nonVisualFacade as any).webglSystemsIntegration =
+      (this.infrastructureSystemFacade as any).webglSystemsIntegration =
         this.sharedWebGLSystemsIntegration;
     }
 
     if (this.sharedEnhancedDeviceTierDetector) {
-      (this.nonVisualFacade as any).enhancedDeviceTierDetector =
+      (this.infrastructureSystemFacade as any).enhancedDeviceTierDetector =
         this.sharedEnhancedDeviceTierDetector;
     }
 
     // Legacy system injection (for backward compatibility)
-    if (this.sharedSimplePerformanceCoordinator) {
-      (this.nonVisualFacade as any).performanceAnalyzer =
-        this.sharedSimplePerformanceCoordinator;
+    if (this.performanceCoordinator) {
+      (this.infrastructureSystemFacade as any).performanceAnalyzer =
+        this.performanceCoordinator;
     }
 
-    if (this.sharedUnifiedCSSVariableManager) {
-      (this.nonVisualFacade as any).cssVariableController =
-        this.sharedUnifiedCSSVariableManager;
+    if (this.sharedCSSVariableWriter) {
+      (this.infrastructureSystemFacade as any).cssVariableController =
+        this.sharedCSSVariableWriter;
     }
 
     if (this.sharedMusicSyncService) {
-      (this.nonVisualFacade as any).musicSyncService =
+      (this.infrastructureSystemFacade as any).musicSyncService =
         this.sharedMusicSyncService;
     }
 
     // NOTE: SettingsManager no longer managed - using TypedSettingsManager singleton
 
     if (this.sharedColorHarmonyEngine) {
-      (this.nonVisualFacade as any).colorHarmonyEngine =
+      (this.infrastructureSystemFacade as any).colorHarmonyEngine =
         this.sharedColorHarmonyEngine;
     }
 
     if (this.sharedSpicetifyColorBridge) {
-      (this.nonVisualFacade as any).semanticColorManager =
+      (this.infrastructureSystemFacade as any).semanticColorManager =
         this.sharedSpicetifyColorBridge;
     }
   }
 
-  private setupCrossFacadeCommunication(): void {
+  private setupSystemEventBus(): void {
     if (!this.coordinationConfig.enableCrossFacadeCommunication) return;
 
     Y3KDebug?.debug?.log(
@@ -586,15 +553,15 @@ export class SystemCoordinator {
 
     // Set up event propagation between facades
     this.addEventListener("visual-event", (event: any) => {
-      if (this.visualBridge) {
-        this.visualBridge.propagateVisualEvent(event);
+      if (this.visualSystemCoordinator) {
+        this.visualSystemCoordinator.propagateVisualEvent(event);
       }
     });
 
     this.addEventListener("performance-event", (event: any) => {
       // Propagate performance events to both facades
-      if (this.visualBridge) {
-        this.visualBridge.handleAdaptationEvent(event);
+      if (this.visualSystemCoordinator) {
+        this.visualSystemCoordinator.handleAdaptationEvent(event);
       }
       // Non-visual facade performance events would be handled here
     });
@@ -609,11 +576,11 @@ export class SystemCoordinator {
     }
   }
 
-  private handleSystemCreated(
+  private async handleSystemCreated(
     type: SystemType,
     key: string,
     system: any
-  ): void {
+  ): Promise<void> {
     // Update metrics
     if (type === "visual") {
       this.currentMetrics.visualSystems++;
@@ -624,7 +591,8 @@ export class SystemCoordinator {
 
     // ✅ ANIMATION LOOP CONSOLIDATION: Register visual systems with EnhancedMasterAnimationCoordinator
     if (type === "visual" && system && typeof system.updateAnimation === "function") {
-      const animationCoordinator = this.nonVisualFacade?.getCachedSystem("EnhancedMasterAnimationCoordinator");
+      // Phase 3.2: Use getSystem({ cacheOnly: true }) instead of getCachedSystem()
+      const animationCoordinator = await this.infrastructureSystemFacade?.getSystem("EnhancedMasterAnimationCoordinator", { cacheOnly: true });
 
       if (animationCoordinator) {
         // Determine priority based on system type
@@ -683,14 +651,14 @@ export class SystemCoordinator {
 
     if (this.coordinationConfig.mode === "performance-optimized") {
       // Aggressive performance optimization
-      this.optimizeForPerformance();
+      this.applyPerformanceOptimizations();
     }
   }
 
-  private optimizeForPerformance(): void {
+  private applyPerformanceOptimizations(): void {
     // Implement performance optimization strategies
-    if (this.visualBridge) {
-      this.visualBridge.setConfiguration({
+    if (this.visualSystemCoordinator) {
+      this.visualSystemCoordinator.setConfiguration({
         mode: "performance-first",
         enableAdaptiveQuality: true,
         qualityPreferences: {
@@ -701,8 +669,8 @@ export class SystemCoordinator {
       });
     }
 
-    if (this.nonVisualFacade) {
-      this.nonVisualFacade.setConfiguration({
+    if (this.infrastructureSystemFacade) {
+      this.infrastructureSystemFacade.setConfiguration({
         mode: "performance-first",
         systemPreferences: {
           lazyInitialization: true,
@@ -715,38 +683,38 @@ export class SystemCoordinator {
 
   // Public API for facade access
   public getVisualSystem<T = any>(key: VisualSystemKey): T | null {
-    if (!this.visualBridge) return null;
-    return this.visualBridge.getVisualSystem<T>(key);
+    if (!this.visualSystemCoordinator) return null;
+    return this.visualSystemCoordinator.getVisualSystem<T>(key);
   }
 
-  public getCachedNonVisualSystem<T = any>(key: NonVisualSystemKey): T | null {
-    if (!this.nonVisualFacade) return null;
-    return this.nonVisualFacade.getCachedSystem<T>(key);
+  public async getCachedNonVisualSystem<T = any>(key: NonVisualSystemKey): Promise<T | null> {
+    if (!this.infrastructureSystemFacade) return null;
+    return await this.infrastructureSystemFacade.getSystem<T>(key, { cacheOnly: true });
   }
 
   public async getNonVisualSystem<T = any>(
     key: NonVisualSystemKey
   ): Promise<T | null> {
-    if (!this.nonVisualFacade) return null;
-    return await this.nonVisualFacade.getSystem<T>(key);
+    if (!this.infrastructureSystemFacade) return null;
+    return await this.infrastructureSystemFacade.getSystem<T>(key);
   }
 
   public async getSystem<T = any>(
     key: VisualSystemKey | NonVisualSystemKey
   ): Promise<T | null> {
     // Try visual systems first
-    if (this.visualBridge) {
+    if (this.visualSystemCoordinator) {
       try {
-        return this.visualBridge.getVisualSystem<T>(key as VisualSystemKey);
+        return this.visualSystemCoordinator.getVisualSystem<T>(key as VisualSystemKey);
       } catch (error) {
         // Not a visual system, try non-visual
       }
     }
 
     // Try non-visual systems
-    if (this.nonVisualFacade) {
+    if (this.infrastructureSystemFacade) {
       try {
-        return await this.nonVisualFacade.getSystem<T>(
+        return await this.infrastructureSystemFacade.getSystem<T>(
           key as NonVisualSystemKey
         );
       } catch (error) {
@@ -835,9 +803,9 @@ export class SystemCoordinator {
     };
 
     // Check visual facade
-    if (this.visualBridge) {
+    if (this.visualSystemCoordinator) {
       try {
-        const visualHealth = await this.visualBridge.performVisualHealthCheck();
+        const visualHealth = await this.visualSystemCoordinator.performVisualHealthCheck();
         healthCheck.facades.visual.ok =
           visualHealth.overall === "excellent" ||
           visualHealth.overall === "good";
@@ -850,9 +818,9 @@ export class SystemCoordinator {
     }
 
     // Check non-visual facade
-    if (this.nonVisualFacade) {
+    if (this.infrastructureSystemFacade) {
       try {
-        const nonVisualHealth = await this.nonVisualFacade.performHealthCheck();
+        const nonVisualHealth = await this.infrastructureSystemFacade.performHealthCheck();
         healthCheck.facades.nonVisual.ok =
           nonVisualHealth.overall === "excellent" ||
           nonVisualHealth.overall === "good";
@@ -867,9 +835,9 @@ export class SystemCoordinator {
 
     // Check shared resources
     // New simplified performance system health check
-    if (this.sharedSimplePerformanceCoordinator) {
+    if (this.performanceCoordinator) {
       try {
-        const performanceHealth = await this.sharedSimplePerformanceCoordinator.healthCheck();
+        const performanceHealth = await this.performanceCoordinator.healthCheck();
         healthCheck.sharedResources.simplePerformanceCoordinator.ok = performanceHealth.healthy;
         healthCheck.sharedResources.simplePerformanceCoordinator.details = performanceHealth.details || "Simple performance coordinator operational";
       } catch (error) {
@@ -879,9 +847,9 @@ export class SystemCoordinator {
     }
 
     // Simple performance coordinator health check 
-    if (this.sharedSimplePerformanceCoordinator) {
+    if (this.performanceCoordinator) {
       try {
-        const performanceHealth = await this.sharedSimplePerformanceCoordinator.healthCheck();
+        const performanceHealth = await this.performanceCoordinator.healthCheck();
         healthCheck.sharedResources.performanceAnalyzer = {
           ok: performanceHealth.healthy,
           details: performanceHealth.details || "Simple performance coordinator operational"
@@ -895,10 +863,10 @@ export class SystemCoordinator {
     }
 
     // Check shared CSS variable controller
-    if (this.sharedUnifiedCSSVariableManager) {
+    if (this.sharedCSSVariableWriter) {
       try {
         const cssHealth =
-          await this.sharedUnifiedCSSVariableManager.healthCheck();
+          await this.sharedCSSVariableWriter.healthCheck();
         healthCheck.sharedResources.cssVariableController.ok =
           cssHealth.healthy || cssHealth.ok || false;
         healthCheck.sharedResources.cssVariableController.details =
@@ -1023,13 +991,13 @@ export class SystemCoordinator {
 
   private updateMetrics(): void {
     // Update combined metrics from both facades
-    if (this.visualBridge) {
-      const visualMetrics = this.visualBridge.getMetrics();
+    if (this.visualSystemCoordinator) {
+      const visualMetrics = this.visualSystemCoordinator.getMetrics();
       this.currentMetrics.visualHealth = visualMetrics.systemHealth;
     }
 
-    if (this.nonVisualFacade) {
-      const nonVisualMetrics = this.nonVisualFacade.getMetrics();
+    if (this.infrastructureSystemFacade) {
+      const nonVisualMetrics = this.infrastructureSystemFacade.getMetrics();
       this.currentMetrics.nonVisualHealth = nonVisualMetrics.systemHealth;
     }
 
@@ -1078,18 +1046,18 @@ export class SystemCoordinator {
       "SpicetifyColorBridge",
     ]);
     this.systemDependencies.set("PerformanceAnalyzer", []);
-    this.systemDependencies.set("UnifiedCSSVariableManager", [
+    this.systemDependencies.set("CSSVariableWriter", [
       "PerformanceAnalyzer",
     ]);
     // NOTE: SettingsManager removed - using TypedSettingsManager singleton
     this.systemDependencies.set("SpicetifyColorBridge", [
-      "UnifiedCSSVariableManager",
+      "CSSVariableWriter",
     ]);
 
     // Define initialization order by phase
     this.initializationOrder.set("core", [
       "PerformanceAnalyzer",
-      "UnifiedCSSVariableManager",
+      "CSSVariableWriter",
     ]);
     this.initializationOrder.set("services", [
       // NOTE: SettingsManager removed - using TypedSettingsManager singleton
@@ -1151,7 +1119,7 @@ export class SystemCoordinator {
     this.currentPhase = "completed";
 
     // Set up cross-facade communication
-    this.setupCrossFacadeCommunication();
+    this.setupSystemEventBus();
 
     // Setup gradient system coordination
     await this.setupGradientSystemCoordination();
@@ -1215,7 +1183,7 @@ export class SystemCoordinator {
         case "PerformanceAnalyzer":
           await this.initializePerformanceAnalyzer();
           break;
-        case "UnifiedCSSVariableManager":
+        case "CSSVariableWriter":
           await this.initializeUnifiedCSSController();
           break;
         // NOTE: SettingsManager case removed - using TypedSettingsManager singleton
@@ -1279,12 +1247,12 @@ export class SystemCoordinator {
     // Initialize both new simplified and legacy performance systems
     
     // Create DeviceCapabilityDetector for WebGL if not exists
-    if (!this.sharedDeviceCapabilityDetector) {
-      this.sharedDeviceCapabilityDetector = new DeviceCapabilityDetector({
+    if (!this.deviceDetector) {
+      this.deviceDetector = new DeviceCapabilityDetector({
         enableDebug: true, // Enable debug for troubleshooting
         spicetifyContext: true
       });
-      await this.sharedDeviceCapabilityDetector.initialize();
+      await this.deviceDetector.initialize();
     }
     
     // Create enhanced tier detector for simplified performance system
@@ -1292,55 +1260,36 @@ export class SystemCoordinator {
     
     // Initialize WebGL with proper DeviceCapabilityDetector
     this.sharedWebGLSystemsIntegration = new WebGLSystemsIntegration(
-      this.sharedDeviceCapabilityDetector
+      this.deviceDetector
     );
     await this.sharedWebGLSystemsIntegration.initialize();
     
-    this.sharedSimplePerformanceCoordinator = new SimplePerformanceCoordinator(
+    this.performanceCoordinator = new SimplePerformanceCoordinator(
       this.sharedEnhancedDeviceTierDetector,
       this.sharedWebGLSystemsIntegration
     );
-    await this.sharedSimplePerformanceCoordinator.initialize();
+    await this.performanceCoordinator.initialize();
 
     // Legacy system removed - using SimplePerformanceCoordinator instead
-    // this.sharedSimplePerformanceCoordinator = new PerformanceAnalyzer(); // REMOVED: Complex monitoring replaced with tier-based system
+    // this.performanceCoordinator = new PerformanceAnalyzer(); // REMOVED: Complex monitoring replaced with tier-based system
   }
 
   private async initializeUnifiedCSSController(): Promise<void> {
-    if (!this.sharedSimplePerformanceCoordinator) {
+    if (!this.performanceCoordinator) {
       throw new Error("SimplePerformanceCoordinator dependency not available");
     }
 
     try {
       // Initialize device capability detector for coordinated initialization
-      this.sharedDeviceCapabilityDetector = new DeviceCapabilityDetector({
+      this.deviceDetector = new DeviceCapabilityDetector({
         enableDebug: this.config.enableDebug || false,
         runStressTests: false
       });
-      await this.sharedDeviceCapabilityDetector.initialize();
+      await this.deviceDetector.initialize();
 
-      // Initialize performance budget manager for coordinated initialization
-      this.sharedPerformanceBudgetManager = new PerformanceBudgetManager({
-        budgets: {
-          animationFrame: 16,
-          cssVariableUpdate: 2,
-          domObservation: 1,
-          audioAnalysis: 5,
-          visualEffects: 8,
-          userInteraction: 100
-        },
-        autoOptimize: {
-          enabled: true,
-          violationThreshold: 3,
-          recoveryThreshold: 0.8
-        },
-        enableDebug: this.config.enableDebug || false
-      }, this.sharedSimplePerformanceCoordinator as any);
-      // PerformanceBudgetManager doesn't have initialize method
-
-      // Create UnifiedCSSVariableManager first (before SimplePerformanceCoordinator)
+      // Create CSSVariableWriter first (before SimplePerformanceCoordinator)
       // Create a minimal performance coordinator for CSS controller initialization
-      const deviceCapabilities = this.sharedDeviceCapabilityDetector.getCapabilities();
+      const deviceCapabilities = this.deviceDetector.getCapabilities();
       const minimalPerformanceCoordinator = {
         getCurrentPerformanceMode: () => ({ 
           name: 'balanced' as const,
@@ -1362,24 +1311,24 @@ export class SystemCoordinator {
         getThermalState: () => ({ temperature: 'normal' as const })
       };
       
-      this.sharedUnifiedCSSVariableManager = new UnifiedCSSVariableManager(
+      this.sharedCSSVariableWriter = new CSSVariableWriter(
         this.config,
         minimalPerformanceCoordinator as any
       );
 
       // Set global instance for systems that need global access
-      setGlobalUnifiedCSSManager(this.sharedUnifiedCSSVariableManager);
+      setGlobalCSSVariableWriter(this.sharedCSSVariableWriter);
       
-      await this.sharedUnifiedCSSVariableManager.initialize();
+      await this.sharedCSSVariableWriter.initialize();
 
       // SimplePerformanceCoordinator is already initialized above, no need to recreate
     } catch (error) {
       Y3KDebug?.debug?.warn(
         "SystemCoordinator",
-        "Failed to initialize UnifiedCSSVariableManager:",
+        "Failed to initialize CSSVariableWriter:",
         error
       );
-      this.sharedUnifiedCSSVariableManager = null;
+      this.sharedCSSVariableWriter = null;
     }
   }
 
@@ -1390,7 +1339,7 @@ export class SystemCoordinator {
     this.sharedMusicSyncService = new MusicSyncService({
       ADVANCED_SYSTEM_CONFIG: this.config,
       ThemeUtilities: this.utils,
-      performanceMonitor: this.sharedSimplePerformanceCoordinator as any,
+      performanceMonitor: this.performanceCoordinator as any,
       // NOTE: settingsManager removed - using typed settings directly
       year3000System: this.year3000System,
     });
@@ -1398,9 +1347,9 @@ export class SystemCoordinator {
   }
 
   private async initializeSpicetifyColorBridge(): Promise<void> {
-    if (!this.sharedUnifiedCSSVariableManager) {
+    if (!this.sharedCSSVariableWriter) {
       throw new Error(
-        "UnifiedCSSVariableManager dependency not available"
+        "CSSVariableWriter dependency not available"
       );
     }
 
@@ -1411,7 +1360,7 @@ export class SystemCoordinator {
     });
 
     await this.sharedSpicetifyColorBridge.initialize(
-      this.sharedUnifiedCSSVariableManager
+      this.sharedCSSVariableWriter
     );
 
     Y3KDebug?.debug?.log(
@@ -1436,7 +1385,7 @@ export class SystemCoordinator {
     this.sharedColorHarmonyEngine = new ColorHarmonyEngine(
       this.config,
       this.utils,
-      (this.sharedSimplePerformanceCoordinator as any) || undefined,
+      (this.performanceCoordinator as any) || undefined,
       this.sharedSpicetifyColorBridge // Dependency injection - single shared instance
       // NOTE: settingsManager parameter removed - using typed settings directly
     );
@@ -1448,12 +1397,12 @@ export class SystemCoordinator {
   }
 
   private async initializeVisualFacade(): Promise<void> {
-    this.visualBridge = new VisualSystemCoordinator(
+    this.visualSystemCoordinator = new VisualSystemCoordinator(
       this.config,
       this.utils,
       this, // year3000System
-      this.sharedUnifiedCSSVariableManager!, // cssVariableController
-      this.sharedSimplePerformanceCoordinator as any,
+      this.sharedCSSVariableWriter!, // cssVariableController
+      this.performanceCoordinator as any,
       this.sharedMusicSyncService!,
       // NOTE: settingsManager removed - using typed settings directly
       this.sharedColorHarmonyEngine || undefined, // optional
@@ -1463,28 +1412,28 @@ export class SystemCoordinator {
     // Note: SpicetifyColorBridge can be accessed through SystemCoordinator shared dependencies
     // Visual systems that need it can get it via getSharedSpicetifyColorBridge()
 
-    await this.visualBridge.initialize();
+    await this.visualSystemCoordinator.initialize();
   }
 
   private async initializeNonVisualFacade(): Promise<void> {
-    this.nonVisualFacade = new NonVisualSystemFacade(this.config, this.utils, {
-      performanceAnalyzer: this.sharedSimplePerformanceCoordinator as any,
+    this.infrastructureSystemFacade = new NonVisualSystemFacade(this.config, this.utils, {
+      performanceAnalyzer: this.performanceCoordinator as any,
       unifiedCSSConsciousnessController:
-        this.sharedUnifiedCSSVariableManager,
+        this.sharedCSSVariableWriter,
       musicSyncService: this.sharedMusicSyncService,
       // NOTE: settingsManager removed - using typed settings directly
       colorHarmonyEngine: this.sharedColorHarmonyEngine,
-      performanceOrchestrator: this.sharedSimplePerformanceCoordinator,
+      performanceOrchestrator: this.performanceCoordinator,
       semanticColorManager: this.sharedSpicetifyColorBridge,
     });
-    await this.nonVisualFacade.initialize();
+    await this.infrastructureSystemFacade.initialize();
   }
 
   private async executeLegacyInitialization(): Promise<void> {
     // Original initialization logic for backward compatibility
     await this.initializeSharedDependencies();
     await this.initializeFacades();
-    this.setupCrossFacadeCommunication();
+    this.setupSystemEventBus();
     await this.setupGradientSystemCoordination();
     this.setupDefaultColorDependentSystems();
     this.startMonitoring();
@@ -1522,22 +1471,22 @@ export class SystemCoordinator {
     }
 
     // Cleanup facades
-    if (this.visualBridge) {
-      await this.visualBridge.destroy();
-      this.visualBridge = null;
+    if (this.visualSystemCoordinator) {
+      await this.visualSystemCoordinator.destroy();
+      this.visualSystemCoordinator = null;
     }
 
-    if (this.nonVisualFacade) {
-      await this.nonVisualFacade.destroy();
-      this.nonVisualFacade = null;
+    if (this.infrastructureSystemFacade) {
+      await this.infrastructureSystemFacade.destroy();
+      this.infrastructureSystemFacade = null;
     }
 
     // Cleanup shared dependencies
     
     // Clean up new simplified performance systems first
-    if (this.sharedSimplePerformanceCoordinator) {
-      this.sharedSimplePerformanceCoordinator.destroy();
-      this.sharedSimplePerformanceCoordinator = null;
+    if (this.performanceCoordinator) {
+      this.performanceCoordinator.destroy();
+      this.performanceCoordinator = null;
     }
 
     if (this.sharedWebGLSystemsIntegration) {
@@ -1569,29 +1518,23 @@ export class SystemCoordinator {
 
     // NOTE: SettingsManager destroy removed - using TypedSettingsManager singleton (no cleanup needed)
 
-    if (this.sharedUnifiedCSSVariableManager) {
-      // UnifiedCSSVariableManager has destroy method
-      this.sharedUnifiedCSSVariableManager.destroy();
-      this.sharedUnifiedCSSVariableManager = null;
+    if (this.sharedCSSVariableWriter) {
+      // CSSVariableWriter has destroy method
+      this.sharedCSSVariableWriter.destroy();
+      this.sharedCSSVariableWriter = null;
     }
 
     // Clean up legacy performance systems
-    if (this.sharedSimplePerformanceCoordinator) {
+    if (this.performanceCoordinator) {
       // SimplePerformanceCoordinator has destroy method
-      (this.sharedSimplePerformanceCoordinator as any).destroy();
-      this.sharedSimplePerformanceCoordinator = null;
+      (this.performanceCoordinator as any).destroy();
+      this.performanceCoordinator = null;
     }
 
-    if (this.sharedPerformanceBudgetManager) {
-      // PerformanceBudgetManager has destroy method
-      this.sharedPerformanceBudgetManager.destroy();
-      this.sharedPerformanceBudgetManager = null;
-    }
-
-    if (this.sharedDeviceCapabilityDetector) {
+    if (this.deviceDetector) {
       // DeviceCapabilityDetector has destroy method
-      this.sharedDeviceCapabilityDetector.destroy();
-      this.sharedDeviceCapabilityDetector = null;
+      this.deviceDetector.destroy();
+      this.deviceDetector = null;
     }
 
     // Clear event listeners
@@ -1645,9 +1588,9 @@ export class SystemCoordinator {
   } {
     return {
       initialized: this.isInitialized,
-      visualSystems: this.visualBridge?.getSystemStatus()?.systemsActive || 0,
+      visualSystems: this.visualSystemCoordinator?.getSystemStatus()?.systemsActive || 0,
       nonVisualSystems:
-        this.nonVisualFacade?.getSystemStatus()?.systemsActive || 0,
+        this.infrastructureSystemFacade?.getSystemStatus()?.systemsActive || 0,
       healthy:
         this.currentMetrics.overallHealth === "excellent" ||
         this.currentMetrics.overallHealth === "good",
@@ -1663,7 +1606,7 @@ export class SystemCoordinator {
    * This method coordinates all gradient-related systems after facades are initialized
    */
   private async setupGradientSystemCoordination(): Promise<void> {
-    if (!this.visualBridge) {
+    if (!this.visualSystemCoordinator) {
       Y3KDebug?.debug?.warn(
         "SystemCoordinator",
         "VisualSystemCoordinator not available - skipping gradient system coordination"
@@ -1727,7 +1670,7 @@ export class SystemCoordinator {
     try {
       // Get GradientConductor through VisualSystemCoordinator factory pattern
       const gradientConductor =
-        this.visualBridge!.getVisualSystem("GradientConductor");
+        this.visualSystemCoordinator!.getVisualSystem("GradientConductor");
 
       if (!gradientConductor) {
         Y3KDebug?.debug?.warn(
@@ -1800,7 +1743,7 @@ export class SystemCoordinator {
   private async coordinateWebGLGradientSystem(): Promise<void> {
     try {
       // Get WebGL system through VisualSystemCoordinator
-      const webglSystem = this.visualBridge!.getVisualSystem("WebGLBackground");
+      const webglSystem = this.visualSystemCoordinator!.getVisualSystem("WebGLBackground");
 
       if (!webglSystem) {
         Y3KDebug?.debug?.warn(
@@ -2091,9 +2034,9 @@ export class SystemCoordinator {
     trigger: string
   ): Promise<void> {
     // Try visual systems first
-    if (this.visualBridge) {
+    if (this.visualSystemCoordinator) {
       try {
-        const system = this.visualBridge.getVisualSystem(systemKey as any);
+        const system = this.visualSystemCoordinator.getVisualSystem(systemKey as any);
         if (system && typeof system.refreshColorState === "function") {
           await system.refreshColorState(trigger);
           return;
@@ -2104,9 +2047,9 @@ export class SystemCoordinator {
     }
 
     // Try non-visual systems
-    if (this.nonVisualFacade) {
+    if (this.infrastructureSystemFacade) {
       try {
-        const system = await this.nonVisualFacade.getSystem(systemKey as any);
+        const system = await this.infrastructureSystemFacade.getSystem(systemKey as any);
         if (system && typeof system.refreshColorState === "function") {
           await system.refreshColorState(trigger);
           return;
@@ -2176,9 +2119,9 @@ export class SystemCoordinator {
     return this.sharedSpicetifyColorBridge || undefined;
   }
 
-  // New simplified performance system getter methods
+  // Performance system getter methods (simplified naming)
   public getSharedSimplePerformanceCoordinator(): SimplePerformanceCoordinator | undefined {
-    return this.sharedSimplePerformanceCoordinator || undefined;
+    return this.performanceCoordinator || undefined;
   }
 
   public getSharedWebGLSystemsIntegration(): WebGLSystemsIntegration | undefined {
@@ -2189,14 +2132,49 @@ export class SystemCoordinator {
     return this.sharedEnhancedDeviceTierDetector || undefined;
   }
 
-  // Legacy performance system getter methods (deprecated, for backward compatibility)
-  /** @deprecated Use getSharedSimplePerformanceCoordinator() instead */
-  public getSharedPerformanceAnalyzer(): SimplePerformanceCoordinator | undefined {
-    return (this.sharedSimplePerformanceCoordinator as any) || undefined;
+  // Device detection getter (for WebGL capabilities only)
+  public getDeviceDetector(): DeviceCapabilityDetector | undefined {
+    return this.deviceDetector || undefined;
   }
 
-  /** @deprecated Use getSharedSimplePerformanceCoordinator() instead */
-  public getSharedPerformanceOrchestrator(): SimplePerformanceCoordinator | undefined {
-    return this.sharedSimplePerformanceCoordinator || undefined;
+  /**
+   * Get shared dependency by name
+   * Single source of truth for all shared system instances
+   * Phase 3.1: Simplified dependency resolution
+   */
+  public getSharedDependency<T = any>(key: string): T | null {
+    switch (key) {
+      case "performanceCoordinator":
+      case "performanceAnalyzer":
+      case "simplePerformanceCoordinator":
+        return (this.performanceCoordinator as T) || null;
+
+      case "cssVariableManager":
+      case "cssVariableController":
+      case "cssConsciousnessController":
+        return (this.sharedCSSVariableWriter as T) || null;
+
+      case "musicSyncService":
+        return (this.sharedMusicSyncService as T) || null;
+
+      case "colorHarmonyEngine":
+        return (this.sharedColorHarmonyEngine as T) || null;
+
+      case "deviceDetector":
+      case "deviceCapabilityDetector":
+        return (this.deviceDetector as T) || null;
+
+      case "webglSystemsIntegration":
+        return (this.sharedWebGLSystemsIntegration as T) || null;
+
+      case "enhancedDeviceTierDetector":
+        return (this.sharedEnhancedDeviceTierDetector as T) || null;
+
+      case "spicetifyColorBridge":
+        return (this.sharedSpicetifyColorBridge as T) || null;
+
+      default:
+        return null;
+    }
   }
 }

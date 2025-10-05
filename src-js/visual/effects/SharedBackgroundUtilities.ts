@@ -9,7 +9,7 @@
  * @philosophy Smooth visual coordination through shared infrastructure
  */
 
-import { getGlobalUnifiedCSSManager, UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { getGlobalCSSVariableWriter, CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import { ShaderLoader } from "@/utils/graphics/ShaderLoader";
 import type {
@@ -219,14 +219,14 @@ export class ShaderResourceManager {
  * Eliminates duplicate CSS variable update patterns
  */
 export class CSSVariableIntegrator {
-  private static cssController: UnifiedCSSVariableManager | null = null;
+  private static cssController: CSSVariableWriter | null = null;
 
   /**
    * Get or cache the CSS controller instance
    */
-  private static getCSSController(): UnifiedCSSVariableManager | null {
+  private static getCSSController(): CSSVariableWriter | null {
     if (!this.cssController) {
-      this.cssController = getGlobalUnifiedCSSManager();
+      this.cssController = getGlobalCSSVariableWriter();
     }
     return this.cssController;
   }

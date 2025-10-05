@@ -9,7 +9,7 @@
  * - Z-index conflicts and layering issues
  */
 
-import { getGlobalUnifiedCSSManager, UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { getGlobalCSSVariableWriter, CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 
 interface WhiteLayerDiagnostics {
@@ -38,7 +38,7 @@ interface DiagnosticResult {
  * - Implements prevention strategies
  */
 export class WhiteLayerDiagnosticSystem {
-  private cssController: UnifiedCSSVariableManager | null;
+  private cssController: CSSVariableWriter | null;
   private diagnostics: WhiteLayerDiagnostics;
   private diagnosticResults: DiagnosticResult[];
   private monitoringInterval: number | null = null;
@@ -46,13 +46,13 @@ export class WhiteLayerDiagnosticSystem {
 
   constructor() {
     // Initialize CSS Consciousness Controller if available
-    const cssController = getGlobalUnifiedCSSManager();
+    const cssController = getGlobalCSSVariableWriter();
     if (cssController) {
       this.cssController = cssController;
     } else {
       Y3KDebug?.debug?.warn(
         "WhiteLayerDiagnosticSystem",
-        "UnifiedCSSVariableManager not available, CSS visual-effects disabled"
+        "CSSVariableWriter not available, CSS visual-effects disabled"
       );
       this.cssController = null;
     }

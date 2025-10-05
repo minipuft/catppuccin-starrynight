@@ -12,7 +12,8 @@
  */
 
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 // NOTE: SettingsManager import removed - was dead code, never used
 import {
@@ -82,7 +83,7 @@ export interface EmotionalGradientState {
 }
 
 export class EmotionalGradientMapper {
-  private cssController!: UnifiedCSSVariableManager;
+  private cssController!: CSSVariableWriter;
   private musicSyncService: MusicSyncService | null = null;
   // NOTE: settingsManager field removed - was dead code, never used
 
@@ -92,8 +93,9 @@ export class EmotionalGradientMapper {
   private maxHistorySize = 50; // Keep 50 frames of emotional history
 
   private isActive = false;
-  private boundSpectralHandler: ((event: Event) => void) | null = null;
-  private boundSettingsHandler: ((event: Event) => void) | null = null;
+  // UnifiedEventBus subscription IDs for cleanup
+  private emotionAnalysisSubscriptionId: string | null = null;
+  private settingsSubscriptionId: string | null = null;
 
   // 🌡️ EMOTIONAL TEMPERATURE INTEGRATION
   private emotionalTemperatureMapper: EmotionalTemperatureMapper;
@@ -249,11 +251,11 @@ export class EmotionalGradientMapper {
     };
 
   constructor(
-    cssController?: UnifiedCSSVariableManager,
+    cssController?: CSSVariableWriter,
     musicSyncService: MusicSyncService | null = null
     // NOTE: settingsManager parameter removed - was dead code, never used
   ) {
-    this.cssController = cssController || getGlobalUnifiedCSSManager();
+    this.cssController = cssController || getGlobalCSSVariableWriter();
     this.musicSyncService = musicSyncService;
     // NOTE: settingsManager assignment removed - was dead code, never used
 
@@ -280,32 +282,29 @@ export class EmotionalGradientMapper {
       neutral: "ambient",
     };
 
-    this.boundSpectralHandler = this.handleSpectralData.bind(this);
-    this.boundSettingsHandler = this.handleSettingsChange.bind(this);
   }
 
   public async initialize(): Promise<void> {
     // CSS controller is already initialized in constructor
 
-    // Subscribe to music analysis events
-    if (this.boundSpectralHandler) {
-      document.addEventListener(
-        "music-sync:data-updated",
-        this.boundSpectralHandler
-      );
-    }
+    // Subscribe to unified music emotion analysis events
+    this.emotionAnalysisSubscriptionId = unifiedEventBus.subscribe(
+      'music:emotion-analyzed',
+      this.handleEmotionAnalysis.bind(this),
+      'EmotionalGradientMapper'
+    );
 
-    if (this.boundSettingsHandler) {
-      document.addEventListener(
-        "year3000SystemSettingsChanged",
-        this.boundSettingsHandler
-      );
-    }
+    // Subscribe to unified settings change events
+    this.settingsSubscriptionId = unifiedEventBus.subscribe(
+      'settings:changed',
+      this.handleSettingsChange.bind(this),
+      'EmotionalGradientMapper'
+    );
 
     this.isActive = true;
     Y3KDebug?.debug?.log(
       "EmotionalGradientMapper",
-      "Emotional mapping system initialized"
+      "Emotional mapping system initialized with UnifiedEventBus"
     );
   }
 
@@ -327,14 +326,52 @@ export class EmotionalGradientMapper {
     };
   }
 
-  private handleSpectralData(event: Event): void {
+  /**
+   * Handle emotion analysis events from UnifiedEventBus
+   */
+  private handleEmotionAnalysis(data: {
+    emotion: {
+      primary: string;
+      valence: number;
+      arousal: number;
+      dominance: number;
+      musicalCharacteristics: {
+        tempo: number;
+        energy: number;
+        danceability: number;
+        acousticness: number;
+        instrumentalness: number;
+        speechiness: number;
+      };
+    };
+    colorTemperature: number;
+    timestamp: number;
+  }): void {
     if (!this.isActive) return;
 
-    const customEvent = event as CustomEvent;
-    const musicData = customEvent.detail as MusicAnalysisData;
+    // Transform UnifiedEventBus data to MusicAnalysisData format
+    const musicData: MusicAnalysisData = {
+      energy: data.emotion.musicalCharacteristics.energy,
+      valence: data.emotion.valence,
+      danceability: data.emotion.musicalCharacteristics.danceability,
+      tempo: data.emotion.musicalCharacteristics.tempo,
+      loudness: data.emotion.dominance, // Map dominance to loudness
+      acousticness: data.emotion.musicalCharacteristics.acousticness,
+      instrumentalness: data.emotion.musicalCharacteristics.instrumentalness,
+      speechiness: data.emotion.musicalCharacteristics.speechiness,
+      mode: 1, // Default major, could be enhanced
+      key: 0, // Default
+      genre: data.emotion.primary, // Use primary emotion as genre hint
+    };
 
-    if (!musicData) return;
+    // Process the music data using existing logic
+    this.processMusicalEmotionalData(musicData);
+  }
 
+  /**
+   * Process musical emotional data (extracted from handleSpectralData)
+   */
+  private processMusicalEmotionalData(musicData: MusicAnalysisData): void {
     // Analyze emotional content from music analysis data
     const emotionalProfile = this.analyzeEmotionalContent(musicData);
 
@@ -827,15 +864,20 @@ export class EmotionalGradientMapper {
     }
   }
 
-  private handleSettingsChange(event: Event): void {
-    const customEvent = event as CustomEvent;
-    const { key, value } = customEvent.detail;
+  private handleSettingsChange(data: {
+    settingKey: string;
+    oldValue: string | number | boolean;
+    newValue: string | number | boolean;
+    timestamp: number;
+  }): void {
+    const { settingKey, newValue } = data;
 
-    if (key.startsWith("sn-emotional-") || key.startsWith("sn-gradient-")) {
+    if (settingKey.startsWith("sn-emotional-") || settingKey.startsWith("sn-gradient-")) {
       // Reload emotional mapping sensitivity based on settings
       Y3KDebug?.debug?.log(
         "EmotionalGradientMapper",
-        "Settings changed, updating emotional sensitivity"
+        "Settings changed via UnifiedEventBus, updating emotional sensitivity",
+        { settingKey, newValue }
       );
     }
   }
@@ -1017,19 +1059,21 @@ export class EmotionalGradientMapper {
   public destroy(): void {
     this.isActive = false;
 
-    if (this.boundSpectralHandler) {
-      document.removeEventListener(
-        "music-sync:data-updated",
-        this.boundSpectralHandler
-      );
+    // Unsubscribe from UnifiedEventBus events
+    if (this.emotionAnalysisSubscriptionId) {
+      unifiedEventBus.unsubscribe(this.emotionAnalysisSubscriptionId);
+      this.emotionAnalysisSubscriptionId = null;
     }
 
-    if (this.boundSettingsHandler) {
-      document.removeEventListener(
-        "year3000SystemSettingsChanged",
-        this.boundSettingsHandler
-      );
+    if (this.settingsSubscriptionId) {
+      unifiedEventBus.unsubscribe(this.settingsSubscriptionId);
+      this.settingsSubscriptionId = null;
     }
+
+    Y3KDebug?.debug?.log(
+      'EmotionalGradientMapper',
+      'Unsubscribed from UnifiedEventBus events'
+    );
 
     // Clean up emotional temperature classes from document
     if (this.currentEmotionalTemperature) {

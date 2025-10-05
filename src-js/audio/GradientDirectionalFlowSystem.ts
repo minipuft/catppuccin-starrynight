@@ -12,7 +12,8 @@
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
@@ -105,7 +106,7 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
   private genreFlowPatterns: GenreFlowPatterns;
   private spectralFlowMapping: SpectralFlowMapping;
 
-  private cssVariableController: UnifiedCSSVariableManager | null;
+  private cssVariableController: CSSVariableWriter | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
 
   private lastBeatTime = 0;
@@ -113,10 +114,9 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
   private flowSmoothingBuffer: FlowDirectionVector[] = [];
   private currentGenre: GenreClassification | null = null;
 
-  private boundBeatHandler: ((event: Event) => void) | null = null;
-  private boundGenreHandler: ((event: Event) => void) | null = null;
-  private boundSpectralHandler: ((event: Event) => void) | null = null;
-  private boundEnergyHandler: ((event: Event) => void) | null = null;
+  // UnifiedEventBus subscription IDs for cleanup
+  private beatSubscriptionId: string | null = null;
+  private energySubscriptionId: string | null = null;
 
   private updateThrottleInterval = 1000 / 30; // 30 FPS for smooth flow
 
@@ -131,13 +131,13 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
 
     this.colorHarmonyEngine = null; // Initialize as null, will be set later
     // Initialize CSS Consciousness Controller if available
-    const cssController = getGlobalUnifiedCSSManager();
+    const cssController = getGlobalCSSVariableWriter();
     if (cssController) {
       this.cssVariableController = cssController;
     } else {
       Y3KDebug?.debug?.warn(
         "GradientDirectionalFlowSystem",
-        "UnifiedCSSVariableManager not available, CSS integration disabled"
+        "CSSVariableWriter not available, CSS integration disabled"
       );
       this.cssVariableController = null;
     }
@@ -194,12 +194,6 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
       harmonyFlow: { x: 0.6, y: 0.4, intensity: 0.8, timestamp: 0 },
     };
 
-    // Bind event handlers
-    this.boundBeatHandler = this.handleBeatEvent.bind(this);
-    this.boundGenreHandler = this.handleGenreChange.bind(this);
-    this.boundSpectralHandler = this.handleSpectralAnalysis.bind(this);
-    this.boundEnergyHandler = this.handleEnergyChange.bind(this);
-
     // Initialize smoothing buffer
     this.flowSmoothingBuffer = Array(5)
       .fill(null)
@@ -219,41 +213,33 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
   }
 
   private subscribeToMusicEvents(): void {
-    if (this.boundBeatHandler) {
-      document.addEventListener("music-sync:beat", this.boundBeatHandler);
-    }
+    // Subscribe to unified music events
+    this.beatSubscriptionId = unifiedEventBus.subscribe(
+      'music:beat',
+      this.handleBeatEvent.bind(this),
+      'GradientDirectionalFlowSystem'
+    );
 
-    if (this.boundGenreHandler) {
-      document.addEventListener(
-        "music-sync:genre-detected",
-        this.boundGenreHandler
-      );
-    }
+    this.energySubscriptionId = unifiedEventBus.subscribe(
+      'music:energy',
+      this.handleEnergyChange.bind(this),
+      'GradientDirectionalFlowSystem'
+    );
 
-    if (this.boundSpectralHandler) {
-      document.addEventListener(
-        "music-sync:spectral-analysis",
-        this.boundSpectralHandler
-      );
-    }
-
-    if (this.boundEnergyHandler) {
-      document.addEventListener(
-        "music-sync:energy-changed",
-        this.boundEnergyHandler
-      );
-    }
+    Y3KDebug?.debug?.log(
+      'GradientDirectionalFlowSystem',
+      'Subscribed to unified music events'
+    );
   }
 
-  private handleBeatEvent(event: Event): void {
+  private handleBeatEvent(data: { bpm: number; intensity: number; timestamp: number; confidence: number }): void {
     const currentTime = performance.now();
 
     // Throttle beat processing to prevent overload
     if (currentTime - this.lastBeatTime < 50) return;
     this.lastBeatTime = currentTime;
 
-    const customEvent = event as CustomEvent;
-    const { intensity, bpm, confidence } = customEvent.detail;
+    const { intensity, bpm, confidence } = data;
 
     // Calculate beat-driven flow direction
     const beatFlowVector = this.calculateBeatFlow(intensity, bpm, confidence);
@@ -272,42 +258,8 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     );
   }
 
-  private handleGenreChange(event: Event): void {
-    const customEvent = event as CustomEvent;
-    const { genre, confidence } = customEvent.detail;
-
-    this.currentGenre = genre;
-
-    // Update genre flow patterns based on detection
-    if (this.flowSettings.genreAdaptation && confidence > 0.7) {
-      this.adaptFlowToGenre(genre);
-    }
-
-    Y3KDebug?.debug?.log(
-      "GradientDirectionalFlowSystem",
-      `Genre flow adaptation: ${genre} (confidence: ${confidence.toFixed(2)})`
-    );
-  }
-
-  private handleSpectralAnalysis(event: Event): void {
-    const customEvent = event as CustomEvent;
-    const spectralData = customEvent.detail as SpectralAnalysisData;
-
-    if (!this.flowSettings.spectralSeparation) return;
-
-    // Map spectral frequencies to flow vectors
-    const spectralFlow = this.mapSpectralToFlow(spectralData);
-
-    // Blend spectral flow with current flow
-    const blendedFlow = this.blendSpectralFlow(spectralFlow);
-
-    // Update flow vector
-    this.updateFlowVector(blendedFlow);
-  }
-
-  private handleEnergyChange(event: Event): void {
-    const customEvent = event as CustomEvent;
-    const { energy, valence } = customEvent.detail;
+  private handleEnergyChange(data: { energy: number; valence: number; tempo: number; timestamp: number }): void {
+    const { energy, valence } = data;
 
     // Modulate flow intensity based on energy
     const energyModulation = energy * this.flowSettings.flowSensitivity;
@@ -766,37 +718,21 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
   public override _performSystemSpecificCleanup(): void {
     super._performSystemSpecificCleanup();
 
-    // Remove event listeners
-    if (this.boundBeatHandler) {
-      document.removeEventListener("music-sync:beat", this.boundBeatHandler);
+    // Unsubscribe from unified event bus
+    if (this.beatSubscriptionId) {
+      unifiedEventBus.unsubscribe(this.beatSubscriptionId);
+      this.beatSubscriptionId = null;
     }
 
-    if (this.boundGenreHandler) {
-      document.removeEventListener(
-        "music-sync:genre-detected",
-        this.boundGenreHandler
-      );
+    if (this.energySubscriptionId) {
+      unifiedEventBus.unsubscribe(this.energySubscriptionId);
+      this.energySubscriptionId = null;
     }
 
-    if (this.boundSpectralHandler) {
-      document.removeEventListener(
-        "music-sync:spectral-analysis",
-        this.boundSpectralHandler
-      );
-    }
-
-    if (this.boundEnergyHandler) {
-      document.removeEventListener(
-        "music-sync:energy-changed",
-        this.boundEnergyHandler
-      );
-    }
-
-    // Clear event handlers
-    this.boundBeatHandler = null;
-    this.boundGenreHandler = null;
-    this.boundSpectralHandler = null;
-    this.boundEnergyHandler = null;
+    Y3KDebug?.debug?.log(
+      'GradientDirectionalFlowSystem',
+      'Unsubscribed from unified music events'
+    );
   }
 
   // Public API for flow control

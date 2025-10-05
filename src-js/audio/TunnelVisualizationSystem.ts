@@ -12,7 +12,8 @@
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
@@ -84,7 +85,7 @@ interface MusicAnalysisData {
 export class TunnelVisualizationSystem extends BaseVisualSystem {
   private tunnelSettings: TunnelVisualizationSettings;
   private currentLightingState: CorridorLightingState;
-  private cssController: UnifiedCSSVariableManager | null;
+  private cssController: CSSVariableWriter | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
 
   private lastBeatTime = 0;
@@ -92,9 +93,9 @@ export class TunnelVisualizationSystem extends BaseVisualSystem {
   private lightingSmoothingBuffer: CorridorLightingState[] = [];
   private currentMusicAnalysis: MusicAnalysisData | null = null;
 
-  private boundBeatHandler: ((event: Event) => void) | null = null;
-  private boundEnergyHandler: ((event: Event) => void) | null = null;
-  private boundSpectralHandler: ((event: Event) => void) | null = null;
+  // UnifiedEventBus subscription IDs for cleanup
+  private beatSubscriptionId: string | null = null;
+  private energySubscriptionId: string | null = null;
 
   private updateThrottleInterval = 1000 / 30; // 30 FPS for smooth updates
 
@@ -108,13 +109,13 @@ export class TunnelVisualizationSystem extends BaseVisualSystem {
     super(config, utils, performanceMonitor, musicSyncService);
 
     // Initialize CSS Consciousness Controller
-    const cssController = getGlobalUnifiedCSSManager();
+    const cssController = getGlobalCSSVariableWriter();
     if (cssController) {
       this.cssController = cssController;
     } else {
       Y3KDebug?.debug?.warn(
         "TunnelVisualizationSystem",
-        "UnifiedCSSVariableManager not available"
+        "CSSVariableWriter not available"
       );
       this.cssController = null;
     }
@@ -166,11 +167,6 @@ export class TunnelVisualizationSystem extends BaseVisualSystem {
       timestamp: performance.now(),
     };
 
-    // Bind event handlers
-    this.boundBeatHandler = this.handleBeatEvent.bind(this);
-    this.boundEnergyHandler = this.handleEnergyChange.bind(this);
-    this.boundSpectralHandler = this.handleSpectralAnalysis.bind(this);
-
     // Initialize smoothing buffer
     this.lightingSmoothingBuffer = Array(3)
       .fill(null)
@@ -190,34 +186,33 @@ export class TunnelVisualizationSystem extends BaseVisualSystem {
   }
 
   private subscribeToMusicEvents(): void {
-    if (this.boundBeatHandler) {
-      document.addEventListener("music-sync:beat", this.boundBeatHandler);
-    }
+    // Subscribe to unified music events
+    this.beatSubscriptionId = unifiedEventBus.subscribe(
+      'music:beat',
+      this.handleBeatEvent.bind(this),
+      'TunnelVisualizationSystem'
+    );
 
-    if (this.boundEnergyHandler) {
-      document.addEventListener(
-        "music-sync:energy-changed",
-        this.boundEnergyHandler
-      );
-    }
+    this.energySubscriptionId = unifiedEventBus.subscribe(
+      'music:energy',
+      this.handleEnergyChange.bind(this),
+      'TunnelVisualizationSystem'
+    );
 
-    if (this.boundSpectralHandler) {
-      document.addEventListener(
-        "music-sync:spectral-analysis",
-        this.boundSpectralHandler
-      );
-    }
+    Y3KDebug?.debug?.log(
+      'TunnelVisualizationSystem',
+      'Subscribed to unified music events'
+    );
   }
 
-  private handleBeatEvent(event: Event): void {
+  private handleBeatEvent(data: { bpm: number; intensity: number; timestamp: number; confidence: number }): void {
     const currentTime = performance.now();
 
     // Throttle beat processing
     if (currentTime - this.lastBeatTime < 50) return;
     this.lastBeatTime = currentTime;
 
-    const customEvent = event as CustomEvent;
-    const { intensity, bpm, confidence } = customEvent.detail;
+    const { intensity, bpm, confidence } = data;
 
     // Calculate beat-driven lighting pulse
     this.updateBeatLighting(intensity, bpm, confidence);
@@ -228,15 +223,14 @@ export class TunnelVisualizationSystem extends BaseVisualSystem {
     );
   }
 
-  private handleEnergyChange(event: Event): void {
-    const customEvent = event as CustomEvent;
-    const { energy, valence } = customEvent.detail;
+  private handleEnergyChange(data: { energy: number; valence: number; tempo: number; timestamp: number }): void {
+    const { energy, valence, tempo } = data;
 
     // Update current music analysis
     this.currentMusicAnalysis = {
       energy,
       valence,
-      tempo: 120, // Default
+      tempo,
       beatIntensity: energy,
       bassResponse: energy * 0.8,
       spectralCentroid: 0.5,
@@ -246,18 +240,6 @@ export class TunnelVisualizationSystem extends BaseVisualSystem {
     this.updateEnergyLighting(energy, valence);
   }
 
-  private handleSpectralAnalysis(event: Event): void {
-    const customEvent = event as CustomEvent;
-    const spectralData = customEvent.detail;
-
-    if (this.currentMusicAnalysis) {
-      this.currentMusicAnalysis.bassResponse = spectralData.bassEnergy || 0.5;
-      this.currentMusicAnalysis.spectralCentroid = spectralData.harmonicContent || 0.5;
-    }
-
-    // Update tunnel width based on bass response
-    this.updateCorridorGeometry(spectralData.bassEnergy || 0.5);
-  }
 
   private updateBeatLighting(intensity: number, bpm: number, confidence: number): void {
     const beatPulse = intensity * this.tunnelSettings.beatLightPulse * confidence;
@@ -483,29 +465,21 @@ export class TunnelVisualizationSystem extends BaseVisualSystem {
   public override _performSystemSpecificCleanup(): void {
     super._performSystemSpecificCleanup();
 
-    // Remove event listeners
-    if (this.boundBeatHandler) {
-      document.removeEventListener("music-sync:beat", this.boundBeatHandler);
+    // Unsubscribe from unified event bus
+    if (this.beatSubscriptionId) {
+      unifiedEventBus.unsubscribe(this.beatSubscriptionId);
+      this.beatSubscriptionId = null;
     }
 
-    if (this.boundEnergyHandler) {
-      document.removeEventListener(
-        "music-sync:energy-changed",
-        this.boundEnergyHandler
-      );
+    if (this.energySubscriptionId) {
+      unifiedEventBus.unsubscribe(this.energySubscriptionId);
+      this.energySubscriptionId = null;
     }
 
-    if (this.boundSpectralHandler) {
-      document.removeEventListener(
-        "music-sync:spectral-analysis",
-        this.boundSpectralHandler
-      );
-    }
-
-    // Clear event handlers
-    this.boundBeatHandler = null;
-    this.boundEnergyHandler = null;
-    this.boundSpectralHandler = null;
+    Y3KDebug?.debug?.log(
+      'TunnelVisualizationSystem',
+      'Unsubscribed from unified music events'
+    );
   }
 
   // ========================================================================

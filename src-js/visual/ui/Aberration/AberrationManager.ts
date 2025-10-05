@@ -9,7 +9,7 @@
  */
 
 import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { AberrationCanvas } from "./AberrationCanvas";
 import { AberrationVisualSystem } from "./AberrationVisualSystem";
 import { getScrollNode } from "@/utils/dom/getScrollNode";
@@ -18,9 +18,9 @@ let instance: AberrationCanvas | null = null;
 let visualSystem: AberrationVisualSystem | null = null;
 
 // Helper to get CSS coordinator for coordination
-function getCSSController(y3k: Year3000System | null): UnifiedCSSVariableManager {
+function getCSSController(y3k: Year3000System | null): CSSVariableWriter {
   const year3000System = y3k || (globalThis as any).year3000System;
-  return year3000System?.cssController || getGlobalUnifiedCSSManager();
+  return year3000System?.cssController || getGlobalCSSVariableWriter();
 }
 
 // Helper to read current user preference without circular dep

@@ -22,7 +22,7 @@
  */
 
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -219,7 +219,7 @@ export class UIEffectsController
   private uiEffectsConfig: UIEffectsConfig;
 
   // Infrastructure dependencies
-  private cssController!: UnifiedCSSVariableManager; // Initialized in initializeCSSConsciousness
+  private cssController!: CSSVariableWriter; // Initialized in initializeCSSConsciousness
   private visualEffectsCoordinator: BackgroundAnimationCoordinator | null =
     null;
   private currentVisualField: VisualCoordinationField | null = null;
@@ -451,7 +451,7 @@ export class UIEffectsController
         (globalThis as any).unifiedVisualCSSController || (globalThis as any).unifiedCSSConsciousnessController || null;
 
       // Initialize CSS variable coordinator with the visual effects controller
-      this.cssController = getGlobalUnifiedCSSManager();
+      this.cssController = getGlobalCSSVariableWriter();
 
       if (!this.cssController) {
         Y3KDebug?.debug?.warn(

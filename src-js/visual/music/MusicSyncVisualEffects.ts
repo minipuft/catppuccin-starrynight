@@ -3,7 +3,7 @@ import { UnifiedSystemBase } from '@/core/base/UnifiedSystemBase';
 import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 import type { HealthCheckResult } from '@/types/systems';
 import * as ThemeUtilities from '@/utils/core/ThemeUtilities';
-import { EnhancedMasterAnimationCoordinator, type ConsolidatedMusicalContext } from '@/core/animation/EnhancedMasterAnimationCoordinator';
+import { AnimationFrameCoordinator, type ConsolidatedMusicalContext } from '@/core/animation/EnhancedMasterAnimationCoordinator';
 import type { MusicSyncService } from '@/audio/MusicSyncService';
 
 /**

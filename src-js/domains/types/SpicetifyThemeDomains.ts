@@ -263,7 +263,7 @@ export interface SystemArchitecture extends ThemeService {
   systemCoordinator: any; // SystemCoordinator
   performanceAnalyzer: any; // PerformanceAnalyzer
   eventBus: any; // UnifiedEventBus
-  cssController: any; // UnifiedCSSVariableManager
+  cssController: any; // CSSVariableWriter
   year3000System: any; // year3000System
   
   // Service-specific coordination methods

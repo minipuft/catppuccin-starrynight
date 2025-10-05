@@ -10,10 +10,10 @@
  */
 
 import { HolographicUISystem } from "@/visual/music/ui/HolographicUISystem";
-import { colorTransitionManager } from "@/visual/effects/ColorTransitionManager";
-import type { RGB, MusicEmotion, BeatData, CinematicPalette } from "@/types/colorStubs";
+import { colorTransitionManager } from "@/visual/effects/MusicColorTransitionState";
+import type { RGB, MusicEmotion, BeatData, CinematicPalette } from "@/types/colorTypes";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
@@ -60,7 +60,7 @@ export class MusicGlowEffectsManager implements IManagedSystem {
   
   private holographicSystem: HolographicUISystem;
   // Using shared colorVisualEffectsManager instead of injected orchestrator
-  private cssVisualEffectsController: UnifiedCSSVariableManager;
+  private cssVisualEffectsController: CSSVariableWriter;
   private musicSyncService: MusicSyncService;
   
   private glowState: GlowEffectState;
@@ -137,7 +137,7 @@ export class MusicGlowEffectsManager implements IManagedSystem {
 
   constructor(
     holographicSystem: HolographicUISystem,
-    cssVisualEffectsController: UnifiedCSSVariableManager,
+    cssVisualEffectsController: CSSVariableWriter,
     musicSyncService: MusicSyncService
   ) {
     this.holographicSystem = holographicSystem;

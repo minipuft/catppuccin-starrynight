@@ -9,7 +9,7 @@ import type {
   GenreVisualStyle,
   GenreType as MusicGenre,
 } from "@/types/genre";
-import type { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
+import type { AnimationFrameCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -187,7 +187,7 @@ export class OKLABColorProcessor
   private vibrancyConfig: VibrancyConfig;
   private paletteExtensionManager: PaletteExtensionManager;
   private semanticColorManager: SpicetifyColorBridge;
-  private animationEngine: EnhancedMasterAnimationCoordinator | null = null;
+  private animationEngine: AnimationFrameCoordinator | null = null;
   private emotionalTemperatureMapper: EmotionalTemperatureMapper;
   private oklabProcessor: OKLABUtilityProcessor; // Utility processor for OKLAB color operations
   private musicEmotionAnalyzer: MusicEmotionAnalyzer;
@@ -743,7 +743,7 @@ export class OKLABColorProcessor
   public override async initialize(): Promise<void> {
     await super.initialize();
 
-    // Initialize SpicetifyColorBridge with UnifiedCSSVariableManager from parent system
+    // Initialize SpicetifyColorBridge with CSSVariableWriter from parent system
     const cssVisualEffectsController = this.performanceMonitor
       ? (this.performanceMonitor as any).cssVisualEffectsController
       : undefined;
@@ -3320,7 +3320,7 @@ export class OKLABColorProcessor
     }
   }
 
-  public setEmergentEngine(engine: EnhancedMasterAnimationCoordinator): void {
+  public setEmergentEngine(engine: AnimationFrameCoordinator): void {
     this.animationEngine = engine;
   }
 

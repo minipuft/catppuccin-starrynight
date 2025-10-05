@@ -1,10 +1,12 @@
-// Consolidates CSS variable management across the entire system:
-// - UnifiedCSSVariableManager: High-performance batching and critical variable handling
-// - UnifiedCSSVariableManager: Priority-based transactions and variable groups
-// - UnifiedCSSVariableManager: Device-aware performance optimization
+// CSS Variable Writing System - Efficient DOM updates with batching and prioritization
 //
-// The unified controller provides visual-effects-driven CSS updates that
-// adapt to music, aesthetics, performance constraints, and device capabilities.
+// Consolidates CSS variable management across the entire system:
+// - CSSVariableBatcher: High-performance batching and critical variable handling
+// - CSSVariableWriter: Priority-based transactions and variable groups
+// - OptimizedCSSVariableManager: Device-aware performance optimization
+//
+// The writer provides visual-effects-driven CSS updates that adapt to music,
+// aesthetics, performance constraints, and device capabilities.
 
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import {
@@ -13,7 +15,7 @@ import {
   type DeviceCapabilities,
   type PerformanceMode,
 } from "@/core/performance/UnifiedPerformanceCoordinator";
-import { type VariablePriority } from "@/core/css/UnifiedVariableGroups";
+import { type VariablePriority } from "@/core/css/CSSVariableSchema";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 
@@ -57,7 +59,7 @@ export interface VisualEffectsState {
 }
 
 export interface CSSVisualEffectsConfig {
-  // Batching configuration (from UnifiedCSSVariableManager)
+  // Batching configuration (from CSSVariableWriter)
   batchIntervalMs: number;
   maxBatchSize: number;
   enableDebug: boolean;
@@ -65,7 +67,7 @@ export interface CSSVisualEffectsConfig {
   useCssTextFastPath?: boolean;
   autoHijack?: boolean;
 
-  // Performance configuration (from UnifiedCSSVariableManager)
+  // Performance configuration (from CSSVariableWriter)
   enableAdaptiveOptimization: boolean;
   enableThermalThrottling: boolean;
   enableBatteryOptimization: boolean;
@@ -123,7 +125,7 @@ interface PerformanceMetrics {
 }
 
 // ===================================================================
-// CRITICAL VARIABLES (from UnifiedCSSVariableManager)
+// CRITICAL VARIABLES (from CSSVariableWriter)
 // ===================================================================
 
 const CRITICAL_NOW_PLAYING_VARS = new Set<string>([
@@ -149,23 +151,24 @@ const CRITICAL_NOW_PLAYING_VARS = new Set<string>([
 // ===================================================================
 
 /**
- * UnifiedCSSVariableManager - Phase 2.1 System Consolidation
+ * CSSVariableWriter - CSS Variable Writing System
  *
- * Combines functionality from:
- * - UnifiedCSSVariableManager: High-performance CSS variable batching
- * - UnifiedCSSVariableManager: Priority-based variable management
- * - UnifiedCSSVariableManager: Device-aware performance optimization
+ * Consolidates CSS variable writing with performance optimization.
+ * Originally consolidated from:
+ * - CSSVariableBatcher: High-performance batching and critical variable handling
+ * - CSSVariableWriter: Priority-based transactions and variable groups
+ * - OptimizedCSSVariableManager: Device-aware performance optimization
  *
- * Adds visual-effects-driven CSS updates that respond to:
- * - Music and rhythm analysis
- * - Aesthetic harmony calculations
- * - Performance and device constraints
- * - User interaction patterns
+ * Provides:
+ * - Batched DOM updates for 60fps performance
+ * - Priority-based update queuing (critical/high/normal/low)
+ * - Device-aware optimization and thermal throttling
+ * - Integration with visual effects and music synchronization
  *
- * @architecture Phase 2.1 of visual system consolidation
+ * @architecture CSS variable writing layer
  * @performance Target: 60fps updates with <5ms CSS batch processing
  */
-export class UnifiedCSSVariableManager implements IManagedSystem {
+export class CSSVariableWriter implements IManagedSystem {
   public initialized: boolean = false;
 
   // Core dependencies
@@ -174,19 +177,19 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   protected performanceCoordinator: PerformanceAnalyzer;
   private eventBus: typeof unifiedEventBus;
 
-  // === BATCHING LAYER (from UnifiedCSSVariableManager) ===
+  // === BATCHING LAYER (from CSSVariableWriter) ===
   private cssVariableQueue: Map<string, PendingUpdate> = new Map();
   private batchUpdateTimer: number | null = null;
   private rafHandle: number | null = null;
   private microtaskScheduled: boolean = false;
 
-  // === MANAGEMENT LAYER (from UnifiedCSSVariableManager) ===
+  // === MANAGEMENT LAYER (from CSSVariableWriter) ===
   private pendingTransactions: Map<string, CSSVariableTransaction> = new Map();
   private transactionCounter = 0;
   private updateQueue: Map<string, PendingUpdate> = new Map();
   private flushTimer: NodeJS.Timeout | null = null;
 
-  // === PERFORMANCE LAYER (from UnifiedCSSVariableManager) ===
+  // === PERFORMANCE LAYER (from CSSVariableWriter) ===
   private currentDeviceCapabilities: DeviceCapabilities | null = null;
   private currentPerformanceMode: PerformanceMode | null = null;
   private lastCSSUpdate = 0;
@@ -294,7 +297,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
 
     if (this.config.enableDebug) {
       console.log(
-        "🌌 [UnifiedCSSVariableManager] Created with visual-effects-driven CSS management"
+        "🌌 [CSSVariableWriter] Created with visual-effects-driven CSS management"
       );
     }
   }
@@ -335,7 +338,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
 
     if (this.config.enableDebug) {
       console.log(
-        "🌌 [UnifiedCSSVariableManager] Initialized with device tier:",
+        "🌌 [CSSVariableWriter] Initialized with device tier:",
         this.currentDeviceCapabilities?.performanceTier
       );
     }
@@ -352,7 +355,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     const isHealthy = queueSize <= 1000 && pendingTransactions <= 100;
 
     return {
-      system: "UnifiedCSSVariableManager",
+      system: "CSSVariableWriter",
       healthy: isHealthy,
       ok: isHealthy,
       details: isHealthy
@@ -374,7 +377,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     this.flushCSSVariableBatch();
     if (this.config.enableDebug && reason) {
       console.log(
-        `🌌 [UnifiedCSSVariableManager] Force repaint: ${reason}`
+        `🌌 [CSSVariableWriter] Force repaint: ${reason}`
       );
     }
   }
@@ -487,7 +490,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
 
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [UnifiedCSSVariableManager] Transaction ${transactionId} queued with ${variableMap.size} variables`
+        `🌌 [CSSVariableWriter] Transaction ${transactionId} queued with ${variableMap.size} variables`
       );
     }
   }
@@ -552,7 +555,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
 
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [UnifiedCSSVariableManager] Consciousness state updated with ${
+        `🌌 [CSSVariableWriter] Consciousness state updated with ${
           Object.keys(variables).length
         } variables`
       );
@@ -593,7 +596,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
 
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [UnifiedCSSVariableManager] Performance optimizations applied for mode: ${performanceMode.name}`
+        `🌌 [CSSVariableWriter] Performance optimizations applied for mode: ${performanceMode.name}`
       );
     }
   }
@@ -663,8 +666,8 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
         } else {
           // Fast path for single/few properties
           for (const update of elementUpdates) {
-            if (UnifiedCSSVariableManager.nativeSetProperty) {
-              UnifiedCSSVariableManager.nativeSetProperty.call(
+            if (CSSVariableWriter.nativeSetProperty) {
+              CSSVariableWriter.nativeSetProperty.call(
                 element.style,
                 update.property,
                 update.value
@@ -682,20 +685,20 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
       // Log performance warnings if batch exceeds budget
       if (batchTime > FRAME_BUDGET && this.config.enableDebug) {
         console.warn(
-          `🌌 [UnifiedCSSVariableManager] CSS batch exceeded frame budget: ${batchTime.toFixed(
+          `🌌 [CSSVariableWriter] CSS batch exceeded frame budget: ${batchTime.toFixed(
             2
           )}ms (${updates.length} updates)`
         );
       } else if (this.config.enableDebug && Math.random() < 0.05) {
         console.log(
-          `🌌 [UnifiedCSSVariableManager] Efficient CSS batch: ${
+          `🌌 [CSSVariableWriter] Efficient CSS batch: ${
             updates.length
           } updates in ${batchTime.toFixed(2)}ms`
         );
       }
     } catch (error) {
       console.error(
-        "[UnifiedCSSVariableManager] Error in optimized CSS batch processing:",
+        "[CSSVariableWriter] Error in optimized CSS batch processing:",
         error
       );
 
@@ -762,8 +765,8 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   private applyUpdatesWithFallback(updates: PendingUpdate[]): void {
     for (const update of updates) {
       try {
-        if (UnifiedCSSVariableManager.nativeSetProperty) {
-          UnifiedCSSVariableManager.nativeSetProperty.call(
+        if (CSSVariableWriter.nativeSetProperty) {
+          CSSVariableWriter.nativeSetProperty.call(
             update.element.style,
             update.property,
             update.value
@@ -773,7 +776,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
         }
       } catch (e) {
         console.warn(
-          `[UnifiedCSSVariableManager] Failed to apply CSS property ${update.property}:`,
+          `[CSSVariableWriter] Failed to apply CSS property ${update.property}:`,
           e
         );
       }
@@ -1020,14 +1023,14 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
         this.performanceCoordinator.getCurrentPerformanceMode();
       this.applyPerformanceModeOptimizations();
       this.updateCSSPerformanceVariables();
-    }, 'UnifiedCSSVariableManager');
+    }, 'CSSVariableWriter');
 
     // Subscribe to performance frame events for thermal monitoring
     this.eventBus.subscribe("performance:frame", (payload: any) => {
       if (payload.temperature && payload.temperature > 80) {
         this.applyThermalOptimizations(payload.temperature);
       }
-    }, 'UnifiedCSSVariableManager');
+    }, 'CSSVariableWriter');
   }
 
   private applyInitialOptimizations(): void {
@@ -1043,7 +1046,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     } catch (error) {
       if (this.config.enableDebug) {
         console.warn(
-          "[UnifiedCSSVariableManager] Error applying initial optimizations:",
+          "[CSSVariableWriter] Error applying initial optimizations:",
           error
         );
       }
@@ -1109,7 +1112,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     } catch (error) {
       if (this.config.enableDebug) {
         console.warn(
-          "[UnifiedCSSVariableManager] Error updating CSS performance variables:",
+          "[CSSVariableWriter] Error updating CSS performance variables:",
           error
         );
       }
@@ -1211,7 +1214,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
       this.performanceMetrics.overBudgetBatches++;
       if (this.config.enableDebug) {
         console.warn(
-          `[UnifiedCSSVariableManager] CSS batch took ${batchTime.toFixed(
+          `[CSSVariableWriter] CSS batch took ${batchTime.toFixed(
             2
           )}ms for ${batchSize} updates`
         );
@@ -1220,11 +1223,11 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   }
 
   private enableGlobalHijack(): void {
-    if (UnifiedCSSVariableManager.hijackEnabled) return;
+    if (CSSVariableWriter.hijackEnabled) return;
 
     const original = CSSStyleDeclaration.prototype.setProperty;
     // Retain native setter for critical fast-path writes
-    UnifiedCSSVariableManager.nativeSetProperty = original;
+    CSSVariableWriter.nativeSetProperty = original;
 
     const controllerInstance = this;
     // @ts-ignore
@@ -1246,11 +1249,11 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
       }
     } as typeof CSSStyleDeclaration.prototype.setProperty;
 
-    UnifiedCSSVariableManager.hijackEnabled = true;
+    CSSVariableWriter.hijackEnabled = true;
 
     if (this.config.enableDebug) {
       console.log(
-        "🌌 [UnifiedCSSVariableManager] Global setProperty hijack enabled (--sn- and --sn. namespaces)"
+        "🌌 [CSSVariableWriter] Global setProperty hijack enabled (--sn- and --sn. namespaces)"
       );
     }
   }
@@ -1326,7 +1329,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   // ===================================================================
 
   /**
-   * Update music system variables (from UnifiedCSSVariableManager)
+   * Update music system variables (from CSSVariableWriter)
    */
   public updateMusicVariables(variables: {
     "beat.pulse.intensity"?: number;
@@ -1356,7 +1359,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   }
 
   /**
-   * Update color system variables (from UnifiedCSSVariableManager)
+   * Update color system variables (from CSSVariableWriter)
    */
   public updateColorVariables(variables: {
     "accent.hex"?: string;
@@ -1383,7 +1386,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   }
 
   /**
-   * Update animation system variables (from UnifiedCSSVariableManager)
+   * Update animation system variables (from CSSVariableWriter)
    */
   public updateAnimationVariables(variables: {
     "duration.fast"?: string;
@@ -1409,7 +1412,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   }
 
   /**
-   * Update performance system variables (from UnifiedCSSVariableManager)
+   * Update performance system variables (from CSSVariableWriter)
    */
   public updatePerformanceVariables(variables: {
     mode?: string;
@@ -1446,7 +1449,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   }
 
   /**
-   * Update utility system variables (from UnifiedCSSVariableManager)
+   * Update utility system variables (from CSSVariableWriter)
    */
   public updateUtilityVariables(variables: {
     "debug.enabled"?: boolean;
@@ -1476,7 +1479,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   }
 
   /**
-   * Queue a CSS variable update (from UnifiedCSSVariableManager compatibility)
+   * Queue a CSS variable update (from CSSVariableWriter compatibility)
    */
   public queueUpdate(
     property: string,
@@ -1488,7 +1491,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   }
 
   /**
-   * Queue multiple CSS variable updates in a transaction (from UnifiedCSSVariableManager)
+   * Queue multiple CSS variable updates in a transaction (from CSSVariableWriter)
    */
   public queueTransaction(
     variables: Record<string, string>,
@@ -1517,7 +1520,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
 
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [UnifiedCSSVariableManager] Transaction ${transactionId} queued with ${variableMap.size} variables`
+        `🌌 [CSSVariableWriter] Transaction ${transactionId} queued with ${variableMap.size} variables`
       );
     }
 
@@ -1525,14 +1528,14 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   }
 
   /**
-   * Force immediate flush (from UnifiedCSSVariableManager)
+   * Force immediate flush (from CSSVariableWriter)
    */
   public forceFlush(): void {
     this.flushCSSVariableBatch();
   }
 
   /**
-   * Register a variable group (from UnifiedCSSVariableManager compatibility)
+   * Register a variable group (from CSSVariableWriter compatibility)
    */
   public registerVariableGroup(
     name: string,
@@ -1540,23 +1543,23 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     batchSize: number = 50,
     flushInterval: number = 16
   ): void {
-    // This was part of the old UnifiedCSSVariableManager - now handled internally
+    // This was part of the old CSSVariableWriter - now handled internally
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [UnifiedCSSVariableManager] Variable group registration: ${name} (handled internally)`
+        `🌌 [CSSVariableWriter] Variable group registration: ${name} (handled internally)`
       );
     }
   }
 
   /**
-   * Update variables in a specific group (from UnifiedCSSVariableManager compatibility)
+   * Update variables in a specific group (from CSSVariableWriter compatibility)
    */
   public updateVariableGroup(
     groupName: string,
     variables: Record<string, string>,
     source: string = "unknown"
   ): void {
-    // This was part of the old UnifiedCSSVariableManager - now handled via updateVariables
+    // This was part of the old CSSVariableWriter - now handled via updateVariables
     this.updateVariables(variables, "normal", `group:${groupName}:${source}`);
   }
 
@@ -1568,7 +1571,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
 
     if (this.config.enableDebug) {
       console.log(
-        "🌌 [UnifiedCSSVariableManager] Configuration updated:",
+        "🌌 [CSSVariableWriter] Configuration updated:",
         newConfig
       );
     }
@@ -1578,7 +1581,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   // LEGACY COMPATIBILITY METHODS
   // ===================================================================
 
-  // For backwards compatibility with UnifiedCSSVariableManager API
+  // For backwards compatibility with CSSVariableWriter API
   public flushNow(): void {
     this.flushCSSVariableBatch();
   }
@@ -1587,7 +1590,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     // Implementation would control batching behavior
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [UnifiedCSSVariableManager] Batching ${
+        `🌌 [CSSVariableWriter] Batching ${
           enabled ? "enabled" : "disabled"
         }`
       );
@@ -1598,7 +1601,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     CRITICAL_NOW_PLAYING_VARS.add(variable);
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [UnifiedCSSVariableManager] Added critical variable: ${variable}`
+        `🌌 [CSSVariableWriter] Added critical variable: ${variable}`
       );
     }
   }
@@ -1607,7 +1610,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     CRITICAL_NOW_PLAYING_VARS.delete(variable);
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [UnifiedCSSVariableManager] Removed critical variable: ${variable}`
+        `🌌 [CSSVariableWriter] Removed critical variable: ${variable}`
       );
     }
   }
@@ -1658,7 +1661,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
 
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [UnifiedCSSVariableManager] Consciousness intensity updated by ${sourceStrategy}: ${clampedIntensity}`
+        `🌌 [CSSVariableWriter] Consciousness intensity updated by ${sourceStrategy}: ${clampedIntensity}`
       );
     }
   }
@@ -1699,7 +1702,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
 
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [UnifiedCSSVariableManager] Crossfade opacity updated by ${sourceStrategy}: ${finalOpacity} (WebGL: ${webglEnabled})`
+        `🌌 [CSSVariableWriter] Crossfade opacity updated by ${sourceStrategy}: ${finalOpacity} (WebGL: ${webglEnabled})`
       );
     }
   }
@@ -1718,7 +1721,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   ): () => void {
     if (!this.eventBus) {
       console.warn(
-        "[UnifiedCSSVariableManager] No UnifiedEventBus available for visual-effects subscriptions"
+        "[CSSVariableWriter] No UnifiedEventBus available for visual-effects subscriptions"
       );
       return () => {};
     }
@@ -1726,7 +1729,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     const subscriptionId = this.eventBus.subscribe(
       "visual-effects:intensity-changed",
       callback,
-      "UnifiedCSSVariableManager"
+      "CSSVariableWriter"
     );
     return () => this.eventBus?.unsubscribe(subscriptionId);
   }
@@ -1744,7 +1747,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
   ): () => void {
     if (!this.eventBus) {
       console.warn(
-        "[UnifiedCSSVariableManager] No UnifiedEventBus available for crossfade subscriptions"
+        "[CSSVariableWriter] No UnifiedEventBus available for crossfade subscriptions"
       );
       return () => {};
     }
@@ -1752,7 +1755,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     const subscriptionId = this.eventBus.subscribe(
       "gradient:crossfade-changed",
       callback,
-      "UnifiedCSSVariableManager"
+      "CSSVariableWriter"
     );
     return () => this.eventBus?.unsubscribe(subscriptionId);
   }
@@ -1845,7 +1848,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     }
     
     if (this.config.enableDebug) {
-      console.log('[UnifiedCSSVariableManager] Optimized features initialized');
+      console.log('[CSSVariableWriter] Optimized features initialized');
     }
   }
 
@@ -1857,7 +1860,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     // No additional initialization needed - existing systems provide this functionality
     
     if (this.config.enableDebug) {
-      console.log('[UnifiedCSSVariableManager] Frame context integration initialized');
+      console.log('[CSSVariableWriter] Frame context integration initialized');
     }
   }
 
@@ -1894,10 +1897,10 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
       (element as HTMLElement).style.setProperty(property, value);
       
       if (this.config.enableDebug) {
-        console.log(`[UnifiedCSSVariableManager] Critical update applied: ${property} = ${value}`);
+        console.log(`[CSSVariableWriter] Critical update applied: ${property} = ${value}`);
       }
     } catch (error) {
-      console.warn('[UnifiedCSSVariableManager] Critical update failed:', error);
+      console.warn('[CSSVariableWriter] Critical update failed:', error);
     }
   }
 
@@ -1934,7 +1937,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     // Most cleanup is handled by existing destroy logic
     
     if (this.config.enableDebug) {
-      console.log('[UnifiedCSSVariableManager] Frame context integration destroyed');
+      console.log('[CSSVariableWriter] Frame context integration destroyed');
     }
   }
 
@@ -1964,7 +1967,7 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     this.cssVariableQueue.clear();
 
     // Unsubscribe from events
-    unifiedEventBus.unsubscribeAll("UnifiedCSSVariableManager");
+    unifiedEventBus.unsubscribeAll("CSSVariableWriter");
 
     this.initialized = false;
   }
@@ -1975,48 +1978,48 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
 // ===================================================================
 
 /**
- * Global UnifiedCSSVariableManager instance
+ * Global CSSVariableWriter instance
  * Set by SystemCoordinator during initialization
  */
-let globalUnifiedCSSManager: UnifiedCSSVariableManager | null = null;
+let globalCSSVariableWriter: CSSVariableWriter | null = null;
 
 /**
- * Set the global UnifiedCSSVariableManager instance
+ * Set the global CSSVariableWriter instance
  * Called by SystemCoordinator during initialization
  *
- * @param instance - The UnifiedCSSVariableManager instance to set as global
+ * @param instance - The CSSVariableWriter instance to set as global
  */
-export function setGlobalUnifiedCSSManager(instance: UnifiedCSSVariableManager): void {
-  if (globalUnifiedCSSManager && globalUnifiedCSSManager !== instance) {
+export function setGlobalCSSVariableWriter(instance: CSSVariableWriter): void {
+  if (globalCSSVariableWriter && globalCSSVariableWriter !== instance) {
     console.warn(
-      '[UnifiedCSSVariableManager] Replacing existing global instance. ' +
+      '[CSSVariableWriter] Replacing existing global instance. ' +
       'This may indicate multiple SystemCoordinator initializations.'
     );
   }
-  globalUnifiedCSSManager = instance;
+  globalCSSVariableWriter = instance;
 }
 
 /**
- * Get the global UnifiedCSSVariableManager instance
+ * Get the global CSSVariableWriter instance
  *
- * @returns The global UnifiedCSSVariableManager instance
+ * @returns The global CSSVariableWriter instance
  * @throws Error if instance not set by SystemCoordinator
  */
-export function getGlobalUnifiedCSSManager(): UnifiedCSSVariableManager {
-  if (!globalUnifiedCSSManager) {
+export function getGlobalCSSVariableWriter(): CSSVariableWriter {
+  if (!globalCSSVariableWriter) {
     throw new Error(
-      '[UnifiedCSSVariableManager] Global instance not initialized. ' +
-      'SystemCoordinator must call setGlobalUnifiedCSSManager() during initialization.'
+      '[CSSVariableWriter] Global instance not initialized. ' +
+      'SystemCoordinator must call setGlobalCSSVariableWriter() during initialization.'
     );
   }
-  return globalUnifiedCSSManager;
+  return globalCSSVariableWriter;
 }
 
 /**
- * Get the global UnifiedCSSVariableManager instance safely
+ * Get the global CSSVariableWriter instance safely
  *
  * @returns Instance or null if not initialized
  */
-export function getGlobalUnifiedCSSManagerSafe(): UnifiedCSSVariableManager | null {
-  return globalUnifiedCSSManager;
+export function getGlobalCSSVariableWriterSafe(): CSSVariableWriter | null {
+  return globalCSSVariableWriter;
 }

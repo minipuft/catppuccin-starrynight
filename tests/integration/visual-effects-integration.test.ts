@@ -6,8 +6,8 @@
  */
 
 import { MusicBeatSynchronizer } from '@/visual/music/MusicSyncVisualEffects';
-// Using stub implementations from colorStubs
-import type { BreathingRhythmEngine, SymbioticListeningCore } from '@/types/colorStubs';
+// Using stub implementations from colorTypes
+import type { BreathingRhythmEngine, SymbioticListeningCore } from '@/types/colorTypes';
 import { AdvancedThemeSystem } from '@/core/lifecycle/AdvancedThemeSystem';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import * as Utils from '@/utils/core/ThemeUtilities';

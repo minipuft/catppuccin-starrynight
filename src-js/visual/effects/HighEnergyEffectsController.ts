@@ -17,9 +17,9 @@
  */
 
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import type { BeatData, RGB } from "@/types/colorStubs";
+import type { BeatData, RGB } from "@/types/colorTypes";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import { EmotionalTemperatureMapper } from "@/utils/color/EmotionalTemperatureMapper";
 import {
@@ -98,7 +98,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
   /** @deprecated Use layeredSystem instead */
   private holographicSystem: HolographicUISystem;
   // Using shared CSS variable manager for color coordination
-  private cssController: UnifiedCSSVariableManager;
+  private cssController: CSSVariableWriter;
   private musicSyncService: MusicSyncService;
 
   // OKLAB integration for perceptually uniform cinematic colors
@@ -153,7 +153,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
 
   constructor(
     layeredSystem: HolographicUISystem,
-    cssVisualEffectsController: UnifiedCSSVariableManager,
+    cssVisualEffectsController: CSSVariableWriter,
     musicSyncService: MusicSyncService
   ) {
     this.layeredSystem = layeredSystem;

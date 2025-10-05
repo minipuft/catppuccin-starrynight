@@ -8,7 +8,7 @@
 
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { unifiedEventBus, type EventData } from "@/core/events/UnifiedEventBus";
 import { SimplePerformanceCoordinator, type QualityLevel, type QualityScalingCapable, type PerformanceMetrics, type QualityCapability } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -1467,7 +1467,7 @@ export class FluidGradientBackgroundSystem
     // Apply visualEffects-aware CSS variables for hybrid coordination
     // Use existing visualEffects variables instead of creating liquid-specific ones
     try {
-      const cssController = getGlobalUnifiedCSSManager();
+      const cssController = getGlobalCSSVariableWriter();
       cssController.queueCSSVariableUpdate(
         "--sn-visualEffects-flow-direction",
         consciousLiquidPhase.toString()

@@ -50,7 +50,7 @@ import * as Utils from "@/utils/core/ThemeUtilities";
 
 // Performance System imports
 import { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
-import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { TimerConsolidationSystem } from "@/core/performance/TimerConsolidationSystem";
 // PerformanceAwareLerpCoordinator consolidated into EnhancedMasterAnimationCoordinator
 
@@ -64,10 +64,10 @@ import { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { PerformanceAnalyzer } from "@/core/performance/UnifiedPerformanceCoordinator";
 import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
-// CSS systems consolidated into UnifiedCSSVariableManager:
-// - UnifiedCSSVariableManager (batching layer)
-// - UnifiedCSSVariableManager (management layer)
-// - UnifiedCSSVariableManager (performance layer)
+// CSS systems consolidated into CSSVariableWriter:
+// - CSSVariableWriter (batching layer)
+// - CSSVariableWriter (management layer)
+// - CSSVariableWriter (performance layer)
 
 // Core Services imports
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
@@ -91,8 +91,8 @@ import { GenreUIBridge } from "@/visual/ui/GenreUIBridge";
 // Integration Systems imports
 import { SidebarSystemsIntegration } from "@/core/integration/SidebarSystemsIntegration";
 
-// Strategy-based creation imports
-import { globalFacadeAdapter } from "@/core/integration/FacadeAdapter";
+// System creation types
+import type { SystemCreationContext, SharedDependencies } from "@/types/systemCreation";
 
 // Interface imports
 // import { IManagedSystem } from "@/types/systems"; // Unused for now
@@ -102,8 +102,8 @@ export type NonVisualSystemKey =
   // Performance Systems
   | "EnhancedMasterAnimationCoordinator"
   | "TimerConsolidationSystem"
-  | "UnifiedCSSVariableManager"
-  | "OptimizedCSSVariableManager" // Alias for UnifiedCSSVariableManager (Phase 6.1 backward compatibility)
+  | "CSSVariableWriter"
+  | "OptimizedCSSVariableManager" // Alias for CSSVariableWriter (Phase 6.1 backward compatibility)
   // PerformanceAwareLerpCoordinator consolidated into EnhancedMasterAnimationCoordinator
   
   // New simplified performance systems (replacing complex monitoring)
@@ -207,7 +207,7 @@ export class NonVisualSystemFacade {
   private year3000System: any; // Reference to main system
 
   // Core shared dependencies (will be injected from main system)
-  private cssVariableManager: UnifiedCSSVariableManager | null =
+  private cssVariableManager: CSSVariableWriter | null =
     null;
   private musicSyncService: MusicSyncService | null = null;
   // NOTE: settingsManager field removed - using TypedSettingsManager singleton
@@ -250,9 +250,6 @@ export class NonVisualSystemFacade {
   private onHealthChange:
     | ((health: NonVisualSystemHealthCheck) => void)
     | null = null;
-
-  // Strategy-based creation adapter
-  private facadeAdapter = globalFacadeAdapter;
 
   constructor(
     config: AdvancedSystemConfig | Year3000Config,
@@ -339,17 +336,17 @@ export class NonVisualSystemFacade {
     ]);
 
     this.systemRegistry.set(
-      "UnifiedCSSVariableManager",
-      UnifiedCSSVariableManager
+      "CSSVariableWriter",
+      CSSVariableWriter
     );
-    this.systemDependencies.set("UnifiedCSSVariableManager", [
+    this.systemDependencies.set("CSSVariableWriter", [
       "performanceCoordinator",
     ]);
 
     // Alias registration for backwards compatibility (Phase 6.1)
     this.systemRegistry.set(
       "OptimizedCSSVariableManager",
-      UnifiedCSSVariableManager
+      CSSVariableWriter
     );
     this.systemDependencies.set("OptimizedCSSVariableManager", [
       "performanceCoordinator",
@@ -371,8 +368,8 @@ export class NonVisualSystemFacade {
     this.systemRegistry.set("PerformanceAnalyzer", SimplePerformanceCoordinator);
     this.systemDependencies.set("PerformanceAnalyzer", []);
 
-    // CSSVariableBatcher - alias for UnifiedCSSVariableManager (backward compatibility)
-    this.systemRegistry.set("CSSVariableBatcher", UnifiedCSSVariableManager);
+    // CSSVariableBatcher - alias for CSSVariableWriter (backward compatibility)
+    this.systemRegistry.set("CSSVariableBatcher", CSSVariableWriter);
     this.systemDependencies.set("CSSVariableBatcher", []);
 
     // SystemHealthMonitor - alias for SimplePerformanceCoordinator (backward compatibility)
@@ -426,10 +423,10 @@ export class NonVisualSystemFacade {
       "deviceCapabilityDetector", // WebGLSystemsIntegration needs DeviceCapabilityDetector, not EnhancedDeviceTierDetector
     ]);
 
-    // CSS systems consolidated into UnifiedCSSVariableManager:
-    // - UnifiedCSSVariableManager → batching layer
-    // - UnifiedCSSVariableManager → management layer
-    // - UnifiedCSSVariableManager → performance layer
+    // CSS systems consolidated into CSSVariableWriter:
+    // - CSSVariableWriter → batching layer
+    // - CSSVariableWriter → management layer
+    // - CSSVariableWriter → performance layer
 
     // Core Services
     // Note: UnifiedDebugManager is a singleton handled as special case in createNonVisualSystem
@@ -649,78 +646,24 @@ export class NonVisualSystemFacade {
   }
 
   /**
-   * Get system from cache (synchronous) - returns null if not cached
-   * Use this for scenarios where the system should already be initialized
+   * Phase 3.2: getCachedSystem() removed - use getSystem({ cacheOnly: true }) instead
    */
-  public getCachedSystem<T = any>(key: NonVisualSystemKey): T | null {
-    // Check cache first
-    const cached = this.systemCache.get(key);
-    if (cached) {
-      return cached as T;
-    }
-
-    // Check for shared instances (injected from SystemCoordinator)
-    
-    // Core dependency systems
-    if (key === "DeviceCapabilityDetector" && this.year3000System?.deviceCapabilityDetector) {
-      const deviceCapabilityDetector = this.year3000System.deviceCapabilityDetector;
-      this.systemCache.set(key, deviceCapabilityDetector);
-      return deviceCapabilityDetector as T;
-    }
-
-    if (key === "EnhancedDeviceTierDetector" && this.enhancedDeviceTierDetector) {
-      this.systemCache.set(key, this.enhancedDeviceTierDetector);
-      return this.enhancedDeviceTierDetector as T;
-    }
-    
-    // New simplified performance systems
-    if (key === "WebGLSystemsIntegration" && this.webglSystemsIntegration) {
-      this.systemCache.set(key, this.webglSystemsIntegration);
-      return this.webglSystemsIntegration as T;
-    }
-
-    if (key === "SimplePerformanceCoordinator" && this.simplePerformanceCoordinator) {
-      this.systemCache.set(key, this.simplePerformanceCoordinator);
-      return this.simplePerformanceCoordinator as T;
-    }
-
-    // Legacy performance systems (for backward compatibility)
-    if (key === "PerformanceAnalyzer" && this.performanceAnalyzer) {
-      this.systemCache.set(key, this.performanceAnalyzer);
-      return this.performanceAnalyzer as T;
-    }
-
-    if (key === "SimplePerformanceCoordinator" && this.performanceOrchestrator) {
-      this.systemCache.set(key, this.performanceOrchestrator);
-      return this.performanceOrchestrator as T;
-    }
-
-    // Shared systems
-    if ((key === "OptimizedCSSVariableManager" || key === "UnifiedCSSVariableManager") && this.cssVariableManager) {
-      this.systemCache.set(key, this.cssVariableManager);
-      return this.cssVariableManager as T;
-    }
-
-    if (key === "MusicSyncService" && this.musicSyncService) {
-      this.systemCache.set(key, this.musicSyncService);
-      return this.musicSyncService as T;
-    }
-
-    // NOTE: SettingsManager cache check removed - using TypedSettingsManager singleton
-
-    if (key === "LoadingStateService" && this.loadingStateService) {
-      this.systemCache.set(key, this.loadingStateService);
-      return this.loadingStateService as T;
-    }
-
-    return null;
-  }
 
   /**
    * Factory method to create and return non-visual systems
    * This is the main interface for the facade pattern
+   *
+   * Phase 3.2: Consolidated cache checking logic
+   * @param key - The system key to retrieve
+   * @param options - Optional configuration
+   * @param options.cacheOnly - If true, only return cached/shared instances (don't create new)
    */
-  public async getSystem<T = any>(key: NonVisualSystemKey): Promise<T> {
+  public async getSystem<T = any>(
+    key: NonVisualSystemKey,
+    options?: { cacheOnly?: boolean }
+  ): Promise<T | null> {
+    const cacheOnly = options?.cacheOnly ?? false;
+
     // Check cache first
     if (this.systemCache.has(key)) {
       return this.systemCache.get(key) as T;
@@ -777,11 +720,11 @@ export class NonVisualSystemFacade {
       return this.performanceAnalyzer as T;
     }
 
-    if ((key === "OptimizedCSSVariableManager" || key === "UnifiedCSSVariableManager") && this.cssVariableManager) {
+    if ((key === "OptimizedCSSVariableManager" || key === "CSSVariableWriter") && this.cssVariableManager) {
       this.systemCache.set(key, this.cssVariableManager);
       Y3KDebug?.debug?.log(
         "NonVisualSystemFacade",
-        `Using shared UnifiedCSSVariableManager instance from SystemCoordinator (requested as ${key})`
+        `Using shared CSSVariableWriter instance from SystemCoordinator (requested as ${key})`
       );
       return this.cssVariableManager as T;
     }
@@ -813,6 +756,11 @@ export class NonVisualSystemFacade {
         "Using shared LoadingStateService instance"
       );
       return this.loadingStateService as T;
+    }
+
+    // Phase 3.2: If cacheOnly mode, return null instead of creating
+    if (cacheOnly) {
+      return null;
     }
 
     // Create new system instance using strategy-based creation
@@ -879,82 +827,14 @@ export class NonVisualSystemFacade {
         throw new Error(`Non-visual system '${key}' not found in registry`);
       }
 
-      // Prepare context for strategy-based creation
-      const context = {
-        systemKey: key,
-        config: this.config,
-        utils: this.utils,
-        dependencies: {
-          config: this.config,
-          utils: this.utils,
-          performanceAnalyzer: this.performanceAnalyzer,
-          // NOTE: settingsManager removed - using TypedSettingsManager singleton
-          musicSyncService: this.musicSyncService,
-          year3000System: this.year3000System,
-          cssVariableManager: this.cssVariableManager,
-          performanceCoordinator: this.performanceCoordinator,
-          performanceOrchestrator: this.performanceOrchestrator,
-          // New simplified performance system dependencies
-          enhancedDeviceTierDetector: this.enhancedDeviceTierDetector,
-          webglSystemsIntegration: this.webglSystemsIntegration,
-          simplePerformanceCoordinator: this.simplePerformanceCoordinator,
-          // Need DeviceCapabilityDetector from SystemCoordinator for WebGL integration
-          deviceCapabilityDetector: this.year3000System?.deviceCapabilityDetector || null,
-        },
-        preferences: {
-          lazyInit: false,
-          validateDependencies: true,
-          creationTimeout: 5000,
-          monitorCreation: true,
-        },
-        metadata: {
-          timestamp: Date.now(),
-          reason: "startup",
-          priority: "medium",
-          resourceConstraints: {
-            maxMemoryMB: 50,
-            maxInitTimeMs: 1000,
-          },
-        },
-        year3000System: this.year3000System,
-      };
+      // Build shared dependencies for system construction
+      const dependencies = this.buildSharedDependencies();
 
-      // Create system using strategy-based factory
-      const result = await this.facadeAdapter.createSystemWithStrategy(
-        key,
-        SystemClass,
-        context
-      );
+      // Create system directly using known constructor patterns
+      // Phase 2: Simplified direct construction (replaces FacadeAdapter)
+      const system = this.createSystemDirectly<T>(key, SystemClass, dependencies);
 
-      if (!result.success) {
-        // Fallback to legacy creation if strategy fails
-        Y3KDebug?.debug?.warn(
-          "NonVisualSystemFacade",
-          `Strategy creation failed for ${key}, falling back to legacy pattern`
-        );
-
-        const system = this.facadeAdapter.createSystemLegacy(
-          key,
-          SystemClass,
-          context
-        );
-
-        // Inject additional dependencies
-        this.injectDependencies(system, key);
-
-        // Integrate performance monitoring
-        this.integratePerformanceMonitoring(system, key);
-
-        const endTime = performance.now();
-        this.currentMetrics.dependencyResolutionTime += endTime - startTime;
-
-        return system;
-      }
-
-      // Strategy creation succeeded
-      const system = result.system;
-
-      // Inject additional dependencies (for compatibility)
+      // Inject additional dependencies (for systems using setter-based injection)
       this.injectDependencies(system, key);
 
       // Integrate performance monitoring
@@ -965,11 +845,9 @@ export class NonVisualSystemFacade {
 
       Y3KDebug?.debug?.log(
         "NonVisualSystemFacade",
-        `Created ${key} using strategy: ${result.strategy}`,
+        `Created ${key} via direct construction`,
         {
-          creationTime: result.creationTime,
           totalTime: endTime - startTime,
-          injectedDependencies: result.injectedDependencies,
         }
       );
 
@@ -989,6 +867,211 @@ export class NonVisualSystemFacade {
         error
       );
       throw error;
+    }
+  }
+
+  /**
+   * Build shared dependencies object for system construction
+   *
+   * Phase 2: Simplified dependency building (replaces FacadeAdapter)
+   * Phase 3.1: Query SystemCoordinator as single source of truth
+   */
+  private buildSharedDependencies(): SharedDependencies {
+    const deps: SharedDependencies = {
+      year3000System: this.year3000System,
+    };
+
+    // Check if year3000System supports getSharedDependency (Phase 3.1 pattern)
+    if (this.year3000System && typeof this.year3000System.getSharedDependency === 'function') {
+      // Use SystemCoordinator as single source of truth
+      const coordinator = this.year3000System;
+
+      // Performance systems (with all aliases)
+      const perfCoord = coordinator.getSharedDependency('performanceCoordinator');
+      if (perfCoord) {
+        deps.performanceCoordinator = perfCoord;
+        deps.performanceAnalyzer = perfCoord;
+        deps.simplePerformanceCoordinator = perfCoord;
+        deps.performanceOrchestrator = perfCoord;
+      }
+
+      // CSS management (with all aliases)
+      const cssManager = coordinator.getSharedDependency('cssVariableManager');
+      if (cssManager) {
+        deps.cssVariableManager = cssManager;
+        deps.cssVariableController = cssManager;
+        deps.cssConsciousnessController = cssManager;
+      }
+
+      // Device detection
+      const deviceDetector = coordinator.getSharedDependency('deviceCapabilityDetector');
+      if (deviceDetector) deps.deviceCapabilityDetector = deviceDetector;
+
+      const enhancedDetector = coordinator.getSharedDependency('enhancedDeviceTierDetector');
+      if (enhancedDetector) deps.enhancedDeviceTierDetector = enhancedDetector;
+
+      // WebGL integration
+      const webgl = coordinator.getSharedDependency('webglSystemsIntegration');
+      if (webgl) deps.webglSystemsIntegration = webgl;
+
+      // Audio/Visual services
+      const musicSync = coordinator.getSharedDependency('musicSyncService');
+      if (musicSync) deps.musicSyncService = musicSync;
+
+    } else {
+      // Fallback: Use instance fields (legacy pattern for backward compatibility)
+      if (this.performanceCoordinator) deps.performanceCoordinator = this.performanceCoordinator;
+      if (this.performanceAnalyzer) deps.performanceAnalyzer = this.performanceAnalyzer;
+      if (this.simplePerformanceCoordinator) deps.simplePerformanceCoordinator = this.simplePerformanceCoordinator;
+      if (this.performanceOrchestrator) deps.performanceOrchestrator = this.performanceOrchestrator;
+
+      if (this.year3000System?.deviceCapabilityDetector) deps.deviceCapabilityDetector = this.year3000System.deviceCapabilityDetector;
+      if (this.enhancedDeviceTierDetector) deps.enhancedDeviceTierDetector = this.enhancedDeviceTierDetector;
+
+      if (this.webglSystemsIntegration) deps.webglSystemsIntegration = this.webglSystemsIntegration;
+
+      if (this.cssVariableManager) {
+        deps.cssVariableManager = this.cssVariableManager;
+        deps.cssVariableController = this.cssVariableManager;
+        deps.cssConsciousnessController = this.cssVariableManager;
+      }
+
+      if (this.musicSyncService) deps.musicSyncService = this.musicSyncService;
+    }
+
+    return deps;
+  }
+
+  /**
+   * Create system directly using hardcoded constructor patterns
+   *
+   * Phase 2: Direct system construction (replaces FacadeAdapter.createSystemLegacy)
+   *
+   * This method contains the hardcoded constructor knowledge for each system type.
+   * Future Phase 2.1 can migrate systems to self-constructing pattern using SystemCreationContext.
+   */
+  private createSystemDirectly<T = any>(
+    key: NonVisualSystemKey,
+    SystemClass: new (...args: any[]) => T,
+    dependencies: SharedDependencies
+  ): T {
+    // Direct construction based on known constructor patterns
+    switch (key) {
+      // Simple systems with no dependencies
+      case "DeviceCapabilityDetector":
+      case "PerformanceAnalyzer":
+      case "TimerConsolidationSystem":
+        return new SystemClass() as T;
+
+      // Systems with single dependency
+      case "SidebarSystemsIntegration":
+        return new SystemClass(
+          dependencies.cssConsciousnessController || dependencies.cssVariableManager
+        ) as T;
+
+      // CSS Variable Writer with performance coordinator dependency
+      case "CSSVariableWriter":
+      case "OptimizedCSSVariableManager":
+        return new SystemClass(
+          this.config,
+          dependencies.performanceCoordinator || dependencies.performanceAnalyzer
+        ) as T;
+
+      // Color Harmony Engine
+      case "ColorHarmonyEngine":
+        return new SystemClass(
+          this.config,
+          this.utils,
+          dependencies.performanceAnalyzer || dependencies.performanceCoordinator,
+          undefined // settingsManager removed - using TypedSettingsManager singleton
+        ) as T;
+
+      // Enhanced Master Animation Coordinator
+      case "EnhancedMasterAnimationCoordinator":
+        return new SystemClass(
+          this.config,
+          dependencies.performanceCoordinator || dependencies.performanceAnalyzer
+        ) as T;
+
+      // Unified Performance Coordinator (legacy)
+      case "UnifiedPerformanceCoordinator":
+        return new SystemClass(
+          this.config,
+          dependencies.performanceAnalyzer || dependencies.performanceCoordinator
+        ) as T;
+
+      // Glassmorphism Manager
+      case "GlassmorphismManager":
+        return new SystemClass(
+          this.config,
+          this.utils,
+          dependencies.cssConsciousnessController || dependencies.cssVariableManager,
+          dependencies.performanceAnalyzer || dependencies.performanceCoordinator,
+          undefined // settingsManager removed - using TypedSettingsManager singleton
+        ) as T;
+
+      // Card 3D Manager
+      case "Card3DManager":
+        return new SystemClass(
+          dependencies.performanceAnalyzer || dependencies.performanceCoordinator,
+          undefined, // settingsManager removed - using TypedSettingsManager singleton
+          this.utils
+        ) as T;
+
+      // Music Sync Service (uses object dependencies pattern)
+      case "MusicSyncService":
+        return new SystemClass({
+          ADVANCED_SYSTEM_CONFIG: this.config,
+          ThemeUtilities: this.utils,
+          settingsManager: undefined, // removed - using TypedSettingsManager singleton
+          year3000System: this.year3000System,
+        }) as T;
+
+      // Enhanced Device Tier Detector (static class)
+      case "EnhancedDeviceTierDetector":
+        return SystemClass as any as T;
+
+      // WebGL Systems Integration
+      case "WebGLSystemsIntegration":
+        if (!dependencies.deviceCapabilityDetector) {
+          throw new Error("WebGLSystemsIntegration requires DeviceCapabilityDetector");
+        }
+        return new SystemClass(dependencies.deviceCapabilityDetector) as T;
+
+      // Simple Performance Coordinator
+      case "SimplePerformanceCoordinator":
+        if (!dependencies.enhancedDeviceTierDetector || !dependencies.webglSystemsIntegration) {
+          throw new Error("SimplePerformanceCoordinator requires EnhancedDeviceTierDetector and WebGLSystemsIntegration");
+        }
+        return new SystemClass(
+          dependencies.enhancedDeviceTierDetector,
+          dependencies.webglSystemsIntegration
+        ) as T;
+
+      // Simple Tier Based Performance System
+      case "SimpleTierBasedPerformanceSystem":
+        if (!dependencies.enhancedDeviceTierDetector) {
+          throw new Error("SimpleTierBasedPerformanceSystem requires EnhancedDeviceTierDetector");
+        }
+        return new SystemClass(dependencies.enhancedDeviceTierDetector) as T;
+
+      // Default: try no-args constructor, then fall back to common pattern
+      default:
+        try {
+          return new SystemClass() as T;
+        } catch (error) {
+          // Fallback to common dependency pattern
+          Y3KDebug?.debug?.warn(
+            "NonVisualSystemFacade",
+            `Using fallback constructor pattern for ${key}`
+          );
+          return new SystemClass(
+            this.config,
+            this.utils,
+            dependencies.performanceAnalyzer || dependencies.performanceCoordinator,
+            undefined // settingsManager removed - using TypedSettingsManager singleton
+          ) as T;
+        }
     }
   }
 

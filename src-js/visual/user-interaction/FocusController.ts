@@ -1,7 +1,7 @@
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 
 interface FocusState {
   isFocusVisible: boolean;
@@ -20,7 +20,7 @@ interface FocusManagerConfig {
 /**
  * FocusController subsystem for reliable --focus-visible CSS variable emission.
  * Tracks keyboard focus and pointer hover states with throttled writes for performance.
- * Integrates with Year3000System's UnifiedCSSVariableManager for optimal batching.
+ * Integrates with Year3000System's CSSVariableWriter for optimal batching.
  */
 export class FocusController implements IManagedSystem {
   public initialized: boolean = false;
@@ -30,7 +30,7 @@ export class FocusController implements IManagedSystem {
   private utils: typeof ThemeUtilities;
   private focusState: FocusState;
   private year3000System: any | null = null;
-  private cssController!: UnifiedCSSVariableManager;
+  private cssController!: CSSVariableWriter;
 
   // Event handlers (stored for cleanup)
   private boundFocusInHandler: ((event: FocusEvent) => void) | null = null;
@@ -76,7 +76,7 @@ export class FocusController implements IManagedSystem {
     try {
       // Initialize CSS coordination - use globalThis to access Year3000System
       const year3000System = (globalThis as any).year3000System;
-      this.cssController = year3000System?.cssController || this.year3000System?.cssController || getGlobalUnifiedCSSManager();
+      this.cssController = year3000System?.cssController || this.year3000System?.cssController || getGlobalCSSVariableWriter();
 
       this.setupEventListeners();
       this.initialized = true;

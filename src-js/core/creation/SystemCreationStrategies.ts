@@ -467,9 +467,9 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
       },
     });
 
-    // UnifiedCSSVariableManager - requires config and performanceCoordinator
+    // CSSVariableWriter - requires config and performanceCoordinator
     this.registerSystemConfig({
-      systemKey: "UnifiedCSSVariableManager",
+      systemKey: "CSSVariableWriter",
       requiredDependencies: ["config", "performanceCoordinator"],
       optionalDependencies: [],
       constructorMapping: {

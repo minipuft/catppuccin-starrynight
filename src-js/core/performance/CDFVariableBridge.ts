@@ -3,19 +3,19 @@
 // ----------------------------------------------------------------------------
 // Listens for the `cdf:frameContext` event emitted by VisualSystemRegistry and
 // writes canonical --sn-cdf-* variables each animation frame through the
-// existing UnifiedCSSVariableManager to avoid excessive style recalculations.
+// existing CSSVariableWriter to avoid excessive style recalculations.
 // ============================================================================
 
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import type { FrameContext } from "@/core/animation/EnhancedMasterAnimationCoordinator";
-import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 
 export class CDFVariableBridge {
   private unsubscribe: () => void;
   private reduceMotionMQ: MediaQueryList | null = null;
   private _mqHandler: ((e: MediaQueryListEvent) => void) | null = null;
 
-  constructor(private batcher: UnifiedCSSVariableManager) {
+  constructor(private batcher: CSSVariableWriter) {
     // Subscribe to frame context broadcasts
     const subscriptionId = unifiedEventBus.subscribe(
       "performance:frame",

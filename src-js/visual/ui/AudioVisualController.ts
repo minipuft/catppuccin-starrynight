@@ -2,7 +2,7 @@
 // 🎆 AUDIO VISUAL CONTROLLER – Phase 2 of Cosmic Mood Field
 // ============================================================================
 // Maps beat, genre, and scroll events to Nebula-related CSS custom properties.
-// Keeps scripting cost low by batching variable writes via UnifiedCSSVariableManager.
+// Keeps scripting cost low by batching variable writes via CSSVariableWriter.
 // ---------------------------------------------------------------------------
 // BACKWARD-COMPATIBILITY CONTRACT:
 //  • No existing public interfaces are modified.
@@ -12,7 +12,7 @@
 // ---------------------------------------------------------------------------
 
 // NOTE: NEBULA_INTENSITY_KEY has been removed in settings rationalization
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { settings } from "@/config"; // TypedSettingsManager singleton
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
@@ -52,7 +52,7 @@ function median(values: number[]): number {
 
 export class AudioVisualController {
   // CSS coordination systems
-  private cssController: UnifiedCSSVariableManager;
+  private cssController: CSSVariableWriter;
   
   // Core systems
   private perf: SimplePerformanceCoordinator | null = null;
@@ -78,13 +78,13 @@ export class AudioVisualController {
 
   constructor(
     y3k: Year3000System | null = null,
-    cssController?: UnifiedCSSVariableManager,
+    cssController?: CSSVariableWriter,
     perf?: SimplePerformanceCoordinator
   ) {
     this.year3000System = y3k;
 
     // Initialize CSS controller - prefer shared instances from Year3000System
-    this.cssController = cssController ?? y3k?.cssVariableController ?? getGlobalUnifiedCSSManager();
+    this.cssController = cssController ?? y3k?.cssVariableController ?? getGlobalCSSVariableWriter();
 
     this.perf = perf ? perf : y3k?.performanceAnalyzer ?? null;
 

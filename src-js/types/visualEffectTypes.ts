@@ -7,7 +7,7 @@
 
 import type { UnifiedEventBus } from '@/core/events/UnifiedEventBus';
 import type { SimplePerformanceCoordinator } from '@/core/performance/SimplePerformanceCoordinator';
-import type { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
+import type { CSSVariableWriter } from '@/core/css/CSSVariableWriter';
 
 // =========================================================================
 // CORE VISUAL EFFECTS TYPES
@@ -363,7 +363,7 @@ export interface AdvancedVisualIntegration {
   performanceAnalyzer: SimplePerformanceCoordinator;
   
   /** Shared CSS variable manager reference */
-  cssVariableManager: UnifiedCSSVariableManager;
+  cssVariableManager: CSSVariableWriter;
 }
 
 // =========================================================================

@@ -1,5 +1,5 @@
 import { PerformanceAnalyzer } from '@/core/performance/UnifiedPerformanceCoordinator';
-import { UnifiedCSSVariableManager } from '@/core/css/UnifiedCSSVariableManager';
+import { CSSVariableWriter } from '@/core/css/CSSVariableWriter';
 import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import { temporalMemoryService } from "@/audio/TemporalMemoryService";
@@ -177,35 +177,32 @@ export interface EnhancedAnimationRegistration extends AnimationRegistration {
 }
 
 /**
- * EnhancedMasterAnimationCoordinator - Phase 3.1 + Phase 4 System Consolidation
- * 
- * 🔧 PHASE 3.1: Enhanced with CSS Animation Management and LERP Coordination
+ * AnimationFrameCoordinator - Unified Animation Frame Management System
+ *
+ * Coordinates all animation frames, CSS animations, and visual effects through a single
+ * RAF loop for optimal performance and synchronization with music events.
+ *
  * @consolidates CSSAnimationManager (902 lines) - CSS keyframe animation coordination
  * @consolidates CSSAnimationIntegration (354 lines) - Integration layer
  * @consolidates PerformanceAwareLerpCoordinator (926 lines) - Musical LERP coordination
  * @consolidates MusicalLerpOrchestrator (455 lines) - Beat-synchronized interpolation
- * 
- * Consolidates all animation coordination into a single unified system:
- * - Merges AnimationConductor and VisualFrameCoordinator functionality
- * - Integrates EmergentChoreographyEngine music-driven adaptation logic
- * - Provides unified animation registration and frame callback management
- * - Integrates with PerformanceAnalyzer for performance-aware coordination
- * - Eliminates redundant RAF loops throughout the system
- * - Handles music-driven multiplier calculations and adaptive coefficients
- * 
- * 🔧 PHASE 3.1 NEW FEATURES:
- * - CSS keyframe animation management with CSS variable integration
- * - Musical LERP coordination with beat synchronization
- * - Performance-aware interpolation with device adaptation
- * - Beat-synchronized CSS animation coordination
- * - Unified LERP orchestration across all animation systems
- * 
- * @architecture Phase 3.1 + Phase 4 of system consolidation
- * @performance Target: ~2,600 lines → ~1,400 lines (46% reduction)
- * @adaptive Integrates adaptive choreography engine functionality
+ * @consolidates AnimationConductor - Animation system registration
+ * @consolidates VisualFrameCoordinator - Visual system frame management
+ *
+ * Core Responsibilities:
+ * - Unified RAF loop coordination (single animation loop for all systems)
+ * - Animation system registration with priority-based execution
+ * - Frame callback management with performance budgeting
+ * - CSS animation synchronization with beat detection
+ * - Musical LERP interpolation with easing functions
+ * - Performance-aware quality scaling and frame rate adaptation
+ * - Adaptive animation based on music tempo and intensity
+ *
+ * @architecture System consolidation reducing ~2,600 lines → ~1,400 lines (46% reduction)
+ * @performance Target 60fps with adaptive quality scaling, <16ms frame budget
  */
-export class EnhancedMasterAnimationCoordinator {
-  private static instance: EnhancedMasterAnimationCoordinator | null = null;
+export class AnimationFrameCoordinator {
+  private static instance: AnimationFrameCoordinator | null = null;
   
   private config: AdvancedSystemConfig | Year3000Config;
   private eventBus: typeof unifiedEventBus;
@@ -261,7 +258,7 @@ export class EnhancedMasterAnimationCoordinator {
   // ===================================================================
 
   // CSS Animation Management (from CSSAnimationManager consolidation)
-  private cssVariableManager: UnifiedCSSVariableManager | null = null;
+  private cssVariableManager: CSSVariableWriter | null = null;
   private cssAnimationStates: Map<string, KineticAnimationState> = new Map();
   private activeCSSAnimations: Map<string, Animation> = new Map();
   private cssAnimationObservers: Map<string, (animation: Animation) => void> = new Map();
@@ -358,7 +355,7 @@ export class EnhancedMasterAnimationCoordinator {
       );
       
       if (this.config.enableDebug) {
-        console.log(`[EnhancedMasterAnimationCoordinator] Visual effects pulsing coordinated - Energy: ${energyLevel.toFixed(2)}, Tempo: ${tempo} BPM`);
+        console.log(`[AnimationFrameCoordinator] Visual effects pulsing coordinated - Energy: ${energyLevel.toFixed(2)}, Tempo: ${tempo} BPM`);
       }
     }
     
@@ -379,7 +376,7 @@ export class EnhancedMasterAnimationCoordinator {
   private currentIntensity: number = 0.5;
   private emergentEventSubscriptions: string[] = [];
   
-  constructor(config: AdvancedSystemConfig | Year3000Config, performanceCoordinator?: PerformanceAnalyzer, cssAnimationManager?: CSSAnimationManagerInterface, cssVariableManager?: UnifiedCSSVariableManager) {
+  constructor(config: AdvancedSystemConfig | Year3000Config, performanceCoordinator?: PerformanceAnalyzer, cssAnimationManager?: CSSAnimationManagerInterface, cssVariableManager?: CSSVariableWriter) {
     this.config = config;
     this.eventBus = unifiedEventBus;
     this.performanceCoordinator = performanceCoordinator || null;
@@ -406,21 +403,21 @@ export class EnhancedMasterAnimationCoordinator {
     this.updateFrameBudget();
     
     if (this.config.enableDebug) {
-      console.log('[EnhancedMasterAnimationCoordinator] Initialized with unified animation coordination, CSS management, and LERP orchestration');
+      console.log('[AnimationFrameCoordinator] Initialized with unified animation coordination, CSS management, and LERP orchestration');
     }
   }
   
   /**
    * Get or create singleton instance
    */
-  public static getInstance(config?: Year3000Config, performanceCoordinator?: PerformanceAnalyzer, cssAnimationManager?: CSSAnimationManagerInterface): EnhancedMasterAnimationCoordinator {
-    if (!EnhancedMasterAnimationCoordinator.instance) {
+  public static getInstance(config?: Year3000Config, performanceCoordinator?: PerformanceAnalyzer, cssAnimationManager?: CSSAnimationManagerInterface): AnimationFrameCoordinator {
+    if (!AnimationFrameCoordinator.instance) {
       if (!config) {
-        throw new Error('EnhancedMasterAnimationCoordinator requires config for first initialization');
+        throw new Error('AnimationFrameCoordinator requires config for first initialization');
       }
-      EnhancedMasterAnimationCoordinator.instance = new EnhancedMasterAnimationCoordinator(config, performanceCoordinator, cssAnimationManager);
+      AnimationFrameCoordinator.instance = new AnimationFrameCoordinator(config, performanceCoordinator, cssAnimationManager);
     }
-    return EnhancedMasterAnimationCoordinator.instance;
+    return AnimationFrameCoordinator.instance;
   }
   
   /**
@@ -428,9 +425,9 @@ export class EnhancedMasterAnimationCoordinator {
    */
   public registerCSSAnimationManager(cssAnimationManager: CSSAnimationManagerInterface): void {
     this.cssAnimationManager = cssAnimationManager;
-    
+
     if (this.config.enableDebug) {
-      console.log('[EnhancedMasterAnimationCoordinator] CSSAnimationManager registered for pulsing coordination');
+      console.log('[AnimationFrameCoordinator] CSSAnimationManager registered for pulsing coordination');
     }
   }
 
@@ -445,7 +442,7 @@ export class EnhancedMasterAnimationCoordinator {
   ): boolean {
     if (this.animations.has(name)) {
       if (this.config.enableDebug) {
-        console.warn(`[EnhancedMasterAnimationCoordinator] Animation system ${name} already registered`);
+        console.warn(`[AnimationFrameCoordinator] Animation system ${name} already registered`);
       }
       return false;
     }
@@ -476,7 +473,7 @@ export class EnhancedMasterAnimationCoordinator {
     this.updateMetrics();
     
     if (this.config.enableDebug) {
-      console.log(`[EnhancedMasterAnimationCoordinator] Registered animation system: ${name} (priority: ${priority}, fps: ${targetFPS})`);
+      console.log(`[AnimationFrameCoordinator] Registered animation system: ${name} (priority: ${priority}, fps: ${targetFPS})`);
     }
     
     return true;
@@ -491,7 +488,7 @@ export class EnhancedMasterAnimationCoordinator {
   ): boolean {
     if (this.animations.has(system.systemName)) {
       if (this.config.enableDebug) {
-        console.warn(`[EnhancedMasterAnimationCoordinator] Visual system ${system.systemName} already registered`);
+        console.warn(`[AnimationFrameCoordinator] Visual system ${system.systemName} already registered`);
       }
       return false;
     }
@@ -522,7 +519,7 @@ export class EnhancedMasterAnimationCoordinator {
     this.updateMetrics();
     
     if (this.config.enableDebug) {
-      console.log(`[EnhancedMasterAnimationCoordinator] Registered visual system: ${system.systemName} (priority: ${priority})`);
+      console.log(`[AnimationFrameCoordinator] Registered visual system: ${system.systemName} (priority: ${priority})`);
     }
     
     return true;
@@ -559,7 +556,7 @@ export class EnhancedMasterAnimationCoordinator {
     this.updateMetrics();
     
     if (this.config.enableDebug) {
-      console.log(`[EnhancedMasterAnimationCoordinator] Registered frame callback: ${id} (priority: ${priority})`);
+      console.log(`[AnimationFrameCoordinator] Registered frame callback: ${id} (priority: ${priority})`);
     }
     
     return id;
@@ -580,7 +577,7 @@ export class EnhancedMasterAnimationCoordinator {
       }
       
       if (this.config.enableDebug) {
-        console.log(`[EnhancedMasterAnimationCoordinator] Unregistered animation system: ${name}`);
+        console.log(`[AnimationFrameCoordinator] Unregistered animation system: ${name}`);
       }
     }
     
@@ -602,7 +599,7 @@ export class EnhancedMasterAnimationCoordinator {
       }
       
       if (this.config.enableDebug) {
-        console.log(`[EnhancedMasterAnimationCoordinator] Unregistered frame callback: ${id}`);
+        console.log(`[AnimationFrameCoordinator] Unregistered frame callback: ${id}`);
       }
     }
     
@@ -630,7 +627,7 @@ export class EnhancedMasterAnimationCoordinator {
     // });
     
     if (this.config.enableDebug) {
-      console.log('[EnhancedMasterAnimationCoordinator] Master animation loop started');
+      console.log('[AnimationFrameCoordinator] Master animation loop started');
     }
   }
   
@@ -655,7 +652,7 @@ export class EnhancedMasterAnimationCoordinator {
     // });
     
     if (this.config.enableDebug) {
-      console.log('[EnhancedMasterAnimationCoordinator] Master animation loop stopped');
+      console.log('[AnimationFrameCoordinator] Master animation loop stopped');
     }
   }
   
@@ -666,7 +663,7 @@ export class EnhancedMasterAnimationCoordinator {
     this.isPaused = true;
     
     if (this.config.enableDebug) {
-      console.log('[EnhancedMasterAnimationCoordinator] Animation loop paused');
+      console.log('[AnimationFrameCoordinator] Animation loop paused');
     }
   }
   
@@ -680,7 +677,7 @@ export class EnhancedMasterAnimationCoordinator {
     this.lastTimestamp = performance.now(); // Reset timing
     
     if (this.config.enableDebug) {
-      console.log('[EnhancedMasterAnimationCoordinator] Animation loop resumed');
+      console.log('[AnimationFrameCoordinator] Animation loop resumed');
     }
   }
   
@@ -709,7 +706,7 @@ export class EnhancedMasterAnimationCoordinator {
     // });
     
     if (this.config.enableDebug) {
-      console.log(`[EnhancedMasterAnimationCoordinator] Performance mode set to: ${mode}`);
+      console.log(`[AnimationFrameCoordinator] Performance mode set to: ${mode}`);
     }
   }
   
@@ -743,7 +740,7 @@ export class EnhancedMasterAnimationCoordinator {
       this.updateMetrics();
       
       if (this.config.enableDebug) {
-        console.log(`[EnhancedMasterAnimationCoordinator] System ${name} ${enabled ? 'enabled' : 'disabled'}`);
+        console.log(`[AnimationFrameCoordinator] System ${name} ${enabled ? 'enabled' : 'disabled'}`);
       }
       
       return true;
@@ -784,7 +781,7 @@ export class EnhancedMasterAnimationCoordinator {
         try {
           (registration.system as IVisualSystem).destroy();
         } catch (error) {
-          console.error(`[EnhancedMasterAnimationCoordinator] Error destroying system ${registration.name}:`, error);
+          console.error(`[AnimationFrameCoordinator] Error destroying system ${registration.name}:`, error);
         }
       }
     }
@@ -792,12 +789,12 @@ export class EnhancedMasterAnimationCoordinator {
     this.animations.clear();
     this.frameCallbacks.clear();
     
-    if (EnhancedMasterAnimationCoordinator.instance === this) {
-      EnhancedMasterAnimationCoordinator.instance = null;
+    if (AnimationFrameCoordinator.instance === this) {
+      AnimationFrameCoordinator.instance = null;
     }
     
     if (this.config.enableDebug) {
-      console.log('[EnhancedMasterAnimationCoordinator] Destroyed');
+      console.log('[AnimationFrameCoordinator] Destroyed');
     }
   }
   
@@ -843,7 +840,7 @@ export class EnhancedMasterAnimationCoordinator {
       // Skip non-critical animation systems to maintain frame rate
       this.metrics.droppedFrames++;
       if (this.config.enableDebug && Math.random() < 0.1) {
-        console.warn(`[EnhancedMasterAnimationCoordinator] Skipped animation systems - budget exceeded: ${callbackTime.toFixed(2)}ms`);
+        console.warn(`[AnimationFrameCoordinator] Skipped animation systems - budget exceeded: ${callbackTime.toFixed(2)}ms`);
       }
     }
     
@@ -915,12 +912,12 @@ export class EnhancedMasterAnimationCoordinator {
         // Budget check
         if (callbackTime > this.frameTimeBudget * 0.5) {
           if (this.config.enableDebug) {
-            console.warn(`[EnhancedMasterAnimationCoordinator] Callback ${callback.id} exceeded budget: ${callbackTime.toFixed(2)}ms`);
+            console.warn(`[AnimationFrameCoordinator] Callback ${callback.id} exceeded budget: ${callbackTime.toFixed(2)}ms`);
           }
         }
         
       } catch (error) {
-        console.error(`[EnhancedMasterAnimationCoordinator] Error in callback ${callback.id}:`, error);
+        console.error(`[AnimationFrameCoordinator] Error in callback ${callback.id}:`, error);
       }
     }
   }
@@ -972,12 +969,12 @@ export class EnhancedMasterAnimationCoordinator {
         // Budget check
         if (systemTime > this.frameTimeBudget * 0.8) {
           if (this.config.enableDebug) {
-            console.warn(`[EnhancedMasterAnimationCoordinator] System ${animation.name} exceeded budget: ${systemTime.toFixed(2)}ms`);
+            console.warn(`[AnimationFrameCoordinator] System ${animation.name} exceeded budget: ${systemTime.toFixed(2)}ms`);
           }
         }
         
       } catch (error) {
-        console.error(`[EnhancedMasterAnimationCoordinator] Error in system ${animation.name}:`, error);
+        console.error(`[AnimationFrameCoordinator] Error in system ${animation.name}:`, error);
       }
     }
   }
@@ -1005,7 +1002,7 @@ export class EnhancedMasterAnimationCoordinator {
       if (elapsed >= budget * 0.9) { // Reserve 10% for cleanup
         skippedCount = sortedSystems.length - processedCount;
         if (this.config.enableDebug && skippedCount > 0) {
-          console.warn(`[EnhancedMasterAnimationCoordinator] Budget exhausted: skipped ${skippedCount} systems`);
+          console.warn(`[AnimationFrameCoordinator] Budget exhausted: skipped ${skippedCount} systems`);
         }
         break;
       }
@@ -1046,12 +1043,12 @@ export class EnhancedMasterAnimationCoordinator {
         // Per-system budget check for future optimization
         if (systemTime > budget * 0.3) { // Single system taking >30% of budget
           if (this.config.enableDebug) {
-            console.warn(`[EnhancedMasterAnimationCoordinator] System ${animation.name} consuming excessive budget: ${systemTime.toFixed(2)}ms`);
+            console.warn(`[AnimationFrameCoordinator] System ${animation.name} consuming excessive budget: ${systemTime.toFixed(2)}ms`);
           }
         }
         
       } catch (error) {
-        console.error(`[EnhancedMasterAnimationCoordinator] Error in system ${animation.name}:`, error);
+        console.error(`[AnimationFrameCoordinator] Error in system ${animation.name}:`, error);
         processedCount++;
       }
     }
@@ -1063,7 +1060,7 @@ export class EnhancedMasterAnimationCoordinator {
     }
     
     if (this.config.enableDebug && Math.random() < 0.02) { // 2% sampling
-      console.log(`[EnhancedMasterAnimationCoordinator] Budget usage: ${totalTime.toFixed(2)}ms/${budget.toFixed(2)}ms, processed: ${processedCount}/${sortedSystems.length}`);
+      console.log(`[AnimationFrameCoordinator] Budget usage: ${totalTime.toFixed(2)}ms/${budget.toFixed(2)}ms, processed: ${processedCount}/${sortedSystems.length}`);
     }
   }
   
@@ -1165,10 +1162,10 @@ export class EnhancedMasterAnimationCoordinator {
       }, 30000);
       
       if (this.config.enableDebug) {
-        console.log('[EnhancedMasterAnimationCoordinator] Emergent choreography initialized');
+        console.log('[AnimationFrameCoordinator] Emergent choreography initialized');
       }
     } catch (error) {
-      console.error('[EnhancedMasterAnimationCoordinator] Failed to initialize adaptive choreography:', error);
+      console.error('[AnimationFrameCoordinator] Failed to initialize adaptive choreography:', error);
     }
   }
   
@@ -1361,7 +1358,7 @@ export class EnhancedMasterAnimationCoordinator {
     this.emergentEventSubscriptions = [];
     
     if (this.config.enableDebug) {
-      console.log('[EnhancedMasterAnimationCoordinator] Emergent choreography destroyed');
+      console.log('[AnimationFrameCoordinator] Emergent choreography destroyed');
     }
   }
 
@@ -1398,11 +1395,11 @@ export class EnhancedMasterAnimationCoordinator {
       });
     } catch (error) {
       // Event types may not be defined in current version - graceful fallback
-      console.warn('[EnhancedMasterAnimationCoordinator] Event subscription failed, using manual coordination');
+      console.warn('[AnimationFrameCoordinator] Event subscription failed, using manual coordination');
     }
 
     if (this.config.enableDebug) {
-      console.log('[EnhancedMasterAnimationCoordinator] Consolidated systems initialized');
+      console.log('[AnimationFrameCoordinator] Consolidated systems initialized');
     }
   }
 
@@ -1473,7 +1470,7 @@ export class EnhancedMasterAnimationCoordinator {
         }
       }
     } catch (error) {
-      console.warn(`[EnhancedMasterAnimationCoordinator] Failed to create CSS animation ${name}:`, error);
+      console.warn(`[AnimationFrameCoordinator] Failed to create CSS animation ${name}:`, error);
     }
   }
 
@@ -1524,7 +1521,7 @@ export class EnhancedMasterAnimationCoordinator {
     this.lerpOperations.set(id, lerpOperation);
 
     if (this.config.enableDebug) {
-      console.log(`[EnhancedMasterAnimationCoordinator] Created musical LERP: ${id}`);
+      console.log(`[AnimationFrameCoordinator] Created musical LERP: ${id}`);
     }
   }
 
@@ -1708,7 +1705,7 @@ export class EnhancedMasterAnimationCoordinator {
     this.cssAnimationStates.clear();
 
     if (this.config.enableDebug) {
-      console.log('[EnhancedMasterAnimationCoordinator] Consolidated systems destroyed');
+      console.log('[AnimationFrameCoordinator] Consolidated systems destroyed');
     }
   }
 
@@ -1757,7 +1754,7 @@ export class EnhancedMasterAnimationCoordinator {
     });
 
     if (this.config.enableDebug) {
-      console.log(`[EnhancedMasterAnimationCoordinator] Triggered consciousness breathing - Energy: ${energyLevel.toFixed(2)}, Tempo: ${tempo} BPM`);
+      console.log(`[AnimationFrameCoordinator] Triggered consciousness breathing - Energy: ${energyLevel.toFixed(2)}, Tempo: ${tempo} BPM`);
     }
   }
 
@@ -1781,7 +1778,7 @@ export class EnhancedMasterAnimationCoordinator {
     }
 
     if (this.config.enableDebug) {
-      console.log('[EnhancedMasterAnimationCoordinator] Stopped consciousness breathing');
+      console.log('[AnimationFrameCoordinator] Stopped consciousness breathing');
     }
   }
 
@@ -1824,3 +1821,5 @@ export class EnhancedMasterAnimationCoordinator {
     };
   }
 }
+// Export with legacy name for backward compatibility
+export { AnimationFrameCoordinator as EnhancedMasterAnimationCoordinator };

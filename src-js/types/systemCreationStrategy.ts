@@ -11,7 +11,7 @@
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 // NOTE: SettingsManager import removed - file deleted in Phase 5, using TypedSettingsManager singleton
-import type { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import type { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import type { MusicSyncService } from "@/audio/MusicSyncService";
 import type { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
 import type { EnhancedDeviceTierDetector } from "@/core/performance/EnhancedDeviceTierDetector";
@@ -43,9 +43,9 @@ export interface SystemCreationContext {
     settingsManager?: any; // Legacy type - SettingsManager deleted in Phase 5
     musicSyncService?: MusicSyncService;
     year3000System?: Year3000System;
-    cssController?: UnifiedCSSVariableManager;
+    cssController?: CSSVariableWriter;
     // Backward compatibility alias
-    cssConsciousnessController?: UnifiedCSSVariableManager;
+    cssConsciousnessController?: CSSVariableWriter;
     performanceCoordinator?: SimplePerformanceCoordinator;
     // New simplified performance system dependencies
     simplePerformanceCoordinator?: SimplePerformanceCoordinator;

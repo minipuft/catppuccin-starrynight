@@ -1,7 +1,7 @@
 import { ADVANCED_SYSTEM_CONFIG as Config } from "@/config/globalConfig";
 import { GLASS_LEVEL_KEY } from "@/config/settingKeys";
 // NOTE: GLASS_LEVEL_OLD_KEY has been removed in settings rationalization
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { SimplePerformanceCoordinator, QualityCapability, QualityLevel, QualityScalingCapable, PerformanceMetrics } from "@/core/performance/SimplePerformanceCoordinator";
 import type { HealthCheckResult } from "@/types/systems";
 import { settings } from "@/config";
@@ -12,7 +12,7 @@ import { MusicSyncService } from "@/audio/MusicSyncService";
 import { EmotionalTemperatureMapper, type EmotionalTemperatureResult } from "@/utils/color/EmotionalTemperatureMapper";
 import { OKLABColorProcessor, type EnhancementPreset } from "@/utils/color/OKLABColorProcessor";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import type { BeatData, MusicEmotion, VisualEffectsState } from "@/types/colorStubs";
+import type { BeatData, MusicEmotion, VisualEffectsState } from "@/types/colorTypes";
 // NOTE: QualityLevel types imported from simplified performance system
 
 type GlassIntensity =
@@ -41,8 +41,8 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   private static instance: GlassmorphismManager;
   private config: typeof Config;
   private utils: typeof Utils;
-  private cssBatcher: UnifiedCSSVariableManager | null = null;
-  private cssController!: UnifiedCSSVariableManager;
+  private cssBatcher: CSSVariableWriter | null = null;
+  private cssController!: CSSVariableWriter;
   private performanceAnalyzer: SimplePerformanceCoordinator | null = null;
   private isSupported: boolean;
   private currentIntensity: GlassIntensity;
@@ -65,7 +65,7 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   constructor(
     config: typeof Config = Config,
     utils: typeof Utils = Utils,
-    cssBatcher: UnifiedCSSVariableManager | null = null,
+    cssBatcher: CSSVariableWriter | null = null,
     performanceAnalyzer: SimplePerformanceCoordinator | null = null,
     viewportOptions: ViewportSystemOptions = {}
   ) {
@@ -116,7 +116,7 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   protected async initializeSystem(): Promise<void> {
     // Initialize CSS coordination - use globalThis to access Year3000System
     const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System?.cssController || getGlobalUnifiedCSSManager();
+    this.cssController = year3000System?.cssController || getGlobalCSSVariableWriter();
 
     const initialIntensity = settings.get("sn-glassmorphism-level");
     this.applyGlassmorphismSettings(initialIntensity);

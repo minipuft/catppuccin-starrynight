@@ -10,7 +10,7 @@
  */
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -58,7 +58,7 @@ export class DynamicGradientStrategy
   extends BaseVisualSystem
   implements IColorProcessor
 {
-  private cssController: UnifiedCSSVariableManager;
+  private cssController: CSSVariableWriter;
   private oklabProcessor: OKLABColorProcessor;
   private deviceDetector: DeviceCapabilityDetector;
   protected override utils = Utils;
@@ -105,7 +105,7 @@ export class DynamicGradientStrategy
     utils = Utils,
     performanceMonitor: any = null,
     musicSyncService: any = null,
-    cssController?: UnifiedCSSVariableManager,
+    cssController?: CSSVariableWriter,
     cssAnimationManager?: any
   ) {
     // Call BaseVisualSystem constructor
@@ -116,7 +116,7 @@ export class DynamicGradientStrategy
       musicSyncService
     );
 
-    this.cssController = cssController || getGlobalUnifiedCSSManager();
+    this.cssController = cssController || getGlobalCSSVariableWriter();
     this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
     this.deviceDetector = new DeviceCapabilityDetector();
     this.cssAnimationManager = cssAnimationManager;
