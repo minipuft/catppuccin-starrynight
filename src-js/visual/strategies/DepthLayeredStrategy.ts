@@ -745,13 +745,13 @@ export class DepthLayeredStrategy implements IColorProcessor {
 
   /**
    * Start depth animation loop
-   * MIGRATION NOTE: This method now no-ops. Animation is driven by EnhancedMasterAnimationCoordinator
-   * via updateAnimation() method, which will be called automatically by SystemCoordinator.
+   * MIGRATION NOTE: This method now no-ops. Animation is driven by AnimationFrameCoordinator
+   * via updateAnimation() method, which will be called automatically by SystemIntegrationCoordinator.
    */
   private startDepthAnimation(): void {
     // Animation is now handled by updateAnimation() called by coordinator
     // No standalone RAF loop needed
-    Y3KDebug?.debug?.log("DepthLayeredStrategy", "Animation loop delegated to EnhancedMasterAnimationCoordinator");
+    Y3KDebug?.debug?.log("DepthLayeredStrategy", "Animation loop delegated to AnimationFrameCoordinator");
   }
 
   /**
@@ -893,7 +893,7 @@ export class DepthLayeredStrategy implements IColorProcessor {
   }
 
   /**
-   * updateAnimation() - Called by EnhancedMasterAnimationCoordinator at 60fps
+   * updateAnimation() - Called by AnimationFrameCoordinator at 60fps
    * Handles depth layer animations that were previously in standalone RAF loop
    */
   public updateAnimation(deltaTime: number): void {

@@ -1,28 +1,24 @@
 /**
- * NonVisualSystemFacade Test Suite
+ * InfrastructureSystemCoordinator Test Suite
  * Tests for Phase 3 non-visual systems factory pattern implementation
  */
 
-import { NonVisualSystemFacade, NonVisualSystemKey, NonVisualSystemConfig } from '@/core/integration/NonVisualSystemFacade';
+import { InfrastructureSystemCoordinator, InfrastructureSystemKey, InfrastructureSystemConfig } from '@/core/integration/InfrastructureSystemCoordinator';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import * as Utils from '@/utils/core/ThemeUtilities';
 
 // Mock all non-visual system imports
-jest.mock('@/core/animation/EnhancedMasterAnimationCoordinator');
+jest.mock('@/core/animation/AnimationFrameCoordinator');
 jest.mock('@/core/performance/TimerConsolidationSystem');
-jest.mock('@/core/performance/OptimizedCSSVariableManager');
-jest.mock('@/core/css/UnifiedCSSVariableManager');
+jest.mock('@/core/css/CSSVariableWriter'); // Replaced OptimizedCSSVariableManager
 jest.mock('@/core/performance/UnifiedPerformanceCoordinator');
 jest.mock('@/core/performance/DeviceCapabilityDetector');
-// PerformanceCSSIntegration doesn't exist - remove mock
 jest.mock('@/debug/UnifiedDebugManager');
-// NOTE: SettingsManager mock removed - system deleted in Phase 5, using TypedSettingsManager singleton
 jest.mock('@/audio/ColorHarmonyEngine');
 jest.mock('@/audio/MusicSyncService');
 jest.mock('@/ui/managers/GlassmorphismManager');
 jest.mock('@/ui/managers/Card3DManager');
 jest.mock('@/core/integration/SidebarSystemsIntegration');
-// jest.mock('@/core/integration/UnifiedSystemIntegration'); // Module doesn't exist
 
 // Mock debug system
 jest.mock('@/debug/UnifiedDebugManager', () => ({
@@ -45,8 +41,8 @@ Object.defineProperty(window, 'performance', {
   }
 });
 
-describe('NonVisualSystemFacade', () => {
-  let facade: NonVisualSystemFacade;
+describe('InfrastructureSystemCoordinator', () => {
+  let facade: InfrastructureSystemCoordinator;
   let mockAdvancedThemeSystem: any;
 
   beforeEach(() => {
@@ -60,7 +56,7 @@ describe('NonVisualSystemFacade', () => {
     };
 
     // Create facade instance
-    facade = new NonVisualSystemFacade(
+    facade = new InfrastructureSystemCoordinator(
       ADVANCED_SYSTEM_CONFIG,
       Utils,
       mockAdvancedThemeSystem
@@ -69,7 +65,7 @@ describe('NonVisualSystemFacade', () => {
 
   describe('Construction and Initialization', () => {
     it('should initialize with correct dependencies', () => {
-      expect(facade).toBeInstanceOf(NonVisualSystemFacade);
+      expect(facade).toBeInstanceOf(InfrastructureSystemCoordinator);
       expect(facade.getSystemStatus().initialized).toBe(false);
     });
 
@@ -87,7 +83,7 @@ describe('NonVisualSystemFacade', () => {
     });
 
     it('should apply custom configuration during initialization', async () => {
-      const customConfig: Partial<NonVisualSystemConfig> = {
+      const customConfig: Partial<InfrastructureSystemConfig> = {
         mode: 'performance-first',
         enablePerformanceMonitoring: false,
         enableDependencyInjection: false
@@ -175,7 +171,7 @@ describe('NonVisualSystemFacade', () => {
 
     it('should throw error for unknown system key', () => {
       expect(() => {
-        facade.getSystem('UnknownSystem' as NonVisualSystemKey);
+        facade.getSystem('UnknownSystem' as InfrastructureSystemKey);
       }).toThrow('Non-visual system \'UnknownSystem\' not found in registry');
     });
   });
@@ -186,8 +182,8 @@ describe('NonVisualSystemFacade', () => {
     });
 
     it('should inject shared dependencies', () => {
-      const system = facade.getSystem('EnhancedMasterAnimationCoordinator');
-      
+      const system = facade.getSystem('AnimationFrameCoordinator');
+
       expect(system).toBeDefined();
       // Note: In real implementation, we'd verify dependency injection was called
     });
@@ -203,13 +199,13 @@ describe('NonVisualSystemFacade', () => {
     it('should inject dependencies in correct order', () => {
       // Create systems that depend on each other
       const cssVariableBatcher = facade.getSystem('CSSVariableBatcher');
-      const unifiedCSSManager = facade.getSystem('UnifiedCSSVariableManager');
-      
+      const cssVariableWriter = facade.getSystem('CSSVariableWriter');
+
       expect(cssVariableBatcher).toBeDefined();
-      expect(unifiedCSSManager).toBeDefined();
-      
-      // CSSVariableBatcher should be created first and injected into UnifiedCSSVariableManager
-      expect(facade.getSystemStatus().systemsActive).toBe(2);
+      expect(cssVariableWriter).toBeDefined();
+
+      // Both point to the same CSSVariableWriter instance (backward compatibility aliases)
+      expect(facade.getSystemStatus().systemsActive).toBe(1); // Same instance cached
     });
   });
 
@@ -282,9 +278,9 @@ describe('NonVisualSystemFacade', () => {
         .mockReturnValue(5000);    // Subsequent calls
 
       (window.performance.now as jest.Mock) = mockPerformanceNow;
-      
+
       // Create new facade with high init time
-      const slowFacade = new NonVisualSystemFacade(
+      const slowFacade = new InfrastructureSystemCoordinator(
         ADVANCED_SYSTEM_CONFIG,
         Utils,
         mockAdvancedThemeSystem
@@ -362,7 +358,7 @@ describe('NonVisualSystemFacade', () => {
     });
 
     it('should update configuration', async () => {
-      const newConfig: Partial<NonVisualSystemConfig> = {
+      const newConfig: Partial<InfrastructureSystemConfig> = {
         mode: 'quality-first',
         enablePerformanceMonitoring: false
       };
@@ -375,7 +371,7 @@ describe('NonVisualSystemFacade', () => {
     });
 
     it('should apply mode-specific optimizations', async () => {
-      const performanceConfig: Partial<NonVisualSystemConfig> = {
+      const performanceConfig: Partial<InfrastructureSystemConfig> = {
         mode: 'performance-first'
       };
 
@@ -387,7 +383,7 @@ describe('NonVisualSystemFacade', () => {
     });
 
     it('should apply battery optimization settings', async () => {
-      const batteryConfig: Partial<NonVisualSystemConfig> = {
+      const batteryConfig: Partial<InfrastructureSystemConfig> = {
         mode: 'battery-optimized'
       };
 

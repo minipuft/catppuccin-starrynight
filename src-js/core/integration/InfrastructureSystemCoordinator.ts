@@ -1,5 +1,5 @@
 /**
- * NonVisualSystemFacade - Infrastructure Systems Factory & Management Layer
+ * InfrastructureSystemCoordinator - Infrastructure Systems Factory & Management Layer
  *
  * Layer 3 of the three-layer facade architecture - handles ALL infrastructure and non-visual systems.
  * Provides comprehensive factory methods, dependency injection, and lifecycle management
@@ -49,10 +49,10 @@ import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import * as Utils from "@/utils/core/ThemeUtilities";
 
 // Performance System imports
-import { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
+import { AnimationFrameCoordinator } from "@/core/animation/AnimationFrameCoordinator";
 import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { TimerConsolidationSystem } from "@/core/performance/TimerConsolidationSystem";
-// PerformanceAwareLerpCoordinator consolidated into EnhancedMasterAnimationCoordinator
+// PerformanceAwareLerpCoordinator consolidated into AnimationFrameCoordinator
 
 // New simplified performance system imports (replacing complex monitoring)
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
@@ -81,7 +81,7 @@ import { VisualEffectsCoordinator } from "@/visual/effects/VisualEffectsCoordina
 import { MusicEmotionAnalyzer } from "@/visual/music/integration/MusicEmotionAnalyzer";
 
 // Color Strategy imports
-import { UnifiedColorProcessingEngine, globalUnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
+import { ColorProcessor, globalColorProcessor, globalUnifiedColorProcessingEngine } from "@/core/color/ColorProcessor";
 
 // UI Managers imports
 import { Card3DManager } from "@/ui/managers/Card3DManager";
@@ -98,13 +98,13 @@ import type { SystemCreationContext, SharedDependencies } from "@/types/systemCr
 // import { IManagedSystem } from "@/types/systems"; // Unused for now
 
 // Type definitions
-export type NonVisualSystemKey =
+export type InfrastructureSystemKey =
   // Performance Systems
-  | "EnhancedMasterAnimationCoordinator"
+  | "AnimationFrameCoordinator"
   | "TimerConsolidationSystem"
   | "CSSVariableWriter"
   | "OptimizedCSSVariableManager" // Alias for CSSVariableWriter (Phase 6.1 backward compatibility)
-  // PerformanceAwareLerpCoordinator consolidated into EnhancedMasterAnimationCoordinator
+  // PerformanceAwareLerpCoordinator consolidated into AnimationFrameCoordinator
   
   // New simplified performance systems (replacing complex monitoring)
   | "SimplePerformanceCoordinator"
@@ -124,7 +124,8 @@ export type NonVisualSystemKey =
   | "ColorHarmonyEngine"
   | "MusicSyncService"
   | "ColorOrchestrator"
-  | "UnifiedColorProcessingEngine"
+  | "ColorProcessor"
+  | "UnifiedColorProcessingEngine" // Legacy alias for ColorProcessor
   | "LoadingStateService"
 
   // Consciousness Systems
@@ -149,7 +150,7 @@ export type IntegrationMode =
   | "quality-first"
   | "battery-optimized";
 
-export interface NonVisualSystemConfig {
+export interface InfrastructureSystemConfig {
   mode: IntegrationMode;
   enablePerformanceMonitoring: boolean;
   enableDependencyInjection: boolean;
@@ -166,7 +167,7 @@ export interface NonVisualSystemConfig {
   };
 }
 
-export interface NonVisualSystemMetrics {
+export interface InfrastructureSystemMetrics {
   // Performance metrics
   systemCount: number;
   initializedSystems: number;
@@ -192,15 +193,15 @@ export interface NonVisualSystemMetrics {
   systemErrors: number;
 }
 
-export interface NonVisualSystemHealthCheck {
+export interface InfrastructureSystemHealthCheck {
   overall: SystemHealth;
   systems: Map<string, { ok: boolean; details: string }>;
   recommendations: string[];
   timestamp: number;
-  metrics: NonVisualSystemMetrics;
+  metrics: InfrastructureSystemMetrics;
 }
 
-export class NonVisualSystemFacade {
+export class InfrastructureSystemCoordinator {
   // Core dependencies
   private config: AdvancedSystemConfig | Year3000Config;
   private utils: typeof Utils;
@@ -226,15 +227,15 @@ export class NonVisualSystemFacade {
   // private systemHealthMonitor: SystemHealthMonitor | null = null; // Unused for now
 
   // System registry and cache
-  private systemRegistry: Map<NonVisualSystemKey, new (...args: any[]) => any>;
-  private systemCache: Map<NonVisualSystemKey, any>;
-  private systemDependencies: Map<NonVisualSystemKey, string[]>;
+  private systemRegistry: Map<InfrastructureSystemKey, new (...args: any[]) => any>;
+  private systemCache: Map<InfrastructureSystemKey, any>;
+  private systemDependencies: Map<InfrastructureSystemKey, string[]>;
 
   // State management
   private isInitialized = false;
-  private facadeConfig: NonVisualSystemConfig;
-  private currentMetrics: NonVisualSystemMetrics;
-  private lastHealthCheck: NonVisualSystemHealthCheck | null = null;
+  private facadeConfig: InfrastructureSystemConfig;
+  private currentMetrics: InfrastructureSystemMetrics;
+  private lastHealthCheck: InfrastructureSystemHealthCheck | null = null;
 
   // Monitoring intervals
   private healthCheckInterval: number | null = null;
@@ -242,13 +243,13 @@ export class NonVisualSystemFacade {
 
   // Event callbacks
   private onSystemCreated:
-    | ((systemKey: NonVisualSystemKey, system: any) => void)
+    | ((systemKey: InfrastructureSystemKey, system: any) => void)
     | null = null;
   private onSystemFailed:
-    | ((systemKey: NonVisualSystemKey, error: Error) => void)
+    | ((systemKey: InfrastructureSystemKey, error: Error) => void)
     | null = null;
   private onHealthChange:
-    | ((health: NonVisualSystemHealthCheck) => void)
+    | ((health: InfrastructureSystemHealthCheck) => void)
     | null = null;
 
   constructor(
@@ -271,7 +272,7 @@ export class NonVisualSystemFacade {
       // NOTE: settingsManager injection removed - using TypedSettingsManager singleton
 
       Y3KDebug?.debug?.log(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         "Shared dependencies injected from SystemCoordinator",
         {
           performanceAnalyzer: !!this.performanceAnalyzer,
@@ -311,7 +312,7 @@ export class NonVisualSystemFacade {
     this.registerNonVisualSystems();
 
     Y3KDebug?.debug?.log(
-      "NonVisualSystemFacade",
+      "InfrastructureSystemCoordinator",
       "Non-visual systems facade initialized"
     );
   }
@@ -319,10 +320,10 @@ export class NonVisualSystemFacade {
   private registerNonVisualSystems(): void {
     // Performance Systems
     this.systemRegistry.set(
-      "EnhancedMasterAnimationCoordinator",
-      EnhancedMasterAnimationCoordinator
+      "AnimationFrameCoordinator",
+      AnimationFrameCoordinator
     );
-    this.systemDependencies.set("EnhancedMasterAnimationCoordinator", [
+    this.systemDependencies.set("AnimationFrameCoordinator", [
       "performanceAnalyzer",
       "cssVariableManager",
     ]);
@@ -400,8 +401,8 @@ export class NonVisualSystemFacade {
     // this.systemRegistry.set('QualityScalingManager', QualityScalingManager);
     // this.systemDependencies.set('QualityScalingManager', ['performanceAnalyzer', 'deviceCapabilityDetector']);
 
-    // PerformanceAwareLerpCoordinator consolidated into EnhancedMasterAnimationCoordinator
-    // Use EnhancedMasterAnimationCoordinator for musical LERP functionality
+    // PerformanceAwareLerpCoordinator consolidated into AnimationFrameCoordinator
+    // Use AnimationFrameCoordinator for musical LERP functionality
 
     // New simplified performance systems (replacing complex monitoring)
     this.systemRegistry.set("SimplePerformanceCoordinator", SimplePerformanceCoordinator);
@@ -445,19 +446,27 @@ export class NonVisualSystemFacade {
     this.systemRegistry.set("LoadingStateService", LoadingStateService);
     this.systemDependencies.set("LoadingStateService", ["performanceAnalyzer"]); // NOTE: settingsManager dependency removed
 
-    // 🔧 PHASE 2.1: UnifiedColorProcessingEngine - Enhanced consolidated color processor (PREFERRED)
+    // 🔧 ColorProcessor - Enhanced consolidated color processor (renamed from UnifiedColorProcessingEngine)
     this.systemRegistry.set(
-      "UnifiedColorProcessingEngine",
-      UnifiedColorProcessingEngine
+      "ColorProcessor",
+      ColorProcessor
     );
-    this.systemDependencies.set("UnifiedColorProcessingEngine", [
-      // NOTE: settingsManager dependency removed - was dead code in constructor
+    this.systemDependencies.set("ColorProcessor", [
       "performanceAnalyzer",
     ]);
 
-    // ColorOrchestrator - Legacy strategy pattern coordinator (now delegates to UnifiedColorProcessingEngine)
-    // Note: Uses globalUnifiedColorProcessingEngine singleton, handled as special case in createSystem
-    // 🔧 PHASE 2.1: Now delegates to UnifiedColorProcessingEngine for enhanced processing
+    // Backward compatibility alias
+    this.systemRegistry.set(
+      "UnifiedColorProcessingEngine",
+      ColorProcessor
+    );
+    this.systemDependencies.set("UnifiedColorProcessingEngine", [
+      "performanceAnalyzer",
+    ]);
+
+    // ColorOrchestrator - Legacy strategy pattern coordinator (now delegates to ColorProcessor)
+    // Note: Uses globalColorProcessor singleton, handled as special case in createSystem
+    // 🔧 PHASE 2.1: Now delegates to ColorProcessor for enhanced processing
     this.systemDependencies.set("ColorOrchestrator", []);
 
     // Consciousness Systems
@@ -509,10 +518,10 @@ export class NonVisualSystemFacade {
   }
 
   public async initialize(
-    config?: Partial<NonVisualSystemConfig>
+    config?: Partial<InfrastructureSystemConfig>
   ): Promise<void> {
     if (this.isInitialized) {
-      Y3KDebug?.debug?.warn("NonVisualSystemFacade", "Already initialized");
+      Y3KDebug?.debug?.warn("InfrastructureSystemCoordinator", "Already initialized");
       return;
     }
 
@@ -540,7 +549,7 @@ export class NonVisualSystemFacade {
       this.isInitialized = true;
 
       Y3KDebug?.debug?.log(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         "Non-visual systems facade fully initialized",
         {
           mode: this.facadeConfig.mode,
@@ -550,7 +559,7 @@ export class NonVisualSystemFacade {
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         "Initialization failed:",
         error
       );
@@ -586,7 +595,7 @@ export class NonVisualSystemFacade {
 
     for (const systemKey of coreSystemsOrder) {
       try {
-        const system = await this.getSystem(systemKey as NonVisualSystemKey);
+        const system = await this.getSystem(systemKey as InfrastructureSystemKey);
         if (system && typeof system.initialize === "function") {
           await system.initialize();
         }
@@ -637,7 +646,7 @@ export class NonVisualSystemFacade {
         }
       } catch (error) {
         Y3KDebug?.debug?.error(
-          "NonVisualSystemFacade",
+          "InfrastructureSystemCoordinator",
           `Failed to initialize ${systemKey}:`,
           error
         );
@@ -646,8 +655,13 @@ export class NonVisualSystemFacade {
   }
 
   /**
-   * Phase 3.2: getCachedSystem() removed - use getSystem({ cacheOnly: true }) instead
+   * Phase 3.2: Synchronous cache accessor for backward compatibility
+   * Returns cached system without creating new instances
+   * @deprecated Use getSystem({ cacheOnly: true }) for async access with shared dependency checking
    */
+  public getCachedSystemSync<T = any>(key: InfrastructureSystemKey): T | null {
+    return this.systemCache.get(key) as T || null;
+  }
 
   /**
    * Factory method to create and return non-visual systems
@@ -659,7 +673,7 @@ export class NonVisualSystemFacade {
    * @param options.cacheOnly - If true, only return cached/shared instances (don't create new)
    */
   public async getSystem<T = any>(
-    key: NonVisualSystemKey,
+    key: InfrastructureSystemKey,
     options?: { cacheOnly?: boolean }
   ): Promise<T | null> {
     const cacheOnly = options?.cacheOnly ?? false;
@@ -676,7 +690,7 @@ export class NonVisualSystemFacade {
       const deviceCapabilityDetector = this.year3000System.deviceCapabilityDetector;
       this.systemCache.set(key, deviceCapabilityDetector);
       Y3KDebug?.debug?.log(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         "Using shared DeviceCapabilityDetector instance from SystemCoordinator"
       );
       return deviceCapabilityDetector as T;
@@ -685,7 +699,7 @@ export class NonVisualSystemFacade {
     if (key === "EnhancedDeviceTierDetector" && this.enhancedDeviceTierDetector) {
       this.systemCache.set(key, this.enhancedDeviceTierDetector);
       Y3KDebug?.debug?.log(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         "Using shared EnhancedDeviceTierDetector instance from SystemCoordinator"
       );
       return this.enhancedDeviceTierDetector as T;
@@ -695,7 +709,7 @@ export class NonVisualSystemFacade {
     if (key === "WebGLSystemsIntegration" && this.webglSystemsIntegration) {
       this.systemCache.set(key, this.webglSystemsIntegration);
       Y3KDebug?.debug?.log(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         "Using shared WebGLSystemsIntegration instance from SystemCoordinator"
       );
       return this.webglSystemsIntegration as T;
@@ -704,7 +718,7 @@ export class NonVisualSystemFacade {
     if (key === "SimplePerformanceCoordinator" && this.simplePerformanceCoordinator) {
       this.systemCache.set(key, this.simplePerformanceCoordinator);
       Y3KDebug?.debug?.log(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         "Using shared SimplePerformanceCoordinator instance from SystemCoordinator"
       );
       return this.simplePerformanceCoordinator as T;
@@ -714,7 +728,7 @@ export class NonVisualSystemFacade {
     if (key === "PerformanceAnalyzer" && this.performanceAnalyzer) {
       this.systemCache.set(key, this.performanceAnalyzer);
       Y3KDebug?.debug?.log(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         "Using shared PerformanceAnalyzer instance from SystemCoordinator"
       );
       return this.performanceAnalyzer as T;
@@ -723,7 +737,7 @@ export class NonVisualSystemFacade {
     if ((key === "OptimizedCSSVariableManager" || key === "CSSVariableWriter") && this.cssVariableManager) {
       this.systemCache.set(key, this.cssVariableManager);
       Y3KDebug?.debug?.log(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         `Using shared CSSVariableWriter instance from SystemCoordinator (requested as ${key})`
       );
       return this.cssVariableManager as T;
@@ -732,7 +746,7 @@ export class NonVisualSystemFacade {
     if (key === "SimplePerformanceCoordinator" && this.performanceOrchestrator) {
       this.systemCache.set(key, this.performanceOrchestrator);
       Y3KDebug?.debug?.log(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         "Using shared SimplePerformanceCoordinator instance from SystemCoordinator"
       );
       return this.performanceOrchestrator as T;
@@ -741,7 +755,7 @@ export class NonVisualSystemFacade {
     if (key === "MusicSyncService" && this.musicSyncService) {
       this.systemCache.set(key, this.musicSyncService);
       Y3KDebug?.debug?.log(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         "Using shared MusicSyncService instance from SystemCoordinator"
       );
       return this.musicSyncService as T;
@@ -752,7 +766,7 @@ export class NonVisualSystemFacade {
     if (key === "LoadingStateService" && this.loadingStateService) {
       this.systemCache.set(key, this.loadingStateService);
       Y3KDebug?.debug?.log(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         "Using shared LoadingStateService instance"
       );
       return this.loadingStateService as T;
@@ -784,7 +798,7 @@ export class NonVisualSystemFacade {
   /**
    * Create a new non-visual system instance with strategy-based dependency injection
    */
-  public async createSystem<T = any>(key: NonVisualSystemKey): Promise<T> {
+  public async createSystem<T = any>(key: InfrastructureSystemKey): Promise<T> {
     const startTime = performance.now();
 
     try {
@@ -806,8 +820,8 @@ export class NonVisualSystemFacade {
       }
 
       if (key === "ColorOrchestrator") {
-        // ColorOrchestrator is a singleton - use globalUnifiedColorProcessingEngine
-        const system = globalUnifiedColorProcessingEngine as T;
+        // ColorOrchestrator is a singleton - use globalColorProcessor
+        const system = globalColorProcessor as T;
 
         // Inject additional dependencies
         this.injectDependencies(system, key);
@@ -844,7 +858,7 @@ export class NonVisualSystemFacade {
       this.currentMetrics.dependencyResolutionTime += endTime - startTime;
 
       Y3KDebug?.debug?.log(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         `Created ${key} via direct construction`,
         {
           totalTime: endTime - startTime,
@@ -862,7 +876,7 @@ export class NonVisualSystemFacade {
       }
 
       Y3KDebug?.debug?.error(
-        "NonVisualSystemFacade",
+        "InfrastructureSystemCoordinator",
         `Failed to create system ${key}:`,
         error
       );
@@ -951,7 +965,7 @@ export class NonVisualSystemFacade {
    * Future Phase 2.1 can migrate systems to self-constructing pattern using SystemCreationContext.
    */
   private createSystemDirectly<T = any>(
-    key: NonVisualSystemKey,
+    key: InfrastructureSystemKey,
     SystemClass: new (...args: any[]) => T,
     dependencies: SharedDependencies
   ): T {
@@ -986,8 +1000,8 @@ export class NonVisualSystemFacade {
           undefined // settingsManager removed - using TypedSettingsManager singleton
         ) as T;
 
-      // Enhanced Master Animation Coordinator
-      case "EnhancedMasterAnimationCoordinator":
+      // Animation Frame Coordinator
+      case "AnimationFrameCoordinator":
         return new SystemClass(
           this.config,
           dependencies.performanceCoordinator || dependencies.performanceAnalyzer
@@ -1062,7 +1076,7 @@ export class NonVisualSystemFacade {
         } catch (error) {
           // Fallback to common dependency pattern
           Y3KDebug?.debug?.warn(
-            "NonVisualSystemFacade",
+            "InfrastructureSystemCoordinator",
             `Using fallback constructor pattern for ${key}`
           );
           return new SystemClass(
@@ -1078,7 +1092,7 @@ export class NonVisualSystemFacade {
   /**
    * Inject dependencies into non-visual systems
    */
-  private injectDependencies(system: any, key: NonVisualSystemKey): void {
+  private injectDependencies(system: any, key: InfrastructureSystemKey): void {
     if (!this.facadeConfig.enableDependencyInjection) return;
 
     const dependencies = this.systemDependencies.get(key) || [];
@@ -1138,10 +1152,13 @@ export class NonVisualSystemFacade {
 
   /**
    * Integrate performance monitoring for non-visual systems
+   *
+   * Phase 3.3: Opt-in pattern - only wraps systems that explicitly enable monitoring
+   * Systems must implement IMonitorableSystem and set enablePerformanceMonitoring = true
    */
   private integratePerformanceMonitoring(
     system: any,
-    key: NonVisualSystemKey
+    key: InfrastructureSystemKey
   ): void {
     if (
       !this.facadeConfig.enablePerformanceMonitoring ||
@@ -1149,7 +1166,13 @@ export class NonVisualSystemFacade {
     )
       return;
 
-    // Wrap initialize method with performance monitoring
+    // Phase 3.3: Check if system opts into performance monitoring
+    // Only wrap methods if system explicitly enables monitoring via IMonitorableSystem interface
+    if (!system.enablePerformanceMonitoring) {
+      return;
+    }
+
+    // System has opted in - wrap initialize method with performance monitoring
     const originalInitialize = system.initialize;
     if (typeof originalInitialize === "function") {
       system.initialize = async (...args: any[]) => {
@@ -1195,13 +1218,13 @@ export class NonVisualSystemFacade {
             await system.initialize();
           }
           Y3KDebug?.debug?.log(
-            "NonVisualSystemFacade",
+            "InfrastructureSystemCoordinator",
             `Initialized system: ${key}`
           );
           return { key, success: true };
         } catch (error) {
           Y3KDebug?.debug?.error(
-            "NonVisualSystemFacade",
+            "InfrastructureSystemCoordinator",
             `Failed to initialize ${key}:`,
             error
           );
@@ -1216,7 +1239,7 @@ export class NonVisualSystemFacade {
     ).length;
 
     Y3KDebug?.debug?.log(
-      "NonVisualSystemFacade",
+      "InfrastructureSystemCoordinator",
       `Non-visual systems initialized: ${successCount}/${results.length}`
     );
   }
@@ -1224,8 +1247,8 @@ export class NonVisualSystemFacade {
   /**
    * Perform health check on all non-visual systems
    */
-  public async performHealthCheck(): Promise<NonVisualSystemHealthCheck> {
-    const healthCheck: NonVisualSystemHealthCheck = {
+  public async performHealthCheck(): Promise<InfrastructureSystemHealthCheck> {
+    const healthCheck: InfrastructureSystemHealthCheck = {
       overall: "good",
       systems: new Map(),
       recommendations: [],
@@ -1308,7 +1331,7 @@ export class NonVisualSystemFacade {
   }
 
   // Utility methods
-  private createInitialMetrics(): NonVisualSystemMetrics {
+  private createInitialMetrics(): InfrastructureSystemMetrics {
     return {
       systemCount: this.systemRegistry.size,
       initializedSystems: 0,
@@ -1413,39 +1436,39 @@ export class NonVisualSystemFacade {
   }
 
   // Public API
-  public getMetrics(): NonVisualSystemMetrics {
+  public getMetrics(): InfrastructureSystemMetrics {
     return { ...this.currentMetrics };
   }
 
-  public getLastHealthCheck(): NonVisualSystemHealthCheck | null {
+  public getLastHealthCheck(): InfrastructureSystemHealthCheck | null {
     return this.lastHealthCheck;
   }
 
-  public getConfiguration(): NonVisualSystemConfig {
+  public getConfiguration(): InfrastructureSystemConfig {
     return { ...this.facadeConfig };
   }
 
   public async setConfiguration(
-    config: Partial<NonVisualSystemConfig>
+    config: Partial<InfrastructureSystemConfig>
   ): Promise<void> {
     this.facadeConfig = { ...this.facadeConfig, ...config };
     await this.applyConfiguration();
   }
 
   public setOnSystemCreated(
-    callback: (systemKey: NonVisualSystemKey, system: any) => void
+    callback: (systemKey: InfrastructureSystemKey, system: any) => void
   ): void {
     this.onSystemCreated = callback;
   }
 
   public setOnSystemFailed(
-    callback: (systemKey: NonVisualSystemKey, error: Error) => void
+    callback: (systemKey: InfrastructureSystemKey, error: Error) => void
   ): void {
     this.onSystemFailed = callback;
   }
 
   public setOnHealthChange(
-    callback: (health: NonVisualSystemHealthCheck) => void
+    callback: (health: InfrastructureSystemHealthCheck) => void
   ): void {
     this.onHealthChange = callback;
   }
@@ -1472,7 +1495,7 @@ export class NonVisualSystemFacade {
     this.systemCache.clear();
 
     Y3KDebug?.debug?.log(
-      "NonVisualSystemFacade",
+      "InfrastructureSystemCoordinator",
       "Non-visual systems facade destroyed"
     );
   }

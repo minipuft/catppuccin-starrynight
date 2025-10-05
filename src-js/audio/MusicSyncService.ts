@@ -1,6 +1,6 @@
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
+import { ThemeLifecycleCoordinator, Year3000System } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 import type { ColorContext } from "@/types/colorStrategy";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { SpicetifyAudioFeatures, SpicetifyPlayerData } from "@/types/systems";
@@ -181,7 +181,7 @@ interface MusicSyncDependencies {
   YEAR3000_CONFIG?: Year3000Config; // Legacy compatibility
   ThemeUtilities?: typeof Utils;
   // NOTE: settingsManager removed - was dead code, never used
-  year3000System?: Year3000System;
+  year3000System?: ThemeLifecycleCoordinator;
   genreProfileManager?: any;
   [key: string]: unknown;
 }
@@ -314,7 +314,7 @@ export class MusicSyncService {
   private config: AdvancedSystemConfig | Year3000Config;
   private utils: typeof Utils;
   // NOTE: settingsManager field removed - was dead code, never used
-  private year3000System?: Year3000System | null;
+  private year3000System?: ThemeLifecycleCoordinator | null;
   private genreProfileManager: GenreProfileManager;
   
   // OKLAB integration for perceptually uniform color processing

@@ -1,5 +1,6 @@
 /**
- * UnifiedColorProcessingEngine - Single Entry Point for All Color Processing
+ * ColorProcessor - Single Entry Point for All Color Processing
+ * (Renamed from UnifiedColorProcessingEngine for standards compliance)
  *
  * Consolidates ColorEventOrchestrator, ColorOrchestrator, EnhancedColorOrchestrator,
  * and ColorHarmonyEngine processing logic into a single, efficient system.
@@ -18,8 +19,8 @@
  */
 
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-// Base system class - UnifiedColorProcessingEngine doesn't extend visual system base
-// import { BaseVisualSystem } from '@/core/base/UnifiedSystemBase';
+// Base system class - ColorProcessor doesn't extend visual system base
+// import { BaseVisualSystem } from '@/core/base/ManagedSystemBase';
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -120,7 +121,7 @@ interface UnifiedProcessingResult extends ColorResult {
 // Main Unified Processing Engine
 // ============================================================================
 
-export class UnifiedColorProcessingEngine
+export class ColorProcessor
   implements IManagedSystem, IColorOrchestrator
 {
   public initialized = false;
@@ -1416,5 +1417,8 @@ const getSharedDependencies = () => {
 };
 
 const { performanceAnalyzer } = getSharedDependencies();
-export const globalUnifiedColorProcessingEngine =
-  new UnifiedColorProcessingEngine(performanceAnalyzer);
+export const globalColorProcessor =
+  new ColorProcessor(performanceAnalyzer);
+
+// Legacy alias for backward compatibility during migration
+export const globalUnifiedColorProcessingEngine = globalColorProcessor;

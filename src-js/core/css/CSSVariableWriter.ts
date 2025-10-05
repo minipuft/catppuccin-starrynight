@@ -293,7 +293,7 @@ export class CSSVariableWriter implements IManagedSystem {
     this.currentPerformanceMode =
       this.performanceCoordinator.getCurrentPerformanceMode();
 
-    // Note: Singleton pattern removed - instances managed through SystemCoordinator
+    // Note: Singleton pattern removed - instances managed through SystemIntegrationCoordinator
 
     if (this.config.enableDebug) {
       console.log(
@@ -302,7 +302,7 @@ export class CSSVariableWriter implements IManagedSystem {
     }
   }
 
-  // Deprecated getInstance() method removed - use dependency injection through SystemCoordinator
+  // Deprecated getInstance() method removed - use dependency injection through SystemIntegrationCoordinator
   // or getGlobalOptimizedCSSController() for simple utility usage
 
   // ===================================================================
@@ -1979,13 +1979,13 @@ export class CSSVariableWriter implements IManagedSystem {
 
 /**
  * Global CSSVariableWriter instance
- * Set by SystemCoordinator during initialization
+ * Set by SystemIntegrationCoordinator during initialization
  */
 let globalCSSVariableWriter: CSSVariableWriter | null = null;
 
 /**
  * Set the global CSSVariableWriter instance
- * Called by SystemCoordinator during initialization
+ * Called by SystemIntegrationCoordinator during initialization
  *
  * @param instance - The CSSVariableWriter instance to set as global
  */
@@ -1993,7 +1993,7 @@ export function setGlobalCSSVariableWriter(instance: CSSVariableWriter): void {
   if (globalCSSVariableWriter && globalCSSVariableWriter !== instance) {
     console.warn(
       '[CSSVariableWriter] Replacing existing global instance. ' +
-      'This may indicate multiple SystemCoordinator initializations.'
+      'This may indicate multiple SystemIntegrationCoordinator initializations.'
     );
   }
   globalCSSVariableWriter = instance;
@@ -2003,13 +2003,13 @@ export function setGlobalCSSVariableWriter(instance: CSSVariableWriter): void {
  * Get the global CSSVariableWriter instance
  *
  * @returns The global CSSVariableWriter instance
- * @throws Error if instance not set by SystemCoordinator
+ * @throws Error if instance not set by SystemIntegrationCoordinator
  */
 export function getGlobalCSSVariableWriter(): CSSVariableWriter {
   if (!globalCSSVariableWriter) {
     throw new Error(
       '[CSSVariableWriter] Global instance not initialized. ' +
-      'SystemCoordinator must call setGlobalCSSVariableWriter() during initialization.'
+      'SystemIntegrationCoordinator must call setGlobalCSSVariableWriter() during initialization.'
     );
   }
   return globalCSSVariableWriter;

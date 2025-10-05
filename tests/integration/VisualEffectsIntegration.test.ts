@@ -234,7 +234,7 @@ describe('Visual Effects Integration', () => {
         });
         document.dispatchEvent(beatEvent);
         
-        musicSync.onAnimate(16.67);
+        musicSync.updateAnimation(16.67);
         glowController.updateAnimation(16.67);
         
         // Check that glow responds to music intensity
@@ -323,7 +323,7 @@ describe('Visual Effects Integration', () => {
         });
         document.dispatchEvent(energyEvent);
         
-        musicSync.onAnimate(16.67);
+        musicSync.updateAnimation(16.67);
         gradientSystem.updateAnimation(16.67);
         
         // Gradient should respond to energy changes
@@ -374,7 +374,7 @@ describe('Visual Effects Integration', () => {
         document.dispatchEvent(customEvent);
         
         // Update all systems
-        musicSync.onAnimate(16.67);
+        musicSync.updateAnimation(16.67);
         particleSystem.updateAnimation(16.67);
         glowController.updateAnimation(16.67);
         gradientSystem.updateAnimation(16.67);
@@ -409,7 +409,7 @@ describe('Visual Effects Integration', () => {
         
         // Process several frames to see adaptation
         for (let frame = 0; frame < 15; frame++) {
-          musicSync.onAnimate(16.67);
+          musicSync.updateAnimation(16.67);
           particleSystem.updateAnimation(16.67);
           gradientSystem.updateAnimation(16.67);
         }
@@ -443,7 +443,7 @@ describe('Visual Effects Integration', () => {
         
         // Process transition frames
         for (let frame = 0; frame < 30; frame++) {
-          musicSync.onAnimate(16.67);
+          musicSync.updateAnimation(16.67);
           glowController.updateAnimation(16.67);
           fluidBackground.updateAnimation(16.67);
         }
@@ -479,7 +479,7 @@ describe('Visual Effects Integration', () => {
           }
           
           // Update all systems
-          musicSync.onAnimate(16.67);
+          musicSync.updateAnimation(16.67);
           particleSystem.updateAnimation(16.67);
           glowController.updateAnimation(16.67);
           gradientSystem.updateAnimation(16.67);
@@ -632,7 +632,7 @@ describe('Visual Effects Integration', () => {
       for (const event of invalidEvents) {
         expect(() => {
           document.dispatchEvent(event);
-          musicSync.onAnimate(16.67);
+          musicSync.updateAnimation(16.67);
           particleSystem.updateAnimation(16.67);
         }).not.toThrow();
       }

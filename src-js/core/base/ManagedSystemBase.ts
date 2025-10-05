@@ -1,26 +1,33 @@
 import { SimplePerformanceCoordinator } from '@/core/performance/SimplePerformanceCoordinator';
 import { getGlobalCSSVariableWriter, CSSVariableWriter } from '@/core/css/CSSVariableWriter';
 import { unifiedEventBus, type EventName, type EventData } from '@/core/events/UnifiedEventBus';
-import { AnimationFrameCoordinator } from '@/core/animation/EnhancedMasterAnimationCoordinator';
+import { AnimationFrameCoordinator } from '@/core/animation/AnimationFrameCoordinator';
 import { UnifiedPerformanceCoordinator, PerformanceAnalyzer } from '@/core/performance/UnifiedPerformanceCoordinator';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import type { HealthCheckResult } from '@/types/systems';
 import type { AdvancedSystemConfig } from '@/types/models';
 
 /**
- * UnifiedSystemBase - Single base class for all Year 3000 systems
- * 
- * This class unifies the IManagedSystem interface and BaseVisualSystem class
- * patterns into a single, optimized architecture. It provides:
- * - Unified lifecycle management
- * - Shared utility access (performance, CSS variables, events, animation)
- * - Consistent error handling and logging
- * - Performance monitoring integration
- * 
- * @architecture Phase 1 of system consolidation
- * @performance Target: 30-40% initialization time improvement
+ * ManagedSystemBase - Single base class for all Year 3000 systems
+ *
+ * @deprecated This class has been replaced by ServiceSystemBase/ServiceVisualSystemBase
+ * which use composition over inheritance for better testability and flexibility.
+ *
+ * Migration guide:
+ * - For non-visual systems: Use ServiceSystemBase from @/core/services/ServiceCompositionBase
+ * - For visual systems: Use ServiceVisualSystemBase from @/core/services/ServiceCompositionBase
+ * - Replace initialize() with performSystemSpecificInitialization() or performVisualSystemInitialization()
+ * - Replace destroy() with performSystemSpecificCleanup() or performVisualSystemCleanup()
+ * - Replace healthCheck() with performSystemHealthCheck()
+ * - Replace onAnimate() with updateAnimation()
+ *
+ * This class will be removed in version 2.0.
+ *
+ * @architecture Legacy inheritance-based pattern (deprecated)
+ * @see ServiceSystemBase for modern composition-based pattern
+ * @see ServiceVisualSystemBase for visual systems
  */
-export abstract class UnifiedSystemBase {
+export abstract class ManagedSystemBase {
   // Core lifecycle state
   public initialized: boolean = false;
   protected destroyed: boolean = false;
@@ -51,9 +58,14 @@ export abstract class UnifiedSystemBase {
   constructor(config: AdvancedSystemConfig = ADVANCED_SYSTEM_CONFIG) {
     this.config = config;
     this.systemName = this.constructor.name;
-    
+
+    // Deprecation warning
     if (this.config.enableDebug) {
-      console.log(`[${this.systemName}] UnifiedSystemBase constructor`);
+      console.warn(
+        `[${this.systemName}] DEPRECATION WARNING: ManagedSystemBase is deprecated. ` +
+        `Migrate to ServiceSystemBase or ServiceVisualSystemBase. ` +
+        `See migration guide in class documentation. Will be removed in v2.0.`
+      );
     }
   }
   

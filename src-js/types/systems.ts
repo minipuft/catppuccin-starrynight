@@ -202,13 +202,41 @@ export interface IManagedSystem {
   forceRepaint?(reason?: string): void;
 }
 
+/**
+ * Phase 3.3: Optional mix-in interface for systems that opt into performance monitoring
+ *
+ * Systems implementing this interface explicitly signal that they want their
+ * initialize() and updateAnimation() methods wrapped with performance tracking.
+ *
+ * This replaces automatic wrapping of all systems (which adds overhead) with an
+ * opt-in pattern where only systems that need monitoring pay the performance cost.
+ *
+ * @example
+ * class MySystem implements IManagedSystem, IMonitorableSystem {
+ *   enablePerformanceMonitoring = true;
+ *
+ *   async initialize() { ... }
+ *   updateAnimation(deltaTime: number) { ... }
+ *   // Performance tracking will be automatically integrated
+ * }
+ */
+export interface IMonitorableSystem {
+  /**
+   * When true, the system's initialize() and updateAnimation() methods will be
+   * wrapped with performance monitoring that records execution time metrics.
+   *
+   * Set to false or omit this property to opt out of monitoring overhead.
+   */
+  enablePerformanceMonitoring: boolean;
+}
+
 // Optional mix-in interface for runtime settings updates. Visual systems that
 // need to react immediately to StarryNight/Year3000 settings changes can
-// implement this. The Year3000System will invoke it whenever the
+// implement this. The ThemeLifecycleCoordinator will invoke it whenever the
 // `year3000SystemSettingsChanged` event is relayed via its internal handler.
 export interface ISettingsResponsiveSystem {
   /**
-   * Called by Year3000System each time a user or API mutates a theme setting.
+   * Called by ThemeLifecycleCoordinator each time a user or API mutates a theme setting.
    * @param key   The storage key that changed (e.g. "sn-enable-webgl")
    * @param value The new value (already validated by SettingsManager)
    */

@@ -2,14 +2,14 @@ import {
   HARMONIC_EVOLUTION_KEY,
   HARMONIC_INTENSITY_KEY,
 } from "@/config/settingKeys";
-// EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
+// EmergentChoreographyEngine consolidated into AnimationFrameCoordinator
 import { GenreProfileManager } from "@/audio/GenreProfileManager";
 import type {
   GenreCharacteristics,
   GenreVisualStyle,
   GenreType as MusicGenre,
 } from "@/types/genre";
-import type { AnimationFrameCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
+import type { AnimationFrameCoordinator } from "@/core/animation/AnimationFrameCoordinator";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -36,7 +36,7 @@ import { PaletteExtensionManager } from "@/utils/core/PaletteExtensionManager";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { SpicetifyColorBridge } from "@/utils/spicetify/SpicetifyColorBridge";
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
-import { globalUnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
+import { globalColorProcessor, globalUnifiedColorProcessingEngine } from "@/core/color/ColorProcessor";
 import {
   MusicEmotionAnalyzer,
   type AudioData,
@@ -129,26 +129,26 @@ interface VibrancyConfig {
 }
 
 // =============================================================================
-// OKLAB COLOR PROCESSOR - Pure Color Science Processing
-// Formerly: Year3000 Color Harmony Engine
+// MUSIC EMOTION ANALYSIS ORCHESTRATOR
+// Formerly: Year3000 Color Harmony Engine (color processing removed Phase 2)
 // =============================================================================
 
 /**
- * 🔧 PHASE 2: Pure OKLAB color processor (renamed from ColorHarmonyEngine)
+ * 🎵 Music Emotion Analysis Orchestrator (formerly ColorHarmonyEngine)
  *
- * ARCHITECTURAL ROLE: Pure processor - generates color harmonies using OKLAB color science
- * - Input: Raw colors from album art
- * - Output: ColorResult with processed colors and complete CSS variables
- * - NO CSS writes, NO state management - pure processing only
- * - Emits results via colors:harmonized event for ColorStateManager to apply
+ * ARCHITECTURAL ROLE: Orchestrates music emotion analysis and emotional context
+ * - Initializes and coordinates MusicEmotionAnalyzer
+ * - Emits music:emotion-analyzed events for audio feature analysis
+ * - Emits music:emotional-context-updated events for emotional temperature
+ * - Integrates genre-specific aesthetic intelligence
+ * - NO color processing - delegated to ColorProcessor
  *
  * @class OKLABColorProcessor
  * @implements {IManagedSystem}
- * @implements {IColorProcessor}
  */
 export class OKLABColorProcessor
   extends BaseVisualSystem
-  implements IManagedSystem, IColorProcessor
+  implements IManagedSystem
 {
   /**
    * Canonical accent CSS custom property names.
@@ -753,18 +753,11 @@ export class OKLABColorProcessor
     // Initial semantic color setup - DISABLED to prevent color override
     // await this.semanticColorManager.updateSemanticColors();
 
-    // Subscribe to color extraction events for strategy pattern
-    unifiedEventBus.subscribe(
-      "colors:extracted",
-      this.handleColorExtraction.bind(this),
-      "ColorHarmonyEngine"
-    );
-
-    // ColorHarmonyEngine operates as independent OKLAB color processor
-    // Direct integration with UnifiedColorProcessingEngine through event system
+    // ColorHarmonyEngine focuses on music emotion analysis
+    // Color processing delegated to ColorProcessor
     if (this.config.enableDebug) {
       console.log(
-        "🎨 [ColorHarmonyEngine] Initialized as independent OKLAB color processor."
+        "🎭 [ColorHarmonyEngine] Initialized for music emotion analysis."
       );
     }
 
@@ -938,271 +931,10 @@ export class OKLABColorProcessor
   // IColorProcessor Strategy Pattern Implementation
   // ============================================================================
 
-  /**
-   * Process colors according to Catppuccin harmony strategy with enhanced OKLAB integration
-   * Implements the Strategy pattern for color processing with comprehensive system utilization
-   */
-  public async processColors(context: ColorContext): Promise<ColorResult> {
-    const startTime = performance.now();
 
-    try {
-      // Extract relevant data from context
-      const { rawColors, trackUri, musicData } = context;
+  // IColorProcessor utility methods removed - ColorHarmonyEngine now focuses on music emotion analysis
+  // Color processing delegated to ColorProcessor
 
-      // 🔬 ENHANCED OKLAB PROCESSING: Determine optimal enhancement preset based on context
-      const optimalPreset = this.determineOptimalOKLABPreset(context);
-      this.oklabState.currentPreset = optimalPreset;
-
-      // 🎶 GENRE AESTHETIC INTELLIGENCE: Detect and apply genre-specific visual characteristics
-      const genreData = await this.analyzeGenreAesthetics(musicData, rawColors);
-
-      // 🌡️ ADVANCED EMOTIONAL TEMPERATURE INTEGRATION: Get comprehensive emotional analysis
-      // Enhanced with album art color psychology for multi-sensory emotion intelligence
-      const emotionalTemperature = await this.getAdvancedEmotionalTemperature(
-        musicData,
-        rawColors
-      );
-
-      // 🎨 PERCEPTUAL COLOR PROCESSING: Use OKLAB-enhanced color blending with genre aesthetics
-      const processedColors = await this.blendWithAdvancedOKLAB(
-        rawColors,
-        musicData,
-        emotionalTemperature,
-        genreData || undefined
-      );
-
-      // Extract primary accent color for event data
-      const accentHex =
-        processedColors["VIBRANT"] ||
-        processedColors["PROMINENT"] ||
-        Object.values(processedColors)[0] ||
-        "#a6adc8"; // Catppuccin fallback
-
-      // Convert to RGB for transparency support
-      const rgb = this.utils.hexToRgb(accentHex);
-      const accentRgb = rgb ? `${rgb.r},${rgb.g},${rgb.b}` : "166,173,200";
-
-      // 🔧 Phase 2: Proper UnifiedEventBus architecture - no DOM events
-      try {
-        // Emit colors:harmonized event through UnifiedEventBus only (no DOM events)
-        const harmonizedEventData = {
-          processedColors: processedColors,
-          accentHex: accentHex,
-          accentRgb: accentRgb,
-          originalColors: rawColors,
-          trackUri: trackUri,
-          musicData: musicData,
-          timestamp: Date.now(),
-          strategies: ["ColorHarmonyEngine"],
-          processingTime: performance.now() - startTime,
-          coordinationMetrics: {
-            detectedGenre: genreData?.genre || "unknown",
-            genreConfidence: genreData?.confidence || 0.0,
-            emotionalState:
-              this.emotionalState.currentEmotion?.primary || "neutral",
-            oklabPreset: optimalPreset?.name || "standard",
-            coordinationStrategy: "genre-emotion-color-unified",
-            musicInfluenceStrength: this.genreState.genreInfluenceIntensity,
-          },
-        };
-
-        // Use UnifiedEventBus for proper facade coordination
-        unifiedEventBus.emitSync("colors:harmonized", harmonizedEventData);
-
-        if (this.config.enableDebug) {
-          console.log(
-            "🎨 [ColorHarmonyEngine] Emitted colors:harmonized via UnifiedEventBus (facade pattern):",
-            {
-              processedColors: Object.keys(processedColors),
-              accentHex: accentHex,
-              noDomEvents: "correct architecture",
-            }
-          );
-        }
-      } catch (eventError) {
-        if (this.config.enableDebug) {
-          console.warn(
-            "[ColorHarmonyEngine] Failed to emit colors:harmonized event:",
-            eventError
-          );
-        }
-      }
-
-      // Calculate processing time
-      const processingTime = performance.now() - startTime;
-
-      // Update metrics
-      this.harmonyMetrics.totalHarmonyCalculations++;
-      this.harmonyMetrics.performance.push(processingTime);
-
-      const result: ColorResult = {
-        processedColors,
-        accentHex,
-        accentRgb,
-        metadata: {
-          strategy: "CatppuccinHarmony",
-          processingTime,
-          cacheKey: `catppuccin-${trackUri}-${this.currentTheme}`,
-          colorHarmonyIntensity: this.userIntensity,
-        },
-        context,
-      };
-
-      // 🔬 COMPREHENSIVE OKLAB CSS GENERATION: Generate advanced OKLAB variables
-      const cssVariables = this.generateAdvancedOKLABCSSVariables(result);
-
-      // 🎨 PHASE 2 OPTIMIZATION: Pre-compute color variations for runtime animation
-      // Generate shimmer and atmosphere variants in OKLAB space to eliminate runtime filters
-      const colorVariations = this.generateColorVariations(result);
-      Object.assign(cssVariables, colorVariations);
-
-      // 🔧 PHASE 2 REFACTOR: Enhance CSS variables for UI components BEFORE emission
-      // This ensures ColorStateManager receives complete, UI-ready variables
-      const enhancedCssVariables = this.enhanceCSSVariablesForUIComponents(cssVariables);
-
-      // 🔧 PHASE 2 REFACTOR: Pure processor pattern
-      // Instead of applying CSS directly, emit event with ALL CSS variables
-      // ColorStateManager (CSS authority) will handle DOM application
-
-      // 🎯 PERCEPTUAL GRADIENT GENERATION: Generate OKLAB-based gradient data for WebGL systems
-      this.generatePerceptualGradientData(result);
-
-      // 📊 COLOR HARMONY ANALYSIS: Update harmony metrics with perceptual analysis
-      this.updateAdvancedHarmonyMetrics(result, processingTime);
-
-      // 🔧 PHASE 2: Emit processed result with complete CSS variable set
-      // ColorStateManager subscribes to this and handles CSS application
-      unifiedEventBus.emitSync("colors:harmonized", {
-        processedColors: result.processedColors,
-        cssVariables: enhancedCssVariables, // 🔧 Complete UI-enhanced CSS variables
-        accentHex: result.accentHex,
-        accentRgb: result.accentRgb,
-        strategies: result.metadata?.strategy
-          ? [result.metadata.strategy]
-          : ["OKLABColorProcessor"], // 🔧 Updated name
-        processingTime: processingTime,
-        trackUri: result.context.trackUri,
-        timestamp: Date.now(), // 🔧 NEW: For tracking
-      });
-
-      if (this.config.enableDebug) {
-        console.log(
-          `🎨 [ColorHarmonyEngine] Processed colors via strategy pattern in ${processingTime.toFixed(
-            2
-          )}ms`,
-          {
-            accentHex,
-            strategy: "CatppuccinHarmony",
-            cssVariablesCount: Object.keys(cssVariables).length,
-          }
-        );
-      }
-
-      return result;
-    } catch (error) {
-      console.error("[ColorHarmonyEngine] Strategy processing failed:", error);
-
-      // Return fallback result
-      return {
-        processedColors: { VIBRANT: "#a6adc8" },
-        accentHex: "#a6adc8",
-        accentRgb: "166,173,200",
-        metadata: {
-          strategy: "CatppuccinHarmony",
-          processingTime: performance.now() - startTime,
-          error: String(error),
-        },
-        context,
-      };
-    }
-  }
-
-  /**
-   * Get strategy name for identification
-   */
-  public getStrategyName(): string {
-    return "CatppuccinHarmony";
-  }
-
-  /**
-   * Check if this strategy can process the given context
-   */
-  public canProcess(context: ColorContext): boolean {
-    // Can process any context with raw colors
-    return (
-      context && context.rawColors && Object.keys(context.rawColors).length > 0
-    );
-  }
-
-  /**
-   * Get estimated processing time for performance planning
-   */
-  public getEstimatedProcessingTime(context: ColorContext): number {
-    // Base time + complexity factor
-    const baseTime = 5; // ms
-    const colorCount = Object.keys(context.rawColors || {}).length;
-    const complexityFactor = Math.max(1, colorCount / 5);
-
-    return baseTime * complexityFactor;
-  }
-
-  /**
-   * Handle color extraction events from unifiedEventBus
-   * Event-driven entry point for strategy pattern
-   */
-  private async handleColorExtraction(data: {
-    rawColors: Record<string, string>;
-    trackUri: string;
-    timestamp: number;
-    musicData?: {
-      energy?: number;
-      valence?: number;
-      tempo?: number;
-      genre?: string;
-    };
-  }): Promise<void> {
-    try {
-      if (!this.initialized) {
-        if (this.config.enableDebug) {
-          console.warn(
-            "[ColorHarmonyEngine] Received color extraction event but not initialized"
-          );
-        }
-        return;
-      }
-
-      // Convert unified event data to ColorContext
-      const context: ColorContext = {
-        rawColors: data.rawColors,
-        trackUri: data.trackUri,
-        timestamp: data.timestamp,
-        colorHarmonyMode: this.currentTheme,
-        harmonicMode: this.currentTheme, // Legacy compatibility
-        musicData: data.musicData,
-        performanceHints: {
-          preferLightweight: false,
-          enableAdvancedBlending: true,
-          maxProcessingTime: 100,
-        },
-      };
-
-      if (this.canProcess(context)) {
-        await this.processColors(context);
-      } else {
-        if (this.config.enableDebug) {
-          console.warn(
-            "[ColorHarmonyEngine] Cannot process color context:",
-            context
-          );
-        }
-      }
-    } catch (error) {
-      console.error(
-        "[ColorHarmonyEngine] Error handling color extraction event:",
-        error
-      );
-    }
-  }
 
   /**
    * Generate CSS variables from color result

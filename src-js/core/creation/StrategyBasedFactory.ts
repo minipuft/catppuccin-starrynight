@@ -218,7 +218,7 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
       "GlassmorphismManager",
       "Card3DManager",
       "CSSVariableWriter",
-      "EnhancedMasterAnimationCoordinator",
+      "AnimationFrameCoordinator",
     ];
 
     if (simpleSystems.includes(systemKey)) {

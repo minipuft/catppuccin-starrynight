@@ -9,7 +9,7 @@
  * =============================================================================
  */
 
-import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
+import { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 
 /** Thin wrapper that owns the canvas and GL program.  */
@@ -30,7 +30,7 @@ export class AberrationCanvas {
 
   constructor(
     private parent: HTMLElement,
-    private y3k: Year3000System | null = null
+    private y3k: ThemeLifecycleCoordinator | null = null
   ) {
     this.canvas = document.createElement("canvas");
     this.canvas.width = this._defaultSize;
@@ -236,7 +236,7 @@ export class AberrationCanvas {
 
 /** Convenience initializer matching AudioVisualController style. */
 export function initializeAberrationCanvas(
-  y3k: Year3000System | null = null
+  y3k: ThemeLifecycleCoordinator | null = null
 ): AberrationCanvas | null {
   // Capability & reduced-motion checks
   const prefersReducedMotion = window.matchMedia(

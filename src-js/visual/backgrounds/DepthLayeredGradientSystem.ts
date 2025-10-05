@@ -356,7 +356,7 @@ export class DepthLayeredGradientSystem
     // Register with visual effects coordinator
     this.registerWithVisualEffectsCoordinator();
 
-    // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by EnhancedMasterAnimationCoordinator
+    // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by AnimationFrameCoordinator
     // The coordinator will call updateAnimation(deltaTime) automatically
 
     Y3KDebug?.debug?.log(
@@ -957,7 +957,7 @@ export class DepthLayeredGradientSystem
   }
 
   /**
-   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   * ✅ RAF LOOP REMOVED - Managed by AnimationFrameCoordinator
    *
    * Benefits:
    * - Single RAF loop for all systems (not 5-8 independent loops)

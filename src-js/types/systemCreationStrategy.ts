@@ -13,7 +13,7 @@ import type { SimplePerformanceCoordinator } from "@/core/performance/SimplePerf
 // NOTE: SettingsManager import removed - file deleted in Phase 5, using TypedSettingsManager singleton
 import type { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import type { MusicSyncService } from "@/audio/MusicSyncService";
-import type { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
+import type { ThemeLifecycleCoordinator, Year3000System } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 import type { EnhancedDeviceTierDetector } from "@/core/performance/EnhancedDeviceTierDetector";
 import type { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import type { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
@@ -42,7 +42,7 @@ export interface SystemCreationContext {
     /** @deprecated Use TypedSettingsManager singleton via `settings` import from @/config */
     settingsManager?: any; // Legacy type - SettingsManager deleted in Phase 5
     musicSyncService?: MusicSyncService;
-    year3000System?: Year3000System;
+    year3000System?: ThemeLifecycleCoordinator;
     cssController?: CSSVariableWriter;
     // Backward compatibility alias
     cssConsciousnessController?: CSSVariableWriter;

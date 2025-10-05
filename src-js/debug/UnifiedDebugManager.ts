@@ -3,7 +3,7 @@
  *
  * Replaces the scattered debug systems (SystemHealthMonitor, SystemIntegrationTester,
  * PerformanceRegressionTester, OrganicConsciousnessVerification) with a single,
- * streamlined debug interface that properly integrates with UnifiedSystemBase
+ * streamlined debug interface that properly integrates with ManagedSystemBase
  * and provides meaningful console output.
  *
  * @architecture Year3000System unified architecture integration

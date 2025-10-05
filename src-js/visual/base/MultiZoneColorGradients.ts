@@ -8,8 +8,8 @@ import type { MusicSyncService } from "@/audio/MusicSyncService";
 import type {
   FrameContext,
   IVisualSystem,
-} from "@/core/animation/EnhancedMasterAnimationCoordinator";
-import type { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
+} from "@/core/animation/AnimationFrameCoordinator";
+import type { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 import type { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 // NOTE: SettingsManager import removed - was dead code, never used
@@ -53,7 +53,7 @@ export class ColorFieldManager implements IVisualSystem {
   private performanceAnalyzer: SimplePerformanceCoordinator;
   private musicSyncService: MusicSyncService | null;
   // NOTE: settingsManager field removed - was dead code, never used
-  private year3000System: Year3000System;
+  private year3000System: ThemeLifecycleCoordinator;
 
   public initialized: boolean = false;
   private colorZones: Map<string, ColorZone> = new Map();
@@ -79,7 +79,7 @@ export class ColorFieldManager implements IVisualSystem {
     performanceAnalyzer: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null,
     // NOTE: settingsManager parameter removed - was dead code, never used
-    year3000System: Year3000System
+    year3000System: ThemeLifecycleCoordinator
   ) {
     this.config = config;
     this.utils = utils;

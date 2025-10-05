@@ -8,7 +8,7 @@
  * energy analysis, and harmonic color coordination for enhanced user experience.
  */
 
-import { UnifiedSystemBase } from "@/core/base/UnifiedSystemBase";
+import { ServiceVisualSystemBase } from "@/core/services/ServiceCompositionBase";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -33,8 +33,8 @@ interface HeaderEffectsState {
   lastFrameTime: number;
 }
 
-export class HeaderVisualEffectsController extends UnifiedSystemBase {
-  protected override cssController!: CSSVariableWriter;
+export class HeaderVisualEffectsController extends ServiceVisualSystemBase {
+  private cssController!: CSSVariableWriter;
   private effectsState: HeaderEffectsState = {
     energy: 0.5,
     valence: 0.5,
@@ -167,10 +167,7 @@ export class HeaderVisualEffectsController extends UnifiedSystemBase {
     });
   }
 
-  public override async _performSystemSpecificInitialization(): Promise<void> {
-    // Call parent's empty implementation
-    await super._performSystemSpecificInitialization();
-
+  protected override async performVisualSystemInitialization(): Promise<void> {
     try {
       // Initialize CSS coordination first - use globalThis to access Year3000System
       const year3000System = (globalThis as any).year3000System;
@@ -392,7 +389,7 @@ export class HeaderVisualEffectsController extends UnifiedSystemBase {
   }
 
   /**
-   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   * ✅ RAF LOOP REMOVED - Managed by AnimationFrameCoordinator
    * Old method removed: startAnimationLoop()
    * Replacement: updateAnimation(deltaTime) called by coordinator
    */
@@ -477,7 +474,12 @@ export class HeaderVisualEffectsController extends UnifiedSystemBase {
     return { ...this.effectsState };
   }
 
-  public override async healthCheck(): Promise<HealthCheckResult> {
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
     const isHealthy =
       this.initialized &&
       this.effectsState.frameRate > 20 &&
@@ -485,6 +487,9 @@ export class HeaderVisualEffectsController extends UnifiedSystemBase {
 
     return {
       healthy: isHealthy,
+      details: isHealthy
+        ? "Header visual effects controller operational"
+        : "Header visual effects controller degraded",
       issues: isHealthy
         ? []
         : [
@@ -505,9 +510,7 @@ export class HeaderVisualEffectsController extends UnifiedSystemBase {
     };
   }
 
-  public override _performSystemSpecificCleanup(): void {
-    super._performSystemSpecificCleanup();
-
+  protected override performVisualSystemCleanup(): void {
     // ✅ RAF LOOP CONSOLIDATION: No need to stop animation - coordinator handles this
 
     // Clear update interval
@@ -525,20 +528,11 @@ export class HeaderVisualEffectsController extends UnifiedSystemBase {
     );
   }
 
-  // Required abstract method implementations
-  public async initialize(): Promise<void> {
-    await this._baseInitialize();
-  }
-
-  public async destroy(): Promise<void> {
-    this._performSystemSpecificCleanup();
-  }
-
-  public onAnimate(deltaTime: number): void {
-    // Animation handled through CSS and event system
-    // Update effects state if needed
-    if (this.effectsState.animationActive) {
-      this.updateHeaderEffectsVariables();
-    }
+  /**
+   * Legacy onAnimate callback for backward compatibility
+   * @deprecated Use updateAnimation instead
+   */
+  onAnimate(deltaTime: number): void {
+    this.updateAnimation(deltaTime);
   }
 }

@@ -1,7 +1,7 @@
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
+import { ThemeLifecycleCoordinator, Year3000System } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
@@ -55,7 +55,7 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     // Use the established updateAnimation pathway to avoid duplicating logic.
     this.updateAnimation(deltaMs);
   }
-  private year3000System: Year3000System | null;
+  private year3000System: ThemeLifecycleCoordinator | null;
   private nexusState: NexusState;
   private biometricState: BiometricState;
   private lastHeavyUpdateTime: number;
@@ -85,7 +85,7 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService,
     // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
-    year3000System: Year3000System | null = null
+    year3000System: ThemeLifecycleCoordinator | null = null
   ) {
     super(config, utils, performanceMonitor, musicSyncService);
     this.year3000System = year3000System;

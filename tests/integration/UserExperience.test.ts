@@ -178,7 +178,7 @@ describe('User Experience Integration', () => {
         document.dispatchEvent(tempoEvent);
         
         // Process animation frame
-        musicSyncSystem.onAnimate(16.67);
+        musicSyncSystem.updateAnimation(16.67);
         
         // Get current state
         const syncState = musicSyncSystem.getMusicSyncState();
@@ -202,7 +202,7 @@ describe('User Experience Integration', () => {
         });
         document.dispatchEvent(beatEvent);
         
-        musicSyncSystem.onAnimate(16.67);
+        musicSyncSystem.updateAnimation(16.67);
       }
       
       const finalState = musicSyncSystem.getMusicSyncState();
@@ -226,7 +226,7 @@ describe('User Experience Integration', () => {
       const startTime = performance.now();
       
       for (let frame = 0; frame < testFrames; frame++) {
-        musicSyncSystem.onAnimate(frameTime);
+        musicSyncSystem.updateAnimation(frameTime);
         
         // Simulate beat events periodically
         if (frame % 30 === 0) { // Every 0.5 seconds
@@ -257,7 +257,7 @@ describe('User Experience Integration', () => {
         
         // Process every 10th event
         if (i % 10 === 0) {
-          musicSyncSystem.onAnimate(16.67);
+          musicSyncSystem.updateAnimation(16.67);
         }
       }
       
@@ -273,7 +273,7 @@ describe('User Experience Integration', () => {
       const idleFrames = 300; // 5 seconds of idle
       
       for (let frame = 0; frame < idleFrames; frame++) {
-        musicSyncSystem.onAnimate(16.67);
+        musicSyncSystem.updateAnimation(16.67);
       }
       
       // System should be efficient during idle
@@ -327,7 +327,7 @@ describe('User Experience Integration', () => {
         // Should not throw errors
         expect(() => {
           document.dispatchEvent(event);
-          musicSyncSystem.onAnimate(16.67);
+          musicSyncSystem.updateAnimation(16.67);
         }).not.toThrow();
       }
     });
@@ -378,7 +378,7 @@ describe('User Experience Integration', () => {
       });
       document.dispatchEvent(intenseBeat);
       
-      musicSyncSystem.onAnimate(16.67);
+      musicSyncSystem.updateAnimation(16.67);
       
       // Visual effects should be reduced but system should still function
       const healthCheck = await musicSyncSystem.healthCheck();
@@ -399,7 +399,7 @@ describe('User Experience Integration', () => {
       await reducedMotionSystem.initialize();
       
       // System should still function without animations
-      reducedMotionSystem.onAnimate(16.67);
+      reducedMotionSystem.updateAnimation(16.67);
       
       const healthCheck = await reducedMotionSystem.healthCheck();
       expect(healthCheck.healthy).toBeDefined();

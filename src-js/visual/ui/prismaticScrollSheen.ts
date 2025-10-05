@@ -8,8 +8,8 @@
 // event overhead.
 // ---------------------------------------------------------------------------
 
-import type { FrameContext, IVisualSystem } from "@/core/animation/EnhancedMasterAnimationCoordinator";
-import year3000System from "@/core/lifecycle/AdvancedThemeSystem";
+import type { FrameContext, IVisualSystem } from "@/core/animation/AnimationFrameCoordinator";
+import year3000System from "@/core/lifecycle/ThemeLifecycleCoordinator"; // ThemeLifecycleCoordinator singleton
 import { CSSVariableWriter, getGlobalCSSVariableWriter
 } from "@/core/css/CSSVariableWriter";
 

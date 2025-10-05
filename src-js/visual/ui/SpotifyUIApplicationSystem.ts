@@ -5,7 +5,7 @@
  * This system discovers DOM elements and applies the existing --sn-* variables systematically.
  */
 
-import type { Year3000System } from "../../core/lifecycle/AdvancedThemeSystem";
+import type { ThemeLifecycleCoordinator } from "../../core/lifecycle/ThemeLifecycleCoordinator";
 import type { HealthCheckResult, IManagedSystem } from "../../types/systems";
 
 // Event-driven integration imports
@@ -48,7 +48,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
   private lastDiscoveryLogTime: number = 0;
   private lastRefreshLogTime: number = 0;
 
-  constructor(private year3000System: Year3000System) {
+  constructor(private year3000System: ThemeLifecycleCoordinator) {
     this.targets = this.initializeEmptyTargets();
   }
 

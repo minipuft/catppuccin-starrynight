@@ -92,7 +92,7 @@ export class DynamicGradientStrategy
   };
 
   // CSS Animation Manager integration for Year 3000 performance revolution  
-  private cssAnimationManager: any = null; // Will be injected (EnhancedMasterAnimationCoordinator or interface)
+  private cssAnimationManager: any = null; // Will be injected (AnimationFrameCoordinator or interface)
 
   // OKLAB calculation caching
   private oklabCache = new Map<string, OKLABProcessingResult[]>();

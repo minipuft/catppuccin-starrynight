@@ -1,12 +1,19 @@
 import { ADVANCED_SYSTEM_CONFIG } from "./config/globalConfig";
 import { settings } from "./config"; // TypedSettingsManager singleton
-import { Year3000System, AdvancedThemeSystem } from "./core/lifecycle/AdvancedThemeSystem";
+import { ThemeLifecycleCoordinator, Year3000System, AdvancedThemeSystem } from "./core/lifecycle/ThemeLifecycleCoordinator";
 import { Y3KDebug } from "./debug/UnifiedDebugManager";
 import * as ThemeUtilities from "./utils/core/ThemeUtilities";
 import { waitForSpicetifyReady } from "./utils/platform/spicetifyReady";
 import { initializeAberrationManager } from "./visual/ui/Aberration/AberrationManager"; // Re-enabled for hybrid CSS+WebGL approach
 import { initializeAudioVisualController } from "./visual/ui/AudioVisualController";
 import { startCardDOMWatcher } from "./utils/dom/CardDOMWatcher"; // Phase 2: Card normalization
+
+// Progressive enhancement utilities
+import {
+  waitForAPI,
+  waitForDOMElement,
+  waitForCatppuccinTheme,
+} from "./core/lifecycle/ProgressiveAPILoader";
 
 // A placeholder for the settings UI function until it can be properly typed.
 declare const initializeSettingsUI: (location: any) => void;
@@ -16,151 +23,8 @@ function isHistoryAvailable(platform: any): platform is { History: any } {
   return platform && typeof platform.History?.listen === "function";
 }
 
-// Enhanced progressive API detection with comprehensive error handling
-async function waitForAPI(apiPath: string, timeout = 5000): Promise<any> {
-  const start = Date.now();
-  let lastError: Error | null = null;
-  let attemptCount = 0;
-
-  while (Date.now() - start < timeout) {
-    attemptCount++;
-    try {
-      const api = apiPath
-        .split(".")
-        .reduce((obj: any, prop: string) => obj?.[prop], window as any);
-
-      if (api) {
-        console.log(
-          `✅ [StarryNight] API ${apiPath} available after ${attemptCount} attempts (${
-            Date.now() - start
-          }ms)`
-        );
-        return api;
-      }
-    } catch (e) {
-      lastError = e as Error;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
-
-  // Enhanced error logging for debugging
-  console.warn(
-    `❌ [StarryNight] API ${apiPath} timeout after ${timeout}ms (${attemptCount} attempts)`
-  );
-  if (lastError) {
-    console.warn(
-      `❌ [StarryNight] Last error for ${apiPath}:`,
-      lastError.message
-    );
-  }
-
-  // Additional diagnostic information
-  const pathParts = apiPath.split(".");
-  let currentObj: any = window;
-  for (let i = 0; i < pathParts.length; i++) {
-    const part = pathParts[i];
-    if (
-      !part ||
-      !currentObj ||
-      typeof currentObj !== "object" ||
-      currentObj[part] === undefined
-    ) {
-      console.warn(
-        `❌ [StarryNight] API path ${apiPath} breaks at '${part}' (step ${
-          i + 1
-        }/${pathParts.length})`
-      );
-      break;
-    }
-    currentObj = currentObj[part];
-  }
-
-  return null;
-}
-
-// Enhanced DOM element waiting function
-async function waitForDOMElement(
-  selector: string,
-  timeout = 5000
-): Promise<Element | null> {
-  const start = Date.now();
-  let attemptCount = 0;
-
-  while (Date.now() - start < timeout) {
-    attemptCount++;
-    try {
-      const element = document.querySelector(selector);
-      if (element) {
-        console.log(
-          `✅ [StarryNight] DOM element '${selector}' found after ${attemptCount} attempts (${
-            Date.now() - start
-          }ms)`
-        );
-        return element;
-      }
-    } catch (e) {
-      console.warn(`❌ [StarryNight] DOM query error for '${selector}':`, e);
-    }
-    await new Promise((resolve) => setTimeout(resolve, 200));
-  }
-
-  console.warn(
-    `❌ [StarryNight] DOM element '${selector}' not found after ${timeout}ms (${attemptCount} attempts)`
-  );
-  return null;
-}
-
-// 🔧 CRITICAL FIX: Wait for Catppuccin theme to be fully loaded
-async function waitForCatppuccinTheme(timeout = 5000): Promise<boolean> {
-  const start = Date.now();
-
-  while (Date.now() - start < timeout) {
-    try {
-      const rootStyle = getComputedStyle(document.documentElement);
-
-      // Check for key Catppuccin variables to ensure theme is loaded
-      const baseColor = rootStyle.getPropertyValue("--spice-base").trim();
-      const accentColor = rootStyle.getPropertyValue("--spice-accent").trim();
-      const textColor = rootStyle.getPropertyValue("--spice-text").trim();
-
-      // Ensure we have non-default, non-white colors
-      const isValidColor = (color: string) => {
-        const normalized = color.toLowerCase();
-        return (
-          color &&
-          !normalized.includes("#ffffff") &&
-          !normalized.includes("#fff") &&
-          !normalized.includes("white") &&
-          normalized.match(/^#[0-9a-f]{6}$/i)
-        );
-      };
-
-      if (
-        isValidColor(baseColor) &&
-        isValidColor(accentColor) &&
-        isValidColor(textColor)
-      ) {
-        console.log(
-          `🎨 [StarryNight] Catppuccin theme loaded: base=${baseColor}, accent=${accentColor}, text=${textColor}`
-        );
-        return true;
-      }
-
-      // If colors are still default/white, continue waiting
-      console.log(
-        `🎨 [StarryNight] Waiting for Catppuccin theme... (base=${baseColor}, accent=${accentColor})`
-      );
-    } catch (e) {
-      // Continue waiting
-    }
-    await new Promise((resolve) => setTimeout(resolve, 200));
-  }
-
-  console.warn(
-    `🎨 [StarryNight] Catppuccin theme not fully loaded after ${timeout}ms - proceeding with fallbacks`
-  );
-  return false;
-}
+// Note: waitForAPI, waitForDOMElement, and waitForCatppuccinTheme are now imported from
+// ProgressiveAPILoader module (Phase 2 refactoring)
 
 // -----------------------------------------------------------------------------
 // React / ReactDOM shim for libraries bundled with CommonJS `require()` calls.
@@ -321,7 +185,7 @@ patchReactRequire();
   }
 
   // 1. Instantiate the main system. It will handle its own internal dependencies.
-  const year3000System = new Year3000System(ADVANCED_SYSTEM_CONFIG);
+  const year3000System = new ThemeLifecycleCoordinator(ADVANCED_SYSTEM_CONFIG);
 
   // 2. Initialize the system using progressive loading approach
   try {
@@ -338,8 +202,8 @@ patchReactRequire();
         "🌟 [StarryNight] Initialized in degraded mode - visual systems only"
       );
 
-      // Set up progressive enhancement to upgrade to full mode when APIs become available
-      setupProgressiveEnhancement(year3000System, requiredAPIs);
+      // Note: Progressive enhancement is now handled internally by ThemeLifecycleCoordinator
+      // via DegradedModeCoordinator (Phase 2 refactoring)
     } else {
       // Full initialization if all APIs are available
       await year3000System.initializeAllSystems();
@@ -627,211 +491,11 @@ patchReactRequire();
 })();
 
 /**
- * Progressive Enhancement System - Upgrade from degraded mode to full mode
- * when Spicetify APIs become available
+ * Progressive Enhancement System - Deprecated (Phase 2 Refactoring)
+ *
+ * Progressive enhancement is now handled internally by:
+ * - DegradedModeCoordinator: Monitors for API availability
+ * - ThemeLifecycleCoordinator: Orchestrates system upgrades
+ *
+ * This refactoring reduces code duplication and improves separation of concerns.
  */
-function setupProgressiveEnhancement(
-  year3000System: any,
-  requiredAPIs: {
-    player: any;
-    platform: any;
-    menu: any;
-    react: any;
-    reactDOM: any;
-  }
-): void {
-  console.log(
-    "🔄 [StarryNight] Setting up progressive enhancement monitoring..."
-  );
-
-  let upgradeAttempts = 0;
-  const maxUpgradeAttempts = 30; // 5 minutes at 10-second intervals
-  const upgradeCheckInterval = 10000; // 10 seconds
-
-  const checkForUpgrade = () => {
-    upgradeAttempts++;
-
-    // Check if APIs are now available
-    const currentAPIs = {
-      player: (window as any).Spicetify?.Player,
-      platform: (window as any).Spicetify?.Platform,
-      menu: (window as any).Spicetify?.Menu,
-      react: (window as any).Spicetify?.React,
-      reactDOM: (window as any).Spicetify?.ReactDOM,
-    };
-
-    const hasRequiredAPIs = currentAPIs.player && currentAPIs.platform;
-
-    if (hasRequiredAPIs) {
-      console.log(
-        "✅ [StarryNight] Required APIs now available - upgrading to full mode!"
-      );
-
-      // Clear the monitoring interval
-      clearInterval(upgradeInterval);
-
-      // Attempt to upgrade the system to full mode
-      upgradeToFullMode(year3000System, currentAPIs)
-        .then(() => {
-          console.log(
-            "🌟 [StarryNight] Successfully upgraded from degraded mode to full mode!"
-          );
-
-          // Update global debug object to reflect the mode change
-          if ((window as any).Y3K) {
-            (window as any).Y3K.mode = "full";
-            (window as any).Y3K.availableAPIs = currentAPIs;
-          }
-        })
-        .catch((error) => {
-          console.error(
-            "❌ [StarryNight] Failed to upgrade to full mode:",
-            error
-          );
-          // Continue in degraded mode
-        });
-
-      return;
-    }
-
-    // Stop checking after max attempts
-    if (upgradeAttempts >= maxUpgradeAttempts) {
-      console.log(
-        `⏰ [StarryNight] Progressive enhancement monitoring ended after ${upgradeAttempts} attempts (${
-          (upgradeAttempts * upgradeCheckInterval) / 1000
-        }s)`
-      );
-      clearInterval(upgradeInterval);
-      return;
-    }
-
-    // Log progress every 5 attempts
-    if (upgradeAttempts % 5 === 0) {
-      console.log(
-        `🔄 [StarryNight] Still monitoring for API availability... (attempt ${upgradeAttempts}/${maxUpgradeAttempts})`
-      );
-      console.log("🔄 [StarryNight] Current API status:", {
-        player: !!currentAPIs.player,
-        platform: !!currentAPIs.platform,
-        menu: !!currentAPIs.menu,
-        react: !!currentAPIs.react,
-        reactDOM: !!currentAPIs.reactDOM,
-      });
-    }
-  };
-
-  // Start monitoring for API availability
-  const upgradeInterval = setInterval(checkForUpgrade, upgradeCheckInterval);
-
-  // Also listen for Spicetify events that might indicate the platform is ready
-  const spicetifyReadyHandler = () => {
-    console.log(
-      "🎵 [StarryNight] Spicetify ready event detected - checking for upgrade..."
-    );
-    checkForUpgrade();
-  };
-
-  // Add event listeners for Spicetify ready events
-  if ((window as any).Spicetify) {
-    if ((window as any).Spicetify.Player) {
-      (window as any).Spicetify.Player.addEventListener?.(
-        "songchange",
-        spicetifyReadyHandler
-      );
-    }
-  }
-
-  // Clean up event listeners when the interval ends
-  setTimeout(() => {
-    if ((window as any).Spicetify?.Player) {
-      (window as any).Spicetify.Player.removeEventListener?.(
-        "songchange",
-        spicetifyReadyHandler
-      );
-    }
-  }, maxUpgradeAttempts * upgradeCheckInterval);
-}
-
-/**
- * Upgrade the Year3000System from degraded mode to full mode
- */
-async function upgradeToFullMode(
-  year3000System: any,
-  availableAPIs: {
-    player: any;
-    platform: any;
-    menu: any;
-    react: any;
-    reactDOM: any;
-  }
-): Promise<void> {
-  try {
-    console.log("🚀 [StarryNight] Beginning upgrade to full mode...");
-
-    // First, verify the system is actually in degraded mode
-    if (!year3000System) {
-      throw new Error("Year3000System instance not available");
-    }
-
-    // Check if the system has an upgrade method
-    if (typeof year3000System.upgradeToFullMode === "function") {
-      console.log("🔧 [StarryNight] Using system's built-in upgrade method...");
-      await year3000System.upgradeToFullMode({
-        player: availableAPIs.player,
-        platform: availableAPIs.platform,
-        config: (window as any).Spicetify?.Config,
-        degradedMode: false,
-      });
-    } else {
-      console.log(
-        "🔧 [StarryNight] System upgrade method not available - attempting manual initialization..."
-      );
-
-      // Manually initialize systems that require Spicetify APIs
-      if (year3000System.setupMusicAnalysisAndColorExtraction) {
-        console.log(
-          "🎵 [StarryNight] Setting up music analysis and color extraction..."
-        );
-        await year3000System.setupMusicAnalysisAndColorExtraction();
-      }
-
-      // Initialize settings UI if React APIs are available
-      if (availableAPIs.react && availableAPIs.reactDOM) {
-        try {
-          console.log("⚙️ [StarryNight] Initializing settings UI...");
-          const settingsUiModule = await import(
-            "./ui/components/StarryNightSettings"
-          );
-          await (settingsUiModule as any).initializeStarryNightSettings?.();
-          console.log("✅ [StarryNight] Settings UI initialized successfully");
-        } catch (error) {
-          console.warn(
-            "⚠️ [StarryNight] Failed to initialize settings UI during upgrade:",
-            error
-          );
-        }
-      }
-    }
-
-    // Emit upgrade event
-    if (year3000System.eventBus?.emitSync) {
-      year3000System.eventBus.emitSync("system:upgraded-to-full-mode", {
-        timestamp: Date.now(),
-        availableAPIs: {
-          player: !!availableAPIs.player,
-          platform: !!availableAPIs.platform,
-          menu: !!availableAPIs.menu,
-          react: !!availableAPIs.react,
-          reactDOM: !!availableAPIs.reactDOM,
-        },
-      });
-    }
-
-    console.log(
-      "🌟 [StarryNight] Upgrade to full mode completed successfully!"
-    );
-  } catch (error) {
-    console.error("❌ [StarryNight] Upgrade to full mode failed:", error);
-    throw error;
-  }
-}

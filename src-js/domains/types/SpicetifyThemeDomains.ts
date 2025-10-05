@@ -260,7 +260,7 @@ export interface SystemCoordinationResult {
 
 export interface SystemArchitecture extends ThemeService {
   // Core components managed by this service
-  systemCoordinator: any; // SystemCoordinator
+  systemCoordinator: any; // SystemIntegrationCoordinator
   performanceAnalyzer: any; // PerformanceAnalyzer
   eventBus: any; // UnifiedEventBus
   cssController: any; // CSSVariableWriter

@@ -2,7 +2,7 @@
  * Color Manager - High-Level Color System Management
  *
  * 🔧 PHASE 2.1: This is now a backward compatibility wrapper that delegates
- * to UnifiedColorProcessingEngine while maintaining the same public API.
+ * to ColorProcessor while maintaining the same public API.
  *
  * Manages event-driven color processing using Strategy pattern.
  * Eliminates circular dependencies by acting as mediator between
@@ -13,12 +13,12 @@
  * - Observer Pattern: Event-driven coordination via UnifiedEventBus
  * - Adapter Pattern: Clean interface between systems
  * - Mediator Pattern: Coordinates strategy selection and execution
- * - Delegation Pattern: Delegates to UnifiedColorProcessingEngine for processing
+ * - Delegation Pattern: Delegates to ColorProcessor for processing
  */
 
 import { settings } from "@/config";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { UnifiedColorProcessingEngine, globalUnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
+import { ColorProcessor, globalColorProcessor, globalUnifiedColorProcessingEngine } from "@/core/color/ColorProcessor";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
@@ -208,8 +208,8 @@ export class ColorManager implements IColorOrchestrator, IManagedSystem {
   private isProcessing = false;
   private currentStrategy: string | null = null;
 
-  // 🔧 PHASE 2.1: Delegation to UnifiedColorProcessingEngine
-  private unifiedEngine: UnifiedColorProcessingEngine;
+  // 🔧 PHASE 2.1: Delegation to ColorProcessor
+  private unifiedEngine: ColorProcessor;
 
   // Enhanced multi-strategy coordination
   private strategySelector: BackgroundStrategySelector;
@@ -261,8 +261,8 @@ export class ColorManager implements IColorOrchestrator, IManagedSystem {
     this.strategySelector = new BackgroundStrategySelector();
     this.oklabProcessor = new OKLABColorProcessor(ADVANCED_SYSTEM_CONFIG.enableDebug);
 
-    // 🔧 PHASE 2.1: Initialize UnifiedColorProcessingEngine for delegation
-    this.unifiedEngine = globalUnifiedColorProcessingEngine;
+    // 🔧 PHASE 2.1: Initialize ColorProcessor for delegation
+    this.unifiedEngine = globalColorProcessor;
 
     // Enhanced default selection criteria with device awareness
     this.selectionCriteria = {
@@ -291,7 +291,7 @@ export class ColorManager implements IColorOrchestrator, IManagedSystem {
 
   /**
    * Initialize enhanced orchestrator with event bus and strategy registry
-   * 🔧 PHASE 2.1: Now delegates to UnifiedColorProcessingEngine for enhanced initialization
+   * 🔧 PHASE 2.1: Now delegates to ColorProcessor for enhanced initialization
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) {
@@ -300,7 +300,7 @@ export class ColorManager implements IColorOrchestrator, IManagedSystem {
     }
 
     try {
-      // 🔧 PHASE 2.1: Initialize UnifiedColorProcessingEngine first
+      // 🔧 PHASE 2.1: Initialize ColorProcessor first
       await this.unifiedEngine.initialize();
 
       // Subscribe to color extraction events via UnifiedEventBus
@@ -358,16 +358,16 @@ export class ColorManager implements IColorOrchestrator, IManagedSystem {
 
   /**
    * Enhanced color extraction processing with multi-strategy coordination
-   * 🔧 PHASE 2.1: Now delegates to UnifiedColorProcessingEngine for enhanced processing
+   * 🔧 PHASE 2.1: Now delegates to ColorProcessor for enhanced processing
    * Phase 4: Added recursion prevention, queue overflow protection, and caching
    */
   async handleColorExtraction(context: ColorContext): Promise<void> {
-    // 🔧 PHASE 2.1: Delegate to UnifiedColorProcessingEngine for enhanced multi-strategy processing
+    // 🔧 PHASE 2.1: Delegate to ColorProcessor for enhanced multi-strategy processing
     try {
       await this.unifiedEngine.handleColorExtraction(context);
       Y3KDebug?.debug?.log(
         "ColorCoordinator",
-        "✅ Delegated color extraction to UnifiedColorProcessingEngine",
+        "✅ Delegated color extraction to ColorProcessor",
         {
           trackUri: context.trackUri || "unknown",
           colorCount: Object.keys(context.rawColors).length,
@@ -377,7 +377,7 @@ export class ColorManager implements IColorOrchestrator, IManagedSystem {
     } catch (error) {
       Y3KDebug?.debug?.warn(
         "ColorCoordinator",
-        "UnifiedColorProcessingEngine delegation failed, falling back to legacy processing:",
+        "ColorProcessor delegation failed, falling back to legacy processing:",
         error
       );
       // Fall back to original processing

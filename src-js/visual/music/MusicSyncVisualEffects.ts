@@ -1,9 +1,9 @@
-import { UnifiedSystemBase } from '@/core/base/UnifiedSystemBase';
+import { ServiceVisualSystemBase } from '@/core/services/ServiceCompositionBase';
 // Removed: unused GlobalEventBus import
 import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 import type { HealthCheckResult } from '@/types/systems';
 import * as ThemeUtilities from '@/utils/core/ThemeUtilities';
-import { AnimationFrameCoordinator, type ConsolidatedMusicalContext } from '@/core/animation/EnhancedMasterAnimationCoordinator';
+import { AnimationFrameCoordinator, type ConsolidatedMusicalContext } from '@/core/animation/AnimationFrameCoordinator';
 import type { MusicSyncService } from '@/audio/MusicSyncService';
 
 /**
@@ -24,7 +24,7 @@ import type { MusicSyncService } from '@/audio/MusicSyncService';
  * @performance 60fps target, <75MB memory, <15% CPU usage
  * @compatibility Spicetify Player API, WebGL2, CSS Variables
  */
-export class MusicBeatSynchronizer extends UnifiedSystemBase {
+export class MusicBeatSynchronizer extends ServiceVisualSystemBase {
   // =========================================================================
   // MUSIC SYNCHRONIZATION STATE MANAGEMENT
   // =========================================================================
@@ -59,7 +59,7 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
   // Music synchronization service integration
   
   // External service integration for music analysis
-  private musicSyncService: MusicSyncService | null = null;  // Spicetify audio analysis service
+  protected override musicSyncService: MusicSyncService | null = null;  // Spicetify audio analysis service
   private currentMusicalContext: ConsolidatedMusicalContext | null = null; // Current musical analysis context
   private lastBeatPhaseUpdate: number = 0;                    // Last context update timestamp
   
@@ -214,85 +214,67 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
   }
 
   /**
-   * Initialize the music beat synchronizer system
-   * 
-   * Sets up event subscriptions, CSS variable groups, and animation coordination
-   * for real-time music-visual synchronization.
-   * 
+   * System-specific initialization (implements ServiceVisualSystemBase abstract method)
+   *
+   * Sets up event subscriptions and prepares for real-time music-visual synchronization.
+   *
    * @returns Promise<void> Resolves when initialization is complete
    * @throws Error if system fails to initialize properly
-   * @public IManagedSystem lifecycle method
    */
-  async initialize(): Promise<void> {
+  protected override async performVisualSystemInitialization(): Promise<void> {
     if (this.config.enableDebug) {
       console.log('[MusicBeatSynchronizer] 🎵 Initializing music synchronization system...');
     }
-    
-    // Register CSS variable groups with appropriate priorities
-    this.registerCSSVariableGroup('music-sync-core', 'critical');
-    this.registerCSSVariableGroup('visual-scaling', 'high');
-    // Removed: Breathing rhythm CSS variable group (pulsing animations completely removed)
-    this.registerCSSVariableGroup('color-temperature', 'normal');
-    this.registerCSSVariableGroup('transition-fluidity', 'normal');
-    
+
     // Initialize music synchronization state
     this.musicIntensity = 0;
     this.scaleMultiplier = 1;
     this.animationPhase = 0;
     this.colorTemperature = 4000;
     this.transitionFluidityLevel = 0.5;
-    
+
     // Subscribe to music synchronization events
     this.subscribeToEvent('music:beat', (payload: any) => this.onBeatDetected(payload));
     this.subscribeToEvent('music:energy', (payload: any) => this.onEnergyChanged(payload));
     this.subscribeToEvent('music:emotion', (payload: any) => this.onEmotionDetected(payload));
     this.subscribeToEvent('music:bpm-change', (payload: any) => this.onTempoChanged(payload));
-    
-    // Register with animation coordinator (critical priority for music sync)
-    this.registerAnimation(60); // 60fps target
-    
+
     if (this.config.enableDebug) {
       console.log('[MusicBeatSynchronizer] 🌟 Music synchronization system ready');
     }
   }
-  
+
   /**
-   * Clean up and shut down the music beat synchronizer system
-   * 
+   * System-specific cleanup (implements ServiceVisualSystemBase abstract method)
+   *
    * Resets all synchronization state to baseline values and performs cleanup.
-   * Called during system shutdown or when switching themes.
-   * 
-   * @public IManagedSystem lifecycle method
    */
-  destroy(): void {
+  protected override performVisualSystemCleanup(): void {
     if (this.config.enableDebug) {
       console.log('[MusicBeatSynchronizer] 🍃 Shutting down music synchronizer...');
     }
-    
-    // Music synchronization cleanup
-    
+
     // Reset synchronization state
     this.musicIntensity = 0;
     this.scaleMultiplier = 1;
     this.animationPhase = 0;
     this.colorTemperature = 4000;
     this.transitionFluidityLevel = 0.5;
-    
+
     if (this.config.enableDebug) {
       console.log('[MusicBeatSynchronizer] 🌌 Music synchronizer cleanly shut down');
     }
   }
   
   /**
-   * Process music synchronization for current animation frame
-   * 
+   * Animation frame callback (implements IManagedSystem interface)
+   *
    * Called by the master animation coordinator at 60fps. Updates all music-synchronized
    * visual properties using LERP interpolation for smooth transitions.
-   * 
+   *
    * @param deltaTime - Time elapsed since last frame in milliseconds
-   * @public IManagedSystem animation interface
    */
-  onAnimate(deltaTime: number): void {
+  updateAnimation(deltaTime: number): void {
     const startTime = performance.now();
     
     // Update musical context
@@ -326,43 +308,46 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
   }
   
   /**
-   * Perform system health check for music synchronization
-   * 
-   * Validates EventBus connectivity, performance metrics, synchronization activity,
-   * and color temperature ranges for system health monitoring.
-   * 
-   * @returns Promise<HealthCheckResult> System health status and diagnostic details
-   * @public IManagedSystem monitoring interface
+   * System-specific health check (implements ServiceSystemBase abstract method)
+   *
+   * Validates performance metrics, synchronization activity, and color temperature ranges
+   * for system health monitoring.
+   *
+   * @returns System health status and diagnostic details
    */
-  async healthCheck(): Promise<HealthCheckResult> {
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
     const issues: string[] = [];
-    
-    // Check EventBus connection for music coordination
-    if (!this.eventBus) {
-      issues.push('EventBus not connected for music coordination');
-    }
-    
+
     // Check performance health
     if (this.performanceMetrics.averageFrameTime > 2.0) {
       issues.push(`Average frame time ${this.performanceMetrics.averageFrameTime.toFixed(2)}ms exceeds 2ms target`);
     }
-    
+
     // Check music synchronization activity
     if (this.musicIntensity === 0 && (Date.now() - this.lastBeatTime) > 10000) {
       issues.push('No music synchronization activity detected in last 10 seconds');
     }
-    
+
     // Check color temperature range
     if (this.colorTemperature < 1000 || this.colorTemperature > 20000) {
       issues.push(`Color temperature ${this.colorTemperature}K outside 1000K-20000K range`);
     }
-    
+
     return {
       healthy: issues.length === 0,
-      ok: issues.length === 0,
       details: `Music synchronization health: ${issues.length === 0 ? 'optimal' : 'needs attention'}`,
       issues: issues,
-      system: 'MusicBeatSynchronizer'
+      metrics: {
+        musicIntensity: this.musicIntensity,
+        colorTemperature: this.colorTemperature,
+        averageFrameTime: this.performanceMetrics.averageFrameTime,
+        syncUpdates: this.performanceMetrics.syncUpdates
+      }
     };
   }
   
@@ -488,27 +473,22 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
    * Apply music sync CSS variables
    */
   private applyMusicSyncCSSVariables(): void {
-    // Core music synchronization variables
-    this.updateCSSVariableGroup('music-sync-core', {
+    // Batch all CSS variable updates together for efficiency
+    this.updateCSSVariables({
+      // Core music synchronization variables
       '--sn-music-intensity': this.musicIntensity.toFixed(3),
       '--sn-music-bpm': this.currentBPM.toString(),
       '--sn-music-animation-phase': this.animationPhase.toFixed(4),
-    });
-    
-    // Visual scaling variables
-    this.updateCSSVariableGroup('visual-scaling', {
+
+      // Visual scaling variables
       '--sn-visual-scale': this.scaleMultiplier.toFixed(3),
       '--sn-visual-response-sensitivity': this.syncConfig.responseSensitivity.toFixed(2),
-    });
-    
-    // Color temperature variables
-    this.updateCSSVariableGroup('color-temperature', {
+
+      // Color temperature variables
       '--sn-color-temperature': `${this.colorTemperature.toFixed(0)}K`,
       '--sn-color-temperature-normalized': ((this.colorTemperature - 1000) / 19000).toFixed(3),
-    });
-    
-    // Transition fluidity variables
-    this.updateCSSVariableGroup('transition-fluidity', {
+
+      // Transition fluidity variables
       '--sn-transition-fluidity': this.transitionFluidityLevel.toFixed(3),
       '--sn-transition-fluidity-enabled': this.syncConfig.transitionFluidityEnabled ? '1' : '0',
     });
@@ -568,7 +548,7 @@ export class MusicBeatSynchronizer extends UnifiedSystemBase {
    * Force music synchronization repaint
    */
   public override forceRepaint(reason?: string): void {
-    super.forceRepaint(reason);
+    super.forceRepaint?.(reason);
     
     // Reset music synchronization state
     this.musicIntensity = 0;

@@ -1,14 +1,21 @@
 declare const Spicetify: any;
 
 // Phase 4: Facade imports for unified system access
-import { SystemCoordinator } from "@/core/integration/SystemCoordinator";
+import { SystemIntegrationCoordinator } from "@/core/integration/SystemIntegrationCoordinator";
+
+// Progressive enhancement imports
+import { DegradedModeCoordinator } from "@/core/lifecycle/DegradedModeCoordinator";
+import type { SpicetifyAPIs } from "@/core/lifecycle/ProgressiveAPILoader";
+
+// Color event coordination imports
+import { ColorEventCoordinator } from "@/core/lifecycle/ColorEventCoordinator";
 
 // Settings import for typed access
 import { settings } from "@/config";
 
 // Color coordination imports for Strategy pattern
 import { globalColorStateManager } from "@/core/css/ColorStateManager";
-import { globalUnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
+import { globalColorProcessor, globalUnifiedColorProcessingEngine } from "@/core/color/ColorProcessor";
 
 // Event-driven integration imports
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
@@ -51,14 +58,32 @@ interface VisualSystemConfig {
     | "spotifyUIApplicationSystem"; // contextMenuSystem removed
 }
 
-export class AdvancedThemeSystem {
+/**
+ * ThemeLifecycleCoordinator - Central Lifecycle Management System
+ *
+ * Coordinates the complete lifecycle of the Catppuccin StarryNight theme:
+ * - System initialization and bootstrap
+ * - Progressive API loading (degraded → full mode)
+ * - Facade coordination via SystemIntegrationCoordinator
+ * - Runtime configuration management
+ * - Graceful shutdown and cleanup
+ *
+ * This class serves as the main entry point and orchestrates all theme subsystems
+ * through the facade pattern, delegating actual functionality to specialized coordinators.
+ *
+ * @architecture Central coordinator following facade pattern
+ * @see SystemIntegrationCoordinator for system access
+ * @see InfrastructureSystemCoordinator for non-visual systems
+ * @see VisualSystemCoordinator for visual systems
+ */
+export class ThemeLifecycleCoordinator {
   public ADVANCED_SYSTEM_CONFIG: Year3000Config;
   public utils: typeof Utils;
   public initialized: boolean;
   private healthCheckInterval: number | null = null;
 
   // Phase 4: Facade Coordination System (replaces direct system properties)
-  public facadeCoordinator: SystemCoordinator | null = null;
+  public facadeCoordinator: SystemIntegrationCoordinator | null = null;
 
   // Color State Management System
   public colorStateManager: typeof globalColorStateManager | null = null;
@@ -69,24 +94,11 @@ export class AdvancedThemeSystem {
   // Private storage for dynamicCatppuccinBridge to allow setter
   private _dynamicCatppuccinBridge: any | null = null;
 
-  // Phase 1: Loop Prevention System - Processing State Tracking
-  private processingState = {
-    isProcessingSongChange: false,
-    lastProcessedTrackUri: null as string | null,
-    lastProcessingTime: 0,
-    processingChain: [] as string[],
-    eventLoopDetected: false,
-  };
-
-  private colorEventState = {
-    processedEvents: new Map<string, number>(),
-    isProcessingColorEvent: false,
-    eventTimeout: null as number | null,
-  };
-
-  private readonly PROCESSING_TIMEOUT = 5000; // 5 second safety timeout
-  private readonly MAX_CHAIN_LENGTH = 10; // Prevent infinite chains
-  private readonly COLOR_EVENT_CACHE_TTL = 2000; // 2 second cache
+  // Phase 3: Color event processing now delegated to ColorEventCoordinator
+  // Legacy state properties kept for backward compatibility but unused
+  private readonly PROCESSING_TIMEOUT = 5000; // Kept for reference
+  private readonly MAX_CHAIN_LENGTH = 10; // Kept for reference
+  private readonly COLOR_EVENT_CACHE_TTL = 2000; // Kept for reference
 
   // Phase 4: Pure Facade Access Property Getters
 
@@ -94,7 +106,7 @@ export class AdvancedThemeSystem {
   public get enhancedMasterAnimationCoordinator() {
     return (
       this.facadeCoordinator?.getCachedNonVisualSystem(
-        "EnhancedMasterAnimationCoordinator"
+        "AnimationFrameCoordinator"
       ) || null
     );
   }
@@ -215,7 +227,7 @@ export class AdvancedThemeSystem {
   public get unifiedColorProcessingEngine() {
     return (
       this.facadeCoordinator?.getCachedNonVisualSystem(
-        "UnifiedColorProcessingEngine"
+        "ColorProcessor"
       ) || null
     );
   }
@@ -365,7 +377,7 @@ export class AdvancedThemeSystem {
     return this.facadeCoordinator?.getVisualSystem("Particle") || null;
   }
   public get animationCoordinator() {
-    // Animation coordination through EnhancedMasterAnimationCoordinator
+    // Animation coordination through AnimationFrameCoordinator
     return this.enhancedMasterAnimationCoordinator || null;
   }
 
@@ -399,6 +411,12 @@ export class AdvancedThemeSystem {
   // API availability tracking
   public availableAPIs: AvailableAPIs | null = null;
   private _songChangeHandler: (() => Promise<void>) | null = null;
+
+  // Progressive enhancement coordination
+  private degradedModeCoordinator: DegradedModeCoordinator | null = null;
+
+  // Color event coordination
+  private colorEventCoordinator: ColorEventCoordinator | null = null;
 
   // Stats
   private _lastInitializationTime: number | null = null;
@@ -569,7 +587,7 @@ export class AdvancedThemeSystem {
       );
     }
     try {
-      this.facadeCoordinator = new SystemCoordinator(
+      this.facadeCoordinator = new SystemIntegrationCoordinator(
         this.ADVANCED_SYSTEM_CONFIG,
         this.utils,
         this
@@ -716,17 +734,17 @@ export class AdvancedThemeSystem {
       },
       // NOTE: SettingsManager removed - using typed settings singleton instead
       {
-        name: "EnhancedMasterAnimationCoordinator",
+        name: "AnimationFrameCoordinator",
         init: () => {
           if (!this.performanceCoordinator) {
             throw new Error(
-              "UnifiedPerformanceCoordinator is required for EnhancedMasterAnimationCoordinator."
+              "UnifiedPerformanceCoordinator is required for AnimationFrameCoordinator."
             );
           }
 
-          // Create singleton instance of EnhancedMasterAnimationCoordinator
+          // Create singleton instance of AnimationFrameCoordinator
           this.enhancedMasterAnimationCoordinator =
-            EnhancedMasterAnimationCoordinator.getInstance(
+            AnimationFrameCoordinator.getInstance(
               this.ADVANCED_SYSTEM_CONFIG,
               this.performanceCoordinator
             );
@@ -736,7 +754,7 @@ export class AdvancedThemeSystem {
 
           if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
             console.log(
-              "[Year3000System] EnhancedMasterAnimationCoordinator initialized for Phase 4 consolidation"
+              "[Year3000System] AnimationFrameCoordinator initialized for Phase 4 consolidation"
             );
           }
         },
@@ -761,7 +779,7 @@ export class AdvancedThemeSystem {
               "SimplePerformanceCoordinator is required for ColorHarmonyEngine."
             );
           }
-          // NOTE: SpicetifyColorBridge should be provided by SystemCoordinator
+          // NOTE: SpicetifyColorBridge should be provided by SystemIntegrationCoordinator
           // AdvancedThemeSystem uses old architecture - will use legacy fallback
           this.colorHarmonyEngine = new ColorHarmonyEngine(
             this.ADVANCED_SYSTEM_CONFIG,
@@ -875,7 +893,7 @@ export class AdvancedThemeSystem {
     } */
 
     // Legacy Animation System Registration Phase - deprecated
-    // Note: Animation registration now handled by EnhancedMasterAnimationCoordinator
+    // Note: Animation registration now handled by AnimationFrameCoordinator
 
     // Phase 4: Enhanced Animation System Registration
     if (this.enhancedMasterAnimationCoordinator) {
@@ -887,7 +905,7 @@ export class AdvancedThemeSystem {
       }
     } else {
       console.warn(
-        "[Year3000System] EnhancedMasterAnimationCoordinator not available for enhanced registration phase"
+        "[Year3000System] AnimationFrameCoordinator not available for enhanced registration phase"
       );
     }
 
@@ -1160,12 +1178,12 @@ export class AdvancedThemeSystem {
 
       await Promise.all(uiPromises);
 
-      // Initialize ColorOrchestrator for Strategy pattern coordination
+      // Initialize ColorProcessor for Strategy pattern coordination
       try {
-        await globalUnifiedColorProcessingEngine.initialize();
+        await globalColorProcessor.initialize();
         if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
           console.log(
-            "🎨 [Year3000System] ColorOrchestrator initialized for strategy pattern coordination"
+            "🎨 [Year3000System] ColorProcessor initialized for strategy pattern coordination"
           );
         }
       } catch (error) {
@@ -1192,7 +1210,7 @@ export class AdvancedThemeSystem {
         "OrganicBeatSync",
         "HeaderVisualEffects", // 🎭 Music-responsive header visual effects animations
         "InteractionTracking",
-        // EmergentChoreography integrated into EnhancedMasterAnimationCoordinator
+        // EmergentChoreography integrated into AnimationFrameCoordinator
       ];
 
       if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
@@ -1392,16 +1410,16 @@ export class AdvancedThemeSystem {
         }
       }
 
-      // Link ColorHarmonyEngine to EnhancedMasterAnimationCoordinator (adaptive functionality)
+      // Link ColorHarmonyEngine to AnimationFrameCoordinator (adaptive functionality)
       if (this.colorHarmonyEngine && this.enhancedMasterAnimationCoordinator) {
         // Note: ColorHarmonyEngine expects EmergentChoreographyEngine interface
-        // but now gets EnhancedMasterAnimationCoordinator with adaptive functionality
+        // but now gets AnimationFrameCoordinator with adaptive functionality
         this.colorHarmonyEngine.setEmergentEngine(
           this.enhancedMasterAnimationCoordinator as any
         );
         if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
           console.log(
-            "🌌 [Year3000System] EnhancedMasterAnimationCoordinator (with adaptive functionality) linked to ColorHarmonyEngine"
+            "🌌 [Year3000System] AnimationFrameCoordinator (with adaptive functionality) linked to ColorHarmonyEngine"
           );
         }
       }
@@ -1455,7 +1473,7 @@ export class AdvancedThemeSystem {
         "InteractionTrackingSystem",
         "BeatSyncVisualSystem",
         "SidebarSystemsIntegration",
-        // "EmergentChoreographyEngine", // Consolidated into EnhancedMasterAnimationCoordinator
+        // "EmergentChoreographyEngine", // Consolidated into AnimationFrameCoordinator
       ];
       visualSystems.forEach((s) => results.skipped.push(s));
       return;
@@ -1473,7 +1491,7 @@ export class AdvancedThemeSystem {
         Class: BeatSyncVisualSystem,
         property: "beatSyncVisualSystem",
       },
-      // EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
+      // EmergentChoreographyEngine consolidated into AnimationFrameCoordinator
       {
         name: "WebGLGradientBackgroundSystem",
         Class: WebGLGradientBackgroundSystem,
@@ -1584,14 +1602,14 @@ export class AdvancedThemeSystem {
     } */
 
     // After all visual systems are initialized, link the engines
-    // Note: EmergentChoreography now integrated into EnhancedMasterAnimationCoordinator
+    // Note: EmergentChoreography now integrated into AnimationFrameCoordinator
     if (this.colorHarmonyEngine && this.enhancedMasterAnimationCoordinator) {
       this.colorHarmonyEngine.setEmergentEngine(
         this.enhancedMasterAnimationCoordinator as any
       );
       if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
         console.log(
-          "🔗 [Year3000System] EnhancedMasterAnimationCoordinator (adaptive functionality) linked to ColorHarmonyEngine."
+          "🔗 [Year3000System] AnimationFrameCoordinator (adaptive functionality) linked to ColorHarmonyEngine."
         );
       }
     }
@@ -1872,11 +1890,28 @@ export class AdvancedThemeSystem {
   }
 
   /**
-   * Handle colors:harmonized event from ColorHarmonyEngine (Event-driven architecture)
-   * 🔧 PHASE 1: Enhanced with loop prevention and recursion protection
+   * @deprecated Phase 3: Color event handling now delegated to ColorEventCoordinator
+   * This method is kept for backward compatibility but no longer used.
+   * See ColorEventCoordinator for actual implementation.
    */
   private handleColorHarmonizedEvent(data: any): void {
-    // Phase 1: Loop Prevention - Check if already processing
+    // DEPRECATED: This method is no longer called
+    // Color events are now handled by ColorEventCoordinator
+    if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
+      console.warn(
+        "⚠️ [ThemeLifecycleCoordinator] handleColorHarmonizedEvent called directly - this is deprecated"
+      );
+    }
+    return;
+  }
+
+  /**
+   * @deprecated Phase 3: Replaced by ColorEventCoordinator - kept for reference only
+   */
+  private _handleColorHarmonizedEvent_DEPRECATED(data: any): void {
+    // LEGACY CODE - Moved to ColorEventCoordinator
+    // Keeping this commented out for reference during migration
+    /* Phase 1: Loop Prevention - Check if already processing
     if (this.colorEventState.isProcessingColorEvent) {
       if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
         console.warn(
@@ -2008,56 +2043,29 @@ export class AdvancedThemeSystem {
         this.processingState.processingChain.splice(chainIndex, 1);
       }
     }
+    */ // End of deprecated legacy code
   }
 
   /**
-   * Phase 1: Helper method to generate simple hash for event caching
+   * @deprecated Phase 3: Moved to ColorEventCoordinator.generateEventHash()
    */
   private _generateEventHash(context: string): string {
-    let hash = 0;
-    for (let i = 0; i < context.length; i++) {
-      const char = context.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash = hash & hash; // Convert to 32-bit integer
-    }
-    return hash.toString();
+    // DEPRECATED: Hash generation now handled by ColorEventCoordinator
+    return "";
   }
 
   /**
-   * Phase 1: Reset color event processing state
+   * @deprecated Phase 3: Moved to ColorEventCoordinator.resetColorEventState()
    */
   private _resetColorEventState(): void {
-    this.colorEventState.isProcessingColorEvent = false;
-
-    if (this.colorEventState.eventTimeout) {
-      clearTimeout(this.colorEventState.eventTimeout);
-      this.colorEventState.eventTimeout = null;
-    }
-
-    // Clean up old cache entries (older than TTL)
-    const now = Date.now();
-    for (const [
-      hash,
-      timestamp,
-    ] of this.colorEventState.processedEvents.entries()) {
-      if (now - timestamp > this.COLOR_EVENT_CACHE_TTL) {
-        this.colorEventState.processedEvents.delete(hash);
-      }
-    }
+    // DEPRECATED: State management now handled by ColorEventCoordinator
   }
 
   /**
-   * Phase 1: Reset processing state after loop detection or timeout
+   * @deprecated Phase 3: Moved to ColorEventCoordinator.resetProcessingState()
    */
   private _resetProcessingState(): void {
-    this.processingState.isProcessingSongChange = false;
-    this.processingState.processingChain = [];
-    this.processingState.eventLoopDetected = false;
-    this.processingState.lastProcessingTime = Date.now();
-
-    if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-      console.log("🔄 [Year3000System] Processing state reset");
-    }
+    // DEPRECATED: State management now handled by ColorEventCoordinator
   }
 
   /**
@@ -2366,7 +2374,7 @@ export class AdvancedThemeSystem {
 
   /**
    * Process colors through the existing facade pattern architecture
-   * Phase 1: Integration with SystemCoordinator and ColorOrchestrator
+   * Phase 1: Integration with SystemIntegrationCoordinator and ColorOrchestrator
    */
   public async processColorsViaFacade(context: any): Promise<void> {
     try {
@@ -2448,27 +2456,18 @@ export class AdvancedThemeSystem {
       return;
     }
 
-    // Set up event-driven color harmonization (NEW ARCHITECTURE)
-    try {
-      unifiedEventBus.subscribe(
-        "colors:harmonized",
-        (data: any) => {
-          this.handleColorHarmonizedEvent(data);
-        },
-        "Year3000System"
-      );
+    // Set up event-driven color harmonization via ColorEventCoordinator (Phase 3)
+    this.colorEventCoordinator = new ColorEventCoordinator({
+      maxChainLength: this.MAX_CHAIN_LENGTH,
+      processingTimeout: this.PROCESSING_TIMEOUT,
+      colorEventCacheTTL: this.COLOR_EVENT_CACHE_TTL,
+      enableDebug: this.ADVANCED_SYSTEM_CONFIG.enableDebug,
+      onApplyColors: (processedColors, accentHex, accentRgb) => {
+        this._applyColorsViaFacadeSystem(processedColors, accentHex, accentRgb);
+      },
+    });
 
-      if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-        console.log(
-          "🎨 [Year3000System] Subscribed to colors:harmonized events for event-driven color application"
-        );
-      }
-    } catch (error) {
-      console.error(
-        "[Year3000System] Failed to subscribe to colors:harmonized events:",
-        error
-      );
-    }
+    this.colorEventCoordinator.startListening();
 
     const processSongUpdate = async () => {
       console.log(
@@ -2557,7 +2556,7 @@ export class AdvancedThemeSystem {
   ): boolean {
     if (!this.enhancedMasterAnimationCoordinator) {
       console.warn(
-        `[Year3000System] Cannot register ${name} - EnhancedMasterAnimationCoordinator not ready`
+        `[Year3000System] Cannot register ${name} - AnimationFrameCoordinator not ready`
       );
       return false;
     }
@@ -2629,7 +2628,7 @@ export class AdvancedThemeSystem {
   private async _registerAnimationSystems(): Promise<void> {
     if (!this.enhancedMasterAnimationCoordinator) {
       console.warn(
-        "[Year3000System] EnhancedMasterAnimationCoordinator not available for visual system registration"
+        "[Year3000System] AnimationFrameCoordinator not available for visual system registration"
       );
       return;
     }
@@ -2640,7 +2639,7 @@ export class AdvancedThemeSystem {
         system: this.beatSyncVisualSystem,
         priority: "critical",
       },
-      // EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
+      // EmergentChoreographyEngine consolidated into AnimationFrameCoordinator
       {
         name: "SidebarSystemsIntegration",
         system: this.sidebarSystemsIntegration,
@@ -2715,13 +2714,13 @@ export class AdvancedThemeSystem {
   }
 
   /**
-   * Register visual systems with the EnhancedMasterAnimationCoordinator
+   * Register visual systems with the AnimationFrameCoordinator
    * Phase 4: Animation System Consolidation
    */
   private async _registerEnhancedAnimationSystems(): Promise<void> {
     if (!this.enhancedMasterAnimationCoordinator) {
       console.warn(
-        "[Year3000System] EnhancedMasterAnimationCoordinator not available for enhanced visual system registration"
+        "[Year3000System] AnimationFrameCoordinator not available for enhanced visual system registration"
       );
       return;
     }
@@ -2735,7 +2734,7 @@ export class AdvancedThemeSystem {
         priority: "critical" as const,
         type: "animation" as const,
       },
-      // EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
+      // EmergentChoreographyEngine consolidated into AnimationFrameCoordinator
       {
         name: "SidebarSystemsIntegration",
         system: this.sidebarSystemsIntegration,
@@ -2789,12 +2788,12 @@ export class AdvancedThemeSystem {
             );
           } else if (!registered) {
             console.warn(
-              `[Year3000System] Failed to register ${name} with EnhancedMasterAnimationCoordinator`
+              `[Year3000System] Failed to register ${name} with AnimationFrameCoordinator`
             );
           }
         } catch (error) {
           console.error(
-            `[Year3000System] Error registering ${name} with EnhancedMasterAnimationCoordinator:`,
+            `[Year3000System] Error registering ${name} with AnimationFrameCoordinator:`,
             error
           );
         }
@@ -2872,16 +2871,16 @@ export class AdvancedThemeSystem {
       // NOTE: PerformanceAnalyzer is now handled by facade coordinator using SimplePerformanceCoordinator
       // The old complex PerformanceAnalyzer has been replaced with a tier-based system
       {
-        name: "EnhancedMasterAnimationCoordinator",
+        name: "AnimationFrameCoordinator",
         init: () => {
           if (!this.performanceAnalyzer) {
             throw new Error(
-              "SimplePerformanceCoordinator is required for EnhancedMasterAnimationCoordinator."
+              "SimplePerformanceCoordinator is required for AnimationFrameCoordinator."
             );
           }
           // In degraded mode, we don't have UnifiedPerformanceCoordinator, so pass undefined
           this.enhancedMasterAnimationCoordinator =
-            EnhancedMasterAnimationCoordinator.getInstance(
+            AnimationFrameCoordinator.getInstance(
               this.ADVANCED_SYSTEM_CONFIG
             );
           this.enhancedMasterAnimationCoordinator.startMasterAnimationLoop();
@@ -2891,7 +2890,7 @@ export class AdvancedThemeSystem {
 
     // Phase 4: Initialize facade coordination system for degraded mode
     try {
-      this.facadeCoordinator = new SystemCoordinator(
+      this.facadeCoordinator = new SystemIntegrationCoordinator(
         this.ADVANCED_SYSTEM_CONFIG,
         this.utils,
         this
@@ -2966,49 +2965,22 @@ export class AdvancedThemeSystem {
   }
 
   private setupProgressiveEnhancement(): void {
-    if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-      console.log(
-        "🌟 [Year3000System] Setting up progressive enhancement monitoring..."
-      );
-    }
+    // Use DegradedModeCoordinator for progressive enhancement monitoring
+    this.degradedModeCoordinator = new DegradedModeCoordinator({
+      maxUpgradeAttempts: 30, // 5 minutes at 10s intervals
+      upgradeCheckInterval: 10000, // 10 seconds
+      enableDebug: this.ADVANCED_SYSTEM_CONFIG.enableDebug,
+      onAPIsAvailable: async (apis: SpicetifyAPIs) => {
+        // Trigger upgrade when APIs become available
+        await this.upgradeToFullMode();
+      },
+      onStatusUpdate: (attemptCount: number, apis: SpicetifyAPIs) => {
+        // Optional: Log periodic status updates handled by coordinator
+      },
+    });
 
-    let enhancementAttempts = 0;
-    const maxEnhancementAttempts = 30; // 1 minute total
-
-    const enhancementInterval = setInterval(() => {
-      enhancementAttempts++;
-
-      // Check if previously missing APIs are now available
-      const playerAvailable = !!(window as any).Spicetify?.Player;
-      const platformAvailable = !!(window as any).Spicetify?.Platform;
-
-      if (
-        playerAvailable &&
-        platformAvailable &&
-        this.availableAPIs?.degradedMode
-      ) {
-        if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-          console.log(
-            "🌟 [Year3000System] APIs now available! Triggering upgrade to full mode..."
-          );
-        }
-
-        clearInterval(enhancementInterval);
-        this.upgradeToFullMode().catch((error) => {
-          console.error("[Year3000System] Upgrade to full mode failed:", error);
-        });
-      }
-
-      // Stop checking after max attempts
-      if (enhancementAttempts >= maxEnhancementAttempts) {
-        if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-          console.log(
-            "🌟 [Year3000System] Progressive enhancement monitoring stopped (timeout)"
-          );
-        }
-        clearInterval(enhancementInterval);
-      }
-    }, 2000); // Check every 2 seconds
+    // Start monitoring for API availability
+    this.degradedModeCoordinator.startMonitoring();
   }
 
   public async upgradeToFullMode(): Promise<void> {
@@ -3331,7 +3303,17 @@ export class AdvancedThemeSystem {
    */
   public async destroy(): Promise<void> {
     try {
-      // Stop monitoring (facade coordinator handles its own cleanup)
+      // Stop progressive enhancement monitoring
+      if (this.degradedModeCoordinator) {
+        this.degradedModeCoordinator.stopMonitoring();
+        this.degradedModeCoordinator = null;
+      }
+
+      // Stop color event coordination
+      if (this.colorEventCoordinator) {
+        this.colorEventCoordinator.stopListening();
+        this.colorEventCoordinator = null;
+      }
 
       // Cleanup facade coordinator
       await this.destroyAllSystems();
@@ -3350,21 +3332,23 @@ export class AdvancedThemeSystem {
       console.error("❌ [AdvancedThemeSystem] Error during destroy:", error);
     }
   }
-} // ← end of AdvancedThemeSystem class
+} // ← end of ThemeLifecycleCoordinator class
 
 // -----------------------------------------------------------------------------
 // 🌌  Modern Exports with Backward Compatibility
 // -----------------------------------------------------------------------------
 
-// Export backward compatibility alias
-export { AdvancedThemeSystem as Year3000System };
+// Backward compatibility exports - maintain all legacy names
+export { ThemeLifecycleCoordinator as AdvancedThemeSystem };
+export { ThemeLifecycleCoordinator as Year3000System };
 
 // Singleton export
-const advancedThemeSystem = new AdvancedThemeSystem();
+const themeLifecycleCoordinator = new ThemeLifecycleCoordinator();
 if (typeof window !== "undefined") {
-  (window as any).advancedThemeSystem = advancedThemeSystem;
-  // Legacy global variable for backward compatibility
-  (window as any).year3000System = advancedThemeSystem;
+  (window as any).themeLifecycleCoordinator = themeLifecycleCoordinator;
+  // Legacy global variables for backward compatibility
+  (window as any).year3000System = themeLifecycleCoordinator;
+  (window as any).advancedThemeSystem = themeLifecycleCoordinator;
 }
 
-export default advancedThemeSystem;
+export default themeLifecycleCoordinator;

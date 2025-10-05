@@ -190,9 +190,9 @@ export class MusicGlowEffectsManager implements IManagedSystem {
       // Setup CSS variables for subtle effects
       this.setupGlowCSSVariables();
 
-      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by EnhancedMasterAnimationCoordinator
+      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by AnimationFrameCoordinator
       // The coordinator will call updateAnimation(deltaTime) automatically
-      // Registration happens in SystemCoordinator during system initialization
+      // Registration happens in SystemIntegrationCoordinator during system initialization
 
       this.initialized = true;
       
@@ -744,7 +744,7 @@ export class MusicGlowEffectsManager implements IManagedSystem {
   }
 
   /**
-   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   * ✅ RAF LOOP REMOVED - Managed by AnimationFrameCoordinator
    *
    * Previous implementation: startEtherealAnimation() with independent RAF loop
    * New implementation: updateAnimation() called by coordinator
@@ -755,7 +755,7 @@ export class MusicGlowEffectsManager implements IManagedSystem {
    * - Coordinated frame budget management
    * - Priority-based execution order
    *
-   * Migration: Lines 725-743 removed, registration added to SystemCoordinator
+   * Migration: Lines 725-743 removed, registration added to SystemIntegrationCoordinator
    */
 
   /**
@@ -786,7 +786,7 @@ export class MusicGlowEffectsManager implements IManagedSystem {
     console.log('[SoftGlowEffectsManager] Dissolving ethereal beauty...');
 
     // ✅ RAF LOOP CONSOLIDATION: No need to stop animation loop (coordinator handles this)
-    // System unregistration happens in SystemCoordinator destroy()
+    // System unregistration happens in SystemIntegrationCoordinator destroy()
 
     // Clear ethereal elements
     this.etherealElements.clear();

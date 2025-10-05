@@ -1,12 +1,12 @@
 /**
- * SystemCoordinator - Main System Integration Coordinator
+ * SystemIntegrationCoordinator - Main System Integration Coordinator
  *
- * Coordinates interaction between VisualSystemCoordinator and NonVisualSystemFacade
+ * Coordinates interaction between VisualSystemCoordinator and InfrastructureSystemCoordinator
  * to provide unified system management with shared dependencies and cross-facade communication.
  *
  * ═══ THREE-LAYER ARCHITECTURE VALUE ═══
- * 
- * LAYER 1 (SystemCoordinator):
+ *
+ * LAYER 1 (SystemIntegrationCoordinator):
  * • Manages initialization phases (core → services → visual → integration)  
  * • Aggregates health metrics from both facades for systematic troubleshooting
  * • Coordinates shared dependencies (CSS, performance, music sync services)
@@ -17,7 +17,7 @@
  * • Music-aware quality adaptation and performance scaling
  * • Visual-specific dependency injection and event coordination
  *
- * LAYER 3 (NonVisualSystemFacade):
+ * LAYER 3 (InfrastructureSystemCoordinator):
  * • Factory for infrastructure systems (CSS, performance, settings)
  * • Infrastructure health monitoring and configuration management
  * • Core service coordination and dependency resolution
@@ -47,9 +47,9 @@ import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { CSSVariableWriter, setGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import {
-  NonVisualSystemFacade,
-  NonVisualSystemKey,
-} from "@/core/integration/NonVisualSystemFacade";
+  InfrastructureSystemCoordinator,
+  InfrastructureSystemKey,
+} from "@/core/integration/InfrastructureSystemCoordinator";
 // Simplified performance system imports (replacing complex monitoring)
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { SimpleTierBasedPerformanceSystem } from "@/core/performance/SimpleTierBasedPerformanceSystem";
@@ -164,7 +164,7 @@ export interface FacadeHealthCheck {
   timestamp: number;
 }
 
-export class SystemCoordinator {
+export class SystemIntegrationCoordinator {
   // Core configuration
   private config: Year3000Config;
   private utils: typeof Utils;
@@ -172,7 +172,7 @@ export class SystemCoordinator {
 
   // Facade instances (renamed for clarity)
   private visualSystemCoordinator: VisualSystemCoordinator | null = null;
-  private infrastructureSystemFacade: NonVisualSystemFacade | null = null;
+  private infrastructureSystemFacade: InfrastructureSystemCoordinator | null = null;
 
   // Shared dependencies (centrally managed)
   private sharedCSSVariableWriter: CSSVariableWriter | null =
@@ -266,14 +266,14 @@ export class SystemCoordinator {
 
     this.currentMetrics = this.createInitialMetrics();
 
-    Y3KDebug?.debug?.log("SystemCoordinator", "System coordinator initialized");
+    Y3KDebug?.debug?.log("SystemIntegrationCoordinator", "System coordinator initialized");
   }
 
   public async initialize(
     config?: Partial<FacadeCoordinationConfig>
   ): Promise<void> {
     if (this.isInitialized) {
-      Y3KDebug?.debug?.warn("SystemCoordinator", "Already initialized");
+      Y3KDebug?.debug?.warn("SystemIntegrationCoordinator", "Already initialized");
       return;
     }
 
@@ -287,13 +287,13 @@ export class SystemCoordinator {
         this.coordinationConfig.coordination.enforceSequentialInitialization
       ) {
         Y3KDebug?.debug?.log(
-          "SystemCoordinator",
+          "SystemIntegrationCoordinator",
           "Starting coordinated initialization"
         );
         await this.executeCoordinatedInitialization();
       } else {
         Y3KDebug?.debug?.log(
-          "SystemCoordinator",
+          "SystemIntegrationCoordinator",
           "Starting legacy initialization"
         );
         await this.executeLegacyInitialization();
@@ -305,7 +305,7 @@ export class SystemCoordinator {
       this.isInitialized = true;
 
       Y3KDebug?.debug?.log(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "System coordination fully initialized",
         {
           mode: this.coordinationConfig.mode,
@@ -320,7 +320,7 @@ export class SystemCoordinator {
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "Initialization failed:",
         error
       );
@@ -333,7 +333,7 @@ export class SystemCoordinator {
     if (!this.coordinationConfig.enableSharedDependencies) return;
 
     Y3KDebug?.debug?.log(
-      "SystemCoordinator",
+      "SystemIntegrationCoordinator",
       "Initializing simplified shared dependencies"
     );
 
@@ -381,7 +381,7 @@ export class SystemCoordinator {
         await this.sharedCSSVariableWriter.initialize();
       } catch (error) {
         Y3KDebug?.debug?.warn(
-          "SystemCoordinator",
+          "SystemIntegrationCoordinator",
           "Failed to initialize CSSVariableWriter:",
           error
         );
@@ -398,12 +398,12 @@ export class SystemCoordinator {
       // to ensure SpicetifyColorBridge is available for dependency injection
 
       Y3KDebug?.debug?.log(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "Shared dependencies initialized successfully"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "Failed to initialize shared dependencies:",
         error
       );
@@ -412,12 +412,12 @@ export class SystemCoordinator {
   }
 
   private async initializeFacades(): Promise<void> {
-    Y3KDebug?.debug?.log("SystemCoordinator", "Initializing facades");
+    Y3KDebug?.debug?.log("SystemIntegrationCoordinator", "Initializing facades");
 
     try {
-      // Get EnhancedMasterAnimationCoordinator from NonVisualSystemFacade for animation integration
+      // Get AnimationFrameCoordinator from InfrastructureSystemCoordinator for animation integration
       // Phase 3.2: Use getSystem({ cacheOnly: true }) instead of getCachedSystem()
-      const animationCoordinator = (await this.infrastructureSystemFacade?.getSystem("EnhancedMasterAnimationCoordinator", { cacheOnly: true })) || null;
+      const animationCoordinator = (await this.infrastructureSystemFacade?.getSystem("AnimationFrameCoordinator", { cacheOnly: true })) || null;
 
       // Initialize Visual System Facade (settingsManager removed - using typed settings)
       this.visualSystemCoordinator = new VisualSystemCoordinator(
@@ -443,13 +443,18 @@ export class SystemCoordinator {
           this.coordinationConfig.enableCrossFacadeCommunication,
       });
 
+      // Phase 3: Wire VisualSystemCoordinator to WebGLSystemsIntegration for quality scaling
+      if (this.sharedWebGLSystemsIntegration) {
+        this.sharedWebGLSystemsIntegration.setVisualSystemCoordinator(this.visualSystemCoordinator);
+      }
+
       // Set up visual bridge callbacks
       this.visualSystemCoordinator.setOnSystemCreated((key, system) => {
         this.handleSystemCreated("visual", key, system);
       });
 
       // Initialize Non-Visual System Facade
-      this.infrastructureSystemFacade = new NonVisualSystemFacade(
+      this.infrastructureSystemFacade = new InfrastructureSystemCoordinator(
         this.config,
         this.utils,
         this.year3000System
@@ -475,12 +480,12 @@ export class SystemCoordinator {
       this.injectSharedDependencies();
 
       Y3KDebug?.debug?.log(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "Facades initialized successfully"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "Failed to initialize facades:",
         error
       );
@@ -547,7 +552,7 @@ export class SystemCoordinator {
     if (!this.coordinationConfig.enableCrossFacadeCommunication) return;
 
     Y3KDebug?.debug?.log(
-      "SystemCoordinator",
+      "SystemIntegrationCoordinator",
       "Setting up cross-facade communication"
     );
 
@@ -589,10 +594,10 @@ export class SystemCoordinator {
     }
     this.currentMetrics.activeSystems++;
 
-    // ✅ ANIMATION LOOP CONSOLIDATION: Register visual systems with EnhancedMasterAnimationCoordinator
+    // ✅ ANIMATION LOOP CONSOLIDATION: Register visual systems with AnimationFrameCoordinator
     if (type === "visual" && system && typeof system.updateAnimation === "function") {
       // Phase 3.2: Use getSystem({ cacheOnly: true }) instead of getCachedSystem()
-      const animationCoordinator = await this.infrastructureSystemFacade?.getSystem("EnhancedMasterAnimationCoordinator", { cacheOnly: true });
+      const animationCoordinator = await this.infrastructureSystemFacade?.getSystem("AnimationFrameCoordinator", { cacheOnly: true });
 
       if (animationCoordinator) {
         // Determine priority based on system type
@@ -613,19 +618,19 @@ export class SystemCoordinator {
           );
 
           Y3KDebug?.debug?.log(
-            "SystemCoordinator",
-            `Registered ${key} with EnhancedMasterAnimationCoordinator (priority: ${priority})`
+            "SystemIntegrationCoordinator",
+            `Registered ${key} with AnimationFrameCoordinator (priority: ${priority})`
           );
         } catch (error) {
           Y3KDebug?.debug?.warn(
-            "SystemCoordinator",
+            "SystemIntegrationCoordinator",
             `Failed to register ${key} with animation coordinator:`,
             error
           );
         }
       } else {
         Y3KDebug?.debug?.warn(
-          "SystemCoordinator",
+          "SystemIntegrationCoordinator",
           `Animation coordinator not available for ${key} registration`
         );
       }
@@ -636,12 +641,12 @@ export class SystemCoordinator {
       this.onSystemCreated(type, key, system);
     }
 
-    Y3KDebug?.debug?.log("SystemCoordinator", `System created: ${type}/${key}`);
+    Y3KDebug?.debug?.log("SystemIntegrationCoordinator", `System created: ${type}/${key}`);
   }
 
   private handleHealthDegradation(event: any): void {
     Y3KDebug?.debug?.warn(
-      "SystemCoordinator",
+      "SystemIntegrationCoordinator",
       "Health degradation detected:",
       event
     );
@@ -687,20 +692,21 @@ export class SystemCoordinator {
     return this.visualSystemCoordinator.getVisualSystem<T>(key);
   }
 
-  public async getCachedNonVisualSystem<T = any>(key: NonVisualSystemKey): Promise<T | null> {
+  public getCachedNonVisualSystem<T = any>(key: InfrastructureSystemKey): T | null {
     if (!this.infrastructureSystemFacade) return null;
-    return await this.infrastructureSystemFacade.getSystem<T>(key, { cacheOnly: true });
+    // Phase 3.2: Use synchronous cache accessor for backward compatibility
+    return this.infrastructureSystemFacade.getCachedSystemSync<T>(key);
   }
 
   public async getNonVisualSystem<T = any>(
-    key: NonVisualSystemKey
+    key: InfrastructureSystemKey
   ): Promise<T | null> {
     if (!this.infrastructureSystemFacade) return null;
     return await this.infrastructureSystemFacade.getSystem<T>(key);
   }
 
   public async getSystem<T = any>(
-    key: VisualSystemKey | NonVisualSystemKey
+    key: VisualSystemKey | InfrastructureSystemKey
   ): Promise<T | null> {
     // Try visual systems first
     if (this.visualSystemCoordinator) {
@@ -715,7 +721,7 @@ export class SystemCoordinator {
     if (this.infrastructureSystemFacade) {
       try {
         return await this.infrastructureSystemFacade.getSystem<T>(
-          key as NonVisualSystemKey
+          key as InfrastructureSystemKey
         );
       } catch (error) {
         // Not a non-visual system either
@@ -751,7 +757,7 @@ export class SystemCoordinator {
           listener(event);
         } catch (error) {
           Y3KDebug?.debug?.error(
-            "SystemCoordinator",
+            "SystemIntegrationCoordinator",
             `Error in event listener for ${eventType}:`,
             error
           );
@@ -1067,7 +1073,7 @@ export class SystemCoordinator {
     this.initializationOrder.set("visual-systems", ["ColorHarmonyEngine"]);
     this.initializationOrder.set("integration", [
       "VisualSystemCoordinator",
-      "NonVisualSystemFacade",
+      "InfrastructureSystemCoordinator",
     ]);
 
     // Initialize all systems as uninitialized
@@ -1078,7 +1084,7 @@ export class SystemCoordinator {
     }
 
     Y3KDebug?.debug?.log(
-      "SystemCoordinator",
+      "SystemIntegrationCoordinator",
       "Coordination phases configured",
       {
         phases: Array.from(this.initializationOrder.keys()),
@@ -1097,18 +1103,18 @@ export class SystemCoordinator {
     ];
 
     for (const phase of phases) {
-      Y3KDebug?.debug?.log("SystemCoordinator", `Starting phase: ${phase}`);
+      Y3KDebug?.debug?.log("SystemIntegrationCoordinator", `Starting phase: ${phase}`);
       this.currentPhase = phase;
 
       try {
         await this.executePhase(phase);
         Y3KDebug?.debug?.log(
-          "SystemCoordinator",
+          "SystemIntegrationCoordinator",
           `Phase ${phase} completed successfully`
         );
       } catch (error) {
         Y3KDebug?.debug?.error(
-          "SystemCoordinator",
+          "SystemIntegrationCoordinator",
           `Phase ${phase} failed:`,
           error
         );
@@ -1199,7 +1205,7 @@ export class SystemCoordinator {
         case "VisualSystemCoordinator":
           await this.initializeVisualFacade();
           break;
-        case "NonVisualSystemFacade":
+        case "InfrastructureSystemCoordinator":
           await this.initializeNonVisualFacade();
           break;
         default:
@@ -1208,13 +1214,13 @@ export class SystemCoordinator {
 
       this.systemStates.set(systemName, "ready");
       Y3KDebug?.debug?.log(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         `System ${systemName} initialized successfully`
       );
     } catch (error) {
       this.systemStates.set(systemName, "failed");
       Y3KDebug?.debug?.error(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         `System ${systemName} initialization failed:`,
         error
       );
@@ -1324,7 +1330,7 @@ export class SystemCoordinator {
       // SimplePerformanceCoordinator is already initialized above, no need to recreate
     } catch (error) {
       Y3KDebug?.debug?.warn(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "Failed to initialize CSSVariableWriter:",
         error
       );
@@ -1364,7 +1370,7 @@ export class SystemCoordinator {
     );
 
     Y3KDebug?.debug?.log(
-      "SystemCoordinator",
+      "SystemIntegrationCoordinator",
       "SpicetifyColorBridge initialized successfully",
       {
         systemMetrics: this.sharedSpicetifyColorBridge.getSystemMetrics(),
@@ -1409,14 +1415,19 @@ export class SystemCoordinator {
       this.eventBus // optional
     );
 
-    // Note: SpicetifyColorBridge can be accessed through SystemCoordinator shared dependencies
+    // Note: SpicetifyColorBridge can be accessed through SystemIntegrationCoordinator shared dependencies
     // Visual systems that need it can get it via getSharedSpicetifyColorBridge()
 
     await this.visualSystemCoordinator.initialize();
+
+    // Phase 3: Wire VisualSystemCoordinator to WebGLSystemsIntegration for quality scaling
+    if (this.sharedWebGLSystemsIntegration) {
+      this.sharedWebGLSystemsIntegration.setVisualSystemCoordinator(this.visualSystemCoordinator);
+    }
   }
 
   private async initializeNonVisualFacade(): Promise<void> {
-    this.infrastructureSystemFacade = new NonVisualSystemFacade(this.config, this.utils, {
+    this.infrastructureSystemFacade = new InfrastructureSystemCoordinator(this.config, this.utils, {
       performanceAnalyzer: this.performanceCoordinator as any,
       unifiedCSSConsciousnessController:
         this.sharedCSSVariableWriter,
@@ -1608,14 +1619,14 @@ export class SystemCoordinator {
   private async setupGradientSystemCoordination(): Promise<void> {
     if (!this.visualSystemCoordinator) {
       Y3KDebug?.debug?.warn(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "VisualSystemCoordinator not available - skipping gradient system coordination"
       );
       return;
     }
 
     Y3KDebug?.debug?.log(
-      "SystemCoordinator",
+      "SystemIntegrationCoordinator",
       "Setting up gradient system coordination"
     );
 
@@ -1641,7 +1652,7 @@ export class SystemCoordinator {
         performance.now() - gradientCoordinationStartTime;
 
       Y3KDebug?.debug?.log(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "Gradient system coordination completed",
         {
           coordinatedSystems,
@@ -1655,7 +1666,7 @@ export class SystemCoordinator {
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "Failed to setup gradient system coordination:",
         error
       );
@@ -1674,13 +1685,13 @@ export class SystemCoordinator {
 
       if (!gradientConductor) {
         Y3KDebug?.debug?.warn(
-          "SystemCoordinator",
+          "SystemIntegrationCoordinator",
           "GradientConductor not available via VisualSystemCoordinator"
         );
         return;
       }
 
-      // Register with SystemCoordinator for cross-system communication
+      // Register for cross-system communication
       this.addEventListener("gradient-conductor-event", (event: any) => {
         if (
           gradientConductor &&
@@ -1714,7 +1725,7 @@ export class SystemCoordinator {
                 }
               } catch (error) {
                 Y3KDebug?.debug?.warn(
-                  "SystemCoordinator",
+                  "SystemIntegrationCoordinator",
                   "Failed to refresh GradientConductor colors:",
                   error
                 );
@@ -1725,12 +1736,12 @@ export class SystemCoordinator {
       );
 
       Y3KDebug?.debug?.log(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "GradientConductor coordination established"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "Failed to coordinate GradientConductor:",
         error
       );
@@ -1747,7 +1758,7 @@ export class SystemCoordinator {
 
       if (!webglSystem) {
         Y3KDebug?.debug?.warn(
-          "SystemCoordinator",
+          "SystemIntegrationCoordinator",
           "WebGLGradientBackgroundSystem not available via VisualSystemCoordinator"
         );
         return;
@@ -1783,12 +1794,12 @@ export class SystemCoordinator {
       );
 
       Y3KDebug?.debug?.log(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "WebGLGradientBackgroundSystem coordination established"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "Failed to coordinate WebGLGradientBackgroundSystem:",
         error
       );
@@ -1806,12 +1817,12 @@ export class SystemCoordinator {
       this.registerColorDependentSystem("GradientTransitionOrchestrator");
 
       Y3KDebug?.debug?.log(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "GradientTransitionOrchestrator registered for color updates"
       );
     } catch (error) {
       Y3KDebug?.debug?.warn(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "Failed to register GradientTransitionOrchestrator:",
         error
       );
@@ -1840,7 +1851,7 @@ export class SystemCoordinator {
         });
       } catch (error) {
         Y3KDebug?.debug?.error(
-          "SystemCoordinator",
+          "SystemIntegrationCoordinator",
           "Failed to propagate color harmony update to gradient systems:",
           error
         );
@@ -1857,7 +1868,7 @@ export class SystemCoordinator {
         });
       } catch (error) {
         Y3KDebug?.debug?.error(
-          "SystemCoordinator",
+          "SystemIntegrationCoordinator",
           "Failed to propagate performance event to gradient systems:",
           error
         );
@@ -1865,7 +1876,7 @@ export class SystemCoordinator {
     });
 
     Y3KDebug?.debug?.log(
-      "SystemCoordinator",
+      "SystemIntegrationCoordinator",
       "Gradient system communication established"
     );
   }
@@ -1910,7 +1921,7 @@ export class SystemCoordinator {
       this.colorSystemRefreshCallbacks.set(systemKey, refreshCallback);
     }
     Y3KDebug?.debug?.log(
-      "SystemCoordinator",
+      "SystemIntegrationCoordinator",
       `Registered color-dependent system: ${systemKey}`
     );
   }
@@ -1922,7 +1933,7 @@ export class SystemCoordinator {
     this.colorDependentSystems.delete(systemKey);
     this.colorSystemRefreshCallbacks.delete(systemKey);
     Y3KDebug?.debug?.log(
-      "SystemCoordinator",
+      "SystemIntegrationCoordinator",
       `Unregistered color-dependent system: ${systemKey}`
     );
   }
@@ -1940,7 +1951,7 @@ export class SystemCoordinator {
   public async refreshColorDependentSystems(trigger: string): Promise<void> {
     if (this.colorDependentSystems.size === 0) {
       Y3KDebug?.debug?.log(
-        "SystemCoordinator",
+        "SystemIntegrationCoordinator",
         "No color-dependent systems to refresh"
       );
       return;
@@ -1952,7 +1963,7 @@ export class SystemCoordinator {
     let failureCount = 0;
 
     Y3KDebug?.debug?.log(
-      "SystemCoordinator",
+      "SystemIntegrationCoordinator",
       `Refreshing ${this.colorDependentSystems.size} color-dependent systems for trigger: ${trigger}`
     );
 
@@ -1966,14 +1977,14 @@ export class SystemCoordinator {
             .then(() => {
               successCount++;
               Y3KDebug?.debug?.log(
-                "SystemCoordinator",
+                "SystemIntegrationCoordinator",
                 `Successfully refreshed color system: ${systemKey}`
               );
             })
             .catch((error) => {
               failureCount++;
               Y3KDebug?.debug?.warn(
-                "SystemCoordinator",
+                "SystemIntegrationCoordinator",
                 `Failed to refresh color system ${systemKey}:`,
                 error
               );
@@ -1989,7 +2000,7 @@ export class SystemCoordinator {
             .catch((error) => {
               failureCount++;
               Y3KDebug?.debug?.warn(
-                "SystemCoordinator",
+                "SystemIntegrationCoordinator",
                 `Failed to refresh color system ${systemKey}:`,
                 error
               );
@@ -2004,7 +2015,7 @@ export class SystemCoordinator {
     const duration = endTime - startTime;
 
     Y3KDebug?.debug?.log(
-      "SystemCoordinator",
+      "SystemIntegrationCoordinator",
       `Color system refresh completed`,
       {
         trigger,
@@ -2061,7 +2072,7 @@ export class SystemCoordinator {
 
     // System not found or doesn't support color refresh
     Y3KDebug?.debug?.warn(
-      "SystemCoordinator",
+      "SystemIntegrationCoordinator",
       `System ${systemKey} not found or doesn't support color refresh`
     );
   }
@@ -2092,7 +2103,7 @@ export class SystemCoordinator {
     }
 
     Y3KDebug?.debug?.log(
-      "SystemCoordinator",
+      "SystemIntegrationCoordinator",
       `Auto-registered ${defaultColorSystems.length} default color-dependent systems`
     );
   }
@@ -2101,7 +2112,7 @@ export class SystemCoordinator {
     await this.cleanup();
     this.isInitialized = false;
 
-    Y3KDebug?.debug?.log("SystemCoordinator", "System coordinator destroyed");
+    Y3KDebug?.debug?.log("SystemIntegrationCoordinator", "System coordinator destroyed");
   }
 
   // Shared service getter methods for testing and integration

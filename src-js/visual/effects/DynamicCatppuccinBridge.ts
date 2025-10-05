@@ -573,7 +573,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
   /**
    * Animate smooth accent color transitions
    * MIGRATION NOTE: This method previously used standalone RAF loop.
-   * Now transitions are driven by EnhancedMasterAnimationCoordinator via updateAnimation().
+   * Now transitions are driven by AnimationFrameCoordinator via updateAnimation().
    * The coordinator will call updateAnimation(deltaTime) which handles all transition logic.
    */
   private animateAccentTransition(): void {
@@ -897,7 +897,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
   }
 
   /**
-   * updateAnimation() - Called by EnhancedMasterAnimationCoordinator at 60fps
+   * updateAnimation() - Called by AnimationFrameCoordinator at 60fps
    * Handles color transition animations that were previously in standalone RAF loop
    */
   public override updateAnimation(deltaTime: number): void {

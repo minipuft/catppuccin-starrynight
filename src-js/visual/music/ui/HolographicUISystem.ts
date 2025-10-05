@@ -353,9 +353,9 @@ export class HolographicUISystem
       // Setup user interaction tracking for content-aware effects
       this.setupUserInteractionTracking();
 
-      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by EnhancedMasterAnimationCoordinator
+      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by AnimationFrameCoordinator
       // The coordinator will call updateAnimation(deltaTime) automatically
-      // Registration happens in SystemCoordinator during system initialization
+      // Registration happens in SystemIntegrationCoordinator during system initialization
 
       this.initialized = true;
       this.isInitialized = true;
@@ -995,7 +995,7 @@ export class HolographicUISystem
   // Data stream canvas method removed - now implemented via CSS-only per-element effects
 
   /**
-   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   * ✅ RAF LOOP REMOVED - Managed by AnimationFrameCoordinator
    *
    * Previous implementation: startHolographicAnimation() with independent RAF loop
    * New implementation: updateAnimation() called by coordinator
@@ -1006,7 +1006,7 @@ export class HolographicUISystem
    * - Coordinated frame budget management
    * - Priority-based execution order
    *
-   * Migration: Lines 998-1016 removed, registration added to SystemCoordinator
+   * Migration: Lines 998-1016 removed, registration added to SystemIntegrationCoordinator
    * Note: updateHolographicAnimation() is now called from updateAnimation(deltaTime)
    */
 
@@ -1482,7 +1482,7 @@ export class HolographicUISystem
     console.log("[HolographicUISystem] Destroying holographic UI system...");
 
     // ✅ RAF LOOP CONSOLIDATION: No need to stop animation loop (coordinator handles this)
-    // System unregistration happens in SystemCoordinator destroy()
+    // System unregistration happens in SystemIntegrationCoordinator destroy()
 
     // Clear holographic elements
     for (const [id, element] of this.holographicElements) {

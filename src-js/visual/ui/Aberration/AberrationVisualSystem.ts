@@ -13,7 +13,7 @@
 import type {
   FrameContext,
   IVisualSystem,
-} from "@/core/animation/EnhancedMasterAnimationCoordinator";
+} from "@/core/animation/AnimationFrameCoordinator";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { AberrationCanvas } from "@/visual/ui/Aberration/AberrationCanvas";
 

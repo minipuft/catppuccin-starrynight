@@ -15,14 +15,15 @@
  * @compatibility IManagedSystem interface, ServiceContainer integration
  */
 
+import { ServiceVisualSystemBase } from "@/core/services/ServiceCompositionBase";
 import { HolographicUISystem } from "@/visual/music/ui/HolographicUISystem";
 import { colorTransitionManager } from "@/visual/effects/MusicColorTransitionState";
 import type { RGB, MusicEmotion, BeatData, CinematicPalette } from "@/types/colorTypes";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
-import type { ServiceContainer, IServiceAwareSystem } from "@/core/services/SystemServices";
+import type { HealthCheckResult } from "@/types/systems";
+import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 
 /**
  * Current state of the animation effects system
@@ -84,26 +85,20 @@ export interface BreathingColorMapping {
 
 /**
  * AnimationEffectsController - Smooth animation animations for visual enhancement
- * 
+ *
  * Implements calm animation effects that synchronize with low-intensity music for meditative
  * visual experience. Features seasonal color transitions and service-aware architecture.
- * 
+ *
  * Architecture:
- * - Implements IManagedSystem for lifecycle management
- * - Optional IServiceAwareSystem for enhanced service integration
+ * - Extends ServiceVisualSystemBase for lifecycle management
+ * - Service composition via dependency injection
  * - Direct UnifiedEventBus integration with service fallback
  * - Seasonal palette system with smooth transitions
  */
-export class AnimationEffectsController implements IManagedSystem, IServiceAwareSystem {
-  public initialized = false;
-  
-  private holographicSystem: HolographicUISystem;
-  // Using shared CSS controller for color coordination
-  private cssController: CSSVariableWriter;
-  private musicSyncService: MusicSyncService;
-  
-  // Service composition support
-  private services?: ServiceContainer;
+export class AnimationEffectsController extends ServiceVisualSystemBase {
+  private holographicSystem: HolographicUISystem | null = null;
+  private cssController!: CSSVariableWriter;
+  protected override musicSyncService: MusicSyncService | null = null;
   
   private effectState: AnimationEffectState;
   private harmonyConfig: BreathingEffectConfig;
@@ -157,15 +152,14 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
     }
   };
 
-  constructor(
-    holographicSystem: HolographicUISystem,
-    cssController: CSSVariableWriter,
-    musicSyncService: MusicSyncService
-  ) {
-    this.holographicSystem = holographicSystem;
-    this.cssController = cssController;
-    this.musicSyncService = musicSyncService;
-    
+  constructor(config: AdvancedSystemConfig | Year3000Config, holographicSystem?: HolographicUISystem) {
+    super(config);
+
+    // Store holographic system if provided (for backward compatibility)
+    if (holographicSystem) {
+      this.holographicSystem = holographicSystem;
+    }
+
     // Initialize animation effect state
     this.effectState = {
       animationIntensity: 0,
@@ -177,7 +171,7 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
       colorShift: 0,
       harmonyLevel: 0
     };
-    
+
     // Initialize animation effect configuration
     this.harmonyConfig = {
       calmThreshold: 0.3,           // Activate on low intensity (peaceful music)
@@ -188,56 +182,56 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
       cycleSpeed: 0.1               // Slow animation cycles
     };
   }
-  
-  // =============================================================================
-  // SERVICE INJECTION INTERFACE
-  // =============================================================================
-  
-  injectServices(services: ServiceContainer): void {
-    this.services = services;
-  }
-  
-  getRequiredServices(): (keyof ServiceContainer)[] {
-    return []; // No required services - system works without services
-  }
-  
-  getOptionalServices(): (keyof ServiceContainer)[] {
-    return ['cssVariables', 'events', 'performance'];
-  }
 
   /**
    * Initialize the animation effects system
-   * 
+   *
    * Sets up event subscriptions, animation elements detection, CSS variables,
    * and starts the animation loop for animation effects.
-   * 
+   *
    * @returns Promise<void> Resolves when initialization completes
    * @throws Error if system fails to initialize
-   * @public IManagedSystem lifecycle method
+   * @override ServiceVisualSystemBase lifecycle method
    */
-  public async initialize(): Promise<void> {
-    if (this.initialized) return;
-    
+  protected override async performVisualSystemInitialization(): Promise<void> {
     try {
       console.log('[AnimationEffectsController] Initializing animation effects...');
-      
+
+      // Initialize CSS coordination - use globalThis to access Year3000System
+      const year3000System = (globalThis as any).year3000System;
+      this.cssController = year3000System?.cssVariableController || getGlobalCSSVariableWriter();
+
+      // Get music sync service from Year3000System if not already set
+      if (!this.musicSyncService && year3000System?.musicSyncService) {
+        this.musicSyncService = year3000System.musicSyncService;
+      }
+
+      // Create holographic system if not provided in constructor
+      if (!this.holographicSystem) {
+        const { VisualEffectsManager } = await import('@/types/colorTypes');
+        const biologicalManager = new VisualEffectsManager();
+        const { HolographicUISystem } = await import('@/visual/music/ui/HolographicUISystem');
+        this.holographicSystem = new HolographicUISystem(
+          biologicalManager,
+          this.musicSyncService || undefined
+        );
+      }
+
       // Register for color coordination events
       this.subscribeToColorEvents();
-      
+
       // Initialize animation effect elements
       await this.initializeBreathingElements();
-      
+
       // Setup CSS variables for animation effects
       this.setupBreathingCSSVariables();
 
-      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by EnhancedMasterAnimationCoordinator
+      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by AnimationFrameCoordinator
       // The coordinator will call updateAnimation(deltaTime) automatically
-      // Registration happens in SystemCoordinator during system initialization
+      // Registration happens in SystemIntegrationCoordinator during system initialization
 
-      this.initialized = true;
-      
       console.log('[AnimationEffectsController] 🌿 Breathing effects system ready');
-      
+
     } catch (error) {
       console.error('[AnimationEffectsController] Failed to initialize:', error);
       throw error;
@@ -286,14 +280,21 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
    * @returns Promise<HealthCheckResult> System health status and metrics
    * @public IManagedSystem monitoring interface
    */
-  public async healthCheck(): Promise<HealthCheckResult> {
-    const isHealthy = this.initialized && 
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
+    const isHealthy = this.initialized &&
                      this.effectState.animationIntensity >= 0 &&
                      this.performanceMetrics.averageProcessingTime < 10; // Gentle 10ms requirement
-    
+
     return {
-      system: 'NaturalHarmonyEngine',
       healthy: isHealthy,
+      details: isHealthy
+        ? 'Animation effects controller operational'
+        : 'Animation effects controller degraded',
       metrics: {
         peacefulMomentCount: this.performanceMetrics.peacefulMomentCount,
         processingTime: this.performanceMetrics.averageProcessingTime,
@@ -308,34 +309,18 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
    * Subscribe to color coordination events
    */
   private subscribeToColorEvents(): void {
-    // Use service-based event subscription when available
-    if (this.services?.events) {
-      this.services.events.subscribe('AnimationEffectsController', 
-        'music:emotional-context-updated', 
-        this.onColorUpdate.bind(this)
-      );
-      this.services.events.subscribe('AnimationEffectsController', 
-        'music:emotion-analyzed', 
-        this.onPeacefulMoment.bind(this)
-      );
-      this.services.events.subscribe('AnimationEffectsController', 
-        'settings:visual-guide-changed', 
-        this.onVisualTransition.bind(this)
-      );
-    } else {
-      // Fallback to direct event bus usage
-      unifiedEventBus.subscribe('music:emotional-context-updated', (event) => {
-        this.onColorUpdate(event);
-      });
-      
-      unifiedEventBus.subscribe('music:emotion-analyzed', (event) => {
-        this.onPeacefulMoment(event);
-      });
-      
-      unifiedEventBus.subscribe('settings:visual-guide-changed', (event) => {
-        this.onVisualTransition(event);
-      });
-    }
+    // Use inherited subscribeToEvent method from ServiceVisualSystemBase
+    this.subscribeToEvent('music:emotional-context-updated', (event: any) => {
+      this.onColorUpdate(event);
+    });
+
+    this.subscribeToEvent('music:emotion-analyzed', (event: any) => {
+      this.onPeacefulMoment(event);
+    });
+
+    this.subscribeToEvent('settings:visual-guide-changed', (event: any) => {
+      this.onVisualTransition(event);
+    });
   }
 
   /**
@@ -444,6 +429,7 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
    * Update natural state from current music
    */
   private updateNaturalFromMusic(): void {
+    if (!this.musicSyncService) return;
     const musicState = this.musicSyncService.getCurrentMusicState();
     if (!musicState) return;
     
@@ -545,44 +531,15 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
    * Update natural colors in CSS
    */
   private updateNaturalColors(mapping: BreathingColorMapping): void {
-    // Use service-based CSS updates for better batching when available
-    if (this.services?.cssVariables) {
-      this.services.cssVariables.queueBatchUpdate({
-        '--sn-animation-warm-r': mapping.warmTone.r.toString(),
-        '--sn-animation-warm-g': mapping.warmTone.g.toString(),
-        '--sn-animation-warm-b': mapping.warmTone.b.toString(),
-        '--sn-animation-cool-r': mapping.coolTone.r.toString(),
-        '--sn-animation-cool-g': mapping.coolTone.g.toString(),
-        '--sn-animation-cool-b': mapping.coolTone.b.toString()
-      });
-    } else {
-      // Fallback to existing CSS controller
-      this.cssController.queueCSSVariableUpdate(
-        '--sn-animation-warm-r',
-        mapping.warmTone.r.toString()
-      );
-      this.cssController.queueCSSVariableUpdate(
-        '--sn-animation-warm-g',
-        mapping.warmTone.g.toString()
-      );
-      this.cssController.queueCSSVariableUpdate(
-        '--sn-animation-warm-b',
-        mapping.warmTone.b.toString()
-      );
-      
-      this.cssController.queueCSSVariableUpdate(
-        '--sn-animation-cool-r',
-        mapping.coolTone.r.toString()
-      );
-      this.cssController.queueCSSVariableUpdate(
-        '--sn-animation-cool-g',
-        mapping.coolTone.g.toString()
-      );
-      this.cssController.queueCSSVariableUpdate(
-        '--sn-animation-cool-b',
-        mapping.coolTone.b.toString()
-      );
-    }
+    // Use inherited updateCSSVariables method for batched updates
+    this.updateCSSVariables({
+      '--sn-animation-warm-r': mapping.warmTone.r.toString(),
+      '--sn-animation-warm-g': mapping.warmTone.g.toString(),
+      '--sn-animation-warm-b': mapping.warmTone.b.toString(),
+      '--sn-animation-cool-r': mapping.coolTone.r.toString(),
+      '--sn-animation-cool-g': mapping.coolTone.g.toString(),
+      '--sn-animation-cool-b': mapping.coolTone.b.toString()
+    });
   }
 
   /**
@@ -611,7 +568,8 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
    * Setup CSS variables for animation effects
    */
   private setupBreathingCSSVariables(): void {
-    const baseVariables = {
+    // Use inherited updateCSSVariables method for batched updates
+    this.updateCSSVariables({
       '--sn-animation-earthy-r': '166',
       '--sn-animation-earthy-g': '227',
       '--sn-animation-earthy-b': '161',
@@ -626,17 +584,7 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
       '--sn-animation-earth-connection': '0',
       '--sn-animation-animation-depth': '0.8',
       '--sn-animation-seasonal-shift': '0'
-    };
-    
-    // Use service-based batch update when available
-    if (this.services?.cssVariables) {
-      this.services.cssVariables.queueBatchUpdate(baseVariables);
-    } else {
-      // Fallback to existing CSS controller
-      for (const [variable, value] of Object.entries(baseVariables)) {
-        this.cssController.queueCSSVariableUpdate(variable, value);
-      }
-    }
+    });
   }
 
   /**
@@ -645,25 +593,16 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
   private updateNaturalCSSVariables(mapping: BreathingColorMapping): void {
     // Update animation phase for CSS animations
     const animationValue = Math.sin(this.animationPhases.animationPhase) * this.effectState.animationDepth;
-    
-    const cssUpdates = {
+
+    // Use inherited updateCSSVariables method for batched updates
+    this.updateCSSVariables({
       '--sn-animation-animation-intensity': this.effectState.animationIntensity.toString(),
       '--sn-animation-animation-frequency': this.effectState.animationFrequency.toString(),
       '--sn-animation-grounding': this.effectState.grounding.toString(),
       '--sn-animation-animation-depth': this.effectState.animationDepth.toString(),
       '--sn-animation-color-shift': this.effectState.colorShift.toString(),
       '--sn-animation-animation-phase': animationValue.toString()
-    };
-    
-    // Use service-based batch update when available
-    if (this.services?.cssVariables) {
-      this.services.cssVariables.queueBatchUpdate(cssUpdates);
-    } else {
-      // Fallback to existing CSS controller
-      Object.entries(cssUpdates).forEach(([variable, value]) => {
-        this.cssController.queueCSSVariableUpdate(variable, value);
-      });
-    }
+    });
   }
 
   /**
@@ -716,23 +655,15 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
     const insetGlowSpread = glowIntensity * 10;
     const insetGlowOpacity = glowIntensity * 0.3;
 
-    // Use CSS variables for batched updates instead of direct style manipulation
-    const breathingVars = {
+    // Use inherited updateCSSVariables method for batched updates
+    this.updateCSSVariables({
       '--sn-breathing-scale': animationScale.toString(),
       '--sn-breathing-opacity': animationOpacity.toString(),
       '--sn-breathing-glow-spread': `${glowSpread}px`,
       '--sn-breathing-glow-opacity': glowOpacity.toString(),
       '--sn-breathing-inset-spread': `${insetGlowSpread}px`,
       '--sn-breathing-inset-opacity': insetGlowOpacity.toString()
-    };
-
-    if (this.services?.cssVariables) {
-      this.services.cssVariables.queueBatchUpdate(breathingVars);
-    } else {
-      Object.entries(breathingVars).forEach(([key, value]) => {
-        this.cssController.queueCSSVariableUpdate(key, value);
-      });
-    }
+    });
   }
 
   /**
@@ -747,20 +678,12 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
     const bgTopOpacity = connectionIntensity * 0.05;
     const bgBottomOpacity = connectionIntensity * 0.08;
 
-    // Use CSS variables for batched updates
-    const earthVars = {
+    // Use inherited updateCSSVariables method for batched updates
+    this.updateCSSVariables({
       '--sn-earth-border-opacity': borderOpacity.toString(),
       '--sn-earth-bg-top-opacity': bgTopOpacity.toString(),
       '--sn-earth-bg-bottom-opacity': bgBottomOpacity.toString()
-    };
-
-    if (this.services?.cssVariables) {
-      this.services.cssVariables.queueBatchUpdate(earthVars);
-    } else {
-      Object.entries(earthVars).forEach(([key, value]) => {
-        this.cssController.queueCSSVariableUpdate(key, value);
-      });
-    }
+    });
   }
 
   /**
@@ -784,21 +707,13 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
     const phaseNormalized = (variationPhase * 0.5) / (Math.PI * 2); // Normalize to 0-1
     const variantIndex = Math.floor(((phaseNormalized % 1) + 1) % 1 * 8); // 0-7
 
-    // Use CSS variables for batched updates
-    const atmosphereVars = {
+    // Use inherited updateCSSVariables method for batched updates
+    this.updateCSSVariables({
       '--sn-atmosphere-translate-y': `${animationOffset}px`,
       // ✅ NEW: Apply pre-computed color variant from ColorHarmonyEngine cache
       // This replaces runtime hue-rotate and saturate filters with direct RGB values
       '--sn-atmosphere-color-rgb': `var(--sn-atmosphere-variant-${variantIndex}-rgb)`
-    };
-
-    if (this.services?.cssVariables) {
-      this.services.cssVariables.queueBatchUpdate(atmosphereVars);
-    } else {
-      Object.entries(atmosphereVars).forEach(([key, value]) => {
-        this.cssController.queueCSSVariableUpdate(key, value);
-      });
-    }
+    });
   }
 
   /**
@@ -827,7 +742,7 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
   }
 
   /**
-   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   * ✅ RAF LOOP REMOVED - Managed by AnimationFrameCoordinator
    *
    * Previous implementation: startBreathingAnimation() with independent RAF loop
    * New implementation: updateAnimation() called by coordinator
@@ -838,7 +753,7 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
    * - Coordinated frame budget management
    * - Priority-based execution order
    *
-   * Migration: Lines 829-847 removed, registration added to SystemCoordinator
+   * Migration: Lines 829-847 removed, registration added to SystemIntegrationCoordinator
    */
 
   /**
@@ -852,38 +767,29 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
   /**
    * Force repaint for immediate visual updates
    */
-  public forceRepaint(reason?: string): void {
+  public override forceRepaint(reason?: string): void {
     console.log(`[AnimationEffectsController] Force repaint triggered: ${reason || 'Unknown'}`);
-    
+
     // Force update of all animation elements
     this.updateBreathingElements();
-    
-    // Flush CSS updates using service when available
-    if (this.services?.cssVariables) {
-      this.services.cssVariables.flushUpdates();
-    } else {
-      // Fallback to existing CSS controller
-      this.cssController.flushCSSVariableBatch();
-    }
+
+    // Flush CSS updates using CSS controller
+    this.cssController.flushCSSVariableBatch();
   }
 
   /**
    * Cleanup and destroy the engine
+   * @override ServiceVisualSystemBase lifecycle method
    */
-  public destroy(): void {
+  protected override performVisualSystemCleanup(): void {
     console.log('[AnimationEffectsController] Shutting down animation effects system...');
 
-    // Clean up service subscriptions
-    if (this.services?.events) {
-      this.services.events.cleanupSystem('AnimationEffectsController');
-    }
-
     // ✅ RAF LOOP CONSOLIDATION: No need to stop animation loop (coordinator handles this)
-    // System unregistration happens in SystemCoordinator destroy()
+    // System unregistration happens in SystemIntegrationCoordinator destroy()
 
     // Clear natural elements
     this.naturalElements.clear();
-    
+
     // Reset animation state
     this.effectState = {
       animationIntensity: 0,
@@ -895,8 +801,6 @@ export class AnimationEffectsController implements IManagedSystem, IServiceAware
       colorShift: 0,
       harmonyLevel: 0
     };
-    
-    this.initialized = false;
   }
 
   // Public API methods

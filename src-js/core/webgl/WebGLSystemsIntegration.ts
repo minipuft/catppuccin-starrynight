@@ -1,35 +1,45 @@
 /**
  * WebGL Systems Integration
- * 
+ *
  * Integrates the UnifiedWebGLController with existing WebGL systems
  * and the Year3000System architecture.
+ *
+ * NOTE: WebGL gradient rendering is now managed via VisualSystemCoordinator
+ * using WebGLGradientStrategy (src-js/visual/strategies/WebGLGradientStrategy.ts).
+ * This integration layer focuses on UnifiedWebGLController coordination and
+ * potential future WebGL systems (particles, corridor effects, etc.).
  */
 
 import { UnifiedWebGLController } from "./UnifiedWebGLController";
-import { WebGLGradientBackgroundSystem } from "@/visual/background/WebGLRenderer";
-import { WebGLGradientAdapter } from "@/visual/backgrounds/WebGLGradientAdapter";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 
 /**
  * WebGL Systems Coordinator
- * 
+ *
  * Manages the integration between UnifiedWebGLController and all WebGL systems.
  * Replaces the complex ContinuousQualityManager approach with a simple,
  * unified management system.
+ *
+ * Phase 3 Update: Now registers WebGLGradientStrategy for direct quality scaling.
  */
 export class WebGLSystemsIntegration implements IManagedSystem {
   public initialized = false;
-  
-  private controller: UnifiedWebGLController;
-  private webglGradientSystem: WebGLGradientBackgroundSystem | null = null;
-  private webglGradientAdapter: WebGLGradientAdapter | null = null;
 
-  constructor(deviceCapabilities: DeviceCapabilityDetector) {
+  private controller: UnifiedWebGLController;
+  private visualSystemCoordinator: any | null = null; // VisualSystemCoordinator reference
+
+  constructor(
+    deviceCapabilities: DeviceCapabilityDetector,
+    visualSystemCoordinator?: any // Optional for Phase 3 integration
+  ) {
     this.controller = new UnifiedWebGLController(deviceCapabilities);
-    
-    Y3KDebug?.debug?.log("WebGLSystemsIntegration", "Created WebGL systems integration");
+    this.visualSystemCoordinator = visualSystemCoordinator || null;
+
+    Y3KDebug?.debug?.log("WebGLSystemsIntegration", "Created WebGL systems integration", {
+      hasVisualCoordinator: !!visualSystemCoordinator
+    });
   }
 
   public async initialize(): Promise<void> {
@@ -58,7 +68,7 @@ export class WebGLSystemsIntegration implements IManagedSystem {
         system: "WebGLSystemsIntegration"
       };
     }
-    
+
     // Check controller health
     const controllerHealth = await this.controller.healthCheck();
     if (!controllerHealth.healthy) {
@@ -68,42 +78,22 @@ export class WebGLSystemsIntegration implements IManagedSystem {
         system: "WebGLSystemsIntegration"
       };
     }
-    
-    // Check individual system health
-    const systemIssues: string[] = [];
-    
-    if (this.webglGradientSystem) {
-      try {
-        const gradientHealth = await this.webglGradientSystem.healthCheck();
-        if (!gradientHealth.ok) {
-          systemIssues.push(`WebGL Gradient: ${gradientHealth.details}`);
-        }
-      } catch (error) {
-        systemIssues.push("WebGL Gradient: health check failed");
-      }
-    }
-    
+
+    // Post-consolidation: Individual WebGL systems (like gradients) are managed
+    // via VisualSystemCoordinator, so we only check the controller health here
     return {
       healthy: true,
-      details: systemIssues.length > 0 
-        ? `Some system issues: ${systemIssues.join(', ')}`
-        : "All WebGL systems healthy",
-      issues: systemIssues,
+      details: "WebGL controller healthy",
       system: "WebGLSystemsIntegration"
     };
   }
 
   public destroy(): void {
-    // Destroy all registered systems
-    if (this.webglGradientSystem) {
-      this.webglGradientSystem.destroy();
-    }
-    
     // Destroy the controller
     this.controller.destroy();
-    
+
     this.initialized = false;
-    
+
     Y3KDebug?.debug?.log("WebGLSystemsIntegration", "Integration destroyed");
   }
 
@@ -166,6 +156,35 @@ export class WebGLSystemsIntegration implements IManagedSystem {
     return this.controller.getQuality();
   }
 
+  /**
+   * Set VisualSystemCoordinator reference (Phase 3 late binding)
+   *
+   * Allows SystemIntegrationCoordinator to provide the VisualSystemCoordinator
+   * reference after both systems are created, enabling WebGLGradientStrategy
+   * registration.
+   *
+   * @param visualSystemCoordinator - VisualSystemCoordinator instance
+   */
+  public setVisualSystemCoordinator(visualSystemCoordinator: any): void {
+    this.visualSystemCoordinator = visualSystemCoordinator;
+
+    // If already initialized, register WebGLGradientStrategy now
+    if (this.initialized) {
+      this._registerWebGLSystems().catch(error => {
+        Y3KDebug?.debug?.warn(
+          "WebGLSystemsIntegration",
+          "Failed to register WebGLGradientStrategy after late binding:",
+          error
+        );
+      });
+    }
+
+    Y3KDebug?.debug?.log(
+      "WebGLSystemsIntegration",
+      "VisualSystemCoordinator reference set (Phase 3 late binding)"
+    );
+  }
+
   // =============================================================================
   // PERFORMANCE SYSTEM INTEGRATION
   // =============================================================================
@@ -210,74 +229,57 @@ export class WebGLSystemsIntegration implements IManagedSystem {
 
   private async _registerWebGLSystems(): Promise<void> {
     try {
-      // Register WebGL Gradient Background System
-      await this._registerWebGLGradientSystem();
-      
-      // TODO: Register other WebGL systems (corridor effects, particle systems, etc.)
+      // Phase 3: Register WebGLGradientStrategy for direct quality scaling
+      if (this.visualSystemCoordinator) {
+        const webglGradient = this.visualSystemCoordinator.getWebGLGradientStrategy();
+
+        if (webglGradient) {
+          // Register with UnifiedWebGLController for quality scaling coordination
+          this.controller.registerSystem("webgl-gradient", webglGradient, 100);
+
+          Y3KDebug?.debug?.log(
+            "WebGLSystemsIntegration",
+            "✓ WebGLGradientStrategy registered with UnifiedWebGLController (Phase 3 direct quality scaling)",
+            {
+              systemName: webglGradient.getSystemName?.() || "WebGLGradientStrategy",
+              isCapable: webglGradient.isCapable?.() || false,
+              isEnabled: webglGradient.isEnabled?.() || false
+            }
+          );
+        } else {
+          Y3KDebug?.debug?.warn(
+            "WebGLSystemsIntegration",
+            "⚠ WebGLGradientStrategy not yet created by VisualSystemCoordinator - will use lazy registration"
+          );
+        }
+      } else {
+        Y3KDebug?.debug?.warn(
+          "WebGLSystemsIntegration",
+          "⚠ VisualSystemCoordinator not provided - WebGLGradientStrategy cannot be registered for quality scaling"
+        );
+      }
+
+      // TODO: Register future WebGL systems here:
       // await this._registerCorridorEffectsSystem();
       // await this._registerParticleSystem();
-      
-      Y3KDebug?.debug?.log("WebGLSystemsIntegration", "All WebGL systems registered successfully");
-      
+
+      Y3KDebug?.debug?.log(
+        "WebGLSystemsIntegration",
+        "WebGL systems registration complete"
+      );
+
     } catch (error) {
       Y3KDebug?.debug?.warn("WebGLSystemsIntegration", "Failed to register some WebGL systems:", error);
     }
   }
 
-  private async _registerWebGLGradientSystem(): Promise<void> {
-    try {
-      // Get access to the global WebGL gradient system from Year3000System
-      const year3000System = (globalThis as any).year3000System;
-      if (!year3000System) {
-        Y3KDebug?.debug?.warn("WebGLSystemsIntegration", "Year3000System not available");
-        return;
-      }
-      
-      // Find the WebGL gradient system - it might be registered under various names
-      const possibleSystems = [
-        'webglGradientBackgroundSystem',
-        'flowingLiquidConsciousnessSystem',
-        'webglBackgroundSystem'
-      ];
-      
-      let foundSystem = null;
-      for (const systemName of possibleSystems) {
-        if (year3000System[systemName]) {
-          foundSystem = year3000System[systemName];
-          break;
-        }
-      }
-      
-      if (!foundSystem) {
-        Y3KDebug?.debug?.warn("WebGLSystemsIntegration", "WebGL gradient system not found in Year3000System");
-        return;
-      }
-      
-      // Create adapter and register with controller
-      this.webglGradientSystem = foundSystem;
-      this.webglGradientAdapter = new WebGLGradientAdapter(this.webglGradientSystem!);
-      
-      this.controller.registerSystem(
-        'webgl-gradient-background', 
-        this.webglGradientAdapter, 
-        100 // High priority
-      );
-      
-      Y3KDebug?.debug?.log("WebGLSystemsIntegration", "WebGL gradient system registered");
-      
-    } catch (error) {
-      Y3KDebug?.debug?.warn("WebGLSystemsIntegration", "Failed to register WebGL gradient system:", error);
-    }
-  }
-
   private _getRegisteredSystemNames(): string[] {
-    // Get names of registered systems from controller
+    // Post-consolidation: Gradient rendering is managed via VisualSystemCoordinator
+    // This will return names of future WebGL systems when registered
     const systemNames: string[] = [];
-    
-    if (this.webglGradientAdapter) {
-      systemNames.push('WebGL Gradient Background');
-    }
-    
+
+    // Future WebGL systems will be listed here
+
     return systemNames;
   }
 }

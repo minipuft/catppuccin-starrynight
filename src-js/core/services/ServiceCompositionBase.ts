@@ -18,7 +18,7 @@ import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 
 import type { CanvasResult } from "@/utils/graphics/VisualCanvasFactory";
-import { DefaultServiceFactory } from "./DefaultServiceImplementations";
+import { DefaultServiceFactory } from "./CoreServiceProviders";
 import type {
   CanvasOptions,
   IServiceAwareSystem,
@@ -26,11 +26,11 @@ import type {
 } from "./SystemServices";
 
 // =============================================================================
-// BASE SYSTEM BRIDGE - Replaces UnifiedSystemBase
+// BASE SYSTEM BRIDGE - Replaces ManagedSystemBase
 // =============================================================================
 
 /**
- * Service-based system foundation that provides the same API as UnifiedSystemBase
+ * Service-based system foundation that provides the same API as ManagedSystemBase
  * but uses composition internally
  */
 export abstract class ServiceSystemBase

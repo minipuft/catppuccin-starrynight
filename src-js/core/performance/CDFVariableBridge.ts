@@ -7,7 +7,7 @@
 // ============================================================================
 
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import type { FrameContext } from "@/core/animation/EnhancedMasterAnimationCoordinator";
+import type { FrameContext } from "@/core/animation/AnimationFrameCoordinator";
 import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 
 export class CDFVariableBridge {

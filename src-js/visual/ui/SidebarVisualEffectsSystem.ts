@@ -2,7 +2,7 @@ import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerforman
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import type { PerformanceProfile, AdvancedSystemConfig } from "@/types/models";
 import { HARMONIC_MODES } from "@/config/globalConfig";
-import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
+import { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { sample as sampleNoise } from "@/utils/graphics/NoiseField";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
@@ -94,7 +94,7 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
   public override onAnimate(deltaMs: number): void {
     // Basic implementation - can be enhanced in future phases
   }
-  private year3000System: Year3000System | null;
+  private year3000System: ThemeLifecycleCoordinator | null;
   private masterAnimationRegistered: boolean;
   private isUsingMasterAnimation: boolean;
   private rootNavBar: HTMLElement | null = null;
@@ -157,7 +157,7 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService,
     // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
-    year3000System: Year3000System | null = null
+    year3000System: ThemeLifecycleCoordinator | null = null
   ) {
     super(config, utils, performanceMonitor, musicSyncService);
     this.year3000System = year3000System;
@@ -421,7 +421,7 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
   }
 
   /**
-   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   * ✅ RAF LOOP REMOVED - Managed by AnimationFrameCoordinator
    *
    * Benefits:
    * - Single RAF loop for all systems

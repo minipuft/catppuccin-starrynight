@@ -769,7 +769,7 @@ export class UIEffectsController
   }
 
   /**
-   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   * ✅ RAF LOOP REMOVED - Managed by AnimationFrameCoordinator
    * Old method removed: startUnifiedAnimationLoop()
    * Replacement: updateAnimation(deltaTime) called by coordinator
    */

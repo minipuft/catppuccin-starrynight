@@ -119,7 +119,7 @@ export class LoadingStateService implements IManagedSystem {
   }
 
   /**
-   * Update animation states (called each frame by SystemCoordinator)
+   * Update animation states (called each frame by SystemIntegrationCoordinator)
    */
   public updateAnimation(deltaTime: number): void {
     if (!this.initialized || !this.config.enableLoadingAnimations) return;

@@ -15,7 +15,7 @@
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { settings } from "@/config"; // TypedSettingsManager singleton
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
+import { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { BeatPayload } from "@/types/systems";
@@ -56,7 +56,7 @@ export class AudioVisualController {
   
   // Core systems
   private perf: SimplePerformanceCoordinator | null = null;
-  private year3000System: Year3000System | null;
+  private year3000System: ThemeLifecycleCoordinator | null;
   
   // Event management
   private unsubscribers: (() => void)[] = [];
@@ -77,7 +77,7 @@ export class AudioVisualController {
   private interactionOffHandler: (() => void) | null = null;
 
   constructor(
-    y3k: Year3000System | null = null,
+    y3k: ThemeLifecycleCoordinator | null = null,
     cssController?: CSSVariableWriter,
     perf?: SimplePerformanceCoordinator
   ) {
@@ -385,7 +385,7 @@ export class AudioVisualController {
 // ---------------------------------------------------------------------------
 
 export function initializeAudioVisualController(
-  y3k: Year3000System | null = null
+  y3k: ThemeLifecycleCoordinator | null = null
 ): AudioVisualController {
   // Singleton guard for hot-reloads.
   const g = globalThis as any;

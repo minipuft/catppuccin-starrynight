@@ -1,26 +1,26 @@
-import { UnifiedSystemBase } from '@/core/base/UnifiedSystemBase';
+import { ServiceSystemBase } from '@/core/services/ServiceCompositionBase';
 import { SidebarVisualEffectsSystem } from '@/visual/ui/SidebarVisualEffectsSystem';
 // Consolidated sidebar systems:
 // - SidebarInteractiveFlowSystem merged into SidebarVisualEffectsSystem
-// - UnifiedSidebarEffectsController merged into SidebarVisualEffectsSystem  
+// - UnifiedSidebarEffectsController merged into SidebarVisualEffectsSystem
 // - RightSidebarController removed in favor of unified approach
 import { SidebarPerformanceManager } from '@/visual/ui/SidebarPerformanceCoordinator';
 import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
-import type { HealthCheckResult } from '@/types/systems';
+import type { HealthCheckResult, IManagedSystem } from '@/types/systems';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 
 // Temporary interfaces for systems that couldn't be created due to build issues
-interface LeftSidebarVisualSystem extends UnifiedSystemBase {
+interface LeftSidebarVisualSystem extends IManagedSystem {
   getVisualState(): any;
   getAnimationMetrics(): any;
 }
 
-interface RightSidebarVisualSystem extends UnifiedSystemBase {
+interface RightSidebarVisualSystem extends IManagedSystem {
   getVisualState(): any;
   getAnimationMetrics(): any;
 }
 
-interface SidebarSystemsOrchestrator extends UnifiedSystemBase {
+interface SidebarSystemsOrchestrator extends IManagedSystem {
   getBilateralState(): any;
   getPerformanceMetrics(): any;
   setSynchronizationEnabled(enabled: boolean): void;
@@ -31,7 +31,7 @@ interface SidebarSystemsOrchestrator extends UnifiedSystemBase {
 
 interface SidebarSystemDefinition {
   name: string;
-  system: UnifiedSystemBase;
+  system: IManagedSystem;
   priority: 'background' | 'normal' | 'critical';
   enabled: boolean;
   dependencies?: string[];
@@ -48,25 +48,25 @@ interface SidebarIntegrationMetrics {
 
 /**
  * SidebarSystemsIntegration
- * 
+ *
  * Central integration point for all sidebar systems with the Year3000System.
  * This module manages the lifecycle, coordination, and performance monitoring
  * of the bilateral visual-effects sidebar architecture.
- * 
+ *
  * Key Features:
  * - Unified system registration and lifecycle management
  * - Bilateral visual-effects coordination
  * - Performance monitoring and optimization
  * - Graceful degradation and error recovery
  * - Integration with existing Year3000System patterns
- * 
+ *
  * Architecture:
- * - Extends UnifiedSystemBase for consistent lifecycle
+ * - Extends ServiceSystemBase for service composition
  * - Manages all sidebar systems as a coordinated unit
  * - Provides unified interface for Year3000System integration
  * - Handles performance budgeting and monitoring
  */
-export class SidebarSystemsIntegration extends UnifiedSystemBase {
+export class SidebarSystemsIntegration extends ServiceSystemBase {
   // Core sidebar systems (consolidated into unified system)
   // private leftSidebarConsciousness: LeftSidebarConsciousnessSystem;
   // private rightSidebarConsciousness: RightSidebarConsciousnessSystem;
@@ -88,11 +88,12 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   
   constructor(config: Year3000Config = ADVANCED_SYSTEM_CONFIG) {
     super(config);
-    
+
     // Initialize shared performance coordinator
+    // Note: performanceAnalyzer access via services.performance is available after initialization
     this.sharedCoordinator = SidebarPerformanceManager.getInstance({
       enableDebug: config.enableDebug,
-      performanceAnalyzer: this.performanceAnalyzer,
+      performanceAnalyzer: null as any, // Will be set during initialization
       onFlushComplete: () => this.handlePerformanceFlush()
     });
     
@@ -116,41 +117,38 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   }
   
   /**
-   * Initialize all sidebar systems in proper order
+   * System-specific initialization logic (implements ServiceSystemBase abstract method)
    */
-  async initialize(): Promise<void> {
+  async _performSystemSpecificInitialization(): Promise<void> {
     if (this.config.enableDebug) {
       console.log(`[${this.systemName}] Initializing sidebar systems integration`);
     }
-    
+
     try {
       // Register system definitions
       this.registerSidebarSystems();
-      
+
       // Phase 3: Register with UnifiedSystemRegistry if available
       await this.registerWithUnifiedRegistry();
-      
+
       // Initialize systems in dependency order
       await this.initializeSystemsInOrder();
-      
+
       // Set up bilateral visual-effects coordination
       this.setupBilateralCoordination();
-      
+
       // Phase 3: Connect to EventBus for system-wide communication
       this.connectToEventBus();
-      
+
       // Phase 3: Integrate with TimerConsolidationSystem and MasterAnimationCoordinator
       this.integrateWithPerformanceSystems();
-      
-      // Register for animation coordination
-      this.registerAnimation(70); // High priority for coordination
-      
+
       // Enable integration
       this.integrationEnabled = true;
-      
+
       // Update performance metrics
       this.updatePerformanceMetrics();
-      
+
       this.publishEvent('sidebar:integration-ready', {
         systemName: this.systemName,
         totalSystems: this.sidebarSystems.size,
@@ -158,7 +156,7 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
         bilateralSync: this.performanceMetrics.bilateralSyncEnabled,
         timestamp: Date.now()
       });
-      
+
     } catch (error) {
       console.error(`[${this.systemName}] Integration initialization failed:`, error);
       throw error;
@@ -186,14 +184,14 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
    */
   private async initializeSystemsInOrder(): Promise<void> {
     const initializationOrder = this.calculateInitializationOrder();
-    
+
     for (const systemName of initializationOrder) {
       const systemDef = this.sidebarSystems.get(systemName);
       if (systemDef && systemDef.enabled) {
         try {
-          await systemDef.system._baseInitialize();
+          await systemDef.system.initialize();
           this.performanceMetrics.activeSystems++;
-          
+
           if (this.config.enableDebug) {
             console.log(`[${this.systemName}] Initialized ${systemName}`);
           }
@@ -323,16 +321,16 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
    */
   private updatePerformanceMetrics(): void {
     this.performanceMetrics.totalSystems = this.sidebarSystems.size;
-    
+
     // Count active systems
     let activeSystems = 0;
     for (const [, systemDef] of this.sidebarSystems) {
-      if (systemDef.enabled && systemDef.system.isInitialized) {
+      if (systemDef.enabled && systemDef.system.initialized) {
         activeSystems++;
       }
     }
     this.performanceMetrics.activeSystems = activeSystems;
-    
+
     // Bilateral sync is managed by consolidated system
     // this.performanceMetrics.bilateralSyncEnabled remains as set in setupBilateralCoordination
   }
@@ -351,17 +349,17 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   }
   
   /**
-   * Animation frame callback
+   * Animation frame callback (implements IManagedSystem interface)
    */
-  onAnimate(deltaTime: number): void {
+  updateAnimation(deltaTime: number): void {
     if (!this.integrationEnabled) return;
-    
+
     // Update performance metrics
     this.updatePerformanceMetrics();
-    
+
     // Monitor system health
     this.updateHealthStatus();
-    
+
     // Emit performance events periodically (every ~1 second)
     const currentTime = performance.now();
     if (currentTime - this.lastFrameTime > 1000) {
@@ -370,6 +368,14 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
         timestamp: Date.now()
       });
     }
+  }
+
+  /**
+   * Legacy onAnimate callback for backward compatibility
+   * @deprecated Use updateAnimation instead
+   */
+  onAnimate(deltaTime: number): void {
+    this.updateAnimation(deltaTime);
   }
   
   /**
@@ -380,10 +386,10 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
       console.warn(`[${this.systemName}] Animation coordinator not available`);
       return;
     }
-    
+
     // Register each system with appropriate priority
     for (const [systemName, systemDef] of this.sidebarSystems) {
-      if (systemDef.enabled && systemDef.system.isInitialized) {
+      if (systemDef.enabled && systemDef.system.initialized) {
         try {
           animationCoordinator.registerAnimationSystem(
             systemName,
@@ -391,7 +397,7 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
             systemDef.priority,
             60 // Default FPS
           );
-          
+
           if (this.config.enableDebug) {
             console.log(`[${this.systemName}] Registered ${systemName} with animation coordinator`);
           }
@@ -423,16 +429,16 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
     const systemDef = this.sidebarSystems.get(systemName);
     if (systemDef) {
       systemDef.enabled = enabled;
-      
-      if (!enabled && systemDef.system.isInitialized) {
-        systemDef.system._baseDestroy();
+
+      if (!enabled && systemDef.system.initialized) {
+        systemDef.system.destroy();
         this.performanceMetrics.activeSystems--;
-      } else if (enabled && !systemDef.system.isInitialized) {
-        systemDef.system._baseInitialize().catch(error => {
+      } else if (enabled && !systemDef.system.initialized) {
+        systemDef.system.initialize().catch(error => {
           console.error(`[${this.systemName}] Failed to re-enable ${systemName}:`, error);
         });
       }
-      
+
       this.publishEvent('sidebar:system-toggled', {
         systemName,
         enabled,
@@ -442,14 +448,19 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   }
   
   /**
-   * System health check
+   * System-specific health check (implements ServiceSystemBase abstract method)
    */
-  async healthCheck(): Promise<HealthCheckResult> {
+  protected async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
     const systemHealthChecks: Record<string, HealthCheckResult> = {};
-    
+
     // Check all sidebar systems
     for (const [systemName, systemDef] of this.sidebarSystems) {
-      if (systemDef.enabled && systemDef.system.isInitialized) {
+      if (systemDef.enabled && systemDef.system.initialized) {
         try {
           systemHealthChecks[systemName] = await systemDef.system.healthCheck();
         } catch (error) {
@@ -463,17 +474,21 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
         }
       }
     }
-    
+
     // Determine overall health
     const unhealthySystems = Object.values(systemHealthChecks).filter(check => !check.ok);
     const isHealthy = unhealthySystems.length === 0;
-    
+
     return {
       healthy: isHealthy,
-      ok: isHealthy,
       details: `Sidebar integration ${isHealthy ? 'healthy' : 'degraded'} - ${this.performanceMetrics.activeSystems}/${this.performanceMetrics.totalSystems} systems active, bilateral sync: ${this.performanceMetrics.bilateralSyncEnabled}`,
       issues: unhealthySystems.map(check => check.details || 'Unknown issue'),
-      system: 'SidebarSystemsIntegration'
+      metrics: {
+        activeSystems: this.performanceMetrics.activeSystems,
+        totalSystems: this.performanceMetrics.totalSystems,
+        bilateralSyncEnabled: this.performanceMetrics.bilateralSyncEnabled,
+        healthStatus: this.performanceMetrics.healthStatus
+      }
     };
   }
   
@@ -541,7 +556,7 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
         }
       }
       
-      // Register with EnhancedMasterAnimationCoordinator if available
+      // Register with AnimationFrameCoordinator if available
       const animationCoordinator = year3000System.enhancedMasterAnimationCoordinator;
       if (animationCoordinator) {
         // Register bilateral visual-effects coordination callback
@@ -554,7 +569,7 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
         );
         
         if (this.config.enableDebug) {
-          console.log(`[${this.systemName}] Integrated with EnhancedMasterAnimationCoordinator`);
+          console.log(`[${this.systemName}] Integrated with AnimationFrameCoordinator`);
         }
       }
     } catch (error) {
@@ -667,30 +682,30 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
   }
   
   /**
-   * Clean up all sidebar systems
+   * System-specific cleanup (implements ServiceSystemBase abstract method)
    */
-  destroy(): void {
+  _performSystemSpecificCleanup(): void {
     if (this.config.enableDebug) {
       console.log(`[${this.systemName}] Destroying sidebar systems integration`);
     }
-    
+
     // Disable integration
     this.integrationEnabled = false;
-    
+
     // Unregister from performance systems
     const year3000System = (globalThis as any).year3000System;
     if (year3000System?.timerConsolidationSystem) {
       year3000System.timerConsolidationSystem.unregisterTimer('sidebar-performance-monitor');
     }
-    
+
     // Destroy all systems in reverse order
     const destructionOrder = this.calculateInitializationOrder().reverse();
-    
+
     for (const systemName of destructionOrder) {
       const systemDef = this.sidebarSystems.get(systemName);
-      if (systemDef && systemDef.system.isInitialized) {
+      if (systemDef && systemDef.system.initialized) {
         try {
-          systemDef.system._baseDestroy();
+          systemDef.system.destroy();
           if (this.config.enableDebug) {
             console.log(`[${this.systemName}] Destroyed ${systemName}`);
           }
@@ -699,10 +714,10 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
         }
       }
     }
-    
+
     // Clear system registry
     this.sidebarSystems.clear();
-    
+
     // Reset performance metrics
     this.performanceMetrics = {
       totalSystems: 0,
@@ -712,7 +727,7 @@ export class SidebarSystemsIntegration extends UnifiedSystemBase {
       totalMemoryUsage: 0,
       healthStatus: 'healthy'
     };
-    
+
     this.publishEvent('sidebar:integration-destroyed', {
       timestamp: Date.now()
     });

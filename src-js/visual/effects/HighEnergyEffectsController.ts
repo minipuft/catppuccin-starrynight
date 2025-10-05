@@ -214,9 +214,9 @@ export class RedEnergyBurstSystem implements IManagedSystem {
       // Setup CSS variables for cinematic effects
       this.setupCinematicCSSVariables();
 
-      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by EnhancedMasterAnimationCoordinator
+      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by AnimationFrameCoordinator
       // The coordinator will call updateAnimation(deltaTime) automatically
-      // Registration happens in SystemCoordinator during system initialization
+      // Registration happens in SystemIntegrationCoordinator during system initialization
 
       this.initialized = true;
 
@@ -1079,7 +1079,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
   }
 
   /**
-   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   * ✅ RAF LOOP REMOVED - Managed by AnimationFrameCoordinator
    *
    * Previous implementation: startCinematicAnimation() with independent RAF loop
    * New implementation: updateAnimation() called by coordinator
@@ -1090,7 +1090,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
    * - Coordinated frame budget management
    * - Priority-based execution order
    *
-   * Migration: Lines 1084-1102 removed, registration added to SystemCoordinator
+   * Migration: Lines 1084-1102 removed, registration added to SystemIntegrationCoordinator
    */
 
   /**
@@ -1126,7 +1126,7 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     console.log("[RedEnergyBurstSystem] Destroying cinematic drama engine...");
 
     // ✅ RAF LOOP CONSOLIDATION: No need to stop animation loop (coordinator handles this)
-    // System unregistration happens in SystemCoordinator destroy()
+    // System unregistration happens in SystemIntegrationCoordinator destroy()
 
     // Clear cinematic elements
     this.cinematicElements.clear();

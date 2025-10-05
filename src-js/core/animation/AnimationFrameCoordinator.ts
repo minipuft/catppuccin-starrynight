@@ -328,7 +328,7 @@ export class AnimationFrameCoordinator {
    * Coordinate visual effects pulsing with CSSAnimationManager
    * Integrates beat events with CSS-first pulsing for 90%+ JavaScript overhead elimination
    */
-  private coordinateVisualEffectsPulsing(payload: any): void {
+  private updateVisualPulseEffects(payload: any): void {
     if (!this.cssAnimationManager) return;
     
     const energyLevel = payload.energy || payload.intensity || 0.5;
@@ -397,7 +397,7 @@ export class AnimationFrameCoordinator {
     this.subscribeToEvents();
     
     // Initialize adaptive choreography (from EmergentChoreographyEngine)
-    this.initializeEmergentChoreography();
+    this.initializeAdaptiveSystem();
     
     // Set up performance-aware frame budget
     this.updateFrameBudget();
@@ -773,7 +773,7 @@ export class AnimationFrameCoordinator {
     this.destroyConsolidatedSystems();
     
     // Clean up adaptive choreography
-    this.destroyEmergentChoreography();
+    this.destroyAdaptiveSystem();
     
     // Destroy all visual systems
     for (const registration of this.animations.values()) {
@@ -852,7 +852,7 @@ export class AnimationFrameCoordinator {
     
     // Process adaptive choreography only if we have budget remaining
     if (midFrameTime < FRAME_BUDGET * 0.8) { // Reserve 20% for cleanup
-      this.processEmergentTick(deltaTime);
+      this.updateAdaptiveAnimations(deltaTime);
     }
     
     // Update performance metrics
@@ -1125,8 +1125,8 @@ export class AnimationFrameCoordinator {
       this.frameContext.beatIntensity = payload.intensity || 0;
       
       // Coordinate visual effects pulsing with CSSAnimationManager
-      this.coordinateVisualEffectsPulsing(payload);
-    }, 'EnhancedMasterAnimationCoordinator');
+      this.updateVisualPulseEffects(payload);
+    }, 'AnimationFrameCoordinator');
     
     // Subscribe to performance events
     this.eventBus.subscribe('performance:frame', (payload: { deltaTime: number; fps: number; memoryUsage: number; timestamp: number }) => {
@@ -1139,7 +1139,7 @@ export class AnimationFrameCoordinator {
       } else if (payload.fps > 55) {
         this.setPerformanceMode("quality");
       }
-    }, 'EnhancedMasterAnimationCoordinator');
+    }, 'AnimationFrameCoordinator');
   }
   
   // =========================================================================
@@ -1149,7 +1149,7 @@ export class AnimationFrameCoordinator {
   /**
    * Initialize adaptive choreography functionality
    */
-  private async initializeEmergentChoreography(): Promise<void> {
+  private async initializeAdaptiveSystem(): Promise<void> {
     try {
       this.signature = await temporalMemoryService.getSignature();
       this.registerEmergentEventListeners();
@@ -1174,23 +1174,23 @@ export class AnimationFrameCoordinator {
    */
   private registerEmergentEventListeners(): void {
     const beatFrameSub = this.eventBus.subscribe("music:beat", (payload: { bpm: number; intensity: number; timestamp: number; confidence: number }) =>
-      this.handleBeatFrame(payload), 'EnhancedMasterAnimationCoordinator'
+      this.handleBeatFrame(payload), 'AnimationFrameCoordinator'
     );
     const harmonyFrameSub = this.eventBus.subscribe(
       "colors:harmonized",
-      (payload: any) => this.handleHarmonyFrame(payload), 'EnhancedMasterAnimationCoordinator'
+      (payload: any) => this.handleHarmonyFrame(payload), 'AnimationFrameCoordinator'
     );
     const bpmSub = this.eventBus.subscribe(
       "music:energy",
       (payload: { energy: number; valence: number; tempo: number; timestamp: number }) => {
         this.currentBpm = payload.tempo;
-      }, 'EnhancedMasterAnimationCoordinator'
+      }, 'AnimationFrameCoordinator'
     );
     const intensitySub = this.eventBus.subscribe(
       "music:beat",
       (payload: { bpm: number; intensity: number; timestamp: number; confidence: number }) => {
         this.currentIntensity = payload.intensity;
-      }, 'EnhancedMasterAnimationCoordinator'
+      }, 'AnimationFrameCoordinator'
     );
 
     this.emergentEventSubscriptions.push(
@@ -1210,7 +1210,7 @@ export class AnimationFrameCoordinator {
     this.signature.lastModified = Date.now();
     
     // Coordinate visual effects pulsing with adaptive choreography
-    this.coordinateVisualEffectsPulsing({
+    this.updateVisualPulseEffects({
       intensity: payload.intensity || this.currentIntensity,
       energy: payload.energy || this.currentIntensity,
       bpm: this.currentBpm,
@@ -1311,7 +1311,7 @@ export class AnimationFrameCoordinator {
   /**
    * Process adaptive choreography tick within animation loop
    */
-  private processEmergentTick(deltaMs: number): void {
+  private updateAdaptiveAnimations(deltaMs: number): void {
     if (!this.signature) return;
 
     // The main loop for the choreography engine
@@ -1344,7 +1344,7 @@ export class AnimationFrameCoordinator {
   /**
    * Clean up adaptive choreography resources
    */
-  private destroyEmergentChoreography(): void {
+  private destroyAdaptiveSystem(): void {
     // Save signature one last time on destroy
     if (this.signature) {
       temporalMemoryService.saveSignature(this.signature);
@@ -1811,7 +1811,7 @@ export class AnimationFrameCoordinator {
 
   /**
    * Get CSS Animation Manager interface for compatibility
-   * This allows the EnhancedMasterAnimationCoordinator to act as its own CSSAnimationManager
+   * This allows the AnimationFrameCoordinator to act as its own CSSAnimationManager
    */
   public getCSSAnimationManagerInterface(): CSSAnimationManagerInterface {
     return {
@@ -1821,5 +1821,3 @@ export class AnimationFrameCoordinator {
     };
   }
 }
-// Export with legacy name for backward compatibility
-export { AnimationFrameCoordinator as EnhancedMasterAnimationCoordinator };

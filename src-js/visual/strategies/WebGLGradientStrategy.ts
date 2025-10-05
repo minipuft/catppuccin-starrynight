@@ -18,6 +18,10 @@ import type {
   ColorResult,
   IColorProcessor,
 } from "@/types/colorStrategy";
+import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
+import type { WebGLSystemInterface } from "@/core/webgl/WebGLSystemInterface";
+import type { WebGLQuality } from "@/core/webgl/UnifiedWebGLController";
+import { WebGLQualityMapper } from "@/core/webgl/WebGLSystemInterface";
 import { settings } from "@/config";
 import {
   OKLABColorProcessor,
@@ -256,7 +260,25 @@ interface WebGLFlowSettings {
   gradientTextureSize: number; // Size of gradient texture for OKLAB precision
 }
 
-export class WebGLGradientStrategy implements IColorProcessor {
+/**
+ * WebGLGradientStrategy - Triple-Interface System
+ *
+ * Implements three complementary interfaces for complete WebGL gradient integration:
+ * 1. IColorProcessor - Color processing layer integration
+ * 2. IManagedSystem - Visual system lifecycle management
+ * 3. WebGLSystemInterface - Quality scaling and performance coordination
+ *
+ * This triple-interface approach enables:
+ * - Color Processing Layer: BackgroundStrategySelector → WebGLGradientStrategy (IColorProcessor)
+ * - Visual System Layer: VisualSystemCoordinator → WebGLGradientStrategy (IManagedSystem)
+ * - Quality Scaling Layer: UnifiedWebGLController → WebGLGradientStrategy (WebGLSystemInterface)
+ *
+ * Phase 3 optimization: Direct quality scaling communication eliminates event bus overhead.
+ */
+export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, WebGLSystemInterface {
+  // IManagedSystem property
+  public initialized = false;
+
   private utils = Utils;
   private config = ADVANCED_SYSTEM_CONFIG;
   private deviceDetector: DeviceCapabilityDetector;
@@ -577,6 +599,82 @@ export class WebGLGradientStrategy implements IColorProcessor {
         },
         context,
       };
+    }
+  }
+
+  // ===========================================================================
+  // IManagedSystem Interface Implementation
+  // ===========================================================================
+
+  /**
+   * Initialize the WebGL gradient system (IManagedSystem)
+   *
+   * This method provides the standard IManagedSystem initialization interface
+   * for use by VisualSystemCoordinator. It wraps the internal initialization
+   * logic and manages the initialized state.
+   */
+  public async initialize(): Promise<void> {
+    if (this.initialized) {
+      Y3KDebug?.debug?.warn(
+        "WebGLGradientStrategy",
+        "Already initialized, skipping"
+      );
+      return;
+    }
+
+    try {
+      // Initialize device detector
+      await this.deviceDetector.initialize();
+
+      // Initialize WebGL if supported
+      if (this.webglState.isWebGLAvailable) {
+        await this.initializeWebGLGradient();
+      } else {
+        Y3KDebug?.debug?.warn(
+          "WebGLGradientStrategy",
+          "WebGL2 not available, will use CSS fallback when processColors is called"
+        );
+      }
+
+      this.initialized = true;
+
+      Y3KDebug?.debug?.log(
+        "WebGLGradientStrategy",
+        "System initialized successfully",
+        {
+          webglAvailable: this.webglState.isWebGLAvailable,
+          webglReady: this.webglState.webglReady,
+        }
+      );
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "WebGLGradientStrategy",
+        "Initialization failed:",
+        error
+      );
+      // Don't throw - allow fallback to CSS
+      this.initialized = true; // Mark as initialized even if WebGL failed
+    }
+  }
+
+  /**
+   * Update animation frame (IManagedSystem)
+   *
+   * Provides external coordination point for animation updates.
+   * The internal animation loop (animateWebGL) runs independently via
+   * requestAnimationFrame, but this method allows external systems to
+   * synchronize or trigger updates as needed.
+   *
+   * @param deltaTime - Time since last frame in milliseconds
+   */
+  public updateAnimation(deltaTime: number): void {
+    // WebGL animation runs independently via requestAnimationFrame
+    // This method is provided for IManagedSystem compatibility and
+    // can be used for future coordination with external animation systems
+
+    // For now, just ensure animation is running if WebGL is ready
+    if (this.webglState.webglReady && !this.webglState.animationId) {
+      this.startWebGLAnimation();
     }
   }
 
@@ -1625,38 +1723,68 @@ export class WebGLGradientStrategy implements IColorProcessor {
   }
 
   /**
-   * Health check for strategy status
+   * Health check for strategy status (IManagedSystem)
+   *
+   * Returns comprehensive health information about the WebGL gradient system,
+   * including WebGL readiness, configuration status, and performance metrics.
    */
-  public async healthCheck(): Promise<any> {
+  public async healthCheck(): Promise<HealthCheckResult> {
     const hasRecentUpdate = Date.now() - this.webglState.lastUpdateTime < 30000; // 30s
+    const isHealthy = this.webglState.webglReady && this.flowSettings.enabled;
 
-    return {
-      healthy: this.webglState.webglReady && this.flowSettings.enabled,
-      canProcess: this.canProcess({} as ColorContext),
-      issues: !this.webglState.webglReady
-        ? ["WebGL system not ready"]
-        : !this.flowSettings.enabled
-        ? ["WebGL gradient disabled in settings"]
-        : [],
+    const issues: string[] = [];
+    if (!this.webglState.webglReady) {
+      issues.push("WebGL system not ready");
+    }
+    if (!this.flowSettings.enabled) {
+      issues.push("WebGL gradient disabled in settings");
+    }
+
+    const result: HealthCheckResult = {
+      system: "WebGLGradientStrategy",
+      healthy: isHealthy,
+      details: isHealthy
+        ? "WebGL gradient rendering active"
+        : issues.join("; "),
       metrics: {
+        // Core status
         webglAvailable: this.webglState.isWebGLAvailable,
         webglReady: this.webglState.webglReady,
         flowEnabled: this.flowSettings.enabled,
+        initialized: this.initialized,
+
+        // Configuration
         intensity: this.flowSettings.intensity,
         deviceCapability: this.deviceDetector.recommendPerformanceQuality(),
+
+        // Runtime status
         hasRecentUpdate,
         animationActive: this.webglState.animationId !== null,
+
+        // OKLAB processing
         oklabProcessing: this.flowSettings.oklabProcessingEnabled,
         oklabPreset: this.flowSettings.oklabPreset,
         gradientTextureSize: this.flowSettings.gradientTextureSize,
-        canvasSize: this.webglState.canvas
-          ? {
-              width: this.webglState.canvas.width,
-              height: this.webglState.canvas.height,
-            }
-          : null,
+
+        // Canvas status
+        ...(this.webglState.canvas && {
+          canvasSize: {
+            width: this.webglState.canvas.width,
+            height: this.webglState.canvas.height,
+          },
+        }),
+
+        // IColorProcessor compatibility flag
+        canProcess: this.canProcess({} as ColorContext),
       },
     };
+
+    // Add issues property only if there are issues (exactOptionalPropertyTypes strict mode)
+    if (issues.length > 0) {
+      result.issues = issues;
+    }
+
+    return result;
   }
 
   /**
@@ -1735,5 +1863,164 @@ export class WebGLGradientStrategy implements IColorProcessor {
       "WebGLGradientStrategy",
       "WebGL gradient strategy destroyed"
     );
+  }
+
+  // ===========================================================================
+  // WebGLSystemInterface Implementation (Phase 3 Optimization)
+  // ===========================================================================
+
+  /**
+   * Enable or disable WebGL rendering (WebGLSystemInterface)
+   *
+   * When disabled, system falls back to CSS gradients. When enabled, resumes
+   * WebGL animation if device supports it.
+   *
+   * @param enabled - Whether WebGL rendering should be active
+   */
+  public setEnabled(enabled: boolean): void {
+    if (enabled && this.isCapable()) {
+      // Enable WebGL rendering
+      if (!this.webglState.webglReady) {
+        // WebGL not initialized yet, try to initialize
+        this.initializeWebGLGradient().then(() => {
+          if (this.webglState.webglReady) {
+            this.startWebGLAnimation();
+            Y3KDebug?.debug?.log("WebGLGradientStrategy", "WebGL enabled and animation started");
+          }
+        }).catch(error => {
+          Y3KDebug?.debug?.warn("WebGLGradientStrategy", "Failed to enable WebGL:", error);
+        });
+      } else if (!this.webglState.animationId) {
+        // WebGL ready but animation not running
+        this.startWebGLAnimation();
+        Y3KDebug?.debug?.log("WebGLGradientStrategy", "WebGL animation resumed");
+      }
+
+      // Update flow settings
+      this.flowSettings.enabled = true;
+
+      // Update backend indicator (WebGL takes over)
+      this.cssController.setVariable(
+        "--sn-current-backend",
+        "webgl",
+        "critical",
+        "webgl-enable"
+      );
+
+    } else {
+      // Disable WebGL, switch to CSS fallback
+      if (this.webglState.animationId) {
+        cancelAnimationFrame(this.webglState.animationId);
+        this.webglState.animationId = null;
+      }
+
+      this.flowSettings.enabled = false;
+
+      // Apply CSS gradient fallback
+      this.cssController.setVariable(
+        "--sn-current-backend",
+        "css",
+        "critical",
+        "webgl-disable"
+      );
+
+      Y3KDebug?.debug?.log("WebGLGradientStrategy", "WebGL disabled, using CSS fallback");
+    }
+  }
+
+  /**
+   * Set quality level for WebGL rendering (WebGLSystemInterface)
+   *
+   * Maps quality levels to flow settings parameters:
+   * - low: Reduced flow intensity, 30fps target
+   * - medium: Balanced flow effects, 45fps target
+   * - high: Maximum flow intensity, 60fps target
+   *
+   * @param quality - Quality tier (low, medium, high)
+   */
+  public setQuality(quality: WebGLQuality): void {
+    // Map quality to flow settings intensity
+    let newIntensity: "minimal" | "balanced" | "intense";
+    let frameThrottleInterval: number;
+
+    switch (quality) {
+      case 'low':
+        newIntensity = "minimal";
+        frameThrottleInterval = WebGLQualityMapper.getFrameThrottling(quality); // ~30fps
+        break;
+      case 'medium':
+        newIntensity = "balanced";
+        frameThrottleInterval = WebGLQualityMapper.getFrameThrottling(quality); // ~45fps
+        break;
+      case 'high':
+        newIntensity = "intense";
+        frameThrottleInterval = WebGLQualityMapper.getFrameThrottling(quality); // ~60fps
+        break;
+    }
+
+    // Update flow settings
+    const oldIntensity = this.flowSettings.intensity;
+    this.flowSettings.intensity = newIntensity;
+    this.flowSettings.frameThrottleInterval = frameThrottleInterval;
+
+    // Load intensity-specific parameters
+    this.loadFlowSettings();
+
+    Y3KDebug?.debug?.log(
+      "WebGLGradientStrategy",
+      `Quality changed: ${quality} (${oldIntensity} → ${newIntensity}, ${frameThrottleInterval.toFixed(1)}ms frame target)`
+    );
+  }
+
+  /**
+   * Check if WebGL rendering is currently enabled (WebGLSystemInterface)
+   *
+   * @returns True if WebGL animation is running
+   */
+  public isEnabled(): boolean {
+    return this.flowSettings.enabled &&
+           this.webglState.webglReady &&
+           this.webglState.animationId !== null;
+  }
+
+  /**
+   * Check if device is capable of WebGL rendering (WebGLSystemInterface)
+   *
+   * @returns True if WebGL2 is available on this device
+   */
+  public isCapable(): boolean {
+    return this.webglState.isWebGLAvailable;
+  }
+
+  /**
+   * Get current quality level (WebGLSystemInterface)
+   *
+   * Maps flowSettings.intensity back to quality tier:
+   * - minimal → low
+   * - balanced → medium
+   * - intense → high
+   *
+   * @returns Current quality tier
+   */
+  public getQuality(): WebGLQuality {
+    switch (this.flowSettings.intensity) {
+      case "minimal":
+        return "low";
+      case "balanced":
+        return "medium";
+      case "intense":
+        return "high";
+      default:
+        return "medium"; // Safe fallback
+    }
+  }
+
+  /**
+   * Get system name for debugging (WebGLSystemInterface)
+   *
+   * @returns System identifier
+   */
+  public getSystemName(): string {
+    return "WebGLGradientStrategy";
   }
 }

@@ -875,7 +875,7 @@ export class SpicetifyColorBridge implements IManagedSystem {
       },
       'SpicetifyColorBridge'
     );
-    
+
     // Listen for settings changes that might affect color processing
     const settingsChangeId = unifiedEventBus.subscribe(
       'settings:changed',
@@ -889,9 +889,30 @@ export class SpicetifyColorBridge implements IManagedSystem {
       },
       'SpicetifyColorBridge'
     );
-    
-    this.eventSubscriptionIds = [trackChangeId, settingsChangeId];
-    
+
+    // 🔧 PHASE 5 FIX: Listen for harmonized colors from ColorProcessor
+    // This reconnects the pathway broken during Phase 2 consolidation
+    // ColorProcessor processes colors:extracted → emits colors:harmonized → SpicetifyColorBridge updates
+    const colorsHarmonizedId = unifiedEventBus.subscribe(
+      'colors:harmonized',
+      (data: any) => {
+        if (data.processedColors) {
+          if (this.config.enableDebug) {
+            console.log('🎨 [SpicetifyColorBridge] Received harmonized colors from ColorProcessor:', {
+              colorCount: Object.keys(data.processedColors).length,
+              strategies: data.strategies,
+              processingTime: data.processingTime
+            });
+          }
+          // Update Spicetify variables with OKLAB-processed colors
+          this.updateWithAlbumColors(data.processedColors);
+        }
+      },
+      'SpicetifyColorBridge'
+    );
+
+    this.eventSubscriptionIds = [trackChangeId, settingsChangeId, colorsHarmonizedId];
+
     if (this.config.enableDebug) {
       console.log('🎨 [SpicetifyColorBridge] Event subscriptions established:', this.eventSubscriptionIds.length);
     }
@@ -960,7 +981,7 @@ export class SpicetifyColorBridge implements IManagedSystem {
  *
  * FILES TO UPDATE (3 total):
  * - src-js/audio/ColorHarmonyEngine.ts:37
- * - src-js/core/integration/SystemCoordinator.ts:65
+ * - src-js/core/integration/SystemIntegrationCoordinator.ts:65
  * - src-js/utils/spicetify/NotificationManager.ts:8
  *
  * @see docs/architecture/adr/ADR-001-rename-semantic-color-manager.md

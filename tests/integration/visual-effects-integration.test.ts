@@ -64,7 +64,7 @@ describe('Visual Effects Integration', () => {
     });
 
     it('should have proper dependency injection', () => {
-      // Dependencies are available through UnifiedSystemBase protected properties
+      // Dependencies are available through ServiceVisualSystemBase composition pattern
       expect(visualEffectsSystem).toBeDefined();
       expect(visualEffectsSystem.initialized).toBeDefined();
     });
@@ -100,7 +100,7 @@ describe('Visual Effects Integration', () => {
       const startTime = performance.now();
       for (let i = 0; i < 10; i++) {
         // Simulate beat events through animation frames instead of direct method calls
-        visualEffectsSystem.onAnimate(16.67); // 60fps
+        visualEffectsSystem.updateAnimation(16.67); // 60fps
       }
       const endTime = performance.now();
       
@@ -128,7 +128,7 @@ describe('Visual Effects Integration', () => {
       };
       
       // Test organic consciousness through animation instead of direct beat calls
-      expect(() => visualEffectsSystem.onAnimate(16.67)).not.toThrow();
+      expect(() => visualEffectsSystem.updateAnimation(16.67)).not.toThrow();
     });
 
     it('should handle tempo effect events', async () => {
@@ -140,7 +140,7 @@ describe('Visual Effects Integration', () => {
       };
       
       // Test tempo handling through animation frames
-      expect(() => visualEffectsSystem.onAnimate(16.67)).not.toThrow();
+      expect(() => visualEffectsSystem.updateAnimation(16.67)).not.toThrow();
     });
 
     it('should handle emotional effect events', async () => {
@@ -154,7 +154,7 @@ describe('Visual Effects Integration', () => {
       };
       
       // Test emotional handling through animation frames
-      expect(() => visualEffectsSystem.onAnimate(16.67)).not.toThrow();
+      expect(() => visualEffectsSystem.updateAnimation(16.67)).not.toThrow();
     });
   });
 
@@ -167,11 +167,11 @@ describe('Visual Effects Integration', () => {
         queueCSSVariableUpdate: jest.fn()
       };
       
-      // CSS variable batcher is managed internally through UnifiedSystemBase
+      // CSS variable batcher is managed internally through ServiceVisualSystemBase
       // Mock the internal batcher if needed
       
       // Trigger update
-      visualEffectsSystem.onAnimate(16.67); // 60fps
+      visualEffectsSystem.updateAnimation(16.67); // 60fps
       
       // Check that CSS variables were updated - commented out since CSS batcher is internal
       // expect(mockBatcher.queueCSSVariableUpdate).toHaveBeenCalledWith(
@@ -201,7 +201,7 @@ describe('Visual Effects Integration', () => {
       await visualEffectsSystem.initialize();
       
       // Trigger organic consciousness through animation
-      visualEffectsSystem.onAnimate(16.67);
+      visualEffectsSystem.updateAnimation(16.67);
       
       // Destroy the system
       visualEffectsSystem.destroy();

@@ -49,7 +49,7 @@
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 // CSSAnimationManager consolidated into AnimationFrameCoordinator
-import { AnimationFrameCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
+import { AnimationFrameCoordinator } from "@/core/animation/AnimationFrameCoordinator";
 import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
@@ -61,7 +61,7 @@ import * as Utils from "@/utils/core/ThemeUtilities";
 
 // Visual System imports
 // import "@/visual/effects/ParticleConsciousnessModule"; // Disabled - converted to CSS-only
-import { WebGLGradientBackgroundSystem } from "@/visual/background/WebGLRenderer";
+import { WebGLGradientStrategy } from "@/visual/strategies/WebGLGradientStrategy";
 import { UIEffectsController } from "@/visual/effects/UIVisualEffectsController";
 import { HeaderVisualEffectsController } from "@/visual/effects/HeaderVisualEffectsController";
 import { SidebarVisualEffectsSystem } from "@/visual/ui/SidebarVisualEffectsSystem";
@@ -70,7 +70,7 @@ import { MusicBeatSynchronizer } from "@/visual/music/MusicSyncVisualEffects";
 import { HolographicUISystem } from "@/visual/music/ui/HolographicUISystem";
 import { InteractionTrackingSystem } from "@/visual/ui/InteractionTrackingSystem";
 import { SpotifyUIApplicationSystem } from "@/visual/ui/SpotifyUIApplicationSystem";
-// EmergentChoreographyEngine consolidated into EnhancedMasterAnimationCoordinator
+// EmergentChoreographyEngine consolidated into AnimationFrameCoordinator
 
 // Consciousness engine imports for integration
 import { RedEnergyBurstSystem } from "@/visual/effects/HighEnergyEffectsController";
@@ -126,13 +126,13 @@ export type VisualSystemKey =
   | "EtherealBeauty"
   | "NaturalHarmony"
   | "GradientConductor"
-  // CSSAnimationManager consolidated into EnhancedMasterAnimationCoordinator
+  // CSSAnimationManager consolidated into AnimationFrameCoordinator
   | "GlowEffects"
   | "UnifiedParticle"
   | "DepthLayeredGradient"
   | "FluidGradientBackground";
 // ParticleField consolidated into Particle (ParticleConsciousnessModule)
-// EmergentChoreography consolidated into EnhancedMasterAnimationCoordinator
+// EmergentChoreography consolidated into AnimationFrameCoordinator
 // Sidebar systems consolidated into Sidebar Effects (UnifiedSidebarEffectsController)
 
 export type SystemHealth = "excellent" | "good" | "degraded" | "critical";
@@ -337,7 +337,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
       "colorHarmonyEngine",
     ]);
 
-    this.systemRegistry.set("WebGLBackground", WebGLGradientBackgroundSystem);
+    this.systemRegistry.set("WebGLBackground", WebGLGradientStrategy);
     this.systemDependencies.set("WebGLBackground", [
       "performanceAnalyzer",
       "eventBus",
@@ -398,10 +398,10 @@ export class VisualSystemCoordinator implements IManagedSystem {
       "eventBus",
     ]);
 
-    // CSSAnimationManager consolidated into EnhancedMasterAnimationCoordinator
-    // Use EnhancedMasterAnimationCoordinator for animation management
+    // CSSAnimationManager consolidated into AnimationFrameCoordinator
+    // Use AnimationFrameCoordinator for animation management
 
-    // EmergentChoreography consolidated into EnhancedMasterAnimationCoordinator
+    // EmergentChoreography consolidated into AnimationFrameCoordinator
     // ParticleField consolidated into Particle (ParticleConsciousnessModule)
 
     // Test compatibility aliases
@@ -429,7 +429,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
       "eventBus",
     ]);
 
-    this.systemRegistry.set("FluidGradientBackground", WebGLGradientBackgroundSystem);
+    this.systemRegistry.set("FluidGradientBackground", WebGLGradientStrategy);
     this.systemDependencies.set("FluidGradientBackground", [
       "performanceAnalyzer",
       "eventBus",
@@ -537,16 +537,6 @@ export class VisualSystemCoordinator implements IManagedSystem {
       throw new Error(`Visual system '${key}' not found in registry`);
     }
 
-    // Special handling for UnifiedSystemBase-derived systems
-    // Check if system extends UnifiedSystemBase by looking for _baseInitialize method
-    const testInstance = new SystemClass(this.config);
-    if (typeof testInstance._baseInitialize === "function") {
-      // UnifiedSystemBase systems expect only config parameter
-      const system = testInstance as T;
-      this.injectUnifiedSystemDependencies(system, key);
-      return system;
-    }
-
     // Special handling for SpotifyUIApplicationSystem
     if (key === "SpotifyUIApplication") {
       const system = new SystemClass(this.year3000System) as T;
@@ -568,8 +558,17 @@ export class VisualSystemCoordinator implements IManagedSystem {
       return system;
     }
 
-    // CSSAnimationManager was consolidated into EnhancedMasterAnimationCoordinator
-    // EnhancedMasterAnimationCoordinator is not a visual system, so removed from this factory
+    // CSSAnimationManager was consolidated into AnimationFrameCoordinator
+    // AnimationFrameCoordinator is not a visual system, so removed from this factory
+
+    // Special handling for WebGLGradientStrategy (WebGL consolidation)
+    if (key === "WebGLBackground" || key === "FluidGradientBackground") {
+      const system = new SystemClass(
+        this.cssVariableController
+      ) as T;
+      this.injectDependencies(system, key);
+      return system;
+    }
 
     // Special handling for visual effects systems with holographic UI integration
     if (
@@ -580,16 +579,17 @@ export class VisualSystemCoordinator implements IManagedSystem {
       // Create visual effects manager for holographic UI system
       const biologicalManager = new VisualEffectsManager();
 
-      // Create holographic UI system for visual effects integration (settingsManager removed - using typed settings)
+      // Create holographic UI system for visual effects integration
       const holographicSystem = new HolographicUISystem(
         biologicalManager,
         this.musicSyncService
       );
-      
+
+      // AnimationEffectsController now uses ServiceVisualSystemBase pattern
+      // Constructor signature: (config, holographicSystem?)
       const system = new SystemClass(
-        holographicSystem,
-        this.cssVariableController,
-        this.musicSyncService
+        this.config,
+        holographicSystem
       ) as T;
       this.injectDependencies(system, key);
       return system;
@@ -656,7 +656,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
       (system as any).setMusicSyncService(this.musicSyncService);
     }
 
-    // Inject animation coordinator (for EnhancedMasterAnimationCoordinator)
+    // Inject animation coordinator (for AnimationFrameCoordinator)
     if (
       dependencies.includes("animationCoordinator") &&
       this.animationCoordinator &&
@@ -666,32 +666,6 @@ export class VisualSystemCoordinator implements IManagedSystem {
     }
 
     // Integrate performance monitoring
-    this.integratePerformanceMonitoring(system, key);
-  }
-
-  /**
-   * Inject dependencies into UnifiedSystemBase-derived systems
-   */
-  private injectUnifiedSystemDependencies(
-    system: any,
-    key: VisualSystemKey
-  ): void {
-    // Set up shared utilities directly on the system (before _baseInitialize)
-    // This ensures the system has access to CSS variable management
-    if (this.cssVariableController) {
-      system.cssVariableController = this.cssVariableController;
-    }
-
-    if (this.performanceAnalyzer) {
-      system.performanceAnalyzer = this.performanceAnalyzer;
-    }
-
-    if (this.year3000System) {
-      // Set global reference so UnifiedSystemBase._baseInitialize can find shared systems
-      (globalThis as any).year3000System = this.year3000System;
-    }
-
-    // Integrate performance monitoring for UnifiedSystemBase systems
     this.integratePerformanceMonitoring(system, key);
   }
 
@@ -831,12 +805,8 @@ export class VisualSystemCoordinator implements IManagedSystem {
     const initPromises = Array.from(this.systemCache.entries()).map(
       async ([key, system]) => {
         try {
-          // Use _baseInitialize for UnifiedSystemBase systems, regular initialize for others
-          if (typeof (system as any)._baseInitialize === "function") {
-            await (system as any)._baseInitialize();
-          } else {
-            await system.initialize();
-          }
+          // All systems now use standard IManagedSystem interface
+          await system.initialize();
           Y3KDebug?.debug?.log(
             "VisualSystemFacade",
             `Initialized visual system: ${key}`
@@ -1493,6 +1463,18 @@ export class VisualSystemCoordinator implements IManagedSystem {
         this.currentMetrics.systemHealth === "excellent" ||
         this.currentMetrics.systemHealth === "good",
     };
+  }
+
+  /**
+   * Get the WebGLGradientStrategy instance from cache (Phase 3 Integration)
+   *
+   * Used by WebGLSystemsIntegration to register the strategy with UnifiedWebGLController
+   * for direct quality scaling communication.
+   *
+   * @returns WebGLGradientStrategy instance if created, null otherwise
+   */
+  public getWebGLGradientStrategy(): any | null {
+    return this.systemCache.get("WebGLBackground") || null;
   }
 
   /**

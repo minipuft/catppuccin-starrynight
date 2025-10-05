@@ -329,9 +329,9 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
       },
     });
 
-    // EnhancedMasterAnimationCoordinator
+    // AnimationFrameCoordinator
     this.registerSystemConfig({
-      systemKey: "EnhancedMasterAnimationCoordinator",
+      systemKey: "AnimationFrameCoordinator",
       requiredDependencies: ["config", "performanceCoordinator"],
       optionalDependencies: [],
       constructorMapping: {

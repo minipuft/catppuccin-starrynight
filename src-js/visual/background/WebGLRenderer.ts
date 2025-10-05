@@ -3,6 +3,18 @@
  * Part of the Year 3000 System visual pipeline
  *
  * Implements Alex Harri's flowing gradient technique with Catppuccin color integration
+ *
+ * @deprecated This system is being phased out in favor of WebGLGradientStrategy.
+ * WebGLGradientStrategy provides:
+ * - OKLAB perceptual color processing for better color harmony
+ * - Progressive fallback system (WebGL → CSS → Solid Color)
+ * - Better error handling and device detection
+ * - Integration with BackgroundStrategySelector
+ *
+ * Migration: Use BackgroundStrategySelector with "webgl" strategy mode instead.
+ * This class will be removed in a future release after migration is complete.
+ *
+ * Location: src-js/visual/strategies/WebGLGradientStrategy.ts
  */
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
@@ -237,6 +249,17 @@ export class WebGLGradientBackgroundSystem
   ) {
     super(config, utils, performanceMonitor, musicSyncService);
 
+    // ⚠️ DEPRECATION WARNING - This system will be removed in a future release
+    if (config.enableDebug) {
+      Y3KDebug?.debug?.warn(
+        "WebGLGradientBackgroundSystem",
+        "⚠️ DEPRECATED: WebGLGradientBackgroundSystem is being phased out. " +
+        "Please migrate to WebGLGradientStrategy (src-js/visual/strategies/WebGLGradientStrategy.ts) " +
+        "which provides OKLAB color processing, progressive fallbacks, and better error handling. " +
+        "This class will be removed after migration is complete."
+      );
+    }
+
     // Get ColorHarmonyEngine from year3000System if available
     this.colorHarmonyEngine = year3000System?.colorHarmonyEngine || null;
 
@@ -339,7 +362,7 @@ export class WebGLGradientBackgroundSystem
       await this.initializeWebGL();
       this.subscribeToEvents();
       this.registerWithVisualEffectsChoreographer();
-      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by EnhancedMasterAnimationCoordinator
+      // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by AnimationFrameCoordinator
       // The coordinator will call updateAnimation(deltaTime) automatically
 
       // WebGL initialised; enable hybrid coordination for dynamic and living feel using coordination
@@ -2055,7 +2078,7 @@ export class WebGLGradientBackgroundSystem
   }
 
   /**
-   * ✅ RAF LOOP REMOVED - Managed by EnhancedMasterAnimationCoordinator
+   * ✅ RAF LOOP REMOVED - Managed by AnimationFrameCoordinator
    *
    * Benefits:
    * - Single RAF loop for all systems (not 5-8 independent loops)
@@ -2555,7 +2578,7 @@ export class WebGLGradientBackgroundSystem
    * Kept for API compatibility with backplane adapters (no-op)
    */
   public stopAnimation(): void {
-    // No-op: Animation loop managed by EnhancedMasterAnimationCoordinator
+    // No-op: Animation loop managed by AnimationFrameCoordinator
     // System will automatically stop receiving updateAnimation() calls when destroyed
   }
 

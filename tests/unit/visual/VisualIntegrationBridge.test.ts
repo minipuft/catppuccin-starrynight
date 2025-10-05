@@ -4,7 +4,7 @@
  */
 
 import { VisualSystemCoordinator, VisualSystemKey, VisualSystemConfig } from '@/visual/coordination/VisualSystemCoordinator';
-import { OptimizedCSSVariableManager as CSSVariableBatcher } from '@/core/performance/OptimizedCSSVariableManager';
+import { CSSVariableWriter } from '@/core/css/CSSVariableWriter';
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { MusicSyncService } from '@/audio/MusicSyncService';
 // NOTE: SettingsManager import removed - deleted in Phase 5, using TypedSettingsManager singleton
@@ -14,7 +14,7 @@ import * as Utils from '@/utils/core/ThemeUtilities';
 import { IManagedSystem } from '@/types/systems';
 
 // Mock dependencies
-jest.mock('@/core/performance/OptimizedCSSVariableManager');
+jest.mock('@/core/css/CSSVariableWriter'); // Replaced OptimizedCSSVariableManager
 // PerformanceAnalyzer is legacy - remove mock
 jest.mock('@/core/performance/DeviceCapabilityDetector');
 jest.mock('@/audio/MusicSyncService');
