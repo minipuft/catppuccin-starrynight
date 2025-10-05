@@ -61,7 +61,7 @@ describe('Visual System Coordinator Integration', () => {
 
     // NOTE: mockSettingsManager removed - SettingsManager deleted in Phase 5, using TypedSettingsManager singleton
 
-    const mockSemanticColorManager = {
+    const mockSpicetifyBridge = {
       initialize: jest.fn().mockResolvedValue(undefined),
       destroy: jest.fn(),
       initialized: true,
@@ -71,14 +71,14 @@ describe('Visual System Coordinator Integration', () => {
     // Initialize coordinators with proper dependencies
     systemCoordinator = new SystemCoordinator(ADVANCED_SYSTEM_CONFIG, Utils, mockAdvancedThemeSystem);
     visualCoordinator = new VisualSystemCoordinator(
-      ADVANCED_SYSTEM_CONFIG, 
-      Utils, 
+      ADVANCED_SYSTEM_CONFIG,
+      Utils,
       mockAdvancedThemeSystem,
       mockCSSController,
       mockPerformanceAnalyzer,
       mockMusicSyncService,
       // NOTE: settingsManager parameter removed - deleted in Phase 5, using TypedSettingsManager singleton
-      mockSemanticColorManager
+      mockSpicetifyBridge
     );
   });
 

@@ -761,11 +761,13 @@ export class AdvancedThemeSystem {
               "SimplePerformanceCoordinator is required for ColorHarmonyEngine."
             );
           }
+          // NOTE: SpicetifyColorBridge should be provided by SystemCoordinator
+          // AdvancedThemeSystem uses old architecture - will use legacy fallback
           this.colorHarmonyEngine = new ColorHarmonyEngine(
             this.ADVANCED_SYSTEM_CONFIG,
             this.utils,
-            this.performanceAnalyzer,
-            this.musicSyncService || undefined
+            this.performanceAnalyzer
+            // No spicetifyBridge - will create legacy instance internally
           );
           await this.colorHarmonyEngine.initialize();
 
