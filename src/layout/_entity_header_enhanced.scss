@@ -52,14 +52,21 @@
   transition: background 800ms var(--sn-anim-easing-organic),
     filter 800ms var(--sn-anim-easing-organic);
 
-  // Remove default Spotify backgrounds
-  .main-entityHeader-backgroundColor,
-  .main-entityHeader-backgroundOverColorGradient {
+  // Remove default Spotify backgrounds using mixins
+  @include entity-header-background-color {
     background: transparent !important;
   }
 
-  // Ensure content layers properly
-  .main-entityHeader-imageContainer,
+  @include entity-header-gradient-overlay {
+    background: transparent !important;
+  }
+
+  // Ensure content layers properly using mixins
+  @include entity-header-image {
+    position: relative;
+    z-index: 1;
+  }
+
   .main-entityHeader-headerText {
     position: relative;
     z-index: 1;

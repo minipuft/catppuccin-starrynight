@@ -9,7 +9,7 @@
  * - Frame rate optimization with intelligent degradation
  */
 
-import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManagerSafe } from "@/core/css/UnifiedCSSVariableManager";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -66,7 +66,7 @@ interface PerformanceAction {
 export class GradientPerformanceOptimizer {
   private performanceAnalyzer: SimplePerformanceCoordinator;
   private deviceCapabilities: DeviceCapabilityDetector;
-  private cssVariableManager: OptimizedCSSVariableManager | null;
+  private cssVariableManager: UnifiedCSSVariableManager | null;
 
   private currentMetrics: PerformanceMetrics;
   private qualitySettings: QualitySettings;
@@ -91,13 +91,13 @@ export class GradientPerformanceOptimizer {
     this.performanceAnalyzer = performanceAnalyzer;
     this.deviceCapabilities = new DeviceCapabilityDetector();
     // Initialize CSS Variable Manager if available
-    const cssController = OptimizedCSSVariableManager.getGlobalInstance();
+    const cssController = getGlobalUnifiedCSSManagerSafe();
     if (cssController) {
       this.cssVariableManager = cssController;
     } else {
       Y3KDebug?.debug?.warn(
         "GradientPerformanceOptimizer",
-        "OptimizedCSSVariableManager not available, CSS variable management disabled"
+        "UnifiedCSSVariableManager not available, CSS variable management disabled"
       );
       this.cssVariableManager = null;
     }

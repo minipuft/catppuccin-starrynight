@@ -8,7 +8,7 @@
 
 
 /* Track List Container Styling*/
-.main-rootlist-wrapper {
+@include library-rootlist-wrapper {
   position: relative;
   background: transparent;
 
@@ -49,7 +49,7 @@
   }
 
   /* Individual track row styling*/
-  .main-trackList-trackListRow {
+  @include tracklist-row {
     position: relative;
     @include css-hover-lift(normal);
     transition: transform 300ms var(--sn-easing-explorer, var(--sn-anim-easing-organic)),

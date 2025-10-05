@@ -22,7 +22,6 @@
 
 @include left-sidebar-root {
   nav[aria-label="Main"] a,
-  .main-yourLibraryX-header a, /* Links in library header*/
   div[data-testid="left-sidebar-footer"] a, /* Links in sidebar footer*/
   a.link-subtle.main-navBar-navBarLink {
     /* Common class for Home, Search etc.*/
@@ -111,6 +110,92 @@
                 ) * 0.5));
     }
   }
+
+  /* Links in library header*/
+  @include your-library-header {
+    a {
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 8px 24px;
+      margin: 2px 0;
+      border-radius: 6px;
+      opacity: var(--sn-nav-item-base-opacity);
+      transform: scale(var(--sn-nav-item-transform-scale));
+      transition: opacity var(--sn-nav-item-transition-duration) ease,
+        background-color var(--sn-nav-item-transition-duration) ease,
+        transform var(--sn-nav-item-transition-duration)
+          var(--sn-anim-easing-dynamic),
+        box-shadow var(--sn-nav-item-transition-duration) ease;
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        background: radial-gradient(
+          ellipse at center,
+          rgba(
+              var(--sn-nav-item-glow-color-rgb),
+              calc(var(--sn-nav-item-glow-intensity) * 0.6)
+            )
+            0%,
+          rgba(
+              var(--sn-nav-item-glow-color-rgb),
+              calc(var(--sn-nav-item-glow-intensity) * 0.2)
+            )
+            40%,
+          transparent 70%
+        );
+        opacity: 0;
+        transition: opacity var(--sn-nav-item-transition-duration) ease;
+        z-index: -1;
+      }
+
+      &:hover,
+      &:focus,
+      &[aria-current="page"],
+      &.main-navBar-navBarLinkActive {
+        background-color: rgba(
+          var(--sn-nav-item-glow-color-rgb),
+          var(--sn-nav-item-hover-bg-opacity)
+        );
+        transform: scale(var(--sn-nav-item-transform-scale)) translateY(-0.5px);
+        box-shadow: 0 2px 8px -2px rgba(var(--sn-nav-item-glow-color-rgb), calc(var(
+                  --sn-nav-item-glow-intensity
+                ) * 0.4));
+
+        &::before {
+          opacity: 1;
+        }
+
+        .Type__TypeElement-sc-goliZz-0,
+        span {
+          text-shadow: 0 0 6px
+            rgba(
+              var(--sn-nav-text-energy-color-rgb),
+              var(--sn-nav-text-energy-opacity)
+            );
+        }
+      }
+
+      &[aria-current="page"],
+      &.main-navBar-navBarLinkActive {
+        background-color: rgba(
+          var(--sn-nav-item-glow-color-rgb),
+          var(--sn-nav-item-active-bg-opacity)
+        );
+        box-shadow: inset 0 1px 3px
+            rgba(
+              var(--sn-nav-item-glow-color-rgb),
+              calc(var(--sn-nav-item-glow-intensity) * 0.3)
+            ),
+          0 2px 8px -2px rgba(var(--sn-nav-item-glow-color-rgb), calc(var(
+                    --sn-nav-item-glow-intensity
+                  ) * 0.5));
+      }
+    }
+  }
 }
 
 /* ████████████████████████████████████████████████████████████████████████████████*/
@@ -155,13 +240,45 @@
 }
 
 /* Item Energy Absorption Feedback (applied to nav items by JS)*/
-.main-yourLibraryX-navLink,
-.main-yourLibraryX-listItem,
-nav[aria-label="Main"] ul li a {
+@include library-nav-link {
   &.sn-absorbing-energy {
     transition: transform 0.1s var(--sn-anim-easing-bounce-playful); /* Quick, bouncy feel*/
     transform: scale(var(--sn-item-energy-absorption-scale));
     /* Potentially add a subtle glow change too*/
+    box-shadow: 0 0 calc(5px + 8px * var(--sn-nav-item-glow-intensity))
+        rgba(
+          var(--sn-nav-item-glow-color-rgb),
+          calc(var(--sn-nav-item-glow-intensity) * 0.3)
+        ),
+      inset 0 0 3px
+        rgba(
+          var(--sn-nav-item-glow-color-rgb),
+          calc(var(--sn-nav-item-glow-intensity) * 0.15)
+        );
+  }
+}
+
+@include your-library-list-item {
+  &.sn-absorbing-energy {
+    transition: transform 0.1s var(--sn-anim-easing-bounce-playful);
+    transform: scale(var(--sn-item-energy-absorption-scale));
+    box-shadow: 0 0 calc(5px + 8px * var(--sn-nav-item-glow-intensity))
+        rgba(
+          var(--sn-nav-item-glow-color-rgb),
+          calc(var(--sn-nav-item-glow-intensity) * 0.3)
+        ),
+      inset 0 0 3px
+        rgba(
+          var(--sn-nav-item-glow-color-rgb),
+          calc(var(--sn-nav-item-glow-intensity) * 0.15)
+        );
+  }
+}
+
+@include main-nav-link {
+  &.sn-absorbing-energy {
+    transition: transform 0.1s var(--sn-anim-easing-bounce-playful);
+    transform: scale(var(--sn-item-energy-absorption-scale));
     box-shadow: 0 0 calc(5px + 8px * var(--sn-nav-item-glow-intensity))
         rgba(
           var(--sn-nav-item-glow-color-rgb),
@@ -355,7 +472,6 @@ nav[aria-label="Main"] ul li a {
 
 @include left-sidebar-root {
   /* Target general navigation links. Adapt selectors as needed.*/
-  .main-yourLibraryX-navLinkContainer a, /* For library items in grid/list view*/
   .main-rootlist-rootlistItem a, /* For playlist items in folders*/
   .main-playlistFolder-textLink {
     position: relative;
@@ -416,35 +532,107 @@ nav[aria-label="Main"] ul li a {
     }
   }
 
+  /* For library items in grid/list view */
+  @include library-nav-link-container {
+    a {
+      position: relative;
+      transition: all 0.4s var(--sn-easing-explorer);
+      padding: 8px 12px;
+      margin: 2px 4px;
+      border-radius: var(--border-radius, 6px);
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        border-radius: inherit;
+        background: radial-gradient(
+          ellipse at center,
+          rgba(
+              var(--sn-accent-rgb, var(--spice-rgb-accent)),
+              calc(var(--sn-sidebar-item-bloom-intensity) * 0.7)
+            )
+            0%,
+          transparent 60%
+        );
+        opacity: 0;
+        transition: opacity 0.4s var(--sn-easing-explorer);
+        z-index: -1;
+        transform: scale(0.95);
+      }
+
+      &:hover,
+      &.main-navBar-navBarLinkActive,
+      &[aria-current="page"] {
+        background-color: rgba(
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
+          0.15
+        );
+        color: var(--spice-text);
+        transform: translateY(-1px) scale(1.02);
+        box-shadow: 0 3px 15px -5px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.3);
+
+        &::before {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .sn-music-high-energy & {
+        .Type__TypeElement-sc-goliZz-0,
+        span {
+          text-shadow: 0 0 8px
+            rgba(
+              var(--sn-accent-rgb, var(--spice-rgb-accent)),
+              calc(0.5 * var(--sn-sidebar-energy-glow-opacity))
+            );
+        }
+      }
+    }
+  }
+
   /* Specificity for Your Library items if different selectors are needed*/
-  .main-yourLibraryX-listItem .main-useDropTarget-base {
-    /* Common wrapper for library items*/
-    transition: all 0.4s var(--sn-easing-explorer);
-    border-radius: var(--border-radius, 4px);
-    padding: 6px 8px;
-    margin: 1px 4px;
+  @include your-library-list-item {
+    .main-useDropTarget-base {
+      /* Common wrapper for library items*/
+      transition: all 0.4s var(--sn-easing-explorer);
+      border-radius: var(--border-radius, 4px);
+      padding: 6px 8px;
+      margin: 1px 4px;
 
-    &:hover {
-      background-color: rgba(
-        var(--sn-accent-rgb, var(--spice-rgb-accent)),
-        0.1
-      );
-      transform: scale(1.01);
-      box-shadow: 0 2px 10px -4px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.25);
-    } /* Closes &:hover*/
+      &:hover {
+        background-color: rgba(
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
+          0.1
+        );
+        transform: scale(1.01);
+        box-shadow: 0 2px 10px -4px rgba(var(--sn-accent-rgb, var(--spice-rgb-accent)), 0.25);
+      }
 
-    /* Active library item*/
-    &[aria-current="true"],
-    .main-yourLibraryX-navLinkActive & {
-      /* If parent has active class*/
-      background-color: rgba(
-        var(--sn-accent-rgb, var(--spice-rgb-accent)),
-        0.15
-      );
-      // Phase 8.5b+: Use consolidated music-reactive-shadow mixin
-      @include music-reactive-shadow($blur: 10px, $spread: -5px, $base-opacity: 0.3, $inset: true, $secondary: false);
-    } /* Closes &[aria-current="true"] / .main-yourLibraryX-navLinkActive &*/
-  } /* Closes .main-yourLibraryX-listItem .main-useDropTarget-base*/
+      /* Active library item*/
+      &[aria-current="true"] {
+        background-color: rgba(
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
+          0.15
+        );
+        // Phase 8.5b+: Use consolidated music-reactive-shadow mixin
+        @include music-reactive-shadow($blur: 10px, $spread: -5px, $base-opacity: 0.3, $inset: true, $secondary: false);
+      }
+    }
+  }
+
+  /* Active library item when parent has active class */
+  @include library-nav-link-active {
+    @include your-library-list-item {
+      .main-useDropTarget-base {
+        background-color: rgba(
+          var(--sn-accent-rgb, var(--spice-rgb-accent)),
+          0.15
+        );
+        @include music-reactive-shadow($blur: 10px, $spread: -5px, $base-opacity: 0.3, $inset: true, $secondary: false);
+      }
+    }
+  }
 
   /* Musical DNA Visualization (Placeholder - requires JS to add specific classes like .sn-item-type-playlist)*/
   .sn-item-type-playlist::after {

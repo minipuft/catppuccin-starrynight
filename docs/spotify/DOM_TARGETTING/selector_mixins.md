@@ -1,7 +1,7 @@
 # Centralised Selector Mixin Matrix
 
 > Living document – update whenever Spotify's DOM evolves.
-> **Last Updated:** 2025-10-04 (Complete modular coverage: 74 mixins across 6 files - 82% documentation coverage)
+> **Last Updated:** 2025-10-04 (Phase 3 Low Priority Complete: 103 mixins across 6 files - 95%+ documentation coverage)
 
 ## Layout & Navigation Selectors
 
@@ -13,6 +13,33 @@
 | `main-view-root`        | `div.Root__main-view#main-view`                           | `.Root__main-view`         | `src/features/_sn_context_zones.scss`, `src/features/_sn_depth_layers.scss`, `src/features/_sn_z_index_management.scss`                                                                                     |
 | `main-view-scroll-node` | `.Root__main-view .main-view-container__scroll-node`      | _(same)_                   | `src/layout/_sn_scroll_node_backgrounds.scss`, `src/features/_sn_depth_layers.scss`                                                                                                                         |
 | `main-nav-link`         | `nav[aria-label="Main"] ul li a`                          | _(same)_                   | `src/sidebar/_sidebar_background_effects.scss`, `src/sidebar/_sidebar_interactive.scss`                                                                                                                     |
+
+## Entity Headers & Content Pages
+
+| Mixin Name                          | Stable Selector (Tier 1)                        | Transitional Selector (Tier 2)       | Use Case                                           | Status     | File |
+| ----------------------------------- | ----------------------------------------------- | ------------------------------------ | -------------------------------------------------- | ---------- | ---- |
+| `entity-header-root`                | `.main-entityHeader-container`                  | `[data-testid*="entity-header"]`     | Album/Playlist/Artist page header container        | ✅ Active | `_index.scss` |
+| `entity-header-title`               | `.main-entityHeader-title`                      | `[class*="entityHeader-title"]`      | Entity header title text                           | ✅ Active | `_index.scss` |
+| `entity-header-image`               | `.main-entityHeader-imageContainer`             | `.main-entityHeader-image`           | Entity header cover art container                  | ✅ Active | `_index.scss` |
+| `entity-header-background-color`    | `.main-entityHeader-backgroundColor`            | _(stable class)_                     | Header background color layer (dynamic effects)    | ✅ Active | `_index.scss` |
+| `entity-header-gradient-overlay`    | `.main-entityHeader-backgroundOverColorGradient`| _(stable class)_                     | Header gradient overlay layer                      | ✅ Active | `_index.scss` |
+| `entity-header-metadata`            | `.main-entityHeader-metaData`                   | _(stable class)_                     | Metadata container (songs, duration, followers)    | ✅ Active | `_index.scss` |
+| `playlist-page-container`           | `div[data-testid="playlist-page"]`              | _(stable attribute)_                 | Playlist page root container                       | ✅ Active | `_index.scss` |
+
+**Usage Example:**
+```scss
+@include entity-header-background-color {
+  // Dynamic color extraction from album art
+  background: var(--extracted-bg-color);
+  transition: background-color 0.5s ease;
+}
+
+@include entity-header-metadata {
+  // Metadata styling with glassmorphism
+  backdrop-filter: blur(8px);
+  background: rgba(var(--spice-rgb-surface0), 0.7);
+}
+```
 
 ## Structural Container Selectors (Home Page & Grid Layouts)
 
@@ -163,6 +190,33 @@
 }
 ```
 
+## Action Bar Components (Playlist/Album Controls)
+
+| Mixin Name                    | Stable Selector (Tier 1)                | Transitional Selector (Tier 2)       | Use Case                                           | Status     | File |
+| ----------------------------- | --------------------------------------- | ------------------------------------ | -------------------------------------------------- | ---------- | ---- |
+| `shuffle-button`              | `button[data-testid="shuffle-button"]`  | _(stable attribute only)_            | Shuffle play button                                | ✅ Active | `_index.scss` |
+| `add-to-library-button`       | `button[data-testid="add-to-library-button"]` | `button.control-button-heart`  | Add to library/like button                         | ✅ Active | `_index.scss` |
+| `filter-pills`                | `div.main-genre-chip`                   | `div.main-tag-container`             | Genre/mood filter pills                            | ✅ Active | `_index.scss` |
+| `search-within-playlist`      | `div.playlist-playlist-searchBoxContainer` | `div.x-filterBox-filterInputContainer` | Playlist search box container               | ✅ Active | `_index.scss` |
+| `sort-dropdown`               | `button.x-sortBox-sortDropdown[data-testid="sort-button"]` | `button.x-sortBox-sortDropdown` | Sort options dropdown          | ✅ Active | `_index.scss` |
+
+**Usage Example:**
+```scss
+@include shuffle-button {
+  // Shuffle button styling with active state
+  &[aria-checked="true"] {
+    color: var(--spice-accent);
+  }
+}
+
+@include filter-pills {
+  // Filter pill styling
+  border-radius: 16px;
+  padding: 8px 16px;
+  background: rgba(var(--spice-rgb-surface1), 0.5);
+}
+```
+
 ## Track List Components (Playlist/Album Tables)
 
 | Mixin Name                    | Stable Selector (Tier 1)                | Transitional Selector (Tier 2)       | Use Case                                           | Status |
@@ -219,30 +273,101 @@
 
 | Mixin Name                    | Stable Selector (Tier 1)                | Transitional Selector (Tier 2)       | Use Case                                           | Status | File |
 | ----------------------------- | --------------------------------------- | ------------------------------------ | -------------------------------------------------- | ------ | ---- |
-| `global-nav-links`            | `button.main-globalNav-navLink`         | _(same)_                             | Custom navigation link buttons                     | ✅ Active | `_dom_selectors_global_nav.scss` |
-| `global-nav-search-section`   | `div.main-globalNav-searchSection`      | _(same)_                             | Search section container                           | ✅ Active | `_dom_selectors_global_nav.scss` |
-| `whats-new-button`            | `button[aria-label="What's New"]`       | _(stable attribute only)_            | What's New notification button                     | ✅ Active | `_dom_selectors_global_nav.scss` |
-| `friend-activity-button`      | `button[data-restore-focus-key="buddy_feed"]` | _(stable attribute only)_      | Friend activity sidebar toggle                     | ✅ Active | `_dom_selectors_global_nav.scss` |
+| `global-nav-links`            | `button.main-globalNav-navLink`         | _(same)_                             | Custom navigation link buttons                     | ✅ Active | `_global-nav.scss` |
+| `global-nav-search-section`   | `div.main-globalNav-searchSection`      | _(same)_                             | Search section container                           | ✅ Active | `_global-nav.scss` |
+| `whats-new-button`            | `button[aria-label="What's New"]`       | _(stable attribute only)_            | What's New notification button                     | ✅ Active | `_global-nav.scss` |
+| `friend-activity-button`      | `button[data-restore-focus-key="buddy_feed"]` | _(stable attribute only)_      | Friend activity sidebar toggle                     | ✅ Active | `_global-nav.scss` |
+| `skip-link`                   | `a[data-encore-id="skipLink"]`          | _(stable attribute only)_            | Accessibility skip to content link                 | ✅ Active | `_global-nav.scss` |
+| `nav-links-scrollable-container` | `div.custom-navlinks-scrollable_container` | _(theme-specific class)_          | Custom navigation links scrollable wrapper         | ✅ Active | `_global-nav.scss` |
+| `global-search-form`          | `form[role="search"]`                   | _(semantic role selector)_           | Global search form element                         | ✅ Active | `_global-nav.scss` |
+| `clear-search-button`         | `button[aria-label="Clear search field"]` | _(stable aria-label)_              | Clear search input button                          | ✅ Active | `_global-nav.scss` |
+
+**Usage Example:**
+```scss
+@include skip-link {
+  // Accessibility skip link (hidden until focused)
+  position: absolute;
+  top: -100px;
+  &:focus {
+    top: 0;
+    z-index: 9999;
+  }
+}
+
+@include global-search-form {
+  // Search form styling
+  width: 100%;
+  max-width: 500px;
+}
+```
 
 ## Now Playing Bar - Extended Controls
 
 | Mixin Name                    | Stable Selector (Tier 1)                | Transitional Selector (Tier 2)       | Use Case                                           | Status | File |
 | ----------------------------- | --------------------------------------- | ------------------------------------ | -------------------------------------------------- | ------ | ---- |
-| `now-playing-progress-bar`    | `.main-nowPlayingBar-progressBar`       | _(same)_                             | Track progress bar                                 | ✅ Active | `_dom_selectors_now_playing.scss` |
-| `volume-control`              | `[data-testid="volume-bar"]`            | `div.main-nowPlayingBar-volumeSlider`| Volume slider control                              | ✅ Active | `_dom_selectors_now_playing.scss` |
-| `lyrics-button`               | `[data-testid="lyrics-button"]`         | `button[aria-label*="Lyrics"]`       | Lyrics toggle button                               | ✅ Active | `_dom_selectors_now_playing.scss` |
-| `queue-button`                | `[data-testid="queue-button"]`          | `button[aria-label*="Queue"]`        | Queue toggle button                                | ✅ Active | `_dom_selectors_now_playing.scss` |
-| `stars-overlay`               | `span.stars-now-playing#stars-now-playing` | _(stable ID)_                     | Theme-specific star animation overlay              | ✅ Active | `_dom_selectors_now_playing.scss` |
+| `now-playing-progress-bar`    | `.main-nowPlayingBar-progressBar`       | _(same)_                             | Track progress bar                                 | ✅ Active | `_now-playing.scss` |
+| `volume-control`              | `[data-testid="volume-bar"]`            | `div.main-nowPlayingBar-volumeSlider`| Volume slider control                              | ✅ Active | `_now-playing.scss` |
+| `lyrics-button`               | `[data-testid="lyrics-button"]`         | `button[aria-label*="Lyrics"]`       | Lyrics toggle button                               | ✅ Active | `_now-playing.scss` |
+| `queue-button`                | `[data-testid="queue-button"]`          | `button[aria-label*="Queue"]`        | Queue toggle button                                | ✅ Active | `_now-playing.scss` |
+| `stars-overlay`               | `span.stars-now-playing#stars-now-playing` | _(stable ID)_                     | Theme-specific star animation overlay              | ✅ Active | `_now-playing.scss` |
+| `now-playing-semantic-wrapper` | `aside[aria-label="Now playing bar"][data-testid="now-playing-bar"]` | `aside[data-testid="now-playing-bar"]` | Semantic aside wrapper for now playing bar | ✅ Active | `_now-playing.scss` |
+| `connect-device-button`       | `button[data-testid="connect-device-picker"]` | `button[aria-label*="Connect to a device"]` | Device/speaker connection button | ✅ Active | `_now-playing.scss` |
+
+**Usage Example:**
+```scss
+@include now-playing-semantic-wrapper {
+  // Main semantic wrapper styling
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+@include connect-device-button {
+  // Device picker button styling
+  &[aria-pressed="true"] {
+    color: var(--spice-accent);
+  }
+}
+```
 
 ## Now Playing View (NPV) - Sections & Enhancements
 
 | Mixin Name                    | Stable Selector (Tier 1)                | Transitional Selector (Tier 2)       | Use Case                                           | Status | File |
 | ----------------------------- | --------------------------------------- | ------------------------------------ | -------------------------------------------------- | ------ | ---- |
-| `npv-visual-enhancement`      | `div[data-testid="track-visual-enhancement"]` | _(stable attribute only)_      | Animated/video track visual overlay                | ✅ Active | `_dom_selectors_npv.scss` |
-| `npv-sections`                | `div.main-nowPlayingView-section`       | _(same)_                             | Generic NPV section container                      | ✅ Active | `_dom_selectors_npv.scss` |
-| `npv-about-artist`            | `.main-nowPlayingView-section:has(...)`  | `.main-nowPlayingView-aboutArtist`  | About the artist section                           | ✅ Active | `_dom_selectors_npv.scss` |
-| `npv-credits`                 | `.main-nowPlayingView-credits`          | _(same)_                             | Song credits section                               | ✅ Active | `_dom_selectors_npv.scss` |
-| `npv-queue`                   | `.main-nowPlayingView-queue`            | _(same)_                             | Queue section in NPV                               | ✅ Active | `_dom_selectors_npv.scss` |
+| `npv-visual-enhancement`      | `div[data-testid="track-visual-enhancement"]` | _(stable attribute only)_      | Animated/video track visual overlay                | ✅ Active | `_npv.scss` |
+| `npv-sections`                | `div.main-nowPlayingView-section`       | _(same)_                             | Generic NPV section container                      | ✅ Active | `_npv.scss` |
+| `npv-about-artist`            | `.main-nowPlayingView-section:has(...)`  | `.main-nowPlayingView-aboutArtist`  | About the artist section                           | ✅ Active | `_npv.scss` |
+| `npv-credits`                 | `.main-nowPlayingView-credits`          | _(same)_                             | Song credits section                               | ✅ Active | `_npv.scss` |
+| `npv-queue`                   | `.main-nowPlayingView-queue`            | _(same)_                             | Queue section in NPV                               | ✅ Active | `_npv.scss` |
+| `npv-cover-art-static`        | `div.main-nowPlayingView-coverArt`      | _(stable class)_                     | Static cover art image container                   | ✅ Active | `_npv.scss` |
+| `npv-tertiary-buttons`        | `[data-encore-id="buttonTertiary"]`     | `button[data-encore-id="buttonTertiary"]` | Tertiary action buttons (Share, Add to Queue) | ✅ Active | `_npv.scss` |
+| `npv-queue-item`              | `li.main-useDropTarget-base`            | _(stable class)_                     | Individual queue item rows                         | ✅ Active | `_npv.scss` |
+
+**Usage Example:**
+```scss
+@include npv-cover-art-static {
+  // Static cover art styling
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(var(--sn-accent-rgb), 0.3);
+}
+
+@include npv-tertiary-buttons {
+  // Tertiary button styling
+  opacity: 0.8;
+  &:hover {
+    opacity: 1;
+    background: rgba(var(--spice-rgb-surface1), 0.5);
+  }
+}
+
+@include npv-queue-item {
+  // Queue item styling
+  padding: 8px;
+  &:hover {
+    background: rgba(var(--spice-rgb-surface1), 0.3);
+  }
+}
+```
 
 ## Track List - Cell-Level Selectors
 
@@ -253,15 +378,62 @@
 | `tracklist-album-cell`        | `div[role="gridcell"][aria-colindex="3"]` | _(role-based selector)_            | Album name column                                  | ✅ Active | `_dom_selectors_tracklist.scss` |
 | `tracklist-duration-cell`     | `div[role="gridcell"][aria-colindex="5"]` | `.main-trackList-rowSectionEnd`    | Duration & actions column                          | ✅ Active | `_dom_selectors_tracklist.scss` |
 | `tracklist-column-header`     | `button.main-tracklist-column`          | `div[role="columnheader"]`           | Column header elements                             | ✅ Active | `_dom_selectors_tracklist.scss` |
+| `tracklist-header-start-section` | `div.main-trackList-trackListHeaderRowSectionStart` | _(same)_              | First column header container (#)                  | ✅ Active | `_tracklist.scss` |
+| `tracklist-header-variable-section` | `div.main-tracklist-tracklistHeaderRowSectionVariable` | _(same)_       | Variable-width column header containers            | ✅ Active | `_tracklist.scss` |
+| `tracklist-header-end-section` | `div.main-tracklist-tracklistHeaderRowSectionEnd` | _(same)_                | Last column header container (duration)            | ✅ Active | `_tracklist.scss` |
+| `tracklist-row-index-section` | `span.main-trackList-rowSectionIndex`   | `div.main-trackList-rowSectionIndex` | Track number/index display area                    | ✅ Active | `_tracklist.scss` |
+| `tracklist-row-main-content`  | `div.main-trackList-rowMainContent`     | _(same)_                             | Title/Artist wrapper in row                        | ✅ Active | `_tracklist.scss` |
+| `tracklist-row-end-section`   | `div.main-trackList-rowSectionEnd`      | _(same)_                             | Like/Duration/Menu container                       | ✅ Active | `_tracklist.scss` |
+
+**Usage Example:**
+```scss
+@include tracklist-header-start-section {
+  // First column header styling
+  text-align: center;
+  width: 48px;
+}
+
+@include tracklist-row-main-content {
+  // Title/artist wrapper styling
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+```
 
 ## Your Library - Advanced Selectors
 
 | Mixin Name                    | Stable Selector (Tier 1)                | Transitional Selector (Tier 2)       | Use Case                                           | Status | File |
 | ----------------------------- | --------------------------------------- | ------------------------------------ | -------------------------------------------------- | ------ | ---- |
-| `your-library-filter-area`    | `.main-yourLibraryX-filterArea`         | `.main-yourLibrary-filterArea`       | Filter pills container                             | ✅ Active | `_dom_selectors_library.scss` |
-| `your-library-search`         | `input[placeholder*="library" i]`       | `.main-yourLibraryX-searchInput`     | Library search input field                         | ✅ Active | `_dom_selectors_library.scss` |
-| `library-drop-target`         | `.main-useDropTarget-base`              | _(with type-specific variants)_      | Drag & drop target zones                           | ✅ Active | `_dom_selectors_library.scss` |
-| `left-sidebar-footer`         | `div[data-testid="left-sidebar-footer"]`| _(stable attribute only)_            | Bottom sidebar action buttons                      | ✅ Active | `_dom_selectors_library.scss` |
+| `your-library-filter-area`    | `.main-yourLibraryX-filterArea`         | `.main-yourLibrary-filterArea`       | Filter pills container                             | ✅ Active | `_library.scss` |
+| `your-library-search`         | `input[placeholder*="library" i]`       | `.main-yourLibraryX-searchInput`     | Library search input field                         | ✅ Active | `_library.scss` |
+| `library-drop-target`         | `.main-useDropTarget-base`              | _(with type-specific variants)_      | Drag & drop target zones                           | ✅ Active | `_library.scss` |
+| `left-sidebar-footer`         | `div[data-testid="left-sidebar-footer"]`| _(stable attribute only)_            | Bottom sidebar action buttons                      | ✅ Active | `_library.scss` |
+| `library-item-container`      | `div[data-overlayscrollbars-initialize="true"].main-yourLibraryX-libraryItemContainer` | `.main-yourLibraryX-libraryItemContainer` | Scrollable items container with custom scrollbars  | ✅ Active | `_library.scss` |
+| `library-rootlist`            | `div.main-yourLibraryX-libraryRootlist` | _(stable class)_                     | Root element for library item grid/list            | ✅ Active | `_library.scss` |
+| `library-virtual-scroll-sentinels` | `div.main-rootlist-topSentinel`, `div.main-rootlist-bottomSentinel` | _(stable classes)_ | Virtual scrolling boundary elements | ✅ Active | `_library.scss` |
+| `library-rootlist-wrapper`    | `div.main-rootlist-wrapper[role="presentation"]` | `div.main-rootlist-wrapper`  | Wrapper around library grid items                  | ✅ Active | `_library.scss` |
+| `sidebar-resize-bar`          | `div.LayoutResizer__resize-bar.LayoutResizer__inline-end` | `div.LayoutResizer__resize-bar` | Sidebar width resize handle                        | ✅ Active | `_library.scss` |
+
+**Usage Example:**
+```scss
+@include library-item-container {
+  // Custom scrollbar styling
+  scrollbar-width: thin;
+  scrollbar-color: var(--spice-surface1) transparent;
+}
+
+@include sidebar-resize-bar {
+  // Resize handle styling
+  width: 4px;
+  cursor: col-resize;
+  background: var(--spice-surface1);
+
+  &:hover {
+    background: var(--spice-accent);
+  }
+}
+```
 
 ### Card Selector Usage Guidelines
 

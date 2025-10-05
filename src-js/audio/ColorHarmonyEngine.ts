@@ -27,14 +27,14 @@ import {
   type MusicAnalysisData,
 } from "@/utils/color/EmotionalTemperatureMapper";
 import {
-  OKLABColorProcessor,
+  OKLABColorProcessor as OKLABUtilityProcessor,
   type EnhancementPreset,
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
 import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
 import { PaletteExtensionManager } from "@/utils/core/PaletteExtensionManager";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
-import { SemanticColorManager } from "@/utils/spicetify/SemanticColorManager";
+import { SpicetifyColorBridge } from "@/utils/spicetify/SpicetifyColorBridge";
 import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
 import { globalUnifiedColorProcessingEngine } from "@/core/color/UnifiedColorProcessingEngine";
 import {
@@ -129,10 +129,24 @@ interface VibrancyConfig {
 }
 
 // =============================================================================
-// YEAR 3000 COLOR HARMONY ENGINE - Enhanced Vibrancy Edition
+// OKLAB COLOR PROCESSOR - Pure Color Science Processing
+// Formerly: Year3000 Color Harmony Engine
 // =============================================================================
 
-export class ColorHarmonyEngine
+/**
+ * 🔧 PHASE 2: Pure OKLAB color processor (renamed from ColorHarmonyEngine)
+ *
+ * ARCHITECTURAL ROLE: Pure processor - generates color harmonies using OKLAB color science
+ * - Input: Raw colors from album art
+ * - Output: ColorResult with processed colors and complete CSS variables
+ * - NO CSS writes, NO state management - pure processing only
+ * - Emits results via colors:harmonized event for ColorStateManager to apply
+ *
+ * @class OKLABColorProcessor
+ * @implements {IManagedSystem}
+ * @implements {IColorProcessor}
+ */
+export class OKLABColorProcessor
   extends BaseVisualSystem
   implements IManagedSystem, IColorProcessor
 {
@@ -172,10 +186,10 @@ export class ColorHarmonyEngine
   private catppuccinPalettes: CatppuccinFlavors;
   private vibrancyConfig: VibrancyConfig;
   private paletteExtensionManager: PaletteExtensionManager;
-  private semanticColorManager: SemanticColorManager;
+  private semanticColorManager: SpicetifyColorBridge;
   private animationEngine: EnhancedMasterAnimationCoordinator | null = null;
   private emotionalTemperatureMapper: EmotionalTemperatureMapper;
-  private oklabProcessor: OKLABColorProcessor;
+  private oklabProcessor: OKLABUtilityProcessor; // Utility processor for OKLAB color operations
   private musicEmotionAnalyzer: MusicEmotionAnalyzer;
   private genreProfileManager: GenreProfileManager;
 
@@ -227,7 +241,8 @@ export class ColorHarmonyEngine
   constructor(
     config?: Year3000Config,
     utils?: typeof ThemeUtilities,
-    performanceMonitor?: SimplePerformanceCoordinator
+    performanceMonitor?: SimplePerformanceCoordinator,
+    semanticColorManager?: SpicetifyColorBridge
     // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
   ) {
     super(
@@ -244,12 +259,19 @@ export class ColorHarmonyEngine
       this.utils
     );
 
-    // Initialize SemanticColorManager for Spicetify integration
-    this.semanticColorManager = new SemanticColorManager({
-      enableDebug: this.config.enableDebug,
-      fallbackToSpiceColors: true,
-      cacheDuration: 5000,
-    });
+    // Use shared SpicetifyColorBridge instance (dependency injection)
+    // Fall back to creating local instance only if not provided
+    if (semanticColorManager) {
+      this.semanticColorManager = semanticColorManager;
+    } else {
+      // LEGACY: Create local instance for backward compatibility
+      // TODO: Remove this fallback once all callers provide shared instance
+      this.semanticColorManager = new SpicetifyColorBridge({
+        enableDebug: this.config.enableDebug,
+        fallbackToSpiceColors: true,
+        cacheDuration: 5000,
+      });
+    }
 
     this.currentTheme = this.detectCurrentTheme();
 
@@ -439,7 +461,7 @@ export class ColorHarmonyEngine
     );
 
     // Initialize OKLAB processor for advanced color science
-    this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+    this.oklabProcessor = new OKLABUtilityProcessor(this.config.enableDebug);
 
     // Initialize music emotion analyzer for audio-responsive color processing
     this.musicEmotionAnalyzer = new MusicEmotionAnalyzer({
@@ -456,7 +478,7 @@ export class ColorHarmonyEngine
 
     // Initialize OKLAB processing state
     this.oklabState = {
-      currentPreset: OKLABColorProcessor.PRESETS.STANDARD!,
+      currentPreset: OKLABUtilityProcessor.PRESETS.STANDARD!,
       processedPalette: {},
       perceptualGradientCache: new Map(),
       colorHarmonyCache: new Map(),
@@ -721,7 +743,7 @@ export class ColorHarmonyEngine
   public override async initialize(): Promise<void> {
     await super.initialize();
 
-    // Initialize SemanticColorManager with UnifiedCSSVariableManager from parent system
+    // Initialize SpicetifyColorBridge with UnifiedCSSVariableManager from parent system
     const cssVisualEffectsController = this.performanceMonitor
       ? (this.performanceMonitor as any).cssVisualEffectsController
       : undefined;
@@ -776,7 +798,7 @@ export class ColorHarmonyEngine
 
     if (this.config.enableDebug) {
       console.log(
-        "🎨 [ColorHarmonyEngine] Initialized with Year 3000 Quantum Empathy via BaseVisualSystem and SemanticColorManager."
+        "🎨 [ColorHarmonyEngine] Initialized with Year 3000 Quantum Empathy via BaseVisualSystem and SpicetifyColorBridge."
       );
       console.log(
         "🎨 [ColorHarmonyEngine] Subscribed to 'colors/extracted' events for strategy pattern processing."
@@ -1034,7 +1056,13 @@ export class ColorHarmonyEngine
       const colorVariations = this.generateColorVariations(result);
       Object.assign(cssVariables, colorVariations);
 
-      this.applyCSSVariablesToDOM(cssVariables);
+      // 🔧 PHASE 2 REFACTOR: Enhance CSS variables for UI components BEFORE emission
+      // This ensures ColorStateManager receives complete, UI-ready variables
+      const enhancedCssVariables = this.enhanceCSSVariablesForUIComponents(cssVariables);
+
+      // 🔧 PHASE 2 REFACTOR: Pure processor pattern
+      // Instead of applying CSS directly, emit event with ALL CSS variables
+      // ColorStateManager (CSS authority) will handle DOM application
 
       // 🎯 PERCEPTUAL GRADIENT GENERATION: Generate OKLAB-based gradient data for WebGL systems
       this.generatePerceptualGradientData(result);
@@ -1042,16 +1070,19 @@ export class ColorHarmonyEngine
       // 📊 COLOR HARMONY ANALYSIS: Update harmony metrics with perceptual analysis
       this.updateAdvancedHarmonyMetrics(result, processingTime);
 
-      // Emit processed result event
+      // 🔧 PHASE 2: Emit processed result with complete CSS variable set
+      // ColorStateManager subscribes to this and handles CSS application
       unifiedEventBus.emitSync("colors:harmonized", {
         processedColors: result.processedColors,
+        cssVariables: enhancedCssVariables, // 🔧 Complete UI-enhanced CSS variables
         accentHex: result.accentHex,
         accentRgb: result.accentRgb,
         strategies: result.metadata?.strategy
           ? [result.metadata.strategy]
-          : ["ColorHarmonyEngine"],
+          : ["OKLABColorProcessor"], // 🔧 Updated name
         processingTime: processingTime,
         trackUri: result.context.trackUri,
+        timestamp: Date.now(), // 🔧 NEW: For tracking
       });
 
       if (this.config.enableDebug) {
@@ -1184,8 +1215,8 @@ export class ColorHarmonyEngine
     cssVars["--sn-accent-rgb"] = result.accentRgb;
 
     // Canonical accent variables
-    cssVars[ColorHarmonyEngine.CANONICAL_HEX_VAR] = result.accentHex;
-    cssVars[ColorHarmonyEngine.CANONICAL_RGB_VAR] = result.accentRgb;
+    cssVars[OKLABColorProcessor.CANONICAL_HEX_VAR] = result.accentHex;
+    cssVars[OKLABColorProcessor.CANONICAL_RGB_VAR] = result.accentRgb;
 
     // 🔧 CRITICAL FIX: Removed --spice-* variable setting to prevent conflicts
     // DynamicCatppuccinBridge is now the sole owner of --spice-* variables
@@ -2177,94 +2208,6 @@ export class ColorHarmonyEngine
   }
 
   /**
-   * Apply multiple CSS variables to the DOM efficiently
-   * Enhanced with comprehensive UI component support and robust fallbacks
-   */
-  private applyCSSVariablesToDOM(cssVariables: Record<string, string>): void {
-    // 🔧 CRITICAL FIX: Enhanced cssVisualEffectsController detection
-    const year3000System = (globalThis as any).year3000System;
-    const cssVisualEffectsController =
-      year3000System?.cssVisualEffectsController ||
-      (this.performanceMonitor as any)?.cssVisualEffectsController ||
-      year3000System?.facadeCoordinator?.getCachedNonVisualSystem?.(
-        "UnifiedCSSVariableManager"
-      );
-
-    // 🔧 CRITICAL FIX: Add UI component-specific CSS variables for sidebar and now-playing
-    const enhancedCssVariables =
-      this.enhanceCSSVariablesForUIComponents(cssVariables);
-
-    if (
-      cssVisualEffectsController &&
-      typeof cssVisualEffectsController.batchSetVariables === "function"
-    ) {
-      try {
-        // Use batched CSS variable updates for better performance
-        cssVisualEffectsController.batchSetVariables(
-          "ColorHarmonyEngine",
-          enhancedCssVariables,
-          "high", // High priority for color processing
-          "color-harmony-oklab-processing"
-        );
-
-        if (this.config.enableDebug) {
-          console.log(
-            "🔧 [ColorHarmonyEngine] Applied CSS variables via cssVisualEffectsController batcher"
-          );
-        }
-      } catch (error) {
-        if (this.config.enableDebug) {
-          console.warn(
-            "🔧 [ColorHarmonyEngine] cssVisualEffectsController.batchSetVariables failed, using direct application:",
-            error
-          );
-        }
-        this.applyVariablesDirectly(enhancedCssVariables);
-      }
-    } else {
-      if (this.config.enableDebug) {
-        console.log(
-          "🔧 [ColorHarmonyEngine] cssVisualEffectsController not available, using direct DOM application"
-        );
-      }
-      this.applyVariablesDirectly(enhancedCssVariables);
-    }
-
-    // 🔧 CRITICAL FIX: Emit colors:applied event for UI components that need immediate notification
-    unifiedEventBus.emitSync("colors:applied", {
-      cssVariables: enhancedCssVariables,
-      accentHex: enhancedCssVariables["--sn-accent-hex"] || "#a6adc8",
-      accentRgb: enhancedCssVariables["--sn-accent-rgb"] || "166,173,200",
-      appliedAt: Date.now(),
-    });
-
-    if (this.config.enableDebug) {
-      console.log(
-        "🔬 [ColorHarmonyEngine] Applied enhanced CSS variables to DOM:",
-        {
-          totalVariables: Object.keys(enhancedCssVariables).length,
-          oklabVariables: Object.keys(enhancedCssVariables).filter((k) =>
-            k.includes("oklab")
-          ).length,
-          oklchVariables: Object.keys(enhancedCssVariables).filter((k) =>
-            k.includes("oklch")
-          ).length,
-          gradientVariables: Object.keys(enhancedCssVariables).filter((k) =>
-            k.includes("gradient")
-          ).length,
-          spiceVariables: Object.keys(enhancedCssVariables).filter((k) =>
-            k.includes("spice")
-          ).length,
-          sidebarVariables: Object.keys(enhancedCssVariables).filter((k) =>
-            k.includes("sidebar")
-          ).length,
-          cssVisualEffectsControllerUsed: !!cssVisualEffectsController,
-        }
-      );
-    }
-  }
-
-  /**
    * Enhance CSS variables with UI component-specific mappings
    * Maps OKLAB-processed colors to variables that sidebar, now-playing, and other UI components expect
    */
@@ -2276,10 +2219,10 @@ export class ColorHarmonyEngine
     // Extract primary colors for UI component mapping
     const accentHex =
       enhanced["--sn-accent-hex"] ||
-      enhanced[ColorHarmonyEngine.CANONICAL_HEX_VAR];
+      enhanced[OKLABColorProcessor.CANONICAL_HEX_VAR];
     const accentRgb =
       enhanced["--sn-accent-rgb"] ||
-      enhanced[ColorHarmonyEngine.CANONICAL_RGB_VAR];
+      enhanced[OKLABColorProcessor.CANONICAL_RGB_VAR];
     const primaryHex = enhanced["--sn-bg-gradient-primary"];
     const primaryRgb = enhanced["--sn-bg-gradient-primary-rgb"];
     const secondaryHex = enhanced["--sn-bg-gradient-secondary"];
@@ -2348,18 +2291,6 @@ export class ColorHarmonyEngine
     }
 
     return enhanced;
-  }
-
-  /**
-   * 🔧 PHASE 2: Emit CSS variables instead of applying directly
-   */
-  private applyVariablesDirectly(cssVariables: Record<string, string>): void {
-    // 🔧 PHASE 2: Emit CSS variables for ColorStateManager to handle
-    unifiedEventBus.emit("system:css-variables" as any, {
-      source: "ColorHarmonyEngine",
-      variables: cssVariables,
-      timestamp: Date.now(),
-    });
   }
 
   generateRecommendations(
@@ -3302,7 +3233,7 @@ export class ColorHarmonyEngine
       this._boundArtisticModeHandler
     );
 
-    // Clean up SemanticColorManager
+    // Clean up SpicetifyColorBridge
     if (this.semanticColorManager) {
       this.semanticColorManager.destroy();
     }
@@ -3452,29 +3383,29 @@ export class ColorHarmonyEngine
 
     // Default to STANDARD preset
     let selectedPreset: EnhancementPreset =
-      OKLABColorProcessor.PRESETS.STANDARD!;
+      OKLABUtilityProcessor.PRESETS.STANDARD!;
 
     if (musicData) {
       const { energy = 0.5, valence = 0.5 } = musicData;
 
       // High energy + high valence = COSMIC (maximum enhancement for vibrant music)
       if (energy > 0.8 && valence > 0.7) {
-        selectedPreset = OKLABColorProcessor.PRESETS.COSMIC!;
+        selectedPreset = OKLABUtilityProcessor.PRESETS.COSMIC!;
       }
       // High energy + low valence = VIBRANT (enhanced vibrancy for intense music)
       else if (energy > 0.7 && valence < 0.4) {
-        selectedPreset = OKLABColorProcessor.PRESETS.VIBRANT!;
+        selectedPreset = OKLABUtilityProcessor.PRESETS.VIBRANT!;
       }
       // Low energy = SUBTLE (gentle enhancement for calm music)
       else if (energy < 0.3) {
-        selectedPreset = OKLABColorProcessor.PRESETS.SUBTLE!;
+        selectedPreset = OKLABUtilityProcessor.PRESETS.SUBTLE!;
       }
       // Everything else = STANDARD
     }
 
     // Performance hints can override musical analysis
     if (context.performanceHints?.preferLightweight) {
-      selectedPreset = OKLABColorProcessor.PRESETS.SUBTLE!;
+      selectedPreset = OKLABUtilityProcessor.PRESETS.SUBTLE!;
     }
 
     if (this.config?.enableDebug) {
@@ -5623,3 +5554,32 @@ export class ColorHarmonyEngine
     };
   }
 }
+
+// =============================================================================
+// BACKWARD COMPATIBILITY ALIAS
+// =============================================================================
+
+/**
+ * @deprecated Use OKLABColorProcessor instead. This alias is provided for backward compatibility.
+ * Will be removed in a future version after all imports are updated.
+ *
+ * ColorHarmonyEngine has been renamed to OKLABColorProcessor to better reflect its role
+ * as a pure processor in the single-responsibility architecture.
+ *
+ * Migration path:
+ * ```typescript
+ * // Old (deprecated)
+ * import { ColorHarmonyEngine } from '@/audio/ColorHarmonyEngine';
+ *
+ * // New (recommended)
+ * import { OKLABColorProcessor } from '@/audio/ColorHarmonyEngine';
+ * // or: import { OKLABColorProcessor as ColorHarmonyEngine } from '@/audio/ColorHarmonyEngine';
+ * ```
+ */
+export const ColorHarmonyEngine = OKLABColorProcessor;
+
+/**
+ * @deprecated Use OKLABColorProcessor type instead. This type alias is provided for backward compatibility.
+ * Will be removed in a future version after all type annotations are updated.
+ */
+export type ColorHarmonyEngine = OKLABColorProcessor;

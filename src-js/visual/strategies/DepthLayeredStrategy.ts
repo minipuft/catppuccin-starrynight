@@ -10,7 +10,7 @@
  */
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { getGlobalOptimizedCSSController, OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
+import { getGlobalUnifiedCSSManager, UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type {
@@ -76,7 +76,7 @@ export class DepthLayeredStrategy implements IColorProcessor {
   private utils = Utils;
   private config = ADVANCED_SYSTEM_CONFIG;
   private deviceDetector: DeviceCapabilityDetector;
-  private cssController: OptimizedCSSVariableManager | null = null;
+  private cssController: UnifiedCSSVariableManager | null = null;
 
   private depthState: DepthLayeredState = {
     containerElement: null,
@@ -162,7 +162,7 @@ export class DepthLayeredStrategy implements IColorProcessor {
     this.deviceDetector = new DeviceCapabilityDetector();
 
     // Get CSS visual effects controller
-    this.cssController = getGlobalOptimizedCSSController();
+    this.cssController = getGlobalUnifiedCSSManager();
 
     // Load settings and adapt to device capabilities
     this.loadDepthSettings();

@@ -1,18 +1,18 @@
 import { HARMONIC_MODES } from "@/config/globalConfig";
 import {
-  OptimizedCSSVariableManager,
-  getGlobalOptimizedCSSController,
-} from "@/core/performance/OptimizedCSSVariableManager";
+  UnifiedCSSVariableManager,
+  getGlobalUnifiedCSSManager,
+} from "@/core/css/UnifiedCSSVariableManager";
 import { SettingsSection } from "@/ui/components/SettingsSection";
 import { settings } from "@/config";
 import { applyStarryNightSettings } from "@/visual/base/starryNightEffects";
 
 // Helper to get CSS controller for coordination
-function getCSSController(): OptimizedCSSVariableManager {
+function getCSSController(): UnifiedCSSVariableManager {
   const year3000System = (globalThis as any).year3000System;
   return (
     year3000System?.cssController ||
-    getGlobalOptimizedCSSController()
+    getGlobalUnifiedCSSManager()
   );
 }
 

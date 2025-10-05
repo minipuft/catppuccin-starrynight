@@ -113,6 +113,42 @@
   }
 }
 
+// Entity Header Background Color Layer
+// Usage: @include entity-header-background-color { … }
+// Use for: Dynamic background color effects on album/playlist pages
+@mixin entity-header-background-color {
+  .main-entityHeader-backgroundColor {
+    @content;
+  }
+}
+
+// Entity Header Gradient Overlay
+// Usage: @include entity-header-gradient-overlay { … }
+// Use for: Gradient overlay effects on entity headers
+@mixin entity-header-gradient-overlay {
+  .main-entityHeader-backgroundOverColorGradient {
+    @content;
+  }
+}
+
+// Entity Header Metadata Container
+// Usage: @include entity-header-metadata { … }
+// Use for: Styling metadata (owner, song count, duration, etc.)
+@mixin entity-header-metadata {
+  .main-entityHeader-metaData {
+    @content;
+  }
+}
+
+// Playlist Page Container
+// Usage: @include playlist-page-container { … }
+// Use for: Playlist page root container targeting
+@mixin playlist-page-container {
+  div[data-testid="playlist-page"] {
+    @content;
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // ARTIST-SPECIFIC SELECTORS (Year 3000 Enhanced Detection)
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -183,6 +219,55 @@
   .main-playButton-PlayButton,
   .main-shuffleButton-button,
   .main-button-button {
+    @content;
+  }
+}
+
+// Shuffle Button (Playlist/Album shuffle play)
+// Usage: @include shuffle-button { … }
+// Use for: Shuffle play button styling, active states
+@mixin shuffle-button {
+  button[data-testid="shuffle-button"] {  // Stable attribute (preferred)
+    @content;
+  }
+}
+
+// Add to Library Button (Like/Save button)
+// Usage: @include add-to-library-button { … }
+// Use for: Add to library button, like/unlike states
+@mixin add-to-library-button {
+  button[data-testid="add-to-library-button"],  // Stable attribute (preferred)
+  button.control-button-heart {                  // Transitional class
+    @content;
+  }
+}
+
+// Filter Pills (Genre/Mood filters)
+// Usage: @include filter-pills { … }
+// Use for: Filter pill/chip styling in action bar
+@mixin filter-pills {
+  div.main-genre-chip,
+  div.main-tag-container {
+    @content;
+  }
+}
+
+// Search Within Playlist (Playlist search box)
+// Usage: @include search-within-playlist { … }
+// Use for: Search box container in playlist/album views
+@mixin search-within-playlist {
+  div.playlist-playlist-searchBoxContainer,
+  div.x-filterBox-filterInputContainer {
+    @content;
+  }
+}
+
+// Sort Dropdown (Track list sorting)
+// Usage: @include sort-dropdown { … }
+// Use for: Sort options dropdown button
+@mixin sort-dropdown {
+  button.x-sortBox-sortDropdown[data-testid="sort-button"],  // Stable attribute (preferred)
+  button.x-sortBox-sortDropdown {                            // Transitional class
     @content;
   }
 }

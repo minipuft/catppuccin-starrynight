@@ -1,7 +1,7 @@
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
-import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
 
 interface FocusState {
   isFocusVisible: boolean;
@@ -30,7 +30,7 @@ export class FocusController implements IManagedSystem {
   private utils: typeof ThemeUtilities;
   private focusState: FocusState;
   private year3000System: any | null = null;
-  private cssController!: OptimizedCSSVariableManager;
+  private cssController!: UnifiedCSSVariableManager;
 
   // Event handlers (stored for cleanup)
   private boundFocusInHandler: ((event: FocusEvent) => void) | null = null;
@@ -76,7 +76,7 @@ export class FocusController implements IManagedSystem {
     try {
       // Initialize CSS coordination - use globalThis to access Year3000System
       const year3000System = (globalThis as any).year3000System;
-      this.cssController = year3000System?.cssController || this.year3000System?.cssController || getGlobalOptimizedCSSController();
+      this.cssController = year3000System?.cssController || this.year3000System?.cssController || getGlobalUnifiedCSSManager();
 
       this.setupEventListeners();
       this.initialized = true;

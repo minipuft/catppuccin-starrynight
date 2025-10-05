@@ -7,6 +7,7 @@
 // Note: OKLAB animation system archived in Phase 10 Week 4 (orphaned file)
 // Using existing CSS variables for OKLAB functionality instead
 
+@use "../../core/_mixins" as *;
 @use "../../core/_design_tokens" as *;
 
 // === GENRE-AWARE COMPONENT INTEGRATION ===
@@ -345,8 +346,7 @@
 }
 
 // Track rows with genre awareness
-.main-trackList-trackListRow,
-.tracklist-row {
+@include tracklist-row {
   &[data-genre-active] {
     @include genre-color-preset(attr(data-genre-active value, 'default'), 0.4);
 

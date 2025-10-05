@@ -48,3 +48,79 @@
     @content;
   }
 }
+
+// Library Item Container (Overlay scrollbar container)
+// Usage: @include library-item-container { … }
+// Use for: Scrollable library items container with custom scrollbars
+@mixin library-item-container {
+  div[data-overlayscrollbars-initialize="true"].main-yourLibraryX-libraryItemContainer,
+  div.main-yourLibraryX-libraryItemContainer {
+    @content;
+  }
+}
+
+// Library Root List (Root list element)
+// Usage: @include library-rootlist { … }
+// Use for: Root element for library item grid/list
+@mixin library-rootlist {
+  div.main-yourLibraryX-libraryRootlist {
+    @content;
+  }
+}
+
+// Library Virtual Scroll Sentinels (Top & bottom scroll boundaries)
+// Usage: @include library-virtual-scroll-sentinels { … }
+// Use for: Virtual scrolling boundary detection elements
+@mixin library-virtual-scroll-sentinels {
+  div.main-rootlist-topSentinel,
+  div.main-rootlist-bottomSentinel {
+    @content;
+  }
+}
+
+// Library Root List Wrapper (Item wrapper for positioning)
+// Usage: @include library-rootlist-wrapper { … }
+// Use for: Wrapper around library grid items
+@mixin library-rootlist-wrapper {
+  div.main-rootlist-wrapper[role="presentation"],
+  div.main-rootlist-wrapper {
+    @content;
+  }
+}
+
+// Sidebar Resize Bar (Draggable resize handle)
+// Usage: @include sidebar-resize-bar { … }
+// Use for: Sidebar width resize handle styling
+@mixin sidebar-resize-bar {
+  div.LayoutResizer__resize-bar.LayoutResizer__inline-end,
+  div.LayoutResizer__resize-bar {
+    @content;
+  }
+}
+
+// Library Navigation Link
+// Usage: @include library-nav-link { … }
+// Use for: Individual library navigation link items
+@mixin library-nav-link {
+  .main-yourLibraryX-navLink {
+    @content;
+  }
+}
+
+// Library Navigation Link Container
+// Usage: @include library-nav-link-container { … }
+// Use for: Library navigation link wrapper element
+@mixin library-nav-link-container {
+  .main-yourLibraryX-navLinkContainer {
+    @content;
+  }
+}
+
+// Library Navigation Link Active State
+// Usage: @include library-nav-link-active { … }
+// Use for: Active/selected library navigation link styling
+@mixin library-nav-link-active {
+  .main-yourLibraryX-navLinkActive {
+    @content;
+  }
+}

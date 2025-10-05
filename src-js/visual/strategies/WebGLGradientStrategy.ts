@@ -10,7 +10,7 @@
  */
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type {
@@ -260,7 +260,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
   private utils = Utils;
   private config = ADVANCED_SYSTEM_CONFIG;
   private deviceDetector: DeviceCapabilityDetector;
-  private cssController: OptimizedCSSVariableManager;
+  private cssController: UnifiedCSSVariableManager;
   private oklabProcessor: OKLABColorProcessor;
 
   private webglState: WebGLGradientState = {
@@ -327,14 +327,14 @@ export class WebGLGradientStrategy implements IColorProcessor {
   private prefersReducedMotion = false;
 
   constructor(
-    cssController?: OptimizedCSSVariableManager
+    cssController?: UnifiedCSSVariableManager
   ) {
     this.deviceDetector = new DeviceCapabilityDetector();
-    this.cssController = cssController || getGlobalOptimizedCSSController();
+    this.cssController = cssController || getGlobalUnifiedCSSManager();
     this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
 
     // Get CSS visual effects controller
-    this.cssController = getGlobalOptimizedCSSController();
+    this.cssController = getGlobalUnifiedCSSManager();
 
     // Check for reduced motion preference
     this.prefersReducedMotion = window.matchMedia(
@@ -677,7 +677,7 @@ export class WebGLGradientStrategy implements IColorProcessor {
 
     // Announce WebGL readiness to CSS visual effects system
     try {
-      const cssController = getGlobalOptimizedCSSController();
+      const cssController = getGlobalUnifiedCSSManager();
       cssController.setPerformanceTokens({
         webglReady: true,
         activeBackend: "webgl-strategy",

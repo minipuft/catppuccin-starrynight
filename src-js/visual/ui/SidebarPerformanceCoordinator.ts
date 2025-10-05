@@ -8,9 +8,9 @@
 
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import {
-  OptimizedCSSVariableManager,
-  getGlobalOptimizedCSSController,
-} from "@/core/performance/OptimizedCSSVariableManager";
+  UnifiedCSSVariableManager,
+  getGlobalUnifiedCSSManager,
+} from "@/core/css/UnifiedCSSVariableManager";
 import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { MODERN_SELECTORS } from "@/debug/SpotifyDOMSelectors";
@@ -36,7 +36,7 @@ export class SidebarPerformanceManager {
   private rafId: number | null = null;
   private config: CoordinatorConfig;
   private performanceAnalyzer: SimplePerformanceCoordinator | null = null;
-  private cssController!: OptimizedCSSVariableManager;
+  private cssController!: UnifiedCSSVariableManager;
 
   // Harmonic variable mapping for Year 3000 convergence
   private readonly harmonicVariableMap: Map<string, string> = new Map([
@@ -126,9 +126,9 @@ export class SidebarPerformanceManager {
       return;
     }
 
-    // Delegate non-critical vars to global OptimizedCSSVariableManager for sync flush
+    // Delegate non-critical vars to global UnifiedCSSVariableManager for sync flush
     try {
-      const cssController = getGlobalOptimizedCSSController();
+      const cssController = getGlobalUnifiedCSSManager();
       cssController.queueCSSVariableUpdate(
         property,
         value,

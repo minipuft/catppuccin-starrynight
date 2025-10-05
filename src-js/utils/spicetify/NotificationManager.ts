@@ -5,7 +5,7 @@
 
 // Import theme-specific Spicetify type extensions
 /// <reference path="../../types/spicetify-extensions.d.ts" />
-import { SemanticColorManager } from "./SemanticColorManager";
+import { SpicetifyColorBridge } from "./SpicetifyColorBridge";
 
 // Runtime utilities for safe Spicetify access
 function safeGetSpicetify(): typeof Spicetify | null {
@@ -39,7 +39,7 @@ export interface NotificationOptions {
 
 export class NotificationManager {
   private config: NotificationConfig;
-  private semanticColorManager: SemanticColorManager | null = null;
+  private semanticColorManager: SpicetifyColorBridge | null = null;
   private notificationQueue: Array<{ message: string; options: NotificationOptions }> = [];
   private initialized: boolean = false;
   private spicetifyAvailable: boolean = false;
@@ -74,7 +74,7 @@ export class NotificationManager {
     this.checkSpicetifyAvailability();
   }
 
-  public initialize(semanticColorManager?: SemanticColorManager): void {
+  public initialize(semanticColorManager?: SpicetifyColorBridge): void {
     this.semanticColorManager = semanticColorManager || null;
     this.checkSpicetifyAvailability();
     this.initialized = true;

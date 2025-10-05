@@ -31,11 +31,13 @@ export interface UnifiedEventMap {
 
   "colors:harmonized": {
     processedColors: Record<string, string>;
+    cssVariables?: Record<string, string>; // 🔧 PHASE 2: Complete CSS variable set from pure processor (optional for backward compat)
     accentHex: string;
     accentRgb: string;
     strategies: string[];
     processingTime: number;
     trackUri: string;
+    timestamp?: number; // 🔧 PHASE 2: Event timestamp for tracking (optional for backward compat)
     processingMode?: string;
     coordinationMetrics?: {
       detectedGenre?: string;
@@ -50,6 +52,7 @@ export interface UnifiedEventMap {
     cssVariables: Record<string, string>;
     accentHex: string;
     accentRgb: string;
+    strategies?: string[]; // 🔧 PHASE 2: Optional processing strategies
     appliedAt: number;
   };
 

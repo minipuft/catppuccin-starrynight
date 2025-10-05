@@ -54,3 +54,76 @@
     @content;
   }
 }
+
+// Track List Header - Start Section (# column container)
+// Usage: @include tracklist-header-start-section { … }
+// Use for: Styling the first column header container
+@mixin tracklist-header-start-section {
+  div.main-trackList-trackListHeaderRowSectionStart {
+    @content;
+  }
+}
+
+// Track List Header - Variable Section (Title/Album columns container)
+// Usage: @include tracklist-header-variable-section { … }
+// Use for: Styling variable-width column header containers
+@mixin tracklist-header-variable-section {
+  div.main-tracklist-tracklistHeaderRowSectionVariable {
+    @content;
+  }
+}
+
+// Track List Header - End Section (Duration column container)
+// Usage: @include tracklist-header-end-section { … }
+// Use for: Styling the last column header container
+@mixin tracklist-header-end-section {
+  div.main-tracklist-tracklistHeaderRowSectionEnd {
+    @content;
+  }
+}
+
+// Track List Row - Index Section (Track number display)
+// Usage: @include tracklist-row-index-section { … }
+// Use for: Styling track number/index area within rows
+@mixin tracklist-row-index-section {
+  span.main-trackList-rowSectionIndex,
+  div.main-trackList-rowSectionIndex {
+    @content;
+  }
+}
+
+// Track List Row - Main Content (Title/Artist wrapper)
+// Usage: @include tracklist-row-main-content { … }
+// Use for: Styling the main content area with title and artist
+@mixin tracklist-row-main-content {
+  div.main-trackList-rowMainContent {
+    @content;
+  }
+}
+
+// Track List Row - End Section (Like/Duration/Menu container)
+// Usage: @include tracklist-row-end-section { … }
+// Use for: Styling the end section with actions and duration
+@mixin tracklist-row-end-section {
+  div.main-trackList-rowSectionEnd {
+    @content;
+  }
+}
+
+// Track List Playing Icon (Currently playing indicator)
+// Usage: @include tracklist-playing-icon { … }
+// Use for: Speaker icon shown on currently playing track
+@mixin tracklist-playing-icon {
+  .main-trackList-playingIcon {
+    @content;
+  }
+}
+
+// Track List Row Marker (Track number/index display)
+// Usage: @include tracklist-row-marker { … }
+// Use for: Track number display, play button hover area
+@mixin tracklist-row-marker {
+  .main-trackList-rowMarker {
+    @content;
+  }
+}

@@ -12,7 +12,7 @@
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
@@ -105,7 +105,7 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
   private genreFlowPatterns: GenreFlowPatterns;
   private spectralFlowMapping: SpectralFlowMapping;
 
-  private cssVariableController: OptimizedCSSVariableManager | null;
+  private cssVariableController: UnifiedCSSVariableManager | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
 
   private lastBeatTime = 0;
@@ -131,13 +131,13 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
 
     this.colorHarmonyEngine = null; // Initialize as null, will be set later
     // Initialize CSS Consciousness Controller if available
-    const cssController = OptimizedCSSVariableManager.getGlobalInstance();
+    const cssController = getGlobalUnifiedCSSManager();
     if (cssController) {
       this.cssVariableController = cssController;
     } else {
       Y3KDebug?.debug?.warn(
         "GradientDirectionalFlowSystem",
-        "OptimizedCSSVariableManager not available, CSS integration disabled"
+        "UnifiedCSSVariableManager not available, CSS integration disabled"
       );
       this.cssVariableController = null;
     }

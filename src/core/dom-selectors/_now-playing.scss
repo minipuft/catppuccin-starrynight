@@ -53,3 +53,23 @@
     @content;
   }
 }
+
+// Now Playing Semantic Wrapper (Aside element)
+// Usage: @include now-playing-semantic-wrapper { … }
+// Use for: Main semantic wrapper for now playing bar
+@mixin now-playing-semantic-wrapper {
+  aside[aria-label="Now playing bar"][data-testid="now-playing-bar"],
+  aside[data-testid="now-playing-bar"] {
+    @content;
+  }
+}
+
+// Connect Device Button (Device picker)
+// Usage: @include connect-device-button { … }
+// Use for: Device/speaker connection button styling
+@mixin connect-device-button {
+  button[data-testid="connect-device-picker"],
+  button[aria-label*="Connect to a device"] {
+    @content;
+  }
+}

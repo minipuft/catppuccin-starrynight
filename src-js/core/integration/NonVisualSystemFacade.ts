@@ -50,7 +50,7 @@ import * as Utils from "@/utils/core/ThemeUtilities";
 
 // Performance System imports
 import { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
-import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
 import { TimerConsolidationSystem } from "@/core/performance/TimerConsolidationSystem";
 // PerformanceAwareLerpCoordinator consolidated into EnhancedMasterAnimationCoordinator
 
@@ -64,10 +64,10 @@ import { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { PerformanceAnalyzer } from "@/core/performance/UnifiedPerformanceCoordinator";
 import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
-// CSS systems consolidated into OptimizedCSSVariableManager:
-// - OptimizedCSSVariableManager (batching layer)
-// - OptimizedCSSVariableManager (management layer)
-// - OptimizedCSSVariableManager (performance layer)
+// CSS systems consolidated into UnifiedCSSVariableManager:
+// - UnifiedCSSVariableManager (batching layer)
+// - UnifiedCSSVariableManager (management layer)
+// - UnifiedCSSVariableManager (performance layer)
 
 // Core Services imports
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
@@ -102,8 +102,8 @@ export type NonVisualSystemKey =
   // Performance Systems
   | "EnhancedMasterAnimationCoordinator"
   | "TimerConsolidationSystem"
-  | "OptimizedCSSVariableManager"
-  | "UnifiedCSSVariableManager" // Alias for OptimizedCSSVariableManager
+  | "UnifiedCSSVariableManager"
+  | "OptimizedCSSVariableManager" // Alias for UnifiedCSSVariableManager (Phase 6.1 backward compatibility)
   // PerformanceAwareLerpCoordinator consolidated into EnhancedMasterAnimationCoordinator
   
   // New simplified performance systems (replacing complex monitoring)
@@ -207,7 +207,7 @@ export class NonVisualSystemFacade {
   private year3000System: any; // Reference to main system
 
   // Core shared dependencies (will be injected from main system)
-  private cssVariableManager: OptimizedCSSVariableManager | null =
+  private cssVariableManager: UnifiedCSSVariableManager | null =
     null;
   private musicSyncService: MusicSyncService | null = null;
   // NOTE: settingsManager field removed - using TypedSettingsManager singleton
@@ -339,19 +339,19 @@ export class NonVisualSystemFacade {
     ]);
 
     this.systemRegistry.set(
-      "OptimizedCSSVariableManager",
-      OptimizedCSSVariableManager
+      "UnifiedCSSVariableManager",
+      UnifiedCSSVariableManager
     );
-    this.systemDependencies.set("OptimizedCSSVariableManager", [
+    this.systemDependencies.set("UnifiedCSSVariableManager", [
       "performanceCoordinator",
     ]);
 
-    // Alias registration for backwards compatibility
+    // Alias registration for backwards compatibility (Phase 6.1)
     this.systemRegistry.set(
-      "UnifiedCSSVariableManager",
-      OptimizedCSSVariableManager
+      "OptimizedCSSVariableManager",
+      UnifiedCSSVariableManager
     );
-    this.systemDependencies.set("UnifiedCSSVariableManager", [
+    this.systemDependencies.set("OptimizedCSSVariableManager", [
       "performanceCoordinator",
     ]);
 
@@ -371,8 +371,8 @@ export class NonVisualSystemFacade {
     this.systemRegistry.set("PerformanceAnalyzer", SimplePerformanceCoordinator);
     this.systemDependencies.set("PerformanceAnalyzer", []);
 
-    // CSSVariableBatcher - alias for OptimizedCSSVariableManager (backward compatibility)
-    this.systemRegistry.set("CSSVariableBatcher", OptimizedCSSVariableManager);
+    // CSSVariableBatcher - alias for UnifiedCSSVariableManager (backward compatibility)
+    this.systemRegistry.set("CSSVariableBatcher", UnifiedCSSVariableManager);
     this.systemDependencies.set("CSSVariableBatcher", []);
 
     // SystemHealthMonitor - alias for SimplePerformanceCoordinator (backward compatibility)
@@ -426,10 +426,10 @@ export class NonVisualSystemFacade {
       "deviceCapabilityDetector", // WebGLSystemsIntegration needs DeviceCapabilityDetector, not EnhancedDeviceTierDetector
     ]);
 
-    // CSS systems consolidated into OptimizedCSSVariableManager:
-    // - OptimizedCSSVariableManager → batching layer
-    // - OptimizedCSSVariableManager → management layer
-    // - OptimizedCSSVariableManager → performance layer
+    // CSS systems consolidated into UnifiedCSSVariableManager:
+    // - UnifiedCSSVariableManager → batching layer
+    // - UnifiedCSSVariableManager → management layer
+    // - UnifiedCSSVariableManager → performance layer
 
     // Core Services
     // Note: UnifiedDebugManager is a singleton handled as special case in createNonVisualSystem
@@ -781,7 +781,7 @@ export class NonVisualSystemFacade {
       this.systemCache.set(key, this.cssVariableManager);
       Y3KDebug?.debug?.log(
         "NonVisualSystemFacade",
-        `Using shared OptimizedCSSVariableManager instance from SystemCoordinator (requested as ${key})`
+        `Using shared UnifiedCSSVariableManager instance from SystemCoordinator (requested as ${key})`
       );
       return this.cssVariableManager as T;
     }

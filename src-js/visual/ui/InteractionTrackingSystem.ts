@@ -6,7 +6,7 @@ import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
-import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
 
 // Type definitions - Simplified to only include actually used state
 interface NexusState {
@@ -77,7 +77,7 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
   // Stored throttled interaction handler for proper cleanup.
   private _interactionHandler: ((event: Event) => void) | null = null;
   // CSS coordination system
-  private cssController!: OptimizedCSSVariableManager;
+  private cssController!: UnifiedCSSVariableManager;
 
   constructor(
     config: AdvancedSystemConfig | Year3000Config,
@@ -147,7 +147,7 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     
     // Initialize CSS coordination - use globalThis to access Year3000System
     const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System?.cssController || getGlobalOptimizedCSSController();
+    this.cssController = year3000System?.cssController || getGlobalUnifiedCSSManager();
     
     this.initializeOptimizedQuantumSpace();
     this.setupModalObserver();

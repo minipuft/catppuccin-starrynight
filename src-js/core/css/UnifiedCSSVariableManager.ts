@@ -1969,3 +1969,54 @@ export class UnifiedCSSVariableManager implements IManagedSystem {
     this.initialized = false;
   }
 }
+
+// ===================================================================
+// GLOBAL INSTANCE PATTERN (Phase 6.1 Migration Support)
+// ===================================================================
+
+/**
+ * Global UnifiedCSSVariableManager instance
+ * Set by SystemCoordinator during initialization
+ */
+let globalUnifiedCSSManager: UnifiedCSSVariableManager | null = null;
+
+/**
+ * Set the global UnifiedCSSVariableManager instance
+ * Called by SystemCoordinator during initialization
+ *
+ * @param instance - The UnifiedCSSVariableManager instance to set as global
+ */
+export function setGlobalUnifiedCSSManager(instance: UnifiedCSSVariableManager): void {
+  if (globalUnifiedCSSManager && globalUnifiedCSSManager !== instance) {
+    console.warn(
+      '[UnifiedCSSVariableManager] Replacing existing global instance. ' +
+      'This may indicate multiple SystemCoordinator initializations.'
+    );
+  }
+  globalUnifiedCSSManager = instance;
+}
+
+/**
+ * Get the global UnifiedCSSVariableManager instance
+ *
+ * @returns The global UnifiedCSSVariableManager instance
+ * @throws Error if instance not set by SystemCoordinator
+ */
+export function getGlobalUnifiedCSSManager(): UnifiedCSSVariableManager {
+  if (!globalUnifiedCSSManager) {
+    throw new Error(
+      '[UnifiedCSSVariableManager] Global instance not initialized. ' +
+      'SystemCoordinator must call setGlobalUnifiedCSSManager() during initialization.'
+    );
+  }
+  return globalUnifiedCSSManager;
+}
+
+/**
+ * Get the global UnifiedCSSVariableManager instance safely
+ *
+ * @returns Instance or null if not initialized
+ */
+export function getGlobalUnifiedCSSManagerSafe(): UnifiedCSSVariableManager | null {
+  return globalUnifiedCSSManager;
+}

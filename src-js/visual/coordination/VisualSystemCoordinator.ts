@@ -50,7 +50,7 @@ import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 // CSSAnimationManager consolidated into EnhancedMasterAnimationCoordinator
 import { EnhancedMasterAnimationCoordinator } from "@/core/animation/EnhancedMasterAnimationCoordinator";
-import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
@@ -197,7 +197,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
   private year3000System: any; // Reference to main system
 
   // Injected dependencies
-  private cssVariableController: OptimizedCSSVariableManager;
+  private cssVariableController: UnifiedCSSVariableManager;
   private performanceAnalyzer: SimplePerformanceCoordinator;
   private musicSyncService: MusicSyncService;
   // REMOVED: private settingsManager: SettingsManager; // Migrated to TypedSettingsManager singleton via typed settings
@@ -246,7 +246,7 @@ export class VisualSystemCoordinator implements IManagedSystem {
     config: AdvancedSystemConfig | Year3000Config,
     utils: typeof Utils,
     year3000System: any,
-    cssVariableController: OptimizedCSSVariableManager,
+    cssVariableController: UnifiedCSSVariableManager,
     performanceAnalyzer: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService,
     // NOTE: settingsManager parameter removed - using typed settings directly

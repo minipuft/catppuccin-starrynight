@@ -12,7 +12,7 @@
 // ---------------------------------------------------------------------------
 
 // NOTE: NEBULA_INTENSITY_KEY has been removed in settings rationalization
-import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
 import { settings } from "@/config"; // TypedSettingsManager singleton
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Year3000System } from "@/core/lifecycle/AdvancedThemeSystem";
@@ -52,7 +52,7 @@ function median(values: number[]): number {
 
 export class AudioVisualController {
   // CSS coordination systems
-  private cssController: OptimizedCSSVariableManager;
+  private cssController: UnifiedCSSVariableManager;
   
   // Core systems
   private perf: SimplePerformanceCoordinator | null = null;
@@ -78,13 +78,13 @@ export class AudioVisualController {
 
   constructor(
     y3k: Year3000System | null = null,
-    cssController?: OptimizedCSSVariableManager,
+    cssController?: UnifiedCSSVariableManager,
     perf?: SimplePerformanceCoordinator
   ) {
     this.year3000System = y3k;
 
     // Initialize CSS controller - prefer shared instances from Year3000System
-    this.cssController = cssController ?? y3k?.cssVariableController ?? getGlobalOptimizedCSSController();
+    this.cssController = cssController ?? y3k?.cssVariableController ?? getGlobalUnifiedCSSManager();
 
     this.perf = perf ? perf : y3k?.performanceAnalyzer ?? null;
 

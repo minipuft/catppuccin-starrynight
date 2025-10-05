@@ -10,8 +10,8 @@
 
 import type { FrameContext, IVisualSystem } from "@/core/animation/EnhancedMasterAnimationCoordinator";
 import year3000System from "@/core/lifecycle/AdvancedThemeSystem";
-import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController
-} from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager
+} from "@/core/css/UnifiedCSSVariableManager";
 
 // Default cycle length in pixels before the ratio loops back to 0.
 // Designers can override at runtime via the CSS variable
@@ -28,12 +28,12 @@ export class PrismaticScrollSheenSystem implements IVisualSystem {
   public readonly systemName = "PrismaticScrollSheen";
 
   private _lastRatio = -1;
-  private cssController: OptimizedCSSVariableManager;
+  private cssController: UnifiedCSSVariableManager;
 
   constructor(private cyclePx = DEFAULT_CYCLE_PX) {
     // Initialize CSS coordination - use globalThis to access Year3000System
     const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System?.cssController || getGlobalOptimizedCSSController();
+    this.cssController = year3000System?.cssController || getGlobalUnifiedCSSManager();
 
     // Expose cycle length so SCSS authors can reference it using coordination
     this.cssController.setVariable(

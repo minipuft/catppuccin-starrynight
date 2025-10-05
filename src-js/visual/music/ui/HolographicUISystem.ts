@@ -15,7 +15,7 @@ import { MusicSyncService } from "@/audio/MusicSyncService";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import { settings } from "@/config";
-import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
 // IManagedSystem interface (inline definition for now)
 interface IManagedSystem {
   initialized: boolean;
@@ -127,7 +127,7 @@ export class HolographicUISystem
   // Removed scanlineOverlay, chromaticCanvas and dataStreamCanvas - converted to CSS-only implementations
   private isInitialized = false;
   private isEnabled = true;
-  private cssController!: OptimizedCSSVariableManager;
+  private cssController!: UnifiedCSSVariableManager;
 
   // Holographic effects
   private scanlineEffect: ScanlineEffect;
@@ -335,7 +335,7 @@ export class HolographicUISystem
     try {
       // Initialize CSS coordination - use globalThis to access Year3000System
       const year3000System = (globalThis as any).year3000System;
-      this.cssController = year3000System?.cssController || getGlobalOptimizedCSSController();
+      this.cssController = year3000System?.cssController || getGlobalUnifiedCSSManager();
 
       // Create interface container
       await this.createInterfaceContainer();

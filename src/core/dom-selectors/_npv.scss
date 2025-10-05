@@ -53,3 +53,31 @@
     @content;
   }
 }
+
+// NPV Cover Art Static Element
+// Usage: @include npv-cover-art-static { … }
+// Use for: Static cover art image container
+@mixin npv-cover-art-static {
+  div.main-nowPlayingView-coverArt {
+    @content;
+  }
+}
+
+// NPV Tertiary Buttons
+// Usage: @include npv-tertiary-buttons { … }
+// Use for: Tertiary action buttons in NPV (Share, Add to Queue, etc.)
+@mixin npv-tertiary-buttons {
+  [data-encore-id="buttonTertiary"],
+  button[data-encore-id="buttonTertiary"] {
+    @content;
+  }
+}
+
+// NPV Queue Item
+// Usage: @include npv-queue-item { … }
+// Use for: Individual queue item rows
+@mixin npv-queue-item {
+  li.main-useDropTarget-base {
+    @content;
+  }
+}

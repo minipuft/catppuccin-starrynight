@@ -45,7 +45,7 @@
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { OptimizedCSSVariableManager, setGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, setGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
 import {
   NonVisualSystemFacade,
   NonVisualSystemKey,
@@ -62,7 +62,7 @@ import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { settings } from "@/config";
 import * as Utils from "@/utils/core/ThemeUtilities";
-import { SemanticColorManager } from "@/utils/spicetify/SemanticColorManager";
+import { SpicetifyColorBridge } from "@/utils/spicetify/SpicetifyColorBridge";
 import {
   VisualSystemCoordinator,
   VisualSystemKey,
@@ -175,7 +175,7 @@ export class SystemCoordinator {
   private nonVisualFacade: NonVisualSystemFacade | null = null;
 
   // Shared dependencies (centrally managed)
-  private sharedUnifiedCSSVariableManager: OptimizedCSSVariableManager | null =
+  private sharedUnifiedCSSVariableManager: UnifiedCSSVariableManager | null =
     null;
   // New simplified performance system
   private sharedSimplePerformanceCoordinator: SimplePerformanceCoordinator | null = null;
@@ -188,7 +188,7 @@ export class SystemCoordinator {
   private sharedMusicSyncService: MusicSyncService | null = null;
   // REMOVED: private sharedSettingsManager: SettingsManager | null = null; // Migrated to TypedSettingsManager singleton via typed settings
   private sharedColorHarmonyEngine: ColorHarmonyEngine | null = null;
-  private sharedSemanticColorManager: SemanticColorManager | null = null;
+  private sharedSpicetifyColorBridge: SpicetifyColorBridge | null = null;
 
   // State management
   private isInitialized = false;
@@ -404,47 +404,19 @@ export class SystemCoordinator {
         // SimplePerformanceCoordinator provides necessary interface methods
         const performanceCoordinatorCompat = this.sharedSimplePerformanceCoordinator as any;
         
-        this.sharedUnifiedCSSVariableManager = new OptimizedCSSVariableManager(
+        this.sharedUnifiedCSSVariableManager = new UnifiedCSSVariableManager(
           this.config,
-          performanceCoordinatorCompat,
-          {
-            enableAdaptiveThrottling: true,
-            batchIntervalMs: 16,
-            maxBatchSize: 50,
-            priorityMappings: {
-              critical: [
-                '--sn-rs-glow-alpha', 
-                '--sn-rs-beat-intensity', 
-                '--sn-rs-hue-shift',
-                '--sn-enhanced-base-hex',
-                '--sn-enhanced-accent-hex'
-              ],
-              high: [
-                '--sn-gradient-primary', 
-                '--sn-gradient-secondary', 
-                '--sn-gradient-accent',
-                '--sn-color-base-hex',
-                '--sn-color-accent-hex'
-              ],
-              normal: ['--sn-gradient-', '--sn-rs-', '--sn-color-'],
-              low: ['--sn-debug-', '--sn-dev-', '--sn-meta-']
-            },
-            thresholds: {
-              excellentFPS: 55,
-              goodFPS: 45,
-              poorFPS: 30
-            }
-          }
+          performanceCoordinatorCompat
         );
-        
+
         // Set global instance for systems that need global access
-        setGlobalOptimizedCSSController(this.sharedUnifiedCSSVariableManager);
+        setGlobalUnifiedCSSManager(this.sharedUnifiedCSSVariableManager);
         
         await this.sharedUnifiedCSSVariableManager.initialize();
       } catch (error) {
         Y3KDebug?.debug?.warn(
           "SystemCoordinator",
-          "Failed to initialize OptimizedCSSVariableManager:",
+          "Failed to initialize UnifiedCSSVariableManager:",
           error
         );
         this.sharedUnifiedCSSVariableManager = null;
@@ -456,14 +428,8 @@ export class SystemCoordinator {
       this.sharedMusicSyncService = new MusicSyncService();
       await this.sharedMusicSyncService.initialize();
 
-      // Color harmony engine (depends on music sync)
-      this.sharedColorHarmonyEngine = new ColorHarmonyEngine(
-        this.config,
-        this.utils,
-        this.sharedSimplePerformanceCoordinator as any
-      );
-      // ColorHarmonyEngine doesn't have setMusicSyncService method
-      await this.sharedColorHarmonyEngine.initialize();
+      // NOTE: ColorHarmonyEngine initialization moved to initializeColorHarmonyEngine()
+      // to ensure SpicetifyColorBridge is available for dependency injection
 
       Y3KDebug?.debug?.log(
         "SystemCoordinator",
@@ -604,9 +570,9 @@ export class SystemCoordinator {
         this.sharedColorHarmonyEngine;
     }
 
-    if (this.sharedSemanticColorManager) {
+    if (this.sharedSpicetifyColorBridge) {
       (this.nonVisualFacade as any).semanticColorManager =
-        this.sharedSemanticColorManager;
+        this.sharedSpicetifyColorBridge;
     }
   }
 
@@ -957,14 +923,14 @@ export class SystemCoordinator {
       }
     }
 
-    // Check SemanticColorManager
-    if (this.sharedSemanticColorManager) {
+    // Check SpicetifyColorBridge
+    if (this.sharedSpicetifyColorBridge) {
       try {
         const semanticColorHealth =
-          await this.sharedSemanticColorManager.healthCheck();
+          await this.sharedSpicetifyColorBridge.healthCheck();
         const semanticColorOk = semanticColorHealth.healthy;
 
-        // Add SemanticColorManager to shared resources check
+        // Add SpicetifyColorBridge to shared resources check
         healthCheck.sharedResources.semanticColorManager = {
           ok: semanticColorOk,
           details:
@@ -1109,14 +1075,14 @@ export class SystemCoordinator {
     this.systemDependencies.set("MusicSyncService", []);
     this.systemDependencies.set("ColorHarmonyEngine", [
       "MusicSyncService",
-      "SemanticColorManager",
+      "SpicetifyColorBridge",
     ]);
     this.systemDependencies.set("PerformanceAnalyzer", []);
     this.systemDependencies.set("UnifiedCSSVariableManager", [
       "PerformanceAnalyzer",
     ]);
     // NOTE: SettingsManager removed - using TypedSettingsManager singleton
-    this.systemDependencies.set("SemanticColorManager", [
+    this.systemDependencies.set("SpicetifyColorBridge", [
       "UnifiedCSSVariableManager",
     ]);
 
@@ -1128,7 +1094,7 @@ export class SystemCoordinator {
     this.initializationOrder.set("services", [
       // NOTE: SettingsManager removed - using TypedSettingsManager singleton
       "MusicSyncService",
-      "SemanticColorManager",
+      "SpicetifyColorBridge",
     ]);
     this.initializationOrder.set("visual-systems", ["ColorHarmonyEngine"]);
     this.initializationOrder.set("integration", [
@@ -1259,8 +1225,8 @@ export class SystemCoordinator {
         case "ColorHarmonyEngine":
           await this.initializeColorHarmonyEngine();
           break;
-        case "SemanticColorManager":
-          await this.initializeSemanticColorManager();
+        case "SpicetifyColorBridge":
+          await this.initializeSpicetifyColorBridge();
           break;
         case "VisualSystemCoordinator":
           await this.initializeVisualFacade();
@@ -1372,7 +1338,7 @@ export class SystemCoordinator {
       }, this.sharedSimplePerformanceCoordinator as any);
       // PerformanceBudgetManager doesn't have initialize method
 
-      // Create OptimizedCSSVariableManager first (before SimplePerformanceCoordinator)
+      // Create UnifiedCSSVariableManager first (before SimplePerformanceCoordinator)
       // Create a minimal performance coordinator for CSS controller initialization
       const deviceCapabilities = this.sharedDeviceCapabilityDetector.getCapabilities();
       const minimalPerformanceCoordinator = {
@@ -1396,41 +1362,13 @@ export class SystemCoordinator {
         getThermalState: () => ({ temperature: 'normal' as const })
       };
       
-      this.sharedUnifiedCSSVariableManager = new OptimizedCSSVariableManager(
+      this.sharedUnifiedCSSVariableManager = new UnifiedCSSVariableManager(
         this.config,
-        minimalPerformanceCoordinator as any,
-        {
-          enableAdaptiveThrottling: true,
-          batchIntervalMs: 16,
-          maxBatchSize: 50,
-          priorityMappings: {
-            critical: [
-              '--sn-rs-glow-alpha', 
-              '--sn-rs-beat-intensity', 
-              '--sn-rs-hue-shift',
-              '--sn-enhanced-base-hex',
-              '--sn-enhanced-accent-hex'
-            ],
-            high: [
-              '--sn-gradient-primary', 
-              '--sn-gradient-secondary', 
-              '--sn-gradient-accent',
-              '--sn-color-base-hex',
-              '--sn-color-accent-hex'
-            ],
-            normal: ['--sn-gradient-', '--sn-rs-', '--sn-color-'],
-            low: ['--sn-debug-', '--sn-dev-', '--sn-meta-']
-          },
-          thresholds: {
-            excellentFPS: 55,
-            goodFPS: 45,
-            poorFPS: 30
-          }
-        }
+        minimalPerformanceCoordinator as any
       );
-      
+
       // Set global instance for systems that need global access
-      setGlobalOptimizedCSSController(this.sharedUnifiedCSSVariableManager);
+      setGlobalUnifiedCSSManager(this.sharedUnifiedCSSVariableManager);
       
       await this.sharedUnifiedCSSVariableManager.initialize();
 
@@ -1438,7 +1376,7 @@ export class SystemCoordinator {
     } catch (error) {
       Y3KDebug?.debug?.warn(
         "SystemCoordinator",
-        "Failed to initialize OptimizedCSSVariableManager:",
+        "Failed to initialize UnifiedCSSVariableManager:",
         error
       );
       this.sharedUnifiedCSSVariableManager = null;
@@ -1459,28 +1397,28 @@ export class SystemCoordinator {
     await this.sharedMusicSyncService.initialize();
   }
 
-  private async initializeSemanticColorManager(): Promise<void> {
+  private async initializeSpicetifyColorBridge(): Promise<void> {
     if (!this.sharedUnifiedCSSVariableManager) {
       throw new Error(
-        "OptimizedCSSVariableManager dependency not available"
+        "UnifiedCSSVariableManager dependency not available"
       );
     }
 
-    this.sharedSemanticColorManager = new SemanticColorManager({
+    this.sharedSpicetifyColorBridge = new SpicetifyColorBridge({
       enableDebug: this.config.enableDebug || false,
       fallbackToSpiceColors: true,
       cacheDuration: 5000,
     });
 
-    await this.sharedSemanticColorManager.initialize(
+    await this.sharedSpicetifyColorBridge.initialize(
       this.sharedUnifiedCSSVariableManager
     );
 
     Y3KDebug?.debug?.log(
       "SystemCoordinator",
-      "SemanticColorManager initialized successfully",
+      "SpicetifyColorBridge initialized successfully",
       {
-        systemMetrics: this.sharedSemanticColorManager.getSystemMetrics(),
+        systemMetrics: this.sharedSpicetifyColorBridge.getSystemMetrics(),
       }
     );
   }
@@ -1490,18 +1428,20 @@ export class SystemCoordinator {
       throw new Error("MusicSyncService dependency not available");
     }
 
-    if (!this.sharedSemanticColorManager) {
-      throw new Error("SemanticColorManager dependency not available");
+    if (!this.sharedSpicetifyColorBridge) {
+      throw new Error("SpicetifyColorBridge dependency not available");
     }
 
+    // Pass shared SpicetifyColorBridge instance to ColorHarmonyEngine
     this.sharedColorHarmonyEngine = new ColorHarmonyEngine(
       this.config,
       this.utils,
-      (this.sharedSimplePerformanceCoordinator as any) || undefined
+      (this.sharedSimplePerformanceCoordinator as any) || undefined,
+      this.sharedSpicetifyColorBridge // Dependency injection - single shared instance
       // NOTE: settingsManager parameter removed - using typed settings directly
     );
 
-    // Note: SemanticColorManager integration will be handled through dependency injection
+    // SpicetifyColorBridge now integrated via dependency injection (single instance)
     // in ColorHarmonyEngine's constructor or through the AdvancedSystem bridge
 
     await this.sharedColorHarmonyEngine.initialize();
@@ -1520,8 +1460,8 @@ export class SystemCoordinator {
       this.eventBus // optional
     );
 
-    // Note: SemanticColorManager can be accessed through SystemCoordinator shared dependencies
-    // Visual systems that need it can get it via getSharedSemanticColorManager()
+    // Note: SpicetifyColorBridge can be accessed through SystemCoordinator shared dependencies
+    // Visual systems that need it can get it via getSharedSpicetifyColorBridge()
 
     await this.visualBridge.initialize();
   }
@@ -1535,7 +1475,7 @@ export class SystemCoordinator {
       // NOTE: settingsManager removed - using typed settings directly
       colorHarmonyEngine: this.sharedColorHarmonyEngine,
       performanceOrchestrator: this.sharedSimplePerformanceCoordinator,
-      semanticColorManager: this.sharedSemanticColorManager,
+      semanticColorManager: this.sharedSpicetifyColorBridge,
     });
     await this.nonVisualFacade.initialize();
   }
@@ -1610,9 +1550,9 @@ export class SystemCoordinator {
       this.sharedEnhancedDeviceTierDetector = null;
     }
 
-    if (this.sharedSemanticColorManager) {
-      this.sharedSemanticColorManager.destroy();
-      this.sharedSemanticColorManager = null;
+    if (this.sharedSpicetifyColorBridge) {
+      this.sharedSpicetifyColorBridge.destroy();
+      this.sharedSpicetifyColorBridge = null;
     }
 
     if (this.sharedColorHarmonyEngine) {
@@ -2198,7 +2138,7 @@ export class SystemCoordinator {
       "ColorHarmonyEngine",
       "GradientTransitionOrchestrator",
       "GradientConductor",
-      "SemanticColorManager",
+      "SpicetifyColorBridge",
       // UI Managers with system integration
       "Card3DManager",
       "GlassmorphismManager",
@@ -2232,8 +2172,8 @@ export class SystemCoordinator {
 
   // NOTE: getSharedSettingsManager() removed - use typed settings directly: import { settings } from "@/config"
 
-  public getSharedSemanticColorManager(): SemanticColorManager | undefined {
-    return this.sharedSemanticColorManager || undefined;
+  public getSharedSpicetifyColorBridge(): SpicetifyColorBridge | undefined {
+    return this.sharedSpicetifyColorBridge || undefined;
   }
 
   // New simplified performance system getter methods

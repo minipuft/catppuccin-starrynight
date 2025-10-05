@@ -17,9 +17,9 @@ import {
 } from "@/config/harmonicModes";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import {
-  OptimizedCSSVariableManager,
-  getGlobalOptimizedCSSController,
-} from "@/core/performance/OptimizedCSSVariableManager";
+  UnifiedCSSVariableManager,
+  getGlobalUnifiedCSSManager,
+} from "@/core/css/UnifiedCSSVariableManager";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import * as Utils from "@/utils/core/ThemeUtilities";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
@@ -85,7 +85,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
   private transitionElapsedTime: number = 0;
 
   // CSS coordination system
-  private cssController!: OptimizedCSSVariableManager;
+  private cssController!: UnifiedCSSVariableManager;
 
   constructor(
     config = ADVANCED_SYSTEM_CONFIG,
@@ -104,7 +104,7 @@ export class DynamicCatppuccinBridge extends BaseVisualSystem {
       const year3000System = (globalThis as any).year3000System;
       this.cssController =
         year3000System?.cssController ||
-        getGlobalOptimizedCSSController();
+        getGlobalUnifiedCSSManager();
 
       // Always setup event listeners and settings monitoring
       this.setupColorExtractionListeners();

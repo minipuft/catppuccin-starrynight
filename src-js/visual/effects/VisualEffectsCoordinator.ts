@@ -29,8 +29,7 @@ import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { EmotionalGradientMapper } from "@/audio/EmotionalGradientMapper";
 import { GradientDirectionalFlowSystem } from "@/audio/GradientDirectionalFlowSystem";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
-import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
 import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { GradientPerformanceOptimizer } from "@/core/performance/GradientPerformanceOptimizer";
@@ -466,7 +465,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   // Core dependencies
   private config: AdvancedSystemConfig | Year3000Config;
   private eventBus: typeof unifiedEventBus;
-  private cssController: OptimizedCSSVariableManager | null = null;
+  private cssController: UnifiedCSSVariableManager | null = null;
   private performanceCoordinator: PerformanceAnalyzer | null = null;
   private musicSyncService: MusicSyncService | null = null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
@@ -555,7 +554,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
 
   constructor(
     config: AdvancedSystemConfig | Year3000Config,
-    cssController?: OptimizedCSSVariableManager,
+    cssController?: UnifiedCSSVariableManager,
     performanceCoordinator?: PerformanceAnalyzer,
     musicSyncService?: MusicSyncService,
     colorHarmonyEngine?: ColorHarmonyEngine
@@ -593,7 +592,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
    */
   public static getInstance(
     config?: Year3000Config,
-    cssController?: OptimizedCSSVariableManager,
+    cssController?: UnifiedCSSVariableManager,
     performanceCoordinator?: PerformanceAnalyzer,
     musicSyncService?: MusicSyncService,
     colorHarmonyEngine?: ColorHarmonyEngine

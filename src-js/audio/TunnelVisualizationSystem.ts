@@ -12,7 +12,7 @@
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { OptimizedCSSVariableManager } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
@@ -84,7 +84,7 @@ interface MusicAnalysisData {
 export class TunnelVisualizationSystem extends BaseVisualSystem {
   private tunnelSettings: TunnelVisualizationSettings;
   private currentLightingState: CorridorLightingState;
-  private cssController: OptimizedCSSVariableManager | null;
+  private cssController: UnifiedCSSVariableManager | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
 
   private lastBeatTime = 0;
@@ -108,13 +108,13 @@ export class TunnelVisualizationSystem extends BaseVisualSystem {
     super(config, utils, performanceMonitor, musicSyncService);
 
     // Initialize CSS Consciousness Controller
-    const cssController = OptimizedCSSVariableManager.getGlobalInstance();
+    const cssController = getGlobalUnifiedCSSManager();
     if (cssController) {
       this.cssController = cssController;
     } else {
       Y3KDebug?.debug?.warn(
         "TunnelVisualizationSystem",
-        "OptimizedCSSVariableManager not available"
+        "UnifiedCSSVariableManager not available"
       );
       this.cssController = null;
     }

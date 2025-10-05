@@ -108,7 +108,7 @@ export class AdvancedThemeSystem {
   public get cssVariableController() {
     return (
       this.facadeCoordinator?.getCachedNonVisualSystem(
-        "OptimizedCSSVariableManager"
+        "UnifiedCSSVariableManager"
       ) || null
     );
   }
@@ -1265,23 +1265,20 @@ export class AdvancedThemeSystem {
     };
 
     try {
-      // Test 1: Validate CSS Controller Alias Registration (Phase 1 fix)
+      // Test 1: Validate CSS Controller Registration
       if (this.facadeCoordinator) {
         try {
           const cssController = await this.facadeCoordinator.getNonVisualSystem(
             "UnifiedCSSVariableManager" as any
           );
-          const optimizedController = await this.facadeCoordinator.getNonVisualSystem(
-            "OptimizedCSSVariableManager" as any
-          );
-          
-          if (cssController && optimizedController) {
+
+          if (cssController) {
             validationResults.cssControllerAlias = true;
             if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-              console.log("✓ [Validation] CSS Controller alias registration working");
+              console.log("✓ [Validation] CSS Controller registration working");
             }
           } else {
-            validationResults.errors.push("CSS Controller alias registration failed");
+            validationResults.errors.push("CSS Controller registration failed");
           }
         } catch (error) {
           validationResults.errors.push(`CSS Controller validation error: ${error}`);

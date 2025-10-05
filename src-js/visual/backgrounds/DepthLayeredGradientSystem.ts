@@ -14,7 +14,7 @@ import { EmotionalGradientMapper } from "@/audio/EmotionalGradientMapper";
 import { GenreProfileManager } from "@/audio/GenreProfileManager";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
 import { unifiedEventBus, type EventData } from "@/core/events/UnifiedEventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
@@ -100,7 +100,7 @@ export class DepthLayeredGradientSystem
   private depthSettings: DepthSettings;
   private depthLayers: Map<string, DepthLayer>;
   private visualEffectsLayers: Map<string, HTMLDivElement>;
-  private cssVariableController: OptimizedCSSVariableManager | null;
+  private cssVariableController: UnifiedCSSVariableManager | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
   private emotionalGradientMapper: EmotionalGradientMapper | null = null;
   private genreProfileManager: GenreProfileManager | null = null;
@@ -267,7 +267,7 @@ export class DepthLayeredGradientSystem
    * Called by VisualSystemFacade during system initialization
    */
   public setOptimizedCSSVariableManager(
-    cssController: OptimizedCSSVariableManager
+    cssController: UnifiedCSSVariableManager
   ): void {
     this.cssVariableController = cssController;
     

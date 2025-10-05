@@ -12,7 +12,7 @@
  */
 
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
 import { Y3KDebug } from "@/debug/UnifiedDebugManager";
 // NOTE: SettingsManager import removed - was dead code, never used
 import {
@@ -82,7 +82,7 @@ export interface EmotionalGradientState {
 }
 
 export class EmotionalGradientMapper {
-  private cssController!: OptimizedCSSVariableManager;
+  private cssController!: UnifiedCSSVariableManager;
   private musicSyncService: MusicSyncService | null = null;
   // NOTE: settingsManager field removed - was dead code, never used
 
@@ -249,11 +249,11 @@ export class EmotionalGradientMapper {
     };
 
   constructor(
-    cssController?: OptimizedCSSVariableManager,
+    cssController?: UnifiedCSSVariableManager,
     musicSyncService: MusicSyncService | null = null
     // NOTE: settingsManager parameter removed - was dead code, never used
   ) {
-    this.cssController = cssController || getGlobalOptimizedCSSController();
+    this.cssController = cssController || getGlobalUnifiedCSSManager();
     this.musicSyncService = musicSyncService;
     // NOTE: settingsManager assignment removed - was dead code, never used
 

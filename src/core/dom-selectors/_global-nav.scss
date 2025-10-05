@@ -40,3 +40,39 @@
     @content;
   }
 }
+
+// Skip Link (Accessibility navigation skip)
+// Usage: @include skip-link { … }
+// Use for: Accessibility skip to content link (hidden until focused)
+@mixin skip-link {
+  a[data-encore-id="skipLink"] {
+    @content;
+  }
+}
+
+// Navigation Links Scrollable Container
+// Usage: @include nav-links-scrollable-container { … }
+// Use for: Custom navigation links container with overflow scrolling
+@mixin nav-links-scrollable-container {
+  div.custom-navlinks-scrollable_container {
+    @content;
+  }
+}
+
+// Global Search Form
+// Usage: @include global-search-form { … }
+// Use for: Search form element styling, submit handlers
+@mixin global-search-form {
+  form[role="search"] {
+    @content;
+  }
+}
+
+// Clear Search Button
+// Usage: @include clear-search-button { … }
+// Use for: Clear search field button styling
+@mixin clear-search-button {
+  button[aria-label="Clear search field"] {
+    @content;
+  }
+}

@@ -10,7 +10,7 @@
  */
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type {
   PerformanceMetrics,
@@ -78,7 +78,7 @@ export class IridescentShimmerEffectsSystem
 {
   private shimmerSettings: ShimmerSettings;
   private shimmerElements: Map<Element, ShimmerElement>;
-  private cssController: OptimizedCSSVariableManager;
+  private cssController: UnifiedCSSVariableManager;
   private intersectionObserver: IntersectionObserver | null = null;
   private animationFrameId: number | null = null;
   private lastAnimationTime = 0;
@@ -128,11 +128,11 @@ export class IridescentShimmerEffectsSystem
     this.shimmerElements = new Map();
     // Initialize CSS Controller - get from Year3000System or global instance
     try {
-      this.cssController = getGlobalOptimizedCSSController();
+      this.cssController = getGlobalUnifiedCSSManager();
     } catch (error) {
       Y3KDebug?.debug?.warn(
         "IridescentShimmerEffectsSystem",
-        "OptimizedCSSVariableManager not available:",
+        "UnifiedCSSVariableManager not available:",
         error
       );
       throw error;

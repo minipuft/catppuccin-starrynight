@@ -1,7 +1,7 @@
 import { ADVANCED_SYSTEM_CONFIG as Config } from "@/config/globalConfig";
 import { GLASS_LEVEL_KEY } from "@/config/settingKeys";
 // NOTE: GLASS_LEVEL_OLD_KEY has been removed in settings rationalization
-import { OptimizedCSSVariableManager, getGlobalOptimizedCSSController } from "@/core/performance/OptimizedCSSVariableManager";
+import { UnifiedCSSVariableManager, getGlobalUnifiedCSSManager } from "@/core/css/UnifiedCSSVariableManager";
 import { SimplePerformanceCoordinator, QualityCapability, QualityLevel, QualityScalingCapable, PerformanceMetrics } from "@/core/performance/SimplePerformanceCoordinator";
 import type { HealthCheckResult } from "@/types/systems";
 import { settings } from "@/config";
@@ -41,8 +41,8 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   private static instance: GlassmorphismManager;
   private config: typeof Config;
   private utils: typeof Utils;
-  private cssBatcher: OptimizedCSSVariableManager | null = null;
-  private cssController!: OptimizedCSSVariableManager;
+  private cssBatcher: UnifiedCSSVariableManager | null = null;
+  private cssController!: UnifiedCSSVariableManager;
   private performanceAnalyzer: SimplePerformanceCoordinator | null = null;
   private isSupported: boolean;
   private currentIntensity: GlassIntensity;
@@ -65,7 +65,7 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   constructor(
     config: typeof Config = Config,
     utils: typeof Utils = Utils,
-    cssBatcher: OptimizedCSSVariableManager | null = null,
+    cssBatcher: UnifiedCSSVariableManager | null = null,
     performanceAnalyzer: SimplePerformanceCoordinator | null = null,
     viewportOptions: ViewportSystemOptions = {}
   ) {
@@ -116,7 +116,7 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   protected async initializeSystem(): Promise<void> {
     // Initialize CSS coordination - use globalThis to access Year3000System
     const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System?.cssController || getGlobalOptimizedCSSController();
+    this.cssController = year3000System?.cssController || getGlobalUnifiedCSSManager();
 
     const initialIntensity = settings.get("sn-glassmorphism-level");
     this.applyGlassmorphismSettings(initialIntensity);

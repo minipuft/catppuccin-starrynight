@@ -436,8 +436,14 @@
   @extend .sn-gpu-accelerated !optional;
 }
 
-.main-trackList-trackListRow,
-.main-actionBar-ActionBarRow,
-.main-nowPlayingBar-nowPlayingBar {
+@include tracklist-row {
+  @extend .sn-gpu-accelerated !optional;
+}
+
+@include action-bar-row {
+  @extend .sn-gpu-accelerated !optional;
+}
+
+@include now-playing-bar-root {
   @extend .sn-gpu-accelerated !optional;
 }
