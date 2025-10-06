@@ -56,7 +56,6 @@ CSSVariableWriter.getInstance().setVariables("visual-effects", {
 - Music-driven values come from `MusicSyncService`, color harmonization from `ColorHarmonyEngine` (documented in `docs/COLOR_AND_AUDIO.md`).
 
 ## Migration Guidance
-- Legacy aliases (`--sn-accent-rgb`, etc.) remain until v4.0.0; prefer modern tokens now.
 - When touching legacy code, update to the new prefix and document the change in the PR.
 - Reference mapping lives in `docs/legacy/tokens/LEGACY_TOKEN_MIGRATION.md` for historical context.
 

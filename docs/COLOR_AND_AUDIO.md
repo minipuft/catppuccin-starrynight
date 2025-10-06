@@ -41,7 +41,6 @@ Authoritative reference for music-driven color processing in the live codebase. 
 
 ## Verification Notes (2025-10-06)
 - Reviewed `src-js/audio/MusicSyncService.ts`, `src-js/audio/ColorHarmonyEngine.ts`, `src-js/utils/color/OKLABColorProcessor.ts`, `src-js/utils/color/EmotionalTemperatureMapper.ts`, and `src-js/utils/spicetify/SpicetifyColorBridge.ts`.
-- Legacy guides referenced for salvage: `docs/legacy/AUDIO_INTEGRATION_GUIDE.md`, existing OKLAB guides.
 
 ## Pending Work
 - Document genre profile behavior (`GenreProfileManager`).
