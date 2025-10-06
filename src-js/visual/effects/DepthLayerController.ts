@@ -13,7 +13,7 @@ import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVar
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { HealthCheckResult } from "@/types/systems";
 import * as Utils from "@/utils/core/ThemeUtilities";
-import { BaseVisualSystem } from "../base/BaseVisualSystem";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 
 interface ContentArea {
   element: Element;
@@ -60,7 +60,13 @@ interface UserInteractionState {
   contentEngagement: number; // 0-1 estimated content engagement level
 }
 
-export class DepthVisualEffectsController extends BaseVisualSystem {
+/**
+ * DepthVisualEffectsController - Content-aware visual effects system
+ *
+ * Migrated to ServiceVisualSystemBase for composition-based architecture.
+ * Uses service injection pattern for better testability and maintainability.
+ */
+export class DepthVisualEffectsController extends ServiceVisualSystemBase {
   private cssController!: CSSVariableWriter;
   private contentAreas: Map<Element, ContentArea> = new Map();
   private chromeAreas: Set<Element> = new Set();
@@ -119,9 +125,7 @@ export class DepthVisualEffectsController extends BaseVisualSystem {
     super(config, utils, performanceMonitor, musicSyncService);
   }
 
-  public override async _performSystemSpecificInitialization(): Promise<void> {
-    await super._performSystemSpecificInitialization();
-
+  protected override async performVisualSystemInitialization(): Promise<void> {
     try {
       // Initialize CSS coordination first - use globalThis to access Year3000System
       const year3000System = (globalThis as any).year3000System;
@@ -1042,12 +1046,23 @@ export class DepthVisualEffectsController extends BaseVisualSystem {
     };
   }
 
-  public override async healthCheck(): Promise<HealthCheckResult> {
+  public updateAnimation(deltaTime: number): void {
+    // No animation frame updates needed - this system uses interval-based updates
+    // via startVisualEffectsUpdate() which runs on its own timer
+  }
+
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
     const metrics = this.getVisualEffectsMetrics();
     const isHealthy = metrics.contentAreas > 0 && metrics.chromeAreas > 0;
 
     return {
       healthy: isHealthy,
+      details: `DepthVisualEffectsController: ${metrics.contentAreas} content areas, ${metrics.chromeAreas} chrome areas`,
       issues: isHealthy
         ? []
         : ["VisualEffects system not properly initialized"],
@@ -1056,12 +1071,12 @@ export class DepthVisualEffectsController extends BaseVisualSystem {
         protectedAreas: metrics.contentAreas,
         enhancedAreas: metrics.chromeAreas,
         musicalEnergy: metrics.musicalEnergy,
+        initialized: this.initialized,
       },
     };
   }
 
-  public override _performSystemSpecificCleanup(): void {
-    super._performSystemSpecificCleanup();
+  protected override performVisualSystemCleanup(): void {
 
     // Clear timers
     clearTimeout(this.readingModeTimer);

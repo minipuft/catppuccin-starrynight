@@ -21,7 +21,7 @@ import type {
 import type { HealthCheckResult } from "@/types/systems";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import { BaseVisualSystem } from "../base/BaseVisualSystem";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 
 interface ShimmerElement {
   element: HTMLElement;
@@ -71,9 +71,12 @@ interface ShimmerKeyframes {
  * - Implements viewport-based optimization
  * - Provides configurable intensity levels
  * - Supports accessibility preferences
+ *
+ * Migrated to ServiceVisualSystemBase for composition-based architecture.
+ * Uses service injection pattern for better testability and maintainability.
  */
 export class IridescentShimmerEffectsSystem
-  extends BaseVisualSystem
+  extends ServiceVisualSystemBase
   implements QualityScalingCapable
 {
   private shimmerSettings: ShimmerSettings;
@@ -277,9 +280,7 @@ export class IridescentShimmerEffectsSystem
       });
   }
 
-  public override async _performSystemSpecificInitialization(): Promise<void> {
-    await super._performSystemSpecificInitialization();
-
+  protected override async performVisualSystemInitialization(): Promise<void> {
     // CSS controller is already initialized in constructor
     // No additional coordination setup needed
 
@@ -622,16 +623,21 @@ export class IridescentShimmerEffectsSystem
     });
   }
 
-  public override updateAnimation(deltaTime: number): void {
+  public updateAnimation(deltaTime: number): void {
     // No update needed - animations are handled by CSS only
   }
 
-  public override async healthCheck(): Promise<HealthCheckResult> {
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
     const isHealthy = this.shimmerSettings.enabled && this.shimmerElements.size > 0;
-    
+
     return {
-      system: 'IridescentShimmerEffectsSystem',
       healthy: isHealthy,
+      details: `IridescentShimmerEffectsSystem health check - ${isHealthy ? 'operational' : 'issues detected'}`,
       metrics: {
         enabled: this.shimmerSettings.enabled,
         elementCount: this.shimmerElements.size,
@@ -645,9 +651,7 @@ export class IridescentShimmerEffectsSystem
     };
   }
 
-  public override _performSystemSpecificCleanup(): void {
-    super._performSystemSpecificCleanup();
-
+  protected override performVisualSystemCleanup(): void {
     // No animation loop cleanup needed - using CSS-only animations
 
     // Clean up intersection observer

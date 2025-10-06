@@ -34,7 +34,7 @@ import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
 import { settings } from "@/config";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
-import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 import { VisualEffectsCoordinator as BackgroundAnimationCoordinator, type VisualEffectState } from "@/visual/effects/VisualEffectsCoordinator";
 
 // ===================================================================
@@ -201,8 +201,14 @@ export interface UIEffectsConfig {
   debugMode: boolean;
 }
 
+/**
+ * UIEffectsController - Consolidated UI effects system
+ *
+ * Migrated to ServiceVisualSystemBase for composition-based architecture.
+ * Uses service injection pattern for better testability and maintainability.
+ */
 export class UIEffectsController
-  extends BaseVisualSystem
+  extends ServiceVisualSystemBase
   implements BackgroundSystemParticipant
 {
   // BackgroundSystemParticipant implementation
@@ -376,8 +382,8 @@ export class UIEffectsController
     };
   }
 
-  // BaseVisualSystem implementation
-  public override async initialize(): Promise<void> {
+  // ServiceVisualSystemBase implementation
+  protected override async performVisualSystemInitialization(): Promise<void> {
     try {
       Y3KDebug?.debug?.log(
         "UIVisualEffectsController",
@@ -420,8 +426,6 @@ export class UIEffectsController
 
       // ✅ RAF LOOP CONSOLIDATION: Animation loop now managed by coordinator
       // updateAnimation(deltaTime) will be called automatically
-
-      this.initialized = true;
 
       Y3KDebug?.debug?.log(
         "UIVisualEffectsController",
@@ -778,7 +782,7 @@ export class UIEffectsController
    * ✅ RAF LOOP CONSOLIDATION: Animation update method called by coordinator
    * Consolidates all UI effects updates in single coordinated frame
    */
-  public override updateAnimation(deltaTime: number): void {
+  public updateAnimation(deltaTime: number): void {
     if (!this.initialized) return;
 
     const currentTime = performance.now();
@@ -1331,7 +1335,12 @@ export class UIEffectsController
   }
 
   // Health check implementation
-  public override async healthCheck(): Promise<HealthCheckResult> {
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
     const state = this.activityState;
     const isHealthy =
       this.initialized &&
@@ -1340,14 +1349,22 @@ export class UIEffectsController
 
     return {
       healthy: isHealthy,
-      ok: isHealthy,
       details:
         `UI Effects Activity: ${state.activityLevel}, ` +
         `Shimmer: ${state.shimmer.activeElements.size} elements, ` +
         `Interaction: ${state.interaction.nexusState}, ` +
         `Performance: ${state.performance.healthStatus}, ` +
         `Diagnostics: ${state.diagnostic.criticalIssuesDetected} issues`,
-      system: "UIVisualEffectsController",
+      metrics: {
+        activityLevel: state.activityLevel,
+        shimmerElements: state.shimmer.activeElements.size,
+        nexusState: state.interaction.nexusState,
+        healthStatus: state.performance.healthStatus,
+        initialized: this.initialized,
+      },
+      issues: state.diagnostic.criticalIssuesDetected > 0
+        ? [`${state.diagnostic.criticalIssuesDetected} critical issues detected`]
+        : [],
     };
   }
 
@@ -1533,7 +1550,7 @@ export class UIEffectsController
     return this.activityState.diagnostic;
   }
 
-  public override async destroy(): Promise<void> {
+  protected override performVisualSystemCleanup(): void {
     Y3KDebug?.debug?.log(
       "UIVisualEffectsController",
       "Destroying unified UI effects controller..."

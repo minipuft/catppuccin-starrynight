@@ -6,7 +6,7 @@ import { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordi
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { sample as sampleNoise } from "@/utils/graphics/NoiseField";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
-import { BaseVisualSystem } from "../base/BaseVisualSystem";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 
 // Type definitions
 interface PerformanceMetrics {
@@ -89,10 +89,21 @@ interface UserInteractionState {
   }>;
 }
 
-export class SidebarVisualEffectsSystem extends BaseVisualSystem {
-  // TODO: Implement abstract onAnimate method for Year 3000 MasterAnimationCoordinator
-  public override onAnimate(deltaMs: number): void {
-    // Basic implementation - can be enhanced in future phases
+/**
+ * SidebarVisualEffectsSystem - Sidebar visual effects and interactions
+ *
+ * Migrated to ServiceVisualSystemBase for composition-based architecture.
+ * Uses service injection pattern for better testability and maintainability.
+ */
+export class SidebarVisualEffectsSystem extends ServiceVisualSystemBase {
+  /**
+   * Animation frame callback for MasterAnimationCoordinator
+   */
+  public onAnimate(deltaMs: number): void {
+    // Delegate to updateAnimation for animation logic
+    if (this.initialized) {
+      this.updateAnimation(deltaMs);
+    }
   }
   private year3000System: ThemeLifecycleCoordinator | null;
   private masterAnimationRegistered: boolean;
@@ -245,8 +256,10 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
-  public override async initialize() {
-    await super.initialize();
+  /**
+   * ServiceVisualSystemBase lifecycle method - performs system-specific initialization
+   */
+  protected override async performVisualSystemInitialization(): Promise<void> {
     this.rootNavBar = document.querySelector(".Root__nav-bar");
     if (!this.rootNavBar) {
       this.initialized = false;
@@ -511,18 +524,16 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
     applyCss("--sidebar-intensity", `${visualIntensity}`);
   }
 
-  public override updateFromMusicAnalysis(
+  public updateFromMusicAnalysis(
     processedMusicData: any,
     rawFeatures?: any,
     trackUri?: string | null
   ): void {
     if (!this.initialized) return;
-    super.updateFromMusicAnalysis(processedMusicData);
     this._updateSidebarVariables(processedMusicData);
   }
 
-  public override updateModeConfiguration(modeConfig: any) {
-    super.updateModeConfiguration(modeConfig);
+  public updateModeConfiguration(modeConfig: any) {
     this.currentHarmonicModeKey = modeConfig.activeMode || "artist-vision";
     this.updateVisualEffectsForMode();
     this.updateHarmonicModeDisplay(this.currentHarmonicModeKey);
@@ -535,7 +546,10 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
     }
   }
 
-  public override destroy() {
+  /**
+   * ServiceVisualSystemBase lifecycle method - performs system-specific cleanup
+   */
+  protected override performVisualSystemCleanup(): void {
     // ✅ RAF LOOP CONSOLIDATION: No need to cancel animation frame - coordinator handles this
 
     // Clean up all pending echo timers
@@ -546,7 +560,7 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
         );
       }
     }
-    
+
     // Clean up nav interaction listener
     if (this.rootNavBar && this._navInteractionHandler) {
       this.rootNavBar.removeEventListener(
@@ -586,7 +600,51 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
         }
       });
     }
-    super.destroy();
+  }
+
+  /**
+   * ServiceSystemBase required method - performs system health check
+   */
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
+    const issues: string[] = [];
+
+    // Check if required DOM elements are available
+    if (!this.rootNavBar) {
+      issues.push("Root navigation bar not found");
+    }
+
+    // Check if animation is registered
+    if (!this.masterAnimationRegistered) {
+      issues.push("Animation not registered with coordinator");
+    }
+
+    // Check performance metrics
+    if (this.performanceMetrics.maxFrameTime > 33) { // > 30fps threshold
+      issues.push(`High frame time detected: ${this.performanceMetrics.maxFrameTime.toFixed(2)}ms`);
+    }
+
+    return {
+      healthy: issues.length === 0,
+      details: `SidebarVisualEffectsSystem health check - ${issues.length} issues found`,
+      issues,
+      metrics: {
+        animationRegistered: this.masterAnimationRegistered,
+        performanceLevel: this.deviceCapabilities.performanceLevel,
+        reducedMotion: this.deviceCapabilities.reducedMotion,
+        animationFrames: this.performanceMetrics.animationFrames,
+        maxFrameTime: this.performanceMetrics.maxFrameTime,
+        averageFrameTime: this.performanceMetrics.averageFrameTime,
+        cssVariableUpdates: this.performanceMetrics.cssVariableUpdates,
+        elementUpdates: this.performanceMetrics.elementUpdates,
+        activeEffects: this.activeEffects.length,
+        echoCount: this.currentEchoCount,
+      }
+    };
   }
 
   // -------------------------------------------------------------------------
@@ -698,16 +756,14 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
   // 🏎️  Performance-Aware Animation Gate
   // ---------------------------------------------------------------------
   /**
-   * Overrides the base implementation so we can toggle a lightweight
-   * CSS class (`sn-motion-disabled`) on the sidebar element whenever the
+   * Applies performance settings to the sidebar visual effects system.
+   * Toggles a lightweight CSS class (`sn-motion-disabled`) on the sidebar element whenever the
    * active PerformanceProfile suggests a "low" tier or when reduced motion
-   * should be respected.  This allows the SCSS layer to instantly pause
+   * should be respected. This allows the SCSS layer to instantly pause
    * expensive keyframes (vibrations, pulses, hue-shifts) without touching
    * inline styles.
    */
-  public override applyPerformanceSettings(profile: PerformanceProfile): void {
-    // Preserve existing behaviour (store on `currentPerformanceProfile` etc.)
-    super.applyPerformanceSettings(profile as any);
+  public applyPerformanceSettings(profile: PerformanceProfile): void {
 
     const lowPerf =
       !profile.enableGPUAcceleration || profile.animationThrottle >= 24;
