@@ -7,6 +7,11 @@ _Last updated: 2025-10-06 09:28 UTC_
 - Remove or archive irrelevant materials before rewriting core references.
 - Track cleanup progress transparently for future contributors.
 
+## Verification Principles
+- Treat every existing rule or document claim as suspect until confirmed against current code and build outputs.
+- Update or discard any instruction that references modules, pipelines, or behaviors no longer present in `src-js/`, `src/`, or the install scripts.
+- Record verification steps when promoting guidance into the consolidated docs so contributors know the source of truth.
+
 ## Quick Removal Candidates (pending confirmation)
 These files reference code paths that no longer exist and offer little reusable content. Removing or archiving them would immediately reduce noise:
 
@@ -38,6 +43,26 @@ These documents still hold relevant knowledge but overlap heavily. Merge or rest
 | Styling & Token Governance | `docs/CSS_OPTIMIZATION_GUIDE.md`, `docs/CSS_OPTIMIZATION_SUMMARY.md`, `docs/token-governance.md`, `docs/token-system-architecture.md`, `docs/token-usage-guide.md`, `docs/LEGACY_TOKEN_MIGRATION.md` | Produce a single styling playbook that explains token governance, SCSS layout, and modern optimization steps while retiring duplicate summaries. |
 | Developer Onboarding & Standards | `docs/CONTRIBUTING_GUIDE.md`, `docs/DEVELOPER_MIGRATION_GUIDE.md`, `docs/development/PROJECT_RULES.md`, `docs/development/DIRECTORY_STRUCTURE.md` | Replace the metaphoric onboarding material with a streamlined contributor guide that references the new `AGENTS` stack and current repo layout. |
 | Settings & Configuration | `docs/SETTINGS_MIGRATION_GUIDE.md`, `docs/DEPENDENCY_ANALYSIS.md`, `docs/MASTER_ARCHITECTURE_OVERVIEW.md` (retain salvaged settings sections) | Consolidate user settings, dependency switches, and configuration contracts into a current settings/configuration reference. |
+
+## Target End State
+When consolidation is complete, the rules and documentation should look like this structured stack:
+
+### Global Rules Layer
+- `AGENTS.md` - Quick start, safe coding defaults, and links into deeper layers.
+- `AGENTS.domain.md` - Verified architecture constraints, technology policies, and module responsibilities referenced directly from the current code.
+- `AGENTS.local.md` - Environment, build, and Spicetify deployment notes, kept in sync with install scripts and generated artifacts.
+
+### Core Documentation
+- `docs/ARCHITECTURE.md` (new) - Single source for lifecycle, visual coordination, module boundaries, and settings integrations.
+- `docs/BUILD_AND_DEPLOY.md` (new) - Build pipeline, CI/CD flow, troubleshooting, and release packaging.
+- `docs/COLOR_AND_AUDIO.md` (new) - OKLAB pipeline, color harmony, audio integration, and tuning parameters.
+- `docs/STYLING_AND_TOKENS.md` (new) - SCSS layout, token governance, optimization practices, and migration history.
+- `docs/CONTRIBUTING.md` (rewrite) - Modern onboarding that references the `AGENTS` guides, directory map, and coding standards.
+- `docs/SETTINGS_AND_CONFIG.md` (new) - User-facing settings, config files, dependency switches, and debugging aids.
+
+### Supporting References
+- Keep focused sub-guides only when they add depth (e.g., `docs/spotify/` for platform quirks) and ensure each references the corresponding source files.
+- Archive or delete superseded docs so the `/docs` directory mirrors the active architecture.
 
 ## Next Actions
 1. Confirm with maintainers whether to delete or archive the quick-removal candidates listed above.

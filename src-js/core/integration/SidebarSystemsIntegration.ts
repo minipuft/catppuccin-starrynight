@@ -1,4 +1,4 @@
-import { ServiceSystemBase } from '@/core/services/ServiceCompositionBase';
+import { ServiceSystemBase } from '@/core/services/SystemServiceBridge';
 import { SidebarVisualEffectsSystem } from '@/visual/ui/SidebarVisualEffectsSystem';
 // Consolidated sidebar systems:
 // - SidebarInteractiveFlowSystem merged into SidebarVisualEffectsSystem

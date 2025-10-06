@@ -5,7 +5,7 @@ import { ThemeLifecycleCoordinator, Year3000System } from "@/core/lifecycle/Them
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
-import { BaseVisualSystem } from "../base/BaseVisualSystem";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 
 // Type definitions - Simplified to only include actually used state
@@ -39,8 +39,13 @@ interface SystemIntegrationMetrics {
   navigationScaleUpdates: number;
 }
 
-// YEAR 3000 INTERACTION TRACKING SYSTEM - Performance Optimized
-export class InteractionTrackingSystem extends BaseVisualSystem {
+/**
+ * YEAR 3000 INTERACTION TRACKING SYSTEM - Performance Optimized
+ *
+ * Migrated to ServiceVisualSystemBase for composition-based architecture.
+ * Uses service injection pattern for better testability and maintainability.
+ */
+export class InteractionTrackingSystem extends ServiceVisualSystemBase {
   /**
    * Frame callback invoked by the MasterAnimationCoordinator.
    * Delegates to the existing `updateAnimation` implementation which
@@ -49,7 +54,7 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
    *
    * @param deltaMs  Milliseconds elapsed since the previous animation frame.
    */
-  public override onAnimate(deltaMs: number): void {
+  public onAnimate(deltaMs: number): void {
     if (!this.initialized) return;
 
     // Use the established updateAnimation pathway to avoid duplicating logic.
@@ -142,13 +147,14 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     this._lastScrollTop = null;
   }
 
-  public override async initialize() {
-    await super.initialize();
-    
+  /**
+   * ServiceVisualSystemBase lifecycle method - performs system-specific initialization
+   */
+  protected override async performVisualSystemInitialization(): Promise<void> {
     // Initialize CSS coordination - use globalThis to access Year3000System
     const year3000System = (globalThis as any).year3000System;
     this.cssController = year3000System?.cssController || getGlobalCSSVariableWriter();
-    
+
     this.initializeOptimizedQuantumSpace();
     this.setupModalObserver();
     this.setupOptimizedInteractionListener();
@@ -294,7 +300,7 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     this._scrollContainerElements = foundContainers;
   }
 
-  public override updateFromMusicAnalysis(
+  public updateFromMusicAnalysis(
     processedMusicData: any,
     rawFeatures?: any,
     trackUri?: string | null
@@ -349,7 +355,7 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     }
   }
 
-  public override updateAnimation(deltaTime: number) {
+  public updateAnimation(deltaTime: number) {
     if (!this.initialized) return;
     const timestamp = performance.now();
     this._frameSkipCounter++;
@@ -504,7 +510,10 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
     };
   }
 
-  public override destroy() {
+  /**
+   * ServiceVisualSystemBase lifecycle method - performs system-specific cleanup
+   */
+  protected override performVisualSystemCleanup(): void {
     // Remove generic interaction listeners
     if (this._interactionHandler) {
       ["click", "mousemove", "keydown"].forEach((evt) => {
@@ -522,9 +531,50 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
       });
       this._interactionHandler = null;
     }
+  }
 
-    // Call parent cleanup
-    super.destroy();
+  /**
+   * ServiceSystemBase required method - performs system health check
+   */
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
+    const issues: string[] = [];
+
+    // Check if animation is registered
+    if (!this._animationRegistered) {
+      issues.push("Animation not registered with coordinator");
+    }
+
+    // Check integration health
+    if (this.systemIntegrationMetrics.integrationHealth === "critical") {
+      issues.push("System integration health is critical");
+    } else if (this.systemIntegrationMetrics.integrationHealth === "degraded") {
+      issues.push("System integration health is degraded");
+    }
+
+    // Check for excessive errors
+    if (this.systemIntegrationMetrics.crossSystemErrors > 10) {
+      issues.push(`Excessive cross-system errors: ${this.systemIntegrationMetrics.crossSystemErrors}`);
+    }
+
+    return {
+      healthy: issues.length === 0,
+      details: `InteractionTrackingSystem health check - ${issues.length} issues found`,
+      issues,
+      metrics: {
+        animationRegistered: this._animationRegistered,
+        integrationHealth: this.systemIntegrationMetrics.integrationHealth,
+        crossSystemErrors: this.systemIntegrationMetrics.crossSystemErrors,
+        meditationTransitions: this.systemIntegrationMetrics.meditationTransitions,
+        navigationScaleUpdates: this.systemIntegrationMetrics.navigationScaleUpdates,
+        isMeditating: this.biometricState.isMeditating,
+        currentNavigationScale: this.nexusState.currentNavigationScale,
+      }
+    };
   }
 }
 

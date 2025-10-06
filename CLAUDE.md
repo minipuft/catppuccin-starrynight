@@ -7,8 +7,9 @@ This file provides guidance to Claude Code when working with the **Catppuccin St
 **Catppuccin StarryNight** is an advanced Spicetify theme that implements sophisticated visual effects and music synchronization through a modular TypeScript architecture. It creates dynamic, music-responsive interfaces with real-time audio analysis and OKLAB color science processing.
 
 ### Core Architecture
-- **Coordination Pattern**: SystemCoordinator orchestrating VisualSystemCoordinator and NonVisualSystemFacade
+- **Coordination Pattern**: ThemeLifecycleCoordinator → SystemIntegrationCoordinator → (VisualEffectsCoordinator + InfrastructureSystemCoordinator)
 - **Unified Interface**: All systems implement `IManagedSystem` for consistent lifecycle management
+- **Service Composition**: Modern systems use `SystemServiceBridge` (composition) instead of `BaseVisualSystem` (inheritance)
 - **Performance-First**: 60fps target with adaptive quality scaling and device-aware optimization
 - **OKLAB Color Science**: Perceptually uniform color processing for natural visual experiences
 - **Audio Integration**: Real-time music analysis driving visual harmonization
@@ -95,10 +96,11 @@ The theme consists of two compilation pipelines:
 - **Progressive API Detection** - Graceful degradation when Spicetify APIs unavailable
 
 #### 2. System Coordination Layer
-- **`VisualSystemCoordinator`** - Coordinates visual systems (background, effects, UI)
-- **`NonVisualSystemFacade`** - Factory for services (performance, settings, music sync)
-- **`SystemCoordinator`** - Orchestrates interaction between visual and non-visual systems
+- **`SystemIntegrationCoordinator`** - Main facade coordinator managing both visual and infrastructure systems
+- **`VisualEffectsCoordinator`** - Manages visual systems (backgrounds, particles, effects, UI)
+- **`InfrastructureSystemCoordinator`** - Manages non-visual systems (performance, CSS, settings, music sync)
 - **Unified lifecycle management** through `IManagedSystem` interface
+- **Service composition** via `DefaultServiceFactory` providing shared services to all systems
 
 #### 3. Visual & Audio Integration Layer
 - **`MusicSyncService`** - Spicetify API integration with beat detection
@@ -216,12 +218,13 @@ interface IManagedSystem {
 **Critical**: Remember that Spicetify loads the compiled `theme.js` and `user.css` files, not the source files directly. Always rebuild after making changes to see them take effect.
 
 ### Common Tasks
-- **Adding Visual Effects**: Implement `IManagedSystem`, register with `VisualSystemCoordinator`
-- **Adding Services**: Register with `NonVisualSystemFacade` for infrastructure systems
-- **Performance Optimization**: Use `PerformanceAnalyzer` integration, measure before/after
+- **Adding Visual Effects**: Extend `ServiceVisualSystemBase`, register with `VisualEffectsCoordinator`
+- **Adding Infrastructure Systems**: Extend `ServiceSystemBase`, register with `InfrastructureSystemCoordinator`
+- **Legacy Systems**: Still using `BaseVisualSystem` (14 systems pending migration to service composition)
+- **Performance Optimization**: Use `SimplePerformanceCoordinator` integration, measure before/after
 - **Color Processing**: Use `ColorHarmonyEngine` and OKLAB color space
 - **Music Integration**: Integrate with `MusicSyncService` for audio-reactive features
-- **Settings**: Use `SettingsManager` for persistent configuration
+- **Settings**: Use `TypedSettingsManager` singleton for persistent configuration
 
 ### Testing Strategy
 - **Framework**: Jest with ts-jest preset and JSDOM environment

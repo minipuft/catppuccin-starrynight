@@ -1,4 +1,4 @@
-import { ServiceVisualSystemBase } from '@/core/services/ServiceCompositionBase';
+import { ServiceVisualSystemBase } from '@/core/services/SystemServiceBridge';
 // Removed: unused GlobalEventBus import
 import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 import type { HealthCheckResult } from '@/types/systems';

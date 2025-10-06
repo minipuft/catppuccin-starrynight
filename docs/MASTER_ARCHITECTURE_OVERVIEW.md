@@ -27,48 +27,64 @@ Catppuccin StarryNight is not just a Spicetify theme—it's a sophisticated **vi
 
 ### Layer 1: Central Orchestration
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                      AdvancedThemeSystem                       │
-│                   (Central Orchestrator)                       │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │                SystemCoordinator                        │   │
-│  │           (Facade Coordination Hub)                     │   │
-│  │  ┌─────────────────────┐  ┌─────────────────────────┐   │   │
-│  │  │  VisualSystemFacade │  │ NonVisualSystemFacade  │   │   │
-│  │  │   (Factory Pattern) │  │   (Factory Pattern)    │   │   │
-│  │  └─────────────────────┘  └─────────────────────────┘   │   │
-│  └─────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│                    ThemeLifecycleCoordinator                       │
+│                     (Entry Point & Lifecycle)                      │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │            SystemIntegrationCoordinator                      │  │
+│  │              (Main Facade Coordinator)                       │  │
+│  │  ┌──────────────────────────┐  ┌───────────────────────────┐ │  │
+│  │  │ VisualEffectsCoordinator │  │ InfrastructureSystem      │ │  │
+│  │  │   (Visual Systems)       │  │ Coordinator (Services)    │ │  │
+│  │  └──────────────────────────┘  └───────────────────────────┘ │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────────┘
 ```
 
-### Layer 2: System Facades
+### Layer 2: System Coordinators
 ```
-┌──── VisualSystemFacade ─────┐  ┌─── NonVisualSystemFacade ────┐
-│ • Background Systems        │  │ • Performance Analyzers      │
-│ • Visual Effects Coordinator│  │ • Unified CSS Controllers    │
-│ • Particle Systems          │  │ • Settings Managers          │
-│ • Color Processing          │  │ • Music Sync Services        │
-│ • UI Enhancement Systems    │  │ • Device Capability Detection│
-└─────────────────────────────┘  └───────────────────────────────┘
+┌─── VisualEffectsCoordinator ──┐  ┌── InfrastructureSystemCoordinator ──┐
+│ • Background Systems           │  │ • SimplePerformanceCoordinator      │
+│ • Particle Effects             │  │ • CSSVariableWriter                 │
+│ • WebGL Rendering              │  │ • TypedSettingsManager              │
+│ • UI Visual Effects            │  │ • MusicSyncService                  │
+│ • Color Harmony Processing     │  │ • DeviceCapabilityDetector          │
+│ • Music-Reactive Visuals       │  │ • WebGLSystemsIntegration           │
+└────────────────────────────────┘  └─────────────────────────────────────┘
 ```
 
-### Layer 3: Shared Dependencies
+### Layer 3: Shared Service Layer (Service Composition Pattern)
 ```
-┌─────────────────── Shared Core Systems ──────────────────────┐
-│ PerformanceAnalyzer • OptimizedUnifiedCSSController │
-│ SettingsManager • ColorHarmonyEngine • DeviceCapabilityDetector │
-│ MusicSyncService • TimerConsolidationSystem                    │
-└───────────────────────────────────────────────────────────────┘
+┌──────────────── DefaultServiceFactory (Singleton) ─────────────────┐
+│  ServiceContainer - Shared services for all systems:               │
+│  • lifecycle: SystemLifecycleService (init/destroy tracking)       │
+│  • performance: PerformanceTrackingService (metrics collection)    │
+│  • cssVariables: CSSVariableService (batched DOM updates)          │
+│  • events: EventSubscriptionService (event management + cleanup)   │
+│  • canvas: CanvasManagementService (WebGL2/Canvas2D creation)      │
+│                                                                     │
+│  Benefits: ONE shared instance vs 14 separate copies               │
+│  - Single CSS update queue for all systems (faster!)               │
+│  - Shared event subscription manager (auto-cleanup)                │
+│  - Centralized performance tracking                                │
+│  - ~220KB bundle size reduction when migration complete            │
+└────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Layer 4: Foundation Systems
 ```
-┌──────── TypeScript Core ────────┐  ┌────── SCSS Styling ──────┐
-│ • IManagedSystem Interface      │  │ • Modular Architecture    │
-│ • UnifiedSystemBase Pattern     │  │ • CSS Variable System     │
-│ • Factory Pattern Implementation│  │ • Catppuccin Integration  │
-│ • Dependency Injection          │  │ • Smooth Visual Effects   │
-└─────────────────────────────────┘  └───────────────────────────┘
+┌────────── TypeScript Core ──────────┐  ┌────── SCSS Styling ──────┐
+│ • IManagedSystem Interface          │  │ • Modular Architecture    │
+│ • ServiceSystemBase (Composition)   │  │ • CSS Variable System     │
+│ • BaseVisualSystem (Legacy - 14)    │  │ • Catppuccin Integration  │
+│ • SystemServiceBridge (Migration)   │  │ • Smooth Visual Effects   │
+│ • Factory Pattern + DI              │  │ • OKLAB Color Processing  │
+└─────────────────────────────────────┘  └───────────────────────────┘
+
+Migration Status:
+• 5 systems using ServiceSystemBase/ServiceVisualSystemBase ✅
+• 14 systems still using BaseVisualSystem (pending migration)
+• Target: All systems migrated by v2.0 for ~220KB bundle savings
 ```
 
 ---
@@ -78,22 +94,22 @@ Catppuccin StarryNight is not just a Spicetify theme—it's a sophisticated **vi
 ### Primary Data Flow
 ```mermaid
 graph TD
-    A[Spicetify APIs] --> B[AdvancedThemeSystem]
-    B --> C[SystemCoordinator]
-    C --> D[VisualSystemFacade]
-    C --> E[NonVisualSystemFacade]
-    
+    A[Spicetify APIs] --> B[ThemeLifecycleCoordinator]
+    B --> C[SystemIntegrationCoordinator]
+    C --> D[VisualEffectsCoordinator]
+    C --> E[InfrastructureSystemCoordinator]
+
     F[Music Events] --> G[MusicSyncService]
-    G --> H[VisualEffectsCoordination]
-    H --> I[Visual Effects]
-    
-    J[User Interactions] --> K[InteractionTracking]
-    K --> L[BehavioralPrediction]
-    L --> M[PredictiveMaterialization]
-    
-    N[Performance Metrics] --> O[PerformanceAnalyzer]
-    O --> P[AdaptiveOptimization]
-    P --> Q[DeviceCapabilityDetection]
+    G --> H[VisualEffectsCoordinator]
+    H --> I[Visual Systems]
+
+    J[All Systems] --> K[DefaultServiceFactory]
+    K --> L[Shared Services]
+    L --> M[lifecycle + performance + css + events + canvas]
+
+    N[Performance Metrics] --> O[SimplePerformanceCoordinator]
+    O --> P[DeviceCapabilityDetector]
+    P --> Q[Adaptive Quality Scaling]
 ```
 
 ### Visual Effects Coordination Flow

@@ -8,7 +8,7 @@
  * energy analysis, and harmonic color coordination for enhanced user experience.
  */
 
-import { ServiceVisualSystemBase } from "@/core/services/ServiceCompositionBase";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { Y3KDebug } from "@/debug/DebugCoordinator";

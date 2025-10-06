@@ -15,7 +15,7 @@
  * @compatibility IManagedSystem interface, ServiceContainer integration
  */
 
-import { ServiceVisualSystemBase } from "@/core/services/ServiceCompositionBase";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 import { HolographicUISystem } from "@/visual/music/ui/HolographicUISystem";
 import { colorTransitionManager } from "@/visual/effects/MusicColorTransitionState";
 import type { RGB, MusicEmotion, BeatData, CinematicPalette } from "@/types/colorTypes";
