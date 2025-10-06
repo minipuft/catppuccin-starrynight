@@ -474,7 +474,7 @@ export class ColorProcessor
         oklabData: unifiedResult.oklabData,
         processingTime,
         timestamp: Date.now(),
-        // 🔧 PHASE 7.2: Pass through full metadata from strategies (especially OKLAB metadata from DynamicCatppuccinStrategy)
+        // 🔧 PHASE 7.2: Pass through full metadata from strategies (especially OKLAB metadata from DynamicAccentColorStrategy)
         metadata: result.metadata,
       });
       console.log("🎨 [ColorProcessor] ✅ 'colors:harmonized' event emitted successfully");

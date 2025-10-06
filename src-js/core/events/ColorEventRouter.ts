@@ -157,9 +157,9 @@ export class ColorEventRouter {
     try {
       // Import and register strategies dynamically to avoid circular dependencies
       import("@/visual/color/ThemeColorController").then(
-        ({ DynamicCatppuccinStrategy }) => {
+        ({ DynamicAccentColorStrategy }) => {
           this.strategyRegistry.register(
-            new DynamicCatppuccinStrategy()
+            new DynamicAccentColorStrategy()
           );
         }
       );

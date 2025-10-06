@@ -1,13 +1,12 @@
 /**
- * DynamicCatppuccinStrategy - Dynamic Accent Color Processing Strategy
+ * DynamicAccentColorStrategy - Dynamic Accent Color Processing Strategy
  *
  * Pure strategy pattern implementation for OKLAB color processing.
  * Processes album art colors with OKLAB enhancement and returns metadata to
  * SpicetifyColorBridge for CSS variable application (single source of truth).
  *
  * **Multi-Palette Support**: Works with ANY palette system (Catppuccin, Year3000, etc.)
- * through PaletteSystemManager abstraction layer. Despite the "Catppuccin" in the name
- * (retained for historical/compatibility reasons), this strategy dynamically adapts to
+ * through PaletteSystemManager abstraction layer. This strategy dynamically adapts to
  * the active palette system configured in ADVANCED_SYSTEM_CONFIG.paletteSystem.
  *
  * **Activation**: Only activates when user selects "dynamic" accent mode in settings.
@@ -17,6 +16,9 @@
  * - Uses PaletteSystemManager.getDefaultAccentColor() which routes to active palette
  * - Applies OKLAB perceptual color enhancement regardless of palette system
  * - Returns processed ColorResult with metadata for SpicetifyColorBridge to apply
+ *
+ * **Strategy Identifier**: Returns "dynamic-catppuccin" for backward compatibility with
+ * existing settings and configuration (the identifier predates multi-palette support).
  *
  * Philosophy: "Pure strategy pattern - process colors, return metadata, let bridge apply."
  *
@@ -53,7 +55,7 @@ interface DynamicColorState {
   transitionInProgress: boolean;
 }
 
-interface CatppuccinIntegrationConfig {
+interface DynamicColorConfig {
   accentUpdateEnabled: boolean;
   baseTransformationEnabled: boolean;
   visualEffectsIntegrationEnabled: boolean;
@@ -63,7 +65,7 @@ interface CatppuccinIntegrationConfig {
   oklabPreset: string; // OKLAB enhancement preset name
 }
 
-export class DynamicCatppuccinStrategy implements IColorProcessor {
+export class DynamicAccentColorStrategy implements IColorProcessor {
   private cssController: CSSVariableWriter | null;
   private oklabProcessor: OKLABColorProcessor;
   private utils = Utils;
@@ -71,7 +73,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
 
   private dynamicColorState: DynamicColorState = this.getInitialColorState();
 
-  private integrationConfig: CatppuccinIntegrationConfig = {
+  private integrationConfig: DynamicColorConfig = {
     accentUpdateEnabled: true,
     baseTransformationEnabled: true,
     visualEffectsIntegrationEnabled: true,
@@ -107,7 +109,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
     } catch (error) {
       // Fallback to hardcoded values
       console.warn(
-        "[DynamicCatppuccinStrategy] Failed to get initial colors, using fallback:",
+        "[DynamicAccentColorStrategy] Failed to get initial colors, using fallback:",
         error
       );
       return {
@@ -130,7 +132,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
     this.initializeCurrentState();
 
     Y3KDebug?.debug?.log(
-      "DynamicCatppuccinStrategy",
+      "DynamicAccentColorStrategy",
       "Color strategy initialized with CSS coordinator and OKLAB processing"
     );
   }
@@ -186,7 +188,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
         processedAccentRgb = oklabResult.enhancedRgb;
 
         Y3KDebug?.debug?.log(
-          "DynamicCatppuccinStrategy",
+          "DynamicAccentColorStrategy",
           "OKLAB color enhancement applied:",
           {
             original: newAccentHex,
@@ -264,7 +266,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
       };
 
       Y3KDebug?.debug?.log(
-        "DynamicCatppuccinStrategy",
+        "DynamicAccentColorStrategy",
         "Color processing completed",
         {
           originalAccent: newAccentHex,
@@ -280,7 +282,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
       const processingTime = performance.now() - startTime;
 
       Y3KDebug?.debug?.error(
-        "DynamicCatppuccinStrategy",
+        "DynamicAccentColorStrategy",
         "Color processing failed:",
         error
       );
@@ -310,7 +312,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
 
       if (this.config.enableDebug) {
         Y3KDebug?.debug?.log(
-          "DynamicCatppuccinStrategy",
+          "DynamicAccentColorStrategy",
           `Accent setting: ${accentSetting}, Dynamic: ${isDynamic}`
         );
       }
@@ -318,7 +320,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
       return isDynamic;
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "DynamicCatppuccinStrategy",
+        "DynamicAccentColorStrategy",
         "Error checking dynamic accent setting:",
         error
       );
@@ -358,7 +360,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
     this.dynamicColorState.lastUpdateTime = Date.now();
 
     Y3KDebug?.debug?.log(
-      "DynamicCatppuccinStrategy",
+      "DynamicAccentColorStrategy",
       "Current state initialized:",
       {
         accent: this.dynamicColorState.currentAccentHex,
@@ -413,7 +415,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
   /**
    * Update integration configuration
    */
-  public updateConfig(newConfig: Partial<CatppuccinIntegrationConfig>): void {
+  public updateConfig(newConfig: Partial<DynamicColorConfig>): void {
     this.integrationConfig = { ...this.integrationConfig, ...newConfig };
 
     // Update OKLAB processor debug setting if configuration changed
@@ -422,7 +424,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
     }
 
     Y3KDebug?.debug?.log(
-      "DynamicCatppuccinStrategy",
+      "DynamicAccentColorStrategy",
       "Configuration updated:",
       {
         ...newConfig,
@@ -474,8 +476,8 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
     this.dynamicColorState.transitionInProgress = false;
 
     Y3KDebug?.debug?.log(
-      "DynamicCatppuccinStrategy",
-      "Dynamic Catppuccin strategy destroyed"
+      "DynamicAccentColorStrategy",
+      "Dynamic accent color strategy destroyed"
     );
   }
 }

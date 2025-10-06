@@ -21,7 +21,7 @@ import { settings } from "@/config";
 
 // Import strategy implementations
 import { DepthLayeredStrategy } from "./DepthLayeredStrategy";
-import { DynamicCatppuccinStrategy } from "../color/ThemeColorController";
+import { DynamicAccentColorStrategy } from "../color/ThemeColorController";
 import { DynamicGradientStrategy } from "./DynamicGradientStrategy";
 import { WebGLGradientStrategy } from "./WebGLGradientStrategy";
 
@@ -636,7 +636,7 @@ export class ColorStrategySelector {
     try {
       switch (strategyName) {
         case "dynamic-catppuccin":
-          strategy = new DynamicCatppuccinStrategy();
+          strategy = new DynamicAccentColorStrategy();
           break;
 
         case "living-gradient":

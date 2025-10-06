@@ -665,7 +665,7 @@ export class SpicetifyColorBridge implements IManagedSystem {
         '--sn-color-harmony-triadic-rgb': rgbDistribution.harmonyPrimary,
       };
 
-      // 🔧 PHASE 7.2: Dynamic Accent Variables (from DynamicCatppuccinStrategy)
+      // 🔧 PHASE 7.2: Dynamic Accent Variables (from DynamicAccentColorStrategy)
       // These variables were previously set by DynamicCatppuccinBridge (legacy system)
       // Now SpicetifyColorBridge is the single source of truth for ALL CSS variables
       const dynamicAccentUpdates: Record<string, string> = {};
@@ -693,7 +693,7 @@ export class SpicetifyColorBridge implements IManagedSystem {
         });
       }
 
-      // 🔧 PHASE 7.2: Music Energy Variables (from DynamicCatppuccinStrategy)
+      // 🔧 PHASE 7.2: Music Energy Variables (from DynamicAccentColorStrategy)
       const musicEnergyUpdates: Record<string, string> = {};
 
       if (metadata?.musicEnergy !== undefined) {
@@ -706,7 +706,7 @@ export class SpicetifyColorBridge implements IManagedSystem {
         });
       }
 
-      // 🔧 PHASE 7.2: Living Gradient Variables (from DynamicCatppuccinStrategy)
+      // 🔧 PHASE 7.2: Living Gradient Variables (from DynamicAccentColorStrategy)
       const livingGradientUpdates: Record<string, string> = {};
 
       if (metadata?.baseTransformationEnabled && oklabMetadata) {
@@ -717,7 +717,7 @@ export class SpicetifyColorBridge implements IManagedSystem {
         console.log("🎨 [SpicetifyColorBridge] Applied living gradient variables");
       }
 
-      // 🔧 PHASE 7.2: Visual Effects Variables (from DynamicCatppuccinStrategy)
+      // 🔧 PHASE 7.2: Visual Effects Variables (from DynamicAccentColorStrategy)
       const visualEffectsUpdates: Record<string, string> = {};
 
       if (metadata?.visualEffectsIntegrationEnabled && oklabMetadata) {
