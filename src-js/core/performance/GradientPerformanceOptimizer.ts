@@ -12,7 +12,7 @@
 import { CSSVariableWriter, getGlobalCSSVariableWriterSafe } from "@/core/css/CSSVariableWriter";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 
 interface PerformanceMetrics {

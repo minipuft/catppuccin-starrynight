@@ -26,6 +26,25 @@ interface SystemMetrics {
   errors: number;
 }
 
+/**
+ * BaseVisualSystem - Base class for visual effect systems
+ *
+ * @deprecated This class will be replaced by ServiceVisualSystemBase which uses
+ * composition over inheritance for better testability and flexibility.
+ *
+ * Migration guide:
+ * - Replace extends BaseVisualSystem with extends ServiceVisualSystemBase
+ * - Update constructor to use service injection pattern
+ * - Replace _performSystemSpecificInitialization() with performVisualSystemInitialization()
+ * - Replace _performSystemSpecificCleanup() with performVisualSystemCleanup()
+ * - Canvas creation methods remain compatible
+ *
+ * This class will remain supported during gradual migration of 14 existing visual systems.
+ * Target removal: Version 2.0 (after all visual systems migrated)
+ *
+ * @see ServiceVisualSystemBase for modern composition-based pattern
+ * @architecture Legacy inheritance-based pattern (migration in progress)
+ */
 export abstract class BaseVisualSystem implements IManagedSystem {
   protected config: SystemConfig;
   protected utils: typeof ThemeUtilities;

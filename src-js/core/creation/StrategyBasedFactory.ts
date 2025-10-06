@@ -6,7 +6,7 @@
  * injection patterns at creation time.
  */
 
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type {
   CreationStrategySelectionCriteria,
   IStrategyBasedFactory,

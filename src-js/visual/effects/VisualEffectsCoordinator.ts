@@ -30,7 +30,7 @@ import { EmotionalGradientMapper } from "@/audio/EmotionalGradientMapper";
 import { GradientDirectionalFlowSystem } from "@/audio/GradientDirectionalFlowSystem";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { GradientPerformanceOptimizer } from "@/core/performance/GradientPerformanceOptimizer";
 import {
@@ -38,8 +38,8 @@ import {
   PerformanceAnalyzer,
   type DeviceCapabilities,
   type PerformanceMode,
-} from "@/core/performance/UnifiedPerformanceCoordinator";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+} from "@/core/performance/PerformanceMonitor";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import type { ChoreographyEventType, DynamicTransitionConfig } from "@/types/animationCoordination";
@@ -402,11 +402,17 @@ export interface VisualSystemConfig {
   enablePerformanceMonitoring: boolean;
   enableAdaptiveQuality: boolean;
   enableEventCoordination: boolean;
-  enableGradientTransitions: boolean;
-  performanceThresholds: {
+  enableGradientTransitions?: boolean;
+  performanceThresholds?: {
     minFPS: number;
     maxMemoryMB: number;
     thermalThreshold: number;
+  };
+  // 🔧 PHASE 2.2: VisualSystemCoordinator compatibility
+  qualityPreferences?: {
+    preferHighQuality: boolean;
+    allowDynamicScaling: boolean;
+    batteryConservation: boolean;
   };
 }
 
@@ -444,6 +450,7 @@ export interface VisualSystemMetrics {
   gradientBackend: GradientBackend;
   transitionCount: number;
   performanceScore: number;
+  systemHealth: SystemHealth;
 }
 
 /**
@@ -469,6 +476,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   private performanceCoordinator: PerformanceAnalyzer | null = null;
   private musicSyncService: MusicSyncService | null = null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
+  private colorProcessor: any | null = null; // 🔧 PHASE 7: ColorProcessor integration
   private emotionalGradientMapper: EmotionalGradientMapper | null = null;
 
   // Visual effect state management
@@ -552,12 +560,26 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   private transitionInProgress: boolean = false;
   private backendStabilityCheck: NodeJS.Timeout | null = null;
 
+  // 🔧 PHASE 2.2: Additional dependencies for VisualSystemCoordinator compatibility
+  private utils: any = null;
+  private year3000System: any = null;
+  private animationCoordinator: any = null;
+
+  // 🔧 PHASE 2.2: Callback for system creation (VisualSystemCoordinator compatibility)
+  private onSystemCreated: ((systemKey: string, system: IManagedSystem) => void) | null = null;
+
   constructor(
     config: AdvancedSystemConfig | Year3000Config,
     cssController?: CSSVariableWriter,
     performanceCoordinator?: PerformanceAnalyzer,
     musicSyncService?: MusicSyncService,
-    colorHarmonyEngine?: ColorHarmonyEngine
+    colorHarmonyEngine?: ColorHarmonyEngine,
+    // 🔧 PHASE 7: ColorProcessor dependency for color processing integration
+    colorProcessor?: any,
+    // 🔧 PHASE 2.2: Additional parameters for VisualSystemCoordinator compatibility
+    utils?: any,
+    year3000System?: any,
+    animationCoordinator?: any
   ) {
     this.config = config;
     this.eventBus = unifiedEventBus;
@@ -565,6 +587,10 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     this.performanceCoordinator = performanceCoordinator || null;
     this.musicSyncService = musicSyncService || null;
     this.colorHarmonyEngine = colorHarmonyEngine || null;
+    this.colorProcessor = colorProcessor || null;
+    this.utils = utils || null;
+    this.year3000System = year3000System || null;
+    this.animationCoordinator = animationCoordinator || null;
 
     // Initialize emotional gradient mapper if we have the required dependencies
     if (this.cssController && this.musicSyncService) {
@@ -595,7 +621,10 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     cssController?: CSSVariableWriter,
     performanceCoordinator?: PerformanceAnalyzer,
     musicSyncService?: MusicSyncService,
-    colorHarmonyEngine?: ColorHarmonyEngine
+    colorHarmonyEngine?: ColorHarmonyEngine,
+    utils?: any,
+    year3000System?: any,
+    animationCoordinator?: any
   ): VisualEffectsCoordinator {
     if (!VisualEffectsCoordinator.instance) {
       if (!config) {
@@ -609,7 +638,10 @@ export class VisualEffectsCoordinator implements IManagedSystem {
           cssController,
           performanceCoordinator,
           musicSyncService,
-          colorHarmonyEngine
+          colorHarmonyEngine,
+          utils,
+          year3000System,
+          animationCoordinator
         );
     }
     return VisualEffectsCoordinator.instance;
@@ -619,10 +651,15 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   // IMANAGEDYSTEM INTERFACE IMPLEMENTATION
   // ===================================================================
 
-  public async initialize(): Promise<void> {
+  public async initialize(config?: Partial<VisualSystemConfig>): Promise<void> {
     if (this.initialized) return;
 
     try {
+      // 🔧 PHASE 2.2: Apply configuration if provided (VisualSystemCoordinator compatibility)
+      if (config) {
+        this.setConfiguration(config);
+      }
+
       // Initialize emotional gradient mapper if available
       if (this.emotionalGradientMapper) {
         await this.emotionalGradientMapper.initialize();
@@ -1868,6 +1905,11 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       // Cache instance
       this.systemInstances.set(systemName, systemInstance);
 
+      // 🔧 PHASE 2.2: Trigger system creation callback (VisualSystemCoordinator compatibility)
+      if (this.onSystemCreated) {
+        this.onSystemCreated(systemKey, systemInstance);
+      }
+
       if (this.config.enableDebug) {
         Y3KDebug?.debug?.log("VisualSystemFactory", `Created visual system: ${systemKey}`);
       }
@@ -2119,5 +2161,232 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   /** @deprecated Use choreographEvent instead */
   public choreographBackgroundEvent(eventType: string, payload: VisualEffectEventPayload): void {
     return this.choreographEvent(eventType, payload);
+  }
+
+  // ===================================================================
+  // 🔧 PHASE 2.2: VISUALSYSTEMCOORDINATOR COMPATIBILITY LAYER
+  // ===================================================================
+
+  /**
+   * Set callback for system creation events (VisualSystemCoordinator compatibility)
+   * @param callback - Called when a visual system is created
+   */
+  public setOnSystemCreated(callback: (systemKey: string, system: IManagedSystem) => void): void {
+    this.onSystemCreated = callback;
+  }
+
+  /**
+   * Propagate visual events to all registered systems (VisualSystemCoordinator compatibility)
+   * @param event - Event to propagate to visual systems
+   */
+  public propagateVisualEvent(event: any): void {
+    // Delegate to choreographEvent with type mapping
+    const eventType = event.type || event.eventType || 'visual:coordination';
+    const payload: VisualEffectEventPayload = {
+      ...event,
+      originalEventType: event.type,
+      metadata: event.data || event.payload || {}
+    };
+    this.choreographEvent(eventType, payload);
+  }
+
+  /**
+   * Handle performance adaptation events (VisualSystemCoordinator compatibility)
+   * @param event - Adaptation event with performance quality settings
+   */
+  public handleAdaptationEvent(event: {
+    type: 'quality-change' | 'thermal-change' | 'performance-change';
+    data: any;
+    reason?: string;
+    newSettings?: any;
+  }): void {
+    if (this.config.enableDebug) {
+      Y3KDebug?.debug?.log(
+        'VisualEffectsCoordinator',
+        `Handling adaptation event: ${event.type}`,
+        event.reason
+      );
+    }
+
+    // Update factory configuration based on adaptation
+    if (event.newSettings) {
+      const qualityLevel = event.newSettings.level || 'medium';
+      const gradientComplexity = event.newSettings.gradientComplexity || 0.7;
+
+      // Update performance thresholds
+      this.factoryConfig = {
+        ...this.factoryConfig,
+        enableAdaptiveQuality: true,
+        performanceThresholds: {
+          minFPS: event.newSettings.animationFPS || 45,
+          maxMemoryMB: this.factoryConfig.performanceThresholds?.maxMemoryMB || 512,
+          thermalThreshold: this.factoryConfig.performanceThresholds?.thermalThreshold || 0.8
+        }
+      };
+    }
+
+    // Propagate adaptation to all registered systems
+    this.registeredParticipants.forEach((participant) => {
+      if ((participant as any).handleAdaptationEvent) {
+        try {
+          (participant as any).handleAdaptationEvent(event);
+        } catch (error) {
+          Y3KDebug?.debug?.warn(
+            'VisualEffectsCoordinator',
+            `Error propagating adaptation to ${participant.systemName}:`,
+            error
+          );
+        }
+      }
+    });
+
+    // Also propagate to system instances
+    this.systemInstances.forEach((system, key) => {
+      if ((system as any).handleAdaptationEvent) {
+        try {
+          (system as any).handleAdaptationEvent(event);
+        } catch (error) {
+          Y3KDebug?.debug?.warn(
+            'VisualEffectsCoordinator',
+            `Error propagating adaptation to system ${key}:`,
+            error
+          );
+        }
+      }
+    });
+
+    // Broadcast adaptation event
+    this.choreographEvent('visual:performance-adapt', {
+      adaptationType: event.type,
+      reason: event.reason ? (event.reason as 'automatic' | 'user-action' | 'music-sync' | 'performance') : 'automatic',
+      metadata: event.newSettings
+    });
+  }
+
+  /**
+   * Set configuration for visual system coordination (VisualSystemCoordinator compatibility)
+   * @param config - Configuration updates to apply
+   */
+  public setConfiguration(config: Partial<VisualSystemConfig>): void {
+    this.factoryConfig = {
+      ...this.factoryConfig,
+      ...config
+    };
+
+    if (this.config.enableDebug) {
+      Y3KDebug?.debug?.log(
+        'VisualEffectsCoordinator',
+        'Configuration updated',
+        this.factoryConfig
+      );
+    }
+  }
+
+  /**
+   * Get visual system metrics (VisualSystemCoordinator compatibility)
+   * @returns Current visual system performance metrics
+   */
+  public getMetrics(): VisualSystemMetrics {
+    return {
+      currentFPS: this.performanceCoordinator?.getMedianFPS?.() || 60,
+      averageFPS: this.performanceCoordinator?.getMedianFPS?.() || 60,
+      frameTime: 16.67,
+      memoryUsageMB: 0,
+      activeSystems: this.systemInstances.size,
+      gradientBackend: this.currentBackend,
+      transitionCount: this.performanceMetrics.animationTransitions,
+      performanceScore: 0.8,
+      systemHealth: 'excellent' as SystemHealth
+    };
+  }
+
+  /**
+   * Get WebGL gradient strategy instance (VisualSystemCoordinator compatibility)
+   * Used by WebGLSystemsIntegration for quality scaling
+   * @returns WebGL gradient system instance or null
+   */
+  public getWebGLGradientStrategy(): IManagedSystem | null {
+    return this.systemInstances.get("WebGLBackground") || null;
+  }
+
+  /**
+   * Get visual system by key with caching (VisualSystemCoordinator compatibility)
+   * @param key - Visual system key to retrieve
+   * @returns Visual system instance
+   */
+  public async getVisualSystem<T = IManagedSystem>(key: string): Promise<T | null> {
+    // Check if system already exists in cache
+    if (this.systemInstances.has(key)) {
+      return this.systemInstances.get(key) as T;
+    }
+
+    // Create system if not cached
+    const system = await this.createVisualSystem(key as VisualSystemKey, false);
+    return system as T;
+  }
+
+  /**
+   * Get cached visual system synchronously (VisualSystemCoordinator compatibility)
+   * Only returns systems that have already been created - does not create new systems
+   * @param key - Visual system key to retrieve
+   * @returns Visual system instance if cached, null otherwise
+   */
+  public getCachedVisualSystem<T = IManagedSystem>(key: string): T | null {
+    return this.systemInstances.get(key) as T || null;
+  }
+
+  /**
+   * Perform comprehensive visual health check (VisualSystemCoordinator compatibility)
+   * @returns Detailed health check results
+   */
+  public async performVisualHealthCheck(): Promise<VisualSystemHealthCheck> {
+    return await this.getConsolidatedHealthCheck();
+  }
+
+  /**
+   * Initialize all visual systems (VisualSystemCoordinator compatibility)
+   * Called by SystemIntegrationCoordinator to ensure all systems are initialized
+   */
+  public async initializeVisualSystems(): Promise<void> {
+    const initPromises: Promise<void>[] = [];
+
+    for (const [key, system] of this.systemInstances) {
+      if (!system.initialized) {
+        initPromises.push(
+          system.initialize().catch((error) => {
+            Y3KDebug?.debug?.error(
+              'VisualEffectsCoordinator',
+              `Failed to initialize ${key}:`,
+              error
+            );
+          })
+        );
+      }
+    }
+
+    await Promise.allSettled(initPromises);
+
+    if (this.config.enableDebug) {
+      Y3KDebug?.debug?.log(
+        'VisualEffectsCoordinator',
+        `Visual systems initialized: ${this.systemInstances.size} systems`
+      );
+    }
+  }
+
+  /**
+   * Get system status (VisualSystemCoordinator compatibility)
+   * @returns Status information about the coordinator and managed systems
+   */
+  public getSystemStatus(): {
+    initialized: boolean;
+    systemsActive: number;
+    healthy: boolean;
+  } {
+    return {
+      initialized: this.initialized,
+      systemsActive: this.systemInstances.size,
+      healthy: this.initialized && this.isActive
+    };
   }
 }

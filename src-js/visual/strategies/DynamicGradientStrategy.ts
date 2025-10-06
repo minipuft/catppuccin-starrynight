@@ -11,9 +11,9 @@
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type {
   ColorContext,
   ColorResult,

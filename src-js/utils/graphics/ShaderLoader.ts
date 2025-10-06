@@ -3,7 +3,7 @@
  * Part of the Year 3000 System WebGL pipeline
  */
 
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 
 interface ShaderCache {
   [key: string]: WebGLShader;

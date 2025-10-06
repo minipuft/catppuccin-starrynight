@@ -11,8 +11,8 @@
  * - Single source of truth for WebGL state
  */
 
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 

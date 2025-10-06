@@ -697,7 +697,7 @@ export class DeviceCapabilityDetector {
   }
 
   /**
-   * Check if WebGL support is available (for BackgroundStrategySelector)
+   * Check if WebGL support is available (for ColorStrategySelector)
    */
   public hasWebGLSupport(): boolean {
     if (this.isInitialized && this.deviceCapabilities) {

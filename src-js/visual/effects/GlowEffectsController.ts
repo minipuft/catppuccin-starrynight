@@ -12,7 +12,7 @@
 import { HolographicUISystem } from "@/visual/music/ui/HolographicUISystem";
 import { colorTransitionManager } from "@/visual/effects/MusicColorTransitionState";
 import type { RGB, MusicEmotion, BeatData, CinematicPalette } from "@/types/colorTypes";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";

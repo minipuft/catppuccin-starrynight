@@ -10,7 +10,7 @@
  */
 
 import { settings } from '@/config';
-import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
+import { unifiedEventBus } from '@/core/events/EventBus';
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from '@/core/css/CSSVariableWriter';
 import type { IManagedSystem, HealthCheckResult } from '@/types/systems';
 import {

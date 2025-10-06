@@ -4,7 +4,7 @@
  * Provides diagnostics and metrics for the viewport-aware system integration.
  */
 
-import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
+import { unifiedEventBus } from '@/core/events/EventBus';
 import { ViewportManager } from '@/utils/performance/ViewportAwarenessManager';
 
 export interface ViewportOptimizationMetrics {

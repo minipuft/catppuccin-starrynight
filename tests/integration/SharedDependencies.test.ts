@@ -112,7 +112,7 @@ describe('Shared Dependencies Integration', () => {
 
   describe('CSS Variable Manager', () => {
     test('CSS variable manager is accessible after initialization', async () => {
-      const cssManager = await coordinator.getNonVisualSystem('UnifiedCSSVariableManager');
+      const cssManager = await coordinator.getNonVisualSystem('CSSVariableWriter');
 
       // CSS manager may be null or initialized depending on system state
       expect(cssManager === null || typeof cssManager === 'object').toBe(true);
@@ -122,7 +122,7 @@ describe('Shared Dependencies Integration', () => {
   describe('Dependency Initialization Order', () => {
     test('Performance coordinator initializes before dependent systems', async () => {
       const perfCoord = coordinator.getSharedSimplePerformanceCoordinator();
-      const cssManager = await coordinator.getNonVisualSystem('UnifiedCSSVariableManager');
+      const cssManager = await coordinator.getNonVisualSystem('CSSVariableWriter');
 
       // Performance coordinator should be initialized first
       expect(perfCoord).toBeTruthy();

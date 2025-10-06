@@ -13,11 +13,11 @@
  */
 
 import { SpicetifyColorBridge } from "@/utils/spicetify/SpicetifyColorBridge";
-import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
+import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 
 describe("SpicetifyColorBridge Performance Baseline", () => {
   let spicetifyBridge: SpicetifyColorBridge;
-  let cssController: UnifiedCSSVariableManager;
+  let cssController: CSSVariableWriter;
   let performanceResults: {
     updateWithAlbumColors: number[];
     cssApplication: number[];
@@ -40,7 +40,7 @@ describe("SpicetifyColorBridge Performance Baseline", () => {
     // Setup DOM for CSS variable testing
     document.documentElement.style.setProperty = jest.fn();
 
-    cssController = new UnifiedCSSVariableManager({
+    cssController = new CSSVariableWriter({
       enableDebug: false,
       batchDelay: 0, // Immediate for testing
       enablePerformanceMonitoring: true

@@ -129,7 +129,7 @@ describe('SystemCoordinator Integration', () => {
 
     test('Infrastructure systems can be accessed after initialization', async () => {
       // Try to get an infrastructure system
-      const result = await coordinator.getNonVisualSystem('UnifiedCSSVariableManager');
+      const result = await coordinator.getNonVisualSystem('CSSVariableWriter');
 
       // Either system exists or is null (both valid states)
       expect(result === null || typeof result === 'object').toBe(true);

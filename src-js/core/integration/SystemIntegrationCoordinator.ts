@@ -1,21 +1,22 @@
 /**
  * SystemIntegrationCoordinator - Main System Integration Coordinator
  *
- * Coordinates interaction between VisualSystemCoordinator and InfrastructureSystemCoordinator
+ * 🔧 PHASE 2.2: Coordinates interaction between VisualEffectsCoordinator and InfrastructureSystemCoordinator
  * to provide unified system management with shared dependencies and cross-facade communication.
  *
  * ═══ THREE-LAYER ARCHITECTURE VALUE ═══
  *
  * LAYER 1 (SystemIntegrationCoordinator):
- * • Manages initialization phases (core → services → visual → integration)  
+ * • Manages initialization phases (core → services → visual → integration)
  * • Aggregates health metrics from both facades for systematic troubleshooting
  * • Coordinates shared dependencies (CSS, performance, music sync services)
  * • Provides unified error recovery across visual and non-visual systems
  *
- * LAYER 2 (VisualSystemCoordinator):
+ * LAYER 2 (VisualEffectsCoordinator) - PHASE 2.2 CONSOLIDATED:
  * • Factory for visual systems (particles, backgrounds, effects)
  * • Music-aware quality adaptation and performance scaling
  * • Visual-specific dependency injection and event coordination
+ * • Consolidated: GradientEffectsCoordinator, TransitionCoordinator, VisualSystemCoordinator ✅
  *
  * LAYER 3 (InfrastructureSystemCoordinator):
  * • Factory for infrastructure systems (CSS, performance, settings)
@@ -25,7 +26,7 @@
  * ═══ DIAGNOSTIC VALUE ═══
  * Each layer enables systematic issue isolation:
  * - Layer 1 problems: "Systems won't start" → Check initialization phases
- * - Layer 2 problems: "Visual effects broken" → Check music sync/visual systems  
+ * - Layer 2 problems: "Visual effects broken" → Check music sync/visual systems
  * - Layer 3 problems: "Settings not saving" → Check infrastructure systems
  *
  * Key Features:
@@ -58,15 +59,16 @@ import { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
 // Legacy imports for backward compatibility (will be deprecated)
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { settings } from "@/config";
 import * as Utils from "@/utils/core/ThemeUtilities";
 import { SpicetifyColorBridge } from "@/utils/spicetify/SpicetifyColorBridge";
+// 🔧 PHASE 2.2: Migrated from VisualSystemCoordinator to VisualEffectsCoordinator
 import {
-  VisualSystemCoordinator,
+  VisualEffectsCoordinator,
   VisualSystemKey,
-} from "@/visual/coordination/VisualSystemCoordinator";
+} from "@/visual/effects/VisualEffectsCoordinator";
 
 // High-energy visual effects imports for integration
 import { RedEnergyBurstSystem } from "@/visual/effects/HighEnergyEffectsController";
@@ -171,7 +173,8 @@ export class SystemIntegrationCoordinator {
   private year3000System: any;
 
   // Facade instances (renamed for clarity)
-  private visualSystemCoordinator: VisualSystemCoordinator | null = null;
+  // 🔧 PHASE 2.2: Migrated to VisualEffectsCoordinator for consolidated visual system management
+  private visualSystemCoordinator: VisualEffectsCoordinator | null = null;
   private infrastructureSystemFacade: InfrastructureSystemCoordinator | null = null;
 
   // Shared dependencies (centrally managed)
@@ -186,6 +189,7 @@ export class SystemIntegrationCoordinator {
   private sharedMusicSyncService: MusicSyncService | null = null;
   // REMOVED: private sharedSettingsManager: SettingsManager | null = null; // Migrated to TypedSettingsManager singleton via typed settings
   private sharedColorHarmonyEngine: ColorHarmonyEngine | null = null;
+  private sharedColorProcessor: any | null = null; // 🔧 PHASE 7: ColorProcessor facade integration - type is ColorProcessor but avoiding circular import
   private sharedSpicetifyColorBridge: SpicetifyColorBridge | null = null;
 
   // State management
@@ -246,8 +250,8 @@ export class SystemIntegrationCoordinator {
         enforceSequentialInitialization: true,
         dependencyValidation: true,
         enableInitializationGates: true,
-        systemReadinessTimeout: 5000,
-        phaseTransitionTimeout: 10000,
+        systemReadinessTimeout: 10000, // Increased from 5000ms to allow for async initialization
+        phaseTransitionTimeout: 15000, // Increased from 10000ms for better stability
       },
       performanceThresholds: {
         maxTotalMemoryMB: 150,
@@ -419,16 +423,15 @@ export class SystemIntegrationCoordinator {
       // Phase 3.2: Use getSystem({ cacheOnly: true }) instead of getCachedSystem()
       const animationCoordinator = (await this.infrastructureSystemFacade?.getSystem("AnimationFrameCoordinator", { cacheOnly: true })) || null;
 
-      // Initialize Visual System Facade (settingsManager removed - using typed settings)
-      this.visualSystemCoordinator = new VisualSystemCoordinator(
+      // 🔧 PHASE 2.2: Initialize VisualEffectsCoordinator (consolidated visual system management)
+      this.visualSystemCoordinator = new VisualEffectsCoordinator(
         this.config,
-        this.utils,
-        this.year3000System,
         this.sharedCSSVariableWriter!,
         this.performanceCoordinator as any,
         this.sharedMusicSyncService!,
         this.sharedColorHarmonyEngine!,
-        this.eventBus,
+        this.utils,
+        this.year3000System,
         animationCoordinator
       );
 
@@ -687,9 +690,10 @@ export class SystemIntegrationCoordinator {
   }
 
   // Public API for facade access
+  // 🔧 PHASE 2.2: Use synchronous cache accessor for backward compatibility
   public getVisualSystem<T = any>(key: VisualSystemKey): T | null {
     if (!this.visualSystemCoordinator) return null;
-    return this.visualSystemCoordinator.getVisualSystem<T>(key);
+    return this.visualSystemCoordinator.getCachedVisualSystem<T>(key);
   }
 
   public getCachedNonVisualSystem<T = any>(key: InfrastructureSystemKey): T | null {
@@ -711,7 +715,8 @@ export class SystemIntegrationCoordinator {
     // Try visual systems first
     if (this.visualSystemCoordinator) {
       try {
-        return this.visualSystemCoordinator.getVisualSystem<T>(key as VisualSystemKey);
+        // 🔧 PHASE 2.2: Use async getVisualSystem for on-demand creation
+        return await this.visualSystemCoordinator.getVisualSystem<T>(key as VisualSystemKey);
       } catch (error) {
         // Not a visual system, try non-visual
       }
@@ -1047,6 +1052,7 @@ export class SystemIntegrationCoordinator {
   private setupCoordinationPhases(): void {
     // Define system dependencies for proper coordination
     this.systemDependencies.set("MusicSyncService", []);
+    this.systemDependencies.set("ColorProcessor", []); // 🔧 CRITICAL: ColorProcessor needs no dependencies, must init BEFORE MusicSyncService emits events
     this.systemDependencies.set("ColorHarmonyEngine", [
       "MusicSyncService",
       "SpicetifyColorBridge",
@@ -1067,6 +1073,7 @@ export class SystemIntegrationCoordinator {
     ]);
     this.initializationOrder.set("services", [
       // NOTE: SettingsManager removed - using TypedSettingsManager singleton
+      "ColorProcessor", // 🔧 PHASE 7: Added to facade coordination - MUST init FIRST to subscribe to colors:extracted BEFORE MusicSyncService emits
       "MusicSyncService",
       "SpicetifyColorBridge",
     ]);
@@ -1193,6 +1200,9 @@ export class SystemIntegrationCoordinator {
           await this.initializeUnifiedCSSController();
           break;
         // NOTE: SettingsManager case removed - using TypedSettingsManager singleton
+        case "ColorProcessor":
+          await this.initializeColorProcessor();
+          break;
         case "MusicSyncService":
           await this.initializeMusicSyncService();
           break;
@@ -1286,48 +1296,23 @@ export class SystemIntegrationCoordinator {
     }
 
     try {
-      // Initialize device capability detector for coordinated initialization
-      this.deviceDetector = new DeviceCapabilityDetector({
-        enableDebug: this.config.enableDebug || false,
-        runStressTests: false
-      });
-      await this.deviceDetector.initialize();
+      // Use the already-initialized performanceCoordinator from initializePerformanceAnalyzer()
+      // No need to recreate DeviceCapabilityDetector - it's already initialized
 
-      // Create CSSVariableWriter first (before SimplePerformanceCoordinator)
-      // Create a minimal performance coordinator for CSS controller initialization
-      const deviceCapabilities = this.deviceDetector.getCapabilities();
-      const minimalPerformanceCoordinator = {
-        getCurrentPerformanceMode: () => ({ 
-          name: 'balanced' as const,
-          qualityLevel: 0.8,
-          animationQuality: 0.8,
-          effectQuality: 0.8,
-          blurQuality: 0.8,
-          shadowQuality: 0.8,
-          frameRate: 60,
-          optimizationLevel: 1
-        }),
-        getDeviceCapabilities: () => deviceCapabilities || { 
-          performanceTier: 'mid' as const, 
-          memoryGB: 8, 
-          isMobile: false, 
-          gpuAcceleration: true 
-        },
-        getBatteryState: () => ({ level: 1, charging: false }),
-        getThermalState: () => ({ temperature: 'normal' as const })
-      };
-      
       this.sharedCSSVariableWriter = new CSSVariableWriter(
         this.config,
-        minimalPerformanceCoordinator as any
+        this.performanceCoordinator as any
       );
 
       // Set global instance for systems that need global access
       setGlobalCSSVariableWriter(this.sharedCSSVariableWriter);
-      
+
       await this.sharedCSSVariableWriter.initialize();
 
-      // SimplePerformanceCoordinator is already initialized above, no need to recreate
+      Y3KDebug?.debug?.log(
+        "SystemIntegrationCoordinator",
+        "CSSVariableWriter initialized successfully with SimplePerformanceCoordinator"
+      );
     } catch (error) {
       Y3KDebug?.debug?.warn(
         "SystemIntegrationCoordinator",
@@ -1335,11 +1320,39 @@ export class SystemIntegrationCoordinator {
         error
       );
       this.sharedCSSVariableWriter = null;
+      throw error;
     }
   }
 
   // NOTE: initializeSettingsManager() removed - using TypedSettingsManager singleton
   // All systems now use typed settings directly via: import { settings } from "@/config";
+
+  private async initializeColorProcessor(): Promise<void> {
+    try {
+      // 🔧 PHASE 7: ColorProcessor facade integration
+      // Dynamic import to avoid circular dependencies
+      const { globalColorProcessor } = await import("@/core/color/ColorProcessor");
+
+      console.log("🎨 [SystemIntegrationCoordinator] Initializing ColorProcessor...");
+      await globalColorProcessor.initialize();
+
+      this.sharedColorProcessor = globalColorProcessor;
+
+      console.log("🎨 [SystemIntegrationCoordinator] ✅ ColorProcessor initialized successfully");
+
+      Y3KDebug?.debug?.log(
+        "SystemIntegrationCoordinator",
+        "ColorProcessor initialized and ready to receive colors:extracted events"
+      );
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "SystemIntegrationCoordinator",
+        "Failed to initialize ColorProcessor:",
+        error
+      );
+      throw error;
+    }
+  }
 
   private async initializeMusicSyncService(): Promise<void> {
     this.sharedMusicSyncService = new MusicSyncService({
@@ -1403,16 +1416,17 @@ export class SystemIntegrationCoordinator {
   }
 
   private async initializeVisualFacade(): Promise<void> {
-    this.visualSystemCoordinator = new VisualSystemCoordinator(
+    // 🔧 PHASE 2.2: Initialize VisualEffectsCoordinator (consolidated visual system management)
+    this.visualSystemCoordinator = new VisualEffectsCoordinator(
       this.config,
-      this.utils,
-      this, // year3000System
-      this.sharedCSSVariableWriter!, // cssVariableController
+      this.sharedCSSVariableWriter!,
       this.performanceCoordinator as any,
       this.sharedMusicSyncService!,
-      // NOTE: settingsManager removed - using typed settings directly
       this.sharedColorHarmonyEngine || undefined, // optional
-      this.eventBus // optional
+      this.sharedColorProcessor || undefined, // 🔧 PHASE 7: ColorProcessor dependency injection
+      this.utils,
+      this, // year3000System
+      undefined // animationCoordinator (not available yet in this initialization path)
     );
 
     // Note: SpicetifyColorBridge can be accessed through SystemIntegrationCoordinator shared dependencies
@@ -1420,7 +1434,7 @@ export class SystemIntegrationCoordinator {
 
     await this.visualSystemCoordinator.initialize();
 
-    // Phase 3: Wire VisualSystemCoordinator to WebGLSystemsIntegration for quality scaling
+    // Phase 3: Wire VisualEffectsCoordinator to WebGLSystemsIntegration for quality scaling
     if (this.sharedWebGLSystemsIntegration) {
       this.sharedWebGLSystemsIntegration.setVisualSystemCoordinator(this.visualSystemCoordinator);
     }
@@ -1679,14 +1693,14 @@ export class SystemIntegrationCoordinator {
    */
   private async coordinateGradientConductor(): Promise<void> {
     try {
-      // Get GradientConductor through VisualSystemCoordinator factory pattern
+      // 🔧 PHASE 2.2: Get GradientConductor through VisualEffectsCoordinator factory pattern
       const gradientConductor =
-        this.visualSystemCoordinator!.getVisualSystem("GradientConductor");
+        await this.visualSystemCoordinator!.getVisualSystem("GradientConductor");
 
       if (!gradientConductor) {
         Y3KDebug?.debug?.warn(
           "SystemIntegrationCoordinator",
-          "GradientConductor not available via VisualSystemCoordinator"
+          "GradientConductor not available via VisualEffectsCoordinator"
         );
         return;
       }
@@ -1695,9 +1709,9 @@ export class SystemIntegrationCoordinator {
       this.addEventListener("gradient-conductor-event", (event: any) => {
         if (
           gradientConductor &&
-          typeof gradientConductor.handleSystemEvent === "function"
+          typeof (gradientConductor as any).handleSystemEvent === "function"
         ) {
-          gradientConductor.handleSystemEvent(event);
+          (gradientConductor as any).handleSystemEvent(event);
         }
       });
 
@@ -1707,12 +1721,12 @@ export class SystemIntegrationCoordinator {
         async (trigger: string) => {
           if (
             gradientConductor &&
-            typeof gradientConductor.refreshColorState === "function"
+            typeof (gradientConductor as any).refreshColorState === "function"
           ) {
-            await gradientConductor.refreshColorState(trigger);
+            await (gradientConductor as any).refreshColorState(trigger);
           } else if (
             gradientConductor &&
-            typeof gradientConductor.setPalette === "function"
+            typeof (gradientConductor as any).setPalette === "function"
           ) {
             // Fallback to setPalette if refreshColorState not available
             const colorHarmonyEngine = this.sharedColorHarmonyEngine;
@@ -1721,7 +1735,7 @@ export class SystemIntegrationCoordinator {
                 const currentGradient =
                   await colorHarmonyEngine.getCurrentGradient();
                 if (currentGradient) {
-                  gradientConductor.setPalette(currentGradient);
+                  (gradientConductor as any).setPalette(currentGradient);
                 }
               } catch (error) {
                 Y3KDebug?.debug?.warn(
@@ -1753,13 +1767,13 @@ export class SystemIntegrationCoordinator {
    */
   private async coordinateWebGLGradientSystem(): Promise<void> {
     try {
-      // Get WebGL system through VisualSystemCoordinator
-      const webglSystem = this.visualSystemCoordinator!.getVisualSystem("WebGLBackground");
+      // 🔧 PHASE 2.2: Get WebGL system through VisualEffectsCoordinator with await
+      const webglSystem = await this.visualSystemCoordinator!.getVisualSystem("WebGLBackground");
 
       if (!webglSystem) {
         Y3KDebug?.debug?.warn(
           "SystemIntegrationCoordinator",
-          "WebGLGradientBackgroundSystem not available via VisualSystemCoordinator"
+          "WebGLGradientBackgroundSystem not available via VisualEffectsCoordinator"
         );
         return;
       }
@@ -1768,9 +1782,9 @@ export class SystemIntegrationCoordinator {
       this.addEventListener("webgl-gradient-event", (event: any) => {
         if (
           webglSystem &&
-          typeof webglSystem.handleSystemEvent === "function"
+          typeof (webglSystem as any).handleSystemEvent === "function"
         ) {
-          webglSystem.handleSystemEvent(event);
+          (webglSystem as any).handleSystemEvent(event);
         }
       });
 
@@ -1780,15 +1794,15 @@ export class SystemIntegrationCoordinator {
         async (trigger: string) => {
           if (
             webglSystem &&
-            typeof webglSystem.refreshColorState === "function"
+            typeof (webglSystem as any).refreshColorState === "function"
           ) {
-            await webglSystem.refreshColorState(trigger);
+            await (webglSystem as any).refreshColorState(trigger);
           } else if (
             webglSystem &&
-            typeof webglSystem.updateGradientTexture === "function"
+            typeof (webglSystem as any).updateGradientTexture === "function"
           ) {
             // Fallback to updateGradientTexture if refreshColorState not available
-            await webglSystem.updateGradientTexture();
+            await (webglSystem as any).updateGradientTexture();
           }
         }
       );
@@ -2047,9 +2061,10 @@ export class SystemIntegrationCoordinator {
     // Try visual systems first
     if (this.visualSystemCoordinator) {
       try {
-        const system = this.visualSystemCoordinator.getVisualSystem(systemKey as any);
-        if (system && typeof system.refreshColorState === "function") {
-          await system.refreshColorState(trigger);
+        // 🔧 PHASE 2.2: Use async getVisualSystem with await
+        const system = await this.visualSystemCoordinator.getVisualSystem(systemKey as any);
+        if (system && typeof (system as any).refreshColorState === "function") {
+          await (system as any).refreshColorState(trigger);
           return;
         }
       } catch (error) {
@@ -2122,6 +2137,10 @@ export class SystemIntegrationCoordinator {
 
   public getSharedColorHarmonyEngine(): ColorHarmonyEngine | undefined {
     return this.sharedColorHarmonyEngine || undefined;
+  }
+
+  public getSharedColorProcessor(): any | undefined {
+    return this.sharedColorProcessor || undefined;
   }
 
   // NOTE: getSharedSettingsManager() removed - use typed settings directly: import { settings } from "@/config"

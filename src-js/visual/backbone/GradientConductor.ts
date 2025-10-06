@@ -12,7 +12,7 @@
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";

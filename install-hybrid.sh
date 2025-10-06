@@ -150,7 +150,6 @@ for SPICETIFY_CONFIG_PATH in "${TARGET_LOCATIONS[@]}"; do
         "color.ini"
         "theme.js"
         "manifest.json"
-        "Extensions"
         "assets"
         "docs"
     )
@@ -177,21 +176,12 @@ for SPICETIFY_CONFIG_PATH in "${TARGET_LOCATIONS[@]}"; do
 
     # Verify essential files
     ESSENTIAL_FILES=("user.css" "color.ini" "theme.js" "manifest.json")
-    EXTENSION_FILES=("Extensions/catppuccin-starrynight.js")
     all_files_exist=true
 
     for file in "${ESSENTIAL_FILES[@]}"; do
         if [ ! -f "$THEME_TARGET_PATH/$file" ]; then
             echo "❌ Essential file missing: $file"
             all_files_exist=false
-        fi
-    done
-
-    for file in "${EXTENSION_FILES[@]}"; do
-        if [ ! -f "$THEME_TARGET_PATH/$file" ]; then
-            echo "⚠️  Extension file missing: $file"
-        else
-            echo "✅ Extension file found: $file"
         fi
     done
 
@@ -219,7 +209,7 @@ echo "✅ Theme files copied to all target locations."
 
 # --- Configuration part (runs only once) ---
 
-echo "📦 Theme includes progressive loading extension for enhanced compatibility"
+echo "📦 Theme includes modern initialization system with API resilience"
 
 # Validate color scheme
 VALID_SCHEMES=("latte" "frappe" "macchiato" "mocha")
@@ -237,23 +227,7 @@ echo "🎨 Applying theme configuration..."
 $SPICETIFY_CMD config current_theme catppuccin-starrynight
 $SPICETIFY_CMD config color_scheme "$COLOR_SCHEME"
 
-# Configure extension
-echo "🔌 Configuring extension..."
-EXTENSION_PATH="catppuccin-starrynight.js"
-
-# Get current extensions
-current_extensions=$($SPICETIFY_CMD config extensions 2>/dev/null || echo "")
-
-if [[ "$current_extensions" != *"catppuccin-starrynight.js"* ]]; then
-    if [ -n "$current_extensions" ]; then
-        $SPICETIFY_CMD config extensions "${current_extensions}|${EXTENSION_PATH}"
-    else
-        $SPICETIFY_CMD config extensions "$EXTENSION_PATH"
-    fi
-    echo "✅ Extension configured: catppuccin-starrynight.js"
-else
-    echo "✅ Extension already configured"
-fi
+# Extension configuration removed - theme.js now handles all initialization
 
 # Apply changes
 if [ "$IN_WSL" = true ]; then
@@ -268,7 +242,6 @@ else
             echo "❌ Error applying theme. Try running manually:"
             echo "   $SPICETIFY_CMD config current_theme catppuccin-starrynight"
             echo "   $SPICETIFY_CMD config color_scheme $COLOR_SCHEME"
-            echo "   $SPICETIFY_CMD config extensions $EXTENSION_PATH"
             echo "   $SPICETIFY_CMD backup apply"
             exit 1
         fi
@@ -279,7 +252,6 @@ else
             echo "❌ Error applying theme. Try running manually:"
             echo "   $SPICETIFY_CMD config current_theme catppuccin-starrynight"
             echo "   $SPICETIFY_CMD config color_scheme $COLOR_SCHEME"
-            echo "   $SPICETIFY_CMD config extensions $EXTENSION_PATH"
             echo "   $SPICETIFY_CMD apply"
             exit 1
         fi
@@ -297,7 +269,7 @@ echo "🌟 Features enabled:"
 echo "   • Catppuccin $COLOR_SCHEME color scheme"
 echo "   • Modern --spice- variable system"
 echo "   • 15 customizable accent colors"
-echo "   • Progressive loading extension with API resilience"
+echo "   • Progressive API detection with graceful degradation"
 echo "   • Year 3000 Color Harmony System"
 echo "   • Music-reactive visual effects"
 echo "   • Modern CSS gradient system"

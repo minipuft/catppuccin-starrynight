@@ -75,7 +75,7 @@ function isSpicetifyPlatformAvailable(): boolean {
   const spicetify = safeGetSpicetify();
   return !!(spicetify?.Platform);
 }
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import * as Utils from "@/utils/core/ThemeUtilities";
 
@@ -419,13 +419,40 @@ export class SpicetifyColorBridge implements IManagedSystem {
   }
 
   /**
+   * 🔧 PHASE 7.2: Enhanced to accept full event data with OKLAB metadata
    * Update Spicetify variables directly with OKLAB-processed album colors
    * This bypasses CSS fallback chains and prevents Spotify overrides
-   * 
-   * Enhanced for comprehensive override protection across all visual systems
+   *
+   * Now extracts and applies:
+   * - OKLAB metadata (enhanced hex, rgb, shadow, OKLCH coordinates)
+   * - Dynamic accent variables
+   * - Music energy variables
+   * - Living gradient variables
+   * - Visual effects variables
    */
-  public updateWithAlbumColors(oklabColors: { [key: string]: string }): void {
+  public updateWithAlbumColors(
+    oklabColorsOrEventData: { [key: string]: string } | any
+  ): void {
+    console.log("🎨 [SpicetifyColorBridge] ═══ updateWithAlbumColors() CALLED ═══");
+
+    // 🔧 PHASE 7.2: Support both legacy (colors only) and new (full event data) formats
+    const isEventData = 'processedColors' in oklabColorsOrEventData;
+    const oklabColors = isEventData
+      ? oklabColorsOrEventData.processedColors
+      : oklabColorsOrEventData;
+    const metadata = isEventData ? oklabColorsOrEventData.metadata : null;
+
+    console.log("🎨 [SpicetifyColorBridge] Input data:", {
+      isEventData,
+      hasMetadata: !!metadata,
+      hasOKLABMetadata: !!metadata?.oklabMetadata,
+      colorKeys: Object.keys(oklabColors),
+      colorCount: Object.keys(oklabColors).length,
+      colors: oklabColors
+    });
+
     if (!this.initialized) {
+      console.error("🎨 [SpicetifyColorBridge] ❌ CRITICAL: Not initialized, cannot update with album colors!");
       console.warn("[SpicetifyColorBridge] Not initialized, cannot update with album colors");
       return;
     }
@@ -435,12 +462,21 @@ export class SpicetifyColorBridge implements IManagedSystem {
       const updateStartTime = performance.now();
 
       // Extract key colors from OKLAB processing result
+      console.log("🎨 [SpicetifyColorBridge] Extracting key colors from OKLAB result...");
       const primaryColor = oklabColors['OKLAB_PRIMARY'] || oklabColors['VIBRANT'] || oklabColors['PRIMARY'];
       const accentColor = oklabColors['OKLAB_ACCENT'] || oklabColors['LIGHT_VIBRANT'] || oklabColors['SECONDARY'];
       const shadowColor = oklabColors['OKLAB_SHADOW'] || oklabColors['DARK_VIBRANT'] || oklabColors['DARK'];
       const highlightColor = oklabColors['OKLAB_HIGHLIGHT'] || oklabColors['VIBRANT_NON_ALARMING'] || oklabColors['LIGHT'];
 
+      console.log("🎨 [SpicetifyColorBridge] Extracted colors:", {
+        primary: primaryColor,
+        accent: accentColor,
+        shadow: shadowColor,
+        highlight: highlightColor
+      });
+
       if (!primaryColor) {
+        console.error("🎨 [SpicetifyColorBridge] ❌ CRITICAL: No primary color found in OKLAB result!");
         console.warn("[SpicetifyColorBridge] No primary color found in OKLAB result, skipping update");
         return;
       }
@@ -453,8 +489,19 @@ export class SpicetifyColorBridge implements IManagedSystem {
       // Convert all colors to RGB for CSS variables
       const rgbDistribution = ColorGen.convertColorsToRgb(colorDistribution) as Required<Record<keyof typeof colorDistribution, string>>;
 
+      // 🔧 PHASE 7.2: Extract OKLAB metadata from strategy (if available)
+      const oklabMetadata = metadata?.oklabMetadata;
+      console.log("🎨 [SpicetifyColorBridge] OKLAB metadata:", {
+        hasOKLABMetadata: !!oklabMetadata,
+        enhancedHex: oklabMetadata?.enhancedHex,
+        shadowHex: oklabMetadata?.shadowHex,
+        oklchL: oklabMetadata?.oklchL,
+        oklchC: oklabMetadata?.oklchC,
+        oklchH: oklabMetadata?.oklchH,
+      });
+
       // === COMPREHENSIVE SPICETIFY VARIABLE UPDATES ===
-      
+
       // Core accent and surface colors (original implementation)
       const coreSpicetifyUpdates = {
         '--spice-accent': colorDistribution.primary,
@@ -618,11 +665,81 @@ export class SpicetifyColorBridge implements IManagedSystem {
         '--sn-color-harmony-triadic-rgb': rgbDistribution.harmonyPrimary,
       };
 
+      // 🔧 PHASE 7.2: Dynamic Accent Variables (from DynamicCatppuccinStrategy)
+      // These variables were previously set by DynamicCatppuccinBridge (legacy system)
+      // Now SpicetifyColorBridge is the single source of truth for ALL CSS variables
+      const dynamicAccentUpdates: Record<string, string> = {};
+
+      if (metadata?.dynamicAccentEnabled && oklabMetadata) {
+        // Apply OKLAB-enhanced accent colors
+        dynamicAccentUpdates['--sn-dynamic-accent-hex'] = oklabMetadata.enhancedHex;
+        dynamicAccentUpdates['--sn-dynamic-accent-rgb'] = oklabMetadata.enhancedRgb;
+        dynamicAccentUpdates['--sn-dynamic-accent-shadow-hex'] = oklabMetadata.shadowHex;
+        dynamicAccentUpdates['--sn-dynamic-accent-shadow-rgb'] = oklabMetadata.shadowRgb;
+
+        // OKLCH coordinate variables for advanced CSS features
+        dynamicAccentUpdates['--sn-oklch-l'] = String(oklabMetadata.oklchL);
+        dynamicAccentUpdates['--sn-oklch-c'] = String(oklabMetadata.oklchC);
+        dynamicAccentUpdates['--sn-oklch-h'] = String(oklabMetadata.oklchH);
+
+        // Original color preservation (for comparison/debugging)
+        dynamicAccentUpdates['--sn-dynamic-accent-original-hex'] = oklabMetadata.originalHex;
+        dynamicAccentUpdates['--sn-dynamic-accent-original-rgb'] = oklabMetadata.originalRgb;
+
+        console.log("🎨 [SpicetifyColorBridge] Applied OKLAB dynamic accent variables:", {
+          enhancedHex: oklabMetadata.enhancedHex,
+          shadowHex: oklabMetadata.shadowHex,
+          oklchCoordinates: `L:${oklabMetadata.oklchL} C:${oklabMetadata.oklchC} H:${oklabMetadata.oklchH}`
+        });
+      }
+
+      // 🔧 PHASE 7.2: Music Energy Variables (from DynamicCatppuccinStrategy)
+      const musicEnergyUpdates: Record<string, string> = {};
+
+      if (metadata?.musicEnergy !== undefined) {
+        musicEnergyUpdates['--sn-music-energy'] = String(metadata.musicEnergy);
+        musicEnergyUpdates['--sn-energy-response-multiplier'] = String(metadata.energyResponseMultiplier || 1.0);
+
+        console.log("🎨 [SpicetifyColorBridge] Applied music energy variables:", {
+          energy: metadata.musicEnergy,
+          multiplier: metadata.energyResponseMultiplier
+        });
+      }
+
+      // 🔧 PHASE 7.2: Living Gradient Variables (from DynamicCatppuccinStrategy)
+      const livingGradientUpdates: Record<string, string> = {};
+
+      if (metadata?.baseTransformationEnabled && oklabMetadata) {
+        // Use OKLAB-enhanced colors for living gradient
+        livingGradientUpdates['--sn-living-base-hex'] = oklabMetadata.enhancedHex;
+        livingGradientUpdates['--sn-living-base-rgb'] = oklabMetadata.enhancedRgb;
+
+        console.log("🎨 [SpicetifyColorBridge] Applied living gradient variables");
+      }
+
+      // 🔧 PHASE 7.2: Visual Effects Variables (from DynamicCatppuccinStrategy)
+      const visualEffectsUpdates: Record<string, string> = {};
+
+      if (metadata?.visualEffectsIntegrationEnabled && oklabMetadata) {
+        // Use OKLAB-enhanced colors for visual effects
+        visualEffectsUpdates['--sn-visual-effects-accent-hex'] = oklabMetadata.enhancedHex;
+        visualEffectsUpdates['--sn-visual-effects-accent-rgb'] = oklabMetadata.enhancedRgb;
+        visualEffectsUpdates['--sn-visual-effects-shadow-hex'] = oklabMetadata.shadowHex;
+        visualEffectsUpdates['--sn-visual-effects-shadow-rgb'] = oklabMetadata.shadowRgb;
+
+        console.log("🎨 [SpicetifyColorBridge] Applied visual effects variables");
+      }
+
       // Combine ALL variables for change detection (Phase 3 optimization)
       const allVariableUpdates = {
         ...allSpicetifyUpdates,
         ...starryNightUpdates,
         ...snColorUpdates,
+        // 🔧 PHASE 7.2: Add new OKLAB-enhanced variable sets
+        ...dynamicAccentUpdates,
+        ...musicEnergyUpdates,
+        ...livingGradientUpdates,
+        ...visualEffectsUpdates,
       };
 
       // Detect only changed variables to avoid redundant DOM updates
@@ -702,7 +819,16 @@ export class SpicetifyColorBridge implements IManagedSystem {
         });
       }
 
+      console.log("🎨 [SpicetifyColorBridge] ═══ updateWithAlbumColors() COMPLETE ═══");
+      console.log("🎨 [SpicetifyColorBridge] ✅ Successfully updated CSS variables:", {
+        updateDuration: `${updateDuration.toFixed(2)}ms`,
+        totalVariablesCalculated,
+        totalVariablesApplied,
+        primaryColor: colorDistribution.primary
+      });
+
     } catch (error) {
+      console.error("🎨 [SpicetifyColorBridge] ❌ FAILED to update with album colors:", error);
       console.error("[SpicetifyColorBridge] Failed to update with album colors:", error);
     }
   }
@@ -893,10 +1019,23 @@ export class SpicetifyColorBridge implements IManagedSystem {
     // 🔧 PHASE 5 FIX: Listen for harmonized colors from ColorProcessor
     // This reconnects the pathway broken during Phase 2 consolidation
     // ColorProcessor processes colors:extracted → emits colors:harmonized → SpicetifyColorBridge updates
+    console.log("🎨 [SpicetifyColorBridge] Subscribing to 'colors:harmonized' event...");
     const colorsHarmonizedId = unifiedEventBus.subscribe(
       'colors:harmonized',
       (data: any) => {
+        console.log("🎨 [SpicetifyColorBridge] ═══ RECEIVED 'colors:harmonized' EVENT ═══");
+        console.log("🎨 [SpicetifyColorBridge] Event data:", {
+          hasProcessedColors: !!data?.processedColors,
+          colorCount: data?.processedColors ? Object.keys(data.processedColors).length : 0,
+          accentHex: data?.accentHex,
+          accentRgb: data?.accentRgb,
+          strategies: data?.strategies,
+          processingTime: data?.processingTime
+        });
+
         if (data.processedColors) {
+          console.log("🎨 [SpicetifyColorBridge] Processed colors received:", data.processedColors);
+
           if (this.config.enableDebug) {
             console.log('🎨 [SpicetifyColorBridge] Received harmonized colors from ColorProcessor:', {
               colorCount: Object.keys(data.processedColors).length,
@@ -904,12 +1043,19 @@ export class SpicetifyColorBridge implements IManagedSystem {
               processingTime: data.processingTime
             });
           }
+
+          // 🔧 PHASE 7.2: Pass full event data including metadata
           // Update Spicetify variables with OKLAB-processed colors
-          this.updateWithAlbumColors(data.processedColors);
+          console.log("🎨 [SpicetifyColorBridge] Updating CSS variables with album colors...");
+          this.updateWithAlbumColors(data); // Pass full event data
+          console.log("🎨 [SpicetifyColorBridge] ✅ CSS variables updated");
+        } else {
+          console.warn("🎨 [SpicetifyColorBridge] ⚠️ No processed colors in event data!");
         }
       },
       'SpicetifyColorBridge'
     );
+    console.log("🎨 [SpicetifyColorBridge] ✅ Subscribed to 'colors:harmonized'");
 
     this.eventSubscriptionIds = [trackChangeId, settingsChangeId, colorsHarmonizedId];
 

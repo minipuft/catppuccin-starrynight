@@ -12,7 +12,7 @@
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { getGlobalCSSVariableWriter, CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type {
   ColorContext,
   ColorResult,

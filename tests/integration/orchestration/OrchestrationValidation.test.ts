@@ -14,7 +14,7 @@
 import { jest } from '@jest/globals';
 
 // Mock dependencies to avoid complex initialization
-jest.mock('@/debug/UnifiedDebugManager', () => ({
+jest.mock('@/debug/DebugCoordinator', () => ({
   Y3K: {
     debug: {
       log: jest.fn(),
@@ -155,7 +155,7 @@ describe('Orchestration Validation Tests', () => {
 
   describe('2. Event Bus Unification', () => {
     test('should have unified event bus working', async () => {
-      const { unifiedEventBus } = await import('@/core/events/UnifiedEventBus');
+      const { unifiedEventBus } = await import('@/core/events/EventBus');
 
       expect(unifiedEventBus).toBeDefined();
       expect(typeof unifiedEventBus.subscribe).toBe('function');
@@ -165,7 +165,7 @@ describe('Orchestration Validation Tests', () => {
     });
 
     test('should handle coordinated event processing', async () => {
-      const { unifiedEventBus } = await import('@/core/events/UnifiedEventBus');
+      const { unifiedEventBus } = await import('@/core/events/EventBus');
 
       const events: Array<{ type: string; timestamp: number; data: any }> = [];
 
@@ -194,7 +194,7 @@ describe('Orchestration Validation Tests', () => {
     });
 
     test('should provide metrics about event processing', async () => {
-      const { unifiedEventBus } = await import('@/core/events/UnifiedEventBus');
+      const { unifiedEventBus } = await import('@/core/events/EventBus');
 
       const metrics = unifiedEventBus.getMetrics();
       
@@ -207,7 +207,7 @@ describe('Orchestration Validation Tests', () => {
   describe('3. Event Migration System', () => {
     test('should migrate legacy events to unified events', async () => {
       // EventMigrationManager functionality is now integrated into UnifiedEventBus
-      const { unifiedEventBus } = await import('@/core/events/UnifiedEventBus');
+      const { unifiedEventBus } = await import('@/core/events/EventBus');
 
       let modernEventReceived = false;
       let eventData: any = null;
@@ -238,7 +238,7 @@ describe('Orchestration Validation Tests', () => {
 
     test('should handle multiple unified event types', async () => {
       // EventMigrationManager functionality is now integrated into UnifiedEventBus
-      const { unifiedEventBus } = await import('@/core/events/UnifiedEventBus');
+      const { unifiedEventBus } = await import('@/core/events/EventBus');
 
       const receivedEvents: string[] = [];
 
@@ -301,7 +301,7 @@ describe('Orchestration Validation Tests', () => {
     });
 
     test('should prevent racing through coordination', async () => {
-      const { unifiedEventBus } = await import('@/core/events/UnifiedEventBus');
+      const { unifiedEventBus } = await import('@/core/events/EventBus');
 
       // Test that events are processed in coordinated order
       const processingOrder: Array<{ event: string; timestamp: number }> = [];
@@ -450,7 +450,7 @@ describe('Orchestration Validation Tests', () => {
 
   describe('7. Regression Prevention', () => {
     test('should maintain orchestration over multiple operations', async () => {
-      const { unifiedEventBus } = await import('@/core/events/UnifiedEventBus');
+      const { unifiedEventBus } = await import('@/core/events/EventBus');
 
       let eventCount = 0;
       
@@ -477,7 +477,7 @@ describe('Orchestration Validation Tests', () => {
     });
 
     test('should prevent return to racing conditions', async () => {
-      const { unifiedEventBus } = await import('@/core/events/UnifiedEventBus');
+      const { unifiedEventBus } = await import('@/core/events/EventBus');
 
       // Test rapid event emission that could potentially cause racing
       const rapidEvents: Array<{ type: string; order: number; timestamp: number }> = [];

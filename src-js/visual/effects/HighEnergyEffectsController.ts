@@ -18,7 +18,7 @@
 
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import type { BeatData, RGB } from "@/types/colorTypes";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import { EmotionalTemperatureMapper } from "@/utils/color/EmotionalTemperatureMapper";

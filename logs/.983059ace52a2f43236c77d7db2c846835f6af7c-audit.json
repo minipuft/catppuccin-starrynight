@@ -39,6 +39,11 @@
             "date": 1759659315854,
             "name": "/home/minipuft/Applications/catppuccin-starrynight/logs/mcp-puppeteer-2025-10-05.log",
             "hash": "31b6ce24aa78a24e715f2ddee83ea90a458f7348093783a19455a484891de214"
+        },
+        {
+            "date": 1759741068732,
+            "name": "/home/minipuft/Applications/catppuccin-starrynight/logs/mcp-puppeteer-2025-10-06.log",
+            "hash": "bbd4c8ba336c35d317c383979c4ba52f097887c81594814b925743edc89735d0"
         }
     ],
     "hashType": "sha256"

@@ -7,9 +7,9 @@
  *
  */
 
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { colorEventOrchestrator } from "./ColorEventRouter";
-import { EventName, unifiedEventBus } from "./UnifiedEventBus";
+import { EventName, unifiedEventBus } from "./EventBus";
 
 interface EventFlowMetrics {
   eventName: EventName;

@@ -10,8 +10,8 @@
 
 import { ServiceVisualSystemBase } from "@/core/services/ServiceCompositionBase";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { unifiedEventBus } from "@/core/events/EventBus";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
 

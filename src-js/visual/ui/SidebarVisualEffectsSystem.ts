@@ -333,7 +333,7 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
 
   /**
    * ✅ RAF LOOP CONSOLIDATION: Fallback removed - now always uses coordinator
-   * VisualSystemCoordinator.registerAnimationSystems() handles registration automatically
+   * VisualEffectsCoordinator.registerAnimationSystems() handles registration automatically
    */
   private _startFallbackVisualEffectsLoop() {
     // No-op: Fallback no longer needed - coordinator registration is guaranteed
@@ -427,7 +427,7 @@ export class SidebarVisualEffectsSystem extends BaseVisualSystem {
    * - Single RAF loop for all systems
    * - Shared deltaTime calculation
    * - Priority-based execution order
-   * - Automatic registration via VisualSystemCoordinator
+   * - Automatic registration via VisualEffectsCoordinator
    *
    * Old method removed: startVisualEffectsLoop()
    * Replacement: updateAnimation(deltaTime) called by coordinator

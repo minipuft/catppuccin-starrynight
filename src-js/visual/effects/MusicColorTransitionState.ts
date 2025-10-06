@@ -8,7 +8,7 @@
  * performance-optimized color processing, and atmospheric visual enhancements.
  */
 
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import type { RGB } from "@/types/colorTypes";
 
 export interface ColorTransitionState {

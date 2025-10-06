@@ -12,7 +12,7 @@
 
 import { GenreProfileManager } from "@/audio/GenreProfileManager";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { ColorResult } from "@/types/colorStrategy";
 import {
   EmotionalTemperatureMapper,

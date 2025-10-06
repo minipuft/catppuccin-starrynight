@@ -8,13 +8,13 @@
 // The writer provides visual-effects-driven CSS updates that adapt to music,
 // aesthetics, performance constraints, and device capabilities.
 
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import {
   UnifiedPerformanceCoordinator,
   PerformanceAnalyzer,
   type DeviceCapabilities,
   type PerformanceMode,
-} from "@/core/performance/UnifiedPerformanceCoordinator";
+} from "@/core/performance/PerformanceMonitor";
 import { type VariablePriority } from "@/core/css/CSSVariableSchema";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";

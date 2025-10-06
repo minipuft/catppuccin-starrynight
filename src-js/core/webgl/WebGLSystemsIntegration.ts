@@ -4,7 +4,7 @@
  * Integrates the UnifiedWebGLController with existing WebGL systems
  * and the Year3000System architecture.
  *
- * NOTE: WebGL gradient rendering is now managed via VisualSystemCoordinator
+ * 🔧 PHASE 2.2: WebGL gradient rendering is now managed via VisualEffectsCoordinator
  * using WebGLGradientStrategy (src-js/visual/strategies/WebGLGradientStrategy.ts).
  * This integration layer focuses on UnifiedWebGLController coordination and
  * potential future WebGL systems (particles, corridor effects, etc.).
@@ -12,7 +12,7 @@
 
 import { UnifiedWebGLController } from "./UnifiedWebGLController";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 
 /**
@@ -22,17 +22,17 @@ import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
  * Replaces the complex ContinuousQualityManager approach with a simple,
  * unified management system.
  *
- * Phase 3 Update: Now registers WebGLGradientStrategy for direct quality scaling.
+ * 🔧 PHASE 2.2: Now uses VisualEffectsCoordinator for WebGL gradient strategy access.
  */
 export class WebGLSystemsIntegration implements IManagedSystem {
   public initialized = false;
 
   private controller: UnifiedWebGLController;
-  private visualSystemCoordinator: any | null = null; // VisualSystemCoordinator reference
+  private visualSystemCoordinator: any | null = null; // VisualEffectsCoordinator reference (Phase 2.2)
 
   constructor(
     deviceCapabilities: DeviceCapabilityDetector,
-    visualSystemCoordinator?: any // Optional for Phase 3 integration
+    visualSystemCoordinator?: any // VisualEffectsCoordinator for WebGL strategy access
   ) {
     this.controller = new UnifiedWebGLController(deviceCapabilities);
     this.visualSystemCoordinator = visualSystemCoordinator || null;
@@ -80,7 +80,7 @@ export class WebGLSystemsIntegration implements IManagedSystem {
     }
 
     // Post-consolidation: Individual WebGL systems (like gradients) are managed
-    // via VisualSystemCoordinator, so we only check the controller health here
+    // via VisualEffectsCoordinator, so we only check the controller health here
     return {
       healthy: true,
       details: "WebGL controller healthy",
@@ -157,13 +157,13 @@ export class WebGLSystemsIntegration implements IManagedSystem {
   }
 
   /**
-   * Set VisualSystemCoordinator reference (Phase 3 late binding)
+   * Set VisualEffectsCoordinator reference (Phase 2.2 late binding)
    *
-   * Allows SystemIntegrationCoordinator to provide the VisualSystemCoordinator
+   * Allows SystemIntegrationCoordinator to provide the VisualEffectsCoordinator
    * reference after both systems are created, enabling WebGLGradientStrategy
    * registration.
    *
-   * @param visualSystemCoordinator - VisualSystemCoordinator instance
+   * @param visualSystemCoordinator - VisualEffectsCoordinator instance
    */
   public setVisualSystemCoordinator(visualSystemCoordinator: any): void {
     this.visualSystemCoordinator = visualSystemCoordinator;
@@ -181,7 +181,7 @@ export class WebGLSystemsIntegration implements IManagedSystem {
 
     Y3KDebug?.debug?.log(
       "WebGLSystemsIntegration",
-      "VisualSystemCoordinator reference set (Phase 3 late binding)"
+      "VisualEffectsCoordinator reference set (Phase 2.2 late binding)"
     );
   }
 
@@ -249,13 +249,13 @@ export class WebGLSystemsIntegration implements IManagedSystem {
         } else {
           Y3KDebug?.debug?.warn(
             "WebGLSystemsIntegration",
-            "⚠ WebGLGradientStrategy not yet created by VisualSystemCoordinator - will use lazy registration"
+            "⚠ WebGLGradientStrategy not yet created by VisualEffectsCoordinator - will use lazy registration"
           );
         }
       } else {
         Y3KDebug?.debug?.warn(
           "WebGLSystemsIntegration",
-          "⚠ VisualSystemCoordinator not provided - WebGLGradientStrategy cannot be registered for quality scaling"
+          "⚠ VisualEffectsCoordinator not provided - WebGLGradientStrategy cannot be registered for quality scaling"
         );
       }
 
@@ -274,7 +274,7 @@ export class WebGLSystemsIntegration implements IManagedSystem {
   }
 
   private _getRegisteredSystemNames(): string[] {
-    // Post-consolidation: Gradient rendering is managed via VisualSystemCoordinator
+    // Post-consolidation: Gradient rendering is managed via VisualEffectsCoordinator
     // This will return names of future WebGL systems when registered
     const systemNames: string[] = [];
 

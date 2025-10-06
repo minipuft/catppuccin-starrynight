@@ -11,8 +11,8 @@
 import { EnhancedDeviceTierDetector, type TierDetectionResult } from "./EnhancedDeviceTierDetector";
 import type { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
 import type { WebGLQuality } from "@/core/webgl/UnifiedWebGLController";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { unifiedEventBus } from "@/core/events/EventBus";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 
 export type PerformanceTier = 'low' | 'medium' | 'high';

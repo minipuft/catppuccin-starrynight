@@ -1,16 +1,17 @@
 /**
- * BackgroundStrategySelector - Intelligent Strategy Selection for Background Systems
+ * ColorStrategySelector - Intelligent Color Strategy Selection
  *
  * Implements sophisticated strategy selection logic that considers device capabilities,
- * user preferences, music context, and visual effects levels to optimize background
- * processing strategies for the best performance and visual experience.
+ * user preferences, music context, and visual effects levels to optimize color
+ * processing strategies (accents, backgrounds, effects, palettes) for the best
+ * performance and visual experience.
  *
- * Philosophy: "The right strategy at the right time - visual-effects-aware selection
- * that adapts to the user's device, preferences, and musical journey."
+ * Scope: Complete color pipeline selection including accent colors, backgrounds,
+ * visual effects, OKLAB coordination, and music-responsive harmonization.
  */
 
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type {
   ColorContext,
   IColorProcessor,
@@ -65,7 +66,7 @@ interface StrategyMetrics {
   compatibilityScore: number;
 }
 
-export class BackgroundStrategySelector {
+export class ColorStrategySelector {
   private deviceDetector: DeviceCapabilityDetector;
 
   // Strategy instances (lazy-loaded)
@@ -81,7 +82,7 @@ export class BackgroundStrategySelector {
     this.initializeStrategyMetadata();
 
     Y3KDebug?.debug?.log(
-      "BackgroundStrategySelector",
+      "ColorStrategySelector",
       "Strategy selector initialized"
     );
   }
@@ -156,7 +157,7 @@ export class BackgroundStrategySelector {
 
       // Enhanced logging for debugging WebGL gradient issues
       Y3KDebug?.debug?.log(
-        "BackgroundStrategySelector",
+        "ColorStrategySelector",
         "🎯 Strategy Selection Debug - WebGL Gradient Analysis",
         {
           trackUri: context.trackUri,
@@ -186,7 +187,7 @@ export class BackgroundStrategySelector {
       // Apply strategy selection rules with detailed logging
       for (const decision of strategyDecisions) {
         Y3KDebug?.debug?.log(
-          "BackgroundStrategySelector",
+          "ColorStrategySelector",
           `Strategy decision: ${decision.strategyName}`,
           {
             shouldInclude: decision.shouldInclude,
@@ -200,7 +201,7 @@ export class BackgroundStrategySelector {
           if (strategy) {
             const canProcess = strategy.canProcess(context);
             Y3KDebug?.debug?.log(
-              "BackgroundStrategySelector",
+              "ColorStrategySelector",
               `Strategy ${decision.strategyName} canProcess check`,
               {
                 canProcess,
@@ -212,18 +213,18 @@ export class BackgroundStrategySelector {
             if (canProcess) {
               selectedStrategies.push(strategy);
               Y3KDebug?.debug?.log(
-                "BackgroundStrategySelector",
+                "ColorStrategySelector",
                 `✅ Selected strategy: ${decision.strategyName}`
               );
             } else {
               Y3KDebug?.debug?.warn(
-                "BackgroundStrategySelector",
+                "ColorStrategySelector",
                 `❌ Strategy rejected by canProcess(): ${decision.strategyName}`
               );
             }
           } else {
             Y3KDebug?.debug?.error(
-              "BackgroundStrategySelector",
+              "ColorStrategySelector",
               `Failed to create strategy: ${decision.strategyName}`
             );
           }
@@ -241,7 +242,7 @@ export class BackgroundStrategySelector {
       const processingTime = performance.now() - startTime;
 
       Y3KDebug?.debug?.log(
-        "BackgroundStrategySelector",
+        "ColorStrategySelector",
         "🎯 Strategy selection completed",
         {
           selectedCount: selectedStrategies.length,
@@ -260,7 +261,7 @@ export class BackgroundStrategySelector {
       return selectedStrategies;
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "BackgroundStrategySelector",
+        "ColorStrategySelector",
         "Strategy selection failed:",
         error
       );
@@ -434,7 +435,7 @@ export class BackgroundStrategySelector {
     if (criteria.settingsContext.webglForceEnabled) {
       score += 0.4; // Major boost when forced
       Y3KDebug?.debug?.log(
-        "BackgroundStrategySelector",
+        "ColorStrategySelector",
         "WebGL force enabled - boosting score by 0.4"
       );
     }
@@ -601,7 +602,7 @@ export class BackgroundStrategySelector {
       };
     } catch (error) {
       Y3KDebug?.debug?.warn(
-        "BackgroundStrategySelector",
+        "ColorStrategySelector",
         "Failed to load settings, using defaults:",
         error
       );
@@ -657,7 +658,7 @@ export class BackgroundStrategySelector {
 
         default:
           Y3KDebug?.debug?.warn(
-            "BackgroundStrategySelector",
+            "ColorStrategySelector",
             `Unknown strategy: ${strategyName}`
           );
           return null;
@@ -666,13 +667,13 @@ export class BackgroundStrategySelector {
       if (strategy) {
         this.strategyInstances.set(strategyName, strategy);
         Y3KDebug?.debug?.log(
-          "BackgroundStrategySelector",
+          "ColorStrategySelector",
           `Created strategy instance: ${strategyName}`
         );
       }
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "BackgroundStrategySelector",
+        "ColorStrategySelector",
         `Failed to create strategy ${strategyName}:`,
         error
       );
@@ -717,7 +718,7 @@ export class BackgroundStrategySelector {
     // This would be used by the ColorOrchestrator to update selection criteria
     // based on runtime conditions, user preference changes, etc.
     Y3KDebug?.debug?.log(
-      "BackgroundStrategySelector",
+      "ColorStrategySelector",
       "Strategy selection criteria updated:",
       updates
     );
@@ -734,7 +735,7 @@ export class BackgroundStrategySelector {
           (strategy as any).destroy();
         } catch (error) {
           Y3KDebug?.debug?.warn(
-            "BackgroundStrategySelector",
+            "ColorStrategySelector",
             `Error destroying strategy ${name}:`,
             error
           );
@@ -746,7 +747,7 @@ export class BackgroundStrategySelector {
     this.strategyMetadata.clear();
 
     Y3KDebug?.debug?.log(
-      "BackgroundStrategySelector",
+      "ColorStrategySelector",
       "Strategy selector destroyed"
     );
   }

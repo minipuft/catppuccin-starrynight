@@ -6,8 +6,8 @@
  * injection patterns at creation time.
  */
 
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { unifiedEventBus } from "@/core/events/EventBus";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type {
   CreationStrategySelectionCriteria,
   IEventDrivenCreationStrategy,

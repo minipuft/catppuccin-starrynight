@@ -11,7 +11,7 @@
  */
 
 import { GenreProfileManager } from "@/audio/GenreProfileManager";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { EmotionalTemperatureMapper } from "@/utils/color/EmotionalTemperatureMapper";
 import { MusicalOKLABCoordinator } from "@/utils/color/MusicalOKLABCoordinator";
 import { OKLABColorProcessor } from "@/utils/color/OKLABColorProcessor";

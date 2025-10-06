@@ -13,7 +13,7 @@
 
 import { GenreProfileManager } from "@/audio/GenreProfileManager";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import type { AdvancedSystemConfig } from "@/types/models";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";

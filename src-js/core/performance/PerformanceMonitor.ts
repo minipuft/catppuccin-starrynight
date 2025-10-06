@@ -1,5 +1,5 @@
 // Removed circular dependency - SimplePerformanceCoordinator now delegates to this class
-import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
+import { unifiedEventBus } from '@/core/events/EventBus';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 
@@ -1371,5 +1371,8 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
   }
 }
 
-// Backward compatibility alias
+// Primary export with action-oriented name
+export const PerformanceMonitor = PerformanceAnalyzer;
+
+// Backward compatibility aliases
 export const UnifiedPerformanceCoordinator = PerformanceAnalyzer;

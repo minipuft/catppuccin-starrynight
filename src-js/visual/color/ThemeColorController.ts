@@ -1,17 +1,35 @@
 /**
- * DynamicCatppuccinStrategy - ColorOrchestrator Strategy Implementation
+ * DynamicCatppuccinStrategy - Dynamic Accent Color Processing Strategy
  *
- * Transforms the DynamicCatppuccinBridge into a proper IColorProcessor strategy
- * for the unified ColorOrchestrator architecture. Handles Spicetify variable
- * updates and visual-effects extensions through the Color Extension Facade pattern.
+ * Pure strategy pattern implementation for OKLAB color processing.
+ * Processes album art colors with OKLAB enhancement and returns metadata to
+ * SpicetifyColorBridge for CSS variable application (single source of truth).
  *
- * Philosophy: "Unified color processing through intelligent strategy coordination,
- * eliminating duplicate event handling while preserving dynamic accent functionality."
+ * **Multi-Palette Support**: Works with ANY palette system (Catppuccin, Year3000, etc.)
+ * through PaletteSystemManager abstraction layer. Despite the "Catppuccin" in the name
+ * (retained for historical/compatibility reasons), this strategy dynamically adapts to
+ * the active palette system configured in ADVANCED_SYSTEM_CONFIG.paletteSystem.
+ *
+ * **Activation**: Only activates when user selects "dynamic" accent mode in settings.
+ * When inactive, static accent colors from the configured palette are used instead.
+ *
+ * **Architecture**:
+ * - Uses PaletteSystemManager.getDefaultAccentColor() which routes to active palette
+ * - Applies OKLAB perceptual color enhancement regardless of palette system
+ * - Returns processed ColorResult with metadata for SpicetifyColorBridge to apply
+ *
+ * Philosophy: "Pure strategy pattern - process colors, return metadata, let bridge apply."
+ *
+ * @see PaletteSystemManager for palette system abstraction
+ * @see SpicetifyColorBridge for CSS variable application
  */
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { getGlobalCSSVariableWriter, CSSVariableWriter } from "@/core/css/CSSVariableWriter";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import {
+  getGlobalCSSVariableWriter,
+  CSSVariableWriter,
+} from "@/core/css/CSSVariableWriter";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type {
   ColorContext,
   ColorResult,
@@ -76,7 +94,7 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
     try {
       const defaultAccent = paletteSystemManager.getDefaultAccentColor();
       const baseColor = paletteSystemManager.getBrightnessAdjustedBaseColor();
-      
+
       return {
         currentAccentHex: defaultAccent.hex,
         currentAccentRgb: defaultAccent.rgb,
@@ -88,7 +106,10 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
       };
     } catch (error) {
       // Fallback to hardcoded values
-      console.warn('[DynamicCatppuccinStrategy] Failed to get initial colors, using fallback:', error);
+      console.warn(
+        "[DynamicCatppuccinStrategy] Failed to get initial colors, using fallback:",
+        error
+      );
       return {
         currentAccentHex: "#7c3aed", // Fallback cosmic purple
         currentAccentRgb: "124,58,237",
@@ -101,11 +122,8 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
     }
   }
 
-  constructor(
-    cssController?: CSSVariableWriter
-  ) {
-    this.cssController =
-      cssController || getGlobalCSSVariableWriter();
+  constructor(cssController?: CSSVariableWriter) {
+    this.cssController = cssController || getGlobalCSSVariableWriter();
     this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
 
     // Initialize current state from existing variables
@@ -179,28 +197,25 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
         );
       }
 
-      // Apply colors using Color Extension Facade with OKLAB-enhanced color
-      await this.applyColorFacade(
-        processedAccentHex,
-        context.rawColors,
-        oklabResult
-      );
+      // 🔧 PHASE 7.1: PURE STRATEGY PATTERN - Strategy processes colors, doesn't apply them
+      // CSS variable application is now handled by SpicetifyColorBridge
+      // This ensures single source of truth for color application and eliminates race conditions
 
-      // Update internal state with processed color
+      // Update internal state with processed color for diagnostics
       this.dynamicColorState.currentAccentHex = processedAccentHex;
       if (processedAccentRgb) {
         this.dynamicColorState.currentAccentRgb = `${processedAccentRgb.r},${processedAccentRgb.g},${processedAccentRgb.b}`;
       }
       this.dynamicColorState.lastUpdateTime = Date.now();
 
-      // Handle music energy if available
+      // Track music energy for diagnostics
       if (context.musicData?.energy !== undefined) {
         this.dynamicColorState.musicEnergy = context.musicData.energy;
-        await this.updateVisualEffectsWithMusicEnergy(context.musicData.energy);
       }
 
       const processingTime = performance.now() - startTime;
 
+      // 🔧 PHASE 7.1: Enhanced ColorResult with complete OKLAB data for SpicetifyColorBridge
       const result: ColorResult = {
         processedColors: {
           accent: processedAccentHex,
@@ -217,12 +232,31 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
           harmonicIntensity: this.integrationConfig.energyResponseMultiplier,
           oklabProcessing: this.integrationConfig.oklabEnhancementEnabled,
           oklabPreset: this.integrationConfig.oklabPreset,
+          // Music energy for visual effects coordination
+          musicEnergy: this.dynamicColorState.musicEnergy,
+          energyResponseMultiplier:
+            this.integrationConfig.energyResponseMultiplier,
+          // Configuration flags for bridge to apply correctly
+          dynamicAccentEnabled: true,
+          visualEffectsIntegrationEnabled:
+            this.integrationConfig.visualEffectsIntegrationEnabled,
+          baseTransformationEnabled:
+            this.integrationConfig.baseTransformationEnabled,
           ...(oklabResult && {
             oklabMetadata: {
               originalHex: oklabResult.originalHex,
+              originalRgb: oklabResult.originalRgb,
               enhancedHex: oklabResult.enhancedHex,
+              enhancedRgb: oklabResult.enhancedRgb,
               shadowHex: oklabResult.shadowHex,
+              shadowRgb: oklabResult.shadowRgb,
               oklabProcessingTime: oklabResult.processingTime,
+              // OKLCH values for advanced CSS features
+              oklchL: oklabResult.oklchEnhanced.L,
+              oklchC: oklabResult.oklchEnhanced.C,
+              oklchH: oklabResult.oklchEnhanced.H,
+              // Complete OKLAB result for CSS variable generation
+              fullOKLABResult: oklabResult,
             },
           }),
         },
@@ -357,212 +391,17 @@ export class DynamicCatppuccinStrategy implements IColorProcessor {
     return null;
   }
 
-  /**
-   * Apply colors using Color Extension Facade pattern with coordinated updates
-   * Updates both core Spicetify variables AND visual-effects extensions with OKLAB enhancement
-   */
-  private async applyColorFacade(
-    accentHex: string,
-    rawColors: Record<string, string>,
-    oklabResult?: OKLABProcessingResult | null
-  ): Promise<void> {
-    const rgb = this.utils.hexToRgb(accentHex);
-
-    if (!rgb) return;
-
-    const rgbString = `${rgb.r},${rgb.g},${rgb.b}`;
-
-    // 🎯 COORDINATED VARIABLE UPDATES - Dynamic > Cosmic > Spicetify cascade
-    const variablesToUpdate: Record<string, string> = {
-      // Dynamic color variables (highest priority) - updated by music systems
-      "--sn-dynamic-accent-hex": accentHex,
-      "--sn-dynamic-accent-rgb": rgbString,
-      "--sn-dynamic-primary-hex": accentHex,
-      "--sn-dynamic-primary-rgb": rgbString,
-
-      // Core Spicetify variables for compatibility
-      "--spice-accent": accentHex,
-      "--spice-button": accentHex,
-      "--spice-button-active": accentHex,
-      "--spice-rgb-accent": rgbString,
-      "--spice-rgb-button": rgbString,
-
-      // Extracted color variables for ColorHarmonyEngine
-      "--sn-color-extracted-primary-rgb": rgbString,
-      "--sn-color-extracted-vibrant-rgb": rgbString,
-      "--sn-color-extracted-dominant-rgb": rgbString,
-    };
-
-    // 🔬 OKLAB ENHANCED VARIABLES - Add OKLAB-processed variables if available
-    if (oklabResult && this.integrationConfig.oklabEnhancementEnabled) {
-      const oklabCSSVars = this.oklabProcessor.generateCSSVariables(
-        oklabResult,
-        "sn-oklab-accent"
-      );
-      Object.assign(variablesToUpdate, {
-        ...oklabCSSVars,
-        // Enhanced shadow variables for depth effects
-        "--sn-dynamic-shadow-hex": oklabResult.shadowHex,
-        "--sn-dynamic-shadow-rgb": `${oklabResult.shadowRgb.r},${oklabResult.shadowRgb.g},${oklabResult.shadowRgb.b}`,
-        // OKLCH variables for advanced CSS features
-        "--sn-accent-oklch-l": oklabResult.oklchEnhanced.L.toFixed(3),
-        "--sn-accent-oklch-c": oklabResult.oklchEnhanced.C.toFixed(3),
-        "--sn-accent-oklch-h": oklabResult.oklchEnhanced.H.toFixed(1),
-      });
-
-      Y3KDebug?.debug?.log(
-        "DynamicCatppuccinStrategy",
-        "Added OKLAB-enhanced CSS variables:",
-        {
-          oklabVarsCount: Object.keys(oklabCSSVars).length,
-          enhancedHex: oklabResult.enhancedHex,
-          shadowHex: oklabResult.shadowHex,
-        }
-      );
-    }
-
-    // Apply all core variables in a coordinated batch
-    if (this.cssController) {
-      this.cssController.updateVariables(
-        variablesToUpdate,
-        "high",
-        "core-spicetify-facade"
-      );
-    }
-
-    // Apply secondary colors if available
-    const primaryColor = rawColors["PRIMARY"] || rawColors["VIBRANT"];
-    if (primaryColor) {
-      await this.updateLivingBaseBackground(primaryColor);
-    }
-
-    // 🔮 VISUAL EFFECTS INTEGRATION
-    if (this.integrationConfig.visualEffectsIntegrationEnabled) {
-      await this.updateVisualEffectsWithAccent(accentHex, rgbString);
-    }
-
-    Y3KDebug?.debug?.log(
-      "DynamicCatppuccinStrategy",
-      `Applied coordinated color facade - Spicetify: ${accentHex}, Visual-effects extensions updated`,
-      {
-        oklabProcessing: !!oklabResult,
-        variableCount: Object.keys(variablesToUpdate).length,
-      }
-    );
-  }
-
-  /**
-   * Update living base background using coordinated variable updates
-   * Preserves Spicetify base while adding visual-effects layers
-   */
-  private async updateLivingBaseBackground(primaryHex: string): Promise<void> {
-    const primaryRgb = this.utils.hexToRgb(primaryHex);
-
-    if (!primaryRgb) return;
-
-    const primaryRgbString = `${primaryRgb.r},${primaryRgb.g},${primaryRgb.b}`;
-
-    // Create living gradient that ENHANCES Spicetify base (doesn't replace)
-    const visualEffectsGradient = `
-      linear-gradient(135deg,
-        var(--spice-base) 0%,
-        rgba(${primaryRgbString}, 0.08) 30%,
-        var(--spice-base) 70%
-      ),
-      var(--spice-base)
-    `;
-
-    // 🌊 COORDINATED VISUAL-EFFECTS EXTENSIONS
-    const livingBaseVariables: Record<string, string> = {
-      // Dynamic secondary colors
-      "--sn-dynamic-secondary-hex": primaryHex,
-      "--sn-dynamic-secondary-rgb": primaryRgbString,
-
-      // Extracted color system for visual-effects
-      "--sn-color-extracted-secondary-rgb": primaryRgbString,
-      "--sn-color-harmony-complementary-rgb": primaryRgbString,
-
-      // Living gradient enhancements
-      "--living-base-gradient": visualEffectsGradient,
-      "--visual-effects-base-gradient": visualEffectsGradient,
-    };
-
-    if (this.cssController) {
-      this.cssController.updateVariables(
-        livingBaseVariables,
-        "normal",
-        "living-base-background"
-      );
-    }
-
-    Y3KDebug?.debug?.log(
-      "DynamicCatppuccinStrategy",
-      `Coordinated living base facade updated - Primary: ${primaryHex}, preserving --spice-base`
-    );
-  }
-
-  /**
-   * Update visual-effects system with new accent awareness using coordinated updates
-   */
-  private async updateVisualEffectsWithAccent(
-    accentHex: string,
-    accentRgb: string
-  ): Promise<void> {
-    const visualEffectsVariables: Record<string, string> = {
-      // Holographic visual-effects variables
-      "--sn-holographic-rgb": accentRgb,
-      "--holographic-scanline-rgb": accentRgb,
-
-      // Depth visual-effects variables
-      "--visual-effects-intensity": `calc(0.5 + var(--musical-sync-intensity) * ${this.integrationConfig.energyResponseMultiplier})`,
-    };
-
-    if (this.cssController) {
-      this.cssController.updateVariables(
-        visualEffectsVariables,
-        "normal",
-        "visual-effects-accent-integration"
-      );
-    }
-  }
-
-  /**
-   * Update visual-effects with music energy using coordinated updates
-   */
-  private async updateVisualEffectsWithMusicEnergy(
-    energy: number
-  ): Promise<void> {
-    const adjustedEnergy =
-      energy * this.integrationConfig.energyResponseMultiplier;
-
-    // Update visual-effects intensity based on energy
-    const baseIntensity = 0.5;
-    const visualEffectsIntensity = Math.max(
-      0.1,
-      Math.min(1.0, baseIntensity + adjustedEnergy * 0.3)
-    );
-
-    const musicEnergyVariables: Record<string, string> = {
-      "--musical-sync-intensity": adjustedEnergy.toString(),
-      "--holographic-music-flicker-intensity": adjustedEnergy.toString(),
-      "--visual-effects-intensity": visualEffectsIntensity.toString(),
-    };
-
-    if (this.cssController) {
-      this.cssController.updateVariables(
-        musicEnergyVariables,
-        "high",
-        "visual-effects-music-energy"
-      );
-
-      // Also update visual-effects intensity using the simplified coordination method
-      this.cssController.updateVisualEffectsIntensity(
-        parseFloat(visualEffectsIntensity.toString()),
-        "DynamicCatppuccinStrategy",
-        adjustedEnergy
-      );
-    }
-  }
+  // 🔧 PHASE 7.1: CSS application methods removed - now handled by SpicetifyColorBridge
+  // The following methods have been deleted as part of pure strategy pattern implementation:
+  // - applyColorFacade() - CSS variable application moved to SpicetifyColorBridge
+  // - updateLivingBaseBackground() - Secondary color application moved to SpicetifyColorBridge
+  // - updateVisualEffectsWithAccent() - Visual effects integration moved to SpicetifyColorBridge
+  // - updateVisualEffectsWithMusicEnergy() - Music energy updates moved to SpicetifyColorBridge
+  //
+  // Strategy now focuses on:
+  // ✅ Color processing (OKLAB enhancement, selection logic)
+  // ✅ Returning enhanced ColorResult with full metadata
+  // ✅ SpicetifyColorBridge applies all CSS variables based on ColorResult metadata
 
   /**
    * Get current dynamic color state for debugging

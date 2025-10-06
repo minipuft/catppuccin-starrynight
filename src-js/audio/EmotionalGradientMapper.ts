@@ -13,8 +13,8 @@
 
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { unifiedEventBus } from "@/core/events/EventBus";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 // NOTE: SettingsManager import removed - was dead code, never used
 import {
   EmotionalTemperatureMapper,

@@ -1,16 +1,17 @@
 /**
- * Performance Manager - High-Level Performance System Management
+ * SimplePerformanceCoordinator - High-Level Performance System Management
  *
  * Provides high-level performance management functionality with backward
- * compatibility. This manager delegates to PerformanceAnalyzer
+ * compatibility. This coordinator delegates to PerformanceAnalyzer
  * for detailed performance monitoring and analysis.
  *
  * Architecture: Manager (high-level) → Coordinator (cross-system) → Controller (direct control)
  */
 
-import { PerformanceAnalyzer } from "./UnifiedPerformanceCoordinator";
+import { PerformanceAnalyzer } from "./PerformanceMonitor";
+import type { DeviceCapabilities, ThermalState, BatteryState, PerformanceMode } from './PerformanceMonitor';
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import type { Year3000Config } from "@/types/models";
 
@@ -38,15 +39,15 @@ export interface QualityScalingCapable {
 }
 
 // Re-export types for backward compatibility
-export type { DeviceCapabilities, ThermalState, BatteryState, PerformanceMode } from './UnifiedPerformanceCoordinator';
+export type { DeviceCapabilities, ThermalState, BatteryState, PerformanceMode };
 
 /**
- * Performance Manager - High-Level Performance Management
+ * SimplePerformanceCoordinator - High-Level Performance Management
  *
  * Provides high-level performance management with delegated functionality.
  * Main entry point for performance system management across the application.
  */
-export class PerformanceManager implements IManagedSystem {
+export class SimplePerformanceCoordinator implements IManagedSystem {
   public initialized = false;
   
   private unifiedCoordinator: PerformanceAnalyzer;
@@ -58,15 +59,15 @@ export class PerformanceManager implements IManagedSystem {
   ) {
     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
       console.warn(
-        '⚠️  [PerformanceManager] Direct instantiation is deprecated. ' +
-        'Use PerformanceManager.getInstance() instead. ' +
+        '⚠️  [SimplePerformanceCoordinator] Direct instantiation is deprecated. ' +
+        'Use SimplePerformanceCoordinator.getInstance() instead. ' +
         'This ensures proper system-wide performance management.'
       );
     }
 
     // Use global config for unified coordinator
     this.config = ADVANCED_SYSTEM_CONFIG as Year3000Config;
-    
+
     // Get or create unified coordinator instance
     // We'll create a simple mock coordinator if the real one doesn't exist
     try {
@@ -75,8 +76,8 @@ export class PerformanceManager implements IManagedSystem {
       // Create with self-reference for compatibility
       this.unifiedCoordinator = new PerformanceAnalyzer(this.config, this);
     }
-    
-    Y3KDebug?.debug?.log("PerformanceManager", "High-level performance management - delegating to PerformanceAnalyzer");
+
+    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "High-level performance management - delegating to PerformanceAnalyzer");
   }
 
   public async initialize(): Promise<void> {
@@ -181,11 +182,43 @@ export class PerformanceManager implements IManagedSystem {
     deviceDescription: string;
     confidence: number;
     reasoning: string[];
-    webglStatus: ReturnType<PerformanceManager['getWebGLStatus']>;
+    webglStatus: ReturnType<SimplePerformanceCoordinator['getWebGLStatus']>;
     energyBoost: boolean;
     settings: any;
   } {
     return this.unifiedCoordinator.getPerformanceSummary();
+  }
+
+  /**
+   * Get device capabilities (required by CSSVariableWriter)
+   * Delegated to PerformanceAnalyzer
+   */
+  public getDeviceCapabilities(): DeviceCapabilities {
+    return this.unifiedCoordinator.getDeviceCapabilities();
+  }
+
+  /**
+   * Get current performance mode (required by CSSVariableWriter)
+   * Delegated to PerformanceAnalyzer
+   */
+  public getCurrentPerformanceMode(): PerformanceMode {
+    return this.unifiedCoordinator.getCurrentPerformanceMode();
+  }
+
+  /**
+   * Get battery state (required by CSSVariableWriter)
+   * Delegated to PerformanceAnalyzer
+   */
+  public getBatteryState(): BatteryState | null {
+    return this.unifiedCoordinator.getBatteryState();
+  }
+
+  /**
+   * Get thermal state (required by CSSVariableWriter)
+   * Delegated to PerformanceAnalyzer
+   */
+  public getThermalState(): ThermalState | null {
+    return this.unifiedCoordinator.getThermalState();
   }
 
   // =============================================================================
@@ -197,7 +230,7 @@ export class PerformanceManager implements IManagedSystem {
    */
   public startMonitoring(): void {
     this.unifiedCoordinator.startMonitoring();
-    Y3KDebug?.debug?.log("PerformanceManager", "Monitoring started (delegated to PerformanceAnalyzer)");
+    Y3KDebug?.debug?.log("SimplePerformanceCoordinator", "Monitoring started (delegated to PerformanceAnalyzer)");
   }
 
   // =============================================================================
@@ -258,25 +291,24 @@ export class PerformanceManager implements IManagedSystem {
 // =============================================================================
 
 /**
- * @deprecated Use PerformanceManager instead
- * Backward compatibility alias for SimplePerformanceCoordinator
+ * @deprecated Use SimplePerformanceCoordinator instead
+ * Backward compatibility alias for old PerformanceManager
  */
-export const SimplePerformanceCoordinator = PerformanceManager;
-export type SimplePerformanceCoordinator = PerformanceManager;
+export const PerformanceManager = SimplePerformanceCoordinator;
 
 /**
- * Migration helper: Create PerformanceManager instance
+ * Migration helper: Create SimplePerformanceCoordinator instance
  */
-export function createPerformanceManager(): PerformanceManager {
-  return new PerformanceManager();
+export function createSimplePerformanceCoordinator(): SimplePerformanceCoordinator {
+  return new SimplePerformanceCoordinator();
 }
 
 /**
- * @deprecated Use createPerformanceManager instead
+ * @deprecated Use createSimplePerformanceCoordinator instead
  * Backward compatibility helper
  */
-export function createSimplePerformanceCoordinator(): PerformanceManager {
-  return new PerformanceManager();
+export function createPerformanceManager(): SimplePerformanceCoordinator {
+  return new SimplePerformanceCoordinator();
 }
 
 /**

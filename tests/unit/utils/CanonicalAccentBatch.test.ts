@@ -1,4 +1,4 @@
-import { AdvancedThemeSystem } from "@/core/lifecycle/AdvancedThemeSystem";
+import { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 
 // Create a simplified mock CSS Variable Batcher for testing
 class MockCSSVariableBatcher {
@@ -31,8 +31,8 @@ describe("Color pipeline emits only canonical token when legacy disabled", () =>
   it("queues only --sn-accent-* variables", () => {
     // Arrange
     const batcher = new MockCSSVariableBatcher();
-    const advancedThemeSystem = new AdvancedThemeSystem();
-    advancedThemeSystem.cssVariableBatcher = batcher as any;
+    const themeLifecycleCoordinator = new ThemeLifecycleCoordinator();
+    themeLifecycleCoordinator.cssVariableBatcher = batcher as any;
 
     // Clear any pre-existing vars on root
     document.documentElement.style.cssText = "";
@@ -44,7 +44,7 @@ describe("Color pipeline emits only canonical token when legacy disabled", () =>
     batcher.flushCSSVariableBatch();
 
     const style = document.documentElement.style;
-    // Updated to match actual variables set by AdvancedThemeSystem
+    // Updated to match actual variables set by ThemeLifecycleCoordinator
     const accentHex = style.getPropertyValue("--sn-processed-vibrant-hex").trim();
     const accentRgb = style.getPropertyValue("--sn-processed-vibrant-rgb").trim();
 

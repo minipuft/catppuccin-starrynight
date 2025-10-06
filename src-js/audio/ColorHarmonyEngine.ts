@@ -10,9 +10,9 @@ import type {
   GenreType as MusicGenre,
 } from "@/types/genre";
 import type { AnimationFrameCoordinator } from "@/core/animation/AnimationFrameCoordinator";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type {
   ColorContext,
   ColorResult,
@@ -950,8 +950,8 @@ export class OKLABColorProcessor
     cssVars[OKLABColorProcessor.CANONICAL_HEX_VAR] = result.accentHex;
     cssVars[OKLABColorProcessor.CANONICAL_RGB_VAR] = result.accentRgb;
 
-    // 🔧 CRITICAL FIX: Removed --spice-* variable setting to prevent conflicts
-    // DynamicCatppuccinBridge is now the sole owner of --spice-* variables
+    // 🔧 PHASE 7.3: Removed --spice-* variable setting to prevent conflicts
+    // SpicetifyColorBridge is now the sole owner of --spice-* variables
     // This prevents timing issues and ensures consistent color application
 
     // 🔧 CRITICAL FIX: Add gradient variables that CSS depends on

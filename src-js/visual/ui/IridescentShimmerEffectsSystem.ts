@@ -19,7 +19,7 @@ import type {
   QualityScalingCapable,
 } from "@/core/performance/SimplePerformanceCoordinator";
 import type { HealthCheckResult } from "@/types/systems";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { BaseVisualSystem } from "../base/BaseVisualSystem";
 

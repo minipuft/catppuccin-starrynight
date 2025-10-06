@@ -6,7 +6,7 @@
 // existing CSSVariableWriter to avoid excessive style recalculations.
 // ============================================================================
 
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import type { FrameContext } from "@/core/animation/AnimationFrameCoordinator";
 import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 

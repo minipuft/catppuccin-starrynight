@@ -7,7 +7,7 @@
  */
 
 import { ViewportManager, type VisibilityState, type ViewportOptions } from "@/utils/performance/ViewportAwarenessManager";
-import { unifiedEventBus, type EventHandler } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus, type EventHandler } from "@/core/events/EventBus";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 
 export interface ViewportSystemOptions extends ViewportOptions {

@@ -9,7 +9,7 @@ import type { ThemeLifecycleCoordinator } from "../../core/lifecycle/ThemeLifecy
 import type { HealthCheckResult, IManagedSystem } from "../../types/systems";
 
 // Event-driven integration imports
-import { unifiedEventBus } from "../../core/events/UnifiedEventBus";
+import { unifiedEventBus } from "../../core/events/EventBus";
 import type { ColorHarmonizedEvent } from "../../types/colorStrategy";
 
 interface SpotifyUITargets {

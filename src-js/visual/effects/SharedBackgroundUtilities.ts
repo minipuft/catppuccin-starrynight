@@ -10,7 +10,7 @@
  */
 
 import { getGlobalCSSVariableWriter, CSSVariableWriter } from "@/core/css/CSSVariableWriter";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { ShaderLoader } from "@/utils/graphics/ShaderLoader";
 import type {
   VisualEffectsCoordinator as BackgroundAnimationCoordinator,

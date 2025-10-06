@@ -5,7 +5,7 @@
  * Technical interfaces for music-synchronized visual effects.
  */
 
-import type { UnifiedEventBus } from '@/core/events/UnifiedEventBus';
+import type { UnifiedEventBus } from '@/core/events/EventBus';
 import type { SimplePerformanceCoordinator } from '@/core/performance/SimplePerformanceCoordinator';
 import type { CSSVariableWriter } from '@/core/css/CSSVariableWriter';
 

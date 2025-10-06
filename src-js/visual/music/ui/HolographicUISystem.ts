@@ -12,8 +12,8 @@ import type {
 } from "@/types/colorTypes";
 
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { unifiedEventBus } from "@/core/events/EventBus";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { settings } from "@/config";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 // IManagedSystem interface (inline definition for now)

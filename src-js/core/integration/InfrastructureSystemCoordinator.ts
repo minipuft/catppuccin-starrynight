@@ -38,13 +38,13 @@
  * - Loose coupling through facade pattern for maintainability
  *
  * Integrates with:
- * - VisualSystemCoordinator (provides infrastructure for visual systems)
+ * - VisualEffectsCoordinator (provides infrastructure for visual systems)
  * - Year3000System (main system coordinator)
  * - Performance monitoring systems (device detection, resource management)
  * - Settings and configuration systems (user preferences, theme config)
  */
 
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import * as Utils from "@/utils/core/ThemeUtilities";
 
@@ -62,7 +62,7 @@ import { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
 
 // Legacy performance imports (deprecated, for backward compatibility)
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { PerformanceAnalyzer } from "@/core/performance/UnifiedPerformanceCoordinator";
+import { PerformanceAnalyzer } from "@/core/performance/PerformanceMonitor";
 import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
 // CSS systems consolidated into CSSVariableWriter:
 // - CSSVariableWriter (batching layer)
@@ -72,7 +72,7 @@ import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetMa
 // Core Services imports
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
-import UnifiedDebugManager from "@/debug/UnifiedDebugManager";
+import UnifiedDebugManager from "@/debug/DebugCoordinator";
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { LoadingStateService } from "@/core/services/LoadingStateService";
 
@@ -575,22 +575,20 @@ export class InfrastructureSystemCoordinator {
       // Core dependency systems first
       "DeviceCapabilityDetector", // Needed by WebGL integration
       "EnhancedDeviceTierDetector", // Needed by simplified performance systems
-      
+
       // New simplified performance systems (primary) - order matters for dependencies
       "WebGLSystemsIntegration", // Depends on DeviceCapabilityDetector
       "SimplePerformanceCoordinator", // Depends on EnhancedDeviceTierDetector and WebGLSystemsIntegration
-      
+
       // Legacy performance systems (for backward compatibility)
       "PerformanceAnalyzer",
-      "PerformanceAnalyzer",
-      "SimplePerformanceCoordinator",
-      
+
       // Shared systems
       "OptimizedCSSVariableManager",
-      "SettingsManager",
+      // NOTE: SettingsManager REMOVED - using TypedSettingsManager singleton via typed settings
       "UnifiedDebugManager",
       "MusicSyncService",
-      "LoadingStateService", // Phase 8.5: Active loading state management (depends on performanceAnalyzer, settingsManager)
+      "LoadingStateService", // Phase 8.5: Active loading state management (depends on performanceAnalyzer)
     ];
 
     for (const systemKey of coreSystemsOrder) {

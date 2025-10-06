@@ -9,7 +9,7 @@
  */
 
 import { DeviceCapabilityDetector, type TierDetectionResult } from './DeviceCapabilityDetector';
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { PerformanceTier } from "./SimpleTierBasedPerformanceSystem";
 
 // Re-export types for backward compatibility

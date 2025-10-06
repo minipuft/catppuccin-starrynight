@@ -17,7 +17,7 @@
  */
 
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { ColorContext, ColorResult } from "@/types/colorStrategy";
 import { settings } from "@/config";
 import {
@@ -25,10 +25,10 @@ import {
   type ProcessingOptions,
   type MusicalColorContext,
 } from "@/utils/color/MusicalOKLABCoordinator";
-import { BackgroundStrategyRegistry } from "@/visual/strategies/BackgroundStrategyRegistry";
-import { BackgroundStrategySelector } from "@/visual/strategies/BackgroundStrategySelector";
-import { ColorHarmonyProcessor } from "@/visual/strategies/EnhancedColorOrchestrator";
-import { EventData, unifiedEventBus } from "./UnifiedEventBus";
+import { ColorStrategyRegistry } from "@/visual/strategies/ColorStrategyRegistry";
+import { ColorStrategySelector } from "@/visual/strategies/ColorStrategySelector";
+import { ColorProcessor, globalColorProcessor } from "@/core/color/ColorProcessor";
+import { EventData, unifiedEventBus } from "./EventBus";
 
 interface ColorProcessingMetrics {
   totalExtractions: number;
@@ -53,9 +53,9 @@ export class ColorEventRouter {
   private static instance: ColorEventRouter | null = null;
 
   // Core processing components
-  private colorOrchestrator: ColorHarmonyProcessor;
-  private strategySelector: BackgroundStrategySelector;
-  private strategyRegistry: BackgroundStrategyRegistry;
+  private colorOrchestrator: ColorProcessor;
+  private strategySelector: ColorStrategySelector;
+  private strategyRegistry: ColorStrategyRegistry;
   private performanceAnalyzer: SimplePerformanceCoordinator;
 
   // Unified OKLAB coordination
@@ -97,11 +97,11 @@ export class ColorEventRouter {
                                globalSystem?.facadeCoordinator?.getCachedNonVisualSystem?.('SimplePerformanceCoordinator') ||
                                globalSystem?.facadeCoordinator?.getCachedNonVisualSystem?.('PerformanceAnalyzer');
     
-    this.strategyRegistry = new BackgroundStrategyRegistry();
-    this.strategySelector = new BackgroundStrategySelector();
-    this.colorOrchestrator = new ColorHarmonyProcessor(
-      this.performanceAnalyzer
-    );
+    this.strategyRegistry = new ColorStrategyRegistry();
+    this.strategySelector = new ColorStrategySelector();
+
+    // Use global ColorProcessor singleton (replaces deprecated ColorHarmonyProcessor)
+    this.colorOrchestrator = globalColorProcessor;
 
     // Initialize unified OKLAB coordination
     this.musicalOKLABCoordinator = new MusicalOKLABProcessor(true);
@@ -721,7 +721,7 @@ export class ColorEventRouter {
   /**
    * Get strategy registry for external access
    */
-  public getStrategyRegistry(): BackgroundStrategyRegistry {
+  public getStrategyRegistry(): ColorStrategyRegistry {
     return this.strategyRegistry;
   }
 

@@ -9,9 +9,9 @@
  * - OKLAB perceptual color processing for better color harmony
  * - Progressive fallback system (WebGL → CSS → Solid Color)
  * - Better error handling and device detection
- * - Integration with BackgroundStrategySelector
+ * - Integration with ColorStrategySelector
  *
- * Migration: Use BackgroundStrategySelector with "webgl" strategy mode instead.
+ * Migration: Use ColorStrategySelector with "webgl" strategy mode instead.
  * This class will be removed in a future release after migration is complete.
  *
  * Location: src-js/visual/strategies/WebGLGradientStrategy.ts
@@ -21,10 +21,10 @@ import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
-import { unifiedEventBus, type EventData } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus, type EventData } from "@/core/events/EventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator, type QualityLevel, type QualityScalingCapable, type PerformanceMetrics, type QualityCapability } from "@/core/performance/SimplePerformanceCoordinator";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
 import { settings } from "@/config";

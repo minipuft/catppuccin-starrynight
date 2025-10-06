@@ -9,7 +9,7 @@
  */
 
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { createOptimizedCanvas, detectRenderingCapabilities, type CanvasResult, type CanvasContextType } from "@/utils/graphics/VisualCanvasFactory";
 import type {
   SystemLifecycleService,

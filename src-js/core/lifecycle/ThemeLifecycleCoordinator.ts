@@ -15,10 +15,10 @@ import { settings } from "@/config";
 
 // Color coordination imports for Strategy pattern
 import { globalColorStateManager } from "@/core/css/ColorStateManager";
-import { globalColorProcessor, globalUnifiedColorProcessingEngine } from "@/core/color/ColorProcessor";
+import { globalUnifiedColorProcessingEngine } from "@/core/color/ColorProcessor";
 
 // Event-driven integration imports
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 
 // Essential configuration imports
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
@@ -74,7 +74,7 @@ interface VisualSystemConfig {
  * @architecture Central coordinator following facade pattern
  * @see SystemIntegrationCoordinator for system access
  * @see InfrastructureSystemCoordinator for non-visual systems
- * @see VisualSystemCoordinator for visual systems
+ * @see VisualEffectsCoordinator for visual systems
  */
 export class ThemeLifecycleCoordinator {
   public ADVANCED_SYSTEM_CONFIG: Year3000Config;
@@ -367,7 +367,7 @@ export class ThemeLifecycleCoordinator {
     );
   }
   public get beatSyncVisualSystem() {
-    return this.facadeCoordinator?.getVisualSystem("MusicBeatSync") || null;
+    return this.facadeCoordinator?.getVisualSystem("MusicBeatSync" as any) || null;
   }
   public get webGLGradientBackgroundSystem() {
     return this.facadeCoordinator?.getVisualSystem("WebGLBackground") || null;
@@ -387,14 +387,14 @@ export class ThemeLifecycleCoordinator {
   }
   public get spotifyUIApplicationSystem() {
     return (
-      this.facadeCoordinator?.getVisualSystem("SpotifyUIApplication") || null
+      this.facadeCoordinator?.getVisualSystem("SpotifyUIApplication" as any) || null
     );
   }
 
   // Music Beat Synchronization System
   public get musicBeatSyncVisualEffects() {
     return (
-      this.facadeCoordinator?.getVisualSystem("MusicBeatSync") ||
+      this.facadeCoordinator?.getVisualSystem("MusicBeatSync" as any) ||
       this.beatSyncVisualSystem
     );
   }
@@ -1061,7 +1061,12 @@ export class ThemeLifecycleCoordinator {
         "UnifiedPerformanceCoordinator", // Depends on SimplePerformanceCoordinator
       ];
 
+      // 🔧 PHASE 7: ColorProcessor initialization moved to SystemIntegrationCoordinator
+      // ColorProcessor is now initialized in the services phase BEFORE MusicSyncService
+      // This ensures it subscribes to 'colors:extracted' events before they are emitted
+
       // Group 3: Event-driven systems (can initialize in parallel after dependencies)
+      // NOTE: ColorProcessor is now initialized by SystemIntegrationCoordinator BEFORE this group
       const eventDrivenSystems = [
         "MusicSyncService",
         "ColorHarmonyEngine", // 🎵 Now includes GenreProfileManager integration
@@ -1178,20 +1183,9 @@ export class ThemeLifecycleCoordinator {
 
       await Promise.all(uiPromises);
 
-      // Initialize ColorProcessor for Strategy pattern coordination
-      try {
-        await globalColorProcessor.initialize();
-        if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-          console.log(
-            "🎨 [Year3000System] ColorProcessor initialized for strategy pattern coordination"
-          );
-        }
-      } catch (error) {
-        console.error(
-          "🎨 [Year3000System] Failed to initialize ColorOrchestrator:",
-          error
-        );
-      }
+      // 🔧 NOTE: ColorProcessor initialization MOVED to _initializeFacadeSystems()
+      // It's now initialized BEFORE MusicSyncService (Group 2.5) to ensure event subscription happens first
+      // This prevents the race condition where MusicSyncService emits colors:extracted before ColorProcessor subscribes
 
       // Start performance monitoring if available
       if (this.performanceAnalyzer) {

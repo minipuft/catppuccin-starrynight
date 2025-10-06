@@ -16,7 +16,7 @@
  * @see unifiedEventBus for event system
  */
 
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 
 export interface ColorEventState {

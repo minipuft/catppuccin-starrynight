@@ -13,10 +13,10 @@
  */
 
 import { jest } from '@jest/globals';
-import { unifiedEventBus, UnifiedEventBus } from '@/core/events/UnifiedEventBus';
+import { unifiedEventBus, UnifiedEventBus } from '@/core/events/EventBus';
 
 // Mock Y3K debug
-jest.mock('@/debug/UnifiedDebugManager', () => ({
+jest.mock('@/debug/DebugCoordinator', () => ({
   Y3KDebug: {
     debug: {
       log: jest.fn(),

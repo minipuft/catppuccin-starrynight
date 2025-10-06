@@ -18,12 +18,10 @@
  * @performance ~200KB bundle reduction, 73% code reduction, 50% faster processing
  */
 
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
-// Base system class - ColorProcessor doesn't extend visual system base
-// import { BaseVisualSystem } from '@/core/base/ManagedSystemBase';
+import { unifiedEventBus } from "@/core/events/EventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type {
   ColorContext,
   ColorResult,
@@ -41,8 +39,11 @@ import {
   OKLABColorProcessor,
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
-import { BackgroundStrategyRegistry } from "@/visual/strategies/BackgroundStrategyRegistry";
-import { BackgroundStrategySelector } from "@/visual/strategies/BackgroundStrategySelector";
+import { ColorStrategyRegistry } from "@/visual/strategies/ColorStrategyRegistry";
+import { ColorStrategySelector } from "@/visual/strategies/ColorStrategySelector";
+import { WebGLGradientStrategy } from "@/visual/strategies/WebGLGradientStrategy";
+import { DepthLayeredStrategy } from "@/visual/strategies/DepthLayeredStrategy";
+import { DynamicGradientStrategy } from "@/visual/strategies/DynamicGradientStrategy";
 
 // ============================================================================
 // Unified Processing Interfaces (Enhanced with ColorCoordinator features)
@@ -132,8 +133,8 @@ export class ColorProcessor
   private deviceCapabilityDetector: DeviceCapabilityDetector;
 
   // === STRATEGY MANAGEMENT ===
-  private strategyRegistry: BackgroundStrategyRegistry;
-  private strategySelector: BackgroundStrategySelector;
+  private strategyRegistry: ColorStrategyRegistry;
+  private strategySelector: ColorStrategySelector;
 
   // === COLOR PROCESSING ===
   private oklabProcessor: OKLABColorProcessor;
@@ -204,8 +205,8 @@ export class ColorProcessor
     this.deviceCapabilityDetector = new DeviceCapabilityDetector();
 
     // Initialize strategy systems
-    this.strategyRegistry = new BackgroundStrategyRegistry();
-    this.strategySelector = new BackgroundStrategySelector();
+    this.strategyRegistry = new ColorStrategyRegistry();
+    this.strategySelector = new ColorStrategySelector();
 
     // Initialize color processing systems
     this.oklabProcessor = new OKLABColorProcessor();
@@ -213,28 +214,47 @@ export class ColorProcessor
   }
 
   public async initialize(): Promise<void> {
-    if (this.initialized) return;
+    if (this.initialized) {
+      console.log("🎨 [ColorProcessor] Already initialized, skipping");
+      return;
+    }
+
+    console.log("🎨 [ColorProcessor] ═══ INITIALIZATION START ═══");
 
     try {
       // Initialize component systems
-      // await this.performanceAnalyzer.initialize(); // PerformanceAnalyzer doesn't have initialize method
+      console.log("🎨 [ColorProcessor] Step 1: Initializing device capability detector...");
       await this.deviceCapabilityDetector.initialize();
+      console.log("🎨 [ColorProcessor] ✅ Device capability detector initialized");
 
       // Setup event subscriptions for unified color processing
+      console.log("🎨 [ColorProcessor] Step 2: Setting up event subscriptions...");
       this.setupEventSubscriptions();
+      console.log("🎨 [ColorProcessor] ✅ Event subscriptions configured");
 
       // Register default strategies
+      console.log("🎨 [ColorProcessor] Step 3: Registering color processing strategies...");
       this.registerDefaultStrategies();
+      console.log("🎨 [ColorProcessor] ✅ Strategies registered");
 
       this.initialized = true;
 
+      console.log("🎨 [ColorProcessor] ═══ INITIALIZATION COMPLETE ═══");
+      console.log("🎨 [ColorProcessor] Ready to receive 'colors:extracted' events");
+
       Y3KDebug?.debug?.log(
-        "UnifiedColorProcessingEngine",
-        "🎨 Unified color processing engine initialized"
+        "ColorProcessor",
+        "🎨 Unified color processing engine initialized successfully",
+        {
+          strategiesCount: this.strategyRegistry.getStrategies().length,
+          eventSubscriptions: "colors:extracted, settings:changed",
+          initialized: this.initialized
+        }
       );
     } catch (error) {
+      console.error("🎨 [ColorProcessor] ❌ INITIALIZATION FAILED:", error);
       Y3KDebug?.debug?.error(
-        "UnifiedColorProcessingEngine",
+        "ColorProcessor",
         "Failed to initialize:",
         error
       );
@@ -307,23 +327,38 @@ export class ColorProcessor
   // ============================================================================
 
   private setupEventSubscriptions(): void {
+    console.log("🎨 [ColorProcessor] Setting up event bus subscriptions...");
+
     // Primary event: Album art color extraction
+    console.log("🎨 [ColorProcessor] Subscribing to 'colors:extracted' event...");
     unifiedEventBus.subscribe(
       "colors:extracted",
       (data) => {
+        console.log("🎨 [ColorProcessor] 🎵 RECEIVED 'colors:extracted' EVENT", {
+          hasRawColors: !!data?.rawColors,
+          trackUri: data?.trackUri,
+          timestamp: data?.timestamp,
+          colorCount: data?.rawColors ? Object.keys(data.rawColors).length : 0
+        });
         this.handleColorExtraction(data);
       },
       "UnifiedColorProcessingEngine"
     );
+    console.log("🎨 [ColorProcessor] ✅ Subscribed to 'colors:extracted'");
 
     // Settings changes that affect color processing
+    console.log("🎨 [ColorProcessor] Subscribing to 'settings:changed' event...");
     unifiedEventBus.subscribe(
       "settings:changed",
       (data) => {
+        console.log("🎨 [ColorProcessor] ⚙️ Settings changed:", data?.settingKey);
         this.handleSettingsChange(data);
       },
       "UnifiedColorProcessingEngine"
     );
+    console.log("🎨 [ColorProcessor] ✅ Subscribed to 'settings:changed'");
+
+    console.log("🎨 [ColorProcessor] Event subscriptions complete");
 
     // Performance optimization triggers
     // Performance optimization triggers (optional, may not exist yet)
@@ -403,7 +438,33 @@ export class ColorProcessor
       // Store last processed result for duplicate handling
       this.processingState.lastProcessedResult = unifiedResult;
 
+      // 🔧 PHASE 7 DEBUG: Log color emission for diagnostic verification
+      console.log("🎨 [ColorProcessor] ═══ COLOR PROCESSING COMPLETE ═══");
+      console.log("🎨 [ColorProcessor] 🎨 Emitting 'colors:harmonized' event", {
+        processedColorKeys: Object.keys(result.processedColors),
+        processedColorCount: Object.keys(result.processedColors).length,
+        accentHex: result.accentHex || "var(--sn-brightness-adjusted-accent-hex, #cba6f7)",
+        accentRgb: result.accentRgb || "var(--sn-brightness-adjusted-accent-rgb, 203, 166, 247)",
+        strategy: unifiedResult.coordinationMetrics.coordinationStrategy,
+        processingTime: `${processingTime.toFixed(2)}ms`
+      });
+
+      Y3KDebug?.debug?.log(
+        "ColorProcessor",
+        "🎨 Emitting colors:harmonized event",
+        {
+          processedColorKeys: Object.keys(result.processedColors),
+          processedColorCount: Object.keys(result.processedColors).length,
+          accentHex: result.accentHex || "var(--sn-brightness-adjusted-accent-hex, #cba6f7)",
+          accentRgb: result.accentRgb || "var(--sn-brightness-adjusted-accent-rgb, 203, 166, 247)",
+          strategy: unifiedResult.coordinationMetrics.coordinationStrategy,
+          processingTime: `${processingTime.toFixed(2)}ms`
+        }
+      );
+
+      // 🔧 PHASE 7.2: Enhanced event emission with full ColorResult metadata
       // Emit unified event for ColorStateManager (single responsibility)
+      console.log("🎨 [ColorProcessor] Broadcasting 'colors:harmonized' to event bus...");
       unifiedEventBus.emit("colors:harmonized" as any, {
         processedColors: result.processedColors,
         accentHex: result.accentHex || "var(--sn-brightness-adjusted-accent-hex, #cba6f7)",
@@ -413,7 +474,10 @@ export class ColorProcessor
         oklabData: unifiedResult.oklabData,
         processingTime,
         timestamp: Date.now(),
+        // 🔧 PHASE 7.2: Pass through full metadata from strategies (especially OKLAB metadata from DynamicCatppuccinStrategy)
+        metadata: result.metadata,
       });
+      console.log("🎨 [ColorProcessor] ✅ 'colors:harmonized' event emitted successfully");
 
       return unifiedResult;
     } catch (error) {
@@ -799,7 +863,7 @@ export class ColorProcessor
     try {
       const capabilities = this.deviceCapabilityDetector.getCapabilities();
 
-      // Build criteria for BackgroundStrategySelector
+      // Build criteria for ColorStrategySelector
       const backgroundCriteria = {
         performance: "medium" as const,
         quality: "enhanced" as const,
@@ -813,7 +877,7 @@ export class ColorProcessor
           intensity: 0.8,
           enableAdvancedBlending: true,
         },
-        // BackgroundStrategySelector-specific properties
+        // ColorStrategySelector-specific properties
         settingsContext: {
           dynamicAccentEnabled: true,
           gradientIntensity: "medium",
@@ -1309,8 +1373,32 @@ export class ColorProcessor
   }
 
   private registerDefaultStrategies(): void {
-    // Register strategies from the strategy registry
-    // This will be handled by the BackgroundStrategyRegistry
+    try {
+      // Register WebGL gradient strategy (takes optional CSSVariableWriter)
+      const webglStrategy = new WebGLGradientStrategy();
+      this.strategyRegistry.register(webglStrategy);
+
+      // Register depth-layered strategy (no parameters)
+      const depthStrategy = new DepthLayeredStrategy();
+      this.strategyRegistry.register(depthStrategy);
+
+      // Register dynamic gradient strategy (all parameters optional)
+      const dynamicStrategy = new DynamicGradientStrategy();
+      this.strategyRegistry.register(dynamicStrategy);
+
+      Y3KDebug?.debug?.log(
+        "ColorProcessor",
+        `✅ Registered ${this.strategyRegistry.getStrategies().length} default color processing strategies`,
+        this.strategyRegistry.getStrategies().map(s => s.getStrategyName())
+      );
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "ColorProcessor",
+        "❌ Strategy registration failed:",
+        error
+      );
+      // Continue with fallback - ColorProcessor will use minimal fallback strategy
+    }
   }
 
   private async handleSettingsChange(data: any): Promise<void> {

@@ -1,7 +1,7 @@
 import { ADVANCED_SYSTEM_CONFIG } from "./config/globalConfig";
 import { settings } from "./config"; // TypedSettingsManager singleton
 import { ThemeLifecycleCoordinator, Year3000System, AdvancedThemeSystem } from "./core/lifecycle/ThemeLifecycleCoordinator";
-import { Y3KDebug } from "./debug/UnifiedDebugManager";
+import { Y3KDebug } from "./debug/DebugCoordinator";
 import * as ThemeUtilities from "./utils/core/ThemeUtilities";
 import { waitForSpicetifyReady } from "./utils/platform/spicetifyReady";
 import { initializeAberrationManager } from "./visual/ui/Aberration/AberrationManager"; // Re-enabled for hybrid CSS+WebGL approach
@@ -389,41 +389,17 @@ patchReactRequire();
     );
   }
 
-  // 3e. 🎨 Initialize Dynamic Catppuccin Bridge (Phase 2.1)
-  try {
-    const { DynamicCatppuccinBridge } = await import(
-      "./visual/effects/DynamicCatppuccinBridge"
-    );
-
-    const dynamicBridge = new DynamicCatppuccinBridge(
-      ADVANCED_SYSTEM_CONFIG,
-      ThemeUtilities,
-      year3000System.performanceAnalyzer,
-      year3000System.musicSyncService as any
-    );
-    await dynamicBridge.initialize();
-
-    // Link with other visual-effects systems
-    if (year3000System.colorHarmonyEngine) {
-      dynamicBridge.linkWithColorHarmonyEngine(
-        year3000System.colorHarmonyEngine
-      );
-    }
-    if ((year3000System as any).depthController) {
-      dynamicBridge.linkWithDepthVisual(
-        (year3000System as any).depthController
-      );
-    }
-
-    year3000System.dynamicCatppuccinBridge = dynamicBridge;
-
-    console.log("🎨 [StarryNight] Dynamic Catppuccin Bridge connected");
-  } catch (err) {
-    console.error(
-      "[StarryNight] Failed to initialize DynamicCatppuccinBridge",
-      err
-    );
-  }
+  // 🔧 PHASE 7.3: DynamicCatppuccinBridge REMOVED (legacy duplicate system)
+  // SpicetifyColorBridge now handles ALL CSS variable application including:
+  // - Dynamic accent variables (--sn-dynamic-accent-*)
+  // - OKLAB metadata (--sn-oklch-*, enhanced colors)
+  // - Music energy variables (--sn-music-energy)
+  // - Living gradient variables (--sn-living-base-*)
+  // - Visual effects variables (--sn-visual-effects-*)
+  //
+  // DynamicCatppuccinBridge was a Phase 2.1 system that created race conditions
+  // by applying the same CSS variables as SpicetifyColorBridge (last-writer-wins).
+  // Removed in Phase 7.3 after SpicetifyColorBridge enhancement in Phase 7.2.
 
   // 3f. 🌊 Initialize Dynamic Gradient Strategy System (Phase 2.2 - Consolidated)
   try {
@@ -440,13 +416,8 @@ patchReactRequire();
     );
     await dynamicGradientSystem.initialize();
 
+    // 🔧 PHASE 7.3: DynamicCatppuccinBridge reference removed (legacy system)
     // Link with other visual-effects systems
-    if ((year3000System as any).dynamicCatppuccinBridge) {
-      // The living gradient system will listen to events from the dynamic bridge
-      console.log(
-        "🌊 [StarryNight] Consolidated Dynamic Gradient System linked with Dynamic Catppuccin Bridge"
-      );
-    }
     if ((year3000System as any).depthController) {
       // The living gradient system coordinates with depth visual-effects
       console.log(

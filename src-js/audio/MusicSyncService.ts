@@ -1,5 +1,5 @@
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import { ThemeLifecycleCoordinator, Year3000System } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 import type { ColorContext } from "@/types/colorStrategy";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
@@ -1407,6 +1407,9 @@ export class MusicSyncService {
     }, this.EVENT_RESET_TIMEOUT);
 
     try {
+      console.log("🎵 [MusicSyncService] ═══ PROCESSING SONG UPDATE ═══");
+      console.log("🎵 [MusicSyncService] Track URI:", trackUri);
+
       // New track detected – clear any stale cache entries for it
       this.invalidateTrackCaches(trackUri);
       const spicetify = safeGetSpicetify();
@@ -1415,10 +1418,15 @@ export class MusicSyncService {
 
       // Phase 1 – instant colour update + provisional BPM from audio-features
       // Use Promise.allSettled for graceful degradation - continue with partial success
+      console.log("🎵 [MusicSyncService] Fetching audio features and extracting colors...");
       const results = await Promise.allSettled([
         this.getAudioFeatures(),
         this.robustColorExtraction(trackUri), // 🔧 IMPROVED: More robust color extraction
       ]);
+      console.log("🎵 [MusicSyncService] Extraction results:", {
+        audioFeaturesSuccess: results[0].status === "fulfilled",
+        colorExtractionSuccess: results[1].status === "fulfilled"
+      });
 
       const audioFeatures =
         results[0].status === "fulfilled" ? results[0].value : null;
@@ -1588,13 +1596,19 @@ export class MusicSyncService {
       }
       
       // 🎨 CRITICAL: Log event data being emitted
-      console.log("🎨 [MusicSyncService] Emitting colors:extracted event with data:", {
-        eventData,
+      console.log("🎵 [MusicSyncService] ═══ EMITTING 'colors:extracted' EVENT ═══");
+      console.log("🎵 [MusicSyncService] Event data:", {
+        trackUri: eventData.trackUri,
         rawColorKeys: eventData.rawColors ? Object.keys(eventData.rawColors) : [],
-        rawColorEntries: eventData.rawColors ? Object.entries(eventData.rawColors) : []
+        rawColorCount: eventData.rawColors ? Object.keys(eventData.rawColors).length : 0,
+        hasMusicData: !!eventData.musicData,
+        timestamp: eventData.timestamp
       });
-      
+      console.log("🎵 [MusicSyncService] Raw colors being sent:", eventData.rawColors);
+
+      console.log("🎵 [MusicSyncService] Broadcasting to event bus...");
       unifiedEventBus.emitSync("colors:extracted", eventData);
+      console.log("🎵 [MusicSyncService] ✅ Event emitted to bus");
 
       if (this.config.enableDebug) {
         console.log(

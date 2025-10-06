@@ -14,10 +14,10 @@
 // NOTE: NEBULA_INTENSITY_KEY has been removed in settings rationalization
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { settings } from "@/config"; // TypedSettingsManager singleton
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { BeatPayload } from "@/types/systems";
 import { UserGenreHistory } from "@/utils/platform/UserHistory";
 

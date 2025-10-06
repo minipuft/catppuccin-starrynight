@@ -179,7 +179,7 @@ export interface VisualEffects extends ThemeService {
   flowingLiquidSystem: any; // FluidGradientBackgroundSystem
   depthLayeredSystem: any; // DepthLayeredGradientSystem
   visualEffectsChoreographer: any; // BackgroundAnimationCoordinator
-  backgroundStrategySelector: any; // BackgroundStrategySelector
+  backgroundStrategySelector: any; // ColorStrategySelector
   
   // Service-specific coordination methods
   configureVisualEffects(config: VisualEffectConfig): Promise<VisualRenderingResult>;

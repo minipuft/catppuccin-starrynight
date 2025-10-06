@@ -6,7 +6,7 @@
  * sidebar element performance and extensible to multiple sidebar locations.
  */
 
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import {
   CSSVariableWriter,
   getGlobalCSSVariableWriter,

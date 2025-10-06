@@ -1,4 +1,4 @@
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { ThemeLifecycleCoordinator, Year3000System } from "@/core/lifecycle/ThemeLifecycleCoordinator";
@@ -380,7 +380,7 @@ export class InteractionTrackingSystem extends BaseVisualSystem {
   }
 
   // ✅ RAF LOOP CONSOLIDATION: Fallback loop removed
-  // Animation coordinator registration is now guaranteed via VisualSystemCoordinator
+  // Animation coordinator registration is now guaranteed via VisualEffectsCoordinator
   private _startFallbackAnimationLoops() {
     // No-op: Fallback no longer needed - coordinator registration is guaranteed
     this._animationRegistered = true;

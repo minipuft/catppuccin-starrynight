@@ -11,7 +11,7 @@ import * as Utils from "@/utils/core/ThemeUtilities";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { EmotionalTemperatureMapper, type EmotionalTemperatureResult } from "@/utils/color/EmotionalTemperatureMapper";
 import { OKLABColorProcessor, type EnhancementPreset } from "@/utils/color/OKLABColorProcessor";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { unifiedEventBus } from "@/core/events/EventBus";
 import type { BeatData, MusicEmotion, VisualEffectsState } from "@/types/colorTypes";
 // NOTE: QualityLevel types imported from simplified performance system
 

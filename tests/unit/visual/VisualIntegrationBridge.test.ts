@@ -1,9 +1,9 @@
 /**
- * VisualSystemCoordinator Test Suite
- * Tests for Phase 2 factory pattern implementation
+ * VisualEffectsCoordinator Test Suite
+ * Tests for Phase 2.2 consolidated factory pattern implementation
  */
 
-import { VisualSystemCoordinator, VisualSystemKey, VisualSystemConfig } from '@/visual/coordination/VisualSystemCoordinator';
+import { VisualEffectsCoordinator, VisualSystemKey, VisualSystemConfig } from '@/visual/effects/VisualEffectsCoordinator';
 import { CSSVariableWriter } from '@/core/css/CSSVariableWriter';
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { MusicSyncService } from '@/audio/MusicSyncService';
@@ -20,7 +20,7 @@ jest.mock('@/core/performance/DeviceCapabilityDetector');
 jest.mock('@/audio/MusicSyncService');
 // NOTE: SettingsManager mock removed - deleted in Phase 5, using TypedSettingsManager singleton
 jest.mock('@/audio/ColorHarmonyEngine');
-jest.mock('@/core/performance/UnifiedPerformanceCoordinator');
+jest.mock('@/core/performance/PerformanceMonitor');
 
 // Mock visual systems
 jest.mock('@/visual/effects/UnifiedParticleSystem');
@@ -32,7 +32,7 @@ jest.mock('@/visual/ui/SpotifyUIApplicationSystem');
 jest.mock('@/core/animation/EnhancedMasterAnimationCoordinator');
 
 // Mock debug system
-jest.mock('@/debug/UnifiedDebugManager', () => ({
+jest.mock('@/debug/DebugCoordinator', () => ({
   Y3K: {
     debug: {
       log: jest.fn(),
@@ -52,9 +52,9 @@ Object.defineProperty(window, 'performance', {
   }
 });
 
-describe('VisualSystemCoordinator', () => {
-  let bridge: VisualSystemCoordinator;
-  let mockCSSVariableBatcher: jest.Mocked<CSSVariableBatcher>;
+describe('VisualEffectsCoordinator', () => {
+  let bridge: VisualEffectsCoordinator;
+  let mockCSSVariableWriter: jest.Mocked<CSSVariableWriter>;
   let mockPerformanceAnalyzer: jest.Mocked<SimplePerformanceCoordinator>;
   let mockMusicSyncService: jest.Mocked<MusicSyncService>;
   // NOTE: mockSettingsManager removed - deleted in Phase 5, using TypedSettingsManager singleton
@@ -64,11 +64,11 @@ describe('VisualSystemCoordinator', () => {
   beforeEach(() => {
     // Reset mocks
     jest.clearAllMocks();
-    
+
     // Create mock instances with jest.fn()
-    mockCSSVariableBatcher = {
-      queueCSSVariableUpdate: jest.fn(),
-      setProperty: jest.fn(),
+    mockCSSVariableWriter = {
+      setVariable: jest.fn(),
+      getVariable: jest.fn(),
       destroy: jest.fn()
     } as any;
     
@@ -110,11 +110,11 @@ describe('VisualSystemCoordinator', () => {
     };
 
     // Create bridge instance
-    bridge = new VisualSystemCoordinator(
+    bridge = new VisualEffectsCoordinator(
       ADVANCED_SYSTEM_CONFIG,
       Utils,
       mockAdvancedThemeSystem,
-      mockCSSVariableBatcher,
+      mockCSSVariableWriter,
       mockPerformanceAnalyzer,
       mockMusicSyncService,
       // NOTE: settingsManager parameter removed - deleted in Phase 5, using TypedSettingsManager singleton
@@ -124,7 +124,7 @@ describe('VisualSystemCoordinator', () => {
 
   describe('Construction and Initialization', () => {
     it('should initialize with correct dependencies', () => {
-      expect(bridge).toBeInstanceOf(VisualSystemCoordinator);
+      expect(bridge).toBeInstanceOf(VisualEffectsCoordinator);
       expect(bridge.getSystemStatus().initialized).toBe(false);
     });
 
@@ -137,7 +137,7 @@ describe('VisualSystemCoordinator', () => {
       await bridge.initialize();
       
       expect(bridge.getSystemStatus().initialized).toBe(true);
-      expect(mockCSSVariableBatcher.queueCSSVariableUpdate).toHaveBeenCalledWith(
+      expect(mockCSSVariableWriter.setVariable).toHaveBeenCalledWith(
         '--sn-visual-bridge-active',
         '1'
       );
@@ -218,17 +218,17 @@ describe('VisualSystemCoordinator', () => {
       const system = bridge.getVisualSystem<IManagedSystem>('MusicBeatSync');
       
       expect(system).toBeDefined();
-      // Note: In real implementation, we'd check if setCSSVariableBatcher was called
+      // Note: In real implementation, we'd check if setCSSVariableWriter was called
     });
 
     it('should inject event bus when available', () => {
       const mockEventBus = { subscribe: jest.fn(), emit: jest.fn() };
 
-      const bridgeWithEventBus = new VisualSystemCoordinator(
+      const bridgeWithEventBus = new VisualEffectsCoordinator(
         ADVANCED_SYSTEM_CONFIG,
         Utils,
         mockAdvancedThemeSystem,
-        mockCSSVariableBatcher,
+        mockCSSVariableWriter,
         mockPerformanceAnalyzer,
         mockMusicSyncService,
         // NOTE: settingsManager parameter removed - deleted in Phase 5, using TypedSettingsManager singleton
@@ -445,7 +445,7 @@ describe('VisualSystemCoordinator', () => {
       await bridge.destroy();
       
       expect(bridge.getSystemStatus().initialized).toBe(false);
-      expect(mockCSSVariableBatcher.queueCSSVariableUpdate).toHaveBeenCalledWith(
+      expect(mockCSSVariableWriter.setVariable).toHaveBeenCalledWith(
         '--sn-visual-bridge-active',
         '0'
       );

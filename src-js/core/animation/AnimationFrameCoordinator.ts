@@ -1,6 +1,6 @@
-import { PerformanceAnalyzer } from '@/core/performance/UnifiedPerformanceCoordinator';
+import { PerformanceAnalyzer } from '@/core/performance/PerformanceMonitor';
 import { CSSVariableWriter } from '@/core/css/CSSVariableWriter';
-import { unifiedEventBus } from '@/core/events/UnifiedEventBus';
+import { unifiedEventBus } from '@/core/events/EventBus';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import { temporalMemoryService } from "@/audio/TemporalMemoryService";
 import type { AdvancedSystemConfig, Year3000Config, MultiplierProfile } from '@/types/models';

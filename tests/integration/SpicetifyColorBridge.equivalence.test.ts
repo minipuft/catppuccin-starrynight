@@ -18,18 +18,18 @@
  */
 
 import { SpicetifyColorBridge } from "@/utils/spicetify/SpicetifyColorBridge";
-import { UnifiedCSSVariableManager } from "@/core/css/UnifiedCSSVariableManager";
-import { unifiedEventBus } from "@/core/events/UnifiedEventBus";
+import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { unifiedEventBus } from "@/core/events/EventBus";
 
 describe("SpicetifyColorBridge Behavioral Equivalence", () => {
   let spicetifyBridge: SpicetifyColorBridge;
-  let cssController: UnifiedCSSVariableManager;
+  let cssController: CSSVariableWriter;
 
   beforeEach(async () => {
     // Setup DOM
     document.documentElement.style.setProperty = jest.fn();
 
-    cssController = new UnifiedCSSVariableManager({
+    cssController = new CSSVariableWriter({
       enableDebug: false,
       batchDelay: 0,
       enablePerformanceMonitoring: false
@@ -263,7 +263,7 @@ describe("SpicetifyColorBridge Behavioral Equivalence", () => {
       spicetifyBridge.updateWithAlbumColors(testInput);
     });
 
-    test("UnifiedCSSVariableManager coordination pattern", () => {
+    test("CSSVariableWriter coordination pattern", () => {
       const testInput = {
         'OKLAB_PRIMARY': '#c6a0f6'
       };

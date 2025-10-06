@@ -1,15 +1,15 @@
 /**
- * BackgroundStrategyRegistry - Centralized Strategy Management
+ * ColorStrategyRegistry - Centralized Color Strategy Management
  *
- * Manages registration, discovery, and coordination of all background color
- * processing strategies. Provides a centralized registry for strategy
- * management with performance monitoring and health checking.
+ * Manages registration, discovery, and coordination of all color processing
+ * strategies (accents, backgrounds, effects, palettes). Provides centralized
+ * strategy management with performance monitoring and health checking.
  *
- * Philosophy: "A technical library of transformation algorithms - each strategy
- * a unique expression of color visual-effects, waiting to be awakened."
+ * Scope: Complete color pipeline including accent colors, backgrounds,
+ * visual effects, OKLAB coordination, and music-responsive harmonization.
  */
 
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type {
   IColorProcessor,
   IColorStrategyRegistry,
@@ -43,7 +43,7 @@ interface RegistryMetrics {
   memoryUsage: number;
 }
 
-export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
+export class ColorStrategyRegistry implements IColorStrategyRegistry {
   private strategiesMap = new Map<string, StrategyRegistration>();
 
   // Performance monitoring
@@ -65,7 +65,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
     this.startHealthMonitoring();
 
     Y3KDebug?.debug?.log(
-      "BackgroundStrategyRegistry",
+      "ColorStrategyRegistry",
       "Strategy registry initialized"
     );
   }
@@ -78,7 +78,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
 
     if (this.strategiesMap.has(strategyName)) {
       Y3KDebug?.debug?.warn(
-        "BackgroundStrategyRegistry",
+        "ColorStrategyRegistry",
         `Strategy ${strategyName} is already registered, replacing...`
       );
     }
@@ -99,7 +99,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
       this.updateMetrics();
 
       Y3KDebug?.debug?.log(
-        "BackgroundStrategyRegistry",
+        "ColorStrategyRegistry",
         `Registered strategy: ${strategyName}`,
         {
           category: registration.metadata.category,
@@ -109,7 +109,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
       );
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "BackgroundStrategyRegistry",
+        "ColorStrategyRegistry",
         `Failed to register strategy ${strategyName}:`,
         error
       );
@@ -129,7 +129,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
 
     if (availableStrategies.length === 0) {
       Y3KDebug?.debug?.warn(
-        "BackgroundStrategyRegistry",
+        "ColorStrategyRegistry",
         "No healthy strategies available"
       );
       return null;
@@ -138,7 +138,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
     const selectedStrategy = availableStrategies[0];
     if (!selectedStrategy) {
       Y3KDebug?.debug?.warn(
-        "BackgroundStrategyRegistry",
+        "ColorStrategyRegistry",
         "No strategies available after filtering"
       );
       return null;
@@ -147,7 +147,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
     this.recordStrategyUsage(selectedStrategy.strategy.getStrategyName());
 
     Y3KDebug?.debug?.log(
-      "BackgroundStrategyRegistry",
+      "ColorStrategyRegistry",
       `Selected strategy: ${selectedStrategy.strategy.getStrategyName()}`,
       {
         score: this.scoreStrategy(selectedStrategy, criteria),
@@ -203,7 +203,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
     );
 
     Y3KDebug?.debug?.log(
-      "BackgroundStrategyRegistry",
+      "ColorStrategyRegistry",
       `Selected ${selectedStrategies.length} strategies`,
       {
         strategies: selectedStrategies.map((s) => s.getStrategyName()),
@@ -405,7 +405,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
       if (errorRate > 0.5 && registration.usageCount > 5) {
         registration.isHealthy = false;
         Y3KDebug?.debug?.warn(
-          "BackgroundStrategyRegistry",
+          "ColorStrategyRegistry",
           `Strategy ${strategyName} marked as unhealthy`,
           {
             errorRate,
@@ -462,7 +462,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
 
             if (!registration.isHealthy) {
               Y3KDebug?.debug?.warn(
-                "BackgroundStrategyRegistry",
+                "ColorStrategyRegistry",
                 `Strategy ${name} failed health check:`,
                 healthResult
               );
@@ -471,7 +471,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
         } catch (error) {
           registration.isHealthy = false;
           Y3KDebug?.debug?.error(
-            "BackgroundStrategyRegistry",
+            "ColorStrategyRegistry",
             `Health check failed for strategy ${name}:`,
             error
           );
@@ -481,7 +481,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
       this.updateMetrics();
     } catch (error) {
       Y3KDebug?.debug?.error(
-        "BackgroundStrategyRegistry",
+        "ColorStrategyRegistry",
         "Health check monitoring failed:",
         error
       );
@@ -562,7 +562,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
     if (success) {
       this.updateMetrics();
       Y3KDebug?.debug?.log(
-        "BackgroundStrategyRegistry",
+        "ColorStrategyRegistry",
         `Unregistered strategy: ${strategyName}`
       );
     }
@@ -576,7 +576,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
     this.strategiesMap.clear();
     this.updateMetrics();
     Y3KDebug?.debug?.log(
-      "BackgroundStrategyRegistry",
+      "ColorStrategyRegistry",
       "All strategies cleared from registry"
     );
   }
@@ -601,7 +601,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
           (registration.strategy as any).destroy();
         } catch (error) {
           Y3KDebug?.debug?.warn(
-            "BackgroundStrategyRegistry",
+            "ColorStrategyRegistry",
             `Error destroying strategy ${name}:`,
             error
           );
@@ -612,7 +612,7 @@ export class BackgroundStrategyRegistry implements IColorStrategyRegistry {
     this.clear();
 
     Y3KDebug?.debug?.log(
-      "BackgroundStrategyRegistry",
+      "ColorStrategyRegistry",
       "Strategy registry destroyed"
     );
   }

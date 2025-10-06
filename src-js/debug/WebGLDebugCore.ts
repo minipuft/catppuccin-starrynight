@@ -10,7 +10,7 @@
  * @performance Minimal overhead, on-demand testing only
  */
 
-import { Y3KDebug } from "./UnifiedDebugManager";
+import { Y3KDebug } from "./DebugCoordinator";
 
 // Runtime utility for safe Spicetify access
 function isSpicetifyAvailable(): boolean {

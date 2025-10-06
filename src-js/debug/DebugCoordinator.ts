@@ -1,10 +1,9 @@
 /**
- * UnifiedDebugManager - Consolidated Debug System for Year 3000 Architecture
+ * DebugCoordinator - Consolidated Debug System for Year 3000 Architecture
  *
  * Replaces the scattered debug systems (SystemHealthMonitor, SystemIntegrationTester,
- * PerformanceRegressionTester, OrganicConsciousnessVerification) with a single,
- * streamlined debug interface that properly integrates with ManagedSystemBase
- * and provides meaningful console output.
+ * PerformanceRegressionTester) with a single, streamlined debug interface that
+ * properly integrates with ManagedSystemBase and provides meaningful console output.
  *
  * @architecture Year3000System unified architecture integration
  * @performance <0.5% CPU overhead for debug operations
@@ -58,8 +57,8 @@ export interface DebugConfig {
 // UNIFIED DEBUG MANAGER
 // =========================================================================
 
-export class UnifiedDebugManager {
-  private static instance: UnifiedDebugManager;
+export class DebugCoordinator {
+  private static instance: DebugCoordinator;
   private config: DebugConfig;
   private registeredSystems: Map<string, SystemDebugInfo> = new Map();
   private reportHistory: DebugReport[] = [];
@@ -79,17 +78,17 @@ export class UnifiedDebugManager {
     };
 
     if (this.config.enableConsoleReporting) {
-      console.log("🔧 [UnifiedDebugManager] Debug system initialized");
+      console.log("🔧 [DebugCoordinator] Debug system initialized");
     }
   }
 
   public static getInstance(
     config?: Partial<DebugConfig>
-  ): UnifiedDebugManager {
-    if (!UnifiedDebugManager.instance) {
-      UnifiedDebugManager.instance = new UnifiedDebugManager(config);
+  ): DebugCoordinator {
+    if (!DebugCoordinator.instance) {
+      DebugCoordinator.instance = new DebugCoordinator(config);
     }
-    return UnifiedDebugManager.instance;
+    return DebugCoordinator.instance;
   }
 
   // =========================================================================
@@ -658,7 +657,7 @@ export class UnifiedDebugManager {
    */
   public destroy(): void {
     this.reset();
-    UnifiedDebugManager.instance = null as any;
+    DebugCoordinator.instance = null as any;
   }
 }
 
@@ -676,7 +675,7 @@ export const Y3KDebug = {
     error: (component: string, message: string, error?: any) => {
       console.error(`[${component}] ${message}`, error);
       // Record as issue in debug manager
-      const debugManager = UnifiedDebugManager.getInstance();
+      const debugManager = DebugCoordinator.getInstance();
       debugManager.recordIssue(
         component,
         `${message}${error ? `: ${error}` : ""}`
@@ -685,27 +684,27 @@ export const Y3KDebug = {
     warn: (component: string, message: string, ...args: any[]) => {
       console.warn(`[${component}] ${message}`, ...args);
       // Record as issue in debug manager
-      const debugManager = UnifiedDebugManager.getInstance();
+      const debugManager = DebugCoordinator.getInstance();
       debugManager.recordIssue(component, message);
     },
     metric: (system: string, metric: string, value: number) => {
-      const debugManager = UnifiedDebugManager.getInstance();
+      const debugManager = DebugCoordinator.getInstance();
       debugManager.recordMetric(system, metric, value);
     },
     register: (name: string, system: any, type?: SystemDebugInfo["type"]) => {
-      const debugManager = UnifiedDebugManager.getInstance();
+      const debugManager = DebugCoordinator.getInstance();
       debugManager.registerSystem(name, system, type);
     },
     unregister: (name: string) => {
-      const debugManager = UnifiedDebugManager.getInstance();
+      const debugManager = DebugCoordinator.getInstance();
       debugManager.unregisterSystem(name);
     },
     checkHealth: () => {
-      const debugManager = UnifiedDebugManager.getInstance();
+      const debugManager = DebugCoordinator.getInstance();
       return debugManager.checkHealth();
     },
     getReport: () => {
-      const debugManager = UnifiedDebugManager.getInstance();
+      const debugManager = DebugCoordinator.getInstance();
       return debugManager.getLatestReport();
     },
   },
@@ -717,13 +716,15 @@ export const Y3KDebug = {
 
 // Make debug manager available globally for console access
 if (typeof window !== "undefined") {
-  (window as any).UnifiedDebugManager = UnifiedDebugManager;
+  (window as any).DebugCoordinator = DebugCoordinator;
+  (window as any).UnifiedDebugManager = DebugCoordinator; // Backward compatibility alias
   (window as any).Y3K = Y3KDebug;
 
-  console.log("🔧 [UnifiedDebugManager] Global debug interface available:");
+  console.log("🔧 [DebugCoordinator] Global debug interface available:");
   console.log("  Y3K.debug.checkHealth() - Check system health");
   console.log("  Y3K.debug.getReport() - Get latest debug report");
-  console.log("  UnifiedDebugManager.getInstance() - Get debug manager");
+  console.log("  DebugCoordinator.getInstance() - Get debug manager");
 }
 
-export default UnifiedDebugManager;
+export default DebugCoordinator;
+export { DebugCoordinator as UnifiedDebugManager }; // Backward compatibility export

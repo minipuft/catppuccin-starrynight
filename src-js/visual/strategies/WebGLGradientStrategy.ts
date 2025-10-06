@@ -12,7 +12,7 @@
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type {
   ColorContext,
   ColorResult,
@@ -269,11 +269,11 @@ interface WebGLFlowSettings {
  * 3. WebGLSystemInterface - Quality scaling and performance coordination
  *
  * This triple-interface approach enables:
- * - Color Processing Layer: BackgroundStrategySelector → WebGLGradientStrategy (IColorProcessor)
- * - Visual System Layer: VisualSystemCoordinator → WebGLGradientStrategy (IManagedSystem)
+ * - Color Processing Layer: ColorStrategySelector → WebGLGradientStrategy (IColorProcessor)
+ * - Visual System Layer: VisualEffectsCoordinator → WebGLGradientStrategy (IManagedSystem)
  * - Quality Scaling Layer: UnifiedWebGLController → WebGLGradientStrategy (WebGLSystemInterface)
  *
- * Phase 3 optimization: Direct quality scaling communication eliminates event bus overhead.
+ * Phase 2.2 optimization: Direct quality scaling communication eliminates event bus overhead.
  */
 export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, WebGLSystemInterface {
   // IManagedSystem property
@@ -610,7 +610,7 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
    * Initialize the WebGL gradient system (IManagedSystem)
    *
    * This method provides the standard IManagedSystem initialization interface
-   * for use by VisualSystemCoordinator. It wraps the internal initialization
+   * for use by VisualEffectsCoordinator. It wraps the internal initialization
    * logic and manages the initialized state.
    */
   public async initialize(): Promise<void> {

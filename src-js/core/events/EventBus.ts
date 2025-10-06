@@ -1,14 +1,14 @@
 /**
- * UnifiedEventBus - Single Source of Truth for All Theme Events
+ * EventBus - Single Source of Truth for All Theme Events
  *
- * Replaces the fragmented event system with a unified, efficient event pipeline
- * that eliminates duplication, provides type safety, and ensures proper cleanup.
+ * Provides a unified, efficient event pipeline that eliminates duplication,
+ * ensures type safety, and handles proper cleanup.
  *
- * Architecture: Unified event coordination for all theme systems with type safety,
+ * Architecture: Event coordination for all theme systems with type safety,
  * performance optimization, and proper resource management.
  */
 
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { VisualEffectsState } from "@/types/colorTypes";
 
 // ============================================================================
@@ -439,8 +439,8 @@ interface EventMetrics {
 // UnifiedEventBus Implementation
 // ============================================================================
 
-export class UnifiedEventBus {
-  private static instance: UnifiedEventBus | null = null;
+export class EventBus {
+  private static instance: EventBus | null = null;
 
   // Event subscriptions registry
   private subscriptions = new Map<EventName, Map<string, EventSubscription<any>>>();
@@ -478,11 +478,11 @@ export class UnifiedEventBus {
   /**
    * Get singleton instance
    */
-  public static getInstance(): UnifiedEventBus {
-    if (!UnifiedEventBus.instance) {
-      UnifiedEventBus.instance = new UnifiedEventBus();
+  public static getInstance(): EventBus {
+    if (!EventBus.instance) {
+      EventBus.instance = new EventBus();
     }
-    return UnifiedEventBus.instance;
+    return EventBus.instance;
   }
 
   /**
@@ -933,7 +933,7 @@ export class UnifiedEventBus {
 
     Y3KDebug?.debug?.log("UnifiedEventBus", "Unified event bus destroyed");
 
-    UnifiedEventBus.instance = null;
+    EventBus.instance = null;
   }
 }
 
@@ -941,4 +941,7 @@ export class UnifiedEventBus {
 // Global Instance Export
 // ============================================================================
 
-export const unifiedEventBus = UnifiedEventBus.getInstance();
+export const unifiedEventBus = EventBus.getInstance();
+
+// Backward compatibility alias
+export { EventBus as UnifiedEventBus };

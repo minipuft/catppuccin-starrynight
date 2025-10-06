@@ -9,7 +9,7 @@
  * transitions that respect human visual perception and enhance aesthetic visual-effects."
  */
 
-import { Y3KDebug } from "@/debug/UnifiedDebugManager";
+import { Y3KDebug } from "@/debug/DebugCoordinator";
 import * as Utils from "@/utils/core/ThemeUtilities";
 
 export interface OKLABColor {
